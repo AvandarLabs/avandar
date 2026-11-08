@@ -853,6 +853,10 @@ msgstr "Quarter"
 msgid "1 person"
 msgstr "1 person"
 
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period for {fieldName}"
+msgstr "Period for {fieldName}"
+
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
@@ -2536,6 +2540,10 @@ msgstr "Unsupported file type"
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column"
+msgstr "Date column"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Are you sure you want to remove this user from the workspace?"
@@ -4112,6 +4120,10 @@ msgstr "Registration requires an internet connection."
 msgid "There are no values"
 msgstr "There are no values"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column for {fieldName}"
+msgstr "Date column for {fieldName}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Show more"
 msgstr "Show more"
@@ -4724,6 +4736,10 @@ msgstr "Clear log"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet is too large"
 msgstr "Google Sheet is too large"
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Choose a date column"
+msgstr "Choose a date column"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -6918,6 +6934,10 @@ msgstr "Rename layer"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Request a feature"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period"
+msgstr "Period"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
@@ -10584,6 +10604,10 @@ msgstr "Annual"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "anyone with "
 msgstr "anyone with "
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "This dataset has no date column"
+msgstr "This dataset has no date column"
 
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "

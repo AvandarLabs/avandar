@@ -852,6 +852,10 @@ msgstr "الربع"
 msgid "1 person"
 msgstr "شخص واحد"
 
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period for {fieldName}"
+msgstr "الفترة لـ {fieldName}"
+
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
@@ -2538,6 +2542,10 @@ msgstr "نوع الملف غير مدعوم"
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "تعذّر رسم {droppedRowCount} من أصل {totalRowCount} صفًا على الخريطة"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column"
+msgstr "عمود التاريخ"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "هل أنت متأكد أنك تريد إزالة هذا المستخدم من مساحة العمل؟"
@@ -4111,6 +4119,10 @@ msgstr "يتطلب التسجيل اتصالاً بالإنترنت."
 msgid "There are no values"
 msgstr "لا توجد قيم"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column for {fieldName}"
+msgstr "عمود التاريخ لـ {fieldName}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Show more"
 msgstr "إظهار المزيد"
@@ -4722,6 +4734,10 @@ msgstr "مسح السجل"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet is too large"
 msgstr "جدول Google كبير جدًا"
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Choose a date column"
+msgstr "اختر عمود تاريخ"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -6909,6 +6925,10 @@ msgstr "إعادة تسمية الطبقة"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "طلب ميزة"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period"
+msgstr "الفترة"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
@@ -10568,6 +10588,10 @@ msgstr "سنوي"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "anyone with "
 msgstr "أي شخص لديه "
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "This dataset has no date column"
+msgstr "لا تحتوي مجموعة البيانات هذه على عمود تاريخ"
 
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "

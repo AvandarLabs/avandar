@@ -862,6 +862,10 @@ msgstr "Robo mwaka"
 msgid "1 person"
 msgstr "Mtu 1"
 
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period for {fieldName}"
+msgstr "Kipindi cha {fieldName}"
+
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
@@ -2569,6 +2573,10 @@ msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "Safu {droppedRowCount} kati ya {totalRowCount} hazikuweza kuwekwa "
 "kwenye ramani"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column"
+msgstr "Safu ya tarehe"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Je, uko tayari kumuondoa mtumiaji huyu katika eneo la kazi?"
@@ -4163,6 +4171,10 @@ msgstr "Usajili unahitaji muunganisho wa intaneti."
 msgid "There are no values"
 msgstr "Hakuna thamani"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column for {fieldName}"
+msgstr "Safu ya tarehe ya {fieldName}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Show more"
 msgstr "Onyesha zaidi"
@@ -4782,6 +4794,10 @@ msgstr "Futa kumbukumbu"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet is too large"
 msgstr "Google Sheet ni kubwa sana"
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Choose a date column"
+msgstr "Chagua safu ya tarehe"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -6991,6 +7007,10 @@ msgstr "Badilisha jina la safu"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Omba kipengele"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period"
+msgstr "Kipindi"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
@@ -10684,6 +10704,10 @@ msgstr "Mwaka"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "anyone with "
 msgstr "mtu yeyote mwenye "
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "This dataset has no date column"
+msgstr "Seti hii ya data haina safu ya tarehe"
 
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "

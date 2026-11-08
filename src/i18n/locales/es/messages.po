@@ -863,6 +863,10 @@ msgstr "Trimestre"
 msgid "1 person"
 msgstr "1 persona"
 
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period for {fieldName}"
+msgstr "Período de {fieldName}"
+
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
@@ -2580,6 +2584,10 @@ msgstr "Tipo de archivo no soportado"
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "No se pudieron mapear {droppedRowCount} de {totalRowCount} filas"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column"
+msgstr "Columna de fecha"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "¿Estás seguro de que deseas eliminar a este usuario del espacio de "
@@ -4178,6 +4186,10 @@ msgstr "El registro requiere una conexión a internet."
 msgid "There are no values"
 msgstr "No hay valores"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column for {fieldName}"
+msgstr "Columna de fecha de {fieldName}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Show more"
 msgstr "Mostrar más"
@@ -4799,6 +4811,10 @@ msgstr "Limpiar registro"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google Sheet is too large"
 msgstr "La Google Sheet es demasiado grande"
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Choose a date column"
+msgstr "Elige una columna de fecha"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -7017,6 +7033,10 @@ msgstr "Cambiar nombre de la capa"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Solicitar una función"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period"
+msgstr "Período"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
@@ -10735,6 +10755,10 @@ msgstr "Anual"
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "anyone with "
 msgstr "cualquiera con "
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "This dataset has no date column"
+msgstr "Este conjunto de datos no tiene ninguna columna de fecha"
 
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
