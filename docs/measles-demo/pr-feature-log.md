@@ -74,6 +74,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F22 | AI harness audit: 15 chat and Data Explorer bug fixes and 8 harness improvements | not started | none (see its section for order within it) | |
 | F23 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
 | F24 | ODC listing data preview and full-screen detail | not started | F12, F16, F19, F23 | |
+| F27 | Pipeline runs pace their writes to the database and retry transient failures | not started | F4, F11, F23 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -105,7 +106,8 @@ API. It's new work, not something this branch built.
 | any | F22 | Chat and Data Explorer code that every other feature leaves alone. Its own PRs go in the order its section gives. |
 | 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
 | 15 | F24 | Adds the data preview and full-screen modal to the detail pane F19 built and F23 regrouped. Merge after both. |
-| 16 | F9 | Last, because the docs describe the merged features. |
+| 16 | F27 | Rewrites the write loop in `loadRelationsPage` that F4 built and F23's byte cap changed, and adds a stage to the progress events F11 added. Merge after F23. |
+| 17 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -1317,7 +1319,8 @@ commits belong to the features that own them, not here.
 | `d50583f7e` | fix(socrata): read a health dataset's office from either metadata key | All of it |
 | `7f2d6dc8e` | fix(hdx): map topics, data source, coverage dates, and caveats | All of it. Supersedes `bcac141e7`'s `domains` mapping: HDX's groups (countries) become keywords, and topics come from `hdxTopics`' tag-to-topic table. |
 | `d9c3bf6c0` | fix(hdx): store each listing's package with only its own resource | All of it. Without it, a package's write grows with the square of its resource count (each listing stored every resource), which ran the demo database out of memory on WHO's country packages. |
-| `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. |
+| `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. F27 replaces its fixed cap with the throttle's budget. |
+| `c75d19331` | fix(hdx): leave license text and file check reports out of source_metadata | All of it. On demo, `license_other` and `fs_check_info` were 55% of HDX's raw JSON. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1597,6 +1600,86 @@ pnpm --filter @avandar/ava-cli test
 
 ---
 
+## F27: Pipeline runs pace their writes to the database and retry transient failures
+
+**Purpose:** A pipeline run sent fixed-size writes as fast as the database
+answered and stopped at the first slow or failed request. On demo (Micro
+compute) two HDX runs stopped partway: a 100 MB write ran the database out
+of memory, and later 4 MB writes stalled or timed out once the database fell
+behind. Now each crawl has a write throttle (`createWriteThrottle`) that
+grows its byte budget after fast writes, halves it and pauses after slow
+ones, and after a transient failure quarters it, waits with exponential
+backoff, and retries. A Supabase store marks a failure a retry can fix as
+`EtlTransientStoreError` (no response, 408, 429, 5xx, statement or lock
+timeout, connection errors). Reads, write batches, checkpoint reads and
+writes, the drive row, and the run's history all retry. A failed batch is
+retried from the same listing, so every listing is written once and in
+order. `ava pipeline run` prints each retry and slow write. **Value:** A
+slow database slows a run down instead of stopping it, the database is not
+pushed into a crash, and no data is lost: only the 8th transient failure in
+a row stops a crawl, with its checkpoint intact. Design:
+`docs/measles-demo/etl-adaptive-write-throttle.md` (goes with F9).
+
+**PR title:** `feat(etl): pace pipeline writes to the database and retry transient failures`
+
+**Depends on:** F4 (the listings store and `loadRelationsPage`), F11 (the
+progress events it adds a stage to), and F23 (whose 4 MiB cap it replaces).
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `4dc0c52d5` | feat(etl): mark store failures a retry can fix as EtlTransientStoreError | All of it |
+| `d9f53c30b` | feat(etl): pace store writes to the database and retry transient failures | All of it |
+| `59ded1ac8` | feat(ava-cli): print when a pipeline run slows its writes or retries one | All of it |
+| `aa5eefaa6` | fix(etl): retry a crawl's drive row write when it fails transiently | All of it |
+| `0a828d45c` | fix(etl): retry run history writes that fail transiently | All of it |
+| `2a627e438` | docs(etl): describe how pipeline runs pace writes and retry failures | `MIXED`: `apps/pipeline-server/README.md` goes here. `docs/measles-demo/etl-adaptive-write-throttle.md` goes with F9. |
+
+**Files:** `packages/node/etl/src/EtlEngine/writeThrottle/`,
+`packages/node/etl/src/stores/EtlTransientStoreError.ts`,
+`throwOnSupabaseError/` and its new test, the four `Supabase*Store` files
+(each passes the response `status`), `createNeverFatalExecutionStore/`,
+`loadRelationsPage/`, `crawlScope/crawlScope.ts`, `createEtlEngine/`,
+`createRunProgressReporter/`, `recordRunExecution/createRunExecutionRecorder.ts`,
+`crawlMetrics/crawlMetrics.ts` (`SYSTEM_CLOCK.sleep`), `EtlEngine.types.ts`
+(`EtlClock.sleep`, the `write_throttled` stage), `src/index.ts`, and the
+`@avandar/etl` README; `apps/ava-cli/src/PipelineCli/PipelineRunProgress/`;
+and the pacing paragraph of `apps/pipeline-server/README.md`.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/etl test
+pnpm --filter @avandar/pipeline-server test
+pnpm --filter @avandar/ava-cli test
+pnpm exec tsc -b --force --noEmit
+pnpm build:ava-cli
+```
+Then, on a switched local stack only, give the role PostgREST connects as a
+short statement timeout, run a pipeline, and re-run it with the timeout
+restored: the re-run must write nothing and find every listing unchanged.
+```sh
+psql "$LOCAL_DB_URL" -c "alter role authenticator set statement_timeout = '60ms'" \
+  -c "select pg_terminate_backend(pid) from pg_stat_activity where usename = 'authenticator'"
+ava pipeline run hdx --local --scope format:csv --since 2026-10-14T00:00:00Z --until 2026-11-01T00:00:00Z --limit 400
+psql "$LOCAL_DB_URL" -c "alter role authenticator set statement_timeout = '8s'" \
+  -c "select pg_terminate_backend(pid) from pg_stat_activity where usename = 'authenticator'"
+ava pipeline run hdx --local --scope format:csv --since 2026-10-14T00:00:00Z --until 2026-11-01T00:00:00Z --limit 400
+```
+
+**Follow-ups, not done here:**
+- Under a statement timeout far below the 2 s slow-write line, the budget
+  saws between failing and recovering, since each fast write grows it
+  back. A hosted database's 8 s timeout makes the slow-write path act
+  first, so this was left as is.
+- Waits for the drive row and the run history are retried but not
+  reported as progress, since no crawl has started yet or every crawl has
+  ended.
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -1742,6 +1825,13 @@ Its commits are covered by F19, not numbered here.
 | 127 | `7f2d6dc8e` | F23 |
 | 128 | `d9c3bf6c0` | F23 |
 | 129 | `62ffe547a` | F23 |
+| 130 | `c75d19331` | F23 |
+| 131 | `4dc0c52d5` | F27 |
+| 132 | `d9f53c30b` | F27 |
+| 133 | `59ded1ac8` | F27 |
+| 134 | `aa5eefaa6` | F27 |
+| 135 | `0a828d45c` | F27 |
+| 136 | `2a627e438` | F27, F9 (MIXED) |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
