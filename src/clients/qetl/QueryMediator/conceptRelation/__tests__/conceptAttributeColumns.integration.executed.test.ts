@@ -5,6 +5,7 @@ import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 /**
  * Executed tests for the step that turns a concept's ontology rows into the
  * columns its DuckDB view emits.
@@ -78,6 +79,9 @@ function _mapping(
     datasetId: Dataset.Id;
     columnName: string;
     ruleType?: DatasetColumnMapping["valuePickerRuleType"];
+    // The column's Ava type. `bigint` by default, a type every rule allows,
+    // so a fixture names one only when its test is about the type.
+    columnDataType?: AvaDataType.T;
   }>,
 ): MappedColumn {
   const datasetColumnId =
@@ -100,6 +104,7 @@ function _mapping(
       id: datasetColumnId,
       name: options.columnName,
       datasetId: options.datasetId,
+      dataType: options.columnDataType ?? "bigint",
     } as DatasetColumn.T,
   };
 }
@@ -618,5 +623,57 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       status_2: null,
       person_id: 101,
     });
+  });
+
+  // A column whose type was changed after the field was made can leave a rule
+  // the new type does not allow. DuckDB would refuse the whole view with an
+  // error that names neither the field nor the rule.
+  it("refuses a sum over a text column", () => {
+    const total = _attribute({ name: "total", dataType: "double" });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, total],
+      mappings: [
+        PERSON_ID_MAPPING,
+        _mapping({
+          attributeName: "total",
+          datasetId: DATASET_A,
+          columnName: "tag",
+          ruleType: "sum",
+          columnDataType: "varchar",
+        }),
+      ],
+    });
+
+    expect(() => {
+      return makeConceptAttributeColumnsFromMetadata(metadata);
+    }).toThrow(
+      /applies 'sum' to dataset column 'tag', whose type 'varchar' does not allow it/,
+    );
+  });
+
+  // A list field keeps every value and applies no rule, so the rule its
+  // mapping happens to store cannot break it.
+  it("reads a list field whatever rule its mapping stores", async () => {
+    const metadata = _metadata({
+      attributes: [PERSON_ID, TAGS],
+      mappings: [
+        PERSON_ID_MAPPING,
+        _mapping({
+          attributeName: "tags",
+          datasetId: DATASET_A,
+          columnName: "tag",
+          ruleType: "sum",
+          columnDataType: "varchar",
+        }),
+      ],
+    });
+
+    const rows = await _queryConcept(metadata);
+
+    expect(
+      rows.map((row) => {
+        return row.tags;
+      }),
+    ).toEqual([["blue", "green"], ["red"], []]);
   });
 });
