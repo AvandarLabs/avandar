@@ -1,3 +1,4 @@
+import type { UiPluginVizConfig } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfig.types.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 
 type UiVizConfigBar = {
@@ -113,7 +114,7 @@ export type BuiltInUiVizConfig =
  * aggregate is emitted as `sum(revenue)` rather than `revenue`, and an
  * explicit alias replaces the name entirely.
  */
-export type UiVizConfig = BuiltInUiVizConfig;
+export type UiVizConfig = BuiltInUiVizConfig | UiPluginVizConfig;
 
 /** Mark settings for mixed XY charts, keyed by `QueryResult` column name. */
 export type XYSeries = BarSeriesShape | LineSeriesShape | AreaSeriesShape;

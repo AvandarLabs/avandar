@@ -34,6 +34,7 @@ type Props = {
  *
  * Bar, line, area, and radar share the descriptor-driven
  * `SeriesAwareVizForm`. Pie, funnel, scatter, and bubble have their own forms.
+ * Table and plugin configs render no subform.
  */
 export function VizSettingsFormBody({
   columns,
@@ -135,6 +136,9 @@ export function VizSettingsFormBody({
           }}
         />
       );
+    })
+    .with({ vizType: "plugin" }, () => {
+      return null;
     })
     .exhaustive();
 }

@@ -9,7 +9,7 @@ import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 export type DashboardTileSummary = {
   id: string;
   prompt: string | undefined;
-  vizType: AvaVizConfig.Type | undefined;
+  vizType: AvaVizConfig.BuiltInType | undefined;
 };
 
 function _readPrompt(nlQuery: unknown): string | undefined {
@@ -20,8 +20,10 @@ function _readPrompt(nlQuery: unknown): string | undefined {
   return isString(prompt) && prompt.trim() !== "" ? prompt : undefined;
 }
 
-/** The viz type a stored value names, or undefined when this build has none. */
-function _readVizType(vizType: unknown): AvaVizConfig.Type | undefined {
+/**
+ * The built-in viz type a stored value names, or undefined when it names none.
+ */
+function _readVizType(vizType: unknown): AvaVizConfig.BuiltInType | undefined {
   return VizTypes.find((knownType) => {
     return knownType === vizType;
   });

@@ -23,7 +23,12 @@ export function synchronizeUiVizType(
     Props,
     { columnBindingVersion: 0 }
   >;
-  if (changed.vizType && vizConfig.vizType !== vizType) {
+  // Version 0 blocks predate plugin charts, so only a built-in type converts.
+  if (
+    changed.vizType &&
+    vizType !== "plugin" &&
+    vizConfig.vizType !== vizType
+  ) {
     const memory = vizConfigMemory[blockId]?.uiVizConfigs ?? {};
     // Presentation converters copy name-bound column slots without
     // allocating IDs.

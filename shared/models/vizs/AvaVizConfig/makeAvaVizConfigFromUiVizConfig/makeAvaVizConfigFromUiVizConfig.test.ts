@@ -64,6 +64,13 @@ const CONFIGS: UiVizConfig[] = [
     seriesColors: { revenue: "red.6" },
   },
   { vizType: "table" },
+  {
+    vizType: "plugin",
+    pluginId: "avandar.epidemiology",
+    pluginVizId: "epicurve",
+    columnSettings: { date: "quarter", count: "revenue" },
+    settings: { interval: "epiWeek" },
+  },
 ];
 
 describe("makeAvaVizConfigFromUiVizConfig", () => {
@@ -127,6 +134,46 @@ describe("makeAvaVizConfigFromUiVizConfig", () => {
       expect(config).toEqual(original);
     },
   );
+
+  it("binds a plugin chart's column settings to column IDs", () => {
+    const result = makeAvaVizConfigFromUiVizConfig({
+      config: CONFIGS[9]!,
+      columns: COLUMNS,
+    });
+    expect(result.config).toMatchObject({
+      columnSettings: { date: CATEGORY_ID, count: REVENUE_ID },
+    });
+  });
+
+  it("leaves an ambiguous plugin column setting unset and reports it", () => {
+    const result = makeAvaVizConfigFromUiVizConfig({
+      config: {
+        vizType: "plugin",
+        pluginId: "avandar.epidemiology",
+        pluginVizId: "epicurve",
+        columnSettings: { count: "revenue" },
+        settings: {},
+      },
+      columns: [
+        ...COLUMNS,
+        {
+          id: uuid<QueryColumn.Id>(),
+          name: "revenue",
+          dataType: "double" as const,
+        },
+      ],
+    });
+    expect(result).toEqual({
+      config: {
+        vizType: "plugin",
+        pluginId: "avandar.epidemiology",
+        pluginVizId: "epicurve",
+        columnSettings: { count: undefined },
+        settings: {},
+      },
+      issues: [{ target: "columnSettings.count", reason: "ambiguous" }],
+    });
+  });
 
   it("accepts a unique case-insensitive QueryResult column name", () => {
     const result = makeAvaVizConfigFromUiVizConfig({

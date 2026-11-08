@@ -76,7 +76,11 @@ export function DataVizPBlock(
       dateColumns={getDateColumns(columns, data)}
       displayVizConfig={
         columnBindings.runtime?.runtimeConfig ??
-        AvaVizConfigs.makeEmptyConfig(props.vizType)
+        // A plugin chart's config needs its manifest, so an empty table
+        // stands in for it until the bindings resolve.
+        AvaVizConfigs.makeEmptyConfig(
+          props.vizType === "plugin" ? "table" : props.vizType,
+        )
       }
       filterProps={{
         globalFilterSubscription: props.globalFilterSubscription,

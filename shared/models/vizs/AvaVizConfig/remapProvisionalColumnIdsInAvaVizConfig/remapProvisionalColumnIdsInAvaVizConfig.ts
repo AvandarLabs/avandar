@@ -1,4 +1,4 @@
-import { identity, propEq } from "@avandar/utils";
+import { identity, objectValuesMap, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
@@ -138,5 +138,13 @@ export function remapProvisionalColumnIdsInAvaVizConfig({
         };
       },
     )
+    .with({ vizType: "plugin" }, (chart) => {
+      return {
+        ...chart,
+        columnSettings: objectValuesMap(chart.columnSettings, (id) => {
+          return mapKey(id);
+        }),
+      };
+    })
     .exhaustive();
 }

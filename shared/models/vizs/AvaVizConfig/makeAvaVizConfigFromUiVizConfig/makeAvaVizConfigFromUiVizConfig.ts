@@ -1,10 +1,17 @@
-import { identity, isDefined, prop, propEq } from "@avandar/utils";
+import {
+  identity,
+  isDefined,
+  objectValuesMap,
+  prop,
+  propEq,
+} from "@avandar/utils";
 import { match } from "ts-pattern";
 import { getQueryColumnIdFromQueryResultColumnName } from "$/models/queries/QueryResultColumnBindings/getQueryColumnIdFromQueryResultColumnName/getQueryColumnIdFromQueryResultColumnName.ts";
 import { makeColumnSlotsFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeColumnSlotsFromAvaVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
+import type { UiPluginVizConfig } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfig.types.ts";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";
 import type { VizColumnSlot } from "$/models/vizs/AvaVizConfig/makeColumnSlotsFromAvaVizConfig.ts";
 import type {
@@ -110,6 +117,24 @@ function _mapCategoryConfig(
   };
 }
 
+function _mapPluginConfig(
+  options: Readonly<{
+    config: UiPluginVizConfig;
+    getSlotColumnId: GetSlotColumnId;
+  }>,
+): AvaVizConfig.Plugin {
+  const { config, getSlotColumnId } = options;
+  return {
+    ...config,
+    columnSettings: objectValuesMap(
+      config.columnSettings,
+      (key, settingKey) => {
+        return getSlotColumnId({ key, target: `columnSettings.${settingKey}` });
+      },
+    ),
+  };
+}
+
 function _mapConfig(
   options: Readonly<{
     config: Readonly<UiVizConfig>;
@@ -148,6 +173,9 @@ function _mapConfig(
     })
     .with({ vizType: "pie" }, { vizType: "funnel" }, (chart) => {
       return _mapCategoryConfig({ config: chart, getSlotColumnId });
+    })
+    .with({ vizType: "plugin" }, (chart) => {
+      return _mapPluginConfig({ config: chart, getSlotColumnId });
     })
     .exhaustive();
 }

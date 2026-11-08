@@ -1,4 +1,5 @@
 import { BuiltInVizContainer } from "@/components/VisualizationContainer/BuiltInVizContainer/BuiltInVizContainer";
+import { PluginVizPlaceholder } from "@/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
@@ -30,6 +31,9 @@ type Props = {
  * `AvaVizConfig`. Pure and prop-driven: holds no state of its own and has no
  * coupling to any app-specific store, so it can be reused anywhere a query
  * result needs to be visualized.
+ *
+ * Built-in configs render through `BuiltInVizContainer`. A plugin config
+ * shows the missing-plugin placeholder.
  */
 export function VisualizationContainer({
   columns,
@@ -38,6 +42,14 @@ export function VisualizationContainer({
   dateColumns,
   vizConfig,
 }: Props): JSX.Element {
+  if (vizConfig.vizType === "plugin") {
+    return (
+      <PluginVizPlaceholder
+        reason="missingPlugin"
+        pluginId={vizConfig.pluginId}
+      />
+    );
+  }
   return (
     <BuiltInVizContainer
       columns={columns}

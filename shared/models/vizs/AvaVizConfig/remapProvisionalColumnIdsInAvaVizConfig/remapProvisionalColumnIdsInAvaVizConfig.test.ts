@@ -2,56 +2,75 @@ import { expect, it } from "vitest";
 import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/AvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";
+
+const OLD_ID = "sql-id" as QueryColumn.Id;
+const NEW_ID = "structured-id" as QueryColumn.Id;
+const PREVIOUS: QueryResultColumnBindingRegistry = {
+  version: 1,
+  scopeKey: "explorer",
+  sqlKey: "select revenue from sales",
+  columns: [
+    {
+      id: OLD_ID,
+      name: "revenue",
+      dataType: "double",
+      expressionKey: "physical",
+      sqlExpressionKey: "physical",
+    },
+  ],
+};
+const CURRENT: QueryResultColumnBindingRegistry = {
+  ...PREVIOUS,
+  columns: [
+    {
+      ...PREVIOUS.columns[0]!,
+      id: NEW_ID,
+      expressionKey: "model",
+      name: "amount",
+    },
+  ],
+};
 
 it("rebinds matching physical expressions and preserves unrelated selections", () => {
-  const oldId = "sql-id" as QueryColumn.Id;
-  const newId = "structured-id" as QueryColumn.Id;
   const config = {
     vizType: "scatter" as const,
-    series: [{ xKey: oldId, key: oldId, color: "#123456" }],
-  };
-  const previous: QueryResultColumnBindingRegistry = {
-    version: 1,
-    scopeKey: "explorer",
-    sqlKey: "select revenue from sales",
-    columns: [
-      {
-        id: oldId,
-        name: "revenue",
-        dataType: "double",
-        expressionKey: "physical",
-        sqlExpressionKey: "physical",
-      },
-    ],
-  };
-  const current: QueryResultColumnBindingRegistry = {
-    ...previous,
-    columns: [
-      {
-        ...previous.columns[0]!,
-        id: newId,
-        expressionKey: "model",
-        name: "amount",
-      },
-    ],
+    series: [{ xKey: OLD_ID, key: OLD_ID, color: "#123456" }],
   };
   expect(
     remapProvisionalColumnIdsInAvaVizConfig({
       config: config,
-      previous: previous,
-      current: current,
+      previous: PREVIOUS,
+      current: CURRENT,
     }),
   ).toMatchObject({
-    series: [{ xKey: newId, key: newId, color: "#123456" }],
+    series: [{ xKey: NEW_ID, key: NEW_ID, color: "#123456" }],
   });
   expect(
     remapProvisionalColumnIdsInAvaVizConfig({
       config: config,
-      previous: previous,
+      previous: PREVIOUS,
       current: {
-        ...current,
-        columns: [{ ...current.columns[0]!, sqlExpressionKey: "unrelated" }],
+        ...CURRENT,
+        columns: [{ ...CURRENT.columns[0]!, sqlExpressionKey: "unrelated" }],
       },
     }),
   ).toEqual(config);
+});
+
+it("rebinds a plugin chart's provisional column settings", () => {
+  const config: AvaVizConfig.Plugin = {
+    vizType: "plugin",
+    pluginId: "avandar.epidemiology",
+    pluginVizId: "epicurve",
+    columnSettings: { date: OLD_ID, stack: undefined },
+    settings: { interval: "epiWeek" },
+  };
+  expect(
+    remapProvisionalColumnIdsInAvaVizConfig({
+      config: config,
+      previous: PREVIOUS,
+      current: CURRENT,
+    }),
+  ).toEqual({ ...config, columnSettings: { date: NEW_ID, stack: undefined } });
 });

@@ -168,7 +168,9 @@ export const DataExplorerStateManager = createAppStateManager({
     ) => {
       const { vizConfig, query, vizConfigMemory, lastResultColumns } = state;
 
-      if (vizConfig.vizType === newVizType) {
+      // A bare "plugin" type names no plugin chart type, so there is nothing
+      // to activate.
+      if (vizConfig.vizType === newVizType || newVizType === "plugin") {
         return state;
       }
 
@@ -213,7 +215,10 @@ export const DataExplorerStateManager = createAppStateManager({
     ): DataExplorerAppState => {
       return {
         ...state,
-        vizConfig: AvaVizConfigs.makeEmptyConfig(urlVizConfig.vizType),
+        vizConfig:
+          urlVizConfig.vizType === "plugin"
+            ? { ...urlVizConfig, columnSettings: {} }
+            : AvaVizConfigs.makeEmptyConfig(urlVizConfig.vizType),
         pendingUrlVizConfig: urlVizConfig,
       };
     },

@@ -2,6 +2,7 @@ import {
   identity,
   isDefined,
   makeIdLookupMap,
+  objectValuesMap,
   prop,
   propEq,
 } from "@avandar/utils";
@@ -10,6 +11,7 @@ import { makeColumnSlotsFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/make
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { QueryResultColumnBindingIssue } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
+import type { UiPluginVizConfig } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfig.types.ts";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";
 import type {
   AvaBubbleSeries,
@@ -17,7 +19,20 @@ import type {
   AvaScatterSeries,
   AvaXYSeries,
 } from "$/models/vizs/series.types.ts";
-import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types.ts";
+import type {
+  BuiltInUiVizConfig,
+  UiVizConfig,
+} from "$/models/vizs/UiVizConfig/UiVizConfig.types.ts";
+
+type ConversionOptions<TConfig> = Readonly<{
+  config: Readonly<TConfig>;
+  columns: readonly QueryResult.ColumnWithId[];
+}>;
+
+type Conversion<TConfig> = {
+  config: TConfig;
+  issues: QueryResultColumnBindingIssue[];
+};
 
 type GetSlotQueryResultColumnName = ({
   key,
@@ -141,6 +156,27 @@ function _mapCategoryConfig(
   };
 }
 
+function _mapPluginConfig(
+  options: Readonly<{
+    config: AvaVizConfig.Plugin;
+    getSlotQueryResultColumnName: GetSlotQueryResultColumnName;
+  }>,
+): UiPluginVizConfig {
+  const { config, getSlotQueryResultColumnName } = options;
+  return {
+    ...config,
+    columnSettings: objectValuesMap(
+      config.columnSettings,
+      (key, settingKey) => {
+        return getSlotQueryResultColumnName({
+          key,
+          target: `columnSettings.${settingKey}`,
+        });
+      },
+    ),
+  };
+}
+
 function _mapConfig(
   options: Readonly<{
     config: Readonly<AvaVizConfig.T>;
@@ -195,28 +231,32 @@ function _mapConfig(
         getSlotQueryResultColumnName,
       });
     })
+    .with({ vizType: "plugin" }, (chart) => {
+      return _mapPluginConfig({ config: chart, getSlotQueryResultColumnName });
+    })
     .exhaustive();
 }
 
 /**
  * Replaces each column ID in a chart config with that column's current
  * `QueryResult` column name, the row key the renderer reads. An ID that no
- * column has is returned in `issues` as missing, and its axis is left unset
- * or its series dropped. Leaves the saved config unchanged.
+ * column has is returned in `issues` as missing, and its axis or column
+ * setting is left unset or its series dropped. Leaves the saved config
+ * unchanged. A built-in config always converts to a built-in config.
  *
  * Use it wherever a chart config must be read by name, for example to render
  * a chart or to write it into a URL.
  */
+export function makeUiVizConfigFromAvaVizConfig(
+  options: ConversionOptions<AvaVizConfig.BuiltIn>,
+): Conversion<BuiltInUiVizConfig>;
+export function makeUiVizConfigFromAvaVizConfig(
+  options: ConversionOptions<AvaVizConfig.T>,
+): Conversion<UiVizConfig>;
 export function makeUiVizConfigFromAvaVizConfig({
   config,
   columns,
-}: Readonly<{
-  config: Readonly<AvaVizConfig.T>;
-  columns: readonly QueryResult.ColumnWithId[];
-}>): {
-  config: UiVizConfig;
-  issues: QueryResultColumnBindingIssue[];
-} {
+}: ConversionOptions<AvaVizConfig.T>): Conversion<UiVizConfig> {
   const columnsById = makeIdLookupMap(columns);
   const slots = makeColumnSlotsFromAvaVizConfig<QueryColumn.Id>(config).map(
     (slot) => {

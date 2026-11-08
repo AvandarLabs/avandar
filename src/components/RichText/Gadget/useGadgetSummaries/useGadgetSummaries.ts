@@ -62,7 +62,7 @@ function _buildDashboardLink(options: {
 }
 
 function _buildChartFacts(
-  vizType: AvaVizConfig.Type | undefined,
+  vizType: AvaVizConfig.BuiltInType | undefined,
 ): GadgetFact[] {
   return vizType === undefined
     ? []
