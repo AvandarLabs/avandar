@@ -9,6 +9,6 @@ import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types.ts";
 export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
   "/:workspaceId/messages": { POST: PostChatMessages },
   "/:workspaceId/session-secret": { GET: GetChatSessionSecret },
-  "/:workspaceId/agent/api/stream": { POST: PostAgentStream },
+  "/:workspaceId/agent/:promptId/api/stream": { POST: PostAgentStream },
   "/:workspaceId/extract-measurements": { POST: PostExtractMeasurements },
 });

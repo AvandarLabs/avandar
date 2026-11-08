@@ -13,7 +13,7 @@ export type ChatAPI = APITypeDef<
   [
     "/:workspaceId/messages",
     "/:workspaceId/session-secret",
-    "/:workspaceId/agent/api/stream",
+    "/:workspaceId/agent/:promptId/api/stream",
     "/:workspaceId/extract-measurements",
   ],
   {
@@ -33,10 +33,12 @@ export type ChatAPI = APITypeDef<
         returnType: ChatResponse.T;
       };
     };
-    "/:workspaceId/agent/api/stream": {
+    "/:workspaceId/agent/:promptId/api/stream": {
       POST: {
         pathParams: {
           workspaceId: string;
+          /** The prompt version, `DATA_AGENT_PROMPT_ID`. */
+          promptId: string;
         };
         body: {
           model: { id: string };

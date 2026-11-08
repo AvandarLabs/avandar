@@ -1,4 +1,4 @@
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 /** A dataset as the data agent sees it: names and column types, no rows. */
 export type DataAgentDataset = {

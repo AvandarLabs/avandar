@@ -1,4 +1,4 @@
-import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 
 const CACHE_KEY_PREFIX = "avandar.dataAgent.datasets.";
 

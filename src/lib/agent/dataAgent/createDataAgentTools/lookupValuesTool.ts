@@ -1,5 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import { arr, obj, str } from "@earendil-works/pi-schema";
+import { LOOKUP_VALUES_TOOL } from "$/agent/dataAgent/dataAgentTools";
 import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
 import { buildCandidateLookupSqlFromDiscovery } from "@/components/ChatPanel/PendingClarificationBlock/buildCandidateLookupSqlFromDiscovery/buildCandidateLookupSqlFromDiscovery";
 import { DEFERRED_ANSWER_TEXT } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
@@ -9,25 +9,6 @@ import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState"
 import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
 
 const MAX_LISTED_VALUES = 100;
-
-const LOOKUP_VALUES_PARAMETERS = obj({
-  table: str({ description: "Dataset alias, such as t0." }),
-  column: str({ description: "Text column to search." }),
-  values: arr(
-    obj({
-      named: str({ description: "What the user wrote, such as UK." }),
-      forms: arr(str(), {
-        description:
-          "Stored forms to try that mean exactly the same thing: full name, abbreviation, code.",
-      }),
-    }),
-    { description: "One entry per value the user named." },
-  ),
-  question: str({
-    description:
-      "Question for the user if the device cannot settle it, such as: Which of these is the UK?",
-  }),
-});
 
 type LookupContext = Readonly<{
   host: DataAgentHost;
@@ -210,13 +191,9 @@ export function createLookupValuesTool(
     aliases: readonly SqlTableAlias.T[];
     state: DataAgentRunState;
   }>,
-): AgentTool<typeof LOOKUP_VALUES_PARAMETERS> {
+): AgentTool<typeof LOOKUP_VALUES_TOOL.parameters> {
   return {
-    name: "lookup_values",
-    label: "Look up values",
-    description:
-      "Finds how values the user named are stored in a text column. Runs on the user's device; returns only matching stored values or the user's pick.",
-    parameters: LOOKUP_VALUES_PARAMETERS,
+    ...LOOKUP_VALUES_TOOL,
     executionMode: "sequential",
     execute: async (_toolCallId, params) => {
       const alias = options.aliases.find((entry) => {

@@ -1,6 +1,6 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { OFFLINE_PLAN_INSTRUCTIONS } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/offlinePlanInstructions";
-import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { QuestionValueMatch } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import type {
   OfflineColumnProfile,
