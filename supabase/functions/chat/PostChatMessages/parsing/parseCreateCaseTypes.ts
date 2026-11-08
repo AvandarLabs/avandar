@@ -102,15 +102,17 @@ function _parseIdentities(raw: unknown): ChatCaseSourceDataset[] {
  * one value whatever the model sent.
  */
 function _withoutListJoinKeys(
-  attributes: readonly ChatCreatedCaseAttribute[],
-  identities: readonly ChatCaseSourceDataset[],
+  options: Readonly<{
+    attributes: readonly ChatCreatedCaseAttribute[];
+    identities: readonly ChatCaseSourceDataset[];
+  }>,
 ): ChatCreatedCaseAttribute[] {
   const joinKeyColumnIds = new Set(
-    identities.map((identity) => {
+    options.identities.map((identity) => {
       return identity.primaryKeyColumnId;
     }),
   );
-  return attributes.map((attribute) => {
+  return options.attributes.map((attribute) => {
     if (
       attribute.kind !== "dataset_column" ||
       !joinKeyColumnIds.has(attribute.columnId)
@@ -154,7 +156,7 @@ function _parseCaseType(raw: unknown): ChatCreatedCaseType | undefined {
     name,
     allowManualCreation: record.allowManualCreation === true,
     identities,
-    attributes: _withoutListJoinKeys(attributes, identities),
+    attributes: _withoutListJoinKeys({ attributes, identities }),
     ...(_asTrimmedString(record.description)
       ? { description: _asTrimmedString(record.description) }
       : {}),
