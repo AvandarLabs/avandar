@@ -33,7 +33,10 @@ export type ConceptAttributeColumn =
        * reader of the view maps a column back to its attribute by this.
        */
       attributeId: ConceptAttribute.Id;
-      /** The relation's column name, which is the attribute's name. */
+      /**
+       * The view column name from `ConceptAttribute.getViewColumnNames`,
+       * suffixed when another column took the name.
+       */
       attributeName: string;
       /** The contributing dataset's column this attribute reads. */
       selectColumnName: string;

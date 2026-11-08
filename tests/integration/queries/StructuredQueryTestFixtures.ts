@@ -45,6 +45,8 @@ type MakeConceptAttributeColumnOptions = {
   sourceColumnName?: string;
   /** The result name the field takes when it is not the field's own name. */
   resultColumnName?: string;
+  /** Whether the field keeps every value, which the view emits as a list. */
+  isArray?: boolean;
 };
 
 type MakeQueryOptions = {
@@ -98,11 +100,11 @@ const _FIXTURE_SQL = `
   ) AS t(pop_key, population);
 
   CREATE TABLE "${_CONCEPT_TABLE_NAME}" AS SELECT * FROM (VALUES
-    ('p1', 'North', 5, 'Confirmed', 'k1', 10, 20),
-    ('p2', 'North', 2, 'Suspected', 'k2', 11, 21),
-    ('p3', 'South', 3, 'Confirmed', 'k3', 12, 22),
-    ('p4', 'East', 1, 'Ruled out', 'k4', 13, 23)
-  ) AS t(external_id, region, headcount, status, external_id_2, age, "Age_2");
+    ('p1', 'North', 5, 'Confirmed', 'k1', 10, 20, ['mild', 'rash']),
+    ('p2', 'North', 2, 'Suspected', 'k2', 11, 21, ['mild', 'rash']),
+    ('p3', 'South', 3, 'Confirmed', 'k3', 12, 22, ['severe']),
+    ('p4', 'East', 1, 'Ruled out', 'k4', 13, 23, [])
+  ) AS t(external_id, region, headcount, status, external_id_2, age, "Age_2", symptoms);
 `;
 
 /** A dataset whose `id` is used verbatim as the FROM table name. */
@@ -155,7 +157,7 @@ function _makeConceptAttributeColumn(
       dataType: args.dataType ?? "varchar",
       isLabel: false,
       isIdentifier: false,
-      isArray: false,
+      isArray: args.isArray ?? false,
     }),
     aggregation: args.aggregation,
     ...(args.sourceColumnName === undefined
@@ -212,26 +214,38 @@ function _makeQuery(args: MakeQueryOptions): PartialStructuredQuery {
   }) as unknown as PartialStructuredQuery;
 }
 
+function _normalizeValue(value: unknown): unknown {
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "toDouble" in value &&
+    typeof value.toDouble === "function"
+  ) {
+    return (value as { toDouble: () => number }).toDouble();
+  }
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "items" in value &&
+    Array.isArray(value.items)
+  ) {
+    return value.items.map(_normalizeValue);
+  }
+  return value;
+}
+
 /**
- * DuckDB returns integer aggregates as `bigint` and decimals as objects.
- * Normalising to `number` keeps the row assertions readable while still
- * comparing real values.
+ * DuckDB returns integer aggregates as `bigint`, decimals as objects and
+ * lists as wrapper objects. Normalising to `number` and plain arrays keeps
+ * the row assertions readable while still comparing real values.
  */
 function _normalizeRow(row: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(row).map(([key, value]) => {
-      if (typeof value === "bigint") {
-        return [key, Number(value)];
-      }
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        "toDouble" in value &&
-        typeof value.toDouble === "function"
-      ) {
-        return [key, (value as { toDouble: () => number }).toDouble()];
-      }
-      return [key, value];
+      return [key, _normalizeValue(value)];
     }),
   );
 }

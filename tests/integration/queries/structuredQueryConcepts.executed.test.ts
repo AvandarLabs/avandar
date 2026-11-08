@@ -309,3 +309,35 @@ it("filters an aggregate of a renamed field by its own view column", async () =>
     { region: "North", "count(external_id)": 2 },
   ]);
 });
+
+it("groups by, counts and orders by a list field", async () => {
+  // A list field is a DuckDB list, which groups, counts and sorts like any
+  // value: lists compare element by element, so the empty list sorts first.
+  const symptoms = _makeConceptAttributeColumn({
+    id: "qc_1_symptoms",
+    name: "symptoms",
+    isArray: true,
+    aggregation: "group_by",
+  });
+  const counted = _makeConceptAttributeColumn({
+    id: "qc_2_symptoms",
+    name: "symptoms",
+    isArray: true,
+    aggregation: "count",
+  });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [symptoms, counted],
+      orderByColumn: symptoms.id,
+      orderByDirection: "asc",
+    }),
+  );
+
+  await expect(_runQuery(sql)).resolves.toEqual([
+    { symptoms: [], "count(symptoms)": 1 },
+    { symptoms: ["mild", "rash"], "count(symptoms)": 2 },
+    { symptoms: ["severe"], "count(symptoms)": 1 },
+  ]);
+});

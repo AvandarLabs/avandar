@@ -3,7 +3,6 @@ import type {
   ConceptAttributeId,
   ConceptAttributeModel,
   ConceptAttributeValueShape,
-  ConceptAttributeViewColumn,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import type { Simplify } from "type-fest";
 
@@ -15,5 +14,4 @@ export namespace ConceptAttribute {
   >;
   export type Id = ConceptAttributeId;
   export type ValueShape = ConceptAttributeValueShape;
-  export type ViewColumn = ConceptAttributeViewColumn;
 }
