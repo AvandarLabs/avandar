@@ -25,7 +25,9 @@ const DBReadSchema = z.object({
   id: z.uuid(),
   workspace_id: z.uuid(),
   concept_attribute_id: z.uuid(),
-  value_picker_rule_type: z.enum(DatasetColumnMappings.ValuePickerTypes),
+  value_picker_rule_type: z
+    .enum(DatasetColumnMappings.ValuePickerTypes)
+    .nullable(),
   dataset_id: z.uuid(),
   dataset_column_id: z.uuid(),
   created_at: z.iso.datetime({ offset: true }),
@@ -49,19 +51,11 @@ export const DatasetColumnMappingParsers =
           conceptAttributeId: obj.conceptAttributeId as ConceptAttributeId,
           datasetId: obj.datasetId as DatasetId,
           datasetColumnId: obj.datasetColumnId as DatasetColumnId,
-          valuePickerRuleType: obj.valuePickerRuleType ?? "most_frequent",
         };
       },
     ),
 
     fromModelInsertToDBInsert: pipe(
-      (input) => {
-        return {
-          ...input,
-          // ensure there's always a default value so it doesn't error
-          valuePickerRuleType: input.valuePickerRuleType ?? "most_frequent",
-        };
-      },
       snakeCaseKeysDeep,
       excludeUndefinedDeep,
       omitProps("type"),

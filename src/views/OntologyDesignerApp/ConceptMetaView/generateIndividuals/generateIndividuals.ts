@@ -303,7 +303,7 @@ async function _stageIndividuals(options: {
         datasetId: titleColumn.datasetId,
         columnDataType: titleColumn.dataType,
         valuePickerRuleType: labelMapping.valuePickerRuleType,
-        isArray: false,
+        valueShape: "single",
         outputColumnName: "name",
         externalIdsTable: "external_ids",
         externalIdColumn: "external_id",

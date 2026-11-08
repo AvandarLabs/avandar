@@ -459,4 +459,22 @@ describe("generateIndividuals", () => {
       total: 3,
     });
   });
+
+  // The label names each record with one value. A label whose mapping names
+  // no rule cannot pick one, so the sync fails rather than guessing.
+  it("refuses to sync a case type whose label names no value rule", async () => {
+    const concept = _makeConcept();
+    const attributes = concept.attributes.map((attribute) => {
+      return attribute.isLabel && attribute.mapping.type === "dataset_column"
+        ? {
+            ...attribute,
+            mapping: { ...attribute.mapping, valuePickerRuleType: undefined },
+          }
+        : attribute;
+    });
+
+    await expect(
+      generateIndividuals({ ...concept, attributes }),
+    ).rejects.toThrow(/names no value rule/);
+  });
 });

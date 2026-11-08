@@ -106,7 +106,9 @@ export type Database = {
           dataset_id: string
           id: string
           updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          value_picker_rule_type:
+            | Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+            | null
           workspace_id: string
         }
         Insert: {
@@ -116,7 +118,9 @@ export type Database = {
           dataset_id: string
           id?: string
           updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          value_picker_rule_type?:
+            | Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+            | null
           workspace_id: string
         }
         Update: {
@@ -126,7 +130,9 @@ export type Database = {
           dataset_id?: string
           id?: string
           updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          value_picker_rule_type?:
+            | Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+            | null
           workspace_id?: string
         }
         Relationships: [

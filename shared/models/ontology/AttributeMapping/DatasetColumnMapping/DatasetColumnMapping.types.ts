@@ -25,8 +25,11 @@ type DatasetColumnMappingRead = {
   /** ID of the concept attribute this mapping populates */
   conceptAttributeId: ConceptAttributeId;
 
-  /** Rule to pick which value to use when multiple are found */
-  valuePickerRuleType: ValuePickerRuleType;
+  /**
+   * Rule to pick which value to use when multiple are found. Undefined for a
+   * field that keeps every value.
+   */
+  valuePickerRuleType: ValuePickerRuleType | undefined;
 
   /** ID of the dataset this mapping reads from */
   datasetId: DatasetId;

@@ -25,16 +25,23 @@ import type { FormType } from "@avandar/ui/hooks";
 import type { CamelCaseKeys, Expect } from "@avandar/utils";
 import type { SetOptional, SetRequired } from "type-fest";
 
+/**
+ * The form's dataset-column mapping. The model lets a mapping name no rule,
+ * which is how a field that keeps every value is stored. The form always
+ * holds one, so the rule select always has a value to show.
+ */
+type DatasetColumnFormMapping = SetOptional<
+  DatasetColumnMapping<"Insert">,
+  "datasetId" | "datasetColumnId" | "workspaceId"
+> & { valuePickerRuleType: ValuePickerRule.T };
+
 export type AttributeFormValues = SetRequired<
   SetOptional<ConceptAttributeModel["Insert"], "workspaceId">,
   "id"
 > & {
   mappings: {
     manualEntry: SetOptional<ManualEntryMapping<"Insert">, "workspaceId">;
-    datasetColumn: SetOptional<
-      DatasetColumnMapping<"Insert">,
-      "datasetId" | "datasetColumnId" | "workspaceId"
-    >;
+    datasetColumn: DatasetColumnFormMapping;
   };
 };
 

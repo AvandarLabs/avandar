@@ -109,7 +109,7 @@ const AGE: ConceptAttributeColumn = {
   primaryKeyColumnName: "person_id",
   columnDataType: "bigint",
   valuePickerRuleType: "first",
-  isArray: false,
+  valueShape: "single",
 };
 
 const REGION: ConceptAttributeColumn = {
@@ -121,7 +121,7 @@ const REGION: ConceptAttributeColumn = {
   primaryKeyColumnName: "hh_id",
   columnDataType: "varchar",
   valuePickerRuleType: "most_frequent",
-  isArray: false,
+  valueShape: "single",
 };
 
 const TAGS: ConceptAttributeColumn = {
@@ -132,8 +132,7 @@ const TAGS: ConceptAttributeColumn = {
   datasetId: DATASET_A,
   primaryKeyColumnName: "person_id",
   columnDataType: "varchar",
-  valuePickerRuleType: "first",
-  isArray: true,
+  valueShape: "list",
 };
 
 const NOTE: ConceptAttributeColumn = {
@@ -141,6 +140,15 @@ const NOTE: ConceptAttributeColumn = {
   attributeId: "attr-note" as ConceptAttribute.Id,
   attributeName: "note",
   duckDbDataType: "VARCHAR",
+  valueShape: "single",
+};
+
+const NOTES: ConceptAttributeColumn = {
+  kind: "unmapped",
+  attributeId: "attr-notes" as ConceptAttribute.Id,
+  attributeName: "notes",
+  duckDbDataType: "VARCHAR",
+  valueShape: "list",
 };
 
 const NICKNAME: ConceptAttributeColumn = {
@@ -152,7 +160,7 @@ const NICKNAME: ConceptAttributeColumn = {
   primaryKeyColumnName: "person_id",
   columnDataType: "varchar",
   valuePickerRuleType: "first",
-  isArray: false,
+  valueShape: "single",
 };
 
 /** The fixture a view is built over: how to seed it and what to call it. */
@@ -326,6 +334,18 @@ describe("buildConceptViewSql", () => {
     });
   });
 
+  // A list field with nothing to read is an empty list of its type, not a
+  // NULL scalar, so SQL that treats it as a list, as chat is told to, binds.
+  it("emits an unmapped list attribute as an empty typed list", async () => {
+    const rows = await _queryView([NOTES]);
+
+    expect(
+      rows.map((row) => {
+        return row.notes;
+      }),
+    ).toEqual([[], [], []]);
+  });
+
   // Why the loader has to mark this statement trusted internal SQL, asserted
   // against the real analyzer rather than reasoned about. The view's `FROM` is
   // the spine table, whose name deliberately resolves to no relation, so the
@@ -421,6 +441,7 @@ describe("buildConceptViewSql", () => {
         attributeId: "attr-status" as ConceptAttribute.Id,
         attributeName: "status",
         duckDbDataType: "VARCHAR",
+        valueShape: "single",
       },
     ]);
 
@@ -455,7 +476,7 @@ describe("buildConceptViewSql", () => {
 
   it("leaves NULL values out of a list column", async () => {
     const rows = await _queryView([
-      { ...NICKNAME, attributeName: "nicknames", isArray: true },
+      { ...NICKNAME, attributeName: "nicknames", valueShape: "list" },
     ]);
 
     expect(
@@ -542,7 +563,7 @@ function _typedField(
       ),
       primaryKeyColumnName: "person_id",
       valuePickerRuleType: options.ruleType,
-      isArray: false,
+      valueShape: "single",
     },
   };
 }

@@ -1,3 +1,5 @@
+import { match } from "ts-pattern";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
@@ -5,9 +7,14 @@ import { EXTERNAL_ID_COLUMN } from "@/clients/qetl/QueryMediator/conceptRelation
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
+import type {
+  DatasetColumnMapping,
+  ValuePickerRuleType,
+} from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type {
+  ConceptAttributeColumn,
+  ConceptAttributeValueRule,
+} from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 
 /** Each contributing dataset's key column, by dataset id. */
 type PrimaryKeyColumnNameByDatasetId = Record<Dataset.Id, string | undefined>;
@@ -170,7 +177,40 @@ function _buildUnmappedColumn(
     duckDbDataType: DuckDbDataTypeUtils.fromDatasetColumnType(
       attribute.dataType,
     ),
+    valueShape: ConceptAttribute.getValueShape(attribute),
   };
+}
+
+/**
+ * How one dataset-column attribute's rows become its value, from the
+ * attribute's value shape. A list keeps every value and drops any rule its
+ * mapping still stores. A single value needs a rule, and an attribute without
+ * one is a broken ontology: guessing a rule would answer with a value nobody
+ * chose, so it throws, naming the attribute.
+ */
+function _getValueRule(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+  }>,
+): ConceptAttributeValueRule {
+  const { attribute } = options;
+  const ruleType: ValuePickerRuleType | undefined =
+    options.mapping.valuePickerRuleType;
+  return match(ConceptAttribute.getValueShape(attribute))
+    .with("single", (): ConceptAttributeValueRule => {
+      if (ruleType === undefined) {
+        throw new Error(
+          `Concept attribute '${attribute.name}' (${attribute.id}) keeps one ` +
+            `value, but its mapping names no value rule.`,
+        );
+      }
+      return { valueShape: "single", valuePickerRuleType: ruleType };
+    })
+    .with("list", (): ConceptAttributeValueRule => {
+      return { valueShape: "list" };
+    })
+    .exhaustive();
 }
 
 /**
@@ -185,15 +225,18 @@ function _buildUnmappedColumn(
 function _assertRuleAllowedForColumn(
   options: Readonly<{
     attribute: ConceptAttribute.T;
-    mapping: DatasetColumnMapping;
+    valueRule: ConceptAttributeValueRule;
     datasetColumn: DatasetColumn.T;
   }>,
 ): void {
-  const { attribute, mapping, datasetColumn } = options;
+  const { attribute, valueRule, datasetColumn } = options;
+  if (valueRule.valueShape === "list") {
+    return;
+  }
+  const { valuePickerRuleType } = valueRule;
   if (
-    attribute.isArray ||
     ValuePickerRule.isAllowedForColumnType({
-      ruleType: mapping.valuePickerRuleType,
+      ruleType: valuePickerRuleType,
       columnDataType: datasetColumn.dataType,
     })
   ) {
@@ -201,7 +244,7 @@ function _assertRuleAllowedForColumn(
   }
   throw new Error(
     `Concept attribute '${attribute.name}' (${attribute.id}) applies ` +
-      `'${mapping.valuePickerRuleType}' to dataset column ` +
+      `'${valuePickerRuleType}' to dataset column ` +
       `'${datasetColumn.name}', whose type '${datasetColumn.dataType}' ` +
       `does not allow it.`,
   );
@@ -246,7 +289,10 @@ function _buildAttributeColumn(
         `dataset column '${mapping.datasetColumnId}', which does not exist.`,
     );
   }
-  _assertRuleAllowedForColumn({ attribute, mapping, datasetColumn });
+  // Resolved before the rule check, so a single value with no rule fails
+  // with the error that names it rather than a pattern-matching error.
+  const valueRule = _getValueRule({ attribute, mapping });
+  _assertRuleAllowedForColumn({ attribute, valueRule, datasetColumn });
 
   const primaryKeyColumnName =
     options.primaryKeyColumnNameByDatasetId[mapping.datasetId];
@@ -267,8 +313,7 @@ function _buildAttributeColumn(
       datasetId: mapping.datasetId,
       columnDataType: datasetColumn.dataType,
       primaryKeyColumnName,
-      valuePickerRuleType: mapping.valuePickerRuleType,
-      isArray: attribute.isArray,
+      ...valueRule,
     },
     contributingDatasetId: mapping.datasetId,
   };

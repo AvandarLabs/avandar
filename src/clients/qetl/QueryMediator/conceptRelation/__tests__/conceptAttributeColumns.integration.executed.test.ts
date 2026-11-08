@@ -397,6 +397,50 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     }).toThrow(/does not exist/);
   });
 
+  // A field that keeps one value needs a rule to pick it. Guessing one would
+  // answer with a value nobody chose, so the planner refuses the concept,
+  // naming the field.
+  it("refuses a single-value attribute whose mapping names no value rule", () => {
+    const metadata = _metadata({
+      attributes: [PERSON_ID, AGE],
+      mappings: [
+        PERSON_ID_MAPPING,
+        {
+          ...AGE_MAPPING,
+          mapping: { ...AGE_MAPPING.mapping, valuePickerRuleType: undefined },
+        },
+      ],
+    });
+
+    expect(() => {
+      return makeConceptAttributeColumnsFromMetadata(metadata);
+    }).toThrow(/'age'.*names no value rule/);
+  });
+
+  // A list field created before lists stored no rule still has one. Its
+  // column carries none, so the view keeps every value.
+  it("drops the stored rule of a list attribute from its column", () => {
+    const metadata = _metadata({
+      attributes: [PERSON_ID, TAGS],
+      mappings: [
+        PERSON_ID_MAPPING,
+        {
+          ...TAGS_MAPPING,
+          mapping: { ...TAGS_MAPPING.mapping, valuePickerRuleType: "sum" },
+        },
+      ],
+    });
+
+    const tags = makeConceptAttributeColumnsFromMetadata(
+      metadata,
+    ).attributeColumns.find((column) => {
+      return column.attributeName === "tags";
+    });
+
+    expect(tags).toMatchObject({ kind: "dataset_column", valueShape: "list" });
+    expect(tags).not.toHaveProperty("valuePickerRuleType");
+  });
+
   // `concept_attributes` has no unique constraint on `(concept_id, name)`, so
   // two attributes of one concept really can share a name, and a view with two
   // identically named columns does not compile. The alphabetically first
@@ -589,6 +633,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
         attributeId: NOTE.id,
         attributeName: "note",
         duckDbDataType: "VARCHAR",
+        valueShape: "single",
       },
     ]);
     expect(columns.contributingDatasetIds).toEqual([]);

@@ -24,7 +24,7 @@ const CONCEPT_PLAN: ConceptRelationPlan = {
       columnDataType: "bigint",
       primaryKeyColumnName: "person_id",
       valuePickerRuleType: "first",
-      isArray: false,
+      valueShape: "single",
     },
   ],
 };

@@ -5,7 +5,8 @@ import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 /**
  * The alias every subquery reads its dataset rows under. It must stay
@@ -29,10 +30,13 @@ export type AttributeValueSqlOptions = {
    * compare a text column alphabetically instead of by byte order.
    */
   columnDataType: AvaDataType.T;
-  /** How one record's rows reduce to one value. Unused for a list. */
-  valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
-  /** Keep every value, as a list, instead of reducing them to one. */
-  isArray: boolean;
+  /** Keep one value, picked by the rule, or every value as a list. */
+  valueShape: ConceptAttribute.ValueShape;
+  /**
+   * How one record's rows reduce to one value. Required for one value. A list
+   * ignores it.
+   */
+  valuePickerRuleType: ValuePickerRuleType | undefined;
   /** The name of the column the subquery emits. */
   outputColumnName: string;
   /** The outer table, by name or alias, holding one row per record key. */
@@ -86,7 +90,7 @@ function _buildTextExtremeSql(
 function _buildReducedValueSql(
   options: Readonly<{
     parts: ValueSqlParts;
-    valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
+    valuePickerRuleType: ValuePickerRuleType;
     columnDataType: AvaDataType.T;
   }>,
 ): string {
@@ -159,14 +163,26 @@ export function buildAttributeValueSql(
     datasetView: quoteSqlIdentifier(options.datasetId),
     rowsView: quoteSqlIdentifier(getRowNumberedViewName(options.datasetId)),
   };
-  // `list()` over no rows is NULL. A record with no values gets an empty
-  // list, which reads as "none" rather than "unknown".
-  const body = options.isArray
-    ? `SELECT COALESCE(list(${value} ORDER BY ${DATASET_ALIAS}.file_row_number), []) FROM ${parts.rowsView} ${DATASET_ALIAS} WHERE ${parts.rowFilter}`
-    : _buildReducedValueSql({
+  const body = match(options.valueShape)
+    .with("list", () => {
+      // `list()` over no rows is NULL. A record with no values gets an empty
+      // list, which reads as "none" rather than "unknown".
+      return `SELECT COALESCE(list(${value} ORDER BY ${DATASET_ALIAS}.file_row_number), []) FROM ${parts.rowsView} ${DATASET_ALIAS} WHERE ${parts.rowFilter}`;
+    })
+    .with("single", () => {
+      const { valuePickerRuleType } = options;
+      // A guessed rule would answer with a value nobody chose.
+      if (valuePickerRuleType === undefined) {
+        throw new Error(
+          `Column '${options.outputColumnName}' keeps one value, but names no value rule.`,
+        );
+      }
+      return _buildReducedValueSql({
         parts,
-        valuePickerRuleType: options.valuePickerRuleType,
+        valuePickerRuleType,
         columnDataType: options.columnDataType,
       });
+    })
+    .exhaustive();
   return `(${body}) AS ${quoteSqlIdentifier(options.outputColumnName)}`;
 }
