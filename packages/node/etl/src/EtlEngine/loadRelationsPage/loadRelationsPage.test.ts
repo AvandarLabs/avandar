@@ -10,6 +10,7 @@ import {
   setEtlPathsRootForTesting,
 } from "@etl/EtlEngine/etlPaths";
 import {
+  BYTES_PER_WRITE,
   COLUMNS_PER_WRITE,
   loadRelationsPage,
 } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
@@ -415,6 +416,30 @@ describe("loadRelationsPage", () => {
       [["ds-004", COLUMNS_PER_WRITE + 1]],
       [["ds-005", 1]],
     ]);
+  });
+
+  it("starts a new write when the next relation would pass the byte budget, never splitting one", async () => {
+    const listings = createInMemoryListingsStore();
+    const underHalfOfBudget = "x".repeat(Math.floor(BYTES_PER_WRITE * 0.45));
+
+    await loadRelationsPage({
+      relations: [
+        _apiRelation(1, { description: underHalfOfBudget }),
+        _apiRelation(2, { description: underHalfOfBudget }),
+        _apiRelation(3, { description: underHalfOfBudget }),
+        _apiRelation(4, { description: "x".repeat(BYTES_PER_WRITE + 1) }),
+        _apiRelation(5),
+      ],
+      context: _context({ listings, objects: undefined }),
+    });
+
+    expect(
+      listings.getUpsertBatches().map((batch) => {
+        return batch.map(({ row }) => {
+          return row.external_dataset_id;
+        });
+      }),
+    ).toEqual([["ds-001", "ds-002"], ["ds-003"], ["ds-004"], ["ds-005"]]);
   });
 
   it("writes an API relation with no columns, with an empty column set", async () => {
