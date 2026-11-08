@@ -18,9 +18,27 @@ create table public.concept_attributes (
   is_identifier boolean not null,
   is_array boolean not null,
   allow_manual_edit boolean not null,
+  -- Set only on a field that keeps one value per period of a date column.
+  -- Its dataset-column mapping names that column in `bucket_column_id`.
+  bucket_grain public.concept_attributes__bucket_grain,
   -- The Data Explorer gives every case type a built-in `status` column, and
   -- DuckDB identifiers ignore case, so no attribute may take that name.
-  constraint concept_attributes__name_not_reserved check (lower(btrim(name)) <> 'status')
+  constraint concept_attributes__name_not_reserved check (lower(btrim(name)) <> 'status'),
+  -- A per-period field is a list of (period, value) pairs.
+  constraint concept_attributes__bucket_grain_requires_array check (
+    bucket_grain is null or
+    is_array
+  ),
+  -- Only dataset rows can be grouped by period, and a list can neither name
+  -- a record nor match its rows across datasets.
+  constraint concept_attributes__bucket_grain_dataset_value_only check (
+    bucket_grain is null or
+    (
+      mapping_type = 'dataset_column' and
+      not is_label and
+      not is_identifier
+    )
+  )
 );
 
 -- Enable row level security
