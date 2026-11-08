@@ -265,3 +265,9 @@ and its cache columns are removed.
 3. **Storage cost.** Copies are only built for listings a workspace adds, so
    cost grows with use, not with the catalog's size. Pre-building copies for
    popular listings is a later option.
+4. **Source drift.** A workspace keeps the columns it copied when it added a
+   listing, while its data comes from the listing's current copy, so a
+   changed source can leave the two disagreeing. A rebuild also deletes the
+   copy it replaced, which a dataset a user chose to freeze would still need.
+   Handling every drift case is tracked as P6.11 in
+   `docs/production-plan-world-humanitarian-day.md` and is out of scope here.

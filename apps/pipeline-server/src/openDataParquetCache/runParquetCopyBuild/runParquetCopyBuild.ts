@@ -22,6 +22,8 @@ export type ParquetCopyListing = DownloadableListing &
     pipelineName: string | undefined;
     /** The listing's running build, if one runs. */
     currentBuildId: string | undefined;
+    /** The names of the columns the catalog lists for it now. */
+    columnNames: readonly string[];
   }>;
 
 /**
@@ -57,7 +59,15 @@ export type ParquetCopyStore = Pick<
 /** How a build ended. */
 export type ParquetCopyBuildOutcome =
   | Readonly<{ status: "superseded" }>
-  | Readonly<{ status: "written"; copy: OpenDataParquetCache }>
+  | Readonly<{
+      status: "written";
+      copy: OpenDataParquetCache;
+      /**
+       * False when the copy shared no column with the listing, so its
+       * columns were kept rather than replaced.
+       */
+      areColumnsVerified: boolean;
+    }>
   | Readonly<{ status: "discarded" }>
   | Readonly<{
       status: "failed";
@@ -91,10 +101,30 @@ async function _recordFailure(
   return { status: "failed", failure, isRecorded };
 }
 
+/**
+ * Whether a copy's columns may replace the listing's. A copy that shares no
+ * column name with a listing that has columns points at a wrong file or a
+ * broken header rather than a changed schema, so its columns are not
+ * trusted.
+ */
+function _canVerifyColumns(
+  listingColumnNames: readonly string[],
+  copy: OpenDataParquetCache,
+): boolean {
+  if (listingColumnNames.length === 0) {
+    return true;
+  }
+  const listed = new Set(listingColumnNames);
+  return copy.columns.some((column) => {
+    return listed.has(column.name);
+  });
+}
+
 /** Records a finished copy, then deletes whichever copy is no longer named. */
 async function _recordCopy(
   options: RunParquetCopyBuildOptions,
   copy: OpenDataParquetCache,
+  listingColumnNames: readonly string[],
 ): Promise<ParquetCopyBuildOutcome> {
   const { job, store } = options;
   const { isApplied, previousFolderPath } = await store.writeCopy({
@@ -108,11 +138,14 @@ async function _recordCopy(
   if (previousFolderPath !== undefined) {
     await store.removeFolder(previousFolderPath);
   }
-  await store.writeVerifiedColumns({
-    catalogListingId: job.catalogListingId,
-    columns: copy.columns,
-  });
-  return { status: "written", copy };
+  const areColumnsVerified = _canVerifyColumns(listingColumnNames, copy);
+  if (areColumnsVerified) {
+    await store.writeVerifiedColumns({
+      catalogListingId: job.catalogListingId,
+      columns: copy.columns,
+    });
+  }
+  return { status: "written", copy, areColumnsVerified };
 }
 
 /**
@@ -122,7 +155,8 @@ async function _recordCopy(
  * recorded only while its build is still the running one; otherwise it is
  * deleted. The copy it replaces is deleted once nothing names it, and the
  * copy's column types are written back as the listing's verified types,
- * since a read of the whole source is more authoritative than a sample.
+ * since a read of the whole source is more authoritative than a sample. A
+ * copy that shares no column with the listing keeps the listing's columns.
  *
  * @param options.job The listing and the build id its claim gave it.
  * @param options.store The listing's Supabase project.
@@ -155,5 +189,5 @@ export async function runParquetCopyBuild(
   } catch (error) {
     return await _recordFailure(options, toParquetCopyFailure(error));
   }
-  return await _recordCopy(options, copy);
+  return await _recordCopy(options, copy, listing.columnNames);
 }

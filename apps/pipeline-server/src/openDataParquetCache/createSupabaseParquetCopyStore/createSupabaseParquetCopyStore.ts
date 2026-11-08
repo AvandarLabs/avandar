@@ -47,6 +47,20 @@ async function _removeFolder(
   }
 }
 
+async function _readColumnNames(
+  client: SupabaseClient,
+  catalogListingId: string,
+): Promise<string[]> {
+  const { data, error } = await client
+    .from("data_catalog_listings__relation_columns")
+    .select("column_name")
+    .eq("catalog_listing_id", catalogListingId);
+  _throwIfError(error);
+  return (data ?? []).map((column) => {
+    return column.column_name;
+  });
+}
+
 async function _readListing(client: SupabaseClient, catalogListingId: string) {
   const { data, error } = await client
     .from("data_catalog_listings")
@@ -67,6 +81,7 @@ async function _readListing(client: SupabaseClient, catalogListingId: string) {
   }
   return {
     id: data.id,
+    columnNames: await _readColumnNames(client, catalogListingId),
     pipelineName: data.pipeline_name ?? undefined,
     currentBuildId: data.parquet_cache_build_id ?? undefined,
     apiBaseUrl: data.api_base_url,

@@ -16,6 +16,7 @@ const LISTING = {
   apiResourceId: "3h2n-5cm9",
   externalDatasetId: "3h2n-5cm9",
   apiResourceFormat: "CSV",
+  columnNames: ["boro", "block"],
 };
 
 const COPY: OpenDataParquetCache = {
@@ -68,7 +69,11 @@ describe("runParquetCopyBuild", () => {
     });
     const { buildCopy, outcome } = _run(store);
 
-    await expect(outcome).resolves.toEqual({ status: "written", copy: COPY });
+    await expect(outcome).resolves.toEqual({
+      status: "written",
+      copy: COPY,
+      areColumnsVerified: true,
+    });
     expect(buildCopy).toHaveBeenCalledWith(
       expect.objectContaining({ listing: LISTING, buildId: BUILD_ID }),
     );
@@ -80,6 +85,33 @@ describe("runParquetCopyBuild", () => {
       catalogListingId: LISTING_ID,
       columns: COPY.columns,
     });
+  });
+
+  it("verifies the columns of a listing that has none yet", async () => {
+    const store = _createStore({
+      readListing: vi.fn().mockResolvedValue({ ...LISTING, columnNames: [] }),
+    });
+
+    await expect(_run(store).outcome).resolves.toMatchObject({
+      areColumnsVerified: true,
+    });
+    expect(store.writeVerifiedColumns).toHaveBeenCalled();
+  });
+
+  it("keeps the listing's columns when the copy shares none of them", async () => {
+    const store = _createStore({
+      readListing: vi
+        .fn()
+        .mockResolvedValue({ ...LISTING, columnNames: ["country", "cases"] }),
+    });
+
+    await expect(_run(store).outcome).resolves.toEqual({
+      status: "written",
+      copy: COPY,
+      areColumnsVerified: false,
+    });
+    expect(store.writeCopy).toHaveBeenCalled();
+    expect(store.writeVerifiedColumns).not.toHaveBeenCalled();
   });
 
   it("skips a build that is no longer the listing's running build", async () => {
