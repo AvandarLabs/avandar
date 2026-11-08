@@ -12,7 +12,9 @@ alter table "public"."data_catalog_listings" add column "parquet_cache_byte_size
 
 alter table "public"."data_catalog_listings" add column "parquet_cache_failure_code" text;
 
-alter table "public"."data_catalog_listings" add column "parquet_cache_object_path" text;
+alter table "public"."data_catalog_listings" add column "parquet_cache_folder_path" text;
+
+alter table "public"."data_catalog_listings" add column "parquet_cache_part_count" integer;
 
 alter table "public"."data_catalog_listings" add column "parquet_cache_row_count" bigint;
 
@@ -20,15 +22,15 @@ alter table "public"."data_catalog_listings" add column "parquet_cache_source_ve
 
 alter table "public"."data_catalog_listings" add column "parquet_cache_status" public.data_catalog_listings__parquet_cache_status;
 
-alter table "public"."data_catalog_listings" add constraint "data_catalog_listings__parquet_cache_copy_complete" CHECK ((((parquet_cache_object_path IS NULL) AND (parquet_cache_source_version IS NULL) AND (parquet_cache_built_at IS NULL) AND (parquet_cache_row_count IS NULL) AND (parquet_cache_byte_size IS NULL)) OR ((parquet_cache_object_path IS NOT NULL) AND (parquet_cache_source_version IS NOT NULL) AND (parquet_cache_built_at IS NOT NULL) AND (parquet_cache_row_count IS NOT NULL) AND (parquet_cache_byte_size IS NOT NULL)))) not valid;
+alter table "public"."data_catalog_listings" add constraint "data_catalog_listings__parquet_cache_copy_complete" CHECK ((((parquet_cache_folder_path IS NULL) AND (parquet_cache_part_count IS NULL) AND (parquet_cache_source_version IS NULL) AND (parquet_cache_built_at IS NULL) AND (parquet_cache_row_count IS NULL) AND (parquet_cache_byte_size IS NULL)) OR ((parquet_cache_folder_path IS NOT NULL) AND (parquet_cache_part_count > 0) AND (parquet_cache_source_version IS NOT NULL) AND (parquet_cache_built_at IS NOT NULL) AND (parquet_cache_row_count IS NOT NULL) AND (parquet_cache_byte_size IS NOT NULL)))) not valid;
 
 alter table "public"."data_catalog_listings" validate constraint "data_catalog_listings__parquet_cache_copy_complete";
 
-alter table "public"."data_catalog_listings" add constraint "data_catalog_listings__parquet_cache_status_complete" CHECK ((((parquet_cache_status IS NULL) AND (parquet_cache_build_id IS NULL) AND (parquet_cache_build_started_at IS NULL) AND (parquet_cache_failure_code IS NULL) AND (parquet_cache_object_path IS NULL)) OR ((parquet_cache_status = 'building'::public.data_catalog_listings__parquet_cache_status) AND (parquet_cache_build_id IS NOT NULL) AND (parquet_cache_build_started_at IS NOT NULL) AND (parquet_cache_failure_code IS NULL)) OR ((parquet_cache_status = 'ready'::public.data_catalog_listings__parquet_cache_status) AND (parquet_cache_build_id IS NULL) AND (parquet_cache_object_path IS NOT NULL) AND (parquet_cache_failure_code IS NULL)) OR ((parquet_cache_status = 'failed'::public.data_catalog_listings__parquet_cache_status) AND (parquet_cache_build_id IS NULL) AND (parquet_cache_failure_code IS NOT NULL)))) not valid;
+alter table "public"."data_catalog_listings" add constraint "data_catalog_listings__parquet_cache_status_complete" CHECK ((((parquet_cache_status IS NULL) AND (parquet_cache_build_id IS NULL) AND (parquet_cache_build_started_at IS NULL) AND (parquet_cache_failure_code IS NULL) AND (parquet_cache_folder_path IS NULL)) OR ((parquet_cache_status = 'building'::public.data_catalog_listings__parquet_cache_status) AND (parquet_cache_build_id IS NOT NULL) AND (parquet_cache_build_started_at IS NOT NULL) AND (parquet_cache_failure_code IS NULL)) OR ((parquet_cache_status = 'ready'::public.data_catalog_listings__parquet_cache_status) AND (parquet_cache_build_id IS NULL) AND (parquet_cache_folder_path IS NOT NULL) AND (parquet_cache_failure_code IS NULL)) OR ((parquet_cache_status = 'failed'::public.data_catalog_listings__parquet_cache_status) AND (parquet_cache_build_id IS NULL) AND (parquet_cache_failure_code IS NOT NULL)))) not valid;
 
 alter table "public"."data_catalog_listings" validate constraint "data_catalog_listings__parquet_cache_status_complete";
 
-alter table "public"."data_catalog_listings" add constraint "data_catalog_listings__pipeline_access_complete" CHECK (((access_kind <> 'pipeline_parquet'::public.data_catalog_listings__access_kind) OR ((parquet_file_name IS NOT NULL) AND (pipeline_name IS NOT NULL) AND (pipeline_run_id IS NOT NULL) AND (api_service IS NULL) AND (api_base_url IS NULL) AND (api_resource_id IS NULL) AND (api_resource_format IS NULL) AND (cached_object_path IS NULL) AND (cached_source_version IS NULL) AND (cached_at IS NULL) AND (parquet_cache_status IS NULL) AND (parquet_cache_object_path IS NULL)))) not valid;
+alter table "public"."data_catalog_listings" add constraint "data_catalog_listings__pipeline_access_complete" CHECK (((access_kind <> 'pipeline_parquet'::public.data_catalog_listings__access_kind) OR ((parquet_file_name IS NOT NULL) AND (pipeline_name IS NOT NULL) AND (pipeline_run_id IS NOT NULL) AND (api_service IS NULL) AND (api_base_url IS NULL) AND (api_resource_id IS NULL) AND (api_resource_format IS NULL) AND (cached_object_path IS NULL) AND (cached_source_version IS NULL) AND (cached_at IS NULL) AND (parquet_cache_status IS NULL) AND (parquet_cache_folder_path IS NULL)))) not valid;
 
 alter table "public"."data_catalog_listings" validate constraint "data_catalog_listings__pipeline_access_complete";
 
@@ -109,18 +111,19 @@ end;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__write_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_object_path text, p_source_version text, p_row_count bigint, p_byte_size bigint)
- RETURNS TABLE(is_applied boolean, previous_object_path text)
+CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__write_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_folder_path text, p_part_count integer, p_source_version text, p_row_count bigint, p_byte_size bigint)
+ RETURNS TABLE(is_applied boolean, previous_folder_path text)
  LANGUAGE plpgsql
  SET search_path TO ''
 AS $function$
 declare
-  v_previous_object_path text;
+  v_previous_folder_path text;
 begin
   if
     p_catalog_listing_id is null or
     p_build_id is null or
-    p_object_path is null or
+    p_folder_path is null or
+    p_part_count is null or
     p_source_version is null or
     p_row_count is null or
     p_byte_size is null
@@ -128,7 +131,7 @@ begin
     raise exception 'rpc_data_catalog_listings__write_parquet_cache needs every argument';
   end if;
 
-  select listing.parquet_cache_object_path into v_previous_object_path
+  select listing.parquet_cache_folder_path into v_previous_folder_path
   from public.data_catalog_listings listing
   where
     listing.id = p_catalog_listing_id and
@@ -145,7 +148,8 @@ begin
     parquet_cache_status = 'ready',
     parquet_cache_build_id = null,
     parquet_cache_failure_code = null,
-    parquet_cache_object_path = p_object_path,
+    parquet_cache_folder_path = p_folder_path,
+    parquet_cache_part_count = p_part_count,
     parquet_cache_source_version = p_source_version,
     parquet_cache_built_at = now(),
     parquet_cache_row_count = p_row_count,
@@ -155,7 +159,7 @@ begin
   return query select
     true,
     case
-      when v_previous_object_path is distinct from p_object_path then v_previous_object_path
+      when v_previous_folder_path is distinct from p_folder_path then v_previous_folder_path
     end;
 end;
 $function$
@@ -169,5 +173,5 @@ revoke all privileges on function public.rpc_data_catalog_listings__fail_parquet
 grant EXECUTE on function public.rpc_data_catalog_listings__fail_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_failure_code text) to "service_role";
 revoke all privileges on function public.rpc_data_catalog_listings__request_parquet_cache(p_catalog_listing_id uuid, p_lost_build_after interval) from public, anon, authenticated, service_role;
 grant EXECUTE on function public.rpc_data_catalog_listings__request_parquet_cache(p_catalog_listing_id uuid, p_lost_build_after interval) to "service_role";
-revoke all privileges on function public.rpc_data_catalog_listings__write_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_object_path text, p_source_version text, p_row_count bigint, p_byte_size bigint) from public, anon, authenticated, service_role;
-grant EXECUTE on function public.rpc_data_catalog_listings__write_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_object_path text, p_source_version text, p_row_count bigint, p_byte_size bigint) to "service_role";
+revoke all privileges on function public.rpc_data_catalog_listings__write_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_folder_path text, p_part_count integer, p_source_version text, p_row_count bigint, p_byte_size bigint) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_data_catalog_listings__write_parquet_cache(p_catalog_listing_id uuid, p_build_id uuid, p_folder_path text, p_part_count integer, p_source_version text, p_row_count bigint, p_byte_size bigint) to "service_role";

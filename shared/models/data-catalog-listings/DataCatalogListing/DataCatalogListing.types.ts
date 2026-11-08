@@ -182,10 +182,14 @@ export type DataCatalogListingRead = {
   parquetCacheFailureCode: string | undefined;
 
   /**
-   * Where the Parquet copy lives in the public `opendata` bucket. The copy
-   * fields below are set together or not at all.
+   * The public `opendata` bucket folder holding the Parquet copy, as
+   * `part-00000.parquet` onward. The copy fields below are set together or
+   * not at all.
    */
-  parquetCacheObjectPath: string | undefined;
+  parquetCacheFolderPath: string | undefined;
+
+  /** How many parts the copy's folder holds. */
+  parquetCachePartCount: number | undefined;
 
   /** The source's freshness token when the copy was built. Never parsed. */
   parquetCacheSourceVersion: string | undefined;
@@ -378,7 +382,8 @@ export type DataCatalogListingModel = SupabaseCrudModelSpec<
         | "parquetCacheBuildId"
         | "parquetCacheBuildStartedAt"
         | "parquetCacheFailureCode"
-        | "parquetCacheObjectPath"
+        | "parquetCacheFolderPath"
+        | "parquetCachePartCount"
         | "parquetCacheSourceVersion"
         | "parquetCacheBuiltAt"
         | "parquetCacheRowCount"

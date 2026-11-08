@@ -28,10 +28,10 @@ create temporary table build_ids (label text primary key, build_id uuid);
 
 grant all on build_ids to service_role;
 
-select plan(22);
+select plan(23);
 
 select results_eq(
-  $$select parquet_cache_status::text, parquet_cache_object_path
+  $$select parquet_cache_status::text, parquet_cache_folder_path
     from public.data_catalog_listings
     where id = 'e9006001-0000-4000-8000-000000000001'::uuid$$,
   $$values (null::text, null::text)$$,
@@ -78,33 +78,34 @@ select ok(
 );
 
 select results_eq(
-  $$select is_applied, previous_object_path
+  $$select is_applied, previous_folder_path
     from public.rpc_data_catalog_listings__write_parquet_cache(
       'e9006001-0000-4000-8000-000000000001'::uuid,
       (select build_id from build_ids where label = 'first'),
-      'catalog-cache/e9006001/aaaaaaaaaaaaaaaa.parquet', 'v1', 10, 100)$$,
+      'catalog-cache/e9006001/build-a', 3, 'v1', 10, 100)$$,
   $$values (false, null::text)$$,
   'a superseded build cannot write its copy'
 );
 
 select results_eq(
-  $$select is_applied, previous_object_path
+  $$select is_applied, previous_folder_path
     from public.rpc_data_catalog_listings__write_parquet_cache(
       'e9006001-0000-4000-8000-000000000001'::uuid,
       (select build_id from build_ids where label = 'reclaimed'),
-      'catalog-cache/e9006001/aaaaaaaaaaaaaaaa.parquet', 'v1', 10, 100)$$,
+      'catalog-cache/e9006001/build-a', 3, 'v1', 10, 100)$$,
   $$values (true, null::text)$$,
   'the current build writes its copy'
 );
 
 select results_eq(
-  $$select parquet_cache_status::text, parquet_cache_object_path,
-      parquet_cache_source_version, parquet_cache_row_count,
+  $$select parquet_cache_status::text, parquet_cache_folder_path,
+      parquet_cache_part_count, parquet_cache_source_version,
+      parquet_cache_row_count,
       parquet_cache_byte_size, parquet_cache_built_at is not null,
       parquet_cache_build_id
     from public.data_catalog_listings
     where id = 'e9006001-0000-4000-8000-000000000001'::uuid$$,
-  $$values ('ready', 'catalog-cache/e9006001/aaaaaaaaaaaaaaaa.parquet',
+  $$values ('ready', 'catalog-cache/e9006001/build-a', 3,
     'v1', 10::bigint, 100::bigint, true, null::uuid)$$,
   'a written copy is ready and says what it holds'
 );
@@ -115,21 +116,21 @@ select 'rebuild', public.rpc_data_catalog_listings__request_parquet_cache(
   'e9006001-0000-4000-8000-000000000001'::uuid, interval '30 minutes');
 
 select results_eq(
-  $$select parquet_cache_status::text, parquet_cache_object_path
+  $$select parquet_cache_status::text, parquet_cache_folder_path
     from public.data_catalog_listings
     where id = 'e9006001-0000-4000-8000-000000000001'::uuid$$,
   $$values ('building',
-    'catalog-cache/e9006001/aaaaaaaaaaaaaaaa.parquet')$$,
+    'catalog-cache/e9006001/build-a')$$,
   'a rebuild keeps the current copy while it runs'
 );
 
 select results_eq(
-  $$select is_applied, previous_object_path
+  $$select is_applied, previous_folder_path
     from public.rpc_data_catalog_listings__write_parquet_cache(
       'e9006001-0000-4000-8000-000000000001'::uuid,
       (select build_id from build_ids where label = 'rebuild'),
-      'catalog-cache/e9006001/bbbbbbbbbbbbbbbb.parquet', 'v2', 12, 120)$$,
-  $$values (true, 'catalog-cache/e9006001/aaaaaaaaaaaaaaaa.parquet')$$,
+      'catalog-cache/e9006001/build-b', 3, 'v2', 12, 120)$$,
+  $$values (true, 'catalog-cache/e9006001/build-a')$$,
   'writing a new copy returns the one it replaced, for deletion'
 );
 
@@ -158,11 +159,11 @@ select is(
 
 select results_eq(
   $$select parquet_cache_status::text, parquet_cache_failure_code,
-      parquet_cache_object_path
+      parquet_cache_folder_path
     from public.data_catalog_listings
     where id = 'e9006001-0000-4000-8000-000000000001'::uuid$$,
   $$values ('failed', 'resource-unreachable',
-    'catalog-cache/e9006001/bbbbbbbbbbbbbbbb.parquet')$$,
+    'catalog-cache/e9006001/build-b')$$,
   'a failed build keeps the last good copy'
 );
 
@@ -200,7 +201,8 @@ select throws_ok(
 select throws_ok(
   $$update public.data_catalog_listings
     set parquet_cache_status = 'ready',
-      parquet_cache_object_path = null,
+      parquet_cache_folder_path = null,
+      parquet_cache_part_count = null,
       parquet_cache_source_version = null,
       parquet_cache_built_at = null,
       parquet_cache_row_count = null,
@@ -215,8 +217,18 @@ select throws_ok(
 
 select throws_ok(
   $$update public.data_catalog_listings
+    set parquet_cache_part_count = 0
+    where id = 'e9006001-0000-4000-8000-000000000001'::uuid$$,
+  '23514',
+  null,
+  'a copy has at least one part'
+);
+
+select throws_ok(
+  $$update public.data_catalog_listings
     set parquet_cache_status = 'building',
-      parquet_cache_object_path = 'catalog-cache/x/y.parquet',
+      parquet_cache_folder_path = 'catalog-cache/x/y',
+      parquet_cache_part_count = 1,
       parquet_cache_source_version = 'v1',
       parquet_cache_built_at = now(),
       parquet_cache_row_count = 1,
@@ -235,7 +247,7 @@ select ok(
   ) and
   not has_function_privilege(
     'authenticated',
-    'public.rpc_data_catalog_listings__write_parquet_cache(uuid, uuid, text, text, bigint, bigint)',
+    'public.rpc_data_catalog_listings__write_parquet_cache(uuid, uuid, text, integer, text, bigint, bigint)',
     'execute'
   ) and
   not has_function_privilege(
@@ -254,7 +266,7 @@ select ok(
   ) and
   not has_function_privilege(
     'anon',
-    'public.rpc_data_catalog_listings__write_parquet_cache(uuid, uuid, text, text, bigint, bigint)',
+    'public.rpc_data_catalog_listings__write_parquet_cache(uuid, uuid, text, integer, text, bigint, bigint)',
     'execute'
   ) and
   not has_function_privilege(
@@ -273,7 +285,7 @@ select ok(
   ) and
   has_function_privilege(
     'service_role',
-    'public.rpc_data_catalog_listings__write_parquet_cache(uuid, uuid, text, text, bigint, bigint)',
+    'public.rpc_data_catalog_listings__write_parquet_cache(uuid, uuid, text, integer, text, bigint, bigint)',
     'execute'
   ) and
   has_function_privilege(

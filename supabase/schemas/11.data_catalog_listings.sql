@@ -154,10 +154,12 @@ create table public.data_catalog_listings (
   -- Why the last build failed, as an open data failure code. Set exactly
   -- when `parquet_cache_status` is `failed`.
   parquet_cache_failure_code text,
-  -- Where the Parquet copy lives in the public `opendata` bucket, named
-  -- after the source version it was built from. The copy columns below are
-  -- set together or not at all.
-  parquet_cache_object_path text,
+  -- The public `opendata` bucket folder holding the Parquet copy, as
+  -- `part-00000.parquet` onward, named after the build that wrote it. The
+  -- copy columns below are set together or not at all.
+  parquet_cache_folder_path text,
+  -- How many parts the copy's folder holds.
+  parquet_cache_part_count integer,
   -- The source's freshness token when the copy was built. Compared against
   -- a live metadata read to decide whether the copy is stale; never parsed.
   parquet_cache_source_version text,
@@ -210,7 +212,7 @@ create table public.data_catalog_listings (
       cached_source_version is null and
       cached_at is null and
       parquet_cache_status is null and
-      parquet_cache_object_path is null
+      parquet_cache_folder_path is null
     )
   ),
   -- An API listing names its service, instance, dataset and resource, and
@@ -248,14 +250,16 @@ create table public.data_catalog_listings (
   -- A Parquet copy is written whole or not at all.
   constraint data_catalog_listings__parquet_cache_copy_complete check (
     (
-      parquet_cache_object_path is null and
+      parquet_cache_folder_path is null and
+      parquet_cache_part_count is null and
       parquet_cache_source_version is null and
       parquet_cache_built_at is null and
       parquet_cache_row_count is null and
       parquet_cache_byte_size is null
     ) or
     (
-      parquet_cache_object_path is not null and
+      parquet_cache_folder_path is not null and
+      parquet_cache_part_count > 0 and
       parquet_cache_source_version is not null and
       parquet_cache_built_at is not null and
       parquet_cache_row_count is not null and
@@ -271,7 +275,7 @@ create table public.data_catalog_listings (
       parquet_cache_build_id is null and
       parquet_cache_build_started_at is null and
       parquet_cache_failure_code is null and
-      parquet_cache_object_path is null
+      parquet_cache_folder_path is null
     ) or
     (
       parquet_cache_status = 'building' and
@@ -282,7 +286,7 @@ create table public.data_catalog_listings (
     (
       parquet_cache_status = 'ready' and
       parquet_cache_build_id is null and
-      parquet_cache_object_path is not null and
+      parquet_cache_folder_path is not null and
       parquet_cache_failure_code is null
     ) or
     (

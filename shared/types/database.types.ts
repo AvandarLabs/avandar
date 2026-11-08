@@ -860,7 +860,8 @@ export type Database = {
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
           parquet_cache_failure_code: string | null
-          parquet_cache_object_path: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
           parquet_cache_row_count: number | null
           parquet_cache_source_version: string | null
           parquet_cache_status:
@@ -921,7 +922,8 @@ export type Database = {
           parquet_cache_built_at?: string | null
           parquet_cache_byte_size?: number | null
           parquet_cache_failure_code?: string | null
-          parquet_cache_object_path?: string | null
+          parquet_cache_folder_path?: string | null
+          parquet_cache_part_count?: number | null
           parquet_cache_row_count?: number | null
           parquet_cache_source_version?: string | null
           parquet_cache_status?:
@@ -982,7 +984,8 @@ export type Database = {
           parquet_cache_built_at?: string | null
           parquet_cache_byte_size?: number | null
           parquet_cache_failure_code?: string | null
-          parquet_cache_object_path?: string | null
+          parquet_cache_folder_path?: string | null
+          parquet_cache_part_count?: number | null
           parquet_cache_row_count?: number | null
           parquet_cache_source_version?: string | null
           parquet_cache_status?:
@@ -2847,7 +2850,8 @@ export type Database = {
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
           parquet_cache_failure_code: string | null
-          parquet_cache_object_path: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
           parquet_cache_row_count: number | null
           parquet_cache_source_version: string | null
           parquet_cache_status:
@@ -2981,7 +2985,8 @@ export type Database = {
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
           parquet_cache_failure_code: string | null
-          parquet_cache_object_path: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
           parquet_cache_row_count: number | null
           parquet_cache_source_version: string | null
           parquet_cache_status:
@@ -3012,13 +3017,14 @@ export type Database = {
           p_build_id: string
           p_byte_size: number
           p_catalog_listing_id: string
-          p_object_path: string
+          p_folder_path: string
+          p_part_count: number
           p_row_count: number
           p_source_version: string
         }
         Returns: {
           is_applied: boolean
-          previous_object_path: string
+          previous_folder_path: string
         }[]
       }
       rpc_data_catalog_listings__write_verified_column_types: {
@@ -3065,7 +3071,8 @@ export type Database = {
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
           parquet_cache_failure_code: string | null
-          parquet_cache_object_path: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
           parquet_cache_row_count: number | null
           parquet_cache_source_version: string | null
           parquet_cache_status:
