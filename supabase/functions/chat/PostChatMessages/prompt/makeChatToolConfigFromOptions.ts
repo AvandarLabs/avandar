@@ -1,6 +1,7 @@
 import { prop, propEq } from "@avandar/utils";
 import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
 import { MAX_PROPOSED_STATUSES } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
@@ -197,9 +198,20 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                 },
                 valueShape: {
                   type: "string",
-                  enum: ["single", "list"],
+                  enum: ["single", "list", "bucketed_list"],
                   description:
-                    "single keeps one value per case, chosen by valuePickerRuleType. list keeps every value the case has, in dataset order. Use list only when one case genuinely has several values of this column and each one matters, such as symptoms recorded at several visits. Never list the label column or a join key.",
+                    "single keeps one value per case, chosen by valuePickerRuleType. list keeps every value the case has, in dataset order. Use list only when one case genuinely has several values of this column and each one matters, such as symptoms recorded at several visits. Use bucketed_list for one value per day, week, month, quarter, or year, with bucketGrain and bucketColumnId. Never list the label column or a join key.",
+                },
+                bucketGrain: {
+                  type: "string",
+                  enum: ConceptAttribute.BUCKET_GRAINS,
+                  description:
+                    "Only with valueShape bucketed_list: the period to keep one value for, such as month for a monthly average.",
+                },
+                bucketColumnId: {
+                  type: "string",
+                  description:
+                    "Only with valueShape bucketed_list: the id of a date or timestamp column in the same dataset, copied verbatim from the catalog, that places each row in a period.",
                 },
                 valuePickerRuleType: {
                   type: "string",
