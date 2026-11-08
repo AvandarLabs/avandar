@@ -95,4 +95,31 @@ describe("fetchOfflineChatSchema", () => {
       },
     ]);
   });
+
+  it("carries each field's period and value type into the offline schema", async () => {
+    conceptAttributeGetAllMock.mockResolvedValue([
+      {
+        conceptId: CONCEPT_ID,
+        name: "Temperature",
+        isArray: true,
+        bucketGrain: "month",
+        dataType: "double",
+      },
+    ]);
+
+    const schema = await fetchOfflineChatSchema({
+      workspace: { id: WORKSPACE_ID } as Workspace.T,
+      navigatorOnLine: true,
+    });
+
+    expect(schema.conceptAttributes).toEqual([
+      {
+        concept_id: CONCEPT_ID,
+        name: "Temperature",
+        is_array: true,
+        bucket_grain: "month",
+        data_type: "double",
+      },
+    ]);
+  });
 });

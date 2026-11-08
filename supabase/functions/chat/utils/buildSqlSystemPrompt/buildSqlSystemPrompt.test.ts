@@ -158,4 +158,28 @@ describe("buildSqlSystemPrompt", () => {
       '- c0: Case (external_id_2 (field "external_id"))',
     );
   });
+
+  it("marks a per-month field and explains how to unnest it", () => {
+    const prompt = buildSqlSystemPrompt({
+      prompt: "average temperature per month",
+      datasets: [],
+      columns: [],
+      concepts: [{ id: "concept-visits", name: "Patient" }],
+      conceptAttributes: [
+        {
+          concept_id: "concept-visits",
+          name: "Temperature",
+          is_array: true,
+          bucket_grain: "month",
+          data_type: "double",
+        },
+      ],
+    });
+
+    expect(prompt).toContain(
+      "Temperature [per month: STRUCT(bucket DATE, value DOUBLE)[]]",
+    );
+    expect(prompt).toContain('UNNEST(c."Temperature") AS p(entry)');
+    expect(prompt).not.toContain("Temperature (list)");
+  });
 });

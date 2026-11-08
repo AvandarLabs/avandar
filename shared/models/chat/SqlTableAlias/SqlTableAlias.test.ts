@@ -305,3 +305,66 @@ describe("SqlTableAlias.formatListFieldNote", () => {
     ).toBe("");
   });
 });
+
+const PER_MONTH_SCHEMA = {
+  aliases: SqlTableAlias.fromSchema({
+    datasets: [],
+    concepts: [{ id: "concept-visits", name: "Patient" }],
+  }),
+  columns: [],
+  conceptAttributes: [
+    { concept_id: "concept-visits", name: "Name" },
+    {
+      concept_id: "concept-visits",
+      name: "Temperature",
+      is_array: true,
+      bucket_grain: "month",
+      data_type: "double",
+    },
+  ],
+};
+
+describe("SqlTableAlias and per-period fields", () => {
+  it("writes a per-month field with the struct its entries hold", () => {
+    expect(SqlTableAlias.formatSchemaBlock(PER_MONTH_SCHEMA)).toBe(
+      "- c0: Patient (Name, Temperature [per month: STRUCT(bucket DATE, value DOUBLE)[]])",
+    );
+  });
+
+  it("keeps a renamed per-period field's own name beside its column name", () => {
+    expect(
+      SqlTableAlias.formatSchemaBlock({
+        ...PER_MONTH_SCHEMA,
+        conceptAttributes: [
+          {
+            id: FIELD_A_ID,
+            concept_id: "concept-visits",
+            name: "external_id",
+            is_array: true,
+            bucket_grain: "week",
+            data_type: "varchar",
+          },
+        ],
+      }),
+    ).toBe(
+      '- c0: Patient (external_id_2 [per week: STRUCT(bucket DATE, value VARCHAR)[]] (field "external_id"))',
+    );
+  });
+
+  it("explains how to unnest a per-period field only when the schema has one", () => {
+    expect(
+      SqlTableAlias.formatBucketedFieldNote(PER_MONTH_SCHEMA.conceptAttributes),
+    ).toContain('UNNEST(c."Temperature") AS p(entry)');
+    expect(
+      SqlTableAlias.formatBucketedFieldNote([
+        { concept_id: "concept-visits", name: "Name" },
+      ]),
+    ).toBe("");
+  });
+
+  it("does not give a per-period field the plain list note", () => {
+    expect(
+      SqlTableAlias.formatListFieldNote(PER_MONTH_SCHEMA.conceptAttributes),
+    ).toBe("");
+  });
+});

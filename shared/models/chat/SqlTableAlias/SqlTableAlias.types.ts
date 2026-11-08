@@ -39,6 +39,13 @@ export type SqlTableAliasConceptAttribute = {
    * Optional, so a schema cached before fields could be lists still reads.
    */
   is_array?: boolean;
+  /**
+   * The period of a field that keeps one value per period. Optional, so a
+   * schema cached before per-period fields still reads.
+   */
+  bucket_grain?: string | null;
+  /** The type of one value, or of each period's value. */
+  data_type?: string;
 };
 
 /** One status of a concept, listed after its attributes in the schema block. */

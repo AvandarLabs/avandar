@@ -93,6 +93,9 @@ function formatOfflineSqlSchemaNotes(schema: OfflineChatSchema): string {
   const listFieldNote = SqlTableAlias.formatListFieldNote(
     schema.conceptAttributes ?? [],
   );
+  const bucketedFieldNote = SqlTableAlias.formatBucketedFieldNote(
+    schema.conceptAttributes ?? [],
+  );
   return `Rules:
 - SQL FROM / JOIN targets must be the quoted aliases above, never a label, filename, or topic word (wrong: FROM "covid_deaths"; right: FROM "t0" or FROM "c0").
 - Do not invent datasets or system tables (pg_database, information_schema).
@@ -100,7 +103,7 @@ function formatOfflineSqlSchemaNotes(schema: OfflineChatSchema): string {
 - Do not invent WHERE literal values unless the user named them.
 - DuckDB uses LIMIT, not SELECT TOP.
 - Wrap every table alias and column name in double quotes.
-- One read-only SELECT or WITH. No semicolons.${listFieldNote ? `\n${listFieldNote}` : ""}`;
+- One read-only SELECT or WITH. No semicolons.${listFieldNote ? `\n${listFieldNote}` : ""}${bucketedFieldNote ? `\n${bucketedFieldNote}` : ""}`;
 }
 
 function formatSqlTurnContext(args: {

@@ -19,9 +19,11 @@ function createFakeClient(rowsByTable: Record<string, unknown[]>): {
     supabaseClient: {
       from(table: string) {
         queriedTables.push(table);
+        let selectedColumns: string | undefined;
         const chain = {
           select: (columns: string) => {
             selectedColumnsByTable[table] = columns;
+            selectedColumns = columns;
             return chain;
           },
           eq: () => {
@@ -31,7 +33,25 @@ function createFakeClient(rowsByTable: Record<string, unknown[]>): {
             return chain;
           },
           throwOnError: async () => {
-            return { data: rowsByTable[table] ?? [] };
+            const rows = (rowsByTable[table] ?? []) as Array<
+              Record<string, unknown>
+            >;
+            const columnNames = selectedColumns?.split(",").map((name) => {
+              return name.trim();
+            });
+            // Answer only the columns the query selects, as PostgREST does.
+            return {
+              data:
+                columnNames === undefined
+                  ? rows
+                  : rows.map((row) => {
+                      return Object.fromEntries(
+                        columnNames.flatMap((name) => {
+                          return name in row ? [[name, row[name]]] : [];
+                        }),
+                      );
+                    }),
+            };
           },
         };
         return chain;
@@ -133,7 +153,7 @@ describe("fetchWorkspaceSchema", () => {
     });
 
     expect(fake.selectedColumnsByTable.concept_attributes).toBe(
-      "id, concept_id, name, is_array",
+      "id, concept_id, name, is_array, bucket_grain, data_type",
     );
     expect(schema.conceptAttributes).toEqual([
       {
@@ -141,6 +161,40 @@ describe("fetchWorkspaceSchema", () => {
         concept_id: CONCEPT_ID,
         name: "Symptoms",
         is_array: true,
+      },
+    ]);
+  });
+
+  it("returns each field's period and value type, and nothing else of it", async () => {
+    const fake = createFakeClient({
+      datasets: [],
+      dataset_columns: [],
+      concepts: [{ id: CONCEPT_ID, name: "Patient" }],
+      concept_attributes: [
+        {
+          concept_id: CONCEPT_ID,
+          name: "Temperature",
+          is_array: true,
+          bucket_grain: "month",
+          data_type: "double",
+          description: "Never part of the schema",
+        },
+      ],
+      concept_statuses: [],
+    });
+
+    const schema = await fetchWorkspaceSchema({
+      supabaseClient: fake.supabaseClient,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    expect(schema.conceptAttributes).toEqual([
+      {
+        concept_id: CONCEPT_ID,
+        name: "Temperature",
+        is_array: true,
+        bucket_grain: "month",
+        data_type: "double",
       },
     ]);
   });

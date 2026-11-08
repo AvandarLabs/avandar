@@ -26,6 +26,10 @@ export type OfflineChatSchemaConceptAttribute = {
   name: string;
   /** True for a field that keeps every value. Absent in an older cache. */
   is_array?: boolean;
+  /** The period of a per-period field. Absent in an older cache. */
+  bucket_grain?: string | null;
+  /** The type of one value, or of each period's. Absent in an older cache. */
+  data_type?: string;
 };
 
 export type OfflineChatSchemaConceptStatus = {

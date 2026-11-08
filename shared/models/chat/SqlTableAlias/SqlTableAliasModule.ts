@@ -133,20 +133,24 @@ function _buildStatusFields(
 
 /**
  * How a concept field appears in the schema block: the column name SQL must
- * write, then in parentheses a `list` marker and, when the column name
- * differs from the field's name, `field "<name>"`.
+ * write, then for a per-period field its period and entry struct in square
+ * brackets, then in parentheses a `list` marker (for a plain list) and, when
+ * the column name differs from the field's name, `field "<name>"`.
  */
 function _formatConceptAttributeName(
   attribute: SqlTableAliasConceptAttribute,
   columnName: string,
 ): string {
   const notes = [
-    ...(attribute.is_array === true ? ["list"] : []),
+    ...(attribute.is_array === true && !attribute.bucket_grain ? ["list"] : []),
     ...(columnName === attribute.name ? [] : [`field "${attribute.name}"`]),
   ];
+  const marker = attribute.bucket_grain
+    ? ` [per ${attribute.bucket_grain}: STRUCT(bucket DATE, value ${(attribute.data_type ?? "varchar").toUpperCase()})[]]`
+    : "";
   return notes.length === 0
-    ? columnName
-    : `${columnName} (${notes.join(", ")})`;
+    ? `${columnName}${marker}`
+    : `${columnName}${marker} (${notes.join(", ")})`;
 }
 
 /**
@@ -202,9 +206,21 @@ function _formatListFieldNote(
   conceptAttributes: readonly SqlTableAliasConceptAttribute[],
 ): string {
   return conceptAttributes.some((attribute) => {
-    return attribute.is_array === true;
+    return attribute.is_array === true && !attribute.bucket_grain;
   })
     ? LIST_FIELD_NOTE
+    : "";
+}
+
+const BUCKETED_FIELD_NOTE = `- A field marked [per <period>: STRUCT(bucket DATE, value T)[]] holds one entry per period that has data, oldest first. Each entry's bucket is the period's first day. A period with no data is missing, not zero. Read it with UNNEST, for example: SELECT p.entry.bucket AS period, p.entry.value FROM "c0" AS c, UNNEST(c."Temperature") AS p(entry)`;
+
+function _formatBucketedFieldNote(
+  conceptAttributes: readonly SqlTableAliasConceptAttribute[],
+): string {
+  return conceptAttributes.some((attribute) => {
+    return Boolean(attribute.bucket_grain);
+  })
+    ? BUCKETED_FIELD_NOTE
     : "";
 }
 
@@ -281,6 +297,12 @@ export const SqlTableAliasModule = {
    * field is a list, so a prompt only pays for it when it applies.
    */
   formatListFieldNote: _formatListFieldNote,
+  /**
+   * The prompt note that explains how to read a per-period field, or an
+   * empty string when no field has a period, so a prompt only pays for it
+   * when it applies.
+   */
+  formatBucketedFieldNote: _formatBucketedFieldNote,
   /** Rewrites aliases to quoted DuckDB table names. */
   applyToSql: _applyToSql,
 };

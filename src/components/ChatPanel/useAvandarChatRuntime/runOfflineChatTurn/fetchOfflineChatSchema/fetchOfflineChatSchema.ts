@@ -58,6 +58,10 @@ function _mapConcepts(
         concept_id: attribute.conceptId,
         name: attribute.name,
         is_array: attribute.isArray,
+        data_type: attribute.dataType,
+        ...(attribute.bucketGrain
+          ? { bucket_grain: attribute.bucketGrain }
+          : {}),
       };
     }),
     conceptStatuses: options.statuses.map((status) => {
