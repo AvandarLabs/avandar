@@ -1,53 +1,63 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { OfflineChatPickerModels } from "@/components/ChatPanel/offlineChatHelpers/OfflineChatPickerModels/OfflineChatPickerModels";
+import { describe, expect, it } from "vitest";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
-import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
+
+const ONLINE_DEFAULTS = {
+  navigatorOnLine: true,
+  isOfflineModeOn: false,
+  isBundleDownloaded: true,
+};
 
 describe("resolveChatRuntimeMode", () => {
-  beforeEach(() => {
-    LocalChatModelStore.markDownloaded("qwen-1.5b");
+  it("uses cloud when online with offline mode off", () => {
+    expect(resolveChatRuntimeMode(ONLINE_DEFAULTS)).toEqual({ kind: "cloud" });
   });
 
-  afterEach(() => {
-    LocalChatModelStore.clearDownloaded("qwen-1.5b");
+  it("uses local when offline mode is on, even while online", () => {
+    expect(
+      resolveChatRuntimeMode({ ...ONLINE_DEFAULTS, isOfflineModeOn: true }),
+    ).toEqual({ kind: "local" });
   });
 
-  it("uses local when offline and model downloaded", () => {
-    expect(resolveChatRuntimeMode({ navigatorOnLine: false })).toEqual({
-      kind: "local",
-    });
-  });
-
-  it("offers fallback when online, post failed, model downloaded", () => {
+  it("keeps offline mode local when the bundle markers are gone", () => {
+    // The user asked that nothing leave the device, so the turn must not
+    // quietly go to the cloud; the local runner explains what is missing.
     expect(
       resolveChatRuntimeMode({
-        navigatorOnLine: true,
-        chatPostFailed: true,
+        ...ONLINE_DEFAULTS,
+        isOfflineModeOn: true,
+        isBundleDownloaded: false,
       }),
+    ).toEqual({ kind: "local" });
+  });
+
+  it("uses local when the browser is offline and the bundle is downloaded", () => {
+    expect(
+      resolveChatRuntimeMode({ ...ONLINE_DEFAULTS, navigatorOnLine: false }),
+    ).toEqual({ kind: "local" });
+  });
+
+  it("stays on cloud when the browser is offline without the bundle", () => {
+    expect(
+      resolveChatRuntimeMode({
+        ...ONLINE_DEFAULTS,
+        navigatorOnLine: false,
+        isBundleDownloaded: false,
+      }),
+    ).toEqual({ kind: "cloud" });
+  });
+
+  it("offers the offline models when the cloud request failed", () => {
+    expect(
+      resolveChatRuntimeMode({ ...ONLINE_DEFAULTS, chatPostFailed: true }),
     ).toEqual({ kind: "offer_local_fallback" });
   });
 
-  it("stays on cloud when offline but no model is downloaded", () => {
-    LocalChatModelStore.clearDownloaded("qwen-1.5b");
-    expect(resolveChatRuntimeMode({ navigatorOnLine: false })).toEqual({
-      kind: "cloud",
-    });
-  });
-
-  it("uses local when online and an offline model is selected in the picker", () => {
+  it("offers nothing when the cloud request failed without the bundle", () => {
     expect(
       resolveChatRuntimeMode({
-        navigatorOnLine: true,
-        selectedChatModelId: OfflineChatPickerModels.buildModelId("qwen-1.5b"),
-      }),
-    ).toEqual({ kind: "local", localChatModelId: "qwen-1.5b" });
-  });
-
-  it("stays on cloud when online with a cloud model selected", () => {
-    expect(
-      resolveChatRuntimeMode({
-        navigatorOnLine: true,
-        selectedChatModelId: "anthropic/claude-3.5-sonnet",
+        ...ONLINE_DEFAULTS,
+        chatPostFailed: true,
+        isBundleDownloaded: false,
       }),
     ).toEqual({ kind: "cloud" });
   });

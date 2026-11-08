@@ -1,4 +1,3 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
@@ -110,23 +109,18 @@ export type OfflineChatTurnResult = {
 };
 
 /**
- * The chat runtime mode chosen by `resolveChatRuntimeMode`, based on
- * connectivity, what's downloaded, and whether the cloud request failed. It
- * enumerates every outcome the offline-capability logic can pick, including
- * staying on the normal cloud path:
+ * The chat runtime mode chosen by `resolveChatRuntimeMode`, based on the
+ * user's offline mode choice, connectivity, whether the offline models are
+ * downloaded, and whether the cloud request failed:
  * - `cloud`: use the normal server-backed chat. The default when online, and
- *   the only non-erroring choice when offline with no local model downloaded.
- * - `local`: run the whole turn on-device with a downloaded WebLLM model.
- *   Chosen when the user selected a downloaded local model, or when the device
- *   is offline and a model is available.
- * - `offer_local_fallback`: online, but the cloud request just failed and a
- *   local model is downloaded, so prompt the user to switch to it.
+ *   the only non-erroring choice when offline without the offline models.
+ * - `local`: run the whole turn on the device with the offline models.
+ *   Chosen when offline mode is on, or when the device is offline and the
+ *   offline models are downloaded.
+ * - `offer_local_fallback`: online, but the cloud request just failed and the
+ *   offline models are downloaded, so offer to answer with them instead.
  */
 export type ChatRuntimeMode =
   | { kind: "cloud" }
-  | {
-      kind: "local";
-      /** When set, overrides the offline settings modal selection. */
-      localChatModelId?: LocalChatModel.Id;
-    }
+  | { kind: "local" }
   | { kind: "offer_local_fallback" };

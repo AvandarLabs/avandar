@@ -1,37 +1,51 @@
 import { describe, expect, it } from "vitest";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 
-describe("LocalChatModel.Catalog", () => {
-  it("lists models in ascending RAM tier", () => {
-    const tiers = LocalChatModel.Catalog.values.map((model) => {
-      return model.minRamGb;
-    });
-    const sortedTiers = [...tiers].sort((leftTier, rightTier) => {
-      return leftTier - rightTier;
-    });
-    expect(tiers).toEqual(sortedTiers);
-  });
-
-  it("caps RAM guidance at 32 GB", () => {
-    const maxTier = Math.max(
-      ...LocalChatModel.Catalog.values.map((model) => {
-        return model.minRamGb;
-      }),
+describe("LocalChatModel.OFFLINE_BUNDLE", () => {
+  it("lists only models that are in the catalog", () => {
+    LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
+      (modelId) => {
+        expect(LocalChatModel.Catalog.isValidId(modelId)).toBe(true);
+      },
     );
-    expect(maxTier).toBe(32);
   });
 
-  it("uses unique catalog and MLC ids", () => {
-    const catalogIds = LocalChatModel.Catalog.values.map((model) => {
-      return model.id;
-    });
-    const mlcIds = LocalChatModel.Catalog.values.map((model) => {
-      return model.mlcModelId;
-    });
-    expect(new Set(catalogIds).size).toBe(catalogIds.length);
-    expect(new Set(mlcIds).size).toBe(mlcIds.length);
+  it("fits a 16 GB computer running Chrome, the app, and DuckDB", () => {
+    // At most one large model is resident at a time, so the peak is the
+    // largest single model, not the sum of the bundle.
+    expect(
+      LocalChatModel.getPeakMemoryMbFromBundle(LocalChatModel.OFFLINE_BUNDLE),
+    ).toBeLessThanOrEqual(LocalChatModel.PEAK_MODEL_MEMORY_BUDGET_MB);
+    LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
+      (modelId) => {
+        expect(
+          LocalChatModel.Catalog.find(modelId).minRamGb,
+        ).toBeLessThanOrEqual(16);
+      },
+    );
+  });
+});
+
+describe("LocalChatModel bundle helpers", () => {
+  const catalogIds = LocalChatModel.Catalog.values.map((model) => {
+    return model.id;
+  });
+  const onlyId = catalogIds[0]!;
+
+  it("counts a model used for several jobs once", () => {
+    const bundle = { answer: onlyId, router: onlyId, escalation: onlyId };
+    expect(LocalChatModel.getModelIdsFromBundle(bundle)).toEqual([onlyId]);
   });
 
+  it("sums the download of each distinct model once", () => {
+    const bundle = { answer: onlyId, router: onlyId };
+    expect(LocalChatModel.getDownloadMbFromBundle(bundle)).toBe(
+      LocalChatModel.Catalog.find(onlyId).approxDownloadMb,
+    );
+  });
+});
+
+describe("LocalChatModel.Catalog", () => {
   it("isValidId accepts every catalog id and rejects unknown ids", () => {
     LocalChatModel.Catalog.values.forEach((model) => {
       expect(LocalChatModel.Catalog.isValidId(model.id)).toBe(true);

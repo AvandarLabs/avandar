@@ -58,11 +58,11 @@ msgid "The link could not be copied."
 msgstr "Kiungo hakikuweza kunakiliwa."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "You are offline. Download an offline chat model using the cloud icon "
-"next to the composer before asking data questions."
-msgstr "Uko nje ya mtandao. Pakua modeli ya gumzo ya nje ya mtandao ukitumia "
-"ikoni ya wingu iliyo karibu na mtunzi kabla ya kuuliza maswali kuhusu "
-"data."
+#~ msgid "You are offline. Download an offline chat model using the cloud icon "
+#~ "next to the composer before asking data questions."
+#~ msgstr "Uko nje ya mtandao. Pakua modeli ya gumzo ya nje ya mtandao ukitumia "
+#~ "ikoni ya wingu iliyo karibu na mtunzi kabla ya kuuliza maswali kuhusu "
+#~ "data."
 
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
@@ -263,8 +263,8 @@ msgstr "Buruta ili kupanga upya, au shikilia Alt na ubonyeze mshale wa juu au "
 "chini"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Choose chat model"
-msgstr "Chagua mfano wa mazungumzo"
+#~ msgid "Choose chat model"
+#~ msgstr "Chagua mfano wa mazungumzo"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedCard.tsx
 msgid "Skip this step"
@@ -316,8 +316,8 @@ msgstr " ufikiaji"
 
 #. placeholder {0}: model.minRamGb
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "{0} GB RAM"
-msgstr "{0} GB RAM"
+#~ msgid "{0} GB RAM"
+#~ msgstr "{0} GB RAM"
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
@@ -331,6 +331,10 @@ msgstr "Chagua {0}"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "Ruhusu usawazishaji mtandaoni"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Works without an internet connection."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING compares \"{columnName}\" against a non-literal expression."
@@ -508,8 +512,8 @@ msgid "Connected as {0}"
 msgstr "Imeunganishwa kama {0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.2 1B"
-msgstr "Llama 3.2 1B"
+#~ msgid "Llama 3.2 1B"
+#~ msgstr "Llama 3.2 1B"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -728,8 +732,8 @@ msgid "For example, County or Household"
 msgstr "Kwa mfano, Kaunti au Kaya"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Offline chat model"
-msgstr "Mfano wa mazungumzo bila mtandao"
+#~ msgid "Offline chat model"
+#~ msgstr "Mfano wa mazungumzo bila mtandao"
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "{statusName} color: {colorName}"
@@ -825,9 +829,9 @@ msgid "Monospace headlines"
 msgstr "Vichwa vya monospace"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 4 GB RAM or need the lightest download."
-msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
-"zaidi."
+#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
+#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
+#~ "zaidi."
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
@@ -877,8 +881,8 @@ msgid "Replying…"
 msgstr "Inajibu…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Re-download"
-msgstr "Pakua tena"
+#~ msgid "Re-download"
+#~ msgstr "Pakua tena"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
@@ -891,8 +895,8 @@ msgstr "Ni baadhi tu ya watu wanaoweza kufungua dashibodi hii. Wenzako wa timu "
 "kwenye kesi hii ambao hawana ufikiaji wataona \"Haipatikani\"."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.1 8B (offline)"
-msgstr "Llama 3.1 8B (nje ya mtandao)"
+#~ msgid "Llama 3.1 8B (offline)"
+#~ msgstr "Llama 3.1 8B (nje ya mtandao)"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
@@ -919,6 +923,10 @@ msgid "Avandar couldn't confirm that this query only reads your datasets, so it 
 "didn't run it."
 msgstr "Avandar haikuweza kuthibitisha kuwa hoja hii inasoma tu seti zako za "
 "data, kwa hivyo haikuiendesha."
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Removing offline models"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -1296,8 +1304,8 @@ msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho. Inaweza "
 "kuchukua dakika chache kufika."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Remove offline chat model?"
-msgstr "Ondoa mfano wa mazungumzo bila mtandao?"
+#~ msgid "Remove offline chat model?"
+#~ msgstr "Ondoa mfano wa mazungumzo bila mtandao?"
 
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
@@ -1398,9 +1406,9 @@ msgid "Close sidebar"
 msgstr "Funga upande"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Unable to delete the offline chat model from cache."
-msgstr "Haiwezekani kufuta mfano wa mazungumzo bila mtandao kutoka kwenye "
-"cache."
+#~ msgid "Unable to delete the offline chat model from cache."
+#~ msgstr "Haiwezekani kufuta mfano wa mazungumzo bila mtandao kutoka kwenye "
+#~ "cache."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
@@ -1441,6 +1449,8 @@ msgstr "Ni baadhi tu ya watu wanaoweza kufungua ramani hii. Wenzako wa timu "
 msgid "Where the fields come from"
 msgstr "Sehemu zinakotoka"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Offline"
 msgstr "Bila mtandao"
@@ -1513,9 +1523,9 @@ msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "Ongeza chati ya nguzo ya {datasetName} iliyogawanywa na {groupByColumn}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
-msgstr "Inapendekezwa ikiwa una RAM ya GB 16 na unaendesha Avandar pamoja na "
-"programu nyingine."
+#~ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
+#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 16 na unaendesha Avandar pamoja na "
+#~ "programu nyingine."
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
@@ -1607,10 +1617,10 @@ msgstr "Ramani hii inajumuisha {0}, safu iliyowekwa kuwa Jumlisha pekee. "
 "zisizozidi {threshold} yanaonyeshwa kuwa yamezuiwa, kamwe si sifuri."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
-"for this message?"
-msgstr "Msaidizi wa wingu hafikiki. Utumie modeli uliyopakua kwenye kifaa kwa "
-"ujumbe huu?"
+#~ msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
+#~ "for this message?"
+#~ msgstr "Msaidizi wa wingu hafikiki. Utumie modeli uliyopakua kwenye kifaa kwa "
+#~ "ujumbe huu?"
 
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
@@ -1668,6 +1678,10 @@ msgstr "Hakiki uhamishaji"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
 msgstr "Ficha kichwa"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+#~ msgid "Offline mode needs a recent version of Chrome or Edge with WebGPU."
+#~ msgstr ""
 
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
@@ -1858,6 +1872,10 @@ msgstr "Safu wima ya 12"
 msgid "North arrow"
 msgstr "Mshale wa kaskazini"
 
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "The offline models did not download"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -2008,8 +2026,8 @@ msgid "Welcome back"
 msgstr "Karibu tena"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Phi 3.5 Mini"
-msgstr "Phi 3.5 Mini"
+#~ msgid "Phi 3.5 Mini"
+#~ msgstr "Phi 3.5 Mini"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published to "
@@ -2116,9 +2134,9 @@ msgid "One dataset is one tab."
 msgstr "Kila seti ya data ni kichupo kimoja."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have about 8 GB RAM (default for most users)."
-msgstr "Inapendekezwa ikiwa una takriban RAM ya GB 8 (chaguo-msingi kwa "
-"watumiaji wengi)."
+#~ msgid "Recommended if you have about 8 GB RAM (default for most users)."
+#~ msgstr "Inapendekezwa ikiwa una takriban RAM ya GB 8 (chaguo-msingi kwa "
+#~ "watumiaji wengi)."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -2180,6 +2198,10 @@ msgstr "Simamia viti katika lango la malipo →"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Source record"
 msgstr "Rekodi chanzo"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Download offline models"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
@@ -2313,6 +2335,10 @@ msgstr "Uwazi"
 msgid "Open Data"
 msgstr "Data za Wazi"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Removing…"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl.tsx
 msgid "Radius"
 msgstr "Radius"
@@ -2364,6 +2390,12 @@ msgstr "Chagua Mpango"
 msgid "Delete case type"
 msgstr "Futa aina ya kesi"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Offline mode"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "Thamani ya kawaida (hiari)"
@@ -2383,9 +2415,17 @@ msgstr "Jumla"
 msgid "Top right"
 msgstr "Juu kulia"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+msgid "Set up offline mode to chat without an internet connection."
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
 msgstr "Ufute kabisa <0>{openDatasetName}</0>?"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "The offline models could not be removed"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
@@ -2394,6 +2434,10 @@ msgstr "WMS"
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "No attributes yet"
 msgstr "Bado hakuna sifa"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Remove offline models"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -2608,6 +2652,10 @@ msgstr "Hakuna thamani zilizorejeshwa kutoka {column}. Eleza unachohitaji "
 msgid "Open map"
 msgstr "Fungua ramani"
 
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Offline models removed"
+msgstr ""
+
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "Ranges from <0>{numericLow}</0> to <1>{numericHigh}</1>, averaging "
@@ -2718,6 +2766,11 @@ msgstr "Nijulishe kuongeza chati kwenye dashibodi hii..."
 #: src/utils/notifications/notifyNotImplemented.ts
 msgid "Not implemented yet"
 msgstr "Haijatekelezwa bado"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The online assistant is unreachable. Answer this message with the "
+"offline models on this computer instead?"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
@@ -2966,14 +3019,18 @@ msgstr "Ingiza data"
 msgid "Descending"
 msgstr "Kushuka"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Offline {percent}%"
+msgstr ""
+
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
 msgstr "Mhimili wa jamii"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Balanced offline model for everyday SQL questions on typical laptops."
-msgstr "Modeli ya offline yenye uwiano kwa maswali ya kila siku ya SQL kwenye "
-"kompyuta mpakato za kawaida."
+#~ msgid "Balanced offline model for everyday SQL questions on typical laptops."
+#~ msgstr "Modeli ya offline yenye uwiano kwa maswali ya kila siku ya SQL kwenye "
+#~ "kompyuta mpakato za kawaida."
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -3231,10 +3288,10 @@ msgid "Statuses"
 msgstr "Hali"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Largest catalog option. Maximum offline capability when RAM and download "
-"size are not constraints."
-msgstr "Chaguo lenye katalogi kubwa zaidi. Uwezo wa juu zaidi wa offline wakati "
-"RAM na ukubwa wa upakuaji si vikwazo."
+#~ msgid "Largest catalog option. Maximum offline capability when RAM and download "
+#~ "size are not constraints."
+#~ msgstr "Chaguo lenye katalogi kubwa zaidi. Uwezo wa juu zaidi wa offline wakati "
+#~ "RAM na ukubwa wa upakuaji si vikwazo."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -3289,8 +3346,7 @@ msgstr "Usaidizi wa jiometri bado unapakuliwa. Hii inaweza kuchukua muda kwa "
 "muunganisho wa polepole."
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
@@ -3415,13 +3471,14 @@ msgid "to"
 msgstr "kwa"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download offline chat model (WebLLM)"
-msgstr "Pakua mfano wa mazungumzo ya mtandaoni (WebLLM)"
+#~ msgid "Download offline chat model (WebLLM)"
+#~ msgstr "Pakua mfano wa mazungumzo ya mtandaoni (WebLLM)"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Kagua zinazolingana"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
@@ -3567,13 +3624,17 @@ msgstr "Hakuna safu katika {0} iliyotambuliwa kwa jina kuwa koordinati. Chagua "
 msgid "Reassign private resources first"
 msgstr "Hamishia umiliki wa rasilimali za faragha kwanza"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "The offline models are on this computer."
+msgstr ""
+
 #. placeholder {0}: modelCopy.displayName
 #. placeholder {1}: model.approxSizeMb
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
-"download it again later."
-msgstr "{0} (~{1} MB) itafutwa kutoka kwenye kivinjari hiki ili kuachilia "
-"nafasi. Unaweza kuipakua tena baadaye."
+#~ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
+#~ "download it again later."
+#~ msgstr "{0} (~{1} MB) itafutwa kutoka kwenye kivinjari hiki ili kuachilia "
+#~ "nafasi. Unaweza kuipakua tena baadaye."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "All organizations"
@@ -3590,6 +3651,11 @@ msgstr "Nenda kwa Mchambuzi wa Data"
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
 msgstr "Chati ya Rada"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Offline mode needs the offline models. Download them from the Offline "
+"button under the message box, or turn offline mode off."
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Comment actions"
@@ -3657,8 +3723,8 @@ msgstr "Safu mlalo {rowIndexes}."
 
 #. placeholder {0}: selectedModel.name
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Using {0}"
-msgstr "Ukifanya matumizi ya {0}"
+#~ msgid "Using {0}"
+#~ msgstr "Ukifanya matumizi ya {0}"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
@@ -3764,10 +3830,10 @@ msgid "Show dots"
 msgstr "Onyesha nukta"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Microsoft's compact instruct model. Solid structure and instruction "
-"following for dashboards."
-msgstr "Modeli ya Microsoft yenye maagizo mafupi. Muundo thabiti na ufuataji "
-"mzuri wa maagizo kwa dashibodi."
+#~ msgid "Microsoft's compact instruct model. Solid structure and instruction "
+#~ "following for dashboards."
+#~ msgstr "Modeli ya Microsoft yenye maagizo mafupi. Muundo thabiti na ufuataji "
+#~ "mzuri wa maagizo kwa dashibodi."
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try asking"
@@ -4092,9 +4158,9 @@ msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Offline chat model ready. Click to switch or re-download."
-msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "
-"pakua tena."
+#~ msgid "Offline chat model ready. Click to switch or re-download."
+#~ msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "
+#~ "pakua tena."
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
@@ -4206,6 +4272,10 @@ msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 msgid "Distance (meters)"
 msgstr "Umbali (mita)"
 
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Preparing offline models"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
 msgstr "Kiolezo cha URL"
@@ -4227,8 +4297,8 @@ msgid "Start your journey with us"
 msgstr "Anza safari yako nasi"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 7B (offline)"
-msgstr "Qwen 2.5 7B (offline)"
+#~ msgid "Qwen 2.5 7B (offline)"
+#~ msgstr "Qwen 2.5 7B (offline)"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
@@ -4252,10 +4322,10 @@ msgid "Topic: {topic}"
 msgstr "Mada: {topic}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
-"analytics work."
-msgstr "Inapendekezwa ikiwa una RAM ya GB 32 na mashine yenye nguvu inayotumika "
-"hasa kwa kazi za uchanganuzi."
+#~ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
+#~ "analytics work."
+#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 32 na mashine yenye nguvu inayotumika "
+#~ "hasa kwa kazi za uchanganuzi."
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
@@ -4277,8 +4347,8 @@ msgid "column {0}"
 msgstr "safu wima {0}"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-msgid "Open models"
-msgstr "Miundo ya Open"
+#~ msgid "Open models"
+#~ msgstr "Miundo ya Open"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -4482,9 +4552,9 @@ msgid "Re-run query"
 msgstr "Rudisha ombi"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
-msgstr "Modeli ndogo zaidi ya mazungumzo ya offline. Ni dhaifu zaidi kwenye SQL "
-"changamano lakini inapakuliwa haraka."
+#~ msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
+#~ msgstr "Modeli ndogo zaidi ya mazungumzo ya offline. Ni dhaifu zaidi kwenye SQL "
+#~ "changamano lakini inapakuliwa haraka."
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Move the pointer over the map to read a coordinate"
@@ -4522,8 +4592,8 @@ msgid "Dashboard not ready"
 msgstr "Dashibodi haijakamilika"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
-msgid "Downloaded on this browser"
-msgstr "Imepakuliwa kwenye kivinjari hiki"
+#~ msgid "Downloaded on this browser"
+#~ msgstr "Imepakuliwa kwenye kivinjari hiki"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
@@ -4557,8 +4627,8 @@ msgid "Can't be loaded"
 msgstr "Haiwezi kupakiwa"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-msgid "Choose a model"
-msgstr "Chagua mfano"
+#~ msgid "Choose a model"
+#~ msgstr "Chagua mfano"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -4751,8 +4821,8 @@ msgstr "Toleo jipya liko tayari. Sasisha sasa, au funga ujumbe huu na usasishe "
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "{0} was deleted from this browser."
-msgstr "{0} imefutwa kutoka kivinjari hiki."
+#~ msgid "{0} was deleted from this browser."
+#~ msgstr "{0} imefutwa kutoka kivinjari hiki."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Tab to import"
@@ -4763,8 +4833,8 @@ msgid "Couldn't search. Keep typing to retry."
 msgstr "Imeshindwa kutafuta. Endelea kuandika ili ujaribu tena."
 
 #: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
-msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
-msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+#~ msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
+#~ msgstr "{description} {recommendedIf} (~{approxSizeMb} MB download)."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
@@ -5162,6 +5232,11 @@ msgstr "Vichujio na dashibodi zilizohifadhiwa hutafuta rekodi kwa jina la hali. 
 "Vichujio vinavyotumia {renamedList} vitaacha kupata rekodi "
 "utakapohifadhi."
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "About {sizeGb} GB to download, once. Needs a recent version of Chrome or "
+"Edge, and a computer with at least 16 GB of memory."
+msgstr ""
+
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "Pitia tena jinsi ya kutengeneza na kushiriki dashboard, kuanzia mwanzo."
@@ -5187,8 +5262,8 @@ msgstr "[Utafutaji wa ugunduzi wa ndani umeshindikana. Jaribu safu wima tofauti 
 "iliyoshindwa.]"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Offline model download failed"
-msgstr "Kupakua mfano wa mtandaoni kumeshindikana"
+#~ msgid "Offline model download failed"
+#~ msgstr "Kupakua mfano wa mtandaoni kumeshindikana"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "File"
@@ -5267,10 +5342,10 @@ msgid "Horizontal gridlines"
 msgstr "Mistari mlalo ya gridi"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
-"the 8 GB tier."
-msgstr "Uwezo wa kufikiri ni bora kuliko 1.5B kwa upakuaji wa wastani. Hatua "
-"nzuri kutoka daraja la GB 8."
+#~ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
+#~ "the 8 GB tier."
+#~ msgstr "Uwezo wa kufikiri ni bora kuliko 1.5B kwa upakuaji wa wastani. Hatua "
+#~ "nzuri kutoka daraja la GB 8."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -5384,10 +5459,10 @@ msgid "Allowed"
 msgstr "Inaruhusiwa"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
-"SQL offline."
-msgstr "Modeli ya instruct ya 7B yenye ubora wa juu. Inafaa zaidi kwa miundo ya "
-"data migumu na SQL changamano bila mtandao."
+#~ msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
+#~ "SQL offline."
+#~ msgstr "Modeli ya instruct ya 7B yenye ubora wa juu. Inafaa zaidi kwa miundo ya "
+#~ "data migumu na SQL changamano bila mtandao."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{numResults, plural, one {# dataset} other {# datasets}}"
@@ -5452,6 +5527,10 @@ msgstr "Safu {layerCount}"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove failed"
 msgstr "Ondoa iliyo fail"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Try again, or clear this site's data in your browser settings."
+msgstr ""
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -5543,6 +5622,10 @@ msgstr "Kiwango cha asilimia"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
 msgstr "Chagua safu"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Check your internet connection and try again."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1"
@@ -5636,8 +5719,8 @@ msgid "Upgrade plan"
 msgstr "Boresha mpango"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
-msgid "Do not refresh or close this tab or else the download will be canceled."
-msgstr "Usi-refresh au kufunga tab hii vinginevyo upakuaji utafutwa."
+#~ msgid "Do not refresh or close this tab or else the download will be canceled."
+#~ msgstr "Usi-refresh au kufunga tab hii vinginevyo upakuaji utafutwa."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
@@ -5680,8 +5763,8 @@ msgid "Dates: {0}"
 msgstr "Tarehe: {0}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.2 1B (offline)"
-msgstr "Llama 3.2 1B (nje ya mtandao)"
+#~ msgid "Llama 3.2 1B (offline)"
+#~ msgstr "Llama 3.2 1B (nje ya mtandao)"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
@@ -5894,14 +5977,14 @@ msgid "Edit user group"
 msgstr "Hariri kundi la mtumiaji"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
-"device."
-msgstr "Inapendekezwa ikiwa una RAM ya GB 24 na unataka ubora unaokaribia wa "
-"wingu kwenye kifaa chako kikamilifu."
+#~ msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
+#~ "device."
+#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 24 na unataka ubora unaokaribia wa "
+#~ "wingu kwenye kifaa chako kikamilifu."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 1.5B"
-msgstr "Qwen 2.5 1.5B"
+#~ msgid "Qwen 2.5 1.5B"
+#~ msgstr "Qwen 2.5 1.5B"
 
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
@@ -5955,6 +6038,11 @@ msgstr "si kweli"
 #: shared/copy/vizTypeLabel.ts
 msgid "Bar Chart"
 msgstr "Chati ya pau"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Offline mode answers your questions with models that run on this "
+"computer instead of on Avandar's servers."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is none of"
@@ -6094,8 +6182,8 @@ msgstr "Hakuna mwelekeo bado. Kumbukumbu inajaza kadri mazungumzo yanavyouliza "
 "maswali ya ufafanuzi."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Llama 3.1 8B"
-msgstr "Llama 3.1 8B"
+#~ msgid "Llama 3.1 8B"
+#~ msgstr "Llama 3.1 8B"
 
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
@@ -6103,8 +6191,8 @@ msgid "Added {0} rows from the assistant. Check them before saving."
 msgstr "Imeongeza mistari {0} kutoka kwa msaidizi. Ikague kabla ya kuhifadhi."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Offline chat model removed"
-msgstr "Mfano wa mazungumzo ya mtandaoni umeondolewa"
+#~ msgid "Offline chat model removed"
+#~ msgstr "Mfano wa mazungumzo ya mtandaoni umeondolewa"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
 msgid "Create \"{trimmedSearch}\""
@@ -6288,6 +6376,11 @@ msgstr "Hakuna seti za data zinazolingana na kichujio chako"
 msgid "Curve"
 msgstr "Mviringo"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "You are not connected to the internet, so chat runs on this computer "
+"with the offline models."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What does this case type represent?"
 msgstr "Aina hii ya kesi inawakilisha nini?"
@@ -6317,8 +6410,8 @@ msgid "Time to answer"
 msgstr "Wakati wa kujibu"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-msgid "Could not remove offline chat model"
-msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
+#~ msgid "Could not remove offline chat model"
+#~ msgstr "Haiwezekani kuondoa mfano wa mazungumzo ya mtandaoni"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Maximum"
@@ -6445,7 +6538,6 @@ msgstr "Weka nambari kamili chanya kwa CRS yoyote ambayo haijaorodheshwa hapo "
 msgid "Overlapping"
 msgstr "Zinazopishana"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Download"
 msgstr "Pakua"
@@ -6497,8 +6589,12 @@ msgid "All"
 msgstr "Yote"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
-msgid "Downloading offline chat model"
-msgstr "Inapakua modeli ya mazungumzo ya nje ya mtandao"
+#~ msgid "Downloading offline chat model"
+#~ msgstr "Inapakua modeli ya mazungumzo ya nje ya mtandao"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Offline models downloaded"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6519,6 +6615,11 @@ msgid "We couldn't read a sample of this dataset, so its columns and their "
 "types are not confirmed. Adding it will try again."
 msgstr "Hatukuweza kusoma sampuli ya mkusanyiko huu wa data, kwa hivyo safu "
 "wima zake na aina zake hazijathibitishwa. Kuuongeza kutajaribu tena."
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Turn on offline mode to chat on this computer, without sending anything "
+"online."
+msgstr ""
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -6576,8 +6677,8 @@ msgid "No description has been added yet."
 msgstr "Maelezo hayajajumuishwa bado."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 3B"
-msgstr "Qwen 2.5 3B"
+#~ msgid "Qwen 2.5 3B"
+#~ msgstr "Qwen 2.5 3B"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
@@ -6708,6 +6809,10 @@ msgstr "wanachama wote wa "
 msgid "Some data should be manually entered"
 msgstr "Baadhi ya data inapaswa kuingizwa kwa mikono"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Running offline"
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
 msgstr "Jina la sehemu"
@@ -6727,9 +6832,9 @@ msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye axis ya Y. Chagua "
 "axis ya X hapa chini."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Pick a model to download. You can switch models or re-download later."
-msgstr "Chagua mfano wa kupakua. Unaweza kubadilisha mifano au kupakua tena "
-"baadaye."
+#~ msgid "Pick a model to download. You can switch models or re-download later."
+#~ msgstr "Chagua mfano wa kupakua. Unaweza kubadilisha mifano au kupakua tena "
+#~ "baadaye."
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename layer"
@@ -6907,6 +7012,10 @@ msgstr "US Letter"
 msgid "Level"
 msgstr "Kiwango"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Manage offline models"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{operator}\" is not an operator this form understands."
 msgstr "\"{operator}\" si opereta ambayo fomu hii inaweza kuelewa."
@@ -6935,6 +7044,10 @@ msgstr "Eneo"
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.tsx
 msgid "Mark not done"
 msgstr "Weka kuwa haijakamilika"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Nothing you ask, and none of your data, leaves this computer."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
@@ -7025,6 +7138,11 @@ msgstr "Mizani inatofautiana katika ramani hii"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
 msgstr "Waruhusu wengine waone dashibodi yako"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "They were deleted from this computer. You can download them again at any "
+"time."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Records added by hand"
@@ -7141,6 +7259,10 @@ msgstr "Aina za safu zimeboreshwa"
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Partially offline"
 msgstr "Sehemu ya mtandaoni"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
+msgid "Downloading offline models: {percent}%"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The comment is removed from the case for everyone."
@@ -7341,8 +7463,8 @@ msgstr "Mtumiaji wa hifadhidata anapaswa kuwa na ufikiaji wa kusoma pekee "
 "kwenye jedwali au mwonekano unaopanga kuleta."
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 7B"
-msgstr "Qwen 2.5 7B"
+#~ msgid "Qwen 2.5 7B"
+#~ msgstr "Qwen 2.5 7B"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
@@ -7510,6 +7632,10 @@ msgid "Could not reach the assistant. Kept the rule-based results."
 msgstr "Haikuwezekana kumfikia msaidizi. Matokeo ya kulingana na kanuni "
 "yamehifadhiwa."
 
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Downloading offline models"
+msgstr ""
+
 #. placeholder {0}: formatColumnShare(missingShare, i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "{0} missing"
@@ -7614,8 +7740,8 @@ msgid "Add layer"
 msgstr "Ongeza safu"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Offline chat model ready"
-msgstr "Mfano wa mazungumzo ya mtandaoni uko tayari"
+#~ msgid "Offline chat model ready"
+#~ msgstr "Mfano wa mazungumzo ya mtandaoni uko tayari"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
@@ -7674,8 +7800,8 @@ msgid "Visualization Settings"
 msgstr "Mipangilio ya Uonyeshaji"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Phi 3.5 Mini (offline)"
-msgstr "Phi 3.5 Mini (nje ya mtandao)"
+#~ msgid "Phi 3.5 Mini (offline)"
+#~ msgstr "Phi 3.5 Mini (nje ya mtandao)"
 
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewData.length
@@ -7936,8 +8062,8 @@ msgstr "Fanya kuwa ya mtandaoni pekee"
 
 #. placeholder {0}: modelCopy.displayName
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "{0} is available when you are offline."
-msgstr "{0} inapatikana unapokuwa mtandaoni."
+#~ msgid "{0} is available when you are offline."
+#~ msgstr "{0} inapatikana unapokuwa mtandaoni."
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
@@ -8030,6 +8156,11 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "Sikuweza kutengeneza SQL bila mtandao. Jaribu kuandika upya au "
 "uunganishe tena ili kutumia mazungumzo ya wingu."
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "This question is too long for the offline models. Try a shorter "
+"question, or turn offline mode off to use online chat."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
@@ -8192,8 +8323,8 @@ msgstr "Mabadiliko ambayo hayajahifadhiwa"
 
 #: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Model"
-msgstr "Mfano"
+#~ msgid "Model"
+#~ msgstr "Mfano"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "I will propose case types from your dataset names and columns. Pick from "
@@ -8229,8 +8360,8 @@ msgid "Show labels"
 msgstr "Onyesha lebo"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 1.5B (offline)"
-msgstr "Qwen 2.5 1.5B (nje ya mtandao)"
+#~ msgid "Qwen 2.5 1.5B (offline)"
+#~ msgstr "Qwen 2.5 1.5B (nje ya mtandao)"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "X axis"
@@ -8370,6 +8501,10 @@ msgstr "Chagua cha kusoma"
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
 
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "The offline models could not be loaded."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
 msgstr "Chanzo hakina tena mkusanyiko huu wa data."
@@ -8390,7 +8525,6 @@ msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
 msgstr "Seti za data {formattedNumResults} kati ya "
 "{formattedNumCatalogListings}"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "Ondoa"
@@ -8417,10 +8551,10 @@ msgid "Loading author"
 msgstr "Inapakia mwandishi"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-msgid "This question is too large for the on-device model. Try a shorter "
-"question, or reconnect to use cloud chat."
-msgstr "Swali hili ni kubwa sana kwa modeli iliyo kwenye kifaa. Jaribu swali "
-"fupi zaidi, au unganisha tena ili kutumia gumzo la wingu."
+#~ msgid "This question is too large for the on-device model. Try a shorter "
+#~ "question, or reconnect to use cloud chat."
+#~ msgstr "Swali hili ni kubwa sana kwa modeli iliyo kwenye kifaa. Jaribu swali "
+#~ "fupi zaidi, au unganisha tena ili kutumia gumzo la wingu."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -8499,8 +8633,8 @@ msgstr "Seti hii ya data haitahifadhiwa mtandaoni tena na inaweza kufikiwa tu "
 "ataweza kufikia data hii. Hii inapendekezwa tu kwa data nyeti sana."
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-msgid "Download a different offline chat model"
-msgstr "Pakua mfano tofauti wa mazungumzo ya mtandaoni"
+#~ msgid "Download a different offline chat model"
+#~ msgstr "Pakua mfano tofauti wa mazungumzo ya mtandaoni"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
@@ -8524,8 +8658,8 @@ msgid "{conceptName} fields"
 msgstr "Sehemu za {conceptName}"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Qwen 2.5 3B (offline)"
-msgstr "Qwen 2.5 3B (nje ya mtandao)"
+#~ msgid "Qwen 2.5 3B (offline)"
+#~ msgstr "Qwen 2.5 3B (nje ya mtandao)"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Collapse the legend"
@@ -8807,10 +8941,10 @@ msgid "Filters (Where)"
 msgstr "Filita (Wapi)"
 
 #: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
-"offline."
-msgstr "Inapendekezwa ikiwa una RAM ya GB 12 na unataka majibu bora zaidi ya "
-"SQL bila mtandao."
+#~ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
+#~ "offline."
+#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 12 na unataka majibu bora zaidi ya "
+#~ "SQL bila mtandao."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
@@ -9024,8 +9158,8 @@ msgid "Details"
 msgstr "Maelezo"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid "Could not prepare the offline chat model."
-msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
+#~ msgid "Could not prepare the offline chat model."
+#~ msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -9166,8 +9300,8 @@ msgid "Add filter"
 msgstr "Ongeza chujio"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-msgid "Offline models"
-msgstr "Miundo ya nje ya mtandao"
+#~ msgid "Offline models"
+#~ msgstr "Miundo ya nje ya mtandao"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
@@ -9260,6 +9394,11 @@ msgstr "Hakuna safu zinazopatikana"
 msgid "Size by"
 msgstr "Ukubwa kwa"
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
+msgid "Offline mode is on. Chat runs on this computer and nothing leaves it. "
+"Click to go back online."
+msgstr ""
+
 #: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
 msgstr "Badilisha ukubwa wa paneli ya pembeni"
@@ -9313,6 +9452,11 @@ msgstr "Kijani"
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Hide details"
 msgstr "Ficha maelezo"
+
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
+msgid "This browser cannot run the offline models. Use a recent version of "
+"Chrome or Edge."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -9396,8 +9540,8 @@ msgid "Center"
 msgstr "Katikati"
 
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-msgid " · downloaded"
-msgstr " · imeshukuliwa"
+#~ msgid " · downloaded"
+#~ msgstr " · imeshukuliwa"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
@@ -9451,6 +9595,11 @@ msgstr "Lugha"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close panel (⌘/)"
 msgstr "Funga paneli (⌘/)"
+
+#: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
+msgid "Click Offline under the message box to use them. Chat also uses them on "
+"its own when you lose your connection."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
@@ -9508,9 +9657,7 @@ msgstr "Hitilafu isiyotarajiwa imetokea."
 msgid "Pay what you want"
 msgstr "Lipa unachotaka"
 
-#. placeholder {0}: modelCopy.displayName
 #. placeholder {0}: region.label
-#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Remove {0}"
 msgstr "Ondoa {0}"
@@ -9689,6 +9836,10 @@ msgstr "Umbo"
 msgid "This comment was deleted."
 msgstr "Maoni haya yalifutwa."
 
+#: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+msgid "Answers are slower and less accurate than online chat."
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
 msgstr "iko kwenye"
@@ -9812,6 +9963,10 @@ msgstr "Juu"
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "Kutoka kwa kichocheo chako:"
+
+#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
+msgid "Keep this tab open until it finishes."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -10620,8 +10775,8 @@ msgid "Get started"
 msgstr "Anza"
 
 #: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-msgid "Frontier models"
-msgstr "Miundo ya Frontier"
+#~ msgid "Frontier models"
+#~ msgstr "Miundo ya Frontier"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx

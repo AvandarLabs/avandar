@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
-import { createMockOfflineChatEngine } from "@/stores/OfflineChatEngineStore/createOfflineChatEngine/createMockOfflineChatEngine";
+import { createMockLocalModelRuntime } from "@/stores/OfflineChatEngineStore/createLocalModelRuntime/createMockLocalModelRuntime";
+import type { OfflineChatEngine } from "$/types/offlineChat.types";
+import type { MockOfflineChatResponse } from "@/stores/OfflineChatEngineStore/createLocalModelRuntime/createMockLocalModelRuntime";
 
 const SCHEMA = {
   datasets: [{ id: "ds-1", name: "Sales" }],
@@ -19,9 +21,27 @@ const COPY = {
   metadataQuery: "Esta es una consulta basada en los metadatos.",
 } as const;
 
+/** A scripted engine in the shape the pipeline takes. */
+function _createMockOfflineChatEngine(
+  script: readonly MockOfflineChatResponse[],
+): OfflineChatEngine {
+  const runtime = createMockLocalModelRuntime(script);
+  return {
+    preload: async () => {},
+    complete: async (request) => {
+      const completion = await runtime.complete({
+        ...request,
+        modelId: "mock",
+      });
+      return completion.text;
+    },
+    unload: async () => {},
+  };
+}
+
 describe("runOfflineChatPipeline", () => {
   it("runs analyze then SQL and rewrites table aliases", async () => {
-    const engine = createMockOfflineChatEngine([
+    const engine = _createMockOfflineChatEngine([
       {
         match: "offline assistant",
         response: '{"summary":"Count sales","proceed":true,"tableName":"t0"}',
@@ -48,7 +68,7 @@ describe("runOfflineChatPipeline", () => {
   });
 
   it("runs analyze then SQL and returns generatedSql", async () => {
-    const engine = createMockOfflineChatEngine([
+    const engine = _createMockOfflineChatEngine([
       {
         match: "offline assistant",
         response: '{"summary":"Count sales","proceed":true}',
@@ -77,7 +97,7 @@ describe("runOfflineChatPipeline", () => {
   });
 
   it("returns clarification when analyze does not proceed", async () => {
-    const engine = createMockOfflineChatEngine([
+    const engine = _createMockOfflineChatEngine([
       {
         match: "offline assistant",
         response:

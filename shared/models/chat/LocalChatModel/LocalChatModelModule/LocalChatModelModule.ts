@@ -1,53 +1,19 @@
-import { prop, propEq } from "@avandar/utils";
+import { propEq } from "@avandar/utils";
+import {
+  LOCAL_CHAT_MODEL_SPECS,
+  OFFLINE_MODEL_BUNDLE,
+  PEAK_MODEL_MEMORY_BUDGET_MB,
+} from "$/models/chat/LocalChatModel/LocalChatModel.constants.ts";
 import type { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 
-const LOCAL_CHAT_MODELS: readonly LocalChatModel.T[] = [
-  {
-    id: "llama-1b",
-    mlcModelId: "Llama-3.2-1B-Instruct-q4f16_1-MLC",
-    approxSizeMb: 600,
-    minRamGb: 4,
-  },
-  {
-    id: "qwen-1.5b",
-    mlcModelId: "Qwen2.5-1.5B-Instruct-q4f16_1-MLC",
-    approxSizeMb: 900,
-    minRamGb: 8,
-  },
-  {
-    id: "qwen-3b",
-    mlcModelId: "Qwen2.5-3B-Instruct-q4f16_1-MLC",
-    approxSizeMb: 1800,
-    minRamGb: 12,
-  },
-  {
-    id: "phi-3.5-mini",
-    mlcModelId: "Phi-3.5-mini-instruct-q4f16_1-MLC",
-    approxSizeMb: 2300,
-    minRamGb: 16,
-  },
-  {
-    id: "qwen-7b",
-    mlcModelId: "Qwen2.5-7B-Instruct-q4f16_1-MLC",
-    approxSizeMb: 4500,
-    minRamGb: 24,
-  },
-  {
-    id: "llama-8b",
-    mlcModelId: "Llama-3.1-8B-Instruct-q4f16_1-MLC",
-    approxSizeMb: 5000,
-    minRamGb: 32,
-  },
-];
-
-const DEFAULT_LOCAL_CHAT_MODEL_ID: LocalChatModel.Id = "qwen-1.5b";
-
-const LOCAL_CHAT_MODEL_ID_SET = new Set<string>(
-  LOCAL_CHAT_MODELS.map(prop("id")),
-);
+const LOCAL_CHAT_MODELS: readonly LocalChatModel.T[] = Object.entries(
+  LOCAL_CHAT_MODEL_SPECS,
+).map(([id, spec]) => {
+  return { id: id as LocalChatModel.Id, ...spec };
+});
 
 function _isValidId(id: string): id is LocalChatModel.Id {
-  return LOCAL_CHAT_MODEL_ID_SET.has(id);
+  return Object.hasOwn(LOCAL_CHAT_MODEL_SPECS, id);
 }
 
 function _find(id: LocalChatModel.Id): LocalChatModel.T {
@@ -58,17 +24,63 @@ function _find(id: LocalChatModel.Id): LocalChatModel.T {
   return model;
 }
 
+function _getModelIdsFromBundle(
+  bundle: LocalChatModel.Bundle,
+): LocalChatModel.Id[] {
+  const ids = [bundle.router, bundle.escalation, bundle.answer].filter(
+    (id): id is LocalChatModel.Id => {
+      return id !== undefined;
+    },
+  );
+  return [...new Set(ids)];
+}
+
+function _getDownloadMbFromBundle(bundle: LocalChatModel.Bundle): number {
+  return _getModelIdsFromBundle(bundle).reduce((totalMb, id) => {
+    return totalMb + _find(id).approxDownloadMb;
+  }, 0);
+}
+
+function _getPeakMemoryMbFromBundle(bundle: LocalChatModel.Bundle): number {
+  return Math.max(
+    ..._getModelIdsFromBundle(bundle).map((id) => {
+      return _find(id).peakMemoryMb;
+    }),
+  );
+}
+
 /**
- * Runtime surface for the {@link LocalChatModel} model. Groups the static
- * catalog of offline-inference models under `Catalog` so callers reference it
- * as `LocalChatModel.Catalog.find(...)`.
+ * Runtime surface for the {@link LocalChatModel} model: the catalog of
+ * models that run on the user's device, and the offline bundle that says
+ * which of them offline mode downloads and uses. Read by the offline chat
+ * stores and the offline mode dialog, for example to show the download size.
  */
 export const LocalChatModelModule = {
-  /** Catalog of local chat models available for offline inference. */
+  /** The models offline mode downloads and the job each one does. */
+  OFFLINE_BUNDLE: OFFLINE_MODEL_BUNDLE,
+
+  /** Most GPU memory offline models may hold at once, in MB. */
+  PEAK_MODEL_MEMORY_BUDGET_MB,
+
+  /** Catalog of local chat models that run on the user's device. */
   Catalog: {
     values: LOCAL_CHAT_MODELS,
-    defaultId: DEFAULT_LOCAL_CHAT_MODEL_ID,
     isValidId: _isValidId,
     find: _find,
   },
+
+  /**
+   * Every distinct model in a bundle, each once, in download order. The
+   * answer model comes last.
+   */
+  getModelIdsFromBundle: _getModelIdsFromBundle,
+
+  /** The bundle's approximate total download size, in MB. */
+  getDownloadMbFromBundle: _getDownloadMbFromBundle,
+
+  /**
+   * The most GPU memory the bundle needs at once, in MB. Models swap in and
+   * out, so this is the largest single model.
+   */
+  getPeakMemoryMbFromBundle: _getPeakMemoryMbFromBundle,
 };

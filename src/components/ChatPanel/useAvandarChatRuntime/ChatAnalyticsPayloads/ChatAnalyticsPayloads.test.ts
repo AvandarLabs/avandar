@@ -43,20 +43,18 @@ const EDITOR_STATE_WITH_TWO_BLOCKS: DashboardEditorAppState = {
 };
 
 describe("ChatAnalyticsPayloads", () => {
-  it("describes the initially selected local route", () => {
+  it("describes a turn that runs on the offline models as local", () => {
     expect(
       ChatAnalyticsPayloads.fromMessage({
         content: "show monthly sales",
         pageContext: ChatPageContext.createDataExplorerViewContext({
           openDatasetId: "dataset-1",
         }),
-        selectedModelId: "offline:qwen-1.5b",
-        runtimeMode: { kind: "local", localChatModelId: "qwen-1.5b" },
+        runtimeMode: { kind: "local" },
       }),
     ).toEqual({
       promptChars: 18,
       pageApp: "data-explorer",
-      modelId: "offline:qwen-1.5b",
       runtimeMode: "local",
       hasOpenDataset: true,
     });

@@ -1,11 +1,9 @@
 import { propEq } from "@avandar/utils";
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { ensureOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/ensureOfflineChatSchema/ensureOfflineChatSchema";
 import { fetchOfflineChatSchema } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/fetchOfflineChatSchema";
 import { formatOfflinePhaseAssistantText } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/formatOfflinePhaseAssistantText";
 import { runOfflineChatPipeline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/runOfflineChatPipeline/runOfflineChatPipeline";
-import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
@@ -21,7 +19,6 @@ export type RunOfflineChatTurnArgs = {
   messages: readonly ChatClientMessage.T[];
   navigatorOnLine: boolean;
   copy: OfflineChatPipelineCopy;
-  localChatModelId?: LocalChatModel.Id;
   executeSql?: (
     sql: string,
   ) => Promise<{ ok: true } | { ok: false; error: string }>;
@@ -57,8 +54,7 @@ export async function runOfflineChatTurn(
     }),
   });
 
-  const modelId = args.localChatModelId ?? LocalChatModelStore.readSelectedId();
-  const engine = await OfflineChatEngineStore.ensureEngine(modelId);
+  const engine = await OfflineChatEngineStore.ensureEngine();
 
   const pipelineMessages = args.messages.map((message) => {
     return {

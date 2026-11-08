@@ -1,9 +1,8 @@
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 
-const SELECTED_MODEL_KEY = "avandar.offlineChat.selectedModelId";
 const DOWNLOADED_MODELS_KEY = "avandar.offlineChat.downloadedModels";
 
-type DownloadedRecord = Partial<Record<LocalChatModel.Id, true>>;
+type DownloadedRecord = Partial<Record<string, true>>;
 
 const downloadedListeners = new Set<() => void>();
 
@@ -20,76 +19,56 @@ function _notifyDownloadedModelsChanged(): void {
   });
 }
 
-function readDownloaded(): DownloadedRecord {
+function _readDownloaded(): DownloadedRecord {
   try {
     const raw = window.localStorage.getItem(DOWNLOADED_MODELS_KEY);
-    if (!raw) {
-      return {};
-    }
-    return JSON.parse(raw) as DownloadedRecord;
+    return raw ? (JSON.parse(raw) as DownloadedRecord) : {};
   } catch {
     return {};
   }
 }
 
-function writeDownloaded(record: DownloadedRecord): void {
-  window.localStorage.setItem(DOWNLOADED_MODELS_KEY, JSON.stringify(record));
-}
-
-function _readSelectedId(): LocalChatModel.Id {
-  const raw = window.localStorage.getItem(SELECTED_MODEL_KEY);
-  if (raw && LocalChatModel.Catalog.isValidId(raw)) {
-    return raw;
+function _writeDownloaded(record: DownloadedRecord): void {
+  try {
+    window.localStorage.setItem(DOWNLOADED_MODELS_KEY, JSON.stringify(record));
+  } catch {
+    // Storage disabled: the marker lives only until the page reloads.
   }
-  return LocalChatModel.Catalog.defaultId;
-}
-
-function _writeSelectedId(id: LocalChatModel.Id): void {
-  window.localStorage.setItem(SELECTED_MODEL_KEY, id);
 }
 
 function _isDownloaded(id: LocalChatModel.Id): boolean {
-  return readDownloaded()[id] === true;
+  return _readDownloaded()[id] === true;
 }
 
 function _markDownloaded(id: LocalChatModel.Id): void {
-  const record = readDownloaded();
-  record[id] = true;
-  writeDownloaded(record);
+  _writeDownloaded({ ..._readDownloaded(), [id]: true });
   _notifyDownloadedModelsChanged();
 }
 
 function _clearDownloaded(id: LocalChatModel.Id): void {
-  const record = readDownloaded();
-  delete record[id];
-  writeDownloaded(record);
+  const { [id]: _cleared, ...rest } = _readDownloaded();
+  _writeDownloaded(rest);
   _notifyDownloadedModelsChanged();
 }
 
-function _hasAnyDownloaded(): boolean {
-  const record = readDownloaded();
-  return Object.values(record).some((value) => {
-    return value === true;
-  });
+function _isBundleDownloaded(): boolean {
+  return LocalChatModel.getModelIdsFromBundle(
+    LocalChatModel.OFFLINE_BUNDLE,
+  ).every(_isDownloaded);
 }
 
-function _listDownloadedIds(): LocalChatModel.Id[] {
-  const record = readDownloaded();
-  return LocalChatModel.Catalog.values.flatMap((model) => {
-    return record[model.id] === true ? [model.id] : [];
-  });
-}
-
-/** Persistent selection and download metadata for local chat models. */
+/**
+ * Remembers, in this browser's local storage, which local models finished
+ * downloading. The browser cache holds the weights; these markers let the
+ * chat runtime and the offline mode control know whether offline mode can
+ * run without opening that cache.
+ */
 export const LocalChatModelStore = {
-  /** Subscribes to changes in the downloaded-models list (mark/clear). */
+  /** Subscribes to changes in the downloaded markers (mark or clear). */
   subscribeDownloadedModels: _subscribeDownloadedModels,
-  readSelectedId: _readSelectedId,
-  writeSelectedId: _writeSelectedId,
   isDownloaded: _isDownloaded,
   markDownloaded: _markDownloaded,
   clearDownloaded: _clearDownloaded,
-  hasAnyDownloaded: _hasAnyDownloaded,
-  /** Downloaded models in catalog order (for UI lists). */
-  listDownloadedIds: _listDownloadedIds,
+  /** True when every model in the offline bundle is downloaded. */
+  isBundleDownloaded: _isBundleDownloaded,
 };

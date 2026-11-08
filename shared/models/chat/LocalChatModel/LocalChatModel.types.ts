@@ -1,29 +1,39 @@
-export type LocalChatModelRamGb = 4 | 8 | 12 | 16 | 24 | 32;
+import type { LOCAL_CHAT_MODEL_SPECS } from "$/models/chat/LocalChatModel/LocalChatModel.constants.ts";
 
-export type LocalChatModelId =
-  | "llama-1b"
-  | "qwen-1.5b"
-  | "qwen-3b"
-  | "phi-3.5-mini"
-  | "qwen-7b"
-  | "llama-8b";
+/** Smallest computer, in GB of memory, a local model is meant to run on. */
+export type LocalChatModelRamGb = 8 | 12 | 16;
 
-/** A local (WebLLM) chat model available for offline inference. */
-export type LocalChatModelT = {
-  id: LocalChatModelId;
-  /** MLC model id passed to `CreateMLCEngine`. */
-  mlcModelId: string;
-  /** Approximate download size for UI copy only. */
-  approxSizeMb: number;
-  /** Minimum system RAM (GB) recommended for this model. */
+/** A WebLLM model id from the catalog, such as `Qwen3-4B-q4f16_1-MLC`. */
+export type LocalChatModelId = keyof typeof LOCAL_CHAT_MODEL_SPECS;
+
+/** The size figures of one local model, keyed by id in the catalog. */
+export type LocalChatModelSpec = {
+  /** Approximate download size, for the offline mode dialog's copy. */
+  approxDownloadMb: number;
+  /**
+   * Approximate GPU memory the model holds while resident, at the context
+   * window the app gives offline models.
+   */
+  peakMemoryMb: number;
+  /** Smallest computer, in GB of memory, this model is meant to run on. */
   minRamGb: LocalChatModelRamGb;
 };
 
-/** Translated copy displayed for a local chat model. */
-export type LocalChatModelCopy = {
-  displayName: string;
-  pickerName: string;
-  description: string;
-  systemRequirements: string;
-  recommendedIf: string;
+/** A local (WebLLM) chat model that runs on the user's device. */
+export type LocalChatModelT = LocalChatModelSpec & {
+  /** The WebLLM model id passed to `MLCEngine.reload`. */
+  id: LocalChatModelId;
+};
+
+/**
+ * Which local model does each job in offline mode. One model may do several
+ * jobs. Mirrors the models the offline data agent takes.
+ */
+export type LocalChatModelBundle = {
+  /** Writes the queries and replies. */
+  answer: LocalChatModelId;
+  /** Sorts messages into data questions and chat, when set. */
+  router?: LocalChatModelId;
+  /** Takes over after a failed or empty query, when set. */
+  escalation?: LocalChatModelId;
 };
