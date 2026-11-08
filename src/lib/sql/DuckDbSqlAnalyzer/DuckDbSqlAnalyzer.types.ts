@@ -24,6 +24,11 @@ export type CteAlias = {
  */
 export type SourceAnalysis = {
   relationTableNames: string[];
+  /**
+   * Names of internal tables the source reads, such as an individuals staging
+   * table. They name no relation, so `relationTableNames` leaves them out.
+   */
+  internalTableNames: string[];
   unsafeReason?: DuckDbUnsafeSqlReason;
   isMutating: boolean;
   mutatedDatasetIds: string[];
@@ -53,7 +58,16 @@ export type DuckDbUnsafeSqlReason =
  * reported as a dataset it is not.
  */
 export type DuckDbSqlAnalysis =
-  | { kind: "read"; relations: RelationRef.T[] }
+  | {
+      kind: "read";
+      relations: RelationRef.T[];
+      /**
+       * The internal tables the statement reads, which name no relation.
+       * Present only when the statement reads at least one, so a caller that
+       * allows only relations can refuse it.
+       */
+      internalTableNames?: string[];
+    }
   | {
       kind: "mutating";
       readDatasetIds: string[];

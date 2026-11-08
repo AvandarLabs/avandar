@@ -181,6 +181,91 @@ describe("DuckDbClient public snapshot reads", () => {
     expect(queryMock).not.toHaveBeenCalled();
   });
 
+  // Internal tables name no dataset, so a relation check alone passes them.
+  // A staging table can hold rows a workspace sync left behind.
+  it("rejects a public read of an individuals staging table", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(
+        `SELECT * FROM "ava_staging_individuals_${CONCEPT_ID}"`,
+        {
+          datasetTableReadMode: "public",
+          publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+        },
+      ),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a public read that joins a published dataset to a staging table", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient, DatasetDuckDbCoordinator } =
+      await importDuckDbModules();
+    DatasetDuckDbCoordinator.setPublicSnapshotDatasetOwner({
+      datasetId: DATASET_ID,
+      owner: PUBLIC_OWNER,
+    });
+
+    await expect(
+      DuckDbClient.runRawQuery(
+        `SELECT * FROM "${DATASET_ID}" JOIN "ava_staging_individuals_${CONCEPT_ID}" ON true`,
+        {
+          datasetTableReadMode: "public",
+          publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+        },
+      ),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a public read of reject_errors", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(`SELECT * FROM reject_errors`, {
+        datasetTableReadMode: "public",
+        publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+      }),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  // A common table expression and a subquery name no table of their own, so
+  // neither counts as an internal table.
+  it("still allows a public read through a CTE and a subquery", async () => {
+    vi.resetModules();
+    stubWorker();
+    queryMock.mockResolvedValue({
+      schema: { fields: [] },
+      toArray: () => {
+        return [];
+      },
+    });
+    const { DuckDbClient, DatasetDuckDbCoordinator } =
+      await importDuckDbModules();
+    DatasetDuckDbCoordinator.setPublicSnapshotDatasetOwner({
+      datasetId: DATASET_ID,
+      owner: PUBLIC_OWNER,
+    });
+
+    await expect(
+      DuckDbClient.runRawQuery(
+        `WITH recent AS (SELECT * FROM "${DATASET_ID}")
+         SELECT * FROM recent JOIN (SELECT 1 AS id FROM range(3)) other ON true`,
+        {
+          datasetTableReadMode: "public",
+          publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+        },
+      ),
+    ).resolves.toMatchObject({ data: [] });
+  });
+
   // Workspace reads build and read case type views on purpose.
   it("still lets a workspace read name a case type's view", async () => {
     vi.resetModules();

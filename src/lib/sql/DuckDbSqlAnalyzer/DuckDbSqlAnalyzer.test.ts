@@ -449,18 +449,81 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
   // account for. The table used to be named with the concept's bare id, which
   // the analyzer resolved as a dataset; adding the prefix made all three reads
   // `uninspectable-source`, so every sync threw the moment its upsert began.
-  // It reads no dataset of its own, so it contributes no relation.
+  // It reads no dataset of its own, so it contributes no relation. It is
+  // reported by name instead, so a caller that allows only datasets can refuse
+  // it.
   it("reads an individuals staging table as an internal table naming no relation", () => {
+    const stagingTableName = `ava_staging_individuals_${CONCEPT_ID}`;
+
     expect(
       DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-        `SELECT * FROM "ava_staging_individuals_${CONCEPT_ID}" LIMIT 1000`,
+        `SELECT * FROM "${stagingTableName}" LIMIT 1000`,
       ),
-    ).toEqual({ kind: "read", relations: [] });
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: [stagingTableName],
+    });
     expect(
       DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-        `DESCRIBE "ava_staging_individuals_${CONCEPT_ID}"`,
+        `DESCRIBE "${stagingTableName}"`,
       ),
-    ).toEqual({ kind: "read", relations: [] });
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: [stagingTableName],
+    });
+  });
+
+  it("reports an internal table beside the datasets a statement reads", () => {
+    const stagingTableName = `ava_staging_individuals_${CONCEPT_ID}`;
+
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "${DATASET_ID}" JOIN "${stagingTableName}" ON true`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+      internalTableNames: [stagingTableName],
+    });
+  });
+
+  it("reports the reject tables as internal tables", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM reject_errors`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: ["reject_errors"],
+    });
+  });
+
+  it("reports an internal table read inside query()", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM query('SELECT * FROM reject_scans')`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: ["reject_scans"],
+    });
+  });
+
+  // A CTE name, a subquery, and a table function name no table of their own.
+  it("reports no internal table for a CTE, a subquery, or a table function", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `WITH recent AS (SELECT * FROM "${DATASET_ID}")
+         SELECT * FROM recent JOIN (SELECT 1 AS id FROM range(3)) other ON true`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+    });
   });
 
   // The staging table is a bare local table, so a qualified name is something

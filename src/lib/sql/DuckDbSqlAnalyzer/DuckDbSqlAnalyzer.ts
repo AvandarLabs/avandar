@@ -126,7 +126,13 @@ function _getDuckDbSqlAnalysisFromSql(
       datasetIds: _getDatasetIds(relationTableNames),
     };
   }
-  return { kind: "read", relations: _getRelations(relationTableNames) };
+  const internalTableNames = mergeUniqueNames(
+    ...sourceAnalyses.map(prop("internalTableNames")),
+  );
+  const relations = _getRelations(relationTableNames);
+  return internalTableNames.length === 0
+    ? { kind: "read", relations }
+    : { kind: "read", relations, internalTableNames };
 }
 
 /** Returns the complete static relation effect analysis for DuckDB SQL. */

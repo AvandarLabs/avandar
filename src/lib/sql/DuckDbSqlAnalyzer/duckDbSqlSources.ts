@@ -111,12 +111,17 @@ function _getFunctionArgumentFromIndexes(
   return fromIndexes;
 }
 
-/** Builds a read-only source analysis over the given relation table names. */
+/**
+ * Builds a read-only source analysis over the given relation table names and,
+ * optionally, the internal tables it reads.
+ */
 function _readSourceAnalysis(
   relationTableNames: readonly string[],
+  internalTableNames: readonly string[] = [],
 ): SourceAnalysis {
   return {
     relationTableNames: [...relationTableNames],
+    internalTableNames: [...internalTableNames],
     isMutating: false,
     mutatedDatasetIds: [],
   };
@@ -128,6 +133,7 @@ function _unsafeSourceAnalysis(
 ): SourceAnalysis {
   return {
     relationTableNames: [],
+    internalTableNames: [],
     unsafeReason,
     isMutating: false,
     mutatedDatasetIds: [],
@@ -142,6 +148,7 @@ function _getSourceAnalysisFromDuckDbSqlAnalysis(
       analysis.relations.map((relation) => {
         return RelationRef.toTableName(relation);
       }),
+      analysis.internalTableNames,
     );
   }
   if (analysis.kind === "mutating") {
@@ -149,12 +156,14 @@ function _getSourceAnalysisFromDuckDbSqlAnalysis(
     // mutating statement are already table names.
     return {
       relationTableNames: analysis.readDatasetIds,
+      internalTableNames: [],
       isMutating: true,
       mutatedDatasetIds: analysis.mutatedDatasetIds,
     };
   }
   return {
     relationTableNames: analysis.datasetIds,
+    internalTableNames: [],
     unsafeReason: analysis.reason,
     isMutating: false,
     mutatedDatasetIds: [],
@@ -272,7 +281,7 @@ function _getAnalysisFromIdentifierSource(
     tableName !== undefined &&
     INSPECTABLE_INTERNAL_TABLES.has(tableName)
   ) {
-    return _readSourceAnalysis([]);
+    return _readSourceAnalysis([], [tableName]);
   }
   // An `ava_staging_individuals_<conceptId>` table holds rows the caller just
   // materialized from relations it was already authorized for, so reading it
@@ -285,7 +294,7 @@ function _getAnalysisFromIdentifierSource(
     tableName !== undefined &&
     isStagingIndividualsTableName(tableName)
   ) {
-    return _readSourceAnalysis([]);
+    return _readSourceAnalysis([], [tableName]);
   }
   return _unsafeSourceAnalysis("uninspectable-source");
 }

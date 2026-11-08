@@ -32,7 +32,8 @@ type RawQueryExecutionPlan = {
  * snapshot it reads, or read anything but a dataset. A snapshot is
  * authorized by the datasets it published and builds no case type view, so
  * a `concept_<id>` view in this DuckDB instance was built by a workspace
- * query and belongs to no snapshot.
+ * query and belongs to no snapshot. An internal table, such as an individuals
+ * staging table, names no relation and so belongs to no snapshot either.
  */
 function _assertPublicReadAnalysis(
   input: Readonly<{ options: RawQueryOptions; analysis: DuckDbSqlAnalysis }>,
@@ -47,9 +48,11 @@ function _assertPublicReadAnalysis(
   if (options.publicSnapshotDuckDbOwner === undefined) {
     throw new Error("Public DuckDB queries require an expected snapshot owner");
   }
-  const isDatasetOnlyRead = analysis.relations.every((relation) => {
-    return relation.kind === "dataset";
-  });
+  const isDatasetOnlyRead =
+    analysis.internalTableNames === undefined &&
+    analysis.relations.every((relation) => {
+      return relation.kind === "dataset";
+    });
   if (!isDatasetOnlyRead) {
     throw new Error("Public DuckDB queries can only read published datasets");
   }
