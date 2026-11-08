@@ -44,9 +44,9 @@ describe("ConceptAttribute.getOutputDataType", () => {
 });
 
 describe("ConceptAttribute.getViewColumnNames", () => {
-  function _names(
+  function _getViewColumnNamesFromPairs(
     fields: ReadonlyArray<readonly [id: string, name: string]>,
-  ): Record<string, string> {
+  ): Record<string, { columnName: string; resultName: string }> {
     return Object.fromEntries(
       ConceptAttribute.getViewColumnNames(
         fields.map(([id, name]) => {
@@ -56,9 +56,21 @@ describe("ConceptAttribute.getViewColumnNames", () => {
     );
   }
 
+  function _getColumnNamesFromPairs(
+    fields: ReadonlyArray<readonly [id: string, name: string]>,
+  ): Record<string, string> {
+    return Object.fromEntries(
+      Object.entries(_getViewColumnNamesFromPairs(fields)).map(
+        ([id, names]) => {
+          return [id, names.columnName];
+        },
+      ),
+    );
+  }
+
   it("names each field's view column after the field", () => {
     expect(
-      _names([
+      _getColumnNamesFromPairs([
         ["b", "County"],
         ["a", "Age"],
       ]),
@@ -67,7 +79,7 @@ describe("ConceptAttribute.getViewColumnNames", () => {
 
   it("suffixes a field named like the record key or the status", () => {
     expect(
-      _names([
+      _getColumnNamesFromPairs([
         ["a", "external_id"],
         ["b", "Status"],
       ]),
@@ -78,12 +90,62 @@ describe("ConceptAttribute.getViewColumnNames", () => {
   // name and then id, so the same field keeps the plain name every run.
   it("suffixes the later of two fields whose names match without case", () => {
     expect(
-      _names([
+      _getColumnNamesFromPairs([
         ["b", "age"],
         ["a", "age"],
         ["c", "REGION"],
         ["d", "Region"],
       ]),
     ).toEqual({ a: "age", b: "age_2", d: "Region", c: "REGION_2" });
+  });
+
+  it("keeps a field's own name as its result name when it has no twin", () => {
+    expect(_getViewColumnNamesFromPairs([["a", "Age"]])).toEqual({
+      a: { columnName: "Age", resultName: "Age" },
+    });
+  });
+
+  // The result keeps the name the user sees when only a reserved column
+  // forced the suffix: no other field is called `external_id`.
+  it("keeps a reserved-name field's own name as its result name", () => {
+    expect(
+      _getViewColumnNamesFromPairs([
+        ["a", "external_id"],
+        ["b", "Status"],
+      ]),
+    ).toEqual({
+      a: { columnName: "external_id_2", resultName: "external_id" },
+      b: { columnName: "Status_2", resultName: "Status" },
+    });
+  });
+
+  // `age` and `Age` would both name their result `age`, and DuckDB reads the
+  // second as `age:1`. The later field's result takes its view column's name.
+  it("names the later of two fields that match without case by its view column", () => {
+    expect(
+      _getViewColumnNamesFromPairs([
+        ["a", "age"],
+        ["b", "Age"],
+      ]),
+    ).toEqual({
+      a: { columnName: "age", resultName: "age" },
+      b: { columnName: "Age_2", resultName: "Age_2" },
+    });
+  });
+
+  it("separates two fields that both match a reserved name", () => {
+    const names = _getViewColumnNamesFromPairs([
+      ["a", "external_id"],
+      ["b", "external_id"],
+    ]);
+
+    expect(names["a"]).toEqual({
+      columnName: "external_id_2",
+      resultName: "external_id",
+    });
+    expect(names["b"]).toEqual({
+      columnName: "external_id_3",
+      resultName: "external_id_3",
+    });
   });
 });

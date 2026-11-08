@@ -76,7 +76,10 @@ export function QueryColumnSingleSelect({
         conceptAttributes ?? [],
       ).map((column) => {
         return column.baseColumn.id === currentSelectedColumn?.baseColumn.id
-          ? currentSelectedColumn
+          ? QueryColumnModule.refreshFromSourceColumn({
+              column: currentSelectedColumn,
+              sourceColumn: column,
+            })
           : column;
       }),
     ];

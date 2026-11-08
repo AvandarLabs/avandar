@@ -1,5 +1,6 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { match } from "ts-pattern";
+import { Concept } from "$/models/ontology/Concept/Concept";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
@@ -10,7 +11,7 @@ import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePic
 /** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
 /** The view's record key column, read from the spine. */
-export const EXTERNAL_ID_COLUMN = "external_id";
+export const EXTERNAL_ID_COLUMN = Concept.RECORD_KEY_COLUMN_NAME;
 const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /**
@@ -87,7 +88,7 @@ export function buildConceptViewSql(
   }>,
 ): string {
   const orderedColumns = [...options.attributeColumns].sort((left, right) => {
-    return left.attributeName.localeCompare(right.attributeName);
+    return left.attributeName.localeCompare(right.attributeName, "en");
   });
 
   const selectors = [

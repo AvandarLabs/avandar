@@ -82,7 +82,14 @@ export function QueryColumnMultiSelect({
           column.baseColumn.id === selected.baseColumn.id
         );
       });
-      return source ? [QueryColumn.refreshSource(selected, source)] : [];
+      return source
+        ? [
+            QueryColumn.refreshFromSourceColumn({
+              column: selected,
+              sourceColumn: source,
+            }),
+          ]
+        : [];
     });
     const unselectedSources = catalog.columns.filter((source) => {
       return !selectedColumns.some((selected) => {

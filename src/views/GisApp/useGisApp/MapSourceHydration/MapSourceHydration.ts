@@ -157,7 +157,9 @@ function _getQuery(options: GetQueryOptions): StructuredQuery.Partial {
           candidate.baseColumn.id === column.baseColumn.id
         );
       });
-      return source ? QueryColumn.refreshSource(column, source) : column;
+      return source
+        ? QueryColumn.refreshFromSourceColumn({ column, sourceColumn: source })
+        : column;
     }),
   };
 }

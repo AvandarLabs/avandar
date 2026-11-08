@@ -1,4 +1,7 @@
-/** Verifies that `outputAlias` sets the `QueryResult` column name. */
+/**
+ * Verifies which column a query column reads and which `QueryResult` column
+ * name it produces.
+ */
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
@@ -41,7 +44,7 @@ function _conceptAttribute(id: string, name: string): ConceptAttribute.T {
 }
 
 describe("QueryColumn.makeFromConceptAttributes", () => {
-  it("reads a renamed field from its view column and keeps its name in the result", () => {
+  it("reads a renamed field from its view column", () => {
     const [county, keyNamed] = QueryColumn.makeFromConceptAttributes([
       _conceptAttribute("attr_county", "County"),
       _conceptAttribute("attr_key", "external_id"),
@@ -50,12 +53,34 @@ describe("QueryColumn.makeFromConceptAttributes", () => {
     expect(county?.sourceColumnName).toBeUndefined();
     expect(QueryColumn.getSourceColumnName(county!)).toBe("County");
     expect(QueryColumn.getSourceColumnName(keyNamed!)).toBe("external_id_2");
+  });
+
+  it("keeps a field named like the record key under its own name in the result", () => {
+    const [keyNamed] = QueryColumn.makeFromConceptAttributes([
+      _conceptAttribute("attr_key", "external_id"),
+    ]);
+
     expect(QueryColumn.getDerivedColumnName(keyNamed!)).toBe("external_id");
+  });
+
+  // `age` and `Age` are one name to DuckDB, so the later field's result is
+  // named after its view column to stay a column of its own.
+  it("names the result of a field that matches another without case after its view column", () => {
+    const [age, secondAge] = QueryColumn.makeFromConceptAttributes([
+      _conceptAttribute("attr_a", "age"),
+      _conceptAttribute("attr_b", "Age"),
+    ]);
+
+    expect(QueryColumn.getDerivedColumnName(age!)).toBe("age");
+    expect(QueryColumn.getDerivedColumnName(secondAge!)).toBe("Age_2");
+    expect(
+      QueryColumn.getDerivedColumnName({ ...secondAge!, aggregation: "count" }),
+    ).toBe("count(Age_2)");
   });
 });
 
-describe("QueryColumn.refreshSource", () => {
-  it("gives a column saved before the rename the view column its field has now", () => {
+describe("QueryColumn.refreshFromSourceColumn", () => {
+  it("gives a column saved before a rename the view column its field has now", () => {
     const saved = QueryColumn.makeFromConceptAttributes([
       _conceptAttribute("attr_key", "county"),
     ])[0]!;
@@ -63,10 +88,10 @@ describe("QueryColumn.refreshSource", () => {
       _conceptAttribute("attr_key", "external_id"),
     ]);
 
-    const refreshed = QueryColumn.refreshSource(
-      { ...saved, aggregation: "count", outputAlias: "n" },
-      fresh!,
-    );
+    const refreshed = QueryColumn.refreshFromSourceColumn({
+      column: { ...saved, aggregation: "count", outputAlias: "n" },
+      sourceColumn: fresh!,
+    });
 
     expect(refreshed).toMatchObject({
       id: saved.id,
@@ -76,16 +101,38 @@ describe("QueryColumn.refreshSource", () => {
     });
   });
 
-  it("drops a source column name the field no longer needs", () => {
-    const [saved] = QueryColumn.makeFromConceptAttributes([
-      _conceptAttribute("attr_key", "external_id"),
-    ]);
+  it("drops a source column name and result name the field no longer needs", () => {
+    const saved = QueryColumn.makeFromConceptAttributes([
+      _conceptAttribute("attr_a", "age"),
+      _conceptAttribute("attr_b", "Age"),
+    ])[1]!;
     const [fresh] = QueryColumn.makeFromConceptAttributes([
-      _conceptAttribute("attr_key", "county"),
+      _conceptAttribute("attr_b", "Age"),
     ]);
 
-    expect(QueryColumn.refreshSource(saved!, fresh!)).not.toHaveProperty(
-      "sourceColumnName",
-    );
+    const refreshed = QueryColumn.refreshFromSourceColumn({
+      column: saved,
+      sourceColumn: fresh!,
+    });
+
+    expect(refreshed).not.toHaveProperty("sourceColumnName");
+    expect(refreshed).not.toHaveProperty("resultColumnName");
+  });
+
+  it("takes the result name its field has now", () => {
+    const saved = QueryColumn.makeFromConceptAttributes([
+      _conceptAttribute("attr_b", "Age"),
+    ])[0]!;
+    const fresh = QueryColumn.makeFromConceptAttributes([
+      _conceptAttribute("attr_a", "age"),
+      _conceptAttribute("attr_b", "Age"),
+    ])[1]!;
+
+    const refreshed = QueryColumn.refreshFromSourceColumn({
+      column: saved,
+      sourceColumn: fresh,
+    });
+
+    expect(QueryColumn.getDerivedColumnName(refreshed)).toBe("Age_2");
   });
 });

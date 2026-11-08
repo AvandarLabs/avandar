@@ -124,7 +124,10 @@ export const QueryColumnReconciliation = {
         incomingColumn,
       });
       const column = retained
-        ? QueryColumn.refreshSource(retained, incomingColumn)
+        ? QueryColumn.refreshFromSourceColumn({
+            column: retained,
+            sourceColumn: incomingColumn,
+          })
         : incomingColumn;
       const aggregation = retained
         ? aggregations[retained.id]

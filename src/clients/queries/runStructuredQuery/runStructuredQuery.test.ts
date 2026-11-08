@@ -232,9 +232,9 @@ describe("runStructuredQuery", () => {
   // for a dataset, so filters, grouping, sorting, and status all apply.
   it("runs an out-of-sync case type query as SQL over the case type's view", async () => {
     const concept = _createConcept();
-    const ageColumn = QueryColumn.makeFromConceptAttribute(
+    const [ageColumn] = QueryColumn.makeFromConceptAttributes([
       _createConceptAttribute(concept.id, "age"),
-    );
+    ]);
     runQueryMock.mockResolvedValue({
       id: uuid(),
       data: [],
@@ -248,7 +248,7 @@ describe("runStructuredQuery", () => {
       query: {
         ...StructuredQuery.makeEmpty(),
         dataSource: concept,
-        queryColumns: [ageColumn],
+        queryColumns: [ageColumn!],
       },
       rawSql: undefined,
       isStructuredQueryInSync: false,
@@ -263,6 +263,9 @@ describe("runStructuredQuery", () => {
 
   it("selects the status column in an out-of-sync case type query", async () => {
     const concept = _createConcept();
+    const [ageColumn] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
+    ]);
     runQueryMock.mockResolvedValue({
       id: uuid(),
       data: [],
@@ -277,9 +280,7 @@ describe("runStructuredQuery", () => {
         ...StructuredQuery.makeEmpty(),
         dataSource: concept,
         queryColumns: [
-          QueryColumn.makeFromConceptAttribute(
-            _createConceptAttribute(concept.id, "age"),
-          ),
+          ageColumn!,
           QueryColumn.makeFromConceptStatusColumn(
             ConceptStatusColumn.fromConceptId(concept.id),
           ),
@@ -291,6 +292,38 @@ describe("runStructuredQuery", () => {
 
     const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
     expect(rawSql).toContain('"status"');
+  });
+
+  // DuckDB compares column names without case, so two result columns named
+  // `age` and `Age` would collide and the second would read as `age:1`.
+  it("gives each of two fields whose names match without case its own result name", async () => {
+    const concept = _createConcept();
+    const [age, secondAge] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
+      _createConceptAttribute(concept.id, "Age"),
+    ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [age!, secondAge!],
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"age" as "age"');
+    expect(rawSql).toContain('"Age_2" as "Age_2"');
   });
 
   // A field named like the record key has the view column `external_id_2`.

@@ -20,7 +20,14 @@ function _getQueryFromSourceColumns(options: {
         column.baseColumn.id === selected.baseColumn.id
       );
     });
-    return source ? [QueryColumn.refreshSource(selected, source)] : [];
+    return source
+      ? [
+          QueryColumn.refreshFromSourceColumn({
+            column: selected,
+            sourceColumn: source,
+          }),
+        ]
+      : [];
   });
   const reconciled = QueryColumnReconciliation.reconcileSelectedColumns({
     previous: query.queryColumns,

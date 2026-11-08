@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import { ConceptModule } from "$/models/ontology/Concept/ConceptModule.ts";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
@@ -6,6 +7,7 @@ import type {
   ConceptAttributeId,
   ConceptAttributeModel,
   ConceptAttributeValueShape,
+  ConceptAttributeViewColumn,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 
 function _valueShapeToIsArray(valueShape: ConceptAttributeValueShape): boolean {
@@ -41,19 +43,31 @@ function _getOutputDataType(
 }
 
 /**
- * The columns a case type's view emits besides its fields: the record key
- * and the status. Lowercased, because DuckDB compares column names without
- * case. The record key's name is the view's `external_id` column.
+ * The columns a case type's view emits besides its fields: the record key and
+ * the status. Lowercased, because DuckDB compares column names without case.
+ * A field named like either is suffixed rather than dropped, so it keeps a
+ * column of its own. The `concept_attributes__name_not_reserved` check keeps
+ * `status` out of the database, but nothing reserves `external_id`, a common
+ * key column name.
  */
 const RESERVED_VIEW_COLUMN_NAMES: readonly string[] = [
-  "external_id",
+  ConceptModule.RECORD_KEY_COLUMN_NAME,
   ConceptStatusColumn.COLUMN_NAME.toLowerCase(),
 ];
+
+/**
+ * The locale names are compared in. Fixed, so the browser and Deno order the
+ * same names the same way and the same field keeps the plain name everywhere.
+ */
+const NAME_COMPARISON_LOCALE = "en";
 
 type NamedField = Readonly<Pick<ConceptAttributeModel["Read"], "id" | "name">>;
 
 function _compareInViewOrder(left: NamedField, right: NamedField): number {
-  return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
+  return (
+    left.name.localeCompare(right.name, NAME_COMPARISON_LOCALE) ||
+    left.id.localeCompare(right.id, NAME_COMPARISON_LOCALE)
+  );
 }
 
 /**
@@ -78,18 +92,30 @@ function _getUniqueColumnName(
 
 function _getViewColumnNames(
   attributes: readonly NamedField[],
-): Map<ConceptAttributeId, string> {
+): Map<ConceptAttributeId, ConceptAttributeViewColumn> {
   const takenNames = new Set(RESERVED_VIEW_COLUMN_NAMES);
-  const columnNamesById = new Map<ConceptAttributeId, string>();
+  const earlierFieldNames = new Set<string>();
+  const viewColumnsById = new Map<
+    ConceptAttributeId,
+    ConceptAttributeViewColumn
+  >();
   [...attributes].sort(_compareInViewOrder).forEach((attribute) => {
     const columnName = _getUniqueColumnName({
       requestedName: attribute.name,
       takenNames,
     });
+    // An earlier field with the same name already claimed it as a result
+    // name, and DuckDB would read both result columns as one. A reserved name
+    // is no field's result name, so it leaves the field's own.
+    const hasTwin = earlierFieldNames.has(attribute.name.toLowerCase());
     takenNames.add(columnName.toLowerCase());
-    columnNamesById.set(attribute.id, columnName);
+    earlierFieldNames.add(attribute.name.toLowerCase());
+    viewColumnsById.set(attribute.id, {
+      columnName,
+      resultName: hasTwin ? columnName : attribute.name,
+    });
   });
-  return columnNamesById;
+  return viewColumnsById;
 }
 
 /**
@@ -116,18 +142,23 @@ export const ConceptAttributeModule = {
   getOutputDataType: _getOutputDataType,
 
   /**
-   * Orders fields the way a case type's view orders its columns: by name,
-   * then by id. Use it wherever fields are listed in column order, for
-   * example on the record page.
+   * The order in which fields claim column names: by name, then by id. The
+   * same field keeps the plain name on every run, so a later field is the one
+   * suffixed when two share a name. The view itself orders its columns by the
+   * name each one is emitted under. Use it wherever fields are listed in the
+   * view's claim order, for example on the record page.
    */
   compareInViewOrder: _compareInViewOrder,
 
   /**
-   * The column a case type's view emits for each field, by field id. A
-   * field's column is its name, suffixed (`_2`, `_3`) when the record key,
-   * the status, or an earlier field in view order already took that name
-   * without regard to case. Use it wherever SQL reads a field's column, for
-   * example when the view is built or a structured query selects a field.
+   * The names a case type's view gives each field, by field id. `columnName`
+   * is the field's name, suffixed (`_2`, `_3`) when the record key, the
+   * status, or an earlier field in view order already took that name without
+   * regard to case. `resultName` is the name the field's value carries in a
+   * query result: the field's own name, unless an earlier field has the same
+   * name, in which case it is `columnName`. Use it wherever SQL reads or
+   * names a field's column, for example when the view is built or a
+   * structured query selects a field.
    */
   getViewColumnNames: _getViewColumnNames,
 };

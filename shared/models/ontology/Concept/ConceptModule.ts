@@ -85,4 +85,13 @@ function createConceptModule(): WithBind<IConceptUtils> {
   };
 }
 
-export const ConceptModule = createConceptModule();
+/**
+ * The name of the column that holds each record's key, in a case type's view
+ * and in its spine table. Use it wherever SQL reads or names that column.
+ */
+const RECORD_KEY_COLUMN_NAME = "external_id";
+
+export const ConceptModule = {
+  ...createConceptModule(),
+  RECORD_KEY_COLUMN_NAME,
+};

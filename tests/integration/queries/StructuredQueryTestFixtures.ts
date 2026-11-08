@@ -43,6 +43,8 @@ type MakeConceptAttributeColumnOptions = {
   aggregation?: QueryAggregationTypeT;
   /** The view column the field reads when it is not the field's own name. */
   sourceColumnName?: string;
+  /** The result name the field takes when it is not the field's own name. */
+  resultColumnName?: string;
 };
 
 type MakeQueryOptions = {
@@ -96,11 +98,11 @@ const _FIXTURE_SQL = `
   ) AS t(pop_key, population);
 
   CREATE TABLE "${_CONCEPT_TABLE_NAME}" AS SELECT * FROM (VALUES
-    ('p1', 'North', 5, 'Confirmed', 'k1'),
-    ('p2', 'North', 2, 'Suspected', 'k2'),
-    ('p3', 'South', 3, 'Confirmed', 'k3'),
-    ('p4', 'East', 1, 'Ruled out', 'k4')
-  ) AS t(external_id, region, headcount, status, external_id_2);
+    ('p1', 'North', 5, 'Confirmed', 'k1', 10, 20),
+    ('p2', 'North', 2, 'Suspected', 'k2', 11, 21),
+    ('p3', 'South', 3, 'Confirmed', 'k3', 12, 22),
+    ('p4', 'East', 1, 'Ruled out', 'k4', 13, 23)
+  ) AS t(external_id, region, headcount, status, external_id_2, age, "Age_2");
 `;
 
 /** A dataset whose `id` is used verbatim as the FROM table name. */
@@ -159,6 +161,9 @@ function _makeConceptAttributeColumn(
     ...(args.sourceColumnName === undefined
       ? {}
       : { sourceColumnName: args.sourceColumnName }),
+    ...(args.resultColumnName === undefined
+      ? {}
+      : { resultColumnName: args.resultColumnName }),
   }) as unknown as QueryColumnRead;
 }
 

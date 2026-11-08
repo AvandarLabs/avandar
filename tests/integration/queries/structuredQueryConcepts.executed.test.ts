@@ -214,3 +214,98 @@ it("reads a field named like the record key from its own view column", async () 
     { external_id: "k2", "count(region)": 1 },
   ]);
 });
+
+// The view has the columns `age` and `Age_2`, and DuckDB compares column names
+// without case: two results both named `age` would collide, and the second
+// would read as the first's values.
+it("returns each of two fields whose names match without case its own values", async () => {
+  const age = _makeConceptAttributeColumn({
+    id: "qc_1_age",
+    name: "age",
+    dataType: "bigint",
+  });
+  const secondAge = _makeConceptAttributeColumn({
+    id: "qc_2_age",
+    name: "Age",
+    dataType: "bigint",
+    sourceColumnName: "Age_2",
+    resultColumnName: "Age_2",
+  });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [age, secondAge],
+      orderByColumn: age.id,
+      orderByDirection: "asc",
+      limit: 2,
+    }),
+  );
+
+  await expect(_runQuery(sql)).resolves.toEqual([
+    { age: 10, Age_2: 20 },
+    { age: 11, Age_2: 21 },
+  ]);
+});
+
+it("filters a renamed field by its own view column", async () => {
+  const field = _makeConceptAttributeColumn({
+    id: "qc_1_field",
+    name: "external_id",
+    sourceColumnName: "external_id_2",
+  });
+  const region = _makeConceptAttributeColumn({
+    id: "qc_2_region",
+    name: "region",
+  });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [region],
+      sourceColumns: [field, region],
+      filters: {
+        type: "group",
+        combinator: "AND",
+        rules: [
+          { type: "rule", columnId: field.id, operator: "=", value: "k3" },
+        ],
+      },
+    }),
+  );
+
+  await expect(_runQuery(sql)).resolves.toEqual([{ region: "South" }]);
+});
+
+it("filters an aggregate of a renamed field by its own view column", async () => {
+  const region = _makeConceptAttributeColumn({
+    id: "qc_1_region",
+    name: "region",
+    aggregation: "group_by",
+  });
+  const field = _makeConceptAttributeColumn({
+    id: "qc_2_field",
+    name: "external_id",
+    aggregation: "count",
+    sourceColumnName: "external_id_2",
+  });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [region, field],
+      having: {
+        type: "group",
+        combinator: "AND",
+        rules: [{ type: "rule", columnId: field.id, operator: ">", value: 1 }],
+      },
+    }),
+  );
+
+  // Counting the record key would count the same rows, so the HAVING that
+  // reads `external_id_2` is shown by the column name in the SQL too.
+  expect(sql).toContain('having count("external_id_2")');
+  await expect(_runQuery(sql)).resolves.toEqual([
+    { region: "North", "count(external_id)": 2 },
+  ]);
+});

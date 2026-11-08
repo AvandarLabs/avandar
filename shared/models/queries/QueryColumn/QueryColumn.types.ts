@@ -30,5 +30,12 @@ export type QueryColumnRead = Model.Base<
      * still named after the field.
      */
     sourceColumnName?: string;
+    /**
+     * The name the result column carries when it is not `baseColumn.name`: a
+     * case type field that shares its name, without regard to case, with an
+     * earlier field. DuckDB reads two result columns of one name as one, so
+     * the later field's result is named after its view column.
+     */
+    resultColumnName?: string;
   }
 >;

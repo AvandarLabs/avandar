@@ -394,7 +394,7 @@ export function makeConceptAttributeColumnsFromMetadata(
       contributingDatasetIds.add(contributingDatasetId);
     }
     const emittedName =
-      viewColumnNames.get(attribute.id) ?? column.attributeName;
+      viewColumnNames.get(attribute.id)?.columnName ?? column.attributeName;
     if (emittedName !== column.attributeName) {
       renamedColumns.push({
         attributeId: attribute.id,

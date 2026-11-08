@@ -59,3 +59,13 @@ export type ConceptAttributeModel = SupabaseCrudModelSpec<
  * list.
  */
 export type ConceptAttributeValueShape = "single" | "list";
+
+/**
+ * The names a case type's view gives one field. `columnName` is the column
+ * the view emits. `resultName` is the name the field's value carries in a
+ * query result, which is the field's own name unless another field shares it.
+ */
+export type ConceptAttributeViewColumn = {
+  columnName: string;
+  resultName: string;
+};

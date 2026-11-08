@@ -9,16 +9,6 @@ import type { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/C
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 export const QueryColumnModule = {
-  makeFromConceptAttribute: (
-    attribute: ConceptAttributeModel["Read"],
-  ): QueryColumn.T => {
-    return Model.make("QueryColumn", {
-      id: uuid<QueryColumn.Id>(),
-      baseColumn: attribute,
-      aggregation: undefined,
-    });
-  },
-
   /**
    * One query column per field of a case type, each reading the column the
    * case type's view emits for it. Pass every field of the case type: a
@@ -27,16 +17,23 @@ export const QueryColumnModule = {
   makeFromConceptAttributes: (
     attributes: ReadonlyArray<ConceptAttributeModel["Read"]>,
   ): QueryColumn.T[] => {
-    const viewColumnNames = ConceptAttribute.getViewColumnNames(attributes);
+    const viewColumns = ConceptAttribute.getViewColumnNames(attributes);
     return attributes.map((attribute) => {
-      const viewColumnName = viewColumnNames.get(attribute.id);
+      const viewColumn = viewColumns.get(attribute.id);
+      const sourceColumnName =
+        viewColumn?.columnName === attribute.name
+          ? undefined
+          : viewColumn?.columnName;
+      const resultColumnName =
+        viewColumn?.resultName === attribute.name
+          ? undefined
+          : viewColumn?.resultName;
       return Model.make("QueryColumn", {
         id: uuid<QueryColumn.Id>(),
         baseColumn: attribute,
         aggregation: undefined,
-        ...(viewColumnName === undefined || viewColumnName === attribute.name
-          ? {}
-          : { sourceColumnName: viewColumnName }),
+        ...(sourceColumnName === undefined ? {} : { sourceColumnName }),
+        ...(resultColumnName === undefined ? {} : { resultColumnName }),
       });
     });
   },
@@ -52,22 +49,38 @@ export const QueryColumnModule = {
 
   /**
    * Points a column at the current definition of its source: the freshly
-   * loaded `baseColumn` and the view column it reads. Everything else the
-   * column carries (id, aggregation, alias) stays. Use it wherever a column
-   * saved or held earlier is matched to freshly loaded metadata, so a column
-   * saved before its field's view column was renamed reads the right one.
+   * loaded `baseColumn`, the view column it reads, and the result name it
+   * takes. Everything else the column carries (id, aggregation, alias) stays.
+   * Use it wherever a column saved or held earlier is matched to freshly
+   * loaded metadata, so a column saved before its field's view column was
+   * renamed reads the right one.
    */
-  refreshSource: (
-    column: QueryColumn.T,
-    source: Readonly<Pick<QueryColumn.T, "baseColumn" | "sourceColumnName">>,
+  refreshFromSourceColumn: (
+    options: Readonly<{
+      column: QueryColumn.T;
+      sourceColumn: Readonly<
+        Pick<
+          QueryColumn.T,
+          "baseColumn" | "sourceColumnName" | "resultColumnName"
+        >
+      >;
+    }>,
   ): QueryColumn.T => {
-    const { sourceColumnName: _staleName, ...rest } = column;
+    const { column, sourceColumn } = options;
+    const {
+      sourceColumnName: _staleSourceColumnName,
+      resultColumnName: _staleResultColumnName,
+      ...rest
+    } = column;
     return {
       ...rest,
-      baseColumn: source.baseColumn,
-      ...(source.sourceColumnName === undefined
+      baseColumn: sourceColumn.baseColumn,
+      ...(sourceColumn.sourceColumnName === undefined
         ? {}
-        : { sourceColumnName: source.sourceColumnName }),
+        : { sourceColumnName: sourceColumn.sourceColumnName }),
+      ...(sourceColumn.resultColumnName === undefined
+        ? {}
+        : { resultColumnName: sourceColumn.resultColumnName }),
     };
   },
 
@@ -96,9 +109,10 @@ export const QueryColumnModule = {
 
   /**
    * Gets the `QueryResult` column name this query column produces: its
-   * `outputAlias` when present, otherwise the aggregate name or the base
-   * column name. Use it wherever a query column must be found in a result by
-   * name, for example to read its values from result rows.
+   * `outputAlias` when present, otherwise the aggregate name or the result
+   * name of the base column: its `resultColumnName`, or its own name. Use it
+   * wherever a query column must be found in a result by name, for example to
+   * read its values from result rows.
    * @param column - The query column to get the derived name of.
    * @returns The derived name of the query column.
    */
@@ -107,16 +121,17 @@ export const QueryColumnModule = {
       return column.outputAlias;
     }
     const { aggregation } = column;
+    const resultBaseName = column.resultColumnName ?? column.baseColumn.name;
     if (
       aggregation === undefined ||
       aggregation === "none" ||
       aggregation === "group_by"
     ) {
-      return column.baseColumn.name;
+      return resultBaseName;
     }
     return QueryAggregationType.getAggregationColumnName(
       aggregation,
-      column.baseColumn.name,
+      resultBaseName,
     );
   },
 
