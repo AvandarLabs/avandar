@@ -105,6 +105,24 @@ describe("localActionFormat", () => {
     ).toEqual({ kind: "tool", name: "echo", args: { word: "hi" } });
   });
 
+  it("closes the braces a model left open at the end", () => {
+    expect(
+      parseLocalAction('{"action": "echo", "args": {"word": "hi"}', ["echo"]),
+    ).toEqual({ kind: "tool", name: "echo", args: { word: "hi" } });
+  });
+
+  it("reports a tool call it cannot read as a broken call, not a reply", () => {
+    expect(
+      parseLocalAction('{"action": "echo", "args": {"word": "hi" OR "hi" OR', [
+        "echo",
+      ]),
+    ).toEqual({
+      kind: "broken_tool",
+      name: "echo",
+      text: '{"action": "echo", "args": {"word": "hi" OR "hi" OR',
+    });
+  });
+
   it("treats output that is not an action as a reply", () => {
     expect(parseLocalAction("Hello there", ["echo"])).toEqual({
       kind: "reply",
@@ -182,6 +200,23 @@ describe("createLocalModelStreamFn", () => {
       role: "assistant",
       content: rawOutput,
     });
+  });
+
+  it("tells the model a broken tool call failed, so it tries again", async () => {
+    const execute = vi.fn();
+    const { llm, requests } = _createScriptedLlm([
+      '{"action": "echo", "args": {"word": "hi" OR "hi" OR',
+      '{"action":"echo","args":{"word":"hi"}}',
+      '{"action":"reply","text":"Done."}',
+    ]);
+    const agent = _createAgent(llm, execute);
+
+    await agent.prompt("Echo hi");
+
+    expect(execute).toHaveBeenCalledTimes(1);
+    expect(requests[1]?.messages.at(-1)?.content).toContain(
+      "could not be read",
+    );
   });
 
   it("ends the turn with an error when the local model fails", async () => {

@@ -6,9 +6,14 @@ import type { Tool } from "@earendil-works/pi-ai";
  */
 export const LOCAL_REPLY_ACTION = "reply";
 
-/** One step a local model chose: a tool call or a plain reply. */
+/**
+ * One step a local model chose: a tool call, a plain reply, or a tool call
+ * whose arguments could not be read (it ran out of tokens or repeated
+ * itself), which goes back to the model as a failed call.
+ */
 export type LocalAction =
   | { kind: "tool"; name: string; args: Record<string, unknown> }
+  | { kind: "broken_tool"; name: string; text: string }
   | { kind: "reply"; text: string };
 
 type JsonSchemaProperty = {
@@ -95,7 +100,9 @@ ${tools.map(_describeTool).join("\n")}`;
 }
 
 /** Writes an action the way the model would have, for the chat history. */
-export function formatLocalAction(action: LocalAction): string {
+export function formatLocalAction(
+  action: Exclude<LocalAction, { kind: "broken_tool" }>,
+): string {
   return action.kind === "tool"
     ? JSON.stringify({ action: action.name, args: action.args })
     : JSON.stringify({ action: LOCAL_REPLY_ACTION, text: action.text });
@@ -112,19 +119,67 @@ const THINKING_BLOCK_PATTERN = /^\s*<think>[\s\S]*?<\/think>\s*/;
  * Reads a local model's output. Anything that is not a known action, such
  * as prose from a runtime without constrained decoding, is a plain reply.
  */
+/**
+ * Closes strings, arrays, and objects a model left open at the end of its
+ * output. Some small models stop one brace short.
+ */
+export function closeOpenJson(text: string): string {
+  const closers: string[] = [];
+  let isInString = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (isInString) {
+      if (character === "\\") {
+        index += 1;
+      } else if (character === '"') {
+        isInString = false;
+      }
+    } else if (character === '"') {
+      isInString = true;
+    } else if (character === "{" || character === "[") {
+      closers.push(character === "{" ? "}" : "]");
+    } else if (character === "}" || character === "]") {
+      closers.pop();
+    }
+  }
+  return `${text}${isInString ? '"' : ""}${closers.reverse().join("")}`;
+}
+
+function _parseJson(text: string): unknown {
+  for (const candidate of [text, closeOpenJson(text.trimEnd())]) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Try the next candidate.
+    }
+  }
+  return undefined;
+}
+
+function _findNamedTool(
+  text: string,
+  toolNames: readonly string[],
+): string | undefined {
+  const named = /^\s*\{\s*"action"\s*:\s*"([^"]+)"/.exec(text)?.[1];
+  return named && toolNames.includes(named) ? named : undefined;
+}
+
+/**
+ * Reads a local model's output. A tool call that cannot be read comes back
+ * as a broken call; anything else that is not a known action, such as prose
+ * from a runtime without constrained decoding, is a plain reply.
+ */
 export function parseLocalAction(
   output: string,
   toolNames: readonly string[],
 ): LocalAction {
   const text = output.replace(THINKING_BLOCK_PATTERN, "");
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    return { kind: "reply", text: text.trim() };
-  }
+  const parsed = _parseJson(text);
   if (!_isRecord(parsed)) {
-    return { kind: "reply", text: text.trim() };
+    const brokenName = _findNamedTool(text, toolNames);
+    return brokenName
+      ? { kind: "broken_tool", name: brokenName, text }
+      : { kind: "reply", text: text.trim() };
   }
   const action = parsed.action;
   if (typeof action === "string" && toolNames.includes(action)) {

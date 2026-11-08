@@ -27,6 +27,10 @@ import type {
 /** The Pi API id for models that run on the user's device. */
 export const LOCAL_MODEL_API = "avandar-local";
 
+/** What the model reads when its tool call could not be read. */
+const BROKEN_CALL_MESSAGE =
+  "Your tool call could not be read: it was cut off or repeated itself. Write it again, shorter, as one JSON object.";
+
 /** Tokens a local model may write per step. Enough for one SQL query. */
 const LOCAL_MAX_OUTPUT_TOKENS = 700;
 
@@ -83,12 +87,17 @@ function _pushAction(
   action: ReturnType<typeof parseLocalAction>,
   onToolCall: (toolCallId: string) => void,
 ): void {
-  if (action.kind === "tool") {
+  if (action.kind === "tool" || action.kind === "broken_tool") {
     const toolCall: ToolCall = {
       type: "toolCall",
       id: `local-${crypto.randomUUID()}`,
       name: action.name,
-      arguments: action.args as JsonObject,
+      arguments: action.kind === "tool" ? (action.args as JsonObject) : {},
+      // Pi fails a call with argumentsError before the tool runs and tells
+      // the model why, so it can write the call again.
+      ...(action.kind === "broken_tool"
+        ? { argumentsError: BROKEN_CALL_MESSAGE }
+        : {}),
     };
     message.content.push(toolCall);
     message.stopReason = "toolUse";
