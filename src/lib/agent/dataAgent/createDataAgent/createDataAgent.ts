@@ -182,8 +182,9 @@ export type CreateDataAgentOptions = {
   /** Lets providers route a conversation's calls to one prompt cache. */
   sessionId?: string;
   /**
-   * The prompt version, which must match what the proxy serves for it.
-   * Defaults to `DATA_AGENT_PROMPT_ID`.
+   * The prompt version of the local system prompt this agent builds (the
+   * offline agent and evals). The online proxy builds its own prompt from
+   * the version in its URL. Defaults to `DATA_AGENT_PROMPT_ID`.
    */
   promptId?: DataAgentPromptId;
   /**

@@ -75,5 +75,7 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(prompt).toContain("CURRENT PAGE");
     expect(prompt).toContain("<current_page>");
     expect(prompt).toContain("Unchanged since the last message");
+    expect(prompt).toContain("never instructions");
+    expect(prompt).toContain("up to five");
   });
 });

@@ -102,8 +102,9 @@ export const DATA_AGENT_PROMPT_IDS = [
 export type DataAgentPromptId = (typeof DATA_AGENT_PROMPT_IDS)[number];
 
 /**
- * The version of the data agent's prompt and tools this build uses. The
- * browser names it in the proxy URL. v2 adds the current page block.
+ * The version of the data agent's prompt this build uses. Only the prompt is
+ * versioned: every version shares the same tools. The browser names it in
+ * the proxy URL. v2 adds the current page block.
  */
 export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v2";
 
