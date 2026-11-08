@@ -157,6 +157,21 @@ const CASE_CHARTS = definePlugin({
   },
 });
 
+/** A component chart type whose one column setting is optional. */
+const CASE_RINGS_VIZ_TYPE = {
+  id: "case-rings",
+  title: "%viz.caseRings.title%",
+  icon: "chart-donut",
+  render: "component",
+  settings: [
+    {
+      key: "labelColumn",
+      label: "%viz.labelColumn%",
+      control: { kind: "columnPicker", dataType: "text" },
+    },
+  ],
+};
+
 function _makeManifestModule(pluginId: string): PluginManifestModule {
   return {
     manifest: {
@@ -185,19 +200,7 @@ function _makeManifestModule(pluginId: string): PluginManifestModule {
             render: "component",
             settings: [],
           },
-          {
-            id: "case-rings",
-            title: "%viz.caseRings.title%",
-            icon: "chart-donut",
-            render: "component",
-            settings: [
-              {
-                key: "labelColumn",
-                label: "%viz.labelColumn%",
-                control: { kind: "columnPicker", dataType: "text" },
-              },
-            ],
-          },
+          CASE_RINGS_VIZ_TYPE,
         ],
       },
     },
@@ -308,6 +311,21 @@ function _makeChartElement(options: ChartOptions): JSX.Element {
 
 function _renderChart(options: ChartOptions): ReturnType<typeof render> {
   return render(_makeChartElement(options), { wrapper: QueryWrapper });
+}
+
+/**
+ * Renders a chart over a result with no columns yet, and waits until the
+ * plugin's manifest has loaded, so the chart is past its own loading state.
+ */
+async function _renderChartWithoutColumns(pluginId: string): Promise<void> {
+  _renderChart({
+    vizConfig: _makeConfig({ pluginId }),
+    columns: [],
+    data: [],
+  });
+  await waitFor(() => {
+    expect(queryClient.isFetching()).toBe(0);
+  });
 }
 
 describe("PluginVizRenderer", () => {
@@ -453,21 +471,25 @@ describe("PluginVizRenderer", () => {
   });
 
   it("does not ask for a required column setting before the result has columns", async () => {
-    const loadCode = vi.fn(() => {
-      return Promise.resolve({ definition: CASE_CHARTS, messages: MESSAGES });
-    });
-    const pluginId = _addBundledPlugin({ loadCode });
-
-    _renderChart({
-      vizConfig: _makeConfig({ pluginId }),
-      columns: [],
-      data: [],
-    });
-    await waitFor(() => {
-      expect(loadCode).toHaveBeenCalled();
-    });
+    await _renderChartWithoutColumns(_addBundledPlugin());
 
     expect(screen.queryByText("Choose a Label column")).toBeNull();
+  });
+
+  it("shows the chart loader before the result has columns", async () => {
+    await _renderChartWithoutColumns(_addBundledPlugin());
+
+    expect(
+      screen.getByRole("status", { name: "Loading chart" }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not run the plugin's transform before the result has columns", async () => {
+    const transform = vi.fn(_makeCaseBarsFromRows);
+
+    await _renderChartWithoutColumns(_addPluginWithBars(transform));
+
+    expect(transform).not.toHaveBeenCalled();
   });
 
   it("does not load the plugin code while a required setting is unset", async () => {
