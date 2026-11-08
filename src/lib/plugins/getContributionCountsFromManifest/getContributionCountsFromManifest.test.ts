@@ -5,7 +5,9 @@ import type { PluginManifest } from "@avandar/plugin-manifest/runtime";
 function _makeManifest(
   menus: PluginManifest["contributes"]["menus"],
 ): PluginManifest {
-  return { contributes: { commands: [], menus } } as unknown as PluginManifest;
+  return {
+    contributes: { commands: [], menus, vizTypes: [] },
+  } as unknown as PluginManifest;
 }
 
 describe("getContributionCountsFromManifest", () => {

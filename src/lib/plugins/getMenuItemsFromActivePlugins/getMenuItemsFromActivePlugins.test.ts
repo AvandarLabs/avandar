@@ -25,6 +25,7 @@ function _makeActivePlugin(when?: WhenCondition): ActivePlugin {
             { id: "regression.linear", title: "%title%", icon: "trending-up" },
           ],
           menus: { [SLOT_ID]: [{ command: "regression.linear", when }] },
+          vizTypes: [],
         },
       },
       strings: {

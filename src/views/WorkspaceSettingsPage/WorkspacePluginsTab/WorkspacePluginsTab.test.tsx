@@ -101,6 +101,7 @@ function _makeManifestModule(
       contributes: {
         commands: [{ id: "run", title: "%name%", icon: "chart-dots" }],
         menus: { "dataExplorer.toolbar": [{ command: "run" }] },
+        vizTypes: [],
       },
     },
     strings: {

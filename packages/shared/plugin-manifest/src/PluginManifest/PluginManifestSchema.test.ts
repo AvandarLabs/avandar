@@ -58,6 +58,51 @@ function _getIssueMessages(input: unknown): string[] {
 
 const WHEN_PATH = "contributes.menus.dataExplorer.toolbar.0.when";
 
+const SETTING_PATH = "contributes.vizTypes.0.settings.0";
+
+const DAY_AND_WEEK_OPTIONS = [
+  { value: "day", label: "%viz.interval.day%" },
+  { value: "week", label: "%viz.interval.week%" },
+];
+
+function _makeSetting(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    key: "interval",
+    label: "%viz.interval%",
+    control: { kind: "segmented", options: DAY_AND_WEEK_OPTIONS },
+    ...overrides,
+  };
+}
+
+function _makeVizType(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: "epicurve",
+    title: "%viz.epicurve.title%",
+    icon: "chart-histogram",
+    render: "transform",
+    settings: [_makeSetting()],
+    ...overrides,
+  };
+}
+
+function _makeManifestWithVizTypes(
+  vizTypes: unknown[],
+): Record<string, unknown> {
+  const manifest = _makeValidManifest();
+  manifest.contributes = { commands: [], menus: {}, vizTypes };
+  return manifest;
+}
+
+function _makeManifestWithSetting(
+  setting: Record<string, unknown>,
+): Record<string, unknown> {
+  return _makeManifestWithVizTypes([_makeVizType({ settings: [setting] })]);
+}
+
 describe("PluginManifestSchema", () => {
   it("accepts a valid manifest and defaults omitted lists", () => {
     const manifest = _makeValidManifest();
@@ -284,5 +329,233 @@ describe("PluginManifestSchema", () => {
     expect(issues[0]?.message).toBe(
       "must be lowercase letters, digits, and hyphens, in dot-separated words",
     );
+  });
+});
+
+describe("PluginManifestSchema contributes.vizTypes", () => {
+  it("defaults vizTypes to an empty list when the manifest declares none", () => {
+    const result = PluginManifestSchema.parse(_makeValidManifest());
+    expect(result.contributes.vizTypes).toEqual([]);
+  });
+
+  it("defaults a setting's required flag to false", () => {
+    const result = PluginManifestSchema.parse(
+      _makeManifestWithSetting(_makeSetting()),
+    );
+    expect(result.contributes.vizTypes[0]?.settings[0]?.required).toBe(false);
+  });
+
+  it("defaults a viz type's settings to an empty list", () => {
+    const vizType = _makeVizType();
+    delete vizType.settings;
+    const result = PluginManifestSchema.parse(
+      _makeManifestWithVizTypes([vizType]),
+    );
+    expect(result.contributes.vizTypes[0]?.settings).toEqual([]);
+  });
+
+  it.each([
+    ["columnPicker", { kind: "columnPicker", dataType: "temporal" }],
+    ["select", { kind: "select", options: [{ value: "a", label: "%a%" }] }],
+    ["switch", { kind: "switch" }],
+    ["number", { kind: "number", min: 1, max: 10, step: 1, unit: "%unit%" }],
+    ["text", { kind: "text", placeholder: "%placeholder%" }],
+    ["color", { kind: "color" }],
+  ])("accepts a %s control", (_kind, control) => {
+    expect(
+      _getIssues(_makeManifestWithSetting(_makeSetting({ control }))),
+    ).toEqual([]);
+  });
+
+  it("lists the known control kinds when a control kind is unknown", () => {
+    const manifest = _makeManifestWithSetting(
+      _makeSetting({ control: { kind: "slider" } }),
+    );
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${SETTING_PATH}.control.kind`,
+        message:
+          "must be columnPicker, select, segmented, switch, number, text, or color",
+      },
+    ]);
+  });
+
+  it("rejects a render mode other than transform or component", () => {
+    const issues = _getIssues(
+      _makeManifestWithVizTypes([_makeVizType({ render: "canvas" })]),
+    );
+    expect(issues).toHaveLength(1);
+    expect(issues[0]?.path).toBe("contributes.vizTypes.0.render");
+  });
+
+  it("explains the viz type id format in lowercase words", () => {
+    const manifest = _makeManifestWithVizTypes([
+      _makeVizType({ id: "Epi_Curve" }),
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.vizTypes.0.id",
+        message:
+          "must be lowercase letters, digits, and hyphens, in dot-separated words",
+      },
+    ]);
+  });
+
+  it("rejects a setting key that does not start with a letter", () => {
+    const manifest = _makeManifestWithSetting(_makeSetting({ key: "1st" }));
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${SETTING_PATH}.key`,
+        message: "must start with a letter and hold only letters and digits",
+      },
+    ]);
+  });
+
+  it("rejects duplicate viz type ids", () => {
+    const manifest = _makeManifestWithVizTypes([
+      _makeVizType(),
+      _makeVizType(),
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.vizTypes.1.id",
+        message: 'duplicate viz type id "epicurve"',
+      },
+    ]);
+  });
+
+  it("rejects duplicate setting keys within a viz type", () => {
+    const manifest = _makeManifestWithVizTypes([
+      _makeVizType({ settings: [_makeSetting(), _makeSetting()] }),
+    ]);
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: "contributes.vizTypes.0.settings.1.key",
+        message: 'duplicate setting key "interval"',
+      },
+    ]);
+  });
+
+  it("accepts the same setting key in two viz types", () => {
+    const manifest = _makeManifestWithVizTypes([
+      _makeVizType(),
+      _makeVizType({ id: "rate-plot" }),
+    ]);
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
+  it("rejects duplicate option values within a control", () => {
+    const manifest = _makeManifestWithSetting(
+      _makeSetting({
+        control: {
+          kind: "segmented",
+          options: [
+            { value: "day", label: "%viz.interval.day%" },
+            { value: "day", label: "%viz.interval.week%" },
+          ],
+        },
+      }),
+    );
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${SETTING_PATH}.control.options.1.value`,
+        message: 'duplicate option value "day"',
+      },
+    ]);
+  });
+
+  it("rejects a default on a column picker", () => {
+    const manifest = _makeManifestWithSetting(
+      _makeSetting({ control: { kind: "columnPicker" }, default: "date" }),
+    );
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${SETTING_PATH}.default`,
+        message: "a column picker cannot have a default",
+      },
+    ]);
+  });
+
+  it.each([
+    [
+      "a segmented default that is not an option value",
+      { kind: "segmented", options: DAY_AND_WEEK_OPTIONS },
+      "month",
+      "must be one of the option values: day, week",
+    ],
+    [
+      "a select default that is not an option value",
+      { kind: "select", options: [{ value: "a", label: "%a%" }] },
+      "b",
+      "must be one of the option values: a",
+    ],
+    [
+      "a switch default that is not a boolean",
+      { kind: "switch" },
+      "yes",
+      "must be true or false for a switch",
+    ],
+    [
+      "a number default that is not a number",
+      { kind: "number" },
+      "5",
+      "must be a number for a number control",
+    ],
+    [
+      "a number default below min",
+      { kind: "number", min: 1 },
+      0,
+      "must be at least 1",
+    ],
+    [
+      "a number default above max",
+      { kind: "number", max: 10 },
+      11,
+      "must be at most 10",
+    ],
+    [
+      "a text default that is not a string",
+      { kind: "text" },
+      5,
+      "must be a string for a text control",
+    ],
+    [
+      "a color default that is not a string",
+      { kind: "color" },
+      true,
+      "must be a string for a color control",
+    ],
+  ])("rejects %s", (_label, control, defaultValue, message) => {
+    const manifest = _makeManifestWithSetting(
+      _makeSetting({ control, default: defaultValue }),
+    );
+    expect(_getIssues(manifest)).toEqual([
+      { path: `${SETTING_PATH}.default`, message },
+    ]);
+  });
+
+  it.each([
+    ["segmented", { kind: "segmented", options: DAY_AND_WEEK_OPTIONS }, "week"],
+    ["switch", { kind: "switch" }, true],
+    ["number", { kind: "number", min: 1, max: 10 }, 10],
+    ["text", { kind: "text" }, "Cases"],
+    ["color", { kind: "color" }, "#228be6"],
+  ])("accepts a %s default that fits the control", (_kind, control, value) => {
+    const manifest = _makeManifestWithSetting(
+      _makeSetting({ control, default: value }),
+    );
+    expect(_getIssues(manifest)).toEqual([]);
+  });
+
+  it("rejects a number control whose min is greater than its max", () => {
+    const manifest = _makeManifestWithSetting(
+      _makeSetting({ control: { kind: "number", min: 10, max: 1 } }),
+    );
+    expect(_getIssues(manifest)).toEqual([
+      {
+        path: `${SETTING_PATH}.control.min`,
+        message: "must not be greater than max (1)",
+      },
+    ]);
   });
 });

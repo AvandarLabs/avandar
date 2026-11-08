@@ -21,6 +21,7 @@ const PLUGIN = {
           { id: "regression.linear", title: "%t%", icon: "trending-up" },
         ],
         menus: {},
+        vizTypes: [],
       },
     },
     strings: { en: { t: "Linear regression" } },
