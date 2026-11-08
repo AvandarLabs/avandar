@@ -13,6 +13,8 @@ type Props = {
   size: MantineSize;
   /** Shows the picker's label above it, as a form does. */
   withLabel: boolean;
+  /** Why the current choice cannot be saved. Shown under the select. */
+  error?: string;
 };
 
 /**
@@ -28,6 +30,7 @@ export function DateColumnSelect({
   onChange,
   size,
   withLabel,
+  error,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const hasNoOptions = options.length === 0;
@@ -41,6 +44,7 @@ export function DateColumnSelect({
       }
       inputWrapperOrder={["label", "input", "description", "error"]}
       placeholder={t`Choose a date column`}
+      error={error}
       data={[...options]}
       value={value ?? null}
       disabled={hasNoOptions}

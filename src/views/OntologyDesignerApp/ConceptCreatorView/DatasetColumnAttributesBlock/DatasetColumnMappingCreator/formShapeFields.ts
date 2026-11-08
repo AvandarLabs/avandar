@@ -77,3 +77,21 @@ export function readFormDateColumnOptions(
   });
   return makeDateColumnOptions(sourceDataset?.dataset.columns ?? []);
 }
+
+/**
+ * The error the form holds for a dataset field's period, which says the
+ * field has no date column. Read by `PerPeriodFields` to show under the date
+ * column picker. It clears when `writeFormShapeFields` next writes the field.
+ */
+export function readFormBucketError(
+  options: Readonly<{
+    conceptForm: FormType<ConceptFormValues>;
+    attributeIdx: number;
+  }>,
+): string | undefined {
+  const error =
+    options.conceptForm.errors[
+      `datasetColumnAttributes.${options.attributeIdx}.bucketGrain`
+    ];
+  return typeof error === "string" ? error : undefined;
+}

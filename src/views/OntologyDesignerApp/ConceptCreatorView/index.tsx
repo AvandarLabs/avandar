@@ -34,6 +34,7 @@ import {
   withFieldDataTypes,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
+import { createBucketColumnValidator } from "@/views/OntologyDesignerApp/ConceptCreatorView/createBucketColumnValidator/createBucketColumnValidator";
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
 import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/getStatusSetValueFromFormValues/getStatusSetValueFromFormValues";
 import { keepKeyAndLabelFieldsSingle } from "@/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle";
@@ -68,17 +69,11 @@ export function ConceptCreatorView(): JSX.Element {
         },
       },
       datasetColumnAttributes: {
-        // The field's period controls already say "This dataset has no date
-        // column" beside it. This rule only stops the submit while one is
-        // missing, as the statuses rule does for its editor.
-        bucketGrain: (bucketGrain, values, path) => {
-          const attribute =
-            values.datasetColumnAttributes[Number(path.split(".")[1])];
-          return bucketGrain !== undefined &&
-            attribute?.mappings.datasetColumn.bucketColumnId === undefined
-            ? t`Choose the date column for this field`
-            : null;
-        },
+        // The field's period controls show this beside the date column. The
+        // rule stops the submit while one is missing.
+        bucketGrain: createBucketColumnValidator(
+          t`Choose the date column for this field`,
+        ),
       },
       // The editor shows each problem beside the status it belongs to. This
       // rule only stops the submit while any problem remains.

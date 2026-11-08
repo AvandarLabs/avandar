@@ -1,7 +1,7 @@
 import { useForm } from "@avandar/ui/hooks";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { fireEvent, render, screen, within } from "@/test-utils";
+import { act, fireEvent, render, screen, within } from "@/test-utils";
 import {
   getMantineSelectDropdown,
   pickMantineSelectOption,
@@ -11,6 +11,7 @@ import {
   getDefaultConceptFormValues,
   makeDefaultDatasetColumnAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { createBucketColumnValidator } from "@/views/OntologyDesignerApp/ConceptCreatorView/createBucketColumnValidator/createBucketColumnValidator";
 import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -27,11 +28,14 @@ const VISIT_DATE_COLUMN = {
   dataType: "date",
 } as DatasetColumn.T;
 
+const MISSING_DATE_COLUMN_MESSAGE = "Choose the date column for this field";
+
 /** The creator for one field, "district", over a column of the given type. */
 function CreatorHarness({
   columnDataType,
   isIdentifierColumn = false,
   isLabelColumn = false,
+  hasDateColumn = true,
   onForm,
 }: Readonly<{
   columnDataType: AvaDataType.T;
@@ -39,6 +43,8 @@ function CreatorHarness({
   isIdentifierColumn?: boolean;
   /** Whether the case type's title is the field this one reads. */
   isLabelColumn?: boolean;
+  /** Whether the field's dataset has a date column a period can use. */
+  hasDateColumn?: boolean;
   /** Receives the form on every render, so a test can read its values. */
   onForm?: (conceptForm: FormType<ConceptFormValues>) => void;
 }>): React.ReactNode {
@@ -56,6 +62,11 @@ function CreatorHarness({
   });
   const conceptForm: FormType<ConceptFormValues> = useForm<ConceptFormValues>({
     mode: "uncontrolled",
+    validate: {
+      datasetColumnAttributes: {
+        bucketGrain: createBucketColumnValidator(MISSING_DATE_COLUMN_MESSAGE),
+      },
+    },
     initialValues: {
       ...defaults,
       // The field's dataset, with a date column a period can group rows by.
@@ -63,7 +74,7 @@ function CreatorHarness({
         {
           dataset: {
             ...DATASET,
-            columns: [column, VISIT_DATE_COLUMN],
+            columns: hasDateColumn ? [column, VISIT_DATE_COLUMN] : [column],
           } as ConceptFormValues["sourceDatasets"][number]["dataset"],
         },
       ],
@@ -348,5 +359,87 @@ describe("DatasetColumnMappingCreator", () => {
     expect(
       conceptForm?.getValues().datasetColumnAttributes[0]?.bucketGrain,
     ).toBe("year");
+  });
+
+  it("says why a per-period field with no date column cannot be saved", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        hasDateColumn={false}
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+
+    act(() => {
+      conceptForm?.validate();
+    });
+
+    const dateColumn = screen.getByRole("combobox", {
+      name: "Date column for district",
+    });
+    expect(dateColumn).toHaveAttribute("aria-invalid", "true");
+    expect(dateColumn).toHaveAccessibleDescription(
+      expect.stringContaining(MISSING_DATE_COLUMN_MESSAGE),
+    );
+    expect(screen.getByText(MISSING_DATE_COLUMN_MESSAGE)).toBeVisible();
+  });
+
+  it("clears the date column error once the field stops being per period", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        hasDateColumn={false}
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+    act(() => {
+      conceptForm?.validate();
+    });
+    expect(screen.getByText(MISSING_DATE_COLUMN_MESSAGE)).toBeVisible();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+
+    expect(
+      screen.queryByText(MISSING_DATE_COLUMN_MESSAGE),
+    ).not.toBeInTheDocument();
+    expect(conceptForm?.errors).toEqual({});
+  });
+
+  it("clears the date column error once a date column is chosen", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+    act(() => {
+      conceptForm?.setFieldValue(
+        "datasetColumnAttributes.0.mappings.datasetColumn.bucketColumnId",
+        undefined,
+      );
+      conceptForm?.validate();
+    });
+    expect(screen.getByText(MISSING_DATE_COLUMN_MESSAGE)).toBeVisible();
+
+    pickMantineSelectOption("Date column for district", "visit_date");
+
+    expect(
+      screen.queryByText(MISSING_DATE_COLUMN_MESSAGE),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: "Date column for district" }),
+    ).not.toHaveAttribute("aria-invalid", "true");
   });
 });

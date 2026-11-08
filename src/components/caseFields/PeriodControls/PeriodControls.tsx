@@ -22,6 +22,8 @@ type Props = {
   size?: MantineSize;
   /** Shows each picker's label above it, as a form does. */
   withLabels?: boolean;
+  /** Why the date column cannot be saved, shown under its picker. */
+  dateColumnError?: string;
 };
 
 /**
@@ -37,6 +39,7 @@ export function PeriodControls({
   onChange,
   size = "sm",
   withLabels = false,
+  dateColumnError,
 }: Readonly<Props>): ReactNode {
   return (
     <>
@@ -55,6 +58,7 @@ export function PeriodControls({
         options={dateColumnOptions}
         size={size}
         withLabel={withLabels}
+        error={dateColumnError}
         onChange={(pickedColumnId) => {
           onChange({ bucketGrain, bucketColumnId: pickedColumnId });
         }}

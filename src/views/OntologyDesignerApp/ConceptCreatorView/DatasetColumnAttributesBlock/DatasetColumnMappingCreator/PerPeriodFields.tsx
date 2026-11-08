@@ -1,5 +1,6 @@
 import { PeriodControls } from "@/components/caseFields/PeriodControls/PeriodControls";
 import {
+  readFormBucketError,
   readFormDateColumnOptions,
   writeFormShapeFields,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/formShapeFields";
@@ -42,6 +43,8 @@ export function PerPeriodFields({
         fieldName={attributeName}
         bucketGrain={shape.bucketGrain ?? "month"}
         bucketColumnId={shape.bucketColumnId}
+        // The form stores the date column's error at the period's path.
+        dateColumnError={readFormBucketError({ conceptForm, attributeIdx })}
         dateColumnOptions={readFormDateColumnOptions({
           conceptForm,
           attributeIdx,
