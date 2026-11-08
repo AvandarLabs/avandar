@@ -32,6 +32,15 @@ function _quote(name: string): string {
   return JSON.stringify(name).replace(/</g, "\\u003c");
 }
 
+/**
+ * Text that is not quoted (column names, types, chart types) kept on one
+ * line: line breaks become spaces and every `<` becomes `\u003c`, so it can
+ * neither start a new line nor spell out `</current_page>`.
+ */
+function _inline(text: string): string {
+  return text.replace(/\s*\n\s*/g, " ").replace(/</g, "\\u003c");
+}
+
 function _formatSql(sql: string, aliases: Aliases): string {
   const singleLine = sql.trim().replace(/\s*\n\s*/g, " ");
   const aliased = SqlTableAlias.toAliasedSql(singleLine, aliases);
@@ -57,7 +66,7 @@ function _explorerLines(
   aliases: Aliases,
 ): string[] {
   const columns = explorer.resultColumns.map((column) => {
-    return `${column.name} ${column.dataType}`;
+    return `${_inline(column.name)} ${_inline(column.dataType)}`;
   });
   return [
     ...(explorer.sql
@@ -73,7 +82,7 @@ function _tileLine(
   aliases: Aliases,
 ): string {
   const sql = _formatSql(tile.sql, aliases);
-  const heading = `${index + 1}. ${_quote(tile.title)} (${tile.chartType})`;
+  const heading = `${index + 1}. ${_quote(tile.title)} (${_inline(tile.chartType)})`;
   return sql === "" ? heading : `${heading}: ${sql}`;
 }
 
