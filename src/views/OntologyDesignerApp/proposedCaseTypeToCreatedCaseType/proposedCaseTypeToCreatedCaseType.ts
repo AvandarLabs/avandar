@@ -6,6 +6,7 @@ import type {
   ChatCreatedCaseType,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
+  ChatProposedManualEntryAttribute,
 } from "$/types/chat.types";
 
 function _toDatasetColumnAttribute(options: {
@@ -38,6 +39,33 @@ function _toDatasetColumnAttribute(options: {
   };
 }
 
+function _joinKeyColumnIdsFromSourceDatasets(
+  sourceDatasets: readonly ChatCaseSourceDataset[],
+): Set<string> {
+  return new Set(
+    sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.primaryKeyColumnId;
+    }),
+  );
+}
+
+function _toManualEntryAttributes(
+  manualEntryAttributes: readonly ChatProposedManualEntryAttribute[],
+): ChatCreatedCaseAttribute[] {
+  return manualEntryAttributes
+    .filter((attribute) => {
+      return attribute.isIncluded;
+    })
+    .map((attribute): ChatCreatedCaseAttribute => {
+      const { description } = attribute;
+      return {
+        name: attribute.name,
+        kind: "manual_entry",
+        ...(description ? { description } : {}),
+      };
+    });
+}
+
 /**
  * A join key has to stay mapped even if the user unchecked it in the card: its
  * dataset's rows cannot be matched to a case without it. Anything else the user
@@ -46,10 +74,8 @@ function _toDatasetColumnAttribute(options: {
 function _includedAttributes(
   draft: ChatProposedCaseType,
 ): ChatProposedCaseAttribute[] {
-  const primaryKeyColumnIds = new Set(
-    draft.sourceDatasets.map((sourceDataset) => {
-      return sourceDataset.primaryKeyColumnId;
-    }),
+  const primaryKeyColumnIds = _joinKeyColumnIdsFromSourceDatasets(
+    draft.sourceDatasets,
   );
   return draft.attributes.filter((attribute) => {
     return attribute.isIncluded || primaryKeyColumnIds.has(attribute.columnId);
@@ -99,9 +125,8 @@ function _resolveLabelColumnId(options: {
  * Converts a draft the user reviewed in the chat card into the payload
  * `applyCreatedCaseTypes` persists. Only attributes still checked in the card
  * are kept, each column's value shape and, for one value, its value picker are
- * carried through, and every
- * dataset still contributing keeps its join key. The card's status set
- * travels with it.
+ * carried through, and every dataset still contributing keeps its join key.
+ * The card's status set travels with it.
  */
 export function proposedCaseTypeToCreatedCaseType(
   draft: ChatProposedCaseType,
@@ -113,11 +138,7 @@ export function proposedCaseTypeToCreatedCaseType(
     included,
     sourceDatasets,
   });
-  const joinKeyColumnIds = new Set(
-    sourceDatasets.map((sourceDataset) => {
-      return sourceDataset.primaryKeyColumnId;
-    }),
-  );
+  const joinKeyColumnIds = _joinKeyColumnIdsFromSourceDatasets(sourceDatasets);
   const datasetAttributes = included.map((attribute) => {
     return _toDatasetColumnAttribute({
       attribute,
@@ -125,24 +146,14 @@ export function proposedCaseTypeToCreatedCaseType(
       isLabel: attribute.columnId === labelColumnId,
     });
   });
-  const manualAttributes = draft.manualEntryAttributes
-    .filter((attribute) => {
-      return attribute.isIncluded;
-    })
-    .map((attribute): ChatCreatedCaseAttribute => {
-      const { description } = attribute;
-      return {
-        name: attribute.name,
-        kind: "manual_entry",
-        ...(description ? { description } : {}),
-      };
-    });
-
   return {
     name: draft.name,
     allowManualCreation: draft.allowManualCreation,
     identities: sourceDatasets,
-    attributes: [...datasetAttributes, ...manualAttributes],
+    attributes: [
+      ...datasetAttributes,
+      ..._toManualEntryAttributes(draft.manualEntryAttributes),
+    ],
     ...(draft.description ? { description: draft.description } : {}),
     ...(draft.statuses ? { statuses: draft.statuses } : {}),
     ...(draft.defaultStatusName

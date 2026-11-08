@@ -186,13 +186,15 @@ function _dedupeSourceDatasets(
 /**
  * The proposed dataset attributes that read a declared source. An attribute
  * naming a dataset with no join key would make the whole concept unqueryable,
- * so it is dropped here instead of surfacing later as a failed query.
+ * so it is dropped here instead of surfacing later as a failed query. A join
+ * key and the label column keep one value whatever the model proposed.
  */
 function _parseSourceAttributes(
   options: Readonly<{
     rawAttributes: unknown;
     sourceDatasets: readonly ChatCaseSourceDataset[];
     columnDataTypesById: ReadonlyMap<string, AvaDataType.T>;
+    labelColumnId: string | undefined;
   }>,
 ): ChatProposedCaseAttribute[] {
   const sourceDatasetIds = new Set(
@@ -200,10 +202,15 @@ function _parseSourceAttributes(
       return sourceDataset.datasetId;
     }),
   );
-  return _parseList(options.rawAttributes, (item) => {
+  const sourceAttributes = _parseList(options.rawAttributes, (item) => {
     return _parseAttribute(item, options.columnDataTypesById);
   }).filter((attribute) => {
     return sourceDatasetIds.has(attribute.datasetId);
+  });
+  return _withKeyAndLabelColumnsSingle({
+    attributes: sourceAttributes,
+    sourceDatasets: options.sourceDatasets,
+    labelColumnId: options.labelColumnId,
   });
 }
 
@@ -277,12 +284,13 @@ export function parseProposeCaseType(
     return undefined;
   }
 
+  const labelColumnId = _asUuid(record.labelColumnId);
   const attributes = _parseSourceAttributes({
     rawAttributes: record.attributes,
     sourceDatasets,
     columnDataTypesById: _createColumnDataTypesByIdFromColumns(options.columns),
+    labelColumnId,
   });
-  const labelColumnId = _asUuid(record.labelColumnId);
   const hasLabelAttribute = attributes.some((attribute) => {
     return attribute.columnId === labelColumnId;
   });
@@ -292,11 +300,7 @@ export function parseProposeCaseType(
     name,
     allowManualCreation: record.allowManualCreation === true,
     sourceDatasets,
-    attributes: _withKeyAndLabelColumnsSingle({
-      attributes,
-      sourceDatasets,
-      labelColumnId,
-    }),
+    attributes,
     manualEntryAttributes: _parseList(
       record.manualEntryAttributes,
       _parseManualEntryAttribute,

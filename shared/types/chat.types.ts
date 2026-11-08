@@ -143,7 +143,10 @@ export type ChatCreatedCaseAttribute =
       isLabel?: boolean;
       /** Absent means `single`. A join key or the label is always `single`. */
       valueShape?: ChatCaseValueShape;
-      /** Absent for a list, which keeps every value. */
+      /**
+       * Absent for a list, and whenever chat named none. The default rule then
+       * applies.
+       */
       valuePickerRuleType?: ChatCaseValuePickerRuleType;
     }
   | {

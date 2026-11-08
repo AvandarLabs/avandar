@@ -346,6 +346,8 @@ const CREATE_CASE_TYPES_TOOL_DEFINITIONS = [
                       valueShape: {
                         type: "string",
                         enum: ["single", "list"],
+                        description:
+                          "single keeps one value per case. list keeps every value the case has. Never list a join key or the label.",
                       },
                     },
                     required: ["name", "kind"],

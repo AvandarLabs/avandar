@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { insertConceptFromFormValues } from "./insertConceptFromFormValues";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
@@ -115,6 +115,34 @@ function _makeFormValues(): ConceptFormSubmitValues {
         },
       },
     ],
+  };
+}
+
+/** A dataset-column field whose mapping names the `sum` rule. */
+function _makeDatasetColumnAttribute(options: {
+  baseAttribute: ConceptFormSubmitValues["attributes"][number];
+  name: string;
+  isArray: boolean;
+}): ConceptFormSubmitValues["attributes"][number] {
+  const attributeId = uuid<ConceptAttributeId>();
+  return {
+    ...options.baseAttribute,
+    id: attributeId,
+    name: options.name,
+    dataType: "bigint",
+    mappingType: "dataset_column",
+    isLabel: false,
+    isArray: options.isArray,
+    mappings: {
+      manualEntry: { type: "manual_entry", conceptAttributeId: attributeId },
+      datasetColumn: {
+        type: "dataset_column",
+        conceptAttributeId: attributeId,
+        valuePickerRuleType: "sum",
+        datasetId: uuid<Dataset.Id>(),
+        datasetColumnId: uuid<DatasetColumn.Id>(),
+      },
+    },
   };
 }
 
@@ -233,48 +261,39 @@ describe("insertConceptFromFormValues", () => {
     expect(generateIndividualsMock).not.toHaveBeenCalled();
   });
 
-  it("writes no value rule into the mapping of a field that keeps every value", async () => {
+  it("writes no value rule for a field that keeps every value, and keeps a single field's rule", async () => {
     generateIndividualsMock.mockResolvedValue(undefined);
-    const listAttributeId = uuid<ConceptAttributeId>();
     const formValues = _makeFormValues();
-    const listAttribute = {
-      ...formValues.attributes[0]!,
-      id: listAttributeId,
+    const listAttribute = _makeDatasetColumnAttribute({
+      baseAttribute: formValues.attributes[0]!,
       name: "Daily new cases",
-      dataType: "bigint" as const,
-      mappingType: "dataset_column" as const,
-      isLabel: false,
       isArray: true,
-      mappings: {
-        manualEntry: {
-          type: "manual_entry" as const,
-          conceptAttributeId: listAttributeId,
-        },
-        datasetColumn: {
-          type: "dataset_column" as const,
-          conceptAttributeId: listAttributeId,
-          valuePickerRuleType: "sum" as const,
-          datasetId: uuid<DatasetId>(),
-          datasetColumnId: uuid<DatasetColumnId>(),
-        },
-      },
-    };
+    });
+    const singleAttribute = _makeDatasetColumnAttribute({
+      baseAttribute: formValues.attributes[0]!,
+      name: "Total cases",
+      isArray: false,
+    });
 
     await insertConceptFromFormValues({
       ...formValues,
-      attributes: [...formValues.attributes, listAttribute],
+      attributes: [...formValues.attributes, listAttribute, singleAttribute],
     });
 
     const [{ mappings }] = conceptCreateMock.mock.calls[0]!;
-    const listMapping = mappings.find(
-      (mapping: { conceptAttributeId: string }) => {
-        return mapping.conceptAttributeId === listAttributeId;
-      },
-    );
-    expect(listMapping).toMatchObject({
+    const findMapping = (attributeId: string) => {
+      return mappings.find((mapping: { conceptAttributeId: string }) => {
+        return mapping.conceptAttributeId === attributeId;
+      });
+    };
+    expect(findMapping(listAttribute.id)).toMatchObject({
       type: "dataset_column",
       workspaceId: WORKSPACE_ID,
     });
-    expect(listMapping.valuePickerRuleType).toBeUndefined();
+    expect(findMapping(listAttribute.id).valuePickerRuleType).toBeUndefined();
+    expect(findMapping(singleAttribute.id)).toMatchObject({
+      type: "dataset_column",
+      valuePickerRuleType: "sum",
+    });
   });
 });

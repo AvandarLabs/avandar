@@ -29,10 +29,11 @@ import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/Concep
  * has no column yet. A field that keeps every value stores no rule: its
  * draft holds one only so the user can switch it back to one value.
  */
-function _datasetColumnMappingFromAttribute(
-  attribute: ConceptFormSubmitValues["attributes"][number],
-  workspaceId: Workspace.Id,
-): AttributeMapping<"Insert"> | undefined {
+function _datasetColumnMappingFromAttribute(options: {
+  attribute: ConceptFormSubmitValues["attributes"][number];
+  workspaceId: Workspace.Id;
+}): AttributeMapping<"Insert"> | undefined {
+  const { attribute, workspaceId } = options;
   const datasetColumnMapping = attribute.mappings.datasetColumn;
   if (!hasPropKeys(datasetColumnMapping, ["datasetId", "datasetColumnId"])) {
     return undefined;
@@ -63,7 +64,7 @@ function _mappingsFromAttributes(
           return { ...mappings.manualEntry, workspaceId };
         })
         .with("dataset_column", () => {
-          return _datasetColumnMappingFromAttribute(attribute, workspaceId);
+          return _datasetColumnMappingFromAttribute({ attribute, workspaceId });
         })
         .exhaustive();
     })

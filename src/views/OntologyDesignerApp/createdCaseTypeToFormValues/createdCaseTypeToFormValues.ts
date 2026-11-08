@@ -32,6 +32,28 @@ function _findColumn(
   });
 }
 
+/** The mappings of a field that reads one dataset column. */
+function _createMappingsFromColumn(options: {
+  conceptAttributeId: ConceptAttributeId;
+  ruleType: ValuePickerRule.T;
+  column: CatalogColumn;
+}): AttributeFormValues["mappings"] {
+  const { conceptAttributeId, ruleType, column } = options;
+  return {
+    manualEntry: {
+      type: "manual_entry",
+      conceptAttributeId,
+    },
+    datasetColumn: {
+      type: "dataset_column",
+      conceptAttributeId,
+      valuePickerRuleType: ruleType,
+      datasetId: column.datasetId,
+      datasetColumnId: column.id,
+    },
+  };
+}
+
 function _makeMappedAttribute(options: {
   conceptId: ConceptId;
   name: string;
@@ -71,19 +93,11 @@ function _makeMappedAttribute(options: {
     isLabel: options.isLabel,
     allowManualEdit: false,
     isArray: ConceptAttribute.valueShapeToIsArray(valueShape),
-    mappings: {
-      manualEntry: {
-        type: "manual_entry",
-        conceptAttributeId,
-      },
-      datasetColumn: {
-        type: "dataset_column",
-        conceptAttributeId,
-        valuePickerRuleType: ruleType,
-        datasetId: options.column.datasetId,
-        datasetColumnId: options.column.id,
-      },
-    },
+    mappings: _createMappingsFromColumn({
+      conceptAttributeId,
+      ruleType,
+      column: options.column,
+    }),
   } as const);
 }
 

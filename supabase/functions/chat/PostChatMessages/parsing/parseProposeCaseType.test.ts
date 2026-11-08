@@ -25,7 +25,7 @@ function _parse(
 }
 
 /** A one-dataset proposal: the join key is the deaths key, the label State. */
-function _proposeWithAttributes(attributes: readonly unknown[]): string {
+function _buildProposalJson(attributes: readonly unknown[]): string {
   return JSON.stringify({
     name: "Measles case",
     sourceDatasets: [
@@ -40,11 +40,10 @@ function _proposeWithAttributes(attributes: readonly unknown[]): string {
   });
 }
 
-function _attribute(
-  columnId: string,
-  name: string,
-  valueShape?: unknown,
+function _createAttributeRecord(
+  options: Readonly<{ columnId: string; name: string; valueShape?: unknown }>,
 ): Record<string, unknown> {
+  const { columnId, name, valueShape } = options;
   return {
     datasetId: DEATHS_DATASET_ID,
     columnId,
@@ -173,9 +172,13 @@ describe("parseProposeCaseType", () => {
 
   it("reads a proposed list field as keeping every value", () => {
     const parsed = _parse(
-      _proposeWithAttributes([
-        _attribute(STATE_COLUMN_ID, "State"),
-        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "list"),
+      _buildProposalJson([
+        _createAttributeRecord({ columnId: STATE_COLUMN_ID, name: "State" }),
+        _createAttributeRecord({
+          columnId: SYMPTOMS_COLUMN_ID,
+          name: "Symptoms",
+          valueShape: "list",
+        }),
       ]),
     );
 
@@ -184,8 +187,12 @@ describe("parseProposeCaseType", () => {
 
   it("keeps a list field's value rule so the card can switch it back", () => {
     const parsed = _parse(
-      _proposeWithAttributes([
-        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "list"),
+      _buildProposalJson([
+        _createAttributeRecord({
+          columnId: SYMPTOMS_COLUMN_ID,
+          name: "Symptoms",
+          valueShape: "list",
+        }),
       ]),
     );
 
@@ -197,9 +204,13 @@ describe("parseProposeCaseType", () => {
 
   it("reads a field with no value shape, or an unknown one, as keeping one value", () => {
     const parsed = _parse(
-      _proposeWithAttributes([
-        _attribute(STATE_COLUMN_ID, "State"),
-        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "many"),
+      _buildProposalJson([
+        _createAttributeRecord({ columnId: STATE_COLUMN_ID, name: "State" }),
+        _createAttributeRecord({
+          columnId: SYMPTOMS_COLUMN_ID,
+          name: "Symptoms",
+          valueShape: "many",
+        }),
       ]),
     );
 
@@ -212,10 +223,22 @@ describe("parseProposeCaseType", () => {
 
   it("keeps the label column and every join key to one value even when proposed as lists", () => {
     const parsed = _parse(
-      _proposeWithAttributes([
-        _attribute(DEATHS_KEY_COLUMN_ID, "County code", "list"),
-        _attribute(STATE_COLUMN_ID, "State", "list"),
-        _attribute(SYMPTOMS_COLUMN_ID, "Symptoms", "list"),
+      _buildProposalJson([
+        _createAttributeRecord({
+          columnId: DEATHS_KEY_COLUMN_ID,
+          name: "County code",
+          valueShape: "list",
+        }),
+        _createAttributeRecord({
+          columnId: STATE_COLUMN_ID,
+          name: "State",
+          valueShape: "list",
+        }),
+        _createAttributeRecord({
+          columnId: SYMPTOMS_COLUMN_ID,
+          name: "Symptoms",
+          valueShape: "list",
+        }),
       ]),
     );
 
