@@ -14,6 +14,7 @@ const {
   runOfflineChatTurnMock,
   runDataAgentTurnMock,
   isAgentEnabledMock,
+  offerOfflineFallbackMock,
 } = vi.hoisted(() => {
   return {
     apiPostMock: vi.fn(),
@@ -21,6 +22,7 @@ const {
     runOfflineChatTurnMock: vi.fn(),
     runDataAgentTurnMock: vi.fn(),
     isAgentEnabledMock: vi.fn(),
+    offerOfflineFallbackMock: vi.fn(),
   };
 });
 
@@ -57,6 +59,13 @@ vi.mock(
   },
 );
 
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback",
+  () => {
+    return { offerOfflineChatFallback: offerOfflineFallbackMock };
+  },
+);
+
 vi.mock("@/lib/agent/dataAgent/browser/DataAgentFeature", () => {
   return { DataAgentFeature: { isEnabled: isAgentEnabledMock } };
 });
@@ -78,7 +87,10 @@ vi.mock(
 
 const OFFLINE_MODEL_REQUIRED = "Download the offline models first.";
 
-function _createAdapter(app: ChatPageContext.T["app"]): ChatModelAdapter {
+function _createAdapter(
+  app: ChatPageContext.T["app"],
+  overrides: Partial<CreateChatModelAdapterOptions> = {},
+): ChatModelAdapter {
   const ref = <T>(current: T) => {
     return { current };
   };
@@ -98,6 +110,7 @@ function _createAdapter(app: ChatPageContext.T["app"]): ChatModelAdapter {
     dataExplorerDispatch: {},
     dashboardEditorDispatch: {},
     chatPanelDispatch: { setPendingClarification: vi.fn() },
+    ...overrides,
   } as unknown as CreateChatModelAdapterOptions);
 }
 
@@ -207,6 +220,13 @@ describe("createChatModelAdapter with the agent on", () => {
       .mockResolvedValue(
         Model.make("ChatResponse", { assistantText: "cloud reply" }),
       );
+    runOfflineDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "offline agent reply" }],
+    });
+    offerOfflineFallbackMock.mockReset().mockResolvedValue(true);
+    LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
+      LocalChatModelStore.markDownloaded,
+    );
     runDataAgentTurnMock.mockReset().mockResolvedValue({
       content: [{ type: "text", text: "agent reply" }],
     });
@@ -228,13 +248,18 @@ describe("createChatModelAdapter with the agent on", () => {
   );
 
   it("passes the page state to the agent", async () => {
-    await _ask(_createAdapter("dashboards"));
+    await _ask(
+      _createAdapter("dashboards", {
+        dashboardEditorStateRef: { current: { selectedItem: "tile-1" } },
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
 
     expect(runDataAgentTurnMock).toHaveBeenCalledWith(
       expect.objectContaining({ workspaceId: "workspace-1" }),
       expect.objectContaining({
         pathname: "/acme/dashboards",
         chatPageContext: expect.objectContaining({ app: "dashboards" }),
+        dashboardEditorState: { selectedItem: "tile-1" },
       }),
     );
   });
@@ -253,5 +278,76 @@ describe("createChatModelAdapter with the agent on", () => {
 
     expect(runDataAgentTurnMock).not.toHaveBeenCalled();
     expect(apiPostMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers the offline fallback when the agent cannot be reached", async () => {
+    runDataAgentTurnMock.mockRejectedValue(new TypeError("Failed to fetch"));
+
+    const result = await _ask(_createAdapter("data-explorer"));
+
+    expect(offerOfflineFallbackMock).toHaveBeenCalledTimes(1);
+    expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      content: [{ type: "text", text: "offline agent reply" }],
+    });
+  });
+
+  it("rethrows an agent network failure when the fallback is declined", async () => {
+    const failure = new TypeError("Failed to fetch");
+    runDataAgentTurnMock.mockRejectedValue(failure);
+    offerOfflineFallbackMock.mockResolvedValue(false);
+
+    await expect(_ask(_createAdapter("data-explorer"))).rejects.toBe(failure);
+    expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("rethrows an agent failure that is not a network failure", async () => {
+    const failure = new Error("model refused");
+    runDataAgentTurnMock.mockRejectedValue(failure);
+
+    await expect(_ask(_createAdapter("data-explorer"))).rejects.toBe(failure);
+    expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
+  });
+
+  it("routes to the offline turn, not the agent, with offline mode on", async () => {
+    OfflineModeStore.setOn(true);
+
+    await _ask(_createAdapter("data-explorer"));
+
+    expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("returns an empty result when the chat was reset during the agent turn", async () => {
+    const chatGenerationRef = { current: 0 };
+    runDataAgentTurnMock.mockImplementation(async () => {
+      chatGenerationRef.current += 1;
+      return { content: [{ type: "text", text: "agent reply" }] };
+    });
+
+    const result = await _ask(
+      _createAdapter("dashboards", {
+        chatGenerationRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(result).toEqual({ content: [] });
+  });
+
+  it("returns an empty result when the chat was reset as the agent failed", async () => {
+    const chatGenerationRef = { current: 0 };
+    runDataAgentTurnMock.mockImplementation(async () => {
+      chatGenerationRef.current += 1;
+      throw new TypeError("Failed to fetch");
+    });
+
+    const result = await _ask(
+      _createAdapter("data-explorer", {
+        chatGenerationRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(result).toEqual({ content: [] });
+    expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
   });
 });

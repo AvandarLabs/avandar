@@ -88,6 +88,46 @@ async function _runAgentTurn(
 }
 
 /**
+ * Handles a failed cloud turn. A network failure with the offline models
+ * downloaded offers to answer offline instead, and runs the offline turn
+ * when accepted. A chat reset during the failure ends the turn quietly.
+ * Anything else is rethrown for the chat to show.
+ */
+async function _recoverFromChatFailure(
+  options: Readonly<{
+    error: unknown;
+    isGenerationStale: () => boolean;
+    copy: ChatRuntimeCopy;
+    runOfflineTurn: () => Promise<ChatModelRunResult>;
+  }>,
+): Promise<ChatModelRunResult> {
+  const { error, isGenerationStale, copy, runOfflineTurn } = options;
+  if (isGenerationStale()) {
+    return { content: [] };
+  }
+  const fallbackMode = resolveChatRuntimeMode({
+    navigatorOnLine: navigator.onLine,
+    isOfflineModeOn: false,
+    isBundleDownloaded: LocalChatModelStore.isBundleDownloaded(),
+    chatPostFailed: isNetworkChatFailure(error),
+  });
+  if (fallbackMode.kind === "offer_local_fallback") {
+    const accepted = await offerOfflineChatFallback({
+      title: copy.fallbackTitle,
+      message: copy.fallbackMessage,
+      action: copy.fallbackAction,
+    });
+    if (isGenerationStale()) {
+      return { content: [] };
+    }
+    if (accepted) {
+      return runOfflineTurn();
+    }
+  }
+  throw error;
+}
+
+/**
  * Builds the Assistant UI model adapter that posts each turn and applies
  * SQL, dashboard blocks, and clarifications to the live page.
  */
@@ -318,14 +358,23 @@ export function createChatModelAdapter(
         currentPageContext.app !== "case-manager" &&
         DataAgentFeature.isEnabled()
       ) {
-        return finishIfCurrent(
-          await _runAgentTurn({
-            dataAgentTurn,
-            pathname: pathnameRef.current,
-            chatPageContext: currentPageContext,
-            dashboardEditorState: dashboardEditorStateRef.current,
-          }),
-        );
+        try {
+          return finishIfCurrent(
+            await _runAgentTurn({
+              dataAgentTurn,
+              pathname: pathnameRef.current,
+              chatPageContext: currentPageContext,
+              dashboardEditorState: dashboardEditorStateRef.current,
+            }),
+          );
+        } catch (error) {
+          return _recoverFromChatFailure({
+            error,
+            isGenerationStale,
+            copy: copyRef.current,
+            runOfflineTurn,
+          });
+        }
       }
 
       const currentMessagesKey = chatMessagesKey(apiMessages);
@@ -355,29 +404,12 @@ export function createChatModelAdapter(
         };
         return applyResponseIfCurrent(response);
       } catch (error) {
-        if (isGenerationStale()) {
-          return { content: [] };
-        }
-        const fallbackMode = resolveChatRuntimeMode({
-          navigatorOnLine: navigator.onLine,
-          isOfflineModeOn: false,
-          isBundleDownloaded: LocalChatModelStore.isBundleDownloaded(),
-          chatPostFailed: isNetworkChatFailure(error),
+        return _recoverFromChatFailure({
+          error,
+          isGenerationStale,
+          copy: copyRef.current,
+          runOfflineTurn,
         });
-        if (fallbackMode.kind === "offer_local_fallback") {
-          const accepted = await offerOfflineChatFallback({
-            title: copyRef.current.fallbackTitle,
-            message: copyRef.current.fallbackMessage,
-            action: copyRef.current.fallbackAction,
-          });
-          if (isGenerationStale()) {
-            return { content: [] };
-          }
-          if (accepted) {
-            return runOfflineTurn();
-          }
-        }
-        throw error;
       }
     },
   };
