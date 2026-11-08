@@ -382,7 +382,7 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     ]);
   });
 
-  it("keeps the raw package with only the relation's own raw resource", async () => {
+  it("keeps the raw package with only the relation's own raw resource, without its bulky check reports and license text", async () => {
     const [csvResource] = _packageWithOneCsv({}).resources;
     const rawCsv1 = { id: "csv-1", format: "CSV", sdd_report: { rows: 9 } };
     const rawCsv2 = { id: "csv-2", format: "CSV", sdd_report: { rows: 4 } };
@@ -392,7 +392,12 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
       sourceRecord: {
         name: "movement-range-maps",
         notes: "Movement range maps.",
-        resources: [rawCsv1, rawCsv2, rawPdf],
+        license_other: "The full text of a custom license.",
+        resources: [
+          { ...rawCsv1, fs_check_info: [{ hxl_proxy_response: {} }] },
+          { ...rawCsv2, fs_check_info: [{ hxl_proxy_response: {} }] },
+          rawPdf,
+        ],
       },
       resources: [
         { ...csvResource!, fileHeaders: ["adm1"] },

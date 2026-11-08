@@ -67,13 +67,37 @@ async function _readResource(params: {
 }
 
 /**
- * The raw CKAN package with only one resource left in its `resources`. A
+ * Package fields left out of `sourceMetadata`. `license_other` is the full
+ * text of a custom license, repeated on every resource listing of a package:
+ * on the demo instance it was 36% of HDX's raw JSON. The license's name
+ * stays in the listing's `license`.
+ */
+const OMITTED_PACKAGE_FIELDS = ["license_other"];
+
+/**
+ * Resource fields left out of `sourceMetadata`. `fs_check_info` is HDX's
+ * file check report, 19% of HDX's raw JSON on the demo instance. The CKAN
+ * client already reads its headers into `fileHeaders`.
+ */
+const OMITTED_RESOURCE_FIELDS = ["fs_check_info"];
+
+function _omitFields(record: object, fields: readonly string[]): object {
+  return Object.fromEntries(
+    Object.entries(record).filter(([field]) => {
+      return !fields.includes(field);
+    }),
+  );
+}
+
+/**
+ * The raw CKAN package as a resource's listing keeps it: with only that
+ * resource left in its `resources`, and without the bulky fields above. A
  * package lists every resource, so storing it whole on each resource's
  * listing grows a package's write with the square of its resource count: a
  * WHO country package's 73 listings carried 42 MB. A record whose resource
  * list cannot be read is kept as it is.
  */
-function _keepOneRawResource(
+function _buildSourceMetadata(
   sourceRecord: unknown,
   resourceId: string,
 ): unknown {
@@ -85,9 +109,13 @@ function _keepOneRawResource(
     return sourceRecord;
   }
   return {
-    ...sourceRecord,
-    resources: resources.filter((rawResource: unknown) => {
-      return (rawResource as { id?: unknown } | null)?.id === resourceId;
+    ..._omitFields(sourceRecord, OMITTED_PACKAGE_FIELDS),
+    resources: resources.flatMap((rawResource: unknown) => {
+      const isOwnResource =
+        (rawResource as { id?: unknown } | null)?.id === resourceId;
+      return isOwnResource
+        ? [_omitFields(rawResource as object, OMITTED_RESOURCE_FIELDS)]
+        : [];
     }),
   };
 }
@@ -103,7 +131,7 @@ function _toRelation(params: {
   const { drive, ckanPackage, resource, readability } = params;
   return {
     ...params.mappedFields,
-    sourceMetadata: _keepOneRawResource(ckanPackage.sourceRecord, resource.id),
+    sourceMetadata: _buildSourceMetadata(ckanPackage.sourceRecord, resource.id),
     kind: "api_resource",
     externalDatasetId: ckanPackage.name,
     apiResourceId: resource.id,
@@ -138,7 +166,8 @@ function _toRelation(params: {
  * rest) comes from the pipeline config's field mapping, which every
  * resource of a package shares. Each relation keeps the raw CKAN package as
  * `sourceMetadata`, with its `resources` narrowed to the relation's own raw
- * resource. The mapped fields are spread first, so a mapping can never
+ * resource and its bulkiest fields left out (`license_other`,
+ * `fs_check_info`). The mapped fields are spread first, so a mapping can never
  * overwrite a field computed here.
  *
  * @param params.mappedFields - The package's mapped catalog metadata, which
