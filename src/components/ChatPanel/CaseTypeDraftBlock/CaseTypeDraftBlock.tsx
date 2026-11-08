@@ -56,6 +56,13 @@ function CaseTypeDraftCardContainer({
   const columnNamesById = useMemo(() => {
     return _makeNamesById(datasetColumns);
   }, [datasetColumns]);
+  const columnDataTypesById = useMemo(() => {
+    return Object.fromEntries(
+      (datasetColumns ?? []).map((column) => {
+        return [column.id, column.dataType];
+      }),
+    );
+  }, [datasetColumns]);
   const datasetNamesById = useMemo(() => {
     return _makeNamesById(datasets);
   }, [datasets]);
@@ -66,6 +73,7 @@ function CaseTypeDraftCardContainer({
         editor={editor}
         datasetNamesById={datasetNamesById}
         columnNamesById={columnNamesById}
+        columnDataTypesById={columnDataTypesById}
         isCreating={isCreating}
         onCreate={
           canCreateCaseType

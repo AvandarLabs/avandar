@@ -2,7 +2,10 @@ import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
 import clsx from "clsx";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import css from "./CaseTypeDraftCard.module.css";
+import { useValuePickerOptions } from "./useValuePickerOptions";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type {
   ChatCaseValuePickerRuleType,
   ChatProposedCaseAttribute,
@@ -12,9 +15,10 @@ import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 type Props = {
   attribute: ChatProposedCaseAttribute;
   columnLabel: string;
+  /** The column's type, once the catalog has loaded. */
+  columnDataType: AvaDataType.T | undefined;
   isPrimaryKey: boolean;
   isLabelColumn: boolean;
-  valuePickerOptions: ReadonlyArray<{ value: string; label: string }>;
   editor: CaseTypeDraftEditor;
 };
 
@@ -27,10 +31,19 @@ export function CaseTypeDraftAttributeRow({
   columnLabel,
   isPrimaryKey,
   isLabelColumn,
-  valuePickerOptions,
+  columnDataType,
   editor,
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
+  const valuePickerOptions = useValuePickerOptions(columnDataType);
+  // A proposed rule the column's type refuses is saved as the default rule, so
+  // the select shows that one rather than a value missing from its options.
+  const shownRuleType = columnDataType
+    ? ValuePickerRule.toAllowedRuleType({
+        ruleType: attribute.valuePickerRuleType,
+        columnDataType,
+      })
+    : attribute.valuePickerRuleType;
   return (
     <div
       className={clsx(css.attributeRow, {
@@ -83,7 +96,7 @@ export function CaseTypeDraftAttributeRow({
       <Select
         size="xs"
         data={valuePickerOptions}
-        value={attribute.valuePickerRuleType}
+        value={shownRuleType}
         allowDeselect={false}
         aria-label={t`Value to keep for ${attribute.name}`}
         onChange={(value) => {

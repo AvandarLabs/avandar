@@ -5497,6 +5497,10 @@ msgstr "请输入名称。"
 msgid "Bold"
 msgstr "粗体"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically first"
+msgstr "按字母顺序最前"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "购买 {seatsToAdd} 个座位"
@@ -7827,6 +7831,10 @@ msgstr "过去一个月"
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} boundaries without data"
 msgstr "{0} 个边界没有数据"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically last"
+msgstr "按字母顺序最后"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dataset. Teammates on this case without "

@@ -3,6 +3,7 @@ import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
 import css from "./CaseTypeDraftCard.module.css";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type {
   CaseTypeDraftEditor,
   CaseTypeDraftSourceGroup,
@@ -13,7 +14,8 @@ type Props = {
   datasetName: string;
   columnNamesById: Readonly<Record<string, string>>;
   labelColumnId: string | undefined;
-  valuePickerOptions: ReadonlyArray<{ value: string; label: string }>;
+  /** Catalog column types, keyed by column id, for each row's value rules. */
+  columnDataTypesById: Readonly<Record<string, AvaDataType.T>>;
   /** Removal is hidden for the last source, which the case type cannot lose. */
   canRemove: boolean;
   editor: CaseTypeDraftEditor;
@@ -29,7 +31,7 @@ export function CaseTypeDraftSourceSection({
   datasetName,
   columnNamesById,
   labelColumnId,
-  valuePickerOptions,
+  columnDataTypesById,
   canRemove,
   editor,
 }: Readonly<Props>): React.ReactNode {
@@ -95,7 +97,7 @@ export function CaseTypeDraftSourceSection({
               }
               isPrimaryKey={attribute.columnId === group.primaryKeyColumnId}
               isLabelColumn={attribute.columnId === labelColumnId}
-              valuePickerOptions={valuePickerOptions}
+              columnDataType={columnDataTypesById[attribute.columnId]}
               editor={editor}
             />
           );

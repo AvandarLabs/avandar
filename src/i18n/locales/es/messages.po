@@ -5725,6 +5725,10 @@ msgstr "Ingrese un nombre."
 msgid "Bold"
 msgstr "Negrita"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically first"
+msgstr "Primero alfabéticamente"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Comprar {seatsToAdd} asiento"
@@ -8144,6 +8148,10 @@ msgstr "Último mes"
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} boundaries without data"
 msgstr "{0} límites sin datos"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically last"
+msgstr "Último alfabéticamente"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dataset. Teammates on this case without "

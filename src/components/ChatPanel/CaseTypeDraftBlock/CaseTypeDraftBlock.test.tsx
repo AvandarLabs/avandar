@@ -11,7 +11,9 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@/test-utils";
+import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import { CaseTypeDraftBlock } from "./CaseTypeDraftBlock";
 import type { PermissionKey } from "$/models/Permissions/Permissions";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -73,11 +75,19 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
       useGetAll: () => {
         return [
           [
-            { id: FIPS_COLUMN_ID, name: "fips" },
-            { id: STATE_COLUMN_ID, name: "state" },
-            { id: DEATHS_COLUMN_ID, name: "deaths_total" },
-            { id: CENSUS_FIPS_COLUMN_ID, name: "county_fips" },
-            { id: POPULATION_COLUMN_ID, name: "population" },
+            { id: FIPS_COLUMN_ID, name: "fips", dataType: "varchar" },
+            { id: STATE_COLUMN_ID, name: "state", dataType: "varchar" },
+            { id: DEATHS_COLUMN_ID, name: "deaths_total", dataType: "bigint" },
+            {
+              id: CENSUS_FIPS_COLUMN_ID,
+              name: "county_fips",
+              dataType: "varchar",
+            },
+            {
+              id: POPULATION_COLUMN_ID,
+              name: "population",
+              dataType: "bigint",
+            },
           ],
         ];
       },
@@ -152,6 +162,15 @@ function makeDraft(): ChatProposedCaseType {
     ],
     manualEntryAttributes: [{ name: "Review notes", isIncluded: false }],
   };
+}
+
+/** The option labels a row's value rule select offers, in order. */
+function _offeredRules(selectLabel: string): string[] {
+  return within(getMantineSelectDropdown(selectLabel))
+    .queryAllByRole("option", { hidden: true })
+    .map((option) => {
+      return option.textContent ?? "";
+    });
 }
 
 describe("CaseTypeDraftBlock", () => {
@@ -446,5 +465,49 @@ describe("CaseTypeDraftBlock", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add field" })).toBeDisabled();
+  });
+
+  it("offers neither sum nor average for a text column, and names max and min alphabetically", () => {
+    render(<CaseTypeDraftBlock />);
+
+    expect(_offeredRules("Value to keep for State")).toEqual([
+      "Most frequent",
+      "First",
+      "Count",
+      "Alphabetically last",
+      "Alphabetically first",
+    ]);
+  });
+
+  it("offers every rule for a whole-number column", () => {
+    render(<CaseTypeDraftBlock />);
+
+    expect(_offeredRules("Value to keep for Total deaths")).toEqual([
+      "Most frequent",
+      "First",
+      "Sum",
+      "Average",
+      "Count",
+      "Max",
+      "Min",
+    ]);
+  });
+
+  it("shows the rule that will be saved when the proposed one does not fit the column", () => {
+    useChatPanelStateMock.mockReturnValue({
+      pendingCaseTypeDraft: {
+        ...makeDraft(),
+        attributes: makeDraft().attributes.map((attribute) => {
+          return attribute.columnId === STATE_COLUMN_ID
+            ? { ...attribute, valuePickerRuleType: "sum" as const }
+            : attribute;
+        }),
+      },
+    });
+    render(<CaseTypeDraftBlock />);
+
+    expect(
+      screen.getByRole("combobox", { name: "Value to keep for State" }),
+    ).toHaveValue("Most frequent");
   });
 });
