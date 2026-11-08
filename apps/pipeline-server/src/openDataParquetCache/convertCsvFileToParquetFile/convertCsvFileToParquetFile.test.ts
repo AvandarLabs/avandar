@@ -48,6 +48,56 @@ describe("convertCsvFileToParquetFile", () => {
     }
   });
 
+  it("reads a quoted value that ends in an apostrophe", async () => {
+    // From NYC's DOB Violations. DuckDB's lenient CSV mode merges these two
+    // rows into one.
+    const csvPath = join(testRoot, "source.csv");
+    const parquetPath = join(testRoot, "source.parquet");
+    await writeFile(
+      csvPath,
+      [
+        '"id","note","street"',
+        '"1","CANCELLED,CITY OWNED\'","58 ST"',
+        '"2","CANCELLED,CITY OWNED","58 ST"',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    const summary = await convertCsvFileToParquetFile({ csvPath, parquetPath });
+
+    expect(summary.rowCount).toBe(2);
+    const db = new NodeDuckDb();
+    try {
+      const rows = await db.runRawQuery(
+        `SELECT note FROM read_parquet('${parquetPath}') ORDER BY id`,
+      );
+      expect(rows).toEqual([
+        { note: "CANCELLED,CITY OWNED'" },
+        { note: "CANCELLED,CITY OWNED" },
+      ]);
+    } finally {
+      await db.close();
+    }
+  });
+
+  it("fails on a malformed row rather than shifting its values", async () => {
+    const csvPath = join(testRoot, "source.csv");
+    const parquetPath = join(testRoot, "source.parquet");
+    const goodRows = Array.from({ length: 30_000 }, (_, index) => {
+      return `${index},x`;
+    });
+    await writeFile(
+      csvPath,
+      ["a,b", ...goodRows, "3,4,5", "6,7", ""].join("\n"),
+      "utf8",
+    );
+
+    await expect(
+      convertCsvFileToParquetFile({ csvPath, parquetPath }),
+    ).rejects.toThrow(/Line: 30002/);
+  });
+
   it("keeps numeric columns numeric", async () => {
     const csvPath = join(testRoot, "source.csv");
     const parquetPath = join(testRoot, "source.parquet");

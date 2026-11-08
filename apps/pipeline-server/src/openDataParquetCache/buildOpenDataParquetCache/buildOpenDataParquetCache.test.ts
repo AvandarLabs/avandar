@@ -24,7 +24,6 @@ function _createDependencies(
       // The file must still exist while it uploads.
       await readFile(parquetPath);
     }),
-    removeObject: vi.fn(),
     ...overrides,
   };
 }
@@ -35,7 +34,6 @@ describe("buildOpenDataParquetCache", () => {
 
     const result = await buildOpenDataParquetCache({
       catalogListingId: LISTING_ID,
-      previousObjectPath: undefined,
       dependencies,
     });
 
@@ -56,21 +54,6 @@ describe("buildOpenDataParquetCache", () => {
         { name: "cases", dataType: "BIGINT" },
       ],
     });
-    expect(dependencies.removeObject).not.toHaveBeenCalled();
-  });
-
-  it("removes the previous copy once the new one is uploaded", async () => {
-    const dependencies = _createDependencies();
-
-    await buildOpenDataParquetCache({
-      catalogListingId: LISTING_ID,
-      previousObjectPath: `catalog-cache/${LISTING_ID}/0000000000000000.parquet`,
-      dependencies,
-    });
-
-    expect(dependencies.removeObject).toHaveBeenCalledWith(
-      `catalog-cache/${LISTING_ID}/0000000000000000.parquet`,
-    );
   });
 
   it("uploads a Parquet source without converting it", async () => {
@@ -94,7 +77,6 @@ describe("buildOpenDataParquetCache", () => {
 
     const result = await buildOpenDataParquetCache({
       catalogListingId: LISTING_ID,
-      previousObjectPath: undefined,
       dependencies,
     });
 
@@ -116,8 +98,7 @@ describe("buildOpenDataParquetCache", () => {
     await expect(
       buildOpenDataParquetCache({
         catalogListingId: LISTING_ID,
-        previousObjectPath: undefined,
-        dependencies,
+          dependencies,
       }),
     ).rejects.toThrow("storage is down");
     await expect(access(tempFilePath)).rejects.toThrow();

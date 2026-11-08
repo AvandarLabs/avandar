@@ -25,8 +25,6 @@ export type OpenDataParquetCacheDependencies = {
     objectPath: string;
     parquetPath: string;
   }) => Promise<void>;
-  /** Deletes an object from the `opendata` bucket. */
-  removeObject: (objectPath: string) => Promise<void>;
 };
 
 /** The Parquet copy a build wrote. */
@@ -78,24 +76,21 @@ async function _writeParquetFile(args: {
  * A source that reports no freshness token is versioned by when it was
  * built, so every build of it writes a new object.
  *
- * Recording the copy on the listing is the caller's job, so a failed write
- * there leaves an orphaned object rather than a listing that names a missing
- * one.
+ * Recording the copy on the listing, and only then deleting the copy it
+ * replaces, is the caller's job. A failed write there leaves an orphaned
+ * object rather than a listing that names a missing one.
  *
  * @param options.catalogListingId The listing.
- * @param options.previousObjectPath The listing's current copy, deleted once
- *   the new one is uploaded.
  * @param options.dependencies The network, source, and Storage steps.
  * @returns The copy that was written.
  */
 export async function buildOpenDataParquetCache(
   options: Readonly<{
     catalogListingId: string;
-    previousObjectPath: string | undefined;
     dependencies: OpenDataParquetCacheDependencies;
   }>,
 ): Promise<OpenDataParquetCache> {
-  const { catalogListingId, previousObjectPath, dependencies } = options;
+  const { catalogListingId, dependencies } = options;
   const download = await dependencies.resolveSourceDownload();
   const sourceVersion =
     download.sourceVersion ?? `built:${new Date().toISOString()}`;
@@ -112,9 +107,6 @@ export async function buildOpenDataParquetCache(
     });
     const byteSize = (await stat(parquetPath)).size;
     await dependencies.uploadParquet({ objectPath, parquetPath });
-    if (previousObjectPath !== undefined && previousObjectPath !== objectPath) {
-      await dependencies.removeObject(previousObjectPath);
-    }
     return { objectPath, sourceVersion, byteSize, ...summary };
   } finally {
     await rm(tempDir, { force: true, recursive: true });
