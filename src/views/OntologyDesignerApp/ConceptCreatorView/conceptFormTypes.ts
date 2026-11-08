@@ -30,7 +30,7 @@ import type { SetOptional, SetRequired } from "type-fest";
  * which is how a field that keeps every value is stored. The form always
  * holds one, so the rule select always has a value to show.
  */
-type DatasetColumnFormMapping = SetOptional<
+type DatasetColumnMappingFormValues = SetOptional<
   DatasetColumnMapping<"Insert">,
   "datasetId" | "datasetColumnId" | "workspaceId"
 > & { valuePickerRuleType: ValuePickerRule.T };
@@ -41,7 +41,7 @@ export type AttributeFormValues = SetRequired<
 > & {
   mappings: {
     manualEntry: SetOptional<ManualEntryMapping<"Insert">, "workspaceId">;
-    datasetColumn: DatasetColumnFormMapping;
+    datasetColumn: DatasetColumnMappingFormValues;
   };
 };
 

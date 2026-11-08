@@ -7,10 +7,7 @@ import { EXTERNAL_ID_COLUMN } from "@/clients/qetl/QueryMediator/conceptRelation
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type {
-  DatasetColumnMapping,
-  ValuePickerRuleType,
-} from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type {
   ConceptAttributeColumn,
   ConceptAttributeValueRule,
@@ -166,7 +163,10 @@ function _getPrimaryKeyColumnNameByDatasetId(
   return primaryKeyColumnNameByDatasetId;
 }
 
-/** The typed NULL column an attribute with nothing to read becomes. */
+/**
+ * The typed column an attribute with nothing to read becomes: a NULL, or an
+ * empty list for a list attribute.
+ */
 function _buildUnmappedColumn(
   attribute: Readonly<ConceptAttribute.T>,
 ): ConceptAttributeColumn {
@@ -195,10 +195,10 @@ function _getValueRule(
   }>,
 ): ConceptAttributeValueRule {
   const { attribute } = options;
-  const ruleType: ValuePickerRuleType | undefined =
-    options.mapping.valuePickerRuleType;
   return match(ConceptAttribute.getValueShape(attribute))
-    .with("single", (): ConceptAttributeValueRule => {
+    .returnType<ConceptAttributeValueRule>()
+    .with("single", () => {
+      const ruleType = options.mapping.valuePickerRuleType;
       if (ruleType === undefined) {
         throw new Error(
           `Concept attribute '${attribute.name}' (${attribute.id}) keeps one ` +
@@ -207,7 +207,7 @@ function _getValueRule(
       }
       return { valueShape: "single", valuePickerRuleType: ruleType };
     })
-    .with("list", (): ConceptAttributeValueRule => {
+    .with("list", () => {
       return { valueShape: "list" };
     })
     .exhaustive();
@@ -251,13 +251,100 @@ function _assertRuleAllowedForColumn(
 }
 
 /**
+ * The dataset column a mapping names.
+ *
+ * Fails closed rather than degrading to a NULL column. A mapping pointing at
+ * a column that no longer exists is a broken ontology, and answering the
+ * query with NULLs would report "no value" for data that may well exist.
+ */
+function _getDatasetColumnForMapping(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+  }>,
+): DatasetColumn.T {
+  const { attribute, mapping, metadata } = options;
+  const datasetColumn = metadata.datasetColumnsById[mapping.datasetColumnId];
+  if (!datasetColumn) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) is mapped to ` +
+        `dataset column '${mapping.datasetColumnId}', which does not exist.`,
+    );
+  }
+  return datasetColumn;
+}
+
+/**
+ * The key column of the dataset a mapping reads. A dataset with no identifier
+ * attribute mapped into it cannot match its rows to an individual, so this
+ * throws rather than returning a key every row would miss.
+ */
+function _getPrimaryKeyColumnNameForMapping(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId;
+  }>,
+): string {
+  const { attribute, mapping } = options;
+  const primaryKeyColumnName =
+    options.primaryKeyColumnNameByDatasetId[mapping.datasetId];
+  if (primaryKeyColumnName === undefined) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) reads dataset ` +
+        `'${mapping.datasetId}', which has no identifier attribute mapped ` +
+        `into it, so its rows cannot be matched to an individual.`,
+    );
+  }
+  return primaryKeyColumnName;
+}
+
+/**
+ * The column a dataset-column attribute becomes, once its mapping, dataset
+ * column, value rule, and dataset key have each been checked.
+ */
+function _buildMappedAttributeColumn(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+    primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId;
+  }>,
+): ConceptAttributeColumn {
+  const { attribute, mapping, metadata } = options;
+  const datasetColumn = _getDatasetColumnForMapping({
+    attribute,
+    mapping,
+    metadata,
+  });
+  const valueRule = _getValueRule({ attribute, mapping });
+  _assertRuleAllowedForColumn({ attribute, valueRule, datasetColumn });
+
+  return {
+    kind: "dataset_column",
+    attributeId: attribute.id,
+    attributeName: attribute.name,
+    selectColumnName: datasetColumn.name,
+    datasetId: mapping.datasetId,
+    columnDataType: datasetColumn.dataType,
+    primaryKeyColumnName: _getPrimaryKeyColumnNameForMapping({
+      attribute,
+      mapping,
+      primaryKeyColumnNameByDatasetId: options.primaryKeyColumnNameByDatasetId,
+    }),
+    ...valueRule,
+  };
+}
+
+/**
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
- * become a typed NULL rather than an error. Do not throw for them instead: one
- * manually entered attribute would make the whole concept unqueryable, while a
- * typed NULL keeps the relation's schema complete and is honest, because no
- * value is stored for it.
+ * become a typed NULL, or an empty list for a list attribute, rather than an
+ * error. Do not throw for them instead: one manually entered attribute would
+ * make the whole concept unqueryable, while a typed column keeps the
+ * relation's schema complete and is honest, because no value is stored for it.
  */
 function _buildAttributeColumn(
   options: Readonly<{
@@ -279,42 +366,8 @@ function _buildAttributeColumn(
     };
   }
 
-  // Fail closed rather than degrading to a NULL column. A mapping pointing at
-  // a column that no longer exists is a broken ontology, and answering the
-  // query with NULLs would report "no value" for data that may well exist.
-  const datasetColumn = metadata.datasetColumnsById[mapping.datasetColumnId];
-  if (!datasetColumn) {
-    throw new Error(
-      `Concept attribute '${attribute.name}' (${attribute.id}) is mapped to ` +
-        `dataset column '${mapping.datasetColumnId}', which does not exist.`,
-    );
-  }
-  // Resolved before the rule check, so a single value with no rule fails
-  // with the error that names it rather than a pattern-matching error.
-  const valueRule = _getValueRule({ attribute, mapping });
-  _assertRuleAllowedForColumn({ attribute, valueRule, datasetColumn });
-
-  const primaryKeyColumnName =
-    options.primaryKeyColumnNameByDatasetId[mapping.datasetId];
-  if (primaryKeyColumnName === undefined) {
-    throw new Error(
-      `Concept attribute '${attribute.name}' (${attribute.id}) reads dataset ` +
-        `'${mapping.datasetId}', which has no identifier attribute mapped ` +
-        `into it, so its rows cannot be matched to an individual.`,
-    );
-  }
-
   return {
-    column: {
-      kind: "dataset_column",
-      attributeId: attribute.id,
-      attributeName: attribute.name,
-      selectColumnName: datasetColumn.name,
-      datasetId: mapping.datasetId,
-      columnDataType: datasetColumn.dataType,
-      primaryKeyColumnName,
-      ...valueRule,
-    },
+    column: _buildMappedAttributeColumn({ ...options, mapping }),
     contributingDatasetId: mapping.datasetId,
   };
 }

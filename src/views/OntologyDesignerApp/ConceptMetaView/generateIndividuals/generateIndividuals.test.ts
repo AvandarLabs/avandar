@@ -475,6 +475,6 @@ describe("generateIndividuals", () => {
 
     await expect(
       generateIndividuals({ ...concept, attributes }),
-    ).rejects.toThrow(/names no value rule/);
+    ).rejects.toThrow(/label attribute .full_name.*names no value rule/i);
   });
 });

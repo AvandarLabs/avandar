@@ -5,8 +5,8 @@ import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
-import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 
 /**
  * The alias every subquery reads its dataset rows under. It must stay
@@ -36,7 +36,7 @@ export type AttributeValueSqlOptions = {
    * How one record's rows reduce to one value. Required for one value. A list
    * ignores it.
    */
-  valuePickerRuleType: ValuePickerRuleType | undefined;
+  valuePickerRuleType: ValuePickerRule.T | undefined;
   /** The name of the column the subquery emits. */
   outputColumnName: string;
   /** The outer table, by name or alias, holding one row per record key. */
@@ -90,7 +90,7 @@ function _buildTextExtremeSql(
 function _buildReducedValueSql(
   options: Readonly<{
     parts: ValueSqlParts;
-    valuePickerRuleType: ValuePickerRuleType;
+    valuePickerRuleType: ValuePickerRule.T;
     columnDataType: AvaDataType.T;
   }>,
 ): string {

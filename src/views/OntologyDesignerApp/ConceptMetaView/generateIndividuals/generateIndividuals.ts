@@ -210,6 +210,14 @@ async function _resolveIndividualSourceMappings(
   const labelMapping = datasetColumnMappings.find((mapping) => {
     return mapping.conceptAttributeId === labelAttribute.id;
   })!;
+  // The label names each record with one value, so its mapping must name the
+  // rule that picks it.
+  if (labelMapping.valuePickerRuleType === undefined) {
+    throw new Error(
+      `Label attribute '${labelAttribute.name}' (${labelAttribute.id}) keeps ` +
+        `one value, but its mapping names no value rule.`,
+    );
+  }
   const identifierMappingsByDatasetId = makeObject(identifierMappings, {
     key: "datasetId",
   });

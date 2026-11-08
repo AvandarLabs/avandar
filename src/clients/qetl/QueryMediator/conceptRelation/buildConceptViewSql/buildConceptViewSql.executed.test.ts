@@ -346,6 +346,21 @@ describe("buildConceptViewSql", () => {
     ).toEqual([[], [], []]);
   });
 
+  it("types an unmapped list attribute as a list of its type", async () => {
+    const columnTypes = await _withConceptView({
+      world: DEFAULT_WORLD,
+      attributeColumns: [NOTES],
+      run: async (connection) => {
+        const reader = await connection.runAndReadAll(
+          `SELECT DISTINCT typeof("notes") AS column_type FROM "${DEFAULT_WORLD.viewName}"`,
+        );
+        return reader.getRowObjects();
+      },
+    });
+
+    expect(columnTypes).toEqual([{ column_type: "VARCHAR[]" }]);
+  });
+
   // Why the loader has to mark this statement trusted internal SQL, asserted
   // against the real analyzer rather than reasoned about. The view's `FROM` is
   // the spine table, whose name deliberately resolves to no relation, so the

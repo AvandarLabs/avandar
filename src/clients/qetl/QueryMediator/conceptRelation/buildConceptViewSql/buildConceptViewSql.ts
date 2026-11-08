@@ -4,8 +4,8 @@ import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/Concep
 import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 
 /** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
@@ -20,7 +20,7 @@ const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
  * selectors.
  */
 export type ConceptAttributeValueRule =
-  | { valueShape: "single"; valuePickerRuleType: ValuePickerRuleType }
+  | { valueShape: "single"; valuePickerRuleType: ValuePickerRule.T }
   | { valueShape: "list" };
 
 /** One column of the concept relation, already resolved to what it reads. */
@@ -135,7 +135,7 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
     valueShape: column.valueShape,
     // A list column carries no rule.
     valuePickerRuleType:
-      "valuePickerRuleType" in column ? column.valuePickerRuleType : undefined,
+      column.valueShape === "single" ? column.valuePickerRuleType : undefined,
     outputColumnName: column.attributeName,
     externalIdsTable: SPINE_ALIAS,
     externalIdColumn: EXTERNAL_ID_COLUMN,
