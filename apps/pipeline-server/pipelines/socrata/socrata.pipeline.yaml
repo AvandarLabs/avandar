@@ -24,6 +24,14 @@ fields:
   update_frequency:
     { script: ./mappers/socrataUpdateFrequency/socrataUpdateFrequency.ts }
 
+# How the pipeline server downloads one listing for its Parquet copy. The
+# Socrata API serves a dataset in pages, so a copy is downloaded and converted
+# one page at a time and never needs the whole dataset on disk.
+download:
+  paging: true
+  pageRows: 100000
+  script: ./download/socrataListingDownload.ts
+
 # Each drive is crawled and resumed on its own, so adding one indexes it from
 # scratch on the next run. A drive must have at most 10,000 assets, the most
 # the Discovery API can page through. A drive may list `scopes`, each a
