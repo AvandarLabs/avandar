@@ -1,5 +1,6 @@
 import { createNeverFatalExecutionStore } from "@etl/stores/createNeverFatalExecutionStore/createNeverFatalExecutionStore";
 import type {
+  EtlClock,
   EtlCrawlReport,
   EtlCrawlStatus,
   EtlPipelineRunId,
@@ -195,6 +196,8 @@ export function createRunExecutionRecorder(args: {
   options: EtlRunOptions;
   startedAt: Date;
   warn?: (message: string) => void;
+  /** Paces retries of failed recording calls. Defaults to `SYSTEM_CLOCK`. */
+  clock?: EtlClock;
 }): RunExecutionRecorder {
   const { invocation } = args.options;
   if (args.store === undefined || invocation === undefined) {
@@ -208,6 +211,7 @@ export function createRunExecutionRecorder(args: {
         ((message) => {
           console.warn(message);
         }),
+      ...(args.clock === undefined ? {} : { clock: args.clock }),
     }),
     executionStart: buildRunExecutionStart({ ...args, invocation }),
   });

@@ -572,6 +572,7 @@ export function createEtlEngine<
         pipelineRunId,
         options,
         startedAt,
+        clock,
       });
       await execution.start();
       return _runRecorded({

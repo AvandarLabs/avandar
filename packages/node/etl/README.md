@@ -528,8 +528,11 @@ three Supabase functions, or `stores.executions` replaces them in tests.
 - `finish` records the outcome: `succeeded`, `partially_failed`, or
   `failed`, with the first error.
 
-Recording never fails a run: a failed call is logged with `console.warn`,
-and after a failed start the rest is skipped.
+Recording never fails a run. A call that fails with
+`EtlTransientStoreError` is retried with the same waits as a crawl's
+requests, so a run that slowed the database down is still recorded. A call
+that still fails is logged with `console.warn`, and after a failed start
+the rest is skipped.
 
 Every crawl report carries `startedAt`, `finishedAt`, `checkpointBefore`,
 `checkpointAfter`, and `metrics`:
