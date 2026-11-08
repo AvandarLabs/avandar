@@ -8,7 +8,6 @@ import { getDefaultConceptFormValues } from "@/views/OntologyDesignerApp/Concept
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type {
   ConceptFormSubmitValues,
   ConceptFormValues,
@@ -50,7 +49,7 @@ vi.mock("@/components/DatasetColumnPickerList", () => {
     DatasetColumnPickerList: ({
       onChange,
     }: {
-      onChange: (value: DatasetColumnId) => void;
+      onChange: (value: DatasetColumn.Id) => void;
     }) => {
       return COLUMNS.map((column) => {
         return (
@@ -107,7 +106,7 @@ function BlockHarness(): React.ReactNode {
 }
 
 describe("DatasetColumnAttributesBlock", () => {
-  it("locks a field's rule each time its column is picked as the ID", () => {
+  it("locks a field's rule when its column is picked as the ID after another column", () => {
     render(<BlockHarness />);
     fireEvent.click(screen.getByText("Pick district"));
     fireEvent.click(

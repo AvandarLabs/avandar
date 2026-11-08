@@ -514,7 +514,7 @@ msgstr "檢視"
 msgid "Second point"
 msgstr "第二點"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "選擇依字母順序排在最前的值"
 
@@ -928,7 +928,7 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 "seats. Each seat allows you to add 10 more datasets!"
 msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添加到工作區的資料集數量，您可以購買更多席位。每個席位允許您添加 10 個額外的資料集！"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "僅允許一個值"
 
@@ -978,7 +978,7 @@ msgstr "調整註解文字大小"
 msgid "stddev"
 msgstr "標準差"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "獲取值的數量"
 
@@ -3929,7 +3929,7 @@ msgstr "無法捕捉儀表板"
 msgid "Processing dataset…"
 msgstr "處理數據集中…"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "ID 欄位保持其原值。"
 
@@ -3963,7 +3963,7 @@ msgstr "X 軸刻度間隔"
 msgid "Please try again."
 msgstr "請再試一次。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "選擇依字母順序排在最後的值"
 
@@ -4099,7 +4099,7 @@ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for 
 msgstr "如果您有 32 GB RAM，且主要使用效能強大的機器進行分析工作，建議使用此選項。"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If each {0} can only have one {attributeName} value, check this box."
 msgstr "如果每個 {0} 只能有一個 {attributeName} 值，請勾選此框。"
 
@@ -4843,7 +4843,7 @@ msgstr "項目符號清單"
 msgid "Annotate the map"
 msgstr "註記地圖"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "選擇最大值"
 
@@ -5462,7 +5462,7 @@ msgstr "已套用感興趣區域"
 msgid "EPSG code"
 msgstr "EPSG 代碼"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "允許手動編輯"
@@ -5649,7 +5649,7 @@ msgstr "繪製要篩選的區域"
 msgid "Pick a dashboard, or create a new one."
 msgstr "選擇一個儀表板，或創建一個新儀表板。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "獲取數值總和"
 
@@ -5717,7 +5717,7 @@ msgstr "幾何功能不可用"
 msgid "X column"
 msgstr "X 欄"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "選擇最常見的值"
 
@@ -6843,7 +6843,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 "excluded from the map only."
 msgstr "未對應的資料列仍會計入此圖層的總數。它們只會從地圖中排除。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "獲取值的平均值"
 
@@ -7805,7 +7805,7 @@ msgstr "正在重新整理 {conceptName} 筆記錄…"
 msgid "Loading private resources"
 msgstr "正在載入私人資源"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "選擇我們看到的第一個值"
 
@@ -8383,7 +8383,7 @@ msgstr "至少為"
 msgid "Stack group"
 msgstr "堆疊群組"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "選擇規則（例如：最常見）"
 
@@ -8835,7 +8835,7 @@ msgid "contains"
 msgstr "包含"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 
@@ -10470,7 +10470,7 @@ msgstr "顯示 QR 碼"
 msgid "Past year"
 msgstr "過去一年"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "選擇最小值"
 

@@ -23,7 +23,7 @@ import {
   ConceptFormValues,
   makeDefaultDatasetColumnAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
+import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { IdentifierBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -191,15 +191,16 @@ export function DatasetColumnAttributesBlock({
 
   const { sourceDatasets } = conceptForm.getValues();
 
-  // The dataset columns picked as an ID. The ID selects are uncontrolled, so a
-  // pick does not re-render this block by itself, and the watch keeps the
-  // lock on the selected field current.
-  const [identifierColumnIds, setIdentifierColumnIds] = useState(() => {
-    return _getIdentifierColumnIds(sourceDatasets);
+  // The ID selects are uncontrolled, so a pick does not re-render this block
+  // by itself. The watch only triggers a re-render. The ID columns are read
+  // from the form each render, so a form reset is reflected too.
+  const [, setIdentifierPickCount] = useState(0);
+  conceptForm.useFieldWatch("sourceDatasets", () => {
+    setIdentifierPickCount((pickCount) => {
+      return pickCount + 1;
+    });
   });
-  conceptForm.useFieldWatch("sourceDatasets", ({ value }) => {
-    setIdentifierColumnIds(_getIdentifierColumnIds(value));
-  });
+  const identifierColumnIds = _getIdentifierColumnIds(sourceDatasets);
 
   // The field being configured. Until submit its `dataType` is its column's
   // type, which decides the value rules it may use.

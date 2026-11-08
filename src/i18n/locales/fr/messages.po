@@ -536,7 +536,7 @@ msgstr "Vues"
 msgid "Second point"
 msgstr "Deuxième point"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "Choisissez la valeur qui vient en premier par ordre alphabétique"
 
@@ -974,7 +974,7 @@ msgstr "Votre plan actuel ne prend en charge que jusqu'à {0} ensembles de "
 "sièges supplémentaires. Chaque siège vous permet d'ajouter 10 ensembles "
 "de données de plus !"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "Autoriser une seule valeur"
 
@@ -1026,7 +1026,7 @@ msgstr "Redimensionner le texte de l’annotation"
 msgid "stddev"
 msgstr "écart type"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "Obtenir un compte du nombre de valeurs"
 
@@ -4143,7 +4143,7 @@ msgstr "Impossible de capturer le tableau de bord"
 msgid "Processing dataset…"
 msgstr "Traitement du jeu de données…"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "Les champs d'identifiant conservent leur valeur telle quelle."
 
@@ -4178,7 +4178,7 @@ msgstr "Intervalle des graduations de l’axe X"
 msgid "Please try again."
 msgstr "Veuillez réessayer."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "Choisissez la valeur qui vient en dernier par ordre alphabétique"
 
@@ -4319,7 +4319,7 @@ msgstr "Recommandé si vous disposez de 32 Go de RAM et d’une machine puissant
 "principalement utilisée pour les tâches d’analyse."
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If each {0} can only have one {attributeName} value, check this box."
 msgstr "Si chaque {0} ne peut avoir qu'une seule valeur {attributeName}, cochez "
 "cette case."
@@ -5092,7 +5092,7 @@ msgstr "Liste à puces"
 msgid "Annotate the map"
 msgstr "Annoter la carte"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "Choisissez la valeur maximale"
 
@@ -5733,7 +5733,7 @@ msgstr "Zone d’intérêt appliquée"
 msgid "EPSG code"
 msgstr "Code EPSG"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "Autoriser l'édition manuelle"
@@ -5933,7 +5933,7 @@ msgstr "Dessinez une zone pour filtrer"
 msgid "Pick a dashboard, or create a new one."
 msgstr "Choisissez un tableau de bord ou créez-en un nouveau."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "Obtenir une somme des valeurs"
 
@@ -6003,7 +6003,7 @@ msgstr "La prise en charge de la géométrie est indisponible"
 msgid "X column"
 msgstr "Colonne X"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "Choisissez la valeur la plus fréquente"
 
@@ -7172,7 +7172,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 msgstr "Les lignes non mappées sont toujours comptabilisées dans les totaux de "
 "cette couche. Elles sont uniquement exclues de la carte."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "Obtenir une moyenne des valeurs"
 
@@ -8185,7 +8185,7 @@ msgstr "Actualisation des enregistrements de {conceptName}…"
 msgid "Loading private resources"
 msgstr "Chargement des ressources privées"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Choisissez la première valeur que nous voyons"
 
@@ -8790,7 +8790,7 @@ msgstr "est au moins égal à"
 msgid "Stack group"
 msgstr "Groupe d’empilement"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Sélectionner la règle (par exemple, la plus fréquente)"
 
@@ -9257,7 +9257,7 @@ msgid "contains"
 msgstr "contient"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "S'il y a plusieurs valeurs {attributeName} pour un {0}, alors..."
 
@@ -10971,7 +10971,7 @@ msgstr "Afficher le code QR"
 msgid "Past year"
 msgstr "Année dernière"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "Choisissez la valeur minimale"
 

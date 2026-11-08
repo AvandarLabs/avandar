@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { DatasetColumnMappingCreator } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
+import { DatasetColumnMappingCreator } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { ManualEntryAttributesBlock } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import {
   createMappingFormFromFrame,

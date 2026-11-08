@@ -532,7 +532,7 @@ msgstr "Mionekano"
 msgid "Second point"
 msgstr "Kipengele cha pili"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "Chagua thamani inayokuja kwanza kialfabeti"
 
@@ -961,7 +961,7 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Ili kuongeza idadi ya "
 "datasets unazoweza kuongeza kwenye eneo lako la kazi unaweza kununua "
 "viti zaidi. Kila kiti kinakuruhusu kuongeza datasets 10 zaidi!"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "Ruhusu thamani moja tu"
 
@@ -1013,7 +1013,7 @@ msgstr "Badilisha ukubwa wa maandishi ya dondoo"
 msgid "stddev"
 msgstr "stddev"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "Pata idadi ya thamani zilizopo"
 
@@ -4094,7 +4094,7 @@ msgstr "Haiwezi kunasa dashibodi"
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "ID fields keep their value as is."
 msgstr "Sehemu za kitambulisho huhifadhi thamani yake kama ilivyo."
 
@@ -4129,7 +4129,7 @@ msgstr "Muda wa alama za mhimili wa X"
 msgid "Please try again."
 msgstr "Tafadhali jaribu tena."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "Chagua thamani inayokuja mwisho kialfabeti"
 
@@ -4269,7 +4269,7 @@ msgstr "Inapendekezwa ikiwa una RAM ya GB 32 na mashine yenye nguvu inayotumika 
 "hasa kwa kazi za uchanganuzi."
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If each {0} can only have one {attributeName} value, check this box."
 msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
 "kisanduku hiki."
@@ -5034,7 +5034,7 @@ msgstr "Orodha yenye vitone"
 msgid "Annotate the map"
 msgstr "Weka maelezo kwenye ramani"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "Chagua thamani ya juu"
 
@@ -5669,7 +5669,7 @@ msgstr "Eneo linalohusika limetumika"
 msgid "EPSG code"
 msgstr "Msimbo wa EPSG"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "Ruhusu kuhariri kwa mkono"
@@ -5866,7 +5866,7 @@ msgstr "Chora eneo la kuchuja kwa"
 msgid "Pick a dashboard, or create a new one."
 msgstr "Chagua dashibodi, au unda mpya."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "Pata jumla ya thamani"
 
@@ -5936,7 +5936,7 @@ msgstr "Usaidizi wa jiometri haupatikani"
 msgid "X column"
 msgstr "Safu ya X"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "Chagua thamani inayojirudia zaidi"
 
@@ -7091,7 +7091,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 msgstr "Safu ambazo hazijaunganishwa bado zinahesabiwa katika jumla za safu "
 "hii. Zimeondolewa kwenye ramani pekee."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "Pata wastani wa thamani"
 
@@ -8089,7 +8089,7 @@ msgstr "Inasasisha rekodi za {conceptName}…"
 msgid "Loading private resources"
 msgstr "Inapakia rasilimali za faragha"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
 
@@ -8686,7 +8686,7 @@ msgstr "ni angalau"
 msgid "Stack group"
 msgstr "Kundi la tabaka"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
 
@@ -9150,7 +9150,7 @@ msgid "contains"
 msgstr "ina"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {attributeName} kwa {0} moja, basi..."
 
@@ -10839,7 +10839,7 @@ msgstr "Onyesha QR code"
 msgid "Past year"
 msgstr "Mwaka uliopita"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "Chagua thamani ya chini"
 
