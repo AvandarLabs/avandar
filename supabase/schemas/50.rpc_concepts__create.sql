@@ -9,10 +9,11 @@
  * parsers. Child rows take the case type's id and workspace from the
  * inserted case type, never from their own payloads.
  *
- * A field that keeps every value (`is_array`) stores no value rule, every
- * other dataset field stores one, and a list is never the label or an
- * identifier. Each is refused with errcode `23514` and the hint
- * `value_rule_mismatch` or `list_field_is_key_or_label`.
+ * A field that keeps every value (`is_array` with no `bucket_grain`) stores
+ * no value rule; every other dataset field stores one, a per-period field
+ * included; and no list of either kind is the label or an identifier. Each
+ * is refused with errcode `23514` and the hint `value_rule_mismatch` or
+ * `list_field_is_key_or_label`.
  *
  * A signed-in caller always owns the new case type. `owner_id` in the
  * payload is read only when there is no signed-in user, which is the
@@ -20,9 +21,10 @@
  *
  * @param p_concept The `concepts` row, including `id` and
  *   `default_status_id`.
- * @param p_attributes The `concept_attributes` rows, each with its `id`.
+ * @param p_attributes The `concept_attributes` rows, each with its `id`. A
+ *   row without `bucket_grain` creates a field with no period.
  * @param p_dataset_column_mappings The `attribute_mappings__dataset_column`
- *   rows.
+ *   rows. A row without `bucket_column_id` names no date column.
  * @param p_manual_entry_mappings The `attribute_mappings__manual_entry` rows.
  * @param p_statuses The `concept_statuses` rows. `default_status_id` must be
  *   one of them, which the deferred foreign key checks at commit.
@@ -106,7 +108,8 @@ begin
     is_label,
     is_identifier,
     is_array,
-    allow_manual_edit
+    allow_manual_edit,
+    bucket_grain
   )
   select
     a.id,
@@ -119,7 +122,8 @@ begin
     a.is_label,
     a.is_identifier,
     a.is_array,
-    a.allow_manual_edit
+    a.allow_manual_edit,
+    a.bucket_grain
   from jsonb_to_recordset(p_attributes) as a (
     id uuid,
     name text,
@@ -129,27 +133,33 @@ begin
     is_label boolean,
     is_identifier boolean,
     is_array boolean,
-    allow_manual_edit boolean
+    allow_manual_edit boolean,
+    bucket_grain public.concept_attributes__bucket_grain
   );
 
+  -- After the attributes, so the bucket column trigger finds each mapping's
+  -- field and its period.
   insert into public.attribute_mappings__dataset_column (
     workspace_id,
     concept_attribute_id,
     value_picker_rule_type,
     dataset_id,
-    dataset_column_id
+    dataset_column_id,
+    bucket_column_id
   )
   select
     v_workspace_id,
     m.concept_attribute_id,
     m.value_picker_rule_type,
     m.dataset_id,
-    m.dataset_column_id
+    m.dataset_column_id,
+    m.bucket_column_id
   from jsonb_to_recordset(p_dataset_column_mappings) as m (
     concept_attribute_id uuid,
     value_picker_rule_type public.attribute_mappings__value_picker_rule_type,
     dataset_id uuid,
-    dataset_column_id uuid
+    dataset_column_id uuid,
+    bucket_column_id uuid
   );
 
   insert into public.attribute_mappings__manual_entry (
@@ -163,20 +173,22 @@ begin
     concept_attribute_id uuid
   );
 
-  -- A list field keeps every value, so its mapping names no rule, and every
-  -- other dataset field reduces its rows with exactly one. The rule and
-  -- `is_array` live in different tables, so no constraint can hold this.
-  -- `rpc_concepts__create` enforces it when a case type is created, and
-  -- readers refuse a single-value field that has no rule.
+  -- A field that keeps every value names no rule. Every other dataset field
+  -- reduces its rows with exactly one, a per-period field once per period.
+  -- The rule and `is_array` live in different tables, so no constraint can
+  -- hold this. `rpc_concepts__create` enforces it when a case type is
+  -- created, and readers refuse a single-value field that has no rule.
   if exists (
     select 1
     from public.attribute_mappings__dataset_column m
     join public.concept_attributes a on a.id = m.concept_attribute_id
     where
       a.concept_id = v_concept_id
-      and a.is_array = (m.value_picker_rule_type is not null)
+      and (a.is_array and a.bucket_grain is null) = (
+        m.value_picker_rule_type is not null
+      )
   ) then
-    raise exception 'A dataset field has a value rule exactly when it keeps one value'
+    raise exception 'A dataset field has a value rule unless it keeps every value'
       using errcode = '23514', hint = 'value_rule_mismatch';
   end if;
 

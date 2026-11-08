@@ -267,7 +267,7 @@ select throws_ok (
   );
   $t18$,
   '23514',
-  'A dataset field has a value rule exactly when it keeps one value',
+  'A dataset field has a value rule unless it keeps every value',
   'a list field that names a value rule is refused'
 );
 
@@ -285,7 +285,7 @@ select throws_ok (
   );
   $t19$,
   '23514',
-  'A dataset field has a value rule exactly when it keeps one value',
+  'A dataset field has a value rule unless it keeps every value',
   'a single-value field without a value rule is refused'
 );
 

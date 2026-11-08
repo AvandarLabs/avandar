@@ -5,7 +5,8 @@
  * a period on dataset list fields that neither name nor key a record, and a
  * trigger holds each dataset-column mapping's `bucket_column_id` to its
  * field's `bucket_grain` and to a date or timestamp column of the mapping's
- * own dataset.
+ * own dataset. `rpc_concepts__create` writes both columns and requires a
+ * value rule on a per-period field.
  */
 begin;
 
@@ -129,7 +130,7 @@ exception
 end;
 $$;
 
-select plan (23);
+select plan (31);
 
 -- 1.
 select throws_ok (
@@ -400,6 +401,90 @@ select lives_ok (
   where concept_attribute_id = 'b4008005-0000-4000-8000-000000000005'::uuid;
   $t23$,
   'an update to an unrelated column skips the date column check'
+);
+
+-- 24. The RPC runs as the test's superuser, so no signed-in user owns the
+-- case type and the payload's owner is used. Assertion 23 retyped
+-- `visit_date`, so the date column here is the timestamp `visit_at`.
+select lives_ok (
+  $t24$
+  select public.rpc_concepts__create (
+    '{"id":"b4209001-0000-4000-8000-000000000001","workspace_id":"b4001001-0000-4000-8000-000000000001","owner_id":"b4000001-0000-4000-8000-000000000001","name":"RPC bucketed case type","description":null,"allow_manual_creation":false,"default_status_id":"b4209002-0000-4000-8000-000000000002"}'::jsonb,
+    '[{"id":"b4209003-0000-4000-8000-000000000003","name":"Patient","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false},{"id":"b4209004-0000-4000-8000-000000000004","name":"Temperature per month","description":null,"data_type":"double","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":false,"bucket_grain":"month"}]'::jsonb,
+    '[{"concept_attribute_id":"b4209003-0000-4000-8000-000000000003","value_picker_rule_type":"first","dataset_id":"b4004001-0000-4000-8000-000000000001","dataset_column_id":"b4005001-0000-4000-8000-000000000001"},{"concept_attribute_id":"b4209004-0000-4000-8000-000000000004","value_picker_rule_type":"avg","dataset_id":"b4004001-0000-4000-8000-000000000001","dataset_column_id":"b4005002-0000-4000-8000-000000000002","bucket_column_id":"b4005004-0000-4000-8000-000000000004"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"b4209002-0000-4000-8000-000000000002","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t24$,
+  'the RPC creates a case type with a per-month field and its rule'
+);
+
+-- 25.
+select is (
+  (select bucket_grain from public.concept_attributes where id = 'b4209004-0000-4000-8000-000000000004'::uuid),
+  'month'::public.concept_attributes__bucket_grain,
+  'the RPC writes the field''s period'
+);
+
+-- 26.
+select is (
+  (select bucket_column_id from public.attribute_mappings__dataset_column where concept_attribute_id = 'b4209004-0000-4000-8000-000000000004'::uuid),
+  'b4005004-0000-4000-8000-000000000004'::uuid,
+  'the RPC writes the mapping''s date column'
+);
+
+-- 27. A payload with neither key, as every case type without a per-period
+-- field sends, still creates a field with no period.
+select is (
+  (select bucket_grain from public.concept_attributes where id = 'b4209003-0000-4000-8000-000000000003'::uuid),
+  null::public.concept_attributes__bucket_grain,
+  'a field sent without a period has none'
+);
+
+-- 28.
+select throws_ok (
+  $t28$
+  select public.rpc_concepts__create (
+    '{"id":"b4209005-0000-4000-8000-000000000005","workspace_id":"b4001001-0000-4000-8000-000000000001","owner_id":"b4000001-0000-4000-8000-000000000001","name":"No date column","description":null,"allow_manual_creation":false,"default_status_id":"b4209006-0000-4000-8000-000000000006"}'::jsonb,
+    '[{"id":"b4209007-0000-4000-8000-000000000007","name":"Patient","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false},{"id":"b4209008-0000-4000-8000-000000000008","name":"Temperature per month","description":null,"data_type":"double","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":false,"bucket_grain":"month"}]'::jsonb,
+    '[{"concept_attribute_id":"b4209007-0000-4000-8000-000000000007","value_picker_rule_type":"first","dataset_id":"b4004001-0000-4000-8000-000000000001","dataset_column_id":"b4005001-0000-4000-8000-000000000001"},{"concept_attribute_id":"b4209008-0000-4000-8000-000000000008","value_picker_rule_type":"avg","dataset_id":"b4004001-0000-4000-8000-000000000001","dataset_column_id":"b4005002-0000-4000-8000-000000000002"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"b4209006-0000-4000-8000-000000000006","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t28$,
+  '23514',
+  'A mapping for a field with a bucket_grain needs a bucket_column_id',
+  'the RPC refuses a per-month field without a date column'
+);
+
+-- 29.
+select is (
+  (select count(*)::int from public.concepts where id = 'b4209005-0000-4000-8000-000000000005'::uuid),
+  0,
+  'a refused date column leaves no case type behind'
+);
+
+-- 30. A per-period field reduces each period with a rule, so it needs one.
+select throws_ok (
+  $t30$
+  select public.rpc_concepts__create (
+    '{"id":"b4209009-0000-4000-8000-000000000009","workspace_id":"b4001001-0000-4000-8000-000000000001","owner_id":"b4000001-0000-4000-8000-000000000001","name":"No rule","description":null,"allow_manual_creation":false,"default_status_id":"b4209010-0000-4000-8000-000000000010"}'::jsonb,
+    '[{"id":"b4209011-0000-4000-8000-000000000011","name":"Patient","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false},{"id":"b4209012-0000-4000-8000-000000000012","name":"Temperature per month","description":null,"data_type":"double","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":false,"bucket_grain":"month"}]'::jsonb,
+    '[{"concept_attribute_id":"b4209011-0000-4000-8000-000000000011","value_picker_rule_type":"first","dataset_id":"b4004001-0000-4000-8000-000000000001","dataset_column_id":"b4005001-0000-4000-8000-000000000001"},{"concept_attribute_id":"b4209012-0000-4000-8000-000000000012","dataset_id":"b4004001-0000-4000-8000-000000000001","dataset_column_id":"b4005002-0000-4000-8000-000000000002","bucket_column_id":"b4005004-0000-4000-8000-000000000004"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"b4209010-0000-4000-8000-000000000010","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t30$,
+  '23514',
+  'A dataset field has a value rule unless it keeps every value',
+  'the RPC refuses a per-month field without a value rule'
+);
+
+-- 31.
+select is (
+  (select count(*)::int from public.concepts where id = 'b4209009-0000-4000-8000-000000000009'::uuid),
+  0,
+  'a refused rule leaves no case type behind'
 );
 
 select * from finish ();
