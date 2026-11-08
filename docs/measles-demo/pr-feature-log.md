@@ -1417,8 +1417,11 @@ rejects the new listing shape, so the catalog would not load.
 columns but none of its rows. It now reads the listing's first 200 rows with
 DuckDB, without adding it to the workspace, and shows them in a "Data
 preview" section that says it holds only the first 200 rows. An API-backed
-listing is read through the `open-data` edge function's resource route (CSV
-through the CSV sniffer, Parquet through a new `DuckDbClient.previewParquetBlob`),
+CSV listing is read from the start-of-file sample its column types are
+verified from (`fetchOpenDataColumnTypeSample`, shared with
+`verifyOpenDataColumnTypes`), so a source of any size previews. Any other
+API-backed listing is read whole through the `open-data` edge function's
+resource route (Parquet through a new `DuckDbClient.previewParquetBlob`), and
 a pipeline listing from its Parquet URL. The section is the one a workspace
 dataset's Metadata tab now uses too (`DatasetPreviewSection`). An expand
 button opens the detail in a near-full-screen modal with the description
@@ -1434,11 +1437,14 @@ cramping them.
 | SHA | Subject | Take |
 |---|---|---|
 | `d8a72da58` | feat(data-catalog): preview an ODC listing's first 200 rows and open it full screen | All of it. Regenerate the `.po` catalogs. |
+| `6b815b3d3` | fix(data-catalog): preview an API-backed CSV listing from the start of its file | All of it. |
 | `99929aeb3` | docs: define ODC and track asking about an ODC listing before adding it | MIXED: the `production-plan-world-humanitarian-day.md` P6.8 bullet only. The `connector-nomenclature.md` ODC line goes with F9. |
 
 **Files:** `src/clients/DuckDbClient/previewParquetBlob/`, the
 `previewParquetBlob` method in `DuckDbClient.ts`,
 `src/lib/openData/fetchCatalogListingPreview/`,
+`src/lib/openData/fetchOpenDataColumnTypeSample/` and the sample read it
+replaces in `verifyOpenDataColumnTypes.ts`,
 `src/components/DatasetPreviewSection/`,
 `DataCatalogView/useCatalogListingPreview/`, `DataCatalogView.tsx` and its
 stylesheet (the `detailProps` object and the modal),
