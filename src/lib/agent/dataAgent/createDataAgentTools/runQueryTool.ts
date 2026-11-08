@@ -118,6 +118,60 @@ function _toToolResult(
   };
 }
 
+/** What a query tool needs from the agent. */
+export type QueryToolContext = Readonly<{
+  host: DataAgentHost;
+  aliases: readonly SqlTableAlias.T[];
+  state: DataAgentRunState;
+  /**
+   * For a model on the user's device: rows it sees after each query, to
+   * check the result before replying. The turn then does not end on rows.
+   */
+  previewRowCount?: number;
+}>;
+
+/**
+ * Runs SQL written over the dataset aliases for the user: asks consent for
+ * the filter values when they call for it, shows the result, records it,
+ * and returns what the model should read next. Every query tool ends here.
+ */
+export async function runQueryForUser(
+  context: QueryToolContext,
+  request: Readonly<{ aliasSql: string; summary: string; chart?: string }>,
+): Promise<AgentToolResult<{ sql: string; outcome: string }>> {
+  const sql = SqlTableAlias.applyToSql(request.aliasSql, context.aliases);
+  const isApproved = await context.host.approveValuesForModel({
+    values: extractSingleQuotedSqlLiterals(sql),
+    reason: "query_filter",
+  });
+  if (!isApproved) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: "The user declined the filter values in this query. Explain how to run it in the Data Explorer instead.",
+        },
+      ],
+      details: { sql, outcome: "declined" },
+    };
+  }
+  context.state.queryRuns += 1;
+  const { summary, chart } = request;
+  const outcome = await context.host.showQuery({
+    sql,
+    summary,
+    chart,
+    previewRowCount: context.previewRowCount,
+  });
+  context.state.lastQuery = { sql, summary, chart, outcome };
+  return _toToolResult({
+    sql,
+    outcome,
+    state: context.state,
+    previewRowCount: context.previewRowCount,
+  });
+}
+
 /**
  * The tool that runs a query for the user. The rows go to the user's screen;
  * the model gets only the row count and column names. A clean result ends the
@@ -125,16 +179,7 @@ function _toToolResult(
  * goes back to the model, with literals removed from the error, for one fix.
  */
 export function createRunQueryTool(
-  options: Readonly<{
-    host: DataAgentHost;
-    aliases: readonly SqlTableAlias.T[];
-    state: DataAgentRunState;
-    /**
-     * For a model on the user's device: rows it sees after each query, to
-     * check the result before replying. The turn then does not end on rows.
-     */
-    previewRowCount?: number;
-  }>,
+  options: QueryToolContext,
 ): AgentTool<typeof RUN_QUERY_PARAMETERS> {
   return {
     name: "run_query",
@@ -144,40 +189,10 @@ export function createRunQueryTool(
     parameters: RUN_QUERY_PARAMETERS,
     executionMode: "sequential",
     execute: async (_toolCallId, params) => {
-      const sql = SqlTableAlias.applyToSql(params.sql, options.aliases);
-      const isApproved = await options.host.approveValuesForModel({
-        values: extractSingleQuotedSqlLiterals(sql),
-        reason: "query_filter",
-      });
-      if (!isApproved) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: "The user declined the filter values in this query. Explain how to run it in the Data Explorer instead.",
-            },
-          ],
-          details: { sql, outcome: "declined" },
-        };
-      }
-      options.state.queryRuns += 1;
-      const outcome = await options.host.showQuery({
-        sql,
+      return runQueryForUser(options, {
+        aliasSql: params.sql,
         summary: params.summary,
         chart: params.chart,
-        previewRowCount: options.previewRowCount,
-      });
-      options.state.lastQuery = {
-        sql,
-        summary: params.summary,
-        chart: params.chart,
-        outcome,
-      };
-      return _toToolResult({
-        sql,
-        outcome,
-        state: options.state,
-        previewRowCount: options.previewRowCount,
       });
     },
   };

@@ -1,5 +1,8 @@
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
-import { buildOfflineDataAgentSystemPrompt } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt";
+import {
+  buildOfflineDataAgentSystemPrompt,
+  buildOfflineQuestionMessage,
+} from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt";
 import { classifyOfflineMessage } from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
 import { findQuestionValues } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import { profileOfflineDatasets } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
@@ -38,6 +41,11 @@ export type CreateOfflineDataAgentOptions = {
   contextWindow: number;
   /** Today's date as `YYYY-MM-DD`. */
   today: string;
+  /**
+   * `plan`: answer with query plans that code turns into SQL. `sql`: write
+   * SQL directly. Default `sql`.
+   */
+  queryStyle?: "sql" | "plan";
 };
 
 /** True once a tool has answered since the user's latest message. */
@@ -75,14 +83,16 @@ type OfflineSession = {
 };
 
 /**
- * Routes the question, profiles the datasets once per conversation, finds
- * the question's stored values, and returns the prompt for this question.
+ * Routes the question, profiles the datasets once per conversation, and
+ * finds the question's stored values. Returns the conversation's system
+ * prompt (the same for every question, so it stays cached) and the message
+ * the model reads for this question.
  */
 async function _prepareQuestion(
   options: Readonly<CreateOfflineDataAgentOptions>,
   session: OfflineSession,
   message: string,
-): Promise<string> {
+): Promise<{ systemPrompt: string; messageText: string }> {
   session.profiles ??= profileOfflineDatasets(options.host, options.datasets);
   session.route.current = options.models.router
     ? await classifyOfflineMessage(options.llm, {
@@ -96,20 +106,28 @@ async function _prepareQuestion(
     : "data";
   session.previousMessage = message;
   const profiles = await session.profiles;
-  const matches =
-    session.route.current === "data"
-      ? await findQuestionValues(options.host, {
-          datasets: options.datasets,
-          profiles,
-          question: message,
-        })
-      : [];
-  return buildOfflineDataAgentSystemPrompt({
+  const systemPrompt = buildOfflineDataAgentSystemPrompt({
     datasets: options.datasets,
     profiles,
-    matches,
     today: options.today,
+    queryStyle: options.queryStyle,
   });
+  if (session.route.current === "chat") {
+    return { systemPrompt, messageText: message };
+  }
+  const matches = await findQuestionValues(options.host, {
+    datasets: options.datasets,
+    profiles,
+    question: message,
+  });
+  return {
+    systemPrompt,
+    messageText: buildOfflineQuestionMessage({
+      question: message,
+      matches,
+      datasets: options.datasets,
+    }),
+  };
 }
 
 function _createLocalChoice(modelId: string, contextWindow: number) {
@@ -149,16 +167,15 @@ export function createOfflineDataAgent(
     }),
     today: options.today,
     previewRowCount: OFFLINE_PREVIEW_ROW_COUNT,
+    queryTools: options.queryStyle ?? "sql",
   });
   const session: OfflineSession = { route };
   return {
     agent: dataAgent.agent,
     ask: async (message) => {
-      _replaceSystemPrompt(
-        dataAgent.agent,
-        await _prepareQuestion(options, session, message),
-      );
-      return dataAgent.ask(message);
+      const prepared = await _prepareQuestion(options, session, message);
+      _replaceSystemPrompt(dataAgent.agent, prepared.systemPrompt);
+      return dataAgent.ask(prepared.messageText);
     },
   };
 }

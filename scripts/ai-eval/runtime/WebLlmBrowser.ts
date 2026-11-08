@@ -10,7 +10,7 @@ import type {
 import type { BrowserContext, Page } from "@playwright/test";
 import type { Server } from "node:http";
 
-/** The context window the app gives offline models (`buildWebLlmChatOpts`). */
+/** The context window the app gives offline models. */
 const EVAL_CONTEXT_WINDOW = 8192;
 
 /**
@@ -48,10 +48,11 @@ window.__ready = true;
 </script></body></html>`;
 
 function _startServer(repoRoot: string): Promise<Server> {
-  const webLlmPath = join(
-    repoRoot,
-    "node_modules/@mlc-ai/web-llm/lib/index.js",
-  );
+  // `AVA_EVAL_WEBLLM_LIB` points at another WebLLM build's lib/index.js, to
+  // try models a newer release adds before upgrading the app's package.
+  const webLlmPath =
+    process.env.AVA_EVAL_WEBLLM_LIB ??
+    join(repoRoot, "node_modules/@mlc-ai/web-llm/lib/index.js");
   const server = createServer((request, response) => {
     if (request.url === "/web-llm.js") {
       response.setHeader("content-type", "text/javascript");
@@ -89,8 +90,11 @@ export class WebLlmBrowser implements LocalLlm {
     const port = typeof address === "object" && address ? address.port : 0;
     // The full Chromium build (not the headless shell) exposes Metal WebGPU
     // with shader-f16 in headless mode.
+    // `AVA_EVAL_WEBLLM_PROFILE` gives a second run its own profile: Chromium
+    // locks a profile while it is open, so two runs cannot share one.
     const context = await chromium.launchPersistentContext(
-      join(repoRoot, ".temp/ai-eval/webllm-profile"),
+      process.env.AVA_EVAL_WEBLLM_PROFILE ??
+        join(repoRoot, ".temp/ai-eval/webllm-profile"),
       { channel: "chromium", headless: true, args: ["--enable-unsafe-webgpu"] },
     );
     const page = await context.newPage();

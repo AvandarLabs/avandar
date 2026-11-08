@@ -33,10 +33,25 @@ export function getActiveTools(context: TranscriptContext): Tool[] {
   return [...toolsByName.values()];
 }
 
-function _formatAssistant(message: AssistantMessage): string {
+/**
+ * What the model wrote for each of its tool calls, by call id. Replaying the
+ * exact text lets WebLLM see the history as its own and reuse its cached
+ * prompt instead of reading the whole conversation again.
+ */
+export type LocalRawOutputs = ReadonlyMap<string, string>;
+
+function _formatAssistant(
+  message: AssistantMessage,
+  rawOutputs: LocalRawOutputs,
+): string {
   const toolCall = message.content.find((block) => {
     return block.type === "toolCall";
   });
+  const rawOutput =
+    toolCall?.type === "toolCall" ? rawOutputs.get(toolCall.id) : undefined;
+  if (rawOutput !== undefined) {
+    return rawOutput;
+  }
   if (toolCall?.type === "toolCall") {
     return formatLocalAction({
       kind: "tool",
@@ -55,6 +70,7 @@ function _formatAssistant(message: AssistantMessage): string {
 function _toLocalMessage(
   message: Message,
   isLeadingSystem: boolean,
+  rawOutputs: LocalRawOutputs,
 ): LocalLlmMessage | undefined {
   switch (message.role) {
     case "system":
@@ -66,7 +82,10 @@ function _toLocalMessage(
     case "user":
       return { role: "user", content: contentText(message.content) };
     case "assistant":
-      return { role: "assistant", content: _formatAssistant(message) };
+      return {
+        role: "assistant",
+        content: _formatAssistant(message, rawOutputs),
+      };
     case "toolResult":
       return {
         role: "user",
@@ -83,6 +102,7 @@ function _toLocalMessage(
  */
 export function toLocalLlmMessages(
   context: TranscriptContext,
+  rawOutputs: LocalRawOutputs = new Map(),
 ): LocalLlmMessage[] {
   const leading = context.messages[0];
   const systemText =
@@ -91,7 +111,7 @@ export function toLocalLlmMessages(
       : "";
   const instructions = buildLocalActionInstructions(getActiveTools(context));
   const conversation = context.messages.flatMap((message, index) => {
-    const localMessage = _toLocalMessage(message, index === 0);
+    const localMessage = _toLocalMessage(message, index === 0, rawOutputs);
     return localMessage ? [localMessage] : [];
   });
   return [

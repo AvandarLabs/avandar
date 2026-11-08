@@ -12,7 +12,8 @@ const LOCAL_CONTEXT_WINDOW = 8192;
 /**
  * Named offline model sets for `--harness pi-local --config <name>`. Each
  * value is a WebLLM model id. A one-model run needs no entry: pass
- * `--config single --model <WebLLM id>`, which also routes with that model.
+ * `--config single --model <WebLLM id>`, which also routes with that model,
+ * or `--config plan --model <WebLLM id>` to answer with query plans.
  */
 const PI_LOCAL_EVAL_CONFIGS: Record<string, OfflineDataAgentModels> = {};
 
@@ -29,8 +30,11 @@ export async function createPiLocalHarness(
     model: string;
   }>,
 ): Promise<EvalHarness> {
+  const isPlan = options.configName === "plan";
   const isSingle =
-    options.configName === "single" || options.configName === "default";
+    isPlan ||
+    options.configName === "single" ||
+    options.configName === "default";
   const models = isSingle
     ? { answer: options.model, router: options.model }
     : PI_LOCAL_EVAL_CONFIGS[options.configName];
@@ -40,7 +44,7 @@ export async function createPiLocalHarness(
   const browser = await WebLlmBrowser.open(options.repoRoot);
   return {
     label: isSingle
-      ? `pi-local:${options.model}`
+      ? `pi-local:${options.model}${isPlan ? ":plan" : ""}`
       : `pi-local:${options.configName}`,
     startConversation: () => {
       return createPiConversation({
@@ -53,6 +57,7 @@ export async function createPiLocalHarness(
             models,
             contextWindow: LOCAL_CONTEXT_WINDOW,
             today: new Date().toISOString().slice(0, 10),
+            queryStyle: isPlan ? "plan" : "sql",
           });
         },
       });

@@ -18,6 +18,7 @@ import type {
   AssistantMessageEventStream,
   JsonObject,
   Model,
+  Tool,
   ToolCall,
   TranscriptContext,
   Usage,
@@ -80,6 +81,7 @@ function _pushAction(
   stream: AssistantMessageEventStream,
   message: AssistantMessage,
   action: ReturnType<typeof parseLocalAction>,
+  onToolCall: (toolCallId: string) => void,
 ): void {
   if (action.kind === "tool") {
     const toolCall: ToolCall = {
@@ -90,6 +92,7 @@ function _pushAction(
     };
     message.content.push(toolCall);
     message.stopReason = "toolUse";
+    onToolCall(toolCall.id);
     stream.push({ type: "toolcall_start", contentIndex: 0, partial: message });
     stream.push({
       type: "toolcall_end",
@@ -106,6 +109,36 @@ function _pushAction(
     contentIndex: 0,
     content: action.text,
     partial: message,
+  });
+}
+
+/** Turns a completion into the action events and ends the stream. */
+function _finishStream(
+  options: Readonly<{
+    stream: AssistantMessageEventStream;
+    message: AssistantMessage;
+    completion: LocalLlmCompletion;
+    tools: readonly Tool[];
+    rawOutputs: Map<string, string>;
+  }>,
+): void {
+  const { stream, message, completion } = options;
+  message.usage = _toUsage(completion);
+  const toolNames = options.tools.map((tool) => {
+    return tool.name;
+  });
+  _pushAction(
+    stream,
+    message,
+    parseLocalAction(completion.text, toolNames),
+    (toolCallId) => {
+      options.rawOutputs.set(toolCallId, completion.text);
+    },
+  );
+  stream.push({
+    type: "done",
+    reason: message.stopReason === "toolUse" ? "toolUse" : "stop",
+    message,
   });
 }
 
@@ -127,6 +160,7 @@ export function createLocalModelStreamFn(
     isReplyAllowed?: (context: TranscriptContext) => boolean;
   }>,
 ): StreamFn {
+  const rawOutputs = new Map<string, string>();
   return (model, context) => {
     const stream = createAssistantMessageEventStream();
     const message = _createMessage(model);
@@ -136,26 +170,13 @@ export function createLocalModelStreamFn(
     void options.llm
       .complete({
         modelId: model.id,
-        messages: toLocalLlmMessages(context),
+        messages: toLocalLlmMessages(context, rawOutputs),
         maxTokens: model.maxTokens,
         temperature: options.temperature ?? 0,
         jsonSchema: buildLocalActionSchema(tools, { isReplyAllowed }),
       })
       .then((completion) => {
-        message.usage = _toUsage(completion);
-        const toolNames = tools.map((tool) => {
-          return tool.name;
-        });
-        _pushAction(
-          stream,
-          message,
-          parseLocalAction(completion.text, toolNames),
-        );
-        stream.push({
-          type: "done",
-          reason: message.stopReason === "toolUse" ? "toolUse" : "stop",
-          message,
-        });
+        _finishStream({ stream, message, completion, tools, rawOutputs });
       })
       .catch((error: unknown) => {
         message.stopReason = "error";

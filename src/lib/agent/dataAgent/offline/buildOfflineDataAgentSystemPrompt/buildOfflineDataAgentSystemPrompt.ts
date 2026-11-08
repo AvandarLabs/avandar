@@ -1,4 +1,5 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { OFFLINE_PLAN_INSTRUCTIONS } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/offlinePlanInstructions";
 import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
 import type { QuestionValueMatch } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import type {
@@ -141,27 +142,50 @@ export function formatQuestionValues(
 }
 
 /**
- * Builds the offline agent's system prompt for one question: instructions,
- * each dataset's profile, the question's values as stored, and today's date.
+ * Builds the offline agent's system prompt for a conversation: instructions,
+ * each dataset's profile, and today's date. It stays the same for every
+ * question, so WebLLM keeps it cached across the conversation; each
+ * question's own values travel in its message instead
+ * ({@link buildOfflineQuestionMessage}).
  */
 export function buildOfflineDataAgentSystemPrompt(
   options: Readonly<{
     datasets: readonly DataAgentDataset[];
     profiles: readonly OfflineDatasetProfile[];
-    matches: readonly QuestionValueMatch[];
     today: string;
+    /** `plan` teaches `plan_query`; `sql` (default) teaches SQL. */
+    queryStyle?: "sql" | "plan";
+  }>,
+): string {
+  const instructions =
+    options.queryStyle === "plan"
+      ? OFFLINE_PLAN_INSTRUCTIONS
+      : OFFLINE_INSTRUCTIONS;
+  return `${instructions}
+
+DATASETS
+${_formatDatasets(options.datasets, options.profiles)}
+
+Today is ${options.today}.`;
+}
+
+/**
+ * The message the offline model reads for a data question: the stored
+ * values found in it, then the question itself.
+ */
+export function buildOfflineQuestionMessage(
+  options: Readonly<{
+    question: string;
+    matches: readonly QuestionValueMatch[];
+    datasets: readonly DataAgentDataset[];
   }>,
 ): string {
   const values =
     formatQuestionValues(options.matches, options.datasets) ||
     "- None of the question's words are stored values.";
-  return `${OFFLINE_INSTRUCTIONS}
-
-DATASETS
-${_formatDatasets(options.datasets, options.profiles)}
-
-VALUES IN THE QUESTION
+  return `VALUES IN THE QUESTION
 ${values}
 
-Today is ${options.today}.`;
+QUESTION
+${options.question}`;
 }

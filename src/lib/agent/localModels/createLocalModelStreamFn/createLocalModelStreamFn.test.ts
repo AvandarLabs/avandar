@@ -159,6 +159,19 @@ describe("createLocalModelStreamFn", () => {
     ]);
   });
 
+  it("replays the model's own output so the runtime can reuse its cache", async () => {
+    const rawOutput = '{\n  "action": "echo",\n  "args": { "word": "hi" }\n}';
+    const { llm, requests } = _createScriptedLlm([rawOutput]);
+    const agent = _createAgent(llm);
+
+    await agent.prompt("Echo hi");
+
+    expect(requests[1]?.messages[2]).toEqual({
+      role: "assistant",
+      content: rawOutput,
+    });
+  });
+
   it("ends the turn with an error when the local model fails", async () => {
     const agent = _createAgent({
       complete: async () => {

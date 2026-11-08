@@ -3,6 +3,7 @@ import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { buildDataAgentSystemPrompt } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
+import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
@@ -103,6 +104,37 @@ function _getReplyText(
   return text || state.lastQuery?.summary || "";
 }
 
+function _createTools(
+  options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
+  state: DataAgentRunState,
+): Array<
+  | ReturnType<typeof createRunQueryTool>
+  | ReturnType<typeof createPlanQueryTool>
+  | ReturnType<typeof createLookupValuesTool>
+  | ReturnType<typeof createAskUserTool>
+> {
+  const queryContext = {
+    host: options.host,
+    aliases,
+    state,
+    previewRowCount: options.previewRowCount,
+  };
+  const askUser = createAskUserTool({ host: options.host, state });
+  if (options.queryTools === "plan") {
+    return [
+      createPlanQueryTool(queryContext, options.datasets),
+      createRunQueryTool(queryContext),
+      askUser,
+    ];
+  }
+  return [
+    createRunQueryTool(queryContext),
+    createLookupValuesTool({ host: options.host, aliases, state }),
+    askUser,
+  ];
+}
+
 function _createAgent(
   options: Readonly<CreateDataAgentOptions>,
   state: DataAgentRunState,
@@ -118,16 +150,7 @@ function _createAgent(
       }),
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
-      tools: [
-        createRunQueryTool({
-          host: options.host,
-          aliases,
-          state,
-          previewRowCount: options.previewRowCount,
-        }),
-        createLookupValuesTool({ host: options.host, aliases, state }),
-        createAskUserTool({ host: options.host, state }),
-      ],
+      tools: _createTools(options, aliases, state),
     },
     streamFn: options.streamFn,
     sessionId: options.sessionId,
@@ -160,6 +183,12 @@ export type CreateDataAgentOptions = {
    * model on the user's device; a hosted model never sees rows.
    */
   previewRowCount?: number;
+  /**
+   * `plan`: the model answers with `plan_query` (slots that code turns into
+   * SQL) and keeps `run_query` for what a plan cannot express. For small
+   * on-device models. Default `sql`.
+   */
+  queryTools?: "sql" | "plan";
 };
 
 /**
