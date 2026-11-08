@@ -1717,7 +1717,7 @@ msgid "Couldn't export PDF"
 msgstr "無法導出 PDF"
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 msgid "Value to keep for {0}"
 msgstr "保留 {0} 的值"
 

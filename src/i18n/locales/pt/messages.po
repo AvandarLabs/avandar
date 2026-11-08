@@ -1794,7 +1794,7 @@ msgid "Couldn't export PDF"
 msgstr "Não foi possível exportar PDF"
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 msgid "Value to keep for {0}"
 msgstr "Valor a manter para {0}"
 

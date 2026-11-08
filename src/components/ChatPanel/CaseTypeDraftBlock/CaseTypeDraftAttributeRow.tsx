@@ -1,15 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
+import { Checkbox, Group, Text, TextInput } from "@mantine/core";
 import clsx from "clsx";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
-import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import css from "./CaseTypeDraftCard.module.css";
-import { useValuePickerOptions } from "./useValuePickerOptions";
+import { CaseTypeDraftValueRuleSelect } from "./CaseTypeDraftValueRuleSelect";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type {
-  ChatCaseValuePickerRuleType,
-  ChatProposedCaseAttribute,
-} from "$/types/chat.types";
+import type { ChatProposedCaseAttribute } from "$/types/chat.types";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
@@ -35,15 +31,6 @@ export function CaseTypeDraftAttributeRow({
   editor,
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
-  const valuePickerOptions = useValuePickerOptions(columnDataType);
-  // A proposed rule the column's type refuses is saved as the default rule, so
-  // the select shows that one rather than a value missing from its options.
-  const shownRuleType = columnDataType
-    ? ValuePickerRule.toAllowedRuleType({
-        ruleType: attribute.valuePickerRuleType,
-        columnDataType,
-      })
-    : attribute.valuePickerRuleType;
   return (
     <div
       className={clsx(css.attributeRow, {
@@ -93,20 +80,10 @@ export function CaseTypeDraftAttributeRow({
           ) : null}
         </Group>
       </div>
-      <Select
-        size="xs"
-        data={valuePickerOptions}
-        value={shownRuleType}
-        allowDeselect={false}
-        aria-label={t`Value to keep for ${attribute.name}`}
-        onChange={(value) => {
-          if (value) {
-            editor.setAttributeValuePicker(
-              attribute.columnId,
-              value as ChatCaseValuePickerRuleType,
-            );
-          }
-        }}
+      <CaseTypeDraftValueRuleSelect
+        attribute={attribute}
+        columnDataType={columnDataType}
+        editor={editor}
       />
     </div>
   );

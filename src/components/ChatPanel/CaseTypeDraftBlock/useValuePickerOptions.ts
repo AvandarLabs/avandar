@@ -1,8 +1,8 @@
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetColumnMappings } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMappings";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 
 /**
  * Short localized value-picker labels for the draft card, offering only the
@@ -13,14 +13,15 @@ import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
  * already held the model's rule to the same catalog, and creation checks it
  * again.
  *
- * On a text column `max` and `min` compare alphabetically, so they are named
- * for that rather than "Max" and "Min", which would suggest "10" beats "9".
+ * On a text column `max` and `min` compare by byte order, which is close to
+ * alphabetical but puts uppercase before lowercase. They are named for that
+ * rather than "Max" and "Min", which would suggest "10" beats "9".
  */
 export function useValuePickerOptions(
   columnDataType: AvaDataType.T | undefined,
 ): ReadonlyArray<{ value: ValuePickerRule.T; label: string }> {
   const { t } = useLingui();
-  const isText = columnDataType === "varchar";
+  const isText = columnDataType ? AvaDataType.isText(columnDataType) : false;
   const maxLabel = isText ? t`Alphabetically last` : t`Max`;
   const minLabel = isText ? t`Alphabetically first` : t`Min`;
   const ruleTypes = columnDataType

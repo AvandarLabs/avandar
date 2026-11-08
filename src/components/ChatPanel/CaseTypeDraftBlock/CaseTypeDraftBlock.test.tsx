@@ -26,6 +26,7 @@ const STATE_COLUMN_ID = "2b3c4d5e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const DEATHS_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_FIPS_COLUMN_ID = "5e6f7081-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "6f708192-aaaa-4bbb-8ccc-ddddeeeeffff";
+const UNLISTED_COLUMN_ID = "7a8b9cad-aaaa-4bbb-8ccc-ddddeeeeffff";
 const WORKSPACE_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff" as Workspace.Id;
 
 const {
@@ -467,7 +468,7 @@ describe("CaseTypeDraftBlock", () => {
     expect(screen.getByRole("button", { name: "Add field" })).toBeDisabled();
   });
 
-  it("offers neither sum nor average for a text column, and names max and min alphabetically", () => {
+  it("offers neither sum nor average for a text column", () => {
     render(<CaseTypeDraftBlock />);
 
     expect(_offeredRules("Value to keep for State")).toEqual([
@@ -477,6 +478,16 @@ describe("CaseTypeDraftBlock", () => {
       "Alphabetically last",
       "Alphabetically first",
     ]);
+  });
+
+  it("names max and min alphabetically for a text column", () => {
+    render(<CaseTypeDraftBlock />);
+
+    const offeredRules = _offeredRules("Value to keep for State");
+    expect(offeredRules).toContain("Alphabetically last");
+    expect(offeredRules).toContain("Alphabetically first");
+    expect(offeredRules).not.toContain("Max");
+    expect(offeredRules).not.toContain("Min");
   });
 
   it("offers every rule for a whole-number column", () => {
@@ -509,5 +520,29 @@ describe("CaseTypeDraftBlock", () => {
     expect(
       screen.getByRole("combobox", { name: "Value to keep for State" }),
     ).toHaveValue("Most frequent");
+  });
+
+  it("offers every rule while a column's type is unknown", () => {
+    useChatPanelStateMock.mockReturnValue({
+      pendingCaseTypeDraft: {
+        ...makeDraft(),
+        attributes: makeDraft().attributes.map((attribute) => {
+          return attribute.columnId === STATE_COLUMN_ID
+            ? { ...attribute, columnId: UNLISTED_COLUMN_ID }
+            : attribute;
+        }),
+      },
+    });
+    render(<CaseTypeDraftBlock />);
+
+    expect(_offeredRules("Value to keep for State")).toEqual([
+      "Most frequent",
+      "First",
+      "Sum",
+      "Average",
+      "Count",
+      "Max",
+      "Min",
+    ]);
   });
 });
