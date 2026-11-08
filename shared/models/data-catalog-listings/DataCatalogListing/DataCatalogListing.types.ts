@@ -162,6 +162,42 @@ export type DataCatalogListingRead = {
 
   /** The drive that produced the listing. */
   driveId: DataCatalogDriveId | undefined;
+
+  /**
+   * Where this listing's Parquet copy stands. Undefined until a build is
+   * first requested. Only ever set on an `api_resource` listing.
+   */
+  parquetCacheStatus: ParquetCacheStatus | undefined;
+
+  /**
+   * The running build's id, which the build passes back to record its
+   * result. Undefined when no build runs.
+   */
+  parquetCacheBuildId: string | undefined;
+
+  /** When the running or last build started. */
+  parquetCacheBuildStartedAt: string | undefined;
+
+  /** Why the last build failed. Set exactly when the status is `failed`. */
+  parquetCacheFailureCode: string | undefined;
+
+  /**
+   * Where the Parquet copy lives in the public `opendata` bucket. The copy
+   * fields below are set together or not at all.
+   */
+  parquetCacheObjectPath: string | undefined;
+
+  /** The source's freshness token when the copy was built. Never parsed. */
+  parquetCacheSourceVersion: string | undefined;
+
+  /** When the copy was written. */
+  parquetCacheBuiltAt: string | undefined;
+
+  /** How many rows the copy holds. */
+  parquetCacheRowCount: number | undefined;
+
+  /** The copy's size in bytes. */
+  parquetCacheByteSize: number | undefined;
 };
 
 /**
@@ -283,6 +319,12 @@ export type InvalidDatasetReason =
   | "unreachable_dataset";
 
 /**
+ * Where an `api_resource` listing's Parquet copy stands. Mirrors the
+ * database enum `data_catalog_listings__parquet_cache_status`.
+ */
+export type ParquetCacheStatus = "building" | "ready" | "failed";
+
+/**
  * How an entry's rows are reached. Mirrors the database enum of the same
  * name.
  */
@@ -332,6 +374,15 @@ export type DataCatalogListingModel = SupabaseCrudModelSpec<
         | "isInvalid"
         | "invalidDatasetReason"
         | "isWorkspaceLoadable"
+        | "parquetCacheStatus"
+        | "parquetCacheBuildId"
+        | "parquetCacheBuildStartedAt"
+        | "parquetCacheFailureCode"
+        | "parquetCacheObjectPath"
+        | "parquetCacheSourceVersion"
+        | "parquetCacheBuiltAt"
+        | "parquetCacheRowCount"
+        | "parquetCacheByteSize"
       >;
       Update: Partial<DataCatalogListingRead>;
     };
