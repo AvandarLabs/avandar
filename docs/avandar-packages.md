@@ -223,11 +223,13 @@ See [`packages/web/plugin-sdk/README.md`](../packages/web/plugin-sdk/README.md).
 The components plugin UI may render. Re-exports a small set of Mantine
 components (`Alert`, `Badge`, `Button`, `Divider`, `Group`, `Loader`,
 `NumberInput`, `Select`, `SimpleGrid`, `Stack`, `Table`, `Text`, `TextInput`,
-`Title`). Plugins import UI only from this package, which keeps their code
-independent of the host's component library.
+`Title`). Its `@avandar/plugin-ui/charts` entry re-exports a curated set of
+Recharts components plus `useChartTheme`, for plugin chart components.
+Plugins import UI only from this package, which keeps their code independent
+of the host's component library.
 
 Private (`"private": true`): not published to npm. It has
-`@mantine/core` and `react` as peers.
+`@mantine/core`, `react`, and `recharts` as peers.
 
 See [`packages/web/plugin-ui/README.md`](../packages/web/plugin-ui/README.md).
 

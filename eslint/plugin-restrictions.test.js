@@ -16,6 +16,12 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const RELATIVE_PATTERN = "\\.{1,2}/";
 const JSX_RUNTIME_PATTERN = "react/jsx-runtime$";
+const CHARTS_SUBPATH_PATTERN = "@avandar/plugin-ui/charts$";
+const NON_PACKAGE_PATTERNS = [
+  RELATIVE_PATTERN,
+  JSX_RUNTIME_PATTERN,
+  CHARTS_SUBPATH_PATTERN,
+];
 
 /** Mirrors how ESLint compiles a `no-restricted-imports` `regex` option. */
 const unapprovedImportRegex = new RegExp(UNAPPROVED_PLUGIN_IMPORT_REGEX, "u");
@@ -26,12 +32,13 @@ function isImportRestricted(specifier) {
 
 /**
  * Package names the ESLint allowlist admits, with the regex anchors and the
- * `date-fns` subpath group removed. Relative files and the JSX runtime are
- * not npm dependencies, so they are left out.
+ * `date-fns` subpath group removed. Relative files, the JSX runtime, and the
+ * `@avandar/plugin-ui/charts` subpath are not npm dependencies of their own,
+ * so they are left out.
  */
 function getPackageNamesFromAllowlist() {
   return APPROVED_PLUGIN_IMPORT_PATTERNS.filter((pattern) => {
-    return pattern !== RELATIVE_PATTERN && pattern !== JSX_RUNTIME_PATTERN;
+    return !NON_PACKAGE_PATTERNS.includes(pattern);
   })
     .map((pattern) => {
       return pattern.replace("(/.*)?$", "").replace(/\$$/, "");
@@ -58,6 +65,7 @@ describe("plugin import allowlist", () => {
     "../shared/helpers",
     "react/jsx-runtime",
     "date-fns/format",
+    "@avandar/plugin-ui/charts",
   ])("lets a plugin import %s", (specifier) => {
     expect(isImportRestricted(specifier)).toBe(false);
   });
@@ -67,6 +75,7 @@ describe("plugin import allowlist", () => {
     "$/models/User/User",
     "@avandar/utils",
     "@avandar/plugin-sdk/internal",
+    "@avandar/plugin-ui/internal",
     "@mantine/core",
     "react-dom",
     "react/jsx-dev-runtime",
@@ -144,6 +153,7 @@ describe("plugin path restrictions", () => {
     "../locales/en.json",
     "@avandar/plugin-sdk",
     "@avandar/plugin-ui",
+    "@avandar/plugin-ui/charts",
     "react",
     "simple-statistics",
   ])("lets a plugin import %s", async (specifier) => {
