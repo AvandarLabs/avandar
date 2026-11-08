@@ -38,7 +38,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D28 | A rules-first router, with a model only when unsure | Built |
 | D29 | The offline eval runs real WebLLM in a headless browser | Built |
 | D30 | The offline model | See entry |
-| D31 | Today's chat defaults to Claude Sonnet 5 | Open |
+| D31 | Today's chat answers with Claude Haiku 5.5 | Done |
 
 ---
 
@@ -442,20 +442,25 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **WebLLM stays at 0.2.84.** The only newer model that fits (Gemma 4 E2B)
   did not earn the upgrade.
 
-## D31. Today's chat defaults to Claude Sonnet 5 (open)
+## D31. Today's chat answers with Claude Haiku 5.5 (done)
 
 - **Situation.** With the picker gone (D22), every online chat turn that
-  does not go through the agent uses today's `chat` function on its default,
+  does not go through the agent used today's `chat` function on its default,
   Claude Sonnet 5: about $0.024 a question, or about 80 questions on a basic
   user's $2 monthly budget.
-- **Evidence.** Today's harness on Claude Haiku 5.5 scored 45, 44, and 44 of
-  45 at about $0.0013 a question ([eval.md](eval.md)), the same accuracy as
-  Sonnet 5 at about 1/18th of the cost.
-- **Options for Pablo.**
-  1. Switch today's default to Haiku 5.5 now: a one-line change, and a
-     full eval run to confirm.
-  2. Turn the agent on by default for the Data Explorer on `demo/measles`
-     (about $0.0003 a question), keeping today's chat for dashboards.
-  3. Leave Sonnet 5 until the agent replaces today's chat everywhere.
-- **Recommendation.** Option 1 now, option 2 for the demo once you have
-  tried the agent there.
+- **Decision (Pablo, 2026-11-08).** Switch to Claude Haiku 5.5: the setup
+  that lost no accuracy and saved the most.
+- **Done.** `DEFAULT_CHAT_MODEL_ID` in
+  `shared/models/chat/ChatModelOption/ChatModelOptionModule/ChatModelOptionModule.ts`
+  is `anthropic/claude-haiku-5.5`, and Haiku 5.5 joined the catalog the
+  server checks models against.
+- **Verified.** Today's harness on Haiku 5.5, with the D21 fix, scored
+  **44 and 45** of 45 (labels `d31:today-haiku-5.5#1` and `#2`) at $0.0013
+  to $0.0015 a question, against Sonnet 5's 44 and 44 at $0.024. The one
+  miss (N04, "which country did best") is a judgment question Sonnet 5 also
+  answers inconsistently.
+- **Also affected, not evaluated.** The PDF table assistant posts to the same
+  chat route, so it now runs on Haiku 5.5 too. The eval does not cover PDF
+  extraction; watch its results.
+- **The agent is unchanged.** It already runs Haiku 5.5 with Sonnet 5.5
+  escalation (D10), the best setup measured: 45/45 at about $0.0003.

@@ -24,6 +24,14 @@ import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOpt
  */
 const CHAT_MODEL_OPTIONS = [
   Model.make("ChatModelOption", {
+    id: "anthropic/claude-haiku-5.5",
+    name: "Anthropic: Claude Haiku 5.5",
+    pickerLabel: "Claude Haiku",
+    supportsTools: true,
+    licenseTier: "proprietary",
+    provider: "anthropic",
+  }),
+  Model.make("ChatModelOption", {
     id: "anthropic/claude-sonnet-5",
     name: "Anthropic: Claude Sonnet 5",
     pickerLabel: "Claude",
@@ -75,12 +83,13 @@ const CHAT_MODEL_OPTIONS = [
 
 /**
  * The model the `chat` edge function answers every chat turn with. Users do
- * not choose a model, and the server ignores one a client sends. Tool-calling
- * into the Data Explorer is the chat panel's core job, so the default favors
- * reliability there over per-token price.
+ * not choose a model, and the server ignores one a client sends. Claude
+ * Haiku 5.5 matched Claude Sonnet 5 on the 45-question eval in
+ * `scripts/ai-eval` at about 1/18th of the cost (decision D31 in
+ * `docs/ai-agent/decisions.md`).
  */
 const DEFAULT_CHAT_MODEL_ID: (typeof CHAT_MODEL_OPTIONS)[number]["id"] =
-  "anthropic/claude-sonnet-5";
+  "anthropic/claude-haiku-5.5";
 
 const CHAT_MODEL_ID_SET = new Set<string>(CHAT_MODEL_OPTIONS.map(prop("id")));
 

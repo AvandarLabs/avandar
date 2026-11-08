@@ -22,6 +22,7 @@ OpenRouter billed.
 |---|---|---|---|---|
 | Today, Claude Sonnet 5 | 44, 44 | $0.024 to $0.026 | 4.4 to 5.1 s | about 80 |
 | Today, GPT-5.6 Terra | 44, 44 | $0.0052 | 3.7 to 3.8 s | about 380 |
+| **Today, Claude Haiku 5.5 (the default since D31)** | 44, 45 | $0.0013 to $0.0015 | 4.1 s | about 1,400 |
 | **Pi agent, Claude Haiku 5.5 with Sonnet 5.5 escalation** | **45, 45, 45, 45, 44** | **$0.0003** | **2.2 to 2.4 s** | **about 6,600** |
 
 **Offline mode** (models in the browser, nothing leaves the computer):
@@ -51,6 +52,3 @@ in about 6,600, which leaves room for multi-step agent work and a free tier.
 1. **D04:** approve moving the agent's prompt to the proxy before the agent
    is on by default (recommended; matters more now that metering, D18, is
    deferred).
-2. **D31:** today's chat defaults to Claude Sonnet 5 now that users cannot
-   pick. Recommended: switch the default to Claude Haiku 5.5 (same accuracy
-   in the eval, about 1/18th of the cost).
