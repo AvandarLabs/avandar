@@ -181,16 +181,11 @@ export function DatasetColumnAttributesBlock({
 
   const { sourceDatasets } = conceptForm.getValues();
 
-  // The field being configured and the column it reads, whose type decides
-  // which value rules the field may use.
+  // The field being configured. Until submit its `dataType` is its column's
+  // type, which decides the value rules it may use.
   const selectedAttribute = addedAttributes.find((attribute) => {
     return attribute.id === selectedAttributeId;
   });
-  const selectedColumnId =
-    selectedAttribute?.mappings.datasetColumn.datasetColumnId;
-  const selectedColumn = selectedColumnId
-    ? datasetColumnLookup[selectedColumnId]?.column
-    : undefined;
 
   return (
     <Fieldset legend={t`Fields that come from datasets`}>
@@ -260,15 +255,16 @@ export function DatasetColumnAttributesBlock({
               </ScrollArea>
             )}
           </Stack>
-          {selectedAttribute && selectedColumn ? (
+          {selectedAttribute ? (
             <Box pt="sm">
               <DatasetColumnMappingCreator
+                key={selectedAttribute.id}
                 conceptForm={conceptForm}
                 attributeIdx={addedAttributes.findIndex(
                   propEq("id", selectedAttribute.id),
                 )}
                 attributeName={selectedAttribute.name}
-                columnDataType={selectedColumn.dataType}
+                columnDataType={selectedAttribute.dataType}
               />
             </Box>
           ) : null}

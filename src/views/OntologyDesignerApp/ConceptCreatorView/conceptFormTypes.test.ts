@@ -3,35 +3,30 @@ import { uuid } from "$/lib/uuid";
 import {
   getDefaultConceptFormValues,
   makeDefaultDatasetColumnAttribute,
+  makeDefaultManualEntryAttribute,
   withDefaultValueRule,
   withFieldDataTypes,
 } from "./conceptFormTypes";
-import type {
-  DatasetId,
-  DatasetWithColumns,
-} from "$/models/datasets/Dataset/Dataset.types";
-import type {
-  DatasetColumnId,
-  DatasetColumnRead,
-} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
-import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import type { AttributeFormValues } from "./conceptFormTypes";
 
-const CONCEPT_ID = uuid<ConceptId>();
+const CONCEPT_ID = uuid<Concept.Id>();
 // Fixtures carry only the fields `withFieldDataTypes` and
 // `makeDefaultDatasetColumnAttribute` read, so they are cast once here.
 const DISTRICT_COLUMN = {
-  id: uuid<DatasetColumnId>(),
+  id: uuid<DatasetColumn.Id>(),
   name: "district",
   dataType: "varchar",
-} as DatasetColumnRead;
+} as DatasetColumn.T;
 // `readonly`, matching `DatasetWithColumns.columns`, so one `as` suffices.
-const DISTRICT_COLUMNS: readonly DatasetColumnRead[] = [DISTRICT_COLUMN];
+const DISTRICT_COLUMNS: readonly DatasetColumn.T[] = [DISTRICT_COLUMN];
 const DATASET = {
-  id: uuid<DatasetId>(),
+  id: uuid<Dataset.Id>(),
   columns: DISTRICT_COLUMNS,
-} as DatasetWithColumns;
+} as Dataset.WithColumns;
 
 /** A "district" field over a text column, with the given rule. */
 function _districtField(options: {
@@ -87,6 +82,32 @@ describe("withFieldDataTypes", () => {
     });
 
     expect(field?.dataType).toBe("varchar");
+  });
+
+  it("stores the default rule in place of one the column's type refuses", () => {
+    const [field] = withFieldDataTypes({
+      attributes: [_districtField({ ruleType: "sum" })],
+      sourceDatasets: [{ dataset: DATASET }],
+    });
+
+    expect(field?.mappings.datasetColumn.valuePickerRuleType).toBe(
+      "most_frequent",
+    );
+    expect(field?.dataType).toBe("varchar");
+  });
+
+  it("returns a manual-entry field unchanged", () => {
+    const field = makeDefaultManualEntryAttribute({
+      conceptId: CONCEPT_ID,
+      name: "notes",
+    });
+
+    const [result] = withFieldDataTypes({
+      attributes: [field],
+      sourceDatasets: [{ dataset: DATASET }],
+    });
+
+    expect(result).toBe(field);
   });
 
   it("keeps the type of a field whose column is not among the sources", () => {

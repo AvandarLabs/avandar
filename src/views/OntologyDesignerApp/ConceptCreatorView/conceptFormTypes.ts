@@ -187,34 +187,35 @@ export function makeDefaultManualEntryAttribute({
   } as const);
 }
 
-/**
- * The type a dataset-column field stores. A field that keeps every value
- * stores its column's type, because each element is one of the column's
- * values. A field that keeps one value stores its rule's output type.
- */
-export function getDatasetColumnAttributeDataType(
-  options: Readonly<{
-    isArray: boolean;
-    ruleType: ValuePickerRule.T;
-    columnDataType: AvaDataType.T;
-  }>,
-): AvaDataType.T {
-  return options.isArray
-    ? options.columnDataType
-    : ValuePickerRule.getOutputDataType({
-        ruleType: options.ruleType,
-        columnDataType: options.columnDataType,
-      });
+/** Returns the attribute with its value rule set to `ruleType`. */
+function _withValueRule(
+  attribute: AttributeFormValues,
+  ruleType: ValuePickerRule.T,
+): AttributeFormValues {
+  return {
+    ...attribute,
+    mappings: {
+      ...attribute.mappings,
+      datasetColumn: {
+        ...attribute.mappings.datasetColumn,
+        valuePickerRuleType: ruleType,
+      },
+    },
+  };
 }
 
 /**
  * Returns the attributes with each dataset-column field's `dataType` set to
- * the type it stores, reading each column's type from `sourceDatasets`.
+ * the type it stores, reading each column's type from `sourceDatasets`. A
+ * field that keeps every value stores its column's type, because each element
+ * is one of the column's values. A field that keeps one value stores its
+ * rule's output type.
  *
  * While the user edits, the form keeps `dataType` as the column's type, and
  * the rule select and "Only allow one value" both change what the field
- * stores, so the stored type is set once, on submit. A field whose column is
- * not among `sourceDatasets` keeps its `dataType`.
+ * stores, so the stored type is set once, on submit. A rule the column's
+ * type refuses is replaced by the default rule first, as the chat path does.
+ * A field whose column is not among `sourceDatasets` is returned unchanged.
  */
 export function withFieldDataTypes(
   options: Readonly<{
@@ -230,24 +231,26 @@ export function withFieldDataTypes(
     }),
   );
   return options.attributes.map((attribute) => {
+    if (attribute.mappingType !== "dataset_column") {
+      return attribute;
+    }
     const { datasetColumnId, valuePickerRuleType } =
       attribute.mappings.datasetColumn;
     const columnDataType = datasetColumnId
       ? columnDataTypesById.get(datasetColumnId)
       : undefined;
-    if (
-      attribute.mappingType !== "dataset_column" ||
-      columnDataType === undefined
-    ) {
+    if (columnDataType === undefined) {
       return attribute;
     }
+    const ruleType = ValuePickerRule.toAllowedRuleType({
+      ruleType: valuePickerRuleType,
+      columnDataType,
+    });
     return {
-      ...attribute,
-      dataType: getDatasetColumnAttributeDataType({
-        isArray: attribute.isArray,
-        ruleType: valuePickerRuleType,
-        columnDataType,
-      }),
+      ..._withValueRule(attribute, ruleType),
+      dataType: attribute.isArray
+        ? columnDataType
+        : ValuePickerRule.getOutputDataType({ ruleType, columnDataType }),
     };
   });
 }
@@ -261,14 +264,5 @@ export function withFieldDataTypes(
 export function withDefaultValueRule(
   attribute: AttributeFormValues,
 ): AttributeFormValues {
-  return {
-    ...attribute,
-    mappings: {
-      ...attribute.mappings,
-      datasetColumn: {
-        ...attribute.mappings.datasetColumn,
-        valuePickerRuleType: ValuePickerRule.DEFAULT_RULE_TYPE,
-      },
-    },
-  };
+  return _withValueRule(attribute, ValuePickerRule.DEFAULT_RULE_TYPE);
 }

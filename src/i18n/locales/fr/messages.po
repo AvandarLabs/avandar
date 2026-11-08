@@ -4143,6 +4143,10 @@ msgstr "Impossible de capturer le tableau de bord"
 msgid "Processing dataset…"
 msgstr "Traitement du jeu de données…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "Les champs d'identifiant conservent leur valeur telle quelle."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modèle de chat hors ligne prêt. Cliquez pour changer ou télécharger à "

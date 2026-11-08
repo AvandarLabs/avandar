@@ -1,6 +1,13 @@
 import { matchLiteral } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  Checkbox,
+  Fieldset,
+  Select,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
@@ -17,13 +24,13 @@ type Props = {
 
 /**
  * Returns the localized value-picker rule options the column's type allows.
- * On a text column `max` and `min` compare alphabetically, so their labels
- * say so instead of suggesting "10" beats "9".
+ * On a text column `max` and `min` compare by byte order, which is close to
+ * alphabetical but puts uppercase before lowercase. They are named for that
+ * rather than "maximum" and "minimum", which would suggest "10" beats "9".
  */
-function useValuePickerOptions(columnDataType: AvaDataType.T): ReadonlyArray<{
-  value: string;
-  label: string;
-}> {
+function useValuePickerOptions(
+  columnDataType: AvaDataType.T,
+): ReadonlyArray<{ value: ValuePickerRule.T; label: string }> {
   const { t } = useLingui();
   const isText = AvaDataType.isText(columnDataType);
   const maxLabel = isText
@@ -50,6 +57,47 @@ function useValuePickerOptions(columnDataType: AvaDataType.T): ReadonlyArray<{
   );
 }
 
+/**
+ * The select for which value to keep when several rows share one case. The
+ * dataset's ID column never reduces its rows, so its select is locked to the
+ * default rule and a note says why.
+ */
+function ValueRuleField({
+  conceptForm,
+  attributeIdx,
+  attributeName,
+  columnDataType,
+  isIdentifierColumn,
+}: Readonly<Props & { isIdentifierColumn: boolean }>): JSX.Element {
+  const { t } = useLingui();
+  const [state] = ConceptCreatorStore.useContext();
+  const valuePickerOptions = useValuePickerOptions(columnDataType);
+  const [mappingKeys, mappingInputProps] = conceptForm.keysAndProps(
+    `datasetColumnAttributes.${attributeIdx}.mappings.datasetColumn`,
+    ["valuePickerRuleType"],
+  );
+
+  return (
+    <Stack gap="xxs">
+      <Select
+        key={mappingKeys.valuePickerRuleType}
+        data={valuePickerOptions}
+        label={t`If there are multiple ${attributeName} values for one ${state.singularConceptName}, then...`}
+        placeholder={t`Select rule (e.g. most frequent)`}
+        {...mappingInputProps.valuePickerRuleType()}
+        {...(isIdentifierColumn
+          ? { value: ValuePickerRule.DEFAULT_RULE_TYPE, disabled: true }
+          : {})}
+      />
+      {isIdentifierColumn ? (
+        <Text size="xs" c="dimmed">
+          <Trans>ID fields keep their value as is.</Trans>
+        </Text>
+      ) : null}
+    </Stack>
+  );
+}
+
 export function DatasetColumnMappingCreator({
   conceptForm,
   attributeIdx,
@@ -57,22 +105,23 @@ export function DatasetColumnMappingCreator({
   columnDataType,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const valuePickerOptions = useValuePickerOptions(columnDataType);
   const [state] = ConceptCreatorStore.useContext();
   const [attributeKeys, attributeInputProps] = conceptForm.keysAndProps(
     `datasetColumnAttributes.${attributeIdx}`,
     ["isArray", "allowManualEdit"],
   );
-
-  const [mappingKeys, mappingInputProps] = conceptForm.keysAndProps(
-    `datasetColumnAttributes.${attributeIdx}.mappings.datasetColumn`,
-    ["valuePickerRuleType"],
-  );
+  const { datasetColumnAttributes, sourceDatasets } = conceptForm.getValues();
+  const { datasetColumnId } =
+    datasetColumnAttributes[attributeIdx]?.mappings.datasetColumn ?? {};
+  const isIdentifierColumn = sourceDatasets.some((source) => {
+    return (
+      datasetColumnId !== undefined &&
+      source.primaryKeyColumnId === datasetColumnId
+    );
+  });
 
   // Check whether "only allow one" is enabled
-  const isArray =
-    conceptForm.getValues().datasetColumnAttributes[attributeIdx]?.isArray ??
-    true;
+  const isArray = datasetColumnAttributes[attributeIdx]?.isArray ?? true;
   const onlyAllowOneValue = !isArray;
 
   return (
@@ -103,12 +152,12 @@ export function DatasetColumnMappingCreator({
         </Tooltip>
 
         {onlyAllowOneValue && (
-          <Select
-            key={mappingKeys.valuePickerRuleType}
-            data={valuePickerOptions}
-            label={t`If there are multiple ${attributeName} values for one ${state.singularConceptName}, then...`}
-            placeholder={t`Select rule (e.g. most frequent)`}
-            {...mappingInputProps.valuePickerRuleType()}
+          <ValueRuleField
+            conceptForm={conceptForm}
+            attributeIdx={attributeIdx}
+            attributeName={attributeName}
+            columnDataType={columnDataType}
+            isIdentifierColumn={isIdentifierColumn}
           />
         )}
       </Stack>

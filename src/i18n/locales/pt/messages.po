@@ -4100,6 +4100,10 @@ msgstr "Não foi possível capturar o painel"
 msgid "Processing dataset…"
 msgstr "Processando conjunto de dados…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "Os campos de ID mantêm o valor como está."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modelo de chat offline pronto. Clique para mudar ou baixar novamente."

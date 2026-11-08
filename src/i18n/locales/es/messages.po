@@ -4108,6 +4108,10 @@ msgstr "No se pudo capturar el panel"
 msgid "Processing dataset…"
 msgstr "Procesando conjunto de datos…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "Los campos de ID conservan su valor tal cual."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Modelo de chat sin conexión listo. Haz clic para cambiar o volver a "
@@ -4141,7 +4145,7 @@ msgstr "Por favor, inténtelo de nuevo."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
 msgid "Choose the value that comes last alphabetically"
-msgstr "Elige el valor que va último alfabéticamente"
+msgstr "Elige el valor que va al final alfabéticamente"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"

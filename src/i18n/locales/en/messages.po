@@ -4041,6 +4041,10 @@ msgstr "Couldn't capture dashboard"
 msgid "Processing dataset…"
 msgstr "Processing dataset…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "ID fields keep their value as is."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Offline chat model ready. Click to switch or re-download."

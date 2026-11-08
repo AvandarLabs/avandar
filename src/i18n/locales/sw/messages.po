@@ -4094,6 +4094,10 @@ msgstr "Haiwezi kunasa dashibodi"
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "Sehemu za kitambulisho huhifadhi thamani yake kama ilivyo."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "Mfano wa mazungumzo bila mtandao uko tayari. Bonyeza kubadilisha au "

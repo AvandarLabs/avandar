@@ -4040,6 +4040,10 @@ msgstr "لم يتمكن من التقاط اللوحة"
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "تحتفظ حقول المعرّف بقيمتها كما هي."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "نموذج الدردشة دون اتصال جاهز. انقر للتبديل أو إعادة التنزيل."

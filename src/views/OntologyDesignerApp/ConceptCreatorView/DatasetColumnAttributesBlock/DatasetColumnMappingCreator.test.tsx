@@ -1,7 +1,7 @@
 import { useForm } from "@avandar/ui/hooks";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { render, within } from "@/test-utils";
+import { render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
 import {
@@ -11,37 +11,58 @@ import {
 import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type {
-  DatasetColumnId,
-  DatasetColumnRead,
-} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { FormType } from "@avandar/ui/hooks";
 
 // `makeDefaultDatasetColumnAttribute` reads only the dataset's id.
-const DATASET = { id: uuid<DatasetId>() } as Dataset.T;
+const DATASET = { id: uuid<Dataset.Id>() } as Dataset.T;
 
 /** The creator for one field, "district", over a column of the given type. */
 function CreatorHarness({
   columnDataType,
-}: Readonly<{ columnDataType: AvaDataType.T }>): React.ReactNode {
+  isIdentifierColumn = false,
+}: Readonly<{
+  columnDataType: AvaDataType.T;
+  /** Whether the dataset's ID column is the one this field reads. */
+  isIdentifierColumn?: boolean;
+}>): React.ReactNode {
   const defaults = getDefaultConceptFormValues();
+  const column = {
+    id: uuid<DatasetColumn.Id>(),
+    name: "district",
+    dataType: columnDataType,
+  } as DatasetColumn.T;
+  // `readonly`, matching `Dataset.WithColumns.columns`, so one `as` suffices.
+  const columns: readonly DatasetColumn.T[] = [column];
+  const attribute = makeDefaultDatasetColumnAttribute({
+    conceptId: defaults.id,
+    name: "district",
+    dataset: DATASET,
+    datasetColumn: column,
+  });
   const conceptForm: FormType<ConceptFormValues> = useForm({
     mode: "uncontrolled",
     initialValues: {
       ...defaults,
       datasetColumnAttributes: [
-        makeDefaultDatasetColumnAttribute({
-          conceptId: defaults.id,
-          name: "district",
-          dataset: DATASET,
-          datasetColumn: {
-            id: uuid<DatasetColumnId>(),
-            name: "district",
-            dataType: columnDataType,
-          } as DatasetColumnRead,
-        }),
+        {
+          ...attribute,
+          // The user had picked "count" before making this the ID column.
+          mappings: {
+            ...attribute.mappings,
+            datasetColumn: {
+              ...attribute.mappings.datasetColumn,
+              valuePickerRuleType: "count",
+            },
+          },
+        },
+      ],
+      sourceDatasets: [
+        {
+          dataset: { id: DATASET.id, columns } as Dataset.WithColumns,
+          primaryKeyColumnId: isIdentifierColumn ? column.id : undefined,
+        },
       ],
     },
   });
@@ -69,7 +90,7 @@ function _offeredRules(): string[] {
 }
 
 describe("DatasetColumnMappingCreator", () => {
-  it("offers no sum or average for a text column, and names max and min alphabetically", () => {
+  it("offers no sum or average for a text column", () => {
     render(<CreatorHarness columnDataType="varchar" />);
 
     expect(_offeredRules()).toEqual([
@@ -81,6 +102,17 @@ describe("DatasetColumnMappingCreator", () => {
     ]);
   });
 
+  it("labels max and min alphabetically on a text column", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(_offeredRules()).toContain(
+      "Choose the value that comes last alphabetically",
+    );
+    expect(_offeredRules()).toContain(
+      "Choose the value that comes first alphabetically",
+    );
+  });
+
   it("offers neither maximum nor minimum for a yes/no column", () => {
     render(<CreatorHarness columnDataType="boolean" />);
 
@@ -89,5 +121,34 @@ describe("DatasetColumnMappingCreator", () => {
       "Choose the first value we see",
       "Get a count of how many values there are",
     ]);
+  });
+
+  it("names max and min plainly on a number column", () => {
+    render(<CreatorHarness columnDataType="bigint" />);
+
+    expect(_offeredRules()).toContain("Choose the maximum value");
+    expect(_offeredRules()).toContain("Choose the minimum value");
+  });
+
+  it("locks the rule select to the default for the dataset's ID column", () => {
+    render(<CreatorHarness columnDataType="varchar" isIdentifierColumn />);
+
+    const select = screen.getByRole("combobox", {
+      name: /If there are multiple district values/,
+    });
+    expect(select).toBeDisabled();
+    expect(select).toHaveValue("Choose the most frequent value");
+    expect(screen.getByText("ID fields keep their value as is.")).toBeTruthy();
+  });
+
+  it("leaves the rule select open for any other column", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(
+      screen.getByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).toBeEnabled();
+    expect(screen.queryByText("ID fields keep their value as is.")).toBeNull();
   });
 });

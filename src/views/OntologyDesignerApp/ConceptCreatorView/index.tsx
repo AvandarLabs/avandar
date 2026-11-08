@@ -105,8 +105,9 @@ export function ConceptCreatorView(): JSX.Element {
 
           if (identifierAttribute) {
             // if the primary key attribute was already added, we want to just
-            // use that same attribute and set `isIdentifier` to true
-            // and drop its value rule, since an identifier is the key itself
+            // use that same attribute and set `isIdentifier` to true. It also
+            // resets its value rule to the default, since an identifier is
+            // the key itself
             return withDefaultValueRule(
               setValue(identifierAttribute, "isIdentifier", true),
             );

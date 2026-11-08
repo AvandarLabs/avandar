@@ -3930,6 +3930,10 @@ msgstr "无法捕获仪表板"
 msgid "Processing dataset…"
 msgstr "正在处理数据集…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "ID 字段保持其原值。"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 msgid "Offline chat model ready. Click to switch or re-download."
 msgstr "离线聊天模型已准备好。点击切换或重新下载。"
