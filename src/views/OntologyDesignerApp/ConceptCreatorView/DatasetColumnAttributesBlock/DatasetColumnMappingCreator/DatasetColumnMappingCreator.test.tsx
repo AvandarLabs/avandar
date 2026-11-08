@@ -1,7 +1,7 @@
 import { useForm } from "@avandar/ui/hooks";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { render, screen, within } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
 import {
@@ -144,5 +144,50 @@ describe("DatasetColumnMappingCreator", () => {
     });
     expect(select).toBeEnabled();
     expect(select).not.toHaveAccessibleDescription();
+  });
+
+  it("offers the one value or every value switch instead of a checkbox", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "One value or every value for district",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: "Only allow one value" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides the rule select once the field keeps every value", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+
+    expect(
+      screen.queryByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("brings the rule select back when the field keeps one value again", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+    fireEvent.click(screen.getByRole("radio", { name: "One value" }));
+
+    expect(
+      screen.getByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).toBeEnabled();
+  });
+
+  it("locks the switch to one value for the dataset's ID column", () => {
+    render(<CreatorHarness columnDataType="varchar" isIdentifierColumn />);
+
+    expect(screen.getByRole("radio", { name: "One value" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Every value" })).toBeDisabled();
   });
 });

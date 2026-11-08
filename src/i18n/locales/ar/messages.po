@@ -967,8 +967,8 @@ msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط
 "يمكنك شراء مقاعد إضافية. كل مقعد يسمح لك بإضافة 10 مجموعات بيانات أخرى!"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "Only allow one value"
-msgstr "السماح بقيمة واحدة فقط"
+#~ msgid "Only allow one value"
+#~ msgstr "السماح بقيمة واحدة فقط"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -4313,9 +4313,9 @@ msgstr "الموضوع: {topic}"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "If each {0} can only have one {attributeName} value, check this box."
-msgstr "إذا كان كل {0} يمكن أن يحتوي فقط على قيمة واحدة لـ {attributeName}، حدد "
-"هذا المربع."
+#~ msgid "If each {0} can only have one {attributeName} value, check this box."
+#~ msgstr "إذا كان كل {0} يمكن أن يحتوي فقط على قيمة واحدة لـ {attributeName}، حدد "
+#~ "هذا المربع."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"

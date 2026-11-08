@@ -3,6 +3,7 @@ import { uuid } from "$/lib/uuid";
 import { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { makeDefaultStatusDrafts } from "@/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts";
@@ -255,9 +256,11 @@ export function withFieldDataTypes(
     });
     return {
       ..._withValueRule(attribute, ruleType),
-      dataType: attribute.isArray
-        ? columnDataType
-        : ValuePickerRule.getOutputDataType({ ruleType, columnDataType }),
+      dataType: ConceptAttribute.getOutputDataType({
+        valueShape: ConceptAttribute.getValueShape(attribute),
+        ruleType,
+        columnDataType,
+      }),
     };
   });
 }

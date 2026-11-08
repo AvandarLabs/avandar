@@ -982,8 +982,8 @@ msgstr "Tu plan actual solo admite hasta {0} conjuntos de datos. Para aumentar "
 "10 conjuntos de datos más!"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "Only allow one value"
-msgstr "Permitir solo un valor"
+#~ msgid "Only allow one value"
+#~ msgstr "Permitir solo un valor"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -4387,9 +4387,9 @@ msgstr "Tema: {topic}"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "If each {0} can only have one {attributeName} value, check this box."
-msgstr "Si cada {0} solo puede tener un valor de {attributeName}, marca esta "
-"casilla."
+#~ msgid "If each {0} can only have one {attributeName} value, check this box."
+#~ msgstr "Si cada {0} solo puede tener un valor de {attributeName}, marca esta "
+#~ "casilla."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"

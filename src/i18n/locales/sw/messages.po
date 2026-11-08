@@ -978,8 +978,8 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Ili kuongeza idadi ya "
 "viti zaidi. Kila kiti kinakuruhusu kuongeza datasets 10 zaidi!"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "Only allow one value"
-msgstr "Ruhusu thamani moja tu"
+#~ msgid "Only allow one value"
+#~ msgstr "Ruhusu thamani moja tu"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -4371,9 +4371,9 @@ msgstr "Mada: {topic}"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "If each {0} can only have one {attributeName} value, check this box."
-msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
-"kisanduku hiki."
+#~ msgid "If each {0} can only have one {attributeName} value, check this box."
+#~ msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
+#~ "kisanduku hiki."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"

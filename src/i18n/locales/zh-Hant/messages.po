@@ -945,8 +945,8 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添加到工作區的資料集數量，您可以購買更多席位。每個席位允許您添加 10 個額外的資料集！"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "Only allow one value"
-msgstr "僅允許一個值"
+#~ msgid "Only allow one value"
+#~ msgstr "僅允許一個值"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -4200,8 +4200,8 @@ msgstr "主題：{topic}"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "If each {0} can only have one {attributeName} value, check this box."
-msgstr "如果每個 {0} 只能有一個 {attributeName} 值，請勾選此框。"
+#~ msgid "If each {0} can only have one {attributeName} value, check this box."
+#~ msgstr "如果每個 {0} 只能有一個 {attributeName} 值，請勾選此框。"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"

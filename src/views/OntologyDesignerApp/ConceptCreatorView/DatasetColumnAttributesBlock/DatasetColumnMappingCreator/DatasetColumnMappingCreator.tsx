@@ -1,8 +1,11 @@
 import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
+import { Checkbox, Fieldset, Select, Stack } from "@mantine/core";
+import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
+import { ValueShapeControl } from "@/components/caseFields/ValueShapeControl/ValueShapeControl";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
 import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { FormType } from "@avandar/ui/hooks";
@@ -92,24 +95,69 @@ function ValueRuleField({
   );
 }
 
-export function DatasetColumnMappingCreator({
+/** The field's value shape. An ID field keeps one value, whatever is stored. */
+function _readValueShape({
   conceptForm,
   attributeIdx,
-  attributeName,
-  columnDataType,
   isIdentifierColumn,
-}: Props): JSX.Element {
+}: Readonly<Props>): ConceptAttribute.ValueShape {
+  if (isIdentifierColumn) {
+    return "single";
+  }
+  return ConceptAttribute.getValueShape({
+    isArray:
+      conceptForm.getValues().datasetColumnAttributes[attributeIdx]?.isArray ??
+      false,
+  });
+}
+
+/**
+ * The switch between keeping one value and every value, followed by the rule
+ * select when the field keeps one value. An ID field keeps one value, so its
+ * switch is locked to it.
+ */
+function ValueShapeFields(props: Readonly<Props>): JSX.Element {
+  const { conceptForm, attributeIdx, attributeName, isIdentifierColumn } =
+    props;
+  const [attributeKeys] = conceptForm.keysAndProps(
+    `datasetColumnAttributes.${attributeIdx}`,
+    ["isArray"],
+  );
+  const valueShape = _readValueShape(props);
+
+  return (
+    <>
+      <ValueShapeControl
+        key={attributeKeys.isArray}
+        fieldName={attributeName}
+        value={valueShape}
+        disabled={isIdentifierColumn}
+        onChange={(nextValueShape) => {
+          conceptForm.setFieldValue(
+            `datasetColumnAttributes.${attributeIdx}.isArray`,
+            ConceptAttribute.valueShapeToIsArray(nextValueShape),
+          );
+        }}
+      />
+      {match(valueShape)
+        .with("single", () => {
+          return <ValueRuleField {...props} />;
+        })
+        .with("list", () => {
+          return null;
+        })
+        .exhaustive()}
+    </>
+  );
+}
+
+export function DatasetColumnMappingCreator(props: Props): JSX.Element {
   const { t } = useLingui();
-  const [state] = ConceptCreatorStore.useContext();
+  const { conceptForm, attributeIdx, attributeName } = props;
   const [attributeKeys, attributeInputProps] = conceptForm.keysAndProps(
     `datasetColumnAttributes.${attributeIdx}`,
-    ["isArray", "allowManualEdit"],
+    ["allowManualEdit"],
   );
-  const { datasetColumnAttributes } = conceptForm.getValues();
-
-  // Check whether "only allow one" is enabled
-  const isArray = datasetColumnAttributes[attributeIdx]?.isArray ?? true;
-  const onlyAllowOneValue = !isArray;
 
   return (
     <Fieldset legend={attributeName}>
@@ -119,34 +167,7 @@ export function DatasetColumnMappingCreator({
           label={t`Allow manual edit`}
           {...attributeInputProps.allowManualEdit({ type: "checkbox" })}
         />
-        <Tooltip
-          label={t`If each ${state.singularConceptName} can only have one ${attributeName} value, check this box.`}
-          refProp="rootRef"
-        >
-          <Checkbox
-            key={attributeKeys.isArray}
-            label={t`Only allow one value`}
-            checked={onlyAllowOneValue}
-            onChange={(e) => {
-              const checked = e.currentTarget.checked;
-              // Invert logic: checked means isArray = false
-              conceptForm.setFieldValue(
-                `datasetColumnAttributes.${attributeIdx}.isArray`,
-                !checked,
-              );
-            }}
-          />
-        </Tooltip>
-
-        {onlyAllowOneValue && (
-          <ValueRuleField
-            conceptForm={conceptForm}
-            attributeIdx={attributeIdx}
-            attributeName={attributeName}
-            columnDataType={columnDataType}
-            isIdentifierColumn={isIdentifierColumn}
-          />
-        )}
+        <ValueShapeFields {...props} />
       </Stack>
     </Fieldset>
   );

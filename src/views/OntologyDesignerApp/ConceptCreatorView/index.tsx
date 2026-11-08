@@ -36,6 +36,7 @@ import {
 import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
 import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/getStatusSetValueFromFormValues/getStatusSetValueFromFormValues";
+import { keepKeyAndLabelFieldsSingle } from "@/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle";
 import { ManualEntryAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import { useSubmitConceptCreatorForm } from "@/views/OntologyDesignerApp/ConceptCreatorView/useSubmitConceptCreatorForm";
 
@@ -154,7 +155,10 @@ export function ConceptCreatorView(): JSX.Element {
       return {
         ...values,
         attributes: withFieldDataTypes({
-          attributes: allAttributes,
+          attributes: keepKeyAndLabelFieldsSingle({
+            attributes: allAttributes,
+            labelAttributeId: values.labelAttributeId,
+          }),
           sourceDatasets: values.sourceDatasets,
         }),
       };
