@@ -12,7 +12,7 @@ import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePic
  * The alias every subquery reads its dataset rows under. It must stay
  * `dataset`, the alias `getEntityKeyComparisonSql` qualifies the key with.
  */
-const DATASET_ALIAS = "dataset";
+export const DATASET_ALIAS = "dataset";
 
 /**
  * What one attribute's value is read from, and the outer table of record keys
@@ -69,7 +69,7 @@ type ValueSqlParts = {
  * same direction. The pick never depends on scan order, and the aggregate
  * returns the original value.
  */
-function _buildTextExtremeSql(
+export function buildTextExtremeSql(
   options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
 ): string {
   const { value, aggregate } = options;
@@ -121,14 +121,14 @@ function _buildReducedValueSql(
     .with("max", () => {
       return aggregateSql(
         isText
-          ? _buildTextExtremeSql({ value, aggregate: "arg_max" })
+          ? buildTextExtremeSql({ value, aggregate: "arg_max" })
           : `MAX(${value})`,
       );
     })
     .with("min", () => {
       return aggregateSql(
         isText
-          ? _buildTextExtremeSql({ value, aggregate: "arg_min" })
+          ? buildTextExtremeSql({ value, aggregate: "arg_min" })
           : `MIN(${value})`,
       );
     })
