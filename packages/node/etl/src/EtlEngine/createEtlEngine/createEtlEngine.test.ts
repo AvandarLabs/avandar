@@ -3,6 +3,7 @@ import { createEtlEngine } from "@etl/EtlEngine/createEtlEngine/createEtlEngine"
 import { EtlRunFailedError } from "@etl/EtlEngine/EtlRunFailedError";
 import { EtlRunOptionsError } from "@etl/EtlEngine/EtlRunOptionsError";
 import { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
+import { EtlTransientStoreError } from "@etl/stores/EtlTransientStoreError";
 import { createInMemoryCheckpointStore } from "@etl/stores/InMemoryCheckpointStore/createInMemoryCheckpointStore";
 import { createInMemoryDrivesStore } from "@etl/stores/InMemoryDrivesStore/createInMemoryDrivesStore";
 import { createInMemoryExecutionStore } from "@etl/stores/InMemoryExecutionStore/createInMemoryExecutionStore";
@@ -2008,6 +2009,121 @@ describe("createEtlEngine", () => {
         ["listDrives"],
         [["a", "skipped", undefined]],
       ]);
+    });
+  });
+
+  describe("transient store failures", () => {
+    /** A ticking clock whose `sleep` returns at once. */
+    function _noWaitClock(): EtlClock {
+      return {
+        ..._tickingClock(),
+        sleep: async () => {},
+      };
+    }
+
+    function _transientError(): EtlTransientStoreError {
+      return new EtlTransientStoreError("statement timeout", {
+        status: 500,
+        code: "57014",
+        cause: undefined,
+      });
+    }
+
+    /** Fails a store method's first call transiently, then lets it through. */
+    function _failFirstCall<TArgs extends unknown[], TResult>(
+      method: (...methodArgs: TArgs) => Promise<TResult>,
+    ): (...methodArgs: TArgs) => Promise<TResult> {
+      let hasFailed = false;
+      return async (...methodArgs) => {
+        if (!hasFailed) {
+          hasFailed = true;
+          throw _transientError();
+        }
+        return await method(...methodArgs);
+      };
+    }
+
+    function _flakyStores(): Readonly<{
+      stores: EtlStores;
+      listings: InMemoryListingsStore;
+      checkpoints: InMemoryCheckpointStore;
+    }> {
+      const listings = createInMemoryListingsStore();
+      const checkpoints = createInMemoryCheckpointStore();
+      return {
+        listings,
+        checkpoints,
+        stores: {
+          listings: {
+            ...listings,
+            upsertListingsWithColumns: _failFirstCall(
+              listings.upsertListingsWithColumns,
+            ),
+          },
+          objects: undefined,
+          checkpoints: {
+            read: _failFirstCall(checkpoints.read),
+            write: _failFirstCall(checkpoints.write),
+          },
+        },
+      };
+    }
+
+    it("retries a failed checkpoint read, write batch, and checkpoint write, and finishes with every listing and the checkpoint", async () => {
+      const flaky = _flakyStores();
+
+      const report = await _run(
+        _config({
+          drives: [
+            _drive("a", [
+              [_connection("a1", 1), _connection("a2", 2)],
+              [_connection("a3", 3)],
+            ]),
+          ],
+          recorder: _recorder(),
+          stores: flaky.stores,
+          clock: _noWaitClock(),
+        }),
+      );
+
+      expect(_statusesOf(report)).toEqual([["a", "ok", undefined]]);
+      expect(_datasetIds(flaky.listings)).toEqual(["a1", "a2", "a3"]);
+      expect(_checkpointValues(flaky.checkpoints)).toEqual([["a", _at(3)]]);
+    });
+
+    it("reports each wait as progress and counts it in the crawl's metrics", async () => {
+      const progress: EtlRunProgress[] = [];
+
+      const report = await _run(
+        _config({
+          drives: [_drive("a", [[_connection("a1", 1)]])],
+          recorder: _recorder(),
+          stores: _flakyStores().stores,
+          clock: _noWaitClock(),
+        }),
+        {
+          mode: "full",
+          onProgress: (event) => {
+            progress.push(event);
+          },
+        },
+      );
+
+      const throttled = progress.filter((event) => {
+        return event.stage === "write_throttled";
+      });
+      expect(
+        throttled.map((event) => {
+          return [event.driveKey, event.throttle?.reason];
+        }),
+      ).toEqual([
+        ["a", "transient_failure"],
+        ["a", "transient_failure"],
+        ["a", "transient_failure"],
+      ]);
+      expect(report.crawls[0]?.metrics.pipelineMetrics).toMatchObject({
+        "etl.transient_failures": 3,
+      });
     });
   });
 

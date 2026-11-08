@@ -39,6 +39,7 @@ export {
   EtlRunOptionsError,
 } from "@etl/EtlEngine/EtlRunOptionsError";
 export { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
+export type { EtlWriteThrottleEvent } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
 export {
   ETL_TRANSIENT_STORE_ERROR_NAME,
   EtlTransientStoreError,

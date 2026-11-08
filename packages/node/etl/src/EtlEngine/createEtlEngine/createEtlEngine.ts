@@ -320,6 +320,9 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
     onPageLoaded: (page) => {
       progress.pageLoaded(progressCrawl, page);
     },
+    onWriteThrottled: (event) => {
+      progress.writeThrottled(progressCrawl, event);
+    },
   });
 }
 

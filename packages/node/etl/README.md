@@ -230,14 +230,36 @@ first three. It is required when the config has `incremental`.
 
 **Writes.** A page loads in connection order. Parquet objects upload before
 any row is written, then changed rows are written in batches of at most 200
-listings, `COLUMNS_PER_WRITE` (5,000) relation columns, and `BYTES_PER_WRITE`
-(4 MiB of JSON), since a hosted database's statement timeout and memory bound
-how large one write can be. Each batch is one
+listings, `COLUMNS_PER_WRITE` (5,000) relation columns, and the crawl's
+current byte budget of JSON. Each batch is one
 `upsertListingsWithColumns` call, which writes every row together with its
 whole column set in one transaction. A listing is never split from its
 columns across batches, so the two are always written together: a listing
 with more columns or bytes than a cap is written alone. The Supabase store
 reads stored rows a few at a time to keep request URLs short.
+
+**Pacing and retries.** Each crawl paces its store requests to how the
+database is keeping up, since a hosted database's statement timeout and
+memory bound how much it can absorb:
+
+| What happened | Byte budget | Wait before the next request |
+| --- | --- | --- |
+| The crawl started | 2 MiB | None |
+| A write took under 1 s | Grows by 512 KiB, up to 4 MiB | None |
+| A write took over 2 s | Halves, down to 64 KiB | As long as the write took, up to 30 s |
+| A request failed with `EtlTransientStoreError` | Quarters, down to 64 KiB | 2 s, doubling per failure in a row up to 60 s, ±25% |
+
+A read, a write batch, or a checkpoint read or write that fails
+transiently is retried. A failed write batch is retried from the same
+listing under the smaller budget, so every listing is written once and in
+order, and a failed batch wrote nothing. The 8th transient failure in a row
+fails the crawl as any other error does, with its checkpoint still at the
+last page it finished, so an incremental run continues from there. Any
+other error fails the crawl at once. Each wait is reported through
+`onProgress` as a `write_throttled` event whose `throttle`
+(`EtlWriteThrottleEvent`) says why, and counted in the crawl's
+`pipelineMetrics` as `etl.write_slowdowns`, `etl.transient_failures`, and
+`etl.throttle_pause_ms`.
 
 **Relation columns.** An `api_resource` relation declares its `columns`,
 which may be empty when the pipeline cannot learn them: they are filled in
@@ -516,10 +538,12 @@ Every crawl report carries `startedAt`, `finishedAt`, `checkpointBefore`,
 | --- | --- |
 | `metrics.timings` | Milliseconds in each stage, summed over pages: `setupMs`, `extractMs`, `transformMs`, `loadReadMs`, `loadParquetBuildMs`, `loadParquetUploadMs`, `loadWriteMs`, `checkpointWriteMs` |
 | `metrics.denominators` | Pages, datasets, listings considered and written, write batches, columns considered and written, the widest listing, CSV and Parquet bytes and rows, and the source's reported bytes |
-| `metrics.pipelineMetrics` | What `extract` and `transform` recorded through their `metrics` argument |
+| `metrics.pipelineMetrics` | What `extract` and `transform` recorded through their `metrics` argument, plus the engine's `etl.write_slowdowns`, `etl.transient_failures`, and `etl.throttle_pause_ms` (see "Pacing and retries") |
 
 Stages interleave page by page, so their sum is not the crawl's wall-clock
-time. `EtlEngineConfig.clock` replaces the system clock in tests.
+time. `EtlEngineConfig.clock` replaces the system clock in tests. Give it a
+`sleep` that returns at once, or advances the test clock, so a test that
+makes the database look slow or failing does not wait on real timers.
 
 ## Testing a pipeline
 
