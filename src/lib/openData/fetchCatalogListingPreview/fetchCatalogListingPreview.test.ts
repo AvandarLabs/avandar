@@ -112,7 +112,7 @@ describe("fetchCatalogListingPreview", () => {
       listing: {
         id: LISTING_ID,
         accessKind: "pipeline_parquet",
-          apiResourceFormat: undefined,
+        apiResourceFormat: undefined,
         canonicalUrls: ["https://example.org/page", "https://x.org/a.PARQUET"],
       },
       maxPreviewRows: 200,
