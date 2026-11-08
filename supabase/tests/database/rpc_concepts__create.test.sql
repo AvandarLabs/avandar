@@ -44,7 +44,7 @@ values ('ac004009-0000-4000-8000-000000000009'::uuid, 'ac000001-0000-4000-8000-0
 insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
 values ('ac005009-0000-4000-8000-000000000009'::uuid, 'ac001001-0000-4000-8000-000000000001'::uuid, 'ac004009-0000-4000-8000-000000000009'::uuid, 'Active', '#40c057', 0);
 
-select plan (21);
+select plan (24);
 
 -- 1.
 select lives_ok (
@@ -320,6 +320,79 @@ select is (
   ),
   0,
   'a refused list or value rule leaves no case type behind'
+);
+
+-- Runs `p_sql` and returns the hint of the error it raises, or null when it
+-- succeeds. pgTAP's `throws_ok` checks the errcode and message but not the
+-- hint. The exception block rolls back the role `p_sql` sets when it raises.
+create function pg_temp.hint_of_error (p_sql text) returns text language plpgsql as $$
+declare
+  v_hint text;
+begin
+  execute p_sql;
+  return null;
+exception
+  when others then
+    get stacked diagnostics v_hint = pg_exception_hint;
+    return v_hint;
+end;
+$$;
+
+-- 22. A list identifier that is not the label.
+select is (
+  pg_temp.hint_of_error (
+    $t22$
+    set local role authenticated;
+    select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+    select public.rpc_concepts__create (
+      '{"id":"ac004012-0000-4000-8000-000000000012","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"List identifier","description":null,"allow_manual_creation":false,"default_status_id":"ac005014-0000-4000-8000-000000000014"}'::jsonb,
+      '[{"id":"ac006013-0000-4000-8000-000000000013","name":"County","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":false,"is_array":false,"allow_manual_edit":false},{"id":"ac006014-0000-4000-8000-000000000014","name":"Case IDs","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":false,"is_identifier":true,"is_array":true,"allow_manual_edit":false}]'::jsonb,
+      '[{"concept_attribute_id":"ac006013-0000-4000-8000-000000000013","value_picker_rule_type":"first","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008002-0000-4000-8000-000000000002"},{"concept_attribute_id":"ac006014-0000-4000-8000-000000000014","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008003-0000-4000-8000-000000000003"}]'::jsonb,
+      '[]'::jsonb,
+      '[{"id":"ac005014-0000-4000-8000-000000000014","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+    );
+    $t22$
+  ),
+  'list_field_is_key_or_label',
+  'a list identifier that is not the label is refused'
+);
+
+reset role;
+
+-- 23. A manual-entry list field that is neither the label nor an identifier.
+select lives_ok (
+  $t23$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004013-0000-4000-8000-000000000013","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Manual list","description":null,"allow_manual_creation":true,"default_status_id":"ac005015-0000-4000-8000-000000000015"}'::jsonb,
+    '[{"id":"ac006015-0000-4000-8000-000000000015","name":"Name","description":null,"data_type":"varchar","mapping_type":"manual_entry","is_label":true,"is_identifier":false,"is_array":false,"allow_manual_edit":true},{"id":"ac006016-0000-4000-8000-000000000016","name":"Notes","description":null,"data_type":"varchar","mapping_type":"manual_entry","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":true}]'::jsonb,
+    '[]'::jsonb,
+    '[{"concept_attribute_id":"ac006015-0000-4000-8000-000000000015"},{"concept_attribute_id":"ac006016-0000-4000-8000-000000000016"}]'::jsonb,
+    '[{"id":"ac005015-0000-4000-8000-000000000015","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t23$,
+  'a manual-entry list field that is neither the label nor an identifier is accepted'
+);
+
+reset role;
+
+-- 24. A manual-entry list field as the label.
+select throws_ok (
+  $t24$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004014-0000-4000-8000-000000000014","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Manual list label","description":null,"allow_manual_creation":true,"default_status_id":"ac005016-0000-4000-8000-000000000016"}'::jsonb,
+    '[{"id":"ac006017-0000-4000-8000-000000000017","name":"Names","description":null,"data_type":"varchar","mapping_type":"manual_entry","is_label":true,"is_identifier":false,"is_array":true,"allow_manual_edit":true}]'::jsonb,
+    '[]'::jsonb,
+    '[{"concept_attribute_id":"ac006017-0000-4000-8000-000000000017"}]'::jsonb,
+    '[{"id":"ac005016-0000-4000-8000-000000000016","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t24$,
+  '23514',
+  'A list field cannot be the label or an identifier',
+  'a manual-entry list label is refused'
 );
 
 select * from finish ();

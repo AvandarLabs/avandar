@@ -135,7 +135,9 @@ begin
 
   -- A list field keeps every value, so its mapping names no rule, and every
   -- other dataset field reduces its rows with exactly one. The rule and
-  -- `is_array` live in different tables, so no constraint can say this.
+  -- `is_array` live in different tables, so no constraint can hold this.
+  -- `rpc_concepts__create` enforces it when a case type is created, and
+  -- readers refuse a single-value field that has no rule.
   if exists (
     select 1
     from public.attribute_mappings__dataset_column m
