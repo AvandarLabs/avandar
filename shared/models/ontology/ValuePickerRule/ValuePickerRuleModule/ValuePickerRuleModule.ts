@@ -9,7 +9,6 @@ type RuleOnColumn = Readonly<{
   columnDataType: AvaDataType.T;
 }>;
 
-/** The rule every column type allows, used in place of one that is not. */
 const DEFAULT_RULE_TYPE: ValuePickerRuleType = "most_frequent";
 
 function getOutputDataType(options: RuleOnColumn): AvaDataType.T {
@@ -64,6 +63,7 @@ function toAllowedRuleType(options: RuleOnColumn): ValuePickerRuleType {
  * the rules a column allows, or to set a field's data type from its rule.
  */
 export const ValuePickerRuleModule = {
+  /** The rule every column type allows, used in place of one that is not. */
   DEFAULT_RULE_TYPE,
   /**
    * The type of the value a rule produces from a column. `first`,
