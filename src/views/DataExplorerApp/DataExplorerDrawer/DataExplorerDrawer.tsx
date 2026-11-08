@@ -75,7 +75,8 @@ export function DataExplorerDrawer({
             isCollapsed={isCollapsed}
             regionId={DRAWER_REGION_ID}
             queryEditorMode={queryEditorMode}
-            vizType={vizConfig.vizType}
+            vizConfig={vizConfig}
+            columns={columns}
             isStructuredQueryInSync={isStructuredQueryInSync}
             onQueryEditorModeChange={setQueryEditorMode}
             onVizTypeChange={dispatch.setActiveVizType}

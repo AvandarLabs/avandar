@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { VizTypeSelect } from "@/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect";
 import { QUERY_EDITOR_MODES } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DrawerTab } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import type { QueryEditorMode } from "@/views/DataExplorerApp/DataExplorerDrawer/QueryTabPanel";
@@ -22,13 +23,25 @@ type Props = {
   regionId: string;
 
   queryEditorMode: QueryEditorMode;
-  vizType: AvaVizConfig.Type;
+
+  /** The active chart config, whose type the chart-type control shows. */
+  vizConfig: AvaVizConfig.T;
+
+  /**
+   * Columns of the latest query result, which a picked plugin chart type
+   * fills its required column settings from.
+   */
+  columns: readonly QueryResult.ColumnWithId[];
 
   /** False when the SQL has parts the manual form cannot represent. */
   isStructuredQueryInSync: boolean;
 
   onQueryEditorModeChange: (mode: QueryEditorMode) => void;
-  onVizTypeChange: (vizType: AvaVizConfig.Type) => void;
+
+  /** Called with the picked built-in viz type or plugin chart config. */
+  onVizTypeChange: (
+    target: AvaVizConfig.BuiltInType | AvaVizConfig.Plugin,
+  ) => void;
   onToggleCollapsed: () => void;
 };
 
@@ -46,7 +59,8 @@ export function DataExplorerDrawerRail({
   isCollapsed,
   regionId,
   queryEditorMode,
-  vizType,
+  vizConfig,
+  columns,
   isStructuredQueryInSync,
   onQueryEditorModeChange,
   onVizTypeChange,
@@ -87,7 +101,8 @@ export function DataExplorerDrawerRail({
         <VizTypeSelect
           size="xs"
           withLabel={false}
-          value={vizType}
+          vizConfig={vizConfig}
+          columns={columns}
           onChange={onVizTypeChange}
         />
       );
