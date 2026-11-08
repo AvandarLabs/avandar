@@ -419,17 +419,95 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
         return relation.sourceMetadata;
       }),
     ).toEqual([
-      {
-        name: "movement-range-maps",
-        notes: "Movement range maps.",
-        resources: [rawCsv1],
-      },
-      {
-        name: "movement-range-maps",
-        notes: "Movement range maps.",
-        resources: [rawCsv2],
-      },
+      { name: "movement-range-maps", resources: [rawCsv1] },
+      { name: "movement-range-maps", resources: [rawCsv2] },
     ]);
+  });
+
+  it("leaves out the package fields a listing column already holds, and keeps only the identifying keys of its organization, tags, and groups", async () => {
+    const ckanPackage: CkanPackage = {
+      ..._packageWithOneCsv({ fileHeaders: ["adm1"] }),
+      sourceRecord: {
+        name: "movement-range-maps",
+        notes: "Movement range maps.",
+        caveats: "Counts are estimates.",
+        methodology_other: "Census.",
+        organization: {
+          id: "org-1",
+          name: "worldpop",
+          title: "WorldPop",
+          description: "A long description of the organization.",
+          image_url: "https://example.com/logo.png",
+        },
+        tags: [
+          {
+            id: "tag-1",
+            name: "population",
+            display_name: "population",
+            state: "active",
+            vocabulary_id: "vocab-1",
+          },
+        ],
+        groups: [
+          {
+            id: "fsm",
+            name: "fsm",
+            title: "Micronesia",
+            description: "",
+            image_display_url: "",
+          },
+        ],
+        resources: [{ id: "csv-1", format: "CSV" }],
+      },
+    };
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
+      ckanPackage,
+      scope: CSV_SCOPE,
+      readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(relations[0]?.sourceMetadata).toEqual({
+      name: "movement-range-maps",
+      methodology_other: "Census.",
+      organization: { id: "org-1", name: "worldpop", title: "WorldPop" },
+      tags: [{ name: "population", vocabulary_id: "vocab-1" }],
+      groups: [{ name: "fsm", title: "Micronesia" }],
+      resources: [{ id: "csv-1", format: "CSV" }],
+    });
+  });
+
+  it("keeps an organization, tag, or group it cannot read as it is", async () => {
+    const ckanPackage: CkanPackage = {
+      ..._packageWithOneCsv({ fileHeaders: ["adm1"] }),
+      sourceRecord: {
+        name: "movement-range-maps",
+        organization: null,
+        tags: ["population"],
+        groups: "none",
+        resources: [{ id: "csv-1", format: "CSV" }],
+      },
+    };
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
+      ckanPackage,
+      scope: CSV_SCOPE,
+      readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(relations[0]?.sourceMetadata).toEqual({
+      name: "movement-range-maps",
+      organization: null,
+      tags: ["population"],
+      groups: "none",
+      resources: [{ id: "csv-1", format: "CSV" }],
+    });
   });
 
   it("keeps a raw package whose resource list it cannot read as it is", async () => {

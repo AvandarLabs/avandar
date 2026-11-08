@@ -70,9 +70,25 @@ async function _readResource(params: {
  * Package fields left out of `sourceMetadata`. `license_other` is the full
  * text of a custom license, repeated on every resource listing of a package:
  * on the demo instance it was 36% of HDX's raw JSON. The license's name
- * stays in the listing's `license`.
+ * stays in the listing's `license`. `notes` and `caveats` are copied whole
+ * into the listing's `description` and `notes` by `hdx.pipeline.yaml`, so
+ * keeping them here stored each one twice per listing.
  */
-const OMITTED_PACKAGE_FIELDS = ["license_other"];
+const OMITTED_PACKAGE_FIELDS = ["license_other", "notes", "caveats"];
+
+/**
+ * Package fields whose objects keep only the keys that identify them. HDX
+ * repeats an organization's description and logo, and each tag's and
+ * group's ids and display copies, on every resource listing of a package.
+ * The kept keys are the ones `hdx.pipeline.yaml`'s mappers read, so a
+ * later column can still be filled from `sourceMetadata`.
+ */
+const KEPT_KEYS_BY_PACKAGE_FIELD: Readonly<Record<string, readonly string[]>> =
+  {
+    organization: ["id", "name", "title"],
+    tags: ["name", "vocabulary_id"],
+    groups: ["name", "title"],
+  };
 
 /**
  * Resource fields left out of `sourceMetadata`. `fs_check_info` is HDX's
@@ -89,13 +105,52 @@ function _omitFields(record: object, fields: readonly string[]): object {
   );
 }
 
+function _pickKeys(value: unknown, keys: readonly string[]): unknown {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return value;
+  }
+  return Object.fromEntries(
+    Object.entries(value).filter(([key]) => {
+      return keys.includes(key);
+    }),
+  );
+}
+
+/**
+ * Narrows each field in `KEPT_KEYS_BY_PACKAGE_FIELD` to its kept keys: an
+ * object field itself, and an array field's object entries. A value of any
+ * other shape is kept as it is.
+ */
+function _narrowPackageFields(record: object): object {
+  return Object.fromEntries(
+    Object.entries(record).map(([field, value]) => {
+      const keptKeys = Object.hasOwn(KEPT_KEYS_BY_PACKAGE_FIELD, field)
+        ? KEPT_KEYS_BY_PACKAGE_FIELD[field]
+        : undefined;
+      if (keptKeys === undefined) {
+        return [field, value];
+      }
+      return [
+        field,
+        Array.isArray(value)
+          ? value.map((entry: unknown) => {
+              return _pickKeys(entry, keptKeys);
+            })
+          : _pickKeys(value, keptKeys),
+      ];
+    }),
+  );
+}
+
 /**
  * The raw CKAN package as a resource's listing keeps it: with only that
- * resource left in its `resources`, and without the bulky fields above. A
- * package lists every resource, so storing it whole on each resource's
- * listing grows a package's write with the square of its resource count: a
- * WHO country package's 73 listings carried 42 MB. A record whose resource
- * list cannot be read is kept as it is.
+ * resource left in its `resources`, without the fields above that are bulky
+ * or already stored in a listing column, and with its organization, tags,
+ * and groups narrowed to their identifying keys. A package lists every
+ * resource, so storing it whole on each resource's listing grows a
+ * package's write with the square of its resource count: a WHO country
+ * package's 73 listings carried 42 MB. A record whose resource list cannot
+ * be read is kept as it is.
  */
 function _buildSourceMetadata(
   sourceRecord: unknown,
@@ -109,7 +164,7 @@ function _buildSourceMetadata(
     return sourceRecord;
   }
   return {
-    ..._omitFields(sourceRecord, OMITTED_PACKAGE_FIELDS),
+    ..._narrowPackageFields(_omitFields(sourceRecord, OMITTED_PACKAGE_FIELDS)),
     resources: resources.flatMap((rawResource: unknown) => {
       const isOwnResource =
         (rawResource as { id?: unknown } | null)?.id === resourceId;
@@ -166,8 +221,10 @@ function _toRelation(params: {
  * rest) comes from the pipeline config's field mapping, which every
  * resource of a package shares. Each relation keeps the raw CKAN package as
  * `sourceMetadata`, with its `resources` narrowed to the relation's own raw
- * resource and its bulkiest fields left out (`license_other`,
- * `fs_check_info`). The mapped fields are spread first, so a mapping can never
+ * resource, its bulkiest fields and the ones a listing column already holds
+ * left out (`license_other`, `notes`, `caveats`, `fs_check_info`), and its
+ * organization, tags, and groups narrowed to their identifying keys. The
+ * mapped fields are spread first, so a mapping can never
  * overwrite a field computed here.
  *
  * @param params.mappedFields - The package's mapped catalog metadata, which
