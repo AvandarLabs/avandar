@@ -52,30 +52,73 @@ with Node DuckDB (`transformedCsvsToParquetBlobs`) and uploads them to
 memory ceiling, so it can stream a source of any size, where the edge
 function cannot:
 
-1. Read the listing with the service role.
-2. Stream the source to a temp file on disk. A CKAN resource is found and
-   host-checked exactly as `acquireOpenDataResource` does. A Socrata dataset
-   is read from its CSV export with no row limit.
-3. `COPY (SELECT * FROM read_csv(...)) TO '<file>.parquet' (FORMAT PARQUET,
-   COMPRESSION ZSTD)`. DuckDB streams this, so memory stays flat. A source
-   that is already Parquet is uploaded unchanged. How the CSV is read
-   matters, and was settled against the real DOB Violations file:
-   - Column types are detected from every row (`sample_size=-1`), since a
-     column that looks numeric for its first 20,000 rows often is not.
-   - The dialect (delimiter, quote, escape) is detected from the start of
-     the file and pinned. Detected from every row, DuckDB reads a file with
-     one malformed row as a single text column, without an error.
-   - Strict mode, never `strict_mode=false`. The lenient mode merged two DOB
-     rows into one where a quoted value ends in an apostrophe, without an
-     error. A malformed row now fails the build, naming its line.
-4. Upload the file to
-   `opendata/catalog-cache/<listingId>/<sourceVersionHash>.parquet`.
-   Naming the object after the source version means a reader holding an
-   older URL never sees a half-replaced file.
-5. Write the cache columns (below) in one RPC call. Write the Parquet's real
-   column types back as verified column types: a full-file read is more
-   authoritative than the browser's 10,000-row sample.
-6. Delete the temp files, and the listing's previous Parquet object.
+**The pipeline server knows no API.** It reads the listing with the service
+role and loads the manifest of the pipeline that wrote it
+(`pipelines/<pipeline_name>/<pipeline_name>.pipeline.yaml`). The manifest's
+`download` block says whether that pipeline's API pages, and names a
+download script in the pipeline's own folder that says where each page or
+file is:
+
+```yaml
+# socrata.pipeline.yaml
+download:
+  paging: true
+  pageRows: 100000
+  script: ./download/socrataListingDownload.ts
+
+# hdx.pipeline.yaml
+download:
+  paging: false
+  script: ./download/hdxListingDownload.ts
+```
+
+The script's contract (`ListingDownload` in `@avandar/etl`) is the only
+thing the server and a pipeline share. A pipeline whose manifest has no
+`download` block has listings that cannot be copied.
+
+**A paged source** (Socrata) is never held whole on disk:
+
+1. The script reads the dataset's schema and declares each column's type
+   from it (`number` as `DOUBLE`, `checkbox` as `BOOLEAN`, dates as
+   `TIMESTAMP`, everything else as `VARCHAR`). A page cannot see the rows
+   after it, so types come from the source's schema, which Socrata enforces
+   on every row, rather than from the data.
+2. The server downloads one page (`pageRows` rows) of RFC 4180 CSV, ordered
+   by Socrata's row id, and converts it to Parquet with the declared types in
+   strict mode. The next page asks for the rows after the last row id of
+   this one (`$where=:id > '<last id>'`): measured, this stays fast however
+   deep into a 343 million row dataset it goes, where `$offset` timed out.
+   A failed page download is retried twice, so a dropped connection costs
+   one page.
+3. Converted pages are staged until they reach about 32 MB, then merged into
+   the next part (without the row id), uploaded, and deleted. The disk only
+   ever holds about one part.
+4. Once every page is in, the source's freshness token is read again. A
+   source that changed mid-download would mix two versions, so the build
+   fails and deletes what it uploaded.
+
+**A source that is one file** (CKAN, as on HDX) is streamed to disk, gzipped
+as it arrives when it is a CSV, so it takes a fraction of the space. DuckDB
+converts it straight into parts of about 32 MB, with the reading rules
+settled against the real DOB Violations file:
+
+- Column types are detected from every row (`sample_size=-1`), since a
+  column that looks numeric for its first 20,000 rows often is not.
+- The dialect (delimiter, quote, escape) is detected from the start of the
+  file and pinned. Detected from every row, DuckDB reads a file with one
+  malformed row as a single text column, without an error.
+- Strict mode, never `strict_mode=false`. The lenient mode merged two DOB
+  rows into one where a quoted value ends in an apostrophe, without an
+  error. A malformed row now fails the build, naming its line.
+
+**Either way**, the copy is a folder of parts,
+`opendata/catalog-cache/<listingId>/<buildId>/part-00000.parquet` onward.
+Naming the folder after the build means a reader holding an older copy
+never sees it change, and a failed build deletes its own parts without
+touching another build's. Every part stays under the 50 MB local upload
+limit, so no part needs a resumable upload. The caller then writes the cache
+columns (below) in one RPC call, writes the copy's column types back as
+verified column types, and deletes the copy it replaced.
 
 A failure records `failed` with a failure code. A failure that says the
 dataset itself cannot be loaded marks the listing invalid through
@@ -101,9 +144,13 @@ new build id, or returns null when one is already running. A build records
 its result only while its build id is still current, so a build given up
 as lost cannot overwrite the one that replaced it.
 
-**Measured on DOB Violations** (2,477,724 rows, 18 columns): the CSV is
-790 MB and took 264 s to stream from Socrata. Converting it took 2 s and
-produced a 79.7 MB ZSTD Parquet file.
+**Measured on DOB Violations** (2,477,724 rows, 18 columns), as one file:
+the CSV is 790 MB and took 264 s to stream from Socrata. Converting it took
+2 s and produced a 79.7 MB ZSTD Parquet file, with a peak of under 0.6 GB of
+memory on one thread. Paged, through the real Socrata API into local
+Storage: 25 pages of 100,000 rows became 4 parts totalling 81.6 MB in 316 s
+end to end, with a peak of about 100 MB on disk instead of 870 MB. The row
+count matched Socrata's live count exactly.
 
 ### 2. When a copy is built: on first use, refreshed when stale
 
@@ -149,7 +196,8 @@ columns (`cached_object_path`, `cached_source_version`, `cached_at`):
 | `parquet_cache_build_id` | The running build's id. Null when no build runs. |
 | `parquet_cache_build_started_at` | When the running or last build started. Drives the lost-build rule. |
 | `parquet_cache_failure_code` | The last build's failure code. Set exactly when the status is `failed`. |
-| `parquet_cache_object_path` | Object path in `opendata`. Set exactly when a copy exists. |
+| `parquet_cache_folder_path` | The `opendata` folder holding the copy's parts. Set exactly when a copy exists. |
+| `parquet_cache_part_count` | How many parts the folder holds, at least one. |
 | `parquet_cache_source_version` | The freshness token the copy was built from. |
 | `parquet_cache_built_at` | When the current copy was written. |
 | `parquet_cache_row_count`, `parquet_cache_byte_size` | What was written, for the catalog and for monitoring. |
@@ -163,7 +211,7 @@ role writes them, through three RPCs:
 | RPC | Caller | Does |
 |---|---|---|
 | `rpc_data_catalog_listings__request_parquet_cache` | edge function | Claims a build and returns its id, or null when one runs |
-| `rpc_data_catalog_listings__write_parquet_cache` | pipeline server | Records a ready copy; returns the copy it replaced, for deletion |
+| `rpc_data_catalog_listings__write_parquet_cache` | pipeline server | Records a ready copy; returns the folder of the copy it replaced, for deletion |
 | `rpc_data_catalog_listings__fail_parquet_cache` | pipeline server | Records a failure; keeps the earlier copy |
 
 A `pipeline_parquet` listing never has a cache. The raw-bytes cache columns
@@ -190,8 +238,8 @@ and its cache columns are removed.
 | # | Slice | Depends on |
 |---|---|---|
 | S1 | Drop the `opendata` authenticated write policies. **Done.** | none |
-| S2 | Pipeline server: the cache builder (stream source to disk, DuckDB to Parquet, upload) with every dependency injected. **Done.** | none |
-| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. The always-on Fly config is **done**. | S2 |
+| S2 | Pipeline server: the cache builder, driven by each pipeline's `download` manifest block. Paged sources are copied one part at a time; one-file sources are gzipped on disk. **Done.** | none |
+| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. On start, it deletes temp folders a killed build left behind. The always-on Fly config and the templated deploy are **done**. | S2 |
 | S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, triggering S3) | S3, S4 |
 | S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
@@ -200,15 +248,15 @@ and its cache columns are removed.
 
 ## Open questions
 
-1. **Production Storage upload limit.** Large ODC sources only fit if
-   production's limit allows them. DOB Violations is 79.7 MB as ZSTD
-   Parquet, which the 50 MB local limit in `supabase/config.toml` would
-   already refuse. Manual uploads already depend on this same number.
-2. **Fly machine sizing and cost.** The builder needs disk for the source
-   CSV plus the Parquet (870 MB for DOB Violations). The pipeline server's
-   disk and memory should be checked against the largest listing we expect
-   to cache. Keeping one machine always on also means paying for it around
-   the clock instead of only while it serves requests.
+1. **Production Storage upload limit.** No longer a blocker: every part is
+   about 32 MB, under even the 50 MB local limit. Production's limit only has
+   to allow 32 MB files.
+2. **Fly machine.** Settled: `performance-1x` with 2 GB of memory and a 10 GB
+   volume at `/data`, about $35 a month. See
+   `docs/measles-demo/pipeline-server-fly-runbook.md`. The largest Socrata
+   dataset on our drives, Lobbyist Bi-Monthly Reports on data.ny.gov (343M
+   rows, about 239 GB of CSV), still takes about a day to download at the
+   2.2 MB/s Socrata serves it, but no longer needs a large disk.
 3. **Storage cost.** Copies are only built for listings a workspace adds, so
    cost grows with use, not with the catalog's size. Pre-building copies for
    popular listings is a later option.
