@@ -45,8 +45,8 @@ export type PluginVizContext = Readonly<{
  * Avandar draws it as one of its own bar, line, or area charts.
  *
  * - `xColumn`: the output column on the x axis.
- * - `xColumnType`: `date` formats the x values as dates in the viewer's
- *   locale. Defaults to `category`.
+ * - `xColumnType`: `date` formats the x values as `YYYY-MM-DD` in UTC.
+ *   Defaults to `category`.
  * - `series`: one entry per output column drawn as a series. A `label` is
  *   shown as written, so translate it with `i18n.t` first.
  * - `layout`: whether series sit side by side or stack. Defaults to `group`.

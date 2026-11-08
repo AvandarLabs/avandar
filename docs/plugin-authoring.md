@@ -47,7 +47,8 @@ the folder to `plugins/bundled.yaml`, keeping that file's comments.
 
 ## 2. Lay out the code
 
-`ava plugin init` writes the five files a plugin needs:
+`ava plugin init` writes the five files a plugin needs. The entry starts as
+`definePlugin({ commands })`, and you add `vizTypes` when you add chart types:
 
 ```text
 plugins/<name>/
@@ -55,7 +56,7 @@ plugins/<name>/
   package.json        approved dependencies only
   tsconfig.json       extends the repo's base config
   locales/en.json     every user-visible string (other locales optional)
-  src/index.tsx       export default definePlugin({ commands, vizTypes })
+  src/index.tsx       export default definePlugin({ commands: { ... } })
 ```
 
 Plugin code follows the same repository rules as app code. Put each module in
@@ -407,18 +408,21 @@ export function makeCountsFromRows(
 | --- | --- |
 | `kind` | `bar`, `line`, or `area` |
 | `xColumn` | The output column on the x axis |
-| `xColumnType` | Optional. `date` formats the x values as dates in the viewer's locale. Write dates as `YYYY-MM-DD` |
-| `series` | One `{ column, label }` per series. `label` is plain text, so translate it with `context.i18n.t` |
-| `layout` | Optional. `stack` stacks the series, and `group` sets them side by side |
-| `barGap` | Optional. `none` removes the space between bars, as an epicurve or a histogram needs |
+| `xColumnType` | Optional, `category` by default. `date` formats the x values as `YYYY-MM-DD` in UTC. Write dates as `YYYY-MM-DD` |
+| `series` | At least one `{ column, label }`, one per series. `label` is optional plain text, so translate it with `context.i18n.t` |
+| `layout` | Optional, `group` by default. `stack` stacks the series, and `group` sets them side by side. It applies to `bar` and `area`, and a `line` chart ignores it |
+| `barGap` | Optional, `default` by default. `none` removes the space between bars, as an epicurve or a histogram needs. It applies to `bar` only |
 
 Name output columns yourself, such as `series_0`, rather than after data
 values: a value such as `a.b` would be read as a nested path, and a value
 could collide with another column. Avandar checks the returned spec, and that
-`xColumn` and every series column exist in the returned rows.
+`xColumn` and every series column exist in the first returned row. Empty rows
+pass that check.
 
 Avandar draws at most as many rows as its own chart of that kind: 200 for
-`bar`, and 500 for `line` and `area`. A transform that returns more should
+`bar`, and 500 for `line` and `area`. Over the limit, a `bar` chart keeps the
+first rows, and `line` and `area` charts show an even sample across the whole
+range, with a warning toast either way. A transform that returns more should
 aggregate further. The epicurve does: it keeps at most the latest 200 buckets,
 to match the 200-bar limit, so a longer span drops the earliest buckets. When
 an epicurve's span holds more than 200 buckets at its interval, such as more
@@ -473,7 +477,7 @@ name, as `role="img"` and `title` do above.
 | `ComposedChart`, `Scatter`, `ErrorBar`, `XAxis`, `YAxis`, `CartesianGrid`, `Tooltip`, `ReferenceLine`, `Legend` | Recharts building blocks |
 | `useChartTheme()` | `{ colors, textColor, gridColor }`: Avandar's chart colors, text color, and grid color for the current color scheme, dark mode included |
 
-Recharts already ships in the app, so these exports add no bytes to its
+Recharts already ships in the app, so these exports add no bytes to app
 chunks.
 
 A saved chart renders from the plugin code this deployment bundles, wherever
@@ -493,7 +497,9 @@ goes wrong, the chart area shows what, and the rest of the page is unaffected:
 | The stored settings fail validation | "Invalid chart settings". The stored chart is kept |
 | A required setting is unset, or its column is not in the result | "Choose a *setting label*", one line per such setting, such as "Choose a Date column" |
 | The plugin code fails to load | "This chart couldn't load", with a "Retry" button |
-| The transform throws or returns an invalid spec, or the component throws | "*Title* couldn't render". The error is logged with the plugin and chart ids |
+| The transform throws or returns an invalid spec | "*Title* couldn't render". The error is logged with the plugin and chart ids |
+| The component throws | "*Title* couldn't render". The error boundary logs it with the plugin name |
+| The plugin code declares no usable chart for the chart type | "*Title* couldn't render". The error is logged with the plugin and chart ids |
 
 A chart that crashed draws again when its settings, its data, or its chart type
 change, so fixing a setting clears the error without a reload.
