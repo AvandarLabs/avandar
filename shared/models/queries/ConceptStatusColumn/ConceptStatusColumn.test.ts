@@ -5,6 +5,7 @@
  */
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
+import { ConceptModule } from "$/models/ontology/Concept/ConceptModule.ts";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 
@@ -27,5 +28,14 @@ describe("ConceptStatusColumn.fromConceptId", () => {
     expect(ConceptStatusColumn.fromConceptId(CHOLERA_ID).id).not.toBe(
       ConceptStatusColumn.fromConceptId(MEASLES_ID).id,
     );
+  });
+});
+
+describe("ConceptStatusColumn.COLUMN_NAME", () => {
+  it("is the name the case type module keeps for the status column", () => {
+    expect(ConceptStatusColumn.COLUMN_NAME).toBe(
+      ConceptModule.STATUS_COLUMN_NAME,
+    );
+    expect(ConceptModule.STATUS_COLUMN_NAME).toBe("status");
   });
 });

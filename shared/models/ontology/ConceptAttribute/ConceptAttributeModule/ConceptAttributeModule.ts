@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 import { ConceptModule } from "$/models/ontology/Concept/ConceptModule.ts";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
-import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type {
   ConceptAttributeId,
@@ -52,7 +51,7 @@ function _getOutputDataType(
  */
 const RESERVED_VIEW_COLUMN_NAMES: readonly string[] = [
   ConceptModule.RECORD_KEY_COLUMN_NAME,
-  ConceptStatusColumn.COLUMN_NAME.toLowerCase(),
+  ConceptModule.STATUS_COLUMN_NAME.toLowerCase(),
 ];
 
 /**

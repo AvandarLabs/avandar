@@ -91,7 +91,16 @@ function createConceptModule(): WithBind<IConceptUtils> {
  */
 const RECORD_KEY_COLUMN_NAME = "external_id";
 
+/**
+ * The name of the built-in column that holds each record's status, in a case
+ * type's view and in every query over it. Kept here, with no dependencies,
+ * so code that only needs the name (the chat edge function) does not import
+ * the status column model.
+ */
+const STATUS_COLUMN_NAME = "status" as const;
+
 export const ConceptModule = {
   ...createConceptModule(),
   RECORD_KEY_COLUMN_NAME,
+  STATUS_COLUMN_NAME,
 };
