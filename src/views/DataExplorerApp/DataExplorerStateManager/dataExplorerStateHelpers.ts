@@ -1,6 +1,8 @@
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import { makePluginVizMemoryKey } from "@/lib/plugins/vizs/pluginVizOptionHelpers";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DataExplorerAppState } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 /**
@@ -80,4 +82,65 @@ export function isSameColumnSchema(
       previousColumn?.dataType === currentColumn.dataType
     );
   });
+}
+
+/**
+ * Returns the state's two viz config memories with its active config filed
+ * under its own key: a built-in config under its viz type in
+ * `vizConfigMemory`, a plugin config under its plugin memory key in
+ * `pluginVizConfigMemory`. Called by `setActiveVizType` and
+ * `makeStateFromPluginVizConfig` on the way out of the active chart type, so
+ * switching back restores that config.
+ */
+export function makeVizConfigMemoriesFromState(
+  state: Readonly<DataExplorerAppState>,
+): Pick<DataExplorerAppState, "vizConfigMemory" | "pluginVizConfigMemory"> {
+  const { vizConfig, vizConfigMemory, pluginVizConfigMemory } = state;
+  if (vizConfig.vizType === "plugin") {
+    return {
+      vizConfigMemory,
+      pluginVizConfigMemory: {
+        ...pluginVizConfigMemory,
+        [makePluginVizMemoryKey(vizConfig)]: vizConfig,
+      },
+    };
+  }
+  // TypeScript widens the computed union key to `string` and so cannot see
+  // that `vizConfig` lands under its own `vizType`. The key is taken from
+  // the value itself, so the correlation holds by construction.
+  return {
+    vizConfigMemory: {
+      ...vizConfigMemory,
+      [vizConfig.vizType]: vizConfig,
+    } as Partial<AvaVizConfig.Registry>,
+    pluginVizConfigMemory,
+  };
+}
+
+/**
+ * Activates a plugin chart config picked in the viz type picker, or the
+ * config remembered for the same plugin chart type when there is one, and
+ * files the outgoing config. Returns `state` unchanged when that plugin chart
+ * type is already active. Called by `setActiveVizType` for a plugin target.
+ */
+export function makeStateFromPluginVizConfig(
+  options: Readonly<{
+    state: DataExplorerAppState;
+    pluginVizConfig: AvaVizConfig.Plugin;
+  }>,
+): DataExplorerAppState {
+  const { state, pluginVizConfig } = options;
+  const memoryKey = makePluginVizMemoryKey(pluginVizConfig);
+  if (
+    state.vizConfig.vizType === "plugin" &&
+    makePluginVizMemoryKey(state.vizConfig) === memoryKey
+  ) {
+    return state;
+  }
+  return {
+    ...state,
+    ...makeVizConfigMemoriesFromState(state),
+    vizConfig: state.pluginVizConfigMemory[memoryKey] ?? pluginVizConfig,
+    pendingUrlVizConfig: undefined,
+  };
 }

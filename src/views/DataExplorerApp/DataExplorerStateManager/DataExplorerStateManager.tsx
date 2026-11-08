@@ -1,5 +1,5 @@
 import { Model } from "@avandar/models";
-import { setValue } from "@avandar/utils";
+import { objectValuesMap, setValue } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -7,6 +7,8 @@ import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplore
 import {
   applyQueryChange,
   isSameColumnSchema,
+  makeStateFromPluginVizConfig,
+  makeVizConfigMemoriesFromState,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { DataExplorerSourceActions } from "./DataExplorerSourceActions";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
@@ -160,24 +162,30 @@ export const DataExplorerStateManager = createAppStateManager({
 
     /**
      * Activates a visualization type while preserving its most recent config.
-     * Returns state with a restored or hydrated config for the selected type.
+     * A built-in type restores its remembered config or converts the active
+     * one, then fills empty slots. A plugin chart config, built by the viz
+     * type picker, gives way to the config remembered for its plugin chart
+     * type when there is one.
      */
     setActiveVizType: (
       state: DataExplorerAppState,
-      newVizType: AvaVizConfig.Type,
-    ) => {
+      target: AvaVizConfig.Type | AvaVizConfig.Plugin,
+    ): DataExplorerAppState => {
+      if (typeof target !== "string") {
+        return makeStateFromPluginVizConfig({ state, pluginVizConfig: target });
+      }
       const { vizConfig, query, vizConfigMemory, lastResultColumns } = state;
 
       // A bare "plugin" type names no plugin chart type, so there is nothing
       // to activate.
-      if (vizConfig.vizType === newVizType || newVizType === "plugin") {
+      if (vizConfig.vizType === target || target === "plugin") {
         return state;
       }
 
-      const rememberedVizConfig = vizConfigMemory[newVizType];
+      const rememberedVizConfig = vizConfigMemory[target];
       const initialVizConfig =
         rememberedVizConfig ??
-        AvaVizConfigs.convertVizConfig(vizConfig, newVizType);
+        AvaVizConfigs.convertVizConfig(vizConfig, target);
       const nextVizConfig =
         lastResultColumns !== undefined
           ? AvaVizConfigs.hydrateFromQueryResult(
@@ -188,18 +196,10 @@ export const DataExplorerStateManager = createAppStateManager({
             ? AvaVizConfigs.hydrateFromQuery(initialVizConfig, query)
             : initialVizConfig;
 
-      // TypeScript widens the computed union key to `string` and so cannot see
-      // that `vizConfig` lands under its own `vizType`. The key is taken from
-      // the value itself, so the correlation holds by construction.
-      const nextVizConfigMemory = {
-        ...vizConfigMemory,
-        [vizConfig.vizType]: vizConfig,
-      } as Partial<AvaVizConfig.Registry>;
-
       return {
         ...state,
+        ...makeVizConfigMemoriesFromState(state),
         vizConfig: nextVizConfig,
-        vizConfigMemory: nextVizConfigMemory,
         pendingUrlVizConfig: undefined,
       };
     },
@@ -265,8 +265,8 @@ export const DataExplorerStateManager = createAppStateManager({
     /**
      * Stores the column bindings of the latest bound query result, which the
      * next result is bound from and "Save to dashboard" saves with the chart.
-     * Chart configs on provisional SQL column IDs move to the IDs these
-     * bindings give the same expressions.
+     * Chart configs on provisional SQL column IDs, remembered ones included,
+     * move to the IDs these bindings give the same expressions.
      */
     setColumnBindings: (
       state: DataExplorerAppState,
@@ -293,7 +293,26 @@ export const DataExplorerStateManager = createAppStateManager({
           ];
         }),
       ) as Partial<AvaVizConfig.Registry>;
-      return { ...state, columnBindings, vizConfig, vizConfigMemory };
+      const pluginVizConfigMemory = objectValuesMap(
+        state.pluginVizConfigMemory,
+        (config) => {
+          const remappedConfig = AvaVizConfigs.remapProvisionalColumnIds({
+            config: config,
+            previous: previous,
+            current: columnBindings,
+          });
+          // The remap keeps a config's viz type, so this only narrows the
+          // result back to a plugin config.
+          return remappedConfig.vizType === "plugin" ? remappedConfig : config;
+        },
+      );
+      return {
+        ...state,
+        columnBindings,
+        vizConfig,
+        vizConfigMemory,
+        pluginVizConfigMemory,
+      };
     },
 
     /** Applies an explicit chart edit, replacing any URL-restored chart. */
