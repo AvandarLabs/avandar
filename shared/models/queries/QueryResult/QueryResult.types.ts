@@ -6,6 +6,13 @@ export type QueryResultId = UUID<"QueryResult">;
 export type QueryResultColumn = {
   name: string;
   dataType: AvaDataTypeT;
+  /**
+   * True for a LIST column, such as a case type field that keeps every
+   * value. Its `dataType` is `varchar` because a list renders as text.
+   * Controls that build SQL from a column's values, like a dashboard filter,
+   * leave it out. Absent means false.
+   */
+  isArray?: boolean;
 };
 
 export type QueryResult<T extends UnknownObject = UnknownObject> = {

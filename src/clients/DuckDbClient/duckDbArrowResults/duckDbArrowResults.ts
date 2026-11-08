@@ -15,6 +15,28 @@ function _getDecimalScale(
 }
 
 /**
+ * One element of a LIST cell. A list result column is described as text, so
+ * its dates and timestamps become strings rather than epoch numbers that
+ * nothing downstream could tell from a count. Any other element goes through
+ * the same conversion as a top-level cell.
+ */
+function _toJsListItem(
+  options: Readonly<{ itemType: arrow.DataType; item: unknown }>,
+): unknown {
+  const { itemType, item } = options;
+  if (item === null || item === undefined) {
+    return null;
+  }
+  if (arrow.DataType.isDate(itemType)) {
+    return new Date(item as number).toISOString().slice(0, 10);
+  }
+  if (arrow.DataType.isTimestamp(itemType)) {
+    return new Date(item as number).toISOString();
+  }
+  return _toJsValueFromArrowValue(item, itemType);
+}
+
+/**
  * Converts one Arrow cell to a plain JavaScript value. `dataType` is the
  * cell's Arrow type, which a decimal needs: it is stored as an unscaled
  * integer, so `2.25` in a `DECIMAL(4,2)` is `225` until the scale is applied.
@@ -32,7 +54,7 @@ function _toJsValueFromArrowValue(
     // `Array.from` rather than `toArray()`: a list of numbers comes back from
     // `toArray()` as a typed array, which can only hold numbers.
     return Array.from(value as Iterable<unknown>, (item) => {
-      return _toJsValueFromArrowValue(item, itemType);
+      return _toJsListItem({ itemType, item });
     });
   }
   if (value instanceof arrow.StructRow || value instanceof arrow.MapRow) {

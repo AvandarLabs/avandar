@@ -1,6 +1,7 @@
 import * as arrow from "apache-arrow";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults";
+import type { ILogger } from "@avandar/logger";
 
 /** Builds a one-column Arrow table, typed as `arrowTableToJS` accepts it. */
 function createTableFromColumn(
@@ -177,6 +178,49 @@ describe("arrowTableToJS", () => {
       { price: 2.25 },
       { price: 0.05 },
     ]);
+  });
+
+  // A list result column is described as text (below), so an epoch number in
+  // it would read as a count.
+  it("returns the dates in a list cell as calendar days", () => {
+    const visits = arrow.vectorFromArray(
+      [[new Date("2026-01-05T00:00:00Z"), new Date("2026-02-01T00:00:00Z")]],
+      new arrow.List(new arrow.Field("item", new arrow.DateDay(), true)),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("visits", visits)).data,
+    ).toEqual([{ visits: ["2026-01-05", "2026-02-01"] }]);
+  });
+
+  it("returns the timestamps in a list cell as ISO strings", () => {
+    const seenAt = arrow.vectorFromArray(
+      [[Date.UTC(2026, 0, 5, 10, 30)]],
+      new arrow.List(
+        new arrow.Field("item", new arrow.TimestampMillisecond(), true),
+      ),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("seenAt", seenAt)).data,
+    ).toEqual([{ seenAt: ["2026-01-05T10:30:00.000Z"] }]);
+  });
+
+  it("describes a list column as a text list without logging an error", () => {
+    const logger = { error: vi.fn() } as unknown as ILogger;
+    const symptoms = arrow.vectorFromArray(
+      [["Rash"]],
+      new arrow.List(new arrow.Field("item", new arrow.Utf8(), true)),
+    );
+
+    const result = arrowTableToJS(createTableFromColumn("Symptoms", symptoms), {
+      logger,
+    });
+
+    expect(result.columns).toEqual([
+      { name: "Symptoms", dataType: "varchar", isArray: true },
+    ]);
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it("returns a decimal inside a list with its scale applied", () => {
