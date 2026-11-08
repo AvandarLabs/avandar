@@ -107,6 +107,7 @@ const AGE: ConceptAttributeColumn = {
   selectColumnName: "age_years",
   datasetId: DATASET_A,
   primaryKeyColumnName: "person_id",
+  columnDataType: "bigint",
   valuePickerRuleType: "first",
   isArray: false,
 };
@@ -118,6 +119,7 @@ const REGION: ConceptAttributeColumn = {
   selectColumnName: "region_name",
   datasetId: DATASET_B,
   primaryKeyColumnName: "hh_id",
+  columnDataType: "varchar",
   valuePickerRuleType: "most_frequent",
   isArray: false,
 };
@@ -129,6 +131,7 @@ const TAGS: ConceptAttributeColumn = {
   selectColumnName: "tag",
   datasetId: DATASET_A,
   primaryKeyColumnName: "person_id",
+  columnDataType: "varchar",
   valuePickerRuleType: "first",
   isArray: true,
 };
@@ -147,6 +150,7 @@ const NICKNAME: ConceptAttributeColumn = {
   selectColumnName: "nickname",
   datasetId: DATASET_C,
   primaryKeyColumnName: "person_id",
+  columnDataType: "varchar",
   valuePickerRuleType: "first",
   isArray: false,
 };
@@ -472,18 +476,24 @@ const TYPED_SPINE = `${TYPED_VIEW}__individuals`;
  *
  * `p1` ties at the maximum twice (two rows share the latest `seen_on`, and
  * two share the most `visits`) and has a row of NULLs, so a rule that counted
- * or compared NULL would show it. `p2` has only a NULL row. `p3` has no row.
+ * or compared NULL would show it. `p1` also holds four words that sort
+ * differently by byte order and alphabetically ("apple", "Zebra", "Ángel",
+ * "Apple"). `p2` has a NULL row, then "apple" and "Apple", which tie
+ * alphabetically. `p3` has no row.
  */
 async function _seedTyped(connection: DuckDBConnection): Promise<void> {
   const path = join(tmpdir(), "ava-concept-typed.parquet");
   await connection.run(`
     COPY (
       SELECT * FROM (VALUES
-        ('p1', '9', 3::BIGINT, 1.5::DOUBLE, DATE '2024-03-01', TIME '08:00', TIMESTAMP '2024-03-01 08:00'),
-        ('p1', '10', 3::BIGINT, NULL::DOUBLE, DATE '2024-03-01', TIME '17:30', TIMESTAMP '2024-03-09 17:30'),
-        ('p1', NULL, NULL::BIGINT, 2.5::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP),
-        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP)
-      ) AS t(person_id, code, visits, weight, seen_on, seen_time, seen_at)
+        ('p1', '9', 3::BIGINT, 1.5::DOUBLE, DATE '2024-03-01', TIME '08:00', TIMESTAMP '2024-03-01 08:00', 'apple'),
+        ('p1', '10', 3::BIGINT, NULL::DOUBLE, DATE '2024-03-01', TIME '17:30', TIMESTAMP '2024-03-09 17:30', 'Zebra'),
+        ('p1', NULL, NULL::BIGINT, 2.5::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Ángel'),
+        ('p1', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Apple'),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, NULL),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'apple'),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Apple')
+      ) AS t(person_id, code, visits, weight, seen_on, seen_time, seen_at, word)
     ) TO '${path}' (FORMAT parquet)
   `);
   await connection.run(`
@@ -526,6 +536,9 @@ function _typedField(
       attributeName: options.attributeName,
       selectColumnName: options.selectColumnName,
       datasetId: DATASET_TYPED,
+      columnDataType: DuckDbDataTypeUtils.toAvaDataType(
+        options.sourceDuckDbType,
+      ),
       primaryKeyColumnName: "person_id",
       valuePickerRuleType: options.ruleType,
       isArray: false,
@@ -561,6 +574,18 @@ const TYPED_FIELDS: readonly TypedField[] = [
   _typedField({
     attributeName: "first_code",
     selectColumnName: "code",
+    sourceDuckDbType: "VARCHAR",
+    ruleType: "min",
+  }),
+  _typedField({
+    attributeName: "last_word",
+    selectColumnName: "word",
+    sourceDuckDbType: "VARCHAR",
+    ruleType: "max",
+  }),
+  _typedField({
+    attributeName: "first_word",
+    selectColumnName: "word",
     sourceDuckDbType: "VARCHAR",
     ruleType: "min",
   }),
@@ -688,10 +713,23 @@ describe("buildConceptViewSql value rule output types", () => {
     expect([p2?.latest_seen, p3?.latest_seen]).toEqual([null, null]);
   });
 
-  it("compares text by byte order under max and min, so '9' beats '10'", async () => {
+  it("compares text alphabetically under max and min, so '9' still beats '10'", async () => {
     const [p1] = await _queryTypedView();
 
     expect([p1?.last_code, p1?.first_code]).toEqual(["9", "10"]);
+  });
+
+  it("ignores case and accents when comparing text, and returns the original value", async () => {
+    const [p1] = await _queryTypedView();
+
+    // Byte order would give "Ángel" for max and "Apple" for min.
+    expect([p1?.last_word, p1?.first_word]).toEqual(["Zebra", "Ángel"]);
+  });
+
+  it("breaks an alphabetical tie by the value in the rule's direction", async () => {
+    const [, p2] = await _queryTypedView();
+
+    expect([p2?.last_word, p2?.first_word]).toEqual(["apple", "Apple"]);
   });
 
   it("counts the non-NULL values, and zero for a record no row matches", async () => {

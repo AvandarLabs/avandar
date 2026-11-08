@@ -1,5 +1,6 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { match } from "ts-pattern";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
@@ -23,6 +24,11 @@ export type AttributeValueSqlOptions = {
   /** The dataset column that holds each row's record key. */
   primaryKeyColumnName: string;
   datasetId: string;
+  /**
+   * The type of the dataset column that holds the value. `max` and `min`
+   * compare a text column alphabetically instead of by byte order.
+   */
+  columnDataType: AvaDataType.T;
   /** How one record's rows reduce to one value. Unused for a list. */
   valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
   /** Keep every value, as a list, instead of reducing them to one. */
@@ -47,20 +53,44 @@ type ValueSqlParts = {
   rowsView: string;
 };
 
-/** The `SELECT` that reduces one record's non-NULL rows to its value. */
+/**
+ * The `SELECT` that picks a text column's last or first value alphabetically.
+ *
+ * The comparison key ignores case and accents (`lower(strip_accents(value))`),
+ * and the row that wins gives back its original value. Values that share a key
+ * ("apple" and "Apple") tie-break by the value itself in byte order, in the
+ * same direction, so the pick never depends on scan order.
+ */
+function _buildTextExtremeSql(
+  options: Readonly<{
+    parts: ValueSqlParts;
+    direction: "ASC" | "DESC";
+  }>,
+): string {
+  const { value, rowFilter, datasetView } = options.parts;
+  const key = `lower(strip_accents(${value}))`;
+  return `SELECT ${value} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter} ORDER BY ${key} ${options.direction}, ${value} ${options.direction} LIMIT 1`;
+}
+
+/**
+ * The `SELECT` that reduces one record's non-NULL rows to its value.
+ *
+ * Each rule passes its aggregate in the rule's output type
+ * (`ValuePickerRule.getOutputDataType`). COUNT is already BIGINT, and is 0,
+ * not NULL, over no rows. MAX and MIN keep the column's type, so dates, times,
+ * and text work as well as numbers. Text compares alphabetically, ignoring
+ * case and accents, so '10' sorts before '9' and 'Ángel' before 'Zebra'. It
+ * still returns the original value.
+ */
 function _buildReducedValueSql(
   options: Readonly<{
     parts: ValueSqlParts;
     valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
+    columnDataType: AvaDataType.T;
   }>,
 ): string {
   const { value, rowFilter, datasetView, rowsView } = options.parts;
-  // Each rule passes its aggregate in the rule's output type
-  // (`ValuePickerRule.getOutputDataType`). COUNT is already BIGINT, and is 0,
-  // not NULL, over no rows. MAX and MIN keep the column's type, so dates,
-  // times, and text work as well as numbers. Text compares by byte order, so
-  // '10' sorts before '9' and uppercase sorts before lowercase ('Zebra' <
-  // 'apple').
+  const isText = AvaDataType.isText(options.columnDataType);
   const aggregateSql = (aggregateExpression: string): string => {
     return `SELECT ${aggregateExpression} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter}`;
   };
@@ -84,10 +114,14 @@ function _buildReducedValueSql(
       return aggregateSql(`COUNT(${value})`);
     })
     .with("max", () => {
-      return aggregateSql(`MAX(${value})`);
+      return isText
+        ? _buildTextExtremeSql({ parts: options.parts, direction: "DESC" })
+        : aggregateSql(`MAX(${value})`);
     })
     .with("min", () => {
-      return aggregateSql(`MIN(${value})`);
+      return isText
+        ? _buildTextExtremeSql({ parts: options.parts, direction: "ASC" })
+        : aggregateSql(`MIN(${value})`);
     })
     .exhaustive();
 }
@@ -127,6 +161,7 @@ export function buildAttributeValueSql(
     : _buildReducedValueSql({
         parts,
         valuePickerRuleType: options.valuePickerRuleType,
+        columnDataType: options.columnDataType,
       });
   return `(${body}) AS ${quoteSqlIdentifier(options.outputColumnName)}`;
 }

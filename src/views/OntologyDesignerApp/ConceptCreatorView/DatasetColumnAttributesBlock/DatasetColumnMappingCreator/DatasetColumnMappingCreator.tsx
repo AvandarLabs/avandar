@@ -22,9 +22,9 @@ type Props = {
 
 /**
  * Returns the localized value-picker rule options the column's type allows.
- * On a text column `max` and `min` compare by byte order, which is close to
- * alphabetical but puts uppercase before lowercase. They are named for that
- * rather than "maximum" and "minimum", which would suggest "10" beats "9".
+ * On a text column `max` and `min` compare alphabetically, ignoring case and
+ * accents. They are named for that rather than "maximum" and "minimum", which
+ * would suggest "10" beats "9".
  */
 function useValuePickerOptions(
   columnDataType: AvaDataType.T,

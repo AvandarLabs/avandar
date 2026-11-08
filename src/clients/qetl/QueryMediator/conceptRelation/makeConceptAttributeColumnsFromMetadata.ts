@@ -265,6 +265,7 @@ function _buildAttributeColumn(
       attributeName: attribute.name,
       selectColumnName: datasetColumn.name,
       datasetId: mapping.datasetId,
+      columnDataType: datasetColumn.dataType,
       primaryKeyColumnName,
       valuePickerRuleType: mapping.valuePickerRuleType,
       isArray: attribute.isArray,

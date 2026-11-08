@@ -25,6 +25,7 @@ const BASE_OPTIONS: AttributeValueSqlOptions = {
   selectColumnName: "region",
   primaryKeyColumnName: 'case "id"',
   datasetId: DATASET_ID,
+  columnDataType: "varchar",
   valuePickerRuleType: "first",
   isArray: false,
   outputColumnName: "value",
@@ -174,11 +175,31 @@ describe("buildAttributeValueSql", () => {
 
   it("ignores NULL in sum, avg, count, max, and min", async () => {
     const records = await _readRecords({
-      sum: { selectColumnName: "dose", valuePickerRuleType: "sum" },
-      avg: { selectColumnName: "dose", valuePickerRuleType: "avg" },
-      count: { selectColumnName: "dose", valuePickerRuleType: "count" },
-      max: { selectColumnName: "dose", valuePickerRuleType: "max" },
-      min: { selectColumnName: "dose", valuePickerRuleType: "min" },
+      sum: {
+        selectColumnName: "dose",
+        columnDataType: "bigint",
+        valuePickerRuleType: "sum",
+      },
+      avg: {
+        selectColumnName: "dose",
+        columnDataType: "bigint",
+        valuePickerRuleType: "avg",
+      },
+      count: {
+        selectColumnName: "dose",
+        columnDataType: "bigint",
+        valuePickerRuleType: "count",
+      },
+      max: {
+        selectColumnName: "dose",
+        columnDataType: "bigint",
+        valuePickerRuleType: "max",
+      },
+      min: {
+        selectColumnName: "dose",
+        columnDataType: "bigint",
+        valuePickerRuleType: "min",
+      },
     });
 
     expect(records.p1).toEqual({ sum: 6, avg: 3, count: 2, max: 4, min: 2 });

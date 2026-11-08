@@ -1,6 +1,7 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
@@ -25,6 +26,8 @@ export type ConceptAttributeColumn =
       /** The contributing dataset's column this attribute reads. */
       selectColumnName: string;
       datasetId: string;
+      /** The type of the dataset column this attribute reads. */
+      columnDataType: AvaDataType.T;
       /** The dataset column mapped to the concept's identifier attribute. */
       primaryKeyColumnName: string;
       valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
@@ -117,6 +120,7 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
     selectColumnName: column.selectColumnName,
     primaryKeyColumnName: column.primaryKeyColumnName,
     datasetId: column.datasetId,
+    columnDataType: column.columnDataType,
     valuePickerRuleType: column.valuePickerRuleType,
     isArray: column.isArray,
     outputColumnName: column.attributeName,

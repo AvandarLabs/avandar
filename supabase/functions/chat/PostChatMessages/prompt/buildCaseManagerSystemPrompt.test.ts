@@ -111,6 +111,8 @@ describe("buildCaseManagerSystemPrompt", () => {
     expect(prompt).toContain(
       "sum and avg only work on bigint and double columns",
     );
-    expect(prompt).toContain("compare text character by character");
+    expect(prompt).toContain(
+      "compare alphabetically, ignoring case and accents",
+    );
   });
 });
