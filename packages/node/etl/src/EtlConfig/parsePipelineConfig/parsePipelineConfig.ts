@@ -68,6 +68,15 @@ const BaseUrlSchema = z
 
 const FormatListSchema = z.array(z.string());
 
+const DownloadSchema = z.discriminatedUnion("paging", [
+  z.strictObject({
+    paging: z.literal(true),
+    pageRows: z.int().positive(),
+    script: z.string().min(1),
+  }),
+  z.strictObject({ paging: z.literal(false), script: z.string().min(1) }),
+]);
+
 const PipelineConfigSchema = z.strictObject({
   organizationLabels: OrganizationLabelsSchema.optional(),
   fields: FieldMappingsSchema.optional(),
@@ -85,6 +94,7 @@ const PipelineConfigSchema = z.strictObject({
       unloadableFormats: FormatListSchema.optional(),
     })
     .optional(),
+  download: DownloadSchema.optional(),
 });
 
 /**

@@ -60,6 +60,20 @@ export type PipelineDriveConfig = Readonly<{
 }>;
 
 /**
+ * How the pipeline server downloads one of this pipeline's listings to copy
+ * it into Parquet. `script` is relative to the config file and
+ * default-exports a `ListingDownloadScript`.
+ *
+ * `paging` says whether the pipeline's API serves a listing in pages. A paged
+ * listing is downloaded and converted one page of `pageRows` rows at a time,
+ * so a copy never needs the whole source on disk. A listing whose API does
+ * not page is downloaded as one file.
+ */
+export type PipelineDownloadConfig =
+  | Readonly<{ paging: true; pageRows: number; script: string }>
+  | Readonly<{ paging: false; script: string }>;
+
+/**
  * One pipeline's config file, such as `socrata.pipeline.yaml`: its drives,
  * how each source record becomes catalog metadata, and its changes to the
  * shared workspace loadability rules.
@@ -73,4 +87,9 @@ export type PipelineConfig = Readonly<{
   drives: readonly PipelineDriveConfig[];
   /** This pipeline's changes to `etl.config.yaml`'s global rules. */
   workspaceLoadability?: EtlPipelineWorkspaceLoadability;
+  /**
+   * How a listing is downloaded for its Parquet copy. Omit it when the
+   * pipeline's listings are never copied.
+   */
+  download?: PipelineDownloadConfig;
 }>;
