@@ -122,15 +122,35 @@ describe("makeDataGridColumnDefs", () => {
     ).toEqual(["2020", "84001001", "1001", "840", "2021"]);
   });
 
-  it("shows a list cell's values separated by semicolons and an empty list as blank", () => {
-    const [columnDef] = makeDataGridColumnDefs({
-      columnNames: ["Daily new cases"],
-      data: [{ "Daily new cases": [31, 1234] }],
-      dateColumns: undefined,
-      dateFormat: "YYYY-MM-DD",
+  describe("a list cell", () => {
+    function _formatListCell(value: unknown): string {
+      const [columnDef] = makeDataGridColumnDefs({
+        columnNames: ["Daily new cases"],
+        data: [{ "Daily new cases": value }],
+        dateColumns: undefined,
+        dateFormat: "YYYY-MM-DD",
+      });
+      return columnDef!.valueFormatter({ value });
+    }
+
+    it("shows its numbers separated by semicolons", () => {
+      expect(_formatListCell([31, 1234])).toBe("31; 1,234");
     });
 
-    expect(columnDef!.valueFormatter({ value: [31, 1234] })).toBe("31; 1,234");
-    expect(columnDef!.valueFormatter({ value: [] })).toBe("");
+    it("shows its text items separated by semicolons", () => {
+      expect(_formatListCell(["Fever", "Cough"])).toBe("Fever; Cough");
+    });
+
+    it("shows an empty list as blank", () => {
+      expect(_formatListCell([])).toBe("");
+    });
+
+    it("leaves a NULL item out instead of showing a stray separator", () => {
+      expect(_formatListCell([null, "Cough"])).toBe("Cough");
+    });
+
+    it("flattens a nested list into one run of values", () => {
+      expect(_formatListCell([[1, 2], [3]])).toBe("1; 2; 3");
+    });
   });
 });

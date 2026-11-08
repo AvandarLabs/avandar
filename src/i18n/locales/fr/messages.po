@@ -4381,6 +4381,12 @@ msgstr "Commencez votre parcours avec nous"
 #~ msgid "Qwen 2.5 7B (offline)"
 #~ msgstr "Qwen 2.5 7B (hors ligne)"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Fields that keep every value cannot be filtered on."
+msgstr "Les champs qui conservent toutes les valeurs ne peuvent pas être "
+"filtrés."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
 msgstr "Drôle"

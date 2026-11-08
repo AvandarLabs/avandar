@@ -22,12 +22,18 @@ export function AggregationFields({
   return (
     <>
       {queryColumns.map((column) => {
+        const validAggregations = QueryColumn.getValidAggregations(column);
+        const savedAggregation = aggregations[column.id] ?? "none";
         return (
           <AggregationSelect
             key={column.id}
             label={column.baseColumn.name}
-            validAggregations={QueryColumn.getValidAggregations(column)}
-            value={aggregations[column.id] ?? "none"}
+            validAggregations={validAggregations}
+            value={
+              validAggregations.includes(savedAggregation)
+                ? savedAggregation
+                : "none"
+            }
             onChange={(newAggregation: QueryAggregationType.T) => {
               onSetColumnAggregation({
                 columnId: column.id,

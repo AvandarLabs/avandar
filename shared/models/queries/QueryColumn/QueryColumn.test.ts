@@ -1,6 +1,7 @@
 /**
- * Verifies which column a query column reads and which `QueryResult` column
- * name it produces.
+ * Verifies which column a query column reads, which `QueryResult` column
+ * name it produces, and which operations it supports when its field keeps
+ * every value as a list.
  */
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
@@ -26,7 +27,11 @@ it("uses an explicit output alias for an aggregate projection", () => {
   ).toBe("total");
 });
 
-function _conceptAttribute(id: string, name: string): ConceptAttribute.T {
+function _conceptAttribute(
+  id: string,
+  name: string,
+  options: Readonly<{ dataType?: AvaDataType.T; isArray?: boolean }> = {},
+): ConceptAttribute.T {
   return Model.make("ConceptAttribute", {
     id,
     conceptId: "concept_1",
@@ -35,12 +40,12 @@ function _conceptAttribute(id: string, name: string): ConceptAttribute.T {
     description: undefined,
     createdAt: "2026-11-06T00:00:00Z",
     updatedAt: "2026-11-06T00:00:00Z",
-    dataType: "varchar",
+    dataType: options.dataType ?? "varchar",
     mappingType: "dataset_column",
     isLabel: false,
     isIdentifier: false,
     allowManualEdit: false,
-    isArray: false,
+    isArray: options.isArray ?? false,
   }) as ConceptAttribute.T;
 }
 
@@ -139,43 +144,15 @@ describe("QueryColumn.refreshFromSourceColumn", () => {
 });
 
 function _fieldColumn(
-  options: Readonly<{
-    name: string;
-    dataType: AvaDataType.T;
-    isArray: boolean;
-  }>,
+  options: Readonly<{ dataType: AvaDataType.T; isArray: boolean }>,
 ): QueryColumn.T {
   return QueryColumn.makeFromConceptAttributes([
-    {
-      ...Model.make("ConceptAttribute", {
-        id: `attr_${options.name}`,
-        conceptId: "concept_1",
-        workspaceId: "workspace_1",
-        name: options.name,
-        description: undefined,
-        createdAt: "2026-11-06T00:00:00Z",
-        updatedAt: "2026-11-06T00:00:00Z",
-        dataType: options.dataType,
-        mappingType: "dataset_column",
-        isLabel: false,
-        isIdentifier: false,
-        allowManualEdit: false,
-        isArray: options.isArray,
-      }),
-    } as ConceptAttribute.T,
+    _conceptAttribute("attr_cases", "Cases", options),
   ])[0]!;
 }
 
-const DAILY_CASES_LIST = _fieldColumn({
-  name: "Daily new cases",
-  dataType: "bigint",
-  isArray: true,
-});
-const DAILY_CASES_TOTAL = _fieldColumn({
-  name: "Total cases",
-  dataType: "bigint",
-  isArray: false,
-});
+const DAILY_CASES_LIST = _fieldColumn({ dataType: "bigint", isArray: true });
+const TOTAL_CASES = _fieldColumn({ dataType: "bigint", isArray: false });
 
 describe("QueryColumn and list fields", () => {
   it("offers a list field only grouping and counting", () => {
@@ -184,18 +161,25 @@ describe("QueryColumn and list fields", () => {
       "group_by",
       "count",
     ]);
-    expect(QueryColumn.getValidAggregations(DAILY_CASES_TOTAL)).toContain(
-      "sum",
-    );
+  });
+
+  it("offers a single-value number field its number aggregations", () => {
+    expect(QueryColumn.getValidAggregations(TOTAL_CASES)).toContain("sum");
   });
 
   it("never treats a list of numbers as numeric", () => {
     expect(QueryColumn.isNumeric(DAILY_CASES_LIST)).toBe(false);
-    expect(QueryColumn.isNumeric(DAILY_CASES_TOTAL)).toBe(true);
   });
 
-  it("treats only a field that keeps every value as a list", () => {
+  it("treats a single-value number field as numeric", () => {
+    expect(QueryColumn.isNumeric(TOTAL_CASES)).toBe(true);
+  });
+
+  it("treats a field that keeps every value as a list", () => {
     expect(QueryColumn.isList(DAILY_CASES_LIST)).toBe(true);
-    expect(QueryColumn.isList(DAILY_CASES_TOTAL)).toBe(false);
+  });
+
+  it("does not treat a single-value field as a list", () => {
+    expect(QueryColumn.isList(TOTAL_CASES)).toBe(false);
   });
 });

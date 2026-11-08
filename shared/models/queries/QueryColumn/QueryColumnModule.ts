@@ -9,6 +9,13 @@ import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/C
 import type { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
+/** Grouping and counting work on a whole list; number aggregates do not. */
+const LIST_AGGREGATIONS: readonly QueryAggregationType.T[] = [
+  "none",
+  "group_by",
+  "count",
+];
+
 function _isList(column: QueryColumn.T): boolean {
   const { baseColumn } = column;
   if (baseColumn.__type !== "ConceptAttribute") {
@@ -23,13 +30,6 @@ function _isList(column: QueryColumn.T): boolean {
     })
     .exhaustive();
 }
-
-/** Grouping and counting work on a whole list; number aggregates do not. */
-const LIST_AGGREGATIONS: readonly QueryAggregationType.T[] = [
-  "none",
-  "group_by",
-  "count",
-];
 
 export const QueryColumnModule = {
   /**

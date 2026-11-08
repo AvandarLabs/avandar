@@ -46,17 +46,30 @@ function _formatGridNumber(value: number, columnName: string): string {
 }
 
 /**
+ * The texts of the items in a list cell. A nested list is flattened into the
+ * same run of items, and a NULL item is left out, so it never leaves a stray
+ * separator.
+ */
+function _listItemTexts(
+  items: readonly unknown[],
+  columnName: string,
+): string[] {
+  return items.flatMap((item) => {
+    if (Array.isArray(item)) {
+      return _listItemTexts(item, columnName);
+    }
+    return item == null ? [] : [_formatCellValue(item, columnName)];
+  });
+}
+
+/**
  * The text of one non-date cell. A list, such as a case type field that
  * keeps every value, shows its values separated by semicolons, which never
  * collide with a number's thousands separator. An empty list is blank.
  */
 function _formatCellValue(value: unknown, columnName: string): string {
   if (Array.isArray(value)) {
-    return value
-      .map((item) => {
-        return _formatCellValue(item, columnName);
-      })
-      .join("; ");
+    return _listItemTexts(value, columnName).join("; ");
   }
   if (typeof value === "number") {
     return _formatGridNumber(value, columnName);

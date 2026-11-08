@@ -248,7 +248,7 @@ describe("QueryFiltersField", () => {
     expect(screen.getByText(/"abc" is not a number/)).toBeInTheDocument();
   });
 
-  // Every filter operator fails on a list in DuckDB, so a field that keeps
+  // Most filter operators fail on a list in DuckDB, so a field that keeps
   // every value is not offered.
   it("leaves a field that keeps every value out of the column dropdown", async () => {
     render(
@@ -268,5 +268,22 @@ describe("QueryFiltersField", () => {
     expect(
       screen.queryByRole("option", { name: "Symptoms", hidden: true }),
     ).toBeNull();
+  });
+
+  it("says so when every column keeps every value and none can be filtered on", () => {
+    render(
+      <AvandarAppProvider>
+        <QueryFiltersField
+          columns={[_listFieldColumn("Symptoms")]}
+          value={StructuredQuery.makeEmpty().filters}
+          onChange={vi.fn()}
+        />
+      </AvandarAppProvider>,
+    );
+
+    expect(
+      screen.getByText("Fields that keep every value cannot be filtered on."),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("query-filters-field")).toBeNull();
   });
 });

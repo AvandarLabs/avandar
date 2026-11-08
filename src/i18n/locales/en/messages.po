@@ -4278,6 +4278,11 @@ msgstr "Start your journey with us"
 #~ msgid "Qwen 2.5 7B (offline)"
 #~ msgstr "Qwen 2.5 7B (offline)"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Fields that keep every value cannot be filtered on."
+msgstr "Fields that keep every value cannot be filtered on."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
 msgstr "Funny"

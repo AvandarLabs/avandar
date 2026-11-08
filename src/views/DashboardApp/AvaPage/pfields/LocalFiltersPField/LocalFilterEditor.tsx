@@ -18,6 +18,7 @@ import type {
 import type { ReactNode } from "react";
 
 type Props = {
+  /** The columns a filter can target: no list column. */
   columns: readonly QueryResult.ColumnWithId[];
   filter: LocalFilter | LegacyLocalFilter;
   onChange: (filter: LocalFilter | LegacyLocalFilter) => void;
@@ -68,14 +69,9 @@ export function LocalFilterEditor({
         <Select
           size="xs"
           label={t`Column`}
-          // A local filter's IN, ILIKE, or = fails on a list column.
-          data={columns
-            .filter((column) => {
-              return !column.isArray;
-            })
-            .map((column) => {
-              return { value: column.id, label: column.name };
-            })}
+          data={columns.map((column) => {
+            return { value: column.id, label: column.name };
+          })}
           value={
             "columnId" in filter
               ? filter.columnId

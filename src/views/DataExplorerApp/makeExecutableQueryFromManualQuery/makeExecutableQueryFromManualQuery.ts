@@ -1,4 +1,5 @@
 import { Model } from "@avandar/models";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
   getCachedDatasetRowCount,
@@ -52,17 +53,45 @@ export async function fetchDatasetRowCount(params: {
 }
 
 /**
+ * Resets each aggregation its column cannot take to `none`, for example a
+ * saved sum on a case type field that keeps every value, which compiles to
+ * `SUM` of a list and fails in DuckDB. Returns the same query when every
+ * aggregation is valid.
+ */
+function _resetUnsupportedAggregations(
+  query: PartialStructuredQuery,
+): PartialStructuredQuery {
+  const unsupportedColumns = query.queryColumns.filter((column) => {
+    const aggregation = query.aggregations[column.id];
+    return (
+      aggregation !== undefined &&
+      !QueryColumn.getValidAggregations(column).includes(aggregation)
+    );
+  });
+  if (unsupportedColumns.length === 0) {
+    return query;
+  }
+  const aggregations = { ...query.aggregations };
+  unsupportedColumns.forEach((column) => {
+    aggregations[column.id] = "none";
+  });
+  return { ...query, aggregations };
+}
+
+/**
  * Returns the manual query to run, with an automatic LIMIT added when the
  * query would return every row of a dataset larger than
  * {@link LARGE_DATASET_ROW_THRESHOLD}. Use it just before a structured query
  * runs, for example when compiling a workspace query to SQL, so a large
- * dataset is never loaded in full by accident.
+ * dataset is never loaded in full by accident. It also resets an aggregation
+ * the column cannot take, such as a sum on a list, to `none`.
  */
 export async function makeExecutableQueryFromManualQuery(params: {
   query: PartialStructuredQuery;
   workspaceId: Workspace.Id;
 }): Promise<ExecutableManualQuery> {
-  const { query, workspaceId } = params;
+  const { workspaceId } = params;
+  const query = _resetUnsupportedAggregations(params.query);
 
   if (!shouldAutoLimitLargeDataset(query)) {
     return { query, didAutoLimit: false };

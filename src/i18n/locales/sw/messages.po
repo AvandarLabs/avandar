@@ -4332,6 +4332,11 @@ msgstr "Anza safari yako nasi"
 #~ msgid "Qwen 2.5 7B (offline)"
 #~ msgstr "Qwen 2.5 7B (offline)"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Fields that keep every value cannot be filtered on."
+msgstr "Huwezi kuchuja kwa sehemu zinazohifadhi thamani zote."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
 msgstr "Inachekesha"

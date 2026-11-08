@@ -1,4 +1,6 @@
+import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
@@ -15,6 +17,7 @@ import {
   LARGE_DATASET_ROW_THRESHOLD,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 vi.mock("@/clients/datasets/DatasetQueryClient", () => {
@@ -43,7 +46,7 @@ function _datasetQuery(): ReturnType<typeof StructuredQuery.makeEmpty> {
           __type: "DatasetColumn",
           id: "dc_1",
           name: "id",
-          dataType: "integer",
+          dataType: "bigint",
           datasetId,
           columnIdx: 0,
         },
@@ -132,6 +135,60 @@ describe("makeExecutableQueryFromManualQuery", () => {
     await makeExecutableQueryFromManualQuery({ query, workspaceId });
 
     expect(DatasetQueryClient.getDatasetMeta).not.toHaveBeenCalled();
+  });
+
+  describe("with a case type field that keeps every value", () => {
+    function _listFieldQuery(
+      aggregation: "sum" | "count",
+    ): ReturnType<typeof StructuredQuery.makeEmpty> {
+      const [column] = QueryColumn.makeFromConceptAttributes([
+        Model.make("ConceptAttribute", {
+          id: "attr_cases",
+          conceptId: "concept_1",
+          workspaceId: "workspace_1",
+          name: "Daily new cases",
+          description: undefined,
+          createdAt: "2026-11-06T00:00:00Z",
+          updatedAt: "2026-11-06T00:00:00Z",
+          dataType: "bigint",
+          mappingType: "dataset_column",
+          isLabel: false,
+          isIdentifier: false,
+          allowManualEdit: false,
+          isArray: true,
+        }) as ConceptAttribute.T,
+      ]);
+      return {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: { __type: "Concept", id: "concept_1", name: "Case" },
+        queryColumns: [column!],
+        aggregations: { [column!.id]: aggregation },
+        limit: 10,
+      } as unknown as ReturnType<typeof StructuredQuery.makeEmpty>;
+    }
+
+    it("resets a saved sum to none so the SQL never sums a list", async () => {
+      const { query } = await makeExecutableQueryFromManualQuery({
+        query: _listFieldQuery("sum"),
+        workspaceId,
+      });
+
+      expect(Object.values(query.aggregations)).toEqual(["none"]);
+      expect(StructuredQuery.toRawDuckDbQuery(query as never)).not.toMatch(
+        /SUM\(/i,
+      );
+    });
+
+    it("keeps a saved count, which works on a list", async () => {
+      const original = _listFieldQuery("count");
+
+      const { query } = await makeExecutableQueryFromManualQuery({
+        query: original,
+        workspaceId,
+      });
+
+      expect(query).toBe(original);
+    });
   });
 });
 

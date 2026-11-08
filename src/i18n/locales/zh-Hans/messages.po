@@ -4163,6 +4163,11 @@ msgstr "与我们一起开始您的旅程"
 #~ msgid "Qwen 2.5 7B (offline)"
 #~ msgstr "Qwen 2.5 7B（离线）"
 
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Fields that keep every value cannot be filtered on."
+msgstr "无法按保留所有值的字段进行筛选。"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
 msgstr "有趣"

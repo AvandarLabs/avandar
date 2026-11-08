@@ -23,3 +23,25 @@ it("omits a deleted local ID without substituting a same-named QueryResult colum
   expect(result.resolvedFilters).toEqual([]);
   expect(result.issues).toEqual([{ target: "local", reason: "missing" }]);
 });
+
+it("reports a saved local filter on a list column instead of applying it", () => {
+  const columnId = uuid<QueryColumn.Id>();
+  const result = makeLocalFilterColumnBindingsFromLocalFilters({
+    filters: [
+      {
+        id: "local",
+        columnId,
+        label: "symptoms",
+        mode: "select_multi",
+        optionsRaw: "",
+        defaultValue: "",
+      },
+    ],
+    valuesById: { local: ["Fever"] },
+    columns: [
+      { id: columnId, name: "Symptoms", dataType: "varchar", isArray: true },
+    ],
+  });
+  expect(result.resolvedFilters).toEqual([]);
+  expect(result.issues).toEqual([{ target: "local", reason: "unsupported" }]);
+});
