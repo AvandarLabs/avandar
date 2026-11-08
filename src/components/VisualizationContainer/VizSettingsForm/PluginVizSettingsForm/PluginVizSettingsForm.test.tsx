@@ -279,13 +279,13 @@ describe("PluginVizSettingsForm", () => {
   it("shows a loading status while the manifest loads", () => {
     mocks.entries = [
       {
-        id: EPIDEMIOLOGY_ID,
+        id: "avandar.pending",
         loadManifest: () => {
           return new Promise(() => {});
         },
       },
     ];
-    _renderForm();
+    _renderForm({ ...CONFIG, pluginId: "avandar.pending" });
 
     expect(
       screen.getByRole("status", { name: "Loading chart settings" }),
