@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useBucketPeriodFormatter } from "@/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter";
-import { useBucketValueFormatter } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/useBucketValueFormatter";
+import { useBucketValueFormatter } from "@/components/caseFields/useBucketValueFormatter/useBucketValueFormatter";
 import type { DataGridPeriodFormatters } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
 
 /**

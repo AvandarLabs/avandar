@@ -6,11 +6,12 @@ import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFor
 const NUMBER_OPTIONS: Intl.NumberFormatOptions = { maximumFractionDigits: 2 };
 
 /**
- * A function that formats one period's value for `RecordFieldPeriodTable`,
- * by the field's data type. Every type reads as it does elsewhere on the
- * record page, except that numbers keep at most two fraction digits: a
- * period's value is usually an average, and a long tail of digits makes the
- * column hard to scan.
+ * A function that formats one period's value for a period table, by the
+ * field's data type. Every type reads as it does elsewhere on the record
+ * page, except that numbers keep at most two fraction digits: a period's
+ * value is usually an average, and a long tail of digits makes the column
+ * hard to scan. Use it wherever a per-period value is shown, for example the
+ * record page's period table and the Data Explorer's grid.
  */
 export function useBucketValueFormatter(
   valueDataType: AvaDataType.T,

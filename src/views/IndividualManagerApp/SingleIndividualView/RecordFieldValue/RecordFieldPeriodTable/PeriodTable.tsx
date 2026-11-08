@@ -1,8 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { useBucketGrainLabels } from "@/components/caseFields/useBucketGrainLabels/useBucketGrainLabels";
 import { useBucketPeriodFormatter } from "@/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter";
+import { useBucketValueFormatter } from "@/components/caseFields/useBucketValueFormatter/useBucketValueFormatter";
 import css from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.module.css";
-import { useBucketValueFormatter } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/useBucketValueFormatter";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ReactNode } from "react";
