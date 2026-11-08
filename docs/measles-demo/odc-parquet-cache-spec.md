@@ -41,10 +41,16 @@ goes through the same Storage limit and nothing stricter.
 
 ### 1. Who builds the copy: the pipeline server
 
-The pipeline server (`apps/pipeline-server`, Bun on Fly) already turns CSVs
-into ZSTD Parquet with Node DuckDB (`transformedCsvsToParquetBlobs`) and
-uploads them to `opendata` for pipeline listings. It has a disk and no
-isolate memory ceiling, so it can stream a source of any size:
+A build is an on-demand copy of one listing, started when a user adds it to
+a workspace (section 2). It is not part of the scheduled data pipeline and
+transforms nothing: it downloads the source, converts it to Parquet without
+changing any value, uploads it, and records it. It runs on the pipeline
+server only because that server is the right host. The pipeline server
+(`apps/pipeline-server`, Bun on Fly) already turns CSVs into ZSTD Parquet
+with Node DuckDB (`transformedCsvsToParquetBlobs`) and uploads them to
+`opendata` for pipeline listings. It has a disk and no isolate time or
+memory ceiling, so it can stream a source of any size, where the edge
+function cannot:
 
 1. Read the listing with the service role.
 2. Stream the source to a temp file on disk. A CKAN resource is found and
@@ -79,6 +85,14 @@ dataset itself cannot be loaded marks the listing invalid through
 pipeline server, authorized with `AVA_PIPELINE_SERVER_SECRET` like the
 existing run route, carrying the build id the edge function claimed. It
 answers `202` straight away and builds in the background.
+
+**The pipeline server runs as an always-on server.** Its Fly config keeps
+one machine running (`auto_stop_machines = "off"`,
+`min_machines_running = 1`), like the dev-fanout server. Fly would otherwise
+stop a machine with no open requests, and a background build outlives the
+request that started it: DOB Violations takes over four minutes to download.
+A build is still lost when a deploy or crash restarts the machine. The
+lost-build rule in section 2 recovers it on the listing's next load.
 
 **One build per listing** is enforced in the database, not in a machine's
 memory, so it holds across Fly machines:
@@ -177,7 +191,7 @@ and its cache columns are removed.
 |---|---|---|
 | S1 | Drop the `opendata` authenticated write policies. **Done.** | none |
 | S2 | Pipeline server: the cache builder (stream source to disk, DuckDB to Parquet, upload) with every dependency injected. **Done.** | none |
-| S3 | Pipeline server: the build route, its auth, and one-build-per-listing | S2 |
+| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. The always-on Fly config is **done**. | S2 |
 | S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, triggering S3) | S3, S4 |
 | S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
@@ -190,9 +204,11 @@ and its cache columns are removed.
    production's limit allows them. DOB Violations is 79.7 MB as ZSTD
    Parquet, which the 50 MB local limit in `supabase/config.toml` would
    already refuse. Manual uploads already depend on this same number.
-2. **Fly machine sizing.** The builder needs disk for the source CSV plus
-   the Parquet. The pipeline server's volume and memory size should be
-   checked against the largest listing we expect to cache.
+2. **Fly machine sizing and cost.** The builder needs disk for the source
+   CSV plus the Parquet (870 MB for DOB Violations). The pipeline server's
+   disk and memory should be checked against the largest listing we expect
+   to cache. Keeping one machine always on also means paying for it around
+   the clock instead of only while it serves requests.
 3. **Storage cost.** Copies are only built for listings a workspace adds, so
    cost grows with use, not with the catalog's size. Pre-building copies for
    popular listings is a later option.
