@@ -1,4 +1,5 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
+import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 
 /** A dataset as the data agent sees it: names and column types, no rows. */
 export type DataAgentDataset = {
@@ -20,10 +21,11 @@ const SHORT_TYPE_BY_DATA_TYPE: Record<string, string> = {
 };
 
 /**
- * The fixed instructions. They come first and never change between turns, so
- * providers can cache them.
+ * The fixed v1 instructions. They come first and never change between turns,
+ * so providers can cache them. Tabs opened before v2 shipped still request
+ * this text, so it must stay as it is.
  */
-const DATA_AGENT_INSTRUCTIONS = `You are Avandar's data assistant in the Data Explorer. The people you help run programs at nonprofits and public agencies; most are not engineers. Use plain words.
+const DATA_AGENT_INSTRUCTIONS_V1 = `You are Avandar's data assistant in the Data Explorer. The people you help run programs at nonprofits and public agencies; most are not engineers. Use plain words.
 
 TOOLS
 - run_query runs one DuckDB SELECT and shows the result to the user as a table, or as a chart when you set "chart". You never see the rows, only the row count and column names. A result ends your turn, so run only the final query that answers the question, never a query to explore the data first. Write "summary" as your answer to the user: one or two plain sentences saying what the result shows, which dataset it uses, and every choice you made (the period, how you read a word like "most", what you left out). No numbers or findings.
@@ -56,6 +58,30 @@ ASKING
 FIXING
 - If run_query reports an error or no rows, fix the SQL and run it again. If it still finds nothing, tell the user plainly what you looked for.`;
 
+const V1_OPENING = "You are Avandar's data assistant in the Data Explorer.";
+
+const CURRENT_PAGE_RULES = `
+
+CURRENT PAGE
+- A user message can start with <current_page>...</current_page>: what the user has on screen. "This", "here", "this dataset", and "this chart" mean what it lists. "Unchanged since the last message" means the last block still holds.
+- To change a chart listed there, start from its SQL. When "this" could mean several listed charts and the user named none, ask_user with their titles as options.
+- A question that does not refer to the page is answered from DATASETS as usual. Never mention the block to the user.`;
+
+/**
+ * v2: the agent answers on every page. Same rules as v1, a page-neutral
+ * opening, and how to read the current page block.
+ */
+const DATA_AGENT_INSTRUCTIONS_V2 =
+  DATA_AGENT_INSTRUCTIONS_V1.replace(
+    V1_OPENING,
+    "You are Avandar's data assistant. You answer from any page of the app.",
+  ) + CURRENT_PAGE_RULES;
+
+const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
+  "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,
+  "data-agent-v2": DATA_AGENT_INSTRUCTIONS_V2,
+};
+
 function _formatDatasetLine(
   alias: string,
   dataset: Readonly<DataAgentDataset>,
@@ -72,13 +98,17 @@ function _formatDatasetLine(
 }
 
 /**
- * Builds the data agent's system prompt: fixed instructions, then the
- * datasets (aliases in the app's `SqlTableAlias` order), then today's date.
- * Everything before the date stays the same between turns, so providers can
- * cache it.
+ * Builds the system prompt for one prompt version: that version's fixed
+ * instructions, then the datasets (aliases in the app's `SqlTableAlias`
+ * order), then today's date. Everything before the date stays the same
+ * between turns, so providers can cache it.
  */
 export function buildDataAgentSystemPrompt(
-  options: Readonly<{ datasets: readonly DataAgentDataset[]; today: string }>,
+  options: Readonly<{
+    datasets: readonly DataAgentDataset[];
+    today: string;
+    promptId: DataAgentPromptId;
+  }>,
 ): string {
   const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
   const datasetLines = aliases.map((entry) => {
@@ -87,7 +117,7 @@ export function buildDataAgentSystemPrompt(
     });
     return dataset ? _formatDatasetLine(entry.alias, dataset) : "";
   });
-  return `${DATA_AGENT_INSTRUCTIONS}
+  return `${INSTRUCTIONS_BY_PROMPT_ID[options.promptId]}
 
 DATASETS
 ${datasetLines.join("\n")}

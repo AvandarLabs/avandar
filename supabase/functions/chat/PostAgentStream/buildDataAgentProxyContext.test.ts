@@ -26,10 +26,15 @@ describe("buildDataAgentProxyContext", () => {
       ],
       datasets: DATASETS,
       today: "2026-11-08",
+      promptId: "data-agent-v1",
     });
 
     expect(context.systemPrompt).toBe(
-      buildDataAgentSystemPrompt({ datasets: DATASETS, today: "2026-11-08" }),
+      buildDataAgentSystemPrompt({
+        datasets: DATASETS,
+        today: "2026-11-08",
+        promptId: "data-agent-v1",
+      }),
     );
     expect(
       context.tools?.map((tool) => {

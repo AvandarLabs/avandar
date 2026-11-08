@@ -62,6 +62,7 @@ export function buildDataAgentProxyContext(
     systemPrompt: buildDataAgentSystemPrompt({
       datasets: options.datasets,
       today: options.today,
+      promptId: "data-agent-v1",
     }),
     tools: DATA_AGENT_TOOLS.map((tool) => {
       return {

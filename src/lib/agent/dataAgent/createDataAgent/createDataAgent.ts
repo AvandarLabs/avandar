@@ -1,5 +1,6 @@
 import { Agent } from "@earendil-works/pi-agent-core";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
@@ -7,6 +8,7 @@ import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type {
@@ -147,6 +149,7 @@ function _createAgent(
       systemPrompt: buildDataAgentSystemPrompt({
         datasets: options.datasets,
         today: options.today,
+        promptId: options.promptId ?? DATA_AGENT_PROMPT_ID,
       }),
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
@@ -178,6 +181,11 @@ export type CreateDataAgentOptions = {
   today: string;
   /** Lets providers route a conversation's calls to one prompt cache. */
   sessionId?: string;
+  /**
+   * The prompt version, which must match what the proxy serves for it.
+   * Defaults to `DATA_AGENT_PROMPT_ID`.
+   */
+  promptId?: DataAgentPromptId;
   /**
    * Rows the model sees after each query, to check its answer. Only for a
    * model on the user's device; a hosted model never sees rows.

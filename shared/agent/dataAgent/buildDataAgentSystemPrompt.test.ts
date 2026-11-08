@@ -23,6 +23,7 @@ describe("buildDataAgentSystemPrompt", () => {
     const prompt = buildDataAgentSystemPrompt({
       datasets: DATASETS,
       today: "2026-11-07",
+      promptId: "data-agent-v1",
     });
 
     // Aliases follow dataset id order, as in SqlTableAlias.
@@ -36,13 +37,43 @@ describe("buildDataAgentSystemPrompt", () => {
     const first = buildDataAgentSystemPrompt({
       datasets: DATASETS,
       today: "2026-11-07",
+      promptId: "data-agent-v1",
     });
     const second = buildDataAgentSystemPrompt({
       datasets: DATASETS,
       today: "2026-11-08",
+      promptId: "data-agent-v1",
     });
 
     expect(first.endsWith("Today is 2026-11-07.")).toBe(true);
     expect(first.slice(0, -12)).toBe(second.slice(0, -12));
+  });
+
+  it("keeps v1's text exactly for tabs opened before the deploy", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-08",
+      promptId: "data-agent-v1",
+    });
+
+    expect(
+      prompt.startsWith(
+        "You are Avandar's data assistant in the Data Explorer.",
+      ),
+    ).toBe(true);
+    expect(prompt).not.toContain("CURRENT PAGE");
+  });
+
+  it("tells v2 how to read the current page block", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-08",
+      promptId: "data-agent-v2",
+    });
+
+    expect(prompt.startsWith("You are Avandar's data assistant.")).toBe(true);
+    expect(prompt).toContain("CURRENT PAGE");
+    expect(prompt).toContain("<current_page>");
+    expect(prompt).toContain("Unchanged since the last message");
   });
 });
