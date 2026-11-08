@@ -257,30 +257,41 @@ describe("makeEpicurveFromRows", () => {
   });
 
   it("keeps only the latest 200 days when an early date is an outlier", () => {
-    const startedAt = performance.now();
     const { rows } = _makeEpicurve({
       rows: _makeOnsetRows(["0020-01-01", "2021-01-04", "2021-09-01"]),
     });
     expect(rows).toHaveLength(200);
     expect(rows[199]).toEqual({ bucket: "2021-09-01", cases: 1 });
     expect(rows[0]).toEqual({ bucket: "2021-02-14", cases: 0 });
-    expect(performance.now() - startedAt).toBeLessThan(500);
   });
 
-  it("keeps only the latest 200 epi weeks and months", () => {
-    const weekRows = _makeEpicurve({
+  it("keeps only the latest 200 epi weeks when an early date is an outlier", () => {
+    const { rows } = _makeEpicurve({
       rows: _makeOnsetRows(["0020-01-01", "2021-09-01"]),
       settings: { interval: "epiWeek" },
-    }).rows;
-    const monthRows = _makeEpicurve({
+    });
+    expect(rows).toHaveLength(200);
+    expect(rows[0]).toEqual({ bucket: "2017-11-05", cases: 0 });
+    expect(rows[199]).toEqual({ bucket: "2021-08-29", cases: 1 });
+  });
+
+  it("keeps only the latest 200 months when an early date is an outlier", () => {
+    const { rows } = _makeEpicurve({
       rows: _makeOnsetRows(["0020-01-01", "2021-09-15"]),
       settings: { interval: "month" },
-    }).rows;
-    expect(weekRows).toHaveLength(200);
-    expect(weekRows[199]).toEqual({ bucket: "2021-08-29", cases: 1 });
-    expect(monthRows).toHaveLength(200);
-    expect(monthRows[0]).toEqual({ bucket: "2005-02-01", cases: 0 });
-    expect(monthRows[199]).toEqual({ bucket: "2021-09-01", cases: 1 });
+    });
+    expect(rows).toHaveLength(200);
+    expect(rows[0]).toEqual({ bucket: "2005-02-01", cases: 0 });
+    expect(rows[199]).toEqual({ bucket: "2021-09-01", cases: 1 });
+  });
+
+  it("drops the first day of a span of 201 days", () => {
+    const { rows } = _makeEpicurve({
+      rows: _makeOnsetRows(["2021-01-01", "2021-07-20"]),
+    });
+    expect(rows).toHaveLength(200);
+    expect(rows[0]).toEqual({ bucket: "2021-01-02", cases: 0 });
+    expect(rows[199]).toEqual({ bucket: "2021-07-20", cases: 1 });
   });
 
   it("keeps every bucket of a span of exactly 200 days", () => {

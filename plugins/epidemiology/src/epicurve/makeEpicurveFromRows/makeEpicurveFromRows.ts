@@ -175,8 +175,8 @@ function _getRankedStackValues(
 
 /**
  * One series per stack-by value for the 8 values with the most cases, then
- * "Other" for the rest. Without a stack-by column, or without any dated
- * row, a single "Cases" series.
+ * "Other" for the rest. Without a stack-by column, or when no kept bucket
+ * has any cases, a single "Cases" series.
  */
 function _getSeriesFromTotals(options: {
   totals: ReadonlyMap<StackValue, number>;
@@ -334,7 +334,8 @@ function _makeChartFromSeries(
 /**
  * Turns line-list or count rows into an epidemic curve: cases per day, epi
  * week, or month, as touching stacked bars. Every bucket between the first
- * and last date is kept, so a gap in an outbreak shows as zero. With a
+ * and last date is kept, so a gap in an outbreak shows as zero. At most the
+ * latest 200 buckets are kept, and rows before them are dropped. With a
  * stack-by column, such as vaccination status, the 8 values with the most
  * cases get their own series and the rest are summed as "Other".
  */
