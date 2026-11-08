@@ -11,7 +11,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D01 | Use Pi as a pinned library, not a fork | Spike |
 | D02 | Run the agent loop in the browser; the server is a thin proxy | Spike |
 | D03 | The proxy trusts nothing about the model but its id | Spike |
-| D04 | The browser builds the prompt | Open |
+| D04 | Move the prompt to the proxy before the agent is on for everyone | Recommended |
 | D05 | The model never sees rows, only a result's shape | Spike |
 | D06 | A clean query result ends the turn | Spike |
 | D07 | Query errors go back to the model with literals removed | Spike |
@@ -25,10 +25,20 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D15 | The agent is off by default, behind a switch | Spike |
 | D16 | The eval is the gate for every harness change | Spike |
 | D17 | The chat function reports billed cost | Spike |
-| D18 | Metering and plan budgets live in the proxy | Proposed |
+| D18 | Metering and plan budgets live in the proxy | Deferred (roadmap) |
 | D19 | A local embedding router picks tool packs for the full agent | Proposed |
 | D20 | Mutating tools ask for confirmation | Proposed |
-| D21 | Fix today's harness for the N11 bug, or not | Open |
+| D21 | Fix today's harness for the N11 bug | Done |
+| D22 | Avandar chooses every model; the composer has no model picker | Built |
+| D23 | Offline mode is the only choice users make | Built |
+| D24 | One offline bundle, sized for a 16 GB computer | Built |
+| D25 | Offline answers run the same Pi agent on in-browser models | Built |
+| D26 | The offline agent gets help a hosted model never gets | Built |
+| D27 | Offline questions are answered from query plans | Built |
+| D28 | A rules-first router, with a model only when unsure | Built |
+| D29 | The offline eval runs real WebLLM in a headless browser | Built |
+| D30 | The offline model | See entry |
+| D31 | Today's chat defaults to Claude Sonnet 5 | Open |
 
 ---
 
@@ -88,20 +98,28 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Costs.** A new model needs a roster change and a deploy of the edge
   function.
 
-## D04. The browser builds the prompt (open)
+## D04. Move the prompt to the proxy before the agent is on for everyone (recommended)
 
-- **Decision in the spike.** The system prompt and tools are built in the
-  browser and sent with each request, as Pi's proxy expects.
-- **Trade-off for Pablo.** The prompt is visible to anyone who opens the
-  browser's dev tools, and a user could send their own prompt through the
-  proxy. Both are bounded: the proxy only serves allowlisted models with
-  capped output, and D18's budgets cap spend per user. The alternative is
-  for the proxy to swap in a server-held prompt by version id, which keeps
-  prompts private and blocks free-form use, at the cost of splitting prompt
-  code between browser and server.
-- **Recommendation.** Keep it in the browser until metering (D18) ships;
-  move to server-held prompts only if prompt privacy matters to the
-  business.
+- **Today.** The system prompt and tools are built in the browser and sent
+  with each request, as Pi's proxy expects.
+- **The risk.** Anyone signed in can send their own prompt through the
+  proxy and use it as a free model endpoint, within the allowlisted models
+  and the 4,000-token output cap. The spike's earlier recommendation relied
+  on D18's budgets to bound that, and D18 is now deferred, so nothing caps
+  it.
+- **Recommendation.** Keep the browser-built prompt while the agent is
+  behind its switch (demo and internal use). Before the agent is on by
+  default, move the prompt to the proxy: the proxy builds the system prompt
+  and tool list itself from a versioned template in `shared/` and the
+  workspace schema it loads (as today's chat function does), the browser
+  sends only the conversation, and the proxy rejects requests whose tools do
+  not match the version. This closes the free-endpoint hole without metering,
+  keeps prompts private, and lets a prompt change ship without a client
+  release. The offline agent keeps building its prompt on the device, since
+  no request leaves it.
+- **Cost.** About a day: the prompt builder moves to `shared/`, the proxy
+  loads the schema, and the browser stops sending `systemPrompt` and
+  `tools`.
 
 ## D05. The model never sees rows, only a result's shape
 
@@ -233,13 +251,17 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Why.** Cost could not be measured before. The refactor changes no
   behavior; the chat function's 121 tests pass.
 
-## D18. Metering and plan budgets live in the proxy (proposed)
+## D18. Metering and plan budgets live in the proxy (deferred, on the roadmap)
 
+- **Decision (Pablo, 2026-11-07).** Not needed for the demo. Deferred, and
+  tracked as a required item in [roadmap.md](roadmap.md) before the agent is
+  on by default.
 - **Proposal.** The proxy records each request's billed cost (Pi reports it
   in the `done` event) against the user, workspace, and plan, and refuses
   requests past the plan's monthly AI budget with a readable message.
   Budgets: $2.00 per user on basic, $7.50 on premium, and a fixed cap on
-  free accounts (**Open:** Pablo to set the free cap).
+  free accounts (still to be set). Offline answers cost nothing and are not
+  metered.
 
 ## D19. A local embedding router picks tool packs for the full agent (proposed)
 
@@ -253,14 +275,187 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Proposal.** Tools that create, change, or delete anything declare it,
   and `beforeToolCall` shows the user what will happen before it runs.
 
-## D21. Fix today's harness for the N11 bug, or not (open)
+## D21. Fix today's harness for the N11 bug (done)
 
 - **Finding.** The eval found a bug the audit missed: asked about New York
   City, today's harness on GPT-5.6 Terra filtered `Admin2 IN ('Kings',
   'Richmond', ...)` without the state, which adds Kings County, CA and the
   Richmond counties in Virginia, Georgia, and North Carolina. Claude Sonnet
-  5 used Manhattan alone. The Pi agent's prompt has a rule for it ("names
-  repeat across parent areas").
-- **Question for Pablo.** Port that one prompt rule to today's `chat`
-  function on `demo/measles` now, or leave today's harness as is until the
-  agent replaces it.
+  5 used Manhattan alone.
+- **Decision (Pablo, 2026-11-07).** Fix it on this branch so it reaches
+  `demo/measles` with the merge.
+- **Done.** Commit `7589f0885` adds one analyst check to today's chat prompt
+  (`buildSystemPrompts.ts`): place names repeat across larger areas, so
+  filter the state too, and New York City is five named counties. N11 now
+  passes 4 of 4 runs (Claude Sonnet 5 twice, GPT-5.6 Terra twice). A full
+  run on Sonnet 5 scored 42/45: the three misses were one follow-up chain
+  (F01 read the CSV file name as a table, and F02 and F03 build on it), and
+  the chain passed 10 of 10 on two reruns, so it is model noise, not the
+  change.
+
+## D22. Avandar chooses every model; the composer has no model picker (built)
+
+- **Decision (Pablo, 2026-11-07).** Users no longer pick a chat model.
+- **Built.** The picker, its catalog hooks, and its stored choice are gone
+  from the app. The `chat` function always answers with its default model
+  and ignores a `model` sent by an older client. The PDF table assistant
+  stopped sending one too. The agent proxy already served only its own
+  allowlist (D03).
+- **Why.** Cost control (D10, D11) only holds if the user cannot pick a
+  frontier model, and a fixed model is the only way the eval's numbers
+  describe what users get.
+
+## D23. Offline mode is the only choice users make (built)
+
+- **Decision (Pablo, 2026-11-07).** The one control left under the message
+  box is offline mode. With it on, chat runs only on in-browser models.
+- **Built.** `OfflineModeControl` replaces the picker. Before the models are
+  downloaded it opens a dialog that says what offline mode does (runs on
+  this computer, works without internet, nothing leaves the device, slower
+  and less accurate) and offers one button, "Download offline models". After
+  the download it toggles offline mode; the dialog also removes the
+  download. It is disabled, with the reason, in a browser without WebGPU.
+  Offline mode also starts on its own when the browser is offline and the
+  models are downloaded, and when an online request fails the user is
+  offered "Answer offline". That offer could only decline before this
+  branch (it had no accept button); it works now.
+- **Offline needs no connection to start.** The agent keeps the workspace's
+  dataset list for the browser tab and reads it when the connection is gone.
+
+## D24. One offline bundle, sized for a 16 GB computer (built)
+
+- **Decision (Pablo, 2026-11-07).** No per-model choice offline; the 24 GB
+  and 32 GB models are gone; the limit is a 16 GB computer running Chrome,
+  the app, and DuckDB.
+- **Built.** `OFFLINE_MODEL_BUNDLE` in
+  `shared/models/chat/LocalChatModel/LocalChatModel.constants.ts` names the
+  model for each job (answer, router, and optionally escalation). A test
+  keeps the bundle's peak resident model memory under **4,500 MB**, with one
+  large model resident at a time: on a 16 GB Mac, macOS lets the GPU use
+  about 10.7 GB, and Chrome, the app, and DuckDB-Wasm with a few large
+  datasets need most of what is left.
+- **Memory is counted at the app's context window.** WebLLM's published
+  figures assume 4,096 tokens; the app uses 8,192, which adds the extra
+  KV cache (about 576 MB for Qwen3 4B).
+
+## D25. Offline answers run the same Pi agent on in-browser models (built)
+
+- **Decision.** Offline mode runs the Pi data agent (D01 to D09), not a
+  separate pipeline: same loop, tools, host, question cards, and caps.
+- **How.** `createLocalModelStreamFn` is a Pi stream function backed by
+  WebLLM. Each step is one completion decoded under a JSON Schema of the
+  allowed actions (one per tool, plus a plain reply), so a small model
+  cannot return malformed JSON or call a tool that does not exist. The old
+  multi-pass offline pipeline stays only for chat outside the Data
+  Explorer.
+- **Why.** One agent to maintain and evaluate, and every improvement to the
+  tools or host reaches both modes.
+
+## D26. The offline agent gets help a hosted model never gets (built)
+
+- **Decision.** A model on the device may read the data, because nothing
+  leaves the device. The offline agent uses that:
+  - **A profile of every dataset**, computed once per conversation in
+    DuckDB: row count, date ranges, and each text column's values (all of
+    them when there are 12 or fewer).
+  - **The question's values as stored.** Every one-to-three-word run in the
+    question is looked up in the text columns before the model runs, so it
+    filters on `'US'` instead of guessing `'United States'`, and a name
+    found in different columns of different datasets (Georgia) is flagged
+    for a question to the user.
+  - **The first rows of each result**, so the model checks its answer and
+    fixes the query before replying. (The hosted agent never sees rows,
+    D05.)
+  - **A query is required** before the agent may reply to a data question:
+    the reply action is left out of the schema until a tool has answered.
+- **No consent prompt offline.** Values never cross a boundary, so the
+  offline host approves them without asking.
+
+## D27. Offline questions are answered from query plans (built)
+
+- **Decision.** The offline model's main tool is `plan_query`, not SQL. It
+  fills slots: measures, filters, an explicit or relative period, a time
+  grain, groups, a calculation (per person, ratio, 7-day average, running
+  total), the order, and whether to keep each group's top row. Tested code
+  (`src/lib/agent/dataAgent/queryPlan`) compiles the plan to DuckDB SQL.
+  `run_query` stays for questions a plan cannot express.
+- **Why.** Reading Qwen3 4B's failures with SQL showed the model knew what
+  to compute but slipped writing it: "January 2021" became all of 2021,
+  "last year" counted from today, a population was summed across days,
+  windows were malformed. Filling slots is the semantic-layer pattern small
+  models handle well, and the compiler gets the SQL right every time,
+  including the population rule (largest value per place, then summed) and
+  calculations over the whole series before the period filter.
+- **Errors teach.** A bad plan comes back with what to fix, such as "t0 has
+  no column deaths. Its columns: ..." or "date is not a number column".
+
+## D28. A rules-first router, with a model only when unsure (built)
+
+- **Decision.** Each offline message is routed as a data question or chat.
+  Rules settle the clear cases (greetings, thanks, how-to questions; any
+  message using analysis words or naming a dataset). Only an unclear
+  message goes to a schema-constrained model call. This is the cheap-first
+  pattern of a Jev-style classifier, and it is the first piece of the full
+  agent's router (D19).
+- **Why.** A model call per message cost several seconds and flushed the
+  answer model's cached prompt.
+
+## D29. The offline eval runs real WebLLM in a headless browser (built)
+
+- **Decision.** `--harness pi-local` runs the app's offline agent in Node,
+  with every model call answered by WebLLM in a headless Chromium with
+  WebGPU (Metal on this Mac): the same engine, files, and quantization the
+  app downloads. Models load from a persistent profile in `.temp/ai-eval/`.
+- **Costs.** Runs are slow (one GPU, one request at a time) and measure a
+  64 GB M4 Pro, which is faster than a 16 GB laptop; latency figures are a
+  lower bound.
+
+
+## D30. The offline model: Qwen3 4B, alone (built)
+
+- **Decision.** The bundle is one model, Qwen3 4B (`Qwen3-4B-q4f16_1-MLC`,
+  about 2.2 GB to download, about 4.0 GB of GPU memory at the app's 8,192
+  token window), for answering and routing, with thinking off.
+- **How it was chosen.** Every model WebLLM ships that fits the 16 GB
+  budget, including Gemma 4 E2B (the newest, which needs WebLLM 0.2.86), ran
+  the same 20-question screen on the final harness:
+
+  | Model | GPU memory | Screen (20) | Median time |
+  |---|---|---|---|
+  | **Qwen3 4B** | 4.0 GB at 8k tokens | **12** | 15 s |
+  | Qwen3.5 4B | 3.9 GB | 10 | 14 s |
+  | Qwen2.5 Coder 3B | 2.5 GB | 8 | 25 s |
+  | Gemma 4 E2B | 3.4 GB | 2 | 26 s |
+  | Phi-4 mini | 3.4 GB | 2 | 19 s |
+  | Llama 3.2 3B | 2.3 GB | 1 | 14 s |
+  | Ministral 3 3B | 2.9 GB | 0 | 35 s |
+  | Qwen3.5 2B | 2.2 GB | 0 | 20 s |
+
+  The models near zero wrote invalid SQL (unquoted columns, invented
+  columns and joins), not just badly formatted calls: the parser fixes
+  (closing braces, retrying unreadable calls) were in place for this
+  screen, and Gemma 4 stayed at 2.
+- **Escalation adds nothing.** Qwen3 4B with Qwen3.5 4B taking over after a
+  failed or empty query scored the same 26/45 with the same misses: the
+  offline model's wrong answers return rows, so nothing triggers the
+  switch. One model also keeps the download at 2.2 GB.
+- **WebLLM stays at 0.2.84.** The only newer model that fits (Gemma 4 E2B)
+  did not earn the upgrade.
+
+## D31. Today's chat defaults to Claude Sonnet 5 (open)
+
+- **Situation.** With the picker gone (D22), every online chat turn that
+  does not go through the agent uses today's `chat` function on its default,
+  Claude Sonnet 5: about $0.024 a question, or about 80 questions on a basic
+  user's $2 monthly budget.
+- **Evidence.** Today's harness on Claude Haiku 5.5 scored 45, 44, and 44 of
+  45 at about $0.0013 a question ([eval.md](eval.md)), the same accuracy as
+  Sonnet 5 at about 1/18th of the cost.
+- **Options for Pablo.**
+  1. Switch today's default to Haiku 5.5 now: a one-line change, and a
+     full eval run to confirm.
+  2. Turn the agent on by default for the Data Explorer on `demo/measles`
+     (about $0.0003 a question), keeping today's chat for dashboards.
+  3. Leave Sonnet 5 until the agent replaces today's chat everywhere.
+- **Recommendation.** Option 1 now, option 2 for the demo once you have
+  tried the agent there.

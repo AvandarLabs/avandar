@@ -87,6 +87,64 @@ deaths in georgia") left out the "Out of GA" rows, against the prompt's
 rule, for a total 4% low. It ran without error, so escalation could not
 catch it.
 
+## Offline mode
+
+The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
+Pro). Every run below is Qwen3 4B unless the row says otherwise. Times are
+per answer with one conversation at a time; the first answer of a
+conversation also loads the model and profiles the data.
+
+### Building the harness (Qwen3 4B, all 45 questions)
+
+| Harness | Correct | Needless questions | Notes |
+|---|---|---|---|
+| The online agent's prompt and tools, unchanged | 8/45 | 0 | Replied in words instead of querying, guessed "United States" for a stored "US", ignored "monthly". |
+| Offline harness, SQL (dataset profile, stored values, first rows to check, query required) | 28/45 | 0 | Remaining misses: invented date limits, per-person math, combining datasets, windows. |
+| Offline harness, query plans | 17/45 | 16 | Copied the profile's example values into filters; asked "which US?" because US is stored in two columns. |
+| Query plans, after the fixes below | 20/45 | 0 | Slot errors: daily instead of monthly, missing groups. Plans stay behind an option; SQL is the default. |
+
+### Choosing the model (20-question screen, final harness)
+
+Every WebLLM model that fits the 16 GB budget, on every other question
+(all categories but follow-ups):
+
+| Model | GPU memory | Correct | Median time |
+|---|---|---|---|
+| **Qwen3 4B** | 4.0 GB at 8k tokens | **12/20** | 15 s |
+| Qwen3.5 4B | 3.9 GB | 10/20 | 14 s |
+| Qwen2.5 Coder 3B | 2.5 GB | 8/20 | 25 s |
+| Gemma 4 E2B (newest; needs WebLLM 0.2.86) | 3.4 GB | 2/20 | 26 s |
+| Phi-4 mini | 3.4 GB | 2/20 | 19 s |
+| Llama 3.2 3B | 2.3 GB | 1/20 | 14 s |
+| Ministral 3 3B | 2.9 GB | 0/20 | 35 s |
+| Qwen3.5 2B | 2.2 GB | 0/20 | 20 s |
+
+### Final (all 45 questions)
+
+| Setup | Correct | Needless | Missed | Median / p90 time |
+|---|---|---|---|---|
+| **Offline: Qwen3 4B** (the bundle) | **26/45** | 0 | 1 | 15 s / 24 s |
+| Offline: Qwen3 4B, Qwen3.5 4B after a failed query | 26/45 | 0 | 1 | 15 s / 28 s |
+| Online agent, Haiku 5.5 with Sonnet 5.5 (regression check) | 44/45 | 0 | 0 | 2.4 s / 3.5 s |
+
+Qwen3 4B scored 26 to 28 across runs with different prompt wording; which
+borderline questions pass moves between runs, the total does not. It
+misses what needs several steps at once: per-person rates, combining two
+datasets, top day per group, running totals. The online regression miss
+(N05) passed 4 of 4 reruns. Times are on a 64 GB M4 Pro; a 16 GB laptop
+will be slower.
+
+Fixes made from reading the answers, all generic:
+
+| Fix | Why |
+|---|---|
+| No example values for many-valued columns in the profile | Small models copied them into filters. |
+| Ambiguity is flagged only across unrelated columns in different datasets | "US" in `iso2` and `Country_Region` is one thing; Georgia as a state and a country is two. |
+| The longest stored-value match wins | "York" (a county) matched inside "New York". |
+| Plan filters checked against the data before running; two filters on one column merged; a period ending on the data's last date includes it | Invented values, accidental empty results, a lost last day. |
+| Unclosed braces closed; an unreadable tool call goes back to the model as a failed call | Qwen3.5 2B and Ministral stopped one brace short; Gemma 4 looped to the token limit. Each had been read as a final answer. |
+| Rules-first router; one system prompt per conversation; the model's own output replayed verbatim | Speed: WebLLM reuses its cache only for an exact prefix (0.5 s instead of 6 s for a 2,000-token prompt). |
+
 ## How the eval works
 
 | Part | File | What it does |
@@ -97,6 +155,7 @@ catch it.
 | Graders | `grading/ResultChecks.ts`, `grading/ResultMatchers.ts` | Find truth rows in any reasonable result shape: long or wide, months as dates, text, or year and month columns, ratios or percents. |
 | Today's harness | `harnesses/baseline/` | Runs the `chat` edge function's own `runChatTurn` through a Deno process (`supabase/functions/_eval/runChatTurnCli.ts`) and plays the Data Explorer's part: alias rewriting, local lookups, automatic matches, question cards, and the consent check on filter values. |
 | Pi agent | `harnesses/pi/` | Runs `src/lib/agent/dataAgent` in Node with a host backed by DuckDB and the simulated user, calling OpenRouter directly. |
+| Offline agent | `harnesses/pi/PiLocalHarness.ts`, `runtime/WebLlmBrowser.ts` | Runs the app's offline agent (`src/lib/agent/dataAgent/offline`) in Node, with every model call answered by WebLLM inside a headless Chromium with WebGPU: the same engine, model files, and quantization the app downloads, so offline scores are the app's scores. Models download once into `.temp/ai-eval/webllm-profile`. |
 | SQL | `runtime/runEvalSql.ts` | The app's fail-closed SQL analyzer, then DuckDB. A result of only blanks counts as empty, as in the app. |
 | Simulated user | `runtime/SimulatedUser.ts` | Picks the option a question's script names, or the values the prompt names, or types the script's answer. |
 | Report | `runtime/summarizeEvalRun.ts` | Correct count, needless and missed questions, consent prompts, calls, tokens, cost, and latency. |
@@ -118,6 +177,9 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonne
 # The Pi agent on any one OpenRouter model, with a thinking level
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config single --model z-ai/glm-5.3@off
 
+# The offline agent on one in-browser model (WebLLM id); needs no API key
+pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --model Qwen3-4B-q4f16_1-MLC
+
 # A subset: question ids, or a category letter (B, I, H, N, F)
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions H,N11
 ```
@@ -127,7 +189,11 @@ It needs the JHU long-format CSVs in `~/cleaned-test-data` and
 `.temp/ai-eval/runs/<time>-<label>/`: `results.jsonl` (every answer with its
 SQL, a preview of the result, the questions asked, and usage) and
 `summary.md`. A full run takes 2 to 5 minutes and costs about $0.01 on Haiku
-or $1.15 on today's Claude setup.
+or $1.15 on today's Claude setup. An offline run costs nothing but takes 20
+to 40 minutes, because one GPU answers one request at a time; the first run
+of a model also downloads it (2 to 4 GB). Headless Chromium only exposes
+WebGPU through Playwright's full `chromium` channel, not the default
+headless shell, which falls back to a software GPU.
 
 ## Changes made while running the eval
 

@@ -183,3 +183,58 @@ trips, and streaming progress events from Pi for the multi-step tasks.
 5. Add **interpretation with consent**: a tool that computes a small summary
    locally and asks before sending it, so the agent can explain what the
    numbers mean with social-sector knowledge.
+
+## 9. Offline mode
+
+Users choose no models (D22). The one choice left is **offline mode**
+(D23): chat answered entirely by models in the browser, for privacy, for
+working without internet, and as the fallback when the online assistant
+cannot be reached.
+
+```
+Composer: Offline mode control ── off ──> online agent (proxy, hosted models)
+                                └─ on ──> offline agent (this section)
+Browser offline + models downloaded ──> offline agent
+Online request fails ──> "Answer offline" offer ──> offline agent
+
+Offline agent (src/lib/agent/dataAgent/offline)
+  1. Route the message        rules first; a model call only when unsure (D28)
+  2. Profile the datasets     once per conversation, in DuckDB (D26)
+  3. Find the question's      every 1-3 word run looked up in text columns;
+     stored values            longest match wins; names that mean different
+                              things in different datasets are flagged
+  4. Pi agent loop            same tools and host as online; each step is one
+                              WebLLM completion decoded under a JSON Schema of
+                              the allowed actions (D25)
+       run_query  ─> DuckDB ─> first 5 rows back to the model to check
+       ask_user   ─> question card
+       (a data question must call a tool before it may reply)
+```
+
+**The bundle (D24).** One download, "Download offline models", holds every
+model offline mode uses. `OFFLINE_MODEL_BUNDLE` names one model per job
+(answer, router, optional escalation). The budget is 4,500 MB of resident
+model memory with one large model resident at a time, counted at the app's
+8,192-token context window: a 16 GB Mac gives the GPU about 10.7 GB, and
+Chrome, the app, and DuckDB-Wasm need most of the rest.
+
+**Why the offline agent gets more help (D26).** A local model may read the
+data: nothing leaves the device. So it sees each dataset's profile (row
+count, date range, the values of every column with 12 or fewer), the
+question's values as they are stored, and the first rows of each result,
+which it checks before replying. None of this reaches a hosted model.
+
+**Speed.** On a small model, prefill dominates. Two choices keep WebLLM's
+cache warm: the system prompt is the same for the whole conversation (each
+question's values travel in its message), and the model's own output is
+replayed verbatim in the history, so each step after the first prefills only
+the new text (0.5 s instead of 6 s for a 2,000-token prompt in a test).
+
+**Query plans (D27).** `plan_query` lets the model fill slots that tested
+code compiles to SQL. It is built and tested, but on Qwen3 4B it scored
+below plain SQL, so the offline agent writes SQL by default and the plan
+tool stays available behind an option (see [eval.md](eval.md#offline-mode)).
+
+**What is not offline.** Chat outside the Data Explorer keeps the old
+multi-pass offline pipeline, now on the bundle's model. Dashboards in the
+offline agent wait for the same work online (roadmap R3).

@@ -15,7 +15,17 @@ const LOCAL_CONTEXT_WINDOW = 8192;
  * `--config single --model <WebLLM id>`, which also routes with that model,
  * or `--config plan --model <WebLLM id>` to answer with query plans.
  */
-const PI_LOCAL_EVAL_CONFIGS: Record<string, OfflineDataAgentModels> = {};
+const PI_LOCAL_EVAL_CONFIGS: Record<string, OfflineDataAgentModels> = {
+  /**
+   * Qwen3 4B answers and routes; Qwen3.5 4B takes over after a failed or
+   * empty query. One model is resident at a time.
+   */
+  "qwen3-qwen35": {
+    answer: "Qwen3-4B-q4f16_1-MLC",
+    router: "Qwen3-4B-q4f16_1-MLC",
+    escalation: "Qwen3.5-4B-q4f16_1-MLC",
+  },
+};
 
 /**
  * The offline harness: the app's offline data agent, with its model calls

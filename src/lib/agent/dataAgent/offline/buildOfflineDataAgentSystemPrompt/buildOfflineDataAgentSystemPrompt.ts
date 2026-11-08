@@ -25,6 +25,7 @@ SQL RULES
 - Tables are the aliases t0, t1, ... in double quotes. Columns in double quotes, exactly as listed. One SELECT or WITH statement, no semicolon.
 - Columns named like daily_new_X hold one day's count for one place. A total is SUM over days and places.
 - "By month" or "monthly": GROUP BY date_trunc('month', "date"). "By week": date_trunc('week', "date"). "By year": year("date").
+- No period named in the question: no date filter at all, so every date counts. Never copy the dataset's date range into the query.
 - A year such as 2022: WHERE "date" >= '2022-01-01' AND "date" < '2023-01-01'.
 - "Latest", "last year", "recently": count back from (SELECT max("date") FROM "t0"), never from today. "Last year" is the last full calendar year in the data.
 - "Most", "top", "highest" of a count: SUM per group over the whole period, ORDER BY that sum DESC, LIMIT N. One row per group.
