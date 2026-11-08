@@ -14,11 +14,6 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
-/** A list of values cannot size a symbol. */
-function _isNotList(column: QueryColumn.T): boolean {
-  return !QueryColumn.isList(column);
-}
-
 /** Edits the value column, radius range, and scale for sized symbols. */
 export function ProportionalSymbolControls({
   layer,
@@ -35,7 +30,7 @@ export function ProportionalSymbolControls({
         label={t`Size by`}
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
-        isColumnSelectable={_isNotList}
+        isColumnSelectable={QueryColumn.isNotList}
         value={
           MapLayerUpdates.getQueryColumnFromLayer({
             layer,

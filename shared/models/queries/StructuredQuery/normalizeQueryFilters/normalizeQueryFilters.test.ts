@@ -1,31 +1,11 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
+import { createConceptAttributeQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
 /** Column-name rules bind only unique names. Runtime rules require IDs. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import type { ColumnNameQueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
-
-function _listFieldColumn(id: string): QueryColumn.T {
-  return QueryColumn.makeFromConceptAttributes([
-    Model.make("ConceptAttribute", {
-      id,
-      conceptId: "concept_1",
-      workspaceId: "workspace_1",
-      name: "Symptoms",
-      description: undefined,
-      createdAt: "2026-11-06T00:00:00Z",
-      updatedAt: "2026-11-06T00:00:00Z",
-      dataType: "varchar",
-      mappingType: "dataset_column",
-      isLabel: false,
-      isIdentifier: false,
-      allowManualEdit: false,
-      isArray: true,
-    }) as ConceptAttribute.T,
-  ])[0]!;
-}
 
 function _column({ id, name }: { id: string; name: string }): QueryColumn.T {
   return Model.make("QueryColumn", {
@@ -100,7 +80,10 @@ describe("normalizeQueryFilters", () => {
     expect(result.issues).toEqual([{ nodeId: "rule", reason: "missing" }]);
   });
   it("drops a rule on a list column and reports it as unsupported", () => {
-    const listColumn = _listFieldColumn("symptoms");
+    const listColumn = createConceptAttributeQueryColumn({
+      name: "Symptoms",
+      isArray: true,
+    });
     const result = normalizeQueryFilters({
       filter: {
         type: "group",
@@ -126,7 +109,7 @@ describe("normalizeQueryFilters", () => {
 
   it("keeps a having rule on a list column that is counted", () => {
     const listColumn = {
-      ..._listFieldColumn("symptoms"),
+      ...createConceptAttributeQueryColumn({ name: "Symptoms", isArray: true }),
       aggregation: "count" as const,
     };
     const rule = {

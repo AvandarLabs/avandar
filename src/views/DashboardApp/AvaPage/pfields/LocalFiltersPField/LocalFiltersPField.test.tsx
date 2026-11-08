@@ -4,11 +4,13 @@
  * button works only when some column can be filtered on.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { fireEvent, render, screen } from "@/test-utils";
 import { useDataVizAuthoring } from "@/views/DashboardApp/AvaPage/pfields/useDataVizAuthoring/useDataVizAuthoring";
 import { LocalFiltersPField } from "./LocalFiltersPField";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 
 vi.mock(
@@ -38,13 +40,18 @@ function _renderField(
     localFilters?: LocalFilter[];
   }>,
 ): void {
+  // The field reads only these four members of the authoring object.
   vi.mocked(useDataVizAuthoring).mockReturnValue({
     props: { columnBindingVersion: 1, localFilters: [] },
     runtime: { localFilters: options.localFilters ?? [] },
     schema: { columns: options.columns },
     update,
-  } as never);
-  render(<LocalFiltersPField auth={{ auth: "workspace" } as never} />);
+  } as unknown as ReturnType<typeof useDataVizAuthoring>);
+  render(
+    <LocalFiltersPField
+      auth={{ auth: "workspace", workspaceId: uuid<Workspace.Id>() }}
+    />,
+  );
 }
 
 beforeEach(() => {

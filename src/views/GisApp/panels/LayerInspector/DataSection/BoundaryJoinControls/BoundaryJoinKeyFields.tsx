@@ -16,11 +16,6 @@ type Props = {
   ) => void;
 };
 
-/** A list of values cannot be matched to one boundary key. */
-function _isNotList(column: QueryColumn.T): boolean {
-  return !QueryColumn.isList(column);
-}
-
 /** Edits the source key column and name-matching mode for a boundary join. */
 export function BoundaryJoinKeyFields({
   dataSourceId,
@@ -35,7 +30,7 @@ export function BoundaryJoinKeyFields({
         label={t`Data key column`}
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
-        isColumnSelectable={_isNotList}
+        isColumnSelectable={QueryColumn.isNotList}
         value={dataKeyColumn}
         onChange={(column) => {
           if (column) {

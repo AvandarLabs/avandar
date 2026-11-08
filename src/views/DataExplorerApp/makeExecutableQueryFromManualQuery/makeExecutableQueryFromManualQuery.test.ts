@@ -1,7 +1,10 @@
-import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import {
+  createConceptAttributeQueryColumn,
+  createDatasetQueryColumn,
+} from "$/models/queries/QueryColumn/QueryColumn.fixtures";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import {
   clearDatasetRowCountCache,
@@ -17,7 +20,6 @@ import {
   LARGE_DATASET_ROW_THRESHOLD,
 } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 vi.mock("@/clients/datasets/DatasetQueryClient", () => {
@@ -137,34 +139,41 @@ describe("makeExecutableQueryFromManualQuery", () => {
     expect(DatasetQueryClient.getDatasetMeta).not.toHaveBeenCalled();
   });
 
+  it("keeps max on a date column, which DuckDB runs even though the form does not offer it", async () => {
+    const reportDate = createDatasetQueryColumn({
+      name: "report_date",
+      dataType: "date",
+    });
+    const original = {
+      ..._datasetQuery(),
+      queryColumns: [reportDate],
+      aggregations: { [reportDate.id]: "max" as const },
+      limit: 10,
+    };
+
+    const { query } = await makeExecutableQueryFromManualQuery({
+      query: original,
+      workspaceId,
+    });
+
+    expect(query).toBe(original);
+  });
+
   describe("with a case type field that keeps every value", () => {
     function _listFieldQuery(
       aggregation: "sum" | "count",
     ): ReturnType<typeof StructuredQuery.makeEmpty> {
-      const [column] = QueryColumn.makeFromConceptAttributes([
-        Model.make("ConceptAttribute", {
-          id: "attr_cases",
-          conceptId: "concept_1",
-          workspaceId: "workspace_1",
-          name: "Daily new cases",
-          description: undefined,
-          createdAt: "2026-11-06T00:00:00Z",
-          updatedAt: "2026-11-06T00:00:00Z",
-          dataType: "bigint",
-          mappingType: "dataset_column",
-          isLabel: false,
-          isIdentifier: false,
-          allowManualEdit: false,
-          isArray: true,
-        }) as ConceptAttribute.T,
-      ]);
+      const column = createConceptAttributeQueryColumn({
+        name: "Daily new cases",
+        dataType: "bigint",
+        isArray: true,
+      });
       return {
-        ...StructuredQuery.makeEmpty(),
-        dataSource: { __type: "Concept", id: "concept_1", name: "Case" },
-        queryColumns: [column!],
-        aggregations: { [column!.id]: aggregation },
+        ..._datasetQuery(),
+        queryColumns: [column],
+        aggregations: { [column.id]: aggregation },
         limit: 10,
-      } as unknown as ReturnType<typeof StructuredQuery.makeEmpty>;
+      };
     }
 
     it("resets a saved sum to none so the SQL never sums a list", async () => {
@@ -174,9 +183,7 @@ describe("makeExecutableQueryFromManualQuery", () => {
       });
 
       expect(Object.values(query.aggregations)).toEqual(["none"]);
-      expect(StructuredQuery.toRawDuckDbQuery(query as never)).not.toMatch(
-        /SUM\(/i,
-      );
+      expect(structuredQueryToSql(query)).not.toMatch(/SUM\(/i);
     });
 
     it("keeps a saved count, which works on a list", async () => {

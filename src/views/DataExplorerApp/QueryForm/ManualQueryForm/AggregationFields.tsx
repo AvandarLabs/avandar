@@ -30,9 +30,10 @@ export function AggregationFields({
             label={column.baseColumn.name}
             validAggregations={validAggregations}
             value={
-              validAggregations.includes(savedAggregation)
-                ? savedAggregation
-                : "none"
+              QueryColumn.isList(column) &&
+              !validAggregations.includes(savedAggregation)
+                ? "none"
+                : savedAggregation
             }
             onChange={(newAggregation: QueryAggregationType.T) => {
               onSetColumnAggregation({

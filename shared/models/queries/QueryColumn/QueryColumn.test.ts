@@ -182,4 +182,9 @@ describe("QueryColumn and list fields", () => {
   it("does not treat a single-value field as a list", () => {
     expect(QueryColumn.isList(TOTAL_CASES)).toBe(false);
   });
+
+  it("treats only a single-value field as not a list", () => {
+    expect(QueryColumn.isNotList(TOTAL_CASES)).toBe(true);
+    expect(QueryColumn.isNotList(DAILY_CASES_LIST)).toBe(false);
+  });
 });

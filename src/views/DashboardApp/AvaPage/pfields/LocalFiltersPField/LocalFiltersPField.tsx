@@ -33,7 +33,7 @@ type Authoring = ReturnType<typeof useDataVizAuthoring>;
  * its filters by column name gets each filter's column ID turned back into
  * the column's name.
  */
-function saveLocalFilters(
+function _saveLocalFilters(
   options: Readonly<{
     authoring: Authoring;
     columns: readonly QueryResult.ColumnWithId[];
@@ -88,7 +88,7 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
   const onChange = (
     localFilters: ReadonlyArray<LocalFilter | LegacyLocalFilter>,
   ): void => {
-    saveLocalFilters({ authoring, columns, localFilters });
+    _saveLocalFilters({ authoring, columns, localFilters });
   };
 
   const updateFilter = (

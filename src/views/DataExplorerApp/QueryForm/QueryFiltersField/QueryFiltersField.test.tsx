@@ -6,12 +6,12 @@ import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
 import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { createConceptAttributeQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 function _column(name: string, dataType: AvaDataType.T): QueryColumn.T {
   return Model.make("QueryColumn", {
@@ -25,26 +25,6 @@ function _column(name: string, dataType: AvaDataType.T): QueryColumn.T {
     }),
     aggregation: undefined,
   }) as QueryColumn.T;
-}
-
-function _listFieldColumn(name: string): QueryColumn.T {
-  return QueryColumn.makeFromConceptAttributes([
-    Model.make("ConceptAttribute", {
-      id: `attr_${name}`,
-      conceptId: "concept_1",
-      workspaceId: "workspace_1",
-      name,
-      description: undefined,
-      createdAt: "2026-11-06T00:00:00Z",
-      updatedAt: "2026-11-06T00:00:00Z",
-      dataType: "varchar",
-      mappingType: "dataset_column",
-      isLabel: false,
-      isIdentifier: false,
-      allowManualEdit: false,
-      isArray: true,
-    }) as ConceptAttribute.T,
-  ])[0]!;
 }
 
 const COLUMNS = [
@@ -254,7 +234,13 @@ describe("QueryFiltersField", () => {
     render(
       <AvandarAppProvider>
         <QueryFiltersField
-          columns={[...COLUMNS, _listFieldColumn("Symptoms")]}
+          columns={[
+            ...COLUMNS,
+            createConceptAttributeQueryColumn({
+              name: "Symptoms",
+              isArray: true,
+            }),
+          ]}
           value={ONE_TEXT_RULE}
           onChange={vi.fn()}
         />
@@ -274,7 +260,12 @@ describe("QueryFiltersField", () => {
     render(
       <AvandarAppProvider>
         <QueryFiltersField
-          columns={[_listFieldColumn("Symptoms")]}
+          columns={[
+            createConceptAttributeQueryColumn({
+              name: "Symptoms",
+              isArray: true,
+            }),
+          ]}
           value={StructuredQuery.makeEmpty().filters}
           onChange={vi.fn()}
         />

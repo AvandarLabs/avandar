@@ -173,6 +173,15 @@ export const QueryColumnModule = {
   isList: _isList,
 
   /**
+   * The negation of {@link QueryColumnModule.isList}. Use it as a predicate
+   * to keep a list out of a picker, for example
+   * `filter(QueryColumn.isNotList)`.
+   */
+  isNotList: (column: QueryColumn.T): boolean => {
+    return !_isList(column);
+  },
+
+  /**
    * The aggregations a column can take in a query: a list's are grouping and
    * counting, any other column's follow its data type.
    */

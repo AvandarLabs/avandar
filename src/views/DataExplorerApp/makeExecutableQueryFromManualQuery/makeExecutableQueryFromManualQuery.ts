@@ -53,10 +53,11 @@ export async function fetchDatasetRowCount(params: {
 }
 
 /**
- * Resets each aggregation its column cannot take to `none`, for example a
- * saved sum on a case type field that keeps every value, which compiles to
- * `SUM` of a list and fails in DuckDB. Returns the same query when every
- * aggregation is valid.
+ * Resets each aggregation a list cannot take to `none`, for example a saved
+ * sum on a case type field that keeps every value, which compiles to `SUM` of
+ * a list and fails in DuckDB. Another column's aggregation is left alone: the
+ * form offers a type only some aggregations, but DuckDB runs more, such as the
+ * max of a date. Returns the same query when nothing needs a reset.
  */
 function _resetUnsupportedAggregations(
   query: PartialStructuredQuery,
@@ -65,6 +66,7 @@ function _resetUnsupportedAggregations(
     const aggregation = query.aggregations[column.id];
     return (
       aggregation !== undefined &&
+      QueryColumn.isList(column) &&
       !QueryColumn.getValidAggregations(column).includes(aggregation)
     );
   });
@@ -84,7 +86,7 @@ function _resetUnsupportedAggregations(
  * {@link LARGE_DATASET_ROW_THRESHOLD}. Use it just before a structured query
  * runs, for example when compiling a workspace query to SQL, so a large
  * dataset is never loaded in full by accident. It also resets an aggregation
- * the column cannot take, such as a sum on a list, to `none`.
+ * a list cannot take, such as a sum, to `none`.
  */
 export async function makeExecutableQueryFromManualQuery(params: {
   query: PartialStructuredQuery;
