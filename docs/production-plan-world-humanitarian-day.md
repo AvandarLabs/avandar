@@ -373,6 +373,30 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   re-reads the sample at once. Other invalid reasons (`dataset_not_found`,
   `unsupported_format`, `external_host`) are not temporary and are not
   retried on a schedule, though "Try again" works for all of them.
+- P6.11 `[NEW]` **Handle ODC source drift**: an ODC listing added to a
+  workspace copies the listing's columns at that moment, while its data is
+  read from the listing's current Parquet copy. When the source changes,
+  the workspace's columns, its data, and the catalog can disagree, and a
+  dashboard or analysis built on the dataset can break with no explanation.
+  Today nothing reconciles them. Cover every case:
+  - (a) **Source changes after a listing is added**: the source's columns
+    or rows change after a workspace added the listing.
+  - (b) **Detect outdated Parquet copies**: notice that a copy's source
+    changed (its freshness token moved) and rebuild it, rather than only on
+    the next load.
+  - (c) **Move workspaces to the new copy**: point every workspace dataset
+    that reads a listing's copy at the rebuilt one.
+  - (d) **Update a workspace's columns**: when the listing's columns change,
+    update the columns of every workspace dataset added from it.
+  - (e) **Track drift and column history in the ODC**: record each change to
+    a listing's columns and data, so the app can show a user why their
+    dashboards or analyses may have broken because the source changed.
+  - (f) **Let users freeze a dataset**: a frozen dataset does not sync with
+    its source, so a changed source never breaks it. This means keeping each
+    copy a frozen dataset reads, and tracking those copies as distinct from
+    the listing's current one, so a rebuild never deletes a copy a frozen
+    dataset still uses.
+  Depends on P6.9.
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
   framework already exists for HDX]`
 

@@ -76,6 +76,12 @@ export class ParquetCopyError extends Error {
  */
 const DEFAULT_MAX_PART_BYTES = 32 * 1024 * 1024;
 
+/**
+ * Starts the name of every build's temp folder, so a server can find and
+ * delete the ones a killed build left behind.
+ */
+export const PARQUET_COPY_TEMP_PREFIX = "odc-parquet-cache-";
+
 /** How many times a page download is tried before the build fails. */
 const PAGE_ATTEMPTS = 3;
 
@@ -335,7 +341,7 @@ export async function buildOpenDataParquetCache(
     buildId: options.buildId,
   });
   await mkdir(tmpdir(), { recursive: true });
-  const tempDir = await mkdtemp(join(tmpdir(), "odc-parquet-cache-"));
+  const tempDir = await mkdtemp(join(tmpdir(), PARQUET_COPY_TEMP_PREFIX));
   const context: CopyContext = {
     folderPath,
     tempDir,

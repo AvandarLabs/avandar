@@ -244,7 +244,7 @@ and its cache columns are removed.
 |---|---|---|
 | S1 | Drop the `opendata` authenticated write policies. **Done.** | none |
 | S2 | Pipeline server: the cache builder, driven by each pipeline's `download` manifest block. Paged sources are copied one part at a time; one-file sources are gzipped on disk. **Done.** | none |
-| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. On start, it deletes temp folders a killed build left behind. The always-on Fly config and the templated deploy are **done**. | S2 |
+| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. Builds run one at a time; a build whose claim was taken over is skipped, and one superseded while it ran deletes its copy. On start, it deletes temp folders a killed build left behind. **Done.** | S2 |
 | S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, triggering S3) | S3, S4 |
 | S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
@@ -265,3 +265,9 @@ and its cache columns are removed.
 3. **Storage cost.** Copies are only built for listings a workspace adds, so
    cost grows with use, not with the catalog's size. Pre-building copies for
    popular listings is a later option.
+4. **Source drift.** A workspace keeps the columns it copied when it added a
+   listing, while its data comes from the listing's current copy, so a
+   changed source can leave the two disagreeing. A rebuild also deletes the
+   copy it replaced, which a dataset a user chose to freeze would still need.
+   Handling every drift case is tracked as P6.11 in
+   `docs/production-plan-world-humanitarian-day.md` and is out of scope here.

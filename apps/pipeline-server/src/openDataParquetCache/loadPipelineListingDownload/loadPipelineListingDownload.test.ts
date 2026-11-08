@@ -1,4 +1,7 @@
-import { loadPipelineListingDownload } from "@pipeline-server/openDataParquetCache/loadPipelineListingDownload/loadPipelineListingDownload";
+import {
+  loadPipelineListingDownload,
+  PIPELINE_DOWNLOAD_MISSING_ERROR_NAME,
+} from "@pipeline-server/openDataParquetCache/loadPipelineListingDownload/loadPipelineListingDownload";
 import { describe, expect, it } from "vitest";
 
 describe("loadPipelineListingDownload", () => {
@@ -21,7 +24,10 @@ describe("loadPipelineListingDownload", () => {
   it("refuses a pipeline whose config has no download block", async () => {
     await expect(
       loadPipelineListingDownload("world-bank__wdi"),
-    ).rejects.toThrow(/world-bank__wdi/);
+    ).rejects.toMatchObject({
+      name: PIPELINE_DOWNLOAD_MISSING_ERROR_NAME,
+      message: expect.stringContaining("world-bank__wdi"),
+    });
   });
 
   it("refuses a pipeline name that is not a folder name", async () => {
