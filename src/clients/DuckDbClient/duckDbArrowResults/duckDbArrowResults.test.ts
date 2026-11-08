@@ -40,6 +40,85 @@ function createDecimalTable(
   return createTableFromColumn(name, column);
 }
 
+/** `DECIMAL(4,2)`, the type of every decimal these tests store. */
+const PRICE_TYPE = new arrow.Decimal(2, 4, 128);
+
+/**
+ * Builds a one-row column holding `MAP {'a': 2.25, 'b': 0.05}`, as DuckDB
+ * exports a `MAP(VARCHAR, DECIMAL(4,2))`: one `entries` struct of `key` and
+ * `value`.
+ */
+function createPriceMapColumn(): arrow.Vector {
+  const entriesType = new arrow.Struct([
+    new arrow.Field("key", new arrow.Utf8(), false),
+    new arrow.Field("value", PRICE_TYPE, true),
+  ]);
+  const keys = arrow.makeData({
+    type: new arrow.Utf8(),
+    length: 2,
+    nullCount: 0,
+    valueOffsets: new Int32Array([0, 1, 2]),
+    data: new TextEncoder().encode("ab"),
+  });
+  const values = arrow.makeData({
+    type: PRICE_TYPE,
+    length: 2,
+    nullCount: 0,
+    data: new Uint32Array([225, 0, 0, 0, 5, 0, 0, 0]),
+  });
+  const entries = arrow.makeData({
+    type: entriesType,
+    length: 2,
+    nullCount: 0,
+    children: [keys, values],
+  });
+  return arrow.makeVector(
+    arrow.makeData({
+      type: new arrow.Map_(new arrow.Field("entries", entriesType, false)),
+      length: 1,
+      nullCount: 0,
+      valueOffsets: new Int32Array([0, 2]),
+      child: entries,
+    }),
+  );
+}
+
+/**
+ * Builds a two-row column of `UNION(amount DECIMAL(4,2), note VARCHAR)`, as
+ * DuckDB exports a union: a sparse union whose first row is the amount 2.25
+ * and whose second is the note `pending`.
+ */
+function createAmountOrNoteColumn(): arrow.Vector {
+  const amounts = arrow.makeData({
+    type: PRICE_TYPE,
+    length: 2,
+    nullCount: 0,
+    data: new Uint32Array([225, 0, 0, 0, 0, 0, 0, 0]),
+  });
+  const notes = arrow.makeData({
+    type: new arrow.Utf8(),
+    length: 2,
+    nullCount: 0,
+    valueOffsets: new Int32Array([0, 0, 7]),
+    data: new TextEncoder().encode("pending"),
+  });
+  return arrow.makeVector(
+    arrow.makeData({
+      type: new arrow.SparseUnion(
+        [0, 1],
+        [
+          new arrow.Field("amount", PRICE_TYPE, true),
+          new arrow.Field("note", new arrow.Utf8(), true),
+        ],
+      ),
+      length: 2,
+      nullCount: 0,
+      typeIds: new Int8Array([0, 1]),
+      children: [amounts, notes],
+    }),
+  );
+}
+
 describe("arrowTableToJS", () => {
   // A list of text holds plain strings, which have no `toJSON`.
   it("returns a list of text as a plain array of strings", () => {
@@ -400,5 +479,38 @@ describe("arrowTableToJS", () => {
     expect(arrowTableToJS(table).data).toEqual([
       { total: Number("123456789012345678901.23") },
     ]);
+  });
+
+  it("returns the decimals in a map with their scale applied", () => {
+    const prices = createPriceMapColumn();
+
+    expect(
+      arrowTableToJS(createTableFromColumn("prices", prices)).data,
+    ).toEqual([{ prices: { a: 2.25, b: 0.05 } }]);
+  });
+
+  it("returns the decimals in a map inside a list with their scale applied", () => {
+    const prices = createPriceMapColumn();
+    const priceLists = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.List(new arrow.Field("item", prices.type, true)),
+        length: 1,
+        nullCount: 0,
+        valueOffsets: new Int32Array([0, 1]),
+        child: prices.data[0]!,
+      }),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("priceLists", priceLists)).data,
+    ).toEqual([{ priceLists: [{ a: 2.25, b: 0.05 }] }]);
+  });
+
+  it("returns a union's decimal member with its scale applied and its other members as they are", () => {
+    const amountOrNote = createAmountOrNoteColumn();
+
+    expect(
+      arrowTableToJS(createTableFromColumn("amountOrNote", amountOrNote)).data,
+    ).toEqual([{ amountOrNote: 2.25 }, { amountOrNote: "pending" }]);
   });
 });
