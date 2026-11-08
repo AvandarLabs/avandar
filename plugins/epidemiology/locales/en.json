@@ -15,5 +15,9 @@
   "modal.failed": "Could not read the result: {message}",
   "viz.epicurve.cases": "Cases",
   "viz.epicurve.other": "Other",
-  "viz.epicurve.unknown": "Unknown"
+  "viz.epicurve.unknown": "Unknown",
+  "viz.ratePlot.title": "Rate plot",
+  "viz.ratePlot.rateText": "{rate, number}",
+  "viz.ratePlot.intervalText": "{rate, number} ({lower, number}–{upper, number})",
+  "viz.ratePlot.empty": "No rows have a numeric rate to plot."
 }
