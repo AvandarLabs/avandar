@@ -3,7 +3,7 @@ import { runQueryForUser } from "@/lib/agent/dataAgent/createDataAgentTools/runQ
 import { compileQueryPlan } from "@/lib/agent/dataAgent/queryPlan/compileQueryPlan/compileQueryPlan";
 import { findColumn } from "@/lib/agent/dataAgent/queryPlan/compileQueryPlan/queryPlanSqlParts";
 import { QUERY_PLAN_PARAMETERS } from "@/lib/agent/dataAgent/queryPlan/QueryPlan";
-import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { QueryToolContext } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import type { QueryPlanTable } from "@/lib/agent/dataAgent/queryPlan/compileQueryPlan/compileQueryPlan";
 import type { QueryPlan } from "@/lib/agent/dataAgent/queryPlan/QueryPlan";

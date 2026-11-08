@@ -7,18 +7,28 @@
  * Requests run concurrently. This directory has no `index.ts`, so it is never
  * deployed as a function.
  *
+ * Also runs the PDF table assistant's extraction for its eval
+ * (`scripts/ai-eval/pdf`).
+ *
  * Usage:
  *   deno run --allow-env --allow-net --allow-read \
  *     --config supabase/functions/chat/deno.json \
  *     supabase/functions/_eval/runChatTurnCli.ts
  */
 import { runChatTurn } from "@sbfn/chat/PostChatMessages/runChatTurn/runChatTurn.ts";
+import { runMeasurementExtraction } from "@sbfn/chat/PostExtractMeasurements/runMeasurementExtraction.ts";
 import type { RunChatTurnOptions } from "@sbfn/chat/PostChatMessages/runChatTurn/runChatTurn.ts";
+import type { RunMeasurementExtractionOptions } from "@sbfn/chat/PostExtractMeasurements/runMeasurementExtraction.ts";
 
-type EvalTurnRequest = {
-  id: string;
-  turn: Omit<RunChatTurnOptions, "apiKey" | "referer">;
-};
+/** A chat turn, or a PDF assistant extraction. */
+type EvalTurnRequest =
+  | { id: string; turn: Omit<RunChatTurnOptions, "apiKey" | "referer"> }
+  | {
+      id: string;
+      extraction: Omit<RunMeasurementExtractionOptions, "apiKey" | "referer">;
+    };
+
+const REFERER = "http://localhost:6213";
 
 const apiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!apiKey) {
@@ -35,10 +45,24 @@ async function _handleLine(line: string, openRouterApiKey: string) {
   const request = JSON.parse(line) as EvalTurnRequest;
   const startedAt = performance.now();
   try {
+    if ("extraction" in request) {
+      const extraction = await runMeasurementExtraction({
+        ...request.extraction,
+        apiKey: openRouterApiKey,
+        referer: REFERER,
+      });
+      _writeLine({
+        id: request.id,
+        text: extraction.text,
+        usage: extraction.usage,
+        latencyMs: performance.now() - startedAt,
+      });
+      return;
+    }
     const turn = await runChatTurn({
       ...request.turn,
       apiKey: openRouterApiKey,
-      referer: "http://localhost:6213",
+      referer: REFERER,
     });
     _writeLine({
       id: request.id,

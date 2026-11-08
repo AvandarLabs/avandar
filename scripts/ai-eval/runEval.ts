@@ -15,7 +15,7 @@
  * `OPEN_ROUTER_API_KEY` (read from `.env.development.edge` when not set).
  * Writes `results.jsonl` and `summary.md` under `.temp/ai-eval/runs/`.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { COVID_QUESTIONS } from "./covid/covidQuestions";
@@ -24,6 +24,7 @@ import { createPiHarness } from "./harnesses/pi/PiHarness";
 import { createPiLocalHarness } from "./harnesses/pi/PiLocalHarness";
 import { EvalDatabase } from "./runtime/EvalDatabase";
 import { gradeEvalAnswer } from "./runtime/gradeEvalAnswer";
+import { readOpenRouterApiKey } from "./runtime/readOpenRouterApiKey";
 import {
   formatSummaryRow,
   SUMMARY_TABLE_HEADER,
@@ -35,27 +36,6 @@ import type { EvalQueryResult } from "./runtime/EvalDatabase";
 import type { GradedAnswer } from "./runtime/gradeEvalAnswer";
 
 const REPO_ROOT = resolve(import.meta.dirname, "../..");
-
-function _readOpenRouterApiKey(): string {
-  if (process.env.OPEN_ROUTER_API_KEY) {
-    return process.env.OPEN_ROUTER_API_KEY;
-  }
-  const envText = readFileSync(
-    join(REPO_ROOT, ".env.development.edge"),
-    "utf8",
-  );
-  const line = envText.split("\n").find((envLine) => {
-    return envLine.startsWith("OPEN_ROUTER_API_KEY=");
-  });
-  const key = line
-    ?.slice("OPEN_ROUTER_API_KEY=".length)
-    .replaceAll('"', "")
-    .trim();
-  if (!key) {
-    throw new Error("OPEN_ROUTER_API_KEY is not set");
-  }
-  return key;
-}
 
 /** Groups questions into conversations: a question and its follow-ups. */
 function _toConversations(
@@ -166,7 +146,7 @@ async function _createHarness(
       model: options.model,
     });
   }
-  const openRouterApiKey = _readOpenRouterApiKey();
+  const openRouterApiKey = readOpenRouterApiKey(REPO_ROOT);
   if (options.harness === "pi") {
     return createPiHarness({
       openRouterApiKey,

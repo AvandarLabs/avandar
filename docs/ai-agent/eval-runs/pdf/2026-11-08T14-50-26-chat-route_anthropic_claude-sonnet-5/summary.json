@@ -1,0 +1,18 @@
+{
+  "label": "chat-route:anthropic/claude-sonnet-5",
+  "answers": 34,
+  "requiredFound": 15,
+  "requiredTotal": 42,
+  "recall": 0.35714285714285715,
+  "useful": 1,
+  "duplicates": 0,
+  "fair": 0,
+  "spurious": 0,
+  "fabricated": 0,
+  "subjectMisses": 0,
+  "unitErrors": 0,
+  "emptyReplies": 11,
+  "errors": 0,
+  "costPerRegion": 0.03129776470588235,
+  "latencyMedianMs": 7331.551958
+}

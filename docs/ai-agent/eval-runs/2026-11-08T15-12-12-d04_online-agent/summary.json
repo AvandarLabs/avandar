@@ -1,0 +1,19 @@
+{
+  "label": "d04:online-agent",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 63,
+  "promptTokens": 179878,
+  "cachedPromptTokens": 160244,
+  "completionTokens": 19706,
+  "totalCost": 0.013904289999999996,
+  "costPerQuestion": 0.0003089842222222221,
+  "latencyMedianMs": 2416.648666,
+  "latencyP90Ms": 3843.0545839999995,
+  "failedIds": [
+    "H06"
+  ]
+}

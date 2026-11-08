@@ -1,12 +1,12 @@
 import { Agent } from "@earendil-works/pi-agent-core";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
-import { buildDataAgentSystemPrompt } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
-import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type {

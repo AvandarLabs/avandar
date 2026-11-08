@@ -1,4 +1,4 @@
-import { obj, oneOf, opt, str } from "@earendil-works/pi-schema";
+import { RUN_QUERY_TOOL } from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { extractSingleQuotedSqlLiterals } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { sanitizeQueryError } from "@/lib/agent/dataAgent/sanitizeQueryError/sanitizeQueryError";
@@ -11,21 +11,6 @@ import type { AgentTool, AgentToolResult } from "@earendil-works/pi-agent-core";
 
 /** After this many runs in one answer, the last result stands. */
 const MAX_QUERY_RUNS_PER_ANSWER = 3;
-
-const RUN_QUERY_PARAMETERS = obj({
-  sql: str({
-    description: "One DuckDB SELECT or WITH statement over the aliases.",
-  }),
-  summary: str({
-    description:
-      "One or two plain sentences for the user: what the result shows, the dataset, and your choices.",
-  }),
-  chart: opt(
-    oneOf(["bar", "line", "area", "scatter", "pie"], {
-      description: "Only when the user asked for a chart, graph, or plot.",
-    }),
-  ),
-});
 
 function _describeShape(
   columns: ReadonlyArray<{ name: string }>,
@@ -180,13 +165,9 @@ export async function runQueryForUser(
  */
 export function createRunQueryTool(
   options: QueryToolContext,
-): AgentTool<typeof RUN_QUERY_PARAMETERS> {
+): AgentTool<typeof RUN_QUERY_TOOL.parameters> {
   return {
-    name: "run_query",
-    label: "Run query",
-    description:
-      "Runs the one DuckDB query that answers the question and shows its result to the user as a table or chart. Returns only the row count and column names. A result ends your turn.",
-    parameters: RUN_QUERY_PARAMETERS,
+    ...RUN_QUERY_TOOL,
     executionMode: "sequential",
     execute: async (_toolCallId, params) => {
       return runQueryForUser(options, {

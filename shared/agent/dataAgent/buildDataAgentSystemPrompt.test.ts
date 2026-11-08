@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildDataAgentSystemPrompt } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
 
 const DATASETS = [
   {

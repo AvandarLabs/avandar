@@ -203,6 +203,90 @@ of a model also downloads it (2 to 4 GB). Headless Chromium only exposes
 WebGPU through Playwright's full `chromium` channel, not the default
 headless shell, which falls back to a software GPU.
 
+## PDF table assistant
+
+In PDF import, the user can draw a box around a passage and, when the
+rule-based extractor flags that it read fewer figures than the passage
+holds, ask the assistant to read the rest. The eval in `scripts/ai-eval/pdf`
+asks: does the final table (rules plus assistant) hold every figure, and
+does the assistant ever add one that is not in the text?
+
+### What it found
+
+**The assistant was doing nothing.** It sent its prompt as a chat message,
+and the chat function made the model call its SQL tool, so the model's JSON
+landed in `generatedSql` and the app, which reads `assistantText`, got an
+empty reply on almost every region, on Claude Sonnet 5 and Haiku 5.5 alike.
+It now has its own route (`POST /chat/:workspaceId/extract-measurements`,
+decision D32) with a server-held prompt and no tools.
+
+### Results
+
+17 hand-labelled regions holding 21 required figures, each run 2 or 3
+times. Counts add up all runs (21 per run); spurious, fabricated, and wrong
+subject are averages per run. Rows are in the order they were measured; v1
+to v3 are successive versions of
+`shared/agent/measurementExtraction/MeasurementExtractionPrompt.ts`.
+
+| Setup | Model | Runs | Required found (all runs) | Spurious | Fabricated | Wrong subject | Cost per region |
+|---|---|---|---|---|---|---|---|
+| Chat route (the app before D32), original prompt | Sonnet 5 | 2 | 15/42 | 0 | 0 | 0 | $0.031 |
+| Chat route, original prompt | Haiku 5.5 | 2 | 15/42 | 1.5 | 0 | 0 | $0.0016 |
+| Own route, original prompt (v0) | Sonnet 5 | 2 | 35/42 | 8.5 | 0 | 0 | $0.0065 |
+| Own route, original prompt (v0) | Haiku 5.5 | 2 | 35/42 | 7 | 0 | 2.5 | $0.0005 |
+| Own route, v1: which numbers are not measurements, lost decimal points, subject goes in subject | Sonnet 5 | 2 | 40/42 | 0 | 0 | 0 | $0.0078 |
+| Own route, v1 | Haiku 5.5 | 2 | 42/42 | 0 | 0 | 1.5 | $0.0004 |
+| Own route, v2: the n-th number in a list goes with the n-th name | Sonnet 5 | 3 | 60/63 | 0 | 0 | 0 | $0.0068 |
+| Own route, v2 | Haiku 5.5 | 3 | 63/63 | 0 | 0 | 0 | $0.0005 |
+| **Own route, v3 (shipped): never fill in missing digits** | Sonnet 5 | 3 | 59/63 | 0.3 | 0 | 0 | $0.0093 |
+| **Own route, v3 (shipped)** | **Haiku 5.5** | **3** | **63/63** | **0** | **0** | **0** | **$0.0005** |
+
+The rules alone find 7 of the 21 required figures (14/42 over two runs); the
+chat route added one figure in 34 answers on each model. Sonnet 5's misses on v1 to v3 are one region (the cholera
+serotypes) where it returns nothing.
+
+**Held-out regions.** The prompt was tuned on the 17 regions, so it was also
+run on the 121 other flagged regions the scan found, which played no part in
+the tuning. They have no answer key, so they are graded for fabrication (a
+number that is nowhere in the text) and for year-like values (a whole number
+from 1900 to 2100):
+
+| Prompt | Model | Regions | Figures extracted | Fabricated | Year-like |
+|---|---|---|---|---|---|
+| v2 | Haiku 5.5 | 121 | 295 | 1 real (it completed "\uFFFD 43" as 1.43) | 0 |
+| v2 | Sonnet 5 | 121 | 317 | 0 real | 0 |
+| **v3** | **Haiku 5.5** | **121** | **459** | **0** | **0** |
+| v3 | Sonnet 5 | 119 (2 hit an OpenRouter account limit) | 396 | 0 | 0 |
+
+The v2 runs' archived counts (22 and 23 fabricated) are higher because the
+grader then misread a typographic minus ("\u2212 0.126") and "2,3, or 4" as
+23; every flagged row was checked by hand, the grader was fixed, and v3 was
+graded with the fix. v3 adds the rule against completing a cut-off number.
+
+**The bar.** The same bar as the chat (D31): the shipped setup must lose no
+accuracy against the old default, with no fabricated figures. Haiku 5.5 on
+v3 found every required figure (Sonnet 5: 59 of 63), with no spurious,
+fabricated, or wrongly attributed rows on the labelled regions and no
+fabrications or years on the held-out ones, at about 1/18th of Sonnet's
+cost per region.
+
+### How it works
+
+| Part | File | What it does |
+|---|---|---|
+| Cases | `pdf/pdfAssistCases.ts` | 17 regions from six documents (two Sudan cholera situation reports, a Sudan surveillance study, three research papers), each a region where the rules flag missed figures. Each lists its **required** figures (value, unit, and the subject where the text names one) and **optional** ones (statistics such as p-values and confidence bounds, population-defining ages, scales), with a note on why. Nine regions have nothing to add (years, citations, list numbers, line numbers), which tests restraint. |
+| Held-out regions | `pdf/pdfAssistHoldoutRegions.json` | Every other flagged paragraph the scan found: 121 regions. |
+| Preparation | `pdf/preparePdfAssistCase.ts` | Builds what the app builds: the page geometry with pdf.js, the region's text (`joinRegionText`), the rule-based rows (`extractProseMeasures`), and the figures the prompt lists as already found (`tableToMeasurements`). |
+| Setups | `pdf/pdfAssistSetups.ts` | `chat-route` sends the prompt through today's `runChatTurn` in the Data Sources context; `extract-route` calls the server's `runMeasurementExtraction`. Both run in the Deno subprocess the chat eval uses. |
+| Parsing | the app's `parseRegionResponse` | The same parser the app uses, so a reply the app cannot read scores nothing. |
+| Grading | `pdf/gradePdfAssist.ts` | A required figure is found when the final table (rules plus model) has a row with its value (within one part in a million) and unit. Each model row is **useful** (a required figure the rules missed), a **duplicate** of a rule row, **fair** (optional), **spurious** (a number in the text that is not a measurement), or **fabricated** (in no form in the text). Numbers in the text are read with scale words, number words, thousands separators, both minus signs, and decimal points the PDF lost. A **wrong subject** is a required figure the model found under a subject that does not contain the expected one. |
+
+The answer keys were read by hand from each region's extracted text (the
+text the app sends, not the rendered page), so a figure the text layer lost
+is not required. Two documents (the IMC situation report and the Sudan
+surveillance study) live in `~/cleaned-test-data`; the IMC file matches the
+SHA-256 recorded in `public/test-data/pdf/gate/imc-sudan-cholera-sitrep-1.geometry.json`.
+
 ## Method in detail
 
 Everything needed to judge or repeat a number in this document.
@@ -327,6 +411,22 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | Gemma 4 E2B offline | prefix `AVA_EVAL_WEBLLM_LIB=<path to web-llm 0.2.86 lib/index.js>` |
 | One question or category | `--questions N11` or `--questions H` |
 
+The PDF table assistant has its own runner,
+`pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
+
+| Result | Arguments |
+|---|---|
+| The shipped assistant | `--setup extract-route --model anthropic/claude-haiku-5.5 --repeat 3` |
+| The app before D32 | `--setup chat-route --model anthropic/claude-sonnet-5 --repeat 2` |
+| The held-out regions | add `--holdout` |
+
+It writes `.temp/ai-eval/pdf-runs/<time>-<label>/`. The chat-route and v0
+rows above used the original prompt, which is
+`src/workers/pdfSniff/llm/makeRegionPromptFromRegionText.ts` at commit
+`64bc1c78d`; v1 and v2 are recorded in the decision log (D32). Each run
+costs a few cents on Haiku and about $0.30 to $0.50 on Sonnet 5 (17 regions,
+or 121 held out, per repeat).
+
 Add `--label <name>` to name a run. Then
 `pnpm vite-script scripts/ai-eval/archiveEvalRuns.ts` copies every local
 run into [eval-runs/](eval-runs/README.md) and rebuilds its index.
@@ -343,7 +443,9 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 ## Run archive
 
-[eval-runs/README.md](eval-runs/README.md) lists all 78+ runs (every
+[eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
+[eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
+chat index lists all 83 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

@@ -29,11 +29,13 @@ Browser                                                   Edge (Supabase)       
 |   |                                             |
 |   v                                             |
 | Pi Agent loop (pi-agent-core)                    |  streamProxy  +--------------------+
-|   - system prompt + tools for the page           |-------------->| chat function:     |--> OpenRouter
-|   - model policy: primary, escalation            |<--------------| /agent/api/stream  |    (any model)
-|   - per-message run state                        |   SSE events  | auth, role check,  |
-|   |                                             |               | model allowlist,   |
-|   v                                             |               | output cap, usage  |
+|   - conversation + tool results                  |-------------->| chat function:     |--> OpenRouter
+|   - model policy: primary, escalation            |<--------------| /agent/<prompt id> |    (any model)
+|   - per-message run state                        |   SSE events  | /api/stream        |
+|   |                                             |               | auth, role check,  |
+|   |                                             |               | server-held prompt |
+|   |                                             |               | and tools, model   |
+|   v                                             |               | allowlist, caps    |
 | Tools (execute in the browser)                   |               +--------------------+
 |   run_query ----> Data Explorer -> DuckDB-Wasm   |
 |   lookup_values -> local query (QETL)            |
@@ -51,9 +53,12 @@ Browser                                                   Edge (Supabase)       
   only their *results' shape* goes back to the model. Mutating tools run with
   the user's own Supabase session, so RLS applies to the agent exactly as it
   does to the user.
-- **The server is a thin, metered proxy.** `POST /chat/:workspaceId/agent/api/stream`
-  holds the OpenRouter key, checks that the caller can use the Data Explorer
-  in that workspace, looks the requested model up in its own catalog
+- **The server is a thin proxy that owns the prompt.**
+  `POST /chat/:workspaceId/agent/data-agent-v1/api/stream` holds the
+  OpenRouter key, checks that the caller can use the Data Explorer in that
+  workspace, builds the system prompt from the workspace's datasets and the
+  tool list from `shared/agent/dataAgent` (the browser sends only the
+  conversation, D04), looks the requested model up in its own catalog
   (never trusting the client's model object, whose `baseUrl` could redirect
   our key), refuses models outside the roster, caps output tokens and context
   size, and streams Pi's proxy events back. Usage metering per user and plan
@@ -64,6 +69,11 @@ Browser                                                   Edge (Supabase)       
   and switching models mid-conversation. Avandar supplies everything that
   makes the product different: the tools, the privacy boundary, the model
   policy, the prompt, and the eval.
+- **Single-shot model tasks get their own routes with server-held prompts.**
+  The PDF table assistant posts a region's text, the figures already found,
+  and a consent ack to `POST /chat/:workspaceId/extract-measurements`, which
+  checks the ack against that exact text and asks the default model with no
+  tools (D32). Borrowing the chat route for it had silently broken it.
 
 ## 3. The data agent (built in the spike)
 

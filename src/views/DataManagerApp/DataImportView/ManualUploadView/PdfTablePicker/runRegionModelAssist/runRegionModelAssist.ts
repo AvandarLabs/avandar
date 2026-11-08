@@ -1,15 +1,11 @@
-import { Model } from "@avandar/models";
-import { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOption";
-import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import { clipToRegion } from "@/workers/pdfSniff/clipToRegion/clipToRegion";
 import { joinRegionText } from "@/workers/pdfSniff/extractors/extractProseMeasures/extractProseMeasures";
-import { makeRegionPromptFromRegionText } from "@/workers/pdfSniff/llm/makeRegionPromptFromRegionText";
 import { parseRegionResponse } from "@/workers/pdfSniff/llm/parseRegionResponse/parseRegionResponse";
+import { tableToMeasurements } from "@/workers/pdfSniff/llm/tableToMeasurements";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { Measurement } from "@/workers/pdfSniff/extractMeasurements/extractMeasurements";
 import type {
   ExtractedTable,
   PageGeometry,
@@ -24,8 +20,6 @@ import type {
  * passage contains, which is the one situation the assistant is offered for.
  */
 export const COVERAGE_FLAG_MARKER = "numbers in this region";
-
-const MODEL_UNITS = new Set<Measurement["unit"]>(["n", "percent", "usd"]);
 
 export type RegionAssistSkipReason =
   | "region_not_on_page"
@@ -99,35 +93,6 @@ function _mergeRegionGeometry(
 }
 
 /**
- * Reads the rule-extracted rows back as measurements, so the prompt can tell
- * the model what has already been found. A row that does not round-trip is
- * dropped rather than guessed at: the worst outcome of dropping one is that
- * the model repeats a figure we already have.
- */
-function _tableToMeasurements(table: ExtractedTable): readonly Measurement[] {
-  return table.cells.slice(table.headerRows).flatMap((row) => {
-    const value = Number(row[2]);
-    const unit = row[3] as Measurement["unit"] | undefined;
-    if (
-      !Number.isFinite(value) ||
-      unit === undefined ||
-      !MODEL_UNITS.has(unit)
-    ) {
-      return [];
-    }
-    return [
-      {
-        subject: row[0] ? row[0] : null,
-        metric: row[1] ?? "",
-        value,
-        unit,
-        sourceText: row[4] ?? "",
-      },
-    ];
-  });
-}
-
-/**
  * Appends the model's rows to the rule-based ones.
  *
  * Rules come first because they are the results the user has already been
@@ -159,6 +124,68 @@ export function mergeModelRows(options: {
     // padding. The model's rows name their unit in a column of their own and
     // never need this array.
     rowUnits: hasRuleRows ? ruleTable.rowUnits : modelTable.rowUnits,
+  };
+}
+
+/**
+ * Asks the user to send the region's text, and returns the text they agreed
+ * to with its consent ack, or nothing when they declined.
+ *
+ * `values` carries the region's text because the PII detectors read values
+ * rather than text, so without it they would never see what is about to be
+ * sent. `explicitConsentRequired` forces the modal even when the detectors
+ * are clean: clicking the button is a request to send, not consent to having
+ * sent. The ack covers the FINAL text, which a bias-suggestion swap may have
+ * rewritten, so the text posted has to be that same text; the server refuses
+ * the request without it.
+ */
+async function _askToSend(
+  params: Readonly<{ workspaceId: Workspace.Id; userId: string }>,
+  regionText: string,
+): Promise<{ text: string; ackToken: string } | undefined> {
+  const consent = await decideIfDataCanCrossBoundary({
+    text: regionText,
+    values: [regionText],
+    context: "user_message_text",
+    workspaceId: params.workspaceId,
+    userId: params.userId,
+    explicitConsentRequired: true,
+  });
+  if (!consent.approved) {
+    return undefined;
+  }
+  const text = consent.payload.text ?? regionText;
+  const ackToken = await PendingAcks.consumeAckForText(text);
+  return ackToken ? { text, ackToken } : undefined;
+}
+
+/**
+ * Reads the assistant's reply into rows and appends them to the rule-based
+ * rows, or skips when it added nothing.
+ */
+function _toOutcome(
+  options: Readonly<{
+    ruleTable: ExtractedTable;
+    regionId: string;
+    geometry: RegionGeometry;
+    response: { responseText: string; model: string };
+  }>,
+): RegionAssistOutcome {
+  const modelTable = parseRegionResponse({
+    regionId: options.regionId,
+    pageIndex: options.geometry.pageIndex,
+    bbox: options.geometry.bbox,
+    responseText: options.response.responseText,
+  });
+  const addedRowCount = modelTable.cells.length - modelTable.headerRows;
+  if (addedRowCount <= 0) {
+    return { kind: "skipped", reason: "empty_model_response" };
+  }
+  return {
+    kind: "merged",
+    table: mergeModelRows({ ruleTable: options.ruleTable, modelTable }),
+    llmModel: options.response.model,
+    addedRowCount,
   };
 }
 
@@ -196,74 +223,29 @@ export async function runRegionModelAssist(
     return { kind: "skipped", reason: "no_text" };
   }
 
-  const prompt = makeRegionPromptFromRegionText({
-    regionText,
-    ruleResults: _tableToMeasurements(params.ruleTable),
-  });
-
-  // `values` carries the region's text because the PII detectors read values
-  // rather than text, so without it they would never see what is about to be
-  // sent. `explicitConsentRequired` forces the modal even when the detectors
-  // are clean: clicking the button is a request to send, not consent to
-  // having sent.
-  const consent = await decideIfDataCanCrossBoundary({
-    text: prompt,
-    values: [regionText],
-    context: "user_message_text",
-    workspaceId: params.workspaceId,
-    userId: params.userId,
-    explicitConsentRequired: true,
-  });
-  if (!consent.approved) {
+  const consented = await _askToSend(params, regionText);
+  if (!consented) {
     return { kind: "skipped", reason: "consent_declined" };
   }
-
-  // The ack covers the FINAL text, which a bias-suggestion swap may have
-  // rewritten, so the message we post has to be that same text.
-  const content = consent.payload.text ?? prompt;
-  const ackToken = await PendingAcks.consumeAckForText(content);
-  // The `chat` edge function always answers with its default model, so that
-  // is the model to record on the merged table.
-  const llmModel = ChatModelOption.Catalog.defaultId;
+  // The assistant's own route holds the prompt and answers with the
+  // server's model; the figures the rules found are sent so the model adds
+  // only what they missed.
   const response = await APIClient.post({
-    route: "chat/:workspaceId/messages",
+    route: "chat/:workspaceId/extract-measurements",
     pathParams: { workspaceId: params.workspaceId },
     body: {
-      messages: [
-        Model.make("ChatClientMessage", { role: "user" as const, content }),
-      ],
-      context: ChatPageContext.createDataSourcesViewContext(),
-      ...(ackToken
-        ? {
-            consentAcks: [
-              {
-                ackToken,
-                scope: { kind: "message_index" as const, index: 0 },
-              },
-            ],
-          }
-        : {}),
+      regionText: consented.text,
+      alreadyExtracted: tableToMeasurements(params.ruleTable).map((figure) => {
+        return { metric: figure.metric, value: figure.value };
+      }),
+      ackToken: consented.ackToken,
     },
   });
 
-  const modelTable = parseRegionResponse({
+  return _toOutcome({
+    ruleTable: params.ruleTable,
     regionId: params.region.id,
-    pageIndex: geometry.pageIndex,
-    bbox: geometry.bbox,
-    responseText: response.assistantText,
+    geometry,
+    response,
   });
-  const addedRowCount = modelTable.cells.length - modelTable.headerRows;
-  if (addedRowCount <= 0) {
-    return { kind: "skipped", reason: "empty_model_response" };
-  }
-
-  return {
-    kind: "merged",
-    table: mergeModelRows({
-      ruleTable: params.ruleTable,
-      modelTable,
-    }),
-    llmModel,
-    addedRowCount,
-  };
 }
