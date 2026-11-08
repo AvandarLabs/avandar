@@ -8,14 +8,21 @@ import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageCont
 import type { CreateChatModelAdapterOptions } from "./createChatModelAdapter";
 import type { ChatModelAdapter } from "@assistant-ui/react";
 
-const { apiPostMock, runOfflineDataAgentTurnMock, runOfflineChatTurnMock } =
-  vi.hoisted(() => {
-    return {
-      apiPostMock: vi.fn(),
-      runOfflineDataAgentTurnMock: vi.fn(),
-      runOfflineChatTurnMock: vi.fn(),
-    };
-  });
+const {
+  apiPostMock,
+  runOfflineDataAgentTurnMock,
+  runOfflineChatTurnMock,
+  runDataAgentTurnMock,
+  isAgentEnabledMock,
+} = vi.hoisted(() => {
+  return {
+    apiPostMock: vi.fn(),
+    runOfflineDataAgentTurnMock: vi.fn(),
+    runOfflineChatTurnMock: vi.fn(),
+    runDataAgentTurnMock: vi.fn(),
+    isAgentEnabledMock: vi.fn(),
+  };
+});
 
 vi.mock("@/clients/APIClient", () => {
   return { APIClient: { post: apiPostMock } };
@@ -42,6 +49,17 @@ vi.mock(
     return { runOfflineChatTurn: runOfflineChatTurnMock };
   },
 );
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn",
+  () => {
+    return { runDataAgentTurn: runDataAgentTurnMock };
+  },
+);
+
+vi.mock("@/lib/agent/dataAgent/browser/DataAgentFeature", () => {
+  return { DataAgentFeature: { isEnabled: isAgentEnabledMock } };
+});
 
 vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse",
@@ -73,6 +91,7 @@ function _createAdapter(app: ChatPageContext.T["app"]): ChatModelAdapter {
     userRef: ref(undefined),
     workspaceIdRef: ref("workspace-1"),
     workspaceRef: ref({ id: "workspace-1" }),
+    pathnameRef: ref("/acme/dashboards"),
     dashboardEditorStateRef: ref({}),
     parseSqlRef: ref(vi.fn()),
     copyRef: ref({ offlineModelRequired: OFFLINE_MODEL_REQUIRED }),
@@ -101,6 +120,7 @@ function _setNavigatorOnLine(isOnLine: boolean): void {
 
 describe("createChatModelAdapter", () => {
   beforeEach(() => {
+    isAgentEnabledMock.mockReturnValue(false);
     apiPostMock
       .mockReset()
       .mockResolvedValue(
@@ -175,5 +195,63 @@ describe("createChatModelAdapter", () => {
     });
     expect(apiPostMock).not.toHaveBeenCalled();
     expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("createChatModelAdapter with the agent on", () => {
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    isAgentEnabledMock.mockReturnValue(true);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    runDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "agent reply" }],
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it.each(["data-explorer", "dashboards", "data-sources", "other"] as const)(
+    "answers on %s with the agent",
+    async (app) => {
+      await _ask(_createAdapter(app));
+
+      expect(runDataAgentTurnMock).toHaveBeenCalledTimes(1);
+      expect(apiPostMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it("passes the page state to the agent", async () => {
+    await _ask(_createAdapter("dashboards"));
+
+    expect(runDataAgentTurnMock).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: "workspace-1" }),
+      expect.objectContaining({
+        pathname: "/acme/dashboards",
+        chatPageContext: expect.objectContaining({ app: "dashboards" }),
+      }),
+    );
+  });
+
+  it("keeps the case designer on today's chat", async () => {
+    await _ask(_createAdapter("case-manager"));
+
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+    expect(apiPostMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses today's chat everywhere while the switch is off", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    await _ask(_createAdapter("data-explorer"));
+
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+    expect(apiPostMock).toHaveBeenCalledTimes(1);
   });
 });

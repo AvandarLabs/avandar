@@ -152,6 +152,7 @@ export function useAvandarChatRuntime(): {
       userRef,
       workspaceIdRef,
       workspaceRef,
+      pathnameRef,
       dashboardEditorStateRef,
       parseSqlRef,
       copyRef,

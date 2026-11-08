@@ -51,6 +51,7 @@ export type CreateChatModelAdapterOptions = {
   userRef: MutableRefObject<User.T | undefined>;
   workspaceIdRef: MutableRefObject<Workspace.Id>;
   workspaceRef: MutableRefObject<Workspace.T>;
+  pathnameRef: MutableRefObject<string>;
   dashboardEditorStateRef: MutableRefObject<DashboardEditorAppState>;
   parseSqlRef: MutableRefObject<
     ReturnType<typeof useSqlToStructuredQuery>["parseSql"]
@@ -62,6 +63,29 @@ export type CreateChatModelAdapterOptions = {
   >;
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
 };
+
+/**
+ * Runs a turn with the data agent on any page. The agent, and the code
+ * that reads the page, load on first use so they stay out of the main
+ * bundle. The case designer keeps today's chat until case management
+ * moves into the agent.
+ */
+async function _runAgentTurn(
+  options: Readonly<{
+    dataAgentTurn: DataAgentTurnOptions;
+    pathname: string;
+    chatPageContext: ChatPageContext.T;
+    dashboardEditorState: DashboardEditorAppState;
+  }>,
+): Promise<ChatModelRunResult> {
+  const { runDataAgentTurn } =
+    await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
+  return runDataAgentTurn(options.dataAgentTurn, {
+    pathname: options.pathname,
+    chatPageContext: options.chatPageContext,
+    dashboardEditorState: options.dashboardEditorState,
+  });
+}
 
 /**
  * Builds the Assistant UI model adapter that posts each turn and applies
@@ -77,6 +101,7 @@ export function createChatModelAdapter(
     userRef,
     workspaceIdRef,
     workspaceRef,
+    pathnameRef,
     dashboardEditorStateRef,
     parseSqlRef,
     copyRef,
@@ -290,13 +315,17 @@ export function createChatModelAdapter(
       }
 
       if (
-        currentPageContext.app === "data-explorer" &&
+        currentPageContext.app !== "case-manager" &&
         DataAgentFeature.isEnabled()
       ) {
-        // Loaded on first use so the agent stays out of the main bundle.
-        const { runDataAgentTurn } =
-          await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
-        return finishIfCurrent(await runDataAgentTurn(dataAgentTurn));
+        return finishIfCurrent(
+          await _runAgentTurn({
+            dataAgentTurn,
+            pathname: pathnameRef.current,
+            chatPageContext: currentPageContext,
+            dashboardEditorState: dashboardEditorStateRef.current,
+          }),
+        );
       }
 
       const currentMessagesKey = chatMessagesKey(apiMessages);
