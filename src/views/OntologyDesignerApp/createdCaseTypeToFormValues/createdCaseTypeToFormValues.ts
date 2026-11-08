@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -34,6 +35,29 @@ function _findColumn(
   });
 }
 
+/**
+ * Holds chat's rule to the column's type, because every chat-created case type
+ * passes through this step. A rule the column's type does not allow becomes
+ * the default rule. Also returns the type that rule emits, which is the type
+ * the field stores.
+ */
+function _resolveRule(options: {
+  valuePickerRuleType: ValuePickerRuleType;
+  column: CatalogColumn;
+}): { ruleType: ValuePickerRuleType; dataType: CatalogColumn["dataType"] } {
+  const ruleOnColumn = {
+    ruleType: ValuePickerRule.toAllowedRuleType({
+      ruleType: options.valuePickerRuleType,
+      columnDataType: options.column.dataType,
+    }),
+    columnDataType: options.column.dataType,
+  };
+  return {
+    ruleType: ruleOnColumn.ruleType,
+    dataType: ValuePickerRule.getOutputDataType(ruleOnColumn),
+  };
+}
+
 function _makeMappedAttribute(options: {
   conceptId: ConceptId;
   name: string;
@@ -44,12 +68,13 @@ function _makeMappedAttribute(options: {
   valuePickerRuleType: ValuePickerRuleType;
 }): AttributeFormValues {
   const conceptAttributeId = uuid<ConceptAttributeId>();
+  const rule = _resolveRule(options);
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId: options.conceptId,
     name: ConceptStatus.toNonReservedAttributeName(options.name),
     description: options.description,
-    dataType: options.column.dataType,
+    dataType: rule.dataType,
     mappingType: "dataset_column",
     isIdentifier: options.isIdentifier,
     isLabel: options.isLabel,
@@ -63,7 +88,7 @@ function _makeMappedAttribute(options: {
       datasetColumn: {
         type: "dataset_column",
         conceptAttributeId,
-        valuePickerRuleType: options.valuePickerRuleType,
+        valuePickerRuleType: rule.ruleType,
         datasetId: options.column.datasetId,
         datasetColumnId: options.column.id,
       },
