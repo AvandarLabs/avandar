@@ -18,6 +18,7 @@ function _createDependencies(
 ): CatalogListingPreviewDependencies {
   return {
     fetchApiResource: vi.fn(),
+    fetchCsvSample: vi.fn(),
     fetchParquetUrl: vi.fn(),
     sniffCsv: vi.fn().mockResolvedValue(SNIFFED),
     previewParquetBlob: vi.fn().mockResolvedValue(SNIFFED),
@@ -26,25 +27,24 @@ function _createDependencies(
 }
 
 describe("fetchCatalogListingPreview", () => {
-  it("reads an API-backed CSV resource with the CSV sniffer", async () => {
+  it("reads an API-backed CSV listing from the start of its file", async () => {
     const dependencies = _createDependencies({
-      fetchApiResource: vi.fn().mockResolvedValue({
-        contentKind: "csv",
-        bytes: new Uint8Array([97]),
-      }),
+      fetchCsvSample: vi.fn().mockResolvedValue("country,report_date\n"),
     });
 
     const preview = await fetchCatalogListingPreview({
       listing: {
         id: LISTING_ID,
         accessKind: "api_resource",
+        apiResourceFormat: "csv",
         canonicalUrls: undefined,
       },
       maxPreviewRows: 200,
       dependencies,
     });
 
-    expect(dependencies.fetchApiResource).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchCsvSample).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchApiResource).not.toHaveBeenCalled();
     expect(dependencies.sniffCsv).toHaveBeenCalledWith(
       expect.objectContaining({ maxPreviewRows: 200, hasHeader: true }),
     );
@@ -52,6 +52,30 @@ describe("fetchCatalogListingPreview", () => {
     expect(preview.columnNames).toEqual(["country", "report_date"]);
     expect([...preview.dateColumnNames]).toEqual(["report_date"]);
     expect(preview.rows).toEqual(SNIFFED.previewRows);
+  });
+
+  it("reads a whole API-backed resource that came back as CSV", async () => {
+    const dependencies = _createDependencies({
+      fetchApiResource: vi.fn().mockResolvedValue({
+        contentKind: "csv",
+        bytes: new Uint8Array([97]),
+      }),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "XLSX",
+        canonicalUrls: undefined,
+      },
+      maxPreviewRows: 200,
+      dependencies,
+    });
+
+    expect(dependencies.fetchApiResource).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchCsvSample).not.toHaveBeenCalled();
+    expect(dependencies.sniffCsv).toHaveBeenCalled();
   });
 
   it("reads an API-backed Parquet resource without the CSV sniffer", async () => {
@@ -66,6 +90,7 @@ describe("fetchCatalogListingPreview", () => {
       listing: {
         id: LISTING_ID,
         accessKind: "api_resource",
+        apiResourceFormat: "PARQUET",
         canonicalUrls: undefined,
       },
       maxPreviewRows: 200,
@@ -87,6 +112,7 @@ describe("fetchCatalogListingPreview", () => {
       listing: {
         id: LISTING_ID,
         accessKind: "pipeline_parquet",
+          apiResourceFormat: undefined,
         canonicalUrls: ["https://example.org/page", "https://x.org/a.PARQUET"],
       },
       maxPreviewRows: 200,
@@ -105,6 +131,7 @@ describe("fetchCatalogListingPreview", () => {
         listing: {
           id: LISTING_ID,
           accessKind: "pipeline_parquet",
+          apiResourceFormat: undefined,
           canonicalUrls: undefined,
         },
         maxPreviewRows: 200,

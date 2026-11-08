@@ -36,6 +36,7 @@ export function useCatalogListingPreview(
       : {
           id: listing.id,
           accessKind: listing.accessKind,
+          apiResourceFormat: listing.apiResourceFormat,
           canonicalUrls: listing.canonicalUrls,
         };
   const query = useQuery({
