@@ -1,10 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DATASET_ID,
+  importDuckDbModules,
   PUBLIC_OWNER,
   queryMock,
   resetDuckDbOwnershipMocks,
+  stubWorker,
 } from "@/clients/DuckDbClient/__tests__/DuckDbClient.ownership.fixtures";
+
+/** A case type whose view a workspace query left in DuckDB. */
+const CONCEPT_ID = "44444444-4444-4444-8444-444444444444";
 
 afterEach(() => {
   resetDuckDbOwnershipMocks();
@@ -117,6 +122,80 @@ describe("DuckDbClient public snapshot reads", () => {
       }),
     ).rejects.toThrow(/public.*read-only/i);
     expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  // A public snapshot builds no case type view, so a `concept_<id>` view in
+  // DuckDB was built by a workspace query and belongs to no snapshot.
+  it("rejects a public read of a case type's view", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(`SELECT * FROM "concept_${CONCEPT_ID}"`, {
+        datasetTableReadMode: "public",
+        publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+      }),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a public read that joins a published dataset to a case type's view", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient, DatasetDuckDbCoordinator } =
+      await importDuckDbModules();
+    DatasetDuckDbCoordinator.setPublicSnapshotDatasetOwner({
+      datasetId: DATASET_ID,
+      owner: PUBLIC_OWNER,
+    });
+
+    await expect(
+      DuckDbClient.runRawQuery(
+        `SELECT * FROM "${DATASET_ID}" JOIN "concept_${CONCEPT_ID}" ON true`,
+        {
+          datasetTableReadMode: "public",
+          publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+        },
+      ),
+    ).rejects.toThrow(/only read published datasets/i);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  // The analyzer cannot account for a spine table, so it refuses the
+  // statement before any relation check runs.
+  it("rejects a public read of a case type's spine table", async () => {
+    vi.resetModules();
+    stubWorker();
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(
+        `SELECT * FROM "concept_${CONCEPT_ID}__individuals"`,
+        {
+          datasetTableReadMode: "public",
+          publicSnapshotDuckDbOwner: PUBLIC_OWNER,
+        },
+      ),
+    ).rejects.toThrow(/uninspectable-source/);
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+
+  // Workspace reads build and read case type views on purpose.
+  it("still lets a workspace read name a case type's view", async () => {
+    vi.resetModules();
+    stubWorker();
+    queryMock.mockResolvedValue({
+      schema: { fields: [] },
+      toArray: () => {
+        return [];
+      },
+    });
+    const { DuckDbClient } = await importDuckDbModules();
+
+    await expect(
+      DuckDbClient.runRawQuery(`SELECT * FROM "concept_${CONCEPT_ID}"`),
+    ).resolves.toMatchObject({ data: [] });
   });
 
   it("rejects direct raw workspace reads of invalid tables", async () => {
