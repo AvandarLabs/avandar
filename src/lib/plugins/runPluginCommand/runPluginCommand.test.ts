@@ -111,7 +111,11 @@ describe("runPluginCommand", () => {
     const failure = await _runCommandFromLoader({
       loadCode: async () => {
         return {
-          definition: { kind: "avandar-plugin", commands: { hello: "nope" } },
+          definition: {
+            kind: "avandar-plugin",
+            commands: { hello: "nope" },
+            vizTypes: {},
+          },
           messages: { en: {} },
         };
       },
@@ -128,6 +132,7 @@ describe("runPluginCommand", () => {
             get commands(): never {
               throw new Error("hostile getter");
             },
+            vizTypes: {},
           },
           messages: { en: {} },
         };

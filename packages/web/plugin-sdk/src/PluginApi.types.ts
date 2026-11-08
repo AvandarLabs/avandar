@@ -1,3 +1,4 @@
+import type { PluginVizDefinition } from "@plugin-sdk/PluginViz.types";
 import type { ReactNode } from "react";
 
 /**
@@ -126,4 +127,9 @@ export type PluginDefinition = Readonly<{
    * `ava.yaml`.
    */
   commands: Readonly<Record<string, CommandHandler>>;
+  /**
+   * How each chart type draws, keyed by the chart type ids the plugin
+   * declares under `contributes.vizTypes` in its `ava.yaml`.
+   */
+  vizTypes: Readonly<Record<string, PluginVizDefinition>>;
 }>;

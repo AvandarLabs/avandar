@@ -25,3 +25,13 @@ export type {
   QueryHandle,
   TranslationValues,
 } from "@plugin-sdk/PluginApi.types";
+export type {
+  PluginChartSpec,
+  PluginVizComponentProps,
+  PluginVizContext,
+  PluginVizDefinition,
+  PluginVizInput,
+  PluginVizSettingValue,
+  PluginVizTransform,
+  PluginVizTransformResult,
+} from "@plugin-sdk/PluginViz.types";
