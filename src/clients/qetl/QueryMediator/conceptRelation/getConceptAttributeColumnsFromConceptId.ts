@@ -8,13 +8,23 @@ import type { AttributeMapping } from "$/models/ontology/AttributeMapping/Attrib
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeColumns } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 
-/** Every dataset column the given mappings name. */
+/**
+ * Every dataset column the given mappings name, as a value or as a date column,
+ * keyed by id.
+ */
 async function _getMappedDatasetColumns(
   mappings: readonly AttributeMapping[],
 ): Promise<DatasetColumn.T[]> {
   const datasetColumnIds = removeDuplicates(
     mappings.flatMap((mapping) => {
-      return mapping.type === "dataset_column" ? [mapping.datasetColumnId] : [];
+      if (mapping.type !== "dataset_column") {
+        return [];
+      }
+      // A per-period field also reads the date column that places each row
+      // in a period, and column resolution looks that column up by id.
+      return mapping.bucketColumnId === undefined
+        ? [mapping.datasetColumnId]
+        : [mapping.datasetColumnId, mapping.bucketColumnId];
     }),
   );
   return datasetColumnIds.length === 0

@@ -5,28 +5,30 @@ import { getNeededColumnsFromQuery } from "@/clients/qetl/QueryMediator/getNeede
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
 
+const AGE_COLUMN: Extract<ConceptAttributeColumn, { kind: "dataset_column" }> =
+  {
+    kind: "dataset_column",
+    attributeId: "attr-age" as ConceptAttribute.Id,
+    attributeName: "age",
+    selectColumnName: "age_years",
+    datasetId: DATASET_ID,
+    columnDataType: "bigint",
+    primaryKeyColumnName: "person_id",
+    valuePickerRuleType: "first",
+    valueShape: "single",
+  };
+
 const CONCEPT_PLAN: ConceptRelationPlan = {
   ref: { kind: "concept", id: CONCEPT_ID },
   contributingDatasetIds: [DATASET_ID],
   spineRows: [{ externalId: "p1", statusName: "Active" }],
-  attributeColumns: [
-    {
-      kind: "dataset_column",
-      attributeId: "attr-age" as ConceptAttribute.Id,
-      attributeName: "age",
-      selectColumnName: "age_years",
-      datasetId: DATASET_ID,
-      columnDataType: "bigint",
-      primaryKeyColumnName: "person_id",
-      valuePickerRuleType: "first",
-      valueShape: "single",
-    },
-  ],
+  attributeColumns: [AGE_COLUMN],
 };
 
 describe("getNeededColumnsFromQuery", () => {
@@ -38,6 +40,32 @@ describe("getNeededColumnsFromQuery", () => {
         conceptRelations: [CONCEPT_PLAN],
       }),
     ).toEqual({ [DATASET_ID]: ["age_years", "person_id"] });
+  });
+
+  it("takes a per-month field's date column from a concept plan", () => {
+    const perMonthPlan: ConceptRelationPlan = {
+      ...CONCEPT_PLAN,
+      attributeColumns: [
+        {
+          ...AGE_COLUMN,
+          attributeName: "temperature per month",
+          selectColumnName: "temperature",
+          valueShape: "bucketed_list",
+          valuePickerRuleType: "avg",
+          bucketGrain: "month",
+          bucketColumnName: "visit_date",
+          isBucketColumnZoned: false,
+        },
+      ],
+    };
+
+    expect(
+      getNeededColumnsFromQuery({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        datasetIds: [DATASET_ID],
+        conceptRelations: [perMonthPlan],
+      }),
+    ).toEqual({ [DATASET_ID]: ["person_id", "temperature", "visit_date"] });
   });
 
   it("reads an explicit select list from a single-dataset query", () => {

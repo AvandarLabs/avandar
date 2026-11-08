@@ -94,6 +94,39 @@ const IDENTIFIER_COLUMN = {
   datasetId: DATASET_ID,
 } as DatasetColumn.T;
 
+const TEMPERATURE_ATTRIBUTE = {
+  ...IDENTIFIER_ATTRIBUTE,
+  id: "attr-temperature" as ConceptAttribute.Id,
+  name: "temperature per month",
+  dataType: "double",
+  isIdentifier: false,
+  isArray: true,
+  bucketGrain: "month",
+} as ConceptAttribute.T;
+
+const TEMPERATURE_MAPPING = {
+  ...IDENTIFIER_MAPPING,
+  id: "map-temperature",
+  conceptAttributeId: TEMPERATURE_ATTRIBUTE.id,
+  valuePickerRuleType: "avg",
+  datasetColumnId: "col-temperature",
+  bucketColumnId: "col-visit-date",
+} as DatasetColumnMapping;
+
+const TEMPERATURE_COLUMN = {
+  id: "col-temperature",
+  name: "temperature",
+  datasetId: DATASET_ID,
+  dataType: "double",
+} as DatasetColumn.T;
+
+const VISIT_DATE_COLUMN = {
+  id: "col-visit-date",
+  name: "visit_date",
+  datasetId: DATASET_ID,
+  dataType: "date",
+} as DatasetColumn.T;
+
 /** An allowlist that permits the fixture concept and its dataset. */
 function _permissiveAllowlist(): {
   getAllowedConceptIds: () => Promise<Concept.Id[]>;
@@ -144,6 +177,47 @@ describe("getConceptRelationPlansFromSql", () => {
     expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
     expect(individualGetAllMock).not.toHaveBeenCalled();
     expect(conceptStatusGetAllMock).not.toHaveBeenCalled();
+  });
+
+  it("fetches the date column a per-month field groups its rows by", async () => {
+    conceptAttributeGetAllMock.mockResolvedValue([
+      IDENTIFIER_ATTRIBUTE,
+      TEMPERATURE_ATTRIBUTE,
+    ]);
+    getAllAttributeMappingsMock.mockResolvedValue([
+      IDENTIFIER_MAPPING,
+      TEMPERATURE_MAPPING,
+    ]);
+    // Answers only the ids asked for, as the real client does.
+    datasetColumnGetAllMock.mockImplementation(
+      async (filter: { where: { id: { in: readonly string[] } } }) => {
+        return [
+          IDENTIFIER_COLUMN,
+          TEMPERATURE_COLUMN,
+          VISIT_DATE_COLUMN,
+        ].filter((column) => {
+          return filter.where.id.in.includes(column.id);
+        });
+      },
+    );
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+    });
+
+    expect(
+      plans[0]?.attributeColumns.find((column) => {
+        return column.attributeName === "temperature per month";
+      }),
+    ).toMatchObject({
+      kind: "dataset_column",
+      valueShape: "bucketed_list",
+      bucketGrain: "month",
+      bucketColumnName: "visit_date",
+    });
   });
 
   it("plans a concept the caller is allowed to read", async () => {
