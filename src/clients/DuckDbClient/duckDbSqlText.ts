@@ -102,6 +102,32 @@ export function getTableNameFromRowNumberedViewName(
 }
 
 /**
+ * The alias every subquery reads its dataset rows under. It must stay
+ * `dataset`: `getEntityKeyComparisonSql` qualifies the key with it.
+ */
+export const DATASET_ALIAS = "dataset";
+
+/**
+ * The aggregate that picks a text column's last or first value
+ * alphabetically, as `arg_max` or `arg_min`.
+ *
+ * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
+ * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
+ * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
+ * a struct, which compares field by field, so values that share a key
+ * ("apple" and "Apple") tie-break by the value itself in byte order, in the
+ * same direction. The pick never depends on scan order, and the aggregate
+ * returns the original value.
+ */
+export function buildTextExtremeSql(
+  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
+): string {
+  const { value, aggregate } = options;
+  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
+  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
+}
+
+/**
  * Matches an outer table's entity key to a contributing dataset's key column,
  * comparing both as text.
  *
@@ -134,7 +160,7 @@ export function getEntityKeyComparisonSql(
   // Quoted rather than wrapped in bare double quotes, so a key column whose
   // name contains `"` still compiles.
   const outerKey = `${quoteSqlIdentifier(options.externalIdsTable)}.${quoteSqlIdentifier(options.externalIdColumn)}`;
-  const datasetKey = `dataset.${quoteSqlIdentifier(options.primaryKeyColumnName)}`;
+  const datasetKey = `${DATASET_ALIAS}.${quoteSqlIdentifier(options.primaryKeyColumnName)}`;
   return `CAST(${outerKey} AS VARCHAR) = CAST(${datasetKey} AS VARCHAR)`;
 }
 

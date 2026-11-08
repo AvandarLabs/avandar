@@ -2,17 +2,13 @@ import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import {
+  DATASET_ALIAS,
+  buildTextExtremeSql,
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
-
-/**
- * The alias every subquery reads its dataset rows under. It must stay
- * `dataset`, the alias `getEntityKeyComparisonSql` qualifies the key with.
- */
-export const DATASET_ALIAS = "dataset";
 
 /**
  * What one attribute's value is read from, and the outer table of record keys
@@ -56,26 +52,6 @@ type ValueSqlParts = {
   /** The dataset's `ava_rows_` view, which exposes `file_row_number`. */
   rowsView: string;
 };
-
-/**
- * The aggregate that picks a text column's last or first value
- * alphabetically, as `arg_max` or `arg_min`.
- *
- * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
- * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
- * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
- * a struct, which compares field by field, so values that share a key
- * ("apple" and "Apple") tie-break by the value itself in byte order, in the
- * same direction. The pick never depends on scan order, and the aggregate
- * returns the original value.
- */
-export function buildTextExtremeSql(
-  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
-): string {
-  const { value, aggregate } = options;
-  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
-  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
-}
 
 /**
  * The `SELECT` that reduces one record's non-NULL rows to its value.

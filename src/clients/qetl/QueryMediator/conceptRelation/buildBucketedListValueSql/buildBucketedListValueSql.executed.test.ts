@@ -38,6 +38,7 @@ const SCORE_PER_MONTH: BucketedListValueSqlOptions = {
   primaryKeyColumnName: "person_id",
   // The space proves the date column is quoted.
   bucketColumnName: "Visit date",
+  isBucketColumnZoned: false,
   bucketGrain: "month",
   ruleType: "first",
   externalIdsTable: "individuals",
@@ -66,7 +67,13 @@ type Period = { bucket: string; value: unknown };
  * `p2` has one row whose cells are all NULL; `p3` has no rows.
  *
  * Readings are four instants around a year end, with a Sunday, for checking
- * where each period starts on a `TIMESTAMP` and on a `DATE` column.
+ * where each period starts on a `TIMESTAMP` and on a `DATE` column. The
+ * `read_zoned` column holds instants near the edges of a UTC month for
+ * `TIMESTAMPTZ`.
+ *
+ * Visits also carry a value column whose name has a double quote, and one
+ * named `external_id` like the spine's key column, to prove both read the
+ * dataset.
  */
 async function _seed(connection: DuckDBConnection): Promise<void> {
   const visitsPath = join(
@@ -80,7 +87,11 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
 
   await connection.run(`
     COPY (
-      SELECT * FROM (VALUES
+      SELECT
+        *,
+        score * 2 AS "dose ""x""",
+        label AS external_id
+      FROM (VALUES
         ('p1', DATE '2026-01-05', 10, 'South', 'zebra'),
         ('p1', DATE '2026-01-20', 20, 'North', 'Ángel'),
         ('p1', DATE '2026-01-25', NULL, 'North', 'Apple'),
@@ -101,11 +112,11 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
   await connection.run(`
     COPY (
       SELECT * FROM (VALUES
-        ('p1', TIMESTAMP '2026-01-04 23:59:59', DATE '2026-01-04', 1),
-        ('p1', TIMESTAMP '2026-01-07 10:00:00', DATE '2026-01-07', 1),
-        ('p1', TIMESTAMP '2026-05-20 08:00:00', DATE '2026-05-20', 1),
-        ('p1', TIMESTAMP '2025-12-31 23:00:00', DATE '2025-12-31', 1)
-      ) AS t(person_id, read_at, read_on, reading)
+        ('p1', TIMESTAMP '2026-01-04 23:59:59', DATE '2026-01-04', 1, TIMESTAMPTZ '2026-01-31 23:30:00+00'),
+        ('p1', TIMESTAMP '2026-01-07 10:00:00', DATE '2026-01-07', 1, TIMESTAMPTZ '2026-01-01 02:00:00+00'),
+        ('p1', TIMESTAMP '2026-05-20 08:00:00', DATE '2026-05-20', 1, TIMESTAMPTZ '2026-01-15 12:00:00+00'),
+        ('p1', TIMESTAMP '2025-12-31 23:00:00', DATE '2025-12-31', 1, TIMESTAMPTZ '2025-12-31 23:00:00+00')
+      ) AS t(person_id, read_at, read_on, reading, read_zoned)
     ) TO '${readingsPath}' (FORMAT parquet)
   `);
   await connection.run(`
@@ -125,6 +136,7 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
  */
 async function _readPeriods(
   overrides: Partial<BucketedListValueSqlOptions> = {},
+  sessionTimeZone: string = "UTC",
 ): Promise<Record<string, Period[]>> {
   const fieldSql = buildBucketedListValueSql({
     ...SCORE_PER_MONTH,
@@ -132,6 +144,7 @@ async function _readPeriods(
   });
   return await withDuckDb(async (connection) => {
     await _seed(connection);
+    await connection.run(`SET TimeZone = '${sessionTimeZone}'`);
     const reader = await connection.runAndReadAll(`
       SELECT
         individuals.external_id AS external_id,
@@ -232,7 +245,7 @@ describe("buildBucketedListValueSql", () => {
     expect(periods.p1?.[3]).toEqual({ bucket: "2026-04-01", value: "West" });
   });
 
-  it("keeps text in its own type for max and min", async () => {
+  it("gives each month's last and first region for max and min", async () => {
     const [maxPeriods, minPeriods] = await Promise.all([
       _readPeriods({
         ruleType: "max",
@@ -359,6 +372,85 @@ describe("buildBucketedListValueSql", () => {
       expect(periods.p1).toEqual(_periods(counts, buckets));
     },
   );
+
+  // Plain `TIMESTAMP` and `DATE` values have no zone, so no session time zone
+  // can move them.
+  it.each(["Asia/Tokyo", "America/Los_Angeles"])(
+    "buckets a column without a time zone the same under %s",
+    async (sessionTimeZone) => {
+      const periods = await _readPeriods(
+        {
+          datasetId: READINGS,
+          selectColumnName: "reading",
+          bucketColumnName: "read_at",
+          bucketGrain: "month",
+          ruleType: "count",
+        },
+        sessionTimeZone,
+      );
+
+      expect(periods.p1).toEqual(
+        _periods([1, 2, 1], ["2025-12-01", "2026-01-01", "2026-05-01"]),
+      );
+    },
+  );
+
+  // The instants are 2026-01-31 23:30, 2026-01-01 02:00, 2026-01-15 12:00 and
+  // 2025-12-31 23:00 UTC. Tokyo is nine hours ahead and Los Angeles eight
+  // behind, so a bucket taken in the session zone would move the first and
+  // last two of them into another month or day.
+  it.each(["UTC", "Asia/Tokyo", "America/Los_Angeles"])(
+    "buckets a time zone column in UTC under a %s session",
+    async (sessionTimeZone) => {
+      const options = {
+        datasetId: READINGS,
+        selectColumnName: "reading",
+        bucketColumnName: "read_zoned",
+        isBucketColumnZoned: true,
+        ruleType: "count",
+      } as const;
+
+      const [monthPeriods, dayPeriods, weekPeriods] = await Promise.all([
+        _readPeriods({ ...options, bucketGrain: "month" }, sessionTimeZone),
+        _readPeriods({ ...options, bucketGrain: "day" }, sessionTimeZone),
+        _readPeriods({ ...options, bucketGrain: "week" }, sessionTimeZone),
+      ]);
+
+      expect(monthPeriods.p1).toEqual(
+        _periods([1, 3], ["2025-12-01", "2026-01-01"]),
+      );
+      expect(dayPeriods.p1).toEqual(
+        _periods(
+          [1, 1, 1, 1],
+          ["2025-12-31", "2026-01-01", "2026-01-15", "2026-01-31"],
+        ),
+      );
+      expect(weekPeriods.p1).toEqual(
+        _periods([2, 1, 1], ["2025-12-29", "2026-01-12", "2026-01-26"]),
+      );
+    },
+  );
+
+  it("reads a value column whose name contains a double quote", async () => {
+    const periods = await _readPeriods({
+      selectColumnName: 'dose "x"',
+      ruleType: "first",
+    });
+
+    expect(periods.p1).toEqual(_periods([2, 20, 14, 10]));
+  });
+
+  // The spine's key column is also `external_id`. The value must come from
+  // the dataset's column of that name: the labels, not the record keys.
+  it("reads a value column named like the spine's key column from the dataset", async () => {
+    const periods = await _readPeriods({
+      selectColumnName: "external_id",
+      columnDataType: "varchar",
+      ruleType: "first",
+    });
+
+    expect(periods.p1).toEqual(_periods(["mango", "zebra", "apple", "Banana"]));
+  });
 
   it("types each field as a list of bucket and value structs", async () => {
     const types = await _describeFields({

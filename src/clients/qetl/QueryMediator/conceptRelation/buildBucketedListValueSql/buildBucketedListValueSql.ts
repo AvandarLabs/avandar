@@ -2,13 +2,11 @@ import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import {
+  DATASET_ALIAS,
+  buildTextExtremeSql,
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
-import {
-  DATASET_ALIAS,
-  buildTextExtremeSql,
-} from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
@@ -27,6 +25,12 @@ export type BucketedListValueSqlOptions = Readonly<{
   primaryKeyColumnName: string;
   /** The date or timestamp column that places each row in a period. */
   bucketColumnName: string;
+  /**
+   * Whether that column is a `TIMESTAMP WITH TIME ZONE`. Truncating one in
+   * the session's time zone would move a record's periods with the viewer's
+   * zone, so a zoned column is read in UTC first.
+   */
+  isBucketColumnZoned: boolean;
   bucketGrain: ConceptAttribute.BucketGrain;
   ruleType: ValuePickerRule.T;
   /** The outer table carrying the record keys, and its key column. */
@@ -62,6 +66,12 @@ const SOURCE_ALIAS = "source_rows";
 function _buildSourceRowsSql(options: BucketedListValueSqlOptions): string {
   const valueColumn = `${DATASET_ALIAS}.${quoteSqlIdentifier(options.selectColumnName)}`;
   const bucketColumn = `${DATASET_ALIAS}.${quoteSqlIdentifier(options.bucketColumnName)}`;
+  // `timezone('UTC', ...)` turns an instant into its UTC wall-clock time, so
+  // the period does not depend on the session's time zone. A column without a
+  // zone has no instant to convert, and the call would reverse its meaning.
+  const bucketInstant = options.isBucketColumnZoned
+    ? `timezone('UTC', ${bucketColumn})`
+    : bucketColumn;
   const datePart = DATE_TRUNC_PART_BY_GRAIN[options.bucketGrain];
   const keyComparison = getEntityKeyComparisonSql({
     externalIdsTable: options.externalIdsTable,
@@ -72,7 +82,7 @@ function _buildSourceRowsSql(options: BucketedListValueSqlOptions): string {
     getRowNumberedViewName(options.datasetId),
   );
   return `SELECT
-          CAST(date_trunc('${datePart}', ${bucketColumn}) AS DATE) AS bucket,
+          CAST(date_trunc('${datePart}', ${bucketInstant}) AS DATE) AS bucket,
           ${valueColumn} AS value,
           ${DATASET_ALIAS}.file_row_number AS row_order
         FROM ${rowsView} ${DATASET_ALIAS}
