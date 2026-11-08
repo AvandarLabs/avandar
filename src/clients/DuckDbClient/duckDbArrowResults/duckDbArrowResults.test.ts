@@ -206,6 +206,68 @@ describe("arrowTableToJS", () => {
     ).toEqual([{ seenAt: ["2026-01-05T10:30:00.000Z"] }]);
   });
 
+  it("returns a whole-second time in a list cell as HH:MM:SS", () => {
+    const opensAt = arrow.vectorFromArray(
+      [[36_000_000_000n, 3_661_000_000n]],
+      new arrow.List(
+        new arrow.Field("item", new arrow.TimeMicrosecond(), true),
+      ),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("opensAt", opensAt)).data,
+    ).toEqual([{ opensAt: ["10:00:00", "01:01:01"] }]);
+  });
+
+  it("returns a fractional time in a list cell with six fraction digits", () => {
+    const opensAt = arrow.vectorFromArray(
+      [[36_000_500_000n, null]],
+      new arrow.List(
+        new arrow.Field("item", new arrow.TimeMicrosecond(), true),
+      ),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("opensAt", opensAt)).data,
+    ).toEqual([{ opensAt: ["10:00:00.500000", null] }]);
+  });
+
+  it.each([
+    ["TimeSecond", new arrow.TimeSecond(), 36_000, 36_001],
+    ["TimeMillisecond", new arrow.TimeMillisecond(), 36_000_000, 36_000_500],
+    [
+      "TimeNanosecond",
+      new arrow.TimeNanosecond(),
+      36_000_000_000_000n,
+      36_000_500_000_000n,
+    ],
+  ])(
+    "returns the times of a %s list cell as clock times",
+    (_unitName, timeType, wholeValue, otherValue) => {
+      const opensAt = arrow.vectorFromArray(
+        [[wholeValue, otherValue]],
+        new arrow.List(new arrow.Field("item", timeType, true)),
+      );
+
+      const [row] = arrowTableToJS(
+        createTableFromColumn("opensAt", opensAt),
+      ).data;
+
+      expect((row as { opensAt: string[] }).opensAt[0]).toBe("10:00:00");
+    },
+  );
+
+  it("leaves a top-level time as a number", () => {
+    const opensAt = arrow.vectorFromArray(
+      [36_000_000_000n],
+      new arrow.TimeMicrosecond(),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("opensAt", opensAt)).data,
+    ).toEqual([{ opensAt: 36_000_000_000 }]);
+  });
+
   it("describes a list column as a text list without logging an error", () => {
     const logger = { error: vi.fn() } as unknown as ILogger;
     const symptoms = arrow.vectorFromArray(

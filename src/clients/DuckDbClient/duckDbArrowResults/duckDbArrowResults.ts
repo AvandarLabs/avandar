@@ -14,9 +14,43 @@ function _getDecimalScale(
   return dataType instanceof arrow.Decimal ? dataType.scale : undefined;
 }
 
+const NANOSECONDS_PER_TIME_UNIT: Readonly<Record<arrow.TimeUnit, bigint>> = {
+  [arrow.TimeUnit.SECOND]: 1_000_000_000n,
+  [arrow.TimeUnit.MILLISECOND]: 1_000_000n,
+  [arrow.TimeUnit.MICROSECOND]: 1_000n,
+  [arrow.TimeUnit.NANOSECOND]: 1n,
+};
+
+/**
+ * Reads a TIME value, counted in `unit`s since midnight, as `HH:MM:SS`. A
+ * fraction is added as six digits only when it is not zero. Precision finer
+ * than a microsecond is dropped.
+ */
+function _toClockTimeFromTimeValue(
+  options: Readonly<{ unit: arrow.TimeUnit; timeValue: number | bigint }>,
+): string {
+  const { unit, timeValue } = options;
+  const totalMicroseconds =
+    (BigInt(timeValue) * NANOSECONDS_PER_TIME_UNIT[unit]) / 1_000n;
+  const totalSeconds = totalMicroseconds / 1_000_000n;
+  const fractionMicroseconds = totalMicroseconds % 1_000_000n;
+  const [hours, minutes, seconds] = [
+    totalSeconds / 3_600n,
+    (totalSeconds / 60n) % 60n,
+    totalSeconds % 60n,
+  ].map((part) => {
+    return String(part).padStart(2, "0");
+  });
+  const fraction =
+    fractionMicroseconds === 0n
+      ? ""
+      : `.${String(fractionMicroseconds).padStart(6, "0")}`;
+  return `${hours}:${minutes}:${seconds}${fraction}`;
+}
+
 /**
  * One element of a LIST cell. A list result column is described as text, so
- * its dates and timestamps become strings rather than epoch numbers that
+ * its dates, timestamps and times become strings rather than epoch numbers that
  * nothing downstream could tell from a count. Any other element goes through
  * the same conversion as a top-level cell.
  */
@@ -32,6 +66,12 @@ function _toJsListItem(
   }
   if (arrow.DataType.isTimestamp(itemType)) {
     return new Date(item as number).toISOString();
+  }
+  if (arrow.DataType.isTime(itemType)) {
+    return _toClockTimeFromTimeValue({
+      unit: itemType.unit,
+      timeValue: item as number | bigint,
+    });
   }
   return _toJsValueFromArrowValue(item, itemType);
 }
