@@ -2,6 +2,7 @@ import { readdir, rename } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { NodeDuckDb } from "@avandar/etl";
+import { buildParquetCachePartName } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath";
 import { Constants } from "$/types/database.types";
 import type { Enums } from "$/types/database.types";
 import type { ListingDownloadColumn } from "@avandar/etl";
@@ -168,10 +169,7 @@ async function _copyRowsToParts(args: {
     });
   return await Promise.all(
     rawNames.map(async (rawName, index) => {
-      const partPath = join(
-        args.partsDir,
-        `part-${String(index).padStart(5, "0")}.parquet`,
-      );
+      const partPath = join(args.partsDir, buildParquetCachePartName(index));
       await rename(join(args.partsDir, rawName), partPath);
       return partPath;
     }),

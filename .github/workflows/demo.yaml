@@ -83,6 +83,7 @@ jobs:
           OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
           FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
           AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
+          AVA_PIPELINE_SERVER_URL: ${{ vars.AVA_PIPELINE_SERVER_URL }}
         run: |
           secrets_file="$RUNNER_TEMP/demo-functions.env"
           {
@@ -104,6 +105,7 @@ jobs:
             echo "OPEN_ROUTER_API_KEY=$OPEN_ROUTER_API_KEY"
             echo "FEATUREBASE_JWT_SECRET=$FEATUREBASE_JWT_SECRET"
             echo "AVA_PIPELINE_SERVER_SECRET=$AVA_PIPELINE_SERVER_SECRET"
+            echo "AVA_PIPELINE_SERVER_URL=$AVA_PIPELINE_SERVER_URL"
           } > "$secrets_file"
           supabase secrets set --project-ref "$DEMO_SUPABASE_REF" \
             --env-file "$secrets_file"
