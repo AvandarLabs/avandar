@@ -50,3 +50,12 @@ export type ConceptAttributeModel = SupabaseCrudModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
+
+/**
+ * How many values a field holds for one record. `single` reduces the field's
+ * rows to one value with its value rule; `list` keeps every non-NULL value
+ * in source order. Authoring, the concept view, the query form, and the
+ * record page each branch on it, for example to hide the value rule of a
+ * list.
+ */
+export type ConceptAttributeValueShape = "single" | "list";
