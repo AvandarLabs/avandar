@@ -14,8 +14,9 @@ host renders.
 | `isPluginDefinition` | Function | Checks that a value came from `definePlugin`, so a host can validate a plugin's entry module before it runs a command or draws a chart |
 | `makePluginTranslator` | Function | Makes a translator for a plugin's own ICU messages. A key falls back from the exact locale to its base language (`es` for `es-MX`), then English, then the bare key. A message that cannot be compiled or formatted is returned as written instead of throwing |
 | `AvandarProvider` | Component | Gives plugin UI access to its scoped `avandar` API. The host renders it around content a plugin opens |
-| `useAvandar` | Hook | Gets the scoped `avandar` API inside plugin UI. Throws a `PluginError` outside an `AvandarProvider` |
-| `useT` | Hook | Gets the plugin's translator inside plugin UI |
+| `PluginVizProvider` | Component | Marks plugin chart content, so `useT` returns the chart's translator. The host renders it around every plugin chart component |
+| `useAvandar` | Hook | Gets the scoped `avandar` API inside plugin UI. Throws a `PluginError` outside an `AvandarProvider`, and inside a plugin chart the error names the chart type |
+| `useT` | Hook | Gets the plugin's translator inside plugin UI or a plugin chart |
 | `PluginError` | Class | A typed error from the plugin API. Branch on its `code` |
 | `PluginErrorCode` | Type | Why a plugin API call failed: `PermissionDenied`, `InvalidHandle`, `LoadFailed`, or `CommandFailed` |
 | `AvandarApi` | Type | The API a plugin receives, scoped to one plugin, workspace, user, and invocation |

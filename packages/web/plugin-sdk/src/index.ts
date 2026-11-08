@@ -9,6 +9,7 @@ export {
 } from "@plugin-sdk/definePlugin/definePlugin";
 export { makePluginTranslator } from "@plugin-sdk/makePluginTranslator/makePluginTranslator";
 export { PluginError } from "@plugin-sdk/PluginError/PluginError";
+export { PluginVizProvider } from "@plugin-sdk/PluginVizContext/PluginVizContext";
 export type { PluginErrorCode } from "@plugin-sdk/PluginError/PluginError";
 export type {
   AvandarApi,

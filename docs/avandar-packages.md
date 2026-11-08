@@ -204,10 +204,12 @@ To write a plugin with it, see [`docs/plugin-authoring.md`](plugin-authoring.md)
 
 The API Avandar plugins are written against. Exports `definePlugin` and
 `isPluginDefinition`, the `avandar` API types (`AvandarApi`, the invocation
-context, `QueryHandle`, `fetchRows` options and result), `PluginError`,
-`makePluginTranslator` (ICU messages with locale fallback), and the React
-`AvandarProvider`, `useAvandar`, and `useT` for plugin UI. Every call is async
-or fire-and-forget and passes serializable data.
+context, `QueryHandle`, `fetchRows` options and result), the chart type types
+(`PluginVizDefinition`, `PluginChartSpec`, and the input and props a chart
+receives), `PluginError`, `makePluginTranslator` (ICU messages with locale
+fallback), and the React `AvandarProvider`, `PluginVizProvider`, `useAvandar`,
+and `useT` for plugin UI and plugin charts. Every call is async or
+fire-and-forget and passes serializable data.
 
 Private (`"private": true`): not published to npm. It depends
 on Lingui's core and message compiler, with `react` as a peer.
