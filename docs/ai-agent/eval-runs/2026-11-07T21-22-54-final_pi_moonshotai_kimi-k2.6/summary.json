@@ -1,0 +1,25 @@
+{
+  "label": "final:pi:moonshotai/kimi-k2.6",
+  "questionCount": 45,
+  "passCount": 38,
+  "needlessQuestions": 3,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 53,
+  "promptTokens": 86543,
+  "cachedPromptTokens": 70788,
+  "completionTokens": 9808,
+  "totalCost": 0.06199905680000001,
+  "costPerQuestion": 0.001377756817777778,
+  "latencyMedianMs": 2888.2652500000004,
+  "latencyP90Ms": 6991.6389590000035,
+  "failedIds": [
+    "B08",
+    "H06",
+    "H09",
+    "I04",
+    "N04",
+    "N06",
+    "N10"
+  ]
+}

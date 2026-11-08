@@ -1,0 +1,19 @@
+{
+  "label": "pi:anthropic/claude-sonnet-5@off",
+  "questionCount": 5,
+  "passCount": 4,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 7,
+  "promptTokens": 18790,
+  "cachedPromptTokens": 7745,
+  "completionTokens": 2490,
+  "totalCost": 0.054054500000000005,
+  "costPerQuestion": 0.010810900000000002,
+  "latencyMedianMs": 6920.224333,
+  "latencyP90Ms": 8140.903957999999,
+  "failedIds": [
+    "H01"
+  ]
+}

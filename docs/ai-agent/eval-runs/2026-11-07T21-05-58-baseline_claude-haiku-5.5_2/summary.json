@@ -1,0 +1,19 @@
+{
+  "label": "baseline:claude-haiku-5.5#2",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 52,
+  "promptTokens": 394429,
+  "cachedPromptTokens": 0,
+  "completionTokens": 37967,
+  "totalCost": 0.0584264,
+  "costPerQuestion": 0.0012983644444444446,
+  "latencyMedianMs": 4093.2800419999985,
+  "latencyP90Ms": 6237.942750000002,
+  "failedIds": [
+    "H06"
+  ]
+}

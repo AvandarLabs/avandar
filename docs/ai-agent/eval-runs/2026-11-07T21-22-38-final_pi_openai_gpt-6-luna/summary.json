@@ -1,0 +1,19 @@
+{
+  "label": "final:pi:openai/gpt-6-luna",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 55,
+  "promptTokens": 84777,
+  "cachedPromptTokens": 21575,
+  "completionTokens": 7858,
+  "totalCost": 0.012040875000000001,
+  "costPerQuestion": 0.00026757500000000004,
+  "latencyMedianMs": 2461.1235830000005,
+  "latencyP90Ms": 4110.804166999998,
+  "failedIds": [
+    "I07"
+  ]
+}

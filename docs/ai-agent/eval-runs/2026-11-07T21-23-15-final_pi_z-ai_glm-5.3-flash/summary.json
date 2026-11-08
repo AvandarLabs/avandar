@@ -1,0 +1,21 @@
+{
+  "label": "final:pi:z-ai/glm-5.3-flash",
+  "questionCount": 45,
+  "passCount": 42,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 57,
+  "promptTokens": 123390,
+  "cachedPromptTokens": 44742,
+  "completionTokens": 38057,
+  "totalCost": 0.026841384399999998,
+  "costPerQuestion": 0.0005964752088888889,
+  "latencyMedianMs": 3969.456291999999,
+  "latencyP90Ms": 13911.113874999995,
+  "failedIds": [
+    "H06",
+    "H09",
+    "N08"
+  ]
+}

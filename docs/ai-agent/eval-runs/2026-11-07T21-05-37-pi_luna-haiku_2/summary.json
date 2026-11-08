@@ -1,0 +1,21 @@
+{
+  "label": "pi:luna-haiku#2",
+  "questionCount": 45,
+  "passCount": 42,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 55,
+  "promptTokens": 80907,
+  "cachedPromptTokens": 20650,
+  "completionTokens": 7790,
+  "totalCost": 0.0116295,
+  "costPerQuestion": 0.0002584333333333333,
+  "latencyMedianMs": 2376.3102500000023,
+  "latencyP90Ms": 4621.420708,
+  "failedIds": [
+    "H07",
+    "I04",
+    "I07"
+  ]
+}

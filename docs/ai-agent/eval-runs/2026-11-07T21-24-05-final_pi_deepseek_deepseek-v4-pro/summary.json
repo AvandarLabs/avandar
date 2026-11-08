@@ -1,0 +1,22 @@
+{
+  "label": "final:pi:deepseek/deepseek-v4-pro",
+  "questionCount": 45,
+  "passCount": 41,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 59,
+  "promptTokens": 122695,
+  "cachedPromptTokens": 92416,
+  "completionTokens": 11908,
+  "totalCost": 0.054176322500000006,
+  "costPerQuestion": 0.001203918277777778,
+  "latencyMedianMs": 3950.394042,
+  "latencyP90Ms": 6558.010957999999,
+  "failedIds": [
+    "B08",
+    "H01",
+    "H09",
+    "N05"
+  ]
+}

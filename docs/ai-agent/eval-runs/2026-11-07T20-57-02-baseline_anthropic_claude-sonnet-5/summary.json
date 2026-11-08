@@ -1,0 +1,19 @@
+{
+  "label": "baseline:anthropic/claude-sonnet-5",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 55,
+  "promptTokens": 436418,
+  "cachedPromptTokens": 0,
+  "completionTokens": 27513,
+  "totalCost": 1.147966,
+  "costPerQuestion": 0.025510355555555555,
+  "latencyMedianMs": 4397.638707999999,
+  "latencyP90Ms": 13036.515375000003,
+  "failedIds": [
+    "N11"
+  ]
+}

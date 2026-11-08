@@ -1,0 +1,27 @@
+{
+  "label": "pi:qwen/qwen3.7-flash@off",
+  "questionCount": 45,
+  "passCount": 36,
+  "needlessQuestions": 1,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 52,
+  "promptTokens": 103562,
+  "cachedPromptTokens": 17152,
+  "completionTokens": 9083,
+  "totalCost": 0.0038760019999999995,
+  "costPerQuestion": 0.00008613337777777777,
+  "latencyMedianMs": 2612.747292,
+  "latencyP90Ms": 4657.025833000003,
+  "failedIds": [
+    "B10",
+    "F02",
+    "F03",
+    "H01",
+    "H06",
+    "H09",
+    "I04",
+    "N05",
+    "N09"
+  ]
+}

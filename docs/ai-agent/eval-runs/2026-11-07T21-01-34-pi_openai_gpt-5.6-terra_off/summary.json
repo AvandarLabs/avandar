@@ -1,0 +1,17 @@
+{
+  "label": "pi:openai/gpt-5.6-terra@off",
+  "questionCount": 45,
+  "passCount": 45,
+  "needlessQuestions": 1,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 52,
+  "promptTokens": 74730,
+  "cachedPromptTokens": 15882,
+  "completionTokens": 9328,
+  "totalCost": 0.26215439999999995,
+  "costPerQuestion": 0.005825653333333332,
+  "latencyMedianMs": 2576.189291999999,
+  "latencyP90Ms": 3788.4418339999975,
+  "failedIds": []
+}
