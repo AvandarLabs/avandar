@@ -1,5 +1,6 @@
 import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import type { EtlDestination } from "@avandar/etl";
+import type { PipelineSupabaseTarget } from "@pipelines/shared/PipelineRunOptions.types";
 
 /** The public bucket prebuilt Parquet relations are written to. */
 const DEFAULT_OPEN_DATA_BUCKET = "opendata";
@@ -12,11 +13,17 @@ export type PipelineEtlDestinationOptions = {
    * Defaults to false.
    */
   isRecordingDrives?: boolean;
+  /**
+   * The Supabase project the run's caller sent. When set, it replaces the
+   * environment's `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+   */
+  supabase?: PipelineSupabaseTarget;
 };
 
 /**
- * Where every pipeline loads: the Supabase stack named by `SUPABASE_URL` and
- * `SUPABASE_SERVICE_ROLE_KEY`, the Open Data Catalog's two tables, the
+ * Where every pipeline loads: the Supabase project the run's caller sent, or
+ * else the one named by `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, the
+ * Open Data Catalog's two tables, the
  * pipeline checkpoints table, and the public `opendata` bucket (or
  * `SUPABASE_OPENDATA_BUCKET`). A pipeline that has drives passes
  * `isRecordingDrives` to also record each drive's organization labels in the
@@ -27,10 +34,10 @@ export type PipelineEtlDestinationOptions = {
 export function getPipelineEtlDestination(
   options: PipelineEtlDestinationOptions = {},
 ): EtlDestination {
-  const { isRecordingDrives = false } = options;
+  const { isRecordingDrives = false, supabase } = options;
 
   return {
-    supabase: {
+    supabase: supabase ?? {
       url: getOptionalEnvVar("SUPABASE_URL"),
       serviceRoleKey: getOptionalEnvVar("SUPABASE_SERVICE_ROLE_KEY"),
     },

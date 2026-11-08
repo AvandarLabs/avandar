@@ -2,7 +2,8 @@
 
 How to create the pipeline server's Fly machine and deploy it. The server
 runs the scheduled data pipelines and builds ODC listings' Parquet copies
-(`docs/measles-demo/odc-parquet-cache-spec.md`).
+(`docs/measles-demo/odc-parquet-cache-spec.md`), loading into whichever
+Supabase project each request names.
 
 No deployment's Fly details live in this repository. The app, region,
 machine size, and volume are read from `.env.pipeline-server.prod`
@@ -25,9 +26,6 @@ own.
 
 - `flyctl` installed (`brew install flyctl`).
 - A Fly account in the organization that will own the app.
-- The production Supabase project's URL and service role key, from the
-  Supabase dashboard: Project Settings → API. Reading them changes nothing.
-  Never paste them into a file in this repository.
 - A Socrata app token, optional but raises Socrata's rate limit.
 
 ## Steps
@@ -74,10 +72,13 @@ own.
    openssl rand -hex 32   # save this as the pipeline server secret
    fly secrets set --app "$FLY_APP_NAME" --stage \
      AVA_PIPELINE_SERVER_SECRET=<the secret you saved> \
-     SUPABASE_URL=<production Supabase URL> \
-     SUPABASE_SERVICE_ROLE_KEY=<production service role key> \
-     SOCRATA_APP_TOKEN=<Socrata app token>
+     SOCRATA_APP_TOKEN=<Socrata App Token, not its Secret Token>
    ```
+
+   The server keeps no Supabase credentials. Each caller sends the project
+   to load into with every request (`X-Ava-Supabase-Url` and
+   `X-Ava-Supabase-Service-Role-Key`), so one server serves demo and
+   production alike.
 
 6. **Deploy.** This renders the Fly config from the env file, checks your
    Fly credentials, and runs `fly deploy` from the repository root.

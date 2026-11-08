@@ -1,6 +1,7 @@
 import { getPipelineServerClientConfig } from "@ava-cli/PipelineCli/getPipelineServerClientConfig";
 import { PipelineRunFailedError } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunFailedError";
 import { readPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/readPipelineRunReport";
+import { getPostgrestTarget } from "@ava-cli/PipelineCli/ResetPipelineCli/pipelineListingsRest";
 import { Agent } from "undici";
 import type { CliInvocation } from "@ava-cli/PipelineCli/buildCliInvocation/buildCliInvocation";
 import type { ReceivedPipelineRunReport } from "@ava-cli/PipelineCli/PipelineRunReport/PipelineRunReport.schemas";
@@ -20,6 +21,14 @@ const _RUN_RESPONSE_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 
 /** The header the pipeline server reads a CLI run's invocation from. */
 const _INVOCATION_HEADER = "x-ava-invocation";
+
+/**
+ * The headers the pipeline server reads the Supabase project to load into
+ * from. They are headers because the server records a run's body, and the
+ * key must never be stored.
+ */
+const _SUPABASE_URL_HEADER = "x-ava-supabase-url";
+const _SUPABASE_KEY_HEADER = "x-ava-supabase-service-role-key";
 
 /**
  * JSON with every character outside printable ASCII written as `\uXXXX`.
@@ -149,6 +158,7 @@ async function _postRunRequest(
     body: Record<string, unknown> | undefined;
     dispatcher: Agent;
     invocationHeader: string | undefined;
+    supabase: Readonly<{ apiUrl: string; secretKey: string }>;
   }>,
 ): Promise<Response> {
   const { body } = args;
@@ -161,6 +171,8 @@ async function _postRunRequest(
       dispatcher: args.dispatcher as unknown as RequestInit["dispatcher"],
       headers: {
         authorization: `Bearer ${args.serverSecret}`,
+        [_SUPABASE_URL_HEADER]: args.supabase.apiUrl,
+        [_SUPABASE_KEY_HEADER]: args.supabase.secretKey,
         // Fastify rejects an empty body sent as JSON, so a body is only sent
         // when there is an option to carry.
         ...(body === undefined ? {} : { "content-type": "application/json" }),
@@ -214,6 +226,7 @@ export async function sendRunPipelineRequest(options: {
       serverSecret: config.serverSecret,
       body,
       dispatcher,
+      supabase: getPostgrestTarget(),
       invocationHeader:
         options.invocation === undefined
           ? undefined

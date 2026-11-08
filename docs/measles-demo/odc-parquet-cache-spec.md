@@ -126,7 +126,12 @@ dataset itself cannot be loaded marks the listing invalid through
 
 **Entry point:** `POST /open-data-cache/:catalogListingId/build` on the
 pipeline server, authorized with `AVA_PIPELINE_SERVER_SECRET` like the
-existing run route, carrying the build id the edge function claimed. It
+existing run route, carrying the build id the edge function claimed. The
+server keeps no Supabase credentials: like a pipeline run, the request names
+the project to read the listing from and upload into, in the
+`X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key` headers. The edge
+function sends its own project's URL and service role key, so each Avandar
+instance's copies land in its own project through the same server. It
 answers `202` straight away and builds in the background.
 
 **The pipeline server runs as an always-on server.** Its Fly config keeps

@@ -5,10 +5,13 @@ import type {
   EtlEngineInstance,
   EtlRunReport,
 } from "@avandar/etl";
-import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
+import type {
+  PipelineRunOptions,
+  PipelineSupabaseTarget,
+} from "@pipelines/shared/PipelineRunOptions.types";
 
-function _createEngine(): EtlEngineInstance {
-  return createWdiEtlEngine(getPipelineEtlDestination());
+function _createEngine(supabase?: PipelineSupabaseTarget): EtlEngineInstance {
+  return createWdiEtlEngine(getPipelineEtlDestination({ supabase }));
 }
 
 /**
@@ -19,7 +22,8 @@ function _createEngine(): EtlEngineInstance {
 export async function run(
   options: PipelineRunOptions = { mode: "full" },
 ): Promise<EtlRunReport> {
-  return await _createEngine().run(options);
+  const { supabase, ...runOptions } = options;
+  return await _createEngine(supabase).run(runOptions);
 }
 
 /**
