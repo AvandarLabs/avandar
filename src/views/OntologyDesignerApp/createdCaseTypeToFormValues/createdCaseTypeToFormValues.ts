@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
@@ -38,9 +39,14 @@ function _makeMappedAttribute(options: {
   column: CatalogColumn;
   isIdentifier: boolean;
   isLabel: boolean;
+  valueShape: ConceptAttribute.ValueShape;
   valuePickerRuleType: ValuePickerRule.T;
 }): AttributeFormValues {
   const conceptAttributeId = uuid<ConceptAttributeId>();
+  // An identifier matches rows to a record and the label names it, so neither
+  // is ever a list.
+  const valueShape: ConceptAttribute.ValueShape =
+    options.isIdentifier || options.isLabel ? "single" : options.valueShape;
   const columnDataType = options.column.dataType;
   // An identifier shows the key itself, so it never reduces the column. Any
   // other field's rule is replaced when the column's type does not allow it.
@@ -55,12 +61,16 @@ function _makeMappedAttribute(options: {
     conceptId: options.conceptId,
     name: ConceptStatus.toNonReservedAttributeName(options.name),
     description: options.description,
-    dataType: ValuePickerRule.getOutputDataType({ ruleType, columnDataType }),
+    dataType: ConceptAttribute.getOutputDataType({
+      valueShape,
+      ruleType,
+      columnDataType,
+    }),
     mappingType: "dataset_column",
     isIdentifier: options.isIdentifier,
     isLabel: options.isLabel,
     allowManualEdit: false,
-    isArray: false,
+    isArray: ConceptAttribute.valueShapeToIsArray(valueShape),
     mappings: {
       manualEntry: {
         type: "manual_entry",
@@ -116,6 +126,7 @@ function _makeMissingIdentifierAttributes(options: {
         column,
         isIdentifier: true,
         isLabel: false,
+        valueShape: "single",
         valuePickerRuleType: ValuePickerRule.DEFAULT_RULE_TYPE,
       }),
     ];
@@ -154,6 +165,7 @@ function _attributesFromCaseType(options: {
         column,
         isIdentifier: primaryKeyColumnIds.has(column.id),
         isLabel: attribute.isLabel === true,
+        valueShape: attribute.valueShape ?? "single",
         valuePickerRuleType:
           attribute.valuePickerRuleType ?? ValuePickerRule.DEFAULT_RULE_TYPE,
       }),

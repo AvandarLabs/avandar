@@ -1,5 +1,7 @@
+import { match } from "ts-pattern";
 import type {
   ChatCaseSourceDataset,
+  ChatCaseValueShape,
   ChatCreatedCaseAttribute,
   ChatCreatedCaseType,
   ChatProposedCaseAttribute,
@@ -9,14 +11,28 @@ import type {
 function _toDatasetColumnAttribute(options: {
   attribute: ChatProposedCaseAttribute;
   isLabel: boolean;
+  isJoinKey: boolean;
 }): ChatCreatedCaseAttribute {
-  const { attribute, isLabel } = options;
+  const { attribute, isLabel, isJoinKey } = options;
+  // A join key matches rows to a case and the label names it, so neither is
+  // ever a list, whatever the card held.
+  const valueShape: ChatCaseValueShape =
+    isLabel || isJoinKey ? "single" : attribute.valueShape;
   return {
     name: attribute.name,
     kind: "dataset_column",
     datasetId: attribute.datasetId,
     columnId: attribute.columnId,
-    valuePickerRuleType: attribute.valuePickerRuleType,
+    valueShape,
+    // A list keeps every value, so the rule the card held is not stored.
+    ...match(valueShape)
+      .with("single", () => {
+        return { valuePickerRuleType: attribute.valuePickerRuleType };
+      })
+      .with("list", () => {
+        return {};
+      })
+      .exhaustive(),
     ...(attribute.description ? { description: attribute.description } : {}),
     ...(isLabel ? { isLabel: true } : {}),
   };
@@ -82,7 +98,8 @@ function _resolveLabelColumnId(options: {
 /**
  * Converts a draft the user reviewed in the chat card into the payload
  * `applyCreatedCaseTypes` persists. Only attributes still checked in the card
- * are kept, the card's per-column value pickers are carried through, and every
+ * are kept, each column's value shape and, for one value, its value picker are
+ * carried through, and every
  * dataset still contributing keeps its join key. The card's status set
  * travels with it.
  */
@@ -96,9 +113,15 @@ export function proposedCaseTypeToCreatedCaseType(
     included,
     sourceDatasets,
   });
+  const joinKeyColumnIds = new Set(
+    sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.primaryKeyColumnId;
+    }),
+  );
   const datasetAttributes = included.map((attribute) => {
     return _toDatasetColumnAttribute({
       attribute,
+      isJoinKey: joinKeyColumnIds.has(attribute.columnId),
       isLabel: attribute.columnId === labelColumnId,
     });
   });

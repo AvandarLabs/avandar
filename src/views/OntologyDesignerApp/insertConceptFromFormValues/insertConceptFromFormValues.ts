@@ -7,6 +7,7 @@ import {
   where,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
@@ -23,6 +24,33 @@ import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatu
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
+/**
+ * The mapping row of one dataset-column field, or undefined when the field
+ * has no column yet. A field that keeps every value stores no rule: its
+ * draft holds one only so the user can switch it back to one value.
+ */
+function _datasetColumnMappingFromAttribute(
+  attribute: ConceptFormSubmitValues["attributes"][number],
+  workspaceId: Workspace.Id,
+): AttributeMapping<"Insert"> | undefined {
+  const datasetColumnMapping = attribute.mappings.datasetColumn;
+  if (!hasPropKeys(datasetColumnMapping, ["datasetId", "datasetColumnId"])) {
+    return undefined;
+  }
+  return match(ConceptAttribute.getValueShape(attribute))
+    .with("single", () => {
+      return { ...datasetColumnMapping, workspaceId };
+    })
+    .with("list", () => {
+      return {
+        ...datasetColumnMapping,
+        valuePickerRuleType: undefined,
+        workspaceId,
+      };
+    })
+    .exhaustive();
+}
+
 function _mappingsFromAttributes(
   attributes: ConceptFormSubmitValues["attributes"],
   workspaceId: Workspace.Id,
@@ -35,13 +63,7 @@ function _mappingsFromAttributes(
           return { ...mappings.manualEntry, workspaceId };
         })
         .with("dataset_column", () => {
-          const datasetColumnMapping = mappings.datasetColumn;
-          if (
-            hasPropKeys(datasetColumnMapping, ["datasetId", "datasetColumnId"])
-          ) {
-            return { ...datasetColumnMapping, workspaceId };
-          }
-          return undefined;
+          return _datasetColumnMappingFromAttribute(attribute, workspaceId);
         })
         .exhaustive();
     })

@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { insertConceptFromFormValues } from "./insertConceptFromFormValues";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
@@ -229,5 +231,50 @@ describe("insertConceptFromFormValues", () => {
       insertConceptFromFormValues(_makeFormValues()),
     ).rejects.toThrow("refused");
     expect(generateIndividualsMock).not.toHaveBeenCalled();
+  });
+
+  it("writes no value rule into the mapping of a field that keeps every value", async () => {
+    generateIndividualsMock.mockResolvedValue(undefined);
+    const listAttributeId = uuid<ConceptAttributeId>();
+    const formValues = _makeFormValues();
+    const listAttribute = {
+      ...formValues.attributes[0]!,
+      id: listAttributeId,
+      name: "Daily new cases",
+      dataType: "bigint" as const,
+      mappingType: "dataset_column" as const,
+      isLabel: false,
+      isArray: true,
+      mappings: {
+        manualEntry: {
+          type: "manual_entry" as const,
+          conceptAttributeId: listAttributeId,
+        },
+        datasetColumn: {
+          type: "dataset_column" as const,
+          conceptAttributeId: listAttributeId,
+          valuePickerRuleType: "sum" as const,
+          datasetId: uuid<DatasetId>(),
+          datasetColumnId: uuid<DatasetColumnId>(),
+        },
+      },
+    };
+
+    await insertConceptFromFormValues({
+      ...formValues,
+      attributes: [...formValues.attributes, listAttribute],
+    });
+
+    const [{ mappings }] = conceptCreateMock.mock.calls[0]!;
+    const listMapping = mappings.find(
+      (mapping: { conceptAttributeId: string }) => {
+        return mapping.conceptAttributeId === listAttributeId;
+      },
+    );
+    expect(listMapping).toMatchObject({
+      type: "dataset_column",
+      workspaceId: WORKSPACE_ID,
+    });
+    expect(listMapping.valuePickerRuleType).toBeUndefined();
   });
 });

@@ -162,6 +162,46 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     });
   });
 
+  it("carries a field switched to every value without a value rule", () => {
+    const draft = makeDraft();
+    const created = proposedCaseTypeToCreatedCaseType({
+      ...draft,
+      attributes: draft.attributes.map((attribute) => {
+        return attribute.columnId === POPULATION_COLUMN_ID
+          ? { ...attribute, valueShape: "list" }
+          : attribute;
+      }),
+    });
+    const population = created.attributes.find((attribute) => {
+      return attribute.name === "Population";
+    });
+
+    expect(population).toMatchObject({ valueShape: "list" });
+    expect(population).not.toHaveProperty("valuePickerRuleType");
+  });
+
+  it("keeps the label and every join key to one value", () => {
+    const draft = makeDraft();
+    const created = proposedCaseTypeToCreatedCaseType({
+      ...draft,
+      attributes: draft.attributes.map((attribute) => {
+        return { ...attribute, valueShape: "list" };
+      }),
+    });
+
+    expect(
+      created.attributes
+        .filter((attribute) => {
+          return ["State", "County code", "Census county code"].includes(
+            attribute.name,
+          );
+        })
+        .map((attribute) => {
+          return "valueShape" in attribute ? attribute.valueShape : undefined;
+        }),
+    ).toEqual(["single", "single", "single"]);
+  });
+
   it("marks the label column as the label attribute", () => {
     const created = proposedCaseTypeToCreatedCaseType(makeDraft());
     const labelled = created.attributes.filter((attribute) => {

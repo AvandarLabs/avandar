@@ -412,4 +412,69 @@ describe("createdCaseTypeToFormValues", () => {
     );
     expect(field?.dataType).toBe("varchar");
   });
+
+  it("makes a field marked every value a list typed as its column", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: {
+        ..._covidCase(),
+        identities: [
+          { datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID },
+          {
+            datasetId: CENSUS_DATASET_ID,
+            primaryKeyColumnId: CENSUS_KEY_COLUMN_ID,
+          },
+        ],
+        attributes: [
+          {
+            name: "Population",
+            kind: "dataset_column",
+            datasetId: CENSUS_DATASET_ID,
+            columnId: POPULATION_COLUMN_ID,
+            valueShape: "list",
+            valuePickerRuleType: "sum",
+          },
+        ],
+      },
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+    const population = formValues.attributes.find((attribute) => {
+      return attribute.name === "Population";
+    });
+
+    expect(population?.isArray).toBe(true);
+    expect(population?.dataType).toBe("bigint");
+  });
+
+  it("keeps a join key and the label to one value even when marked every value", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [
+          {
+            name: "Case id",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: PK_COLUMN_ID,
+            valueShape: "list",
+          },
+          {
+            name: "Case status",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: STATUS_COLUMN_ID,
+            isLabel: true,
+            valueShape: "list",
+          },
+        ],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.attributes.map((attribute) => {
+        return attribute.isArray;
+      }),
+    ).toEqual([false, false]);
+  });
 });
