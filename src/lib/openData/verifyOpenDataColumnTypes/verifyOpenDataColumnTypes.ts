@@ -1,6 +1,10 @@
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Constants } from "$/types/database.types";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import {
+  buildOpenDataListingUrl,
+  fetchOpenDataColumnTypeSample,
+  readOpenDataAccessToken,
+} from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Enums } from "$/types/database.types";
 
@@ -81,55 +85,6 @@ export function isColumnTypeVerificationDue(
   );
 }
 
-async function _readAccessToken(): Promise<string> {
-  const { data } = await AvaSupabase.db().auth.getSession();
-  const accessToken = data.session?.access_token;
-  if (accessToken === undefined) {
-    throw new Error("No session is available to verify column types");
-  }
-  return accessToken;
-}
-
-/** The failure code a refused sample response names, if it names one. */
-async function _readSampleFailureCode(
-  response: Response,
-): Promise<string | undefined> {
-  try {
-    const body = (await response.json()) as {
-      error?: { code?: unknown };
-    };
-    return typeof body.error?.code === "string" ? body.error.code : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * Reads a listing's sample and its token. The server gzips the sample and
- * `fetch` gunzips it, so this reads plain text.
- *
- * @throws When the sample cannot be read, naming the server's failure code.
- */
-async function _fetchSample(args: {
-  listingUrl: string;
-  accessToken: string;
-}): Promise<Readonly<{ csvText: string; token: string }>> {
-  const response = await fetch(`${args.listingUrl}/column-type-sample`, {
-    headers: { Authorization: `Bearer ${args.accessToken}` },
-  });
-  if (!response.ok) {
-    const code = await _readSampleFailureCode(response);
-    const codeNote = code === undefined ? "" : ` (${code})`;
-    throw new Error(
-      `Column type sample fetch failed: ${response.status}${codeNote}`,
-    );
-  }
-  return {
-    token: response.headers.get("X-Ava-Column-Type-Token") ?? "",
-    csvText: await response.text(),
-  };
-}
-
 /**
  * Infers a sample's column types. When DuckDB cannot parse the sample, or
  * finds no columns in it, the server is told the listing is unparseable.
@@ -185,11 +140,12 @@ export async function verifyOpenDataColumnTypes(
   catalogListingId: DataCatalogListing.Id,
   options: { inferColumnTypes?: InferColumnTypes } = {},
 ): Promise<void> {
-  const accessToken = await _readAccessToken();
-  const listingUrl =
-    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/data-catalog-listings/` +
-    encodeURIComponent(catalogListingId);
-  const { csvText, token } = await _fetchSample({ listingUrl, accessToken });
+  const accessToken = await readOpenDataAccessToken();
+  const listingUrl = buildOpenDataListingUrl(catalogListingId);
+  const { csvText, token } = await fetchOpenDataColumnTypeSample(
+    catalogListingId,
+    { accessToken },
+  );
   const columns = await _inferOrReportUnparseable({
     csvText,
     token,

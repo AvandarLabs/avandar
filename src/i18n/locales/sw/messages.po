@@ -30,6 +30,10 @@ msgstr "Hali zilizopendekezwa"
 msgid "{0} rows"
 msgstr "{0} safu"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "We couldn't load a preview of this dataset."
+msgstr "Hatukuweza kupakia onyesho la kuchungulia la seti hii ya data."
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Funga paneli ya mazungumzo"
@@ -56,6 +60,10 @@ msgstr "Rudi mtandaoni ili kuona au kufanya ukurasa upatikane bila mtandao."
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "Kiungo hakikuweza kunakiliwa."
+
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "First {numRows} rows"
+msgstr "Safu mlalo {numRows} za kwanza"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -1567,6 +1575,11 @@ msgstr "Jina la Eneo la Kazi"
 msgid "Your dashboard is published at:"
 msgstr "Dashibodi yako imechapishwa kwenye:"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "This preview shows only the first {numRows} rows of the dataset."
+msgstr "Onyesho hili la kuchungulia linaonyesha safu mlalo {numRows} za kwanza "
+"pekee za seti ya data."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
@@ -2508,6 +2521,10 @@ msgstr "Mpango wako hauruhusu kushiriki dashboard nyingine. Unaweza kuboresha "
 "mpango wako, au kuondoa ushiriki wa dashboard nyingine, kisha urudi "
 "hapa."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Open in full screen"
+msgstr "Fungua katika skrini nzima"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
@@ -3361,7 +3378,7 @@ msgid "Data scope"
 msgstr "Muktadha wa data"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
 msgid "Data preview"
 msgstr "Mapitio ya data"
 
@@ -7679,11 +7696,9 @@ msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (nje ya mtandao)"
 
 #. placeholder {0}: options.numPreviewRows
-#. placeholder {0}: previewData.length
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "First {0} rows"
 msgstr "Safu mlalo {0} za kwanza"
 

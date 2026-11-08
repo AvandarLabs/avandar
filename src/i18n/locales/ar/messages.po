@@ -30,6 +30,10 @@ msgstr "الحالات المقترحة"
 msgid "{0} rows"
 msgstr "{0} صفوف"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "We couldn't load a preview of this dataset."
+msgstr "تعذّر تحميل معاينة لمجموعة البيانات هذه."
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "إغلاق لوحة الدردشة"
@@ -56,6 +60,10 @@ msgstr "عد إلى الإنترنت لعرض الصفحة أو جعلها مت�
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "تعذّر نسخ الرابط."
+
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "First {numRows} rows"
+msgstr "أول {numRows} صفوف"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -1547,6 +1555,10 @@ msgstr "اسم مساحة العمل"
 msgid "Your dashboard is published at:"
 msgstr "تم نشر لوحة المعلومات الخاصة بك في:"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "This preview shows only the first {numRows} rows of the dataset."
+msgstr "تعرض هذه المعاينة أول {numRows} صفوف فقط من مجموعة البيانات."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
@@ -2475,6 +2487,10 @@ msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 msgstr "لا تتيح خطتك مشاركة لوحة معلومات أخرى. يمكنك الترقية، أو إلغاء مشاركة "
 "لوحة معلومات أخرى، ثم العودة إلى هنا."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Open in full screen"
+msgstr "فتح بملء الشاشة"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "تم الكشف عن تحيز:"
@@ -3315,7 +3331,7 @@ msgid "Data scope"
 msgstr "نطاق البيانات"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
 msgid "Data preview"
 msgstr "معاينة البيانات"
 
@@ -7583,11 +7599,9 @@ msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (دون اتصال)"
 
 #. placeholder {0}: options.numPreviewRows
-#. placeholder {0}: previewData.length
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "First {0} rows"
 msgstr "أول {0} صفوف"
 

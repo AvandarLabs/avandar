@@ -30,6 +30,10 @@ msgstr "Status propostos"
 msgid "{0} rows"
 msgstr "{0} linhas"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "We couldn't load a preview of this dataset."
+msgstr "Não foi possível carregar uma prévia deste conjunto de dados."
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Fechar painel de chat"
@@ -57,6 +61,10 @@ msgstr "Retorne online para visualizar ou tornar a página disponível offline."
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "Não foi possível copiar o link."
+
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "First {numRows} rows"
+msgstr "Primeiras {numRows} linhas"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -1574,6 +1582,11 @@ msgstr "Nome do espaço de trabalho"
 msgid "Your dashboard is published at:"
 msgstr "Seu painel está publicado em:"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "This preview shows only the first {numRows} rows of the dataset."
+msgstr "Esta prévia mostra apenas as primeiras {numRows} linhas do conjunto de "
+"dados."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
@@ -2512,6 +2525,10 @@ msgstr "Seu plano não permite compartilhar outro dashboard. Você pode fazer "
 "upgrade ou deixar de compartilhar outro dashboard e voltar a esta "
 "etapa."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Open in full screen"
+msgstr "Abrir em tela cheia"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Viés detectado:"
@@ -3365,7 +3382,7 @@ msgid "Data scope"
 msgstr "Escopo de dados"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
 msgid "Data preview"
 msgstr "Pré-visualização de dados"
 
@@ -7691,11 +7708,9 @@ msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (offline)"
 
 #. placeholder {0}: options.numPreviewRows
-#. placeholder {0}: previewData.length
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "First {0} rows"
 msgstr "Primeiras {0} linhas"
 

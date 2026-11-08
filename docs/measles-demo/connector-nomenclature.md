@@ -333,7 +333,10 @@ These three are easy to conflate and must not be:
   a future Socrata `api_resource`). It is shared across every workspace, not
   workspace-scoped. Its rows are **listings** (`DataCatalogListing`) -
   see "Relation vs. dataset" above for why a listing is a relation, not a
-  dataset, until some workspace adopts it.
+  dataset, until some workspace adopts it. Abbreviated **ODC** in
+  conversation, commits, docs, and comments ("ODC listing", "the ODC
+  page"). Never in user-facing copy, which says "open data" or names the
+  dataset.
 - **A drive index** (lower case, a generic shape, defined above) is a
   per-drive search index over one drive's own relations. It exists
   independently of the Open Data Catalog and is not limited to public data: a

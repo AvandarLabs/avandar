@@ -13,9 +13,11 @@ name, adjust and save. `ManualUploadView` and `GoogleSheetsImportView` are
 both of these, and any new connector will be too.
 
 `DataCatalogView` is deliberately not one. It adds an already-modeled
-catalog entry to the workspace, so it never sniffs, never previews, and never
-renders `DatasetImportForm`. Do not force it into the shape below, and do not
-take it as the example to copy.
+catalog entry to the workspace, so it never renders `DatasetImportForm`. It
+does show a read-only preview of a listing's first rows
+(`useCatalogListingPreview`), but that preview is for browsing: nothing it
+reads is saved, and adding the listing does not use it. Do not force it into
+the shape below, and do not take it as the example to copy.
 
 ## The shape
 

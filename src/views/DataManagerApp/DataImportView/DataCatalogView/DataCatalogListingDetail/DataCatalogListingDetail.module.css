@@ -131,3 +131,37 @@
     transition: none;
   }
 }
+
+/*
+ * In the pane the content is one column. In full screen the facts move into
+ * a rail beside the content, split from it by a hairline as a workspace
+ * dataset's rail is, so the description, columns, and preview get the width.
+ */
+.dataCatalogListingDetailLayoutIsExpanded {
+  display: grid;
+  gap: var(--mantine-spacing-xl);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+}
+
+.dataCatalogListingDetailMain > * {
+  flex-shrink: 0;
+}
+
+.dataCatalogListingDetailRail {
+  align-self: start;
+  border-inline-start: 1px solid var(--ava-border-default);
+  padding-inline-start: var(--mantine-spacing-lg);
+}
+
+@media (width < 62em) {
+  .dataCatalogListingDetailLayoutIsExpanded {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dataCatalogListingDetailRail {
+    border-inline-start: none;
+    border-top: 1px solid var(--ava-border-default);
+    padding-inline-start: 0;
+    padding-top: var(--mantine-spacing-lg);
+  }
+}

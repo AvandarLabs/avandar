@@ -73,6 +73,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F21 | Gadget references: link and embed dashboards, tiles, datasets, maps, case types, and cases in a case comment | not started | F18 | |
 | F22 | AI harness audit: 15 chat and Data Explorer bug fixes and 8 harness improvements | not started | none (see its section for order within it) | |
 | F23 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
+| F24 | ODC listing data preview and full-screen detail | not started | F12, F16, F19, F23 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -103,7 +104,8 @@ API. It's new work, not something this branch built.
 | after F18 | F21 | Extends F18's rich text model, editor, and comment triggers, so it cannot land first. Otherwise self-contained. |
 | any | F22 | Chat and Data Explorer code that every other feature leaves alone. Its own PRs go in the order its section gives. |
 | 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
-| 15 | F9 | Last, because the docs describe the merged features. |
+| 15 | F24 | Adds the data preview and full-screen modal to the detail pane F19 built and F23 regrouped. Merge after both. |
+| 16 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -128,7 +130,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/tests/database/data_catalog_listings_access.test.sql` | F4, F8 | F4: rename and the index test. F8: cache-column and `pipeline_access_complete` tests. |
 | `apps/pipeline-server/pipelines/world-bank__wdi/run.ts` | F1, F4, F10 | F1: `EtlEngine.create(name, { state })`. F4: `createSupabaseAdminClient` import from `pipelines/shared`. F10: `run(options)` rejecting `--limit`. |
 | `shared/types/database.types.ts` | F4, F6, F8, F17, F19 | Generated: regenerate in each. |
-| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19, F23 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. F23: the Published by, About, Source, and Technical details groups, the clickable topic and keyword chips, and the drive read. |
+| `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx` | F12, F16, F19, F23 | F12: `DataCatalogInvalidNotice`. F16: `DataCatalogUnsupportedNotice`, the `isWorkspaceLoadable` guard on the invalid notice, and `!listing.isWorkspaceLoadable` in `isAddBlocked`. F19: the scrolling body, pinned foot, back button, and fact list. F23: the Published by, About, Source, and Technical details groups, the clickable topic and keyword chips, and the drive read. F24: the expand button, the `preview`, `isExpanded`, and `onExpand` props, `ListingDescription`, the `factsRail` split, and the data preview section. |
 | `supabase/schemas/11.data_catalog_listings.sql` (F4, F8, F17 know it as `10.data_catalog_listings.sql`) | F4, F8, F17, F23 | F23: the rename to `11.` (so `10.data_catalog_drives.sql` sorts first), `external_organization_name` becomes `organization1_name`, the new organization, `domains`, `tags`, `source_metadata`, and `drive_id` columns, the wider `search_vector`, and the filter indexes. |
 | `supabase/schemas/51.data_catalog_listings__search_matches.sql`, `52.rpc_data_catalog_listings__search.sql`, `52.rpc_data_catalog_listings__search_facets.sql` | F19, F23 | F23: the `organization1_name` rename, the level-2, topic, and keyword filters and facets, and the organization columns in the output. |
 | `apps/pipeline-server/pipelines/etl.config.yaml`, `packages/node/etl/src/EtlConfig/**` | F16, F23 | F23: per-pipeline loadability overrides move into each `<pipeline>.pipeline.yaml`, and the config parser, field mapper, and organization label lookup are added. |
@@ -1406,6 +1408,61 @@ rejects the new listing shape, so the catalog would not load.
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
   manually.
+
+---
+
+## F24: ODC listing data preview and full-screen detail
+
+**Purpose:** An Open Data Catalog (ODC) listing's detail pane showed its
+columns but none of its rows. It now reads the listing's first 200 rows with
+DuckDB, without adding it to the workspace, and shows them in a "Data
+preview" section that says it holds only the first 200 rows. An API-backed
+CSV listing is read from the start-of-file sample its column types are
+verified from (`fetchOpenDataColumnTypeSample`, shared with
+`verifyOpenDataColumnTypes`), so a source of any size previews. Any other
+API-backed listing is read whole through the `open-data` edge function's
+resource route (Parquet through a new `DuckDbClient.previewParquetBlob`), and
+a pipeline listing from its Parquet URL. The section is the one a workspace
+dataset's Metadata tab now uses too (`DatasetPreviewSection`). An expand
+button opens the detail in a near-full-screen modal with the description
+unfolded and the fact groups in a rail beside the columns and preview.
+**Value:** A user can see what a dataset actually contains before adding it,
+and read a long description and a wide preview without the narrow pane
+cramping them.
+
+**PR title:** `feat(data-catalog): preview an ODC listing's first 200 rows and open it full screen`
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `d8a72da58` | feat(data-catalog): preview an ODC listing's first 200 rows and open it full screen | All of it. Regenerate the `.po` catalogs. |
+| `6b815b3d3` | fix(data-catalog): preview an API-backed CSV listing from the start of its file | All of it. |
+| `99929aeb3` | docs: define ODC and track asking about an ODC listing before adding it | MIXED: the `production-plan-world-humanitarian-day.md` P6.8 bullet only. The `connector-nomenclature.md` ODC line goes with F9. |
+
+**Files:** `src/clients/DuckDbClient/previewParquetBlob/`, the
+`previewParquetBlob` method in `DuckDbClient.ts`,
+`src/lib/openData/fetchCatalogListingPreview/`,
+`src/lib/openData/fetchOpenDataColumnTypeSample/` and the sample read it
+replaces in `verifyOpenDataColumnTypes.ts`,
+`src/components/DatasetPreviewSection/`,
+`DataCatalogView/useCatalogListingPreview/`, `DataCatalogView.tsx` and its
+stylesheet (the `detailProps` object and the modal),
+`DataCatalogListingDetail.tsx`, its stylesheet and test (the F24 hunks
+listed under **Files shared by several features**), `DatasetMetaView.tsx`
+(the preview section swap), and the `DataCatalogView` sentence in
+`src/views/DataManagerApp/DataImportView/AGENTS.md`.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm vitest run src/views/DataManagerApp src/components/DatasetPreviewSection src/lib/openData src/clients/DuckDbClient
+```
+Then open the Open data tab, select a loadable listing, and check that the
+pane shows "Data preview, First 200 rows" with the cap note, that the expand
+button opens the modal with the rail beside the content, and that a
+workspace dataset's Metadata tab still shows its preview.
 
 ---
 

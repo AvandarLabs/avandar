@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail";
 import type { DataCatalogDrive } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
+import type { CatalogListingPreviewState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import type { ReactElement } from "react";
 
 const NYC_DRIVE: DataCatalogDrive.T = {
@@ -77,6 +78,16 @@ type DetailOptions = {
   drive?: DataCatalogDrive.T;
   onSelectTopic?: (domain: string) => void;
   onAddKeyword?: (tag: string) => void;
+  preview?: CatalogListingPreviewState;
+  isExpanded?: boolean;
+  onExpand?: () => void;
+};
+
+const NO_PREVIEW: CatalogListingPreviewState = {
+  preview: undefined,
+  isLoading: false,
+  isError: false,
+  isAvailable: false,
 };
 
 function _buildDetail(options: DetailOptions): ReactElement {
@@ -94,6 +105,9 @@ function _buildDetail(options: DetailOptions): ReactElement {
       onBack={vi.fn()}
       onSelectTopic={options.onSelectTopic ?? vi.fn()}
       onAddKeyword={options.onAddKeyword ?? vi.fn()}
+      preview={options.preview ?? NO_PREVIEW}
+      isExpanded={options.isExpanded}
+      onExpand={options.onExpand}
     />
   );
 }
@@ -109,6 +123,61 @@ function _getFactValue(label: string): string | null | undefined {
 }
 
 describe("DataCatalogListingDetail", () => {
+  it("shows the listing's first rows, saying the preview holds only those", () => {
+    _renderDetail({
+      listing: _createListing(),
+      preview: {
+        preview: {
+          columnNames: ["country"],
+          dateColumnNames: new Set(),
+          rows: Array.from({ length: 200 }, () => {
+            return { country: "Chad" };
+          }),
+        },
+        isLoading: false,
+        isError: false,
+        isAvailable: true,
+      },
+    });
+
+    expect(screen.getByText("Data preview")).toBeInTheDocument();
+    expect(screen.getByText("First 200 rows")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "This preview shows only the first 200 rows of the dataset.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("leaves the preview out for a listing with no data to read", () => {
+    _renderDetail({ listing: _createListing({ isWorkspaceLoadable: false }) });
+
+    expect(screen.queryByText("Data preview")).toBeNull();
+  });
+
+  it("opens the listing in full screen from the expand button", () => {
+    const onExpand = vi.fn();
+    _renderDetail({ listing: _createListing(), onExpand });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open in full screen" }),
+    );
+
+    expect(onExpand).toHaveBeenCalledOnce();
+  });
+
+  it("drops the expand button once expanded", () => {
+    _renderDetail({
+      listing: _createListing(),
+      onExpand: vi.fn(),
+      isExpanded: true,
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Open in full screen" }),
+    ).toBeNull();
+  });
+
   it("labels each organization level with the drive's name for it", () => {
     _renderDetail({
       listing: _createListing({

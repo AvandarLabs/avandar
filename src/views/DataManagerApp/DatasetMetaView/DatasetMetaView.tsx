@@ -8,6 +8,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { DatasetPreviewSection } from "@/components/DatasetPreviewSection/DatasetPreviewSection";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
@@ -18,7 +19,6 @@ import { ShareResourceButton } from "@/components/permissions/ShareResourceModal
 import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
@@ -302,25 +302,15 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
                       />
                     </AppViewSection>
 
-                    <AppViewSection
-                      title={<Trans>Data preview</Trans>}
-                      meta={
-                        previewData === undefined
-                          ? undefined
-                          : t`First ${previewData.length} rows`
+                    <DatasetPreviewSection
+                      columnNames={datasetColumnNames}
+                      rows={previewData}
+                      maxPreviewRows={
+                        GlobalAppConfig.dataManagerApp.maxPreviewRows
                       }
-                    >
-                      {isLoadingPreviewData ? (
-                        <Skeleton height={320} radius="sm" />
-                      ) : previewData ? (
-                        <DataGrid
-                          columnNames={datasetColumnNames}
-                          data={previewData}
-                          dateColumns={dateColumnNames}
-                          dateFormat="YYYY-MM-DD"
-                        />
-                      ) : null}
-                    </AppViewSection>
+                      dateColumnNames={dateColumnNames}
+                      isLoading={isLoadingPreviewData}
+                    />
                   </Stack>
                 );
               },

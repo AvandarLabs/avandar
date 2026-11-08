@@ -30,6 +30,10 @@ msgstr "Estados propuestos"
 msgid "{0} rows"
 msgstr "{0} filas"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "We couldn't load a preview of this dataset."
+msgstr "No pudimos cargar una vista previa de este conjunto de datos."
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "Cerrar panel de chat"
@@ -57,6 +61,10 @@ msgstr "Regresa en línea para ver o hacer la página disponible sin conexión."
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The link could not be copied."
 msgstr "No se pudo copiar el enlace."
+
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "First {numRows} rows"
+msgstr "Primeras {numRows} filas"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "You are offline. Download an offline chat model using the cloud icon "
@@ -1573,6 +1581,11 @@ msgstr "Nombre del espacio de trabajo"
 msgid "Your dashboard is published at:"
 msgstr "Tu tablero está publicado en:"
 
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
+msgid "This preview shows only the first {numRows} rows of the dataset."
+msgstr "Esta vista previa muestra solo las primeras {numRows} filas del "
+"conjunto de datos."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "The catalog is in <0/> and grows from what people ask for. Missing a "
 "dataset? <1>Request one</1>"
@@ -2518,6 +2531,10 @@ msgid "Your plan does not allow sharing another dashboard. You can upgrade, or "
 msgstr "Su plan no permite compartir otro dashboard. Puede mejorar su plan o "
 "dejar de compartir otro dashboard y volver a intentarlo."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+msgid "Open in full screen"
+msgstr "Abrir en pantalla completa"
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Bias detected:"
 msgstr "Sesgo detectado:"
@@ -3372,7 +3389,7 @@ msgid "Data scope"
 msgstr "Alcance de datos"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
 msgid "Data preview"
 msgstr "Previsualización de datos"
 
@@ -7710,11 +7727,9 @@ msgid "Phi 3.5 Mini (offline)"
 msgstr "Phi 3.5 Mini (sin conexión)"
 
 #. placeholder {0}: options.numPreviewRows
-#. placeholder {0}: previewData.length
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
-#: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "First {0} rows"
 msgstr "Primeras {0} filas"
 
