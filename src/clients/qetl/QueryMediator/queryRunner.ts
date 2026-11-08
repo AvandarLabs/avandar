@@ -228,6 +228,35 @@ function _getLeaseNames(
   ];
 }
 
+/**
+ * Plans the concept relations a query names, with the caller's spine
+ * restrictions. A session without a planner cannot narrow a spine, so it
+ * refuses a restriction instead of answering unrestricted.
+ */
+async function _getConceptRelationPlans(
+  options: Readonly<{
+    runnerOptions: QetlRunnerOptions;
+    queryOptions: RunQetlQueryOptions;
+  }>,
+): Promise<ConceptRelationPlan[]> {
+  const { planConceptRelations } = options.runnerOptions;
+  const conceptSpineRestrictions =
+    options.queryOptions.conceptSpineRestrictions ?? [];
+  if (planConceptRelations === undefined) {
+    if (conceptSpineRestrictions.length > 0) {
+      throw new Error(
+        "This query session cannot plan concepts, so it cannot restrict a " +
+          "concept's records.",
+      );
+    }
+    return [];
+  }
+  return await planConceptRelations({
+    rawSql: options.queryOptions.rawSql,
+    conceptSpineRestrictions,
+  });
+}
+
 async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
   options: Readonly<{
     runnerOptions: QetlRunnerOptions;
@@ -239,10 +268,7 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
   const namedDatasetIds = await options.runnerOptions.getQueryDependencies(
     options.queryOptions.rawSql,
   );
-  const conceptRelations =
-    (await options.runnerOptions.planConceptRelations?.(
-      options.queryOptions.rawSql,
-    )) ?? [];
+  const conceptRelations = await _getConceptRelationPlans(options);
   const queryDependencies = _getExpandedQueryDependencies({
     datasetIds: namedDatasetIds,
     conceptRelations,

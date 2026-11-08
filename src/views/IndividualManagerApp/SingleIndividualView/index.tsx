@@ -1,6 +1,4 @@
-import { unknownToString, where } from "@avandar/utils";
-import { useLingui } from "@lingui/react/macro";
-import { Skeleton, VisuallyHidden } from "@mantine/core";
+import { where } from "@avandar/utils";
 import { useMemo } from "react";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
@@ -15,12 +13,11 @@ import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualVi
 import { RecordFactsGroup } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup";
 import { RecordStatusControl } from "@/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusControl";
 import css from "@/views/IndividualManagerApp/SingleIndividualView/SingleIndividualView.module.css";
-import { useHydratedIndividual } from "@/views/IndividualManagerApp/SingleIndividualView/useHydratedIndividual";
+import { useRecordFields } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordFields/useRecordFields";
 import { useRecordStatusChange } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { UserProfile } from "$/models/User/UserProfile";
-import type { CaseDetailsRow } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 
 /** Stands in for the members until they load, one array for every render. */
 const EMPTY_MEMBERS: readonly UserProfile.WithRole[] = [];
@@ -38,21 +35,18 @@ type Props = {
  * its activity feed and composer in the content column, and its fields and
  * record facts in the properties rail.
  *
- * The status control is a menu for a Case Records editor and a badge for
- * everyone else. A change saves at once and refreshes every view that shows
- * the record's status, this page's loader included.
+ * The fields are read through the case type's concept view, so they show the
+ * values the Data Explorer and chat see. The status control is a menu for a
+ * Case Records editor and a badge for everyone else. A change saves at once
+ * and refreshes every view that shows the record's status, this page's loader
+ * included.
  */
 export function SingleIndividualView({
   concept,
   individual,
   highlightedCommentId,
 }: Props): JSX.Element {
-  const { t } = useLingui();
-  const [hydratedIndividual, isLoadingHydratedIndividual] =
-    useHydratedIndividual({
-      concept,
-      individual,
-    });
+  const recordFields = useRecordFields({ concept, individual });
   const [members, isLoadingMembers] = WorkspaceClient.useGetUsersForWorkspace({
     workspaceId: individual.workspaceId,
     useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
@@ -67,39 +61,10 @@ export function SingleIndividualView({
     return statuses ? ConceptStatus.sortByPosition(statuses) : undefined;
   }, [statuses]);
 
-  const attributeRows: CaseDetailsRow[] | undefined = useMemo(() => {
-    if (!hydratedIndividual.assertions) {
-      return undefined;
-    }
-    return hydratedIndividual.assertions.map((assertion) => {
-      return {
-        id: assertion.conceptAttributeId,
-        name: assertion.attributeName ?? t`Loading...`,
-        value: assertion.value,
-        sourceName: assertion.sourceName,
-      };
-    });
-  }, [hydratedIndividual.assertions, t]);
-
   return (
     <AppView>
       <AppViewHeader
-        title={
-          isLoadingHydratedIndividual ? (
-            <>
-              <Skeleton
-                component="span"
-                height={24}
-                width={200}
-                display="inline-block"
-                aria-hidden
-              />
-              <VisuallyHidden>{t`Loading case`}</VisuallyHidden>
-            </>
-          ) : (
-            unknownToString(hydratedIndividual.name)
-          )
-        }
+        title={individual.name}
         titleAccessory={
           sortedStatuses ? (
             <RecordStatusControl
@@ -121,7 +86,17 @@ export function SingleIndividualView({
       <AppViewBody
         noPadding
         rail={
-          <CaseDetailsRail attributes={attributeRows}>
+          <CaseDetailsRail
+            attributes={recordFields.rows}
+            loadError={
+              recordFields.isLoadError
+                ? {
+                    isRetrying: recordFields.isRetrying,
+                    onRetry: recordFields.retry,
+                  }
+                : undefined
+            }
+          >
             <RecordFactsGroup individual={individual} />
           </CaseDetailsRail>
         }

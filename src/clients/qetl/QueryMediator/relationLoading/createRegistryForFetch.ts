@@ -96,6 +96,9 @@ export function createRegistryForFetch(
       );
     },
     runParquetQuery: ({ rawSql }) => {
+      // The caller's spine restrictions apply only to the outer statement's
+      // concepts and must not reach this nested query: its bytes are cached in
+      // the relation cache under a key that ignores them.
       return options.runQuery({
         rawSql,
         returnType: "parquet",

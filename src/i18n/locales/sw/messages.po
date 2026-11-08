@@ -2237,7 +2237,6 @@ msgid "Medium"
 msgstr "Wastani"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "Inapakia kesi"
 
@@ -5624,6 +5623,7 @@ msgstr "Unda Mahali pa Kazi"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again"
 msgstr "Jaribu tena"
 
@@ -7330,6 +7330,7 @@ msgstr "Unda eneo jipya la kazi. Unaweza kila wakati kulihariri baadaye."
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
 "litaendelea."
@@ -9032,6 +9033,10 @@ msgstr "Haiwezekani kuandaa mfano wa mazungumzo ya mtandaoni."
 msgid "Delete the view {0}"
 msgstr "Futa mwonekano {0}"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "This record's fields failed to load"
+msgstr "Imeshindwa kupakia sehemu za rekodi hii"
+
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Features in cluster ({0})"
@@ -9678,6 +9683,7 @@ msgid "Show as link"
 msgstr "Onyesha kama kiungo"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No value"
 msgstr "Hakuna thamani"
 
@@ -10560,8 +10566,8 @@ msgid "This dashboard is published publicly."
 msgstr "Dashibodi hii imechapishwa hadharani."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "Inapakia..."
+#~ msgid "Loading..."
+#~ msgstr "Inapakia..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

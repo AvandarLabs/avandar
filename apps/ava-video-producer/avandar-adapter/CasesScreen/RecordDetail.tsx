@@ -8,7 +8,7 @@ import type { CaseDetailsRow } from "@/views/IndividualManagerApp/SingleIndividu
 type Props = {
   frame: number;
   caseLabel: string;
-  fields: ReadonlyArray<Omit<CaseDetailsRow, "id">>;
+  fields: ReadonlyArray<{ name: string; value: unknown; sourceName: string }>;
 };
 
 /** Resolves immediately: the video never posts an update. */
@@ -23,7 +23,12 @@ function _ignoreSubmit(): Promise<boolean> {
  */
 export function RecordDetail({ frame, caseLabel, fields }: Props) {
   const attributes: CaseDetailsRow[] = fields.map((field) => {
-    return { ...field, id: field.name as ConceptAttribute.Id };
+    return {
+      id: field.name as ConceptAttribute.Id,
+      name: field.name,
+      value: field.value,
+      sourceNames: [field.sourceName],
+    };
   });
   return (
     <Container py="md">

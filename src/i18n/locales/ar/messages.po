@@ -2208,7 +2208,6 @@ msgid "Medium"
 msgstr "متوسط"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "جارٍ تحميل الحالة"
 
@@ -5554,6 +5553,7 @@ msgstr "إنشاء مساحة عمل"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again"
 msgstr "حاول مرة أخرى"
 
@@ -7241,6 +7241,7 @@ msgstr "إنشاء مساحة عمل جديدة. يمكنك دائمًا تعد�
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "حاول مرة أخرى بعد قليل، أو تواصل مع الدعم إذا استمرت المشكلة."
 
@@ -8924,6 +8925,10 @@ msgstr "لم يتمكن من إعداد نموذج الدردشة غير الم�
 msgid "Delete the view {0}"
 msgstr "حذف العرض {0}"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "This record's fields failed to load"
+msgstr "تعذّر تحميل حقول هذا السجل"
+
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Features in cluster ({0})"
@@ -9564,6 +9569,7 @@ msgid "Show as link"
 msgstr "عرض كرابط"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No value"
 msgstr "لا قيمة"
 
@@ -10438,8 +10444,8 @@ msgid "This dashboard is published publicly."
 msgstr "تم نشر هذه اللوحة للجمهور."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "جارٍ التحميل..."
+#~ msgid "Loading..."
+#~ msgstr "جارٍ التحميل..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

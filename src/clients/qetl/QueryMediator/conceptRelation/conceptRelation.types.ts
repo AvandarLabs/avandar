@@ -1,4 +1,5 @@
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptRelationRef } from "$/models/relations/RelationRef/RelationRef.types";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 
@@ -7,6 +8,21 @@ export type ConceptSpineRow = {
   externalId: string;
   /** The record's status name, which the view exposes as `status`. */
   statusName: string;
+};
+
+/**
+ * Narrows one concept's spine to the records with these keys, so a query over
+ * its view computes values for those records only.
+ *
+ * Passed as data beside the SQL (`conceptSpineRestrictions` on
+ * `WorkspaceQuerySession.runQuery`), never written into it, so a record key
+ * reaches DuckDB only through the spine's CSV. Use it to read a few records'
+ * values, for example the one record a record page shows. A key that names no
+ * record of the concept yields no row.
+ */
+export type ConceptSpineRestriction = {
+  conceptId: Concept.Id;
+  externalIds: readonly string[];
 };
 
 /**

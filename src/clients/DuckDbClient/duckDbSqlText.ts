@@ -1,4 +1,5 @@
 import { objectEntries, objectKeys, prop } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import type { DuckDbLoadParquetOptions } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** Escapes a value for use inside a single-quoted SQL string literal. */
@@ -123,10 +124,11 @@ export function getEntityKeyComparisonSql(
     primaryKeyColumnName: string;
   }>,
 ): string {
-  return (
-    `CAST("${options.externalIdsTable}"."${options.externalIdColumn}" AS VARCHAR)` +
-    ` = CAST(dataset."${options.primaryKeyColumnName}" AS VARCHAR)`
-  );
+  // Quoted rather than wrapped in bare double quotes, so a key column whose
+  // name contains `"` still compiles.
+  const outerKey = `${quoteSqlIdentifier(options.externalIdsTable)}.${quoteSqlIdentifier(options.externalIdColumn)}`;
+  const datasetKey = `dataset.${quoteSqlIdentifier(options.primaryKeyColumnName)}`;
+  return `CAST(${outerKey} AS VARCHAR) = CAST(${datasetKey} AS VARCHAR)`;
 }
 
 /** Builds the `EXCLUDE`/replacement clauses for a parquet projection. */

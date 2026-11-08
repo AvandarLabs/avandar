@@ -12,9 +12,14 @@ function _toJsValueFromArrowValue(value: unknown): unknown {
     return Number(value);
   }
   if (value instanceof arrow.Vector) {
-    return value.toArray().map((item: Readonly<{ toJSON: () => unknown }>) => {
-      return item.toJSON();
+    // `Array.from` rather than `toArray()`: a list of numbers comes back from
+    // `toArray()` as a typed array, which can only hold numbers.
+    return Array.from(value as Iterable<unknown>, (item) => {
+      return _toJsValueFromArrowValue(item);
     });
+  }
+  if (value instanceof arrow.StructRow || value instanceof arrow.MapRow) {
+    return objectValuesMap(value.toJSON(), _toJsValueFromArrowValue);
   }
   if (value === null || typeof value !== "object") {
     return value;

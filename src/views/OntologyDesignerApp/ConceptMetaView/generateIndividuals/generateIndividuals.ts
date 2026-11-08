@@ -16,8 +16,8 @@ import { Concept } from "$/models/ontology/Concept/Concept";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
-import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
+import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
@@ -297,11 +297,12 @@ async function _stageIndividuals(options: {
           return `SELECT "${column.name}" AS external_id FROM "${column.datasetId}"`;
         })
         .join(" UNION ALL "),
-      titleSelector: getSQLSelectOfMapping({
+      titleSelector: buildAttributeValueSql({
         selectColumnName: titleColumn.name,
         primaryKeyColumnName: titleDatasetPrimaryKeyColumn.name,
         datasetId: titleColumn.datasetId,
-        ruleType: labelMapping.valuePickerRuleType,
+        valuePickerRuleType: labelMapping.valuePickerRuleType,
+        isArray: false,
         outputColumnName: "name",
         externalIdsTable: "external_ids",
         externalIdColumn: "external_id",

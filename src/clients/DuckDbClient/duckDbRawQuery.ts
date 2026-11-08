@@ -3,7 +3,7 @@ import * as arrow from "apache-arrow";
 import { uuid } from "$/lib/uuid";
 import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
+import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import {
   getQueryStringFromParams,

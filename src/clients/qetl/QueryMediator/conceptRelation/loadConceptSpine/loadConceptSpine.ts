@@ -108,8 +108,7 @@ async function _createEmptyConceptSpine(
  *
  * The rows travel as CSV text rather than as a `VALUES` list because
  * `external_id` is user data: inlining it would mean escaping user text into
- * SQL, duplicating the one injection surface the codebase already has
- * (`AttributeAssertionClient`'s `WHERE "<pk>" = '<externalId>'`).
+ * SQL, which no concept SQL does.
  *
  * Both columns are pinned to `VARCHAR` rather than sniffed. The key because
  * `individuals.external_id` is `text` in Postgres and a sniffed type would vary
@@ -128,8 +127,11 @@ async function _createEmptyConceptSpine(
  *
  * Reloading the whole spine on every query is right at demo scale (thousands of
  * individuals) and becomes the dominant cost in the tens of thousands. Caching
- * it belongs to the relation cache, keyed on the concept plus the
- * `modified-time` freshness signal `ConceptWrapper` already declares.
+ * it belongs to the relation cache, keyed on the concept plus its records'
+ * `updated_at`. A caller reading a few records restricts the spine instead
+ * (`ConceptSpineRestriction`). Any such key must also include the spine
+ * restriction, because a restricted spine must never answer an unrestricted
+ * query.
  */
 export async function loadConceptSpine(
   options: Readonly<{

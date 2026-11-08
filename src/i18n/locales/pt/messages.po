@@ -2240,7 +2240,6 @@ msgid "Medium"
 msgstr "Médio"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "Carregando caso"
 
@@ -5629,6 +5628,7 @@ msgstr "Criar Espaço de Trabalho"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again"
 msgstr "Tente novamente"
 
@@ -7340,6 +7340,7 @@ msgstr "Criar um novo espaço de trabalho. Você pode editá-lo a qualquer "
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Tente novamente em instantes ou entre em contato com o suporte se o "
 "problema persistir."
@@ -9047,6 +9048,10 @@ msgstr "Não foi possível preparar o modelo de chat offline."
 msgid "Delete the view {0}"
 msgstr "Excluir a visualização {0}"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "This record's fields failed to load"
+msgstr "Não foi possível carregar os campos deste registro"
+
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Features in cluster ({0})"
@@ -9695,6 +9700,7 @@ msgid "Show as link"
 msgstr "Exibir como link"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No value"
 msgstr "Nenhum valor"
 
@@ -10580,8 +10586,8 @@ msgid "This dashboard is published publicly."
 msgstr "Este painel está publicado publicamente."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "Carregando..."
+#~ msgid "Loading..."
+#~ msgstr "Carregando..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

@@ -1,22 +1,25 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
-import {
-  getEntityKeyComparisonSql,
-  getRowNumberedViewName,
-} from "@/clients/DuckDbClient/duckDbSqlText";
-import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
+import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 /** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
-const EXTERNAL_ID_COLUMN = "external_id";
+/** The view's record key column, read from the spine. */
+export const EXTERNAL_ID_COLUMN = "external_id";
 const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /** One column of the concept relation, already resolved to what it reads. */
 export type ConceptAttributeColumn =
   | {
       kind: "dataset_column";
+      /**
+       * The attribute this column holds. It survives a renamed column, so a
+       * reader of the view maps a column back to its attribute by this.
+       */
+      attributeId: ConceptAttribute.Id;
       /** The relation's column name, which is the attribute's name. */
       attributeName: string;
       /** The contributing dataset's column this attribute reads. */
@@ -35,6 +38,8 @@ export type ConceptAttributeColumn =
        * vanishing and breaking a saved query.
        */
       kind: "unmapped";
+      /** The attribute this column holds, as on the other arm. */
+      attributeId: ConceptAttribute.Id;
       attributeName: string;
       duckDbDataType: DuckDbDataType;
     };
@@ -47,9 +52,8 @@ export type ConceptAttributeColumn =
  *
  * 1. **The `FROM` is the spine alone.** Every attribute is a correlated scalar
  *    subquery, so no join can multiply rows and the grain is the spine's grain
- *    by construction. This is what fixes today's implementation, which
- *    concatenates one row set per contributing dataset and therefore emits an
- *    individual twice when two datasets contribute to it.
+ *    by construction. Do not join the datasets instead: a record present in
+ *    two datasets would come back once per dataset.
  * 2. **A missing contribution is a NULL, not a lost row.** A scalar subquery
  *    with no matching rows returns NULL, which is `LEFT JOIN` semantics without
  *    a `LEFT JOIN`. An individual no dataset contributes to still appears.
@@ -81,12 +85,16 @@ export function buildConceptViewSql(
     `${SPINE_ALIAS}.${quoteSqlIdentifier(STATUS_COLUMN)} AS ${quoteSqlIdentifier(STATUS_COLUMN)}`,
     ...orderedColumns
       .filter((column) => {
-        // An attribute already named `external_id` or `status` would collide
-        // with a spine column above. The spine wins: a join depends on the
-        // key, and every case type's status is that column.
+        // `makeConceptAttributeColumnsFromMetadata` already suffixes an
+        // attribute named `external_id` or `status`, so this only guards a
+        // caller that builds columns by hand. Such a column would collide with
+        // a spine column above, and the spine must win: a join depends on the
+        // key, and every case type's status is that column. Column names are
+        // case-insensitive in DuckDB, so the comparison is too.
+        const lowercasedName = column.attributeName.toLowerCase();
         return (
-          column.attributeName !== EXTERNAL_ID_COLUMN &&
-          column.attributeName !== STATUS_COLUMN
+          lowercasedName !== EXTERNAL_ID_COLUMN &&
+          lowercasedName !== STATUS_COLUMN
         );
       })
       .map(_buildColumnSelector),
@@ -103,53 +111,16 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
     return `CAST(NULL AS ${column.duckDbDataType}) AS ${quoteSqlIdentifier(column.attributeName)}`;
   }
 
-  return column.isArray
-    ? _buildArraySelector(column)
-    : getSQLSelectOfMapping({
-        selectColumnName: column.selectColumnName,
-        primaryKeyColumnName: column.primaryKeyColumnName,
-        datasetId: column.datasetId,
-        ruleType: column.valuePickerRuleType,
-        outputColumnName: column.attributeName,
-        externalIdsTable: SPINE_ALIAS,
-        externalIdColumn: EXTERNAL_ID_COLUMN,
-      });
-}
-
-/**
- * Collects every contributed value for an array-valued attribute.
- *
- * Ordered by `file_row_number` rather than left unordered, so an array is
- * deterministic by exactly the argument that makes `first` deterministic: the
- * row order within a file is stable, and `list()` without an `ORDER BY` would
- * reorder under parallel scans. A rule that is deterministic only by luck is
- * not deterministic.
- *
- * `COALESCE` to an empty list because `list()` over zero rows returns NULL, and
- * "this individual contributed no values" is better expressed as an empty array
- * than as a NULL that reads like "unknown". The value pickers do not apply:
- * all seven collapse many values to one, and an array attribute keeps them.
- */
-function _buildArraySelector(
-  column: Extract<ConceptAttributeColumn, { kind: "dataset_column" }>,
-): string {
-  const rowsView = quoteSqlIdentifier(getRowNumberedViewName(column.datasetId));
-  const valueColumn = quoteSqlIdentifier(column.selectColumnName);
-  // The same text comparison every value-picker rule uses, for the same
-  // reason: the spine's key is Postgres `text` and the dataset's key column is
-  // whatever its parquet file says.
-  const keyComparison = getEntityKeyComparisonSql({
+  // Single values and lists alike: one function owns every value rule, so the
+  // view and Sync's record name read values the same way.
+  return buildAttributeValueSql({
+    selectColumnName: column.selectColumnName,
+    primaryKeyColumnName: column.primaryKeyColumnName,
+    datasetId: column.datasetId,
+    valuePickerRuleType: column.valuePickerRuleType,
+    isArray: column.isArray,
+    outputColumnName: column.attributeName,
     externalIdsTable: SPINE_ALIAS,
     externalIdColumn: EXTERNAL_ID_COLUMN,
-    primaryKeyColumnName: column.primaryKeyColumnName,
   });
-
-  return `
-        -- Collect every contributed value, in a deterministic order
-        (
-          SELECT COALESCE(list(dataset.${valueColumn} ORDER BY dataset.file_row_number), [])
-          FROM ${rowsView} dataset
-          WHERE ${keyComparison}
-        ) AS ${quoteSqlIdentifier(column.attributeName)}
-      `;
 }

@@ -366,7 +366,9 @@ names only. Three options:
 The client and the planner read the rows a few milliseconds apart. Case types
 cannot be edited after creation (umbrella section 8), so the only change
 between the reads is a deletion, which fails both. An attribute added between
-them would surface as "No value" rather than a wrong value.
+them changes the view's column names, which the client detects and rejects
+with an error a retry recovers from, so it never files a value under the wrong
+field (section 11).
 
 **Service client.** `createServiceClient("ConceptRecordValuesClient")`,
 `withLogger`, and `withQueryHooks` with `queryFns: ["getConceptRecordValues"]`,
@@ -491,10 +493,9 @@ comments that cite deleted code are rewritten (`loadConceptSpine.ts:109-112,129-
   keyed on `isArray` in both its options and `ConceptAttributeColumn`; G3's
   rename of that field to a value shape covers both. The rail still renders a
   list with `unknownToString`; `CaseDetailsRow.value` is `unknown`.
-- **G4 (bucketed lists):** a struct list element is converted with its own
-  `toJSON()`, whose fields are not converted further (a `DATE` or `bigint`
-  inside a struct arrives as Arrow returns it). G4 must extend
-  `_toJsValueFromArrowValue` for struct fields.
+- **G4 (bucketed lists):** `_toJsValueFromArrowValue` recurses into struct and
+  map rows, so a struct list element's fields convert like top-level values
+  (section 11). G4 needs no further Arrow change for `STRUCT(bucket, value)[]`.
 - **G5 (multi-source):** `buildAttributeValueSql` takes one source today.
   `makeCaseDetailsRowsFromAttributes` already lists every mapping's dataset
   name. `getConceptAttributeColumnsFromConceptId` is the single column read.
@@ -519,7 +520,7 @@ comments that cite deleted code are rewritten (`loadConceptSpine.ts:109-112,129-
 | A restriction names a concept the statement does not read, names one twice, or names more than 500 keys | `getConceptRelationPlansFromSql` throws before any read | A programming error; the callout if it ever ships |
 | A restriction reaches a session with no planner | `_getConceptRelationPlans` throws | Same |
 | The record is no longer in the case type (deleted after the page loaded) | The view has no row; the client returns no entry | Every field shows "No value" |
-| An attribute was added between the client's and the planner's column reads | The row lacks the column | That field shows "No value" |
+| An attribute was added between the client's and the planner's column reads | The result's column names differ from the expected set, and the client throws | The callout; a retry recovers |
 | The mapping or dataset-name read fails | Only `sourceNames` is affected | Values without source lines |
 
 The query hook retries once online and not at all offline
@@ -622,3 +623,76 @@ lists of primitives now convert to arrays (section 4.6); and
    Data Explorer's view columns use. Fields have no stored position, so the
    alternative is a schema change (a `position` on `concept_attributes`).
    Name order unless you want authoring order.
+
+## 11. Implementation notes
+
+Plan 1 shipped on `feat/joined-cases`. Code review during execution changed
+the built code in the ways below. Later plans must start from this code, not
+from the plan text.
+
+### What differs from the plan text
+
+1. **Case-insensitive column names.** DuckDB column names ignore case. Two
+   things now match names case-insensitively:
+   - Column-name reservation (`external_id`, `status`).
+   - Duplicate suffixing.
+
+   So `EXTERNAL_ID` becomes `EXTERNAL_ID_2`, and `age` and `Age` become `age`
+   and `Age_2`. The reserved-name filter in `buildConceptViewSql.ts` compares
+   lowercased names. `EXTERNAL_ID_COLUMN` is exported from
+   `buildConceptViewSql.ts` and replaces a local `RECORD_KEY_COLUMN_NAME`.
+2. **Restricted reads.**
+   - `getIndividualsByExternalIds` reads a key with its own `eq` filter when
+     the key starts with a space or tab, or contains `"` or `\`. PostgREST
+     drops whitespace after `in.(`.
+   - The planner's 500 cap counts unique keys.
+   - An empty restriction loads no records.
+   - A restriction on SQL that reads no such concept is refused.
+3. **No planner, or a nested query.**
+   - A session with no planner refuses a non-empty restriction.
+   - A nested virtual-dataset query never receives the outer restriction,
+     because its bytes are cached without it.
+4. **Arrow conversion.** `arrowTableToJS` recurses into `Vector`, `StructRow`
+   and `MapRow`. Struct fields, lists of structs, and decimals inside lists
+   therefore convert like top-level values. The bucketed list shape
+   `STRUCT(bucket, value)[]` relies on this.
+5. **Record values client.** `getConceptRecordValues` behaves as follows:
+   - It checks the 500 cap before any read.
+   - It runs the column read and the value read concurrently.
+   - It throws when the result's column names differ from the expected set.
+     This happens when fields are edited between the two reads.
+   - It reads row fields with `Object.hasOwn`.
+6. **Record page.**
+   - `useRecordFields` keeps rows loading until the values and the source
+     reads arrive.
+   - A failed source read shows fields without source names. It is not an
+     error.
+   - `isRetrying` counts only failed reads.
+   - The private hook is `useSourceDatasets`. The rules of hooks require the
+     `use` prefix.
+7. **Source names.** Source names are de-duplicated by dataset id, not name.
+   The rail keys source lines by index.
+8. **Video producer.** `apps/ava-video-producer/avandar-adapter/CasesScreen/RecordDetail.tsx`
+   maps `sourceName` to `sourceNames`.
+
+### Follow-ups found during execution (not in any plan)
+
+1. **Structured query columns.** They select a case type field by
+   `baseColumn.name`, so a field whose view column was suffixed reads the wrong
+   column. Fix: resolve query columns by `attributeId` to the emitted name.
+2. **Stale record values.** Re-uploading an offline CSV or XLSX, deleting a
+   dataset, or a live source aging out does not mark record values stale.
+   Only a Google Sheets or Postgres refresh does.
+3. **Public snapshot reads.** In public read mode, only dataset table ownership
+   is checked. A `concept_<id>` view left from an earlier workspace query could
+   answer a public snapshot query.
+4. **Top-level decimals.** A top-level DECIMAL loses its scale in
+   `arrowTableToJS` (`valueOf()`).
+5. **`executedSql`.** It is undefined on the structured query path, although
+   SQL now runs.
+6. **Shared comparator.** The rail and the view copy the same field-order
+   comparator. Export it once.
+7. **Layout doc exception (resolved).** `docs/design/app-view-layout.md` says a
+   fact with no value is omitted. The record page shows "No value" on purpose,
+   because a blank field means the data is missing. The layout doc now lists
+   a record's fields as an exception.

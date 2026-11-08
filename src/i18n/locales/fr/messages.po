@@ -2263,7 +2263,6 @@ msgid "Medium"
 msgstr "Moyen"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "Chargement du dossier"
 
@@ -5686,6 +5685,7 @@ msgstr "Créer un espace de travail"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again"
 msgstr "Réessayer"
 
@@ -7413,6 +7413,7 @@ msgstr "Créer un nouvel espace de travail. Vous pouvez toujours le modifier "
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Réessayez dans un instant ou contactez l’assistance si le problème "
 "persiste."
@@ -9138,6 +9139,10 @@ msgstr "Impossible de préparer le modèle de chat hors ligne."
 msgid "Delete the view {0}"
 msgstr "Supprimer la vue {0}"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "This record's fields failed to load"
+msgstr "Les champs de cet enregistrement n'ont pas pu être chargés"
+
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Features in cluster ({0})"
@@ -9794,6 +9799,7 @@ msgid "Show as link"
 msgstr "Afficher sous forme de lien"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No value"
 msgstr "Aucune valeur"
 
@@ -10688,8 +10694,8 @@ msgid "This dashboard is published publicly."
 msgstr "Ce tableau de bord est publié publiquement."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "Chargement..."
+#~ msgid "Loading..."
+#~ msgstr "Chargement..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

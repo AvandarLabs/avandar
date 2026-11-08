@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { getNeededColumnsFromQuery } from "@/clients/qetl/QueryMediator/getNeededColumnsFromQuery/getNeededColumnsFromQuery";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
@@ -16,6 +17,7 @@ const CONCEPT_PLAN: ConceptRelationPlan = {
   attributeColumns: [
     {
       kind: "dataset_column",
+      attributeId: "attr-age" as ConceptAttribute.Id,
       attributeName: "age",
       selectColumnName: "age_years",
       datasetId: DATASET_ID,

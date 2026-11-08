@@ -2,7 +2,6 @@ import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { createRelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import { createConceptWrapper } from "@/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper";
 import { createDatasetParquetWrapper } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
 import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
@@ -212,9 +211,11 @@ function _createDatasetWrapper(
 /**
  * The wrappers the application runs with, one registry per query session.
  *
- * Two wrappers are registered because there are two relation kinds. The six
- * dataset source types sit behind one composite, so the registry's
- * one-wrapper-per-kind invariant holds without collapsing their behaviour.
+ * One wrapper is registered: the dataset composite, behind which the dataset
+ * source types sit, so the registry's one-wrapper-per-kind invariant holds
+ * without collapsing their behaviour. No wrapper claims the `concept` kind:
+ * the concept planner builds a concept's view inside the query's lease, so a
+ * concept is never acquired.
  */
 export function createDefaultRegistry(
   options: Readonly<DefaultRegistryOptions>,
@@ -241,6 +242,5 @@ export function createDefaultRegistry(
         readCsv: options.readRelationCsv,
       }),
     }),
-    createConceptWrapper(),
   ]);
 }

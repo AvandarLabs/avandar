@@ -2148,7 +2148,6 @@ msgid "Medium"
 msgstr "中"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Loading case"
 msgstr "正在載入案件"
 
@@ -5417,6 +5416,7 @@ msgstr "創建工作區"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again"
 msgstr "再試一次"
 
@@ -7078,6 +7078,7 @@ msgstr "創建一個新的工作區。您可以隨時稍後編輯它。"
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "請稍後再試；如果問題持續發生，請聯絡支援人員。"
 
@@ -8719,6 +8720,10 @@ msgstr "無法準備離線聊天模型。"
 msgid "Delete the view {0}"
 msgstr "刪除檢視 {0}"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "This record's fields failed to load"
+msgstr "此記錄的欄位載入失敗"
+
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Features in cluster ({0})"
@@ -9344,6 +9349,7 @@ msgid "Show as link"
 msgstr "顯示為連結"
 
 #: src/components/providers/AvandarAppProvider.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "No value"
 msgstr "無值"
 
@@ -10195,8 +10201,8 @@ msgid "This dashboard is published publicly."
 msgstr "此儀表板已公開發佈。"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-msgid "Loading..."
-msgstr "載入中..."
+#~ msgid "Loading..."
+#~ msgstr "載入中..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"

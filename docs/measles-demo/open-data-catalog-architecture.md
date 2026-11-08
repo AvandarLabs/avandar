@@ -62,7 +62,7 @@ a real endpoint, not assumed:
 | --- | --- | --- | --- |
 | Preloaded | Built once by the Avandar pipeline, read from a stable storage object forever after | Yes - `pipeline_parquet` entries | Unchanged |
 | Dataset-connect lazy load | Fetched live once, written back to storage, every later read (any workspace) served from that cached copy until a cheap freshness check says otherwise | **No** - `api_resource` entries re-fetch live on every acquire, with no write-back | **This spec's build scope**, for both CKAN and a new Socrata connector |
-| Query-time lazy load (pushdown) | A predicate or aggregate sent to the source, only the matching rows fetched | No - anticipated in `RelationCapabilities`/`SourceWrapper.pushDown`, unimplemented everywhere (`ConceptWrapper`'s own docstring admits its `pushDown` is an unused stub) | **Explicitly deferred** (section 8). Needs the capability-driven planner `qetl-architecture.md` section 9 already names as not built, for every source type, not just Socrata |
+| Query-time lazy load (pushdown) | A predicate or aggregate sent to the source, only the matching rows fetched | No - anticipated in `RelationCapabilities`/`SourceWrapper.pushDown`, unimplemented everywhere (no wrapper implements `pushDown`) | **Explicitly deferred** (section 8). Needs the capability-driven planner `qetl-architecture.md` section 9 already names as not built, for every source type, not just Socrata |
 
 ## 3. Module layout
 

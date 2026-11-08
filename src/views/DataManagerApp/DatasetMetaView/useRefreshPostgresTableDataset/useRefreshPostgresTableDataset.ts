@@ -6,7 +6,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { clearCachedDatasetRows } from "@/views/DataManagerApp/DatasetMetaView/clearCachedDatasetRows";
-import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries";
+import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries/invalidateDatasetRowQueries";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { User } from "$/models/User/User";
 import type { UseMutationResultTuple } from "@avandar/query-hooks";

@@ -19,26 +19,30 @@ import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
 const DATASET_A = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa";
 const DATASET_B = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb";
+const DATASET_C = "dddddddd-4444-4444-8444-dddddddddddd";
 const CONCEPT_VIEW = "concept_cccccccc-3333-4333-8333-cccccccccccc";
 const SPINE = `${CONCEPT_VIEW}__individuals`;
 
 /**
- * Builds the fixture world: two contributing datasets as parquet, each with its
- * `ava_rows_` view, plus the spine.
+ * Builds the fixture world: three contributing datasets as parquet, each with
+ * its `ava_rows_` view, plus the spine.
  *
  * `p1` has two rows in dataset A, so `first` has something to be wrong about.
  * `p2` has two equally frequent regions in dataset B, so `most_frequent` has a
  * tie to break. `p3` is in the spine and in no dataset, which is the
- * missing-contribution case.
+ * missing-contribution case. Dataset C holds NULLs: `p1`'s first nickname is
+ * NULL, and `p2` has two NULL nicknames and one real one.
  */
 async function _seed(connection: DuckDBConnection): Promise<void> {
   const pathA = join(tmpdir(), "ava-concept-a.parquet");
   const pathB = join(tmpdir(), "ava-concept-b.parquet");
+  const pathC = join(tmpdir(), "ava-concept-c.parquet");
 
   await connection.run(`
     COPY (
@@ -58,18 +62,32 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
       ) AS t(hh_id, region_name)
     ) TO '${pathB}' (FORMAT parquet)
   `);
+  await connection.run(`
+    COPY (
+      SELECT * FROM (VALUES
+        ('p1', CAST(NULL AS VARCHAR)),
+        ('p1', 'Ada'),
+        ('p2', NULL),
+        ('p2', NULL),
+        ('p2', 'Bo')
+      ) AS t(person_id, nickname)
+    ) TO '${pathC}' (FORMAT parquet)
+  `);
 
-  // Both views per dataset, exactly as production has them. Only the `first`
-  // rule reads the row-numbered view; `most_frequent` and the aggregates read
+  // Both views per dataset, exactly as production has them. Only `first` and
+  // lists read the row-numbered view; `most_frequent` and the aggregates read
   // the dataset's public view, which does not expose `file_row_number` and does
   // not need to. A fixture with only one of the two hides that distinction.
   await connection.run(`
     CREATE VIEW "${DATASET_A}" AS SELECT * FROM read_parquet('${pathA}');
     CREATE VIEW "${DATASET_B}" AS SELECT * FROM read_parquet('${pathB}');
+    CREATE VIEW "${DATASET_C}" AS SELECT * FROM read_parquet('${pathC}');
     CREATE VIEW "${getRowNumberedViewName(DATASET_A)}" AS
       SELECT * FROM read_parquet('${pathA}', file_row_number = true);
     CREATE VIEW "${getRowNumberedViewName(DATASET_B)}" AS
       SELECT * FROM read_parquet('${pathB}', file_row_number = true);
+    CREATE VIEW "${getRowNumberedViewName(DATASET_C)}" AS
+      SELECT * FROM read_parquet('${pathC}', file_row_number = true);
     CREATE TABLE "${SPINE}" AS
       SELECT * FROM (VALUES
         ('p1', 'Suspected'),
@@ -81,6 +99,7 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
 
 const AGE: ConceptAttributeColumn = {
   kind: "dataset_column",
+  attributeId: "attr-age" as ConceptAttribute.Id,
   attributeName: "age",
   selectColumnName: "age_years",
   datasetId: DATASET_A,
@@ -91,6 +110,7 @@ const AGE: ConceptAttributeColumn = {
 
 const REGION: ConceptAttributeColumn = {
   kind: "dataset_column",
+  attributeId: "attr-region" as ConceptAttribute.Id,
   attributeName: "region",
   selectColumnName: "region_name",
   datasetId: DATASET_B,
@@ -101,6 +121,7 @@ const REGION: ConceptAttributeColumn = {
 
 const TAGS: ConceptAttributeColumn = {
   kind: "dataset_column",
+  attributeId: "attr-tags" as ConceptAttribute.Id,
   attributeName: "tags",
   selectColumnName: "tag",
   datasetId: DATASET_A,
@@ -111,8 +132,20 @@ const TAGS: ConceptAttributeColumn = {
 
 const NOTE: ConceptAttributeColumn = {
   kind: "unmapped",
+  attributeId: "attr-note" as ConceptAttribute.Id,
   attributeName: "note",
   duckDbDataType: "VARCHAR",
+};
+
+const NICKNAME: ConceptAttributeColumn = {
+  kind: "dataset_column",
+  attributeId: "attr-nickname" as ConceptAttribute.Id,
+  attributeName: "nickname",
+  selectColumnName: "nickname",
+  datasetId: DATASET_C,
+  primaryKeyColumnName: "person_id",
+  valuePickerRuleType: "first",
+  isArray: false,
 };
 
 /** Creates the view from the given columns and returns its rows. */
@@ -153,8 +186,8 @@ function _normalize(row: Record<string, unknown>): Record<string, unknown> {
 describe("buildConceptViewSql", () => {
   // The grain claim. Three individuals in the spine must be three rows out,
   // even though `p1` has two rows in dataset A and `p2` has two in dataset B.
-  // Today's concatenating implementation emits an individual once per
-  // contributing dataset, which is the bug this shape removes.
+  // A join-based shape would return a record once per contributing dataset.
+  // The spine-plus-subquery shape prevents that.
   it("emits exactly one row per individual regardless of contributions", async () => {
     const rows = await _queryView([AGE, REGION]);
 
@@ -342,9 +375,52 @@ describe("buildConceptViewSql", () => {
   // name, which does not compile. The spine's column wins.
   it("keeps the spine's status when an attribute column is named status", async () => {
     const rows = await _queryView([
-      { kind: "unmapped", attributeName: "status", duckDbDataType: "VARCHAR" },
+      {
+        kind: "unmapped",
+        attributeId: "attr-status" as ConceptAttribute.Id,
+        attributeName: "status",
+        duckDbDataType: "VARCHAR",
+      },
     ]);
 
     expect(rows[1]).toEqual({ external_id: "p2", status: "Confirmed" });
+  });
+
+  // NULL means "no value". `p1`'s first nickname is NULL, so `first` has to
+  // read past it rather than report that `p1` has none.
+  it("reads the first non-NULL value rather than a leading NULL", async () => {
+    const rows = await _queryView([NICKNAME]);
+
+    expect(rows[0]).toEqual({
+      external_id: "p1",
+      status: "Suspected",
+      nickname: "Ada",
+    });
+  });
+
+  // `p2` has two NULL nicknames and one `Bo`. Counting NULL as a value would
+  // make NULL the most frequent.
+  it("ignores NULL under most_frequent even when it is the most common cell", async () => {
+    const rows = await _queryView([
+      { ...NICKNAME, valuePickerRuleType: "most_frequent" },
+    ]);
+
+    expect(rows[1]).toEqual({
+      external_id: "p2",
+      status: "Confirmed",
+      nickname: "Bo",
+    });
+  });
+
+  it("leaves NULL values out of a list column", async () => {
+    const rows = await _queryView([
+      { ...NICKNAME, attributeName: "nicknames", isArray: true },
+    ]);
+
+    expect(
+      rows.map((row) => {
+        return row.nicknames;
+      }),
+    ).toEqual([["Ada"], ["Bo"], []]);
   });
 });

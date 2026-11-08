@@ -1,5 +1,6 @@
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { EXTERNAL_ID_COLUMN } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
@@ -163,6 +164,7 @@ function _buildUnmappedColumn(
 ): ConceptAttributeColumn {
   return {
     kind: "unmapped",
+    attributeId: attribute.id,
     attributeName: attribute.name,
     duckDbDataType: DuckDbDataTypeUtils.fromDatasetColumnType(
       attribute.dataType,
@@ -174,11 +176,10 @@ function _buildUnmappedColumn(
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
- * become a typed NULL rather than an error. Today
- * `getAttributeAssertions._getAssertionsByMappingType` throws for any
- * manual-entry mapping, so one manually entered attribute makes a whole concept
- * unqueryable; a typed NULL keeps the relation's schema complete and is honest,
- * because we hold no value for it.
+ * become a typed NULL rather than an error. Do not throw for them instead: one
+ * manually entered attribute would make the whole concept unqueryable, while a
+ * typed NULL keeps the relation's schema complete and is honest, because no
+ * value is stored for it.
  */
 function _buildAttributeColumn(
   options: Readonly<{
@@ -224,6 +225,7 @@ function _buildAttributeColumn(
   return {
     column: {
       kind: "dataset_column",
+      attributeId: attribute.id,
       attributeName: attribute.name,
       selectColumnName: datasetColumn.name,
       datasetId: mapping.datasetId,
@@ -238,18 +240,22 @@ function _buildAttributeColumn(
 /**
  * Suffixes a name that an earlier attribute already took.
  *
- * `<name>_2`, `<name>_3`, and so on, matching the order
+ * `<name>_2`, `<name>_3`, and so on. The match ignores case, which is how
+ * DuckDB compares column names, and `takenNames` holds lowercased names. The
+ * emitted name keeps the requested casing. The order matches the order
  * `_compareAttributes` fixes, so the alphabetically first attribute id keeps
  * the plain name.
  */
 function _getUniqueColumnName(
   options: Readonly<{ requestedName: string; takenNames: ReadonlySet<string> }>,
 ): string {
-  if (!options.takenNames.has(options.requestedName)) {
+  if (!options.takenNames.has(options.requestedName.toLowerCase())) {
     return options.requestedName;
   }
   let suffix = 2;
-  while (options.takenNames.has(`${options.requestedName}_${suffix}`)) {
+  while (
+    options.takenNames.has(`${options.requestedName}_${suffix}`.toLowerCase())
+  ) {
     suffix += 1;
   }
   return `${options.requestedName}_${suffix}`;
@@ -265,9 +271,8 @@ function _getUniqueColumnName(
  * real SQL over a fake concept instead of asserting the shape of this return
  * value.
  *
- * One column per attribute, never one per mapping. That is the difference from
- * `getDatasetColumnAssertions`, which iterates mappings and therefore emits an
- * attribute twice when it has two.
+ * One column per attribute, never one per mapping. Iterating mappings instead
+ * would emit an attribute twice when it has two.
  */
 export function makeConceptAttributeColumnsFromMetadata(
   metadata: Readonly<ConceptRelationMetadata>,
@@ -279,11 +284,16 @@ export function makeConceptAttributeColumnsFromMetadata(
   const attributeColumns: ConceptAttributeColumn[] = [];
   const contributingDatasetIds = new Set<Dataset.Id>();
   const renamedColumns: RenamedConceptAttributeColumn[] = [];
-  // Seeded with the built-in status column's name, which the view reads from
-  // the spine, so an attribute of that name is suffixed rather than dropped.
-  // The `concept_attributes__name_not_reserved` check keeps such attributes
-  // out of the database; this guards rows that predate it.
-  const takenNames = new Set<string>([ConceptStatusColumn.COLUMN_NAME]);
+  // Seeded with the two columns the view reads from the spine, the record key
+  // and the status, so an attribute of either name is suffixed rather than
+  // dropped and keeps a column of its own. The
+  // `concept_attributes__name_not_reserved` check keeps `status` out of the
+  // database. Nothing reserves `external_id`, a common key column name.
+  // Lowercased, because DuckDB column names are case-insensitive.
+  const takenNames = new Set<string>([
+    EXTERNAL_ID_COLUMN,
+    ConceptStatusColumn.COLUMN_NAME.toLowerCase(),
+  ]);
 
   orderedAttributes.forEach((attribute) => {
     const { column, contributingDatasetId } = _buildAttributeColumn({
@@ -305,7 +315,7 @@ export function makeConceptAttributeColumnsFromMetadata(
         emittedName,
       });
     }
-    takenNames.add(emittedName);
+    takenNames.add(emittedName.toLowerCase());
     attributeColumns.push({ ...column, attributeName: emittedName });
   });
 
