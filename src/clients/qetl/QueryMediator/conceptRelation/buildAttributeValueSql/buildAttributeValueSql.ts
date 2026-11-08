@@ -1,5 +1,6 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { match } from "ts-pattern";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import {
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
@@ -23,6 +24,11 @@ export type AttributeValueSqlOptions = {
   /** The dataset column that holds each row's record key. */
   primaryKeyColumnName: string;
   datasetId: string;
+  /**
+   * The type of the dataset column that holds the value. `max` and `min`
+   * compare a text column alphabetically instead of by byte order.
+   */
+  columnDataType: AvaDataType.T;
   /** How one record's rows reduce to one value. Unused for a list. */
   valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
   /** Keep every value, as a list, instead of reducing them to one. */
@@ -47,16 +53,47 @@ type ValueSqlParts = {
   rowsView: string;
 };
 
-/** The `SELECT` that reduces one record's non-NULL rows to its value. */
+/**
+ * The aggregate that picks a text column's last or first value
+ * alphabetically, as `arg_max` or `arg_min`.
+ *
+ * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
+ * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
+ * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
+ * a struct, which compares field by field, so values that share a key
+ * ("apple" and "Apple") tie-break by the value itself in byte order, in the
+ * same direction. The pick never depends on scan order, and the aggregate
+ * returns the original value.
+ */
+function _buildTextExtremeSql(
+  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
+): string {
+  const { value, aggregate } = options;
+  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
+  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
+}
+
+/**
+ * The `SELECT` that reduces one record's non-NULL rows to its value.
+ *
+ * Each rule passes its aggregate in the rule's output type
+ * (`ValuePickerRule.getOutputDataType`). COUNT is already BIGINT, and is 0,
+ * not NULL, over no rows. MAX and MIN keep the column's type, so dates, times,
+ * and text work as well as numbers. Text compares alphabetically, ignoring
+ * case and accents, so '10' sorts before '9' and 'Ángel' before 'Zebra'. It
+ * still returns the original value.
+ */
 function _buildReducedValueSql(
   options: Readonly<{
     parts: ValueSqlParts;
     valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
+    columnDataType: AvaDataType.T;
   }>,
 ): string {
   const { value, rowFilter, datasetView, rowsView } = options.parts;
-  const aggregateSql = (aggregate: string): string => {
-    return `SELECT CAST(${aggregate}(${value}) AS DOUBLE) FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter}`;
+  const isText = AvaDataType.isText(options.columnDataType);
+  const aggregateSql = (aggregateExpression: string): string => {
+    return `SELECT ${aggregateExpression} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter}`;
   };
   return match(options.valuePickerRuleType)
     .with("first", () => {
@@ -69,19 +106,27 @@ function _buildReducedValueSql(
       return `SELECT ${value} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter} GROUP BY ${value} ORDER BY COUNT(*) DESC, ${value} LIMIT 1`;
     })
     .with("sum", () => {
-      return aggregateSql("SUM");
+      return aggregateSql(`CAST(SUM(${value}) AS DOUBLE)`);
     })
     .with("avg", () => {
-      return aggregateSql("AVG");
+      return aggregateSql(`CAST(AVG(${value}) AS DOUBLE)`);
     })
     .with("count", () => {
-      return aggregateSql("COUNT");
+      return aggregateSql(`COUNT(${value})`);
     })
     .with("max", () => {
-      return aggregateSql("MAX");
+      return aggregateSql(
+        isText
+          ? _buildTextExtremeSql({ value, aggregate: "arg_max" })
+          : `MAX(${value})`,
+      );
     })
     .with("min", () => {
-      return aggregateSql("MIN");
+      return aggregateSql(
+        isText
+          ? _buildTextExtremeSql({ value, aggregate: "arg_min" })
+          : `MIN(${value})`,
+      );
     })
     .exhaustive();
 }
@@ -121,6 +166,7 @@ export function buildAttributeValueSql(
     : _buildReducedValueSql({
         parts,
         valuePickerRuleType: options.valuePickerRuleType,
+        columnDataType: options.columnDataType,
       });
   return `(${body}) AS ${quoteSqlIdentifier(options.outputColumnName)}`;
 }

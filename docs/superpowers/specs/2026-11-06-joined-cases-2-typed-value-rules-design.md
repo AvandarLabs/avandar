@@ -204,7 +204,7 @@ the way `parseProposeCaseType.ts:2` imports `ConceptStatus`.
 one of the column's values and its `data_type` is the column's type (umbrella
 section 3.2). `getOutputDataType` describes single-value fields only. The
 form, the one path that can create a list field today, applies this in
-`getDatasetColumnAttributeDataType` (section 4.4).
+the output type logic inlined in `withFieldDataTypes` (section 4.4).
 
 ### 4.2 The concept view
 
@@ -279,7 +279,7 @@ field. It affects only the Data Explorer's menus (open question 2).
 | `proposedCaseTypeToCreatedCaseType` | `src/views/OntologyDesignerApp/proposedCaseTypeToCreatedCaseType/proposedCaseTypeToCreatedCaseType.ts` | None. It does no I/O and has no catalog. It carries the card's rule, which the next step checks |
 | `createdCaseTypeToFormValues` | `createdCaseTypeToFormValues.ts` | `_makeMappedAttribute` stores `toAllowedRuleType(...)` as the rule and `getOutputDataType(...)` as `dataType`. It already has each column's type (`:23-26`) and serves both chat tools (`applyCreatedCaseTypes.ts:21-28`) |
 | Concept creator form | `DatasetColumnMappingCreator.tsx`, `DatasetColumnAttributesBlock/index.tsx` | The parent passes the selected field's column type from its `datasetColumnLookup`, and the form's `useValuePickerOptions(columnDataType)` offers only allowed rules |
-| Concept creator form submit | `conceptFormTypes.ts`, `ConceptCreatorView/index.tsx` | `transformValues` (`index.tsx:84-152`) runs every field through `withFieldDataTypes`, which sets each dataset-column field's `dataType` from its column (found in `sourceDatasets`), its rule, and `isArray`, using `getDatasetColumnAttributeDataType` |
+| Concept creator form submit | `conceptFormTypes.ts`, `ConceptCreatorView/index.tsx` | `transformValues` (`index.tsx:84-152`) runs every field through `withFieldDataTypes`, which sets each dataset-column field's `dataType` from its column (found in `sourceDatasets`), its rule, and `isArray`, with the output type logic inlined |
 | Insert | `insertConceptFromFormValues.ts`, `rpc_concepts__create` | None. They write what they are given |
 
 **Why the form computes `dataType` at submit.** While the user edits, the
@@ -305,6 +305,13 @@ Decision: **no warning; the option names the behaviour.** On a text column:
 Other column types keep "Max"/"Min" and "Choose the maximum value"/"Choose
 the minimum value".
 
+The labels are made true in SQL (Kristi's decision, section 11): on a text
+column, `max` and `min` compare `lower(strip_accents(CAST(v AS VARCHAR)))`
+and return the original value, through `arg_max(v, {k: key, v: v})` and
+`arg_min`. The struct breaks a tie between case variants ("apple" and
+"Apple") by the value itself, so the result is deterministic. Accented Latin
+letters sort with their base letter; ß, æ, ø, and ł are not folded.
+
 Why: a label is read every time someone picks a rule, while a warning is read
 once and then ignored. "Alphabetically last" makes "10 before 9" predictable
 without one. Detecting numbers stored as text would need row values, which
@@ -319,8 +326,8 @@ After its value-picker bullet (`:92`) it gains:
 
 > sum and avg only work on bigint and double columns. max and min work on
 > every column type except boolean, and on a varchar column they compare
-> alphabetically, so "10" comes before "9": never use them for numbers stored
-> as text. count, first, and most_frequent work on every column.
+> alphabetically, ignoring case and accents, so "10" comes before "9": never
+> use them for numbers stored as text. count, first, and most_frequent work on every column.
 
 The `valuePickerRuleType` description in the `proposeCaseType` schema
 (`makeChatToolConfigFromOptions.ts:209-210`) gains "sum and avg need a bigint
@@ -348,21 +355,25 @@ migration.
 One `do $$ ... $$` block, in this order:
 
 1. **Replace each disallowed rule with `most_frequent`**: `sum` or `avg` over
-   anything but `bigint` or `double`, and `max` or `min` over `boolean`. The
+   anything but `bigint` or `double`, `max` or `min` over `boolean`, and any
+   rule other than `most_frequent` on an identifier field. The
    column type comes from `dataset_columns.data_type`, joined on
    `dataset_column_id` and `dataset_id`. This applies to list fields too: they
    ignore their rule, but every stored rule should then be allowed, which the
    upgrade test can check.
 2. **Set each dataset-column field's `data_type`** to `dataset_columns.data_type`
-   for a list field, `double` for `sum` or `avg`, `bigint` for `count`, and
+   for a list field or an identifier, `double` for `sum` or `avg`, `bigint`
+   for `count`, and
    the column's type otherwise. Only rows where it differs are written.
 3. **Report** both row counts with `raise notice`, so whoever applies the
    migration sees how much it changed.
 
 Rows it leaves alone: a mapping whose column no longer exists, or belongs to
-another dataset, which the planner already refuses
-(`makeConceptAttributeColumnsFromMetadata.ts:203-212`); manual-entry fields;
-and fields with no mapping row. A re-run changes nothing.
+another dataset, and its field; manual-entry fields, including a
+dataset-column mapping left over on one; and fields with no mapping row. A
+re-run changes nothing. The block first takes `lock table
+public.concept_attributes in share row exclusive mode`, so it never upgrades
+to that lock midway and deadlocks against a concurrent case type edit.
 
 **The label-and-identifier trigger is disabled around step 2.**
 `tr_concept_attributes__validate_label_and_identifiers` fires after every
@@ -440,7 +451,9 @@ task drives the running app once, headless, and takes screenshots.
 4. The planner refuses a disallowed stored rule with a message naming the
    field and rule.
 5. After the migration, this read-only query returns `0` on any database it
-   has run against:
+   has run against. It skips what the migration leaves alone: manual-entry
+   fields and mappings whose column is missing or in another dataset. The
+   replay test asserts it.
 
    ```sql
    select count(*)
@@ -448,15 +461,18 @@ task drives the running app once, headless, and takes screenshots.
    join public.attribute_mappings__dataset_column m on m.concept_attribute_id = a.id
    join public.dataset_columns c on c.id = m.dataset_column_id and c.dataset_id = m.dataset_id
    where
-     (m.value_picker_rule_type in ('sum', 'avg') and c.data_type not in ('bigint', 'double'))
-     or (m.value_picker_rule_type in ('max', 'min') and c.data_type = 'boolean')
-     or a.data_type is distinct from (
-       case
-         when a.is_array then c.data_type
-         when m.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
-         when m.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
-         else c.data_type
-       end
+     a.mapping_type = 'dataset_column' and (
+       (m.value_picker_rule_type in ('sum', 'avg') and c.data_type not in ('bigint', 'double'))
+       or (m.value_picker_rule_type in ('max', 'min') and c.data_type = 'boolean')
+       or (a.is_identifier and m.value_picker_rule_type <> 'most_frequent')
+       or a.data_type is distinct from (
+         case
+           when a.is_array or a.is_identifier then c.data_type
+           when m.value_picker_rule_type in ('sum', 'avg') then 'double'::public.datasets__ava_data_type
+           when m.value_picker_rule_type = 'count' then 'bigint'::public.datasets__ava_data_type
+           else c.data_type
+         end
+       )
      );
    ```
 
@@ -538,3 +554,85 @@ The four `ValuePickerRule` members beyond umbrella section 6's two (section
    automatically (and reset a rule that becomes disallowed), or keep G2's
    behaviour until case-type editing exists. G5's cast to the field's type
    makes a stale type matter more, so G5 is the latest point to decide.
+
+## 11. Implementation notes
+
+Plan 2 shipped on `feat/joined-cases`. Code review during execution changed
+the built code in the ways below. Later plans must start from this code, not
+from the plan text.
+
+### What differs from the plan text
+
+1. **Identifier fields always use `most_frequent`.** A key column reduced
+   with `count` or `sum` showed a number instead of the key, and so did a
+   label that fell back to it. Every path now forces the default rule on an
+   identifier, which keeps the key column's type:
+   - chat, in `createdCaseTypeToFormValues`;
+   - the form, through `withDefaultValueRule` on submit. The rule select on
+     an ID column is disabled, shows the default, and carries the note "ID
+     fields keep their value as is." as its accessible description. A
+     `useFieldWatch("sourceDatasets")` re-render makes the lock follow the
+     ID pick at once;
+   - the data migration (section 4.8), which Kristi confirmed should fix
+     identifier fields already stored with another rule.
+2. **Text compares alphabetically.** Kristi chose to make the
+   "Alphabetically first/last" labels true. `max` and `min` on a text column
+   compare `lower(strip_accents(CAST(v AS VARCHAR)))` with `arg_max` and
+   `arg_min` over a `{k, v}` struct, and return the original value. The cast
+   keeps UUID, JSON, and other columns the app treats as text from failing to
+   bind, and the struct form is about as fast as `MAX` in duckdb-wasm. The
+   column's Ava type reaches `buildAttributeValueSql` through
+   `ConceptAttributeColumn` and Sync's `generateIndividuals` (section 4.5).
+3. **Decimals keep their scale.** Dropping the DOUBLE cast exposed
+   `arrowTableToJS` reading a DECIMAL without its scale (2.25 read as 225).
+   It now converts through the exact decimal string, at top level and inside
+   lists and structs, for every rule.
+4. **The chat parser requires catalog columns** at every level
+   (`parseProposeCaseType`, `parseOpenRouterResponse`,
+   `runChatAttemptsWithEscalation`) and takes `Pick<DatasetColumn, "id" |
+   "data_type">`. There is no separate catalog column type.
+5. **The draft card shows the rule that will be saved.** A row whose proposed
+   rule its column disallows shows `most_frequent`, so the select never shows
+   a value missing from its options. The draft keeps the proposed rule, and
+   creation replaces it with the same function.
+6. **The form normalizes on submit too.** `withFieldDataTypes` runs every
+   rule through `toAllowedRuleType` and returns manual-entry fields
+   unchanged. The mapping pane reads the field's own `dataType` rather than
+   looking its column up, and is keyed by field id, which fixes a stale select
+   after a field is removed. `DatasetColumnMappingCreator` moved to its own
+   folder and takes an `isIdentifierColumn` prop. There is no separate
+   `getDatasetColumnAttributeDataType`: its logic is inlined in
+   `withFieldDataTypes`.
+7. **The migration** (`20261108031541_correct_value_rule_data_types.sql`)
+   also covers identifiers, skips leftover mappings on manual-entry fields,
+   and locks `concept_attributes` first (section 4.8). Its replay test covers
+   every guard, and each guard was shown to fail the replay when removed. The
+   exit criterion 5 query gained the identifier rule and the manual-entry
+   filter, so it agrees with the migration.
+
+### Follow-ups
+
+1. **Dates on the record page.** DATE and TIMESTAMP values reach the record
+   page as epoch milliseconds, and TIME as microseconds, because
+   `CaseDetailsRail` renders them with `unknownToString`. `first` already did
+   this; `max` and `min` over dates now do too, where they used to fail.
+   Format values by the field's `data_type`.
+2. **Sync's record name.** A numeric label field stages `name` as a number
+   although it is typed `string`. Postgres returns a string, so every Sync
+   rewrites those rows. A TIME label fails (`TIME::TIMESTAMP`). Plan 6 should
+   cast the label to VARCHAR.
+3. **Decimals in a MAP or UNION** still read without their scale.
+4. **Join key rows in the draft card** show the proposed rule, though
+   creation saves the default. Show the default, or disable the select, as
+   the form does.
+5. **The migration has no CI gate on `demo/measles`.** `pnpm test:db` runs
+   only in PR CI to `develop`. Run it locally before merging.
+6. **Long components.** `DatasetColumnMappingCreator` (59 lines),
+   `DatasetColumnAttributesBlock` (about 280) and `_buildAttributeColumn` (56)
+   exceed the 45-line limit, as they did before.
+
+### Open question 3 (resolved)
+
+3. **"Alphabetically first/last" was not quite true** under byte order.
+   Kristi chose to make text comparison ignore case and accents, so the copy
+   is now true (section 4.5, implementation note 2).

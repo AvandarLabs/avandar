@@ -14,7 +14,7 @@ import { CaseTypeDraftIdentityFields } from "./CaseTypeDraftIdentityFields";
 import { CaseTypeDraftManualEntrySection } from "./CaseTypeDraftManualEntrySection";
 import { CaseTypeDraftSourceSection } from "./CaseTypeDraftSourceSection";
 import { CaseTypeDraftStatusSection } from "./CaseTypeDraftStatusSection";
-import { useValuePickerOptions } from "./useValuePickerOptions";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
@@ -23,6 +23,8 @@ type Props = {
   datasetNamesById: Readonly<Record<string, string>>;
   /** Catalog column names, keyed by column id, for the rows and pickers. */
   columnNamesById: Readonly<Record<string, string>>;
+  /** Catalog column types, keyed by column id, for each row's value rules. */
+  columnDataTypesById: Readonly<Record<string, AvaDataType.T>>;
   isCreating: boolean;
   /** Omitted when the user cannot create case types. */
   onCreate?: () => void;
@@ -41,12 +43,12 @@ export function CaseTypeDraftCard({
   editor,
   datasetNamesById,
   columnNamesById,
+  columnDataTypesById,
   isCreating,
   onCreate,
   onDismiss,
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
-  const valuePickerOptions = useValuePickerOptions();
   const { draft, sourceGroups } = editor;
   const labelOptions = draft.attributes
     .filter((attribute) => {
@@ -97,7 +99,7 @@ export function CaseTypeDraftCard({
                   }
                   columnNamesById={columnNamesById}
                   labelColumnId={draft.labelColumnId}
-                  valuePickerOptions={valuePickerOptions}
+                  columnDataTypesById={columnDataTypesById}
                   canRemove={sourceGroups.length > 1}
                   editor={editor}
                 />

@@ -160,4 +160,38 @@ describe("makeChatToolConfigFromOptions", () => {
       dashboard?.function.parameters.properties.sql?.description,
     ).not.toContain("dataset ids");
   });
+
+  it("tells proposeCaseType which column types sum, avg, max, and min need", () => {
+    const config = makeChatToolConfigFromOptions({
+      clarificationCapReached: false,
+      app: "case-manager",
+    });
+    const tools = config.tools as Array<{
+      function: {
+        name: string;
+        parameters: {
+          properties: {
+            attributes?: {
+              items: {
+                properties: { valuePickerRuleType?: { description: string } };
+              };
+            };
+          };
+        };
+      };
+    }>;
+    const propose = tools.find((tool) => {
+      return tool.function.name === "proposeCaseType";
+    });
+    const ruleDescription =
+      propose?.function.parameters.properties.attributes?.items.properties
+        .valuePickerRuleType?.description;
+
+    expect(ruleDescription).toContain(
+      "sum and avg need a bigint or double column",
+    );
+    expect(ruleDescription).toContain(
+      "max and min never apply to a boolean column",
+    );
+  });
 });

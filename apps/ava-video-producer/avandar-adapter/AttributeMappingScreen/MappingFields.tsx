@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { DatasetColumnMappingCreator } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
+import { DatasetColumnMappingCreator } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { ManualEntryAttributesBlock } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import {
   createMappingFormFromFrame,
@@ -29,6 +29,9 @@ export function MappingFields({ frame }: Props) {
           conceptForm={conceptForm}
           attributeIdx={0}
           attributeName="supply_kits_delivered"
+          // A numeric column, so the authored "sum" rule is one it offers.
+          columnDataType="bigint"
+          isIdentifierColumn={false}
         />
       </div>
       <div data-video-target="mapping-manual-controls">

@@ -301,6 +301,7 @@ async function _stageIndividuals(options: {
         selectColumnName: titleColumn.name,
         primaryKeyColumnName: titleDatasetPrimaryKeyColumn.name,
         datasetId: titleColumn.datasetId,
+        columnDataType: titleColumn.dataType,
         valuePickerRuleType: labelMapping.valuePickerRuleType,
         isArray: false,
         outputColumnName: "name",

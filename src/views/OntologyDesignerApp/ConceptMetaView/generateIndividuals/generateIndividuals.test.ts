@@ -77,6 +77,7 @@ const STAGING_TABLE = getStagingIndividualsTableName(CONCEPT_ID);
 function _makeDatasetColumn(
   id: DatasetColumnId,
   name: string,
+  dataType: DatasetColumnRead["dataType"] = "varchar",
 ): DatasetColumnRead {
   return Model.make("DatasetColumn", {
     id,
@@ -85,7 +86,7 @@ function _makeDatasetColumn(
     datasetId: DATASET_ID,
     workspaceId: WORKSPACE_ID,
     description: undefined,
-    dataType: "varchar" as const,
+    dataType,
     detectedDataType: "VARCHAR" as const,
     originalDataType: "VARCHAR",
     columnIdx: 0,
@@ -97,13 +98,14 @@ function _makeDatasetColumn(
 function _makeMapping(args: {
   conceptAttributeId: ConceptAttributeId;
   datasetColumnId: DatasetColumnId;
+  valuePickerRuleType?: DatasetColumnMapping["valuePickerRuleType"];
 }): DatasetColumnMapping {
   return {
     id: uuid<DatasetColumnMappingId>(),
     workspaceId: WORKSPACE_ID,
     type: "dataset_column",
     conceptAttributeId: args.conceptAttributeId,
-    valuePickerRuleType: "first",
+    valuePickerRuleType: args.valuePickerRuleType ?? "first",
     datasetId: DATASET_ID,
     datasetColumnId: args.datasetColumnId,
     createdAt: "2026-08-19T00:00:00.000Z",
@@ -115,7 +117,9 @@ function _makeMapping(args: {
  * A concept with the minimum `generateIndividuals` reads: one identifier
  * attribute and one label attribute, each mapped to a dataset column.
  */
-function _makeConcept(): BuildableConcept {
+function _makeConcept(
+  labelRuleType?: DatasetColumnMapping["valuePickerRuleType"],
+): BuildableConcept {
   const identifierAttributeId = uuid<ConceptAttributeId>();
   const labelAttributeId = uuid<ConceptAttributeId>();
 
@@ -125,6 +129,7 @@ function _makeConcept(): BuildableConcept {
     isIdentifier: boolean;
     isLabel: boolean;
     datasetColumnId: DatasetColumnId;
+    valuePickerRuleType?: DatasetColumnMapping["valuePickerRuleType"];
   }) => {
     return {
       ...Model.make("ConceptAttribute", {
@@ -145,6 +150,7 @@ function _makeConcept(): BuildableConcept {
       mapping: _makeMapping({
         conceptAttributeId: args.id,
         datasetColumnId: args.datasetColumnId,
+        valuePickerRuleType: args.valuePickerRuleType,
       }),
     };
   };
@@ -176,6 +182,7 @@ function _makeConcept(): BuildableConcept {
         isIdentifier: false,
         isLabel: true,
         datasetColumnId: NAME_COLUMN_ID,
+        valuePickerRuleType: labelRuleType,
       }),
     ],
   };
@@ -301,6 +308,28 @@ describe("generateIndividuals", () => {
     expect(DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(createSql)).toEqual([
       DATASET_ID,
     ]);
+  });
+
+  it("builds an accent- and case-insensitive ordering for a text label under max", async () => {
+    await generateIndividuals(_makeConcept("max"));
+
+    const createSql = _getRunSqlStatements()[0]!;
+    expect(createSql).toContain(
+      `arg_max(dataset."full_name", {'k': lower(strip_accents(CAST(dataset."full_name" AS VARCHAR))), 'v': dataset."full_name"})`,
+    );
+  });
+
+  it("picks a non-text label under max with a plain MAX", async () => {
+    getAllDatasetColumnsMock.mockResolvedValue([
+      _makeDatasetColumn(EXTERNAL_ID_COLUMN_ID, "person_id"),
+      _makeDatasetColumn(NAME_COLUMN_ID, "full_name", "bigint"),
+    ]);
+
+    await generateIndividuals(_makeConcept("max"));
+
+    const createSql = _getRunSqlStatements()[0]!;
+    expect(createSql).toContain('MAX(dataset."full_name")');
+    expect(createSql).not.toContain("strip_accents");
   });
 
   it("never includes id, status_id, assigned_to, created_at, or updated_at in an upsert payload", async () => {

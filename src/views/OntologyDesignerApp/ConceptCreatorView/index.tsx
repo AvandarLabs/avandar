@@ -30,6 +30,8 @@ import {
   getDefaultConceptFormValues,
   makeDefaultDatasetColumnAttribute,
   makeDefaultManualEntryAttribute,
+  withDefaultValueRule,
+  withFieldDataTypes,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
@@ -103,8 +105,12 @@ export function ConceptCreatorView(): JSX.Element {
 
           if (identifierAttribute) {
             // if the primary key attribute was already added, we want to just
-            // use that same attribute and set `isIdentifier` to true
-            return setValue(identifierAttribute, "isIdentifier", true);
+            // use that same attribute and set `isIdentifier` to true. It also
+            // resets its value rule to the default, since an identifier is
+            // the key itself
+            return withDefaultValueRule(
+              setValue(identifierAttribute, "isIdentifier", true),
+            );
           }
 
           // otherwise, create a datasetColumnAttribute for this primary key
@@ -147,7 +153,10 @@ export function ConceptCreatorView(): JSX.Element {
         });
       return {
         ...values,
-        attributes: allAttributes,
+        attributes: withFieldDataTypes({
+          attributes: allAttributes,
+          sourceDatasets: values.sourceDatasets,
+        }),
       };
     },
   });

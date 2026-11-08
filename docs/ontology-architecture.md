@@ -285,6 +285,14 @@ to it; it is reached from Spotlight or by URL.
   join key choices, concatenates the per-kind lists into one `attributes`
   list, and flags the label.
 - Manual-entry fields are hidden when `FeatureFlag.DisableManualData` is on.
+- The value rule select offers only the rules the field's column type allows
+  (`ValuePickerRule.getAllowedRuleTypes`). On submit, `transformValues` runs
+  every field through `withFieldDataTypes`, which replaces a rule its column
+  does not allow (`ValuePickerRule.toAllowedRuleType`) and stores the column's
+  type for a field that keeps every value and the rule's output type
+  otherwise. An identifier field always uses `most_frequent`: the select is
+  disabled with the note "ID fields keep their value as is.", and
+  `withDefaultValueRule` resets an identifier's rule to the default on submit.
 
 ### 5.3 Chat path (design session and draft card)
 
@@ -310,8 +318,12 @@ On the edge function (`PostChatMessages`, context `case-manager`):
   call `createCaseTypes`.
 - `parseProposeCaseType` sanitizes the draft: it drops sources without a join
   key, attributes whose dataset is not a declared source, and a label that is
-  not one of the attributes, and defaults unknown value pickers to
-  `most_frequent`.
+  not one of the attributes, defaults unknown value pickers to
+  `most_frequent`, and replaces a value picker its column's catalog type does
+  not allow with `most_frequent` too (`ValuePickerRule.toAllowedRuleType`).
+  The catalog columns are required at every level, from `fetchWorkspaceSchema`
+  through `runChatAttemptsWithEscalation`. A column the catalog does not list
+  keeps the proposed rule, and the client drops that attribute.
   It renames an attribute named "status" to "status (attribute)"
   (`ConceptStatus.toNonReservedAttributeName`), and keeps the proposal's status
   set only when it is valid as a whole (`parseProposedCaseStatuses`: 1 to 12
@@ -371,6 +383,9 @@ The draft card converts to the insert payload in two steps that do no I/O:
    dropped), adds a missing identifier attribute for any source whose join key
    was not an attribute, and makes the first identifier the label when none is
    set.
+   It holds each field's rule to its column's type and stores the rule's
+   output type as the field's `data_type`. An identifier field always gets
+   `most_frequent` and keeps its key column's type.
    It builds the status set with `makeStatusSetValueFromChatStatuses`: chat's
    statuses with fresh ids and the named default, or the default set when chat
    sent none, which is always the case for `createCaseTypes`.
@@ -471,7 +486,9 @@ value.
 | --- | --- | --- |
 | `first` | Reads `ava_rows_<datasetId>`, `ORDER BY file_row_number LIMIT 1` | Total order within a parquet file |
 | `most_frequent` | `GROUP BY col ORDER BY COUNT(*) DESC, col LIMIT 1` | Ties broken by value |
-| `sum`, `avg`, `count`, `max`, `min` | `CAST(<agg>(col) AS DOUBLE)` | Floating-point; see limitations for `max`/`min` |
+| `max`, `min` | `MAX(col)`, `MIN(col)`, in the column's own type. On a text column: `arg_max(col, {'k': lower(strip_accents(CAST(col AS VARCHAR))), 'v': col})` for `max` and `arg_min` for `min`, so text compares alphabetically, ignoring case and accents, and gives back the original value. `'10' < '9'` still holds | Ties share one value. On text, values that share a key (`'apple'`, `'Apple'`) break by the value in byte order, because the struct compares field by field |
+| `count` | `COUNT(col)`, `BIGINT`. `0` when no row matches | Exact |
+| `sum`, `avg` | `CAST(<agg>(col) AS DOUBLE)` | Floating-point |
 | List (`is_array`) | Reads `ava_rows_<datasetId>`, `COALESCE(list(col ORDER BY file_row_number), [])` | Row order; `[]` when there is no value |
 
 **NULL means "no value".** No rule reads a NULL cell: `first` returns the
@@ -486,11 +503,39 @@ Every identifier is quoted with `quoteSqlIdentifier`, and every value column is
 qualified with the `dataset` alias, so a column name may contain `"` and a
 value column named like a spine column cannot bind to the outer row.
 
-The rule names are hand-written in five places: the database enum,
-`DatasetColumnMappings.ValuePickerTypes`, `ChatCaseValuePickerRuleType` in
-`shared/types/chat.types.ts`, `VALUE_PICKER_RULE_TYPES` in
-`parseProposeCaseType.ts`, and the tool's JSON schema in
-`makeChatToolConfigFromOptions.ts`.
+The rule names are hand-written in four places: the database enum,
+`DatasetColumnMappings.ValuePickerTypes` (which `parseProposeCaseType.ts` also
+reads), `ChatCaseValuePickerRuleType` in `shared/types/chat.types.ts`, and the
+tool's JSON schema in `makeChatToolConfigFromOptions.ts`.
+`ValuePickerRule` matches the rules exhaustively, so a new enum value does not
+compile until its output type and allowed column types are declared. The
+correction migration also lists them, once, in SQL.
+
+**Typed rules.** Every rule has an output type, and a field's `data_type` is
+always that type: `first`, `most_frequent`, `max`, and `min` keep the column's
+type; `sum` and `avg` emit `double`; `count` emits `bigint`. A list field
+stores its column's type, and so does an identifier field, which always uses
+`most_frequent` because it shows the record's key as is. `sum` and `avg` are
+allowed only on `bigint` and `double` columns, and `max` and `min` on every
+type but `boolean`. The option labels say "alphabetically" for text, which
+holds for accented Latin letters: the comparison ignores case and accents,
+as the table says. Letters with no accent to strip are not folded: ß, æ, ø,
+and ł keep their own place, so "Øystein" sorts after "Zebra".
+`buildAttributeValueSql` takes the column's type (`columnDataType`) to know
+when to compare that way.
+`ValuePickerRule` (`shared/models/ontology/ValuePickerRule/`) is the one
+implementation of this table, used by every authoring path. The query planner
+refuses a stored rule its column's current type does not allow, naming the
+field, which can only happen when the column's type is edited after the field
+was made. A `DECIMAL` result keeps its scale when it is read back
+(`arrowTableToJS`), so `max` and `min` over a decimal column read correctly.
+Rows saved before the rules were typed were corrected by the hand-written
+migration `*_correct_value_rule_data_types.sql`. It replaces a disallowed rule
+with `most_frequent`, sets every identifier field's rule to `most_frequent`,
+and sets each field's `data_type` to its rule's output type. It skips
+manual-entry fields and any dataset-column mapping left over on one, mappings
+whose column no longer exists, and mappings whose column belongs to another
+dataset.
 
 ### 7.2 Record page read path
 
@@ -593,7 +638,7 @@ defined, so the datasets and the spine must already exist._
 | Piece | File | What it guarantees |
 | --- | --- | --- |
 | Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed); statuses are read once per concept and matched to each record by `statusId`, and a record whose status is missing throws; a caller's `conceptSpineRestrictions` narrow a spine to the named records (section 7.3) |
-| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` and `external_id` are taken before any attribute, and duplicate names (including an attribute named `status` or `external_id`) are suffixed `_2`, `_3`, ignoring case as DuckDB does (`EXTERNAL_ID` becomes `EXTERNAL_ID_2`; `age` and `Age` become `age` and `Age_2`); each column carries its attribute's id (`attributeId`); manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws |
+| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` and `external_id` are taken before any attribute, and duplicate names (including an attribute named `status` or `external_id`) are suffixed `_2`, `_3`, ignoring case as DuckDB does (`EXTERNAL_ID` becomes `EXTERNAL_ID_2`; `age` and `Age` become `age` and `Age_2`); each column carries its attribute's id (`attributeId`); manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws; a single-value attribute whose rule its column's type does not allow throws, naming the field |
 | Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvRows/toCsvRows.ts` | Keys and status names travel as RFC 4180 CSV, never spliced into SQL; both columns pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty table with both typed columns |
 | View | `conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; `external_id` and `status` come from the spine and win over an attribute of the same name, compared ignoring case; attribute columns sorted by name for byte-stable SQL; every dataset-backed value from `buildAttributeValueSql` |
 | Ordering and lease | `src/clients/qetl/QueryMediator/queryRunner.ts`, `conceptRelation/loadConceptRelations.ts` | Datasets, then spine, then view, then user SQL; spine names included in the lease |
@@ -682,6 +727,8 @@ Outside the routes:
 | Concept refs and contributors outside the workspace throw | `getConceptRelationPlansFromSql` | Do not change this to dropping the reference: a stale view could answer |
 | Datasets and the spine before the view | `queryRunner._runLeasedQuery`, `loadConceptRelations` | DuckDB binds a view's sources when it is defined; the code loads datasets, then the spine, then the view. The lease must include each spine name (`_getLeaseNames`) |
 | Chat prompt sees catalog metadata only | `buildCaseManagerSystemPrompt` | Never add row values |
+| A field's `data_type` is its rule's output type (its column's type for a list field or an identifier) | `ValuePickerRule.getOutputDataType` in `createdCaseTypeToFormValues` and the form's `withFieldDataTypes`; the correction migration for older rows | A column type edited later in the Data Manager can leave it stale (section 16) |
+| A stored rule is one its column's type allows | Option lists use `ValuePickerRule.getAllowedRuleTypes`; `parseProposeCaseType`, `createdCaseTypeToFormValues`, and `withFieldDataTypes` replace a disallowed rule; `makeConceptAttributeColumnsFromMetadata` throws on one | List fields apply no rule and are not checked |
 | Every draft attribute names a declared source with a join key | `parseProposeCaseType`, `parseCreateCaseTypes`, `useCaseTypeDraftEditor` | Otherwise column resolution throws at query time |
 
 ## 11. Design patterns and their caveats
@@ -863,6 +910,9 @@ Follow [rules/testing.md](rules/testing.md). Existing coverage:
 | RLS (pgTAP) | `supabase/tests/database/permissions/rls_concepts.test.sql` and the four peers | `pnpm test:db`, only after `ava supabase status` reports the right project for the current branch (on any branch other than `develop`, that means its own switched project; see `CLAUDE.md`) |
 | Concept view and column resolution against real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/conceptAttributeColumns.integration.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/toCsvColumn/toCsvColumn.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/toCsvRows/toCsvRows.executed.test.ts`, `tests/integration/queries/structuredQueryConcepts.executed.test.ts` | `pnpm vitest run --config vitest.executed.config.ts <files>` (or `pnpm test:executed`) |
 | Value rules (NULL, ties, quoting) against real DuckDB | `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.executed.test.ts` | `pnpm test:executed <file>` |
+| Value rule table | `shared/models/ontology/ValuePickerRule/ValuePickerRuleModule/ValuePickerRuleModule.test.ts` | `pnpm test:frontend ValuePickerRule` |
+| Value rule output types against real DuckDB | `buildConceptViewSql.executed.test.ts` (`value rule output types`) | `pnpm test:executed buildConceptViewSql` |
+| Rule and data type correction of older rows | `supabase/migration-upgrade-tests/value_rule_data_types.*.sql` | `pnpm test:db`, after the switch check |
 | QETL planning, spine, ordering | `src/clients/qetl/QueryMediator/conceptRelation/**/*.test.ts`, `src/clients/qetl/QueryMediator/__tests__/QueryMediator.concepts.test.ts`, `src/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession.membership.test.ts` | `pnpm vitest run <paths>` |
 | Authoring conversion and draft card | `src/views/OntologyDesignerApp/**/*.test.ts(x)`, `src/components/ChatPanel/CaseTypeDraftBlock/*.test.ts(x)`, `src/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff.test.ts` | `pnpm vitest run <paths>` |
 | Edge function parsing and prompt | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.test.ts`, `parseCreateCaseTypes.test.ts`, `prompt/buildCaseManagerSystemPrompt.test.ts` | `pnpm vitest run <paths>` |
@@ -885,7 +935,7 @@ means established from the code.
 | --- | --- | --- |
 | Sync takes keys from every dataset but the name from one | A multi-dataset case type with an uncovered key fails to sync, after partial writes | Read |
 | Chat offers manual-entry fields regardless of `DisableManualData` | Such fields always show "No value", since nothing stores entered values | Read |
-| `max`/`min` cast to `DOUBLE`, which fails for non-numeric columns | Date or text attributes with those rules fail their record pages and any concept query that reads the column; numeric columns are unaffected | Verified (DuckDB CLI 1.3.2; the app's DuckDB-wasm build not tested) |
+| A dataset column's type edited after a field reads it leaves the field's `data_type` stale | The Data Explorer offers menus for the old type; a rule the new type disallows makes the case type fail to plan, with a message naming the field | Read |
 | Sync never deletes individuals | Records whose keys left the data stay | Read |
 | `getPage` in `createSupabaseCrudClient` uses an inclusive range with no order | Duplicate rows in the records list; duplicate spine keys past 500 individuals | Verified (duplicate-key warnings; rolled-back replay) |
 | Identifier-per-dataset trigger check runs before mappings exist | The database never enforces one key per dataset | Read |

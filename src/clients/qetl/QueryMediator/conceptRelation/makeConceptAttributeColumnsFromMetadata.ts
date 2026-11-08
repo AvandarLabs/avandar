@@ -1,3 +1,4 @@
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { EXTERNAL_ID_COLUMN } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
@@ -173,6 +174,40 @@ function _buildUnmappedColumn(
 }
 
 /**
+ * Throws when a single-value attribute applies a rule its column's current
+ * type does not allow, which happens when the rule was saved without checking
+ * the column's type, or when the column's type changed afterwards. DuckDB
+ * would otherwise refuse the whole view (`sum(VARCHAR)` does not bind), or
+ * answer `max` over a yes/no column with a value the rule table calls
+ * meaningless, and neither names the field.
+ * A list attribute applies no rule, so it is not checked.
+ */
+function _assertRuleAllowedForColumn(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    datasetColumn: DatasetColumn.T;
+  }>,
+): void {
+  const { attribute, mapping, datasetColumn } = options;
+  if (
+    attribute.isArray ||
+    ValuePickerRule.isAllowedForColumnType({
+      ruleType: mapping.valuePickerRuleType,
+      columnDataType: datasetColumn.dataType,
+    })
+  ) {
+    return;
+  }
+  throw new Error(
+    `Concept attribute '${attribute.name}' (${attribute.id}) applies ` +
+      `'${mapping.valuePickerRuleType}' to dataset column ` +
+      `'${datasetColumn.name}', whose type '${datasetColumn.dataType}' ` +
+      `does not allow it.`,
+  );
+}
+
+/**
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
@@ -211,6 +246,7 @@ function _buildAttributeColumn(
         `dataset column '${mapping.datasetColumnId}', which does not exist.`,
     );
   }
+  _assertRuleAllowedForColumn({ attribute, mapping, datasetColumn });
 
   const primaryKeyColumnName =
     options.primaryKeyColumnNameByDatasetId[mapping.datasetId];
@@ -229,6 +265,7 @@ function _buildAttributeColumn(
       attributeName: attribute.name,
       selectColumnName: datasetColumn.name,
       datasetId: mapping.datasetId,
+      columnDataType: datasetColumn.dataType,
       primaryKeyColumnName,
       valuePickerRuleType: mapping.valuePickerRuleType,
       isArray: attribute.isArray,

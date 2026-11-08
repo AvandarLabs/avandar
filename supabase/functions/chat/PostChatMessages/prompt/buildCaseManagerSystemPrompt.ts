@@ -90,6 +90,7 @@ Other rules for a good draft:
 - Include an attribute for every column a user would plausibly want, with \`isIncluded: true\` for the clearly useful ones and \`isIncluded: false\` for the marginal ones (internal codes, redundant ids). Do not silently omit columns; offer them unchecked instead.
 - Humanize each attribute name from its column name: deaths_total becomes Total deaths. Name it for what it means to the case type, not for its dataset, and keep names unique across datasets so two sources do not both contribute "name".
 - Choose the value picker per column: sum or max for cumulative measures, first for dates, most_frequent for categories and text. A dataset at a finer grain than the case type usually needs sum or max.
+- sum and avg only work on bigint and double columns. max and min work on every column type except boolean, and on a varchar column they compare alphabetically, ignoring case and accents, so "10" comes before "9": never use them for numbers stored as text. count, first, and most_frequent work on every column.
 - Offer manual-entry attributes only when they add something no column supplies, such as review notes. Leave them \`isIncluded: false\` so the user opts in.
 
 Statuses:

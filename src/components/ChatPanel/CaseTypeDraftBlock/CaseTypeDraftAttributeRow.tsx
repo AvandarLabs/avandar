@@ -1,20 +1,20 @@
 import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Group, Select, Text, TextInput } from "@mantine/core";
+import { Checkbox, Group, Text, TextInput } from "@mantine/core";
 import clsx from "clsx";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import css from "./CaseTypeDraftCard.module.css";
-import type {
-  ChatCaseValuePickerRuleType,
-  ChatProposedCaseAttribute,
-} from "$/types/chat.types";
+import { CaseTypeDraftValueRuleSelect } from "./CaseTypeDraftValueRuleSelect";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ChatProposedCaseAttribute } from "$/types/chat.types";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
 
 type Props = {
   attribute: ChatProposedCaseAttribute;
   columnLabel: string;
+  /** The column's type, once the catalog has loaded. */
+  columnDataType: AvaDataType.T | undefined;
   isPrimaryKey: boolean;
   isLabelColumn: boolean;
-  valuePickerOptions: ReadonlyArray<{ value: string; label: string }>;
   editor: CaseTypeDraftEditor;
 };
 
@@ -27,7 +27,7 @@ export function CaseTypeDraftAttributeRow({
   columnLabel,
   isPrimaryKey,
   isLabelColumn,
-  valuePickerOptions,
+  columnDataType,
   editor,
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
@@ -80,20 +80,10 @@ export function CaseTypeDraftAttributeRow({
           ) : null}
         </Group>
       </div>
-      <Select
-        size="xs"
-        data={valuePickerOptions}
-        value={attribute.valuePickerRuleType}
-        allowDeselect={false}
-        aria-label={t`Value to keep for ${attribute.name}`}
-        onChange={(value) => {
-          if (value) {
-            editor.setAttributeValuePicker(
-              attribute.columnId,
-              value as ChatCaseValuePickerRuleType,
-            );
-          }
-        }}
+      <CaseTypeDraftValueRuleSelect
+        attribute={attribute}
+        columnDataType={columnDataType}
+        editor={editor}
       />
     </div>
   );

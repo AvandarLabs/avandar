@@ -26,6 +26,7 @@ describe("parseOpenRouterResponse", () => {
       attemptText: "",
       lastUserPrompt: "preview cholera",
       priorClarifications: 0,
+      columns: [],
       datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
     });
 
@@ -43,6 +44,7 @@ describe("parseOpenRouterResponse", () => {
         'SELECT "Province_State", SUM("daily_new_deaths") FROM "t0" GROUP BY 1',
       lastUserPrompt: "deaths by state",
       priorClarifications: 0,
+      columns: [],
       datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
     });
 
@@ -58,6 +60,7 @@ describe("parseOpenRouterResponse", () => {
       attemptText,
       lastUserPrompt: "compare states",
       priorClarifications: 0,
+      columns: [],
       datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
     });
 
@@ -87,6 +90,7 @@ describe("parseOpenRouterResponse", () => {
       attemptText: "",
       lastUserPrompt: "chart cases",
       priorClarifications: 0,
+      columns: [],
       datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
     });
 
@@ -115,6 +119,7 @@ describe("parseOpenRouterResponse", () => {
       attemptText: "",
       lastUserPrompt: "monthly deaths 2022",
       priorClarifications: 0,
+      columns: [],
       datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
     });
 
@@ -147,6 +152,7 @@ describe("parseOpenRouterResponse", () => {
       attemptText: "",
       lastUserPrompt: "filter cholera",
       priorClarifications: 0,
+      columns: [],
       datasets: [{ id: CHOLERA_ID, name: "Cholera cases" }],
     });
 
@@ -173,6 +179,7 @@ describe("parseOpenRouterResponse", () => {
       attemptText: "",
       lastUserPrompt: "preview cases",
       priorClarifications: 0,
+      columns: [],
       concepts: [{ id: CONCEPT_ID, name: "Case" }],
     });
 
@@ -208,10 +215,59 @@ describe("parseOpenRouterResponse", () => {
       attemptText: "Creating COVID case",
       lastUserPrompt: "create it",
       priorClarifications: 0,
+      columns: [],
       skipSqlExtraction: true,
     });
 
     expect(parsed.createdCaseTypes?.[0]?.name).toBe("COVID case");
     expect(parsed.generatedSql).toBeUndefined();
+  });
+
+  it("replaces an avg over a text catalog column with most_frequent", () => {
+    const keyColumnId = "1a2b3c4d-cccc-4ccc-8ccc-ddddeeeeffff";
+    const districtColumnId = "2b3c4d5e-cccc-4ccc-8ccc-ddddeeeeffff";
+    const parsed = parseOpenRouterResponse({
+      message: {
+        tool_calls: [
+          {
+            function: {
+              name: "proposeCaseType",
+              arguments: JSON.stringify({
+                name: "Cholera case",
+                sourceDatasets: [
+                  { datasetId: CHOLERA_ID, primaryKeyColumnId: keyColumnId },
+                ],
+                attributes: [
+                  {
+                    datasetId: CHOLERA_ID,
+                    columnId: districtColumnId,
+                    name: "District",
+                    isIncluded: true,
+                    valuePickerRuleType: "avg",
+                  },
+                ],
+                manualEntryAttributes: [],
+              }),
+            },
+          },
+        ],
+      },
+      attemptText: "",
+      lastUserPrompt: "propose it",
+      priorClarifications: 0,
+      columns: [
+        {
+          id: districtColumnId,
+          dataset_id: CHOLERA_ID,
+          name: "district",
+          data_type: "varchar",
+        },
+      ],
+      skipSqlExtraction: true,
+    });
+
+    expect(parsed.proposedCaseType?.attributes[0]?.valuePickerRuleType).toBe(
+      "most_frequent",
+    );
   });
 });

@@ -538,6 +538,10 @@ msgstr "العروض"
 msgid "Second point"
 msgstr "النقطة الثانية"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes first alphabetically"
+msgstr "اختر القيمة التي تأتي أولًا أبجديًا"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
 msgstr "يبدو أن خط العرض وخط الطول متبادلان"
@@ -962,7 +966,7 @@ msgstr "خطة الاشتراك الحالية الخاصة بك تدعم فقط
 "عدد مجموعات البيانات التي يمكنك إضافتها إلى مساحة العمل الخاصة بك، "
 "يمكنك شراء مقاعد إضافية. كل مقعد يسمح لك بإضافة 10 مجموعات بيانات أخرى!"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "السماح بقيمة واحدة فقط"
 
@@ -1013,7 +1017,7 @@ msgstr "تغيير حجم نص التعليق التوضيحي"
 msgid "stddev"
 msgstr "الانحراف المعياري"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "احصل على عدد القيم الموجودة"
 
@@ -1796,7 +1800,7 @@ msgid "Couldn't export PDF"
 msgstr "لم يتمكن من تصدير PDF"
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 msgid "Value to keep for {0}"
 msgstr "القيمة التي يجب الاحتفاظ بها لـ {0}"
 
@@ -4122,6 +4126,10 @@ msgstr "لم يتمكن من التقاط اللوحة"
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "تحتفظ حقول المعرّف بقيمتها كما هي."
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 #~ msgid "Offline chat model ready. Click to switch or re-download."
 #~ msgstr "نموذج الدردشة دون اتصال جاهز. انقر للتبديل أو إعادة التنزيل."
@@ -4151,6 +4159,10 @@ msgstr "الفاصل بين تدريجات المحور X"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "يرجى المحاولة مرة أخرى."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes last alphabetically"
+msgstr "اختر القيمة التي تأتي أخيرًا أبجديًا"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
@@ -4290,7 +4302,7 @@ msgstr "الموضوع: {topic}"
 #~ "أساسي لأعمال التحليلات."
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If each {0} can only have one {attributeName} value, check this box."
 msgstr "إذا كان كل {0} يمكن أن يحتوي فقط على قيمة واحدة لـ {attributeName}، حدد "
 "هذا المربع."
@@ -5049,7 +5061,7 @@ msgstr "قائمة نقطية"
 msgid "Annotate the map"
 msgstr "إضافة تعليقات توضيحية إلى الخريطة"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "اختر القيمة القصوى"
 
@@ -5690,7 +5702,7 @@ msgstr "تم تطبيق منطقة الاهتمام"
 msgid "EPSG code"
 msgstr "رمز EPSG"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "السماح بالتعديل اليدوي"
@@ -5735,6 +5747,10 @@ msgstr "أدخل اسماً."
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bold"
 msgstr "عريض"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically first"
+msgstr "الأول أبجديًا"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5878,7 +5894,7 @@ msgstr "ارسم مساحة للتصفية حسبها"
 msgid "Pick a dashboard, or create a new one."
 msgstr "اختر لوحة تحكم، أو أنشئ واحدة جديدة."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "احصل على مجموع القيم"
 
@@ -5947,7 +5963,7 @@ msgstr "دعم الأشكال الهندسية غير متاح"
 msgid "X column"
 msgstr "عمود X"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "اختر القيمة الأكثر تكرارًا"
 
@@ -7127,7 +7143,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 msgstr "لا تزال الصفوف غير المُعيّنة محتسبة ضمن إجماليات هذه الطبقة. ويتم "
 "استبعادها من الخريطة فقط."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "احصل على متوسط القيم"
 
@@ -8121,7 +8137,7 @@ msgstr "جارٍ تحديث سجلات {conceptName}…"
 msgid "Loading private resources"
 msgstr "جارٍ تحميل الموارد الخاصة"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "اختر القيمة الأولى التي نراها"
 
@@ -8159,6 +8175,10 @@ msgstr "الشهر الماضي"
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} boundaries without data"
 msgstr "{0} من الحدود بلا بيانات"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically last"
+msgstr "الأخير أبجديًا"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dataset. Teammates on this case without "
@@ -8712,7 +8732,7 @@ msgstr "يساوي على الأقل"
 msgid "Stack group"
 msgstr "مجموعة التكديس"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "اختر قاعدة (مثل الأكثر تكرارًا)"
 
@@ -9174,7 +9194,7 @@ msgid "contains"
 msgstr "يحتوي على"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لواحد {0}، فـ..."
 
@@ -10868,7 +10888,7 @@ msgstr "عرض رمز QR"
 msgid "Past year"
 msgstr "العام الماضي"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "اختر القيمة الدنيا"
 

@@ -526,6 +526,10 @@ msgstr "视图"
 msgid "Second point"
 msgstr "第二点"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes first alphabetically"
+msgstr "选择按字母顺序排在最前的值"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude and longitude look swapped"
 msgstr "纬度和经度似乎颠倒了"
@@ -940,7 +944,7 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 "seats. Each seat allows you to add 10 more datasets!"
 msgstr "您当前的计划仅支持最多 {0} 个数据集。要增加可以添加到工作区的数据集数量，您可以购买更多席位。每个席位允许您添加 10 个额外的数据集！"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Only allow one value"
 msgstr "仅允许一个值"
 
@@ -990,7 +994,7 @@ msgstr "调整注释文本大小"
 msgid "stddev"
 msgstr "标准差"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a count of how many values there are"
 msgstr "获取值的数量"
 
@@ -1747,7 +1751,7 @@ msgid "Couldn't export PDF"
 msgstr "无法导出 PDF"
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 msgid "Value to keep for {0}"
 msgstr "{0} 要保留的值"
 
@@ -4012,6 +4016,10 @@ msgstr "无法捕获仪表板"
 msgid "Processing dataset…"
 msgstr "正在处理数据集…"
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+msgid "ID fields keep their value as is."
+msgstr "ID 字段保持其原值。"
+
 #: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
 #~ msgid "Offline chat model ready. Click to switch or re-download."
 #~ msgstr "离线聊天模型已准备好。点击切换或重新下载。"
@@ -4041,6 +4049,10 @@ msgstr "X 轴刻度间隔"
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Please try again."
 msgstr "请再试一次。"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+msgid "Choose the value that comes last alphabetically"
+msgstr "选择按字母顺序排在最后的值"
 
 #: src/views/DashboardApp/DashboardShareModal/AddRowFilterMenu.tsx
 msgid "+ Add row filter"
@@ -4178,7 +4190,7 @@ msgstr "主题：{topic}"
 #~ msgstr "如果你拥有 32 GB RAM，并且主要使用高性能设备进行分析工作，推荐使用此模型。"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If each {0} can only have one {attributeName} value, check this box."
 msgstr "如果每个 {0} 只能有一个 {attributeName} 值，请勾选此框。"
 
@@ -4922,7 +4934,7 @@ msgstr "项目符号列表"
 msgid "Annotate the map"
 msgstr "标注地图"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the maximum value"
 msgstr "选择最大值"
 
@@ -5554,7 +5566,7 @@ msgstr "已应用关注区域"
 msgid "EPSG code"
 msgstr "EPSG 代码"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow manual edit"
 msgstr "允许手动编辑"
@@ -5599,6 +5611,10 @@ msgstr "请输入名称。"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bold"
 msgstr "粗体"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically first"
+msgstr "按字母顺序最前"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -5737,7 +5753,7 @@ msgstr "绘制区域以进行筛选"
 msgid "Pick a dashboard, or create a new one."
 msgstr "选择一个仪表板，或创建一个新仪表板。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get a sum of the values"
 msgstr "获取值的总和"
 
@@ -5805,7 +5821,7 @@ msgstr "几何功能不可用"
 msgid "X column"
 msgstr "X 列"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the most frequent value"
 msgstr "选择最常见的值"
 
@@ -6966,7 +6982,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 "excluded from the map only."
 msgstr "未映射的行仍会计入此图层的总数，仅从地图中排除。"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Get an average of the values"
 msgstr "获取值的平均值"
 
@@ -7938,7 +7954,7 @@ msgstr "正在刷新 {conceptName} 条记录…"
 msgid "Loading private resources"
 msgstr "正在加载私有资源"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the first value we see"
 msgstr "选择我们看到的第一个值"
 
@@ -7976,6 +7992,10 @@ msgstr "过去一个月"
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} boundaries without data"
 msgstr "{0} 个边界没有数据"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
+msgid "Alphabetically last"
+msgstr "按字母顺序最后"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Only some people can open this dataset. Teammates on this case without "
@@ -8515,7 +8535,7 @@ msgstr "至少为"
 msgid "Stack group"
 msgstr "堆叠组"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "选择规则（例如，最频繁）"
 
@@ -8967,7 +8987,7 @@ msgid "contains"
 msgstr "包含"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "如果一个 {0} 有多个 {attributeName} 值，那么..."
 
@@ -10623,7 +10643,7 @@ msgstr "显示二维码"
 msgid "Past year"
 msgstr "过去一年"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
 msgstr "选择最小值"
 

@@ -1,10 +1,10 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -16,9 +16,6 @@ import type {
   AttributeFormValues,
   ConceptFormSubmitValues,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-
-/** Matches the concept creator form's default for a new mapped attribute. */
-const DEFAULT_VALUE_PICKER_RULE_TYPE: ValuePickerRuleType = "most_frequent";
 
 type CatalogColumn = Pick<
   DatasetColumn.T,
@@ -41,15 +38,24 @@ function _makeMappedAttribute(options: {
   column: CatalogColumn;
   isIdentifier: boolean;
   isLabel: boolean;
-  valuePickerRuleType: ValuePickerRuleType;
+  valuePickerRuleType: ValuePickerRule.T;
 }): AttributeFormValues {
   const conceptAttributeId = uuid<ConceptAttributeId>();
+  const columnDataType = options.column.dataType;
+  // An identifier shows the key itself, so it never reduces the column. Any
+  // other field's rule is replaced when the column's type does not allow it.
+  const ruleType = options.isIdentifier
+    ? ValuePickerRule.DEFAULT_RULE_TYPE
+    : ValuePickerRule.toAllowedRuleType({
+        ruleType: options.valuePickerRuleType,
+        columnDataType,
+      });
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId: options.conceptId,
     name: ConceptStatus.toNonReservedAttributeName(options.name),
     description: options.description,
-    dataType: options.column.dataType,
+    dataType: ValuePickerRule.getOutputDataType({ ruleType, columnDataType }),
     mappingType: "dataset_column",
     isIdentifier: options.isIdentifier,
     isLabel: options.isLabel,
@@ -63,7 +69,7 @@ function _makeMappedAttribute(options: {
       datasetColumn: {
         type: "dataset_column",
         conceptAttributeId,
-        valuePickerRuleType: options.valuePickerRuleType,
+        valuePickerRuleType: ruleType,
         datasetId: options.column.datasetId,
         datasetColumnId: options.column.id,
       },
@@ -110,7 +116,7 @@ function _makeMissingIdentifierAttributes(options: {
         column,
         isIdentifier: true,
         isLabel: false,
-        valuePickerRuleType: DEFAULT_VALUE_PICKER_RULE_TYPE,
+        valuePickerRuleType: ValuePickerRule.DEFAULT_RULE_TYPE,
       }),
     ];
   });
@@ -149,7 +155,7 @@ function _attributesFromCaseType(options: {
         isIdentifier: primaryKeyColumnIds.has(column.id),
         isLabel: attribute.isLabel === true,
         valuePickerRuleType:
-          attribute.valuePickerRuleType ?? DEFAULT_VALUE_PICKER_RULE_TYPE,
+          attribute.valuePickerRuleType ?? ValuePickerRule.DEFAULT_RULE_TYPE,
       }),
     ];
   });

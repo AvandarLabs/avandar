@@ -1,5 +1,8 @@
 import { parseProposedCaseStatuses } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import { DatasetColumnMappings } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMappings.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import type {
   ChatCaseSourceDataset,
   ChatCaseValuePickerRuleType,
@@ -7,22 +10,29 @@ import type {
   ChatProposedCaseType,
   ChatProposedManualEntryAttribute,
 } from "$/types/chat.types.ts";
+import type { DatasetColumn } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const VALUE_PICKER_RULE_TYPES = [
-  "most_frequent",
-  "first",
-  "sum",
-  "avg",
-  "count",
-  "max",
-  "min",
-] as const;
+/** The catalog columns' ids and Ava types, as `dataset_columns` stores them. */
+type CatalogColumn = Pick<DatasetColumn, "id" | "data_type">;
 
-const DEFAULT_VALUE_PICKER_RULE_TYPE: ChatCaseValuePickerRuleType =
-  "most_frequent";
+/** Each catalog column's Ava data type, by column id. */
+type ColumnDataTypesById = Map<string, AvaDataType.T>;
+
+function _createColumnDataTypesByIdFromColumns(
+  columns: readonly CatalogColumn[],
+): ColumnDataTypesById {
+  return new Map(
+    columns.flatMap((column) => {
+      const dataType = AvaDataType.Types.find((type) => {
+        return type === column.data_type;
+      });
+      return column.id && dataType ? [[column.id, dataType] as const] : [];
+    }),
+  );
+}
 
 function _asTrimmedString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim().length > 0
@@ -43,10 +53,30 @@ function _asUuid(value: unknown): string | undefined {
 function _asValuePickerRuleType(value: unknown): ChatCaseValuePickerRuleType {
   const text = _asTrimmedString(value);
   return (
-    VALUE_PICKER_RULE_TYPES.find((rule) => {
+    DatasetColumnMappings.ValuePickerTypes.find((rule) => {
       return rule === text;
-    }) ?? DEFAULT_VALUE_PICKER_RULE_TYPE
+    }) ?? ValuePickerRule.DEFAULT_RULE_TYPE
   );
+}
+
+/**
+ * The model's rule, unless the column's type does not allow it, in which
+ * case the rule every type allows. A column the catalog does not list keeps
+ * the model's rule: the client drops that attribute when it resolves columns.
+ */
+function _toCatalogAllowedRuleType(
+  options: Readonly<{
+    rawRuleType: unknown;
+    columnDataType: AvaDataType.T | undefined;
+  }>,
+): ChatCaseValuePickerRuleType {
+  const ruleType = _asValuePickerRuleType(options.rawRuleType);
+  return options.columnDataType
+    ? ValuePickerRule.toAllowedRuleType({
+        ruleType,
+        columnDataType: options.columnDataType,
+      })
+    : ruleType;
 }
 
 function _parseSourceDataset(raw: unknown): ChatCaseSourceDataset | undefined {
@@ -64,7 +94,10 @@ function _parseSourceDataset(raw: unknown): ChatCaseSourceDataset | undefined {
   return { datasetId, primaryKeyColumnId };
 }
 
-function _parseAttribute(raw: unknown): ChatProposedCaseAttribute | undefined {
+function _parseAttribute(
+  raw: unknown,
+  columnDataTypesById: ReadonlyMap<string, AvaDataType.T>,
+): ChatProposedCaseAttribute | undefined {
   if (!raw || typeof raw !== "object") {
     return undefined;
   }
@@ -83,7 +116,10 @@ function _parseAttribute(raw: unknown): ChatProposedCaseAttribute | undefined {
     // is common, so the attribute is renamed rather than dropped.
     name: ConceptStatus.toNonReservedAttributeName(name),
     isIncluded: record.isIncluded !== false,
-    valuePickerRuleType: _asValuePickerRuleType(record.valuePickerRuleType),
+    valuePickerRuleType: _toCatalogAllowedRuleType({
+      rawRuleType: record.valuePickerRuleType,
+      columnDataType: columnDataTypesById.get(columnId),
+    }),
     ...(description ? { description } : {}),
   };
 }
@@ -146,6 +182,7 @@ function _parseSourceAttributes(
   options: Readonly<{
     rawAttributes: unknown;
     sourceDatasets: readonly ChatCaseSourceDataset[];
+    columnDataTypesById: ReadonlyMap<string, AvaDataType.T>;
   }>,
 ): ChatProposedCaseAttribute[] {
   const sourceDatasetIds = new Set(
@@ -153,11 +190,25 @@ function _parseSourceAttributes(
       return sourceDataset.datasetId;
     }),
   );
-  return _parseList(options.rawAttributes, _parseAttribute).filter(
-    (attribute) => {
-      return sourceDatasetIds.has(attribute.datasetId);
-    },
-  );
+  return _parseList(options.rawAttributes, (item) => {
+    return _parseAttribute(item, options.columnDataTypesById);
+  }).filter((attribute) => {
+    return sourceDatasetIds.has(attribute.datasetId);
+  });
+}
+
+/** The tool call's arguments as a record, or undefined when not valid JSON. */
+function _parseArgsRecord(
+  argsJson: string | undefined,
+): Record<string, unknown> | undefined {
+  if (!argsJson) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(argsJson) as Record<string, unknown>;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
@@ -169,17 +220,16 @@ function _parseSourceAttributes(
  * built-in `status` is renamed. A status set is kept only when it is valid
  * whole; otherwise the draft carries none and the client supplies the default
  * set.
+ *
+ * A value rule its column's catalog type does not allow becomes
+ * `most_frequent`.
  */
 export function parseProposeCaseType(
   argsJson: string | undefined,
+  options: Readonly<{ columns: readonly CatalogColumn[] }>,
 ): ChatProposedCaseType | undefined {
-  if (!argsJson) {
-    return undefined;
-  }
-  let record: Record<string, unknown>;
-  try {
-    record = JSON.parse(argsJson) as Record<string, unknown>;
-  } catch {
+  const record = _parseArgsRecord(argsJson);
+  if (!record) {
     return undefined;
   }
 
@@ -194,6 +244,7 @@ export function parseProposeCaseType(
   const attributes = _parseSourceAttributes({
     rawAttributes: record.attributes,
     sourceDatasets,
+    columnDataTypesById: _createColumnDataTypesByIdFromColumns(options.columns),
   });
   const labelColumnId = _asUuid(record.labelColumnId);
   const hasLabelAttribute = attributes.some((attribute) => {

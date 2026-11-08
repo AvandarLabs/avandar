@@ -21,6 +21,7 @@ const CONCEPT_PLAN: ConceptRelationPlan = {
       attributeName: "age",
       selectColumnName: "age_years",
       datasetId: DATASET_ID,
+      columnDataType: "bigint",
       primaryKeyColumnName: "person_id",
       valuePickerRuleType: "first",
       isArray: false,

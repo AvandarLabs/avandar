@@ -171,6 +171,7 @@ export async function runChatTurn(
     priorClarifications,
     datasets: options.schema.datasets,
     concepts: options.schema.concepts,
+    columns: options.schema.columns,
     skipSqlExtraction: options.context.app === "case-manager",
   });
   return {

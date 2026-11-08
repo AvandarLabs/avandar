@@ -53,6 +53,7 @@ function _run(
     priorClarifications: 0,
     datasets,
     concepts,
+    columns: [],
   });
 }
 
@@ -164,6 +165,31 @@ describe("runChatAttemptsWithEscalation", () => {
 
     expect(parseOpenRouterResponseMock.mock.calls[0]?.[0].concepts).toBe(
       concepts,
+    );
+  });
+
+  it("hands the catalog columns to the parser", async () => {
+    parseOpenRouterResponseMock.mockReturnValue(USABLE);
+    const columns = [
+      {
+        id: "column-1",
+        dataset_id: "dataset-1",
+        name: "revenue",
+        data_type: "varchar",
+      },
+    ];
+
+    await runChatAttemptsWithEscalation({
+      requestBody: { model: "m" },
+      apiKey: "key",
+      referer: "https://example.test",
+      lastUserPrompt: "show revenue",
+      priorClarifications: 0,
+      columns,
+    });
+
+    expect(parseOpenRouterResponseMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columns }),
     );
   });
 });
