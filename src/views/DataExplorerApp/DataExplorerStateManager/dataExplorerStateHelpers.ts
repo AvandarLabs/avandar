@@ -1,6 +1,9 @@
+import { objectValuesMap } from "@avandar/utils";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { makePluginVizMemoryKey } from "@/lib/plugins/vizs/pluginVizOptionHelpers";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { DataExplorerAppState } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
@@ -143,4 +146,30 @@ export function makeStateFromPluginVizConfig(
     vizConfig: state.pluginVizConfigMemory[memoryKey] ?? pluginVizConfig,
     pendingUrlVizConfig: undefined,
   };
+}
+
+/**
+ * Returns the plugin chart config memory with each remembered config moved
+ * from the provisional column IDs of `previous` to the IDs `current` gives the
+ * same expressions. Called by `setColumnBindings`, which remaps the built-in
+ * memory the same way.
+ */
+export function makePluginVizConfigMemoryFromBindings(
+  options: Readonly<{
+    memory: Readonly<Record<string, AvaVizConfig.Plugin>>;
+    previous: QueryResultColumnBindingRegistry;
+    current: QueryResultColumnBindingRegistry;
+  }>,
+): Readonly<Record<string, AvaVizConfig.Plugin>> {
+  const { memory, previous, current } = options;
+  return objectValuesMap(memory, (config) => {
+    const remappedConfig = AvaVizConfigs.remapProvisionalColumnIds({
+      config: config,
+      previous: previous,
+      current: current,
+    });
+    // The remap keeps a config's viz type, so this only narrows the result
+    // back to a plugin config.
+    return remappedConfig.vizType === "plugin" ? remappedConfig : config;
+  });
 }

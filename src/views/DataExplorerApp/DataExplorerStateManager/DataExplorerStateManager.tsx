@@ -1,5 +1,5 @@
 import { Model } from "@avandar/models";
-import { objectValuesMap, setValue } from "@avandar/utils";
+import { setValue } from "@avandar/utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -7,6 +7,7 @@ import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplore
 import {
   applyQueryChange,
   isSameColumnSchema,
+  makePluginVizConfigMemoryFromBindings,
   makeStateFromPluginVizConfig,
   makeVizConfigMemoriesFromState,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
@@ -293,19 +294,11 @@ export const DataExplorerStateManager = createAppStateManager({
           ];
         }),
       ) as Partial<AvaVizConfig.Registry>;
-      const pluginVizConfigMemory = objectValuesMap(
-        state.pluginVizConfigMemory,
-        (config) => {
-          const remappedConfig = AvaVizConfigs.remapProvisionalColumnIds({
-            config: config,
-            previous: previous,
-            current: columnBindings,
-          });
-          // The remap keeps a config's viz type, so this only narrows the
-          // result back to a plugin config.
-          return remappedConfig.vizType === "plugin" ? remappedConfig : config;
-        },
-      );
+      const pluginVizConfigMemory = makePluginVizConfigMemoryFromBindings({
+        memory: state.pluginVizConfigMemory,
+        previous: previous,
+        current: columnBindings,
+      });
       return {
         ...state,
         columnBindings,
