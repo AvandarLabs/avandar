@@ -427,3 +427,61 @@ describe("parseProposeCaseType reserved attribute names", () => {
     expect(parsed?.manualEntryAttributes[0]?.name).toBe("status (attribute)");
   });
 });
+
+const DEATHS_TOTAL_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
+
+/** The catalog's column types, as `fetchWorkspaceSchema` returns them. */
+const CATALOG_COLUMNS = [
+  { id: STATE_COLUMN_ID, data_type: "varchar" },
+  { id: DEATHS_TOTAL_COLUMN_ID, data_type: "bigint" },
+];
+
+/** A one-field draft over the deaths dataset, reading `columnId`. */
+function _draftReading(columnId: string, ruleType: string): string {
+  return JSON.stringify({
+    name: "County record",
+    sourceDatasets: [
+      {
+        datasetId: DEATHS_DATASET_ID,
+        primaryKeyColumnId: DEATHS_KEY_COLUMN_ID,
+      },
+    ],
+    attributes: [
+      {
+        datasetId: DEATHS_DATASET_ID,
+        columnId,
+        name: "Field",
+        isIncluded: true,
+        valuePickerRuleType: ruleType,
+      },
+    ],
+    manualEntryAttributes: [],
+  });
+}
+
+describe("parseProposeCaseType value rules", () => {
+  it("replaces a sum over a text column with most_frequent", () => {
+    const parsed = parseProposeCaseType(_draftReading(STATE_COLUMN_ID, "sum"), {
+      columns: CATALOG_COLUMNS,
+    });
+
+    expect(parsed?.attributes[0]?.valuePickerRuleType).toBe("most_frequent");
+  });
+
+  it("keeps a sum over a whole-number column", () => {
+    const parsed = parseProposeCaseType(
+      _draftReading(DEATHS_TOTAL_COLUMN_ID, "sum"),
+      { columns: CATALOG_COLUMNS },
+    );
+
+    expect(parsed?.attributes[0]?.valuePickerRuleType).toBe("sum");
+  });
+
+  it("keeps the model's rule for a column the catalog does not list", () => {
+    const parsed = parseProposeCaseType(_draftReading(STATE_COLUMN_ID, "sum"), {
+      columns: [],
+    });
+
+    expect(parsed?.attributes[0]?.valuePickerRuleType).toBe("sum");
+  });
+});

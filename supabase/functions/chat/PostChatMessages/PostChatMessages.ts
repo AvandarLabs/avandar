@@ -174,6 +174,7 @@ export const PostChatMessages = POST({
           priorClarifications,
           datasets: schema.datasets,
           concepts: schema.concepts,
+          columns: schema.columns,
           skipSqlExtraction: context.app === "case-manager",
         }));
       } catch (error) {

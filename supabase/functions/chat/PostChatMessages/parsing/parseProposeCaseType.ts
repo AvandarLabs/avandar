@@ -1,5 +1,7 @@
 import { parseProposedCaseStatuses } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import type {
   ChatCaseSourceDataset,
   ChatCaseValuePickerRuleType,
@@ -23,6 +25,31 @@ const VALUE_PICKER_RULE_TYPES = [
 
 const DEFAULT_VALUE_PICKER_RULE_TYPE: ChatCaseValuePickerRuleType =
   "most_frequent";
+
+/**
+ * A catalog column as the edge function reads it from `dataset_columns`. Its
+ * Ava data type arrives as plain text.
+ */
+export type ProposeCaseTypeCatalogColumn = Readonly<{
+  id?: string;
+  data_type: string;
+}>;
+
+/** Each catalog column's Ava data type, by column id. */
+type ColumnDataTypesById = ReadonlyMap<string, AvaDataType.T>;
+
+function _getColumnDataTypesById(
+  columns: readonly ProposeCaseTypeCatalogColumn[],
+): ColumnDataTypesById {
+  return new Map(
+    columns.flatMap((column) => {
+      const dataType = AvaDataType.Types.find((type) => {
+        return type === column.data_type;
+      });
+      return column.id && dataType ? [[column.id, dataType] as const] : [];
+    }),
+  );
+}
 
 function _asTrimmedString(value: unknown): string | undefined {
   return typeof value === "string" && value.trim().length > 0
@@ -49,6 +76,26 @@ function _asValuePickerRuleType(value: unknown): ChatCaseValuePickerRuleType {
   );
 }
 
+/**
+ * The model's rule, unless the column's type does not allow it, in which
+ * case the rule every type allows. A column the catalog does not list keeps
+ * the model's rule: the client drops that attribute when it resolves columns.
+ */
+function _toCatalogAllowedRuleType(
+  options: Readonly<{
+    rawRuleType: unknown;
+    columnDataType: AvaDataType.T | undefined;
+  }>,
+): ChatCaseValuePickerRuleType {
+  const ruleType = _asValuePickerRuleType(options.rawRuleType);
+  return options.columnDataType
+    ? ValuePickerRule.toAllowedRuleType({
+        ruleType,
+        columnDataType: options.columnDataType,
+      })
+    : ruleType;
+}
+
 function _parseSourceDataset(raw: unknown): ChatCaseSourceDataset | undefined {
   if (!raw || typeof raw !== "object") {
     return undefined;
@@ -64,7 +111,10 @@ function _parseSourceDataset(raw: unknown): ChatCaseSourceDataset | undefined {
   return { datasetId, primaryKeyColumnId };
 }
 
-function _parseAttribute(raw: unknown): ChatProposedCaseAttribute | undefined {
+function _parseAttribute(
+  raw: unknown,
+  columnDataTypesById: ColumnDataTypesById,
+): ChatProposedCaseAttribute | undefined {
   if (!raw || typeof raw !== "object") {
     return undefined;
   }
@@ -83,7 +133,10 @@ function _parseAttribute(raw: unknown): ChatProposedCaseAttribute | undefined {
     // is common, so the attribute is renamed rather than dropped.
     name: ConceptStatus.toNonReservedAttributeName(name),
     isIncluded: record.isIncluded !== false,
-    valuePickerRuleType: _asValuePickerRuleType(record.valuePickerRuleType),
+    valuePickerRuleType: _toCatalogAllowedRuleType({
+      rawRuleType: record.valuePickerRuleType,
+      columnDataType: columnDataTypesById.get(columnId),
+    }),
     ...(description ? { description } : {}),
   };
 }
@@ -146,6 +199,7 @@ function _parseSourceAttributes(
   options: Readonly<{
     rawAttributes: unknown;
     sourceDatasets: readonly ChatCaseSourceDataset[];
+    columnDataTypesById: ColumnDataTypesById;
   }>,
 ): ChatProposedCaseAttribute[] {
   const sourceDatasetIds = new Set(
@@ -153,11 +207,11 @@ function _parseSourceAttributes(
       return sourceDataset.datasetId;
     }),
   );
-  return _parseList(options.rawAttributes, _parseAttribute).filter(
-    (attribute) => {
-      return sourceDatasetIds.has(attribute.datasetId);
-    },
-  );
+  return _parseList(options.rawAttributes, (item) => {
+    return _parseAttribute(item, options.columnDataTypesById);
+  }).filter((attribute) => {
+    return sourceDatasetIds.has(attribute.datasetId);
+  });
 }
 
 /**
@@ -169,9 +223,15 @@ function _parseSourceAttributes(
  * built-in `status` is renamed. A status set is kept only when it is valid
  * whole; otherwise the draft carries none and the client supplies the default
  * set.
+ *
+ * A value rule its column's catalog type does not allow becomes
+ * `most_frequent`.
  */
 export function parseProposeCaseType(
   argsJson: string | undefined,
+  options: Readonly<{
+    columns: readonly ProposeCaseTypeCatalogColumn[];
+  }> = { columns: [] },
 ): ChatProposedCaseType | undefined {
   if (!argsJson) {
     return undefined;
@@ -194,6 +254,7 @@ export function parseProposeCaseType(
   const attributes = _parseSourceAttributes({
     rawAttributes: record.attributes,
     sourceDatasets,
+    columnDataTypesById: _getColumnDataTypesById(options.columns),
   });
   const labelColumnId = _asUuid(record.labelColumnId);
   const hasLabelAttribute = attributes.some((attribute) => {

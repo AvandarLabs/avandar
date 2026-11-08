@@ -214,4 +214,45 @@ describe("parseOpenRouterResponse", () => {
     expect(parsed.createdCaseTypes?.[0]?.name).toBe("COVID case");
     expect(parsed.generatedSql).toBeUndefined();
   });
+
+  it("holds a proposed value rule to its catalog column's type", () => {
+    const keyColumnId = "1a2b3c4d-cccc-4ccc-8ccc-ddddeeeeffff";
+    const districtColumnId = "2b3c4d5e-cccc-4ccc-8ccc-ddddeeeeffff";
+    const parsed = parseOpenRouterResponse({
+      message: {
+        tool_calls: [
+          {
+            function: {
+              name: "proposeCaseType",
+              arguments: JSON.stringify({
+                name: "Cholera case",
+                sourceDatasets: [
+                  { datasetId: CHOLERA_ID, primaryKeyColumnId: keyColumnId },
+                ],
+                attributes: [
+                  {
+                    datasetId: CHOLERA_ID,
+                    columnId: districtColumnId,
+                    name: "District",
+                    isIncluded: true,
+                    valuePickerRuleType: "avg",
+                  },
+                ],
+                manualEntryAttributes: [],
+              }),
+            },
+          },
+        ],
+      },
+      attemptText: "",
+      lastUserPrompt: "propose it",
+      priorClarifications: 0,
+      columns: [{ id: districtColumnId, data_type: "varchar" }],
+      skipSqlExtraction: true,
+    });
+
+    expect(parsed.proposedCaseType?.attributes[0]?.valuePickerRuleType).toBe(
+      "most_frequent",
+    );
+  });
 });

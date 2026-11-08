@@ -2,6 +2,7 @@ import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/se
 import { isEmptyParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/isEmptyParsedAttempt.ts";
 import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
+import type { ProposeCaseTypeCatalogColumn } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
 
 /**
  * Runs a chat turn against OpenRouter, escalating up to three times while the
@@ -27,6 +28,8 @@ export async function runChatAttemptsWithEscalation(
     priorClarifications: number;
     datasets?: ReadonlyArray<{ id: string; name: string }>;
     concepts?: ReadonlyArray<{ id: string; name: string }>;
+    /** Catalog columns, so proposed value rules are held to their types. */
+    columns: readonly ProposeCaseTypeCatalogColumn[];
     skipSqlExtraction?: boolean;
   }>,
 ): Promise<{ parsed: ParsedAttempt; attemptCount: number }> {
@@ -38,6 +41,7 @@ export async function runChatAttemptsWithEscalation(
     priorClarifications,
     datasets,
     concepts,
+    columns,
     skipSqlExtraction,
   } = options;
 
@@ -58,6 +62,7 @@ export async function runChatAttemptsWithEscalation(
       priorClarifications,
       datasets,
       concepts,
+      columns,
       skipSqlExtraction,
     });
   };

@@ -16,6 +16,7 @@ import type {
   OpenRouterMessage,
   OpenRouterToolCall,
 } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
+import type { ProposeCaseTypeCatalogColumn } from "@sbfn/chat/PostChatMessages/parsing/parseProposeCaseType.ts";
 
 export type ParsedAttempt = {
   text: string;
@@ -34,6 +35,8 @@ export function parseOpenRouterResponse(options: {
   priorClarifications: number;
   datasets?: ReadonlyArray<{ id: string; name: string }>;
   concepts?: ReadonlyArray<{ id: string; name: string }>;
+  /** Catalog columns, so proposed value rules are held to their types. */
+  columns?: readonly ProposeCaseTypeCatalogColumn[];
   skipSqlExtraction?: boolean;
 }): ParsedAttempt {
   const calls: OpenRouterToolCall[] = options.message?.tool_calls ?? [];
@@ -55,7 +58,9 @@ export function parseOpenRouterResponse(options: {
       return call?.function?.name === "proposeCaseType";
     });
     if (proposeCall?.function) {
-      proposedCaseType = parseProposeCaseType(proposeCall.function.arguments);
+      proposedCaseType = parseProposeCaseType(proposeCall.function.arguments, {
+        columns: options.columns ?? [],
+      });
     }
   }
 
