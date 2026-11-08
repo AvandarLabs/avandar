@@ -1321,6 +1321,8 @@ commits belong to the features that own them, not here.
 | `d9c3bf6c0` | fix(hdx): store each listing's package with only its own resource | All of it. Without it, a package's write grows with the square of its resource count (each listing stored every resource), which ran the demo database out of memory on WHO's country packages. |
 | `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. F27 replaces its fixed cap with the throttle's budget. |
 | `c75d19331` | fix(hdx): leave license text and file check reports out of source_metadata | All of it. On demo, `license_other` and `fs_check_info` were 55% of HDX's raw JSON. |
+| `8e707d700` | fix(hdx): leave mapped and repeated package fields out of source_metadata | All of it. Drops `notes` and `caveats` (already in `description` and `notes`) and narrows `organization`, `tags`, and `groups` to the keys the mappers read. Sizing and the demo disk analysis: `docs/measles-demo/etl-disk-footprint.md`. |
+| `ec060372c` | docs(measles): explain the HDX disk footprint and how a full run fits | Branch-only: the demo instance's numbers and recovery steps. Port only if `develop` gets the same HDX sizing question. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1414,6 +1416,11 @@ rejects the new listing shape, so the catalog would not load.
   left 11,983 listings storing whole packages. Change detection ignores
   `source_metadata`, so a later run does not shrink them: reset HDX on demo
   (`ava pipeline reset hdx --env demo`) before its next full run.
+  Run `95f18055` later filled the demo disk (`53100`). A complete HDX run is
+  about 191k listings, roughly 1.9 GB of database after `8e707d700`, which
+  does not fit a Free project's 2 GB disk. See
+  `docs/measles-demo/etl-disk-footprint.md` for the recovery steps and the
+  GeoTIFF trade-off.
 - `hdxTopics`' tag-to-topic table covers HDX's 150-tag vocabulary as of
   2026-11-08. A tag HDX adds later gets no topic until it is added there.
 - Removing one of two chosen publishers leaves the agencies chosen under it
@@ -1832,6 +1839,8 @@ Its commits are covered by F19, not numbered here.
 | 134 | `aa5eefaa6` | F27 |
 | 135 | `0a828d45c` | F27 |
 | 136 | `2a627e438` | F27, F9 (MIXED) |
+| 137 | `8e707d700` | F23 |
+| 138 | `ec060372c` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
