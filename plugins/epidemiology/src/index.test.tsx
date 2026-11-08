@@ -2,7 +2,9 @@ import { AvandarProvider } from "@avandar/plugin-sdk";
 import { MantineProvider } from "@mantine/core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
 import plugin from "./index";
+import { RatePlot } from "./ratePlot/RatePlot/RatePlot";
 import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
 
 function _makeApi(openModal: AvandarApi["ui"]["openModal"]): AvandarApi {
@@ -49,5 +51,13 @@ describe("the epidemiology plugin", () => {
     expect(
       screen.getByRole("button", { name: "translated:modal.fit" }),
     ).toBeInTheDocument();
+  });
+
+  it("draws the epicurve chart type with the epicurve transform", () => {
+    expect(plugin.vizTypes.epicurve?.transform).toBe(makeEpicurveFromRows);
+  });
+
+  it("draws the rate-plot chart type with the RatePlot component", () => {
+    expect(plugin.vizTypes["rate-plot"]?.Component).toBe(RatePlot);
   });
 });

@@ -1,4 +1,6 @@
 import { definePlugin } from "@avandar/plugin-sdk";
+import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
+import { RatePlot } from "./ratePlot/RatePlot/RatePlot";
 import { RegressionModal } from "./RegressionModal/RegressionModal";
 
 // A plugin entry exports its definition, not a component, so there is nothing
@@ -12,5 +14,9 @@ export default definePlugin({
         content: <RegressionModal />,
       });
     },
+  },
+  vizTypes: {
+    epicurve: { transform: makeEpicurveFromRows },
+    "rate-plot": { Component: RatePlot },
   },
 });
