@@ -31,7 +31,8 @@ function isAllowedForColumnType(options: RuleOnColumn): boolean {
       return true;
     })
     .with("max", "min", () => {
-      // Text compares alphabetically, so "10" comes before "9".
+      // Text compares by byte order, so "10" comes before "9" and uppercase
+      // comes before lowercase ("Zebra" before "apple").
       return options.columnDataType !== "boolean";
     })
     .with("sum", "avg", () => {

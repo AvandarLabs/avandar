@@ -58,8 +58,9 @@ function _buildReducedValueSql(
   // Each rule passes its aggregate in the rule's output type
   // (`ValuePickerRule.getOutputDataType`). COUNT is already BIGINT, and is 0,
   // not NULL, over no rows. MAX and MIN keep the column's type, so dates,
-  // times, and text work as well as numbers. Text compares by bytes, so '10'
-  // sorts before '9'.
+  // times, and text work as well as numbers. Text compares by byte order, so
+  // '10' sorts before '9' and uppercase sorts before lowercase ('Zebra' <
+  // 'apple').
   const aggregateSql = (aggregateExpression: string): string => {
     return `SELECT ${aggregateExpression} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter}`;
   };

@@ -1,6 +1,7 @@
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 /**
  * Executed tests for the concept relation view.
  *
@@ -15,12 +16,13 @@ import { describe, expect, it } from "vitest";
  * deterministic only in the absence of ties is not deterministic, so a fixture
  * without ties would assert nothing about determinism.
  */
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { DuckDBConnection } from "@duckdb/node-api";
 
@@ -149,23 +151,58 @@ const NICKNAME: ConceptAttributeColumn = {
   isArray: false,
 };
 
-/** Creates the view from the given columns and returns its rows. */
-async function _queryView(
-  attributeColumns: readonly ConceptAttributeColumn[],
-): Promise<Array<Record<string, unknown>>> {
+/** The fixture a view is built over: how to seed it and what to call it. */
+type ViewWorld = Readonly<{
+  seed: (connection: DuckDBConnection) => Promise<void>;
+  viewName: string;
+  spineTableName: string;
+}>;
+
+const DEFAULT_WORLD: ViewWorld = {
+  seed: _seed,
+  viewName: CONCEPT_VIEW,
+  spineTableName: SPINE,
+};
+
+/**
+ * Seeds the world, creates the view from the given columns, and hands the
+ * connection to `run`.
+ */
+async function _withConceptView<Result>(
+  options: Readonly<{
+    world: ViewWorld;
+    attributeColumns: readonly ConceptAttributeColumn[];
+    run: (connection: DuckDBConnection) => Promise<Result>;
+  }>,
+): Promise<Result> {
+  const { world, attributeColumns, run } = options;
   return await withDuckDb(async (connection) => {
-    await _seed(connection);
+    await world.seed(connection);
     await connection.run(
       buildConceptViewSql({
-        viewName: CONCEPT_VIEW,
-        spineTableName: SPINE,
+        viewName: world.viewName,
+        spineTableName: world.spineTableName,
         attributeColumns,
       }),
     );
-    const reader = await connection.runAndReadAll(
-      `SELECT * FROM "${CONCEPT_VIEW}" ORDER BY external_id`,
-    );
-    return reader.getRowObjects().map(_normalize);
+    return await run(connection);
+  });
+}
+
+/** Creates the view from the given columns and returns its rows. */
+async function _queryView(
+  attributeColumns: readonly ConceptAttributeColumn[],
+  world: ViewWorld = DEFAULT_WORLD,
+): Promise<Array<Record<string, unknown>>> {
+  return await _withConceptView({
+    world,
+    attributeColumns,
+    run: async (connection) => {
+      const reader = await connection.runAndReadAll(
+        `SELECT * FROM "${world.viewName}" ORDER BY external_id`,
+      );
+      return reader.getRowObjects().map(_normalize);
+    },
   });
 }
 
@@ -460,109 +497,136 @@ async function _seedTyped(connection: DuckDBConnection): Promise<void> {
   `);
 }
 
-/** One single-value field over the typed dataset. */
-function _typedColumn(
+const TYPED_WORLD: ViewWorld = {
+  seed: _seedTyped,
+  viewName: TYPED_VIEW,
+  spineTableName: TYPED_SPINE,
+};
+
+/** One single-value field over the typed dataset, and the type it reads. */
+type TypedField = Readonly<{
+  column: ConceptAttributeColumn;
+  sourceDuckDbType: DuckDbDataType;
+}>;
+
+function _typedField(
   options: Readonly<{
     attributeName: string;
     selectColumnName: string;
+    sourceDuckDbType: DuckDbDataType;
     ruleType: ValuePickerRule.T;
   }>,
-): ConceptAttributeColumn {
+): TypedField {
   return {
-    kind: "dataset_column",
-    attributeId: `attr-${options.attributeName}` as ConceptAttribute.Id,
-    attributeName: options.attributeName,
-    selectColumnName: options.selectColumnName,
-    datasetId: DATASET_TYPED,
-    primaryKeyColumnName: "person_id",
-    valuePickerRuleType: options.ruleType,
-    isArray: false,
+    sourceDuckDbType: options.sourceDuckDbType,
+    column: {
+      kind: "dataset_column",
+      attributeId: `attr-${options.attributeName}` as ConceptAttribute.Id,
+      attributeName: options.attributeName,
+      selectColumnName: options.selectColumnName,
+      datasetId: DATASET_TYPED,
+      primaryKeyColumnName: "person_id",
+      valuePickerRuleType: options.ruleType,
+      isArray: false,
+    },
   };
 }
 
-const TYPED_COLUMNS: readonly ConceptAttributeColumn[] = [
-  _typedColumn({
+const TYPED_FIELDS: readonly TypedField[] = [
+  _typedField({
     attributeName: "latest_seen",
     selectColumnName: "seen_on",
+    sourceDuckDbType: "DATE",
     ruleType: "max",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "earliest_time",
     selectColumnName: "seen_time",
+    sourceDuckDbType: "TIME",
     ruleType: "min",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "latest_seen_at",
     selectColumnName: "seen_at",
+    sourceDuckDbType: "TIMESTAMP",
     ruleType: "max",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "last_code",
     selectColumnName: "code",
+    sourceDuckDbType: "VARCHAR",
     ruleType: "max",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "first_code",
     selectColumnName: "code",
+    sourceDuckDbType: "VARCHAR",
     ruleType: "min",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "most_visits",
     selectColumnName: "visits",
+    sourceDuckDbType: "BIGINT",
     ruleType: "max",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "code_count",
     selectColumnName: "code",
+    sourceDuckDbType: "VARCHAR",
     ruleType: "count",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "total_visits",
     selectColumnName: "visits",
+    sourceDuckDbType: "BIGINT",
     ruleType: "sum",
   }),
-  _typedColumn({
+  _typedField({
     attributeName: "average_weight",
     selectColumnName: "weight",
+    sourceDuckDbType: "DOUBLE",
     ruleType: "avg",
   }),
 ];
 
-async function _createTypedView(connection: DuckDBConnection): Promise<void> {
-  await _seedTyped(connection);
-  await connection.run(
-    buildConceptViewSql({
-      viewName: TYPED_VIEW,
-      spineTableName: TYPED_SPINE,
-      attributeColumns: TYPED_COLUMNS,
-    }),
-  );
-}
+const TYPED_COLUMNS: readonly ConceptAttributeColumn[] = TYPED_FIELDS.map(
+  (field) => {
+    return field.column;
+  },
+);
 
 /** The typed view's DuckDB column types, by column name. */
 async function _describeTypedView(): Promise<Record<string, string>> {
-  return await withDuckDb(async (connection) => {
-    await _createTypedView(connection);
-    const reader = await connection.runAndReadAll(`DESCRIBE "${TYPED_VIEW}"`);
-    return Object.fromEntries(
-      reader.getRowObjectsJson().map((row) => {
-        return [String(row.column_name), String(row.column_type)];
-      }),
-    );
+  return await _withConceptView({
+    world: TYPED_WORLD,
+    attributeColumns: TYPED_COLUMNS,
+    run: async (connection) => {
+      const reader = await connection.runAndReadAll(`DESCRIBE "${TYPED_VIEW}"`);
+      return Object.fromEntries(
+        reader.getRowObjectsJson().map((row) => {
+          return [String(row.column_name), String(row.column_type)];
+        }),
+      );
+    },
   });
 }
 
 /**
  * The typed view's rows in DuckDB's JSON form: dates and times as text,
- * `BIGINT` as a string, `DOUBLE` as a number.
+ * `BIGINT` as a string, `DOUBLE` as a number. It does not use `_queryView`,
+ * whose `getRowObjects()` returns a date as a DuckDB value object that has
+ * no plain-text form to assert on.
  */
 async function _queryTypedView(): Promise<Array<Record<string, unknown>>> {
-  return await withDuckDb(async (connection) => {
-    await _createTypedView(connection);
-    const reader = await connection.runAndReadAll(
-      `SELECT * FROM "${TYPED_VIEW}" ORDER BY external_id`,
-    );
-    return reader.getRowObjectsJson();
+  return await _withConceptView({
+    world: TYPED_WORLD,
+    attributeColumns: TYPED_COLUMNS,
+    run: async (connection) => {
+      const reader = await connection.runAndReadAll(
+        `SELECT * FROM "${TYPED_VIEW}" ORDER BY external_id`,
+      );
+      return reader.getRowObjectsJson();
+    },
   });
 }
 
@@ -581,7 +645,43 @@ describe("buildConceptViewSql value rule output types", () => {
     });
   });
 
-  it("takes the latest date and time when two rows tie and one is NULL", async () => {
+  // The rule table is what the rest of the app trusts for a field's type, so
+  // a rule whose SQL emits another type than the table says is a defect.
+  it("emits the type the rule table declares for every rule", async () => {
+    const describedTypes = await _describeTypedView();
+
+    const actual = Object.fromEntries(
+      TYPED_FIELDS.map((field) => {
+        const describedType = describedTypes[field.column.attributeName];
+        return [
+          field.column.attributeName,
+          DuckDbDataTypeUtils.toAvaDataType(describedType as DuckDbDataType),
+        ];
+      }),
+    );
+    const expected = Object.fromEntries(
+      TYPED_FIELDS.map((field) => {
+        return [
+          field.column.attributeName,
+          ValuePickerRule.getOutputDataType({
+            ruleType: (
+              field.column as Extract<
+                ConceptAttributeColumn,
+                { kind: "dataset_column" }
+              >
+            ).valuePickerRuleType,
+            columnDataType: DuckDbDataTypeUtils.toAvaDataType(
+              field.sourceDuckDbType,
+            ),
+          }),
+        ];
+      }),
+    );
+
+    expect(actual).toEqual(expected);
+  });
+
+  it("takes the latest date and timestamp and the earliest time, ignoring NULLs", async () => {
     const [p1, p2, p3] = await _queryTypedView();
 
     expect([p1?.latest_seen, p1?.latest_seen_at, p1?.earliest_time]).toEqual([
@@ -592,7 +692,7 @@ describe("buildConceptViewSql value rule output types", () => {
     expect([p2?.latest_seen, p3?.latest_seen]).toEqual([null, null]);
   });
 
-  it("orders text alphabetically under max and min, so '9' beats '10'", async () => {
+  it("compares text by byte order under max and min, so '9' beats '10'", async () => {
     const [p1] = await _queryTypedView();
 
     expect([p1?.last_code, p1?.first_code]).toEqual(["9", "10"]);
@@ -611,11 +711,19 @@ describe("buildConceptViewSql value rule output types", () => {
   it("sums whole numbers into a decimal and skips NULLs", async () => {
     const [p1, p2] = await _queryTypedView();
 
-    expect([p1?.total_visits, p1?.average_weight, p1?.most_visits]).toEqual([
-      6,
-      2,
-      "3",
-    ]);
+    expect(p1?.total_visits).toBe(6);
     expect(p2?.total_visits).toBeNull();
+  });
+
+  it("averages the non-NULL values", async () => {
+    const [p1] = await _queryTypedView();
+
+    expect(p1?.average_weight).toBe(2);
+  });
+
+  it("keeps a whole number whole under max, even when two rows tie", async () => {
+    const [p1] = await _queryTypedView();
+
+    expect(p1?.most_visits).toBe("3");
   });
 });
