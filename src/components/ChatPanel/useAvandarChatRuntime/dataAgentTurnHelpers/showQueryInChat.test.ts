@@ -12,11 +12,14 @@ vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
 
 const WORKSPACE_ID = "workspace-1" as never;
 
-function _mockRun(data: Array<Record<string, unknown>>): void {
+function _mockRun(
+  data: Array<Record<string, unknown>>,
+  numRows = data.length,
+): void {
   runQueryMock.mockResolvedValue({
     columns: [{ name: "state", dataType: "varchar" }],
     data,
-    numRows: data.length,
+    numRows,
   });
 }
 
@@ -63,6 +66,34 @@ describe("showQueryInChat", () => {
 
     expect(outcome.kind).toBe("empty");
     expect(results).toEqual([]);
+  });
+
+  it("counts rows the result did not return as rows, as the explorer does", async () => {
+    _mockRun([], 2);
+    const results: AgentQueryResultData[] = [];
+
+    const outcome = await showQueryInChat({
+      workspaceId: WORKSPACE_ID,
+      title: "t",
+      results,
+      request: { sql: "SELECT 1", summary: "s" },
+    });
+
+    expect(outcome.kind).toBe("rows");
+    expect(results).toHaveLength(1);
+  });
+
+  it("returns the first rows when a preview is asked for", async () => {
+    _mockRun([{ state: "Ohio" }, { state: "Utah" }, { state: "Iowa" }]);
+
+    const outcome = await showQueryInChat({
+      workspaceId: WORKSPACE_ID,
+      title: "t",
+      results: [],
+      request: { sql: "SELECT 1", summary: "s", previewRowCount: 2 },
+    });
+
+    expect(outcome).toMatchObject({ previewRows: [["Ohio"], ["Utah"]] });
   });
 
   it("reports a failed query with its message", async () => {

@@ -1,7 +1,14 @@
-import { describe, expect, it, vi } from "vitest";
-import { createConversationAgentHost } from "./createConversationAgentHost";
-import type { AgentConversationState } from "./createConversationAgentHost";
-import type { DataAgentTurnOptions } from "./dataAgentTurnHelpers";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  createAgentConversation,
+  createConversationAgentHost,
+} from "./createConversationAgentHost";
+import type {
+  AgentConversationState,
+  DataAgentTurnOptions,
+} from "./dataAgentConversation.types";
+import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 const { showQueryInChatMock, explorerShowQueryMock } = vi.hoisted(() => {
   return {
@@ -34,7 +41,14 @@ vi.mock(
   },
 );
 
-function _turn(app: "data-explorer" | "dashboard"): DataAgentTurnOptions {
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+function _turn(
+  app: "data-explorer" | "dashboard" | undefined,
+  overrides: Partial<DataAgentTurnOptions> = {},
+): DataAgentTurnOptions {
   return {
     apiMessages: [{ role: "user", content: "How many?" }],
     workspaceId: "workspace-1",
@@ -43,7 +57,8 @@ function _turn(app: "data-explorer" | "dashboard"): DataAgentTurnOptions {
     parseSqlRef: { current: vi.fn() },
     dataExplorerDispatch: {},
     chatPanelDispatch: { setPendingClarification: vi.fn() },
-    pageContext: { app },
+    pageContext: app ? { app } : undefined,
+    ...overrides,
   } as unknown as DataAgentTurnOptions;
 }
 
@@ -90,5 +105,47 @@ describe("createConversationAgentHost", () => {
     expect(
       laterTurn.chatPanelDispatch.setPendingClarification,
     ).toHaveBeenCalled();
+  });
+
+  it("shows results in the chat when the page is unknown", async () => {
+    await createConversationAgentHost(_state(_turn(undefined))).showQuery(
+      REQUEST,
+    );
+
+    expect(showQueryInChatMock).toHaveBeenCalled();
+    expect(explorerShowQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an offline turn's results in the explorer", async () => {
+    const turn = _turn(undefined, { isOffline: true });
+    await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
+
+    expect(explorerShowQueryMock).toHaveBeenCalledWith(REQUEST);
+    expect(showQueryInChatMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("createAgentConversation", () => {
+  it("gives the agent a host that reads the conversation it returns", async () => {
+    let agentHost: DataAgentHost | undefined;
+    const dataAgent = { ask: vi.fn() } as unknown as DataAgent;
+    const datasets = [{ id: "dataset-1", name: "cases.csv", columns: [] }];
+
+    const conversation = createAgentConversation({
+      turnRef: { current: _turn("data-explorer") },
+      datasets,
+      createDataAgent: (host) => {
+        agentHost = host;
+        return dataAgent;
+      },
+    });
+    conversation.turnRef.current = _turn("dashboard");
+    await agentHost!.showQuery(REQUEST);
+
+    expect(conversation.dataAgent).toBe(dataAgent);
+    expect(conversation.datasets).toBe(datasets);
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({ results: conversation.results }),
+    );
   });
 });

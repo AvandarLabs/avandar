@@ -2,24 +2,22 @@ import { createExplorerShowQuery } from "@/components/ChatPanel/useAvandarChatRu
 import { showQueryInChat } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
-import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
-import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type {
+  AgentConversationState,
+  DataAgentConversation,
+  DataAgentTurnOptions,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
+import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /**
- * What a conversation's host reads on every call: the turn being answered
- * (the agent outlives each turn, so it must never keep the first one) and
- * the results this turn added to the chat.
+ * Results go to the Data Explorer only when the turn says so: the user is on
+ * it, or the turn is offline (offline turns run only there). An unknown page
+ * sends them to the chat, which shows them on any page.
  */
-export type AgentConversationState = {
-  turnRef: { current: DataAgentTurnOptions };
-  results: AgentQueryResultData[];
-};
-
 function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
-  return (
-    turn.pageContext === undefined || turn.pageContext.app === "data-explorer"
-  );
+  return turn.isOffline === true || turn.pageContext?.app === "data-explorer";
 }
 
 /**
@@ -52,5 +50,28 @@ export function createConversationAgentHost(
         clarification,
       );
     },
+  });
+}
+
+/**
+ * A new conversation whose agent runs against a conversation host. The host
+ * holds the returned object itself, since `askConversationDataAgent`
+ * updates its turn and results in place on every turn.
+ */
+export function createAgentConversation(
+  options: Readonly<{
+    turnRef: AgentConversationState["turnRef"];
+    datasets: readonly DataAgentDataset[];
+    createDataAgent: (host: DataAgentHost) => DataAgent;
+  }>,
+): DataAgentConversation {
+  const state: AgentConversationState = {
+    turnRef: options.turnRef,
+    results: [],
+  };
+  const host = createConversationAgentHost(state);
+  return Object.assign(state, {
+    datasets: options.datasets,
+    dataAgent: options.createDataAgent(host),
   });
 }

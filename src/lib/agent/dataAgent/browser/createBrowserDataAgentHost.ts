@@ -2,10 +2,7 @@ import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/Work
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatClarifyRequest } from "$/types/chat.types";
-import type {
-  DataAgentHost,
-  DataAgentQueryOutcome,
-} from "@/lib/agent/dataAgent/DataAgentHost";
+import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /** What the browser host needs from the chat runtime and the page. */
 export type BrowserDataAgentHostOptions = {
@@ -15,9 +12,7 @@ export type BrowserDataAgentHostOptions = {
    * Runs SQL and shows the result: in the Data Explorer or in the chat, as
    * the caller decides.
    */
-  showQuery: (
-    request: Readonly<{ sql: string; summary: string; chart?: string }>,
-  ) => Promise<DataAgentQueryOutcome>;
+  showQuery: DataAgentHost["showQuery"];
   /** Shows a question card in the chat panel. */
   showQuestionCard: (clarification: ChatClarifyRequest) => void;
 };

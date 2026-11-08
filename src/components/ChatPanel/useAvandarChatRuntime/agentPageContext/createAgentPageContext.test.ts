@@ -87,6 +87,30 @@ describe("createAgentPageContext", () => {
     expect(loader.getDashboard).not.toHaveBeenCalled();
   });
 
+  it("keeps an open editor's dashboard when its charts cannot be read", async () => {
+    const brokenTile = {
+      type: "DataViz",
+      get props(): never {
+        throw new Error("unreadable chart");
+      },
+    };
+    const context = await _create(`/acme/dashboards/edit/${DASHBOARD_ID}`, {
+      dashboardEditorState: {
+        activeDashboardId: DASHBOARD_ID,
+        editorData: {
+          root: { props: { title: "Measles 2026" } },
+          content: [brokenTile],
+        } as never,
+      },
+    });
+
+    expect(context.dashboard).toEqual({
+      id: DASHBOARD_ID,
+      name: "Measles 2026",
+      tiles: [],
+    });
+  });
+
   it("loads a dashboard that is not open in the editor", async () => {
     const context = await _create(`/acme/dashboards/preview/${DASHBOARD_ID}`, {
       loader: _loader({

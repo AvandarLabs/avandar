@@ -8,20 +8,23 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/agentPageNameLoader";
 import { createAgentPageContext } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/createAgentPageContext";
-import { createConversationAgentHost } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/createConversationAgentHost";
+import { parseAgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
+import { createAgentConversation } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/createConversationAgentHost";
 import {
   askConversationDataAgent,
+  buildConversationKey,
   loadDataAgentDatasets,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { AgentConversationState } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/createConversationAgentHost";
 import type {
+  AgentConversationState,
   DataAgentConversation,
   DataAgentTurnOptions,
-} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { ChatModelRunResult } from "@assistant-ui/react";
@@ -69,45 +72,62 @@ function _createProxyStreamFn(workspaceId: Workspace.Id): StreamFn {
   };
 }
 
-/**
- * The host must hold the same object the conversation map keeps, since
- * `askConversationDataAgent` updates its turn and results in place.
- */
-async function _createConversation(
+function _createConversation(
   turnRef: AgentConversationState["turnRef"],
   datasets: readonly DataAgentDataset[],
-): Promise<DataAgentConversation> {
-  const conversation = {
+): DataAgentConversation {
+  return createAgentConversation({
     turnRef,
-    results: [],
-  } as unknown as DataAgentConversation;
-  conversation.dataAgent = createDataAgent({
     datasets,
-    host: createConversationAgentHost(conversation),
-    policy: _createModelPolicy(),
-    streamFn: _createProxyStreamFn(turnRef.current.workspaceId),
-    today: new Date().toISOString().slice(0, 10),
-    sessionId: crypto.randomUUID(),
+    createDataAgent: (host) => {
+      return createDataAgent({
+        datasets,
+        host,
+        policy: _createModelPolicy(),
+        streamFn: _createProxyStreamFn(turnRef.current.workspaceId),
+        today: new Date().toISOString().slice(0, 10),
+        sessionId: crypto.randomUUID(),
+      });
+    },
   });
-  return conversation;
+}
+
+/**
+ * What is on screen for this turn. When reading the page fails, the route
+ * still names the page, so results keep going where the user is looking.
+ */
+async function _readPageContext(
+  page: Readonly<AgentPageInputs>,
+  datasets: readonly DataAgentDataset[],
+  workspaceId: Workspace.Id,
+): Promise<AgentPageContext> {
+  try {
+    return await createAgentPageContext({
+      ...page,
+      datasets,
+      loader: createAgentPageNameLoader(workspaceId),
+    });
+  } catch {
+    return { app: parseAgentPageRoute(page.pathname).app };
+  }
 }
 
 /**
  * Answers a chat message on any page with the Pi-based data agent. The
  * agent runs in the browser; only model requests go to the server, through
- * the agent proxy. The current page starts each turn's message.
+ * the agent proxy. The current page starts each turn's message. Datasets
+ * load once per conversation: the agent's table aliases are positional, so
+ * the page block must name tables from the same list the agent was given.
  */
 export async function runDataAgentTurn(
   options: Readonly<DataAgentTurnOptions>,
   page?: Readonly<AgentPageInputs>,
 ): Promise<ChatModelRunResult> {
-  const datasets = await loadDataAgentDatasets(options.workspaceId);
+  const existing = conversationsByChat.get(buildConversationKey(options));
+  const datasets =
+    existing?.datasets ?? (await loadDataAgentDatasets(options.workspaceId));
   const pageContext = page
-    ? await createAgentPageContext({
-        ...page,
-        datasets,
-        loader: createAgentPageNameLoader(options.workspaceId),
-      })
+    ? await _readPageContext(page, datasets, options.workspaceId)
     : undefined;
   return askConversationDataAgent({
     conversations: conversationsByChat,
@@ -118,7 +138,7 @@ export async function runDataAgentTurn(
           aliases: SqlTableAlias.fromSchema({ datasets }),
         })
       : undefined,
-    createConversation: (turnRef) => {
+    createConversation: async (turnRef) => {
       return _createConversation(turnRef, datasets);
     },
   });

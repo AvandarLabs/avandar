@@ -10,7 +10,7 @@ import {
 import type {
   DataAgentConversation,
   DataAgentTurnOptions,
-} from "./dataAgentTurnHelpers";
+} from "./dataAgentConversation.types";
 
 vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome",
@@ -134,56 +134,113 @@ describe("loadDataAgentDatasets", () => {
 });
 
 describe("askConversationDataAgent", () => {
-  function _fakeConversation(): DataAgentConversation & {
-    asked: string[];
-  } {
+  type FakeConversation = DataAgentConversation & { asked: string[] };
+
+  const PAGE_BLOCK = "<current_page>\nPage: Map\n</current_page>";
+
+  function _fakeConversation(
+    ask?: (text: string) => Promise<{ text: string }>,
+  ): FakeConversation {
     const asked: string[] = [];
     const conversation = {
       asked,
       turnRef: { current: _createTurnOptions() },
       results: [],
+      datasets: [],
       dataAgent: {
+        agent: { abort: vi.fn() },
         ask: vi.fn(async (text: string) => {
           asked.push(text);
+          if (ask) {
+            return await ask(text);
+          }
           conversation.results.push(
             AgentQueryResult.create({ sql: "SELECT 1", title: "t" }),
           );
           return { text: "Here it is." };
         }),
       },
-    } as unknown as DataAgentConversation & { asked: string[] };
+    } as unknown as FakeConversation;
     return conversation;
   }
 
-  function _turn(content: string): DataAgentTurnOptions {
+  function _turn(
+    content: string | readonly string[],
+    chatGeneration = 0,
+  ): DataAgentTurnOptions {
+    const contents = typeof content === "string" ? [content] : content;
     return {
       ..._createTurnOptions(),
-      apiMessages: [{ role: "user", content }],
+      chatGeneration,
+      apiMessages: contents.map((text, index) => {
+        return { role: index % 2 === 0 ? "user" : "assistant", content: text };
+      }),
       chatPanelDispatch: { setPendingClarification: vi.fn() },
     } as unknown as DataAgentTurnOptions;
+  }
+
+  function _ask(
+    conversations: Map<string, DataAgentConversation>,
+    turn: DataAgentTurnOptions,
+    pageBlock?: string,
+  ) {
+    return askConversationDataAgent({
+      conversations,
+      turn,
+      pageBlock,
+      createConversation: vi.fn(),
+    });
   }
 
   it("sends the page block first, then 'unchanged' on the same page", async () => {
     const conversation = _fakeConversation();
     const conversations = new Map([["workspace-1:0", conversation]]);
-    const pageBlock = "<current_page>\nPage: Map\n</current_page>";
 
-    await askConversationDataAgent({
-      conversations,
-      turn: _turn("How many?"),
-      pageBlock,
-      createConversation: vi.fn(),
-    });
-    await askConversationDataAgent({
-      conversations,
-      turn: _turn("And deaths?"),
-      pageBlock,
-      createConversation: vi.fn(),
-    });
+    await _ask(conversations, _turn("How many?"), PAGE_BLOCK);
+    await _ask(conversations, _turn("And deaths?"), PAGE_BLOCK);
 
-    expect(conversation.asked[0]).toBe(`${pageBlock}\n\nHow many?`);
+    expect(conversation.asked[0]).toBe(`${PAGE_BLOCK}\n\nHow many?`);
     expect(conversation.asked[1]).toContain(
       "Unchanged since the last message.",
+    );
+  });
+
+  it("sends the full block again when the page changes", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
+
+    await _ask(conversations, _turn("How many?"), PAGE_BLOCK);
+    await _ask(conversations, _turn("And here?"), dashboardBlock);
+
+    expect(conversation.asked[1]).toBe(`${dashboardBlock}\n\nAnd here?`);
+  });
+
+  it("resends a block the agent failed to answer", async () => {
+    const conversation = _fakeConversation();
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const dashboardBlock = "<current_page>\nPage: Dashboard\n</current_page>";
+    await _ask(conversations, _turn("How many?"), PAGE_BLOCK);
+    vi.mocked(conversation.dataAgent.ask).mockRejectedValueOnce(
+      new Error("model down"),
+    );
+
+    await expect(
+      _ask(conversations, _turn("And here?"), dashboardBlock),
+    ).rejects.toThrow("model down");
+    await _ask(conversations, _turn("And here?"), dashboardBlock);
+
+    expect(conversation.lastPageBlock).toBe(dashboardBlock);
+    expect(conversation.asked.at(-1)).toBe(`${dashboardBlock}\n\nAnd here?`);
+  });
+
+  it("clears the previous turn's question card", async () => {
+    const turn = _turn("How many?");
+
+    await _ask(new Map([["workspace-1:0", _fakeConversation()]]), turn);
+
+    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
+      undefined,
     );
   });
 
@@ -193,11 +250,10 @@ describe("askConversationDataAgent", () => {
       AgentQueryResult.create({ sql: "SELECT 0", title: "old" }),
     );
 
-    const reply = await askConversationDataAgent({
-      conversations: new Map([["workspace-1:0", conversation]]),
-      turn: _turn("How many?"),
-      createConversation: vi.fn(),
-    });
+    const reply = await _ask(
+      new Map([["workspace-1:0", conversation]]),
+      _turn("How many?"),
+    );
 
     expect(reply.content).toEqual([
       { type: "text", text: "Here it is." },
@@ -220,5 +276,88 @@ describe("askConversationDataAgent", () => {
     expect(createConversation).toHaveBeenCalledWith({ current: turn });
     expect(conversations.get("workspace-1:0")).toBe(conversation);
     expect(conversation.asked).toEqual(["How many?"]);
+  });
+
+  it("starts a new agent with the page block, then a recap", async () => {
+    const conversation = _fakeConversation();
+
+    await askConversationDataAgent({
+      conversations: new Map(),
+      turn: _turn(["How many?", "42.", "And deaths?"]),
+      pageBlock: PAGE_BLOCK,
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect(conversation.asked[0]).toBe(
+      `${PAGE_BLOCK}\n\nEarlier in this conversation:\n` +
+        "User: How many?\nAssistant: 42.\n\nAnd deaths?",
+    );
+  });
+
+  it("drops the workspace's older chats when a new chat starts", async () => {
+    const otherWorkspace = _fakeConversation();
+    const conversations = new Map<string, DataAgentConversation>([
+      ["workspace-1:0", _fakeConversation()],
+      ["workspace-2:0", otherWorkspace],
+    ]);
+    const conversation = _fakeConversation();
+
+    await askConversationDataAgent({
+      conversations,
+      turn: _turn("How many?", 1),
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect([...conversations.keys()]).toEqual([
+      "workspace-2:0",
+      "workspace-1:1",
+    ]);
+  });
+
+  it("stops a run still in progress before the next turn starts", async () => {
+    let finishFirstRun: (() => void) | undefined;
+    const conversation = _fakeConversation(async (text) => {
+      if (text === "First?") {
+        conversation.results.push(
+          AgentQueryResult.create({ sql: "SELECT 1", title: "first" }),
+        );
+        await new Promise<void>((resolve) => {
+          finishFirstRun = resolve;
+        });
+        return { text: "Stopped." };
+      }
+      conversation.results.push(
+        AgentQueryResult.create({ sql: "SELECT 2", title: "second" }),
+      );
+      return { text: "Second." };
+    });
+    vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
+      finishFirstRun?.();
+    });
+    const conversations = new Map([["workspace-1:0", conversation]]);
+    const secondTurn = _turn("Second?");
+
+    const firstReply = _ask(conversations, _turn("First?"));
+    const secondReply = _ask(conversations, secondTurn);
+
+    expect((await firstReply).content).toEqual([
+      { type: "text", text: "Stopped." },
+      AgentQueryResult.toDataPart(
+        AgentQueryResult.create({ sql: "SELECT 1", title: "first" }),
+      ),
+    ]);
+    expect((await secondReply).content).toEqual([
+      { type: "text", text: "Second." },
+      AgentQueryResult.toDataPart(
+        AgentQueryResult.create({ sql: "SELECT 2", title: "second" }),
+      ),
+    ]);
+    expect(conversation.dataAgent.agent.abort).toHaveBeenCalledTimes(1);
+    expect(conversation.turnRef.current).toBe(secondTurn);
+    expect(conversation.activeAsk).toBeUndefined();
   });
 });

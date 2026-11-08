@@ -59,6 +59,15 @@ function _findDataset(
 /** Shown when neither the editor nor the saved dashboard has a name. */
 const UNTITLED_DASHBOARD_NAME = "Untitled dashboard";
 
+/** Tiles of the editor's live data, or none when they cannot be read. */
+function _extractEditorTiles(editorData: unknown): readonly AgentPageTile[] {
+  try {
+    return extractDashboardTiles(editorData);
+  } catch {
+    return [];
+  }
+}
+
 /** Tiles of a saved config, or none when it cannot be upgraded. */
 function _extractSavedTiles(config: unknown): readonly AgentPageTile[] {
   try {
@@ -105,7 +114,7 @@ async function _readDashboard(
   return {
     id: idOrSlug,
     name: editorTitle || savedName || UNTITLED_DASHBOARD_NAME,
-    tiles: extractDashboardTiles(editorData),
+    tiles: _extractEditorTiles(editorData),
   };
 }
 
