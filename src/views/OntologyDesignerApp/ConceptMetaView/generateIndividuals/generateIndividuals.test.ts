@@ -310,12 +310,12 @@ describe("generateIndividuals", () => {
     ]);
   });
 
-  it("picks a text label under max alphabetically, ignoring case and accents", async () => {
+  it("builds an accent- and case-insensitive ordering for a text label under max", async () => {
     await generateIndividuals(_makeConcept("max"));
 
     const createSql = _getRunSqlStatements()[0]!;
     expect(createSql).toContain(
-      'lower(strip_accents(dataset."full_name")) DESC',
+      `arg_max(dataset."full_name", {'k': lower(strip_accents(CAST(dataset."full_name" AS VARCHAR))), 'v': dataset."full_name"})`,
     );
   });
 

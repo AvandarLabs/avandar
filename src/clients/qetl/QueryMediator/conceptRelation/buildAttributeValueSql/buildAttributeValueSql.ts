@@ -54,22 +54,23 @@ type ValueSqlParts = {
 };
 
 /**
- * The `SELECT` that picks a text column's last or first value alphabetically.
+ * The aggregate that picks a text column's last or first value
+ * alphabetically, as `arg_max` or `arg_min`.
  *
- * The comparison key ignores case and accents (`lower(strip_accents(value))`),
- * and the row that wins gives back its original value. Values that share a key
+ * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
+ * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
+ * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
+ * a struct, which compares field by field, so values that share a key
  * ("apple" and "Apple") tie-break by the value itself in byte order, in the
- * same direction, so the pick never depends on scan order.
+ * same direction. The pick never depends on scan order, and the aggregate
+ * returns the original value.
  */
 function _buildTextExtremeSql(
-  options: Readonly<{
-    parts: ValueSqlParts;
-    direction: "ASC" | "DESC";
-  }>,
+  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
 ): string {
-  const { value, rowFilter, datasetView } = options.parts;
-  const key = `lower(strip_accents(${value}))`;
-  return `SELECT ${value} FROM ${datasetView} ${DATASET_ALIAS} WHERE ${rowFilter} ORDER BY ${key} ${options.direction}, ${value} ${options.direction} LIMIT 1`;
+  const { value, aggregate } = options;
+  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
+  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
 }
 
 /**
@@ -114,14 +115,18 @@ function _buildReducedValueSql(
       return aggregateSql(`COUNT(${value})`);
     })
     .with("max", () => {
-      return isText
-        ? _buildTextExtremeSql({ parts: options.parts, direction: "DESC" })
-        : aggregateSql(`MAX(${value})`);
+      return aggregateSql(
+        isText
+          ? _buildTextExtremeSql({ value, aggregate: "arg_max" })
+          : `MAX(${value})`,
+      );
     })
     .with("min", () => {
-      return isText
-        ? _buildTextExtremeSql({ parts: options.parts, direction: "ASC" })
-        : aggregateSql(`MIN(${value})`);
+      return aggregateSql(
+        isText
+          ? _buildTextExtremeSql({ value, aggregate: "arg_min" })
+          : `MIN(${value})`,
+      );
     })
     .exhaustive();
 }

@@ -478,22 +478,23 @@ const TYPED_SPINE = `${TYPED_VIEW}__individuals`;
  * two share the most `visits`) and has a row of NULLs, so a rule that counted
  * or compared NULL would show it. `p1` also holds four words that sort
  * differently by byte order and alphabetically ("apple", "Zebra", "Ángel",
- * "Apple"). `p2` has a NULL row, then "apple" and "Apple", which tie
- * alphabetically. `p3` has no row.
+ * "Apple"), and two UUIDs. `p2` has a NULL row, then "apple" and "Apple",
+ * which tie alphabetically, and `word_reversed` holds the same two values in
+ * the opposite order. `p3` has no row.
  */
 async function _seedTyped(connection: DuckDBConnection): Promise<void> {
   const path = join(tmpdir(), "ava-concept-typed.parquet");
   await connection.run(`
     COPY (
       SELECT * FROM (VALUES
-        ('p1', '9', 3::BIGINT, 1.5::DOUBLE, DATE '2024-03-01', TIME '08:00', TIMESTAMP '2024-03-01 08:00', 'apple'),
-        ('p1', '10', 3::BIGINT, NULL::DOUBLE, DATE '2024-03-01', TIME '17:30', TIMESTAMP '2024-03-09 17:30', 'Zebra'),
-        ('p1', NULL, NULL::BIGINT, 2.5::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Ángel'),
-        ('p1', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Apple'),
-        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, NULL),
-        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'apple'),
-        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Apple')
-      ) AS t(person_id, code, visits, weight, seen_on, seen_time, seen_at, word)
+        ('p1', '9', 3::BIGINT, 1.5::DOUBLE, DATE '2024-03-01', TIME '08:00', TIMESTAMP '2024-03-01 08:00', 'apple', NULL, UUID '00000000-0000-4000-8000-000000000001'),
+        ('p1', '10', 3::BIGINT, NULL::DOUBLE, DATE '2024-03-01', TIME '17:30', TIMESTAMP '2024-03-09 17:30', 'Zebra', NULL, UUID '00000000-0000-4000-8000-000000000002'),
+        ('p1', NULL, NULL::BIGINT, 2.5::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Ángel', NULL, NULL),
+        ('p1', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Apple', NULL, NULL),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, NULL, NULL, NULL),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'apple', 'Apple', NULL),
+        ('p2', NULL, NULL::BIGINT, NULL::DOUBLE, NULL::DATE, NULL::TIME, NULL::TIMESTAMP, 'Apple', 'apple', NULL)
+      ) AS t(person_id, code, visits, weight, seen_on, seen_time, seen_at, word, word_reversed, ref)
     ) TO '${path}' (FORMAT parquet)
   `);
   await connection.run(`
@@ -588,6 +589,24 @@ const TYPED_FIELDS: readonly TypedField[] = [
     selectColumnName: "word",
     sourceDuckDbType: "VARCHAR",
     ruleType: "min",
+  }),
+  _typedField({
+    attributeName: "first_word_reversed",
+    selectColumnName: "word_reversed",
+    sourceDuckDbType: "VARCHAR",
+    ruleType: "min",
+  }),
+  _typedField({
+    attributeName: "last_word_reversed",
+    selectColumnName: "word_reversed",
+    sourceDuckDbType: "VARCHAR",
+    ruleType: "max",
+  }),
+  _typedField({
+    attributeName: "last_ref",
+    selectColumnName: "ref",
+    sourceDuckDbType: "UUID",
+    ruleType: "max",
   }),
   _typedField({
     attributeName: "most_visits",
@@ -730,6 +749,23 @@ describe("buildConceptViewSql value rule output types", () => {
     const [, p2] = await _queryTypedView();
 
     expect([p2?.last_word, p2?.first_word]).toEqual(["apple", "Apple"]);
+  });
+
+  // The same tie with the rows in the opposite order, so a missing tie-break
+  // fails whichever row a tie returns.
+  it("breaks the tie the same way whichever tied row comes first", async () => {
+    const [, p2] = await _queryTypedView();
+
+    expect([p2?.last_word_reversed, p2?.first_word_reversed]).toEqual([
+      "apple",
+      "Apple",
+    ]);
+  });
+
+  it("compares a column that DuckDB does not store as VARCHAR, such as a UUID", async () => {
+    const [p1] = await _queryTypedView();
+
+    expect(p1?.last_ref).toBe("00000000-0000-4000-8000-000000000002");
   });
 
   it("counts the non-NULL values, and zero for a record no row matches", async () => {

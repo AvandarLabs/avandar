@@ -486,7 +486,7 @@ value.
 | --- | --- | --- |
 | `first` | Reads `ava_rows_<datasetId>`, `ORDER BY file_row_number LIMIT 1` | Total order within a parquet file |
 | `most_frequent` | `GROUP BY col ORDER BY COUNT(*) DESC, col LIMIT 1` | Ties broken by value |
-| `max`, `min` | `MAX(col)`, `MIN(col)`, in the column's own type. On a text column: `ORDER BY lower(strip_accents(col)) DESC, col DESC LIMIT 1` for `max` and `ASC` for `min`, so text compares alphabetically, ignoring case and accents, and gives back the original value. `'10' < '9'` still holds | Ties share one value. On text, values that share a key (`'apple'`, `'Apple'`) break by the value in byte order |
+| `max`, `min` | `MAX(col)`, `MIN(col)`, in the column's own type. On a text column: `arg_max(col, {'k': lower(strip_accents(CAST(col AS VARCHAR))), 'v': col})` for `max` and `arg_min` for `min`, so text compares alphabetically, ignoring case and accents, and gives back the original value. `'10' < '9'` still holds | Ties share one value. On text, values that share a key (`'apple'`, `'Apple'`) break by the value in byte order, because the struct compares field by field |
 | `count` | `COUNT(col)`, `BIGINT`. `0` when no row matches | Exact |
 | `sum`, `avg` | `CAST(<agg>(col) AS DOUBLE)` | Floating-point |
 | List (`is_array`) | Reads `ava_rows_<datasetId>`, `COALESCE(list(col ORDER BY file_row_number), [])` | Row order; `[]` when there is no value |
@@ -518,7 +518,9 @@ stores its column's type, and so does an identifier field, which always uses
 `most_frequent` because it shows the record's key as is. `sum` and `avg` are
 allowed only on `bigint` and `double` columns, and `max` and `min` on every
 type but `boolean`. The option labels say "alphabetically" for text, which
-is exact: the comparison ignores case and accents, as the table says.
+holds for accented Latin letters: the comparison ignores case and accents,
+as the table says. Letters with no accent to strip are not folded: ß, æ, ø,
+and ł keep their own place, so "Øystein" sorts after "Zebra".
 `buildAttributeValueSql` takes the column's type (`columnDataType`) to know
 when to compare that way.
 `ValuePickerRule` (`shared/models/ontology/ValuePickerRule/`) is the one
