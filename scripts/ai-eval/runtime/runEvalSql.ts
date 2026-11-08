@@ -7,6 +7,18 @@ export type EvalSqlOutcome =
   | { kind: "empty"; result: EvalQueryResult }
   | { kind: "failed"; error: string };
 
+/**
+ * Rows the eval keeps from one result. A model that returns every county's
+ * every day (millions of rows) has not answered a question, and grading
+ * that many rows takes hours.
+ */
+const MAX_RESULT_ROWS = 50_000;
+
+function _capRows(sql: string): string {
+  const statement = sql.trim().replace(/;+\s*$/, "");
+  return `SELECT * FROM (${statement}) AS eval_capped LIMIT ${MAX_RESULT_ROWS}`;
+}
+
 function _isAllNull(result: EvalQueryResult): boolean {
   return result.rows.every((row) => {
     return row.every((cell) => {
@@ -17,8 +29,9 @@ function _isAllNull(result: EvalQueryResult): boolean {
 
 /**
  * Runs SQL the way the app's query session does: the fail-closed analyzer
- * first (it blocks SQL it cannot inspect), then DuckDB. A result whose cells
- * are all empty counts as empty, as in the app.
+ * first (it blocks SQL it cannot inspect), then DuckDB, keeping at most
+ * 50,000 rows. A result whose cells are all empty counts as empty, as in the
+ * app.
  */
 export async function runEvalSql(
   database: EvalDatabase,
@@ -33,7 +46,7 @@ export async function runEvalSql(
     };
   }
   try {
-    const result = await database.query(sql);
+    const result = await database.query(_capRows(sql));
     return result.rows.length === 0 || _isAllNull(result)
       ? { kind: "empty", result }
       : { kind: "rows", result };
