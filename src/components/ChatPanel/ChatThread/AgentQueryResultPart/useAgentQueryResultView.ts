@@ -6,7 +6,7 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type { UnknownDataFrame } from "@avandar/utils";
@@ -21,7 +21,7 @@ export type AgentQueryResultView =
       rawColumns: readonly QueryResult.Column[];
       data: UnknownDataFrame;
       dateColumns: ReadonlySet<string>;
-      vizConfig: AvaVizConfig;
+      vizConfig: AvaVizConfig.T;
     };
 
 /**
