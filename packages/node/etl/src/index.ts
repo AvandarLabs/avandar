@@ -40,6 +40,11 @@ export {
 } from "@etl/EtlEngine/EtlRunOptionsError";
 export { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
 export {
+  ETL_TRANSIENT_STORE_ERROR_NAME,
+  EtlTransientStoreError,
+  isEtlTransientStoreError,
+} from "@etl/stores/EtlTransientStoreError";
+export {
   ETL_DEFAULT_SCOPE,
   ETL_SCOPE_KEY_PATTERN,
   ETL_UNLISTED_SCOPE_KEY,

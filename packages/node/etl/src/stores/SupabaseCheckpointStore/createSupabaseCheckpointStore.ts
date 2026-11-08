@@ -29,7 +29,7 @@ export function createSupabaseCheckpointStore(
   const { client, checkpointsTable } = options;
   return {
     read: async (key) => {
-      const { data, error } = await client
+      const { data, error, status } = await client
         .from(checkpointsTable)
         .select("high_water_mark")
         .eq("pipeline_name", key.pipelineName)
@@ -38,13 +38,14 @@ export function createSupabaseCheckpointStore(
         .maybeSingle();
       throwOnSupabaseError({
         error,
+        status,
         action: `reading a checkpoint from ${checkpointsTable}`,
       });
       const row = data as Readonly<{ high_water_mark: string }> | null;
       return row === null ? undefined : new Date(row.high_water_mark);
     },
     write: async (checkpoint) => {
-      const { error } = await client.from(checkpointsTable).upsert(
+      const { error, status } = await client.from(checkpointsTable).upsert(
         {
           pipeline_name: checkpoint.pipelineName,
           drive_key: checkpoint.driveKey,
@@ -56,6 +57,7 @@ export function createSupabaseCheckpointStore(
       );
       throwOnSupabaseError({
         error,
+        status,
         action: `writing a checkpoint to ${checkpointsTable}`,
       });
     },

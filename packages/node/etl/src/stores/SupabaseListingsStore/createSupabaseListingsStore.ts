@@ -114,9 +114,10 @@ async function _readChunk(args: {
           .eq("access_kind", "pipeline_parquet")
           .eq("pipeline_name", first.pipeline_name)
           .in("parquet_file_name", _uniqueValues(rows, "parquet_file_name"));
-  const { data, error } = await query;
+  const { data, error, status } = await query;
   throwOnSupabaseError({
     error,
+    status,
     action: `reading rows from ${options.listingsTable}`,
   });
   const stored = _toStoredRows(data);
@@ -172,7 +173,7 @@ async function _upsertListingsWithColumns(args: {
   }
   // One function call is one transaction, so every listing in it is stored
   // with its columns, or none is.
-  const { data, error } = await client
+  const { data, error, status } = await client
     .rpc(upsertListingsFunction, {
       p_listings: args.entries.map(({ row, columns }) => {
         return {
@@ -184,6 +185,7 @@ async function _upsertListingsWithColumns(args: {
     .select(SELECT_COLUMNS);
   throwOnSupabaseError({
     error,
+    status,
     action: `upserting listings with ${upsertListingsFunction}`,
   });
   return _toStoredRows(data);

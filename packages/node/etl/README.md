@@ -471,6 +471,17 @@ pipeline").
 | `DrivesStore` | `{ upsert(drive): Promise<string> }`: inserts a drive or replaces its labels, and resolves to its id |
 | `DriveRow` | One drive: `pipelineName`, `driveKey`, `organizationLabels` |
 | `InMemoryDrivesStore`, `StoredDriveRow`, `SupabaseDrivesStoreOptions` | The in-memory store's type, a `DriveRow` with its `id`, and the Supabase store's options |
+| `EtlTransientStoreError`, `isEtlTransientStoreError`, `ETL_TRANSIENT_STORE_ERROR_NAME` | What a store throws for a failure a later attempt can succeed at, with the response's `status` and Postgres or PostgREST `code`. The engine retries it (see "Writes"). Match it with `isEtlTransientStoreError`, which checks the `name`, when the package may be loaded more than once |
+
+**Transient failures.** The Supabase stores throw `EtlTransientStoreError`
+for no response (status 0), 408, 429, or any 5xx (Cloudflare's 520-524
+included), and for Postgres codes `57014` (statement timeout), `55P03`
+(lock timeout), `40001`, `40P01`, `53300`, `57P01` to `57P03`, any `08xxx`
+connection error, and PostgREST's `PGRST000` to `PGRST002`. Every other
+failure, such as a constraint violation or an exception a database function
+raises, throws a plain `Error` and fails the crawl at once. A gateway's HTML
+error page is reported by its title, not as the whole page. A store written
+for tests throws `EtlTransientStoreError` to simulate a database under load.
 
 **Drives.** Set `output.drivesTable` (such as `data_catalog_drives`) to
 record each crawled drive and link its listing rows to it through

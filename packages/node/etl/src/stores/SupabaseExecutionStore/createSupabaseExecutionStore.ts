@@ -39,27 +39,36 @@ export function createSupabaseExecutionStore(
   const { client, functions } = options;
   return {
     start: async (execution) => {
-      const { error } = await client.rpc(functions.start, {
+      const { error, status } = await client.rpc(functions.start, {
         p_execution: buildExecutionStartRow(execution),
       });
-      throwOnSupabaseError({ error, action: `calling ${functions.start}` });
+      throwOnSupabaseError({
+        error,
+        status,
+        action: `calling ${functions.start}`,
+      });
     },
     recordScope: async ({ executionId, scope }) => {
-      const { error } = await client.rpc(functions.recordScope, {
+      const { error, status } = await client.rpc(functions.recordScope, {
         p_execution_id: executionId,
         p_scope: buildExecutionScopeRow(scope),
       });
       throwOnSupabaseError({
         error,
+        status,
         action: `calling ${functions.recordScope}`,
       });
     },
     finish: async ({ executionId, outcome }) => {
-      const { error } = await client.rpc(functions.finish, {
+      const { error, status } = await client.rpc(functions.finish, {
         p_execution_id: executionId,
         p_outcome: buildExecutionOutcomeRow(outcome),
       });
-      throwOnSupabaseError({ error, action: `calling ${functions.finish}` });
+      throwOnSupabaseError({
+        error,
+        status,
+        action: `calling ${functions.finish}`,
+      });
     },
   };
 }
