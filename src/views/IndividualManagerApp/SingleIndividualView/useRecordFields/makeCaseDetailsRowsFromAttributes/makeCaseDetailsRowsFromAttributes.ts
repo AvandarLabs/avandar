@@ -1,7 +1,7 @@
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { CaseDetailsRow } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 
 /** What one record's rail rows are built from. */
@@ -58,11 +58,7 @@ export function makeCaseDetailsRowsFromAttributes(
     }),
   );
   return [...options.attributes]
-    .sort((left, right) => {
-      return (
-        left.name.localeCompare(right.name) || left.id.localeCompare(right.id)
-      );
-    })
+    .sort(ConceptAttribute.compareInViewOrder)
     .map((attribute) => {
       return {
         id: attribute.id,

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
@@ -39,6 +39,63 @@ describe("CaseDetailsRail", () => {
     expect(
       screen.queryByText(/[0-9a-f]{8}-[0-9a-f]{4}/),
     ).not.toBeInTheDocument();
+  });
+
+  it("names a field's source lines as its sources for assistive technology", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Borough",
+            value: "Brooklyn",
+            sourceNames: ["Lab results", "Measles line list"],
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole("list", { name: "Sources" }))
+        .getAllByRole("listitem")
+        .map((item) => {
+          return item.textContent;
+        }),
+    ).toEqual(["Lab results", "Measles line list"]);
+  });
+
+  it("lists no sources for a field that reads none", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Notes",
+            value: "Called twice",
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByRole("list", { name: "Sources" })).toBeNull();
+  });
+
+  // The rail group's label is an h4, so the failure under it is an h5.
+  it("titles the load failure below the rail group's heading", () => {
+    render(
+      <CaseDetailsRail
+        attributes={undefined}
+        loadError={{ isRetrying: false, onRetry: vi.fn() }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "This record's fields failed to load",
+        level: 5,
+      }),
+    ).toBeInTheDocument();
   });
 
   // A field with nothing to show must say so in words. Printing `null` reads

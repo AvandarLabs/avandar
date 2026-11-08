@@ -132,6 +132,21 @@ function _makeLoadedValuesResult(): unknown[] {
   ];
 }
 
+/** A mappings read that has returned one mapping of the age field. */
+function _makeLoadedMappingsResult(): unknown[] {
+  return [
+    [
+      {
+        type: "dataset_column",
+        conceptAttributeId: AGE.id,
+        datasetId: "dataset-lab-results",
+      },
+    ],
+    false,
+    _makeQueryState(false),
+  ];
+}
+
 function _renderRecordFields(): RenderHookResult<RecordFields, unknown> {
   return renderHook(() => {
     return useRecordFields({ concept: CONCEPT, individual: RECORD });
@@ -188,6 +203,31 @@ describe("useRecordFields", () => {
 
   it("shows the fields without sources when their sources fail to load", () => {
     mappingsResultRef.current = [undefined, false, _makeQueryState(true)];
+    valuesResultRef.current = _makeLoadedValuesResult();
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toEqual([
+      { id: AGE.id, name: "age", value: 41, sourceNames: [] },
+    ]);
+    expect(result.current.isLoadError).toBe(false);
+  });
+
+  // The source names would otherwise arrive after the values and shift the
+  // rail.
+  it("keeps the fields loading until the datasets their sources name arrive", () => {
+    mappingsResultRef.current = _makeLoadedMappingsResult();
+    datasetsResultRef.current = [undefined, true, _makeQueryState(false)];
+    valuesResultRef.current = _makeLoadedValuesResult();
+
+    const { result } = _renderRecordFields();
+
+    expect(result.current.rows).toBeUndefined();
+  });
+
+  it("shows the fields without source names when the datasets fail to load", () => {
+    mappingsResultRef.current = _makeLoadedMappingsResult();
+    datasetsResultRef.current = [undefined, false, _makeQueryState(true)];
     valuesResultRef.current = _makeLoadedValuesResult();
 
     const { result } = _renderRecordFields();
