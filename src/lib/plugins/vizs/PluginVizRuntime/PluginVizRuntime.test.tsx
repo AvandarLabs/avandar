@@ -208,6 +208,41 @@ describe("PluginVizRuntime.runPluginVizTransform", () => {
     ).toBe("failed");
   });
 
+  it("reports failed when reading the transform throws", () => {
+    const thrownError = new Error("hostile getter");
+    const definition: PluginVizDefinition = {
+      get transform(): never {
+        throw thrownError;
+      },
+    };
+
+    expect(_runTransform({ definition })).toEqual({
+      status: "failed",
+      error: thrownError,
+    });
+  });
+
+  it("draws the same rows it checked when the rows change on each read", () => {
+    const checkedRows = [{ region: "North", cases: 3 }];
+    let rowsReadCount = 0;
+
+    const outcome = _runTransformFunction(() => {
+      return {
+        get rows() {
+          rowsReadCount += 1;
+          return rowsReadCount === 1 ? checkedRows : [{ other: 1 }];
+        },
+        chart: {
+          kind: "bar",
+          xColumn: "region",
+          series: [{ column: "cases" }],
+        },
+      };
+    });
+
+    expect(outcome).toMatchObject({ status: "ok", rows: checkedRows });
+  });
+
   it("reports failed for a chart that has no transform", () => {
     expect(_runTransform({ definition: { Component: CaseDots } }).status).toBe(
       "failed",
@@ -310,6 +345,18 @@ describe("PluginVizRuntime.PluginVizComponentView", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     _renderComponentView({ definition: { Component: CrashingChart } });
+
+    expect(screen.getByText(ERROR_FALLBACK_TEXT)).toBeInTheDocument();
+  });
+
+  it("shows the error fallback when reading the chart component throws", () => {
+    _renderComponentView({
+      definition: {
+        get Component(): never {
+          throw new Error("hostile getter");
+        },
+      },
+    });
 
     expect(screen.getByText(ERROR_FALLBACK_TEXT)).toBeInTheDocument();
   });

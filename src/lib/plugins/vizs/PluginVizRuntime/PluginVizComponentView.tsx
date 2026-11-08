@@ -10,6 +10,17 @@ import type {
 } from "@avandar/plugin-sdk";
 import type { ReactNode } from "react";
 
+function _getComponentFromDefinition(
+  definition: PluginVizDefinition,
+): PluginVizDefinition["Component"] {
+  // Plugin code is untrusted, so reading the component can throw.
+  try {
+    return definition.Component;
+  } catch {
+    return undefined;
+  }
+}
+
 type Props = {
   definition: PluginVizDefinition;
   vizId: string;
@@ -30,9 +41,10 @@ type Props = {
 /**
  * Draws a plugin chart's component at the size of the area it fills, with
  * the plugin's strings available through `useT()`. The component renders
- * only once the area has a size, and a crash inside it shows `errorFallback`
- * without affecting the rest of the page. `PluginVizRuntime` is its only
- * importer, so it loads with the plugin chart runtime.
+ * only once the area has a size, and a crash inside it, or in reading it,
+ * shows `errorFallback` without affecting the rest of the page.
+ * `PluginVizRuntime` is its only importer, so it loads with the plugin chart
+ * runtime.
  */
 export function PluginVizComponentView({
   definition,
@@ -47,7 +59,7 @@ export function PluginVizComponentView({
   const t = useMemo(() => {
     return makePluginTranslator({ locale, messages });
   }, [locale, messages]);
-  const { Component } = definition;
+  const Component = _getComponentFromDefinition(definition);
   if (Component === undefined) {
     return errorFallback;
   }

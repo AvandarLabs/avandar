@@ -80,24 +80,24 @@ function _runPluginVizTransform(
   options: Readonly<PluginVizRunOptions>,
 ): PluginVizTransformOutcome {
   const { definition, vizId, input, messages, locale } = options;
-  if (definition.transform === undefined) {
-    return {
-      status: "failed",
-      error: new Error(`The "${vizId}" chart has no transform.`),
-    };
-  }
-  // Plugin code is untrusted, so the transform runs inside the try, and its
-  // spec and rows are checked before anything is drawn.
+  // Plugin code is untrusted, so every read of the definition and of what the
+  // transform returns runs inside the try. The rows are read once, so the
+  // rows that pass the column check are the rows that get drawn.
   try {
-    const result = definition.transform(input, {
+    const { transform } = definition;
+    if (transform === undefined) {
+      throw new Error(`The "${vizId}" chart has no transform.`);
+    }
+    const result = transform(input, {
       i18n: { t: makePluginTranslator({ locale, messages }) },
       locale,
     });
+    const { rows } = result;
     const chart = PluginChartSpecSchema.parse(result.chart);
     return {
       status: "ok",
-      ...makeUiVizConfigFromPluginChartSpec({ chart, rows: result.rows }),
-      rows: [...result.rows],
+      ...makeUiVizConfigFromPluginChartSpec({ chart, rows }),
+      rows: [...rows],
     };
   } catch (error) {
     return { status: "failed", error };
