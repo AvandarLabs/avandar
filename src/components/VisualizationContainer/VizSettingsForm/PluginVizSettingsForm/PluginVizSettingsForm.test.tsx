@@ -218,6 +218,12 @@ describe("PluginVizSettingsForm", () => {
     ).toBeInTheDocument();
   });
 
+  it("captions a segmented control with its localized label", async () => {
+    _renderForm();
+
+    expect(await screen.findByText("Interval")).toBeVisible();
+  });
+
   it("writes a segmented choice to settings", async () => {
     const onConfigChange = _renderForm();
 
@@ -268,6 +274,22 @@ describe("PluginVizSettingsForm", () => {
     _renderForm();
 
     expect(await screen.findByLabelText("Bar color")).toBeInTheDocument();
+  });
+
+  it("shows a loading status while the manifest loads", () => {
+    mocks.entries = [
+      {
+        id: EPIDEMIOLOGY_ID,
+        loadManifest: () => {
+          return new Promise(() => {});
+        },
+      },
+    ];
+    _renderForm();
+
+    expect(
+      screen.getByRole("status", { name: "Loading chart settings" }),
+    ).toBeInTheDocument();
   });
 
   it("says the settings are unavailable when the plugin is not bundled", async () => {

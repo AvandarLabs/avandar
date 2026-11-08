@@ -1,6 +1,7 @@
 import { getLocalizedTextFromManifestStrings } from "@avandar/plugin-manifest/runtime";
 import { useLingui } from "@lingui/react/macro";
-import { Stack } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
+import { Fragment } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import {
   makeControlSpecFromPluginVizSetting,
@@ -21,6 +22,58 @@ type Props = {
   settings: readonly PluginVizSetting[];
   onConfigChange: (nextConfig: AvaVizConfig.Plugin) => void;
 };
+
+type SettingControlOptions = Readonly<{
+  setting: PluginVizSetting;
+  localize: (value: string) => string;
+  fields: readonly QueryResult.ColumnWithId[];
+  config: AvaVizConfig.Plugin;
+  onConfigChange: (nextConfig: AvaVizConfig.Plugin) => void;
+}>;
+
+/**
+ * Makes the `Control` for one setting. A segmented control has no visible
+ * label of its own, so it gets its localized label as a caption above it.
+ */
+function _makeControlElementFromSetting(
+  options: SettingControlOptions,
+): ReactNode {
+  const { setting, localize, fields, config, onConfigChange } = options;
+  const label = localize(setting.label);
+  const control = (
+    <Control
+      label={label}
+      spec={makeControlSpecFromPluginVizSetting({ setting, localize })}
+      value={
+        setting.control.kind === "columnPicker"
+          ? config.columnSettings[setting.key]
+          : config.settings[setting.key]
+      }
+      fields={fields}
+      onChange={(nextValue) => {
+        onConfigChange(
+          makePluginVizConfigFromSettingValue({
+            config,
+            setting,
+            value: nextValue,
+            fields,
+          }),
+        );
+      }}
+    />
+  );
+  if (setting.control.kind !== "segmented") {
+    return control;
+  }
+  return (
+    <Stack gap={4}>
+      <Text size="sm" fw={500}>
+        {label}
+      </Text>
+      {control}
+    </Stack>
+  );
+}
 
 /**
  * One `Control` per setting a plugin chart's manifest declares, in
@@ -45,29 +98,16 @@ export function PluginVizSettingControls({
   return (
     <Stack gap="xs">
       {settings.map((setting) => {
-        const isColumnSetting = setting.control.kind === "columnPicker";
         return (
-          <Control
-            key={setting.key}
-            label={localize(setting.label)}
-            spec={makeControlSpecFromPluginVizSetting({ setting, localize })}
-            value={
-              isColumnSetting
-                ? config.columnSettings[setting.key]
-                : config.settings[setting.key]
-            }
-            fields={fields}
-            onChange={(nextValue) => {
-              onConfigChange(
-                makePluginVizConfigFromSettingValue({
-                  config,
-                  setting,
-                  value: nextValue,
-                  fields,
-                }),
-              );
-            }}
-          />
+          <Fragment key={setting.key}>
+            {_makeControlElementFromSetting({
+              setting,
+              localize,
+              fields,
+              config,
+              onConfigChange,
+            })}
+          </Fragment>
         );
       })}
     </Stack>
