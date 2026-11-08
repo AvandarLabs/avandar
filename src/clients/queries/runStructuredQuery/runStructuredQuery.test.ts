@@ -292,6 +292,42 @@ describe("runStructuredQuery", () => {
     const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
     expect(rawSql).toContain('"status"');
   });
+
+  // A field named like the record key has the view column `external_id_2`.
+  // Reading `external_id` would read every record's key instead.
+  it("reads a renamed case type field from the column the view emits for it", async () => {
+    const concept = _createConcept();
+    const [keyNamedColumn, ageColumn] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "external_id"),
+      _createConceptAttribute(concept.id, "age"),
+    ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [keyNamedColumn!, ageColumn!],
+        aggregations: {
+          [keyNamedColumn!.id]: "group_by",
+          [ageColumn!.id]: "count",
+        },
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"external_id_2" as "external_id"');
+    expect(rawSql).toContain('group by "external_id_2"');
+  });
 });
 
 /**

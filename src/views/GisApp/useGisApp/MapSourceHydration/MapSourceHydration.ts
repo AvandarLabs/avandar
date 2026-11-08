@@ -5,6 +5,7 @@ import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryCol
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 
@@ -95,6 +96,23 @@ function _getHavingColumns(query: StructuredQuery.Partial): QueryColumn.T[] {
     });
 }
 
+/**
+ * A case type's query columns, built from all of its fields at once because a
+ * field's view column depends on the other fields' names.
+ */
+function _makeConceptColumns({
+  conceptId,
+  options,
+}: {
+  conceptId: Concept.Id;
+  options: Readonly<MapSourceHydrationOptions>;
+}): QueryColumn.T[] | undefined {
+  const attributes = options.conceptAttributes?.filter(
+    propEq("conceptId", conceptId),
+  );
+  return attributes && QueryColumn.makeFromConceptAttributes(attributes);
+}
+
 function _getColumns({
   source,
   options,
@@ -106,9 +124,7 @@ function _getColumns({
     ? options.datasetColumns
         ?.filter(propEq("datasetId", source.id))
         .map(QueryColumn.makeFromDatasetColumn)
-    : options.conceptAttributes
-        ?.filter(propEq("conceptId", source.id))
-        .map(QueryColumn.makeFromConceptAttribute);
+    : _makeConceptColumns({ conceptId: source.id, options });
 }
 
 function _getQuery(options: GetQueryOptions): StructuredQuery.Partial {
@@ -141,7 +157,7 @@ function _getQuery(options: GetQueryOptions): StructuredQuery.Partial {
           candidate.baseColumn.id === column.baseColumn.id
         );
       });
-      return source ? { ...column, baseColumn: source.baseColumn } : column;
+      return source ? QueryColumn.refreshSource(column, source) : column;
     }),
   };
 }

@@ -60,4 +60,16 @@ describe("makeQueryColumnsFromConcept", () => {
 
     expect(columns.map(prop("baseColumn.name"))).toEqual(["status"]);
   });
+
+  it("reads a field named like the record key from its suffixed view column", () => {
+    const columns = makeQueryColumnsFromConcept({
+      conceptId: CONCEPT_ID,
+      attributes: [_makeAttribute("external_id")],
+    });
+
+    expect(columns.map(prop("sourceColumnName"))).toEqual([
+      "external_id_2",
+      undefined,
+    ]);
+  });
 });

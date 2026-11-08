@@ -39,7 +39,7 @@ export function makeProjectionDescriptorsFromStructuredQuery(
       ]),
       sqlExpressionKey: makeSqlExpressionKeyFromColumnExpression({
         table,
-        column: column.baseColumn.name,
+        column: QueryColumn.getSourceColumnName(column),
         aggregation,
       }),
       queryResultColumnName: QueryColumn.getDerivedColumnName({

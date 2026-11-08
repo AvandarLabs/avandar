@@ -1,6 +1,6 @@
 import { Model } from "@avandar/models";
 import { makeObject, propEq } from "@avandar/utils";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.ts";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 
@@ -103,7 +103,8 @@ export const QueryColumnReconciliation = {
    * Reconciles the columns a query selects, the `StructuredQuery.queryColumns`
    * that HAVING filters, ORDER BY, and chart bindings target. A retained
    * column keeps its ID, aggregation, and output alias and takes its refreshed
-   * `baseColumn`. Returns the columns with a matching aggregation map.
+   * `baseColumn` and source column name. Returns the columns with a matching
+   * aggregation map.
    */
   reconcileSelectedColumns: (
     options: Readonly<{
@@ -123,7 +124,7 @@ export const QueryColumnReconciliation = {
         incomingColumn,
       });
       const column = retained
-        ? { ...retained, baseColumn: incomingColumn.baseColumn }
+        ? QueryColumn.refreshSource(retained, incomingColumn)
         : incomingColumn;
       const aggregation = retained
         ? aggregations[retained.id]

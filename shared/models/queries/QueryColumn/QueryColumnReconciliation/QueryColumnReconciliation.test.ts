@@ -110,6 +110,19 @@ describe("QueryColumnReconciliation", () => {
     expect(incoming.aggregation).toBeUndefined();
   });
 
+  it("points a retained column at the view column its field reads now", () => {
+    const previous = _createColumn();
+    const incoming = { ..._createColumn(), sourceColumnName: "revenue_2" };
+    const result = QueryColumnReconciliation.reconcileSelectedColumns({
+      previous: [previous],
+      incoming: [incoming],
+      aggregations: { [previous.id]: "sum" },
+    });
+    expect(result.columns).toMatchObject([
+      { id: previous.id, sourceColumnName: "revenue_2" },
+    ]);
+  });
+
   it("keeps a new explicit projection separate when another projection already selects its source", () => {
     const previous = _createColumn();
     const additional = _createColumn();

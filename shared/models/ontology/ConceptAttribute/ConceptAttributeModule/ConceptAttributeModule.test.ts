@@ -42,3 +42,48 @@ describe("ConceptAttribute.getOutputDataType", () => {
     ).toBe("bigint");
   });
 });
+
+describe("ConceptAttribute.getViewColumnNames", () => {
+  function _names(
+    fields: ReadonlyArray<readonly [id: string, name: string]>,
+  ): Record<string, string> {
+    return Object.fromEntries(
+      ConceptAttribute.getViewColumnNames(
+        fields.map(([id, name]) => {
+          return { id: id as ConceptAttribute.Id, name };
+        }),
+      ),
+    );
+  }
+
+  it("names each field's view column after the field", () => {
+    expect(
+      _names([
+        ["b", "County"],
+        ["a", "Age"],
+      ]),
+    ).toEqual({ a: "Age", b: "County" });
+  });
+
+  it("suffixes a field named like the record key or the status", () => {
+    expect(
+      _names([
+        ["a", "external_id"],
+        ["b", "Status"],
+      ]),
+    ).toEqual({ a: "external_id_2", b: "Status_2" });
+  });
+
+  // DuckDB compares column names without case, and the view orders fields by
+  // name and then id, so the same field keeps the plain name every run.
+  it("suffixes the later of two fields whose names match without case", () => {
+    expect(
+      _names([
+        ["b", "age"],
+        ["a", "age"],
+        ["c", "REGION"],
+        ["d", "Region"],
+      ]),
+    ).toEqual({ a: "age", b: "age_2", d: "Region", c: "REGION_2" });
+  });
+});

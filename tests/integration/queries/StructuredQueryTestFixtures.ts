@@ -41,6 +41,8 @@ type MakeConceptAttributeColumnOptions = {
   name: string;
   dataType?: AvaDataType.T;
   aggregation?: QueryAggregationTypeT;
+  /** The view column the field reads when it is not the field's own name. */
+  sourceColumnName?: string;
 };
 
 type MakeQueryOptions = {
@@ -94,11 +96,11 @@ const _FIXTURE_SQL = `
   ) AS t(pop_key, population);
 
   CREATE TABLE "${_CONCEPT_TABLE_NAME}" AS SELECT * FROM (VALUES
-    ('p1', 'North', 5, 'Confirmed'),
-    ('p2', 'North', 2, 'Suspected'),
-    ('p3', 'South', 3, 'Confirmed'),
-    ('p4', 'East', 1, 'Ruled out')
-  ) AS t(external_id, region, headcount, status);
+    ('p1', 'North', 5, 'Confirmed', 'k1'),
+    ('p2', 'North', 2, 'Suspected', 'k2'),
+    ('p3', 'South', 3, 'Confirmed', 'k3'),
+    ('p4', 'East', 1, 'Ruled out', 'k4')
+  ) AS t(external_id, region, headcount, status, external_id_2);
 `;
 
 /** A dataset whose `id` is used verbatim as the FROM table name. */
@@ -154,6 +156,9 @@ function _makeConceptAttributeColumn(
       isArray: false,
     }),
     aggregation: args.aggregation,
+    ...(args.sourceColumnName === undefined
+      ? {}
+      : { sourceColumnName: args.sourceColumnName }),
   }) as unknown as QueryColumnRead;
 }
 

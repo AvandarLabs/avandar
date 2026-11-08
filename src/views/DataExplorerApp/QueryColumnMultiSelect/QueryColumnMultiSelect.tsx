@@ -10,8 +10,8 @@ import { useUncontrolled } from "@mantine/hooks";
 import { matchSorter } from "match-sorter";
 import { useMemo } from "react";
 import { uuid } from "$/lib/uuid";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useSourceColumnCatalog } from "@/views/DataExplorerApp/useSourceColumnCatalog/useSourceColumnCatalog";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { SourceColumnCatalog } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import type {
@@ -82,7 +82,7 @@ export function QueryColumnMultiSelect({
           column.baseColumn.id === selected.baseColumn.id
         );
       });
-      return source ? [{ ...selected, baseColumn: source.baseColumn }] : [];
+      return source ? [QueryColumn.refreshSource(selected, source)] : [];
     });
     const unselectedSources = catalog.columns.filter((source) => {
       return !selectedColumns.some((selected) => {

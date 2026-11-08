@@ -1,9 +1,7 @@
 import { match } from "ts-pattern";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
-import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { EXTERNAL_ID_COLUMN } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
@@ -66,21 +64,6 @@ export type ConceptAttributeColumns = {
 };
 
 /**
- * Orders attributes so two runs over unchanged metadata agree.
- *
- * By name first, because the emitted column order is by name, and by id to
- * break a tie. The tie is not hypothetical: duplicate names are exactly the
- * case `renamedColumns` exists for, and which of the two keeps the unsuffixed
- * name has to be decided the same way every run.
- */
-function _compareAttributes(
-  left: Readonly<ConceptAttribute.T>,
-  right: Readonly<ConceptAttribute.T>,
-): number {
-  return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
-}
-
-/**
  * Narrows a mapping to the dataset-column arm.
  *
  * A predicate on `type` does not narrow the union for the compiler, so this
@@ -141,7 +124,7 @@ function _getPrimaryKeyColumnNameByDatasetId(
         attribute.isIdentifier && attribute.mappingType === "dataset_column"
       );
     })
-    .sort(_compareAttributes);
+    .sort(ConceptAttribute.compareInViewOrder);
 
   const primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId = {};
   identifierAttributes.forEach((attribute) => {
@@ -373,30 +356,6 @@ function _buildAttributeColumn(
 }
 
 /**
- * Suffixes a name that an earlier attribute already took.
- *
- * `<name>_2`, `<name>_3`, and so on. The match ignores case, which is how
- * DuckDB compares column names, and `takenNames` holds lowercased names. The
- * emitted name keeps the requested casing. The order matches the order
- * `_compareAttributes` fixes, so the alphabetically first attribute id keeps
- * the plain name.
- */
-function _getUniqueColumnName(
-  options: Readonly<{ requestedName: string; takenNames: ReadonlySet<string> }>,
-): string {
-  if (!options.takenNames.has(options.requestedName.toLowerCase())) {
-    return options.requestedName;
-  }
-  let suffix = 2;
-  while (
-    options.takenNames.has(`${options.requestedName}_${suffix}`.toLowerCase())
-  ) {
-    suffix += 1;
-  }
-  return `${options.requestedName}_${suffix}`;
-}
-
-/**
  * Turns one concept's ontology rows into the columns its DuckDB view emits.
  *
  * Pure on purpose, and it is the half of the concept relation that no type can
@@ -414,21 +373,16 @@ export function makeConceptAttributeColumnsFromMetadata(
 ): ConceptAttributeColumns {
   const primaryKeyColumnNameByDatasetId =
     _getPrimaryKeyColumnNameByDatasetId(metadata);
-  const orderedAttributes = [...metadata.attributes].sort(_compareAttributes);
+  const orderedAttributes = [...metadata.attributes].sort(
+    ConceptAttribute.compareInViewOrder,
+  );
+  const viewColumnNames = ConceptAttribute.getViewColumnNames(
+    metadata.attributes,
+  );
 
   const attributeColumns: ConceptAttributeColumn[] = [];
   const contributingDatasetIds = new Set<Dataset.Id>();
   const renamedColumns: RenamedConceptAttributeColumn[] = [];
-  // Seeded with the two columns the view reads from the spine, the record key
-  // and the status, so an attribute of either name is suffixed rather than
-  // dropped and keeps a column of its own. The
-  // `concept_attributes__name_not_reserved` check keeps `status` out of the
-  // database. Nothing reserves `external_id`, a common key column name.
-  // Lowercased, because DuckDB column names are case-insensitive.
-  const takenNames = new Set<string>([
-    EXTERNAL_ID_COLUMN,
-    ConceptStatusColumn.COLUMN_NAME.toLowerCase(),
-  ]);
 
   orderedAttributes.forEach((attribute) => {
     const { column, contributingDatasetId } = _buildAttributeColumn({
@@ -439,10 +393,8 @@ export function makeConceptAttributeColumnsFromMetadata(
     if (contributingDatasetId !== undefined) {
       contributingDatasetIds.add(contributingDatasetId);
     }
-    const emittedName = _getUniqueColumnName({
-      requestedName: column.attributeName,
-      takenNames,
-    });
+    const emittedName =
+      viewColumnNames.get(attribute.id) ?? column.attributeName;
     if (emittedName !== column.attributeName) {
       renamedColumns.push({
         attributeId: attribute.id,
@@ -450,7 +402,6 @@ export function makeConceptAttributeColumnsFromMetadata(
         emittedName,
       });
     }
-    takenNames.add(emittedName.toLowerCase());
     attributeColumns.push({ ...column, attributeName: emittedName });
   });
 

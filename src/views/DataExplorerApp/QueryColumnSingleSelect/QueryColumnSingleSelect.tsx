@@ -72,11 +72,12 @@ export function QueryColumnSingleSelect({
         }
         return QueryColumnModule.makeFromDatasetColumn(col);
       }),
-      ...(conceptAttributes ?? []).map((col) => {
-        if (col.id === currentSelectedColumn?.baseColumn.id) {
-          return currentSelectedColumn;
-        }
-        return QueryColumnModule.makeFromConceptAttribute(col);
+      ...QueryColumnModule.makeFromConceptAttributes(
+        conceptAttributes ?? [],
+      ).map((column) => {
+        return column.baseColumn.id === currentSelectedColumn?.baseColumn.id
+          ? currentSelectedColumn
+          : column;
       }),
     ];
 

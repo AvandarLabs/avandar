@@ -23,5 +23,12 @@ export type QueryColumnRead = Model.Base<
      * when it names one explicitly.
      */
     outputAlias?: string;
+    /**
+     * The column the SQL reads, when it is not `baseColumn.name`: a case
+     * type field whose view column was suffixed because the record key, the
+     * status, or another field already had that name. The result column is
+     * still named after the field.
+     */
+    sourceColumnName?: string;
   }
 >;

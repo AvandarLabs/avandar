@@ -182,3 +182,35 @@ it("filters a Concept's records by status", async () => {
     { external_id: "p3" },
   ]);
 });
+
+it("reads a field named like the record key from its own view column", async () => {
+  // The view emits a field named `external_id` as `external_id_2`, because the
+  // record key already has the plain name. The query must read the suffixed
+  // column and still name its result after the field.
+  const field = _makeConceptAttributeColumn({
+    id: "qc_1_field",
+    name: "external_id",
+    aggregation: "group_by",
+    sourceColumnName: "external_id_2",
+  });
+  const records = _makeConceptAttributeColumn({
+    id: "qc_2_region",
+    name: "region",
+    aggregation: "count",
+  });
+
+  const sql = structuredQueryToSql(
+    _makeQuery({
+      dataSource: _makeConcept(),
+      columns: [field, records],
+      orderByColumn: field.id,
+      orderByDirection: "asc",
+      limit: 2,
+    }),
+  );
+
+  await expect(_runQuery(sql)).resolves.toEqual([
+    { external_id: "k1", "count(region)": 1 },
+    { external_id: "k2", "count(region)": 1 },
+  ]);
+});

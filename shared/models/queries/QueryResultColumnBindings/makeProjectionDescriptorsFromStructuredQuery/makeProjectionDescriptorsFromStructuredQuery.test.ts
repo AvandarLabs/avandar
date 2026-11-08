@@ -7,6 +7,8 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 /** Structured identity follows selected IDs and the aggregation map. */
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
+import type { Concept } from "$/models/ontology/Concept/Concept.ts";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 
 const COLUMN: QueryColumn.T = {
   ...QueryColumn.makeFromDatasetColumn(
@@ -93,5 +95,32 @@ describe("makeProjectionDescriptorsFromStructuredQuery", () => {
         dataSource: undefined,
       }),
     ).toEqual([]);
+  });
+  // The SQL reads a renamed case type field from its suffixed view column, so
+  // the descriptor's SQL key has to name that column to match the result.
+  it("keys a renamed case type field by the view column the SQL reads", () => {
+    const concept = Model.make("Concept", {
+      id: "cases",
+      name: "Cases",
+    }) as Concept.T;
+    const [column] = QueryColumn.makeFromConceptAttributes([
+      Model.make("ConceptAttribute", {
+        id: "attr_key",
+        name: "external_id",
+        dataType: "varchar",
+      }) as ConceptAttribute.T,
+    ]);
+    const query = {
+      ...StructuredQuery.makeEmpty(),
+      dataSource: concept,
+      queryColumns: [column!],
+      aggregations: {},
+    };
+    const descriptor = makeProjectionDescriptorsFromStructuredQuery(query)[0];
+    const sql = makeProjectionDescriptorsFromSql({
+      sql: 'SELECT "external_id_2" AS "external_id" FROM "concept_cases"',
+      columns: [{ name: "external_id", dataType: "varchar" }],
+    })[0];
+    expect(descriptor?.sqlExpressionKey).toBe(sql?.expressionKey);
   });
 });
