@@ -9,8 +9,8 @@ import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeColumns } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 
 /**
- * Every dataset column the given mappings name, as a value or as a date column,
- * keyed by id.
+ * Every dataset column the given mappings name, as a value or as a date
+ * column.
  */
 async function _getMappedDatasetColumns(
   mappings: readonly AttributeMapping[],

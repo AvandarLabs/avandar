@@ -179,6 +179,42 @@ function _isZonedTimestampColumn(column: DatasetColumn.T): boolean {
 }
 
 /**
+ * The date column a per-period field's mapping names, checked to exist, to
+ * belong to the dataset the mapping reads, and to be a date or timestamp.
+ * `field` names the field in each error.
+ */
+function _findBucketColumn(
+  options: Readonly<{
+    mapping: DatasetColumnMapping & { bucketColumnId: DatasetColumn.Id };
+    metadata: ConceptRelationMetadata;
+    field: string;
+  }>,
+): DatasetColumn.T {
+  const { mapping, metadata, field } = options;
+  const bucketColumn = metadata.datasetColumnsById[mapping.bucketColumnId];
+  if (!bucketColumn) {
+    throw new Error(
+      `${field} groups its rows by date column '${mapping.bucketColumnId}', ` +
+        `which does not exist.`,
+    );
+  }
+  if (bucketColumn.datasetId !== mapping.datasetId) {
+    throw new Error(
+      `${field} groups its rows by column '${bucketColumn.name}' of dataset ` +
+        `'${bucketColumn.datasetId}', not of the dataset it reads ` +
+        `('${mapping.datasetId}').`,
+    );
+  }
+  if (!ConceptAttribute.isBucketDateColumnType(bucketColumn.dataType)) {
+    throw new Error(
+      `${field} groups its rows by column '${bucketColumn.name}', which is ` +
+        `'${bucketColumn.dataType}', not a date or timestamp.`,
+    );
+  }
+  return bucketColumn;
+}
+
+/**
  * A per-period field's period and the date column it groups its rows by.
  *
  * Fails closed, like the value column: a period with no readable date column
@@ -202,37 +238,45 @@ function _buildBucket(
   if (attribute.bucketGrain === undefined) {
     throw new Error(`${field} has no period.`);
   }
-  if (mapping.bucketColumnId === undefined) {
+  const { bucketColumnId } = mapping;
+  if (bucketColumnId === undefined) {
     throw new Error(
       `${field} keeps one value per ${attribute.bucketGrain}, but its ` +
         `mapping names no date column.`,
     );
   }
-  const bucketColumn = metadata.datasetColumnsById[mapping.bucketColumnId];
-  if (!bucketColumn) {
-    throw new Error(
-      `${field} groups its rows by date column '${mapping.bucketColumnId}', ` +
-        `which does not exist.`,
-    );
-  }
-  if (bucketColumn.datasetId !== mapping.datasetId) {
-    throw new Error(
-      `${field} groups its rows by column '${bucketColumn.name}' of dataset ` +
-        `'${bucketColumn.datasetId}', not of the dataset it reads ` +
-        `('${mapping.datasetId}').`,
-    );
-  }
-  if (!ConceptAttribute.isBucketDateColumnType(bucketColumn.dataType)) {
-    throw new Error(
-      `${field} groups its rows by column '${bucketColumn.name}', which is ` +
-        `'${bucketColumn.dataType}', not a date or timestamp.`,
-    );
-  }
+  const bucketColumn = _findBucketColumn({
+    mapping: { ...mapping, bucketColumnId },
+    metadata,
+    field,
+  });
   return {
     bucketGrain: attribute.bucketGrain,
     bucketColumnName: bucketColumn.name,
     isBucketColumnZoned: _isZonedTimestampColumn(bucketColumn),
   };
+}
+
+/**
+ * Throws when a field without a period has a mapping that names a date
+ * column. A date column means something only to a per-period field;
+ * anywhere else the ontology is inconsistent, and ignoring it would hide
+ * that.
+ */
+function _assertNoStrayBucketColumn(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    valueShape: ConceptAttribute.ValueShape;
+  }>,
+): void {
+  const { attribute, mapping, valueShape } = options;
+  if (valueShape !== "bucketed_list" && mapping.bucketColumnId !== undefined) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) has no ` +
+        `period, but its mapping names date column '${mapping.bucketColumnId}'.`,
+    );
+  }
 }
 
 /**
@@ -253,14 +297,7 @@ function _getValueRule(
   const { attribute, mapping } = options;
   const ruleType = mapping.valuePickerRuleType;
   const valueShape = ConceptAttribute.getValueShape(attribute);
-  // A date column means something only to a per-period field; anywhere else
-  // the ontology is inconsistent, and ignoring it would hide that.
-  if (valueShape !== "bucketed_list" && mapping.bucketColumnId !== undefined) {
-    throw new Error(
-      `Concept attribute '${attribute.name}' (${attribute.id}) has no ` +
-        `period, but its mapping names date column '${mapping.bucketColumnId}'.`,
-    );
-  }
+  _assertNoStrayBucketColumn({ attribute, mapping, valueShape });
   return match(valueShape)
     .returnType<ConceptAttributeValueRule>()
     .with("single", () => {

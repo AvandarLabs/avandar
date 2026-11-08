@@ -2,11 +2,11 @@ import { isNullish } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { match } from "ts-pattern";
-import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFormatter/useFieldValueFormatter";
-import { RecordFieldPeriodTable } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable";
+import { RecordFieldBucketedValue } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldBucketedValue";
 import { RecordFieldValueList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -76,17 +76,12 @@ export function RecordFieldValue({
       );
     })
     .with("bucketed_list", () => {
-      const entries = ConceptAttribute.toBucketedListEntries(value);
-      // Anything else is a broken value; show it rather than fail the page.
-      if (!entries || bucketGrain === undefined) {
-        return formatValue(value);
-      }
       return (
-        <RecordFieldPeriodTable
+        <RecordFieldBucketedValue
           fieldName={fieldName}
           bucketGrain={bucketGrain}
-          valueDataType={dataType}
-          entries={entries}
+          dataType={dataType}
+          value={value}
         />
       );
     })

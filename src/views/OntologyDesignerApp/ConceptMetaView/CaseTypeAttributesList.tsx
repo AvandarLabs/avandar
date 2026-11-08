@@ -85,7 +85,6 @@ function AttributeChips({
   attribute: Attribute;
   sourceName: string | undefined;
 }): ReactNode {
-  const grainLabels = useBucketGrainLabels();
   return (
     <Group gap="xs" wrap="nowrap">
       {attribute.isIdentifier ? (
@@ -98,25 +97,7 @@ function AttributeChips({
           <Trans>Name</Trans>
         </Badge>
       ) : null}
-      {match(ConceptAttribute.getValueShape(attribute))
-        .with("single", () => {
-          return null;
-        })
-        .with("list", () => {
-          return (
-            <Badge variant="light" color="neutral" size="sm">
-              <Trans>Every value</Trans>
-            </Badge>
-          );
-        })
-        .with("bucketed_list", () => {
-          return attribute.bucketGrain ? (
-            <Badge variant="light" color="neutral" size="sm">
-              {grainLabels[attribute.bucketGrain].perPeriod}
-            </Badge>
-          ) : null;
-        })
-        .exhaustive()}
+      <ValueShapeBadge attribute={attribute} />
       {sourceName ? (
         <Text className={css.source} lineClamp={1}>
           {sourceName}
@@ -132,6 +113,34 @@ function AttributeChips({
       )}
     </Group>
   );
+}
+
+/**
+ * Says how many values a field keeps when it keeps more than one: "Every
+ * value" for a list, or its period, such as "Per month". A single value
+ * shows nothing.
+ */
+function ValueShapeBadge({ attribute }: { attribute: Attribute }): ReactNode {
+  const grainLabels = useBucketGrainLabels();
+  return match(ConceptAttribute.getValueShape(attribute))
+    .with("single", () => {
+      return null;
+    })
+    .with("list", () => {
+      return (
+        <Badge variant="light" color="neutral" size="sm">
+          <Trans>Every value</Trans>
+        </Badge>
+      );
+    })
+    .with("bucketed_list", () => {
+      return attribute.bucketGrain ? (
+        <Badge variant="light" color="neutral" size="sm">
+          {grainLabels[attribute.bucketGrain].perPeriod}
+        </Badge>
+      ) : null;
+    })
+    .exhaustive();
 }
 
 function datasetNameForAttribute(

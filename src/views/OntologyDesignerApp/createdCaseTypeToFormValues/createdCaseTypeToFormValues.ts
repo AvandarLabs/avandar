@@ -110,6 +110,26 @@ function _createMappingsFromColumn(options: {
   };
 }
 
+/**
+ * The rule a mapped field stores. An identifier shows the key itself, so it
+ * never reduces the column. Any other field's rule is replaced when the
+ * column's type does not allow it.
+ */
+function _getStoredRuleType(
+  options: Readonly<{
+    isIdentifier: boolean;
+    valuePickerRuleType: ValuePickerRule.T;
+    columnDataType: CatalogColumn["dataType"];
+  }>,
+): ValuePickerRule.T {
+  return options.isIdentifier
+    ? ValuePickerRule.DEFAULT_RULE_TYPE
+    : ValuePickerRule.toAllowedRuleType({
+        ruleType: options.valuePickerRuleType,
+        columnDataType: options.columnDataType,
+      });
+}
+
 function _makeMappedAttribute(options: {
   conceptId: ConceptId;
   name: string;
@@ -130,14 +150,7 @@ function _makeMappedAttribute(options: {
   const { valueShape } = shape;
   const bucket = shape.valueShape === "bucketed_list" ? shape : undefined;
   const columnDataType = options.column.dataType;
-  // An identifier shows the key itself, so it never reduces the column. Any
-  // other field's rule is replaced when the column's type does not allow it.
-  const ruleType = options.isIdentifier
-    ? ValuePickerRule.DEFAULT_RULE_TYPE
-    : ValuePickerRule.toAllowedRuleType({
-        ruleType: options.valuePickerRuleType,
-        columnDataType,
-      });
+  const ruleType = _getStoredRuleType({ ...options, columnDataType });
   return Model.make("ConceptAttribute", {
     id: conceptAttributeId,
     conceptId: options.conceptId,
@@ -209,6 +222,67 @@ function _makeMissingIdentifierAttributes(options: {
   });
 }
 
+/**
+ * A chat attribute's shape. A join key and the label keep one value and
+ * resolve no date column, so a bad period never drops them. Any other
+ * attribute's shape is checked against the catalog.
+ */
+function _getShapeForAttribute(
+  options: Readonly<{
+    attribute: Extract<ChatCreatedCaseAttribute, { kind: "dataset_column" }>;
+    column: CatalogColumn;
+    columns: readonly CatalogColumn[];
+    isIdentifier: boolean;
+  }>,
+): MappedAttributeShape | undefined {
+  return options.isIdentifier || options.attribute.isLabel === true
+    ? { valueShape: "single" }
+    : _getShapeFromCatalog(options);
+}
+
+/**
+ * The form field a chat attribute that reads a dataset column becomes, or
+ * none when its column, or a per-period attribute's date column, is not in
+ * the catalog.
+ */
+function _makeAttributesFromDatasetColumnAttribute(
+  options: Readonly<{
+    attribute: Extract<ChatCreatedCaseAttribute, { kind: "dataset_column" }>;
+    conceptId: ConceptId;
+    columns: readonly CatalogColumn[];
+    primaryKeyColumnIds: ReadonlySet<string>;
+  }>,
+): AttributeFormValues[] {
+  const { attribute, columns } = options;
+  const column = _findColumn(columns, attribute.columnId);
+  if (!column) {
+    return [];
+  }
+  const isIdentifier = options.primaryKeyColumnIds.has(column.id);
+  const shape = _getShapeForAttribute({
+    attribute,
+    column,
+    columns,
+    isIdentifier,
+  });
+  if (shape === undefined) {
+    return [];
+  }
+  return [
+    _makeMappedAttribute({
+      conceptId: options.conceptId,
+      name: attribute.name,
+      description: attribute.description,
+      column,
+      isIdentifier,
+      isLabel: attribute.isLabel === true,
+      shape,
+      valuePickerRuleType:
+        attribute.valuePickerRuleType ?? ValuePickerRule.DEFAULT_RULE_TYPE,
+    }),
+  ];
+}
+
 function _attributesFromCaseType(options: {
   caseType: ChatCreatedCaseType;
   conceptId: ConceptId;
@@ -229,33 +303,12 @@ function _attributesFromCaseType(options: {
         }),
       ];
     }
-    const column = _findColumn(columns, attribute.columnId);
-    if (!column) {
-      return [];
-    }
-    const isIdentifier = primaryKeyColumnIds.has(column.id);
-    // A join key and the label resolve no date column, so a bad period
-    // never drops them.
-    const shape: MappedAttributeShape | undefined =
-      isIdentifier || attribute.isLabel === true
-        ? { valueShape: "single" }
-        : _getShapeFromCatalog({ attribute, column, columns });
-    if (shape === undefined) {
-      return [];
-    }
-    return [
-      _makeMappedAttribute({
-        conceptId,
-        name: attribute.name,
-        description: attribute.description,
-        column,
-        isIdentifier,
-        isLabel: attribute.isLabel === true,
-        shape,
-        valuePickerRuleType:
-          attribute.valuePickerRuleType ?? ValuePickerRule.DEFAULT_RULE_TYPE,
-      }),
-    ];
+    return _makeAttributesFromDatasetColumnAttribute({
+      attribute,
+      conceptId,
+      columns,
+      primaryKeyColumnIds,
+    });
   });
   return [
     ..._makeMissingIdentifierAttributes({

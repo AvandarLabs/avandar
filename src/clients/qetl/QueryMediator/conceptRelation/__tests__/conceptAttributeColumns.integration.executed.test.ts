@@ -924,4 +924,35 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       return makeConceptAttributeColumnsFromMetadata(metadata);
     }).toThrow(/has no period/);
   });
+
+  it.each([
+    ["a timestamp detected with a time zone", "TIMESTAMP_TZ", true],
+    ["a column retyped to timestamp from text", "VARCHAR", false],
+  ] as const)(
+    "reads the date column's zone for %s",
+    (_label, detectedDataType, isZoned) => {
+      const visitedAt = {
+        ..._typedColumn({
+          datasetId: DATASET_A,
+          columnName: "visited_at",
+          dataType: "timestamp",
+        }),
+        detectedDataType,
+      } as DatasetColumn.T;
+
+      const { attributeColumns } = makeConceptAttributeColumnsFromMetadata(
+        _metadataWithColumns({
+          attributes: [PERSON_ID, AGE_PER_MONTH],
+          mappings: [PERSON_ID_MAPPING, _agePerMonthMapping(visitedAt)],
+          extraColumns: [visitedAt],
+        }),
+      );
+
+      expect(
+        attributeColumns.find((column) => {
+          return column.attributeId === AGE_PER_MONTH.id;
+        }),
+      ).toMatchObject({ isBucketColumnZoned: isZoned });
+    },
+  );
 });

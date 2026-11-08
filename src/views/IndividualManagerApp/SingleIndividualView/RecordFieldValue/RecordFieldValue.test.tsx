@@ -221,7 +221,7 @@ describe("RecordFieldValue", () => {
     expect(screen.queryByRole("list")).toBeNull();
   });
 
-  it("shows a per-month field as a table of months and values", () => {
+  it("shows a per-month field as a table of each month and its value", () => {
     render(
       <RecordFieldValue
         fieldName="Temperature"
@@ -233,8 +233,9 @@ describe("RecordFieldValue", () => {
     );
 
     const table = screen.getByRole("table", { name: "Temperature per month" });
-    expect(
-      within(table).getByRole("rowheader", { name: "Jan 2026" }),
-    ).toBeInTheDocument();
+    const janRow = within(table)
+      .getByRole("rowheader", { name: "Jan 2026" })
+      .closest("tr");
+    expect(within(janRow!).getByRole("cell")).toHaveTextContent("38.5");
   });
 });
