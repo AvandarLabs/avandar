@@ -70,3 +70,11 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.prelude.sql" \
   "$repo_root/supabase/migrations/20261107180000_catalog_field_mapping.sql" \
   "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.assertions.sql"
+
+# Value rule data types: replace rules a column's type does not allow with
+# most_frequent, and store each field's rule output type, even in a case type
+# that already breaks the identifier rule.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/value_rule_data_types.prelude.sql" \
+  "$repo_root/supabase/migrations/20261108031541_correct_value_rule_data_types.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/value_rule_data_types.assertions.sql"
