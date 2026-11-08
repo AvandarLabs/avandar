@@ -49,10 +49,36 @@ function _toClockTimeFromTimeValue(
 }
 
 /**
+ * A date, timestamp or time as text, or `undefined` for any other type. A date
+ * is `YYYY-MM-DD` and a timestamp is ISO with `Z`, both read in UTC. A time is
+ * `HH:MM:SS`.
+ */
+function _toTemporalText(
+  options: Readonly<{ dataType: arrow.DataType; value: unknown }>,
+): string | undefined {
+  const { dataType, value } = options;
+  if (arrow.DataType.isDate(dataType)) {
+    return new Date(value as number).toISOString().slice(0, 10);
+  }
+  if (arrow.DataType.isTimestamp(dataType)) {
+    return new Date(value as number).toISOString();
+  }
+  if (arrow.DataType.isTime(dataType)) {
+    return _toClockTimeFromTimeValue({
+      unit: dataType.unit,
+      timeValue: value as number | bigint,
+    });
+  }
+  return undefined;
+}
+
+/**
  * One element of a LIST cell. A list result column is described as text, so
  * its dates, timestamps and times become strings rather than epoch numbers that
- * nothing downstream could tell from a count. Any other element goes through
- * the same conversion as a top-level cell.
+ * nothing downstream could tell from a count. This holds at every depth inside
+ * the element: a date in a struct in a list, such as a per-period field's
+ * `bucket`, is a `YYYY-MM-DD` string. Any other element goes through the same
+ * conversion as a top-level cell.
  */
 function _toJsListItem(
   options: Readonly<{ itemType: arrow.DataType; item: unknown }>,
@@ -61,29 +87,23 @@ function _toJsListItem(
   if (item === null || item === undefined) {
     return null;
   }
-  if (arrow.DataType.isDate(itemType)) {
-    return new Date(item as number).toISOString().slice(0, 10);
-  }
-  if (arrow.DataType.isTimestamp(itemType)) {
-    return new Date(item as number).toISOString();
-  }
-  if (arrow.DataType.isTime(itemType)) {
-    return _toClockTimeFromTimeValue({
-      unit: itemType.unit,
-      timeValue: item as number | bigint,
-    });
-  }
-  return _toJsValueFromArrowValue(item, itemType);
+  return (
+    _toTemporalText({ dataType: itemType, value: item }) ??
+    _toJsValueFromArrowValue(item, itemType, { isInsideList: true })
+  );
 }
 
 /**
  * Converts one Arrow cell to a plain JavaScript value. `dataType` is the
  * cell's Arrow type, which a decimal needs: it is stored as an unscaled
  * integer, so `2.25` in a `DECIMAL(4,2)` is `225` until the scale is applied.
+ * `isInsideList` is set for a value within a LIST element, where dates,
+ * timestamps and times become text.
  */
 function _toJsValueFromArrowValue(
   value: unknown,
   dataType?: arrow.DataType,
+  { isInsideList = false }: Readonly<{ isInsideList?: boolean }> = {},
 ): unknown {
   if (typeof value === "bigint") {
     return Number(value);
@@ -105,9 +125,12 @@ function _toJsValueFromArrowValue(
     );
     return Object.fromEntries(
       Object.entries(value.toJSON()).map(([fieldName, fieldValue]) => {
+        const fieldType = fieldTypes.get(fieldName);
         return [
           fieldName,
-          _toJsValueFromArrowValue(fieldValue, fieldTypes.get(fieldName)),
+          isInsideList && fieldType !== undefined
+            ? _toJsListItem({ itemType: fieldType, item: fieldValue })
+            : _toJsValueFromArrowValue(fieldValue, fieldType),
         ];
       }),
     );

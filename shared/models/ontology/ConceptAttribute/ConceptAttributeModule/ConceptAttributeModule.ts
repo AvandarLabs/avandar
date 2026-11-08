@@ -1,15 +1,57 @@
-import { registry } from "@avandar/utils";
+import { isDefined, registry } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { ConceptModule } from "$/models/ontology/Concept/ConceptModule.ts";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type {
+  ConceptAttributeBucketedListEntry,
   ConceptAttributeBucketGrain,
   ConceptAttributeId,
   ConceptAttributeModel,
   ConceptAttributeValueShape,
   ConceptAttributeViewColumn,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
+
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * A period's first day as `YYYY-MM-DD`, read in UTC, or `undefined` for a
+ * value that is not a date. A DuckDB `DATE` that arrives as a number is epoch
+ * milliseconds at UTC midnight, so reading it in local time would move it a
+ * day back for anyone west of UTC.
+ */
+function _toBucketDate(bucket: unknown): string | undefined {
+  if (typeof bucket === "string") {
+    return ISO_DATE_PATTERN.test(bucket) ? bucket : undefined;
+  }
+  const epochMilliseconds =
+    bucket instanceof Date
+      ? bucket.getTime()
+      : typeof bucket === "number"
+        ? bucket
+        : Number.NaN;
+  return Number.isFinite(epochMilliseconds)
+    ? new Date(epochMilliseconds).toISOString().slice(0, 10)
+    : undefined;
+}
+
+/** One `{ bucket, value }` struct, or `undefined` for anything else. */
+function _toBucketedListEntry(
+  item: unknown,
+): ConceptAttributeBucketedListEntry | undefined {
+  if (typeof item !== "object" || item === null || Array.isArray(item)) {
+    return undefined;
+  }
+  if (
+    Object.keys(item).length !== 2 ||
+    !("bucket" in item) ||
+    !("value" in item)
+  ) {
+    return undefined;
+  }
+  const bucket = _toBucketDate(item.bucket);
+  return bucket === undefined ? undefined : { bucket, value: item.value };
+}
 
 function _valueShapeToIsArray(valueShape: ConceptAttributeValueShape): boolean {
   return match(valueShape)
@@ -137,6 +179,36 @@ export const ConceptAttributeModule = {
     "quarter",
     "year",
   ),
+
+  /**
+   * Whether a dataset column of this type can place rows in a period. Used
+   * by the pickers that offer a date column and by the concept view's column
+   * resolution. A `time` column has no calendar date, so it is refused, even
+   * though `AvaDataType.isDateOrTimestamp` accepts it.
+   */
+  isBucketDateColumnType: (dataType: AvaDataType.T): boolean => {
+    return dataType === "date" || dataType === "timestamp";
+  },
+
+  /**
+   * Reads a per-period field's value as a reader received it from DuckDB: a
+   * list of `{ bucket, value }` structs. Returns the entries in the order
+   * given (the view orders them by period), or `undefined` for a value of any
+   * other shape, so a caller can fall back to plain text. A bucket may be a
+   * `YYYY-MM-DD` string (as the query result reader returns it), a `Date`, or
+   * epoch milliseconds, and always comes back as `YYYY-MM-DD` in UTC. For
+   * example, the record page renders the entries as a table, and the Data
+   * Explorer grid as one line of text.
+   */
+  toBucketedListEntries: (
+    value: unknown,
+  ): ConceptAttributeBucketedListEntry[] | undefined => {
+    if (!Array.isArray(value)) {
+      return undefined;
+    }
+    const entries = value.map(_toBucketedListEntry);
+    return entries.every(isDefined) ? entries : undefined;
+  },
 
   /** A field's value shape, read from its stored columns. */
   getValueShape: (

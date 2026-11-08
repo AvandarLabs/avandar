@@ -65,27 +65,99 @@ describe("arrowTableToJS", () => {
     ]);
   });
 
-  it("returns a struct inside a list with each field converted as at top level", () => {
-    const bucketDate = new Date("2026-01-05");
+  // A per-period field's value is a list of `{ bucket, value }` structs. The
+  // bucket is a calendar day, so it must not arrive as an epoch number that a
+  // reader would have to read in the right time zone.
+  it("returns a date inside a struct inside a list as a calendar day", () => {
     const struct = new arrow.Struct([
       new arrow.Field("bucket", new arrow.DateDay(), true),
       new arrow.Field("value", new arrow.Int64(), true),
     ]);
     const series = arrow.vectorFromArray(
-      [[{ bucket: bucketDate, value: 3n }]],
+      [
+        [
+          { bucket: new Date("2026-01-05"), value: 3n },
+          { bucket: new Date("2026-02-01"), value: null },
+        ],
+      ],
       new arrow.List(new arrow.Field("item", struct, true)),
     );
-    const topLevelBucket = arrow.vectorFromArray(
-      [bucketDate],
-      new arrow.DateDay(),
+
+    expect(
+      arrowTableToJS(createTableFromColumn("series", series)).data,
+    ).toEqual([
+      {
+        series: [
+          { bucket: "2026-01-05", value: 3 },
+          { bucket: "2026-02-01", value: null },
+        ],
+      },
+    ]);
+  });
+
+  it("returns a NULL date inside a struct inside a list as null", () => {
+    const struct = new arrow.Struct([
+      new arrow.Field("bucket", new arrow.DateDay(), true),
+      new arrow.Field("value", new arrow.Utf8(), true),
+    ]);
+    const series = arrow.vectorFromArray(
+      [[{ bucket: null, value: "East" }]],
+      new arrow.List(new arrow.Field("item", struct, true)),
     );
 
-    const [row] = arrowTableToJS(createTableFromColumn("series", series)).data;
-    const [topLevelRow] = arrowTableToJS(
-      createTableFromColumn("bucket", topLevelBucket),
-    ).data;
+    expect(
+      arrowTableToJS(createTableFromColumn("series", series)).data,
+    ).toEqual([{ series: [{ bucket: null, value: "East" }] }]);
+  });
 
-    expect(row?.series).toEqual([{ bucket: topLevelRow?.bucket, value: 3 }]);
+  it("returns a decimal value inside a struct inside a list with its scale applied", () => {
+    const decimalType = new arrow.Decimal(2, 4, 128);
+    const structType = new arrow.Struct([
+      new arrow.Field("bucket", new arrow.DateDay(), true),
+      new arrow.Field("value", decimalType, true),
+    ]);
+    const structData = arrow.makeData({
+      type: structType,
+      length: 1,
+      nullCount: 0,
+      children: [
+        arrow.vectorFromArray([new Date("2026-01-05")], new arrow.DateDay())
+          .data[0]!,
+        arrow.makeData({
+          type: decimalType,
+          length: 1,
+          nullCount: 0,
+          data: new Uint32Array([225, 0, 0, 0]),
+        }),
+      ],
+    });
+    const series = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.List(new arrow.Field("item", structType, true)),
+        length: 1,
+        nullCount: 0,
+        valueOffsets: new Int32Array([0, 1]),
+        child: structData,
+      }),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("series", series)).data,
+    ).toEqual([{ series: [{ bucket: "2026-01-05", value: 2.25 }] }]);
+  });
+
+  it("leaves a date inside a top-level struct as an epoch number", () => {
+    const struct = new arrow.Struct([
+      new arrow.Field("openedOn", new arrow.DateDay(), true),
+    ]);
+    const summary = arrow.vectorFromArray(
+      [{ openedOn: new Date("2026-01-05") }],
+      struct,
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("summary", summary)).data,
+    ).toEqual([{ summary: { openedOn: Date.UTC(2026, 0, 5) } }]);
   });
 
   it("returns a list field of a struct as a plain array", () => {

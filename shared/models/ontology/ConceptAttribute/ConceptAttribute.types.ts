@@ -17,6 +17,16 @@ export type ConceptAttributeId = UUID<"ConceptAttribute">;
 export type ConceptAttributeBucketGrain =
   Enums<"concept_attributes__bucket_grain">;
 
+/**
+ * One period of a per-period field's value, as a reader displays it.
+ * `bucket` is the period's first day as `YYYY-MM-DD`. `value` is the field's
+ * rule applied to that period's rows.
+ */
+export type ConceptAttributeBucketedListEntry = {
+  bucket: string;
+  value: unknown;
+};
+
 type ConceptAttributeRead = Model.Base<
   "ConceptAttribute",
   {

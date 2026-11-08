@@ -4,6 +4,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 
 describe("ConceptAttribute.getValueShape", () => {
   it("reads a field that keeps every value as a list and any other as one value", () => {
@@ -147,5 +148,73 @@ describe("ConceptAttribute.getViewColumnNames", () => {
       columnName: "external_id_3",
       resultName: "external_id_3",
     });
+  });
+});
+
+describe("isBucketDateColumnType", () => {
+  it("accepts date and timestamp columns and refuses a time of day", () => {
+    const dataTypes: AvaDataType.T[] = [
+      "date",
+      "timestamp",
+      "time",
+      "varchar",
+      "bigint",
+    ];
+
+    expect(
+      dataTypes.map((dataType) => {
+        return ConceptAttribute.isBucketDateColumnType(dataType);
+      }),
+    ).toEqual([true, true, false, false, false]);
+  });
+});
+
+describe("toBucketedListEntries", () => {
+  // A DuckDB DATE reaches the browser as epoch milliseconds at UTC midnight.
+  it("reads epoch milliseconds as the UTC calendar date", () => {
+    expect(
+      ConceptAttribute.toBucketedListEntries([
+        { bucket: Date.UTC(2026, 0, 1), value: 38.5 },
+      ]),
+    ).toEqual([{ bucket: "2026-01-01", value: 38.5 }]);
+  });
+
+  it("reads a Date bucket and keeps a YYYY-MM-DD bucket as it is", () => {
+    expect(
+      ConceptAttribute.toBucketedListEntries([
+        { bucket: new Date(Date.UTC(2026, 1, 1)), value: 1 },
+        { bucket: "2026-03-01", value: 2 },
+      ]),
+    ).toEqual([
+      { bucket: "2026-02-01", value: 1 },
+      { bucket: "2026-03-01", value: 2 },
+    ]);
+  });
+
+  it("keeps each value untouched, NULL included", () => {
+    expect(
+      ConceptAttribute.toBucketedListEntries([
+        { bucket: "2026-01-01", value: null },
+        { bucket: "2026-02-01", value: "East" },
+      ]),
+    ).toEqual([
+      { bucket: "2026-01-01", value: null },
+      { bucket: "2026-02-01", value: "East" },
+    ]);
+  });
+
+  it("reads an empty list as no periods", () => {
+    expect(ConceptAttribute.toBucketedListEntries([])).toEqual([]);
+  });
+
+  it.each([
+    ["no value", null],
+    ["text", "2026-01-01"],
+    ["a list of numbers", [1, 2]],
+    ["an entry without a value", [{ bucket: "2026-01-01" }]],
+    ["an entry with an extra key", [{ bucket: "2026-01-01", value: 1, n: 2 }]],
+    ["a bucket that is not a date", [{ bucket: "January", value: 1 }]],
+  ])("refuses %s", (_label, value) => {
+    expect(ConceptAttribute.toBucketedListEntries(value)).toBeUndefined();
   });
 });
