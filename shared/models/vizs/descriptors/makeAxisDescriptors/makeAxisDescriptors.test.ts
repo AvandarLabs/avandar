@@ -91,9 +91,10 @@ describe("makeAxisDescriptors", () => {
 });
 
 describe("descriptor registry field order", () => {
-  it("bar leads with layout, legend, then the axes and grid", () => {
+  it("bar leads with layout, bar gap, legend, then the axes and grid", () => {
     expect(_keysOf(AvaVizConfigs.getDescriptors("bar").chart)).toEqual([
       "layout",
+      "barGap",
       "withLegend",
       "chartStyle.legend.position",
       "chartStyle.xAxis.label",

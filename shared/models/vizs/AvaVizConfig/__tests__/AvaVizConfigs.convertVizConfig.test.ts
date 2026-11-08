@@ -49,6 +49,7 @@ const FIXTURES: { [K in BuiltInVizType]: AvaVizConfigType<K> } = {
       },
     ],
     layout: "stack",
+    barGap: "none",
     withLegend: false,
     chartStyle: CHART_STYLE,
   },
@@ -161,7 +162,7 @@ const OPTIONAL_KEYS: {
   [K in BuiltInVizType]: ReadonlyArray<keyof AvaVizConfigType<K>>;
 } = {
   table: [],
-  bar: ["chartStyle"],
+  bar: ["barGap", "chartStyle"],
   line: ["chartStyle"],
   area: ["chartStyle"],
   scatter: ["chartStyle"],
@@ -283,6 +284,18 @@ describe("AvaVizConfigs.convertVizConfig layout mapping", () => {
       "bar",
     );
     expect(result.layout).toBe(AvaVizConfigs.makeEmptyConfig("bar").layout);
+  });
+});
+
+describe("AvaVizConfigs.convertVizConfig bar gap", () => {
+  it("keeps barGap when a bar chart stays a bar chart", () => {
+    const result = AvaVizConfigs.convertVizConfig(FIXTURES.bar, "bar");
+    expect(result.barGap).toBe("none");
+  });
+
+  it("drops barGap when a bar chart becomes a line chart", () => {
+    const result = AvaVizConfigs.convertVizConfig(FIXTURES.bar, "line");
+    expect(result).not.toHaveProperty("barGap");
   });
 });
 

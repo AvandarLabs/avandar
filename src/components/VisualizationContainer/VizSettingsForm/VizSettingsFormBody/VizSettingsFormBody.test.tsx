@@ -97,6 +97,15 @@ describe("VizSettingsFormBody: bar chart smoke test", () => {
     renderForm({ vizConfig: baseConfig });
     expect(screen.getByText(/Grouped/i)).toBeInTheDocument();
   });
+
+  it("sets barGap to none when the None bar gap option is picked", () => {
+    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
+    fireEvent.click(screen.getByRole("radio", { name: "None" }));
+    expect(onVizConfigChange).toHaveBeenCalledWith({
+      ...baseConfig,
+      barGap: "none",
+    });
+  });
 });
 
 describe("VizSettingsFormBody: line chart smoke test", () => {

@@ -35,6 +35,11 @@ const BAR_LAYOUT_OPTIONS = [
   { value: "percent", label: "100% stacked" },
 ] as const;
 
+const BAR_GAP_OPTIONS = [
+  { value: "default", label: "Default" },
+  { value: "none", label: "None" },
+] as const;
+
 const descriptors: VizSettingDescriptors<AvaBarChartVizConfig, AvaBarSeries> = {
   chart: [
     {
@@ -42,6 +47,12 @@ const descriptors: VizSettingDescriptors<AvaBarChartVizConfig, AvaBarSeries> = {
       label: "Bar layout",
       group: "Layout",
       control: { kind: "segmented", options: BAR_LAYOUT_OPTIONS },
+    },
+    {
+      key: "barGap",
+      label: "Bar gap",
+      group: "Style",
+      control: { kind: "segmented", options: BAR_GAP_OPTIONS },
     },
     {
       key: "withLegend",

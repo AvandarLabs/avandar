@@ -153,6 +153,7 @@ function _renderBarChart(
           xAxisKey={validConfig.xAxisKey}
           series={config.series}
           layout={config.layout}
+          barGap={config.barGap}
           withLegend={config.withLegend}
           chartStyle={config.chartStyle}
         />

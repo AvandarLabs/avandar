@@ -24,6 +24,7 @@ vi.mock("@/lib/ui/viz/BarChart/BarChart", () => {
       xAxisKey?: string;
       series?: ReadonlyArray<{ key: string }>;
       data: UnknownDataFrame;
+      barGap?: string;
     }) => {
       return (
         <div
@@ -31,6 +32,7 @@ vi.mock("@/lib/ui/viz/BarChart/BarChart", () => {
           data-x={props.xAxisKey}
           data-y={props.series?.[0]?.key}
           data-row-count={props.data.length}
+          data-bar-gap={props.barGap}
         />
       );
     },
@@ -63,6 +65,28 @@ describe("UiVizConfigRenderer", () => {
     const bar = screen.getByTestId("bar-chart");
     expect(bar).toHaveAttribute("data-x", "week");
     expect(bar).toHaveAttribute("data-y", "cases");
+  });
+
+  it("passes the config's bar gap to the bar chart", () => {
+    render(
+      <UiVizConfigRenderer
+        uiVizConfig={{
+          vizType: "bar",
+          xAxisKey: "week",
+          series: [{ renderAs: "bar", key: "cases" }],
+          layout: "stack",
+          barGap: "none",
+          withLegend: false,
+        }}
+        data={DATA}
+        dateColumns={NO_DATE_COLUMNS}
+        columnNames={["week", "cases"]}
+      />,
+    );
+    expect(screen.getByTestId("bar-chart")).toHaveAttribute(
+      "data-bar-gap",
+      "none",
+    );
   });
 
   it("lists the given column names in the table view", () => {

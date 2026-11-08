@@ -6,6 +6,7 @@ type UiVizConfigBar = {
   xAxisKey: string | undefined;
   series: XYSeries[];
   layout: "group" | "stack" | "percent";
+  barGap?: "default" | "none";
   withLegend: boolean;
   chartStyle?: ChartStyle;
 };
