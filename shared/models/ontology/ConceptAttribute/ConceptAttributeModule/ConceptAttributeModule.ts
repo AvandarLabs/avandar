@@ -1,7 +1,6 @@
 import { match } from "ts-pattern";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import type { ValuePickerRuleType } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types.ts";
 import type {
   ConceptAttributeModel,
   ConceptAttributeValueShape,
@@ -21,7 +20,7 @@ function _valueShapeToIsArray(valueShape: ConceptAttributeValueShape): boolean {
 function _getOutputDataType(
   options: Readonly<{
     valueShape: ConceptAttributeValueShape;
-    ruleType: ValuePickerRuleType;
+    ruleType: ValuePickerRule.T;
     columnDataType: AvaDataType.T;
   }>,
 ): AvaDataType.T {
