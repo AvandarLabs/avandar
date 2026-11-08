@@ -12,5 +12,8 @@
   "modal.notAvailable": "Not available",
   "modal.truncated": "Fitted on the first {count, plural, one {# row} other {# rows}} of the result.",
   "modal.notEnoughData": "Pick two different numeric columns with at least two rows where X varies.",
-  "modal.failed": "Could not read the result: {message}"
+  "modal.failed": "Could not read the result: {message}",
+  "viz.epicurve.cases": "Cases",
+  "viz.epicurve.other": "Other",
+  "viz.epicurve.unknown": "Unknown"
 }
