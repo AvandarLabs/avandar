@@ -1516,6 +1516,7 @@ added to a workspace and load from Storage instead of the source.
 | `d74b62ca8` | docs: record the paged ODC copy design and add the pipeline server Fly runbook | All of it. |
 | `5685fb84c` | chore: keep env files and installed modules out of Docker build contexts | All of it. |
 | `d3dd08b56` | fix(pipeline-server): make the Docker image start and run DuckDB | All of it. |
+| `513873f61` | fix(pipeline-server): hoist DuckDB in the image, and fail the build if it cannot resolve | All of it. Merged in `7e428d400`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
