@@ -41,6 +41,9 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D31 | Today's chat answers with Claude Haiku 5.5 | Done |
 | D32 | The PDF table assistant gets its own route, measured by its own eval | Done |
 | D33 | The plan to the full Avandar agent | Approved |
+| D34 | Phase 1 is reshaped: the agent is not page-specific | Approved |
+| D35 | One agent with a general host; the page travels in each turn | Approved |
+| D36 | Results outside the Data Explorer show in the chat | Approved |
 
 ---
 
@@ -537,4 +540,62 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **The bar stays:** each area's eval exists before it ships, and the new
   setup loses no accuracy against what it replaces, invents nothing, and
   uses the cheapest model that passes.
+
+## D34. Phase 1 is reshaped: the agent is not page-specific (approved)
+
+- **Decision (Pablo, 2026-11-08).** While speccing "dashboards in the
+  agent", Pablo set four rules for Phase 1 and everything after it
+  ([specs/phase-1.md](specs/phase-1.md)): the agent is not page-specific
+  (R1); the current page is always in context (R2); the agent never changes
+  the user's page, and results show in the chat as gadget links or embeds
+  (R3); every AI entry point in the app opens a new session in the AI chat
+  panel (R4).
+- **What it changes.** Phase 1 becomes six sub-projects, each with its own
+  spec, plan, and implementation: 1A page-agnostic agent, 1B attachable
+  context (`@` mentions and a context picker), 1C multiple chats and an
+  archive, 1D dashboard actions from anywhere, 1E "Try again", 1F the
+  browser test and on by default. Roadmap 2.4 (the general host) moves into
+  1A.
+- **Why R4.** All AI work happens in one place, while entry points can sit
+  wherever users look for them (the case manager's "add new case", a future
+  question box in the data catalog), and starting one never loses the
+  session the user already had.
+- **Added to the roadmap.** Chat history in the database (F4; 1C keeps it in
+  the browser for now) and chat session limits for free and basic accounts
+  (F5).
+- **Case manager.** Until 1C its chat keeps running on today's `chat`
+  function. After 1C it opens as a new session in the main panel, still
+  answered by today's case-manager chat until Phase 3.5.
+
+## D35. One agent with a general host; the page travels in each turn (approved)
+
+- **Decision (Pablo, 2026-11-08).** One agent answers on every page. Each
+  turn's message begins with a short block describing the current page
+  (`buildAgentPageContextBlock`, shared by the browser and the eval). The
+  browser host decides where a query's result goes.
+- **Why.** The system prompt stays identical on every page, so it stays
+  cached (D19's reasoning), and there is one agent and one eval to maintain.
+- **Alternatives.** One agent per page type (contradicts R1; an eval per
+  page type). Page context in the proxy's system prompt (breaks the cache on
+  every navigation; the proxy would still trust client-built context).
+- **Privacy.** The block carries metadata, the explorer's current SQL (as
+  today's chat already sends), and up to 12 visible dashboard tiles' titles,
+  chart types, and SQL (cut at 1,500 characters each). Never rows, and never
+  a case's field values.
+- **Costs.** The block is uncached input on every turn; the 1A eval reports
+  the change in cost per question.
+
+## D36. Results outside the Data Explorer show in the chat (approved)
+
+- **Decision (Pablo, 2026-11-08).** Following R3, a query the agent runs
+  from any page other than the Data Explorer shows in the chat as a result
+  part drawn with the gadget visuals: an embed card with a live body, or an
+  inline chip that opens it in the Data Explorer. On the Data Explorer,
+  results keep going to the explorer.
+- **What is stored.** The part keeps the SQL, chart type, title, and
+  dataset ids, never rows; it re-runs in DuckDB-Wasm when shown.
+- **Why not a gadget type.** A query result has no table to reference
+  (saved queries are "not gadgets yet" in
+  [gadgets.md](../measles-demo/gadgets.md)), so it is a chat content part
+  that reuses the gadget chip and card instead of a new `Gadget.Type`.
 
