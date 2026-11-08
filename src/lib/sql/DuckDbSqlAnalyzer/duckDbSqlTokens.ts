@@ -1,4 +1,4 @@
-import { isDefined, propEq } from "@avandar/utils";
+import { isDefined } from "@avandar/utils";
 import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
 type KeywordIndexOptions = {
@@ -50,6 +50,19 @@ export function getSqlTokens(sql: string): SqlToken[] {
     .filter(isDefined);
 }
 
+/**
+ * Returns whether a token is the structural symbol `value`. A string or quoted
+ * name with the same text, such as `'('` or `"("`, is not a symbol, so it does
+ * not open a parenthesis or end a statement.
+ */
+export function isSymbolToken(
+  options: Readonly<{ token: SqlToken | undefined; value: string }>,
+): boolean {
+  return (
+    options.token?.kind === "symbol" && options.token.value === options.value
+  );
+}
+
 /** Returns whether an unquoted identifier token is one of `keywords`. */
 export function isKeywordToken(
   options: Readonly<{
@@ -70,11 +83,11 @@ export function isKeywordToken(
 export function getParenthesisDepths(tokens: readonly SqlToken[]): number[] {
   let depth = 0;
   return tokens.map((token) => {
-    if (token.value === ")") {
+    if (isSymbolToken({ token, value: ")" })) {
       depth -= 1;
     }
     const tokenDepth = depth;
-    if (token.value === "(") {
+    if (isSymbolToken({ token, value: "(" })) {
       depth += 1;
     }
     return tokenDepth;
@@ -91,9 +104,9 @@ export function getClosingParenthesisIndex(
     if (index < openingIndex) {
       return false;
     }
-    if (token.value === "(") {
+    if (isSymbolToken({ token, value: "(" })) {
       depth += 1;
-    } else if (token.value === ")") {
+    } else if (isSymbolToken({ token, value: ")" })) {
       depth -= 1;
     }
     return depth === 0;
@@ -107,7 +120,7 @@ export function getStatementEndIndex(
 ): number {
   const { statementIndex, tokens } = options;
   const relativeEndIndex = tokens.slice(statementIndex).findIndex((token) => {
-    return token.value === ";";
+    return isSymbolToken({ token, value: ";" });
   });
   return relativeEndIndex === -1
     ? tokens.length
@@ -139,7 +152,11 @@ export function hasInvalidTokenStructure(tokens: readonly SqlToken[]): boolean {
     depths.some((depth) => {
       return depth < 0;
     }) ||
-    tokens.filter(propEq("value", "(")).length !==
-      tokens.filter(propEq("value", ")")).length
+    tokens.filter((token) => {
+      return isSymbolToken({ token, value: "(" });
+    }).length !==
+      tokens.filter((token) => {
+        return isSymbolToken({ token, value: ")" });
+      }).length
   );
 }

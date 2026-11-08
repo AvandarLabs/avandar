@@ -1,4 +1,5 @@
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
+import { isSymbolToken } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
 import type {
   IdentifierParts,
   SqlToken,
@@ -38,7 +39,7 @@ function _getRemainingIdentifierParts(
   const { endIndex, tokens } = options;
   const identifierToken = tokens[endIndex + 2];
   if (
-    tokens[endIndex + 1]?.value !== "." ||
+    !isSymbolToken({ token: tokens[endIndex + 1], value: "." }) ||
     identifierToken?.kind !== "identifier"
   ) {
     return { endIndex, parts: [] };

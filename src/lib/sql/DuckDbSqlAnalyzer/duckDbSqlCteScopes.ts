@@ -2,6 +2,7 @@ import {
   getClosingParenthesisIndex,
   getParenthesisDepths,
   isKeywordToken,
+  isSymbolToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
 import type {
   CteAlias,
@@ -12,7 +13,7 @@ function _getIndexAfterCteColumns(
   options: Readonly<{ tokens: readonly SqlToken[]; aliasIndex: number }>,
 ): number | undefined {
   const { aliasIndex, tokens } = options;
-  if (tokens[aliasIndex + 1]?.value !== "(") {
+  if (!isSymbolToken({ token: tokens[aliasIndex + 1], value: "(" })) {
     return aliasIndex + 1;
   }
   const closingIndex = getClosingParenthesisIndex({
@@ -49,7 +50,9 @@ function _getCteBodyOpeningIndex(
   if (isKeywordToken({ token: tokens[index], keywords: "MATERIALIZED" })) {
     index += 1;
   }
-  return tokens[index]?.value === "(" ? index : undefined;
+  return isSymbolToken({ token: tokens[index], value: "(" })
+    ? index
+    : undefined;
 }
 
 /**
@@ -58,7 +61,8 @@ function _getCteBodyOpeningIndex(
  * A plain CTE does not see itself: a read of its own name inside the body is a
  * read of the real table of that name. A recursive CTE sees itself only from
  * the last top-level `UNION` of its body, because the terms before it are the
- * base and read the real table too.
+ * base and read the real table too. When an `EXCEPT` or `INTERSECT` follows
+ * that `UNION`, DuckDB does not run it recursively, so it sees no name at all.
  */
 function _getOwnNameScopeStart(
   options: Readonly<{
@@ -74,15 +78,28 @@ function _getOwnNameScopeStart(
     return bodyClosingIndex + 1;
   }
   const bodyDepth = (depths[bodyOpeningIndex] ?? 0) + 1;
-  const lastUnionIndex = tokens.findLastIndex((token, index) => {
-    return (
-      index > bodyOpeningIndex &&
+  const topLevelIndexes = tokens.flatMap((token, index) => {
+    return index > bodyOpeningIndex &&
       index < bodyClosingIndex &&
-      depths[index] === bodyDepth &&
-      isKeywordToken({ token, keywords: "UNION" })
+      depths[index] === bodyDepth
+      ? [{ index, token }]
+      : [];
+  });
+  const lastUnionIndex = topLevelIndexes.findLast(({ token }) => {
+    return isKeywordToken({ token, keywords: "UNION" });
+  })?.index;
+  // DuckDB runs a CTE recursively only when its top-level operation is the
+  // `UNION`. An `EXCEPT` or `INTERSECT` after it makes the CTE a plain one.
+  const hasLaterSetOperation = topLevelIndexes.some(({ index, token }) => {
+    return (
+      lastUnionIndex !== undefined &&
+      index > lastUnionIndex &&
+      isKeywordToken({ token, keywords: new Set(["EXCEPT", "INTERSECT"]) })
     );
   });
-  return lastUnionIndex === -1 ? bodyClosingIndex + 1 : lastUnionIndex;
+  return lastUnionIndex === undefined || hasLaterSetOperation
+    ? bodyClosingIndex + 1
+    : lastUnionIndex;
 }
 
 /** Returns where a CTE's scope ends: the end of the statement or subquery. */
@@ -100,8 +117,10 @@ function _getCteScopeEnd(
     .findIndex((candidate, relativeIndex) => {
       const index = aliasIndex + relativeIndex + 1;
       return (
-        (candidate.value === ";" && depths[index] === aliasDepth) ||
-        (candidate.value === ")" && (depths[index] ?? 0) < aliasDepth)
+        (isSymbolToken({ token: candidate, value: ";" }) &&
+          depths[index] === aliasDepth) ||
+        (isSymbolToken({ token: candidate, value: ")" }) &&
+          (depths[index] ?? 0) < aliasDepth)
       );
     });
   return relativeEndIndex === -1
@@ -151,7 +170,7 @@ function _getAliasesFromWithClause(
       }),
       scopeEnd: _getCteScopeEnd({ tokens, depths, aliasIndex }),
     });
-    if (tokens[bodyClosingIndex + 1]?.value !== ",") {
+    if (!isSymbolToken({ token: tokens[bodyClosingIndex + 1], value: "," })) {
       return aliases;
     }
     aliasIndex = bodyClosingIndex + 2;

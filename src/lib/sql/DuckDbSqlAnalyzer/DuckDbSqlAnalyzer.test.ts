@@ -834,4 +834,128 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
       },
     );
   });
+
+  describe("only symbols are structure", () => {
+    const conceptView = `"concept_${CONCEPT_ID}"`;
+    const readsConcept = {
+      kind: "read",
+      relations: [{ kind: "concept", id: CONCEPT_ID }],
+      internalTableNames: [],
+    };
+
+    it.each([
+      [
+        "a string paren inside trim",
+        `SELECT trim(BOTH FROM '(') AS t, a FROM ${conceptView} WHERE ')' <> ''`,
+      ],
+      [
+        "a quoted paren name",
+        `SELECT "(" FROM ${conceptView} WHERE ")" IS NULL`,
+      ],
+      [
+        "a string paren beside a shadowed CTE name",
+        `SELECT * FROM (WITH ${conceptView} AS (SELECT 1 AS a)
+           SELECT * FROM ${conceptView} WHERE '(' <> 'x') t
+         JOIN ${conceptView} c ON true WHERE ')' <> 'y'`,
+      ],
+      ["a string semicolon", `SELECT ';' AS s FROM ${conceptView}`],
+      [
+        "a string comma after a join",
+        `SELECT ',' AS s FROM range(1) r JOIN range(1) s ON true, ${conceptView}`,
+      ],
+      [
+        "a string dot",
+        `SELECT * FROM range(1) a, ${conceptView} b WHERE '.' <> 'x'`,
+      ],
+    ])("still reads the view past %s", (_description, sql) => {
+      expect(DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql)).toEqual(
+        readsConcept,
+      );
+    });
+
+    it("does not treat a string semicolon as a second statement", () => {
+      expect(DuckDbSqlAnalyzer.isSinglePlainQuery(`SELECT ';' AS s`)).toBe(
+        true,
+      );
+      expect(DuckDbSqlAnalyzer.isSinglePlainQuery(`SELECT 1; SELECT 2`)).toBe(
+        false,
+      );
+    });
+  });
+
+  describe("joins and recursive CTEs", () => {
+    const conceptView = `"concept_${CONCEPT_ID}"`;
+    const readsConcept = {
+      kind: "read",
+      relations: [{ kind: "concept", id: CONCEPT_ID }],
+      internalTableNames: [],
+    };
+
+    it.each([
+      ["EXCEPT", "SELECT 'x' AS a UNION SELECT * FROM V EXCEPT SELECT 'y'"],
+      [
+        "INTERSECT",
+        "SELECT 'x' AS a UNION SELECT * FROM V INTERSECT SELECT 'y'",
+      ],
+    ])(
+      "reads the real view when a recursive CTE has %s after its UNION",
+      (_operator, bodyTemplate) => {
+        const body = bodyTemplate.replace("V", conceptView);
+
+        expect(
+          DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+            `WITH RECURSIVE ${conceptView} AS (${body}) SELECT * FROM ${conceptView}`,
+          ),
+        ).toEqual(readsConcept);
+      },
+    );
+
+    it("still lets a recursive CTE read itself after a UNION", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH RECURSIVE counter(n) AS (
+             SELECT 1 UNION SELECT n + 1 FROM counter WHERE n < 3
+           ) SELECT * FROM counter`,
+        ),
+      ).toEqual({ kind: "read", relations: [], internalTableNames: [] });
+    });
+
+    it.each([
+      ["a parenthesized join", `SELECT * FROM (V CROSS JOIN range(1))`],
+      [
+        "a nested parenthesized join",
+        `SELECT * FROM ((V CROSS JOIN range(1)) x)`,
+      ],
+      [
+        "a join inside parentheses",
+        `SELECT * FROM range(1) a JOIN (V JOIN range(1) ON true) ON true`,
+      ],
+      [
+        "a comma after a join condition",
+        `SELECT * FROM range(1) r JOIN range(1) s ON true, V`,
+      ],
+      [
+        "a comma after a CASE in a join condition",
+        `SELECT * FROM range(1) r JOIN range(1) s ON CASE WHEN true THEN true END, V`,
+      ],
+    ])("reads the view named in %s", (_description, sqlTemplate) => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          sqlTemplate.replace("V", conceptView),
+        ),
+      ).toEqual(readsConcept);
+    });
+
+    it("still ends the source list at ON CONFLICT, WHEN of a MERGE, and PIVOT ON", () => {
+      [
+        `INSERT INTO "${DATASET_ID}" SELECT * FROM "${JOINED_DATASET_ID}" ON CONFLICT (id) DO UPDATE SET a = 1, b = 2`,
+        `MERGE INTO "${DATASET_ID}" USING "${JOINED_DATASET_ID}" ON true WHEN MATCHED THEN UPDATE SET a = 1, b = 2`,
+        `PIVOT "${DATASET_ID}" ON a, b USING sum(c)`,
+      ].forEach((sql) => {
+        expect(
+          DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql),
+        ).not.toMatchObject({ kind: "unsafe" });
+      });
+    });
+  });
 });

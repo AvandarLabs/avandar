@@ -1,6 +1,7 @@
 import {
   getParenthesisDepths,
   isKeywordToken,
+  isSymbolToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
 import type { SqlToken } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 
@@ -74,11 +75,14 @@ export function getStatementStartIndexes(
   return [
     0,
     ...tokens.flatMap((token, index) => {
-      return token.value === ";" ? [index + 1] : [];
+      return isSymbolToken({ token, value: ";" }) ? [index + 1] : [];
     }),
   ].filter((startIndex) => {
     const startToken = tokens[startIndex];
-    return startToken !== undefined && startToken.value !== ";";
+    return (
+      startToken !== undefined &&
+      !isSymbolToken({ token: startToken, value: ";" })
+    );
   });
 }
 
@@ -113,7 +117,7 @@ export function isSinglePlainQuery(tokens: readonly SqlToken[]): boolean {
   return (
     startIndexes.length === 1 &&
     startToken !== undefined &&
-    (startToken.value === "(" ||
+    (isSymbolToken({ token: startToken, value: "(" }) ||
       isKeywordToken({ token: startToken, keywords: PLAIN_QUERY_KEYWORDS }))
   );
 }
@@ -137,7 +141,7 @@ export function getTopLevelMutationIndexes(
   const statementStarts = [
     0,
     ...tokens.flatMap((token, index) => {
-      return token.value === ";" ? [index + 1] : [];
+      return isSymbolToken({ token, value: ";" }) ? [index + 1] : [];
     }),
   ];
   return statementStarts.flatMap((statementStart, statementIndex) => {
