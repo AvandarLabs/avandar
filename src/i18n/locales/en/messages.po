@@ -1607,6 +1607,10 @@ msgstr "This map includes {0}, a layer set to Aggregate only. The export "
 msgid "Status: {0}"
 msgstr "Status: {0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr "Answer offline"
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Expand the layers panel"

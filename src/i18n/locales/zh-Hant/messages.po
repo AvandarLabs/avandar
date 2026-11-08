@@ -1561,6 +1561,10 @@ msgstr "此地圖包含 {0}，這是一個僅設為彙總的圖層。匯出內�
 msgid "Status: {0}"
 msgstr "狀態：{0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "展開圖層面板"

@@ -1634,6 +1634,10 @@ msgstr "Este mapa incluye {0}, una capa configurada únicamente como Aggregate. 
 msgid "Status: {0}"
 msgstr "Estado: {0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Expandir el panel de capas"

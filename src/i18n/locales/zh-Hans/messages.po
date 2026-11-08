@@ -1561,6 +1561,10 @@ msgstr "此地图包含 {0}，这是一个仅设置为聚合的图层。导出�
 msgid "Status: {0}"
 msgstr "状态：{0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "展开图层面板"

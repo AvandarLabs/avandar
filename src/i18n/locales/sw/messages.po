@@ -1627,6 +1627,10 @@ msgstr "Ramani hii inajumuisha {0}, safu iliyowekwa kuwa Jumlisha pekee. "
 msgid "Status: {0}"
 msgstr "Hali: {0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Panua kidirisha cha tabaka"

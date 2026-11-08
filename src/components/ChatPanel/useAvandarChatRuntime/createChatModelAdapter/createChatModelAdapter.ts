@@ -339,6 +339,7 @@ export function createChatModelAdapter(
           const accepted = await offerOfflineChatFallback({
             title: copyRef.current.fallbackTitle,
             message: copyRef.current.fallbackMessage,
+            action: copyRef.current.fallbackAction,
           });
           if (isGenerationStale()) {
             return { content: [] };

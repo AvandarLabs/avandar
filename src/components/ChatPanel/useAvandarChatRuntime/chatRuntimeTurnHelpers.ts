@@ -27,6 +27,8 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   dashboardOnlyBlock: string;
   fallbackTitle: string;
   fallbackMessage: string;
+  /** The button that answers the failed message offline. */
+  fallbackAction: string;
   contextWindowExceeded: string;
 };
 

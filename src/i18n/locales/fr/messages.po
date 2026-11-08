@@ -1649,6 +1649,10 @@ msgstr "Cette carte inclut {0}, une couche définie sur Aggregate uniquement. "
 msgid "Status: {0}"
 msgstr "Statut : {0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Développer le panneau des calques"

@@ -1634,6 +1634,10 @@ msgstr "Este mapa inclui {0}, uma camada definida como somente agregada. A "
 msgid "Status: {0}"
 msgstr "Status: {0}"
 
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answer offline"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Expandir o painel de camadas"

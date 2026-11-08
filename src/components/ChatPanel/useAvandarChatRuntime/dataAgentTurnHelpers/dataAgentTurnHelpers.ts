@@ -1,5 +1,6 @@
 import { where } from "@avandar/utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import {
   readAppliedSqlResult,
@@ -145,8 +146,7 @@ export function createExplorerDataAgentHost(
   });
 }
 
-/** Every dataset in the workspace, with its columns, as the agent reads it. */
-export async function loadDataAgentDatasets(
+async function _fetchDataAgentDatasets(
   workspaceId: Workspace.Id,
 ): Promise<DataAgentDataset[]> {
   const datasets = await DatasetClient.getAllDatasetsWithColumns(
@@ -161,6 +161,30 @@ export async function loadDataAgentDatasets(
       }),
     };
   });
+}
+
+/**
+ * The workspace's datasets and columns for the agent's prompt. Loaded from
+ * the server when online and kept for this tab; offline, or when the server
+ * cannot be reached, the kept copy answers instead.
+ */
+export async function loadDataAgentDatasets(
+  workspaceId: Workspace.Id,
+): Promise<DataAgentDataset[]> {
+  const cached = DataAgentDatasetCache.read(workspaceId);
+  if (!navigator.onLine && cached) {
+    return cached;
+  }
+  try {
+    const datasets = await _fetchDataAgentDatasets(workspaceId);
+    DataAgentDatasetCache.write(workspaceId, datasets);
+    return datasets;
+  } catch (error) {
+    if (cached) {
+      return cached;
+    }
+    throw error;
+  }
 }
 
 /**
