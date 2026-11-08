@@ -1,5 +1,5 @@
 import { BuiltInVizContainer } from "@/components/VisualizationContainer/BuiltInVizContainer/BuiltInVizContainer";
-import { PluginVizPlaceholder } from "@/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder";
+import { PluginVizRenderer } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizRenderer";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
@@ -33,7 +33,7 @@ type Props = {
  * result needs to be visualized.
  *
  * Built-in configs render through `BuiltInVizContainer`. A plugin config
- * shows the missing-plugin placeholder.
+ * draws through `PluginVizRenderer`.
  */
 export function VisualizationContainer({
   columns,
@@ -44,9 +44,11 @@ export function VisualizationContainer({
 }: Props): JSX.Element {
   if (vizConfig.vizType === "plugin") {
     return (
-      <PluginVizPlaceholder
-        reason="missingPlugin"
-        pluginId={vizConfig.pluginId}
+      <PluginVizRenderer
+        columns={columns}
+        rawColumns={rawColumns}
+        data={data}
+        vizConfig={vizConfig}
       />
     );
   }
