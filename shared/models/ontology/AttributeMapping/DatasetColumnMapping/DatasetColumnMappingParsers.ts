@@ -30,6 +30,7 @@ const DBReadSchema = z.object({
     .nullable(),
   dataset_id: z.uuid(),
   dataset_column_id: z.uuid(),
+  bucket_column_id: z.uuid().nullable(),
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
 });
@@ -51,6 +52,7 @@ export const DatasetColumnMappingParsers =
           conceptAttributeId: obj.conceptAttributeId as ConceptAttributeId,
           datasetId: obj.datasetId as DatasetId,
           datasetColumnId: obj.datasetColumnId as DatasetColumnId,
+          bucketColumnId: obj.bucketColumnId as DatasetColumnId | undefined,
         };
       },
     ),

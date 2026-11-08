@@ -37,6 +37,12 @@ type DatasetColumnMappingRead = {
   /** ID of the specific column in the dataset this mapping reads */
   datasetColumnId: DatasetColumnId;
 
+  /**
+   * The date or timestamp column of `datasetId` that places each row in a
+   * period. Set exactly when the field has a `bucketGrain`.
+   */
+  bucketColumnId: DatasetColumnId | undefined;
+
   /** Creation timestamp */
   createdAt: string;
 
@@ -46,7 +52,7 @@ type DatasetColumnMappingRead = {
 
 type DatasetColumnMappingInsert = SetOptional<
   DatasetColumnMappingRead,
-  "id" | "createdAt" | "updatedAt"
+  "id" | "createdAt" | "updatedAt" | "bucketColumnId"
 >;
 
 type DatasetColumnMappingUpdate = Partial<DatasetColumnMappingRead>;

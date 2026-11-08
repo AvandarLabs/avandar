@@ -62,6 +62,7 @@ function _attribute(
     isIdentifier: false,
     allowManualEdit: false,
     isArray: false,
+    bucketGrain: undefined,
     ...overrides,
   };
 }
@@ -97,6 +98,7 @@ function _mapping(
       valuePickerRuleType: options.ruleType ?? "first",
       datasetId: options.datasetId,
       datasetColumnId,
+      bucketColumnId: undefined,
       createdAt: "2026-08-19T00:00:00Z",
       updatedAt: "2026-08-19T00:00:00Z",
     },

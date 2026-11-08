@@ -40,6 +40,7 @@ function _makeAttribute(
     isIdentifier: false,
     allowManualEdit: false,
     isArray: options.isArray ?? false,
+    bucketGrain: undefined,
   });
 }
 
@@ -70,6 +71,7 @@ function _makeMapping(
     valuePickerRuleType: "first",
     datasetId: options.dataset.id,
     datasetColumnId: uuid<DatasetColumn.Id>(),
+    bucketColumnId: undefined,
     createdAt: NOW,
     updatedAt: NOW,
   };

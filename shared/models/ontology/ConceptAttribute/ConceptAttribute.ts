@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
+  ConceptAttributeBucketGrain,
   ConceptAttributeId,
   ConceptAttributeModel,
   ConceptAttributeValueShape,
@@ -14,4 +15,5 @@ export namespace ConceptAttribute {
   >;
   export type Id = ConceptAttributeId;
   export type ValueShape = ConceptAttributeValueShape;
+  export type BucketGrain = ConceptAttributeBucketGrain;
 }

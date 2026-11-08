@@ -1,8 +1,10 @@
+import { registry } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { ConceptModule } from "$/models/ontology/Concept/ConceptModule.ts";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type {
+  ConceptAttributeBucketGrain,
   ConceptAttributeId,
   ConceptAttributeModel,
   ConceptAttributeValueShape,
@@ -123,6 +125,19 @@ function _getViewColumnNames(
  * `is_array` and `data_type`, or whether a query column is a list.
  */
 export const ConceptAttributeModule = {
+  /**
+   * Every period a per-period field can keep one value for, in the database
+   * enum's order. Read by the model's parser, the chat parser and tool
+   * schema, and the pickers that offer a period.
+   */
+  BUCKET_GRAINS: registry<ConceptAttributeBucketGrain>().keys(
+    "day",
+    "week",
+    "month",
+    "quarter",
+    "year",
+  ),
+
   /** A field's value shape, read from its stored columns. */
   getValueShape: (
     attribute: Readonly<Pick<ConceptAttributeModel["Read"], "isArray">>,

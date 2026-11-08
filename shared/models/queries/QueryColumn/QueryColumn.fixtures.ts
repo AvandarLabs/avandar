@@ -40,6 +40,7 @@ export function createConceptAttributeQueryColumn(
     isIdentifier: false,
     allowManualEdit: false,
     isArray: options.isArray,
+    bucketGrain: undefined,
   });
   return QueryColumn.makeFromConceptAttributes([attribute])[0]!;
 }

@@ -81,6 +81,7 @@ function _createConceptAttribute(
     isIdentifier: false,
     allowManualEdit: true,
     isArray: false,
+    bucketGrain: undefined,
   });
 }
 

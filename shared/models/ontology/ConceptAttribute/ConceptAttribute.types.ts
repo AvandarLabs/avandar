@@ -3,11 +3,19 @@ import type { AttributeMappingType } from "$/models/ontology/AttributeMapping/At
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Enums } from "$/types/database.types.ts";
 import type { Model } from "@avandar/models";
 import type { UUID } from "@avandar/utils";
 import type { SetOptional } from "type-fest";
 
 export type ConceptAttributeId = UUID<"ConceptAttribute">;
+
+/**
+ * The period a per-period field keeps one value for. Mirrors the
+ * `concept_attributes__bucket_grain` database enum.
+ */
+export type ConceptAttributeBucketGrain =
+  Enums<"concept_attributes__bucket_grain">;
 
 type ConceptAttributeRead = Model.Base<
   "ConceptAttribute",
@@ -25,12 +33,17 @@ type ConceptAttributeRead = Model.Base<
     isIdentifier: boolean;
     allowManualEdit: boolean;
     isArray: boolean;
+    /**
+     * Set only on a per-period field: its value is one entry per period of
+     * the mapping's date column. Always `undefined` when `isArray` is false.
+     */
+    bucketGrain: ConceptAttributeBucketGrain | undefined;
   }
 >;
 
 type ConceptAttributeInsert = SetOptional<
   ConceptAttributeRead,
-  "id" | "createdAt" | "updatedAt" | "description"
+  "id" | "createdAt" | "updatedAt" | "description" | "bucketGrain"
 >;
 
 type ConceptAttributeUpdate = Partial<ConceptAttributeRead>;

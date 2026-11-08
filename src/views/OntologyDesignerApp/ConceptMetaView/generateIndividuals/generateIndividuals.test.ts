@@ -108,6 +108,7 @@ function _makeMapping(args: {
     valuePickerRuleType: args.valuePickerRuleType ?? "first",
     datasetId: DATASET_ID,
     datasetColumnId: args.datasetColumnId,
+    bucketColumnId: undefined,
     createdAt: "2026-08-19T00:00:00.000Z",
     updatedAt: "2026-08-19T00:00:00.000Z",
   };
@@ -146,6 +147,7 @@ function _makeConcept(
         isIdentifier: args.isIdentifier,
         allowManualEdit: false,
         isArray: false,
+        bucketGrain: undefined,
       }),
       mapping: _makeMapping({
         conceptAttributeId: args.id,
