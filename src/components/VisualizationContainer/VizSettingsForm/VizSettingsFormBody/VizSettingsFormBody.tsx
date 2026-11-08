@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm/BubbleChartForm";
 import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm";
 import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm";
+import { PluginVizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm/ScatterChartForm";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -34,7 +35,8 @@ type Props = {
  *
  * Bar, line, area, and radar share the descriptor-driven
  * `SeriesAwareVizForm`. Pie, funnel, scatter, and bubble have their own forms.
- * Table and plugin configs render no subform.
+ * Plugin charts use `PluginVizSettingsForm`, drawn from their manifest.
+ * Table configs render no subform.
  */
 export function VizSettingsFormBody({
   columns,
@@ -137,8 +139,15 @@ export function VizSettingsFormBody({
         />
       );
     })
-    .with({ vizType: "plugin" }, () => {
-      return null;
+    .with({ vizType: "plugin" }, (config) => {
+      return (
+        <PluginVizSettingsForm
+          fields={columns}
+          config={config}
+          layout={layout}
+          onConfigChange={onVizConfigChange}
+        />
+      );
     })
     .exhaustive();
 }
