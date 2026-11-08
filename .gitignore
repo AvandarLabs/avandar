@@ -30,6 +30,7 @@ dist-ssr
 !.env.example
 !.env.example.edge
 !.env.pipelines.example
+!.env.pipeline-server.prod.example
 *client_secret*
 
 # Ignorable development files 
