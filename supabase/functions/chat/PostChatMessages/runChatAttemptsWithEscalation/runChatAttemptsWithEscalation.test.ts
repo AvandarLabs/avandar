@@ -151,7 +151,14 @@ describe("runChatAttemptsWithEscalation", () => {
 
   it("hands the catalog columns to the parser", async () => {
     parseOpenRouterResponseMock.mockReturnValue(USABLE);
-    const columns = [{ id: "column-1", data_type: "varchar" }];
+    const columns = [
+      {
+        id: "column-1",
+        dataset_id: "dataset-1",
+        name: "revenue",
+        data_type: "varchar",
+      },
+    ];
 
     await runChatAttemptsWithEscalation({
       requestBody: { model: "m" },

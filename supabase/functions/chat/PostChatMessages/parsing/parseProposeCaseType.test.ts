@@ -16,9 +16,16 @@ const CENSUS_KEY_COLUMN_ID = "1a2b3c4d-bbbb-4bbb-8ccc-ddddeeeeffff";
 const STATE_COLUMN_ID = "2b3c4d5e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "2b3c4d5e-bbbb-4bbb-8ccc-ddddeeeeffff";
 
+/** Parses a draft against a catalog that lists no columns. */
+function _parse(
+  argsJson: string | undefined,
+): ReturnType<typeof parseProposeCaseType> {
+  return parseProposeCaseType(argsJson, { columns: [] });
+}
+
 describe("parseProposeCaseType", () => {
   it("parses a draft that joins columns from two datasets", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "County COVID record",
         description: "One county's deaths and population",
@@ -75,7 +82,7 @@ describe("parseProposeCaseType", () => {
   });
 
   it("drops an attribute naming a dataset that is not a source", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "County COVID record",
         sourceDatasets: [
@@ -107,7 +114,7 @@ describe("parseProposeCaseType", () => {
   });
 
   it("drops a source dataset the model listed twice", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "County COVID record",
         sourceDatasets: [
@@ -133,7 +140,7 @@ describe("parseProposeCaseType", () => {
   });
 
   it("includes attributes by default and falls back to most_frequent", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "Doctor",
         sourceDatasets: [
@@ -166,7 +173,7 @@ describe("parseProposeCaseType", () => {
   });
 
   it("rejects an unknown value picker rule instead of passing it on", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "Doctor",
         sourceDatasets: [
@@ -190,7 +197,7 @@ describe("parseProposeCaseType", () => {
   });
 
   it("drops attributes whose column id is not a uuid", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "Doctor",
         sourceDatasets: [
@@ -221,7 +228,7 @@ describe("parseProposeCaseType", () => {
   });
 
   it("drops a label column that is not one of the attributes", () => {
-    const parsed = parseProposeCaseType(
+    const parsed = _parse(
       JSON.stringify({
         name: "Doctor",
         sourceDatasets: [
@@ -246,7 +253,7 @@ describe("parseProposeCaseType", () => {
 
   it("returns undefined without a name or any usable source dataset", () => {
     expect(
-      parseProposeCaseType(
+      _parse(
         JSON.stringify({
           sourceDatasets: [
             {
@@ -257,11 +264,9 @@ describe("parseProposeCaseType", () => {
         }),
       ),
     ).toBeUndefined();
+    expect(_parse(JSON.stringify({ name: "Doctor" }))).toBeUndefined();
     expect(
-      parseProposeCaseType(JSON.stringify({ name: "Doctor" })),
-    ).toBeUndefined();
-    expect(
-      parseProposeCaseType(
+      _parse(
         JSON.stringify({
           name: "Doctor",
           sourceDatasets: [{ datasetId: DEATHS_DATASET_ID }],
@@ -271,8 +276,8 @@ describe("parseProposeCaseType", () => {
   });
 
   it("returns undefined for malformed JSON", () => {
-    expect(parseProposeCaseType("{not json")).toBeUndefined();
-    expect(parseProposeCaseType(undefined)).toBeUndefined();
+    expect(_parse("{not json")).toBeUndefined();
+    expect(_parse(undefined)).toBeUndefined();
   });
 });
 
@@ -280,7 +285,7 @@ describe("parseProposeCaseType", () => {
 function _parseWithFields(
   fields: Record<string, unknown>,
 ): ReturnType<typeof parseProposeCaseType> {
-  return parseProposeCaseType(
+  return _parse(
     JSON.stringify({
       name: "Cholera case",
       sourceDatasets: [
@@ -430,14 +435,17 @@ describe("parseProposeCaseType reserved attribute names", () => {
 
 const DEATHS_TOTAL_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 
-/** The catalog's column types, as `fetchWorkspaceSchema` returns them. */
+/** The catalog columns' ids and Ava types. */
 const CATALOG_COLUMNS = [
   { id: STATE_COLUMN_ID, data_type: "varchar" },
   { id: DEATHS_TOTAL_COLUMN_ID, data_type: "bigint" },
 ];
 
 /** A one-field draft over the deaths dataset, reading `columnId`. */
-function _draftReading(columnId: string, ruleType: string): string {
+function _buildDraftArgsReadingColumn(
+  columnId: string,
+  ruleType: string,
+): string {
   return JSON.stringify({
     name: "County record",
     sourceDatasets: [
@@ -461,16 +469,19 @@ function _draftReading(columnId: string, ruleType: string): string {
 
 describe("parseProposeCaseType value rules", () => {
   it("replaces a sum over a text column with most_frequent", () => {
-    const parsed = parseProposeCaseType(_draftReading(STATE_COLUMN_ID, "sum"), {
-      columns: CATALOG_COLUMNS,
-    });
+    const parsed = parseProposeCaseType(
+      _buildDraftArgsReadingColumn(STATE_COLUMN_ID, "sum"),
+      {
+        columns: CATALOG_COLUMNS,
+      },
+    );
 
     expect(parsed?.attributes[0]?.valuePickerRuleType).toBe("most_frequent");
   });
 
   it("keeps a sum over a whole-number column", () => {
     const parsed = parseProposeCaseType(
-      _draftReading(DEATHS_TOTAL_COLUMN_ID, "sum"),
+      _buildDraftArgsReadingColumn(DEATHS_TOTAL_COLUMN_ID, "sum"),
       { columns: CATALOG_COLUMNS },
     );
 
@@ -478,9 +489,23 @@ describe("parseProposeCaseType value rules", () => {
   });
 
   it("keeps the model's rule for a column the catalog does not list", () => {
-    const parsed = parseProposeCaseType(_draftReading(STATE_COLUMN_ID, "sum"), {
-      columns: [],
-    });
+    const parsed = parseProposeCaseType(
+      _buildDraftArgsReadingColumn(STATE_COLUMN_ID, "sum"),
+      {
+        columns: [],
+      },
+    );
+
+    expect(parsed?.attributes[0]?.valuePickerRuleType).toBe("sum");
+  });
+
+  it("keeps the model's rule for a column whose type is not an Ava type", () => {
+    const parsed = parseProposeCaseType(
+      _buildDraftArgsReadingColumn(STATE_COLUMN_ID, "sum"),
+      {
+        columns: [{ id: STATE_COLUMN_ID, data_type: "geometry" }],
+      },
+    );
 
     expect(parsed?.attributes[0]?.valuePickerRuleType).toBe("sum");
   });
