@@ -532,9 +532,12 @@ the data and are not translated.
 | `license` | `metadata.license`, when present (rare on NYC) | `license_title` |
 
 HDX lists one listing per resource, but every mapped field describes the
-dataset, so its record is the raw CKAN package (`package_search`'s result),
-and each of a package's resource listings stores that same package as its
-`source_metadata`. HDX's `display_name` stays in code because it comes from
+dataset, so its record is the raw CKAN package (`package_search`'s result).
+Each of a package's resource listings stores that package as its
+`source_metadata`, with `resources` narrowed to the listing's own raw
+resource: a package lists every resource, so storing it whole on every
+listing grows a package's write with the square of its resource count (a
+WHO country package with 73 CSVs wrote 42 MB). HDX's `display_name` stays in code because it comes from
 the resource. The CKAN package schema does not need to widen: the mapper
 reads the raw package, not the narrowed `CkanPackage`. HDX's `notes` are
 Markdown; they show as plain text for now.

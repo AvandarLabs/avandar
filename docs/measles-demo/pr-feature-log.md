@@ -1316,6 +1316,8 @@ commits belong to the features that own them, not here.
 | `79dc85076` | fix(hdx): read only HDX's own update frequency codes | All of it |
 | `d50583f7e` | fix(socrata): read a health dataset's office from either metadata key | All of it |
 | `7f2d6dc8e` | fix(hdx): map topics, data source, coverage dates, and caveats | All of it. Supersedes `bcac141e7`'s `domains` mapping: HDX's groups (countries) become keywords, and topics come from `hdxTopics`' tag-to-topic table. |
+| `d9c3bf6c0` | fix(hdx): store each listing's package with only its own resource | All of it. Without it, a package's write grows with the square of its resource count (each listing stored every resource), which ran the demo database out of memory on WHO's country packages. |
+| `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1405,7 +1407,10 @@ rejects the new listing shape, so the catalog would not load.
 - Backfill the demo instance with one full (non-incremental) run of each
   pipeline. Incremental runs only touch datasets that changed, so unchanged
   listings keep empty new columns. Socrata was backfilled on 2026-11-07.
-  HDX has never run on demo, so its first run fills every field.
+  HDX's first demo run (2026-11-08) failed partway, before `d9c3bf6c0`, and
+  left 11,983 listings storing whole packages. Change detection ignores
+  `source_metadata`, so a later run does not shrink them: reset HDX on demo
+  (`ava pipeline reset hdx --env demo`) before its next full run.
 - `hdxTopics`' tag-to-topic table covers HDX's 150-tag vocabulary as of
   2026-11-08. A tag HDX adds later gets no topic until it is added there.
 - Removing one of two chosen publishers leaves the agencies chosen under it
@@ -1691,6 +1696,8 @@ Its commits are covered by F19, not numbered here.
 | 125 | `bc4baf853` | F23 |
 | 126 | `d50583f7e` | F23 |
 | 127 | `7f2d6dc8e` | F23 |
+| 128 | `d9c3bf6c0` | F23 |
+| 129 | `62ffe547a` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
