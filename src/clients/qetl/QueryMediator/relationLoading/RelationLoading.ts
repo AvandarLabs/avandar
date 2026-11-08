@@ -386,11 +386,20 @@ async function _writeStoredRelationBytes(
  * A write failure does not fail the query. The bytes are in hand and the
  * queryable tier is about to receive them, so a full disk costs the next
  * query a re-fetch rather than costing this one its result.
+ *
+ * With no relations to load, the dataset column catalog is not read at all.
+ * A query that names no dataset, or whose datasets are all already in the
+ * queryable tier, needs no column replacements, and the catalog is gated by
+ * RLS, so reading it would fail for a caller who may read no dataset's
+ * columns, such as an anonymous visitor to a public dashboard.
  */
 async function _loadRelationBytes(
   options: Readonly<LoadRelationBytesOptions>,
 ): Promise<void> {
   await _writeStoredRelationBytes(options);
+  if (options.relations.length === 0) {
+    return;
+  }
   const columns = await DatasetColumnClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
     .getAll(

@@ -299,6 +299,25 @@ describe("QueryMediator relation cache projection", () => {
     expect(datasetGetAllMock).toHaveBeenCalledTimes(1);
   });
 
+  it("runs a query that names no dataset without reading dataset columns", async () => {
+    const mediator = QueryMediatorFactory.create("QueryMediator", {
+      state: {
+        getQueryDependencies: async () => {
+          return [];
+        },
+        relationCache,
+        principalKey: PRINCIPAL_KEY,
+      },
+    });
+
+    await mediator.runQuery({
+      rawSql: "SELECT * FROM (VALUES ('a', 1)) AS literal_rows(label, total)",
+    });
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(runRawQueryMock).toHaveBeenCalledTimes(1);
+  });
+
   it("serves a covering queryable table without reading a dataset record", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
     QueryableRelationColumns.remember({
