@@ -13,7 +13,10 @@ import {
   waitFor,
   within,
 } from "@/test-utils";
-import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
+import {
+  getMantineSelectDropdown,
+  pickMantineSelectOption,
+} from "@/test-utils/pickMantineSelectOption";
 import { CaseTypeDraftBlock } from "./CaseTypeDraftBlock";
 import type { PermissionKey } from "$/models/Permissions/Permissions";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -28,6 +31,9 @@ const CENSUS_FIPS_COLUMN_ID = "5e6f7081-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "6f708192-aaaa-4bbb-8ccc-ddddeeeeffff";
 const UNLISTED_COLUMN_ID = "7a8b9cad-aaaa-4bbb-8ccc-ddddeeeeffff";
 const REPORT_DATE_COLUMN_ID = "7a8b9c0d-aaaa-4bbb-8ccc-ddddeeeeffff";
+const HOSPITAL_DATASET_ID = "8a9b0cad-cccc-4bbb-8ccc-ddddeeeeffff";
+const BEDS_COLUMN_ID = "9b0cad12-cccc-4bbb-8ccc-ddddeeeeffff";
+const CONFIRMED_COLUMN_ID = "0cad1234-cccc-4bbb-8ccc-ddddeeeeffff";
 const WORKSPACE_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff" as Workspace.Id;
 
 const {
@@ -83,33 +89,83 @@ vi.mock("@/utils/notifications/notify", () => {
   };
 });
 
+const CATALOG_DATASETS = [
+  {
+    id: DEATHS_DATASET_ID,
+    name: "long-us-deaths.csv",
+    columns: [
+      {
+        id: FIPS_COLUMN_ID,
+        name: "fips",
+        datasetId: DEATHS_DATASET_ID,
+        dataType: "varchar",
+      },
+      {
+        id: STATE_COLUMN_ID,
+        name: "state",
+        datasetId: DEATHS_DATASET_ID,
+        dataType: "varchar",
+      },
+      {
+        id: DEATHS_COLUMN_ID,
+        name: "deaths_total",
+        datasetId: DEATHS_DATASET_ID,
+        dataType: "bigint",
+      },
+      {
+        id: CONFIRMED_COLUMN_ID,
+        name: "confirmed_cases",
+        datasetId: DEATHS_DATASET_ID,
+        dataType: "bigint",
+      },
+      {
+        id: REPORT_DATE_COLUMN_ID,
+        name: "report_date",
+        datasetId: DEATHS_DATASET_ID,
+        dataType: "date",
+      },
+    ],
+  },
+  {
+    id: CENSUS_DATASET_ID,
+    name: "county-census.csv",
+    columns: [
+      {
+        id: CENSUS_FIPS_COLUMN_ID,
+        name: "county_fips",
+        datasetId: CENSUS_DATASET_ID,
+        dataType: "varchar",
+      },
+      {
+        id: POPULATION_COLUMN_ID,
+        name: "population",
+        datasetId: CENSUS_DATASET_ID,
+        dataType: "bigint",
+      },
+    ],
+  },
+  {
+    id: HOSPITAL_DATASET_ID,
+    name: "hospitals.csv",
+    columns: [
+      {
+        id: BEDS_COLUMN_ID,
+        name: "beds",
+        datasetId: HOSPITAL_DATASET_ID,
+        dataType: "bigint",
+      },
+    ],
+  },
+];
+
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {
       useGetAll: () => {
-        return [
-          [
-            { id: FIPS_COLUMN_ID, name: "fips", dataType: "varchar" },
-            { id: STATE_COLUMN_ID, name: "state", dataType: "varchar" },
-            { id: DEATHS_COLUMN_ID, name: "deaths_total", dataType: "bigint" },
-            {
-              id: CENSUS_FIPS_COLUMN_ID,
-              name: "county_fips",
-              dataType: "varchar",
-            },
-            {
-              id: POPULATION_COLUMN_ID,
-              name: "population",
-              dataType: "bigint",
-            },
-            {
-              id: REPORT_DATE_COLUMN_ID,
-              name: "report_date",
-              datasetId: DEATHS_DATASET_ID,
-              dataType: "date",
-            },
-          ],
-        ];
+        const columns = CATALOG_DATASETS.flatMap((dataset) => {
+          return dataset.columns;
+        });
+        return [columns];
       },
     },
   };
@@ -120,11 +176,13 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
     DatasetClient: {
       useGetAll: () => {
         return [
-          [
-            { id: DEATHS_DATASET_ID, name: "long-us-deaths.csv" },
-            { id: CENSUS_DATASET_ID, name: "county-census.csv" },
-          ],
+          CATALOG_DATASETS.map((dataset) => {
+            return { id: dataset.id, name: dataset.name };
+          }),
         ];
+      },
+      useGetAllDatasetsWithColumns: () => {
+        return [CATALOG_DATASETS];
       },
     },
   };
@@ -324,8 +382,12 @@ describe("CaseTypeDraftBlock", () => {
   it("shows a section per contributing dataset, not just one", () => {
     render(<CaseTypeDraftBlock />);
 
-    expect(screen.getByText("long-us-deaths.csv")).toBeInTheDocument();
-    expect(screen.getByText("county-census.csv")).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: "Dataset long-us-deaths.csv" }),
+    ).toHaveValue("long-us-deaths.csv");
+    expect(
+      screen.getByRole("combobox", { name: "Dataset county-census.csv" }),
+    ).toHaveValue("county-census.csv");
     expect(screen.getByText("2 datasets joined")).toBeInTheDocument();
   });
 
@@ -424,7 +486,7 @@ describe("CaseTypeDraftBlock", () => {
     ).toEqual(["County code", "State"]);
   });
 
-  it("offers no removal control when only one dataset is left", () => {
+  it("removes the only dataset and then lets the user choose another", () => {
     useChatPanelStateMock.mockReturnValue({
       pendingCaseTypeDraft: {
         ...makeDraft(),
@@ -438,9 +500,30 @@ describe("CaseTypeDraftBlock", () => {
     });
     render(<CaseTypeDraftBlock />);
 
+    fireEvent.click(
+      screen.getByRole("button", { name: "Remove long-us-deaths.csv" }),
+    );
+
+    expect(screen.getByText("No datasets")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /^Remove / }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("combobox", { name: "Dataset" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create case type" }),
+    ).toBeDisabled();
+
+    pickMantineSelectOption("Dataset", "hospitals.csv");
+    expect(
+      screen.getByRole("combobox", { name: "Dataset hospitals.csv" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Create case type" }),
+    ).toBeDisabled();
+
+    pickMantineSelectOption("Add a field from hospitals.csv", "beds");
+    expect(
+      screen.getByRole("button", { name: "Create case type" }),
+    ).toBeEnabled();
   });
 
   it("keeps the draft open when the insert fails", async () => {
@@ -737,5 +820,78 @@ describe("CaseTypeDraftBlock", () => {
       bucketGrain: "month",
       bucketColumnId: REPORT_DATE_COLUMN_ID,
     });
+  });
+
+  it("does not offer a dataset another section already uses", () => {
+    render(<CaseTypeDraftBlock />);
+
+    const optionLabels = within(
+      getMantineSelectDropdown("Dataset long-us-deaths.csv"),
+    )
+      .getAllByRole("option", { hidden: true })
+      .map((option) => {
+        return option.textContent;
+      });
+
+    expect(optionLabels).toEqual(["long-us-deaths.csv", "hospitals.csv"]);
+  });
+
+  it("changes a drafted dataset and drops the fields that came from it", () => {
+    render(<CaseTypeDraftBlock />);
+
+    pickMantineSelectOption("Dataset long-us-deaths.csv", "hospitals.csv");
+
+    expect(
+      screen.queryByLabelText("Include County code"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Include State")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: "Dataset hospitals.csv" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("2 datasets joined")).toBeInTheDocument();
+  });
+
+  it("persists a joined dataset and column the draft did not include", async () => {
+    render(<CaseTypeDraftBlock />);
+
+    pickMantineSelectOption("Add a dataset", "hospitals.csv");
+    pickMantineSelectOption("Add a field from hospitals.csv", "beds");
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const [call] = applyCreatedCaseTypesMock.mock.calls;
+    const caseType = call?.[0].caseTypes[0];
+    expect(caseType.identities).toContainEqual({
+      datasetId: HOSPITAL_DATASET_ID,
+      primaryKeyColumnId: BEDS_COLUMN_ID,
+    });
+    expect(
+      caseType.attributes.map((attribute: { name: string }) => {
+        return attribute.name;
+      }),
+    ).toContain("beds");
+  });
+
+  it("persists a column added to a dataset the draft already uses", async () => {
+    render(<CaseTypeDraftBlock />);
+
+    pickMantineSelectOption(
+      "Add a field from long-us-deaths.csv",
+      "confirmed_cases",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const [call] = applyCreatedCaseTypesMock.mock.calls;
+    const names = call?.[0].caseTypes[0].attributes.map(
+      (attribute: { name: string }) => {
+        return attribute.name;
+      },
+    );
+    expect(names).toContain("confirmed_cases");
   });
 });

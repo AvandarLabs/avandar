@@ -30,9 +30,41 @@ export type CaseTypeDraftEditor = {
   setName: (name: string) => void;
   setDescription: (description: string) => void;
   setAllowManualCreation: (allowManualCreation: boolean) => void;
-  setPrimaryKeyColumnId: (datasetId: string, columnId: string) => void;
+  /**
+   * Sets the column that matches this dataset's rows to a case. When the
+   * column is not yet a field, `columnName` is the name the new field starts
+   * with. A missing name leaves the draft unchanged.
+   */
+  setPrimaryKeyColumnId: (
+    datasetId: string,
+    columnId: string,
+    columnName?: string,
+  ) => void;
   setLabelColumnId: (columnId: string) => void;
   removeSourceDataset: (datasetId: string) => void;
+  /**
+   * Swaps one contributing dataset for another and drops the columns that
+   * came from the old one. The replacement has no join key until a column
+   * is chosen. A dataset the draft already uses is left as it is.
+   */
+  replaceSourceDataset: (datasetId: string, nextDatasetId: string) => void;
+  /**
+   * Adds a dataset the draft can pull columns from. It has no join key until
+   * a column is added or chosen. A dataset already listed is left as it is.
+   */
+  addSourceDataset: (datasetId: string) => void;
+  /**
+   * Maps one more column of a contributing dataset. The first column of a
+   * dataset that has no join key becomes that key. A column already listed
+   * is left as it is.
+   */
+  addSourceColumn: (
+    column: Readonly<{
+      datasetId: string;
+      columnId: string;
+      name: string;
+    }>,
+  ) => void;
   setAttributeName: (columnId: string, name: string) => void;
   setAttributeValuePicker: (
     columnId: string,
@@ -150,6 +182,230 @@ function _hasReservedAttributeName(draft: ChatProposedCaseType): boolean {
  * column the dataset does not offer counts as none: creation would drop the
  * field.
  */
+/** A column the card maps onto a contributing dataset. */
+type CaseTypeDraftSourceColumn = Readonly<{
+  datasetId: string;
+  columnId: string;
+  name: string;
+}>;
+
+/** The column ids the draft already maps from one dataset. */
+function _columnIdsForDataset(
+  draft: ChatProposedCaseType,
+  datasetId: string,
+): ReadonlySet<string> {
+  return new Set(
+    draft.attributes.flatMap((attribute) => {
+      return attribute.datasetId === datasetId ? [attribute.columnId] : [];
+    }),
+  );
+}
+
+/** Whether the draft already pulls columns from this dataset. */
+function _hasSourceDataset(
+  draft: ChatProposedCaseType,
+  datasetId: string,
+): boolean {
+  return draft.sourceDatasets.some((sourceDataset) => {
+    return sourceDataset.datasetId === datasetId;
+  });
+}
+
+/**
+ * Whether this source's join key is a column the draft maps from that same
+ * dataset. A dataset the user just added has an empty key, which fails.
+ */
+function _hasJoinKey(
+  draft: ChatProposedCaseType,
+  sourceDataset: ChatProposedCaseType["sourceDatasets"][number],
+): boolean {
+  return draft.attributes.some((attribute) => {
+    return (
+      sourceDataset.primaryKeyColumnId.length > 0 &&
+      attribute.datasetId === sourceDataset.datasetId &&
+      attribute.columnId === sourceDataset.primaryKeyColumnId
+    );
+  });
+}
+
+/** Drops the label when its column is leaving the draft. */
+function _withoutLabelFromColumns(
+  draft: ChatProposedCaseType,
+  columnIds: ReadonlySet<string>,
+): ChatProposedCaseType {
+  if (!draft.labelColumnId || !columnIds.has(draft.labelColumnId)) {
+    return draft;
+  }
+  return { ...draft, labelColumnId: undefined };
+}
+
+/** A newly mapped column: included, one value, the default value rule. */
+function _makeAddedColumn(
+  column: CaseTypeDraftSourceColumn,
+): ChatProposedCaseAttribute {
+  return {
+    datasetId: column.datasetId,
+    columnId: column.columnId,
+    name: column.name,
+    isIncluded: true,
+    valueShape: "single",
+    valuePickerRuleType: "most_frequent",
+  };
+}
+
+/** The draft plus one mapped column. */
+function _withAddedColumn(
+  draft: ChatProposedCaseType,
+  column: CaseTypeDraftSourceColumn,
+): ChatProposedCaseType {
+  return {
+    ...draft,
+    attributes: [...draft.attributes, _makeAddedColumn(column)],
+  };
+}
+
+/**
+ * The draft without one contributing dataset, including its columns. The
+ * label is cleared when it named a column from that dataset.
+ */
+function _withoutSourceDataset(
+  draft: ChatProposedCaseType,
+  datasetId: string,
+): ChatProposedCaseType {
+  const removedColumnIds = _columnIdsForDataset(draft, datasetId);
+  const withoutLabel = _withoutLabelFromColumns(draft, removedColumnIds);
+  return {
+    ...withoutLabel,
+    sourceDatasets: withoutLabel.sourceDatasets.filter((sourceDataset) => {
+      return sourceDataset.datasetId !== datasetId;
+    }),
+    attributes: withoutLabel.attributes.filter((attribute) => {
+      return attribute.datasetId !== datasetId;
+    }),
+  };
+}
+
+/**
+ * The draft with one contributing dataset swapped for another. Columns from
+ * the old dataset are dropped, and the replacement starts with no join key.
+ */
+function _withReplacedSourceDataset(
+  draft: ChatProposedCaseType,
+  datasetId: string,
+  nextDatasetId: string,
+): ChatProposedCaseType {
+  if (
+    datasetId === nextDatasetId ||
+    !_hasSourceDataset(draft, datasetId) ||
+    _hasSourceDataset(draft, nextDatasetId)
+  ) {
+    return draft;
+  }
+  const withoutOldDataset = _withoutSourceDataset(draft, datasetId);
+  return {
+    ...withoutOldDataset,
+    sourceDatasets: draft.sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.datasetId === datasetId
+        ? { datasetId: nextDatasetId, primaryKeyColumnId: "" }
+        : sourceDataset;
+    }),
+  };
+}
+
+/** The draft plus a contributing dataset that still needs a join key. */
+function _withAddedSourceDataset(
+  draft: ChatProposedCaseType,
+  datasetId: string,
+): ChatProposedCaseType {
+  if (_hasSourceDataset(draft, datasetId)) {
+    return draft;
+  }
+  return {
+    ...draft,
+    sourceDatasets: [
+      ...draft.sourceDatasets,
+      { datasetId, primaryKeyColumnId: "" },
+    ],
+  };
+}
+
+/**
+ * The draft with one more column of a contributing dataset. When that
+ * dataset has no join key, the new column becomes it.
+ */
+function _withSourceColumn(
+  draft: ChatProposedCaseType,
+  column: CaseTypeDraftSourceColumn,
+): ChatProposedCaseType {
+  if (
+    !_hasSourceDataset(draft, column.datasetId) ||
+    draft.attributes.some((attribute) => {
+      return attribute.columnId === column.columnId;
+    })
+  ) {
+    return draft;
+  }
+  const withColumn = _withAddedColumn(draft, column);
+  const sourceDataset = draft.sourceDatasets.find((candidate) => {
+    return candidate.datasetId === column.datasetId;
+  });
+  if (sourceDataset && _hasJoinKey(draft, sourceDataset)) {
+    return withColumn;
+  }
+  return {
+    ...withColumn,
+    sourceDatasets: withColumn.sourceDatasets.map((candidate) => {
+      return candidate.datasetId === column.datasetId
+        ? { ...candidate, primaryKeyColumnId: column.columnId }
+        : candidate;
+    }),
+  };
+}
+
+/**
+ * The draft with this dataset's join key set to `columnId`. A column the
+ * draft does not list yet is added when `columnName` is given.
+ */
+function _withPrimaryKeyColumn(
+  draft: ChatProposedCaseType,
+  datasetId: string,
+  columnId: string,
+  columnName: string | undefined,
+): ChatProposedCaseType {
+  if (!_hasSourceDataset(draft, datasetId)) {
+    return draft;
+  }
+  const hasAttribute = draft.attributes.some((attribute) => {
+    return attribute.columnId === columnId;
+  });
+  if (!hasAttribute && columnName === undefined) {
+    return draft;
+  }
+  const withAttribute = hasAttribute
+    ? draft
+    : _withAddedColumn(draft, {
+        datasetId,
+        columnId,
+        name: columnName ?? "",
+      });
+  const keyed = _withKeyOrLabelColumn(withAttribute, columnId);
+  return {
+    ...keyed,
+    sourceDatasets: keyed.sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.datasetId === datasetId
+        ? { ...sourceDataset, primaryKeyColumnId: columnId }
+        : sourceDataset;
+    }),
+  };
+}
+
+/** Whether any contributing dataset is missing a mapped join key. */
+function _hasSourceWithoutJoinKey(draft: ChatProposedCaseType): boolean {
+  return draft.sourceDatasets.some((sourceDataset) => {
+    return !_hasJoinKey(draft, sourceDataset);
+  });
+}
+
 function _hasPeriodWithoutDateColumn(
   options: Readonly<{
     draft: ChatProposedCaseType;
@@ -225,6 +481,7 @@ export function useCaseTypeDraftEditor(
     canCreate:
       draft.name.trim().length > 0 &&
       draft.sourceDatasets.length > 0 &&
+      !_hasSourceWithoutJoinKey(draft) &&
       !_hasReservedAttributeName(draft) &&
       !_hasPeriodWithoutDateColumn({
         draft,
@@ -246,31 +503,31 @@ export function useCaseTypeDraftEditor(
         return { ...current, allowManualCreation };
       });
     },
-    setPrimaryKeyColumnId: (datasetId, columnId) => {
+    setPrimaryKeyColumnId: (datasetId, columnId, columnName) => {
       setDraft((current) => {
-        return {
-          ..._withKeyOrLabelColumn(current, columnId),
-          sourceDatasets: current.sourceDatasets.map((sourceDataset) => {
-            return sourceDataset.datasetId === datasetId
-              ? { ...sourceDataset, primaryKeyColumnId: columnId }
-              : sourceDataset;
-          }),
-        };
+        return _withPrimaryKeyColumn(current, datasetId, columnId, columnName);
       });
     },
     removeSourceDataset: (datasetId) => {
       setDraft((current) => {
         // Dropping the source alone would leave its attributes pointing at a
         // dataset with no join key, which the relation builder rejects.
-        return {
-          ...current,
-          sourceDatasets: current.sourceDatasets.filter((sourceDataset) => {
-            return sourceDataset.datasetId !== datasetId;
-          }),
-          attributes: current.attributes.filter((attribute) => {
-            return attribute.datasetId !== datasetId;
-          }),
-        };
+        return _withoutSourceDataset(current, datasetId);
+      });
+    },
+    replaceSourceDataset: (datasetId, nextDatasetId) => {
+      setDraft((current) => {
+        return _withReplacedSourceDataset(current, datasetId, nextDatasetId);
+      });
+    },
+    addSourceDataset: (datasetId) => {
+      setDraft((current) => {
+        return _withAddedSourceDataset(current, datasetId);
+      });
+    },
+    addSourceColumn: (column) => {
+      setDraft((current) => {
+        return _withSourceColumn(current, column);
       });
     },
     setLabelColumnId: (columnId) => {
