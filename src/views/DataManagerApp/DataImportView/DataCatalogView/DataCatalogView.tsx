@@ -29,9 +29,14 @@ import {
 import { MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ColumnTypeVerifications } from "@/lib/openData/ColumnTypeVerifications";
+import { requestOpenDataParquetCopy } from "@/lib/openData/requestOpenDataParquetCopy/requestOpenDataParquetCopy";
 import { isColumnTypeVerificationDue } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
 import { Logger } from "@/utils/Logger";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@/utils/notifications/notify";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
 import {
   addCatalogFilterValue,
@@ -47,6 +52,7 @@ import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/Da
 import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
 import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
+import { requestParquetCopyForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/requestParquetCopyForAdding/requestParquetCopyForAdding";
 import { useActiveCatalogFilters } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters";
 import { useCatalogListingPreview } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
@@ -232,6 +238,35 @@ export function DataCatalogView({
     }
   }
 
+  // Starts the listing's Parquet copy as it is added, so the first build is
+  // under way before the dataset is first opened.
+  async function _requestParquetCopy(
+    listing: DataCatalogListingRead,
+  ): Promise<void> {
+    try {
+      const copyStatus = await requestParquetCopyForAdding({
+        listing,
+        requestCopy: requestOpenDataParquetCopy,
+      });
+      if (copyStatus === "preparing") {
+        notifySuccess({
+          title: t`Preparing your data`,
+          message: t`"${listing.displayName}" is being prepared. Large datasets can take a few minutes to open the first time.`,
+        });
+      } else if (copyStatus === "failed") {
+        notifyWarning({
+          title: t`Data not ready`,
+          message: t`We couldn't prepare the data for "${listing.displayName}", so it may not open.`,
+        });
+      }
+    } catch (error) {
+      Logger.warn("Could not request a catalog listing's Parquet copy", {
+        catalogListingId: listing.id,
+        error,
+      });
+    }
+  }
+
   async function onAddToWorkspace(): Promise<void> {
     // An invalid or unsupported listing's button is only styled disabled,
     // so it still clicks.
@@ -266,6 +301,7 @@ export function DataCatalogView({
       datasetName: listing.displayName,
       workspaceId: workspace.id,
     });
+    void _requestParquetCopy(listing);
   }
 
   const requestDatasetButton = (
