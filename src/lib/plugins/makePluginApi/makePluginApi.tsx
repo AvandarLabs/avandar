@@ -70,19 +70,13 @@ function _makeDataExplorerApi(
   };
 }
 
-function _makeUiApi(
+function _makeModalApi(
   options: Readonly<{
-    pluginName: string;
     wrapContent: (content: ReactNode) => ReactNode;
-
-    /**
-     * Whether the drawer host is the one the API was made in. A command's
-     * modal or drawer must not appear in the next workspace.
-     */
     isFromCurrentHost: () => boolean;
   }>,
-): AvandarApi["ui"] {
-  const { pluginName, wrapContent, isFromCurrentHost } = options;
+): Pick<AvandarApi["ui"], "openModal" | "closeModal"> {
+  const { wrapContent, isFromCurrentHost } = options;
   // The id of the modal this invocation opened last, which `closeModal`
   // closes. Other invocations' modals are never touched.
   let lastModalId: string | undefined;
@@ -104,6 +98,24 @@ function _makeUiApi(
         lastModalId = undefined;
       }
     },
+  };
+}
+
+function _makeUiApi(
+  options: Readonly<{
+    pluginName: string;
+    wrapContent: (content: ReactNode) => ReactNode;
+
+    /**
+     * Whether the drawer host is the one the API was made in. A command's
+     * modal or drawer must not appear in the next workspace.
+     */
+    isFromCurrentHost: () => boolean;
+  }>,
+): AvandarApi["ui"] {
+  const { pluginName, wrapContent, isFromCurrentHost } = options;
+  return {
+    ..._makeModalApi({ wrapContent, isFromCurrentHost }),
     openDrawer: ({ title, content }) => {
       if (!isFromCurrentHost()) {
         return;
