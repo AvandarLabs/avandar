@@ -19,6 +19,7 @@ type SeededKeys = {
   filteredRecords: QueryKey;
   recordCount: QueryKey;
   otherCaseTypeRecords: QueryKey;
+  assigneeQueue: QueryKey;
   statuses: QueryKey;
   statusRecordCounts: QueryKey;
   caseType: QueryKey;
@@ -49,6 +50,11 @@ function _makeSeededCache(): { queryClient: QueryClient; keys: SeededKeys } {
         assignee: { kind: "anyone" },
       }),
     ),
+    assigneeQueue: IndividualClient.QueryKeys.getAll({
+      where: {
+        assigned_to: { eq: "00000000-0000-4000-8000-0000000000b1" },
+      },
+    }),
     statuses: ConceptStatusClient.QueryKeys.getAll(
       where("concept_id", "eq", CONCEPT_ID),
     ),
@@ -95,6 +101,23 @@ describe("invalidateCaseStatusQueries", () => {
     expect(_isStale(queryClient, keys.filteredRecords)).toBe(true);
     expect(_isStale(queryClient, keys.recordCount)).toBe(true);
     expect(_isStale(queryClient, keys.statusRecordCounts)).toBe(true);
+  });
+
+  it("marks the assignee queue stale when a record's assignee changes, and leaves another case type's list alone", async () => {
+    const { queryClient, keys } = _makeSeededCache();
+    const router = _makeRouter();
+
+    await invalidateCaseStatusQueries({
+      queryClient,
+      router,
+      conceptId: CONCEPT_ID,
+      change: "recordAssignment",
+    });
+
+    expect(_isStale(queryClient, keys.assigneeQueue)).toBe(true);
+    expect(_isStale(queryClient, keys.filteredRecords)).toBe(true);
+    expect(_isStale(queryClient, keys.otherCaseTypeRecords)).toBe(false);
+    expect(router.invalidate).toHaveBeenCalledOnce();
   });
 
   it("leaves another case type's records alone", async () => {

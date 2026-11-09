@@ -16,10 +16,11 @@ type Options = {
   conceptId: Concept.Id;
 
   /**
-   * `recordStatus` after one record's status changes, `statusSet` after a
-   * case type's statuses are saved.
+   * `recordStatus` after one record's status changes, `recordAssignment`
+   * after one record's assignee changes, `statusSet` after a case type's
+   * statuses are saved.
    */
-  change: "recordStatus" | "statusSet";
+  change: "recordStatus" | "recordAssignment" | "statusSet";
 };
 
 /**
@@ -49,6 +50,23 @@ function _isQueryForCaseType(
   );
 }
 
+/**
+ * Whether an individual query filters on `assigned_to`. A plain object
+ * covers `{ eq: userId }` and `{ is: null }`, so an assignee queue matches
+ * alongside a case type's filtered list.
+ */
+function _isAssigneeQuery(queryKey: QueryKey): boolean {
+  const [clientName, , params] = queryKey;
+  if (
+    clientName !== IndividualClient.getClientName() ||
+    !isPlainObject(params)
+  ) {
+    return false;
+  }
+  const { where } = params;
+  return isPlainObject(where) && isPlainObject(where.assigned_to);
+}
+
 function _invalidateCaseTypeQueries(
   options: Readonly<{
     queryClient: QueryClient;
@@ -69,15 +87,18 @@ function _invalidateCaseTypeQueries(
 }
 
 /**
- * Marks stale every query that shows a case type's statuses or the status
- * of one of its records, and reloads the open route.
+ * Marks stale every query that shows a case type's statuses, the status of
+ * one of its records, or who a record is assigned to, and reloads the open
+ * route.
  *
- * Both kinds of change refresh the case type's record lists and counts
- * (whatever status filter they use), its statuses and their record counts,
- * every Data Explorer query, and the route loader, which holds the open
- * record and the open case type. A data query's key names its SQL, not the
- * case types the SQL reads, so all of them are marked. Saving a status set
- * also refreshes the case type itself, whose default status may have moved.
+ * Every change refreshes the case type's record lists and counts (whatever
+ * status filter they use), its statuses and their record counts, every
+ * Data Explorer query, and the route loader, which holds the open record
+ * and the open case type. An assignee change also refreshes assignee lists,
+ * including a queue whose filter names `assigned_to` and no case type. A
+ * data query's key names its SQL, not the case types the SQL reads, so all
+ * of them are marked. Saving a status set also refreshes the case type
+ * itself, whose default status may have moved.
  */
 export async function invalidateCaseStatusQueries(
   options: Readonly<Options>,
@@ -105,6 +126,15 @@ export async function invalidateCaseStatusQueries(
     invalidations.push(
       queryClient.invalidateQueries({
         queryKey: [ConceptClient.getClientName()],
+      }),
+    );
+  }
+  if (change === "recordAssignment") {
+    invalidations.push(
+      queryClient.invalidateQueries({
+        predicate: (query) => {
+          return _isAssigneeQuery(query.queryKey);
+        },
       }),
     );
   }
