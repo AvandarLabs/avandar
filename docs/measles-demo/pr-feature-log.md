@@ -1493,8 +1493,10 @@ workspace dataset's Metadata tab still shows its preview.
 Status: in progress. The pipeline server builds copies on request through
 `POST /open-data-cache/:catalogListingId/build`, and the `open-data` edge
 function requests them through
-`POST /data-catalog-listings/:id/parquet-cache`. Nothing in the app reads
-them yet (see the spec's slices).
+`POST /data-catalog-listings/:id/parquet-cache`. Workspaces read API-backed
+listings from their copies, falling back to the 25 MB relay where no
+pipeline server is configured. The relay's removal and an E2E test are still
+to come (see the spec's slices).
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1505,7 +1507,9 @@ size limit of its own. It knows no API: each pipeline's manifest has a
 in the pipeline's folder. Socrata pages by row id with its declared column
 types, so a copy needs about one part of disk. CKAN files are gzipped on disk
 and split. The database claims one build per listing and records the copy.
-The server deploys from a template filled by a gitignored
+The app downloads a copy's parts from Storage, merges them in DuckDB, waits
+while a copy builds, and starts the build when a listing is added to a
+workspace, saying when its data is still being prepared. The server deploys from a template filled by a gitignored
 `.env.pipeline-server.prod`, and its Docker image now starts.
 **Value:** Large listings, such as NYC's DOB Violations (2.48M rows), can be
 added to a workspace and load from Storage instead of the source.
@@ -1535,6 +1539,8 @@ added to a workspace and load from Storage instead of the source.
 | `3ca228aae` | feat(pipeline-server): build ODC listings' Parquet copies on request | All of it. Merged in `42754c16c`. |
 | `e86a92b21` | feat(pipeline-server): keep a listing's columns when its copy shares none of them | All of it, including the P6.11 roadmap item. Merged in `42754c16c`. |
 | `b1c3a196b` | feat(open-data): request an ODC listing's Parquet copy from the pipeline server | All of it. Merged in `3600d91d9`. |
+| `2e0039c62` | feat(open-data): load ODC listings from their Parquet copies | All of it, including the four new messages in every `src/i18n/locales/*/messages.po` and `messages.ts`. Merged in `cc10b08f2`. |
+| `a285a3612` | docs: record how the app reads ODC listings' Parquet copies | All of it. Merged in `cc10b08f2`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
@@ -1554,7 +1560,14 @@ fixtures that list them, `shared/connectors/open-data/buildParquetCachePartPath/
 `supabase/functions/open-data/startParquetCopyBuild/`, the parquet-cache
 route in `OpenDataRoutes.ts` and `OpenDataRoutes.types.ts`, the pipeline
 server section of `.env.example.edge`, the `AVA_PIPELINE_SERVER_URL` lines
-in `.github/workflows/demo.yaml`, `docs/measles-demo/odc-parquet-cache-spec.md`,
+in `.github/workflows/demo.yaml`, `src/lib/openData/requestOpenDataParquetCopy/`,
+`src/lib/openData/fetchOpenDataParquetCopy/`,
+`src/clients/DuckDbClient/mergeParquetBlobs/` and `mergeParquetBlobs` in
+`DuckDbClient.ts`, the copy options in `DatasetParquetWrapper.ts`,
+`createDefaultRegistry.ts`, and `createRegistryForFetch.ts`,
+`src/views/DataManagerApp/DataImportView/DataCatalogView/requestParquetCopyForAdding/`
+and its call in `DataCatalogView.tsx`, the four new catalog messages,
+`docs/measles-demo/odc-parquet-cache-spec.md`,
 `docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
 bullets in `production-plan-world-humanitarian-day.md`.
 
@@ -1571,10 +1584,15 @@ migrations `20261107220000_STORAGE-opendata-service-role-writes-only.sql`
 pnpm --filter @avandar/pipeline-server test
 pnpm --filter @avandar/etl test
 pnpm exec vitest run supabase/functions/open-data shared/connectors/open-data
+pnpm exec vitest run src/clients/qetl src/lib/openData src/clients/DuckDbClient src/views/DataManagerApp/DataImportView
+pnpm test:executed src/clients/DuckDbClient/mergeParquetBlobs
 supabase test db supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql
 ```
 Then build the image (`docker build -f apps/pipeline-server/Dockerfile .`),
-run it, and check `/healthz` answers `{"ok":true}`.
+run it, and check `/healthz` answers `{"ok":true}`. In the app, add an
+API-backed listing that has no copy: a "Preparing your data" notification
+appears, and opening the dataset downloads its parts from the `opendata`
+bucket, with no request to the `/resource` relay.
 
 ---
 
