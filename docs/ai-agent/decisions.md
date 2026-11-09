@@ -724,7 +724,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Alternatives.** Leave them until after 1F (the agent would run by
   default without the audit trail and analytics today's chat has).
 
-## D41. Attachable context: inline mentions plus a chat-long tray (approved)
+## D41. Attachable context: inline mentions plus a chat-long tray (built)
 
 - **Decision (Pablo, 2026-11-09).** Typing `@` in the chat composer inserts
   a dashboard, tile, dataset, map, or case type as an inline chip, and a

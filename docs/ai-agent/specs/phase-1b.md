@@ -51,7 +51,7 @@ Out:
 | Which types | Dashboards, tiles, datasets, maps, case types | Cases need consent (Phase 3.5); teammates are not data. |
 | What the picker shows | A search box; before typing, "On this page" then "Recent" | The page's own items are the most likely picks. |
 | How to build the composer | A TipTap editor (approach A) | A textarea cannot draw inline chips. assistant-ui's `unstable_useMentionAdapter` keeps the textarea, so it shows raw directive text, and its API is marked deprecated. A textarea with a mirrored overlay breaks on wrapping, IME, and selection. |
-| Where refs live | Tokens inside the message text; the tray in `ChatThreadStore` | The message stays one text part, so assistant-ui, the store, and `apiMessages` keep their shape. |
+| Where refs live | Tokens inside the message text; the tray in `ChatContextTrayStore` | The message stays one text part, so assistant-ui, the store, and `apiMessages` keep their shape. |
 
 ## Decisions made while planning
 
@@ -75,15 +75,15 @@ Out:
 | Unit | Where | What it does |
 |---|---|---|
 | `ChatMentionToken` | `shared/agent/mentions/` | Pure. `serialize` writes a TipTap document as text with ref tokens. `parse` splits text into text and refs, accepting only the five chat types with valid ids. `toModelText` replaces each token with `@"<name>"` from a name map, masked. Shared so the eval renders the same text. |
-| `buildAgentMentionBlocks` | `shared/agent/mentions/` | Renders `<attached>` and `<mentioned>` from loaded gadget context, with the caps and dedupe lines below. |
+| `buildAgentContextBlocks` | `shared/agent/mentions/` | Renders `<attached>` and `<mentioned>` from loaded gadget context, with the caps and dedupe lines below. |
 | `AgentGadgetContext` | `shared/agent/mentions/` | The loaded metadata of one ref, per type, or "unavailable". Metadata only. |
 | `createAgentGadgetContextLoader` | `src/components/ChatPanel/useAvandarChatRuntime/agentMentions/` | Loads each ref with the user's own session (RLS applies) and checks its workspace. Uses `extractDashboardTiles` for dashboards and tiles. |
-| `ChatComposerEditor` | `src/components/ChatPanel/ChatThread/Composer/` | The TipTap editor: `createRichTextExtensions` with `GadgetLink` only. Enter sends and Shift+Enter adds a line. While the `@` menu is open, Enter and Shift+Enter both insert the highlighted row as a link. Sends with `aui.thread().append(...)`. |
-| `createMentionMenuSuggestion` options | `src/components/RichText/MentionMenu/` | New options: no people, an allowed-types filter (which also sets the search limit), links only, and no limited-audience hint. Comments keep today's behavior. |
+| `ChatComposerEditor` | `src/components/ChatPanel/ChatThread/Composer/` | The TipTap editor: `createChatComposerExtensions`, a trimmed StarterKit with `GadgetLink`. Enter sends and Shift+Enter adds a line. While the `@` menu is open, Enter and Shift+Enter both insert the highlighted row as a link. Sends with `aui.thread().append(...)`. |
+| `createMentionMenuSuggestion` options | `src/components/RichText/MentionMenu/` | New options: no people, an allowed-types filter, links only, and no limited-audience hint. Comments keep today's behavior. |
 | `ChatContextTray` | `src/components/ChatPanel/ChatThread/ChatContextTray/` | Chips with remove buttons above the input, and the "Add context" button. At most 5 items. |
 | `ChatContextPicker` | same folder | A popover with a search box over `searchGadgets`. Before typing: "On this page" (from the page capture 1A uses), then "Recent" (the blank-query search). Groups with `buildMentionMenuGroups`; items already attached show as added. |
 | `UserMessage` | `src/components/ChatPanel/ChatThread/UserMessage/` | Draws each token as a `GadgetChip` that opens the gadget, with its current name or its "Unavailable" label. |
-| `ChatThreadStore` | `src/components/ChatPanel/ChatThreadStore/` | Stores the tray per chat, as refs only. A new chat starts with an empty tray. |
+| `ChatContextTrayStore` | `src/components/ChatPanel/ChatContextTrayStore/` | Stores the tray per workspace and user under its own localStorage key, as refs only. A new chat starts with an empty tray. |
 | Prompt and proxy | `shared/agent/dataAgent/`, `supabase/functions/chat/PostAgentStream/` | Prompt v3 (below). `DATA_AGENT_PROMPT_IDS` adds `data-agent-v3`; the proxy serves all three. |
 | Turn | `askConversationDataAgent`, `runDataAgentTurn` | Builds the page, tray, and mention blocks in one pass through the conversation's vault, and converts tokens in the message and the recap. |
 
@@ -112,8 +112,9 @@ it cannot reveal anything the user could not open.
 
 Wherever a message is shown as a label (`getLastQuestionFromMessages`, the
 explorer's "From your prompt" banner, a chart title saved from a result), the
-token reads as `@Name`, resolved when shown. Analytics payloads carry counts
-by type only, never ids or names.
+token reads as `@Name`, resolved when shown. Analytics payloads carry
+`mentionCount` and `attachedCount` totals on agent turns, never ids or
+names.
 
 ## One turn
 
@@ -205,7 +206,7 @@ v1 and v2 stay served, so tabs opened before the deploy keep working.
 | A message has more than 5 mentions | Allowed. The composer notes that only the first 5 are described. |
 | The user navigates with the picker open | "On this page" follows the new page. |
 | The user switches workspace | Chats are per workspace, so the tray does not carry over. |
-| The thread reloads | Tray and chips come back from `ChatThreadStore`; names resolve again. |
+| The thread reloads | Tray and chips come back from `ChatContextTrayStore`; names resolve again. |
 
 ## Testing
 
@@ -214,16 +215,16 @@ Red/green TDD with Vitest, plus one browser spec:
 - `ChatMentionToken`: serialize, parse, and `toModelText`; malformed tokens,
   foreign types, and invalid ids stay text; a typed token parses.
 - `createMentionMenuSuggestion`: with the chat options, no people, only the
-  five types, the matching search limit, and links on Enter and Shift+Enter.
+  five types, and links on Enter and Shift+Enter.
   Comments unchanged.
 - `createAgentGadgetContextLoader`: each type, unavailable, another
   workspace's id, a removed tile, and a dataset outside the conversation.
-- `buildAgentMentionBlocks`: block order, the per-message and tray caps, the
+- `buildAgentContextBlocks`: block order, the per-message and tray caps, the
   24-tile total, dedupe lines, the unchanged line, and escaping.
 - Privacy in one pass: a value filtered in a mentioned tile masks a page
   title and the reverse; a personal title becomes "Untitled chart"; map layer
   names and case type fields are masked like names.
-- `ChatThreadStore`: the tray survives a round trip and stores refs only.
+- `ChatContextTrayStore`: the tray survives a round trip and stores refs only.
 - `ChatComposerEditor`: Enter, Shift+Enter, Enter in the menu, disabled and
   running states.
 - `ChatContextTray` and `ChatContextPicker`: "On this page", "Recent", added
@@ -242,7 +243,7 @@ Red/green TDD with Vitest, plus one browser spec:
 ## Eval
 
 `EvalQuestion` gains optional `attached` and `mentions`, rendered with
-`buildAgentMentionBlocks` and the same vault as the browser. Six questions on
+`buildAgentContextBlocks` and the same vault as the browser. Six questions on
 the COVID datasets, run with `--questions M`:
 
 | Id | Setup | Question shape |

@@ -1,5 +1,7 @@
 # Phase 1B: Attachable Context Implementation Plan
 
+> Built on feat/agent-context. Where this plan and the spec disagree, the spec's "Decisions made while planning" and D42 win (for example, today's chat names mentions by type only).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** With the agent switch on, the user can `@` mention a dashboard,
