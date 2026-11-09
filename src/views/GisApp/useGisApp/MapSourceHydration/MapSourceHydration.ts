@@ -80,10 +80,52 @@ function _getLayerFromMetadata({
   return {
     layer: {
       ...layer,
-      source: { ...query, filters: filters.filter, having: having.filter },
+      source: _withPopupAllColumnsQueried({
+        layer,
+        query: { ...query, filters: filters.filter, having: having.filter },
+      }),
     },
     issues: [...filters.issues, ...having.issues],
   };
+}
+
+/**
+ * A query that also selects every source column when the layer draws one
+ * feature per row and its popup shows all fields. "All fields" would
+ * otherwise mean only the columns the binding happened to select (for a
+ * geometry column layer, just the geometry), leaving the popup and the
+ * feature list empty. Aggregated sources are left alone, since selecting
+ * more columns would change what each row means. The source columns keep
+ * their ids across hydrations, so the layer's query key stays stable.
+ */
+function _withPopupAllColumnsQueried({
+  layer,
+  query,
+}: {
+  layer: AvaMapConfig.T["layers"][number];
+  query: StructuredQuery.Partial;
+}): StructuredQuery.Partial {
+  const bindingType = layer.geoBinding?.type;
+  const isRowLayer =
+    bindingType === "geometryColumn" || bindingType === "latLngColumns";
+  if (
+    layer.popup.columnIds !== "all" ||
+    !isRowLayer ||
+    Object.keys(query.aggregations).length > 0
+  ) {
+    return query;
+  }
+  const queriedBaseIds = new Set(
+    query.queryColumns.map((column) => {
+      return column.baseColumn.id;
+    }),
+  );
+  const missingColumns = (query.sourceColumns ?? []).filter((column) => {
+    return !queriedBaseIds.has(column.baseColumn.id);
+  });
+  return missingColumns.length === 0
+    ? query
+    : { ...query, queryColumns: [...query.queryColumns, ...missingColumns] };
 }
 
 function _getHavingColumns(query: StructuredQuery.Partial): QueryColumn.T[] {

@@ -131,3 +131,108 @@ it("points a saved case type layer at the view column its renamed field reads", 
     '"external_id_2" as "external_id"',
   );
 });
+
+function _makeSchoolsFixture(): {
+  config: AvaMapConfig.T;
+  columns: DatasetColumn.T[];
+} {
+  const dataset = Model.make("Dataset", {
+    id: "schools",
+    name: "schools",
+  }) as Dataset.T;
+  const columns = ["the_geom", "loc_name", "address"].map((name, index) => {
+    return Model.make("DatasetColumn", {
+      id: `dc_${name}`,
+      datasetId: dataset.id,
+      name,
+      originalName: name,
+      dataType: "varchar",
+      columnIdx: index,
+    }) as DatasetColumn.T;
+  });
+  const geometryColumn = QueryColumn.makeFromDatasetColumn(columns[0]!);
+  const layer = MapLayer.makeEmpty("schools");
+  return {
+    columns,
+    config: {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [
+        {
+          ...layer,
+          source: {
+            ...layer.source,
+            dataSource: dataset,
+            queryColumns: [geometryColumn],
+          },
+          geoBinding: {
+            type: "geometryColumn",
+            column: geometryColumn.id,
+            encoding: "wkt",
+            family: "point",
+            simplification: undefined,
+            sourceCrs: undefined,
+          },
+        },
+      ],
+    },
+  };
+}
+
+it("queries every source column of a geometry layer whose popup shows all fields", () => {
+  const { config, columns } = _makeSchoolsFixture();
+
+  const loaded = MapSourceHydration.fromMetadata({
+    config,
+    datasetColumns: columns,
+    conceptAttributes: undefined,
+  });
+
+  const layer = loaded.config.layers[0]!;
+  expect(layer.popup.columnIds).toBe("all");
+  expect(layer.source.queryColumns.map(prop("baseColumn.name"))).toEqual([
+    "the_geom",
+    "loc_name",
+    "address",
+  ]);
+  expect(structuredQueryToSql(layer.source)).toContain('"loc_name"');
+});
+
+it("keeps the queried columns' ids stable across hydrations", () => {
+  const { config, columns } = _makeSchoolsFixture();
+  const loaded = MapSourceHydration.fromMetadata({
+    config,
+    datasetColumns: columns,
+    conceptAttributes: undefined,
+  });
+
+  const reloaded = MapSourceHydration.fromMetadata({
+    config: loaded.config,
+    previousInput: loaded.config,
+    previousConfig: loaded.config,
+    datasetColumns: columns,
+    conceptAttributes: undefined,
+  });
+
+  expect(
+    reloaded.config.layers[0]!.source.queryColumns.map(prop("id")),
+  ).toEqual(loaded.config.layers[0]!.source.queryColumns.map(prop("id")));
+});
+
+it("leaves a popup's chosen fields as the only queried columns", () => {
+  const { config, columns } = _makeSchoolsFixture();
+  const layer = config.layers[0]!;
+  const chosen = {
+    ...config,
+    layers: [{ ...layer, popup: { ...layer.popup, columnIds: [] } }],
+  };
+
+  const loaded = MapSourceHydration.fromMetadata({
+    config: chosen,
+    datasetColumns: columns,
+    conceptAttributes: undefined,
+  });
+
+  expect(
+    loaded.config.layers[0]!.source.queryColumns.map(prop("baseColumn.name")),
+  ).toEqual(["the_geom"]);
+});
