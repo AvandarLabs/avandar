@@ -1501,9 +1501,9 @@ Status: in progress. The pipeline server builds copies on request through
 `POST /open-data-cache/:catalogListingId/build`, and the `open-data` edge
 function requests them through
 `POST /data-catalog-listings/:id/parquet-cache`. Workspaces read API-backed
-listings from their copies, falling back to the 25 MB relay where no
-pipeline server is configured. The relay's removal and an E2E test are still
-to come (see the spec's slices).
+listings only from their copies: the 25 MB relay, its raw-bytes cache, and
+the `cached_*` columns are removed. An E2E test is still to come (see the
+spec's slices).
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1548,6 +1548,8 @@ added to a workspace and load from Storage instead of the source.
 | `b1c3a196b` | feat(open-data): request an ODC listing's Parquet copy from the pipeline server | All of it. Merged in `3600d91d9`. |
 | `2e0039c62` | feat(open-data): load ODC listings from their Parquet copies | All of it, including the four new messages in every `src/i18n/locales/*/messages.po` and `messages.ts`. Merged in `cc10b08f2`. |
 | `a285a3612` | docs: record how the app reads ODC listings' Parquet copies | All of it. Merged in `cc10b08f2`. |
+| `86f234dc1` | refactor(open-data): remove the 25 MB relay and its raw-bytes cache | All of it, including the desktop SQLite migrations it adds for the earlier F25 migrations. Merged in `ba9724f2a`. |
+| `37c7cb7d1` | Merge branch 'demo/measles' into feat/odc-parquet-cache, and remove the empty open-data-catalog bucket | Its own changes only: `20261109030000_STORAGE-drop-open-data-catalog-bucket.sql`, its `sql_paths` entry in `supabase/config.toml`, the rewritten `storage_open_data_catalog_bucket.test.sql`, and the regenerated `database.types.ts`. Merged in `ba9724f2a`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
@@ -1583,7 +1585,14 @@ bullets in `production-plan-world-humanitarian-day.md`.
 the three `50.rpc_data_catalog_listings__*_parquet_cache.sql` RPCs,
 migrations `20261107220000_STORAGE-opendata-service-role-writes-only.sql`
 (hand-written, in `[db.seed] sql_paths`, mirrored in `99.storage.sql`) and
-`20261108195431_odc_parquet_cache.sql`, and
+`20261108195431_odc_parquet_cache.sql`, `20261109021620_drop_odc_raw_bytes_cache.sql`
+(drops `cached_object_path`, `cached_source_version`, and `cached_at`), and
+`20261109030000_STORAGE-drop-open-data-catalog-bucket.sql` (hand-written, in
+`[db.seed] sql_paths`; deletes the `open-data-catalog` bucket once it is
+empty), their desktop `.gen.sql` files, the rewritten
+`storage_open_data_catalog_bucket.test.sql`, the copy-column cases in
+`data_catalog_listings_access.test.sql` and
+`rpc_data_catalog_listings__upsert_with_relation_columns.test.sql`, and
 `supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql`.
 
 **Verification:**
