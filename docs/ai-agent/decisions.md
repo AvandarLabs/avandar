@@ -720,3 +720,27 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   agent on loses nothing today's chat records.
 - **Alternatives.** Leave them until after 1F (the agent would run by
   default without the audit trail and analytics today's chat has).
+
+## D41. Attachable context: inline mentions plus a chat-long tray (approved)
+
+- **Decision (Pablo, 2026-11-09).** Typing `@` in the chat composer inserts
+  a dashboard, tile, dataset, map, or case type as an inline chip, and a
+  tray above the composer holds up to five items for the whole chat, added
+  with a picker that lists the current page's items first. The agent gets
+  each one's metadata in `<mentioned>` and `<attached>` blocks, through the
+  page block's redaction, under prompt `data-agent-v3`. Spec:
+  [phase-1b.md](specs/phase-1b.md).
+- **Why.** A mention is about one message; the tray is context the user
+  wants kept, sent in full only when it changes, so it costs little on
+  later turns. Reusing the comment composer's menu, search, and chip keeps
+  one way to reference a gadget across the app.
+- **How.** A TipTap chat composer replaces the textarea with the switch on,
+  because a textarea cannot draw inline chips. Chips are stored as ref
+  tokens in the message text, never names.
+- **Alternatives.** One concept for both (picker inserts inline chips), or a
+  tray only over a plain textarea (text and chips can drift apart).
+  assistant-ui's `unstable_useMentionAdapter` (raw directive text in the
+  textarea, an API marked deprecated). A textarea with a mirrored overlay
+  (fragile).
+- **Left out.** Cases, until Phase 3.5 adds consent for personal data, and
+  teammates, which are not data.
