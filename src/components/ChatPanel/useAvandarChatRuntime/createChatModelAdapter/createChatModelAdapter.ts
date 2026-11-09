@@ -45,6 +45,26 @@ type LastCompletedTurn = {
   response: ChatResponse.T;
 };
 
+/**
+ * A user message's text as the model reads it. Discovery continuations get
+ * their model wording. View-change lines, recognized the way the stored
+ * thread and the hidden-message filter recognize them (the view-change
+ * metadata flag, or the line's prefix for lines whose metadata was lost),
+ * get any case id hidden. Anything else the user typed is sent as is.
+ */
+function _userModelContent(
+  metadata: Readonly<{ custom?: Record<string, unknown> }> | undefined,
+  content: string,
+): string {
+  if (DiscoveryContinuationMessage.isInternal(metadata)) {
+    return DiscoveryContinuationMessage.toModelContent(content);
+  }
+  const isViewChange =
+    ChatViewEvent.isInternal(metadata) ||
+    ChatViewEvent.isViewChangeContent(content);
+  return isViewChange ? ChatViewEvent.toModelContent(content) : content;
+}
+
 /** Refs and dispatches the chat model adapter reads on each turn. */
 export type CreateChatModelAdapterOptions = {
   chatGenerationRef: MutableRefObject<number>;
@@ -215,11 +235,7 @@ export function createChatModelAdapter(
             }),
             user: Model.make("ChatClientMessage", {
               role: "user" as const,
-              content: DiscoveryContinuationMessage.isInternal(
-                threadMessage.metadata,
-              )
-                ? DiscoveryContinuationMessage.toModelContent(content)
-                : ChatViewEvent.toModelContent(content),
+              content: _userModelContent(threadMessage.metadata, content),
             }),
           });
         })

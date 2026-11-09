@@ -132,11 +132,9 @@ describe("buildDataAgentSystemPrompt", () => {
       today: "2026-11-08",
       promptId: "data-agent-v1",
     });
-    const rule =
-      "Never show the user the tag or a table alias such as t0; " +
-      "call datasets by their names.";
+    const rule = /never show the user[^.]*\btable alias[^.]*\bnames\b/i;
 
-    expect(v2).toContain(rule);
-    expect(v1).not.toContain(rule);
+    expect(v2).toMatch(rule);
+    expect(v1).not.toMatch(rule);
   });
 });

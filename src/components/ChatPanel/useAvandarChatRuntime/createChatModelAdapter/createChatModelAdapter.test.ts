@@ -207,6 +207,24 @@ describe("createChatModelAdapter", () => {
     expect(sent).not.toContain(CASE_INDIVIDUAL_ID);
   });
 
+  it("never rewrites typed text that mentions a case route", async () => {
+    const typed =
+      "Why does route=/acme/individual-manager/c1/" +
+      `${CASE_INDIVIDUAL_ID} look empty?`;
+
+    await _createAdapter("dashboards").run({
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: typed }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+
+    expect(apiPostMock.mock.calls[0]![0].body.messages[0].content).toBe(typed);
+  });
+
   it("runs the offline data agent in the Data Explorer with offline mode on", async () => {
     OfflineModeStore.setOn(true);
 

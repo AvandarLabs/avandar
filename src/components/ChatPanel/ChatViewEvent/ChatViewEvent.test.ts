@@ -192,9 +192,57 @@ describe("ChatViewEvent", () => {
     );
   });
 
-  it("leaves typed user text alone", () => {
-    const typed = `Open /individual-manager/${CONCEPT_ID}/${INDIVIDUAL_ID}`;
+  /** Routes and the route each should format to. */
+  const CASE_ROUTES = [
+    [
+      "a case page",
+      "/acme/individual-manager/c1/i1",
+      "/acme/individual-manager/c1/<case>",
+    ],
+    [
+      "a trailing slash",
+      "/acme/individual-manager/c1/i1/",
+      "/acme/individual-manager/c1/<case>/",
+    ],
+    [
+      "a query",
+      "/acme/individual-manager/c1/i1?tab=2",
+      "/acme/individual-manager/c1/<case>?tab=2",
+    ],
+    [
+      "a hash",
+      "/acme/individual-manager/c1/i1#notes",
+      "/acme/individual-manager/c1/<case>#notes",
+    ],
+    [
+      "a workspace slug named individual-manager",
+      "/individual-manager/individual-manager/c1/i1",
+      "/individual-manager/individual-manager/c1/<case>",
+    ],
+    [
+      "a case type page with no case",
+      "/acme/individual-manager/c1",
+      "/acme/individual-manager/c1",
+    ],
+  ] as const;
 
-    expect(ChatViewEvent.toModelContent(typed)).toBe(typed);
+  it.each(CASE_ROUTES)("hides the case id in %s", (_name, route, expected) => {
+    const line = ChatViewEvent.format({ app: "other", route });
+
+    expect(line).toContain(`route=${expected};`);
+    expect(line.replace(expected, "")).not.toContain("i1");
   });
+
+  it.each(CASE_ROUTES)(
+    "hides the case id in a stored line for %s",
+    (_name, route, expected) => {
+      const storedLine =
+        `[View changed: app=other; route=${route}; ` +
+        "dataset=none; dashboard=none]";
+
+      expect(ChatViewEvent.toModelContent(storedLine)).toBe(
+        ChatViewEvent.format({ app: "other", route: expected }),
+      );
+    },
+  );
 });
