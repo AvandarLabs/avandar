@@ -1,4 +1,4 @@
-import { Model } from "@avandar/models";
+import { getPlacesLayerDatasetId } from "@/views/GisApp/places/getPlacesLayerDatasetId/getPlacesLayerDatasetId";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -14,12 +14,8 @@ export function getPlacesLayerDatasetIds(
   }>,
 ): Dataset.Id[] {
   const datasetIds = options.layers.flatMap((layer) => {
-    const dataSource = layer.source.dataSource;
-    return dataSource &&
-      Model.isOfModelType(dataSource, "Dataset") &&
-      options.placesDatasetIds.has(dataSource.id)
-      ? [dataSource.id]
-      : [];
+    const datasetId = getPlacesLayerDatasetId(layer, options.placesDatasetIds);
+    return datasetId ? [datasetId] : [];
   });
   return [...new Set(datasetIds)];
 }

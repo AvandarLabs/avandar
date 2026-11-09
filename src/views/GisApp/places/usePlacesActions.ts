@@ -36,8 +36,10 @@ import type { UseMutationResultTuple } from "@avandar/query-hooks";
 
 type PlacesSession = {
   workspaceId: Workspace.Id;
-  userId: User.Id;
+  userId: User.Id | undefined;
 };
+
+type SignedInPlacesSession = PlacesSession & { userId: User.Id };
 
 type SavePlaceVariables = {
   datasetId: Dataset.Id;
@@ -64,8 +66,15 @@ function usePlacesSession(app: GisAppState): PlacesSession {
   const user = useCurrentUser();
   return {
     workspaceId: app.avaMap.workspaceId,
-    userId: user!.id as User.Id,
+    userId: user?.id as User.Id | undefined,
   };
+}
+
+function _requireSignedIn(session: PlacesSession): SignedInPlacesSession {
+  if (!session.userId) {
+    throw new Error("Places can only be changed by a signed-in user.");
+  }
+  return { ...session, userId: session.userId };
 }
 
 function _addLayer(app: GisAppState, layer: MapLayer.T): void {
@@ -82,7 +91,7 @@ function _addLayer(app: GisAppState, layer: MapLayer.T): void {
  * duplicates the place.
  */
 async function _refreshAfterWrite(
-  target: Readonly<PlacesSession & { datasetId: Dataset.Id }>,
+  target: Readonly<SignedInPlacesSession & { datasetId: Dataset.Id }>,
 ): Promise<boolean> {
   try {
     await refreshPlacesDatasetCaches({
@@ -109,7 +118,8 @@ async function _editPlaces(
     edit: (rows: readonly PlaceRow[]) => PlaceEditResult;
   }>,
 ): Promise<PlacesEditOutcome> {
-  const { session, datasetId } = options;
+  const session = _requireSignedIn(options.session);
+  const { datasetId } = options;
   const target = {
     workspaceId: session.workspaceId,
     userId: session.userId,
@@ -149,9 +159,10 @@ function useCreatePlacesDataset(
   const toErrorMessage = usePlacesErrorMessage();
   return useMutation({
     mutationFn: async (datasetName: string): Promise<MapLayer.T> => {
+      const signedIn = _requireSignedIn(session);
       const dataset = await PlacesStore.createPlacesDataset({
-        workspaceId: session.workspaceId,
-        userId: session.userId,
+        workspaceId: signedIn.workspaceId,
+        userId: signedIn.userId,
         datasetName,
       });
       const datasetColumns = await DatasetColumnClient.getAll(
@@ -262,9 +273,10 @@ function useLoadPlace(
   const toErrorMessage = usePlacesErrorMessage();
   return useMutation({
     mutationFn: async (variables: LoadPlaceVariables) => {
+      const signedIn = _requireSignedIn(session);
       const rows = await PlacesStore.readPlaces({
-        workspaceId: session.workspaceId,
-        userId: session.userId,
+        workspaceId: signedIn.workspaceId,
+        userId: signedIn.userId,
         datasetId: variables.target.datasetId,
       });
       return rows.find(propEq("placeId", variables.target.placeId));
@@ -288,6 +300,60 @@ function useLoadPlace(
       notifyError(toErrorMessage(error, t`Could not open the place.`));
     },
   });
+}
+
+type PlacesActionsInputs = Readonly<{
+  app: GisAppState;
+  datasets: readonly Dataset.T[];
+  datasetColumns: readonly DatasetColumn.T[];
+  placesDatasetIds: ReadonlySet<Dataset.Id>;
+  targetDatasetId: Dataset.Id | undefined;
+  isSaving: boolean;
+  createDataset: (datasetName: string) => void;
+  savePlace: (variables: SavePlaceVariables) => void;
+  deletePlace: (target: PlaceFeatureTarget) => void;
+  loadPlace: (variables: LoadPlaceVariables) => void;
+}>;
+
+function _createPlacesActions(
+  inputs: PlacesActionsInputs,
+): ReturnType<typeof usePlacesActions> {
+  const { app } = inputs;
+  return {
+    isSaving: inputs.isSaving,
+    createPlacesDataset: inputs.createDataset,
+    addPlacesLayer: (datasetId) => {
+      const dataset = inputs.datasets.find(propEq("id", datasetId));
+      if (dataset) {
+        _addLayer(
+          app,
+          createPlacesLayer({
+            dataset,
+            datasetColumns: inputs.datasetColumns,
+          }),
+        );
+      }
+    },
+    savePlace: (input) => {
+      const draft = app.placeToolState.draft;
+      const datasetId = draft?.datasetId ?? inputs.targetDatasetId;
+      if (draft && datasetId) {
+        inputs.savePlace({ datasetId, placeId: draft.placeId, input });
+      }
+    },
+    featureActions: {
+      placesDatasetIds: inputs.placesDatasetIds,
+      onEdit: (target) => {
+        inputs.loadPlace({ target, mode: "edit" });
+      },
+      onMove: (target) => {
+        inputs.loadPlace({ target, mode: "move" });
+      },
+      onDelete: (target) => {
+        inputs.deletePlace(target);
+      },
+    },
+  };
 }
 
 /**
@@ -317,39 +383,12 @@ export function usePlacesActions(
   const [savePlace, isSavingPlace] = useSavePlace(app, session);
   const [deletePlace, isDeleting] = useDeletePlace(app, session);
   const [loadPlace, isLoading] = useLoadPlace(app, session);
-  return {
+  return _createPlacesActions({
+    ...options,
     isSaving: isCreating || isSavingPlace || isDeleting || isLoading,
-    createPlacesDataset: createDataset,
-    addPlacesLayer: (datasetId) => {
-      const dataset = options.datasets.find(propEq("id", datasetId));
-      if (dataset) {
-        _addLayer(
-          app,
-          createPlacesLayer({
-            dataset,
-            datasetColumns: options.datasetColumns,
-          }),
-        );
-      }
-    },
-    savePlace: (input) => {
-      const draft = app.placeToolState.draft;
-      const datasetId = draft?.datasetId ?? options.targetDatasetId;
-      if (draft && datasetId) {
-        savePlace({ datasetId, placeId: draft.placeId, input });
-      }
-    },
-    featureActions: {
-      placesDatasetIds: options.placesDatasetIds,
-      onEdit: (target) => {
-        loadPlace({ target, mode: "edit" });
-      },
-      onMove: (target) => {
-        loadPlace({ target, mode: "move" });
-      },
-      onDelete: (target) => {
-        deletePlace(target);
-      },
-    },
-  };
+    createDataset,
+    savePlace,
+    deletePlace,
+    loadPlace,
+  });
 }

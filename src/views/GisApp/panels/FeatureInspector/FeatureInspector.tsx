@@ -1,4 +1,3 @@
-import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { Button, Stack } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
@@ -9,6 +8,7 @@ import { FeatureFields } from "@/views/GisApp/panels/FeatureInspector/FeatureFie
 import css from "@/views/GisApp/panels/FeatureInspector/FeatureInspector.module.css";
 import { FeatureInspectorHeader } from "@/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader";
 import { PlaceFeatureActions } from "@/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions";
+import { getPlacesLayerDatasetId } from "@/views/GisApp/places/getPlacesLayerDatasetId/getPlacesLayerDatasetId";
 import { PLACE_ID_COLUMN_NAME } from "@/views/GisApp/places/withPlaceIdColumn/withPlaceIdColumn";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -22,6 +22,7 @@ import type { ReactNode, RefObject } from "react";
 
 const FEATURE_DRAWER_REGION_ID = "gis-feature-drawer-region";
 const FEATURE_DRAWER_TITLE_ID = "gis-feature-drawer-title";
+const NO_PLACES_DATASETS: ReadonlySet<Dataset.Id> = new Set();
 
 type Props = {
   opened: boolean;
@@ -47,20 +48,6 @@ type Props = {
   placeActions?: PlaceFeatureActionHandlers;
 };
 
-/** The places dataset a layer reads, when it reads one. */
-function _getPlacesDatasetId(
-  layer: MapLayer.T | undefined,
-  placeActions: PlaceFeatureActionHandlers | undefined,
-): Dataset.Id | undefined {
-  const dataSource = layer?.source.dataSource;
-  return placeActions &&
-    dataSource &&
-    Model.isOfModelType(dataSource, "Dataset") &&
-    placeActions.placesDatasetIds.has(dataSource.id)
-    ? dataSource.id
-    : undefined;
-}
-
 /**
  * The clicked place and the fields it shows. A place's `place_id` only
  * identifies the row for Edit, Move, and Delete, so it is never shown.
@@ -76,7 +63,10 @@ function _getPlaceView(
   visibleProperties: Record<string, unknown>;
 } {
   const { properties } = options;
-  const datasetId = _getPlacesDatasetId(options.layer, options.placeActions);
+  const datasetId = getPlacesLayerDatasetId(
+    options.layer,
+    options.placeActions?.placesDatasetIds ?? NO_PLACES_DATASETS,
+  );
   if (!datasetId) {
     return { placeTarget: undefined, visibleProperties: properties };
   }
@@ -135,7 +125,10 @@ export function FeatureInspector({
               mapRef={mapRef}
               onRowClick={onRowClick}
               hiddenColumnNames={
-                _getPlacesDatasetId(layer, placeActions)
+                getPlacesLayerDatasetId(
+                  layer,
+                  placeActions?.placesDatasetIds ?? NO_PLACES_DATASETS,
+                )
                   ? [PLACE_ID_COLUMN_NAME]
                   : undefined
               }

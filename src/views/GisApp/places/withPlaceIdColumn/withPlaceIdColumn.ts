@@ -1,24 +1,13 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { getPlacesLayerDatasetId } from "@/views/GisApp/places/getPlacesLayerDatasetId/getPlacesLayerDatasetId";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 /** The places column that identifies a row. Edit, Move, and Delete read it. */
 export const PLACE_ID_COLUMN_NAME = "place_id";
-
-function _getPlacesDatasetId(
-  layer: MapLayer.T,
-  placesDatasetIds: ReadonlySet<Dataset.Id>,
-): Dataset.Id | undefined {
-  const dataSource = layer.source.dataSource;
-  return dataSource &&
-    Model.isOfModelType(dataSource, "Dataset") &&
-    placesDatasetIds.has(dataSource.id)
-    ? dataSource.id
-    : undefined;
-}
 
 /** Whether a query column is a places dataset's internal `place_id`. */
 export function isPlaceIdColumn(column: QueryColumn.T): boolean {
@@ -51,7 +40,7 @@ export function withPlaceIdColumn(
   }>,
 ): MapLayer.T {
   const { layer } = options;
-  const datasetId = _getPlacesDatasetId(layer, options.placesDatasetIds);
+  const datasetId = getPlacesLayerDatasetId(layer, options.placesDatasetIds);
   const datasetColumn = options.datasetColumns.find((column) => {
     return (
       column.datasetId === datasetId && column.name === PLACE_ID_COLUMN_NAME
