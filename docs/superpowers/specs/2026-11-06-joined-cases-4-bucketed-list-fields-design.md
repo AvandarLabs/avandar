@@ -684,3 +684,77 @@ compile error.
 3. **Record page density.** The rail shows the six most recent periods and a
    "Show all" modal. Would a small chart serve the demo better than a table
    for numeric per-period fields?
+
+## 12. Implementation notes
+
+Plan 4 was built on `feat/joined-cases` on top of plans 1 to 3. Code review
+during execution changed the built code in the ways below. Later plans must
+start from this code, not from the plan text.
+
+### What differs from the plan text
+
+1. **The mapping trigger is scoped to the mapping's workspace (security).** A
+   BEFORE trigger runs ahead of RLS `with check`, so any signed-in user
+   reaches it. Its field and column lookups match on `workspace_id`, so another
+   workspace's field or column reads as missing, and the
+   `bucket_column_not_a_date` detail no longer echoes a column's type. It fires
+   only on updates of `concept_attribute_id`, `dataset_id`, and
+   `bucket_column_id`. Migration `20261108193037_add_bucketed_list_fields.sql`;
+   pgTAP asserts each hint and an `authenticated` editor case.
+2. **The RPC's rule check** is `(is_array and bucket_grain is null) = (rule is
+   not null)`: a per-period field keeps a rule, a list does not.
+3. **Zoned timestamps bucket in UTC.** DuckDB reads an offset-bearing CSV value
+   as `TIMESTAMP WITH TIME ZONE`, which the app types as `timestamp`.
+   `date_trunc` on it depends on the session time zone, so a period could
+   differ between viewers. `BucketedListValueSqlOptions.isBucketColumnZoned`
+   (from the column's `detectedDataType`) reads it as `timezone('UTC', col)`.
+4. **Text `max` and `min` per period** use the same `arg_max`/`arg_min` over
+   `{k: lower(strip_accents(CAST(v AS VARCHAR))), v: v}` as single values
+   (section 5.4's table says `MAX`/`MIN`). A review compared per-period results
+   with single values over 110 combinations: no mismatches.
+5. **Buckets arrive as `YYYY-MM-DD` text.** `arrowTableToJS` turns any date,
+   timestamp, or time inside a list element (struct fields included) into
+   text. Decimals inside a map or union keep their scale.
+6. **The record page table** shows the six most recent periods with an inline
+   "Show all <n> <periods>" toggle (not a modal), locale period labels, and
+   values to at most two decimals (`useBucketValueFormatter`, in
+   `src/components/caseFields/`). `CaseDetailsRow` carries plan 3's `dataType`,
+   not `valueDataType` (section 5.6).
+7. **The Data Explorer grid** labels periods with the same locale hooks
+   (`Jan 2026: 38.5; Feb 2026: 37.9`), not ISO labels. `bucketGrain` rides on
+   result columns and projection descriptors.
+8. **Chat.** The parser keeps a proposed per-period field only when its date
+   column is a catalog `date` or `timestamp` column of the attribute's dataset;
+   otherwise the field falls back to one value. The SQL context marks
+   `Name [per month: STRUCT(bucket DATE, value T)[]]` and adds
+   `formatBucketedFieldNote`; the list marker and list note skip per-period
+   fields.
+9. **Keys and titles never keep a period.** The form clears the period when a
+   field becomes a key or the title (`_keepKeyFieldsSingle`,
+   `keepKeyAndLabelFieldsSingle`). The draft card disables Create while a
+   per-period field's date column is missing, not a date column of its
+   dataset, or still loading (`useCaseTypeDraftEditor` takes
+   `{ proposedDraft, dateColumnOptionsByDatasetId }`). The form shows "Choose
+   the date column for this field" on the date picker.
+10. **Planning** fetches the date column in
+    `getConceptAttributeColumnsFromConceptId` and keeps it in projected loads
+    in `getNeededColumnsFromQuery`.
+
+### Follow-ups
+
+1. **E2E not yet run green.** `tests/e2e/case-bucketed-fields.spec.ts` is
+   committed, but no run got past sign-in: the machine was overloaded and the
+   local Supabase stack stopped answering. Plan 3's list-field spec failed the
+   same way. Re-run all three record page specs once the stack is healthy.
+   The final full check also could not reach the local database: every
+   migration applied, but seeding and `pnpm test:db` timed out connecting.
+   `pnpm test:db` last passed after the RPC change (1222 tests), and no
+   database change came after it.
+2. **Grid values are formatted as numbers.** A per-period date or boolean
+   value shows raw in the Data Explorer; carry the value type onto the result
+   column.
+3. **Raw SQL results** have no grain, so their periods show as `YYYY-MM-DD`.
+4. **Nothing refuses a later `bucket_grain` change** on a field that already
+   has a mapping (a direct PostgREST PATCH by an editor). No app path does it.
+5. **A mapping can reference another workspace's field** when it has no date
+   column (general mapping integrity, older than this plan).
