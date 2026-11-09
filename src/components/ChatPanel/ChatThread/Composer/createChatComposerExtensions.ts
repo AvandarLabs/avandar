@@ -3,7 +3,9 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { isChatMentionType } from "$/agent/mentions/ChatMentionToken";
 import { ChatGadgetLinkView } from "@/components/ChatPanel/ChatThread/Composer/ChatGadgetLinkView";
+import { createGadgetRefFromAttrs } from "@/components/RichText/Gadget/GadgetNodes/createGadgetRefFromAttrs";
 import { GadgetLink } from "@/components/RichText/Gadget/GadgetNodes/GadgetNodes";
 import { createMentionMenuSuggestion } from "@/components/RichText/MentionMenu/createMentionMenuSuggestion";
 import { UserMention } from "@/components/RichText/UserMention/UserMention";
@@ -40,6 +42,20 @@ const ChatComposerKeys = Extension.create<{ onSubmit: () => void }>({
     };
   },
 });
+
+/**
+ * Matches a pasted gadget chip only when it carries a valid ref of a type
+ * the chat offers. Any other chip, such as a case copied from a comment,
+ * pastes as its text instead of a chip the message would drop.
+ */
+function _readChatRefFromElement(element: HTMLElement): false | null {
+  const ref = createGadgetRefFromAttrs({
+    gadgetType: element.getAttribute("data-gadget-type"),
+    gadgetId: element.getAttribute("data-gadget-id"),
+    subId: element.getAttribute("data-sub-id"),
+  });
+  return ref && isChatMentionType(ref.gadgetType) ? null : false;
+}
 
 /**
  * The chat composer's editor: paragraphs, line breaks, undo and redo, the
@@ -88,6 +104,15 @@ export function createChatComposerExtensions(
     // imports reach back to the chat panel, so a module-level `extend` can
     // run before `GadgetLink` exists.
     GadgetLink.extend({
+      parseHTML() {
+        return [
+          {
+            tag: '[data-type="gadgetLink"]',
+            priority: 60,
+            getAttrs: _readChatRefFromElement,
+          },
+        ];
+      },
       addNodeView() {
         return ReactNodeViewRenderer(ChatGadgetLinkView);
       },

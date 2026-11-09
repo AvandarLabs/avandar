@@ -91,9 +91,10 @@ export function Composer(): React.ReactNode {
         <div className={css.composer}>
           <ChatComposerEditor
             placeholder={placeholder}
-            disabled={chatDisabled}
+            // This branch only renders where chat is available.
+            disabled={false}
             inputRef={editorInputRef}
-            actions={<OfflineModeControl disabled={chatDisabled} />}
+            actions={<OfflineModeControl disabled={false} />}
           />
         </div>
       ) : (

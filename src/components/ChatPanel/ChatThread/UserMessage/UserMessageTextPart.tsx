@@ -1,7 +1,7 @@
 import { useMessagePartText } from "@assistant-ui/react";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { GadgetChip } from "@/components/RichText/Gadget/GadgetChip/GadgetChip";
-import css from "../MessageTextPart/MessageTextPart.module.css";
+import css from "./UserMessageTextPart.module.css";
 import type { ReactNode } from "react";
 
 /**

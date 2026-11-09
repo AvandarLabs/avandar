@@ -93,11 +93,12 @@ export function useChatComposerEditor(
       attributes: {
         "aria-label": t`Message`,
         "aria-multiline": "true",
+        "aria-disabled": String(options.disabled),
         role: "textbox",
         class: css.composerEditor ?? "",
       },
     };
-  }, [t]);
+  }, [t, options.disabled]);
   const editor = useEditor({
     extensions,
     editable: !options.disabled,

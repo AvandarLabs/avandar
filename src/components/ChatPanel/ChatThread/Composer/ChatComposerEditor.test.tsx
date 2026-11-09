@@ -388,4 +388,41 @@ describe("ChatComposerEditor", () => {
     expect(inputRef.current).toBe(_getEditingArea());
     expect(screen.getByText("Offline mode")).toBeInTheDocument();
   });
+  it("pastes a chip of a type the chat does not offer as its text", () => {
+    render(<Harness />);
+    const caseId = "55555555-5555-4555-8555-555555555555";
+
+    act(() => {
+      _getEditor().commands.setContent(
+        `<p>See <a data-type="gadgetLink" data-gadget-type="individual" ` +
+          `data-gadget-id="${caseId}" href="/cases">Case of Amara</a></p>`,
+      );
+    });
+
+    const json = JSON.stringify(_getEditor().getJSON());
+    expect(json).not.toContain("gadgetLink");
+    expect(_getEditor().getText()).toBe("See Case of Amara");
+  });
+
+  it("pastes a chip of a chat type as a chip", () => {
+    render(<Harness />);
+
+    act(() => {
+      _getEditor().commands.setContent(
+        `<p>See <a data-type="gadgetLink" data-gadget-type="dataset" ` +
+          `data-gadget-id="${DATASET_REF.gadgetId}" href="/d">US deaths</a></p>`,
+      );
+    });
+
+    expect(JSON.stringify(_getEditor().getJSON())).toContain("gadgetLink");
+  });
+
+  it("marks the editing area disabled while input is off", () => {
+    const { rerender } = render(<Harness />);
+    expect(_getEditingArea()).toHaveAttribute("aria-disabled", "false");
+
+    rerender(<Harness disabled />);
+
+    expect(_getEditingArea()).toHaveAttribute("aria-disabled", "true");
+  });
 });
