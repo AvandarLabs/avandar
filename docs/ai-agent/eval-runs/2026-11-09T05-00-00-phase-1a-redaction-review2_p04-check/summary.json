@@ -1,0 +1,17 @@
+{
+  "label": "phase-1a-redaction-review2:p04-check",
+  "questionCount": 2,
+  "passCount": 2,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 3,
+  "promptTokens": 9987,
+  "cachedPromptTokens": 9797,
+  "completionTokens": 688,
+  "totalCost": 0.00046547,
+  "costPerQuestion": 0.000232735,
+  "latencyMedianMs": 2866.8717500000002,
+  "latencyP90Ms": 2866.8717500000002,
+  "failedIds": []
+}

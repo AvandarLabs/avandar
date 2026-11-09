@@ -41,6 +41,12 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D31 | Today's chat answers with Claude Haiku 5.5 | Done |
 | D32 | The PDF table assistant gets its own route, measured by its own eval | Done |
 | D33 | The plan to the full Avandar agent | Approved |
+| D34 | Phase 1 is reshaped: the agent is not page-specific | Approved |
+| D35 | One agent with a general host; the page travels in each turn | Approved |
+| D36 | Results outside the Data Explorer show in the chat | Approved |
+| D37 | The agent path offers offline answers on network failure | Built |
+| D38 | Page context never routes results to the Data Explorer by default | Built |
+| D39 | Personal values in page SQL become placeholders the browser maps back | Built |
 
 ---
 
@@ -538,3 +544,165 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   setup loses no accuracy against what it replaces, invents nothing, and
   uses the cheapest model that passes.
 
+## D34. Phase 1 is reshaped: the agent is not page-specific (approved)
+
+- **Decision (Pablo, 2026-11-08).** While speccing "dashboards in the
+  agent", Pablo set four rules for Phase 1 and everything after it
+  ([specs/phase-1.md](specs/phase-1.md)): the agent is not page-specific
+  (R1); the current page is always in context (R2); the agent never changes
+  the user's page, and results show in the chat as gadget links or embeds
+  (R3); every AI entry point in the app opens a new session in the AI chat
+  panel (R4).
+- **What it changes.** Phase 1 becomes six sub-projects, each with its own
+  spec, plan, and implementation: 1A page-agnostic agent, 1B attachable
+  context (`@` mentions and a context picker), 1C multiple chats and an
+  archive, 1D dashboard actions from anywhere, 1E "Try again", 1F the
+  browser test and on by default. Roadmap 2.4 (the general host) moves into
+  1A.
+- **Why R4.** All AI work happens in one place, while entry points can sit
+  wherever users look for them (the case manager's "add new case", a future
+  question box in the data catalog), and starting one never loses the
+  session the user already had.
+- **Added to the roadmap.** Chat history in the database (F4; 1C keeps it in
+  the browser for now) and chat session limits for free and basic accounts
+  (F5).
+- **Case manager.** Until 1C its chat keeps running on today's `chat`
+  function. After 1C it opens as a new session in the main panel, still
+  answered by today's case-manager chat until Phase 3.5.
+
+## D35. One agent with a general host; the page travels in each turn (approved)
+
+- **Decision (Pablo, 2026-11-08).** One agent answers on every page. Each
+  turn's message begins with a short block describing the current page
+  (`buildAgentPageContextBlock`, shared by the browser and the eval). The
+  browser host decides where a query's result goes.
+- **Why.** The system prompt stays identical on every page, so it stays
+  cached (D19's reasoning), and there is one agent and one eval to maintain.
+- **Alternatives.** One agent per page type (contradicts R1; an eval per
+  page type). Page context in the proxy's system prompt (breaks the cache on
+  every navigation; the proxy would still trust client-built context).
+- **Privacy.** The block carries metadata, the explorer's current SQL (as
+  today's chat already sends), and up to 12 dashboard tiles' titles, chart
+  types, and SQL, in page order (cut at 1,500 characters each). Never rows.
+  A tile title, or a string literal in a tile's SQL, that the browser's PII
+  check (`detectPii`) flags is replaced ("Untitled chart", `'<redacted>'`)
+  before the block is sent. The explorer's SQL is not redacted, to match
+  what today's chat sends. (D39 replaces both SQL rules: personal values in
+  tile and explorer SQL now become placeholders.) A case's name is never sent, only its case type's name, because a case's
+  name is usually a person's name. A case's field values are never sent
+  either. Page text is escaped and marked as data in the block, and prompt
+  v2 tells the model never to follow instructions inside it.
+- **Costs.** The block is uncached input on every turn; the 1A eval reports
+  the change in cost per question.
+
+## D36. Results outside the Data Explorer show in the chat (approved)
+
+- **Decision (Pablo, 2026-11-08).** Following R3, a query the agent runs
+  from any page other than the Data Explorer shows in the chat as a result
+  part drawn with the gadget visuals: an embed card with a live body, or an
+  inline chip that opens it in the Data Explorer. On the Data Explorer,
+  results keep going to the explorer.
+- **What is stored.** The part keeps the SQL, chart type, and title, never
+  rows and never dataset ids (nothing read them; a query that can no longer
+  run shows as failed). It re-runs in DuckDB-Wasm when shown.
+- **Why not a gadget type.** A query result has no table to reference
+  (saved queries are "not gadgets yet" in
+  [gadgets.md](../measles-demo/gadgets.md)), so it is a chat content part
+  that reuses the gadget chip and card instead of a new `Gadget.Type`.
+
+## D37. The agent path offers offline answers on network failure (built)
+
+- **Decision.** When an agent turn fails because the network or the proxy
+  cannot be reached, the chat offers "Answer offline", as today's chat does
+  (`_recoverFromChatFailure`). Accepting it reruns the question with the
+  offline model (D25) and the Data Explorer as the destination.
+- **How a failure is seen.** Pi never rejects `agent.prompt` for a failed
+  model call: `streamProxy` catches the failed fetch, and the agent loop
+  records it as an assistant message with `stopReason: "error"`. The data
+  agent (`createDataAgent`) rethrows that message's error, so the adapter
+  sees the failure. A stopped run (`aborted`) is not a failure.
+- **When it cannot recover.** If the failure is not a network failure, or
+  the offer is declined or unavailable, the agent path replies instead of
+  failing the turn: an access message when the proxy refuses the user's
+  role (403), otherwise "The assistant could not answer that". Today's chat
+  still rethrows.
+- **Why.** Today's chat already recovers this way. Turning the agent on
+  everywhere would otherwise make a dropped connection a dead end on pages
+  where the old path offered a way out, and offline mode is the one choice
+  users make (D23).
+- **Alternatives.** Show a plain error and let the user find the Offline
+  switch (a regression from today's chat). Switch to offline automatically
+  (hides that the answer comes from a smaller model, and the user has not
+  agreed to download or run it).
+
+## D38. Page context never routes results to the Data Explorer by default (built)
+
+- **Decision.** `createConversationAgentHost` sends a query's result to the
+  Data Explorer only on the Data Explorer page, or on an offline turn
+  (`isOffline`). Everything else goes to the chat: a missing or failed page
+  context, and a page read that fell back to the route's app.
+- **Why.** R3 says the agent never changes the user's page. Sending a result
+  to the explorer is the one action that moves the user, so it needs positive
+  proof that the user is already there. When the context is unknown, the safe
+  answer is the chat, which works from every page. Offline turns keep the
+  explorer because the offline agent only runs there (roadmap 4.2).
+- **Alternatives.** Default to the explorer when unsure, as the agent did
+  before 1A (a failed page read would navigate the user away from what they
+  were doing).
+
+## D39. Personal values in page SQL become placeholders the browser maps back (built)
+
+- **Decision (Pablo, 2026-11-08).** A string literal in page SQL (dashboard
+  charts and the Data Explorer's query) becomes `'<value N>'` when it is
+  compared with a column whose name `detectPii` flags, when its value looks
+  personal, or when the SQL cannot be parsed. Each conversation keeps the
+  map in the browser, and the host swaps placeholders back before
+  `run_query` and value lookups run. Prompt v2 tells the model to keep a
+  placeholder exactly as written. Spec:
+  [phase-1a-redaction.md](specs/phase-1a-redaction.md).
+- **Why.** The pattern check behind D35 only caught literals that look like
+  an email, phone number, or id, so names reached the model. Judging a name
+  by its value alone fails on Avandar's data (`'Kings'`, `'Georgia'`, and
+  `'Washington'` are places), and deleting values would break "show this
+  chart by week". A placeholder hides the value and keeps the filter.
+- **Alternatives.** Redact by value with a name detector (false positives
+  on places, and the filter is lost). Delete flagged literals (`'<redacted>'`,
+  the D35 rule; the model cannot rebuild the chart). Send nothing but titles
+  (the agent could no longer change a chart).
+- **What the eval found.** A chart title that names the value tells the
+  model what its placeholder hides, since titles get only the content
+  check. Without the prompt rule, Haiku asked the user what `'<value 1>'`
+  meant. With it, P07 passes and keeps the placeholder.
+- **Hardened after review (2026-11-09).** An adversarial review found
+  leaks, all fixed: restored values came back in DuckDB's result column
+  names (now masked, with errors and preview cells); detection missed
+  functions, CASE, BETWEEN, aliases, numbers, typed literals, `E''` and
+  dollar-quoted strings, and comments (detection now fails closed on any
+  expression that reads a personal or unknown column, and comments are
+  dropped); spreadsheet headers such as `First Name` were not personal
+  (column names are now normalized and matched as whole words, which also
+  stops `stage` and `vaccination_status` matching); the vault did not
+  re-hide values it held; lookups of a placeholder missed mixed-case
+  values. Titles and page names now mask detected values too. Prompt v2
+  says to use a placeholder only as a whole value and to alias computed
+  columns.
+- **Second review (2026-11-09).** Word masking hid ordinary words: every
+  literal in a personal expression counted as detected, so a chart with
+  `date_trunc('month', "dob")` turned "month" and "2022" into
+  placeholders in every title. Values now record whether they were
+  compared with a personal column's value or only swept up, and only
+  compared values are masked as words in page text; SQL is never
+  word-masked. Integers past 2^53 now redact and restore exactly. Also:
+  small numbers in unparsable SQL stay only without a personal column,
+  aliases that shadow a dataset column are personal, the mask is built
+  lazily, lookups read placeholder variants, variant placeholders are
+  refused, and names show placeholders unescaped. Replies still show
+  `<value N>`: mapping them back for the user needs the recap redacted
+  first.
+- **Costs.** About 120 to 170 more input tokens per call for the prompt
+  rules.
+  Columns outside the page's datasets count as personal, and DuckDB-only
+  syntax such as `GROUP BY ALL` does not parse, so some ordinary filters
+  reach the model as placeholders; answers stay correct through the round
+  trip. Still open: names that never appear as SQL literals, and row
+  counts as an oracle for a model probing a placeholder (see the spec).

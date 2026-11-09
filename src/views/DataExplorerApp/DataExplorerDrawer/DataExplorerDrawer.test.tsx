@@ -64,6 +64,7 @@ function _renderDrawer(
         <DataExplorerDrawer
           columns={columns}
           data={DATA}
+          splitColumnName={undefined}
           chartRef={createRef<HTMLDivElement>()}
         />
       </DataExplorerStateManager.Provider>

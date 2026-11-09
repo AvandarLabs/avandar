@@ -1,5 +1,7 @@
 import { where } from "@avandar/utils";
+import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import {
@@ -7,36 +9,21 @@ import {
   waitForAppliedSqlOutcome,
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatDashboardVizType } from "$/types/chat.types";
-import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
-import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type {
-  DataAgentHost,
-  DataAgentQueryOutcome,
-} from "@/lib/agent/dataAgent/DataAgentHost";
-import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
+  AgentConversationState,
+  DataAgentConversation,
+  DataAgentTurnOptions,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
+import type { DataAgentQueryOutcome } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { ChatModelRunResult } from "@assistant-ui/react";
-import type { MutableRefObject } from "react";
 
-/** The chat runtime pieces a data agent turn uses, online or offline. */
-export type DataAgentTurnOptions = {
-  apiMessages: readonly ChatClientMessage.T[];
-  workspaceId: Workspace.Id;
-  currentUser: User.T | undefined;
-  /** Identifies the conversation; a new chat gets a new agent. */
-  chatGeneration: number;
-  parseSqlRef: MutableRefObject<
-    ReturnType<typeof useSqlToStructuredQuery>["parseSql"]
-  >;
-  dataExplorerDispatch: ReturnType<typeof DataExplorerStateManager.useDispatch>;
-  chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
-};
+/** Re-exported for the chat model adapter, which builds each turn's options. */
+export type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 
 /** The query request the explorer host answers, as the agent sends it. */
 type ShowQueryRequest = Readonly<{
@@ -132,20 +119,6 @@ export function createExplorerShowQuery(
   };
 }
 
-/** The browser host a data agent in the Data Explorer chat runs against. */
-export function createExplorerDataAgentHost(
-  options: Readonly<DataAgentTurnOptions>,
-): DataAgentHost {
-  return createBrowserDataAgentHost({
-    workspaceId: options.workspaceId,
-    userId: options.currentUser?.id,
-    showQueryInExplorer: createExplorerShowQuery(options),
-    showQuestionCard: (clarification) => {
-      options.chatPanelDispatch.setPendingClarification(clarification);
-    },
-  });
-}
-
 async function _fetchDataAgentDatasets(
   workspaceId: Workspace.Id,
 ): Promise<DataAgentDataset[]> {
@@ -208,27 +181,126 @@ function _buildPromptText(
   return `Earlier in this conversation:\n${recap}\n\n${latest}`;
 }
 
+/** The map key of a turn's conversation: one per workspace and chat. */
+export function buildConversationKey(
+  turn: Readonly<Pick<DataAgentTurnOptions, "workspaceId" | "chatGeneration">>,
+): string {
+  return `${turn.workspaceId}:${turn.chatGeneration}`;
+}
+
 /**
- * Asks this conversation's agent the turn's message, creating the agent on
- * the conversation's first turn, and returns its reply as chat content.
- * `agents` holds one agent per `${workspaceId}:${chatGeneration}`, so
- * follow-ups see earlier turns.
+ * Drops the workspace's other chats, stopping any run still in progress: a
+ * new chat replaces the old one.
+ */
+function _dropOtherChats(
+  conversations: Map<string, DataAgentConversation>,
+  turn: Readonly<DataAgentTurnOptions>,
+): void {
+  const key = buildConversationKey(turn);
+  [...conversations.keys()].forEach((otherKey) => {
+    if (otherKey !== key && otherKey.startsWith(`${turn.workspaceId}:`)) {
+      conversations.get(otherKey)?.dataAgent.agent.abort();
+      conversations.delete(otherKey);
+    }
+  });
+}
+
+/**
+ * Stops a run still in progress (a message sent before the last reply
+ * finished) and waits for it to settle, so its turn keeps its results and
+ * the agent is free for the next message.
+ */
+async function _stopAsk(
+  conversation: DataAgentConversation,
+  activeAsk: Promise<unknown>,
+): Promise<void> {
+  conversation.dataAgent.agent.abort();
+  await activeAsk.catch(() => {
+    // The stopped turn reports its own failure.
+  });
+}
+
+/** Asks the agent, marking the conversation busy until the run settles. */
+async function _askAgent(
+  conversation: DataAgentConversation,
+  text: string,
+): Promise<Awaited<ReturnType<DataAgentConversation["dataAgent"]["ask"]>>> {
+  const ask = conversation.dataAgent.ask(text);
+  conversation.activeAsk = ask;
+  try {
+    return await ask;
+  } finally {
+    if (conversation.activeAsk === ask) {
+      conversation.activeAsk = undefined;
+    }
+  }
+}
+
+async function _getConversation(
+  options: Readonly<AskConversationDataAgentOptions>,
+): Promise<{ conversation: DataAgentConversation; isNew: boolean }> {
+  const { conversations, turn } = options;
+  const key = buildConversationKey(turn);
+  const existing = conversations.get(key);
+  if (existing) {
+    return { conversation: existing, isNew: false };
+  }
+  const conversation = await options.createConversation({ current: turn });
+  _dropOtherChats(conversations, turn);
+  conversations.set(key, conversation);
+  return { conversation, isNew: true };
+}
+
+type AskConversationDataAgentOptions = {
+  conversations: Map<string, DataAgentConversation>;
+  turn: Readonly<DataAgentTurnOptions>;
+  /**
+   * The page block for this turn, built from the conversation it goes to,
+   * whose vault hides personal values in page SQL.
+   */
+  buildPageBlock?: (conversation: DataAgentConversation) => string | undefined;
+  createConversation: (
+    turnRef: AgentConversationState["turnRef"],
+  ) => Promise<DataAgentConversation>;
+};
+
+/**
+ * Asks this conversation's agent the turn's message, creating the
+ * conversation on its first turn, and returns the reply with any results
+ * this turn added to the chat. `conversations` holds one per
+ * `${workspaceId}:${chatGeneration}`, so follow-ups see earlier turns. The
+ * page block, when there is one, starts the message. A run still in progress is
+ * stopped first, since a conversation answers one message at a time.
  */
 export async function askConversationDataAgent(
-  options: Readonly<{
-    agents: Map<string, DataAgent>;
-    turn: Readonly<DataAgentTurnOptions>;
-    createAgent: () => Promise<DataAgent>;
-  }>,
+  options: Readonly<AskConversationDataAgentOptions>,
 ): Promise<ChatModelRunResult> {
   const { turn } = options;
-  const key = `${turn.workspaceId}:${turn.chatGeneration}`;
-  const existing = options.agents.get(key);
-  const dataAgent = existing ?? (await options.createAgent());
-  options.agents.set(key, dataAgent);
+  const { conversation, isNew } = await _getConversation(options);
+  // Checked again after every wait: another message may have started a run
+  // meanwhile. From the last check to the ask, nothing awaits.
+  while (conversation.activeAsk) {
+    await _stopAsk(conversation, conversation.activeAsk);
+  }
+  // A fresh list per turn: a stopped run's late results land in its own.
+  const results: AgentQueryResultData[] = [];
+  conversation.turnRef.current = turn;
+  conversation.results = results;
   turn.chatPanelDispatch.setPendingClarification(undefined);
-  const reply = await dataAgent.ask(
-    _buildPromptText(turn.apiMessages, !existing),
+  const pageBlock = options.buildPageBlock?.(conversation);
+  const reply = await _askAgent(
+    conversation,
+    buildAgentTurnText({
+      message: _buildPromptText(turn.apiMessages, isNew),
+      pageBlock,
+      previousPageBlock: conversation.lastPageBlock,
+    }),
   );
-  return { content: [{ type: "text", text: reply.text }] };
+  conversation.lastPageBlock = pageBlock ?? conversation.lastPageBlock;
+  return {
+    content: [
+      { type: "text", text: reply.text },
+      ...results.map(AgentQueryResult.toDataPart),
+    ],
+  };
 }

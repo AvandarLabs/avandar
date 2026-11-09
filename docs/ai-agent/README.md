@@ -8,7 +8,7 @@ before it merges to `demo/measles`, and later `develop`.
 | Doc | What it holds |
 |---|---|
 | [architecture.md](architecture.md) | The target design: agent loop in the browser, metered proxy, tools, privacy boundary, model policy, cost model, and the path to the full agent. |
-| [decisions.md](decisions.md) | Every decision made (D01 to D33), with alternatives and costs. |
+| [decisions.md](decisions.md) | Every decision made (D01 to D38), with alternatives and costs. |
 | [roadmap.md](roadmap.md) | The approved plan to the full Avandar agent (D33), offline work, and what must happen before `develop`. |
 | [HANDOFF.md](HANDOFF.md) | Temporary: how a new session starts on the roadmap. Deleted once the Phase 1 plan exists. |
 | [eval.md](eval.md) | The eval: results, model sweeps (online and offline), the method in detail (data checksums, graders, metrics, versions), and the command behind every number. |
@@ -49,8 +49,10 @@ in about 6,600, which leaves room for multi-step agent work and a free tier.
   or Edge with WebGPU). Once downloaded, the same control turns offline
   mode on and off.
 - **In the app:** open the Data Explorer, then in the browser console run
-  `localStorage.setItem("avandar:data-agent", "on")` and reload. Data
-  Explorer chat now runs through the agent. Remove the key to switch back.
+  `localStorage.setItem("avandar:data-agent", "on")` and reload. With the
+  switch on, the agent answers on every page except the case designer.
+  Results outside the Data Explorer show in the chat. Remove the key to
+  switch back.
   The `chat` edge function must include the agent proxy route from this
   branch.
 - **The eval:** see [eval.md](eval.md#running-it).

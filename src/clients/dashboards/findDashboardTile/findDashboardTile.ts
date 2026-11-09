@@ -38,24 +38,45 @@ function _readVizType(vizType: unknown): AvaVizConfig.Type | undefined {
   });
 }
 
-function _collectTiles(dashboardConfig: unknown): DashboardTileSummary[] {
-  const tiles: DashboardTileSummary[] = [];
-  // `traverse` visits each object once, so a tile is never collected twice.
+/** A DataViz block found in a dashboard config, with its raw props. */
+export type DataVizNode = {
+  type: "DataViz";
+  props: Record<string, unknown>;
+};
+
+/**
+ * Every DataViz block in a dashboard config, in page order, at any depth and
+ * in any slot, including the legacy top-level `zones`. Reads defensively: a
+ * config is JSON of any age.
+ */
+export function collectDataVizNodes(dashboardConfig: unknown): DataVizNode[] {
+  const nodes: DataVizNode[] = [];
+  // `traverse` visits each object once, so a block is never collected twice.
   traverse(dashboardConfig, (node) => {
     if (!isPlainObject(node) || node["type"] !== "DataViz") {
       return;
     }
     const props: unknown = node["props"];
-    if (!isPlainObject(props) || !isString(props["id"])) {
-      return;
+    if (isPlainObject(props)) {
+      nodes.push({ type: "DataViz", props });
     }
-    tiles.push({
-      id: props["id"],
-      prompt: _readPrompt(props["nlQuery"]),
-      vizType: _readVizType(props["vizType"]),
-    });
   });
-  return tiles;
+  return nodes;
+}
+
+function _collectTiles(dashboardConfig: unknown): DashboardTileSummary[] {
+  return collectDataVizNodes(dashboardConfig).flatMap(({ props }) => {
+    const id = props["id"];
+    return isString(id)
+      ? [
+          {
+            id,
+            prompt: _readPrompt(props["nlQuery"]),
+            vizType: _readVizType(props["vizType"]),
+          },
+        ]
+      : [];
+  });
 }
 
 /**

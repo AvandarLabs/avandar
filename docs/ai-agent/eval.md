@@ -95,6 +95,106 @@ deaths in georgia") left out the "Out of GA" rows, against the prompt's
 rule, for a total 4% low. It ran without error, so escalation could not
 catch it.
 
+### Phase 1A
+
+Runs on 2026-11-09 for the page-agnostic agent (D35), archived under the
+`phase-1a` label. The agent ran with prompt v2, which reads the current page
+block. The six page questions P01 to P06 are described under "Questions and
+ground truth". Today's chat only ran the three that give it the same
+context (P01, P02, P05).
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a:agent-45 (agent, prompt v2, 45 questions) | 45/45 | 0 / 0 | $0.00030 | 3,026 | 2.7 s / 8.8 s |
+| phase-1a:agent-page #1-#3 (agent, P01-P06) | 6/6, 6/6, 6/6 | 0 / 0 | $0.00019 to $0.00021 | 3,127 to 3,128 | 5.4 to 7.9 s / 5.9 to 8.3 s |
+| phase-1a:today-page (today's chat, P01, P02, P05) | 2/3 | 1 / 0 | $0.00190 | 11,585 | 6.3 s / 7.1 s |
+
+- P04 ("Make this a line chart" with two tiles on screen) asked exactly one
+  question in every run, as expected.
+- Today's chat missed P01: it asked which dataset to use, then totalled US
+  deaths instead of the open global dataset.
+- Prompt v2 costs about 210 more input tokens per call (+7%) and stays
+  inside D10's cost range.
+
+Then, on 2026-11-09, personal values in page SQL became placeholders
+(D39, [phase-1a-redaction.md](specs/phase-1a-redaction.md)), archived under
+the `phase-1a-redaction` label. P07 shows a dashboard chart of Kings County
+deaths in 2022, with `Admin2` treated as personal, so the model reads
+`"Admin2" = '<value 1>'` and must keep it when asked for the chart by week.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a-redaction:agent-page #1 (title named the county) | 7/7 | 0 / 0 | $0.00036 | 3,123 | 2.2 s / 2.7 s |
+| phase-1a-redaction:agent-page #2 (no placeholder rule) | 6/7 | 1 / 0 | $0.00021 | 3,138 | 1.8 s / 2.7 s |
+| phase-1a-redaction:agent-page #3 (final) | 7/7 | 0 / 0 | $0.00031 | 3,213 | 1.8 s / 2.9 s |
+| phase-1a-redaction:p07-repeat #1-#2 (P07 alone) | 1/1, 1/1 | 0 / 0 | $0.00019 | | 2.0 s |
+| phase-1a-redaction:agent-45 (prompt v2 with the placeholder rule) | 45/45 | 0 / 0 | $0.00026 | 3,110 | 2.1 s / 3.3 s |
+
+- Run #1 passed P07 without testing it: the tile was titled "Deaths in
+  Kings County by month", titles get only the content check, and the model
+  wrote `'Kings'` from the title. The tile is now "Deaths in one county by
+  month".
+- Run #2 missed P07: Haiku read `'<value 1>'` as an unknown value and asked
+  which New York county to use. Prompt v2 now says to keep a placeholder
+  exactly as written and never ask what it is.
+- From run #3 on, P07 passed three times in a row, each time with
+  `'<value 1>'` kept in the model's SQL and restored on the device to sum
+  to 2,707. P01 to P06 and the 45 questions still pass. The placeholder
+  rule adds about 75 to 85 input tokens per call. All seven runs cost $0.018.
+
+After an adversarial review, the redaction was hardened (D39): values are
+masked in what comes back from a query, detection fails closed, and
+prompt v2 gained rules on using placeholders. Runs archived under the
+`phase-1a-redaction-review` label.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a-redaction-review:agent-page (P01-P07) | 7/7 | 0 / 0 | $0.00022 | 3,257 | 1.8 s / 2.6 s |
+| phase-1a-redaction-review:agent-45 | 43/45 | 0 / 0 | $0.00030 | 3,193 | 2.4 s / 3.4 s |
+| phase-1a-redaction-review:rerun #1-#3 (H06, N04) | H06 2/3, N04 3/3 | 0 / 0 | $0.00035 | | 3.2 s |
+
+- Neither miss had a page block, so neither touched placeholders. H06
+  rounded per-capita rates to five places, which reordered tied states,
+  and on one rerun dropped "Unassigned" rows. N04 left out countries with
+  zero deaths. Both are known to vary between runs (see "Remaining misses
+  on the chosen setup").
+- The longer prompt rules add about 45 to 85 input tokens per call over
+  the first placeholder rule. The review runs cost $0.017.
+
+A second review narrowed word masking to values compared with a personal
+column and fixed large ids (D39). Runs archived under the
+`phase-1a-redaction-review2` label.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| review2:agent-page (P01-P07) | 6/7 | 0 / 1 | $0.00034 | 3,224 | 1.9 s / 2.1 s |
+| review2:agent-45 | 43/45 | 0 / 0 | $0.00062 | 3,177 | 2.1 s / 3.3 s |
+| review2:rerun #1-#3 (P04, N02, N04) | P04 1/3, N02 3/3, N04 1/3 | | $0.00017 to $0.00031 | | |
+| review2:p04-check #1-#4 (scoped "never ask") | P04 4/4, P07 4/4 | 0 / 0 | $0.00017 to $0.00055 | | |
+| review2:agent-45-final | 44/45 | 0 / 0 | $0.00026 | 3,164 | 2.1 s / 3.2 s |
+| review2:agent-page-final | 7/7 | 0 / 0 | $0.00020 | 3,264 | 1.7 s / 2.8 s |
+
+- P04 ("make this a pie chart" with two charts) answered without asking in
+  3 of 4 runs once the placeholder rule said "page text". Its page block
+  had no placeholders and was unchanged, so the cause was the rule's
+  unscoped "Never ask what it is". Scoped to "never ask the user what a
+  placeholder stands for", P04 asked in 5 of 5 runs.
+- N02 and N04 have no page block. N02 missed once and passed 3 of 3 on
+  rerun; N04 left out zero-death countries, as it does on some runs.
+- The second review's runs cost $0.048.
+
+Then the page block named the open dataset before its alias
+(`"Response cases" (query it as t0)`), prompt v2 said never to show the
+user an alias such as `t0`, and view-change lines stopped carrying a
+case's id. Runs archived under the `phase-1a-fixes` label.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a-fixes:agent-page (P01-P07) | 7/7 | 0 / 0 | $0.00036 | 3,280 | 1.9 s / 2.5 s |
+| phase-1a-fixes:agent-45 | 45/45 | 0 / 0 | $0.00028 | 3,232 | 2.2 s / 3.3 s |
+
+- No reply in either run named a table alias. Both runs cost $0.015.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -341,6 +441,22 @@ A question passes when the final result matches the truth, and, when the
 user asked for a chart, the answer is a chart. Answering in words without
 running a query fails.
 
+`covid/covidPageQuestions.ts` adds seven page-context questions, P01 to P07,
+for the page-agnostic agent. Each carries a `pageContext`: what the user
+has open when asking. The Pi harness renders it with
+`buildAgentPageContextBlock`, and the baseline harness passes the matching
+`ChatPageContext` where today's chat has one. They run only with
+`--questions P`: the default run stays at the original 45.
+
+| Id | Page | Question shape |
+|---|---|---|
+| P01 | Data Explorer, global deaths open | A total over "this dataset" |
+| P02 | Data Explorer, a query on screen | "Break this down by state", graded by the resulting state |
+| P03 | Dashboard, one tile visible | "Show this chart by month" |
+| P04 | Dashboard, two tiles visible | "Make this a line chart" (asking one question is expected) |
+| P05 | Map page | A data question that has nothing to do with the page |
+| P06 | Follows P03 | A follow-up on the new result |
+
 ### Metrics
 
 | Metric | Definition |
@@ -410,6 +526,8 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The 20-question offline screen | add `--questions B01,B03,B05,B07,B09,I01,I03,I05,I07,I09,H01,H03,H05,H07,H09,N02,N04,N06,N08,N10` |
 | Gemma 4 E2B offline | prefix `AVA_EVAL_WEBLLM_LIB=<path to web-llm 0.2.86 lib/index.js>` |
 | One question or category | `--questions N11` or `--questions H` |
+| The page-context questions (add `--label phase-1a-redaction:agent-page`) | `--harness pi --config haiku-sonnet --questions P` |
+| Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 
 The PDF table assistant has its own runner,
 `pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
@@ -445,7 +563,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 83 runs (every
+chat index lists all 112 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

@@ -28,6 +28,7 @@ type ThreadMessage = { role: "user" | "assistant"; content: string };
 
 type ExplorerContext = {
   app: "data-explorer";
+  openDatasetId?: string;
   lastSql?: string;
   lastResultColumns?: Array<{ name: string; dataType: string }>;
   lastError?: string;
@@ -36,6 +37,29 @@ type ExplorerContext = {
 type Clarification = NonNullable<
   NonNullable<DenoChatTurnResponse["result"]>["clarification"]
 >;
+
+/**
+ * Today's chat page context for a question whose screen is the Data
+ * Explorer. Other screens leave the context as the conversation built it:
+ * today's chat sees no tiles, maps, or case types.
+ */
+function _toExplorerContext(
+  pageContext: NonNullable<EvalQuestion["pageContext"]>,
+): ExplorerContext {
+  const { dataset, explorer } = pageContext;
+  return {
+    app: "data-explorer",
+    ...(dataset ? { openDatasetId: dataset.id } : {}),
+    ...(explorer?.sql ? { lastSql: explorer.sql } : {}),
+    ...(explorer?.resultColumns.length
+      ? {
+          lastResultColumns: explorer.resultColumns.map((column) => {
+            return { ...column };
+          }),
+        }
+      : {}),
+  };
+}
 
 /** The reply text for applied SQL, as `applyChatTurnResponse` builds it. */
 function _buildThreadText(
@@ -94,6 +118,9 @@ class BaselineConversation implements EvalConversation {
       usage: EMPTY_EVAL_USAGE,
       latencyMs: 0,
     };
+    if (question.pageContext?.app === "data-explorer") {
+      this.context = _toExplorerContext(question.pageContext);
+    }
     this.messages.push({ role: "user", content: question.prompt });
     for (let turn = 0; turn < MAX_MODEL_TURNS_PER_QUESTION; turn += 1) {
       const isDone = await this.runModelTurn(question, answer);

@@ -86,6 +86,8 @@ export function useAvandarChatRuntime(): {
     noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
     metadataQuery: t`Here is a query based on your workspace metadata.`,
     contextWindowExceeded: t`This question is too long for the offline models. Try a shorter question, or turn offline mode off to use online chat.`,
+    agentAccessDenied: t`Answering data questions needs access to the Data Explorer in this workspace.`,
+    agentUnavailable: t`The assistant could not answer that. Try again in a moment.`,
   });
   const [initialMessages] = useState(() => {
     return user && workspace.id
@@ -125,6 +127,8 @@ export function useAvandarChatRuntime(): {
         noSql: t`I could not produce SQL offline. Try rephrasing or reconnect to use cloud chat.`,
         metadataQuery: t`Here is a query based on your workspace metadata.`,
         contextWindowExceeded: t`This question is too long for the offline models. Try a shorter question, or turn offline mode off to use online chat.`,
+        agentAccessDenied: t`Answering data questions needs access to the Data Explorer in this workspace.`,
+        agentUnavailable: t`The assistant could not answer that. Try again in a moment.`,
       };
     },
     [dashboardEditorState, pageContext, pathname, parseSql, t, user, workspace],
@@ -152,6 +156,7 @@ export function useAvandarChatRuntime(): {
       userRef,
       workspaceIdRef,
       workspaceRef,
+      pathnameRef,
       dashboardEditorStateRef,
       parseSqlRef,
       copyRef,

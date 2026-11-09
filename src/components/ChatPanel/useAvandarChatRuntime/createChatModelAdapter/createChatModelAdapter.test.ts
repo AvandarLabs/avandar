@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
 import { createChatModelAdapter } from "./createChatModelAdapter";
@@ -8,14 +9,23 @@ import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageCont
 import type { CreateChatModelAdapterOptions } from "./createChatModelAdapter";
 import type { ChatModelAdapter } from "@assistant-ui/react";
 
-const { apiPostMock, runOfflineDataAgentTurnMock, runOfflineChatTurnMock } =
-  vi.hoisted(() => {
-    return {
-      apiPostMock: vi.fn(),
-      runOfflineDataAgentTurnMock: vi.fn(),
-      runOfflineChatTurnMock: vi.fn(),
-    };
-  });
+const {
+  apiPostMock,
+  runOfflineDataAgentTurnMock,
+  runOfflineChatTurnMock,
+  runDataAgentTurnMock,
+  isAgentEnabledMock,
+  offerOfflineFallbackMock,
+} = vi.hoisted(() => {
+  return {
+    apiPostMock: vi.fn(),
+    runOfflineDataAgentTurnMock: vi.fn(),
+    runOfflineChatTurnMock: vi.fn(),
+    runDataAgentTurnMock: vi.fn(),
+    isAgentEnabledMock: vi.fn(),
+    offerOfflineFallbackMock: vi.fn(),
+  };
+});
 
 vi.mock("@/clients/APIClient", () => {
   return { APIClient: { post: apiPostMock } };
@@ -44,6 +54,24 @@ vi.mock(
 );
 
 vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn",
+  () => {
+    return { runDataAgentTurn: runDataAgentTurnMock };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback",
+  () => {
+    return { offerOfflineChatFallback: offerOfflineFallbackMock };
+  },
+);
+
+vi.mock("@/lib/agent/dataAgent/browser/DataAgentFeature", () => {
+  return { DataAgentFeature: { isEnabled: isAgentEnabledMock } };
+});
+
+vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse",
   () => {
     return {
@@ -59,8 +87,13 @@ vi.mock(
 );
 
 const OFFLINE_MODEL_REQUIRED = "Download the offline models first.";
+const AGENT_ACCESS_DENIED = "Needs Data Explorer access.";
+const AGENT_UNAVAILABLE = "Could not answer.";
 
-function _createAdapter(app: ChatPageContext.T["app"]): ChatModelAdapter {
+function _createAdapter(
+  app: ChatPageContext.T["app"],
+  overrides: Partial<CreateChatModelAdapterOptions> = {},
+): ChatModelAdapter {
   const ref = <T>(current: T) => {
     return { current };
   };
@@ -73,12 +106,18 @@ function _createAdapter(app: ChatPageContext.T["app"]): ChatModelAdapter {
     userRef: ref(undefined),
     workspaceIdRef: ref("workspace-1"),
     workspaceRef: ref({ id: "workspace-1" }),
+    pathnameRef: ref("/acme/dashboards"),
     dashboardEditorStateRef: ref({}),
     parseSqlRef: ref(vi.fn()),
-    copyRef: ref({ offlineModelRequired: OFFLINE_MODEL_REQUIRED }),
+    copyRef: ref({
+      offlineModelRequired: OFFLINE_MODEL_REQUIRED,
+      agentAccessDenied: AGENT_ACCESS_DENIED,
+      agentUnavailable: AGENT_UNAVAILABLE,
+    }),
     dataExplorerDispatch: {},
     dashboardEditorDispatch: {},
     chatPanelDispatch: { setPendingClarification: vi.fn() },
+    ...overrides,
   } as unknown as CreateChatModelAdapterOptions);
 }
 
@@ -95,12 +134,41 @@ async function _ask(adapter: ChatModelAdapter): Promise<unknown> {
   return run;
 }
 
+const CASE_INDIVIDUAL_ID = "33333333-3333-4333-8333-333333333333";
+
+/** A view-change line written before case ids were hidden from it. */
+const STORED_CASE_VIEW_LINE =
+  "[View changed: app=other; " +
+  `route=/acme/individual-manager/c1/${CASE_INDIVIDUAL_ID}; ` +
+  "dataset=none; dashboard=none]";
+
+/** Asks with an older case view-change line ahead of the question. */
+async function _askAfterStoredCaseView(
+  adapter: ChatModelAdapter,
+): Promise<unknown> {
+  return adapter.run({
+    messages: [
+      {
+        role: "user",
+        content: [{ type: "text", text: STORED_CASE_VIEW_LINE }],
+        metadata: { custom: { isViewChange: true } },
+      },
+      {
+        role: "user",
+        content: [{ type: "text", text: "How many cases?" }],
+        metadata: {},
+      },
+    ],
+  } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+}
+
 function _setNavigatorOnLine(isOnLine: boolean): void {
   vi.spyOn(navigator, "onLine", "get").mockReturnValue(isOnLine);
 }
 
 describe("createChatModelAdapter", () => {
   beforeEach(() => {
+    isAgentEnabledMock.mockReturnValue(false);
     apiPostMock
       .mockReset()
       .mockResolvedValue(
@@ -129,6 +197,32 @@ describe("createChatModelAdapter", () => {
       content: [{ type: "text", text: "cloud reply" }],
     });
     expect(apiPostMock.mock.calls[0]![0].body).not.toHaveProperty("model");
+  });
+
+  it("keeps a stored case id out of today's chat request", async () => {
+    await _askAfterStoredCaseView(_createAdapter("dashboards"));
+
+    const sent = JSON.stringify(apiPostMock.mock.calls[0]![0].body.messages);
+    expect(sent).toContain("/acme/individual-manager/c1/<case>");
+    expect(sent).not.toContain(CASE_INDIVIDUAL_ID);
+  });
+
+  it("never rewrites typed text that mentions a case route", async () => {
+    const typed =
+      "Why does route=/acme/individual-manager/c1/" +
+      `${CASE_INDIVIDUAL_ID} look empty?`;
+
+    await _createAdapter("dashboards").run({
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: typed }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+
+    expect(apiPostMock.mock.calls[0]![0].body.messages[0].content).toBe(typed);
   });
 
   it("runs the offline data agent in the Data Explorer with offline mode on", async () => {
@@ -175,5 +269,238 @@ describe("createChatModelAdapter", () => {
     });
     expect(apiPostMock).not.toHaveBeenCalled();
     expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("createChatModelAdapter with the agent on", () => {
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    isAgentEnabledMock.mockReturnValue(true);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    runOfflineDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "offline agent reply" }],
+    });
+    offerOfflineFallbackMock.mockReset().mockResolvedValue(true);
+    LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
+      LocalChatModelStore.markDownloaded,
+    );
+    runDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "agent reply" }],
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it.each(["data-explorer", "dashboards", "data-sources", "other"] as const)(
+    "answers on %s with the agent",
+    async (app) => {
+      await _ask(_createAdapter(app));
+
+      expect(runDataAgentTurnMock).toHaveBeenCalledTimes(1);
+      expect(apiPostMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it("keeps a stored case id out of the agent's messages", async () => {
+    await _askAfterStoredCaseView(_createAdapter("dashboards"));
+
+    const turn = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(JSON.stringify(turn.apiMessages)).not.toContain(CASE_INDIVIDUAL_ID);
+  });
+
+  it("passes the page state to the agent", async () => {
+    await _ask(
+      _createAdapter("dashboards", {
+        dashboardEditorStateRef: { current: { selectedItem: "tile-1" } },
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(runDataAgentTurnMock).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: "workspace-1" }),
+      expect.objectContaining({
+        pathname: "/acme/dashboards",
+        chatPageContext: expect.objectContaining({ app: "dashboards" }),
+        dashboardEditorState: { selectedItem: "tile-1" },
+      }),
+    );
+  });
+
+  it("keeps the page from when the turn started after a navigation", async () => {
+    const pathnameRef = { current: "/acme/dashboards" };
+    const dashboardEditorStateRef = { current: { selectedItem: "tile-1" } };
+    // The user navigates while the adapter waits on consent acks.
+    vi.mocked(PendingAcks.consumeAckForText).mockImplementationOnce(
+      async () => {
+        pathnameRef.current = "/acme/data-explorer";
+        dashboardEditorStateRef.current = { selectedItem: "tile-2" };
+        return undefined;
+      },
+    );
+
+    await _ask(
+      _createAdapter("dashboards", {
+        pathnameRef,
+        dashboardEditorStateRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(runDataAgentTurnMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        pathname: "/acme/dashboards",
+        dashboardEditorState: { selectedItem: "tile-1" },
+      }),
+    );
+  });
+
+  it("keeps the case designer on today's chat", async () => {
+    await _ask(_createAdapter("case-manager"));
+
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+    expect(apiPostMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses today's chat everywhere while the switch is off", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    await _ask(_createAdapter("data-explorer"));
+
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+    expect(apiPostMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers the offline fallback when the agent cannot be reached", async () => {
+    runDataAgentTurnMock.mockRejectedValue(new TypeError("Failed to fetch"));
+
+    const result = await _ask(_createAdapter("data-explorer"));
+
+    expect(offerOfflineFallbackMock).toHaveBeenCalledTimes(1);
+    expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      content: [{ type: "text", text: "offline agent reply" }],
+    });
+  });
+
+  it("says it could not answer when the offline offer is declined", async () => {
+    runDataAgentTurnMock.mockRejectedValue(new TypeError("Failed to fetch"));
+    offerOfflineFallbackMock.mockResolvedValue(false);
+
+    const result = await _ask(_createAdapter("data-explorer"));
+
+    expect(result).toEqual({
+      content: [{ type: "text", text: AGENT_UNAVAILABLE }],
+    });
+    expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("says it could not answer after a network failure with no offline models", async () => {
+    window.localStorage.clear();
+    runDataAgentTurnMock.mockRejectedValue(new TypeError("Failed to fetch"));
+
+    const result = await _ask(_createAdapter("data-explorer"));
+
+    expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      content: [{ type: "text", text: AGENT_UNAVAILABLE }],
+    });
+  });
+
+  it("says it could not answer after a failure that is not a network failure", async () => {
+    runDataAgentTurnMock.mockRejectedValue(new Error("model refused"));
+
+    const result = await _ask(_createAdapter("dashboards"));
+
+    expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      content: [{ type: "text", text: AGENT_UNAVAILABLE }],
+    });
+  });
+
+  it.each([
+    "Proxy error: This action requires at least the 'viewer' role on 'data_explorer' in this workspace",
+    "Proxy error: 403 Forbidden",
+  ])(
+    "says Data Explorer access is needed when the proxy refuses: %s",
+    async (message) => {
+      runDataAgentTurnMock.mockRejectedValue(new Error(message));
+
+      const result = await _ask(_createAdapter("dashboards"));
+
+      expect(result).toEqual({
+        content: [{ type: "text", text: AGENT_ACCESS_DENIED }],
+      });
+    },
+  );
+
+  it("does not turn a stopped turn into a reply", async () => {
+    const abort = new DOMException("The run was stopped.", "AbortError");
+    runDataAgentTurnMock.mockRejectedValue(abort);
+
+    await expect(_ask(_createAdapter("dashboards"))).rejects.toBe(abort);
+  });
+
+  it("still rethrows today's chat failures with the switch off", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+    const failure = new Error("Proxy error: 403 Forbidden");
+    apiPostMock.mockRejectedValue(failure);
+
+    await expect(_ask(_createAdapter("dashboards"))).rejects.toBe(failure);
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("still rethrows today's chat failures in the case designer", async () => {
+    const failure = new Error("model refused");
+    apiPostMock.mockRejectedValue(failure);
+
+    await expect(_ask(_createAdapter("case-manager"))).rejects.toBe(failure);
+  });
+
+  it("routes to the offline turn, not the agent, with offline mode on", async () => {
+    OfflineModeStore.setOn(true);
+
+    await _ask(_createAdapter("data-explorer"));
+
+    expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("returns an empty result when the chat was reset during the agent turn", async () => {
+    const chatGenerationRef = { current: 0 };
+    runDataAgentTurnMock.mockImplementation(async () => {
+      chatGenerationRef.current += 1;
+      return { content: [{ type: "text", text: "agent reply" }] };
+    });
+
+    const result = await _ask(
+      _createAdapter("dashboards", {
+        chatGenerationRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(result).toEqual({ content: [] });
+  });
+
+  it("returns an empty result when the chat was reset as the agent failed", async () => {
+    const chatGenerationRef = { current: 0 };
+    runDataAgentTurnMock.mockImplementation(async () => {
+      chatGenerationRef.current += 1;
+      throw new TypeError("Failed to fetch");
+    });
+
+    const result = await _ask(
+      _createAdapter("data-explorer", {
+        chatGenerationRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(result).toEqual({ content: [] });
+    expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,17 @@
+{
+  "label": "phase-1a-redaction-review:rerun",
+  "questionCount": 2,
+  "passCount": 2,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 3,
+  "promptTokens": 9344,
+  "cachedPromptTokens": 9144,
+  "completionTokens": 1033,
+  "totalCost": 0.00063269,
+  "costPerQuestion": 0.000316345,
+  "latencyMedianMs": 3186.026041,
+  "latencyP90Ms": 3186.026041,
+  "failedIds": []
+}

@@ -12,6 +12,32 @@ export type ChatViewSnapshot = {
 
 const CONTENT_PREFIX = "[View changed:";
 
+/**
+ * A case page's route up to its case type
+ * (`/<workspaceSlug>/individual-manager/<conceptId>/`), then the case's own
+ * id, which ends at the next `/`, `;`, `?`, `#`, space, or the end of the
+ * text. It is anchored on the workspace slug, so a slug that is itself
+ * `individual-manager` cannot shift the match onto the concept id.
+ */
+const CASE_ID_IN_ROUTE =
+  /^(\/[^/;?#\s]+\/individual-manager\/[^/;?#\s]+\/)[^/;?#\s]+/;
+
+/** The same route inside a formatted line, anchored on its `route=` field. */
+const CASE_ID_IN_LINE =
+  /(route=\/[^/;?#\s]+\/individual-manager\/[^/;?#\s]+\/)[^/;?#\s]+/;
+
+/** What a case's id becomes in a view-change line. */
+const HIDDEN_CASE_ID = "<case>";
+
+/**
+ * Text with a case route's case id replaced by `<case>`, keeping the case
+ * type. A case's id is never shared with a model, and the case type is
+ * enough to say what kind of page is open.
+ */
+function _hideCaseId(text: string, pattern: RegExp): string {
+  return text.replace(pattern, `$1${HIDDEN_CASE_ID}`);
+}
+
 function _messageText(message: ThreadMessageLike): string {
   if (typeof message.content === "string") {
     return message.content;
@@ -89,9 +115,28 @@ export const ChatViewEvent = {
     );
   },
 
-  /** Formats a snapshot as a stable hidden view-change line. */
+  /**
+   * Formats a snapshot as a stable hidden view-change line. The line is
+   * sent to models, so a case page's case id is written as `<case>`. Two
+   * cases of one case type therefore format, and compare, the same.
+   */
   format: (snapshot: Readonly<ChatViewSnapshot>): string => {
-    return `[View changed: app=${snapshot.app}; route=${snapshot.route}; dataset=${snapshot.openDatasetId ?? "none"}; dashboard=${snapshot.dashboardId ?? "none"}]`;
+    const route = _hideCaseId(snapshot.route, CASE_ID_IN_ROUTE);
+    const dataset = snapshot.openDatasetId ?? "none";
+    const dashboard = snapshot.dashboardId ?? "none";
+    return (
+      `[View changed: app=${snapshot.app}; route=${route}; ` +
+      `dataset=${dataset}; dashboard=${dashboard}]`
+    );
+  },
+
+  /**
+   * A view-change line as a model should read it: a line saved before
+   * `format` hid case ids gets its `route=` field's case id hidden. Call it
+   * only for messages already known to be view-change lines.
+   */
+  toModelContent: (line: string): string => {
+    return _hideCaseId(line, CASE_ID_IN_LINE);
   },
 
   /** Converts a snapshot into an assistant-ui thread message. */

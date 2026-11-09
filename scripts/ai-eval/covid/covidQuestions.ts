@@ -1,5 +1,6 @@
 import { ResultChecks } from "../grading/ResultChecks";
 import { MatcherText } from "../grading/ResultMatchers";
+import { PAGE_QUESTIONS } from "./covidPageQuestions";
 import { CovidTruthSql as Sql, US_STATE_NAMES } from "./covidTruthSql";
 import type { EvalQuestion, GradeContext } from "../EvalQuestion";
 import type { TruthRowSpec } from "../grading/ResultChecks";
@@ -1002,4 +1003,5 @@ export const COVID_QUESTIONS: readonly EvalQuestion[] = [
   ...HARD_QUESTIONS,
   ...NON_TECHNICAL_QUESTIONS,
   ...FOLLOW_UP_QUESTIONS,
+  ...PAGE_QUESTIONS,
 ];
