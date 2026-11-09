@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { Popover } from "@mantine/core";
+import { Popover, Stack, Text } from "@mantine/core";
+import { useId } from "react";
 import { PlaceMapToolTrigger } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapToolTrigger";
 import { PlaceToolSteps } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceToolSteps";
 import type { PlaceToolController } from "@/views/GisApp/places/PlaceTool.types";
@@ -15,7 +16,10 @@ type Props = { controller: PlaceToolController };
 export function PlaceMapTool({ controller }: Props): ReactNode {
   const { t } = useLingui();
   const label = t`Add a place`;
-  const isOpen = controller.state.draft !== undefined && !controller.isArmed;
+  const titleId = useId();
+  const draft = controller.state.draft;
+  const isOpen = draft !== undefined && !controller.isArmed;
+  const title = draft?.placeId ? t`Edit place` : label;
   return (
     <Popover
       opened={isOpen}
@@ -35,8 +39,13 @@ export function PlaceMapTool({ controller }: Props): ReactNode {
           onClick={isOpen ? controller.state.close : controller.state.startNew}
         />
       </Popover.Target>
-      <Popover.Dropdown p="sm">
-        <PlaceToolSteps controller={controller} />
+      <Popover.Dropdown p="sm" aria-labelledby={titleId}>
+        <Stack gap="xs">
+          <Text id={titleId} size="sm" fw={600}>
+            {title}
+          </Text>
+          <PlaceToolSteps controller={controller} />
+        </Stack>
       </Popover.Dropdown>
     </Popover>
   );

@@ -161,6 +161,21 @@ describe("PlaceMapTool", () => {
     expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
   });
 
+  it("titles the popover for a new place", () => {
+    const controller = _withDraft(NEW_DRAFT, { targetDatasetId: DATASET_ID });
+    render(<PlaceMapTool controller={controller} />);
+    expect(screen.getByRole("dialog", { name: "Add a place" })).toBeVisible();
+  });
+
+  it("titles the popover for an existing place", () => {
+    const controller = _withDraft(
+      { ...NEW_DRAFT, datasetId: DATASET_ID, placeId: "place-1" },
+      { targetDatasetId: DATASET_ID },
+    );
+    render(<PlaceMapTool controller={controller} />);
+    expect(screen.getByRole("dialog", { name: "Edit place" })).toBeVisible();
+  });
+
   it("gets out of the way while waiting for the map click", () => {
     const controller = _withDraft(NEW_DRAFT, {
       targetDatasetId: DATASET_ID,
