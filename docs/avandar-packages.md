@@ -222,9 +222,10 @@ See [`packages/web/plugin-sdk/README.md`](../packages/web/plugin-sdk/README.md).
 
 The components plugin UI may render. Re-exports a small set of Mantine
 components (`Alert`, `Badge`, `Button`, `Divider`, `Group`, `Loader`,
-`NumberInput`, `Select`, `SimpleGrid`, `Stack`, `Table`, `Text`, `TextInput`,
-`Title`). Its `@avandar/plugin-ui/charts` entry re-exports a curated set of
-Recharts components plus `useChartTheme`, for plugin chart components.
+`NumberInput`, `SegmentedControl`, `Select`, `SimpleGrid`, `Stack`, `Table`,
+`Text`, `TextInput`, `Title`). Its `@avandar/plugin-ui/charts` entry
+re-exports a curated set of Recharts components plus `useChartTheme`, for
+plugin chart components.
 Plugins import UI only from this package, which keeps their code independent
 of the host's component library.
 

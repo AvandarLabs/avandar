@@ -547,12 +547,12 @@ the approved list. The list is `APPROVED_PLUGIN_DEPENDENCIES` in
 `@avandar/plugin-manifest`, and the ESLint patterns must stay in step with it.
 
 Build plugin UI only from `@avandar/plugin-ui`: `Alert`, `Badge`, `Button`,
-`Divider`, `Group`, `Loader`, `NumberInput`, `Select`, `SimpleGrid`, `Stack`,
-`Table`, `Text`, `TextInput`, and `Title`, and draw component charts only from
-`@avandar/plugin-ui/charts`. Every API call is async or fire-and-forget and
-passes serializable data, with three exceptions: the synchronous `i18n.t`, the
-React `content` of `openModal` and `openDrawer`, and chart components, which
-are React components too.
+`Divider`, `Group`, `Loader`, `NumberInput`, `SegmentedControl`, `Select`,
+`SimpleGrid`, `Stack`, `Table`, `Text`, `TextInput`, and `Title`, and draw
+component charts only from `@avandar/plugin-ui/charts`. Every API call is async
+or fire-and-forget and passes serializable data, with three exceptions: the
+synchronous `i18n.t`, the React `content` of `openModal` and `openDrawer`, and
+chart components, which are React components too.
 
 ## 10. Validate
 
