@@ -2229,7 +2229,7 @@ pnpm test:e2e gis-feature-list.spec.ts
 Status: not started. Built on `feat/gis-pdf-feature-list`, branched from
 `demo/measles` at `cd546fdea`. The commits below are all of
 `git log --oneline cd546fdea..feat/gis-pdf-feature-list --no-merges`, except
-the one that adds this entry. If `demo/measles` already has an F34, renumber
+the ones that only update this log. If `demo/measles` already has an F34, renumber
 on merge.
 
 **Purpose:** The export sheet gains an "Include a feature list" section: pick
@@ -2271,6 +2271,7 @@ PDF list calls `fetchMapLayerFeatureList` and `formatFeatureListCell`).
 | `dd79c5c7b` | fix(gis): name what the PDF feature list counts | All of it. |
 | `37aaf0f10` | chore(i18n): extract the PDF feature list strings | All of it. |
 | `74d888249` | test(gis): assert the exported PDF carries the feature list pages | All of it. |
+| `d649a4496` | fix(gis): offer the same columns in the export sheet as the PDF prints | All of it. |
 
 **Files:**
 - Model: `shared/models/AvaMap/AvaMapConfig/` (`ExportLayout.types.ts`,
