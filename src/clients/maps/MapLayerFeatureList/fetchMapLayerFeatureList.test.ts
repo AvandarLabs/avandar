@@ -1,6 +1,7 @@
 import { i18n } from "@lingui/core";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MAP_LAYER_FEATURE_LIST_ROW_KEYS } from "./MapLayerFeatureList.constants";
 import { createSitesAndSchoolsFixture } from "./MapLayerFeatureList.fixtures";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -122,5 +123,28 @@ describe("fetchMapLayerFeatureList", () => {
     ).rejects.toThrow(
       "A feature list is only available for a layer with exact locations",
     );
+  });
+
+  it("refuses distances to sites whose locations are displaced", async () => {
+    const { config, sites, schools } = createSitesAndSchoolsFixture();
+    const jitteredSites = MapLayer.withSensitivity(sites, {
+      mode: "jitter",
+      radiusMeters: 500,
+    });
+    const jitteredConfig = {
+      ...config,
+      layers: config.layers.map((layer) => {
+        return layer.id === sites.id ? jitteredSites : layer;
+      }),
+    };
+
+    await expect(
+      fetchMapLayerFeatureList(
+        _makeOptions({ config: jitteredConfig, layerId: schools.id }),
+      ),
+    ).rejects.toThrow(
+      "Distances cannot be measured from a layer with approximate locations",
+    );
+    expect(runQueryMock).not.toHaveBeenCalled();
   });
 });

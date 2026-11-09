@@ -82,6 +82,11 @@ function _getNearestBuffer(
   if (!sourceLayer) {
     return undefined;
   }
+  if (sourceLayer.sensitivity.mode === "jitter") {
+    throw new Error(
+      "Distances cannot be measured from a layer with approximate locations",
+    );
+  }
   const labelColumn = binding.labelColumn
     ? sourceLayer.source.queryColumns.find(propEq("id", binding.labelColumn))
     : undefined;
