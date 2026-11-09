@@ -88,6 +88,9 @@ describe("createGeoapifyGeocoder", () => {
       .catch((caught: unknown) => {
         return caught as Error;
       });
+    if (!(error instanceof Error)) {
+      throw new Error("Expected the search to fail.");
+    }
     expect(error.message).toBe("The address search provider answered 401.");
     expect(error.message).not.toContain("46th");
   });
