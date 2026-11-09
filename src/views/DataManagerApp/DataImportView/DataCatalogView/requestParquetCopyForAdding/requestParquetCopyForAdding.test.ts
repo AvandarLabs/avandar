@@ -20,6 +20,21 @@ describe("requestParquetCopyForAdding", () => {
     expect(requestCopy).toHaveBeenCalledWith(LISTING_ID);
   });
 
+  it("hands back a complete sample this page already read, so the source is not read again", async () => {
+    const requestCopy = vi.fn().mockResolvedValue({ status: "building" });
+    const completeSample = { csvText: "borocode\n1\n", token: "token-1" };
+
+    await requestParquetCopyForAdding({
+      listing: { id: LISTING_ID, accessKind: "api_resource" },
+      requestCopy,
+      readCompleteSample: (catalogListingId) => {
+        return catalogListingId === LISTING_ID ? completeSample : undefined;
+      },
+    });
+
+    expect(requestCopy).toHaveBeenCalledWith(LISTING_ID, { completeSample });
+  });
+
   it("says the data could not be prepared when the build failed", async () => {
     const requestCopy = vi
       .fn()

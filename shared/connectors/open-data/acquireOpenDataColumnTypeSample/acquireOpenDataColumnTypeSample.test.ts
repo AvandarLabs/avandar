@@ -329,3 +329,88 @@ describe("acquireOpenDataColumnTypeSample", () => {
     expect(code).toBe("ckan-unreachable");
   });
 });
+
+/** An HttpClient whose Socrata CSV export answers with `csvText`. */
+function _socrataHttp(csvText: string): OpenDataHttp {
+  return {
+    get: vi.fn(),
+    getBytes: vi.fn(async () => {
+      return new TextEncoder().encode(csvText) as Uint8Array<ArrayBuffer>;
+    }),
+  };
+}
+
+const SOCRATA_ENTRY_OVERRIDES: Partial<DataCatalogListing.T> = {
+  apiService: "socrata",
+  apiBaseUrl: "https://data.cityofnewyork.us",
+  externalDatasetId: "gthc-hcne",
+  apiResourceId: "gthc-hcne",
+};
+
+/** A CSV with a header and `numRows` one-column rows. */
+function _csvWithRows(numRows: number): string {
+  return (
+    [
+      "id",
+      ...Array.from({ length: numRows }, (_, index) => {
+        return String(index);
+      }),
+    ].join("\n") + "\n"
+  );
+}
+
+describe("acquireOpenDataColumnTypeSample completeness", () => {
+  it("calls a CKAN file shorter than the byte limit complete", async () => {
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _entry(),
+      http: _ckanHttp(),
+      readByteRange: _readByteRange("a,b\n1,2\n"),
+    });
+
+    expect(sample.isComplete).toBe(true);
+  });
+
+  it("calls a CKAN sample that filled the byte limit incomplete", async () => {
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _entry(),
+      http: _ckanHttp(),
+      readByteRange: _readByteRange(
+        "a,b\n".padEnd(COLUMN_TYPE_SAMPLE_MAX_BYTES, "9"),
+      ),
+    });
+
+    expect(sample.isComplete).toBe(false);
+  });
+
+  it("calls a Socrata export with fewer rows than the row limit complete", async () => {
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _entry(SOCRATA_ENTRY_OVERRIDES),
+      http: _socrataHttp(_csvWithRows(5)),
+      readByteRange: _readByteRange(""),
+    });
+
+    expect(sample.isComplete).toBe(true);
+  });
+
+  it("calls a Socrata export that reached the row limit incomplete", async () => {
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _entry(SOCRATA_ENTRY_OVERRIDES),
+      http: _socrataHttp(_csvWithRows(COLUMN_TYPE_SAMPLE_MAX_ROWS)),
+      readByteRange: _readByteRange(""),
+    });
+
+    expect(sample.isComplete).toBe(false);
+  });
+
+  it("does not count line breaks inside quoted values as rows", async () => {
+    const quotedRow = `"${"line\n".repeat(COLUMN_TYPE_SAMPLE_MAX_ROWS)}"`;
+
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _entry(SOCRATA_ENTRY_OVERRIDES),
+      http: _socrataHttp(`the_geom\n${quotedRow}\n`),
+      readByteRange: _readByteRange(""),
+    });
+
+    expect(sample.isComplete).toBe(true);
+  });
+});

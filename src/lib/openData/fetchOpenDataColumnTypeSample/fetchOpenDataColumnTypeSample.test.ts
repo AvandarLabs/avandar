@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearOpenDataColumnTypeSampleCache,
   fetchOpenDataColumnTypeSample,
+  readRememberedCompleteSample,
 } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 
@@ -23,10 +24,17 @@ vi.mock("$/db/supabase/AvaSupabase", () => {
   };
 });
 
-function _sampleResponse(csvText: string, token: string): Response {
+function _sampleResponse(
+  csvText: string,
+  token: string,
+  isComplete = false,
+): Response {
   return new Response(csvText, {
     status: 200,
-    headers: { "X-Ava-Column-Type-Token": token },
+    headers: {
+      "X-Ava-Column-Type-Token": token,
+      "X-Ava-Column-Type-Sample-Complete": String(isComplete),
+    },
   });
 }
 
@@ -62,7 +70,11 @@ describe("fetchOpenDataColumnTypeSample", () => {
       sleep,
     });
 
-    expect(sample).toEqual({ csvText: "borough,count\n", token: "token-1" });
+    expect(sample).toEqual({
+      csvText: "borough,count\n",
+      token: "token-1",
+      isComplete: false,
+    });
     expect(fetch).toHaveBeenCalledTimes(2);
     expect(fetch).toHaveBeenNthCalledWith(1, SAMPLE_URL, {
       headers: { Authorization: "Bearer session-token" },
@@ -123,8 +135,8 @@ describe("fetchOpenDataColumnTypeSample", () => {
     resolveFetch?.(_sampleResponse("a\n1\n", "token-shared"));
 
     await expect(Promise.all([first, second])).resolves.toEqual([
-      { csvText: "a\n1\n", token: "token-shared" },
-      { csvText: "a\n1\n", token: "token-shared" },
+      { csvText: "a\n1\n", token: "token-shared", isComplete: false },
+      { csvText: "a\n1\n", token: "token-shared", isComplete: false },
     ]);
     expect(fetch).toHaveBeenCalledTimes(1);
   });
@@ -164,7 +176,11 @@ describe("fetchOpenDataColumnTypeSample", () => {
       sleep,
     });
 
-    expect(sample).toEqual({ csvText: "a\n1\n", token: "token-2" });
+    expect(sample).toEqual({
+      csvText: "a\n1\n",
+      token: "token-2",
+      isComplete: false,
+    });
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
@@ -184,8 +200,65 @@ describe("fetchOpenDataColumnTypeSample", () => {
       }),
     ]);
 
-    expect(first).toEqual({ csvText: "a\n1\n", token: "token-a" });
-    expect(second).toEqual({ csvText: "b\n2\n", token: "token-b" });
+    expect(first).toEqual({
+      csvText: "a\n1\n",
+      token: "token-a",
+      isComplete: false,
+    });
+    expect(second).toEqual({
+      csvText: "b\n2\n",
+      token: "token-b",
+      isComplete: false,
+    });
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("complete samples", () => {
+  beforeEach(() => {
+    clearOpenDataColumnTypeSampleCache();
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("says when the server served the whole source", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      _sampleResponse("borocode\n1\n", "token-1", true),
+    );
+
+    const sample = await fetchOpenDataColumnTypeSample(LISTING_ID, {
+      accessToken: "session-token",
+    });
+
+    expect(sample.isComplete).toBe(true);
+  });
+
+  it("hands back a complete sample this page already read", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      _sampleResponse("borocode\n1\n", "token-1", true),
+    );
+    await fetchOpenDataColumnTypeSample(LISTING_ID, {
+      accessToken: "session-token",
+    });
+
+    expect(readRememberedCompleteSample(LISTING_ID)).toEqual({
+      csvText: "borocode\n1\n",
+      token: "token-1",
+    });
+    expect(readRememberedCompleteSample(OTHER_LISTING_ID)).toBeUndefined();
+  });
+
+  it("hands back nothing for a sample that is only the start of the source", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      _sampleResponse("borocode\n1\n", "token-1", false),
+    );
+    await fetchOpenDataColumnTypeSample(LISTING_ID, {
+      accessToken: "session-token",
+    });
+
+    expect(readRememberedCompleteSample(LISTING_ID)).toBeUndefined();
   });
 });

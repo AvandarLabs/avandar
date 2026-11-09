@@ -87,6 +87,24 @@ describe("runParquetCopyBuild", () => {
     });
   });
 
+  it("builds from a complete sample when the job carries one", async () => {
+    const store = _createStore();
+    const buildCopy = vi.fn().mockResolvedValue(COPY);
+
+    await runParquetCopyBuild({
+      job: { ...JOB, completeSampleCsv: "county\nKings\n" },
+      store,
+      loadPipelineDownload: vi.fn(),
+      downloadToFile: vi.fn(),
+      buildCopy,
+    });
+
+    expect(buildCopy).toHaveBeenCalledWith(
+      expect.objectContaining({ completeSampleCsv: "county\nKings\n" }),
+    );
+    expect(store.writeCopy).toHaveBeenCalledWith({ ...JOB, copy: COPY });
+  });
+
   it("verifies the columns of a listing that has none yet", async () => {
     const store = _createStore({
       readListing: vi.fn().mockResolvedValue({ ...LISTING, columnNames: [] }),

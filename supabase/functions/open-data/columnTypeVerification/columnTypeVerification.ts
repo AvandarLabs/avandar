@@ -1,7 +1,9 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import {
+  buildCompleteSampleSha256,
   isColumnTypeSampleTokenValid,
+  isCompleteSampleVouchedFor,
   signColumnTypeSampleToken,
 } from "@sbfn/open-data/columnTypeSampleToken/columnTypeSampleToken.ts";
 import { gzipBytes } from "@sbfn/open-data/gzipBytes/gzipBytes.ts";
@@ -18,6 +20,29 @@ const MAX_SAMPLE_RESPONSE_BYTES = 25 * 1024 * 1024;
 
 /** The header the sample route returns its token in. */
 export const COLUMN_TYPE_TOKEN_HEADER = "X-Ava-Column-Type-Token";
+
+/**
+ * The header the sample route sets to `true` when the sample holds the
+ * whole source.
+ */
+export const COLUMN_TYPE_SAMPLE_COMPLETE_HEADER =
+  "X-Ava-Column-Type-Sample-Complete";
+
+/**
+ * The largest complete sample a copy request may hand back, in characters:
+ * the most a Socrata sample read may hold.
+ */
+const MAX_COMPLETE_SAMPLE_CHARACTERS = MAX_SAMPLE_RESPONSE_BYTES;
+
+/**
+ * A complete column type sample handed back with a copy request, with the
+ * token it was served with, so the copy is built from it instead of the
+ * source.
+ */
+export const CompleteSampleBodySchema = z.object({
+  token: z.string().min(1).max(4096),
+  csvText: z.string().min(1).max(MAX_COMPLETE_SAMPLE_CHARACTERS),
+});
 
 /** The body the column types route accepts. */
 export const VerifiedColumnTypesBodySchema = z.object({
@@ -93,6 +118,11 @@ export const markListingInvalid: MarkListingInvalid = async ({
  * quoting gets DuckDB's handling, not a hand-written parser's. The browser
  * sends the types back with the token to `writeVerifiedColumnTypes`.
  *
+ * A sample that holds the whole source says so in
+ * `X-Ava-Column-Type-Sample-Complete`, and its token carries the hash of its
+ * text as a browser reads it, so the browser can hand it back to be copied
+ * (`readVouchedCompleteSample`).
+ *
  * @throws `OpenDataAcquisitionFailed` when the sample cannot be read.
  */
 export async function respondWithColumnTypeSample(
@@ -105,19 +135,26 @@ export async function respondWithColumnTypeSample(
     }),
     readByteRange: createByteRangeReader(),
   });
+  // Hashed as the text a browser's `response.text()` reads, which decodes
+  // the bytes the same way.
+  const completeSampleSha256 = sample.isComplete
+    ? await buildCompleteSampleSha256(new TextDecoder().decode(sample.bytes))
+    : undefined;
   const token = await signColumnTypeSampleToken({
     catalogListingId: entry.id,
     secret: _getSigningSecret(),
     now: Date.now(),
+    completeSampleSha256,
   });
   return new Response(await gzipBytes(sample.bytes), {
     status: 200,
     headers: {
       ...corsHeaders,
-      "Access-Control-Expose-Headers": COLUMN_TYPE_TOKEN_HEADER,
+      "Access-Control-Expose-Headers": `${COLUMN_TYPE_TOKEN_HEADER}, ${COLUMN_TYPE_SAMPLE_COMPLETE_HEADER}`,
       "Content-Encoding": "gzip",
       "Content-Type": "text/csv",
       [COLUMN_TYPE_TOKEN_HEADER]: token,
+      [COLUMN_TYPE_SAMPLE_COMPLETE_HEADER]: String(sample.isComplete),
     },
   });
 }
@@ -174,4 +211,29 @@ export async function markColumnTypeSampleUnparseable(args: {
     reason: "unparseable_dataset",
   });
   return _jsonResponse(200, { invalidDatasetReason: "unparseable_dataset" });
+}
+
+/**
+ * The text of a complete sample handed back with a copy request, when its
+ * token vouches for exactly that text as the whole source of this listing.
+ * Anything else, a changed text, an expired token, or a sample that was not
+ * complete, is ignored, and the copy is built from the source as usual.
+ *
+ * @returns The sample's text, or nothing when it is not vouched for.
+ */
+export async function readVouchedCompleteSample(args: {
+  catalogListingId: string;
+  completeSample: z.infer<typeof CompleteSampleBodySchema> | undefined;
+}): Promise<string | undefined> {
+  if (args.completeSample === undefined) {
+    return undefined;
+  }
+  const isVouchedFor = await isCompleteSampleVouchedFor({
+    token: args.completeSample.token,
+    csvText: args.completeSample.csvText,
+    catalogListingId: args.catalogListingId,
+    secret: _getSigningSecret(),
+    now: Date.now(),
+  });
+  return isVouchedFor ? args.completeSample.csvText : undefined;
 }

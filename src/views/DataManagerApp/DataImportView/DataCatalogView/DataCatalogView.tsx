@@ -29,6 +29,7 @@ import {
 import { MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ColumnTypeVerifications } from "@/lib/openData/ColumnTypeVerifications";
+import { readRememberedCompleteSample } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 import { requestOpenDataParquetCopy } from "@/lib/openData/requestOpenDataParquetCopy/requestOpenDataParquetCopy";
 import { isColumnTypeVerificationDue } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
 import { Logger } from "@/utils/Logger";
@@ -258,7 +259,9 @@ export function DataCatalogView({
   }
 
   // Starts the listing's Parquet copy as it is added, so the first build is
-  // under way before the dataset is first opened.
+  // under way before the dataset is first opened. A complete sample the
+  // preview already read becomes the copy, rather than reading the source
+  // again.
   async function _requestParquetCopy(
     listing: DataCatalogListingRead,
   ): Promise<void> {
@@ -266,6 +269,7 @@ export function DataCatalogView({
       const copyStatus = await requestParquetCopyForAdding({
         listing,
         requestCopy: requestOpenDataParquetCopy,
+        readCompleteSample: readRememberedCompleteSample,
       });
       if (copyStatus === "preparing") {
         notifySuccess({
