@@ -11,6 +11,7 @@ import { IsochroneMapTool } from "@/views/GisApp/shell/MapToolCluster/IsochroneM
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 import { MeasureMapTool } from "@/views/GisApp/shell/MapToolCluster/MeasureMapTool";
 import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
+import { PlaceMapTool } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
@@ -43,6 +44,7 @@ export function MapToolClusterToolbar({
   layers,
   featureCollections,
   requestFitBounds,
+  placeTool,
 }: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
   return (
@@ -74,6 +76,7 @@ export function MapToolClusterToolbar({
         selectedLayer={selectedLayer}
         onBufferConfirm={onBufferConfirm}
       />
+      {placeTool ? <PlaceMapTool controller={placeTool} /> : null}
       {isFlagEnabled(FeatureFlag.EnableGisIsochrone) ? (
         <IsochroneMapTool />
       ) : null}
