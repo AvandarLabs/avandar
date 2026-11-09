@@ -48,7 +48,11 @@ export type OpenDataAPI = APITypeDef<
       POST: {
         returnType: Response;
         pathParams: { catalogListingId: string };
-        body: Record<string, never>;
+        /**
+         * A complete column type sample and its token, when the caller holds
+         * one, so the copy is built from it instead of the source.
+         */
+        body: { completeSample?: { token: string; csvText: string } };
       };
     };
   }

@@ -1,11 +1,22 @@
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 
-/** A listing's column type sample and the token that vouches for it. */
+/**
+ * A listing's column type sample and the token that vouches for it.
+ * `isComplete` is true when the sample holds the whole source, so it can be
+ * handed back to build the listing's copy from.
+ */
 export type OpenDataColumnTypeSample = Readonly<{
   csvText: string;
   token: string;
+  isComplete: boolean;
 }>;
+
+/** A complete sample's text and token, as a copy request hands them back. */
+export type OpenDataCompleteSample = Pick<
+  OpenDataColumnTypeSample,
+  "csvText" | "token"
+>;
 
 /** The open-data edge function's URL for one catalog listing. */
 export function buildOpenDataListingUrl(
@@ -91,6 +102,28 @@ export function clearOpenDataColumnTypeSampleCache(): void {
   rememberedSamples.clear();
 }
 
+/**
+ * The complete sample of a listing this page read in the last 14 minutes,
+ * while its token is still good, or nothing when it read none or only the
+ * start of the source.
+ *
+ * @param catalogListingId The listing.
+ */
+export function readRememberedCompleteSample(
+  catalogListingId: DataCatalogListing.Id,
+): OpenDataCompleteSample | undefined {
+  const remembered = rememberedSamples.get(catalogListingId);
+  if (
+    remembered === undefined ||
+    remembered.rememberUntilMs <= Date.now() ||
+    !remembered.sample.isComplete
+  ) {
+    return undefined;
+  }
+  const { csvText, token } = remembered.sample;
+  return { csvText, token };
+}
+
 function _sleep(delayMs: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, delayMs);
@@ -135,6 +168,8 @@ async function _readSampleOnce(
   return {
     token: response.headers.get("X-Ava-Column-Type-Token") ?? "",
     csvText: await response.text(),
+    isComplete:
+      response.headers.get("X-Ava-Column-Type-Sample-Complete") === "true",
   };
 }
 

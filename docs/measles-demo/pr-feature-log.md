@@ -75,6 +75,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F23 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
 | F24 | ODC listing data preview and full-screen detail | not started | F12, F16, F19, F23 | |
 | F27 | Pipeline runs pace their writes to the database and retry transient failures | not started | F4, F11, F23 | |
+| F28 | Build an ODC listing's Parquet copy from a column type sample that holds the whole source | not started | F12, F24, F25 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -107,6 +108,7 @@ API. It's new work, not something this branch built.
 | 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
 | 15 | F24 | Adds the data preview and full-screen modal to the detail pane F19 built and F23 regrouped. Merge after both. |
 | 16 | F27 | Rewrites the write loop in `loadRelationsPage` that F4 built and F23's byte cap changed, and adds a stage to the progress events F11 added. Merge after F23. |
+| after F25 | F28 | Extends F25's copy request, build route, and build, and the column type sample F12 reworked. The pipeline server half must deploy before the edge function half: an older build route refuses the new `completeSampleCsv` key. |
 | 17 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -1920,6 +1922,40 @@ Commits that only update this log are branch-only and are not listed.
 - `b920bee1b` (desktop SQLite generator catch-up) is on the Postgres branch.
 - `7dbb2210a`'s non-open-data files (`db_connections*`, `PostgresTableWrapper*`, the Postgres import views, `supabase/functions/connectors/*`, `supabase/functions/_shared/*`, `createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) are formatting and Postgres work. They belong to the Postgres branch, not to any feature here.
 - `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere. Done in `f710dcb68`.
+
+## F28: Build an ODC listing's Parquet copy from a sample that holds the whole source
+
+Status: not started. Built on `feat/catalog-complete-sample`, branched from
+`demo/measles`.
+
+**Purpose:** The column type sample reads up to 10,000 Socrata rows or the
+first 5 MB of a CKAN file. For a small listing that read is the whole
+source, yet the Parquet copy build read the source again, and a flaky
+source could fail the second read: Borough Boundaries (`gthc-hcne`) could
+not be added because Socrata intermittently answers 503 for its
+geometry-heavy rows. The sample route now says when a sample is complete
+and signs the SHA-256 of its text into the sample token. The browser hands
+the text back to `/parquet-cache` right after writing the verified column
+types, and on "Add to workspace" when the preview read a complete sample.
+The edge function copies the text only when the token vouches for exactly
+that text, forwards it to the pipeline server as `completeSampleCsv`, and
+lets a failed build retry at once. **Value:** small listings get their copy
+the moment their columns are checked, with no second read of the source,
+and no caller can put rows of its own into a copy every workspace reads.
+Design: `docs/measles-demo/odc-parquet-cache-spec.md`, "A complete sample
+becomes the copy".
+
+**PR title:** `feat(open-data): build a listing's Parquet copy from a sample that holds the whole source`
+
+**Depends on:** F12 (the column type sample route and token), F24 (the
+preview that reads the sample), and F25 (the copy request, build route,
+and build).
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `0a25bc0df` | feat(open-data): build a listing's Parquet copy from a sample that holds the whole source | All of it, including the `DataImportView/CLAUDE.md` note and the spec section. |
 
 ## F22: AI harness audit fixes
 

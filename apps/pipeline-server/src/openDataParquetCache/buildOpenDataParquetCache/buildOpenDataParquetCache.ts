@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, stat } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { buildParquetCacheFolderPath } from "@pipeline-server/openDataParquetCache/buildParquetCacheFolderPath/buildParquetCacheFolderPath";
@@ -120,23 +120,14 @@ async function _uploadParts(
 }
 
 /**
- * Downloads a source that is one file, gzipped on disk when it is a CSV,
- * converts it into parts, and uploads them.
+ * Converts a source file on disk into parts and uploads them, deleting the
+ * source file first.
  */
-async function _copyWholeFile(
+async function _copySourceFile(
   context: CopyContext,
-  download: WholeFileListingDownload,
+  sourcePath: string,
+  isCsv: boolean,
 ): Promise<WrittenParts> {
-  const isCsv = download.contentKind === "csv";
-  const sourcePath = join(
-    context.tempDir,
-    isCsv ? "source.csv.gz" : "source.parquet",
-  );
-  await context.dependencies.downloadToFile({
-    url: download.url,
-    filePath: sourcePath,
-    isGzipped: isCsv,
-  });
   const partsDir = join(context.tempDir, "parts");
   await mkdir(partsDir);
   const partOptions = { partsDir, maxPartBytes: context.maxPartBytes };
@@ -157,6 +148,40 @@ async function _copyWholeFile(
   }
   const byteSize = await _uploadParts(context, partPaths);
   return { partCount: partPaths.length, byteSize, ...summary };
+}
+
+/**
+ * Downloads a source that is one file, gzipped on disk when it is a CSV,
+ * converts it into parts, and uploads them.
+ */
+async function _copyWholeFile(
+  context: CopyContext,
+  download: WholeFileListingDownload,
+): Promise<WrittenParts> {
+  const isCsv = download.contentKind === "csv";
+  const sourcePath = join(
+    context.tempDir,
+    isCsv ? "source.csv.gz" : "source.parquet",
+  );
+  await context.dependencies.downloadToFile({
+    url: download.url,
+    filePath: sourcePath,
+    isGzipped: isCsv,
+  });
+  return await _copySourceFile(context, sourcePath, isCsv);
+}
+
+/**
+ * Copies a column type sample that holds the whole source, so the source is
+ * not downloaded again. Its column types are read from all of its rows.
+ */
+async function _copyCompleteSample(
+  context: CopyContext,
+  completeSampleCsv: string,
+): Promise<WrittenParts> {
+  const sourcePath = join(context.tempDir, "source.csv");
+  await writeFile(sourcePath, completeSampleCsv);
+  return await _copySourceFile(context, sourcePath, true);
 }
 
 async function _sleep(ms: number): Promise<void> {
@@ -309,8 +334,10 @@ async function _readDownload(
  * so a source of any size needs only about one part of disk. A source that
  * is one file is downloaded whole, gzipped on disk when it is a CSV.
  *
- * A paged copy whose source changed while it downloaded mixes two versions,
- * so it fails. A failed build deletes the parts it uploaded. Recording a
+ * A complete column type sample, when one is given, is copied in place of
+ * the source: the source is only asked for its version. A paged copy whose
+ * source changed while it downloaded mixes two versions, so it fails. A
+ * failed build deletes the parts it uploaded. Recording a
  * copy on the listing, and deleting the copy it replaces, is the caller's
  * job.
  *
@@ -320,6 +347,8 @@ async function _readDownload(
  * @param options.maxPartBytes About how large each part grows.
  * @param options.pageRetryDelayMs How long to wait before the first retry
  *   of a failed page download. Each later retry waits longer.
+ * @param options.completeSampleCsv A column type sample vouched for as the
+ *   whole source, copied instead of downloading the source.
  * @returns The copy that was written.
  * @throws `ParquetCopyError` when the source is empty or changed.
  */
@@ -330,6 +359,7 @@ export async function buildOpenDataParquetCache(
     dependencies: OpenDataParquetCacheDependencies;
     maxPartBytes?: number;
     pageRetryDelayMs?: number;
+    completeSampleCsv?: string;
   }>,
 ): Promise<OpenDataParquetCache> {
   const { listing, dependencies } = options;
@@ -350,6 +380,11 @@ export async function buildOpenDataParquetCache(
     dependencies,
   };
   try {
+    const { completeSampleCsv } = options;
+    if (completeSampleCsv !== undefined) {
+      const parts = await _copyCompleteSample(context, completeSampleCsv);
+      return { folderPath, sourceVersion, ...parts };
+    }
     const parts = download.paging
       ? await _copyPages(context, download, pageRows)
       : await _copyWholeFile(context, download);
