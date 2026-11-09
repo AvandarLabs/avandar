@@ -6,7 +6,10 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
-import type { DataExplorerAppState } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
+import type {
+  DataExplorerAppState,
+  DerivedColumnsSnapshot,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 /**
  * Try to compute a fresh SQL string from the structured query. Used by
@@ -213,4 +216,24 @@ export function makePluginVizConfigMemoryFromBindings(
     // back to a plugin config.
     return remappedConfig.vizType === "plugin" ? remappedConfig : config;
   });
+}
+
+/**
+ * Takes the part of the state that applying derived columns SQL replaces, so
+ * Undo can put it back. Called by `useDataExplorerPluginBridge` right before
+ * it dispatches `applyDerivedColumnsSql`.
+ */
+export function makeDerivedColumnsSnapshotFromState(
+  state: DataExplorerAppState,
+): DerivedColumnsSnapshot {
+  return {
+    rawSql: state.rawSql,
+    query: state.query,
+    isStructuredQueryInSync: state.isStructuredQueryInSync,
+    sqlSyncWarnings: state.sqlSyncWarnings,
+    vizConfig: state.vizConfig,
+    columnBindings: state.columnBindings,
+    sourceCatalog: state.sourceCatalog,
+    nlPrompt: state.nlPrompt,
+  };
 }

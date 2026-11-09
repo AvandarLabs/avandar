@@ -174,6 +174,25 @@ export type DataExplorerAppState = {
   queryTrigger: UserQueryAnalyticsTrigger;
 };
 
+/**
+ * The part of the Data Explorer state a plugin command's derived columns
+ * replace: the SQL, the structured query and its sync flags, the chart, the
+ * column bindings, the source columns, and the prompt. Taken by
+ * `useDataExplorerPluginBridge` before it applies the derived columns SQL, and
+ * passed back to `restoreDerivedColumnsSnapshot` when the user clicks Undo.
+ */
+export type DerivedColumnsSnapshot = Pick<
+  DataExplorerAppState,
+  | "rawSql"
+  | "query"
+  | "isStructuredQueryInSync"
+  | "sqlSyncWarnings"
+  | "vizConfig"
+  | "columnBindings"
+  | "sourceCatalog"
+  | "nlPrompt"
+>;
+
 export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   query: StructuredQuery.makeEmpty(),
   vizConfig: {

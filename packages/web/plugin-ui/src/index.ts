@@ -11,6 +11,7 @@ export {
   Group,
   Loader,
   NumberInput,
+  SegmentedControl,
   Select,
   SimpleGrid,
   Stack,

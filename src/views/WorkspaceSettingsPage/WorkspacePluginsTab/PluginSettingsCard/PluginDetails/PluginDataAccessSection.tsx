@@ -26,6 +26,7 @@ export function PluginDataAccessSection({
       key: permission,
       text: matchLiteral(permission, {
         "data:context": t`A query result's rows, only when you run one of its tools on that result`,
+        "query:addColumns": t`Add calculated columns to a Data Explorer query when you run one of its tools`,
       }),
     };
   });

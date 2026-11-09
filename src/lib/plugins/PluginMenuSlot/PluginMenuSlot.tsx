@@ -2,6 +2,7 @@ import { usePluginMenuItems } from "@/lib/plugins/PluginHost/usePluginMenuItems"
 import { PluginInlineButtons } from "@/lib/plugins/PluginMenuSlot/PluginInlineButtons";
 import { PluginOverflowMenu } from "@/lib/plugins/PluginMenuSlot/PluginOverflowMenu";
 import { usePluginCommandRunner } from "@/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 import type { SlotId, WhenFacts } from "@avandar/plugin-manifest/runtime";
 import type { PluginInvocationContext } from "@avandar/plugin-sdk";
@@ -19,6 +20,12 @@ type Props = Readonly<{
    */
   getContext: (() => PluginInvocationContext) | undefined;
 
+  /**
+   * Builds what a Data Explorer toolbar command changes its query through.
+   * The slot calls it once per click, right after `getContext`.
+   */
+  getDataExplorerBridge?: (() => DataExplorerBridge) | undefined;
+
   /** The slot's current facts, which the plugins' `when` conditions read. */
   facts: WhenFacts;
 }>;
@@ -32,10 +39,14 @@ type Props = Readonly<{
 export function PluginMenuSlot({
   slotId,
   getContext,
+  getDataExplorerBridge,
   facts,
 }: Props): JSX.Element | null {
   const items = usePluginMenuItems({ slotId, facts });
-  const { runningKey, run } = usePluginCommandRunner(getContext);
+  const { runningKey, run } = usePluginCommandRunner({
+    getContext,
+    getDataExplorerBridge,
+  });
 
   if (items.length === 0) {
     return null;

@@ -52,6 +52,34 @@ describe("runPluginCommand", () => {
     );
   });
 
+  it("gives the handler a dataExplorer API that applies through the bridge", async () => {
+    const applyDerivedColumnsSql = vi.fn(() => {
+      return true;
+    });
+    await runPluginCommand({
+      plugin: PLUGIN,
+      pluginName: "Test",
+      commandId: "hello",
+      context: { ...CONTEXT, columns: [{ name: "x", dataType: "bigint" }] },
+      workspace: WORKSPACE,
+      dataExplorerBridge: {
+        baseSql: `SELECT * FROM "t"`,
+        applyDerivedColumnsSql,
+      },
+      loadCode: async () => {
+        return _makeCodeModuleFromCommands({
+          hello: async (avandar) => {
+            await avandar.dataExplorer?.addColumns([
+              { name: "double_x", expression: "{x} * 2", inputs: { x: "x" } },
+            ]);
+          },
+        });
+      },
+    });
+
+    expect(applyDerivedColumnsSql).toHaveBeenCalledTimes(1);
+  });
+
   it("reports no failure when the handler completes", async () => {
     const failure = await _runCommandFromLoader({
       loadCode: async () => {
