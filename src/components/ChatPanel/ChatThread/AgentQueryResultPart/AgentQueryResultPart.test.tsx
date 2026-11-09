@@ -93,19 +93,32 @@ describe("AgentQueryResultPart", () => {
     );
   });
 
-  it("says the result is loading while it runs", () => {
+  it("keeps the title and shows a placeholder while the result runs", () => {
     useAgentQueryResultViewMock.mockReturnValue({ status: "loading" });
     render(<AgentQueryResultPart {..._props(RESULT)} />);
 
-    expect(screen.getByText("Loading result")).toBeInTheDocument();
+    const card = screen.getByRole("group", { name: "How many cases?" });
+    expect(card).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByTestId("agent-query-result-skeleton")).toBeVisible();
+    expect(screen.queryByTestId("viz")).not.toBeInTheDocument();
   });
 
-  it("says the result is unavailable when it cannot run", () => {
+  it("keeps the title and says so when the result cannot run", () => {
     useAgentQueryResultViewMock.mockReturnValue({ status: "unavailable" });
     render(<AgentQueryResultPart {..._props(RESULT)} />);
 
-    expect(screen.getByText("Unavailable result")).toBeInTheDocument();
+    expect(
+      screen.getByRole("group", { name: "How many cases?" }),
+    ).not.toHaveAttribute("aria-busy");
+    expect(screen.getByText("This result could not be loaded.")).toBeVisible();
     expect(screen.queryByTestId("viz")).not.toBeInTheDocument();
+  });
+
+  it("names a result with a blank title after its type", () => {
+    useAgentQueryResultViewMock.mockReturnValue({ status: "ready" });
+    render(<AgentQueryResultPart {..._props({ ...RESULT, title: "  " })} />);
+
+    expect(screen.getByRole("group", { name: "Result" })).toBeVisible();
   });
 
   it("shows a link result as an inline chip", () => {

@@ -25,6 +25,14 @@ export type AgentQueryResultView =
     };
 
 /**
+ * The structured query every chat result passes alongside its SQL. Shared at
+ * module level because `useDataQuery` keys its cache on it and each
+ * `makeEmpty` call mints a new id: a query per card would re-run the SQL on
+ * every remount and leave an orphaned cache entry each time.
+ */
+const EMPTY_QUERY = StructuredQuery.makeEmpty();
+
+/**
  * Binds the columns of a finished result of `sql` to column IDs, the way
  * the Data Explorer does for SQL typed in its editor. Undefined until the
  * result of `sql` is bound.
@@ -46,8 +54,11 @@ function useResultColumns(
       columns: queryResult?.columns ?? [],
     });
   }, [sql, queryResult?.columns]);
+  const scopeKey = useMemo(() => {
+    return `${workspaceId}:chat-result:${sql}`;
+  }, [workspaceId, sql]);
   const schema = useQueryResultColumnBindings({
-    scopeKey: `${workspaceId}:chat-result:${sql}`,
+    scopeKey,
     sqlKey: sql,
     resultSqlKey: queryResult?.executedSql,
     result: isLoading ? undefined : queryResult,
@@ -66,11 +77,8 @@ export function useAgentQueryResultView(
   result: AgentQueryResultData,
   workspaceId: Workspace.Id,
 ): AgentQueryResultView {
-  const emptyQuery = useMemo(() => {
-    return StructuredQuery.makeEmpty();
-  }, []);
   const [queryResult, isLoading, query] = useDataQuery({
-    query: emptyQuery,
+    query: EMPTY_QUERY,
     rawSql: result.sql,
     auth: "workspace",
     workspaceId,
@@ -88,6 +96,10 @@ export function useAgentQueryResultView(
       columns ?? [],
     );
   }, [result.chartType, columns]);
+  const data = queryResult?.data;
+  const dateColumns = useMemo(() => {
+    return getDateColumns(columns ?? [], data ?? []);
+  }, [columns, data]);
   if (query.isError) {
     return { status: "unavailable" };
   }
@@ -99,7 +111,7 @@ export function useAgentQueryResultView(
     columns,
     rawColumns: queryResult.columns,
     data: queryResult.data,
-    dateColumns: getDateColumns(columns, queryResult.data),
+    dateColumns,
     vizConfig,
   };
 }

@@ -9704,6 +9704,10 @@ msgstr "Général"
 msgid "Show a Not reported entry"
 msgstr "Afficher une entrée « Non renseigné »"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "Impossible de charger ce résultat."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
 msgstr "Groupes d'utilisateurs pour l'invité"

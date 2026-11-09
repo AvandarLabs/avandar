@@ -6,7 +6,7 @@ const AgentQueryResultSchema = z.object({
   version: z.literal(1),
   sql: z.string().min(1),
   chartType: z.enum(CHART_TYPES),
-  title: z.string(),
+  title: z.string().min(1),
   display: z.enum(["embed", "link"]),
 });
 

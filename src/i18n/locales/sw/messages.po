@@ -9591,6 +9591,10 @@ msgstr "Kawaida"
 msgid "Show a Not reported entry"
 msgstr "Onyesha kipengee cha Haijaripotiwa"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "Matokeo haya hayakuweza kupakiwa."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
 msgstr "Makundi ya watumiaji kwa mgeni"

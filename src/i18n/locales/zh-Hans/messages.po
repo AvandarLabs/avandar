@@ -9261,6 +9261,10 @@ msgstr "常规"
 msgid "Show a Not reported entry"
 msgstr "显示“未报告”条目"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "无法加载此结果。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
 msgstr "邀请者的用户组"

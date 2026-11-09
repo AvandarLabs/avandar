@@ -35,6 +35,7 @@ describe("AgentQueryResult", () => {
     expect(AgentQueryResult.parse({ ...result, chartType: "radar" })).toBe(
       undefined,
     );
+    expect(AgentQueryResult.parse({ ...result, title: "" })).toBe(undefined);
     expect(AgentQueryResult.parse({ sql: 1 })).toBe(undefined);
     expect(AgentQueryResult.parse(undefined)).toBe(undefined);
   });

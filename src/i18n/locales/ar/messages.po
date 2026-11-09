@@ -9475,6 +9475,10 @@ msgstr "عام"
 msgid "Show a Not reported entry"
 msgstr "إظهار إدخال «غير مُبلّغ عنه»"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "تعذّر تحميل هذه النتيجة."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
 msgstr "مجموعات المستخدمين للمدعوين"
