@@ -216,6 +216,7 @@ function useSavePlace(
 }
 
 function useDeletePlace(
+  app: GisAppState,
   session: PlacesSession,
 ): UseMutationResultTuple<PlacesEditOutcome, PlaceFeatureTarget> {
   const { t } = useLingui();
@@ -235,6 +236,7 @@ function useDeletePlace(
       });
     },
     onSuccess: ({ result, isMapStale }) => {
+      app.closeInspector();
       if (result === "ok" && isMapStale) {
         notifyWarning(staleMapMessage);
         return;
@@ -313,7 +315,7 @@ export function usePlacesActions(
   const session = usePlacesSession(app);
   const [createDataset, isCreating] = useCreatePlacesDataset(app, session);
   const [savePlace, isSavingPlace] = useSavePlace(app, session);
-  const [deletePlace, isDeleting] = useDeletePlace(session);
+  const [deletePlace, isDeleting] = useDeletePlace(app, session);
   const [loadPlace, isLoading] = useLoadPlace(app, session);
   return {
     isSaving: isCreating || isSavingPlace || isDeleting || isLoading,

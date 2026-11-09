@@ -241,4 +241,22 @@ describe("usePlacesActions", () => {
     });
     expect(mocks.notifyError).not.toHaveBeenCalled();
   });
+
+  it("closes the inspector on the place it deleted", async () => {
+    mocks.readPlaces.mockResolvedValue([
+      { ...PLACE_INPUT, placeId: "place-1" },
+    ] satisfies PlaceRow[]);
+    const app = _createApp();
+    const result = _renderActions(app);
+    act(() => {
+      _getFeatureActions(result).onDelete({
+        datasetId: DATASET_ID,
+        placeId: "place-1",
+      });
+    });
+    await waitFor(() => {
+      expect(mocks.notifySuccess).toHaveBeenCalledOnce();
+    });
+    expect(app.closeInspector).toHaveBeenCalledOnce();
+  });
 });
