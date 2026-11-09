@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Accordion, Divider, Stack } from "@mantine/core";
+import { DashboardMapAudienceAlert } from "@/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert";
 import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
 import { PublishSliceSection } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection";
 import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
@@ -30,6 +31,10 @@ export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
   return (
     <Stack gap="md">
       <Divider />
+      <DashboardMapAudienceAlert
+        dashboard={publishing.currentDashboard}
+        targetVisibility={publishing.targetVisibility}
+      />
       <PublishDashboardStatus
         visibility={publishing.currentDashboard.visibility}
         targetVisibility={publishing.targetVisibility}

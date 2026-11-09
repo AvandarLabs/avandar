@@ -37,6 +37,17 @@ vi.mock(
   },
 );
 
+vi.mock(
+  "@/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert",
+  () => {
+    return {
+      DashboardMapAudienceAlert: () => {
+        return null;
+      },
+    };
+  },
+);
+
 function _makePublishing(
   visibility: Dashboard.Visibility = "draft",
 ): ReturnType<typeof useDashboardPublishingControl> {
