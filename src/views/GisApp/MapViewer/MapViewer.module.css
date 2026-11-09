@@ -18,10 +18,19 @@
   display: none;
 }
 
+/* With no buttons to clear, a fixed picture's legend may use the full height. */
+.mapViewerCanvas--fixed .mapViewerLegend {
+  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm));
+}
+
+/*
+ * The legend shares the right edge with MapLibre's zoom in, zoom out, and
+ * compass buttons: 3 x 29px plus their 10px margin. It stops above them.
+ */
 .mapViewerLegend {
   inset-block-end: var(--mantine-spacing-sm);
   inset-inline-end: var(--mantine-spacing-sm);
-  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm));
+  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm) - 97px);
   overflow: auto;
   position: absolute;
   z-index: 1;

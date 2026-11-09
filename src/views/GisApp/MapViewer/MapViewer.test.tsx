@@ -156,14 +156,17 @@ function _makeRendering(hasDrawnDisputedFeature = false): unknown {
   };
 }
 
-function _render(source: MapViewerSource): void {
+function _render(
+  source: MapViewerSource,
+  display: MapViewerDisplay = DISPLAY,
+): void {
   render(
     <QueryClientProvider
       client={
         new QueryClient({ defaultOptions: { queries: { retry: false } } })
       }
     >
-      <MapViewer source={source} display={DISPLAY} />
+      <MapViewer source={source} display={display} />
     </QueryClientProvider>,
   );
 }
@@ -295,6 +298,32 @@ describe("MapViewer", () => {
     expect(screen.getByLabelText("Loading the map")).toBeInTheDocument();
     expect(useMapCanvasSpy).not.toHaveBeenCalled();
     expect(useMapLayerRenderingMock).not.toHaveBeenCalled();
+  });
+
+  it("starts the legend collapsed on a short map", () => {
+    useGetMapByIdMock.mockReturnValue([
+      _makeMap([MapLayer.makeEmpty("Schools")]),
+      false,
+    ]);
+
+    _render(LIVE_SOURCE, { ...DISPLAY, heightPx: 240 });
+
+    expect(
+      screen.getByRole("button", { name: "Expand the legend" }),
+    ).toBeInTheDocument();
+  });
+
+  it("starts the legend open on a tall map", () => {
+    useGetMapByIdMock.mockReturnValue([
+      _makeMap([MapLayer.makeEmpty("Schools")]),
+      false,
+    ]);
+
+    _render(LIVE_SOURCE);
+
+    expect(
+      screen.getByRole("button", { name: "Collapse the legend" }),
+    ).toBeInTheDocument();
   });
 
   it("tells a viewer who cannot read the map that they have no access", () => {

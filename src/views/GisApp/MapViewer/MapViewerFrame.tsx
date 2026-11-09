@@ -6,7 +6,10 @@ import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
 import { getMapViewerPopupFromClick } from "@/views/GisApp/MapViewer/getMapViewerPopupFromClick/getMapViewerPopupFromClick";
 import css from "@/views/GisApp/MapViewer/MapViewer.module.css";
 import { MapViewerFurniture } from "@/views/GisApp/MapViewer/MapViewerFurniture";
-import { MapViewerLegend } from "@/views/GisApp/MapViewer/MapViewerLegend";
+import {
+  MAP_VIEWER_COLLAPSED_LEGEND_MAX_HEIGHT_PX,
+  MapViewerLegend,
+} from "@/views/GisApp/MapViewer/MapViewerLegend";
 import { MapViewerPopupCard } from "@/views/GisApp/MapViewer/MapViewerPopupCard";
 import { useMapInteractionMode } from "@/views/GisApp/MapViewer/useMapInteractionMode/useMapInteractionMode";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -69,8 +72,14 @@ export function MapViewerFrame(props: Props): ReactNode {
         <MapCanvasSurface containerRef={containerRef} />
         {display.showLegend ? (
           <MapViewerLegend
+            key={
+              display.heightPx < MAP_VIEWER_COLLAPSED_LEGEND_MAX_HEIGHT_PX
+                ? "short"
+                : "tall"
+            }
             config={config}
             hasDrawnDisputedFeature={rendering.hasDrawnDisputedFeature}
+            heightPx={display.heightPx}
           />
         ) : null}
         {popup ? (
