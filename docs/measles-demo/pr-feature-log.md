@@ -1340,6 +1340,7 @@ commits belong to the features that own them, not here.
 | `d7fd436a8` | fix(catalog): keep the source record as the source sent it | All of it |
 | `bc4baf853` | test(catalog): filter the open data catalog by publisher, agency, and keyword end to end | All of it |
 | `ad6d300a7` | feat(catalog): offer keywords in the rail and return every facet in one value | All of it. Supersedes `d90481335`'s Keywords chips (`DataCatalogKeywordFacet.tsx` is deleted) and moves the facet rows into `52.data_catalog_listings__search_facet_rows.sql`, with the RPC in `53.`. Regenerate the migration, types, desktop migration, and `.po` catalogs. |
+| `a8e99dc8a` | feat(catalog): search keywords on the server and count every facet in one pass | All of it, on top of `ad6d300a7`. Adds `52.rpc_data_catalog_listings__search_tag_options.sql`, rewrites `52.data_catalog_listings__search_facet_rows.sql`, and adds `useDataCatalogKeywordOptions`. `catalog-search-performance.md` goes with F9. Regenerate the migration, types, and desktop migration. Built on `feat/catalog-keyword-search`. |
 
 *Docs, which go with F9:*
 
@@ -1389,7 +1390,9 @@ its `drop column source_metadata` is intended, since the old values hold
 mapped fields the new column must not). Last,
 `20261109041614_catalog_facets_as_one_value_with_keywords.sql` (generated:
 it drops the row-returning facet RPC and recreates it returning `jsonb`, over
-the new `data_catalog_listings__search_facet_rows`).
+the new `data_catalog_listings__search_facet_rows`), then
+`20261109052742_catalog_single_pass_facets_and_keyword_search.sql`
+(generated: the one-pass facet rows and the keyword search RPC).
 
 **Verification:**
 ```sh
