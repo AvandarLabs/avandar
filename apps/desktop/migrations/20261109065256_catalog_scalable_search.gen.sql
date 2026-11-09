@@ -2,7 +2,7 @@
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 4
--- Statements dropped (RLS/funcs/triggers/data/etc.): 39
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 40
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
 CREATE INDEX data_catalog_listings__display_name ON data_catalog_listings(display_name, id);

@@ -1,3 +1,14 @@
+-- Load pg_trgm into this session before a function below sets
+-- `pg_trgm.word_similarity_threshold`. Until the library is loaded the
+-- parameter is an unknown placeholder, and only a superuser may attach one to
+-- a function, which the hosted `postgres` role is not. Calling any pg_trgm
+-- function loads it and registers the parameter as user-settable.
+do $$
+begin
+  perform extensions.word_similarity('', '');
+end
+$$;
+
 drop function if exists "public"."data_catalog_listings__search_facet_rows"(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]);
 
 drop function if exists "public"."data_catalog_listings__search_matches"(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]);
