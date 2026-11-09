@@ -201,11 +201,26 @@ source.
 ### 3. Who reads the copy
 
 - `DatasetParquetWrapper` (`src/clients/qetl/wrappers/DatasetParquetWrapper`):
-  for an `api_resource` listing, it calls the `parquet-cache` route. `ready`
-  fetches the public URL, the same code path a pipeline listing uses.
-  `building` polls the route until it is `ready`, with a progress label.
-- "Add to workspace" shows that the dataset is being prepared while the
-  first build runs, rather than failing.
+  for an `api_resource` listing, it calls the `parquet-cache` route through
+  `fetchOpenDataParquetCopy` (`src/lib/openData/`).
+  - `ready`: it downloads each part from the bucket's public URL, the way a
+    pipeline listing's Parquet is read. A copy of several parts is merged
+    into one Parquet blob in DuckDB (`DuckDbClient.mergeParquetBlobs`),
+    since the relation cache and loader hold one blob per dataset. A stale
+    copy is cached for only 5 minutes, so the next load reads the rebuilt
+    copy.
+  - `building`: it asks again, waiting from 2 s up to 15 s between asks, for
+    up to 10 minutes. The load shows its usual loading state meanwhile. Past
+    that it fails with `OpenDataParquetCopyError` (`still-preparing`), and the
+    build keeps running.
+  - `failed`: it fails with `OpenDataParquetCopyError` and the failure code.
+  - `unavailable` (no pipeline server configured): it reads the source
+    through the 25 MB relay, as before, until S7 removes it.
+- "Add to workspace" requests the copy as the dataset is saved, so the first
+  build starts before the dataset is first opened. While it builds, a
+  notification says the data is being prepared and that large datasets can
+  take a few minutes to open the first time. A failed build gets a warning
+  that the dataset may not open.
 - The data preview can later read a ready copy's first row group with HTTP
   range requests instead of the sample. That is not part of the first cut.
 
@@ -266,7 +281,7 @@ and its cache columns are removed.
 | S3 | Pipeline server: the build route, its auth, and one-build-per-listing. Builds run one at a time; a build whose claim was taken over is skipped, and one superseded while it ran deletes its copy. On start, it deletes temp folders a killed build left behind. **Done.** | S2 |
 | S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, retry backoff, triggering S3), and its env in `.env.example.edge` and the Demo workflow. **Done.** | S3, S4 |
-| S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
+| S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state. **Done.** | S5 |
 | S7 | Remove the 25 MB relay, the private bucket cache, and its columns | S6 |
 | S8 | E2E: add a listing over 25 MB and query it | S6 |
 
