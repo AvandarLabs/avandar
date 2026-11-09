@@ -258,17 +258,17 @@ describe("createSupabaseListingsStore", () => {
   it("writes only contract columns when a row carries other properties", async () => {
     const rowWithCacheColumn = {
       ..._apiRow(),
-      cached_object_path: "etl-fixture/stray.csv",
+      parquet_cache_failure_code: "etl-fixture-stray",
     };
 
     const [stored] = await _upsert([rowWithCacheColumn]);
 
     const { data } = await client
       .from(LISTINGS_TABLE)
-      .select("cached_object_path")
+      .select("parquet_cache_failure_code")
       .eq("id", stored?.id ?? "")
       .single();
-    expect(data).toEqual({ cached_object_path: null });
+    expect(data).toEqual({ parquet_cache_failure_code: null });
   });
 
   it("reads back a written row that the change check sees as unchanged", async () => {
@@ -424,14 +424,18 @@ describe("createSupabaseListingsStore", () => {
     ).toBe(true);
   });
 
-  it("leaves an existing row's cache columns untouched", async () => {
+  it("leaves an existing row's Parquet copy columns untouched", async () => {
     const [stored] = await _upsert([_apiRow()]);
     await client
       .from(LISTINGS_TABLE)
       .update({
-        cached_object_path: "etl-fixture/cache.csv",
-        cached_source_version: "v1",
-        cached_at: "2026-10-20T00:00:00.000Z",
+        parquet_cache_status: "ready",
+        parquet_cache_folder_path: "etl-fixture/copy",
+        parquet_cache_part_count: 1,
+        parquet_cache_source_version: "v1",
+        parquet_cache_built_at: "2026-10-20T00:00:00.000Z",
+        parquet_cache_row_count: 10,
+        parquet_cache_byte_size: 1024,
       })
       .eq("id", stored?.id ?? "");
 
@@ -439,9 +443,9 @@ describe("createSupabaseListingsStore", () => {
 
     const { data } = await client
       .from(LISTINGS_TABLE)
-      .select("cached_object_path")
+      .select("parquet_cache_folder_path")
       .eq("id", stored?.id ?? "")
       .single();
-    expect(data).toEqual({ cached_object_path: "etl-fixture/cache.csv" });
+    expect(data).toEqual({ parquet_cache_folder_path: "etl-fixture/copy" });
   });
 });

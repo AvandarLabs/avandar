@@ -1,4 +1,5 @@
 import { MIMEType, promiseMap } from "@avandar/utils";
+import { match } from "ts-pattern";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { requestOpenDataParquetCopy } from "@/lib/openData/requestOpenDataParquetCopy/requestOpenDataParquetCopy";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
@@ -30,25 +31,49 @@ export type FetchedOpenDataParquetCopy = Readonly<{
 }>;
 
 /**
- * Why a copy could not be read: its build failed, or it was still being
- * prepared when the load stopped waiting.
+ * Why a copy could not be read: its build failed, it was still being
+ * prepared when the load stopped waiting, or this Avandar instance builds no
+ * copies, so the listing cannot be read at all.
  */
+type OpenDataParquetCopyErrorReason =
+  | "failed"
+  | "still-preparing"
+  | "unavailable";
+
+function _buildCopyErrorMessage(
+  options: Readonly<{
+    catalogListingId: DataCatalogListing.Id;
+    reason: OpenDataParquetCopyErrorReason;
+    failureCode?: string;
+  }>,
+): string {
+  const copyName = `The Parquet copy of catalog listing '${options.catalogListingId}'`;
+  return match(options.reason)
+    .with("failed", () => {
+      return `${copyName} failed to build (${options.failureCode})`;
+    })
+    .with("still-preparing", () => {
+      return `${copyName} is still being prepared`;
+    })
+    .with("unavailable", () => {
+      return `${copyName} cannot be built: no pipeline server is configured`;
+    })
+    .exhaustive();
+}
+
+/** Why an ODC listing's Parquet copy could not be read. */
 export class OpenDataParquetCopyError extends Error {
-  readonly reason: "failed" | "still-preparing";
+  readonly reason: OpenDataParquetCopyErrorReason;
   readonly failureCode: string | undefined;
 
   constructor(
     options: Readonly<{
       catalogListingId: DataCatalogListing.Id;
-      reason: "failed" | "still-preparing";
+      reason: OpenDataParquetCopyErrorReason;
       failureCode?: string;
     }>,
   ) {
-    super(
-      options.reason === "failed"
-        ? `The Parquet copy of catalog listing '${options.catalogListingId}' failed to build (${options.failureCode})`
-        : `The Parquet copy of catalog listing '${options.catalogListingId}' is still being prepared`,
-    );
+    super(_buildCopyErrorMessage(options));
     this.name = "OpenDataParquetCopyError";
     this.reason = options.reason;
     this.failureCode = options.failureCode;
@@ -67,10 +92,15 @@ type OpenDataParquetCopyFetcherDependencies = Readonly<{
 }>;
 
 /**
- * Downloads one part of a copy through the bucket's public URL, the way a
- * pipeline listing's Parquet is read.
+ * Downloads one part of an ODC listing's Parquet copy through the `opendata`
+ * bucket's public URL, the way a pipeline listing's Parquet is read.
+ *
+ * @param partPath The part's path in the bucket.
+ * @returns The part, typed as Parquet.
  */
-async function _downloadPublicPart(partPath: string): Promise<Blob> {
+export async function downloadOpenDataParquetPart(
+  partPath: string,
+): Promise<Blob> {
   const { publicUrl } = AvaSupabase.db()
     .storage.from(OPEN_DATA_BUCKET)
     .getPublicUrl(partPath).data;
@@ -117,20 +147,22 @@ async function _requestUntilBuilt(
  * open-data edge function for the copy, waits while it builds, and downloads
  * its parts.
  *
- * @returns A function resolving to the downloaded copy, or `undefined` when
- *   this Avandar instance builds no copies, so the caller can read the
- *   source instead. It throws `OpenDataParquetCopyError` when the build
- *   failed or outlasted the wait.
+ * @returns A function resolving to the downloaded copy. It throws
+ *   `OpenDataParquetCopyError` when the build failed or outlasted the wait,
+ *   or when this Avandar instance builds no copies.
  */
 export function createOpenDataParquetCopyFetcher(
   deps: OpenDataParquetCopyFetcherDependencies,
 ): (
   catalogListingId: DataCatalogListing.Id,
-) => Promise<FetchedOpenDataParquetCopy | undefined> {
+) => Promise<FetchedOpenDataParquetCopy> {
   return async (catalogListingId) => {
     const answer = await _requestUntilBuilt(catalogListingId, deps);
     if (answer.status === "unavailable") {
-      return undefined;
+      throw new OpenDataParquetCopyError({
+        catalogListingId,
+        reason: "unavailable",
+      });
     }
     if (answer.status === "failed") {
       throw new OpenDataParquetCopyError({
@@ -155,7 +187,7 @@ export const fetchOpenDataParquetCopy = createOpenDataParquetCopyFetcher({
   requestCopy: (catalogListingId) => {
     return requestOpenDataParquetCopy(catalogListingId);
   },
-  downloadPart: _downloadPublicPart,
+  downloadPart: downloadOpenDataParquetPart,
   now: () => {
     return Date.now();
   },

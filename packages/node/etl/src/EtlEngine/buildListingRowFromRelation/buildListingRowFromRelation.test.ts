@@ -167,11 +167,15 @@ describe("buildListingRowFromRelation", () => {
     ]).toEqual(["pipeline_parquet", "WDICSV.parquet", null, null, null, null]);
   });
 
-  it("writes exactly the contract's columns and never a cache column", () => {
+  it("writes exactly the contract's columns and never a Parquet copy column", () => {
     const columns = Object.keys(_build(API_RELATION)).sort();
 
     expect(columns).toEqual([...LISTING_CONTRACT_COLUMNS].sort());
-    expect(columns).not.toContain("cached_object_path");
+    expect(
+      columns.filter((column) => {
+        return column.startsWith("parquet_cache_");
+      }),
+    ).toEqual([]);
   });
 
   it("refuses an API relation when the engine has no service", () => {

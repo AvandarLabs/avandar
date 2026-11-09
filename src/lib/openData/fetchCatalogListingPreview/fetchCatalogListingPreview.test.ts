@@ -17,7 +17,7 @@ function _createDependencies(
   overrides: Partial<CatalogListingPreviewDependencies> = {},
 ): CatalogListingPreviewDependencies {
   return {
-    fetchApiResource: vi.fn(),
+    fetchCopyPart: vi.fn(),
     fetchCsvSample: vi.fn(),
     fetchParquetUrl: vi.fn(),
     sniffCsv: vi.fn().mockResolvedValue(SNIFFED),
@@ -38,13 +38,14 @@ describe("fetchCatalogListingPreview", () => {
         accessKind: "api_resource",
         apiResourceFormat: "csv",
         canonicalUrls: undefined,
+        parquetCacheFolderPath: undefined,
       },
       maxPreviewRows: 200,
       dependencies,
     });
 
     expect(dependencies.fetchCsvSample).toHaveBeenCalledWith(LISTING_ID);
-    expect(dependencies.fetchApiResource).not.toHaveBeenCalled();
+    expect(dependencies.fetchCopyPart).not.toHaveBeenCalled();
     expect(dependencies.sniffCsv).toHaveBeenCalledWith(
       expect.objectContaining({ maxPreviewRows: 200, hasHeader: true }),
     );
@@ -54,36 +55,10 @@ describe("fetchCatalogListingPreview", () => {
     expect(preview.rows).toEqual(SNIFFED.previewRows);
   });
 
-  it("reads a whole API-backed resource that came back as CSV", async () => {
+  it("reads any other API-backed listing from the first part of its Parquet copy", async () => {
+    const partBlob = new Blob(["part"]);
     const dependencies = _createDependencies({
-      fetchApiResource: vi.fn().mockResolvedValue({
-        contentKind: "csv",
-        bytes: new Uint8Array([97]),
-      }),
-    });
-
-    await fetchCatalogListingPreview({
-      listing: {
-        id: LISTING_ID,
-        accessKind: "api_resource",
-        apiResourceFormat: "XLSX",
-        canonicalUrls: undefined,
-      },
-      maxPreviewRows: 200,
-      dependencies,
-    });
-
-    expect(dependencies.fetchApiResource).toHaveBeenCalledWith(LISTING_ID);
-    expect(dependencies.fetchCsvSample).not.toHaveBeenCalled();
-    expect(dependencies.sniffCsv).toHaveBeenCalled();
-  });
-
-  it("reads an API-backed Parquet resource without the CSV sniffer", async () => {
-    const dependencies = _createDependencies({
-      fetchApiResource: vi.fn().mockResolvedValue({
-        contentKind: "parquet",
-        bytes: new Uint8Array([1]),
-      }),
+      fetchCopyPart: vi.fn().mockResolvedValue(partBlob),
     });
 
     await fetchCatalogListingPreview({
@@ -92,15 +67,39 @@ describe("fetchCatalogListingPreview", () => {
         accessKind: "api_resource",
         apiResourceFormat: "PARQUET",
         canonicalUrls: undefined,
+        parquetCacheFolderPath: "catalog-cache/listing-1/build-1",
       },
       maxPreviewRows: 200,
       dependencies,
     });
 
-    expect(dependencies.previewParquetBlob).toHaveBeenCalledWith(
-      expect.objectContaining({ maxPreviewRows: 200 }),
+    expect(dependencies.fetchCopyPart).toHaveBeenCalledWith(
+      "catalog-cache/listing-1/build-1/part-00000.parquet",
     );
+    expect(dependencies.previewParquetBlob).toHaveBeenCalledWith({
+      parquetBlob: partBlob,
+      maxPreviewRows: 200,
+    });
     expect(dependencies.sniffCsv).not.toHaveBeenCalled();
+  });
+
+  it("throws, without starting a build, when a non-CSV API-backed listing has no copy yet", async () => {
+    const dependencies = _createDependencies();
+
+    await expect(
+      fetchCatalogListingPreview({
+        listing: {
+          id: LISTING_ID,
+          accessKind: "api_resource",
+          apiResourceFormat: "PARQUET",
+          canonicalUrls: undefined,
+          parquetCacheFolderPath: undefined,
+        },
+        maxPreviewRows: 200,
+        dependencies,
+      }),
+    ).rejects.toThrow(/no Parquet copy/);
+    expect(dependencies.fetchCopyPart).not.toHaveBeenCalled();
   });
 
   it("reads a pipeline listing from its Parquet URL", async () => {
@@ -114,6 +113,7 @@ describe("fetchCatalogListingPreview", () => {
         accessKind: "pipeline_parquet",
         apiResourceFormat: undefined,
         canonicalUrls: ["https://example.org/page", "https://x.org/a.PARQUET"],
+        parquetCacheFolderPath: undefined,
       },
       maxPreviewRows: 200,
       dependencies,
@@ -133,6 +133,7 @@ describe("fetchCatalogListingPreview", () => {
           accessKind: "pipeline_parquet",
           apiResourceFormat: undefined,
           canonicalUrls: undefined,
+          parquetCacheFolderPath: undefined,
         },
         maxPreviewRows: 200,
         dependencies: _createDependencies(),

@@ -229,97 +229,13 @@ describe("DatasetParquetWrapper", () => {
     ).rejects.toThrow("No Parquet URL in catalog for dataset 'cases'");
   });
 
-  it("acquires an API-backed open data resource through the injected fetch", async () => {
-    _mockDataset("open_data");
-    catalogEntryGetOneMock.mockResolvedValue({
-      id: CATALOG_ENTRY_ID,
-      accessKind: "api_resource",
-    });
-    const parquetBytes = Uint8Array.from([1, 2, 3]) as Uint8Array<ArrayBuffer>;
-    const fetchApiOpenDataResource = vi.fn().mockResolvedValue({
-      contentKind: "parquet",
-      bytes: parquetBytes,
-      sourceVersion: "ckan:hash:abc",
-    });
-    const wrapper = createDatasetParquetWrapper({ fetchApiOpenDataResource });
-
-    const acquired = await wrapper.acquire!(
-      { ref: DATASET_REF, columns: "all" },
-      CONTEXT,
-    );
-
-    expect(fetchApiOpenDataResource).toHaveBeenCalledWith(CATALOG_ENTRY_ID);
-    expect(acquired.sourceVersion).toBe("ckan:hash:abc");
-    expect(acquired.parquetBlob).toBeInstanceOf(Blob);
-    expect(acquired.parquetBlob.size).toBe(parquetBytes.byteLength);
-  });
-
-  it("types an API-backed Parquet resource as Parquet so DuckDB can register it", async () => {
-    _mockDataset("open_data");
-    catalogEntryGetOneMock.mockResolvedValue({
-      id: CATALOG_ENTRY_ID,
-      accessKind: "api_resource",
-    });
-    const fetchApiOpenDataResource = vi.fn().mockResolvedValue({
-      contentKind: "parquet",
-      bytes: Uint8Array.from([1, 2, 3]) as Uint8Array<ArrayBuffer>,
-      sourceVersion: undefined,
-    });
-    const wrapper = createDatasetParquetWrapper({ fetchApiOpenDataResource });
-
-    const acquired = await wrapper.acquire!(
-      { ref: DATASET_REF, columns: "all" },
-      CONTEXT,
-    );
-
-    // `registerParquetFile` refuses any blob without this type, which is
-    // what kept an untyped resource from ever loading.
-    expect(acquired.parquetBlob.type).toBe(MIMEType.APPLICATION_PARQUET);
-  });
-
-  it("transcodes an API-backed CSV resource before returning parquet", async () => {
-    _mockDataset("open_data");
-    catalogEntryGetOneMock.mockResolvedValue({
-      id: CATALOG_ENTRY_ID,
-      accessKind: "api_resource",
-    });
-    const csvBytes = new TextEncoder().encode(
-      "a,b\n1,2",
-    ) as Uint8Array<ArrayBuffer>;
-    const parquetBlob = new Blob(["transcoded"]);
-    const transcodeCsvToParquet = vi.fn().mockResolvedValue(parquetBlob);
-    const wrapper = createDatasetParquetWrapper({
-      fetchApiOpenDataResource: async () => {
-        return {
-          contentKind: "csv",
-          bytes: csvBytes,
-          sourceVersion: "ckan:mtime:1",
-        };
-      },
-      transcodeCsvToParquet,
-    });
-
-    const acquired = await wrapper.acquire!(
-      { ref: DATASET_REF, columns: "all" },
-      CONTEXT,
-    );
-
-    expect(transcodeCsvToParquet).toHaveBeenCalledWith({
-      datasetId: DATASET_ID,
-      bytes: csvBytes,
-    });
-    expect(acquired.parquetBlob).toBe(parquetBlob);
-    expect(acquired.sourceVersion).toBe("ckan:mtime:1");
-  });
-
-  it("reads an API-backed listing's one-part Parquet copy instead of its source", async () => {
+  it("reads an API-backed listing from its one-part Parquet copy", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,
       accessKind: "api_resource",
     });
     const partBlob = new Blob(["part"], { type: MIMEType.APPLICATION_PARQUET });
-    const fetchApiOpenDataResource = vi.fn();
     const mergeParquetParts = vi.fn();
     const wrapper = createDatasetParquetWrapper({
       fetchApiOpenDataParquetCopy: async () => {
@@ -329,7 +245,6 @@ describe("DatasetParquetWrapper", () => {
           isStale: false,
         };
       },
-      fetchApiOpenDataResource,
       mergeParquetParts,
     });
 
@@ -341,7 +256,6 @@ describe("DatasetParquetWrapper", () => {
     expect(acquired.parquetBlob).toBe(partBlob);
     expect(acquired.sourceVersion).toBe("socrata:1");
     expect(acquired.maxAgeMs).toBeUndefined();
-    expect(fetchApiOpenDataResource).not.toHaveBeenCalled();
     expect(mergeParquetParts).not.toHaveBeenCalled();
   });
 
@@ -394,31 +308,22 @@ describe("DatasetParquetWrapper", () => {
     expect(acquired.maxAgeMs).toBe(5 * 60_000);
   });
 
-  it("reads the source through the edge function when no copies are built", async () => {
+  it("fails the load when the listing's copy cannot be read", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,
       accessKind: "api_resource",
     });
-    const fetchApiOpenDataResource = vi.fn().mockResolvedValue({
-      contentKind: "parquet",
-      bytes: Uint8Array.from([1, 2, 3]) as Uint8Array<ArrayBuffer>,
-      sourceVersion: "ckan:hash:abc",
-    });
+    const copyError = new Error("no pipeline server is configured");
     const wrapper = createDatasetParquetWrapper({
       fetchApiOpenDataParquetCopy: async () => {
-        return undefined;
+        throw copyError;
       },
-      fetchApiOpenDataResource,
     });
 
-    const acquired = await wrapper.acquire!(
-      { ref: DATASET_REF, columns: "all" },
-      CONTEXT,
-    );
-
-    expect(fetchApiOpenDataResource).toHaveBeenCalledWith(CATALOG_ENTRY_ID);
-    expect(acquired.sourceVersion).toBe("ckan:hash:abc");
+    await expect(
+      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
+    ).rejects.toBe(copyError);
   });
 
   it("refuses a dataset whose source type belongs to another wrapper", async () => {

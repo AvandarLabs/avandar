@@ -1,4 +1,4 @@
-import { MIMEType, where } from "@avandar/utils";
+import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -9,7 +9,6 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { readDatasetRelationSchema } from "@/clients/qetl/wrappers/DatasetParquetWrapper/readDatasetRelationSchema";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import type { OpenDataContentKind } from "$/connectors/open-data/acquireOpenDataResource";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
@@ -24,13 +23,6 @@ import type {
 import type { FetchedOpenDataParquetCopy } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
-
-/** Bytes fetched from an API-backed catalog listing, before any transcode. */
-export type FetchedApiOpenDataResource = {
-  contentKind: OpenDataContentKind;
-  bytes: Uint8Array<ArrayBuffer>;
-  sourceVersion: SourceVersion | undefined;
-};
 
 const CAPABILITIES = {
   relations: "single",
@@ -80,17 +72,6 @@ type FetchedParquet = {
  */
 const STALE_COPY_MAX_AGE_MS = 5 * 60_000;
 
-/**
- * Wraps fetched Parquet bytes in a Blob typed as Parquet. The type is not
- * cosmetic: `registerParquetFile` refuses any blob without it, so an untyped
- * blob would fail every load into DuckDB.
- */
-function _parquetBlobFromBytes(bytes: Uint8Array<ArrayBuffer>): Blob {
-  const copy = new Uint8Array(bytes.byteLength);
-  copy.set(bytes);
-  return new Blob([copy], { type: MIMEType.APPLICATION_PARQUET });
-}
-
 type DatasetParquetWrapperOptions = {
   /**
    * Fetches one dataset's Parquet bytes. Defaults to the storage and catalog
@@ -111,44 +92,23 @@ type DatasetParquetWrapperOptions = {
 
   /**
    * Reads an API-backed catalog listing's Parquet copy, waiting while it
-   * builds. Resolves `undefined` when this Avandar instance builds no copies,
-   * and the resource is then read through `fetchApiOpenDataResource`.
+   * builds. Injected so a test drives the branch without a network.
    */
   fetchApiOpenDataParquetCopy?: (
     catalogListingId: DataCatalogListing.Id,
-  ) => Promise<FetchedOpenDataParquetCopy | undefined>;
+  ) => Promise<FetchedOpenDataParquetCopy>;
 
   /**
    * Merges a copy's parts, in row order, into one Parquet blob. Bound to the
-   * caller's DuckDB lease, like `transcodeCsvToParquet`.
+   * caller's DuckDB lease so acquisition does not race the outer query.
    */
   mergeParquetParts?: (partBlobs: readonly Blob[]) => Promise<Blob>;
-
-  /**
-   * Fetches one API-backed catalog resource through the open-data edge
-   * function. Injected so a test drives the branch without a network.
-   */
-  fetchApiOpenDataResource?: (
-    catalogListingId: DataCatalogListing.Id,
-  ) => Promise<FetchedApiOpenDataResource>;
-
-  /**
-   * Transcodes CSV bytes into Parquet. Bound to the caller's DuckDB lease so
-   * acquisition does not race the outer query.
-   */
-  transcodeCsvToParquet?: (params: {
-    datasetId: Dataset.Id;
-    bytes: Uint8Array<ArrayBuffer>;
-  }) => Promise<Blob>;
 };
 
 /** The options that read an API-backed catalog listing. */
 type ApiOpenDataOptions = Pick<
   DatasetParquetWrapperOptions,
-  | "fetchApiOpenDataParquetCopy"
-  | "fetchApiOpenDataResource"
-  | "mergeParquetParts"
-  | "transcodeCsvToParquet"
+  "fetchApiOpenDataParquetCopy" | "mergeParquetParts"
 >;
 
 /**
@@ -253,64 +213,20 @@ async function _mergeCopyParts(
   return await options.mergeParquetParts(options.copy.partBlobs);
 }
 
-/**
- * Reads an API-backed catalog resource through the open-data edge function's
- * relay, which reads the whole source on every load.
- */
-async function _relayApiOpenData(
-  options: Readonly<
-    ApiOpenDataOptions & {
-      datasetId: Dataset.Id;
-      catalogListingId: DataCatalogListing.Id;
-    }
-  >,
-): Promise<FetchedParquet> {
-  const fetchApi = options.fetchApiOpenDataResource;
-  if (!fetchApi) {
-    throw new Error(
-      `No API open-data fetch for catalog listing '${options.catalogListingId}'`,
-    );
-  }
-  const acquisition = await fetchApi(options.catalogListingId);
-  if (acquisition.contentKind !== "csv") {
-    return {
-      parquetBlob: _parquetBlobFromBytes(acquisition.bytes),
-      sourceVersion: acquisition.sourceVersion,
-    };
-  }
-  const transcode = options.transcodeCsvToParquet;
-  if (!transcode) {
-    throw new Error(
-      `No CSV transcode for catalog listing '${options.catalogListingId}'`,
-    );
-  }
-  return {
-    parquetBlob: await transcode({
-      datasetId: options.datasetId,
-      bytes: acquisition.bytes,
-    }),
-    sourceVersion: acquisition.sourceVersion,
-  };
-}
-
-/**
- * Reads an API-backed catalog listing from its Parquet copy, or through the
- * relay when this Avandar instance builds no copies.
- */
+/** Reads an API-backed catalog listing from its Parquet copy. */
 async function _downloadApiOpenData(
   options: Readonly<
-    ApiOpenDataOptions & {
-      datasetId: Dataset.Id;
-      catalogListingId: DataCatalogListing.Id;
-    }
+    ApiOpenDataOptions & { catalogListingId: DataCatalogListing.Id }
   >,
 ): Promise<FetchedParquet> {
-  const copy = await options.fetchApiOpenDataParquetCopy?.(
+  if (!options.fetchApiOpenDataParquetCopy) {
+    throw new Error(
+      `No Parquet copy fetch for catalog listing '${options.catalogListingId}'`,
+    );
+  }
+  const copy = await options.fetchApiOpenDataParquetCopy(
     options.catalogListingId,
   );
-  if (copy === undefined) {
-    return await _relayApiOpenData(options);
-  }
   return {
     parquetBlob: await _mergeCopyParts({ ...options, copy }),
     sourceVersion: copy.sourceVersion,
@@ -320,7 +236,7 @@ async function _downloadApiOpenData(
 
 /**
  * Downloads an `open_data` dataset: pipeline Parquet from its catalog URL, or
- * an API-backed resource from its Parquet copy or the edge function relay.
+ * an API-backed listing from its Parquet copy.
  */
 async function _downloadOpenDataParquet(
   dataset: Readonly<Dataset.T>,
@@ -340,7 +256,6 @@ async function _downloadOpenDataParquet(
   );
   if (catalogListing?.accessKind === "api_resource") {
     return await _downloadApiOpenData({
-      datasetId: dataset.id,
       catalogListingId: catalogListing.id,
       ...apiOptions,
     });
@@ -388,9 +303,7 @@ export function createDatasetParquetWrapper(
   const getDataset = options.getDataset ?? _getDataset;
   const apiOptions = {
     fetchApiOpenDataParquetCopy: options.fetchApiOpenDataParquetCopy,
-    fetchApiOpenDataResource: options.fetchApiOpenDataResource,
     mergeParquetParts: options.mergeParquetParts,
-    transcodeCsvToParquet: options.transcodeCsvToParquet,
   };
 
   return {

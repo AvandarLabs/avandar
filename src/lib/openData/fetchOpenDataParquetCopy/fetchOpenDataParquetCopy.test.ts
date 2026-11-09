@@ -157,12 +157,19 @@ describe("createOpenDataParquetCopyFetcher", () => {
     expect(downloadPart).not.toHaveBeenCalled();
   });
 
-  it("returns undefined when copies are unavailable, so the caller reads the source", async () => {
+  it("throws when this Avandar instance builds no copies", async () => {
     const { downloadPart, fetchCopy } = _createFetcher([
       { status: "unavailable", reason: "copies-unavailable" },
     ]);
 
-    await expect(fetchCopy(CATALOG_LISTING_ID)).resolves.toBeUndefined();
+    const error = await fetchCopy(CATALOG_LISTING_ID).catch(
+      (caught: unknown) => {
+        return caught;
+      },
+    );
+
+    expect(error).toBeInstanceOf(OpenDataParquetCopyError);
+    expect((error as OpenDataParquetCopyError).reason).toBe("unavailable");
     expect(downloadPart).not.toHaveBeenCalled();
   });
 

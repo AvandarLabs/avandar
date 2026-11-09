@@ -1,7 +1,7 @@
 \set ON_ERROR_STOP on
 
 -- Fixtures: one stored `api_resource` listing with two relation columns and a
--- cache written by the app, which an upsert must keep. Identifiers are
+-- Parquet copy recorded by the pipeline server, which an upsert must keep. Identifiers are
 -- `pgtap-fixture`-prefixed and hosts are `.invalid`.
 
 begin;
@@ -11,13 +11,16 @@ set search_path to extensions, public;
 insert into public.data_catalog_listings
   (id, display_name, organization1_name, access_kind, api_service,
    api_base_url, external_dataset_id, api_resource_id, api_resource_format,
-   pipeline_name, pipeline_run_id, pipeline_scope_keys, cached_object_path,
-   cached_source_version, cached_at)
+   pipeline_name, pipeline_run_id, pipeline_scope_keys, parquet_cache_status,
+   parquet_cache_folder_path, parquet_cache_part_count,
+   parquet_cache_source_version, parquet_cache_built_at,
+   parquet_cache_row_count, parquet_cache_byte_size)
 values
   ('e8004001-0000-4000-8000-000000000001'::uuid, 'stored', 'Fixture Org',
    'api_resource', 'ckan', 'https://pgtap-fixture-a.invalid',
    'pgtap-fixture-stored', 'r1', 'CSV', 'pgtap-fixture-pipeline', 'run-1',
-   array['all'], 'cache/stored.parquet', 'v1', '2026-10-01T00:00:00Z');
+   array['all'], 'ready', 'catalog-cache/stored', 1, 'v1',
+   '2026-10-01T00:00:00Z', 10, 1024);
 
 insert into public.data_catalog_listings__relation_columns
   (catalog_listing_id, column_name, display_order, original_data_type,
@@ -176,11 +179,11 @@ select results_eq(
 );
 
 select results_eq(
-  $$select cached_object_path, cached_source_version
+  $$select parquet_cache_folder_path, parquet_cache_source_version
     from public.data_catalog_listings
     where id = 'e8004001-0000-4000-8000-000000000001'::uuid$$,
-  $$values ('cache/stored.parquet', 'v1')$$,
-  'a stored listing keeps the cache the app wrote'
+  $$values ('catalog-cache/stored', 'v1')$$,
+  'a stored listing keeps its Parquet copy'
 );
 
 select results_eq(
