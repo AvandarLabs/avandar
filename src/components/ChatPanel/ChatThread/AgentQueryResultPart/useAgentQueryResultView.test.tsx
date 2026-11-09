@@ -5,10 +5,12 @@
  */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { useAgentQueryResultView } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/useAgentQueryResultView";
-import { renderHook, waitFor } from "@/test-utils";
+import { TestProviders, renderHook, waitFor } from "@/test-utils";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type { ReactNode } from "react";
 
 const { runStructuredQueryWithMetadataMock } = vi.hoisted(() => {
@@ -55,17 +57,52 @@ function _succeed(): void {
   });
 }
 
-function _renderView(queryClient: QueryClient) {
+const LONG_SQL = 'SELECT "week", "district", "cases" FROM "weekly_cases"';
+
+const LONG_RESULT = AgentQueryResult.create({
+  sql: LONG_SQL,
+  chart: "line",
+  title: "Cases by week and district",
+});
+
+function _succeedWithLongResult(): void {
+  runStructuredQueryWithMetadataMock.mockResolvedValue({
+    result: {
+      id: "r2",
+      columns: [
+        { name: "week", dataType: "date" },
+        { name: "district", dataType: "varchar" },
+        { name: "cases", dataType: "bigint" },
+      ],
+      data: [
+        { week: "2024-01-01", district: "North", cases: 5 },
+        { week: "2024-01-01", district: "South", cases: 3 },
+        { week: "2024-01-08", district: "North", cases: 7 },
+        { week: "2024-01-08", district: "South", cases: 2 },
+      ],
+      numRows: 4,
+    },
+    didAutoLimit: false,
+    executedSql: LONG_SQL,
+  });
+}
+
+function _renderView(
+  queryClient: QueryClient,
+  agentResult: AgentQueryResultData = RESULT,
+) {
   return renderHook(
     () => {
-      return useAgentQueryResultView(RESULT, WORKSPACE_ID);
+      return useAgentQueryResultView(agentResult, WORKSPACE_ID);
     },
     {
       wrapper: ({ children }: { children: ReactNode }) => {
         return (
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
+          <TestProviders>
+            <QueryClientProvider client={queryClient}>
+              {children}
+            </QueryClientProvider>
+          </TestProviders>
         );
       },
     },
@@ -131,5 +168,33 @@ describe("useAgentQueryResultView", () => {
       expect(second.result.current.status).toBe("ready");
     });
     expect(runStructuredQueryWithMetadataMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("draws a line per district for a long result", async () => {
+    _succeedWithLongResult();
+
+    const { result } = _renderView(_createQueryClient(), LONG_RESULT);
+
+    await waitFor(() => {
+      expect(result.current.status).toBe("ready");
+    });
+    const view = result.current;
+    if (view.status !== "ready") {
+      throw new Error("Expected a ready view");
+    }
+    const { config } = makeUiVizConfigFromAvaVizConfig({
+      config: view.vizConfig,
+      columns: view.columns,
+    });
+    expect(config).toMatchObject({
+      vizType: "line",
+      xAxisKey: "week",
+      withLegend: true,
+      series: [{ key: "North" }, { key: "South" }],
+    });
+    expect(view.data).toEqual([
+      { week: "2024-01-01", North: 5, South: 3 },
+      { week: "2024-01-08", North: 7, South: 2 },
+    ]);
   });
 });

@@ -3,6 +3,7 @@ import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultCo
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
+import { useCategorySplitChartInput } from "@/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -31,6 +32,10 @@ export type AgentQueryResultView =
  * every remount and leave an orphaned cache entry each time.
  */
 const EMPTY_QUERY = StructuredQuery.makeEmpty();
+
+/** Stable stand-ins while the result loads, so memoized values hold. */
+const NO_COLUMNS: readonly QueryResult.ColumnWithId[] = [];
+const NO_ROWS: UnknownDataFrame = [];
 
 /**
  * Binds the columns of a finished result of `sql` to column IDs, the way
@@ -93,13 +98,21 @@ export function useAgentQueryResultView(
   const vizConfig = useMemo(() => {
     return AvaVizConfigs.hydrateFromQueryResult(
       AvaVizConfigs.makeEmptyConfig(result.chartType),
-      columns ?? [],
+      columns ?? NO_COLUMNS,
     );
   }, [result.chartType, columns]);
-  const data = queryResult?.data;
+  const data = queryResult?.data ?? NO_ROWS;
   const dateColumns = useMemo(() => {
-    return getDateColumns(columns ?? [], data ?? []);
+    return getDateColumns(columns ?? NO_COLUMNS, data);
   }, [columns, data]);
+  // A long result drawn as a line, bar, or area chart shows one series per
+  // category. A table, and every other chart, gets the rows as they came.
+  const chartInput = useCategorySplitChartInput({
+    columns: columns ?? NO_COLUMNS,
+    data,
+    dateColumns,
+    vizConfig,
+  });
   if (query.isError) {
     return { status: "unavailable" };
   }
@@ -108,10 +121,7 @@ export function useAgentQueryResultView(
   }
   return {
     status: "ready",
-    columns,
     rawColumns: queryResult.columns,
-    data: queryResult.data,
-    dateColumns,
-    vizConfig,
+    ...chartInput,
   };
 }
