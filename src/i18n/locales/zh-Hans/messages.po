@@ -1329,8 +1329,8 @@ msgid "Getting {0} from {1}"
 msgstr "正在从 {1} 获取 {0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults}+ 个（共 {formattedNumCatalogListings} 个）数据集"
+#~ msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+#~ msgstr "{formattedNumResults}+ 个（共 {formattedNumCatalogListings} 个）数据集"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -8700,8 +8700,8 @@ msgid "First"
 msgstr "第一项"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "共 {formattedNumCatalogListings} 个数据集中的 {formattedNumResults} 个"
+#~ msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
+#~ msgstr "共 {formattedNumCatalogListings} 个数据集中的 {formattedNumResults} 个"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
