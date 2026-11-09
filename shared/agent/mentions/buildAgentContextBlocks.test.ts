@@ -164,6 +164,20 @@ describe("buildAgentContextBlocks", () => {
     expect(mentionedBlock).not.toContain("SELECT 42");
   });
 
+  it("does not spend the chart budget on a chart with no SQL", () => {
+    const { mentionedBlock } = buildAgentContextBlocks({
+      attached: [_dashboard("A", 12), _dashboard("B", 11)],
+      mentioned: [
+        _tileMention("empty", "Empty chart", ""),
+        _tileMention("late", "Late chart", "SELECT 42"),
+      ],
+      aliases: ALIASES,
+    });
+    expect(mentionedBlock).toContain(
+      '"Late chart" on dashboard "C" (bar): SELECT 42',
+    );
+  });
+
   it("describes a mentioned chart with its SQL", () => {
     const { mentionedBlock } = buildAgentContextBlocks({
       attached: [],

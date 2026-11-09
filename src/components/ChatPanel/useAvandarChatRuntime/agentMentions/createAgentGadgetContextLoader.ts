@@ -24,14 +24,13 @@ export type AgentGadgetContextLoader = {
   ) => Promise<Map<string, AgentGadgetContext>>;
 };
 
-/** A context without its ref, which `_loadOne` adds. Omit per variant. */
-type Loaded =
-  | (AgentGadgetContext extends infer Variant
-      ? Variant extends AgentGadgetContext
-        ? Omit<Variant, "ref">
-        : never
-      : never)
-  | undefined;
+/** `Omit` applied to each variant of a union, so each keeps its keys. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
+/** A context without its ref, which `_loadOne` adds. */
+type Loaded = DistributiveOmit<AgentGadgetContext, "ref"> | undefined;
 
 type InWorkspace = <T extends { workspaceId: string }>(
   row: T | undefined,

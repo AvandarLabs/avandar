@@ -75,13 +75,16 @@ describe("loadTurnGadgetContext", () => {
 });
 
 describe("buildLocalGadgetName", () => {
-  it("names a loaded gadget, and an unknown one as unavailable", () => {
-    const nameOf = buildLocalGadgetName({
-      attachedRefs: [],
-      contexts: new Map([[KEY_A, DATASET_A]]),
-    });
+  const nameOf = buildLocalGadgetName({
+    attachedRefs: [],
+    contexts: new Map([[KEY_A, DATASET_A]]),
+  });
 
+  it("names a loaded gadget", () => {
     expect(nameOf(REF_A)).toBe("US deaths");
+  });
+
+  it("names an unknown gadget as unavailable", () => {
     expect(nameOf(REF_B)).toBe("an unavailable dataset");
   });
 });

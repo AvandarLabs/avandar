@@ -170,7 +170,9 @@ describe("createAgentGadgetContextLoader", () => {
       name: "Measles case",
       fieldNames: ["Onset date", "Status"],
     });
-    expect(clients.attribute.getAll).toHaveBeenCalledTimes(1);
+    expect(clients.attribute.getAll).toHaveBeenCalledWith({
+      where: { concept_id: { eq: CONCEPT_ID } },
+    });
   });
 
   it("is unavailable for another workspace's row", async () => {
@@ -220,6 +222,11 @@ describe("createAgentGadgetContextLoader", () => {
     expect(await _loadOne(caseRef)).toEqual({
       kind: "unavailable",
       ref: caseRef,
+    });
+    Object.values(clients).forEach((client) => {
+      Object.values(client).forEach((method) => {
+        expect(method).not.toHaveBeenCalled();
+      });
     });
   });
 

@@ -118,17 +118,26 @@ describe("extractDashboardTile", () => {
 });
 
 describe("saved config helpers", () => {
-  it("read a saved config's charts and tolerate a config of no shape", () => {
-    const config = {
-      root: { props: { title: "Saved", schemaVersion: 5 } },
-      content: [_dataViz("Cases", "SELECT 1")],
-    };
+  const config = {
+    root: { props: { title: "Saved", schemaVersion: 5 } },
+    content: [_dataViz("Cases", "SELECT 1")],
+  };
 
+  it("extractSavedDashboardTiles reads a saved config's charts", () => {
     expect(extractSavedDashboardTiles(config)).toEqual([
       { title: "Cases", chartType: "bar", sql: "SELECT 1" },
     ]);
+  });
+
+  it("extractSavedDashboardTile reads one chart of a saved config", () => {
     expect(extractSavedDashboardTile(config, "Cases")?.sql).toBe("SELECT 1");
+  });
+
+  it("extractSavedDashboardTiles returns none for a config of no shape", () => {
     expect(extractSavedDashboardTiles(null)).toEqual([]);
+  });
+
+  it("extractSavedDashboardTile returns nothing for a config of no shape", () => {
     expect(extractSavedDashboardTile(null, "Cases")).toBeUndefined();
   });
 });

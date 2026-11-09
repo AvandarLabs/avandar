@@ -83,6 +83,9 @@ function _listTiles(
   remaining: number,
 ): BudgetedItem<ListedGadget> {
   if (context.kind === "dashboard_tile") {
+    if (context.tile.sql === "") {
+      return { item: context, sqlTileCount: 0 };
+    }
     const hasSql = remaining > 0;
     return {
       item: hasSql
