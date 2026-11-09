@@ -52,6 +52,12 @@ export type EvalQuestion = {
    * Data Explorer part as today's chat's page context.
    */
   pageContext?: AgentPageContext;
+  /**
+   * Columns the Pi harness treats as personal for this question, on top of
+   * the ones `detectPii` flags by name, so a value compared with them in
+   * page SQL reaches the model only as a placeholder.
+   */
+  personalColumns?: readonly string[];
   /** The user asked for a chart, so a table alone is a miss. */
   expectsChart?: boolean;
 };

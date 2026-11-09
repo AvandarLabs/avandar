@@ -63,6 +63,27 @@ const DEATHS_TILE = {
   sql: _monthlyIn2022(US_DEATHS, "daily_new_deaths", "deaths"),
 };
 
+/** Kings County, New York (Brooklyn), in the us deaths data. */
+const KINGS_COUNTY_2022 = `"Admin2" = 'Kings' AND "Province_State" = 'New York' AND year("date") = 2022`;
+
+/** A county chart, whose county name the harness treats as personal. */
+const KINGS_DASHBOARD: AgentPageContext = {
+  app: "dashboard",
+  dashboard: {
+    id: "dash-3",
+    name: "New York deaths",
+    tiles: [
+      {
+        title: "Deaths in Kings County by month",
+        chartType: "line",
+        sql: _stored(
+          `SELECT date_trunc('month', "date") AS "month", SUM("daily_new_deaths") AS "deaths" FROM "${US_DEATHS}" WHERE ${KINGS_COUNTY_2022} GROUP BY 1 ORDER BY 1`,
+        ),
+      },
+    ],
+  },
+};
+
 const ONE_TILE_DASHBOARD: AgentPageContext = {
   app: "dashboard",
   dashboard: { id: "dash-1", name: "COVID 2022", tiles: [CASES_TILE] },
@@ -242,6 +263,18 @@ const SCREEN_QUESTIONS: readonly EvalQuestion[] = [
     },
     grade: (context) => {
       return _weeklyTotal(context, 26);
+    },
+  },
+  {
+    id: "P07",
+    category: "page_context",
+    prompt: "show this chart by week",
+    clarification: "not_needed",
+    pageContext: KINGS_DASHBOARD,
+    personalColumns: ["Admin2"],
+    truth: { total: Sql.total("us_deaths", KINGS_COUNTY_2022) },
+    grade: (context) => {
+      return _weeklyTotal(context, 52);
     },
   },
 ];

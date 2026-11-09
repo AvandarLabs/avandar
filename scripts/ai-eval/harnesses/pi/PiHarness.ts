@@ -8,6 +8,8 @@ import {
   isPersonalDataText,
 } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
+import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
@@ -31,6 +33,7 @@ import type {
   DataAgentHost,
   DataAgentUserAnswer,
 } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
 
@@ -204,20 +207,42 @@ function _toFailedEvalAnswer(
   };
 }
 
-function _buildPageBlock(question: EvalQuestion): string | undefined {
+/**
+ * The page block as the browser builds it: personal values in page SQL
+ * become placeholders from the conversation's vault. A column is personal
+ * when `detectPii` flags its name or the question lists it.
+ */
+function _buildPageBlock(
+  question: EvalQuestion,
+  vault: SqlPlaceholderVault,
+): string | undefined {
+  const personalColumns = new Set(question.personalColumns ?? []);
   return question.pageContext
     ? buildAgentPageContextBlock({
         context: question.pageContext,
         aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
         isSensitive: isPersonalDataText,
+        redactSql: (sql) => {
+          return vault.redact(sql, {
+            isSensitiveColumn: (columnName) => {
+              return (
+                personalColumns.has(columnName) ||
+                detectPii({ columnName }).hits.length > 0
+              );
+            },
+            isSensitiveValue: isPersonalDataText,
+          });
+        },
       })
     : undefined;
 }
 
 /**
  * One eval conversation with a data agent built by `createAgent` over a host
- * backed by DuckDB and the simulated user. A question whose model call
- * fails comes back as an answer with that error, not a rejection.
+ * backed by DuckDB and the simulated user. Like the browser, it keeps one
+ * placeholder vault per conversation and restores placeholders before SQL
+ * runs. A question whose model call fails comes back as an answer with that
+ * error, not a rejection.
  */
 export function createPiConversation(
   options: Readonly<{
@@ -226,9 +251,13 @@ export function createPiConversation(
   }>,
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
+  const vault = createSqlPlaceholderVault();
   let lastPageBlock: string | undefined;
   const dataAgent = options.createAgent(
-    _createEvalHost(options.database, recorder),
+    createPlaceholderRestoringHost(
+      _createEvalHost(options.database, recorder),
+      vault,
+    ),
   );
   return {
     ask: async (question) => {
@@ -241,7 +270,7 @@ export function createPiConversation(
       });
       const startedAt = performance.now();
       const firstMessageIndex = dataAgent.agent.state.messages.length;
-      const pageBlock = _buildPageBlock(question);
+      const pageBlock = _buildPageBlock(question, vault);
       try {
         const reply = await dataAgent.ask(
           buildAgentTurnText({
