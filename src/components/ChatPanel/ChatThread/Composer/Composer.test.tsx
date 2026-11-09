@@ -33,6 +33,17 @@ vi.mock("@/components/ChatPanel/OfflineModeControl/OfflineModeControl", () => {
   };
 });
 
+vi.mock(
+  "@/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray",
+  () => {
+    return {
+      ChatContextTray: () => {
+        return <div data-testid="chat-context-tray" />;
+      },
+    };
+  },
+);
+
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
@@ -160,6 +171,18 @@ describe("Composer", () => {
       expect(sendButton.parentElement).toBe(offlineControl.parentElement);
     });
 
+    it("shows the context tray above the editor", () => {
+      const input = _renderComposer({
+        isAgentEnabled: true,
+        context: { app: "other" },
+      });
+
+      const tray = screen.getByTestId("chat-context-tray");
+      expect(
+        tray.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
     it("leaves the case designer composer disabled", () => {
       const input = _renderComposer({
         isAgentEnabled: true,
@@ -168,6 +191,7 @@ describe("Composer", () => {
 
       expect(input).toBeDisabled();
       expect(input).toHaveAttribute("placeholder", DISABLED_PLACEHOLDER);
+      expect(screen.queryByTestId("chat-context-tray")).not.toBeInTheDocument();
     });
   });
 
@@ -184,6 +208,15 @@ describe("Composer", () => {
         expect(input).toHaveAttribute("placeholder", DISABLED_PLACEHOLDER);
       },
     );
+
+    it("shows no context tray", () => {
+      _renderComposer({
+        isAgentEnabled: false,
+        context: { app: "data-explorer" },
+      });
+
+      expect(screen.queryByTestId("chat-context-tray")).not.toBeInTheDocument();
+    });
 
     it("enables the composer in the Data Explorer", () => {
       const input = _renderComposer({

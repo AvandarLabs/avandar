@@ -1,0 +1,82 @@
+/*
+ * The attached chips and the "Add context" trigger, wrapping as one row at
+ * the top of the message box, inset like the editor's own text.
+ */
+.tray {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-xxs);
+  padding: 0 var(--mantine-spacing-xxs);
+}
+
+.trayList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-xxs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.trayItem {
+  align-items: center;
+  display: inline-flex;
+  font-size: var(--mantine-font-size-xs);
+  gap: 2px;
+  max-width: 100%;
+}
+
+.trigger[data-disabled] {
+  cursor: not-allowed;
+}
+
+.option {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.optionIcon {
+  color: var(--mantine-color-neutral-7);
+  flex: none;
+}
+
+.optionText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.optionLabel,
+.optionDetail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionAdded {
+  flex: none;
+}
+
+.optionSkeleton {
+  animation: chat-context-option-pulse 1.5s ease-in-out infinite;
+  background-color: var(--mantine-color-neutral-2);
+  block-size: 12px;
+  border-radius: var(--mantine-radius-xs);
+  display: inline-block;
+  inline-size: 120px;
+}
+
+@keyframes chat-context-option-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .optionSkeleton {
+    animation: none;
+  }
+}

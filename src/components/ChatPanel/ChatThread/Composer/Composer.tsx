@@ -6,6 +6,7 @@ import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef } from "react";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { ChatContextTray } from "@/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray";
 import { ChatComposerEditor } from "@/components/ChatPanel/ChatThread/Composer/ChatComposerEditor";
 import { OfflineModeControl } from "@/components/ChatPanel/OfflineModeControl/OfflineModeControl";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
@@ -58,7 +59,8 @@ function _getPlaceholderKind(
  * is not available: the case designer, and with the data agent off, every
  * page other than Data Explorer and Dashboards. With the data agent on and
  * chat available, the input is the rich text editor that takes `@`
- * mentions; otherwise it is a plain textarea.
+ * mentions, below the tray of gadgets attached to the chat; otherwise it is
+ * a plain textarea.
  */
 export function Composer(): React.ReactNode {
   const { isOpen } = ChatPanelStateManager.useState();
@@ -89,6 +91,7 @@ export function Composer(): React.ReactNode {
     >
       {isAgentComposer ? (
         <div className={css.composer}>
+          <ChatContextTray />
           <ChatComposerEditor
             placeholder={placeholder}
             // This branch only renders where chat is available.
