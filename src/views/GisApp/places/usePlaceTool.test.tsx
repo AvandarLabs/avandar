@@ -24,19 +24,39 @@ vi.mock("@/clients/places/VirtualPlacesStore/VirtualPlacesStore", () => {
 });
 
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
-  return { DatasetClient: { useGetAll: () => {return [[]]} } };
+  return {
+    DatasetClient: {
+      useGetAll: () => {
+        return [[]];
+      },
+    },
+  };
 });
 
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
-  return { DatasetColumnClient: { useGetAll: () => {return [[]]} } };
+  return {
+    DatasetColumnClient: {
+      useGetAll: () => {
+        return [[]];
+      },
+    },
+  };
 });
 
 vi.mock("@/hooks/users/useCurrentUser", () => {
-  return { useCurrentUser: () => {return undefined} };
+  return {
+    useCurrentUser: () => {
+      return undefined;
+    },
+  };
 });
 
 vi.mock("@/views/GisApp/places/usePlacesActions", () => {
-  return { usePlacesActions: () => {return {}} };
+  return {
+    usePlacesActions: () => {
+      return {};
+    },
+  };
 });
 
 vi.mock("@/views/GisApp/places/useRefreshPlacesOnMapOpen", () => {
