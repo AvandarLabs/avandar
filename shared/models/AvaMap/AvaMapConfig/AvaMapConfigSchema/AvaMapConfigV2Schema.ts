@@ -75,7 +75,9 @@ export const PointGeometryBindingSchema = z.strictObject({
   column: uuidType<"QueryColumn">(),
   encoding: GeometryEncodingSchema,
   family: z.literal("point"),
-  simplification: z.undefined(),
+  // Points are never simplified. Saved JSON drops an undefined key, so the
+  // key is optional for the config to read back what it wrote.
+  simplification: z.undefined().optional(),
 });
 
 const PointBindingSchema = z.discriminatedUnion("type", [

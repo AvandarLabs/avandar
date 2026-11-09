@@ -351,4 +351,3 @@ Red/green TDD with Vitest, plus one browser spec:
   `assertMeetsMinAppRole`'s text needs the matcher updated.
 - Rename `agentPageNameLoader.ts` to match its export,
   `createAgentPageNameLoader`.
-- A manual check in the real app with live models is still owed.

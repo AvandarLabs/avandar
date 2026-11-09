@@ -100,15 +100,70 @@ function _toPreview(sniffed: SniffedPreview): CatalogListingPreview {
 }
 
 /**
- * The resource formats whose preview reads the column-type sample route,
- * which returns CSV text, rather than the listing's Parquet copy.
+ * The resource formats the column-type sample route can preview: it returns
+ * their first rows as CSV text.
  */
 const CSV_SAMPLE_FORMATS: ReadonlySet<string> = new Set(["CSV", "ODATA"]);
 
-function _isReadFromCsvSample(apiResourceFormat: string | undefined): boolean {
+/**
+ * Where an API-backed listing's preview rows come from.
+ *
+ * `stored-copy` is the Parquet copy in Storage. `live-sample` is the
+ * column-type sample route, which reads the source API. A column recheck
+ * asks for `live-sample` even when a copy is already stored.
+ */
+export type CatalogListingPreviewSource = "stored-copy" | "live-sample";
+
+/**
+ * Whether a catalog preview can read this format from the column-type
+ * sample route. CSV and OData can. A stored Parquet copy is still used
+ * when one exists, unless the caller asks for a live sample.
+ */
+export function isCatalogListingSampleFormat(
+  apiResourceFormat: string | undefined,
+): boolean {
   return (
     apiResourceFormat !== undefined &&
     CSV_SAMPLE_FORMATS.has(apiResourceFormat.toUpperCase())
+  );
+}
+
+type ApiResourcePreviewListing = Pick<
+  DataCatalogListing.T,
+  "id" | "apiResourceFormat" | "parquetCacheFolderPath"
+>;
+
+/** Reads an API-backed listing's preview from its copy or from the API. */
+async function _readApiResourcePreview(options: {
+  listing: ApiResourcePreviewListing;
+  maxPreviewRows: number;
+  source: CatalogListingPreviewSource | undefined;
+  dependencies: CatalogListingPreviewDependencies;
+}): Promise<CatalogListingPreview> {
+  const { listing, maxPreviewRows, dependencies } = options;
+  const readLiveSample =
+    options.source === "live-sample" ||
+    listing.parquetCacheFolderPath === undefined;
+  if (
+    readLiveSample &&
+    isCatalogListingSampleFormat(listing.apiResourceFormat)
+  ) {
+    const csvText = await dependencies.fetchCsvSample(listing.id);
+    return _toPreview(
+      await _sniffCsvFile(dependencies, csvText, maxPreviewRows),
+    );
+  }
+  if (listing.parquetCacheFolderPath === undefined) {
+    throw new Error(
+      `Catalog listing '${listing.id}' has no Parquet copy to preview yet`,
+    );
+  }
+  const partPath = `${listing.parquetCacheFolderPath}/${buildParquetCachePartName(0)}`;
+  return _toPreview(
+    await dependencies.previewParquetBlob({
+      parquetBlob: await dependencies.fetchCopyPart(partPath),
+      maxPreviewRows,
+    }),
   );
 }
 
@@ -116,18 +171,18 @@ function _isReadFromCsvSample(apiResourceFormat: string | undefined): boolean {
  * Reads the first `maxPreviewRows` rows of a catalog listing's data, without
  * adding the listing to a workspace.
  *
- * An API-backed CSV listing is read from the start of its file, the same
- * sample its column types are verified from, so a source of any size can be
- * previewed. An OData listing is read from the same sample route, which
- * writes its first rows as CSV. Any other API-backed listing is read from
- * the first part of its Parquet copy, and has no preview until a workspace
- * adds it and the copy is built: browsing never starts a build. A pipeline
- * listing is read from the Parquet URL its catalog row names. Either way
- * DuckDB reads only the preview's rows and nothing is kept once they are
- * read.
+ * An API-backed listing that already has a Parquet copy is read from the
+ * first part of that copy, so opening it does not call the source API. A
+ * CSV or OData listing with no copy yet is read from the column-type sample
+ * route. Any other API-backed listing has no preview until a workspace adds
+ * it and the copy is built: browsing never starts a build. A pipeline
+ * listing is read from the Parquet URL its catalog row names. DuckDB reads
+ * only the preview's rows and nothing is kept once they are read.
  *
  * @param options.listing The listing to preview.
  * @param options.maxPreviewRows How many rows to read at most.
+ * @param options.source `live-sample` reads the source API even when a
+ * copy is stored. Omitted, a stored copy is preferred.
  * @param options.dependencies Replaces the network and DuckDB, for tests.
  * @throws When the listing's data cannot be fetched or read.
  */
@@ -142,6 +197,7 @@ export async function fetchCatalogListingPreview(
       | "parquetCacheFolderPath"
     >;
     maxPreviewRows: number;
+    source?: CatalogListingPreviewSource;
     dependencies?: CatalogListingPreviewDependencies;
   }>,
 ): Promise<CatalogListingPreview> {
@@ -149,25 +205,12 @@ export async function fetchCatalogListingPreview(
   const dependencies = options.dependencies ?? DEFAULT_DEPENDENCIES;
 
   if (listing.accessKind === "api_resource") {
-    if (_isReadFromCsvSample(listing.apiResourceFormat)) {
-      const csvText = await dependencies.fetchCsvSample(listing.id);
-      return _toPreview(
-        await _sniffCsvFile(dependencies, csvText, maxPreviewRows),
-      );
-    }
-    if (listing.parquetCacheFolderPath === undefined) {
-      throw new Error(
-        `Catalog listing '${listing.id}' has no Parquet copy to preview yet`,
-      );
-    }
-    return _toPreview(
-      await dependencies.previewParquetBlob({
-        parquetBlob: await dependencies.fetchCopyPart(
-          `${listing.parquetCacheFolderPath}/${buildParquetCachePartName(0)}`,
-        ),
-        maxPreviewRows,
-      }),
-    );
+    return await _readApiResourcePreview({
+      listing,
+      maxPreviewRows,
+      source: options.source,
+      dependencies,
+    });
   }
 
   const parquetUrl = listing.canonicalUrls?.find((url) => {

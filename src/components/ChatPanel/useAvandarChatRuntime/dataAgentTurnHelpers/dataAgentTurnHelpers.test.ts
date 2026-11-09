@@ -1,4 +1,6 @@
+import { Model } from "@avandar/models";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
@@ -79,6 +81,57 @@ describe("createExplorerShowQuery", () => {
     });
   });
 
+  it("labels the explorer's prompt with mention names, never tokens", async () => {
+    const ref = {
+      gadgetType: "dataset",
+      gadgetId: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
+      subId: null,
+    } as const;
+    const turn: DataAgentTurnOptions = {
+      ..._createTurnOptions(),
+      apiMessages: [
+        Model.make("ChatClientMessage", {
+          role: "user",
+          content: `Totals for ${ChatMentionToken.buildToken(ref)}`,
+        }),
+      ],
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: new Map([
+          [
+            ChatMentionToken.buildRefKey(ref),
+            { kind: "dataset", ref, name: "US deaths" },
+          ],
+        ]),
+      },
+    };
+
+    await createExplorerShowQuery(turn)({ sql: "select 1", summary: "s" });
+
+    expect(turn.dataExplorerDispatch.setNlPrompt).toHaveBeenCalledWith(
+      "Totals for @US deaths",
+    );
+  });
+
+  it("labels the explorer's prompt with the turn's question label", async () => {
+    const turn: DataAgentTurnOptions = {
+      ..._createTurnOptions(),
+      apiMessages: [
+        Model.make("ChatClientMessage", {
+          role: "user",
+          content: 'Totals for @"US deaths"',
+        }),
+      ],
+      questionLabel: "Totals for @US deaths",
+    };
+
+    await createExplorerShowQuery(turn)({ sql: "select 1", summary: "s" });
+
+    expect(turn.dataExplorerDispatch.setNlPrompt).toHaveBeenCalledWith(
+      "Totals for @US deaths",
+    );
+  });
+
   it("returns no rows when no preview is asked for", async () => {
     const showQuery = createExplorerShowQuery(_createTurnOptions());
 
@@ -139,6 +192,14 @@ describe("askConversationDataAgent", () => {
 
   const PAGE_BLOCK = "<current_page>\nPage: Map\n</current_page>";
 
+  function _noName(): string {
+    return "";
+  }
+
+  function _keepText(text: string): string {
+    return text;
+  }
+
   function _fakeConversation(
     ask?: (text: string) => Promise<{ text: string }>,
   ): FakeConversation {
@@ -188,8 +249,12 @@ describe("askConversationDataAgent", () => {
     return askConversationDataAgent({
       conversations,
       turn,
-      buildPageBlock: () => {
-        return pageBlock;
+      buildTurnInputs: () => {
+        return {
+          blocks: { pageBlock },
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+        };
       },
       createConversation: vi.fn(),
     });
@@ -287,8 +352,12 @@ describe("askConversationDataAgent", () => {
     await askConversationDataAgent({
       conversations: new Map(),
       turn: _turn(["How many?", "42.", "And deaths?"]),
-      buildPageBlock: () => {
-        return PAGE_BLOCK;
+      buildTurnInputs: () => {
+        return {
+          blocks: { pageBlock: PAGE_BLOCK },
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+        };
       },
       createConversation: async () => {
         return conversation;
@@ -312,8 +381,12 @@ describe("askConversationDataAgent", () => {
     await askConversationDataAgent({
       conversations: new Map(),
       turn: _turn([caseView, "42.", "And deaths?"]),
-      buildPageBlock: () => {
-        return PAGE_BLOCK;
+      buildTurnInputs: () => {
+        return {
+          blocks: { pageBlock: PAGE_BLOCK },
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+        };
       },
       createConversation: async () => {
         return conversation;
@@ -326,21 +399,90 @@ describe("askConversationDataAgent", () => {
 
   it("builds the page block from the conversation it asks", async () => {
     const conversation = _fakeConversation();
-    const buildPageBlock = vi.fn(() => {
-      return PAGE_BLOCK;
+    const buildTurnInputs = vi.fn(() => {
+      return {
+        blocks: { pageBlock: PAGE_BLOCK },
+        nameOf: _noName,
+        maskAssistantText: _keepText,
+      };
     });
 
     await askConversationDataAgent({
       conversations: new Map(),
       turn: _turn("How many?"),
-      buildPageBlock,
+      buildTurnInputs,
       createConversation: async () => {
         return conversation;
       },
     });
 
-    expect(buildPageBlock).toHaveBeenCalledWith(conversation);
+    expect(buildTurnInputs).toHaveBeenCalledWith(conversation);
     expect(conversation.asked[0]).toBe(`${PAGE_BLOCK}\n\nHow many?`);
+  });
+
+  it("masks each assistant reply in the recap", async () => {
+    const conversation = _fakeConversation();
+
+    await askConversationDataAgent({
+      conversations: new Map(),
+      turn: _turn(["Who?", "Jane Doe visits has two rows.", "Total?"]),
+      buildTurnInputs: () => {
+        return {
+          blocks: {},
+          nameOf: _noName,
+          maskAssistantText: (text) => {
+            return text.replace("Jane Doe", "<value 1>");
+          },
+        };
+      },
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect(conversation.asked[0]).toBe(
+      "Earlier in this conversation:\nUser: Who?\n" +
+        "Assistant: <value 1> visits has two rows.\n\nTotal?",
+    );
+  });
+
+  it("sends the attached and mentioned blocks and names each mention", async () => {
+    const conversation = _fakeConversation();
+    const ref = {
+      gadgetType: "dataset",
+      gadgetId: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
+      subId: null,
+    } as const;
+    const token = ChatMentionToken.buildToken(ref);
+    const nameOf = vi.fn(() => {
+      return "US deaths";
+    });
+
+    await askConversationDataAgent({
+      conversations: new Map(),
+      turn: _turn([`About ${token}?`, "42.", `And ${token}?`]),
+      buildTurnInputs: () => {
+        return {
+          blocks: {
+            attachedBlock: "<attached>\nA\n</attached>",
+            mentionedBlock: "<mentioned>\nM\n</mentioned>",
+          },
+          nameOf,
+          maskAssistantText: _keepText,
+        };
+      },
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect(nameOf).toHaveBeenCalledWith(ref);
+    expect(conversation.asked[0]).toBe(
+      "<attached>\nA\n</attached>\n\n<mentioned>\nM\n</mentioned>\n\n" +
+        'Earlier in this conversation:\nUser: About @"US deaths"?\n' +
+        'Assistant: 42.\n\nAnd @"US deaths"?',
+    );
+    expect(conversation.lastAttachedBlock).toBe("<attached>\nA\n</attached>");
   });
 
   it("drops and stops the workspace's older chats when a new chat starts", async () => {

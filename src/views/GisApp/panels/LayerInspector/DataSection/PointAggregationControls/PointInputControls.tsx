@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { findSourceColumnId } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/findSourceColumnId";
 import { PointCoordinateSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -15,6 +16,7 @@ type PointAggregationBinding = Extract<
 type Props = {
   layer: MapLayer.T;
   binding: PointAggregationBinding;
+  sourceColumns: readonly QueryColumn.T[];
   updatePoints: (points: MapLayer.PointBinding) => void;
 };
 
@@ -29,6 +31,7 @@ function _findColumn(
 export function PointInputControls({
   layer,
   binding,
+  sourceColumns,
   updatePoints,
 }: Props): ReactNode {
   const { t } = useLingui();
@@ -45,7 +48,13 @@ export function PointInputControls({
         value={_findColumn(layer, points.column)}
         onChange={(column) => {
           if (column) {
-            updatePoints({ ...points, column: column.id });
+            updatePoints({
+              ...points,
+              column: findSourceColumnId({
+                sourceColumns,
+                pickedColumn: column,
+              }),
+            });
           }
         }}
       />
@@ -56,12 +65,14 @@ export function PointInputControls({
       <PointCoordinateSelect
         layer={layer}
         binding={binding}
+        sourceColumns={sourceColumns}
         updatePoints={updatePoints}
         axis="latitude"
       />
       <PointCoordinateSelect
         layer={layer}
         binding={binding}
+        sourceColumns={sourceColumns}
         updatePoints={updatePoints}
         axis="longitude"
       />

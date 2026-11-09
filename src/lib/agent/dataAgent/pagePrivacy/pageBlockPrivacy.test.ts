@@ -74,6 +74,25 @@ describe("page block privacy", () => {
     expect(block).not.toContain("Jane");
   });
 
+  it("hides a name only a chart past the first 12 filters on, without sending its SQL", () => {
+    const ordinary = Array.from({ length: 12 }, (_, index) => {
+      return { title: `Cases ${index + 1}`, sql: `SELECT ${index + 1}` };
+    });
+    const block = _buildBlock(
+      _dashboard("Jane Doe follow-up", [
+        ...ordinary,
+        {
+          title: "Visits",
+          sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
+        },
+      ]),
+    );
+
+    expect(block).toContain("1 more chart not listed.");
+    expect(block).not.toContain("Jane");
+    expect(block).not.toContain("patient_name");
+  });
+
   it("keeps titles readable when a personal chart sweeps up ordinary words", () => {
     const block = _buildBlock(
       _dashboard("Measles 2022", [

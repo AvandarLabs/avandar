@@ -112,7 +112,7 @@ async function _expectNumResults(
   const results = page.getByRole("region", { name: "Results" });
   await expect(
     results.getByRole("heading", {
-      name: new RegExp(`^${numResults} of [\\d,]+ datasets$`),
+      name: new RegExp(`^${numResults} datasets$`),
     }),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
   await expect(

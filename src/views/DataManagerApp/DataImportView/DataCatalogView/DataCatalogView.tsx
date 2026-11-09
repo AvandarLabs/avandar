@@ -215,12 +215,6 @@ export function DataCatalogView({
     },
   });
 
-  const selectedListingPreview = useCatalogListingPreview(selectedListing);
-  const selectedListingCompanions = useCatalogListingCompanions({
-    catalogListingId: selectedListing?.id,
-    workspaceId: workspace.id,
-  });
-
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
     coordinator: ColumnTypeVerifications,
@@ -228,6 +222,13 @@ export function DataCatalogView({
   const columnTypeVerificationStatus = useColumnTypeVerificationStatus({
     catalogListingId: selectedListing?.id,
     coordinator: ColumnTypeVerifications,
+  });
+  const selectedListingPreview = useCatalogListingPreview(selectedListing, {
+    isRecheckingColumns: columnTypeVerificationStatus === "verifying",
+  });
+  const selectedListingCompanions = useCatalogListingCompanions({
+    catalogListingId: selectedListing?.id,
+    workspaceId: workspace.id,
   });
   const catalogListingAdder = useAddCatalogListing();
   const { addingListingIds, waitingToAddListingId } = catalogListingAdder;
@@ -358,13 +359,6 @@ export function DataCatalogView({
           <DataCatalogResultsHeader
             numResults={catalogSearch.totalCount}
             isNumResultsCapped={catalogSearch.isTotalCapped}
-            numCatalogListings={facets?.numCatalogListings ?? 0}
-            // "X of Y" waits for the catalog's size, which the facet counts
-            // carry, rather than reading "X of 0" for a moment.
-            isNarrowed={
-              (isSearching || hasActiveCatalogFilters(filters)) &&
-              facets !== undefined
-            }
             activeFilters={activeFilters}
             onClearAll={() => {
               setFilters(EMPTY_CATALOG_LISTING_FILTERS);

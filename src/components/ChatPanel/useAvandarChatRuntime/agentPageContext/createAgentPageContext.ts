@@ -1,6 +1,8 @@
-import { extractDashboardTiles } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/extractDashboardTiles";
+import {
+  extractDashboardTiles,
+  extractSavedDashboardTiles,
+} from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/extractDashboardTiles";
 import { parseAgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
-import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type {
   AgentPageContext,
@@ -8,7 +10,6 @@ import type {
 } from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { AgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
-import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 
 /**
@@ -68,17 +69,6 @@ function _extractEditorTiles(editorData: unknown): readonly AgentPageTile[] {
   }
 }
 
-/** Tiles of a saved config, or none when it cannot be upgraded. */
-function _extractSavedTiles(config: unknown): readonly AgentPageTile[] {
-  try {
-    return extractDashboardTiles(
-      upgradeAvaPageData(config as AvaPageGenericData),
-    );
-  } catch {
-    return [];
-  }
-}
-
 async function _loadSavedDashboard(
   idOrSlug: string,
   loader: AgentPageNameLoader,
@@ -89,7 +79,7 @@ async function _loadSavedDashboard(
       ? {
           id: dashboard.id ?? idOrSlug,
           name: dashboard.name,
-          tiles: _extractSavedTiles(dashboard.config),
+          tiles: extractSavedDashboardTiles(dashboard.config),
         }
       : undefined;
   });

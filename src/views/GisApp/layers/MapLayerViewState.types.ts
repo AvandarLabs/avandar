@@ -40,6 +40,12 @@ export type MapLayerViewState = {
   /** Number of filter clauses on the layer query. */
   filterCount: number;
 
+  /**
+   * Lowest and highest value the layer's graduated colors classified. The
+   * classification editor reads it to tell fractions from percents.
+   */
+  classifiedValueDomain?: readonly [number, number];
+
   /** Re-runs the layer query. */
   onRetry: () => void;
 };

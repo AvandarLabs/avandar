@@ -48,6 +48,13 @@ const avandarGridTheme = themeMaterial.withParams({
   primaryColor: mantineColorVar("primary"),
 });
 
+/**
+ * A table of rows. A column title that does not fit ends in an ellipsis,
+ * and hovering that title shows the full name.
+ *
+ * Used wherever a result set is shown as a table, such as a dataset
+ * preview or the Explorer.
+ */
 export function DataGrid({
   columnNames,
   className,
@@ -104,6 +111,11 @@ export function DataGrid({
         rowData={data as Writable<UnknownDataFrame>}
         pagination={pagination}
         paginationPageSize={50}
+        // The grid waits two seconds unless this is set, and never less
+        // than a fifth of a second. A clipped title should show once the
+        // pointer rests on it.
+        tooltipShowDelay={0}
+        tooltipShowMode="whenTruncated"
         onGridReady={onGridReady}
         onGridSizeChanged={onGridSizeChanged}
         onRowDataUpdated={onRowDataUpdated}

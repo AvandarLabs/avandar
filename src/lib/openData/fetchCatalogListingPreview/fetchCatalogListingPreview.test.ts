@@ -60,6 +60,56 @@ describe("fetchCatalogListingPreview", () => {
     ]);
   });
 
+  it("reads an API-backed CSV listing from its stored Parquet copy instead of the API", async () => {
+    const partBlob = new Blob(["part"]);
+    const dependencies = _createDependencies({
+      fetchCopyPart: vi.fn().mockResolvedValue(partBlob),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "csv",
+        canonicalUrls: undefined,
+        parquetCacheFolderPath: "catalog-cache/listing-1/build-1",
+      },
+      maxPreviewRows: 200,
+      dependencies,
+    });
+
+    expect(dependencies.fetchCopyPart).toHaveBeenCalledWith(
+      "catalog-cache/listing-1/build-1/part-00000.parquet",
+    );
+    expect(dependencies.previewParquetBlob).toHaveBeenCalledWith({
+      parquetBlob: partBlob,
+      maxPreviewRows: 200,
+    });
+    expect(dependencies.fetchCsvSample).not.toHaveBeenCalled();
+  });
+
+  it("reads the API sample of a stored CSV listing when a column recheck asks for it", async () => {
+    const dependencies = _createDependencies({
+      fetchCsvSample: vi.fn().mockResolvedValue("country,report_date\n"),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "csv",
+        canonicalUrls: undefined,
+        parquetCacheFolderPath: "catalog-cache/listing-1/build-1",
+      },
+      maxPreviewRows: 200,
+      source: "live-sample",
+      dependencies,
+    });
+
+    expect(dependencies.fetchCsvSample).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchCopyPart).not.toHaveBeenCalled();
+  });
+
   it("reads an API-backed OData listing from its CSV sample", async () => {
     const dependencies = _createDependencies({
       fetchCsvSample: vi.fn().mockResolvedValue("country,report_date\n"),

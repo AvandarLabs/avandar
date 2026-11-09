@@ -29,6 +29,7 @@ function _Wrapper({
         caseDesignSessionNonce: 0,
         pendingClarification: undefined,
         pendingCaseTypeDraft: undefined,
+        contextTray: [],
       }}
     >
       <NuxStateManager.Provider

@@ -9,8 +9,6 @@ describe("DataCatalogResultsHeader", () => {
       <DataCatalogResultsHeader
         numResults={3}
         isNumResultsCapped={false}
-        numCatalogListings={10}
-        isNarrowed
         activeFilters={[
           { key: "domains:Health", label: "Topic: Health", onRemove },
         ]}
@@ -29,13 +27,28 @@ describe("DataCatalogResultsHeader", () => {
     expect(onRemove).toHaveBeenCalledOnce();
   });
 
+  it("counts the datasets in view without the catalog total", () => {
+    render(
+      <DataCatalogResultsHeader
+        numResults={3}
+        isNumResultsCapped={false}
+        activeFilters={[]}
+        onClearAll={vi.fn()}
+        sortBy="updated"
+        isSearching={false}
+        onSortByChange={vi.fn()}
+        onOpenFilters={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("heading")).toHaveTextContent(/^3 datasets$/);
+  });
+
   it("says the count is a floor when more datasets match than were counted", () => {
     render(
       <DataCatalogResultsHeader
         numResults={10000}
         isNumResultsCapped
-        numCatalogListings={2000000}
-        isNarrowed
         activeFilters={[]}
         onClearAll={vi.fn()}
         sortBy="updated"
@@ -46,7 +59,7 @@ describe("DataCatalogResultsHeader", () => {
     );
 
     expect(screen.getByRole("heading")).toHaveTextContent(
-      "10,000+ of 2,000,000 datasets",
+      /^10,000\+ datasets$/,
     );
   });
 });

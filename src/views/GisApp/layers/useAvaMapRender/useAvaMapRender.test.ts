@@ -4,6 +4,7 @@ import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { renderHook } from "@/test-utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
@@ -209,5 +210,59 @@ describe("useAvaMapRender annotations", () => {
         return layerSpec.type;
       }),
     ).toContain("symbol");
+  });
+});
+
+function _makeValuedPolygon(value: number): GeoJSON.Feature {
+  return {
+    ...POLYGON_COLLECTION.features[0]!,
+    id: value,
+    properties: { [MapLayerSpatialFeatureProperties.value]: value },
+  };
+}
+
+describe("useAvaMapRender classified values", () => {
+  it("reports the lowest and highest classified value on the view state", () => {
+    const boundLayer = _makeBoundFillLayer();
+    const layer: MapLayer.T = {
+      ...boundLayer,
+      symbology: {
+        ...MapLayer.createDefaultFillSymbology(),
+        color: {
+          type: "graduated",
+          value: {
+            type: "areaAggregation",
+            outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+          },
+          ramp: ["#d7301f", "#d9d9d9"],
+          classification: { method: "manual", breaks: [0.95] },
+          normalization: undefined,
+          noData: { color: "#ced4da", label: "" },
+          classLabels: [undefined, undefined],
+        },
+      },
+    };
+    const { result } = renderHook(() => {
+      return useAvaMapRender({
+        mapConfig: _makeMapConfig({
+          layer,
+          annotations: { isVisible: true, features: [] },
+          annotationsZIndex: 0,
+        }),
+        layerQueryStates: new Map([
+          [
+            layer.id,
+            _makeReadyQueryState({
+              type: "FeatureCollection",
+              features: [_makeValuedPolygon(0.97), _makeValuedPolygon(0.82)],
+            }),
+          ],
+        ]),
+      });
+    });
+
+    expect(
+      result.current.layerViewStates.get(layer.id)?.classifiedValueDomain,
+    ).toEqual([0.82, 0.97]);
   });
 });

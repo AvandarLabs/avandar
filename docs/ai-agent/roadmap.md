@@ -37,12 +37,28 @@ and implementation, in order.
 
 | # | Item | Done when |
 |---|---|---|
-| 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). A manual check with live models is still owed. |
-| 1B | **Attachable context.** `@` mentions of gadgets in the chat composer and a context picker. | To spec. |
+| 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). Three live checks with live models in the real app passed (2026-11-09). Pushed to the demo on 2026-11-09, so prompt v2 is now fixed: a prompt change needs a new version served beside v1 and v2. The agent stays off until 1D and 1E close the gaps listed under [What keeps the agent off](#what-keeps-the-agent-off-pablo-2026-11-09). |
+| 1B | **Attachable context.** Done (2026-11-09). `@` mentions of gadgets in the chat composer and a context picker ([spec](specs/phase-1b.md)). | Done (2026-11-09) on `feat/agent-context` (D41, D42). Met: unit tests; an adversarial privacy review over three rounds, with eight leaks found and fixed; mention questions M01 to M06 passing on all three runs, with P01 to P07 passing and the 45 questions at 44/45 (the miss passed on rerun) on prompt v3. Eval label `phase-1b` ([results](eval.md#phase-1b)). A mocked browser spec, and a live check with live models in the real app that passed all six steps. |
 | 1C | **Multiple chats and an archive.** Session tabs, a browser-only archive, the expand button, auto-generated titles, and every AI entry point opening a new session (the case manager's chat moves into the main panel). | To spec. |
 | 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard (was 1.1). | Dashboard eval questions exist and the agent matches today's chat on them. |
-| 1E | **"Try again" in the agent.** Regenerating reruns the answer with the previous attempt as context, as today's `retryContext` does (was 1.2). | Covered by a unit test and the browser test (1F). |
+| 1E | **"Try again" and parity in the agent.** Regenerating reruns the answer with the previous attempt as context, as today's `retryContext` does (was 1.2). The agent's question cards are audit-logged and bias-checked like today's clarification cards, and it logs `chat.sql_generated` and `dashboard.block_added_via_chat` (D40). | Covered by unit tests and the browser test (1F). |
 | 1F | **Browser test, then on by default.** One Playwright spec (ask, see a table, answer a question card, follow up, ask for a chart), then the agent as the default and the switch removed (was 1.3 and 1.4). | A week on the demo without regressions; the 45-question eval unchanged. |
+
+### What keeps the agent off (Pablo, 2026-11-09)
+
+Turning it on today would lose things today's chat does:
+
+| Today's chat feature | Agent today | Planned |
+|---|---|---|
+| "Add a chart to this dashboard" adds a block in the dashboard editor | No dashboard tool; shows the result in the chat instead | 1D |
+| "Try again" sends the previous attempt (`retryContext`) | The agent branch runs before the retry logic; it just asks again | 1E |
+| Clarification cards are audit-logged (`ClarificationAuditEntryClient.recordShown`) and bias-checked (`detectBias`) in `applyChatModelTurnResponse.ts` | The agent's `ask_user` cards skip both | 1E (D40) |
+| Analytics `chat.sql_generated`, `dashboard.block_added_via_chat` | Not logged (`chat.message_sent` is logged for both) | 1E (D40) |
+
+Parity or better: data questions (45/45, about a quarter of the cost, about
+twice as fast), consent before values or a typed message cross, the case
+designer, offline mode. New: questions from maps, datasets, case pages,
+settings.
 
 ## Phase 2: foundations every area needs
 

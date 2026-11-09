@@ -1,0 +1,12 @@
+{
+  // The producer's own tsconfigs live in the parent directory and only map
+  // `@utils`. ESLint's resolver reuses the nearest cached project, so a
+  // producer test linted in the same run (the pre-push hook does this) makes
+  // every `@/` and `$/` import in this folder unresolved. This file is the
+  // closer project and keeps the app path map.
+  "extends": "../../../tsconfig.app.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}

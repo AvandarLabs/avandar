@@ -1,4 +1,7 @@
+import { MAX_ATTACHED_GADGETS } from "$/agent/mentions/AgentGadgetContext";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type {
   ChatClarifyRequest,
   ChatProposedCaseType,
@@ -35,6 +38,12 @@ type ChatPanelState = {
    * editable; cleared once the user creates the case type or dismisses it.
    */
   pendingCaseTypeDraft: ChatProposedCaseType | undefined;
+  /**
+   * Gadgets the user attached to the chat, sent to the agent with every
+   * turn until removed. At most five, refs only. `useAvandarChatRuntime`
+   * loads and saves it per workspace and user, and a new chat empties it.
+   */
+  contextTray: readonly Gadget.Ref[];
 };
 
 const initialState: ChatPanelState = {
@@ -44,6 +53,7 @@ const initialState: ChatPanelState = {
   caseDesignSessionNonce: 0,
   pendingClarification: undefined,
   pendingCaseTypeDraft: undefined,
+  contextTray: [],
 };
 
 /**
@@ -67,6 +77,7 @@ export const ChatPanelStateManager = createAppStateManager({
     caseDesignSessionNonce: 0,
     pendingClarification: undefined,
     pendingCaseTypeDraft: undefined,
+    contextTray: [],
   },
   actions: {
     open: (state: ChatPanelState) => {
@@ -106,6 +117,33 @@ export const ChatPanelStateManager = createAppStateManager({
       pendingCaseTypeDraft: ChatProposedCaseType | undefined,
     ) => {
       return { ...state, pendingCaseTypeDraft };
+    },
+    addToContextTray: (state: Readonly<ChatPanelState>, ref: Gadget.Ref) => {
+      const key = ChatMentionToken.buildRefKey(ref);
+      const isAttached = state.contextTray.some((item) => {
+        return ChatMentionToken.buildRefKey(item) === key;
+      });
+      return isAttached || state.contextTray.length >= MAX_ATTACHED_GADGETS
+        ? state
+        : { ...state, contextTray: [...state.contextTray, ref] };
+    },
+    removeFromContextTray: (
+      state: Readonly<ChatPanelState>,
+      ref: Gadget.Ref,
+    ) => {
+      const key = ChatMentionToken.buildRefKey(ref);
+      return {
+        ...state,
+        contextTray: state.contextTray.filter((item) => {
+          return ChatMentionToken.buildRefKey(item) !== key;
+        }),
+      };
+    },
+    setContextTray: (
+      state: Readonly<ChatPanelState>,
+      contextTray: readonly Gadget.Ref[],
+    ) => {
+      return { ...state, contextTray };
     },
   },
 });

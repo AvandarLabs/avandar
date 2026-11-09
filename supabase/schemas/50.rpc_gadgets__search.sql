@@ -59,15 +59,22 @@ set
         d.name as label, null::text as sub_label, d.has_limited_audience, d.updated_at
       from visible_dashboards d
       union all
-      select 'dashboard_tile', d.id, tile ->> 'id', tile -> 'nlQuery' ->> 'prompt', d.name, d.has_limited_audience, d.updated_at
+      select 'dashboard_tile', d.id, tiles.block_id, tiles.prompt, d.name, d.has_limited_audience, d.updated_at
       from visible_dashboards d
       -- `strict`, because lax `.**` yields every block inside an array twice.
+      -- Saved configs are snake-cased, so the prompt is under `nl_query`.
+      -- `nlQuery` covers a config written before that.
       cross join lateral (
-        select node -> 'props' as tile
+        select
+          node -> 'props' ->> 'id' as block_id,
+          coalesce(
+            node -> 'props' -> 'nl_query' ->> 'prompt',
+            node -> 'props' -> 'nlQuery' ->> 'prompt'
+          ) as prompt
         from jsonb_path_query(d.config, 'strict $.** ? (@.type == "DataViz")') as node
       ) as tiles
-      where coalesce(btrim(tile -> 'nlQuery' ->> 'prompt'), '') <> ''
-        and nullif(tile ->> 'id', '') is not null
+      where coalesce(btrim(tiles.prompt), '') <> ''
+        and nullif(tiles.block_id, '') is not null
       union all
       select 'dataset', ds.id, null, ds.name, null, ds.is_restricted, ds.updated_at
       from public.datasets ds

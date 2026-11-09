@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { extractDashboardTiles } from "./extractDashboardTiles";
+import {
+  extractDashboardTile,
+  extractDashboardTiles,
+  extractSavedDashboardTile,
+  extractSavedDashboardTiles,
+} from "./extractDashboardTiles";
 
 function _dataViz(prompt: string, rawSql: string, vizType = "bar"): unknown {
   return {
@@ -79,5 +84,60 @@ describe("extractDashboardTiles", () => {
       { title: "Top", chartType: "bar", sql: "SELECT 1" },
       { title: "In a zone", chartType: "pie", sql: "SELECT 5" },
     ]);
+  });
+});
+
+describe("extractDashboardTile", () => {
+  it("finds a chart by its block id, with or without SQL", () => {
+    const data = {
+      content: [
+        {
+          type: "DataViz",
+          props: {
+            id: "b1",
+            vizType: "line",
+            nlQuery: { prompt: "Weekly cases", rawSql: "SELECT 1" },
+          },
+        },
+        { type: "DataViz", props: { id: "b2", nlQuery: {} } },
+      ],
+    };
+
+    expect(extractDashboardTile(data, "b1")).toEqual({
+      title: "Weekly cases",
+      chartType: "line",
+      sql: "SELECT 1",
+    });
+    expect(extractDashboardTile(data, "b2")).toEqual({
+      title: "Untitled chart",
+      chartType: "table",
+      sql: "",
+    });
+    expect(extractDashboardTile(data, "missing")).toBeUndefined();
+  });
+});
+
+describe("saved config helpers", () => {
+  const config = {
+    root: { props: { title: "Saved", schemaVersion: 5 } },
+    content: [_dataViz("Cases", "SELECT 1")],
+  };
+
+  it("extractSavedDashboardTiles reads a saved config's charts", () => {
+    expect(extractSavedDashboardTiles(config)).toEqual([
+      { title: "Cases", chartType: "bar", sql: "SELECT 1" },
+    ]);
+  });
+
+  it("extractSavedDashboardTile reads one chart of a saved config", () => {
+    expect(extractSavedDashboardTile(config, "Cases")?.sql).toBe("SELECT 1");
+  });
+
+  it("extractSavedDashboardTiles returns none for a config of no shape", () => {
+    expect(extractSavedDashboardTiles(null)).toEqual([]);
+  });
+
+  it("extractSavedDashboardTile returns nothing for a config of no shape", () => {
+    expect(extractSavedDashboardTile(null, "Cases")).toBeUndefined();
   });
 });
