@@ -129,33 +129,6 @@ async function _addSchoolsLayer(page: Page): Promise<void> {
       `${SCHOOL_ROW_COUNT} of ${SCHOOL_ROW_COUNT} rows mapped`,
     ),
   ).toBeVisible({ timeout: LONG_WAIT });
-  await _showSchoolNameInPopup(page, inspector);
-}
-
-/**
- * Narrows the schools popup to the school name. A geometry column layer
- * starts with every field in its popup but queries none of them, and the
- * feature list shows the popup's queried fields.
- */
-async function _showSchoolNameInPopup(
-  page: Page,
-  inspector: Locator,
-): Promise<void> {
-  await inspector.getByRole("button", { name: /^Popup/ }).click();
-  const fields = inspector.getByRole("combobox", { name: "Fields" });
-  // Mantine hides the clear button from assistive technology, so it is
-  // found by its class inside the Fields input.
-  await inspector
-    .locator(".mantine-MultiSelect-root", {
-      has: page.getByRole("combobox", { name: "Fields" }),
-    })
-    .locator(".mantine-InputClearButton-root")
-    .click();
-  await fields.fill("loc_name");
-  await page.getByRole("option", { name: "loc_name", exact: true }).click();
-  await expect(inspector.getByRole("button", { name: /^Popup/ })).toContainText(
-    "1 field",
-  );
 }
 
 /** Buffers the selected sites by half a mile and filters schools by it. */
