@@ -56,6 +56,40 @@ function _createFakeVault() {
   };
 }
 
+/** A dataset with its own id, distinct for each `index` from 0 to 9. */
+function _dataset(index: number, name: string): AgentGadgetContext {
+  return {
+    kind: "dataset",
+    ref: {
+      gadgetType: "dataset",
+      gadgetId: `4444444${index}-4444-4444-8444-444444444444`,
+      subId: null,
+    },
+    name,
+  };
+}
+
+function _tileMention(
+  subId: string,
+  title: string,
+  sql: string,
+): AgentGadgetContext {
+  return {
+    kind: "dashboard_tile",
+    ref: { gadgetType: "dashboard_tile", gadgetId: DASH_ID, subId },
+    dashboardName: "C",
+    tile: _tile(title, sql),
+  };
+}
+
+/** An attached dashboard whose only chart filters on `'Springfield'`. */
+const SPRINGFIELD_DASHBOARD: AgentGadgetContext = {
+  kind: "dashboard",
+  ref: { gadgetType: "dashboard", gadgetId: DASH_ID, subId: null },
+  name: "Clinics",
+  tiles: [_tile("Visits", "SELECT * FROM v WHERE city = 'Springfield'")],
+};
+
 describe("buildAgentContextBlocks", () => {
   it("leaves out empty blocks", () => {
     const blocks = buildAgentContextBlocks({
@@ -66,44 +100,81 @@ describe("buildAgentContextBlocks", () => {
     expect(blocks).toEqual({});
   });
 
-  it("names a dataset with its alias, or as not queryable", () => {
-    const other: AgentGadgetContext = {
-      kind: "dataset",
-      ref: {
-        gadgetType: "dataset",
-        gadgetId: "33333333-3333-4333-8333-333333333333",
-        subId: null,
-      },
-      name: "New list",
-    };
+  it("names a dataset in the chat with its alias", () => {
     const { attachedBlock } = buildAgentContextBlocks({
-      attached: [DATASET, other],
+      attached: [DATASET],
       mentioned: [],
       aliases: ALIASES,
     });
     expect(attachedBlock).toContain('1. Dataset "US deaths" (query it as t0)');
+  });
+
+  it("marks a dataset outside the chat as not queryable", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [_dataset(0, "New list")],
+      mentioned: [],
+      aliases: ALIASES,
+    });
     expect(attachedBlock).toContain(
-      '2. Dataset "New list", not queryable in this chat',
+      '1. Dataset "New list", not queryable in this chat',
     );
   });
 
-  it("caps charts at 12 per dashboard and 24 across blocks", () => {
-    const { attachedBlock, mentionedBlock } = buildAgentContextBlocks({
-      attached: [_dashboard("A", 14), _dashboard("B", 14)],
+  it("lists only the first five attached gadgets", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: Array.from({ length: 6 }, (_, index) => {
+        return _dataset(index, `Set ${index + 1}`);
+      }),
+      mentioned: [],
+      aliases: ALIASES,
+    });
+    expect(attachedBlock).toContain('5. Dataset "Set 5"');
+    expect(attachedBlock).not.toContain("Set 6");
+  });
+
+  it("lists 12 charts per dashboard and counts the rest", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [_dashboard("A", 14)],
+      mentioned: [],
+      aliases: ALIASES,
+    });
+    expect(attachedBlock?.match(/: SELECT 1/g)).toHaveLength(12);
+    expect(attachedBlock).toContain("2 more charts not listed.");
+  });
+
+  it("gives SQL to at most 24 charts across the attached gadgets", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [_dashboard("A", 12), _dashboard("B", 12), _dashboard("C", 12)],
+      mentioned: [],
+      aliases: ALIASES,
+    });
+    expect(attachedBlock?.match(/: SELECT 1/g)).toHaveLength(24);
+    expect(attachedBlock?.match(/\(bar\)$/gm)).toHaveLength(12);
+  });
+
+  it("lists a mentioned chart past the budget by title only", () => {
+    const { mentionedBlock } = buildAgentContextBlocks({
+      attached: [_dashboard("A", 12), _dashboard("B", 12)],
+      mentioned: [_tileMention("x", "Late chart", "SELECT 42")],
+      aliases: ALIASES,
+    });
+    expect(mentionedBlock).toContain(
+      '@"Late chart": Chart "Late chart" on dashboard "C" (bar)\n',
+    );
+    expect(mentionedBlock).not.toContain("SELECT 42");
+  });
+
+  it("describes a mentioned chart with its SQL", () => {
+    const { mentionedBlock } = buildAgentContextBlocks({
+      attached: [],
       mentioned: [
-        {
-          kind: "dashboard_tile",
-          ref: { gadgetType: "dashboard_tile", gadgetId: DASH_ID, subId: "x" },
-          dashboardName: "C",
-          tile: _tile("Late chart", "SELECT 42"),
-        },
+        _tileMention("x", "Weekly", `SELECT * FROM ${ALIASES[0]!.tableName}`),
       ],
       aliases: ALIASES,
     });
-    expect(attachedBlock).toContain("2 more charts not listed.");
-    expect(attachedBlock?.match(/: SELECT 1/g)).toHaveLength(24);
-    expect(mentionedBlock).toContain('Chart "Late chart"');
-    expect(mentionedBlock).not.toContain("SELECT 42");
+    expect(mentionedBlock).toContain(
+      '@"Weekly": Chart "Weekly" on dashboard "C" (bar): SELECT * FROM "t0"',
+    );
   });
 
   it("never redacts SQL that a cap leaves out", () => {
@@ -118,21 +189,11 @@ describe("buildAgentContextBlocks", () => {
         }),
       };
     };
-    const mentioned = Array.from({ length: 6 }, (_, index) => {
-      return {
-        kind: "dashboard_tile",
-        ref: {
-          gadgetType: "dashboard_tile",
-          gadgetId: DASH_ID,
-          subId: `m${index}`,
-        },
-        dashboardName: "C",
-        tile: _tile(`Mention ${index + 1}`, `SELECT ${100 + index}`),
-      } as AgentGadgetContext;
-    });
     buildAgentContextBlocks({
       attached: [dashboard("A", "SELECT A"), dashboard("B", "SELECT B")],
-      mentioned,
+      mentioned: Array.from({ length: 6 }, (_, index) => {
+        return _tileMention(`m${index}`, `M ${index}`, `SELECT ${100 + index}`);
+      }),
       aliases: ALIASES,
       redactSql: (sql) => {
         redacted.push(sql);
@@ -145,38 +206,70 @@ describe("buildAgentContextBlocks", () => {
     expect(redacted).not.toContain("SELECT 105");
   });
 
-  it("describes only the first five mentions", () => {
-    const mentioned = Array.from({ length: 6 }, (_, index) => {
-      return {
-        ...DATASET,
-        ref: {
-          ...DATASET.ref,
-          gadgetId: `4444444${index}-4444-4444-8444-444444444444`,
-        },
-        name: `Set ${index + 1}`,
-      } as AgentGadgetContext;
+  it("describes the first five mentions that are not pointers", () => {
+    const { mentionedBlock } = buildAgentContextBlocks({
+      attached: [DATASET],
+      mentioned: [
+        DATASET,
+        ...Array.from({ length: 5 }, (_, index) => {
+          return _dataset(index, `Set ${index + 1}`);
+        }),
+      ],
+      aliases: ALIASES,
     });
+    expect(mentionedBlock).toContain('@"Set 5": Dataset "Set 5"');
+  });
+
+  it("names a sixth described mention without describing it", () => {
     const { mentionedBlock } = buildAgentContextBlocks({
       attached: [],
-      mentioned,
+      mentioned: Array.from({ length: 6 }, (_, index) => {
+        return _dataset(index, `Set ${index + 1}`);
+      }),
       aliases: ALIASES,
     });
     expect(mentionedBlock).toContain('@"Set 6": mentioned, not described');
   });
 
-  it("points at the page or the tray instead of repeating", () => {
+  it("describes new mentions after four tray pointers", () => {
+    const attached = Array.from({ length: 4 }, (_, index) => {
+      return _dataset(index, `Pinned ${index + 1}`);
+    });
+    const { mentionedBlock } = buildAgentContextBlocks({
+      attached,
+      mentioned: [...attached, _dataset(5, "New 1"), _dataset(6, "New 2")],
+      aliases: ALIASES,
+    });
+    expect(mentionedBlock).toContain('@"New 2": Dataset "New 2"');
+  });
+
+  it("points at the page instead of repeating its dashboard", () => {
     const { mentionedBlock } = buildAgentContextBlocks({
       page: {
         app: "dashboard",
         dashboard: { id: DASH_ID, name: "A", tiles: [] },
       },
-      attached: [DATASET],
-      mentioned: [_dashboard("A", 1), DATASET],
+      attached: [],
+      mentioned: [_dashboard("A", 1)],
       aliases: ALIASES,
     });
-    expect(mentionedBlock).toContain("the dashboard on the current page");
+    expect(mentionedBlock).toBe(
+      [
+        "<mentioned>",
+        "What each @ in the message refers to:",
+        '@"A": Dashboard "A", the dashboard on the current page',
+        "</mentioned>",
+      ].join("\n"),
+    );
+  });
+
+  it("points at the tray instead of repeating an attached gadget", () => {
+    const { mentionedBlock } = buildAgentContextBlocks({
+      attached: [DATASET],
+      mentioned: [DATASET],
+      aliases: ALIASES,
+    });
     expect(mentionedBlock).toContain('@"US deaths": attached above');
-    expect(mentionedBlock).not.toContain("Chart 1");
   });
 
   it("tells the model what it cannot see", () => {
@@ -193,6 +286,90 @@ describe("buildAgentContextBlocks", () => {
     expect(mentionedBlock).toContain(
       '@"an unavailable map": An unavailable map. You cannot see it.',
     );
+  });
+
+  it("lists a map's layers with their sources", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [
+        {
+          kind: "map",
+          ref: { gadgetType: "map", gadgetId: DASH_ID, subId: null },
+          name: "Clinics",
+          layers: [
+            { name: "Sites", sourceName: "Clinic list" },
+            { name: "Areas" },
+          ],
+        },
+      ],
+      mentioned: [],
+      aliases: ALIASES,
+    });
+    expect(attachedBlock).toContain(
+      '1. Map "Clinics", layers: "Sites" from "Clinic list"; "Areas"',
+    );
+  });
+
+  it("masks a map's layer and source names", () => {
+    const vault = _createFakeVault();
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [
+        SPRINGFIELD_DASHBOARD,
+        {
+          kind: "map",
+          ref: { gadgetType: "map", gadgetId: DATASET_ID, subId: null },
+          name: "Clinics",
+          layers: [{ name: "Springfield sites", sourceName: "Springfield" }],
+        },
+      ],
+      mentioned: [],
+      aliases: ALIASES,
+      redactSql: vault.redactSql,
+      maskText: vault.maskText,
+    });
+    expect(attachedBlock).toContain(
+      '2. Map "Clinics", layers: "<value 1> sites" from "<value 1>"',
+    );
+  });
+
+  it("masks a case type's field names", () => {
+    const vault = _createFakeVault();
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [
+        SPRINGFIELD_DASHBOARD,
+        {
+          kind: "concept",
+          ref: { gadgetType: "concept", gadgetId: DATASET_ID, subId: null },
+          name: "Measles case",
+          fieldNames: ["Onset date", "Springfield ward"],
+        },
+      ],
+      mentioned: [],
+      aliases: ALIASES,
+      redactSql: vault.redactSql,
+      maskText: vault.maskText,
+    });
+    expect(attachedBlock).toContain(
+      '2. Case type "Measles case", fields: "Onset date", "<value 1> ward"',
+    );
+  });
+
+  it("lists 40 case type fields and counts the rest", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [
+        {
+          kind: "concept",
+          ref: { gadgetType: "concept", gadgetId: DATASET_ID, subId: null },
+          name: "Measles case",
+          fieldNames: Array.from({ length: 41 }, (_, index) => {
+            return `Field ${index + 1}`;
+          }),
+        },
+      ],
+      mentioned: [],
+      aliases: ALIASES,
+    });
+    expect(attachedBlock).toContain('"Field 40", and 1 more');
+    expect(attachedBlock).not.toContain("Field 41");
   });
 
   it("redacts every SQL before masking any name", () => {
@@ -226,16 +403,7 @@ describe("buildAgentContextBlocks", () => {
   it("masks a value from an attached chart's SQL in a mentioned name", () => {
     const vault = _createFakeVault();
     const { attachedBlock, mentionedBlock } = buildAgentContextBlocks({
-      attached: [
-        {
-          kind: "dashboard",
-          ref: { gadgetType: "dashboard", gadgetId: DASH_ID, subId: null },
-          name: "Clinics",
-          tiles: [
-            _tile("Visits", "SELECT * FROM v WHERE city = 'Springfield'"),
-          ],
-        },
-      ],
+      attached: [SPRINGFIELD_DASHBOARD],
       mentioned: [{ ...DATASET, name: "Springfield clinics" }],
       aliases: ALIASES,
       redactSql: vault.redactSql,
@@ -271,13 +439,13 @@ describe("buildAgentContextBlocks", () => {
     expect(mentionedBlock).not.toContain("Springfield");
   });
 
-  it("hides personal chart titles and masks names", () => {
+  it("hides a chart title that looks personal", () => {
     const { attachedBlock } = buildAgentContextBlocks({
       attached: [
         {
           kind: "dashboard",
           ref: { gadgetType: "dashboard", gadgetId: DASH_ID, subId: null },
-          name: "Visits by Jane Doe",
+          name: "Visits",
           tiles: [_tile("jane@example.org")],
         },
       ],
@@ -286,13 +454,21 @@ describe("buildAgentContextBlocks", () => {
       isSensitive: (text) => {
         return text.includes("@");
       },
+    });
+    expect(attachedBlock).toContain('1. "Untitled chart" (bar)');
+    expect(attachedBlock).not.toContain("jane@example.org");
+  });
+
+  it("masks a dashboard's name", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [_dashboard("Visits by Jane Doe", 0)],
+      mentioned: [],
+      aliases: ALIASES,
       maskText: (text) => {
         return text.replace("Jane Doe", "<value 1>");
       },
     });
     expect(attachedBlock).toContain('Dashboard "Visits by <value 1>"');
-    expect(attachedBlock).toContain('"Untitled chart"');
-    expect(attachedBlock).not.toContain("jane@example.org");
   });
 
   it("escapes a block tag inside a name", () => {
@@ -306,31 +482,39 @@ describe("buildAgentContextBlocks", () => {
 });
 
 describe("buildAgentGadgetModelName", () => {
-  it("hides a personal tile title and masks other names", () => {
-    const options = {
-      isSensitive: (text: string) => {
-        return text.includes("@");
-      },
-      mask: (text: string) => {
-        return text.replace("Jane", "<value 1>");
-      },
-    };
+  const OPTIONS = {
+    isSensitive: (text: string) => {
+      return text.includes("@");
+    },
+    mask: (text: string) => {
+      return text.replace("Jane", "<value 1>").replace("map", "<value 2>");
+    },
+  };
+
+  it("hides a tile title that looks personal", () => {
+    expect(
+      buildAgentGadgetModelName(
+        _tileMention("b", "jane@example.org", "SELECT 1"),
+        OPTIONS,
+      ),
+    ).toBe("Untitled chart");
+  });
+
+  it("masks a gadget's name", () => {
+    expect(
+      buildAgentGadgetModelName({ ...DATASET, name: "Jane" }, OPTIONS),
+    ).toBe("<value 1>");
+  });
+
+  it("never masks an unavailable gadget's fixed name", () => {
     expect(
       buildAgentGadgetModelName(
         {
-          kind: "dashboard_tile",
-          ref: { gadgetType: "dashboard_tile", gadgetId: DASH_ID, subId: "b" },
-          dashboardName: "D",
-          tile: _tile("jane@example.org"),
+          kind: "unavailable",
+          ref: { gadgetType: "map", gadgetId: DASH_ID, subId: null },
         },
-        options,
+        OPTIONS,
       ),
-    ).toBe("Untitled chart");
-    expect(
-      buildAgentGadgetModelName(
-        { ...DATASET, name: "Jane" } as AgentGadgetContext,
-        options,
-      ),
-    ).toBe("<value 1>");
+    ).toBe("an unavailable map");
   });
 });

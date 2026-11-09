@@ -1,5 +1,6 @@
 import {
   getAgentGadgetName,
+  getUnavailableGadgetName,
   MAX_ATTACHED_GADGETS,
   MAX_CASE_TYPE_FIELDS,
   MAX_DESCRIBED_MENTIONS,
@@ -8,6 +9,7 @@ import {
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken.ts";
 import {
   formatBlockSql,
+  formatHiddenChartsLine,
   formatTileLine,
   formatTileTitle,
   inlineBlockText,
@@ -39,7 +41,7 @@ export type AgentContextBlocks = {
 type HideText = (text: string) => string;
 
 /** The inputs of one turn's blocks. */
-type ContextBlockOptions = Readonly<{
+type ContextBlockOptions = {
   page?: AgentPageContext;
   attached: readonly AgentGadgetContext[];
   mentioned: readonly AgentGadgetContext[];
@@ -47,7 +49,7 @@ type ContextBlockOptions = Readonly<{
   isSensitive?: (text: string) => boolean;
   redactSql?: HideText;
   maskText?: HideText;
-}>;
+};
 
 /**
  * A gadget with only the charts a block lists. A chart left out by the
@@ -64,11 +66,11 @@ type PlannedMention =
   | { kind: "pointer"; context: AgentGadgetContext; pointer: MentionPointer };
 
 /** What each block holds before rendering. */
-type PlannedBlocks<Page> = Readonly<{
+type PlannedBlocks<Page> = {
   page?: Page;
   attached: readonly ListedGadget[];
   mentioned: readonly PlannedMention[];
-}>;
+};
 
 type BudgetedItem<Item> = { item: Item; sqlTileCount: number };
 
@@ -127,7 +129,8 @@ function _spendTileBudget<Item, Listed>(
 /**
  * Each mention as a description or a pointer: to the tray when it is
  * attached, to the page when it is the page's dashboard, and "not
- * described" past the first five.
+ * described" once five mentions are described. Pointers to the tray or the
+ * page do not count toward the five.
  */
 function _planMentions(
   mentioned: readonly AgentGadgetContext[],
@@ -139,20 +142,38 @@ function _planMentions(
       return ChatMentionToken.buildRefKey(context.ref);
     }),
   );
-  return mentioned.map((context, index): PlannedMention => {
+  const planned = mentioned.map((context): PlannedMention => {
     if (attachedKeys.has(ChatMentionToken.buildRefKey(context.ref))) {
       return { kind: "pointer", context, pointer: "attached" };
     }
-    if (
-      context.kind === "dashboard" &&
+    return context.kind === "dashboard" &&
       page?.dashboard?.id === context.ref.gadgetId
-    ) {
-      return { kind: "pointer", context, pointer: "page" };
-    }
-    return index < MAX_DESCRIBED_MENTIONS
-      ? { kind: "described", context }
-      : { kind: "pointer", context, pointer: "not_described" };
+      ? { kind: "pointer", context, pointer: "page" }
+      : { kind: "described", context };
   });
+  // Only described mentions spend the cap; the sixth becomes a pointer.
+  return planned.reduce<{ items: PlannedMention[]; describedCount: number }>(
+    (counted, item) => {
+      if (item.kind === "pointer") {
+        return { ...counted, items: [...counted.items, item] };
+      }
+      const isDescribed = counted.describedCount < MAX_DESCRIBED_MENTIONS;
+      return {
+        items: [
+          ...counted.items,
+          isDescribed
+            ? item
+            : {
+                kind: "pointer",
+                context: item.context,
+                pointer: "not_described",
+              },
+        ],
+        describedCount: counted.describedCount + (isDescribed ? 1 : 0),
+      };
+    },
+    { items: [], describedCount: 0 },
+  ).items;
 }
 
 /**
@@ -160,7 +181,7 @@ function _planMentions(
  * and 24 charts with SQL across the attached and described mentions.
  */
 function _planBlocks(
-  options: ContextBlockOptions,
+  options: Readonly<ContextBlockOptions>,
 ): PlannedBlocks<AgentPageContext> {
   const attached = _spendTileBudget(
     options.attached.slice(0, MAX_ATTACHED_GADGETS),
@@ -211,7 +232,7 @@ function _redactGadgetSql(
  * not redacted: their SQL is never shown, so the vault never holds it.
  */
 function _redactBlocks(
-  planned: PlannedBlocks<AgentPageContext>,
+  planned: Readonly<PlannedBlocks<AgentPageContext>>,
   redactSql: HideText | undefined,
 ): PlannedBlocks<RedactedPageContext> {
   return {
@@ -289,11 +310,7 @@ function _dashboardLines(
     ...context.tiles.map((tile, index) => {
       return formatTileLine(tile, index, render);
     }),
-    ...(hiddenCount > 0
-      ? [
-          `${hiddenCount} more ${hiddenCount === 1 ? "chart" : "charts"} not listed.`,
-        ]
-      : []),
+    ...(hiddenCount > 0 ? [formatHiddenChartsLine(hiddenCount)] : []),
   ];
   return [
     `Dashboard ${_quoted(context.name, render)}`,
@@ -343,8 +360,9 @@ function _describe(
 /**
  * How the agent's model hears a gadget's name, in the blocks and in the
  * message's `@"Name"`: a tile title that looks personal becomes "Untitled
- * chart", and every name is masked with the conversation's vault. Call it
- * only after every piece of SQL in the turn is redacted, for example once
+ * chart", an unavailable gadget keeps its fixed type phrase, and every
+ * other name is masked with the conversation's vault. Call it only after
+ * every piece of SQL in the turn is redacted, for example once
  * `buildAgentContextBlocks` has built the turn's blocks.
  */
 export function buildAgentGadgetModelName(
@@ -354,9 +372,16 @@ export function buildAgentGadgetModelName(
     mask: HideText;
   }>,
 ): string {
-  return context.kind === "dashboard_tile"
-    ? formatTileTitle(context.tile.title, { aliases: [], ...options })
-    : options.mask(getAgentGadgetName(context));
+  switch (context.kind) {
+    case "dashboard_tile":
+      return formatTileTitle(context.tile.title, { aliases: [], ...options });
+    case "unavailable":
+      // Fixed model-facing text, never masked, so the `@` name matches the
+      // entry's description.
+      return getUnavailableGadgetName(context.ref);
+    default:
+      return options.mask(getAgentGadgetName(context));
+  }
 }
 
 function _attachedBlock(
@@ -434,14 +459,15 @@ function _withoutUndefined(blocks: AgentContextBlocks): AgentContextBlocks {
  * any name, title, or column is masked with `maskText`, so a value one
  * chart filters on is hidden in every title, wherever that title appears.
  * SQL a cap leaves out is never redacted, so the vault holds only values
- * the model could see. Caps: 5 attached, 5 described mentions, 12 charts
- * per dashboard, and 24 charts with SQL across the attached and mentioned
- * blocks. A mention of the page's dashboard, or of an attached gadget, is
- * one pointer line.
+ * the model could see.
  */
 export function buildAgentContextBlocks(
-  options: ContextBlockOptions,
+  options: Readonly<ContextBlockOptions>,
 ): AgentContextBlocks {
+  // Caps: 5 attached, 5 described mentions, 12 charts per dashboard, and 24
+  // charts with SQL across the attached and described mentions. A mention
+  // of the page's dashboard or of an attached gadget is one pointer line
+  // and does not count toward the 5 described mentions.
   // Every redaction happens here, before anything below masks a name.
   const redacted = _redactBlocks(_planBlocks(options), options.redactSql);
   const render: BlockRenderOptions = {

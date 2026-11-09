@@ -62,7 +62,7 @@ describe("buildAgentTurnText", () => {
     expect(text).toBe(`${ATTACHED_UNCHANGED_BLOCK}\n\nhi`);
   });
 
-  it("says once that the tray was emptied", () => {
+  it("sends the cleared line when the attached block disappears", () => {
     const text = buildAgentTurnText({
       message: "hi",
       previousAttachedBlock: "<attached>A</attached>",

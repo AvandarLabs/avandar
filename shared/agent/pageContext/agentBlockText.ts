@@ -105,6 +105,15 @@ export function formatTileTitle(
 }
 
 /**
+ * The line that counts a dashboard's charts past the listing cap, so the
+ * model knows the list is partial. Shared by the page, attached, and
+ * mentioned blocks.
+ */
+export function formatHiddenChartsLine(count: number): string {
+  return `${count} more ${count === 1 ? "chart" : "charts"} not listed.`;
+}
+
+/**
  * One chart's line: its number, quoted title, chart type, and SQL. A tile
  * whose SQL is empty, or left out by a cap, shows its heading only.
  */

@@ -1,5 +1,6 @@
 import {
   formatBlockSql,
+  formatHiddenChartsLine,
   formatTileLine,
   inlineBlockText,
   quoteBlockText,
@@ -124,11 +125,7 @@ function _dashboardLines(
     ...listed.map((tile, index) => {
       return formatTileLine(tile, index, options);
     }),
-    ...(hiddenCount > 0
-      ? [
-          `${hiddenCount} more ${hiddenCount === 1 ? "chart" : "charts"} not listed.`,
-        ]
-      : []),
+    ...(hiddenCount > 0 ? [formatHiddenChartsLine(hiddenCount)] : []),
   ];
 }
 

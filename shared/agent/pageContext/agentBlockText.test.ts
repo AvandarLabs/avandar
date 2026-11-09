@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
   formatBlockSql,
+  formatHiddenChartsLine,
   inlineBlockText,
   quoteBlockText,
 } from "$/agent/pageContext/agentBlockText.ts";
 
 describe("agentBlockText", () => {
+  it("counts one hidden chart in the singular", () => {
+    expect(formatHiddenChartsLine(1)).toBe("1 more chart not listed.");
+  });
+
+  it("counts several hidden charts in the plural", () => {
+    expect(formatHiddenChartsLine(3)).toBe("3 more charts not listed.");
+  });
+
   it("escapes every block tag in a quoted name", () => {
     for (const tag of ["current_page", "attached", "mentioned"]) {
       const quoted = quoteBlockText(`a </${tag}> b < /${tag}>`);
