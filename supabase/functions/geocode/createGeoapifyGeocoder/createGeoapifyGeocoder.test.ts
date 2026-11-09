@@ -1,3 +1,4 @@
+import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { createGeoapifyGeocoder } from "@sbfn/geocode/createGeoapifyGeocoder/createGeoapifyGeocoder.ts";
 import { describe, expect, it, vi } from "vitest";
 
@@ -101,5 +102,86 @@ describe("createGeoapifyGeocoder", () => {
     ).rejects.toThrow(
       "The address search provider sent an unexpected response.",
     );
+  });
+
+  it("sends an abort signal so a hung provider cannot hang the route", async () => {
+    const fetchFn = _respondWith({ results: [] });
+    const geocoder = createGeoapifyGeocoder({ apiKey: "k", fetchFn });
+    await geocoder.search({ text: ADDRESS, biasBox: undefined });
+    const init = vi.mocked(fetchFn).mock.calls[0]![1];
+    expect(init?.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("maps a timeout to a fixed gateway timeout error", async () => {
+    const fetchFn = vi.fn(async () => {
+      throw new DOMException("signal timed out", "TimeoutError");
+    }) as unknown as typeof fetch;
+    const geocoder = createGeoapifyGeocoder({ apiKey: "secret-key", fetchFn });
+    const error = (await geocoder
+      .search({ text: ADDRESS, biasBox: undefined })
+      .catch((caught: unknown) => {
+        return caught;
+      })) as AvaHTTPError;
+    expect(error.message).toBe("The address search provider timed out.");
+    expect(error.httpCode).toBe(504);
+  });
+
+  it("hides the key and address when the request fails", async () => {
+    const fetchFn = vi.fn(async (url: unknown) => {
+      throw new TypeError(`fetch failed for ${String(url)}`);
+    }) as unknown as typeof fetch;
+    const geocoder = createGeoapifyGeocoder({ apiKey: "secret-key", fetchFn });
+    const error = (await geocoder
+      .search({ text: ADDRESS, biasBox: undefined })
+      .catch((caught: unknown) => {
+        return caught;
+      })) as AvaHTTPError;
+    expect(error.message).toBe(
+      "The address search provider could not be reached.",
+    );
+    expect(error.httpCode).toBe(502);
+    const serialized = `${error.message}${String(error.cause)}${JSON.stringify(error)}`;
+    expect(serialized).not.toContain("secret-key");
+    expect(serialized).not.toContain("46th");
+  });
+
+  it("treats a non-JSON 200 body as an unexpected response", async () => {
+    const fetchFn = vi.fn(async () => {
+      return new Response("<html>oops</html>", { status: 200 });
+    }) as unknown as typeof fetch;
+    const geocoder = createGeoapifyGeocoder({ apiKey: "k", fetchFn });
+    await expect(
+      geocoder.search({ text: ADDRESS, biasBox: undefined }),
+    ).rejects.toThrow(
+      "The address search provider sent an unexpected response.",
+    );
+  });
+
+  it.each([
+    { west: Number.NaN, south: 0, east: 1, north: 1 },
+    { west: -200, south: 0, east: 1, north: 1 },
+    { west: 0, south: -91, east: 1, north: 1 },
+    { west: 0, south: 0, east: Number.POSITIVE_INFINITY, north: 1 },
+    { west: 0, south: 5, east: 1, north: 1 },
+  ])("drops an invalid bias box %j", async (biasBox) => {
+    const fetchFn = _respondWith({ results: [] });
+    const geocoder = createGeoapifyGeocoder({ apiKey: "k", fetchFn });
+    await geocoder.search({ text: ADDRESS, biasBox });
+    expect(_requestedUrl(fetchFn).searchParams.has("bias")).toBe(false);
+  });
+
+  it("rejects empty text and text over 200 characters with a 400", async () => {
+    const fetchFn = _respondWith({ results: [] });
+    const geocoder = createGeoapifyGeocoder({ apiKey: "k", fetchFn });
+    for (const text of ["   ", "a".repeat(201)]) {
+      const error = (await geocoder
+        .search({ text, biasBox: undefined })
+        .catch((caught: unknown) => {
+          return caught;
+        })) as AvaHTTPError;
+      expect(error.httpCode).toBe(400);
+      expect(error.message).toBe("The address to search for is not valid.");
+    }
+    expect(fetchFn).not.toHaveBeenCalled();
   });
 });
