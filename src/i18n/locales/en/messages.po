@@ -2912,10 +2912,6 @@ msgstr "Two statuses have the same name. Give each one its own name."
 msgid "Its features are removed from this workspace."
 msgstr "Its features are removed from this workspace."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-#~ msgid "Reads the query result you run it on"
-#~ msgstr "Reads the query result you run it on"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Last updated"
@@ -11004,12 +11000,6 @@ msgstr "Get started"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
 msgstr "Bottom left"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-#~ msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-#~ "other {Adds # buttons to Data Explorer}}"
-#~ msgstr "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-#~ "other {Adds # buttons to Data Explorer}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"

@@ -328,7 +328,8 @@ msgstr "Selecione {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "A query result's rows, only when you run one of its tools on that result"
-msgstr ""
+msgstr "As linhas do resultado de uma consulta, somente quando você executa uma "
+"de suas ferramentas nesse resultado"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
@@ -2202,7 +2203,7 @@ msgstr "Um conjunto de dados corresponde a uma aba."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
-msgstr ""
+msgstr "Dados que ele pode ler"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -2353,7 +2354,7 @@ msgstr "Inclua os marcadores z, x e y onde o servidor espera o índice do tile."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Data Explorer toolbar: {toolbarCommands}"
-msgstr ""
+msgstr "Barra de ferramentas do Data Explorer: {toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2951,10 +2952,6 @@ msgstr "Dois status têm o mesmo nome. Dê a cada um seu próprio nome."
 msgid "Its features are removed from this workspace."
 msgstr "Os recursos dele foram removidos deste workspace."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-#~ msgid "Reads the query result you run it on"
-#~ msgstr "Lê o resultado da consulta em que ele é executado"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Última atualização"
@@ -3192,7 +3189,7 @@ msgstr "ID do espaço de trabalho"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "What it adds"
-msgstr ""
+msgstr "O que ele adiciona"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -5273,7 +5270,7 @@ msgstr "Resposta de esclarecimento"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Chart types: {chartTypes}"
-msgstr ""
+msgstr "Tipos de gráfico: {chartTypes}"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
@@ -5931,7 +5928,7 @@ msgstr "Incorporar"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Nothing yet."
-msgstr ""
+msgstr "Nada ainda."
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -8998,7 +8995,7 @@ msgstr "{0} áreas não têm dados"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Its charts see only the rows of the chart they draw"
-msgstr ""
+msgstr "Os gráficos dele veem apenas as linhas do gráfico que desenham"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
@@ -9385,7 +9382,7 @@ msgstr "Este {resource} é acessível a qualquer pessoa com permissão {app} {0}
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
-msgstr ""
+msgstr "Ver menos"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
@@ -9526,7 +9523,7 @@ msgstr "Essa aba não está mais nesta planilha. Ela pode ter sido renomeada ou 
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See more"
-msgstr ""
+msgstr "Ver mais"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -11141,12 +11138,6 @@ msgstr "Começar"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
 msgstr "Inferior esquerdo"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-#~ msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-#~ "other {Adds # buttons to Data Explorer}}"
-#~ msgstr "{dataExplorerToolbarItems, plural, one {Adiciona # botão ao Data "
-#~ "Explorer} other {Adiciona # botões ao Data Explorer}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
