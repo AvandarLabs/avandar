@@ -1416,9 +1416,11 @@ rejects the new listing shape, so the catalog would not load.
   left 11,983 listings storing whole packages. Change detection ignores
   `source_metadata`, so a later run does not shrink them: reset HDX on demo
   (`ava pipeline reset hdx --env demo`) before its next full run.
-  Run `95f18055` later filled the demo disk (`53100`). A complete HDX run is
-  about 191k listings, roughly 1.9 GB of database after `8e707d700`, which
-  does not fit a Free project's 2 GB disk. See
+  Run `95f18055` later filled the demo branch's disk (`53100`) at about
+  1.2 GB of database plus WAL. A complete HDX run is about 191k listings,
+  roughly 1.45 GB of database and 2.5 GB of disk with WAL after
+  `8e707d700`, so the `demo-measles` branch needs a disk of at least 4 GB.
+  See
   `docs/measles-demo/etl-disk-footprint.md` for the recovery steps and the
   GeoTIFF trade-off.
 - `hdxTopics`' tag-to-topic table covers HDX's 150-tag vocabulary as of

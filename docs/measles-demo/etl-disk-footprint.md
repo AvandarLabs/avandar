@@ -20,9 +20,30 @@ it as not transient: retrying cannot free space.
 
 ## Where the space goes
 
-Measured on the demo instance through the service role (row counts and
-samples of 1,000 rows). Byte figures are estimates: JSON size per row, with
-TOAST compression approximated by zlib.
+The demo instance is not a standalone project. It is `demo-measles`
+(`zwbvgtefomjjjmosnbjg`), a preview branch of Avandar Staging created on
+2026-11-04, in the Avandar Labs organization, which is on the Pro plan.
+
+Measured read-only on 2026-11-09 at 01:30 UTC, after the failed run:
+
+| What | Size | Notes |
+| --- | --- | --- |
+| `data_catalog_listings` | 1,034 MB | 856 MB TOAST, 110 MB heap, 68 MB indexes. 82,016 rows, 358 dead |
+| `data_catalog_listings__relation_columns` | 131 MB | 655,955 rows, none dead |
+| Everything else in the database | ~15 MB | |
+| Database total | 1,183 MB | |
+| WAL directory | 608 MB | 39 segments. `min_wal_size` is 1 GB, so Postgres keeps up to 1 GB of WAL around for reuse, and `max_wal_size` (4 GB) lets it grow further between checkpoints under heavy writes |
+
+There is no vacuum bloat to reclaim (358 dead rows), no replication slot
+holding WAL, and WAL archiving is keeping up (0 failures, 0 segments
+waiting). The disk holds real listing data plus WAL: about 1.8 GB now, and
+more at the moment of failure, while WAL from the run was still being
+recycled.
+
+Counts and samples of 1,000 rows, read through the service role. Byte
+figures per row are estimates: JSON size, with TOAST compression
+approximated by zlib. They agree with the measured table: 12.6 KB per
+listing measured, 12.5 KB estimated.
 
 | What | Count | Notes |
 | --- | --- | --- |
@@ -30,7 +51,6 @@ TOAST compression approximated by zlib.
 | ...of which `format:other` | ~36,000 | 28,910 of them GeoTIFF rasters |
 | ...workspace-loadable | 36,472 | |
 | Socrata listings | 5,280 | ~6 KB of JSON each |
-| Relation columns | 655,955 | ~150 MB with indexes |
 
 An HDX listing averaged 21 KB of JSON in `source_metadata` alone, 80% of
 the row:
@@ -69,28 +89,25 @@ HDX resources by format, from `package_search` on 2026-11-08:
 
 `format:other` still has about 117,600 resources to write.
 
-Estimated database size after a complete run. A listing's footprint
-includes its heap row, TOAST, and index entries. The "Other" column covers
-relation columns, Socrata, and roughly 0.4 GB of Postgres, Supabase
-schemas, and WAL (an assumption: the actual figure needs the diagnostic
-query below).
+Estimated disk after a complete run. A listing's footprint includes its
+heap row, TOAST, and index entries. "Disk" adds relation columns and
+Socrata (~0.15 GB), the rest of the database (~0.05 GB), and up to 1 GB of
+WAL, which `min_wal_size` keeps around.
 
-| Scenario | HDX listings | Per listing | HDX total | Database total |
-| --- | --- | --- | --- | --- |
-| Keep today's rows, continue incrementally on the code before this change | 76.7k legacy + 114k new | 12.5 KB / 8.0 KB | 1.9 GB | ~2.5 GB |
-| Reset HDX, full run with this change | 191k | 6.5 KB | 1.24 GB | ~1.9 GB |
-| Same, without GeoTIFF | 112k | 6.5 KB | 0.73 GB | ~1.4 GB |
-| Same, CSV and Parquet only | 41k | 6.5 KB | 0.27 GB | ~0.9 GB |
+| Scenario | HDX listings | Per listing | HDX total | Database | Disk with WAL |
+| --- | --- | --- | --- | --- | --- |
+| Keep today's rows, continue incrementally on the code before this change | 76.7k legacy + 114k new | 12.5 KB / 8.0 KB | 1.9 GB | ~2.1 GB | ~3.1 GB |
+| Reset HDX, full run with this change | 191k | 6.5 KB | 1.24 GB | ~1.45 GB | ~2.5 GB |
+| Same, without GeoTIFF | 112k | 6.5 KB | 0.73 GB | ~0.95 GB | ~2.0 GB |
+| Same, CSV and Parquet only | 41k | 6.5 KB | 0.27 GB | ~0.5 GB | ~1.5 GB |
 
-Supabase disk limits:
-
-| Plan | Disk | Behavior when full |
-| --- | --- | --- |
-| Free | 2 GB, fixed | Read-only at 95% (1.9 GB). A full disk shuts Postgres down until the project is upgraded |
-| Pro | 8 GB, grows 50% at 90% used, up to 4 times per 24 h | Read-only at 95% only when growth is exhausted |
-
-A database of roughly 1.5 to 2 GB running out of disk matches the Free
-plan's fixed 2 GB, not Pro's 8 GB. The diagnostic query below confirms it.
+A Pro project starts with an 8 GB disk that grows by 50% when 90% full, so
+1.8 GB should not have filled it. Supabase's docs do not say whether a
+preview branch gets the same disk or autoscaling. The failure at about 2 GB
+used suggests this branch has a smaller disk, or one that does not grow.
+The branch's disk size is under its own Settings → Compute and Disk page,
+and a Pro organization can raise it there (about $0.125 per GB per month,
+then a cooldown of about 4 hours before the next change).
 
 ## What changed
 
@@ -114,40 +131,17 @@ written before them keeps its old `source_metadata` until it is reset.
 
 ## Recovering the demo instance
 
-Run these in the demo project's SQL editor (Dashboard → SQL Editor). They
-delete only HDX rows, all of which were created today and are rebuilt by
-the next run.
+These steps act on the `demo-measles` branch only. Its HDX rows were all
+created on 2026-11-08 and are rebuilt by the next run.
 
-1. Check the disk and what fills it:
+1. Check the branch's disk size: open the `demo-measles` branch in the
+   dashboard (Avandar Staging → Branches → `demo-measles`), then Settings →
+   Compute and Disk. If it is under 4 GB, raise it to at least 4 GB there.
+   A full HDX run needs about 2.5 GB with WAL, and headroom keeps the run
+   clear of the 95% read-only line.
 
-   ```sql
-   select pg_size_pretty(pg_database_size(current_database())) as database_size;
-
-   select
-     c.relname,
-     pg_size_pretty(pg_total_relation_size(c.oid)) as total,
-     pg_size_pretty(pg_relation_size(c.oid)) as heap,
-     pg_size_pretty(pg_total_relation_size(c.reltoastrelid)) as toast,
-     s.n_live_tup,
-     s.n_dead_tup,
-     s.last_autovacuum
-   from pg_class c
-   join pg_stat_user_tables s on s.relid = c.oid
-   order by pg_total_relation_size(c.oid) desc
-   limit 10;
-
-   select
-     slot_name,
-     active,
-     pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) as retained_wal
-   from pg_replication_slots;
-   ```
-
-   The plan and disk size are under Project Settings → Billing and
-   Database → Settings → Disk.
-
-2. Optional backup of the catalog tables, from a terminal with the
-   connection string from Dashboard → Connect (session pooler):
+2. Optional backup of the catalog tables, from a terminal with the branch's
+   connection string (Connect, session pooler):
 
    ```bash
    pg_dump "$DEMO_DATABASE_URL" --data-only --format=custom \
@@ -165,11 +159,11 @@ the next run.
    ```
 
 3. Delete the HDX listings (their relation columns cascade) and
-   checkpoints. The first line is only needed while the project is in
-   read-only mode:
+   checkpoints, in the branch's SQL editor. Add
+   `set session characteristics as transaction read write;` first only if
+   the branch is in read-only mode (it was not on 2026-11-09):
 
    ```sql
-   set session characteristics as transaction read write;
    delete from public.data_catalog_listings where pipeline_name = 'hdx';
    delete from public.pipeline_scope_checkpoints where pipeline_name = 'hdx';
    ```
@@ -189,12 +183,21 @@ the next run.
 
    If it stops partway, `--incremental` continues from the checkpoint.
 
+6. To watch the disk during the run:
+
+   ```sql
+   select
+     pg_size_pretty(pg_database_size(current_database())) as database_size,
+     (select pg_size_pretty(sum(size)) from pg_ls_waldir()) as wal_size;
+   ```
+
 ## Deciding what fits
 
-| Disk | Full HDX after reset (~1.9 GB) | Recommendation |
+| Branch disk | Full HDX after reset (~2.5 GB with WAL) | Recommendation |
 | --- | --- | --- |
-| Pro, 8 GB or more | Fits | Reset and run everything |
-| Free, 2 GB | At the read-only threshold, and a full disk stops Postgres | Upgrade, or leave GeoTIFF out (~1.4 GB) |
+| 4 GB or more | Fits | Reset and run everything |
+| Under 4 GB, and it can be raised | Fits once raised | Raise it (step 1), reset, run everything |
+| Under 4 GB, and it cannot be raised | Does not fit safely | Leave GeoTIFF out (~2.0 GB), or recreate the branch with a larger disk |
 
 Leaving GeoTIFF out drops 78,834 raster files that no workspace can load.
 CSV and every other listed format stay. It is a one-line change: add
@@ -206,5 +209,5 @@ CSV and every other listed format stay. It is a one-line change: add
 | Improvement | Saving | Why not now |
 | --- | --- | --- |
 | Store a package's metadata once, not on each resource listing | Most of the remaining ~4 KB per listing (`description`, `search_vector`, package fields), with 6.4 resources per HDX dataset | Needs a new table and changes to catalog search |
-| Stop a run before the database passes a size limit | Avoids a Free project's Postgres shutdown | Needs an RPC reading `pg_database_size` and a configured limit |
+| Stop a run before the database passes a size limit | Ends a run cleanly instead of on a full disk | Needs an RPC reading `pg_database_size` and a configured limit |
 | Count a change to `source_metadata`'s keys as a change | Lets a trim reach rows a run would not otherwise rewrite | Rewrites every legacy row, which needs free disk first. A reset is cheaper for the demo |
