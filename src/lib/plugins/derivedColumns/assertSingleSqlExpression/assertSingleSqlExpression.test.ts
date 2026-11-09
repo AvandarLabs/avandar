@@ -79,6 +79,10 @@ describe("assertSingleSqlExpression", () => {
       `row_number() OVER (ORDER BY "date")`,
     ],
     ["count of all rows", `count(*)`],
+    [
+      "a row-count window over a date range",
+      `count(*) OVER (PARTITION BY "borough" ORDER BY "date" RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW) / 7.0`,
+    ],
     ["a qualified function the deny-list does not name", `main.abs("a")`],
   ])("accepts %s", (_label, expression) => {
     expect(_getThrownCode(expression)).toBeUndefined();

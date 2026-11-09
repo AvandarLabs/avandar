@@ -7,13 +7,22 @@ import { FeatureAction } from "@/views/GisApp/panels/FeatureInspector/FeatureAct
 import { FeatureFields } from "@/views/GisApp/panels/FeatureInspector/FeatureFields";
 import css from "@/views/GisApp/panels/FeatureInspector/FeatureInspector.module.css";
 import { FeatureInspectorHeader } from "@/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader";
+import { PlaceFeatureActions } from "@/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions";
+import { getPlacesLayerDatasetId } from "@/views/GisApp/places/getPlacesLayerDatasetId/getPlacesLayerDatasetId";
+import { PLACE_ID_COLUMN_NAME } from "@/views/GisApp/places/withPlaceIdColumn/withPlaceIdColumn";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
+import type {
+  PlaceFeatureActionHandlers,
+  PlaceFeatureTarget,
+} from "@/views/GisApp/places/PlaceTool.types";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import type { ReactNode, RefObject } from "react";
 
 const FEATURE_DRAWER_REGION_ID = "gis-feature-drawer-region";
 const FEATURE_DRAWER_TITLE_ID = "gis-feature-drawer-title";
+const NO_PLACES_DATASETS: ReadonlySet<Dataset.Id> = new Set();
 
 type Props = {
   opened: boolean;
@@ -37,7 +46,43 @@ type Props = {
    * open, since the two share the drawer slot under the map.
    */
   onBackToList?: () => void;
+
+  /**
+   * Edit, Move, and Delete for places; omitted where places cannot be
+   * edited.
+   */
+  placeActions?: PlaceFeatureActionHandlers;
 };
+
+/**
+ * The clicked place and the fields it shows. A place's `place_id` only
+ * identifies the row for Edit, Move, and Delete, so it is never shown.
+ */
+function _getPlaceView(
+  options: Readonly<{
+    layer: MapLayer.T | undefined;
+    properties: Record<string, unknown>;
+    placeActions: PlaceFeatureActionHandlers | undefined;
+  }>,
+): {
+  placeTarget: PlaceFeatureTarget | undefined;
+  visibleProperties: Record<string, unknown>;
+} {
+  const { properties } = options;
+  const datasetId = getPlacesLayerDatasetId(
+    options.layer,
+    options.placeActions?.placesDatasetIds ?? NO_PLACES_DATASETS,
+  );
+  if (!datasetId) {
+    return { placeTarget: undefined, visibleProperties: properties };
+  }
+  const { [PLACE_ID_COLUMN_NAME]: placeId, ...visibleProperties } = properties;
+  return {
+    placeTarget:
+      typeof placeId === "string" ? { datasetId, placeId } : undefined,
+    visibleProperties,
+  };
+}
 
 /**
  * Shows a cluster's member features as a table, or one selected feature's
@@ -55,10 +100,16 @@ export function FeatureInspector({
   onRowClick,
   onBackToTable,
   onBackToList,
+  placeActions,
 }: Props): ReactNode {
   const { t } = useLingui();
   const popup = layer?.popup;
   const properties: Record<string, unknown> = feature?.properties ?? {};
+  const { placeTarget, visibleProperties } = _getPlaceView({
+    layer,
+    properties,
+    placeActions,
+  });
   const showTable = cluster !== undefined && feature === undefined;
   const showBackToTable = cluster !== undefined && feature !== undefined;
   const title = showTable
@@ -81,6 +132,14 @@ export function FeatureInspector({
               layer={layer}
               mapRef={mapRef}
               onRowClick={onRowClick}
+              hiddenColumnNames={
+                getPlacesLayerDatasetId(
+                  layer,
+                  placeActions?.placesDatasetIds ?? NO_PLACES_DATASETS,
+                )
+                  ? [PLACE_ID_COLUMN_NAME]
+                  : undefined
+              }
             />
           ) : (
             <Stack className={css.featureInspectorBody} gap="sm">
@@ -106,8 +165,14 @@ export function FeatureInspector({
                   {t`Back to the feature list`}
                 </Button>
               ) : null}
-              <FeatureFields properties={properties} />
+              <FeatureFields properties={visibleProperties} />
               <FeatureAction action={popup?.action} properties={properties} />
+              {placeTarget && placeActions ? (
+                <PlaceFeatureActions
+                  target={placeTarget}
+                  handlers={placeActions}
+                />
+              ) : null}
             </Stack>
           )}
         </div>

@@ -22,6 +22,9 @@ const UPDATED_WITHIN_ORDER: readonly CatalogUpdatedWithin[] = [
 type Props = {
   value: CatalogUpdatedWithin;
   counts: Readonly<CatalogFacets["updatedWithin"]>;
+
+  /** True while the counts beside the windows are being worked out again. */
+  isCountLoading: boolean;
   onChange: (updatedWithin: CatalogUpdatedWithin) => void;
 };
 
@@ -33,6 +36,7 @@ type Props = {
 export function DataCatalogUpdatedWithinSelect({
   value,
   counts,
+  isCountLoading,
   onChange,
 }: Props): ReactNode {
   const { t } = useLingui();
@@ -76,6 +80,7 @@ export function DataCatalogUpdatedWithinSelect({
           <DataCatalogFacetOption
             label={option.label}
             count={counts[option.value]}
+            isCountLoading={isCountLoading}
             search={typedSearch}
             isChecked={checked === true}
           />

@@ -212,7 +212,52 @@ describe("RollingAverageModal", () => {
     expect(screen.getByRole("button", { name: "Add column" })).toBeEnabled();
   });
 
-  it("explains that a numeric and a date column are needed when one is missing", () => {
+  it("counts each row as 1 when the result has a date and no numeric column", async () => {
+    const { addColumns } = _renderModal({
+      columns: [
+        { name: "borough", dataType: "varchar" },
+        { name: "onset", dataType: "date" },
+      ],
+    });
+    expect(screen.getByRole("combobox", { name: "Value column" })).toHaveValue(
+      "",
+    );
+    expect(
+      screen.getByText(/Each row counts as 1, which fits a line list/),
+    ).toBeInTheDocument();
+    _clickAdd();
+    await waitFor(() => {
+      expect(addColumns).toHaveBeenCalledWith([
+        makeRollingAverageColumnFromOptions({
+          valueColumn: undefined,
+          dateColumn: "onset",
+          window: { size: 7, unit: "day" },
+          groupByColumn: undefined,
+        }),
+      ]);
+    });
+  });
+
+  it("counts each row as 1 after the value column is cleared", async () => {
+    const { addColumns } = _renderModal({});
+    fireEvent.click(screen.getByRole("button", { name: "Count each row" }));
+    expect(
+      screen.getByText(/Each row counts as 1, which fits a line list/),
+    ).toBeInTheDocument();
+    _clickAdd();
+    await waitFor(() => {
+      expect(addColumns).toHaveBeenCalledWith([
+        makeRollingAverageColumnFromOptions({
+          valueColumn: undefined,
+          dateColumn: "report_date",
+          window: { size: 7, unit: "day" },
+          groupByColumn: undefined,
+        }),
+      ]);
+    });
+  });
+
+  it("explains that a date column is needed when the result has none", () => {
     _renderModal({
       columns: [
         { name: "borough", dataType: "varchar" },
@@ -220,7 +265,7 @@ describe("RollingAverageModal", () => {
       ],
     });
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "This command needs a numeric column and a date column.",
+      "This command needs a date column.",
     );
     expect(
       screen.queryByRole("button", { name: "Add column" }),

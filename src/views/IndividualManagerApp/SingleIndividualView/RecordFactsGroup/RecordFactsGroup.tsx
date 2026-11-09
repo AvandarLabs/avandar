@@ -13,8 +13,8 @@ function _formatDay(date: string): string {
 }
 
 /**
- * The record's own facts, as a group in the record page's rail: its ID in
- * the source data, and when it was created, last changed, and (only when it
+ * The record's own facts, in the record page's details band: its ID in the
+ * source data, and when it was created, last changed, and (only when it
  * happened) found missing from its source. A fact with no value is omitted.
  * The case type is not repeated here: the header's facts line already states
  * it.

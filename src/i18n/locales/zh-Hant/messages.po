@@ -68,6 +68,10 @@ msgstr "無法複製連結。"
 msgid "First {numRows} rows"
 msgstr "前 {numRows} 列"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove from context"
+msgstr "從上下文中移除"
+
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
@@ -237,6 +241,10 @@ msgstr "右側範圍"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "搜尋資料集..."
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Latitude and longitude"
+msgstr "緯度和經度"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
@@ -515,6 +523,7 @@ msgid "Square"
 msgstr "正方形"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Notes"
 msgstr "備註"
 
@@ -532,6 +541,10 @@ msgstr "幾何圖形"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connected as {0}"
 msgstr "以 {0} 身分連線"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not open the place."
+msgstr "無法開啟地點。"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -578,6 +591,11 @@ msgstr "此案件尚無活動"
 msgid "Members still assigned to this group must be moved first."
 msgstr "仍然分配給此組的成員必須先移動。"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "The place is removed from its dataset, so it disappears from every map "
+"and chart that uses it."
+msgstr "此地點已從其資料集移除，因此會從所有使用它的地圖和圖表中消失。"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar layout"
 msgstr "側邊欄版面配置"
@@ -585,6 +603,10 @@ msgstr "側邊欄版面配置"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "新增狀態"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Search dashboards, datasets, maps..."
+msgstr "搜尋儀表板、資料集、地圖..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -685,7 +707,7 @@ msgstr "已保存為 \"{0}\"。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "These values are fractions, so type a percent such as 95."
-msgstr ""
+msgstr "這些值是分數，因此請輸入百分比，例如 95。"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
@@ -1214,6 +1236,10 @@ msgid "The current SQL contains parts the form could not represent. Continuing "
 "overwrites it with SQL generated from the form."
 msgstr "目前的 SQL 包含表單無法表示的部分。繼續操作會以表單產生的 SQL 覆寫目前內容。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No keywords"
+msgstr "沒有關鍵字"
+
 #. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
@@ -1224,6 +1250,10 @@ msgstr "目前的 SQL 包含表單無法表示的部分。繼續操作會以表�
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Updated {0}"
 msgstr "已更新 {0}"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Attached to this chat"
+msgstr "已附加到此聊天"
 
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
@@ -1240,6 +1270,10 @@ msgstr "Y 軸最小值"
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish publicly"
 msgstr "公開發布"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Choose a column"
+msgstr ""
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -1348,10 +1382,6 @@ msgstr "工作表"
 msgid "Getting {0} from {1}"
 msgstr "正在從 {1} 取得 {0}"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults}+ 個（共 {formattedNumCatalogListings} 個資料集）"
-
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "已發布至工作區"
@@ -1422,6 +1452,10 @@ msgstr ""
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " permission"
 msgstr "權限"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Places are saved in a dataset, so any map, chart, or query can use them."
+msgstr "地點會儲存在資料集中，因此任何地圖、圖表或查詢都能使用這些地點。"
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
@@ -1766,6 +1800,10 @@ msgstr "指派對象未變更"
 msgid "Type your answer…"
 msgstr "輸入您的答案…"
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> add"
+msgstr "<0>Enter</0> 新增"
+
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
 msgstr "密碼重置失敗"
@@ -2022,6 +2060,10 @@ msgstr "值軸 {0} 至 {1}，{scaleLabel}，適合 {2} 個刻度（最大誤差 
 msgid "Password"
 msgstr "密碼"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Exposure sites"
+msgstr "暴露地點"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Show the first 20 rows of {datasetName}"
 msgstr "顯示 {datasetName} 的前 20 行"
@@ -2076,6 +2118,10 @@ msgstr "移除成員"
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Produced {0}"
 msgstr "產製於 {0}"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Exposure ends"
+msgstr "暴露結束時間"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -2132,7 +2178,7 @@ msgstr "記錄會保留先前的狀態。請稍候再試一次。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
@@ -2150,6 +2196,10 @@ msgstr "此圖表的篩選器"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Align"
 msgstr "對齊"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Give the place a name."
+msgstr "為此地點命名。"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
@@ -2395,6 +2445,10 @@ msgstr "間距"
 msgid "Select a data source"
 msgstr "選擇數據來源"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Keep the name under 200 characters."
+msgstr "名稱請勿超過 200 個字元。"
+
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
 msgstr "不透明度"
@@ -2502,6 +2556,10 @@ msgstr "右上"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 msgid "Set up offline mode to chat without an internet connection."
 msgstr "設定離線模式，即可在沒有網際網路連線的情況下聊天。"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place saved. Reload the map to see it."
+msgstr "地點已儲存。重新載入地圖即可查看。"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
@@ -2659,6 +2717,10 @@ msgstr "{pluginId} 外掛在繪製此圖表時發生錯誤。"
 msgid "Body"
 msgstr "內文"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Add a dataset"
+msgstr ""
+
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "{workspaceName} 中其他成員看到的名稱。"
@@ -2744,6 +2806,10 @@ msgstr "從 {column} 返回的值為空。請描述您需要的內容。"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open map"
 msgstr "開啟地圖"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No formats"
+msgstr "沒有格式"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
@@ -2947,6 +3013,10 @@ msgstr "整數"
 msgid "Exact"
 msgstr "確切"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place deleted."
+msgstr "地點已刪除。"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Discard"
 msgstr "捨棄"
@@ -2967,6 +3037,10 @@ msgstr "上次更新"
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "深色或衛星底圖可能不適合影印。"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not save the place."
+msgstr "無法儲存地點。"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is before"
 msgstr "早於"
@@ -2983,6 +3057,11 @@ msgstr "案件"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
 msgstr "角色與權限"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
+msgid "For public places only. The search goes to an outside service, so never "
+"type a person's home address."
+msgstr "僅限公共場所。搜尋會連線至外部服務，因此請勿輸入任何人的住家地址。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall {pluginName}?"
@@ -3022,6 +3101,10 @@ msgstr "選擇已保存的資料集或將新數據匯入您的工作區。"
 msgid "Cannot sync this case type"
 msgstr "無法同步此個案類型"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Recent"
+msgstr "最近"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "回報錯誤"
@@ -3030,6 +3113,10 @@ msgstr "回報錯誤"
 msgid "Pan, zoom and tap a feature to read it. To edit layers, open this map on "
 "a tablet or a laptop."
 msgstr "平移、縮放並點選圖徵以閱讀內容。若要編輯圖層，請在平板電腦或筆記型電腦上開啟此地圖。"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not create the places dataset."
+msgstr "無法建立地點資料集。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Info"
@@ -3145,6 +3232,7 @@ msgstr "{keyboardShortcut} 以保存"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
@@ -3194,6 +3282,10 @@ msgstr "工作區 ID"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "What it adds"
 msgstr "它新增的內容"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "The longitude must be between -180 and 180."
+msgstr "經度必須介於 -180 和 180 之間。"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -3264,7 +3356,7 @@ msgstr "無資料顏色"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Highlight values below"
-msgstr ""
+msgstr "醒目標示低於以下值"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
@@ -3343,6 +3435,7 @@ msgstr "主要"
 msgid "Unable to publish dashboard"
 msgstr "無法發佈儀表板"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
 msgstr "測量"
@@ -3473,6 +3566,7 @@ msgstr "幾何功能正在下載。在網路較慢時可能需要稍等。"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
@@ -3546,6 +3640,10 @@ msgstr "需要幾何資料"
 msgid "Gridline color"
 msgstr "網格線顏色"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Add to map"
+msgstr "新增至地圖"
+
 #: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre、OpenStreetMap 貢獻者"
@@ -3579,6 +3677,14 @@ msgstr "在目錄中找不到「{displayName}」。請再次嘗試新增。"
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "檢閱相符項目"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Dataset {datasetName}"
+msgstr ""
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Choose a dataset"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
@@ -3631,6 +3737,10 @@ msgstr "正在準備「{0}」。大型資料集第一次開啟可能需要幾分
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "使用您的自訂網址。"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Address"
+msgstr "地址"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -4025,6 +4135,10 @@ msgstr "程式碼"
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "本地過濾器（可由查看者編輯，僅此圖表）"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Press Enter to use it."
+msgstr "按 Enter 鍵以使用。"
+
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid X axis selected"
 msgstr "選擇了無效的 X 軸"
@@ -4123,6 +4237,10 @@ msgstr "創建儀表板並儲存"
 msgid "Your data is summarized"
 msgstr "您的資料已摘要"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No topics"
+msgstr "沒有主題"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "內距"
@@ -4146,7 +4264,7 @@ msgstr "主題"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Reverse colors"
-msgstr ""
+msgstr "反轉顏色"
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -4215,6 +4333,10 @@ msgstr "顯示更多"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "澄清 {turnNumber} / 3"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Keep the address under 500 characters."
+msgstr "地址請勿超過 500 個字元。"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix the fields above, then save."
@@ -4303,9 +4425,18 @@ msgstr "恭喜"
 msgid "Capturing dashboard…"
 msgstr "捕捉儀表板中…"
 
+#: src/views/GisApp/places/usePlacesErrorMessage.ts
+msgid "This places dataset was changed outside the map and can no longer be "
+"edited here."
+msgstr "此地點資料集已在地圖外變更，因此無法再於此處編輯。"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the measurements as found"
 msgstr "依原樣保留測量值"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Add a field"
+msgstr ""
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -4384,6 +4515,10 @@ msgstr "關於您的工作區"
 msgid "Some coordinates are 0, 0."
 msgstr "部分座標為 0, 0。"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "The exposure must end after it starts."
+msgstr "暴露結束時間必須晚於開始時間。"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
@@ -4396,6 +4531,11 @@ msgstr "推薦搭配此資料集"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
 msgstr "完整"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchStatus.tsx
+msgid "{resultCount, plural, =0 {No addresses found} one {# address found} "
+"other {# addresses found}}"
+msgstr "{resultCount, plural, =0 {找不到地址} one {找到 # 個地址} other {找到 # 個地址}}"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffers are off for layers set to Displace, since rings would reveal "
@@ -4660,6 +4800,10 @@ msgstr "正在加載數據集..."
 msgid "No fields"
 msgstr "沒有字段"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Places dataset"
+msgstr "地點資料集"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
 msgstr "更新工作區名稱失敗"
@@ -4899,6 +5043,10 @@ msgstr "圖片"
 msgid "Uses no workspace data."
 msgstr "不使用工作區資料。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "No organizations"
+msgstr "沒有組織"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "隱藏 X 軸"
@@ -4918,6 +5066,10 @@ msgstr "新聊天"
 #: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "無法使用的結果"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Create places dataset"
+msgstr "建立地點資料集"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -4969,6 +5121,7 @@ msgstr "已設定大小"
 msgid "Save to dashboard"
 msgstr "儲存到儀表板"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "新增時間"
@@ -5111,6 +5264,10 @@ msgstr "和"
 msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}：此資料集只會存在於這台電腦上，團隊中的其他人都無法開啟。"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "This place was already deleted."
+msgstr "此地點已刪除。"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -5256,6 +5413,10 @@ msgstr "您目前的方案只能分享或發布 {maxAllowed, plural, one {# 個�
 msgid "Region {0}"
 msgstr "區域 {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove {name} from context"
+msgstr "從上下文中移除 {name}"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "繼續進入您的工作區"
@@ -5267,6 +5428,10 @@ msgstr "有值"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
+msgstr "最多可附加 {MAX_ATTACHED_GADGETS} 項。"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -5311,7 +5476,7 @@ msgstr "生成的 SQL"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
 msgid "Class colors"
-msgstr ""
+msgstr "分類顏色"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
@@ -5641,7 +5806,7 @@ msgstr "導入失敗：{reason}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
 msgid "Class {classNumber} label"
-msgstr ""
+msgstr "分類 {classNumber} 標籤"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
@@ -5650,6 +5815,10 @@ msgstr "時間戳格式"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "File size"
 msgstr "檔案大小"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Type a latitude and longitude, like 40.7603, -73.9885."
+msgstr "輸入緯度和經度，例如 40.7603, -73.9885。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Labelled graphic (map, chart, tiles)"
@@ -5878,7 +6047,7 @@ msgstr "彙總"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Below {threshold}"
-msgstr ""
+msgstr "低於 {threshold}"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
@@ -5974,7 +6143,7 @@ msgstr "目前沒有內容。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
 msgid "Class {classNumber}"
-msgstr ""
+msgstr "分類 {classNumber}"
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6107,10 +6276,15 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 "it until you press the button below."
 msgstr "此儀表板仍公開於網路上。任何取得連結的人都能檢視，直到您按下下方按鈕為止。"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Enter each exposure time as a date and a time."
+msgstr "輸入每個暴露時間的日期和時間。"
+
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Filter by status"
 msgstr "依狀態篩選"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
 msgstr "結果"
@@ -6190,6 +6364,10 @@ msgstr "同意"
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Choose a dataset to join"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
 msgstr "編輯用戶群組"
@@ -6257,6 +6435,7 @@ msgid "is none of"
 msgstr "不屬於"
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "That coordinate is out of range."
 msgstr "該座標超出範圍。"
 
@@ -6267,6 +6446,10 @@ msgstr "開啟記錄"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "資料集已添加"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Add context"
+msgstr "新增上下文"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
@@ -6609,7 +6792,7 @@ msgstr "曲線"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "{threshold}% or above"
-msgstr ""
+msgstr "{threshold}% 或以上"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -6720,6 +6903,10 @@ msgstr "案件管理員"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr "內建"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Location: {latitude}, {longitude}"
+msgstr "位置：{latitude}, {longitude}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -6956,7 +7143,7 @@ msgstr "類型"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Below {threshold}%"
-msgstr ""
+msgstr "低於 {threshold}%"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
@@ -7222,7 +7409,7 @@ msgstr "Y 軸刻度顏色"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
 msgid "Class {classNumber} color"
-msgstr ""
+msgstr "分類 {classNumber} 顏色"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -7261,6 +7448,10 @@ msgstr "來自這張表格的列"
 msgid "Dataset name must be at least 2 characters."
 msgstr "資料集名稱必須至少 2 個字元。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "No datasets"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
 msgstr "US Letter"
@@ -7283,7 +7474,7 @@ msgstr "打開側邊欄"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red to blue"
-msgstr ""
+msgstr "紅到藍"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
@@ -7455,6 +7646,10 @@ msgstr "不允許"
 msgid "Member"
 msgstr "成員"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Nothing found"
+msgstr "找不到任何內容"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "更新訂閱"
@@ -7503,6 +7698,10 @@ msgstr "清單項目"
 msgid "Roughness ({0})"
 msgstr "粗糙度 ({0})"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
+msgid "Search an address"
+msgstr "搜尋地址"
+
 #. placeholder {0}: columns.length
 #. placeholder {1}: numRows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
@@ -7531,6 +7730,10 @@ msgstr "確認密碼"
 msgid "Attribution"
 msgstr "署名"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "New places dataset name"
+msgstr "新的地點資料集名稱"
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
 msgstr "列類型已更新"
@@ -7550,6 +7753,10 @@ msgstr "所有人都看不到此留言了。"
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
 msgstr "來源標註（一定包含）"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
+msgid "Address search is not available right now."
+msgstr "地址搜尋目前無法使用。"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Status name"
@@ -7646,6 +7853,7 @@ msgstr "新增欄位後，查詢內容已變更。"
 msgid "Write your paragraph here..."
 msgstr "在此輸入您的段落…"
 
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
 msgstr "發送消息"
@@ -7756,6 +7964,10 @@ msgstr ""
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
 msgstr "資料庫使用者最好對您計畫匯入的資料表或檢視具有唯讀存取權。"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "The latitude must be between -90 and 90."
+msgstr "緯度必須介於 -90 和 90 之間。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
@@ -8094,7 +8306,7 @@ msgstr "視覺化設定"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Threshold"
-msgstr ""
+msgstr "閾值"
 
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
@@ -8360,9 +8572,17 @@ msgstr "行"
 msgid "Its features disappear for every member until you enable it again."
 msgstr "在您再次啟用前，所有成員都無法使用其功能。"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/GeoapifyAttribution.tsx
+msgid "Powered by Geoapify"
+msgstr "由 Geoapify 提供"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "設為僅限離線"
+
+#: src/views/GisApp/places/usePlacesErrorMessage.ts
+msgid "This dataset isn't a places dataset, so places can't be added to it."
+msgstr "此資料集不是地點資料集，因此無法將地點新增至其中。"
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
@@ -8425,7 +8645,7 @@ msgstr "幾何功能不可用"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Custom colors"
-msgstr ""
+msgstr "自訂顏色"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
 msgid "Use a link"
@@ -8558,6 +8778,10 @@ msgid "Only some people can open this dataset. Teammates on this case without "
 "access will see \"Unavailable\"."
 msgstr "只有部分人員可以開啟此資料集。無權限的此案件協作者會看到「無法使用」。"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place deleted. Reload the map to see the change."
+msgstr "地點已刪除。重新載入地圖即可查看變更。"
+
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -8602,6 +8826,11 @@ msgstr "輸入數據集名稱"
 msgid "Select an annotation on the map to edit it."
 msgstr "在地圖上選取註記以進行編輯。"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "Delete this place?"
+msgstr "要刪除此地點嗎？"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "搜尋中…"
@@ -8641,6 +8870,7 @@ msgstr "未保存的更改將不會出現在預覽中。請先保存。"
 msgid "This workspace does not have a valid subscription."
 msgstr "此工作區沒有有效的訂閱。"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Dataset"
@@ -8658,6 +8888,10 @@ msgstr "所有決策"
 #: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
 msgid "series.cases"
 msgstr "series.cases"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
+msgid "Loading count"
+msgstr "正在載入數量"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
@@ -8691,6 +8925,10 @@ msgstr "用戶組已刪除"
 msgid "(Monthly billing)"
 msgstr "（每月計費）"
 
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToAddPlaceButton.tsx
+msgid "Add a place here"
+msgstr "在此處新增地點"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "What to read"
 msgstr "要讀取的內容"
@@ -8705,7 +8943,11 @@ msgstr "還沒有帳戶？"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "{threshold} or above"
-msgstr ""
+msgstr "{threshold} 或以上"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place saved."
+msgstr "地點已儲存。"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -8834,10 +9076,6 @@ msgstr "我們無法更新您的訂閱。請聯絡 {SUPPORT_EMAIL}"
 msgid "First"
 msgstr "第一個"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults} / {formattedNumCatalogListings} 個資料集"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "移除"
@@ -8866,6 +9104,11 @@ msgstr "正在載入作者"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable {pluginName}?"
 msgstr "停用 {pluginName}？"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "詢問有關您資料的問題。輸入 @ 指向儀表板、資料集或地圖。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -9056,6 +9299,10 @@ msgstr "{0} 個區域沒有資料"
 msgid "Its charts see only the rows of the chart they draw"
 msgstr "其圖表只能查看所繪製圖表中的資料列"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/OpenStreetMapAttribution.tsx
+msgid "© OpenStreetMap contributors"
+msgstr "© OpenStreetMap 貢獻者"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "必填"
@@ -9213,6 +9460,10 @@ msgstr "替代文字"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Please try again in a moment."
 msgstr "請稍後再試一次。"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not delete the place."
+msgstr "無法刪除地點。"
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -9438,6 +9689,11 @@ msgstr "部分資料列的緯度或經度為空。"
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "此 {resource} 對擁有 {app} {0} 權限的任何人可訪問。"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool.tsx
+msgid "Edit place"
+msgstr "編輯地點"
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
 msgstr "顯示較少"
@@ -9462,6 +9718,10 @@ msgstr "儲存"
 msgid "Hide the tutorial"
 msgstr "隱藏教學"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "Move place"
+msgstr "移動地點"
+
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
 msgid "{rowCount, plural, one {Built from the first row of the result.} other "
 "{Built from the first # rows of the result.}}"
@@ -9477,6 +9737,7 @@ msgid "Dataset columns"
 msgstr "數據集欄位"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
 msgstr "詳細資料"
 
@@ -9599,6 +9860,10 @@ msgstr "再試一次。"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "contains"
 msgstr "包含"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Keep the notes under 2,000 characters."
+msgstr "備註不得超過 2,000 個字元。"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
@@ -9857,6 +10122,10 @@ msgstr "{droppedRowCount} 筆資料列未對應"
 msgid "Edit role group"
 msgstr "編輯角色群組"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "A places dataset holds at most {maxPlaces} places."
+msgstr "地點資料集最多可容納 {maxPlaces} 個地點。"
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "個人資料"
@@ -10086,6 +10355,10 @@ msgid "Avandar is still in beta. Some features may not work as expected and "
 "feedback as we work to improve the product."
 msgstr "Avandar 仍在測試階段。某些功能可能無法按預期工作，某些功能可能仍在建設中。我們感謝您的耐心和反饋，幫助我們改進產品。"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Exposure starts"
+msgstr "曝光開始時間"
+
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "感謝您的關注！"
@@ -10262,6 +10535,10 @@ msgid "{0, plural, one {# saved database available} other {# saved databases "
 "available}}"
 msgstr "{0, plural, one {# 個已儲存的資料庫可用} other {# 個已儲存的資料庫可用}}"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Add a field from {datasetName}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "分級"
@@ -10434,6 +10711,10 @@ msgstr "分箱至網格"
 msgid "Handling"
 msgstr "處理方式"
 
+#: src/components/ChatPanel/ChatThread/Composer/useChatComposerEditor.ts
+msgid "Message"
+msgstr "訊息"
+
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
@@ -10515,6 +10796,10 @@ msgstr "此查詢將某種值視為另一種值，例如將文字視為數字或
 msgid "In your workspace"
 msgstr "在您的工作區中"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "On this page"
+msgstr "此頁面上"
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10537,6 +10822,7 @@ msgstr "細微"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
 msgstr "活動"
 
@@ -10673,6 +10959,10 @@ msgstr "支援"
 msgid "+ Condition"
 msgstr "+ 條件"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Click the map"
+msgstr "點擊地圖"
+
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "No maps yet"
 msgstr "尚無地圖"
@@ -10756,6 +11046,10 @@ msgstr "撰寫更新內容"
 msgid "Could not create that case type"
 msgstr "無法建立該案件類型"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No publishers"
+msgstr "沒有發布者"
+
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
 msgstr "測試版"
@@ -10804,6 +11098,10 @@ msgstr "案件類型已刪除"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Search failed. Try again."
+msgstr "搜尋失敗。請再試一次。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
@@ -11097,6 +11395,10 @@ msgstr "符合模式（舊版）"
 msgid "Max width"
 msgstr "最大寬度"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Change location"
+msgstr "變更位置"
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
 msgstr "不離線"
@@ -11173,6 +11475,10 @@ msgstr "無效的日期"
 msgid "Get started"
 msgstr "開始使用"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "Delete place"
+msgstr "刪除地點"
+
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
@@ -11224,6 +11530,10 @@ msgstr "因為您尚未訂閱，無法載入帳務入口網站。"
 msgid "Dataset saved, but its original file failed to upload"
 msgstr "資料集已儲存，但原始檔案上傳失敗"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "This place no longer exists. Someone may have deleted it."
+msgstr "此地點已不存在。可能已由其他人刪除。"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
 msgid "Add a tile service"
@@ -11240,6 +11550,11 @@ msgstr "+{0} 個值與 {1} 行相關聯"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "最常見的值是 <0>{0}</0>，出現在 <1>{1}</1> 的資料列中。"
+
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
+msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
+"assistant."
+msgstr "只有前 {MAX_DESCRIBED_MENTIONS} 個提及會描述給助理。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"
@@ -11311,6 +11626,10 @@ msgstr "升級計劃至 {newPlanName} ({newPlanSubType})"
 msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "表單不支援類型為「{exprType}」的 SELECT 運算式。"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool.tsx
+msgid "Add a place"
+msgstr "新增地點"
+
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
 msgstr "繪製註記區域"
@@ -11359,6 +11678,10 @@ msgstr "已準備離線"
 msgid "Unavailable case type"
 msgstr "無法使用的案件類型"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Save place"
+msgstr "儲存地點"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
 msgid "Reactions"
 msgstr "回應"
@@ -11390,6 +11713,10 @@ msgstr "過去一年"
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Week"
 msgstr "週"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Place name"
+msgstr "地點名稱"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "The record keeps its previous assignee. Try again in a moment."

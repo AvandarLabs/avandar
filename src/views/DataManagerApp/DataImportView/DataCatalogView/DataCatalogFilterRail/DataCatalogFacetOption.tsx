@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { CheckIcon } from "@mantine/core";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.module.css";
 import {
@@ -11,6 +12,9 @@ type Props = {
 
   /** How many datasets choosing this option would leave. */
   count: number | undefined;
+
+  /** True while that number is being worked out again. */
+  isCountLoading: boolean;
 
   /** What the user has typed, whose matched characters are highlighted. */
   search: string;
@@ -27,9 +31,11 @@ type Props = {
 export function DataCatalogFacetOption({
   label,
   count,
+  isCountLoading,
   search,
   isChecked,
 }: Props): ReactNode {
+  const { t } = useLingui();
   const matchedRanges = findTokenSearchMatch(label, search)?.matchedRanges;
 
   return (
@@ -59,7 +65,14 @@ export function DataCatalogFacetOption({
           },
         )}
       </span>
-      {count === undefined ? null : (
+      {isCountLoading ? (
+        <span
+          className={css.dataCatalogFilterRailCountLoading}
+          data-testid="facet-option-count-loading"
+          role="status"
+          aria-label={t`Loading count`}
+        />
+      ) : count === undefined ? null : (
         <span className={css.dataCatalogFilterRailOptionCount}>{count}</span>
       )}
     </span>

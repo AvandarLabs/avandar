@@ -1,9 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { GraduatedRamps } from "@/views/GisApp/layers/GraduatedRamps/GraduatedRamps";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { withQueryColumn } from "@/views/GisApp/layers/MapLayerUpdates/withQueryColumn";
+import { getNumericLayerColumns } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/getNumericLayerColumns";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
@@ -14,8 +16,18 @@ type Props = {
 };
 
 type ColorMode = "single" | "categorical" | "graduated";
+type ClassifiedColor = Exclude<MapLayer.Color, { type: "single" }>;
+type CreatedColor = {
+  color: MapLayer.Color;
+  column: QueryColumn.T | undefined;
+};
 
-function _getDefaultValue(layer: MapLayer.T): MapLayer.LayerValue | undefined {
+function _getDefaultValue(layer: MapLayer.T):
+  | {
+      value: MapLayer.LayerValue;
+      column: QueryColumn.T | undefined;
+    }
+  | undefined {
   const binding = layer.geoBinding;
   if (
     binding?.type === "joinToBoundaries" ||
@@ -23,18 +35,65 @@ function _getDefaultValue(layer: MapLayer.T): MapLayer.LayerValue | undefined {
     binding?.type === "binPointsToGrid"
   ) {
     return {
-      type: "areaAggregation",
-      outputValueId: binding.aggregation.outputValueId,
+      value: {
+        type: "areaAggregation",
+        outputValueId: binding.aggregation.outputValueId,
+      },
+      column: undefined,
     };
   }
-  const column = layer.source.queryColumns.find(QueryColumn.isNumeric);
-  return column ? { type: "queryColumn", column: column.id } : undefined;
+  const column = getNumericLayerColumns(layer)[0];
+  return column
+    ? { value: { type: "queryColumn", column: column.id }, column }
+    : undefined;
+}
+
+function _makeGraduatedColor(
+  value: MapLayer.LayerValue,
+  column: QueryColumn.T | undefined,
+  noData: ClassifiedColor["noData"],
+): CreatedColor {
+  return {
+    column,
+    color: {
+      type: "graduated",
+      value,
+      ramp: GraduatedRamps.presets.blue,
+      classification: { method: "quantile", classCount: 5 },
+      normalization: undefined,
+      noData,
+      classLabels: Array.from({ length: 5 }, () => {
+        return undefined;
+      }),
+    },
+  };
+}
+
+function _makeCategoricalColor(
+  value: MapLayer.LayerValue,
+  column: QueryColumn.T | undefined,
+  noData: ClassifiedColor["noData"],
+): CreatedColor {
+  return {
+    column,
+    color: {
+      type: "categorical",
+      value,
+      categories: [
+        { value: "", label: "", color: "#2171b5" },
+        { value: "", label: "", color: "#f16913" },
+        { value: "", label: "", color: "#31a354" },
+      ],
+      other: { color: "#969696", label: "" },
+      noData,
+    },
+  };
 }
 
 function _createColor(
   layer: MapLayer.T,
   mode: ColorMode,
-): MapLayer.Color | undefined {
+): CreatedColor | undefined {
   if (layer.symbology.type === "heatmap") {
     return undefined;
   }
@@ -46,9 +105,13 @@ function _createColor(
         : current.type === "graduated"
           ? current.ramp[0]
           : current.categories[0]?.color;
-    return { type: "single", color: color ?? "#228be6" };
+    return {
+      color: { type: "single", color: color ?? "#228be6" },
+      column: undefined,
+    };
   }
-  const value = current.type === mode ? current.value : _getDefaultValue(layer);
+  const defaults = current.type === mode ? undefined : _getDefaultValue(layer);
+  const value = current.type === mode ? current.value : defaults?.value;
   if (!value) {
     return undefined;
   }
@@ -56,30 +119,9 @@ function _createColor(
     current.type === "single"
       ? { color: "#ced4da", label: "" }
       : current.noData;
-  if (mode === "graduated") {
-    return {
-      type: "graduated",
-      value,
-      ramp: GraduatedRamps.presets.blue,
-      classification: { method: "quantile", classCount: 5 },
-      normalization: undefined,
-      noData,
-      classLabels: Array.from({ length: 5 }, () => {
-        return undefined;
-      }),
-    };
-  }
-  return {
-    type: "categorical",
-    value,
-    categories: [
-      { value: "", label: "", color: "#2171b5" },
-      { value: "", label: "", color: "#f16913" },
-      { value: "", label: "", color: "#31a354" },
-    ],
-    other: { color: "#969696", label: "" },
-    noData,
-  };
+  return mode === "graduated"
+    ? _makeGraduatedColor(value, defaults?.column, noData)
+    : _makeCategoricalColor(value, defaults?.column, noData);
 }
 
 function _isColorMode(value: string | null): value is ColorMode {
@@ -110,9 +152,12 @@ export function ClassificationColorModeSelect({
         const nextColor = _createColor(layer, mode);
         if (nextColor) {
           onLayerChange((current) => {
+            const withColumn = nextColor.column
+              ? withQueryColumn({ layer: current, column: nextColor.column })
+              : current;
             return MapLayerUpdates.withLayerColor({
-              layer: current,
-              color: nextColor,
+              layer: withColumn,
+              color: nextColor.color,
             });
           });
         }

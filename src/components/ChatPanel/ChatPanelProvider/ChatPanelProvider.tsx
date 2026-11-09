@@ -42,6 +42,7 @@ export function ChatPanelProvider({
         caseDesignSessionNonce: 0,
         pendingClarification: undefined,
         pendingCaseTypeDraft: undefined,
+        contextTray: [],
       }}
     >
       <ChatPanelContents>{children}</ChatPanelContents>

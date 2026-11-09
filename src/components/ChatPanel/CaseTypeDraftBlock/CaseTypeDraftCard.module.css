@@ -39,6 +39,11 @@
   white-space: nowrap;
 }
 
+.datasetSelect {
+  flex: 1;
+  min-width: 0;
+}
+
 .draftCardActions {
   background-color: var(--mantine-color-blue-0);
   bottom: 0;

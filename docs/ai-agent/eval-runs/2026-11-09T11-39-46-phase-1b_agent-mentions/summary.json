@@ -1,0 +1,17 @@
+{
+  "label": "phase-1b:agent-mentions",
+  "questionCount": 7,
+  "passCount": 7,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 7,
+  "promptTokens": 24923,
+  "cachedPromptTokens": 13302,
+  "completionTokens": 1929,
+  "totalCost": 0.002549445,
+  "costPerQuestion": 0.00036420642857142857,
+  "latencyMedianMs": 2171.356791,
+  "latencyP90Ms": 2429.3808339999996,
+  "failedIds": []
+}

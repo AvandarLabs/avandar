@@ -2,10 +2,11 @@ import type { RollingWindow } from "../makeRollingAverageColumnFromOptions/makeR
 
 /**
  * The rolling average form's column pickers as the user left them.
+ * `valueColumn` is undefined when none is chosen, so each row counts as 1.
  * `groupByColumn` is undefined when no group-by column is chosen.
  */
 export type RollingAverageColumnsInput = {
-  valueColumn: string;
+  valueColumn: string | undefined;
   dateColumn: string;
   groupByColumn: string | undefined;
 };

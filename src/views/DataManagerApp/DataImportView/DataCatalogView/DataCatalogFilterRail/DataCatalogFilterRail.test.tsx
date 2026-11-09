@@ -37,6 +37,7 @@ function _renderRail(options: {
   filters?: Partial<CatalogListingFilters>;
   facets?: CatalogFacets;
   keywordOptions?: CatalogFacets["tags"];
+  isCountLoading?: boolean;
   onFiltersChange?: (filters: CatalogListingFilters) => void;
   onKeywordSearchChange?: (keywordSearch: string) => void;
 }): ReturnType<typeof render> {
@@ -46,6 +47,8 @@ function _renderRail(options: {
       filters={{ ...EMPTY_CATALOG_LISTING_FILTERS, ...options.filters }}
       facets={facets}
       keywordOptions={options.keywordOptions ?? facets.tags}
+      isCountLoading={options.isCountLoading ?? false}
+      isKeywordCountLoading={false}
       onFiltersChange={options.onFiltersChange ?? vi.fn()}
       onKeywordSearchChange={options.onKeywordSearchChange ?? vi.fn()}
     />,
@@ -96,15 +99,15 @@ describe("DataCatalogFilterRail", () => {
     ).toBeInTheDocument();
   });
 
-  it("hides the second level when a chosen publisher has no second level", () => {
+  it("keeps the second level when a chosen publisher has no organizations", () => {
     _renderRail({
       filters: { sources: ["City of New York"] },
       facets: { ...FACETS_WITH_AGENCIES, organization2: [] },
     });
 
     expect(
-      screen.queryByRole("combobox", { name: "Agency or Department" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("combobox", { name: "Agency or Department" }),
+    ).toHaveProperty("placeholder", "No organizations");
   });
 
   it("names the second level Organization when the drives have no label", () => {
@@ -118,12 +121,33 @@ describe("DataCatalogFilterRail", () => {
     ).toBeInTheDocument();
   });
 
-  it("hides Topic when it has no options", () => {
+  it("keeps Topic when it has nothing to offer and says so", () => {
     _renderRail({});
 
+    expect(screen.getByRole("combobox", { name: "Topic" })).toHaveProperty(
+      "placeholder",
+      "No topics",
+    );
+  });
+
+  it("keeps Keywords when none are offered and says so", () => {
+    _renderRail({ keywordOptions: [] });
+
+    expect(screen.getByRole("combobox", { name: "Keywords" })).toHaveProperty(
+      "placeholder",
+      "No keywords",
+    );
+  });
+
+  it("shimmers a count while new counts load instead of showing the stale number", async () => {
+    _renderRail({ isCountLoading: true });
+
+    const options = await _searchFacet("Publisher", "state");
+
+    expect(options[0]).not.toHaveTextContent("9");
     expect(
-      screen.queryByRole("combobox", { name: "Topic" }),
-    ).not.toBeInTheDocument();
+      within(options[0]!).getByTestId("facet-option-count-loading"),
+    ).toBeInTheDocument();
   });
 
   it("shows Topic when it has options", () => {
@@ -285,6 +309,8 @@ describe("DataCatalogFilterRail", () => {
         filters={EMPTY_CATALOG_LISTING_FILTERS}
         facets={FACETS_WITH_KEYWORDS}
         keywordOptions={[]}
+        isCountLoading={false}
+        isKeywordCountLoading={false}
         onFiltersChange={vi.fn()}
         onKeywordSearchChange={vi.fn()}
       />,

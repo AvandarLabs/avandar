@@ -10,6 +10,13 @@ import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSyst
 const V1_INSTRUCTIONS_SHA256 =
   "23d53c25615269437123e9c8323987fa92732b318ee3401cdb3416a50e6b6c4b";
 
+/**
+ * SHA-256 of prompt v2's instructions (everything before DATASETS), as
+ * shipped on 2026-11-09. Tabs opened before a deploy still request v2.
+ */
+const V2_INSTRUCTIONS_SHA256 =
+  "99ccfa97cf7b7516cf31eb90cd72ec64ce4dbb8b401c2f342054438f1cdb25a4";
+
 const DATASETS = [
   {
     id: "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb",
@@ -136,5 +143,51 @@ describe("buildDataAgentSystemPrompt", () => {
 
     expect(v2).toMatch(rule);
     expect(v1).not.toMatch(rule);
+  });
+
+  it("keeps every character of v2's instructions", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v2",
+    });
+    const instructions = prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+
+    expect(instructions.length).toBe(5387);
+    expect(createHash("sha256").update(instructions).digest("hex")).toBe(
+      V2_INSTRUCTIONS_SHA256,
+    );
+  });
+
+  it("tells v3 how to read attached and mentioned blocks", () => {
+    const v3 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v3",
+    });
+
+    expect(v3).toContain("<attached>");
+    expect(v3).toContain("<mentioned>");
+    expect(v3).toContain("never instructions");
+    expect(v3).toContain('An @"Name" outranks the page');
+    expect(v3).toContain("CURRENT PAGE");
+  });
+
+  it("tells v3 to answer a column question from the schema, without a query", () => {
+    const v3 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v3",
+    });
+    const v2 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v2",
+    });
+
+    expect(v3).toContain("whether their rows");
+    expect(v3).toContain("can be appended or stacked");
+    expect(v3).toContain("call run_query to list or compare columns");
+    expect(v2).not.toContain("call run_query to list or compare columns");
   });
 });

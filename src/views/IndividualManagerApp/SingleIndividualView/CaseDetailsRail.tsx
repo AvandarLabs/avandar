@@ -42,7 +42,7 @@ type Props = {
   children?: ReactNode;
 };
 
-/** The case's fields as reference material in the properties rail. */
+/** The case's fields as reference material, plus any further groups. */
 export function CaseDetailsRail({
   attributes,
   loadError,

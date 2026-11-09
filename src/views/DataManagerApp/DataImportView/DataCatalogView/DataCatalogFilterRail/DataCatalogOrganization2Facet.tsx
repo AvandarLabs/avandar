@@ -11,6 +11,9 @@ type Props = {
   labels: readonly string[];
   options: readonly CatalogFacetOption[];
   chosenValues: readonly string[];
+
+  /** True while the counts beside the options are being worked out again. */
+  isCountLoading: boolean;
   onChange: (chosenValues: string[]) => void;
 };
 
@@ -25,6 +28,7 @@ export function DataCatalogOrganization2Facet({
   labels,
   options,
   chosenValues,
+  isCountLoading,
   onChange,
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
@@ -44,6 +48,8 @@ export function DataCatalogOrganization2Facet({
       placeholder={t`All organizations`}
       options={options}
       chosenValues={chosenValues}
+      emptyPlaceholder={t`No organizations`}
+      isCountLoading={isCountLoading}
       onChange={onChange}
     />
   );

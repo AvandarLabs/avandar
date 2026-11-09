@@ -6,6 +6,8 @@ import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useRef } from "react";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { ChatContextTray } from "@/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray";
+import { ChatComposerEditor } from "@/components/ChatPanel/ChatThread/Composer/ChatComposerEditor";
 import { OfflineModeControl } from "@/components/ChatPanel/OfflineModeControl/OfflineModeControl";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
@@ -55,21 +57,25 @@ function _getPlaceholderKind(
  * The message input at the bottom of the thread: a text input, the offline
  * mode control, and the send button. Input and actions are disabled where chat
  * is not available: the case designer, and with the data agent off, every
- * page other than Data Explorer and Dashboards.
+ * page other than Data Explorer and Dashboards. With the data agent on and
+ * chat available, the input is the rich text editor that takes `@`
+ * mentions, below the tray of gadgets attached to the chat; otherwise it is
+ * a plain textarea.
  */
 export function Composer(): React.ReactNode {
   const { isOpen } = ChatPanelStateManager.useState();
   const panelRef = useRef<HTMLDivElement>(null);
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
-  useChatPanelComposerAutoFocus({
-    isOpen,
-    panelRef,
-    composerInputRef,
-  });
-
+  const editorInputRef = useRef<HTMLElement | null>(null);
   const context = useChatPageContext();
   const { t } = useLingui();
   const chatDisabled = !_isComposerEnabled(context.app);
+  const isAgentComposer = DataAgentFeature.isEnabled() && !chatDisabled;
+  useChatPanelComposerAutoFocus({
+    isOpen,
+    panelRef,
+    composerInputRef: isAgentComposer ? editorInputRef : composerInputRef,
+  });
 
   const placeholder = matchLiteral(_getPlaceholderKind(context), {
     dashboard: t`Ask me to add a chart to this dashboard...`,
@@ -83,36 +89,49 @@ export function Composer(): React.ReactNode {
       className={css.composerContainer}
       {...NuxAnchors.props(NuxAnchors.ids.chatComposer)}
     >
-      <ComposerPrimitive.Root
-        className={clsx(css.composer, chatDisabled && css.composerDisabled)}
-      >
-        <ComposerPrimitive.Input
-          ref={composerInputRef}
-          className={css.composerInput}
-          placeholder={placeholder}
-          rows={1}
-          autoFocus={false}
-          disabled={chatDisabled}
-          unstable_focusOnRunStart={false}
-          unstable_focusOnScrollToBottom={false}
-          unstable_focusOnThreadSwitched={false}
-        />
-        <div className={css.composerActions}>
-          <OfflineModeControl disabled={chatDisabled} />
-          <ComposerPrimitive.Send asChild>
-            <ActionIcon
-              variant="filled"
-              color="primary"
-              size="md"
-              aria-label={t`Send message`}
-              disabled={chatDisabled}
-              className={css.composerSend}
-            >
-              <IconArrowUp size={16} stroke={2.25} />
-            </ActionIcon>
-          </ComposerPrimitive.Send>
+      {isAgentComposer ? (
+        <div className={css.composer}>
+          <ChatContextTray />
+          <ChatComposerEditor
+            placeholder={placeholder}
+            // This branch only renders where chat is available.
+            disabled={false}
+            inputRef={editorInputRef}
+            actions={<OfflineModeControl disabled={false} />}
+          />
         </div>
-      </ComposerPrimitive.Root>
+      ) : (
+        <ComposerPrimitive.Root
+          className={clsx(css.composer, chatDisabled && css.composerDisabled)}
+        >
+          <ComposerPrimitive.Input
+            ref={composerInputRef}
+            className={css.composerInput}
+            placeholder={placeholder}
+            rows={1}
+            autoFocus={false}
+            disabled={chatDisabled}
+            unstable_focusOnRunStart={false}
+            unstable_focusOnScrollToBottom={false}
+            unstable_focusOnThreadSwitched={false}
+          />
+          <div className={css.composerActions}>
+            <OfflineModeControl disabled={chatDisabled} />
+            <ComposerPrimitive.Send asChild>
+              <ActionIcon
+                variant="filled"
+                color="primary"
+                size="md"
+                aria-label={t`Send message`}
+                disabled={chatDisabled}
+                className={css.composerSend}
+              >
+                <IconArrowUp size={16} stroke={2.25} />
+              </ActionIcon>
+            </ComposerPrimitive.Send>
+          </div>
+        </ComposerPrimitive.Root>
+      )}
     </div>
   );
 }

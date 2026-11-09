@@ -72,3 +72,45 @@
 .composerSend {
   flex-shrink: 0;
 }
+
+.composerEditorFrame {
+  width: 100%;
+}
+
+/*
+ * The data agent's editing area: the textarea's type, padding, and height
+ * cap, with the placeholder drawn while the one paragraph is empty.
+ */
+.composerEditor {
+  caret-color: var(--mantine-color-primary-6);
+  color: var(--mantine-color-neutral-9);
+  font-family: inherit;
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.5;
+  max-height: 160px;
+  min-height: calc(var(--mantine-font-size-sm) * 1.5);
+  outline: none;
+  overflow-y: auto;
+  padding: 2px var(--mantine-spacing-xxs);
+  width: 100%;
+}
+
+.composerEditor p {
+  margin: 0;
+}
+
+.composerEditor > p[data-placeholder]:only-child::before {
+  color: var(--mantine-color-neutral-5);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.composerEditor[contenteditable="false"] {
+  cursor: default;
+}
+
+.composerNote {
+  padding: 0 var(--mantine-spacing-xxs);
+}

@@ -7,6 +7,7 @@ import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayer
 import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
 import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+import { useMapConfigWithPlaceIds } from "@/views/GisApp/places/useMapConfigWithPlaceIds";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -56,10 +57,15 @@ export function useGisAppRendering(
     // Capture latitude only when a new integer zoom band begins.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomBand]);
-  const savedLayers = options.editor.mapConfig.layers;
+  const renderedMapConfig = useMapConfigWithPlaceIds({
+    mapConfig: options.editor.mapConfig,
+    workspaceId: options.avaMap.workspaceId,
+    datasetColumns,
+  });
+  const renderedLayers = renderedMapConfig.layers;
   const queryLayers = useMemo(() => {
-    return getQueryLayersFromMapLayers(savedLayers);
-  }, [savedLayers]);
+    return getQueryLayersFromMapLayers(renderedLayers);
+  }, [renderedLayers]);
   const layerQueryStates = useMapLayersData({
     layers: queryLayers,
     workspaceId: options.avaMap.workspaceId,
@@ -74,7 +80,7 @@ export function useGisAppRendering(
   });
   const rendering = useAvaMapRender({
     layerQueryStates,
-    mapConfig: options.editor.mapConfig,
+    mapConfig: renderedMapConfig,
     hiddenAnnotationFeatureIds: options.hiddenAnnotationFeatureIds,
   });
   PersistedLayerLegends.usePersistedLayerLegends({

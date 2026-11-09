@@ -12,6 +12,7 @@ import { useChatSuggestions } from "@/components/ChatPanel/ChatEmptyState/useCha
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { DataAgentFeature } from "@/lib/agent/dataAgent/browser/DataAgentFeature";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import css from "./ChatEmptyState.module.css";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
@@ -34,7 +35,9 @@ function usePageLabel(app: ChatPageContext.ChatApp): string {
  * Empty-state shown above the composer when the thread has no messages yet.
  * Sits at the foot of the thread, next to the composer where the eye already
  * is, and shows the current page context as a chip and, for Data Explorer,
- * three starter prompts the user can click to send.
+ * three starter prompts the user can click to send. On a page without its own
+ * copy, it says chat works only in Data Explorer and Dashboards, unless the
+ * data agent is on, where chat works there too.
  */
 export function ChatEmptyState(): React.ReactNode {
   const context = useChatPageContext();
@@ -117,6 +120,11 @@ export function ChatEmptyState(): React.ReactNode {
             <Trans>
               I will propose case types from your dataset names and columns.
               Pick from the options or tell me what to create.
+            </Trans>
+          ) : DataAgentFeature.isEnabled() ? (
+            <Trans>
+              Ask a question about your data. Type @ to point me at a dashboard,
+              dataset, or map.
             </Trans>
           ) : (
             <Trans>

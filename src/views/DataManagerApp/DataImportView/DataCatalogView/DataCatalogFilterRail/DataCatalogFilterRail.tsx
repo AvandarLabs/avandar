@@ -25,6 +25,12 @@ type Props = {
    * user searches there, then the keywords that search found.
    */
   keywordOptions: readonly CatalogFacetOption[];
+
+  /** True while the counts beside the options are being worked out again. */
+  isCountLoading: boolean;
+
+  /** True while a search inside Keywords is still counting. */
+  isKeywordCountLoading: boolean;
   onFiltersChange: (filters: CatalogListingFilters) => void;
 
   /** Called with what the user types into Keywords. */
@@ -41,6 +47,8 @@ export function DataCatalogFilterRail({
   filters,
   facets,
   keywordOptions,
+  isCountLoading,
+  isKeywordCountLoading,
   onFiltersChange,
   onKeywordSearchChange,
 }: Props): ReactNode {
@@ -54,6 +62,8 @@ export function DataCatalogFilterRail({
           placeholder={t`All publishers`}
           options={facets.sources}
           chosenValues={filters.sources}
+          emptyPlaceholder={t`No publishers`}
+          isCountLoading={isCountLoading}
           onChange={(sources) => {
             onFiltersChange({ ...filters, sources });
           }}
@@ -64,6 +74,7 @@ export function DataCatalogFilterRail({
           labels={facets.organization2Labels}
           options={facets.organization2}
           chosenValues={filters.organization2Names}
+          isCountLoading={isCountLoading}
           onChange={(organization2Names) => {
             onFiltersChange({ ...filters, organization2Names });
           }}
@@ -74,6 +85,8 @@ export function DataCatalogFilterRail({
           placeholder={t`All topics`}
           options={facets.domains}
           chosenValues={filters.domains}
+          emptyPlaceholder={t`No topics`}
+          isCountLoading={isCountLoading}
           onChange={(domains) => {
             onFiltersChange({ ...filters, domains });
           }}
@@ -84,6 +97,8 @@ export function DataCatalogFilterRail({
           placeholder={t`All keywords`}
           options={keywordOptions}
           chosenValues={filters.tags}
+          emptyPlaceholder={t`No keywords`}
+          isCountLoading={isCountLoading || isKeywordCountLoading}
           onSearchChange={onKeywordSearchChange}
           onChange={(tags) => {
             onFiltersChange({ ...filters, tags });
@@ -95,6 +110,8 @@ export function DataCatalogFilterRail({
           placeholder={t`All formats`}
           options={facets.formats}
           chosenValues={filters.formats}
+          emptyPlaceholder={t`No formats`}
+          isCountLoading={isCountLoading}
           onChange={(formats) => {
             onFiltersChange({ ...filters, formats });
           }}
@@ -103,6 +120,7 @@ export function DataCatalogFilterRail({
         <DataCatalogUpdatedWithinSelect
           value={filters.updatedWithin}
           counts={facets.updatedWithin}
+          isCountLoading={isCountLoading}
           onChange={(updatedWithin) => {
             onFiltersChange({ ...filters, updatedWithin });
           }}

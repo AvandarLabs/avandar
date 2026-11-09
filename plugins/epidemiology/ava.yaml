@@ -32,9 +32,7 @@ contributes:
           numericColumnCount: { gte: 1 }
       - command: rolling.average
         when:
-          all:
-            - dateColumnCount: { gte: 1 }
-            - numericColumnCount: { gte: 1 }
+          dateColumnCount: { gte: 1 }
   vizTypes:
     - id: epicurve
       title: "%viz.epicurve.title%"

@@ -8,6 +8,11 @@ import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 export type DataGridColumnDef = {
   field: string;
   headerName: string;
+  /**
+   * The full column title. The grid shows it when the title in the header
+   * is cut off.
+   */
+  headerTooltip: string;
   filter: true;
   valueFormatter: (params: { value: unknown }) => string;
 };
@@ -181,6 +186,7 @@ function _makeColumnDef(
   return {
     field: field,
     headerName: field,
+    headerTooltip: field,
     filter: true,
     valueFormatter: (params: { value: unknown }) => {
       // First, so a per-period field of dates is never read as one date.
@@ -199,7 +205,8 @@ function _makeColumnDef(
 
 /**
  * Builds the AG Grid column definitions for a `DataGrid`, including how each
- * cell's value is displayed.
+ * cell's value is displayed. Each column's title is its header tooltip, so a
+ * title the grid clips can show in full.
  *
  * Dates render through `formatQueryResultDate`, so a stored date shows on its
  * own calendar day for every user. A per-period cell shows its periods

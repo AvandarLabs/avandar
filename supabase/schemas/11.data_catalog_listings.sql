@@ -354,6 +354,20 @@ create index data_catalog_listings__search_vector on public.data_catalog_listing
 -- listing's name.
 create index data_catalog_listings__display_name_trgm on public.data_catalog_listings using gin (display_name extensions.gin_trgm_ops);
 
+-- Serves the catalog's default search, which hides listings a workspace
+-- cannot load. The indexes above also contain those listings, so a common
+-- word reads every one of them and throws them away. These two hold only
+-- the listings that search keeps.
+create index data_catalog_listings__search_vector_loadable on public.data_catalog_listings using gin (search_vector)
+where
+  is_workspace_loadable and
+  not is_invalid;
+
+create index data_catalog_listings__display_name_trgm_loadable on public.data_catalog_listings using gin (display_name extensions.gin_trgm_ops)
+where
+  is_workspace_loadable and
+  not is_invalid;
+
 -- Serves the catalog's publisher filter, and its second-level filter under a
 -- chosen publisher.
 create index data_catalog_listings__organization_levels on public.data_catalog_listings (organization1_name, organization2_name);

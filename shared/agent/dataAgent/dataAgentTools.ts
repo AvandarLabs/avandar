@@ -27,7 +27,7 @@ export const RUN_QUERY_TOOL = {
   name: "run_query",
   label: "Run query",
   description:
-    "Runs the one DuckDB query that answers the question and shows its result to the user as a table or chart. Returns only the row count and column names. A result ends your turn.",
+    "Runs the one DuckDB query that answers a question about rows and shows its result to the user as a table or chart. Returns only the row count and column names. A result ends your turn. Do not use it to list or compare columns: those are already under DATASETS.",
   parameters: RUN_QUERY_PARAMETERS,
 };
 
@@ -96,6 +96,7 @@ export const DATA_AGENT_TOOLS = [
 export const DATA_AGENT_PROMPT_IDS = [
   "data-agent-v1",
   "data-agent-v2",
+  "data-agent-v3",
 ] as const;
 
 /** One served prompt version. */
@@ -104,9 +105,10 @@ export type DataAgentPromptId = (typeof DATA_AGENT_PROMPT_IDS)[number];
 /**
  * The version of the data agent's prompt this build uses. Only the prompt is
  * versioned: every version shares the same tools. The browser names it in
- * the proxy URL. v2 adds the current page block.
+ * the proxy URL. v2 adds the current page block. v3 adds the attached
+ * and mentioned blocks.
  */
-export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v2";
+export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v3";
 
 /** Whether the proxy serves a prompt version. */
 export function isDataAgentPromptId(value: string): value is DataAgentPromptId {

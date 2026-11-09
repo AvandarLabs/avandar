@@ -6,7 +6,10 @@ import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/as
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
-import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
+import {
+  beginDataAgentRun,
+  createDataAgentRunState,
+} from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
@@ -249,7 +252,7 @@ export function createDataAgent(
   return {
     agent,
     ask: async (message) => {
-      Object.assign(state, createDataAgentRunState());
+      Object.assign(state, beginDataAgentRun(state, message));
       turnCounter.turns = 0;
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;

@@ -1,10 +1,17 @@
 import { ClearAoiButton } from "@/views/GisApp/shell/ClearAoiButton/ClearAoiButton";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
+import type { PlaceToolController } from "@/views/GisApp/places/PlaceTool.types";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 
 /** Map-tool cluster, AOI clear control, and invalid-ring status. */
-export function GisAppMapToolCluster({ app }: { app: GisAppState }): ReactNode {
+export function GisAppMapToolCluster({
+  app,
+  placeTool,
+}: {
+  app: GisAppState;
+  placeTool: PlaceToolController;
+}): ReactNode {
   return (
     <>
       <ClearAoiButton aoi={app.mapConfig.aoi} updateConfig={app.updateConfig} />
@@ -21,6 +28,7 @@ export function GisAppMapToolCluster({ app }: { app: GisAppState }): ReactNode {
         featureCollections={app.layerFeatureCollections}
         requestFitBounds={app.requestFitBounds}
         onOpenFeatureList={app.openFeatureList}
+        placeTool={placeTool}
       />
     </>
   );

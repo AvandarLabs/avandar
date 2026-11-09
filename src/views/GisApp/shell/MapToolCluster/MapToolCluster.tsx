@@ -7,6 +7,7 @@ import { MapToolClusterToolbar } from "@/views/GisApp/shell/MapToolCluster/MapTo
 import { MeasureReadout } from "@/views/GisApp/shell/MapToolCluster/MeasureReadout";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { PlaceToolController } from "@/views/GisApp/places/PlaceTool.types";
 import type {
   BufferConfirmOptions,
   FilterByBufferOptions,
@@ -26,6 +27,9 @@ type Props = {
 
   /** Opens a layer's feature list, after the buffer tool filters it. */
   onOpenFeatureList?: (layerId: MapLayer.Id) => void;
+
+  /** Drives the Add a place tool; omitted where the map cannot hold places. */
+  placeTool?: PlaceToolController;
 };
 
 const EMPTY_MEASURE_VERTICES: ReadonlyArray<[number, number]> = [];
@@ -91,6 +95,7 @@ export function MapToolCluster({
   featureCollections,
   requestFitBounds = noop,
   onOpenFeatureList = noop,
+  placeTool,
 }: Readonly<Props>): ReactNode {
   const onBufferConfirm = useBufferConfirmHandler(selectedLayer, updateConfig);
   return (
@@ -107,6 +112,7 @@ export function MapToolCluster({
         layers={layers}
         featureCollections={featureCollections}
         requestFitBounds={requestFitBounds}
+        placeTool={placeTool}
       />
     </>
   );

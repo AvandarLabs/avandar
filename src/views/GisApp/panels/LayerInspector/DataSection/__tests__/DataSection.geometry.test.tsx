@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import {
   createBoundLayer,
   createGeometryLayer,
@@ -16,6 +16,30 @@ beforeEach(() => {
 });
 
 describe("DataSection geometry", () => {
+  it("puts every source column on a geometry layer's popup", async () => {
+    fixtures.sourceColumns = [
+      fixtures.nameColumn,
+      fixtures.geometryColumn,
+      fixtures.latitudeColumn,
+    ];
+    const onLayerChange = vi.fn();
+
+    render(
+      <DataSection layer={createGeometryLayer()} onLayerChange={onLayerChange} />,
+    );
+
+    await waitFor(() => {
+      expect(onLayerChange).toHaveBeenCalled();
+    });
+    const update = onLayerChange.mock.calls.at(-1)![0];
+    const updatedLayer = update(createGeometryLayer());
+    expect(updatedLayer.popup.columnIds).toEqual([
+      fixtures.nameColumn.id,
+      fixtures.geometryColumn.id,
+      fixtures.latitudeColumn.id,
+    ]);
+  });
+
   it("shows the complete geometry-column controls", () => {
     render(
       <DataSection layer={createGeometryLayer()} onLayerChange={vi.fn()} />,

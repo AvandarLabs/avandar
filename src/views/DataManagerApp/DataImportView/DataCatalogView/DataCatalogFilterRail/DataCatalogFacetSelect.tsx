@@ -17,6 +17,15 @@ type Props = {
   placeholder: string;
   options: readonly CatalogFacetOption[];
   chosenValues: readonly string[];
+
+  /**
+   * What the closed field reads when this facet has nothing to offer, such
+   * as "No topics".
+   */
+  emptyPlaceholder: string;
+
+  /** True while a new search's counts are still being worked out. */
+  isCountLoading: boolean;
   onChange: (chosenValues: string[]) => void;
 
   /**
@@ -47,6 +56,8 @@ export function DataCatalogFacetSelect({
   placeholder,
   options,
   chosenValues,
+  emptyPlaceholder,
+  isCountLoading,
   onChange,
   onSearchChange,
 }: Props): ReactNode {
@@ -75,20 +86,16 @@ export function DataCatalogFacetSelect({
     });
   }, [options, chosenValues, countsByValue]);
 
-  // While the user is searching the facet, it stays put even when nothing
-  // matches, or the field they are typing into would vanish.
-  if (
-    options.length === 0 &&
-    chosenValues.length === 0 &&
-    search.trim() === ""
-  ) {
-    return null;
-  }
+  const isEmpty = options.length === 0 && chosenValues.length === 0;
+  // A facet with nothing to offer stays on screen and says so. While counts
+  // are still loading, the ordinary placeholder stays: "No topics" would
+  // claim the search had none before the search had answered.
+  const closedPlaceholder = isCountLoading || !isEmpty ? placeholder : emptyPlaceholder;
 
   return (
     <MultiSelect
       label={label}
-      placeholder={chosenValues.length === 0 ? placeholder : undefined}
+      placeholder={chosenValues.length === 0 ? closedPlaceholder : undefined}
       data={items}
       value={[...chosenValues]}
       onChange={onChange}
@@ -126,6 +133,7 @@ export function DataCatalogFacetSelect({
           <DataCatalogFacetOption
             label={option.label}
             count={countsByValue.get(option.value)}
+            isCountLoading={isCountLoading}
             search={search}
             isChecked={checked === true}
           />

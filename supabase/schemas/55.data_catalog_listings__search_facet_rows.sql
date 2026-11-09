@@ -51,7 +51,7 @@
  * @param p_domains Topics chosen. Empty keeps every topic.
  * @param p_tags Keywords chosen. Empty keeps every keyword.
  * @param p_count_cap The most matches a facet counts, clamped to between 1
- * and 10,000.
+ * and 5,000. Past that the options stay selectable and carry no count.
  *
  * @returns Facet rows, facet by facet, each facet's options most listings
  * first. A broad search returns more rows than the Data API's row cap, so
@@ -66,14 +66,14 @@ create or replace function public.data_catalog_listings__search_facet_rows (
   p_organization2_names text[] default '{}',
   p_domains text[] default '{}',
   p_tags text[] default '{}',
-  p_count_cap integer default 10000
+  p_count_cap integer default 5000
 ) returns table (
   facet text,
   value text,
   listing_count bigint
 ) as $$
 declare
-  v_count_cap integer := least(greatest(coalesce(p_count_cap, 10000), 1), 10000);
+  v_count_cap integer := least(greatest(coalesce(p_count_cap, 5000), 1), 5000);
   v_updated_within text := coalesce(p_updated_within, 'any');
   v_is_loadable_only boolean := coalesce(p_is_loadable_only, false);
   v_sources text[] := coalesce(p_sources, '{}');
@@ -95,6 +95,28 @@ begin
       errcode = '22023';
   end if;
 
+  -- One read of the matches, shared by every facet. This is the search
+  -- with no publisher, topic, keyword, format, or freshness chosen: each
+  -- facet is counting that same set. A chosen filter still takes the
+  -- per-facet path below, because that facet has to ignore its own filter.
+  if not v_is_unsearched and not (
+    v_has_sources or
+    v_has_formats or
+    v_has_window or
+    v_has_organization2 or
+    v_has_domains or
+    v_has_tags
+  ) then
+    return query
+    select
+      *
+    from
+      public.data_catalog_listings__facets_for_one_search (
+        p_query,
+        v_is_loadable_only,
+        v_count_cap
+      );
+  else
   return query
   select
     'source',
@@ -307,6 +329,8 @@ begin
     from
       unnest(array['any', 'past_month', 'past_year', 'over_a_year']) as update_window (name)
       left join counted on counted.value = update_window.name;
+  end if;
+
   end if;
 
   if v_is_unsearched and not (

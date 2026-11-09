@@ -71,6 +71,31 @@ describe("run_query", () => {
     expect(_textOf(result)).toContain("No rows matched");
   });
 
+  it("does not show a query when the turn asks about columns", async () => {
+    const state = createDataAgentRunState();
+    state.userTexts = [
+      "Are these two datasets appendable? Do they have the same columns?",
+    ];
+    const host = _createHost({
+      showQuery: vi.fn().mockResolvedValue({
+        kind: "rows",
+        columns: [],
+        rowCount: 1,
+      }),
+    });
+    const tool = createRunQueryTool({ host, aliases: ALIASES, state });
+
+    const result = await tool.execute("call-1", {
+      sql: 'SELECT "deaths" FROM "t0"',
+      summary: "Column list.",
+    });
+
+    expect(host.showQuery).not.toHaveBeenCalled();
+    expect(state.lastQuery).toBeUndefined();
+    expect(state.needsEscalation).toBe(false);
+    expect(_textOf(result)).toContain("DATASETS");
+  });
+
   it("strips literals from errors before the model sees them", async () => {
     const { result } = await _run({
       kind: "failed",

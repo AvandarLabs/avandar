@@ -2,6 +2,7 @@ import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCa
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { reviewGeneratedSqlAssumptions } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
+import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn";
 import { COVID_WORKSPACE_SCHEMA } from "../../covid/covidWorkspace";
 import { resolveEvalDiscovery } from "../../runtime/resolveEvalDiscovery";
 import { runEvalSql } from "../../runtime/runEvalSql";
@@ -159,6 +160,15 @@ class BaselineConversation implements EvalConversation {
       return true;
     }
     const appliedSql = _getAppliedSql(response.result);
+    const userTexts = this.messages.flatMap((message) => {
+      return message.role === "user" ? [message.content] : [];
+    });
+    if (appliedSql && isSchemaAnswerTurn(userTexts)) {
+      const text = response.result.assistantText;
+      this.messages.push({ role: "assistant", content: text });
+      answer.assistantText = text;
+      return true;
+    }
     if (appliedSql) {
       await this.applySql(appliedSql, response.result.assistantText, answer);
       return true;

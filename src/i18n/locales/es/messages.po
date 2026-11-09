@@ -70,6 +70,10 @@ msgstr "No se pudo copiar el enlace."
 msgid "First {numRows} rows"
 msgstr "Primeras {numRows} filas"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove from context"
+msgstr "Quitar del contexto"
+
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "No se detectaron columnas para este conjunto de datos. Volviendo a "
@@ -248,6 +252,10 @@ msgstr "Extensión derecha"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Search datasets..."
 msgstr "Buscar conjuntos de datos..."
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Latitude and longitude"
+msgstr "Latitud y longitud"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
@@ -533,6 +541,7 @@ msgid "Square"
 msgstr "Cuadrado"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Notes"
 msgstr "Notas"
 
@@ -552,6 +561,10 @@ msgstr "Geometría"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connected as {0}"
 msgstr "Conectado como {0}"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not open the place."
+msgstr "No se pudo abrir el lugar."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -598,6 +611,12 @@ msgstr "Aún no hay actividad en este caso"
 msgid "Members still assigned to this group must be moved first."
 msgstr "Los miembros aún asignados a este grupo deben ser movidos primero."
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "The place is removed from its dataset, so it disappears from every map "
+"and chart that uses it."
+msgstr "El lugar se eliminó de su conjunto de datos, por lo que desaparece de "
+"todos los mapas y gráficos que lo utilizan."
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar layout"
 msgstr "Diseño con barra lateral"
@@ -605,6 +624,10 @@ msgstr "Diseño con barra lateral"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "Agregar estado"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Search dashboards, datasets, maps..."
+msgstr "Buscar paneles, conjuntos de datos, mapas..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -709,7 +732,7 @@ msgstr "Guardado como \"{0}\"."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "These values are fractions, so type a percent such as 95."
-msgstr ""
+msgstr "Estos valores son fracciones, así que ingrese un porcentaje, como 95."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
@@ -1265,6 +1288,10 @@ msgid "The current SQL contains parts the form could not represent. Continuing "
 msgstr "El SQL actual contiene partes que el formulario no pudo representar. Si "
 "continúa, se reemplazará por SQL generado a partir del formulario."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No keywords"
+msgstr "Sin palabras clave"
+
 #. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
@@ -1275,6 +1302,10 @@ msgstr "El SQL actual contiene partes que el formulario no pudo representar. Si 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Updated {0}"
 msgstr "Actualizado {0}"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Attached to this chat"
+msgstr "Adjuntos a este chat"
 
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
@@ -1291,6 +1322,10 @@ msgstr "Mínimo del eje Y"
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish publicly"
 msgstr "Publicar públicamente"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Choose a column"
+msgstr ""
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -1407,11 +1442,6 @@ msgstr "Hoja"
 msgid "Getting {0} from {1}"
 msgstr "Obteniendo {0} de {1}"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr "Más de {formattedNumResults} de {formattedNumCatalogListings} conjuntos "
-"de datos"
-
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Publicado en el espacio de trabajo"
@@ -1484,6 +1514,11 @@ msgstr ""
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " permission"
 msgstr " permiso"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Places are saved in a dataset, so any map, chart, or query can use them."
+msgstr "Los lugares se guardan en un conjunto de datos, por lo que cualquier "
+"mapa, gráfico o consulta puede utilizarlos."
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
@@ -1844,6 +1879,10 @@ msgstr "La asignación no cambió"
 msgid "Type your answer…"
 msgstr "Escribe tu respuesta…"
 
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> add"
+msgstr "<0>Enter</0> agregar"
+
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
 msgstr "El restablecimiento de contraseña falló"
@@ -2112,6 +2151,10 @@ msgstr "Eje de valores de {0} a {1}, {scaleLabel}, caben {2} marcas (error "
 msgid "Password"
 msgstr "Contraseña"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Exposure sites"
+msgstr "Sitios de exposición"
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Show the first 20 rows of {datasetName}"
 msgstr "Mostrar las primeras 20 filas de {datasetName}"
@@ -2171,6 +2214,10 @@ msgstr "Eliminar miembro"
 msgid "Produced {0}"
 msgstr "Producido {0}"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Exposure ends"
+msgstr "Fin de la exposición"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign"
@@ -2228,7 +2275,7 @@ msgstr "El registro conserva su estado anterior. Inténtelo de nuevo en un "
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
@@ -2246,6 +2293,10 @@ msgstr "Filtros para este gráfico"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Align"
 msgstr "Alinear"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Give the place a name."
+msgstr "Asigne un nombre al lugar."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
@@ -2498,6 +2549,10 @@ msgstr "Espacio"
 msgid "Select a data source"
 msgstr "Seleccionar una fuente de datos"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Keep the name under 200 characters."
+msgstr "Mantenga el nombre por debajo de 200 caracteres."
+
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
 msgstr "Opacidad"
@@ -2607,6 +2662,10 @@ msgstr "Parte superior derecha"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 msgid "Set up offline mode to chat without an internet connection."
 msgstr "Configura el modo sin conexión para chatear sin conexión a Internet."
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place saved. Reload the map to see it."
+msgstr "Lugar guardado. Recargue el mapa para verlo."
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
@@ -2771,6 +2830,10 @@ msgstr "El plugin {pluginId} encontró un error al dibujar este gráfico."
 msgid "Body"
 msgstr "Cuerpo"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Add a dataset"
+msgstr ""
+
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "El nombre que otros miembros ven en {workspaceName}."
@@ -2860,6 +2923,10 @@ msgstr "No se devolvieron valores de {column}. Describe lo que necesitas en su "
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open map"
 msgstr "Abrir mapa"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No formats"
+msgstr "Sin formatos"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
@@ -3069,6 +3136,10 @@ msgstr "número entero"
 msgid "Exact"
 msgstr "Exacto"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place deleted."
+msgstr "Lugar eliminado."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Discard"
 msgstr "Descartar"
@@ -3090,6 +3161,10 @@ msgstr "Última actualización"
 msgid "A dark or satellite basemap may photocopy poorly."
 msgstr "Un mapa base oscuro o satelital puede reproducirse mal en fotocopias."
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not save the place."
+msgstr "No se pudo guardar el lugar."
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is before"
 msgstr "es anterior a"
@@ -3107,6 +3182,13 @@ msgstr "Caso"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Roles & Permissions"
 msgstr "Roles y permisos"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
+msgid "For public places only. The search goes to an outside service, so never "
+"type a person's home address."
+msgstr "Solo para lugares públicos. La búsqueda se realiza mediante un servicio "
+"externo, por lo que nunca debe escribir la dirección de la casa de una "
+"persona."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall {pluginName}?"
@@ -3150,6 +3232,10 @@ msgstr "Elige un conjunto de datos guardado o importa nuevos datos a tu espacio 
 msgid "Cannot sync this case type"
 msgstr "No se puede sincronizar este tipo de caso"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Recent"
+msgstr "Recientes"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "Reportar un error"
@@ -3159,6 +3245,10 @@ msgid "Pan, zoom and tap a feature to read it. To edit layers, open this map on 
 "a tablet or a laptop."
 msgstr "Desplácese, haga zoom y toque una característica para leerla. Para "
 "editar capas, abra este mapa en una tablet o una laptop."
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not create the places dataset."
+msgstr "No se pudo crear el conjunto de datos de lugares."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Info"
@@ -3279,6 +3369,7 @@ msgstr "{keyboardShortcut} para guardar"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActionsMenu.tsx
@@ -3332,6 +3423,10 @@ msgstr "ID del espacio de trabajo"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "What it adds"
 msgstr "Lo que agrega"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "The longitude must be between -180 and 180."
+msgstr "La longitud debe estar entre -180 y 180."
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -3402,7 +3497,7 @@ msgstr "Sin color para los datos"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Highlight values below"
-msgstr ""
+msgstr "Resaltar valores inferiores a"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
@@ -3484,6 +3579,7 @@ msgstr "Principal"
 msgid "Unable to publish dashboard"
 msgstr "No se puede publicar el panel"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
 msgstr "Medir"
@@ -3621,6 +3717,7 @@ msgstr "El soporte de geometría se está descargando. Puede tardar un momento "
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapActions.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
@@ -3696,6 +3793,10 @@ msgstr "Necesita geometría"
 msgid "Gridline color"
 msgstr "Color de las líneas de cuadrícula"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Add to map"
+msgstr "Agregar al mapa"
+
 #: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
 msgstr "MapLibre, colaboradores de OpenStreetMap"
@@ -3732,6 +3833,14 @@ msgstr "No encontramos \"{displayName}\" en el catálogo. Intente agregarlo "
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Revisar coincidencias"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Dataset {datasetName}"
+msgstr ""
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Choose a dataset"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
@@ -3785,6 +3894,10 @@ msgstr "\"{0}\" se está preparando. Los conjuntos de datos grandes pueden "
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "Usando su URL personalizada."
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Address"
+msgstr "Dirección"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -4202,6 +4315,10 @@ msgstr "Código"
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "Filtros locales (editables por el espectador, solo este gráfico)"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Press Enter to use it."
+msgstr "Presione Enter para usarla."
+
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid X axis selected"
 msgstr "Eje X seleccionado no válido"
@@ -4301,6 +4418,10 @@ msgstr "Crear panel y guardar"
 msgid "Your data is summarized"
 msgstr "Tus datos están resumidos"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No topics"
+msgstr "Sin temas"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Relleno"
@@ -4325,7 +4446,7 @@ msgstr "Tema"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Reverse colors"
-msgstr ""
+msgstr "Invertir colores"
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -4398,6 +4519,10 @@ msgstr "Mostrar más"
 #: src/components/ChatPanel/ClarificationCard/ClarificationCardHeader.tsx
 msgid "Clarification {turnNumber} of 3"
 msgstr "Aclaración {turnNumber} de 3"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Keep the address under 500 characters."
+msgstr "Mantenga la dirección por debajo de 500 caracteres."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix the fields above, then save."
@@ -4490,9 +4615,19 @@ msgstr "Felicidades"
 msgid "Capturing dashboard…"
 msgstr "Capturando panel…"
 
+#: src/views/GisApp/places/usePlacesErrorMessage.ts
+msgid "This places dataset was changed outside the map and can no longer be "
+"edited here."
+msgstr "Este conjunto de datos de lugares se modificó fuera del mapa y ya no se "
+"puede editar aquí."
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the measurements as found"
 msgstr "Conservar las mediciones tal como se encontraron"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Add a field"
+msgstr ""
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -4574,6 +4709,10 @@ msgstr "Acerca de tu espacio de trabajo"
 msgid "Some coordinates are 0, 0."
 msgstr "Algunas coordenadas son 0, 0."
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "The exposure must end after it starts."
+msgstr "La exposición debe terminar después de comenzar."
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
@@ -4587,6 +4726,12 @@ msgstr "Recomendado con este conjunto de datos"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
 msgstr "Completo"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchStatus.tsx
+msgid "{resultCount, plural, =0 {No addresses found} one {# address found} "
+"other {# addresses found}}"
+msgstr "{resultCount, plural, =0 {No se encontraron direcciones} one {Se "
+"encontró # dirección} other {Se encontraron # direcciones}}"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffers are off for layers set to Displace, since rings would reveal "
@@ -4857,6 +5002,10 @@ msgstr "Cargando conjuntos de datos..."
 msgid "No fields"
 msgstr "Sin campos"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Places dataset"
+msgstr "Conjunto de datos de lugares"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
 msgstr "Error al actualizar el nombre del espacio de trabajo"
@@ -5107,6 +5256,10 @@ msgstr "Imagen"
 msgid "Uses no workspace data."
 msgstr "No usa datos del espacio de trabajo."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "No organizations"
+msgstr "Sin organizaciones"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "Ocultar eje X"
@@ -5126,6 +5279,10 @@ msgstr "Nuevo chat"
 #: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "Resultado no disponible"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "Create places dataset"
+msgstr "Crear conjunto de datos de lugares"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5177,6 +5334,7 @@ msgstr "Dimensionado"
 msgid "Save to dashboard"
 msgstr "Guardar en el panel"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "Agregado"
@@ -5323,6 +5481,10 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}: solo estará disponible en esta computadora y nadie "
 "más de su equipo podrá abrirlo."
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "This place was already deleted."
+msgstr "Este lugar ya se eliminó."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -5475,6 +5637,10 @@ msgstr "Su plan actual solo le permite compartir o publicar {maxAllowed, "
 msgid "Region {0}"
 msgstr "Región {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove {name} from context"
+msgstr "Quitar {name} del contexto"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "Continúa a tu espacio de trabajo"
@@ -5486,6 +5652,10 @@ msgstr "tiene un valor"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "La URL personalizada no puede contener espacios"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
+msgstr "Puedes adjuntar hasta {MAX_ATTACHED_GADGETS} elementos."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -5530,7 +5700,7 @@ msgstr "SQL generado"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
 msgid "Class colors"
-msgstr ""
+msgstr "Colores de clase"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
@@ -5875,7 +6045,7 @@ msgstr "Importación fallida: {reason}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
 msgid "Class {classNumber} label"
-msgstr ""
+msgstr "Etiqueta de la clase {classNumber}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
@@ -5884,6 +6054,10 @@ msgstr "Formato de marca de tiempo"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "File size"
 msgstr "Tamaño del archivo"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Type a latitude and longitude, like 40.7603, -73.9885."
+msgstr "Escriba una latitud y longitud, como 40.7603, -73.9885."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Labelled graphic (map, chart, tiles)"
@@ -6118,7 +6292,7 @@ msgstr "Agregación"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Below {threshold}"
-msgstr ""
+msgstr "Inferior a {threshold}"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
@@ -6217,7 +6391,7 @@ msgstr "Aún no hay nada."
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
 msgid "Class {classNumber}"
-msgstr ""
+msgstr "Clase {classNumber}"
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6360,10 +6534,15 @@ msgid "This dashboard is still public on the web. Anyone with the link can view 
 msgstr "Este dashboard todavía es público en la web. Cualquier persona con el "
 "enlace puede verlo hasta que presione el botón de abajo."
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Enter each exposure time as a date and a time."
+msgstr "Ingrese cada hora de exposición como una fecha y una hora."
+
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Filter by status"
 msgstr "Filtrar por estado"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
 msgstr "Resultados"
@@ -6445,6 +6624,10 @@ msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Cuéntanos de dónde debería provenir la información de "
 "{singularConceptName}..."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Choose a dataset to join"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
 msgstr "Editar grupo de usuarios"
@@ -6513,6 +6696,7 @@ msgid "is none of"
 msgstr "no es ninguno de"
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "That coordinate is out of range."
 msgstr "Esa coordenada está fuera del rango permitido."
 
@@ -6523,6 +6707,10 @@ msgstr "Abrir el registro"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "Conjunto de datos agregado"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Add context"
+msgstr "Agregar contexto"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
@@ -6877,7 +7065,7 @@ msgstr "Curva"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "{threshold}% or above"
-msgstr ""
+msgstr "{threshold}% o más"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -6989,6 +7177,10 @@ msgstr "Gestor de casos"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "Built in"
 msgstr "Integrado"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Location: {latitude}, {longitude}"
+msgstr "Ubicación: {latitude}, {longitude}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -7236,7 +7428,7 @@ msgstr "tipo"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Below {threshold}%"
-msgstr ""
+msgstr "Inferior a {threshold}%"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
@@ -7509,7 +7701,7 @@ msgstr "Color de las marcas del eje Y"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
 msgid "Class {classNumber} color"
-msgstr ""
+msgstr "Color de la clase {classNumber}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
@@ -7548,6 +7740,10 @@ msgstr "Filas de esta tabla"
 msgid "Dataset name must be at least 2 characters."
 msgstr "El nombre del conjunto de datos debe tener al menos 2 caracteres."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "No datasets"
+msgstr ""
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
 msgstr "Carta de EE. UU."
@@ -7570,7 +7766,7 @@ msgstr "Abrir barra lateral"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red to blue"
-msgstr ""
+msgstr "De rojo a azul"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
@@ -7749,6 +7945,10 @@ msgstr "No permitido"
 msgid "Member"
 msgstr "Miembro"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Nothing found"
+msgstr "No se encontró nada"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "Actualizar suscripción"
@@ -7799,6 +7999,10 @@ msgstr "Elemento de lista"
 msgid "Roughness ({0})"
 msgstr "Rugosidad ({0})"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
+msgid "Search an address"
+msgstr "Buscar una dirección"
+
 #. placeholder {0}: columns.length
 #. placeholder {1}: numRows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
@@ -7827,6 +8031,10 @@ msgstr "Confirmar contraseña"
 msgid "Attribution"
 msgstr "Atribución"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
+msgid "New places dataset name"
+msgstr "Nuevo nombre para el conjunto de datos de lugares"
+
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
 msgstr "Tipos de columna actualizados"
@@ -7846,6 +8054,10 @@ msgstr "El comentario se elimina del caso para todos."
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
 msgstr "Atribución de la fuente (Siempre incluida)"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
+msgid "Address search is not available right now."
+msgstr "La búsqueda de direcciones no está disponible en este momento."
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Status name"
@@ -7943,6 +8155,7 @@ msgstr "La consulta cambió después de agregar las columnas."
 msgid "Write your paragraph here..."
 msgstr "Escriba aquí su párrafo..."
 
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
 msgstr "Enviar mensaje"
@@ -8058,6 +8271,10 @@ msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
 msgstr "Lo ideal es que el usuario de la base de datos tenga acceso de solo "
 "lectura a la tabla o vista que planea importar."
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "The latitude must be between -90 and 90."
+msgstr "La latitud debe estar entre -90 y 90."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
@@ -8413,7 +8630,7 @@ msgstr "Configuraciones de visualización"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Threshold"
-msgstr ""
+msgstr "Umbral"
 
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
@@ -8696,9 +8913,18 @@ msgid "Its features disappear for every member until you enable it again."
 msgstr "Sus funciones desaparecerán para todos los miembros hasta que vuelva a "
 "habilitarlo."
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/GeoapifyAttribution.tsx
+msgid "Powered by Geoapify"
+msgstr "Funciona con Geoapify"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "Hacer solo offline"
+
+#: src/views/GisApp/places/usePlacesErrorMessage.ts
+msgid "This dataset isn't a places dataset, so places can't be added to it."
+msgstr "Este conjunto de datos no es un conjunto de datos de lugares, por lo "
+"que no se pueden agregar lugares."
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
@@ -8765,7 +8991,7 @@ msgstr "Geometría no disponible"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Custom colors"
-msgstr ""
+msgstr "Colores personalizados"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
 msgid "Use a link"
@@ -8907,6 +9133,10 @@ msgstr "Solo algunas personas pueden abrir este conjunto de datos. Los "
 "compañeros de equipo en este caso que no tengan acceso verán \"No "
 "disponible\"."
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place deleted. Reload the map to see the change."
+msgstr "Lugar eliminado. Recargue el mapa para ver el cambio."
+
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Description must be under {maxDatasetDescriptionLength} characters "
@@ -8953,6 +9183,11 @@ msgstr "Ingrese el nombre del conjunto de datos"
 msgid "Select an annotation on the map to edit it."
 msgstr "Seleccione una anotación en el mapa para editarla."
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "Delete this place?"
+msgstr "¿Eliminar este lugar?"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "Buscando…"
@@ -8995,6 +9230,7 @@ msgstr "Los cambios no guardados no aparecerán en la vista previa. Guarde "
 msgid "This workspace does not have a valid subscription."
 msgstr "Este espacio de trabajo no tiene una suscripción válida."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Dataset"
@@ -9013,6 +9249,10 @@ msgstr "Todas las decisiones"
 #: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
 msgid "series.cases"
 msgstr "series.cases"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
+msgid "Loading count"
+msgstr "Cargando cantidad"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
@@ -9047,6 +9287,10 @@ msgstr "Grupo de usuarios eliminado"
 msgid "(Monthly billing)"
 msgstr "(Facturación mensual)"
 
+#: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToAddPlaceButton.tsx
+msgid "Add a place here"
+msgstr "Agregar un lugar aquí"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "What to read"
 msgstr "Qué leer"
@@ -9061,7 +9305,11 @@ msgstr "¿Aún no tienes una cuenta?"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "{threshold} or above"
-msgstr ""
+msgstr "{threshold} o más"
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Place saved."
+msgstr "Lugar guardado."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -9191,11 +9439,6 @@ msgstr "No pudimos actualizar su suscripción. Por favor, contacte a "
 msgid "First"
 msgstr "Primero"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults} de {formattedNumCatalogListings} conjuntos de "
-"datos"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "Eliminar"
@@ -9224,6 +9467,12 @@ msgstr "Cargando autor"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable {pluginName}?"
 msgstr "¿Deshabilitar {pluginName}?"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "Haz una pregunta sobre tus datos. Escribe @ para señalarme un tablero, "
+"un conjunto de datos o un mapa."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -9423,6 +9672,10 @@ msgstr "{0} áreas no tienen datos"
 msgid "Its charts see only the rows of the chart they draw"
 msgstr "Sus gráficos solo ven las filas del gráfico que representan"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/OpenStreetMapAttribution.tsx
+msgid "© OpenStreetMap contributors"
+msgstr "© Colaboradores de OpenStreetMap"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "Obligatorio"
@@ -9586,6 +9839,10 @@ msgstr "Texto alternativo"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Please try again in a moment."
 msgstr "Inténtelo de nuevo en un momento."
+
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "Could not delete the place."
+msgstr "No se pudo eliminar el lugar."
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -9820,6 +10077,11 @@ msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "Este {resource} es accesible para cualquier persona con permiso {app} "
 "{0}."
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool.tsx
+msgid "Edit place"
+msgstr "Editar lugar"
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
 msgstr "Ver menos"
@@ -9844,6 +10106,10 @@ msgstr "Guardarlo"
 msgid "Hide the tutorial"
 msgstr "Ocultar el tutorial"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "Move place"
+msgstr "Mover lugar"
+
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
 msgid "{rowCount, plural, one {Built from the first row of the result.} other "
 "{Built from the first # rows of the result.}}"
@@ -9861,6 +10127,7 @@ msgid "Dataset columns"
 msgstr "Columnas del conjunto de datos"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
 msgstr "Detalles"
 
@@ -9987,6 +10254,10 @@ msgstr "Inténtalo de nuevo."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "contains"
 msgstr "contiene"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Keep the notes under 2,000 characters."
+msgstr "Mantenga las notas en menos de 2,000 caracteres."
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
@@ -10262,6 +10533,11 @@ msgstr "{droppedRowCount} filas sin asignar"
 msgid "Edit role group"
 msgstr "Editar grupo de roles"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "A places dataset holds at most {maxPlaces} places."
+msgstr "Un conjunto de datos de lugares contiene como máximo {maxPlaces} "
+"lugares."
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "Perfiles"
@@ -10500,6 +10776,10 @@ msgstr "Avandar aún está en beta. Algunas funciones pueden no funcionar como s
 "espera y algunas pueden estar aún en construcción. Agradecemos tu "
 "paciencia y comentarios mientras trabajamos para mejorar el producto."
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Exposure starts"
+msgstr "Comienza la exposición"
+
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "¡Gracias por tu interés!"
@@ -10681,6 +10961,10 @@ msgid "{0, plural, one {# saved database available} other {# saved databases "
 msgstr "{0, plural, one {# base de datos guardada disponible} other {# bases de "
 "datos guardadas disponibles}}"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Add a field from {datasetName}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "Graduado"
@@ -10860,6 +11144,10 @@ msgstr "Agrupar en una cuadrícula"
 msgid "Handling"
 msgstr "Tratamiento"
 
+#: src/components/ChatPanel/ChatThread/Composer/useChatComposerEditor.ts
+msgid "Message"
+msgstr "Mensaje"
+
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
@@ -10945,6 +11233,10 @@ msgstr "Esta consulta trata un tipo de valor como otro, por ejemplo, texto como 
 msgid "In your workspace"
 msgstr "En su espacio de trabajo"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "On this page"
+msgstr "En esta página"
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10967,6 +11259,7 @@ msgstr "Sutil"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
 msgstr "Actividad"
 
@@ -11111,6 +11404,10 @@ msgstr "Soporte"
 msgid "+ Condition"
 msgstr "+ Condición"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
+msgid "Click the map"
+msgstr "Haga clic en el mapa"
+
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "No maps yet"
 msgstr "Aún no hay mapas"
@@ -11196,6 +11493,10 @@ msgstr "Escriba una actualización"
 msgid "Could not create that case type"
 msgstr "No se pudo crear ese tipo de caso"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No publishers"
+msgstr "Sin publicaciones"
+
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
 msgstr "Beta"
@@ -11245,6 +11546,10 @@ msgstr "Tipo de caso eliminado"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING usa el operador \"{operator}\", que no es compatible con el "
 "formulario."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Search failed. Try again."
+msgstr "La búsqueda falló. Inténtalo de nuevo."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
@@ -11554,6 +11859,10 @@ msgstr "coincide con el patrón (heredado)"
 msgid "Max width"
 msgstr "Ancho máximo"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Change location"
+msgstr "Cambiar ubicación"
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
 msgstr "No disponible sin conexión"
@@ -11631,6 +11940,10 @@ msgstr "Fecha inválida"
 msgid "Get started"
 msgstr "Comenzar"
 
+#: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
+msgid "Delete place"
+msgstr "Eliminar lugar"
+
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
@@ -11684,6 +11997,10 @@ msgid "Dataset saved, but its original file failed to upload"
 msgstr "El conjunto de datos se guardó, pero no se pudo cargar el archivo "
 "original"
 
+#: src/views/GisApp/places/usePlacesActions.ts
+msgid "This place no longer exists. Someone may have deleted it."
+msgstr "Este lugar ya no existe. Es posible que alguien lo haya eliminado."
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
 msgid "Add a tile service"
@@ -11700,6 +12017,12 @@ msgstr "+{0} valores más empatados en {1} filas"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "El valor más común es <0>{0}</0>, en <1>{1}</1> de las filas."
+
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
+msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
+"assistant."
+msgstr "Solo las primeras {MAX_DESCRIBED_MENTIONS} menciones se describen al "
+"asistente."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"
@@ -11776,6 +12099,10 @@ msgid "SELECT expression of type \"{exprType}\" is not supported by the form."
 msgstr "La expresión SELECT de tipo \"{exprType}\" no es compatible con el "
 "formulario."
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool.tsx
+msgid "Add a place"
+msgstr "Agregar un lugar"
+
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
 msgstr "Dibujar un área de anotación"
@@ -11824,6 +12151,10 @@ msgstr "Listo para uso sin conexión"
 msgid "Unavailable case type"
 msgstr "Tipo de caso no disponible"
 
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
+msgid "Save place"
+msgstr "Guardar lugar"
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
 msgid "Reactions"
 msgstr "Reacciones"
@@ -11855,6 +12186,10 @@ msgstr "Último año"
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Week"
 msgstr "Semana"
+
+#: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
+msgid "Place name"
+msgstr "Nombre del lugar"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "The record keeps its previous assignee. Try again in a moment."

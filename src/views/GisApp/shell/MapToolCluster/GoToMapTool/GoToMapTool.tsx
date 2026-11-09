@@ -5,24 +5,36 @@ import { TextInput } from "@mantine/core";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { getBoundsFromFeatureCollection } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import { GoToAddPlaceButton } from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToAddPlaceButton";
 import css from "@/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.module.css";
 import { findBoundaryFeatureByPcode } from "@/views/GisApp/tools/findBoundaryFeatureByPcode/findBoundaryFeatureByPcode";
 import { parseMapGoToQuery } from "@/views/GisApp/tools/parseMapGoToQuery/parseMapGoToQuery";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { PlaceCoordinate } from "@/clients/places/places.types";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { I18n } from "@lingui/core";
-import type { ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 
 type Props = {
   layers?: readonly MapLayer.T[];
   featureCollections?: ReadonlyMap<MapLayer.Id, GeoJSON.FeatureCollection>;
   requestFitBounds: (bounds: MapBounds) => void;
+
+  /**
+   * Starts a new place at a coordinate result. Omitted where places cannot
+   * be added.
+   */
+  onAddPlaceAt?: (coordinate: PlaceCoordinate) => void;
 };
 
 type GoToErrorReason = "outOfRange" | "noBoundaryLayer" | "noMatchingPcode";
 
 type GoToSubmitResult =
-  | { type: "bounds"; bounds: MapBounds }
+  | {
+      type: "bounds";
+      bounds: MapBounds;
+      coordinate: PlaceCoordinate | undefined;
+    }
   | { type: "error"; reason: GoToErrorReason };
 
 type GoToSubmitOptions = {
@@ -32,6 +44,7 @@ type GoToSubmitOptions = {
   i18n: I18n;
   requestFitBounds: (bounds: MapBounds) => void;
   setError: (error: string | undefined) => void;
+  setLastCoordinate: (coordinate: PlaceCoordinate | undefined) => void;
 };
 
 const EMPTY_LAYERS: readonly MapLayer.T[] = [];
@@ -85,7 +98,7 @@ function _getPcodeSubmitResult(options: {
   if (!bounds) {
     return { type: "error", reason: "noMatchingPcode" };
   }
-  return { type: "bounds", bounds };
+  return { type: "bounds", bounds, coordinate: undefined };
 }
 
 function _getGoToSubmitResult(options: {
@@ -107,6 +120,10 @@ function _getGoToSubmitResult(options: {
           coordinate.longitude,
           coordinate.latitude,
         ),
+        coordinate: {
+          latitude: coordinate.latitude,
+          longitude: coordinate.longitude,
+        },
       };
     })
     .with({ type: "pcode" }, (pcode) => {
@@ -131,16 +148,44 @@ function _errorMessageFromReason(reason: GoToErrorReason, i18n: I18n): string {
 
 function _onGoToSubmit(options: GoToSubmitOptions): void {
   const result = _getGoToSubmitResult(options);
-  if (!result) {
-    options.setError(undefined);
-    return;
-  }
-  if (result.type === "error") {
-    options.setError(_errorMessageFromReason(result.reason, options.i18n));
+  if (!result || result.type === "error") {
+    options.setError(
+      result ? _errorMessageFromReason(result.reason, options.i18n) : undefined,
+    );
+    options.setLastCoordinate(undefined);
     return;
   }
   options.setError(undefined);
+  options.setLastCoordinate(result.coordinate);
   options.requestFitBounds(result.bounds);
+}
+
+/** The Go-to field's state and the handlers that change it. */
+function useGoToField(props: Readonly<Required<Omit<Props, "onAddPlaceAt">>>) {
+  const { i18n } = useLingui();
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [lastCoordinate, setLastCoordinate] = useState<
+    PlaceCoordinate | undefined
+  >(undefined);
+  return {
+    query,
+    error,
+    lastCoordinate,
+    label: i18n._(msg`Go to a coordinate or P-code`),
+    onSubmit: (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      _onGoToSubmit({ ...props, query, i18n, setError, setLastCoordinate });
+    },
+    onQueryChange: (value: string) => {
+      setQuery(value);
+      setError(undefined);
+      setLastCoordinate(undefined);
+    },
+    clearLastCoordinate: () => {
+      setLastCoordinate(undefined);
+    },
+  };
 }
 
 /** Search field that flies the camera to a coordinate or P-code. */
@@ -148,35 +193,30 @@ export function GoToMapTool({
   layers = EMPTY_LAYERS,
   featureCollections = EMPTY_FEATURE_COLLECTIONS,
   requestFitBounds,
+  onAddPlaceAt,
 }: Readonly<Props>): ReactNode {
-  const { i18n } = useLingui();
-  const [query, setQuery] = useState("");
-  const [error, setError] = useState<string | undefined>(undefined);
-  const label = i18n._(msg`Go to a coordinate or P-code`);
+  const field = useGoToField({ layers, featureCollections, requestFitBounds });
+  const { lastCoordinate } = field;
   return (
-    <form
-      className={css.goToMapTool}
-      onSubmit={(event) => {
-        event.preventDefault();
-        _onGoToSubmit({
-          query,
-          layers,
-          featureCollections,
-          i18n,
-          requestFitBounds,
-          setError,
-        });
-      }}
-    >
+    <form className={css.goToMapTool} onSubmit={field.onSubmit}>
       <TextInput
-        aria-label={label}
-        placeholder={label}
+        aria-label={field.label}
+        placeholder={field.label}
         size="xs"
-        value={query}
-        error={error}
+        value={field.query}
+        error={field.error}
+        rightSection={
+          lastCoordinate && onAddPlaceAt ? (
+            <GoToAddPlaceButton
+              onClick={() => {
+                onAddPlaceAt(lastCoordinate);
+                field.clearLastCoordinate();
+              }}
+            />
+          ) : undefined
+        }
         onChange={(event) => {
-          setQuery(event.currentTarget.value);
-          setError(undefined);
+          field.onQueryChange(event.currentTarget.value);
         }}
       />
     </form>

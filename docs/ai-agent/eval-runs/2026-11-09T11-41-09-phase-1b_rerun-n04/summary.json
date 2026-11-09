@@ -1,0 +1,17 @@
+{
+  "label": "phase-1b:rerun-n04",
+  "questionCount": 1,
+  "passCount": 1,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 2,
+  "promptTokens": 6997,
+  "cachedPromptTokens": 6690,
+  "completionTokens": 509,
+  "totalCost": 0.00035962500000000003,
+  "costPerQuestion": 0.00035962500000000003,
+  "latencyMedianMs": 3548.2617080000005,
+  "latencyP90Ms": 3548.2617080000005,
+  "failedIds": []
+}

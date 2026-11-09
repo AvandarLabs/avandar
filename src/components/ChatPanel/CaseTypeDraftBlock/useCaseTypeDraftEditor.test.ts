@@ -16,6 +16,9 @@ const STATE_COLUMN_ID = "2b3c4d5e-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_KEY_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_DATE_COLUMN_ID = "5e6f7081-bbbb-4bbb-8ccc-ddddeeeeffff";
+const HOSPITAL_DATASET_ID = "8a9b0cad-cccc-4bbb-8ccc-ddddeeeeffff";
+const BEDS_COLUMN_ID = "9b0cad12-cccc-4bbb-8ccc-ddddeeeeffff";
+const CASES_COLUMN_ID = "0cad1234-cccc-4bbb-8ccc-ddddeeeeffff";
 /** A catalog with no date columns, for tests that set no period. */
 const NO_DATE_COLUMNS = {};
 
@@ -685,6 +688,240 @@ describe("useCaseTypeDraftEditor", () => {
       });
     });
 
+    expect(result.current.canCreate).toBe(true);
+  });
+
+  it("replaces a source dataset and drops the columns that came from it", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.replaceSourceDataset(
+        CENSUS_DATASET_ID,
+        HOSPITAL_DATASET_ID,
+      );
+    });
+
+    expect(result.current.draft.sourceDatasets).toEqual([
+      { datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID },
+      { datasetId: HOSPITAL_DATASET_ID, primaryKeyColumnId: "" },
+    ]);
+    expect(
+      result.current.draft.attributes.every((attribute) => {
+        return attribute.datasetId === DATASET_ID;
+      }),
+    ).toBe(true);
+    expect(result.current.draft.labelColumnId).toBe(STATE_COLUMN_ID);
+    expect(result.current.canCreate).toBe(false);
+  });
+
+  it("clears the label when it belonged to the dataset that was replaced", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.replaceSourceDataset(DATASET_ID, HOSPITAL_DATASET_ID);
+    });
+
+    expect(result.current.draft.labelColumnId).toBeUndefined();
+  });
+
+  it("does not replace a dataset with one the draft already uses", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.replaceSourceDataset(CENSUS_DATASET_ID, DATASET_ID);
+    });
+
+    expect(
+      result.current.draft.sourceDatasets.map((sourceDataset) => {
+        return sourceDataset.datasetId;
+      }),
+    ).toEqual([DATASET_ID, CENSUS_DATASET_ID]);
+  });
+
+  it("adds a dataset the draft did not include, with no join key yet", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.addSourceDataset(HOSPITAL_DATASET_ID);
+    });
+
+    expect(result.current.draft.sourceDatasets).toEqual([
+      { datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID },
+      {
+        datasetId: CENSUS_DATASET_ID,
+        primaryKeyColumnId: CENSUS_KEY_COLUMN_ID,
+      },
+      { datasetId: HOSPITAL_DATASET_ID, primaryKeyColumnId: "" },
+    ]);
+    expect(result.current.canCreate).toBe(false);
+  });
+
+  it("does not add a dataset that is already a source", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.addSourceDataset(DATASET_ID);
+    });
+
+    expect(result.current.draft.sourceDatasets).toHaveLength(2);
+  });
+
+  it("adds a column and uses it as the join key when the dataset has none", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.addSourceDataset(HOSPITAL_DATASET_ID);
+    });
+    act(() => {
+      result.current.addSourceColumn({
+        datasetId: HOSPITAL_DATASET_ID,
+        columnId: BEDS_COLUMN_ID,
+        name: "Beds",
+      });
+    });
+
+    expect(result.current.draft.sourceDatasets[2]).toEqual({
+      datasetId: HOSPITAL_DATASET_ID,
+      primaryKeyColumnId: BEDS_COLUMN_ID,
+    });
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === BEDS_COLUMN_ID;
+      }),
+    ).toMatchObject({
+      datasetId: HOSPITAL_DATASET_ID,
+      name: "Beds",
+      isIncluded: true,
+      valueShape: "single",
+      valuePickerRuleType: "most_frequent",
+    });
+    expect(result.current.canCreate).toBe(true);
+  });
+
+  it("adds a column without changing a join key the dataset already has", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.addSourceColumn({
+        datasetId: DATASET_ID,
+        columnId: CASES_COLUMN_ID,
+        name: "Cases",
+      });
+    });
+
+    expect(result.current.draft.sourceDatasets[0]?.primaryKeyColumnId).toBe(
+      PK_COLUMN_ID,
+    );
+    expect(
+      result.current.draft.attributes.some((attribute) => {
+        return attribute.columnId === CASES_COLUMN_ID && attribute.isIncluded;
+      }),
+    ).toBe(true);
+  });
+
+  it("does not add a column the draft already lists", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.addSourceColumn({
+        datasetId: DATASET_ID,
+        columnId: STATE_COLUMN_ID,
+        name: "State again",
+      });
+    });
+
+    expect(
+      result.current.draft.attributes.filter((attribute) => {
+        return attribute.columnId === STATE_COLUMN_ID;
+      }),
+    ).toEqual([
+      expect.objectContaining({ columnId: STATE_COLUMN_ID, name: "State" }),
+    ]);
+  });
+
+  it("adds a field when the join key is a column the draft did not list", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.setPrimaryKeyColumnId(
+        DATASET_ID,
+        CASES_COLUMN_ID,
+        "Cases",
+      );
+    });
+
+    expect(result.current.draft.sourceDatasets[0]?.primaryKeyColumnId).toBe(
+      CASES_COLUMN_ID,
+    );
+    expect(
+      result.current.draft.attributes.find((attribute) => {
+        return attribute.columnId === CASES_COLUMN_ID;
+      }),
+    ).toMatchObject({
+      name: "Cases",
+      isIncluded: true,
+      valueShape: "single",
+    });
+  });
+
+  it("clears the label when removing the dataset that supplied it", () => {
+    const { result } = renderHook(() => {
+      return useCaseTypeDraftEditor({
+        proposedDraft: makeDraft(),
+        dateColumnOptionsByDatasetId: NO_DATE_COLUMNS,
+      });
+    });
+
+    act(() => {
+      result.current.removeSourceDataset(DATASET_ID);
+    });
+
+    expect(result.current.draft.labelColumnId).toBeUndefined();
     expect(result.current.canCreate).toBe(true);
   });
 });

@@ -5,8 +5,12 @@
   background: var(--ava-overlay-background);
   border: none;
   cursor: pointer;
-  inset: var(--app-shell-header-offset, 0)
-    var(--ava-chat-composer-width, min(64vw, 960px)) 0 0;
+  /*
+   * Full bleed under the expanded panel. The panel paints above this layer,
+   * and its gutter is transparent, so stopping at the panel's outer edge
+   * leaves a sharp strip of the slate between the blur and the panel.
+   */
+  inset: var(--app-shell-header-offset, 0) 0 0 0;
   margin: 0;
   padding: 0;
   position: fixed;

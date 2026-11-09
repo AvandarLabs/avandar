@@ -1,6 +1,7 @@
 import { useHotkeys } from "@mantine/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
+import { usePlaceToolState } from "@/views/GisApp/places/usePlaceToolState";
 import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
@@ -13,7 +14,9 @@ import { useHydratedMapSources } from "./MapSourceHydration/useHydratedMapSource
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { PlaceCoordinate } from "@/clients/places/places.types";
 import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
+import type { PlaceToolState } from "@/views/GisApp/places/PlaceTool.types";
 import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { GisAppFeatureList } from "@/views/GisApp/useGisApp/useGisAppFeatureList";
@@ -29,6 +32,7 @@ type UseGisAppCanvasOptions = {
   onEditingTextFeatureIdChange: (
     featureId: AvaMapConfig.AnnotationFeatureId | undefined,
   ) => void;
+  onPlacePicked: (coordinate: PlaceCoordinate) => void;
 };
 
 type UseSelectCreatedAnnotationOptions = {
@@ -44,6 +48,7 @@ type UseSelectCreatedAnnotationOptions = {
 type GisAppStateExtras = {
   annotationTextOverlayTarget: AnnotationTextOverlayTarget;
   avaMap: AvaMap.T;
+  placeToolState: PlaceToolState;
   editingTextFeatureId: AvaMapConfig.AnnotationFeatureId | undefined;
   setEditingTextFeatureId: Dispatch<
     SetStateAction<AvaMapConfig.AnnotationFeatureId | undefined>
@@ -120,6 +125,7 @@ function useGisAppCanvas(
     aoi: options.editor.mapConfig.aoi,
     updateConfig: options.editor.updateConfig,
     onEditingTextFeatureIdChange: options.onEditingTextFeatureIdChange,
+    onPlacePicked: options.onPlacePicked,
   });
 }
 
@@ -204,6 +210,7 @@ export function useGisAppState(
   >();
   const toolMode = useGisAppToolMode();
   const featureList = useGisAppFeatureList();
+  const placeToolState = usePlaceToolState();
   const textOverlayTarget = annotationTextOverlayTarget({
     annotationFeatures: editor.mapConfig.annotations.features,
     editingTextFeatureId,
@@ -239,6 +246,7 @@ export function useGisAppState(
     mapToolMode: toolMode.mapToolMode,
     onMapToolModeChange: toolMode.setMapToolMode,
     onEditingTextFeatureIdChange: setEditingTextFeatureId,
+    onPlacePicked: placeToolState.onPlacePicked,
   });
   useGisAppHotkeys({ editor, setIsChromeHidden: chrome.setIsChromeHidden });
   useSelectCreatedAnnotation({
@@ -262,6 +270,7 @@ export function useGisAppState(
     ...featureList,
     annotationTextOverlayTarget: textOverlayTarget,
     avaMap,
+    placeToolState,
     editingTextFeatureId,
     setEditingTextFeatureId,
   };

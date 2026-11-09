@@ -20,6 +20,7 @@ import {
   reviewGeneratedSqlAssumptions,
 } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError } from "@/utils/notifications/notify";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
@@ -41,6 +42,11 @@ import type { MutableRefObject } from "react";
 type ApplyChatModelTurnResponseOptions = {
   response: ChatResponse.T;
   apiMessages: readonly ChatClientMessage.T[];
+  /**
+   * The question as labels on this device show it, each mention as
+   * `@Name`. Defaults to the last question in `apiMessages`.
+   */
+  questionLabel?: string;
   currentUser: User.T | undefined;
   currentPageContext: ChatPageContext.T;
   workspaceId: Workspace.Id;
@@ -62,6 +68,7 @@ async function reviewAndApplySql(
     Pick<
       ApplyChatModelTurnResponseOptions,
       | "apiMessages"
+      | "questionLabel"
       | "currentUser"
       | "workspaceId"
       | "isGenerationStale"
@@ -95,7 +102,8 @@ async function reviewAndApplySql(
   if (options.isGenerationStale()) {
     return false;
   }
-  const prompt = getLastQuestionFromMessages(options.apiMessages);
+  const prompt =
+    options.questionLabel ?? getLastQuestionFromMessages(options.apiMessages);
   options.dataExplorerDispatch.setRawSql(options.sql);
   options.dataExplorerDispatch.setNlPrompt(prompt);
   try {
@@ -161,7 +169,14 @@ export async function applyChatModelTurnResponse(
   const options = explorerResponse
     ? { ...rawOptions, response: explorerResponse.response }
     : rawOptions;
-  const generatedSql = options.response.generatedSql?.sql;
+  const userTexts = options.apiMessages.flatMap((message) => {
+    return message.role === "user" ? [message.content] : [];
+  });
+  // A column question is answered from the schema. Applying its SQL paints
+  // a failed query on the explorer beside a reply that did not need one.
+  const generatedSql = isSchemaAnswerTurn(userTexts)
+    ? undefined
+    : options.response.generatedSql?.sql;
   const sqlApplied = generatedSql
     ? await reviewAndApplySql({ ...options, sql: generatedSql })
     : false;
