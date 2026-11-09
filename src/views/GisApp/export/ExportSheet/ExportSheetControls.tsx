@@ -1,4 +1,5 @@
 import { Divider, Stack } from "@mantine/core";
+import { ExportSheetFeatureListFields } from "@/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields";
 import { ExportSheetHeaderLineFields } from "@/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields";
 import { ExportSheetMandatoryFurniture } from "@/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture";
 import { ExportSheetPaperOrientationFields } from "@/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields";
@@ -52,6 +53,11 @@ export function ExportSheetControls({
       <ExportSheetSourceAndDisclaimerFields
         exportLayout={config.exportLayout}
         sourceLinePlaceholder={furnitureText.sourceLine}
+        onConfigChange={onConfigChange}
+      />
+      <Divider />
+      <ExportSheetFeatureListFields
+        config={config}
         onConfigChange={onConfigChange}
       />
       <Divider />
