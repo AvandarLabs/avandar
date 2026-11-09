@@ -27,10 +27,7 @@ export function useDataCatalogKeywordOptions(options: {
 }): DataCatalogKeywordOptions {
   const { query, filters, topKeywords } = options;
   const [keywordSearch, setKeywordSearch] = useState("");
-  const [debouncedKeywordSearch] = useDebouncedValue(
-    keywordSearch.trim(),
-    150,
-  );
+  const [debouncedKeywordSearch] = useDebouncedValue(keywordSearch.trim(), 150);
   const isSearchingKeywords = debouncedKeywordSearch !== "";
   const keywordQuery = useQuery({
     queryKey: [
@@ -51,9 +48,9 @@ export function useDataCatalogKeywordOptions(options: {
 
   return {
     keywordOptions:
-      isSearchingKeywords && keywordQuery.data ?
-        keywordQuery.data
-      : topKeywords,
+      isSearchingKeywords && keywordQuery.data
+        ? keywordQuery.data
+        : topKeywords,
     onKeywordSearchChange: setKeywordSearch,
   };
 }

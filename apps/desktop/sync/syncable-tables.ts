@@ -197,6 +197,10 @@ export const EXCLUDED_TABLES = [
   // debugging. Nothing the desktop renders.
   "pipeline_executions",
   "pipeline_execution_scopes",
+  // The open data catalog's unfiltered facet counts, recounted on the server
+  // after each pipeline run. Derived from `data_catalog_listings`, which the
+  // desktop already mirrors and can count itself.
+  "data_catalog_facet_counts",
 ] as const;
 
 /**

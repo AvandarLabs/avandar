@@ -262,10 +262,13 @@ export type DataCatalogListingSearchFilters = {
   isLoadableOnly: boolean;
 };
 
-/** One choosable value of a facet and how many listings it would keep. */
+/**
+ * One choosable value of a facet and how many listings it would keep. The
+ * count is undefined where too many listings match to count them quickly.
+ */
 export type DataCatalogListingFacetOption = {
   value: string;
-  count: number;
+  count: number | undefined;
 };
 
 /**
@@ -290,10 +293,14 @@ export type DataCatalogListingSearchFacets = {
   /** The sources' free-form keywords on the listings in view. */
   tags: DataCatalogListingFacetOption[];
   formats: DataCatalogListingFacetOption[];
-  updatedWithin: Record<DataCatalogListingUpdatedWithin, number>;
+  /** Undefined for a window too many listings match to count quickly. */
+  updatedWithin: Record<DataCatalogListingUpdatedWithin, number | undefined>;
 
-  /** Unloadable listings that match everything except loadable-only. */
-  numUnloadable: number;
+  /**
+   * Unloadable listings that match everything except loadable-only, or
+   * undefined where too many listings match to count them quickly.
+   */
+  numUnloadable: number | undefined;
 
   /** Every listing in the catalog, unsearched and unfiltered. */
   numCatalogListings: number;

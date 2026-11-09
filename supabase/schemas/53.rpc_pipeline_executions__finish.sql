@@ -1,7 +1,8 @@
 /**
  * Records that a pipeline command finished: sets its status, error, and
  * finish time, adds the run's own setup time to `setup_ms`, writes deletion
- * totals a reset passes, and counts the pipeline's catalog as it now stands.
+ * totals a reset passes, counts the pipeline's catalog as it now stands, and
+ * refreshes the catalog's facet counts (`data_catalog_facet_counts__refresh`).
  * An execution with scope rows, such as a prune, gets its deletion totals
  * from those scope rows, so passing them is an error.
  *
@@ -114,6 +115,10 @@ begin
       where listing.pipeline_name = v_pipeline_name
     ) catalog_columns
   where execution.id = p_execution_id;
+
+  -- The run may have added, changed, or removed listings, so the catalog's
+  -- unfiltered facet counts are recounted.
+  perform public.data_catalog_facet_counts__refresh();
 end;
 $$ language plpgsql volatile security invoker
 set

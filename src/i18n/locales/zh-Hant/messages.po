@@ -1262,6 +1262,10 @@ msgstr "來自衍生數據集"
 msgid "Sheet"
 msgstr "工作表"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "已發布至工作區"
@@ -5088,6 +5092,10 @@ msgstr "數字範圍"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "取代 URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr ""
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts

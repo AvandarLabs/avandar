@@ -25,6 +25,9 @@ values
    'Bridge inspections', 'Fixture Quoxmire Agency',
    null, 'search-4.parquet', 'pgtap-fixture-search', 'run-1');
 
+-- An unsearched, unfiltered total is the summary's, as of its last refresh.
+select public.data_catalog_facet_counts__refresh();
+
 select plan(13);
 
 select bag_eq(
@@ -101,7 +104,7 @@ select results_eq(
 select ok(
   has_function_privilege(
     'authenticated',
-    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text, boolean, text[], text[], text[], text)',
+    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text, boolean, text[], text[], text[], text, integer)',
     'execute'
   ),
   'a signed-in user may search the catalog'
@@ -110,7 +113,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text, boolean, text[], text[], text[], text)',
+    'public.rpc_data_catalog_listings__search(text, integer, integer, text[], text[], text, boolean, text[], text[], text[], text, integer)',
     'execute'
   ),
   'a signed-out visitor may not search the catalog'

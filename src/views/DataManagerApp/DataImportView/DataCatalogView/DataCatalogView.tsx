@@ -410,6 +410,7 @@ export function DataCatalogView({
         <section className={css.dataCatalogViewResults} aria-label={t`Results`}>
           <DataCatalogResultsHeader
             numResults={catalogSearch.totalCount}
+            isNumResultsCapped={catalogSearch.isTotalCapped}
             numCatalogListings={facets?.numCatalogListings ?? 0}
             // "X of Y" waits for the catalog's size, which the facet counts
             // carry, rather than reading "X of 0" for a moment.
@@ -481,7 +482,11 @@ export function DataCatalogView({
           ) : (
             <DataCatalogListingList
               displayedListings={catalogSearch.listings}
-              totalCount={catalogSearch.totalCount}
+              totalCount={
+                catalogSearch.isTotalCapped
+                  ? undefined
+                  : catalogSearch.totalCount
+              }
               selectedId={isSelectionShown ? selectedId : undefined}
               onSelect={setSelectedId}
               hasNextPage={catalogSearch.hasNextPage}

@@ -152,7 +152,7 @@ export function DataCatalogFilterRail({
           }}
           label={t`Hide datasets that can't be loaded`}
           description={
-            filters.isLoadableOnly && facets.numUnloadable > 0
+            filters.isLoadableOnly && (facets.numUnloadable ?? 0) > 0
               ? t`${facets.numUnloadable} hidden`
               : undefined
           }

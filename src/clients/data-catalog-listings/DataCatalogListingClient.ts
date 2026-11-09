@@ -107,7 +107,10 @@ export const DataCatalogListingClient = createUsableServiceClient(
             .throwOnError();
 
           return (dbRows ?? []).map((dbRow) => {
-            return { value: dbRow.value, count: dbRow.listing_count };
+            // The generated type marks `listing_count` non-null, but it is
+            // null where too many listings match to count them.
+            const listingCount: number | null = dbRow.listing_count;
+            return { value: dbRow.value, count: listingCount ?? undefined };
           });
         },
       };

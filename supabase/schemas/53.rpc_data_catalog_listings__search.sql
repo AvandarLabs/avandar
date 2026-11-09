@@ -6,6 +6,12 @@
  * page always agrees with the counts `rpc_data_catalog_listings__search_facets`
  * reports. Every sort ends on name and id, so pages are stable.
  *
+ * A page reads about as many listings as it shows, so it stays fast as the
+ * catalog grows. The total is counted only up to `p_count_cap`: past that,
+ * `is_total_capped` is true and `total_count` is the cap. With nothing
+ * searched or filtered, the total is the whole catalog's, read from
+ * `data_catalog_facet_counts`.
+ *
  * @param p_query What the user typed. Accepts `websearch_to_tsquery` syntax:
  * quoted phrases, `or`, and `-word`.
  * @param p_limit Page size, clamped to between 1 and 200.
@@ -26,10 +32,12 @@
  * updated first, undated last), or `name`. Null sorts by relevance when there
  * is a query and by name when there is not. Any other value raises `22023`
  * (invalid parameter value).
+ * @param p_count_cap The most matches to count, clamped to between 1 and
+ * 10,000.
  *
  * @returns One row per listing on the page, with its organization levels.
- * `total_count` is the number of matches across every page, repeated on each
- * row.
+ * `total_count` and `is_total_capped` describe the matches across every page,
+ * repeated on each row.
  */
 create or replace function public.rpc_data_catalog_listings__search (
   p_query text,
@@ -42,7 +50,8 @@ create or replace function public.rpc_data_catalog_listings__search (
   p_organization2_names text[] default '{}',
   p_domains text[] default '{}',
   p_tags text[] default '{}',
-  p_sort_by text default null
+  p_sort_by text default null,
+  p_count_cap integer default 10000
 ) returns table (
   id uuid,
   display_name text,
@@ -55,11 +64,13 @@ create or replace function public.rpc_data_catalog_listings__search (
   is_invalid boolean,
   file_format text,
   last_updated_at timestamptz,
-  total_count bigint
+  total_count bigint,
+  is_total_capped boolean
 ) as $$
 declare
   v_limit integer := least(greatest(coalesce(p_limit, 50), 1), 200);
   v_offset integer := greatest(coalesce(p_offset, 0), 0);
+  v_count_cap integer := least(greatest(coalesce(p_count_cap, 10000), 1), 10000);
   v_sort_by text := coalesce(
     p_sort_by,
     case
@@ -67,11 +78,56 @@ declare
       else 'relevance'
     end
   );
+  v_is_unnarrowed boolean := nullif(btrim(p_query), '') is null and
+  cardinality(coalesce(p_sources, '{}')) = 0 and
+  cardinality(coalesce(p_formats, '{}')) = 0 and
+  coalesce(p_updated_within, 'any') = 'any' and
+  cardinality(coalesce(p_organization2_names, '{}')) = 0 and
+  cardinality(coalesce(p_domains, '{}')) = 0 and
+  cardinality(coalesce(p_tags, '{}')) = 0;
+  v_total_count bigint;
+  v_is_total_capped boolean := false;
 begin
   if v_sort_by not in ('relevance', 'updated', 'name') then
     raise exception 'Unknown catalog sort: %', p_sort_by
     using
       errcode = '22023';
+  end if;
+
+  if v_is_unnarrowed then
+    select
+      facet_count.listing_count
+    into
+      v_total_count
+    from
+      public.data_catalog_facet_counts facet_count
+    where
+      facet_count.facet = 'updated_within' and
+      facet_count.value = 'any' and
+      facet_count.is_loadable_only = coalesce(p_is_loadable_only, false);
+  end if;
+
+  if v_total_count is null then
+    select
+      count(*)
+    into
+      v_total_count
+    from
+      public.data_catalog_listings__search_matches (
+        p_query,
+        p_sources,
+        p_formats,
+        p_updated_within,
+        p_is_loadable_only,
+        p_organization2_names,
+        p_domains,
+        p_tags,
+        null,
+        v_count_cap + 1
+      );
+
+    v_is_total_capped := v_total_count > v_count_cap;
+    v_total_count := least(v_total_count, v_count_cap);
   end if;
 
   return query
@@ -87,7 +143,8 @@ begin
     match.is_invalid,
     match.file_format,
     match.last_updated_at,
-    count(*) over ()
+    v_total_count,
+    v_is_total_capped
   from
     public.data_catalog_listings__search_matches (
       p_query,
@@ -97,36 +154,21 @@ begin
       p_is_loadable_only,
       p_organization2_names,
       p_domains,
-      p_tags
-    ) match
-  where
-    match.passes_source and
-    match.passes_format and
-    match.passes_updated and
-    match.passes_loadable and
-    match.passes_organization2 and
-    match.passes_domain and
-    match.passes_tag
+      p_tags,
+      v_sort_by,
+      v_limit,
+      v_offset
+    )
+  with
+    ordinality as match
   order by
-    case
-      when v_sort_by = 'relevance' then match.score
-    end desc nulls last,
-    case
-      when v_sort_by = 'updated' then match.last_updated_at
-    end desc nulls last,
-    match.display_name,
-    match.id
-  limit
-    v_limit
-  offset
-    v_offset;
+    match.ordinality;
 end;
 $$ language plpgsql stable security invoker
 set
   search_path = '';
 
--- `authenticated` only: the catalog is browsed from the app by signed-in
--- users, and row level security already lets them read every listing.
+-- `authenticated` only: unauthenticated callers cannot browse the catalog.
 revoke all on function public.rpc_data_catalog_listings__search (
   text,
   integer,
@@ -138,7 +180,8 @@ revoke all on function public.rpc_data_catalog_listings__search (
   text[],
   text[],
   text[],
-  text
+  text,
+  integer
 )
 from
   public,
@@ -158,5 +201,6 @@ execute on function public.rpc_data_catalog_listings__search (
   text[],
   text[],
   text[],
-  text
+  text,
+  integer
 ) to authenticated;

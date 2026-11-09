@@ -125,7 +125,7 @@ export function DataCatalogFacetSelect({
         return (
           <DataCatalogFacetOption
             label={option.label}
-            count={countsByValue.get(option.value) ?? 0}
+            count={countsByValue.get(option.value)}
             search={search}
             isChecked={checked === true}
           />

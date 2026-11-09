@@ -1295,6 +1295,10 @@ msgstr "من مجموعة البيانات المشتقة"
 msgid "Sheet"
 msgstr "ورقة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "تم النشر في مساحة العمل"
@@ -5213,6 +5217,10 @@ msgstr "نطاق الأرقام"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "استبدال عنوان URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr ""
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
