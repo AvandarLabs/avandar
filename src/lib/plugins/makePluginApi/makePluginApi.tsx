@@ -1,4 +1,8 @@
-import { AvandarProvider, makePluginTranslator } from "@avandar/plugin-sdk";
+import {
+  AvandarProvider,
+  PluginError,
+  makePluginTranslator,
+} from "@avandar/plugin-sdk";
 import { t } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -13,6 +17,17 @@ import type {
   PluginMessages,
 } from "@avandar/plugin-sdk";
 import type { ReactNode } from "react";
+
+/**
+ * Whether the drawer host generation is still `hostGeneration`. A command can
+ * outlive the workspace or view it started in, so its API checks this before
+ * it opens anything or changes the Data Explorer.
+ */
+function _makeIsFromCurrentHost(hostGeneration: number): () => boolean {
+  return () => {
+    return PluginDrawerStore.getGeneration() === hostGeneration;
+  };
+}
 
 function _makeDataApi(context: PluginInvocationContext): AvandarApi["data"] {
   return {
@@ -30,9 +45,13 @@ function _makeDataApi(context: PluginInvocationContext): AvandarApi["data"] {
 }
 
 function _makeDataExplorerApi(
-  context: PluginInvocationContext,
-  bridge: DataExplorerBridge | undefined,
+  options: Readonly<{
+    context: PluginInvocationContext;
+    bridge: DataExplorerBridge | undefined;
+    isFromCurrentHost: () => boolean;
+  }>,
 ): AvandarApi["dataExplorer"] {
+  const { context, bridge, isFromCurrentHost } = options;
   if (context.slotId !== "dataExplorer.toolbar" || bridge === undefined) {
     return undefined;
   }
@@ -40,6 +59,12 @@ function _makeDataExplorerApi(
     // `async` turns a thrown `PluginError` into a rejected promise, which is
     // how a plugin receives it.
     addColumns: async (columns) => {
+      if (!isFromCurrentHost()) {
+        throw new PluginError(
+          "InvalidHandle",
+          "The Data Explorer this command ran in is no longer open. Run the command again.",
+        );
+      }
       return addColumnsForInvocation({ context, bridge, columns });
     },
   };
@@ -50,16 +75,14 @@ function _makeUiApi(
     pluginName: string;
     wrapContent: (content: ReactNode) => ReactNode;
 
-    /** The drawer host generation the API was made in. */
-    hostGeneration: number;
+    /**
+     * Whether the drawer host is the one the API was made in. A command's
+     * modal or drawer must not appear in the next workspace.
+     */
+    isFromCurrentHost: () => boolean;
   }>,
 ): AvandarApi["ui"] {
-  const { pluginName, wrapContent, hostGeneration } = options;
-  // A command can outlive the workspace it started in. Its modal or drawer
-  // must not appear in the next workspace.
-  const isFromCurrentHost = (): boolean => {
-    return PluginDrawerStore.getGeneration() === hostGeneration;
-  };
+  const { pluginName, wrapContent, isFromCurrentHost } = options;
   // The id of the modal this invocation opened last, which `closeModal`
   // closes. Other invocations' modals are never touched.
   let lastModalId: string | undefined;
@@ -105,7 +128,8 @@ function _makeUiApi(
  * the drawer host has unmounted, so a command left running by a workspace
  * switch cannot open a modal or a drawer in the next workspace. Its
  * `dataExplorer` is set only for a Data Explorer toolbar invocation that came
- * with a `dataExplorerBridge`.
+ * with a `dataExplorerBridge`, and its `addColumns` rejects with
+ * `PluginError("InvalidHandle")` once the drawer host has unmounted.
  *
  * It pulls in the plugin SDK runtime and Lingui's message compiler, so import
  * it lazily, at the time a command runs, to keep them out of the main bundle.
@@ -130,19 +154,22 @@ export function makePluginApi(
       </PluginErrorBoundary>
     );
   };
+  const isFromCurrentHost = _makeIsFromCurrentHost(
+    PluginDrawerStore.getGeneration(),
+  );
   const api: AvandarApi = {
     context,
     workspace,
     data: _makeDataApi(context),
-    ui: _makeUiApi({
-      pluginName,
-      wrapContent,
-      hostGeneration: PluginDrawerStore.getGeneration(),
-    }),
+    ui: _makeUiApi({ pluginName, wrapContent, isFromCurrentHost }),
     i18n: {
       t: makePluginTranslator({ locale: workspace.locale, messages }),
     },
-    dataExplorer: _makeDataExplorerApi(context, dataExplorerBridge),
+    dataExplorer: _makeDataExplorerApi({
+      context,
+      bridge: dataExplorerBridge,
+      isFromCurrentHost,
+    }),
   };
   return api;
 }

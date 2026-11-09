@@ -117,6 +117,24 @@ describe("useDataExplorerPluginBridge", () => {
     expect(rendered.result.current.state.rawSql).toBe(BASE_SQL);
   });
 
+  it("changes nothing and shows no notification once the explorer unmounted", () => {
+    const rendered = _renderBridge();
+    const bridge = rendered.result.current.getBridge?.();
+    rendered.unmount();
+
+    let isApplied = true;
+    act(() => {
+      isApplied =
+        bridge?.applyDerivedColumnsSql({
+          sql: WRAPPED_SQL,
+          columnNames: COLUMN_NAMES,
+        }) ?? true;
+    });
+
+    expect(isApplied).toBe(false);
+    expect(screen.queryByText("Added double_cases")).not.toBeInTheDocument();
+  });
+
   it("lists the added columns in a notification", async () => {
     const rendered = _renderBridge();
 

@@ -286,6 +286,20 @@ describe("makePluginApi", () => {
     });
   });
 
+  it("rejects addColumns with InvalidHandle for an api made before the host unmounted", async () => {
+    const previousHost = render(<PluginDrawerHost />);
+    const bridge = _makeBridge();
+    const staleApi = _makeApiFromRows(bridge);
+    previousHost.unmount();
+
+    await expect(
+      staleApi.dataExplorer?.addColumns([
+        { name: "double_x", expression: "{x} * 2", inputs: { x: "x" } },
+      ]),
+    ).rejects.toMatchObject({ code: "InvalidHandle" });
+    expect(bridge.applyDerivedColumnsSql).not.toHaveBeenCalled();
+  });
+
   it("gives no dataExplorer API to an invocation without a bridge", () => {
     expect(_makeApiFromRows().dataExplorer).toBeUndefined();
   });

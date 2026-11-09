@@ -67,7 +67,8 @@ function _makeBridgeFromBaseSql(
  * Builds what the Data Explorer lends a toolbar plugin command so
  * `avandar.dataExplorer.addColumns` can add columns to its query. The getter
  * captures the result on screen when the command is clicked. Applying
- * returns false, changing nothing, once the explorer shows another result.
+ * returns false, changing nothing, once the explorer shows another result or
+ * has unmounted.
  * Undefined while there is no result to run on.
  *
  * Used by `DataExplorerApp`, which passes the getter to `PluginMenuSlot`.
@@ -87,6 +88,11 @@ export function useDataExplorerPluginBridge(
   const latestRef = useRef<LatestExplorer>({ executedSql, state });
   useLayoutEffect(() => {
     latestRef.current = { executedSql, state };
+    return () => {
+      // Plugin modals live at the app root and can outlast the explorer. With
+      // no executed SQL, an apply after unmount returns false.
+      latestRef.current = { executedSql: undefined, state };
+    };
   }, [executedSql, state]);
 
   return useMemo(() => {
