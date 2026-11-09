@@ -36,14 +36,21 @@ list_crs AS (
     WHERE geom IS NOT NULL
   ) centroid
 ),
-list_pairs AS (
-  SELECT list_rows.list_row_id, ${labelSql} AS nearest_label,
-    ST_Distance(
-      ST_Transform(list_rows.geom, 'EPSG:4326', list_crs.meters_crs, always_xy := true),
-      ST_Transform(nearest_features.geom, 'EPSG:4326', list_crs.meters_crs, always_xy := true)
-    ) AS pair_distance
-  FROM list_rows, nearest_features, list_crs
+list_projected AS (
+  SELECT list_rows.list_row_id,
+    ST_Transform(list_rows.geom, 'EPSG:4326', list_crs.meters_crs, always_xy := true) AS meters_geom
+  FROM list_rows, list_crs
+),
+nearest_projected AS (
+  SELECT ${labelSql} AS nearest_label,
+    ST_Transform(nearest_features.geom, 'EPSG:4326', list_crs.meters_crs, always_xy := true) AS meters_geom
+  FROM nearest_features, list_crs
   WHERE nearest_features.geom IS NOT NULL
+),
+list_pairs AS (
+  SELECT list_projected.list_row_id, nearest_projected.nearest_label,
+    ST_Distance(list_projected.meters_geom, nearest_projected.meters_geom) AS pair_distance
+  FROM list_projected, nearest_projected
 ),
 list_measured AS (
   SELECT list_row_id, min(pair_distance) AS distance_meters,
