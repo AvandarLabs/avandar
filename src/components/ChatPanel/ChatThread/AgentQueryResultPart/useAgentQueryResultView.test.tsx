@@ -197,4 +197,41 @@ describe("useAgentQueryResultView", () => {
       { week: "2024-01-08", North: 7, South: 2 },
     ]);
   });
+
+  it.each([
+    { chart: "bar", layout: "stack" },
+    { chart: "area", layout: "stacked" },
+  ])("stacks a $chart chart split by district", async ({ chart, layout }) => {
+    _succeedWithLongResult();
+    const agentResult = AgentQueryResult.create({
+      sql: LONG_SQL,
+      chart,
+      title: "Cases by week and district",
+    });
+
+    const { result } = _renderView(_createQueryClient(), agentResult);
+
+    await waitFor(() => {
+      expect(result.current.status).toBe("ready");
+    });
+    expect(result.current).toMatchObject({
+      vizConfig: { vizType: chart, layout },
+    });
+  });
+
+  it("keeps a bar chart grouped when the result is not split", async () => {
+    _succeed();
+    const agentResult = AgentQueryResult.create({
+      sql: SQL,
+      chart: "bar",
+      title: "Cases by state",
+    });
+
+    const { result } = _renderView(_createQueryClient(), agentResult);
+
+    await waitFor(() => {
+      expect(result.current.status).toBe("ready");
+    });
+    expect(result.current).toMatchObject({ vizConfig: { layout: "group" } });
+  });
 });

@@ -2215,6 +2215,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "أدرج العناصر النائبة z وx وy حيث يتوقع الخادم فهرس التجانب."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(فارغ)"
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
@@ -8955,6 +8959,12 @@ msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على م
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "أدخل نصك هنا"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "تُرسم سلسلة واحدة لكل {splitColumnName}. تُحدَّد الألوان تلقائيًا. "
+"إضافة سلسلة ثانية توقف ذلك."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "

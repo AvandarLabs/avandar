@@ -16,10 +16,25 @@ export type ChartInput = {
   vizConfig: AvaVizConfig.T;
 };
 
+/**
+ * Chart props after a category split, plus the name of the column the chart
+ * was split by. `splitColumnName` is undefined when nothing was split.
+ */
+export type CategorySplitChartInput = ChartInput & {
+  splitColumnName: string | undefined;
+};
+
 type XYVizConfig = Extract<
   AvaVizConfig.T,
   { vizType: "bar" | "line" | "area" }
 >;
+
+type SplitSource = {
+  vizConfig: XYVizConfig;
+  templateSeries: AvaXYSeries;
+  xColumn: QueryResult.ColumnWithId;
+  valueColumn: QueryResult.ColumnWithId;
+};
 
 /** The Other series is neutral, so it reads as the rest, not a category. */
 const OTHER_SERIES_COLOR = "var(--mantine-color-neutral-5)";
@@ -32,35 +47,15 @@ function _isXYVizConfig(config: AvaVizConfig.T): config is XYVizConfig {
   );
 }
 
-/** One series per split column, styled like the chart's own series. */
-function _buildSplitSeries(
-  options: Readonly<{
-    templateSeries: AvaXYSeries;
-    seriesColumns: readonly QueryResult.ColumnWithId[];
-    otherLabel: string;
-  }>,
-): AvaXYSeries[] {
-  const { templateSeries, seriesColumns, otherLabel } = options;
-  return seriesColumns.map((column, index) => {
-    return {
-      ...templateSeries,
-      key: column.id,
-      label: undefined,
-      color:
-        column.name === otherLabel
-          ? OTHER_SERIES_COLOR
-          : CHART_COLOR_SWATCHES[index % CHART_COLOR_SWATCHES.length],
-    };
-  });
-}
-
-function _splitChartInputByCategory(
-  input: ChartInput,
-  otherLabel: string,
-): ChartInput {
+/**
+ * The XY config, its one series, and the X and value columns a split needs.
+ * Undefined for any other chart type, a chart with more or fewer than one
+ * series, or a slot whose column is missing from the result.
+ */
+function _getSplitSource(input: ChartInput): SplitSource | undefined {
   const { columns, vizConfig } = input;
   if (!_isXYVizConfig(vizConfig) || vizConfig.series.length !== 1) {
-    return input;
+    return undefined;
   }
   const [templateSeries] = vizConfig.series;
   const xColumn = columns.find((column) => {
@@ -69,34 +64,72 @@ function _splitChartInputByCategory(
   const valueColumn = columns.find((column) => {
     return column.id === templateSeries?.key;
   });
-  if (
-    templateSeries === undefined ||
+  return templateSeries === undefined ||
     xColumn === undefined ||
     valueColumn === undefined
-  ) {
-    return input;
-  }
-  const wideResult = makeWideResultFromLongResult({
-    ...input,
-    xColumnName: xColumn.name,
-    valueColumnName: valueColumn.name,
-    otherLabel,
+    ? undefined
+    : { vizConfig, templateSeries, xColumn, valueColumn };
+}
+
+/** One series per split column, styled like the chart's own series. */
+function _buildSplitSeries(
+  options: Readonly<{
+    templateSeries: AvaXYSeries;
+    seriesColumns: readonly QueryResult.ColumnWithId[];
+    hasOtherSeries: boolean;
+  }>,
+): AvaXYSeries[] {
+  const { templateSeries, seriesColumns, hasOtherSeries } = options;
+  const otherIndex = hasOtherSeries ? seriesColumns.length - 1 : undefined;
+  return seriesColumns.map((column, index) => {
+    return {
+      ...templateSeries,
+      key: column.id,
+      label: undefined,
+      color:
+        index === otherIndex
+          ? OTHER_SERIES_COLOR
+          : CHART_COLOR_SWATCHES[index % CHART_COLOR_SWATCHES.length],
+    };
   });
-  if (!wideResult.isSplit) {
-    return input;
+}
+
+function _splitChartInputByCategory(
+  input: ChartInput,
+  labels: Readonly<{ otherLabel: string; blankLabel: string }>,
+): CategorySplitChartInput {
+  const unchanged = { ...input, splitColumnName: undefined };
+  const source = _getSplitSource(input);
+  const wideResult =
+    source === undefined
+      ? undefined
+      : makeWideResultFromLongResult({
+          ...input,
+          ...labels,
+          xColumnName: source.xColumn.name,
+          valueColumnName: source.valueColumn.name,
+        });
+  if (source === undefined || wideResult === undefined || !wideResult.isSplit) {
+    return unchanged;
   }
+  const { valueColumn, templateSeries } = source;
   const seriesColumns = wideResult.seriesColumnNames.map((name, index) => {
     const id = `${valueColumn.id}:split:${index}` as QueryColumn.Id;
     return { id, name, dataType: valueColumn.dataType };
   });
   return {
-    columns: [xColumn, ...seriesColumns],
+    columns: [source.xColumn, ...seriesColumns],
     data: wideResult.data,
     dateColumns: input.dateColumns,
+    splitColumnName: wideResult.splitColumnName,
     vizConfig: {
-      ...vizConfig,
+      ...source.vizConfig,
       withLegend: true,
-      series: _buildSplitSeries({ templateSeries, seriesColumns, otherLabel }),
+      series: _buildSplitSeries({
+        templateSeries,
+        seriesColumns,
+        hasOtherSeries: wideResult.hasOtherSeries,
+      }),
     },
   };
 }
@@ -105,20 +138,25 @@ function _splitChartInputByCategory(
  * Turns a long query result into one series per category when it is drawn
  * as a line, bar, or area chart, so `cases` by week and district shows a
  * line per district with a legend instead of one zigzag line. Every other
- * chart type, and any result that is not long, comes back unchanged.
+ * chart type, and any result that is not long, comes back unchanged with no
+ * `splitColumnName`.
  *
- * Use it on the props of a `VisualizationContainer` whose result comes from
- * free-form SQL, for example a chart the AI agent drew. It only changes what
- * is drawn: the caller's own config, columns, and rows stay as they are.
+ * Use it on the props of a `VisualizationContainer`, whether the result came
+ * from a structured query or from free-form SQL, for example a chart the AI
+ * agent drew. It only changes what is drawn: the caller's own config,
+ * columns, and rows stay as they are.
  */
-export function useCategorySplitChartInput(input: ChartInput): ChartInput {
+export function useCategorySplitChartInput(
+  input: ChartInput,
+): CategorySplitChartInput {
   const { t } = useLingui();
   const otherLabel = t`Other`;
+  const blankLabel = t`(Blank)`;
   const { columns, data, dateColumns, vizConfig } = input;
   return useMemo(() => {
     return _splitChartInputByCategory(
       { columns, data, dateColumns, vizConfig },
-      otherLabel,
+      { otherLabel, blankLabel },
     );
-  }, [columns, data, dateColumns, vizConfig, otherLabel]);
+  }, [columns, data, dateColumns, vizConfig, otherLabel, blankLabel]);
 }

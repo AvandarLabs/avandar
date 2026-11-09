@@ -2160,6 +2160,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "在伺服器預期圖磚索引的位置加入 z、x 和 y 佔位符。"
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "（空白）"
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
@@ -8756,6 +8760,11 @@ msgstr "工作區 ID 不得包含空格"
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "在此輸入文字"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "按每個{splitColumnName}各繪製一個系列。顏色已自動設定。新增第二個系列會關閉此功能。"
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "

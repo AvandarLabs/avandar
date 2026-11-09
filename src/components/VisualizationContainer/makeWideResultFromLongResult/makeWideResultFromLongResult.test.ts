@@ -22,8 +22,19 @@ function _split(
     xColumnName: "week",
     valueColumnName: "cases",
     otherLabel: "Other",
+    blankLabel: "(Blank)",
   });
 }
+
+function _getWeeks(result: { data: UnknownDataFrame }): unknown[] {
+  return result.data.map((row) => {
+    return row.week;
+  });
+}
+
+const JAN_1_MS = Date.UTC(2024, 0, 1);
+const JAN_8_MS = Date.UTC(2024, 0, 8);
+const JAN_15_MS = Date.UTC(2024, 0, 15);
 
 describe("makeWideResultFromLongResult", () => {
   it("gives one series column per district", () => {
@@ -109,6 +120,7 @@ describe("makeWideResultFromLongResult", () => {
       xColumnName: "quarter",
       valueColumnName: "cases",
       otherLabel: "Other",
+      blankLabel: "(Blank)",
     });
 
     expect(
@@ -169,5 +181,127 @@ describe("makeWideResultFromLongResult", () => {
     );
 
     expect(result.data).toEqual([{ week: "2024-01-01", North: 5, South: 3 }]);
+  });
+
+  it("groups and sorts epoch-millisecond dates oldest first", () => {
+    const result = _split([
+      { week: JAN_15_MS, district: "North", cases: 1 },
+      { week: JAN_1_MS, district: "North", cases: 2 },
+      { week: JAN_15_MS, district: "South", cases: 3 },
+      { week: JAN_8_MS, district: "South", cases: 4 },
+    ]);
+
+    expect(result.data).toEqual([
+      { week: JAN_1_MS, North: 2, South: null },
+      { week: JAN_8_MS, North: null, South: 4 },
+      { week: JAN_15_MS, North: 1, South: 3 },
+    ]);
+  });
+
+  it("groups equal Date objects into one row, oldest first", () => {
+    const result = _split([
+      { week: new Date(JAN_8_MS), district: "North", cases: 1 },
+      { week: new Date(JAN_1_MS), district: "North", cases: 2 },
+      { week: new Date(JAN_8_MS), district: "South", cases: 3 },
+    ]);
+
+    expect(result.data).toEqual([
+      { week: new Date(JAN_1_MS), North: 2, South: null },
+      { week: new Date(JAN_8_MS), North: 1, South: 3 },
+    ]);
+  });
+
+  it("sums rows with no district into Other", () => {
+    const result = _split([
+      { week: "2024-01-01", district: "North", cases: 5 },
+      { week: "2024-01-01", district: "South", cases: 3 },
+      { week: "2024-01-01", district: null, cases: 2 },
+    ]);
+
+    expect(result).toMatchObject({
+      isSplit: true,
+      hasOtherSeries: true,
+      seriesColumnNames: ["North", "South", "Other"],
+      data: [{ week: "2024-01-01", North: 5, South: 3, Other: 2 }],
+    });
+  });
+
+  it("keeps a real district named Other as a district", () => {
+    const result = _split([
+      { week: "2024-01-01", district: "North", cases: 5 },
+      { week: "2024-01-01", district: "Other", cases: 3 },
+    ]);
+
+    expect(result).toMatchObject({
+      isSplit: true,
+      hasOtherSeries: false,
+      seriesColumnNames: ["North", "Other"],
+    });
+  });
+
+  it("returns the input unchanged when Other would name two series", () => {
+    const data = [
+      { week: "2024-01-01", district: "Other", cases: 5 },
+      { week: "2024-01-01", district: "South", cases: 3 },
+      { week: "2024-01-01", district: null, cases: 2 },
+    ];
+
+    expect(_split(data)).toEqual({ isSplit: false, data });
+  });
+
+  it("returns the input unchanged when a district shares the x name", () => {
+    const data = [
+      { week: "2024-01-01", district: "week", cases: 5 },
+      { week: "2024-01-01", district: "South", cases: 3 },
+    ];
+
+    expect(_split(data)).toEqual({ isSplit: false, data });
+  });
+
+  it("puts empty and unreadable dates after the readable ones", () => {
+    const result = _split([
+      { week: "2024-01-08", district: "North", cases: 1 },
+      { week: null, district: "North", cases: 2 },
+      { week: "not a date", district: "South", cases: 3 },
+      { week: "2024-01-01", district: "South", cases: 4 },
+    ]);
+
+    expect(_getWeeks(result)).toEqual([
+      "2024-01-01",
+      "2024-01-08",
+      null,
+      "not a date",
+    ]);
+  });
+
+  it("reads bigint values as numbers", () => {
+    const result = _split([
+      { week: "2024-01-01", district: "North", cases: 5n },
+      { week: "2024-01-01", district: "South", cases: 3n },
+      { week: "2024-01-01", district: "South", cases: 4n },
+    ]);
+
+    expect(result.data).toEqual([{ week: "2024-01-01", North: 5, South: 7 }]);
+  });
+
+  it("names a series (Blank) for districts that are empty text", () => {
+    const result = _split([
+      { week: "2024-01-01", district: "North", cases: 5 },
+      { week: "2024-01-01", district: "", cases: 3 },
+    ]);
+
+    expect(result).toMatchObject({
+      seriesColumnNames: ["North", "(Blank)"],
+      data: [{ week: "2024-01-01", North: 5, "(Blank)": 3 }],
+    });
+  });
+
+  it("names the district column it split by", () => {
+    const result = _split([
+      { week: "2024-01-01", district: "North", cases: 5 },
+      { week: "2024-01-01", district: "South", cases: 3 },
+    ]);
+
+    expect(result).toMatchObject({ splitColumnName: "district" });
   });
 });

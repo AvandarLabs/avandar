@@ -2256,6 +2256,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 msgstr "Incluya los marcadores de posición z, x e y donde el servidor espera el "
 "índice de tesela."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(En blanco)"
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
@@ -9107,6 +9111,12 @@ msgstr "El ID del espacio de trabajo no puede contener espacios"
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Ingrese su texto aquí"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Se dibuja una serie por cada {splitColumnName}. Los colores se asignan "
+"automáticamente. Si agregas una segunda serie, esto se desactiva."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "

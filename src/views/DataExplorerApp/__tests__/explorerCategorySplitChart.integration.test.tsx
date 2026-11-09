@@ -32,7 +32,10 @@ const LONG_ROWS = [
 ];
 
 const fixtures = vi.hoisted(() => {
-  return { renderedProps: [] as VisualizationProps[] };
+  return {
+    renderedProps: [] as VisualizationProps[],
+    drawerSplitColumnNames: [] as Array<string | undefined>,
+  };
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
@@ -97,7 +100,8 @@ vi.mock("@/components/layouts/AppSlate/AppSlate", () => {
 });
 vi.mock("@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer", () => {
   return {
-    DataExplorerDrawer: () => {
+    DataExplorerDrawer: (props: { splitColumnName: string | undefined }) => {
+      fixtures.drawerSplitColumnNames.push(props.splitColumnName);
       return null;
     },
   };
@@ -162,6 +166,7 @@ function _getLastRenderedProps(): VisualizationProps {
 afterEach(() => {
   cleanup();
   fixtures.renderedProps = [];
+  fixtures.drawerSplitColumnNames = [];
 });
 
 it("draws a line per district for a long result in line view", async () => {
@@ -192,6 +197,7 @@ it("draws a line per district for a long result in line view", async () => {
     { week: "2024-01-01", North: 5, South: 3 },
     { week: "2024-01-08", North: 7, South: 2 },
   ]);
+  expect(fixtures.drawerSplitColumnNames.at(-1)).toBe("district");
 });
 
 it("keeps the line view's stored chart on the one cases series", async () => {
@@ -237,4 +243,5 @@ it("gives the table view the rows as the query returned them", async () => {
     expect(_getLastRenderedProps().vizConfig.vizType).toBe("table");
   });
   expect(_getLastRenderedProps().data).toEqual(LONG_ROWS);
+  expect(fixtures.drawerSplitColumnNames.at(-1)).toBeUndefined();
 });

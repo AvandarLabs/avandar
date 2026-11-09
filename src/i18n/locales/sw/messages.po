@@ -2244,6 +2244,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 msgstr "Jumuisha vishikilia nafasi vya z, x na y ambapo seva inatarajia "
 "faharasa ya kigae."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(Tupu)"
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Health information detected"
@@ -9065,6 +9069,12 @@ msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Weka maandishi yako hapa"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Mfululizo mmoja huchorwa kwa kila {splitColumnName}. Rangi zimewekwa "
+"kwa ajili yako. Kuongeza mfululizo wa pili huzima hili."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "

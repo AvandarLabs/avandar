@@ -20,12 +20,17 @@ type LongResult = {
 
   /** The series name for the categories past the top eight. */
   otherLabel: string;
+
+  /** The series name for categories that are empty text. */
+  blankLabel: string;
 };
 
 /**
  * A query result reshaped for an XY chart. When `isSplit` is true, `data`
  * holds one row per X value and one numeric column per name in
- * `seriesColumnNames`. Otherwise `data` is the input, untouched.
+ * `seriesColumnNames`, split by the categories in `splitColumnName`. When
+ * `hasOtherSeries` is true, the last series name is the Other bucket.
+ * Otherwise `data` is the input, untouched.
  */
 export type WideResult =
   | { isSplit: false; data: UnknownDataFrame }
@@ -33,7 +38,14 @@ export type WideResult =
       isSplit: true;
       data: UnknownDataFrame;
       seriesColumnNames: readonly string[];
+      splitColumnName: string;
+      hasOtherSeries: boolean;
     };
+
+type SeriesPlan = {
+  seriesColumnNames: readonly string[];
+  hasOtherSeries: boolean;
+};
 
 type XGroup = { xValue: unknown; sums: Map<string, number> };
 
@@ -89,18 +101,26 @@ function _getNumberFromValue(value: unknown): number | undefined {
     : undefined;
 }
 
-function _getCategoryFromValue(value: unknown): string | undefined {
-  return value === null || value === undefined ? undefined : String(value);
+/** A category's series name: empty text is blank, and `null` has none. */
+function _getCategoryFromValue(
+  value: unknown,
+  blankLabel: string,
+): string | undefined {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+  const category = String(value);
+  return category.trim() === "" ? blankLabel : category;
 }
 
 /** Category names, largest total first. Ties keep the result's order. */
 function _rankCategories(
-  data: UnknownDataFrame,
+  options: LongResult,
   categoryColumnName: string,
-  valueColumnName: string,
 ): string[] {
+  const { data, valueColumnName, blankLabel } = options;
   const totals = data.reduce((totalsByCategory, row) => {
-    const category = _getCategoryFromValue(row[categoryColumnName]);
+    const category = _getCategoryFromValue(row[categoryColumnName], blankLabel);
     if (category !== undefined) {
       const value = _getNumberFromValue(row[valueColumnName]) ?? 0;
       totalsByCategory.set(
@@ -165,23 +185,33 @@ function _groupRowsByX(
   return [...groups.values()];
 }
 
-/** The series names: the top categories, then Other when anything is left. */
-function _buildSeriesColumnNames(
-  options: Readonly<{
-    data: UnknownDataFrame;
-    rankedCategories: readonly string[];
-    categoryColumnName: string;
-    otherLabel: string;
-  }>,
-): string[] {
-  const { data, rankedCategories, categoryColumnName, otherLabel } = options;
-  const namedCategories = rankedCategories.slice(0, MAX_NAMED_CATEGORIES);
+/**
+ * The series names: the top categories, then Other when anything is left.
+ * Undefined when there are fewer than two categories, or when two series, or
+ * a series and the X column, would share a name.
+ */
+function _planSeries(
+  options: LongResult,
+  categoryColumnName: string,
+): SeriesPlan | undefined {
+  const { data, xColumnName, otherLabel, blankLabel } = options;
+  const rankedCategories = _rankCategories(options, categoryColumnName);
   const hasNullCategory = data.some((row) => {
-    return _getCategoryFromValue(row[categoryColumnName]) === undefined;
+    return (
+      _getCategoryFromValue(row[categoryColumnName], blankLabel) === undefined
+    );
   });
-  return rankedCategories.length > MAX_NAMED_CATEGORIES || hasNullCategory
+  const hasOtherSeries =
+    rankedCategories.length > MAX_NAMED_CATEGORIES || hasNullCategory;
+  const namedCategories = rankedCategories.slice(0, MAX_NAMED_CATEGORIES);
+  const seriesColumnNames = hasOtherSeries
     ? [...namedCategories, otherLabel]
     : namedCategories;
+  const outputNames = new Set([xColumnName, ...seriesColumnNames]);
+  return rankedCategories.length < 2 ||
+    outputNames.size !== seriesColumnNames.length + 1
+    ? undefined
+    : { seriesColumnNames, hasOtherSeries };
 }
 
 function _isDateXColumn(options: LongResult): boolean {
@@ -225,56 +255,48 @@ function _buildWideRows(
  * Splits only when the X column is a date or text, the value column is
  * numeric, and exactly one other text column is left to split by. Other
  * numeric columns are dropped, since the chart draws only `valueColumnName`.
- * The eight largest categories by total keep their own series, the rest are
- * summed into `otherLabel`, and a missing X and category pair is `null`.
+ * The eight largest categories by total keep their own series. The rest,
+ * and every row whose category is `null`, are summed into `otherLabel`.
+ * Empty text categories become `blankLabel`, and a missing X and category
+ * pair is `null`.
  * Date X values are sorted oldest first; text X values keep the result's
  * order. Returns the input unchanged when the shape does not match or there
  * is only one category.
  */
 export function makeWideResultFromLongResult(options: LongResult): WideResult {
-  const { data, xColumnName, valueColumnName } = options;
-  const unchanged: WideResult = { isSplit: false, data };
+  const { data, xColumnName, otherLabel, blankLabel } = options;
   const categoryColumnName = _getCategoryColumnName(options);
-  if (categoryColumnName === undefined) {
-    return unchanged;
+  const plan =
+    categoryColumnName === undefined
+      ? undefined
+      : _planSeries(options, categoryColumnName);
+  if (categoryColumnName === undefined || plan === undefined) {
+    return { isSplit: false, data };
   }
-  const rankedCategories = _rankCategories(
-    data,
-    categoryColumnName,
-    valueColumnName,
-  );
-  const seriesColumnNames = _buildSeriesColumnNames({
-    data,
-    rankedCategories,
-    categoryColumnName,
-    otherLabel: options.otherLabel,
-  });
-  const outputNames = new Set([xColumnName, ...seriesColumnNames]);
-  if (
-    rankedCategories.length < 2 ||
-    outputNames.size !== seriesColumnNames.length + 1
-  ) {
-    return unchanged;
-  }
-  const namedCategories = new Set(seriesColumnNames);
+  const namedSeries = new Set(plan.seriesColumnNames);
   const groups = _groupRowsByX({
     data,
     xColumnName,
-    valueColumnName,
+    valueColumnName: options.valueColumnName,
     getSeriesName: (row) => {
-      const category = _getCategoryFromValue(row[categoryColumnName]);
-      return category !== undefined && namedCategories.has(category)
+      const category = _getCategoryFromValue(
+        row[categoryColumnName],
+        blankLabel,
+      );
+      return category !== undefined && namedSeries.has(category)
         ? category
-        : options.otherLabel;
+        : otherLabel;
     },
   });
   return {
     isSplit: true,
-    seriesColumnNames,
+    seriesColumnNames: plan.seriesColumnNames,
+    splitColumnName: categoryColumnName,
+    hasOtherSeries: plan.hasOtherSeries,
     data: _buildWideRows({
       groups: _isDateXColumn(options) ? _sortGroupsByDate(groups) : groups,
       xColumnName,
-      seriesColumnNames,
+      seriesColumnNames: plan.seriesColumnNames,
     }),
   };
 }

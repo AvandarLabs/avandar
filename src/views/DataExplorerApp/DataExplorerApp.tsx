@@ -324,6 +324,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
         <DataExplorerDrawer
           columns={queryResultColumns}
           data={queryResultData}
+          splitColumnName={chartInput.splitColumnName}
           chartRef={chartRef}
         />
       </Stack>
