@@ -16,7 +16,10 @@ create table public.datasets__virtual (
   -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- The query that was used to generate the dataset
-  raw_sql text not null
+  raw_sql text not null,
+  -- True for a places dataset: `raw_sql` is a `VALUES` list of hand-placed
+  -- sites that the map's "Add a place" tool rewrites on every edit.
+  is_places boolean not null default false
 );
 
 -- Enable row level security

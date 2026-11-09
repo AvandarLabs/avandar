@@ -18,6 +18,7 @@ import {
 } from "@/views/GisApp/shell/MapToolCluster/mapToolClusterHarness";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { FeatureFlag } from "@/config/FeatureFlagConfig";
+import type { PlaceToolController } from "@/views/GisApp/places/PlaceTool.types";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { ReactNode } from "react";
 
@@ -520,6 +521,55 @@ describe("MapToolCluster", () => {
     expect(updateConfig).not.toHaveBeenCalled();
     expect(screen.getByRole("status")).toHaveTextContent(
       "Close a valid ring that does not cross itself.",
+    );
+  });
+
+  it("places Add a place right after Buffer when the map can hold places", () => {
+    const placeTool = {
+      state: {
+        draft: undefined,
+        startNew: vi.fn(),
+        startEdit: vi.fn(),
+        startMove: vi.fn(),
+        onPlacePicked: vi.fn(),
+        onSearchResultPicked: vi.fn(),
+        clearCoordinate: vi.fn(),
+        close: vi.fn(),
+      },
+      isArmed: false,
+      isSaving: false,
+      targetDatasetId: undefined,
+      placesDatasetOptions: [],
+      getBiasBox: () => {
+        return undefined;
+      },
+      armMapPick: vi.fn(),
+      createPlacesDataset: vi.fn(),
+      addPlacesLayer: vi.fn(),
+      savePlace: vi.fn(),
+      featureActions: {
+        placesDatasetIds: new Set(),
+        onEdit: vi.fn(),
+        onMove: vi.fn(),
+        onDelete: vi.fn(),
+      },
+    } satisfies PlaceToolController;
+    render(
+      <MapToolCluster
+        mapToolMode={{ type: "pan" }}
+        onMapToolModeChange={vi.fn()}
+        placeTool={placeTool}
+      />,
+    );
+    const labels = within(screen.getByRole("toolbar", { name: "Map tools" }))
+      .getAllByRole("button")
+      .map((button) => {
+        return button.getAttribute("aria-label");
+      });
+    expect(labels.indexOf("Add a place")).toBe(
+      labels.findIndex((label) => {
+        return label?.startsWith("Buffer around a layer") ?? false;
+      }) + 1,
     );
   });
 });

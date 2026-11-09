@@ -84,6 +84,7 @@ jobs:
           FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
           AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
           AVA_PIPELINE_SERVER_URL: ${{ vars.AVA_PIPELINE_SERVER_URL }}
+          GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
         run: |
           secrets_file="$RUNNER_TEMP/demo-functions.env"
           {
@@ -106,6 +107,11 @@ jobs:
             echo "FEATUREBASE_JWT_SECRET=$FEATUREBASE_JWT_SECRET"
             echo "AVA_PIPELINE_SERVER_SECRET=$AVA_PIPELINE_SERVER_SECRET"
             echo "AVA_PIPELINE_SERVER_URL=$AVA_PIPELINE_SERVER_URL"
+            # Only when the GitHub secret exists: an empty value would
+            # overwrite a key set directly on the demo project.
+            if [ -n "$GEOAPIFY_API_KEY" ]; then
+              echo "GEOAPIFY_API_KEY=$GEOAPIFY_API_KEY"
+            fi
           } > "$secrets_file"
           supabase secrets set --project-ref "$DEMO_SUPABASE_REF" \
             --env-file "$secrets_file"

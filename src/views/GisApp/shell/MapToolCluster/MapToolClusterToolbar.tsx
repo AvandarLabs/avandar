@@ -11,9 +11,11 @@ import { IsochroneMapTool } from "@/views/GisApp/shell/MapToolCluster/IsochroneM
 import css from "@/views/GisApp/shell/MapToolCluster/MapToolCluster.module.css";
 import { MeasureMapTool } from "@/views/GisApp/shell/MapToolCluster/MeasureMapTool";
 import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
+import { PlaceMapTool } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { PlaceToolController } from "@/views/GisApp/places/PlaceTool.types";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { ReactNode } from "react";
 
@@ -28,6 +30,9 @@ type Props = {
   layers?: readonly MapLayer.T[];
   featureCollections?: ReadonlyMap<MapLayer.Id, GeoJSON.FeatureCollection>;
   requestFitBounds: (bounds: MapBounds) => void;
+
+  /** The "Add a place" tool's controller; the tool is hidden without it. */
+  placeTool?: PlaceToolController;
 };
 
 /** Renders the ordered map tool buttons and unavailable slots. */
@@ -39,6 +44,7 @@ export function MapToolClusterToolbar({
   layers,
   featureCollections,
   requestFitBounds,
+  placeTool,
 }: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
   return (
@@ -70,6 +76,7 @@ export function MapToolClusterToolbar({
         selectedLayer={selectedLayer}
         onBufferConfirm={onBufferConfirm}
       />
+      {placeTool ? <PlaceMapTool controller={placeTool} /> : null}
       {isFlagEnabled(FeatureFlag.EnableGisIsochrone) ? (
         <IsochroneMapTool />
       ) : null}
@@ -86,6 +93,7 @@ export function MapToolClusterToolbar({
         layers={layers}
         featureCollections={featureCollections}
         requestFitBounds={requestFitBounds}
+        onAddPlaceAt={placeTool?.state.onPlacePicked}
       />
     </div>
   );
