@@ -1465,7 +1465,7 @@ msgstr "無法重新序列化位置 {index} 的 JOIN 子查詢。"
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "輸入問題，我會為您產生 SQL 並執行。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "搜尋資料集"
 
@@ -7021,7 +7021,7 @@ msgstr "此圖層有一個作用中的篩選條件，可能會排除所有內容
 msgid "Workspace name updated"
 msgstr "工作區名稱已更新"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "搜尋開放資料"
 
@@ -9202,7 +9202,7 @@ msgstr "如果一個 {0} 有多個 {attributeName} 值，那麼..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的未命名欄位運算式；已略過。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "清除搜尋"

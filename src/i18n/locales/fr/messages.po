@@ -1544,7 +1544,7 @@ msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Saisissez une question et je générerai le SQL, puis l’exécuterai pour "
 "vous."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "Rechercher des jeux de données"
 
@@ -7349,7 +7349,7 @@ msgstr "Un filtre est actif sur cette couche. Il peut exclure tous les "
 msgid "Workspace name updated"
 msgstr "Nom de l'espace de travail mis à jour"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "Rechercher des données ouvertes"
 
@@ -9635,7 +9635,7 @@ msgstr "S'il y a plusieurs valeurs {attributeName} pour un {0}, alors..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Expression de colonne sans nom dans SELECT ; ignorée."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Effacer la recherche"

@@ -1524,7 +1524,7 @@ msgstr "Hoja ndogo ya JOIN katika nafasi ya {index} haikuweza kusawazishwa "
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Andika swali, nami nitaunda SQL na kuiendesha kwa ajili yako."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "Tafuta seti za data"
 
@@ -7267,7 +7267,7 @@ msgstr "Kichujio kimoja kinatumika kwenye safu hii. Huenda kinazuia kila kitu."
 msgid "Workspace name updated"
 msgstr "Jina la eneo la kazi limeboreshwa"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "Tafuta data iliyo wazi"
 
@@ -9527,7 +9527,7 @@ msgstr "Ikiwa kuna thamani nyingi za {attributeName} kwa {0} moja, basi..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Usemi wa safu usio na jina katika SELECT; umerukwa."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Futa utafutaji"

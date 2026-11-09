@@ -1507,7 +1507,7 @@ msgstr "JOIN subquery at position {index} could not be re-serialised."
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Type a question and I will generate the SQL and run it for you."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "Search datasets"
 
@@ -7189,7 +7189,7 @@ msgstr "One filter is active on this layer. It may be excluding everything."
 msgid "Workspace name updated"
 msgstr "Workspace name updated"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "Search open data"
 
@@ -9426,7 +9426,7 @@ msgstr "If there are multiple {attributeName} values for one {0}, then..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Unnamed column expression in SELECT; skipped."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Clear search"
