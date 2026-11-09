@@ -128,12 +128,13 @@ export function FeatureListTable({ list, onRowClick }: Props): ReactNode {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {rows.map((row) => {
+          {rows.map((row, rowIndex) => {
             return (
               <FeatureListTableRow
                 key={rowKeys.get(row)}
                 row={row}
                 list={list}
+                position={rowIndex + 1}
                 onRowClick={onRowClick}
               />
             );

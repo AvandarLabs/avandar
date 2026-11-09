@@ -222,4 +222,20 @@ describe("FeatureListDrawer", () => {
     ).toHaveAttribute("aria-sort", "ascending");
     expect(_getFirstRowText()).toContain("Near school");
   });
+
+  it("names a row by its position when no column reads like a name", () => {
+    _mockState({
+      list: {
+        ...LIST,
+        columns: [{ key: "loc_code", label: "loc_code", kind: "source" }],
+        rows: [{ loc_code: "M260" }],
+        totalCount: 1,
+      },
+    });
+    _renderDrawer();
+
+    expect(
+      screen.getByRole("button", { name: "Show feature 1 on the map" }),
+    ).toBeInTheDocument();
+  });
 });

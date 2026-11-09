@@ -2,12 +2,15 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Table } from "@mantine/core";
 import css from "@/views/GisApp/panels/FeatureListDrawer/FeatureListDrawer.module.css";
 import { formatFeatureListCell } from "@/views/GisApp/panels/FeatureListDrawer/formatFeatureListCell/formatFeatureListCell";
+import { getFeatureListRowLabel } from "@/views/GisApp/panels/FeatureListDrawer/getFeatureListRowLabel/getFeatureListRowLabel";
 import type { MapLayerFeatureList } from "@/clients/maps/MapLayerFeatureList/MapLayerFeatureList.types";
 import type { ReactNode } from "react";
 
 type Props = {
   row: MapLayerFeatureList["rows"][number];
   list: MapLayerFeatureList;
+  /** The row's 1-based position in the table as shown. */
+  position: number;
   onRowClick: (row: MapLayerFeatureList["rows"][number]) => void;
 };
 
@@ -18,6 +21,7 @@ type Props = {
 export function FeatureListTableRow({
   row,
   list,
+  position,
   onRowClick,
 }: Props): ReactNode {
   const { i18n, t } = useLingui();
@@ -32,7 +36,7 @@ export function FeatureListTableRow({
       }),
     };
   });
-  const rowLabel = cells[0]?.text ?? "";
+  const rowLabel = getFeatureListRowLabel({ columns: list.columns, row });
   const onActivate = (): void => {
     onRowClick(row);
   };
@@ -46,7 +50,11 @@ export function FeatureListTableRow({
           size="compact-xs"
           variant="subtle"
           color="neutral"
-          aria-label={t`Show ${rowLabel} on the map`}
+          aria-label={
+            rowLabel
+              ? t`Show ${rowLabel} on the map`
+              : t`Show feature ${position} on the map`
+          }
           onClick={(event) => {
             event.stopPropagation();
             onActivate();
