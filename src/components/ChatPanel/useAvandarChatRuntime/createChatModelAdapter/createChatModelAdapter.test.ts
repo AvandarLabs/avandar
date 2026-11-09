@@ -87,6 +87,8 @@ vi.mock(
 );
 
 const OFFLINE_MODEL_REQUIRED = "Download the offline models first.";
+const AGENT_ACCESS_DENIED = "Needs Data Explorer access.";
+const AGENT_UNAVAILABLE = "Could not answer.";
 
 function _createAdapter(
   app: ChatPageContext.T["app"],
@@ -107,7 +109,11 @@ function _createAdapter(
     pathnameRef: ref("/acme/dashboards"),
     dashboardEditorStateRef: ref({}),
     parseSqlRef: ref(vi.fn()),
-    copyRef: ref({ offlineModelRequired: OFFLINE_MODEL_REQUIRED }),
+    copyRef: ref({
+      offlineModelRequired: OFFLINE_MODEL_REQUIRED,
+      agentAccessDenied: AGENT_ACCESS_DENIED,
+      agentUnavailable: AGENT_UNAVAILABLE,
+    }),
     dataExplorerDispatch: {},
     dashboardEditorDispatch: {},
     chatPanelDispatch: { setPendingClarification: vi.fn() },
@@ -321,21 +327,78 @@ describe("createChatModelAdapter with the agent on", () => {
     });
   });
 
-  it("rethrows an agent network failure when the fallback is declined", async () => {
-    const failure = new TypeError("Failed to fetch");
-    runDataAgentTurnMock.mockRejectedValue(failure);
+  it("says it could not answer when the offline offer is declined", async () => {
+    runDataAgentTurnMock.mockRejectedValue(new TypeError("Failed to fetch"));
     offerOfflineFallbackMock.mockResolvedValue(false);
 
-    await expect(_ask(_createAdapter("data-explorer"))).rejects.toBe(failure);
+    const result = await _ask(_createAdapter("data-explorer"));
+
+    expect(result).toEqual({
+      content: [{ type: "text", text: AGENT_UNAVAILABLE }],
+    });
     expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
   });
 
-  it("rethrows an agent failure that is not a network failure", async () => {
-    const failure = new Error("model refused");
-    runDataAgentTurnMock.mockRejectedValue(failure);
+  it("says it could not answer after a network failure with no offline models", async () => {
+    window.localStorage.clear();
+    runDataAgentTurnMock.mockRejectedValue(new TypeError("Failed to fetch"));
 
-    await expect(_ask(_createAdapter("data-explorer"))).rejects.toBe(failure);
+    const result = await _ask(_createAdapter("data-explorer"));
+
     expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      content: [{ type: "text", text: AGENT_UNAVAILABLE }],
+    });
+  });
+
+  it("says it could not answer after a failure that is not a network failure", async () => {
+    runDataAgentTurnMock.mockRejectedValue(new Error("model refused"));
+
+    const result = await _ask(_createAdapter("dashboards"));
+
+    expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      content: [{ type: "text", text: AGENT_UNAVAILABLE }],
+    });
+  });
+
+  it.each([
+    "Proxy error: This action requires at least the 'viewer' role on 'data_explorer' in this workspace",
+    "Proxy error: 403 Forbidden",
+  ])(
+    "says Data Explorer access is needed when the proxy refuses: %s",
+    async (message) => {
+      runDataAgentTurnMock.mockRejectedValue(new Error(message));
+
+      const result = await _ask(_createAdapter("dashboards"));
+
+      expect(result).toEqual({
+        content: [{ type: "text", text: AGENT_ACCESS_DENIED }],
+      });
+    },
+  );
+
+  it("does not turn a stopped turn into a reply", async () => {
+    const abort = new DOMException("The run was stopped.", "AbortError");
+    runDataAgentTurnMock.mockRejectedValue(abort);
+
+    await expect(_ask(_createAdapter("dashboards"))).rejects.toBe(abort);
+  });
+
+  it("still rethrows today's chat failures with the switch off", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+    const failure = new Error("Proxy error: 403 Forbidden");
+    apiPostMock.mockRejectedValue(failure);
+
+    await expect(_ask(_createAdapter("dashboards"))).rejects.toBe(failure);
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("still rethrows today's chat failures in the case designer", async () => {
+    const failure = new Error("model refused");
+    apiPostMock.mockRejectedValue(failure);
+
+    await expect(_ask(_createAdapter("case-manager"))).rejects.toBe(failure);
   });
 
   it("routes to the offline turn, not the agent, with offline mode on", async () => {

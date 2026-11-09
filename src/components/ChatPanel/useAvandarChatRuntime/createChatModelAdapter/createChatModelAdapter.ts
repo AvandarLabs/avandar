@@ -12,6 +12,7 @@ import {
   extractText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { runLocalChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/runLocalChatTurn";
+import { isAgentAccessDenied } from "@/components/ChatPanel/useAvandarChatRuntime/isAgentAccessDenied";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
@@ -125,6 +126,41 @@ async function _recoverFromChatFailure(
     }
   }
   throw error;
+}
+
+function _isAbortError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { name?: unknown }).name === "AbortError"
+  );
+}
+
+/**
+ * Handles a failed agent turn like `_recoverFromChatFailure`, except for its
+ * last step: a failure that would be rethrown becomes a reply instead, so
+ * the chat never shows a turn with no content. A refused role gets the
+ * access message, and anything else (including a declined or unavailable
+ * offline offer) says the assistant could not answer. A chat reset still
+ * ends the turn quietly, and a stopped turn is still rethrown.
+ */
+async function _recoverFromAgentFailure(
+  options: Readonly<Parameters<typeof _recoverFromChatFailure>[0]>,
+): Promise<ChatModelRunResult> {
+  try {
+    return await _recoverFromChatFailure(options);
+  } catch (error) {
+    if (options.isGenerationStale()) {
+      return { content: [] };
+    }
+    if (_isAbortError(error)) {
+      throw error;
+    }
+    const text = isAgentAccessDenied(error)
+      ? options.copy.agentAccessDenied
+      : options.copy.agentUnavailable;
+    return { content: [{ type: "text", text }] };
+  }
 }
 
 /**
@@ -372,7 +408,7 @@ export function createChatModelAdapter(
             }),
           );
         } catch (error) {
-          return _recoverFromChatFailure({
+          return _recoverFromAgentFailure({
             error,
             isGenerationStale,
             copy: copyRef.current,

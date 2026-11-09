@@ -619,6 +619,11 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   records it as an assistant message with `stopReason: "error"`. The data
   agent (`createDataAgent`) rethrows that message's error, so the adapter
   sees the failure. A stopped run (`aborted`) is not a failure.
+- **When it cannot recover.** If the failure is not a network failure, or
+  the offer is declined or unavailable, the agent path replies instead of
+  failing the turn: an access message when the proxy refuses the user's
+  role (403), otherwise "The assistant could not answer that". Today's chat
+  still rethrows.
 - **Why.** Today's chat already recovers this way. Turning the agent on
   everywhere would otherwise make a dropped connection a dead end on pages
   where the old path offered a way out, and offline mode is the one choice

@@ -4562,7 +4562,7 @@ msgstr "صورة"
 msgid "Hide X axis"
 msgstr "إخفاء المحور X"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Loading result"
 msgstr "جارٍ تحميل النتيجة"
 
@@ -4574,7 +4574,7 @@ msgstr "المواقع الدقيقة"
 msgid "New chat"
 msgstr "محادثة جديدة"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "نتيجة غير متاحة"
 
@@ -6040,6 +6040,12 @@ msgstr "ما هي السلسلة؟"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "خط العرض أو خط الطول ليس رقمًا"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "تتطلب الإجابة عن أسئلة البيانات الوصول إلى مستكشف البيانات في مساحة "
+"العمل هذه."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -7695,7 +7701,7 @@ msgstr "هذه مجموعة البيانات متاحة فقط عند عدم ا�
 msgid "Checking your data…"
 msgstr "جارٍ التحقق من بياناتك…"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Result"
 msgstr "النتيجة"
 
@@ -10604,6 +10610,10 @@ msgstr "S"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "https://example.org"
 msgstr "https://example.org"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "تعذر على المساعد الإجابة عن ذلك. حاول مرة أخرى بعد قليل."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

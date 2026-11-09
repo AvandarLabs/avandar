@@ -167,9 +167,22 @@ the adapter. A stopped run (`aborted`) is not a failure.
 - A network failure (the browser's "Failed to fetch", "Load failed", or
   "NetworkError ...") offers "Answer offline", like today's chat
   (`_recoverFromChatFailure`, D37).
-- Any other failure, such as the proxy refusing the request
-  ("Proxy error: ..."), is rethrown to assistant-ui, which marks the
-  message as failed. This is the same path today's chat takes.
+- When the agent path cannot recover (a failure that is not a network
+  failure, or a network failure whose offline offer is declined or not
+  available because the offline models are not downloaded), it replies
+  instead of rethrowing (`_recoverFromAgentFailure`), so the turn never
+  ends with no content:
+  - The proxy refusing the user's role (a 403, which `streamProxy` reports
+    as "Proxy error: 403 Forbidden" or "Proxy error: This action requires
+    at least the 'viewer' role ...", matched by `isAgentAccessDenied`):
+    "Answering data questions needs access to the Data Explorer in this
+    workspace."
+  - Anything else: "The assistant could not answer that. Try again in a
+    moment."
+  - A chat reset still ends the turn with no reply, and a stopped turn
+    (`AbortError`) is still rethrown.
+- Today's chat path is unchanged: it still rethrows what it cannot
+  recover.
 - The offline agent uses the same `ask`, so an on-device engine error now
   surfaces too, and a prompt too long for the offline models becomes the
   chat's "too long" reply.
@@ -208,8 +221,9 @@ the model instructions (D35).
 | A chat result's query fails | Recorded under the `data_explorer` analytics app with surface `chat_result`, because the app enum has no chat value. |
 | "This" could mean several things (several tiles, none named) | The agent asks with a question card whose options are the tile titles (up to five). |
 | The user navigates during a turn | The context captured at send time stands. The result still lands in the chat. |
-| The network fails | The agent's answer rejects with the fetch error, and the chat offers "Answer offline" (D37). |
-| The user lacks Data Explorer access | The proxy refuses, as today (D03). The agent's answer rejects with "Proxy error: ...", which reaches assistant-ui's error state as today's chat does. 1D revisits roles per tool. |
+| The network fails | The agent's answer rejects with the fetch error, and the chat offers "Answer offline" (D37). If the offer is declined, or the offline models are not downloaded, the chat replies "The assistant could not answer that. Try again in a moment." |
+| A model call fails for another reason | The chat replies "The assistant could not answer that. Try again in a moment." |
+| The user lacks Data Explorer access | The proxy refuses with a 403, as today (D03), and the chat replies "Answering data questions needs access to the Data Explorer in this workspace." 1D revisits roles per tool. |
 | The page context is missing or fails to load | The turn runs, and results go to the chat. |
 | A page with nothing to describe (settings) | The block names only the app. |
 
@@ -241,7 +255,10 @@ Red/green TDD with Vitest, plus one browser spec:
   error.
 - `createChatModelAdapter`: with the switch on, the agent answers on every
   page except the case designer, and a navigation during the consent wait
-  does not change the page the turn uses. Offline routing is unchanged.
+  does not change the page the turn uses. A proxy 403 gets the access
+  reply, any other failure and a declined or unavailable offline offer get
+  the general reply, a stopped turn is rethrown, and today's chat still
+  rethrows. Offline routing is unchanged.
 - The proxy serves `data-agent-v1` and `data-agent-v2`.
 - `tests/e2e/agent-chat-result.spec.ts`: the agent proxy's stream is mocked,
   as `dashboard-chat-block.spec.ts` mocks today's chat. Turn the switch on,
@@ -305,10 +322,14 @@ Red/green TDD with Vitest, plus one browser spec:
 - Each chat result runs twice: once in the host, to give the model its row
   count and columns, and again in the card. The two runs can apply
   different automatic row limits.
-- The chat shows no error text for a failed turn: the failed message has
-  no content, so `AssistantMessage` keeps showing its typing dots and no
-  "Try again". Today's chat behaves the same; render the message's error
-  status (assistant-ui's `incomplete`/`error`).
+- Today's chat still shows no error text for a failed turn: the failed
+  message has no content, so `AssistantMessage` keeps showing its typing
+  dots and no "Try again". The agent path replies instead. Rendering the
+  message's error status (assistant-ui's `incomplete`/`error`) would fix
+  both.
+- `isAgentAccessDenied` reads the proxy's error message, because
+  `streamProxy` keeps no status code. A change to that message or to
+  `assertMeetsMinAppRole`'s text needs the matcher updated.
 - Rename `agentPageNameLoader.ts` to match its export,
   `createAgentPageNameLoader`.
 - A manual check in the real app with live models is still owed.

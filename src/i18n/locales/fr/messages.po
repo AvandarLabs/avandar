@@ -4676,7 +4676,7 @@ msgstr "Image"
 msgid "Hide X axis"
 msgstr "Masquer l’axe X"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Loading result"
 msgstr "Chargement du résultat"
 
@@ -4688,7 +4688,7 @@ msgstr "Emplacements exacts"
 msgid "New chat"
 msgstr "Nouvelle conversation"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "Résultat indisponible"
 
@@ -6188,6 +6188,12 @@ msgstr "Qu'est-ce qu'une série ?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "La latitude ou la longitude n’est pas un nombre"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Pour répondre aux questions sur les données, il faut avoir accès à "
+"l'Explorateur de données dans cet espace de travail."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -7883,7 +7889,7 @@ msgstr "Ce jeu de données est uniquement hors ligne. Cliquez pour autoriser la 
 msgid "Checking your data…"
 msgstr "Vérification de vos données…"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Result"
 msgstr "Résultat"
 
@@ -10861,6 +10867,10 @@ msgstr "S"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "https://example.org"
 msgstr "https://example.org"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "L'assistant n'a pas pu répondre. Réessayez dans un instant."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

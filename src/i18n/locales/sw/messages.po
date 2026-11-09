@@ -4623,7 +4623,7 @@ msgstr "Picha"
 msgid "Hide X axis"
 msgstr "Ficha mhimili wa X"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Loading result"
 msgstr "Inapakia matokeo"
 
@@ -4635,7 +4635,7 @@ msgstr "Maeneo kamili"
 msgid "New chat"
 msgstr "Mazungumzo mapya"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Unavailable result"
 msgstr "Matokeo hayapatikani"
 
@@ -6119,6 +6119,12 @@ msgstr "Nini maana ya series?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "Latitudo au longitudo si nambari"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Kujibu maswali ya data kunahitaji ufikiaji wa Data Explorer katika "
+"nafasi hii ya kazi."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -7794,7 +7800,7 @@ msgstr "Seti hii ya data ni ya mtandaoni pekee. Bonyeza kuruhusu usawazishaji "
 msgid "Checking your data…"
 msgstr "Inaangalia data yako…"
 
-#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Result"
 msgstr "Matokeo"
 
@@ -10730,6 +10736,10 @@ msgstr "S"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "https://example.org"
 msgstr "https://example.org"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "Msaidizi hakuweza kujibu hilo. Jaribu tena baada ya muda mfupi."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
