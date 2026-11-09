@@ -40,6 +40,27 @@ function _getThrownCode(
   }
 }
 
+/**
+ * The `PluginError` code thrown for `columns` of any shape, as plugin code
+ * can pass at runtime. `Reflect.apply` passes it without a type cast.
+ */
+function _getThrownCodeFromUnknownColumns(
+  columns: unknown,
+): string | undefined {
+  try {
+    Reflect.apply(makeDerivedColumnsSqlFromColumns, undefined, [
+      {
+        baseSql: BASE_SQL,
+        existingColumnNames: EXISTING_COLUMN_NAMES,
+        columns,
+      },
+    ]);
+    return undefined;
+  } catch (error) {
+    return error instanceof PluginError ? error.code : "not a PluginError";
+  }
+}
+
 describe("makeDerivedColumnsSqlFromColumns", () => {
   it("wraps the base SQL and appends each column in order", () => {
     const { sql } = _makeSqlFromColumns([
@@ -170,5 +191,36 @@ describe("makeDerivedColumnsSqlFromColumns", () => {
         },
       ]),
     ).toBe("InvalidExpression");
+  });
+
+  it.each([
+    ["columns that are not an array", { name: "rate" }],
+    ["columns that are undefined", undefined],
+    ["a null entry", [null]],
+    ["an entry that is a string", ["rate"]],
+    [
+      "a name that is not a string",
+      [{ name: ["rate"], expression: "{c}", inputs: { c: "cases" } }],
+    ],
+    [
+      "an expression that is not a string",
+      [{ name: "rate", expression: 1, inputs: { c: "cases" } }],
+    ],
+    ["missing inputs", [{ name: "rate", expression: "{c}" }]],
+    ["null inputs", [{ name: "rate", expression: "{c}", inputs: null }]],
+    [
+      "inputs that are a string",
+      [{ name: "rate", expression: "1", inputs: "" }],
+    ],
+    [
+      "inputs that are an array",
+      [{ name: "rate", expression: "1", inputs: ["cases"] }],
+    ],
+    [
+      "an input value that is not a string",
+      [{ name: "rate", expression: "{c}", inputs: { c: 1 } }],
+    ],
+  ])("rejects %s with InvalidExpression", (_label, columns) => {
+    expect(_getThrownCodeFromUnknownColumns(columns)).toBe("InvalidExpression");
   });
 });

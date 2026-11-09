@@ -15,6 +15,50 @@ const ROW_NUMBER_COLUMN_NAME = "__ava_row";
 /** A `{placeholder}` in an expression, capturing the key it names. */
 const PLACEHOLDER_PATTERN = /\{([A-Za-z_][A-Za-z0-9_]*)\}/g;
 
+function _isStringRecord(value: unknown): boolean {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.values(value).every((entry) => {
+      return typeof entry === "string";
+    })
+  );
+}
+
+function _isDerivedColumnShape(column: unknown): boolean {
+  return (
+    typeof column === "object" &&
+    column !== null &&
+    typeof Reflect.get(column, "name") === "string" &&
+    typeof Reflect.get(column, "expression") === "string" &&
+    _isStringRecord(Reflect.get(column, "inputs"))
+  );
+}
+
+/**
+ * Plugin code is not type-checked against the host, so `columns` can arrive
+ * in any shape. Throws `PluginError("InvalidExpression")` unless it is an
+ * array of objects with a string `name`, a string `expression`, and an
+ * `inputs` object whose values are strings.
+ */
+function _assertDerivedColumnShapes(columns: unknown): void {
+  if (!Array.isArray(columns)) {
+    throw new PluginError(
+      "InvalidExpression",
+      "addColumns needs an array of columns.",
+    );
+  }
+  columns.forEach((column, index) => {
+    if (!_isDerivedColumnShape(column)) {
+      throw new PluginError(
+        "InvalidExpression",
+        `Column ${index + 1} must be an object with a string name, a string expression, and an inputs object of column names.`,
+      );
+    }
+  });
+}
+
 function _buildExpressionSql(
   column: DerivedColumn,
   existingColumnNames: ReadonlySet<string>,
@@ -102,7 +146,8 @@ function _assertNoReservedColumn(existingColumnNames: readonly string[]): void {
  * keeps the base query's row order, which a window expression would
  * otherwise change.
  *
- * Throws `PluginError("InvalidExpression")` for an empty list, a result with
+ * Throws `PluginError("InvalidExpression")` for `columns` that are not an
+ * array of well-formed `DerivedColumn` objects, an empty list, a result with
  * a reserved `__ava_row` column, a bad name, an
  * unbound placeholder, an input naming a column not in
  * `existingColumnNames`, or an expression that is not exactly one SQL
@@ -117,6 +162,7 @@ export function makeDerivedColumnsSqlFromColumns(
   }>,
 ): Readonly<{ sql: string; columnNames: readonly string[] }> {
   const { baseSql, existingColumnNames, columns } = options;
+  _assertDerivedColumnShapes(columns);
   if (columns.length === 0) {
     throw new PluginError(
       "InvalidExpression",
