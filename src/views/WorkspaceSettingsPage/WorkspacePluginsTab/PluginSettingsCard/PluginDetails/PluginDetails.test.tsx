@@ -103,6 +103,16 @@ describe("PluginDetails", () => {
     );
   });
 
+  it("points the collapsed toggle at an element that exists", () => {
+    _renderDetails(EPIDEMIOLOGY_MANIFEST);
+
+    const regionId = screen
+      .getByRole("button", { name: "See more" })
+      .getAttribute("aria-controls");
+    expect(regionId).toBeTruthy();
+    expect(document.getElementById(regionId ?? "")).toBeInTheDocument();
+  });
+
   it("points the toggle at the region holding the details", async () => {
     await _renderExpandedDetails(EPIDEMIOLOGY_MANIFEST);
 

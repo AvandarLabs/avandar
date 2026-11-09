@@ -9414,7 +9414,7 @@ msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "Cette {resource} est accessible à toute personne ayant la permission "
 "{app} {0}."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
 msgstr ""
 
@@ -9555,7 +9555,7 @@ msgstr "Cet onglet ne se trouve plus dans cette feuille de calcul. Il a "
 "peut-être été renommé ou supprimé. Sélectionnez à nouveau la feuille, "
 "puis choisissez un onglet."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See more"
 msgstr ""
 

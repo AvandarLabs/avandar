@@ -9308,7 +9308,7 @@ msgstr "Baadhi ya safu zina latitudo au longitudo tupu."
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "Hii {resource} inapatikana kwa mtu yeyote mwenye ruhusa ya {app} {0}."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
 msgstr ""
 
@@ -9448,7 +9448,7 @@ msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 msgstr "Kichupo hicho hakipo tena kwenye lahajedwali hili. Huenda kimepewa jina "
 "jipya au kimefutwa. Chagua laha tena kisha uchague kichupo."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See more"
 msgstr ""
 

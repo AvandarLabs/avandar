@@ -1,12 +1,13 @@
 import { getLocalizedTextFromManifestStrings } from "@avandar/plugin-manifest/runtime";
 import { useLingui } from "@lingui/react/macro";
-import { Box, Button, Collapse, Stack } from "@mantine/core";
+import { Box, Collapse, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { useId } from "react";
 import { getContributionsFromManifest } from "@/lib/plugins/getContributionsFromManifest/getContributionsFromManifest";
 import { PluginAdditionsSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection";
 import { PluginDataAccessSection } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection";
+import { PluginDetailsToggle } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle";
+import type { PluginContribution } from "@/lib/plugins/getContributionsFromManifest/getContributionsFromManifest";
 import type {
   PluginLocaleMessages,
   PluginManifest,
@@ -22,6 +23,29 @@ type Props = Readonly<{
   headingId: string;
 }>;
 
+function _getLocalizedContributionTitles(options: {
+  manifest: PluginManifest;
+  strings: PluginLocaleMessages;
+  locale: string;
+}): { toolbarCommandTitles: string[]; chartTypeTitles: string[] } {
+  const { manifest, strings, locale } = options;
+  const { dataExplorerToolbarCommands, chartTypes } =
+    getContributionsFromManifest(manifest);
+  const getTitles = (contributions: readonly PluginContribution[]) => {
+    return contributions.map((contribution) => {
+      return getLocalizedTextFromManifestStrings({
+        strings,
+        locale,
+        value: contribution.title,
+      });
+    });
+  };
+  return {
+    toolbarCommandTitles: getTitles(dataExplorerToolbarCommands),
+    chartTypeTitles: getTitles(chartTypes),
+  };
+}
+
 /**
  * What a plugin adds and which data it can read, in plain language, behind a
  * "See more" toggle so a plugin's settings card stays short until an admin
@@ -32,37 +56,23 @@ export function PluginDetails({
   strings,
   headingId,
 }: Props): JSX.Element {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
   const [isExpanded, { toggle }] = useDisclosure(false);
   const regionId = useId();
-  const { dataExplorerToolbarCommands, chartTypes } =
-    getContributionsFromManifest(manifest);
-  const getTitles = (contributions: ReadonlyArray<{ title: string }>) => {
-    return contributions.map((contribution) => {
-      return getLocalizedTextFromManifestStrings({
-        strings,
-        locale: i18n.locale,
-        value: contribution.title,
-      });
+  const { toolbarCommandTitles, chartTypeTitles } =
+    _getLocalizedContributionTitles({
+      manifest,
+      strings,
+      locale: i18n.locale,
     });
-  };
-  const ToggleIcon = isExpanded ? IconChevronUp : IconChevronDown;
   return (
     <>
-      <Button
-        variant="subtle"
-        color="neutral"
-        size="compact-sm"
-        w="fit-content"
-        px={0}
-        rightSection={<ToggleIcon size={14} aria-hidden />}
-        aria-expanded={isExpanded}
-        aria-controls={regionId}
-        aria-describedby={headingId}
-        onClick={toggle}
-      >
-        {isExpanded ? t`See less` : t`See more`}
-      </Button>
+      <PluginDetailsToggle
+        isExpanded={isExpanded}
+        regionId={regionId}
+        headingId={headingId}
+        onToggle={toggle}
+      />
       {/* The id sits on a wrapper because Collapse renders nothing while
           closed under reduced motion, and the toggle must always point at
           an element. */}
@@ -70,12 +80,12 @@ export function PluginDetails({
         <Collapse expanded={isExpanded}>
           <Stack gap="sm" pt="xxs">
             <PluginAdditionsSection
-              toolbarCommandTitles={getTitles(dataExplorerToolbarCommands)}
-              chartTypeTitles={getTitles(chartTypes)}
+              toolbarCommandTitles={toolbarCommandTitles}
+              chartTypeTitles={chartTypeTitles}
             />
             <PluginDataAccessSection
               permissions={manifest.permissions}
-              hasChartTypes={chartTypes.length > 0}
+              hasChartTypes={chartTypeTitles.length > 0}
             />
           </Stack>
         </Collapse>

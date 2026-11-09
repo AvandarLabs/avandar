@@ -9209,7 +9209,7 @@ msgstr "Some rows have an empty latitude or longitude."
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "This {resource} is accessible to anyone with {app} {0} permission."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
 msgstr "See less"
 
@@ -9348,7 +9348,7 @@ msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 msgstr "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See more"
 msgstr "See more"
 
