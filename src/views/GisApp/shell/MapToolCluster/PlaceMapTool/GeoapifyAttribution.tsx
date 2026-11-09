@@ -12,7 +12,7 @@ export function GeoapifyAttribution(): ReactNode {
     <Anchor
       href="https://www.geoapify.com/"
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
       size="xs"
       c="dimmed"
     >

@@ -12,7 +12,7 @@ export function OpenStreetMapAttribution(): ReactNode {
     <Anchor
       href="https://www.openstreetmap.org/copyright"
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
       size="xs"
       c="dimmed"
     >

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
 import type { ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
@@ -85,6 +85,52 @@ describe("AddressSearchField", () => {
     expect(
       screen.getByRole("link", { name: "Powered by Geoapify" }),
     ).toHaveAttribute("href", "https://www.geoapify.com/");
+  });
+
+  it("opens the credit links in a new tab without handing over the opener", async () => {
+    _renderField();
+    _search("W 46th St");
+    await _findCandidate();
+    for (const name of [
+      "© OpenStreetMap contributors",
+      "Powered by Geoapify",
+    ]) {
+      const link = screen.getByRole("link", { name });
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    }
+  });
+
+  it("lists the results as a list", async () => {
+    _renderField();
+    _search("W 46th St");
+    await _findCandidate();
+    const items = within(screen.getByRole("list")).getAllByRole("listitem");
+    expect(items).toHaveLength(1);
+    expect(
+      within(items[0]!).getByRole("button", { name: CANDIDATE.label }),
+    ).toBeVisible();
+  });
+
+  it("announces how many addresses were found", async () => {
+    _renderField();
+    _search("W 46th St");
+    await _findCandidate();
+    expect(screen.getByRole("status")).toHaveTextContent("1 address found");
+  });
+
+  it("announces when no address matches", async () => {
+    mocks.post.mockResolvedValue({ candidates: [] });
+    _renderField();
+    _search("Nowhere at all");
+    await waitFor(
+      () => {
+        expect(screen.getByRole("status")).toHaveTextContent(
+          "No addresses found",
+        );
+      },
+      { timeout: 2000 },
+    );
   });
 
   it("picks a result", async () => {

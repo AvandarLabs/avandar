@@ -16,6 +16,9 @@ type AddressSearch = {
   candidates: readonly GeocodeCandidate[];
   isSearching: boolean;
   isError: boolean;
+
+  /** True once the current text's search has come back, even empty. */
+  hasResult: boolean;
 };
 
 /**
@@ -51,5 +54,6 @@ export function useAddressSearch(
       : EMPTY_CANDIDATES,
     isSearching: isEnabled && isLoading,
     isError: isEnabled && queryResult.isError,
+    hasResult: isEnabled && !isLoading && data !== undefined,
   };
 }

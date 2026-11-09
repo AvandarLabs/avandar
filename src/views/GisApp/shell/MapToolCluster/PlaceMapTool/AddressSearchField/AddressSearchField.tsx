@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Loader, Stack, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { AddressSearchResults } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchResults";
+import { AddressSearchStatus } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchStatus";
 import { useAddressSearch } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/useAddressSearch";
 import type {
   GeocodeBiasBox,
@@ -22,7 +23,7 @@ type Props = {
 export function AddressSearchField({ biasBox, onPick }: Props): ReactNode {
   const { t } = useLingui();
   const [text, setText] = useState("");
-  const { candidates, isSearching, isError } = useAddressSearch({
+  const { candidates, isSearching, isError, hasResult } = useAddressSearch({
     text,
     biasBox,
   });
@@ -44,6 +45,10 @@ export function AddressSearchField({ biasBox, onPick }: Props): ReactNode {
       {candidates.length > 0 ? (
         <AddressSearchResults candidates={candidates} onPick={onPick} />
       ) : null}
+      <AddressSearchStatus
+        hasResult={hasResult}
+        resultCount={candidates.length}
+      />
     </Stack>
   );
 }
