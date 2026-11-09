@@ -8,8 +8,6 @@
 .root {
   background-color: var(--mantine-navbar-background);
 
-  --ava-chat-composer-width: min(64vw, 960px);
-
   /* Set overflow-x to clip so that the horizontal bleed from AppShell.Main's
    * negative margins is visually clipped without creating a scroll container.
    * Otherwise wheel events are absorbed by .root before reaching the window,
