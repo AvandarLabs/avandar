@@ -2120,10 +2120,6 @@ msgstr "Global Editor"
 msgid "Manage seats in billing portal →"
 msgstr "Manage seats in billing portal →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-#~ msgid "Source record"
-#~ msgstr "Source record"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "Download offline models"

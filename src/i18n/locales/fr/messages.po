@@ -2173,10 +2173,6 @@ msgstr "Éditeur global"
 msgid "Manage seats in billing portal →"
 msgstr "Gérer les sièges dans le portail de facturation →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-#~ msgid "Source record"
-#~ msgstr "Enregistrement source"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "Télécharger les modèles hors ligne"
@@ -3502,7 +3498,8 @@ msgstr "Une URL courte et facile à retenir pour les prospectus, les rapports et
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
-msgstr ""
+msgstr "« {0} » est en cours de préparation. L’ouverture de jeux de données "
+"volumineux peut prendre quelques minutes la première fois."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -8931,7 +8928,7 @@ msgstr "Colonne 2"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Data not ready"
-msgstr ""
+msgstr "Données non prêtes"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -9075,7 +9072,7 @@ msgstr "Détails"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Preparing your data"
-msgstr ""
+msgstr "Préparation de vos données"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -10614,7 +10611,8 @@ msgstr "Lien"
 #. placeholder {0}: listing.displayName
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
-msgstr ""
+msgstr "Nous n’avons pas pu préparer les données pour « {0} » ; leur ouverture "
+"pourrait donc échouer."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."

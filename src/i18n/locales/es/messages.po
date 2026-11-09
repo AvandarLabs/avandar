@@ -2158,10 +2158,6 @@ msgstr "Editor Global"
 msgid "Manage seats in billing portal →"
 msgstr "Gestionar asientos en el portal de facturación →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-#~ msgid "Source record"
-#~ msgstr "Registro de origen"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "Descargar modelos sin conexión"
@@ -3477,7 +3473,8 @@ msgstr "Una URL corta y fácil de recordar para volantes, informes y códigos QR
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
-msgstr ""
+msgstr "\"{0}\" se está preparando. Los conjuntos de datos grandes pueden "
+"tardar unos minutos en abrirse la primera vez."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -8870,7 +8867,7 @@ msgstr "Columna 2"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Data not ready"
-msgstr ""
+msgstr "Datos no disponibles"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -9014,7 +9011,7 @@ msgstr "Detalles"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Preparing your data"
-msgstr ""
+msgstr "Preparando sus datos"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -10539,7 +10536,8 @@ msgstr "Enlace"
 #. placeholder {0}: listing.displayName
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
-msgstr ""
+msgstr "No pudimos preparar los datos de \"{0}\", por lo que es posible que no "
+"se abra."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."

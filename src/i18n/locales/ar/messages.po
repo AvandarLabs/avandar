@@ -2119,10 +2119,6 @@ msgstr "المحرر العالمي"
 msgid "Manage seats in billing portal →"
 msgstr "إدارة المقاعد في بوابة الفوترة →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-#~ msgid "Source record"
-#~ msgstr "السجل المصدر"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "تنزيل النماذج غير المتصلة"
@@ -3417,7 +3413,8 @@ msgstr "عنوان URL قصير وسهل التذكر للمنشورات وال�
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
-msgstr ""
+msgstr "جارٍ تجهيز \"{0}\". قد تستغرق مجموعات البيانات الكبيرة بضع دقائق لفتحها "
+"في المرة الأولى."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -8720,7 +8717,7 @@ msgstr "العمود 2"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Data not ready"
-msgstr ""
+msgstr "البيانات غير جاهزة"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -8862,7 +8859,7 @@ msgstr "التفاصيل"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Preparing your data"
-msgstr ""
+msgstr "جارٍ تجهيز بياناتك"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -10363,7 +10360,7 @@ msgstr "رابط"
 #. placeholder {0}: listing.displayName
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
-msgstr ""
+msgstr "تعذّر علينا تجهيز البيانات لـ \"{0}\"، لذا قد لا تُفتح."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."

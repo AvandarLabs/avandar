@@ -2065,10 +2065,6 @@ msgstr "全球编辑器"
 msgid "Manage seats in billing portal →"
 msgstr "在计费门户中管理席位 →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-#~ msgid "Source record"
-#~ msgstr "源记录"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "下载离线模型"
@@ -3334,7 +3330,7 @@ msgstr "适用于传单、报告和二维码的简短易记 URL。"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
-msgstr ""
+msgstr "正在准备“{0}”。大型数据集首次打开可能需要几分钟。"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -8526,7 +8522,7 @@ msgstr "第 2 列"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Data not ready"
-msgstr ""
+msgstr "数据尚未就绪"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -8665,7 +8661,7 @@ msgstr "详细信息"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Preparing your data"
-msgstr ""
+msgstr "正在准备您的数据"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -10126,7 +10122,7 @@ msgstr "链接"
 #. placeholder {0}: listing.displayName
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
-msgstr ""
+msgstr "我们无法准备“{0}”的数据，因此可能无法打开。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
