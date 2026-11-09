@@ -75,6 +75,22 @@ function _toQueryOutcome(
   };
 }
 
+/**
+ * The turn's question as a label shows it on this device: the turn's
+ * `questionLabel`, or its last question with each mention as `@Name`.
+ */
+export function getTurnQuestionLabel(
+  turn: Readonly<DataAgentTurnOptions>,
+): string {
+  return (
+    turn.questionLabel ??
+    getLastQuestionFromMessages(
+      turn.apiMessages,
+      buildLocalGadgetName(turn.gadgetContext),
+    )
+  );
+}
+
 /** Puts the agent's SQL into the Data Explorer, which runs and shows it. */
 function _applySqlToExplorer(
   options: Readonly<DataAgentTurnOptions>,
@@ -82,12 +98,7 @@ function _applySqlToExplorer(
 ): void {
   const { dataExplorerDispatch } = options;
   dataExplorerDispatch.setRawSql(request.sql);
-  dataExplorerDispatch.setNlPrompt(
-    getLastQuestionFromMessages(
-      options.apiMessages,
-      buildLocalGadgetName(options.gadgetContext),
-    ),
-  );
+  dataExplorerDispatch.setNlPrompt(getTurnQuestionLabel(options));
   try {
     const mapping = options.parseSqlRef.current({ sql: request.sql });
     dataExplorerDispatch.applySqlMapping(mapping);

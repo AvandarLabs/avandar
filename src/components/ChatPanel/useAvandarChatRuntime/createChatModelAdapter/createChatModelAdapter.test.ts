@@ -23,8 +23,10 @@ const {
   loadGadgetsMock,
   detectBiasMock,
   decideConsentMock,
+  applyResponseMock,
 } = vi.hoisted(() => {
   return {
+    applyResponseMock: vi.fn(),
     loadGadgetsMock: vi.fn(),
     detectBiasMock: vi.fn(),
     decideConsentMock: vi.fn(),
@@ -110,6 +112,7 @@ vi.mock(
       applyChatModelTurnResponse: async (options: {
         response: { assistantText: string };
       }) => {
+        applyResponseMock(options);
         return {
           content: [{ type: "text", text: options.response.assistantText }],
         };
@@ -612,6 +615,7 @@ describe("createChatModelAdapter with mentions", () => {
       .mockReset()
       .mockResolvedValue({ assistantText: "offline pipeline reply" });
     loadGadgetsMock.mockReset().mockResolvedValue(LOADED_CONTEXTS);
+    applyResponseMock.mockClear();
     detectBiasMock.mockReset().mockReturnValue({ hits: [] });
     decideConsentMock.mockReset().mockResolvedValue({ approved: true });
     LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
@@ -717,6 +721,100 @@ describe("createChatModelAdapter with mentions", () => {
     const { messages } = runOfflineChatTurnMock.mock.calls[0]![0];
     expect(messages.at(-1).content).toBe('Show @"US deaths"');
     expect(JSON.stringify(messages)).not.toContain("@{");
+  });
+
+  it("keeps the page from when the turn started while gadgets load", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+    const pathnameRef = { current: "/acme/dashboards" };
+    const dashboardEditorStateRef = { current: { selectedItem: "tile-1" } };
+    loadGadgetsMock.mockImplementation(async () => {
+      pathnameRef.current = "/acme/data-explorer";
+      dashboardEditorStateRef.current = { selectedItem: "tile-2" };
+      return LOADED_CONTEXTS;
+    });
+
+    await _askWithMention("dashboards", [], {
+      pathnameRef,
+      dashboardEditorStateRef,
+    } as unknown as Partial<CreateChatModelAdapterOptions>);
+
+    expect(runDataAgentTurnMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        pathname: "/acme/dashboards",
+        dashboardEditorState: { selectedItem: "tile-1" },
+      }),
+    );
+  });
+
+  it("checks consent for the user from when the turn started", async () => {
+    detectBiasMock.mockReturnValue({
+      hits: [{ category: "loaded_framing", label: "x", sample: "x" }],
+    });
+    const userRef = { current: { id: "user-1" } as { id: string } | undefined };
+    loadGadgetsMock.mockImplementation(async () => {
+      userRef.current = undefined;
+      return LOADED_CONTEXTS;
+    });
+
+    await _askWithMention("dashboards", [], {
+      userRef,
+    } as unknown as Partial<CreateChatModelAdapterOptions>);
+
+    expect(decideConsentMock).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "user-1" }),
+    );
+  });
+
+  it("counts an empty tray as zero with the agent on", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _askWithMention("dashboards");
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).toMatchObject({ attachedCount: 0 });
+  });
+
+  it("leaves the attached count out with the switch off", async () => {
+    await _askWithMention("dashboards", [DASHBOARD_REF]);
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).not.toHaveProperty("attachedCount");
+  });
+
+  it("leaves the attached count out in the case designer", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _askWithMention("case-manager", [DASHBOARD_REF]);
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).not.toHaveProperty("attachedCount");
+  });
+
+  it("does not load the tray in the case designer", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _askWithMention("case-manager", [DASHBOARD_REF]);
+
+    expect(loadGadgetsMock).toHaveBeenCalledWith([DATASET_REF]);
+  });
+
+  it("labels today's chat result with mention names", async () => {
+    await _askWithMention("dashboards");
+
+    expect(applyResponseMock).toHaveBeenCalledWith(
+      expect.objectContaining({ questionLabel: "Show @US deaths" }),
+    );
+  });
+
+  it("labels an offline turn's result with mention names", async () => {
+    OfflineModeStore.setOn(true);
+
+    await _askWithMention("data-explorer");
+
+    expect(runOfflineDataAgentTurnMock).toHaveBeenCalledWith(
+      expect.objectContaining({ questionLabel: "Show @US deaths" }),
+    );
   });
 
   it("ignores the tray with the switch off", async () => {

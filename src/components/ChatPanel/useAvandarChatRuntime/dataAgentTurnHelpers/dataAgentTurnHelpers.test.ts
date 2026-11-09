@@ -113,6 +113,25 @@ describe("createExplorerShowQuery", () => {
     );
   });
 
+  it("labels the explorer's prompt with the turn's question label", async () => {
+    const turn: DataAgentTurnOptions = {
+      ..._createTurnOptions(),
+      apiMessages: [
+        Model.make("ChatClientMessage", {
+          role: "user",
+          content: 'Totals for @"US deaths"',
+        }),
+      ],
+      questionLabel: "Totals for @US deaths",
+    };
+
+    await createExplorerShowQuery(turn)({ sql: "select 1", summary: "s" });
+
+    expect(turn.dataExplorerDispatch.setNlPrompt).toHaveBeenCalledWith(
+      "Totals for @US deaths",
+    );
+  });
+
   it("returns no rows when no preview is asked for", async () => {
     const showQuery = createExplorerShowQuery(_createTurnOptions());
 

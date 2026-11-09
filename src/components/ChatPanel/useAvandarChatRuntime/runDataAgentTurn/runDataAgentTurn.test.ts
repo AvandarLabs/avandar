@@ -427,4 +427,56 @@ describe("runDataAgentTurn", () => {
     );
     expect(_askedTexts()[2]).toBe("And still?");
   });
+
+  it("says the tray was emptied when loading failed with an empty tray", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn({
+      ..._turn("workspace-load-failed-empty", "What is pinned?"),
+      gadgetContext: {
+        attachedRefs: [DASHBOARD_REF],
+        contexts: _contexts(DASHBOARD_CONTEXT),
+      },
+    });
+
+    await runDataAgentTurn({
+      ..._turn("workspace-load-failed-empty", `Totals for ${DATASET_TOKEN}`),
+      gadgetContext: { attachedRefs: [], contexts: undefined },
+    });
+
+    expect(_askedTexts()[1]).toContain(
+      "<attached>Nothing is attached any more.</attached>",
+    );
+  });
+
+  it("masks a value an earlier mention's SQL holds in that mention's recap name", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const tileRef: Gadget.Ref = {
+      gadgetType: "dashboard_tile",
+      gadgetId: DASHBOARD_REF.gadgetId,
+      subId: "block-1",
+    };
+
+    await runDataAgentTurn({
+      ..._turn("workspace-recap-mask", [
+        `Who is in ${ChatMentionToken.buildToken(tileRef)}?`,
+        "Two people.",
+        "And in total?",
+      ]),
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: _contexts({
+          kind: "dashboard_tile",
+          ref: tileRef,
+          dashboardName: "Weekly outbreak",
+          tile: {
+            title: "Jane Doe visits",
+            chartType: "table",
+            sql: `SELECT * FROM t WHERE "patient_name" = 'Jane Doe'`,
+          },
+        }),
+      },
+    });
+
+    expect(_askedTexts()[0]).toContain('User: Who is in @"<value 1> visits"?');
+  });
 });

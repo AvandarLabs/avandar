@@ -57,6 +57,12 @@ export type DataAgentTurnOptions = {
    * them, and it converts them with the conversation's vault.
    */
   gadgetContext?: AgentTurnGadgetContext;
+  /**
+   * The question as labels on this device show it, each mention as
+   * `@Name`. Set when `apiMessages` already name their mentions for a
+   * model (offline turns), so labels still read `@Name`.
+   */
+  questionLabel?: string;
 };
 
 /**

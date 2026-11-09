@@ -8,6 +8,7 @@ import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryCo
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { createAgentGadgetContextLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader";
 import {
+  buildLocalGadgetName,
   loadTurnGadgetContext,
   toModelMessages,
 } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
@@ -19,6 +20,7 @@ import {
   extractText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { runLocalChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/runLocalChatTurn";
+import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { isAgentAccessDenied } from "@/components/ChatPanel/useAvandarChatRuntime/isAgentAccessDenied";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
@@ -113,6 +115,8 @@ type TurnMessages = {
   gadgetContext: AgentTurnGadgetContext | undefined;
   /** Gadgets the latest user message mentions. */
   mentionCount: number;
+  /** The last question as labels show it, each mention as `@Name`. */
+  questionLabel: string;
 };
 
 /**
@@ -143,6 +147,10 @@ async function _prepareTurnMessages(
     gadgetContext,
     mentionCount: ChatMentionToken.refsFromText(lastUserMessage?.content ?? "")
       .length,
+    questionLabel: getLastQuestionFromMessages(
+      apiMessages,
+      buildLocalGadgetName(gadgetContext),
+    ),
   };
 }
 
@@ -303,17 +311,27 @@ export function createChatModelAdapter(
       };
 
       const workspaceId = workspaceIdRef.current;
-      const { apiMessages, modelMessages, gadgetContext, mentionCount } =
-        await _prepareTurnMessages({
-          messages,
-          attachedRefs: DataAgentFeature.isEnabled()
-            ? contextTrayRef.current
-            : [],
-          workspaceId,
-        });
+      const currentUser = userRef.current;
+      // The page is read once, here, so the gadget load, consent waits, and
+      // navigation during the turn cannot mix one page's context with
+      // another page's route.
+      const currentPageContext = pageContextRef.current;
+      const currentPathname = pathnameRef.current;
+      const currentDashboardEditorState = dashboardEditorStateRef.current;
+      // Only an agent turn reads the tray. Today's chat never sees it.
+      const isAgentTurn =
+        currentPageContext.app !== "case-manager" &&
+        DataAgentFeature.isEnabled();
+      const attachedRefs = isAgentTurn ? contextTrayRef.current : [];
+      const turnMessages = await _prepareTurnMessages({
+        messages,
+        attachedRefs,
+        workspaceId,
+      });
       if (isGenerationStale()) {
         return { content: [] };
       }
+      const { apiMessages, modelMessages, gadgetContext } = turnMessages;
 
       // Bias-check the latest user-typed message before it leaves the
       // browser. Clarification-answer markers and hidden view-change lines
@@ -322,12 +340,6 @@ export function createChatModelAdapter(
       const lastUserMessage = [...modelMessages]
         .reverse()
         .find(propEq("role", "user"));
-      const currentUser = userRef.current;
-      // The page is read once, here, so consent waits and navigation during
-      // the turn cannot mix one page's context with another page's route.
-      const currentPageContext = pageContextRef.current;
-      const currentPathname = pathnameRef.current;
-      const currentDashboardEditorState = dashboardEditorStateRef.current;
 
       if (
         lastUserMessage &&
@@ -424,8 +436,8 @@ export function createChatModelAdapter(
             content: lastUserMessage.content,
             pageContext: currentPageContext,
             runtimeMode: initialRuntimeMode,
-            mentionCount,
-            attachedCount: gadgetContext?.attachedRefs.length,
+            mentionCount: turnMessages.mentionCount,
+            attachedCount: isAgentTurn ? attachedRefs.length : undefined,
           }),
         });
       }
@@ -436,6 +448,7 @@ export function createChatModelAdapter(
         return applyChatModelTurnResponse({
           response,
           apiMessages: modelMessages,
+          questionLabel: turnMessages.questionLabel,
           currentUser,
           currentPageContext,
           workspaceId,
@@ -475,6 +488,7 @@ export function createChatModelAdapter(
             ...dataAgentTurn,
             apiMessages: modelMessages,
             gadgetContext: undefined,
+            questionLabel: turnMessages.questionLabel,
           },
           workspace: workspaceRef.current,
           pageContext: currentPageContext,
@@ -489,10 +503,7 @@ export function createChatModelAdapter(
         return runOfflineTurn();
       }
 
-      if (
-        currentPageContext.app !== "case-manager" &&
-        DataAgentFeature.isEnabled()
-      ) {
+      if (isAgentTurn) {
         try {
           return finishIfCurrent(
             await _runAgentTurn({

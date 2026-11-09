@@ -167,10 +167,57 @@ type TurnInputsOptions = {
   turn: Readonly<DataAgentTurnOptions>;
 };
 
+/** The SQL a gadget's charts filter with, empty strings left out. */
+function _gadgetSql(context: AgentGadgetContext | undefined): string[] {
+  switch (context?.kind) {
+    case "dashboard":
+      return context.tiles
+        .map((tile) => {
+          return tile.sql;
+        })
+        .filter(Boolean);
+    case "dashboard_tile":
+      return [context.tile.sql].filter(Boolean);
+    default:
+      return [];
+  }
+}
+
+/**
+ * Redacts the SQL of gadgets only earlier user messages mention. No block
+ * shows it, but the recap names those gadgets, so the vault must hold the
+ * values it filters on before any name is masked.
+ */
+function _redactEarlierMentionSql(
+  turn: Readonly<DataAgentTurnOptions>,
+  question: string,
+  redactSql: (sql: string) => void,
+): void {
+  const contexts = turn.gadgetContext?.contexts;
+  const questionKeys = new Set(
+    ChatMentionToken.refsFromText(question).map(ChatMentionToken.buildRefKey),
+  );
+  turn.apiMessages
+    .flatMap((message) => {
+      return message.role === "user"
+        ? ChatMentionToken.refsFromText(message.content)
+        : [];
+    })
+    .map(ChatMentionToken.buildRefKey)
+    .filter((key) => {
+      return !questionKeys.has(key);
+    })
+    .forEach((key) => {
+      _gadgetSql(contexts?.get(key)).forEach(redactSql);
+    });
+}
+
 /**
  * The page, attached, and mentioned blocks in one redaction pass through
  * the conversation's vault. Mentions come from the message being answered.
- * Nothing is attached or mentioned when the gadgets failed to load.
+ * Nothing is attached or mentioned when the gadgets failed to load. The SQL
+ * of gadgets earlier messages mention is redacted first, so their recap
+ * names are masked too.
  */
 function _buildBlocks(
   options: Readonly<TurnInputsOptions>,
@@ -184,6 +231,11 @@ function _buildBlocks(
   const toContext = (ref: Gadget.Ref): AgentGadgetContext => {
     return _contextOf(gadgetContext, ref);
   };
+  const redactSql = (sql: string): string => {
+    return sqlVault.redact(sql, detectors);
+  };
+  // Every redaction happens before `buildAgentContextBlocks` masks a name.
+  _redactEarlierMentionSql(options.turn, question, redactSql);
   return buildAgentContextBlocks({
     page: options.pageContext,
     attached: isLoaded ? gadgetContext.attachedRefs.map(toContext) : [],
@@ -192,9 +244,7 @@ function _buildBlocks(
       : [],
     aliases: SqlTableAlias.fromSchema({ datasets: options.datasets }),
     isSensitive: isPersonalDataText,
-    redactSql: (sql) => {
-      return sqlVault.redact(sql, detectors);
-    },
+    redactSql,
     maskText: sqlVault.maskText,
   });
 }
@@ -202,8 +252,8 @@ function _buildBlocks(
 /**
  * The turn's blocks, and the mention names masked with the same vault
  * after every block's SQL is redacted. When the gadgets failed to load,
- * the attached block repeats last turn's, so the model reads "unchanged",
- * and every mention is named as unavailable.
+ * a non-empty tray's attached block repeats last turn's, so the model reads
+ * "unchanged", and every mention is named as unavailable.
  */
 function _buildTurnInputs(
   options: Readonly<TurnInputsOptions>,
@@ -211,9 +261,14 @@ function _buildTurnInputs(
   const { conversation } = options;
   const { gadgetContext } = options.turn;
   const blocks = _buildBlocks(options);
-  const isLoadFailed = gadgetContext !== undefined && !gadgetContext.contexts;
+  // A failed load with a tray repeats last turn's tray. With an empty tray
+  // the attached block stays empty, so the model hears it was cleared.
+  const isTrayUnknown =
+    gadgetContext !== undefined &&
+    !gadgetContext.contexts &&
+    gadgetContext.attachedRefs.length > 0;
   return {
-    blocks: isLoadFailed
+    blocks: isTrayUnknown
       ? { ...blocks, attachedBlock: conversation.lastAttachedBlock }
       : blocks,
     nameOf: (ref) => {
