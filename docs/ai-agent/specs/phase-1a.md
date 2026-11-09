@@ -301,7 +301,8 @@ Red/green TDD with Vitest, plus one browser spec:
   every page rerun, at $0.0003 and $0.0002 per question. With placeholders
   (D39), P01 to P07 pass, P07 three times in a row, and the 45 questions
   stay at 45/45; after the review fixes, P01 to P07 still pass and the 45
-  questions scored 43/45, with both misses passing on rerun. See
+  questions scored 43/45, with both misses passing on rerun; after the
+  second review, P01 to P07 pass and the 45 questions score 44/45. See
   [eval.md](../eval.md#phase-1a).
 
 ## Done when

@@ -161,6 +161,28 @@ prompt v2 gained rules on using placeholders. Runs archived under the
 - The longer prompt rules add about 45 to 85 input tokens per call over
   the first placeholder rule. The review runs cost $0.017.
 
+A second review narrowed word masking to values compared with a personal
+column and fixed large ids (D39). Runs archived under the
+`phase-1a-redaction-review2` label.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| review2:agent-page (P01-P07) | 6/7 | 0 / 1 | $0.00034 | 3,224 | 1.9 s / 2.1 s |
+| review2:agent-45 | 43/45 | 0 / 0 | $0.00062 | 3,177 | 2.1 s / 3.3 s |
+| review2:rerun #1-#3 (P04, N02, N04) | P04 1/3, N02 3/3, N04 1/3 | | $0.00017 to $0.00031 | | |
+| review2:p04-check #1-#4 (scoped "never ask") | P04 4/4, P07 4/4 | 0 / 0 | $0.00017 to $0.00055 | | |
+| review2:agent-45-final | 44/45 | 0 / 0 | $0.00026 | 3,164 | 2.1 s / 3.2 s |
+| review2:agent-page-final | 7/7 | 0 / 0 | $0.00020 | 3,264 | 1.7 s / 2.8 s |
+
+- P04 ("make this a pie chart" with two charts) answered without asking in
+  3 of 4 runs once the placeholder rule said "page text". Its page block
+  had no placeholders and was unchanged, so the cause was the rule's
+  unscoped "Never ask what it is". Scoped to "never ask the user what a
+  placeholder stands for", P04 asked in 5 of 5 runs.
+- N02 and N04 have no page block. N02 missed once and passed 3 of 3 on
+  rerun; N04 left out zero-death countries, as it does on some runs.
+- The second review's runs cost $0.048.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -529,7 +551,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 99 runs (every
+chat index lists all 110 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

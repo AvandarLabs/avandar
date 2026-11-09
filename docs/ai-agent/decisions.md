@@ -686,6 +686,19 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   values. Titles and page names now mask detected values too. Prompt v2
   says to use a placeholder only as a whole value and to alias computed
   columns.
+- **Second review (2026-11-09).** Word masking hid ordinary words: every
+  literal in a personal expression counted as detected, so a chart with
+  `date_trunc('month', "dob")` turned "month" and "2022" into
+  placeholders in every title. Values now record whether they were
+  compared with a personal column's value or only swept up, and only
+  compared values are masked as words in page text; SQL is never
+  word-masked. Integers past 2^53 now redact and restore exactly. Also:
+  small numbers in unparsable SQL stay only without a personal column,
+  aliases that shadow a dataset column are personal, the mask is built
+  lazily, lookups read placeholder variants, variant placeholders are
+  refused, and names show placeholders unescaped. Replies still show
+  `<value N>`: mapping them back for the user needs the recap redacted
+  first.
 - **Costs.** About 120 to 170 more input tokens per call for the prompt
   rules.
   Columns outside the page's datasets count as personal, and DuckDB-only
