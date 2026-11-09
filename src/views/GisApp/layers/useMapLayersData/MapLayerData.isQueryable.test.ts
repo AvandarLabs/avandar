@@ -119,4 +119,28 @@ describe("MapLayerData.isQueryable", () => {
 
     expect(MapLayerData.isQueryable(buffer, [buffer])).toBe(false);
   });
+
+  it("waits while the spatial filter layer cannot compile yet", () => {
+    const unboundFilterLayer = MapLayer.createArea("ZIP codes");
+    const schools: MapLayer.T = {
+      ...createQueryableLayer(),
+      spatialFilter: { layerId: unboundFilterLayer.id },
+    };
+
+    expect(
+      MapLayerData.isQueryable(schools, [unboundFilterLayer, schools]),
+    ).toBe(false);
+  });
+
+  it("runs once the spatial filter layer can compile", () => {
+    const filterLayer = createSpatialLayer();
+    const schools: MapLayer.T = {
+      ...createQueryableLayer(),
+      spatialFilter: { layerId: filterLayer.id },
+    };
+
+    expect(MapLayerData.isQueryable(schools, [filterLayer, schools])).toBe(
+      true,
+    );
+  });
 });

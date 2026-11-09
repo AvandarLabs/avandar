@@ -133,4 +133,46 @@ describe("MapLayerData.getQueryKeyFromMapLayer spatial filters", () => {
       ]),
     );
   });
+
+  it("changes when a layer further down the filter chain changes", () => {
+    const zipCodes = MapLayer.createArea("ZIP codes");
+    const sites = {
+      ...MapLayer.createArea("Buffer of Sites"),
+      spatialFilter: { layerId: zipCodes.id },
+    };
+    const schools = {
+      ...MapLayer.makeEmpty("Schools"),
+      spatialFilter: { layerId: sites.id },
+    };
+    const editedZipCodes = {
+      ...zipCodes,
+      source: { ...zipCodes.source, limit: 10 },
+    };
+
+    expect(
+      MapLayerData.getQueryKeyFromMapLayer(schools, undefined, undefined, [
+        zipCodes,
+        sites,
+        schools,
+      ]),
+    ).not.toEqual(
+      MapLayerData.getQueryKeyFromMapLayer(schools, undefined, undefined, [
+        editedZipCodes,
+        sites,
+        schools,
+      ]),
+    );
+  });
+
+  it("leaves an unfiltered layer's key unchanged by other stacked layers", () => {
+    const cases = MapLayer.makeEmpty("Cases");
+    const zipCodes = MapLayer.createArea("ZIP codes");
+
+    expect(
+      MapLayerData.getQueryKeyFromMapLayer(cases, undefined, undefined, [
+        zipCodes,
+        cases,
+      ]),
+    ).toEqual(MapLayerData.getQueryKeyFromMapLayer(cases));
+  });
 });

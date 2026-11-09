@@ -44,29 +44,6 @@ function _getBufferSourceQueryKey(
   };
 }
 
-/** Cache key parts of the layer `layer` is spatially filtered by. */
-function _getSpatialFilterQueryKey(
-  layer: MapLayer.T,
-  stack: readonly MapLayer.T[],
-): unknown {
-  const filterLayer = layer.spatialFilter
-    ? stack.find(propEq("id", layer.spatialFilter.layerId))
-    : undefined;
-  if (!filterLayer) {
-    return undefined;
-  }
-  return {
-    id: filterLayer.id,
-    source: filterLayer.source,
-    geoBinding: filterLayer.geoBinding,
-    sensitivity: filterLayer.sensitivity,
-    timeColumn: filterLayer.timeColumn,
-    applyAoiFilter: filterLayer.applyAoiFilter,
-    spatialFilter: filterLayer.spatialFilter,
-    bufferSource: _getBufferSourceQueryKey(filterLayer, stack),
-  };
-}
-
 /** Layers a layer's query reads: its buffer source and its filter layer. */
 function _getDependencyLayers(
   layer: MapLayer.T,
@@ -83,6 +60,100 @@ function _getDependencyLayers(
       return stack.find(propEq("id", dependencyId));
     })
     .filter(isDefined);
+}
+
+/**
+ * Cache key parts of every layer a filtered layer's compiled SQL reads
+ * through its spatial filter: the filter layer, then each buffer source and
+ * filter layer reached from it, in walk order. `undefined` for a layer with
+ * no spatial filter, so unfiltered keys do not change.
+ */
+function _getSpatialFilterDependencyKey(
+  layer: MapLayer.T,
+  stack: readonly MapLayer.T[],
+): unknown[] | undefined {
+  if (!layer.spatialFilter) {
+    return undefined;
+  }
+  const visitedIds = new Set<MapLayer.Id>([layer.id]);
+  const dependencyKeys: unknown[] = [];
+  const pendingLayers = [
+    stack.find(propEq("id", layer.spatialFilter.layerId)),
+  ].filter(isDefined);
+  for (
+    let current = pendingLayers.shift();
+    current !== undefined;
+    current = pendingLayers.shift()
+  ) {
+    if (!visitedIds.has(current.id)) {
+      visitedIds.add(current.id);
+      dependencyKeys.push({
+        id: current.id,
+        source: current.source,
+        geoBinding: current.geoBinding,
+        sensitivity: current.sensitivity,
+        timeColumn: current.timeColumn,
+        applyAoiFilter: current.applyAoiFilter,
+        spatialFilter: current.spatialFilter,
+      });
+      pendingLayers.push(..._getDependencyLayers(current, stack));
+    }
+  }
+  return dependencyKeys;
+}
+
+/** True when `layer`'s own binding and source can compile. */
+function _isOwnBindingQueryable(
+  layer: MapLayer.T,
+  stack: readonly MapLayer.T[],
+): boolean {
+  if (layer.geoBinding?.type === "bufferOfLayer") {
+    const sourceId = layer.geoBinding.layerId;
+    return stack.some(propEq("id", sourceId));
+  }
+  if (layer.source.dataSource === undefined) {
+    return false;
+  }
+  const binding = layer.geoBinding;
+  if (binding?.type === "geometryColumn") {
+    return layer.source.queryColumns.some(propEq("id", binding.column));
+  }
+  if (binding?.type === "binPointsToGrid") {
+    return _isPointBindingComplete(layer, binding.points);
+  }
+  if (
+    binding?.type === "joinToBoundaries" ||
+    binding?.type === "aggregatePointsToBoundaries"
+  ) {
+    return true;
+  }
+  return MapLayer.toGeoBinding(layer) !== undefined;
+}
+
+/**
+ * True when every layer along `layer`'s spatial filter chain can compile.
+ * A missing filter layer or a cycle returns true, so the compiler can
+ * report it.
+ */
+function _isSpatialFilterChainQueryable(
+  layer: MapLayer.T,
+  stack: readonly MapLayer.T[],
+): boolean {
+  const visitedIds = new Set<MapLayer.Id>([layer.id]);
+  let filterLayer = layer.spatialFilter
+    ? stack.find(propEq("id", layer.spatialFilter.layerId))
+    : undefined;
+  while (filterLayer && !visitedIds.has(filterLayer.id)) {
+    if (!_isOwnBindingQueryable(filterLayer, stack)) {
+      return false;
+    }
+    visitedIds.add(filterLayer.id);
+    const nextFilterId = filterLayer.spatialFilter?.layerId;
+    filterLayer = nextFilterId
+      ? stack.find(propEq("id", nextFilterId))
+      : undefined;
+  }
+  return true;
 }
 
 function _hasColumnIdFilterTargets(
@@ -145,33 +216,18 @@ export const MapLayerData = {
 
   /**
    * True when the layer can compile: a resolvable binding, or a buffer whose
-   * source is on the stack.
+   * source is on the stack, and, when it is spatially filtered, every layer
+   * along its filter chain can compile too. A filtered layer waits rather
+   * than errors while its filter layer is still being configured.
    */
   isQueryable: (
     layer: MapLayer.T,
     stack: readonly MapLayer.T[] = [],
   ): boolean => {
-    if (layer.geoBinding?.type === "bufferOfLayer") {
-      const sourceId = layer.geoBinding.layerId;
-      return stack.some(propEq("id", sourceId));
-    }
-    if (layer.source.dataSource === undefined) {
-      return false;
-    }
-    const binding = layer.geoBinding;
-    if (binding?.type === "geometryColumn") {
-      return layer.source.queryColumns.some(propEq("id", binding.column));
-    }
-    if (binding?.type === "binPointsToGrid") {
-      return _isPointBindingComplete(layer, binding.points);
-    }
-    if (
-      binding?.type === "joinToBoundaries" ||
-      binding?.type === "aggregatePointsToBoundaries"
-    ) {
-      return true;
-    }
-    return MapLayer.toGeoBinding(layer) !== undefined;
+    return (
+      _isOwnBindingQueryable(layer, stack) &&
+      _isSpatialFilterChainQueryable(layer, stack)
+    );
   },
 
   /**
@@ -194,7 +250,7 @@ export const MapLayerData = {
     pointContext?: { zoomBand: number },
   ): unknown[] => {
     const sourceKey = _getBufferSourceQueryKey(layer, stack);
-    const filterKey = _getSpatialFilterQueryKey(layer, stack);
+    const filterKey = _getSpatialFilterDependencyKey(layer, stack);
     return [
       "mapLayerData",
       layer.id,
