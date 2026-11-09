@@ -43,6 +43,68 @@ const ensureSpatialMock = vi.hoisted(() => {
   });
 });
 
+const geometrySampleRunQuery = vi.hoisted(() => {
+  return vi.fn();
+});
+
+/** The geometry-sample query the binding-guess tests replace. */
+export const geometrySampleQuery = geometrySampleRunQuery;
+
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
+  return {
+    WorkspaceQuerySession: {
+      runQuery: geometrySampleRunQuery,
+    },
+  };
+});
+
+vi.mock("@avandar/query-hooks", async () => {
+  const React = await import("react");
+  const actual = await vi.importActual<typeof import("@avandar/query-hooks")>(
+    "@avandar/query-hooks",
+  );
+  return {
+    ...actual,
+    useQuery: (options: {
+      enabled?: boolean;
+      queryKey: unknown;
+      queryFn: (context: { signal: AbortSignal }) => Promise<unknown>;
+    }) => {
+      const enabled = options.enabled !== false;
+      const queryFnRef = React.useRef(options.queryFn);
+      queryFnRef.current = options.queryFn;
+      const [state, setState] = React.useState({
+        data: undefined as unknown,
+        isSuccess: false,
+        isError: false,
+      });
+      const queryKey = JSON.stringify(options.queryKey);
+      React.useEffect(() => {
+        if (!enabled) {
+          return undefined;
+        }
+        let isCancelled = false;
+        void queryFnRef.current({ signal: new AbortController().signal }).then(
+          (data) => {
+            if (!isCancelled) {
+              setState({ data, isSuccess: true, isError: false });
+            }
+          },
+          () => {
+            if (!isCancelled) {
+              setState({ data: undefined, isSuccess: false, isError: true });
+            }
+          },
+        );
+        return () => {
+          isCancelled = true;
+        };
+      }, [enabled, queryKey]);
+      return [state.data, enabled && !state.isSuccess && !state.isError, state];
+    },
+  };
+});
+
 /** The `ensureSpatial` spy the Spatial deadlock test asserts on. */
 export const duckDbEnsureSpatial = ensureSpatialMock;
 
@@ -78,6 +140,26 @@ export function createDataset(): Dataset.T {
     ownerProfileId: uuid<UserProfile.Id>(),
     workspaceId: uuid<Workspace.Id>(),
   });
+}
+
+/** Creates a text query column for geometry-value inference. */
+export function createTextColumn(name: string): QueryColumn.T {
+  const now = new Date().toISOString();
+  const datasetColumn = Model.make("DatasetColumn", {
+    id: uuid<DatasetColumn.Id>(),
+    datasetId: uuid<Dataset.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+    createdAt: now,
+    updatedAt: now,
+    name,
+    originalName: name,
+    originalDataType: "VARCHAR",
+    dataType: "varchar",
+    detectedDataType: "VARCHAR",
+    description: undefined,
+    columnIdx: 0,
+  });
+  return QueryColumnModel.makeFromDatasetColumn(datasetColumn);
 }
 
 /** Creates a numeric query column for coordinate inference. */
@@ -311,4 +393,11 @@ export function resetDataSectionFixtures(): void {
   fixtures = createFixtures();
   spatialAvailability.value = "available";
   ensureSpatialMock.mockClear();
+  geometrySampleRunQuery.mockReset();
+  geometrySampleRunQuery.mockResolvedValue({
+    id: "geometry-sample",
+    columns: [],
+    data: [],
+    numRows: 0,
+  });
 }

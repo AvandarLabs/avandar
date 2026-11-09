@@ -18,17 +18,22 @@ export function CoordinateBindingControls({
     ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(dataSourceId);
-  const guess = useCoordinateBindingGuess({
-    layer,
-    sourceColumns,
-    onLayerChange,
-  });
+  const { latLngGuess: guess, isDetectingGeometry } = useCoordinateBindingGuess(
+    {
+      layer,
+      sourceColumns,
+      onLayerChange,
+    },
+  );
   const binding =
     layer.geoBinding?.type === "latLngColumns" ? layer.geoBinding : undefined;
   const isBound =
     binding?.latitude !== undefined && binding.longitude !== undefined;
   const hasCoordinateCandidates = guess !== undefined;
-  if (!hasCoordinateCandidates && !isBound && !layer.source.dataSource) {
+  if (
+    isDetectingGeometry ||
+    (!hasCoordinateCandidates && !isBound && !layer.source.dataSource)
+  ) {
     return null;
   }
   return (
