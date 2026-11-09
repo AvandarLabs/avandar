@@ -54,7 +54,9 @@ export function HighlightValuesBelowInput({
         const aboveLabel = isFraction
           ? t`${threshold}% or above`
           : t`${threshold} or above`;
-        const breakValue = isFraction ? value / 100 : value;
+        const breakValue = isFraction
+          ? Number((value / 100).toFixed(10))
+          : value;
         onLayerChange((current) => {
           return MapLayerUpdates.withHighlightBelow({
             layer: current,

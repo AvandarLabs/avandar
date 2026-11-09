@@ -514,6 +514,28 @@ describe("ClassificationEditor", () => {
     });
   });
 
+  it("stores a typed percent without float drift", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        classifiedValueDomain={[0.1, 1]}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Highlight values below" }),
+      { target: { value: "33.3" } },
+    );
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color.classification.breaks).toEqual([0.333]);
+  });
+
   it("stores the typed number as is when values are not fractions", () => {
     boundarySourceState.options = [];
     const layer = _createLayer();
