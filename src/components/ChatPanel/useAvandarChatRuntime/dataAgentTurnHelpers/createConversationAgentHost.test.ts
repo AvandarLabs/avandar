@@ -1,4 +1,6 @@
+import { Model } from "@avandar/models";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import {
   createAgentConversation,
@@ -112,6 +114,37 @@ describe("createConversationAgentHost", () => {
 
     expect(showQueryInChatMock).toHaveBeenCalledWith(
       expect.objectContaining({ title: "How many?", request: REQUEST }),
+    );
+  });
+
+  it("titles a chat result with the mention's name, never its token", async () => {
+    const ref = {
+      gadgetType: "dataset",
+      gadgetId: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
+      subId: null,
+    } as const;
+    const turn = _turn("dashboard", {
+      apiMessages: [
+        Model.make("ChatClientMessage", {
+          role: "user",
+          content: `Totals for ${ChatMentionToken.buildToken(ref)}`,
+        }),
+      ],
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: new Map([
+          [
+            ChatMentionToken.buildRefKey(ref),
+            { kind: "dataset", ref, name: "US deaths" },
+          ],
+        ]),
+      },
+    });
+
+    await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Totals for @US deaths" }),
     );
   });
 

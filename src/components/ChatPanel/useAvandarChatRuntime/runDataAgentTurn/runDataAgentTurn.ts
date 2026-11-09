@@ -3,7 +3,11 @@ import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster";
-import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageContextBlock";
+import {
+  buildAgentContextBlocks,
+  buildAgentGadgetModelName,
+} from "$/agent/mentions/buildAgentContextBlocks";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/agentPageNameLoader";
@@ -15,18 +19,24 @@ import {
   buildConversationKey,
   loadDataAgentDatasets,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
+import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   AgentConversationState,
+  AgentTurnGadgetContext,
   DataAgentConversation,
   DataAgentTurnOptions,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
+import type { AgentTurnInputs } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { SqlLiteralDetectors } from "@/lib/agent/dataAgent/pagePrivacy/findSensitiveSqlLiterals";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
@@ -137,10 +147,89 @@ async function _readPageContext(
   }
 }
 
+/** A ref's loaded context, or `unavailable` when it was not loaded. */
+function _contextOf(
+  gadgetContext: AgentTurnGadgetContext | undefined,
+  ref: Gadget.Ref,
+): AgentGadgetContext {
+  return (
+    gadgetContext?.contexts?.get(ChatMentionToken.buildRefKey(ref)) ?? {
+      kind: "unavailable",
+      ref,
+    }
+  );
+}
+
+type TurnInputsOptions = {
+  conversation: DataAgentConversation;
+  datasets: readonly DataAgentDataset[];
+  pageContext: AgentPageContext | undefined;
+  turn: Readonly<DataAgentTurnOptions>;
+};
+
+/**
+ * The page, attached, and mentioned blocks in one redaction pass through
+ * the conversation's vault. Mentions come from the message being answered.
+ * Nothing is attached or mentioned when the gadgets failed to load.
+ */
+function _buildBlocks(
+  options: Readonly<TurnInputsOptions>,
+): AgentContextBlocks {
+  const { gadgetContext } = options.turn;
+  const { sqlVault } = options.conversation;
+  const detectors = _createPageSqlDetectors(options.datasets);
+  const isLoaded = gadgetContext?.contexts !== undefined;
+  // The raw question, which still holds the ref tokens.
+  const question = getLastQuestionFromMessages(options.turn.apiMessages);
+  const toContext = (ref: Gadget.Ref): AgentGadgetContext => {
+    return _contextOf(gadgetContext, ref);
+  };
+  return buildAgentContextBlocks({
+    page: options.pageContext,
+    attached: isLoaded ? gadgetContext.attachedRefs.map(toContext) : [],
+    mentioned: isLoaded
+      ? ChatMentionToken.refsFromText(question).map(toContext)
+      : [],
+    aliases: SqlTableAlias.fromSchema({ datasets: options.datasets }),
+    isSensitive: isPersonalDataText,
+    redactSql: (sql) => {
+      return sqlVault.redact(sql, detectors);
+    },
+    maskText: sqlVault.maskText,
+  });
+}
+
+/**
+ * The turn's blocks, and the mention names masked with the same vault
+ * after every block's SQL is redacted. When the gadgets failed to load,
+ * the attached block repeats last turn's, so the model reads "unchanged",
+ * and every mention is named as unavailable.
+ */
+function _buildTurnInputs(
+  options: Readonly<TurnInputsOptions>,
+): AgentTurnInputs {
+  const { conversation } = options;
+  const { gadgetContext } = options.turn;
+  const blocks = _buildBlocks(options);
+  const isLoadFailed = gadgetContext !== undefined && !gadgetContext.contexts;
+  return {
+    blocks: isLoadFailed
+      ? { ...blocks, attachedBlock: conversation.lastAttachedBlock }
+      : blocks,
+    nameOf: (ref) => {
+      return buildAgentGadgetModelName(_contextOf(gadgetContext, ref), {
+        isSensitive: isPersonalDataText,
+        mask: conversation.sqlVault.maskText,
+      });
+    },
+  };
+}
+
 /**
  * Answers a chat message on any page with the Pi-based data agent. The
  * agent runs in the browser; only model requests go to the server, through
- * the agent proxy. The current page starts each turn's message. Personal
+ * the agent proxy. The current page, the attached gadgets, and what the
+ * message's mentions refer to start each turn's message. Personal
  * values in its SQL become placeholders from the conversation's vault,
  * which the host maps back before the agent's SQL runs, and are masked in
  * the page's names and titles too. Datasets
@@ -160,20 +249,13 @@ export async function runDataAgentTurn(
   return askConversationDataAgent({
     conversations: conversationsByChat,
     turn: { ...options, pageContext },
-    buildPageBlock: (conversation) => {
-      const { sqlVault } = conversation;
-      const detectors = _createPageSqlDetectors(datasets);
-      return pageContext
-        ? buildAgentPageContextBlock({
-            context: pageContext,
-            aliases: SqlTableAlias.fromSchema({ datasets }),
-            isSensitive: isPersonalDataText,
-            redactSql: (sql) => {
-              return sqlVault.redact(sql, detectors);
-            },
-            maskText: sqlVault.maskText,
-          })
-        : undefined;
+    buildTurnInputs: (conversation) => {
+      return _buildTurnInputs({
+        conversation,
+        datasets,
+        pageContext,
+        turn: options,
+      });
     },
     createConversation: async (turnRef) => {
       return _createConversation(turnRef, datasets);

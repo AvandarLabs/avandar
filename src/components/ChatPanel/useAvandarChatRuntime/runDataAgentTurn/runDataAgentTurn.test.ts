@@ -1,7 +1,10 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { runDataAgentTurn } from "./runDataAgentTurn";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { AgentPageInputs } from "./runDataAgentTurn";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { CreateDataAgentOptions } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
@@ -82,13 +85,61 @@ const DATASET_B = {
 };
 const DASHBOARD_ID = "cccccccc-3333-4333-8333-cccccccccccc";
 
+const DATASET_REF: Gadget.Ref = {
+  gadgetType: "dataset",
+  gadgetId: DATASET_A.id,
+  subId: null,
+};
+const DATASET_TOKEN = ChatMentionToken.buildToken(DATASET_REF);
+const DATASET_CONTEXT: AgentGadgetContext = {
+  kind: "dataset",
+  ref: DATASET_REF,
+  name: "US deaths",
+};
+const OTHER_DATASET_REF: Gadget.Ref = {
+  gadgetType: "dataset",
+  gadgetId: "dddddddd-4444-4444-8444-dddddddddddd",
+  subId: null,
+};
+const OTHER_DATASET_TOKEN = ChatMentionToken.buildToken(OTHER_DATASET_REF);
+const OTHER_DATASET_CONTEXT: AgentGadgetContext = {
+  kind: "dataset",
+  ref: OTHER_DATASET_REF,
+  name: "Hospital beds",
+};
+const DASHBOARD_REF: Gadget.Ref = {
+  gadgetType: "dashboard",
+  gadgetId: "eeeeeeee-5555-4555-8555-eeeeeeeeeeee",
+  subId: null,
+};
+const DASHBOARD_CONTEXT: AgentGadgetContext = {
+  kind: "dashboard",
+  ref: DASHBOARD_REF,
+  name: "Weekly outbreak",
+  tiles: [{ title: "Cases", chartType: "table", sql: "SELECT 1" }],
+};
+
+/** The contexts by ref key, as the turn's loader returns them. */
+function _contexts(
+  ...contexts: readonly AgentGadgetContext[]
+): Map<string, AgentGadgetContext> {
+  return new Map(
+    contexts.map((context) => {
+      return [ChatMentionToken.buildRefKey(context.ref), context];
+    }),
+  );
+}
+
 function _turn(
   workspaceId: string,
-  content: string,
+  content: string | readonly string[],
   chatGeneration = 0,
 ): DataAgentTurnOptions {
+  const contents = typeof content === "string" ? [content] : content;
   return {
-    apiMessages: [{ role: "user", content }],
+    apiMessages: contents.map((text, index) => {
+      return { role: index % 2 === 0 ? "user" : "assistant", content: text };
+    }),
     workspaceId,
     currentUser: undefined,
     chatGeneration,
@@ -260,5 +311,120 @@ describe("runDataAgentTurn", () => {
         }),
       }),
     );
+  });
+
+  it("sends attached and mentioned blocks and names mentions in the message", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+
+    await runDataAgentTurn({
+      ..._turn("workspace-mentions", `Totals for ${DATASET_TOKEN}`),
+      gadgetContext: {
+        attachedRefs: [DASHBOARD_REF],
+        contexts: _contexts(DATASET_CONTEXT, DASHBOARD_CONTEXT),
+      },
+    });
+
+    const asked = _askedTexts()[0]!;
+    expect(asked).toContain("<attached>");
+    expect(asked).toContain('1. Dashboard "Weekly outbreak"');
+    expect(asked).toContain("<mentioned>");
+    expect(asked).toContain(
+      '@"US deaths": Dataset "US deaths" (query it as t0)',
+    );
+    expect(asked).toContain('Totals for @"US deaths"');
+    expect(asked).not.toContain("@{");
+    expect(asked).not.toContain(DATASET_A.id);
+    expect(asked).not.toContain(DASHBOARD_REF.gadgetId);
+  });
+
+  it("masks a mentioned name that page SQL revealed", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock.mockResolvedValueOnce(
+      _dashboardWithTile(`SELECT * FROM t WHERE "patient_name" = 'Jane Doe'`),
+    );
+
+    await runDataAgentTurn(
+      {
+        ..._turn("workspace-mention-mask", `Visits in ${DATASET_TOKEN}`),
+        gadgetContext: {
+          attachedRefs: [],
+          contexts: _contexts({ ...DATASET_CONTEXT, name: "Jane Doe visits" }),
+        },
+      },
+      _page(`/acme/dashboards/edit/${DASHBOARD_ID}`),
+    );
+
+    const asked = _askedTexts()[0]!;
+    expect(asked).toContain(`"patient_name" = '<value 1>'`);
+    expect(asked).toContain('Visits in @"<value 1> visits"');
+    expect(asked).toContain('@"<value 1> visits": Dataset "<value 1> visits"');
+    expect(asked).not.toContain("Jane Doe");
+  });
+
+  it("describes only the answered message's mentions, naming earlier ones in the recap", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+
+    await runDataAgentTurn({
+      ..._turn("workspace-recap", [
+        `Beds in ${OTHER_DATASET_TOKEN}?`,
+        "There are 40.",
+        `Totals for ${DATASET_TOKEN}`,
+      ]),
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: _contexts(DATASET_CONTEXT, OTHER_DATASET_CONTEXT),
+      },
+    });
+
+    const asked = _askedTexts()[0]!;
+    expect(asked).toContain('User: Beds in @"Hospital beds"?');
+    expect(asked).toContain('@"US deaths": Dataset "US deaths"');
+    expect(asked).not.toContain('@"Hospital beds": Dataset');
+    expect(asked).not.toContain("@{");
+    expect(asked).not.toContain(OTHER_DATASET_REF.gadgetId);
+  });
+
+  it("sends no gadget blocks when loading failed, keeping last turn's tray", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn({
+      ..._turn("workspace-load-failed", "What is pinned?"),
+      gadgetContext: {
+        attachedRefs: [DASHBOARD_REF],
+        contexts: _contexts(DASHBOARD_CONTEXT),
+      },
+    });
+
+    await runDataAgentTurn({
+      ..._turn("workspace-load-failed", `Totals for ${DATASET_TOKEN}`),
+      gadgetContext: { attachedRefs: [DASHBOARD_REF], contexts: undefined },
+    });
+
+    const asked = _askedTexts()[1]!;
+    expect(_askedTexts()[0]).toContain('1. Dashboard "Weekly outbreak"');
+    expect(asked).toContain(
+      "<attached>Unchanged since the last message.</attached>",
+    );
+    expect(asked).not.toContain("<mentioned>");
+    expect(asked).toContain('Totals for @"an unavailable dataset"');
+    expect(asked).not.toContain("@{");
+  });
+
+  it("says once that the tray was emptied", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn({
+      ..._turn("workspace-tray-emptied", "What is pinned?"),
+      gadgetContext: {
+        attachedRefs: [DASHBOARD_REF],
+        contexts: _contexts(DASHBOARD_CONTEXT),
+      },
+    });
+
+    await runDataAgentTurn(_turn("workspace-tray-emptied", "And now?"));
+    await runDataAgentTurn(_turn("workspace-tray-emptied", "And still?"));
+
+    expect(_askedTexts()[1]).toBe(
+      "<attached>Nothing is attached any more.</attached>\n\nAnd now?",
+    );
+    expect(_askedTexts()[2]).toBe("And still?");
   });
 });

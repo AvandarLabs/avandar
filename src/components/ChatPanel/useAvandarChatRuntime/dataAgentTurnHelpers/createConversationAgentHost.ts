@@ -1,3 +1,4 @@
+import { buildLocalGadgetName } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
 import { createExplorerShowQuery } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import { showQueryInChat } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
@@ -44,7 +45,10 @@ export function createConversationAgentHost(
       }
       return showQueryInChat({
         workspaceId: turn.workspaceId,
-        title: getLastQuestionFromMessages(turn.apiMessages),
+        title: getLastQuestionFromMessages(
+          turn.apiMessages,
+          buildLocalGadgetName(turn.gadgetContext),
+        ),
         results: state.results,
         request,
       });
