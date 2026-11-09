@@ -46,8 +46,9 @@ export type RedactedPageContext = Omit<AgentPageContext, "dashboard"> & {
 };
 
 /**
- * The context with its page SQL (the explorer's query and each listed
- * chart's) stripped of comments and passed through `redactSql`. The first
+ * The context with its page SQL (the explorer's query and every chart's,
+ * including charts past the listing cap, which are then dropped) stripped
+ * of comments and passed through `redactSql`. The first
  * half of `buildAgentPageContextBlock`, exported so the page block can be
  * built in one redaction pass with the attached and mentioned blocks.
  */
@@ -68,9 +69,13 @@ export function redactAgentPageContext(
       ? {
           dashboard: {
             ...dashboard,
-            tiles: dashboard.tiles.slice(0, MAX_PAGE_TILES).map((tile) => {
-              return { ...tile, sql: redact(tile.sql) };
-            }),
+            // Every chart is redacted, so a value only a chart past the
+            // listing cap filters on is still masked in names and titles.
+            tiles: dashboard.tiles
+              .map((tile) => {
+                return { ...tile, sql: redact(tile.sql) };
+              })
+              .slice(0, MAX_PAGE_TILES),
             hiddenTileCount: Math.max(
               dashboard.tiles.length - MAX_PAGE_TILES,
               0,

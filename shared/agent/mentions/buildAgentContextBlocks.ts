@@ -66,10 +66,17 @@ type PlannedMention =
   | { kind: "pointer"; context: AgentGadgetContext; pointer: MentionPointer };
 
 /** What each block holds before rendering. */
-type PlannedBlocks<Page> = {
-  page?: Page;
+type PlannedBlocks = {
+  page?: RedactedPageContext;
   attached: readonly ListedGadget[];
   mentioned: readonly PlannedMention[];
+};
+
+/** The turn's gadgets and page with every piece of their SQL redacted. */
+type RedactedInputs = {
+  page?: RedactedPageContext;
+  attached: readonly AgentGadgetContext[];
+  mentioned: readonly AgentGadgetContext[];
 };
 
 type BudgetedItem<Item> = { item: Item; sqlTileCount: number };
@@ -138,7 +145,7 @@ function _spendTileBudget<Item, Listed>(
 function _planMentions(
   mentioned: readonly AgentGadgetContext[],
   attached: readonly AgentGadgetContext[],
-  page: AgentPageContext | undefined,
+  page: RedactedPageContext | undefined,
 ): PlannedMention[] {
   const attachedKeys = new Set(
     attached.map((context) => {
@@ -180,19 +187,18 @@ function _planMentions(
 }
 
 /**
- * The turn's gadgets cut to the caps: 5 attached, 5 described mentions,
- * and 24 charts with SQL across the attached and described mentions.
+ * The turn's redacted gadgets cut to the caps: 5 described mentions and 24
+ * charts with SQL across the attached and described mentions. A cap only
+ * empties SQL that was already redacted, so the vault holds its values.
  */
-function _planBlocks(
-  options: Readonly<ContextBlockOptions>,
-): PlannedBlocks<AgentPageContext> {
+function _planBlocks(inputs: Readonly<RedactedInputs>): PlannedBlocks {
   const attached = _spendTileBudget(
-    options.attached.slice(0, MAX_ATTACHED_GADGETS),
+    inputs.attached,
     MAX_GADGET_BLOCK_TILES,
     _listTiles,
   );
   const mentioned = _spendTileBudget(
-    _planMentions(options.mentioned, attached.items, options.page),
+    _planMentions(inputs.mentioned, attached.items, inputs.page),
     attached.remaining,
     (item, remaining): BudgetedItem<PlannedMention> => {
       if (item.kind === "pointer") {
@@ -203,17 +209,17 @@ function _planBlocks(
     },
   );
   return {
-    page: options.page,
+    page: inputs.page,
     attached: attached.items,
     mentioned: mentioned.items,
   };
 }
 
-/** The gadget with each listed chart's SQL redacted. Empty SQL is skipped. */
+/** The gadget with every chart's SQL redacted. Empty SQL is skipped. */
 function _redactGadgetSql(
-  context: ListedGadget,
+  context: AgentGadgetContext,
   redactSql: HideText | undefined,
-): ListedGadget {
+): AgentGadgetContext {
   const redact = (sql: string): string => {
     return sql === "" ? "" : redactBlockSql(sql, redactSql);
   };
@@ -231,25 +237,24 @@ function _redactGadgetSql(
 }
 
 /**
- * Every piece of SQL the blocks will show, redacted. Pointer mentions are
- * not redacted: their SQL is never shown, so the vault never holds it.
+ * Every piece of SQL of every gadget whose name or title the blocks may
+ * send, redacted: the page's charts past 12, every attached and mentioned
+ * gadget's charts, and the SQL of mentions that become pointers or charts a
+ * cap leaves out. A value only that SQL filters on is then masked in the
+ * gadget's name, even though the SQL itself is never sent. Attached
+ * gadgets past the tray's 5 are dropped here, since nothing of them is
+ * sent.
  */
-function _redactBlocks(
-  planned: Readonly<PlannedBlocks<AgentPageContext>>,
-  redactSql: HideText | undefined,
-): PlannedBlocks<RedactedPageContext> {
+function _redactInputs(options: Readonly<ContextBlockOptions>): RedactedInputs {
+  const redact = (context: AgentGadgetContext): AgentGadgetContext => {
+    return _redactGadgetSql(context, options.redactSql);
+  };
   return {
-    page: planned.page
-      ? redactAgentPageContext(planned.page, redactSql)
+    page: options.page
+      ? redactAgentPageContext(options.page, options.redactSql)
       : undefined,
-    attached: planned.attached.map((context) => {
-      return _redactGadgetSql(context, redactSql);
-    }),
-    mentioned: planned.mentioned.map((item) => {
-      return item.kind === "described"
-        ? { ...item, context: _redactGadgetSql(item.context, redactSql) }
-        : item;
-    }),
+    attached: options.attached.slice(0, MAX_ATTACHED_GADGETS).map(redact),
+    mentioned: options.mentioned.map(redact),
   };
 }
 
@@ -461,8 +466,8 @@ function _withoutUndefined(blocks: AgentContextBlocks): AgentContextBlocks {
  * to. Every piece of SQL in all three is redacted with `redactSql` before
  * any name, title, or column is masked with `maskText`, so a value one
  * chart filters on is hidden in every title, wherever that title appears.
- * SQL a cap leaves out is never redacted, so the vault holds only values
- * the model could see.
+ * SQL a cap leaves out is redacted too but never sent, so a value only that
+ * SQL filters on is still hidden in its gadget's name and titles.
  */
 export function buildAgentContextBlocks(
   options: Readonly<ContextBlockOptions>,
@@ -472,7 +477,7 @@ export function buildAgentContextBlocks(
   // of the page's dashboard or of an attached gadget is one pointer line
   // and does not count toward the 5 described mentions.
   // Every redaction happens here, before anything below masks a name.
-  const redacted = _redactBlocks(_planBlocks(options), options.redactSql);
+  const redacted = _planBlocks(_redactInputs(options));
   const render: BlockRenderOptions = {
     aliases: options.aliases,
     isSensitive: options.isSensitive,

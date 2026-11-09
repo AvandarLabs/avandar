@@ -480,3 +480,118 @@ describe("runDataAgentTurn", () => {
     expect(_askedTexts()[0]).toContain('User: Who is in @"<value 1> visits"?');
   });
 });
+
+/*
+ * Written by the 1B adversarial privacy review: what the agent's model
+ * reads for a whole turn, recap included, when a mention is cut by a cap.
+ */
+describe("runDataAgentTurn mention privacy leaks", () => {
+  const tileRef: Gadget.Ref = {
+    gadgetType: "dashboard_tile",
+    gadgetId: DASHBOARD_REF.gadgetId,
+    subId: "block-1",
+  };
+  const tileContext: AgentGadgetContext = {
+    kind: "dashboard_tile",
+    ref: tileRef,
+    dashboardName: "Clinic",
+    tile: {
+      title: "Jane Doe visits",
+      chartType: "table",
+      sql: `SELECT * FROM t WHERE "patient_name" = 'Jane Doe'`,
+    },
+  };
+  const fillerContexts = ["1", "2", "3", "4", "5"].map(
+    (digit): AgentGadgetContext => {
+      return {
+        kind: "dataset",
+        ref: {
+          gadgetType: "dataset",
+          gadgetId: `0000000${digit}-0000-4000-8000-000000000000`,
+          subId: null,
+        },
+        name: `Filler ${digit}`,
+      };
+    },
+  );
+  const fillerTokens = fillerContexts
+    .map((context) => {
+      return ChatMentionToken.buildToken(context.ref);
+    })
+    .join(" ");
+
+  it("masks the sixth mention's name in the message and its pointer line", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+
+    await runDataAgentTurn({
+      ..._turn(
+        "workspace-sixth-mention",
+        `Compare ${fillerTokens} with ${ChatMentionToken.buildToken(tileRef)}`,
+      ),
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: _contexts(...fillerContexts, tileContext),
+      },
+    });
+
+    const asked = _askedTexts()[0]!;
+    expect(asked).toContain("mentioned, not described");
+    expect(asked).not.toContain("Jane");
+  });
+
+  it("masks the sixth mention's name in the recap after a reload", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const sixthMessage = `Compare ${fillerTokens} with ${ChatMentionToken.buildToken(tileRef)}`;
+
+    // A reload starts a new conversation, so the earlier messages come
+    // back as a recap. The question repeats the mention as its sixth.
+    await runDataAgentTurn({
+      ..._turn("workspace-sixth-recap", [
+        sixthMessage,
+        "They differ.",
+        sixthMessage,
+      ]),
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: _contexts(...fillerContexts, tileContext),
+      },
+    });
+
+    const asked = _askedTexts()[0]!;
+    expect(asked).toContain("Earlier in this conversation:");
+    expect(asked).not.toContain("Jane");
+  });
+
+  it("holds: masks a recap-only mention whose dashboard has more than 12 charts", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const bigDashboard: AgentGadgetContext = {
+      kind: "dashboard",
+      ref: DASHBOARD_REF,
+      name: "Jane Doe follow-up",
+      tiles: [
+        ...Array.from({ length: 12 }, (_, index) => {
+          return { title: `C${index}`, chartType: "bar", sql: "SELECT 1" };
+        }),
+        {
+          title: "Visits",
+          chartType: "bar",
+          sql: `SELECT * FROM t WHERE "patient_name" = 'Jane Doe'`,
+        },
+      ],
+    };
+
+    await runDataAgentTurn({
+      ..._turn("workspace-recap-big", [
+        `What is in ${ChatMentionToken.buildToken(DASHBOARD_REF)}?`,
+        "Charts.",
+        "And in total?",
+      ]),
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: _contexts(bigDashboard),
+      },
+    });
+
+    expect(_askedTexts()[0]).not.toContain("Jane");
+  });
+});

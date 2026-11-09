@@ -191,7 +191,7 @@ describe("buildAgentContextBlocks", () => {
     );
   });
 
-  it("never redacts SQL that a cap leaves out", () => {
+  it("redacts SQL that a cap leaves out but never sends it", () => {
     const redacted: string[] = [];
     const dashboard = (name: string, sqlPrefix: string): AgentGadgetContext => {
       return {
@@ -203,7 +203,7 @@ describe("buildAgentContextBlocks", () => {
         }),
       };
     };
-    buildAgentContextBlocks({
+    const blocks = buildAgentContextBlocks({
       attached: [dashboard("A", "SELECT A"), dashboard("B", "SELECT B")],
       mentioned: Array.from({ length: 6 }, (_, index) => {
         return _tileMention(`m${index}`, `M ${index}`, `SELECT ${100 + index}`);
@@ -214,10 +214,16 @@ describe("buildAgentContextBlocks", () => {
         return sql;
       },
     });
-    expect(redacted).toHaveLength(24);
-    expect(redacted).not.toContain("SELECT A 13");
-    expect(redacted).not.toContain("SELECT 100");
-    expect(redacted).not.toContain("SELECT 105");
+    // Every chart's SQL reaches the vault, so a value it filters on is
+    // masked in names, but only the 24 the budget allows are sent.
+    expect(redacted).toHaveLength(34);
+    expect(redacted).toContain("SELECT A 13");
+    expect(redacted).toContain("SELECT 105");
+    const sent = Object.values(blocks).join("\n");
+    expect(sent).toContain("SELECT B 12");
+    expect(sent).not.toContain("SELECT A 13");
+    expect(sent).not.toContain("SELECT 100");
+    expect(sent).not.toContain("SELECT 105");
   });
 
   it("describes the first five mentions that are not pointers", () => {
