@@ -286,6 +286,28 @@ describe("MapViewer", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("keeps a live popup open when Escape is pressed elsewhere on the page", () => {
+    const layer = createQueryableLayer();
+    const dataset = layer.source.dataSource as Dataset.T;
+    useGetDatasetsMock.mockReturnValue([[dataset], false]);
+    useGetMapByIdMock.mockReturnValue([_makeMap([layer]), false]);
+
+    _render(LIVE_SOURCE);
+    act(() => {
+      useMapCanvasSpy.mock.lastCall?.[0]?.onFeatureClick(
+        {
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [0, 0] },
+          properties: { name: "Clinic A" },
+        },
+        MapLayerIds.toLayerId(layer.id),
+      );
+    });
+    fireEvent.keyDown(document.body, { key: "Escape" });
+
+    expect(screen.getByRole("region", { name: "Cases" })).toBeInTheDocument();
+  });
+
   it("waits for dataset access before drawing a live map", () => {
     useGetDatasetsMock.mockReturnValue([undefined, true]);
     useGetMapByIdMock.mockReturnValue([
