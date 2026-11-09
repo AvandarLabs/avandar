@@ -148,6 +148,33 @@ describe("overlay updaters", () => {
 });
 
 describe("withBufferLayerInserted", () => {
+  it("keeps the typed unit, the ring label, and the requested id", () => {
+    const source = _makePolygonLayer();
+    const labelColumn = uuid<QueryColumn.Id>();
+    const bufferLayerId = uuid<MapLayer.Id>();
+    const nextConfig = AvaMapConfig.withBufferLayerInserted({
+      config: AvaMapConfig.withLayerAdded({
+        config: AvaMapConfig.makeEmpty(),
+        layer: source,
+      }),
+      sourceLayerId: source.id,
+      distanceMeters: 805,
+      distanceUnit: "mi",
+      labelColumn,
+      dissolve: false,
+      name: "Buffer of Cases",
+      bufferLayerId,
+    });
+    const buffer = nextConfig.layers[1];
+
+    expect(buffer?.id).toBe(bufferLayerId);
+    expect(buffer?.geoBinding).toMatchObject({
+      distanceMeters: 805,
+      distanceUnit: "mi",
+      labelColumn,
+    });
+  });
+
   it("inserts a buffer layer above the source and copies sensitivity", () => {
     const source = _makePolygonLayer();
     const withSource = AvaMapConfig.withLayerAdded({

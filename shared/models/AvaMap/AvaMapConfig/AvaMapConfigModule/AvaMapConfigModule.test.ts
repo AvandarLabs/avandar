@@ -77,6 +77,22 @@ describe("stack order", () => {
 });
 
 describe("layer operations", () => {
+  it("clears a spatial filter that named the removed layer", () => {
+    const area = MapLayer.createArea("Buffer of Sites");
+    const schools = {
+      ...MapLayer.makeEmpty("Schools"),
+      spatialFilter: { layerId: area.id },
+    };
+    const config = { ...AvaMapConfig.makeEmpty(), layers: [area, schools] };
+
+    const nextConfig = AvaMapConfig.withLayerRemoved({
+      config,
+      layerId: area.id,
+    });
+
+    expect(nextConfig.layers[0]?.spatialFilter).toBeUndefined();
+  });
+
   it("adds a new layer at the top of the z-order", () => {
     const existing = MapLayer.makeEmpty("Existing");
     const added = MapLayer.makeEmpty("Added");

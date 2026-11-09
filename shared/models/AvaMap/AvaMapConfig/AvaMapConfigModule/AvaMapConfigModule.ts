@@ -150,9 +150,17 @@ export const AvaMapConfigModule = {
   ): AvaMapConfigRead => {
     const { config, layerId } = options;
     const nextLayers = config.layers.filter(propNotEq("id", layerId));
-    return nextLayers.length === config.layers.length
-      ? config
-      : { ...config, layers: nextLayers };
+    if (nextLayers.length === config.layers.length) {
+      return config;
+    }
+    return {
+      ...config,
+      layers: nextLayers.map((layer) => {
+        return layer.spatialFilter?.layerId === layerId
+          ? { ...layer, spatialFilter: undefined }
+          : layer;
+      }),
+    };
   },
 
   /**
