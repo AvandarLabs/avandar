@@ -628,7 +628,7 @@ describe("ClassificationEditor", () => {
       value: { type: "queryColumn", column: measles.id },
     });
     expect(
-      updated.source.queryColumns.map((column) => {
+      updated.source.queryColumns.map((column: QueryColumn.T) => {
         return column.id;
       }),
     ).toContain(measles.id);
@@ -647,6 +647,7 @@ describe("ClassificationEditor", () => {
     }
     const layer: MapLayer.T = {
       ...schools,
+      sensitivity: { mode: "exact" },
       symbology: {
         ...schools.symbology,
         color: {
@@ -683,7 +684,7 @@ describe("ClassificationEditor", () => {
       column: measles.id,
     });
     expect(
-      updated.source.queryColumns.map((column) => {
+      updated.source.queryColumns.map((column: QueryColumn.T) => {
         return column.id;
       }),
     ).toContain(measles.id);
