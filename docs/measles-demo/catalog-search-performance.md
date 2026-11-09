@@ -68,6 +68,40 @@ Signed-in requests time out at 8s (`statement_timeout` on `authenticated`).
 | Keyword search | The same rules, over the summary's keyword list. |
 | `data_catalog_facet_counts__refresh` | Reads the whole catalog once, at the end of each pipeline run (`rpc_pipeline_executions__finish`). |
 
+### Measured on demo
+
+Benchmarked on 2026-11-09 against the demo database (196,271 listings),
+with the indexes built and the functions created for one session only. Cold
+is the first run, warm the second.
+
+| Call | Before | Cold | Warm |
+|---|---|---|---|
+| List, nothing searched, by date | 2,700ms | 81ms | 1ms |
+| List, nothing searched, by name | | 192ms | 1ms |
+| List, nothing searched, page 21 | | 27ms | 3ms |
+| List, publisher with 7.5k listings | | 3,054ms | 97ms |
+| List, publisher with 2.4k listings | | 22ms | 13ms |
+| List, keyword on 130k listings | | 682ms | 639ms |
+| List, "measles", best match | 140ms | 725ms | 22ms |
+| List, "measles", by date | | 23ms | 23ms |
+| Facet counts, nothing searched | 4,800 to 5,200ms | 23ms | 21ms |
+| Facet counts, "measles" | 60ms | 126ms | 102ms |
+| Facet counts, publisher with 2.4k listings | | 131ms | 130ms |
+| Facet counts, publisher with 7.5k listings | | 403ms | 402ms |
+| Facet counts, format on most listings | | 265ms | 249ms |
+| Facet counts, keyword on 130k listings | | 1,229ms | 1,126ms |
+| Keyword search, nothing searched | 3,100ms | 17ms | 16ms |
+| Keyword search, publisher chosen | | 24ms | 23ms |
+| Summary refresh | | 2,352ms | 2,055ms |
+
+The refresh first measured 20 to 24s, because it checked each listing's
+update window with `data_catalog_listings__is_updated_within`: six function
+calls per listing. It now reads each window's dates once.
+
+The slowest cold calls read rows Postgres has not cached: a filter that
+keeps a few thousand listings is counted up to the cap from the table
+itself.
+
 **Accepted trade-off:** when too many listings match to count, an option has
 no count and may keep no listings. Showing only options that are known to
 match would mean counting, which is the work being avoided. A search engine
@@ -87,7 +121,7 @@ removes this trade-off; see "Rejected for now" below.
 
 | Item | When | Trade-off |
 |---|---|---|
-| Refresh the summary outside `rpc_pipeline_executions__finish` (pg_cron, or a queued job) | Before the catalog reaches a few million listings | The refresh reads the whole catalog. At 196k listings that takes a few seconds inside the finish call, but at 20 million it would exceed the Data API's statement timeout. |
+| Refresh the summary outside `rpc_pipeline_executions__finish` (pg_cron, which demo has available but not installed, or a queued job) | Before the catalog reaches about 500k listings | The refresh reads the whole catalog: about 2.1s at 196k listings. It grows with the catalog and runs inside the finish call, which the Data API stops at 8s, so somewhere near 750k listings pipeline runs would fail at their last step. |
 | Build new catalog indexes with `create index concurrently` in their own migration | Before the catalog reaches a few million listings | A plain `create index` blocks writes to the listings while it builds. That is seconds on demo today and minutes at 20 million rows. Concurrent builds cannot run inside a transaction, so they need a migration of their own. |
 | Keyset paging (`after` the last row's sort key) instead of `offset` | If people or agents page deep into results | An offset still walks every skipped row. |
 | Server-side search for the publisher and level-2 organization filters | When either passes about 1,000 values | Same shape as the keyword search. The level-2 facet already sends only the top 50 when no publisher is chosen. |
