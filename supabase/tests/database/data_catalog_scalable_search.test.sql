@@ -38,7 +38,7 @@ values
 
 select public.data_catalog_facet_counts__refresh();
 
-select plan(16);
+select plan(17);
 
 -- Matching, sorting, and paging
 
@@ -120,6 +120,23 @@ select results_eq(
     from public.data_catalog_listings
     where not is_workspace_loadable or is_invalid$$,
   'the summary counts the listings that cannot be loaded'
+);
+
+select results_eq(
+  $$select value, listing_count
+    from public.data_catalog_facet_counts
+    where facet = 'updated_within' and not is_loadable_only
+    order by value$$,
+  $$select update_window.name, count(listing.id)
+    from unnest(array['any', 'over_a_year', 'past_month', 'past_year'])
+      as update_window (name)
+      left join public.data_catalog_listings listing
+        on public.data_catalog_listings__is_updated_within(
+          coalesce(listing.date_of_last_update, listing.date_of_last_sync),
+          update_window.name)
+    group by update_window.name
+    order by update_window.name$$,
+  'the summary counts each update window as the window check does'
 );
 
 -- Facet counts
