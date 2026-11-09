@@ -107,7 +107,11 @@ jobs:
             echo "FEATUREBASE_JWT_SECRET=$FEATUREBASE_JWT_SECRET"
             echo "AVA_PIPELINE_SERVER_SECRET=$AVA_PIPELINE_SERVER_SECRET"
             echo "AVA_PIPELINE_SERVER_URL=$AVA_PIPELINE_SERVER_URL"
-            echo "GEOAPIFY_API_KEY=$GEOAPIFY_API_KEY"
+            # Only when the GitHub secret exists: an empty value would
+            # overwrite a key set directly on the demo project.
+            if [ -n "$GEOAPIFY_API_KEY" ]; then
+              echo "GEOAPIFY_API_KEY=$GEOAPIFY_API_KEY"
+            fi
           } > "$secrets_file"
           supabase secrets set --project-ref "$DEMO_SUPABASE_REF" \
             --env-file "$secrets_file"
