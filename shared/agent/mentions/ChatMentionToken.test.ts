@@ -106,7 +106,7 @@ describe("ChatMentionToken", () => {
   it("says a case cannot be a token", () => {
     expect(
       ChatMentionToken.isTokenizable({
-        gadgetType: "case",
+        gadgetType: "individual",
         gadgetId: CASE_ID,
         subId: null,
       }),
