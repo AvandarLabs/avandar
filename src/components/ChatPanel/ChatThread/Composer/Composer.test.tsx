@@ -28,7 +28,15 @@ vi.mock("@/lib/agent/dataAgent/browser/DataAgentFeature", () => {
 vi.mock("@/components/ChatPanel/OfflineModeControl/OfflineModeControl", () => {
   return {
     OfflineModeControl: () => {
-      return null;
+      return <button type="button">Offline mode</button>;
+    },
+  };
+});
+
+vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
+  return {
+    useCurrentWorkspace: () => {
+      return { id: "33333333-3333-4333-8333-333333333333" };
     },
   };
 });
@@ -60,6 +68,20 @@ function _renderComposer(options: {
   return screen.getByRole("textbox");
 }
 
+function _expectEditableEditor(input: HTMLElement): void {
+  expect(input).toHaveAccessibleName("Message");
+  expect(input).toHaveAttribute("contenteditable", "true");
+}
+
+/** The placeholder TipTap draws on the editor's empty paragraph. */
+function _readEditorPlaceholder(input: HTMLElement): string | null {
+  return (
+    input
+      .querySelector("[data-placeholder]")
+      ?.getAttribute("data-placeholder") ?? null
+  );
+}
+
 describe("Composer", () => {
   beforeEach(() => {
     pageContextMock.mockReset();
@@ -68,15 +90,15 @@ describe("Composer", () => {
 
   describe("with the data agent on", () => {
     it.each(["data-sources", "other"] as const)(
-      "enables the composer on the %s app with the neutral placeholder",
+      "enables the editor on the %s app with the neutral placeholder",
       (app) => {
         const input = _renderComposer({
           isAgentEnabled: true,
           context: { app },
         });
 
-        expect(input).toBeEnabled();
-        expect(input).toHaveAttribute("placeholder", DATA_EXPLORER_PLACEHOLDER);
+        _expectEditableEditor(input);
+        expect(_readEditorPlaceholder(input)).toBe(DATA_EXPLORER_PLACEHOLDER);
       },
     );
 
@@ -86,8 +108,8 @@ describe("Composer", () => {
         context: { app: "data-explorer" },
       });
 
-      expect(input).toBeEnabled();
-      expect(input).toHaveAttribute("placeholder", DATA_EXPLORER_PLACEHOLDER);
+      _expectEditableEditor(input);
+      expect(_readEditorPlaceholder(input)).toBe(DATA_EXPLORER_PLACEHOLDER);
     });
 
     it("keeps the dashboard placeholder on a dashboard editor", () => {
@@ -96,8 +118,8 @@ describe("Composer", () => {
         context: { app: "dashboards", dashboardId: "dashboard-1" },
       });
 
-      expect(input).toBeEnabled();
-      expect(input).toHaveAttribute("placeholder", DASHBOARD_PLACEHOLDER);
+      _expectEditableEditor(input);
+      expect(_readEditorPlaceholder(input)).toBe(DASHBOARD_PLACEHOLDER);
     });
 
     it("uses the neutral placeholder on the dashboard list", () => {
@@ -106,8 +128,36 @@ describe("Composer", () => {
         context: { app: "dashboards" },
       });
 
-      expect(input).toBeEnabled();
-      expect(input).toHaveAttribute("placeholder", DATA_EXPLORER_PLACEHOLDER);
+      _expectEditableEditor(input);
+      expect(_readEditorPlaceholder(input)).toBe(DATA_EXPLORER_PLACEHOLDER);
+    });
+
+    it("follows the page's placeholder without remounting", () => {
+      isAgentEnabledMock.mockReturnValue(true);
+      pageContextMock.mockReturnValue({
+        app: "dashboards",
+        dashboardId: "dashboard-1",
+      });
+      const { rerender } = render(<ComposerWithRuntime />);
+      const input = screen.getByRole("textbox", { name: "Message" });
+      expect(_readEditorPlaceholder(input)).toBe(DASHBOARD_PLACEHOLDER);
+
+      pageContextMock.mockReturnValue({ app: "dashboards" });
+      rerender(<ComposerWithRuntime />);
+
+      expect(screen.getByRole("textbox", { name: "Message" })).toBe(input);
+      expect(_readEditorPlaceholder(input)).toBe(DATA_EXPLORER_PLACEHOLDER);
+    });
+
+    it("keeps offline mode beside the send button", () => {
+      _renderComposer({ isAgentEnabled: true, context: { app: "other" } });
+
+      const sendButton = screen.getByRole("button", { name: "Send message" });
+      const offlineControl = screen.getByRole("button", {
+        name: "Offline mode",
+      });
+
+      expect(sendButton.parentElement).toBe(offlineControl.parentElement);
     });
 
     it("leaves the case designer composer disabled", () => {
