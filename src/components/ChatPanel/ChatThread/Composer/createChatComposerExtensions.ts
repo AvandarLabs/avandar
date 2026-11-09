@@ -3,7 +3,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { isChatMentionType } from "$/agent/mentions/ChatMentionToken";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { ChatGadgetLinkView } from "@/components/ChatPanel/ChatThread/Composer/ChatGadgetLinkView";
 import { createGadgetRefFromAttrs } from "@/components/RichText/Gadget/GadgetNodes/createGadgetRefFromAttrs";
 import { GadgetLink } from "@/components/RichText/Gadget/GadgetNodes/GadgetNodes";
@@ -45,7 +45,8 @@ const ChatComposerKeys = Extension.create<{ onSubmit: () => void }>({
 
 /**
  * Matches a pasted gadget chip only when it carries a valid ref of a type
- * the chat offers. Any other chip, such as a case copied from a comment,
+ * the chat offers whose token parses back to that ref. Any other chip, such
+ * as a case copied from a comment or a tile whose block id holds a space,
  * pastes as its text instead of a chip the message would drop.
  */
 function _readChatRefFromElement(element: HTMLElement): false | null {
@@ -54,7 +55,7 @@ function _readChatRefFromElement(element: HTMLElement): false | null {
     gadgetId: element.getAttribute("data-gadget-id"),
     subId: element.getAttribute("data-sub-id"),
   });
-  return ref && isChatMentionType(ref.gadgetType) ? null : false;
+  return ref && ChatMentionToken.isTokenizable(ref) ? null : false;
 }
 
 /**

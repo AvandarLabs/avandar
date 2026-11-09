@@ -88,4 +88,28 @@ describe("ChatMentionToken", () => {
       "dashboard_tile:11111111-1111-4111-8111-111111111111:DataViz-abc",
     );
   });
+
+  it.each([
+    ["a space", "block 1"],
+    ["a slash", "block/1"],
+    ["a brace", "block}1"],
+    ["over 200 characters", "b".repeat(201)],
+  ])("says a tile whose block id has %s cannot be a token", (_label, subId) => {
+    expect(ChatMentionToken.isTokenizable({ ...TILE, subId })).toBe(false);
+  });
+
+  it("says a ref of a chat type with a plain block id can be a token", () => {
+    expect(ChatMentionToken.isTokenizable(TILE)).toBe(true);
+    expect(ChatMentionToken.isTokenizable(DASHBOARD)).toBe(true);
+  });
+
+  it("says a case cannot be a token", () => {
+    expect(
+      ChatMentionToken.isTokenizable({
+        gadgetType: "case",
+        gadgetId: CASE_ID,
+        subId: null,
+      }),
+    ).toBe(false);
+  });
 });

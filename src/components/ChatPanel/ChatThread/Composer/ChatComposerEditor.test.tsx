@@ -404,6 +404,22 @@ describe("ChatComposerEditor", () => {
     expect(_getEditor().getText()).toBe("See Case of Amara");
   });
 
+  it("pastes a tile chip whose block id cannot be a token as its text", () => {
+    render(<Harness />);
+    const dashboardId = "66666666-6666-4666-8666-666666666666";
+
+    act(() => {
+      _getEditor().commands.setContent(
+        `<p>See <a data-type="gadgetLink" data-gadget-type="dashboard_tile" ` +
+          `data-gadget-id="${dashboardId}" data-sub-id="block 1" ` +
+          `href="/d">Visits</a></p>`,
+      );
+    });
+
+    expect(JSON.stringify(_getEditor().getJSON())).not.toContain("gadgetLink");
+    expect(_getEditor().getText()).toBe("See Visits");
+  });
+
   it("pastes a chip of a chat type as a chip", () => {
     render(<Harness />);
 

@@ -71,3 +71,55 @@ describe("serializeChatComposerDocument", () => {
     expect(text).toBe("one\n\ntwo");
   });
 });
+
+/*
+ * Written by the 1B adversarial privacy review. A chip the serializer
+ * writes as a token that `ChatMentionToken.parse` then rejects stays raw
+ * text, so its uuid reaches the model and the stored thread. A pasted
+ * chip's `data-sub-id` is any non-empty string.
+ */
+describe("serializeChatComposerDocument privacy leaks", () => {
+  const DASHBOARD_ID = "66666666-6666-4666-8666-666666666666";
+
+  it.each([
+    ["a space", "block 1"],
+    ["a slash", "block/1"],
+    ["a brace", "block}1"],
+    ["a next-line character", "block\u00851"],
+    ["over 200 characters", "b".repeat(201)],
+  ])(
+    "never writes a tile chip whose sub id has %s as a raw uuid",
+    (_label, subId) => {
+      const text = serializeChatComposerDocument({
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "Show " },
+              {
+                type: "gadgetLink",
+                attrs: {
+                  gadgetType: "dashboard_tile",
+                  gadgetId: DASHBOARD_ID,
+                  subId,
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      // Either a token the parser reads back, or no chip at all.
+      const leftover = ChatMentionToken.parse(text)
+        .filter((segment) => {
+          return segment.kind === "text";
+        })
+        .map((segment) => {
+          return segment.kind === "text" ? segment.text : "";
+        })
+        .join("");
+      expect(leftover).not.toContain(DASHBOARD_ID);
+    },
+  );
+});

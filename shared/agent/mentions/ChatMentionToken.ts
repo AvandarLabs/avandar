@@ -81,6 +81,21 @@ function _refsFromText(text: string): Gadget.Ref[] {
   return [...refsByKey.values()];
 }
 
+/**
+ * Whether a ref survives as a token: its token parses back to exactly this
+ * ref. A block id with a space, `/`, `}`, or over 200 characters does not,
+ * so its token would stay raw text holding the gadget's uuid.
+ */
+function _isTokenizable(ref: Gadget.Ref): boolean {
+  const segments = _parse(_buildToken(ref));
+  const [segment] = segments;
+  return (
+    segments.length === 1 &&
+    segment?.kind === "mention" &&
+    _buildRefKey(segment.ref) === _buildRefKey(ref)
+  );
+}
+
 function _replaceTokens(
   text: string,
   render: (ref: Gadget.Ref) => string,
@@ -102,6 +117,9 @@ function _replaceTokens(
 export const ChatMentionToken = {
   /** The token a chip becomes in the message text. */
   buildToken: _buildToken,
+
+  /** Whether a ref's token parses back to exactly that ref. */
+  isTokenizable: _isTokenizable,
 
   /** Splits message text into text runs and mentions. */
   parse: _parse,
