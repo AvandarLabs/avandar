@@ -197,6 +197,7 @@ function _classifyLegend(options: {
           classification: color.classification,
           ramp: color.ramp,
           noData: color.noData,
+          classLabels: color.classLabels,
         },
       );
 }

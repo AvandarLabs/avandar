@@ -8,16 +8,64 @@ const noData = { color: "#ccc", label: "" };
 function _classify(
   values: readonly unknown[],
   classification: MapLayer.Classification,
+  classLabels: ReadonlyArray<string | undefined> = [],
 ) {
   return classifyLayerValues(
     values.map((value, index) => {
       return { featureId: String(index), value };
     }),
-    { classification, ramp, noData },
+    { classification, ramp, noData, classLabels },
   );
 }
 
 describe("classifyLayerValues", () => {
+  it("uses a custom class label in place of the generated interval label", () => {
+    const result = _classify(
+      [0.62, 0.9, 0.97],
+      { method: "manual", breaks: [0.95] },
+      ["Below 95%", "95% or above"],
+    );
+
+    expect(
+      result.entries.map(({ label }) => {
+        return label;
+      }),
+    ).toEqual(["Below 95%", "95% or above"]);
+  });
+
+  it("keeps the generated label for a class whose label is unset", () => {
+    const result = _classify(
+      [0.62, 0.97],
+      { method: "manual", breaks: [0.95] },
+      ["Below 95%", undefined],
+    );
+
+    expect(result.entries[1]?.label).toBe("≥ 0.95");
+  });
+
+  it("uses generated labels when the data yields fewer classes than labels", () => {
+    const result = _classify(
+      [1, 1, 2, 2],
+      { method: "equalInterval", classCount: 3 },
+      ["Low", "Middle", "High"],
+    );
+
+    expect(
+      result.entries.map(({ label }) => {
+        return label;
+      }),
+    ).toEqual(["< 1.5", "≥ 1.5"]);
+  });
+
+  it("reports the lowest and highest classified value", () => {
+    const result = _classify([0.97, null, 0.62, 0.8], {
+      method: "quantile",
+      classCount: 2,
+    });
+
+    expect(result.valueDomain).toEqual([0.62, 0.97]);
+  });
+
   it.each([
     ["quantile", [3, 5]],
     ["equalInterval", [2.666666666666667, 4.333333333333334]],
