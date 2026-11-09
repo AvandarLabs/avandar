@@ -217,6 +217,21 @@ describe("useMapLayerRendering", () => {
     expect(_getQueryColumnNames(drawnConfig.layers)).toContain("place_id");
   });
 
+  it("hands useMapLayersData the same layers across re-renders of one config, so queries do not refetch", () => {
+    const mapConfig = {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [_makeSchoolsLayer()],
+    };
+    const { rerender } = _renderRendering(mapConfig);
+    const [{ layers: firstLayers }] = useMapLayersDataMock.mock.calls[0]!;
+
+    rerender();
+
+    const [{ layers: lastLayers }] = useMapLayersDataMock.mock.lastCall!;
+    expect(useMapLayersDataMock.mock.calls.length).toBeGreaterThan(1);
+    expect(lastLayers).toBe(firstLayers);
+  });
+
   it("returns each loaded spatial layer's features", () => {
     const layer = _makeSchoolsLayer();
     const featureCollection: GeoJSON.FeatureCollection = {
