@@ -1,4 +1,5 @@
 import { prop, propEq } from "@avandar/utils";
+import { msg } from "@lingui/core/macro";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { fetchMapLayerFeatureList } from "@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList";
 import { getFeatureListAccessFromMapLayer } from "@/clients/maps/MapLayerFeatureList/getFeatureListAccessFromMapLayer/getFeatureListAccessFromMapLayer";
@@ -90,7 +91,8 @@ function _getPrintedRows(
  * the drawer formats them, already in the buffer's unit. Returns undefined
  * when the layout has no feature list, or when its layer was removed or can
  * no longer list rows (not exact, or not drawn from rows).
- * @throws When the workspace's datasets or columns have not loaded yet.
+ * @throws With a localized message when the workspace's datasets or columns
+ * have not loaded yet, so a list is never printed from partial metadata.
  */
 export async function loadExportFeatureTable(
   options: Readonly<{
@@ -112,7 +114,10 @@ export async function loadExportFeatureTable(
     return undefined;
   }
   if (datasets === undefined || datasetColumns === undefined) {
-    throw new Error("The workspace's datasets are still loading");
+    // Shown to the user, so it is localized here.
+    throw new Error(
+      i18n._(msg`The map's data is still loading. Try again in a moment.`),
+    );
   }
   const list = await fetchMapLayerFeatureList({
     config,

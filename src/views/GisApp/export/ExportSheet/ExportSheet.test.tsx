@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { RenderResult } from "@testing-library/react";
 import type { ComponentProps } from "react";
 
@@ -80,6 +82,7 @@ function _props(overrides: Overrides): Props {
     config: _buildConfig(overrides),
     mapName: overrides.mapName ?? "Cholera response",
     workspaceName: "Test workspace",
+    workspaceId: uuid<Workspace.Id>(),
     basemapAttribution: "MapLibre, OpenStreetMap contributors",
     spec: { sources: {}, layers: [] },
     view: { center: [0, 0], zoom: 4 },

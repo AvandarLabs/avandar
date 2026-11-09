@@ -6,6 +6,7 @@ import { ExportSheetNotices } from "@/views/GisApp/export/ExportSheet/ExportShee
 import { ExportSheetPreview } from "@/views/GisApp/export/ExportSheet/ExportSheetPreview/ExportSheetPreview";
 import { useExportPdfDownload } from "@/views/GisApp/export/useExportPdfDownload/useExportPdfDownload";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { ReactNode } from "react";
@@ -16,6 +17,7 @@ type Props = {
   config: AvaMapConfig.T;
   mapName: string;
   workspaceName: string;
+  workspaceId: Workspace.Id;
   basemapAttribution: string;
   spec: MapSpec;
   view: AvaMapConfig.ViewState;
@@ -42,6 +44,7 @@ export function ExportSheet({
   config,
   mapName,
   workspaceName,
+  workspaceId,
   basemapAttribution,
   spec,
   view,
@@ -56,6 +59,7 @@ export function ExportSheet({
     view,
     mapName,
     workspaceName,
+    workspaceId,
     basemapAttribution,
     legendEntries,
     hasDrawnDisputedFeature,

@@ -178,6 +178,7 @@ export function GisAppMapShell({ app }: Props): ReactNode {
             config={app.mapConfig}
             mapName={app.name}
             workspaceName={workspace.name}
+            workspaceId={app.avaMap.workspaceId}
             basemapAttribution={basemapAttribution}
             spec={app.spec}
             view={app.mapConfig.view}
