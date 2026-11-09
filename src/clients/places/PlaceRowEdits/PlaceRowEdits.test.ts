@@ -49,7 +49,11 @@ describe("PlaceRowEdits", () => {
       place: { ...PLACE, name: "Moved clinic", latitude: 41 },
     });
     expect(
-      result.type === "ok" ? result.rows.map((row) => {return row.name}) : [],
+      result.type === "ok"
+        ? result.rows.map((row) => {
+            return row.name;
+          })
+        : [],
     ).toEqual(["Clinic", "Moved clinic", "Clinic"]);
   });
 
