@@ -104,6 +104,10 @@ export function createHdxEtlEngine(
         scope,
         metrics,
         mappedFields: { ...fields, organization1Name },
+        unmappedSourceRecord: mapper.omitMappedPaths(
+          connection.sourceRecord,
+          current.baseUrl,
+        ),
         readFileColumns:
           readFileColumns ??
           createHdxFileColumnReader({ baseUrl: current.baseUrl }),

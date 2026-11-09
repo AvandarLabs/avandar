@@ -209,15 +209,19 @@ The engine writes only these listings-table columns
 | `date_column_type_last_verified` | every row, `null` when the column types are not verified |
 | `is_workspace_loadable` | every row (see "Workspace loadability") |
 | `external_service_name`, `source_url`, `source_download_url`, `source_asset_type`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
-| `organization2_name` ... `organization4_name`, `domains`, `tags`, `source_metadata` | every row, `null` when unset |
+| `organization2_name` ... `organization4_name`, `domains`, `tags`, `additional_source_metadata` | every row, `null` when unset |
 | `drive_id` | every row, `null` with no drives store |
 | `api_service`, `api_base_url`, `api_resource_id`, `api_resource_format` | `api_resource` rows |
 | `parquet_file_name` | `pipeline_parquet` rows |
 
-`source_metadata` holds a relation's `sourceMetadata`: the source's own
-record (a JSON value). It never counts as a change: it carries counters
-that change daily, so it is written only alongside a change to another
-column. `drive_id` links a row to its drive in the drives table (see
+`additional_source_metadata` holds a relation's `additionalSourceMetadata`:
+what the source's own record says that no other column holds (a JSON
+value). A pipeline builds it with `CatalogFieldMapper.omitMappedPaths`,
+which leaves out every path a field mapping consumes and the config's
+`additionalSourceMetadata.omit` paths, then leaves out the fields it maps
+in code. A change to its value never counts as a change: it carries
+counters that change daily, so it is written only alongside a change to
+another column, or when the stored row has none. `drive_id` links a row to its drive in the drives table (see
 "Stores").
 
 Conflict targets: `(api_service, api_base_url, external_dataset_id,
@@ -315,7 +319,8 @@ write. It takes `p_listings`, a JSON array of `{ listing, relation_columns }`
 where `listing` holds the contract columns and `relation_columns` holds
 `{ column_name, display_order, original_data_type, cast_data_type }` rows,
 upserts each listing on its conflict target, replaces its columns, and
-returns the stored listings. Avandar's is
+returns the stored listings' ids in input order, never the rows themselves,
+so a write does not carry every stored row back. Avandar's is
 `rpc_data_catalog_listings__upsert_with_relation_columns`. Deleting a
 listing deletes its columns too (`on delete cascade`), which is how reset
 and prune clear them.
@@ -391,6 +396,7 @@ drives:
 | `fields` | No | Field mappings every drive uses |
 | `drives` | Yes | The drives to crawl, in order. An empty list switches the pipeline off |
 | `workspaceLoadability` | No | This pipeline's `loadableFormats` and `unloadableFormats` (see "Workspace loadability") |
+| `additionalSourceMetadata` | No | `omit`: dotted source record paths `additional_source_metadata` leaves out although no field maps them, such as a license's full text (see "Additional source metadata") |
 
 | Drive key | Required | Meaning |
 | --- | --- | --- |
@@ -419,6 +425,27 @@ export default function socrataDomains(
 `context` carries the drive's `driveKey` and the target `field`. A script
 that throws fails that field for that record only: the field is left out and
 the result lists a problem.
+
+A script may also export `reads`, the dotted paths whose whole value the
+field it fills now holds:
+
+```ts
+export const reads = ["dataset_date"];
+```
+
+A `reads` export that is not a list of dotted paths fails the load. A path a
+script reads only part of, such as one entry of a keyed list, is left out of
+`reads` so `additional_source_metadata` keeps it.
+
+**Additional source metadata.** A listing's `additional_source_metadata`
+keeps only what its source record says that no listing column holds.
+`CatalogFieldMapper.omitMappedPaths(record, driveKey)` returns the record
+without every path the drive's mappings consume (each `from` path and each
+script's `reads`) and without the config's `additionalSourceMetadata.omit`
+paths. A pipeline then leaves out the fields it maps in code, such as the
+ids and URLs, and sets the result as the relation's
+`additionalSourceMetadata`. `omitRecordPaths(record, paths)` removes paths
+the same way, and an object left with no keys is removed from its parent.
 
 **Mappable fields.** `fields` accepts only the names in
 `CATALOG_MAPPABLE_FIELDS`: `description`, `notes`, `license`,
@@ -449,7 +476,8 @@ function default export rejects here, before any network call. The returned
 file, and throws when `driveKey` is not a drive in the config. It returns
 `{ fields, problems }`, where `fields` is named as `RelationDescription`
 names them (`organization1Name`, `updateFrequency`, `canonicalUrls`, ...), so
-a pipeline spreads it into a relation.
+a pipeline spreads it into a relation. A script whose `reads` export is not a
+list of dotted paths also rejects at load.
 
 ```ts
 import {
@@ -469,11 +497,12 @@ const organizationLabels = getOrganizationLabelsFromDrive({ config, drive });
 | `parsePipelineConfig` | `({ yamlText, sourceName })`: validates YAML text and returns a `PipelineConfig`. Throws naming `sourceName` and the key |
 | `readPipelineConfigFile` | `(filePath)`: reads and parses one pipeline config file |
 | `loadCatalogFieldMapper` | `({ config, configDir, importScript? })`: compiles a config into a `CatalogFieldMapper`. `importScript` replaces the module import in tests |
+| `omitRecordPaths` | `(record, paths)`: a copy of a source record without the given dotted paths, read as `from` paths read them. An object left with no keys is removed |
 | `getOrganizationLabelsFromDrive` | `({ config, drive })`: a drive's own organization labels, else the pipeline's, else `{}`. Pass the result as `EtlDriveDescription.organizationLabels` |
 | `CATALOG_MAPPABLE_FIELDS` | The listing fields a config can map, as the listings table names them |
-| `PipelineConfig`, `PipelineDriveConfig` | A parsed config file, and one of its drives |
+| `PipelineConfig`, `PipelineDriveConfig`, `PipelineAdditionalSourceMetadataConfig` | A parsed config file, one of its drives, and its `additionalSourceMetadata` block |
 | `CatalogFieldMappings`, `CatalogFieldSource`, `CatalogMappableField` | A set of mappings, one `from` / `value` / `script` entry, and one mappable field name |
-| `CatalogFieldMapper`, `CatalogFieldMapResult`, `CatalogFieldMapProblem`, `CatalogMappedFields` | The compiled mapper, one record's `{ fields, problems }`, a field left out and why, and the mapped fields in `RelationDescription` names |
+| `CatalogFieldMapper`, `CatalogFieldMapResult`, `CatalogFieldMapProblem`, `CatalogMappedFields` | The compiled mapper (`mapFields` and `omitMappedPaths`), one record's `{ fields, problems }`, a field left out and why, and the mapped fields in `RelationDescription` names |
 | `CatalogFieldScript`, `CatalogFieldScriptContext` | A script's default export, and its `{ driveKey, field }` context |
 | `EtlOrganizationLevel`, `EtlOrganizationLabels` | A level (`1` to `4`, broadest first), and the label each level has on a drive, such as `City` for level 1 |
 

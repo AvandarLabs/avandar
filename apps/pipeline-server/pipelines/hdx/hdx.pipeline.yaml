@@ -25,6 +25,25 @@ fields:
   update_frequency:
     { script: ./mappers/hdxUpdateFrequency/hdxUpdateFrequency.ts }
 
+# Package fields additional_source_metadata leaves out although no field maps
+# them. license_other is a custom license's full text, repeated on every
+# resource listing of a package (the license's name is in `license`).
+# owner_org and the organization's other keys repeat the organization on every
+# listing (its title is organization1_name, and its id and name are kept).
+# solr_additions repeats the groups for HDX's search index.
+additionalSourceMetadata:
+  omit:
+    - license_other
+    - owner_org
+    - solr_additions
+    - organization.type
+    - organization.description
+    - organization.image_url
+    - organization.created
+    - organization.is_organization
+    - organization.approval_status
+    - organization.state
+
 # How the pipeline server downloads one listing for its Parquet copy. CKAN
 # serves a resource only as one file, so it does not page.
 download:

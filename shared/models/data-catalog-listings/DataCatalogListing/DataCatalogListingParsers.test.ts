@@ -46,7 +46,7 @@ const SHARED_DB_COLUMNS = {
   organization4_name: null,
   domains: null,
   tags: null,
-  source_metadata: null,
+  additional_source_metadata: null,
   drive_id: null,
   search_vector: "'seri':1A 'world':2B 'bank':3B",
 } as const;
@@ -132,11 +132,11 @@ describe("DataCatalogListingParsers", () => {
     const entry = DataCatalogListingParsers.fromDBReadToModelRead(
       DataCatalogListingParsers.DBReadSchema.parse({
         ..._apiDBRow(),
-        source_metadata: sourceRecord,
+        additional_source_metadata: sourceRecord,
       }),
     );
 
-    expect(entry.sourceMetadata).toEqual(sourceRecord);
+    expect(entry.additionalSourceMetadata).toEqual(sourceRecord);
   });
 
   it("keeps the metadata's keys and nulls as the pipeline wrote them", () => {
@@ -156,7 +156,7 @@ describe("DataCatalogListingParsers", () => {
       DataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
     );
 
-    expect(entry.sourceMetadata).toBeUndefined();
+    expect(entry.additionalSourceMetadata).toBeUndefined();
   });
 
   it("rejects an unknown access kind", () => {

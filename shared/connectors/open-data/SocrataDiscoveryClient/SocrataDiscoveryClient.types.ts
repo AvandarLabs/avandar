@@ -26,7 +26,8 @@ export type SocrataDiscoveryResult = {
   /**
    * The result exactly as the Discovery API returned it, before any of it
    * was narrowed to the fields above. A pipeline maps catalog metadata
-   * from it and stores it as the listing's `source_metadata`.
+   * from it and stores what it does not map as the listing's
+   * `additional_source_metadata`.
    */
   sourceRecord: unknown;
 };

@@ -2,6 +2,8 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildCatalogFieldPathReader } from "@etl/EtlConfig/buildCatalogFieldPathReader/buildCatalogFieldPathReader";
 import { coerceCatalogFieldValue } from "@etl/EtlConfig/coerceCatalogFieldValue/coerceCatalogFieldValue";
+import { omitRecordPaths } from "@etl/EtlConfig/omitRecordPaths/omitRecordPaths";
+import { CATALOG_FIELD_PATH_PATTERN } from "@etl/EtlConfig/PipelineConfig.types";
 import type {
   CatalogFieldMappings,
   CatalogFieldSource,
@@ -20,6 +22,12 @@ export type CatalogFieldScriptContext = Readonly<{
 /**
  * A mapper script's default export. It must be synchronous: a returned
  * Promise is coerced as an object and dropped with a problem.
+ *
+ * A script may also export `reads`, the dotted source record paths whose
+ * whole value the field it fills now holds, such as
+ * `export const reads = ["dataset_date"]`. Those paths are left out of a
+ * listing's `additional_source_metadata`. A path the script reads only part
+ * of stays.
  */
 export type CatalogFieldScript = (
   record: unknown,
@@ -67,6 +75,15 @@ export type CatalogFieldMapper = Readonly<{
    * @throws When `driveKey` is not a drive in the config.
    */
   mapFields: (record: unknown, driveKey: string) => CatalogFieldMapResult;
+  /**
+   * A copy of one source record without the paths this drive's mappings
+   * consume (each `from` path and each script's `reads`) and the config's
+   * `additionalSourceMetadata.omit` paths: what a listing's
+   * `additional_source_metadata` keeps of it.
+   *
+   * @throws When `driveKey` is not a drive in the config.
+   */
+  omitMappedPaths: (record: unknown, driveKey: string) => unknown;
 }>;
 
 /** How a script module is imported. Replaced in tests to count imports. */
@@ -96,6 +113,20 @@ type _CompiledField = Readonly<{
   /** Describes the source in a problem, such as `script ./x.ts`. */
   sourceLabel: string;
   read: (record: unknown, driveKey: string) => unknown;
+  /** The record paths whose whole value the field holds. */
+  consumedPaths: readonly string[];
+}>;
+
+/** One drive's compiled fields, and the paths its listings leave out. */
+type _CompiledDrive = Readonly<{
+  fields: readonly _CompiledField[];
+  omittedPaths: readonly string[];
+}>;
+
+/** An imported mapper script. */
+type _LoadedScript = Readonly<{
+  run: CatalogFieldScript;
+  reads: readonly string[];
 }>;
 
 const _importModule: CatalogFieldScriptImporter = async (url) => {
@@ -131,6 +162,27 @@ async function _importOrExplain(
   }
 }
 
+/** A script module's `reads` export, or an empty list when it has none. */
+function _readScriptReads(
+  module: Readonly<{ reads?: unknown }>,
+  absolutePath: string,
+): readonly string[] {
+  if (module.reads === undefined) {
+    return [];
+  }
+  const isPathList =
+    Array.isArray(module.reads) &&
+    module.reads.every((path: unknown) => {
+      return typeof path === "string" && CATALOG_FIELD_PATH_PATTERN.test(path);
+    });
+  if (!isPathList) {
+    throw new Error(
+      `${absolutePath} must export reads as a list of dotted paths, such as organization.title.`,
+    );
+  }
+  return module.reads as readonly string[];
+}
+
 /**
  * Imports every distinct script the config names, once each, keyed by its
  * absolute path.
@@ -139,7 +191,7 @@ async function _importScripts(args: {
   config: PipelineConfig;
   configDir: string;
   importScript: CatalogFieldScriptImporter;
-}): Promise<ReadonlyMap<string, CatalogFieldScript>> {
+}): Promise<ReadonlyMap<string, _LoadedScript>> {
   const absolutePaths = [
     ...new Set(
       _listScriptPaths(args.config).map((scriptPath) => {
@@ -152,13 +204,17 @@ async function _importScripts(args: {
       const module = (await _importOrExplain(
         args.importScript,
         absolutePath,
-      )) as { default?: unknown };
+      )) as { default?: unknown; reads?: unknown };
       if (typeof module.default !== "function") {
         throw new Error(
           `${absolutePath} must default-export a function (record, context) => value.`,
         );
       }
-      return [absolutePath, module.default as CatalogFieldScript] as const;
+      const script: _LoadedScript = {
+        run: module.default as CatalogFieldScript,
+        reads: _readScriptReads(module, absolutePath),
+      };
+      return [absolutePath, script] as const;
     }),
   );
   return new Map(entries);
@@ -168,7 +224,7 @@ function _compileField(args: {
   field: CatalogMappableField;
   source: CatalogFieldSource;
   configDir: string;
-  scripts: ReadonlyMap<string, CatalogFieldScript>;
+  scripts: ReadonlyMap<string, _LoadedScript>;
 }): _CompiledField {
   const { field, source } = args;
   if ("from" in source) {
@@ -179,6 +235,7 @@ function _compileField(args: {
       read: (record) => {
         return readPath(record);
       },
+      consumedPaths: [source.from],
     };
   }
   if ("value" in source) {
@@ -188,6 +245,7 @@ function _compileField(args: {
       read: () => {
         return source.value;
       },
+      consumedPaths: [],
     };
   }
   const script = args.scripts.get(resolve(args.configDir, source.script));
@@ -198,9 +256,45 @@ function _compileField(args: {
     field,
     sourceLabel: `script ${source.script}`,
     read: (record, driveKey) => {
-      return script(record, { driveKey, field });
+      return script.run(record, { driveKey, field });
     },
+    consumedPaths: script.reads,
   };
+}
+
+/**
+ * Compiles one drive's fields, merged over the pipeline's, and collects the
+ * paths its listings leave out of `additional_source_metadata`.
+ */
+function _compileDrive(args: {
+  config: PipelineConfig;
+  drive: PipelineConfig["drives"][number];
+  configDir: string;
+  scripts: ReadonlyMap<string, _LoadedScript>;
+}): _CompiledDrive {
+  const merged: CatalogFieldMappings = {
+    ...args.config.fields,
+    ...args.drive.fields,
+  };
+  const fields = Object.entries(merged).flatMap(([field, source]) => {
+    return source === undefined
+      ? []
+      : [
+          _compileField({
+            field: field as CatalogMappableField,
+            source,
+            configDir: args.configDir,
+            scripts: args.scripts,
+          }),
+        ];
+  });
+  const omittedPaths = [
+    ...fields.flatMap((compiled) => {
+      return compiled.consumedPaths;
+    }),
+    ...(args.config.additionalSourceMetadata?.omit ?? []),
+  ];
+  return { fields, omittedPaths: [...new Set(omittedPaths)] };
 }
 
 function _readField(
@@ -247,7 +341,9 @@ function _mapRecord(
  * is split here, each drive's fields are merged over the pipeline's here,
  * and each distinct script is imported here, once, however many fields and
  * records use it. `mapFields` is then synchronous, so mapping 10,000
- * records never touches a file.
+ * records never touches a file. Each drive's consumed paths (its `from`
+ * paths and its scripts' `reads`) and the config's omitted paths are
+ * collected here too, for `omitMappedPaths`.
  *
  * Scripts are imported by `file://` URL, which both Bun (the pipeline
  * server) and vite-node (`ava pipeline run`) resolve the same way, and both
@@ -274,36 +370,25 @@ export async function loadCatalogFieldMapper(args: {
   });
   const compiledByDrive = new Map(
     config.drives.map((drive) => {
-      const merged: CatalogFieldMappings = {
-        ...config.fields,
-        ...drive.fields,
-      };
-      const compiledFields = Object.entries(merged).flatMap(
-        ([field, source]) => {
-          return source === undefined
-            ? []
-            : [
-                _compileField({
-                  field: field as CatalogMappableField,
-                  source,
-                  configDir,
-                  scripts,
-                }),
-              ];
-        },
-      );
-      return [drive.baseUrl, compiledFields] as const;
+      return [
+        drive.baseUrl,
+        _compileDrive({ config, drive, configDir, scripts }),
+      ] as const;
     }),
   );
+  const getDrive = (driveKey: string): _CompiledDrive => {
+    const compiled = compiledByDrive.get(driveKey);
+    if (compiled === undefined) {
+      throw new Error(`${driveKey} is not a drive in this pipeline's config.`);
+    }
+    return compiled;
+  };
   return {
     mapFields: (record, driveKey) => {
-      const compiledFields = compiledByDrive.get(driveKey);
-      if (compiledFields === undefined) {
-        throw new Error(
-          `${driveKey} is not a drive in this pipeline's config.`,
-        );
-      }
-      return _mapRecord(compiledFields, record, driveKey);
+      return _mapRecord(getDrive(driveKey).fields, record, driveKey);
+    },
+    omitMappedPaths: (record, driveKey) => {
+      return omitRecordPaths(record, getDrive(driveKey).omittedPaths);
     },
   };
 }

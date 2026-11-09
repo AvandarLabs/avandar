@@ -1323,6 +1323,8 @@ commits belong to the features that own them, not here.
 | `c75d19331` | fix(hdx): leave license text and file check reports out of source_metadata | All of it. On demo, `license_other` and `fs_check_info` were 55% of HDX's raw JSON. |
 | `8e707d700` | fix(hdx): leave mapped and repeated package fields out of source_metadata | All of it. Drops `notes` and `caveats` (already in `description` and `notes`) and narrows `organization`, `tags`, and `groups` to the keys the mappers read. Sizing and the demo disk analysis: `docs/measles-demo/etl-disk-footprint.md`. |
 | `ec060372c` | docs(measles): explain the HDX disk footprint and how a full run fits | Branch-only: the demo instance's numbers and recovery steps. Port only if `develop` gets the same HDX sizing question. |
+| `4d1d2a7d5` | feat(etl): leave the paths a field mapping consumes out of a source record | All of it: `omitRecordPaths/`, `CatalogFieldMapper.omitMappedPaths`, a script's `reads` export, `additionalSourceMetadata.omit` in the config parser and types, and the two new loader fixtures. |
+| `2d61eb961` | refactor(catalog)!: keep only unmapped source fields in additional_source_metadata | All of it. Supersedes `d9c3bf6c0`, `c75d19331`, and `8e707d700`'s trims of `source_metadata`: port the final `makeApiResourceRelationsFromCkanPackage.ts`, not theirs. `source_metadata` becomes `additional_source_metadata` (the schema, both pipelines, the scripts' `reads`, `hdx.pipeline.yaml`'s `omit`, the `DataCatalogListing` model, the technical details' "More from the source" label and its translations), and the listings upsert returns ids (the schema, its pgTAP test, both listings stores and their tests). It also fixes `catalog_field_mapping.prelude.sql` for the new column and return type. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1378,7 +1380,12 @@ renamed column) and `20261107180100_catalog_search_organization_filters.sql`
 (adds the level-2, topic, and keyword parameters and facets). Hand-write the
 first, because the schema diff would turn the rename into a drop and a
 create: confirm the result has no `drop column` of a data column. Regenerate
-the second after it. Both land after F16, F17 and F19's migrations.
+the second after it. Both land after F16, F17 and F19's migrations. Then
+`20261109020452_drop_catalog_upsert_for_return_type_change.sql`
+(hand-written: the diff cannot change a function's return type) and
+`20261109020622_catalog_additional_source_metadata.sql` (generated after it;
+its `drop column source_metadata` is intended, since the old values hold
+mapped fields the new column must not).
 
 **Verification:**
 ```sh
@@ -1493,8 +1500,10 @@ workspace dataset's Metadata tab still shows its preview.
 Status: in progress. The pipeline server builds copies on request through
 `POST /open-data-cache/:catalogListingId/build`, and the `open-data` edge
 function requests them through
-`POST /data-catalog-listings/:id/parquet-cache`. Nothing in the app reads
-them yet (see the spec's slices).
+`POST /data-catalog-listings/:id/parquet-cache`. Workspaces read API-backed
+listings from their copies, falling back to the 25 MB relay where no
+pipeline server is configured. The relay's removal and an E2E test are still
+to come (see the spec's slices).
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1505,7 +1514,9 @@ size limit of its own. It knows no API: each pipeline's manifest has a
 in the pipeline's folder. Socrata pages by row id with its declared column
 types, so a copy needs about one part of disk. CKAN files are gzipped on disk
 and split. The database claims one build per listing and records the copy.
-The server deploys from a template filled by a gitignored
+The app downloads a copy's parts from Storage, merges them in DuckDB, waits
+while a copy builds, and starts the build when a listing is added to a
+workspace, saying when its data is still being prepared. The server deploys from a template filled by a gitignored
 `.env.pipeline-server.prod`, and its Docker image now starts.
 **Value:** Large listings, such as NYC's DOB Violations (2.48M rows), can be
 added to a workspace and load from Storage instead of the source.
@@ -1535,6 +1546,8 @@ added to a workspace and load from Storage instead of the source.
 | `3ca228aae` | feat(pipeline-server): build ODC listings' Parquet copies on request | All of it. Merged in `42754c16c`. |
 | `e86a92b21` | feat(pipeline-server): keep a listing's columns when its copy shares none of them | All of it, including the P6.11 roadmap item. Merged in `42754c16c`. |
 | `b1c3a196b` | feat(open-data): request an ODC listing's Parquet copy from the pipeline server | All of it. Merged in `3600d91d9`. |
+| `2e0039c62` | feat(open-data): load ODC listings from their Parquet copies | All of it, including the four new messages in every `src/i18n/locales/*/messages.po` and `messages.ts`. Merged in `cc10b08f2`. |
+| `a285a3612` | docs: record how the app reads ODC listings' Parquet copies | All of it. Merged in `cc10b08f2`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
@@ -1554,7 +1567,14 @@ fixtures that list them, `shared/connectors/open-data/buildParquetCachePartPath/
 `supabase/functions/open-data/startParquetCopyBuild/`, the parquet-cache
 route in `OpenDataRoutes.ts` and `OpenDataRoutes.types.ts`, the pipeline
 server section of `.env.example.edge`, the `AVA_PIPELINE_SERVER_URL` lines
-in `.github/workflows/demo.yaml`, `docs/measles-demo/odc-parquet-cache-spec.md`,
+in `.github/workflows/demo.yaml`, `src/lib/openData/requestOpenDataParquetCopy/`,
+`src/lib/openData/fetchOpenDataParquetCopy/`,
+`src/clients/DuckDbClient/mergeParquetBlobs/` and `mergeParquetBlobs` in
+`DuckDbClient.ts`, the copy options in `DatasetParquetWrapper.ts`,
+`createDefaultRegistry.ts`, and `createRegistryForFetch.ts`,
+`src/views/DataManagerApp/DataImportView/DataCatalogView/requestParquetCopyForAdding/`
+and its call in `DataCatalogView.tsx`, the four new catalog messages,
+`docs/measles-demo/odc-parquet-cache-spec.md`,
 `docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
 bullets in `production-plan-world-humanitarian-day.md`.
 
@@ -1571,10 +1591,15 @@ migrations `20261107220000_STORAGE-opendata-service-role-writes-only.sql`
 pnpm --filter @avandar/pipeline-server test
 pnpm --filter @avandar/etl test
 pnpm exec vitest run supabase/functions/open-data shared/connectors/open-data
+pnpm exec vitest run src/clients/qetl src/lib/openData src/clients/DuckDbClient src/views/DataManagerApp/DataImportView
+pnpm test:executed src/clients/DuckDbClient/mergeParquetBlobs
 supabase test db supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql
 ```
 Then build the image (`docker build -f apps/pipeline-server/Dockerfile .`),
-run it, and check `/healthz` answers `{"ok":true}`.
+run it, and check `/healthz` answers `{"ok":true}`. In the app, add an
+API-backed listing that has no copy: a "Preparing your data" notification
+appears, and opening the dataset downloads its parts from the `opendata`
+bucket, with no request to the `/resource` relay.
 
 ---
 
@@ -1852,6 +1877,8 @@ Its commits are covered by F19, not numbered here.
 | 136 | `2a627e438` | F27, F9 (MIXED) |
 | 137 | `8e707d700` | F23 |
 | 138 | `ec060372c` | F23 |
+| 139 | `4d1d2a7d5` | F23 |
+| 140 | `2d61eb961` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full

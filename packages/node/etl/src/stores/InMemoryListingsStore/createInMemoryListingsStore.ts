@@ -116,32 +116,27 @@ export function createInMemoryListingsStore(
     upsertListingsWithColumns: async (entries) => {
       _throwOnInvalidEntries(entries);
       upsertBatches.push(_copyThroughJson([...entries]));
-      return _copyThroughJson(
-        entries.map((entry) => {
-          const key = buildListingKeyFromRow(entry.row);
-          const existing = rowsByKey.get(key);
-          const isKeepingStoredColumns = _isKeepingStoredColumns(
-            entry,
-            existing,
+      return entries.map((entry) => {
+        const key = buildListingKeyFromRow(entry.row);
+        const existing = rowsByKey.get(key);
+        const isKeepingStoredColumns = _isKeepingStoredColumns(entry, existing);
+        const stored = {
+          ...existing,
+          ..._copyThroughJson(entry.row),
+          id: existing?.id ?? randomUUID(),
+          date_column_type_last_verified: isKeepingStoredColumns
+            ? (existing?.date_column_type_last_verified ?? null)
+            : entry.row.date_column_type_last_verified,
+        };
+        rowsByKey.set(key, stored);
+        if (!isKeepingStoredColumns) {
+          columnsByListingId.set(
+            stored.id,
+            _copyThroughJson([...entry.columns]),
           );
-          const stored = {
-            ...existing,
-            ..._copyThroughJson(entry.row),
-            id: existing?.id ?? randomUUID(),
-            date_column_type_last_verified: isKeepingStoredColumns
-              ? (existing?.date_column_type_last_verified ?? null)
-              : entry.row.date_column_type_last_verified,
-          };
-          rowsByKey.set(key, stored);
-          if (!isKeepingStoredColumns) {
-            columnsByListingId.set(
-              stored.id,
-              _copyThroughJson([...entry.columns]),
-            );
-          }
-          return stored;
-        }),
-      );
+        }
+        return stored.id;
+      });
     },
     getRows: () => {
       return _copyThroughJson([...rowsByKey.values()]);

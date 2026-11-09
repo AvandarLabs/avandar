@@ -50,8 +50,11 @@ export type ListingRowValues = Readonly<{
   organization4_name: string | null;
   domains: readonly string[] | null;
   tags: readonly string[] | null;
-  /** The raw source record. Never counts as a change on its own. */
-  source_metadata: unknown;
+  /**
+   * What the source record says that no other column holds. A change to its
+   * value never counts as a change on its own.
+   */
+  additional_source_metadata: unknown;
   /** The drive's `data_catalog_drives.id`, when the run has a drives store. */
   drive_id: string | null;
 }>;
@@ -97,8 +100,8 @@ export type ListingsStore = Readonly<{
   /**
    * Inserts or replaces each entry's row on its conflict key and replaces
    * that listing's whole set of relation columns, and returns the stored
-   * rows. The result is in no particular order and has at most one entry per
-   * key, so callers match rows with `buildListingKeyFromRow`.
+   * listings' ids in entry order. Only the ids come back, so a write never
+   * carries every stored row back over the wire.
    *
    * Each call is one transaction: a call that fails writes none of its rows
    * and none of their columns, so a listing and its columns are always
@@ -110,7 +113,7 @@ export type ListingsStore = Readonly<{
    */
   upsertListingsWithColumns: (
     entries: readonly ListingWithColumns[],
-  ) => Promise<readonly StoredListingRow[]>;
+  ) => Promise<readonly string[]>;
 }>;
 
 /** Writes Parquet objects to one storage bucket. */

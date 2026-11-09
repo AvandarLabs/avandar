@@ -71,7 +71,7 @@ function _createListing(
     organization4Name: undefined,
     domains: undefined,
     tags: undefined,
-    sourceMetadata: undefined,
+    additionalSourceMetadata: undefined,
     driveId: undefined,
     ...overrides,
     id: overrides.id as DataCatalogListing.Id,

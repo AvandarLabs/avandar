@@ -41,6 +41,6 @@ export const LISTING_CONTRACT_COLUMNS = [
   "organization4_name",
   "domains",
   "tags",
-  "source_metadata",
+  "additional_source_metadata",
   "drive_id",
 ] as const satisfies ReadonlyArray<keyof ListingRowValues>;

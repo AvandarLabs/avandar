@@ -15,10 +15,12 @@ export type {
   CatalogFieldMappings,
   CatalogFieldSource,
   CatalogMappableField,
+  PipelineAdditionalSourceMetadataConfig,
   PipelineConfig,
   PipelineDownloadConfig,
   PipelineDriveConfig,
 } from "@etl/EtlConfig/PipelineConfig.types";
+export { omitRecordPaths } from "@etl/EtlConfig/omitRecordPaths/omitRecordPaths";
 export { parsePipelineConfig } from "@etl/EtlConfig/parsePipelineConfig/parsePipelineConfig";
 export { readPipelineConfigFile } from "@etl/EtlConfig/readPipelineConfigFile/readPipelineConfigFile";
 export { loadListingDownloadScript } from "@etl/ListingDownload/loadListingDownloadScript/loadListingDownloadScript";

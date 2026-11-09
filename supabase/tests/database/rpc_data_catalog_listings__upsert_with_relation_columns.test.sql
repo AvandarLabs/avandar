@@ -64,7 +64,47 @@ create function pg_temp.one_column (p_name text) returns jsonb as $$
   ));
 $$ language sql;
 
-select plan(28);
+-- Calls the function under test, then reads the listings it stored, in
+-- input order. The function returns only ids, and a statement cannot see
+-- what a function it calls wrote, so the read is a second statement here.
+create function pg_temp.upsert_listings (p_listings jsonb) returns setof public.data_catalog_listings as $$
+declare
+  v_ids uuid[];
+begin
+  select array_agg(written.id order by written.position) into v_ids
+  from public.rpc_data_catalog_listings__upsert_with_relation_columns(p_listings)
+    with ordinality as written (id, position);
+
+  return query
+  select listing.*
+  from unnest(v_ids) with ordinality as wanted (id, position)
+  join public.data_catalog_listings listing on listing.id = wanted.id
+  order by wanted.position;
+end;
+$$ language plpgsql volatile;
+
+select plan(29);
+
+-- ---------------------------------------------------------------------------
+-- Returning only the stored listings' ids, in input order
+-- ---------------------------------------------------------------------------
+
+create temporary table written_listing_ids as
+select written.id, written.position
+from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+  jsonb_build_array(
+    pg_temp.api_listing('pgtap-fixture-ids-b', 'ids b', '[]'::jsonb),
+    pg_temp.api_listing('pgtap-fixture-ids-a', 'ids a', '[]'::jsonb)
+  )) with ordinality as written (id, position);
+
+select results_eq(
+  $$select listing.external_dataset_id
+    from written_listing_ids written
+    join public.data_catalog_listings listing on listing.id = written.id
+    order by written.position$$,
+  $$values ('pgtap-fixture-ids-b'), ('pgtap-fixture-ids-a')$$,
+  'the function returns the stored listings'' ids, in input order'
+);
 
 -- ---------------------------------------------------------------------------
 -- Refusing a listing without a column array, and rolling back the whole call
@@ -97,7 +137,7 @@ select results_eq(
       from public.data_catalog_listings__relation_columns relation_column
       where relation_column.catalog_listing_id = listing.id
     )
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.api_listing('pgtap-fixture-empty', 'empty', '[]'::jsonb))) listing$$,
   $$values ('empty', 0)$$,
   'a listing with an empty column list is stored with no columns'
@@ -128,7 +168,7 @@ select throws_ok(
 select is(
   (
     select display_name
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(
         pg_temp.api_listing('pgtap-fixture-new', 'new', jsonb_build_array(
           jsonb_build_object('column_name', 'x', 'display_order', 0,
@@ -161,7 +201,7 @@ select results_eq(
 select is(
   (
     select id
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(
         pg_temp.api_listing('pgtap-fixture-stored', 'stored, renamed', pg_temp.one_column('new_a'))
       ))
@@ -201,7 +241,7 @@ select results_eq(
 select is(
   (
     select parquet_file_name
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(jsonb_build_object(
         'listing', jsonb_build_object(
           'access_kind', 'pipeline_parquet',
@@ -243,7 +283,7 @@ $$ language sql;
 select is(
   (
     select date_column_type_last_verified
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.fingerprinted_listing('fp-1', '2026-10-01T00:00:00Z', 'piped')))
   ),
   '2026-10-01T00:00:00Z'::timestamptz,
@@ -269,7 +309,7 @@ $$ language sql;
 select is(
   (
     select date_column_type_last_verified
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.fingerprinted_listing('fp-1', null, 'piped')))
   ),
   now(),
@@ -285,7 +325,7 @@ select results_eq(
 select is(
   (
     select date_column_type_last_verified
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.fingerprinted_listing('fp-2', null, 'renamed')))
   ),
   null,
@@ -301,7 +341,7 @@ select results_eq(
 select is(
   (
     select date_column_type_last_verified
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.fingerprinted_listing('fp-2', '2026-10-05T00:00:00Z', 'reread')))
   ),
   '2026-10-05T00:00:00Z'::timestamptz,
@@ -317,7 +357,7 @@ select results_eq(
 select is(
   (
     select date_column_type_last_verified
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.api_listing('pgtap-fixture-no-fingerprint', 'no fingerprint', pg_temp.one_column('a'))))
   ),
   null,
@@ -373,7 +413,7 @@ $$ language sql;
 select is(
   (
     select is_invalid
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.invalid_fixture('2026-10-01T00:00:00Z')))
   ),
   false,
@@ -386,7 +426,7 @@ where external_dataset_id = 'pgtap-fixture-invalid';
 
 select results_eq(
   $$select is_invalid, invalid_dataset_reason::text
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.invalid_fixture('2026-10-01T00:00:00Z')))$$,
   $$values (true, 'empty_dataset')$$,
   'a rewrite of an unchanged source keeps the listing invalid'
@@ -394,7 +434,7 @@ select results_eq(
 
 select results_eq(
   $$select is_invalid, invalid_dataset_reason::text
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.invalid_fixture('2026-10-15T00:00:00Z')))$$,
   $$values (false, null::text)$$,
   'a rewrite after the source changed makes the listing valid again, to be checked anew'
@@ -419,13 +459,13 @@ create function pg_temp.metadata_listing (p_metadata jsonb) returns jsonb as $$
 $$ language sql;
 
 select results_eq(
-  $$select organization2_name, domains, tags, source_metadata, drive_id
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+  $$select organization2_name, domains, tags, additional_source_metadata, drive_id
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.metadata_listing(jsonb_build_object(
         'organization2_name', 'Fixture Agency',
         'domains', jsonb_build_array('Health'),
         'tags', jsonb_build_array('clinics', 'visits'),
-        'source_metadata', jsonb_build_object('id', 'abcd-1234'),
+        'additional_source_metadata', jsonb_build_object('id', 'abcd-1234'),
         'drive_id', 'e8004001-0000-4000-8000-0000000000d1'))))$$,
   $$values (
     'Fixture Agency'::text, array['Health'], array['clinics', 'visits'],
@@ -434,13 +474,13 @@ select results_eq(
 );
 
 select results_eq(
-  $$select organization2_name, domains, tags, source_metadata, drive_id
-    from public.rpc_data_catalog_listings__upsert_with_relation_columns(
+  $$select organization2_name, domains, tags, additional_source_metadata, drive_id
+    from pg_temp.upsert_listings(
       jsonb_build_array(pg_temp.metadata_listing(jsonb_build_object(
         'organization2_name', 'Fixture Office',
         'domains', jsonb_build_array('Transportation'),
         'tags', jsonb_build_array('ferry'),
-        'source_metadata', jsonb_build_object('id', 'efgh-5678'),
+        'additional_source_metadata', jsonb_build_object('id', 'efgh-5678'),
         'drive_id', 'e8004001-0000-4000-8000-0000000000d2'))))$$,
   $$values (
     'Fixture Office'::text, array['Transportation'], array['ferry'],

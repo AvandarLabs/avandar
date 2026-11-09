@@ -141,8 +141,11 @@ export type DataCatalogListingRead = {
   /** The source's free-form keywords. */
   tags: string[] | undefined;
 
-  /** The source record the listing was built from, untouched. */
-  sourceMetadata: Json | undefined;
+  /**
+   * What the source record the listing was built from says that no other
+   * field holds. A field the pipeline maps elsewhere is left out.
+   */
+  additionalSourceMetadata: Json | undefined;
 
   /** The drive that produced the listing. */
   driveId: DataCatalogDriveId | undefined;

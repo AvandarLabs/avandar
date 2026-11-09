@@ -304,12 +304,13 @@ describe("createHdxEtlEngine", () => {
     ]);
   });
 
-  it("maps each package's metadata and records the drive's labels", async () => {
+  it("maps each package's metadata, keeps only what no mapping consumed, and records the drive's labels", async () => {
     const listings = createInMemoryListingsStore();
     const drives = createInMemoryDrivesStore();
     const sourceRecord = {
       organization: { title: "World Health Organization" },
       notes: "Measles cases by week.",
+      title: "Measles cases",
     };
 
     await createHdxEtlEngine({
@@ -331,7 +332,7 @@ describe("createHdxEtlEngine", () => {
     expect(listings.getRows()[0]).toMatchObject({
       organization1_name: "World Health Organization",
       description: "Measles cases by week.",
-      source_metadata: sourceRecord,
+      additional_source_metadata: { package: { title: "Measles cases" } },
       drive_id: drives.getDrives()[0]?.id,
     });
     expect(drives.getDrives()[0]?.organizationLabels).toEqual({

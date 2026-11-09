@@ -64,7 +64,7 @@ describe("buildListingRowFromRelation", () => {
         organization3Name: "Licensing",
         domains: ["Transportation"],
         tags: ["taxi", "fhv"],
-        sourceMetadata: { resource: { id: "8wbx-tsch" } },
+        additionalSourceMetadata: { resource: { id: "8wbx-tsch" } },
       },
       { driveId: "6f7e2c1a-0000-4000-8000-000000000001" },
     );
@@ -75,7 +75,7 @@ describe("buildListingRowFromRelation", () => {
       organization4_name: null,
       domains: ["Transportation"],
       tags: ["taxi", "fhv"],
-      source_metadata: { resource: { id: "8wbx-tsch" } },
+      additional_source_metadata: { resource: { id: "8wbx-tsch" } },
       drive_id: "6f7e2c1a-0000-4000-8000-000000000001",
     });
   });
@@ -89,7 +89,7 @@ describe("buildListingRowFromRelation", () => {
       organization4_name: null,
       domains: null,
       tags: null,
-      source_metadata: null,
+      additional_source_metadata: null,
       drive_id: null,
     });
   });

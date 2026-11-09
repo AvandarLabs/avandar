@@ -4,6 +4,13 @@ type HdxSourcedRecord = {
 };
 
 /**
+ * The source record paths this field holds, left out of a listing's additional
+ * source metadata. `dataset_source`, which this field holds whenever it is not
+ * the publisher, which `organization1_name` already holds.
+ */
+export const reads = ["dataset_source"];
+
+/**
  * Mapper script for `organization2_name`: HDX's `dataset_source`, the
  * organization the data comes from, which often differs from the HDX
  * organization that published it (WHO data published by an OCHA country

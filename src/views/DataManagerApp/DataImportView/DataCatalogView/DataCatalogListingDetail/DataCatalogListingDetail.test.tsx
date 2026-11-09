@@ -74,7 +74,7 @@ function _createListing(
     organization4Name: undefined,
     domains: undefined,
     tags: undefined,
-    sourceMetadata: undefined,
+    additionalSourceMetadata: undefined,
     driveId: undefined,
     ...overrides,
   };
@@ -346,10 +346,10 @@ describe("DataCatalogListingDetail", () => {
     });
   });
 
-  it("shows the source record rather than the listing's metadata", async () => {
+  it("shows what else the source says rather than the listing's metadata", async () => {
     _renderDetail({
       listing: _createListing({
-        sourceMetadata: { resource: { id: "8wbx-tsch" } },
+        additionalSourceMetadata: { resource: { id: "8wbx-tsch" } },
         metadata: { ignored: true },
       }),
     });
@@ -357,7 +357,7 @@ describe("DataCatalogListingDetail", () => {
     fireEvent.click(screen.getByRole("button", { name: "Technical details" }));
 
     expect(
-      await screen.findByRole("figure", { name: "Source record" }),
+      await screen.findByRole("figure", { name: "More from the source" }),
     ).toHaveTextContent('"id": "8wbx-tsch"');
   });
 });
