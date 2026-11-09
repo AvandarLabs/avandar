@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
-import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { GraduatedRamps } from "@/views/GisApp/layers/GraduatedRamps/GraduatedRamps";
+import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
@@ -24,7 +24,9 @@ export function GraduatedRampSelect({
         { value: "blue", label: t`Blue` },
         { value: "orange", label: t`Orange` },
       ]}
-      value={color.ramp[0] === GraduatedRamps.presets.orange[0] ? "orange" : "blue"}
+      value={
+        color.ramp[0] === GraduatedRamps.presets.orange[0] ? "orange" : "blue"
+      }
       allowDeselect={false}
       onChange={(value) => {
         onLayerChange((current) => {

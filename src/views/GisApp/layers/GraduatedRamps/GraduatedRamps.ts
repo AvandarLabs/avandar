@@ -60,9 +60,7 @@ function _isSameRamp(
   );
 }
 
-function _findPreset(
-  ramp: readonly string[],
-): GraduatedRampSource | undefined {
+function _findPreset(ramp: readonly string[]): GraduatedRampSource | undefined {
   return GRADUATED_RAMP_SOURCES.find((source) => {
     return _isSameRamp(
       _createPresetRamp({ ...source, classCount: ramp.length }),
@@ -71,10 +69,7 @@ function _findPreset(
   });
 }
 
-function _resampleRamp(
-  ramp: readonly string[],
-  classCount: number,
-): string[] {
+function _resampleRamp(ramp: readonly string[], classCount: number): string[] {
   // A ramp that still matches a preset is resampled from the whole preset,
   // so shrinking to two classes and growing back loses no colors.
   const source = _findPreset(ramp);

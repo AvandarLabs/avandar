@@ -56,9 +56,7 @@ describe("GraduatedRamps.fitColorToClassCount", () => {
       classification: { method: "quantile", classCount: 5 },
     });
 
-    expect(GraduatedRamps.fitColorToClassCount(color).ramp).toEqual(
-      BLUE_RAMP,
-    );
+    expect(GraduatedRamps.fitColorToClassCount(color).ramp).toEqual(BLUE_RAMP);
   });
 
   it("resamples a reversed preset in reverse", () => {
