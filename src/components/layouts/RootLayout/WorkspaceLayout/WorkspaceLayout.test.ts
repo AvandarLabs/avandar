@@ -74,4 +74,29 @@ describe("workspace navigation permissions", () => {
 
     expect(links).not.toContain(COUNTY_RECORDS_LINK);
   });
+
+  it("puts Assigned to me ahead of the case types when the user can view records", () => {
+    const links = makeMainNavbarLinksFromPermissions({
+      ...NO_APP_ACCESS,
+      canAccessCaseRecords: true,
+      individualManagerLinks: [COUNTY_RECORDS_LINK],
+    });
+    const paths = links.map(prop("link.to"));
+
+    expect(paths).toContain("/$workspaceSlug/individual-manager/assigned");
+    expect(
+      paths.indexOf("/$workspaceSlug/individual-manager/assigned"),
+    ).toBeLessThan(paths.indexOf(COUNTY_RECORDS_LINK.link.to));
+  });
+
+  it("omits Assigned to me when the user cannot view records", () => {
+    const links = makeMainNavbarLinksFromPermissions({
+      ...NO_APP_ACCESS,
+      individualManagerLinks: [COUNTY_RECORDS_LINK],
+    });
+
+    expect(links.map(prop("link.to"))).not.toContain(
+      "/$workspaceSlug/individual-manager/assigned",
+    );
+  });
 });
