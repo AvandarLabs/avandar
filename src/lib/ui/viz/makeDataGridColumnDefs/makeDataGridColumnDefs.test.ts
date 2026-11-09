@@ -31,6 +31,20 @@ function _formatCell(
 describe("makeDataGridColumnDefs", () => {
   const originalTimezone = process.env.TZ;
 
+  it("offers each column title as that column's header tooltip", () => {
+    const columnDefs = makeDataGridColumnDefs({
+      columnNames: ["county_of_residence", "deaths"],
+      data: [],
+      dateColumns: new Set(),
+      dateFormat: "YYYY-MM-DD",
+    });
+    expect(
+      columnDefs.map((columnDef) => {
+        return columnDef.headerTooltip;
+      }),
+    ).toEqual(["county_of_residence", "deaths"]);
+  });
+
   beforeAll(() => {
     // A user west of UTC is where a zone-less date used to slip a day back.
     process.env.TZ = "America/New_York";
