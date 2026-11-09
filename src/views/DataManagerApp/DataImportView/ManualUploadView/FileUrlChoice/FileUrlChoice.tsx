@@ -2,7 +2,7 @@ import { formatFileSize } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, Stack, Text, UnstyledButton } from "@mantine/core";
 import css from "@/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.module.css";
-import type { FileUrlChoiceMember } from "$/fileUrl/AcquiredPastedFile.ts";
+import type { FileUrlChoiceMember } from "$/fileUrl/AcquiredPastedFile";
 import type { ReactNode } from "react";
 
 type Props = {

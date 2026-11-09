@@ -56,7 +56,8 @@ export function ManualUploadView({
     isDefined(previewRows) &&
     isDefined(uploadedFile) &&
     isDefined(dataSourceMetadata);
-  const isAcquiring = manualUpload.isLoadingFile || fileUrl.phase === "fetching";
+  const isAcquiring =
+    manualUpload.isLoadingFile || fileUrl.phase === "fetching";
   const isChoosingFile = !hasParsedFile && fileUrl.members.length > 0;
 
   return (
@@ -105,8 +106,8 @@ export function ManualUploadView({
               */}
               <Text size="xs" c="dimmed">
                 <Trans>
-                  A file you drop stays on this device until you save. A link
-                  is downloaded by Avandar first, then read here the same way.
+                  A file you drop stays on this device until you save. A link is
+                  downloaded by Avandar first, then read here the same way.
                 </Trans>
               </Text>
             </Stack>

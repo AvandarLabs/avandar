@@ -68,9 +68,10 @@ function _parseResource(value: unknown): CkanImportResource | undefined {
   if (!IMPORTABLE_FORMATS.has(format.toLowerCase()) || url.length === 0) {
     return undefined;
   }
-  const name = typeof resource.name === "string" && resource.name.length > 0
-    ? resource.name
-    : (url.split("/").pop() ?? url);
+  const name =
+    typeof resource.name === "string" && resource.name.length > 0
+      ? resource.name
+      : (url.split("/").pop() ?? url);
   const size = typeof resource.size === "number" ? resource.size : 0;
   return { id, name, format, url, size };
 }

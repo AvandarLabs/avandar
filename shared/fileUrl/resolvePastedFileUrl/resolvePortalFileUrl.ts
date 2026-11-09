@@ -20,7 +20,11 @@ function _resolveCkan(url: URL): ResolvedPastedFileUrl | undefined {
   const parts = pathParts(url);
   const datasetIndex = parts.indexOf("dataset");
   const packageId = parts[datasetIndex + 1];
-  if (datasetIndex < 0 || packageId === undefined || parts.includes("download")) {
+  if (
+    datasetIndex < 0 ||
+    packageId === undefined ||
+    parts.includes("download")
+  ) {
     return undefined;
   }
   const sourceLabel = sourceHost(url);

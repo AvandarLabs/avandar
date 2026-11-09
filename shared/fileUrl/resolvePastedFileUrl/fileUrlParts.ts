@@ -1,4 +1,7 @@
-/** Path segments of a URL, without the empty segments a leading slash creates. */
+/**
+ * Path segments of a URL, without the empty segments a leading slash
+ * creates.
+ */
 export function pathParts(url: URL): string[] {
   return url.pathname.split("/").filter((part) => {
     return part.length > 0;

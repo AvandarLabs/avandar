@@ -1,6 +1,4 @@
-import {
-  fileNameFromPath,
-} from "$/fileUrl/resolvePastedFileUrl/fileUrlParts.ts";
+import { fileNameFromPath } from "$/fileUrl/resolvePastedFileUrl/fileUrlParts.ts";
 import type { ResolvedPastedFileUrl } from "$/fileUrl/PastedFileUrl.ts";
 
 /**

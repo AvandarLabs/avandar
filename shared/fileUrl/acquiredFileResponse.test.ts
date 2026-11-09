@@ -15,9 +15,9 @@ describe("acquiredFileResponse", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("X-Ava-Outcome")).toBe("file");
-    expect(decodeURIComponent(response.headers.get("X-Ava-File-Name") ?? "")).toBe(
-      "Main Routine.csv",
-    );
+    expect(
+      decodeURIComponent(response.headers.get("X-Ava-File-Name") ?? ""),
+    ).toBe("Main Routine.csv");
     expect(Array.from(new Uint8Array(await response.arrayBuffer()))).toEqual(
       Array.from(CSV),
     );

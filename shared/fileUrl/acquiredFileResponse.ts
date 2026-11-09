@@ -1,4 +1,7 @@
-import type { AcquiredPastedFile, FileUrlFailureReason } from "$/fileUrl/AcquiredPastedFile.ts";
+import type {
+  AcquiredPastedFile,
+  FileUrlFailureReason,
+} from "$/fileUrl/AcquiredPastedFile.ts";
 
 const BAD_REQUEST = 400;
 const FORBIDDEN = 403;
@@ -24,7 +27,8 @@ export function acquiredFileResponse(acquired: AcquiredPastedFile): Response {
       },
     });
   }
-  const status = acquired.outcome === "choice" ? 200 : _statusFor(acquired.reason);
+  const status =
+    acquired.outcome === "choice" ? 200 : _statusFor(acquired.reason);
   return new Response(JSON.stringify(acquired), {
     status,
     headers: { "Content-Type": "application/json" },

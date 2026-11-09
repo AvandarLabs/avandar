@@ -1,11 +1,14 @@
 import { formatFileSize } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { FILE_URL_MAX_BYTES } from "$/fileUrl/PastedFileUrl.ts";
+import { FILE_URL_MAX_BYTES } from "$/fileUrl/PastedFileUrl";
+import { resolvePastedFileUrl } from "$/fileUrl/resolvePastedFileUrl/resolvePastedFileUrl";
 import { requestFileFromUrl } from "@/clients/fileUrl/requestFileFromUrl";
-import { resolvePastedFileUrl } from "$/fileUrl/resolvePastedFileUrl/resolvePastedFileUrl.ts";
 import { fileUrlErrorMessage } from "@/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage";
-import type { FileUrlChoiceMember, FileUrlFailureReason } from "$/fileUrl/AcquiredPastedFile.ts";
+import type {
+  FileUrlChoiceMember,
+  FileUrlFailureReason,
+} from "$/fileUrl/AcquiredPastedFile";
 
 type Phase = "idle" | "fetching" | "choice";
 
@@ -40,7 +43,9 @@ export function useFileUrlImport(onFileReady: (file: File) => void): {
   const [pendingUrl, setPendingUrl] = useState("");
   const fieldRef = useRef<HTMLInputElement>(null);
   const [focusRequest, setFocusRequest] = useState(0);
-  const limitLabel = formatFileSize(FILE_URL_MAX_BYTES, { locale: i18n.locale });
+  const limitLabel = formatFileSize(FILE_URL_MAX_BYTES, {
+    locale: i18n.locale,
+  });
 
   useEffect(
     function focusLinkField() {

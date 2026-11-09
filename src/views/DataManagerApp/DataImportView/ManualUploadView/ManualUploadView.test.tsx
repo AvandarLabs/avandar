@@ -404,7 +404,9 @@ describe("ManualUploadView", () => {
     await waitFor(() => {
       expect(screen.getByText(/6 detected/)).toBeInTheDocument();
     });
-    expect(screen.getByText("Main_Routine_Vaccine_Geo.csv")).toBeInTheDocument();
+    expect(
+      screen.getByText("Main_Routine_Vaccine_Geo.csv"),
+    ).toBeInTheDocument();
     expect(requestFileFromUrlMock).toHaveBeenCalledWith({
       url: "https://github.com/nychealth/immunization-data/blob/main/geo/Main_Routine_Vaccine_Geo.csv",
     });
@@ -431,7 +433,12 @@ describe("ManualUploadView", () => {
       sourceLabel: "GitHub",
       members: [
         { path: "cases.csv", size: 12, mediaType: "text/csv" },
-        { path: "notes/summary.xlsx", size: 40, mediaType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+        {
+          path: "notes/summary.xlsx",
+          size: 40,
+          mediaType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
       ],
     });
 

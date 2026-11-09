@@ -20,9 +20,16 @@ export function mediaTypeForFileName(fileName: string): string | undefined {
 }
 
 /** Whether a download should be opened as a zip, gzip, or tar.gz. */
-export function isArchiveDownload(fileName: string, mediaType: string): boolean {
+export function isArchiveDownload(
+  fileName: string,
+  mediaType: string,
+): boolean {
   const lowerName = fileName.toLowerCase();
-  if (ARCHIVE_EXTENSIONS.some((extension) => lowerName.endsWith(extension))) {
+  if (
+    ARCHIVE_EXTENSIONS.some((extension) => {
+      return lowerName.endsWith(extension);
+    })
+  ) {
     return true;
   }
   return mediaType.includes("zip") || mediaType.includes("gzip");
