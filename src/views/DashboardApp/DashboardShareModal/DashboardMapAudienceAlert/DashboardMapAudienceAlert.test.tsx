@@ -77,7 +77,7 @@ describe("DashboardMapAudienceAlert", () => {
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      /cannot open 2 maps you cannot open\./,
+      /cannot open 2 maps hidden from you\./,
     );
   });
 

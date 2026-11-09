@@ -60,8 +60,8 @@ export function useLimitedAudienceMapNames(dashboard: Dashboard.T): string[] {
     : [
         ...mapNames,
         plural(numUnavailableMaps, {
-          one: "a map you cannot open",
-          other: "# maps you cannot open",
+          one: "a map hidden from you",
+          other: "# maps hidden from you",
         }),
       ];
 }
