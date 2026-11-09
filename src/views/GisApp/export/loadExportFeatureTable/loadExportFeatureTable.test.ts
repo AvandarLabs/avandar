@@ -221,7 +221,7 @@ describe("loadExportFeatureTable", () => {
 
   it("returns the list's labels and each row's printed cells", async () => {
     expect(await _load(_config({ layer: _sitesLayer() }))).toEqual({
-      summaryLine: "2 Sites",
+      summaryLine: "2 features in Sites",
       truncationNote: undefined,
       buildColumnLimitNote: expect.any(Function),
       headerLabels: ["site_id", "cases"],

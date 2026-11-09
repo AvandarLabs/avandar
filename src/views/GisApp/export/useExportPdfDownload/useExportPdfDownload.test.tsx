@@ -337,7 +337,7 @@ describe("useExportPdfDownload", () => {
       }),
     );
     expect(composeExportPdfMock.mock.calls[0]![0].featureTable).toEqual({
-      summaryLine: "2 Sites",
+      summaryLine: "2 features in Sites",
       truncationNote: undefined,
       buildColumnLimitNote: expect.any(Function),
       headerLabels: ["site_id"],

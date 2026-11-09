@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { msg } from "@lingui/core/macro";
+import { msg, plural } from "@lingui/core/macro";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { BUFFER_DISTANCE_UNIT_LABELS } from "@/views/GisApp/layers/BufferDistanceUnit.constants";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -46,18 +46,27 @@ function _formatBufferDistance(
   return i18n._(msg`${distance} ${unit}`);
 }
 
-/** "{count} {layer}" or "{count} {layer} within {distance} of {source}". */
+/**
+ * "{count} features in {layer}", or "{count} features in {layer} within
+ * {distance} of {source}" when a buffer filters the layer. The count is
+ * pluralized and digit-grouped for the active locale.
+ */
 function _getSummaryLine(
   options: Readonly<{
-    countText: string;
+    totalCount: number;
     layerName: string;
     bufferFilter: BufferFilter | undefined;
     i18n: I18n;
   }>,
 ): string {
-  const { countText, layerName, bufferFilter, i18n } = options;
+  const { totalCount, layerName, bufferFilter, i18n } = options;
   if (bufferFilter === undefined) {
-    return i18n._(msg`${countText} ${layerName}`);
+    return i18n._(
+      msg`${plural(totalCount, {
+        one: "# feature",
+        other: "# features",
+      })} in ${layerName}`,
+    );
   }
   const distanceText = _formatBufferDistance({
     binding: bufferFilter.binding,
@@ -65,7 +74,10 @@ function _getSummaryLine(
   });
   const sourceLayerName = bufferFilter.sourceLayerName;
   return i18n._(
-    msg`${countText} ${layerName} within ${distanceText} of ${sourceLayerName}`,
+    msg`${plural(totalCount, {
+      one: "# feature",
+      other: "# features",
+    })} in ${layerName} within ${distanceText} of ${sourceLayerName}`,
   );
 }
 
@@ -124,7 +136,7 @@ export function getExportFeatureTableCopy(
   const isRowCut = shownCount < totalCount;
   return {
     summaryLine: _getSummaryLine({
-      countText,
+      totalCount,
       layerName: layer.name,
       bufferFilter: _getBufferFilter({ config, layer }),
       i18n,

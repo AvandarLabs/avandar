@@ -45,7 +45,7 @@ describe("getExportFeatureTableCopy", () => {
     i18n.loadAndActivate({ locale: "en", messages: {} });
   });
 
-  it("states the count and layer name when no buffer filters the layer", () => {
+  it("counts the layer's features when no buffer filters the layer", () => {
     const { config, schools } = _unfilteredMap();
     const copy = getExportFeatureTableCopy({
       config,
@@ -55,7 +55,7 @@ describe("getExportFeatureTableCopy", () => {
       i18n,
     });
 
-    expect(copy.summaryLine).toBe("42 Schools");
+    expect(copy.summaryLine).toBe("42 features in Schools");
   });
 
   it("states the buffer distance and source when a buffer filters the layer", () => {
@@ -68,7 +68,9 @@ describe("getExportFeatureTableCopy", () => {
       i18n,
     });
 
-    expect(copy.summaryLine).toBe("42 Schools within 0.5 mi of Exposure sites");
+    expect(copy.summaryLine).toBe(
+      "42 features in Schools within 0.5 mi of Exposure sites",
+    );
   });
 
   it("states the buffer distance in the unit it was typed in", () => {
@@ -81,7 +83,37 @@ describe("getExportFeatureTableCopy", () => {
       i18n,
     });
 
-    expect(copy.summaryLine).toBe("3 Schools within 805 m of Exposure sites");
+    expect(copy.summaryLine).toBe(
+      "3 features in Schools within 805 m of Exposure sites",
+    );
+  });
+
+  it("names a single feature in the singular", () => {
+    const { config, schools } = _unfilteredMap();
+    const copy = getExportFeatureTableCopy({
+      config,
+      layer: schools,
+      totalCount: 1,
+      shownCount: 1,
+      i18n,
+    });
+
+    expect(copy.summaryLine).toBe("1 feature in Schools");
+  });
+
+  it("groups the digits of a large feature count", () => {
+    const { config, schools } = _bufferedMap("mi");
+    const copy = getExportFeatureTableCopy({
+      config,
+      layer: schools,
+      totalCount: 1500,
+      shownCount: 200,
+      i18n,
+    });
+
+    expect(copy.summaryLine).toBe(
+      "1,500 features in Schools within 0.5 mi of Exposure sites",
+    );
   });
 
   it("adds a truncation note when the row cap cut the list", () => {
