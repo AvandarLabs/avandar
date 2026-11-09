@@ -3963,7 +3963,7 @@ msgstr "Jaribu kuuliza"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Columns added"
-msgstr ""
+msgstr "Safu wima zimeongezwa"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -5881,7 +5881,8 @@ msgstr "Sehemu {0} kati ya {1}, {value}"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Add calculated columns to a Data Explorer query when you run one of its "
 "tools"
-msgstr ""
+msgstr "Ongeza safu wima zilizokokotolewa kwenye hoja ya Data Explorer "
+"unapoendesha mojawapo ya zana zake"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
@@ -7606,7 +7607,7 @@ msgstr "Kikao chako kimeisha"
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
-msgstr ""
+msgstr "Hoja ilibadilika baada ya safu wima kuongezwa."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
@@ -10888,7 +10889,7 @@ msgstr "Thamani ulizochagua zinaweza kuwa na taarifa za kibinafsi. Mtoa huduma "
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "Nothing to undo"
-msgstr ""
+msgstr "Hakuna cha kutendua"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
@@ -11352,7 +11353,7 @@ msgstr "Chini"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Added {columnList}"
-msgstr ""
+msgstr "Imeongezwa {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"

@@ -3807,7 +3807,7 @@ msgstr "试着问问"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Columns added"
-msgstr ""
+msgstr "已添加列"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -5676,7 +5676,7 @@ msgstr "第 {0} 个断点，共 {1} 个，{value}"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Add calculated columns to a Data Explorer query when you run one of its "
 "tools"
-msgstr ""
+msgstr "运行 Data Explorer 查询工具时，向查询中添加计算列"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
@@ -7349,7 +7349,7 @@ msgstr "您的会话已过期"
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
-msgstr ""
+msgstr "添加列后，查询已发生变化。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
@@ -10512,7 +10512,7 @@ msgstr "您选择的值可能包含个人信息。AI 提供者将接收这些信
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "Nothing to undo"
-msgstr ""
+msgstr "没有可撤销的操作"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
@@ -10965,7 +10965,7 @@ msgstr "底部"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Added {columnList}"
-msgstr ""
+msgstr "已添加 {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"

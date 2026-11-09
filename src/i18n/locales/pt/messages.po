@@ -3966,7 +3966,7 @@ msgstr "Experimente perguntar"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Columns added"
-msgstr ""
+msgstr "Colunas adicionadas"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -5886,7 +5886,8 @@ msgstr "Intervalo {0} de {1}, {value}"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Add calculated columns to a Data Explorer query when you run one of its "
 "tools"
-msgstr ""
+msgstr "Adicione colunas calculadas a uma consulta do Data Explorer ao executar "
+"uma de suas ferramentas"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
@@ -7613,7 +7614,7 @@ msgstr "Sua sessão expirou"
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
-msgstr ""
+msgstr "A consulta foi alterada após a adição das colunas."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
@@ -10907,7 +10908,7 @@ msgstr "Os valores que você selecionou podem conter informações pessoais. O "
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "Nothing to undo"
-msgstr ""
+msgstr "Nada para desfazer"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
@@ -11378,7 +11379,7 @@ msgstr "Inferior"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Added {columnList}"
-msgstr ""
+msgstr "Adicionadas {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"

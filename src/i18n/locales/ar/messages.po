@@ -3908,7 +3908,7 @@ msgstr "جرّب أن تسأل"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Columns added"
-msgstr ""
+msgstr "تمت إضافة الأعمدة"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -5810,7 +5810,7 @@ msgstr "التقسيم {0} من {1}، {value}"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Add calculated columns to a Data Explorer query when you run one of its "
 "tools"
-msgstr ""
+msgstr "أضف أعمدة محسوبة إلى استعلام Data Explorer عند تشغيل إحدى أدواته"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
@@ -7514,7 +7514,7 @@ msgstr "انتهت جلستك"
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
-msgstr ""
+msgstr "تغيّر الاستعلام بعد إضافة الأعمدة."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
@@ -10763,7 +10763,7 @@ msgstr "قد تحتوي القيم التي اخترتها على معلومات
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "Nothing to undo"
-msgstr ""
+msgstr "لا شيء للتراجع عنه"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
@@ -11223,7 +11223,7 @@ msgstr "الأسفل"
 
 #: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Added {columnList}"
-msgstr ""
+msgstr "تمت إضافة {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"
