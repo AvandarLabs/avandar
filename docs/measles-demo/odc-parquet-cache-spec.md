@@ -1,7 +1,7 @@
 # ODC Parquet cache: spec
 
-**Status:** in progress on `feat/odc-parquet-cache` (branched from
-`demo/measles`).
+**Status:** done on `feat/odc-parquet-cache` (branched from
+`demo/measles`). Drift handling is tracked separately (open question 4).
 
 ## Problem
 
@@ -300,7 +300,7 @@ are raw-bytes copies of sources, so nothing is lost.
 | S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, retry backoff, triggering S3), and its env in `.env.example.edge` and the Demo workflow. **Done.** | S3, S4 |
 | S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state. **Done.** | S5 |
 | S7 | Remove the 25 MB relay, the private bucket cache, and its columns. **Done.** A bucket that still has files is emptied by hand first (section 6). | S6 |
-| S8 | E2E: add a listing over 25 MB and query it | S6 |
+| S8 | E2E: add a listing whose copy has several parts and query it. **Done** (`tests/e2e/odc-parquet-copy.spec.ts`). Setup seeds a built copy of three parts, since the build is the pipeline server's and is tested there; the test adds the listing, opens the dataset, and checks the row count and row order across parts. | S6 |
 
 ## Open questions
 
