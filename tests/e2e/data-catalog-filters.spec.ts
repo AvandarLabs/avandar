@@ -118,7 +118,10 @@ async function _expectNumResults(
   ).toHaveCount(numResults);
 }
 
-/** Opens the open data catalog and searches it for the seeded word. */
+/**
+ * Opens the open data catalog, checks the rail offers Publisher and Keywords
+ * before anything is typed, and searches it for the seeded word.
+ */
 async function _searchOpenDataCatalog(
   options: Readonly<{ page: Page; workspaceSlug: string }>,
 ): Promise<Locator> {
@@ -128,6 +131,10 @@ async function _searchOpenDataCatalog(
   });
   await page.getByRole("tab", { name: "Open data" }).click();
   const rail = page.getByRole("complementary", { name: "Filters" });
+  await expect(rail.getByRole("combobox", { name: "Publisher" })).toBeVisible({
+    timeout: LONG_WAIT,
+  });
+  await expect(rail.getByRole("combobox", { name: "Keywords" })).toBeVisible();
   await rail
     .getByRole("textbox", { name: "Search open data" })
     .fill(E2E_CATALOG_SEARCH_WORD, { timeout: LONG_WAIT });
@@ -177,7 +184,7 @@ async function _openTaxiListingAndChooseItsKeyword(page: Page): Promise<void> {
 }
 
 test.describe("Open data catalog filters", () => {
-  test("narrows the catalog by publisher, agency, and keyword, and clearing them restores every match", async ({
+  test("narrows the catalog by publisher, agency, and keyword, clearing them restores every match, and a keyword can be picked from the rail", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -222,9 +229,7 @@ test.describe("Open data catalog filters", () => {
 
       await _openTaxiListingAndChooseItsKeyword(page);
       await expect(
-        rail
-          .getByRole("group", { name: "Keywords" })
-          .getByRole("button", { name: "Remove keyword e2e-taxi" }),
+        rail.getByRole("button", { name: "Remove e2e-taxi" }),
       ).toBeVisible();
       await _expectNumResults({ page, numResults: 1 });
 
@@ -234,9 +239,17 @@ test.describe("Open data catalog filters", () => {
         .click();
       await _expectNumResults({ page, numResults: 3 });
       await expect(agencyFacet).toHaveCount(0);
-      await expect(rail.getByRole("group", { name: "Keywords" })).toHaveCount(
-        0,
-      );
+      await expect(
+        rail.getByRole("button", { name: "Remove e2e-taxi" }),
+      ).toHaveCount(0);
+
+      await _pickFacetOption({
+        page,
+        facet: rail.getByRole("combobox", { name: "Keywords" }),
+        search: "ferry",
+        optionName: /^e2e-ferry\b/,
+      });
+      await _expectNumResults({ page, numResults: 1 });
     } finally {
       await _deleteE2ECatalogFixtures(admin);
     }

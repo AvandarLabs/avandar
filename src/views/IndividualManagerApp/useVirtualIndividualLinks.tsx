@@ -8,10 +8,11 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { Individual } from "$/models/ontology/Individual/Individual";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { NavLinkProps } from "@avandar/ui";
 import type { CSSProperties, RefObject } from "react";
 
-const ROW_HEIGHT_PX = 50;
+const ROW_HEIGHT_PX = 64;
 
 /**
  * One row of the virtualized records list: a record link, the trailing
@@ -26,6 +27,8 @@ export type VirtualIndividualLink =
 type Options = {
   concept: Concept.T;
   statusesById: ReadonlyMap<ConceptStatus.Id, ConceptStatus.T>;
+  /** The workspace's members by user id. `undefined` while they load. */
+  membersById: ReadonlyMap<string, UserProfile.WithRole> | undefined;
   allIndividuals: readonly Individual.T[];
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
@@ -39,7 +42,35 @@ type MakeVirtualLinkOptions = {
   concept: Concept.T;
   workspaceSlug: string;
   loadingText: string;
+  membersById: ReadonlyMap<string, UserProfile.WithRole> | undefined;
+  unassignedText: string;
+  formerMemberText: string;
 };
+
+/**
+ * Who a record is assigned to, as its row's second line. Omitted while the
+ * members load, since a name cannot be told from a former member until then.
+ */
+function _makeAssigneeDescription(
+  individual: Individual.T,
+  options: Readonly<
+    Pick<
+      MakeVirtualLinkOptions,
+      "membersById" | "unassignedText" | "formerMemberText"
+    >
+  >,
+): string | undefined {
+  const { membersById, unassignedText, formerMemberText } = options;
+  if (membersById === undefined) {
+    return undefined;
+  }
+  if (!individual.assignedTo) {
+    return unassignedText;
+  }
+  return (
+    membersById.get(individual.assignedTo)?.displayName ?? formerMemberText
+  );
+}
 
 function _makeVirtualLink(
   options: Readonly<MakeVirtualLinkOptions>,
@@ -70,6 +101,7 @@ function _makeVirtualLink(
   return {
     ...appLink,
     label: appLink.label(),
+    description: _makeAssigneeDescription(individual, options),
     // The dot is the row's only mark of its status, so it is announced by
     // the status name.
     leftSection: status ? (
@@ -123,7 +155,7 @@ export function useVirtualIndividualLinks(options: Readonly<Options>): {
     fetchNextPage,
   ]);
 
-  const { concept, statusesById } = options;
+  const { concept, statusesById, membersById } = options;
   const individualLinks = useMemo(() => {
     return virtualRows.map((virtualRow) => {
       return _makeVirtualLink({
@@ -133,9 +165,20 @@ export function useVirtualIndividualLinks(options: Readonly<Options>): {
         concept,
         workspaceSlug: workspace.slug,
         loadingText: t`Loading more...`,
+        membersById,
+        unassignedText: t`Unassigned`,
+        formerMemberText: t`Former member`,
       });
     });
-  }, [virtualRows, allIndividuals, statusesById, concept, workspace.slug, t]);
+  }, [
+    virtualRows,
+    allIndividuals,
+    statusesById,
+    membersById,
+    concept,
+    workspace.slug,
+    t,
+  ]);
 
   return {
     parentRef,

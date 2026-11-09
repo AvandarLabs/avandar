@@ -42,6 +42,7 @@ export const EMPTY_CATALOG_FACETS: Readonly<CatalogFacets> = {
   organization2: [],
   organization2Labels: [],
   domains: [],
+  tags: [],
   formats: [],
   updatedWithin: { any: 0, pastMonth: 0, pastYear: 0, overAYear: 0 },
   numUnloadable: 0,

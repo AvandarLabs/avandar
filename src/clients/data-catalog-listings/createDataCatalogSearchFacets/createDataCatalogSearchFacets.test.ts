@@ -50,6 +50,18 @@ describe("createDataCatalogSearchFacets", () => {
     ]);
   });
 
+  it("reads the keywords", () => {
+    const facets = createDataCatalogSearchFacets([
+      _row("tag", "taxi", 40),
+      _row("tag", "for hire", 12),
+    ]);
+
+    expect(facets.tags).toEqual([
+      { value: "taxi", count: 40 },
+      { value: "for hire", count: 12 },
+    ]);
+  });
+
   it("lists the labels with the most listings first", () => {
     const facets = createDataCatalogSearchFacets([
       _row("organization2_label", "Department", 2),
@@ -93,10 +105,33 @@ describe("createDataCatalogSearchFacets", () => {
       organization2: [],
       organization2Labels: [],
       domains: [],
+      tags: [],
       formats: [],
       updatedWithin: { any: 0, pastMonth: 0, pastYear: 0, overAYear: 0 },
       numUnloadable: 0,
       numCatalogListings: 0,
     });
+  });
+
+  it("reads the JSON array the RPC returns", () => {
+    const facets = createDataCatalogSearchFacets(
+      JSON.parse(
+        '[{"facet": "source", "value": "World Bank", "listing_count": 40},' +
+          ' {"facet": "catalog", "value": null, "listing_count": 5012}]',
+      ),
+    );
+
+    expect(facets.sources).toEqual([{ value: "World Bank", count: 40 }]);
+    expect(facets.numCatalogListings).toBe(5012);
+  });
+
+  it("counts zero for every facet when the RPC returns null", () => {
+    expect(createDataCatalogSearchFacets(null).numCatalogListings).toBe(0);
+  });
+
+  it("throws when the RPC returns something other than facet rows", () => {
+    expect(() => {
+      return createDataCatalogSearchFacets([{ facet: "source" }]);
+    }).toThrow();
   });
 });

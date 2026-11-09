@@ -2,7 +2,7 @@
 
 -- Filters and sort on `rpc_data_catalog_listings__search`, and the facet
 -- counts `rpc_data_catalog_listings__search_facets` reports for the same
--- narrowing. Tested together because each facet must count exactly what its
+-- narrowing, read row by row from `data_catalog_listings__search_facet_rows`. Tested together because each facet must count exactly what its
 -- filter would keep.
 --
 -- Fixtures: four listings named with a made-up word ("plimbrook") so every
@@ -77,7 +77,7 @@ values
    null, null,
    'e9007002-0000-4000-8000-000000000002'::uuid);
 
-select plan(43);
+select plan(50);
 
 -- Search filters
 
@@ -181,7 +181,7 @@ select throws_ok(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(p_query => 'plimbrook')
+    from public.data_catalog_listings__search_facet_rows(p_query => 'plimbrook')
     where facet = 'source'$$,
   $$values ('Fixture North Agency'::text, 2::bigint),
            ('Fixture South Agency', 2)$$,
@@ -190,7 +190,7 @@ select bag_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(p_query => 'plimbrook')
+    from public.data_catalog_listings__search_facet_rows(p_query => 'plimbrook')
     where facet = 'format'$$,
   $$values ('PARQUET'::text, 2::bigint), ('CSV', 1), ('JSON', 1)$$,
   'the format facet counts each format''s matches'
@@ -198,7 +198,7 @@ select bag_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(p_query => 'plimbrook')
+    from public.data_catalog_listings__search_facet_rows(p_query => 'plimbrook')
     where facet = 'updated_within'$$,
   $$values ('any'::text, 4::bigint), ('past_month', 2), ('past_year', 3),
            ('over_a_year', 1)$$,
@@ -207,15 +207,23 @@ select bag_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(p_query => 'plimbrook')
+    from public.data_catalog_listings__search_facet_rows(p_query => 'plimbrook')
     where facet = 'unloadable'$$,
   $$values (1::bigint)$$,
   'the unloadable count is the listings loadable-only would hide'
 );
 
+select bag_eq(
+  $$select value, listing_count
+    from public.data_catalog_listings__search_facet_rows(p_query => 'plimbrook')
+    where facet = 'tag'$$,
+  $$values ('gribbleweed'::text, 2::bigint), ('snorfle', 2)$$,
+  'the keyword facet counts each keyword''s matches'
+);
+
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(p_query => 'plimbrook')
+    from public.data_catalog_listings__search_facet_rows(p_query => 'plimbrook')
     where facet = 'catalog'$$,
   $$select count(*) from public.data_catalog_listings$$,
   'the catalog row is the size of the whole catalog, unsearched'
@@ -225,7 +233,7 @@ select results_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_sources => array['Fixture North Agency'],
       p_is_loadable_only => true)
     where facet = 'source'$$,
@@ -236,7 +244,7 @@ select bag_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_sources => array['Fixture North Agency'],
       p_is_loadable_only => true)
     where facet = 'format'$$,
@@ -246,7 +254,7 @@ select bag_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_sources => array['Fixture East Agency'])
     where facet = 'source' and value = 'Fixture East Agency'$$,
   $$values (0::bigint)$$,
@@ -361,7 +369,7 @@ select results_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_tags => array['gribbleweed'],
       p_organization2_names => array['Quillfen Office'])
     where facet = 'organization2'$$,
@@ -371,7 +379,7 @@ select bag_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_organization2_names => array['Glimmerholt Office'])
     where facet = 'organization2' and value = 'Glimmerholt Office'$$,
   $$values (0::bigint)$$,
@@ -380,7 +388,7 @@ select results_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_sources => array['Fixture North Agency'],
       p_organization2_names => array['Drellmoor Office'])
     where facet = 'organization2_label'$$,
@@ -390,7 +398,7 @@ select bag_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_domains => array['Murkonomy'],
       p_sources => array['Fixture North Agency'])
     where facet = 'domain'$$,
@@ -400,7 +408,7 @@ select bag_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_domains => array['Nothingology'])
     where facet = 'domain' and value = 'Nothingology'$$,
   $$values (0::bigint)$$,
@@ -409,7 +417,7 @@ select results_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_tags => array['snorfle'])
     where facet = 'source'$$,
   $$values ('Fixture North Agency'::text, 1::bigint),
@@ -419,7 +427,7 @@ select bag_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_organization2_names => array['Quillfen Office'])
     where facet = 'format'$$,
   $$values ('PARQUET'::text, 1::bigint)$$,
@@ -428,7 +436,7 @@ select bag_eq(
 
 select bag_eq(
   $$select value, listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_domains => array['Zanthology'])
     where facet = 'updated_within'$$,
   $$values ('any'::text, 2::bigint), ('past_month', 1), ('past_year', 2),
@@ -438,11 +446,52 @@ select bag_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'plimbrook', p_tags => array['snorfle'])
     where facet = 'unloadable'$$,
   $$values (0::bigint)$$,
   'the unloadable count applies the keyword filter'
+);
+
+select bag_eq(
+  $$select value, listing_count
+    from public.data_catalog_listings__search_facet_rows(
+      p_query => 'plimbrook', p_tags => array['snorfle'],
+      p_sources => array['Fixture North Agency'])
+    where facet = 'tag'$$,
+  $$values ('gribbleweed'::text, 1::bigint), ('snorfle', 1)$$,
+  'the keyword facet counts each keyword over every filter but its own'
+);
+
+select results_eq(
+  $$select listing_count
+    from public.data_catalog_listings__search_facet_rows(
+      p_query => 'plimbrook', p_tags => array['nothingweed'])
+    where facet = 'tag' and value = 'nothingweed'$$,
+  $$values (0::bigint)$$,
+  'a chosen keyword with no matches is still listed'
+);
+
+-- The RPC's single value
+
+select results_eq(
+  $$select facet_row.facet, facet_row.value, facet_row.listing_count
+    from jsonb_to_recordset(
+      public.rpc_data_catalog_listings__search_facets(
+        p_query => 'plimbrook', p_tags => array['snorfle'])
+    ) as facet_row (facet text, value text, listing_count bigint)$$,
+  $$select facet, value, listing_count
+    from public.data_catalog_listings__search_facet_rows(
+      p_query => 'plimbrook', p_tags => array['snorfle'])$$,
+  'the RPC returns every facet row, in order, as one JSON array'
+);
+
+select results_eq(
+  $$select public.rpc_data_catalog_listings__search_facets(
+    p_query => 'zzzz-no-listing-matches-this', p_is_loadable_only => true)
+    @> '[{"facet": "catalog"}]'::jsonb$$,
+  $$values (true)$$,
+  'the RPC still returns the catalog count when nothing matches'
 );
 
 -- Privileges
@@ -463,6 +512,24 @@ select ok(
     'execute'
   ),
   'a signed-out visitor may not count the catalog''s facets'
+);
+
+select ok(
+  has_function_privilege(
+    'authenticated',
+    'public.data_catalog_listings__search_facet_rows(text, text[], text[], text, boolean, text[], text[], text[])',
+    'execute'
+  ),
+  'a signed-in user may count the facet rows the RPC runs as them'
+);
+
+select ok(
+  not has_function_privilege(
+    'anon',
+    'public.data_catalog_listings__search_facet_rows(text, text[], text[], text, boolean, text[], text[], text[])',
+    'execute'
+  ),
+  'a signed-out visitor may not count the facet rows'
 );
 
 set local role authenticated;

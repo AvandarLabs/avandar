@@ -71,14 +71,14 @@ export const DataCatalogListingClient = createUsableServiceClient(
           const logger = clientLogger.appendName("searchFacets");
           logger.log("Counting catalog facets", { query, filters });
 
-          const { data: dbRows } = await dbClient
+          const { data: dbFacetRows } = await dbClient
             .rpc("rpc_data_catalog_listings__search_facets", {
               p_query: query,
               ...buildDataCatalogSearchFilterArgs(filters),
             })
             .throwOnError();
 
-          return createDataCatalogSearchFacets(dbRows ?? []);
+          return createDataCatalogSearchFacets(dbFacetRows);
         },
       };
     },

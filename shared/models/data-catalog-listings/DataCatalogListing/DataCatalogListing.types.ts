@@ -286,6 +286,9 @@ export type DataCatalogListingSearchFacets = {
 
   /** Subject areas the listings in view are filed under. */
   domains: DataCatalogListingFacetOption[];
+
+  /** The sources' free-form keywords on the listings in view. */
+  tags: DataCatalogListingFacetOption[];
   formats: DataCatalogListingFacetOption[];
   updatedWithin: Record<DataCatalogListingUpdatedWithin, number>;
 

@@ -9,21 +9,21 @@ import type { ReactNode } from "react";
 type Props = {
   isLoading: boolean;
   hasRecords: boolean;
-  /** Whether a status filter is narrowing the list. */
-  isFiltered: boolean;
+  /** What to say when no record matches. Defaults to "No records yet". */
+  emptyMessage?: ReactNode;
   links: readonly VirtualIndividualLink[];
   listHeight: number;
 };
 
 /**
  * The body of the records list: a skeleton while the first page loads, an
- * empty state that says whether the filter or the case type is empty, or the
+ * empty state that says whether a filter or the case type is empty, or the
  * virtualized rows.
  */
 export function IndividualNavbarRows({
   isLoading,
   hasRecords,
-  isFiltered,
+  emptyMessage,
   links,
   listHeight,
 }: Readonly<Props>): ReactNode {
@@ -47,11 +47,7 @@ export function IndividualNavbarRows({
           className={css.individualNavbarEmptyIcon}
         />
         <Text size="sm" c="dimmed">
-          {isFiltered ? (
-            <Trans>No records have these statuses</Trans>
-          ) : (
-            <Trans>No records yet</Trans>
-          )}
+          {emptyMessage ?? <Trans>No records yet</Trans>}
         </Text>
       </Stack>
     );

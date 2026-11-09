@@ -2712,6 +2712,23 @@ export type Database = {
         Args: { p_last_updated_at: string; p_updated_within: string }
         Returns: boolean
       }
+      data_catalog_listings__search_facet_rows: {
+        Args: {
+          p_domains?: string[]
+          p_formats?: string[]
+          p_is_loadable_only?: boolean
+          p_organization2_names?: string[]
+          p_query: string
+          p_sources?: string[]
+          p_tags?: string[]
+          p_updated_within?: string
+        }
+        Returns: {
+          facet: string
+          listing_count: number
+          value: string
+        }[]
+      }
       data_catalog_listings__search_matches: {
         Args: {
           p_domains: string[]
@@ -2985,11 +3002,7 @@ export type Database = {
           p_tags?: string[]
           p_updated_within?: string
         }
-        Returns: {
-          facet: string
-          listing_count: number
-          value: string
-        }[]
+        Returns: Json
       }
       rpc_data_catalog_listings__upsert_with_relation_columns: {
         Args: { p_listings: Json }

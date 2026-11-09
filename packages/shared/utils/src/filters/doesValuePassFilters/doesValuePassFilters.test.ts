@@ -15,4 +15,10 @@ describe("doesValuePassFilters", () => {
   it('returns false when "in" receives a non-array', () => {
     expect(doesValuePassFilters("foo", "in", "foo")).toBe(false);
   });
+
+  it("treats is as a null check", () => {
+    expect(doesValuePassFilters(null, "is", null)).toBe(true);
+    expect(doesValuePassFilters(undefined, "is", null)).toBe(true);
+    expect(doesValuePassFilters("user-1", "is", null)).toBe(false);
+  });
 });

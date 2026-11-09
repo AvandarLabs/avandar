@@ -281,8 +281,12 @@ with no writer or UI.
     referenced; faster search (split blank and non-blank queries, trigram
     indexes); a case Status fact once status sets exist (P5c.4); comments,
     saved queries, and catalog listings as gadgets.
-- P5c.3 `[NEW]` **Assignment**: assign a case (ABox) to a user/user-group;
-  persist `assignedTo`; "assigned to me" views.
+- P5c.3 `[NEW]` **Assignment**: one workspace member per record, or
+  unassigned. A Case Records editor sets it from the record header. "Assigned
+  to me" is a sidebar queue across case types, and a case type's record list
+  filters by assignee. Spec:
+  `docs/superpowers/specs/2026-11-08-individual-assignment-design.md`.
+  User groups stay out of this slice.
 - P5c.4 `[DONE, except history]` **Status workflow**: set/track status from the
   configurable set (P5b.1). A record's status changes from the record page,
   with each status's description on hover; status is a column in the Data
@@ -294,10 +298,14 @@ with no writer or UI.
   kind written by a trigger; the feed and table already exist (P5c.2).
 - P5c.6 `[PARTIAL]` ABox **list/grid view** with filtering by status/assignee.
   Done: the records list filters by status and counts the matching records.
-  Not done: filtering by assignee, which waits on assignment (P5c.3).
+  The assignee filter ships with assignment (P5c.3), not as a later pass.
 - P5c.7 `[NEW]` Manual case creation + edit (uses P5.4 manual_entry).
-- P5c.8 `[NEW]` Notifications for assignment/mention/status change (reuse email
-  client / in-app). Mention notifications read `comment_mentions`.
+- P5c.8 `[NEW]` **Notifications and email.** Out of the assignment demo
+  on purpose. After a record is assigned, a person is mentioned, or a status
+  changes, notify the people involved in the app and by email, reusing the
+  existing email client. Mention notifications read `comment_mentions`.
+  Assignment (P5c.3) persists the assignee and shows it. It does not send
+  anything.
 - P5c.9 `[NEW]` **Case change history**: record who changed what on a case and
   when, across status, assignment, and edits, and show it on the record page.
   Covers the status change history left out of P5c.4 and feeds P5c.5. Kept out
@@ -640,9 +648,11 @@ even if later, deeper items are still stabilizing on demo day. Land these first:
    on already-built `resource_shares`; finish the UX and "shared with me".
 3. **Guests, minimal (P4.1–P4.4)** - view-only guest to a single dashboard.
    High demo value ("invite a field partner to just this dashboard").
-4. **Case management thin slice (P5c.1 lite, P5c.2, P5c.3, P5c.4 with P5b.1)** -
-   comments + assignment + configurable statuses on individuals, LLM-generated
-   case type for the cholera example. Backend-wire the existing stubs.
+4. **Case management thin slice (P5c.1 lite, P5c.2, P5c.4 with P5b.1, then
+   P5c.3)** - comments and configurable statuses are in. Assignment is next:
+   one workspace member per record, an Assigned to me queue, and an assignee
+   filter. Notifications and email stay P5c.8 and are not required for the
+   demo. LLM-generated case type for the cholera example remains P5c.1.
 5. **GIS points, cleaned up (P7.1) + plot cases/dataset on a map** - drop
    choropleth/multi-layer for the demo; a clean point map of cases is enough.
 6. **Google Sheets re-enabled (P6.1)** - live field-data intake story; code is

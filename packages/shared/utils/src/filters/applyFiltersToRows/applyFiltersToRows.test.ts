@@ -32,4 +32,26 @@ describe("applyFiltersToRows", () => {
   it("returns input when filters are empty", () => {
     expect(applyFiltersToRows(data, {})).toBe(data);
   });
+
+  it("keeps rows whose column is null when the filter is is", () => {
+    const rows = [
+      { id: "1", assignee: null },
+      { id: "2", assignee: "user-1" },
+    ];
+
+    expect(applyFiltersToRows(rows, { assignee: { is: null } })).toEqual([
+      { id: "1", assignee: null },
+    ]);
+  });
+
+  it("keeps nulls when is is written in the operator shape", () => {
+    const rows = [
+      { id: "1", assignee: null },
+      { id: "2", assignee: "user-1" },
+    ];
+
+    expect(applyFiltersToRows(rows, { is: [["assignee", null]] })).toEqual([
+      { id: "1", assignee: null },
+    ]);
+  });
 });

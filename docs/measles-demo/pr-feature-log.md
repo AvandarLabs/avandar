@@ -1339,6 +1339,7 @@ commits belong to the features that own them, not here.
 | `6c43b5a65` | chore(catalog): apply the formatter to the results header test | Formatting: take the final file |
 | `d7fd436a8` | fix(catalog): keep the source record as the source sent it | All of it |
 | `bc4baf853` | test(catalog): filter the open data catalog by publisher, agency, and keyword end to end | All of it |
+| `ad6d300a7` | feat(catalog): offer keywords in the rail and return every facet in one value | All of it. Supersedes `d90481335`'s Keywords chips (`DataCatalogKeywordFacet.tsx` is deleted) and moves the facet rows into `52.data_catalog_listings__search_facet_rows.sql`, with the RPC in `53.`. Regenerate the migration, types, desktop migration, and `.po` catalogs. |
 
 *Docs, which go with F9:*
 
@@ -1385,7 +1386,10 @@ the second after it. Both land after F16, F17 and F19's migrations. Then
 (hand-written: the diff cannot change a function's return type) and
 `20261109020622_catalog_additional_source_metadata.sql` (generated after it;
 its `drop column source_metadata` is intended, since the old values hold
-mapped fields the new column must not).
+mapped fields the new column must not). Last,
+`20261109041614_catalog_facets_as_one_value_with_keywords.sql` (generated:
+it drops the row-returning facet RPC and recreates it returning `jsonb`, over
+the new `data_catalog_listings__search_facet_rows`).
 
 **Verification:**
 ```sh
@@ -1397,8 +1401,10 @@ pnpm exec tsc -b --force
 pnpm test:e2e data-catalog-filters.spec.ts
 ava pipeline run socrata --local --limit 20   # local stack only: rows carry organization1_name to 3, domains, tags
 ```
-Then open the Open data tab with a few hundred listings: choose a publisher,
-then its agency, then click a keyword on a listing, and clear the filters.
+Then open the Open data tab with a few hundred listings: before typing,
+Publisher and Keywords are offered. Choose a publisher, then its agency, then
+click a keyword on a listing, clear the filters, and pick a keyword from the
+Keywords facet.
 
 **Rollout:** Deploy the two migrations, the frontend, and the
 pipeline-server together, with no pipeline run in between. An old
@@ -1437,6 +1443,12 @@ rejects the new listing shape, so the catalog would not load.
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
   manually.
+- The facet RPC with nothing searched took 5.2s on the demo catalog (196k
+  listings) on 2026-11-08, before the keyword facet, which adds about 1s.
+  `authenticated` has an 8s `statement_timeout`, and a timed-out facet call
+  leaves the rail with no facets. With nothing searched it also returns
+  every keyword (6,443 on demo) on each filter change. Consider caching the
+  blank-search counts or capping the keyword options.
 
 ---
 

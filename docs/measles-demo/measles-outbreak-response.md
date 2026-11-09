@@ -567,9 +567,14 @@ tracked as P5b/P5c in `docs/production-plan-world-humanitarian-day.md`:
   defaulted to `'active'`; there is no `Suspected -> Probable -> Confirmed`
   pipeline, just a column a workspace member could type anything into.
   (P5b.1.)
-- **No assignment UI or persistence beyond a bare column.**
-  `Individual.assigned_to` exists in the schema with no writer and no "my
-  caseload" view. (P5c.3.)
+- **Assignment is a column with no writer and no queue.**
+  `individuals.assigned_to` references a user and Sync leaves it alone, and
+  nothing in the UI sets it or lists a person's caseload. The demo slice
+  (P5c.3,
+  `docs/superpowers/specs/2026-11-08-individual-assignment-design.md`)
+  makes a record assignable to one workspace member and adds an Assigned to
+  me view plus an assignee filter. In-app notifications and email stay on
+  the roadmap as P5c.8. They are not part of the demo.
 - **No comments or activity log.** At the snapshot date the record page's
   comment block called `notifyNotImplemented`. Comments have since shipped
   (P5c.2, see `docs/measles-demo/case-activity-architecture.md`). The audit log of case

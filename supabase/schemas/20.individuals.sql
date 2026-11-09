@@ -217,3 +217,67 @@ from
 create trigger tr_individuals__check_status_change before insert or
 update of status_id on public.individuals for each row
 execute function public.individuals__check_status_change ();
+
+/**
+ * Refuses an assignee change by a signed-in user who is not a Case Records
+ * editor, and refuses an assignee who is not a member of the record's
+ * workspace. RLS lets Case Types editors update records so they can sync
+ * them, and a policy cannot single out one column, so this trigger guards
+ * `assigned_to`.
+ *
+ * An insert that leaves the assignee empty passes, which is how Sync inserts
+ * a record. Only Data API requests (`current_user = 'authenticated'`) are
+ * checked. `service_role` is trusted.
+ */
+create or replace function public.individuals__check_assignment_change () returns trigger language plpgsql
+set
+  search_path = '' as $$
+begin
+  if current_user <> 'authenticated' then
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE' and new.assigned_to is not distinct from old.assigned_to then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' and new.assigned_to is null then
+    return new;
+  end if;
+
+  if not public.util__auth_user_meets_min_app_role (
+    new.workspace_id,
+    'case_records'::public.app_type,
+    'editor'::public.role_level
+  ) then
+    raise exception 'Only Case Records editors can assign a record'
+      using errcode = '42501', hint = 'case_records_editor_required';
+  end if;
+
+  if new.assigned_to is not null and not exists (
+    select 1
+    from public.workspace_memberships membership
+    where membership.workspace_id = new.workspace_id
+      and membership.user_id = new.assigned_to
+  ) then
+    raise exception 'A record can only be assigned to a member of its workspace'
+      using errcode = '23514', hint = 'assignee_not_in_workspace';
+  end if;
+
+  return new;
+end;
+$$;
+
+revoke
+execute on function public.individuals__check_assignment_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr_individuals__check_assignment_change before insert or
+update of assigned_to on public.individuals for each row
+execute function public.individuals__check_assignment_change ();
+
+create index idx_individuals__workspace_id_assigned_to on public.individuals (workspace_id, assigned_to);

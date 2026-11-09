@@ -1,70 +1,13 @@
-/**
- * What each of the catalog's filters would keep, for a search and the
- * filters already chosen. Each facet is counted against every other filter
- * but not its own, so choosing one source never makes the other sources read
- * as empty.
- *
- * Matching and filtering are `data_catalog_listings__search_matches`'s, so
- * these counts always agree with the pages `rpc_data_catalog_listings__search`
- * returns for the same arguments.
- *
- * Facets:
- *
- * `source`: one row per level-1 organization with matches, plus each
- * chosen source even at 0, so a user can always unchoose what they chose.
- *
- * `format`: one row per upper-cased file format, plus each chosen format even
- * at 0. Listings with no format are not counted.
- *
- * `organization2`: one row per level-2 organization with matches, plus each
- * chosen level-2 organization even at 0. Listings with no level 2 are not
- * counted.
- *
- * `organization2_label`: one row per name the matching listings' drives give
- * level 2 (`data_catalog_drives.organization2_label`), counted over the same
- * listings as `organization2`, so the catalog can label that filter.
- *
- * `domain`: one row per topic with matches, plus each chosen topic even at
- * 0. A listing counts once under each of its topics, even when its source
- * repeats one.
- *
- * `updated_within`: one row per window (`any`, `past_month`, `past_year`,
- * `over_a_year`). The windows are cumulative.
- *
- * `unloadable`: one row, `value` null, counting the listings that cannot be
- * loaded and that loadable-only would hide.
- *
- * `catalog`: one row, `value` null, counting every listing in the catalog,
- * unsearched and unfiltered, so the list can say how much it narrowed.
- *
- * @param p_query What the user typed. Accepts `websearch_to_tsquery` syntax.
- * @param p_sources Level-1 organizations (`organization1_name`) chosen. Empty
- * keeps every source.
- * @param p_formats Upper-cased file formats chosen. Empty keeps every format.
- * @param p_updated_within `any`, `past_month`, `past_year`, or `over_a_year`.
- * Any other value raises `22023` (invalid parameter value).
- * @param p_is_loadable_only Whether listings that cannot be loaded are hidden.
- * @param p_organization2_names Level-2 organizations (`organization2_name`)
- * chosen. Empty keeps every level-2 organization.
- * @param p_domains Topics chosen. Empty keeps every topic.
- * @param p_tags Keywords chosen. Empty keeps every keyword.
- *
- * @returns Facet rows ordered by facet, then most listings first, then value.
- */
-create or replace function public.rpc_data_catalog_listings__search_facets (
-  p_query text,
-  p_sources text[] default '{}',
-  p_formats text[] default '{}',
-  p_updated_within text default 'any',
-  p_is_loadable_only boolean default false,
-  p_organization2_names text[] default '{}',
-  p_domains text[] default '{}',
-  p_tags text[] default '{}'
-) returns table (
-  facet text,
-  value text,
-  listing_count bigint
-) as $$
+drop function if exists "public"."rpc_data_catalog_listings__search_facets"(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]);
+
+set check_function_bodies = off;
+
+CREATE OR REPLACE FUNCTION public.data_catalog_listings__search_facet_rows(p_query text, p_sources text[] DEFAULT '{}'::text[], p_formats text[] DEFAULT '{}'::text[], p_updated_within text DEFAULT 'any'::text, p_is_loadable_only boolean DEFAULT false, p_organization2_names text[] DEFAULT '{}'::text[], p_domains text[] DEFAULT '{}'::text[], p_tags text[] DEFAULT '{}'::text[])
+ RETURNS TABLE(facet text, value text, listing_count bigint)
+ LANGUAGE sql
+ STABLE
+ SET search_path TO ''
+AS $function$
   with
     match as (
       select
@@ -197,6 +140,30 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
         unnest(coalesce(p_domains, '{}')) as chosen (value)
       union all
       select
+        'tag',
+        listing_tag.value,
+        count(distinct match.id)
+      from
+        match
+        cross join unnest(match.tags) as listing_tag (value)
+      where
+        match.passes_source and
+        match.passes_format and
+        match.passes_updated and
+        match.passes_loadable and
+        match.passes_organization2 and
+        match.passes_domain
+      group by
+        listing_tag.value
+      union all
+      select
+        'tag',
+        chosen.value,
+        0
+      from
+        unnest(coalesce(p_tags, '{}')) as chosen (value)
+      union all
+      select
         'updated_within',
         update_window.name,
         count(match.id)
@@ -250,35 +217,53 @@ create or replace function public.rpc_data_catalog_listings__search_facets (
     facet_counts.facet,
     max(facet_counts.listing_count) desc,
     facet_counts.value;
-$$ language sql stable security invoker
-set
-  search_path = '';
+$function$
+;
 
--- `authenticated` only, like the search it counts for.
-revoke all on function public.rpc_data_catalog_listings__search_facets (
-  text,
-  text[],
-  text[],
-  text,
-  boolean,
-  text[],
-  text[],
-  text[]
-)
-from
-  public,
-  anon,
-  authenticated,
-  service_role;
+CREATE OR REPLACE FUNCTION public.rpc_data_catalog_listings__search_facets(p_query text, p_sources text[] DEFAULT '{}'::text[], p_formats text[] DEFAULT '{}'::text[], p_updated_within text DEFAULT 'any'::text, p_is_loadable_only boolean DEFAULT false, p_organization2_names text[] DEFAULT '{}'::text[], p_domains text[] DEFAULT '{}'::text[], p_tags text[] DEFAULT '{}'::text[])
+ RETURNS jsonb
+ LANGUAGE sql
+ STABLE
+ SET search_path TO ''
+AS $function$
+  select
+    coalesce(
+      jsonb_agg(
+        jsonb_build_object(
+          'facet',
+          facet_row.facet,
+          'value',
+          facet_row.value,
+          'listing_count',
+          facet_row.listing_count
+        )
+        order by
+          facet_row.row_num
+      ),
+      '[]'::jsonb
+    )
+  from
+    public.data_catalog_listings__search_facet_rows (
+      p_query,
+      p_sources,
+      p_formats,
+      p_updated_within,
+      p_is_loadable_only,
+      p_organization2_names,
+      p_domains,
+      p_tags
+    )
+  with
+    ordinality as facet_row (facet, value, listing_count, row_num);
+$function$
+;
 
-grant
-execute on function public.rpc_data_catalog_listings__search_facets (
-  text,
-  text[],
-  text[],
-  text,
-  boolean,
-  text[],
-  text[],
-  text[]
-) to authenticated;
+
+
+-- Privileges that `supabase db diff` cannot see: default, schema, column,
+-- and view grants. Appended by `pnpm db:new-migration` from what
+-- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
+revoke all privileges on function public.data_catalog_listings__search_facet_rows(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.data_catalog_listings__search_facet_rows(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]) to "authenticated";
+revoke all privileges on function public.rpc_data_catalog_listings__search_facets(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_data_catalog_listings__search_facets(p_query text, p_sources text[], p_formats text[], p_updated_within text, p_is_loadable_only boolean, p_organization2_names text[], p_domains text[], p_tags text[]) to "authenticated";

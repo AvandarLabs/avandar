@@ -16,5 +16,8 @@ export function doesValuePassFilters(
       }
       return false;
     })
+    .with("is", () => {
+      return value == null && targetValue == null;
+    })
     .exhaustive();
 }

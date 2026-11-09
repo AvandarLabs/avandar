@@ -113,7 +113,7 @@ The returned client exposes the following methods (all return promises):
 | ------------------------ | ----------------------------------------------------------------- |
 | `getById({ id })`        | Single read by primary key. `id` may be nullish (returns `undefined`) |
 | `getCount({ where? })`   | Total row count matching the filter                               |
-| `getPage({ where?, pageSize, pageNum })` | One page of rows plus pagination metadata         |
+| `getPage({ where?, orderBy?, pageSize, pageNum })` | One page of rows plus pagination metadata         |
 | `getAll({ where?, batchSize? })`         | All rows, internally paginated                    |
 | `getOne({ where? })`     | First row matching the filter                                     |
 | `insert({ data, upsert?, onConflict? })` | Insert (or upsert) a single row                   |

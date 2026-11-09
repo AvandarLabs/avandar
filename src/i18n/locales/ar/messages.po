@@ -130,7 +130,7 @@ msgstr "قم بتشغيل استعلام لرؤية النتائج."
 msgid "Start (e.g. 2024-01-01)"
 msgstr "ابدأ (مثل 2024-01-01)"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Keywords"
 msgstr "الكلمات المفتاحية"
@@ -443,6 +443,10 @@ msgstr "من PDF"
 #: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
 msgid "Avandar {appVersion}"
 msgstr "Avandar {appVersion}"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records are unassigned"
+msgstr "لا توجد سجلات غير مُسنَدة"
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
@@ -862,9 +866,9 @@ msgstr "الفترة لـ {fieldName}"
 msgid "Rename"
 msgstr "إعادة التسمية"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
-msgid "Remove keyword {keyword}"
-msgstr "إزالة الكلمة المفتاحية {keyword}"
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Filter by assignee"
+msgstr "تصفية حسب المُسنَد إليه"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -1313,6 +1317,10 @@ msgid "Please check your email for a confirmation link. It may take a few "
 msgstr "يرجى التحقق من بريدك الإلكتروني للحصول على رابط التأكيد. قد يستغرق "
 "وصوله بضع دقائق."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+msgid "Assign to"
+msgstr "إسناد إلى"
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share “{resourceName}”"
@@ -1733,6 +1741,10 @@ msgstr "جارٍ تحميل الخطط..."
 msgid "User groups"
 msgstr "مجموعات المستخدمين"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "Assignment not changed"
+msgstr "لم يتغير الإسناد"
+
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "اكتب إجابتك..."
@@ -1957,7 +1969,7 @@ msgstr "الطابع الزمني"
 msgid "Y axis tick interval"
 msgstr "الفاصل بين تدريجات المحور Y"
 
-#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records have these statuses"
 msgstr "لا توجد سجلات بهذه الحالات"
 
@@ -3034,6 +3046,8 @@ msgstr "خطوة"
 #: src/components/RichText/RichTextView/RichTextView.tsx
 #: src/components/RichText/UserMention/UserMentionChip.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
 msgid "Former member"
 msgstr "عضو سابق"
 
@@ -3671,6 +3685,10 @@ msgid "No column in {0} was recognized as a coordinate by name. Pick the "
 msgstr "لم يتم التعرّف على أي عمود في {0} على أنه إحداثي بالاسم. اختر عمودي خط "
 "العرض وخط الطول أعلاه، أو اربط عمودًا هندسيًا بدلًا من ذلك."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+msgid "Assignee unavailable"
+msgstr "المُسنَد إليه غير متاح"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
 msgstr "أعد تعيين ملكية الموارد الخاصة أولًا"
@@ -3690,6 +3708,13 @@ msgstr "أفلت ملفًا هنا، أو انقر للاستعراض"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
 msgstr "اذهب إلى مستكشف البيانات"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
+msgid "Unassigned"
+msgstr "غير مُسنَدة"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
@@ -4131,6 +4156,7 @@ msgid "Date column for {fieldName}"
 msgstr "عمود التاريخ لـ {fieldName}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
 msgid "Show more"
 msgstr "إظهار المزيد"
 
@@ -4557,6 +4583,10 @@ msgstr "لا توجد حقول"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
 msgstr "فشل في تحديث اسم مساحة العمل"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Show every assignee"
+msgstr "عرض جميع المُسنَد إليهم"
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
@@ -5246,6 +5276,11 @@ msgstr "اسحب للاستيراد"
 msgid "Date range"
 msgstr "نطاق التاريخ"
 
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
+msgid "Assigned to me"
+msgstr "مُسنَدة إليّ"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "إضافة مجموعة البيانات إلى مساحة العمل"
@@ -5615,6 +5650,10 @@ msgstr "من مجموعة البيانات"
 msgid "End (e.g. 2024-12-31)"
 msgstr "النهاية (على سبيل المثال 2024-12-31)"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All keywords"
+msgstr "جميع الكلمات المفتاحية"
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"
 msgstr "فتح مربع لوحة المعلومات"
@@ -5764,6 +5803,7 @@ msgstr "إنشاء مساحة عمل"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
@@ -6230,6 +6270,10 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "لا توجد توضيحات بعد. يتم ملء السجل مع طرح الدردشة لأسئلة توضيحية."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+msgid "Assigned to"
+msgstr "مُسنَدة إلى"
+
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
@@ -6321,6 +6365,10 @@ msgstr "هذا هو مستكشف البيانات. اطرح سؤالًا بكل�
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "سياق"
+
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
+msgid "{count, plural, one {# record} other {# records}}"
+msgstr "{count, plural, one {# سجل} other {# سجلات}}"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -6860,6 +6908,10 @@ msgstr "تحرير التصنيف"
 msgid "all members of "
 msgstr "جميع الأعضاء في "
 
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "That person is not a member of this workspace."
+msgstr "هذا الشخص ليس عضوًا في مساحة العمل هذه."
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "يجب إدخال بعض البيانات يدويًا"
@@ -7106,6 +7158,10 @@ msgstr "وضع علامة «غير مكتمل»"
 msgid "Nothing you ask, and none of your data, leaves this computer."
 msgstr "لا يغادر هذا الكمبيوتر أي سؤال تطرحه أو أي من بياناتك."
 
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
+msgid "These records failed to load"
+msgstr "تعذّر تحميل هذه السجلات"
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "لم يتم تكوين أي حقول بعد"
@@ -7187,6 +7243,10 @@ msgstr "لوحات المعلومات الخاصة"
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
 msgstr "رفع"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+msgid "Assigned to: {label}"
+msgstr "مُسنَدة إلى: {label}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove {datasetName}"
@@ -7519,6 +7579,7 @@ msgstr "إنشاء مساحة عمل جديدة. يمكنك دائمًا تعد�
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
@@ -9619,6 +9680,10 @@ msgstr "تحرير مجموعة الأدوار"
 msgid "Profiles"
 msgstr "الملفات الشخصية"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records are assigned to this person"
+msgstr "لا توجد سجلات مُسنَدة إلى هذا الشخص"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "تحديث وإعادة نشر"
@@ -9849,6 +9914,7 @@ msgstr "شكرًا لاهتمامك!"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
 msgstr "نوع الحالة"
@@ -9866,6 +9932,7 @@ msgstr "مربع لوحة المعلومات"
 msgid "Source"
 msgstr "المصدر"
 
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
 msgstr "جارٍ تحميل السجلات"
@@ -10099,6 +10166,10 @@ msgstr "حذف الخريطة {0}"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
 msgstr "يُقرأ كـ"
+
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
+msgid "Nothing is assigned to you."
+msgstr "لا يوجد شيء مُسنَد إليك."
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid value column selected"
@@ -10472,6 +10543,10 @@ msgstr "يمكن لـ Google تصدير 10 ميغابايت كحد أقصى من
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "ما الحقل الذي يجب استخدامه كاسم لـ {singularConceptName}؟"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "You need Case Records editor access to assign a record."
+msgstr "تحتاج إلى صلاحية محرر سجلات الحالات لإسناد سجل."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
@@ -10857,6 +10932,10 @@ msgstr "عنصر لوحة معلومات غير متاح"
 msgid "Not reported"
 msgstr "لم يُبلّغ عنه"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Anyone"
+msgstr "أي شخص"
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve"
 msgstr "موافقة"
@@ -10870,6 +10949,10 @@ msgstr "مشاركة"
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "مجموعة البيانات الكاملة"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records match these filters"
+msgstr "لا تتطابق أي سجلات مع هذه الفلاتر"
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Or"
@@ -11119,6 +11202,10 @@ msgstr "العام الماضي"
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Week"
 msgstr "الأسبوع"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "The record keeps its previous assignee. Try again in a moment."
+msgstr "يحتفظ السجل بالمُسنَد إليه السابق. حاول مرة أخرى بعد قليل."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
