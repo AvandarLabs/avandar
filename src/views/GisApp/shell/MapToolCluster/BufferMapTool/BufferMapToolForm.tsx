@@ -67,6 +67,9 @@ function BufferDistanceFields({
       />
       <Select<MapLayer.BufferDistanceUnit>
         label={t`Unit`}
+        // Kept inside the popover: an option in a portal counts as a press
+        // outside it and would close the popover mid-pick.
+        comboboxProps={{ withinPortal: false }}
         w={88}
         allowDeselect={false}
         value={distanceUnit}
@@ -113,6 +116,9 @@ export function BufferMapToolForm({
       {labelColumnOptions.length > 0 ? (
         <Select<QueryColumn.Id>
           label={t`Label each ring with`}
+          // Kept inside the popover: an option in a portal counts as a press
+          // outside it and would close the popover mid-pick.
+          comboboxProps={{ withinPortal: false }}
           placeholder={t`No label`}
           clearable
           disabled={dissolve}

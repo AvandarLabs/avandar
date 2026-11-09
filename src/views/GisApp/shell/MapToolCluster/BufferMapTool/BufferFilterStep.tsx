@@ -52,6 +52,9 @@ function BufferFilterTargetPicker({
     <>
       <Select<MapLayer.Id>
         label={t`Filter another layer by this buffer`}
+        // Kept inside the popover: an option in a portal counts as a press
+        // outside it and would close the popover mid-pick.
+        comboboxProps={{ withinPortal: false }}
         // The confirm button that held focus is gone once this step shows.
         autoFocus
         placeholder={t`Pick a point layer`}

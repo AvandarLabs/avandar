@@ -102,6 +102,24 @@ async function _openBufferForm(): Promise<void> {
   await screen.findByRole("button", { name: "Confirm" });
 }
 
+/**
+ * Picks a Select option the way a pointer does: a mouse down before the
+ * click, which is what a popover listens to when it closes on outside
+ * presses.
+ */
+function _pressMantineSelectOption(
+  comboboxLabel: string,
+  optionLabel: string,
+): void {
+  fireEvent.click(screen.getByRole("combobox", { name: comboboxLabel }));
+  const option = screen.getByRole("option", {
+    name: optionLabel,
+    hidden: true,
+  });
+  fireEvent.mouseDown(option);
+  fireEvent.click(option);
+}
+
 describe("BufferMapTool", () => {
   beforeEach(() => {
     spatialAvailability.value = "unavailable";
@@ -325,6 +343,32 @@ describe("BufferMapTool", () => {
       bufferLayerId: buffer.id,
       targetLayerId: schools.id,
     });
+  });
+
+  it("stays open while a unit and a layer to filter are picked", async () => {
+    spatialAvailability.value = "available";
+    const sites = _createLatLngLayer("Sites");
+    const schools = _createLatLngLayer("Schools");
+    const buffer = _makeBufferOf(sites);
+    render(
+      <BufferMapTool
+        selectedLayer={sites}
+        layers={[sites, buffer, schools]}
+        onBufferConfirm={() => {
+          return buffer.id;
+        }}
+      />,
+    );
+
+    await _openBufferForm();
+    _pressMantineSelectOption("Unit", "mi");
+    expect(screen.getByRole("button", { name: "Confirm" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    _pressMantineSelectOption("Filter another layer by this buffer", "Schools");
+
+    expect(
+      screen.getByRole("button", { name: "Filter and show list" }),
+    ).toBeEnabled();
   });
 
   it("anchors the popover to the tool button", async () => {
