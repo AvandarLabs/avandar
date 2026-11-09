@@ -7,6 +7,7 @@ import { fireEvent, render, screen, within } from "@/test-utils";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { MapLayerFeatureList } from "@/clients/maps/MapLayerFeatureList/MapLayerFeatureList.types";
 import type { FeatureListQueryState } from "@/views/GisApp/panels/FeatureListDrawer/useFeatureListQuery";
+import type { ReactElement } from "react";
 
 const { useFeatureListQueryMock, downloadRowsAsCsvMock } = vi.hoisted(() => {
   return {
@@ -64,22 +65,31 @@ function _mockState(state: Partial<FeatureListQueryState>): void {
   });
 }
 
-function _renderDrawer(
-  onRowClick = vi.fn(),
-  options: { layer: MapLayer.T | undefined } = {
-    layer: MapLayer.makeEmpty("Schools"),
-  },
-): void {
-  render(
+const SCHOOLS_LAYER = MapLayer.makeEmpty("Schools");
+const WORKSPACE_ID = uuid<Workspace.Id>();
+const CANVAS_REF = createRef<HTMLDivElement>();
+
+function _makeDrawer(
+  onRowClick: (row: MapLayerFeatureList["rows"][number]) => void,
+  layer: MapLayer.T | undefined,
+): ReactElement {
+  return (
     <FeatureListDrawer
-      layer={options.layer}
+      layer={layer}
       config={AvaMapConfig.makeEmpty()}
-      workspaceId={uuid<Workspace.Id>()}
-      canvasRef={createRef<HTMLDivElement>()}
+      workspaceId={WORKSPACE_ID}
+      canvasRef={CANVAS_REF}
       onClose={vi.fn()}
       onRowClick={onRowClick}
-    />,
+    />
   );
+}
+
+function _renderDrawer(
+  onRowClick = vi.fn(),
+  options: { layer: MapLayer.T | undefined } = { layer: SCHOOLS_LAYER },
+): ReturnType<typeof render> {
+  return render(_makeDrawer(onRowClick, options.layer));
 }
 
 function _getFirstRowText(): string {
@@ -182,5 +192,34 @@ describe("FeatureListDrawer", () => {
     );
 
     expect(onRowClick).toHaveBeenCalledWith(LIST.rows[0]);
+  });
+
+  it("labels the show-on-map column for screen readers", () => {
+    _mockState({ list: LIST });
+    _renderDrawer();
+
+    expect(
+      screen.getByRole("columnheader", { name: "Actions" }),
+    ).toBeInTheDocument();
+  });
+
+  it("goes back to nearest first when a distance column appears", () => {
+    const listWithoutDistance: MapLayerFeatureList = {
+      ...LIST,
+      columns: LIST.columns.slice(0, 1),
+      distanceUnit: undefined,
+    };
+    _mockState({ list: listWithoutDistance });
+    const onRowClick = vi.fn();
+    const { rerender } = _renderDrawer(onRowClick);
+    fireEvent.click(screen.getByRole("button", { name: "loc_name" }));
+
+    _mockState({ list: LIST });
+    rerender(_makeDrawer(onRowClick, SCHOOLS_LAYER));
+
+    expect(
+      screen.getByRole("columnheader", { name: "Distance to nearest Sites" }),
+    ).toHaveAttribute("aria-sort", "ascending");
+    expect(_getFirstRowText()).toContain("Near school");
   });
 });

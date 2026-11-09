@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { Group, Table, UnstyledButton } from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
+import { Group, Table, UnstyledButton, VisuallyHidden } from "@mantine/core";
 import { IconArrowDown, IconArrowUp } from "@tabler/icons-react";
 import { useState } from "react";
 import { sortMapLayerFeatureListRows } from "@/clients/maps/MapLayerFeatureList/sortMapLayerFeatureListRows/sortMapLayerFeatureListRows";
@@ -90,9 +91,11 @@ function FeatureListSortHeader({
 /**
  * The feature list drawer's table: one sortable header per column, and rows
  * that show their feature on the map when pressed. Rendered by
- * `FeatureListBody`.
+ * `FeatureListBody`, keyed by its columns so the sort starts over (nearest
+ * first, when there is a distance column) whenever the columns change.
  */
 export function FeatureListTable({ list, onRowClick }: Props): ReactNode {
+  const { t } = useLingui();
   const [sort, setSort] = useState(() => {
     return _getDefaultSort(list);
   });
@@ -118,7 +121,9 @@ export function FeatureListTable({ list, onRowClick }: Props): ReactNode {
                 />
               );
             })}
-            <Table.Th />
+            <Table.Th>
+              <VisuallyHidden>{t`Actions`}</VisuallyHidden>
+            </Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>

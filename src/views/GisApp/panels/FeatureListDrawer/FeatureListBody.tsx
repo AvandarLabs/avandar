@@ -21,6 +21,19 @@ type Props = {
   onRowClick: (row: MapLayerFeatureList["rows"][number]) => void;
 };
 
+/**
+ * Identifies a list's columns, so a table keyed by it resets its sort when a
+ * column appears or disappears, for example a distance column once the layer
+ * is filtered by a buffer.
+ */
+function _getColumnsKey(list: MapLayerFeatureList): string {
+  return JSON.stringify(
+    list.columns.map((column) => {
+      return column.key;
+    }),
+  );
+}
+
 function FeatureCountText({ count }: { count: number }): ReactNode {
   return (
     <Text size="sm" fw={600}>
@@ -94,7 +107,11 @@ function FeatureListRows({
           {t`Download CSV`}
         </Button>
       </Group>
-      <FeatureListTable list={list} onRowClick={onRowClick} />
+      <FeatureListTable
+        key={_getColumnsKey(list)}
+        list={list}
+        onRowClick={onRowClick}
+      />
     </>
   );
 }

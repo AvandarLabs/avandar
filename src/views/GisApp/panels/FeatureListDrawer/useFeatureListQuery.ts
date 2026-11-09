@@ -6,6 +6,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { fetchMapLayerFeatureCount } from "@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureCount/fetchMapLayerFeatureCount";
 import { fetchMapLayerFeatureList } from "@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList";
 import { getFeatureListAccessFromMapLayer } from "@/clients/maps/MapLayerFeatureList/getFeatureListAccessFromMapLayer/getFeatureListAccessFromMapLayer";
+import { getFeatureListQueryKey } from "@/views/GisApp/panels/FeatureListDrawer/getFeatureListQueryKey/getFeatureListQueryKey";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -50,10 +51,11 @@ type FeatureListQueryInputs = {
   workspaceId: Workspace.Id;
   metadata: WorkspaceColumnMetadata | undefined;
   /**
-   * The parts of the map that change which features pass its filters. The
-   * whole config is not keyed, so panning or zooming does not refetch; the
-   * workspace metadata is not keyed either, since a column change already
-   * shows up in `config.layers`.
+   * The parts of the map that change the list, from
+   * `getFeatureListQueryKey`. The whole config is not keyed, so panning,
+   * zooming, or restyling another layer does not refetch. The workspace
+   * metadata is not keyed either, since a column change already shows up in
+   * the listed layers' sources.
    */
   keyParts: readonly unknown[];
 };
@@ -118,8 +120,8 @@ function useFeatureCount(
 /**
  * Loads what the feature list drawer may show for `layer`: every row for an
  * exact layer, or only a count for a jittered one. Read by
- * `FeatureListDrawer`; it refetches when the map's layers, area, or time
- * window change.
+ * `FeatureListDrawer`; it refetches only when the listed layer, a layer its
+ * spatial filter reads, or the map's area or time window changes.
  */
 export function useFeatureListQuery(
   options: Readonly<{
@@ -142,9 +144,7 @@ export function useFeatureListQuery(
     keyParts: [
       workspaceId,
       layerId,
-      config.layers,
-      config.aoi,
-      config.timeRange,
+      ...getFeatureListQueryKey({ config, layer: options.layer }),
     ],
   };
   const [list, isListLoading, listQuery] = useFeatureListRows({
