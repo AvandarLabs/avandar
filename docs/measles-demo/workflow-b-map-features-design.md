@@ -381,10 +381,13 @@ shows the last setup. If the layer is deleted, the field resets to unset.
   `drawExportLegend`, using jsPDF directly like the rest of the composer, so
   no new dependency. It repeats the header row on every page, wraps long
   cells, runs every string through `toPdfSafeText`, and paginates.
-- Above the table: "{count} {layer name} within {distance} of {source}" when
-  the layer is filtered by a buffer, otherwise "{count} {layer name}."
+- Above the table: "{count} features in {layer name} within {distance} of
+  {source}" when the layer is filtered by a buffer, otherwise "{count}
+  features in {layer name}", pluralized ("1 feature").
 - When rows exceed the cap: "Showing {maxRows} of {count}. Download the full
   list as CSV from the map."
+- Columns that do not fit the page width are left out, and a note says how
+  many are shown and points to the CSV for the full list.
 - Page numbers become "Page n of N" across all pages. Every page keeps the
   footer with the source line and disclaimer, since a field team may print
   only the list.

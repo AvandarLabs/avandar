@@ -11,7 +11,7 @@ describe("AvaMapConfigSchema v5 export layout", () => {
   it("migrates a version 4 config into the default export layout", () => {
     const parsed = AvaMapConfigSchema.fromJson(createVersion4JsonWithLayer());
 
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(8);
     expect(parsed.exportLayout).toEqual({
       paper: "a4",
       orientation: "landscape",
@@ -69,6 +69,7 @@ describe("AvaMapConfigSchema v5 export layout", () => {
         scaleBar: true,
         sourceLine: "OCHA",
         disclaimer: "Our own required wording.",
+        featureList: undefined,
       },
     });
 

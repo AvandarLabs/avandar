@@ -12,4 +12,7 @@ export const AvaMapConfigValues = {
   annotationKinds: ["text", "arrow", "freehand", "area"] as const,
   exportPapers: ["a4", "letter"] as const,
   exportOrientations: ["landscape", "portrait"] as const,
+  exportFeatureListSortDirections: ["asc", "desc"] as const,
+  exportFeatureListDefaultMaxRows: 200,
+  exportFeatureListMaxRows: 1000,
 };

@@ -6,15 +6,15 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 describe("AvaMapConfig.makeEmpty", () => {
   it("starts with no layers and the avandar basemap", () => {
     const mapConfig = AvaMapConfig.makeEmpty();
-    expect(mapConfig.version).toBe(7);
+    expect(mapConfig.version).toBe(8);
     expect(mapConfig.layers).toEqual([]);
     expect(mapConfig.basemap).toEqual({ type: "builtIn", style: "avandar" });
     expect(mapConfig.view).toEqual(AvaMapConfig.defaultViewState);
   });
 
-  it("starts version 7 maps with no overlay and annotations on top", () => {
+  it("starts version 8 maps with no overlay and annotations on top", () => {
     const config = AvaMapConfig.makeEmpty();
-    expect(config.version).toBe(7);
+    expect(config.version).toBe(8);
     expect(config.aoi).toBeUndefined();
     expect(config.timeRange).toBeUndefined();
     expect(config.annotations).toEqual({ isVisible: true, features: [] });
@@ -77,6 +77,51 @@ describe("stack order", () => {
 });
 
 describe("layer operations", () => {
+  it("clears the export feature list when its layer is removed", () => {
+    const listed = MapLayer.makeEmpty("Schools");
+    const base = AvaMapConfig.makeEmpty();
+    const config: AvaMapConfig.T = {
+      ...base,
+      layers: [listed],
+      exportLayout: {
+        ...base.exportLayout,
+        featureList: {
+          layerId: listed.id,
+          columnIds: [],
+          sort: undefined,
+          maxRows: 200,
+        },
+      },
+    };
+
+    expect(
+      AvaMapConfig.withLayerRemoved({ config, layerId: listed.id }).exportLayout
+        .featureList,
+    ).toBeUndefined();
+  });
+
+  it("keeps the export feature list when another layer is removed", () => {
+    const listed = MapLayer.makeEmpty("Schools");
+    const other = MapLayer.makeEmpty("Roads");
+    const base = AvaMapConfig.makeEmpty();
+    const featureList: AvaMapConfig.ExportFeatureList = {
+      layerId: listed.id,
+      columnIds: [],
+      sort: undefined,
+      maxRows: 200,
+    };
+    const config: AvaMapConfig.T = {
+      ...base,
+      layers: [listed, other],
+      exportLayout: { ...base.exportLayout, featureList },
+    };
+
+    expect(
+      AvaMapConfig.withLayerRemoved({ config, layerId: other.id }).exportLayout
+        .featureList,
+    ).toBe(featureList);
+  });
+
   it("clears a spatial filter that named the removed layer", () => {
     const area = MapLayer.createArea("Buffer of Sites");
     const schools = {
