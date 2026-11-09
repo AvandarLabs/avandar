@@ -9,9 +9,7 @@ function _ok(bytes: Uint8Array, headers: Record<string, string>): Response {
   return new Response(bytes, { status: 200, headers });
 }
 
-function _fetchFrom(
-  routes: Record<string, Response>,
-): typeof fetch {
+function _fetchFrom(routes: Record<string, Response>): typeof fetch {
   return vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
     const response = routes[url];

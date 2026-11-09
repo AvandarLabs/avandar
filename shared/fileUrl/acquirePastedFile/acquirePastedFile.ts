@@ -1,10 +1,10 @@
-import { FILE_URL_MAX_BYTES } from "$/fileUrl/PastedFileUrl.ts";
 import {
   ckanImportResources,
   ckanResourceChoice,
 } from "$/fileUrl/ckanImportResources.ts";
 import { classifyDownloadedBytes } from "$/fileUrl/classifyDownloadedBytes.ts";
 import { fetchPublicBytes } from "$/fileUrl/fetchPublicBytes.ts";
+import { FILE_URL_MAX_BYTES } from "$/fileUrl/PastedFileUrl.ts";
 import { resolvePastedFileUrl } from "$/fileUrl/resolvePastedFileUrl/resolvePastedFileUrl.ts";
 import type { AcquiredPastedFile } from "$/fileUrl/AcquiredPastedFile.ts";
 import type { PublicBytes } from "$/fileUrl/fetchPublicBytes.ts";
@@ -71,11 +71,16 @@ function _isDriveConfirmPage(download: PublicBytes): boolean {
     return false;
   }
   const preview = new TextDecoder().decode(download.bytes.subarray(0, 8000));
-  return preview.includes("uc-download-link") || preview.includes("download_warning");
+  return (
+    preview.includes("uc-download-link") || preview.includes("download_warning")
+  );
 }
 
 async function _acquireCkan(
-  resolved: Extract<ResolvedPastedFileUrl, { kind: "ckan-package" | "ckan-resource" }>,
+  resolved: Extract<
+    ResolvedPastedFileUrl,
+    { kind: "ckan-package" | "ckan-resource" }
+  >,
   input: {
     fetch: typeof fetch;
     assertPublicHost: (host: string) => Promise<void>;
@@ -119,7 +124,10 @@ async function _acquireCkan(
 
 function _matchingResources(
   bytes: Uint8Array,
-  resolved: Extract<ResolvedPastedFileUrl, { kind: "ckan-package" | "ckan-resource" }>,
+  resolved: Extract<
+    ResolvedPastedFileUrl,
+    { kind: "ckan-package" | "ckan-resource" }
+  >,
 ): ReturnType<typeof ckanImportResources> {
   let body: unknown;
   try {
@@ -131,5 +139,7 @@ function _matchingResources(
   if (resolved.kind !== "ckan-resource") {
     return resources;
   }
-  return resources.filter((resource) => resource.id === resolved.resourceId);
+  return resources.filter((resource) => {
+    return resource.id === resolved.resourceId;
+  });
 }

@@ -24,7 +24,9 @@ export function resolvePastedFileUrl(input: string): ResolvedPastedFileUrl {
 
 function _parseHttpUrl(
   input: string,
-): { kind: "url"; url: URL } | { kind: "refuse"; reason: "not-a-url" | "unsupported-scheme" } {
+):
+  | { kind: "url"; url: URL }
+  | { kind: "refuse"; reason: "not-a-url" | "unsupported-scheme" } {
   let url: URL;
   try {
     url = new URL(input);

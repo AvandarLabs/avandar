@@ -58,16 +58,16 @@ describe("readArchive", () => {
     if (read.kind !== "archive") {
       return;
     }
-    expect(read.members.map((member) => member.path)).toEqual([
-      "geo/vaccines.csv",
-      "README.md",
-      "tables/old.xlsx",
-    ]);
-    expect(read.members.map((member) => member.role)).toEqual([
-      "data",
-      "other",
-      "data",
-    ]);
+    expect(
+      read.members.map((member) => {
+        return member.path;
+      }),
+    ).toEqual(["geo/vaccines.csv", "README.md", "tables/old.xlsx"]);
+    expect(
+      read.members.map((member) => {
+        return member.role;
+      }),
+    ).toEqual(["data", "other", "data"]);
   });
 
   it("marks a zip stored inside a zip as an archive and does not open it", () => {
@@ -80,7 +80,9 @@ describe("readArchive", () => {
     if (read.kind !== "archive") {
       return;
     }
-    const nested = read.members.find((member) => member.path === "nested.zip");
+    const nested = read.members.find((member) => {
+      return member.path === "nested.zip";
+    });
     expect(nested?.role).toBe("archive");
     expect(nested?.bytes).toEqual(inner);
   });

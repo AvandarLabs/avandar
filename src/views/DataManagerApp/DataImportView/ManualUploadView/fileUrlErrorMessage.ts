@@ -1,5 +1,5 @@
 import { msg } from "@lingui/core/macro";
-import type { FileUrlFailureReason } from "$/fileUrl/AcquiredPastedFile.ts";
+import type { FileUrlFailureReason } from "$/fileUrl/AcquiredPastedFile";
 import type { I18n, MessageDescriptor } from "@lingui/core";
 
 /**

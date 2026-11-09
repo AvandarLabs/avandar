@@ -50,7 +50,11 @@ function _isAppleDouble(path: string): boolean {
 
 function _role(path: string): ArchiveMember["role"] {
   const lower = path.toLowerCase();
-  if (DATA_EXTENSIONS.some((extension) => lower.endsWith(extension))) {
+  if (
+    DATA_EXTENSIONS.some((extension) => {
+      return lower.endsWith(extension);
+    })
+  ) {
     return "data";
   }
   if (

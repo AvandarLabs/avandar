@@ -1,5 +1,5 @@
 import { fetchEdgeFunctionRoute } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
-import type { AcquiredPastedFile } from "$/fileUrl/AcquiredPastedFile.ts";
+import type { AcquiredPastedFile } from "$/fileUrl/AcquiredPastedFile";
 import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 
 /**

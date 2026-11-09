@@ -6,8 +6,8 @@ import {
   UnsafeHostError,
 } from "@sbfn/_shared/validateHostNotPrivate.ts";
 import { z } from "zod";
-import { acquirePastedFile } from "$/fileUrl/acquirePastedFile/acquirePastedFile.ts";
 import { acquiredFileResponse } from "$/fileUrl/acquiredFileResponse.ts";
+import { acquirePastedFile } from "$/fileUrl/acquirePastedFile/acquirePastedFile.ts";
 import { PrivateFileHostError } from "$/fileUrl/PrivateFileHostError.ts";
 import type { FileUrlAPI } from "@sbfn/file-url/FileUrlRoutes.types.ts";
 
@@ -27,10 +27,13 @@ export const FileUrlRoutes = defineRoutes<FileUrlAPI>("file-url", {
       )
       .action(async ({ body, user }) => {
         if (!user) {
-          return new Response(JSON.stringify({ outcome: "error", reason: "not-public" }), {
-            status: UNAUTHORIZED,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+          return new Response(
+            JSON.stringify({ outcome: "error", reason: "not-public" }),
+            {
+              status: UNAUTHORIZED,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            },
+          );
         }
         const acquired = await acquirePastedFile({
           url: body.url,

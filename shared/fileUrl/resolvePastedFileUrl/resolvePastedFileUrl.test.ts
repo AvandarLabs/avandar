@@ -82,7 +82,9 @@ describe("resolvePastedFileUrl", () => {
       ),
     ).toEqual({ kind: "refuse", reason: "google-sheet" });
     expect(
-      resolvePastedFileUrl("https://docs.google.com/document/d/1AbCDef_ghi/edit"),
+      resolvePastedFileUrl(
+        "https://docs.google.com/document/d/1AbCDef_ghi/edit",
+      ),
     ).toEqual({ kind: "refuse", reason: "google-document" });
     expect(
       resolvePastedFileUrl(

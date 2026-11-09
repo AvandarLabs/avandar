@@ -1,7 +1,7 @@
-import { readBoundedBody } from "$/utils/HttpClientFactory/readBoundedBody.ts";
-import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import { contentDispositionFileName } from "$/fileUrl/contentDispositionFileName.ts";
 import { PrivateFileHostError } from "$/fileUrl/PrivateFileHostError.ts";
+import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
+import { readBoundedBody } from "$/utils/HttpClientFactory/readBoundedBody.ts";
 
 const MAX_REDIRECTS = 5;
 
@@ -91,7 +91,10 @@ async function _request(
   }
 }
 
-function _redirectLocation(response: Response, current: string): string | undefined {
+function _redirectLocation(
+  response: Response,
+  current: string,
+): string | undefined {
   if (response.status < 300 || response.status >= 400) {
     return undefined;
   }
