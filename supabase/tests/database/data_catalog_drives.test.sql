@@ -21,7 +21,7 @@ select hasnt_column('public', 'data_catalog_listings', 'external_organization_na
 select col_not_null('public', 'data_catalog_listings', 'organization1_name', 'level 1 is required');
 select col_type_is('public', 'data_catalog_listings', 'domains', 'text[]', 'domains is a text array');
 select col_type_is('public', 'data_catalog_listings', 'tags', 'text[]', 'tags is a text array');
-select col_type_is('public', 'data_catalog_listings', 'source_metadata', 'jsonb', 'source_metadata is jsonb');
+select col_type_is('public', 'data_catalog_listings', 'additional_source_metadata', 'jsonb', 'additional_source_metadata is jsonb');
 select fk_ok('public', 'data_catalog_listings', 'drive_id', 'public', 'data_catalog_drives', 'id', 'a listing points at its drive');
 
 insert into public.data_catalog_drives (pipeline_name, drive_key, organization1_label)

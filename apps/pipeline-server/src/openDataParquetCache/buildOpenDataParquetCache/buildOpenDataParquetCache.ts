@@ -9,6 +9,7 @@ import {
   splitParquetFileIntoParts,
   summarizeParquetParts,
 } from "@pipeline-server/openDataParquetCache/convertToParquetParts/convertToParquetParts";
+import { buildParquetCachePartName } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath";
 import type {
   DownloadableListing,
   ListingDownloadScript,
@@ -76,6 +77,12 @@ export class ParquetCopyError extends Error {
  */
 const DEFAULT_MAX_PART_BYTES = 32 * 1024 * 1024;
 
+/**
+ * Starts the name of every build's temp folder, so a server can find and
+ * delete the ones a killed build left behind.
+ */
+export const PARQUET_COPY_TEMP_PREFIX = "odc-parquet-cache-";
+
 /** How many times a page download is tried before the build fails. */
 const PAGE_ATTEMPTS = 3;
 
@@ -95,10 +102,6 @@ type WrittenParts = Readonly<{
   byteSize: number;
   columns: readonly ParquetCacheColumn[];
 }>;
-
-function _buildPartName(partIndex: number): string {
-  return `part-${String(partIndex).padStart(5, "0")}.parquet`;
-}
 
 /** Uploads parts in order, returning their total size in bytes. */
 async function _uploadParts(
@@ -209,7 +212,10 @@ async function _uploadStagedPages(args: {
   cursorColumn: string;
 }): Promise<number> {
   const { context, staged } = args;
-  const partPath = join(context.tempDir, _buildPartName(args.partIndex));
+  const partPath = join(
+    context.tempDir,
+    buildParquetCachePartName(args.partIndex),
+  );
   await mergeParquetFilesIntoPart({
     parquetPaths: staged.paths,
     partPath,
@@ -335,7 +341,7 @@ export async function buildOpenDataParquetCache(
     buildId: options.buildId,
   });
   await mkdir(tmpdir(), { recursive: true });
-  const tempDir = await mkdtemp(join(tmpdir(), "odc-parquet-cache-"));
+  const tempDir = await mkdtemp(join(tmpdir(), PARQUET_COPY_TEMP_PREFIX));
   const context: CopyContext = {
     folderPath,
     tempDir,

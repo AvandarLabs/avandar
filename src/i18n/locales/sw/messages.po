@@ -2146,10 +2146,6 @@ msgstr "Mhariri wa Kimataifa"
 msgid "Manage seats in billing portal →"
 msgstr "Simamia viti katika lango la malipo →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-msgid "Source record"
-msgstr "Rekodi chanzo"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "Pakua modeli za nje ya mtandao"
@@ -3459,6 +3455,13 @@ msgstr "Tekeleza kichujio cha eneo"
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "URL fupi na rahisi kukumbuka kwa vipeperushi, ripoti na misimbo ya QR."
+
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
+"the first time."
+msgstr "\"{0}\" inatayarishwa. Seti kubwa za data zinaweza kuchukua dakika "
+"chache kufunguka mara ya kwanza."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -8821,6 +8824,10 @@ msgstr "portali ya malipo."
 msgid "Column 2"
 msgstr "Safu wima ya 2"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Data not ready"
+msgstr "Data haiko tayari"
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
 msgstr "Hujachagua safu ya thamani"
@@ -8959,6 +8966,10 @@ msgstr "Safu za seti za data"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Details"
 msgstr "Maelezo"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Preparing your data"
+msgstr "Data yako inatayarishwa"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -9704,6 +9715,10 @@ msgstr "{0, plural, one {# hifadhidata iliyohifadhiwa inapatikana} other {# "
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "Iliyopangwa kwa viwango"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "More from the source"
+msgstr "Maelezo zaidi kutoka kwa chanzo"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
@@ -10465,6 +10480,11 @@ msgstr "Funga"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link"
 msgstr "Kiungo"
+
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't prepare the data for \"{0}\", so it may not open."
+msgstr "Hatukuweza kutayarisha data ya \"{0}\", kwa hivyo huenda isifunguke."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."

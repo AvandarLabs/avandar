@@ -56,6 +56,28 @@ describe("parsePipelineConfig", () => {
     expect(config.workspaceLoadability).toEqual({ loadableFormats: ["XLSX"] });
   });
 
+  it("reads the paths additional source metadata leaves out", () => {
+    const config = _parse([
+      "additionalSourceMetadata:",
+      "  omit: [license_other, organization.image_url]",
+      "drives: []",
+    ]);
+
+    expect(config.additionalSourceMetadata).toEqual({
+      omit: ["license_other", "organization.image_url"],
+    });
+  });
+
+  it("refuses an omitted path that is not dotted segments", () => {
+    expect(() => {
+      return _parse([
+        "additionalSourceMetadata:",
+        "  omit: ['tags[].name']",
+        "drives: []",
+      ]);
+    }).toThrow("additionalSourceMetadata.omit");
+  });
+
   it("reads a paged download with its page size", () => {
     const config = _parse([
       "download:",

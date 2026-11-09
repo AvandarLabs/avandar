@@ -16,6 +16,12 @@ const UPDATE_FREQUENCY_BY_CODE: Readonly<Record<string, string>> = {
 };
 
 /**
+ * The source record paths this field holds, left out of a listing's additional
+ * source metadata. The update frequency code this field names.
+ */
+export const reads = ["data_update_frequency"];
+
+/**
  * Mapper script for `update_frequency`: HDX's code in words. An unknown
  * code is kept as written, so a new code still shows up rather than
  * vanishing.

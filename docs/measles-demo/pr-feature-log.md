@@ -74,6 +74,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F22 | AI harness audit: 15 chat and Data Explorer bug fixes and 8 harness improvements | not started | none (see its section for order within it) | |
 | F23 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
 | F24 | ODC listing data preview and full-screen detail | not started | F12, F16, F19, F23 | |
+| F27 | Pipeline runs pace their writes to the database and retry transient failures | not started | F4, F11, F23 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -105,7 +106,8 @@ API. It's new work, not something this branch built.
 | any | F22 | Chat and Data Explorer code that every other feature leaves alone. Its own PRs go in the order its section gives. |
 | 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
 | 15 | F24 | Adds the data preview and full-screen modal to the detail pane F19 built and F23 regrouped. Merge after both. |
-| 16 | F9 | Last, because the docs describe the merged features. |
+| 16 | F27 | Rewrites the write loop in `loadRelationsPage` that F4 built and F23's byte cap changed, and adds a stage to the progress events F11 added. Merge after F23. |
+| 17 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -1317,7 +1319,12 @@ commits belong to the features that own them, not here.
 | `d50583f7e` | fix(socrata): read a health dataset's office from either metadata key | All of it |
 | `7f2d6dc8e` | fix(hdx): map topics, data source, coverage dates, and caveats | All of it. Supersedes `bcac141e7`'s `domains` mapping: HDX's groups (countries) become keywords, and topics come from `hdxTopics`' tag-to-topic table. |
 | `d9c3bf6c0` | fix(hdx): store each listing's package with only its own resource | All of it. Without it, a package's write grows with the square of its resource count (each listing stored every resource), which ran the demo database out of memory on WHO's country packages. |
-| `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. |
+| `62ffe547a` | fix(etl): cap each listings write at 4 MiB of JSON | All of it (`loadRelationsPage` and its test, and the `@avandar/etl` README's **Writes** paragraph). It edits a file F4 owns: apply it on top of F4's final `loadRelationsPage.ts`. F27 replaces its fixed cap with the throttle's budget. |
+| `c75d19331` | fix(hdx): leave license text and file check reports out of source_metadata | All of it. On demo, `license_other` and `fs_check_info` were 55% of HDX's raw JSON. |
+| `8e707d700` | fix(hdx): leave mapped and repeated package fields out of source_metadata | All of it. Drops `notes` and `caveats` (already in `description` and `notes`) and narrows `organization`, `tags`, and `groups` to the keys the mappers read. Sizing and the demo disk analysis: `docs/measles-demo/etl-disk-footprint.md`. |
+| `ec060372c` | docs(measles): explain the HDX disk footprint and how a full run fits | Branch-only: the demo instance's numbers and recovery steps. Port only if `develop` gets the same HDX sizing question. |
+| `4d1d2a7d5` | feat(etl): leave the paths a field mapping consumes out of a source record | All of it: `omitRecordPaths/`, `CatalogFieldMapper.omitMappedPaths`, a script's `reads` export, `additionalSourceMetadata.omit` in the config parser and types, and the two new loader fixtures. |
+| `2d61eb961` | refactor(catalog)!: keep only unmapped source fields in additional_source_metadata | All of it. Supersedes `d9c3bf6c0`, `c75d19331`, and `8e707d700`'s trims of `source_metadata`: port the final `makeApiResourceRelationsFromCkanPackage.ts`, not theirs. `source_metadata` becomes `additional_source_metadata` (the schema, both pipelines, the scripts' `reads`, `hdx.pipeline.yaml`'s `omit`, the `DataCatalogListing` model, the technical details' "More from the source" label and its translations), and the listings upsert returns ids (the schema, its pgTAP test, both listings stores and their tests). It also fixes `catalog_field_mapping.prelude.sql` for the new column and return type. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1373,7 +1380,12 @@ renamed column) and `20261107180100_catalog_search_organization_filters.sql`
 (adds the level-2, topic, and keyword parameters and facets). Hand-write the
 first, because the schema diff would turn the rename into a drop and a
 create: confirm the result has no `drop column` of a data column. Regenerate
-the second after it. Both land after F16, F17 and F19's migrations.
+the second after it. Both land after F16, F17 and F19's migrations. Then
+`20261109020452_drop_catalog_upsert_for_return_type_change.sql`
+(hand-written: the diff cannot change a function's return type) and
+`20261109020622_catalog_additional_source_metadata.sql` (generated after it;
+its `drop column source_metadata` is intended, since the old values hold
+mapped fields the new column must not).
 
 **Verification:**
 ```sh
@@ -1411,6 +1423,14 @@ rejects the new listing shape, so the catalog would not load.
   left 11,983 listings storing whole packages. Change detection ignores
   `source_metadata`, so a later run does not shrink them: reset HDX on demo
   (`ava pipeline reset hdx --env demo`) before its next full run.
+  Run `95f18055` later filled the demo branch's disk (`53100`) at about
+  1.2 GB of database plus WAL. A complete HDX run is about 191k listings,
+  roughly 1.45 GB of database and 2.5 GB of disk with WAL after
+  `8e707d700`. The branch's `/data` volume was 8.4 GB with 6.3 GB free on
+  2026-11-09, so it fits, but what filled it at 22:41 UTC is unexplained.
+  See
+  `docs/measles-demo/etl-disk-footprint.md` for the recovery steps and the
+  GeoTIFF trade-off.
 - `hdxTopics`' tag-to-topic table covers HDX's 150-tag vocabulary as of
   2026-11-08. A tag HDX adds later gets no topic until it is added there.
 - Removing one of two chosen publishers leaves the agencies chosen under it
@@ -1477,9 +1497,13 @@ workspace dataset's Metadata tab still shows its preview.
 
 ## F25: Cached Parquet copies of ODC listings
 
-Status: in progress. The pipeline server builds and uploads copies; nothing
-requests or reads them yet (the build route, the edge route, and the app's
-readers are still to come, see the spec's slices).
+Status: in progress. The pipeline server builds copies on request through
+`POST /open-data-cache/:catalogListingId/build`, and the `open-data` edge
+function requests them through
+`POST /data-catalog-listings/:id/parquet-cache`. Workspaces read API-backed
+listings from their copies, falling back to the 25 MB relay where no
+pipeline server is configured. The relay's removal and an E2E test are still
+to come (see the spec's slices).
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1490,7 +1514,9 @@ size limit of its own. It knows no API: each pipeline's manifest has a
 in the pipeline's folder. Socrata pages by row id with its declared column
 types, so a copy needs about one part of disk. CKAN files are gzipped on disk
 and split. The database claims one build per listing and records the copy.
-The server deploys from a template filled by a gitignored
+The app downloads a copy's parts from Storage, merges them in DuckDB, waits
+while a copy builds, and starts the build when a listing is added to a
+workspace, saying when its data is still being prepared. The server deploys from a template filled by a gitignored
 `.env.pipeline-server.prod`, and its Docker image now starts.
 **Value:** Large listings, such as NYC's DOB Violations (2.48M rows), can be
 added to a workspace and load from Storage instead of the source.
@@ -1517,6 +1543,11 @@ added to a workspace and load from Storage instead of the source.
 | `5685fb84c` | chore: keep env files and installed modules out of Docker build contexts | All of it. |
 | `d3dd08b56` | fix(pipeline-server): make the Docker image start and run DuckDB | All of it. |
 | `513873f61` | fix(pipeline-server): hoist DuckDB in the image, and fail the build if it cannot resolve | All of it. Merged in `7e428d400`. |
+| `3ca228aae` | feat(pipeline-server): build ODC listings' Parquet copies on request | All of it. Merged in `42754c16c`. |
+| `e86a92b21` | feat(pipeline-server): keep a listing's columns when its copy shares none of them | All of it, including the P6.11 roadmap item. Merged in `42754c16c`. |
+| `b1c3a196b` | feat(open-data): request an ODC listing's Parquet copy from the pipeline server | All of it. Merged in `3600d91d9`. |
+| `2e0039c62` | feat(open-data): load ODC listings from their Parquet copies | All of it, including the four new messages in every `src/i18n/locales/*/messages.po` and `messages.ts`. Merged in `cc10b08f2`. |
+| `a285a3612` | docs: record how the app reads ODC listings' Parquet copies | All of it. Merged in `cc10b08f2`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
@@ -1531,7 +1562,19 @@ entry, `.dockerignore`, `.env.pipeline-server.prod.example` and its
 `package.json`, the deleted `apps/pipeline-server/fly.production.toml`, the
 Fly section of `apps/pipeline-server/README.md`, the `parquetCache*` fields
 in `DataCatalogListing.types.ts` and `DataCatalogListingParsers.ts` and the
-fixtures that list them, `docs/measles-demo/odc-parquet-cache-spec.md`,
+fixtures that list them, `shared/connectors/open-data/buildParquetCachePartPath/`,
+`supabase/functions/open-data/requestParquetCache/`,
+`supabase/functions/open-data/startParquetCopyBuild/`, the parquet-cache
+route in `OpenDataRoutes.ts` and `OpenDataRoutes.types.ts`, the pipeline
+server section of `.env.example.edge`, the `AVA_PIPELINE_SERVER_URL` lines
+in `.github/workflows/demo.yaml`, `src/lib/openData/requestOpenDataParquetCopy/`,
+`src/lib/openData/fetchOpenDataParquetCopy/`,
+`src/clients/DuckDbClient/mergeParquetBlobs/` and `mergeParquetBlobs` in
+`DuckDbClient.ts`, the copy options in `DatasetParquetWrapper.ts`,
+`createDefaultRegistry.ts`, and `createRegistryForFetch.ts`,
+`src/views/DataManagerApp/DataImportView/DataCatalogView/requestParquetCopyForAdding/`
+and its call in `DataCatalogView.tsx`, the four new catalog messages,
+`docs/measles-demo/odc-parquet-cache-spec.md`,
 `docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
 bullets in `production-plan-world-humanitarian-day.md`.
 
@@ -1547,10 +1590,16 @@ migrations `20261107220000_STORAGE-opendata-service-role-writes-only.sql`
 ```sh
 pnpm --filter @avandar/pipeline-server test
 pnpm --filter @avandar/etl test
+pnpm exec vitest run supabase/functions/open-data shared/connectors/open-data
+pnpm exec vitest run src/clients/qetl src/lib/openData src/clients/DuckDbClient src/views/DataManagerApp/DataImportView
+pnpm test:executed src/clients/DuckDbClient/mergeParquetBlobs
 supabase test db supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql
 ```
 Then build the image (`docker build -f apps/pipeline-server/Dockerfile .`),
-run it, and check `/healthz` answers `{"ok":true}`.
+run it, and check `/healthz` answers `{"ok":true}`. In the app, add an
+API-backed listing that has no copy: a "Preparing your data" notification
+appears, and opening the dataset downloads its parts from the `opendata`
+bucket, with no request to the `/resource` relay.
 
 ---
 
@@ -1591,6 +1640,86 @@ and its test, `RunPipelineCli.test.ts`, and the Supabase paragraphs in
 pnpm --filter @avandar/pipeline-server test
 pnpm --filter @avandar/ava-cli test
 ```
+
+---
+
+## F27: Pipeline runs pace their writes to the database and retry transient failures
+
+**Purpose:** A pipeline run sent fixed-size writes as fast as the database
+answered and stopped at the first slow or failed request. On demo (Micro
+compute) two HDX runs stopped partway: a 100 MB write ran the database out
+of memory, and later 4 MB writes stalled or timed out once the database fell
+behind. Now each crawl has a write throttle (`createWriteThrottle`) that
+grows its byte budget after fast writes, halves it and pauses after slow
+ones, and after a transient failure quarters it, waits with exponential
+backoff, and retries. A Supabase store marks a failure a retry can fix as
+`EtlTransientStoreError` (no response, 408, 429, 5xx, statement or lock
+timeout, connection errors). Reads, write batches, checkpoint reads and
+writes, the drive row, and the run's history all retry. A failed batch is
+retried from the same listing, so every listing is written once and in
+order. `ava pipeline run` prints each retry and slow write. **Value:** A
+slow database slows a run down instead of stopping it, the database is not
+pushed into a crash, and no data is lost: only the 8th transient failure in
+a row stops a crawl, with its checkpoint intact. Design:
+`docs/measles-demo/etl-adaptive-write-throttle.md` (goes with F9).
+
+**PR title:** `feat(etl): pace pipeline writes to the database and retry transient failures`
+
+**Depends on:** F4 (the listings store and `loadRelationsPage`), F11 (the
+progress events it adds a stage to), and F23 (whose 4 MiB cap it replaces).
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `4dc0c52d5` | feat(etl): mark store failures a retry can fix as EtlTransientStoreError | All of it |
+| `d9f53c30b` | feat(etl): pace store writes to the database and retry transient failures | All of it |
+| `59ded1ac8` | feat(ava-cli): print when a pipeline run slows its writes or retries one | All of it |
+| `aa5eefaa6` | fix(etl): retry a crawl's drive row write when it fails transiently | All of it |
+| `0a828d45c` | fix(etl): retry run history writes that fail transiently | All of it |
+| `2a627e438` | docs(etl): describe how pipeline runs pace writes and retry failures | `MIXED`: `apps/pipeline-server/README.md` goes here. `docs/measles-demo/etl-adaptive-write-throttle.md` goes with F9. |
+
+**Files:** `packages/node/etl/src/EtlEngine/writeThrottle/`,
+`packages/node/etl/src/stores/EtlTransientStoreError.ts`,
+`throwOnSupabaseError/` and its new test, the four `Supabase*Store` files
+(each passes the response `status`), `createNeverFatalExecutionStore/`,
+`loadRelationsPage/`, `crawlScope/crawlScope.ts`, `createEtlEngine/`,
+`createRunProgressReporter/`, `recordRunExecution/createRunExecutionRecorder.ts`,
+`crawlMetrics/crawlMetrics.ts` (`SYSTEM_CLOCK.sleep`), `EtlEngine.types.ts`
+(`EtlClock.sleep`, the `write_throttled` stage), `src/index.ts`, and the
+`@avandar/etl` README; `apps/ava-cli/src/PipelineCli/PipelineRunProgress/`;
+and the pacing paragraph of `apps/pipeline-server/README.md`.
+
+**Schema:** none.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/etl test
+pnpm --filter @avandar/pipeline-server test
+pnpm --filter @avandar/ava-cli test
+pnpm exec tsc -b --force --noEmit
+pnpm build:ava-cli
+```
+Then, on a switched local stack only, give the role PostgREST connects as a
+short statement timeout, run a pipeline, and re-run it with the timeout
+restored: the re-run must write nothing and find every listing unchanged.
+```sh
+psql "$LOCAL_DB_URL" -c "alter role authenticator set statement_timeout = '60ms'" \
+  -c "select pg_terminate_backend(pid) from pg_stat_activity where usename = 'authenticator'"
+ava pipeline run hdx --local --scope format:csv --since 2026-10-14T00:00:00Z --until 2026-11-01T00:00:00Z --limit 400
+psql "$LOCAL_DB_URL" -c "alter role authenticator set statement_timeout = '8s'" \
+  -c "select pg_terminate_backend(pid) from pg_stat_activity where usename = 'authenticator'"
+ava pipeline run hdx --local --scope format:csv --since 2026-10-14T00:00:00Z --until 2026-11-01T00:00:00Z --limit 400
+```
+
+**Follow-ups, not done here:**
+- Under a statement timeout far below the 2 s slow-write line, the budget
+  saws between failing and recovering, since each fast write grows it
+  back. A hosted database's 8 s timeout makes the slow-write path act
+  first, so this was left as is.
+- Waits for the drive row and the run history are retried but not
+  reported as progress, since no crawl has started yet or every crawl has
+  ended.
 
 ---
 
@@ -1739,6 +1868,17 @@ Its commits are covered by F19, not numbered here.
 | 127 | `7f2d6dc8e` | F23 |
 | 128 | `d9c3bf6c0` | F23 |
 | 129 | `62ffe547a` | F23 |
+| 130 | `c75d19331` | F23 |
+| 131 | `4dc0c52d5` | F27 |
+| 132 | `d9f53c30b` | F27 |
+| 133 | `59ded1ac8` | F27 |
+| 134 | `aa5eefaa6` | F27 |
+| 135 | `0a828d45c` | F27 |
+| 136 | `2a627e438` | F27, F9 (MIXED) |
+| 137 | `8e707d700` | F23 |
+| 138 | `ec060372c` | F23 |
+| 139 | `4d1d2a7d5` | F23 |
+| 140 | `2d61eb961` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full

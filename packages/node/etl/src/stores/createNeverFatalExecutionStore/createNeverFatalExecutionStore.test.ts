@@ -1,4 +1,6 @@
+import { SYSTEM_CLOCK } from "@etl/EtlEngine/crawlMetrics/crawlMetrics";
 import { createNeverFatalExecutionStore } from "@etl/stores/createNeverFatalExecutionStore/createNeverFatalExecutionStore";
+import { EtlTransientStoreError } from "@etl/stores/EtlTransientStoreError";
 import {
   NO_DENOMINATORS,
   NO_STAGE_TIMINGS,
@@ -89,6 +91,42 @@ describe("createNeverFatalExecutionStore", () => {
     expect(store.getExecutions()).toEqual([
       { start: START, scopes: [SCOPE], outcome: OUTCOME },
     ]);
+  });
+
+  it("retries a call that failed transiently before recording it", async () => {
+    const store = createInMemoryExecutionStore();
+    const sleeps: number[] = [];
+    let failuresLeft = 2;
+    const warn = vi.fn();
+    const safe = createNeverFatalExecutionStore({
+      store: {
+        ...store,
+        start: async (execution) => {
+          if (failuresLeft > 0) {
+            failuresLeft -= 1;
+            throw new EtlTransientStoreError("statement timeout", {
+              status: 500,
+              code: "57014",
+              cause: undefined,
+            });
+          }
+          return await store.start(execution);
+        },
+      },
+      warn,
+      clock: {
+        ...SYSTEM_CLOCK,
+        sleep: async (ms) => {
+          sleeps.push(ms);
+        },
+      },
+    });
+
+    await safe.start(START);
+    await safe.recordScope({ executionId: "run-1", scope: SCOPE });
+
+    expect([store.getExecutions().length, sleeps.length]).toEqual([1, 2]);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it("warns instead of throwing when a call fails", async () => {

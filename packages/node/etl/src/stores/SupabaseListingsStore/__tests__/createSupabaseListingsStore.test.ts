@@ -49,7 +49,7 @@ const ROW: ListingRowValues = {
   organization4_name: null,
   domains: null,
   tags: null,
-  source_metadata: null,
+  additional_source_metadata: null,
   drive_id: null,
 };
 

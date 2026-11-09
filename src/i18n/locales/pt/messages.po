@@ -2151,10 +2151,6 @@ msgstr "Editor Global"
 msgid "Manage seats in billing portal →"
 msgstr "Gerenciar assentos no portal de cobrança →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-msgid "Source record"
-msgstr "Registro de origem"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
 msgstr "Baixar modelos offline"
@@ -3464,6 +3460,13 @@ msgstr "Aplicar filtro de área"
 msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "Uma URL curta e fácil de memorizar para panfletos, relatórios e códigos "
 "QR."
+
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
+"the first time."
+msgstr "\"{0}\" está sendo preparado. Conjuntos de dados grandes podem levar "
+"alguns minutos para abrir pela primeira vez."
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -8835,6 +8838,10 @@ msgstr "portal de cobrança."
 msgid "Column 2"
 msgstr "Coluna 2"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Data not ready"
+msgstr "Dados não prontos"
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
 msgstr "Você não escolheu uma coluna de valor"
@@ -8973,6 +8980,10 @@ msgstr "Colunas do conjunto de dados"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Details"
 msgstr "Detalhes"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Preparing your data"
+msgstr "Preparando seus dados"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -9720,6 +9731,10 @@ msgstr "{0, plural, one {# banco de dados salvo disponível} other {# bancos de 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "Graduado"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "More from the source"
+msgstr "Mais informações da fonte"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
@@ -10484,6 +10499,12 @@ msgstr "Fechar"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link"
 msgstr "Link"
+
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't prepare the data for \"{0}\", so it may not open."
+msgstr "Não foi possível preparar os dados de \"{0}\", portanto talvez não seja "
+"possível abri-los."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."

@@ -3,6 +3,7 @@ import type {
   EtlCrawlStatus,
   EtlRunProgress,
 } from "@etl/EtlEngine/EtlEngine.types";
+import type { EtlWriteThrottleEvent } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
 
 /** Which crawl a progress event is about. */
 export type ProgressCrawl = Readonly<{
@@ -17,6 +18,10 @@ export type RunProgressReporter = Readonly<{
   crawlStarted: (crawl: ProgressCrawl) => void;
   pageLoaded: (crawl: ProgressCrawl, page: CrawledPageCounts) => void;
   crawlFinished: (crawl: ProgressCrawl, status: EtlCrawlStatus) => void;
+  writeThrottled: (
+    crawl: ProgressCrawl,
+    throttle: EtlWriteThrottleEvent,
+  ) => void;
 }>;
 
 /**
@@ -43,7 +48,7 @@ export function createRunProgressReporter(args: {
   const report = (
     stage: EtlRunProgress["stage"],
     crawl: ProgressCrawl,
-    status?: EtlCrawlStatus,
+    details: Pick<EtlRunProgress, "status" | "throttle"> = {},
   ): void => {
     onProgress?.({
       stage,
@@ -51,7 +56,8 @@ export function createRunProgressReporter(args: {
       crawlCount: args.crawlCount,
       limit: args.limit,
       ...totals,
-      ...(status === undefined ? {} : { status }),
+      ...(details.status === undefined ? {} : { status: details.status }),
+      ...(details.throttle === undefined ? {} : { throttle: details.throttle }),
     });
   };
   return {
@@ -67,7 +73,10 @@ export function createRunProgressReporter(args: {
       report("page_loaded", crawl);
     },
     crawlFinished: (crawl, status) => {
-      report("crawl_finished", crawl, status);
+      report("crawl_finished", crawl, { status });
+    },
+    writeThrottled: (crawl, throttle) => {
+      report("write_throttled", crawl, { throttle });
     },
   };
 }

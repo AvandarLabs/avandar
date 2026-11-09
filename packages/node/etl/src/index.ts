@@ -15,10 +15,12 @@ export type {
   CatalogFieldMappings,
   CatalogFieldSource,
   CatalogMappableField,
+  PipelineAdditionalSourceMetadataConfig,
   PipelineConfig,
   PipelineDownloadConfig,
   PipelineDriveConfig,
 } from "@etl/EtlConfig/PipelineConfig.types";
+export { omitRecordPaths } from "@etl/EtlConfig/omitRecordPaths/omitRecordPaths";
 export { parsePipelineConfig } from "@etl/EtlConfig/parsePipelineConfig/parsePipelineConfig";
 export { readPipelineConfigFile } from "@etl/EtlConfig/readPipelineConfigFile/readPipelineConfigFile";
 export { loadListingDownloadScript } from "@etl/ListingDownload/loadListingDownloadScript/loadListingDownloadScript";
@@ -39,6 +41,12 @@ export {
   EtlRunOptionsError,
 } from "@etl/EtlEngine/EtlRunOptionsError";
 export { OutOfOrderConnectionError } from "@etl/EtlEngine/OutOfOrderConnectionError";
+export type { EtlWriteThrottleEvent } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
+export {
+  ETL_TRANSIENT_STORE_ERROR_NAME,
+  EtlTransientStoreError,
+  isEtlTransientStoreError,
+} from "@etl/stores/EtlTransientStoreError";
 export {
   ETL_DEFAULT_SCOPE,
   ETL_SCOPE_KEY_PATTERN,

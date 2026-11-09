@@ -35,7 +35,7 @@ export type SupabaseListingsStoreOptions = Readonly<{
   /**
    * The database function writes call. It takes `p_listings`, a JSON array
    * of `{ listing, relation_columns }`, writes it in one transaction, and
-   * returns the stored listings.
+   * returns the stored listings' ids in input order.
    */
   upsertListingsFunction: string;
 }>;
@@ -114,9 +114,10 @@ async function _readChunk(args: {
           .eq("access_kind", "pipeline_parquet")
           .eq("pipeline_name", first.pipeline_name)
           .in("parquet_file_name", _uniqueValues(rows, "parquet_file_name"));
-  const { data, error } = await query;
+  const { data, error, status } = await query;
   throwOnSupabaseError({
     error,
+    status,
     action: `reading rows from ${options.listingsTable}`,
   });
   const stored = _toStoredRows(data);
@@ -155,16 +156,31 @@ async function _readRowsMatching(args: {
   });
 }
 
+/** The function's result: one id per entry, in entry order. */
+function _toListingIds(data: unknown): readonly string[] {
+  if (
+    !Array.isArray(data) ||
+    !data.every((id: unknown) => {
+      return typeof id === "string";
+    })
+  ) {
+    throw new Error(
+      "The listings write function must return the stored listings' ids.",
+    );
+  }
+  return data;
+}
+
 async function _upsertListingsWithColumns(args: {
   options: SupabaseListingsStoreOptions;
   entries: readonly ListingWithColumns[];
-}): Promise<readonly StoredListingRow[]> {
+}): Promise<readonly string[]> {
   if (args.entries.length === 0) {
     return [];
   }
   const { client, upsertListingsFunction } = args.options;
   // PostgREST caps a function's returned rows as it caps a select's, so a
-  // larger call would store every listing and return only some of them.
+  // larger call would store every listing and return only some ids.
   if (args.entries.length > POSTGREST_MAX_ROWS) {
     throw new Error(
       `upsertListingsWithColumns takes at most ${POSTGREST_MAX_ROWS} listings per call, PostgREST's row cap, and this call has ${args.entries.length}.`,
@@ -172,21 +188,20 @@ async function _upsertListingsWithColumns(args: {
   }
   // One function call is one transaction, so every listing in it is stored
   // with its columns, or none is.
-  const { data, error } = await client
-    .rpc(upsertListingsFunction, {
-      p_listings: args.entries.map(({ row, columns }) => {
-        return {
-          listing: _pickContractColumns(row),
-          relation_columns: columns,
-        };
-      }),
-    })
-    .select(SELECT_COLUMNS);
+  const { data, error, status } = await client.rpc(upsertListingsFunction, {
+    p_listings: args.entries.map(({ row, columns }) => {
+      return {
+        listing: _pickContractColumns(row),
+        relation_columns: columns,
+      };
+    }),
+  });
   throwOnSupabaseError({
     error,
+    status,
     action: `upserting listings with ${upsertListingsFunction}`,
   });
-  return _toStoredRows(data);
+  return _toListingIds(data);
 }
 
 /**

@@ -1,6 +1,7 @@
 import type { UUID } from "@avandar/utils";
 import type { EtlWorkspaceLoadabilityRules } from "@etl/EtlConfig/EtlConfig.types";
 import type { TransformedColumnDescription } from "@etl/EtlEngine/transformedCsvsToParquetBlobs";
+import type { EtlWriteThrottleEvent } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 import type {
   CheckpointStore,
@@ -25,6 +26,12 @@ export type EtlClock = Readonly<{
   now: () => Date;
   /** Milliseconds from an arbitrary origin that never goes backwards. */
   monotonicMs: () => number;
+  /**
+   * Waits `ms` milliseconds: how the engine pauses between writes when the
+   * database slows down or fails. Omit to wait on a real timer, as
+   * `SYSTEM_CLOCK` does. A test clock can advance its own time instead.
+   */
+  sleep?: (ms: number) => Promise<void>;
 }>;
 
 /**
@@ -85,7 +92,11 @@ export type EtlRunOptions = Readonly<{
  * skips only reports `crawl_finished`.
  */
 export type EtlRunProgress = Readonly<{
-  stage: "crawl_started" | "page_loaded" | "crawl_finished";
+  /**
+   * `write_throttled` reports that the crawl eased off the database: after a
+   * slow write, or a transient failure it will retry. `throttle` says which.
+   */
+  stage: "crawl_started" | "page_loaded" | "crawl_finished" | "write_throttled";
   driveKey: string;
   scopeKey: string;
   /** The crawl's 1-based position among the run's crawls. */
@@ -99,6 +110,8 @@ export type EtlRunProgress = Readonly<{
   columnsFound: number;
   /** How the crawl ended. Set only on `crawl_finished`. */
   status?: EtlCrawlStatus;
+  /** What the crawl did to ease off. Set only on `write_throttled`. */
+  throttle?: EtlWriteThrottleEvent;
 }>;
 
 /** The `[since, until)` range of source timestamps one drive's crawl covers. */
@@ -155,10 +168,12 @@ export type RelationDescription = Readonly<{
   /** The source's free-form keywords. */
   tags?: readonly string[];
   /**
-   * The source record the relation was built from, untouched, written to
-   * `source_metadata`. Must survive `JSON.stringify`.
+   * What the source record says that no listing column holds, written to
+   * `additional_source_metadata`: the record without the paths the field
+   * mappings consume (`CatalogFieldMapper.omitMappedPaths`) and without the
+   * fields the pipeline maps in code. Must survive `JSON.stringify`.
    */
-  sourceMetadata?: unknown;
+  additionalSourceMetadata?: unknown;
   /**
    * The connection's source modification time, written to
    * `date_of_last_update`.

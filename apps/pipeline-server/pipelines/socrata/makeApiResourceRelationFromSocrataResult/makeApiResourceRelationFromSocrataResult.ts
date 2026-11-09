@@ -1,3 +1,4 @@
+import { omitRecordPaths } from "@avandar/etl";
 import type {
   SocrataDiscoveryColumn,
   SocrataDiscoveryResult,
@@ -67,6 +68,39 @@ function _toRelationColumn(column: SocrataDiscoveryColumn): RelationColumn {
   };
 }
 
+/**
+ * Discovery API result fields the pipeline maps in code, left out of a
+ * listing's additional source metadata. The resource's `id`, `name`,
+ * `updatedAt`, `type`, and `blob_mime_type` become listing columns, and its
+ * column field names and types become relation columns. `metadata.domain`
+ * is the drive, and `permalink` is the listing's `source_url`.
+ */
+const RESULT_FIELDS_MAPPED_IN_CODE = [
+  "resource.id",
+  "resource.name",
+  "resource.updatedAt",
+  "resource.type",
+  "resource.blob_mime_type",
+  "resource.columns_field_name",
+  "resource.columns_datatype",
+  "metadata.domain",
+  "permalink",
+];
+
+function _buildAdditionalSourceMetadata(
+  unmappedSourceRecord: unknown,
+): unknown {
+  const remaining = omitRecordPaths(
+    unmappedSourceRecord,
+    RESULT_FIELDS_MAPPED_IN_CODE,
+  );
+  const isEmpty =
+    typeof remaining !== "object" ||
+    remaining === null ||
+    Object.keys(remaining).length === 0;
+  return isEmpty ? undefined : remaining;
+}
+
 /** A `file` asset's format, from its MIME type without parameters. */
 function _getFileFormat(blobMimeType: string | undefined): string | undefined {
   const mimeType = blobMimeType?.split(";")[0]?.trim().toLowerCase();
@@ -110,19 +144,25 @@ function _buildDownloadUrl(params: {
  * takes its format from its MIME type.
  *
  * The catalog metadata (organizations, description, domains, tags, and the
- * rest) comes from the pipeline config's field mapping, and the raw
- * Discovery API result is kept as `sourceMetadata`. The mapped fields are
- * spread first, so a mapping can never overwrite a field computed here.
+ * rest) comes from the pipeline config's field mapping. The relation's
+ * `additionalSourceMetadata` keeps what the Discovery API result says that
+ * no listing column holds: `unmappedSourceRecord` without the fields mapped
+ * here. The mapped fields are spread first, so a mapping can never
+ * overwrite a field computed here.
  *
  * @param params.drive - The drive the result came from.
  * @param params.result - The discovered asset.
  * @param params.mappedFields - The result's mapped catalog metadata, which
  *   must name its level 1 organization.
+ * @param params.unmappedSourceRecord - The raw result without the paths its
+ *   field mappings consume and the config omits
+ *   (`CatalogFieldMapper.omitMappedPaths`).
  */
 export function makeApiResourceRelationFromSocrataResult(params: {
   drive: Readonly<ConfiguredDrive>;
   result: Readonly<SocrataDiscoveryResult>;
   mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
+  unmappedSourceRecord: unknown;
 }): ApiResourceRelation {
   const { drive, result } = params;
   const isTabular =
@@ -131,9 +171,14 @@ export function makeApiResourceRelationFromSocrataResult(params: {
     ? result.columns.filter(_isExportedColumn).map(_toRelationColumn)
     : [];
   const sourceDownloadUrl = _buildDownloadUrl({ drive, result, isTabular });
+  const additionalSourceMetadata = _buildAdditionalSourceMetadata(
+    params.unmappedSourceRecord,
+  );
   return {
     ...params.mappedFields,
-    sourceMetadata: result.sourceRecord,
+    ...(additionalSourceMetadata === undefined
+      ? {}
+      : { additionalSourceMetadata }),
     kind: "api_resource",
     externalDatasetId: result.datasetId,
     apiResourceId: result.datasetId,

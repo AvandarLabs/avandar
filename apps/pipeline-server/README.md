@@ -6,11 +6,23 @@ the requested pipeline.
 The current placeholder implementation returns the pipeline name as a plain text
 response.
 
-## Endpoint
+## Endpoints
 
-- `POST /:pipelineName/run`
-- Header: `Authorization: Bearer $AVA_PIPELINE_SERVER_SECRET`
-- Example: `POST /daily-sync/run`
+Every endpoint needs `Authorization: Bearer $AVA_PIPELINE_SERVER_SECRET`. One
+that writes to Supabase also needs the project to write to, in
+`X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key`: the server keeps
+no Supabase credentials.
+
+- `POST /:pipelineName/run`, such as `POST /socrata/run`: runs a pipeline and
+  answers with its report once it ends.
+- `GET /:pipelineName/scopes`: lists each drive's live scope keys.
+- `POST /open-data-cache/:catalogListingId/build` with `{ "buildId": "<uuid>" }`:
+  queues a build of an API-backed catalog listing's Parquet copy and answers
+  202 straight away. The build id comes from
+  `rpc_data_catalog_listings__request_parquet_cache`, which the caller runs
+  first. The server builds one copy at a time, records the copy or the
+  failure on the listing, and deletes the copy it replaced. See
+  `docs/measles-demo/odc-parquet-cache-spec.md`.
 
 ## Environment variables
 
@@ -18,6 +30,11 @@ response.
   pipeline run.
 - `HOST` (optional): Defaults to `0.0.0.0`.
 - `PORT` (optional): For localhost only, defaults to `4611`.
+- `AVA_DUCKDB_MEMORY_LIMIT` (optional): How much memory one Parquet copy's
+  DuckDB conversion uses before it spills to the temp directory. Defaults to
+  `1GB`.
+- `TMPDIR` (optional): Where Parquet copy builds stream their sources. On
+  Fly it is the data volume.
 - `SOCRATA_APP_TOKEN` (optional): App token for the `socrata` pipeline, which
   raises the Socrata API's rate limit. Locally, copy `.env.pipelines.example`
   at the repo root to `.env.pipelines.local` and fill it in. In production,
@@ -49,6 +66,17 @@ drive and scope): its window, how many datasets it fetched, and how many
 listings it wrote or left unchanged. When every crawl fails, the report is still printed before the
 command exits with an error. `ava pipeline reset` selects listings by their
 `pipeline_name`.
+
+A run paces its writes to how the database is keeping up, and retries a
+request that fails transiently (a timeout, a 5xx, a dropped connection)
+instead of failing the crawl, so a slow database slows a run down rather
+than stopping it. While it does, `ava pipeline run` prints warnings such as
+`writes slowed: 1 MiB batches, pausing 4.2 s` and
+`write failed (2 of 8 in a row), retrying in 4.0 s with 256 KiB batches`.
+Only the 8th transient failure in a row fails a crawl, and its checkpoint
+still holds every page it finished, so `--incremental` continues from
+there. See
+[`etl-adaptive-write-throttle.md`](../../docs/measles-demo/etl-adaptive-write-throttle.md).
 
 A scope is a slice of a drive that is crawled and resumed on its own: `hdx`
 has `format:csv`, `format:parquet`, and `format:other` (every other

@@ -40,7 +40,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     organization4_name: null,
     domains: null,
     tags: null,
-    source_metadata: null,
+    additional_source_metadata: null,
     drive_id: null,
     ...overrides,
   };
@@ -51,13 +51,33 @@ function _stored(overrides: Partial<ListingRowValues> = {}): StoredListingRow {
 }
 
 describe("isListingRowUnchanged", () => {
-  it("ignores a change to source_metadata alone", () => {
+  it("ignores a change to additional_source_metadata alone", () => {
     // Socrata's record carries page_views and download_count, which change
     // daily: counting them would rewrite every listing on every full run.
     expect(
       isListingRowUnchanged({
-        stored: _stored({ source_metadata: { page_views: 1 } }),
-        next: _row({ source_metadata: { page_views: 2 } }),
+        stored: _stored({ additional_source_metadata: { page_views: 1 } }),
+        next: _row({ additional_source_metadata: { page_views: 2 } }),
+      }),
+    ).toBe(true);
+  });
+
+  it("counts a stored row with no additional_source_metadata when the next one has it", () => {
+    // A listing written before the column existed gets it on the next run,
+    // without waiting for another column to change.
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ additional_source_metadata: null }),
+        next: _row({ additional_source_metadata: { title: "Trips" } }),
+      }),
+    ).toBe(false);
+  });
+
+  it("ignores additional_source_metadata the next row no longer has", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ additional_source_metadata: { title: "Trips" } }),
+        next: _row({ additional_source_metadata: null }),
       }),
     ).toBe(true);
   });

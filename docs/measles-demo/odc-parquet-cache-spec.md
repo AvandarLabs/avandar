@@ -159,20 +159,39 @@ count matched Socrata's live count exactly.
 
 ### 2. When a copy is built: on first use, refreshed when stale
 
-A new edge route, `POST /data-catalog-listings/:id/parquet-cache`, read as
-the caller so RLS decides whether they can see the listing:
+An edge route in the `open-data` function,
+`POST /data-catalog-listings/:id/parquet-cache` with a body of `{}`, reads
+the listing as the caller so RLS decides whether they can see it, then
+decides with `requestParquetCache`:
 
 | Listing state | Response | Side effect |
 |---|---|---|
-| Copy is `ready` and its source version matches the live freshness token | `200 { status: "ready", url }` | none |
-| Copy is `ready` but stale | `200 { status: "ready", url, isStale: true }` | asks the pipeline server for a rebuild |
-| No copy, or the last build `failed` with a retryable code | `202 { status: "building" }` | marks `building`, asks the pipeline server to build |
-| `building`, started within the last 30 minutes | `202 { status: "building" }` | none |
-| `building`, started over 30 minutes ago | `202 { status: "building" }` | treats the build as lost and asks again |
+| Has a copy, and its source version matches the live freshness token | `200 { status: "ready", partPaths, rowCount, byteSize, sourceVersion, isStale: false }` | none |
+| Has a copy, but the token moved | `200 { ..., isStale: true }` | claims a rebuild and asks the pipeline server for it |
+| Has a copy while a rebuild runs | `200` with the copy | claims again only if the build counts as lost |
+| No copy | `202 { status: "building" }` | claims a build and asks the pipeline server for it |
+| `building`, started within the last 30 minutes | `202 { status: "building" }` | none: the claim returns no id |
+| `building`, started over 30 minutes ago | `202 { status: "building" }` | the claim treats the build as lost and gives a new id |
+| `failed`, under 15 minutes ago, or the listing is invalid, or `copy-unsupported` | `409 { status: "failed", failureCode }` | none |
+| `failed`, over 15 minutes ago | `202 { status: "building" }` | retries the build |
+| The pipeline server does not accept the build | `409 { status: "failed", failureCode: "pipeline-server-unreachable" }` | releases the claim as that failure, so a later request retries |
+| Not API-backed | `409 { status: "unavailable", reason: "not-api-backed" }` | none |
+| No pipeline server configured | `503 { status: "unavailable", reason: "copies-unavailable" }` | none; an existing copy is still served |
 
-A stale copy is still served while the rebuild runs: an old copy now is
-better than a correct one in ten minutes. The freshness check is the
-existing `readOpenDataFreshnessToken`.
+`partPaths` are the copy's parts in the `opendata` bucket, in row order
+(`buildParquetCachePartPaths`). A stale copy is still served while the
+rebuild runs: an old copy now is better than a correct one in ten minutes.
+The freshness check is the existing `readOpenDataFreshnessToken`, and a
+check that fails serves the copy as current.
+
+The function reaches the pipeline server through `AVA_PIPELINE_SERVER_URL`
+and `AVA_PIPELINE_SERVER_SECRET`, and sends its own project's URL and secret
+key with each build. Locally the function runs in Docker and sees its
+project as `http://kong:8000`, so `AVA_PIPELINE_SERVER_SUPABASE_URL` gives the
+URL the pipeline server can reach instead (see `.env.example.edge`). The
+Demo deploy workflow sets both on the demo project from the `Staging`
+environment's `AVA_PIPELINE_SERVER_URL` variable and secret. Staging and
+production edge secrets are set by hand.
 
 **Callers:** "Add to workspace" and every later load of an added listing.
 Browsing the catalog never starts a build. The preview keeps reading the
@@ -182,11 +201,26 @@ source.
 ### 3. Who reads the copy
 
 - `DatasetParquetWrapper` (`src/clients/qetl/wrappers/DatasetParquetWrapper`):
-  for an `api_resource` listing, it calls the `parquet-cache` route. `ready`
-  fetches the public URL, the same code path a pipeline listing uses.
-  `building` polls the route until it is `ready`, with a progress label.
-- "Add to workspace" shows that the dataset is being prepared while the
-  first build runs, rather than failing.
+  for an `api_resource` listing, it calls the `parquet-cache` route through
+  `fetchOpenDataParquetCopy` (`src/lib/openData/`).
+  - `ready`: it downloads each part from the bucket's public URL, the way a
+    pipeline listing's Parquet is read. A copy of several parts is merged
+    into one Parquet blob in DuckDB (`DuckDbClient.mergeParquetBlobs`),
+    since the relation cache and loader hold one blob per dataset. A stale
+    copy is cached for only 5 minutes, so the next load reads the rebuilt
+    copy.
+  - `building`: it asks again, waiting from 2 s up to 15 s between asks, for
+    up to 10 minutes. The load shows its usual loading state meanwhile. Past
+    that it fails with `OpenDataParquetCopyError` (`still-preparing`), and the
+    build keeps running.
+  - `failed`: it fails with `OpenDataParquetCopyError` and the failure code.
+  - `unavailable` (no pipeline server configured): it reads the source
+    through the 25 MB relay, as before, until S7 removes it.
+- "Add to workspace" requests the copy as the dataset is saved, so the first
+  build starts before the dataset is first opened. While it builds, a
+  notification says the data is being prepared and that large datasets can
+  take a few minutes to open the first time. A failed build gets a warning
+  that the dataset may not open.
 - The data preview can later read a ready copy's first row group with HTTP
   range requests instead of the sample. That is not part of the first cut.
 
@@ -244,10 +278,10 @@ and its cache columns are removed.
 |---|---|---|
 | S1 | Drop the `opendata` authenticated write policies. **Done.** | none |
 | S2 | Pipeline server: the cache builder, driven by each pipeline's `download` manifest block. Paged sources are copied one part at a time; one-file sources are gzipped on disk. **Done.** | none |
-| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. On start, it deletes temp folders a killed build left behind. The always-on Fly config and the templated deploy are **done**. | S2 |
+| S3 | Pipeline server: the build route, its auth, and one-build-per-listing. Builds run one at a time; a build whose claim was taken over is skipped, and one superseded while it ran deletes its copy. On start, it deletes temp folders a killed build left behind. **Done.** | S2 |
 | S4 | Schema: the cache columns, constraints, and the three RPCs. **Done.** | none |
-| S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, triggering S3) | S3, S4 |
-| S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state | S5 |
+| S5 | Edge function: the `parquet-cache` route (freshness check, lost-build rule, retry backoff, triggering S3), and its env in `.env.example.edge` and the Demo workflow. **Done.** | S3, S4 |
+| S6 | App: `DatasetParquetWrapper` and "Add to workspace" read the copy and show its preparing state. **Done.** | S5 |
 | S7 | Remove the 25 MB relay, the private bucket cache, and its columns | S6 |
 | S8 | E2E: add a listing over 25 MB and query it | S6 |
 
@@ -265,3 +299,9 @@ and its cache columns are removed.
 3. **Storage cost.** Copies are only built for listings a workspace adds, so
    cost grows with use, not with the catalog's size. Pre-building copies for
    popular listings is a later option.
+4. **Source drift.** A workspace keeps the columns it copied when it added a
+   listing, while its data comes from the listing's current copy, so a
+   changed source can leave the two disagreeing. A rebuild also deletes the
+   copy it replaced, which a dataset a user chose to freeze would still need.
+   Handling every drift case is tracked as P6.11 in
+   `docs/production-plan-world-humanitarian-day.md` and is out of scope here.

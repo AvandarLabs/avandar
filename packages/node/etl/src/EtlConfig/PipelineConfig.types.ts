@@ -30,6 +30,12 @@ export type CatalogMappableField = (typeof CATALOG_MAPPABLE_FIELDS)[number];
 export const REQUIRED_CATALOG_FIELD = "organization1_name";
 
 /**
+ * A dotted path into a source record: segments of letters, digits, `_`, and
+ * `-`, such as `classification.domain_tags` or `groups.0.title`.
+ */
+export const CATALOG_FIELD_PATH_PATTERN = /^[\w-]+(\.[\w-]+)*$/;
+
+/**
  * Where one field's value comes from: a dotted path into the source record,
  * a constant, or the default export of a script whose path is relative to
  * the config file.
@@ -74,6 +80,18 @@ export type PipelineDownloadConfig =
   | Readonly<{ paging: false; script: string }>;
 
 /**
+ * What a listing's `additional_source_metadata` leaves out besides the paths
+ * its field mappings consume.
+ */
+export type PipelineAdditionalSourceMetadataConfig = Readonly<{
+  /**
+   * Source record paths no listing column holds that are still not worth
+   * keeping, such as a license's full text when its name is mapped.
+   */
+  omit?: readonly string[];
+}>;
+
+/**
  * One pipeline's config file, such as `socrata.pipeline.yaml`: its drives,
  * how each source record becomes catalog metadata, and its changes to the
  * shared workspace loadability rules.
@@ -92,4 +110,6 @@ export type PipelineConfig = Readonly<{
    * pipeline's listings are never copied.
    */
   download?: PipelineDownloadConfig;
+  /** What `additional_source_metadata` leaves out. */
+  additionalSourceMetadata?: PipelineAdditionalSourceMetadataConfig;
 }>;

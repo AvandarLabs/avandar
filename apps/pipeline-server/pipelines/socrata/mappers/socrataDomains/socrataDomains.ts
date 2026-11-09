@@ -10,6 +10,16 @@ function _readStrings(value: unknown): readonly string[] {
 }
 
 /**
+ * The source record paths this field holds, left out of a listing's additional
+ * source metadata. The portal's own category and Socrata's categories, which
+ * this field holds together.
+ */
+export const reads = [
+  "classification.domain_category",
+  "classification.categories",
+];
+
+/**
  * Mapper script for `domains`: the portal's own category
  * (`classification.domain_category`) followed by Socrata's global
  * categories (`classification.categories`), which most portals leave empty.

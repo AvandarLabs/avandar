@@ -44,7 +44,7 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     organization4_name: null,
     domains: null,
     tags: null,
-    source_metadata: null,
+    additional_source_metadata: null,
     drive_id: null,
     ...overrides,
   };
@@ -82,13 +82,24 @@ function _columnNames(columns: readonly RelationColumnRow[] | undefined) {
   });
 }
 
+function _findStoredRow(
+  store: ReturnType<typeof createInMemoryListingsStore>,
+  listingId: string | undefined,
+) {
+  return store.getRows().find((row) => {
+    return row.id === listingId;
+  });
+}
+
 describe("createInMemoryListingsStore", () => {
   it("keeps a row's id when the same key is upserted again", async () => {
     const store = createInMemoryListingsStore();
-    const [first] = await store.upsertListingsWithColumns([_entry(_row())]);
-    const [second] = await store.upsertListingsWithColumns([
+    const [firstId] = await store.upsertListingsWithColumns([_entry(_row())]);
+    const first = _findStoredRow(store, firstId);
+    const [secondId] = await store.upsertListingsWithColumns([
       _entry(_row({ display_name: "Renamed" })),
     ]);
+    const second = _findStoredRow(store, secondId);
 
     expect([second?.id, second?.display_name, store.getRows().length]).toEqual([
       first?.id,
@@ -116,9 +127,10 @@ describe("createInMemoryListingsStore", () => {
 
   it("stores a listing's columns with its row", async () => {
     const store = createInMemoryListingsStore();
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row(), [_column("a", 0), _column("b", 1)]),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     expect(_columnNames(store.getRelationColumns(stored?.id ?? ""))).toEqual([
       "a",
@@ -131,9 +143,10 @@ describe("createInMemoryListingsStore", () => {
     await store.upsertListingsWithColumns([
       _entry(_row(), [_column("a", 0), _column("b", 1)]),
     ]);
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row(), [_column("c", 0)]),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     expect(_columnNames(store.getRelationColumns(stored?.id ?? ""))).toEqual([
       "c",
@@ -153,11 +166,12 @@ describe("createInMemoryListingsStore", () => {
       ),
     ]);
 
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row({ metadata, display_name: "Renamed" }), [
         _column("piped", 0),
       ]),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     expect([
       stored?.display_name,
@@ -178,11 +192,12 @@ describe("createInMemoryListingsStore", () => {
       ),
     ]);
 
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row({ metadata: { relation_columns_sha256: "fp-2" } }), [
         _column("piped", 0),
       ]),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     expect([
       stored?.date_column_type_last_verified,
@@ -214,9 +229,10 @@ describe("createInMemoryListingsStore", () => {
   it("stores an entry with no columns, with an empty column set", async () => {
     const store = createInMemoryListingsStore();
 
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row(), []),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     expect(store.getRelationColumns(stored?.id ?? "")).toEqual([]);
   });
@@ -276,11 +292,12 @@ describe("createInMemoryListingsStore", () => {
     expect(store.getRows()[0]?.metadata).toEqual({ count: 1 });
   });
 
-  it("is not changed by editing the rows an upsert returns", async () => {
+  it("is not changed by editing the rows it returns", async () => {
     const store = createInMemoryListingsStore();
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row({ metadata: { count: 1 } })),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     Object.assign(stored?.metadata ?? {}, { count: 2 });
 
@@ -304,9 +321,10 @@ describe("createInMemoryListingsStore", () => {
   it("is not changed by editing a relation column list afterwards", async () => {
     const store = createInMemoryListingsStore();
     const columns: RelationColumnRow[] = [_column("a", 0)];
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(_row(), columns),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     columns.push(_column("b", 1));
 
@@ -315,7 +333,8 @@ describe("createInMemoryListingsStore", () => {
 
   it("is not changed by editing the relation columns a read returns", async () => {
     const store = createInMemoryListingsStore();
-    const [stored] = await store.upsertListingsWithColumns([_entry(_row())]);
+    const [storedId] = await store.upsertListingsWithColumns([_entry(_row())]);
+    const stored = _findStoredRow(store, storedId);
     const listingId = stored?.id ?? "";
 
     Object.assign(store.getRelationColumns(listingId)?.[0] ?? {}, {
@@ -328,7 +347,7 @@ describe("createInMemoryListingsStore", () => {
   it("stores and returns rows the way Postgres would, as JSON", async () => {
     const store = createInMemoryListingsStore();
 
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       _entry(
         _row({
           metadata: {
@@ -339,6 +358,7 @@ describe("createInMemoryListingsStore", () => {
         }),
       ),
     ]);
+    const stored = _findStoredRow(store, storedId);
 
     expect(stored?.metadata).toEqual({
       kept: 1,
