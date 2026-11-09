@@ -46,6 +46,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D36 | Results outside the Data Explorer show in the chat | Approved |
 | D37 | The agent path offers offline answers on network failure | Built |
 | D38 | Page context never routes results to the Data Explorer by default | Built |
+| D39 | Personal values in page SQL become placeholders the browser maps back | Built |
 
 ---
 
@@ -586,7 +587,8 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   A tile title, or a string literal in a tile's SQL, that the browser's PII
   check (`detectPii`) flags is replaced ("Untitled chart", `'<redacted>'`)
   before the block is sent. The explorer's SQL is not redacted, to match
-  what today's chat sends. A case's name is never sent, only its case type's name, because a case's
+  what today's chat sends. (D39 replaces both SQL rules: personal values in
+  tile and explorer SQL now become placeholders.) A case's name is never sent, only its case type's name, because a case's
   name is usually a person's name. A case's field values are never sent
   either. Page text is escaped and marked as data in the block, and prompt
   v2 tells the model never to follow instructions inside it.
@@ -647,3 +649,32 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Alternatives.** Default to the explorer when unsure, as the agent did
   before 1A (a failed page read would navigate the user away from what they
   were doing).
+
+## D39. Personal values in page SQL become placeholders the browser maps back (built)
+
+- **Decision (Pablo, 2026-11-08).** A string literal in page SQL (dashboard
+  charts and the Data Explorer's query) becomes `'<value N>'` when it is
+  compared with a column whose name `detectPii` flags, when its value looks
+  personal, or when the SQL cannot be parsed. Each conversation keeps the
+  map in the browser, and the host swaps placeholders back before
+  `run_query` and value lookups run. Prompt v2 tells the model to keep a
+  placeholder exactly as written. Spec:
+  [phase-1a-redaction.md](specs/phase-1a-redaction.md).
+- **Why.** The pattern check behind D35 only caught literals that look like
+  an email, phone number, or id, so names reached the model. Judging a name
+  by its value alone fails on Avandar's data (`'Kings'`, `'Georgia'`, and
+  `'Washington'` are places), and deleting values would break "show this
+  chart by week". A placeholder hides the value and keeps the filter.
+- **Alternatives.** Redact by value with a name detector (false positives
+  on places, and the filter is lost). Delete flagged literals (`'<redacted>'`,
+  the D35 rule; the model cannot rebuild the chart). Send nothing but titles
+  (the agent could no longer change a chart).
+- **What the eval found.** A chart title that names the value tells the
+  model what its placeholder hides, since titles get only the content
+  check. Without the prompt rule, Haiku asked the user what `'<value 1>'`
+  meant. With it, P07 passes and keeps the placeholder.
+- **Costs.** About 75 to 85 more input tokens per call for the prompt rule.
+  Column names match by substring (`stage` contains `age`), so some
+  ordinary filters reach the model as placeholders; answers stay correct
+  through the round trip. DuckDB-only syntax such as `GROUP BY ALL` does
+  not parse, so all of that statement's literals become placeholders.

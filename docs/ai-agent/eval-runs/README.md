@@ -106,3 +106,4 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T04-06-49](2026-11-09T04-06-49-phase-1a-redaction_agent-page/results.jsonl) | `phase-1a-redaction:agent-page` | 7/7 | 0 | 0 | $0.00031 | 1.8 s / 2.9 s | none |
 | [2026-11-09T04-07-01](2026-11-09T04-07-01-phase-1a-redaction_p07-repeat/results.jsonl) | `phase-1a-redaction:p07-repeat` | 1/1 | 0 | 0 | $0.00019 | 2.0 s / 2.0 s | none |
 | [2026-11-09T04-07-05](2026-11-09T04-07-05-phase-1a-redaction_p07-repeat/results.jsonl) | `phase-1a-redaction:p07-repeat` | 1/1 | 0 | 0 | $0.00019 | 2.0 s / 2.0 s | none |
+| [2026-11-09T04-08-54](2026-11-09T04-08-54-phase-1a-redaction_agent-45/results.jsonl) | `phase-1a-redaction:agent-45` | 45/45 | 0 | 0 | $0.00026 | 2.1 s / 3.3 s | none |

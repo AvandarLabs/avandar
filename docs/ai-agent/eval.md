@@ -116,6 +116,32 @@ context (P01, P02, P05).
 - Prompt v2 costs about 210 more input tokens per call (+7%) and stays
   inside D10's cost range.
 
+Then, on 2026-11-09, personal values in page SQL became placeholders
+(D39, [phase-1a-redaction.md](specs/phase-1a-redaction.md)), archived under
+the `phase-1a-redaction` label. P07 shows a dashboard chart of Kings County
+deaths in 2022, with `Admin2` treated as personal, so the model reads
+`"Admin2" = '<value 1>'` and must keep it when asked for the chart by week.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a-redaction:agent-page #1 (title named the county) | 7/7 | 0 / 0 | $0.00036 | 3,123 | 2.2 s / 2.7 s |
+| phase-1a-redaction:agent-page #2 (no placeholder rule) | 6/7 | 1 / 0 | $0.00021 | 3,138 | 1.8 s / 2.7 s |
+| phase-1a-redaction:agent-page #3 (final) | 7/7 | 0 / 0 | $0.00031 | 3,213 | 1.8 s / 2.9 s |
+| phase-1a-redaction:p07-repeat #1-#2 (P07 alone) | 1/1, 1/1 | 0 / 0 | $0.00019 | | 2.0 s |
+| phase-1a-redaction:agent-45 (prompt v2 with the placeholder rule) | 45/45 | 0 / 0 | $0.00026 | 3,110 | 2.1 s / 3.3 s |
+
+- Run #1 passed P07 without testing it: the tile was titled "Deaths in
+  Kings County by month", titles get only the content check, and the model
+  wrote `'Kings'` from the title. The tile is now "Deaths in one county by
+  month".
+- Run #2 missed P07: Haiku read `'<value 1>'` as an unknown value and asked
+  which New York county to use. Prompt v2 now says to keep a placeholder
+  exactly as written and never ask what it is.
+- From run #3 on, P07 passed three times in a row, each time with
+  `'<value 1>'` kept in the model's SQL and restored on the device to sum
+  to 2,707. P01 to P06 and the 45 questions still pass. The placeholder
+  rule adds about 75 to 85 input tokens per call. All seven runs cost $0.018.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -362,7 +388,7 @@ A question passes when the final result matches the truth, and, when the
 user asked for a chart, the answer is a chart. Answering in words without
 running a query fails.
 
-`covid/covidPageQuestions.ts` adds six page-context questions, P01 to P06,
+`covid/covidPageQuestions.ts` adds seven page-context questions, P01 to P07,
 for the page-agnostic agent. Each carries a `pageContext`: what the user
 has open when asking. The Pi harness renders it with
 `buildAgentPageContextBlock`, and the baseline harness passes the matching
@@ -447,7 +473,7 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The 20-question offline screen | add `--questions B01,B03,B05,B07,B09,I01,I03,I05,I07,I09,H01,H03,H05,H07,H09,N02,N04,N06,N08,N10` |
 | Gemma 4 E2B offline | prefix `AVA_EVAL_WEBLLM_LIB=<path to web-llm 0.2.86 lib/index.js>` |
 | One question or category | `--questions N11` or `--questions H` |
-| The page-context questions (add `--label phase-1a:agent-page`) | `--harness pi --config haiku-sonnet --questions P` |
+| The page-context questions (add `--label phase-1a-redaction:agent-page`) | `--harness pi --config haiku-sonnet --questions P` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 
 The PDF table assistant has its own runner,
@@ -484,7 +510,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 88 runs (every
+chat index lists all 94 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
