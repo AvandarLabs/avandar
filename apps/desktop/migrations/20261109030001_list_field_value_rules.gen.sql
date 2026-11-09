@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261109030000_list_field_value_rules.sql by
+-- Generated from supabase/migrations/20261109030001_list_field_value_rules.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 0
