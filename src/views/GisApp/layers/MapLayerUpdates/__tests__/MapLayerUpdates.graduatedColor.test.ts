@@ -129,6 +129,82 @@ describe("graduated color updates", () => {
     });
   });
 
+  it("clears labels when the method changes the intervals", () => {
+    const layer = _createGraduatedLayer({
+      ramp: ["#d7301f", "#d9d9d9"],
+      classification: { method: "manual", breaks: [95] },
+      classLabels: ["Below 95%", "95% or above"],
+    });
+    const color = _getGraduatedColor(layer);
+
+    const updated = MapLayerUpdates.withLayerColor({
+      layer,
+      color: {
+        ...color,
+        classification: { method: "quantile", classCount: 2 },
+      },
+    });
+
+    expect(_getGraduatedColor(updated).classLabels).toEqual([
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("clears labels when a manual break moves", () => {
+    const layer = _createGraduatedLayer({
+      ramp: ["#d7301f", "#d9d9d9"],
+      classification: { method: "manual", breaks: [95] },
+      classLabels: ["Below 95%", "95% or above"],
+    });
+
+    const updated = MapLayerUpdates.withManualBreaks({ layer, breaks: [90] });
+
+    expect(_getGraduatedColor(updated).classLabels).toEqual([
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("keeps labels when the classification is unchanged", () => {
+    const layer = _createGraduatedLayer({
+      ramp: ["#d7301f", "#d9d9d9"],
+      classification: { method: "manual", breaks: [95] },
+      classLabels: ["Below 95%", "95% or above"],
+    });
+
+    const updated = MapLayerUpdates.withClassColor({
+      layer,
+      classIndex: 0,
+      color: "#000000",
+    });
+
+    expect(_getGraduatedColor(updated).classLabels).toEqual([
+      "Below 95%",
+      "95% or above",
+    ]);
+  });
+
+  it("keeps the labels highlight-below writes over a changed classification", () => {
+    const layer = _createGraduatedLayer({
+      ramp: ["#d7301f", "#d9d9d9"],
+      classification: { method: "manual", breaks: [95] },
+      classLabels: ["Old", "Older"],
+    });
+
+    const updated = MapLayerUpdates.withHighlightBelow({
+      layer,
+      breakValue: 90,
+      belowLabel: "Below 90",
+      aboveLabel: "90 or above",
+    });
+
+    expect(_getGraduatedColor(updated).classLabels).toEqual([
+      "Below 90",
+      "90 or above",
+    ]);
+  });
+
   it("leaves a single-color layer unchanged", () => {
     const layer = MapLayer.createArea("ZIP codes");
 
