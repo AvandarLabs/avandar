@@ -85,6 +85,7 @@ msgid "Numbers in prose"
 msgstr "正文中的数字"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Sort by"
 msgstr "排序方式"
 
@@ -720,6 +721,11 @@ msgstr "无法保存。您最近的更改仍显示在屏幕上。"
 #: src/components/badges/SourceBadge.tsx
 msgid "From Excel"
 msgstr "来自 Excel"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "Showing {shownText} of {countText}. Download the full list as CSV from "
+"the map."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -1945,6 +1951,10 @@ msgstr "SQL 为空。"
 msgid "Name column"
 msgstr "名称列"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
+msgid "Include a feature list"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign private resources"
 msgstr "重新分配私有资源"
@@ -2122,6 +2132,10 @@ msgstr "生成于 {0}"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Exposure ends"
 msgstr "暴露结束时间"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
+msgid "Prints the layer's features as a table after the map."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -2638,6 +2652,11 @@ msgstr "请重试。如果仍然失败，请重新加载页面。"
 msgid "You can start using your new password now"
 msgstr "您现在可以开始使用新密码"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
+msgid "The default order lists the nearest first when a buffer filters the "
+"layer."
+msgstr ""
+
 #: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
 msgid "Q{quarter} {year}"
 msgstr "{year}年第{quarter}季度"
@@ -2928,6 +2947,10 @@ msgid "The online assistant is unreachable. Answer this message with the "
 "offline models on this computer instead?"
 msgstr "无法连接在线助手。要改用此计算机上的离线模型回答此消息吗？"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
+msgid "Up to 1,000. The PDF says when the list is cut short."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
 msgstr "在下面输入或粘贴电子邮件。您的工作区将按成员收费。"
@@ -3206,6 +3229,7 @@ msgid "Import data"
 msgstr "导入数据"
 
 #: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Descending"
 msgstr "降序"
 
@@ -3651,6 +3675,10 @@ msgstr "MapLibre、OpenStreetMap 贡献者"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "No columns from this dataset."
 msgstr "此数据集中没有列。"
+
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
+msgid "Only point, line, or polygon layers with exact locations can be listed."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
@@ -5719,6 +5747,7 @@ msgstr "{formattedNumResults}+ 个数据集"
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListColumnFields.tsx
 msgid "Columns"
 msgstr "列"
 
@@ -6029,6 +6058,10 @@ msgstr "选择一个或多个"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Large"
 msgstr "大"
+
+#: src/views/GisApp/export/loadExportFeatureTable/loadExportFeatureTable.ts
+msgid "The map's data is still loading. Try again in a moment."
+msgstr ""
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Invalid workspace"
@@ -7023,6 +7056,10 @@ msgstr "全部"
 msgid "Offline models downloaded"
 msgstr "离线模型已下载"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
+msgid "Maximum rows"
+msgstr ""
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
 msgstr "{fieldName} 必须至少包含 {minLength} 个字符"
@@ -7348,6 +7385,7 @@ msgid "Allow syncing"
 msgstr "允许同步"
 
 #: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Ascending"
 msgstr "升序"
 
@@ -7436,6 +7474,10 @@ msgstr "过滤"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+#~ msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
+#~ msgstr ""
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
@@ -7576,6 +7618,10 @@ msgstr "堆叠"
 msgid "Share this {resourceLabel}"
 msgstr "分享此 {resourceLabel}"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
+msgid "Default order"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
 msgstr "此 {resource} 与以下人员共享："
@@ -7601,6 +7647,11 @@ msgstr "移除 {datasetName}"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr "此地图中的比例尺各不相同"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName} "
+"within {distanceText} of {sourceLayerName}"
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
@@ -7821,6 +7872,10 @@ msgstr "无法打开 Google 文件选择器。请重试。"
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/座位"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
+msgid "Sort direction"
+msgstr ""
+
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
 msgstr "显示名称"
@@ -7912,6 +7967,7 @@ msgstr "放置文本"
 msgid "Workspace"
 msgstr "工作区"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
 msgid "Layer"
 msgstr "图层"
@@ -8747,6 +8803,10 @@ msgstr "最小半径"
 msgid "Access denied"
 msgstr "访问被拒绝"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
+msgid "Pick a layer"
+msgstr ""
+
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
 msgid "Refresh {0} records"
@@ -9254,6 +9314,11 @@ msgstr "列已绑定。未分配任何值；轮廓将显示为已确定。"
 msgid "From Google Sheets"
 msgstr "来自 Google Sheets"
 
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "Showing {shownColumnsText} of {totalColumnsText} columns. Download the "
+"full list as CSV from the map."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Subscription updated successfully"
 msgstr "订阅已成功更新"
@@ -9469,6 +9534,10 @@ msgstr "无法删除地点。"
 msgid "Switch Workspace"
 msgstr "切换工作区"
 
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+#~ msgid "{countText} {layerName}"
+#~ msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "您可以查看此仪表板，因为它已与您共享。"
@@ -9476,6 +9545,10 @@ msgstr "您可以查看此仪表板，因为它已与您共享。"
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Pick user groups for this member"
 msgstr "为此成员选择用户组"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName}"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -9587,6 +9660,7 @@ msgstr "您尚未选择值列"
 msgid "Text contains"
 msgstr "文本包含"
 
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 #: src/views/GisApp/panels/FeatureListDrawer/formatFeatureListCell/formatFeatureListCell.ts
 msgid "{distance} {unit}"
 msgstr ""
@@ -11738,6 +11812,11 @@ msgstr "成功"
 msgid "This layer's popup shows no fields. Choose some in the layer's Popup "
 "section."
 msgstr "此图层的弹出窗口未显示任何字段。请在图层的“弹出窗口”部分选择字段。"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "Showing {shownText} of {countText} rows and {shownColumnsText} of "
+"{totalColumnsText} columns. Download the full list as CSV from the map."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Pick a case type"

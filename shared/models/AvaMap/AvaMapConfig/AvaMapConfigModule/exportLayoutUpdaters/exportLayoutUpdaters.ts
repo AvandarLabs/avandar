@@ -1,3 +1,4 @@
+import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
 import type { AvaMapConfigRead } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 import type {
   ExportLayout, // oxfmt-ignore
@@ -14,6 +15,7 @@ export const DEFAULT_EXPORT_LAYOUT: ExportLayout = {
   scaleBar: true,
   sourceLine: "",
   disclaimer: undefined,
+  featureList: undefined,
 };
 
 /** Blank or whitespace-only disclaimers become unset, never stored verbatim. */
@@ -23,12 +25,54 @@ function _normalizeDisclaimer(
   return disclaimer?.trim() || undefined;
 }
 
+/**
+ * Keeps a feature list's row cap a whole number from 1 to 1,000, so a typed
+ * value can never make the persisted config fail its schema. A value that is
+ * not a number falls back to the default cap.
+ */
+function _normalizeFeatureList(
+  featureList: ExportLayout["featureList"],
+): ExportLayout["featureList"] {
+  if (featureList === undefined) {
+    return undefined;
+  }
+  const maxRows = Number.isFinite(featureList.maxRows)
+    ? Math.min(
+        AvaMapConfigValues.exportFeatureListMaxRows,
+        Math.max(1, Math.round(featureList.maxRows)),
+      )
+    : AvaMapConfigValues.exportFeatureListDefaultMaxRows;
+  return maxRows === featureList.maxRows
+    ? featureList
+    : { ...featureList, maxRows };
+}
+
 /** True when two header lines are equal. */
 function _isSameHeaderLine(
   first: ExportLayout["title"],
   second: ExportLayout["title"],
 ): boolean {
   return first.isVisible === second.isVisible && first.text === second.text;
+}
+
+/** True when two feature lists, or two unset lists, are equal. */
+function _isSameFeatureList(
+  first: ExportLayout["featureList"],
+  second: ExportLayout["featureList"],
+): boolean {
+  if (first === undefined || second === undefined) {
+    return first === second;
+  }
+  return (
+    first.layerId === second.layerId &&
+    first.maxRows === second.maxRows &&
+    first.sort?.columnId === second.sort?.columnId &&
+    first.sort?.direction === second.sort?.direction &&
+    first.columnIds.length === second.columnIds.length &&
+    first.columnIds.every((columnId, index) => {
+      return columnId === second.columnIds[index];
+    })
+  );
 }
 
 /** Every scalar `ExportLayout` field compared by `_isSameLayout` directly. */
@@ -45,14 +89,14 @@ type _ScalarKey = (typeof _SCALAR_KEYS)[number];
 
 /**
  * Compile-time exhaustiveness guard: fails `pnpm type-check` if `ExportLayout`
- * gains a field that neither `_SCALAR_KEYS` nor `_isSameHeaderLine`'s two call
- * sites below account for, so a forgotten field can never silently make
- * `_isSameLayout` treat a real edit as a no-op.
+ * gains a field that neither `_SCALAR_KEYS`, `_isSameHeaderLine`'s two call
+ * sites, nor `_isSameFeatureList` account for, so a forgotten field can never
+ * silently make `_isSameLayout` treat a real edit as a no-op.
  */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type test - this variable is intentionally not used
 type _ExhaustiveExportLayoutKeys = Expect<
-  IsEqual<keyof ExportLayout, _ScalarKey | "title" | "subtitle">
+  IsEqual<keyof ExportLayout, _ScalarKey | "title" | "subtitle" | "featureList">
 >;
 
 /** True when two layouts are field-for-field equal. */
@@ -62,7 +106,8 @@ function _isSameLayout(first: ExportLayout, second: ExportLayout): boolean {
       return first[key] === second[key];
     }) &&
     _isSameHeaderLine(first.title, second.title) &&
-    _isSameHeaderLine(first.subtitle, second.subtitle)
+    _isSameHeaderLine(first.subtitle, second.subtitle) &&
+    _isSameFeatureList(first.featureList, second.featureList)
   );
 }
 
@@ -75,7 +120,8 @@ export const exportLayoutUpdaters = {
    * Replaces the map's export furniture.
    *
    * A blank disclaimer is normalized to unset, so the furniture strip and the
-   * page fall back to the localized default instead of showing nothing.
+   * page fall back to the localized default instead of showing nothing. A
+   * feature list's row cap is kept a whole number from 1 to 1,000.
    */
   withExportLayout: (
     options: Readonly<{
@@ -87,6 +133,7 @@ export const exportLayoutUpdaters = {
     const normalizedExportLayout: ExportLayout = {
       ...exportLayout,
       disclaimer: _normalizeDisclaimer(exportLayout.disclaimer),
+      featureList: _normalizeFeatureList(exportLayout.featureList),
     };
     return _isSameLayout(config.exportLayout, normalizedExportLayout)
       ? config

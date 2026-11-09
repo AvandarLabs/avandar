@@ -1,8 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { createDatasetQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures";
 import { fireEvent, render, screen } from "@/test-utils";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { RenderResult } from "@testing-library/react";
 import type { ComponentProps } from "react";
 
@@ -43,6 +47,37 @@ function _aggregateOnlyLayer(): MapLayer.T {
   });
 }
 
+/** An exact point layer, which a feature list can print. */
+function _pointLayer(
+  queryColumns: MapLayer.T["source"]["queryColumns"] = [],
+): MapLayer.T {
+  const layer = MapLayer.makeEmpty("Sites");
+  return {
+    ...layer,
+    source: { ...layer.source, queryColumns },
+    geoBinding: {
+      type: "latLngColumns",
+      latitude: uuid<QueryColumn.Id>(),
+      longitude: uuid<QueryColumn.Id>(),
+    },
+  };
+}
+
+/** A map holding `layer`, with an optional export feature list. */
+function _configWithLayer(
+  options: Readonly<{
+    layer: MapLayer.T;
+    featureList?: AvaMapConfig.ExportFeatureList;
+  }>,
+): AvaMapConfig.T {
+  const base = AvaMapConfig.makeEmpty();
+  return {
+    ...base,
+    layers: [options.layer],
+    exportLayout: { ...base.exportLayout, featureList: options.featureList },
+  };
+}
+
 type Overrides = Partial<{
   onConfigChange: (update: ConfigUpdate) => void;
   mapName: string;
@@ -80,6 +115,7 @@ function _props(overrides: Overrides): Props {
     config: _buildConfig(overrides),
     mapName: overrides.mapName ?? "Cholera response",
     workspaceName: "Test workspace",
+    workspaceId: uuid<Workspace.Id>(),
     basemapAttribution: "MapLibre, OpenStreetMap contributors",
     spec: { sources: {}, layers: [] },
     view: { center: [0, 0], zoom: 4 },
@@ -283,6 +319,205 @@ describe("ExportSheet", () => {
       screen.getByText("The PDF could not be created: boom"),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Download PDF" })).toBeEnabled();
+  });
+
+  it("includes a feature list of the first listable layer, capped at 200 rows", () => {
+    const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
+    const config = _configWithLayer({ layer: _pointLayer() });
+    render(<ExportSheet {..._props({ onConfigChange })} config={config} />);
+
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Include a feature list" }),
+    );
+
+    expect(
+      onConfigChange.mock.calls.at(-1)![0](config).exportLayout.featureList,
+    ).toEqual({
+      layerId: config.layers[0]!.id,
+      columnIds: [],
+      sort: undefined,
+      maxRows: 200,
+    });
+  });
+
+  it("removes the feature list when the switch is turned off", () => {
+    const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
+    const layer = _pointLayer();
+    const config = _configWithLayer({
+      layer,
+      featureList: {
+        layerId: layer.id,
+        columnIds: [],
+        sort: undefined,
+        maxRows: 200,
+      },
+    });
+    render(<ExportSheet {..._props({ onConfigChange })} config={config} />);
+
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Include a feature list" }),
+    );
+
+    expect(
+      onConfigChange.mock.calls.at(-1)![0](config).exportLayout.featureList,
+    ).toBeUndefined();
+  });
+
+  it.each([
+    { label: "an aggregate-only layer", layers: [_aggregateOnlyLayer()] },
+    { label: "an unbound area layer", layers: [MapLayer.createArea("Zones")] },
+  ])("disables the feature list when the map has only $label", ({ layers }) => {
+    _render({ layers });
+
+    const featureListSwitch = screen.getByRole("switch", {
+      name: "Include a feature list",
+    });
+    expect(featureListSwitch).toBeDisabled();
+    expect(featureListSwitch).toHaveAccessibleDescription(
+      "Only point, line, or polygon layers with exact locations can be listed.",
+    );
+  });
+
+  it("adds a checked column to the feature list in the layer's column order", () => {
+    const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
+    const siteId = createDatasetQueryColumn({
+      name: "site_id",
+      dataType: "varchar",
+    });
+    const cases = createDatasetQueryColumn({
+      name: "cases",
+      dataType: "bigint",
+    });
+    const layer = _pointLayer([siteId, cases]);
+    const config = _configWithLayer({
+      layer,
+      featureList: {
+        layerId: layer.id,
+        columnIds: [cases.id],
+        sort: undefined,
+        maxRows: 200,
+      },
+    });
+    render(<ExportSheet {..._props({ onConfigChange })} config={config} />);
+
+    fireEvent.click(screen.getByRole("checkbox", { name: "site_id" }));
+
+    expect(
+      onConfigChange.mock.calls.at(-1)![0](config).exportLayout.featureList
+        ?.columnIds,
+    ).toEqual([siteId.id, cases.id]);
+  });
+
+  it("never offers a layer's latitude or longitude column", () => {
+    const name = createDatasetQueryColumn({
+      name: "site_name",
+      dataType: "varchar",
+    });
+    const latitude = createDatasetQueryColumn({
+      name: "latitude",
+      dataType: "double",
+    });
+    const longitude = createDatasetQueryColumn({
+      name: "longitude",
+      dataType: "double",
+    });
+    const emptyLayer = MapLayer.makeEmpty("Sites");
+    const layer: MapLayer.T = {
+      ...emptyLayer,
+      source: {
+        ...emptyLayer.source,
+        queryColumns: [name, latitude, longitude],
+      },
+      geoBinding: {
+        type: "latLngColumns",
+        latitude: latitude.id,
+        longitude: longitude.id,
+      },
+    };
+    const config = _configWithLayer({
+      layer,
+      featureList: {
+        layerId: layer.id,
+        columnIds: [name.id],
+        sort: undefined,
+        maxRows: 200,
+      },
+    });
+    render(<ExportSheet {..._props({})} config={config} />);
+
+    expect(
+      screen.getByRole("checkbox", { name: "site_name" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: "latitude" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: "longitude" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers and saves the source columns a popup-all layer's PDF prints", () => {
+    const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
+    const [geometry, schoolName, address] = [
+      "the_geom",
+      "school_name",
+      "address",
+    ].map((name) => {
+      return createDatasetQueryColumn({ name, dataType: "varchar" });
+    });
+    const emptyLayer = MapLayer.makeEmpty("Schools");
+    const layer: MapLayer.T = {
+      ...emptyLayer,
+      source: {
+        ...emptyLayer.source,
+        queryColumns: [geometry!],
+        sourceColumns: [geometry!, schoolName!, address!],
+      },
+      geoBinding: {
+        type: "geometryColumn",
+        column: geometry!.id,
+        encoding: "wkt",
+        family: "point",
+        simplification: undefined,
+        sourceCrs: undefined,
+      },
+      popup: { columnIds: "all", action: undefined },
+    };
+    const config = _configWithLayer({ layer });
+    render(<ExportSheet {..._props({ onConfigChange })} config={config} />);
+
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Include a feature list" }),
+    );
+
+    expect(
+      onConfigChange.mock.calls.at(-1)![0](config).exportLayout.featureList
+        ?.columnIds,
+    ).toEqual([schoolName!.id, address!.id]);
+  });
+
+  it("persists the feature list's maximum rows", () => {
+    const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
+    const layer = _pointLayer();
+    const config = _configWithLayer({
+      layer,
+      featureList: {
+        layerId: layer.id,
+        columnIds: [],
+        sort: undefined,
+        maxRows: 200,
+      },
+    });
+    render(<ExportSheet {..._props({ onConfigChange })} config={config} />);
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Maximum rows" }), {
+      target: { value: "50" },
+    });
+
+    expect(
+      onConfigChange.mock.calls.at(-1)![0](config).exportLayout.featureList
+        ?.maxRows,
+    ).toBe(50);
   });
 
   it("gives the preview an accessible name", () => {

@@ -81,6 +81,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F31 | Threshold colors: map config version 6 with one color and label per graduated class | not started | none (its e2e spec needs F19, F25) | |
 | F32 | Add places to a map: click, coordinates, or address search, stored as a dataset | not started | none (its e2e spec needs no catalog) | |
 | F33 | Filter a map layer by another layer, and the feature list: map config version 7 | not started | F31 | |
+| F34 | Feature list in the export PDF: map config version 8 | not started | F33 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -119,6 +120,7 @@ API. It's new work, not something this branch built.
 | any | F31 | Self-contained GIS change: the map config version 6 migration, the graduated class editor, and three bug fixes. Its e2e spec adds listings through the catalog, so run that spec after F19 and F25. |
 | any | F32 | Self-contained: one schema migration, one new edge function, and a new map tool. It adds an ordinary `latLngColumns` layer, so it needs no map config version and merges before or after F31. |
 | after F31 | F33 | Map config version 7 migrates from version 6, which F31 introduces. Its e2e spec needs the catalog browser (F19) and Parquet copies (F25). |
+| after F33 | F34 | Map config version 8 migrates from version 7, and the PDF list runs F33's feature list query and cell formatting. Its e2e spec imports a CSV, so it needs no catalog. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -2222,6 +2224,90 @@ pnpm test:e2e gis-feature-list.spec.ts
 
 ---
 
+## F34: Feature list in the export PDF (map config version 8)
+
+Status: not started. Built on `feat/gis-pdf-feature-list`, branched from
+`demo/measles` at `cd546fdea`. The commits below are all of
+`git log --oneline cd546fdea..feat/gis-pdf-feature-list --no-merges`, except
+the ones that only update this log. If `demo/measles` already has an F34, renumber
+on merge.
+
+**Purpose:** The export sheet gains an "Include a feature list" section: pick
+a listable layer, its columns, a sort, and a row cap (200 by default, 1,000 at
+most). `ExportLayout.featureList` persists the choice in map config version 8,
+and is cleared when its layer is removed. At download the PDF runs F33's
+feature list query with the on-screen filters, formats cells as the drawer
+does, and prints the rows as a table on the pages after the map and any legend
+overflow page. The table repeats its header on every page, wraps long cells,
+drops columns that do not fit, and opens with a line such as "16 features in
+Schools within 0.5 mi of Exposure sites". A note points at the CSV when rows
+or columns are cut. Every page carries "Page n of N" and the footer.
+**Value:** Field teams get the candidate list in the same PDF as the map,
+filtered exactly as on screen, without a separate CSV.
+
+**Design:** `docs/measles-demo/workflow-b-map-features-design.md` §6. Plan:
+`docs/measles-demo/workflow-b-f4-pdf-feature-list-plan.md`.
+
+**PR title:** `feat(gis): print a layer's feature list in the export PDF`
+
+**Depends on:** F33 (map config version 7 is the base for version 8, and the
+PDF list calls `fetchMapLayerFeatureList` and `formatFeatureListCell`).
+
+**Commits to read** (from `feat/gis-pdf-feature-list`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `b1b36a800` | feat(gis): persist an export feature list in map config version 8 | All of it. |
+| `3970e3f64` | feat(gis): cap an export feature list at 1,000 rows | All of it. |
+| `a6d405596` | feat(gis): clear the export feature list when its layer is removed | All of it. |
+| `1e22d6c5b` | feat(gis): word the PDF feature list summary and truncation note | All of it. |
+| `f5ba8b0b2` | feat(gis): lay out the PDF feature table across pages | All of it. |
+| `cf8108950` | feat(gis): print the feature list pages in the export PDF | All of it. |
+| `8222ca084` | fix(gis): keep PDF table columns readable | All of it. |
+| `a090f2594` | feat(gis): fetch the export feature list at download time | All of it. |
+| `fbc225e45` | feat(gis): fetch the feature list rows when downloading the PDF | All of it. |
+| `9ea58f26a` | feat(gis): add feature list defaults and edits for the export sheet | All of it. |
+| `f06e989c9` | feat(gis): add "Include a feature list" to the export sheet | All of it. |
+| `dd79c5c7b` | fix(gis): name what the PDF feature list counts | All of it. |
+| `37aaf0f10` | chore(i18n): extract the PDF feature list strings | All of it. |
+| `74d888249` | test(gis): assert the exported PDF carries the feature list pages | All of it. |
+| `d649a4496` | fix(gis): offer the same columns in the export sheet as the PDF prints | All of it. |
+
+**Files:**
+- Model: `shared/models/AvaMap/AvaMapConfig/` (`ExportLayout.types.ts`,
+  `AvaMapConfigValues.ts`, `AvaMapConfig.ts`, `AvaMapConfig.types.ts`,
+  `AvaMapConfigSchema/AvaMapConfigV8Schema.ts`, `migrateAvaMapConfig.ts`,
+  `AvaMapConfigSchema.ts`, `AvaMapConfigModule/` and `exportLayoutUpdaters/`,
+  and the schema test suites and fixtures).
+- PDF: `src/views/GisApp/export/` (`getExportFeatureTableCopy`,
+  `loadExportFeatureTable`, `composeExportPdf/` with
+  `drawExportFeatureTable` and `createPdfTextMeasurer`,
+  `useExportPdfDownload`).
+- Export sheet: `src/views/GisApp/export/ExportFeatureListConfig/` and
+  `src/views/GisApp/export/ExportSheet/` (`ExportSheetFeatureList*.tsx`,
+  `updateExportFeatureList.ts`, `ExportSheetControls.tsx`,
+  `ExportSheet.tsx`, `updateExportLayout.ts`).
+- GIS app: `src/views/GisApp/GisAppMapShell.tsx` and
+  `src/views/GisApp/layers/getQueryLayersFromMapLayers/`.
+- E2E: `tests/e2e/gis-export-feature-list.spec.ts`.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** none. Map config version 8 is stored in the existing `config`
+JSON, and the 7 to 8 migration runs on read.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm tsc -b --force
+pnpm vitest run shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm test:e2e gis-export-feature-list.spec.ts
+pnpm test:e2e gis-export-pdf.spec.ts
+```
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -2386,7 +2472,8 @@ under F18 above rather than numbered here. F21's commits are listed in full
 under F21 in the same way, F25's (merged in `a9d2ec770`) under F25,
 F26's (merged in `d0af42ce6`) under F26, and F29's and F30's (from
 `feat/gho-pipeline`) under F29 and F30, and F31's (from
-`feat/gis-threshold-colors`) under F31.
+`feat/gis-threshold-colors`) under F31, and F34's (from
+`feat/gis-pdf-feature-list`) under F34.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.

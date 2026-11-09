@@ -45,7 +45,7 @@ describe("AvaMapConfigSchema v7 spatial filters", () => {
       return layer.geoBinding?.type === "bufferOfLayer";
     });
 
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(8);
     expect(buffer?.geoBinding).toMatchObject({
       distanceMeters: 805,
       distanceUnit: "m",

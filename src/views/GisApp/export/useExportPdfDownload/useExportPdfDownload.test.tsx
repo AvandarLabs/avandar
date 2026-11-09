@@ -1,12 +1,27 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { act, renderHook, TestProviders } from "@/test-utils";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UseExportPdfDownloadInput } from "@/views/GisApp/export/useExportPdfDownload/useExportPdfDownload";
 
-const { captureExportMapCanvasMock, composeExportPdfMock } = vi.hoisted(() => {
+const {
+  captureExportMapCanvasMock,
+  composeExportPdfMock,
+  fetchMapLayerFeatureListMock,
+  workspaceMetadata,
+} = vi.hoisted(() => {
   return {
     captureExportMapCanvasMock: vi.fn(),
     composeExportPdfMock: vi.fn(),
+    fetchMapLayerFeatureListMock: vi.fn(),
+    /** What the mocked dataset clients return; undefined while loading. */
+    workspaceMetadata: {
+      datasets: [] as unknown[] | undefined,
+      datasetColumns: [] as unknown[] | undefined,
+    },
   };
 });
 
@@ -19,6 +34,30 @@ vi.mock(
 
 vi.mock("@/views/GisApp/export/composeExportPdf/composeExportPdf", () => {
   return { composeExportPdf: composeExportPdfMock };
+});
+
+vi.mock("@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList", () => {
+  return { fetchMapLayerFeatureList: fetchMapLayerFeatureListMock };
+});
+
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
+  return {
+    DatasetClient: {
+      useGetAll: () => {
+        return [workspaceMetadata.datasets, false, {}];
+      },
+    },
+  };
+});
+
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      useGetAll: () => {
+        return [workspaceMetadata.datasetColumns, false, {}];
+      },
+    },
+  };
 });
 
 const { useExportPdfDownload } =
@@ -68,15 +107,48 @@ function _input(
     view: { center: [0, 0], zoom: overrides.zoom ?? 8 },
     mapName: "Cholera response",
     workspaceName: "Test workspace",
+    workspaceId: uuid<Workspace.Id>(),
     basemapAttribution: "MapLibre, OpenStreetMap contributors",
     legendEntries: [],
     hasDrawnDisputedFeature: false,
   };
 }
 
+/** A hook input whose export lists an exact "Sites" point layer. */
+function _inputWithFeatureList(): UseExportPdfDownloadInput {
+  const base = _input();
+  const layer: MapLayer.T = {
+    ...MapLayer.makeEmpty("Sites"),
+    geoBinding: {
+      type: "latLngColumns",
+      latitude: uuid<QueryColumn.Id>(),
+      longitude: uuid<QueryColumn.Id>(),
+    },
+  };
+  return {
+    ...base,
+    config: {
+      ...base.config,
+      layers: [layer],
+      exportLayout: {
+        ...base.config.exportLayout,
+        featureList: {
+          layerId: layer.id,
+          columnIds: [],
+          sort: undefined,
+          maxRows: 200,
+        },
+      },
+    },
+  };
+}
+
 describe("useExportPdfDownload", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    fetchMapLayerFeatureListMock.mockReset();
+    workspaceMetadata.datasets = [];
+    workspaceMetadata.datasetColumns = [];
     vi.useRealTimers();
     _succeedCapture();
   });
@@ -237,5 +309,91 @@ describe("useExportPdfDownload", () => {
     });
 
     expect(composeExportPdfMock.mock.calls[0]![0].scaleLabel).toBeUndefined();
+  });
+  it("hands the composer the feature list fetched at download", async () => {
+    fetchMapLayerFeatureListMock.mockResolvedValue({
+      columns: [{ key: "site_id", label: "site_id", kind: "source" }],
+      rows: [{ site_id: "S1" }, { site_id: "S2" }],
+      totalCount: 2,
+      distanceUnit: undefined,
+    });
+    const input = _inputWithFeatureList();
+    const { result } = renderHook(
+      () => {
+        return useExportPdfDownload(input);
+      },
+      { wrapper: TestProviders },
+    );
+
+    await act(async () => {
+      await result.current.download();
+    });
+
+    expect(fetchMapLayerFeatureListMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: input.workspaceId,
+        datasets: [],
+        datasetColumns: [],
+      }),
+    );
+    expect(composeExportPdfMock.mock.calls[0]![0].featureTable).toEqual({
+      summaryLine: "2 features in Sites",
+      truncationNote: undefined,
+      buildColumnLimitNote: expect.any(Function),
+      headerLabels: ["site_id"],
+      rows: [["S1"], ["S2"]],
+    });
+  });
+
+  it("passes no table and fetches nothing when the layout has no list", async () => {
+    const { result } = renderHook(
+      () => {
+        return useExportPdfDownload(_input());
+      },
+      { wrapper: TestProviders },
+    );
+
+    await act(async () => {
+      await result.current.download();
+    });
+
+    expect(fetchMapLayerFeatureListMock).not.toHaveBeenCalled();
+    expect(composeExportPdfMock.mock.calls[0]![0].featureTable).toBeUndefined();
+  });
+
+  it("writes no file when the feature list cannot be fetched", async () => {
+    fetchMapLayerFeatureListMock.mockRejectedValue(new Error("query failed"));
+    const { result } = renderHook(
+      () => {
+        return useExportPdfDownload(_inputWithFeatureList());
+      },
+      { wrapper: TestProviders },
+    );
+
+    await act(async () => {
+      await result.current.download();
+    });
+
+    expect(result.current.status).toBe("error");
+    expect(composeExportPdfMock).not.toHaveBeenCalled();
+  });
+
+  it("asks for a retry, and prints no list, while the datasets are loading", async () => {
+    workspaceMetadata.datasetColumns = undefined;
+    const { result } = renderHook(
+      () => {
+        return useExportPdfDownload(_inputWithFeatureList());
+      },
+      { wrapper: TestProviders },
+    );
+
+    await act(async () => {
+      await result.current.download();
+    });
+
+    expect(result.current.status).toBe("error");
+    expect(result.current.errorMessage).toContain("Try again in a moment");
+    expect(fetchMapLayerFeatureListMock).not.toHaveBeenCalled();
+    expect(composeExportPdfMock).not.toHaveBeenCalled();
   });
 });

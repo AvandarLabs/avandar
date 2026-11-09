@@ -21,6 +21,7 @@ import {
   AvaMapConfigV6Schema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV6Schema.ts";
 import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
+import { AvaMapConfigV8Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV8Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 // eslint-disable-next-line no-restricted-imports
 import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
@@ -35,6 +36,14 @@ type ConfigV5 = z.infer<typeof AvaMapConfigV5Schema>;
 type ConfigV5Layer = ConfigV5["layers"][number];
 type ConfigV6 = z.infer<typeof AvaMapConfigV6Schema>;
 type ConfigV6Layer = z.infer<typeof AvaMapConfigV6LayerSchema>;
+type ConfigV7 = z.infer<typeof AvaMapConfigV7Schema>;
+
+/**
+ * Export furniture a version 4 map gains on its way to version 5: today's
+ * default without `featureList`, a key version 5's strict schema rejects.
+ */
+const { featureList: _featureList, ...VERSION_5_EXPORT_LAYOUT } =
+  DEFAULT_EXPORT_LAYOUT;
 
 /** Migrates one version 1 layer without weakening its sensitivity. */
 function _migrateVersion1Layer(layer: ConfigV1Layer): ConfigV2Layer {
@@ -127,7 +136,7 @@ function _migrateVersion4(config: ConfigV4): ConfigV5 {
   return AvaMapConfigV5Schema.parse({
     ...config,
     version: 5,
-    exportLayout: DEFAULT_EXPORT_LAYOUT,
+    exportLayout: VERSION_5_EXPORT_LAYOUT,
     layers: config.layers.map((layer) => {
       return {
         ...layer,
@@ -194,8 +203,8 @@ function _migrateVersion6GeoBinding(
     : binding;
 }
 
-/** Migrates a valid version 6 config into the current persisted shape. */
-function _migrateVersion6(config: ConfigV6): AvaMapConfigRead {
+/** Migrates a valid version 6 config into the version 7 representation. */
+function _migrateVersion6(config: ConfigV6): ConfigV7 {
   return AvaMapConfigV7Schema.parse({
     ...config,
     version: 7,
@@ -206,6 +215,15 @@ function _migrateVersion6(config: ConfigV6): AvaMapConfigRead {
         spatialFilter: undefined,
       };
     }),
+  });
+}
+
+/** Migrates a valid version 7 config into the current persisted shape. */
+function _migrateVersion7(config: ConfigV7): AvaMapConfigRead {
+  return AvaMapConfigV8Schema.parse({
+    ...config,
+    version: 8,
+    exportLayout: { ...config.exportLayout, featureList: undefined },
     // The cast bridges `PopupConfig.action`, a required `| undefined` field
     // on `MapLayer.T` that `PopupSchema` still infers as an optional key.
   }) as AvaMapConfigRead;
@@ -239,5 +257,10 @@ export const migrateAvaMapConfig = {
   },
 
   /** Migrates a valid version 6 config into the current representation. */
-  fromV6: _migrateVersion6,
+  fromV6: (config: ConfigV6): AvaMapConfigRead => {
+    return migrateAvaMapConfig.fromV7(_migrateVersion6(config));
+  },
+
+  /** Migrates a valid version 7 config into the current representation. */
+  fromV7: _migrateVersion7,
 };

@@ -12,7 +12,7 @@ describe("AvaMapConfigSchema v6 class colors", () => {
       createVersion5JsonWithGraduatedLayer(),
     );
 
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(8);
     expect(parsed.layers[0]?.symbology).toMatchObject({
       color: { ramp: ["#eff3ff", "#08306b"] },
     });

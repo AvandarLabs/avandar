@@ -16,6 +16,17 @@ import type {
   MapBookmarkId,
   MapViewState,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
+import type { ExportLayout } from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
+
+/** The export layout, minus its feature list if that list prints `layerId`. */
+function _clearFeatureListOfLayer(
+  options: Readonly<{ exportLayout: ExportLayout; layerId: MapLayer.Id }>,
+): ExportLayout {
+  const { exportLayout, layerId } = options;
+  return exportLayout.featureList?.layerId === layerId
+    ? { ...exportLayout, featureList: undefined }
+    : exportLayout;
+}
 
 /** Opening camera position when a map has no data to fit yet. */
 const DEFAULT_MAP_VIEW_STATE: MapViewState = {
@@ -79,7 +90,7 @@ export const AvaMapConfigModule = {
   /** A new, empty config with the default basemap and camera and no layers. */
   makeEmpty: (): AvaMapConfigRead => {
     return Model.make("AvaMapConfig", {
-      version: 7,
+      version: 8,
       basemap: { type: "builtIn", style: "avandar" },
       view: DEFAULT_MAP_VIEW_STATE,
       bookmarks: [],
@@ -144,7 +155,11 @@ export const AvaMapConfigModule = {
     return { ...config, layers: [...config.layers, layer] };
   },
 
-  /** Removes a layer by id. Unknown ids leave the config untouched. */
+  /**
+   * Removes a layer by id. Layers it filtered lose that spatial filter, and
+   * the export feature list goes when it printed that layer. Unknown ids
+   * leave the config untouched.
+   */
   withLayerRemoved: (
     options: Readonly<{ config: AvaMapConfigRead; layerId: MapLayer.Id }>,
   ): AvaMapConfigRead => {
@@ -159,6 +174,10 @@ export const AvaMapConfigModule = {
         return layer.spatialFilter?.layerId === layerId
           ? { ...layer, spatialFilter: undefined }
           : layer;
+      }),
+      exportLayout: _clearFeatureListOfLayer({
+        exportLayout: config.exportLayout,
+        layerId,
       }),
     };
   },
