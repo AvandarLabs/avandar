@@ -66,6 +66,10 @@ msgstr "Não foi possível copiar o link."
 msgid "First {numRows} rows"
 msgstr "Primeiras {numRows} linhas"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove from context"
+msgstr "Remover do contexto"
+
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "Nenhuma coluna detectada para este conjunto de dados. Retornando a "
@@ -588,6 +592,10 @@ msgstr "Layout da barra lateral"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "Adicionar status"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Search dashboards, datasets, maps..."
+msgstr "Pesquisar painéis, conjuntos de dados, mapas..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1238,6 +1246,10 @@ msgstr "O SQL atual contém partes que o formulário não conseguiu representar.
 msgid "Updated {0}"
 msgstr "Atualizado {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Attached to this chat"
+msgstr "Anexados a este chat"
+
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Solicite uma conexão de fonte de dados via feedback"
@@ -1778,6 +1790,10 @@ msgstr "A atribuição não foi alterada"
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Digite sua resposta…"
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> add"
+msgstr "<0>Enter</0> adicionar"
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -3021,6 +3037,10 @@ msgstr "Escolha um conjunto de dados salvo ou importe novos dados para seu "
 msgid "Cannot sync this case type"
 msgstr "Não é possível sincronizar este tipo de caso"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Recent"
+msgstr "Recentes"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "Reportar um bug"
@@ -3635,6 +3655,10 @@ msgstr "\"{0}\" está sendo preparado. Conjuntos de dados grandes podem levar "
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "Usando sua URL personalizada."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Searching..."
+msgstr "Pesquisando..."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -4951,6 +4975,7 @@ msgstr "Dimensionado"
 msgid "Save to dashboard"
 msgstr "Salvar no painel"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "Adicionado"
@@ -5237,6 +5262,10 @@ msgstr "Seu plano atual permite apenas compartilhar ou publicar {maxAllowed, "
 msgid "Region {0}"
 msgstr "Região {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove {name} from context"
+msgstr "Remover {name} do contexto"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "Continue para seu workspace"
@@ -5248,6 +5277,10 @@ msgstr "tem um valor"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "A URL personalizada não pode conter espaços"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
+msgstr "Você pode anexar até {MAX_ATTACHED_GADGETS} itens."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -6082,6 +6115,7 @@ msgstr "Este dashboard ainda está público na web. Qualquer pessoa com o link "
 msgid "Filter by status"
 msgstr "Filtrar por status"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
 msgstr "Resultados"
@@ -6241,6 +6275,10 @@ msgstr "Abrir o registro"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Dataset added"
 msgstr "Conjunto de dados adicionado"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Add context"
+msgstr "Adicionar contexto"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
@@ -7413,6 +7451,10 @@ msgstr "Não permitido"
 msgid "Member"
 msgstr "Membro"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Nothing found"
+msgstr "Nada encontrado"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "Atualizar assinatura"
@@ -7596,6 +7638,7 @@ msgstr "Sua sessão expirou"
 msgid "Write your paragraph here..."
 msgstr "Escreva seu parágrafo aqui..."
 
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
 msgstr "Enviar mensagem"
@@ -10414,6 +10457,10 @@ msgstr "Agrupar em uma grade"
 msgid "Handling"
 msgstr "Tratamento"
 
+#: src/components/ChatPanel/ChatThread/Composer/useChatComposerEditor.ts
+msgid "Message"
+msgstr "Mensagem"
+
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
@@ -10494,6 +10541,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 "or a date, so it couldn't run."
 msgstr "Esta consulta trata um tipo de valor como outro, como texto como número "
 "ou data, por isso não pôde ser executada."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "On this page"
+msgstr "Nesta página"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10793,6 +10844,10 @@ msgstr "Tipo de caso excluído"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING usa o operador \"{operator}\", que não é compatível com o "
 "formulário."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Search failed. Try again."
+msgstr "A pesquisa falhou. Tente novamente."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
@@ -11236,6 +11291,12 @@ msgstr "+{0} mais valores empatados em {1} linhas"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "O valor mais comum é <0>{0}</0>, em <1>{1}</1> das linhas."
+
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
+msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
+"assistant."
+msgstr "Apenas as primeiras {MAX_DESCRIBED_MENTIONS} menções são descritas ao "
+"assistente."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"

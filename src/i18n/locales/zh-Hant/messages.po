@@ -64,6 +64,10 @@ msgstr "無法複製連結。"
 msgid "First {numRows} rows"
 msgstr "前 {numRows} 列"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove from context"
+msgstr "從上下文中移除"
+
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
@@ -569,6 +573,10 @@ msgstr "側邊欄版面配置"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "新增狀態"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Search dashboards, datasets, maps..."
+msgstr "搜尋儀表板、資料集、地圖..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1188,6 +1196,10 @@ msgstr "目前的 SQL 包含表單無法表示的部分。繼續操作會以表�
 msgid "Updated {0}"
 msgstr "已更新 {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Attached to this chat"
+msgstr "已附加到此聊天"
+
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "通過反饋請求數據源連接"
@@ -1705,6 +1717,10 @@ msgstr "指派對象未變更"
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "輸入您的答案…"
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> add"
+msgstr "<0>Enter</0> 新增"
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -2906,6 +2922,10 @@ msgstr "選擇已保存的資料集或將新數據匯入您的工作區。"
 msgid "Cannot sync this case type"
 msgstr "無法同步此個案類型"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Recent"
+msgstr "最近"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "回報錯誤"
@@ -3494,6 +3514,10 @@ msgstr "正在準備「{0}」。大型資料集第一次開啟可能需要幾分
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "使用您的自訂網址。"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Searching..."
+msgstr "搜尋中..."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -4766,6 +4790,7 @@ msgstr "已設定大小"
 msgid "Save to dashboard"
 msgstr "儲存到儀表板"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "新增時間"
@@ -5044,6 +5069,10 @@ msgstr "您目前的方案只能分享或發布 {maxAllowed, plural, one {# 個�
 msgid "Region {0}"
 msgstr "區域 {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove {name} from context"
+msgstr "從上下文中移除 {name}"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "繼續進入您的工作區"
@@ -5055,6 +5084,10 @@ msgstr "有值"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "自訂 URL 不得包含空格"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
+msgstr "最多可附加 {MAX_ATTACHED_GADGETS} 項。"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -5863,6 +5896,7 @@ msgstr "此儀表板仍公開於網路上。任何取得連結的人都能檢視
 msgid "Filter by status"
 msgstr "依狀態篩選"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
 msgstr "結果"
@@ -6019,6 +6053,10 @@ msgstr "開啟記錄"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Dataset added"
 msgstr "資料集已添加"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Add context"
+msgstr "新增上下文"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
@@ -7153,6 +7191,10 @@ msgstr "不允許"
 msgid "Member"
 msgstr "成員"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Nothing found"
+msgstr "找不到任何內容"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "更新訂閱"
@@ -7332,6 +7374,7 @@ msgstr "您的會話已過期"
 msgid "Write your paragraph here..."
 msgstr "在此輸入您的段落…"
 
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
 msgstr "發送消息"
@@ -10040,6 +10083,10 @@ msgstr "分箱至網格"
 msgid "Handling"
 msgstr "處理方式"
 
+#: src/components/ChatPanel/ChatThread/Composer/useChatComposerEditor.ts
+msgid "Message"
+msgstr "訊息"
+
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
@@ -10116,6 +10163,10 @@ msgstr "搜尋儀表板"
 msgid "This query treats one kind of value as another, such as text as a number "
 "or a date, so it couldn't run."
 msgstr "此查詢將某種值視為另一種值，例如將文字視為數字或日期，因此無法執行。"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "On this page"
+msgstr "此頁面上"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10406,6 +10457,10 @@ msgstr "案件類型已刪除"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用運算子「{operator}」，表單不支援此運算子。"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Search failed. Try again."
+msgstr "搜尋失敗。請再試一次。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
@@ -10830,6 +10885,11 @@ msgstr "+{0} 個值與 {1} 行相關聯"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "最常見的值是 <0>{0}</0>，出現在 <1>{1}</1> 的資料列中。"
+
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
+msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
+"assistant."
+msgstr "只有前 {MAX_DESCRIBED_MENTIONS} 個提及會描述給助理。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"

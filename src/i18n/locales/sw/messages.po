@@ -65,6 +65,10 @@ msgstr "Kiungo hakikuweza kunakiliwa."
 msgid "First {numRows} rows"
 msgstr "Safu mlalo {numRows} za kwanza"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove from context"
+msgstr "Ondoa kwenye muktadha"
+
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "Hakuna safu zilizogundulika kwa dataset hii. Kurudi kwenye safu zote."
@@ -587,6 +591,10 @@ msgstr "Mpangilio wa upau wa pembeni"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "Ongeza hali"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Search dashboards, datasets, maps..."
+msgstr "Tafuta dashibodi, seti za data, ramani..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1232,6 +1240,10 @@ msgstr "SQL ya sasa ina sehemu ambazo fomu haikuweza kuwakilisha. Ukiendelea, "
 msgid "Updated {0}"
 msgstr "Imesasishwa {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Attached to this chat"
+msgstr "Vilivyoambatishwa kwenye gumzo hili"
+
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "Omba muunganisho wa chanzo cha data kupitia maoni"
@@ -1771,6 +1783,10 @@ msgstr "Mgawo haujabadilishwa"
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Andika jibu lako..."
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> add"
+msgstr "<0>Enter</0> ongeza"
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -3020,6 +3036,10 @@ msgstr "Chagua dataset iliyohifadhiwa au uagize data mpya kwenye eneo lako la "
 msgid "Cannot sync this case type"
 msgstr "Haiwezi kusawazisha aina hii ya kesi"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Recent"
+msgstr "Vya hivi karibuni"
+
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
 msgstr "Ripoti hitilafu"
@@ -3631,6 +3651,10 @@ msgstr "\"{0}\" inatayarishwa. Seti kubwa za data zinaweza kuchukua dakika "
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "Unatumia URL yako maalum."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Searching..."
+msgstr "Inatafuta..."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -4947,6 +4971,7 @@ msgstr "Yenye ukubwa"
 msgid "Save to dashboard"
 msgstr "Hifadhi kwenye dashibodi"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "Imeongezwa"
@@ -5233,6 +5258,10 @@ msgstr "Mpango wako wa sasa unakuruhusu tu kushiriki au kuchapisha {maxAllowed, 
 msgid "Region {0}"
 msgstr "Eneo {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove {name} from context"
+msgstr "Ondoa {name} kwenye muktadha"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "Endelea kwenye ofisi yako"
@@ -5244,6 +5273,10 @@ msgstr "ina thamani"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "URL maalum haiwezi kuwa na nafasi"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
+msgstr "Unaweza kuambatisha hadi vipengee {MAX_ATTACHED_GADGETS}."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -6079,6 +6112,7 @@ msgstr "Dashibodi hii bado iko hadharani kwenye wavuti. Mtu yeyote aliye na "
 msgid "Filter by status"
 msgstr "Chuja kwa hali"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
 msgstr "Matokeo"
@@ -6238,6 +6272,10 @@ msgstr "Fungua rekodi"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Dataset added"
 msgstr "Dataset imeongezwa"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Add context"
+msgstr "Ongeza muktadha"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
@@ -7406,6 +7444,10 @@ msgstr "Hairuhusiwi"
 msgid "Member"
 msgstr "Mwanachama"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Nothing found"
+msgstr "Hakuna kilichopatikana"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "Sasisha usajili"
@@ -7589,6 +7631,7 @@ msgstr "Kikao chako kimeisha"
 msgid "Write your paragraph here..."
 msgstr "Andika aya yako hapa..."
 
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
 msgstr "Tuma ujumbe"
@@ -10397,6 +10440,10 @@ msgstr "Panga katika gridi"
 msgid "Handling"
 msgstr "Ushughulikiaji"
 
+#: src/components/ChatPanel/ChatThread/Composer/useChatComposerEditor.ts
+msgid "Message"
+msgstr "Ujumbe"
+
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
@@ -10477,6 +10524,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 "or a date, so it couldn't run."
 msgstr "Hoja hii inachukulia aina moja ya thamani kama aina nyingine, kama vile "
 "maandishi kuwa nambari au tarehe, kwa hivyo haikuweza kuendeshwa."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "On this page"
+msgstr "Kwenye ukurasa huu"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10775,6 +10826,10 @@ msgstr "Aina ya kesi imefutwa"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING inatumia opereta \"{operator}\" ambaye fomu haitumii."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Search failed. Try again."
+msgstr "Utafutaji umeshindwa. Jaribu tena."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
@@ -11213,6 +11268,12 @@ msgstr "+{0} thamani zaidi zimefungwa kwenye {1} safu"
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "Thamani inayojulikana zaidi ni <0>{0}</0>, katika <1>{1}</1> ya safu "
 "mlalo."
+
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
+msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
+"assistant."
+msgstr "Ni mitajo {MAX_DESCRIBED_MENTIONS} ya kwanza tu inayoelezwa kwa "
+"msaidizi."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"
