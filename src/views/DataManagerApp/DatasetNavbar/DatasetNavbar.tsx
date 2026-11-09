@@ -1,4 +1,4 @@
-import { NavLinkList } from "@avandar/ui";
+import { NavLinkList, Tooltip, useCheckTruncatedText } from "@avandar/ui";
 import { makeBucketMap, prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -9,7 +9,7 @@ import {
   Stack,
   Text,
   TextInput,
-  Tooltip,
+  Tooltip as MantineTooltip,
 } from "@mantine/core";
 import { IconDatabaseOff, IconSearch } from "@tabler/icons-react";
 import { useDeferredValue, useMemo, useState } from "react";
@@ -52,20 +52,60 @@ type MakeDatasetLinkOptions = {
   showOfflineBadge: boolean;
 };
 
+type DatasetNavbarNameProps = {
+  name: string;
+  /**
+   * Replaces the full-name tooltip. An offline dataset uses this so hover
+   * explains why the row cannot be opened.
+   */
+  tooltipLabel?: ReactNode;
+};
+
+/**
+ * One dataset's name in `DatasetNavbar`. A name that does not fit the row
+ * ends in an ellipsis, and hovering that name shows the rest.
+ */
+function DatasetNavbarName({
+  name,
+  tooltipLabel,
+}: DatasetNavbarNameProps): ReactNode {
+  const [textRef, isTruncated] = useCheckTruncatedText<HTMLSpanElement>([name]);
+
+  // `truncate` rather than `lineClamp`: a row is one line. `lineClamp` also
+  // sets `display: -webkit-box`, so the block display on this name would
+  // silently disable it.
+  return (
+    <Tooltip
+      label={tooltipLabel ?? name}
+      disabled={tooltipLabel === undefined && !isTruncated}
+      position="right"
+    >
+      <Text
+        ref={textRef}
+        className={css.datasetNavbarName}
+        size="sm"
+        component="span"
+        truncate
+      >
+        {name}
+      </Text>
+    </Tooltip>
+  );
+}
+
 function makeDatasetLink(
   options: MakeDatasetLinkOptions,
 ): NavLinkProps & { key: string } {
   const { workspaceSlug, dataset, isOfflineUnavailable, showOfflineBadge } =
     options;
 
-  // `truncate` rather than `lineClamp`: a row is one line, and an ellipsis
-  // says "there is more of this name" where a hard clip does not. Note that
-  // `lineClamp` also needs the `-webkit-box` display it sets for itself, so
-  // pairing it with an explicit `display` silently disables it.
   const nameText = (
-    <Text size="sm" component="span" truncate>
-      {dataset.name}
-    </Text>
+    <DatasetNavbarName
+      name={dataset.name}
+      tooltipLabel={
+        isOfflineUnavailable ? <OfflineUnavailableTooltipLabel /> : undefined
+      }
+    />
   );
 
   // Destination only, not the whole `AppLink`. Spreading it carried two
@@ -86,16 +126,16 @@ function makeDatasetLink(
     params,
     className: css.datasetNavbarLink,
     leftSection: <DatasetSourceIcon sourceType={dataset.sourceType} />,
-    label: isOfflineUnavailable ? (
-      <Tooltip label={<OfflineUnavailableTooltipLabel />}>{nameText}</Tooltip>
-    ) : showOfflineBadge ? (
+    label: showOfflineBadge ? (
       <Group gap="xs" wrap="nowrap" justify="space-between">
         {nameText}
-        <Tooltip label={<Trans>This dataset is fully available offline</Trans>}>
+        <MantineTooltip
+          label={<Trans>This dataset is fully available offline</Trans>}
+        >
           <Badge size="xs" color="teal" variant="light">
             <Trans>Offline</Trans>
           </Badge>
-        </Tooltip>
+        </MantineTooltip>
       </Group>
     ) : (
       nameText
