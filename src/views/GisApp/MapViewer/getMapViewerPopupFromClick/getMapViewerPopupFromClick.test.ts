@@ -64,10 +64,11 @@ describe("getMapViewerPopupFromClick", () => {
       placesDatasetIds: NO_PLACES,
     });
 
-    expect(popup?.rows.map((row) => {return row.name})).toEqual([
-      "school_name",
-      "enrolled",
-    ]);
+    expect(
+      popup?.rows.map((row) => {
+        return row.name;
+      }),
+    ).toEqual(["school_name", "enrolled"]);
   });
 
   describe("location and place fields", () => {
@@ -123,7 +124,9 @@ describe("getMapViewerPopupFromClick", () => {
         feature,
         renderedLayerId: MapLayerIds.toLayerId(layer.id),
         placesDatasetIds,
-      })?.rows.map((row) => {return row.name});
+      })?.rows.map((row) => {
+        return row.name;
+      });
     }
 
     it("hides bound lat/lng columns when the popup shows all fields", () => {
