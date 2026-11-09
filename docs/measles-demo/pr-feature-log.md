@@ -1341,6 +1341,8 @@ commits belong to the features that own them, not here.
 | `bc4baf853` | test(catalog): filter the open data catalog by publisher, agency, and keyword end to end | All of it |
 | `ad6d300a7` | feat(catalog): offer keywords in the rail and return every facet in one value | All of it. Supersedes `d90481335`'s Keywords chips (`DataCatalogKeywordFacet.tsx` is deleted) and moves the facet rows into `52.data_catalog_listings__search_facet_rows.sql`, with the RPC in `53.`. Regenerate the migration, types, desktop migration, and `.po` catalogs. |
 | `a8e99dc8a` | feat(catalog): search keywords on the server and count every facet in one pass | All of it, on top of `ad6d300a7`. Adds `52.rpc_data_catalog_listings__search_tag_options.sql`, rewrites `52.data_catalog_listings__search_facet_rows.sql`, and adds `useDataCatalogKeywordOptions`. `catalog-search-performance.md` goes with F9. Regenerate the migration, types, and desktop migration. Built on `feat/catalog-keyword-search`. |
+| `6c0ac89b9` | feat(catalog): keep catalog search fast as the catalog grows | All of it, on top of `a8e99dc8a`. Adds `10.data_catalog_facet_counts.sql`, `50.data_catalog_listings__updated_window.sql`, `52.data_catalog_facet_counts__refresh.sql`, `53.data_catalog_listings__count_facet.sql`, and `54.data_catalog_listings__facet_value_rows.sql`, renumbers the other search schemas and `rpc_pipeline_executions__finish`, adds the listings' new indexes, and excludes `data_catalog_facet_counts` from desktop sync. The populate migration is hand-written. Regenerate the rest. Built on `feat/catalog-scalable-search`. |
+| `db8d5f86c` | fix(db): load pg_trgm before the scalable search migration sets its threshold | All of it. Hand-written header on the generated migration, as the earlier catalog search migrations have. |
 
 *Docs, which go with F9:*
 
@@ -1392,7 +1394,11 @@ mapped fields the new column must not). Last,
 it drops the row-returning facet RPC and recreates it returning `jsonb`, over
 the new `data_catalog_listings__search_facet_rows`), then
 `20261109052742_catalog_single_pass_facets_and_keyword_search.sql`
-(generated: the one-pass facet rows and the keyword search RPC).
+(generated: the one-pass facet rows and the keyword search RPC), then
+`20261109065256_catalog_scalable_search.sql` (generated, plus the
+hand-written pg_trgm load header) and
+`20261109065300_populate_catalog_facet_counts.sql` (hand-written: fills the
+summary table once).
 
 **Verification:**
 ```sh
@@ -1446,11 +1452,11 @@ rejects the new listing shape, so the catalog would not load.
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
   manually.
-- An unsearched catalog is still slow on demo: about 3.4s for the facet
-  counts, 2.7s for the first page, and 3.1s per keyword search, against an
-  8s `statement_timeout`. `docs/measles-demo/catalog-search-performance.md`
-  (goes with F9) measures why and lists the optimizations held back, with
-  their trade-offs.
+- `docs/measles-demo/catalog-search-performance.md` (goes with F9) records
+  how catalog search stays bounded as the catalog grows, what was rejected,
+  and the work held back: refreshing the summary outside the finish call and
+  building indexes concurrently before the catalog reaches millions of
+  listings, keyset paging, and server-side search for publishers.
 
 ---
 

@@ -1,15 +1,16 @@
 # Catalog search performance
 
-Where the open data catalog's search spends its time, what has been done
-about it, and the optimizations held back until the UI feels too slow. The
+Where the open data catalog's search spends its time, how it was made to
+stay fast as the catalog grows, and the work held back for later. The
 numbers were measured on the demo database (196,271 listings, 6,443 distinct
 keywords, 1,001 level-2 organizations) on 2026-11-08 and 2026-11-09.
 Timings on that instance vary by up to 50% between runs, so treat them as
 rough.
 
-## What is slow
+## What was slow
 
-Only an **unsearched** catalog is slow. Opening the Open data tab, or
+These were measured before the changes below. Only an **unsearched**
+catalog was slow. Opening the Open data tab, or
 choosing filters without typing a search, makes every call read every
 listing. Once a search is typed, the `search_vector` and trigram indexes
 narrow the matches to a few hundred rows and every call is fast.
@@ -22,7 +23,7 @@ narrow the matches to a few hundred rows and every call is fast.
 
 Signed-in requests time out at 8s (`statement_timeout` on `authenticated`).
 
-## Why
+## Why it was slow
 
 1. **The table does not fit in cache.** `data_catalog_listings` is 294 MB of
    rows plus 913 MB of TOAST, and the demo instance's `shared_buffers` is
@@ -39,44 +40,55 @@ Signed-in requests time out at 8s (`statement_timeout` on `authenticated`).
    against every other filter but its own, so after choosing one publisher,
    the Publisher facet still counts every other publisher. Together the
    facets need every listing.
-4. **The dataset list could, but does not.** It filters on the match
-   function's pass flags after the fact, so it reads every row even when a
-   filter would narrow them, and sorts all of them to return 50.
+4. **The dataset list could, but did not.** It filtered on the match
+   function's pass flags after the fact, so it read every row even when a
+   filter would narrow them, and sorted all of them to return 50.
 
 ## What has been done
 
 - **The facet RPC returns one JSON value.** The Data API cuts a row set off
   at `max_rows` (1,000), which silently dropped whole facets with nothing
-  searched. See `53.rpc_data_catalog_listings__search_facets.sql`.
-- **The facet counts read the matches once.**
-  `data_catalog_listings__search_facet_rows` used to re-read the matches once
-  per facet (ten times). It now computes every facet in one grouping-sets
-  aggregation, and groups topics and keywords by a listing's whole list
-  before splitting the lists. Measured: 4.8s to 3.4s.
+  searched. See `56.rpc_data_catalog_listings__search_facets.sql`.
 - **Keywords are searched on the server.** The counts carry only the 50
   keywords with the most listings, plus any chosen ones. Typing into the
-  Keywords filter calls `rpc_data_catalog_listings__search_tag_options`,
-  which returns the 50 best matching keywords. Only that call sends keywords
-  past the top 50, and only while the user types there.
+  Keywords filter calls `rpc_data_catalog_listings__search_tag_options`.
+- **No call reads the whole catalog.** The catalog is expected to grow 10 to
+  100 times (2 to 20 million listings), and agents will search it, so the
+  work a call does is bounded by what it returns rather than by the catalog's
+  size. Exact counts are not required.
 
-## Future optimizations
+### How each call stays bounded
 
-Apply these when the UI still feels too slow. They are ordered by how much
-they are expected to help for their cost.
+| Call | How |
+|---|---|
+| Matching (`data_catalog_listings__search_matches`) | Every filter is a condition on the listings, not a pass flag computed for every row, and the function takes an optional sort, limit, and offset. `plan_cache_mode = force_custom_plan` plans each call for its own arguments, so Postgres can use the listings' indexes. |
+| Dataset list (`rpc_data_catalog_listings__search`) | Browsing walks `data_catalog_listings__last_updated_at` or `data_catalog_listings__display_name` and stops at the page. A filter uses its own index (`tags`, `domains`, publisher, `organization2_name`, the format expression). The total is counted only up to 10,000; past that the list says "10,000+" and keeps paging while pages come back full. With nothing narrowed, the total is the summary's. |
+| Typed search sorted by date | The sort adds `interval '0 seconds'` to the date when a query is typed, which hides the date index from that sort. Otherwise Postgres may walk the whole date index looking for a search's few matches. |
+| Facet counts (`data_catalog_listings__search_facet_rows`) | With nothing narrowing a facet, its counts are read from `data_catalog_facet_counts`. With at most 10,000 matches, they are counted exactly (`data_catalog_listings__count_facet`). Otherwise the options are the catalog's values from the summary, with no count. |
+| Keyword search | The same rules, over the summary's keyword list. |
+| `data_catalog_facet_counts__refresh` | Reads the whole catalog once, at the end of each pipeline run (`rpc_pipeline_executions__finish`). |
 
-| Optimization | Helps | Extra storage | Sync work | Trade-off |
-|---|---|---|---|---|
-| Stop buffering in the match function | Every unsearched call, by about 1 to 2s | None | None | An SQL function is only inlined when it has no `SET` clauses, but this one sets `search_path` (a security lint) and `pg_trgm.word_similarity_threshold` (needed by the `<%` trigram operator and its index). Either keep PL/pgSQL for searched calls and add a separate unsearched path, or find another way to set the threshold. |
-| Covering index on the filter columns (`create index ... include (...)`) | Every unsearched call: an index-only scan of about 60 MB instead of the 294 MB heap | About 60 MB | None: Postgres updates indexes on every write | An index-only scan only skips the heap on pages vacuum has marked all-visible. Pipelines rewrite many rows, so right after a run reads fall back to the heap until autovacuum catches up. Unbenchmarked. |
-| Dataset list filters before it reads, plus an index on the last-updated date | The dataset list | One index | None | The list stops sharing the match function's pass-flag shape with the counts, so a new filter must be added to its `where` as well. The total count can come from the facet call instead of a second count. |
-| Server-side search for the level-2 organization filter | Payload: it is the other facet past 1,000 values | None | None | Same shape as the keyword search: top values plus a search RPC. |
-| Materialized view of the filter columns | Every unsearched call | About 60 MB | Refresh after each pipeline run | Stale between refreshes. `rpc_data_catalog_listings__mark_invalid` changes listings at runtime, so a listing marked invalid keeps its old status until the next refresh. |
-| Bigger demo compute | Everything | None | None | Costs money. The table needs more than the current 256 MB of cache. |
+**Accepted trade-off:** when too many listings match to count, an option has
+no count and may keep no listings. Showing only options that are known to
+match would mean counting, which is the work being avoided. A search engine
+removes this trade-off; see "Rejected for now" below.
 
-### Rejected: estimated counts
+## Rejected
 
-Counting a sample (`tablesample`) when the result is large, and exact counts
-when it is small, was considered and rejected. A publisher or keyword with
-few listings often does not appear in a sample, so it would drop out of its
-filter or show a wrong count, which reads as a bug. Deciding what is large
-also needs its own estimate first.
+| Option | Why |
+|---|---|
+| Covering index of the filter columns | A btree index entry holds at most about 2.7 KB. 62 demo listings already exceed that across the filter columns, and the largest keyword list alone is 2,718 bytes, so building the index fails, or worse, a later pipeline write of a listing with many keywords is refused. Leaving the keyword and topic lists out leaves the counts reading the table anyway. |
+| Inlining the match function | Postgres only inlines an SQL function with no `SET` clauses. Dropping `search_path` fails the security lint, and the trigram threshold must be set for `<%` to use its index. A second, unsearched code path would duplicate the filters. The bounded calls make the buffering it would remove small anyway. |
+| Estimated counts (`tablesample`) | A value with few listings often does not appear in a sample, so it would drop out of its filter or show a wrong count, which reads as a bug. |
+| A plain view of the filter columns | A view is a stored query: reading it reads the same wide table pages. |
+| A search engine (Typesense, Meilisearch, OpenSearch) | Rejected for now, to avoid adding a service to the demo. It is the standard way to get exact counts with filters at millions of listings, and the path if those become a requirement. ParadeDB's `pg_search` would need checking for Supabase support. |
+
+## Future work
+
+| Item | When | Trade-off |
+|---|---|---|
+| Refresh the summary outside `rpc_pipeline_executions__finish` (pg_cron, or a queued job) | Before the catalog reaches a few million listings | The refresh reads the whole catalog. At 196k listings that takes a few seconds inside the finish call, but at 20 million it would exceed the Data API's statement timeout. |
+| Build new catalog indexes with `create index concurrently` in their own migration | Before the catalog reaches a few million listings | A plain `create index` blocks writes to the listings while it builds. That is seconds on demo today and minutes at 20 million rows. Concurrent builds cannot run inside a transaction, so they need a migration of their own. |
+| Keyset paging (`after` the last row's sort key) instead of `offset` | If people or agents page deep into results | An offset still walks every skipped row. |
+| Server-side search for the publisher and level-2 organization filters | When either passes about 1,000 values | Same shape as the keyword search. The level-2 facet already sends only the top 50 when no publisher is chosen. |
+| A materialized view or bigger compute | Only if the bounded calls are still too slow | See the earlier measurements: the table is wider than the demo instance's 256 MB cache. |
