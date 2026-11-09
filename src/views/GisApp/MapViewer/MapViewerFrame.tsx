@@ -7,7 +7,7 @@ import { getMapViewerPopupFromClick } from "@/views/GisApp/MapViewer/getMapViewe
 import css from "@/views/GisApp/MapViewer/MapViewer.module.css";
 import { MapViewerFurniture } from "@/views/GisApp/MapViewer/MapViewerFurniture";
 import {
-  MAP_VIEWER_COLLAPSED_LEGEND_MAX_HEIGHT_PX,
+  MAP_VIEWER_SHORT_MAP_MAX_HEIGHT_PX,
   MapViewerLegend,
 } from "@/views/GisApp/MapViewer/MapViewerLegend";
 import { MapViewerPopupCard } from "@/views/GisApp/MapViewer/MapViewerPopupCard";
@@ -31,13 +31,48 @@ type Props = {
   placesDatasetIds: ReadonlySet<Dataset.Id>;
 };
 
+type OverlaysProps = {
+  config: AvaMapConfig.T;
+  display: MapViewerDisplay;
+  hasDrawnDisputedFeature: boolean;
+  popup: MapViewerPopup | undefined;
+  onClosePopup: () => void;
+};
+
 /**
- * A read-only map: the canvas, its legend, a click popup, and its
- * attribution. No panels, tools, or editing.
+ * The legend and click popup floating over the canvas. The legend is keyed
+ * by whether the map is short, so it returns to that height's default.
  */
-export function MapViewerFrame(props: Props): ReactNode {
+function _MapViewerOverlays(props: OverlaysProps): ReactNode {
+  const { display } = props;
+  const isShortMap = display.heightPx < MAP_VIEWER_SHORT_MAP_MAX_HEIGHT_PX;
+  return (
+    <>
+      {display.showLegend ? (
+        <MapViewerLegend
+          key={isShortMap ? "short" : "tall"}
+          config={props.config}
+          hasDrawnDisputedFeature={props.hasDrawnDisputedFeature}
+          heightPx={display.heightPx}
+        />
+      ) : null}
+      {props.popup ? (
+        <MapViewerPopupCard popup={props.popup} onClose={props.onClosePopup} />
+      ) : null}
+    </>
+  );
+}
+
+/**
+ * The canvas behind a read-only map, and the popup its clicks open. Pan and
+ * zoom follow the display's interaction setting.
+ */
+function useMapViewerCanvas(props: Props): {
+  containerRef: ReturnType<typeof useMapCanvas>["containerRef"];
+  popup: MapViewerPopup | undefined;
+  closePopup: () => void;
+} {
   const { config, display, rendering } = props;
-  const { t } = useLingui();
   const [popup, setPopup] = useState<MapViewerPopup | undefined>();
   const { containerRef, mapInstance } = useMapCanvas({
     basemap: config.basemap,
@@ -60,6 +95,23 @@ export function MapViewerFrame(props: Props): ReactNode {
     onViewChange: props.onViewChange,
   });
   useMapInteractionMode({ mapInstance, isInteractive: display.isInteractive });
+  return {
+    containerRef,
+    popup,
+    closePopup: () => {
+      setPopup(undefined);
+    },
+  };
+}
+
+/**
+ * A read-only map: the canvas, its legend, a click popup, and its
+ * attribution. No panels, tools, or editing.
+ */
+export function MapViewerFrame(props: Props): ReactNode {
+  const { config, display, rendering } = props;
+  const { t } = useLingui();
+  const { containerRef, popup, closePopup } = useMapViewerCanvas(props);
   return (
     <section aria-label={t`Map of ${props.mapName}`} className={css.mapViewer}>
       <div
@@ -70,26 +122,13 @@ export function MapViewerFrame(props: Props): ReactNode {
         style={{ height: display.heightPx }}
       >
         <MapCanvasSurface containerRef={containerRef} />
-        {display.showLegend ? (
-          <MapViewerLegend
-            key={
-              display.heightPx < MAP_VIEWER_COLLAPSED_LEGEND_MAX_HEIGHT_PX
-                ? "short"
-                : "tall"
-            }
-            config={config}
-            hasDrawnDisputedFeature={rendering.hasDrawnDisputedFeature}
-            heightPx={display.heightPx}
-          />
-        ) : null}
-        {popup ? (
-          <MapViewerPopupCard
-            popup={popup}
-            onClose={() => {
-              setPopup(undefined);
-            }}
-          />
-        ) : null}
+        <_MapViewerOverlays
+          config={config}
+          display={display}
+          hasDrawnDisputedFeature={rendering.hasDrawnDisputedFeature}
+          popup={popup}
+          onClosePopup={closePopup}
+        />
       </div>
       <MapViewerFurniture
         config={config}

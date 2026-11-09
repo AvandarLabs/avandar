@@ -5,6 +5,9 @@
 }
 
 .mapViewerCanvas {
+  /* MapLibre's three 29px navigation buttons plus their 10px margin. */
+  --map-viewer-nav-controls-block-size: 97px;
+
   background: var(--ava-surface-body);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
@@ -25,12 +28,15 @@
 
 /*
  * The legend shares the right edge with MapLibre's zoom in, zoom out, and
- * compass buttons: 3 x 29px plus their 10px margin. It stops above them.
+ * compass buttons, so it stops above them.
  */
 .mapViewerLegend {
   inset-block-end: var(--mantine-spacing-sm);
   inset-inline-end: var(--mantine-spacing-sm);
-  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm) - 97px);
+  max-block-size: calc(
+    100% - 2 * var(--mantine-spacing-sm) -
+      var(--map-viewer-nav-controls-block-size)
+  );
   overflow: auto;
   position: absolute;
   z-index: 1;

@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
  * header, so it leaves the map visible, the same way the GIS app collapses
  * its legend while a feature list shortens the map.
  */
-export const MAP_VIEWER_COLLAPSED_LEGEND_MAX_HEIGHT_PX = 320;
+export const MAP_VIEWER_SHORT_MAP_MAX_HEIGHT_PX = 320;
 
 type Props = {
   config: AvaMapConfig.T;
@@ -31,7 +31,7 @@ export function MapViewerLegend({
   heightPx,
 }: Props): ReactNode {
   const [isCollapsed, setIsCollapsed] = useState(
-    heightPx < MAP_VIEWER_COLLAPSED_LEGEND_MAX_HEIGHT_PX,
+    heightPx < MAP_VIEWER_SHORT_MAP_MAX_HEIGHT_PX,
   );
   const layers = useMemo(() => {
     return AvaMapConfig.toStackOrder(config).filter(prop("isVisible"));

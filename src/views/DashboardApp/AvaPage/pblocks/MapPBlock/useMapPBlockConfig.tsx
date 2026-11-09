@@ -10,6 +10,38 @@ import { MapViewPField } from "@/views/DashboardApp/AvaPage/pfields/MapViewPFiel
 import type { Props as MapPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock";
 import type { ComponentConfig } from "@puckeditor/core";
 
+/** The Map block's editor fields, labelled in the reader's language. */
+function _buildMapPBlockFields(
+  t: ReturnType<typeof useLingui>["t"],
+): ComponentConfig<MapPBlockProps>["fields"] {
+  return {
+    mapId: { label: t`Map`, type: "custom", render: MapPickerPField },
+    view: { label: t`Opens on`, type: "custom", render: MapViewPField },
+    heightPx: {
+      label: t`Height in pixels`,
+      type: "number",
+      min: MAP_PBLOCK_HEIGHT_RANGE.min,
+      max: MAP_PBLOCK_HEIGHT_RANGE.max,
+    },
+    showLegend: {
+      label: t`Legend`,
+      type: "radio",
+      options: [
+        { label: t`Show`, value: true },
+        { label: t`Hide`, value: false },
+      ],
+    },
+    isInteractive: {
+      label: t`Interaction`,
+      type: "radio",
+      options: [
+        { label: t`Pan, zoom, and popups`, value: true },
+        { label: t`Fixed picture`, value: false },
+      ],
+    },
+  };
+}
+
 /**
  * Builds the Puck component config for the dashboard's Map block: the map
  * picker, which camera it opens on, its height, legend, and interaction. The
@@ -21,32 +53,7 @@ export function useMapPBlockConfig(): ComponentConfig<MapPBlockProps> {
   return useMemo(() => {
     return {
       label: t`Map`,
-      fields: {
-        mapId: { label: t`Map`, type: "custom", render: MapPickerPField },
-        view: { label: t`Opens on`, type: "custom", render: MapViewPField },
-        heightPx: {
-          label: t`Height in pixels`,
-          type: "number",
-          min: MAP_PBLOCK_HEIGHT_RANGE.min,
-          max: MAP_PBLOCK_HEIGHT_RANGE.max,
-        },
-        showLegend: {
-          label: t`Legend`,
-          type: "radio",
-          options: [
-            { label: t`Show`, value: true },
-            { label: t`Hide`, value: false },
-          ],
-        },
-        isInteractive: {
-          label: t`Interaction`,
-          type: "radio",
-          options: [
-            { label: t`Pan, zoom, and popups`, value: true },
-            { label: t`Fixed picture`, value: false },
-          ],
-        },
-      },
+      fields: _buildMapPBlockFields(t),
       defaultProps: DEFAULT_MAP_PBLOCK_SETTINGS,
       resolveFields: (data, { fields }) => {
         return {
