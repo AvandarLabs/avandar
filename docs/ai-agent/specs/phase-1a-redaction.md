@@ -1,69 +1,104 @@
 # Phase 1A follow-up: personal values in page SQL stay on the device
 
-Status: built on `feat/agent-default`, eval archived under the
-`phase-1a-redaction` label. Approved by Pablo on 2026-11-08 (D39). Extends
-[phase-1a.md](phase-1a.md); replaces its pattern-only redaction of chart
-SQL. Results in [eval.md](../eval.md#phase-1a).
+Status: built on `feat/agent-default`, then hardened after an adversarial
+review. Evals archived under the `phase-1a-redaction` and
+`phase-1a-redaction-review` labels. Approved by Pablo on 2026-11-08 (D39).
+Extends [phase-1a.md](phase-1a.md); replaces its pattern-only redaction of
+chart SQL. Results in [eval.md](../eval.md#phase-1a).
 
 ## Problem
 
 The page block sends the SQL of dashboard charts and of the Data
-Explorer's current query. Their string literals can hold personal data,
-such as `WHERE "patient_name" = 'Jane Doe'`. Today only literals that look
-like an email, phone number, or id are redacted, so names reach the hosted
-model. Detecting names from the value alone does not work: in Avandar's
-data, `'Kings'`, `'Georgia'`, and `'Washington'` are places that look like
-names, and redacting them would break ordinary filters.
+Explorer's current query. Their literals can hold personal data, such as
+`WHERE "patient_name" = 'Jane Doe'`. Before this change only literals that
+looked like an email, phone number, or id were redacted, so names reached
+the hosted model. Detecting names from the value alone does not work: in
+Avandar's data, `'Kings'`, `'Georgia'`, and `'Washington'` are places that
+look like names, and redacting them would break ordinary filters.
 
 ## Decision
 
-Redact by the column a value is compared to, and replace it with a
-placeholder the browser maps back, instead of deleting it.
+Redact by the column a value goes with, and replace it with a placeholder
+the browser maps back, instead of deleting it.
 
 1. **What is redacted.** In page SQL (dashboard tiles and the explorer's
-   query), a single-quoted literal is replaced when it is compared to a
-   column that `detectPii` flags by name (`=`, `<>`, `IN (...)`, `LIKE`,
-   `ILIKE`, either side), or when the literal itself is flagged by
-   `detectPii`'s content check (today's rule). Other literals stay.
-2. **Placeholders.** A redacted literal becomes `'<value N>'`. The browser
-   keeps a per-conversation map from placeholder to the original literal,
-   so the same value always gets the same placeholder in that conversation.
-3. **Round trip.** Before any SQL the model sends runs (`run_query` and
-   value lookups), the browser swaps each known placeholder back to its
-   original literal. The model can keep a filter it never saw ("show this
-   chart by week" keeps `<value 1>`), so answers stay correct.
-4. **Fail closed.** If a statement cannot be parsed, every string literal
-   in it becomes a placeholder. The parser (`node-sql-parser`, PostgreSQL
-   dialect, as elsewhere in the app) reads ordinary DuckDB SQL, including
-   quoted UUID table names, `::` casts, CTEs, and functions such as
-   `date_trunc`, but not DuckDB-only syntax such as `GROUP BY ALL`,
-   `SELECT * EXCLUDE`, `FROM t SELECT`, or list literals. Those statements
-   send every literal as a placeholder, and answers stay correct through
-   the round trip.
-5. **Titles.** A chart title that `detectPii`'s content check flags is
-   still replaced with "Untitled chart" (titles are not SQL, so they have
-   no round trip). A plain name in a title (`"Visits by Jane Doe"`) is not
-   caught, and it tells the model the value its placeholder hides. The
-   eval's first P07 tile was titled "Deaths in Kings County by month", and
-   the model wrote `'Kings'` from the title.
-6. **The model is told.** Prompt v2's current page rules say a quoted
-   `'<value N>'` is a value hidden for privacy, to keep it exactly as
-   written, and never to ask what it is. Without that rule Haiku asked the
-   user which county `'<value 1>'` meant. v2 had not shipped, so the rule
-   joined it in place.
-7. **Lookups.** A value lookup the model writes with a placeholder runs
-   with the value restored, and any held value it finds comes back as its
-   placeholder, so a lookup never tells the model what a placeholder
-   stands for. Lookups without placeholders are unchanged.
+   query), every string and number literal inside an expression that reads
+   a personal column: any operator (`=`, `IN`, `LIKE`, `BETWEEN`, `>=`,
+   `~`, ...), any function (`lower`, `contains`, `concat`, ...), `CASE` in
+   both forms, casts, and `FILTER`, on either side, anywhere in the
+   statement (CTEs, subqueries, `HAVING`, `JOIN ON`, `ORDER BY`). `AND` and
+   `OR` are not expressions here: each side is its own condition. Also
+   redacted: every literal in a `VALUES` list, and every string whose value
+   looks personal on its own (`detectPii`'s content check). Typed literals
+   (`DATE '1990-05-12'`) count as strings.
+2. **Personal columns.** A column is personal when its name, normalized
+   (camelCase split, spaces and punctuation to `_`, lowercase), contains
+   one of `detectPii`'s column keywords, or `surname`, `nickname`,
+   `firstname`, `lastname`, `fullname`, `birthdate`, `maiden`, `name`, as
+   whole `_`-separated words. So `First Name`, `firstName`, `Surname`,
+   `Date of Birth`, and `patient_id` are personal, and `stage`,
+   `vaccination_status`, and `Population` are not. A column that is none
+   of the page's datasets' columns (a CTE, subquery, or `VALUES` alias) is
+   personal too, since it may stand for one.
+3. **Placeholders.** A redacted literal becomes `'<value N>'`, N without a
+   leading zero. The browser keeps a per-conversation map from placeholder
+   to the original literal, its kind, and why it is held, so the same
+   value always gets the same placeholder in that conversation. A value
+   the vault already holds is hidden wherever it appears again, even where
+   no detector would flag it. A number's placeholder is quoted like a
+   string's in the SQL the model reads; restoring writes the bare number.
+4. **Round trip.** Before any SQL the model sends runs (`run_query` and
+   value lookups), the browser swaps each known placeholder back. The
+   model can keep a filter it never saw ("show this chart by week" keeps
+   `<value 1>`), so answers stay correct. SQL with an unknown placeholder,
+   or a placeholder inside a longer string (`'%<value 1>%'`), fails
+   without running, and the model is told why.
+5. **Nothing comes back.** DuckDB names an unaliased expression after its
+   SQL, restored values included (`count_star() FILTER (WHERE (Admin2 =
+   'Kings'))`). The host masks result column names, preview cells, and
+   errors before the model reads them, and the page block masks the
+   explorer's result columns. A lookup that names a held placeholder is
+   answered as already stored, without a query.
+6. **Fail closed.** SQL the parser cannot read, or that uses `E''` or
+   dollar-quoted strings, has every string and every number above 99
+   replaced. The parser (`node-sql-parser`, PostgreSQL dialect, as
+   elsewhere in the app) reads ordinary DuckDB SQL but not DuckDB-only
+   syntax such as `GROUP BY ALL`, `SELECT * EXCLUDE`, `QUALIFY`, `GLOB`,
+   `COLLATE`, `IS NOT DISTINCT FROM`, or list literals.
+7. **Comments.** Comments are dropped from page SQL before it is sent.
+   They can hold values, and once the SQL is on one line a `--` comment
+   would swallow the rest of the statement.
+8. **Titles and names.** Chart titles, the dashboard, dataset, map, and
+   case type names, and the explorer's result columns are masked: each
+   value a detector flagged in the page's SQL becomes its placeholder
+   wherever it appears as a whole word (Unicode letters, digits, and `_`
+   are word characters; case is ignored; LIKE `%` wildcards are dropped
+   from the value). All SQL is redacted first, so a value one chart
+   filters on is hidden in every title. Values held only because their SQL
+   could not be parsed are masked only as quoted literals, so an unread
+   chart's `'month'` never turns "Deaths by month" into a placeholder. A
+   title `detectPii`'s content check flags still becomes "Untitled chart".
+9. **The model is told.** Prompt v2's current page rules say a quoted
+   `'<value N>'` is a value hidden for privacy: keep it exactly as
+   written, never ask what it is, use it only as a whole quoted value
+   (never inside another string or LIKE pattern, never in
+   `lookup_values`), and alias every computed column. v2 had not shipped,
+   so the rules joined it in place.
 
 ## What reaches the model
 
 | Text | Model sees |
 |---|---|
-| Literal compared to a column whose name looks personal (`name`, `patient`, `dob`, `email`, `phone`, ...) | `'<value N>'` |
-| Literal that looks like an email, phone, or id | `'<value N>'` |
-| Any literal in SQL that cannot be parsed | `'<value N>'` |
-| Other literals (`'Texas'`, `'2022-01-01'`) | Unchanged |
+| String or number in an expression that reads a personal column (`name`, `First Name`, `patient_id`, `dob`, `email`, `phone`, ...) | `'<value N>'` |
+| Literal in an expression that reads an alias (a CTE, subquery, or `VALUES` column) | `'<value N>'` |
+| Literal in a `VALUES` list | `'<value N>'` |
+| String that looks like an email, phone, or id | `'<value N>'` |
+| Any string, or number above 99, in SQL that cannot be parsed or uses `E''` or `$$` strings | `'<value N>'` |
+| A value the vault already holds, anywhere in later page SQL | `'<value N>'` |
+| SQL comments | Dropped |
+| A detected value in a chart title, page name, or result column name | `<value N>` |
+| A restored value in a result column name, preview cell, or error | `<value N>` |
+| Other literals (`'Texas'`, `'2022-01-01'`, `LIMIT 10`) | Unchanged |
 
 The model never receives the map. Restored SQL runs only in the browser,
 and the result card stores the restored SQL locally, as it does today.
@@ -72,54 +107,70 @@ and the result card stores the restored SQL locally, as it does today.
 
 | Unit | Where | Role |
 |---|---|---|
-| `findSensitiveSqlLiterals` | `src/lib/agent/dataAgent/pagePrivacy/` | Parses SQL with `node-sql-parser` and returns the literal values to redact, or "all" when parsing fails. A comparison counts when either side reads a personal column, directly or inside a function (`lower("name") LIKE '%doe%'`), anywhere in the statement (CTEs, `CASE`, `HAVING`). Numbers are never redacted. |
-| `SqlStringLiterals` | same folder | Finds and replaces single-quoted literals without parsing, skipping comments and quoted identifiers. Replaces the shared `redactSqlLiterals`, which nothing else used. |
-| `SqlPlaceholderVault` (`createSqlPlaceholderVault`) | same folder | Per-conversation map: `redact(sql, detectors)` returns SQL with placeholders; `restore(sql)` swaps known ones back, re-escaping quotes (`O'Brien` becomes `'O''Brien'`), and leaves unknown ones as written so the query fails visibly. A literal that is already a placeholder is never vaulted again. |
-| `createPlaceholderRestoringHost` | same folder | Wraps any `DataAgentHost`: restores in `showQuery` and `readColumnValues`, and masks held values in a lookup that used placeholders. The browser and the eval both use it. Free of UI imports, so the eval can load it. |
-| `buildAgentPageContextBlock` | `shared/agent/pageContext/` | Takes a `redactSql(sql)` function, applied to tile SQL and the explorer's SQL before aliasing, cutting, and escaping. Titles keep `isSensitive`. |
+| `SqlLiterals` | `shared/agent/pageContext/` | Finds and replaces literals (strings, numbers, `E''` and dollar-quoted strings) without parsing, skipping comments and quoted identifiers, and strips comments. Shared so the block can strip comments. Replaces the shared `redactSqlLiterals`. |
+| `findSensitiveSqlLiterals` | `src/lib/agent/dataAgent/pagePrivacy/` | Parses SQL with `node-sql-parser` and returns the keys of the literals to redact, or "all". Takes `isSensitiveColumn`, `isSensitiveValue`, and the page's `knownColumnNames`. |
+| `isPersonalColumnName` | same folder | The normalized, whole-word column check above. Uses `detectPii`'s exported keyword list (`PII_COLUMN_NAME_KEYWORDS`) rather than changing `detectPii`, which other privacy checks share. |
+| `SqlPlaceholderVault` (`createSqlPlaceholderVault`) | same folder | Per-conversation map: `redact`, `restore` (re-escaping quotes, numbers bare), `getPlaceholderError`, `maskText`, `getPlaceholder`, and `isHeldPlaceholder`. |
+| `createPlaceholderRestoringHost` | same folder | Wraps any `DataAgentHost`: refuses misused placeholders, restores in `showQuery` and `readColumnValues`, masks what comes back, and exposes `isHeldPlaceholder`. The browser and the eval both use it. |
+| `lookup_values` | `createDataAgentTools/lookupValuesTool.ts` | Answers a held placeholder as stored as itself, without a query. |
+| `buildAgentPageContextBlock` | `shared/agent/pageContext/` | Strips comments, redacts every piece of page SQL with `redactSql`, then masks names, titles, result columns, and SQL with `maskText`. |
 | Conversation | `AgentConversationState.sqlVault` | Created with every conversation. Offline conversations send no page block, so their vault stays empty and restoring changes nothing. |
 | Host | `createConversationAgentHost` | Wraps the browser host with `createPlaceholderRestoringHost`, so the explorer and the chat result card get the restored SQL. |
-| Turn | `runDataAgentTurn`, `askConversationDataAgent` | The page block is built from the conversation (`buildPageBlock`), so even a first turn uses its vault. The column check is `detectPii({ columnName }).hits` being non-empty; the value check is `isPersonalDataText`. |
-| Prompt v2 | `shared/agent/dataAgent/` | One current page rule: keep `'<value N>'` as written. |
+| Turn | `runDataAgentTurn`, `askConversationDataAgent` | The page block is built from the conversation (`buildPageBlock`), with `isPersonalColumnName`, `isPersonalDataText`, and the conversation's dataset columns. |
+| Prompt v2 | `shared/agent/dataAgent/` | The placeholder rules in item 9. |
 
-The model-facing results carry no restored values: `run_query` reports
-only a result's shape, its error text goes through `sanitizeQueryError`
-(which removes quoted literals), and `lastQuery.sql` keeps the SQL the model
-wrote, with placeholders.
+## Still open
 
-`detectPii`'s column-name check matches substrings, so some ordinary
-columns count as personal (`stage` and `percentage` contain `age`,
-`vaccine` contains `cc`, `Population` contains `lat`). Their text filters
-reach the model as placeholders. Answers stay correct through the round
-trip; the model just reads fewer filter values.
+- **Names that never appear as SQL literals.** A name used only in a
+  column alias (`AS "Jane Doe visits"`), a title, or a dashboard name
+  reaches the model unless some page SQL filters on it. A name that is
+  stored as a column value but never filtered on is never in the block.
+- **Row counts as an oracle.** A model that wanted to learn a hidden value
+  could run `WHERE "name" = '<value 1>' AND "name" LIKE 'J%'` and read the
+  row count, one letter at a time. The agent's model has no reason to, and
+  each run is capped (D14), but the placeholder does not stop it.
+- **Double-quoted values.** `"name" = "Jane"` names a column in DuckDB, so
+  the query cannot run and "Jane" is not treated as a value.
+- **Short values.** Bare words under two characters are not masked in
+  titles. Numbers of 99 or less in unparsable SQL are sent as written.
+- **Over-redaction.** Any column outside the page's datasets counts as
+  personal, so literals compared with a SELECT alias (`HAVING "deaths" >
+  100`) become placeholders. Answers stay correct through the round trip;
+  the model just reads fewer filter values.
 
 ## Testing
 
-- Unit: column-aware detection for `=`, `<>`, `!=`, `IN`, `LIKE`, `ILIKE`,
-  and their `NOT` forms, reversed operands, quoted, unquoted, and qualified
-  columns, functions of a column, CTEs, `CASE`, and `HAVING`, doubled
-  quotes, numbers and other columns left alone, and a parse failure; vault
-  round trip, stable numbering across calls, restore escaping, and unknown
-  placeholders; the block shows placeholders in tile and explorer SQL while
-  `'Texas'` stays; the host restores before `showQuery` and
-  `readColumnValues`, and the model-facing tool result has no restored
-  value; `runDataAgentTurn` keeps a value's placeholder across turns of one
-  conversation.
+- Unit: `SqlLiterals` (literal kinds, numbers inside names, comments);
+  `isPersonalColumnName` (headers flagged, `stage`,
+  `vaccination_status`, `Population` not); `findSensitiveSqlLiterals`
+  (every operator, functions, both CASE forms, CTE and subquery aliases,
+  VALUES, `COLUMNS()`, typed literals, numbers, parse failures);
+  `pageSqlLeaks.test.ts`, the review's 52 leak attempts and 6 ordinary
+  filters with the browser's detectors; the vault (re-hiding, numbers
+  restored bare, canonical placeholders, `maskText`, placeholder errors);
+  the host (masked column names, preview cells, and errors, refused
+  placeholders); `pageBlockPrivacy.test.ts` (titles masked from another
+  chart's SQL, an unread `'month'` not masked); the block (comments,
+  masking after all redaction); `runDataAgentTurn` (spreadsheet headers,
+  alias filters, titles, placeholders kept across turns).
+- Executed, real DuckDB (`placeholderRoundTrip.executed.test.ts`):
+  `run_query` results for `FILTER`, `CASE`, and a bare comparison carry no
+  restored value; a lookup of a held placeholder matches without a query.
 - Integration: `explorerPageBlock.integration.test.tsx` goes from the real
-  `DataExplorerStateManager` through `useChatPageContext` and
-  `createAgentPageContext` to the block, and checks the explorer's personal
-  filter becomes `'<value 1>'`.
+  `DataExplorerStateManager` to the block, and checks the explorer's
+  filter and a result column named after it are both masked.
 - Eval: P07, a dashboard tile "Deaths in one county by month" over US
   deaths in 2022 (`"Admin2" = 'Kings' AND "Province_State" = 'New York'`),
   with the harness treating `Admin2` as personal for this question only.
   "Show this chart by week" must keep the placeholder and grade like P03:
-  about 52 weekly rows adding up to Kings County's 2022 deaths (2,707). A
-  unit test checks P07's block has `'<value 1>'` and no "Kings".
+  about 52 weekly rows adding up to Kings County's 2022 deaths (2,707).
 
 ## Result
 
-P01 to P07 pass on `haiku-sonnet`, and P07 passed on three runs in a row,
-each time with `'<value 1>'` kept in the model's SQL. Two earlier runs
-found the title leak and the missing prompt rule above. Cost per question
-stayed at about $0.0002 to $0.0003; all five runs cost $0.0065. See
-[eval.md](../eval.md#phase-1a).
+P01 to P07 pass on `haiku-sonnet` after the review fixes, as before them
+(P07 passed three runs in a row with `'<value 1>'` kept). The 45 original
+questions scored 43/45 on the first run after the fixes; the two misses
+(H06, N04) had no page block and missed for known reasons (rounding ties,
+leaving out zero-death countries, dropping "Unassigned" rows). On reruns
+N04 passed 3 of 3 and H06 2 of 3. All runs for this spec cost $0.035.
+See [eval.md](../eval.md#phase-1a).

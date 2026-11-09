@@ -142,6 +142,25 @@ deaths in 2022, with `Admin2` treated as personal, so the model reads
   to 2,707. P01 to P06 and the 45 questions still pass. The placeholder
   rule adds about 75 to 85 input tokens per call. All seven runs cost $0.018.
 
+After an adversarial review, the redaction was hardened (D39): values are
+masked in what comes back from a query, detection fails closed, and
+prompt v2 gained rules on using placeholders. Runs archived under the
+`phase-1a-redaction-review` label.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a-redaction-review:agent-page (P01-P07) | 7/7 | 0 / 0 | $0.00022 | 3,257 | 1.8 s / 2.6 s |
+| phase-1a-redaction-review:agent-45 | 43/45 | 0 / 0 | $0.00030 | 3,193 | 2.4 s / 3.4 s |
+| phase-1a-redaction-review:rerun #1-#3 (H06, N04) | H06 2/3, N04 3/3 | 0 / 0 | $0.00035 | | 3.2 s |
+
+- Neither miss had a page block, so neither touched placeholders. H06
+  rounded per-capita rates to five places, which reordered tied states,
+  and on one rerun dropped "Unassigned" rows. N04 left out countries with
+  zero deaths. Both are known to vary between runs (see "Remaining misses
+  on the chosen setup").
+- The longer prompt rules add about 45 to 85 input tokens per call over
+  the first placeholder rule. The review runs cost $0.017.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -510,7 +529,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 94 runs (every
+chat index lists all 99 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

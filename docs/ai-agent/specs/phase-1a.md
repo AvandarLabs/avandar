@@ -210,7 +210,7 @@ the adapter. A stopped run (`aborted`) is not a failure.
 | App, route, names of the open dataset, dashboard, map, and case type, and column names and types | Metadata, sent freely, as in the system prompt. |
 | The Data Explorer's current SQL and result columns | Cut at 1,500 characters. Personal values in the SQL become placeholders, as in tile SQL. |
 | Dashboard tiles: title, chart type, SQL | At most 12 tiles, in page order, each SQL cut at 1,500 characters. A title the browser's PII check flags (`isPersonalDataText`, built on `detectPii`) becomes "Untitled chart". |
-| String literals in page SQL | A literal compared with a column whose name `detectPii` flags, a literal whose value looks personal, and every literal in SQL that cannot be parsed become `'<value N>'` (D39, [phase-1a-redaction.md](phase-1a-redaction.md)). The browser keeps the map per conversation and restores the values before the agent's SQL runs; the model never receives it. Other literals, such as `'Texas'`, are sent as written. The eval renders blocks the same way. |
+| Literals in page SQL | Strings and numbers in any expression that reads a personal column or an alias, `VALUES` literals, strings whose value looks personal, and every literal in SQL that cannot be parsed become `'<value N>'`. Comments are dropped. Values the SQL revealed are masked in titles, page names, and result columns, and in whatever comes back from a query (D39, [phase-1a-redaction.md](phase-1a-redaction.md)). The browser keeps the map per conversation and restores the values before the agent's SQL runs; the model never receives it. Other literals, such as `'Texas'`, are sent as written. The eval renders blocks the same way. |
 | An open case | The case type name and "one case is open" only. Never the case's name or field values. |
 | Rows | Never. |
 
@@ -300,7 +300,9 @@ Red/green TDD with Vitest, plus one browser spec:
 - **Result:** the bar is met. 45/45 on the original questions and 6/6 on
   every page rerun, at $0.0003 and $0.0002 per question. With placeholders
   (D39), P01 to P07 pass, P07 three times in a row, and the 45 questions
-  stay at 45/45. See [eval.md](../eval.md#phase-1a).
+  stay at 45/45; after the review fixes, P01 to P07 still pass and the 45
+  questions scored 43/45, with both misses passing on rerun. See
+  [eval.md](../eval.md#phase-1a).
 
 ## Done when
 
@@ -322,10 +324,10 @@ Red/green TDD with Vitest, plus one browser spec:
 - Drop the unused "Unavailable result" label by narrowing
   `GadgetCardHeader`'s prop further. ("Loading result" now names the
   placeholder shown while the card loads.)
-- A plain name in a chart title (`"Visits by Jane Doe"`) is not caught:
-  titles get only the content check, and a name there tells the model what
-  a placeholder hides. A name in a literal is caught only when the column
-  it is compared with looks personal by name.
+- A name that never appears as a SQL literal (a column alias, or a title
+  no chart's SQL filters on) still reaches the model, and row counts can
+  act as an oracle for a model probing a placeholder. See
+  [phase-1a-redaction.md](phase-1a-redaction.md#still-open).
 - The proxy rebuilds table aliases from the workspace's current datasets on
   every request, while the browser keeps a conversation's first dataset
   list. A dataset added mid-conversation can still shift the server's

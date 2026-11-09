@@ -673,8 +673,23 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   model what its placeholder hides, since titles get only the content
   check. Without the prompt rule, Haiku asked the user what `'<value 1>'`
   meant. With it, P07 passes and keeps the placeholder.
-- **Costs.** About 75 to 85 more input tokens per call for the prompt rule.
-  Column names match by substring (`stage` contains `age`), so some
-  ordinary filters reach the model as placeholders; answers stay correct
-  through the round trip. DuckDB-only syntax such as `GROUP BY ALL` does
-  not parse, so all of that statement's literals become placeholders.
+- **Hardened after review (2026-11-09).** An adversarial review found
+  leaks, all fixed: restored values came back in DuckDB's result column
+  names (now masked, with errors and preview cells); detection missed
+  functions, CASE, BETWEEN, aliases, numbers, typed literals, `E''` and
+  dollar-quoted strings, and comments (detection now fails closed on any
+  expression that reads a personal or unknown column, and comments are
+  dropped); spreadsheet headers such as `First Name` were not personal
+  (column names are now normalized and matched as whole words, which also
+  stops `stage` and `vaccination_status` matching); the vault did not
+  re-hide values it held; lookups of a placeholder missed mixed-case
+  values. Titles and page names now mask detected values too. Prompt v2
+  says to use a placeholder only as a whole value and to alias computed
+  columns.
+- **Costs.** About 120 to 170 more input tokens per call for the prompt
+  rules.
+  Columns outside the page's datasets count as personal, and DuckDB-only
+  syntax such as `GROUP BY ALL` does not parse, so some ordinary filters
+  reach the model as placeholders; answers stay correct through the round
+  trip. Still open: names that never appear as SQL literals, and row
+  counts as an oracle for a model probing a placeholder (see the spec).
