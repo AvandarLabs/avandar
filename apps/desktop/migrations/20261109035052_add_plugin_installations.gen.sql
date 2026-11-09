@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261109020254_add_plugin_installations.sql by
+-- Generated from supabase/migrations/20261109035052_add_plugin_installations.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 0
