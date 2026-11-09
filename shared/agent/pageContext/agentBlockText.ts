@@ -12,10 +12,13 @@ const LINE_BREAKS = /\s*[\r\n\v\f\u0085\u2028\u2029]+\s*/g;
 /**
  * A `<` that would start an agent block tag (`current_page`, `attached`,
  * `mentioned`), opening or closing, including spellings with spaces such
- * as `< /attached>` or with zero-width characters between `<` and the name.
+ * as `< /attached>` or with invisible characters between `<`, the `/`, and
+ * the name: any whitespace, space separator (`Zs`), format character
+ * (`Cf`, such as a zero-width space or soft hyphen), or combining mark
+ * (`Mn`, such as a combining grapheme joiner).
  */
 const BLOCK_TAG_START =
-  /<(?=[\s\u200b-\u200d\u2060\ufeff]*\/?[\s\u200b-\u200d\u2060\ufeff]*(?:current_page|attached|mentioned))/gi;
+  /<(?=[\s\p{Zs}\p{Cf}\p{Mn}]*\/?[\s\p{Zs}\p{Cf}\p{Mn}]*(?:current_page|attached|mentioned))/giu;
 
 /**
  * A `<` that does not start a page placeholder (`<value 3>`). A placeholder
