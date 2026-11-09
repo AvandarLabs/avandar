@@ -82,6 +82,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F32 | Add places to a map: click, coordinates, or address search, stored as a dataset | not started | none (its e2e spec needs no catalog) | |
 | F33 | Filter a map layer by another layer, and the feature list: map config version 7 | not started | F31 | |
 | F34 | Feature list in the export PDF: map config version 8 | not started | F33 | |
+| F35 | Map block on dashboards, with privacy-filtered map snapshots for public publishes | not started | F31, F33, F34 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -121,6 +122,7 @@ API. It's new work, not something this branch built.
 | any | F32 | Self-contained: one schema migration, one new edge function, and a new map tool. It adds an ordinary `latLngColumns` layer, so it needs no map config version and merges before or after F31. |
 | after F31 | F33 | Map config version 7 migrates from version 6, which F31 introduces. Its e2e spec needs the catalog browser (F19) and Parquet copies (F25). |
 | after F33 | F34 | Map config version 8 migrates from version 7, and the PDF list runs F33's feature list query and cell formatting. Its e2e spec imports a CSV, so it needs no catalog. |
+| after F34 | F35 | Its "Add to dashboard" lives in F34's export sheet footer, and its snapshots bake F31's threshold colors and run F33's spatial filter query. It adds two schema migrations and its e2e spec imports a CSV, so it needs no catalog. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -2626,8 +2628,9 @@ under F18 above rather than numbered here. F21's commits are listed in full
 under F21 in the same way, F25's (merged in `a9d2ec770`) under F25,
 F26's (merged in `d0af42ce6`) under F26, and F29's and F30's (from
 `feat/gho-pipeline`) under F29 and F30, and F31's (from
-`feat/gis-threshold-colors`) under F31, and F34's (from
-`feat/gis-pdf-feature-list`) under F34.
+`feat/gis-threshold-colors`) under F31, F34's (from
+`feat/gis-pdf-feature-list`) under F34, and F35's (from
+`feat/dashboard-map-block`) under F35.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
