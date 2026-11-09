@@ -101,13 +101,26 @@ WAL, which `min_wal_size` keeps around.
 | Same, without GeoTIFF | 112k | 6.5 KB | 0.73 GB | ~0.95 GB | ~2.0 GB |
 | Same, CSV and Parquet only | 41k | 6.5 KB | 0.27 GB | ~0.5 GB | ~1.5 GB |
 
-A Pro project starts with an 8 GB disk that grows by 50% when 90% full, so
-1.8 GB should not have filled it. Supabase's docs do not say whether a
-preview branch gets the same disk or autoscaling. The failure at about 2 GB
-used suggests this branch has a smaller disk, or one that does not grow.
-The branch's disk size is under its own Settings → Compute and Disk page,
-and a Pro organization can raise it there (about $0.125 per GB per month,
-then a cooldown of about 4 hours before the next change).
+The branch's `/data` volume, which holds the data directory, WAL, and temp
+files, is 8.4 GB with 6.3 GB free (the branch's metrics endpoint,
+2026-11-09 01:39 UTC). Every scenario above fits it.
+
+What filled it at 22:41:54 UTC is not explained by anything Postgres
+records:
+
+| Evidence | What it rules out |
+| --- | --- |
+| The failing file, `base/5/20930`, is the listings TOAST table, still 845 MB and never rewritten | Data that was later deleted or compacted |
+| Checkpoints at 22:39:48 and 22:44:48 recycled 17 to 22 WAL segments and added none, and no replication slot exists | WAL growth |
+| `pg_stat_database` counts 6.36 GB of temp files since the restart, and completed upsert calls account for 6.07 GB of it at about 10 MB each, freed after each call | A failed query spilling gigabytes |
+| The VM has run since 21:20 UTC | A restart that cleared something |
+
+The first two errors were temp-file writes inside two concurrent upsert
+calls (`RETURN NEXT`, which buffers the full rows the function returns).
+They are where a full disk was noticed, not what filled it. The likeliest
+reading is that the volume was smaller at 22:41 and has been grown since.
+The branch's Reports → Database → Disk chart around 22:40 UTC shows whether
+its size changed.
 
 ## What changed
 
@@ -134,11 +147,14 @@ written before them keeps its old `source_metadata` until it is reset.
 These steps act on the `demo-measles` branch only. Its HDX rows were all
 created on 2026-11-08 and are rebuilt by the next run.
 
+With 6.3 GB free, the run can continue as is
+(`ava pipeline run hdx --local --env demo --incremental`). The steps below
+are only for reclaiming the ~0.5 GB that rows written before the
+`source_metadata` trims still hold.
+
 1. Check the branch's disk size: open the `demo-measles` branch in the
    dashboard (Avandar Staging → Branches → `demo-measles`), then Settings →
-   Compute and Disk. If it is under 4 GB, raise it to at least 4 GB there.
-   A full HDX run needs about 2.5 GB with WAL, and headroom keeps the run
-   clear of the 95% read-only line.
+   Compute and Disk. A full HDX run needs about 2.5 GB with WAL.
 
 2. Optional backup of the catalog tables, from a terminal with the branch's
    connection string (Connect, session pooler):
@@ -193,11 +209,10 @@ created on 2026-11-08 and are rebuilt by the next run.
 
 ## Deciding what fits
 
-| Branch disk | Full HDX after reset (~2.5 GB with WAL) | Recommendation |
+| Branch disk | Full HDX (~2.5 GB after a reset, ~3.1 GB without) | Recommendation |
 | --- | --- | --- |
-| 4 GB or more | Fits | Reset and run everything |
-| Under 4 GB, and it can be raised | Fits once raised | Raise it (step 1), reset, run everything |
-| Under 4 GB, and it cannot be raised | Does not fit safely | Leave GeoTIFF out (~2.0 GB), or recreate the branch with a larger disk |
+| 4 GB or more (8.4 GB on 2026-11-09) | Fits | Continue incrementally, and watch the disk (step 6) |
+| Under 4 GB | Does not fit safely | Raise it, or leave GeoTIFF out (~2.0 GB) |
 
 Leaving GeoTIFF out drops 78,834 raster files that no workspace can load.
 CSV and every other listed format stay. It is a one-line change: add
@@ -210,4 +225,6 @@ CSV and every other listed format stay. It is a one-line change: add
 | --- | --- | --- |
 | Store a package's metadata once, not on each resource listing | Most of the remaining ~4 KB per listing (`description`, `search_vector`, package fields), with 6.4 resources per HDX dataset | Needs a new table and changes to catalog search |
 | Stop a run before the database passes a size limit | Ends a run cleanly instead of on a full disk | Needs an RPC reading `pg_database_size` and a configured limit |
+| Return only ids from `rpc_data_catalog_listings__upsert_with_relation_columns` | Most of the 6 GB of temp files the upsert wrote (about 10 MB per call), which spends the branch's disk IO budget | `RETURN NEXT` buffers every full listing row and PostgREST serializes it back, but the pipeline does not need the rows. Needs a migration |
+| Set `temp_file_limit` for the API roles | A runaway query fails instead of filling the disk | A database setting change on the branch |
 | Count a change to `source_metadata`'s keys as a change | Lets a trim reach rows a run would not otherwise rewrite | Rewrites every legacy row, which needs free disk first. A reset is cheaper for the demo |

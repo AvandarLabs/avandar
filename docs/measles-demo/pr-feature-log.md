@@ -1419,7 +1419,8 @@ rejects the new listing shape, so the catalog would not load.
   Run `95f18055` later filled the demo branch's disk (`53100`) at about
   1.2 GB of database plus WAL. A complete HDX run is about 191k listings,
   roughly 1.45 GB of database and 2.5 GB of disk with WAL after
-  `8e707d700`, so the `demo-measles` branch needs a disk of at least 4 GB.
+  `8e707d700`. The branch's `/data` volume was 8.4 GB with 6.3 GB free on
+  2026-11-09, so it fits, but what filled it at 22:41 UTC is unexplained.
   See
   `docs/measles-demo/etl-disk-footprint.md` for the recovery steps and the
   GeoTIFF trade-off.
