@@ -77,8 +77,8 @@ values
                 "type": "DataViz",
                 "props": {
                   "id": "DataViz-tile1",
-                  "nlQuery": { "prompt": "Cases per week by borough", "rawSql": "", "generations": [] },
-                  "vizType": "bar"
+                  "nl_query": { "prompt": "Cases per week by borough", "raw_sql": "", "generations": [] },
+                  "viz_type": "bar"
                 }
               }
             ],
@@ -87,15 +87,23 @@ values
                 "type": "DataViz",
                 "props": {
                   "id": "DataViz-blank",
-                  "nlQuery": { "prompt": "   ", "rawSql": "", "generations": [] },
-                  "vizType": "bar"
+                  "nl_query": { "prompt": "   ", "raw_sql": "", "generations": [] },
+                  "viz_type": "bar"
                 }
               },
               {
                 "type": "DataViz",
                 "props": {
                   "id": "",
-                  "nlQuery": { "prompt": "Empty id tile", "rawSql": "", "generations": [] },
+                  "nl_query": { "prompt": "Empty id tile", "raw_sql": "", "generations": [] },
+                  "viz_type": "bar"
+                }
+              },
+              {
+                "type": "DataViz",
+                "props": {
+                  "id": "DataViz-legacy",
+                  "nlQuery": { "prompt": "Vaccine uptake from an older save", "rawSql": "", "generations": [] },
                   "vizType": "bar"
                 }
               }
@@ -118,7 +126,7 @@ values
     'Board briefing',
     '',
     'workspace',
-    '{"content":[{"type":"DataViz","props":{"id":"DataViz-briefing","nlQuery":{"prompt":"Briefing summary chart","rawSql":"","generations":[]},"vizType":"bar"}}]}'::jsonb,
+    '{"content":[{"type":"DataViz","props":{"id":"DataViz-briefing","nl_query":{"prompt":"Briefing summary chart","raw_sql":"","generations":[]},"viz_type":"bar"}}]}'::jsonb,
     true,
     'e45000a2-0000-4000-8000-000000000002'::uuid,
     now() - interval '6 minutes'
@@ -132,7 +140,7 @@ values
     'Draft surveillance',
     '',
     'draft',
-    '{"content":[{"type":"DataViz","props":{"id":"DataViz-draft","nlQuery":{"prompt":"Draft outbreak trend","rawSql":"","generations":[]},"vizType":"line"}}]}'::jsonb,
+    '{"content":[{"type":"DataViz","props":{"id":"DataViz-draft","nl_query":{"prompt":"Draft outbreak trend","raw_sql":"","generations":[]},"viz_type":"line"}}]}'::jsonb,
     false,
     null,
     now() - interval '7 minutes'
@@ -257,7 +265,7 @@ select
 from generate_series(2, 8) as n
 on conflict (id) do nothing;
 
-select plan (16);
+select plan (17);
 
 -- 1. A name search spans gadget types.
 select lives_ok (
@@ -581,15 +589,38 @@ select lives_ok (
   'a viewer finds dashboards, tiles, datasets, maps, case types, and cases'
 );
 
+-- 15. A tile saved before configs were snake-cased is still found by its prompt.
+select lives_ok (
+  $t$
+  reset role;
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"e4000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
+  do $chk$
+  declare
+    v_tile text;
+  begin
+    select max(s.sub_id || '|' || s.label)
+    into v_tile
+    from public.rpc_gadgets__search ('e4100001-0000-4000-8000-000000000001'::uuid, 'vaccine uptake', 20) s
+    where s.gadget_type = 'dashboard_tile';
+
+    if v_tile is distinct from 'DataViz-legacy|Vaccine uptake from an older save' then
+      raise exception 'the camelCased tile row is %', v_tile;
+    end if;
+  end $chk$;
+  $t$,
+  'a tile whose config predates snake-casing is found by its prompt'
+);
+
 reset role;
 
--- 15. Signed-in users can call it.
+-- 16. Signed-in users can call it.
 select ok (
   has_function_privilege('authenticated', 'public.rpc_gadgets__search(uuid, text, integer)', 'EXECUTE'),
   'authenticated can execute rpc_gadgets__search'
 );
 
--- 16. Anonymous users cannot.
+-- 17. Anonymous users cannot.
 select ok (
   not has_function_privilege('anon', 'public.rpc_gadgets__search(uuid, text, integer)', 'EXECUTE'),
   'anon cannot execute rpc_gadgets__search'
