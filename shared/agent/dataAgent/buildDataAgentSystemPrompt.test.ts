@@ -97,4 +97,23 @@ describe("buildDataAgentSystemPrompt", () => {
       "Use it only as a whole quoted value, never inside another string or LIKE pattern, never pass it to lookup_values, and give every computed column an alias.",
     );
   });
+
+  it("tells v2 to name datasets, never show their aliases", () => {
+    const v2 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-08",
+      promptId: "data-agent-v2",
+    });
+    const v1 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-08",
+      promptId: "data-agent-v1",
+    });
+    const rule =
+      "Never show the user the tag or a table alias such as t0; " +
+      "call datasets by their names.";
+
+    expect(v2).toContain(rule);
+    expect(v1).not.toContain(rule);
+  });
 });

@@ -162,7 +162,9 @@ describe("runDataAgentTurn", () => {
     );
 
     expect(getAllDatasetsMock).toHaveBeenCalledTimes(1);
-    expect(_askedTexts()[1]).toContain('Open dataset: t0 = "cases.csv"');
+    expect(_askedTexts()[1]).toContain(
+      'Open dataset: "cases.csv" (query it as t0)',
+    );
   });
 
   it("keeps the page and shows results in the chat when reading it fails", async () => {

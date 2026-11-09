@@ -15,7 +15,7 @@ function _block(context: AgentPageContext): string {
 }
 
 describe("buildAgentPageContextBlock", () => {
-  it("names the open dataset by alias and shows the explorer query", () => {
+  it("names the open dataset before its alias and shows the query", () => {
     const block = _block({
       app: "data-explorer",
       dataset: { id: DATASET_ID, name: "deaths.csv" },
@@ -29,7 +29,7 @@ describe("buildAgentPageContextBlock", () => {
       [
         "<current_page>",
         "Page: Data Explorer",
-        'Open dataset: t0 = "deaths.csv"',
+        'Open dataset: "deaths.csv" (query it as t0)',
         'Query on screen: SELECT "state" FROM "t0"',
         "Result columns: state varchar",
         "</current_page>",
@@ -184,7 +184,7 @@ describe("buildAgentPageContextBlock", () => {
     });
 
     expect(block).toContain('Open dataset: "new.csv"');
-    expect(block).not.toContain("t0 =");
+    expect(block).not.toContain("query it as");
   });
 
   it("keeps hostile column names and chart types on their own line", () => {
@@ -363,7 +363,7 @@ describe("buildAgentPageContextBlock", () => {
 
     // SQL is never masked: redaction already hid the literals it holds.
     expect(block).toContain(`AS "Jane visits" FROM "t0"`);
-    expect(block).toContain('Open dataset: t0 = "<value 1>.csv"');
+    expect(block).toContain('Open dataset: "<value 1>.csv" (query it as t0)');
     expect(block).toContain('Dashboard: "<value 1>\'s dashboard"');
     expect(block).toContain('Map: "<value 1> map"');
     expect(block).toContain('Case type: "<value 1> cases"');

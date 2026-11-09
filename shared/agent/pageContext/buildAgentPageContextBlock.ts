@@ -144,6 +144,10 @@ function _formatSql(sql: string, options: RenderOptions): string {
     : aliased;
 }
 
+/**
+ * The open dataset's line. The name comes first and the alias follows as a
+ * note for SQL, so the model reads the name as what to call the dataset.
+ */
 function _datasetLine(
   dataset: NonNullable<AgentPageContext["dataset"]>,
   options: RenderOptions,
@@ -153,7 +157,7 @@ function _datasetLine(
   });
   const name = _quote(options.mask(dataset.name));
   return entry
-    ? `Open dataset: ${entry.alias} = ${name}`
+    ? `Open dataset: ${name} (query it as ${entry.alias})`
     : `Open dataset: ${name}`;
 }
 
