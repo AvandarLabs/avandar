@@ -66,7 +66,12 @@ const DEATHS_TILE = {
 /** Kings County, New York (Brooklyn), in the us deaths data. */
 const KINGS_COUNTY_2022 = `"Admin2" = 'Kings' AND "Province_State" = 'New York' AND year("date") = 2022`;
 
-/** A county chart, whose county name the harness treats as personal. */
+/**
+ * A county chart, whose county name the harness treats as personal. The
+ * title does not name the county: titles get only the content check, so a
+ * name in the title would reach the model and the placeholder would not be
+ * needed.
+ */
 const KINGS_DASHBOARD: AgentPageContext = {
   app: "dashboard",
   dashboard: {
@@ -74,7 +79,7 @@ const KINGS_DASHBOARD: AgentPageContext = {
     name: "New York deaths",
     tiles: [
       {
-        title: "Deaths in Kings County by month",
+        title: "Deaths in one county by month",
         chartType: "line",
         sql: _stored(
           `SELECT date_trunc('month', "date") AS "month", SUM("daily_new_deaths") AS "deaths" FROM "${US_DEATHS}" WHERE ${KINGS_COUNTY_2022} GROUP BY 1 ORDER BY 1`,

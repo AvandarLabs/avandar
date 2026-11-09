@@ -136,7 +136,7 @@ describe("createPiConversation page placeholders", () => {
 
     expect(asked[0]).toContain(`"Admin2" = '<value 1>'`);
     expect(asked[0]).toContain(`"Province_State" = 'New York'`);
-    expect(asked[0]).not.toContain("'Kings'");
+    expect(asked[0]).not.toContain("Kings");
     expect(runEvalSqlMock).toHaveBeenNthCalledWith(
       1,
       expect.anything(),
