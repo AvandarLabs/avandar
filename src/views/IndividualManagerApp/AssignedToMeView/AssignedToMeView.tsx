@@ -26,9 +26,12 @@ export function AssignedToMeView(): ReactNode {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const userId = useCurrentUser()?.id;
-  const assigned = useAssignedRecords(userId);
+  const assigned = useAssignedRecords(userId, workspace.id);
   const [count] = IndividualClient.useGetCount({
-    where: { assigned_to: { eq: userId } },
+    where: {
+      assigned_to: { eq: userId },
+      workspace_id: { eq: workspace.id },
+    },
     useQueryOptions: { enabled: userId !== undefined },
   });
   const [concepts] = ConceptClient.useGetAll(

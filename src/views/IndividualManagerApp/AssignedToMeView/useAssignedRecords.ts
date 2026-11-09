@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import type { Individual } from "$/models/ontology/Individual/Individual";
 import type { User } from "$/models/User/User";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const PAGE_SIZE = 20;
 
@@ -18,26 +19,34 @@ type AssignedRecordsPage = {
 };
 
 /**
- * Pages through every record assigned to a user, across case types.
+ * Pages through every record assigned to a user in one workspace, across case
+ * types.
  *
  * Rows come ordered by case type, then name, then id. The id keeps two
  * records with the same name from swapping places across pages. The query key
- * is the `getAll` key of the `assigned_to` filter, so saving an assignment
- * finds this queue through the key the save already invalidates. The query
- * waits until the user is known.
+ * is the `getAll` key of the `assigned_to` and `workspace_id` filter, so
+ * saving an assignment finds this queue through the key the save already
+ * invalidates. The query waits until the user is known.
  *
  * @param userId The signed-in user. `undefined` disables the query.
+ * @param workspaceId The workspace whose records are listed. A person in two
+ * workspaces never sees the other one's records.
  */
 export function useAssignedRecords(
   userId: User.Id | undefined,
+  workspaceId: Workspace.Id,
 ): AssignedRecordsPage {
+  const assignedWhere = {
+    assigned_to: { eq: userId },
+    workspace_id: { eq: workspaceId },
+  };
   const query = useInfiniteQuery({
     queryKey: IndividualClient.QueryKeys.getAll({
-      where: { assigned_to: { eq: userId } },
+      where: assignedWhere,
     }),
     queryFn: (ctx) => {
       return IndividualClient.getPage({
-        where: { assigned_to: { eq: userId } },
+        where: assignedWhere,
         orderBy: [
           { column: "concept_id", direction: "asc" },
           { column: "name", direction: "asc" },

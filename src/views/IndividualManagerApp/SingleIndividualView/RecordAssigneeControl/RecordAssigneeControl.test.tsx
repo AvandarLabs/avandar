@@ -47,7 +47,13 @@ describe("RecordAssigneeControl", () => {
         return option.textContent;
       }),
     ).toEqual(["Unassigned", "Alice", "Zoe"]);
-    fireEvent.click(options[1]);
+    const aliceOption = options.find((option) => {
+      return option.textContent === "Alice";
+    });
+    if (aliceOption === undefined) {
+      throw new Error("Expected an Alice menu item");
+    }
+    fireEvent.click(aliceOption);
 
     expect(onChange).toHaveBeenCalledWith(ALICE.userId);
   });
