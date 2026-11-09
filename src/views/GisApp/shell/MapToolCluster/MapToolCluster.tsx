@@ -5,6 +5,7 @@ import { MapToolClusterToolbar } from "@/views/GisApp/shell/MapToolCluster/MapTo
 import { MeasureReadout } from "@/views/GisApp/shell/MapToolCluster/MeasureReadout";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type { PlaceToolController } from "@/views/GisApp/places/PlaceTool.types";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { ReactNode } from "react";
 
@@ -17,6 +18,7 @@ type Props = {
   layers?: readonly MapLayer.T[];
   featureCollections?: ReadonlyMap<MapLayer.Id, GeoJSON.FeatureCollection>;
   requestFitBounds?: (bounds: MapBounds) => void;
+  placeTool?: PlaceToolController;
 };
 
 const EMPTY_MEASURE_VERTICES: ReadonlyArray<[number, number]> = [];
@@ -74,6 +76,7 @@ export function MapToolCluster({
   layers,
   featureCollections,
   requestFitBounds = noop,
+  placeTool,
 }: Readonly<Props>): ReactNode {
   const onBufferConfirm = useBufferConfirmHandler(selectedLayer, updateConfig);
   return (
@@ -87,6 +90,7 @@ export function MapToolCluster({
         layers={layers}
         featureCollections={featureCollections}
         requestFitBounds={requestFitBounds}
+        placeTool={placeTool}
       />
     </>
   );

@@ -15,6 +15,7 @@ import { GisAppStatusCard } from "@/views/GisApp/GisAppStatusCard";
 import { GisAppTopBar } from "@/views/GisApp/GisAppTopBar";
 import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface";
 import { FeatureInspector } from "@/views/GisApp/panels/FeatureInspector/FeatureInspector";
+import { usePlaceTool } from "@/views/GisApp/places/usePlaceTool";
 import { AnnotationTextOverlay } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay";
 import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
 import { MapTimeSlider } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSlider";
@@ -88,6 +89,7 @@ function GisAppAnnotationTextOverlay({ app }: Readonly<Props>): ReactNode {
 export function GisAppMapShell({ app }: Props): ReactNode {
   const { t } = useLingui();
   const layerActions = useGisAppLayerActions(app);
+  const placeTool = usePlaceTool(app);
   const mapSurfaceRef = useRef<HTMLDivElement>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const workspace = useCurrentWorkspace();
@@ -132,7 +134,7 @@ export function GisAppMapShell({ app }: Props): ReactNode {
           workspaceId={app.avaMap.workspaceId}
         />
       }
-      toolCluster={<GisAppMapToolCluster app={app} />}
+      toolCluster={<GisAppMapToolCluster app={app} placeTool={placeTool} />}
       firstRunCard={
         <GisAppFirstRunCard
           app={app}
