@@ -1770,7 +1770,7 @@ msgstr "لوحة المعلومات"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add {displayName} to workspace"
-msgstr ""
+msgstr "إضافة {displayName} إلى مساحة العمل"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2381,7 +2381,7 @@ msgstr "البيانات المفتوحة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "This dataset has no data yet"
-msgstr ""
+msgstr "لا تحتوي مجموعة البيانات هذه على بيانات بعد"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3542,7 +3542,7 @@ msgstr "إلى"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
-msgstr ""
+msgstr "تعذّر العثور على \"{displayName}\" في الكتالوج. حاول إضافتها مرة أخرى."
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
@@ -4231,7 +4231,7 @@ msgstr "يرجى التحقق من بريدك الإلكتروني"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Add them too"
-msgstr ""
+msgstr "إضافة هذه العناصر أيضًا"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -4361,7 +4361,7 @@ msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
-msgstr ""
+msgstr "موصى به مع مجموعة البيانات هذه"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -6370,7 +6370,7 @@ msgstr "جميع النتائج"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add"
-msgstr ""
+msgstr "إضافة"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -7235,7 +7235,7 @@ msgstr "يوجد عامل تصفية واحد نشط على هذه الطبقة.
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Recommended with it: {companionNames}"
-msgstr ""
+msgstr "موصى به معها: {companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -10030,7 +10030,7 @@ msgstr "أخضر مزرق"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
-msgstr ""
+msgstr "لم يضف الناشر أي صفوف إليها. لا يزال بإمكانك فتح الأصل حيث تم نشرها."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
@@ -10405,7 +10405,7 @@ msgstr "يتعامل هذا الاستعلام مع نوع من القيم عل�
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "In your workspace"
-msgstr ""
+msgstr "في مساحة العمل لديك"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10828,7 +10828,7 @@ msgstr "جارٍ التحميل"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Names the codes in {columnList}"
-msgstr ""
+msgstr "يسمّي الرموز في {columnList}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx

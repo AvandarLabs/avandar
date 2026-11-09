@@ -1799,7 +1799,7 @@ msgstr "Dashboard"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add {displayName} to workspace"
-msgstr ""
+msgstr "Adicionar {displayName} ao espaço de trabalho"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2414,7 +2414,7 @@ msgstr "Dados Abertos"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "This dataset has no data yet"
-msgstr ""
+msgstr "Este conjunto de dados ainda não contém dados"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3594,7 +3594,8 @@ msgstr "para"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
-msgstr ""
+msgstr "Não encontramos \"{displayName}\" no catálogo. Tente adicioná-lo "
+"novamente."
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
@@ -4291,7 +4292,7 @@ msgstr "Por favor, verifique seu e-mail"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Add them too"
-msgstr ""
+msgstr "Adicione-os também"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -4424,7 +4425,7 @@ msgstr "Adicione um bloco de Filtro ao painel para habilitar filtragem global "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
-msgstr ""
+msgstr "Recomendado com este conjunto de dados"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -6456,7 +6457,7 @@ msgstr "Todos os resultados"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add"
-msgstr ""
+msgstr "Adicionar"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -7328,7 +7329,7 @@ msgstr "Há um filtro ativo nesta camada. Ele pode estar excluindo tudo."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Recommended with it: {companionNames}"
-msgstr ""
+msgstr "Recomendado com ele: {companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -10165,7 +10166,8 @@ msgstr "Verde-azulado"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
-msgstr ""
+msgstr "O publicador ainda não adicionou nenhuma linha a ele. Você ainda pode "
+"abrir o original, onde ele está publicado."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
@@ -10543,7 +10545,7 @@ msgstr "Esta consulta trata um tipo de valor como outro, como texto como número
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "In your workspace"
-msgstr ""
+msgstr "No seu espaço de trabalho"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10974,7 +10976,7 @@ msgstr "Carregando"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Names the codes in {columnList}"
-msgstr ""
+msgstr "Nomeia os códigos em {columnList}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx

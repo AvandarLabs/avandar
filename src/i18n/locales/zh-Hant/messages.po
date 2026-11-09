@@ -1725,7 +1725,7 @@ msgstr "儀表板"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add {displayName} to workspace"
-msgstr ""
+msgstr "將 {displayName} 新增至工作區"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2322,7 +2322,7 @@ msgstr "開放資料"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "This dataset has no data yet"
-msgstr ""
+msgstr "此資料集目前尚無資料"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3454,7 +3454,7 @@ msgstr "至"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
-msgstr ""
+msgstr "在目錄中找不到「{displayName}」。請再次嘗試新增。"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
@@ -4121,7 +4121,7 @@ msgstr "請檢查您的電子郵件"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Add them too"
-msgstr ""
+msgstr "也一併新增"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -4250,7 +4250,7 @@ msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
-msgstr ""
+msgstr "推薦搭配此資料集"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -6226,7 +6226,7 @@ msgstr "所有結果"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add"
-msgstr ""
+msgstr "新增"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -7073,7 +7073,7 @@ msgstr "此圖層有一個作用中的篩選條件，可能會排除所有內容
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Recommended with it: {companionNames}"
-msgstr ""
+msgstr "推薦搭配：{companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -9798,7 +9798,7 @@ msgstr "藍綠色"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
-msgstr ""
+msgstr "發布者尚未在其中新增任何資料列。您仍可開啟發布原始資料的位置。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
@@ -10164,7 +10164,7 @@ msgstr "此查詢將某種值視為另一種值，例如將文字視為數字或
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "In your workspace"
-msgstr ""
+msgstr "在您的工作區中"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10576,7 +10576,7 @@ msgstr "載入中"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Names the codes in {columnList}"
-msgstr ""
+msgstr "為 {columnList} 中的代碼命名"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
