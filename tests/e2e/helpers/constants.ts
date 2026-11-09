@@ -201,6 +201,15 @@ export const GIS_NYC_EXPOSURE_SITES_CSV_PATH = path.join(
 export const GIS_NYC_EXPOSURE_SITES_ROW_COUNT = 2;
 
 /**
+ * The same two sites as {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, as Parquet,
+ * so a spec can seed them as a catalog listing instead of uploading the CSV.
+ */
+export const GIS_NYC_EXPOSURE_SITES_PARQUET_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-exposure-sites.parquet",
+);
+
+/**
  * 35 NYC school points (WKT `the_geom`, name in `loc_name`) around
  * {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, with none near the edge of a
  * half-mile ring around either site.

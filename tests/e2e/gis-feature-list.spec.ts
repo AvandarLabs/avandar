@@ -1,13 +1,11 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  GIS_NYC_EXPOSURE_SITES_CSV_PATH,
-  GIS_NYC_EXPOSURE_SITES_ROW_COUNT,
+  GIS_NYC_EXPOSURE_SITES_PARQUET_PATH,
   GIS_NYC_SCHOOL_POINTS_PARQUET_PATH,
 } from "./helpers/constants";
 import { deleteDatasetAndShares } from "./helpers/datasetSharingCleanup";
 import { deleteMapsByIds } from "./helpers/deleteMapsByIds";
-import { importDatasetViaUi } from "./helpers/importDatasetViaUi";
 import { parseDatasetIdFromDataManagerUrl } from "./helpers/manualUploadCloudSyncFlow";
 import { refreshCatalogFacetCounts } from "./helpers/refreshCatalogFacetCounts";
 import { seedAvaMap } from "./helpers/seedAvaMap";
@@ -24,7 +22,6 @@ import { E2E_ONLINE_TAG } from "./setup/ensureE2EViteFeatureFlags/ensureE2EViteF
 import type { Locator, Page } from "@playwright/test";
 
 const MAP_NAME = "E2E GIS feature list";
-const SITES_LAYER_NAME = "nyc-exposure-sites.csv";
 const SCREENSHOT_DIR = ".temp/feat-gis-filter-by-layer";
 
 /**
@@ -34,7 +31,8 @@ const SCREENSHOT_DIR = ".temp/feat-gis-filter-by-layer";
  */
 const E2E_PIPELINE_NAME = "e2e-gis-feature-list";
 
-/** Seeded listing name. "Brindlecove" is in no real listing's name. */
+/** Seeded listing names. "Brindlecove" is in no real listing's name. */
+const SITES_LISTING_NAME = "Brindlecove exposure sites";
 const SCHOOLS_LISTING_NAME = "Brindlecove school point locations";
 
 /** Rows in the seeded schools listing. */
@@ -67,27 +65,28 @@ async function _pickOption(
   await page.getByRole("option", { name: optionName, exact: true }).click();
 }
 
-/** Adds the seeded schools listing from the catalog; returns its dataset id. */
-async function _addSchoolsListing(
+/** Adds a seeded listing from the catalog; returns its dataset id. */
+async function _addListing(
   page: Page,
-  workspaceSlug: string,
+  options: Readonly<{ listingName: string; workspaceSlug: string }>,
 ): Promise<string> {
+  const { listingName, workspaceSlug } = options;
   await page.getByRole("link", { name: "Data Sources" }).click();
   await page.getByRole("button", { name: "Add new dataset" }).click();
   await page.getByRole("tab", { name: "Open data" }).click();
   await page
     .getByRole("textbox", { name: "Search open data" })
-    .fill(SCHOOLS_LISTING_NAME, { timeout: LONG_WAIT });
+    .fill(listingName, { timeout: LONG_WAIT });
   await page
     .getByRole("region", { name: "Results" })
     .getByRole("listbox", { name: "Open datasets" })
-    .getByRole("option", { name: SCHOOLS_LISTING_NAME })
+    .getByRole("option", { name: listingName })
     .click();
   await page.getByRole("button", { name: "Add dataset to workspace" }).click();
   await expect(page.getByText("Dataset added")).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
-  await page.getByRole("link", { name: SCHOOLS_LISTING_NAME }).click();
+  await page.getByRole("link", { name: listingName }).click();
   await page.waitForURL(/\/data-manager\/[0-9a-f-]{36}/i);
   const datasetId = parseDatasetIdFromDataManagerUrl({
     url: page.url(),
@@ -211,6 +210,12 @@ test.describe("GIS feature list", () => {
       displayName: SCHOOLS_LISTING_NAME,
       parquetPath: GIS_NYC_SCHOOL_POINTS_PARQUET_PATH,
     });
+    await seedOpenDataListingCopy({
+      admin,
+      pipelineName: E2E_PIPELINE_NAME,
+      displayName: SITES_LISTING_NAME,
+      parquetPath: GIS_NYC_EXPOSURE_SITES_PARQUET_PATH,
+    });
     await refreshCatalogFacetCounts(admin);
   });
 
@@ -247,22 +252,18 @@ test.describe("GIS feature list", () => {
           password: primaryUser.password,
           workspaceSlug,
         });
-        datasetIds.push(
-          await importDatasetViaUi({
-            page,
-            workspaceSlug,
-            filePath: GIS_NYC_EXPOSURE_SITES_CSV_PATH,
-            expectedRowCount: GIS_NYC_EXPOSURE_SITES_ROW_COUNT,
-          }),
-        );
-        datasetIds.push(await _addSchoolsListing(page, workspaceSlug));
+        for (const listingName of [SITES_LISTING_NAME, SCHOOLS_LISTING_NAME]) {
+          datasetIds.push(
+            await _addListing(page, { listingName, workspaceSlug }),
+          );
+        }
         await page.getByRole("link", { name: "Maps" }).click();
         await page
           .getByRole("link", { name: `Open the map ${MAP_NAME}` })
           .click();
         await _addSchoolsLayer(page);
         const sitesInspector = await _addLayer(page, {
-          datasetName: SITES_LAYER_NAME,
+          datasetName: SITES_LISTING_NAME,
           isFirstLayer: false,
         });
         await expect(
