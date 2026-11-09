@@ -204,10 +204,12 @@ To write a plugin with it, see [`docs/plugin-authoring.md`](plugin-authoring.md)
 
 The API Avandar plugins are written against. Exports `definePlugin` and
 `isPluginDefinition`, the `avandar` API types (`AvandarApi`, the invocation
-context, `QueryHandle`, `fetchRows` options and result), `PluginError`,
-`makePluginTranslator` (ICU messages with locale fallback), and the React
-`AvandarProvider`, `useAvandar`, and `useT` for plugin UI. Every call is async
-or fire-and-forget and passes serializable data.
+context, `QueryHandle`, `fetchRows` options and result), the chart type types
+(`PluginVizDefinition`, `PluginChartSpec`, and the input and props a chart
+receives), `PluginError`, `makePluginTranslator` (ICU messages with locale
+fallback), and the React `AvandarProvider`, `PluginVizProvider`, `useAvandar`,
+and `useT` for plugin UI and plugin charts. Every call is async or
+fire-and-forget and passes serializable data.
 
 Private (`"private": true`): not published to npm. It depends
 on Lingui's core and message compiler, with `react` as a peer.
@@ -221,11 +223,13 @@ See [`packages/web/plugin-sdk/README.md`](../packages/web/plugin-sdk/README.md).
 The components plugin UI may render. Re-exports a small set of Mantine
 components (`Alert`, `Badge`, `Button`, `Divider`, `Group`, `Loader`,
 `NumberInput`, `Select`, `SimpleGrid`, `Stack`, `Table`, `Text`, `TextInput`,
-`Title`). Plugins import UI only from this package, which keeps their code
-independent of the host's component library.
+`Title`). Its `@avandar/plugin-ui/charts` entry re-exports a curated set of
+Recharts components plus `useChartTheme`, for plugin chart components.
+Plugins import UI only from this package, which keeps their code independent
+of the host's component library.
 
 Private (`"private": true`): not published to npm. It has
-`@mantine/core` and `react` as peers.
+`@mantine/core`, `react`, and `recharts` as peers.
 
 See [`packages/web/plugin-ui/README.md`](../packages/web/plugin-ui/README.md).
 

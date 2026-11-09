@@ -11,12 +11,14 @@ import { fileURLToPath } from "node:url";
  * `plugin-restrictions.test.js` fails when the two drift apart.
  *
  * Every entry other than relative files, `react/jsx-runtime` (the automatic
- * JSX runtime), and the `date-fns` subpaths must be an exact package name.
+ * JSX runtime), `@avandar/plugin-ui/charts` (the chart building blocks), and
+ * the `date-fns` subpaths must be an exact package name.
  */
 export const APPROVED_PLUGIN_IMPORT_PATTERNS = [
   "\\.{1,2}/",
   "@avandar/plugin-sdk$",
   "@avandar/plugin-ui$",
+  "@avandar/plugin-ui/charts$",
   "react$",
   "react/jsx-runtime$",
   "simple-statistics$",
@@ -125,7 +127,7 @@ export const pluginRestrictions = [
             {
               regex: UNAPPROVED_PLUGIN_IMPORT_REGEX,
               message:
-                "Plugins may import only @avandar/plugin-sdk, @avandar/plugin-ui, React, relative files, and approved npm packages (see APPROVED_PLUGIN_DEPENDENCIES in @avandar/plugin-manifest).",
+                "Plugins may import only @avandar/plugin-sdk, @avandar/plugin-ui, @avandar/plugin-ui/charts, React, relative files, and approved npm packages (see APPROVED_PLUGIN_DEPENDENCIES in @avandar/plugin-manifest).",
             },
           ],
         },

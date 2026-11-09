@@ -319,6 +319,18 @@ describe("VisualizationContainer", () => {
     expect(bubble).toHaveAttribute("data-size", "value");
   });
 
+  it("shows the missing plugin placeholder for a plugin chart", async () => {
+    renderViz({
+      vizType: "plugin",
+      pluginId: "avandar.epidemiology",
+      pluginVizId: "epicurve",
+      columnSettings: {},
+      settings: {},
+    });
+    expect(await screen.findByText("Plugin not available")).toBeInTheDocument();
+    expect(screen.getByText(/avandar\.epidemiology/)).toBeInTheDocument();
+  });
+
   it("passes truncated data to bar charts over the render limit", () => {
     const barMax = VIZ_RENDER_LIMITS.bar!.max;
     const overLimitData: UnknownDataFrame = Array.from(

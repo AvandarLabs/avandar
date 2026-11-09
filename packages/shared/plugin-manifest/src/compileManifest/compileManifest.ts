@@ -2,7 +2,11 @@ import { PluginManifestError } from "@plugin-manifest/compileManifest/PluginMani
 import { PluginManifestSchema } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 import { getMessageKeyFromManifestString } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 import { parseStrictYaml } from "@plugin-manifest/yaml/parseStrictYaml/parseStrictYaml.ts";
-import type { PluginManifest } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
+import type {
+  PluginManifest,
+  PluginVizSettingControl,
+  PluginVizType,
+} from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 import type { PluginLocaleMessages } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 
 /** A validated manifest plus the locale strings its `%key%` references need. */
@@ -87,6 +91,33 @@ function _pickReferencedStrings(options: {
   );
 }
 
+function _getControlStrings(control: PluginVizSettingControl): string[] {
+  switch (control.kind) {
+    case "select":
+    case "segmented":
+      return control.options.map((option) => {
+        return option.label;
+      });
+    case "number":
+      return control.unit === undefined ? [] : [control.unit];
+    case "text":
+      return control.placeholder === undefined ? [] : [control.placeholder];
+    case "columnPicker":
+    case "switch":
+    case "color":
+      return [];
+  }
+}
+
+function _getVizTypeStrings(vizType: PluginVizType): string[] {
+  return [
+    vizType.title,
+    ...vizType.settings.flatMap((setting) => {
+      return [setting.label, ..._getControlStrings(setting.control)];
+    }),
+  ];
+}
+
 /**
  * Gets each distinct message key the manifest's user-facing strings
  * reference, so the compiler can check that the locale files define them.
@@ -97,6 +128,9 @@ export function getMessageKeysFromManifest(manifest: PluginManifest): string[] {
     manifest.description,
     ...manifest.contributes.commands.map((command) => {
       return command.title;
+    }),
+    ...manifest.contributes.vizTypes.flatMap((vizType) => {
+      return _getVizTypeStrings(vizType);
     }),
   ];
   const keys = values.flatMap((value) => {

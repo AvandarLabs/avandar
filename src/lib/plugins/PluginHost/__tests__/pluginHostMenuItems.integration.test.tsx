@@ -74,6 +74,7 @@ function _makeManifestModule(pluginId: string): PluginManifestModule {
       contributes: {
         commands: [{ id: "run", title: `Run ${pluginId}`, icon: "none" }],
         menus: { [SLOT_ID]: [{ command: "run" }] },
+        vizTypes: [],
       },
     },
     strings: {},

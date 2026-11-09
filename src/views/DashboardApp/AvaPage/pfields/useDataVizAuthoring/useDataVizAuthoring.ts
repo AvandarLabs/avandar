@@ -17,6 +17,21 @@ type Authoring = ReturnType<typeof useDataVizRuntimeColumnBindings> & {
   updateColumnNameProps: (
     changes: Partial<Extract<Props, { columnBindingVersion: 0 }>>,
   ) => void;
+
+  /**
+   * Writes a chart type together with its config, such as a picked plugin
+   * chart. On a block that stores column IDs, it is merged over the block's
+   * bound props once its columns are known, and written as given before its
+   * query has run. On a version 0 block that stores column names, it is
+   * skipped until the query has run and every name binds to a column, then
+   * written over the bound props.
+   */
+  replaceVizConfig: (
+    changes: Pick<
+      Extract<Props, { columnBindingVersion: 1 }>,
+      "vizType" | "vizConfig"
+    >,
+  ) => void;
 };
 
 function useSelectedDataVizOwner(): {
@@ -70,6 +85,12 @@ export function useDataVizAuthoring(
       replace(updated);
     }
   };
+  const replaceVizConfig: Authoring["replaceVizConfig"] = (changes) => {
+    const boundProps = columnBindings.runtime?.props ?? props;
+    if (boundProps.columnBindingVersion === 1) {
+      replace({ ...props, ...boundProps, ...changes });
+    }
+  };
   return {
     ...columnBindings,
     props,
@@ -79,5 +100,6 @@ export function useDataVizAuthoring(
     updateColumnNameProps: (changes) => {
       return update({ kind: "columnName", props: changes });
     },
+    replaceVizConfig,
   };
 }

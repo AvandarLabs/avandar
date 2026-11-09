@@ -107,6 +107,19 @@ export type DataExplorerAppState = {
    */
   vizConfigMemory: Partial<AvaVizConfig.Registry>;
 
+  /**
+   * The last config the user saw for each plugin chart type, keyed by
+   * `makePluginVizMemoryKey` (`<pluginId>/<pluginVizId>`), so switching away
+   * from a plugin chart and back restores its settings.
+   *
+   * Kept apart from `vizConfigMemory` because every plugin config shares the
+   * one `"plugin"` viz type. Written on the way out of a plugin chart type.
+   * On the way back in, a remembered column setting is kept only while its
+   * column is still in `lastResultColumns` (or while that is unset), and the
+   * picked config fills the rest. In-memory only.
+   */
+  pluginVizConfigMemory: Readonly<Record<string, AvaVizConfig.Plugin>>;
+
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;
 
@@ -167,6 +180,7 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
     vizType: "table",
   },
   vizConfigMemory: {},
+  pluginVizConfigMemory: {},
   rawSql: undefined,
   nlPrompt: undefined,
   openDataset: undefined,

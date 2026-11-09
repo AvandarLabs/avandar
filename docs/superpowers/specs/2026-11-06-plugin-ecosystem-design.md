@@ -631,7 +631,7 @@ implementation cycle.
 | Slice | Delivers | Done when |
 | --- | --- | --- |
 | **1a. Plugin core and commands** (spec: `2026-11-06-plugins-1a-core-commands-design.md`) | Manifest schema and compiler, `plugin-manifest`/`plugin-sdk`/`plugin-ui` packages, build-time bundling, `plugin_installations`, Settings → Plugins, `commands` and `menus` in the Data Explorer toolbar, `context`, `data.fetchRows`, `ui`, `i18n`, `ava plugin init` and `validate` | The epidemiology plugin's "Linear regression" button works on the current query result |
-| 1b. Viz types | The open `plugin` viz variant, a registry, settings descriptors, persistence in the Explorer and dashboards | An epicurve renders in the Explorer and on a dashboard |
+| **1b. Viz types and derived columns** (spec: `2026-11-07-plugins-1b-viz-types-design.md`) | The open `plugin` viz variant, a registry, settings descriptors, transform and component render paths, persistence in the Explorer and dashboards, and an API for commands to add query columns | An epicurve renders in the Explorer and on a dashboard, and the incidence command adds rate columns that the rate plot draws |
 | 1c. AI tools | A generic tool-call path in chat, with client-run plugin tools whose results return to the model | The chat calls `fitRegression` |
 | 1d. Data slots, content, minimal wizard | Slot declarations, manual binding, content import | The Mozambique pack installs, and the epidemiology plugin binds a `Case` slot |
 | 1e. Views and plugin roles | A catch-all route, sidebar links, per-plugin app roles, chat page context, plugin storage | A plugin view appears in the sidebar, gated by role |

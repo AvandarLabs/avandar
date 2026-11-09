@@ -21,6 +21,7 @@ function _makeManifest(options: {
           },
         ),
       },
+      vizTypes: [],
     },
   } as unknown as PluginManifest;
 }

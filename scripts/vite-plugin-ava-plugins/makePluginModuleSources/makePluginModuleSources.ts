@@ -48,6 +48,9 @@ function _getDistinctIconNamesFromPlugin(plugin: PluginDirectory): string[] {
       ...manifest.contributes.commands.map((command) => {
         return command.icon;
       }),
+      ...manifest.contributes.vizTypes.map((vizType) => {
+        return vizType.icon;
+      }),
     ]),
   ];
 }

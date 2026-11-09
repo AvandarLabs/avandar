@@ -345,6 +345,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "UNION/INTERSECT/EXCEPT haitumiki katika fomu hii."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "Mipangilio ya chati"
@@ -365,6 +366,10 @@ msgstr "Unahitaji ufikiaji wa mhariri wa Aina za Kesi ili kubadilisha hali "
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Reorder {statusName}"
 msgstr "Panga upya {statusName}"
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart needs the {pluginId} plugin, which is not available."
+msgstr ""
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -714,6 +719,10 @@ msgstr "Panga seti za data kwa"
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
 msgstr "Vyanzo vya Data"
+
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader.tsx
+msgid "Loading chart"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand drawer"
@@ -1379,6 +1388,10 @@ msgstr "Uwanja huu hauwezi kuwa tupu"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "\"{value}\" si tarehe. Tumia YYYY-MM-DD."
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "Plugin not available"
+msgstr ""
+
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -1490,6 +1503,7 @@ msgstr "Onyesha chache"
 msgid "Metadata"
 msgstr "Metadata"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Retry"
@@ -1778,6 +1792,10 @@ msgstr "Jina la mtumiaji"
 msgid "Column name in SQL"
 msgstr "Jina la safu katika SQL"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart's saved settings are not valid, so it cannot be displayed."
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field, e.g. Review notes"
 msgstr "Ongeza sehemu, kwa mfano Maelezo ya ukaguzi"
@@ -1941,7 +1959,7 @@ msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {Hamisha rekodi # hadi} other {Hamisha rekodi "
 "# hadi}}"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid name column selected"
 msgstr "Safu ya jina isiyo sahihi imechaguliwa"
 
@@ -2601,6 +2619,10 @@ msgstr "Fungua katika skrini nzima"
 msgid "Bias detected:"
 msgstr "Upendeleo umegunduliwa:"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "The {pluginId} plugin ran into an error while drawing this chart."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "Mwili"
@@ -3145,6 +3167,10 @@ msgstr "PDF imeshukuliwa."
 msgid "Workspace ID"
 msgstr "Kitambulisho cha eneo la kazi"
 
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
+msgid "You haven't chosen: {settingLabel}"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "Watu {numUsers}"
@@ -3551,7 +3577,7 @@ msgstr "Maeneo {0} yamefichwa"
 msgid "Annotation text:"
 msgstr "Maandishi ya maelezo:"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen an X axis"
 msgstr "Hujachagua mhimili wa X"
 
@@ -3733,6 +3759,7 @@ msgstr "Kila nukta husogea kwa kiasi kilekile kila wakati ramani hii "
 msgid "Link to the source record"
 msgstr "Kiungo cha rekodi chanzo"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -3968,7 +3995,7 @@ msgstr "Msimbo"
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "Filita za ndani (zinazoweza kuhaririwa na mtazamaji, chati hii pekee)"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid X axis selected"
 msgstr "X axis isiyo sahihi imechaguliwa"
 
@@ -5496,6 +5523,11 @@ msgstr "Kifungu cha WHERE kinalinganisha \"{columnName}\" na usemi usio wa "
 msgid "WKB"
 msgstr "WKB"
 
+#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
+msgid "The plugin behind this chart is not available, so its settings cannot be "
+"shown."
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
 msgstr "\"{value}\" si regular expression halali."
@@ -6423,6 +6455,10 @@ msgstr "Mwelekeo"
 msgid "Dashboard deleted successfully!"
 msgstr "Dashibodi imefutwa kwa mafanikio!"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "The {pluginId} plugin's chart code didn't load."
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "Jina unalotaka wanachama wengine wa timu waone."
@@ -7021,7 +7057,7 @@ msgstr "Uliza kuhusu data yako"
 msgid "Enter values; press Enter after each"
 msgstr "Ingiza thamani; bonyeza Enter baada ya kila moja"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't added any series"
 msgstr "Hujongeza mfululizo wowote"
 
@@ -7043,6 +7079,10 @@ msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 "inaonyesha makadirio bora; SQL iliyo juu ndiyo inayoendesha."
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart couldn't render"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
@@ -7150,6 +7190,7 @@ msgstr "Hakuna unachouliza, wala data yako yoyote, itakayotoka kwenye kompyuta "
 msgid "No fields have been configured yet"
 msgstr "Hakuna maeneo yaliyowekwa bado"
 
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/lib/plugins/PluginMenuSlot/PluginOverflowMenu.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -7269,6 +7310,7 @@ msgstr "Chagua safu za kuuliza"
 msgid "Donut style"
 msgstr "Mtindo wa donut"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
@@ -7616,6 +7658,10 @@ msgstr "Giza"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
 msgid "Could not load this workspace's plugins. Reload to try again."
 msgstr ""
+
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
+#~ msgid "Choose a {settingLabel}"
+#~ msgstr ""
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -7984,7 +8030,7 @@ msgid "Rows from this text"
 msgstr "Mistari kutoka kwenye maandishi haya"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizTypePField/useVizTypePFieldConfig.tsx
 msgid "Visualization Type"
 msgstr "Aina ya Uonyeshaji"
 
@@ -8483,6 +8529,11 @@ msgstr ""
 msgid "All decisions"
 msgstr "Maamuzi yote"
 
+#. js-lingui-explicit-id
+#: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
+msgid "series.cases"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
 msgstr "Mada"
@@ -8591,7 +8642,7 @@ msgstr "Asilimia"
 msgid "Each case type is a kind of record you manage."
 msgstr "Kila aina ya kesi ni aina ya rekodi unayosimamia."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "bar chart"
 msgstr "chati ya bar"
 
@@ -8881,7 +8932,7 @@ msgstr "Lazima"
 msgid "No numeric columns available to add to this series."
 msgstr "Hakuna safu za nambari zinazopatikana kuongezwa kwenye mfululizo huu."
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a name column"
 msgstr "Hujachagua safu ya jina"
 
@@ -8916,6 +8967,11 @@ msgstr "Ni wewe pekee unayeweza kufikia {resource} hii."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at least"
 msgstr "ni angalau"
+
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
+msgid "Plugin chart"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -9138,7 +9194,7 @@ msgstr "Safu wima ya 2"
 msgid "Data not ready"
 msgstr "Data haiko tayari"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
 msgstr "Hujachagua safu ya thamani"
 
@@ -9264,6 +9320,11 @@ msgstr "Ihifadhi"
 msgid "Hide the tutorial"
 msgstr "Ficha mafunzo"
 
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
+msgid "{rowCount, plural, one {Built from the first row of the result.} other "
+"{Built from the first # rows of the result.}}"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Excel"
@@ -9323,7 +9384,7 @@ msgstr "Inapakia vipengele"
 msgid "This dataset will be offline-only"
 msgstr "Hii dataset itakuwa ya mtandaoni pekee"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Add at least one X / Y / Size series"
 msgstr "Ongeza angalau mfululizo mmoja wa X / Y / Ukubwa"
 
@@ -9942,6 +10003,10 @@ msgstr "Iliorodheshwa na"
 msgid "Select all"
 msgstr "Chagua yote"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "Invalid chart settings"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "Tu kile kinachoulizwa (inapendekezwa)"
@@ -10140,7 +10205,7 @@ msgstr "Futa ramani {0}"
 msgid "Read as"
 msgstr "Soma kama"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid value column selected"
 msgstr "Thamani isiyo sahihi ya safu imechaguliwa"
 
@@ -10238,6 +10303,10 @@ msgstr "Muda wa kuunganisha umeisha"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
 msgstr "Chini hadi Juu"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bar gap"
+msgstr ""
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -10356,6 +10425,10 @@ msgid "Every workspace member who can open the {app} app gets this role on this 
 msgstr "Kila mwanachama wa nafasi ya kazi anayeweza kufungua programu ya {app} "
 "anapewa jukumu hili kwenye {resource} hii, pamoja na yale "
 "yaliyoorodheshwa hapa chini."
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "{title} couldn't render"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -11019,6 +11092,10 @@ msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "Thamani inayojulikana zaidi ni <0>{0}</0>, katika <1>{1}</1> ya safu "
 "mlalo."
 
+#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
+msgid "Loading chart settings"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"
 msgstr "Safu wima ya ufunguo wa data"
@@ -11067,6 +11144,10 @@ msgstr "ORDER BY inarejelea safu wima \"{columnName}\" ambayo haipo kwenye "
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Blue"
 msgstr "Bluu"
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart couldn't load"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
@@ -11136,7 +11217,7 @@ msgstr "Badilisha latitudo na longitudo"
 msgid "Download PNG"
 msgstr "Pakua PNG"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Add at least one X / Y series"
 msgstr "Ongeza angalau mfululizo mmoja wa X / Y"
 

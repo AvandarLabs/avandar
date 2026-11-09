@@ -335,6 +335,7 @@ msgid "UNION/INTERSECT/EXCEPT is not supported in the form."
 msgstr "表單不支援 UNION／INTERSECT／EXCEPT。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/useChartSettingGroups.tsx
 msgid "Chart settings"
 msgstr "圖表設定"
@@ -354,6 +355,10 @@ msgstr "您需要 Case Types 編輯器存取權限才能變更這些狀態。"
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Reorder {statusName}"
 msgstr "重新排序 {statusName}"
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart needs the {pluginId} plugin, which is not available."
+msgstr ""
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -693,6 +698,10 @@ msgstr "資料集排序依據"
 #: src/views/DataManagerApp/DataManagerApp.tsx
 msgid "Data Sources"
 msgstr "資料來源"
+
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader.tsx
+msgid "Loading chart"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand drawer"
@@ -1328,6 +1337,10 @@ msgstr "此欄位不能為空"
 msgid "\"{value}\" is not a date. Use YYYY-MM-DD."
 msgstr "「{value}」不是日期。請使用 YYYY-MM-DD。"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "Plugin not available"
+msgstr ""
+
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "Open the map {0}"
@@ -1434,6 +1447,7 @@ msgstr "顯示較少"
 msgid "Metadata"
 msgstr "元數據"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Retry"
@@ -1713,6 +1727,10 @@ msgstr "使用者名稱"
 msgid "Column name in SQL"
 msgstr "SQL 中的列名"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart's saved settings are not valid, so it cannot be displayed."
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field, e.g. Review notes"
 msgstr "新增欄位，例如「審核備註」"
@@ -1870,7 +1888,7 @@ msgstr "符號"
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {將 # 筆記錄移至} other {將 # 筆記錄移至}}"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid name column selected"
 msgstr "所選名稱欄位無效"
 
@@ -2509,6 +2527,10 @@ msgstr "以全螢幕開啟"
 msgid "Bias detected:"
 msgstr "檢測到偏見："
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "The {pluginId} plugin ran into an error while drawing this chart."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "內文"
@@ -3026,6 +3048,10 @@ msgstr "PDF 已下載。"
 msgid "Workspace ID"
 msgstr "工作區 ID"
 
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
+msgid "You haven't chosen: {settingLabel}"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "{numUsers} 人"
@@ -3420,7 +3446,7 @@ msgstr "已抑制 {0} 個區域"
 msgid "Annotation text:"
 msgstr "標註文本："
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen an X axis"
 msgstr "您尚未選擇 X 軸"
 
@@ -3591,6 +3617,7 @@ msgstr "每個點在每次開啟此地圖時都會以相同的幅度移動，因
 msgid "Link to the source record"
 msgstr "連結至來源紀錄"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
@@ -3815,7 +3842,7 @@ msgstr "程式碼"
 msgid "Local filters (viewer-editable, this chart only)"
 msgstr "本地過濾器（可由查看者編輯，僅此圖表）"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid X axis selected"
 msgstr "選擇了無效的 X 軸"
 
@@ -5301,6 +5328,11 @@ msgstr "WHERE 子句將「{columnName}」與非常值運算式進行比較。"
 msgid "WKB"
 msgstr "WKB"
 
+#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
+msgid "The plugin behind this chart is not available, so its settings cannot be "
+"shown."
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
 msgstr "「{value}」不是有效的正規表示式。"
@@ -6201,6 +6233,10 @@ msgstr "方向"
 msgid "Dashboard deleted successfully!"
 msgstr "儀表板已成功刪除！"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "The {pluginId} plugin's chart code didn't load."
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "您希望其他團隊成員看到的名稱。"
@@ -6784,7 +6820,7 @@ msgstr "詢問您的數據"
 msgid "Enter values; press Enter after each"
 msgstr "輸入值；每個值後按 Enter"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't added any series"
 msgstr "您尚未添加任何系列"
 
@@ -6805,6 +6841,10 @@ msgstr "更改"
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL above is what actually runs."
 msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努力的近似值；上面的 SQL 是實際執行的內容。"
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart couldn't render"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
@@ -6911,6 +6951,7 @@ msgstr "您提出的任何問題，以及您的任何資料，都不會離開這
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
 
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 #: src/lib/plugins/PluginMenuSlot/PluginOverflowMenu.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
@@ -7024,6 +7065,7 @@ msgstr "選擇要查詢的欄位"
 msgid "Donut style"
 msgstr "甜甜圈樣式"
 
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftStatusSection.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
@@ -7363,6 +7405,10 @@ msgstr "深色"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
 msgid "Could not load this workspace's plugins. Reload to try again."
 msgstr ""
+
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
+#~ msgid "Choose a {settingLabel}"
+#~ msgstr ""
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -7719,7 +7765,7 @@ msgid "Rows from this text"
 msgstr "來自這段文字的列"
 
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
-#: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/VizTypePField/useVizTypePFieldConfig.tsx
 msgid "Visualization Type"
 msgstr "視覺化類型"
 
@@ -8191,6 +8237,11 @@ msgstr ""
 msgid "All decisions"
 msgstr "所有決策"
 
+#. js-lingui-explicit-id
+#: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
+msgid "series.cases"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
 msgstr "主題"
@@ -8298,7 +8349,7 @@ msgstr "百分比"
 msgid "Each case type is a kind of record you manage."
 msgstr "每個案件類型都是您管理的一種記錄。"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "bar chart"
 msgstr "條形圖"
 
@@ -8580,7 +8631,7 @@ msgstr "必填"
 msgid "No numeric columns available to add to this series."
 msgstr "沒有可添加到此系列的數值欄位。"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a name column"
 msgstr "您尚未選擇名稱欄位"
 
@@ -8613,6 +8664,11 @@ msgstr "只有您可以存取此 {resource}。"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at least"
 msgstr "至少為"
+
+#: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+#: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
+msgid "Plugin chart"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -8830,7 +8886,7 @@ msgstr "第 2 欄"
 msgid "Data not ready"
 msgstr "資料尚未準備就緒"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
 msgstr "您尚未選擇值欄位"
 
@@ -8952,6 +9008,11 @@ msgstr "儲存"
 msgid "Hide the tutorial"
 msgstr "隱藏教學"
 
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
+msgid "{rowCount, plural, one {Built from the first row of the result.} other "
+"{Built from the first # rows of the result.}}"
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Excel"
@@ -9011,7 +9072,7 @@ msgstr "正在載入功能"
 msgid "This dataset will be offline-only"
 msgstr "此資料集將僅限離線使用"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Add at least one X / Y / Size series"
 msgstr "至少添加一個 X / Y / 大小系列"
 
@@ -9606,6 +9667,10 @@ msgstr "建立索引者"
 msgid "Select all"
 msgstr "全選"
 
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "Invalid chart settings"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
 msgstr "僅查詢的內容（推薦）"
@@ -9800,7 +9865,7 @@ msgstr "刪除地圖 {0}"
 msgid "Read as"
 msgstr "讀取為"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid value column selected"
 msgstr "選擇的值欄位無效"
 
@@ -9892,6 +9957,10 @@ msgstr "連線逾時"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/HeatmapLegend/HeatmapLegend.tsx
 msgid "Low to High"
 msgstr "低至高"
+
+#: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
+msgid "Bar gap"
+msgstr ""
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -10005,6 +10074,10 @@ msgstr "展開圖例"
 msgid "Every workspace member who can open the {app} app gets this role on this "
 "{resource}, in addition to whatever's listed below."
 msgstr "每位可以開啟 {app} 應用程式的工作區成員，都會在此 {resource} 上獲得此角色，此外還會擁有下方列出的任何權限。"
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "{title} couldn't render"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -10650,6 +10723,10 @@ msgstr "+{0} 個值與 {1} 行相關聯"
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "最常見的值是 <0>{0}</0>，出現在 <1>{1}</1> 的資料列中。"
 
+#: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
+msgid "Loading chart settings"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"
 msgstr "資料鍵欄"
@@ -10695,6 +10772,10 @@ msgstr "ORDER BY 參照的欄位「{columnName}」不在 SELECT 清單中。"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
 msgid "Blue"
 msgstr "藍色"
+
+#: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
+msgid "This chart couldn't load"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
@@ -10764,7 +10845,7 @@ msgstr "交換緯度與經度"
 msgid "Download PNG"
 msgstr "下載 PNG"
 
-#: src/components/VisualizationContainer/VisualizationContainer.tsx
+#: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Add at least one X / Y series"
 msgstr "至少添加一個 X / Y 系列"
 

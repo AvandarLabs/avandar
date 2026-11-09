@@ -31,6 +31,9 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 | `PluginManifest` | Type | main, runtime | A manifest that passed the schema, with omitted lists defaulted to empty |
 | `PluginCommand` | Type | main, runtime | A command declared under `contributes.commands` |
 | `PluginMenuEntry` | Type | main, runtime | One entry in a slot's menu list: a command and an optional `when` |
+| `PluginVizType` | Type | main, runtime | A chart type declared under `contributes.vizTypes` |
+| `PluginVizSetting` | Type | main, runtime | One setting of a chart type, edited in the chart's settings form |
+| `PluginVizSettingControl` | Type | main, runtime | The control a chart setting uses, such as `columnPicker` or `segmented` |
 | `PluginPermission` | Type | main, runtime | A permission a plugin may request |
 | `CompiledPluginManifest` | Type | main, runtime | A validated manifest plus the locale strings it references |
 | `PluginLocaleMessages` | Type | main, runtime | Locale code to message key to text |

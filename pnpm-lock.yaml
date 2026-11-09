@@ -1202,15 +1202,30 @@ importers:
       '@mantine/core':
         specifier: 'catalog:'
         version: 9.2.0(@mantine/hooks@9.2.0(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@testing-library/react':
+        specifier: ^16.3.0
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0
       react:
         specifier: 'catalog:'
         version: 19.2.5
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.5(react@19.2.5)
+      recharts:
+        specifier: ^3.8.1
+        version: 3.8.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-is@18.3.1)(react@19.2.5)(redux@5.0.1)
       tsup:
         specifier: 'catalog:'
         version: 8.5.1(@microsoft/api-extractor@7.58.12(@types/node@25.3.4))(jiti@2.7.0)(postcss@8.5.8)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.9.0)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@25.3.4)(happy-dom@20.9.0)(jiti@2.7.0)(jsdom@26.1.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
   packages/web/query-hooks:
     dependencies:

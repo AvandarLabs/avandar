@@ -173,6 +173,9 @@ function _getIconIssues(options: {
     ...manifest.contributes.commands.map((command) => {
       return command.icon;
     }),
+    ...manifest.contributes.vizTypes.map((vizType) => {
+      return vizType.icon;
+    }),
   ]);
   return [...iconNames].flatMap((iconName) => {
     const iconFile = `${makeTablerComponentNameFromIconName(iconName)}.mjs`;

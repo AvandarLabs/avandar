@@ -1,9 +1,16 @@
+import { getIssuesFromVizTypes } from "@plugin-manifest/PluginManifest/getIssuesFromVizTypes.ts";
 import { getIssuesFromWhenCondition } from "@plugin-manifest/PluginManifest/getIssuesFromWhenCondition.ts";
+import {
+  COMMAND_ID_MESSAGE,
+  COMMAND_ID_PATTERN,
+  IconNameSchema,
+  LocalizedStringSchema,
+} from "@plugin-manifest/PluginManifest/manifestFieldSchemas.ts";
+import { PluginVizTypeSchema } from "@plugin-manifest/PluginManifest/PluginVizTypeSchema.ts";
 import {
   SLOT_IDS,
   SlotFactRegistry,
 } from "@plugin-manifest/SlotFacts/SlotFactRegistry.ts";
-import { LOCALIZED_KEY_PATTERN } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 import { z } from "zod";
 import type {
   WhenCondition,
@@ -12,8 +19,6 @@ import type {
 
 const PLUGIN_ID_PATTERN = /^[a-z0-9-]+\.[a-z0-9-]+$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
-const COMMAND_ID_PATTERN = /^[a-z0-9-]+(?:\.[a-z0-9-]+)*$/;
-const ICON_NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ENTRY_PATTERN = /^(?!\/)(?!.*\.\.)[A-Za-z0-9_./-]+\.tsx?$/;
 const WHEN_OPERATORS = [
   "eq",
@@ -35,14 +40,6 @@ export const PLUGIN_PERMISSIONS = ["data:context"] as const;
  * checks what a plugin is allowed to do.
  */
 export type PluginPermission = (typeof PLUGIN_PERMISSIONS)[number];
-
-const LocalizedStringSchema = z
-  .string()
-  .regex(LOCALIZED_KEY_PATTERN, "must be a %key% reference to locales/en.json");
-
-const IconNameSchema = z
-  .string()
-  .regex(ICON_NAME_PATTERN, "must be a Tabler icon name, e.g. chart-dots");
 
 const FactValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 
@@ -85,12 +82,7 @@ const WhenConditionSchema: z.ZodType<WhenCondition> = z.lazy(() => {
 });
 
 const CommandSchema = z.strictObject({
-  id: z
-    .string()
-    .regex(
-      COMMAND_ID_PATTERN,
-      "must be lowercase letters, digits, and hyphens, in dot-separated words",
-    ),
+  id: z.string().regex(COMMAND_ID_PATTERN, COMMAND_ID_MESSAGE),
   title: LocalizedStringSchema,
   icon: IconNameSchema,
 });
@@ -133,6 +125,7 @@ const BasePluginManifestSchema = z.strictObject({
   contributes: z.strictObject({
     commands: z.array(CommandSchema).default([]),
     menus: MenusSchema.default({}),
+    vizTypes: z.array(PluginVizTypeSchema).default([]),
   }),
 });
 
@@ -192,6 +185,22 @@ function _refineMenus(
   });
 }
 
+function _refineVizTypes(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  getIssuesFromVizTypes({
+    vizTypes: manifest.contributes.vizTypes,
+    path: ["contributes", "vizTypes"],
+  }).forEach((issue) => {
+    context.addIssue({
+      code: "custom",
+      path: [...issue.path],
+      message: issue.message,
+    });
+  });
+}
+
 /**
  * The schema for a compiled `ava.yaml`. Strict: unknown keys fail, so a typo
  * is a build error rather than a silently ignored setting.
@@ -200,6 +209,7 @@ export const PluginManifestSchema = BasePluginManifestSchema.superRefine(
   (manifest, context) => {
     _refineCommands(manifest, context);
     _refineMenus(manifest, context);
+    _refineVizTypes(manifest, context);
   },
 );
 
@@ -221,3 +231,21 @@ export type PluginCommand = PluginManifest["contributes"]["commands"][number];
  * a slot's menu: the command to show plus its optional `when` condition.
  */
 export type PluginMenuEntry = z.output<typeof MenuItemSchema>;
+
+/**
+ * A chart type a plugin declares under `contributes.vizTypes`, for example
+ * to list it in a chart picker or to build its settings form.
+ */
+export type PluginVizType = PluginManifest["contributes"]["vizTypes"][number];
+
+/**
+ * One setting of a plugin chart type, in declaration order, for code that
+ * builds the chart's settings form or fills in its defaults.
+ */
+export type PluginVizSetting = PluginVizType["settings"][number];
+
+/**
+ * The control a plugin chart setting is edited with, discriminated by
+ * `kind`, for example to map it onto a settings form control.
+ */
+export type PluginVizSettingControl = PluginVizSetting["control"];

@@ -10,6 +10,9 @@ export type {
   PluginManifest,
   PluginMenuEntry,
   PluginPermission,
+  PluginVizSetting,
+  PluginVizSettingControl,
+  PluginVizType,
 } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
 export type {
   FactType,

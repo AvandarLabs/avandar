@@ -11,6 +11,37 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
 import type { UnknownDataFrame } from "@avandar/utils";
 
+vi.mock(
+  "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm",
+  () => {
+    return {
+      PluginVizSettingsForm: (props: {
+        config: { pluginVizId: string };
+        onConfigChange: (nextConfig: unknown) => void;
+      }) => {
+        return (
+          <div
+            data-testid="plugin-viz-settings-form"
+            data-viz-id={props.config.pluginVizId}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                props.onConfigChange({
+                  ...props.config,
+                  settings: { interval: "month" },
+                });
+              }}
+            >
+              Change interval
+            </button>
+          </div>
+        );
+      },
+    };
+  },
+);
+
 const COLUMNS: readonly QueryResult.ColumnWithId[] = [
   { id: "category" as QueryColumn.Id, name: "category", dataType: "varchar" },
   { id: "value" as QueryColumn.Id, name: "value", dataType: "double" },
@@ -96,6 +127,15 @@ describe("VizSettingsFormBody: bar chart smoke test", () => {
   it("renders the bar layout segmented control", () => {
     renderForm({ vizConfig: baseConfig });
     expect(screen.getByText(/Grouped/i)).toBeInTheDocument();
+  });
+
+  it("sets barGap to none when the None bar gap option is picked", () => {
+    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
+    fireEvent.click(screen.getByRole("radio", { name: "None" }));
+    expect(onVizConfigChange).toHaveBeenCalledWith({
+      ...baseConfig,
+      barGap: "none",
+    });
   });
 });
 
@@ -294,5 +334,35 @@ describe("VizSettingsFormBody: bubble chart controls", () => {
     expect(
       screen.getByRole("combobox", { name: /Size column/i }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("VizSettingsFormBody: plugin chart", () => {
+  const baseConfig: AvaVizConfig = {
+    vizType: "plugin",
+    pluginId: "avandar.epidemiology",
+    pluginVizId: "epicurve",
+    columnSettings: {},
+    settings: {},
+  };
+
+  it("renders the plugin settings form for a plugin chart", () => {
+    renderForm({ vizConfig: baseConfig });
+
+    expect(screen.getByTestId("plugin-viz-settings-form")).toHaveAttribute(
+      "data-viz-id",
+      "epicurve",
+    );
+  });
+
+  it("passes plugin settings edits to onVizConfigChange", () => {
+    const { onVizConfigChange } = renderForm({ vizConfig: baseConfig });
+
+    fireEvent.click(screen.getByRole("button", { name: "Change interval" }));
+
+    expect(onVizConfigChange).toHaveBeenCalledWith({
+      ...baseConfig,
+      settings: { interval: "month" },
+    });
   });
 });

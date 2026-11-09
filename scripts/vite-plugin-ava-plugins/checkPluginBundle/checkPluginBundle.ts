@@ -15,8 +15,12 @@ export type ChunkSummary = Readonly<{
   moduleLengths: Readonly<Record<string, number>>;
 }>;
 
-/** Rendered bytes of host code a workspace without plugins may load. */
-export const HOST_BUDGET_BYTES = 24_000;
+/**
+ * Rendered bytes of host code a workspace without plugins may load. Measured
+ * at 36,053 bytes with plugin charts drawing in the Data Explorer and on
+ * dashboards, rounded up to the next 1,000 bytes, plus 2,000 of headroom.
+ */
+export const HOST_BUDGET_BYTES = 39_000;
 
 /** Rendered bytes each bundled plugin adds to `HOST_BUDGET_BYTES`. */
 export const PER_PLUGIN_BUDGET_BYTES = 600;
@@ -33,20 +37,27 @@ const HOST_MODULE_MARKERS = [
   `\0${PLUGIN_INDEX_MODULE_ID}`,
 ];
 
-/** The module the command runner chunk is found by. */
-const RUNNER_MODULE_SUFFIX =
-  "/src/lib/plugins/runPluginCommand/runPluginCommand.ts";
+/**
+ * The modules the lazily loaded plugin runtimes are found by: the command
+ * runner, which loads when a user picks a command, and the plugin chart
+ * runtime, which loads when a plugin chart draws. The app reaches each only
+ * through a dynamic `import()`.
+ */
+const LAZY_RUNTIME_MODULE_MARKERS = [
+  "/src/lib/plugins/runPluginCommand/runPluginCommand.ts",
+  "/src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.tsx",
+];
 
 /**
  * The chunks of a bundle by file name, plus the chunks the check starts its
- * walks from: the entries, the chunk holding the plugin index, and the chunk
- * holding the command runner.
+ * walks from: the entries, the chunk holding the plugin index, and the
+ * chunks holding the lazy runtimes.
  */
 type ChunkGraph = Readonly<{
   chunksByFileName: ReadonlyMap<string, ChunkSummary>;
   entryFileNames: readonly string[];
   indexChunk: ChunkSummary | undefined;
-  runnerChunk: ChunkSummary | undefined;
+  lazyRuntimeFileNames: ReadonlySet<string>;
 }>;
 
 function _findChunkWithModule(options: {
@@ -56,6 +67,22 @@ function _findChunkWithModule(options: {
   return options.chunks.find((chunk) => {
     return Object.keys(chunk.moduleLengths).some(options.isModule);
   });
+}
+
+function _getLazyRuntimeFileNames(
+  chunks: readonly ChunkSummary[],
+): Set<string> {
+  return new Set(
+    LAZY_RUNTIME_MODULE_MARKERS.flatMap((marker) => {
+      const chunk = _findChunkWithModule({
+        chunks,
+        isModule: (moduleId) => {
+          return moduleId.endsWith(marker);
+        },
+      });
+      return chunk === undefined ? [] : [chunk.fileName];
+    }),
+  );
 }
 
 function _makeChunkGraphFromChunks(
@@ -80,12 +107,7 @@ function _makeChunkGraphFromChunks(
         return moduleId === `\0${PLUGIN_INDEX_MODULE_ID}`;
       },
     }),
-    runnerChunk: _findChunkWithModule({
-      chunks,
-      isModule: (moduleId) => {
-        return moduleId.endsWith(RUNNER_MODULE_SUFFIX);
-      },
-    }),
+    lazyRuntimeFileNames: _getLazyRuntimeFileNames(chunks),
   };
 }
 
@@ -111,21 +133,21 @@ function _getReachableFileNames(options: {
 /**
  * The imports the app follows from a chunk without running a plugin loader:
  * all of them except the dynamic imports of the plugin index's chunk, and
- * except a dynamic import of `skippedFileName` when one is given.
+ * except dynamic imports of `skippedFileNames` when given.
  */
 function _getHostEdges(options: {
   chunk: ChunkSummary;
   graph: ChunkGraph;
-  skippedFileName?: string;
+  skippedFileNames?: ReadonlySet<string>;
 }): readonly string[] {
-  const { chunk, graph, skippedFileName } = options;
+  const { chunk, graph, skippedFileNames } = options;
   if (chunk === graph.indexChunk) {
     return chunk.imports;
   }
   return [
     ...chunk.imports,
     ...chunk.dynamicImports.filter((fileName) => {
-      return fileName !== skippedFileName;
+      return !skippedFileNames?.has(fileName);
     }),
   ];
 }
@@ -169,17 +191,16 @@ function _getPluginOnlyFileNames(graph: ChunkGraph): Set<string> {
 }
 
 /**
- * Runner-only chunks: those reachable from the command runner's chunk that
- * the app cannot reach from an entry without dynamically importing that
- * chunk. A runner chunk that any reachable chunk imports statically is not
- * lazy, so then there are none.
+ * Lazy-runtime-only chunks: those reachable from a lazy runtime's chunk that
+ * the app cannot reach from an entry without dynamically importing one of
+ * those chunks. A runtime chunk that any reachable chunk imports statically
+ * is not lazy, so it and the chunks it reaches count.
  */
-function _getRunnerOnlyFileNames(graph: ChunkGraph): Set<string> {
-  const runnerFileName = graph.runnerChunk?.fileName;
+function _getLazyRuntimeOnlyFileNames(graph: ChunkGraph): Set<string> {
   return _getFileNamesNotIn({
     fileNames: _getReachableFileNames({
       graph,
-      startFileNames: runnerFileName === undefined ? [] : [runnerFileName],
+      startFileNames: [...graph.lazyRuntimeFileNames],
       getEdges: (chunk) => {
         return _getHostEdges({ chunk, graph });
       },
@@ -188,7 +209,11 @@ function _getRunnerOnlyFileNames(graph: ChunkGraph): Set<string> {
       graph,
       startFileNames: graph.entryFileNames,
       getEdges: (chunk) => {
-        return _getHostEdges({ chunk, graph, skippedFileName: runnerFileName });
+        return _getHostEdges({
+          chunk,
+          graph,
+          skippedFileNames: graph.lazyRuntimeFileNames,
+        });
       },
     }),
   });
@@ -261,9 +286,10 @@ export function makeChunkSummariesFromBundle(
  * Checks that workspaces without plugins pay nothing for them. Every plugin
  * code, manifest, or locale module must sit in a plugin-only chunk: one the
  * app loads only through a plugin loader in `virtual:ava-plugin-index`. The
- * host modules in every other chunk, except those only the lazily loaded
- * command runner reaches, must stay within the host's byte budget. Returns
- * one message per violation, for `vitePluginAvaPlugins` to fail the build.
+ * host modules in every other chunk, except those only a lazily loaded
+ * runtime (the command runner or the plugin chart runtime) reaches, must
+ * stay within the host's byte budget. Returns one message per violation, for
+ * `vitePluginAvaPlugins` to fail the build.
  *
  * `pluginsDirectory` must be a real, forward-slash absolute path without a
  * trailing slash, because Vite module ids are realpathed.
@@ -276,7 +302,7 @@ export function checkPluginBundle(options: {
   const { chunks, pluginsDirectory, pluginCount } = options;
   const graph = _makeChunkGraphFromChunks(chunks);
   const pluginOnlyFileNames = _getPluginOnlyFileNames(graph);
-  const runnerOnlyFileNames = _getRunnerOnlyFileNames(graph);
+  const lazyRuntimeOnlyFileNames = _getLazyRuntimeOnlyFileNames(graph);
   const appChunks = chunks.filter((chunk) => {
     return !pluginOnlyFileNames.has(chunk.fileName);
   });
@@ -295,7 +321,7 @@ export function checkPluginBundle(options: {
   });
   const hostBytes = _getHostBytesFromChunks(
     appChunks.filter((chunk) => {
-      return !runnerOnlyFileNames.has(chunk.fileName);
+      return !lazyRuntimeOnlyFileNames.has(chunk.fileName);
     }),
   );
   const budgetBytes = HOST_BUDGET_BYTES + PER_PLUGIN_BUDGET_BYTES * pluginCount;

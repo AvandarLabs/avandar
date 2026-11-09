@@ -9,6 +9,7 @@ export {
 } from "@plugin-sdk/definePlugin/definePlugin";
 export { makePluginTranslator } from "@plugin-sdk/makePluginTranslator/makePluginTranslator";
 export { PluginError } from "@plugin-sdk/PluginError/PluginError";
+export { PluginVizProvider } from "@plugin-sdk/PluginVizContext/PluginVizContext";
 export type { PluginErrorCode } from "@plugin-sdk/PluginError/PluginError";
 export type {
   AvandarApi,
@@ -25,3 +26,13 @@ export type {
   QueryHandle,
   TranslationValues,
 } from "@plugin-sdk/PluginApi.types";
+export type {
+  PluginChartSpec,
+  PluginVizComponentProps,
+  PluginVizContext,
+  PluginVizDefinition,
+  PluginVizInput,
+  PluginVizSettingValue,
+  PluginVizTransform,
+  PluginVizTransformResult,
+} from "@plugin-sdk/PluginViz.types";

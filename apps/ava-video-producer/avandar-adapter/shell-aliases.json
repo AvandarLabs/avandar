@@ -1,4 +1,5 @@
 {
   "@/hooks/workspaces/useCurrentWorkspace": "avandar-adapter/shims/useCurrentWorkspace.ts",
-  "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder": "avandar-adapter/shims/sqlBuilder.ts"
+  "$/models/queries/StructuredQuery/structuredQueryToSql/sqlBuilder": "avandar-adapter/shims/sqlBuilder.ts",
+  "virtual:ava-plugin-index": "avandar-adapter/shims/pluginIndex.ts"
 }

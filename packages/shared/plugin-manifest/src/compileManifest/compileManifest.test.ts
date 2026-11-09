@@ -56,6 +56,47 @@ function _getIssues(run: () => unknown): readonly string[] {
   return expect.unreachable();
 }
 
+const VIZ_YAML = `${VALID_YAML}  vizTypes:
+    - id: epicurve
+      title: "%viz.title%"
+      icon: chart-histogram
+      render: transform
+      settings:
+        - key: interval
+          label: "%viz.interval%"
+          control:
+            kind: segmented
+            options:
+              - { value: day, label: "%viz.interval.day%" }
+              - { value: week, label: "%viz.interval.week%" }
+        - key: windowSize
+          label: "%viz.windowSize%"
+          control: { kind: number, unit: "%viz.windowSize.unit%" }
+        - key: caption
+          label: "%viz.caption%"
+          control: { kind: text, placeholder: "%viz.caption.placeholder%" }
+`;
+
+const VIZ_EN_MESSAGES: Record<string, string> = {
+  ...LOCALES.en,
+  "viz.title": "Epidemic curve",
+  "viz.interval": "Interval",
+  "viz.interval.day": "Day",
+  "viz.interval.week": "Week",
+  "viz.windowSize": "Window",
+  "viz.windowSize.unit": "days",
+  "viz.caption": "Caption",
+  "viz.caption.placeholder": "Add a caption",
+};
+
+function _omitVizMessage(key: string): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(VIZ_EN_MESSAGES).filter(([candidateKey]) => {
+      return candidateKey !== key;
+    }),
+  );
+}
+
 describe("compileManifest", () => {
   it("returns the manifest and only the strings it references", () => {
     const { manifest, strings } = _compile(VALID_YAML);
@@ -237,5 +278,38 @@ describe("compileManifest", () => {
         return _compile(yamlText);
       }),
     ).toEqual(["ava.yaml is empty"]);
+  });
+
+  describe("viz type strings", () => {
+    it.each([
+      ["title", "viz.title"],
+      ["setting label", "viz.windowSize"],
+      ["option label", "viz.interval.week"],
+      ["number unit", "viz.windowSize.unit"],
+      ["text placeholder", "viz.caption.placeholder"],
+    ])("requires a viz type's %s in locales/en.json", (_label, key) => {
+      expect(
+        _getIssues(() => {
+          return _compile(VIZ_YAML, { en: _omitVizMessage(key) });
+        }),
+      ).toEqual([`"${key}" is referenced but missing from locales/en.json`]);
+    });
+
+    it("keeps every viz type string in the compiled strings", () => {
+      const { strings } = _compile(VIZ_YAML, { en: VIZ_EN_MESSAGES });
+      expect(strings.en).toEqual({
+        "plugin.name": "Epidemiology",
+        "plugin.description": "Statistical tools.",
+        "regression.linear.title": "Linear regression",
+        "viz.title": "Epidemic curve",
+        "viz.interval": "Interval",
+        "viz.interval.day": "Day",
+        "viz.interval.week": "Week",
+        "viz.windowSize": "Window",
+        "viz.windowSize.unit": "days",
+        "viz.caption": "Caption",
+        "viz.caption.placeholder": "Add a caption",
+      });
+    });
   });
 });
