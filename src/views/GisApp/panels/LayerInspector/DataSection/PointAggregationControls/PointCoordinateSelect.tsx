@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { findSourceColumnId } from "@/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/findSourceColumnId";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { ReactNode } from "react";
@@ -14,6 +15,7 @@ type PointAggregationBinding = Extract<
 type Props = {
   layer: MapLayer.T;
   binding: PointAggregationBinding;
+  sourceColumns: readonly QueryColumn.T[];
   updatePoints: (points: MapLayer.PointBinding) => void;
   axis: "latitude" | "longitude";
 };
@@ -29,6 +31,7 @@ function _findColumn(
 export function PointCoordinateSelect({
   layer,
   binding,
+  sourceColumns,
   updatePoints,
   axis,
 }: Props): ReactNode {
@@ -48,7 +51,12 @@ export function PointCoordinateSelect({
       dataSourceId={dataSourceId}
       value={_findColumn(layer, points[axis])}
       onChange={(column) => {
-        updatePoints({ ...points, [axis]: column?.id });
+        updatePoints({
+          ...points,
+          [axis]: column
+            ? findSourceColumnId({ sourceColumns, pickedColumn: column })
+            : undefined,
+        });
       }}
     />
   );
