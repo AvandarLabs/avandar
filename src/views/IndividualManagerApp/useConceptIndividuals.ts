@@ -2,7 +2,10 @@ import { prop } from "@avandar/utils";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
-import { makeRecordsWhereFromStatusFilter } from "@/views/IndividualManagerApp/makeRecordsWhereFromStatusFilter/makeRecordsWhereFromStatusFilter";
+import {
+  type AssigneeFilter,
+  makeRecordsListWhere,
+} from "@/views/IndividualManagerApp/makeRecordsListWhere/makeRecordsListWhere";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { Individual } from "$/models/ontology/Individual/Individual";
@@ -10,6 +13,8 @@ import type { Individual } from "$/models/ontology/Individual/Individual";
 const PAGE_SIZE = 20;
 
 const NO_STATUS_IDS: readonly ConceptStatus.Id[] = [];
+
+const ANYONE: AssigneeFilter = { kind: "anyone" };
 
 type ConceptIndividualsPage = {
   allIndividuals: Individual.T[];
@@ -20,27 +25,31 @@ type ConceptIndividualsPage = {
 };
 
 /**
- * Pages through one case type's records, narrowed to the given statuses when
- * any are given.
+ * Pages through one case type's records, narrowed to the given statuses and
+ * assignee when any are given.
  *
  * The query key is the `getAll` key of the filter the records count also
- * uses, so the chosen statuses are part of the key, and a status change finds
- * every list of the case type by its `concept_id`. While a new filter loads,
- * the previous rows stay on screen rather than flashing to a loader.
+ * uses, so the chosen statuses and assignee are part of the key, and a status
+ * change finds every list of the case type by its `concept_id`. While a new
+ * filter loads, the previous rows stay on screen rather than flashing to a
+ * loader.
  *
  * @param options.conceptId The case type.
  * @param options.statusIds The chosen statuses. Empty or unset means all.
+ * @param options.assignee Who the records are assigned to. Unset means anyone.
  */
 export function useConceptIndividuals(
   options: Readonly<{
     conceptId: Concept.Id;
     statusIds?: readonly ConceptStatus.Id[];
+    assignee?: AssigneeFilter;
   }>,
 ): ConceptIndividualsPage {
-  const { conceptId, statusIds = NO_STATUS_IDS } = options;
-  const recordsWhere = makeRecordsWhereFromStatusFilter({
+  const { conceptId, statusIds = NO_STATUS_IDS, assignee = ANYONE } = options;
+  const recordsWhere = makeRecordsListWhere({
     conceptId,
     statusIds,
+    assignee,
   });
   const query = useInfiniteQuery({
     queryKey: IndividualClient.QueryKeys.getAll(recordsWhere),

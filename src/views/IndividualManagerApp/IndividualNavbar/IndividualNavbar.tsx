@@ -10,7 +10,7 @@ import { AppListPane } from "@/components/layouts/AppListPane/AppListPane";
 import { filterToKnownStatusIds } from "@/views/IndividualManagerApp/IndividualNavbar/filterToKnownStatusIds/filterToKnownStatusIds";
 import { IndividualNavbarRows } from "@/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows";
 import { StatusFilter } from "@/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter";
-import { makeRecordsWhereFromStatusFilter } from "@/views/IndividualManagerApp/makeRecordsWhereFromStatusFilter/makeRecordsWhereFromStatusFilter";
+import { makeRecordsListWhere } from "@/views/IndividualManagerApp/makeRecordsListWhere/makeRecordsListWhere";
 import { useConceptIndividuals } from "@/views/IndividualManagerApp/useConceptIndividuals";
 import { useVirtualIndividualLinks } from "@/views/IndividualManagerApp/useVirtualIndividualLinks";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -54,7 +54,11 @@ export function IndividualNavbar({ concept }: Readonly<Props>): ReactNode {
     });
   }, [pickedStatusIds, sortedStatuses]);
   const [matchingCount] = IndividualClient.useGetCount({
-    ...makeRecordsWhereFromStatusFilter({ conceptId: concept.id, statusIds }),
+    ...makeRecordsListWhere({
+      conceptId: concept.id,
+      statusIds,
+      assignee: { kind: "anyone" },
+    }),
     useQueryOptions: { placeholderData: keepPreviousData },
   });
   const records = useConceptIndividuals({ conceptId: concept.id, statusIds });

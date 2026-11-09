@@ -6,7 +6,7 @@ import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { invalidateCaseStatusQueries } from "@/views/IndividualManagerApp/invalidateCaseStatusQueries/invalidateCaseStatusQueries";
-import { makeRecordsWhereFromStatusFilter } from "@/views/IndividualManagerApp/makeRecordsWhereFromStatusFilter/makeRecordsWhereFromStatusFilter";
+import { makeRecordsListWhere } from "@/views/IndividualManagerApp/makeRecordsListWhere/makeRecordsListWhere";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { QueryKey } from "@tanstack/react-query";
@@ -29,21 +29,24 @@ function _makeSeededCache(): { queryClient: QueryClient; keys: SeededKeys } {
   const queryClient = new QueryClient();
   const keys: SeededKeys = {
     filteredRecords: IndividualClient.QueryKeys.getAll(
-      makeRecordsWhereFromStatusFilter({
+      makeRecordsListWhere({
         conceptId: CONCEPT_ID,
         statusIds: [STATUS_ID],
+        assignee: { kind: "anyone" },
       }),
     ),
     recordCount: IndividualClient.QueryKeys.getCount(
-      makeRecordsWhereFromStatusFilter({
+      makeRecordsListWhere({
         conceptId: CONCEPT_ID,
         statusIds: [],
+        assignee: { kind: "anyone" },
       }),
     ),
     otherCaseTypeRecords: IndividualClient.QueryKeys.getAll(
-      makeRecordsWhereFromStatusFilter({
+      makeRecordsListWhere({
         conceptId: OTHER_CONCEPT_ID,
         statusIds: [],
+        assignee: { kind: "anyone" },
       }),
     ),
     statuses: ConceptStatusClient.QueryKeys.getAll(
