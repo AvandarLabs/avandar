@@ -55,10 +55,10 @@ async function _installPlugin(
   await expect(card.getByText("Not installed", { exact: true })).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
-  await card.getByRole("button", { name: "Install" }).click();
+  await card.getByRole("button", { name: "Install", exact: true }).click();
   await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Install" })
+    .getByRole("dialog", { name: "Install Epidemiology?" })
+    .getByRole("button", { name: "Install", exact: true })
     .click();
   await expect(card.getByText("Installed", { exact: true })).toBeVisible({
     timeout: MEDIUM_WAIT,
@@ -70,6 +70,8 @@ async function _pickEpicurve(
   options: Readonly<{ page: Page; workspaceSlug: string }>,
 ): Promise<void> {
   const { page, workspaceSlug } = options;
+  // The `?sql=` deep link stands in for typing the query: the editor is not
+  // what this spec covers, and the epicurve picker is still driven by clicks.
   await page.goto(
     `/${workspaceSlug}/data-explorer?sql=${encodeURIComponent(ONSET_SQL)}`,
   );
@@ -179,11 +181,14 @@ async function _deleteDashboardsNamed(
   if (dashboardIds.length === 0) {
     return;
   }
-  await admin
+  const { error } = await admin
     .from("resource_shares")
     .delete()
     .eq("resource_type", "dashboard")
     .in("resource_id", dashboardIds);
+  if (error) {
+    console.warn(`[e2e] epicurve dashboard share cleanup: ${error.message}`);
+  }
   await deleteDashboardsByIds({ admin, dashboardIds });
 }
 
@@ -237,14 +242,26 @@ test.describe("Epidemiology plugin epicurve", () => {
         timeout: LONG_WAIT,
       });
     } finally {
-      await visitorContext?.close();
-      await _deleteDashboardsNamed({ admin, workspaceId, dashboardName });
+      // Each cleanup step runs even when an earlier one fails.
+      await visitorContext?.close().catch(() => {});
+      await _deleteDashboardsNamed({
+        admin,
+        workspaceId,
+        dashboardName,
+      }).catch((error: unknown) => {
+        console.warn(`[e2e] epicurve dashboard cleanup: ${String(error)}`);
+      });
       // Removes only the install this spec made through Settings.
-      await admin
+      const { error: installationError } = await admin
         .from("plugin_installations")
         .delete()
         .eq("workspace_id", workspaceId)
         .eq("plugin_id", PLUGIN_ID);
+      if (installationError) {
+        console.warn(
+          `[e2e] epicurve plugin installation cleanup: ${installationError.message}`,
+        );
+      }
     }
   });
 });
