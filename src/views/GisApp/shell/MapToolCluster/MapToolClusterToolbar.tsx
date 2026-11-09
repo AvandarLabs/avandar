@@ -14,6 +14,10 @@ import { PanMapTool } from "@/views/GisApp/shell/MapToolCluster/PanMapTool";
 import { GIS_SKIP_TARGET_IDS } from "@/views/GisApp/shell/SkipLinks/SkipLinks.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
+import type {
+  BufferConfirmOptions,
+  FilterByBufferOptions,
+} from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.types";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { ReactNode } from "react";
 
@@ -21,10 +25,8 @@ type Props = {
   mapToolMode: MapToolMode;
   onMapToolModeChange: (mode: MapToolMode) => void;
   selectedLayer?: MapLayer.T;
-  onBufferConfirm: (options: {
-    distanceMeters: number;
-    dissolve: boolean;
-  }) => void;
+  onBufferConfirm: (options: BufferConfirmOptions) => MapLayer.Id | undefined;
+  onFilterByBuffer: (options: FilterByBufferOptions) => void;
   layers?: readonly MapLayer.T[];
   featureCollections?: ReadonlyMap<MapLayer.Id, GeoJSON.FeatureCollection>;
   requestFitBounds: (bounds: MapBounds) => void;
@@ -36,6 +38,7 @@ export function MapToolClusterToolbar({
   onMapToolModeChange,
   selectedLayer,
   onBufferConfirm,
+  onFilterByBuffer,
   layers,
   featureCollections,
   requestFitBounds,
@@ -68,7 +71,9 @@ export function MapToolClusterToolbar({
       />
       <BufferMapTool
         selectedLayer={selectedLayer}
+        layers={layers}
         onBufferConfirm={onBufferConfirm}
+        onFilterByBuffer={onFilterByBuffer}
       />
       {isFlagEnabled(FeatureFlag.EnableGisIsochrone) ? (
         <IsochroneMapTool />
