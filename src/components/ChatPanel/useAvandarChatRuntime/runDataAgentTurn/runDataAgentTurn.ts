@@ -1,6 +1,7 @@
 import { streamProxy } from "@earendil-works/pi-agent-core";
 import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
+import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import {
@@ -48,7 +49,7 @@ function _createProxyStreamFn(workspaceId: Workspace.Id): StreamFn {
     return streamProxy(model, context, {
       ...streamOptions,
       authToken: data.session?.access_token ?? "",
-      proxyUrl: `${AvaSupabase.getEdgeFunctionsURL()}/chat/${workspaceId}/agent`,
+      proxyUrl: `${AvaSupabase.getEdgeFunctionsURL()}/chat/${workspaceId}/agent/${DATA_AGENT_PROMPT_ID}`,
     });
   };
 }

@@ -101,6 +101,8 @@ describe("runPipelineCommand", () => {
 
     process.env.AVA_PIPELINE_SERVER_URL = "https://pipeline.example/";
     process.env.AVA_PIPELINE_SERVER_SECRET = "secret";
+    process.env.VITE_SUPABASE_API_URL = "https://abcd.supabase.co";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-key";
 
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
   });

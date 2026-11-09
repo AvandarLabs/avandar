@@ -838,6 +838,7 @@ export type Database = {
       data_catalog_listings: {
         Row: {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          additional_source_metadata: Json | null
           api_base_url: string | null
           api_resource_format: string | null
           api_resource_id: string | null
@@ -873,6 +874,18 @@ export type Database = {
           organization2_name: string | null
           organization3_name: string | null
           organization4_name: string | null
+          parquet_cache_build_id: string | null
+          parquet_cache_build_started_at: string | null
+          parquet_cache_built_at: string | null
+          parquet_cache_byte_size: number | null
+          parquet_cache_failure_code: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
+          parquet_cache_row_count: number | null
+          parquet_cache_source_version: string | null
+          parquet_cache_status:
+            | Database["public"]["Enums"]["data_catalog_listings__parquet_cache_status"]
+            | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -880,7 +893,6 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
-          source_metadata: Json | null
           source_url: string | null
           tags: string[] | null
           update_frequency: string | null
@@ -888,6 +900,7 @@ export type Database = {
         }
         Insert: {
           access_kind?: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          additional_source_metadata?: Json | null
           api_base_url?: string | null
           api_resource_format?: string | null
           api_resource_id?: string | null
@@ -923,6 +936,18 @@ export type Database = {
           organization2_name?: string | null
           organization3_name?: string | null
           organization4_name?: string | null
+          parquet_cache_build_id?: string | null
+          parquet_cache_build_started_at?: string | null
+          parquet_cache_built_at?: string | null
+          parquet_cache_byte_size?: number | null
+          parquet_cache_failure_code?: string | null
+          parquet_cache_folder_path?: string | null
+          parquet_cache_part_count?: number | null
+          parquet_cache_row_count?: number | null
+          parquet_cache_source_version?: string | null
+          parquet_cache_status?:
+            | Database["public"]["Enums"]["data_catalog_listings__parquet_cache_status"]
+            | null
           parquet_file_name?: string | null
           pipeline_name?: string | null
           pipeline_run_id?: string | null
@@ -930,7 +955,6 @@ export type Database = {
           search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
-          source_metadata?: Json | null
           source_url?: string | null
           tags?: string[] | null
           update_frequency?: string | null
@@ -938,6 +962,7 @@ export type Database = {
         }
         Update: {
           access_kind?: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          additional_source_metadata?: Json | null
           api_base_url?: string | null
           api_resource_format?: string | null
           api_resource_id?: string | null
@@ -973,6 +998,18 @@ export type Database = {
           organization2_name?: string | null
           organization3_name?: string | null
           organization4_name?: string | null
+          parquet_cache_build_id?: string | null
+          parquet_cache_build_started_at?: string | null
+          parquet_cache_built_at?: string | null
+          parquet_cache_byte_size?: number | null
+          parquet_cache_failure_code?: string | null
+          parquet_cache_folder_path?: string | null
+          parquet_cache_part_count?: number | null
+          parquet_cache_row_count?: number | null
+          parquet_cache_source_version?: string | null
+          parquet_cache_status?:
+            | Database["public"]["Enums"]["data_catalog_listings__parquet_cache_status"]
+            | null
           parquet_file_name?: string | null
           pipeline_name?: string | null
           pipeline_run_id?: string | null
@@ -980,7 +1017,6 @@ export type Database = {
           search_vector?: unknown
           source_asset_type?: string | null
           source_download_url?: string | null
-          source_metadata?: Json | null
           source_url?: string | null
           tags?: string[] | null
           update_frequency?: string | null
@@ -2770,6 +2806,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      rpc_data_catalog_listings__fail_parquet_cache: {
+        Args: {
+          p_build_id: string
+          p_catalog_listing_id: string
+          p_failure_code: string
+        }
+        Returns: boolean
+      }
       rpc_data_catalog_listings__list_pipeline_scopes: {
         Args: { p_pipeline_name: string }
         Returns: {
@@ -2784,6 +2828,7 @@ export type Database = {
         }
         Returns: {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          additional_source_metadata: Json | null
           api_base_url: string | null
           api_resource_format: string | null
           api_resource_id: string | null
@@ -2819,6 +2864,18 @@ export type Database = {
           organization2_name: string | null
           organization3_name: string | null
           organization4_name: string | null
+          parquet_cache_build_id: string | null
+          parquet_cache_build_started_at: string | null
+          parquet_cache_built_at: string | null
+          parquet_cache_byte_size: number | null
+          parquet_cache_failure_code: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
+          parquet_cache_row_count: number | null
+          parquet_cache_source_version: string | null
+          parquet_cache_status:
+            | Database["public"]["Enums"]["data_catalog_listings__parquet_cache_status"]
+            | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -2826,7 +2883,6 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
-          source_metadata: Json | null
           source_url: string | null
           tags: string[] | null
           update_frequency: string | null
@@ -2852,6 +2908,10 @@ export type Database = {
           listings_detached: number
           listings_kept_in_use: number
         }[]
+      }
+      rpc_data_catalog_listings__request_parquet_cache: {
+        Args: { p_catalog_listing_id: string; p_lost_build_after: string }
+        Returns: string
       }
       rpc_data_catalog_listings__search: {
         Args: {
@@ -2901,67 +2961,28 @@ export type Database = {
       }
       rpc_data_catalog_listings__upsert_with_relation_columns: {
         Args: { p_listings: Json }
-        Returns: {
-          access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
-          api_base_url: string | null
-          api_resource_format: string | null
-          api_resource_id: string | null
-          api_service:
-            | Database["public"]["Enums"]["data_catalog_listings__api_service"]
-            | null
-          cached_at: string | null
-          cached_object_path: string | null
-          cached_source_version: string | null
-          canonical_urls: string[] | null
-          coverage_end_date: string | null
-          coverage_start_date: string | null
-          created_at: string
-          date_column_type_last_verified: string | null
-          date_of_last_sync: string | null
-          date_of_last_update: string | null
-          description: string | null
-          display_name: string
-          domains: string[] | null
-          drive_id: string | null
-          external_dataset_id: string | null
-          external_service_name: string | null
-          id: string
-          invalid_dataset_reason:
-            | Database["public"]["Enums"]["data_catalog_listings__invalid_dataset_reason"]
-            | null
-          is_invalid: boolean
-          is_workspace_loadable: boolean
-          license: string | null
-          metadata: Json | null
-          notes: string | null
-          organization1_name: string
-          organization2_name: string | null
-          organization3_name: string | null
-          organization4_name: string | null
-          parquet_file_name: string | null
-          pipeline_name: string | null
-          pipeline_run_id: string | null
-          pipeline_scope_keys: string[]
-          search_vector: unknown
-          source_asset_type: string | null
-          source_download_url: string | null
-          source_metadata: Json | null
-          source_url: string | null
-          tags: string[] | null
-          update_frequency: string | null
-          updated_at: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "data_catalog_listings"
-          isOneToOne: false
-          isSetofReturn: true
+        Returns: string[]
+      }
+      rpc_data_catalog_listings__write_parquet_cache: {
+        Args: {
+          p_build_id: string
+          p_byte_size: number
+          p_catalog_listing_id: string
+          p_folder_path: string
+          p_part_count: number
+          p_row_count: number
+          p_source_version: string
         }
+        Returns: {
+          is_applied: boolean
+          previous_folder_path: string
+        }[]
       }
       rpc_data_catalog_listings__write_verified_column_types: {
         Args: { p_catalog_listing_id: string; p_columns: Json }
         Returns: {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
+          additional_source_metadata: Json | null
           api_base_url: string | null
           api_resource_format: string | null
           api_resource_id: string | null
@@ -2997,6 +3018,18 @@ export type Database = {
           organization2_name: string | null
           organization3_name: string | null
           organization4_name: string | null
+          parquet_cache_build_id: string | null
+          parquet_cache_build_started_at: string | null
+          parquet_cache_built_at: string | null
+          parquet_cache_byte_size: number | null
+          parquet_cache_failure_code: string | null
+          parquet_cache_folder_path: string | null
+          parquet_cache_part_count: number | null
+          parquet_cache_row_count: number | null
+          parquet_cache_source_version: string | null
+          parquet_cache_status:
+            | Database["public"]["Enums"]["data_catalog_listings__parquet_cache_status"]
+            | null
           parquet_file_name: string | null
           pipeline_name: string | null
           pipeline_run_id: string | null
@@ -3004,7 +3037,6 @@ export type Database = {
           search_vector: unknown
           source_asset_type: string | null
           source_download_url: string | null
-          source_metadata: Json | null
           source_url: string | null
           tags: string[] | null
           update_frequency: string | null
@@ -3598,6 +3630,10 @@ export type Database = {
         | "external_host"
         | "unparseable_dataset"
         | "unreachable_dataset"
+      data_catalog_listings__parquet_cache_status:
+        | "building"
+        | "ready"
+        | "failed"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -3900,6 +3936,11 @@ export const Constants = {
         "external_host",
         "unparseable_dataset",
         "unreachable_dataset",
+      ],
+      data_catalog_listings__parquet_cache_status: [
+        "building",
+        "ready",
+        "failed",
       ],
       datasets__ava_data_type: [
         "boolean",

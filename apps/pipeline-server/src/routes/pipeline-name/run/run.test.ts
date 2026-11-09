@@ -42,4 +42,15 @@ describe("run pipeline", () => {
       expect.objectContaining({ invocation: { invokedVia: "http" } }),
     );
   });
+
+  it("passes the Supabase target to the pipeline module's run", async () => {
+    const supabase = {
+      url: "https://abcd.supabase.co",
+      serviceRoleKey: "service-role-key",
+    };
+
+    await run({ pipelineName: "hdx", mode: "full", supabase });
+
+    expect(hdxRun).toHaveBeenCalledWith(expect.objectContaining({ supabase }));
+  });
 });

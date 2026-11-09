@@ -56,6 +56,77 @@ describe("parsePipelineConfig", () => {
     expect(config.workspaceLoadability).toEqual({ loadableFormats: ["XLSX"] });
   });
 
+  it("reads the paths additional source metadata leaves out", () => {
+    const config = _parse([
+      "additionalSourceMetadata:",
+      "  omit: [license_other, organization.image_url]",
+      "drives: []",
+    ]);
+
+    expect(config.additionalSourceMetadata).toEqual({
+      omit: ["license_other", "organization.image_url"],
+    });
+  });
+
+  it("refuses an omitted path that is not dotted segments", () => {
+    expect(() => {
+      return _parse([
+        "additionalSourceMetadata:",
+        "  omit: ['tags[].name']",
+        "drives: []",
+      ]);
+    }).toThrow("additionalSourceMetadata.omit");
+  });
+
+  it("reads a paged download with its page size", () => {
+    const config = _parse([
+      "download:",
+      "  paging: true",
+      "  pageRows: 100000",
+      "  script: ./download/listingDownload.ts",
+      "drives: []",
+    ]);
+
+    expect(config.download).toEqual({
+      paging: true,
+      pageRows: 100_000,
+      script: "./download/listingDownload.ts",
+    });
+  });
+
+  it("reads a download whose API does not page", () => {
+    const config = _parse([
+      "download: { paging: false, script: ./download/listingDownload.ts }",
+      "drives: []",
+    ]);
+
+    expect(config.download).toEqual({
+      paging: false,
+      script: "./download/listingDownload.ts",
+    });
+  });
+
+  it("refuses a paged download with no page size", () => {
+    expect(() => {
+      return _parse([
+        "download: { paging: true, script: ./download/listingDownload.ts }",
+        "drives: []",
+      ]);
+    }).toThrow("pageRows");
+  });
+
+  it("refuses a page size on a download whose API does not page", () => {
+    expect(() => {
+      return _parse([
+        "download:",
+        "  paging: false",
+        "  pageRows: 100000",
+        "  script: ./download/listingDownload.ts",
+        "drives: []",
+      ]);
+    }).toThrow("pageRows");
+  });
+
   it("refuses a field that is not mappable, naming it", () => {
     expect(() => {
       return _parse([

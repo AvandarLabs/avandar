@@ -1,3 +1,4 @@
+import { setTimeout } from "node:timers/promises";
 import {
   NO_DENOMINATORS,
   NO_STAGE_TIMINGS,
@@ -19,6 +20,9 @@ export const SYSTEM_CLOCK: EtlClock = {
   },
   monotonicMs: () => {
     return performance.now();
+  },
+  sleep: (ms) => {
+    return setTimeout(ms);
   },
 };
 

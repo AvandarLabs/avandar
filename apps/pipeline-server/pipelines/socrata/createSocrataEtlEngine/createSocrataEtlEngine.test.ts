@@ -301,7 +301,9 @@ describe("createSocrataEtlEngine", () => {
     const catalog = _catalog(1).map((result) => {
       return {
         ...result,
-        sourceRecord: { resource: { attribution: "TLC" } },
+        sourceRecord: {
+          resource: { attribution: "TLC", provenance: "official" },
+        },
       };
     });
     const engine = createSocrataEtlEngine({
@@ -325,7 +327,7 @@ describe("createSocrataEtlEngine", () => {
     expect(listings.getRows()[0]).toMatchObject({
       organization1_name: "City of New York",
       organization2_name: "TLC",
-      source_metadata: { resource: { attribution: "TLC" } },
+      additional_source_metadata: { resource: { provenance: "official" } },
       drive_id: drives.getDrives()[0]?.id,
     });
     expect(drives.getDrives()[0]?.organizationLabels).toEqual({ 1: "City" });

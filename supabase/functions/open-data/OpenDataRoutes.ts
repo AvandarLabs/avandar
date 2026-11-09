@@ -13,9 +13,17 @@ import {
   VerifiedColumnTypesBodySchema,
   writeVerifiedColumnTypes,
 } from "@sbfn/open-data/columnTypeVerification/columnTypeVerification.ts";
+import {
+  parquetCacheAnswerToStatus,
+  requestParquetCache,
+} from "@sbfn/open-data/requestParquetCache/requestParquetCache.ts";
 import { respondWithSampleFailure } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
+import {
+  readPipelineServerTarget,
+  startParquetCopyBuild,
+} from "@sbfn/open-data/startParquetCopyBuild/startParquetCopyBuild.ts";
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
-import { string } from "zod";
+import { object, string } from "zod";
 import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
 import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.ts";
@@ -26,6 +34,7 @@ import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.t
 import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
+import type { ParquetCacheDependencies } from "@sbfn/open-data/requestParquetCache/requestParquetCache.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -106,6 +115,77 @@ async function _resolveOpenDataAcquisition(
     storage,
     updateCache: _persistOpenDataCache,
   });
+}
+
+/** The largest metadata response the freshness check reads. */
+const MAX_FRESHNESS_RESPONSE_BYTES = 10 * 1024 * 1024;
+
+/**
+ * How long a build may run before a request treats it as lost and claims
+ * the listing again. Builds of the largest sources take longer, so this is a
+ * floor for retrying, not a limit on a build.
+ */
+const LOST_BUILD_AFTER = "30 minutes";
+
+/**
+ * Wires a copy request to its listing's freshness check, the build claim,
+ * and the pipeline server. Claims and failures are written with the admin
+ * client, after the caller's own read showed they may see the listing.
+ */
+function _createParquetCacheDependencies(
+  entry: Readonly<DataCatalogListing.T>,
+): ParquetCacheDependencies {
+  const target = readPipelineServerTarget((name) => {
+    return Deno.env.get(name);
+  });
+  const http = HttpClientFactory.create("OpenDataRouteHttpClient", {
+    state: { maxResponseBytes: MAX_FRESHNESS_RESPONSE_BYTES },
+  });
+  return {
+    canStartBuilds: target !== undefined,
+    readFreshnessToken: () => {
+      return readOpenDataFreshnessToken({ entry, http });
+    },
+    claimBuild: async () => {
+      const { data, error } = await SupabaseAdmin.rpc(
+        "rpc_data_catalog_listings__request_parquet_cache",
+        {
+          p_catalog_listing_id: entry.id,
+          p_lost_build_after: LOST_BUILD_AFTER,
+        },
+      );
+      if (error) {
+        throw error;
+      }
+      return data ?? undefined;
+    },
+    startBuild: async (buildId) => {
+      if (target === undefined) {
+        throw new Error("No pipeline server is configured.");
+      }
+      await startParquetCopyBuild({
+        target,
+        catalogListingId: entry.id,
+        buildId,
+      });
+    },
+    recordStartFailure: async (buildId, failureCode) => {
+      const { error } = await SupabaseAdmin.rpc(
+        "rpc_data_catalog_listings__fail_parquet_cache",
+        {
+          p_catalog_listing_id: entry.id,
+          p_build_id: buildId,
+          p_failure_code: failureCode,
+        },
+      );
+      if (error) {
+        throw error;
+      }
+    },
+    now: () => {
+      return new Date();
+    },
+  };
 }
 
 /**
@@ -242,6 +322,32 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
           });
         },
       ),
+  },
+  "/data-catalog-listings/:catalogListingId/parquet-cache": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/parquet-cache",
+      schema: { catalogListingId: string().uuid() },
+    })
+      // Every POST here parses a JSON body, so the caller sends `{}`.
+      .bodySchema(object({}).strict())
+      .action(async ({ pathParams, supabaseClient }): Promise<Response> => {
+        // Read as the caller first, so only a listing they can see is built.
+        const entry = await _readCatalogListing(
+          supabaseClient,
+          pathParams.catalogListingId,
+        );
+        if (entry instanceof Response) {
+          return entry;
+        }
+        const answer = await requestParquetCache({
+          listing: entry,
+          deps: _createParquetCacheDependencies(entry),
+        });
+        return new Response(JSON.stringify(answer), {
+          status: parquetCacheAnswerToStatus(answer),
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }),
   },
   "/data-catalog-listings/:catalogListingId/unparseable": {
     POST: POST({

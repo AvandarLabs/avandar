@@ -64,11 +64,6 @@ msgstr "無法複製連結。"
 msgid "First {numRows} rows"
 msgstr "前 {numRows} 列"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-#~ msgid "You are offline. Download an offline chat model using the cloud icon "
-#~ "next to the composer before asking data questions."
-#~ msgstr "您目前處於離線狀態。請先使用撰寫框旁的雲端圖示下載離線聊天模型，再詢問資料相關問題。"
-
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "此資料集未檢測到任何欄位。將回退至所有欄位。"
@@ -259,10 +254,6 @@ msgstr "為它命名"
 msgid "Drag to reorder, or hold Alt and press the up or down arrow"
 msgstr "拖曳以重新排序，或按住 Alt 並按向上或向下箭頭鍵"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Choose chat model"
-#~ msgstr "選擇聊天模型"
-
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedCard.tsx
 msgid "Skip this step"
 msgstr "略過此步驟"
@@ -310,11 +301,6 @@ msgstr "類型"
 msgid " access"
 msgstr "訪問"
 
-#. placeholder {0}: model.minRamGb
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "{0} GB RAM"
-#~ msgstr "{0} GB RAM"
-
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
 msgstr "無法顯示 {chartName}。"
@@ -330,7 +316,7 @@ msgstr "允許在線同步"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Works without an internet connection."
-msgstr ""
+msgstr "無需網際網路連線即可運作。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING compares \"{columnName}\" against a non-literal expression."
@@ -504,10 +490,6 @@ msgstr "幾何圖形"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Connected as {0}"
 msgstr "以 {0} 身分連線"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Llama 3.2 1B"
-#~ msgstr "Llama 3.2 1B"
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -725,10 +707,6 @@ msgstr "來源 CRS"
 msgid "For example, County or Household"
 msgstr "例如：郡或家戶"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Offline chat model"
-#~ msgstr "離線聊天模型"
-
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "{statusName} color: {colorName}"
 msgstr "{statusName} 顏色：{colorName}"
@@ -880,10 +858,6 @@ msgstr "直向"
 msgid "Replying…"
 msgstr "回覆中…"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Re-download"
-#~ msgstr "重新下載"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Allow multiple values"
 msgstr "允許多個值"
@@ -892,10 +866,6 @@ msgstr "允許多個值"
 msgid "Only some people can open this dashboard. Teammates on this case without "
 "access will see \"Unavailable\"."
 msgstr "只有部分人員可以開啟此儀表板。無權限的此案件協作者會看到「無法使用」。"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Llama 3.1 8B (offline)"
-#~ msgstr "Llama 3.1 8B（離線）"
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
@@ -924,7 +894,7 @@ msgstr "Avandar 無法確認此查詢只會讀取您的資料集，因此未執�
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing offline models"
-msgstr ""
+msgstr "正在移除離線模型"
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Year"
@@ -1283,10 +1253,6 @@ msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "請檢查您的電子郵件以獲取確認鏈接。可能需要幾分鐘才能到達。"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#~ msgid "Remove offline chat model?"
-#~ msgstr "要移除離線聊天模型嗎？"
-
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share “{resourceName}”"
@@ -1383,10 +1349,6 @@ msgstr "建立您的第一個儀表板"
 #: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Close sidebar"
 msgstr "關閉側邊欄"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#~ msgid "Unable to delete the offline chat model from cache."
-#~ msgstr "無法從快取中刪除離線聊天模型。"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
@@ -1503,10 +1465,6 @@ msgstr "正在讀取此資料集的範例，以確認其欄位及欄位類型。
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "新增一個按 {groupByColumn} 分組的 {datasetName} 的條形圖"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 16 GB RAM and run Avandar alongside other apps."
-#~ msgstr "如果您有 16 GB RAM，且會與其他應用程式一起執行 Avandar，建議使用此選項。"
-
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
 msgstr "儲存狀態"
@@ -1597,11 +1555,6 @@ msgid "This map includes {0}, a layer set to Aggregate only. The export applies 
 msgstr "此地圖包含 {0}，這是一個僅設為彙總的圖層。匯出內容套用與畫面相同的抑制規則：少於 {threshold} "
 "筆記錄的區域會顯示為已抑制，不會顯示為零。"
 
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-#~ msgid "The cloud assistant is unreachable. Use your downloaded on-device model "
-#~ "for this message?"
-#~ msgstr "無法連線至雲端助理。要使用您下載到裝置上的模型處理此訊息嗎？"
-
 #. placeholder {0}: currentStatus.name
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Status: {0}"
@@ -1609,7 +1562,7 @@ msgstr "狀態：{0}"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Answer offline"
-msgstr ""
+msgstr "離線回答"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Expand the layers panel"
@@ -1664,10 +1617,6 @@ msgstr "匯出預覽"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Hide title"
 msgstr "隱藏標題"
-
-#: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
-#~ msgid "Offline mode needs a recent version of Chrome or Edge with WebGPU."
-#~ msgstr ""
 
 #. placeholder {0}: vizTypeLabel(vizType)
 #: src/components/VisualizationContainer/useVizDataLimit/useVizDataLimit.ts
@@ -1860,7 +1809,7 @@ msgstr "指北針"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "The offline models did not download"
-msgstr ""
+msgstr "離線模型未下載"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2008,10 +1957,6 @@ msgstr "重新指派"
 msgid "Welcome back"
 msgstr "歡迎回來"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Phi 3.5 Mini"
-#~ msgstr "Phi 3.5 Mini"
-
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published to "
 msgstr " 已發布至 "
@@ -2112,10 +2057,6 @@ msgstr "撤銷"
 msgid "One dataset is one tab."
 msgstr "一個資料集就是一個分頁。"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have about 8 GB RAM (default for most users)."
-#~ msgstr "如果您有約 8 GB RAM（大多數使用者的預設選項），建議使用此選項。"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "權限已保存"
@@ -2171,13 +2112,9 @@ msgstr "全球編輯器"
 msgid "Manage seats in billing portal →"
 msgstr "在計費入口網站中管理座位 →"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-msgid "Source record"
-msgstr "來源記錄"
-
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
-msgstr ""
+msgstr "下載離線模型"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations"
@@ -2309,7 +2246,7 @@ msgstr "開放資料"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
-msgstr ""
+msgstr "正在移除…"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/CircleRadiusControl.tsx
 msgid "Radius"
@@ -2370,7 +2307,7 @@ msgstr "刪除個案類型"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Offline mode"
-msgstr ""
+msgstr "離線模式"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2393,7 +2330,7 @@ msgstr "右上"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 msgid "Set up offline mode to chat without an internet connection."
-msgstr ""
+msgstr "設定離線模式，即可在沒有網際網路連線的情況下聊天。"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
@@ -2401,7 +2338,7 @@ msgstr "要永久刪除 <0>{openDatasetName}</0> 嗎？"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "The offline models could not be removed"
-msgstr ""
+msgstr "無法移除離線模型"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
 msgid "{periodCount, plural, one {Show all # day} other {Show all # days}}"
@@ -2417,7 +2354,7 @@ msgstr "尚無屬性"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Remove offline models"
-msgstr ""
+msgstr "移除離線模型"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " who also have "
@@ -2635,7 +2572,7 @@ msgstr "開啟地圖"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
-msgstr ""
+msgstr "已移除離線模型"
 
 #. placeholder {0}: Number.isFinite(summary.stdDev) ? ( <> {" "} with a standard deviation of{" "} <SummaryTag>{_fmtNum(summary.stdDev)}</SummaryTag>. </> ) : ( "." )
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
@@ -2748,7 +2685,7 @@ msgstr "尚未實現"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The online assistant is unreachable. Answer this message with the "
 "offline models on this computer instead?"
-msgstr ""
+msgstr "無法連線至線上助理。要改用這台電腦上的離線模型回答此訊息嗎？"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
@@ -2985,15 +2922,11 @@ msgstr "降序"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Offline {percent}%"
-msgstr ""
+msgstr "離線 {percent}%"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
 msgstr "類別軸"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Balanced offline model for everyday SQL questions on typical laptops."
-#~ msgstr "適合日常 SQL 問題的平衡離線模型，可在一般筆記型電腦上執行。"
 
 #: src/components/AppShell/AppShell.tsx
 msgid "Nothing found..."
@@ -3240,11 +3173,6 @@ msgstr "{usedSeats} / {maxSeats} 個座位已使用 · {remainingSeats} 個剩�
 msgid "Statuses"
 msgstr "狀態"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Largest catalog option. Maximum offline capability when RAM and download "
-#~ "size are not constraints."
-#~ msgstr "最大型的目錄選項。當 RAM 和下載大小不受限制時，提供最大的離線能力。"
-
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "請輸入此數據集的名稱"
@@ -3416,10 +3344,6 @@ msgstr "請重新登入以繼續。如果無法登入，請重設應用程式以
 msgid "to"
 msgstr "至"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Download offline chat model (WebLLM)"
-#~ msgstr "下載離線聊天模型 (WebLLM)"
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "檢閱相符項目"
@@ -3464,6 +3388,12 @@ msgstr "套用區域篩選條件"
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "適合傳單、報告和 QR Code 的簡短易記網址。"
+
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
+"the first time."
+msgstr "正在準備「{0}」。大型資料集第一次開啟可能需要幾分鐘。"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
@@ -3570,14 +3500,7 @@ msgstr "請先重新指派私人資源"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "The offline models are on this computer."
-msgstr ""
-
-#. placeholder {0}: modelCopy.displayName
-#. placeholder {1}: model.approxSizeMb
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#~ msgid "{0} (~{1} MB) will be deleted from this browser to free space. You can "
-#~ "download it again later."
-#~ msgstr "{0} (~{1} MB) 將從此瀏覽器中刪除以釋放空間。您可以稍後再次下載。"
+msgstr "離線模型已在這台電腦上。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "All organizations"
@@ -3598,7 +3521,7 @@ msgstr "雷達圖"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Offline mode needs the offline models. Download them from the Offline "
 "button under the message box, or turn offline mode off."
-msgstr ""
+msgstr "離線模式需要離線模型。請從訊息框下方的「離線」按鈕下載，或關閉離線模式。"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Comment actions"
@@ -3658,11 +3581,6 @@ msgstr "發布"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Rows {rowIndexes}."
 msgstr "資料列 {rowIndexes}。"
-
-#. placeholder {0}: selectedModel.name
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Using {0}"
-#~ msgstr "使用 {0}"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
@@ -3765,11 +3683,6 @@ msgstr "繫結所選圖層中的幾何資料，以建立緩衝區。"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "顯示資料點"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Microsoft's compact instruct model. Solid structure and instruction "
-#~ "following for dashboards."
-#~ msgstr "Microsoft 的精簡指令模型。具備穩固的結構和指令遵循能力，適合儀表板。"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try asking"
@@ -4096,10 +4009,6 @@ msgstr "處理數據集中…"
 msgid "ID fields keep their value as is."
 msgstr "ID 欄位保持其原值。"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Offline chat model ready. Click to switch or re-download."
-#~ msgstr "離線聊天模型已準備好。點擊以切換或重新下載。"
-
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
 msgid "Congratulations"
 msgstr "恭喜"
@@ -4213,7 +4122,7 @@ msgstr "距離（公尺）"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Preparing offline models"
-msgstr ""
+msgstr "正在準備離線模型"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "URL template"
@@ -4265,11 +4174,6 @@ msgstr "SQL 包含多個陳述式；表單僅對應第一個。"
 msgid "Topic: {topic}"
 msgstr "主題：{topic}"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 32 GB RAM and a powerful machine used mainly for "
-#~ "analytics work."
-#~ msgstr "如果您有 32 GB RAM，且主要使用效能強大的機器進行分析工作，建議使用此選項。"
-
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 #~ msgid "If each {0} can only have one {attributeName} value, check this box."
@@ -4287,10 +4191,6 @@ msgstr "在 Y 軸上按一下第二個有標籤的刻度。"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
 msgid "column {0}"
 msgstr "欄 {0}"
-
-#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-#~ msgid "Open models"
-#~ msgstr "Open 模型"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -4499,10 +4399,6 @@ msgstr "4258 - ETRS89"
 msgid "Re-run query"
 msgstr "重新執行查詢"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Smallest offline chat model. Weaker on complex SQL but fast to download."
-#~ msgstr "最小型的離線聊天模型。處理複雜 SQL 的能力較弱，但下載速度快。"
-
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Move the pointer over the map to read a coordinate"
 msgstr "將指標移到地圖上以讀取座標"
@@ -4537,10 +4433,6 @@ msgstr "沒有值可供總結。"
 msgid "Dashboard not ready"
 msgstr "儀表板尚未準備好"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/DownloadedModelList.tsx
-#~ msgid "Downloaded on this browser"
-#~ msgstr "在此瀏覽器上下載"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/planUtils.ts
 msgid "Pay monthly"
 msgstr "每月付款"
@@ -4568,10 +4460,6 @@ msgstr "只有您可以存取此 {resource}。包括工作區管理員在內的�
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 msgid "Can't be loaded"
 msgstr "無法載入"
-
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#~ msgid "Choose a model"
-#~ msgstr "選擇模型"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -4774,11 +4662,6 @@ msgstr "您仍可開啟其發布所在的原始內容。"
 msgid "A new version is ready. Update now, or close this and update later."
 msgstr "新版本已準備就緒。立即更新，或關閉此訊息稍後更新。"
 
-#. placeholder {0}: modelCopy.displayName
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#~ msgid "{0} was deleted from this browser."
-#~ msgstr "{0} 已從此瀏覽器中刪除。"
-
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Tab to import"
 msgstr "要匯入的分頁"
@@ -4786,10 +4669,6 @@ msgstr "要匯入的分頁"
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Couldn't search. Keep typing to retry."
 msgstr "無法搜尋。繼續輸入以重試。"
-
-#: src/lib/localModels/ModelPickerCopy/ModelPickerCopy.ts
-#~ msgid "{description} {recommendedIf} (~{approxSizeMb} MB download)."
-#~ msgstr "{description} {recommendedIf}（約 {approxSizeMb} MB 下載）。"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "Authentication failed"
@@ -5185,7 +5064,7 @@ msgstr "已儲存的篩選條件和儀表板會依狀態名稱尋找記錄。儲
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "About {sizeGb} GB to download, once. Needs a recent version of Chrome or "
 "Edge, and a computer with at least 16 GB of memory."
-msgstr ""
+msgstr "一次下載約 {sizeGb} GB。需要最新版的 Chrome 或 Edge，以及至少 16 GB 記憶體的電腦。"
 
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Walk through building and sharing a dashboard again, from the top."
@@ -5208,10 +5087,6 @@ msgstr "已從資料庫重新整理"
 msgid "[The local discovery lookup failed. Try a different column or lookup "
 "query without asking me to select from the failed catalog.]"
 msgstr "[本機探索查詢失敗。請嘗試其他欄位或查詢語句，不要要求我從失敗的目錄中選取。]"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Offline model download failed"
-#~ msgstr "離線模型下載失敗"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "File"
@@ -5286,11 +5161,6 @@ msgstr "更多動作"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Horizontal gridlines"
 msgstr "水平網格線"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Stronger reasoning than 1.5B with a moderate download. Good step up from "
-#~ "the 8 GB tier."
-#~ msgstr "推理能力比 1.5B 更強，下載大小適中。相較於 8 GB 級別，是很好的升級選擇。"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
@@ -5403,11 +5273,6 @@ msgstr "已標籤圖像（地圖、圖表、圖磚）"
 msgid "Allowed"
 msgstr "允許"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "High-quality 7B instruct model. Best for difficult schemas and complex "
-#~ "SQL offline."
-#~ msgstr "高品質 7B 指令模型。最適合處理困難的結構描述，以及在離線環境中執行複雜 SQL。"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{numResults, plural, one {# dataset} other {# datasets}}"
 msgstr "{numResults, plural, one {# 個資料集} other {# 個資料集}}"
@@ -5473,7 +5338,7 @@ msgstr "移除失敗"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Try again, or clear this site's data in your browser settings."
-msgstr ""
+msgstr "請再試一次，或在瀏覽器設定中清除這個網站的資料。"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -5570,7 +5435,7 @@ msgstr "選擇列"
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Check your internet connection and try again."
-msgstr ""
+msgstr "請檢查網際網路連線後再試一次。"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "1"
@@ -5663,10 +5528,6 @@ msgstr "新增手動填寫的欄位"
 msgid "Upgrade plan"
 msgstr "升級方案"
 
-#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
-#~ msgid "Do not refresh or close this tab or else the download will be canceled."
-#~ msgstr "請勿刷新或關閉此標籤，否則下載將被取消。"
-
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
 msgstr "森林"
@@ -5706,10 +5567,6 @@ msgstr "嵌入"
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 msgid "Dates: {0}"
 msgstr "日期：{0}"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Llama 3.2 1B (offline)"
-#~ msgstr "Llama 3.2 1B（離線）"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/FunnelChartForm/FunnelChartForm.tsx
@@ -5915,15 +5772,6 @@ msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
 msgid "Edit user group"
 msgstr "編輯用戶群組"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 24 GB RAM and want near-cloud quality fully on "
-#~ "device."
-#~ msgstr "如果您有 24 GB RAM，並希望完全在裝置上達到接近雲端的品質，建議選用此模型。"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 1.5B"
-#~ msgstr "Qwen 2.5 1.5B"
-
 #: src/components/layouts/AuthLayout/AuthFooter.tsx
 msgid "Privacy Policy"
 msgstr "隱私政策"
@@ -5980,7 +5828,7 @@ msgstr "長條圖"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Offline mode answers your questions with models that run on this "
 "computer instead of on Avandar's servers."
-msgstr ""
+msgstr "離線模式會使用在這台電腦上執行的模型回答問題，而不是使用 Avandar 的伺服器。"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is none of"
@@ -6114,18 +5962,10 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "尚無澄清。當聊天提出澄清問題時，日誌會填寫。"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Llama 3.1 8B"
-#~ msgstr "Llama 3.1 8B"
-
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
 msgstr "已從助理新增 {0} 列。儲存前請檢查這些資料。"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#~ msgid "Offline chat model removed"
-#~ msgstr "離線聊天模型已移除"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/OptionsDropdown.tsx
 msgid "Create \"{trimmedSearch}\""
@@ -6313,7 +6153,7 @@ msgstr "曲線"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
-msgstr ""
+msgstr "您目前未連線至網際網路，因此聊天會在這台電腦上使用離線模型執行。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What does this case type represent?"
@@ -6342,10 +6182,6 @@ msgstr "{filterCount} 個篩選條件"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
 msgstr "回答時間"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/useDeleteOfflineChatModel.tsx
-#~ msgid "Could not remove offline chat model"
-#~ msgstr "無法移除離線聊天模型"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Maximum"
@@ -6518,13 +6354,9 @@ msgstr "空的"
 msgid "All"
 msgstr "全部"
 
-#: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
-#~ msgid "Downloading offline chat model"
-#~ msgstr "正在下載離線聊天模型"
-
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models downloaded"
-msgstr ""
+msgstr "已下載離線模型"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -6548,7 +6380,7 @@ msgstr "我們無法讀取此資料集的範例，因此尚未確認其欄位及
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Turn on offline mode to chat on this computer, without sending anything "
 "online."
-msgstr ""
+msgstr "開啟離線模式，即可在這台電腦上聊天，不會將任何內容傳送到線上。"
 
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "We detected both potential personal information and language that may "
@@ -6745,7 +6577,7 @@ msgstr "某些數據應手動輸入"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Running offline"
-msgstr ""
+msgstr "正在離線執行"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Field name"
@@ -6763,10 +6595,6 @@ msgstr "最常見"
 msgid "Each series is a numeric column plotted on the Y axis. Pick the X axis "
 "below."
 msgstr "每個系列都是一個繪製在 Y 軸上的數值欄。請選擇下面的 X 軸。"
-
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Pick a model to download. You can switch models or re-download later."
-#~ msgstr "選擇要下載的模型。您可以稍後切換模型或重新下載。"
 
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename layer"
@@ -6946,7 +6774,7 @@ msgstr "層級"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Manage offline models"
-msgstr ""
+msgstr "管理離線模型"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{operator}\" is not an operator this form understands."
@@ -6979,7 +6807,7 @@ msgstr "標記為未完成"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Nothing you ask, and none of your data, leaves this computer."
-msgstr ""
+msgstr "您提出的任何問題，以及您的任何資料，都不會離開這台電腦。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
@@ -7069,7 +6897,7 @@ msgstr "讓其他人查看您的儀表板"
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "They were deleted from this computer. You can download them again at any "
 "time."
-msgstr ""
+msgstr "這些模型已從這台電腦刪除。您隨時可以再次下載。"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Records added by hand"
@@ -7188,7 +7016,7 @@ msgstr "部分離線"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Downloading offline models: {percent}%"
-msgstr ""
+msgstr "正在下載離線模型：{percent}%"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The comment is removed from the case for everyone."
@@ -7383,10 +7211,6 @@ msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
 msgstr "資料庫使用者最好對您計畫匯入的資料表或檢視具有唯讀存取權。"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 7B"
-#~ msgstr "Qwen 2.5 7B"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
 msgstr "中性"
@@ -7548,7 +7372,7 @@ msgstr "無法連線至助理。已保留規則式結果。"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Downloading offline models"
-msgstr ""
+msgstr "正在下載離線模型"
 
 #. placeholder {0}: formatColumnShare(missingShare, i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
@@ -7651,10 +7475,6 @@ msgstr "不以…結尾"
 msgid "Add layer"
 msgstr "新增圖層"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Offline chat model ready"
-#~ msgstr "離線聊天模型已準備好"
-
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
 msgstr "欄位描述已成功更新！"
@@ -7709,10 +7529,6 @@ msgstr "選擇您想在此 {conceptName} 中的欄位"
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "視覺化設定"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Phi 3.5 Mini (offline)"
-#~ msgstr "Phi 3.5 Mini（離線）"
 
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
@@ -7965,11 +7781,6 @@ msgstr "行"
 msgid "Make offline-only"
 msgstr "設為僅限離線"
 
-#. placeholder {0}: modelCopy.displayName
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "{0} is available when you are offline."
-#~ msgstr "{0} 在您離線時可用。"
-
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
 msgstr "自訂網址可用"
@@ -8064,7 +7875,7 @@ msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新�
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
 "question, or turn offline mode off to use online chat."
-msgstr ""
+msgstr "這個問題對離線模型而言太長。請嘗試縮短問題，或關閉離線模式以使用線上聊天。"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
@@ -8226,11 +8037,6 @@ msgstr "{0} 個來源鍵不明確"
 msgid "Unsaved changes"
 msgstr "未儲存的變更"
 
-#: src/components/ChatPanel/ChatModelPicker/ChatModelPicker.tsx
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Model"
-#~ msgstr "模型"
-
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "I will propose case types from your dataset names and columns. Pick from "
 "the options or tell me what to create."
@@ -8260,10 +8066,6 @@ msgstr "主題"
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
 msgstr "顯示標籤"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 1.5B (offline)"
-#~ msgstr "Qwen 2.5 1.5B（離線）"
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "X axis"
@@ -8404,7 +8206,7 @@ msgstr "建議重寫："
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "The offline models could not be loaded."
-msgstr ""
+msgstr "無法載入離線模型。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source no longer has this dataset."
@@ -8448,11 +8250,6 @@ msgstr "服務"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardHeader.tsx
 msgid "Loading author"
 msgstr "正在載入作者"
-
-#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
-#~ msgid "This question is too large for the on-device model. Try a shorter "
-#~ "question, or reconnect to use cloud chat."
-#~ msgstr "此問題對裝置上的模型來說太長。請嘗試縮短問題，或重新連線以使用雲端聊天。"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -8527,10 +8324,6 @@ msgid "This dataset will no longer be stored online and can only be accessed as 
 "data."
 msgstr "此數據集將不再在線存儲，僅能在您的個人電腦上訪問。您的團隊中的任何人都無法訪問此數據。這僅建議用於非常敏感的數據。"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatDownloadControl.tsx
-#~ msgid "Download a different offline chat model"
-#~ msgstr "下載不同的離線聊天模型"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
 msgstr "編輯權限"
@@ -8551,10 +8344,6 @@ msgstr "他們引用了此資料來源沒有的欄。"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
 msgstr "{conceptName} 欄位"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 3B (offline)"
-#~ msgstr "Qwen 2.5 3B（離線）"
 
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Collapse the legend"
@@ -8828,11 +8617,6 @@ msgstr "座標超出有效範圍"
 msgid "Filters (Where)"
 msgstr "篩選器（位置）"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 12 GB RAM and want noticeably better SQL answers "
-#~ "offline."
-#~ msgstr "如果您有 12 GB RAM，且希望在離線狀態下獲得明顯更好的 SQL 回覆，建議使用此模型。"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "Avandar can't add this kind of dataset yet."
 msgstr "Avandar 目前尚無法新增此類資料集。"
@@ -8901,6 +8685,10 @@ msgstr "計費入口網站。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 2"
 msgstr "第 2 欄"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Data not ready"
+msgstr "資料尚未準備就緒"
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
@@ -9037,9 +8825,9 @@ msgstr "數據集欄位"
 msgid "Details"
 msgstr "詳細資料"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid "Could not prepare the offline chat model."
-#~ msgstr "無法準備離線聊天模型。"
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Preparing your data"
+msgstr "正在準備您的資料"
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -9180,10 +8968,6 @@ msgstr "這是最後一步。發布後，您工作區中的任何人都可以開
 msgid "Add filter"
 msgstr "新增篩選器"
 
-#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-#~ msgid "Offline models"
-#~ msgstr "離線模型"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
 msgstr "結構描述版本"
@@ -9272,7 +9056,7 @@ msgstr "大小依據"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Offline mode is on. Chat runs on this computer and nothing leaves it. "
 "Click to go back online."
-msgstr ""
+msgstr "離線模式已開啟。聊天會在這台電腦上執行，任何內容都不會離開這台電腦。按一下即可恢復上線。"
 
 #: src/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle.tsx
 msgid "Resize drawer"
@@ -9331,7 +9115,7 @@ msgstr "隱藏詳細資料"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 msgid "This browser cannot run the offline models. Use a recent version of "
 "Chrome or Edge."
-msgstr ""
+msgstr "這個瀏覽器無法執行離線模型。請使用最新版的 Chrome 或 Edge。"
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Choose a case type from the sidebar to see its records."
@@ -9409,10 +9193,6 @@ msgstr "更新並重新發布"
 msgid "Center"
 msgstr "置中"
 
-#: src/components/ChatPanel/OfflineChatDownloadControl/OfflineChatModelSettingsModalContents.tsx
-#~ msgid " · downloaded"
-#~ msgstr " · 已下載"
-
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
@@ -9472,7 +9252,7 @@ msgstr "關閉面板 (⌘/)"
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Click Offline under the message box to use them. Chat also uses them on "
 "its own when you lose your connection."
-msgstr ""
+msgstr "按一下訊息框下方的「離線」即可使用這些模型。失去連線時，聊天也會自動使用這些模型。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Image URL"
@@ -9707,7 +9487,7 @@ msgstr "這則留言已刪除。"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Answers are slower and less accurate than online chat."
-msgstr ""
+msgstr "回答速度比線上聊天慢，準確度也較低。"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on"
@@ -9775,6 +9555,10 @@ msgstr "{0, plural, one {# 個已儲存的資料庫可用} other {# 個已儲存
 msgid "Graduated"
 msgstr "分級"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "More from the source"
+msgstr "來自來源的更多資訊"
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."
 msgstr "請再試一次。您的儀表板仍已發布。"
@@ -9834,7 +9618,7 @@ msgstr "來自您的提示："
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Keep this tab open until it finishes."
-msgstr ""
+msgstr "請保持這個分頁開啟，直到完成。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -10519,6 +10303,11 @@ msgstr "關閉"
 msgid "Link"
 msgstr "連結"
 
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't prepare the data for \"{0}\", so it may not open."
+msgstr "我們無法準備「{0}」的資料，因此可能無法開啟。"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."
 msgstr "您的工作區已使用所有 {currentSeatUsage} 個座位中的 {totalSeats} 個。"
@@ -10564,10 +10353,6 @@ msgstr "不離線"
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
 msgid "This dashboard is published publicly."
 msgstr "此儀表板已公開發佈。"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
-#~ msgid "Loading..."
-#~ msgstr "載入中..."
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable dashboard tile"
@@ -10624,10 +10409,6 @@ msgstr "無效的日期"
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Get started"
 msgstr "開始使用"
-
-#: src/components/ChatPanel/useChatModelCatalog/useChatModelCatalog.ts
-#~ msgid "Frontier models"
-#~ msgstr "Frontier 模型"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx

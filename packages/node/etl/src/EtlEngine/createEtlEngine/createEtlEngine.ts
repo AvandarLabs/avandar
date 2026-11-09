@@ -15,6 +15,7 @@ import {
 import { createRunExecutionRecorder } from "@etl/EtlEngine/recordRunExecution/createRunExecutionRecorder";
 import { resolveDriveScopes } from "@etl/EtlEngine/resolveDriveScopes/resolveDriveScopes";
 import { selectRequestedScopes } from "@etl/EtlEngine/selectRequestedScopes/selectRequestedScopes";
+import { createWriteThrottle } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
 import { createSupabaseCheckpointStore } from "@etl/stores/SupabaseCheckpointStore/createSupabaseCheckpointStore";
 import { createSupabaseDrivesStore } from "@etl/stores/SupabaseDrivesStore/createSupabaseDrivesStore";
 import { createSupabaseExecutionStore } from "@etl/stores/SupabaseExecutionStore/createSupabaseExecutionStore";
@@ -207,8 +208,10 @@ function _buildCrawlTasks<TDrive, TScope extends EtlScope>(
 
 /**
  * Resolves a drive's id, writing its row the first time the run reaches
- * it. A failed write is not remembered, so the drive's next scope tries
- * again. Resolves to `undefined` when there is no drives store.
+ * it. A write that fails transiently is retried as a crawl's requests are
+ * (see `createWriteThrottle`). A write that still fails is not remembered,
+ * so the drive's next scope tries again. Resolves to `undefined` when there
+ * is no drives store.
  */
 function _createDriveIdResolver<
   TDrive,
@@ -217,6 +220,7 @@ function _createDriveIdResolver<
 >(args: {
   config: EtlEngineConfig<TDrive, TConnection, TScope>;
   stores: EtlStores;
+  clock: EtlClock;
 }): (drive: TDrive, driveKey: string) => Promise<string | undefined> {
   const idsByDriveKey = new Map<string, string>();
   return async (drive, driveKey) => {
@@ -228,12 +232,16 @@ function _createDriveIdResolver<
     if (knownId !== undefined) {
       return knownId;
     }
-    const id = await drives.upsert({
-      pipelineName: args.config.name,
-      driveKey,
-      organizationLabels:
-        args.config.describeDrive?.(drive).organizationLabels ?? {},
-    });
+    const id = await createWriteThrottle({ clock: args.clock }).retryTransient(
+      () => {
+        return drives.upsert({
+          pipelineName: args.config.name,
+          driveKey,
+          organizationLabels:
+            args.config.describeDrive?.(drive).organizationLabels ?? {},
+        });
+      },
+    );
     idsByDriveKey.set(driveKey, id);
     return id;
   };
@@ -319,6 +327,9 @@ async function _runCrawlTask<TDrive, TConnection, TScope extends EtlScope>(
     clock: args.clock,
     onPageLoaded: (page) => {
       progress.pageLoaded(progressCrawl, page);
+    },
+    onWriteThrottled: (event) => {
+      progress.writeThrottled(progressCrawl, event);
     },
   });
 }
@@ -474,7 +485,11 @@ async function _runRecorded<TDrive, TConnection, TScope extends EtlScope>(
       stores: args.stores,
       syncedAt: args.startedAt,
       clock,
-      resolveDriveId: _createDriveIdResolver({ config, stores: args.stores }),
+      resolveDriveId: _createDriveIdResolver({
+        config,
+        stores: args.stores,
+        clock,
+      }),
       onCrawled: execution.recordCrawl,
     });
     const report = _buildRunReport({
@@ -557,6 +572,7 @@ export function createEtlEngine<
         pipelineRunId,
         options,
         startedAt,
+        clock,
       });
       await execution.start();
       return _runRecorded({

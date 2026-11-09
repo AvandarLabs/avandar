@@ -1,5 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import type { DataAgentDataset } from "@/lib/agent/dataAgent/buildDataAgentSystemPrompt/buildDataAgentSystemPrompt";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { OfflineDatasetProfile } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 

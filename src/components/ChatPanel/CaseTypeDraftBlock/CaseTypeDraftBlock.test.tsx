@@ -71,6 +71,18 @@ vi.mock(
   },
 );
 
+// Creating a case type shows a toast, and every Mantine toast mounted here
+// leaves a 4s auto-close timer that unmounting cannot clear. When that timer
+// outlives the file it fires after jsdom is torn down and fails the whole run
+// with "window is not defined", so no real toast is mounted.
+vi.mock("@/utils/notifications/notify", () => {
+  return {
+    notifyError: vi.fn(),
+    notifySuccess: vi.fn(),
+    notifyWarning: vi.fn(),
+  };
+});
+
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {

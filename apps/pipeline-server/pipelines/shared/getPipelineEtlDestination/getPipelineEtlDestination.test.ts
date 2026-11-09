@@ -28,6 +28,20 @@ describe("getPipelineEtlDestination", () => {
     });
   });
 
+  it("loads into the run's own Supabase project, not the environment's", () => {
+    vi.stubEnv("SUPABASE_URL", "http://127.0.0.1:55341");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "environment-key");
+
+    expect(
+      getPipelineEtlDestination({
+        supabase: {
+          url: "https://abcd.supabase.co",
+          serviceRoleKey: "run-key",
+        },
+      }).supabase,
+    ).toEqual({ url: "https://abcd.supabase.co", serviceRoleKey: "run-key" });
+  });
+
   it("falls back to the opendata bucket when SUPABASE_OPENDATA_BUCKET is blank", () => {
     vi.stubEnv("SUPABASE_OPENDATA_BUCKET", "  ");
 

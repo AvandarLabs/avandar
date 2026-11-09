@@ -1,16 +1,38 @@
-/** Tests how the storage relation cache hands cached payloads to the loader. */
+/**
+ * Tests how the storage relation cache hands cached payloads to the loader,
+ * and when the loader reads the dataset column catalog.
+ */
 
 import { MIMEType } from "@avandar/utils";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
 
+const { datasetColumnGetAllMock } = vi.hoisted(() => {
+  return { datasetColumnGetAllMock: vi.fn() };
+});
+
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return { DuckDbClient: {} };
+});
+
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      withCache: () => {
+        return {
+          withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+        };
+      },
+    },
+  };
 });
 
 vi.mock(
@@ -50,5 +72,29 @@ describe("RelationLoading.probeStorageRelationCache", () => {
       MIMEType.APPLICATION_PARQUET,
     );
     expect(cachedRelations[0]?.parquetBlob.size).toBe("parquet-bytes".length);
+  });
+});
+
+describe("RelationLoading.loadRelationBytes", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    datasetColumnGetAllMock.mockResolvedValue([]);
+  });
+
+  it("reads no dataset columns when the query loads no relation", async () => {
+    // A query that names no dataset (a literal `VALUES` query, or one whose
+    // datasets are all already in DuckDB) loads nothing. The column catalog
+    // is gated by RLS, so reading it anyway fails for a visitor who may not
+    // read any dataset's columns.
+    await RelationLoading.loadRelationBytes({
+      datasetColumnSource: "catalog",
+      datasetDuckDbLease: {} as DatasetDuckDbLease,
+      principalKey: PRINCIPAL_KEY,
+      relationCache: createInMemoryRelationCache(),
+      relations: [],
+      relationsToStore: [],
+    });
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
   });
 });

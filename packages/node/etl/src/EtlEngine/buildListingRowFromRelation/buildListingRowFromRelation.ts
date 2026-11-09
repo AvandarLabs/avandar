@@ -64,7 +64,7 @@ function _buildSharedColumns(args: _BuildArgs): _SharedColumns {
     organization4_name: relation.organization4Name ?? null,
     domains: relation.domains ? [...relation.domains] : null,
     tags: relation.tags ? [...relation.tags] : null,
-    source_metadata: relation.sourceMetadata ?? null,
+    additional_source_metadata: relation.additionalSourceMetadata ?? null,
     drive_id: args.driveId ?? null,
     canonical_urls: relation.canonicalUrls ? [...relation.canonicalUrls] : null,
     license: relation.license ?? null,

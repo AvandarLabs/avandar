@@ -54,6 +54,12 @@ export type PublishDatasets = {
 /** Everything a publish needs before it starts writing snapshot objects. */
 export type PreparedPublishSnapshot = PublishDatasets & {
   columnsByDataset: Record<string, string[]>;
+  /**
+   * Datasets whose column catalog renames or casts a stored column. Their
+   * stored Parquet does not have the names and types queries use, so a
+   * whole-dataset slice of one cannot be copied as is.
+   */
+  datasetIdsWithColumnReplacements: ReadonlySet<Dataset.Id>;
   publishConfig: PublishSliceConfig.Dashboard;
   referenced: ReturnType<typeof DashboardSliceBuilder.extractReferencedColumns>;
 };

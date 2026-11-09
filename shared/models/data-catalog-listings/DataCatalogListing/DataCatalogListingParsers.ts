@@ -68,22 +68,32 @@ const DBReadSchema = z.object({
   organization4_name: z.string().nullable(),
   domains: z.array(z.string()).nullable(),
   tags: z.array(z.string()).nullable(),
-  source_metadata: supabaseJSONSchema.nullable(),
+  additional_source_metadata: supabaseJSONSchema.nullable(),
   drive_id: z.uuid().nullable(),
+  parquet_cache_status: z.enum(["building", "ready", "failed"]).nullable(),
+  parquet_cache_build_id: z.uuid().nullable(),
+  parquet_cache_build_started_at: z.iso.datetime({ offset: true }).nullable(),
+  parquet_cache_failure_code: z.string().nullable(),
+  parquet_cache_folder_path: z.string().nullable(),
+  parquet_cache_part_count: z.number().nullable(),
+  parquet_cache_source_version: z.string().nullable(),
+  parquet_cache_built_at: z.iso.datetime({ offset: true }).nullable(),
+  parquet_cache_row_count: z.number().nullable(),
+  parquet_cache_byte_size: z.number().nullable(),
   search_vector: z.unknown(),
 });
 
 /**
- * Reads a listing row. `metadata` and `source_metadata` are JSON documents
- * a pipeline wrote, not columns, so they keep their keys and nulls exactly
- * as stored: readers look up a source's own key names in them, and the
- * source record is shown as the source sent it. Only a missing document
- * becomes undefined.
+ * Reads a listing row. `metadata` and `additional_source_metadata` are JSON
+ * documents a pipeline wrote, not columns, so they keep their keys and nulls
+ * exactly as stored: readers look up a source's own key names in them, and
+ * the source's details are shown as the source sent them. Only a missing
+ * document becomes undefined.
  */
 function _fromDBReadToModelRead(
   dbRow: DataCatalogListingModel["DBRead"],
 ): DataCatalogListingRead {
-  const { metadata, source_metadata, ...columns } = dbRow;
+  const { metadata, additional_source_metadata, ...columns } = dbRow;
   // The search document exists for catalog search in Postgres. Nothing in
   // the app reads it.
   const fields = nullsToUndefinedDeep(
@@ -94,7 +104,7 @@ function _fromDBReadToModelRead(
     id: fields.id as DataCatalogListingId,
     driveId: fields.driveId as DataCatalogDriveId | undefined,
     metadata: metadata ?? undefined,
-    sourceMetadata: source_metadata ?? undefined,
+    additionalSourceMetadata: additional_source_metadata ?? undefined,
   };
 }
 

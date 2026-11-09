@@ -41,13 +41,14 @@ export function createSupabaseDrivesStore(
   const { client, drivesTable } = options;
   return {
     upsert: async (drive) => {
-      const { data, error } = await client
+      const { data, error, status } = await client
         .from(drivesTable)
         .upsert(_driveToTableRow(drive), { onConflict: DRIVE_CONFLICT })
         .select("id")
         .single();
       throwOnSupabaseError({
         error,
+        status,
         action: `writing drive ${drive.driveKey} to ${drivesTable}`,
       });
       return (data as Readonly<{ id: string }>).id;

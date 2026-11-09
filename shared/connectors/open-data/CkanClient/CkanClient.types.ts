@@ -73,8 +73,8 @@ export type CkanPackage = {
   /**
    * The dataset exactly as `package_show` or `package_search` returned it,
    * before any of it was narrowed to the fields above. A pipeline maps
-   * catalog metadata from it and stores it as the listing's
-   * `source_metadata`.
+   * catalog metadata from it and stores what it does not map as the
+   * listing's `additional_source_metadata`.
    */
   sourceRecord: unknown;
 };

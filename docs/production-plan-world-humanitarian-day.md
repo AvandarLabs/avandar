@@ -354,6 +354,49 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
   relation, not a dataset: `docs/measles-demo/connector-nomenclature.md`),
   how much of it a query may read, and what a chat session that cites it
   keeps once the listing is never added. Needs P10's app-wide chat.
+- P6.9 `[NEW]` **Cached Parquet copies of API-backed ODC listings**: the
+  pipeline server streams a listing's source into a Parquet copy in the
+  public `opendata` bucket the first time a workspace adds it, and rebuilds
+  it when the source changes. Workspaces read the copy straight from
+  Storage, which removes the 25 MB ceiling of the edge function relay, so an
+  ODC listing is limited only by the Storage upload limit manual uploads
+  already have. Starts by dropping the policies that let any signed-in user
+  write to `opendata`. Spec: `docs/measles-demo/odc-parquet-cache-spec.md`.
+  In progress.
+- P6.10 `[NEW]` **Retest ODC listings marked unreachable**: a file host that
+  does not answer marks a listing `unreachable_dataset`, even when the
+  outage is temporary, and the mark only clears when the pipeline sees the
+  source change or a sample is later verified. Add (a) a scheduled job that
+  re-reads each `unreachable_dataset` listing's sample with backoff (daily
+  at first, weekly after repeated failures) and clears the mark on success,
+  and (b) a "Try again" button on the ODC listing's invalid notice that
+  re-reads the sample at once. Other invalid reasons (`dataset_not_found`,
+  `unsupported_format`, `external_host`) are not temporary and are not
+  retried on a schedule, though "Try again" works for all of them.
+- P6.11 `[NEW]` **Handle ODC source drift**: an ODC listing added to a
+  workspace copies the listing's columns at that moment, while its data is
+  read from the listing's current Parquet copy. When the source changes,
+  the workspace's columns, its data, and the catalog can disagree, and a
+  dashboard or analysis built on the dataset can break with no explanation.
+  Today nothing reconciles them. Cover every case:
+  - (a) **Source changes after a listing is added**: the source's columns
+    or rows change after a workspace added the listing.
+  - (b) **Detect outdated Parquet copies**: notice that a copy's source
+    changed (its freshness token moved) and rebuild it, rather than only on
+    the next load.
+  - (c) **Move workspaces to the new copy**: point every workspace dataset
+    that reads a listing's copy at the rebuilt one.
+  - (d) **Update a workspace's columns**: when the listing's columns change,
+    update the columns of every workspace dataset added from it.
+  - (e) **Track drift and column history in the ODC**: record each change to
+    a listing's columns and data, so the app can show a user why their
+    dashboards or analyses may have broken because the source changed.
+  - (f) **Let users freeze a dataset**: a frozen dataset does not sync with
+    its source, so a changed source never breaks it. This means keeping each
+    copy a frozen dataset reads, and tracking those copies as distinct from
+    the listing's current one, so a rebuild never deletes a copy a frozen
+    dataset still uses.
+  Depends on P6.9.
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
   framework already exists for HDX]`
 

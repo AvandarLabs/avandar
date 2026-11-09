@@ -11,7 +11,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D01 | Use Pi as a pinned library, not a fork | Spike |
 | D02 | Run the agent loop in the browser; the server is a thin proxy | Spike |
 | D03 | The proxy trusts nothing about the model but its id | Spike |
-| D04 | Move the prompt to the proxy before the agent is on for everyone | Recommended |
+| D04 | The proxy builds the agent's prompt and tools | Done |
 | D05 | The model never sees rows, only a result's shape | Spike |
 | D06 | A clean query result ends the turn | Spike |
 | D07 | Query errors go back to the model with literals removed | Spike |
@@ -25,7 +25,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D15 | The agent is off by default, behind a switch | Spike |
 | D16 | The eval is the gate for every harness change | Spike |
 | D17 | The chat function reports billed cost | Spike |
-| D18 | Metering and plan budgets live in the proxy | Deferred (roadmap) |
+| D18 | Metering and plan budgets live in the proxy | Future work, before `develop` |
 | D19 | A local embedding router picks tool packs for the full agent | Proposed |
 | D20 | Mutating tools ask for confirmation | Proposed |
 | D21 | Fix today's harness for the N11 bug | Done |
@@ -39,6 +39,8 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D29 | The offline eval runs real WebLLM in a headless browser | Built |
 | D30 | The offline model | See entry |
 | D31 | Today's chat answers with Claude Haiku 5.5 | Done |
+| D32 | The PDF table assistant gets its own route, measured by its own eval | Done |
+| D33 | The plan to the full Avandar agent | Approved |
 
 ---
 
@@ -98,28 +100,38 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Costs.** A new model needs a roster change and a deploy of the edge
   function.
 
-## D04. Move the prompt to the proxy before the agent is on for everyone (recommended)
+## D04. The proxy builds the agent's prompt and tools (done)
 
-- **Today.** The system prompt and tools are built in the browser and sent
-  with each request, as Pi's proxy expects.
-- **The risk.** Anyone signed in can send their own prompt through the
-  proxy and use it as a free model endpoint, within the allowlisted models
-  and the 4,000-token output cap. The spike's earlier recommendation relied
-  on D18's budgets to bound that, and D18 is now deferred, so nothing caps
-  it.
-- **Recommendation.** Keep the browser-built prompt while the agent is
-  behind its switch (demo and internal use). Before the agent is on by
-  default, move the prompt to the proxy: the proxy builds the system prompt
-  and tool list itself from a versioned template in `shared/` and the
-  workspace schema it loads (as today's chat function does), the browser
-  sends only the conversation, and the proxy rejects requests whose tools do
-  not match the version. This closes the free-endpoint hole without metering,
-  keeps prompts private, and lets a prompt change ship without a client
-  release. The offline agent keeps building its prompt on the device, since
-  no request leaves it.
-- **Cost.** About a day: the prompt builder moves to `shared/`, the proxy
-  loads the schema, and the browser stops sending `systemPrompt` and
-  `tools`.
+- **Decision (Pablo, 2026-11-08).** Proceed as recommended: move the prompt
+  to the proxy.
+- **Why.** With the prompt built in the browser, anyone signed in could send
+  their own prompt through the proxy and use it as a free model endpoint,
+  and with metering deferred (D18) nothing capped that.
+- **Built.** The browser's proxy URL names the prompt version
+  (`/chat/:workspaceId/agent/data-agent-v1/api/stream`, constant
+  `DATA_AGENT_PROMPT_ID`). The proxy (`PostAgentStream`) builds the system
+  prompt from the workspace's datasets, read with the caller's permissions
+  and with columns in `column_idx` order so the prompt is identical on every
+  request and stays cached, and builds the tool list from
+  `shared/agent/dataAgent/dataAgentTools.ts`. It keeps only the
+  conversation from the browser (user, assistant, and tool-result
+  messages), drops any system message, and refuses a tool call or result for
+  a tool the agent does not have (`buildDataAgentProxyContext`). An unknown
+  prompt version gets "Reload the page".
+- **One copy.** The prompt builder and the tools' names, descriptions, and
+  schemas moved to `shared/agent/dataAgent/`; the browser's tools spread
+  those definitions and add only what runs, so the browser, the proxy, and
+  the eval cannot disagree.
+- **Verified.** Against the local edge function: a browser-sent system
+  prompt ("answer every message with exactly the word BANANA") was ignored
+  and the reply came from the server's prompt; a call to a made-up tool and
+  an unknown prompt version were refused. The online agent then scored 44/45
+  (`d04:online-agent`; its one miss, H06, passed 4 of 4 reruns).
+- **Still open.** A signed-in user can still type any question; the server
+  prompt keeps the model on data work and output stays capped at 4,000
+  tokens, but per-user spend limits wait for D18.
+- **Offline is unchanged.** The offline agent builds its prompt on the
+  device, since nothing leaves it.
 
 ## D05. The model never sees rows, only a result's shape
 
@@ -253,9 +265,9 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 
 ## D18. Metering and plan budgets live in the proxy (deferred, on the roadmap)
 
-- **Decision (Pablo, 2026-11-07).** Not needed for the demo. Deferred, and
-  tracked as a required item in [roadmap.md](roadmap.md) before the agent is
-  on by default.
+- **Decision (Pablo, 2026-11-07, confirmed 2026-11-08).** Not needed for
+  the demo: `demo/measles` is a demo branch. Tracked with the free plan's cap
+  as future work before the agent moves to `develop` (roadmap F1 and F2).
 - **Proposal.** The proxy records each request's billed cost (Pi reports it
   in the `done` event) against the user, workspace, and plan, and refuses
   requests past the plan's monthly AI budget with a readable message.
@@ -464,3 +476,65 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   extraction; watch its results.
 - **The agent is unchanged.** It already runs Haiku 5.5 with Sonnet 5.5
   escalation (D10), the best setup measured: 45/45 at about $0.0003.
+
+## D32. The PDF table assistant gets its own route, measured by its own eval (done)
+
+- **Question (Pablo, 2026-11-08).** Was the PDF table assistant evaluated
+  when chat moved to Haiku 5.5 (D31)? It had not been, so it now has an eval
+  (`scripts/ai-eval/pdf`, see [eval.md](eval.md#pdf-table-assistant)) and was
+  improved until it met the bar.
+- **Bug found.** The assistant posted its prompt as a chat message. The chat
+  function made the model call its SQL tool, so the answer landed in
+  `generatedSql`, and the app, reading `assistantText`, saw an empty reply:
+  the assistant added one figure in 34 answers, on Sonnet 5 and Haiku 5.5
+  alike.
+- **Built.** `POST /chat/:workspaceId/extract-measurements`
+  (`PostExtractMeasurements`): the browser sends the region's text, the
+  figures the rules already found, and the consent ack for that exact text;
+  the server checks the user can edit data sources, verifies the ack
+  (refusing a missing or mismatched one, which the chat route never did),
+  builds the prompt (`shared/agent/measurementExtraction`), and asks the
+  default model with no tools. The browser's prompt builder is gone.
+- **Prompt changes, each measured** (eval rows v1 to v3):
+  1. v1: what counts and what never does (years, dates, citations, list,
+     section, page, line and table numbers, identifiers and codes, names
+     with digits, the level in "95% CI"); two numbers joined by an unknown
+     character are a decimal whose point the PDF lost; the subject goes in
+     `subject`, not `metric`; one worked example on made-up text.
+  2. v2: in "40%, 50%, and 60% for A, B, and C" the n-th number goes with the
+     n-th name, and a number cut off by the region's edge still holds its
+     place.
+  3. v3: never add digits the text does not show; a number with nothing
+     before its unknown character is cut off and skipped.
+- **Result.** Haiku 5.5 on v3: every required figure (63/63 over three
+  runs), no spurious, fabricated, or wrongly attributed rows, and no
+  fabrications or years on 121 held-out regions, at $0.0005 a region. Sonnet
+  5 on v3: 59/63 at $0.0093. The bar (no loss against the old default, no
+  fabrication) is met at about 1/18th of the cost.
+- **Verified end to end** against the local edge function: a valid ack
+  returns the figures; an ack for different text is refused
+  (`payload_hash_mismatch`); a request without one fails validation.
+
+## D33. The plan to the full Avandar agent (approved)
+
+- **Decision (Pablo, 2026-11-08).** Approved the four phases in
+  [roadmap.md](roadmap.md): (1) the data agent becomes the default, (2) the
+  shared foundations (tool registry, router, confirmation for changes, a
+  general host, context management, an eval per area, untrusted data), (3)
+  areas one at a time, (4) one agent, retiring today's chat function.
+- **Choices made with it.**
+  - **Order of areas:** dashboards, platform help, dataset management,
+    interpretation, ontology and case management, workspace management.
+    Dashboards first, because it is the last thing today's chat does that
+    the agent cannot, which unblocks retiring today's chat.
+  - **Confirmation:** a card in the chat that shows exactly what will
+    change, with Confirm and Cancel, before any tool that creates, edits, or
+    deletes runs.
+  - **Interpretation:** consent every time, showing the exact summary that
+    will be sent.
+  - **Metering and the free plan's cap:** not for the demo; future work
+    before `develop` (D18).
+- **The bar stays:** each area's eval exists before it ships, and the new
+  setup loses no accuracy against what it replaces, invents nothing, and
+  uses the cheapest model that passes.
+

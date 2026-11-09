@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import { promiseMapSequential } from "@avandar/utils";
 import { buildListingRowFromRelation } from "@etl/EtlEngine/buildListingRowFromRelation/buildListingRowFromRelation";
@@ -13,6 +14,7 @@ import type {
   Relation,
   RelationColumn,
 } from "@etl/EtlEngine/EtlEngine.types";
+import type { WriteThrottle } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
 import type {
   ListingRowValues,
   ListingsStore,
@@ -49,6 +51,11 @@ export type LoadRelationsPageContext = Readonly<{
   bucket: string | undefined;
   /** The crawl's metrics, which this page's reads and writes add to. */
   metrics: CrawlMetricsRecorder;
+  /**
+   * The crawl's throttle, which sizes each write to how the database is
+   * keeping up and retries reads and writes that fail transiently.
+   */
+  writeThrottle: WriteThrottle;
   /** The formats a workspace cannot load. Omit to rule out none. */
   workspaceLoadability?: EtlWorkspaceLoadabilityRules;
 }>;
@@ -161,11 +168,14 @@ function _buildRelationsWithRows(args: {
 async function _readStoredRowsByKey(args: {
   rows: readonly ListingRowValues[];
   listings: ListingsStore;
+  writeThrottle: WriteThrottle;
 }): Promise<Map<string, StoredListingRow>> {
   const storedChunks = await promiseMapSequential(
     splitIntoChunks(args.rows, LISTING_CHUNK_SIZE),
     (chunk) => {
-      return args.listings.readRowsMatching(chunk);
+      return args.writeThrottle.retryTransient(() => {
+        return args.listings.readRowsMatching(chunk);
+      });
     },
   );
   return new Map(
@@ -259,57 +269,93 @@ function _countConsidered(args: {
   });
 }
 
-/**
- * Splits relations into write batches of at most `LISTING_CHUNK_SIZE`
- * listings and `COLUMNS_PER_WRITE` columns, keeping their order. Each
- * listing goes into one batch with all of its columns.
- */
-function _splitIntoWriteBatches(
-  preparedRelations: readonly _PreparedRelation[],
-): _PreparedRelation[][] {
-  const batches: _PreparedRelation[][] = [];
-  let columnCount = 0;
-  preparedRelations.forEach((prepared) => {
-    const lastBatch = batches.at(-1);
-    const fitsLastBatch =
-      lastBatch !== undefined &&
-      lastBatch.length < LISTING_CHUNK_SIZE &&
-      columnCount + prepared.columns.length <= COLUMNS_PER_WRITE;
-    if (fitsLastBatch) {
-      lastBatch.push(prepared);
-      columnCount += prepared.columns.length;
-    } else {
-      batches.push([prepared]);
-      columnCount = prepared.columns.length;
-    }
-  });
-  return batches;
+/** How many JSON bytes a listing and its columns add to a write. */
+function _measureWriteBytes(prepared: _PreparedRelation): number {
+  return Buffer.byteLength(
+    JSON.stringify({ row: prepared.row, columns: prepared.columns }),
+  );
 }
 
+/**
+ * How many relations, from `start`, the next write takes: at most
+ * `LISTING_CHUNK_SIZE` listings, `COLUMNS_PER_WRITE` columns, and
+ * `byteBudget` bytes, and always at least one, so a listing larger than a
+ * cap is written alone rather than never. A listing and its columns are
+ * never split.
+ */
+function _countNextBatch(args: {
+  relations: readonly _PreparedRelation[];
+  writeBytes: readonly number[];
+  start: number;
+  byteBudget: number;
+}): number {
+  let count = 1;
+  let columnCount = args.relations[args.start]?.columns.length ?? 0;
+  let byteCount = args.writeBytes[args.start] ?? 0;
+  while (args.start + count < args.relations.length) {
+    const next = args.start + count;
+    const nextColumns = args.relations[next]?.columns.length ?? 0;
+    const nextBytes = args.writeBytes[next] ?? 0;
+    const fits =
+      count < LISTING_CHUNK_SIZE &&
+      columnCount + nextColumns <= COLUMNS_PER_WRITE &&
+      byteCount + nextBytes <= args.byteBudget;
+    if (!fits) {
+      break;
+    }
+    count += 1;
+    columnCount += nextColumns;
+    byteCount += nextBytes;
+  }
+  return count;
+}
+
+/**
+ * Writes changed relations in batches sized by the throttle's byte budget,
+ * oldest connection first. A batch that fails transiently is retried from
+ * the same relation under the smaller budget the failure leaves, so every
+ * relation is written exactly once and in order. Each batch is one
+ * transaction, so a failed batch wrote nothing.
+ */
 async function _writeChangedRelations(args: {
   changedRelations: readonly _PreparedRelation[];
   listings: ListingsStore;
   metrics: CrawlMetricsRecorder;
+  writeThrottle: WriteThrottle;
 }): Promise<void> {
-  const { metrics } = args;
-  args.changedRelations.forEach(({ columns }) => {
+  const { changedRelations: relations, metrics, writeThrottle } = args;
+  relations.forEach(({ columns }) => {
     metrics.count("columnsWritten", columns.length);
   });
+  const writeBytes = relations.map(_measureWriteBytes);
+  let start = 0;
   // Sequential on purpose: batches go oldest connection first, so a failure
-  // partway leaves an oldest-first prefix of the page written.
-  await promiseMapSequential(
-    _splitIntoWriteBatches(args.changedRelations),
-    (batch) => {
-      metrics.count("writeBatches", 1);
-      return metrics.time("loadWriteMs", () => {
-        return args.listings.upsertListingsWithColumns(
-          batch.map(({ row, columns }) => {
-            return { row, columns };
-          }),
-        );
+  // partway leaves an oldest-first prefix of the page written, and each
+  // write's time sets the next one's budget.
+  while (start < relations.length) {
+    const count = _countNextBatch({
+      relations,
+      writeBytes,
+      start,
+      byteBudget: writeThrottle.getByteBudget(),
+    });
+    const batch = relations.slice(start, start + count);
+    try {
+      await writeThrottle.timeWrite(() => {
+        return metrics.time("loadWriteMs", () => {
+          return args.listings.upsertListingsWithColumns(
+            batch.map(({ row, columns }) => {
+              return { row, columns };
+            }),
+          );
+        });
       });
-    },
-  );
+      metrics.count("writeBatches", 1);
+      start += count;
+    } catch (error: unknown) {
+      await writeThrottle.waitAfterFailure(error);
+    }
+  }
 }
 
 /**
@@ -340,6 +386,7 @@ export async function loadRelationsPage(args: {
         return row;
       }),
       listings: context.stores.listings,
+      writeThrottle: context.writeThrottle,
     });
   });
   const preparedRelations = await promiseMapSequential(
@@ -362,6 +409,7 @@ export async function loadRelationsPage(args: {
     changedRelations,
     listings: context.stores.listings,
     metrics: context.metrics,
+    writeThrottle: context.writeThrottle,
   });
   return {
     written: changedRelations.length,

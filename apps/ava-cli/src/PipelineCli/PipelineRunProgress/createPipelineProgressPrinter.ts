@@ -12,6 +12,15 @@ const _HEARTBEAT_AFTER_MS = 15_000;
 /** How often the printer checks whether it has been quiet too long. */
 const _HEARTBEAT_CHECK_MS = 1000;
 
+/**
+ * The least time between two printed slow-write lines. A database that
+ * stays slow slows every write, and one line says so.
+ */
+const _SLOW_WRITE_LINE_INTERVAL_MS = 15_000;
+
+const _KIB = 1024;
+const _MIB = 1024 * _KIB;
+
 /** Prints a run's progress as it arrives. */
 export type PipelineProgressPrinter = Readonly<{
   /** Prints a progress event, or drops it when it cannot be read. */
@@ -75,8 +84,37 @@ type _PrinterState = {
   readonly startedAtMs: number;
   lastPrintedAtMs: number;
   lastPageLineAtMs: number | undefined;
+  lastSlowWriteLineAtMs: number | undefined;
   latestLine: string;
 };
+
+/** A byte budget in MiB, to one decimal place when not whole, or KiB. */
+function _formatBatchSize(byteBudget: number): string {
+  if (byteBudget < _MIB) {
+    return `${String(Math.round(byteBudget / _KIB))} KiB`;
+  }
+  const mebibytes = Math.round((byteBudget / _MIB) * 10) / 10;
+  return `${String(mebibytes)} MiB`;
+}
+
+/**
+ * One line for a `write_throttled` event: the crawl, then what it eased
+ * off for, how long it waits, and how large its next batch may be.
+ */
+export function formatWriteThrottleLine(progress: PipelineRunProgress): string {
+  const crawl = `[${String(progress.crawlNumber)}/${String(progress.crawlCount)}] ${progress.driveKey} [${progress.scopeKey}]`;
+  const { throttle } = progress;
+  if (throttle === undefined) {
+    return crawl;
+  }
+  const batchSize = _formatBatchSize(throttle.byteBudget);
+  const pause = formatDuration(throttle.pauseMs);
+  if (throttle.reason === "slow_write") {
+    return `${crawl} · writes slowed: ${batchSize} batches, pausing ${pause}`;
+  }
+  const count = `${String(throttle.failureCount ?? 1)} of ${String(throttle.maxFailures ?? 1)} in a row`;
+  return `${crawl} · write failed (${count}), retrying in ${pause} with ${batchSize} batches: ${throttle.message ?? "unknown error"}`;
+}
 
 function _printLine(state: _PrinterState, line: string): void {
   printInfo(line);
@@ -96,8 +134,33 @@ function _printHeartbeatWhenQuiet(state: _PrinterState): void {
 }
 
 /**
- * Prints a readable event: a crawl's start or end at once, and a page
- * update unless one was printed less than 5 seconds ago.
+ * Prints a throttle event as a warning: every transient failure, and a slow
+ * write unless one was printed less than 15 seconds ago.
+ */
+function _printWriteThrottled(
+  state: _PrinterState,
+  progress: PipelineRunProgress,
+): void {
+  state.latestLine = formatWriteThrottleLine(progress);
+  const isSlowWrite = progress.throttle?.reason === "slow_write";
+  const isQuieted =
+    isSlowWrite &&
+    state.lastSlowWriteLineAtMs !== undefined &&
+    Date.now() - state.lastSlowWriteLineAtMs < _SLOW_WRITE_LINE_INTERVAL_MS;
+  if (isQuieted) {
+    return;
+  }
+  printWarn(state.latestLine);
+  state.lastPrintedAtMs = Date.now();
+  if (isSlowWrite) {
+    state.lastSlowWriteLineAtMs = Date.now();
+  }
+}
+
+/**
+ * Prints a readable event: a crawl's start or end at once, a page update
+ * unless one was printed less than 5 seconds ago, and a throttle event as
+ * `_printWriteThrottled` decides.
  */
 function _printProgress(state: _PrinterState, rawProgress: unknown): void {
   const parsed = PipelineRunProgressSchema.safeParse(rawProgress);
@@ -105,6 +168,10 @@ function _printProgress(state: _PrinterState, rawProgress: unknown): void {
     return;
   }
   const progress = parsed.data;
+  if (progress.stage === "write_throttled") {
+    _printWriteThrottled(state, progress);
+    return;
+  }
   state.latestLine = formatPipelineRunProgress(
     progress,
     Date.now() - state.startedAtMs,
@@ -124,11 +191,12 @@ function _printProgress(state: _PrinterState, rawProgress: unknown): void {
 
 /**
  * Creates a printer for a run's progress. Each crawl's start and end is
- * printed, page updates at most once every 5 seconds, and a crawl the
- * limit skipped not at all, since the final report lists it. After 15
- * seconds without printing anything, it prints that the run is still
- * going, with the latest progress, so a hung run is easy to tell apart
- * from a slow one.
+ * printed, page updates at most once every 5 seconds, each transient
+ * failure the run retries, slow writes at most once every 15 seconds, and
+ * a crawl the limit skipped not at all, since the final report lists it.
+ * After 15 seconds without printing anything, it prints that the run is
+ * still going, with the latest progress, so a hung run is easy to tell
+ * apart from a slow one.
  *
  * @param options.waitingLabel - What the "still running" line says before
  * any progress arrives.
@@ -141,6 +209,7 @@ export function createPipelineProgressPrinter(
     startedAtMs,
     lastPrintedAtMs: startedAtMs,
     lastPageLineAtMs: undefined,
+    lastSlowWriteLineAtMs: undefined,
     latestLine: options.waitingLabel ?? "starting the run",
   };
   const heartbeat = setInterval(() => {

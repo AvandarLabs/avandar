@@ -312,6 +312,115 @@ describe("DatasetParquetWrapper", () => {
     expect(acquired.sourceVersion).toBe("ckan:mtime:1");
   });
 
+  it("reads an API-backed listing's one-part Parquet copy instead of its source", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const partBlob = new Blob(["part"], { type: MIMEType.APPLICATION_PARQUET });
+    const fetchApiOpenDataResource = vi.fn();
+    const mergeParquetParts = vi.fn();
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return {
+          partBlobs: [partBlob],
+          sourceVersion: "socrata:1",
+          isStale: false,
+        };
+      },
+      fetchApiOpenDataResource,
+      mergeParquetParts,
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.parquetBlob).toBe(partBlob);
+    expect(acquired.sourceVersion).toBe("socrata:1");
+    expect(acquired.maxAgeMs).toBeUndefined();
+    expect(fetchApiOpenDataResource).not.toHaveBeenCalled();
+    expect(mergeParquetParts).not.toHaveBeenCalled();
+  });
+
+  it("merges a copy's parts, in row order, into one Parquet blob", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const partBlobs = [new Blob(["part-0"]), new Blob(["part-1"])];
+    const mergedBlob = new Blob(["merged"]);
+    const mergeParquetParts = vi.fn().mockResolvedValue(mergedBlob);
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return { partBlobs, sourceVersion: undefined, isStale: false };
+      },
+      mergeParquetParts,
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(mergeParquetParts).toHaveBeenCalledWith(partBlobs);
+    expect(acquired.parquetBlob).toBe(mergedBlob);
+  });
+
+  it("serves a stale copy only briefly, so the rebuilt copy is read soon", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return {
+          partBlobs: [new Blob(["part"])],
+          sourceVersion: "socrata:1",
+          isStale: true,
+        };
+      },
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.maxAgeMs).toBe(5 * 60_000);
+  });
+
+  it("reads the source through the edge function when no copies are built", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const fetchApiOpenDataResource = vi.fn().mockResolvedValue({
+      contentKind: "parquet",
+      bytes: Uint8Array.from([1, 2, 3]) as Uint8Array<ArrayBuffer>,
+      sourceVersion: "ckan:hash:abc",
+    });
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return undefined;
+      },
+      fetchApiOpenDataResource,
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(fetchApiOpenDataResource).toHaveBeenCalledWith(CATALOG_ENTRY_ID);
+    expect(acquired.sourceVersion).toBe("ckan:hash:abc");
+  });
+
   it("refuses a dataset whose source type belongs to another wrapper", async () => {
     _mockDataset("google_sheets");
     const wrapper = createDatasetParquetWrapper();

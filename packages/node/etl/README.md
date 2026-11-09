@@ -209,15 +209,19 @@ The engine writes only these listings-table columns
 | `date_column_type_last_verified` | every row, `null` when the column types are not verified |
 | `is_workspace_loadable` | every row (see "Workspace loadability") |
 | `external_service_name`, `source_url`, `source_download_url`, `source_asset_type`, `canonical_urls`, `license`, `update_frequency`, `description`, `notes`, `metadata`, `coverage_start_date`, `coverage_end_date` | every row, `null` when unset |
-| `organization2_name` ... `organization4_name`, `domains`, `tags`, `source_metadata` | every row, `null` when unset |
+| `organization2_name` ... `organization4_name`, `domains`, `tags`, `additional_source_metadata` | every row, `null` when unset |
 | `drive_id` | every row, `null` with no drives store |
 | `api_service`, `api_base_url`, `api_resource_id`, `api_resource_format` | `api_resource` rows |
 | `parquet_file_name` | `pipeline_parquet` rows |
 
-`source_metadata` holds a relation's `sourceMetadata`: the source's own
-record (a JSON value). It never counts as a change: it carries counters
-that change daily, so it is written only alongside a change to another
-column. `drive_id` links a row to its drive in the drives table (see
+`additional_source_metadata` holds a relation's `additionalSourceMetadata`:
+what the source's own record says that no other column holds (a JSON
+value). A pipeline builds it with `CatalogFieldMapper.omitMappedPaths`,
+which leaves out every path a field mapping consumes and the config's
+`additionalSourceMetadata.omit` paths, then leaves out the fields it maps
+in code. A change to its value never counts as a change: it carries
+counters that change daily, so it is written only alongside a change to
+another column, or when the stored row has none. `drive_id` links a row to its drive in the drives table (see
 "Stores").
 
 Conflict targets: `(api_service, api_base_url, external_dataset_id,
@@ -230,12 +234,36 @@ first three. It is required when the config has `incremental`.
 
 **Writes.** A page loads in connection order. Parquet objects upload before
 any row is written, then changed rows are written in batches of at most 200
-listings and `COLUMNS_PER_WRITE` (5,000) relation columns. Each batch is one
+listings, `COLUMNS_PER_WRITE` (5,000) relation columns, and the crawl's
+current byte budget of JSON. Each batch is one
 `upsertListingsWithColumns` call, which writes every row together with its
 whole column set in one transaction. A listing is never split from its
 columns across batches, so the two are always written together: a listing
-with more columns than the cap is written alone. The Supabase store
+with more columns or bytes than a cap is written alone. The Supabase store
 reads stored rows a few at a time to keep request URLs short.
+
+**Pacing and retries.** Each crawl paces its store requests to how the
+database is keeping up, since a hosted database's statement timeout and
+memory bound how much it can absorb:
+
+| What happened | Byte budget | Wait before the next request |
+| --- | --- | --- |
+| The crawl started | 2 MiB | None |
+| A write took under 1 s | Grows by 512 KiB, up to 4 MiB | None |
+| A write took over 2 s | Halves, down to 64 KiB | As long as the write took, up to 30 s |
+| A request failed with `EtlTransientStoreError` | Quarters, down to 64 KiB | 2 s, doubling per failure in a row up to 60 s, ±25% |
+
+A read, a write batch, a checkpoint read or write, or the drive row a
+crawl writes before it starts that fails transiently is retried. A failed write batch is retried from the same
+listing under the smaller budget, so every listing is written once and in
+order, and a failed batch wrote nothing. The 8th transient failure in a row
+fails the crawl as any other error does, with its checkpoint still at the
+last page it finished, so an incremental run continues from there. Any
+other error fails the crawl at once. Each wait is reported through
+`onProgress` as a `write_throttled` event whose `throttle`
+(`EtlWriteThrottleEvent`) says why, and counted in the crawl's
+`pipelineMetrics` as `etl.write_slowdowns`, `etl.transient_failures`, and
+`etl.throttle_pause_ms`.
 
 **Relation columns.** An `api_resource` relation declares its `columns`,
 which may be empty when the pipeline cannot learn them: they are filled in
@@ -291,7 +319,8 @@ write. It takes `p_listings`, a JSON array of `{ listing, relation_columns }`
 where `listing` holds the contract columns and `relation_columns` holds
 `{ column_name, display_order, original_data_type, cast_data_type }` rows,
 upserts each listing on its conflict target, replaces its columns, and
-returns the stored listings. Avandar's is
+returns the stored listings' ids in input order, never the rows themselves,
+so a write does not carry every stored row back. Avandar's is
 `rpc_data_catalog_listings__upsert_with_relation_columns`. Deleting a
 listing deletes its columns too (`on delete cascade`), which is how reset
 and prune clear them.
@@ -367,6 +396,7 @@ drives:
 | `fields` | No | Field mappings every drive uses |
 | `drives` | Yes | The drives to crawl, in order. An empty list switches the pipeline off |
 | `workspaceLoadability` | No | This pipeline's `loadableFormats` and `unloadableFormats` (see "Workspace loadability") |
+| `additionalSourceMetadata` | No | `omit`: dotted source record paths `additional_source_metadata` leaves out although no field maps them, such as a license's full text (see "Additional source metadata") |
 
 | Drive key | Required | Meaning |
 | --- | --- | --- |
@@ -395,6 +425,27 @@ export default function socrataDomains(
 `context` carries the drive's `driveKey` and the target `field`. A script
 that throws fails that field for that record only: the field is left out and
 the result lists a problem.
+
+A script may also export `reads`, the dotted paths whose whole value the
+field it fills now holds:
+
+```ts
+export const reads = ["dataset_date"];
+```
+
+A `reads` export that is not a list of dotted paths fails the load. A path a
+script reads only part of, such as one entry of a keyed list, is left out of
+`reads` so `additional_source_metadata` keeps it.
+
+**Additional source metadata.** A listing's `additional_source_metadata`
+keeps only what its source record says that no listing column holds.
+`CatalogFieldMapper.omitMappedPaths(record, driveKey)` returns the record
+without every path the drive's mappings consume (each `from` path and each
+script's `reads`) and without the config's `additionalSourceMetadata.omit`
+paths. A pipeline then leaves out the fields it maps in code, such as the
+ids and URLs, and sets the result as the relation's
+`additionalSourceMetadata`. `omitRecordPaths(record, paths)` removes paths
+the same way, and an object left with no keys is removed from its parent.
 
 **Mappable fields.** `fields` accepts only the names in
 `CATALOG_MAPPABLE_FIELDS`: `description`, `notes`, `license`,
@@ -425,7 +476,8 @@ function default export rejects here, before any network call. The returned
 file, and throws when `driveKey` is not a drive in the config. It returns
 `{ fields, problems }`, where `fields` is named as `RelationDescription`
 names them (`organization1Name`, `updateFrequency`, `canonicalUrls`, ...), so
-a pipeline spreads it into a relation.
+a pipeline spreads it into a relation. A script whose `reads` export is not a
+list of dotted paths also rejects at load.
 
 ```ts
 import {
@@ -445,11 +497,12 @@ const organizationLabels = getOrganizationLabelsFromDrive({ config, drive });
 | `parsePipelineConfig` | `({ yamlText, sourceName })`: validates YAML text and returns a `PipelineConfig`. Throws naming `sourceName` and the key |
 | `readPipelineConfigFile` | `(filePath)`: reads and parses one pipeline config file |
 | `loadCatalogFieldMapper` | `({ config, configDir, importScript? })`: compiles a config into a `CatalogFieldMapper`. `importScript` replaces the module import in tests |
+| `omitRecordPaths` | `(record, paths)`: a copy of a source record without the given dotted paths, read as `from` paths read them. An object left with no keys is removed |
 | `getOrganizationLabelsFromDrive` | `({ config, drive })`: a drive's own organization labels, else the pipeline's, else `{}`. Pass the result as `EtlDriveDescription.organizationLabels` |
 | `CATALOG_MAPPABLE_FIELDS` | The listing fields a config can map, as the listings table names them |
-| `PipelineConfig`, `PipelineDriveConfig` | A parsed config file, and one of its drives |
+| `PipelineConfig`, `PipelineDriveConfig`, `PipelineAdditionalSourceMetadataConfig` | A parsed config file, one of its drives, and its `additionalSourceMetadata` block |
 | `CatalogFieldMappings`, `CatalogFieldSource`, `CatalogMappableField` | A set of mappings, one `from` / `value` / `script` entry, and one mappable field name |
-| `CatalogFieldMapper`, `CatalogFieldMapResult`, `CatalogFieldMapProblem`, `CatalogMappedFields` | The compiled mapper, one record's `{ fields, problems }`, a field left out and why, and the mapped fields in `RelationDescription` names |
+| `CatalogFieldMapper`, `CatalogFieldMapResult`, `CatalogFieldMapProblem`, `CatalogMappedFields` | The compiled mapper (`mapFields` and `omitMappedPaths`), one record's `{ fields, problems }`, a field left out and why, and the mapped fields in `RelationDescription` names |
 | `CatalogFieldScript`, `CatalogFieldScriptContext` | A script's default export, and its `{ driveKey, field }` context |
 | `EtlOrganizationLevel`, `EtlOrganizationLabels` | A level (`1` to `4`, broadest first), and the label each level has on a drive, such as `City` for level 1 |
 
@@ -469,6 +522,17 @@ pipeline").
 | `DrivesStore` | `{ upsert(drive): Promise<string> }`: inserts a drive or replaces its labels, and resolves to its id |
 | `DriveRow` | One drive: `pipelineName`, `driveKey`, `organizationLabels` |
 | `InMemoryDrivesStore`, `StoredDriveRow`, `SupabaseDrivesStoreOptions` | The in-memory store's type, a `DriveRow` with its `id`, and the Supabase store's options |
+| `EtlTransientStoreError`, `isEtlTransientStoreError`, `ETL_TRANSIENT_STORE_ERROR_NAME` | What a store throws for a failure a later attempt can succeed at, with the response's `status` and Postgres or PostgREST `code`. The engine retries it (see "Writes"). Match it with `isEtlTransientStoreError`, which checks the `name`, when the package may be loaded more than once |
+
+**Transient failures.** The Supabase stores throw `EtlTransientStoreError`
+for no response (status 0), 408, 429, or any 5xx (Cloudflare's 520-524
+included), and for Postgres codes `57014` (statement timeout), `55P03`
+(lock timeout), `40001`, `40P01`, `53300`, `57P01` to `57P03`, any `08xxx`
+connection error, and PostgREST's `PGRST000` to `PGRST002`. Every other
+failure, such as a constraint violation or an exception a database function
+raises, throws a plain `Error` and fails the crawl at once. A gateway's HTML
+error page is reported by its title, not as the whole page. A store written
+for tests throws `EtlTransientStoreError` to simulate a database under load.
 
 **Drives.** Set `output.drivesTable` (such as `data_catalog_drives`) to
 record each crawled drive and link its listing rows to it through
@@ -493,8 +557,11 @@ three Supabase functions, or `stores.executions` replaces them in tests.
 - `finish` records the outcome: `succeeded`, `partially_failed`, or
   `failed`, with the first error.
 
-Recording never fails a run: a failed call is logged with `console.warn`,
-and after a failed start the rest is skipped.
+Recording never fails a run. A call that fails with
+`EtlTransientStoreError` is retried with the same waits as a crawl's
+requests, so a run that slowed the database down is still recorded. A call
+that still fails is logged with `console.warn`, and after a failed start
+the rest is skipped.
 
 Every crawl report carries `startedAt`, `finishedAt`, `checkpointBefore`,
 `checkpointAfter`, and `metrics`:
@@ -503,10 +570,12 @@ Every crawl report carries `startedAt`, `finishedAt`, `checkpointBefore`,
 | --- | --- |
 | `metrics.timings` | Milliseconds in each stage, summed over pages: `setupMs`, `extractMs`, `transformMs`, `loadReadMs`, `loadParquetBuildMs`, `loadParquetUploadMs`, `loadWriteMs`, `checkpointWriteMs` |
 | `metrics.denominators` | Pages, datasets, listings considered and written, write batches, columns considered and written, the widest listing, CSV and Parquet bytes and rows, and the source's reported bytes |
-| `metrics.pipelineMetrics` | What `extract` and `transform` recorded through their `metrics` argument |
+| `metrics.pipelineMetrics` | What `extract` and `transform` recorded through their `metrics` argument, plus the engine's `etl.write_slowdowns`, `etl.transient_failures`, and `etl.throttle_pause_ms` (see "Pacing and retries") |
 
 Stages interleave page by page, so their sum is not the crawl's wall-clock
-time. `EtlEngineConfig.clock` replaces the system clock in tests.
+time. `EtlEngineConfig.clock` replaces the system clock in tests. Give it a
+`sleep` that returns at once, or advances the test clock, so a test that
+makes the database look slow or failing does not wait on real timers.
 
 ## Testing a pipeline
 

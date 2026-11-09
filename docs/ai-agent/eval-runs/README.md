@@ -8,7 +8,8 @@ grader's verdict, tokens, cost, and time). How to read and reproduce them:
 [eval.md](../eval.md).
 
 Runs with fewer than 45 questions are screens, reruns of single questions,
-or smoke checks; the label says which. Times are UTC.
+or smoke checks; the label says which. Times are UTC. The PDF table
+assistant's runs are in [pdf/](pdf/README.md).
 
 | Run (UTC) | Label | Correct | Needless | Missed | Cost per question | Latency p50 / p90 | Misses |
 |---|---|---|---|---|---|---|---|
@@ -90,3 +91,8 @@ or smoke checks; the label says which. Times are UTC.
 | [2026-11-08T09-04-48](2026-11-08T09-04-48-local_qwen3-4b_final2/results.jsonl) | `local:qwen3-4b:final2` | 26/45 | 0 | 1 | $0.00000 | 15.1 s / 24.1 s | B08 B09 H01 H02 H05 H06 H09 H10 I04 I06 I07 I08 I09 N03 N04 N07 N10 N11 N12 |
 | [2026-11-08T14-24-03](2026-11-08T14-24-03-d31_today-haiku-5.5_1/results.jsonl) | `d31:today-haiku-5.5#1` | 44/45 | 0 | 0 | $0.00131 | 4.1 s / 6.2 s | N04 |
 | [2026-11-08T14-24-03](2026-11-08T14-24-03-d31_today-haiku-5.5_2/results.jsonl) | `d31:today-haiku-5.5#2` | 45/45 | 0 | 0 | $0.00145 | 4.1 s / 6.3 s | none |
+| [2026-11-08T15-12-12](2026-11-08T15-12-12-d04_online-agent/results.jsonl) | `d04:online-agent` | 44/45 | 1 | 0 | $0.00031 | 2.4 s / 3.8 s | H06 |
+| [2026-11-08T15-12-20](2026-11-08T15-12-20-d04_h06_1/results.jsonl) | `d04:h06#1` | 1/1 | 0 | 0 | $0.00036 | 3.4 s / 3.4 s | none |
+| [2026-11-08T15-12-24](2026-11-08T15-12-24-d04_h06_2/results.jsonl) | `d04:h06#2` | 1/1 | 0 | 0 | $0.00036 | 3.2 s / 3.2 s | none |
+| [2026-11-08T15-12-28](2026-11-08T15-12-28-d04_h06_3/results.jsonl) | `d04:h06#3` | 1/1 | 0 | 0 | $0.00033 | 3.0 s / 3.0 s | none |
+| [2026-11-08T15-12-33](2026-11-08T15-12-33-d04_h06_4/results.jsonl) | `d04:h06#4` | 1/1 | 0 | 0 | $0.00033 | 2.9 s / 2.9 s | none |

@@ -1,6 +1,7 @@
 /**
- * Copies every eval run's results from `.temp/ai-eval/runs/` (gitignored)
- * into `docs/ai-agent/eval-runs/` and writes an index of all of them, so the
+ * Copies every eval run's results from `.temp/ai-eval/runs/` and
+ * `.temp/ai-eval/pdf-runs/` (gitignored) into `docs/ai-agent/eval-runs/` and
+ * `docs/ai-agent/eval-runs/pdf/`, and writes an index of each, so the
  * numbers in `docs/ai-agent/eval.md` can be traced to the answers behind
  * them after the local runs are gone.
  *
@@ -15,21 +16,29 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
+import type { PdfAssistRunSummary } from "./pdf/summarizePdfAssistRun";
 import type { EvalRunSummary } from "./runtime/summarizeEvalRun";
 
 const REPO_ROOT = resolve(import.meta.dirname, "../..");
 const RUNS_DIR = join(REPO_ROOT, ".temp/ai-eval/runs");
 const ARCHIVE_DIR = join(REPO_ROOT, "docs/ai-agent/eval-runs");
+const PDF_RUNS_DIR = join(REPO_ROOT, ".temp/ai-eval/pdf-runs");
+const PDF_ARCHIVE_DIR = join(ARCHIVE_DIR, "pdf");
 const ARCHIVED_FILES = ["summary.json", "results.jsonl"] as const;
 
 type ArchivedRun = { runId: string; summary: EvalRunSummary };
 
-function _archiveRun(runId: string): ArchivedRun | undefined {
-  const source = join(RUNS_DIR, runId);
+/** Copies one run's files and returns its summary, or nothing if unfinished. */
+function _archiveRun<TSummary>(
+  runsDir: string,
+  archiveDir: string,
+  runId: string,
+): { runId: string; summary: TSummary } | undefined {
+  const source = join(runsDir, runId);
   if (!existsSync(join(source, "summary.json"))) {
     return undefined;
   }
-  const target = join(ARCHIVE_DIR, runId);
+  const target = join(archiveDir, runId);
   mkdirSync(target, { recursive: true });
   for (const fileName of ARCHIVED_FILES) {
     if (existsSync(join(source, fileName))) {
@@ -38,8 +47,62 @@ function _archiveRun(runId: string): ArchivedRun | undefined {
   }
   const summary = JSON.parse(
     readFileSync(join(source, "summary.json"), "utf8"),
-  ) as EvalRunSummary;
+  ) as TSummary;
   return { runId, summary };
+}
+
+function _archiveAll<TSummary>(
+  runsDir: string,
+  archiveDir: string,
+): Array<{ runId: string; summary: TSummary }> {
+  mkdirSync(archiveDir, { recursive: true });
+  if (!existsSync(runsDir)) {
+    return [];
+  }
+  return readdirSync(runsDir)
+    .sort()
+    .flatMap((runId) => {
+      const run = _archiveRun<TSummary>(runsDir, archiveDir, runId);
+      return run ? [run] : [];
+    });
+}
+
+function _formatPdfRow(
+  run: Readonly<{ runId: string; summary: PdfAssistRunSummary }>,
+): string {
+  const { summary } = run;
+  return [
+    `[${run.runId.slice(0, 19)}](${run.runId}/results.jsonl)`,
+    `\`${summary.label}\``,
+    String(summary.answers),
+    `${summary.requiredFound}/${summary.requiredTotal}`,
+    String(summary.spurious),
+    String(summary.fabricated),
+    String(summary.subjectMisses),
+    String(summary.emptyReplies),
+    `$${summary.costPerRegion.toFixed(5)}`,
+  ].join(" | ");
+}
+
+function _buildPdfIndex(
+  runs: ReadonlyArray<{ runId: string; summary: PdfAssistRunSummary }>,
+): string {
+  const rows = runs.map((run) => {
+    return `| ${_formatPdfRow(run)} |`;
+  });
+  return `# PDF table assistant eval runs
+
+Every run of \`scripts/ai-eval/pdf/runPdfAssistEval.ts\`, copied from
+\`.temp/ai-eval/pdf-runs/\`. Each folder holds \`summary.json\` and
+\`results.jsonl\` (every region's reply, its rows, and its grade). Labels
+starting \`holdout\` ran the 121 held-out regions, where "spurious" counts
+real figures (there is no answer key) and only fabrication is graded. How to
+read and reproduce them: [eval.md](../../eval.md#pdf-table-assistant).
+
+| Run (UTC) | Label | Answers | Required found | Spurious | Fabricated | Wrong subject | Empty replies | Cost per region |
+|---|---|---|---|---|---|---|---|---|
+${rows.join("\n")}
+`;
 }
 
 function _formatSeconds(milliseconds: number): string {
@@ -75,7 +138,8 @@ grader's verdict, tokens, cost, and time). How to read and reproduce them:
 [eval.md](../eval.md).
 
 Runs with fewer than 45 questions are screens, reruns of single questions,
-or smoke checks; the label says which. Times are UTC.
+or smoke checks; the label says which. Times are UTC. The PDF table
+assistant's runs are in [pdf/](pdf/README.md).
 
 | Run (UTC) | Label | Correct | Needless | Missed | Cost per question | Latency p50 / p90 | Misses |
 |---|---|---|---|---|---|---|---|
@@ -84,15 +148,16 @@ ${rows.join("\n")}
 }
 
 function main(): void {
-  mkdirSync(ARCHIVE_DIR, { recursive: true });
-  const runs = readdirSync(RUNS_DIR)
-    .sort()
-    .flatMap((runId) => {
-      const run = _archiveRun(runId);
-      return run ? [run] : [];
-    });
+  const runs = _archiveAll<EvalRunSummary>(RUNS_DIR, ARCHIVE_DIR);
   writeFileSync(join(ARCHIVE_DIR, "README.md"), _buildIndex(runs));
-  console.log(`Archived ${runs.length} runs to ${ARCHIVE_DIR}`);
+  const pdfRuns = _archiveAll<PdfAssistRunSummary>(
+    PDF_RUNS_DIR,
+    PDF_ARCHIVE_DIR,
+  );
+  writeFileSync(join(PDF_ARCHIVE_DIR, "README.md"), _buildPdfIndex(pdfRuns));
+  console.log(
+    `Archived ${runs.length} chat runs and ${pdfRuns.length} PDF assistant runs to ${ARCHIVE_DIR}`,
+  );
 }
 
 main();

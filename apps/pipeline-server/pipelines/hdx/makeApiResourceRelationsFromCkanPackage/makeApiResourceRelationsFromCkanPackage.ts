@@ -1,3 +1,4 @@
+import { omitRecordPaths } from "@avandar/etl";
 import { promiseMapSequential } from "@avandar/utils";
 import { getHdxDatasetTimestamp } from "@pipelines/hdx/getHdxDatasetTimestamp/getHdxDatasetTimestamp";
 import { readHdxResourceColumns } from "@pipelines/hdx/readHdxResourceColumns/readHdxResourceColumns";
@@ -66,18 +67,107 @@ async function _readResource(params: {
   return { isWorkspaceLoadable: true, ...resourceColumns };
 }
 
+/**
+ * Package fields the pipeline maps in code: `name` becomes the listing's
+ * `external_dataset_id` and `metadata_modified` its `date_of_last_update`.
+ * `resources` is replaced by the relation's own resource.
+ */
+const PACKAGE_FIELDS_MAPPED_IN_CODE = [
+  "name",
+  "metadata_modified",
+  "resources",
+];
+
+/**
+ * Resource fields left out of a listing's additional source metadata. `id`,
+ * `name`, `format`, `url`, and `url_type` become listing columns.
+ * `download_url` and `hdx_rel_url` are copies of `url`, and `package_id` of
+ * the package's `id`. `fs_check_info` is HDX's file check report, 19% of
+ * HDX's raw JSON on the demo instance, whose headers the CKAN client
+ * already reads into `fileHeaders`.
+ */
+const RESOURCE_FIELDS_LEFT_OUT = [
+  "id",
+  "name",
+  "format",
+  "url",
+  "url_type",
+  "download_url",
+  "hdx_rel_url",
+  "package_id",
+  "fs_check_info",
+];
+
+function _isNonEmptyObject(value: unknown): value is object {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.keys(value).length > 0
+  );
+}
+
+function _findRawResource(record: object, resourceId: string): unknown {
+  const { resources } = record as { resources?: unknown };
+  if (!Array.isArray(resources)) {
+    return undefined;
+  }
+  return resources.find((rawResource: unknown) => {
+    return (rawResource as { id?: unknown } | null)?.id === resourceId;
+  });
+}
+
+/**
+ * What a resource's listing keeps of its package and of itself that no
+ * listing column holds, as `{ package, resource }`. `unmappedSourceRecord` is
+ * the package already without the paths its field mappings consume, so this
+ * only leaves out the fields mapped in code and the resource's copies. A
+ * part with nothing left is left out, and so is the whole when both are.
+ */
+function _buildAdditionalSourceMetadata(
+  unmappedSourceRecord: unknown,
+  resourceId: string,
+): unknown {
+  if (
+    typeof unmappedSourceRecord !== "object" ||
+    unmappedSourceRecord === null
+  ) {
+    return undefined;
+  }
+  const packagePart = omitRecordPaths(
+    unmappedSourceRecord,
+    PACKAGE_FIELDS_MAPPED_IN_CODE,
+  );
+  const resourcePart = omitRecordPaths(
+    _findRawResource(unmappedSourceRecord, resourceId),
+    RESOURCE_FIELDS_LEFT_OUT,
+  );
+  const parts = {
+    ...(_isNonEmptyObject(packagePart) ? { package: packagePart } : {}),
+    ...(_isNonEmptyObject(resourcePart) ? { resource: resourcePart } : {}),
+  };
+  return Object.keys(parts).length > 0 ? parts : undefined;
+}
+
 function _toRelation(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
+  unmappedSourceRecord: unknown;
   resource: Readonly<CkanResource>;
   sourceUpdatedAt: Date;
   readability: _ResourceReadability;
   mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
 }): ApiResourceRelation {
   const { drive, ckanPackage, resource, readability } = params;
+  const additionalSourceMetadata = _buildAdditionalSourceMetadata(
+    params.unmappedSourceRecord,
+    resource.id,
+  );
   return {
     ...params.mappedFields,
-    sourceMetadata: ckanPackage.sourceRecord,
+    ...(additionalSourceMetadata === undefined
+      ? {}
+      : { additionalSourceMetadata }),
     kind: "api_resource",
     externalDatasetId: ckanPackage.name,
     apiResourceId: resource.id,
@@ -109,13 +199,19 @@ function _toRelation(params: {
  * records one.
  *
  * The catalog metadata (organizations, description, domains, tags, and the
- * rest) comes from the pipeline config's field mapping, and the raw CKAN
- * package is kept as `sourceMetadata`. Every resource of a package shares
- * both. The mapped fields are spread first, so a mapping can never
- * overwrite a field computed here.
+ * rest) comes from the pipeline config's field mapping, which every
+ * resource of a package shares. Each relation's `additionalSourceMetadata`
+ * keeps what the package and the relation's own resource say that no
+ * listing column holds, as `{ package, resource }`: `unmappedSourceRecord`
+ * without the fields mapped here and without the resource's copies of
+ * them. The mapped fields are spread first, so a mapping can never overwrite
+ * a field computed here.
  *
  * @param params.mappedFields - The package's mapped catalog metadata, which
  *   must name its level 1 organization.
+ * @param params.unmappedSourceRecord - The raw package without the paths
+ *   its field mappings consume and the config omits
+ *   (`CatalogFieldMapper.omitMappedPaths`).
  * @param params.scope - The scope being crawled. Only its resources become
  *   relations.
  * @param params.readFileColumns - Reads a resource's columns from its file
@@ -129,6 +225,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
   mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
+  unmappedSourceRecord: unknown;
   scope: HdxScope;
   readFileColumns: HdxFileColumnReader;
   metrics: EtlPipelineMetrics;
@@ -156,6 +253,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
         sourceUpdatedAt,
         readability,
         mappedFields: params.mappedFields,
+        unmappedSourceRecord: params.unmappedSourceRecord,
       });
     },
   );

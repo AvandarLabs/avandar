@@ -10,6 +10,7 @@ import {
 import { loadRelationsPage } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import { resolveRunWindow } from "@etl/EtlEngine/resolveRunWindow/resolveRunWindow";
 import { selectPageConnections } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
+import { createWriteThrottle } from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
 import type {
   CrawlCheckpoint,
   CrawlStart,
@@ -29,6 +30,18 @@ import type {
 } from "@etl/EtlEngine/EtlEngine.types";
 import type { LoadRelationsPageContext } from "@etl/EtlEngine/loadRelationsPage/loadRelationsPage";
 import type { ConnectionSelectionState } from "@etl/EtlEngine/selectPageConnections/selectPageConnections";
+import type {
+  EtlWriteThrottleEvent,
+  WriteThrottle,
+} from "@etl/EtlEngine/writeThrottle/createWriteThrottle";
+
+/**
+ * The crawl's `pipelineMetrics` counters for its throttle: slow writes, waited
+ * out transient failures, and the milliseconds it paused for either.
+ */
+const WRITE_SLOWDOWNS_METRIC = "etl.write_slowdowns";
+const TRANSIENT_FAILURES_METRIC = "etl.transient_failures";
+const THROTTLE_PAUSE_MS_METRIC = "etl.throttle_pause_ms";
 
 /** What one scope's crawl needs. */
 export type CrawlScopeArgs<
@@ -55,6 +68,11 @@ export type CrawlScopeArgs<
   clock: EtlClock;
   /** Called after each page finishes loading, with that page's counts. */
   onPageLoaded?: (page: CrawledPageCounts) => void;
+  /**
+   * Called each time the crawl eases off the database, before it pauses:
+   * after a slow write, or a transient failure it will retry.
+   */
+  onWriteThrottled?: (event: EtlWriteThrottleEvent) => void;
 }>;
 
 /** What one loaded page added to its crawl. */
@@ -94,6 +112,8 @@ type _PagesArgs<TDrive, TConnection, TScope extends EtlScope> = CrawlScopeArgs<
     startCheckpoint: CrawlCheckpoint | undefined;
     /** The crawl's metrics recorder. */
     metrics: CrawlMetricsRecorder;
+    /** Paces the crawl's store requests and retries transient failures. */
+    writeThrottle: WriteThrottle;
   }>;
 
 type _CrawlCounts = Readonly<{
@@ -338,6 +358,7 @@ function _buildLoadContext<TDrive, TConnection, TScope extends EtlScope>(
     stores: args.stores,
     bucket: args.config.output.bucket,
     metrics: args.metrics,
+    writeThrottle: args.writeThrottle,
     workspaceLoadability: args.config.workspaceLoadability,
   };
 }
@@ -450,11 +471,13 @@ async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
       args.onPageLoaded?.(loaded.pageCounts);
       // The page is loaded, so the checkpoint may move past it.
       const checkpoint = await args.metrics.time("checkpointWriteMs", () => {
-        return advanceCrawlCheckpoint({
-          checkpoint: progress.checkpoint,
-          pageTimestamps: loaded.pageTimestamps,
-          syncedAt: args.syncedAt,
-          pipelineRunId: args.pipelineRunId,
+        return args.writeThrottle.retryTransient(() => {
+          return advanceCrawlCheckpoint({
+            checkpoint: progress.checkpoint,
+            pageTimestamps: loaded.pageTimestamps,
+            syncedAt: args.syncedAt,
+            pipelineRunId: args.pipelineRunId,
+          });
         });
       });
       progress = { ...progress, checkpoint };
@@ -469,8 +492,35 @@ async function _crawlPages<TDrive, TConnection, TScope extends EtlScope>(
 }
 
 /**
+ * The crawl's throttle, which counts each slow write, transient failure, and
+ * pause in the crawl's metrics and reports it to `onWriteThrottled`.
+ */
+function _createCrawlThrottle<TDrive, TConnection, TScope extends EtlScope>(
+  args: CrawlScopeArgs<TDrive, TConnection, TScope>,
+  metrics: CrawlMetricsRecorder,
+): WriteThrottle {
+  return createWriteThrottle({
+    clock: args.clock,
+    onEvent: (event) => {
+      metrics.pipelineMetrics.increment(
+        event.reason === "slow_write"
+          ? WRITE_SLOWDOWNS_METRIC
+          : TRANSIENT_FAILURES_METRIC,
+      );
+      metrics.pipelineMetrics.increment(
+        THROTTLE_PAUSE_MS_METRIC,
+        event.pauseMs,
+      );
+      args.onWriteThrottled?.(event);
+    },
+  });
+}
+
+/**
  * Reads the scope's checkpoint, timed as the crawl's setup, then crawls its
- * pages and builds the result with the crawl's metrics.
+ * pages and builds the result with the crawl's metrics. One throttle paces
+ * the whole crawl, so a slow database found on one page is eased off on the
+ * next.
  *
  * @throws Only when the checkpoint cannot be read.
  */
@@ -484,14 +534,18 @@ async function _crawlFromStart<
 }): Promise<CrawlScopeResult> {
   const { args } = options;
   const metrics = createCrawlMetricsRecorder(args.clock);
+  const writeThrottle = _createCrawlThrottle(args, metrics);
   const start = await metrics.time("setupMs", () => {
-    return _readScopeStart(args);
+    return writeThrottle.retryTransient(() => {
+      return _readScopeStart(args);
+    });
   });
   const { progress, outcome } = await _crawlPages({
     ...args,
     window: start.window,
     startCheckpoint: start.checkpoint,
     metrics,
+    writeThrottle,
   });
   return _buildCrawlResult({
     driveKey: args.driveKey,

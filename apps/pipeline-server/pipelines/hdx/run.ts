@@ -11,7 +11,10 @@ import type {
   EtlEngineInstance,
   EtlRunReport,
 } from "@avandar/etl";
-import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
+import type {
+  PipelineRunOptions,
+  PipelineSupabaseTarget,
+} from "@pipelines/shared/PipelineRunOptions.types";
 
 /** This pipeline's drive and field mappings. */
 const HDX_PIPELINE_CONFIG_PATH = fileURLToPath(
@@ -22,7 +25,9 @@ const HDX_PIPELINE_CONFIG_PATH = fileURLToPath(
  * Loads `hdx.pipeline.yaml` once and builds the engine over its drive and
  * field mappings.
  */
-async function _createEngine(): Promise<EtlEngineInstance> {
+async function _createEngine(
+  supabase?: PipelineSupabaseTarget,
+): Promise<EtlEngineInstance> {
   const { config, mapper } = await loadPipelineDefinition(
     HDX_PIPELINE_CONFIG_PATH,
   );
@@ -30,7 +35,7 @@ async function _createEngine(): Promise<EtlEngineInstance> {
     createHdxHttpClient({ baseUrl: HDX_BASE_URL }),
   );
   return createHdxEtlEngine({
-    ...getPipelineEtlDestination({ isRecordingDrives: true }),
+    ...getPipelineEtlDestination({ isRecordingDrives: true, supabase }),
     discovery,
     drives: listHdxDrives(config),
     mapper,
@@ -45,8 +50,9 @@ async function _createEngine(): Promise<EtlEngineInstance> {
 export async function run(
   options: PipelineRunOptions = { mode: "full" },
 ): Promise<EtlRunReport> {
-  const engine = await _createEngine();
-  return await engine.run(options);
+  const { supabase, ...runOptions } = options;
+  const engine = await _createEngine(supabase);
+  return await engine.run(runOptions);
 }
 
 /**

@@ -1,0 +1,607 @@
+[
+  {
+    "file": "onlineData",
+    "page": 1,
+    "bbox": [0, 80, 306, 455]
+  },
+  {
+    "file": "onlineData",
+    "page": 1,
+    "bbox": [0, 567, 612, 614]
+  },
+  {
+    "file": "onlineData",
+    "page": 1,
+    "bbox": [0, 80, 612, 562]
+  },
+  {
+    "file": "onlineData",
+    "page": 2,
+    "bbox": [0, 438, 612, 721]
+  },
+  {
+    "file": "onlineData",
+    "page": 2,
+    "bbox": [0, 80, 612, 424]
+  },
+  {
+    "file": "onlineData",
+    "page": 3,
+    "bbox": [0, 80, 612, 719]
+  },
+  {
+    "file": "onlineData",
+    "page": 4,
+    "bbox": [0, 457, 612, 719]
+  },
+  {
+    "file": "onlineData",
+    "page": 4,
+    "bbox": [0, 80, 612, 437]
+  },
+  {
+    "file": "onlineData",
+    "page": 5,
+    "bbox": [0, 301, 612, 719]
+  },
+  {
+    "file": "onlineData",
+    "page": 9,
+    "bbox": [0, 80, 612, 719]
+  },
+  {
+    "file": "onlineData",
+    "page": 11,
+    "bbox": [0, 424, 612, 493]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 1,
+    "bbox": [0, 491, 306, 569]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 1,
+    "bbox": [0, 80, 306, 466]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 1,
+    "bbox": [306, 521, 612, 569]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 1,
+    "bbox": [0, 491, 612, 569]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 2,
+    "bbox": [0, 612, 306, 721]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 2,
+    "bbox": [0, 422, 612, 496]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 2,
+    "bbox": [0, 80, 612, 372]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 3,
+    "bbox": [0, 184, 612, 719]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 4,
+    "bbox": [0, 335, 306, 365]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 5,
+    "bbox": [0, 652, 612, 719]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 5,
+    "bbox": [0, 139, 612, 639]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 6,
+    "bbox": [0, 426, 612, 721]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 6,
+    "bbox": [0, 281, 612, 413]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 7,
+    "bbox": [306, 119, 612, 225]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 7,
+    "bbox": [0, 665, 612, 719]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 7,
+    "bbox": [0, 80, 612, 281]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [0, 316, 306, 706]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [306, 656, 612, 706]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [306, 544, 612, 596]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [306, 456, 612, 534]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [306, 331, 612, 396]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [306, 201, 612, 255]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [0, 316, 612, 721]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [0, 201, 612, 307]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 8,
+    "bbox": [0, 80, 612, 177]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 9,
+    "bbox": [0, 531, 306, 721]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 9,
+    "bbox": [0, 171, 306, 432]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 9,
+    "bbox": [0, 98, 306, 167]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 9,
+    "bbox": [306, 641, 612, 706]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 9,
+    "bbox": [306, 591, 612, 631]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 9,
+    "bbox": [306, 531, 612, 584]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [0, 177, 306, 414]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [0, 80, 306, 173]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [306, 665, 612, 706]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [306, 535, 612, 576]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [306, 177, 612, 414]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [0, 496, 612, 719]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 10,
+    "bbox": [0, 177, 612, 429]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 11,
+    "bbox": [306, 626, 612, 667]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 11,
+    "bbox": [306, 535, 612, 576]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 11,
+    "bbox": [306, 340, 612, 381]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 11,
+    "bbox": [0, 301, 612, 719]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 11,
+    "bbox": [0, 204, 612, 288]
+  },
+  {
+    "file": "ncdSurveys",
+    "page": 12,
+    "bbox": [0, 80, 612, 719]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 1,
+    "bbox": [0, 273, 298, 688]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 1,
+    "bbox": [298, 515, 595, 589]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 1,
+    "bbox": [0, 188, 595, 688]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 2,
+    "bbox": [0, 67, 298, 742]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 2,
+    "bbox": [298, 499, 595, 586]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 2,
+    "bbox": [0, 67, 595, 766]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 3,
+    "bbox": [0, 691, 298, 766]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 4,
+    "bbox": [0, 343, 298, 478]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 4,
+    "bbox": [0, 163, 298, 286]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 4,
+    "bbox": [0, 499, 595, 559]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 5,
+    "bbox": [0, 86, 298, 743]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 5,
+    "bbox": [298, 348, 595, 743]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 5,
+    "bbox": [298, 71, 595, 322]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 5,
+    "bbox": [0, 747, 595, 771]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 5,
+    "bbox": [0, 71, 595, 743]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 6,
+    "bbox": [0, 74, 298, 752]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 6,
+    "bbox": [298, 97, 595, 182]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 7,
+    "bbox": [0, 487, 298, 520]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 7,
+    "bbox": [0, 79, 298, 430]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 7,
+    "bbox": [298, 79, 595, 454]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 7,
+    "bbox": [0, 79, 595, 454]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [0, 449, 298, 473]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [0, 243, 298, 382]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [0, 67, 298, 226]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [298, 224, 595, 373]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [298, 67, 595, 202]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [0, 422, 595, 509]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 8,
+    "bbox": [0, 67, 595, 401]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 9,
+    "bbox": [298, 67, 595, 106]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 9,
+    "bbox": [0, 67, 595, 106]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 10,
+    "bbox": [0, 293, 298, 766]
+  },
+  {
+    "file": "peruInsurance",
+    "page": 10,
+    "bbox": [298, 293, 595, 748]
+  },
+  {
+    "file": "ochaSudan",
+    "page": 1,
+    "bbox": [298, 440, 595, 617]
+  },
+  {
+    "file": "ochaSudan",
+    "page": 1,
+    "bbox": [0, 238, 595, 671]
+  },
+  {
+    "file": "ochaSudan",
+    "page": 1,
+    "bbox": [0, 62, 595, 210]
+  },
+  {
+    "file": "ochaSudan",
+    "page": 1,
+    "bbox": [0, 16, 595, 39]
+  },
+  {
+    "file": "ochaSudan",
+    "page": 3,
+    "bbox": [0, 698, 595, 791]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 5,
+    "bbox": [306, 72, 612, 707]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 5,
+    "bbox": [0, 72, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 15,
+    "bbox": [0, 402, 612, 725]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 17,
+    "bbox": [0, 154, 612, 611]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 18,
+    "bbox": [0, 223, 612, 569]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 19,
+    "bbox": [0, 85, 612, 404]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 20,
+    "bbox": [0, 99, 612, 583]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 21,
+    "bbox": [0, 85, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 22,
+    "bbox": [0, 85, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 23,
+    "bbox": [0, 85, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 24,
+    "bbox": [0, 85, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 28,
+    "bbox": [0, 471, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 33,
+    "bbox": [0, 499, 306, 597]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 33,
+    "bbox": [0, 140, 306, 169]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 33,
+    "bbox": [0, 85, 306, 128]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 33,
+    "bbox": [0, 85, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 34,
+    "bbox": [0, 430, 306, 473]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 34,
+    "bbox": [0, 292, 306, 362]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 34,
+    "bbox": [0, 99, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 35,
+    "bbox": [0, 568, 306, 652]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 35,
+    "bbox": [0, 499, 306, 555]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 35,
+    "bbox": [0, 223, 306, 293]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 35,
+    "bbox": [0, 113, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 36,
+    "bbox": [0, 113, 306, 197]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 36,
+    "bbox": [0, 99, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 37,
+    "bbox": [0, 444, 306, 500]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 37,
+    "bbox": [0, 251, 306, 321]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 37,
+    "bbox": [0, 113, 612, 721]
+  },
+  {
+    "file": "sudanSurveillance",
+    "page": 38,
+    "bbox": [0, 444, 612, 721]
+  }
+]

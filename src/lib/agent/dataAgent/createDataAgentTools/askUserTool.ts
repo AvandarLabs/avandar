@@ -1,4 +1,4 @@
-import { arr, bool, obj, opt, str } from "@earendil-works/pi-schema";
+import { ASK_USER_TOOL } from "$/agent/dataAgent/dataAgentTools";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { AgentTool } from "@earendil-works/pi-agent-core";
@@ -14,29 +14,15 @@ const CARD_BUILT_IN_OPTION_PATTERN =
 export const DEFERRED_ANSWER_TEXT =
   "The question is on the user's screen. Their answer will be their next message.";
 
-const ASK_USER_PARAMETERS = obj({
-  question: str({ description: "One neutral question, under 20 words." }),
-  options: arr(str(), {
-    minItems: 2,
-    maxItems: 5,
-    description: "Answers the data can support.",
-  }),
-  multi: opt(bool({ description: "Whether the user may pick several." })),
-});
-
 /**
  * The tool that asks the user one question on a card and waits for the
  * answer, so the clarification and the query happen in one agent run.
  */
 export function createAskUserTool(
   options: Readonly<{ host: DataAgentHost; state: DataAgentRunState }>,
-): AgentTool<typeof ASK_USER_PARAMETERS> {
+): AgentTool<typeof ASK_USER_TOOL.parameters> {
   return {
-    name: "ask_user",
-    label: "Ask the user",
-    description:
-      "Asks the user one short question with options and returns the answer. Only for choices that change who or what is counted.",
-    parameters: ASK_USER_PARAMETERS,
+    ...ASK_USER_TOOL,
     executionMode: "sequential",
     execute: async (_toolCallId, params) => {
       const askedCount = options.state.questions.filter((question) => {

@@ -699,7 +699,7 @@ start from this code, not from the plan text.
    workspace's field or column reads as missing, and the
    `bucket_column_not_a_date` detail no longer echoes a column's type. It fires
    only on updates of `concept_attribute_id`, `dataset_id`, and
-   `bucket_column_id`. Migration `20261108193037_add_bucketed_list_fields.sql`;
+   `bucket_column_id`. Migration `20261109030100_add_bucketed_list_fields.sql`;
    pgTAP asserts each hint and an `authenticated` editor case.
 2. **The RPC's rule check** is `(is_array and bucket_grain is null) = (rule is
    not null)`: a per-period field keeps a rule, a list does not.

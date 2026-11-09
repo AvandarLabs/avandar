@@ -133,14 +133,37 @@ create table public.data_catalog_listings (
   domains text[],
   -- The source's free-form keywords.
   tags text[],
-  -- The source record this listing was built from, untouched, such as a
-  -- Socrata Discovery API result or a CKAN package. Keeps source metadata
-  -- that has no column of its own, so a later column can be filled from it
-  -- without re-crawling. As of the last write that changed another column.
-  source_metadata jsonb,
   -- The drive that produced this listing. Null on a listing no drive-index
   -- pipeline wrote.
   drive_id uuid references public.data_catalog_drives (id) on delete set null,
+  -- Where this listing's Parquet copy stands. Null until a build is first
+  -- requested. Only ever set on an `api_resource` listing.
+  parquet_cache_status public.data_catalog_listings__parquet_cache_status,
+  -- The running build's id. A build may only record its result while this
+  -- still names it, so a build that was given up as lost and later finishes
+  -- cannot overwrite the build that replaced it. Null when no build runs.
+  parquet_cache_build_id uuid,
+  -- When the running or last build started. A build that has run too long
+  -- is treated as lost and may be claimed again.
+  parquet_cache_build_started_at timestamptz,
+  -- Why the last build failed, as an open data failure code. Set exactly
+  -- when `parquet_cache_status` is `failed`.
+  parquet_cache_failure_code text,
+  -- The public `opendata` bucket folder holding the Parquet copy, as
+  -- `part-00000.parquet` onward, named after the build that wrote it. The
+  -- copy columns below are set together or not at all.
+  parquet_cache_folder_path text,
+  -- How many parts the copy's folder holds.
+  parquet_cache_part_count integer,
+  -- The source's freshness token when the copy was built. Compared against
+  -- a live metadata read to decide whether the copy is stale; never parsed.
+  parquet_cache_source_version text,
+  -- When the copy was written.
+  parquet_cache_built_at timestamptz,
+  -- How many rows the copy holds.
+  parquet_cache_row_count bigint,
+  -- The copy's size in bytes.
+  parquet_cache_byte_size bigint,
   -- What catalog search matches words against, weighted by how strongly a
   -- match in each field says this is the listing the user wants: the name
   -- (A), who publishes it and what it is filed under (B), then what it says
@@ -166,6 +189,12 @@ create table public.data_catalog_listings (
       'C'
     )
   ) stored,
+  -- What the source record this listing was built from says that no other
+  -- column holds, such as a CKAN package's title or a Socrata asset's
+  -- owner. A field the pipeline maps to a column is left out, so nothing is
+  -- stored twice. Keeps the rest so a later column can be filled from it
+  -- without re-crawling. As of the last write that changed another column.
+  additional_source_metadata jsonb,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -182,7 +211,9 @@ create table public.data_catalog_listings (
       api_resource_format is null and
       cached_object_path is null and
       cached_source_version is null and
-      cached_at is null
+      cached_at is null and
+      parquet_cache_status is null and
+      parquet_cache_folder_path is null
     )
   ),
   -- An API listing names its service, instance, dataset and resource, and
@@ -215,6 +246,54 @@ create table public.data_catalog_listings (
       cached_object_path is not null and
       cached_source_version is not null and
       cached_at is not null
+    )
+  ),
+  -- A Parquet copy is written whole or not at all.
+  constraint data_catalog_listings__parquet_cache_copy_complete check (
+    (
+      parquet_cache_folder_path is null and
+      parquet_cache_part_count is null and
+      parquet_cache_source_version is null and
+      parquet_cache_built_at is null and
+      parquet_cache_row_count is null and
+      parquet_cache_byte_size is null
+    ) or
+    (
+      parquet_cache_folder_path is not null and
+      parquet_cache_part_count > 0 and
+      parquet_cache_source_version is not null and
+      parquet_cache_built_at is not null and
+      parquet_cache_row_count is not null and
+      parquet_cache_byte_size is not null
+    )
+  ),
+  -- Each status carries exactly what it means: a running build has an id
+  -- and a start time, a ready listing has a copy, a failed build says why,
+  -- and a listing no build was ever requested for carries nothing.
+  constraint data_catalog_listings__parquet_cache_status_complete check (
+    (
+      parquet_cache_status is null and
+      parquet_cache_build_id is null and
+      parquet_cache_build_started_at is null and
+      parquet_cache_failure_code is null and
+      parquet_cache_folder_path is null
+    ) or
+    (
+      parquet_cache_status = 'building' and
+      parquet_cache_build_id is not null and
+      parquet_cache_build_started_at is not null and
+      parquet_cache_failure_code is null
+    ) or
+    (
+      parquet_cache_status = 'ready' and
+      parquet_cache_build_id is null and
+      parquet_cache_folder_path is not null and
+      parquet_cache_failure_code is null
+    ) or
+    (
+      parquet_cache_status = 'failed' and
+      parquet_cache_build_id is null and
+      parquet_cache_failure_code is not null
     )
   ),
   -- An invalid listing says why, and a valid one carries no reason.

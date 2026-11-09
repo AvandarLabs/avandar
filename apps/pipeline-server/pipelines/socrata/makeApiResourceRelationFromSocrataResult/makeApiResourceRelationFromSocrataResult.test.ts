@@ -30,6 +30,7 @@ function _make(
     drive: DRIVE,
     result: { ...RESULT, columns, ...overrides },
     mappedFields: { organization1Name: "City of New York" },
+    unmappedSourceRecord: {},
   });
 }
 
@@ -46,7 +47,6 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
       apiResourceFormat: "CSV",
       displayName: "311 Service Requests",
       organization1Name: "City of New York",
-      sourceMetadata: {},
       sourceUpdatedAt: new Date("2026-10-19T08:30:00.000Z"),
       sourceAssetType: "dataset",
       sourceUrl: "https://data.cityofnewyork.us/d/erm2-nwe9",
@@ -184,20 +184,32 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
     expect(relation.isWorkspaceLoadable).toBe(false);
   });
 
-  it("spreads the mapped fields and keeps the raw record", () => {
+  it("spreads the mapped fields and keeps only what no field holds", () => {
     const relation = makeApiResourceRelationFromSocrataResult({
       drive: {
         baseUrl: "https://data.cityofnewyork.us",
         organizationLabels: {},
       },
-      result: {
-        ...RESULT,
-        sourceRecord: { resource: { id: RESULT.datasetId } },
-      },
+      result: RESULT,
       mappedFields: {
         organization1Name: "City of New York",
         organization2Name: "TLC",
         tags: ["fhv"],
+      },
+      unmappedSourceRecord: {
+        resource: {
+          id: RESULT.datasetId,
+          name: RESULT.name,
+          updatedAt: RESULT.updatedAt,
+          type: "dataset",
+          columns_field_name: ["unique_key"],
+          columns_datatype: ["Text"],
+          columns_name: ["Unique Key"],
+          download_count: 12,
+        },
+        metadata: { domain: "data.cityofnewyork.us" },
+        permalink: "https://data.cityofnewyork.us/d/erm2-nwe9",
+        owner: { display_name: "NYC OpenData" },
       },
     });
 
@@ -205,7 +217,21 @@ describe("makeApiResourceRelationFromSocrataResult", () => {
       organization1Name: "City of New York",
       organization2Name: "TLC",
       tags: ["fhv"],
-      sourceMetadata: { resource: { id: RESULT.datasetId } },
+      additionalSourceMetadata: {
+        resource: { columns_name: ["Unique Key"], download_count: 12 },
+        owner: { display_name: "NYC OpenData" },
+      },
     });
+  });
+
+  it("leaves additional source metadata out when no field is left", () => {
+    expect(
+      makeApiResourceRelationFromSocrataResult({
+        drive: DRIVE,
+        result: RESULT,
+        mappedFields: { organization1Name: "City of New York" },
+        unmappedSourceRecord: { resource: { id: RESULT.datasetId } },
+      }),
+    ).not.toHaveProperty("additionalSourceMetadata");
   });
 });

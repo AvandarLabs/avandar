@@ -113,9 +113,10 @@ function _approve(): void {
   });
 }
 
-function _respondWith(assistantText: string): void {
+function _respondWith(responseText: string): void {
   vi.mocked(APIClient.post).mockResolvedValue({
-    assistantText,
+    responseText,
+    model: "anthropic/claude-haiku-5.5",
   } as Awaited<ReturnType<typeof APIClient.post>>);
 }
 
@@ -135,8 +136,7 @@ describe("runRegionModelAssist", () => {
 
     const request = vi.mocked(decideIfDataCanCrossBoundary).mock
       .calls[0]![0] as CrossBoundaryRequest;
-    expect(request.text).toContain(IN_REGION_SENTENCE);
-    expect(request.text).not.toContain("Confidential");
+    expect(request.text).toBe(IN_REGION_SENTENCE);
     expect(request.values).toEqual([IN_REGION_SENTENCE]);
     // Without values the PII detectors never see the text at all, and
     // without the forced modal a clean region would be sent silently.
@@ -158,21 +158,31 @@ describe("runRegionModelAssist", () => {
     });
   });
 
-  it("attaches the consent ack to the request", async () => {
-    // The ack is the server's proof that the gate ran. Sending without one
-    // would leave a route to the model that the privacy log cannot see.
+  it("posts the region's text, the rules' figures, and the consent ack to the assistant's own route", async () => {
+    // The ack is the server's proof that the gate ran; the server refuses
+    // the request without it. The prompt itself lives on the server.
     _approve();
     _respondWith("[]");
 
     await _run();
 
-    const body = vi.mocked(APIClient.post).mock.calls[0]![0]
-      .body as unknown as {
-      consentAcks?: ReadonlyArray<{ ackToken: string }>;
-    };
-    expect(body.consentAcks).toEqual([
-      { ackToken: "ack-1", scope: { kind: "message_index", index: 0 } },
-    ]);
+    const request = vi.mocked(APIClient.post).mock.calls[0]![0];
+    expect(request.route).toBe("chat/:workspaceId/extract-measurements");
+    expect(request.body).toEqual({
+      regionText: IN_REGION_SENTENCE,
+      alreadyExtracted: expect.any(Array),
+      ackToken: "ack-1",
+    });
+  });
+
+  it("sends nothing when no consent ack is available", async () => {
+    _approve();
+    vi.mocked(PendingAcks.consumeAckForText).mockResolvedValue(undefined);
+
+    const outcome = await _run();
+
+    expect(APIClient.post).not.toHaveBeenCalled();
+    expect(outcome).toEqual({ kind: "skipped", reason: "consent_declined" });
   });
 
   it("leaves the model to the server", async () => {

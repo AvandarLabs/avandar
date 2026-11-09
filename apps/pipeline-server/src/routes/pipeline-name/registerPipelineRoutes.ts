@@ -9,7 +9,12 @@ import {
   INVOCATION_HEADER,
 } from "@pipeline-server/routes/pipeline-name/buildServerRunInvocation/buildServerRunInvocation";
 import { listScopes } from "@pipeline-server/routes/pipeline-name/listScopes/listScopes";
+import {
+  readSupabaseTarget,
+  SUPABASE_TARGET_ERROR_NAME,
+} from "@pipeline-server/routes/pipeline-name/readSupabaseTarget/readSupabaseTarget";
 import { run } from "@pipeline-server/routes/pipeline-name/run/run";
+import { requireServerAuth } from "@pipeline-server/routes/requireServerAuth/requireServerAuth";
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
 import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
@@ -38,49 +43,6 @@ type PipelineScopesRequest = FastifyRequest<{
   };
 }>;
 
-function _getServerSecret(): string | undefined {
-  const rawSecret: string | undefined = process.env.AVA_PIPELINE_SERVER_SECRET;
-  return rawSecret?.trim();
-}
-
-function _getBearerToken(authorizationHeader: unknown): string | undefined {
-  const prefix = "Bearer ";
-  if (
-    typeof authorizationHeader !== "string" ||
-    !authorizationHeader.startsWith(prefix)
-  ) {
-    return undefined;
-  }
-  return authorizationHeader.slice(prefix.length).trim();
-}
-
-async function _requireRunAuth(options: {
-  request: FastifyRequest;
-  reply: FastifyReply;
-}): Promise<FastifyReply | undefined> {
-  const pipelineServerSecret: string | undefined = _getServerSecret();
-
-  if (!pipelineServerSecret) {
-    return await options.reply.status(500).send({
-      ok: false,
-      error: "Server is missing AVA_PIPELINE_SERVER_SECRET.",
-    });
-  }
-
-  const actualSecret: string | undefined = _getBearerToken(
-    options.request.headers.authorization,
-  );
-
-  if (actualSecret !== pipelineServerSecret) {
-    return await options.reply.status(401).send({
-      ok: false,
-      error: "Unauthorized.",
-    });
-  }
-
-  return undefined;
-}
-
 /**
  * The run body's shape. Unknown keys are rejected, so a typo such as
  * `incremntal` answers 400 instead of silently running in full. This uses
@@ -98,6 +60,7 @@ const RUN_BODY_SCHEMA = {
 const _CLIENT_ERROR_NAMES: ReadonlySet<string> = new Set([
   ETL_RUN_OPTIONS_ERROR_NAME,
   INVALID_PIPELINE_NAME_ERROR_NAME,
+  SUPABASE_TARGET_ERROR_NAME,
 ]);
 
 function _getErrorStatus(error: unknown): 400 | 500 {
@@ -131,6 +94,7 @@ async function _runPipeline(
     const report = await run({
       pipelineName: request.params.pipelineName,
       ...options,
+      supabase: readSupabaseTarget(request.headers),
       invocation: buildServerRunInvocation({
         invocationHeader: request.headers[INVOCATION_HEADER],
         requestBody: request.body ?? {},
@@ -175,7 +139,11 @@ async function _listPipelineScopes(
  * as JSON. Auth is checked before the body is validated, so an
  * unauthenticated caller gets 401 whatever it sends. Invalid options answer
  * 400, and the pipeline does not run. So does a pipeline name that is not a
- * plain folder name of lowercase letters, digits, `_` and `-`. A run where
+ * plain folder name of lowercase letters, digits, `_` and `-`, and a run that
+ * does not name the Supabase project to load into: the server keeps no
+ * Supabase credentials, so each run sends its project's URL and service role
+ * key in the `X-Ava-Supabase-Url` and `X-Ava-Supabase-Service-Role-Key`
+ * headers (see `readSupabaseTarget`). A run where
  * every crawl failed answers 500 with the error and the report. Each run is
  * recorded with the request body, the CLI's `X-Ava-Invocation` header when
  * present, and the server's host and `AVA_CODE_VERSION`.
@@ -191,7 +159,7 @@ export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
       schema: { body: RUN_BODY_SCHEMA },
       attachValidation: true,
       preValidation: async (request, reply) => {
-        const authError = await _requireRunAuth({ request, reply });
+        const authError = await requireServerAuth({ request, reply });
         // A request with no body is a full run, so it validates as `{}`.
         request.body ??= {};
         return authError;
@@ -203,7 +171,7 @@ export const registerPipelineRoutes: FastifyPluginAsync = async (server) => {
     "/:pipelineName/scopes",
     {
       preValidation: async (request, reply) => {
-        return await _requireRunAuth({ request, reply });
+        return await requireServerAuth({ request, reply });
       },
     },
     _listPipelineScopes,

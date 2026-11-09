@@ -5,13 +5,16 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { buildDataAgentProxyContext } from "@sbfn/chat/PostAgentStream/buildDataAgentProxyContext.ts";
+import { loadDataAgentDatasets } from "@sbfn/chat/PostAgentStream/loadDataAgentDatasets.ts";
 import { toProxyEvent } from "@sbfn/chat/PostAgentStream/toProxyEvent.ts";
 import { z } from "zod";
+import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools.ts";
 import {
   DATA_AGENT_PROXY_MAX_OUTPUT_TOKENS,
   DATA_AGENT_PROXY_MODEL_IDS,
 } from "$/agent/DataAgentModelRoster.ts";
-import type { Context, Model, Api } from "@earendil-works/pi-ai";
+import type { Model, Api } from "@earendil-works/pi-ai";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 
@@ -66,12 +69,17 @@ function _toSseResponse(
  * The server side of Pi's `streamProxy`: the browser data agent sends each
  * model request here, and this streams the model's events back. It holds the
  * OpenRouter key, checks the caller can use the Data Explorer in the
- * workspace, and enforces the model allowlist and output cap. Only the
- * options that change the answer pass through.
+ * workspace, and enforces the model allowlist and output cap.
+ *
+ * The prompt and tools are the server's (decision D04): the path names the
+ * prompt version, the system prompt is built from the workspace's datasets,
+ * and the browser contributes only the conversation. That keeps the prompt
+ * private and stops the proxy from serving as a general-purpose model
+ * endpoint. Only the options that change the answer pass through.
  */
 export const PostAgentStream = POST({
-  path: "/:workspaceId/agent/api/stream",
-  schema: { workspaceId: z.uuid() },
+  path: "/:workspaceId/agent/:promptId/api/stream",
+  schema: { workspaceId: z.uuid(), promptId: z.string() },
 })
   .bodySchema({
     model: z.looseObject({ id: z.string() }),
@@ -89,6 +97,12 @@ export const PostAgentStream = POST({
     if (!openRouterApiKey) {
       throw new Error("OPEN_ROUTER_API_KEY environment variable is not set");
     }
+    if (pathParams.promptId !== DATA_AGENT_PROMPT_ID) {
+      throw new AvaHTTPError(
+        `Unknown agent prompt "${pathParams.promptId}". Reload the page.`,
+        BAD_REQUEST,
+      );
+    }
     await assertMeetsMinAppRole({
       supabaseClient,
       workspaceId: pathParams.workspaceId,
@@ -99,19 +113,23 @@ export const PostAgentStream = POST({
       throw new AvaHTTPError("This conversation is too long", BAD_REQUEST);
     }
     const options = body.options ?? {};
-    const stream = models.streamSimple(
-      _resolveModel(body.model.id),
-      body.context as unknown as Context,
-      {
-        apiKey: openRouterApiKey,
-        reasoning: options.reasoning,
-        sessionId: options.sessionId,
-        temperature: options.temperature,
-        maxTokens: Math.min(
-          options.maxTokens ?? DATA_AGENT_PROXY_MAX_OUTPUT_TOKENS,
-          DATA_AGENT_PROXY_MAX_OUTPUT_TOKENS,
-        ),
-      },
-    );
+    const context = buildDataAgentProxyContext({
+      clientMessages: body.context.messages,
+      datasets: await loadDataAgentDatasets({
+        supabaseClient,
+        workspaceId: pathParams.workspaceId,
+      }),
+      today: new Date().toISOString().slice(0, 10),
+    });
+    const stream = models.streamSimple(_resolveModel(body.model.id), context, {
+      apiKey: openRouterApiKey,
+      reasoning: options.reasoning,
+      sessionId: options.sessionId,
+      temperature: options.temperature,
+      maxTokens: Math.min(
+        options.maxTokens ?? DATA_AGENT_PROXY_MAX_OUTPUT_TOKENS,
+        DATA_AGENT_PROXY_MAX_OUTPUT_TOKENS,
+      ),
+    });
     return _toSseResponse(stream);
   });

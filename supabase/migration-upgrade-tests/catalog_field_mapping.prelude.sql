@@ -16,6 +16,12 @@ begin;
 -- level-2 organization, topic, and keyword filters.
 alter table public.data_catalog_listings drop column search_vector;
 
+-- `20261109020622_catalog_additional_source_metadata` changed the upsert's
+-- return type, which the migration's `create or replace` cannot change
+-- back, and replaced `source_metadata` with `additional_source_metadata`,
+-- which is dropped with the other new columns below.
+drop function public.rpc_data_catalog_listings__upsert_with_relation_columns (jsonb);
+
 drop function public.util__text_array_to_text (text[]);
 
 drop function public.rpc_data_catalog_listings__search_facets (
@@ -61,7 +67,7 @@ alter table public.data_catalog_listings
   drop column organization4_name,
   drop column domains,
   drop column tags,
-  drop column source_metadata;
+  drop column additional_source_metadata;
 
 drop table public.data_catalog_drives;
 

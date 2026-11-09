@@ -4,17 +4,51 @@
 # socrata.pipeline.yaml for the mapping kinds, and
 # docs/measles-demo/catalog-field-mapping-design.md.
 
+# Level 2 is where the data comes from (`dataset_source`), not a part of the
+# publishing organization: HDX has no deeper organization levels.
 organizationLabels:
   1: Organization
+  2: Data source
 
 fields:
   organization1_name: { from: organization.title }
+  organization2_name: { script: ./mappers/hdxDataSource/hdxDataSource.ts }
   description: { from: notes }
+  notes: { from: caveats }
   license: { from: license_title }
-  domains: { script: ./mappers/hdxGroupTitles/hdxGroupTitles.ts }
-  tags: { script: ./mappers/hdxTagNames/hdxTagNames.ts }
+  coverage_start_date: { script: ./mappers/hdxCoverageDate/hdxCoverageDate.ts }
+  coverage_end_date: { script: ./mappers/hdxCoverageDate/hdxCoverageDate.ts }
+  # HDX's groups are countries, so they are keywords, and topics come from
+  # its tag vocabulary.
+  domains: { script: ./mappers/hdxTopics/hdxTopics.ts }
+  tags: { script: ./mappers/hdxKeywords/hdxKeywords.ts }
   update_frequency:
     { script: ./mappers/hdxUpdateFrequency/hdxUpdateFrequency.ts }
+
+# Package fields additional_source_metadata leaves out although no field maps
+# them. license_other is a custom license's full text, repeated on every
+# resource listing of a package (the license's name is in `license`).
+# owner_org and the organization's other keys repeat the organization on every
+# listing (its title is organization1_name, and its id and name are kept).
+# solr_additions repeats the groups for HDX's search index.
+additionalSourceMetadata:
+  omit:
+    - license_other
+    - owner_org
+    - solr_additions
+    - organization.type
+    - organization.description
+    - organization.image_url
+    - organization.created
+    - organization.is_organization
+    - organization.approval_status
+    - organization.state
+
+# How the pipeline server downloads one listing for its Parquet copy. CKAN
+# serves a resource only as one file, so it does not page.
+download:
+  paging: false
+  script: ./download/hdxListingDownload.ts
 
 # HDX is one CKAN deployment, so this lists one drive. An empty list switches
 # the pipeline off.
