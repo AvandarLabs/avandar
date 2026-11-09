@@ -240,7 +240,6 @@ async function _openSeededListing(
   });
   await page.getByRole("tab", { name: "Open data" }).click();
   await page
-    .getByRole("complementary", { name: "Filters" })
     .getByRole("textbox", { name: "Search open data" })
     .fill(E2E_SEARCH_WORD, { timeout: LONG_WAIT });
   await page

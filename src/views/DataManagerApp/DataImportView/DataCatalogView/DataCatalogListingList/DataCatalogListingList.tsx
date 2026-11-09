@@ -1,9 +1,10 @@
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { useId } from "@mantine/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { buildOrganizationLine } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
 import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
@@ -12,6 +13,50 @@ import type { KeyboardEvent, ReactNode } from "react";
 
 /** A first guess at a row's height, corrected once the row is measured. */
 const ESTIMATED_ROW_HEIGHT_PX = 60;
+
+/**
+ * One line of a listing's name. A name that does not fit ends in an ellipsis,
+ * and hovering that name shows the rest, so every row stays the same height.
+ */
+function DataCatalogListingName({
+  name,
+  isSelected,
+}: {
+  name: string;
+  isSelected: boolean;
+}): ReactNode {
+  const nameRef = useRef<HTMLParagraphElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useLayoutEffect(() => {
+    const element = nameRef.current;
+    if (element === null) {
+      return;
+    }
+    const updateIsTruncated = (): void => {
+      setIsTruncated(element.scrollWidth > element.clientWidth + 1);
+    };
+    updateIsTruncated();
+    const observer = new ResizeObserver(updateIsTruncated);
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, [name]);
+
+  return (
+    <Tooltip label={name} disabled={!isTruncated} position="top-start">
+      <Text
+        ref={nameRef}
+        className={css.dataCatalogListingListName}
+        size="sm"
+        fw={isSelected ? 600 : 500}
+      >
+        {name}
+      </Text>
+    </Tooltip>
+  );
+}
 
 type Props = {
   /** Every result page loaded so far, in the order search sorted them. */
@@ -172,10 +217,15 @@ export function DataCatalogListingList({
                 onSelect(listing.id);
               }}
             >
-              <Text size="sm" fw={isSelected ? 600 : 500} lineClamp={2}>
-                {listing.displayName}
-              </Text>
-              <Text c="dimmed" lineClamp={1} size="xs">
+              <DataCatalogListingName
+                name={listing.displayName}
+                isSelected={isSelected}
+              />
+              <Text
+                c="dimmed"
+                className={css.dataCatalogListingListFacts}
+                size="xs"
+              >
                 {[
                   buildOrganizationLine(listing),
                   listing.fileFormat,

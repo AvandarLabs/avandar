@@ -1,13 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  CloseButton,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-  UnstyledButton,
-} from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
+import { Stack, Switch, Text, UnstyledButton } from "@mantine/core";
 import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
@@ -24,22 +16,18 @@ import type {
 import type { ReactNode } from "react";
 
 type Props = {
-  search: string;
-  onSearchChange: (search: string) => void;
   filters: Readonly<CatalogListingFilters>;
   facets: Readonly<CatalogFacets>;
   onFiltersChange: (filters: CatalogListingFilters) => void;
 };
 
 /**
- * Everything that narrows the catalog, in the order a user reaches for it:
- * search first, then who published the data and what it is about, its
+ * The catalog's filters: who published the data and what it is about, its
  * format, and how fresh it is. Every option carries the number of results it
- * would leave, so a user can see a dead end before walking into it.
+ * would leave, so a user can see a dead end before walking into it. Search
+ * lives on the tab row, beside Open data.
  */
 export function DataCatalogFilterRail({
-  search,
-  onSearchChange,
   filters,
   facets,
   onFiltersChange,
@@ -49,27 +37,6 @@ export function DataCatalogFilterRail({
   return (
     <div className={css.dataCatalogFilterRail}>
       <Stack gap="lg" className={css.dataCatalogFilterRailBody}>
-        <TextInput
-          aria-label={t`Search open data`}
-          placeholder={t`Search datasets`}
-          leftSection={<IconSearch size={16} stroke={1.6} aria-hidden />}
-          rightSection={
-            search ? (
-              <CloseButton
-                size="sm"
-                aria-label={t`Clear search`}
-                onClick={() => {
-                  onSearchChange("");
-                }}
-              />
-            ) : null
-          }
-          value={search}
-          onChange={(event) => {
-            onSearchChange(event.currentTarget.value);
-          }}
-        />
-
         <DataCatalogFacetSelect
           label={t`Publisher`}
           placeholder={t`All publishers`}

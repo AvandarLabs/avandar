@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearOpenDataColumnTypeSampleCache } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 import {
   isColumnTypeVerificationDue,
   verifyOpenDataColumnTypes,
@@ -84,6 +85,7 @@ describe("isColumnTypeVerificationDue", () => {
 
 describe("verifyOpenDataColumnTypes", () => {
   beforeEach(() => {
+    clearOpenDataColumnTypeSampleCache();
     getSessionMock.mockResolvedValue({
       data: { session: { access_token: "session-token" } },
     });

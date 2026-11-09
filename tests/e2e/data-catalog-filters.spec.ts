@@ -120,7 +120,7 @@ async function _expectNumResults(
 
 /**
  * Opens the open data catalog, checks the rail offers Publisher and Keywords
- * before anything is typed, and searches it for the seeded word.
+ * before anything is typed, and searches from the tab row for the seeded word.
  */
 async function _searchOpenDataCatalog(
   options: Readonly<{ page: Page; workspaceSlug: string }>,
@@ -135,7 +135,7 @@ async function _searchOpenDataCatalog(
     timeout: LONG_WAIT,
   });
   await expect(rail.getByRole("combobox", { name: "Keywords" })).toBeVisible();
-  await rail
+  await page
     .getByRole("textbox", { name: "Search open data" })
     .fill(E2E_CATALOG_SEARCH_WORD, { timeout: LONG_WAIT });
   await _expectNumResults({ page, numResults: 3 });

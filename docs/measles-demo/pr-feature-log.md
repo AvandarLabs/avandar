@@ -1340,6 +1340,7 @@ commits belong to the features that own them, not here.
 | `d7fd436a8` | fix(catalog): keep the source record as the source sent it | All of it |
 | `bc4baf853` | test(catalog): filter the open data catalog by publisher, agency, and keyword end to end | All of it |
 | `ad6d300a7` | feat(catalog): offer keywords in the rail and return every facet in one value | All of it. Supersedes `d90481335`'s Keywords chips (`DataCatalogKeywordFacet.tsx` is deleted) and moves the facet rows into `52.data_catalog_listings__search_facet_rows.sql`, with the RPC in `53.`. Regenerate the migration, types, desktop migration, and `.po` catalogs. |
+| `dbf921eda` | fix(catalog): bust the persisted query cache for the new facet shape | All of it. Must ship with `ad6d300a7`: it bumps `CACHE_SCHEMA_VERSION` so browsers drop facets cached without `tags`. If `develop` has bumped the version since, bump to the next one instead of taking `v10`. |
 
 *Docs, which go with F9:*
 
@@ -1902,6 +1903,7 @@ Its commits are covered by F19, not numbered here.
 | 138 | `ec060372c` | F23 |
 | 139 | `4d1d2a7d5` | F23 |
 | 140 | `2d61eb961` | F23 |
+| 141 | `dbf921eda` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full

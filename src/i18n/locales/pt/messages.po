@@ -1531,7 +1531,7 @@ msgstr "Não foi possível serializar novamente a subconsulta JOIN na posição 
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Digite uma pergunta e eu gerarei o SQL e o executarei para você."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "Pesquisar conjuntos de dados"
 
@@ -7293,7 +7293,7 @@ msgstr "Há um filtro ativo nesta camada. Ele pode estar excluindo tudo."
 msgid "Workspace name updated"
 msgstr "Nome do espaço de trabalho atualizado"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "Pesquisar dados abertos"
 
@@ -9571,7 +9571,7 @@ msgstr "Se houver múltiplos valores de {attributeName} para um {0}, então..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Expressão de coluna sem nome no SELECT; ignorada."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Limpar pesquisa"

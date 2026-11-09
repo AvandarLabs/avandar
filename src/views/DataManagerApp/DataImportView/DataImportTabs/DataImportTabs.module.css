@@ -32,3 +32,22 @@
     )
   );
 }
+
+/*
+ * The catalog search shares this row. It starts just after the Open data tab
+ * and grows into the free width. The shared tab list pins a trailing section
+ * to the far edge, so this row left-aligns that section and lets it grow.
+ */
+.dataImportTabsList:has(.dataImportTabsSearch) {
+  justify-content: flex-start;
+}
+
+.dataImportTabsList:has(.dataImportTabsSearch) > :last-child {
+  flex: 1 1 auto;
+  margin-left: var(--mantine-spacing-sm);
+  min-width: 0;
+}
+
+.dataImportTabsSearch {
+  width: 100%;
+}

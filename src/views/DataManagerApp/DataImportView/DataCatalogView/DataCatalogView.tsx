@@ -15,7 +15,7 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconWorldSearch } from "@tabler/icons-react";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { uuid } from "$/lib/uuid";
 import { DataCatalogDriveClient } from "@/clients/data-catalog-listings/DataCatalogDriveClient";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
@@ -93,6 +93,18 @@ type Props = BoxProps & {
   /** When false, the add action is disabled (subscription limits). */
   isAddAllowed: boolean;
 
+  /** The catalog query typed in the tab-row search field. */
+  search: string;
+
+  /** Called with the search field's next value. */
+  onSearchChange: (search: string) => void;
+
+  /**
+   * Tells the host when nothing is published, so it can hide the tab-row
+   * search. False while the catalog is loading or has listings.
+   */
+  onCatalogEmptyChange?: (isCatalogEmpty: boolean) => void;
+
   /**
    * When set, this callback is invoked with the newly saved dataset after
    * a successful catalog-listing import.
@@ -114,13 +126,15 @@ type Props = BoxProps & {
  */
 export function DataCatalogView({
   isAddAllowed,
+  search,
+  onSearchChange,
+  onCatalogEmptyChange,
   onSaveSuccess,
   className,
   ...boxProps
 }: Props): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
-  const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<CatalogListingFilters>(
     EMPTY_CATALOG_LISTING_FILTERS,
   );
@@ -140,6 +154,11 @@ export function DataCatalogView({
     sortBy,
   });
   const facets = useDataCatalogFacets({ query: debouncedSearch, filters });
+  const isCatalogEmpty =
+    facets !== undefined && facets.numCatalogListings === 0;
+  useEffect(() => {
+    onCatalogEmptyChange?.(isCatalogEmpty);
+  }, [isCatalogEmpty, onCatalogEmptyChange]);
   const isLoadingCatalog = catalogSearch.isLoading;
   const changeFilters = (nextFilters: CatalogListingFilters): void => {
     setFilters(settleCatalogListingFilters(nextFilters));
@@ -317,13 +336,13 @@ export function DataCatalogView({
     </Button>
   );
 
-  // Nothing published yet. The search field and the browser panes are all
+  // Nothing published yet. The tab-row search and the browser panes are all
   // affordances for choosing among things, so with nothing to choose they are
   // dead chrome: a box that can only ever answer "no results" and a pane that
   // asks the user to pick from an empty list. The activation state replaces
-  // all of it and carries the one move that does something, which is telling
-  // us what to publish next. Same rule the no-datasets route follows.
-  if (facets !== undefined && facets.numCatalogListings === 0) {
+  // the panes. `onCatalogEmptyChange` tells the host to drop the search.
+  // Same rule the no-datasets route follows.
+  if (isCatalogEmpty) {
     return (
       <Box {...boxProps}>
         <AppSlateEmptyState
@@ -377,8 +396,6 @@ export function DataCatalogView({
   };
   const filterRail = (
     <DataCatalogFilterRail
-      search={search}
-      onSearchChange={setSearch}
       filters={filters}
       facets={facets ?? EMPTY_CATALOG_FACETS}
       onFiltersChange={changeFilters}
@@ -461,7 +478,7 @@ export function DataCatalogView({
                     variant="default"
                     size="xs"
                     onClick={() => {
-                      setSearch("");
+                      onSearchChange("");
                     }}
                   >
                     <Trans>Clear search</Trans>

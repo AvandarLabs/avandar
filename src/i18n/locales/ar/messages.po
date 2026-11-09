@@ -1504,7 +1504,7 @@ msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي لـ 
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "اكتب سؤالًا وسأُنشئ SQL وأُشغّله نيابةً عنك."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "البحث في مجموعات البيانات"
 
@@ -7200,7 +7200,7 @@ msgstr "يوجد عامل تصفية واحد نشط على هذه الطبقة.
 msgid "Workspace name updated"
 msgstr "تم تحديث اسم مساحة العمل"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "البحث في البيانات المفتوحة"
 
@@ -9444,7 +9444,7 @@ msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لوا
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "مسح البحث"
