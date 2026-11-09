@@ -195,6 +195,32 @@ case's id. Runs archived under the `phase-1a-fixes` label.
 
 - No reply in either run named a table alias. Both runs cost $0.015.
 
+### Phase 1B
+
+Runs on 2026-11-09 for attachable context (D41, [phase-1b.md](specs/phase-1b.md)),
+archived under the `phase-1b` label. The agent ran with prompt v3, which reads
+the `<attached>` and `<mentioned>` blocks. The mention questions M01 to M06 are
+described under "Questions and ground truth".
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1b:agent-mentions #1-#3 (M01-M06, M03b) | 7/7, 7/7, 7/7 | 0 / 0 | $0.00018 to $0.00036 | 3,557 to 3,560 | 1.8 to 2.2 s / 2.3 to 2.4 s |
+| phase-1b:agent-page (P01-P07) | 7/7 | 0 / 0 | $0.00021 | 3,556 | 1.7 s / 2.7 s |
+| phase-1b:agent-45 | 44/45 | 0 / 0 | $0.00055 | 3,478 | 2.1 s / 3.5 s |
+| phase-1b:rerun-n04 | 1/1 | 0 / 0 | $0.00036 | | 3.5 s |
+
+- The bar is met: every mention question passes on all three runs, P01 to P07
+  still pass on v3, and the 45 questions score 44/45. The miss, N04, left out
+  zero-death countries, as it does on some runs, and passed on rerun.
+- M05 (an unavailable dashboard) ran no query and told the user it cannot see
+  it on every run. M06 kept `'<value 1>'` for the mentioned Kings County chart.
+- Prompt v3 adds about 290 input tokens per call (+9%) over v2's last runs.
+  Cost per question on the 45 was $0.00055 against $0.00028 on v2's last run,
+  with fewer model calls (58 against 62). It stays inside the range v2's own
+  runs showed ($0.00026 to $0.00062), so the difference is run-to-run
+  variance and caching, not more work per question. All Phase 1B runs cost
+  about $0.03.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -457,6 +483,21 @@ has open when asking. The Pi harness renders it with
 | P05 | Map page | A data question that has nothing to do with the page |
 | P06 | Follows P03 | A follow-up on the new result |
 
+`covid/covidMentionQuestions.ts` adds the mention questions for attachable
+context. Each carries `attached` (the chat's tray) and `mentions` (gadgets the
+prompt names with ref tokens); the Pi harness renders them with
+`buildAgentContextBlocks` through the conversation's vault, as the browser
+does. They run only with `--questions M`.
+
+| Id | Setup | Question shape |
+|---|---|---|
+| M01 | Data Explorer on global deaths, US deaths mentioned | A total that must come from the mentioned dataset |
+| M02 | Dashboard with the cases chart open, another dashboard's deaths chart mentioned | "Show this by week", from the mentioned chart |
+| M03, M03b | A dashboard attached; M03b follows two turns on | A total, then a follow-up that still uses it (unchanged line) |
+| M04 | Two datasets mentioned | "Compare these" by month |
+| M05 | An unavailable dashboard mentioned | Must run no query, say it cannot see it, and state no numbers |
+| M06 | The Kings County chart mentioned, `Admin2` personal | "Show this by week", keeping `'<value 1>'` |
+
 ### Metrics
 
 | Metric | Definition |
@@ -527,6 +568,7 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | Gemma 4 E2B offline | prefix `AVA_EVAL_WEBLLM_LIB=<path to web-llm 0.2.86 lib/index.js>` |
 | One question or category | `--questions N11` or `--questions H` |
 | The page-context questions (add `--label phase-1a-redaction:agent-page`) | `--harness pi --config haiku-sonnet --questions P` |
+| The mention questions (add `--label phase-1b:agent-mentions`) | `--harness pi --config haiku-sonnet --questions M` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 
 The PDF table assistant has its own runner,

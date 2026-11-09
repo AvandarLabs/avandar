@@ -41,6 +41,11 @@ import type { MutableRefObject } from "react";
 type ApplyChatModelTurnResponseOptions = {
   response: ChatResponse.T;
   apiMessages: readonly ChatClientMessage.T[];
+  /**
+   * The question as labels on this device show it, each mention as
+   * `@Name`. Defaults to the last question in `apiMessages`.
+   */
+  questionLabel?: string;
   currentUser: User.T | undefined;
   currentPageContext: ChatPageContext.T;
   workspaceId: Workspace.Id;
@@ -62,6 +67,7 @@ async function reviewAndApplySql(
     Pick<
       ApplyChatModelTurnResponseOptions,
       | "apiMessages"
+      | "questionLabel"
       | "currentUser"
       | "workspaceId"
       | "isGenerationStale"
@@ -95,7 +101,8 @@ async function reviewAndApplySql(
   if (options.isGenerationStale()) {
     return false;
   }
-  const prompt = getLastQuestionFromMessages(options.apiMessages);
+  const prompt =
+    options.questionLabel ?? getLastQuestionFromMessages(options.apiMessages);
   options.dataExplorerDispatch.setRawSql(options.sql);
   options.dataExplorerDispatch.setNlPrompt(prompt);
   try {

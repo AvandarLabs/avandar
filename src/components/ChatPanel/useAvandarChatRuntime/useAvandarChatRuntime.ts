@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
+import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
@@ -49,6 +50,7 @@ export function useAvandarChatRuntime(): {
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
   const dashboardEditorState = DashboardEditorStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
+  const { contextTray } = ChatPanelStateManager.useState();
   const { parseSql } = useSqlToStructuredQuery();
   const { t } = useLingui();
   // Refs keep the adapter instance stable while still reading fresh values
@@ -61,6 +63,13 @@ export function useAvandarChatRuntime(): {
   const dashboardEditorStateRef = useRef(dashboardEditorState);
   const parseSqlRef = useRef(parseSql);
   const userRef = useRef(user);
+  const contextTrayRef = useRef(contextTray);
+  // Relies on the workspace layout remounting per workspace
+  // (`key={workspace.id}`).
+  const hasHydratedTrayRef = useRef(false);
+  // Set by hydration so the persist effect of that same commit, which still
+  // sees the empty tray, does not overwrite what was just loaded.
+  const skipNextTrayPersistRef = useRef(false);
   const workspaceIdRef = useRef(workspace.id);
   const workspaceRef = useRef(workspace);
   const chatGenerationRef = useRef(0);
@@ -103,6 +112,7 @@ export function useAvandarChatRuntime(): {
       dashboardEditorStateRef.current = dashboardEditorState;
       parseSqlRef.current = parseSql;
       userRef.current = user;
+      contextTrayRef.current = contextTray;
       workspaceIdRef.current = workspace.id;
       workspaceRef.current = workspace;
       copyRef.current = {
@@ -131,7 +141,16 @@ export function useAvandarChatRuntime(): {
         agentUnavailable: t`The assistant could not answer that. Try again in a moment.`,
       };
     },
-    [dashboardEditorState, pageContext, pathname, parseSql, t, user, workspace],
+    [
+      contextTray,
+      dashboardEditorState,
+      pageContext,
+      pathname,
+      parseSql,
+      t,
+      user,
+      workspace,
+    ],
   );
 
   // Tracks the last completed turn so we can detect "Try Again". When the
@@ -163,6 +182,7 @@ export function useAvandarChatRuntime(): {
       dataExplorerDispatch,
       dashboardEditorDispatch,
       chatPanelDispatch,
+      contextTrayRef,
     });
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
   }, [dataExplorerDispatch, dashboardEditorDispatch, chatPanelDispatch]);
@@ -187,6 +207,42 @@ export function useAvandarChatRuntime(): {
       runtime.thread.reset(stored);
     },
     [runtime, user, workspace.id],
+  );
+
+  useEffect(
+    function hydrateContextTrayWhenIdentityIsReady() {
+      if (hasHydratedTrayRef.current || !user || !workspace.id) {
+        return;
+      }
+      hasHydratedTrayRef.current = true;
+      skipNextTrayPersistRef.current = true;
+      chatPanelDispatch.setContextTray(
+        ChatContextTrayStore.read({
+          workspaceId: workspace.id,
+          userId: user.id,
+        }),
+      );
+    },
+    [chatPanelDispatch, user, workspace.id],
+  );
+
+  useEffect(
+    function persistContextTray() {
+      if (!hasHydratedTrayRef.current || !user || !workspace.id) {
+        return;
+      }
+      if (skipNextTrayPersistRef.current) {
+        skipNextTrayPersistRef.current = false;
+        return;
+      }
+      const identity = { workspaceId: workspace.id, userId: user.id };
+      if (contextTray.length === 0) {
+        ChatContextTrayStore.clear(identity);
+        return;
+      }
+      ChatContextTrayStore.write({ ...identity, refs: contextTray });
+    },
+    [contextTray, user, workspace.id],
   );
 
   useEffect(
@@ -247,6 +303,10 @@ export function useAvandarChatRuntime(): {
         userId: currentUser.id,
       });
     }
+    if (currentUser && workspaceId) {
+      ChatContextTrayStore.clear({ workspaceId, userId: currentUser.id });
+    }
+    chatPanelDispatch.setContextTray([]);
     chatPanelDispatch.setPendingClarification(undefined);
     if (pageContextRef.current.app === "case-manager") {
       runtime.thread.append({

@@ -65,6 +65,10 @@ msgstr "تعذّر نسخ الرابط."
 msgid "First {numRows} rows"
 msgstr "أول {numRows} صفوف"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove from context"
+msgstr "إزالة من السياق"
+
 #: src/views/DashboardApp/DashboardShareModal/QueriedSlicePreview.tsx
 msgid "No columns detected for this dataset. Falling back to all columns."
 msgstr "لم يتم الكشف عن أي أعمدة لهذه المجموعة من البيانات. سيتم الرجوع إلى "
@@ -584,6 +588,10 @@ msgstr "تخطيط الشريط الجانبي"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "إضافة حالة"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Search dashboards, datasets, maps..."
+msgstr "البحث في لوحات المعلومات ومجموعات البيانات والخرائط..."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1233,6 +1241,10 @@ msgstr "يحتوي SQL الحالي على أجزاء لا يمكن للنموذ
 msgid "Updated {0}"
 msgstr "تم التحديث {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Attached to this chat"
+msgstr "مرفقة بهذه المحادثة"
+
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory.tsx
 msgid "Request a data source connection via feedback"
 msgstr "اطلب اتصال مصدر البيانات عبر التعليقات"
@@ -1360,11 +1372,6 @@ msgstr "ورقة"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Getting {0} from {1}"
 msgstr "جارٍ الحصول على {0} من {1}"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-#~ msgstr "أكثر من {formattedNumResults} من أصل {formattedNumCatalogListings} "
-#~ "مجموعة بيانات"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -1780,6 +1787,10 @@ msgstr "لم يتغير الإسناد"
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "اكتب إجابتك..."
+
+#: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
+msgid "<0>Enter</0> add"
+msgstr "<0>Enter</0> للإضافة"
 
 #: src/routes/forgot-password.tsx
 msgid "Password reset failed"
@@ -3045,6 +3056,10 @@ msgstr "اختر مجموعة بيانات محفوظة أو استورد بيا
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
 msgid "Cannot sync this case type"
 msgstr "لا يمكن مزامنة نوع الحالة هذا"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Recent"
+msgstr "الأحدث"
 
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Report a bug"
@@ -5004,6 +5019,7 @@ msgstr "بحجم محدد"
 msgid "Save to dashboard"
 msgstr "حفظ إلى اللوحة"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
 msgstr "أُضيفت"
@@ -5295,6 +5311,10 @@ msgstr "تسمح خطتك الحالية فقط بمشاركة {maxAllowed, plur
 msgid "Region {0}"
 msgstr "المنطقة {0}"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
+msgid "Remove {name} from context"
+msgstr "إزالة {name} من السياق"
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Continue to your workspace"
 msgstr "تابع إلى مساحة العمل الخاصة بك"
@@ -5306,6 +5326,10 @@ msgstr "له قيمة"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL cannot contain spaces"
 msgstr "لا يمكن أن يحتوي عنوان URL المخصص على مسافات"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
+msgstr "يمكنك إرفاق ما يصل إلى {MAX_ATTACHED_GADGETS} عناصر."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -6162,6 +6186,7 @@ msgstr "لا تزال لوحة المعلومات هذه عامة على الو�
 msgid "Filter by status"
 msgstr "التصفية حسب الحالة"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Results"
 msgstr "النتائج"
@@ -6319,6 +6344,10 @@ msgstr "فتح السجل"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "تمت إضافة مجموعة البيانات"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "Add context"
+msgstr "إضافة سياق"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Optional"
@@ -7510,6 +7539,10 @@ msgstr "غير مسموح"
 msgid "Member"
 msgstr "العضو"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Nothing found"
+msgstr "لم يُعثر على شيء"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Update subscription"
 msgstr "تحديث الاشتراك"
@@ -7694,6 +7727,7 @@ msgstr "تغيّر الاستعلام بعد إضافة الأعمدة."
 msgid "Write your paragraph here..."
 msgstr "اكتب فقرتك هنا..."
 
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Send message"
 msgstr "إرسال رسالة"
@@ -8675,6 +8709,7 @@ msgstr "أدخل اسم مجموعة البيانات"
 msgid "Select an annotation on the map to edit it."
 msgstr "حدّد تعليقًا توضيحيًا على الخريطة لتحريره."
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "جارٍ البحث…"
@@ -8902,11 +8937,6 @@ msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال 
 msgid "First"
 msgstr "الأول"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-#~ msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-#~ msgstr "{formattedNumResults} من أصل {formattedNumCatalogListings} مجموعة "
-#~ "بيانات"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "إزالة"
@@ -8935,6 +8965,12 @@ msgstr "جارٍ تحميل الكاتب"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable {pluginName}?"
 msgstr "هل تريد تعطيل {pluginName}؟"
+
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "اطرح سؤالًا عن بياناتك. اكتب @ لتوجيهي إلى لوحة معلومات أو مجموعة "
+"بيانات أو خريطة."
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -10516,6 +10552,10 @@ msgstr "التجميع في شبكة"
 msgid "Handling"
 msgstr "المعالجة"
 
+#: src/components/ChatPanel/ChatThread/Composer/useChatComposerEditor.ts
+msgid "Message"
+msgstr "رسالة"
+
 #. placeholder {0}: sensitivity.minCellCount
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/AggregateSensitivityControls.tsx
 msgid "Aggregate only draws areas after at least {0} contributing records. "
@@ -10600,6 +10640,10 @@ msgstr "يتعامل هذا الاستعلام مع نوع من القيم عل�
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "In your workspace"
 msgstr "في مساحة العمل لديك"
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
+msgid "On this page"
+msgstr "في هذه الصفحة"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10894,6 +10938,10 @@ msgstr "تم حذف نوع الحالة"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه النموذج."
+
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
+msgid "Search failed. Try again."
+msgstr "فشل البحث. حاول مرة أخرى."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
@@ -11337,6 +11385,11 @@ msgstr "+{0} قيم إضافية مرتبطة بـ {1} صفوف"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
 msgid "The most common value is <0>{0}</0>, in <1>{1}</1> of rows."
 msgstr "القيمة الأكثر شيوعًا هي <0>{0}</0>، في <1>{1}</1> من الصفوف."
+
+#: src/components/ChatPanel/ChatThread/Composer/ChatComposerEditor.tsx
+msgid "Only the first {MAX_DESCRIBED_MENTIONS} mentions are described to the "
+"assistant."
+msgstr "يُوصَف للمساعد أول {MAX_DESCRIBED_MENTIONS} إشارات فقط."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"

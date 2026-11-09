@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { openAgentChat } from "./helpers/openAgentChat";
 import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
@@ -75,7 +76,7 @@ test.describe("agent results in the chat", () => {
       window.localStorage.setItem("avandar:data-agent", "on");
     });
     await page.route(
-      "**/functions/v1/chat/*/agent/data-agent-v2/api/stream",
+      "**/functions/v1/chat/*/agent/data-agent-v3/api/stream",
       async (route) => {
         proxyBodies.push(route.request().postData() ?? "");
         await route.fulfill({
@@ -107,14 +108,10 @@ test.describe("agent results in the chat", () => {
         createdDashboardIds.push(dashboardId);
       }
 
-      const chatToggle = page.getByRole("button", { name: /^chat$/i });
-      if (await chatToggle.isVisible()) {
-        await chatToggle.click();
-      }
-      const composer = page
-        .getByPlaceholder(/Ask me/i)
-        .or(page.locator('[data-testid="composer-input"]'))
-        .first();
+      await openAgentChat(page);
+      // With the agent on, the message box is a rich text editor named
+      // "Message", which has no placeholder attribute.
+      const composer = page.getByLabel("Message", { exact: true });
       await composer.fill("How many cases in California?");
       await composer.press("Enter");
 
@@ -138,9 +135,7 @@ test.describe("agent results in the chat", () => {
       });
 
       await page.reload();
-      if (await chatToggle.isVisible()) {
-        await chatToggle.click();
-      }
+      await openAgentChat(page);
       await expect(card.getByRole("link", { name: /^Open / })).toBeVisible({
         timeout: MEDIUM_WAIT,
       });

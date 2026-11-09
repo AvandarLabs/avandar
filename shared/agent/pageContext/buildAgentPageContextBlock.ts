@@ -1,14 +1,18 @@
 import {
-  MAX_PAGE_SQL_CHARACTERS,
-  MAX_PAGE_TILES,
-} from "$/agent/pageContext/AgentPageContext.ts";
-import { SqlLiterals } from "$/agent/pageContext/SqlLiterals.ts";
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
+  formatBlockSql,
+  formatHiddenChartsLine,
+  formatTileLine,
+  inlineBlockText,
+  quoteBlockText,
+  redactBlockSql,
+} from "$/agent/pageContext/agentBlockText.ts";
+import { MAX_PAGE_TILES } from "$/agent/pageContext/AgentPageContext.ts";
+import type { BlockRenderOptions } from "$/agent/pageContext/agentBlockText.ts";
 import type {
   AgentPageApp,
   AgentPageContext,
-  AgentPageTile,
 } from "$/agent/pageContext/AgentPageContext.ts";
+import type { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
 const APP_LABELS: Record<AgentPageApp, string> = {
   "data-explorer": "Data Explorer",
@@ -22,24 +26,6 @@ const APP_LABELS: Record<AgentPageApp, string> = {
   "case-manager": "Case designer",
   other: "Other",
 };
-
-/** A run of line breaks (CR, LF, line and paragraph separators) and spaces. */
-const LINE_BREAKS = /\s*[\r\n\u2028\u2029]+\s*/g;
-
-/**
- * A `<` that would start `<current_page>` or `</current_page>`, including
- * spellings with spaces such as `< /current_page>` or `</ current_page>`.
- */
-const PAGE_TAG_START = /<(?=\s*\/?\s*current_page)/gi;
-
-/**
- * A `<` that does not start a page placeholder (`<value 3>`). A placeholder
- * cannot spell out a page tag, so it is left readable in names.
- */
-const NON_PLACEHOLDER_LT = /<(?!value [1-9]\d*>)/g;
-
-/** A chart's title in the block when its own looks like personal data. */
-const REDACTED_TILE_TITLE = "Untitled chart";
 
 type Aliases = readonly SqlTableAlias.T[];
 
@@ -55,53 +41,23 @@ type ListedDashboard = NonNullable<AgentPageContext["dashboard"]> & {
 };
 
 /** The page with its SQL redacted and only the listed charts kept. */
-type RedactedPageContext = Omit<AgentPageContext, "dashboard"> & {
+export type RedactedPageContext = Omit<AgentPageContext, "dashboard"> & {
   dashboard?: ListedDashboard;
 };
 
-/** What rendering needs once every piece of page SQL is redacted. */
-type RenderOptions = Readonly<{
-  aliases: Aliases;
-  isSensitive?: IsSensitive;
-  mask: HideText;
-}>;
-
 /**
- * A name as a JSON string literal, so quotes and line breaks are escaped,
- * including the line and paragraph separators JSON leaves raw. Every `<`
- * but a placeholder's becomes `\u003c`, so a name can never spell out
- * `</current_page>`.
+ * The context with its page SQL (the explorer's query and every chart's,
+ * including charts past the listing cap, which are then dropped) stripped
+ * of comments and passed through `redactSql`. The first
+ * half of `buildAgentPageContextBlock`, exported so the page block can be
+ * built in one redaction pass with the attached and mentioned blocks.
  */
-function _quote(name: string): string {
-  return JSON.stringify(name)
-    .replace(NON_PLACEHOLDER_LT, "\\u003c")
-    .replace(/\u2028/g, "\\u2028")
-    .replace(/\u2029/g, "\\u2029");
-}
-
-/**
- * Text that is not quoted (column names, types, chart types) kept on one
- * line: line breaks become spaces and every `<` but a placeholder's becomes
- * `\u003c`, so it can neither start a new line nor spell out
- * `</current_page>`.
- */
-function _inline(text: string): string {
-  return text.replace(LINE_BREAKS, " ").replace(NON_PLACEHOLDER_LT, "\\u003c");
-}
-
-/**
- * The context with its page SQL (the explorer's query and each listed
- * chart's) stripped of comments and passed through `redactSql`. Comments go
- * first: they can hold values, and once the SQL is on one line a `--`
- * comment would swallow the rest of the statement.
- */
-function _redactContextSql(
+export function redactAgentPageContext(
   context: AgentPageContext,
   redactSql: HideText | undefined,
 ): RedactedPageContext {
   const redact = (sql: string): string => {
-    const stripped = SqlLiterals.stripComments(sql);
-    return redactSql ? redactSql(stripped) : stripped;
+    return redactBlockSql(sql, redactSql);
   };
   const { explorer, dashboard } = context;
   return {
@@ -113,9 +69,13 @@ function _redactContextSql(
       ? {
           dashboard: {
             ...dashboard,
-            tiles: dashboard.tiles.slice(0, MAX_PAGE_TILES).map((tile) => {
-              return { ...tile, sql: redact(tile.sql) };
-            }),
+            // Every chart is redacted, so a value only a chart past the
+            // listing cap filters on is still masked in names and titles.
+            tiles: dashboard.tiles
+              .map((tile) => {
+                return { ...tile, sql: redact(tile.sql) };
+              })
+              .slice(0, MAX_PAGE_TILES),
             hiddenTileCount: Math.max(
               dashboard.tiles.length - MAX_PAGE_TILES,
               0,
@@ -127,35 +87,17 @@ function _redactContextSql(
 }
 
 /**
- * One redacted SQL statement on a single line, with table names shown as
- * aliases, and cut at the cap. It is never masked: masking words would
- * break identifiers, and redaction already hid the literals the vault
- * holds. Only a `<` that would start a page tag is escaped, so comparisons
- * such as `a < b` stay readable.
- */
-function _formatSql(sql: string, options: RenderOptions): string {
-  const singleLine = sql.trim().replace(LINE_BREAKS, " ");
-  const aliased = SqlTableAlias.toAliasedSql(
-    singleLine,
-    options.aliases,
-  ).replace(PAGE_TAG_START, "\\u003c");
-  return aliased.length > MAX_PAGE_SQL_CHARACTERS
-    ? `${aliased.slice(0, MAX_PAGE_SQL_CHARACTERS)} ...`
-    : aliased;
-}
-
-/**
  * The open dataset's line. The name comes first and the alias follows as a
  * note for SQL, so the model reads the name as what to call the dataset.
  */
 function _datasetLine(
   dataset: NonNullable<AgentPageContext["dataset"]>,
-  options: RenderOptions,
+  options: BlockRenderOptions,
 ): string {
   const entry = options.aliases.find((candidate) => {
     return candidate.kind === "dataset" && candidate.datasetId === dataset.id;
   });
-  const name = _quote(options.mask(dataset.name));
+  const name = quoteBlockText(options.mask(dataset.name));
   return entry
     ? `Open dataset: ${name} (query it as ${entry.alias})`
     : `Open dataset: ${name}`;
@@ -163,70 +105,65 @@ function _datasetLine(
 
 function _explorerLines(
   explorer: NonNullable<AgentPageContext["explorer"]>,
-  options: RenderOptions,
+  options: BlockRenderOptions,
 ): string[] {
   const columns = explorer.resultColumns.map((column) => {
-    return `${_inline(options.mask(column.name))} ${_inline(column.dataType)}`;
+    return `${inlineBlockText(options.mask(column.name))} ${inlineBlockText(column.dataType)}`;
   });
   return [
     ...(explorer.sql
-      ? [`Query on screen: ${_formatSql(explorer.sql, options)}`]
+      ? [`Query on screen: ${formatBlockSql(explorer.sql, options.aliases)}`]
       : []),
     ...(columns.length > 0 ? [`Result columns: ${columns.join(", ")}`] : []),
   ];
 }
 
-/**
- * One chart's line. With `isSensitive`, a title that looks like personal
- * data becomes "Untitled chart"; any other title is masked.
- */
-function _tileLine(
-  tile: AgentPageTile,
-  index: number,
-  options: RenderOptions,
-): string {
-  const { isSensitive } = options;
-  const title =
-    isSensitive && isSensitive(tile.title)
-      ? REDACTED_TILE_TITLE
-      : options.mask(tile.title);
-  const sql = _formatSql(tile.sql, options);
-  const heading = `${index + 1}. ${_quote(title)} (${_inline(tile.chartType)})`;
-  return sql === "" ? heading : `${heading}: ${sql}`;
-}
-
 function _dashboardLines(
   dashboard: ListedDashboard,
-  options: RenderOptions,
+  options: BlockRenderOptions,
 ): string[] {
   const listed = dashboard.tiles;
   const hiddenCount = dashboard.hiddenTileCount ?? 0;
   return [
-    `Dashboard: ${_quote(options.mask(dashboard.name))}`,
+    `Dashboard: ${quoteBlockText(options.mask(dashboard.name))}`,
     ...(listed.length > 0 ? ["Charts on this dashboard:"] : []),
     ...listed.map((tile, index) => {
-      return _tileLine(tile, index, options);
+      return formatTileLine(tile, index, options);
     }),
-    ...(hiddenCount > 0
-      ? [
-          `${hiddenCount} more ${hiddenCount === 1 ? "chart" : "charts"} not listed.`,
-        ]
-      : []),
+    ...(hiddenCount > 0 ? [formatHiddenChartsLine(hiddenCount)] : []),
   ];
 }
 
 function _caseLines(
   context: RedactedPageContext,
-  options: RenderOptions,
+  options: BlockRenderOptions,
 ): string[] {
   return [
     ...(context.caseType
-      ? [`Case type: ${_quote(options.mask(context.caseType.name))}`]
+      ? [`Case type: ${quoteBlockText(options.mask(context.caseType.name))}`]
       : []),
     ...(context.app === "case"
       ? ["One case is open; its details are not shared."]
       : []),
   ];
+}
+
+/** Renders a redacted page context as the `<current_page>` block. */
+export function renderAgentPageContextBlock(
+  context: RedactedPageContext,
+  render: BlockRenderOptions,
+): string {
+  const lines = [
+    `Page: ${APP_LABELS[context.app]}`,
+    ...(context.dataset ? [_datasetLine(context.dataset, render)] : []),
+    ...(context.explorer ? _explorerLines(context.explorer, render) : []),
+    ...(context.dashboard ? _dashboardLines(context.dashboard, render) : []),
+    ...(context.map
+      ? [`Map: ${quoteBlockText(render.mask(context.map.name))}`]
+      : []),
+    ..._caseLines(context, render),
+  ];
+  return ["<current_page>", ...lines, "</current_page>"].join("\n");
 }
 
 /**
@@ -244,7 +181,8 @@ function _caseLines(
  * columns, never the SQL. Every piece of SQL is redacted before anything is
  * masked, so a value one chart filters on is hidden in every title.
  * `isSensitive` flags chart titles that look like personal data, which
- * become "Untitled chart".
+ * become "Untitled chart". Built from `redactAgentPageContext` and
+ * `renderAgentPageContextBlock`.
  */
 export function buildAgentPageContextBlock(
   options: Readonly<{
@@ -255,8 +193,8 @@ export function buildAgentPageContextBlock(
     maskText?: HideText;
   }>,
 ): string {
-  const context = _redactContextSql(options.context, options.redactSql);
-  const render: RenderOptions = {
+  const context = redactAgentPageContext(options.context, options.redactSql);
+  return renderAgentPageContextBlock(context, {
     aliases: options.aliases,
     isSensitive: options.isSensitive,
     mask:
@@ -264,14 +202,5 @@ export function buildAgentPageContextBlock(
       ((text) => {
         return text;
       }),
-  };
-  const lines = [
-    `Page: ${APP_LABELS[context.app]}`,
-    ...(context.dataset ? [_datasetLine(context.dataset, render)] : []),
-    ...(context.explorer ? _explorerLines(context.explorer, render) : []),
-    ...(context.dashboard ? _dashboardLines(context.dashboard, render) : []),
-    ...(context.map ? [`Map: ${_quote(render.mask(context.map.name))}`] : []),
-    ..._caseLines(context, render),
-  ];
-  return ["<current_page>", ...lines, "</current_page>"].join("\n");
+  });
 }

@@ -1,10 +1,18 @@
 import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
+import { OfflineAnswerMessage } from "@/components/ChatPanel/OfflineAnswerMessage/OfflineAnswerMessage";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
+import {
+  buildLocalGadgetName,
+  loadTurnGadgetContext,
+  toHostedChatMessages,
+  toLocalModelMessages,
+} from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
 import { applyChatModelTurnResponse } from "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import {
@@ -13,6 +21,7 @@ import {
   extractText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { runLocalChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/runLocalChatTurn";
+import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { isAgentAccessDenied } from "@/components/ChatPanel/useAvandarChatRuntime/isAgentAccessDenied";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
@@ -30,10 +39,12 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConsentAck } from "$/types/chat.types";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -65,6 +76,163 @@ function _userModelContent(
   return isViewChange ? ChatViewEvent.toModelContent(content) : content;
 }
 
+/** The thread as Assistant UI hands it to the adapter. */
+type ThreadMessages = Parameters<ChatModelAdapter["run"]>[0]["messages"];
+
+/**
+ * The thread as the chat's models read it, mentions still as tokens. With
+ * `hideOfflineAnswers`, each answer an offline turn produced reads as a
+ * fixed line: an offline model read real gadget names, so its answer must
+ * never reach a hosted model.
+ */
+function _toApiMessages(
+  messages: ThreadMessages,
+  options: Readonly<{ hideOfflineAnswers: boolean }>,
+): ChatClientMessage.T[] {
+  return messages
+    .map((threadMessage) => {
+      const text = extractText(threadMessage.content);
+      if (!text) {
+        return null;
+      }
+      const content =
+        options.hideOfflineAnswers &&
+        threadMessage.role === "assistant" &&
+        OfflineAnswerMessage.isOfflineAnswer(threadMessage.metadata)
+          ? OfflineAnswerMessage.hostedContent
+          : text;
+      return matchLiteral(threadMessage.role, {
+        system: Model.make("ChatClientMessage", {
+          role: "system" as const,
+          content,
+        }),
+        assistant: Model.make("ChatClientMessage", {
+          role: "assistant" as const,
+          content,
+        }),
+        user: Model.make("ChatClientMessage", {
+          role: "user" as const,
+          content: _userModelContent(threadMessage.metadata, content),
+        }),
+      });
+    })
+    .filter((message): message is ChatClientMessage.T => {
+      return isNotNull(message);
+    });
+}
+
+/** One turn's thread, in the form each path may read. */
+type TurnMessages = {
+  /**
+   * The thread with its ref tokens and offline answers hidden. Only the
+   * agent path reads it.
+   */
+  apiMessages: ChatClientMessage.T[];
+  /**
+   * The thread with each mention as `@"Name"` with its real name, for uses
+   * on the device: offline turns, the agent path's consent check, and
+   * applying a response. Never posted to a hosted model.
+   */
+  localMessages: readonly ChatClientMessage.T[];
+  /**
+   * The thread as today's hosted chat receives it, each mention named by
+   * its type only (`@"a chart"`), and offline answers hidden. Its consent
+   * check runs on this text, so a consent ack matches the message it is
+   * posted with.
+   */
+  hostedChatMessages: readonly ChatClientMessage.T[];
+  gadgetContext: AgentTurnGadgetContext | undefined;
+  /**
+   * Gadgets the last real question mentions, so a clarification answer
+   * does not hide them. Undefined off the agent path.
+   */
+  mentionCount: number | undefined;
+  /** The last question as labels show it, each mention as `@Name`. */
+  questionLabel: string;
+};
+
+/** Whether the tray or any user message holds a gadget to load. */
+function _hasGadgetRefs(
+  apiMessages: readonly ChatClientMessage.T[],
+  attachedRefs: readonly Gadget.Ref[],
+): boolean {
+  return (
+    attachedRefs.length > 0 ||
+    apiMessages.some((message) => {
+      return (
+        message.role === "user" &&
+        ChatMentionToken.refsFromText(message.content).length > 0
+      );
+    })
+  );
+}
+
+/**
+ * Loads the turn's gadgets, or nothing when there are none. The loader and
+ * the gadget clients behind it load on first use so they stay out of the
+ * main bundle.
+ */
+async function _loadGadgetContext(
+  options: Readonly<{
+    apiMessages: readonly ChatClientMessage.T[];
+    attachedRefs: readonly Gadget.Ref[];
+    workspaceId: Workspace.Id;
+  }>,
+): Promise<AgentTurnGadgetContext | undefined> {
+  if (!_hasGadgetRefs(options.apiMessages, options.attachedRefs)) {
+    return undefined;
+  }
+  const { createAgentGadgetContextLoader } =
+    await import("@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader");
+  return loadTurnGadgetContext({
+    apiMessages: options.apiMessages,
+    attachedRefs: options.attachedRefs,
+    loader: createAgentGadgetContextLoader(options.workspaceId),
+  });
+}
+
+/**
+ * Builds the turn's thread and loads its attached and mentioned gadgets
+ * once. Ref tokens reach only the agent path, which names them with the
+ * conversation's vault. Offline turns and labels read real names; today's
+ * hosted chat reads each mention's type only.
+ */
+async function _prepareTurnMessages(
+  options: Readonly<{
+    messages: ThreadMessages;
+    attachedRefs: readonly Gadget.Ref[];
+    workspaceId: Workspace.Id;
+    isAgentTurn: boolean;
+  }>,
+): Promise<TurnMessages> {
+  const apiMessages = _toApiMessages(options.messages, {
+    hideOfflineAnswers: true,
+  });
+  const gadgetContext = await _loadGadgetContext({
+    apiMessages,
+    attachedRefs: options.attachedRefs,
+    workspaceId: options.workspaceId,
+  });
+  return {
+    apiMessages,
+    // Offline answers stay readable on the device.
+    localMessages: toLocalModelMessages(
+      _toApiMessages(options.messages, { hideOfflineAnswers: false }),
+      gadgetContext,
+    ),
+    hostedChatMessages: toHostedChatMessages(apiMessages),
+    gadgetContext,
+    mentionCount: options.isAgentTurn
+      ? ChatMentionToken.refsFromText(getLastQuestionFromMessages(apiMessages))
+          .length
+      : undefined,
+    questionLabel: getLastQuestionFromMessages(
+      apiMessages,
+      buildLocalGadgetName(gadgetContext),
+    ),
+  };
+}
+
 /** Refs and dispatches the chat model adapter reads on each turn. */
 export type CreateChatModelAdapterOptions = {
   chatGenerationRef: MutableRefObject<number>;
@@ -84,6 +252,8 @@ export type CreateChatModelAdapterOptions = {
     typeof DashboardEditorStateManager.useDispatch
   >;
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
+  /** The chat's context tray, read when a turn starts. */
+  contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
 };
 
 /**
@@ -205,6 +375,7 @@ export function createChatModelAdapter(
     dataExplorerDispatch,
     dashboardEditorDispatch,
     chatPanelDispatch,
+    contextTrayRef,
   } = options;
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
@@ -218,45 +389,42 @@ export function createChatModelAdapter(
         return isGenerationStale() ? { content: [] } : result;
       };
 
-      const apiMessages: ChatClientMessage.T[] = messages
-        .map((threadMessage) => {
-          const content = extractText(threadMessage.content);
-          if (!content) {
-            return null;
-          }
-          return matchLiteral(threadMessage.role, {
-            system: Model.make("ChatClientMessage", {
-              role: "system" as const,
-              content,
-            }),
-            assistant: Model.make("ChatClientMessage", {
-              role: "assistant" as const,
-              content,
-            }),
-            user: Model.make("ChatClientMessage", {
-              role: "user" as const,
-              content: _userModelContent(threadMessage.metadata, content),
-            }),
-          });
-        })
-        .filter((message): message is ChatClientMessage.T => {
-          return isNotNull(message);
-        });
+      const workspaceId = workspaceIdRef.current;
+      const currentUser = userRef.current;
+      // The page is read once, here, so the gadget load, consent waits, and
+      // navigation during the turn cannot mix one page's context with
+      // another page's route.
+      const currentPageContext = pageContextRef.current;
+      const currentPathname = pathnameRef.current;
+      const currentDashboardEditorState = dashboardEditorStateRef.current;
+      // Only an agent turn reads the tray. Today's chat never sees it.
+      const isAgentTurn =
+        currentPageContext.app !== "case-manager" &&
+        DataAgentFeature.isEnabled();
+      const attachedRefs = isAgentTurn ? contextTrayRef.current : [];
+      const turnMessages = await _prepareTurnMessages({
+        messages,
+        attachedRefs,
+        workspaceId,
+        isAgentTurn,
+      });
+      if (isGenerationStale()) {
+        return { content: [] };
+      }
+      const { apiMessages, localMessages, hostedChatMessages, gadgetContext } =
+        turnMessages;
+      // The text the consent check reads: real names on the agent path,
+      // and on today's chat the type-only text it posts, so the consent
+      // ack's hash matches the posted message.
+      const consentMessages = isAgentTurn ? localMessages : hostedChatMessages;
 
       // Bias-check the latest user-typed message before it leaves the
       // browser. Clarification-answer markers and hidden view-change lines
       // skip consent here (clarification answers are pre-vetted via
       // `crossBoundary`; view events are synthetic).
-      const lastUserMessage = [...apiMessages]
+      const lastUserMessage = [...consentMessages]
         .reverse()
         .find(propEq("role", "user"));
-      const currentUser = userRef.current;
-      const workspaceId = workspaceIdRef.current;
-      // The page is read once, here, so consent waits and navigation during
-      // the turn cannot mix one page's context with another page's route.
-      const currentPageContext = pageContextRef.current;
-      const currentPathname = pathnameRef.current;
-      const currentDashboardEditorState = dashboardEditorStateRef.current;
 
       if (
         lastUserMessage &&
@@ -296,7 +464,7 @@ export function createChatModelAdapter(
       // entries here and attach them to the backend request.
       const consentAcks = (
         await Promise.all(
-          apiMessages.map(
+          consentMessages.map(
             async (message, messageIndex): Promise<ConsentAck | undefined> => {
               if (message.role !== "user") {
                 return undefined;
@@ -353,6 +521,8 @@ export function createChatModelAdapter(
             content: lastUserMessage.content,
             pageContext: currentPageContext,
             runtimeMode: initialRuntimeMode,
+            mentionCount: turnMessages.mentionCount,
+            attachedCount: isAgentTurn ? attachedRefs.length : undefined,
           }),
         });
       }
@@ -362,7 +532,8 @@ export function createChatModelAdapter(
       ): Promise<ChatModelRunResult> => {
         return applyChatModelTurnResponse({
           response,
-          apiMessages,
+          apiMessages: localMessages,
+          questionLabel: turnMessages.questionLabel,
           currentUser,
           currentPageContext,
           workspaceId,
@@ -387,6 +558,7 @@ export function createChatModelAdapter(
 
       const dataAgentTurn: DataAgentTurnOptions = {
         apiMessages,
+        gadgetContext,
         workspaceId,
         currentUser,
         chatGeneration: generation,
@@ -395,9 +567,16 @@ export function createChatModelAdapter(
         chatPanelDispatch,
       };
 
-      const runOfflineTurn = (): Promise<ChatModelRunResult> => {
-        return runLocalChatTurn({
-          dataAgentTurn,
+      // Every answer an offline turn produces is marked, so a hosted
+      // request later reads a fixed line in its place.
+      const runOfflineTurn = async (): Promise<ChatModelRunResult> => {
+        const result = await runLocalChatTurn({
+          dataAgentTurn: {
+            ...dataAgentTurn,
+            apiMessages: localMessages,
+            gadgetContext: undefined,
+            questionLabel: turnMessages.questionLabel,
+          },
           workspace: workspaceRef.current,
           pageContext: currentPageContext,
           copy: copyRef.current,
@@ -405,16 +584,14 @@ export function createChatModelAdapter(
           finishIfCurrent,
           applyResponseIfCurrent,
         });
+        return OfflineAnswerMessage.mark(result);
       };
 
       if (initialRuntimeMode.kind === "local") {
         return runOfflineTurn();
       }
 
-      if (
-        currentPageContext.app !== "case-manager" &&
-        DataAgentFeature.isEnabled()
-      ) {
+      if (isAgentTurn) {
         try {
           return finishIfCurrent(
             await _runAgentTurn({
@@ -434,7 +611,7 @@ export function createChatModelAdapter(
         }
       }
 
-      const currentMessagesKey = chatMessagesKey(apiMessages);
+      const currentMessagesKey = chatMessagesKey(hostedChatMessages);
       const cachedTurn = lastTurnRef.current;
       const retryContext =
         cachedTurn && cachedTurn.messagesKey === currentMessagesKey
@@ -446,7 +623,7 @@ export function createChatModelAdapter(
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId },
           body: {
-            messages: apiMessages,
+            messages: [...hostedChatMessages],
             context: currentPageContext,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
             ...(retryContext ? { retryContext } : {}),

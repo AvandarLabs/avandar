@@ -1,6 +1,8 @@
-import { createExplorerShowQuery } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import {
+  createExplorerShowQuery,
+  getTurnQuestionLabel,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import { showQueryInChat } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
-import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
@@ -44,7 +46,7 @@ export function createConversationAgentHost(
       }
       return showQueryInChat({
         workspaceId: turn.workspaceId,
-        title: getLastQuestionFromMessages(turn.apiMessages),
+        title: getTurnQuestionLabel(turn),
         results: state.results,
         request,
       });
