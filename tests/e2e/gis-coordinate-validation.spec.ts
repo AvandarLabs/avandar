@@ -109,7 +109,10 @@ test("explains dropped coordinates and maps them after swapping", async ({
       { timeout: LONG_WAIT },
     );
     await report.getByRole("button", { name: "Back" }).click();
-    const inspector = page.getByRole("region", { name: "Layer" });
+    const inspector = page.getByRole("region", {
+      name: DATASET_NAME,
+      exact: true,
+    });
     await expect(inspector.getByText("4 of 4 rows mapped")).toBeVisible({
       timeout: LONG_WAIT,
     });

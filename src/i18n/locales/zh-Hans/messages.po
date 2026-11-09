@@ -1700,6 +1700,7 @@ msgid "Answer offline"
 msgstr "离线回答"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "展开图层面板"
 
@@ -2896,8 +2897,8 @@ msgstr "{0, plural, one {# 条记录} other {# 条记录}}"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "SELECT 中不支持聚合函数“{funcName}”；已跳过。"
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Annotations"
 msgstr "注释"
 
@@ -3427,6 +3428,10 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 "to share it with."
 msgstr "您的信息中心已创建，但其他人还无法打开。请选择要与哪些人共享。"
 
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layer settings"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
@@ -3439,6 +3444,7 @@ msgid "Created"
 msgstr "已创建"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "收起图层面板"
 
@@ -6925,8 +6931,8 @@ msgid "No saved datasets found."
 msgstr "未找到已保存的数据集。"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Expand the inspector"
-msgstr "展开检查器"
+#~ msgid "Expand the inspector"
+#~ msgstr "展开检查器"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -7969,6 +7975,7 @@ msgstr "工作区"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Layer"
 msgstr "图层"
 
@@ -9044,8 +9051,8 @@ msgid "... and {remainingCount} more"
 msgstr "... 还有 {remainingCount} 个"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Collapse the inspector"
-msgstr "折叠检查器"
+#~ msgid "Collapse the inspector"
+#~ msgstr "折叠检查器"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -10215,6 +10222,10 @@ msgstr "更新并重新发布"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Center"
 msgstr "居中"
+
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layers"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx

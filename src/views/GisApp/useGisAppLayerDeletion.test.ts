@@ -19,6 +19,7 @@ function _makeDeletionState(
     selectedLayerId: undefined,
     setSelectedLayerId: vi.fn(),
     closeInspector: vi.fn(),
+    closeLayerSettings: vi.fn(),
     featureListLayerId: featureListLayerId,
     closeFeatureList: vi.fn(),
   };
@@ -47,5 +48,19 @@ describe("useGisAppLayerDeletion", () => {
     result.current(state.layer.id);
 
     expect(state.closeFeatureList).not.toHaveBeenCalled();
+    expect(state.closeLayerSettings).not.toHaveBeenCalled();
+  });
+
+  it("returns to the layer list when the selected layer is deleted", () => {
+    const state = _makeDeletionState(undefined);
+    state.selectedLayerId = state.layer.id;
+    const { result } = renderHook(() => {
+      return useGisAppLayerDeletion(state);
+    });
+
+    result.current(state.layer.id);
+
+    expect(state.closeLayerSettings).toHaveBeenCalledOnce();
+    expect(state.setSelectedLayerId).toHaveBeenCalledOnce();
   });
 });

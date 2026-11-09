@@ -66,7 +66,10 @@ test("classifies a latitude and longitude layer and keeps its legend keys", asyn
     await page.getByPlaceholder("Search data sources").click();
     await page.getByRole("option", { name: DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
+    const inspector = page.getByRole("region", {
+      name: DATASET_NAME,
+      exact: true,
+    });
     await expect(inspector.getByText("8 of 8 rows mapped")).toBeVisible({
       timeout: LONG_WAIT,
     });

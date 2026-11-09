@@ -71,7 +71,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: DATASET_NAME,
+        exact: true,
+      });
       await _selectOption(page, inspector, "Geometry", "Geometry column");
       await _selectOption(page, inspector, "Geometry column", "wkt");
       await inspector
@@ -127,6 +130,14 @@ test(
       // encodings. `Geometry column` carries a smaller version of that risk,
       // since its option labels come from the dataset-columns query.
       await page.reload();
+      await page
+        .getByRole("region", { name: "Layers" })
+        .getByRole("button", {
+          name: new RegExp(
+            `^${DATASET_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\s|$)`,
+          ),
+        })
+        .click();
       await expect(
         inspector.getByRole("combobox", { name: "Geometry column" }),
       ).toHaveValue("geojson", { timeout: LONG_WAIT });

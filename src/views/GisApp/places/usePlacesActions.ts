@@ -82,6 +82,7 @@ function _addLayer(app: GisAppState, layer: MapLayer.T): void {
     return AvaMapConfig.withLayerAdded({ config: current, layer });
   });
   app.setSelectedLayerId(layer.id);
+  app.openLayerSettings();
 }
 
 /**

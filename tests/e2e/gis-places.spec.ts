@@ -87,6 +87,7 @@ async function _createPlacesDataset(
     .getByRole("textbox", { name: "New places dataset name" })
     .fill(datasetName);
   await page.getByRole("button", { name: "Create places dataset" }).click();
+  await page.getByRole("button", { name: "Back to layers" }).click();
   await expect(_layerRow(page, datasetName)).toBeVisible({
     timeout: LONG_WAIT,
   });

@@ -1744,6 +1744,7 @@ msgid "Answer offline"
 msgstr "الإجابة دون اتصال"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "توسيع لوحة الطبقات"
 
@@ -2965,8 +2966,8 @@ msgstr "{0, plural, one {# سجل} other {# سجلات}}"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "دالة التجميع \"{funcName}\" غير مدعومة في SELECT؛ تم تخطيها."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Annotations"
 msgstr "التعليقات التوضيحية"
 
@@ -3511,6 +3512,10 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 msgstr "لوحة المعلومات متاحة، لكن لا يمكن لأي شخص آخر فتحها بعد. لنختر الأشخاص "
 "الذين تريد مشاركتها معهم."
 
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layer settings"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
@@ -3523,6 +3528,7 @@ msgid "Created"
 msgstr "تم الإنشاء"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "طي لوحة الطبقات"
 
@@ -7084,8 +7090,8 @@ msgid "No saved datasets found."
 msgstr "لم يتم العثور على مجموعات بيانات محفوظة."
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Expand the inspector"
-msgstr "توسيع المفتش"
+#~ msgid "Expand the inspector"
+#~ msgstr "توسيع المفتش"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -8144,6 +8150,7 @@ msgstr "مساحة العمل"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Layer"
 msgstr "الطبقة"
 
@@ -9252,8 +9259,8 @@ msgid "... and {remainingCount} more"
 msgstr "... و {remainingCount} المزيد"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Collapse the inspector"
-msgstr "طيّ المفتش"
+#~ msgid "Collapse the inspector"
+#~ msgstr "طيّ المفتش"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -10450,6 +10457,10 @@ msgstr "تحديث وإعادة نشر"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Center"
 msgstr "توسيط"
+
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layers"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx

@@ -60,12 +60,13 @@
 }
 
 .mapShellLeftColumn {
-  align-self: start;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: var(--mantine-spacing-sm);
   grid-column: 1;
   grid-row: 2;
+  height: 100%;
 
   /* The layer panel's body scrolls once the row is shorter than the panel. */
   max-height: 100%;

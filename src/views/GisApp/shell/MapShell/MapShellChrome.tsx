@@ -5,7 +5,7 @@ import type { ReactNode, RefCallback } from "react";
 type Props = {
   topBar: ReactNode;
   layerPanel: ReactNode;
-  inspector: ReactNode;
+  inspector?: ReactNode;
   legend: ReactNode;
   toolCluster: ReactNode;
   statusCard: ReactNode;
@@ -55,9 +55,11 @@ export function MapShellChrome({
           <div className={css.mapShellLeftColumn} ref={leftColumnRef}>
             {layerPanel}
           </div>
-          <div className={css.mapShellRightColumn} ref={rightColumnRef}>
-            {inspector}
-          </div>
+          {inspector ? (
+            <div className={css.mapShellRightColumn} ref={rightColumnRef}>
+              {inspector}
+            </div>
+          ) : null}
           <div className={css.mapShellBottomLeft}>{legend}</div>
           <div className={css.mapShellBottomCenter}>
             {statusCard}

@@ -106,6 +106,9 @@ async function _addLayer(
   page: Page,
   options: Readonly<{ datasetName: string; isFirstLayer: boolean }>,
 ): Promise<Locator> {
+  if (!options.isFirstLayer) {
+    await page.getByRole("button", { name: "Back to layers" }).click();
+  }
   const addButton = options.isFirstLayer
     ? page
         .getByRole("region", { name: new RegExp(MAP_NAME) })
@@ -116,7 +119,7 @@ async function _addLayer(
   await addButton.click();
   await page.getByPlaceholder("Search data sources").click();
   await page.getByRole("option", { name: options.datasetName }).click();
-  return page.getByRole("region", { name: "Layer", exact: true });
+  return page.getByRole("region", { name: options.datasetName, exact: true });
 }
 
 async function _addSchoolsLayer(page: Page): Promise<void> {
@@ -181,19 +184,16 @@ async function _waitForMapToSettle(page: Page): Promise<void> {
 }
 
 /**
- * Frames both half-mile rings between the layer panel and the inspector,
- * then waits for every layer to redraw at the new view, for the screenshot.
+ * Frames both half-mile rings clear of the layers panel, then waits for
+ * every layer to redraw at the new view, for the screenshot.
  */
 async function _frameRings(page: Page): Promise<void> {
   await page.evaluate((bounds) => {
     window.__avandarE2EMap?.fitBounds(bounds, {
-      padding: { top: 56, bottom: 48, left: 280, right: 330 },
+      padding: { top: 56, bottom: 48, left: 340, right: 48 },
       duration: 0,
     });
   }, RINGS_BOUNDS);
-  await expect(
-    page.getByRole("region", { name: "Layers" }).getByText("Loading"),
-  ).toHaveCount(0, { timeout: LONG_WAIT });
   await _waitForMapToSettle(page);
 }
 

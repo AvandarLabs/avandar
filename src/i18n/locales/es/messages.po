@@ -1775,6 +1775,7 @@ msgid "Answer offline"
 msgstr "Responder sin conexión"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Expandir el panel de capas"
 
@@ -3017,8 +3018,8 @@ msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "La función de agregación \"{funcName}\" no es compatible en SELECT; se "
 "omitió."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Annotations"
 msgstr "Anotaciones"
 
@@ -3571,6 +3572,10 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 msgstr "Tu panel existe, pero nadie más puede abrirlo todavía. Elijamos con "
 "quién compartirlo."
 
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layer settings"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesCard.tsx
@@ -3583,6 +3588,7 @@ msgid "Created"
 msgstr "Creado"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Contraer el panel de capas"
 
@@ -7198,8 +7204,8 @@ msgid "No saved datasets found."
 msgstr "No se encontraron conjuntos de datos guardados."
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Expand the inspector"
-msgstr "Expandir el inspector"
+#~ msgid "Expand the inspector"
+#~ msgstr "Expandir el inspector"
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -8273,6 +8279,7 @@ msgstr "Espacio de trabajo"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Layer"
 msgstr "Capa"
 
@@ -9406,8 +9413,8 @@ msgid "... and {remainingCount} more"
 msgstr "... y {remainingCount} más"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Collapse the inspector"
-msgstr "Contraer el inspector"
+#~ msgid "Collapse the inspector"
+#~ msgstr "Contraer el inspector"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -10627,6 +10634,10 @@ msgstr "Actualizar y republicar"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Center"
 msgstr "Centro"
+
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layers"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx

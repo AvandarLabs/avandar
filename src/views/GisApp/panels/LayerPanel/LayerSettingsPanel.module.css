@@ -1,0 +1,31 @@
+.headerAction,
+.backAction {
+  height: 24px;
+  min-height: 24px;
+  min-width: 24px;
+  width: 24px;
+}
+
+.headerAction:focus-visible,
+.backAction:focus-visible {
+  outline-offset: -2px;
+}
+
+/*
+ * Back points toward the inline start. The icon is drawn facing left, so a
+ * right-to-left page turns it around.
+ */
+:global([dir="rtl"]) .backIcon {
+  transform: scaleX(-1);
+}
+
+/* stylelint-disable-next-line container-name-pattern, value-keyword-case */
+@container mapShell (max-width: 792px) {
+  .headerAction,
+  .backAction {
+    height: 44px;
+    min-height: 44px;
+    min-width: 44px;
+    width: 44px;
+  }
+}

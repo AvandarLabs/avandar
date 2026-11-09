@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 type Props = {
   layerName: string;
+  className?: string;
   onRename: () => void;
   onDuplicate: () => void;
   onZoomToLayer: () => void;
@@ -16,6 +17,7 @@ type Props = {
 /** Provides actions for one layer in the layers panel. */
 export function LayerActionsMenu({
   layerName,
+  className,
   onRename,
   onDuplicate,
   onZoomToLayer,
@@ -28,6 +30,7 @@ export function LayerActionsMenu({
     <Menu position="bottom-end" withinPortal>
       <Menu.Target>
         <ActionIcon
+          className={className}
           variant="subtle"
           color="neutral"
           size="sm"

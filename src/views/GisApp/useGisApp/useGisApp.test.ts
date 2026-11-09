@@ -1,5 +1,6 @@
 /**
- * useGisApp expands the inspector when an annotation is created or selected.
+ * useGisApp opens the layer panel's settings when an annotation is created
+ * or selected.
  */
 import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -221,9 +222,9 @@ describe("useGisApp annotation inspector", () => {
     mapCanvasState.lastCreatedAnnotationId = undefined;
   });
 
-  it("expands the inspector when a new annotation is created", () => {
+  it("opens layer settings when a new annotation is created", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
-    const { rerender } = renderHook(
+    const { result, rerender } = renderHook(
       () => {
         return useGisApp(_createAvaMap());
       },
@@ -231,14 +232,16 @@ describe("useGisApp annotation inspector", () => {
     );
 
     expect(expandPanelMock).not.toHaveBeenCalled();
+    expect(result.current.layerPanelPage).toBe("list");
 
     mapCanvasState.lastCreatedAnnotationId = feature.id;
     rerender();
 
-    expect(expandPanelMock).toHaveBeenCalledWith("inspector");
+    expect(expandPanelMock).toHaveBeenCalledWith("layers");
+    expect(result.current.layerPanelPage).toBe("settings");
   });
 
-  it("expands the inspector when an annotation feature is clicked on the map", () => {
+  it("opens layer settings when an annotation feature is clicked on the map", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { result } = renderHook(
       () => {
@@ -261,7 +264,8 @@ describe("useGisApp annotation inspector", () => {
       );
     });
 
-    expect(expandPanelMock).toHaveBeenCalledWith("inspector");
+    expect(expandPanelMock).toHaveBeenCalledWith("layers");
+    expect(result.current.layerPanelPage).toBe("settings");
     expect(result.current.selectedAnnotationFeatureId).toBe(feature.id);
     expect(result.current.isAnnotationRowSelected).toBe(true);
   });
