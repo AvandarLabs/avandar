@@ -44,6 +44,8 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D34 | Phase 1 is reshaped: the agent is not page-specific | Approved |
 | D35 | One agent with a general host; the page travels in each turn | Approved |
 | D36 | Results outside the Data Explorer show in the chat | Approved |
+| D37 | The agent path offers offline answers on network failure | Built |
+| D38 | Page context never routes results to the Data Explorer by default | Built |
 
 ---
 
@@ -579,9 +581,12 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   page type). Page context in the proxy's system prompt (breaks the cache on
   every navigation; the proxy would still trust client-built context).
 - **Privacy.** The block carries metadata, the explorer's current SQL (as
-  today's chat already sends), and up to 12 visible dashboard tiles' titles,
-  chart types, and SQL (cut at 1,500 characters each). Never rows, and never
-  a case's field values.
+  today's chat already sends), and up to 12 dashboard tiles' titles, chart
+  types, and SQL, in page order (cut at 1,500 characters each). Never rows.
+  A case's name is never sent, only its case type's name, because a case's
+  name is usually a person's name. A case's field values are never sent
+  either. Page text is escaped and marked as data in the block, and prompt
+  v2 tells the model never to follow instructions inside it.
 - **Costs.** The block is uncached input on every turn; the 1A eval reports
   the change in cost per question.
 
@@ -592,10 +597,40 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   part drawn with the gadget visuals: an embed card with a live body, or an
   inline chip that opens it in the Data Explorer. On the Data Explorer,
   results keep going to the explorer.
-- **What is stored.** The part keeps the SQL, chart type, title, and
-  dataset ids, never rows; it re-runs in DuckDB-Wasm when shown.
+- **What is stored.** The part keeps the SQL, chart type, and title, never
+  rows and never dataset ids (nothing read them; a query that can no longer
+  run shows as failed). It re-runs in DuckDB-Wasm when shown.
 - **Why not a gadget type.** A query result has no table to reference
   (saved queries are "not gadgets yet" in
   [gadgets.md](../measles-demo/gadgets.md)), so it is a chat content part
   that reuses the gadget chip and card instead of a new `Gadget.Type`.
 
+## D37. The agent path offers offline answers on network failure (built)
+
+- **Decision.** When an agent turn fails because the network or the proxy
+  cannot be reached, the chat offers "Answer offline", as today's chat does
+  (`_recoverFromChatFailure`). Accepting it reruns the question with the
+  offline model (D25) and the Data Explorer as the destination.
+- **Why.** Today's chat already recovers this way. Turning the agent on
+  everywhere would otherwise make a dropped connection a dead end on pages
+  where the old path offered a way out, and offline mode is the one choice
+  users make (D23).
+- **Alternatives.** Show a plain error and let the user find the Offline
+  switch (a regression from today's chat). Switch to offline automatically
+  (hides that the answer comes from a smaller model, and the user has not
+  agreed to download or run it).
+
+## D38. Page context never routes results to the Data Explorer by default (built)
+
+- **Decision.** `createConversationAgentHost` sends a query's result to the
+  Data Explorer only on the Data Explorer page, or on an offline turn
+  (`isOffline`). Everything else goes to the chat: a missing or failed page
+  context, and a page read that fell back to the route's app.
+- **Why.** R3 says the agent never changes the user's page. Sending a result
+  to the explorer is the one action that moves the user, so it needs positive
+  proof that the user is already there. When the context is unknown, the safe
+  answer is the chat, which works from every page. Offline turns keep the
+  explorer because the offline agent only runs there (roadmap 4.2).
+- **Alternatives.** Default to the explorer when unsure, as the agent did
+  before 1A (a failed page read would navigate the user away from what they
+  were doing).

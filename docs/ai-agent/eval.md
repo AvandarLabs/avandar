@@ -95,6 +95,27 @@ deaths in georgia") left out the "Out of GA" rows, against the prompt's
 rule, for a total 4% low. It ran without error, so escalation could not
 catch it.
 
+### Phase 1A
+
+Runs on 2026-11-09 for the page-agnostic agent (D35), archived under the
+`phase-1a` label. The agent ran with prompt v2, which reads the current page
+block. The six page questions P01 to P06 are described under "Questions and
+ground truth". Today's chat only ran the three that give it the same
+context (P01, P02, P05).
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a:agent-45 (agent, prompt v2, 45 questions) | 45/45 | 0 / 0 | $0.00030 | 3,026 | 2.7 s / 8.8 s |
+| phase-1a:agent-page #1-#3 (agent, P01-P06) | 6/6, 6/6, 6/6 | 0 / 0 | $0.00019 to $0.00021 | 3,127 to 3,128 | 5.4 to 7.9 s / 5.9 to 8.3 s |
+| phase-1a:today-page (today's chat, P01, P02, P05) | 2/3 | 1 / 0 | $0.00190 | 11,585 | 6.3 s / 7.1 s |
+
+- P04 ("Make this a line chart" with two tiles on screen) asked exactly one
+  question in every run, as expected.
+- Today's chat missed P01: it asked which dataset to use, then totalled US
+  deaths instead of the open global dataset.
+- Prompt v2 costs about 210 more input tokens per call (+7%) and stays
+  inside D10's cost range.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -341,6 +362,22 @@ A question passes when the final result matches the truth, and, when the
 user asked for a chart, the answer is a chart. Answering in words without
 running a query fails.
 
+`covid/covidPageQuestions.ts` adds six page-context questions, P01 to P06,
+for the page-agnostic agent. Each carries a `pageContext`: what the user
+has open when asking. The Pi harness renders it with
+`buildAgentPageContextBlock`, and the baseline harness passes the matching
+`ChatPageContext` where today's chat has one. They run only with
+`--questions P`: the default run stays at the original 45.
+
+| Id | Page | Question shape |
+|---|---|---|
+| P01 | Data Explorer, global deaths open | A total over "this dataset" |
+| P02 | Data Explorer, a query on screen | "Break this down by state", graded by the resulting state |
+| P03 | Dashboard, one tile visible | "Show this chart by month" |
+| P04 | Dashboard, two tiles visible | "Make this a line chart" (asking one question is expected) |
+| P05 | Map page | A data question that has nothing to do with the page |
+| P06 | Follows P03 | A follow-up on the new result |
+
 ### Metrics
 
 | Metric | Definition |
@@ -410,6 +447,8 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The 20-question offline screen | add `--questions B01,B03,B05,B07,B09,I01,I03,I05,I07,I09,H01,H03,H05,H07,H09,N02,N04,N06,N08,N10` |
 | Gemma 4 E2B offline | prefix `AVA_EVAL_WEBLLM_LIB=<path to web-llm 0.2.86 lib/index.js>` |
 | One question or category | `--questions N11` or `--questions H` |
+| The page-context questions (add `--label phase-1a:agent-page`) | `--harness pi --config haiku-sonnet --questions P` |
+| Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 
 The PDF table assistant has its own runner,
 `pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
@@ -445,7 +484,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 83 runs (every
+chat index lists all 88 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

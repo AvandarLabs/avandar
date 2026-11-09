@@ -37,7 +37,7 @@ and implementation, in order.
 
 | # | Item | Done when |
 |---|---|---|
-| 1A | **Page-agnostic agent.** The agent answers on every page; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Unit tests, six page-context eval questions passing, the 45-question eval unchanged, and a mocked browser spec. |
+| 1A | **Page-agnostic agent.** Done (2026-11-09). The agent answers on every page except the case designer; the current page travels in each turn; results outside the Data Explorer show in the chat as gadget embeds and links ([spec](specs/phase-1a.md)). | Met: unit tests, six page-context eval questions passing (6/6 on three runs), the 45-question eval unchanged (45/45), and a mocked browser spec. Eval label `phase-1a` ([results](eval.md#phase-1a)). A manual check with live models is still owed. |
 | 1B | **Attachable context.** `@` mentions of gadgets in the chat composer and a context picker. | To spec. |
 | 1C | **Multiple chats and an archive.** Session tabs, a browser-only archive, the expand button, auto-generated titles, and every AI entry point opening a new session (the case manager's chat moves into the main panel). | To spec. |
 | 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard (was 1.1). | Dashboard eval questions exist and the agent matches today's chat on them. |
@@ -51,7 +51,7 @@ and implementation, in order.
 | 2.1 | **Tool registry** | One shared definition per Avandar operation (name, argument schema, area, what data it exposes, whether it changes anything, minimum app role), extending `shared/agent/dataAgent/dataAgentTools.ts`. The proxy serves tool lists from it (the D04 pattern); the browser adds what runs. |
 | 2.2 | **Router** | Rules first, then a small classifier only when unsure (the offline router, D28, is the first piece). Picks the area and loads only that area's tools, which keeps prompts small and cached (D19). |
 | 2.3 | **Confirmation for changes** | A tool that creates, edits, or deletes shows a card in the chat with exactly what will change, and Confirm and Cancel, before it runs (D20, D33). Undo where the operation allows it. |
-| 2.4 | **General host** (moved into Phase 1 as 1A) | `DataAgentHost` is Data Explorer specific. It becomes a host that knows the current page and shows results in the chat without moving the user (Phase 1 rule R3). |
+| 2.4 | **General host** (moved into Phase 1 as 1A, done) | `DataAgentHost` is Data Explorer specific. It becomes a host that knows the current page and shows results in the chat without moving the user (Phase 1 rule R3). |
 | 2.5 | **Context management** | Pruning old tool results (Pi's `transformContext`) and a short workspace summary, so long conversations stay cheap. |
 | 2.6 | **An eval per area** | Each area gets its question set and graders before it ships. Graders for actions check the end state ("the dashboard has these blocks"), run against a local stack. |
 | 2.7 | **Instructions hidden in data** | Text from datasets, PDFs, and documents is marked as untrusted in tool results, and changes always go through 2.3, so a document cannot make the agent act. |
