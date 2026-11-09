@@ -1,3 +1,9 @@
+/** Machine-readable reasons a sensitivity policy rejects a geometry request. */
+export type SensitivityViolationCode =
+  | "aggregateOnly"
+  | "aggregateOnlyLayerSpec"
+  | "jitterRequiresPoints";
+
 /**
  * Thrown when a layer's sensitivity policy forbids the geometry it was asked
  * to produce.
@@ -18,19 +24,20 @@
  * counts per boundary. Asking `makeFeatureCollectionFromRows` for one point per
  * respondent would reveal exactly the addresses the policy protects, so it
  * throws instead, and the map surfaces the error in its status overlay.
+ *
+ * `jitterRequiresPoints` covers a `jitter` layer whose geometry cannot be
+ * displaced point by point: a line or polygon layer, or a buffer drawn around
+ * a point layer, whose rings would stay centered on the exact points.
  */
 export class SensitivityViolationError extends Error {
   /** Machine-readable reason the requested geometry is forbidden. */
-  readonly code: "aggregateOnly" | "aggregateOnlyLayerSpec";
+  readonly code: SensitivityViolationCode;
 
   /** Layer name associated with a layer-spec failure. */
   readonly layerName: string | undefined;
 
   /** Creates a sensitivity-policy error without formatting display copy. */
-  constructor(
-    code: "aggregateOnly" | "aggregateOnlyLayerSpec",
-    layerName?: string,
-  ) {
+  constructor(code: SensitivityViolationCode, layerName?: string) {
     super(code);
     this.name = "SensitivityViolationError";
     this.code = code;

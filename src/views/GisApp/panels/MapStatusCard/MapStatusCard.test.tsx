@@ -83,6 +83,28 @@ describe("MapStatusCard", () => {
     ).toBeInTheDocument();
   });
 
+  it("explains that a displaced layer must show points", () => {
+    render(
+      <MapStatusCard
+        layer={_makeLayer()}
+        viewState={_makeViewState({
+          status: "error",
+          error: new SensitivityViolationError("jitterRequiresPoints", "Roads"),
+        })}
+        onSeeWhy={vi.fn()}
+        onReviewFilter={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Show details" }));
+
+    expect(
+      screen.getByText(
+        "Layer Roads is set to Displace, which only works for points. Choose another handling option in its Sensitivity settings.",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("offers filter review for an empty filtered layer", () => {
     const onReviewFilter = vi.fn();
     render(
