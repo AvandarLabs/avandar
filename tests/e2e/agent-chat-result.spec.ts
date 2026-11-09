@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { openAgentChat } from "./helpers/openAgentChat";
 import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
@@ -107,10 +108,7 @@ test.describe("agent results in the chat", () => {
         createdDashboardIds.push(dashboardId);
       }
 
-      const chatToggle = page.getByRole("button", { name: /^chat$/i });
-      if (await chatToggle.isVisible()) {
-        await chatToggle.click();
-      }
+      await openAgentChat(page);
       // With the agent on, the message box is a rich text editor named
       // "Message", which has no placeholder attribute.
       const composer = page.getByLabel("Message", { exact: true });
@@ -137,9 +135,7 @@ test.describe("agent results in the chat", () => {
       });
 
       await page.reload();
-      if (await chatToggle.isVisible()) {
-        await chatToggle.click();
-      }
+      await openAgentChat(page);
       await expect(card.getByRole("link", { name: /^Open / })).toBeVisible({
         timeout: MEDIUM_WAIT,
       });

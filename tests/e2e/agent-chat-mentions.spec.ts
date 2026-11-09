@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { deleteDatasetFixture } from "./helpers/deleteDatasetFixture";
+import { openAgentChat } from "./helpers/openAgentChat";
 import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import {
@@ -129,35 +130,6 @@ function _removeViewChangeLines(body: string): string {
   return body.replace(/User: \[View changed:[^\]]*\]/g, "");
 }
 
-/**
- * Whether the message box is on screen. A closed chat panel keeps it in
- * the page, outside the viewport, so visibility alone does not tell.
- */
-async function _isComposerOnScreen(page: Page): Promise<boolean> {
-  const box = await page.getByLabel("Message", { exact: true }).boundingBox();
-  const viewport = page.viewportSize();
-  if (!box || !viewport) {
-    return false;
-  }
-  return box.x >= 0 && box.x + box.width <= viewport.width;
-}
-
-/**
- * Opens the chat panel unless it is already open. The panel's open state
- * survives a reload, and the header's "Chat" button toggles it, so the
- * button is clicked only when the message box is off screen.
- */
-async function _openChat(page: Page): Promise<void> {
-  const chatToggle = page.getByRole("button", { name: /^chat$/i });
-  const composer = page.getByLabel("Message", { exact: true });
-  await expect(chatToggle).toBeVisible({ timeout: LONG_WAIT });
-  await expect(composer).toBeAttached({ timeout: LONG_WAIT });
-  if (!(await _isComposerOnScreen(page))) {
-    await chatToggle.click();
-  }
-  await expect(composer).toBeInViewport();
-}
-
 /** Creates a dashboard through the UI and returns its id. */
 async function _createDashboard(
   page: Page,
@@ -204,10 +176,11 @@ test.describe("agent context in the chat", () => {
       slug: e2eWorkerDb.workspaceSlug,
     });
     const createdDashboardIds: string[] = [];
+    const datasetName = `${DATASET_SEARCH_WORD} cases ${Date.now()}`;
     const datasetId = await _seedDataset({
       admin,
       workspaceId,
-      name: `${DATASET_SEARCH_WORD} cases ${Date.now()}`,
+      name: datasetName,
     });
     try {
       await signInWithEmailPassword(page, {
@@ -220,15 +193,15 @@ test.describe("agent context in the chat", () => {
         e2eWorkerDb.workspaceSlug,
       );
       createdDashboardIds.push(dashboardId);
-      await _openChat(page);
+      await openAgentChat(page);
 
       // A label, not a role: the editing area is a combobox while the `@`
       // menu is open and a textbox otherwise.
       const composer = page.getByLabel("Message", { exact: true });
       await composer.click();
       await composer.pressSequentially(`Totals for @${DATASET_SEARCH_WORD}`);
-      const datasetOption = page.getByRole("option", {
-        name: new RegExp(DATASET_SEARCH_WORD),
+      const datasetOption = page.getByRole("option").filter({
+        has: page.getByText(datasetName, { exact: true }),
       });
       await expect(datasetOption).toBeVisible({ timeout: MEDIUM_WAIT });
       await composer.press("Enter");
@@ -241,6 +214,9 @@ test.describe("agent context in the chat", () => {
       const tray = page.getByRole("list", { name: "Attached to this chat" });
       const dashboardChip = `[data-gadget-id="${dashboardId}"]`;
       await expect(tray.locator(dashboardChip)).toBeVisible();
+      const dashboardName = (
+        await tray.locator(dashboardChip).innerText()
+      ).trim();
 
       await composer.press("Enter");
       await expect
@@ -252,6 +228,14 @@ test.describe("agent context in the chat", () => {
       expect(body).toContain("<attached>");
       expect(body).toContain("<mentioned>");
       expect(body).toContain('@\\"');
+      // The body is JSON, so each quote inside the message is escaped.
+      expect(body).toContain(`@\\"${datasetName}\\"`);
+      // The system prompt names the tags too, so the turn's block is the
+      // last one.
+      const attachedBlock = [
+        ...body.matchAll(/<attached>[\s\S]*?<\/attached>/g),
+      ].at(-1);
+      expect(attachedBlock?.[0]).toContain(`\\"${dashboardName}\\"`);
       expect(body).not.toContain("@{");
       expect(body).not.toContain(datasetId);
       // The recap of earlier messages still carries the chat's view change
@@ -271,7 +255,7 @@ test.describe("agent context in the chat", () => {
       });
 
       await page.reload();
-      await _openChat(page);
+      await openAgentChat(page);
       await expect(tray.locator(dashboardChip)).toBeVisible({
         timeout: MEDIUM_WAIT,
       });
