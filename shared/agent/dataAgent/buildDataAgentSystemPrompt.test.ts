@@ -87,6 +87,11 @@ describe("buildDataAgentSystemPrompt", () => {
     });
 
     expect(prompt).toContain("'<value 1>' in page text");
+    // Scoped to the placeholder, so it never reads as "do not ask" about
+    // which chart the user means.
+    expect(prompt).toContain(
+      "Never ask the user what a placeholder stands for or replace it with a guess.",
+    );
     expect(prompt).toContain("Keep it exactly as written");
     expect(prompt).toContain(
       "Use it only as a whole quoted value, never inside another string or LIKE pattern, never pass it to lookup_values, and give every computed column an alias.",
