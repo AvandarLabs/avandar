@@ -15,23 +15,17 @@ import type {
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
- * A period's first day as `YYYY-MM-DD`, read in UTC, or `undefined` for a
- * value that is not a date. A DuckDB `DATE` that arrives as a number is epoch
- * milliseconds at UTC midnight, so reading it in local time would move it a
- * day back for anyone west of UTC.
+ * A period's first day as `YYYY-MM-DD`, or `undefined` for a value that is not
+ * a date. Only text and `Date`s count: the Arrow reader returns a `DATE`
+ * inside a list as text, and a number is never read as a period. A `Date` is
+ * read in UTC, so it does not move a day back for anyone west of UTC.
  */
 function _toBucketDate(bucket: unknown): string | undefined {
   if (typeof bucket === "string") {
     return ISO_DATE_PATTERN.test(bucket) ? bucket : undefined;
   }
-  const epochMilliseconds =
-    bucket instanceof Date
-      ? bucket.getTime()
-      : typeof bucket === "number"
-        ? bucket
-        : Number.NaN;
-  return Number.isFinite(epochMilliseconds)
-    ? new Date(epochMilliseconds).toISOString().slice(0, 10)
+  return bucket instanceof Date && Number.isFinite(bucket.getTime())
+    ? bucket.toISOString().slice(0, 10)
     : undefined;
 }
 

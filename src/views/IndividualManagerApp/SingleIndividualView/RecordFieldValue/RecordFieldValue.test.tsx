@@ -228,7 +228,7 @@ describe("RecordFieldValue", () => {
         valueShape="bucketed_list"
         bucketGrain="month"
         dataType="double"
-        value={[{ bucket: Date.UTC(2026, 0, 1), value: 38.5 }]}
+        value={[{ bucket: "2026-01-01", value: 38.5 }]}
       />,
     );
 

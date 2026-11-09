@@ -212,13 +212,13 @@ describe("makeDataGridColumnDefs", () => {
       expect(second!.valueFormatter({ value })).toBe("year 2026-01-01: <1>");
     });
 
-    it("reads a bucket that arrives as epoch milliseconds", () => {
+    it("does not read a numeric bucket as a period", () => {
       expect(
         _formatPeriods({
-          value: [{ bucket: Date.UTC(2026, 3, 1), value: 4 }],
+          value: [{ bucket: 5, value: 4 }],
           bucketGrain: "day",
         }),
-      ).toBe("day 2026-04-01: <4>");
+      ).not.toContain("day ");
     });
 
     it("still shows the periods when the column's grain is unknown", () => {

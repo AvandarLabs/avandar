@@ -146,7 +146,7 @@ function _formatConceptAttributeName(
     ...(columnName === attribute.name ? [] : [`field "${attribute.name}"`]),
   ];
   const marker = attribute.bucket_grain
-    ? ` [per ${attribute.bucket_grain}: STRUCT(bucket DATE, value ${(attribute.data_type ?? "varchar").toUpperCase()})[]]`
+    ? ` [per ${attribute.bucket_grain}: STRUCT(bucket DATE, value ${attribute.data_type?.toUpperCase() ?? "T"})[]]`
     : "";
   return notes.length === 0
     ? `${columnName}${marker}`

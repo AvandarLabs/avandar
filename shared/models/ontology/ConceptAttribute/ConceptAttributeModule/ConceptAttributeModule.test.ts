@@ -170,16 +170,7 @@ describe("isBucketDateColumnType", () => {
 });
 
 describe("toBucketedListEntries", () => {
-  // A DuckDB DATE reaches the browser as epoch milliseconds at UTC midnight.
-  it("reads epoch milliseconds as the UTC calendar date", () => {
-    expect(
-      ConceptAttribute.toBucketedListEntries([
-        { bucket: Date.UTC(2026, 0, 1), value: 38.5 },
-      ]),
-    ).toEqual([{ bucket: "2026-01-01", value: 38.5 }]);
-  });
-
-  it("reads a Date bucket and keeps a YYYY-MM-DD bucket as it is", () => {
+  it("reads a Date bucket in UTC and keeps a YYYY-MM-DD bucket as it is", () => {
     expect(
       ConceptAttribute.toBucketedListEntries([
         { bucket: new Date(Date.UTC(2026, 1, 1)), value: 1 },
@@ -214,6 +205,11 @@ describe("toBucketedListEntries", () => {
     ["an entry without a value", [{ bucket: "2026-01-01" }]],
     ["an entry with an extra key", [{ bucket: "2026-01-01", value: 1, n: 2 }]],
     ["a bucket that is not a date", [{ bucket: "January", value: 1 }]],
+    ["a bucket that is a number", [{ bucket: 5, value: 1 }]],
+    [
+      "a bucket that is epoch milliseconds",
+      [{ bucket: Date.UTC(2026, 0, 1), value: 1 }],
+    ],
   ])("refuses %s", (_label, value) => {
     expect(ConceptAttribute.toBucketedListEntries(value)).toBeUndefined();
   });

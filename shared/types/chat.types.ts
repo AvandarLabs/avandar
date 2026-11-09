@@ -8,6 +8,9 @@
  * and the edge function through Deno's path alias of the same name.
  */
 
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
+import type { Expect, IsEqual } from "@avandar/utils";
+
 export type ChatDashboardVizType =
   | "table"
   | "bar"
@@ -138,6 +141,13 @@ export type ChatCaseValueShape = "single" | "list" | "bucketed_list";
  * `ConceptAttribute.BucketGrain`.
  */
 export type ChatCaseBucketGrain = "day" | "week" | "month" | "quarter" | "year";
+
+/** Do not remove these tests! */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Type tests - this variable is intentionally not used
+type ChatCaseBucketGrainTests = [
+  Expect<IsEqual<ChatCaseBucketGrain, ConceptAttribute.BucketGrain>>,
+];
 
 /** One attribute the case-manager model wants stored on a new concept. */
 export type ChatCreatedCaseAttribute =

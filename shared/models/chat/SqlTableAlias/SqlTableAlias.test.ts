@@ -331,6 +331,24 @@ describe("SqlTableAlias and per-period fields", () => {
     );
   });
 
+  it("leaves the value type as T when a cached field has no data type", () => {
+    expect(
+      SqlTableAlias.formatSchemaBlock({
+        ...PER_MONTH_SCHEMA,
+        conceptAttributes: [
+          {
+            concept_id: "concept-visits",
+            name: "Temperature",
+            is_array: true,
+            bucket_grain: "month",
+          },
+        ],
+      }),
+    ).toBe(
+      "- c0: Patient (Temperature [per month: STRUCT(bucket DATE, value T)[]])",
+    );
+  });
+
   it("keeps a renamed per-period field's own name beside its column name", () => {
     expect(
       SqlTableAlias.formatSchemaBlock({
