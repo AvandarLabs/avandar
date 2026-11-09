@@ -6,9 +6,14 @@ import type { ChatRuntimeMode } from "$/types/offlineChat.types";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 
 type FromMessageOptions = {
+  /** The message as the model reads it, with mentions named. */
   content: string;
   pageContext: ChatPageContext.T;
   runtimeMode: ChatRuntimeMode;
+  /** Gadgets the message mentions. Counted, never named. */
+  mentionCount?: number;
+  /** Gadgets attached to the chat. Counted, never named. */
+  attachedCount?: number;
 };
 
 function _fromMessage(
@@ -19,6 +24,8 @@ function _fromMessage(
     pageApp: options.pageContext.app,
     runtimeMode: options.runtimeMode.kind === "local" ? "local" : "cloud",
     hasOpenDataset: options.pageContext.openDatasetId !== undefined,
+    mentionCount: options.mentionCount,
+    attachedCount: options.attachedCount,
   });
 }
 

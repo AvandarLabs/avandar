@@ -1,11 +1,15 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
 import { createChatModelAdapter } from "./createChatModelAdapter";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { CreateChatModelAdapterOptions } from "./createChatModelAdapter";
 import type { ChatModelAdapter } from "@assistant-ui/react";
 
@@ -16,8 +20,14 @@ const {
   runDataAgentTurnMock,
   isAgentEnabledMock,
   offerOfflineFallbackMock,
+  loadGadgetsMock,
+  detectBiasMock,
+  decideConsentMock,
 } = vi.hoisted(() => {
   return {
+    loadGadgetsMock: vi.fn(),
+    detectBiasMock: vi.fn(),
+    decideConsentMock: vi.fn(),
     apiPostMock: vi.fn(),
     runOfflineDataAgentTurnMock: vi.fn(),
     runOfflineChatTurnMock: vi.fn(),
@@ -64,6 +74,28 @@ vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback",
   () => {
     return { offerOfflineChatFallback: offerOfflineFallbackMock };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader",
+  () => {
+    return {
+      createAgentGadgetContextLoader: () => {
+        return { load: loadGadgetsMock };
+      },
+    };
+  },
+);
+
+vi.mock("@/components/privacy/privacy-helpers/detectBias/detectBias", () => {
+  return { detectBias: detectBiasMock };
+});
+
+vi.mock(
+  "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary",
+  () => {
+    return { decideIfDataCanCrossBoundary: decideConsentMock };
   },
 );
 
@@ -117,6 +149,7 @@ function _createAdapter(
     dataExplorerDispatch: {},
     dashboardEditorDispatch: {},
     chatPanelDispatch: { setPendingClarification: vi.fn() },
+    contextTrayRef: ref([]),
     ...overrides,
   } as unknown as CreateChatModelAdapterOptions);
 }
@@ -502,5 +535,219 @@ describe("createChatModelAdapter with the agent on", () => {
 
     expect(result).toEqual({ content: [] });
     expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
+  });
+});
+
+const DATASET_REF: Gadget.Ref = {
+  gadgetType: "dataset",
+  gadgetId: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
+  subId: null,
+};
+const DATASET_TOKEN = ChatMentionToken.buildToken(DATASET_REF);
+const DATASET_CONTEXT: AgentGadgetContext = {
+  kind: "dataset",
+  ref: DATASET_REF,
+  name: "US deaths",
+};
+const DASHBOARD_REF: Gadget.Ref = {
+  gadgetType: "dashboard",
+  gadgetId: "eeeeeeee-5555-4555-8555-eeeeeeeeeeee",
+  subId: null,
+};
+const DASHBOARD_CONTEXT: AgentGadgetContext = {
+  kind: "dashboard",
+  ref: DASHBOARD_REF,
+  name: "Weekly outbreak",
+  tiles: [],
+};
+
+/** Every loaded context, keyed as the loader keys them. */
+const LOADED_CONTEXTS = new Map(
+  [DATASET_CONTEXT, DASHBOARD_CONTEXT].map((context) => {
+    return [ChatMentionToken.buildRefKey(context.ref), context] as const;
+  }),
+);
+
+/** Asks one user message, with the chat's tray holding `tray`. */
+async function _askWithMention(
+  app: ChatPageContext.T["app"],
+  tray: readonly Gadget.Ref[] = [],
+  overrides: Partial<CreateChatModelAdapterOptions> = {},
+): Promise<unknown> {
+  return _createAdapter(app, {
+    contextTrayRef: { current: tray },
+    ...overrides,
+  }).run({
+    messages: [
+      {
+        role: "user",
+        content: [{ type: "text", text: `Show ${DATASET_TOKEN}` }],
+        metadata: {},
+      },
+    ],
+  } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+}
+
+/** The last message today's chat posted. */
+function _postedLastMessage(): { role: string; content: string } {
+  return apiPostMock.mock.calls[0]![0].body.messages.at(-1);
+}
+
+describe("createChatModelAdapter with mentions", () => {
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    isAgentEnabledMock.mockReturnValue(false);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    runDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "agent reply" }],
+    });
+    runOfflineDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "offline agent reply" }],
+    });
+    runOfflineChatTurnMock
+      .mockReset()
+      .mockResolvedValue({ assistantText: "offline pipeline reply" });
+    loadGadgetsMock.mockReset().mockResolvedValue(LOADED_CONTEXTS);
+    detectBiasMock.mockReset().mockReturnValue({ hits: [] });
+    decideConsentMock.mockReset().mockResolvedValue({ approved: true });
+    LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
+      LocalChatModelStore.markDownloaded,
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.mocked(AnalyticsClient.logEvent).mockClear();
+    window.localStorage.clear();
+  });
+
+  it("sends today's chat names, never tokens", async () => {
+    await _askWithMention("dashboards");
+
+    expect(loadGadgetsMock).toHaveBeenCalledWith([DATASET_REF]);
+    expect(_postedLastMessage()).toMatchObject({
+      role: "user",
+      content: 'Show @"US deaths"',
+    });
+    expect(JSON.stringify(apiPostMock.mock.calls[0]![0].body)).not.toContain(
+      "@{",
+    );
+  });
+
+  it("names mentions as unavailable in today's chat when loading fails", async () => {
+    loadGadgetsMock.mockRejectedValue(new Error("network"));
+
+    await _askWithMention("dashboards");
+
+    expect(_postedLastMessage().content).toBe('Show @"an unavailable dataset"');
+  });
+
+  it("runs the consent check on the named text", async () => {
+    detectBiasMock.mockReturnValue({
+      hits: [{ category: "loaded_framing", label: "x", sample: "x" }],
+    });
+
+    await _askWithMention("dashboards", [], {
+      userRef: { current: { id: "user-1" } },
+    } as unknown as Partial<CreateChatModelAdapterOptions>);
+
+    expect(detectBiasMock).toHaveBeenCalledWith('Show @"US deaths"');
+    expect(decideConsentMock).toHaveBeenCalledWith(
+      expect.objectContaining({ text: 'Show @"US deaths"' }),
+    );
+    expect(PendingAcks.consumeAckForText).toHaveBeenCalledWith(
+      'Show @"US deaths"',
+    );
+  });
+
+  it("logs counts of mentions and attached items, never names", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _askWithMention("dashboards", [DASHBOARD_REF]);
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).toMatchObject({
+      promptChars: 'Show @"US deaths"'.length,
+      mentionCount: 1,
+      attachedCount: 1,
+    });
+    expect(JSON.stringify(event)).not.toContain("@{");
+    expect(JSON.stringify(event)).not.toContain("US deaths");
+    expect(JSON.stringify(event)).not.toContain(DATASET_REF.gadgetId);
+  });
+
+  it("hands the agent raw tokens and the loaded context", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _askWithMention("dashboards", [DASHBOARD_REF]);
+
+    const turn = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(turn.apiMessages.at(-1).content).toBe(`Show ${DATASET_TOKEN}`);
+    expect(turn.gadgetContext).toEqual({
+      attachedRefs: [DASHBOARD_REF],
+      contexts: LOADED_CONTEXTS,
+    });
+    expect(loadGadgetsMock).toHaveBeenCalledTimes(1);
+    expect(loadGadgetsMock).toHaveBeenCalledWith([DASHBOARD_REF, DATASET_REF]);
+    expect(apiPostMock).not.toHaveBeenCalled();
+  });
+
+  it("sends the offline data agent names, never tokens", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+    OfflineModeStore.setOn(true);
+
+    await _askWithMention("data-explorer", [DASHBOARD_REF]);
+
+    const turn = runOfflineDataAgentTurnMock.mock.calls[0]![0];
+    expect(turn.apiMessages.at(-1).content).toBe('Show @"US deaths"');
+    expect(JSON.stringify(turn.apiMessages)).not.toContain("@{");
+    expect(turn.gadgetContext).toBeUndefined();
+    expect(runDataAgentTurnMock).not.toHaveBeenCalled();
+  });
+
+  it("sends the offline pipeline names, never tokens", async () => {
+    OfflineModeStore.setOn(true);
+
+    await _askWithMention("dashboards");
+
+    const { messages } = runOfflineChatTurnMock.mock.calls[0]![0];
+    expect(messages.at(-1).content).toBe('Show @"US deaths"');
+    expect(JSON.stringify(messages)).not.toContain("@{");
+  });
+
+  it("ignores the tray with the switch off", async () => {
+    await _createAdapter("dashboards", {
+      contextTrayRef: { current: [DASHBOARD_REF] },
+    }).run({
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: "How many cases?" }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+
+    expect(loadGadgetsMock).not.toHaveBeenCalled();
+    expect(_postedLastMessage().content).toBe("How many cases?");
+  });
+
+  it("returns an empty result when the chat was reset while gadgets loaded", async () => {
+    const chatGenerationRef = { current: 0 };
+    loadGadgetsMock.mockImplementation(async () => {
+      chatGenerationRef.current += 1;
+      return LOADED_CONTEXTS;
+    });
+
+    const result = await _askWithMention("dashboards", [], {
+      chatGenerationRef,
+    } as unknown as Partial<CreateChatModelAdapterOptions>);
+
+    expect(result).toEqual({ content: [] });
+    expect(apiPostMock).not.toHaveBeenCalled();
   });
 });

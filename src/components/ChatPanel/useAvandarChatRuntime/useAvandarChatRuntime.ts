@@ -16,6 +16,7 @@ import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEdito
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { ChatModelAdapter } from "@assistant-ui/react";
 
@@ -148,6 +149,9 @@ export function useAvandarChatRuntime(): {
     | undefined
   >(undefined);
 
+  // The chat's context tray. Empty until the tray has its own state.
+  const contextTrayRef = useRef<readonly Gadget.Ref[]>([]);
+
   const adapter: ChatModelAdapter = useMemo(() => {
     return createChatModelAdapter({
       chatGenerationRef,
@@ -163,6 +167,7 @@ export function useAvandarChatRuntime(): {
       dataExplorerDispatch,
       dashboardEditorDispatch,
       chatPanelDispatch,
+      contextTrayRef,
     });
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
   }, [dataExplorerDispatch, dashboardEditorDispatch, chatPanelDispatch]);

@@ -1,10 +1,16 @@
 import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
+import { createAgentGadgetContextLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader";
+import {
+  loadTurnGadgetContext,
+  toModelMessages,
+} from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
 import { applyChatModelTurnResponse } from "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import {
@@ -30,10 +36,12 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConsentAck } from "$/types/chat.types";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
+import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -65,6 +73,79 @@ function _userModelContent(
   return isViewChange ? ChatViewEvent.toModelContent(content) : content;
 }
 
+/** The thread as Assistant UI hands it to the adapter. */
+type ThreadMessages = Parameters<ChatModelAdapter["run"]>[0]["messages"];
+
+/** The thread as the chat's models read it, mentions still as tokens. */
+function _toApiMessages(messages: ThreadMessages): ChatClientMessage.T[] {
+  return messages
+    .map((threadMessage) => {
+      const content = extractText(threadMessage.content);
+      if (!content) {
+        return null;
+      }
+      return matchLiteral(threadMessage.role, {
+        system: Model.make("ChatClientMessage", {
+          role: "system" as const,
+          content,
+        }),
+        assistant: Model.make("ChatClientMessage", {
+          role: "assistant" as const,
+          content,
+        }),
+        user: Model.make("ChatClientMessage", {
+          role: "user" as const,
+          content: _userModelContent(threadMessage.metadata, content),
+        }),
+      });
+    })
+    .filter((message): message is ChatClientMessage.T => {
+      return isNotNull(message);
+    });
+}
+
+/** One turn's thread, in the form each path may read. */
+type TurnMessages = {
+  /** The thread with its ref tokens. Only the agent path reads it. */
+  apiMessages: ChatClientMessage.T[];
+  /** The thread with each mention as `@"Name"`, for every other path. */
+  modelMessages: readonly ChatClientMessage.T[];
+  gadgetContext: AgentTurnGadgetContext | undefined;
+  /** Gadgets the latest user message mentions. */
+  mentionCount: number;
+};
+
+/**
+ * Builds the turn's thread and loads its attached and mentioned gadgets
+ * once. Ref tokens reach only the agent path, which names them with the
+ * conversation's vault. Everything else (the consent check, today's chat,
+ * offline turns, analytics) reads `@"Name"`.
+ */
+async function _prepareTurnMessages(
+  options: Readonly<{
+    messages: ThreadMessages;
+    attachedRefs: readonly Gadget.Ref[];
+    workspaceId: Workspace.Id;
+  }>,
+): Promise<TurnMessages> {
+  const apiMessages = _toApiMessages(options.messages);
+  const gadgetContext = await loadTurnGadgetContext({
+    apiMessages,
+    attachedRefs: options.attachedRefs,
+    loader: createAgentGadgetContextLoader(options.workspaceId),
+  });
+  const lastUserMessage = [...apiMessages]
+    .reverse()
+    .find(propEq("role", "user"));
+  return {
+    apiMessages,
+    modelMessages: toModelMessages(apiMessages, gadgetContext),
+    gadgetContext,
+    mentionCount: ChatMentionToken.refsFromText(lastUserMessage?.content ?? "")
+      .length,
+  };
+}
+
 /** Refs and dispatches the chat model adapter reads on each turn. */
 export type CreateChatModelAdapterOptions = {
   chatGenerationRef: MutableRefObject<number>;
@@ -84,6 +165,8 @@ export type CreateChatModelAdapterOptions = {
     typeof DashboardEditorStateManager.useDispatch
   >;
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
+  /** The chat's context tray, read when a turn starts. */
+  contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
 };
 
 /**
@@ -205,6 +288,7 @@ export function createChatModelAdapter(
     dataExplorerDispatch,
     dashboardEditorDispatch,
     chatPanelDispatch,
+    contextTrayRef,
   } = options;
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
@@ -218,40 +302,27 @@ export function createChatModelAdapter(
         return isGenerationStale() ? { content: [] } : result;
       };
 
-      const apiMessages: ChatClientMessage.T[] = messages
-        .map((threadMessage) => {
-          const content = extractText(threadMessage.content);
-          if (!content) {
-            return null;
-          }
-          return matchLiteral(threadMessage.role, {
-            system: Model.make("ChatClientMessage", {
-              role: "system" as const,
-              content,
-            }),
-            assistant: Model.make("ChatClientMessage", {
-              role: "assistant" as const,
-              content,
-            }),
-            user: Model.make("ChatClientMessage", {
-              role: "user" as const,
-              content: _userModelContent(threadMessage.metadata, content),
-            }),
-          });
-        })
-        .filter((message): message is ChatClientMessage.T => {
-          return isNotNull(message);
+      const workspaceId = workspaceIdRef.current;
+      const { apiMessages, modelMessages, gadgetContext, mentionCount } =
+        await _prepareTurnMessages({
+          messages,
+          attachedRefs: DataAgentFeature.isEnabled()
+            ? contextTrayRef.current
+            : [],
+          workspaceId,
         });
+      if (isGenerationStale()) {
+        return { content: [] };
+      }
 
       // Bias-check the latest user-typed message before it leaves the
       // browser. Clarification-answer markers and hidden view-change lines
       // skip consent here (clarification answers are pre-vetted via
       // `crossBoundary`; view events are synthetic).
-      const lastUserMessage = [...apiMessages]
+      const lastUserMessage = [...modelMessages]
         .reverse()
         .find(propEq("role", "user"));
       const currentUser = userRef.current;
-      const workspaceId = workspaceIdRef.current;
       // The page is read once, here, so consent waits and navigation during
       // the turn cannot mix one page's context with another page's route.
       const currentPageContext = pageContextRef.current;
@@ -296,7 +367,7 @@ export function createChatModelAdapter(
       // entries here and attach them to the backend request.
       const consentAcks = (
         await Promise.all(
-          apiMessages.map(
+          modelMessages.map(
             async (message, messageIndex): Promise<ConsentAck | undefined> => {
               if (message.role !== "user") {
                 return undefined;
@@ -353,6 +424,8 @@ export function createChatModelAdapter(
             content: lastUserMessage.content,
             pageContext: currentPageContext,
             runtimeMode: initialRuntimeMode,
+            mentionCount,
+            attachedCount: gadgetContext?.attachedRefs.length,
           }),
         });
       }
@@ -362,7 +435,7 @@ export function createChatModelAdapter(
       ): Promise<ChatModelRunResult> => {
         return applyChatModelTurnResponse({
           response,
-          apiMessages,
+          apiMessages: modelMessages,
           currentUser,
           currentPageContext,
           workspaceId,
@@ -387,6 +460,7 @@ export function createChatModelAdapter(
 
       const dataAgentTurn: DataAgentTurnOptions = {
         apiMessages,
+        gadgetContext,
         workspaceId,
         currentUser,
         chatGeneration: generation,
@@ -397,7 +471,11 @@ export function createChatModelAdapter(
 
       const runOfflineTurn = (): Promise<ChatModelRunResult> => {
         return runLocalChatTurn({
-          dataAgentTurn,
+          dataAgentTurn: {
+            ...dataAgentTurn,
+            apiMessages: modelMessages,
+            gadgetContext: undefined,
+          },
           workspace: workspaceRef.current,
           pageContext: currentPageContext,
           copy: copyRef.current,
@@ -434,7 +512,7 @@ export function createChatModelAdapter(
         }
       }
 
-      const currentMessagesKey = chatMessagesKey(apiMessages);
+      const currentMessagesKey = chatMessagesKey(modelMessages);
       const cachedTurn = lastTurnRef.current;
       const retryContext =
         cachedTurn && cachedTurn.messagesKey === currentMessagesKey
@@ -446,7 +524,7 @@ export function createChatModelAdapter(
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId },
           body: {
-            messages: apiMessages,
+            messages: [...modelMessages],
             context: currentPageContext,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
             ...(retryContext ? { retryContext } : {}),

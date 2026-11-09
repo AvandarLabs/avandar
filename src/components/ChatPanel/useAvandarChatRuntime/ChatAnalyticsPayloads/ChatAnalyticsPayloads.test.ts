@@ -75,6 +75,28 @@ describe("ChatAnalyticsPayloads", () => {
     });
   });
 
+  it("counts mentions and attached items, never names", () => {
+    const payload = ChatAnalyticsPayloads.fromMessage({
+      content: 'Show @"US deaths"',
+      pageContext: ChatPageContext.createDashboardsViewContext({
+        dashboardId: "dashboard-1",
+      }),
+      runtimeMode: { kind: "cloud" },
+      mentionCount: 1,
+      attachedCount: 2,
+    });
+
+    expect(payload).toEqual({
+      promptChars: 17,
+      pageApp: "dashboards",
+      runtimeMode: "cloud",
+      hasOpenDataset: false,
+      mentionCount: 1,
+      attachedCount: 2,
+    });
+    expect(JSON.stringify(payload)).not.toContain("US deaths");
+  });
+
   it("counts SQL without retaining SQL", () => {
     const payload = ChatAnalyticsPayloads.fromSql("select secret from data");
     expect(payload).toEqual({ sqlChars: 23 });

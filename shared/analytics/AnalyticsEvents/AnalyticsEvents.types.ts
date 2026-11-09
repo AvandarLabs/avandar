@@ -125,6 +125,10 @@ type ChatMessageSentPayload = {
   modelId?: string;
   runtimeMode: "cloud" | "local";
   hasOpenDataset: boolean;
+  /** Gadgets the message mentions. */
+  mentionCount?: number;
+  /** Gadgets attached to the chat when the message was sent. */
+  attachedCount?: number;
 };
 
 /**
