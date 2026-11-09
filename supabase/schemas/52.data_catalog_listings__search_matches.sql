@@ -6,8 +6,11 @@
  *
  * A listing matches when `search_vector` contains the query's words, or when
  * the query is close to a word in its name: a partial word while typing, or
- * a misspelling. `score` is the full-text rank plus the name's trigram word
- * similarity. A blank query matches every listing, each with a score of 0.
+ * a misspelling. Once 50 listings already match the words themselves, a
+ * merely similar name is left out: it would not change the first page, and
+ * keeping it would make the search recheck every whole-word hit. `score` is
+ * the full-text rank plus the name's trigram word similarity. A blank query
+ * matches every listing, each with a score of 0.
  *
  * The filters are applied as conditions on the listings rather than computed
  * for every row, and plans are made for each call's own arguments
@@ -89,6 +92,9 @@ declare
   v_tags text[] := coalesce(p_tags, '{}');
   v_updated_window tstzrange;
   v_ts_query tsquery;
+  -- A full page of whole-word matches. Past this, name similarity is skipped.
+  v_name_similarity_limit constant integer := 50;
+  v_skip_name_similarity boolean := false;
 begin
   if v_updated_within not in ('any', 'past_month', 'past_year', 'over_a_year') then
     raise exception 'Unknown catalog update window: %', p_updated_within
@@ -106,6 +112,61 @@ begin
 
   if v_query is not null then
     v_ts_query := websearch_to_tsquery('english'::regconfig, v_query);
+  end if;
+
+  if v_ts_query is not null and numnode(v_ts_query) > 0 then
+    select
+      count(*) >= v_name_similarity_limit
+    into
+      v_skip_name_similarity
+    from
+      (
+        select
+          1
+        from
+          public.data_catalog_listings listing
+        where
+          listing.search_vector @@ v_ts_query and
+          (
+            cardinality(v_sources) = 0 or
+            listing.organization1_name = any (v_sources)
+          ) and
+          (
+            cardinality(v_formats) = 0 or
+            case
+              when listing.api_resource_format is not null then upper(listing.api_resource_format)
+              when listing.parquet_file_name is not null then 'PARQUET'
+            end = any (v_formats)
+          ) and
+          (
+            v_updated_within = 'any' or
+            (
+              coalesce(listing.date_of_last_update, listing.date_of_last_sync) >= coalesce(lower(v_updated_window), '-infinity'::timestamptz) and
+              coalesce(listing.date_of_last_update, listing.date_of_last_sync) < coalesce(upper(v_updated_window), 'infinity'::timestamptz)
+            )
+          ) and
+          (
+            not v_is_loadable_only or
+            (
+              listing.is_workspace_loadable and
+              not listing.is_invalid
+            )
+          ) and
+          (
+            cardinality(v_organization2_names) = 0 or
+            listing.organization2_name = any (v_organization2_names)
+          ) and
+          (
+            cardinality(v_domains) = 0 or
+            listing.domains && v_domains
+          ) and
+          (
+            cardinality(v_tags) = 0 or
+            listing.tags && v_tags
+          )
+        limit
+          v_name_similarity_limit
+      ) as name_similarity_probe;
   end if;
 
   return query
@@ -145,7 +206,10 @@ begin
     (
       v_query is null or
       listing.search_vector @@ v_ts_query or
-      v_query operator(extensions.<%) listing.display_name
+      (
+        not v_skip_name_similarity and
+        v_query operator(extensions.<%) listing.display_name
+      )
     ) and
     (
       cardinality(v_sources) = 0 or

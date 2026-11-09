@@ -1279,6 +1279,10 @@ msgstr "Le SQL actuel contient des éléments que le formulaire ne peut pas "
 "représenter. Si vous continuez, il sera remplacé par le SQL généré à "
 "partir du formulaire."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No keywords"
+msgstr "Aucun mot-clé"
+
 #. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
@@ -2896,6 +2900,10 @@ msgstr "Aucune valeur n'a été retournée depuis {column}. Décrivez ce dont vo
 msgid "Open map"
 msgstr "Ouvrir la carte"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No formats"
+msgstr "Aucun format"
+
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
 msgstr "Modèles hors ligne supprimés"
@@ -4378,6 +4386,10 @@ msgstr "Créer un tableau de bord et enregistrer"
 msgid "Your data is summarized"
 msgstr "Vos données sont résumées"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No topics"
+msgstr "Aucun sujet"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Marge intérieure"
@@ -5195,6 +5207,10 @@ msgstr "Image"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "N’utilise aucune donnée de l’espace de travail."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "No organizations"
+msgstr "Aucune organisation"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
@@ -9170,6 +9186,10 @@ msgstr "Toutes les décisions"
 msgid "series.cases"
 msgstr "series.cases"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
+msgid "Loading count"
+msgstr "Chargement du nombre"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
 msgstr "Thèmes"
@@ -11385,6 +11405,10 @@ msgstr "Écrivez une mise à jour"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
 msgstr "Impossible de créer ce type de dossier"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No publishers"
+msgstr "Aucun éditeur"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

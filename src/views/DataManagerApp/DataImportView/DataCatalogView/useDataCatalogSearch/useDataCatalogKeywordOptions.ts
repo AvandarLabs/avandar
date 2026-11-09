@@ -8,6 +8,9 @@ type DataCatalogKeywordOptions = {
   /** The keywords the Keywords filter offers right now. */
   keywordOptions: readonly DataCatalogListing.FacetOption[];
 
+  /** True while a search inside Keywords is still counting. */
+  isKeywordCountLoading: boolean;
+
   /** Takes what the user types into the Keywords filter. */
   onKeywordSearchChange: (keywordSearch: string) => void;
 };
@@ -44,6 +47,7 @@ export function useDataCatalogKeywordOptions(options: {
     },
     enabled: isSearchingKeywords,
     placeholderData: keepPreviousData,
+    retry: false,
   });
 
   return {
@@ -51,6 +55,7 @@ export function useDataCatalogKeywordOptions(options: {
       isSearchingKeywords && keywordQuery.data
         ? keywordQuery.data
         : topKeywords,
+    isKeywordCountLoading: keywordQuery.isFetching,
     onKeywordSearchChange: setKeywordSearch,
   };
 }

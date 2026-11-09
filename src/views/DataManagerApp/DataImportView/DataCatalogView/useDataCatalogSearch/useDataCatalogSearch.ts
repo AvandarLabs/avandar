@@ -61,6 +61,9 @@ export function useDataCatalogSearch(options: {
     },
     initialPageParam: 0,
     placeholderData: keepPreviousData,
+    // A timeout is the signed-in role stopping a slow count. Retrying it
+    // spends another 8 seconds to learn the same thing.
+    retry: false,
   });
 
   const listings = useMemo(() => {

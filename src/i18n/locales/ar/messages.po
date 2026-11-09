@@ -1245,6 +1245,10 @@ msgid "The current SQL contains parts the form could not represent. Continuing "
 msgstr "يحتوي SQL الحالي على أجزاء لا يمكن للنموذج تمثيلها. سيؤدي المتابعة إلى "
 "استبداله بـ SQL الذي تم إنشاؤه من النموذج."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No keywords"
+msgstr "لا توجد كلمات مفتاحية"
+
 #. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
@@ -2825,6 +2829,10 @@ msgstr "لم يتم إرجاع أي قيم من {column}. وصف ما تحتاج
 msgid "Open map"
 msgstr "فتح الخريطة"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No formats"
+msgstr "لا توجد تنسيقات"
+
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
 msgstr "تمت إزالة النماذج غير المتصلة"
@@ -4272,6 +4280,10 @@ msgstr "إنشاء لوحة & حفظ"
 msgid "Your data is summarized"
 msgstr "تم تلخيص بياناتك"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No topics"
+msgstr "لا توجد موضوعات"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "حشوة"
@@ -5068,6 +5080,10 @@ msgstr "صورة"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "لا يستخدم أي بيانات من مساحة العمل."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "No organizations"
+msgstr "لا توجد مؤسسات"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
@@ -8952,6 +8968,10 @@ msgstr "جميع القرارات"
 msgid "series.cases"
 msgstr "series.cases"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
+msgid "Loading count"
+msgstr "جارٍ تحميل العدد"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
 msgstr "المواضيع"
@@ -11117,6 +11137,10 @@ msgstr "اكتب تحديثًا"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
 msgstr "تعذّر إنشاء نوع الحالة هذا"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No publishers"
+msgstr "لا يوجد ناشرون"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

@@ -33,7 +33,7 @@
  * is a query and by name when there is not. Any other value raises `22023`
  * (invalid parameter value).
  * @param p_count_cap The most matches to count, clamped to between 1 and
- * 10,000.
+ * 5,000. Past that the total is reported as 5,000 and `is_total_capped`.
  *
  * @returns One row per listing on the page, with its organization levels.
  * `total_count` and `is_total_capped` describe the matches across every page,
@@ -51,7 +51,7 @@ create or replace function public.rpc_data_catalog_listings__search (
   p_domains text[] default '{}',
   p_tags text[] default '{}',
   p_sort_by text default null,
-  p_count_cap integer default 10000
+  p_count_cap integer default 5000
 ) returns table (
   id uuid,
   display_name text,
@@ -70,7 +70,7 @@ create or replace function public.rpc_data_catalog_listings__search (
 declare
   v_limit integer := least(greatest(coalesce(p_limit, 50), 1), 200);
   v_offset integer := greatest(coalesce(p_offset, 0), 0);
-  v_count_cap integer := least(greatest(coalesce(p_count_cap, 10000), 1), 10000);
+  v_count_cap integer := least(greatest(coalesce(p_count_cap, 5000), 1), 5000);
   v_sort_by text := coalesce(
     p_sort_by,
     case

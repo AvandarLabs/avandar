@@ -57,7 +57,7 @@ create or replace function public.rpc_data_catalog_listings__search_tag_options 
       '{}',
       50,
       p_tag_search,
-      10000,
+      5000,
       p_query,
       p_sources,
       p_formats,

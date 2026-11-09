@@ -1262,6 +1262,10 @@ msgstr "SQL ya sasa ina sehemu ambazo fomu haikuweza kuwakilisha. Ukiendelea, "
 "SQL hiyo itafutwa na kubadilishwa na SQL inayozalishwa kutoka kwenye "
 "fomu."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No keywords"
+msgstr "Hakuna maneno muhimu"
+
 #. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
@@ -2864,6 +2868,10 @@ msgstr "Hakuna thamani zilizorejeshwa kutoka {column}. Eleza unachohitaji "
 msgid "Open map"
 msgstr "Fungua ramani"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No formats"
+msgstr "Hakuna miundo"
+
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
 msgstr "Modeli za nje ya mtandao zimeondolewa"
@@ -4330,6 +4338,10 @@ msgstr "Unda dashibodi & hifadhi"
 msgid "Your data is summarized"
 msgstr "Data yako imefupishwa"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No topics"
+msgstr "Hakuna mada"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Pengo la ndani"
@@ -5135,6 +5147,10 @@ msgstr "Picha"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "Haitumii data ya workspace."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "No organizations"
+msgstr "Hakuna mashirika"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
@@ -9066,6 +9082,10 @@ msgstr "Maamuzi yote"
 msgid "series.cases"
 msgstr "mfululizo.kesi"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
+msgid "Loading count"
+msgstr "Inapakia idadi"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
 msgstr "Mada"
@@ -11251,6 +11271,10 @@ msgstr "Andika taarifa"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
 msgstr "Imeshindwa kuunda aina hiyo ya kesi"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No publishers"
+msgstr "Hakuna wachapishaji"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"

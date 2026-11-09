@@ -2796,6 +2796,18 @@ export type Database = {
           value: string
         }[]
       }
+      data_catalog_listings__facets_for_one_search: {
+        Args: {
+          p_count_cap: number
+          p_is_loadable_only: boolean
+          p_query: string
+        }
+        Returns: {
+          facet: string
+          listing_count: number
+          value: string
+        }[]
+      }
       data_catalog_listings__is_updated_within: {
         Args: { p_last_updated_at: string; p_updated_within: string }
         Returns: boolean

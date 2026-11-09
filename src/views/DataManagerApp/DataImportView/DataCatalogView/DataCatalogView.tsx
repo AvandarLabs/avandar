@@ -154,13 +154,16 @@ export function DataCatalogView({
     filters,
     sortBy,
   });
-  const facets = useDataCatalogFacets({ query: debouncedSearch, filters });
+  const { facets, isCountLoading } = useDataCatalogFacets({
+    query: debouncedSearch,
+    filters,
+  });
   const isCatalogEmpty =
     facets !== undefined && facets.numCatalogListings === 0;
   useEffect(() => {
     onCatalogEmptyChange?.(isCatalogEmpty);
   }, [isCatalogEmpty, onCatalogEmptyChange]);
-  const { keywordOptions, onKeywordSearchChange } =
+  const { keywordOptions, isKeywordCountLoading, onKeywordSearchChange } =
     useDataCatalogKeywordOptions({
       query: debouncedSearch,
       filters,
@@ -337,6 +340,8 @@ export function DataCatalogView({
       filters={filters}
       facets={facets ?? EMPTY_CATALOG_FACETS}
       keywordOptions={keywordOptions}
+      isCountLoading={isCountLoading}
+      isKeywordCountLoading={isKeywordCountLoading}
       onFiltersChange={changeFilters}
       onKeywordSearchChange={onKeywordSearchChange}
     />
