@@ -72,7 +72,113 @@ function _createLayer(): MapLayer.T {
   };
 }
 
+type GraduatedColor = Extract<MapLayer.Color, { type: "graduated" }>;
+
+function _withGraduatedColor(
+  layer: MapLayer.T,
+  overrides: Partial<GraduatedColor>,
+): MapLayer.T {
+  if (
+    layer.symbology.type !== "fill" ||
+    layer.symbology.color.type !== "graduated"
+  ) {
+    throw new Error("Expected a graduated fill layer");
+  }
+  return {
+    ...layer,
+    symbology: {
+      ...layer.symbology,
+      color: { ...layer.symbology.color, ...overrides },
+    },
+  };
+}
+
 describe("ClassificationEditor", () => {
+  it("names a reversed preset in the color ramp select", () => {
+    boundarySourceState.options = [];
+    const layer = _withGraduatedColor(_createLayer(), {
+      ramp: ["#08306b", "#2171b5", "#6baed6", "#bdd7e7", "#eff3ff"],
+    });
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Color ramp" })).toHaveValue(
+      "Blue",
+    );
+  });
+
+  it("shows custom colors when the ramp matches no preset", () => {
+    boundarySourceState.options = [];
+    const layer = _withGraduatedColor(_createLayer(), {
+      ramp: ["#d7301f", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+    });
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    const rampSelect = screen.getByRole("combobox", { name: "Color ramp" });
+    expect(rampSelect).toHaveValue("");
+    expect(rampSelect).toHaveAttribute("placeholder", "Custom colors");
+  });
+
+  it("fills every class from the picked red preset", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Color ramp" }));
+    fireEvent.click(screen.getByRole("option", { name: "Red", hidden: true }));
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.ramp).toEqual([
+      "#fee5d9",
+      "#fcae91",
+      "#fb6a4a",
+      "#de2d26",
+      "#a50f15",
+    ]);
+  });
+
+  it("reverses the class colors from the Reverse colors button", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Reverse colors" }));
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.ramp).toEqual([
+      "#08306b",
+      "#2171b5",
+      "#6baed6",
+      "#bdd7e7",
+      "#eff3ff",
+    ]);
+  });
+
   it("uses the grid aggregation output when enabling graduated color", () => {
     const layer = _createLayer();
     const outputValueId = uuid<MapLayer.AreaAggregationOutputId>();
