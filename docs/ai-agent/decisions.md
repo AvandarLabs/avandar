@@ -706,3 +706,17 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   reach the model as placeholders; answers stay correct through the round
   trip. Still open: names that never appear as SQL literals, and row
   counts as an oracle for a model probing a placeholder (see the spec).
+
+## D40. 1E brings the agent's question cards and analytics to parity (approved)
+
+- **Decision (Pablo, 2026-11-09).** Besides "Try again", 1E gives the
+  agent's `ask_user` cards today's audit log
+  (`ClarificationAuditEntryClient.recordShown`) and bias check
+  (`detectBias`), and the agent logs `chat.sql_generated` and
+  `dashboard.block_added_via_chat` as today's chat does
+  (`applyChatModelTurnResponse.ts`).
+- **Why.** These are the last gaps between the agent and today's chat
+  besides dashboard actions (1D). Closing them before 1F means turning the
+  agent on loses nothing today's chat records.
+- **Alternatives.** Leave them until after 1F (the agent would run by
+  default without the audit trail and analytics today's chat has).

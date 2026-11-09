@@ -23,7 +23,7 @@ the local `demo/measles` merge commit `cc3833377`) is where 1B starts.
    - [decisions.md](decisions.md): D34 to D39 are this phase's decisions.
    - [eval.md](eval.md): "Phase 1A" results, P01 to P07, and "Reproducing
      every result".
-2. **Check the open decisions below with Pablo** before starting work.
+2. The open decisions are settled (below).
 3. **Spec 1B** with the `brainstorming` skill, to
    `docs/ai-agent/specs/phase-1b.md`, and get Pablo's approval.
 4. **Plan it** with `writing-plans` to `docs/ai-agent/plans/phase-1b.md`,
@@ -31,13 +31,13 @@ the local `demo/measles` merge commit `cc3833377`) is where 1B starts.
 5. **Implement** with `subagent-driven-development` (see "How Pablo wants
    the work run").
 
-## Open decisions for Pablo (ask first)
+## Decisions Pablo made at the start of the 1B session (2026-11-09)
 
-| # | Decision | Context |
+| # | Decision | Outcome |
 |---|---|---|
-| 1 | **Push `demo/measles`?** | The merge of Phase 1A is local only: `demo/measles` is 69 commits ahead of origin and was not pushed. A push deploys the demo. The agent stays off for users unless `localStorage["avandar:data-agent"] = "on"`. |
-| 2 | **Add the audit log, bias check, and analytics to 1E?** | Proposed, not yet approved. See "The agent stays off" below. |
-| 3 | **Remove the `feat/agent-default` worktree and its local Supabase stack?** | It is fully merged into local `demo/measles`. Keep it until the push, then clean up with the `using-wt` skill (`wt rm`) and `supabase stop --project-id feat-agent-default`. |
+| 1 | **Push `demo/measles`?** | Yes. Origin's newer commits were merged in, and `demo/measles` was pushed at `6915c456e`. Prompt v2 is now fixed: any prompt change needs a new version. |
+| 2 | **Add the audit log, bias check, and analytics to 1E?** | Yes, all three (D40). |
+| 3 | **Remove the `feat/agent-default` worktree and its local Supabase stack?** | Done. Its stack was stopped with its data kept, and its live-check screenshots moved to `.temp/feat-agent-default/` in this worktree. |
 
 ## Where things stand (2026-11-09)
 
@@ -50,7 +50,7 @@ the local `demo/measles` merge commit `cc3833377`) is where 1B starts.
 | Failure handling | Agent failures throw; network failures offer "Answer offline"; other failures reply with a translated message (access or generic). |
 | Evals | P01 to P07 7/7; the 45 questions 45/45 on the latest run. Spend for the phase was about $0.15. |
 | Browser spec | `tests/e2e/agent-chat-result.spec.ts` passes in about 15 s (6 of 6 since the Docker cleanup). |
-| Live checks | Three rounds with live models in the real app (Data Explorer, dashboard, dashboard list, map, dataset, settings, case type, case, case designer, switch off). All passed. Screenshots: `~/src/worktrees/avandar/feat/agent-default/.temp/feat-agent-default/live*/`. |
+| Live checks | Three rounds with live models in the real app (Data Explorer, dashboard, dashboard list, map, dataset, settings, case type, case, case designer, switch off). All passed. Screenshots: `.temp/feat-agent-default/live*/` in this worktree. |
 
 ### The agent stays off (Pablo, 2026-11-09)
 
