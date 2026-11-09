@@ -142,6 +142,21 @@ describe("PublicMapSnapshotStorageClient", () => {
     expect(removeMock).toHaveBeenCalledWith([MAP_PATH]);
   });
 
+  it("fails when storage removes fewer map snapshots than requested", async () => {
+    listMock.mockResolvedValue({
+      data: [{ name: `${MAP_ID}.json` }],
+      error: null,
+    });
+    // Storage RLS silently skips objects the caller may not delete.
+    removeMock.mockResolvedValue({ data: [], error: null });
+
+    await expect(
+      PublicMapSnapshotStorageClient.deleteMapSnapshotsForGeneration(
+        GENERATION,
+      ),
+    ).rejects.toThrow("removed 0 of 1 requested objects");
+  });
+
   it("does not look for map snapshots in the legacy generation", async () => {
     await PublicMapSnapshotStorageClient.deleteMapSnapshotsForGeneration({
       ...GENERATION,

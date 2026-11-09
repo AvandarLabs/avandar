@@ -1,4 +1,4 @@
-import { MIMEType } from "@avandar/utils";
+import { MIMEType, prop } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { MapSnapshotJson } from "@/clients/maps/MapSnapshot/MapSnapshotJson/MapSnapshotJson";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
@@ -94,12 +94,23 @@ async function _deleteMapSnapshotsForGeneration(
     return;
   }
   await options.assertCanDelete?.();
-  const { error } = await AvaSupabase.db()
+  const { data: removedObjects, error } = await AvaSupabase.db()
     .storage.from(options.bucket)
     .remove(objectPaths);
   if (error) {
     throw new Error(
       `Failed to clear map snapshots from ${options.bucket} for dashboard ${options.dashboardId}: ${error.message}`,
+    );
+  }
+  // Storage RLS skips objects the caller may not delete without an error, so
+  // only the returned names prove each snapshot is gone.
+  const removedObjectNames = new Set(removedObjects?.map(prop("name")) ?? []);
+  const missingObjectPaths = objectPaths.filter((objectPath) => {
+    return !removedObjectNames.has(objectPath);
+  });
+  if (missingObjectPaths.length > 0) {
+    throw new Error(
+      `Failed to clear map snapshots from ${options.bucket} for dashboard ${options.dashboardId}: removed ${removedObjectNames.size} of ${objectPaths.length} requested objects.`,
     );
   }
 }
