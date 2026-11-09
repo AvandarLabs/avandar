@@ -67,6 +67,16 @@ export type DataAgent = {
   ask: (message: string) => Promise<DataAgentReply>;
 };
 
+/** The usage of an answer before any model call. */
+const EMPTY_USAGE: DataAgentUsage = {
+  calls: 0,
+  inputTokens: 0,
+  cachedInputTokens: 0,
+  outputTokens: 0,
+  reasoningTokens: 0,
+  cost: 0,
+};
+
 function _addUsage(total: DataAgentUsage, usage: Usage): DataAgentUsage {
   return {
     calls: total.calls + 1,
@@ -79,6 +89,31 @@ function _addUsage(total: DataAgentUsage, usage: Usage): DataAgentUsage {
   };
 }
 
+/** What the error says when a failed model call gave no message. */
+const FALLBACK_ERROR_MESSAGE = "The assistant could not answer.";
+
+function _findLastAssistant(
+  messages: Agent["state"]["messages"],
+): AssistantMessage | undefined {
+  return [...messages].reverse().find((message) => {
+    return message.role === "assistant";
+  }) as AssistantMessage | undefined;
+}
+
+/**
+ * Throws when the answer ended on a failed model call. Pi does not reject
+ * `prompt` for one: a failed request (for example a fetch that never
+ * reached the proxy, or the proxy refusing it) ends the run with an
+ * assistant message whose `stopReason` is `error`. A stopped run
+ * (`aborted`) is not a failure.
+ */
+function _throwIfModelCallFailed(messages: Agent["state"]["messages"]): void {
+  const lastAssistant = _findLastAssistant(messages);
+  if (lastAssistant?.stopReason === "error") {
+    throw new Error(lastAssistant.errorMessage || FALLBACK_ERROR_MESSAGE);
+  }
+}
+
 /**
  * The reply to show. When the turn ended on a query, the query's summary is
  * the answer; any text the model wrote beside the tool call is narration
@@ -88,9 +123,7 @@ function _getReplyText(
   messages: Agent["state"]["messages"],
   state: DataAgentRunState,
 ): string {
-  const lastAssistant = [...messages].reverse().find((message) => {
-    return message.role === "assistant";
-  }) as AssistantMessage | undefined;
+  const lastAssistant = _findLastAssistant(messages);
   const endedOnToolCall = (lastAssistant?.content ?? []).some((block) => {
     return block.type === "toolCall";
   });
@@ -204,7 +237,8 @@ export type CreateDataAgentOptions = {
  * Creates the Pi-based data agent for one conversation: three tools (run a
  * query, look up stored values, ask the user), a cache-friendly system
  * prompt, and a model policy that escalates to a stronger model only when a
- * query fails or comes back empty.
+ * query fails or comes back empty. `ask` rejects when a model call fails,
+ * so callers can show the error or offer another way to answer.
  */
 export function createDataAgent(
   options: Readonly<CreateDataAgentOptions>,
@@ -219,14 +253,7 @@ export function createDataAgent(
       turnCounter.turns = 0;
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;
-      let usage: DataAgentUsage = {
-        calls: 0,
-        inputTokens: 0,
-        cachedInputTokens: 0,
-        outputTokens: 0,
-        reasoningTokens: 0,
-        cost: 0,
-      };
+      let usage: DataAgentUsage = EMPTY_USAGE;
       const modelIds: string[] = [];
       const unsubscribe = agent.subscribe((event: AgentEvent) => {
         if (
@@ -242,6 +269,7 @@ export function createDataAgent(
       } finally {
         unsubscribe();
       }
+      _throwIfModelCallFailed(agent.state.messages);
       return {
         text: _getReplyText(agent.state.messages, state),
         state,
