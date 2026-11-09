@@ -628,7 +628,7 @@ describe("ClassificationEditor", () => {
       value: { type: "queryColumn", column: measles.id },
     });
     expect(
-      updated.source.queryColumns.map((column) => {
+      updated.source.queryColumns.map((column: QueryColumn.T) => {
         return column.id;
       }),
     ).toContain(measles.id);
@@ -645,8 +645,14 @@ describe("ClassificationEditor", () => {
     if (schools.symbology.type !== "circle") {
       throw new Error("Expected a circle layer");
     }
+    const { sensitivity, geoBinding, ...schoolsRest } = schools;
+    if (sensitivity.mode === "aggregateOnly") {
+      throw new Error("Expected a point-level sensitivity");
+    }
     const layer: MapLayer.T = {
-      ...schools,
+      ...schoolsRest,
+      sensitivity,
+      geoBinding,
       symbology: {
         ...schools.symbology,
         color: {
@@ -683,7 +689,7 @@ describe("ClassificationEditor", () => {
       column: measles.id,
     });
     expect(
-      updated.source.queryColumns.map((column) => {
+      updated.source.queryColumns.map((column: QueryColumn.T) => {
         return column.id;
       }),
     ).toContain(measles.id);
