@@ -115,9 +115,11 @@ function _compileListSql(
     }),
     nearest: nearest
       ? {
+          // Rings are drawn around every site, whatever the sites layer is
+          // itself filtered by, so distances are measured to the same sites.
           source: compileMapLayerFeatureSource({
             ...shared,
-            layer: nearest.sourceLayer,
+            layer: { ...nearest.sourceLayer, spatialFilter: undefined },
             propertyColumnIds: nearest.labelColumn
               ? [nearest.labelColumn.id]
               : [],

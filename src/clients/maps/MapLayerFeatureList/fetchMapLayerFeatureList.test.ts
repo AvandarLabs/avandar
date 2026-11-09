@@ -112,6 +112,43 @@ describe("fetchMapLayerFeatureList", () => {
     expect(rawSql).toContain("arg_min(nearest_label, pair_distance)");
   });
 
+  it("measures distances from every site the rings are drawn around, even when the sites layer is filtered", async () => {
+    const { config, sites, schools } = createSitesAndSchoolsFixture();
+    const clinics = createSitesAndSchoolsFixture();
+    const filteredSites: MapLayer.T = {
+      ...sites,
+      spatialFilter: { layerId: clinics.buffer.id },
+    };
+    const filteredConfig = {
+      ...config,
+      layers: [
+        clinics.sites,
+        clinics.buffer,
+        ...config.layers.map((layer) => {
+          return layer.id === sites.id ? filteredSites : layer;
+        }),
+      ],
+    };
+    const unfilteredConfig = {
+      ...filteredConfig,
+      layers: filteredConfig.layers.map((layer) => {
+        return layer.id === sites.id ? sites : layer;
+      }),
+    };
+
+    await fetchMapLayerFeatureList(
+      _makeOptions({ config: unfilteredConfig, layerId: schools.id }),
+    );
+    await fetchMapLayerFeatureList(
+      _makeOptions({ config: filteredConfig, layerId: schools.id }),
+    );
+
+    const [unfilteredSql, filteredSql] = runQueryMock.mock.calls.map((call) => {
+      return (call[0] as { rawSql: string }).rawSql;
+    });
+    expect(filteredSql).toBe(unfilteredSql);
+  });
+
   it("refuses a layer with approximate locations", async () => {
     const { config, schools } = createSitesAndSchoolsFixture({
       mode: "jitter",
