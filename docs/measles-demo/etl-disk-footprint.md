@@ -219,12 +219,45 @@ CSV and every other listed format stay. It is a one-line change: add
 `"GeoTIFF"` to `format:other`'s `excludedFormats` in
 `apps/pipeline-server/pipelines/hdx/hdxScopes.ts`.
 
+## Space savings on 2026-11-09
+
+Stored (compressed) bytes per column for the 76,736 HDX listings, measured
+before the reset:
+
+| Column | MB | Distinct values |
+| --- | --- | --- |
+| `source_metadata` | 592 | |
+| `search_vector` | 115 | |
+| `description` | 75 | 17,319 datasets |
+| `source_url`, `source_download_url` | 18 | |
+| `tags`, `domains` | 13 | |
+| Every other short text column | 12 | |
+| `organization1_name`, `organization2_name` | 3 | 334 organizations |
+| `license` | 1 | 15 |
+
+What changed:
+
+| Change | Why |
+| --- | --- |
+| `source_metadata` is now `additional_source_metadata`, holding only what no listing column holds | Each mapped field was stored twice, and a CKAN package's metadata once per resource. `CatalogFieldMapper.omitMappedPaths` leaves out every `from` path and each script's `reads`, the pipelines leave out what they map in code, and `hdx.pipeline.yaml` omits license text, the organization's repeated keys, and `solr_additions` |
+| The listings upsert returns ids, not rows, and reads its input by index | Returning rows buffered every call in a temp file: 6 GB of temp writes on demo, which spends the disk IO budget, and the whole batch was sent back over the wire |
+| A stored row with no `additional_source_metadata` counts as changed | A full run fills the column for listings written before it existed, such as Socrata's |
+
+What was measured and left alone:
+
+| Idea | Saving | Decision |
+| --- | --- | --- |
+| A `data_catalog_licenses` table with integer keys | Under 1 MB: `license` holds 15 short names | Not worth a join. The license bloat was `license_other`, a license's full text inside `source_metadata`, now omitted |
+| Lookup tables for other repeated short text (organizations, formats, URLs' hosts) | Under 20 MB in all | Not worth the joins, the search changes, and the writes that resolve keys |
+| An integer key on `data_catalog_listings__relation_columns` | About 16 MB (its uuid key index is 25 MB) | Small, and the table is mirrored to the desktop's SQLite, whose sync and generated migrations assume its uuid key |
+| An integer key on `data_catalog_listings` | Under 5 MB | Its uuid is referenced by datasets, gadgets, routes, and the Parquet cache |
+| Dead rows from rewrites | 358 dead rows on demo | Autovacuum kept up. The waste was duplication, not rows kept too long |
+
 ## Not done here
 
 | Improvement | Saving | Why not now |
 | --- | --- | --- |
-| Store a package's metadata once, not on each resource listing | Most of the remaining ~4 KB per listing (`description`, `search_vector`, package fields), with 6.4 resources per HDX dataset | Needs a new table and changes to catalog search |
+| Store a package's metadata once, not on each resource listing | The biggest remaining saving: `description` and `search_vector` are 190 MB for 76,736 listings of 17,319 datasets, about 75% of it repeated. Roughly 350 MB at HDX's full 191k listings | Needs a datasets table, a search vector split across two tables, and changes to every catalog search function |
 | Stop a run before the database passes a size limit | Ends a run cleanly instead of on a full disk | Needs an RPC reading `pg_database_size` and a configured limit |
-| Return only ids from `rpc_data_catalog_listings__upsert_with_relation_columns` | Most of the 6 GB of temp files the upsert wrote (about 10 MB per call), which spends the branch's disk IO budget | `RETURN NEXT` buffers every full listing row and PostgREST serializes it back, but the pipeline does not need the rows. Needs a migration |
 | Set `temp_file_limit` for the API roles | A runaway query fails instead of filling the disk | A database setting change on the branch |
 | Count a change to `source_metadata`'s keys as a change | Lets a trim reach rows a run would not otherwise rewrite | Rewrites every legacy row, which needs free disk first. A reset is cheaper for the demo |
