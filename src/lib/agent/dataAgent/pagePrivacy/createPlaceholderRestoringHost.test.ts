@@ -106,6 +106,35 @@ describe("createPlaceholderRestoringHost", () => {
     });
   });
 
+  it("masks values held only because their SQL was unread, as words", async () => {
+    const vault = createSqlPlaceholderVault();
+    vault.redact(`SELECT "x" FROM t WHERE "county" = 'Kings' GROUP BY ALL`, {
+      isSensitiveColumn: () => {
+        return false;
+      },
+      isSensitiveValue: () => {
+        return false;
+      },
+    });
+    const inner = _createInnerHost({
+      showQuery: vi.fn().mockResolvedValue({
+        kind: "failed",
+        error: "Binder Error: Kings is not a column",
+      }),
+    });
+    const host = createPlaceholderRestoringHost(inner, vault);
+
+    expect(
+      await host.showQuery({
+        sql: `SELECT 1 FROM t WHERE "county" = '<value 1>'`,
+        summary: "s",
+      }),
+    ).toEqual({
+      kind: "failed",
+      error: "Binder Error: <value 1> is not a column",
+    });
+  });
+
   it("masks restored values in a failed query's error", async () => {
     const inner = _createInnerHost({
       showQuery: vi.fn().mockResolvedValue({

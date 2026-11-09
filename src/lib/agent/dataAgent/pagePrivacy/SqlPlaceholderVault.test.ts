@@ -118,16 +118,52 @@ describe("createSqlPlaceholderVault redact", () => {
 
     expect(
       vault.redact(
-        `SELECT 1 FROM t WHERE "name" IN ('<value 01>', '<value 0>') GROUP BY ALL`,
+        `SELECT "x" FROM t WHERE "name" IN ('<value 01>', '<value 0>') GROUP BY ALL`,
         DETECTORS,
       ),
     ).toBe(
-      `SELECT 1 FROM t WHERE "name" IN ('<value 1>', '<value 2>') GROUP BY ALL`,
+      `SELECT "x" FROM t WHERE "name" IN ('<value 1>', '<value 2>') GROUP BY ALL`,
     );
   });
 });
 
+describe("createSqlPlaceholderVault unread numbers", () => {
+  it("keeps small numbers in unreadable SQL without a personal column", () => {
+    const vault = createSqlPlaceholderVault();
+
+    expect(
+      vault.redact(`SELECT "x" FROM t WHERE "x" = 42 GROUP BY ALL`, DETECTORS),
+    ).toBe(`SELECT "x" FROM t WHERE "x" = 42 GROUP BY ALL`);
+  });
+
+  it("hides small numbers in unreadable SQL that names a personal column", () => {
+    const vault = createSqlPlaceholderVault();
+
+    expect(
+      vault.redact(
+        `SELECT "x" FROM t WHERE "patient_id" = 42 GROUP BY ALL`,
+        DETECTORS,
+      ),
+    ).toBe(`SELECT "x" FROM t WHERE "patient_id" = '<value 1>' GROUP BY ALL`);
+  });
+});
+
 describe("createSqlPlaceholderVault restore", () => {
+  it("restores large and zero-padded numbers exactly as written", () => {
+    const vault = createSqlPlaceholderVault();
+    const redacted = vault.redact(
+      `SELECT * FROM t WHERE "patient_id" IN (12345678901234567891, 12345678901234567892, 007)`,
+      DETECTORS,
+    );
+
+    expect(redacted).toBe(
+      `SELECT * FROM t WHERE "patient_id" IN ('<value 1>', '<value 2>', '<value 3>')`,
+    );
+    expect(vault.restore(redacted)).toBe(
+      `SELECT * FROM t WHERE "patient_id" IN (12345678901234567891, 12345678901234567892, 007)`,
+    );
+  });
+
   it("restores placeholders with their quotes escaped", () => {
     expect(
       _vaultWithNames().restore(
@@ -183,7 +219,12 @@ describe("createSqlPlaceholderVault getPlaceholderError", () => {
   it.each([
     `SELECT '<value 1> and more'`,
     `SELECT * FROM t WHERE x LIKE '%<value 2>%'`,
-  ])("rejects a placeholder inside a larger value: %s", (sql) => {
+    `SELECT * FROM t WHERE x = '<VALUE 1>'`,
+    `SELECT * FROM t WHERE x = '<value 01>'`,
+    `SELECT * FROM t WHERE x = '<value  1>'`,
+    `SELECT * FROM t WHERE x = $$<value 1>$$`,
+    `SELECT * FROM t WHERE x = E'<value 1>'`,
+  ])("rejects a placeholder not written as a whole value: %s", (sql) => {
     expect(_vaultWithNames().getPlaceholderError(sql)).toMatch(
       /must be used as a whole quoted value/,
     );
@@ -237,6 +278,53 @@ describe("createSqlPlaceholderVault maskText", () => {
     expect(vault.maskText(`<value 1> and value`)).toBe(
       `<value 1> and <value 1>`,
     );
+  });
+});
+
+describe("createSqlPlaceholderVault masking by reason", () => {
+  /** A vault holding a swept 'month', 2022, 'Yes', and 'No', and 'Ann'. */
+  function _vaultWithSweptValues(): ReturnType<
+    typeof createSqlPlaceholderVault
+  > {
+    const vault = createSqlPlaceholderVault();
+    vault.redact(
+      `SELECT date_trunc('month', "name"), CASE WHEN "name" IS NULL THEN 'No' ELSE 'Yes' END FROM t WHERE year("name") = 2022 AND "name" = 'Ann'`,
+      DETECTORS,
+    );
+    return vault;
+  }
+
+  it("masks only compared values as words in page text", () => {
+    expect(
+      _vaultWithSweptValues().maskText(
+        "Cases by month in 2022: Yes or No, for Ann",
+      ),
+    ).toBe("Cases by month in 2022: Yes or No, for <value 5>");
+  });
+
+  it("masks every held value as a word in query results", () => {
+    expect(
+      _vaultWithSweptValues().maskResultText(
+        "date_trunc('month', name) in 2022: Yes",
+      ),
+    ).toBe("date_trunc('<value 1>', name) in <value 4>: <value 3>");
+  });
+});
+
+describe("createSqlPlaceholderVault speed", () => {
+  it("holds hundreds of values without rebuilding its mask each time", () => {
+    const vault = createSqlPlaceholderVault();
+    const startedAt = performance.now();
+    Array.from({ length: 300 }).forEach((_, index) => {
+      vault.redact(
+        `SELECT * FROM t WHERE "name" = 'Person ${index}'`,
+        DETECTORS,
+      );
+    });
+    vault.maskText("Visits by Person 250");
+
+    // About 20 ms on a laptop; rebuilding the mask on every hold took 2.7 s.
+    expect(performance.now() - startedAt).toBeLessThan(1_000);
   });
 });
 

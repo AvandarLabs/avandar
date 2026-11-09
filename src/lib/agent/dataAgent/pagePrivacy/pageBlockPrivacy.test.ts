@@ -55,7 +55,7 @@ describe("page block privacy", () => {
     );
 
     expect(block).toContain(
-      `1. "Visits by \\u003cvalue 1>" (bar): SELECT count(*) FROM t WHERE "patient_name" = '<value 1>'`,
+      `1. "Visits by <value 1>" (bar): SELECT count(*) FROM t WHERE "patient_name" = '<value 1>'`,
     );
     expect(block).not.toContain("Jane");
   });
@@ -71,6 +71,40 @@ describe("page block privacy", () => {
       ]),
     );
 
+    expect(block).not.toContain("Jane");
+  });
+
+  it("keeps titles readable when a personal chart sweeps up ordinary words", () => {
+    const block = _buildBlock(
+      _dashboard("Measles 2022", [
+        {
+          title: "Births by month",
+          sql: `SELECT date_trunc('month', "dob") AS "month", count(*) FROM t WHERE year("dob") = 2022 GROUP BY 1`,
+        },
+        {
+          title: "Cases by month in 2022",
+          sql: `SELECT date_trunc('month', "date") AS "month" FROM t WHERE year("date") = 2022 AND "state" = 'Texas' GROUP BY 1`,
+        },
+        {
+          title: "Vaccinated: Yes or No",
+          sql: `SELECT CASE WHEN "patient_name" IS NULL THEN 'No' ELSE 'Yes' END AS "named", count(*) FROM t GROUP BY 1`,
+        },
+        {
+          title: "Visits by Jane Doe",
+          sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
+        },
+      ]),
+    );
+
+    expect(block).toContain('Dashboard: "Measles 2022"');
+    expect(block).toContain(`1. "Births by month" (bar)`);
+    expect(block).toContain(
+      // Values the vault holds are hidden in every chart's SQL, never in
+      // titles unless they were compared with a personal column.
+      `2. "Cases by month in 2022" (bar): SELECT date_trunc('<value 1>', "date") AS "month" FROM t WHERE year("date") = '<value 2>' AND "state" = 'Texas'`,
+    );
+    expect(block).toContain(`3. "Vaccinated: Yes or No" (bar)`);
+    expect(block).toContain(`4. "Visits by <value 5>" (bar)`);
     expect(block).not.toContain("Jane");
   });
 

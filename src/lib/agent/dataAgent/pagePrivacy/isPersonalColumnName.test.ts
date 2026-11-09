@@ -24,6 +24,9 @@ describe("isPersonalColumnName", () => {
     "age_group",
     "patient_id",
     "Name",
+    "Client",
+    "client_id",
+    "Guardian",
   ])("flags %s", (columnName) => {
     expect(isPersonalColumnName(columnName)).toBe(true);
   });

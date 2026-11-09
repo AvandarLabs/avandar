@@ -103,7 +103,7 @@ describe("explorer page block", () => {
     );
     // DuckDB names an unaliased column after its restored SQL.
     expect(block).toContain(
-      "Result columns: district_name varchar, count_star() FILTER (WHERE (patient_name = '\\u003cvalue 1>')) bigint",
+      "Result columns: district_name varchar, count_star() FILTER (WHERE (patient_name = '<value 1>')) bigint",
     );
     expect(block).not.toContain("Jane Doe");
   });

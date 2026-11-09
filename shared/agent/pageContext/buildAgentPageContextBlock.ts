@@ -32,6 +32,12 @@ const LINE_BREAKS = /\s*[\r\n\u2028\u2029]+\s*/g;
  */
 const PAGE_TAG_START = /<(?=\s*\/?\s*current_page)/gi;
 
+/**
+ * A `<` that does not start a page placeholder (`<value 3>`). A placeholder
+ * cannot spell out a page tag, so it is left readable in names.
+ */
+const NON_PLACEHOLDER_LT = /<(?!value [1-9]\d*>)/g;
+
 /** A chart's title in the block when its own looks like personal data. */
 const REDACTED_TILE_TITLE = "Untitled chart";
 
@@ -63,22 +69,24 @@ type RenderOptions = Readonly<{
 /**
  * A name as a JSON string literal, so quotes and line breaks are escaped,
  * including the line and paragraph separators JSON leaves raw. Every `<`
- * becomes `\u003c`, so a name can never spell out `</current_page>`.
+ * but a placeholder's becomes `\u003c`, so a name can never spell out
+ * `</current_page>`.
  */
 function _quote(name: string): string {
   return JSON.stringify(name)
-    .replace(/</g, "\\u003c")
+    .replace(NON_PLACEHOLDER_LT, "\\u003c")
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
 }
 
 /**
  * Text that is not quoted (column names, types, chart types) kept on one
- * line: line breaks become spaces and every `<` becomes `\u003c`, so it can
- * neither start a new line nor spell out `</current_page>`.
+ * line: line breaks become spaces and every `<` but a placeholder's becomes
+ * `\u003c`, so it can neither start a new line nor spell out
+ * `</current_page>`.
  */
 function _inline(text: string): string {
-  return text.replace(LINE_BREAKS, " ").replace(/</g, "\\u003c");
+  return text.replace(LINE_BREAKS, " ").replace(NON_PLACEHOLDER_LT, "\\u003c");
 }
 
 /**
@@ -120,14 +128,17 @@ function _redactContextSql(
 
 /**
  * One redacted SQL statement on a single line, with table names shown as
- * aliases, masked, and cut at the cap. Only a `<` that would start a page
- * tag is escaped, so comparisons such as `a < b` stay readable.
+ * aliases, and cut at the cap. It is never masked: masking words would
+ * break identifiers, and redaction already hid the literals the vault
+ * holds. Only a `<` that would start a page tag is escaped, so comparisons
+ * such as `a < b` stay readable.
  */
 function _formatSql(sql: string, options: RenderOptions): string {
   const singleLine = sql.trim().replace(LINE_BREAKS, " ");
-  const aliased = options
-    .mask(SqlTableAlias.toAliasedSql(singleLine, options.aliases))
-    .replace(PAGE_TAG_START, "\\u003c");
+  const aliased = SqlTableAlias.toAliasedSql(
+    singleLine,
+    options.aliases,
+  ).replace(PAGE_TAG_START, "\\u003c");
   return aliased.length > MAX_PAGE_SQL_CHARACTERS
     ? `${aliased.slice(0, MAX_PAGE_SQL_CHARACTERS)} ...`
     : aliased;
@@ -225,8 +236,8 @@ function _caseLines(
  * Data Explorer's query) before the block leaves the device, for example by
  * swapping them for placeholders the browser maps back. Comments are
  * dropped from page SQL first. `maskText` then hides values that SQL
- * revealed wherever else they appear: names, chart titles, result columns,
- * and the SQL itself. Every piece of SQL is redacted before anything is
+ * revealed wherever else they appear: names, chart titles, and result
+ * columns, never the SQL. Every piece of SQL is redacted before anything is
  * masked, so a value one chart filters on is hidden in every title.
  * `isSensitive` flags chart titles that look like personal data, which
  * become "Untitled chart".

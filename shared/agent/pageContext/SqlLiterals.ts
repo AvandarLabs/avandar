@@ -25,6 +25,15 @@ export type SqlLiteral = Readonly<{
 const SQL_TOKEN =
   /(?<comment>--[^\n]*|\/\*[\s\S]*?(?:\*\/|$))|(?<escapeString>[eE]'(?:\\[\s\S]|''|[^'\\])*(?:'|$))|(?<dollarString>\$(?<tag>[A-Za-z_]\w*)?\$[\s\S]*?\$\k<tag>\$)|(?<string>'(?:''|[^'])*(?:'|$))|(?<identifier>"(?:""|[^"])*(?:"|$)|`(?:``|[^`])*(?:`|$))|(?<word>[A-Za-z_\u0080-\uffff][\w$\u0080-\uffff]*)|(?<number>(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)/g;
 
+/**
+ * A number's value in one canonical form: digits-only integers exactly (by
+ * `BigInt`, so an id past 2^53 keeps every digit, and `007` is `7`), and
+ * any other number as JavaScript prints it (`1.50` is `1.5`).
+ */
+function _getNumberValue(text: string): string {
+  return /^\d+$/.test(text) ? String(BigInt(text)) : String(Number(text));
+}
+
 /** Strips the quotes around a run, which may be unterminated. */
 function _unquote(text: string, prefixLength: number): string {
   const body = text.slice(prefixLength);
@@ -57,7 +66,7 @@ function _getLiteralFromGroups(
   }
   if (groups.number !== undefined) {
     const text = groups.number;
-    return { kind: "number", value: String(Number(text)), text };
+    return { kind: "number", value: _getNumberValue(text), text };
   }
   if (groups.escapeString !== undefined) {
     const text = groups.escapeString;
@@ -101,6 +110,23 @@ export const SqlLiterals = {
       return literal === undefined ? [] : [literal];
     });
   },
+
+  /**
+   * Every identifier, quoted ones unquoted, and every bare word, keywords
+   * included, in order. Literal and comment text is never listed.
+   */
+  listIdentifiers: (sql: string): string[] => {
+    return Array.from(sql.matchAll(SQL_TOKEN)).flatMap((match) => {
+      const { identifier, word } = match.groups ?? {};
+      if (identifier !== undefined) {
+        return [identifier.slice(1, -1).replaceAll('""', '"')];
+      }
+      return word === undefined ? [] : [word];
+    });
+  },
+
+  /** A number's canonical value, as literals of kind `"number"` carry. */
+  getNumberValue: _getNumberValue,
 
   /**
    * SQL with each comment replaced by one space, so collapsing it onto one

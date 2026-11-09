@@ -96,6 +96,60 @@ describe("placeholder round trip in DuckDB", () => {
     });
   });
 
+  it.each([
+    ["the placeholder quoted", "'<value 1>'", []],
+    ["the placeholder in capitals", "<VALUE 1>", []],
+    ["the placeholder with spaces", " <value  1> ", []],
+    ["a form that is the placeholder", "Jane", ["<value 1>"]],
+  ])("treats %s as the stored placeholder", async (_label, named, forms) => {
+    await withDuckDb(async (connection) => {
+      await _createPatients(connection);
+      const inner = _createDuckDbHost(connection);
+      const tool = createLookupValuesTool({
+        host: createPlaceholderRestoringHost(inner, _createVault()),
+        aliases: ALIASES,
+        state: createDataAgentRunState(),
+      });
+
+      const result = await tool.execute("call-1", {
+        table: "t0",
+        column: "patient_name",
+        values: [{ named, forms }],
+        question: "Which patient?",
+      });
+
+      expect(JSON.stringify(result.content)).toContain(
+        '\\"<value 1>\\" is stored as \\"<value 1>\\"',
+      );
+      expect(inner.readColumnValues).not.toHaveBeenCalled();
+      expect(inner.askUser).not.toHaveBeenCalled();
+    });
+  });
+
+  it("answers an unknown placeholder with an error, not a card", async () => {
+    await withDuckDb(async (connection) => {
+      await _createPatients(connection);
+      const inner = _createDuckDbHost(connection);
+      const tool = createLookupValuesTool({
+        host: createPlaceholderRestoringHost(inner, _createVault()),
+        aliases: ALIASES,
+        state: createDataAgentRunState(),
+      });
+
+      const result = await tool.execute("call-1", {
+        table: "t0",
+        column: "patient_name",
+        values: [{ named: "<value 9>", forms: [] }],
+        question: "Which patient?",
+      });
+
+      expect(result.isError).toBe(true);
+      expect(JSON.stringify(result.content)).toContain("unknown placeholder");
+      expect(inner.readColumnValues).not.toHaveBeenCalled();
+      expect(inner.askUser).not.toHaveBeenCalled();
+    });
+  });
+
   it("treats a held placeholder as a stored value without a lookup", async () => {
     await withDuckDb(async (connection) => {
       await _createPatients(connection);

@@ -9,27 +9,42 @@ import type {
 /** A placeholder's text inside its quotes, such as `<value 3>`. */
 const PLACEHOLDER_VALUE = /^<value ([1-9]\d*)>$/;
 
-/** Any placeholder inside a longer text. */
-const PLACEHOLDER_IN_TEXT = /<value ([1-9]\d*)>/;
+/**
+ * Anything a model may have meant as a placeholder: any case, spacing, or
+ * leading zeros, as in `<VALUE 01>`.
+ */
+const PLACEHOLDER_LIKE = /<\s*value\s*\d+\s*>/i;
 
 /**
- * In SQL that could not be read, numbers this small stay as written: they
- * are column positions (`GROUP BY 1`), limits, and months, not people.
+ * In SQL that could not be read, numbers this small stay as written when
+ * no identifier names a personal column: they are column positions
+ * (`GROUP BY 1`), limits, and months, not people.
  */
 const MAX_KEPT_NUMBER_WHEN_UNREAD = 99;
 
-/** The shortest bare value `maskText` looks for in free text. */
+/** The shortest bare value masking looks for in free text. */
 const MIN_MASKED_BARE_LENGTH = 2;
 
 /**
- * Why a value is held: a detector flagged it, or its SQL could not be read
- * and every literal was hidden. Only detected values are masked as bare
- * words in titles and names, since an unread chart's `'month'` is not
- * personal.
+ * Why a value is held. `compared`: a detector found it tested against a
+ * personal column's value, or it looks personal itself. `swept`: it was
+ * elsewhere in an expression that reads a personal column. `unread`: its
+ * SQL could not be parsed, so every literal was hidden. Only `compared`
+ * values are masked as words in page text such as chart titles.
  */
-type HoldReason = "detected" | "unread";
+type HoldReason = "compared" | "swept" | "unread";
+
+/** How strongly each reason claims a value, so a value keeps the strongest. */
+const REASON_RANK: Record<HoldReason, number> = {
+  unread: 0,
+  swept: 1,
+  compared: 2,
+};
 
 type HeldValue = SqlLiteral & { placeholder: string; reason: HoldReason };
+
+/** Which held values `maskText` and `maskResultText` match as bare words. */
+type MaskScope = "page" | "result";
 
 /**
  * Swaps personal values in SQL for numbered placeholders and back, for one
@@ -39,7 +54,7 @@ type HeldValue = SqlLiteral & { placeholder: string; reason: HoldReason };
  * values never leave the vault, which lives only in the browser.
  *
  * A number's placeholder is quoted like a string's in the SQL the model
- * reads; restoring writes the number back unquoted.
+ * reads; restoring writes the number back unquoted, exactly as first seen.
  */
 export type SqlPlaceholderVault = {
   /**
@@ -55,22 +70,38 @@ export type SqlPlaceholderVault = {
   restore: (sql: string) => string;
   /**
    * Why SQL from the model cannot run as written, in words for the model:
-   * an unknown placeholder, or one inside a longer string. Undefined when
-   * every placeholder is a whole, known value.
+   * an unknown placeholder, or one not written exactly as a whole
+   * single-quoted value. Undefined when every placeholder is fine.
    */
   getPlaceholderError: (sql: string) => string | undefined;
   /**
-   * Text with held values swapped for their placeholders: each value as a
-   * quoted SQL literal, and each detected value as a whole word, ignoring
-   * case. Use it on anything shown to the model that could repeat a value,
-   * such as result column names, errors, chart titles, and page names.
+   * Page text (chart titles, page names, result column names) with held
+   * values swapped for their placeholders: each value as a quoted SQL
+   * literal, and each compared value as a whole word, ignoring case. Never
+   * use it on SQL: `redact` already hides held literals there.
    */
   maskText: (text: string) => string;
+  /**
+   * Text that comes back from running restored SQL (column names, errors,
+   * preview cells), with every held value masked as a quoted literal and as
+   * a whole word, whatever it is held for. A false match there costs
+   * nothing, and it covers values held only because SQL was unread.
+   */
+  maskResultText: (text: string) => string;
   /** The placeholder text (no quotes) a value has, if the vault holds it. */
   getPlaceholder: (value: string) => string | undefined;
   /** True when `text` is exactly a placeholder this vault holds. */
   isHeldPlaceholder: (text: string) => boolean;
 };
+
+/** The values one vault holds, by number and by key, and cached masks. */
+type HeldValueStore = {
+  values: HeldValue[];
+  byKey: Map<string, HeldValue>;
+  masks: Partial<Record<MaskScope, MaskPattern>>;
+};
+
+type MaskPattern = { pattern: RegExp; placeholders: string[] };
 
 function _escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -78,21 +109,27 @@ function _escapeRegExp(text: string): string {
 
 /** The SQL a held value is written back as. */
 function _toRestoredSql(held: HeldValue): string {
-  if (held.kind === "string") {
-    return SqlLiterals.quote(held.value);
-  }
-  return held.kind === "number" ? held.value : held.text;
+  return held.kind === "string" ? SqlLiterals.quote(held.value) : held.text;
+}
+
+/** The bare-word pattern for one held value, if it is long enough. */
+function _buildBarePattern(held: HeldValue): string | undefined {
+  const word = held.value.replaceAll("%", "").trim();
+  return word.length >= MIN_MASKED_BARE_LENGTH
+    ? `(?<![\\p{L}\\p{N}_])${_escapeRegExp(word)}(?![\\p{L}\\p{N}_])`
+    : undefined;
 }
 
 /**
  * One regex that finds every held value in text: existing placeholders
- * first (kept as they are), then each value as a quoted literal, then each
- * detected value as a whole word, longest first. One pass, so a
+ * first (kept as they are), then each value as a quoted literal, then the
+ * scope's values as whole words, longest first. One pass, so a
  * replacement is never searched again.
  */
 function _buildMaskPattern(
   heldValues: readonly HeldValue[],
-): { pattern: RegExp; placeholders: string[] } | undefined {
+  scope: MaskScope,
+): MaskPattern {
   const byLength = [...heldValues].sort((first, second) => {
     return second.value.length - first.value.length;
   });
@@ -101,41 +138,34 @@ function _buildMaskPattern(
     return { text, placeholder: `'${held.placeholder}'` };
   });
   const bare = byLength.flatMap((held) => {
-    const word = held.value.replaceAll("%", "").trim();
-    return held.reason === "detected" && word.length >= MIN_MASKED_BARE_LENGTH
-      ? [
-          {
-            text: `(?<![\\p{L}\\p{N}_])${_escapeRegExp(word)}(?![\\p{L}\\p{N}_])`,
-            placeholder: held.placeholder,
-          },
-        ]
-      : [];
+    const text =
+      scope === "result" || held.reason === "compared"
+        ? _buildBarePattern(held)
+        : undefined;
+    return text === undefined ? [] : [{ text, placeholder: held.placeholder }];
   });
   const alternatives = [
     { text: "<value [1-9]\\d*>", placeholder: "" },
     ...quoted,
     ...bare,
   ];
-  return heldValues.length === 0
-    ? undefined
-    : {
-        pattern: new RegExp(
-          alternatives
-            .map((entry) => {
-              return `(${entry.text})`;
-            })
-            .join("|"),
-          "giu",
-        ),
-        placeholders: alternatives.map((entry) => {
-          return entry.placeholder;
-        }),
-      };
+  const source = alternatives
+    .map((entry) => {
+      return `(${entry.text})`;
+    })
+    .join("|");
+  return {
+    pattern: new RegExp(source, "giu"),
+    placeholders: alternatives.map((entry) => {
+      return entry.placeholder;
+    }),
+  };
 }
 
 /**
  * Whether redaction hides a literal, and why, or undefined to keep it.
- * Placeholders already in the SQL are kept as they are.
+ * Placeholders already in the SQL are kept as they are, and a held value
+ * is hidden wherever it appears.
  */
 function _getHoldReason(
   literal: SqlLiteral,
@@ -145,44 +175,37 @@ function _getHoldReason(
   if (literal.kind === "string" && PLACEHOLDER_VALUE.test(literal.value)) {
     return undefined;
   }
-  if (sensitive !== "all") {
-    return sensitive.has(SqlLiterals.getKey(literal))
-      ? "detected"
-      : held?.reason;
+  if (sensitive.kind === "read") {
+    return sensitive.reasons.get(SqlLiterals.getKey(literal)) ?? held?.reason;
   }
-  const isSmallNumber =
+  const isKeptNumber =
+    sensitive.keepsSmallNumbers &&
     literal.kind === "number" &&
     Number(literal.value) <= MAX_KEPT_NUMBER_WHEN_UNREAD;
-  return isSmallNumber && held === undefined
+  return isKeptNumber && held === undefined
     ? undefined
     : (held?.reason ?? "unread");
 }
 
-/** The model-facing problem with one string literal's placeholders. */
+/** The model-facing problem with one literal's placeholders, if any. */
 function _getLiteralPlaceholderError(
-  value: string,
+  literal: SqlLiteral,
   heldCount: number,
 ): string | undefined {
-  const whole = PLACEHOLDER_VALUE.exec(value);
+  const whole =
+    literal.kind === "string" ? PLACEHOLDER_VALUE.exec(literal.value) : null;
   if (whole) {
     return Number(whole[1]) > heldCount
-      ? `${value} is an unknown placeholder: use only the placeholders shown on the page.`
+      ? `${literal.value} is an unknown placeholder: use only the placeholders shown on the page.`
       : undefined;
   }
-  const inside = PLACEHOLDER_IN_TEXT.exec(value);
-  return inside
-    ? `${inside[0]} must be used as a whole quoted value, never inside another string or pattern.`
+  const like = PLACEHOLDER_LIKE.exec(literal.value);
+  return like
+    ? `${like[0]} must be used as a whole quoted value, written exactly as on the page ('<value N>'), never inside another string or pattern.`
     : undefined;
 }
 
-/** The values one vault holds, by number and by key, and their mask. */
-type HeldValueStore = {
-  values: HeldValue[];
-  byKey: Map<string, HeldValue>;
-  mask: ReturnType<typeof _buildMaskPattern>;
-};
-
-/** Holds a literal, or updates why it is held, and returns its entry. */
+/** Holds a literal, or strengthens why it is held, and returns its entry. */
 function _hold(
   store: HeldValueStore,
   literal: SqlLiteral,
@@ -195,13 +218,13 @@ function _hold(
     placeholder: `<value ${store.values.length + 1}>`,
     reason,
   };
-  if (known) {
-    known.reason = known.reason === "detected" ? "detected" : reason;
-  } else {
+  if (!known) {
     store.values.push(held);
     store.byKey.set(key, held);
+  } else if (REASON_RANK[reason] > REASON_RANK[known.reason]) {
+    known.reason = reason;
   }
-  store.mask = _buildMaskPattern(store.values);
+  store.masks = {};
   return held;
 }
 
@@ -239,17 +262,23 @@ function _restoreSql(store: HeldValueStore, sql: string): string {
   });
 }
 
-function _maskTextWithStore(store: HeldValueStore, text: string): string {
-  if (store.mask === undefined) {
+/** Masks text for a scope, building that scope's pattern on first use. */
+function _maskTextWithStore(
+  store: HeldValueStore,
+  text: string,
+  scope: MaskScope,
+): string {
+  if (store.values.length === 0) {
     return text;
   }
-  const { pattern, placeholders } = store.mask;
-  return text.replace(pattern, (match: string, ...groups: unknown[]) => {
+  const mask = store.masks[scope] ?? _buildMaskPattern(store.values, scope);
+  store.masks[scope] = mask;
+  return text.replace(mask.pattern, (match: string, ...groups: unknown[]) => {
     // Exactly one capture group matched; its index names the placeholder.
     const index = groups.findIndex((group) => {
       return typeof group === "string";
     });
-    return placeholders[index] || match;
+    return mask.placeholders[index] || match;
   });
 }
 
@@ -258,11 +287,7 @@ function _maskTextWithStore(store: HeldValueStore, text: string): string {
  * placeholder means the same thing in every turn the model remembers.
  */
 export function createSqlPlaceholderVault(): SqlPlaceholderVault {
-  const store: HeldValueStore = {
-    values: [],
-    byKey: new Map(),
-    mask: undefined,
-  };
+  const store: HeldValueStore = { values: [], byKey: new Map(), masks: {} };
   return {
     redact: (sql, detectors) => {
       return _redactSql(store, sql, detectors);
@@ -272,21 +297,18 @@ export function createSqlPlaceholderVault(): SqlPlaceholderVault {
     },
     getPlaceholderError: (sql) => {
       return SqlLiterals.list(sql)
-        .filter((literal) => {
-          return literal.kind !== "number";
-        })
         .map((literal) => {
-          return _getLiteralPlaceholderError(
-            literal.value,
-            store.values.length,
-          );
+          return _getLiteralPlaceholderError(literal, store.values.length);
         })
         .find((error) => {
           return error !== undefined;
         });
     },
     maskText: (text) => {
-      return _maskTextWithStore(store, text);
+      return _maskTextWithStore(store, text, "page");
+    },
+    maskResultText: (text) => {
+      return _maskTextWithStore(store, text, "result");
     },
     getPlaceholder: (value) => {
       const held =

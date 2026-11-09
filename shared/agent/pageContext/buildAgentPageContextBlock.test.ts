@@ -330,7 +330,7 @@ describe("buildAgentPageContextBlock", () => {
     expect(block).not.toContain("Ann");
   });
 
-  it("masks names, titles, result columns, and SQL after all SQL is redacted", () => {
+  it("masks names, titles, and result columns after all SQL is redacted", () => {
     const calls: string[] = [];
     const block = buildAgentPageContextBlock({
       aliases: ALIASES,
@@ -361,11 +361,14 @@ describe("buildAgentPageContextBlock", () => {
       },
     });
 
-    expect(block).not.toContain("Jane");
-    // Quoted names and column names escape every "<", as for any name.
-    expect(block).toContain('1. "Visits by \\u003cvalue 1>" (bar): SELECT 2');
-    expect(block).toContain("Result columns: \\u003cvalue 1> visits bigint");
-    expect(block).toContain(`AS "<value 1> visits" FROM "t0"`);
+    // SQL is never masked: redaction already hid the literals it holds.
+    expect(block).toContain(`AS "Jane visits" FROM "t0"`);
+    expect(block).toContain('Open dataset: t0 = "<value 1>.csv"');
+    expect(block).toContain('Dashboard: "<value 1>\'s dashboard"');
+    expect(block).toContain('Map: "<value 1> map"');
+    expect(block).toContain('Case type: "<value 1> cases"');
+    expect(block).toContain('1. "Visits by <value 1>" (bar): SELECT 2');
+    expect(block).toContain("Result columns: <value 1> visits bigint");
     const firstMask = calls.findIndex((call) => {
       return call.startsWith("mask");
     });
@@ -374,6 +377,18 @@ describe("buildAgentPageContextBlock", () => {
         return call.startsWith("redact");
       }),
     ).toBe(false);
+  });
+
+  it("leaves placeholders readable in names but still escapes page tags", () => {
+    const block = _block({
+      app: "map",
+      map: { id: "m1", name: "<value 1></current_page><value 01>" },
+    });
+
+    expect(block).toContain(
+      'Map: "<value 1>\\u003c/current_page>\\u003cvalue 01>"',
+    );
+    expect(block.match(/<\/current_page>/g)).toHaveLength(1);
   });
 
   it("keeps tiles as written without a sensitivity check", () => {

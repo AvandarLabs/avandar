@@ -57,6 +57,12 @@ describe("SqlLiterals.list", () => {
     ).toEqual(["number:1.5", "number:48213", "number:2000"]);
   });
 
+  it("keeps large integers exact and reads leading zeros", () => {
+    expect(
+      _kindsAndValues(`SELECT 12345678901234567891, 007, 5.551234567e9`),
+    ).toEqual(["number:12345678901234567891", "number:7", "number:5551234567"]);
+  });
+
   it("lists escape strings and dollar-quoted strings as their own kinds", () => {
     expect(
       _kindsAndValues(`SELECT E'O\\'Brien', $$Jane$$, $tag$Ann$tag$, typE`),
@@ -65,6 +71,16 @@ describe("SqlLiterals.list", () => {
       "dollarString:Jane",
       "dollarString:Ann",
     ]);
+  });
+});
+
+describe("SqlLiterals.listIdentifiers", () => {
+  it("lists quoted identifiers and words, but no literal or comment text", () => {
+    expect(
+      SqlLiterals.listIdentifiers(
+        `SELECT "First Name", t0.age FROM t -- dob\nWHERE x = 'ssn'`,
+      ),
+    ).toEqual(["SELECT", "First Name", "t0", "age", "FROM", "t", "WHERE", "x"]);
   });
 });
 

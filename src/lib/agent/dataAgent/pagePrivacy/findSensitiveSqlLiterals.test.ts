@@ -30,7 +30,13 @@ function _find(
   detectors: SqlLiteralDetectors = DETECTORS,
 ): string[] | "all" {
   const found = findSensitiveSqlLiterals(sql, detectors);
-  return found === "all" ? "all" : [...found].sort();
+  return found.kind === "unread" ? "all" : [...found.reasons.keys()].sort();
+}
+
+/** Each found literal's key and why it was found. */
+function _findReasons(sql: string): Record<string, string> {
+  const found = findSensitiveSqlLiterals(sql, DETECTORS);
+  return found.kind === "unread" ? {} : Object.fromEntries(found.reasons);
 }
 
 describe("findSensitiveSqlLiterals", () => {
@@ -108,6 +114,17 @@ describe("findSensitiveSqlLiterals", () => {
     );
   });
 
+  it("treats an alias of a personal column as personal, even with a known name", () => {
+    const detectors = { ...DETECTORS, knownColumnNames: KNOWN_COLUMNS };
+
+    expect(
+      _find(
+        `WITH x AS (SELECT "patient_name" AS "state" FROM t) SELECT * FROM x WHERE "state" = 'Jane'`,
+        detectors,
+      ),
+    ).toEqual(["s:Jane"]);
+  });
+
   it("finds every literal in a VALUES list", () => {
     expect(
       _find(`SELECT * FROM t JOIN (VALUES ('Jane')) v(n) ON t."name" = v.n`),
@@ -130,6 +147,83 @@ describe("findSensitiveSqlLiterals", () => {
     expect(
       _find(`SELECT * FROM t WHERE "patient_id" = 48213 OR "patient_id" = -7`),
     ).toEqual(["n:48213", "n:7"]);
+  });
+
+  it("finds large integers and exponent numbers the parser types as bigint", () => {
+    expect(
+      _find(
+        `SELECT * FROM t WHERE "patient_id" = 12345678901234567891 OR "patient_id" = 5.551234567e9`,
+      ),
+    ).toEqual(["n:12345678901234567891", "n:5551234567"]);
+  });
+
+  it("reads all literals when the parser loses a number's digits", () => {
+    expect(
+      _find(`SELECT * FROM t WHERE "patient_id" = -9007199254740993`),
+    ).toBe("all");
+  });
+
+  it("says a direct operand of a comparison was compared", () => {
+    expect(
+      _findReasons(
+        `SELECT * FROM t WHERE "name" = 'A' OR "name" IN ('B', 'C'::VARCHAR) OR "name" LIKE '%D%' OR "name" BETWEEN 'E' AND 'F' OR "x" = 'a@b.co'`,
+      ),
+    ).toEqual({
+      "s:A": "compared",
+      "s:B": "compared",
+      "s:C": "compared",
+      "s:%D%": "compared",
+      "s:E": "compared",
+      "s:F": "compared",
+      "s:a@b.co": "compared",
+    });
+  });
+
+  it("says a value compared with a column through case or joining functions was compared", () => {
+    expect(
+      _findReasons(
+        `SELECT * FROM t WHERE lower(trim("name")) = 'jane' OR concat("name", ' ', "x") = 'Jane Doe' OR "name" || 'x' = 'Ann'`,
+      ),
+    ).toMatchObject({
+      "s:jane": "compared",
+      "s:Jane Doe": "compared",
+      "s:Ann": "compared",
+      "s: ": "swept",
+    });
+  });
+
+  it("says a value a simple CASE tests the column against was compared", () => {
+    expect(
+      _findReasons(`SELECT CASE "name" WHEN 'A' THEN 'yes' END AS f FROM t`),
+    ).toEqual({ "s:A": "compared", "s:yes": "swept" });
+  });
+
+  it("says any other literal in a personal expression was swept", () => {
+    expect(
+      _findReasons(
+        `SELECT date_trunc('month', "name"), CASE WHEN "name" IS NULL THEN 'No' ELSE 'Yes' END FROM t WHERE year("name") = 2022`,
+      ),
+    ).toEqual({
+      "s:month": "swept",
+      "s:No": "swept",
+      "s:Yes": "swept",
+      "n:2022": "swept",
+    });
+  });
+
+  it("keeps small numbers in unreadable SQL only without a personal column", () => {
+    const unread = (sql: string) => {
+      return findSensitiveSqlLiterals(sql, DETECTORS);
+    };
+
+    expect(
+      unread(`SELECT "state", count(*) FROM t WHERE "x" = 3 GROUP BY ALL`),
+    ).toEqual({ kind: "unread", keepsSmallNumbers: true });
+    expect(
+      unread(
+        `SELECT "state", count(*) FROM t WHERE "patient_id" = 42 GROUP BY ALL`,
+      ),
+    ).toEqual({ kind: "unread", keepsSmallNumbers: false });
   });
 
   it("unescapes doubled quotes in a found value", () => {

@@ -14,14 +14,14 @@ function _maskOutcome(
   vault: SqlPlaceholderVault,
 ): DataAgentQueryOutcome {
   if (outcome.kind === "failed") {
-    return { ...outcome, error: vault.maskText(outcome.error) };
+    return { ...outcome, error: vault.maskResultText(outcome.error) };
   }
   const columns = outcome.columns.map((column) => {
-    return { ...column, name: vault.maskText(column.name) };
+    return { ...column, name: vault.maskResultText(column.name) };
   });
   const previewRows = outcome.previewRows?.map((row) => {
     return row.map((cell) => {
-      return typeof cell === "string" ? vault.maskText(cell) : cell;
+      return typeof cell === "string" ? vault.maskResultText(cell) : cell;
     });
   });
   return {
@@ -71,7 +71,7 @@ export function createPlaceholderRestoringHost(
       const restoredSql = vault.restore(sql);
       const values = await host.readColumnValues(restoredSql);
       if (!Array.isArray(values)) {
-        return { error: vault.maskText(values.error) };
+        return { error: vault.maskResultText(values.error) };
       }
       return restoredSql === sql
         ? values

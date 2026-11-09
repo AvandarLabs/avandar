@@ -2,7 +2,8 @@ import { PII_COLUMN_NAME_KEYWORDS } from "@/components/privacy/privacy-helpers/d
 
 /**
  * Personal words a spreadsheet header often uses that `detectPii`'s list
- * lacks, written as one word: `Surname`, `FIRSTNAME`, `birthdate`.
+ * lacks: one-word forms such as `Surname`, `FIRSTNAME`, and `birthdate`,
+ * and the people a program serves, `Client` and `Guardian`.
  */
 const EXTRA_PERSONAL_WORDS: readonly string[] = [
   "name",
@@ -13,6 +14,8 @@ const EXTRA_PERSONAL_WORDS: readonly string[] = [
   "lastname",
   "fullname",
   "birthdate",
+  "client",
+  "guardian",
 ];
 
 /**
