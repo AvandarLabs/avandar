@@ -88,5 +88,8 @@ describe("buildDataAgentSystemPrompt", () => {
 
     expect(prompt).toContain("'<value 1>'");
     expect(prompt).toContain("Keep it exactly as written");
+    expect(prompt).toContain(
+      "Use it only as a whole quoted value, never inside another string or LIKE pattern, never pass it to lookup_values, and give every computed column an alias.",
+    );
   });
 });
