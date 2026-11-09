@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
+import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import { ClassificationEditor } from "./ClassificationEditor";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -73,6 +74,44 @@ function _createLayer(): MapLayer.T {
 }
 
 type GraduatedColor = Extract<MapLayer.Color, { type: "graduated" }>;
+
+function _createColumn(
+  name: string,
+  dataType: "double" | "varchar",
+): QueryColumn.T {
+  const now = new Date().toISOString();
+  return QueryColumn.makeFromDatasetColumn(
+    Model.make("DatasetColumn", {
+      id: uuid<DatasetColumn.Id>(),
+      datasetId: uuid<Dataset.Id>(),
+      workspaceId: uuid<Workspace.Id>(),
+      createdAt: now,
+      updatedAt: now,
+      name,
+      originalName: name,
+      originalDataType: dataType === "double" ? "DOUBLE" : "VARCHAR",
+      dataType,
+      detectedDataType: dataType === "double" ? "DOUBLE" : "VARCHAR",
+      description: undefined,
+      columnIdx: 0,
+    }),
+  );
+}
+
+function _withSourceColumns(options: {
+  queryColumns: QueryColumn.T[];
+  sourceColumns: QueryColumn.T[];
+}): MapLayer.T {
+  const layer = MapLayer.makeEmpty("Schools");
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      queryColumns: options.queryColumns,
+      sourceColumns: options.sourceColumns,
+    },
+  };
+}
 
 function _withGraduatedColor(
   layer: MapLayer.T,
@@ -278,12 +317,13 @@ describe("ClassificationEditor", () => {
     );
 
     fireEvent.click(screen.getByRole("combobox", { name: "Normalize by" }));
+    const dropdown = getMantineSelectDropdown("Normalize by");
 
     expect(
-      screen.getByRole("option", { name: "Cases", hidden: true }),
+      within(dropdown).getByRole("option", { name: "Cases", hidden: true }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("option", {
+      within(dropdown).queryByRole("option", {
         name: "Population (boundary)",
         hidden: true,
       }),
@@ -559,5 +599,93 @@ describe("ClassificationEditor", () => {
       classification: { method: "manual", breaks: [100] },
       classLabels: ["Below 100", "100 or above"],
     });
+  });
+
+  it("enables graduated color from a numeric source column that is not queried yet", () => {
+    const geometry = _createColumn("coordinates", "varchar");
+    const measles = _createColumn("percentimmunizedmeasles", "double");
+    const layer = _withSourceColumns({
+      queryColumns: [geometry],
+      sourceColumns: [geometry, measles],
+    });
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Color mode" }));
+    fireEvent.click(
+      screen.getByRole("option", { name: "Graduated", hidden: true }),
+    );
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color).toMatchObject({
+      type: "graduated",
+      value: { type: "queryColumn", column: measles.id },
+    });
+    expect(
+      updated.source.queryColumns.map((column) => {
+        return column.id;
+      }),
+    ).toContain(measles.id);
+  });
+
+  it("changes the graduated measure to another numeric source column", () => {
+    const geometry = _createColumn("coordinates", "varchar");
+    const exemptions = _createColumn("percentmedicalexemptions", "double");
+    const measles = _createColumn("percentimmunizedmeasles", "double");
+    const schools = _withSourceColumns({
+      queryColumns: [geometry],
+      sourceColumns: [geometry, exemptions, measles],
+    });
+    if (schools.symbology.type !== "circle") {
+      throw new Error("Expected a circle layer");
+    }
+    const layer: MapLayer.T = {
+      ...schools,
+      symbology: {
+        ...schools.symbology,
+        color: {
+          type: "graduated",
+          value: { type: "queryColumn", column: exemptions.id },
+          ramp: ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+          classLabels: [undefined, undefined, undefined, undefined, undefined],
+          classification: { method: "quantile", classCount: 5 },
+          normalization: undefined,
+          noData: { color: "#ced4da", label: "" },
+        },
+      },
+    };
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox", { name: "Measure" }));
+    fireEvent.click(
+      screen.getByRole("option", {
+        name: "percentimmunizedmeasles",
+        hidden: true,
+      }),
+    );
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.value).toEqual({
+      type: "queryColumn",
+      column: measles.id,
+    });
+    expect(
+      updated.source.queryColumns.map((column) => {
+        return column.id;
+      }),
+    ).toContain(measles.id);
   });
 });
