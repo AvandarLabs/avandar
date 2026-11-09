@@ -1323,6 +1323,8 @@ commits belong to the features that own them, not here.
 | `c75d19331` | fix(hdx): leave license text and file check reports out of source_metadata | All of it. On demo, `license_other` and `fs_check_info` were 55% of HDX's raw JSON. |
 | `8e707d700` | fix(hdx): leave mapped and repeated package fields out of source_metadata | All of it. Drops `notes` and `caveats` (already in `description` and `notes`) and narrows `organization`, `tags`, and `groups` to the keys the mappers read. Sizing and the demo disk analysis: `docs/measles-demo/etl-disk-footprint.md`. |
 | `ec060372c` | docs(measles): explain the HDX disk footprint and how a full run fits | Branch-only: the demo instance's numbers and recovery steps. Port only if `develop` gets the same HDX sizing question. |
+| `4d1d2a7d5` | feat(etl): leave the paths a field mapping consumes out of a source record | All of it: `omitRecordPaths/`, `CatalogFieldMapper.omitMappedPaths`, a script's `reads` export, `additionalSourceMetadata.omit` in the config parser and types, and the two new loader fixtures. |
+| `2d61eb961` | refactor(catalog)!: keep only unmapped source fields in additional_source_metadata | All of it. Supersedes `d9c3bf6c0`, `c75d19331`, and `8e707d700`'s trims of `source_metadata`: port the final `makeApiResourceRelationsFromCkanPackage.ts`, not theirs. `source_metadata` becomes `additional_source_metadata` (the schema, both pipelines, the scripts' `reads`, `hdx.pipeline.yaml`'s `omit`, the `DataCatalogListing` model, the technical details' "More from the source" label and its translations), and the listings upsert returns ids (the schema, its pgTAP test, both listings stores and their tests). It also fixes `catalog_field_mapping.prelude.sql` for the new column and return type. |
 
 *The app reads the renamed column, the drives, and the new filters:*
 
@@ -1378,7 +1380,12 @@ renamed column) and `20261107180100_catalog_search_organization_filters.sql`
 (adds the level-2, topic, and keyword parameters and facets). Hand-write the
 first, because the schema diff would turn the rename into a drop and a
 create: confirm the result has no `drop column` of a data column. Regenerate
-the second after it. Both land after F16, F17 and F19's migrations.
+the second after it. Both land after F16, F17 and F19's migrations. Then
+`20261109020452_drop_catalog_upsert_for_return_type_change.sql`
+(hand-written: the diff cannot change a function's return type) and
+`20261109020622_catalog_additional_source_metadata.sql` (generated after it;
+its `drop column source_metadata` is intended, since the old values hold
+mapped fields the new column must not).
 
 **Verification:**
 ```sh
@@ -1870,6 +1877,8 @@ Its commits are covered by F19, not numbered here.
 | 136 | `2a627e438` | F27, F9 (MIXED) |
 | 137 | `8e707d700` | F23 |
 | 138 | `ec060372c` | F23 |
+| 139 | `4d1d2a7d5` | F23 |
+| 140 | `2d61eb961` | F23 |
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
