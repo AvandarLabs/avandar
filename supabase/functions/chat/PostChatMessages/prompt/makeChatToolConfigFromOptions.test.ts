@@ -194,4 +194,56 @@ describe("makeChatToolConfigFromOptions", () => {
       "max and min never apply to a boolean column",
     );
   });
+
+  it("lets proposeCaseType mark a field as keeping every value", () => {
+    const attributeSchema = _getProposeCaseTypeAttributeSchema();
+
+    expect(attributeSchema?.properties.valueShape?.enum).toEqual([
+      "single",
+      "list",
+      "bucketed_list",
+    ]);
+    expect(attributeSchema?.required).toContain("valueShape");
+  });
+
+  it("lets proposeCaseType keep a field per day, week, month, quarter, or year", () => {
+    const attributeSchema = _getProposeCaseTypeAttributeSchema();
+
+    expect(attributeSchema?.properties.bucketGrain?.enum).toEqual([
+      "day",
+      "week",
+      "month",
+      "quarter",
+      "year",
+    ]);
+    expect(attributeSchema?.properties.bucketColumnId?.type).toBe("string");
+    expect(attributeSchema?.required).not.toContain("bucketGrain");
+    expect(attributeSchema?.required).not.toContain("bucketColumnId");
+  });
 });
+
+type _AttributeSchema = {
+  properties: Record<
+    string,
+    { type?: string; enum?: readonly string[] } | undefined
+  >;
+  required: readonly string[];
+};
+
+function _getProposeCaseTypeAttributeSchema(): _AttributeSchema | undefined {
+  const config = makeChatToolConfigFromOptions({
+    clarificationCapReached: false,
+    app: "case-manager",
+  });
+  const tools = config.tools as Array<{
+    function: {
+      name: string;
+      parameters: {
+        properties: { attributes?: { items: _AttributeSchema } };
+      };
+    };
+  }>;
+  return tools.find((tool) => {
+    return tool.function.name === "proposeCaseType";
+  })?.function.parameters.properties.attributes?.items;
+}

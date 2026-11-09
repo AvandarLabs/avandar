@@ -32,6 +32,7 @@ export function MappingFields({ frame }: Props) {
           // A numeric column, so the authored "sum" rule is one it offers.
           columnDataType="bigint"
           isIdentifierColumn={false}
+          isLabelColumn={false}
         />
       </div>
       <div data-video-target="mapping-manual-controls">

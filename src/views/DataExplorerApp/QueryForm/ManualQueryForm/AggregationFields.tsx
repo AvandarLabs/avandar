@@ -1,3 +1,4 @@
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
@@ -21,12 +22,19 @@ export function AggregationFields({
   return (
     <>
       {queryColumns.map((column) => {
+        const validAggregations = QueryColumn.getValidAggregations(column);
+        const savedAggregation = aggregations[column.id] ?? "none";
         return (
           <AggregationSelect
             key={column.id}
             label={column.baseColumn.name}
-            dataType={column.baseColumn.dataType}
-            value={aggregations[column.id] ?? "none"}
+            validAggregations={validAggregations}
+            value={
+              QueryColumn.isList(column) &&
+              !validAggregations.includes(savedAggregation)
+                ? "none"
+                : savedAggregation
+            }
             onChange={(newAggregation: QueryAggregationType.T) => {
               onSetColumnAggregation({
                 columnId: column.id,

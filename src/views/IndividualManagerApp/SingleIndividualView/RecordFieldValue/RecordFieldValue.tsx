@@ -1,0 +1,89 @@
+import { isNullish } from "@avandar/utils";
+import { Trans } from "@lingui/react/macro";
+import { Text } from "@mantine/core";
+import { match } from "ts-pattern";
+import { useFieldValueFormatter } from "@/components/caseFields/useFieldValueFormatter/useFieldValueFormatter";
+import { RecordFieldBucketedValue } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldBucketedValue";
+import { RecordFieldValueList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ReactNode } from "react";
+
+type Props = {
+  /** The field's name, which names its list of values. */
+  fieldName: string;
+  /** Whether the field keeps one value, every value, or one per period. */
+  valueShape: ConceptAttribute.ValueShape;
+  /** The field's period; read only for a per-period field. */
+  bucketGrain?: ConceptAttribute.BucketGrain;
+  /**
+   * The field's `data_type`: the type of its one value, of each item, or of
+   * each period's value.
+   */
+  dataType: AvaDataType.T;
+  value: unknown;
+};
+
+/** Whether a value has anything to show: not a NULL and not empty text. */
+function _hasValue(value: unknown): boolean {
+  return !isNullish(value) && value !== "";
+}
+
+/** The items of a list value that hold a value, in order. */
+function _getListItems(value: unknown): unknown[] {
+  const items = Array.isArray(value) ? value : [value];
+  return items.filter(_hasValue);
+}
+
+/**
+ * One field's value on the record page, shaped by the field and read by its
+ * type: one value as text, every value of a list field as a list, a
+ * per-period field as a table of periods, and a dimmed "No value" when there
+ * is none (a NULL, a record missing from the view, empty text, or a list
+ * with nothing in it). A NULL or empty item inside a list is left out.
+ * Rendered by the record page's details rail.
+ */
+export function RecordFieldValue({
+  fieldName,
+  valueShape,
+  bucketGrain,
+  dataType,
+  value,
+}: Readonly<Props>): ReactNode {
+  const formatValue = useFieldValueFormatter(dataType);
+  const noValue = (
+    <Text span c="dimmed">
+      <Trans>No value</Trans>
+    </Text>
+  );
+  if (!_hasValue(value)) {
+    return noValue;
+  }
+  return match(valueShape)
+    .with("single", () => {
+      return formatValue(value);
+    })
+    .with("list", () => {
+      const items = _getListItems(value);
+      return items.length === 0 ? (
+        noValue
+      ) : (
+        <RecordFieldValueList
+          fieldName={fieldName}
+          values={items}
+          formatValue={formatValue}
+        />
+      );
+    })
+    .with("bucketed_list", () => {
+      return (
+        <RecordFieldBucketedValue
+          fieldName={fieldName}
+          bucketGrain={bucketGrain}
+          dataType={dataType}
+          value={value}
+        />
+      );
+    })
+    .exhaustive();
+}

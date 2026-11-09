@@ -16,6 +16,7 @@ import { CaseTypeDraftSourceSection } from "./CaseTypeDraftSourceSection";
 import { CaseTypeDraftStatusSection } from "./CaseTypeDraftStatusSection";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { CaseTypeDraftEditor } from "./useCaseTypeDraftEditor";
+import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 
 type Props = {
   editor: CaseTypeDraftEditor;
@@ -25,6 +26,13 @@ type Props = {
   columnNamesById: Readonly<Record<string, string>>;
   /** Catalog column types, keyed by column id, for each row's value rules. */
   columnDataTypesById: Readonly<Record<string, AvaDataType.T>>;
+  /**
+   * Each source dataset's date and timestamp columns, for a per-period
+   * field's date column picker.
+   */
+  dateColumnOptionsByDatasetId: Readonly<
+    Record<string, readonly DateColumnOption[]>
+  >;
   isCreating: boolean;
   /** Omitted when the user cannot create case types. */
   onCreate?: () => void;
@@ -44,6 +52,7 @@ export function CaseTypeDraftCard({
   datasetNamesById,
   columnNamesById,
   columnDataTypesById,
+  dateColumnOptionsByDatasetId,
   isCreating,
   onCreate,
   onDismiss,
@@ -100,6 +109,9 @@ export function CaseTypeDraftCard({
                   columnNamesById={columnNamesById}
                   labelColumnId={draft.labelColumnId}
                   columnDataTypesById={columnDataTypesById}
+                  dateColumnOptions={
+                    dateColumnOptionsByDatasetId[group.datasetId] ?? []
+                  }
                   canRemove={sourceGroups.length > 1}
                   editor={editor}
                 />

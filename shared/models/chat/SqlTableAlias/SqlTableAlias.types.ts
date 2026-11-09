@@ -26,8 +26,26 @@ export type SqlTableAliasConcept = {
 
 /** Attribute name listed next to a concept alias in the schema block. */
 export type SqlTableAliasConceptAttribute = {
+  /**
+   * The field's id, which fixes the column name the case type's view gives it
+   * when two fields share a name. Optional, so a schema cached before this
+   * was kept still reads, listing the bare name.
+   */
+  id?: string;
   concept_id: string;
   name: string;
+  /**
+   * True for a field that keeps every value, which SQL reads as a list.
+   * Optional, so a schema cached before fields could be lists still reads.
+   */
+  is_array?: boolean;
+  /**
+   * The period of a field that keeps one value per period. Optional, so a
+   * schema cached before per-period fields still reads.
+   */
+  bucket_grain?: string | null;
+  /** The type of one value, or of each period's value. */
+  data_type?: string;
 };
 
 /** One status of a concept, listed after its attributes in the schema block. */

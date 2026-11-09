@@ -44,7 +44,7 @@ values ('ac004009-0000-4000-8000-000000000009'::uuid, 'ac000001-0000-4000-8000-0
 insert into public.concept_statuses (id, workspace_id, concept_id, name, color, position)
 values ('ac005009-0000-4000-8000-000000000009'::uuid, 'ac001001-0000-4000-8000-000000000001'::uuid, 'ac004009-0000-4000-8000-000000000009'::uuid, 'Active', '#40c057', 0);
 
-select plan (15);
+select plan (24);
 
 -- 1.
 select lives_ok (
@@ -220,6 +220,179 @@ select is (
   (select owner_id from public.concepts where id = 'ac004006-0000-4000-8000-000000000006'::uuid),
   'ac000001-0000-4000-8000-000000000001'::uuid,
   'a service-role caller sets the owner from the payload'
+);
+
+-- 16. A list field keeps every value, so its mapping names no rule.
+select lives_ok (
+  $t16$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004007-0000-4000-8000-000000000007","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"List case type","description":null,"allow_manual_creation":false,"default_status_id":"ac005010-0000-4000-8000-000000000010"}'::jsonb,
+    '[{"id":"ac006007-0000-4000-8000-000000000007","name":"County","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false},{"id":"ac006008-0000-4000-8000-000000000008","name":"Daily new cases","description":null,"data_type":"bigint","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":false}]'::jsonb,
+    '[{"concept_attribute_id":"ac006007-0000-4000-8000-000000000007","value_picker_rule_type":"first","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008002-0000-4000-8000-000000000002"},{"concept_attribute_id":"ac006008-0000-4000-8000-000000000008","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008003-0000-4000-8000-000000000003"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"ac005010-0000-4000-8000-000000000010","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t16$,
+  'a Case Types editor creates a case type with a list field'
+);
+
+reset role;
+
+-- 17.
+select is (
+  (
+    select count(*)::int
+    from public.attribute_mappings__dataset_column
+    where
+      concept_attribute_id = 'ac006008-0000-4000-8000-000000000008'::uuid
+      and value_picker_rule_type is null
+  ),
+  1,
+  'a list field''s mapping stores no value rule'
+);
+
+-- 18. A list field whose mapping names a rule.
+select throws_ok (
+  $t18$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004008-0000-4000-8000-000000000008","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"List with a rule","description":null,"allow_manual_creation":false,"default_status_id":"ac005011-0000-4000-8000-000000000011"}'::jsonb,
+    '[{"id":"ac006009-0000-4000-8000-000000000009","name":"County","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false},{"id":"ac006010-0000-4000-8000-000000000010","name":"Daily new cases","description":null,"data_type":"bigint","mapping_type":"dataset_column","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":false}]'::jsonb,
+    '[{"concept_attribute_id":"ac006009-0000-4000-8000-000000000009","value_picker_rule_type":"first","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008002-0000-4000-8000-000000000002"},{"concept_attribute_id":"ac006010-0000-4000-8000-000000000010","value_picker_rule_type":"sum","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008003-0000-4000-8000-000000000003"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"ac005011-0000-4000-8000-000000000011","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t18$,
+  '23514',
+  'A dataset field has a value rule unless it keeps every value',
+  'a list field that names a value rule is refused'
+);
+
+-- 19. A field that keeps one value, with no rule.
+select throws_ok (
+  $t19$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004010-0000-4000-8000-000000000010","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Single without a rule","description":null,"allow_manual_creation":false,"default_status_id":"ac005012-0000-4000-8000-000000000012"}'::jsonb,
+    '[{"id":"ac006011-0000-4000-8000-000000000011","name":"County","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":false,"allow_manual_edit":false}]'::jsonb,
+    '[{"concept_attribute_id":"ac006011-0000-4000-8000-000000000011","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008002-0000-4000-8000-000000000002"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"ac005012-0000-4000-8000-000000000012","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t19$,
+  '23514',
+  'A dataset field has a value rule unless it keeps every value',
+  'a single-value field without a value rule is refused'
+);
+
+-- 20. A list field as the label and identifier.
+select throws_ok (
+  $t20$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004011-0000-4000-8000-000000000011","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"List label","description":null,"allow_manual_creation":false,"default_status_id":"ac005013-0000-4000-8000-000000000013"}'::jsonb,
+    '[{"id":"ac006012-0000-4000-8000-000000000012","name":"County","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":true,"is_array":true,"allow_manual_edit":false}]'::jsonb,
+    '[{"concept_attribute_id":"ac006012-0000-4000-8000-000000000012","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008002-0000-4000-8000-000000000002"}]'::jsonb,
+    '[]'::jsonb,
+    '[{"id":"ac005013-0000-4000-8000-000000000013","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t20$,
+  '23514',
+  'A list field cannot be the label or an identifier',
+  'a list field that is the label is refused'
+);
+
+-- 21.
+select is (
+  (
+    select count(*)::int
+    from public.concepts
+    where id in (
+      'ac004008-0000-4000-8000-000000000008'::uuid,
+      'ac004010-0000-4000-8000-000000000010'::uuid,
+      'ac004011-0000-4000-8000-000000000011'::uuid
+    )
+  ),
+  0,
+  'a refused list or value rule leaves no case type behind'
+);
+
+-- Runs `p_sql` and returns the hint of the error it raises, or null when it
+-- succeeds. pgTAP's `throws_ok` checks the errcode and message but not the
+-- hint. The exception block rolls back the role `p_sql` sets when it raises.
+create function pg_temp.hint_of_error (p_sql text) returns text language plpgsql as $$
+declare
+  v_hint text;
+begin
+  execute p_sql;
+  return null;
+exception
+  when others then
+    get stacked diagnostics v_hint = pg_exception_hint;
+    return v_hint;
+end;
+$$;
+
+-- 22. A list identifier that is not the label.
+select is (
+  pg_temp.hint_of_error (
+    $t22$
+    set local role authenticated;
+    select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+    select public.rpc_concepts__create (
+      '{"id":"ac004012-0000-4000-8000-000000000012","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"List identifier","description":null,"allow_manual_creation":false,"default_status_id":"ac005014-0000-4000-8000-000000000014"}'::jsonb,
+      '[{"id":"ac006013-0000-4000-8000-000000000013","name":"County","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":true,"is_identifier":false,"is_array":false,"allow_manual_edit":false},{"id":"ac006014-0000-4000-8000-000000000014","name":"Case IDs","description":null,"data_type":"varchar","mapping_type":"dataset_column","is_label":false,"is_identifier":true,"is_array":true,"allow_manual_edit":false}]'::jsonb,
+      '[{"concept_attribute_id":"ac006013-0000-4000-8000-000000000013","value_picker_rule_type":"first","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008002-0000-4000-8000-000000000002"},{"concept_attribute_id":"ac006014-0000-4000-8000-000000000014","dataset_id":"ac007002-0000-4000-8000-000000000002","dataset_column_id":"ac008003-0000-4000-8000-000000000003"}]'::jsonb,
+      '[]'::jsonb,
+      '[{"id":"ac005014-0000-4000-8000-000000000014","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+    );
+    $t22$
+  ),
+  'list_field_is_key_or_label',
+  'a list identifier that is not the label is refused'
+);
+
+reset role;
+
+-- 23. A manual-entry list field that is neither the label nor an identifier.
+select lives_ok (
+  $t23$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004013-0000-4000-8000-000000000013","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Manual list","description":null,"allow_manual_creation":true,"default_status_id":"ac005015-0000-4000-8000-000000000015"}'::jsonb,
+    '[{"id":"ac006015-0000-4000-8000-000000000015","name":"Name","description":null,"data_type":"varchar","mapping_type":"manual_entry","is_label":true,"is_identifier":false,"is_array":false,"allow_manual_edit":true},{"id":"ac006016-0000-4000-8000-000000000016","name":"Notes","description":null,"data_type":"varchar","mapping_type":"manual_entry","is_label":false,"is_identifier":false,"is_array":true,"allow_manual_edit":true}]'::jsonb,
+    '[]'::jsonb,
+    '[{"concept_attribute_id":"ac006015-0000-4000-8000-000000000015"},{"concept_attribute_id":"ac006016-0000-4000-8000-000000000016"}]'::jsonb,
+    '[{"id":"ac005015-0000-4000-8000-000000000015","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t23$,
+  'a manual-entry list field that is neither the label nor an identifier is accepted'
+);
+
+reset role;
+
+-- 24. A manual-entry list field as the label.
+select throws_ok (
+  $t24$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"ac000002-0000-4000-8000-000000000002","role":"authenticated"}', true);
+  select public.rpc_concepts__create (
+    '{"id":"ac004014-0000-4000-8000-000000000014","workspace_id":"ac001001-0000-4000-8000-000000000001","name":"Manual list label","description":null,"allow_manual_creation":true,"default_status_id":"ac005016-0000-4000-8000-000000000016"}'::jsonb,
+    '[{"id":"ac006017-0000-4000-8000-000000000017","name":"Names","description":null,"data_type":"varchar","mapping_type":"manual_entry","is_label":true,"is_identifier":false,"is_array":true,"allow_manual_edit":true}]'::jsonb,
+    '[]'::jsonb,
+    '[{"concept_attribute_id":"ac006017-0000-4000-8000-000000000017"}]'::jsonb,
+    '[{"id":"ac005016-0000-4000-8000-000000000016","name":"Active","description":null,"color":"#40c057","position":0}]'::jsonb
+  );
+  $t24$,
+  '23514',
+  'A list field cannot be the label or an identifier',
+  'a manual-entry list label is refused'
 );
 
 select * from finish ();

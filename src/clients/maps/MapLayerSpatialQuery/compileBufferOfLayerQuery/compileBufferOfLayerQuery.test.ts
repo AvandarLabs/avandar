@@ -111,7 +111,11 @@ describe("compileBufferOfLayerQuery", () => {
         ]),
       ).rawSql,
     );
-    expect(analysis).toEqual({ kind: "read", relations: expect.any(Array) });
+    expect(analysis).toEqual({
+      kind: "read",
+      relations: expect.any(Array),
+      internalTableNames: [],
+    });
   });
 
   it("dissolves with ST_Union_Agg", () => {

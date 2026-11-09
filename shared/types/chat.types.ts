@@ -8,6 +8,9 @@
  * and the edge function through Deno's path alias of the same name.
  */
 
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
+import type { Expect, IsEqual } from "@avandar/utils";
+
 export type ChatDashboardVizType =
   | "table"
   | "bar"
@@ -125,6 +128,27 @@ export type ChatCaseValuePickerRuleType =
   | "max"
   | "min";
 
+/**
+ * How many values a chat-drafted field keeps for one case: `single` reduces
+ * the dataset's rows with a value picker, `list` keeps every value, and
+ * `bucketed_list` keeps one picked value per period of a date column.
+ * Mirrors `ConceptAttribute.ValueShape`.
+ */
+export type ChatCaseValueShape = "single" | "list" | "bucketed_list";
+
+/**
+ * The period a per-period attribute keeps one value for. Mirrors
+ * `ConceptAttribute.BucketGrain`.
+ */
+export type ChatCaseBucketGrain = "day" | "week" | "month" | "quarter" | "year";
+
+/** Do not remove these tests! */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Type tests - this variable is intentionally not used
+type ChatCaseBucketGrainTests = [
+  Expect<IsEqual<ChatCaseBucketGrain, ConceptAttribute.BucketGrain>>,
+];
+
 /** One attribute the case-manager model wants stored on a new concept. */
 export type ChatCreatedCaseAttribute =
   | {
@@ -134,7 +158,17 @@ export type ChatCreatedCaseAttribute =
       datasetId: string;
       columnId: string;
       isLabel?: boolean;
+      /** Absent means `single`. A join key or the label is always `single`. */
+      valueShape?: ChatCaseValueShape;
+      /**
+       * Absent for a list, and whenever chat named none. The default rule then
+       * applies.
+       */
       valuePickerRuleType?: ChatCaseValuePickerRuleType;
+      /** The period, exactly when `valueShape` is `"bucketed_list"`. */
+      bucketGrain?: ChatCaseBucketGrain;
+      /** The date column, exactly when `valueShape` is `"bucketed_list"`. */
+      bucketColumnId?: string;
     }
   | {
       name: string;
@@ -203,6 +237,24 @@ export type ChatProposedCaseAttribute = {
   name: string;
   description?: string;
   isIncluded: boolean;
+  /** Whether the field keeps one value, every value, or one per period. */
+  valueShape: ChatCaseValueShape;
+  /**
+   * The period this attribute keeps one value for. Present when
+   * `valueShape` is `"bucketed_list"`, and only then.
+   */
+  bucketGrain?: ChatCaseBucketGrain;
+  /**
+   * The date or timestamp column of `datasetId` that places each row in a
+   * period. Present when `valueShape` is `"bucketed_list"`, and only then,
+   * except in a card whose dataset has no date column, which refuses to
+   * create it.
+   */
+  bucketColumnId?: string;
+  /**
+   * The rule that picks one value. Kept for a list too, so the card can
+   * switch the field back to one value without asking for a rule.
+   */
   valuePickerRuleType: ChatCaseValuePickerRuleType;
 };
 

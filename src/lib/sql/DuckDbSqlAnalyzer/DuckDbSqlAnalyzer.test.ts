@@ -359,6 +359,7 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     expect(analysis).toEqual({
       kind: "read",
       relations: [{ kind: "concept", id: CONCEPT_ID }],
+      internalTableNames: [],
     });
   });
 
@@ -370,6 +371,7 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     expect(analysis).toEqual({
       kind: "read",
       relations: [{ kind: "dataset", id: DATASET_ID }],
+      internalTableNames: [],
     });
   });
 
@@ -411,6 +413,7 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     ).toEqual({
       kind: "read",
       relations: [{ kind: "dataset", id: DATASET_ID }],
+      internalTableNames: [],
     });
   });
 
@@ -444,23 +447,94 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     });
   });
   // Individual generation stages its rows in `ava_staging_individuals_<id>`
-  // and then reads that table back — `DESCRIBE`, `SELECT count(*)`, and a
-  // paged `SELECT` — through `runRawQuery`, which refuses any source it cannot
-  // account for. The table used to be named with the concept's bare id, which
-  // the analyzer resolved as a dataset; adding the prefix made all three reads
-  // `uninspectable-source`, so every sync threw the moment its upsert began.
-  // It reads no dataset of its own, so it contributes no relation.
+  // and reads that table back through `runRawQuery`, so the analyzer accepts
+  // it. It reads no dataset of its own, so it contributes no relation. It is
+  // reported by name, so a caller that allows only datasets can refuse it.
   it("reads an individuals staging table as an internal table naming no relation", () => {
+    const stagingTableName = `ava_staging_individuals_${CONCEPT_ID}`;
+
     expect(
       DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-        `SELECT * FROM "ava_staging_individuals_${CONCEPT_ID}" LIMIT 1000`,
+        `SELECT * FROM "${stagingTableName}" LIMIT 1000`,
       ),
-    ).toEqual({ kind: "read", relations: [] });
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: [stagingTableName],
+    });
     expect(
       DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
-        `DESCRIBE "ava_staging_individuals_${CONCEPT_ID}"`,
+        `DESCRIBE "${stagingTableName}"`,
       ),
-    ).toEqual({ kind: "read", relations: [] });
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: [stagingTableName],
+    });
+  });
+
+  it("reports an internal table beside the datasets a statement reads", () => {
+    const stagingTableName = `ava_staging_individuals_${CONCEPT_ID}`;
+
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "${DATASET_ID}" JOIN "${stagingTableName}" ON true`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+      internalTableNames: [stagingTableName],
+    });
+  });
+
+  it("reports the reject tables as internal tables", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM reject_errors`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: ["reject_errors"],
+    });
+  });
+
+  it("reports an internal table read inside query()", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM query('SELECT * FROM reject_scans')`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [],
+      internalTableNames: ["reject_scans"],
+    });
+  });
+
+  // A CTE name, a subquery, and a table function name no table of their own.
+  it("reports no internal table for a CTE, a subquery, or a table function", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `WITH recent AS (SELECT * FROM "${DATASET_ID}")
+         SELECT * FROM recent JOIN (SELECT 1 AS id FROM range(3)) other ON true`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+      internalTableNames: [],
+    });
+  });
+
+  it("refuses a staging name whose suffix is not a UUID", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_staging_individuals_secret"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
   });
 
   // The staging table is a bare local table, so a qualified name is something
@@ -474,6 +548,414 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
       kind: "unsafe",
       reason: "uninspectable-source",
       datasetIds: [],
+    });
+  });
+
+  describe("sources the keyword list used to miss", () => {
+    const conceptRelation = { kind: "concept", id: CONCEPT_ID };
+
+    it.each([
+      ["TABLE", `SELECT * FROM (TABLE "concept_${CONCEPT_ID}")`],
+      [
+        "PIVOT_WIDER",
+        `SELECT * FROM (PIVOT_WIDER "concept_${CONCEPT_ID}" ON a USING max(a))`,
+      ],
+      [
+        "PIVOT_LONGER",
+        `SELECT * FROM (PIVOT_LONGER "concept_${CONCEPT_ID}" ON a INTO NAME n VALUE v)`,
+      ],
+      ["SHOW", `SHOW "concept_${CONCEPT_ID}"`],
+      [
+        "TABLE after UNION ALL",
+        `SELECT 1 UNION ALL TABLE "concept_${CONCEPT_ID}"`,
+      ],
+    ])("reads the relation named after %s", (_keyword, sql) => {
+      const analysis = DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql);
+
+      expect(JSON.stringify(analysis)).toContain(CONCEPT_ID);
+      expect(analysis.kind === "read" ? analysis.relations : []).toEqual(
+        analysis.kind === "read" ? [conceptRelation] : [],
+      );
+    });
+
+    it("reads the dataset named after AS TABLE in a CREATE", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `CREATE TABLE "${DATASET_ID}" AS TABLE "${JOINED_DATASET_ID}"`,
+        ),
+      ).toEqual({
+        kind: "mutating",
+        readDatasetIds: [JOINED_DATASET_ID],
+        mutatedDatasetIds: [DATASET_ID],
+      });
+    });
+
+    it("does not read the target of a CREATE, DROP, or ALTER TABLE as a source", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `DROP TABLE IF EXISTS "${DATASET_ID}"`,
+        ),
+      ).toEqual({
+        kind: "mutating",
+        readDatasetIds: [],
+        mutatedDatasetIds: [DATASET_ID],
+      });
+    });
+
+    it("refuses SHOW of anything that is not a relation", () => {
+      ["SHOW TABLES", "SHOW ALL TABLES"].forEach((sql) => {
+        expect(
+          DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql),
+        ).toMatchObject({ kind: "unsafe", reason: "uninspectable-source" });
+      });
+    });
+  });
+
+  describe("common table expression scope", () => {
+    it("reads the real view a CTE of the same name selects from", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH "concept_${CONCEPT_ID}" AS (SELECT * FROM "concept_${CONCEPT_ID}")
+           SELECT * FROM "concept_${CONCEPT_ID}"`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "concept", id: CONCEPT_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it("reads the real staging table a CTE of the same name selects from", () => {
+      const stagingTableName = `ava_staging_individuals_${CONCEPT_ID}`;
+
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH "${stagingTableName}" AS (SELECT * FROM "${stagingTableName}")
+           SELECT * FROM "${stagingTableName}"`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [],
+        internalTableNames: [stagingTableName],
+      });
+    });
+
+    it("lets a recursive CTE read its own name", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH RECURSIVE counter(n) AS (
+             SELECT 1 UNION ALL SELECT n + 1 FROM counter WHERE n < 3
+           ) SELECT * FROM counter`,
+        ),
+      ).toEqual({ kind: "read", relations: [], internalTableNames: [] });
+    });
+
+    it("reads the real view in the base term of a recursive CTE of the same name", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH RECURSIVE "concept_${CONCEPT_ID}" AS (
+             SELECT * FROM "concept_${CONCEPT_ID}"
+             UNION ALL SELECT a + 1 FROM "concept_${CONCEPT_ID}" WHERE a < 3
+           ) SELECT * FROM "concept_${CONCEPT_ID}"`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "concept", id: CONCEPT_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it("reads the real view in an earlier term of a recursive CTE with several unions", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH RECURSIVE "concept_${CONCEPT_ID}" AS (
+             SELECT 1
+             UNION ALL SELECT a FROM "concept_${CONCEPT_ID}"
+             UNION ALL SELECT a + 1 FROM "concept_${CONCEPT_ID}" WHERE a < 3
+           ) SELECT 1`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "concept", id: CONCEPT_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it("reads the real view when the shadowing CTE is not the first in the list", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH first_cte AS (SELECT 1),
+                "concept_${CONCEPT_ID}" AS (SELECT * FROM "concept_${CONCEPT_ID}")
+           SELECT * FROM "concept_${CONCEPT_ID}"`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "concept", id: CONCEPT_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it("lets a later CTE in the list read an earlier one", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH first_cte AS (SELECT * FROM "${DATASET_ID}"),
+                second_cte AS (SELECT * FROM first_cte)
+           SELECT * FROM second_cte`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "dataset", id: DATASET_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it("does not treat a WINDOW definition as a CTE", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `SELECT 'x' FROM range(1) WINDOW "concept_${CONCEPT_ID}" AS (ORDER BY 1)
+           UNION ALL SELECT a FROM "concept_${CONCEPT_ID}"`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "concept", id: CONCEPT_ID }],
+        internalTableNames: [],
+      });
+    });
+  });
+
+  describe("syntax the tokenizer reads differently from DuckDB", () => {
+    it.each([
+      [
+        "a nested block comment",
+        `SELECT 1 /* /* */ ' */, (SELECT max(a) FROM "concept_${CONCEPT_ID}") --'`,
+      ],
+      ["an unterminated block comment", `SELECT 1 /* never closed`],
+      ["an unterminated string", `SELECT 'never closed`],
+      ["an E string", `SELECT E'\\'', (SELECT 1 FROM x) --'`],
+      ["a lowercase E string", `SELECT e'a'`],
+      ["dollar quoting", `SELECT $$'$$, (SELECT 1 FROM x) --'`],
+      ["tagged dollar quoting", `SELECT $q$'$q$, (SELECT 1 FROM x) --'`],
+      ["a positional parameter", `SELECT $1`],
+    ])("refuses %s", (_description, sql) => {
+      expect(DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql)).toEqual({
+        kind: "unsafe",
+        reason: "unsupported-syntax",
+        datasetIds: [],
+      });
+    });
+
+    it("ends a line comment at a carriage return", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `SELECT 1 --x\r, (SELECT max(a) FROM "concept_${CONCEPT_ID}")`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "concept", id: CONCEPT_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it("keeps accepting quotes, escapes, and dollar signs where they are plain text", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `SELECT 'it''s $$ E''x', "a$b", "e", e_col$1, /* a $$ b */ 1
+           FROM "${DATASET_ID}" -- $$ E'
+           WHERE name = 'E'`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "dataset", id: DATASET_ID }],
+        internalTableNames: [],
+      });
+    });
+  });
+
+  describe("statements", () => {
+    it.each([
+      "PRAGMA threads=1",
+      "USE other_db",
+      "PREPARE q AS SELECT 1",
+      "EXECUTE q",
+      "DEALLOCATE q",
+      "CHECKPOINT",
+      "FORCE CHECKPOINT",
+      "BEGIN TRANSACTION",
+      "COMMIT",
+      "ROLLBACK",
+      "SELECT 1; PRAGMA threads=1",
+      "SELECT 1; COMMIT",
+    ])("refuses %s", (sql) => {
+      expect(DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql)).toMatchObject({
+        kind: "unsafe",
+      });
+    });
+
+    it("refuses a later statement that is not a read", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `SELECT 1; TABLE "concept_${CONCEPT_ID}"`,
+        ),
+      ).toMatchObject({ kind: "unsafe", reason: "invalid-sql" });
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(`SELECT 1; WHATEVER x`),
+      ).toMatchObject({ kind: "unsafe", reason: "invalid-sql" });
+    });
+
+    it("keeps reading a column named like a transaction keyword", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `SELECT begin, commit, "use", execute FROM "${DATASET_ID}"`,
+        ),
+      ).toEqual({
+        kind: "read",
+        relations: [{ kind: "dataset", id: DATASET_ID }],
+        internalTableNames: [],
+      });
+    });
+
+    it.each([
+      ["a SELECT", "SELECT 1", true],
+      ["a trailing semicolon", "SELECT 1;", true],
+      ["a WITH", "WITH a AS (SELECT 1) SELECT * FROM a", true],
+      ["FROM first", "FROM t SELECT a", true],
+      ["a parenthesis", "(SELECT 1)", true],
+      ["two statements", "SELECT 1; SELECT 2", false],
+      ["TABLE", "TABLE t", false],
+      ["SHOW", "SHOW TABLES", false],
+      ["DESCRIBE", "DESCRIBE t", false],
+      ["PRAGMA", "PRAGMA threads=1", false],
+      ["nothing", "", false],
+      ["unsupported syntax", "SELECT $$a$$", false],
+    ])(
+      "reports whether %s is one plain query",
+      (_description, sql, expected) => {
+        expect(DuckDbSqlAnalyzer.isSinglePlainQuery(sql)).toBe(expected);
+      },
+    );
+  });
+
+  describe("only symbols are structure", () => {
+    const conceptView = `"concept_${CONCEPT_ID}"`;
+    const readsConcept = {
+      kind: "read",
+      relations: [{ kind: "concept", id: CONCEPT_ID }],
+      internalTableNames: [],
+    };
+
+    it.each([
+      [
+        "a string paren inside trim",
+        `SELECT trim(BOTH FROM '(') AS t, a FROM ${conceptView} WHERE ')' <> ''`,
+      ],
+      [
+        "a quoted paren name",
+        `SELECT "(" FROM ${conceptView} WHERE ")" IS NULL`,
+      ],
+      [
+        "a string paren beside a shadowed CTE name",
+        `SELECT * FROM (WITH ${conceptView} AS (SELECT 1 AS a)
+           SELECT * FROM ${conceptView} WHERE '(' <> 'x') t
+         JOIN ${conceptView} c ON true WHERE ')' <> 'y'`,
+      ],
+      ["a string semicolon", `SELECT ';' AS s FROM ${conceptView}`],
+      [
+        "a string comma after a join",
+        `SELECT ',' AS s FROM range(1) r JOIN range(1) s ON true, ${conceptView}`,
+      ],
+      [
+        "a string dot",
+        `SELECT * FROM range(1) a, ${conceptView} b WHERE '.' <> 'x'`,
+      ],
+    ])("still reads the view past %s", (_description, sql) => {
+      expect(DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql)).toEqual(
+        readsConcept,
+      );
+    });
+
+    it("does not treat a string semicolon as a second statement", () => {
+      expect(DuckDbSqlAnalyzer.isSinglePlainQuery(`SELECT ';' AS s`)).toBe(
+        true,
+      );
+      expect(DuckDbSqlAnalyzer.isSinglePlainQuery(`SELECT 1; SELECT 2`)).toBe(
+        false,
+      );
+    });
+  });
+
+  describe("joins and recursive CTEs", () => {
+    const conceptView = `"concept_${CONCEPT_ID}"`;
+    const readsConcept = {
+      kind: "read",
+      relations: [{ kind: "concept", id: CONCEPT_ID }],
+      internalTableNames: [],
+    };
+
+    it.each([
+      ["EXCEPT", "SELECT 'x' AS a UNION SELECT * FROM V EXCEPT SELECT 'y'"],
+      [
+        "INTERSECT",
+        "SELECT 'x' AS a UNION SELECT * FROM V INTERSECT SELECT 'y'",
+      ],
+    ])(
+      "reads the real view when a recursive CTE has %s after its UNION",
+      (_operator, bodyTemplate) => {
+        const body = bodyTemplate.replace("V", conceptView);
+
+        expect(
+          DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+            `WITH RECURSIVE ${conceptView} AS (${body}) SELECT * FROM ${conceptView}`,
+          ),
+        ).toEqual(readsConcept);
+      },
+    );
+
+    it("still lets a recursive CTE read itself after a UNION", () => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          `WITH RECURSIVE counter(n) AS (
+             SELECT 1 UNION SELECT n + 1 FROM counter WHERE n < 3
+           ) SELECT * FROM counter`,
+        ),
+      ).toEqual({ kind: "read", relations: [], internalTableNames: [] });
+    });
+
+    it.each([
+      ["a parenthesized join", `SELECT * FROM (V CROSS JOIN range(1))`],
+      [
+        "a nested parenthesized join",
+        `SELECT * FROM ((V CROSS JOIN range(1)) x)`,
+      ],
+      [
+        "a join inside parentheses",
+        `SELECT * FROM range(1) a JOIN (V JOIN range(1) ON true) ON true`,
+      ],
+      [
+        "a comma after a join condition",
+        `SELECT * FROM range(1) r JOIN range(1) s ON true, V`,
+      ],
+      [
+        "a comma after a CASE in a join condition",
+        `SELECT * FROM range(1) r JOIN range(1) s ON CASE WHEN true THEN true END, V`,
+      ],
+    ])("reads the view named in %s", (_description, sqlTemplate) => {
+      expect(
+        DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+          sqlTemplate.replace("V", conceptView),
+        ),
+      ).toEqual(readsConcept);
+    });
+
+    it("still ends the source list at ON CONFLICT, WHEN of a MERGE, and PIVOT ON", () => {
+      [
+        `INSERT INTO "${DATASET_ID}" SELECT * FROM "${JOINED_DATASET_ID}" ON CONFLICT (id) DO UPDATE SET a = 1, b = 2`,
+        `MERGE INTO "${DATASET_ID}" USING "${JOINED_DATASET_ID}" ON true WHEN MATCHED THEN UPDATE SET a = 1, b = 2`,
+        `PIVOT "${DATASET_ID}" ON a, b USING sum(c)`,
+      ].forEach((sql) => {
+        expect(
+          DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(sql),
+        ).not.toMatchObject({ kind: "unsafe" });
+      });
     });
   });
 });

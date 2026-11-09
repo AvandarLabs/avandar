@@ -8,6 +8,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 
 const WORKSPACE_ID = "wwwwwwww-wwww-4www-8www-wwwwwwwwwwww" as Workspace.Id;
 const CONCEPT_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const FIELD_ID = "11111111-1111-4111-8111-111111111111";
 
 const {
   datasetsWithColumnsMock,
@@ -73,5 +74,52 @@ describe("fetchOfflineChatSchema", () => {
 
     expect(schema.conceptStatuses).toEqual([]);
     expect(conceptStatusGetAllMock).not.toHaveBeenCalled();
+  });
+
+  it("carries each field's id and whether it keeps every value into the offline schema", async () => {
+    conceptAttributeGetAllMock.mockResolvedValue([
+      { id: FIELD_ID, conceptId: CONCEPT_ID, name: "Symptoms", isArray: true },
+    ]);
+
+    const schema = await fetchOfflineChatSchema({
+      workspace: { id: WORKSPACE_ID } as Workspace.T,
+      navigatorOnLine: true,
+    });
+
+    expect(schema.conceptAttributes).toEqual([
+      {
+        id: FIELD_ID,
+        concept_id: CONCEPT_ID,
+        name: "Symptoms",
+        is_array: true,
+      },
+    ]);
+  });
+
+  it("carries each field's period and value type into the offline schema", async () => {
+    conceptAttributeGetAllMock.mockResolvedValue([
+      {
+        conceptId: CONCEPT_ID,
+        name: "Temperature",
+        isArray: true,
+        bucketGrain: "month",
+        dataType: "double",
+      },
+    ]);
+
+    const schema = await fetchOfflineChatSchema({
+      workspace: { id: WORKSPACE_ID } as Workspace.T,
+      navigatorOnLine: true,
+    });
+
+    expect(schema.conceptAttributes).toEqual([
+      {
+        concept_id: CONCEPT_ID,
+        name: "Temperature",
+        is_array: true,
+        bucket_grain: "month",
+        data_type: "double",
+      },
+    ]);
   });
 });

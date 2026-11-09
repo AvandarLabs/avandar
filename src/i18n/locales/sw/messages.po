@@ -403,7 +403,11 @@ msgstr "Ficha seti za data ambazo haziwezi kupakiwa"
 msgid "Join key"
 msgstr "Ufunguo wa kuunganisha"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per year"
+msgstr "{fieldName} kwa mwaka"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "label"
 msgstr "lebo"
 
@@ -524,7 +528,7 @@ msgstr "Mionekano"
 msgid "Second point"
 msgstr "Kipengele cha pili"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "Chagua thamani inayokuja kwanza kialfabeti"
 
@@ -596,6 +600,7 @@ msgstr "Maeneo mahususi yatachorwa kwenye ramani, na maeneo yaliyofichwa "
 msgid "Aggregations"
 msgstr "Mkusanyiko"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -795,6 +800,10 @@ msgstr "Mwangaza wa meza haina mipangilio ya ziada."
 msgid "About you"
 msgstr "Kuhusu wewe"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per quarter"
+msgstr "{fieldName} kwa robo mwaka"
+
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
 msgstr "Imeshindikana kusawazisha mkusanyiko wa data mtandaoni"
@@ -816,9 +825,22 @@ msgstr "Tumia ramani hii ya msingi"
 msgid "Monospace headlines"
 msgstr "Vichwa vya monospace"
 
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
+#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
+#~ "zaidi."
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Quarter"
+msgstr "Robo mwaka"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "Mtu 1"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period for {fieldName}"
+msgstr "Kipindi cha {fieldName}"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
@@ -903,6 +925,10 @@ msgstr "Avandar haikuweza kuthibitisha kuwa hoja hii inasoma tu seti zako za "
 msgid "Removing offline models"
 msgstr "Inaondoa modeli za nje ya mtandao"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Year"
+msgstr "Mwaka"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
 msgstr "Onyesha seti za data katika {topic}"
@@ -941,8 +967,8 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Ili kuongeza idadi ya "
 "viti zaidi. Kila kiti kinakuruhusu kuongeza datasets 10 zaidi!"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "Only allow one value"
-msgstr "Ruhusu thamani moja tu"
+#~ msgid "Only allow one value"
+#~ msgstr "Ruhusu thamani moja tu"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -992,7 +1018,7 @@ msgstr "Badilisha ukubwa wa maandishi ya dondoo"
 msgid "stddev"
 msgstr "stddev"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a count of how many values there are"
 msgstr "Pata idadi ya thamani zilizopo"
 
@@ -1430,6 +1456,11 @@ msgstr "Seti hizi za data zimeorodheshwa kwenye eneo lako la kazi, lakini data "
 "kuendelea, unahitaji ama kupakia tena seti ya data au kuifuta kutoka "
 "kwenye eneo lako la kazi."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTableToggle.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
+msgid "Show fewer"
+msgstr "Onyesha chache"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "Metadata"
@@ -1455,6 +1486,10 @@ msgstr "Tafuta seti za data"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Ingiza barua pepe"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per week"
+msgstr "{fieldName} kwa wiki"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
@@ -1607,6 +1642,10 @@ msgstr "Funga mazungumzo (⌘/)"
 msgid "Create failed"
 msgstr "Kuunda kumeshindikana"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per month"
+msgstr "{fieldName} kwa mwezi"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
 msgstr "Kuratibu ni 0, 0"
@@ -1655,6 +1694,10 @@ msgstr "Shiriki kwenye workspace yako"
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "Ingiza barua yako ya pepe kupata kiungo cha kurekebisha"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Kwa kila kipindi"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
@@ -1961,11 +2004,16 @@ msgstr "Hoja hii inatumia seti ya data ambayo haipo katika nafasi hii ya kazi "
 msgid "(Annual billing)"
 msgstr "(Malipo ya kila mwaka)"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
 msgstr "Kila aina ya kesi tayari ina hali. Chagua jina lingine."
+
+#. placeholder {0}: values.length
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
+msgid "{0, plural, one {Show all # value} other {Show all # values}}"
+msgstr "{0, plural, one {Onyesha thamani #} other {Onyesha thamani zote #}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -2289,6 +2337,10 @@ msgstr "Inaondoa…"
 msgid "Radius"
 msgstr "Radius"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Week of {day}"
+msgstr "Wiki ya {day}"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Panga na punguza"
@@ -2374,6 +2426,10 @@ msgstr "Ufute kabisa <0>{openDatasetName}</0>?"
 msgid "The offline models could not be removed"
 msgstr "Modeli za nje ya mtandao hazikuweza kuondolewa"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # day} other {Show all # days}}"
+msgstr "{periodCount, plural, one {Onyesha siku #} other {Onyesha siku zote #}}"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
 msgstr "WMS"
@@ -2440,6 +2496,10 @@ msgstr "Jaribu tena. Ikiendelea kushindikana, pakia upya ukurasa."
 msgid "You can start using your new password now"
 msgstr "Unaweza kuanza kutumia nenosiri lako jipya sasa"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Q{quarter} {year}"
+msgstr "Robo {quarter} {year}"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
 msgstr "Aina ya faili isiyoungwa mkono"
@@ -2448,6 +2508,10 @@ msgstr "Aina ya faili isiyoungwa mkono"
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "Safu {droppedRowCount} kati ya {totalRowCount} hazikuweza kuwekwa "
 "kwenye ramani"
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column"
+msgstr "Safu ya tarehe"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
@@ -3548,6 +3612,10 @@ msgstr "{layerName} haikurejesha safu yoyote"
 msgid "is at most"
 msgstr "ni isiyozidi"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per year"
+msgstr "Kwa mwaka"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
 msgstr "Tumia hifadhidata"
@@ -3662,6 +3730,10 @@ msgstr "Safu mlalo {rowIndexes}."
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "Futa: {openDatasetName}"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per day"
+msgstr "Kwa siku"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -3789,6 +3861,10 @@ msgstr "Utambulisho"
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Data source"
 msgstr "Chanzo cha data"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "One value"
+msgstr "Thamani moja"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
@@ -4007,6 +4083,10 @@ msgstr "Usajili unahitaji muunganisho wa intaneti."
 msgid "There are no values"
 msgstr "Hakuna thamani"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column for {fieldName}"
+msgstr "Safu ya tarehe ya {fieldName}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Show more"
 msgstr "Onyesha zaidi"
@@ -4084,7 +4164,9 @@ msgstr "Haiwezi kunasa dashibodi"
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
 msgid "ID fields keep their value as is."
 msgstr "Sehemu za kitambulisho huhifadhi thamani yake kama ilivyo."
 
@@ -4114,7 +4196,7 @@ msgstr "Muda wa alama za mhimili wa X"
 msgid "Please try again."
 msgstr "Tafadhali jaribu tena."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "Chagua thamani inayokuja mwisho kialfabeti"
 
@@ -4226,6 +4308,15 @@ msgstr "Ficha safu {layerName}"
 msgid "Start your journey with us"
 msgstr "Anza safari yako nasi"
 
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#~ msgid "Qwen 2.5 7B (offline)"
+#~ msgstr "Qwen 2.5 7B (offline)"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Fields that keep every value cannot be filtered on."
+msgstr "Huwezi kuchuja kwa sehemu zinazohifadhi thamani zote."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
 msgstr "Inachekesha"
@@ -4249,9 +4340,9 @@ msgstr "Mada: {topic}"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "If each {0} can only have one {attributeName} value, check this box."
-msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
-"kisanduku hiki."
+#~ msgid "If each {0} can only have one {attributeName} value, check this box."
+#~ msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
+#~ "kisanduku hiki."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -4332,6 +4423,11 @@ msgstr "Je, uko tayari kufuta {0}?"
 msgid "Running the layer's query."
 msgstr "Inaendesha hoja ya safu."
 
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "Vyanzo vya {0}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Andika jina la workspace ili kuthibitisha"
@@ -4378,6 +4474,11 @@ msgstr "Vitendo zaidi vya seti ya data"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
 msgstr "Futa dashibodi?"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Every value"
+msgstr "Thamani zote"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
@@ -4542,6 +4643,10 @@ msgstr "Data binafsi zimegunduliwa"
 msgid "Coordinate validation report"
 msgstr "Ripoti ya uthibitishaji wa viwianishi"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Day"
+msgstr "Siku"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "Tumia kila kichujio cha kimataifa kwenye dashibodi."
@@ -4553,6 +4658,10 @@ msgstr "Punguza"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Kikomo kimefikiwa"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Month"
+msgstr "Mwezi"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
@@ -4570,6 +4679,10 @@ msgstr "Futa kumbukumbu"
 msgid "Google Sheet is too large"
 msgstr "Google Sheet ni kubwa sana"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Choose a date column"
+msgstr "Chagua safu ya tarehe"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
 msgstr "ni mojawapo ya"
@@ -4581,6 +4694,10 @@ msgstr "Ramani mpya"
 #: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
 msgid "Current version"
 msgstr "Toleo la sasa"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeValueShapeControl.tsx
+msgid "Join keys and the label keep one value."
+msgstr "Funguo za kuunganisha na lebo hubaki na thamani moja."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
@@ -4822,6 +4939,10 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 msgstr "{offlineOnlyTitle}: itaishi kwenye kompyuta hii pekee, na hakuna mtu "
 "mwingine kwenye timu yako atakayeweza kuifungua."
 
+#: src/components/caseFields/ValueShapeControl.tsx
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "Thamani moja au thamani zote za {fieldName}"
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
 msgstr "A4"
@@ -4987,7 +5108,7 @@ msgstr "Orodha yenye vitone"
 msgid "Annotate the map"
 msgstr "Weka maelezo kwenye ramani"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the maximum value"
 msgstr "Chagua thamani ya juu"
 
@@ -5264,6 +5385,10 @@ msgstr "Mtu yeyote aliye na kiungo anaweza kutazama {resource} hii. Watu na "
 "vikundi vilivyo hapa chini bado vinadhibiti ni nani anayeweza "
 "kuihariri."
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
+msgid "The title field keeps one value."
+msgstr "Sehemu ya kichwa hubaki na thamani moja."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
 "Ask them to reconnect it, then try again."
@@ -5446,6 +5571,10 @@ msgstr "Mwisho (mfano. 2024-12-31)"
 msgid "Open dashboard tile"
 msgstr "Fungua kigae cha dashibodi"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per month"
+msgstr "Kwa mwezi"
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
@@ -5587,7 +5716,7 @@ msgstr "Unda Mahali pa Kazi"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "Try again"
 msgstr "Jaribu tena"
 
@@ -5810,7 +5939,7 @@ msgstr "Chora eneo la kuchuja kwa"
 msgid "Pick a dashboard, or create a new one."
 msgstr "Chagua dashibodi, au unda mpya."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a sum of the values"
 msgstr "Pata jumla ya thamani"
 
@@ -5826,6 +5955,7 @@ msgstr "Ingiza"
 msgid "Clear Disputed status column"
 msgstr "Futa safu ya hali ya Zinazobishaniwa"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -5870,7 +6000,7 @@ msgstr "Usaidizi wa jiometri haupatikani"
 msgid "X column"
 msgstr "Safu ya X"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the most frequent value"
 msgstr "Chagua thamani inayojirudia zaidi"
 
@@ -6149,6 +6279,12 @@ msgstr "Kosa la kuhifadhi dataset: {0}"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "No columns yet"
 msgstr "Bado hakuna safu"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # quarter} other {Show all # "
+"quarters}}"
+msgstr "{periodCount, plural, one {Onyesha robo mwaka #} other {Onyesha robo "
+"zote za mwaka #}}"
 
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
@@ -6517,6 +6653,10 @@ msgstr "Google Sheet"
 msgid "You wrote:"
 msgstr "Umeandika:"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per day"
+msgstr "{fieldName} kwa siku"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Chaguo nyingi"
@@ -6529,6 +6669,15 @@ msgstr "Haiwezekani kupakia datasets za dashibodi"
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "Maelezo hayajajumuishwa bado."
+
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#~ msgid "Qwen 2.5 3B"
+#~ msgstr "Qwen 2.5 3B"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "Katika kila kipindi, ikiwa kuna thamani nyingi za {attributeName}, "
+"basi..."
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
@@ -6688,6 +6837,10 @@ msgstr "Badilisha jina la safu"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Omba kipengele"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period"
+msgstr "Kipindi"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
@@ -7040,7 +7193,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 msgstr "Safu ambazo hazijaunganishwa bado zinahesabiwa katika jumla za safu "
 "hii. Zimeondolewa kwenye ramani pekee."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get an average of the values"
 msgstr "Pata wastani wa thamani"
 
@@ -7299,7 +7452,7 @@ msgstr "Unda eneo jipya la kazi. Unaweza kila wakati kulihariri baadaye."
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
 "litaendelea."
@@ -7750,6 +7903,10 @@ msgstr "Wakati umewezeshwa, wanachama wa kundi hili wanapata ufikiaji tu ikiwa "
 msgid "Divider"
 msgstr "Kitenganishi"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # week} other {Show all # weeks}}"
+msgstr "{periodCount, plural, one {Onyesha wiki #} other {Onyesha wiki zote #}}"
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "Kikomo cha chini"
@@ -7868,6 +8025,10 @@ msgstr "Acha wazi wakati jiometri tayari ni WGS 84."
 msgid "Chart settings appear once the query returns some columns."
 msgstr "Mipangilio ya chati huonekana baada ya hoja kurejesha baadhi ya safu."
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "Idadi ya thamani ambazo {fieldName} huhifadhi"
+
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
@@ -7936,6 +8097,11 @@ msgstr "URL ya kiungo"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
 msgstr "Tuma maoni"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # year} other {Show all # years}}"
+msgstr "{periodCount, plural, one {Onyesha mwaka #} other {Onyesha miaka yote "
+"#}}"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
@@ -8034,7 +8200,7 @@ msgstr "Inasasisha rekodi za {conceptName}…"
 msgid "Loading private resources"
 msgstr "Inapakia rasilimali za faragha"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
 
@@ -8056,7 +8222,7 @@ msgstr "Upatikanaji umekataliwa"
 msgid "Refresh {0} records"
 msgstr "Sasisha rekodi {0}"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "join key"
 msgstr "ufunguo wa kuunganisha"
 
@@ -8124,6 +8290,10 @@ msgstr "Huna muunganisho wa intaneti. Rasimu yako imehifadhiwa kwenye kifaa "
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "Ingiza jina la seti ya data"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#~ msgid "Sources"
+#~ msgstr "Vyanzo"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
@@ -8439,7 +8609,7 @@ msgid "None of the selected regions produced any rows yet, so there are no "
 msgstr "Hakuna mistari iliyozalishwa bado na maeneo yaliyochaguliwa, kwa hivyo "
 "hakuna safu zilizochapishwa za kuweka."
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "Name for {columnLabel}"
 msgstr "Jina la {columnLabel}"
 
@@ -8611,7 +8781,7 @@ msgstr "ni angalau"
 msgid "Stack group"
 msgstr "Kundi la tabaka"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
 
@@ -8976,7 +9146,7 @@ msgstr "Data yako inatayarishwa"
 msgid "Delete the view {0}"
 msgstr "Futa mwonekano {0}"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "This record's fields failed to load"
 msgstr "Imeshindwa kupakia sehemu za rekodi hii"
 
@@ -9073,7 +9243,7 @@ msgid "contains"
 msgstr "ina"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {attributeName} kwa {0} moja, basi..."
 
@@ -9184,7 +9354,7 @@ msgstr "Kile mtu huyu au kundi linaweza kufanya. Mtazamaji = kusoma tu, Mhariri 
 "= hariri maudhui, Msimamizi = udhibiti kamili ikijumuisha kushiriki."
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/CaseTypeDraftAttributeRow.tsx
 msgid "Include {0}"
 msgstr "Jumuisha {0}"
 
@@ -9364,6 +9534,11 @@ msgstr "Mseto wa rangi"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Over a year ago"
 msgstr "Zaidi ya mwaka mmoja uliopita"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # month} other {Show all # months}}"
+msgstr "{periodCount, plural, one {Onyesha mwezi #} other {Onyesha miezi yote "
+"#}}"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -9634,7 +9809,8 @@ msgid "Show as link"
 msgstr "Onyesha kama kiungo"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "Hakuna thamani"
 
@@ -9673,6 +9849,7 @@ msgstr "Hebu tuhamishe matokeo haya kwenye dashibodi"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "Thamani"
 
@@ -10085,7 +10262,7 @@ msgstr "Sawa na mtandaoni?"
 msgid "Neutral failure"
 msgstr "Kushindwa kwa kawaida"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "No fields yet"
 msgstr "Bado hakuna sehemu"
 
@@ -10323,6 +10500,10 @@ msgstr "Mwaka"
 msgid "anyone with "
 msgstr "mtu yeyote mwenye "
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "This dataset has no date column"
+msgstr "Seti hii ya data haina safu ya tarehe"
+
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
@@ -10353,6 +10534,10 @@ msgstr "Pakia faili ya CSV, Excel au PDF, unganisha Google Sheet, au vinjari "
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
 msgstr "Hifadhidata haikujibu kwa wakati. Kagua anwani na ujaribu tena."
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per quarter"
+msgstr "Kwa robo mwaka"
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
@@ -10421,6 +10606,10 @@ msgid "Pick one from the list to review its columns, preview its rows, and read 
 "a summary of what is in it."
 msgstr "Chagua moja kutoka kwenye orodha ili ukague safu zake, uhakiki safu "
 "mlalo zake, na usome muhtasari wa yaliyomo."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Choose the date column for this field"
+msgstr "Chagua safu ya tarehe kwa sehemu hii"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -10662,6 +10851,10 @@ msgstr "Thamani inayojulikana zaidi ni <0>{0}</0>, katika <1>{1}</1> ya safu "
 msgid "Data key column"
 msgstr "Safu wima ya ufunguo wa data"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per week"
+msgstr "Kwa wiki"
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
 msgstr "Inashughulika, {remainingLabel} iliyobaki"
@@ -10779,7 +10972,11 @@ msgstr "Onyesha QR code"
 msgid "Past year"
 msgstr "Mwaka uliopita"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Week"
+msgstr "Wiki"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
 msgstr "Chagua thamani ya chini"
 

@@ -1,5 +1,6 @@
+import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters";
 import { notifyWarning } from "@/utils/notifications/notify";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
@@ -23,6 +24,37 @@ type FilterState = {
   onDismiss: () => void;
 };
 
+type FilterIssues = ReturnType<typeof normalizeQueryFilters>["issues"];
+
+/**
+ * Returns a function that says why filters were removed: their column is
+ * gone, or their field keeps every value and cannot be filtered on.
+ */
+function useRemovedFiltersMessage(): (issues: FilterIssues) => string {
+  const { t } = useLingui();
+  return useCallback(
+    (issues) => {
+      const hasMissingColumn = issues.some((issue) => {
+        return issue.reason !== "unsupported";
+      });
+      const hasListField = issues.some((issue) => {
+        return issue.reason === "unsupported";
+      });
+      return [
+        hasMissingColumn
+          ? t`They referenced columns this data source does not have.`
+          : undefined,
+        hasListField
+          ? t`Fields that keep every value cannot be filtered on.`
+          : undefined,
+      ]
+        .filter(isDefined)
+        .join(" ");
+    },
+    [t],
+  );
+}
+
 function useFilterPruning({
   filters,
   sourceCatalog,
@@ -31,6 +63,7 @@ function useFilterPruning({
   normalized,
 }: Readonly<PruningOptions>): void {
   const { t } = useLingui();
+  const buildRemovedFiltersMessage = useRemovedFiltersMessage();
   // Track fresh host handlers without retriggering pruning.
   const onSetFiltersRef = useRef(onSetFilters);
   useEffect(function trackLatestSetFilters() {
@@ -57,11 +90,18 @@ function useFilterPruning({
         prunedColumnsRef.current = issueKey;
         notifyWarning({
           title: t`Some filters were removed`,
-          message: t`They referenced columns this data source does not have.`,
+          message: buildRemovedFiltersMessage(result.issues),
         });
       }
     },
-    [normalized, columns, filters, isStructuredQueryInSync, t],
+    [
+      normalized,
+      columns,
+      filters,
+      isStructuredQueryInSync,
+      t,
+      buildRemovedFiltersMessage,
+    ],
   );
 }
 

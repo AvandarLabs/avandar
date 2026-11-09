@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { insertConceptFromFormValues } from "./insertConceptFromFormValues";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
@@ -113,6 +115,34 @@ function _makeFormValues(): ConceptFormSubmitValues {
         },
       },
     ],
+  };
+}
+
+/** A dataset-column field whose mapping names the `sum` rule. */
+function _makeDatasetColumnAttribute(options: {
+  baseAttribute: ConceptFormSubmitValues["attributes"][number];
+  name: string;
+  isArray: boolean;
+}): ConceptFormSubmitValues["attributes"][number] {
+  const attributeId = uuid<ConceptAttributeId>();
+  return {
+    ...options.baseAttribute,
+    id: attributeId,
+    name: options.name,
+    dataType: "bigint",
+    mappingType: "dataset_column",
+    isLabel: false,
+    isArray: options.isArray,
+    mappings: {
+      manualEntry: { type: "manual_entry", conceptAttributeId: attributeId },
+      datasetColumn: {
+        type: "dataset_column",
+        conceptAttributeId: attributeId,
+        valuePickerRuleType: "sum",
+        datasetId: uuid<Dataset.Id>(),
+        datasetColumnId: uuid<DatasetColumn.Id>(),
+      },
+    },
   };
 }
 
@@ -229,5 +259,76 @@ describe("insertConceptFromFormValues", () => {
       insertConceptFromFormValues(_makeFormValues()),
     ).rejects.toThrow("refused");
     expect(generateIndividualsMock).not.toHaveBeenCalled();
+  });
+
+  it("writes no value rule for a field that keeps every value, and keeps a single field's rule", async () => {
+    generateIndividualsMock.mockResolvedValue(undefined);
+    const formValues = _makeFormValues();
+    const listAttribute = _makeDatasetColumnAttribute({
+      baseAttribute: formValues.attributes[0]!,
+      name: "Daily new cases",
+      isArray: true,
+    });
+    const singleAttribute = _makeDatasetColumnAttribute({
+      baseAttribute: formValues.attributes[0]!,
+      name: "Total cases",
+      isArray: false,
+    });
+
+    await insertConceptFromFormValues({
+      ...formValues,
+      attributes: [...formValues.attributes, listAttribute, singleAttribute],
+    });
+
+    const [{ mappings }] = conceptCreateMock.mock.calls[0]!;
+    const findMapping = (attributeId: string) => {
+      return mappings.find((mapping: { conceptAttributeId: string }) => {
+        return mapping.conceptAttributeId === attributeId;
+      });
+    };
+    expect(findMapping(listAttribute.id)).toMatchObject({
+      type: "dataset_column",
+      workspaceId: WORKSPACE_ID,
+    });
+    expect(findMapping(listAttribute.id).valuePickerRuleType).toBeUndefined();
+    expect(findMapping(singleAttribute.id)).toMatchObject({
+      type: "dataset_column",
+      valuePickerRuleType: "sum",
+    });
+  });
+
+  it("keeps a per-month field's rule and date column on its mapping", async () => {
+    generateIndividualsMock.mockResolvedValue(undefined);
+    const formValues = _makeFormValues();
+    const listAttribute = _makeDatasetColumnAttribute({
+      baseAttribute: formValues.attributes[0]!,
+      name: "Average visits",
+      isArray: true,
+    });
+    const bucketColumnId = uuid<DatasetColumn.Id>();
+    const perMonthAttribute: ConceptFormSubmitValues["attributes"][number] = {
+      ...listAttribute,
+      bucketGrain: "month",
+      mappings: {
+        ...listAttribute.mappings,
+        datasetColumn: {
+          ...listAttribute.mappings.datasetColumn,
+          valuePickerRuleType: "avg",
+          bucketColumnId,
+        },
+      },
+    };
+
+    await insertConceptFromFormValues({
+      ...formValues,
+      attributes: [...formValues.attributes, perMonthAttribute],
+    });
+
+    const [{ mappings }] = conceptCreateMock.mock.calls[0]!;
+    expect(
+      mappings.find((mapping: { conceptAttributeId: string }) => {
+        return mapping.conceptAttributeId === perMonthAttribute.id;
+      }),
+    ).toMatchObject({ valuePickerRuleType: "avg", bucketColumnId });
   });
 });

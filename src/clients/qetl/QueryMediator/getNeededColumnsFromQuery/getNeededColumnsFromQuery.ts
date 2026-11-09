@@ -86,6 +86,11 @@ function _getConceptColumnsByDatasetId(
         nextColumnsByDatasetId[column.datasetId] = unionColumnSets(prior, [
           column.selectColumnName,
           column.primaryKeyColumnName,
+          // A per-period field also reads its date column, so a projected
+          // load must keep it or the view fails to bind.
+          ...(column.valueShape === "bucketed_list"
+            ? [column.bucketColumnName]
+            : []),
         ]);
         return nextColumnsByDatasetId;
       }, columnsByDatasetId);

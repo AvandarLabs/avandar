@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
@@ -20,12 +20,18 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
             value: "Brooklyn",
             sourceNames: ["Lab results", "Measles line list"],
           },
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "MMR status",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
             value: "Unknown",
             sourceNames: [],
           },
@@ -41,6 +47,89 @@ describe("CaseDetailsRail", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("names a field's source lines as its sources for assistive technology", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Borough",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
+            value: "Brooklyn",
+            sourceNames: ["Lab results", "Measles line list"],
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole("list", { name: "Sources of Borough" }))
+        .getAllByRole("listitem")
+        .map((item) => {
+          return item.textContent;
+        }),
+    ).toEqual(["Lab results", "Measles line list"]);
+  });
+
+  it("lists no sources for a field that reads none", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Notes",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
+            value: "Called twice",
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByRole("list", { name: "Sources of Notes" })).toBeNull();
+  });
+
+  // The rail group's label is an h4, so the failure under it is an h5.
+  it("titles the load failure below the rail group's heading", () => {
+    render(
+      <CaseDetailsRail
+        attributes={undefined}
+        loadError={{ isRetrying: false, onRetry: vi.fn() }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "This record's fields failed to load",
+        level: 5,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a date field's value as a date", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Rash onset",
+            dataType: "date",
+            valueShape: "single",
+            bucketGrain: undefined,
+            value: 1_709_596_800_000,
+            sourceNames: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Mar 5, 2024")).toBeInTheDocument();
+  });
+
   // A field with nothing to show must say so in words. Printing `null` reads
   // as a value.
   it("says a field has no value instead of printing null", () => {
@@ -50,6 +139,9 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
             value: null,
             sourceNames: [],
           },
@@ -67,6 +159,9 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Notes",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
             value: undefined,
             sourceNames: [],
           },
@@ -88,6 +183,9 @@ describe("CaseDetailsRail", () => {
           {
             id: uuid<ConceptAttribute.Id>(),
             name: "Borough",
+            dataType: "varchar",
+            valueShape: "single",
+            bucketGrain: undefined,
             value: "Brooklyn",
             sourceNames: ["Line list", "Line list"],
           },
@@ -146,5 +244,32 @@ describe("CaseDetailsRail", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it("lists every value of a field that keeps every value", () => {
+    render(
+      <CaseDetailsRail
+        attributes={[
+          {
+            id: uuid<ConceptAttribute.Id>(),
+            name: "Daily new cases",
+            dataType: "bigint",
+            valueShape: "list",
+            bucketGrain: undefined,
+            value: [31, 48],
+            sourceNames: ["County cases"],
+          },
+        ]}
+      />,
+    );
+
+    // The field's own list, not its "Sources of Daily new cases" list.
+    expect(
+      within(screen.getByRole("list", { name: "Daily new cases" }))
+        .getAllByRole("listitem")
+        .map((item) => {
+          return item.textContent;
+        }),
+    ).toEqual(["31", "48"]);
   });
 });

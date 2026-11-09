@@ -27,6 +27,7 @@ const DEATHS_COLUMN_ID = "3c4d5e6f-aaaa-4bbb-8ccc-ddddeeeeffff";
 const CENSUS_FIPS_COLUMN_ID = "5e6f7081-aaaa-4bbb-8ccc-ddddeeeeffff";
 const POPULATION_COLUMN_ID = "6f708192-aaaa-4bbb-8ccc-ddddeeeeffff";
 const UNLISTED_COLUMN_ID = "7a8b9cad-aaaa-4bbb-8ccc-ddddeeeeffff";
+const REPORT_DATE_COLUMN_ID = "7a8b9c0d-aaaa-4bbb-8ccc-ddddeeeeffff";
 const WORKSPACE_ID = "4d5e6f70-aaaa-4bbb-8ccc-ddddeeeeffff" as Workspace.Id;
 
 const {
@@ -101,6 +102,12 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
               name: "population",
               dataType: "bigint",
             },
+            {
+              id: REPORT_DATE_COLUMN_ID,
+              name: "report_date",
+              datasetId: DEATHS_DATASET_ID,
+              dataType: "date",
+            },
           ],
         ];
       },
@@ -142,6 +149,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: FIPS_COLUMN_ID,
         name: "County code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -149,6 +157,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: STATE_COLUMN_ID,
         name: "State",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "most_frequent",
       },
       {
@@ -156,6 +165,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: DEATHS_COLUMN_ID,
         name: "Total deaths",
         isIncluded: false,
+        valueShape: "single",
         valuePickerRuleType: "sum",
       },
       {
@@ -163,6 +173,7 @@ function makeDraft(): ChatProposedCaseType {
         columnId: CENSUS_FIPS_COLUMN_ID,
         name: "Census county code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -170,11 +181,32 @@ function makeDraft(): ChatProposedCaseType {
         columnId: POPULATION_COLUMN_ID,
         name: "Population",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "max",
       },
     ],
     manualEntryAttributes: [{ name: "Review notes", isIncluded: false }],
   };
+}
+
+/** The input of a row's "Value to keep" select, not its dropdown list. */
+function _getRuleInput(fieldName: string): HTMLElement {
+  const input = screen
+    .getAllByLabelText(`Value to keep for ${fieldName}`)
+    .find((element) => {
+      return element.tagName === "INPUT";
+    });
+  if (!input) {
+    throw new Error(`No value to keep select for ${fieldName}`);
+  }
+  return input;
+}
+
+/** The One value / Every value control of a field's row. */
+function _getValueShapeControl(fieldName: string): HTMLElement {
+  return screen.getByRole("radiogroup", {
+    name: `How many values ${fieldName} keeps`,
+  });
 }
 
 /** The option labels a row's value rule select offers, in order. */
@@ -199,6 +231,76 @@ describe("CaseTypeDraftBlock", () => {
     useChatPanelStateMock.mockReturnValue({
       pendingCaseTypeDraft: makeDraft(),
     });
+  });
+
+  it("persists a field switched to every value as a list without a value rule", async () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.click(
+      within(_getValueShapeControl("Population")).getByRole("radio", {
+        name: "Every value",
+      }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const [call] = applyCreatedCaseTypesMock.mock.calls;
+    const population = call?.[0].caseTypes[0].attributes.find(
+      (attribute: { name: string }) => {
+        return attribute.name === "Population";
+      },
+    );
+    expect(population).toMatchObject({ valueShape: "list" });
+    expect(population).not.toHaveProperty("valuePickerRuleType");
+  });
+
+  it("hides the value picker of a field that keeps every value", () => {
+    render(<CaseTypeDraftBlock />);
+    expect(
+      screen.queryAllByLabelText("Value to keep for Population"),
+    ).not.toHaveLength(0);
+
+    fireEvent.click(
+      within(_getValueShapeControl("Population")).getByRole("radio", {
+        name: "Every value",
+      }),
+    );
+
+    expect(
+      screen.queryAllByLabelText("Value to keep for Population"),
+    ).toHaveLength(0);
+  });
+
+  it("locks the label and each join key to one value", () => {
+    render(<CaseTypeDraftBlock />);
+
+    for (const fieldName of ["State", "County code", "Census county code"]) {
+      expect(
+        within(_getValueShapeControl(fieldName)).getByRole("radio", {
+          name: "Every value",
+        }),
+      ).toBeDisabled();
+    }
+  });
+
+  it("says why the label and each join key keep one value", () => {
+    render(<CaseTypeDraftBlock />);
+
+    for (const fieldName of ["State", "County code", "Census county code"]) {
+      expect(_getValueShapeControl(fieldName)).toHaveAccessibleDescription(
+        "Join keys and the label keep one value.",
+      );
+    }
+  });
+
+  it("gives a field that can keep every value no note", () => {
+    render(<CaseTypeDraftBlock />);
+
+    expect(
+      _getValueShapeControl("Population"),
+    ).not.toHaveAccessibleDescription();
   });
 
   it("renders nothing when no draft is pending", () => {
@@ -480,6 +582,51 @@ describe("CaseTypeDraftBlock", () => {
     expect(screen.getByRole("button", { name: "Add field" })).toBeDisabled();
   });
 
+  // Creation saves `most_frequent` for every join key, so the row shows that
+  // rule rather than the one chat proposed ("first" in this draft).
+  it("shows each join key keeping its value as is, whatever rule chat proposed", () => {
+    render(<CaseTypeDraftBlock />);
+
+    for (const fieldName of ["County code", "Census county code"]) {
+      const ruleInput = _getRuleInput(fieldName);
+      expect(ruleInput).toHaveValue("Most frequent");
+      expect(ruleInput).toBeDisabled();
+      expect(ruleInput).toHaveAccessibleDescription(
+        "ID fields keep their value as is.",
+      );
+    }
+  });
+
+  it("leaves the value to keep editable on a field that is not a join key", () => {
+    render(<CaseTypeDraftBlock />);
+
+    const ruleInput = _getRuleInput("Population");
+    expect(ruleInput).toBeEnabled();
+    expect(ruleInput).toHaveValue("Max");
+  });
+
+  it("moves the lock to the new join key when the user changes it", () => {
+    render(<CaseTypeDraftBlock />);
+
+    const deathsJoinKey = screen.getAllByRole("combobox", {
+      name: "Join key",
+    })[0]!;
+    const dropdown = document.querySelectorAll<HTMLElement>(
+      ".mantine-Select-dropdown",
+    )[screen.getAllByRole("combobox").indexOf(deathsJoinKey)]!;
+    fireEvent.click(deathsJoinKey);
+    fireEvent.click(
+      within(dropdown).getByRole("option", { name: "state", hidden: true }),
+    );
+
+    expect(_getRuleInput("State")).toBeDisabled();
+    expect(_getRuleInput("State")).toHaveValue("Most frequent");
+    expect(_getRuleInput("County code")).toBeEnabled();
+    expect(_getRuleInput("County code")).toHaveValue("First");
+    expect(_getRuleInput("County code")).not.toHaveAccessibleDescription();
+    expect(_getRuleInput("Census county code")).toBeDisabled();
+  });
+
   it("offers neither sum nor average for a text column", () => {
     render(<CaseTypeDraftBlock />);
 
@@ -556,5 +703,39 @@ describe("CaseTypeDraftBlock", () => {
       "Max",
       "Min",
     ]);
+  });
+
+  it("creates a per-month field with its dataset's first date column", async () => {
+    render(<CaseTypeDraftBlock />);
+
+    fireEvent.click(screen.getByLabelText("Include Total deaths"));
+    fireEvent.click(
+      within(_getValueShapeControl("Total deaths")).getByRole("radio", {
+        name: "Per period",
+      }),
+    );
+    const dateColumnInput = screen
+      .getAllByLabelText("Date column for Total deaths")
+      .find((element) => {
+        return element.tagName === "INPUT";
+      });
+    expect(dateColumnInput).toHaveValue("report_date");
+    fireEvent.click(screen.getByRole("button", { name: "Create case type" }));
+
+    await waitFor(() => {
+      expect(applyCreatedCaseTypesMock).toHaveBeenCalled();
+    });
+    const [call] = applyCreatedCaseTypesMock.mock.calls;
+    const totalDeaths = call?.[0].caseTypes[0].attributes.find(
+      (attribute: { name: string }) => {
+        return attribute.name === "Total deaths";
+      },
+    );
+    expect(totalDeaths).toMatchObject({
+      valueShape: "bucketed_list",
+      valuePickerRuleType: "sum",
+      bucketGrain: "month",
+      bucketColumnId: REPORT_DATE_COLUMN_ID,
+    });
   });
 });

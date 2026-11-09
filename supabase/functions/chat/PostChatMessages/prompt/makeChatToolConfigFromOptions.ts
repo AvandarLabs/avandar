@@ -1,6 +1,7 @@
 import { prop, propEq } from "@avandar/utils";
 import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
 import { MAX_PROPOSED_STATUSES } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
@@ -195,6 +196,23 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                   type: "boolean",
                   description: "Whether the card preselects this attribute.",
                 },
+                valueShape: {
+                  type: "string",
+                  enum: ["single", "list", "bucketed_list"],
+                  description:
+                    "single keeps one value per case, chosen by valuePickerRuleType. list keeps every value the case has, in dataset order. Use list only when one case genuinely has several values of this column and each one matters, such as symptoms recorded at several visits. Use bucketed_list for one value per day, week, month, quarter, or year, with bucketGrain and bucketColumnId. Never list the label column or a join key.",
+                },
+                bucketGrain: {
+                  type: "string",
+                  enum: ConceptAttribute.BUCKET_GRAINS,
+                  description:
+                    "Only with valueShape bucketed_list: the period to keep one value for, such as month for a monthly average.",
+                },
+                bucketColumnId: {
+                  type: "string",
+                  description:
+                    "Only with valueShape bucketed_list: the id of a date or timestamp column in the same dataset, copied verbatim from the catalog, that places each row in a period.",
+                },
                 valuePickerRuleType: {
                   type: "string",
                   enum: [
@@ -207,7 +225,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                     "min",
                   ],
                   description:
-                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories. sum and avg need a bigint or double column; max and min never apply to a boolean column.",
+                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories. sum and avg need a bigint or double column; max and min never apply to a boolean column. For a list, still give the rule the field would use with one value, so the user can switch it back.",
                 },
               },
               required: [
@@ -215,6 +233,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                 "columnId",
                 "name",
                 "isIncluded",
+                "valueShape",
                 "valuePickerRuleType",
               ],
               additionalProperties: false,
@@ -336,6 +355,12 @@ const CREATE_CASE_TYPES_TOOL_DEFINITIONS = [
                       datasetId: { type: "string" },
                       columnId: { type: "string" },
                       isLabel: { type: "boolean" },
+                      valueShape: {
+                        type: "string",
+                        enum: ["single", "list"],
+                        description:
+                          "single keeps one value per case. list keeps every value the case has. Never list a join key or the label.",
+                      },
                     },
                     required: ["name", "kind"],
                   },

@@ -1,6 +1,7 @@
 import * as arrow from "apache-arrow";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults";
+import type { ILogger } from "@avandar/logger";
 
 /** Builds a one-column Arrow table, typed as `arrowTableToJS` accepts it. */
 function createTableFromColumn(
@@ -39,6 +40,85 @@ function createDecimalTable(
   return createTableFromColumn(name, column);
 }
 
+/** `DECIMAL(4,2)`, the type of every decimal these tests store. */
+const PRICE_TYPE = new arrow.Decimal(2, 4, 128);
+
+/**
+ * Builds a one-row column holding `MAP {'a': 2.25, 'b': 0.05}`, as DuckDB
+ * exports a `MAP(VARCHAR, DECIMAL(4,2))`: one `entries` struct of `key` and
+ * `value`.
+ */
+function createPriceMapColumn(): arrow.Vector {
+  const entriesType = new arrow.Struct([
+    new arrow.Field("key", new arrow.Utf8(), false),
+    new arrow.Field("value", PRICE_TYPE, true),
+  ]);
+  const keys = arrow.makeData({
+    type: new arrow.Utf8(),
+    length: 2,
+    nullCount: 0,
+    valueOffsets: new Int32Array([0, 1, 2]),
+    data: new TextEncoder().encode("ab"),
+  });
+  const values = arrow.makeData({
+    type: PRICE_TYPE,
+    length: 2,
+    nullCount: 0,
+    data: new Uint32Array([225, 0, 0, 0, 5, 0, 0, 0]),
+  });
+  const entries = arrow.makeData({
+    type: entriesType,
+    length: 2,
+    nullCount: 0,
+    children: [keys, values],
+  });
+  return arrow.makeVector(
+    arrow.makeData({
+      type: new arrow.Map_(new arrow.Field("entries", entriesType, false)),
+      length: 1,
+      nullCount: 0,
+      valueOffsets: new Int32Array([0, 2]),
+      child: entries,
+    }),
+  );
+}
+
+/**
+ * Builds a two-row column of `UNION(amount DECIMAL(4,2), note VARCHAR)`, as
+ * DuckDB exports a union: a sparse union whose first row is the amount 2.25
+ * and whose second is the note `pending`.
+ */
+function createAmountOrNoteColumn(): arrow.Vector {
+  const amounts = arrow.makeData({
+    type: PRICE_TYPE,
+    length: 2,
+    nullCount: 0,
+    data: new Uint32Array([225, 0, 0, 0, 0, 0, 0, 0]),
+  });
+  const notes = arrow.makeData({
+    type: new arrow.Utf8(),
+    length: 2,
+    nullCount: 0,
+    valueOffsets: new Int32Array([0, 0, 7]),
+    data: new TextEncoder().encode("pending"),
+  });
+  return arrow.makeVector(
+    arrow.makeData({
+      type: new arrow.SparseUnion(
+        [0, 1],
+        [
+          new arrow.Field("amount", PRICE_TYPE, true),
+          new arrow.Field("note", new arrow.Utf8(), true),
+        ],
+      ),
+      length: 2,
+      nullCount: 0,
+      typeIds: new Int8Array([0, 1]),
+      children: [amounts, notes],
+    }),
+  );
+}
+
 describe("arrowTableToJS", () => {
   // A list of text holds plain strings, which have no `toJSON`.
   it("returns a list of text as a plain array of strings", () => {
@@ -64,27 +144,99 @@ describe("arrowTableToJS", () => {
     ]);
   });
 
-  it("returns a struct inside a list with each field converted as at top level", () => {
-    const bucketDate = new Date("2026-01-05");
+  // A per-period field's value is a list of `{ bucket, value }` structs. The
+  // bucket is a calendar day, so it must not arrive as an epoch number that a
+  // reader would have to read in the right time zone.
+  it("returns a date inside a struct inside a list as a calendar day", () => {
     const struct = new arrow.Struct([
       new arrow.Field("bucket", new arrow.DateDay(), true),
       new arrow.Field("value", new arrow.Int64(), true),
     ]);
     const series = arrow.vectorFromArray(
-      [[{ bucket: bucketDate, value: 3n }]],
+      [
+        [
+          { bucket: new Date("2026-01-05"), value: 3n },
+          { bucket: new Date("2026-02-01"), value: null },
+        ],
+      ],
       new arrow.List(new arrow.Field("item", struct, true)),
     );
-    const topLevelBucket = arrow.vectorFromArray(
-      [bucketDate],
-      new arrow.DateDay(),
+
+    expect(
+      arrowTableToJS(createTableFromColumn("series", series)).data,
+    ).toEqual([
+      {
+        series: [
+          { bucket: "2026-01-05", value: 3 },
+          { bucket: "2026-02-01", value: null },
+        ],
+      },
+    ]);
+  });
+
+  it("returns a NULL date inside a struct inside a list as null", () => {
+    const struct = new arrow.Struct([
+      new arrow.Field("bucket", new arrow.DateDay(), true),
+      new arrow.Field("value", new arrow.Utf8(), true),
+    ]);
+    const series = arrow.vectorFromArray(
+      [[{ bucket: null, value: "East" }]],
+      new arrow.List(new arrow.Field("item", struct, true)),
     );
 
-    const [row] = arrowTableToJS(createTableFromColumn("series", series)).data;
-    const [topLevelRow] = arrowTableToJS(
-      createTableFromColumn("bucket", topLevelBucket),
-    ).data;
+    expect(
+      arrowTableToJS(createTableFromColumn("series", series)).data,
+    ).toEqual([{ series: [{ bucket: null, value: "East" }] }]);
+  });
 
-    expect(row?.series).toEqual([{ bucket: topLevelRow?.bucket, value: 3 }]);
+  it("returns a decimal value inside a struct inside a list with its scale applied", () => {
+    const decimalType = new arrow.Decimal(2, 4, 128);
+    const structType = new arrow.Struct([
+      new arrow.Field("bucket", new arrow.DateDay(), true),
+      new arrow.Field("value", decimalType, true),
+    ]);
+    const structData = arrow.makeData({
+      type: structType,
+      length: 1,
+      nullCount: 0,
+      children: [
+        arrow.vectorFromArray([new Date("2026-01-05")], new arrow.DateDay())
+          .data[0]!,
+        arrow.makeData({
+          type: decimalType,
+          length: 1,
+          nullCount: 0,
+          data: new Uint32Array([225, 0, 0, 0]),
+        }),
+      ],
+    });
+    const series = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.List(new arrow.Field("item", structType, true)),
+        length: 1,
+        nullCount: 0,
+        valueOffsets: new Int32Array([0, 1]),
+        child: structData,
+      }),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("series", series)).data,
+    ).toEqual([{ series: [{ bucket: "2026-01-05", value: 2.25 }] }]);
+  });
+
+  it("leaves a date inside a top-level struct as an epoch number", () => {
+    const struct = new arrow.Struct([
+      new arrow.Field("openedOn", new arrow.DateDay(), true),
+    ]);
+    const summary = arrow.vectorFromArray(
+      [{ openedOn: new Date("2026-01-05") }],
+      struct,
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("summary", summary)).data,
+    ).toEqual([{ summary: { openedOn: Date.UTC(2026, 0, 5) } }]);
   });
 
   it("returns a list field of a struct as a plain array", () => {
@@ -179,6 +331,111 @@ describe("arrowTableToJS", () => {
     ]);
   });
 
+  // A list result column is described as text (below), so an epoch number in
+  // it would read as a count.
+  it("returns the dates in a list cell as calendar days", () => {
+    const visits = arrow.vectorFromArray(
+      [[new Date("2026-01-05T00:00:00Z"), new Date("2026-02-01T00:00:00Z")]],
+      new arrow.List(new arrow.Field("item", new arrow.DateDay(), true)),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("visits", visits)).data,
+    ).toEqual([{ visits: ["2026-01-05", "2026-02-01"] }]);
+  });
+
+  it("returns the timestamps in a list cell as ISO strings", () => {
+    const seenAt = arrow.vectorFromArray(
+      [[Date.UTC(2026, 0, 5, 10, 30)]],
+      new arrow.List(
+        new arrow.Field("item", new arrow.TimestampMillisecond(), true),
+      ),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("seenAt", seenAt)).data,
+    ).toEqual([{ seenAt: ["2026-01-05T10:30:00.000Z"] }]);
+  });
+
+  it("returns a whole-second time in a list cell as HH:MM:SS", () => {
+    const opensAt = arrow.vectorFromArray(
+      [[36_000_000_000n, 3_661_000_000n]],
+      new arrow.List(
+        new arrow.Field("item", new arrow.TimeMicrosecond(), true),
+      ),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("opensAt", opensAt)).data,
+    ).toEqual([{ opensAt: ["10:00:00", "01:01:01"] }]);
+  });
+
+  it("returns a fractional time in a list cell with six fraction digits", () => {
+    const opensAt = arrow.vectorFromArray(
+      [[36_000_500_000n, null]],
+      new arrow.List(
+        new arrow.Field("item", new arrow.TimeMicrosecond(), true),
+      ),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("opensAt", opensAt)).data,
+    ).toEqual([{ opensAt: ["10:00:00.500000", null] }]);
+  });
+
+  it.each([
+    ["TimeSecond", new arrow.TimeSecond(), 36_000, 36_001],
+    ["TimeMillisecond", new arrow.TimeMillisecond(), 36_000_000, 36_000_500],
+    [
+      "TimeNanosecond",
+      new arrow.TimeNanosecond(),
+      36_000_000_000_000n,
+      36_000_500_000_000n,
+    ],
+  ])(
+    "returns the times of a %s list cell as clock times",
+    (_unitName, timeType, wholeValue, otherValue) => {
+      const opensAt = arrow.vectorFromArray(
+        [[wholeValue, otherValue]],
+        new arrow.List(new arrow.Field("item", timeType, true)),
+      );
+
+      const [row] = arrowTableToJS(
+        createTableFromColumn("opensAt", opensAt),
+      ).data;
+
+      expect((row as { opensAt: string[] }).opensAt[0]).toBe("10:00:00");
+    },
+  );
+
+  it("leaves a top-level time as a number", () => {
+    const opensAt = arrow.vectorFromArray(
+      [36_000_000_000n],
+      new arrow.TimeMicrosecond(),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("opensAt", opensAt)).data,
+    ).toEqual([{ opensAt: 36_000_000_000 }]);
+  });
+
+  it("describes a list column as a text list without logging an error", () => {
+    const logger = { error: vi.fn() } as unknown as ILogger;
+    const symptoms = arrow.vectorFromArray(
+      [["Rash"]],
+      new arrow.List(new arrow.Field("item", new arrow.Utf8(), true)),
+    );
+
+    const result = arrowTableToJS(createTableFromColumn("Symptoms", symptoms), {
+      logger,
+    });
+
+    expect(result.columns).toEqual([
+      { name: "Symptoms", dataType: "varchar", isArray: true },
+    ]);
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
   it("returns a decimal inside a list with its scale applied", () => {
     const decimalType = new arrow.Decimal(2, 4, 128);
     const child = arrow.makeData({
@@ -222,5 +479,38 @@ describe("arrowTableToJS", () => {
     expect(arrowTableToJS(table).data).toEqual([
       { total: Number("123456789012345678901.23") },
     ]);
+  });
+
+  it("returns the decimals in a map with their scale applied", () => {
+    const prices = createPriceMapColumn();
+
+    expect(
+      arrowTableToJS(createTableFromColumn("prices", prices)).data,
+    ).toEqual([{ prices: { a: 2.25, b: 0.05 } }]);
+  });
+
+  it("returns the decimals in a map inside a list with their scale applied", () => {
+    const prices = createPriceMapColumn();
+    const priceLists = arrow.makeVector(
+      arrow.makeData({
+        type: new arrow.List(new arrow.Field("item", prices.type, true)),
+        length: 1,
+        nullCount: 0,
+        valueOffsets: new Int32Array([0, 1]),
+        child: prices.data[0]!,
+      }),
+    );
+
+    expect(
+      arrowTableToJS(createTableFromColumn("priceLists", priceLists)).data,
+    ).toEqual([{ priceLists: [{ a: 2.25, b: 0.05 }] }]);
+  });
+
+  it("returns a union's decimal member with its scale applied and its other members as they are", () => {
+    const amountOrNote = createAmountOrNoteColumn();
+
+    expect(
+      arrowTableToJS(createTableFromColumn("amountOrNote", amountOrNote)).data,
+    ).toEqual([{ amountOrNote: 2.25 }, { amountOrNote: "pending" }]);
   });
 });

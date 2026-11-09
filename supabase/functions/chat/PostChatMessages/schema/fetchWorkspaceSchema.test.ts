@@ -9,15 +9,21 @@ import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 function createFakeClient(rowsByTable: Record<string, unknown[]>): {
   supabaseClient: AvaSupabaseClient;
   queriedTables: string[];
+  selectedColumnsByTable: Record<string, string>;
 } {
   const queriedTables: string[] = [];
+  const selectedColumnsByTable: Record<string, string> = {};
   return {
     queriedTables,
+    selectedColumnsByTable,
     supabaseClient: {
       from(table: string) {
         queriedTables.push(table);
+        let selectedColumns: string | undefined;
         const chain = {
-          select: () => {
+          select: (columns: string) => {
+            selectedColumnsByTable[table] = columns;
+            selectedColumns = columns;
             return chain;
           },
           eq: () => {
@@ -27,7 +33,25 @@ function createFakeClient(rowsByTable: Record<string, unknown[]>): {
             return chain;
           },
           throwOnError: async () => {
-            return { data: rowsByTable[table] ?? [] };
+            const rows = (rowsByTable[table] ?? []) as Array<
+              Record<string, unknown>
+            >;
+            const columnNames = selectedColumns?.split(",").map((name) => {
+              return name.trim();
+            });
+            // Answer only the columns the query selects, as PostgREST does.
+            return {
+              data:
+                columnNames === undefined
+                  ? rows
+                  : rows.map((row) => {
+                      return Object.fromEntries(
+                        columnNames.flatMap((name) => {
+                          return name in row ? [[name, row[name]]] : [];
+                        }),
+                      );
+                    }),
+            };
           },
         };
         return chain;
@@ -38,6 +62,7 @@ function createFakeClient(rowsByTable: Record<string, unknown[]>): {
 
 const WORKSPACE_ID = "wwwwwwww-wwww-4www-8www-wwwwwwwwwwww";
 const CONCEPT_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const FIELD_ID = "11111111-1111-4111-8111-111111111111";
 
 describe("fetchWorkspaceSchema", () => {
   it("returns concepts when the workspace has no datasets", async () => {
@@ -103,6 +128,74 @@ describe("fetchWorkspaceSchema", () => {
     expect(schema.conceptStatuses).toEqual([
       { concept_id: CONCEPT_ID, name: "Suspected", position: 0 },
       { concept_id: CONCEPT_ID, name: "Confirmed", position: 1 },
+    ]);
+  });
+
+  it("asks for each field's id and list flag along with its name", async () => {
+    const fake = createFakeClient({
+      datasets: [],
+      dataset_columns: [],
+      concepts: [{ id: CONCEPT_ID, name: "Case" }],
+      concept_attributes: [
+        {
+          id: FIELD_ID,
+          concept_id: CONCEPT_ID,
+          name: "Symptoms",
+          is_array: true,
+        },
+      ],
+      concept_statuses: [],
+    });
+
+    const schema = await fetchWorkspaceSchema({
+      supabaseClient: fake.supabaseClient,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    expect(fake.selectedColumnsByTable.concept_attributes).toBe(
+      "id, concept_id, name, is_array, bucket_grain, data_type",
+    );
+    expect(schema.conceptAttributes).toEqual([
+      {
+        id: FIELD_ID,
+        concept_id: CONCEPT_ID,
+        name: "Symptoms",
+        is_array: true,
+      },
+    ]);
+  });
+
+  it("returns each field's period and value type, and nothing else of it", async () => {
+    const fake = createFakeClient({
+      datasets: [],
+      dataset_columns: [],
+      concepts: [{ id: CONCEPT_ID, name: "Patient" }],
+      concept_attributes: [
+        {
+          concept_id: CONCEPT_ID,
+          name: "Temperature",
+          is_array: true,
+          bucket_grain: "month",
+          data_type: "double",
+          description: "Never part of the schema",
+        },
+      ],
+      concept_statuses: [],
+    });
+
+    const schema = await fetchWorkspaceSchema({
+      supabaseClient: fake.supabaseClient,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    expect(schema.conceptAttributes).toEqual([
+      {
+        concept_id: CONCEPT_ID,
+        name: "Temperature",
+        is_array: true,
+        bucket_grain: "month",
+        data_type: "double",
+      },
     ]);
   });
 });

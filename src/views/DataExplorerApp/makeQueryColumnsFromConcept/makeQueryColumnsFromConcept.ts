@@ -14,9 +14,7 @@ export function makeQueryColumnsFromConcept(
   }>,
 ): QueryColumn.T[] {
   return [
-    ...options.attributes.map((attribute) => {
-      return QueryColumn.makeFromConceptAttribute(attribute);
-    }),
+    ...QueryColumn.makeFromConceptAttributes(options.attributes),
     QueryColumn.makeFromConceptStatusColumn(
       ConceptStatusColumn.fromConceptId(options.conceptId),
     ),

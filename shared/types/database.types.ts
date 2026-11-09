@@ -100,33 +100,42 @@ export type Database = {
       }
       attribute_mappings__dataset_column: {
         Row: {
+          bucket_column_id: string | null
           concept_attribute_id: string
           created_at: string
           dataset_column_id: string
           dataset_id: string
           id: string
           updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          value_picker_rule_type:
+            | Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+            | null
           workspace_id: string
         }
         Insert: {
+          bucket_column_id?: string | null
           concept_attribute_id: string
           created_at?: string
           dataset_column_id: string
           dataset_id: string
           id?: string
           updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          value_picker_rule_type?:
+            | Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+            | null
           workspace_id: string
         }
         Update: {
+          bucket_column_id?: string | null
           concept_attribute_id?: string
           created_at?: string
           dataset_column_id?: string
           dataset_id?: string
           id?: string
           updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+          value_picker_rule_type?:
+            | Database["public"]["Enums"]["attribute_mappings__value_picker_rule_type"]
+            | null
           workspace_id?: string
         }
         Relationships: [
@@ -425,6 +434,9 @@ export type Database = {
       concept_attributes: {
         Row: {
           allow_manual_edit: boolean
+          bucket_grain:
+            | Database["public"]["Enums"]["concept_attributes__bucket_grain"]
+            | null
           concept_id: string
           created_at: string
           data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
@@ -440,6 +452,9 @@ export type Database = {
         }
         Insert: {
           allow_manual_edit: boolean
+          bucket_grain?:
+            | Database["public"]["Enums"]["concept_attributes__bucket_grain"]
+            | null
           concept_id: string
           created_at?: string
           data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
@@ -455,6 +470,9 @@ export type Database = {
         }
         Update: {
           allow_manual_edit?: boolean
+          bucket_grain?:
+            | Database["public"]["Enums"]["concept_attributes__bucket_grain"]
+            | null
           concept_id?: string
           created_at?: string
           data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
@@ -3587,6 +3605,12 @@ export type Database = {
         | "insightful"
         | "funny"
       comment_revisions__reason: "edit" | "delete"
+      concept_attributes__bucket_grain:
+        | "day"
+        | "week"
+        | "month"
+        | "quarter"
+        | "year"
       concept_attributes__mapping_type: "dataset_column" | "manual_entry"
       connections__connection_type: "postgres"
       connections__postgres_ssl_mode: "disable" | "require"
@@ -3885,6 +3909,13 @@ export const Constants = {
         "funny",
       ],
       comment_revisions__reason: ["edit", "delete"],
+      concept_attributes__bucket_grain: [
+        "day",
+        "week",
+        "month",
+        "quarter",
+        "year",
+      ],
       concept_attributes__mapping_type: ["dataset_column", "manual_entry"],
       connections__connection_type: ["postgres"],
       connections__postgres_ssl_mode: ["disable", "require"],

@@ -34,8 +34,10 @@ import {
   withFieldDataTypes,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
+import { createBucketColumnValidator } from "@/views/OntologyDesignerApp/ConceptCreatorView/createBucketColumnValidator/createBucketColumnValidator";
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
 import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/getStatusSetValueFromFormValues/getStatusSetValueFromFormValues";
+import { keepKeyAndLabelFieldsSingle } from "@/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle";
 import { ManualEntryAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import { useSubmitConceptCreatorForm } from "@/views/OntologyDesignerApp/ConceptCreatorView/useSubmitConceptCreatorForm";
 
@@ -65,6 +67,13 @@ export function ConceptCreatorView(): JSX.Element {
             ? t`Every case type already has a status. Choose another name.`
             : null;
         },
+      },
+      datasetColumnAttributes: {
+        // The field's period controls show this beside the date column. The
+        // rule stops the submit while one is missing.
+        bucketGrain: createBucketColumnValidator(
+          t`Choose the date column for this field`,
+        ),
       },
       // The editor shows each problem beside the status it belongs to. This
       // rule only stops the submit while any problem remains.
@@ -154,7 +163,10 @@ export function ConceptCreatorView(): JSX.Element {
       return {
         ...values,
         attributes: withFieldDataTypes({
-          attributes: allAttributes,
+          attributes: keepKeyAndLabelFieldsSingle({
+            attributes: allAttributes,
+            labelAttributeId: values.labelAttributeId,
+          }),
           sourceDatasets: values.sourceDatasets,
         }),
       };

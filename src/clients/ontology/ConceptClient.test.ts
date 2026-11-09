@@ -144,4 +144,40 @@ describe("ConceptClient.create", () => {
       }),
     ]);
   });
+
+  it("sends a mapping that names no value rule without one", async () => {
+    rpcMock.mockReturnValue({
+      throwOnError: () => {
+        return Promise.resolve({ data: CONCEPT_ID });
+      },
+    });
+
+    await ConceptClient.create({
+      concept: Model.make("Concept", {
+        id: CONCEPT_ID,
+        workspaceId: WORKSPACE_ID,
+        name: "Facility",
+        description: undefined,
+        allowManualCreation: false,
+        defaultStatusId: STATUS_ID,
+      }),
+      statuses: [],
+      attributes: [],
+      mappings: [
+        {
+          type: "dataset_column",
+          conceptAttributeId: KEY_ATTRIBUTE_ID,
+          workspaceId: WORKSPACE_ID,
+          valuePickerRuleType: undefined,
+          datasetId: DATASET_ID,
+          datasetColumnId: COLUMN_ID,
+        },
+      ],
+    });
+
+    const [, args] = rpcMock.mock.calls.at(-1)!;
+    expect(args.p_dataset_column_mappings[0]).not.toHaveProperty(
+      "value_picker_rule_type",
+    );
+  });
 });

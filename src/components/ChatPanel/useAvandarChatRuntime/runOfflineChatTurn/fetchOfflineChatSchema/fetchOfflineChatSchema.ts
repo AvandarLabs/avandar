@@ -53,7 +53,16 @@ function _mapConcepts(
       return { id: concept.id, name: concept.name };
     }),
     conceptAttributes: options.attributes.map((attribute) => {
-      return { concept_id: attribute.conceptId, name: attribute.name };
+      return {
+        id: attribute.id,
+        concept_id: attribute.conceptId,
+        name: attribute.name,
+        is_array: attribute.isArray,
+        data_type: attribute.dataType,
+        ...(attribute.bucketGrain
+          ? { bucket_grain: attribute.bucketGrain }
+          : {}),
+      };
     }),
     conceptStatuses: options.statuses.map((status) => {
       return {

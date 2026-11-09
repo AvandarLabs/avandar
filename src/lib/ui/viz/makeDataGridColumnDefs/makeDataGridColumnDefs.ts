@@ -1,4 +1,5 @@
 import { formatNumber } from "@avandar/utils";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
 import { formatQueryResultDate } from "@/lib/ui/viz/formatQueryResultDate/formatQueryResultDate";
 import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
@@ -9,6 +10,23 @@ export type DataGridColumnDef = {
   headerName: string;
   filter: true;
   valueFormatter: (params: { value: unknown }) => string;
+};
+
+/**
+ * How a per-period cell reads. The grid cannot call a hook, so a component
+ * that can supplies these.
+ */
+export type DataGridPeriodFormatters = {
+  /**
+   * Labels a period (`YYYY-MM-DD`, its first day) for a period length, or
+   * for an unknown one when `bucketGrain` is `undefined`.
+   */
+  formatPeriod: (
+    bucket: string,
+    bucketGrain: ConceptAttribute.BucketGrain | undefined,
+  ) => string;
+  /** Reads one period's value as text. */
+  formatValue: (value: unknown) => string;
 };
 
 const DATE_ONLY_FORMAT = "YYYY-MM-DD";
@@ -46,6 +64,63 @@ function _formatGridNumber(value: number, columnName: string): string {
 }
 
 /**
+ * The texts of the items in a list cell. A nested list is flattened into the
+ * same run of items, and a NULL item is left out, so it never leaves a stray
+ * separator.
+ */
+function _listItemTexts(
+  items: readonly unknown[],
+  columnName: string,
+): string[] {
+  return items.flatMap((item) => {
+    if (Array.isArray(item)) {
+      return _listItemTexts(item, columnName);
+    }
+    return item == null ? [] : [_formatCellValue(item, columnName)];
+  });
+}
+
+/**
+ * The text of one non-date cell. A list, such as a case type field that
+ * keeps every value, shows its values separated by semicolons, which never
+ * collide with a number's thousands separator. An empty list is blank.
+ */
+function _formatCellValue(value: unknown, columnName: string): string {
+  if (Array.isArray(value)) {
+    return _listItemTexts(value, columnName).join("; ");
+  }
+  if (typeof value === "number") {
+    return _formatGridNumber(value, columnName);
+  }
+  return value == null ? "" : String(value);
+}
+
+/**
+ * A per-period cell as `period: value` pairs joined like a list's values, or
+ * `undefined` for any other value. An empty list is left to the list
+ * formatting, which shows it blank.
+ */
+function _formatPeriodsCell(
+  options: Readonly<{
+    value: unknown;
+    bucketGrain: ConceptAttribute.BucketGrain | undefined;
+    periodFormatters: DataGridPeriodFormatters;
+  }>,
+): string | undefined {
+  const { value, bucketGrain, periodFormatters } = options;
+  const entries = ConceptAttribute.toBucketedListEntries(value);
+  if (!entries || entries.length === 0) {
+    return undefined;
+  }
+  return entries
+    .map((entry) => {
+      const period = periodFormatters.formatPeriod(entry.bucket, bucketGrain);
+      return `${period}: ${periodFormatters.formatValue(entry.value)}`;
+    })
+    .join("; ");
+}
+
+/**
  * Whether every value in a date column falls on midnight UTC, which is how a
  * `DATE` or a day, month, or year bucket from `date_trunc` arrives. Those
  * columns show only the date, since a `00:00:00` on every row says nothing.
@@ -67,47 +142,73 @@ function _isDateOnlyColumn(
   return hasValue && isEveryValueMidnight;
 }
 
+type ColumnDefsOptions = Readonly<{
+  columnNames: readonly string[];
+  data: UnknownDataFrame;
+  dateColumns: ReadonlySet<string> | undefined;
+  dateFormat: string;
+  timezone?: FormattableTimezone;
+  /** The period of each per-period column, by column name. */
+  bucketGrains?: Readonly<Record<string, ConceptAttribute.BucketGrain>>;
+  /**
+   * How to read a per-period cell. Without it, a per-period cell reads like
+   * any other value.
+   */
+  periodFormatters?: DataGridPeriodFormatters;
+}>;
+
+/** The AG Grid column definition of one field. */
+function _makeColumnDef(
+  options: ColumnDefsOptions,
+  field: string,
+): DataGridColumnDef {
+  const { data, dateColumns, dateFormat, timezone, periodFormatters } = options;
+  const isDate = dateColumns?.has(field) ?? false;
+  const columnDateFormat =
+    isDate && _isDateOnlyColumn({ data, field })
+      ? DATE_ONLY_FORMAT
+      : dateFormat;
+  const formatValue = isDate
+    ? (value: unknown) => {
+        return formatQueryResultDate(value, {
+          format: columnDateFormat,
+          timezone,
+        });
+      }
+    : (value: unknown) => {
+        return _formatCellValue(value, field);
+      };
+  return {
+    field: field,
+    headerName: field,
+    filter: true,
+    valueFormatter: (params: { value: unknown }) => {
+      // First, so a per-period field of dates is never read as one date.
+      return (
+        (periodFormatters &&
+          _formatPeriodsCell({
+            value: params.value,
+            bucketGrain: options.bucketGrains?.[field],
+            periodFormatters,
+          })) ??
+        formatValue(params.value)
+      );
+    },
+  };
+}
+
 /**
  * Builds the AG Grid column definitions for a `DataGrid`, including how each
  * cell's value is displayed.
  *
  * Dates render through `formatQueryResultDate`, so a stored date shows on its
- * own calendar day for every user.
+ * own calendar day for every user. A per-period cell shows its periods
+ * through `periodFormatters`.
  */
 export function makeDataGridColumnDefs(
-  options: Readonly<{
-    columnNames: readonly string[];
-    data: UnknownDataFrame;
-    dateColumns: ReadonlySet<string> | undefined;
-    dateFormat: string;
-    timezone?: FormattableTimezone;
-  }>,
+  options: ColumnDefsOptions,
 ): DataGridColumnDef[] {
-  const { columnNames, data, dateColumns, dateFormat, timezone } = options;
-  return columnNames.map((field) => {
-    const isDate = dateColumns?.has(field) ?? false;
-    const columnDateFormat =
-      isDate && _isDateOnlyColumn({ data, field })
-        ? DATE_ONLY_FORMAT
-        : dateFormat;
-    return {
-      field: field,
-      headerName: field,
-      filter: true,
-      valueFormatter: isDate
-        ? (params: { value: unknown }) => {
-            return formatQueryResultDate(params.value, {
-              format: columnDateFormat,
-              timezone,
-            });
-          }
-        : (params: { value: unknown }) => {
-            return typeof params.value === "number"
-              ? _formatGridNumber(params.value, field)
-              : params.value == null
-                ? ""
-                : String(params.value);
-          },
-    };
+  return options.columnNames.map((field) => {
+    return _makeColumnDef(options, field);
   });
 }

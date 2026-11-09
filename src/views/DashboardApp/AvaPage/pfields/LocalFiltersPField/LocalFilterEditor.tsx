@@ -18,6 +18,7 @@ import type {
 import type { ReactNode } from "react";
 
 type Props = {
+  /** The columns a filter can target: no list column. */
   columns: readonly QueryResult.ColumnWithId[];
   filter: LocalFilter | LegacyLocalFilter;
   onChange: (filter: LocalFilter | LegacyLocalFilter) => void;

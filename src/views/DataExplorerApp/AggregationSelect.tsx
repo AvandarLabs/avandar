@@ -2,13 +2,15 @@ import { Select } from "@avandar/ui";
 import { propIsInArray } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useUncontrolled } from "@mantine/hooks";
-import { AvaDataType as AvaDataTypeFns } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { SelectOption, SelectProps } from "@avandar/ui";
 
 type Props = {
-  dataType: AvaDataType.T;
+  /**
+   * The aggregations this column can take, for example from
+   * `QueryColumn.getValidAggregations`.
+   */
+  validAggregations: readonly QueryAggregationType.T[];
   label: string;
   value?: QueryAggregationType.T;
   defaultValue?: QueryAggregationType.T;
@@ -36,7 +38,7 @@ function useAggregationOptions(): Array<SelectOption<QueryAggregationType.T>> {
 }
 
 export function AggregationSelect({
-  dataType,
+  validAggregations,
   label,
   value,
   defaultValue,
@@ -45,7 +47,6 @@ export function AggregationSelect({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const allAggregationOptions = useAggregationOptions();
-  const validAggregations = AvaDataTypeFns.getValidQueryAggregations(dataType);
 
   // only show valid aggregations as Select options
   const aggregationOptions = allAggregationOptions.filter(

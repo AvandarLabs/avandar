@@ -122,9 +122,10 @@ function _getWorkspaceAuthFromStructuredQuery(
 }
 
 /**
- * Runs a structured query against its data source. A dataset and a case type
- * both compile to SQL: a case type's SQL names its `concept_<id>` view, which
- * QETL builds inside the query's lease.
+ * Runs a structured query against its data source, and returns the SQL it
+ * ran. A dataset and a case type both compile to SQL: a case type's SQL
+ * names its `concept_<id>` view, which QETL builds inside the query's lease.
+ * Nothing runs, and no SQL is returned, without a data source or a column.
  */
 async function _runSourceQuery({
   workspaceId,
@@ -136,20 +137,19 @@ async function _runSourceQuery({
   dataSource: QueryDataSource.T | undefined;
   executionQuery: StructuredQuery.Partial;
   queryColumnCount: number;
-}): Promise<QueryResult.T<UnknownRow>> {
+}): Promise<Pick<RunStructuredQueryResult, "result" | "executedSql">> {
   if (!dataSource || queryColumnCount === 0) {
-    return QueryResult.makeEmpty();
+    return { result: QueryResult.makeEmpty(), executedSql: undefined };
   }
 
-  const executionQueryWithSource = {
+  const rawSql = StructuredQuery.toRawDuckDbQuery({
     ...executionQuery,
     dataSource,
-  } as StructuredQuery.T;
-
-  return await WorkspaceQuerySession.runQuery({
-    rawSql: StructuredQuery.toRawDuckDbQuery(executionQueryWithSource),
-    workspaceId,
-  });
+  } as StructuredQuery.T);
+  return {
+    result: await WorkspaceQuerySession.runQuery({ rawSql, workspaceId }),
+    executedSql: rawSql,
+  };
 }
 
 /**
@@ -181,14 +181,11 @@ export async function runStructuredQueryWithMetadata(
     };
   }
 
-  return {
-    result: await _runSourceQuery({
-      workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
-      dataSource,
-      executionQuery,
-      queryColumnCount: queryColumns.length,
-    }),
-    didAutoLimit,
-    executedSql: sqlToRun,
-  };
+  const sourceRun = await _runSourceQuery({
+    workspaceId: _getWorkspaceAuthFromStructuredQuery(params).workspaceId,
+    dataSource,
+    executionQuery,
+    queryColumnCount: queryColumns.length,
+  });
+  return { ...sourceRun, didAutoLimit };
 }

@@ -1,12 +1,13 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid.ts";
+import { ConceptModule } from "$/models/ontology/Concept/ConceptModule.ts";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
 import type {
   ConceptStatusColumnId,
   ConceptStatusColumnRead,
 } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn.types.ts";
 
-const COLUMN_NAME = "status";
+const COLUMN_NAME = ConceptModule.STATUS_COLUMN_NAME;
 
 function _fromConceptId(conceptId: ConceptId): ConceptStatusColumnRead {
   return Model.make("ConceptStatusColumn", {

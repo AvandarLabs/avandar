@@ -17,14 +17,68 @@ import type {
   DuckDbClientOperations,
   RawQueryOptions,
 } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type { DuckDbSqlAnalysis } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 import type * as duckdb from "@duckdb/duckdb-wasm";
+
+/**
+ * Where a raw query may read dataset tables from. A public read carries the
+ * snapshot owner that authorizes it, so no later step has to check for one.
+ */
+type RawQueryReadScope =
+  | { kind: "workspace" }
+  | { kind: "public"; owner: PublicSnapshotDuckDbOwner };
 
 type RawQueryExecutionPlan = {
   datasetIds: string[];
   mutatedDatasetIds: string[];
-  publicSnapshotDuckDbOwner: PublicSnapshotDuckDbOwner | undefined;
   readDatasetIds: string[];
+  readScope: RawQueryReadScope;
 };
+
+function _getReadScope(options: RawQueryOptions): RawQueryReadScope {
+  if (options.datasetTableReadMode !== "public") {
+    return { kind: "workspace" };
+  }
+  if (options.publicSnapshotDuckDbOwner === undefined) {
+    throw new Error("Public DuckDB queries require an expected snapshot owner");
+  }
+  return { kind: "public", owner: options.publicSnapshotDuckDbOwner };
+}
+
+/**
+ * Refuses what a public snapshot query may not do: write, run more than one
+ * plain query, or read anything but a dataset. A snapshot is authorized by the
+ * datasets it published and builds no case type view, so a `concept_<id>` view
+ * in this DuckDB instance was built by a workspace query and belongs to no
+ * snapshot. An internal table, such as an individuals staging table, names no
+ * relation and so belongs to no snapshot either.
+ */
+function _assertPublicReadAnalysis(
+  input: Readonly<{
+    analysis: DuckDbSqlAnalysis;
+    queryStringToUse: string;
+    readScope: RawQueryReadScope;
+  }>,
+): void {
+  const { analysis, queryStringToUse, readScope } = input;
+  if (readScope.kind !== "public") {
+    return;
+  }
+  if (analysis.kind !== "read") {
+    throw new Error("Public DuckDB queries must be read-only");
+  }
+  if (!DuckDbSqlAnalyzer.isSinglePlainQuery(queryStringToUse)) {
+    throw new Error("Public DuckDB queries can only run a query");
+  }
+  const isDatasetOnlyRead =
+    analysis.internalTableNames.length === 0 &&
+    analysis.relations.every((relation) => {
+      return relation.kind === "dataset";
+    });
+  if (!isDatasetOnlyRead) {
+    throw new Error("Public DuckDB queries can only read published datasets");
+  }
+}
 
 function _getRawQueryExecutionPlan(
   input: Readonly<{ options: RawQueryOptions; queryStringToUse: string }>,
@@ -40,16 +94,8 @@ function _getRawQueryExecutionPlan(
   if (analysis.kind === "unsafe" && !isTrustedInternalSql) {
     throw new Error(`Cannot safely execute DuckDB SQL: ${analysis.reason}`);
   }
-  if (options.datasetTableReadMode === "public" && analysis.kind !== "read") {
-    throw new Error("Public DuckDB queries must be read-only");
-  }
-  const publicSnapshotDuckDbOwner = options.publicSnapshotDuckDbOwner;
-  if (
-    options.datasetTableReadMode === "public" &&
-    publicSnapshotDuckDbOwner === undefined
-  ) {
-    throw new Error("Public DuckDB queries require an expected snapshot owner");
-  }
+  const readScope = _getReadScope(options);
+  _assertPublicReadAnalysis({ analysis, queryStringToUse, readScope });
   // A read analysis names relations of every kind, so only the datasets among
   // them are dataset tables this plan has to prepare.
   const readDatasetIds =
@@ -63,27 +109,17 @@ function _getRawQueryExecutionPlan(
   const mutatedDatasetIds =
     analysis.kind === "mutating" ? analysis.mutatedDatasetIds : [];
   const datasetIds = mergeDuckDbDatasetIds(readDatasetIds, mutatedDatasetIds);
-  return {
-    datasetIds,
-    mutatedDatasetIds,
-    publicSnapshotDuckDbOwner,
-    readDatasetIds,
-  };
+  return { datasetIds, mutatedDatasetIds, readDatasetIds, readScope };
 }
 
 function _prepareRawQueryDatasetTables(
-  input: Readonly<{ options: RawQueryOptions; plan: RawQueryExecutionPlan }>,
+  input: Readonly<{ plan: RawQueryExecutionPlan }>,
 ): void {
-  const { options, plan } = input;
-  if (options.datasetTableReadMode === "public") {
-    if (plan.publicSnapshotDuckDbOwner === undefined) {
-      throw new Error(
-        "Public DuckDB queries require an expected snapshot owner",
-      );
-    }
+  const { plan } = input;
+  if (plan.readScope.kind === "public") {
     DatasetDuckDbCoordinator.assertPublicSnapshotDatasetOwners({
       datasetIds: plan.readDatasetIds,
-      owner: plan.publicSnapshotDuckDbOwner,
+      owner: plan.readScope.owner,
     });
   } else {
     DatasetDuckDbCoordinator.assertWorkspaceDatasetTables(plan.readDatasetIds);
@@ -158,7 +194,7 @@ export async function runDuckDbRawQuery<RowObject extends UnknownRow>(
     datasetIds: plan.datasetIds,
     lease: options.datasetDuckDbLease,
     operation: async () => {
-      _prepareRawQueryDatasetTables({ options, plan });
+      _prepareRawQueryDatasetTables({ plan });
       return await _executeRawQuery<RowObject>({
         client,
         options,

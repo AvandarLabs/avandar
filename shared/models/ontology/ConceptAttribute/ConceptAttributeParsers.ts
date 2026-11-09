@@ -15,12 +15,14 @@ import {
   ConceptAttributeId,
   ConceptAttributeModel,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
+import { ConceptAttributeModule } from "$/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts";
 import { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 
 const DBReadSchema = z.object({
   allow_manual_edit: z.boolean(),
+  bucket_grain: z.enum(ConceptAttributeModule.BUCKET_GRAINS).nullable(),
   data_type: z.enum(AvaDataType.Types),
   created_at: z.string(),
   description: z.string().nullable(),

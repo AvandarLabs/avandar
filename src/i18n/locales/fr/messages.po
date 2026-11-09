@@ -407,7 +407,11 @@ msgstr "Masquer les jeux de données qui ne peuvent pas être chargés"
 msgid "Join key"
 msgstr "Clé de jointure"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per year"
+msgstr "{fieldName} par an"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "label"
 msgstr "Libellé"
 
@@ -528,7 +532,7 @@ msgstr "Vues"
 msgid "Second point"
 msgstr "Deuxième point"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes first alphabetically"
 msgstr "Choisissez la valeur qui vient en premier par ordre alphabétique"
 
@@ -601,6 +605,7 @@ msgstr "Les emplacements individuels seront affichés sur la carte et les zones 
 msgid "Aggregations"
 msgstr "Agrégations"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -803,6 +808,10 @@ msgstr "La visualisation du tableau n'a pas de paramètres supplémentaires."
 msgid "About you"
 msgstr "À propos de vous"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per quarter"
+msgstr "{fieldName} par trimestre"
+
 #: src/clients/storage/DatasetParquetStorageClient/startDatasetUpload.ts
 msgid "Unable to sync dataset online"
 msgstr "Impossible de synchroniser le jeu de données en ligne"
@@ -824,9 +833,22 @@ msgstr "Utiliser ce fond de carte"
 msgid "Monospace headlines"
 msgstr "Titres en monospace"
 
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
+#~ msgstr "Recommandé si vous disposez de 4 Go de RAM ou si vous avez besoin du "
+#~ "téléchargement le plus léger."
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Quarter"
+msgstr "Trimestre"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "1 person"
 msgstr "1 personne"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period for {fieldName}"
+msgstr "Période de {fieldName}"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 #: src/views/GisApp/useGisAppLayerActions.tsx
@@ -913,6 +935,10 @@ msgstr "Avandar n’a pas pu confirmer que cette requête se limite à la lectur
 msgid "Removing offline models"
 msgstr "Suppression des modèles hors ligne"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Year"
+msgstr "Année"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
 msgstr "Afficher les jeux de données sur le thème {topic}"
@@ -954,8 +980,8 @@ msgstr "Votre plan actuel ne prend en charge que jusqu'à {0} ensembles de "
 "de données de plus !"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "Only allow one value"
-msgstr "Autoriser une seule valeur"
+#~ msgid "Only allow one value"
+#~ msgstr "Autoriser une seule valeur"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -1005,7 +1031,7 @@ msgstr "Redimensionner le texte de l’annotation"
 msgid "stddev"
 msgstr "écart type"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a count of how many values there are"
 msgstr "Obtenir un compte du nombre de valeurs"
 
@@ -1449,6 +1475,11 @@ msgstr "Ces ensembles de données sont répertoriés dans votre espace de travai
 "stockage local. Pour continuer, vous devez soit re-télécharger "
 "l'ensemble de données, soit le supprimer de votre espace de travail."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTableToggle.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
+msgid "Show fewer"
+msgstr "Afficher moins"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Metadata"
 msgstr "Métadonnées"
@@ -1475,6 +1506,10 @@ msgstr "Rechercher des jeux de données"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Entrez l'email"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per week"
+msgstr "{fieldName} par semaine"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis minimum"
@@ -1630,6 +1665,10 @@ msgstr "Fermer le chat (⌘/)"
 msgid "Create failed"
 msgstr "Échec de la création"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per month"
+msgstr "{fieldName} par mois"
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Coordinate is 0, 0"
 msgstr "La coordonnée est 0, 0"
@@ -1678,6 +1717,10 @@ msgstr "Partager avec votre espace de travail"
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "Entrez votre email pour obtenir un lien de réinitialisation"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "Per period"
+msgstr "Par période"
 
 #: src/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody.tsx
 msgid "Select a layer to edit how it is queried and drawn."
@@ -1987,11 +2030,16 @@ msgstr "Cette requête utilise un jeu de données qui n’est pas présent dans 
 msgid "(Annual billing)"
 msgstr "(Facturation annuelle)"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Every case type already has a status. Choose another name."
 msgstr "Chaque type de dossier possède déjà un statut. Choisissez un autre nom."
+
+#. placeholder {0}: values.length
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
+msgid "{0, plural, one {Show all # value} other {Show all # values}}"
+msgstr "{0, plural, one {Afficher la # valeur} other {Afficher les # valeurs}}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -2316,6 +2364,10 @@ msgstr "Suppression…"
 msgid "Radius"
 msgstr "Rayon"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Week of {day}"
+msgstr "Semaine du {day}"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Sort & limit"
 msgstr "Tri et limite"
@@ -2401,6 +2453,11 @@ msgstr "Supprimer définitivement <0>{openDatasetName}</0> ?"
 msgid "The offline models could not be removed"
 msgstr "Les modèles hors ligne n’ont pas pu être supprimés"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # day} other {Show all # days}}"
+msgstr "{periodCount, plural, one {Afficher # jour} other {Afficher les # "
+"jours}}"
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMS"
 msgstr "WMS"
@@ -2468,6 +2525,10 @@ msgstr "Réessayez. Si le problème persiste, rechargez la page."
 msgid "You can start using your new password now"
 msgstr "Vous pouvez commencer à utiliser votre nouveau mot de passe maintenant"
 
+#: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
+msgid "Q{quarter} {year}"
+msgstr "T{quarter} {year}"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Unsupported file type"
 msgstr "Type de fichier non pris en charge"
@@ -2476,6 +2537,10 @@ msgstr "Type de fichier non pris en charge"
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "{droppedRowCount} lignes sur {totalRowCount} n’ont pas pu être "
 "cartographiées"
+
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column"
+msgstr "Colonne de date"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
@@ -3588,6 +3653,10 @@ msgstr "{layerName} n’a renvoyé aucune ligne"
 msgid "is at most"
 msgstr "est inférieur ou égal à"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per year"
+msgstr "Par an"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Use a database"
 msgstr "Utiliser une base de données"
@@ -3702,6 +3771,10 @@ msgstr "Lignes {rowIndexes}."
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "Supprimer : {openDatasetName}"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per day"
+msgstr "Par jour"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "No SQL yet. Ask Avandar a question or build a query in the Manual tab to "
@@ -3831,6 +3904,10 @@ msgstr "Identité"
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
 msgid "Data source"
 msgstr "Source de données"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "One value"
+msgstr "Une valeur"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Last synced"
@@ -4053,6 +4130,10 @@ msgstr "L'inscription nécessite une connexion Internet."
 msgid "There are no values"
 msgstr "Il n'y a pas de valeurs"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Date column for {fieldName}"
+msgstr "Colonne de date de {fieldName}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Show more"
 msgstr "Afficher plus"
@@ -4132,7 +4213,9 @@ msgstr "Impossible de capturer le tableau de bord"
 msgid "Processing dataset…"
 msgstr "Traitement du jeu de données…"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
 msgid "ID fields keep their value as is."
 msgstr "Les champs d'identifiant conservent leur valeur telle quelle."
 
@@ -4162,7 +4245,7 @@ msgstr "Intervalle des graduations de l’axe X"
 msgid "Please try again."
 msgstr "Veuillez réessayer."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the value that comes last alphabetically"
 msgstr "Choisissez la valeur qui vient en dernier par ordre alphabétique"
 
@@ -4274,6 +4357,16 @@ msgstr "Masquer la couche {layerName}"
 msgid "Start your journey with us"
 msgstr "Commencez votre parcours avec nous"
 
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#~ msgid "Qwen 2.5 7B (offline)"
+#~ msgstr "Qwen 2.5 7B (hors ligne)"
+
+#: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
+#: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
+msgid "Fields that keep every value cannot be filtered on."
+msgstr "Les champs qui conservent toutes les valeurs ne peuvent pas être "
+"filtrés."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Funny"
 msgstr "Drôle"
@@ -4298,9 +4391,9 @@ msgstr "Thème : {topic}"
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-msgid "If each {0} can only have one {attributeName} value, check this box."
-msgstr "Si chaque {0} ne peut avoir qu'une seule valeur {attributeName}, cochez "
-"cette case."
+#~ msgid "If each {0} can only have one {attributeName} value, check this box."
+#~ msgstr "Si chaque {0} ne peut avoir qu'une seule valeur {attributeName}, cochez "
+#~ "cette case."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -4382,6 +4475,11 @@ msgstr "Êtes-vous sûr de vouloir supprimer {0} ?"
 msgid "Running the layer's query."
 msgstr "Exécution de la requête de la couche."
 
+#. placeholder {0}: attribute.name
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+msgid "Sources of {0}"
+msgstr "Sources de {0}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "Type the workspace name to confirm"
 msgstr "Saisissez le nom de l’espace de travail pour confirmer"
@@ -4429,6 +4527,11 @@ msgstr "Plus d’actions sur le jeu de données"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "Delete dashboard?"
 msgstr "Supprimer le tableau de bord ?"
+
+#: src/components/caseFields/ValueShapeControl.tsx
+#: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
+msgid "Every value"
+msgstr "Toutes les valeurs"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
@@ -4595,6 +4698,10 @@ msgstr "Données personnelles détectées"
 msgid "Coordinate validation report"
 msgstr "Rapport de validation des coordonnées"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Day"
+msgstr "Jour"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Apply every global filter on the dashboard."
 msgstr "Appliquer chaque filtre global sur le tableau de bord."
@@ -4606,6 +4713,10 @@ msgstr "Réduire"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Limite atteinte"
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Month"
+msgstr "Mois"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Your statuses were not saved. Try again in a moment."
@@ -4623,6 +4734,10 @@ msgstr "Effacer le journal"
 msgid "Google Sheet is too large"
 msgstr "La feuille Google est trop volumineuse"
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "Choose a date column"
+msgstr "Choisissez une colonne de date"
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
 msgstr "correspond à l’une des valeurs suivantes"
@@ -4634,6 +4749,10 @@ msgstr "Nouvelle carte"
 #: src/components/layouts/RootLayout/useSpotlightActions/useSpotlightActions.tsx
 msgid "Current version"
 msgstr "Version actuelle"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeValueShapeControl.tsx
+msgid "Join keys and the label keep one value."
+msgstr "Les clés de jointure et le libellé gardent une seule valeur."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Nested subquery in FROM could not be re-serialised; mapping kept as a "
@@ -4876,6 +4995,10 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 msgstr "{offlineOnlyTitle} : il sera disponible uniquement sur cet ordinateur, "
 "et personne d’autre de votre équipe ne pourra l’ouvrir."
 
+#: src/components/caseFields/ValueShapeControl.tsx
+#~ msgid "One value or every value for {fieldName}"
+#~ msgstr "Une valeur ou toutes les valeurs pour {fieldName}"
+
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
 msgstr "A4"
@@ -5043,7 +5166,7 @@ msgstr "Liste à puces"
 msgid "Annotate the map"
 msgstr "Annoter la carte"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the maximum value"
 msgstr "Choisissez la valeur maximale"
 
@@ -5324,6 +5447,10 @@ msgstr "Toute personne disposant du lien peut consulter ce {resource}. Les "
 "personnes et les groupes ci-dessous contrôlent toujours les accès en "
 "modification."
 
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
+msgid "The title field keeps one value."
+msgstr "Le champ du titre garde une seule valeur."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "The person who added this sheet needs to reconnect their Google account. "
 "Ask them to reconnect it, then try again."
@@ -5506,6 +5633,10 @@ msgstr "Fin (par exemple, 2024-12-31)"
 msgid "Open dashboard tile"
 msgstr "Ouvrir la vignette du tableau de bord"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per month"
+msgstr "Par mois"
+
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
 "shows a best-effort approximation; the SQL is what actually runs."
@@ -5648,7 +5779,7 @@ msgstr "Créer un espace de travail"
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "Try again"
 msgstr "Réessayer"
 
@@ -5875,7 +6006,7 @@ msgstr "Dessinez une zone pour filtrer"
 msgid "Pick a dashboard, or create a new one."
 msgstr "Choisissez un tableau de bord ou créez-en un nouveau."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get a sum of the values"
 msgstr "Obtenir une somme des valeurs"
 
@@ -5891,6 +6022,7 @@ msgstr "Importer"
 msgid "Clear Disputed status column"
 msgstr "Effacer la colonne d’état « Contestée »"
 
+#: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
@@ -5935,7 +6067,7 @@ msgstr "La prise en charge de la géométrie est indisponible"
 msgid "X column"
 msgstr "Colonne X"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the most frequent value"
 msgstr "Choisissez la valeur la plus fréquente"
 
@@ -6220,6 +6352,12 @@ msgstr "Erreur lors de l'enregistrement du jeu de données : {0}"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "No columns yet"
 msgstr "Aucune colonne pour le moment"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # quarter} other {Show all # "
+"quarters}}"
+msgstr "{periodCount, plural, one {Afficher # trimestre} other {Afficher les # "
+"trimestres}}"
 
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
@@ -6593,6 +6731,10 @@ msgstr "Feuille Google"
 msgid "You wrote:"
 msgstr "Vous avez écrit :"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
+msgid "{fieldName} per day"
+msgstr "{fieldName} par jour"
+
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
 msgid "Multi select"
 msgstr "Sélection multiple"
@@ -6605,6 +6747,15 @@ msgstr "Impossible de charger les jeux de données du tableau de bord"
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "Aucune description n'a encore été ajoutée."
+
+#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
+#~ msgid "Qwen 2.5 3B"
+#~ msgstr "Qwen 2.5 3B"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
+msgid "In each period, if there are multiple {attributeName} values, then..."
+msgstr "Pour chaque période, s'il y a plusieurs valeurs de {attributeName}, "
+"alors..."
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Collapse drawer"
@@ -6764,6 +6915,10 @@ msgstr "Renommer la couche"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Request a feature"
 msgstr "Demander une fonctionnalité"
+
+#: src/components/caseFields/PeriodControls/PeriodSelect.tsx
+msgid "Period"
+msgstr "Période"
 
 #. placeholder {0}: sourcedDataset?.name
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
@@ -7119,7 +7274,7 @@ msgid "Unmapped rows are still counted in this layer's totals. They are "
 msgstr "Les lignes non mappées sont toujours comptabilisées dans les totaux de "
 "cette couche. Elles sont uniquement exclues de la carte."
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Get an average of the values"
 msgstr "Obtenir une moyenne des valeurs"
 
@@ -7380,7 +7535,7 @@ msgstr "Créer un nouvel espace de travail. Vous pouvez toujours le modifier "
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Réessayez dans un instant ou contactez l’assistance si le problème "
 "persiste."
@@ -7839,6 +7994,11 @@ msgstr "Lorsque cette option est activée, les membres de ce groupe n'ont accès
 msgid "Divider"
 msgstr "Séparateur"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # week} other {Show all # weeks}}"
+msgstr "{periodCount, plural, one {Afficher # semaine} other {Afficher les # "
+"semaines}}"
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Lower bound"
 msgstr "Limite inférieure"
@@ -7959,6 +8119,10 @@ msgid "Chart settings appear once the query returns some columns."
 msgstr "Les paramètres du graphique apparaissent une fois que la requête "
 "renvoie des colonnes."
 
+#: src/components/caseFields/ValueShapeControl.tsx
+msgid "How many values {fieldName} keeps"
+msgstr "Nombre de valeurs que garde {fieldName}"
+
 #. placeholder {0}: operationalState.featureCount
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
@@ -8028,6 +8192,10 @@ msgstr "URL du lien"
 #: src/components/buttons/FeedbackButton/FeedbackButton.tsx
 msgid "Send feedback"
 msgstr "Envoyer des commentaires"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # year} other {Show all # years}}"
+msgstr "{periodCount, plural, one {Afficher # an} other {Afficher les # ans}}"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardLoadingState.tsx
 msgid "Loading dashboard datasets"
@@ -8128,7 +8296,7 @@ msgstr "Actualisation des enregistrements de {conceptName}…"
 msgid "Loading private resources"
 msgstr "Chargement des ressources privées"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the first value we see"
 msgstr "Choisissez la première valeur que nous voyons"
 
@@ -8150,7 +8318,7 @@ msgstr "Accès refusé"
 msgid "Refresh {0} records"
 msgstr "Actualiser {0} enregistrements"
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "join key"
 msgstr "clé de jointure"
 
@@ -8219,6 +8387,10 @@ msgstr "Vous êtes hors ligne. Votre brouillon est enregistré sur cet appareil 
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "Entrez le nom de l'ensemble de données"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#~ msgid "Sources"
+#~ msgstr "Sources"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
@@ -8535,7 +8707,7 @@ msgid "None of the selected regions produced any rows yet, so there are no "
 msgstr "Aucune des régions sélectionnées n’a encore produit de lignes ; il n’y "
 "a donc aucune colonne imprimée à conserver."
 
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "Name for {columnLabel}"
 msgstr "Nom pour {columnLabel}"
 
@@ -8712,7 +8884,7 @@ msgstr "est au moins égal à"
 msgid "Stack group"
 msgstr "Groupe d’empilement"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Select rule (e.g. most frequent)"
 msgstr "Sélectionner la règle (par exemple, la plus fréquente)"
 
@@ -9079,7 +9251,7 @@ msgstr "Préparation de vos données"
 msgid "Delete the view {0}"
 msgstr "Supprimer la vue {0}"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "This record's fields failed to load"
 msgstr "Les champs de cet enregistrement n'ont pas pu être chargés"
 
@@ -9177,7 +9349,7 @@ msgid "contains"
 msgstr "contient"
 
 #. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "S'il y a plusieurs valeurs {attributeName} pour un {0}, alors..."
 
@@ -9290,7 +9462,7 @@ msgstr "Ce que cette personne ou ce groupe peut faire. Spectateur = lecture "
 "y compris le partage."
 
 #. placeholder {0}: attribute.name
-#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow.tsx
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/CaseTypeDraftAttributeRow.tsx
 msgid "Include {0}"
 msgstr "Inclure {0}"
 
@@ -9471,6 +9643,11 @@ msgstr "Dégradé de couleurs"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Over a year ago"
 msgstr "Il y a plus d’un an"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
+msgid "{periodCount, plural, one {Show all # month} other {Show all # months}}"
+msgstr "{periodCount, plural, one {Afficher # mois} other {Afficher les # "
+"mois}}"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Sync this case type from Case Manager to create records from your data."
@@ -9748,7 +9925,8 @@ msgid "Show as link"
 msgstr "Afficher sous forme de lien"
 
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/RecordFieldPeriodTable.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValue.tsx
 msgid "No value"
 msgstr "Aucune valeur"
 
@@ -9788,6 +9966,7 @@ msgstr "Déplaçons ces résultats vers un tableau de bord"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "Valeur"
 
@@ -10205,7 +10384,7 @@ msgstr "Synchroniser en ligne ?"
 msgid "Neutral failure"
 msgstr "Échec neutre"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "No fields yet"
 msgstr "Aucun champ pour le moment"
 
@@ -10447,6 +10626,10 @@ msgstr "Annuel"
 msgid "anyone with "
 msgstr "quiconque avec "
 
+#: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
+msgid "This dataset has no date column"
+msgstr "Ce jeu de données n'a aucune colonne de date"
+
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
@@ -10479,6 +10662,10 @@ msgstr "Importez un fichier CSV, Excel ou PDF, connectez une feuille Google "
 msgid "The database did not respond in time. Check the address and try again."
 msgstr "La base de données n’a pas répondu à temps. Vérifiez l’adresse et "
 "réessayez."
+
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per quarter"
+msgstr "Par trimestre"
 
 #. placeholder {0}: column.name
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls.tsx
@@ -10547,6 +10734,10 @@ msgid "Pick one from the list to review its columns, preview its rows, and read 
 "a summary of what is in it."
 msgstr "Sélectionnez un élément dans la liste pour examiner ses colonnes, "
 "prévisualiser ses lignes et lire un résumé de son contenu."
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
+msgid "Choose the date column for this field"
+msgstr "Choisissez la colonne de date pour ce champ"
 
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
@@ -10792,6 +10983,10 @@ msgstr "La valeur la plus fréquente est <0>{0}</0>, présente dans <1>{1}</1> "
 msgid "Data key column"
 msgstr "Colonne de clé de données"
 
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Per week"
+msgstr "Par semaine"
+
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Processing, {remainingLabel} remaining"
 msgstr "Traitement, {remainingLabel} restant"
@@ -10911,7 +11106,11 @@ msgstr "Afficher le code QR"
 msgid "Past year"
 msgstr "Année dernière"
 
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
+#: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
+msgid "Week"
+msgstr "Semaine"
+
+#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
 msgstr "Choisissez la valeur minimale"
 

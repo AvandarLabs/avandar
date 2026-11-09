@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 import type { Model } from "@avandar/models";
 import type { ReactNode } from "react";
@@ -30,6 +30,7 @@ export function BoundaryJoinKeyFields({
         label={t`Data key column`}
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
+        isColumnSelectable={QueryColumn.isNotList}
         value={dataKeyColumn}
         onChange={(column) => {
           if (column) {

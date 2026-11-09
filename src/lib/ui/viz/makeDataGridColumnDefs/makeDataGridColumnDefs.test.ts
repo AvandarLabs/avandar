@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { makeDataGridColumnDefs } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { DataGridPeriodFormatters } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
 
 /** Midnight on 2022-01-01, as DuckDB returns a DATE or a month bucket. */
 const JAN_1_2022 = Date.UTC(2022, 0, 1);
@@ -120,5 +122,138 @@ describe("makeDataGridColumnDefs", () => {
         return columnDef.valueFormatter({ value: values[index] });
       }),
     ).toEqual(["2020", "84001001", "1001", "840", "2021"]);
+  });
+
+  describe("a list cell", () => {
+    function _formatListCell(value: unknown): string {
+      const [columnDef] = makeDataGridColumnDefs({
+        columnNames: ["Daily new cases"],
+        data: [{ "Daily new cases": value }],
+        dateColumns: undefined,
+        dateFormat: "YYYY-MM-DD",
+      });
+      return columnDef!.valueFormatter({ value });
+    }
+
+    it("shows its numbers separated by semicolons", () => {
+      expect(_formatListCell([31, 1234])).toBe("31; 1,234");
+    });
+
+    it("shows its text items separated by semicolons", () => {
+      expect(_formatListCell(["Fever", "Cough"])).toBe("Fever; Cough");
+    });
+
+    it("shows an empty list as blank", () => {
+      expect(_formatListCell([])).toBe("");
+    });
+
+    it("leaves a NULL item out instead of showing a stray separator", () => {
+      expect(_formatListCell([null, "Cough"])).toBe("Cough");
+    });
+
+    it("flattens a nested list into one run of values", () => {
+      expect(_formatListCell([[1, 2], [3]])).toBe("1; 2; 3");
+    });
+  });
+
+  describe("a per-period cell", () => {
+    // Stand-ins that show which grain and which value each label came from.
+    const PERIOD_FORMATTERS: DataGridPeriodFormatters = {
+      formatPeriod: (bucket, bucketGrain) => {
+        return `${bucketGrain ?? "any"} ${bucket}`;
+      },
+      formatValue: (value) => {
+        return `<${String(value)}>`;
+      },
+    };
+    const APRIL_AND_JULY = [
+      { bucket: "2026-04-01", value: 38.5 },
+      { bucket: "2026-07-01", value: 37.9 },
+    ];
+
+    function _formatPeriods(
+      options: Readonly<{
+        value: unknown;
+        bucketGrain?: ConceptAttribute.BucketGrain;
+        isDate?: boolean;
+        periodFormatters?: DataGridPeriodFormatters;
+      }>,
+    ): string {
+      const [columnDef] = makeDataGridColumnDefs({
+        columnNames: ["Temperature"],
+        data: [{ Temperature: options.value }],
+        dateColumns: options.isDate ? new Set(["Temperature"]) : undefined,
+        dateFormat: "YYYY-MM-DD",
+        bucketGrains: options.bucketGrain
+          ? { Temperature: options.bucketGrain }
+          : {},
+        periodFormatters: options.periodFormatters ?? PERIOD_FORMATTERS,
+      });
+      return columnDef!.valueFormatter({ value: options.value });
+    }
+
+    it("shows each period as its label and value, separated by semicolons", () => {
+      expect(
+        _formatPeriods({ value: APRIL_AND_JULY, bucketGrain: "month" }),
+      ).toBe("month 2026-04-01: <38.5>; month 2026-07-01: <37.9>");
+    });
+
+    it("labels periods by the grain of its own column", () => {
+      const [first, second] = makeDataGridColumnDefs({
+        columnNames: ["Monthly", "Yearly"],
+        data: [],
+        dateColumns: undefined,
+        dateFormat: "YYYY-MM-DD",
+        bucketGrains: { Monthly: "month", Yearly: "year" },
+        periodFormatters: PERIOD_FORMATTERS,
+      });
+      const value = [{ bucket: "2026-01-01", value: 1 }];
+      expect(first!.valueFormatter({ value })).toBe("month 2026-01-01: <1>");
+      expect(second!.valueFormatter({ value })).toBe("year 2026-01-01: <1>");
+    });
+
+    it("does not read a numeric bucket as a period", () => {
+      expect(
+        _formatPeriods({
+          value: [{ bucket: 5, value: 4 }],
+          bucketGrain: "day",
+        }),
+      ).not.toContain("day ");
+    });
+
+    it("still shows the periods when the column's grain is unknown", () => {
+      expect(_formatPeriods({ value: APRIL_AND_JULY })).toBe(
+        "any 2026-04-01: <38.5>; any 2026-07-01: <37.9>",
+      );
+    });
+
+    it("shows periods even in a column marked as dates", () => {
+      expect(
+        _formatPeriods({
+          value: APRIL_AND_JULY,
+          bucketGrain: "month",
+          isDate: true,
+        }),
+      ).toBe("month 2026-04-01: <38.5>; month 2026-07-01: <37.9>");
+    });
+
+    it("hands a period's missing value to the value formatter", () => {
+      expect(
+        _formatPeriods({
+          value: [{ bucket: "2026-04-01", value: null }],
+          bucketGrain: "month",
+        }),
+      ).toBe("month 2026-04-01: <null>");
+    });
+
+    it("shows an empty list of periods as blank", () => {
+      expect(_formatPeriods({ value: [], bucketGrain: "month" })).toBe("");
+    });
+
+    it("leaves a list of anything else to the list formatting", () => {
+      expect(
+        _formatPeriods({ value: ["Fever", "Cough"], bucketGrain: "month" }),
+      ).toBe("Fever; Cough");
+    });
   });
 });

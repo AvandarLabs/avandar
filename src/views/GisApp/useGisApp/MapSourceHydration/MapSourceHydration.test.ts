@@ -10,6 +10,8 @@ import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structure
 import { MapSourceHydration } from "./MapSourceHydration";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 
 it("keeps an unselected persisted WHERE target through metadata hydration and rename", () => {
   const dataset = Model.make("Dataset", {
@@ -78,5 +80,54 @@ it("keeps an unselected persisted WHERE target through metadata hydration and re
   });
   expect(structuredQueryToSql(renamed.config.layers[0]!.source)).toContain(
     'where "count_value" >= 5',
+  );
+});
+
+// A layer saved before the view suffixed a field's column carries no source
+// column name. Loading it against current metadata gives it one, so the layer
+// keeps reading the field instead of the record key.
+it("points a saved case type layer at the view column its renamed field reads", () => {
+  const concept = Model.make("Concept", {
+    id: "cases",
+    name: "Cases",
+  }) as Concept.T;
+  const attribute = Model.make("ConceptAttribute", {
+    id: "attr_key",
+    conceptId: concept.id,
+    name: "external_id",
+    dataType: "varchar",
+  }) as ConceptAttribute.T;
+  const layer = MapLayer.makeEmpty("cases");
+  const config = AvaMapConfigSchema.fromJson({
+    ...AvaMapConfig.makeEmpty(),
+    layers: [
+      {
+        ...layer,
+        source: {
+          ...layer.source,
+          dataSource: concept,
+          queryColumns: [
+            {
+              ...QueryColumn.makeFromConceptAttributes([attribute])[0]!,
+              sourceColumnName: undefined,
+            },
+          ],
+        },
+      },
+    ],
+  });
+
+  const loaded = MapSourceHydration.fromMetadata({
+    config,
+    datasetColumns: undefined,
+    conceptAttributes: [attribute],
+  });
+
+  const source = loaded.config.layers[0]!.source;
+  expect(source.queryColumns.map(prop("sourceColumnName"))).toEqual([
+    "external_id_2",
+  ]);
+  expect(structuredQueryToSql(source)).toContain(
+    '"external_id_2" as "external_id"',
   );
 });

@@ -1,10 +1,16 @@
 import { Alert, Stack, Text, Title } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
-import type { AlertProps, TextProps } from "@mantine/core";
+import type { AlertProps, TextProps, TitleOrder } from "@mantine/core";
 
 type Props = {
   title?: string;
   titleSize?: TextProps["size"];
+
+  /**
+   * The title's heading level, so it fits the page's outline: for example
+   * 5 under a rail group's `h4`. Defaults to 2.
+   */
+  titleOrder?: TitleOrder;
 
   /**
    * If a message is provided, it will be displayed in a Text component.
@@ -18,6 +24,7 @@ export function Callout({
   title,
   message,
   titleSize,
+  titleOrder = 2,
   color = "danger",
   variant = "light",
   icon = <IconAlertCircle size={32} />,
@@ -38,7 +45,7 @@ export function Callout({
       variant={variant}
       title={
         title ? (
-          <Title order={2} size={titleSize}>
+          <Title order={titleOrder} size={titleSize}>
             {title}
           </Title>
         ) : null

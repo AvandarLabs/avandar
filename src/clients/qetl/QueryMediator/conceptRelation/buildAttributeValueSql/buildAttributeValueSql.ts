@@ -2,16 +2,13 @@ import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { match } from "ts-pattern";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import {
+  DATASET_ALIAS,
+  buildTextExtremeSql,
   getEntityKeyComparisonSql,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-
-/**
- * The alias every subquery reads its dataset rows under. It must stay
- * `dataset`, the alias `getEntityKeyComparisonSql` qualifies the key with.
- */
-const DATASET_ALIAS = "dataset";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 
 /**
  * What one attribute's value is read from, and the outer table of record keys
@@ -29,10 +26,16 @@ export type AttributeValueSqlOptions = {
    * compare a text column alphabetically instead of by byte order.
    */
   columnDataType: AvaDataType.T;
-  /** How one record's rows reduce to one value. Unused for a list. */
-  valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
-  /** Keep every value, as a list, instead of reducing them to one. */
-  isArray: boolean;
+  /**
+   * Keep one value, picked by the rule, or every value as a list. A
+   * per-period field reads through `buildBucketedListValueSql` instead.
+   */
+  valueShape: Exclude<ConceptAttribute.ValueShape, "bucketed_list">;
+  /**
+   * How one record's rows reduce to one value. Required for one value. A list
+   * ignores it.
+   */
+  valuePickerRuleType: ValuePickerRule.T | undefined;
   /** The name of the column the subquery emits. */
   outputColumnName: string;
   /** The outer table, by name or alias, holding one row per record key. */
@@ -54,26 +57,6 @@ type ValueSqlParts = {
 };
 
 /**
- * The aggregate that picks a text column's last or first value
- * alphabetically, as `arg_max` or `arg_min`.
- *
- * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
- * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
- * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
- * a struct, which compares field by field, so values that share a key
- * ("apple" and "Apple") tie-break by the value itself in byte order, in the
- * same direction. The pick never depends on scan order, and the aggregate
- * returns the original value.
- */
-function _buildTextExtremeSql(
-  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
-): string {
-  const { value, aggregate } = options;
-  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
-  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
-}
-
-/**
  * The `SELECT` that reduces one record's non-NULL rows to its value.
  *
  * Each rule passes its aggregate in the rule's output type
@@ -86,7 +69,7 @@ function _buildTextExtremeSql(
 function _buildReducedValueSql(
   options: Readonly<{
     parts: ValueSqlParts;
-    valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
+    valuePickerRuleType: ValuePickerRule.T;
     columnDataType: AvaDataType.T;
   }>,
 ): string {
@@ -117,14 +100,14 @@ function _buildReducedValueSql(
     .with("max", () => {
       return aggregateSql(
         isText
-          ? _buildTextExtremeSql({ value, aggregate: "arg_max" })
+          ? buildTextExtremeSql({ value, aggregate: "arg_max" })
           : `MAX(${value})`,
       );
     })
     .with("min", () => {
       return aggregateSql(
         isText
-          ? _buildTextExtremeSql({ value, aggregate: "arg_min" })
+          ? buildTextExtremeSql({ value, aggregate: "arg_min" })
           : `MIN(${value})`,
       );
     })
@@ -159,14 +142,26 @@ export function buildAttributeValueSql(
     datasetView: quoteSqlIdentifier(options.datasetId),
     rowsView: quoteSqlIdentifier(getRowNumberedViewName(options.datasetId)),
   };
-  // `list()` over no rows is NULL. A record with no values gets an empty
-  // list, which reads as "none" rather than "unknown".
-  const body = options.isArray
-    ? `SELECT COALESCE(list(${value} ORDER BY ${DATASET_ALIAS}.file_row_number), []) FROM ${parts.rowsView} ${DATASET_ALIAS} WHERE ${parts.rowFilter}`
-    : _buildReducedValueSql({
+  const body = match(options.valueShape)
+    .with("list", () => {
+      // `list()` over no rows is NULL. A record with no values gets an empty
+      // list, which reads as "none" rather than "unknown".
+      return `SELECT COALESCE(list(${value} ORDER BY ${DATASET_ALIAS}.file_row_number), []) FROM ${parts.rowsView} ${DATASET_ALIAS} WHERE ${parts.rowFilter}`;
+    })
+    .with("single", () => {
+      const { valuePickerRuleType } = options;
+      // A guessed rule would answer with a value nobody chose.
+      if (valuePickerRuleType === undefined) {
+        throw new Error(
+          `Column '${options.outputColumnName}' keeps one value, but names no value rule.`,
+        );
+      }
+      return _buildReducedValueSql({
         parts,
-        valuePickerRuleType: options.valuePickerRuleType,
+        valuePickerRuleType,
         columnDataType: options.columnDataType,
       });
+    })
+    .exhaustive();
   return `(${body}) AS ${quoteSqlIdentifier(options.outputColumnName)}`;
 }

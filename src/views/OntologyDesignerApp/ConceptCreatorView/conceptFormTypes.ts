@@ -3,6 +3,7 @@ import { uuid } from "$/lib/uuid";
 import { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { makeDefaultStatusDrafts } from "@/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts";
@@ -25,16 +26,23 @@ import type { FormType } from "@avandar/ui/hooks";
 import type { CamelCaseKeys, Expect } from "@avandar/utils";
 import type { SetOptional, SetRequired } from "type-fest";
 
+/**
+ * The form's dataset-column mapping. The model lets a mapping name no rule,
+ * which is how a field that keeps every value is stored. The form always
+ * holds one, so the rule select always has a value to show.
+ */
+type DatasetColumnMappingFormValues = SetOptional<
+  DatasetColumnMapping<"Insert">,
+  "datasetId" | "datasetColumnId" | "workspaceId"
+> & { valuePickerRuleType: ValuePickerRule.T };
+
 export type AttributeFormValues = SetRequired<
   SetOptional<ConceptAttributeModel["Insert"], "workspaceId">,
   "id"
 > & {
   mappings: {
     manualEntry: SetOptional<ManualEntryMapping<"Insert">, "workspaceId">;
-    datasetColumn: SetOptional<
-      DatasetColumnMapping<"Insert">,
-      "datasetId" | "datasetColumnId" | "workspaceId"
-    >;
+    datasetColumn: DatasetColumnMappingFormValues;
   };
 };
 
@@ -248,9 +256,11 @@ export function withFieldDataTypes(
     });
     return {
       ..._withValueRule(attribute, ruleType),
-      dataType: attribute.isArray
-        ? columnDataType
-        : ValuePickerRule.getOutputDataType({ ruleType, columnDataType }),
+      dataType: ConceptAttribute.getOutputDataType({
+        valueShape: ConceptAttribute.getValueShape(attribute),
+        ruleType,
+        columnDataType,
+      }),
     };
   });
 }
