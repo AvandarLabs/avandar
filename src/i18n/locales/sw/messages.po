@@ -4111,6 +4111,11 @@ msgstr "Kila nukta husogea kwa kiasi kilekile kila wakati ramani hii "
 "inapofunguliwa, kwa hivyo msomaji hawezi kukadiria wastani wa mionekano "
 "kadhaa ili kupata tena eneo halisi."
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
+msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
+"editor of the map to publish this dashboard."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
 msgstr "Kiungo cha rekodi chanzo"

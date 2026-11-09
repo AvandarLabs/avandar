@@ -40,6 +40,8 @@ export function usePublishDashboardMutation(
     switch (error.reason) {
       case "filtersNoLongerApply":
         return t`The map "${mapName}" has filters that no longer match its data. Open the map and fix them before publishing.`;
+      case "cannotEditMap":
+        return t`Only someone who can edit the map "${mapName}" can publish it. Ask an editor of the map to publish this dashboard.`;
     }
   };
 

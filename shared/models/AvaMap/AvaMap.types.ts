@@ -29,13 +29,6 @@ export type AvaMapRead = Model.Base<
     /** Inert because no public route or policy consumes this column. */
     isPublic: boolean;
 
-    /**
-     * The map's secret key for displacing jittered points. It lives on the
-     * row, never in `config`, so it is never copied into a published map
-     * snapshot: anyone holding it could undo the displacement.
-     */
-    jitterSalt: string;
-
     /** Restricted unless the caller has explicit grants (RBAC). */
     isRestricted: boolean;
 
@@ -67,12 +60,7 @@ type AvaMapCrudSpec = {
     Read: AvaMapRead;
     Insert: SetOptional<
       AvaMapRead,
-      | "createdAt"
-      | "id"
-      | "isPublic"
-      | "isRestricted"
-      | "jitterSalt"
-      | "updatedAt"
+      "createdAt" | "id" | "isPublic" | "isRestricted" | "updatedAt"
     >;
     Update: Partial<AvaMapRead>;
   };

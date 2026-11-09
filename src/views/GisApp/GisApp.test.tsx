@@ -70,7 +70,6 @@ function _createAvaMap(): AvaMap.T {
     description: undefined,
     isPublic: false,
     isRestricted: false,
-    jitterSalt: "00000000-0000-4000-8000-0000000000aa",
     slug: undefined,
     config: AvaMapConfig.makeEmpty(),
   });
@@ -83,7 +82,7 @@ describe("GisApp", () => {
   });
 
   it("renders the map shell inside the shared app canvas layout", () => {
-    render(<GisApp avaMap={_createAvaMap()} />);
+    render(<GisApp avaMap={_createAvaMap()} jitterSalt="map-salt" />);
 
     expect(screen.getByTestId("app-layout")).toContainElement(
       screen.getByTestId("gis-map-shell"),
@@ -95,7 +94,7 @@ describe("GisApp", () => {
   // asking, so if this stops happening they wait on "loading" for the life of
   // the page.
   it("requests the Spatial extension on mount, before any layer exists", () => {
-    render(<GisApp avaMap={_createAvaMap()} />);
+    render(<GisApp avaMap={_createAvaMap()} jitterSalt="map-salt" />);
 
     expect(ensureSpatialMock).toHaveBeenCalledTimes(1);
   });

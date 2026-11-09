@@ -101,6 +101,40 @@ describe("usePublishDashboardMutation", () => {
     consoleErrorSpy.mockRestore();
   });
 
+  it("tells a publisher who cannot edit a map to ask its editor", () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {
+        return undefined;
+      });
+    renderHook(
+      () => {
+        return usePublishDashboardMutation({
+          currentDashboard: makeDashboard("draft"),
+          onPublished: vi.fn(),
+          onShareableLimitReached: vi.fn(),
+        });
+      },
+      { wrapper: TestWrapper },
+    );
+
+    publishOnError?.(
+      new MapSnapshotPublishError({
+        reason: "cannotEditMap",
+        mapId: "00000000-0000-4000-8000-0000000000f5" as AvaMap.Id,
+        mapName: "Coverage risk",
+        layerNames: [],
+      }),
+    );
+
+    expect(notifyError).toHaveBeenCalledWith({
+      title: "Could not publish dashboard",
+      message:
+        'Only someone who can edit the map "Coverage risk" can publish it. Ask an editor of the map to publish this dashboard.',
+    });
+    consoleErrorSpy.mockRestore();
+  });
+
   it("announces dashboard.published on the first publish from draft", () => {
     const listener = vi.fn();
     const unsubscribe = NuxEvents.subscribe(listener);

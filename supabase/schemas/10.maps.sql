@@ -28,12 +28,7 @@ create table public.maps (
   -- shared/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts
   config jsonb not null,
   -- When true, tag-based app roles do not apply; shares still can
-  is_restricted boolean not null default false,
-  -- Secret key for the map's displaced (jittered) points. Displacement is a
-  -- keyed hash of this salt with the layer id and row index, so a published
-  -- snapshot cannot be reversed to exact locations without it. It is never
-  -- written into `config` or into any published output.
-  jitter_salt uuid not null default gen_random_uuid()
+  is_restricted boolean not null default false
 );
 
 -- Enable row level security

@@ -4055,6 +4055,11 @@ msgid "Each point moves by the same amount every time this map is opened, so a "
 msgstr "تتحرك كل نقطة بالمقدار نفسه في كل مرة تُفتح فيها هذه الخريطة، لذلك لا "
 "يستطيع القارئ حساب متوسط عدة مشاهدات لاستعادة الموقع الحقيقي."
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
+msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
+"editor of the map to publish this dashboard."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
 msgstr "رابط إلى السجل المصدر"

@@ -3,15 +3,15 @@ import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 
-const { fromMock } = vi.hoisted(() => {
-  return { fromMock: vi.fn() };
+const { fromMock, rpcMock } = vi.hoisted(() => {
+  return { fromMock: vi.fn(), rpcMock: vi.fn() };
 });
 
 vi.mock("$/db/supabase/AvaSupabase", () => {
   return {
     AvaSupabase: {
       db: () => {
-        return { from: fromMock };
+        return { from: fromMock, rpc: rpcMock };
       },
     },
   };
@@ -58,7 +58,6 @@ function _createMapRow(updatedAt: string): AvaMap.T<"DBRead"> {
     id: "00000000-0000-4000-8000-000000000001",
     is_public: false,
     is_restricted: false,
-    jitter_salt: "00000000-0000-4000-8000-0000000000aa",
     name: "Updated map",
     owner_id: "00000000-0000-4000-8000-000000000002",
     owner_profile_id: "00000000-0000-4000-8000-000000000003",
@@ -118,5 +117,37 @@ describe("AvaMapClient.saveMapConfig", () => {
     await expect(AvaMapClient.saveMapConfig(saveParams)).rejects.toBeInstanceOf(
       MapSaveConflictError,
     );
+  });
+});
+
+describe("AvaMapClient.getJitterSalt", () => {
+  const MAP_ID = "00000000-0000-4000-8000-000000000001" as AvaMap.Id;
+
+  function _mockRpcResult(data: string | null): void {
+    rpcMock.mockReturnValue({
+      throwOnError: () => {
+        return Promise.resolve({ data });
+      },
+    });
+  }
+
+  it("reads the map's salt through the editor-only rpc", async () => {
+    _mockRpcResult("00000000-0000-4000-8000-0000000000aa");
+
+    const salt = await AvaMapClient.getJitterSalt({ mapId: MAP_ID });
+
+    expect(rpcMock).toHaveBeenCalledWith(
+      "rpc_maps__get_or_create_jitter_salt",
+      { p_map_id: MAP_ID },
+    );
+    expect(salt).toBe("00000000-0000-4000-8000-0000000000aa");
+  });
+
+  it("returns undefined when the caller cannot edit the map", async () => {
+    _mockRpcResult(null);
+
+    await expect(
+      AvaMapClient.getJitterSalt({ mapId: MAP_ID }),
+    ).resolves.toBeUndefined();
   });
 });

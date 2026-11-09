@@ -17,6 +17,8 @@ export type GisAppRendering = MapLayerRendering;
 export function useGisAppRendering(
   options: Readonly<{
     avaMap: AvaMap.T;
+    /** The salt that displaces the map's jittered points. */
+    jitterSalt: string;
     chrome: GisAppChrome;
     editor: ReturnType<typeof useAvaMapEditor>;
     hiddenAnnotationFeatureIds?: readonly AvaMapConfig.AnnotationFeatureId[];
@@ -26,7 +28,7 @@ export function useGisAppRendering(
     mapConfig: options.editor.mapConfig,
     workspaceId: options.avaMap.workspaceId,
     view: options.editor.mapConfig.view,
-    jitterSalt: options.avaMap.jitterSalt,
+    jitterSalt: options.jitterSalt,
     hiddenAnnotationFeatureIds: options.hiddenAnnotationFeatureIds,
   });
   PersistedLayerLegends.usePersistedLayerLegends({

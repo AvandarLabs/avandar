@@ -3958,6 +3958,11 @@ msgid "Each point moves by the same amount every time this map is opened, so a "
 "reader cannot average several views back to the real location."
 msgstr "每個點在每次開啟此地圖時都會以相同的幅度移動，因此讀者無法透過平均多個檢視畫面還原真實位置。"
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
+msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
+"editor of the map to publish this dashboard."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
 msgstr "連結至來源紀錄"

@@ -12,19 +12,23 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 const {
   compileMapSnapshotMock,
   getMapByIdMock,
+  getJitterSaltMock,
   getVirtualDatasetsMock,
   ensureSpatialMock,
 } = vi.hoisted(() => {
   return {
     compileMapSnapshotMock: vi.fn(),
     getMapByIdMock: vi.fn(),
+    getJitterSaltMock: vi.fn(),
     getVirtualDatasetsMock: vi.fn(),
     ensureSpatialMock: vi.fn(),
   };
 });
 
 vi.mock("@/clients/maps/AvaMapClient/AvaMapClient", () => {
-  return { AvaMapClient: { getById: getMapByIdMock } };
+  return {
+    AvaMapClient: { getById: getMapByIdMock, getJitterSalt: getJitterSaltMock },
+  };
 });
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return { DatasetClient: { getAll: vi.fn().mockResolvedValue([]) } };
@@ -88,9 +92,9 @@ const MAP = {
   id: "00000000-0000-4000-8000-0000000000f5" as AvaMap.Id,
   name: "Coverage risk",
   workspaceId: WORKSPACE_ID,
-  jitterSalt: "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b",
   config: MAP_CONFIG,
 };
+const MAP_SALT = "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b";
 
 describe("createMapSnapshotFromMapId", () => {
   beforeEach(() => {
@@ -99,6 +103,7 @@ describe("createMapSnapshotFromMapId", () => {
       { datasetId: PLACES_DATASET_ID, isPlaces: true },
     ]);
     ensureSpatialMock.mockResolvedValue(true);
+    getJitterSaltMock.mockResolvedValue(MAP_SALT);
   });
 
   it("compiles the saved map under its own name with its own salt", async () => {
@@ -122,10 +127,40 @@ describe("createMapSnapshotFromMapId", () => {
           simplificationReferenceLatitude: 33.2,
           datasets: [],
           datasetColumns: [],
-          jitterSalt: MAP.jitterSalt,
+          jitterSalt: MAP_SALT,
         },
       }),
     );
+  });
+
+  it("reads the salt for the map being published", async () => {
+    getMapByIdMock.mockResolvedValue(MAP);
+    compileMapSnapshotMock.mockResolvedValue({ mapId: MAP.id });
+
+    await createMapSnapshotFromMapId({
+      mapId: MAP.id,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    expect(getJitterSaltMock).toHaveBeenCalledWith({ mapId: MAP.id });
+  });
+
+  it("refuses to publish a map the publisher cannot edit, rather than leave it unsalted", async () => {
+    getMapByIdMock.mockResolvedValue(MAP);
+    getJitterSaltMock.mockResolvedValue(undefined);
+
+    const publish = createMapSnapshotFromMapId({
+      mapId: MAP.id,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    await expect(publish).rejects.toBeInstanceOf(MapSnapshotPublishError);
+    await expect(publish).rejects.toMatchObject({
+      reason: "cannotEditMap",
+      mapId: MAP.id,
+      mapName: "Coverage risk",
+    });
+    expect(compileMapSnapshotMock).not.toHaveBeenCalled();
   });
 
   it("refuses a map the publisher cannot read", async () => {

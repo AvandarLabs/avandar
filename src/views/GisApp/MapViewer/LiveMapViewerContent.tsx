@@ -9,10 +9,23 @@ import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { MapViewerDisplay } from "@/views/GisApp/MapViewer/MapViewer.types";
 import type { ReactNode } from "react";
 
-type Props = { avaMap: AvaMap.T; display: MapViewerDisplay };
+type Props = {
+  avaMap: AvaMap.T;
+  /** The salt that displaces the map's jittered points. */
+  jitterSalt: string;
+  display: MapViewerDisplay;
+};
 
-function LiveMapViewerCanvas({ avaMap, display }: Props): ReactNode {
-  const state = useLiveMapViewerState({ avaMap, camera: display.camera });
+function LiveMapViewerCanvas({
+  avaMap,
+  jitterSalt,
+  display,
+}: Props): ReactNode {
+  const state = useLiveMapViewerState({
+    avaMap,
+    jitterSalt,
+    camera: display.camera,
+  });
   return (
     <MapViewerFrame
       mapName={avaMap.name}
@@ -30,7 +43,11 @@ function LiveMapViewerCanvas({ avaMap, display }: Props): ReactNode {
  * A live map the viewer can read, or no-access when a dataset is hidden.
  * Nothing is drawn or queried until dataset access is known.
  */
-export function LiveMapViewerContent({ avaMap, display }: Props): ReactNode {
+export function LiveMapViewerContent({
+  avaMap,
+  jitterSalt,
+  display,
+}: Props): ReactNode {
   const datasetAccess = useMapDatasetAccess(avaMap);
   return matchLiteral(datasetAccess, {
     loading: () => {
@@ -40,7 +57,13 @@ export function LiveMapViewerContent({ avaMap, display }: Props): ReactNode {
       return <MapViewerState kind="noAccess" heightPx={display.heightPx} />;
     },
     granted: () => {
-      return <LiveMapViewerCanvas avaMap={avaMap} display={display} />;
+      return (
+        <LiveMapViewerCanvas
+          avaMap={avaMap}
+          jitterSalt={jitterSalt}
+          display={display}
+        />
+      );
     },
   });
 }

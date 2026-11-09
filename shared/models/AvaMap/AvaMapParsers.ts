@@ -24,7 +24,6 @@ const DBReadSchema = z.object({
   id: z.uuid(),
   is_public: z.boolean(),
   is_restricted: z.boolean(),
-  jitter_salt: z.uuid(),
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),

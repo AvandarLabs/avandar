@@ -158,7 +158,6 @@ function _createPlacesFixture(): {
     dateOfLastSync: undefined,
     description: undefined,
     isRestricted: false,
-    jitterSalt: "00000000-0000-4000-8000-0000000000aa",
     name: "Exposure sites",
     sourceType: "virtual",
     ownerId: uuid<User.Id>(),
@@ -209,7 +208,6 @@ function _createAvaMap(
     description: undefined,
     isPublic: false,
     isRestricted: false,
-    jitterSalt: "00000000-0000-4000-8000-0000000000aa",
     slug: undefined,
     config,
   });
@@ -227,7 +225,7 @@ describe("useGisApp annotation inspector", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { rerender } = renderHook(
       () => {
-        return useGisApp(_createAvaMap());
+        return useGisApp(_createAvaMap(), "map-salt");
       },
       { wrapper: TestProviders },
     );
@@ -244,7 +242,7 @@ describe("useGisApp annotation inspector", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { result } = renderHook(
       () => {
-        return useGisApp(_createAvaMap());
+        return useGisApp(_createAvaMap(), "map-salt");
       },
       { wrapper: TestProviders },
     );
@@ -281,7 +279,7 @@ describe("useGisApp places layers", () => {
     placesState.datasetColumns = fixture.datasetColumns;
     const { result } = renderHook(
       () => {
-        return useGisApp(_createAvaMap(fixture.mapConfig));
+        return useGisApp(_createAvaMap(fixture.mapConfig), "map-salt");
       },
       { wrapper: TestProviders },
     );

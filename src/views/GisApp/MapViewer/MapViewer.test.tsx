@@ -24,6 +24,7 @@ const {
   downloadMapSnapshotMock,
   placesState,
   useGetDatasetsMock,
+  useGetJitterSaltMock,
   useGetMapByIdMock,
   useMapCanvasSpy,
   useMapLayerRenderingMock,
@@ -33,6 +34,7 @@ const {
     downloadMapSnapshotMock: vi.fn(),
     placesState: { placesDatasetIds: new Set<string>() },
     useGetDatasetsMock: vi.fn(),
+    useGetJitterSaltMock: vi.fn(),
     useGetMapByIdMock: vi.fn(),
     useMapCanvasSpy: vi.fn(),
     useMapLayerRenderingMock: vi.fn(),
@@ -55,7 +57,12 @@ vi.mock("@/views/GisApp/MapCanvas/useMapCanvas", () => {
   };
 });
 vi.mock("@/clients/maps/AvaMapClient/AvaMapClient", () => {
-  return { AvaMapClient: { useGetById: useGetMapByIdMock } };
+  return {
+    AvaMapClient: {
+      useGetById: useGetMapByIdMock,
+      useGetJitterSalt: useGetJitterSaltMock,
+    },
+  };
 });
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return { DatasetClient: { useGetAll: useGetDatasetsMock } };
@@ -138,7 +145,6 @@ function _makeMap(layers: readonly MapLayer.T[]): AvaMap.T {
     description: undefined,
     isPublic: false,
     isRestricted: false,
-    jitterSalt: JITTER_SALT,
     slug: undefined,
     config: { ...AvaMapConfig.makeEmpty(), layers: [...layers] },
   });
@@ -198,6 +204,7 @@ describe("MapViewer", () => {
     placesState.placesDatasetIds = new Set();
     useGetDatasetsMock.mockReturnValue([[], false]);
     useMapLayerRenderingMock.mockReturnValue(_makeRendering());
+    useGetJitterSaltMock.mockReturnValue([JITTER_SALT, false]);
   });
 
   it("shows a live map's legend and attribution to a viewer with access", () => {
@@ -232,6 +239,43 @@ describe("MapViewer", () => {
         workspaceId: WORKSPACE_ID,
       }),
     );
+  });
+
+  it("reads the live map's salt for that map only", () => {
+    useGetMapByIdMock.mockReturnValue([
+      _makeMap([MapLayer.makeEmpty("Schools")]),
+      false,
+    ]);
+
+    _render(LIVE_SOURCE);
+
+    expect(useGetJitterSaltMock).toHaveBeenCalledWith({ mapId: MAP_ID });
+  });
+
+  it("waits for the live map's salt before drawing anything", () => {
+    useGetMapByIdMock.mockReturnValue([
+      _makeMap([MapLayer.makeEmpty("Schools")]),
+      false,
+    ]);
+    useGetJitterSaltMock.mockReturnValue([undefined, true]);
+
+    _render(LIVE_SOURCE);
+
+    expect(useMapLayerRenderingMock).not.toHaveBeenCalled();
+  });
+
+  it("draws a live map for a viewer who cannot edit it with a throwaway salt", () => {
+    useGetMapByIdMock.mockReturnValue([
+      _makeMap([MapLayer.makeEmpty("Schools")]),
+      false,
+    ]);
+    useGetJitterSaltMock.mockReturnValue([undefined, false]);
+
+    _render(LIVE_SOURCE);
+
+    const jitterSalt = useMapLayerRenderingMock.mock.lastCall?.[0]?.jitterSalt;
+    expect(jitterSalt).toMatch(/^[0-9a-f-]{36}$/);
+    expect(jitterSalt).not.toBe(JITTER_SALT);
   });
 
   it("keeps a places layer's internal id out of a live popup", () => {

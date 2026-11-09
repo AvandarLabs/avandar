@@ -140,12 +140,34 @@ async function _assertSpatialAvailable(
 }
 
 /**
+ * Reads the map's secret displacement salt. Only a map editor can read it, and
+ * a snapshot compiled without it would publish exact locations, so a
+ * non-editor's publish stops here.
+ */
+async function _getJitterSaltForPublish(avaMap: AvaMap.T): Promise<string> {
+  const jitterSalt = await AvaMapClient.getJitterSalt({ mapId: avaMap.id });
+  if (jitterSalt === undefined) {
+    throw new MapSnapshotPublishError({
+      reason: "cannotEditMap",
+      mapId: avaMap.id,
+      mapName: avaMap.name,
+      layerNames: [],
+    });
+  }
+  return jitterSalt;
+}
+
+/**
  * The query context the GIS app builds for a map at its saved view: the zoom
  * band and simplification latitude come from the saved camera, and jittered
- * points are keyed by the map row's own salt.
+ * points are keyed by the map's own salt.
  */
 function _createQueryContext(
-  options: Readonly<{ avaMap: AvaMap.T; inputs: MapQueryInputs }>,
+  options: Readonly<{
+    avaMap: AvaMap.T;
+    inputs: MapQueryInputs;
+    jitterSalt: string;
+  }>,
 ): MapSnapshotQueryContext {
   const { config, datasets, datasetColumns } = options.inputs;
   return {
@@ -154,7 +176,7 @@ function _createQueryContext(
     simplificationReferenceLatitude: config.view.center[1],
     datasets,
     datasetColumns,
-    jitterSalt: options.avaMap.jitterSalt,
+    jitterSalt: options.jitterSalt,
   };
 }
 
@@ -165,7 +187,8 @@ function _createQueryContext(
  * publish never goes out with a map silently left behind.
  *
  * @throws MapSnapshotPublishError when a saved filter no longer matches the
- * map's data, so the snapshot would show rows the author filtered out.
+ * map's data, so the snapshot would show rows the author filtered out, or
+ * when the publisher cannot edit the map and so cannot read its salt.
  */
 export async function createMapSnapshotFromMapId(
   options: Readonly<{ mapId: AvaMap.Id; workspaceId: Workspace.Id }>,
@@ -176,13 +199,14 @@ export async function createMapSnapshotFromMapId(
       `Cannot publish: map ${options.mapId} is unavailable or outside this workspace.`,
     );
   }
+  const jitterSalt = await _getJitterSaltForPublish(avaMap);
   const inputs = await _loadMapQueryInputs(avaMap);
   await _assertSpatialAvailable(inputs.config);
   return await compileMapSnapshot({
     mapId: avaMap.id,
     mapName: avaMap.name,
     mapConfig: inputs.config,
-    queryContext: _createQueryContext({ avaMap, inputs }),
+    queryContext: _createQueryContext({ avaMap, inputs, jitterSalt }),
     placesDatasetIds: inputs.placesDatasetIds,
   });
 }

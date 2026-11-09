@@ -4126,6 +4126,11 @@ msgstr "Cada punto se desplaza la misma cantidad cada vez que se abre este "
 "mapa, por lo que un lector no puede promediar varias vistas para "
 "recuperar la ubicación real."
 
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
+msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
+"editor of the map to publish this dashboard."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
 msgstr "Enlace al registro de origen"

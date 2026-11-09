@@ -47,12 +47,16 @@ export function useMapDatasetAccess(avaMap: AvaMap.T): MapDatasetAccess {
 }
 
 /**
- * Hydrates and renders a live map exactly like the GIS app, keyed by the
- * map's own displacement salt, but keeps derived legends and camera moves in
+ * Hydrates and renders a live map exactly like the GIS app, keyed by
+ * `jitterSalt`, but keeps derived legends and camera moves in
  * memory: a viewer never writes to the map.
  */
 export function useLiveMapViewerState(
-  options: Readonly<{ avaMap: AvaMap.T; camera: MapViewerCamera }>,
+  options: Readonly<{
+    avaMap: AvaMap.T;
+    jitterSalt: string;
+    camera: MapViewerCamera;
+  }>,
 ): LiveMapViewerState {
   const { avaMap, camera } = options;
   useRequestSpatialExtension();
@@ -68,7 +72,7 @@ export function useLiveMapViewerState(
     mapConfig: hydration.config,
     workspaceId: avaMap.workspaceId,
     view: currentView,
-    jitterSalt: avaMap.jitterSalt,
+    jitterSalt: options.jitterSalt,
   });
   const config = useMemo(() => {
     return PersistedLayerLegends.withLegendUpdates({
