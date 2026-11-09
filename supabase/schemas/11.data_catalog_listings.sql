@@ -183,6 +183,27 @@ create table public.data_catalog_listings (
   -- stored twice. Keeps the rest so a later column can be filled from it
   -- without re-crawling. As of the last write that changed another column.
   additional_source_metadata jsonb,
+  -- Other listings in the same drive that are usually added with this one,
+  -- such as the list of country codes a column holds. Each member is
+  -- `{kind, externalDatasetId, apiResourceId, joinOn}` and names its
+  -- listing by the API key `data_catalog_listings__api_resource_unique`
+  -- covers, together with this listing's `api_service` and `api_base_url`,
+  -- because a member may be written before or after this listing is.
+  -- `rpc_data_catalog_listings__get_companions` resolves them.
+  companion_listings jsonb not null default '[]'::jsonb,
+  -- How to read a token that changes when this listing's source changes:
+  -- `{url, token}`, where `token` is `{kind: "json-paths", paths}` or
+  -- `{kind: "body-sha256"}`. Written by the pipeline, so the `open-data`
+  -- edge function and the Parquet copy builder check any API's freshness
+  -- with no code of their own for it. Null for a listing whose service has
+  -- a built-in check.
+  api_freshness_probe jsonb,
+  -- When the `open-data` edge function last read this listing's freshness
+  -- token, so it reads the source at most once per recheck window however
+  -- many workspaces ask.
+  parquet_cache_checked_at timestamptz,
+  -- The token that read returned.
+  parquet_cache_checked_source_version text,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -266,6 +287,17 @@ create table public.data_catalog_listings (
       parquet_cache_build_id is null and
       parquet_cache_failure_code is not null
     )
+  ),
+  -- A freshness check records when it ran and what it read, together.
+  constraint data_catalog_listings__parquet_cache_check_complete check (
+    (parquet_cache_checked_at is null) = (parquet_cache_checked_source_version is null)
+  ),
+  constraint data_catalog_listings__companion_listings_is_array check (
+    jsonb_typeof(companion_listings) = 'array'
+  ),
+  constraint data_catalog_listings__api_freshness_probe_is_object check (
+    api_freshness_probe is null or
+    jsonb_typeof(api_freshness_probe) = 'object'
   ),
   -- An invalid listing says why, and a valid one carries no reason.
   constraint data_catalog_listings__invalid_reason_complete check (

@@ -150,7 +150,9 @@ begin
       domains,
       tags,
       additional_source_metadata,
-      drive_id
+      drive_id,
+      companion_listings,
+      api_freshness_probe
     ) values (
       coalesce(v_input.id, gen_random_uuid()),
       v_input.access_kind,
@@ -189,7 +191,9 @@ begin
       v_input.domains,
       v_input.tags,
       v_input.additional_source_metadata,
-      v_input.drive_id
+      v_input.drive_id,
+      coalesce(v_input.companion_listings, '[]'::jsonb),
+      v_input.api_freshness_probe
     )
     on conflict (id) do update set
       access_kind = excluded.access_kind,
@@ -228,7 +232,9 @@ begin
       domains = excluded.domains,
       tags = excluded.tags,
       additional_source_metadata = excluded.additional_source_metadata,
-      drive_id = excluded.drive_id
+      drive_id = excluded.drive_id,
+      companion_listings = excluded.companion_listings,
+      api_freshness_probe = excluded.api_freshness_probe
     returning id into v_listing_id;
 
     v_written_ids := v_written_ids || v_listing_id;

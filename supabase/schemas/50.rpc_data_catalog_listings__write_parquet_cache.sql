@@ -2,7 +2,9 @@
  * Records a finished build's Parquet copy on its catalog listing, and marks
  * the listing ready. Applies only while `p_build_id` is still the listing's
  * running build, so a build that was given up as lost cannot overwrite the
- * build that replaced it.
+ * build that replaced it. The build read the source's freshness token, so
+ * that read also becomes the listing's latest freshness check: an older
+ * check would otherwise call the new copy stale and start another build.
  *
  * @param p_catalog_listing_id The listing.
  * @param p_build_id The build's id, from
@@ -69,7 +71,9 @@ begin
     parquet_cache_source_version = p_source_version,
     parquet_cache_built_at = now(),
     parquet_cache_row_count = p_row_count,
-    parquet_cache_byte_size = p_byte_size
+    parquet_cache_byte_size = p_byte_size,
+    parquet_cache_checked_at = now(),
+    parquet_cache_checked_source_version = p_source_version
   where listing.id = p_catalog_listing_id;
 
   return query select

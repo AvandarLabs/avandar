@@ -5,6 +5,7 @@
  * `api_base_url` selects the instance. Socrata is a second such protocol:
  * many open-data portals (data.cdc.gov among them) run Socrata instead of
  * CKAN, and the same reasoning applies, one client per protocol,
- * `api_base_url` per instance.
+ * `api_base_url` per instance. OData is a third: WHO's Global Health
+ * Observatory serves each indicator as an OData entity set.
  */
-create type public.data_catalog_listings__api_service as enum('ckan', 'socrata');
+create type public.data_catalog_listings__api_service as enum('ckan', 'socrata', 'odata');
