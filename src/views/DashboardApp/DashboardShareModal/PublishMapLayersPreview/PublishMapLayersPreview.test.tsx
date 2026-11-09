@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { render, screen } from "@/test-utils";
+import { render, screen, waitFor } from "@/test-utils";
 import { PublishMapLayersPreview } from "@/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -55,11 +55,15 @@ function _makeSnapshot(): MapSnapshot {
   };
 }
 
-function _renderPreview(dashboard: Dashboard.T): void {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  render(
+function _createQueryClient(): QueryClient {
+  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
+}
+
+function _renderPreview(
+  dashboard: Dashboard.T,
+  queryClient: QueryClient = _createQueryClient(),
+): ReturnType<typeof render> {
+  return render(
     <QueryClientProvider client={queryClient}>
       <PublishMapLayersPreview dashboard={dashboard} />
     </QueryClientProvider>,
@@ -87,5 +91,22 @@ describe("PublishMapLayersPreview", () => {
 
     expect(screen.queryByText("Maps")).toBeNull();
     expect(prepareMapSnapshotsMock).not.toHaveBeenCalled();
+  });
+
+  it("compiles the maps again each time the preview opens", async () => {
+    prepareMapSnapshotsMock.mockResolvedValue([_makeSnapshot()]);
+    const queryClient = _createQueryClient();
+    const dashboard = _makeDashboard([
+      { type: "Map", props: { id: "Map-1", mapId: MAP_ID } },
+    ]);
+
+    const firstPreview = _renderPreview(dashboard, queryClient);
+    expect(await screen.findByText("Schools: 1 feature")).toBeInTheDocument();
+    firstPreview.unmount();
+    _renderPreview(dashboard, queryClient);
+
+    await waitFor(() => {
+      expect(prepareMapSnapshotsMock).toHaveBeenCalledTimes(2);
+    });
   });
 });

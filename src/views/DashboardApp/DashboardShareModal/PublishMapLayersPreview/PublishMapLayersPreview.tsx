@@ -29,7 +29,10 @@ export function PublishMapLayersPreview({
       return await prepareMapSnapshots({ dashboard, visibility: "public" });
     },
     enabled: mapIds.length > 0,
-    staleTime: Infinity,
+    // Each opening recompiles, so the preview matches what publishing
+    // compiles even when a map's layers or data changed since last time.
+    refetchOnMount: "always",
+    gcTime: 0,
   });
   if (mapIds.length === 0) {
     return null;
