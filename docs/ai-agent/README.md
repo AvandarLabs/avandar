@@ -11,6 +11,7 @@ before it merges to `demo/measles`, and later `develop`.
 | [decisions.md](decisions.md) | Every decision made (D01 to D42), with alternatives and costs. |
 | [roadmap.md](roadmap.md) | The approved plan to the full Avandar agent (D33), offline work, and what must happen before `develop`. |
 | [eval.md](eval.md) | The eval: results, model sweeps (online and offline), the method in detail (data checksums, graders, metrics, versions), and the command behind every number. |
+| [HANDOFF.md](HANDOFF.md) | Temporary: how a new session picks up Phase 1B (merge, then 1C). Deleted with the merge into `demo/measles`. |
 | [eval-runs/](eval-runs/README.md) | Every eval run with all of its answers, for checking any number. |
 | [spike-findings.md](spike-findings.md) | Bundle size, Deno, prompt caching, the chat UI integration, and the browser run. |
 
