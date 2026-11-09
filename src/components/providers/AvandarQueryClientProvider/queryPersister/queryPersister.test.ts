@@ -79,6 +79,21 @@ describe("makeCacheBuster", () => {
     expect(restoredData).toBeUndefined();
   });
 
+  it("discards a catalog preview saved when date columns were a Set", async () => {
+    const restoredData = await _restorePersistedQueryData({
+      cacheSchemaVersion: "v10",
+      queryKey: ["data-catalog-listing-preview", { id: "borough-boundaries" }],
+      data: {
+        columnNames: ["boro_name"],
+        // JSON.stringify(new Set()) is {}. That object has no `.has`, so the
+        // grid crashed when the listing was opened again.
+        dateColumnNames: {},
+        rows: [{ boro_name: "Bronx" }],
+      },
+    });
+    expect(restoredData).toBeUndefined();
+  });
+
   it("discards cached catalog facets from before keywords were counted", async () => {
     const queryKey = [
       "DataCatalogListingClient",

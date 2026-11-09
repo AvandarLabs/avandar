@@ -136,7 +136,7 @@ describe("DataCatalogListingDetail", () => {
       preview: {
         preview: {
           columnNames: ["country"],
-          dateColumnNames: new Set(),
+          dateColumnNames: [],
           rows: Array.from({ length: 200 }, () => {
             return { country: "Chad" };
           }),
@@ -154,6 +154,49 @@ describe("DataCatalogListingDetail", () => {
         "This preview shows only the first 200 rows of the dataset.",
       ),
     ).toBeInTheDocument();
+  });
+
+  it("shows the preview after date column names were saved and read back as JSON", () => {
+    // A Set becomes {} in the persisted query cache. That is what the grid
+    // reads the next time this listing is opened.
+    const storedPreview = JSON.parse(
+      JSON.stringify({
+        columnNames: ["boro_name"],
+        dateColumnNames: new Set<string>(),
+        rows: [{ boro_name: "Bronx" }],
+      }),
+    );
+    _renderDetail({
+      listing: _createListing({ displayName: "Borough boundaries" }),
+      preview: {
+        preview: storedPreview,
+        isLoading: false,
+        isError: false,
+        isAvailable: true,
+      },
+    });
+
+    expect(screen.getByText("Data preview")).toBeInTheDocument();
+    expect(screen.getByText("First 1 rows")).toBeInTheDocument();
+  });
+
+  it("shows the preview when date column names are a list", () => {
+    _renderDetail({
+      listing: _createListing(),
+      preview: {
+        preview: {
+          columnNames: ["boro_name", "report_date"],
+          dateColumnNames: ["report_date"],
+          rows: [{ boro_name: "Bronx", report_date: Date.UTC(2022, 0, 1) }],
+        },
+        isLoading: false,
+        isError: false,
+        isAvailable: true,
+      },
+    });
+
+    expect(screen.getByText("Data preview")).toBeInTheDocument();
+    expect(screen.getByText("First 1 rows")).toBeInTheDocument();
   });
 
   it("leaves the preview out for a listing with no data to read", () => {
