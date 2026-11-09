@@ -283,11 +283,23 @@ test.describe("GIS feature list", () => {
         await _frameRings(page);
         await page.screenshot({ path: `${SCREENSHOT_DIR}/feature-list.png` });
 
-        // Pressing a row shows its feature's fields beside the list.
+        // Pressing a row shows its feature in the list's place, with a way
+        // back to the list.
         await firstRow
-          .getByRole("button", { name: /^Show .+ on the map$/ })
+          .getByRole("button", {
+            name: `Show ${NEAREST_SCHOOL_NAME} on the map`,
+          })
           .click();
-        await expect(page.getByText(NEAREST_SCHOOL_ADDRESS)).toHaveCount(2);
+        const featurePanel = page.getByRole("region", {
+          name: "Feature",
+          exact: true,
+        });
+        await expect(featurePanel).toContainText(NEAREST_SCHOOL_ADDRESS);
+        await expect(featureList).toBeHidden();
+        await featurePanel
+          .getByRole("button", { name: "Back to the feature list" })
+          .click();
+        await expect(firstRow).toContainText(NEAREST_SCHOOL_NAME);
       } finally {
         await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
         for (const datasetId of datasetIds) {
