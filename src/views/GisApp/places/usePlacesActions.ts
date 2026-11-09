@@ -12,7 +12,11 @@ import { VirtualPlacesStore as PlacesStore } from "@/clients/places/VirtualPlace
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@/utils/notifications/notify";
 import { createPlacesLayer } from "@/views/GisApp/places/createPlacesLayer/createPlacesLayer";
 import { refreshPlacesDatasetCaches } from "@/views/GisApp/places/refreshPlacesDatasetCaches/refreshPlacesDatasetCaches";
 import { usePlacesErrorMessage } from "@/views/GisApp/places/usePlacesErrorMessage";
@@ -41,6 +45,16 @@ type SavePlaceVariables = {
   input: PlaceInput;
 };
 
+/**
+ * What one places edit did. `isMapStale` is true when the write succeeded but
+ * dropping the cached copies of the dataset failed, so the map may still show
+ * the old places until it is reloaded.
+ */
+type PlacesEditOutcome = {
+  result: PlaceEditResult["type"];
+  isMapStale: boolean;
+};
+
 type LoadPlaceVariables = {
   target: PlaceFeatureTarget;
   mode: "edit" | "move";
@@ -62,6 +76,27 @@ function _addLayer(app: GisAppState, layer: MapLayer.T): void {
 }
 
 /**
+ * Drops every cached copy of a places dataset after a write. A failure here
+ * is logged and reported as a stale map instead of thrown, because the write
+ * already succeeded and reporting it as failed would invite a retry that
+ * duplicates the place.
+ */
+async function _refreshAfterWrite(
+  target: Readonly<PlacesSession & { datasetId: Dataset.Id }>,
+): Promise<boolean> {
+  try {
+    await refreshPlacesDatasetCaches({
+      ...target,
+      queryClient: AvaQueryClient,
+    });
+    return false;
+  } catch (error) {
+    Logger.error(error, { devMsg: "Refreshing a places dataset failed" });
+    return true;
+  }
+}
+
+/**
  * Reads the rows, applies one edit, and writes them back when it applied.
  * The refresh goes through `AvaQueryClient` because that is the client QETL
  * caches `raw_sql` in (`VirtualDatasetClient.withCache(AvaQueryClient)`), so
@@ -73,7 +108,7 @@ async function _editPlaces(
     datasetId: Dataset.Id;
     edit: (rows: readonly PlaceRow[]) => PlaceEditResult;
   }>,
-): Promise<PlaceEditResult["type"]> {
+): Promise<PlacesEditOutcome> {
   const { session, datasetId } = options;
   const target = {
     workspaceId: session.workspaceId,
@@ -82,11 +117,10 @@ async function _editPlaces(
   };
   const result = options.edit(await PlacesStore.readPlaces(target));
   if (result.type !== "ok") {
-    return result.type;
+    return { result: result.type, isMapStale: false };
   }
   await PlacesStore.writePlaces({ ...target, rows: result.rows });
-  await refreshPlacesDatasetCaches({ ...target, queryClient: AvaQueryClient });
-  return "ok";
+  return { result: "ok", isMapStale: await _refreshAfterWrite(target) };
 }
 
 function _applySave(
@@ -145,10 +179,11 @@ function useCreatePlacesDataset(
 function useSavePlace(
   app: GisAppState,
   session: PlacesSession,
-): UseMutationResultTuple<PlaceEditResult["type"], SavePlaceVariables> {
+): UseMutationResultTuple<PlacesEditOutcome, SavePlaceVariables> {
   const { t } = useLingui();
   const toErrorMessage = usePlacesErrorMessage();
   const maxPlaces = PLACES_MAX_ROWS;
+  const staleMapMessage = t`Place saved. Reload the map to see it.`;
   return useMutation({
     mutationFn: async (variables: SavePlaceVariables) => {
       return await _editPlaces({
@@ -157,14 +192,18 @@ function useSavePlace(
         edit: _applySave(variables),
       });
     },
-    onSuccess: (outcome) => {
-      if (outcome === "ok") {
-        notifySuccess(t`Place saved.`);
+    onSuccess: ({ result, isMapStale }) => {
+      if (result === "ok") {
+        if (isMapStale) {
+          notifyWarning(staleMapMessage);
+        } else {
+          notifySuccess(t`Place saved.`);
+        }
         app.placeToolState.close();
         return;
       }
       notifyError(
-        outcome === "limitReached"
+        result === "limitReached"
           ? t`A places dataset holds at most ${maxPlaces} places.`
           : t`This place no longer exists. Someone may have deleted it.`,
       );
@@ -178,8 +217,9 @@ function useSavePlace(
 
 function useDeletePlace(
   session: PlacesSession,
-): UseMutationResultTuple<PlaceEditResult["type"], PlaceFeatureTarget> {
+): UseMutationResultTuple<PlacesEditOutcome, PlaceFeatureTarget> {
   const { t } = useLingui();
+  const staleMapMessage = t`Place deleted. Reload the map to see the change.`;
   const toErrorMessage = usePlacesErrorMessage();
   return useMutation({
     mutationFn: async (target: PlaceFeatureTarget) => {
@@ -194,9 +234,13 @@ function useDeletePlace(
         },
       });
     },
-    onSuccess: (outcome) => {
+    onSuccess: ({ result, isMapStale }) => {
+      if (result === "ok" && isMapStale) {
+        notifyWarning(staleMapMessage);
+        return;
+      }
       notifySuccess(
-        outcome === "ok"
+        result === "ok"
           ? t`Place deleted.`
           : t`This place was already deleted.`,
       );

@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => {
     refreshPlacesDatasetCaches: vi.fn(),
     notifyError: vi.fn(),
     notifySuccess: vi.fn(),
+    notifyWarning: vi.fn(),
   };
 });
 
@@ -51,6 +52,7 @@ vi.mock("@/utils/notifications/notify", () => {
   return {
     notifyError: mocks.notifyError,
     notifySuccess: mocks.notifySuccess,
+    notifyWarning: mocks.notifyWarning,
   };
 });
 
@@ -89,7 +91,9 @@ function _createApp(): GisAppState {
  * Mounts the hook under a query client that is NOT `AvaQueryClient`, so a
  * test can tell which client the cache refresh received.
  */
-function _renderActions(): { current: ReturnType<typeof usePlacesActions> } {
+function _renderActions(app: GisAppState = _createApp()): {
+  current: ReturnType<typeof usePlacesActions>;
+} {
   const providerClient = new QueryClient();
   function Wrapper({ children }: { children: ReactNode }): JSX.Element {
     return (
@@ -103,7 +107,7 @@ function _renderActions(): { current: ReturnType<typeof usePlacesActions> } {
   return renderHook(
     () => {
       return usePlacesActions({
-        app: _createApp(),
+        app,
         datasets: [],
         datasetColumns: [],
         placesDatasetIds: new Set([DATASET_ID]),
@@ -203,5 +207,38 @@ describe("usePlacesActions", () => {
         "Could not save the place.",
       );
     });
+  });
+
+  it("reports a save as done when only the map refresh fails", async () => {
+    mocks.refreshPlacesDatasetCaches.mockRejectedValue(new Error("stale"));
+    const app = _createApp();
+    const result = _renderActions(app);
+    act(() => {
+      result.current.savePlace(PLACE_INPUT);
+    });
+    await waitFor(() => {
+      expect(mocks.notifyWarning).toHaveBeenCalledOnce();
+    });
+    expect(mocks.writePlaces).toHaveBeenCalledOnce();
+    expect(app.placeToolState.close).toHaveBeenCalledOnce();
+    expect(mocks.notifyError).not.toHaveBeenCalled();
+  });
+
+  it("reports a delete as done when only the map refresh fails", async () => {
+    mocks.readPlaces.mockResolvedValue([
+      { ...PLACE_INPUT, placeId: "place-1" },
+    ] satisfies PlaceRow[]);
+    mocks.refreshPlacesDatasetCaches.mockRejectedValue(new Error("stale"));
+    const result = _renderActions();
+    act(() => {
+      _getFeatureActions(result).onDelete({
+        datasetId: DATASET_ID,
+        placeId: "place-1",
+      });
+    });
+    await waitFor(() => {
+      expect(mocks.notifyWarning).toHaveBeenCalledOnce();
+    });
+    expect(mocks.notifyError).not.toHaveBeenCalled();
   });
 });
