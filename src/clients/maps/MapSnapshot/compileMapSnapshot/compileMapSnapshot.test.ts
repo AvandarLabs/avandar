@@ -211,14 +211,25 @@ describe("compileMapSnapshot sensitivity", () => {
   });
 
   it("refuses to publish a point from an aggregate-only layer", async () => {
+    // `MapLayer.withSensitivity` would unbind a point layer made
+    // aggregate-only, so the policy is set directly: this is the stale or
+    // hand-edited config the publish-time check exists to stop.
+    const layer = {
+      ...createGeometryLayer({
+        family: "point",
+        sensitivity: { mode: "exact" },
+      }),
+      sensitivity: AGGREGATE_ONLY,
+    } as MapLayer.T;
     _mockDuckDb({
       features: [
-        createFeature(UNIT_CELL),
         createFeature({ type: "Point", coordinates: [...SCHOOL_POSITION] }),
       ],
     });
 
-    await expect(_compile([_createGridBinOfPoints()])).rejects.toThrow();
+    await expect(_compile([layer])).rejects.toBeInstanceOf(
+      SensitivityViolationError,
+    );
   });
 });
 
@@ -499,5 +510,104 @@ describe("compileMapSnapshot displacement salt", () => {
     const snapshot = await _compile([createSchoolLayer(JITTER)]);
 
     expect(MapSnapshotJson.toJson(snapshot)).not.toContain(MAP_SALT);
+  });
+});
+
+describe("compileMapSnapshot public config", () => {
+  beforeEach(() => {
+    runQueryMock.mockReset();
+  });
+
+  it("keeps only the layers it published", async () => {
+    const filterLayer = createGeometryLayer({
+      family: "polygon",
+      sensitivity: { mode: "exact" },
+    });
+    const schools: MapLayer.T = {
+      ...createGeometryLayer({
+        family: "point",
+        sensitivity: { mode: "exact" },
+      }),
+      spatialFilter: { layerId: filterLayer.id },
+    };
+    _mockDuckDb({
+      features: [
+        createFeature({ type: "Point", coordinates: [...SCHOOL_POSITION] }),
+      ],
+    });
+
+    const snapshot = await _compile([
+      { ...filterLayer, isVisible: false },
+      schools,
+      MapLayer.makeEmpty("Draft"),
+    ]);
+
+    expect(
+      snapshot.config.layers.map((layer) => {
+        return layer.id;
+      }),
+    ).toEqual([schools.id]);
+  });
+
+  it("publishes query columns without their dataset column metadata", async () => {
+    _mockDuckDb({ rows: [SCHOOL_ROW] });
+    const layer = createSchoolLayer({ mode: "exact" });
+    const nameColumn = layer.source.queryColumns.at(-1)!;
+    const baseColumn = nameColumn.baseColumn;
+    if (baseColumn.__type !== "DatasetColumn") {
+      throw new Error("The school fixture reads a dataset column");
+    }
+
+    const snapshot = await _compile([layer]);
+    const publishedJson = MapSnapshotJson.toJson(snapshot);
+
+    [
+      baseColumn.datasetId,
+      baseColumn.workspaceId,
+      baseColumn.id,
+      "originalName",
+      "description",
+      "datasetId",
+      "workspaceId",
+    ].forEach((secret) => {
+      expect(publishedJson).not.toContain(secret);
+    });
+  });
+
+  it("keeps every name the renderer resolves through query columns", async () => {
+    _mockDuckDb({ rows: [SCHOOL_ROW] });
+    const layer = createSchoolLayer({ mode: "exact" });
+
+    const snapshot = await _compile([layer]);
+    const publicLayer = MapSnapshotJson.fromJson(
+      MapSnapshotJson.toJson(snapshot),
+    ).config.layers[0]!;
+
+    expect(
+      publicLayer.source.queryColumns.map((column) => {
+        return column.id;
+      }),
+    ).toEqual(
+      layer.source.queryColumns.map((column) => {
+        return column.id;
+      }),
+    );
+    expect(MapLayer.toPopupColumnNames(publicLayer)).toEqual(
+      MapLayer.toPopupColumnNames(layer),
+    );
+    expect(MapLayer.toGeoBinding(publicLayer)).toEqual(
+      MapLayer.toGeoBinding(layer),
+    );
+  });
+
+  it("publishes a displaced layer's mode but not its radius", async () => {
+    _mockDuckDb({ rows: [SCHOOL_ROW] });
+
+    const snapshot = await _compile([createSchoolLayer(JITTER)]);
+
+    expect(snapshot.config.layers[0]!.sensitivity).toEqual({
+      mode: "jitter",
+      radiusMeters: 0,
+    });
   });
 });

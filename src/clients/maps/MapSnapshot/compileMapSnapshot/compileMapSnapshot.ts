@@ -168,7 +168,8 @@ async function _compileVisibleLayers(
  * popup set to all fields behave as they do live) and the map's saved area
  * of interest and time range. Its sensitivity policy is checked again, its
  * properties are cut to its popup, its legend is baked in, and the config
- * loses its source queries.
+ * keeps only the published layers, without their source queries, dataset
+ * column metadata, or displacement radius.
  *
  * Displaced points are keyed by `queryContext.jitterSalt`, the map's secret
  * salt. It is read but never written into the snapshot.
@@ -196,7 +197,14 @@ export async function compileMapSnapshot(
     version: 1,
     mapId: options.mapId,
     mapName: options.mapName,
-    config: createPublicMapConfigFromMapConfig(configWithLegends),
+    config: createPublicMapConfigFromMapConfig({
+      config: configWithLegends,
+      publishedLayerIds: new Set(
+        compiledLayers.map((compiled) => {
+          return compiled.snapshotLayer.layerId;
+        }),
+      ),
+    }),
     layers: compiledLayers.map(prop("snapshotLayer")),
   };
 }
