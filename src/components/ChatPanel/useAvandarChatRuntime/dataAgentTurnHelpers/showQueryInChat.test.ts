@@ -96,6 +96,37 @@ describe("showQueryInChat", () => {
     expect(outcome).toMatchObject({ previewRows: [["Ohio"], ["Utah"]] });
   });
 
+  it("names the result by its summary when the question is blank", async () => {
+    _mockRun([{ state: "Ohio" }]);
+    const results: AgentQueryResultData[] = [];
+
+    await showQueryInChat({
+      workspaceId: WORKSPACE_ID,
+      title: "  ",
+      results,
+      request: { sql: "SELECT 1", summary: " Cases by state " },
+    });
+
+    expect(results).toEqual([
+      expect.objectContaining({ title: "Cases by state" }),
+    ]);
+  });
+
+  it("adds no result when the question and summary are both blank", async () => {
+    _mockRun([{ state: "Ohio" }]);
+    const results: AgentQueryResultData[] = [];
+
+    const outcome = await showQueryInChat({
+      workspaceId: WORKSPACE_ID,
+      title: "",
+      results,
+      request: { sql: "SELECT 1", summary: " " },
+    });
+
+    expect(outcome.kind).toBe("rows");
+    expect(results).toEqual([]);
+  });
+
   it("reports a failed query with its message", async () => {
     runQueryMock.mockRejectedValue(
       new Error('Binder Error: column "x" not found'),

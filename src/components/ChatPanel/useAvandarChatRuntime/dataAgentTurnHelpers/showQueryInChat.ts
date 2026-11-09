@@ -52,10 +52,11 @@ function _toQueryOutcome(
 /**
  * Runs the agent's query for a page other than the Data Explorer: through
  * the workspace query session (the fail-closed analyzer, then DuckDB-Wasm),
- * adding a chat result when it has rows. The agent gets the result's shape,
- * plus its first rows only when the request asks for `previewRowCount` of
- * them. A result whose cells are all empty counts as empty, as in the
- * explorer.
+ * adding a chat result when it has rows and a title (the question, or the
+ * query's summary when the question is blank). The agent gets the result's
+ * shape, plus its first rows only when the request asks for
+ * `previewRowCount` of them. A result whose cells are all empty counts as
+ * empty, as in the explorer.
  */
 export async function showQueryInChat(
   options: Readonly<{
@@ -72,12 +73,15 @@ export async function showQueryInChat(
       workspaceId: options.workspaceId,
     });
     const isEmpty = result.numRows === 0 || _isAllBlank(result.data);
-    if (!isEmpty) {
+    // A stored result needs a title to be shown, so a blank question falls
+    // back to the agent's summary of the query.
+    const title = options.title.trim() || request.summary.trim();
+    if (!isEmpty && title) {
       options.results.push(
         AgentQueryResult.create({
           sql: request.sql,
           chart: request.chart,
-          title: options.title,
+          title,
         }),
       );
     }
