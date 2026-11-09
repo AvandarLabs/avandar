@@ -244,7 +244,7 @@ export function createEmptyVersion5Json() {
     layers: config.layers,
     annotations: config.annotations,
     annotationsZIndex: config.annotationsZIndex,
-    exportLayout: config.exportLayout,
+    exportLayout: omitFeatureListField(config.exportLayout),
   };
 }
 
@@ -401,6 +401,49 @@ export function createVersion6BufferJson() {
     layers: [omitSpatialFilterField(source), omitSpatialFilterField(buffer)],
     annotations: config.annotations,
     annotationsZIndex: 0,
-    exportLayout: config.exportLayout,
+    exportLayout: omitFeatureListField(config.exportLayout),
   };
+}
+
+/**
+ * Export furniture as versions 5 to 7 persist it: today's layout without the
+ * `featureList` key, which their strict schemas reject.
+ */
+export function omitFeatureListField(exportLayout: AvaMapConfig.ExportLayout) {
+  const { featureList: _featureList, ...olderExportLayout } = exportLayout;
+  return olderExportLayout;
+}
+
+/** A version 7 config: today's empty map with version 7 export furniture. */
+export function createEmptyVersion7Json() {
+  const config = AvaMapConfig.makeEmpty();
+  return {
+    ...config,
+    version: 7,
+    exportLayout: omitFeatureListField(config.exportLayout),
+  } as const;
+}
+
+/** A version 8 config whose export prints a one-layer feature list. */
+export function createVersion8FeatureListJson(
+  options: Readonly<{ maxRows?: number; hasSort?: boolean }> = {},
+) {
+  const layer = MapLayer.makeEmpty("Schools");
+  const columnId = uuid<QueryColumn.Id>();
+  return {
+    ...AvaMapConfig.makeEmpty(),
+    layers: [layer],
+    exportLayout: {
+      ...AvaMapConfig.defaultExportLayout,
+      featureList: {
+        layerId: layer.id,
+        columnIds: [columnId],
+        sort:
+          options.hasSort === false
+            ? undefined
+            : { columnId, direction: "desc" },
+        maxRows: options.maxRows ?? 200,
+      },
+    },
+  } as const;
 }

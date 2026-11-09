@@ -6,6 +6,7 @@ import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigS
 import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts";
 import { AvaMapConfigV6Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV6Schema.ts";
 import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
+import { AvaMapConfigV8Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV8Schema.ts";
 import { migrateAvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/migrateAvaMapConfig.ts";
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle.ts";
 import { hasSpatialFilterCycle } from "$/models/AvaMap/AvaMapConfig/hasSpatialFilterCycle/hasSpatialFilterCycle.ts";
@@ -41,11 +42,15 @@ function _assertSpatialFilterInvariants(layers: readonly MapLayer.T[]): void {
 function _parseCurrentConfig(json: unknown): AvaMapConfigRead {
   // The cast bridges `PopupConfig.action`, a required `| undefined` field on
   // `MapLayer.T` that `PopupSchema` still infers as an optional key.
-  const parsed = AvaMapConfigV7Schema.parse(json) as AvaMapConfigRead;
+  const parsed = AvaMapConfigV8Schema.parse(json) as AvaMapConfigRead;
   return {
     ...parsed,
     aoi: parsed.aoi,
     timeRange: parsed.timeRange,
+    exportLayout: {
+      ...parsed.exportLayout,
+      featureList: parsed.exportLayout.featureList,
+    },
   };
 }
 
@@ -75,13 +80,16 @@ function _parseAnyVersion(json: unknown): AvaMapConfigRead {
   if (version === 6) {
     return migrateAvaMapConfig.fromV6(AvaMapConfigV6Schema.parse(json));
   }
+  if (version === 7) {
+    return migrateAvaMapConfig.fromV7(AvaMapConfigV7Schema.parse(json));
+  }
   return _parseCurrentConfig(json);
 }
 
 /** Reads and writes the persisted JSON representation of a map config. */
 export const AvaMapConfigSchema = {
   /** The Zod schema used to validate current persisted map configuration. */
-  schema: AvaMapConfigV7Schema,
+  schema: AvaMapConfigV8Schema,
 
   /**
    * Validates and migrates a raw JSON value to the current config shape. The
@@ -98,6 +106,6 @@ export const AvaMapConfigSchema = {
 
   /** Serializes a current map config into plain JSON for persistence. */
   toJson: (config: AvaMapConfigRead): Json => {
-    return JSON.parse(JSON.stringify(AvaMapConfigV7Schema.parse(config)));
+    return JSON.parse(JSON.stringify(AvaMapConfigV8Schema.parse(config)));
   },
 };

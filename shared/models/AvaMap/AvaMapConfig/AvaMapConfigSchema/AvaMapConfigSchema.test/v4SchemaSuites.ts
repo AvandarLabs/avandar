@@ -17,7 +17,7 @@ import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSch
 describe("AvaMapConfigSchema v4 overlays", () => {
   it("migrates a version 3 config to version 4 without changing wave c layers", () => {
     const parsed = AvaMapConfigSchema.fromJson(createVersion3Json());
-    expect(parsed.version).toBe(7);
+    expect(parsed.version).toBe(8);
     expect(parsed.aoi).toBeUndefined();
     expect(parsed.timeRange).toBeUndefined();
     expect(parsed.annotations.features).toEqual([]);

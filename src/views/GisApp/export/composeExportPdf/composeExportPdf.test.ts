@@ -93,6 +93,7 @@ function _options(
       scaleBar: true,
       sourceLine: "",
       disclaimer: undefined,
+      featureList: undefined,
     },
     text: {
       title: overrides.title ?? "Cholera response",

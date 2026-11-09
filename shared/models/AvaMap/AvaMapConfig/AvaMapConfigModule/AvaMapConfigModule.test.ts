@@ -6,15 +6,15 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 describe("AvaMapConfig.makeEmpty", () => {
   it("starts with no layers and the avandar basemap", () => {
     const mapConfig = AvaMapConfig.makeEmpty();
-    expect(mapConfig.version).toBe(7);
+    expect(mapConfig.version).toBe(8);
     expect(mapConfig.layers).toEqual([]);
     expect(mapConfig.basemap).toEqual({ type: "builtIn", style: "avandar" });
     expect(mapConfig.view).toEqual(AvaMapConfig.defaultViewState);
   });
 
-  it("starts version 7 maps with no overlay and annotations on top", () => {
+  it("starts version 8 maps with no overlay and annotations on top", () => {
     const config = AvaMapConfig.makeEmpty();
-    expect(config.version).toBe(7);
+    expect(config.version).toBe(8);
     expect(config.aoi).toBeUndefined();
     expect(config.timeRange).toBeUndefined();
     expect(config.annotations).toEqual({ isVisible: true, features: [] });
