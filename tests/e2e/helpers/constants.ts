@@ -53,6 +53,21 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
 /**
+ * Seven patient visits with a date and a temperature, for a per-month case
+ * type field. See the README beside it.
+ */
+export const CASE_BUCKETED_VISITS_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/case-bucketed-visits/case-bucketed-visits.csv",
+);
+
+/**
+ * Row count reported after DuckDB parses
+ * {@link CASE_BUCKETED_VISITS_CSV_PATH}.
+ */
+export const CASE_BUCKETED_VISITS_CSV_EXPECTED_ROW_COUNT = 7;
+
+/**
  * Real 10-page tagged PDF (see `public/test-data/pdf/README.md` for its
  * provenance and licence). Well under the 50-page import cap, so its page
  * geometry sniff finishes quickly.
