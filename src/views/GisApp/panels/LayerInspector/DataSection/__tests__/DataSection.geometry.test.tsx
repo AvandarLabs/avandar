@@ -25,7 +25,10 @@ describe("DataSection geometry", () => {
     const onLayerChange = vi.fn();
 
     render(
-      <DataSection layer={createGeometryLayer()} onLayerChange={onLayerChange} />,
+      <DataSection
+        layer={createGeometryLayer()}
+        onLayerChange={onLayerChange}
+      />,
     );
 
     await waitFor(() => {

@@ -1273,7 +1273,7 @@ msgstr "公開發布"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Choose a column"
-msgstr ""
+msgstr "選擇欄位"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -2719,7 +2719,7 @@ msgstr "內文"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Add a dataset"
-msgstr ""
+msgstr "新增資料集"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -3680,11 +3680,11 @@ msgstr "檢閱相符項目"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Dataset {datasetName}"
-msgstr ""
+msgstr "資料集 {datasetName}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset"
-msgstr ""
+msgstr "選擇資料集"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
@@ -4436,7 +4436,7 @@ msgstr "依原樣保留測量值"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
-msgstr ""
+msgstr "新增欄位"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -6366,7 +6366,7 @@ msgstr "告訴我們 {singularConceptName} 數據應該來自哪裡..."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset to join"
-msgstr ""
+msgstr "選擇要聯結的資料集"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -7450,7 +7450,7 @@ msgstr "資料集名稱必須至少 2 個字元。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "No datasets"
-msgstr ""
+msgstr "沒有資料集"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
@@ -10537,7 +10537,7 @@ msgstr "{0, plural, one {# 個已儲存的資料庫可用} other {# 個已儲存
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field from {datasetName}"
-msgstr ""
+msgstr "從 {datasetName} 新增欄位"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"

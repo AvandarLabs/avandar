@@ -645,14 +645,9 @@ describe("ClassificationEditor", () => {
     if (schools.symbology.type !== "circle") {
       throw new Error("Expected a circle layer");
     }
-    const { sensitivity, geoBinding, ...schoolsRest } = schools;
-    if (sensitivity.mode === "aggregateOnly") {
-      throw new Error("Expected a point-level sensitivity");
-    }
     const layer: MapLayer.T = {
-      ...schoolsRest,
-      sensitivity,
-      geoBinding,
+      ...schools,
+      sensitivity: { mode: "exact" },
       symbology: {
         ...schools.symbology,
         color: {

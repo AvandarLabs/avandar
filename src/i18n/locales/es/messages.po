@@ -1325,7 +1325,7 @@ msgstr "Publicar públicamente"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Choose a column"
-msgstr ""
+msgstr "Elija una columna"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -2832,7 +2832,7 @@ msgstr "Cuerpo"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Add a dataset"
-msgstr ""
+msgstr "Agregar un conjunto de datos"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -3836,11 +3836,11 @@ msgstr "Revisar coincidencias"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Dataset {datasetName}"
-msgstr ""
+msgstr "Conjunto de datos {datasetName}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset"
-msgstr ""
+msgstr "Elija un conjunto de datos"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
@@ -4627,7 +4627,7 @@ msgstr "Conservar las mediciones tal como se encontraron"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
-msgstr ""
+msgstr "Agregar un campo"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -6626,7 +6626,7 @@ msgstr "Cuéntanos de dónde debería provenir la información de "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset to join"
-msgstr ""
+msgstr "Elija un conjunto de datos para combinar"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -7742,7 +7742,7 @@ msgstr "El nombre del conjunto de datos debe tener al menos 2 caracteres."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "No datasets"
-msgstr ""
+msgstr "No hay conjuntos de datos"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
@@ -10963,7 +10963,7 @@ msgstr "{0, plural, one {# base de datos guardada disponible} other {# bases de 
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field from {datasetName}"
-msgstr ""
+msgstr "Agregar un campo de {datasetName}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"

@@ -167,10 +167,7 @@ describe("SingleIndividualView", () => {
     // jsdom does not apply CSS module rules, so the scroll contract is the
     // classes those rules live on. The band is the fixed-height scroller.
     // The activity pane is the other scroller.
-    const { detailsBand, activityPane: activityPaneClass } = css;
-    expect(detailsBand).toBeDefined();
-    expect(activityPaneClass).toBeDefined();
-    expect(detailsPane).toHaveClass(detailsBand ?? "");
-    expect(activityPane).toHaveClass(activityPaneClass ?? "");
+    expect(detailsPane).toHaveClass(css.detailsBand!);
+    expect(activityPane).toHaveClass(css.activityPane!);
   });
 });
