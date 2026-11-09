@@ -70,6 +70,7 @@ describe("AvaMapParsers", () => {
       id: "00000000-0000-4000-8000-000000000001",
       is_public: false,
       is_restricted: true,
+      jitter_salt: "00000000-0000-4000-8000-000000000005",
       name: "Goma cases",
       owner_id: "00000000-0000-4000-8000-000000000002",
       owner_profile_id: "00000000-0000-4000-8000-000000000003",
@@ -87,9 +88,35 @@ describe("AvaMapParsers", () => {
     expect(model).toMatchObject({
       __type: "AvaMap",
       description: undefined,
+      jitterSalt: "00000000-0000-4000-8000-000000000005",
       slug: undefined,
     });
     expect(model.config).toEqual(config);
     expect(model.config.__type).toBe("AvaMapConfig");
+  });
+
+  it("keeps the jitter salt out of the map config", () => {
+    const config = _makePopulatedConfig();
+    const salt = "00000000-0000-4000-8000-000000000005";
+    const model = AvaMapParsers.fromDBReadToModelRead({
+      config: AvaMapConfigSchema.toJson(config),
+      created_at: "2026-08-14T12:00:00.000Z",
+      description: null,
+      id: "00000000-0000-4000-8000-000000000001",
+      is_public: false,
+      is_restricted: false,
+      jitter_salt: salt,
+      name: "Goma cases",
+      owner_id: "00000000-0000-4000-8000-000000000002",
+      owner_profile_id: "00000000-0000-4000-8000-000000000003",
+      slug: null,
+      updated_at: "2026-08-14T12:30:00.000Z",
+      workspace_id: "00000000-0000-4000-8000-000000000004",
+    });
+
+    expect(model.jitterSalt).toBe(salt);
+    expect(
+      JSON.stringify(AvaMapConfigSchema.toJson(model.config)),
+    ).not.toContain(salt);
   });
 });

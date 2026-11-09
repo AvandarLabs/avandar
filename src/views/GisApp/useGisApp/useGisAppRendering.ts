@@ -77,11 +77,13 @@ export function useGisAppRendering(
       aoi: options.editor.mapConfig.aoi,
       timeRange: options.editor.mapConfig.timeRange,
     },
+    jitterSalt: options.avaMap.jitterSalt,
   });
   const rendering = useAvaMapRender({
     layerQueryStates,
     mapConfig: renderedMapConfig,
     hiddenAnnotationFeatureIds: options.hiddenAnnotationFeatureIds,
+    jitterSalt: options.avaMap.jitterSalt,
   });
   PersistedLayerLegends.usePersistedLayerLegends({
     mapConfig: options.editor.mapConfig,

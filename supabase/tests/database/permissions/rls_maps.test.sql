@@ -249,7 +249,7 @@ values
   )
 on conflict (id) do nothing;
 
-select plan (28);
+select plan (30);
 
 select isnt(
   to_regprocedure('public.maps__auth_user_may_select_grant(uuid,uuid,uuid,boolean)'),
@@ -437,6 +437,36 @@ select throws_ok (
   '42501',
   null,
   'is_public does not make a map anon-readable'
+);
+
+-- 7a. The jitter salt is the key that keeps displaced points from being
+-- reversed, so anonymous callers must not reach it either.
+select throws_ok (
+  $t7a$
+  set local role anon;
+  select m.jitter_salt from public.maps m;
+  $t7a$,
+  '42501',
+  null,
+  'anon cannot select a map jitter salt'
+);
+
+reset role;
+
+-- 7b. Every map gets its own jitter salt, so one leaked salt does not unlock
+-- another map's displaced points.
+select is (
+  (
+    select count(distinct m.jitter_salt)::int
+    from public.maps m
+    where m.id::text like 'e210a%'
+  ),
+  (
+    select count(*)::int
+    from public.maps m
+    where m.id::text like 'e210a%'
+  ),
+  'each map gets a distinct jitter salt'
 );
 
 -- 8. An outsider cannot insert a map claiming this workspace.

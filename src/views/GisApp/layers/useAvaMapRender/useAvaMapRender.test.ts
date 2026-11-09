@@ -112,6 +112,7 @@ describe("useAvaMapRender annotations", () => {
     const layer = _makeBoundFillLayer();
     const { result } = renderHook(() => {
       return useAvaMapRender({
+        jitterSalt: "test-map-salt",
         mapConfig: _makeMapConfig({
           layer,
           annotations: { isVisible: true, features: [_makeTextAnnotation()] },
@@ -135,6 +136,7 @@ describe("useAvaMapRender annotations", () => {
     const layer = _makeBoundFillLayer();
     const { result } = renderHook(() => {
       return useAvaMapRender({
+        jitterSalt: "test-map-salt",
         mapConfig: _makeMapConfig({
           layer,
           annotations: { isVisible: true, features: [_makeTextAnnotation()] },
@@ -155,6 +157,7 @@ describe("useAvaMapRender annotations", () => {
     const layer = _makeBoundFillLayer();
     const { result } = renderHook(() => {
       return useAvaMapRender({
+        jitterSalt: "test-map-salt",
         mapConfig: _makeMapConfig({
           layer,
           annotations: { isVisible: false, features: [_makeTextAnnotation()] },
@@ -190,6 +193,7 @@ describe("useAvaMapRender annotations", () => {
     });
     const { result } = renderHook(() => {
       return useAvaMapRender({
+        jitterSalt: "test-map-salt",
         mapConfig: _makeMapConfig({
           layer,
           annotations: { isVisible: true, features: [_makeTextAnnotation()] },
@@ -245,6 +249,7 @@ describe("useAvaMapRender classified values", () => {
     };
     const { result } = renderHook(() => {
       return useAvaMapRender({
+        jitterSalt: "test-map-salt",
         mapConfig: _makeMapConfig({
           layer,
           annotations: { isVisible: true, features: [] },
@@ -280,6 +285,7 @@ describe("useAvaMapRender snapshot layers", () => {
     };
     const { result } = renderHook(() => {
       return useAvaMapRender({
+        jitterSalt: "test-map-salt",
         mapConfig: {
           ...AvaMapConfig.makeEmpty(),
           layers: [layer],

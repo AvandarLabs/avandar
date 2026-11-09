@@ -9,6 +9,8 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 const METERS_PER_DEGREE_LATITUDE = 111_320;
 const RADIUS_METERS = 500;
+const MAP_SALT = "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b";
+const OTHER_MAP_SALT = "0c5d1f2a-7b3e-4c69-9d8a-2f6e4b1a3c57";
 
 const kinshasa: GeoJSON.Position = [15.2663, -4.4419];
 const goma: GeoJSON.Position = [29.2205, -1.6585];
@@ -85,6 +87,7 @@ describe("displaceSpatialFeatures", () => {
       layer: jitterLayer,
       sourceLayer: jitterLayer,
       featureCollection,
+      jitterSalt: MAP_SALT,
     });
 
     const positions = _getPointPositions(displaced);
@@ -102,12 +105,14 @@ describe("displaceSpatialFeatures", () => {
       layer: jitterLayer,
       sourceLayer: jitterLayer,
       featureCollection: _createPointCollection([kinshasa, goma]),
+      jitterSalt: MAP_SALT,
     });
 
     const expected = jitterCoordinate({
       longitude: goma[0] ?? 0,
       latitude: goma[1] ?? 0,
       radiusMeters: RADIUS_METERS,
+      salt: MAP_SALT,
       seed: `${jitterLayer.id}:1`,
     });
     expect(_getPointPositions(displaced)[1]).toEqual([
@@ -121,19 +126,53 @@ describe("displaceSpatialFeatures", () => {
       layer: jitterLayer,
       sourceLayer: jitterLayer,
       featureCollection: _createPointCollection([kinshasa, goma]),
+      jitterSalt: MAP_SALT,
     });
     const second = displaceSpatialFeatures({
       layer: jitterLayer,
       sourceLayer: jitterLayer,
       featureCollection: _createPointCollection([kinshasa, goma]),
+      jitterSalt: MAP_SALT,
     });
     expect(_getPointPositions(second)).toEqual(_getPointPositions(first));
+  });
+
+  it("keys each point's displacement with the map's salt", () => {
+    const displaced = displaceSpatialFeatures({
+      layer: jitterLayer,
+      sourceLayer: jitterLayer,
+      featureCollection: _createPointCollection([kinshasa, goma]),
+      jitterSalt: MAP_SALT,
+    });
+    const otherMap = displaceSpatialFeatures({
+      layer: jitterLayer,
+      sourceLayer: jitterLayer,
+      featureCollection: _createPointCollection([kinshasa, goma]),
+      jitterSalt: OTHER_MAP_SALT,
+    });
+
+    const positions = _getPointPositions(displaced);
+    expect(_getPointPositions(otherMap)).not.toEqual(positions);
+    [kinshasa, goma].forEach((source, index) => {
+      const unsalted = jitterCoordinate({
+        longitude: source[0] ?? 0,
+        latitude: source[1] ?? 0,
+        radiusMeters: RADIUS_METERS,
+        salt: "",
+        seed: `${jitterLayer.id}:${index}`,
+      });
+      expect(positions[index]).not.toEqual([
+        unsalted.longitude,
+        unsalted.latitude,
+      ]);
+    });
   });
 
   it("moves each member of a MultiPoint independently", () => {
     const displaced = displaceSpatialFeatures({
       layer: jitterLayer,
       sourceLayer: jitterLayer,
+      jitterSalt: MAP_SALT,
       featureCollection: {
         type: "FeatureCollection",
         features: [
@@ -161,6 +200,7 @@ describe("displaceSpatialFeatures", () => {
       layer: jitterLayer,
       sourceLayer: jitterLayer,
       featureCollection: _createPointCollection([kinshasa]),
+      jitterSalt: MAP_SALT,
     });
     expect(displaced.features[0]?.properties).toEqual({ cases: 1 });
   });
@@ -173,6 +213,7 @@ describe("displaceSpatialFeatures", () => {
       layer: exactLayer,
       sourceLayer: exactLayer,
       featureCollection,
+      jitterSalt: MAP_SALT,
     });
 
     expect(displaced).toBe(featureCollection);
@@ -188,6 +229,7 @@ describe("displaceSpatialFeatures", () => {
           layer,
           sourceLayer: layer,
           featureCollection: { type: "FeatureCollection", features: [] },
+          jitterSalt: MAP_SALT,
         });
       }).toThrow(SensitivityViolationError);
     },
@@ -211,6 +253,7 @@ describe("displaceSpatialFeatures", () => {
         layer: bufferLayer,
         sourceLayer: jitterLayer,
         featureCollection: { type: "FeatureCollection", features: [] },
+        jitterSalt: MAP_SALT,
       });
     }).toThrow(SensitivityViolationError);
   });
@@ -240,6 +283,7 @@ describe("displaceSpatialFeatures", () => {
         layer: bufferLayer,
         sourceLayer: latLngSource,
         featureCollection: { type: "FeatureCollection", features: [] },
+        jitterSalt: MAP_SALT,
       });
     }).toThrow(SensitivityViolationError);
   });

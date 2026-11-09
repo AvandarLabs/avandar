@@ -158,6 +158,7 @@ function _createPlacesFixture(): {
     dateOfLastSync: undefined,
     description: undefined,
     isRestricted: false,
+    jitterSalt: "00000000-0000-4000-8000-0000000000aa",
     name: "Exposure sites",
     sourceType: "virtual",
     ownerId: uuid<User.Id>(),
@@ -208,6 +209,7 @@ function _createAvaMap(
     description: undefined,
     isPublic: false,
     isRestricted: false,
+    jitterSalt: "00000000-0000-4000-8000-0000000000aa",
     slug: undefined,
     config,
   });

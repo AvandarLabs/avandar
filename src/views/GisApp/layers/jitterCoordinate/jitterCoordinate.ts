@@ -1,17 +1,16 @@
+import { buildHmacSha256 } from "@/views/GisApp/layers/jitterCoordinate/buildHmacSha256";
+
 const METERS_PER_DEGREE_LATITUDE = 111_320;
 
 /**
- * Hashes a string into a 32-bit unsigned integer (FNV-1a). Used to derive a
- * stable pseudo-random displacement from a row's identity, so a jittered
- * point lands in the same place on every repaint.
+ * Derives a stable 32-bit value from a row's identity, keyed by the map's
+ * secret salt. Keying it means a reader who knows the public seed (layer id
+ * and row index) still cannot recompute the offset, so the exact location
+ * cannot be recovered by subtracting it.
  */
-function _buildSeedHash(seed: string): number {
-  let hash = 0x811c9dc5;
-  for (let index = 0; index < seed.length; index += 1) {
-    hash ^= seed.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193) >>> 0;
-  }
-  return hash;
+function _buildKeyedSeedHash(salt: string, seed: string): number {
+  const digest = buildHmacSha256({ key: salt, message: seed });
+  return new DataView(digest.buffer).getUint32(0);
 }
 
 /**
@@ -37,14 +36,17 @@ function _clampLatitude(latitude: number): number {
  * `radiusMeters`, so an approximate location can be shown without revealing
  * the exact one.
  *
- * The offset is a function of `seed` alone, so repeated renders of the same
- * row do not make the point wander.
+ * The offset is a keyed hash of `seed` under `salt`, so repeated renders of
+ * the same row do not make the point wander, yet the offset cannot be
+ * recomputed by anyone who only sees the published seed.
  *
  * @param params The coordinate to displace and how far to displace it.
  * @param params.longitude The exact longitude, in degrees.
  * @param params.latitude The exact latitude, in degrees.
  * @param params.radiusMeters Largest displacement allowed; zero disables
  * jitter.
+ * @param params.salt The map's secret jitter salt. It must never be
+ * published alongside displaced points.
  * @param params.seed Stable per-row identity, for example
  * `${layerId}:${rowIndex}`.
  * @returns The displaced coordinate, unchanged when `radiusMeters` is zero.
@@ -53,17 +55,19 @@ export function jitterCoordinate({
   longitude,
   latitude,
   radiusMeters,
+  salt,
   seed,
 }: {
   longitude: number;
   latitude: number;
   radiusMeters: number;
+  salt: string;
   seed: string;
 }): { longitude: number; latitude: number } {
   if (radiusMeters <= 0) {
     return { longitude, latitude };
   }
-  const seedHash = _buildSeedHash(seed);
+  const seedHash = _buildKeyedSeedHash(salt, seed);
   // Split the hash into two independent unit fractions: one for the bearing,
   // one for the radius. Square-rooting the radius fraction spreads points
   // uniformly over the disc instead of clustering them at the center.

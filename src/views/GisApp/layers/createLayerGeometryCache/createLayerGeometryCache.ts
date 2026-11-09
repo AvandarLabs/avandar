@@ -11,6 +11,9 @@ export type LayerGeometryInputs = {
   sensitivity: MapLayer.Sensitivity;
   propertyColumnNames: readonly string[] | "all";
 
+  /** The map's secret key for jittered points. */
+  jitterSalt: string;
+
   /** `undefined` while the layer's query has not resolved. */
   rows: readonly UnknownRow[] | undefined;
 };
@@ -42,6 +45,7 @@ function _buildInputSignature(inputs: LayerGeometryInputs): string {
     inputs.binding,
     inputs.sensitivity,
     inputs.propertyColumnNames,
+    inputs.jitterSalt,
   ]);
 }
 
@@ -58,6 +62,7 @@ function _makeGeometryFromInputs(inputs: LayerGeometryInputs): LayerGeometry {
         sensitivity: inputs.sensitivity,
         propertyColumnNames: inputs.propertyColumnNames,
         layerId: inputs.layerId,
+        jitterSalt: inputs.jitterSalt,
       }),
       error: undefined,
     };

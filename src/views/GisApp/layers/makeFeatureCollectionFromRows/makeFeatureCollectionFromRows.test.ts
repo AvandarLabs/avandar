@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
@@ -9,6 +10,7 @@ const binding: MapLayer.GeoBindingColumnNames = {
 };
 
 const exact = { mode: "exact" } as const;
+const MAP_SALT = "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b";
 
 describe("makeFeatureCollectionFromRows", () => {
   it("builds a point per row with the row index as the feature id", () => {
@@ -18,6 +20,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
 
     expect(result.featureCollection.features).toEqual([
@@ -38,6 +41,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.featureCollection.features[0]?.properties).toEqual({
       cases: 3,
@@ -54,6 +58,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.featureCollection.features).toHaveLength(0);
     expect(result.drops).toEqual([
@@ -68,6 +73,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "nonNumericCoordinate", count: 1, sampleRowIndexes: [0] },
@@ -81,6 +87,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.featureCollection.features[0]?.geometry).toEqual({
       type: "Point",
@@ -95,6 +102,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "nullIsland", count: 1, sampleRowIndexes: [0] },
@@ -108,6 +116,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "suspectedLatLngSwap", count: 1, sampleRowIndexes: [0] },
@@ -121,6 +130,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "outOfRange", count: 1, sampleRowIndexes: [0] },
@@ -134,6 +144,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "outOfRange", count: 1, sampleRowIndexes: [0] },
@@ -150,6 +161,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "suspectedLatLngSwap", count: 1, sampleRowIndexes: [0] },
@@ -163,6 +175,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "suspectedLatLngSwap", count: 1, sampleRowIndexes: [0] },
@@ -176,6 +189,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops).toEqual([
       { reason: "outOfRange", count: 1, sampleRowIndexes: [0] },
@@ -192,6 +206,7 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: exact,
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(result.drops[0]?.count).toBe(30);
     expect(result.drops[0]?.sampleRowIndexes).toHaveLength(10);
@@ -204,12 +219,54 @@ describe("makeFeatureCollectionFromRows", () => {
       propertyColumnNames: "all",
       sensitivity: { mode: "jitter", radiusMeters: 500 },
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     const [longitude, latitude] = (
       jittered.featureCollection.features[0]?.geometry as GeoJSON.Point
     ).coordinates;
     expect(longitude).not.toBe(15.27);
     expect(latitude).not.toBe(-4.44);
+  });
+
+  it("keys each displaced point with the map's salt", () => {
+    const makeJitteredPosition = (jitterSalt: string): GeoJSON.Position => {
+      const result = makeFeatureCollectionFromRows({
+        rows: [{ lat: -4.44, lon: 15.27 }],
+        binding,
+        propertyColumnNames: "all",
+        sensitivity: { mode: "jitter", radiusMeters: 500 },
+        layerId: "layer-1",
+        jitterSalt,
+      });
+      return (result.featureCollection.features[0]?.geometry as GeoJSON.Point)
+        .coordinates;
+    };
+    const expected = jitterCoordinate({
+      longitude: 15.27,
+      latitude: -4.44,
+      radiusMeters: 500,
+      salt: MAP_SALT,
+      seed: "layer-1:0",
+    });
+    const unsalted = jitterCoordinate({
+      longitude: 15.27,
+      latitude: -4.44,
+      radiusMeters: 500,
+      salt: "",
+      seed: "layer-1:0",
+    });
+
+    expect(makeJitteredPosition(MAP_SALT)).toEqual([
+      expected.longitude,
+      expected.latitude,
+    ]);
+    expect(makeJitteredPosition(MAP_SALT)).not.toEqual([
+      unsalted.longitude,
+      unsalted.latitude,
+    ]);
+    expect(makeJitteredPosition("another-map-salt")).not.toEqual(
+      makeJitteredPosition(MAP_SALT),
+    );
   });
 
   it("refuses to build exact points for an aggregate-only layer", () => {
@@ -225,6 +282,7 @@ describe("makeFeatureCollectionFromRows", () => {
             minGeoLevel: "admin2",
           },
           layerId: "layer-1",
+          jitterSalt: MAP_SALT,
         });
         return undefined;
       } catch (error) {
@@ -248,6 +306,7 @@ describe("feature properties", () => {
       propertyColumnNames: ["caseId"],
       sensitivity: { mode: "exact" },
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(featureCollection.features[0]?.properties).toEqual({
       caseId: "c1",
@@ -271,6 +330,7 @@ describe("feature properties", () => {
       propertyColumnNames: ["caseId", "missing", "inherited"],
       sensitivity: { mode: "exact" },
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
 
     expect(featureCollection.features[0]?.properties).toEqual({
@@ -289,6 +349,7 @@ describe("feature properties", () => {
       propertyColumnNames: ["lat"],
       sensitivity: { mode: "exact" },
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(featureCollection.features[0]?.properties).toEqual({ lat: 1 });
   });
@@ -304,6 +365,7 @@ describe("feature properties", () => {
       propertyColumnNames: "all",
       sensitivity: { mode: "exact" },
       layerId: "layer-1",
+      jitterSalt: MAP_SALT,
     });
     expect(featureCollection.features[0]?.properties).toEqual({
       caseId: "c1",

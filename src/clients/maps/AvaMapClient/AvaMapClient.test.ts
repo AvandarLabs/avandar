@@ -58,6 +58,7 @@ function _createMapRow(updatedAt: string): AvaMap.T<"DBRead"> {
     id: "00000000-0000-4000-8000-000000000001",
     is_public: false,
     is_restricted: false,
+    jitter_salt: "00000000-0000-4000-8000-0000000000aa",
     name: "Updated map",
     owner_id: "00000000-0000-4000-8000-000000000002",
     owner_profile_id: "00000000-0000-4000-8000-000000000003",

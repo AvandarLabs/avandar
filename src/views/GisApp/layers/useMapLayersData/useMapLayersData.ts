@@ -27,6 +27,9 @@ type UseMapLayersDataOptions = {
   datasets?: readonly Dataset.T[];
   datasetColumns?: readonly DatasetColumn.T[];
   overlay: MapOverlay;
+
+  /** The map's secret key for jittered points. Never published. */
+  jitterSalt: string;
 };
 
 /** One layer's query, as the map render pipeline needs to see it. */
@@ -79,6 +82,7 @@ type LayerQueryContext = {
   datasetColumns: readonly DatasetColumn.T[];
   overlay: MapOverlay;
   spatialAvailability: DuckDbSpatialAvailability;
+  jitterSalt: string;
 };
 
 function _createLayerQuery(
@@ -142,6 +146,7 @@ function _createLayerQuery(
           datasets: context.datasets,
           datasetColumns: context.datasetColumns,
           overlay: context.overlay,
+          jitterSalt: context.jitterSalt,
         },
         signal,
       });
@@ -194,6 +199,7 @@ export function useMapLayersData({
   datasets = [],
   datasetColumns = [],
   overlay,
+  jitterSalt,
 }: UseMapLayersDataOptions): Map<MapLayer.Id, MapLayerQueryState> {
   const spatialAvailability = useDuckDbSpatialAvailability();
   const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
@@ -208,6 +214,7 @@ export function useMapLayersData({
         datasetColumns,
         overlay,
         spatialAvailability,
+        jitterSalt,
       });
     }),
   });

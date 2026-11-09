@@ -42,6 +42,7 @@ type PlaceCoordinateInput = {
   longitude: number;
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
+  jitterSalt: string;
   rowIndex: number;
 };
 
@@ -59,6 +60,7 @@ type PlaceRowInput = {
   binding: MapLayer.GeoBindingColumnNames;
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
+  jitterSalt: string;
   propertyColumnNames: readonly string[] | "all";
 };
 
@@ -68,6 +70,7 @@ type MakeFeatureCollectionInput = {
   propertyColumnNames: readonly string[] | "all";
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
+  jitterSalt: string;
 };
 
 type FeatureCollectionConversion = {
@@ -114,6 +117,7 @@ function _placeCoordinate({
   longitude,
   sensitivity,
   layerId,
+  jitterSalt,
   rowIndex,
 }: PlaceCoordinateInput): { longitude: number; latitude: number } {
   return match(sensitivity)
@@ -125,6 +129,7 @@ function _placeCoordinate({
         longitude,
         latitude,
         radiusMeters: policy.radiusMeters,
+        salt: jitterSalt,
         seed: `${layerId}:${rowIndex}`,
       });
     })
@@ -213,6 +218,7 @@ function _placeRow({
   binding,
   sensitivity,
   layerId,
+  jitterSalt,
   propertyColumnNames,
 }: PlaceRowInput): RowPlacement {
   const coordinateRead = _readCoordinate({ row, binding });
@@ -223,6 +229,7 @@ function _placeRow({
     ...coordinateRead.coordinate,
     sensitivity,
     layerId,
+    jitterSalt,
     rowIndex,
   });
 
@@ -294,6 +301,8 @@ function _buildConversionResult(
  * coordinate columns.
  * @param params.sensitivity Spatial privacy policy applied to each geometry.
  * @param params.layerId Used with the row index to seed jitter.
+ * @param params.jitterSalt The map's secret key for jitter, so a published
+ * displaced point cannot be reversed from its layer id and row index.
  * @returns The converted features and a report for every row that was dropped.
  * @throws SensitivityViolationError when the policy is `aggregateOnly`, which
  * no geometry binding can satisfy yet.
@@ -304,6 +313,7 @@ export function makeFeatureCollectionFromRows({
   propertyColumnNames,
   sensitivity,
   layerId,
+  jitterSalt,
 }: MakeFeatureCollectionInput): FeatureCollectionConversion {
   if (sensitivity.mode === "aggregateOnly") {
     throw new SensitivityViolationError("aggregateOnly");
@@ -317,6 +327,7 @@ export function makeFeatureCollectionFromRows({
       propertyColumnNames,
       sensitivity,
       layerId,
+      jitterSalt,
     });
   });
   return _buildConversionResult(placements);

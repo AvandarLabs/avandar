@@ -6,6 +6,7 @@ type DisplaceSpatialFeaturesInput = {
   layer: MapLayer.T;
   sourceLayer: MapLayer.T;
   featureCollection: GeoJSON.FeatureCollection;
+  jitterSalt: string;
 };
 
 /** Displaces one position with the seed lat/lng layers use for a row. */
@@ -13,6 +14,7 @@ function _jitterPosition(
   options: Readonly<{
     position: GeoJSON.Position;
     radiusMeters: number;
+    salt: string;
     seed: string;
   }>,
 ): GeoJSON.Position {
@@ -21,6 +23,7 @@ function _jitterPosition(
     longitude,
     latitude,
     radiusMeters: options.radiusMeters,
+    salt: options.salt,
     seed: options.seed,
   });
   return [displaced.longitude, displaced.latitude];
@@ -34,17 +37,19 @@ function _jitterGeometry(
   options: Readonly<{
     geometry: GeoJSON.Geometry;
     radiusMeters: number;
+    salt: string;
     seed: string;
     layerName: string;
   }>,
 ): GeoJSON.Geometry {
-  const { geometry, radiusMeters, seed } = options;
+  const { geometry, radiusMeters, salt, seed } = options;
   if (geometry.type === "Point") {
     return {
       type: "Point",
       coordinates: _jitterPosition({
         position: geometry.coordinates,
         radiusMeters,
+        salt,
         seed,
       }),
     };
@@ -56,6 +61,7 @@ function _jitterGeometry(
         return _jitterPosition({
           position,
           radiusMeters,
+          salt,
           seed: `${seed}:${memberIndex}`,
         });
       }),
@@ -93,7 +99,8 @@ function _isUndisplaceable(
  * map, its popups, or the map tools that read the same features.
  *
  * Each point moves exactly as a lat/lng row at the same index does: the same
- * `jitterCoordinate` with the seed `${layerId}:${featureIndex}`. Members of a
+ * `jitterCoordinate` keyed by the map's secret salt, with the seed
+ * `${layerId}:${featureIndex}`. Members of a
  * multipoint add their own index to that seed so they do not move together.
  *
  * Aggregated bindings (boundary joins, point aggregation, grid bins) are
@@ -105,6 +112,7 @@ function _isUndisplaceable(
  * @param params.sourceLayer The layer a buffer is drawn around, or `layer`
  * itself for every other binding.
  * @param params.featureCollection The parsed spatial query features.
+ * @param params.jitterSalt The map's secret jitter salt.
  * @returns The displaced features, or the input itself when nothing moves.
  * @throws SensitivityViolationError when a `jitter` layer draws lines,
  * polygons, or buffers around points, none of which can be displaced.
@@ -113,6 +121,7 @@ export function displaceSpatialFeatures({
   layer,
   sourceLayer,
   featureCollection,
+  jitterSalt,
 }: Readonly<DisplaceSpatialFeaturesInput>): GeoJSON.FeatureCollection {
   const { sensitivity } = layer;
   if (sensitivity.mode !== "jitter") {
@@ -132,6 +141,7 @@ export function displaceSpatialFeatures({
         geometry: _jitterGeometry({
           geometry: feature.geometry,
           radiusMeters: sensitivity.radiusMeters,
+          salt: jitterSalt,
           seed: `${layer.id}:${featureIndex}`,
           layerName: layer.name,
         }),

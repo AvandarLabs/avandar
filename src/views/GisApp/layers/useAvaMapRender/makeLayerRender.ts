@@ -114,6 +114,7 @@ function _getLayerGeometry(options: {
   queryState: MapLayerQueryState | undefined;
   geometryCache: ReturnType<typeof createLayerGeometryCache>;
   isAggregated: boolean;
+  jitterSalt: string;
 }): LayerGeometry {
   const data = options.queryState?.data;
   if (data?.type === "spatial" || data?.type === "snapshot") {
@@ -128,6 +129,7 @@ function _getLayerGeometry(options: {
     binding: options.binding,
     sensitivity: options.layer.sensitivity,
     propertyColumnNames: _getPropertyColumnNames(options),
+    jitterSalt: options.jitterSalt,
     rows:
       options.queryState?.data?.type === "rows"
         ? options.queryState.data.queryResult.data
@@ -145,15 +147,22 @@ function _getAggregation(
   return undefined;
 }
 
-/** Derives all rendering state for one configured map layer. */
+/**
+ * Derives all rendering state for one configured map layer.
+ *
+ * `jitterSalt` is the map's secret key for displacing a jittered lat/lng
+ * layer's points. It must come from the map row, never from published output.
+ */
 export function makeLayerRender({
   layer,
   layerQueryStates,
   geometryCache,
+  jitterSalt,
 }: Readonly<{
   layer: MapLayer.T;
   layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
   geometryCache: ReturnType<typeof createLayerGeometryCache>;
+  jitterSalt: string;
 }>): LayerRender {
   const queryState = layerQueryStates.get(layer.id);
   const binding = MapLayer.toGeoBinding(layer);
@@ -165,6 +174,7 @@ export function makeLayerRender({
     queryState,
     geometryCache,
     isAggregated,
+    jitterSalt,
   });
   const { geometry, legendUpdate, valueDomain } = classifyLayerGeometry({
     layer,

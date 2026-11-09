@@ -95,6 +95,7 @@ async function _compileLayer(
     layer,
     layerQueryStates: new Map([[layer.id, _makeReadyQueryState(data)]]),
     geometryCache: createLayerGeometryCache(),
+    jitterSalt: context.jitterSalt,
   });
   _assertLayerRendered({ layer, render });
   const protectedFeatures = applySnapshotSensitivity({
@@ -168,6 +169,9 @@ async function _compileVisibleLayers(
  * of interest and time range. Its sensitivity policy is checked again, its
  * properties are cut to its popup, its legend is baked in, and the config
  * loses its source queries.
+ *
+ * Displaced points are keyed by `queryContext.jitterSalt`, the map's secret
+ * salt. It is read but never written into the snapshot.
  *
  * @throws SensitivityViolationError when a layer would publish geometry its
  * policy forbids, or any error that kept a layer from drawing. Nothing is

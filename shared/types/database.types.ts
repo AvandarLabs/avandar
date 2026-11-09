@@ -1730,6 +1730,7 @@ export type Database = {
           id: string
           is_public: boolean
           is_restricted: boolean
+          jitter_salt: string
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1744,6 +1745,7 @@ export type Database = {
           id?: string
           is_public?: boolean
           is_restricted?: boolean
+          jitter_salt?: string
           name: string
           owner_id?: string
           owner_profile_id: string
@@ -1758,6 +1760,7 @@ export type Database = {
           id?: string
           is_public?: boolean
           is_restricted?: boolean
+          jitter_salt?: string
           name?: string
           owner_id?: string
           owner_profile_id?: string

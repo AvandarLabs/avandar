@@ -200,6 +200,7 @@ function useLayerQueries(
   layers: readonly MapLayer.T[],
 ): ReturnType<typeof useMapLayersData> {
   return useMapLayersData({
+    jitterSalt: "test-map-salt",
     layers,
     workspaceId,
     overlay: { aoi: undefined, timeRange: undefined },

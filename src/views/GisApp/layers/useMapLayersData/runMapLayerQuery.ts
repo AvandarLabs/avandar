@@ -32,6 +32,12 @@ export type MapLayerQueryContext = {
   datasets: readonly Dataset.T[];
   datasetColumns: readonly DatasetColumn.T[];
   overlay: MapOverlay;
+
+  /**
+   * The map's secret key for jittered points. Displacement is keyed by it so
+   * published displaced points cannot be reversed. Never publish it.
+   */
+  jitterSalt: string;
 };
 
 type RunMapLayerQueryOptions = Readonly<{
@@ -111,6 +117,7 @@ async function _runSpatialLayer(
         compileOptions.stack,
       ),
       featureCollection: parsed.featureCollection,
+      jitterSalt: options.context.jitterSalt,
     }),
     diagnostics: parsed.diagnostics,
   };

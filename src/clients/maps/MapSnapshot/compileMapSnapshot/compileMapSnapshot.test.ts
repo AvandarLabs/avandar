@@ -15,6 +15,8 @@ import {
   SCHOOL_POSITION,
   UNIT_CELL,
 } from "@/clients/maps/MapSnapshot/compileMapSnapshot/compileMapSnapshot.fixtures";
+import { MapSnapshotJson } from "@/clients/maps/MapSnapshot/MapSnapshotJson/MapSnapshotJson";
+import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
   createGridBinLayer,
@@ -39,6 +41,8 @@ const { compileMapSnapshot } =
   await import("@/clients/maps/MapSnapshot/compileMapSnapshot/compileMapSnapshot");
 
 const MAP_ID = "00000000-0000-4000-8000-0000000000f5" as AvaMap.Id;
+const MAP_SALT = "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b";
+const OTHER_MAP_SALT = "0c5d1f2a-7b3e-4c69-9d8a-2f6e4b1a3c57";
 const JITTER = { mode: "jitter", radiusMeters: 500 } as const;
 const AGGREGATE_ONLY = {
   mode: "aggregateOnly",
@@ -79,6 +83,7 @@ async function _compile(
   options: Readonly<{
     placesDatasetIds?: ReadonlySet<Dataset.Id>;
     aoi?: AvaMapConfig.AoiPolygon;
+    jitterSalt?: string;
   }> = {},
 ): Promise<MapSnapshot> {
   const mapConfig = layers.reduce(
@@ -97,6 +102,7 @@ async function _compile(
       simplificationReferenceLatitude: 0,
       datasets: [],
       datasetColumns: [],
+      jitterSalt: options.jitterSalt ?? MAP_SALT,
     },
     placesDatasetIds: options.placesDatasetIds ?? new Set(),
   });
@@ -416,5 +422,82 @@ describe("compileMapSnapshot queries", () => {
     const snapshot = await _compile([createSchoolLayer({ mode: "exact" })]);
 
     expect(snapshot.config.layers[0]!.source.dataSource).toBeUndefined();
+  });
+});
+
+/** The displaced position the map's salt gives `position` as row `rowIndex`. */
+function _getSaltedPosition(
+  options: Readonly<{ layerId: MapLayer.Id; salt: string; rowIndex: number }>,
+): GeoJSON.Position {
+  const displaced = jitterCoordinate({
+    longitude: SCHOOL_POSITION[0],
+    latitude: SCHOOL_POSITION[1],
+    radiusMeters: JITTER.radiusMeters,
+    salt: options.salt,
+    seed: `${options.layerId}:${options.rowIndex}`,
+  });
+  return [displaced.longitude, displaced.latitude];
+}
+
+describe("compileMapSnapshot displacement salt", () => {
+  beforeEach(() => {
+    runQueryMock.mockReset();
+  });
+
+  it("keys a displaced lat/lng layer with the map's salt, so the public seed cannot reverse it", async () => {
+    _mockDuckDb({ rows: [SCHOOL_ROW] });
+    const layer = createSchoolLayer(JITTER);
+
+    const point = _getFirstPoint(await _compile([layer]));
+
+    expect(point).toEqual(
+      _getSaltedPosition({ layerId: layer.id, salt: MAP_SALT, rowIndex: 0 }),
+    );
+    expect(point).not.toEqual(
+      _getSaltedPosition({ layerId: layer.id, salt: "", rowIndex: 0 }),
+    );
+  });
+
+  it("keys a displaced geometry layer with the map's salt, so the public seed cannot reverse it", async () => {
+    _mockDuckDb({
+      features: [
+        createFeature({ type: "Point", coordinates: [...SCHOOL_POSITION] }),
+      ],
+    });
+    const layer = createGeometryLayer({ family: "point", sensitivity: JITTER });
+
+    const point = _getFirstPoint(await _compile([layer]));
+
+    expect(point).toEqual(
+      _getSaltedPosition({ layerId: layer.id, salt: MAP_SALT, rowIndex: 0 }),
+    );
+    expect(point).not.toEqual(
+      _getSaltedPosition({ layerId: layer.id, salt: "", rowIndex: 0 }),
+    );
+  });
+
+  it("publishes the same points for the same salt and different points for another", async () => {
+    _mockDuckDb({ rows: [SCHOOL_ROW] });
+    const layer = createSchoolLayer(JITTER);
+
+    const first = _getFirstPoint(await _compile([layer]));
+    const again = _getFirstPoint(await _compile([layer]));
+    const otherMap = _getFirstPoint(
+      await _compile([layer], { jitterSalt: OTHER_MAP_SALT }),
+    );
+
+    expect(again).toEqual(first);
+    expect(otherMap).not.toEqual(first);
+    expect(getDistanceMeters(SCHOOL_POSITION, otherMap)).toBeLessThanOrEqual(
+      JITTER.radiusMeters + 1,
+    );
+  });
+
+  it("never writes the salt into the published snapshot", async () => {
+    _mockDuckDb({ rows: [SCHOOL_ROW] });
+
+    const snapshot = await _compile([createSchoolLayer(JITTER)]);
+
+    expect(MapSnapshotJson.toJson(snapshot)).not.toContain(MAP_SALT);
   });
 });
