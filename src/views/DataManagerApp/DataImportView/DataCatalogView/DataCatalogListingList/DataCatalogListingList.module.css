@@ -31,10 +31,31 @@
   flex-direction: column;
   gap: 2px;
   inset-inline: 0;
+  min-width: 0;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
   position: absolute;
   top: 0;
   transition: var(--ava-transition-interactive);
+}
+
+/*
+ * Names stay on one line. A flex item's default min-width is the text's own
+ * width, which would wrap or spill into the next row instead of clipping.
+ */
+.dataCatalogListingListRow > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dataCatalogListingListName,
+.dataCatalogListingListFacts {
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dataCatalogListingListRow:hover {

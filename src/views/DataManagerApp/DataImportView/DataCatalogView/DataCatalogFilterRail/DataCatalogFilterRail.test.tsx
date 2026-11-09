@@ -40,8 +40,6 @@ function _renderRail(options: {
 }): void {
   render(
     <DataCatalogFilterRail
-      search=""
-      onSearchChange={vi.fn()}
       filters={{ ...EMPTY_CATALOG_LISTING_FILTERS, ...options.filters }}
       facets={options.facets ?? FACETS_WITH_AGENCIES}
       onFiltersChange={options.onFiltersChange ?? vi.fn()}
@@ -61,6 +59,14 @@ async function _searchFacet(
 }
 
 describe("DataCatalogFilterRail", () => {
+  it("does not include the catalog search, which lives on the tab row", () => {
+    _renderRail({});
+
+    expect(
+      screen.queryByRole("textbox", { name: "Search open data" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("labels the first facet Publisher", () => {
     _renderRail({});
 

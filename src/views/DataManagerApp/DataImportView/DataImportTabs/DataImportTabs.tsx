@@ -1,6 +1,8 @@
 import { Tabs } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
+import { useState } from "react";
+import { DataCatalogSearchField } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField";
 import { DataCatalogView } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView";
 import { ConnectorsAdvisory } from "@/views/DataManagerApp/DataImportView/DataImportTabs/ConnectorsAdvisory/ConnectorsAdvisory";
 import css from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.module.css";
@@ -46,15 +48,33 @@ export function DataImportTabs({
   onTabChange,
 }: Props): JSX.Element {
   const { t } = useLingui();
+  const [activeTabId, setActiveTabId] =
+    useState<DataImportTabId>("upload-view");
+  const [search, setSearch] = useState("");
+  const [isCatalogEmpty, setIsCatalogEmpty] = useState(false);
+  const catalogSearch =
+    activeTabId === "open-data-catalog" && !isCatalogEmpty ? (
+      <DataCatalogSearchField
+        className={css.dataImportTabsSearch}
+        value={search}
+        onChange={setSearch}
+      />
+    ) : undefined;
+
   return (
     <Tabs
+      value={activeTabId}
       tabIds={["upload-view", "connectors-view", "open-data-catalog"] as const}
       classNames={{
         root: css.dataImportTabs,
         list: css.dataImportTabsList,
         panel: css.dataImportTabsPanel,
       }}
-      onTabChange={onTabChange}
+      onTabChange={(tabId) => {
+        setActiveTabId(tabId);
+        onTabChange?.(tabId);
+      }}
+      listRightSection={catalogSearch}
       renderTabHeader={{
         "upload-view": t`Upload`,
         "connectors-view": t`Connectors`,
@@ -78,6 +98,9 @@ export function DataImportTabs({
             <DataCatalogView
               isAddAllowed={isAddAllowed}
               onSaveSuccess={onSaveSuccess}
+              search={search}
+              onSearchChange={setSearch}
+              onCatalogEmptyChange={setIsCatalogEmpty}
             />
           );
         },
