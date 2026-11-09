@@ -15,8 +15,17 @@ vi.mock(
   "@/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTable",
   () => {
     return {
-      ClusterFeatureTable: () => {
-        return <div data-testid="cluster-feature-table" />;
+      ClusterFeatureTable: ({
+        hiddenColumnNames,
+      }: {
+        hiddenColumnNames?: readonly string[];
+      }) => {
+        return (
+          <div
+            data-testid="cluster-feature-table"
+            data-hidden-columns={(hiddenColumnNames ?? []).join(",")}
+          />
+        );
       },
     };
   },
@@ -222,5 +231,33 @@ describe("FeatureInspector place actions", () => {
       screen.queryByRole("button", { name: "Edit place" }),
     ).not.toBeInTheDocument();
     expect(screen.getByText("place_id")).toBeInTheDocument();
+  });
+
+  it("hides the internal place_id from a places cluster's feature table", () => {
+    _renderInspector({
+      feature: undefined,
+      cluster: CLUSTER,
+      layer: _makePlacesLayer(placesDatasetId),
+      placeActions,
+    });
+
+    expect(screen.getByTestId("cluster-feature-table")).toHaveAttribute(
+      "data-hidden-columns",
+      "place_id",
+    );
+  });
+
+  it("hides nothing from the cluster table of a dataset that is not a places dataset", () => {
+    _renderInspector({
+      feature: undefined,
+      cluster: CLUSTER,
+      layer: _makePlacesLayer(uuid<Dataset.Id>()),
+      placeActions,
+    });
+
+    expect(screen.getByTestId("cluster-feature-table")).toHaveAttribute(
+      "data-hidden-columns",
+      "",
+    );
   });
 });

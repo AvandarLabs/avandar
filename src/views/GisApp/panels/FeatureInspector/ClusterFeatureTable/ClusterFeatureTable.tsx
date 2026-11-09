@@ -19,6 +19,9 @@ type Props = {
   layer: MapLayer.T | undefined;
   mapRef: RefObject<MapLibreMap | undefined>;
   onRowClick: (feature: GeoJSON.Feature) => void;
+
+  /** Columns never shown, even when the layer's popup would show them. */
+  hiddenColumnNames?: readonly string[];
 };
 
 /**
@@ -31,6 +34,7 @@ export function ClusterFeatureTable({
   layer,
   mapRef,
   onRowClick,
+  hiddenColumnNames,
 }: Props): ReactNode {
   const { t } = useLingui();
   const [page, setPage] = useState(1);
@@ -93,6 +97,7 @@ export function ClusterFeatureTable({
           totalPages={totalPages}
           onPageChange={setPage}
           onRowClick={onRowClick}
+          hiddenColumnNames={hiddenColumnNames}
         />
       )}
     </div>

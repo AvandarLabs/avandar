@@ -20,7 +20,8 @@ function _getPlacesDatasetId(
     : undefined;
 }
 
-function _isPlaceIdColumn(column: QueryColumn.T): boolean {
+/** Whether a query column is a places dataset's internal `place_id`. */
+export function isPlaceIdColumn(column: QueryColumn.T): boolean {
   return QueryColumn.getDerivedColumnName(column) === PLACE_ID_COLUMN_NAME;
 }
 
@@ -57,7 +58,7 @@ export function withPlaceIdColumn(
     );
   });
   const queryColumn =
-    layer.source.queryColumns.find(_isPlaceIdColumn) ??
+    layer.source.queryColumns.find(isPlaceIdColumn) ??
     (datasetColumn ? _makePlaceIdQueryColumn(datasetColumn) : undefined);
   if (!datasetId || !queryColumn) {
     return layer;

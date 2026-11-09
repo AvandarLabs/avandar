@@ -134,6 +134,11 @@ export function FeatureInspector({
               layer={layer}
               mapRef={mapRef}
               onRowClick={onRowClick}
+              hiddenColumnNames={
+                _getPlacesDatasetId(layer, placeActions)
+                  ? [PLACE_ID_COLUMN_NAME]
+                  : undefined
+              }
             />
           ) : (
             <Stack className={css.featureInspectorBody} gap="sm">
