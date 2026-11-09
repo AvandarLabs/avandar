@@ -45,7 +45,7 @@ describe("DataSection buffer of layer", () => {
       "Cases",
     );
     expect(
-      screen.getByRole("textbox", { name: "Distance (meters)" }),
+      screen.getByRole("textbox", { name: "Distance (m)" }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("switch", { name: "Dissolve" }),
