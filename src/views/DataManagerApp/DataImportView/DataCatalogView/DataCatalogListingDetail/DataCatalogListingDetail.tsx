@@ -30,7 +30,7 @@ import type { DataCatalogListingRead } from "$/models/data-catalog-listings/Data
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import type { CatalogListingPreviewState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 /**
  * How tall the description runs before "Show more": about six lines of
@@ -187,6 +187,9 @@ export function DataCatalogListingDetail({
 }: Props): ReactNode {
   const { t } = useLingui();
   const offline = useOfflineGate();
+  const dateColumnNames = useMemo(() => {
+    return _dateColumnNamesForGrid(preview.preview?.dateColumnNames);
+  }, [preview.preview?.dateColumnNames]);
 
   if (!listing) {
     return (
@@ -337,7 +340,7 @@ export function DataCatalogListingDetail({
                 columnNames={preview.preview?.columnNames ?? []}
                 rows={preview.preview?.rows}
                 maxPreviewRows={GlobalAppConfig.dataManagerApp.maxPreviewRows}
-                dateColumnNames={preview.preview?.dateColumnNames}
+                dateColumnNames={dateColumnNames}
                 isLoading={preview.isLoading}
                 isError={preview.isError}
                 gridHeight={isExpanded ? undefined : PANE_PREVIEW_GRID_HEIGHT}
@@ -387,4 +390,19 @@ export function DataCatalogListingDetail({
       </div>
     </div>
   );
+}
+
+/**
+ * The date columns the preview grid should format. A list becomes the set
+ * the grid queries. Anything else, including a preview restored from a cache
+ * that stored a Set as JSON, counts as no date columns, so the grid still
+ * renders.
+ */
+function _dateColumnNamesForGrid(
+  dateColumnNames: readonly string[] | undefined,
+): ReadonlySet<string> | undefined {
+  if (!Array.isArray(dateColumnNames)) {
+    return undefined;
+  }
+  return new Set(dateColumnNames);
 }

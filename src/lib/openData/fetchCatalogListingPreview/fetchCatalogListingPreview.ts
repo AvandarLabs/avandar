@@ -14,10 +14,12 @@ export type CatalogListingPreview = {
   /** Every column, in the source's order. */
   columnNames: readonly string[];
   /**
-   * The columns DuckDB read as dates or times. Their values arrive as epoch
-   * milliseconds, so the grid has to be told to format them.
+   * The columns DuckDB read as dates or times, in source order. Their values
+   * arrive as epoch milliseconds, so the grid has to be told to format them.
+   * A list, because this preview is stored in the JSON query cache: a Set
+   * comes back as an object, and the grid crashes calling `.has` on it.
    */
-  dateColumnNames: ReadonlySet<string>;
+  dateColumnNames: readonly string[];
   rows: readonly UnknownRow[];
 };
 
@@ -86,15 +88,13 @@ function _toPreview(sniffed: SniffedPreview): CatalogListingPreview {
     columnNames: sniffed.columns.map((column) => {
       return column.column_name;
     }),
-    dateColumnNames: new Set(
-      sniffed.columns
-        .filter((column) => {
-          return DuckDbDataTypeUtils.isDateOrTimestamp(column.column_type);
-        })
-        .map((column) => {
-          return column.column_name;
-        }),
-    ),
+    dateColumnNames: sniffed.columns
+      .filter((column) => {
+        return DuckDbDataTypeUtils.isDateOrTimestamp(column.column_type);
+      })
+      .map((column) => {
+        return column.column_name;
+      }),
     rows: sniffed.previewRows,
   };
 }
