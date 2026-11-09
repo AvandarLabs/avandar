@@ -126,7 +126,7 @@ msgstr "运行查询以查看结果。"
 msgid "Start (e.g. 2024-01-01)"
 msgstr "开始时间（例如：2024-01-01）"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Keywords"
 msgstr "关键词"
@@ -803,8 +803,8 @@ msgid "Rename"
 msgstr "重命名"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
-msgid "Remove keyword {keyword}"
-msgstr "移除关键词 {keyword}"
+#~ msgid "Remove keyword {keyword}"
+#~ msgstr "移除关键词 {keyword}"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "← Back"
@@ -5246,6 +5246,10 @@ msgstr "来自数据集"
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "End (e.g. 2024-12-31)"
 msgstr "结束（例如：2024-12-31）"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "All keywords"
+msgstr ""
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Open dashboard tile"

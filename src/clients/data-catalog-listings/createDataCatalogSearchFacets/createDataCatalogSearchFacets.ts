@@ -1,16 +1,22 @@
+import { z } from "zod";
 import { UPDATED_WITHIN_DB_VALUES } from "@/clients/data-catalog-listings/buildDataCatalogSearchFilterArgs/buildDataCatalogSearchFilterArgs";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 
+const DataCatalogSearchFacetDBRowsSchema = z.array(
+  z.object({
+    facet: z.string(),
+    value: z.string().nullable(),
+    listing_count: z.number(),
+  }),
+);
+
 /**
- * One row `rpc_data_catalog_listings__search_facets` returns. The generated
- * types mark every `returns table` column non-null, but `value` is null on
- * the `unloadable` and `catalog` rows.
+ * One facet row in the JSON array `rpc_data_catalog_listings__search_facets`
+ * returns. `value` is null on the `unloadable` and `catalog` rows.
  */
-export type DataCatalogSearchFacetDBRow = {
-  facet: string;
-  value: string | null;
-  listing_count: number;
-};
+export type DataCatalogSearchFacetDBRow = z.infer<
+  typeof DataCatalogSearchFacetDBRowsSchema
+>[number];
 
 function _toFacetOptions(
   dbRows: readonly DataCatalogSearchFacetDBRow[],
@@ -64,18 +70,22 @@ function _toUpdatedWithinCount(
 }
 
 /**
- * Builds the catalog's facets from the rows the facet RPC returned. Options
- * keep the order Postgres ranked them in, most listings first, and a facet
- * with no rows counts zero.
+ * Builds the catalog's facets from the JSON array the facet RPC returned.
+ * Options keep the order Postgres ranked them in, most listings first, and a
+ * facet with no rows counts zero.
+ *
+ * @throws When the JSON is not an array of facet rows.
  */
 export function createDataCatalogSearchFacets(
-  dbRows: readonly DataCatalogSearchFacetDBRow[],
+  dbFacetRows: unknown,
 ): DataCatalogListing.SearchFacets {
+  const dbRows = DataCatalogSearchFacetDBRowsSchema.parse(dbFacetRows ?? []);
   return {
     sources: _toFacetOptions(dbRows, "source"),
     organization2: _toFacetOptions(dbRows, "organization2"),
     organization2Labels: _toValuesByCount(dbRows, "organization2_label"),
     domains: _toFacetOptions(dbRows, "domain"),
+    tags: _toFacetOptions(dbRows, "tag"),
     formats: _toFacetOptions(dbRows, "format"),
     updatedWithin: {
       any: _toUpdatedWithinCount(dbRows, "any"),

@@ -25,6 +25,14 @@ const FACETS_WITH_AGENCIES: CatalogFacets = {
   updatedWithin: { any: 25, pastMonth: 3, pastYear: 11, overAYear: 14 },
 };
 
+const FACETS_WITH_KEYWORDS: CatalogFacets = {
+  ...FACETS_WITH_AGENCIES,
+  tags: [
+    { value: "taxi", count: 8 },
+    { value: "fhv", count: 3 },
+  ],
+};
+
 function _renderRail(options: {
   filters?: Partial<CatalogListingFilters>;
   facets?: CatalogFacets;
@@ -226,32 +234,33 @@ describe("DataCatalogFilterRail", () => {
     );
   });
 
-  it("hides Keywords while no keyword is chosen", () => {
-    _renderRail({});
+  it("offers Keywords to browse before any keyword is chosen", async () => {
+    _renderRail({ facets: FACETS_WITH_KEYWORDS });
 
-    expect(
-      screen.queryByRole("group", { name: "Keywords" }),
-    ).not.toBeInTheDocument();
+    expect(await _searchFacet("Keywords", "")).toHaveLength(2);
   });
 
-  it("shows each chosen keyword as a chip", () => {
-    _renderRail({ filters: { tags: ["taxi", "fhv"] } });
-
-    expect(
-      screen.getByRole("button", { name: "Remove keyword taxi" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Remove keyword fhv" }),
-    ).toBeInTheDocument();
-  });
-
-  it("drops a keyword from the filters when its chip is removed", () => {
+  it("adds a picked keyword to the filters", async () => {
     const onFiltersChange = vi.fn();
-    _renderRail({ filters: { tags: ["taxi", "fhv"] }, onFiltersChange });
+    _renderRail({ facets: FACETS_WITH_KEYWORDS, onFiltersChange });
 
-    fireEvent.click(
-      screen.getByRole("button", { name: "Remove keyword taxi" }),
+    const options = await _searchFacet("Keywords", "tax");
+    fireEvent.click(options[0]!);
+
+    expect(onFiltersChange).toHaveBeenCalledWith(
+      expect.objectContaining({ tags: ["taxi"] }),
     );
+  });
+
+  it("drops a keyword from the filters when its pill is removed", () => {
+    const onFiltersChange = vi.fn();
+    _renderRail({
+      facets: FACETS_WITH_KEYWORDS,
+      filters: { tags: ["taxi", "fhv"] },
+      onFiltersChange,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove taxi" }));
 
     expect(onFiltersChange).toHaveBeenCalledWith(
       expect.objectContaining({ tags: ["fhv"] }),

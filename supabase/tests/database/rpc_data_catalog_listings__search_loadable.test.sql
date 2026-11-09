@@ -62,7 +62,7 @@ select results_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'wobblethorn')
     where facet = 'unloadable'$$,
   $$values (2::bigint)$$,
@@ -71,7 +71,7 @@ select results_eq(
 
 select results_eq(
   $$select listing_count
-    from public.rpc_data_catalog_listings__search_facets(
+    from public.data_catalog_listings__search_facet_rows(
       p_query => 'wobblethorn', p_is_loadable_only => true)
     where facet = 'unloadable'$$,
   $$values (2::bigint)$$,

@@ -15,7 +15,6 @@ import {
 } from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { DataCatalogFacetSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetSelect";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.module.css";
-import { DataCatalogKeywordFacet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet";
 import { DataCatalogOrganization2Facet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet";
 import { DataCatalogUpdatedWithinSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect";
 import type {
@@ -101,8 +100,11 @@ export function DataCatalogFilterRail({
           }}
         />
 
-        <DataCatalogKeywordFacet
-          chosenKeywords={filters.tags}
+        <DataCatalogFacetSelect
+          label={t`Keywords`}
+          placeholder={t`All keywords`}
+          options={facets.tags}
+          chosenValues={filters.tags}
           onChange={(tags) => {
             onFiltersChange({ ...filters, tags });
           }}

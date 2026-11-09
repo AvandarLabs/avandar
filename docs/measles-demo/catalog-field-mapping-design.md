@@ -360,9 +360,19 @@ as the existing facets are:
 | `organization2` | A level-2 organization | Rows passing every filter except `passes_organization2` |
 | `organization2_label` | A level-2 label from `data_catalog_drives`, via `drive_id` | The same rows as `organization2` |
 | `domain` | One element of `domains` | Rows passing every filter except `passes_domain` |
+| `tag` | One element of `tags` | Rows passing every filter except `passes_tag` |
 
-Tags are not a facet: there are thousands, and a user reaches a tag from a
-listing (section 7.3). The existing `source` facet is the level-1 facet.
+The existing `source` facet is the level-1 facet.
+
+The facet rows themselves come from `data_catalog_listings__search_facet_rows`,
+and `rpc_data_catalog_listings__search_facets` returns them as one JSON array
+(`{ facet, value, listing_count }` objects). A blank search over the full
+catalog produces thousands of rows (over 1,000 level-2 organizations and
+6,000 keywords on the demo catalog), and the Data API cuts any row set off at
+`max_rows` (1,000). Rows are ordered by facet name, so the cut silently
+dropped `source`, `unloadable`, and `updated_within`: Publisher only appeared
+once a search narrowed `organization2` under the cap. One JSON value is one
+row, so no facet can be cut.
 
 Each signature change means the migration drops the old function before
 creating the new one, as `feat/catalog-filters`'s migration did.
@@ -401,10 +411,10 @@ The rail's order becomes: search, **Publisher**, the second-level filter,
   with " or " ("Agency", or "Agency or Department" when the chosen
   publishers' portals disagree). Unchoosing every publisher clears it.
 - **Topic** is a multi-choice facet over `domain`.
-- **Keywords** has no options to browse. A user adds a keyword by clicking it
-  on a listing (section 7.3); the section then shows each chosen keyword as
-  a removable chip, and is not rendered while none is chosen.
-- Publisher, the second level, Topic, and Format all reuse
+- **Keywords** is a multi-choice facet over `tags`. A user can also add a
+  keyword by clicking it on a listing (section 7.3), which chooses it in this
+  facet.
+- Publisher, the second level, Topic, Keywords, and Format all reuse
   `DataCatalogFacetSelect`: a searchable combobox, since a facet can grow to
   hundreds of publishers or topics. Typing narrows the options by every
   whitespace-separated fragment, case- and accent-insensitively and inside
@@ -482,7 +492,7 @@ when the listing has a `drive_id`.
 
 | Where | Text |
 |---|---|
-| Rail | "Publisher" (replacing "Source"), the drive's level-2 label, "Topic", "Keywords", "Remove keyword {tag}" |
+| Rail | "Publisher" (replacing "Source"), the drive's level-2 label, "Topic", "Keywords", "All keywords" |
 | Detail groups | "Published by", "About", "Source", "Technical details" |
 | Detail facts | "Topics", "Keywords", "Original", "Download", "Indexed by", "Last run", "Last indexed", "Source record" |
 | Chip actions | "Show datasets in {topic}", "Show datasets tagged {keyword}" |
