@@ -111,4 +111,34 @@ describe("getExportFeatureTableCopy", () => {
 
     expect(copy.truncationNote).toBeUndefined();
   });
+
+  it("notes the columns left out when every row is shown", () => {
+    const { config, schools } = _unfilteredMap();
+    const copy = getExportFeatureTableCopy({
+      config,
+      layer: schools,
+      totalCount: 12,
+      shownCount: 12,
+      i18n,
+    });
+
+    expect(copy.buildColumnLimitNote({ shownCount: 10, totalCount: 40 })).toBe(
+      "Showing 10 of 40 columns. Download the full list as CSV from the map.",
+    );
+  });
+
+  it("notes the rows and columns left out in one sentence when both are cut", () => {
+    const { config, schools } = _unfilteredMap();
+    const copy = getExportFeatureTableCopy({
+      config,
+      layer: schools,
+      totalCount: 1500,
+      shownCount: 200,
+      i18n,
+    });
+
+    expect(copy.buildColumnLimitNote({ shownCount: 10, totalCount: 40 })).toBe(
+      "Showing 200 of 1,500 rows and 10 of 40 columns. Download the full list as CSV from the map.",
+    );
+  });
 });

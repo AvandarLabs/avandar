@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import { match } from "ts-pattern";
+import { createPdfTextMeasurer } from "@/views/GisApp/export/composeExportPdf/createPdfTextMeasurer/createPdfTextMeasurer";
 import { drawExportFeatureTable } from "@/views/GisApp/export/composeExportPdf/drawExportFeatureTable/drawExportFeatureTable";
 import { drawExportLegend } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import { toPdfSafeText } from "@/views/GisApp/export/toPdfSafeText/toPdfSafeText";
@@ -358,14 +359,13 @@ function _layoutFeatureTable(
   if (input.featureTable === undefined) {
     return [];
   }
-  document.setFontSize(BODY_FONT_SIZE_PT);
   return drawExportFeatureTable({
     block: _getFullPageBlock(input.page),
     table: input.featureTable,
-    wrapText: (text, widthMm) => {
-      const lines: unknown = document.splitTextToSize(text, widthMm);
-      return Array.isArray(lines) ? lines.map(String) : [String(lines)];
-    },
+    measurer: createPdfTextMeasurer({
+      document,
+      fontSizePt: BODY_FONT_SIZE_PT,
+    }),
   });
 }
 

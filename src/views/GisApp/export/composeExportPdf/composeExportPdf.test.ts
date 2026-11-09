@@ -15,6 +15,9 @@ const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
     splitTextToSize: vi.fn((text: string) => {
       return [text];
     }),
+    getTextWidth: vi.fn((text: string) => {
+      return text.length;
+    }),
     rect: vi.fn(),
     line: vi.fn(),
     circle: vi.fn(),
@@ -66,6 +69,9 @@ function _makeFeatureTable(rowCount: number): ExportFeatureTable {
   return {
     summaryLine: `${rowCount} Schools`,
     truncationNote: undefined,
+    buildColumnLimitNote: ({ shownCount, totalCount }) => {
+      return `Showing ${shownCount} of ${totalCount} columns.`;
+    },
     headerLabels: ["School", "Distance"],
     rows: Array.from({ length: rowCount }, (_, index) => {
       return [`School ${index}`, `${index} mi`];

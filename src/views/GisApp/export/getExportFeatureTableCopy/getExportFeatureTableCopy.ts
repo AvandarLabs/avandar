@@ -69,10 +69,41 @@ function _getSummaryLine(
   );
 }
 
+/** How many of a table's columns the PDF prints, out of how many chosen. */
+export type ExportColumnCounts = { shownCount: number; totalCount: number };
+
 /**
- * The line printed above the PDF feature table, and the note printed under it
- * when the row cap cut the list. Both are localized here, with `msg`, because
- * this runs at download time outside any component.
+ * Builds the note printed when the page is too narrow for every column. When
+ * the row cap also cut the list, one sentence states both cuts, so the reader
+ * is pointed at the CSV once.
+ */
+function _makeColumnLimitNoteBuilder(
+  options: Readonly<{
+    countText: string;
+    shownText: string;
+    isRowCut: boolean;
+    i18n: I18n;
+  }>,
+): (columnCounts: ExportColumnCounts) => string {
+  const { countText, shownText, isRowCut, i18n } = options;
+  return (columnCounts) => {
+    const shownColumnsText = i18n.number(columnCounts.shownCount);
+    const totalColumnsText = i18n.number(columnCounts.totalCount);
+    return isRowCut
+      ? i18n._(
+          msg`Showing ${shownText} of ${countText} rows and ${shownColumnsText} of ${totalColumnsText} columns. Download the full list as CSV from the map.`,
+        )
+      : i18n._(
+          msg`Showing ${shownColumnsText} of ${totalColumnsText} columns. Download the full list as CSV from the map.`,
+        );
+  };
+}
+
+/**
+ * The line printed above the PDF feature table, the note printed under it
+ * when the row cap cut the list, and a builder for the note that replaces it
+ * when the page is too narrow for every column. All are localized here, with
+ * `msg`, because this runs at download time outside any component.
  */
 export function getExportFeatureTableCopy(
   options: Readonly<{
@@ -82,10 +113,15 @@ export function getExportFeatureTableCopy(
     shownCount: number;
     i18n: I18n;
   }>,
-): { summaryLine: string; truncationNote: string | undefined } {
+): {
+  summaryLine: string;
+  truncationNote: string | undefined;
+  buildColumnLimitNote: (columnCounts: ExportColumnCounts) => string;
+} {
   const { config, layer, totalCount, shownCount, i18n } = options;
   const countText = i18n.number(totalCount);
   const shownText = i18n.number(shownCount);
+  const isRowCut = shownCount < totalCount;
   return {
     summaryLine: _getSummaryLine({
       countText,
@@ -93,11 +129,16 @@ export function getExportFeatureTableCopy(
       bufferFilter: _getBufferFilter({ config, layer }),
       i18n,
     }),
-    truncationNote:
-      shownCount < totalCount
-        ? i18n._(
-            msg`Showing ${shownText} of ${countText}. Download the full list as CSV from the map.`,
-          )
-        : undefined,
+    truncationNote: isRowCut
+      ? i18n._(
+          msg`Showing ${shownText} of ${countText}. Download the full list as CSV from the map.`,
+        )
+      : undefined,
+    buildColumnLimitNote: _makeColumnLimitNoteBuilder({
+      countText,
+      shownText,
+      isRowCut,
+      i18n,
+    }),
   };
 }
