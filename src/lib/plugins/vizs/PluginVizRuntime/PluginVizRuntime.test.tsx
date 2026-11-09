@@ -243,6 +243,36 @@ describe("PluginVizRuntime.runPluginVizTransform", () => {
     expect(outcome).toMatchObject({ status: "ok", rows: checkedRows });
   });
 
+  it("reports failed when a row is not a plain object", () => {
+    expect(
+      _runTransformFunction(() => {
+        return {
+          rows: [{ region: "North", cases: 3 }, null],
+          chart: {
+            kind: "bar",
+            xColumn: "region",
+            series: [{ column: "cases" }],
+          },
+        } as unknown as PluginVizTransformResult;
+      }).status,
+    ).toBe("failed");
+  });
+
+  it("reports failed when the rows are not an array", () => {
+    expect(
+      _runTransformFunction(() => {
+        return {
+          rows: { region: "North", cases: 3 },
+          chart: {
+            kind: "bar",
+            xColumn: "region",
+            series: [{ column: "cases" }],
+          },
+        } as unknown as PluginVizTransformResult;
+      }).status,
+    ).toBe("failed");
+  });
+
   it("reports failed for a chart that has no transform", () => {
     expect(_runTransform({ definition: { Component: CaseDots } }).status).toBe(
       "failed",

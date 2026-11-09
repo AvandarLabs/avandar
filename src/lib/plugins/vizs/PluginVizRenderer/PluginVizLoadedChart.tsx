@@ -14,10 +14,7 @@ type Props = {
   /** The chart type's localized title, which the render-failed state names. */
   title: string;
 
-  /**
-   * The plugin's localized name, which a crashing chart component is logged
-   * under.
-   */
+  /** The plugin's localized name, which a crashing chart is logged under. */
   pluginName: string;
 };
 
@@ -62,6 +59,7 @@ export function PluginVizLoadedChart({
       chartOptions={chartOptions}
       pluginId={pluginId}
       title={title}
+      pluginName={pluginName}
     />
   ) : (
     <PluginVizComponentView

@@ -1,4 +1,5 @@
 import { isPluginDefinition, makePluginTranslator } from "@avandar/plugin-sdk";
+import { isPlainObject } from "@avandar/utils";
 import { makeUiVizConfigFromPluginChartSpec } from "@/lib/plugins/vizs/makeUiVizConfigFromPluginChartSpec/makeUiVizConfigFromPluginChartSpec";
 import { PluginChartSpecSchema } from "@/lib/plugins/vizs/PluginChartSpecSchema/PluginChartSpecSchema";
 import { PluginVizComponentView } from "@/lib/plugins/vizs/PluginVizRuntime/PluginVizComponentView";
@@ -14,8 +15,9 @@ import type { UnknownDataFrame } from "@avandar/utils";
 /**
  * What running a plugin chart's transform produced. `ok` carries the
  * built-in chart config, its column metadata, and the rows to draw.
- * `failed` carries what went wrong: the transform threw, returned an invalid
- * chart spec, or named a column its rows lack.
+ * `failed` carries what went wrong: the transform threw, returned rows that
+ * are not an array of plain objects, returned an invalid chart spec, or
+ * named a column its rows lack.
  */
 export type PluginVizTransformOutcome =
   | Readonly<{
@@ -76,6 +78,17 @@ function _getPluginVizDefinitionFromCodeModule(options: {
   }
 }
 
+function _assertRowsArePlainObjects(rows: unknown): void {
+  const areRowsPlainObjects =
+    Array.isArray(rows) &&
+    rows.every((row) => {
+      return isPlainObject(row);
+    });
+  if (!areRowsPlainObjects) {
+    throw new Error("The transform's rows must be an array of plain objects.");
+  }
+}
+
 function _runPluginVizTransform(
   options: Readonly<PluginVizRunOptions>,
 ): PluginVizTransformOutcome {
@@ -93,6 +106,7 @@ function _runPluginVizTransform(
       locale,
     });
     const { rows } = result;
+    _assertRowsArePlainObjects(rows);
     const chart = PluginChartSpecSchema.parse(result.chart);
     return {
       status: "ok",

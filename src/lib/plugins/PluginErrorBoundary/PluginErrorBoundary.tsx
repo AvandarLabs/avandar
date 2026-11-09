@@ -20,8 +20,10 @@ type State = Readonly<{ hasError: boolean }>;
 /**
  * Contains a crash inside plugin UI to the modal, drawer, or chart that
  * renders it, so the rest of the app keeps working. `makePluginApi` wraps the
- * content of every overlay a plugin opens in it, and `PluginVizComponentView`
- * wraps every plugin chart component in it with the chart's own `fallback`.
+ * content of every overlay a plugin opens in it. `PluginVizComponentView`
+ * wraps every plugin chart component in it, and `PluginVizTransformChart`
+ * wraps the drawing of every transform's rows, each with the chart's own
+ * `fallback`.
  *
  * This is a class because React offers no hook for catching render errors:
  * `getDerivedStateFromError` and `componentDidCatch` exist only on class

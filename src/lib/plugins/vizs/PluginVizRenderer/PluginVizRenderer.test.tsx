@@ -77,6 +77,11 @@ vi.mock("@/lib/ui/viz/BarChart/BarChart", () => {
           data-x={props.xAxisKey}
           data-y={props.series?.[0]?.key}
           data-row-count={props.data.length}
+          data-x-values={props.data
+            .map((row) => {
+              return String(row[props.xAxisKey ?? ""]);
+            })
+            .join(",")}
         />
       );
     },
@@ -599,6 +604,43 @@ describe("PluginVizRenderer", () => {
           xColumn: "district",
           series: [{ column: "cases" }],
         },
+      };
+    });
+
+    _renderChart({ vizConfig: _makeConfig({ pluginId }) });
+
+    expect(
+      await screen.findByText("Case bars couldn't render"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows that the chart couldn't render when a transformed row is null", async () => {
+    const pluginId = _addPluginWithBars(() => {
+      return {
+        rows: [{ label: "North", cases: 3 }, null],
+        chart: { kind: "bar", xColumn: "label", series: [{ column: "cases" }] },
+      } as unknown as PluginVizTransformResult;
+    });
+
+    _renderChart({ vizConfig: _makeConfig({ pluginId }) });
+
+    expect(
+      await screen.findByText("Case bars couldn't render"),
+    ).toBeInTheDocument();
+  });
+
+  it("contains to the chart a row value that throws while the chart draws", async () => {
+    // React and the boundary both log the crash. Keep the test output clean.
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const unprintableLabel = {
+      toString(): never {
+        throw new Error("cannot print");
+      },
+    };
+    const pluginId = _addPluginWithBars(() => {
+      return {
+        rows: [{ label: unprintableLabel, cases: 3 }],
+        chart: { kind: "bar", xColumn: "label", series: [{ column: "cases" }] },
       };
     });
 
