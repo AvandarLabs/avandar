@@ -8746,6 +8746,12 @@ msgstr "جارٍ تحميل الكاتب"
 msgid "Disable {pluginName}?"
 msgstr "هل تريد تعطيل {pluginName}؟"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "اطرح سؤالًا عن بياناتك. اكتب @ لتوجيهي إلى لوحة معلومات أو مجموعة "
+"بيانات أو خريطة."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "تم الاحتفاظ بالأصل"

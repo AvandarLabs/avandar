@@ -8854,6 +8854,12 @@ msgstr "Inapakia mwandishi"
 msgid "Disable {pluginName}?"
 msgstr "Lemaza {pluginName}?"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "Uliza swali kuhusu data yako. Andika @ ili kunielekeza kwenye "
+"dashibodi, seti ya data, au ramani."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "Asili imehifadhiwa"

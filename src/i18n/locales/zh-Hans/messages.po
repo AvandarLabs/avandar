@@ -8548,6 +8548,11 @@ msgstr "正在加载作者信息"
 msgid "Disable {pluginName}?"
 msgstr "禁用 {pluginName}？"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "询问有关您数据的问题。输入 @ 指向仪表板、数据集或地图。"
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "已保留原始内容"

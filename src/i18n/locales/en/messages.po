@@ -8758,6 +8758,12 @@ msgstr "Loading author"
 msgid "Disable {pluginName}?"
 msgstr "Disable {pluginName}?"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "Original kept"

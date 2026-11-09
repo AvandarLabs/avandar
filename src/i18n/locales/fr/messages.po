@@ -8952,6 +8952,12 @@ msgstr "Chargement de l’auteur"
 msgid "Disable {pluginName}?"
 msgstr "Désactiver {pluginName} ?"
 
+#: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
+msgid "Ask a question about your data. Type @ to point me at a dashboard, "
+"dataset, or map."
+msgstr "Posez une question sur vos données. Tapez @ pour m'indiquer un tableau "
+"de bord, un jeu de données ou une carte."
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
 msgstr "Original conservé"
