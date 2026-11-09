@@ -1,3 +1,14 @@
+-- Load pg_trgm into this session before a function below sets
+-- `pg_trgm.word_similarity_threshold`. Until the library is loaded the
+-- parameter is an unknown placeholder, and only a superuser may attach one to
+-- a function, which the hosted `postgres` role is not. Calling any pg_trgm
+-- function loads it and registers the parameter as user-settable.
+do $$
+begin
+  perform extensions.word_similarity('', '');
+end
+$$;
+
 CREATE INDEX data_catalog_listings__display_name_trgm_loadable ON public.data_catalog_listings USING gin (display_name extensions.gin_trgm_ops) WHERE (is_workspace_loadable AND (NOT is_invalid));
 
 CREATE INDEX data_catalog_listings__search_vector_loadable ON public.data_catalog_listings USING gin (search_vector) WHERE (is_workspace_loadable AND (NOT is_invalid));

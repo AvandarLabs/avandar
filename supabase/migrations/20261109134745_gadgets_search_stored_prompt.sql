@@ -1,3 +1,14 @@
+-- Load pg_trgm into this session before a function below sets
+-- `pg_trgm.word_similarity_threshold`. Until the library is loaded the
+-- parameter is an unknown placeholder, and only a superuser may attach one to
+-- a function, which the hosted `postgres` role is not. Calling any pg_trgm
+-- function loads it and registers the parameter as user-settable.
+do $$
+begin
+  perform extensions.word_similarity('', '');
+end
+$$;
+
 set check_function_bodies = off;
 
 CREATE OR REPLACE FUNCTION public.rpc_gadgets__search(p_workspace_id uuid, p_query text, p_limit integer DEFAULT 20)
