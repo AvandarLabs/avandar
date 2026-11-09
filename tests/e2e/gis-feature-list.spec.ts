@@ -153,34 +153,40 @@ async function _bufferSitesAndFilterSchools(page: Page): Promise<void> {
 }
 
 /**
- * Shows the nearest school from its row, then pulls back far enough to see
- * both half-mile rings, for the screenshot of the map beside its list.
+ * West, south, east, and north edges of the two half-mile rings: the sites'
+ * extent widened by 805 m (0.0073 degrees of latitude and 0.0096 of
+ * longitude at 40.73 N).
+ */
+const RINGS_BOUNDS: [number, number, number, number] = [
+  -74.0069, 40.7235, -73.981, 40.7432,
+];
+
+/** Resolves once the map has stopped moving and drawn every tile. */
+async function _waitForMapToSettle(page: Page): Promise<void> {
+  await expect
+    .poll(async () => {
+      return page.evaluate(() => {
+        const map = window.__avandarE2EMap;
+        return map?.isMoving() === false && map.areTilesLoaded();
+      });
+    })
+    .toBe(true);
+}
+
+/**
+ * Shows the nearest school from its row, then frames both half-mile rings
+ * for the screenshot of the map beside its list.
  */
 async function _showRingsAroundNearestSchool(
   page: Page,
   firstRow: Locator,
 ): Promise<void> {
-  await firstRow
-    .getByRole("button", { name: `Show ${NEAREST_SCHOOL_NAME} on the map` })
-    .click();
-  await page.getByRole("button", { name: "Collapse the legend" }).click();
-  await expect
-    .poll(async () => {
-      return page.evaluate(() => {
-        return window.__avandarE2EMap?.isMoving() === false;
-      });
-    })
-    .toBe(true);
-  await page.evaluate(() => {
-    window.__avandarE2EMap?.jumpTo({ zoom: 14 });
-  });
-  await expect
-    .poll(async () => {
-      return page.evaluate(() => {
-        return window.__avandarE2EMap?.areTilesLoaded() === true;
-      });
-    })
-    .toBe(true);
+  await firstRow.getByRole("button", { name: /^Show .+ on the map$/ }).click();
+  await _waitForMapToSettle(page);
+  await page.evaluate((bounds) => {
+    window.__avandarE2EMap?.fitBounds(bounds, { padding: 24, duration: 0 });
+  }, RINGS_BOUNDS);
+  await _waitForMapToSettle(page);
 }
 
 test.describe("GIS feature list", () => {
@@ -267,6 +273,11 @@ test.describe("GIS feature list", () => {
         await featureList.screenshot({
           path: `${SCREENSHOT_DIR}/feature-list-drawer.png`,
         });
+        // The legend folds to its header while the list is open, so it stays
+        // clear of the layer list on the shortened map.
+        await expect(
+          page.getByRole("button", { name: "Expand the legend" }),
+        ).toBeVisible();
         await _showRingsAroundNearestSchool(page, firstRow);
         await page.screenshot({ path: `${SCREENSHOT_DIR}/feature-list.png` });
       } finally {
