@@ -9,6 +9,9 @@ import type { DerivedColumn } from "@avandar/plugin-sdk";
 /** The names a derived column may take: lowercase snake case. */
 const COLUMN_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 
+/** The row number column the wrapper injects, which the host reserves. */
+const ROW_NUMBER_COLUMN_NAME = "__ava_row";
+
 /** A `{placeholder}` in an expression, capturing the key it names. */
 const PLACEHOLDER_PATTERN = /\{([A-Za-z_][A-Za-z0-9_]*)\}/g;
 
@@ -79,6 +82,18 @@ function _buildAddedColumns(
   });
 }
 
+function _assertNoReservedColumn(existingColumnNames: readonly string[]): void {
+  const hasReservedColumn = existingColumnNames.some((name) => {
+    return name.toLowerCase() === ROW_NUMBER_COLUMN_NAME;
+  });
+  if (hasReservedColumn) {
+    throw new PluginError(
+      "InvalidExpression",
+      `This query result already has a column named "${ROW_NUMBER_COLUMN_NAME}", which the host reserves.`,
+    );
+  }
+}
+
 /**
  * Makes the SQL that adds `columns` to the result of `baseSql`, plus the
  * names the columns were added under (a name already in the result, compared
@@ -87,7 +102,8 @@ function _buildAddedColumns(
  * keeps the base query's row order, which a window expression would
  * otherwise change.
  *
- * Throws `PluginError("InvalidExpression")` for an empty list, a bad name, an
+ * Throws `PluginError("InvalidExpression")` for an empty list, a result with
+ * a reserved `__ava_row` column, a bad name, an
  * unbound placeholder, an input naming a column not in
  * `existingColumnNames`, or an expression that is not exactly one SQL
  * expression. Used by `addColumnsForInvocation` for
@@ -107,6 +123,7 @@ export function makeDerivedColumnsSqlFromColumns(
       "addColumns needs at least one column.",
     );
   }
+  _assertNoReservedColumn(existingColumnNames);
   const addedColumns = _buildAddedColumns(columns, existingColumnNames);
   const sql = [
     "WITH ava_source AS (",

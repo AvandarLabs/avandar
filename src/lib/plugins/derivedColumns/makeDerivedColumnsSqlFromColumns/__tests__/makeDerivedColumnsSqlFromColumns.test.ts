@@ -28,9 +28,12 @@ function _makeSqlFromColumns(
  * The `PluginError` code `makeDerivedColumnsSqlFromColumns` throws for
  * `columns`, undefined when it does not throw.
  */
-function _getThrownCode(columns: readonly DerivedColumn[]): string | undefined {
+function _getThrownCode(
+  columns: readonly DerivedColumn[],
+  existingColumnNames: readonly string[] = EXISTING_COLUMN_NAMES,
+): string | undefined {
   try {
-    _makeSqlFromColumns(columns);
+    _makeSqlFromColumns(columns, existingColumnNames);
     return undefined;
   } catch (error) {
     return error instanceof PluginError ? error.code : "not a PluginError";
@@ -136,6 +139,21 @@ describe("makeDerivedColumnsSqlFromColumns", () => {
         { ...RATE_COLUMN, inputs: { cases: "cases", population: "people" } },
       ]),
     ).toBe("InvalidExpression");
+  });
+
+  it("rejects a result that already has a column named __ava_row", () => {
+    expect(
+      _getThrownCode([RATE_COLUMN], [...EXISTING_COLUMN_NAMES, "__AVA_ROW"]),
+    ).toBe("InvalidExpression");
+  });
+
+  it("quotes an input column named {x} without substituting it again", () => {
+    const { sql } = _makeSqlFromColumns(
+      [{ name: "doubled", expression: "{x} * 2", inputs: { x: "{x}" } }],
+      ["{x}"],
+    );
+
+    expect(sql).toContain(`  ("{x}" * 2) AS "doubled"`);
   });
 
   it("rejects an empty column list", () => {
