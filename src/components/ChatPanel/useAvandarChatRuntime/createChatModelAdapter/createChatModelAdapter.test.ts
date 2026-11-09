@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
 import { createChatModelAdapter } from "./createChatModelAdapter";
@@ -259,6 +260,34 @@ describe("createChatModelAdapter with the agent on", () => {
       expect.objectContaining({
         pathname: "/acme/dashboards",
         chatPageContext: expect.objectContaining({ app: "dashboards" }),
+        dashboardEditorState: { selectedItem: "tile-1" },
+      }),
+    );
+  });
+
+  it("keeps the page from when the turn started after a navigation", async () => {
+    const pathnameRef = { current: "/acme/dashboards" };
+    const dashboardEditorStateRef = { current: { selectedItem: "tile-1" } };
+    // The user navigates while the adapter waits on consent acks.
+    vi.mocked(PendingAcks.consumeAckForText).mockImplementationOnce(
+      async () => {
+        pathnameRef.current = "/acme/data-explorer";
+        dashboardEditorStateRef.current = { selectedItem: "tile-2" };
+        return undefined;
+      },
+    );
+
+    await _ask(
+      _createAdapter("dashboards", {
+        pathnameRef,
+        dashboardEditorStateRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(runDataAgentTurnMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        pathname: "/acme/dashboards",
         dashboardEditorState: { selectedItem: "tile-1" },
       }),
     );

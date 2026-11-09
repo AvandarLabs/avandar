@@ -199,7 +199,11 @@ export function createChatModelAdapter(
         .find(propEq("role", "user"));
       const currentUser = userRef.current;
       const workspaceId = workspaceIdRef.current;
+      // The page is read once, here, so consent waits and navigation during
+      // the turn cannot mix one page's context with another page's route.
       const currentPageContext = pageContextRef.current;
+      const currentPathname = pathnameRef.current;
+      const currentDashboardEditorState = dashboardEditorStateRef.current;
 
       if (
         lastUserMessage &&
@@ -362,9 +366,9 @@ export function createChatModelAdapter(
           return finishIfCurrent(
             await _runAgentTurn({
               dataAgentTurn,
-              pathname: pathnameRef.current,
+              pathname: currentPathname,
               chatPageContext: currentPageContext,
-              dashboardEditorState: dashboardEditorStateRef.current,
+              dashboardEditorState: currentDashboardEditorState,
             }),
           );
         } catch (error) {
