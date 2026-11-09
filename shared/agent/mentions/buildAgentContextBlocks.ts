@@ -23,7 +23,10 @@ import {
 } from "$/agent/pageContext/buildAgentPageContextBlock.ts";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext.ts";
 import type { BlockRenderOptions } from "$/agent/pageContext/agentBlockText.ts";
-import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext.ts";
+import type {
+  AgentPageContext,
+  AgentPageTile,
+} from "$/agent/pageContext/AgentPageContext.ts";
 import type { RedactedPageContext } from "$/agent/pageContext/buildAgentPageContextBlock.ts";
 import type { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 
@@ -83,7 +86,8 @@ type BudgetedItem<Item> = { item: Item; sqlTileCount: number };
 
 /**
  * A gadget cut to the charts a block lists: 12 per dashboard, and the
- * first `remaining` of those keep their SQL. The rest keep their titles.
+ * first `remaining` of those with SQL keep it. The rest keep their titles.
+ * Charts with no SQL never spend the budget.
  */
 function _listTiles(
   context: AgentGadgetContext,
@@ -104,18 +108,35 @@ function _listTiles(
   if (context.kind !== "dashboard") {
     return { item: context, sqlTileCount: 0 };
   }
-  const listed = context.tiles.slice(0, MAX_PAGE_TILES);
-  const sqlTileCount = Math.min(listed.length, Math.max(remaining, 0));
+  const listed = _spendTileBudget(
+    context.tiles.slice(0, MAX_PAGE_TILES),
+    remaining,
+    _listAgentPageTile,
+  );
   return {
     item: {
       ...context,
-      tiles: listed.map((tile, index) => {
-        return index < sqlTileCount ? tile : { ...tile, sql: "" };
-      }),
+      tiles: listed.items,
       hiddenTileCount: Math.max(context.tiles.length - MAX_PAGE_TILES, 0),
     },
-    sqlTileCount,
+    sqlTileCount: remaining - listed.remaining,
   };
+}
+
+/**
+ * One dashboard chart, keeping its SQL while the budget lasts. A chart with
+ * no SQL costs nothing.
+ */
+function _listAgentPageTile(
+  tile: AgentPageTile,
+  remaining: number,
+): BudgetedItem<AgentPageTile> {
+  if (tile.sql === "") {
+    return { item: tile, sqlTileCount: 0 };
+  }
+  return remaining > 0
+    ? { item: tile, sqlTileCount: 1 }
+    : { item: { ...tile, sql: "" }, sqlTileCount: 0 };
 }
 
 /** Lists each item's charts in order, spending one shared tile budget. */

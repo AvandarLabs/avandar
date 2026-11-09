@@ -178,6 +178,26 @@ describe("buildAgentContextBlocks", () => {
     );
   });
 
+  it("does not spend the chart budget on a dashboard chart with no SQL", () => {
+    const withEmptyCharts: AgentGadgetContext = {
+      kind: "dashboard",
+      ref: { gadgetType: "dashboard", gadgetId: DASH_ID, subId: null },
+      name: "B",
+      tiles: Array.from({ length: 12 }, (_, index) => {
+        return index < 6
+          ? _tile(`Empty ${index + 1}`, "")
+          : _tile(`Chart ${index + 1}`);
+      }),
+    };
+    const { attachedBlock } = buildAgentContextBlocks({
+      attached: [_dashboard("A", 12), withEmptyCharts, _dashboard("C", 12)],
+      mentioned: [],
+      aliases: ALIASES,
+    });
+    // 12 from A, 6 from B, and the 6 left go to C's first charts.
+    expect(attachedBlock?.match(/: SELECT 1/g)).toHaveLength(24);
+  });
+
   it("describes a mentioned chart with its SQL", () => {
     const { mentionedBlock } = buildAgentContextBlocks({
       attached: [],
