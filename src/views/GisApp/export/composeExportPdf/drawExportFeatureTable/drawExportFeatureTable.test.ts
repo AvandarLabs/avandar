@@ -300,7 +300,12 @@ describe("drawExportFeatureTable with real jsPDF text measurement", () => {
     const pages = drawExportFeatureTable({
       block: A4_BLOCK,
       table: _table(0, {
-        headerLabels: [longHeader, ...Array.from({ length: 9 }, () => {return "x"})],
+        headerLabels: [
+          longHeader,
+          ...Array.from({ length: 9 }, () => {
+            return "x";
+          }),
+        ],
       }),
       measurer,
     });
@@ -328,8 +333,20 @@ describe("drawExportFeatureTable with real jsPDF text measurement", () => {
     const pages = drawExportFeatureTable({
       block: A4_BLOCK,
       table: _table(1, {
-        headerLabels: ["Notes", ...Array.from({ length: 9 }, () => {return "x"})],
-        rows: [["word ".repeat(200), ...Array.from({ length: 9 }, () => {return "y"})]],
+        headerLabels: [
+          "Notes",
+          ...Array.from({ length: 9 }, () => {
+            return "x";
+          }),
+        ],
+        rows: [
+          [
+            "word ".repeat(200),
+            ...Array.from({ length: 9 }, () => {
+              return "y";
+            }),
+          ],
+        ],
       }),
       measurer,
     });

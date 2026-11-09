@@ -7823,8 +7823,8 @@ msgid "This cannot be undone."
 msgstr "Cela ne peut pas être annulé."
 
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
-msgstr ""
+#~ msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
+#~ msgstr ""
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
@@ -8001,6 +8001,11 @@ msgstr "Supprimer {datasetName}"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Scale varies across this map"
 msgstr "L’échelle varie sur cette carte"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName} "
+"within {distanceText} of {sourceLayerName}"
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
@@ -9976,8 +9981,8 @@ msgid "Switch Workspace"
 msgstr "Changer d'espace de travail"
 
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-msgid "{countText} {layerName}"
-msgstr ""
+#~ msgid "{countText} {layerName}"
+#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
@@ -9986,6 +9991,10 @@ msgstr "Vous pouvez voir ce tableau de bord car il a été partagé avec vous."
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Pick user groups for this member"
 msgstr "Choisir des groupes d'utilisateurs pour ce membre"
+
+#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
+msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName}"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
