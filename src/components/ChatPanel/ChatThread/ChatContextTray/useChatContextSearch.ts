@@ -1,3 +1,4 @@
+import { getIsOnline } from "@avandar/browser-utils";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { isChatMentionType } from "$/agent/mentions/ChatMentionToken";
@@ -23,6 +24,14 @@ const CHAT_CONTEXT_SEARCH_LIMIT = SEARCH_ROWS_PER_TYPE * GADGET_TYPES.length;
 
 /** How long a query's results are reused before reopening searches again. */
 const SEARCH_STALE_TIME_MS = 30_000;
+
+/**
+ * Fresh for a short while online. Offline, never stale, as the app's
+ * default, so the picker shows what it has and does not try to refetch.
+ */
+function _getSearchStaleTime(): number {
+  return getIsOnline() ? SEARCH_STALE_TIME_MS : Number.POSITIVE_INFINITY;
+}
 
 type ChatContextSearchState = {
   results: GadgetSearchResult[];
@@ -51,7 +60,7 @@ export function useChatContextSearch(
   const search = useQuery({
     queryKey: ["chatContextSearch", workspace.id, debouncedQuery],
     enabled: options.isEnabled,
-    staleTime: SEARCH_STALE_TIME_MS,
+    staleTime: _getSearchStaleTime,
     meta: { persist: false },
     queryFn: async ({ signal }) => {
       const allResults = await searchGadgets({

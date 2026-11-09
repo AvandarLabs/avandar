@@ -338,6 +338,9 @@ describe("ChatContextPicker", () => {
       "aria-live",
       "polite",
     );
+    expect(
+      screen.getByRole("listbox", { hidden: true, name: "Add context" }),
+    ).not.toContainElement(screen.getByRole("status", { hidden: true }));
   });
 
   it("points the open button at the list it controls", async () => {

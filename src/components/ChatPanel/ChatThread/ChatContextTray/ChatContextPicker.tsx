@@ -211,10 +211,6 @@ type PickerState = {
 };
 
 /**
- * The picker's combobox, query, and what it lists. Closing it clears the
- * query, and the search runs only while it is open.
- */
-/**
  * Which listed page items turned out to be ones the user cannot open, as
  * each item reports once its summary loads, so the picker can hide the
  * page group when none is left.
@@ -245,6 +241,10 @@ function useLockedPageRefs(
   return { hasOpenablePageRefs, setPageRefLocked };
 }
 
+/**
+ * The picker's combobox, query, and what it lists. Closing it clears the
+ * query, and the search runs only while it is open.
+ */
 function useChatContextPickerState(): PickerState {
   const [query, setQuery] = useState("");
   const listId = useId();
@@ -292,7 +292,10 @@ type DropdownProps = {
   onEscape: () => void;
 };
 
-/** The search box, the groups of choices, and the search's status. */
+/**
+ * The search box, the groups of choices, and after the list, the search's
+ * status, kept out of the listbox so it holds only groups and options.
+ */
 function ChatContextPickerDropdown({
   state,
   attachedKeys,
@@ -324,14 +327,14 @@ function ChatContextPickerDropdown({
             hasOpenablePageRefs={state.hasOpenablePageRefs}
             onPageRefLockedChange={state.setPageRefLocked}
           />
-          <ChatContextPickerSearchStatus
-            isSearching={search.isSearching}
-            searchFailed={search.searchFailed}
-            hasResults={listing.results.length > 0}
-            hasOtherOptions={state.hasOpenablePageRefs}
-          />
         </ScrollArea.Autosize>
       </Combobox.Options>
+      <ChatContextPickerSearchStatus
+        isSearching={search.isSearching}
+        searchFailed={search.searchFailed}
+        hasResults={listing.results.length > 0}
+        hasOtherOptions={state.hasOpenablePageRefs}
+      />
     </Combobox.Dropdown>
   );
 }

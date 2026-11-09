@@ -7,7 +7,13 @@ import type { GadgetSearchResult } from "@/clients/gadgets/searchGadgets/searchG
 import type { ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
-  return { searchGadgets: vi.fn() };
+  return { searchGadgets: vi.fn(), getIsOnline: vi.fn() };
+});
+
+vi.mock("@avandar/browser-utils", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@avandar/browser-utils")>();
+  return { ...actual, getIsOnline: mocks.getIsOnline };
 });
 
 vi.mock("@/clients/gadgets/searchGadgets/searchGadgets", () => {
@@ -68,6 +74,8 @@ function _renderSearch(query: string, isEnabled = true) {
 }
 
 beforeEach(() => {
+  mocks.getIsOnline.mockReset();
+  mocks.getIsOnline.mockReturnValue(true);
   mocks.searchGadgets.mockReset();
 });
 
@@ -122,7 +130,13 @@ describe("useChatContextSearch", () => {
     });
     const [query] = queryClient.getQueryCache().getAll();
     expect(query?.meta).toEqual({ persist: false });
-    expect(query?.observers[0]?.options.staleTime).toBe(30_000);
+    const staleTime = query?.observers[0]?.options.staleTime;
+    if (typeof staleTime !== "function") {
+      throw new Error("Expected staleTime to depend on being online");
+    }
+    expect(staleTime(query!)).toBe(30_000);
+    mocks.getIsOnline.mockReturnValue(false);
+    expect(staleTime(query!)).toBe(Number.POSITIVE_INFINITY);
   });
 
   it("reports a failed search without the generic error popup", async () => {
