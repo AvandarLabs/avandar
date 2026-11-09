@@ -313,7 +313,7 @@ contributes:
 | `settings[].key` | A letter, then letters and digits. Unique within the chart type |
 | `settings[].label` | A `%key%` reference |
 | `settings[].control` | One of the controls below |
-| `settings[].required` | Optional, `false` by default. Until every required setting has a value, the chart area asks for each one ("Choose a Date column") instead of drawing the chart |
+| `settings[].required` | Optional, `false` by default. Until every required setting has a value, the chart area asks for each one ("You haven't chosen: Date column") instead of drawing the chart |
 | `settings[].default` | Optional. It must fit the control, as the table below says |
 
 Settings render in the order they are declared, in one group. When someone
@@ -495,7 +495,7 @@ goes wrong, the chart area shows what, and the rest of the page is unaffected:
 | --- | --- |
 | The plugin or chart type is not bundled | "Plugin not available", naming the plugin. The stored chart is kept |
 | The stored settings fail validation | "Invalid chart settings". The stored chart is kept |
-| A required setting is unset, or its column is not in the result | "Choose a *setting label*", one line per such setting, such as "Choose a Date column" |
+| A required setting is unset, or its column is not in the result | "You haven't chosen: *setting label*", one line per such setting, such as "You haven't chosen: Date column" |
 | The plugin code fails to load | "This chart couldn't load", with a "Retry" button |
 | The transform throws or returns an invalid spec | "*Title* couldn't render". The error is logged with the plugin and chart ids |
 | The component throws | "*Title* couldn't render". The error boundary logs it with the plugin name |

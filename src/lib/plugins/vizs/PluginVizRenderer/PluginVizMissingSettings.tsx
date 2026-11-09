@@ -17,8 +17,8 @@ type Props = {
 
 /**
  * What a plugin chart shows instead of drawing while required settings are
- * unset: one line per setting, such as "Choose a Date column", in the same
- * danger text built-in charts use for a missing axis or series.
+ * unset: one line per setting, such as "You haven't chosen: Date column", in
+ * the same danger text built-in charts use for a missing axis or series.
  * `PluginVizConfiguredChart` renders it.
  */
 export function PluginVizMissingSettings({
@@ -37,7 +37,7 @@ export function PluginVizMissingSettings({
         return (
           <DangerText
             key={setting.key}
-          >{t`Choose a ${settingLabel}`}</DangerText>
+          >{t`You haven't chosen: ${settingLabel}`}</DangerText>
         );
       })}
     </Stack>

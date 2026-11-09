@@ -458,7 +458,7 @@ describe("PluginVizRenderer", () => {
     });
 
     expect(
-      await screen.findByText("Choose a Label column"),
+      await screen.findByText("You haven't chosen: Label column"),
     ).toBeInTheDocument();
   });
 
@@ -471,14 +471,14 @@ describe("PluginVizRenderer", () => {
     });
 
     expect(
-      await screen.findByText("Choose a Label column"),
+      await screen.findByText("You haven't chosen: Label column"),
     ).toBeInTheDocument();
   });
 
   it("does not ask for a required column setting before the result has columns", async () => {
     await _renderChartWithoutColumns(_addBundledPlugin());
 
-    expect(screen.queryByText("Choose a Label column")).toBeNull();
+    expect(screen.queryByText("You haven't chosen: Label column")).toBeNull();
   });
 
   it("shows no loading status before the result has columns", async () => {
@@ -502,7 +502,7 @@ describe("PluginVizRenderer", () => {
     const pluginId = _addBundledPlugin({ loadCode });
 
     _renderChart({ vizConfig: _makeConfig({ pluginId, columnSettings: {} }) });
-    await screen.findByText("Choose a Label column");
+    await screen.findByText("You haven't chosen: Label column");
 
     expect(loadCode).not.toHaveBeenCalled();
   });
