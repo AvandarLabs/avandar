@@ -56,6 +56,30 @@ describe("gradeEvalAnswer with expectsNoQuery", () => {
     expect(graded.pass).toBe(false);
   });
 
+  it("fails a text answer that states a number", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({
+        assistantText: "I cannot see it, but it likely shows 1,200 deaths.",
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+
+  it("ignores the digits of a value placeholder", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({
+        assistantText: "I cannot see it, so I cannot tell about <value 1>.",
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
+
   it("fails an answer that ran a query", () => {
     const graded = gradeEvalAnswer(
       NO_QUERY_QUESTION,

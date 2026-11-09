@@ -272,25 +272,101 @@ describe("createPiConversation mentions", () => {
   });
 });
 
+const UUID_PATTERN =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
+
+function _questionById(id: string): EvalQuestion {
+  return MENTION_QUESTIONS.find((candidate) => {
+    return candidate.id === id;
+  })!;
+}
+
+/** Asks the questions in order in one conversation, returning each text. */
+async function _askAll(ids: readonly string[]): Promise<string[]> {
+  const asked: string[] = [];
+  runEvalSqlMock.mockResolvedValue({
+    kind: "rows",
+    result: { columns: [], rows: [] },
+  });
+  const conversation = createPiConversation({
+    database: {} as EvalDatabase,
+    createAgent: () => {
+      return _createRecordingAgent(asked);
+    },
+  });
+  for (const id of ids) {
+    await conversation.ask(_questionById(id));
+  }
+  return asked;
+}
+
+function _blockOf(text: string, tag: string): string {
+  return text.match(new RegExp(`<${tag}>[\\s\\S]*?</${tag}>`))?.[0] ?? "";
+}
+
 describe("the mention questions", () => {
   it.each(MENTION_QUESTIONS.map((question) => {return question.id}))(
-    "%s reaches the model with named mentions and no tokens",
+    "%s sends no token and no gadget id",
     async (id) => {
-      const question = MENTION_QUESTIONS.find((candidate) => {
-        return candidate.id === id;
-      })!;
-      const asked: string[] = [];
-      const conversation = createPiConversation({
-        database: {} as EvalDatabase,
-        createAgent: () => {
-          return _createRecordingAgent(asked);
-        },
-      });
+      const asked = await _askAll(id === "M03b" ? ["M03", id] : [id]);
 
-      await conversation.ask(question);
-
-      expect(asked[0]).not.toContain("@{");
-      expect(asked[0]).toContain(question.prompt.includes("@{") ? '@"' : "");
+      expect(asked.join("\n")).not.toContain("@{");
+      expect(asked.join("\n")).not.toMatch(UUID_PATTERN);
     },
   );
+
+  it("M01 names the US deaths dataset in the mentioned block", async () => {
+    const [text = ""] = await _askAll(["M01"]);
+
+    expect(_blockOf(text, "mentioned")).toContain('"long-us-deaths.csv"');
+  });
+
+  it("M02 shows the mentioned tile's SQL in the mentioned block", async () => {
+    const [text = ""] = await _askAll(["M02"]);
+
+    expect(_blockOf(text, "mentioned")).toContain("daily_new_deaths");
+  });
+
+  it("M02 keeps the page's cases tile out of the mentioned block", async () => {
+    const [text = ""] = await _askAll(["M02"]);
+
+    expect(_blockOf(text, "mentioned")).not.toContain("daily_new_cases");
+    expect(_blockOf(text, "current_page")).toContain("daily_new_cases");
+  });
+
+  it("M03 sends the attached block", async () => {
+    const [text = ""] = await _askAll(["M03"]);
+
+    expect(_blockOf(text, "attached")).toContain("Mortality");
+  });
+
+  it("M03b sends the unchanged line after M03", async () => {
+    const asked = await _askAll(["M03", "M03b"]);
+
+    expect(asked[1]).toContain(
+      "<attached>Unchanged since the last message.</attached>",
+    );
+  });
+
+  it("M04 names both datasets in the mentioned block", async () => {
+    const [text = ""] = await _askAll(["M04"]);
+
+    expect(_blockOf(text, "mentioned")).toContain('"long-us-deaths.csv"');
+    expect(_blockOf(text, "mentioned")).toContain(
+      '"long-us-confirmed-cases.csv"',
+    );
+  });
+
+  it("M05 names the mention as an unavailable dashboard", async () => {
+    const [text = ""] = await _askAll(["M05"]);
+
+    expect(text).toContain("an unavailable dashboard");
+  });
+
+  it("M06 hides the county behind a placeholder", async () => {
+    const [text = ""] = await _askAll(["M06"]);
+
+    expect(text).toContain("'<value 1>'");
+    expect(text).not.toContain("Kings");
+  });
 });

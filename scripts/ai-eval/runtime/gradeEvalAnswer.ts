@@ -37,9 +37,16 @@ function _gradeNoQuery(answer: EvalAnswer): {
   if (answer.finalSql !== undefined || answer.result) {
     return { pass: false, detail: "ran a query it should not have run" };
   }
-  return CANNOT_SEE_PATTERN.test(answer.assistantText)
-    ? { pass: true, detail: "ran no query and said it cannot see it" }
-    : { pass: false, detail: "ran no query but did not say it cannot see it" };
+  if (!CANNOT_SEE_PATTERN.test(answer.assistantText)) {
+    return {
+      pass: false,
+      detail: "ran no query but did not say it cannot see it",
+    };
+  }
+  const text = answer.assistantText.replaceAll(/<value \d+>/g, "");
+  return /\d/.test(text)
+    ? { pass: false, detail: "said it cannot see it but stated a number" }
+    : { pass: true, detail: "ran no query and said it cannot see it" };
 }
 
 function _gradeResult(

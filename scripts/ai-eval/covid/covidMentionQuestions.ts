@@ -18,8 +18,8 @@ import type { EvalQuestion } from "../EvalQuestion";
 import type { Verdict } from "../grading/ResultMatchers";
 
 /** Fixed ids, so a run's prompts are the same every time. */
-const DASHBOARD_ID = "5c1d0a10-0001-4000-8000-000000000001";
-const OTHER_DASHBOARD_ID = "5c1d0a10-0002-4000-8000-000000000002";
+const COVID_DASHBOARD_ID = "5c1d0a10-0001-4000-8000-000000000001";
+const MORTALITY_DASHBOARD_ID = "5c1d0a10-0002-4000-8000-000000000002";
 const KINGS_DASHBOARD_ID = "5c1d0a10-0003-4000-8000-000000000003";
 const UNAVAILABLE_DASHBOARD_ID = "5c1d0a10-0004-4000-8000-000000000004";
 
@@ -45,7 +45,7 @@ const US_CASES_CONTEXT = _datasetContext("long-us-confirmed-cases.csv");
 
 const DEATHS_TILE_CONTEXT: AgentGadgetContext = {
   kind: "dashboard_tile",
-  ref: _tileRef(OTHER_DASHBOARD_ID, "deaths-tile"),
+  ref: _tileRef(MORTALITY_DASHBOARD_ID, "deaths-tile"),
   dashboardName: "Mortality",
   tile: DEATHS_TILE,
 };
@@ -66,7 +66,11 @@ const KINGS_TILE_CONTEXT: AgentGadgetContext = {
 
 const ATTACHED_DASHBOARD: AgentGadgetContext = {
   kind: "dashboard",
-  ref: { gadgetType: "dashboard", gadgetId: DASHBOARD_ID, subId: null },
+  ref: {
+    gadgetType: "dashboard",
+    gadgetId: MORTALITY_DASHBOARD_ID,
+    subId: null,
+  },
   name: "Mortality",
   tiles: [DEATHS_TILE],
 };
@@ -99,14 +103,14 @@ const EXPLORER_ON_GLOBAL_DEATHS: AgentPageContext = {
 const OPEN_DASHBOARD: AgentPageContext = {
   app: "dashboard",
   dashboard: {
-    id: DASHBOARD_ID,
+    id: COVID_DASHBOARD_ID,
     name: "COVID 2022",
     tiles: [CASES_TILE],
   },
 };
 
-const DEATHS_2022 = `year("date") = 2022`;
-const FIRST_HALF_2022 = `${DEATHS_2022} AND month("date") <= 6`;
+const YEAR_2022 = `year("date") = 2022`;
+const FIRST_HALF_2022 = `${YEAR_2022} AND month("date") <= 6`;
 
 /** Rows by month holding both the deaths and the cases for each month. */
 function _gradeBothMeasuresByMonth(
@@ -141,7 +145,7 @@ const GADGET_QUESTIONS: readonly EvalQuestion[] = [
     clarification: "not_needed",
     pageContext: OPEN_DASHBOARD,
     mentions: [DEATHS_TILE_CONTEXT],
-    truth: { total: Sql.total("us_deaths", DEATHS_2022) },
+    truth: { total: Sql.total("us_deaths", YEAR_2022) },
     grade: (context) => {
       return weeklyTotal(context, 52);
     },
@@ -152,7 +156,7 @@ const GADGET_QUESTIONS: readonly EvalQuestion[] = [
     prompt: "how many deaths does the attached dashboard show in total?",
     clarification: "not_needed",
     attached: [ATTACHED_DASHBOARD],
-    truth: { total: Sql.total("us_deaths", DEATHS_2022) },
+    truth: { total: Sql.total("us_deaths", YEAR_2022) },
     grade: totalOrSum,
   },
   {
@@ -172,8 +176,8 @@ const GADGET_QUESTIONS: readonly EvalQuestion[] = [
     clarification: "not_needed",
     mentions: [US_DEATHS_CONTEXT, US_CASES_CONTEXT],
     truth: {
-      deaths: Sql.monthly("us_deaths", DEATHS_2022),
-      cases: Sql.monthly("us_cases", DEATHS_2022),
+      deaths: Sql.monthly("us_deaths", YEAR_2022),
+      cases: Sql.monthly("us_cases", YEAR_2022),
     },
     grade: _gradeBothMeasuresByMonth,
   },

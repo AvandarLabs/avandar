@@ -237,7 +237,10 @@ function _toFailedEvalAnswer(
  * then names are masked with the same vault. A column is personal when its
  * name looks personal, when the question lists it, or when it is none of
  * the COVID datasets' columns (an alias). A mention the question gives no
- * context for is unavailable.
+ * context for is unavailable. Unlike the browser, it does not redact the SQL
+ * of gadgets only earlier messages mention: no eval follow-up mentions a
+ * gadget its parent did not also have in scope, so the vault never lacks a
+ * value a later name needs.
  */
 function _buildTurnInputs(
   question: EvalQuestion,
