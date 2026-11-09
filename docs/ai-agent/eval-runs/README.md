@@ -125,3 +125,9 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T05-01-03](2026-11-09T05-01-03-phase-1a-redaction-review2_agent-page-final/results.jsonl) | `phase-1a-redaction-review2:agent-page-final` | 7/7 | 0 | 0 | $0.00020 | 1.7 s / 2.8 s | none |
 | [2026-11-09T05-27-25](2026-11-09T05-27-25-phase-1a-fixes_agent-page/results.jsonl) | `phase-1a-fixes:agent-page` | 7/7 | 0 | 0 | $0.00036 | 1.9 s / 2.5 s | none |
 | [2026-11-09T05-28-14](2026-11-09T05-28-14-phase-1a-fixes_agent-45/results.jsonl) | `phase-1a-fixes:agent-45` | 45/45 | 0 | 0 | $0.00028 | 2.2 s / 3.3 s | none |
+| [2026-11-09T11-39-46](2026-11-09T11-39-46-phase-1b_agent-mentions/results.jsonl) | `phase-1b:agent-mentions` | 7/7 | 0 | 0 | $0.00036 | 2.2 s / 2.4 s | none |
+| [2026-11-09T11-39-54](2026-11-09T11-39-54-phase-1b_agent-mentions/results.jsonl) | `phase-1b:agent-mentions` | 7/7 | 0 | 0 | $0.00018 | 2.0 s / 2.3 s | none |
+| [2026-11-09T11-40-01](2026-11-09T11-40-01-phase-1b_agent-mentions/results.jsonl) | `phase-1b:agent-mentions` | 7/7 | 0 | 0 | $0.00018 | 1.8 s / 2.3 s | none |
+| [2026-11-09T11-40-15](2026-11-09T11-40-15-phase-1b_agent-page/results.jsonl) | `phase-1b:agent-page` | 7/7 | 0 | 0 | $0.00021 | 1.7 s / 2.7 s | none |
+| [2026-11-09T11-40-56](2026-11-09T11-40-56-phase-1b_agent-45/results.jsonl) | `phase-1b:agent-45` | 44/45 | 0 | 0 | $0.00055 | 2.1 s / 3.5 s | N04 |
+| [2026-11-09T11-41-09](2026-11-09T11-41-09-phase-1b_rerun-n04/results.jsonl) | `phase-1b:rerun-n04` | 1/1 | 0 | 0 | $0.00036 | 3.5 s / 3.5 s | none |
