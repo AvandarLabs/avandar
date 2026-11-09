@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import {
   createAgentConversation,
   createConversationAgentHost,
@@ -10,15 +11,22 @@ import type {
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
-const { showQueryInChatMock, explorerShowQueryMock } = vi.hoisted(() => {
-  return {
-    showQueryInChatMock: vi
-      .fn()
-      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
-    explorerShowQueryMock: vi
-      .fn()
-      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
-  };
+const { showQueryInChatMock, explorerShowQueryMock, runQueryMock } = vi.hoisted(
+  () => {
+    return {
+      runQueryMock: vi.fn(),
+      showQueryInChatMock: vi
+        .fn()
+        .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+      explorerShowQueryMock: vi
+        .fn()
+        .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+    };
+  },
+);
+
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
+  return { WorkspaceQuerySession: { runQuery: runQueryMock } };
 });
 
 vi.mock(
@@ -63,10 +71,28 @@ function _turn(
 }
 
 function _state(turn: DataAgentTurnOptions): AgentConversationState {
-  return { turnRef: { current: turn }, results: [] };
+  return {
+    turnRef: { current: turn },
+    results: [],
+    sqlVault: createSqlPlaceholderVault(),
+  };
 }
 
 const REQUEST = { sql: "SELECT 1", summary: "s" };
+
+/** A conversation state whose vault holds `'Kings'` as `<value 1>`. */
+function _stateWithKings(turn: DataAgentTurnOptions): AgentConversationState {
+  const state = _state(turn);
+  state.sqlVault.redact(`SELECT 1 FROM t WHERE "patient_name" = 'Kings'`, {
+    isSensitiveColumn: (columnName) => {
+      return columnName === "patient_name";
+    },
+    isSensitiveValue: () => {
+      return false;
+    },
+  });
+  return state;
+}
 
 describe("createConversationAgentHost", () => {
   it("shows results in the explorer on the Data Explorer", async () => {
@@ -125,6 +151,61 @@ describe("createConversationAgentHost", () => {
   });
 });
 
+describe("createConversationAgentHost placeholders", () => {
+  it("restores page placeholders before the explorer runs a query", async () => {
+    const host = createConversationAgentHost(
+      _stateWithKings(_turn("data-explorer")),
+    );
+
+    await host.showQuery({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`,
+      summary: "s",
+    });
+
+    expect(explorerShowQueryMock).toHaveBeenCalledWith({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`,
+      summary: "s",
+    });
+  });
+
+  it("stores the restored SQL on the chat result card", async () => {
+    const state = _stateWithKings(_turn("dashboard"));
+
+    await createConversationAgentHost(state).showQuery({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`,
+      summary: "s",
+    });
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({
+          sql: `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`,
+        }),
+      }),
+    );
+  });
+
+  it("restores page placeholders before a lookup runs", async () => {
+    runQueryMock.mockResolvedValue({
+      data: [{ x: "Kings" }, { x: "Kingston" }],
+    });
+    const host = createConversationAgentHost(
+      _stateWithKings(_turn("dashboard")),
+    );
+
+    const values = await host.readColumnValues(
+      `SELECT DISTINCT x FROM t WHERE x IN ('<value 1>', 'Kingston')`,
+    );
+
+    expect(runQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSql: `SELECT DISTINCT x FROM t WHERE x IN ('Kings', 'Kingston')`,
+      }),
+    );
+    expect(values).toEqual(["<value 1>", "Kingston"]);
+  });
+});
+
 describe("createAgentConversation", () => {
   it("gives the agent a host that reads the conversation it returns", async () => {
     let agentHost: DataAgentHost | undefined;
@@ -144,6 +225,9 @@ describe("createAgentConversation", () => {
 
     expect(conversation.dataAgent).toBe(dataAgent);
     expect(conversation.datasets).toBe(datasets);
+    expect(conversation.sqlVault.restore("SELECT '<value 1>'")).toBe(
+      "SELECT '<value 1>'",
+    );
     expect(showQueryInChatMock).toHaveBeenCalledWith(
       expect.objectContaining({ results: conversation.results }),
     );

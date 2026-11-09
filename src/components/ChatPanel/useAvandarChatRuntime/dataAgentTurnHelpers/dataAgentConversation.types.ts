@@ -6,6 +6,7 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { MutableRefObject } from "react";
@@ -37,12 +38,19 @@ export type DataAgentTurnOptions = {
 
 /**
  * What a conversation's host reads on every call: the turn being answered
- * (the agent outlives each turn, so it must never keep the first one) and
- * the results this turn added to the chat.
+ * (the agent outlives each turn, so it must never keep the first one), the
+ * results this turn added to the chat, and the placeholders that stand for
+ * personal values in the page SQL this conversation's model has read.
  */
 export type AgentConversationState = {
   turnRef: { current: DataAgentTurnOptions };
   results: AgentQueryResultData[];
+  /**
+   * Created with the conversation. Page blocks hide values with it, and the
+   * host restores them before SQL runs. An offline conversation sends no
+   * page block, so its vault stays empty and restoring changes nothing.
+   */
+  sqlVault: SqlPlaceholderVault;
 };
 
 /** One conversation's agent, the turn it is answering, and its results. */

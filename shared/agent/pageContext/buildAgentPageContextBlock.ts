@@ -2,7 +2,6 @@ import {
   MAX_PAGE_SQL_CHARACTERS,
   MAX_PAGE_TILES,
 } from "$/agent/pageContext/AgentPageContext.ts";
-import { redactSqlLiterals } from "$/agent/pageContext/redactSqlLiterals.ts";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import type {
   AgentPageApp,
@@ -40,6 +39,13 @@ type Aliases = readonly SqlTableAlias.T[];
 /** True when a piece of page text looks like personal data. */
 type IsSensitive = (text: string) => boolean;
 
+/** Page SQL with its personal values hidden, before it leaves the device. */
+type RedactSql = (sql: string) => string;
+
+type SqlOptions = Readonly<{ aliases: Aliases; redactSql?: RedactSql }>;
+
+type TileOptions = SqlOptions & Readonly<{ isSensitive?: IsSensitive }>;
+
 /**
  * A name as a JSON string literal, so quotes and line breaks are escaped,
  * including the line and paragraph separators JSON leaves raw. Every `<`
@@ -62,12 +68,15 @@ function _inline(text: string): string {
 }
 
 /**
- * One SQL statement on a single line, with table names shown as aliases and
- * cut at the cap. Only a `<` that would start a page tag is escaped, so
- * comparisons such as `a < b` stay readable.
+ * One SQL statement on a single line, with personal values hidden by
+ * `redactSql`, table names shown as aliases, and cut at the cap. Values are
+ * hidden first, on the SQL as stored. Only a `<` that would start a page tag
+ * is escaped, so comparisons such as `a < b` stay readable.
  */
-function _formatSql(sql: string, aliases: Aliases): string {
-  const singleLine = sql.trim().replace(LINE_BREAKS, " ");
+function _formatSql(sql: string, options: SqlOptions): string {
+  const { aliases, redactSql } = options;
+  const redacted = redactSql ? redactSql(sql) : sql;
+  const singleLine = redacted.trim().replace(LINE_BREAKS, " ");
   const aliased = SqlTableAlias.toAliasedSql(singleLine, aliases).replace(
     PAGE_TAG_START,
     "\\u003c",
@@ -91,14 +100,14 @@ function _datasetLine(
 
 function _explorerLines(
   explorer: NonNullable<AgentPageContext["explorer"]>,
-  aliases: Aliases,
+  options: SqlOptions,
 ): string[] {
   const columns = explorer.resultColumns.map((column) => {
     return `${_inline(column.name)} ${_inline(column.dataType)}`;
   });
   return [
     ...(explorer.sql
-      ? [`Query on screen: ${_formatSql(explorer.sql, aliases)}`]
+      ? [`Query on screen: ${_formatSql(explorer.sql, options)}`]
       : []),
     ...(columns.length > 0 ? [`Result columns: ${columns.join(", ")}`] : []),
   ];
@@ -106,28 +115,24 @@ function _explorerLines(
 
 /**
  * One chart's line. With `isSensitive`, a title that looks like personal
- * data becomes "Untitled chart", and each such string literal in its SQL
- * becomes `'<redacted>'`, before anything is cut or escaped.
+ * data becomes "Untitled chart".
  */
 function _tileLine(
   tile: AgentPageTile,
   index: number,
-  options: Readonly<{ aliases: Aliases; isSensitive?: IsSensitive }>,
+  options: TileOptions,
 ): string {
-  const { aliases, isSensitive } = options;
+  const { isSensitive } = options;
   const title =
     isSensitive && isSensitive(tile.title) ? REDACTED_TILE_TITLE : tile.title;
-  const sql = _formatSql(
-    isSensitive ? redactSqlLiterals(tile.sql, isSensitive) : tile.sql,
-    aliases,
-  );
+  const sql = _formatSql(tile.sql, options);
   const heading = `${index + 1}. ${_quote(title)} (${_inline(tile.chartType)})`;
   return sql === "" ? heading : `${heading}: ${sql}`;
 }
 
 function _dashboardLines(
   dashboard: NonNullable<AgentPageContext["dashboard"]>,
-  options: Readonly<{ aliases: Aliases; isSensitive?: IsSensitive }>,
+  options: TileOptions,
 ): string[] {
   const listed = dashboard.tiles.slice(0, MAX_PAGE_TILES);
   const hiddenCount = dashboard.tiles.length - listed.length;
@@ -163,24 +168,24 @@ function _caseLines(context: AgentPageContext): string[] {
  * strings and SQL is collapsed to one line, so neither can start a new line
  * or end the block.
  *
- * `isSensitive` flags text that looks like personal data. Dashboard chart
- * titles and the string literals in their SQL go through it, so a filter
- * value such as an email address is redacted before the block leaves the
- * device. The Data Explorer's SQL is not checked: today's chat already sends
- * it unredacted as `lastSql`, and the block keeps parity with that.
+ * `redactSql` hides personal values in page SQL (dashboard charts and the
+ * Data Explorer's query) before the block leaves the device, for example by
+ * swapping them for placeholders the browser maps back. `isSensitive` flags
+ * chart titles that look like personal data, which become "Untitled chart".
  */
 export function buildAgentPageContextBlock(
   options: Readonly<{
     context: AgentPageContext;
     aliases: Aliases;
     isSensitive?: IsSensitive;
+    redactSql?: RedactSql;
   }>,
 ): string {
   const { context, aliases } = options;
   const lines = [
     `Page: ${APP_LABELS[context.app]}`,
     ...(context.dataset ? [_datasetLine(context.dataset, aliases)] : []),
-    ...(context.explorer ? _explorerLines(context.explorer, aliases) : []),
+    ...(context.explorer ? _explorerLines(context.explorer, options) : []),
     ...(context.dashboard ? _dashboardLines(context.dashboard, options) : []),
     ...(context.map ? [`Map: ${_quote(context.map.name)}`] : []),
     ..._caseLines(context),

@@ -187,7 +187,9 @@ describe("askConversationDataAgent", () => {
     return askConversationDataAgent({
       conversations,
       turn,
-      pageBlock,
+      buildPageBlock: () => {
+        return pageBlock;
+      },
       createConversation: vi.fn(),
     });
   }
@@ -284,7 +286,9 @@ describe("askConversationDataAgent", () => {
     await askConversationDataAgent({
       conversations: new Map(),
       turn: _turn(["How many?", "42.", "And deaths?"]),
-      pageBlock: PAGE_BLOCK,
+      buildPageBlock: () => {
+        return PAGE_BLOCK;
+      },
       createConversation: async () => {
         return conversation;
       },
@@ -294,6 +298,25 @@ describe("askConversationDataAgent", () => {
       `${PAGE_BLOCK}\n\nEarlier in this conversation:\n` +
         "User: How many?\nAssistant: 42.\n\nAnd deaths?",
     );
+  });
+
+  it("builds the page block from the conversation it asks", async () => {
+    const conversation = _fakeConversation();
+    const buildPageBlock = vi.fn(() => {
+      return PAGE_BLOCK;
+    });
+
+    await askConversationDataAgent({
+      conversations: new Map(),
+      turn: _turn("How many?"),
+      buildPageBlock,
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect(buildPageBlock).toHaveBeenCalledWith(conversation);
+    expect(conversation.asked[0]).toBe(`${PAGE_BLOCK}\n\nHow many?`);
   });
 
   it("drops and stops the workspace's older chats when a new chat starts", async () => {

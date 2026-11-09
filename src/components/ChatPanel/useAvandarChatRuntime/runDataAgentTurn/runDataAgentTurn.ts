@@ -15,7 +15,10 @@ import {
   buildConversationKey,
   loadDataAgentDatasets,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
-import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import {
+  detectPii,
+  isPersonalDataText,
+} from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
@@ -27,6 +30,7 @@ import type {
   DataAgentTurnOptions,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentModelPolicy } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { SqlLiteralDetectors } from "@/lib/agent/dataAgent/pagePrivacy/findSensitiveSqlLiterals";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
@@ -40,6 +44,17 @@ export type AgentPageInputs = {
 
 /** One conversation per chat, so follow-ups see earlier turns. */
 const conversationsByChat = new Map<string, DataAgentConversation>();
+
+/**
+ * What counts as personal in page SQL: values compared with a column whose
+ * name looks personal, and values that look personal on their own.
+ */
+const PAGE_SQL_DETECTORS: SqlLiteralDetectors = {
+  isSensitiveColumn: (columnName) => {
+    return detectPii({ columnName }).hits.length > 0;
+  },
+  isSensitiveValue: isPersonalDataText,
+};
 
 const models = createModels();
 models.setProvider(openrouterProvider());
@@ -116,8 +131,9 @@ async function _readPageContext(
 /**
  * Answers a chat message on any page with the Pi-based data agent. The
  * agent runs in the browser; only model requests go to the server, through
- * the agent proxy. The current page starts each turn's message, with
- * personal data in dashboard charts redacted. Datasets
+ * the agent proxy. The current page starts each turn's message. Personal
+ * values in its SQL become placeholders from the conversation's vault,
+ * which the host maps back before the agent's SQL runs. Datasets
  * load once per conversation: the agent's table aliases are positional, so
  * the page block must name tables from the same list the agent was given.
  */
@@ -134,13 +150,18 @@ export async function runDataAgentTurn(
   return askConversationDataAgent({
     conversations: conversationsByChat,
     turn: { ...options, pageContext },
-    pageBlock: pageContext
-      ? buildAgentPageContextBlock({
-          context: pageContext,
-          aliases: SqlTableAlias.fromSchema({ datasets }),
-          isSensitive: isPersonalDataText,
-        })
-      : undefined,
+    buildPageBlock: (conversation) => {
+      return pageContext
+        ? buildAgentPageContextBlock({
+            context: pageContext,
+            aliases: SqlTableAlias.fromSchema({ datasets }),
+            isSensitive: isPersonalDataText,
+            redactSql: (sql) => {
+              return conversation.sqlVault.redact(sql, PAGE_SQL_DETECTORS);
+            },
+          })
+        : undefined;
+    },
     createConversation: async (turnRef) => {
       return _createConversation(turnRef, datasets);
     },

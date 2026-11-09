@@ -256,15 +256,23 @@ describe("buildAgentPageContextBlock", () => {
     expect(block).toContain("Result columns: a b int");
   });
 
-  it("redacts sensitive literals and titles in dashboard charts", () => {
+  it("redacts SQL in charts and the explorer, and personal titles", () => {
+    const redactSql = (sql: string): string => {
+      return sql.replace("'Kings'", "'<value 1>'");
+    };
     const isSensitive = (text: string): boolean => {
       return text.includes("@");
     };
     const block = buildAgentPageContextBlock({
       aliases: ALIASES,
       isSensitive,
+      redactSql,
       context: {
         app: "dashboard",
+        explorer: {
+          sql: `SELECT * FROM "${TABLE}" WHERE "Admin2" = 'Kings'`,
+          resultColumns: [],
+        },
         dashboard: {
           id: "d1",
           name: "D",
@@ -272,7 +280,7 @@ describe("buildAgentPageContextBlock", () => {
             {
               title: "Cases for jane.doe@example.com",
               chartType: "table",
-              sql: `SELECT * FROM "${TABLE}" WHERE "email" = 'jane.doe@example.com' AND "state" = 'Texas'`,
+              sql: `SELECT * FROM "${TABLE}" WHERE "Admin2" = 'Kings' AND "state" = 'Texas'`,
             },
           ],
         },
@@ -280,24 +288,30 @@ describe("buildAgentPageContextBlock", () => {
     });
 
     expect(block).toContain(
-      `1. "Untitled chart" (table): SELECT * FROM "t0" WHERE "email" = '<redacted>' AND "state" = 'Texas'`,
+      `Query on screen: SELECT * FROM "t0" WHERE "Admin2" = '<value 1>'`,
     );
+    expect(block).toContain(
+      `1. "Untitled chart" (table): SELECT * FROM "t0" WHERE "Admin2" = '<value 1>' AND "state" = 'Texas'`,
+    );
+    expect(block).not.toContain("Kings");
     expect(block).not.toContain("jane.doe");
   });
 
-  it("leaves the explorer's SQL unredacted, as today's chat sends it", () => {
-    const block = buildAgentPageContextBlock({
+  it("redacts SQL before table names become aliases", () => {
+    const seen: string[] = [];
+    buildAgentPageContextBlock({
       aliases: ALIASES,
-      isSensitive: () => {
-        return true;
+      redactSql: (sql) => {
+        seen.push(sql);
+        return sql;
       },
       context: {
         app: "data-explorer",
-        explorer: { sql: "SELECT 'a@b.co'", resultColumns: [] },
+        explorer: { sql: `SELECT 1 FROM "${TABLE}"`, resultColumns: [] },
       },
     });
 
-    expect(block).toContain("Query on screen: SELECT 'a@b.co'");
+    expect(seen).toEqual([`SELECT 1 FROM "${TABLE}"`]);
   });
 
   it("keeps tiles as written without a sensitivity check", () => {

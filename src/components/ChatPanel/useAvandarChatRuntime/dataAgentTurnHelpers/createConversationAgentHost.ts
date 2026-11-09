@@ -2,6 +2,8 @@ import { createExplorerShowQuery } from "@/components/ChatPanel/useAvandarChatRu
 import { showQueryInChat } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
+import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
+import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type {
   AgentConversationState,
@@ -24,13 +26,15 @@ function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
  * The browser host for one conversation's agent. Each call reads the
  * current turn, so a follow-up sent from another page shows its result
  * there: in the Data Explorer when the user is on it, in the chat otherwise.
- * The agent never changes the page.
+ * The agent never changes the page. Page placeholders in the agent's SQL are
+ * restored from the conversation's vault before anything runs, so the
+ * explorer and the chat result card get the real SQL.
  */
 export function createConversationAgentHost(
   state: AgentConversationState,
 ): DataAgentHost {
   const firstTurn = state.turnRef.current;
-  return createBrowserDataAgentHost({
+  const browserHost = createBrowserDataAgentHost({
     workspaceId: firstTurn.workspaceId,
     userId: firstTurn.currentUser?.id,
     showQuery: (request) => {
@@ -51,6 +55,7 @@ export function createConversationAgentHost(
       );
     },
   });
+  return createPlaceholderRestoringHost(browserHost, state.sqlVault);
 }
 
 /**
@@ -68,6 +73,7 @@ export function createAgentConversation(
   const state: AgentConversationState = {
     turnRef: options.turnRef,
     results: [],
+    sqlVault: createSqlPlaceholderVault(),
   };
   const host = createConversationAgentHost(state);
   return Object.assign(state, {

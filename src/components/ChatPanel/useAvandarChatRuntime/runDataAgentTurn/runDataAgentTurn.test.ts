@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runDataAgentTurn } from "./runDataAgentTurn";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { AgentPageInputs } from "./runDataAgentTurn";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { CreateDataAgentOptions } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
@@ -104,6 +105,17 @@ function _page(pathname: string): AgentPageInputs {
   };
 }
 
+function _dashboardWithTile(sql: string, title = "Cases"): AgentPageContext {
+  return {
+    app: "dashboard",
+    dashboard: {
+      id: DASHBOARD_ID,
+      name: "Outbreak",
+      tiles: [{ title, chartType: "table", sql }],
+    },
+  };
+}
+
 function _askedTexts(): string[] {
   return askMock.mock.calls.map(([text]) => {
     return text as string;
@@ -163,22 +175,14 @@ describe("runDataAgentTurn", () => {
     expect(showQueryInChatMock).toHaveBeenCalled();
   });
 
-  it("redacts personal data in dashboard charts before asking", async () => {
+  it("hides personal values in page SQL behind placeholders", async () => {
     getAllDatasetsMock.mockResolvedValue([DATASET_A]);
-    createAgentPageContextMock.mockResolvedValueOnce({
-      app: "dashboard",
-      dashboard: {
-        id: DASHBOARD_ID,
-        name: "Outbreak",
-        tiles: [
-          {
-            title: "Calls to 555-123-4567",
-            chartType: "table",
-            sql: `SELECT * FROM t WHERE "email" = 'jane.doe@example.com' AND "state" = 'Texas'`,
-          },
-        ],
-      },
-    });
+    createAgentPageContextMock.mockResolvedValueOnce(
+      _dashboardWithTile(
+        `SELECT * FROM t WHERE "email" = 'jane.doe@example.com' AND "last_name" = 'Doe' AND "state" = 'Texas'`,
+        "Calls to 555-123-4567",
+      ),
+    );
 
     await runDataAgentTurn(
       _turn("workspace-redaction", "What is this?"),
@@ -186,8 +190,42 @@ describe("runDataAgentTurn", () => {
     );
 
     expect(_askedTexts()[0]).toContain(
-      `1. "Untitled chart" (table): SELECT * FROM t WHERE "email" = '<redacted>' AND "state" = 'Texas'`,
+      `1. "Untitled chart" (table): SELECT * FROM t WHERE "email" = '<value 1>' AND "last_name" = '<value 2>' AND "state" = 'Texas'`,
     );
     expect(_askedTexts()[0]).not.toContain("jane.doe");
+    expect(_askedTexts()[0]).not.toContain("'Doe'");
+  });
+
+  it("keeps a value's placeholder across turns and restores it", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock
+      .mockResolvedValueOnce(
+        _dashboardWithTile(`SELECT * FROM t WHERE "last_name" = 'Doe'`),
+      )
+      .mockResolvedValueOnce(
+        _dashboardWithTile(
+          `SELECT * FROM t WHERE "last_name" IN ('Roe', 'Doe')`,
+        ),
+      );
+    const page = _page(`/acme/dashboards/edit/${DASHBOARD_ID}`);
+
+    await runDataAgentTurn(_turn("workspace-vault", "What is this?"), page);
+    await runDataAgentTurn(_turn("workspace-vault", "And now?"), page);
+    await _lastAgentOptions().host.showQuery({
+      sql: `SELECT * FROM t WHERE "last_name" = '<value 1>'`,
+      summary: "s",
+    });
+
+    expect(createDataAgentMock).toHaveBeenCalledTimes(1);
+    expect(_askedTexts()[1]).toContain(
+      `"last_name" IN ('<value 2>', '<value 1>')`,
+    );
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({
+          sql: `SELECT * FROM t WHERE "last_name" = 'Doe'`,
+        }),
+      }),
+    );
   });
 });

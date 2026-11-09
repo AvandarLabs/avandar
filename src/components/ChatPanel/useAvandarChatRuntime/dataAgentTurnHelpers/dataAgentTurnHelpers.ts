@@ -254,7 +254,11 @@ async function _getConversation(
 type AskConversationDataAgentOptions = {
   conversations: Map<string, DataAgentConversation>;
   turn: Readonly<DataAgentTurnOptions>;
-  pageBlock?: string;
+  /**
+   * The page block for this turn, built from the conversation it goes to,
+   * whose vault hides personal values in page SQL.
+   */
+  buildPageBlock?: (conversation: DataAgentConversation) => string | undefined;
   createConversation: (
     turnRef: AgentConversationState["turnRef"],
   ) => Promise<DataAgentConversation>;
@@ -265,7 +269,7 @@ type AskConversationDataAgentOptions = {
  * conversation on its first turn, and returns the reply with any results
  * this turn added to the chat. `conversations` holds one per
  * `${workspaceId}:${chatGeneration}`, so follow-ups see earlier turns. The
- * page block, when given, starts the message. A run still in progress is
+ * page block, when there is one, starts the message. A run still in progress is
  * stopped first, since a conversation answers one message at a time.
  */
 export async function askConversationDataAgent(
@@ -283,15 +287,16 @@ export async function askConversationDataAgent(
   conversation.turnRef.current = turn;
   conversation.results = results;
   turn.chatPanelDispatch.setPendingClarification(undefined);
+  const pageBlock = options.buildPageBlock?.(conversation);
   const reply = await _askAgent(
     conversation,
     buildAgentTurnText({
       message: _buildPromptText(turn.apiMessages, isNew),
-      pageBlock: options.pageBlock,
+      pageBlock,
       previousPageBlock: conversation.lastPageBlock,
     }),
   );
-  conversation.lastPageBlock = options.pageBlock ?? conversation.lastPageBlock;
+  conversation.lastPageBlock = pageBlock ?? conversation.lastPageBlock;
   return {
     content: [
       { type: "text", text: reply.text },
