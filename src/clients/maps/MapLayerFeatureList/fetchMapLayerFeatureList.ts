@@ -1,4 +1,4 @@
-import { isDefined, isPlainObject, prop, propEq } from "@avandar/utils";
+import { isPlainObject, prop, propEq } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -6,6 +6,7 @@ import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/Work
 import { compileMapLayerFeatureListSql } from "./compileMapLayerFeatureListSql/compileMapLayerFeatureListSql";
 import { compileMapLayerFeatureSource } from "./compileMapLayerFeatureSource/compileMapLayerFeatureSource";
 import { getFeatureListAccessFromMapLayer } from "./getFeatureListAccessFromMapLayer/getFeatureListAccessFromMapLayer";
+import { getFeatureListQueryColumns } from "./getFeatureListQueryColumns/getFeatureListQueryColumns";
 import {
   MAP_LAYER_FEATURE_LIST_ROW_KEYS,
   MAP_LAYER_FEATURE_LIST_SQL_COLUMNS,
@@ -42,29 +43,6 @@ function _getListLayer(
     );
   }
   return layer;
-}
-
-/** The query columns a list shows, the popup's by default. */
-function _getListQueryColumns(
-  layer: MapLayer.T,
-  columnIds: FetchMapLayerFeatureListOptions["columnIds"],
-): QueryColumn.T[] {
-  const geometryColumnId =
-    layer.geoBinding?.type === "geometryColumn"
-      ? layer.geoBinding.column
-      : undefined;
-  const popupIds =
-    layer.popup.columnIds === "all"
-      ? layer.source.queryColumns.map(prop("id")).filter((columnId) => {
-          return columnId !== geometryColumnId;
-        })
-      : layer.popup.columnIds;
-  const requestedIds = columnIds === "popup" ? popupIds : columnIds;
-  return requestedIds
-    .map((columnId) => {
-      return layer.source.queryColumns.find(propEq("id", columnId));
-    })
-    .filter(isDefined);
 }
 
 function _getNearestBuffer(
@@ -216,7 +194,7 @@ export async function fetchMapLayerFeatureList(
   options: FetchMapLayerFeatureListOptions,
 ): Promise<MapLayerFeatureList> {
   const layer = _getListLayer(options.config, options.layerId);
-  const queryColumns = _getListQueryColumns(layer, options.columnIds);
+  const queryColumns = getFeatureListQueryColumns(layer, options.columnIds);
   const nearest = _getNearestBuffer(options.config, layer);
   const queryResult = await WorkspaceQuerySession.runQuery({
     rawSql: _compileListSql({
