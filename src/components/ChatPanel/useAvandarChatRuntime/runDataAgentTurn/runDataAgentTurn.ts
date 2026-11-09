@@ -15,11 +15,9 @@ import {
   buildConversationKey,
   loadDataAgentDatasets,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
-import {
-  detectPii,
-  isPersonalDataText,
-} from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
@@ -46,15 +44,26 @@ export type AgentPageInputs = {
 const conversationsByChat = new Map<string, DataAgentConversation>();
 
 /**
- * What counts as personal in page SQL: values compared with a column whose
- * name looks personal, and values that look personal on their own.
+ * What counts as personal in page SQL: values that go with a column whose
+ * name looks personal or that is none of the datasets' columns (an alias
+ * may stand for a personal one), and values that look personal on their
+ * own.
  */
-const PAGE_SQL_DETECTORS: SqlLiteralDetectors = {
-  isSensitiveColumn: (columnName) => {
-    return detectPii({ columnName }).hits.length > 0;
-  },
-  isSensitiveValue: isPersonalDataText,
-};
+function _createPageSqlDetectors(
+  datasets: readonly DataAgentDataset[],
+): SqlLiteralDetectors {
+  return {
+    isSensitiveColumn: isPersonalColumnName,
+    isSensitiveValue: isPersonalDataText,
+    knownColumnNames: new Set(
+      datasets.flatMap((dataset) => {
+        return dataset.columns.map((column) => {
+          return column.name.toLowerCase();
+        });
+      }),
+    ),
+  };
+}
 
 const models = createModels();
 models.setProvider(openrouterProvider());
@@ -133,7 +142,8 @@ async function _readPageContext(
  * agent runs in the browser; only model requests go to the server, through
  * the agent proxy. The current page starts each turn's message. Personal
  * values in its SQL become placeholders from the conversation's vault,
- * which the host maps back before the agent's SQL runs. Datasets
+ * which the host maps back before the agent's SQL runs, and are masked in
+ * the page's names and titles too. Datasets
  * load once per conversation: the agent's table aliases are positional, so
  * the page block must name tables from the same list the agent was given.
  */
@@ -151,14 +161,17 @@ export async function runDataAgentTurn(
     conversations: conversationsByChat,
     turn: { ...options, pageContext },
     buildPageBlock: (conversation) => {
+      const { sqlVault } = conversation;
+      const detectors = _createPageSqlDetectors(datasets);
       return pageContext
         ? buildAgentPageContextBlock({
             context: pageContext,
             aliases: SqlTableAlias.fromSchema({ datasets }),
             isSensitive: isPersonalDataText,
             redactSql: (sql) => {
-              return conversation.sqlVault.redact(sql, PAGE_SQL_DETECTORS);
+              return sqlVault.redact(sql, detectors);
             },
+            maskText: sqlVault.maskText,
           })
         : undefined;
     },

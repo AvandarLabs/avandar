@@ -2,6 +2,7 @@ import {
   MAX_PAGE_SQL_CHARACTERS,
   MAX_PAGE_TILES,
 } from "$/agent/pageContext/AgentPageContext.ts";
+import { SqlLiterals } from "$/agent/pageContext/SqlLiterals.ts";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import type {
   AgentPageApp,
@@ -39,12 +40,25 @@ type Aliases = readonly SqlTableAlias.T[];
 /** True when a piece of page text looks like personal data. */
 type IsSensitive = (text: string) => boolean;
 
-/** Page SQL with its personal values hidden, before it leaves the device. */
-type RedactSql = (sql: string) => string;
+/** Page text with personal values hidden, before it leaves the device. */
+type HideText = (text: string) => string;
 
-type SqlOptions = Readonly<{ aliases: Aliases; redactSql?: RedactSql }>;
+/** A dashboard whose tiles are the listed ones, with the rest counted. */
+type ListedDashboard = NonNullable<AgentPageContext["dashboard"]> & {
+  hiddenTileCount?: number;
+};
 
-type TileOptions = SqlOptions & Readonly<{ isSensitive?: IsSensitive }>;
+/** The page with its SQL redacted and only the listed charts kept. */
+type RedactedPageContext = Omit<AgentPageContext, "dashboard"> & {
+  dashboard?: ListedDashboard;
+};
+
+/** What rendering needs once every piece of page SQL is redacted. */
+type RenderOptions = Readonly<{
+  aliases: Aliases;
+  isSensitive?: IsSensitive;
+  mask: HideText;
+}>;
 
 /**
  * A name as a JSON string literal, so quotes and line breaks are escaped,
@@ -68,19 +82,52 @@ function _inline(text: string): string {
 }
 
 /**
- * One SQL statement on a single line, with personal values hidden by
- * `redactSql`, table names shown as aliases, and cut at the cap. Values are
- * hidden first, on the SQL as stored. Only a `<` that would start a page tag
- * is escaped, so comparisons such as `a < b` stay readable.
+ * The context with its page SQL (the explorer's query and each listed
+ * chart's) stripped of comments and passed through `redactSql`. Comments go
+ * first: they can hold values, and once the SQL is on one line a `--`
+ * comment would swallow the rest of the statement.
  */
-function _formatSql(sql: string, options: SqlOptions): string {
-  const { aliases, redactSql } = options;
-  const redacted = redactSql ? redactSql(sql) : sql;
-  const singleLine = redacted.trim().replace(LINE_BREAKS, " ");
-  const aliased = SqlTableAlias.toAliasedSql(singleLine, aliases).replace(
-    PAGE_TAG_START,
-    "\\u003c",
-  );
+function _redactContextSql(
+  context: AgentPageContext,
+  redactSql: HideText | undefined,
+): RedactedPageContext {
+  const redact = (sql: string): string => {
+    const stripped = SqlLiterals.stripComments(sql);
+    return redactSql ? redactSql(stripped) : stripped;
+  };
+  const { explorer, dashboard } = context;
+  return {
+    ...context,
+    ...(explorer?.sql
+      ? { explorer: { ...explorer, sql: redact(explorer.sql) } }
+      : {}),
+    ...(dashboard
+      ? {
+          dashboard: {
+            ...dashboard,
+            tiles: dashboard.tiles.slice(0, MAX_PAGE_TILES).map((tile) => {
+              return { ...tile, sql: redact(tile.sql) };
+            }),
+            hiddenTileCount: Math.max(
+              dashboard.tiles.length - MAX_PAGE_TILES,
+              0,
+            ),
+          },
+        }
+      : {}),
+  };
+}
+
+/**
+ * One redacted SQL statement on a single line, with table names shown as
+ * aliases, masked, and cut at the cap. Only a `<` that would start a page
+ * tag is escaped, so comparisons such as `a < b` stay readable.
+ */
+function _formatSql(sql: string, options: RenderOptions): string {
+  const singleLine = sql.trim().replace(LINE_BREAKS, " ");
+  const aliased = options
+    .mask(SqlTableAlias.toAliasedSql(singleLine, options.aliases))
+    .replace(PAGE_TAG_START, "\\u003c");
   return aliased.length > MAX_PAGE_SQL_CHARACTERS
     ? `${aliased.slice(0, MAX_PAGE_SQL_CHARACTERS)} ...`
     : aliased;
@@ -88,22 +135,23 @@ function _formatSql(sql: string, options: SqlOptions): string {
 
 function _datasetLine(
   dataset: NonNullable<AgentPageContext["dataset"]>,
-  aliases: Aliases,
+  options: RenderOptions,
 ): string {
-  const entry = aliases.find((candidate) => {
+  const entry = options.aliases.find((candidate) => {
     return candidate.kind === "dataset" && candidate.datasetId === dataset.id;
   });
+  const name = _quote(options.mask(dataset.name));
   return entry
-    ? `Open dataset: ${entry.alias} = ${_quote(dataset.name)}`
-    : `Open dataset: ${_quote(dataset.name)}`;
+    ? `Open dataset: ${entry.alias} = ${name}`
+    : `Open dataset: ${name}`;
 }
 
 function _explorerLines(
   explorer: NonNullable<AgentPageContext["explorer"]>,
-  options: SqlOptions,
+  options: RenderOptions,
 ): string[] {
   const columns = explorer.resultColumns.map((column) => {
-    return `${_inline(column.name)} ${_inline(column.dataType)}`;
+    return `${_inline(options.mask(column.name))} ${_inline(column.dataType)}`;
   });
   return [
     ...(explorer.sql
@@ -115,29 +163,31 @@ function _explorerLines(
 
 /**
  * One chart's line. With `isSensitive`, a title that looks like personal
- * data becomes "Untitled chart".
+ * data becomes "Untitled chart"; any other title is masked.
  */
 function _tileLine(
   tile: AgentPageTile,
   index: number,
-  options: TileOptions,
+  options: RenderOptions,
 ): string {
   const { isSensitive } = options;
   const title =
-    isSensitive && isSensitive(tile.title) ? REDACTED_TILE_TITLE : tile.title;
+    isSensitive && isSensitive(tile.title)
+      ? REDACTED_TILE_TITLE
+      : options.mask(tile.title);
   const sql = _formatSql(tile.sql, options);
   const heading = `${index + 1}. ${_quote(title)} (${_inline(tile.chartType)})`;
   return sql === "" ? heading : `${heading}: ${sql}`;
 }
 
 function _dashboardLines(
-  dashboard: NonNullable<AgentPageContext["dashboard"]>,
-  options: TileOptions,
+  dashboard: ListedDashboard,
+  options: RenderOptions,
 ): string[] {
-  const listed = dashboard.tiles.slice(0, MAX_PAGE_TILES);
-  const hiddenCount = dashboard.tiles.length - listed.length;
+  const listed = dashboard.tiles;
+  const hiddenCount = dashboard.hiddenTileCount ?? 0;
   return [
-    `Dashboard: ${_quote(dashboard.name)}`,
+    `Dashboard: ${_quote(options.mask(dashboard.name))}`,
     ...(listed.length > 0 ? ["Charts on this dashboard:"] : []),
     ...listed.map((tile, index) => {
       return _tileLine(tile, index, options);
@@ -150,10 +200,13 @@ function _dashboardLines(
   ];
 }
 
-function _caseLines(context: AgentPageContext): string[] {
+function _caseLines(
+  context: RedactedPageContext,
+  options: RenderOptions,
+): string[] {
   return [
     ...(context.caseType
-      ? [`Case type: ${_quote(context.caseType.name)}`]
+      ? [`Case type: ${_quote(options.mask(context.caseType.name))}`]
       : []),
     ...(context.app === "case"
       ? ["One case is open; its details are not shared."]
@@ -170,25 +223,40 @@ function _caseLines(context: AgentPageContext): string[] {
  *
  * `redactSql` hides personal values in page SQL (dashboard charts and the
  * Data Explorer's query) before the block leaves the device, for example by
- * swapping them for placeholders the browser maps back. `isSensitive` flags
- * chart titles that look like personal data, which become "Untitled chart".
+ * swapping them for placeholders the browser maps back. Comments are
+ * dropped from page SQL first. `maskText` then hides values that SQL
+ * revealed wherever else they appear: names, chart titles, result columns,
+ * and the SQL itself. Every piece of SQL is redacted before anything is
+ * masked, so a value one chart filters on is hidden in every title.
+ * `isSensitive` flags chart titles that look like personal data, which
+ * become "Untitled chart".
  */
 export function buildAgentPageContextBlock(
   options: Readonly<{
     context: AgentPageContext;
     aliases: Aliases;
     isSensitive?: IsSensitive;
-    redactSql?: RedactSql;
+    redactSql?: HideText;
+    maskText?: HideText;
   }>,
 ): string {
-  const { context, aliases } = options;
+  const context = _redactContextSql(options.context, options.redactSql);
+  const render: RenderOptions = {
+    aliases: options.aliases,
+    isSensitive: options.isSensitive,
+    mask:
+      options.maskText ??
+      ((text) => {
+        return text;
+      }),
+  };
   const lines = [
     `Page: ${APP_LABELS[context.app]}`,
-    ...(context.dataset ? [_datasetLine(context.dataset, aliases)] : []),
-    ...(context.explorer ? _explorerLines(context.explorer, options) : []),
-    ...(context.dashboard ? _dashboardLines(context.dashboard, options) : []),
-    ...(context.map ? [`Map: ${_quote(context.map.name)}`] : []),
-    ..._caseLines(context),
+    ...(context.dataset ? [_datasetLine(context.dataset, render)] : []),
+    ...(context.explorer ? _explorerLines(context.explorer, render) : []),
+    ...(context.dashboard ? _dashboardLines(context.dashboard, render) : []),
+    ...(context.map ? [`Map: ${_quote(render.mask(context.map.name))}`] : []),
+    ..._caseLines(context, render),
   ];
   return ["<current_page>", ...lines, "</current_page>"].join("\n");
 }

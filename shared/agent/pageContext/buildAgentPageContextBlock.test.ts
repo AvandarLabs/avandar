@@ -314,6 +314,68 @@ describe("buildAgentPageContextBlock", () => {
     expect(seen).toEqual([`SELECT 1 FROM "${TABLE}"`]);
   });
 
+  it("drops SQL comments so one line cannot comment out the rest", () => {
+    const block = _block({
+      app: "data-explorer",
+      explorer: {
+        sql: `SELECT 1 -- Jane Doe\nFROM "${TABLE}" /* Ann */ WHERE x = '--y'`,
+        resultColumns: [],
+      },
+    });
+
+    expect(block).toContain(
+      `Query on screen: SELECT 1 FROM "t0"   WHERE x = '--y'`,
+    );
+    expect(block).not.toContain("Jane");
+    expect(block).not.toContain("Ann");
+  });
+
+  it("masks names, titles, result columns, and SQL after all SQL is redacted", () => {
+    const calls: string[] = [];
+    const block = buildAgentPageContextBlock({
+      aliases: ALIASES,
+      redactSql: (sql) => {
+        calls.push(`redact ${sql}`);
+        return sql;
+      },
+      maskText: (text) => {
+        calls.push(`mask ${text}`);
+        return text.replaceAll("Jane", "<value 1>");
+      },
+      context: {
+        app: "dashboard",
+        dataset: { id: DATASET_ID, name: "Jane.csv" },
+        explorer: {
+          sql: `SELECT "x" AS "Jane visits" FROM "${TABLE}"`,
+          resultColumns: [{ name: "Jane visits", dataType: "bigint" }],
+        },
+        dashboard: {
+          id: "d1",
+          name: "Jane's dashboard",
+          tiles: [
+            { title: "Visits by Jane", chartType: "bar", sql: "SELECT 2" },
+          ],
+        },
+        map: { id: "m1", name: "Jane map" },
+        caseType: { id: "c1", name: "Jane cases" },
+      },
+    });
+
+    expect(block).not.toContain("Jane");
+    // Quoted names and column names escape every "<", as for any name.
+    expect(block).toContain('1. "Visits by \\u003cvalue 1>" (bar): SELECT 2');
+    expect(block).toContain("Result columns: \\u003cvalue 1> visits bigint");
+    expect(block).toContain(`AS "<value 1> visits" FROM "t0"`);
+    const firstMask = calls.findIndex((call) => {
+      return call.startsWith("mask");
+    });
+    expect(
+      calls.slice(firstMask).some((call) => {
+        return call.startsWith("redact");
+      }),
+    ).toBe(false);
+  });
+
   it("keeps tiles as written without a sensitivity check", () => {
     const block = _block({
       app: "dashboard",

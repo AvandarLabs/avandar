@@ -68,7 +68,11 @@ vi.mock(
 const DATASET_A = {
   id: "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb",
   name: "cases.csv",
-  columns: [],
+  columns: [
+    { name: "email", dataType: "varchar" },
+    { name: "last_name", dataType: "varchar" },
+    { name: "state", dataType: "varchar" },
+  ],
 };
 /** Sorts before A, so a list with it would make A's alias `t1`. */
 const DATASET_B = {
@@ -194,6 +198,33 @@ describe("runDataAgentTurn", () => {
     );
     expect(_askedTexts()[0]).not.toContain("jane.doe");
     expect(_askedTexts()[0]).not.toContain("'Doe'");
+  });
+
+  it("hides spreadsheet-header filters, alias filters, and titles", async () => {
+    getAllDatasetsMock.mockResolvedValue([
+      {
+        ...DATASET_A,
+        columns: [
+          { name: "First Name", dataType: "varchar" },
+          { name: "state", dataType: "varchar" },
+        ],
+      },
+    ]);
+    createAgentPageContextMock.mockResolvedValueOnce(
+      _dashboardWithTile(
+        `WITH x AS (SELECT "First Name" AS n, "state" FROM t) SELECT * FROM x WHERE n = 'Ann' OR "First Name" = 'Jane' AND "state" = 'Texas'`,
+        "Visits by Jane",
+      ),
+    );
+
+    await runDataAgentTurn(
+      _turn("workspace-headers", "What is this?"),
+      _page(`/acme/dashboards/edit/${DASHBOARD_ID}`),
+    );
+
+    expect(_askedTexts()[0]).not.toContain("Ann");
+    expect(_askedTexts()[0]).not.toContain("Jane");
+    expect(_askedTexts()[0]).toContain(`"state" = 'Texas'`);
   });
 
   it("keeps a value's placeholder across turns and restores it", async () => {

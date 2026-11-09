@@ -10,10 +10,8 @@ import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageCo
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAgentPageContext } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/createAgentPageContext";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
-import {
-  detectPii,
-  isPersonalDataText,
-} from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { ReactNode } from "react";
@@ -56,13 +54,18 @@ function _renderExplorerWithQuery(sql: string) {
   act(() => {
     result.current.dispatch.syncVizFromQueryResult([
       { id: "district_name", name: "district_name", dataType: "varchar" },
+      {
+        id: "visits",
+        name: `count_star() FILTER (WHERE (patient_name = 'Jane Doe'))`,
+        dataType: "bigint",
+      },
     ] as never);
   });
   return result;
 }
 
 describe("explorer page block", () => {
-  it("shows the explorer's query with personal values as placeholders", async () => {
+  it("hides personal values in the explorer's query and result columns", async () => {
     const result = _renderExplorerWithQuery(
       `SELECT "district_name" FROM "${DATASET_ID}" WHERE "patient_name" = 'Jane Doe' AND "state" = 'Texas'`,
     );
@@ -88,18 +91,20 @@ describe("explorer page block", () => {
       isSensitive: isPersonalDataText,
       redactSql: (sql) => {
         return vault.redact(sql, {
-          isSensitiveColumn: (columnName) => {
-            return detectPii({ columnName }).hits.length > 0;
-          },
+          isSensitiveColumn: isPersonalColumnName,
           isSensitiveValue: isPersonalDataText,
         });
       },
+      maskText: vault.maskText,
     });
 
     expect(block).toContain(
       `Query on screen: SELECT "district_name" FROM "t0" WHERE "patient_name" = '<value 1>' AND "state" = 'Texas'`,
     );
-    expect(block).toContain("Result columns: district_name varchar");
+    // DuckDB names an unaliased column after its restored SQL.
+    expect(block).toContain(
+      "Result columns: district_name varchar, count_star() FILTER (WHERE (patient_name = '\\u003cvalue 1>')) bigint",
+    );
     expect(block).not.toContain("Jane Doe");
   });
 });

@@ -135,6 +135,16 @@ const COLUMN_NAME_KEYWORDS: Array<{
   },
 ];
 
+/**
+ * Every keyword the column-name check looks for, such as `email` or
+ * `date_of_birth`. Exported for checks that match the same words more
+ * strictly, for example as whole words of a normalized column name.
+ */
+export const PII_COLUMN_NAME_KEYWORDS: readonly string[] =
+  COLUMN_NAME_KEYWORDS.flatMap((entry) => {
+    return entry.keywords;
+  });
+
 // Standalone "name" (not in a compound like "first_name") is a direct
 // identifier hit. We add it after the table to keep compound matching from
 // double-firing.

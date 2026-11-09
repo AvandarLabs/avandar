@@ -19,10 +19,19 @@ type LookupContext = Readonly<{
 
 type LookupMatch = { named: string; storedValue: string | undefined };
 
+/**
+ * How a value is stored. A page placeholder the host holds (`<value 1>`)
+ * is already the stored value as far as the model knows, so it matches
+ * itself without a query: a lookup would compare its value in lower case,
+ * miss a mixed-case value, and could tell the model what it stands for.
+ */
 async function _findStoredValue(
   context: LookupContext,
   value: Readonly<{ named: string; forms: readonly string[] }>,
 ): Promise<LookupMatch> {
+  if (context.host.isHeldPlaceholder?.(value.named)) {
+    return { named: value.named, storedValue: value.named };
+  }
   const candidateValues = [value.named, ...value.forms];
   const sql = buildCandidateLookupSqlFromDiscovery({
     discoveryQuery: `SELECT DISTINCT ${quoteSqlIdentifier(context.column)} FROM ${quoteSqlIdentifier(context.tableName)}`,

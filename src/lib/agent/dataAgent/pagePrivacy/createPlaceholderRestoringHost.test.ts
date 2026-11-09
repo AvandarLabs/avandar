@@ -75,6 +75,90 @@ describe("createPlaceholderRestoringHost", () => {
     ]);
   });
 
+  it("masks restored values in result column names and errors", async () => {
+    const inner = _createInnerHost({
+      showQuery: vi.fn().mockResolvedValue({
+        kind: "rows",
+        columns: [
+          {
+            name: `count_star() FILTER (WHERE (patient_name = 'Kings'))`,
+            type: "bigint",
+          },
+        ],
+        rowCount: 1,
+        previewRows: [["Kings", 3]],
+      }),
+    });
+    const host = createPlaceholderRestoringHost(inner, _createVault());
+
+    const outcome = await host.showQuery({ sql: MODEL_SQL, summary: "s" });
+
+    expect(outcome).toEqual({
+      kind: "rows",
+      columns: [
+        {
+          name: `count_star() FILTER (WHERE (patient_name = '<value 1>'))`,
+          type: "bigint",
+        },
+      ],
+      rowCount: 1,
+      previewRows: [["<value 1>", 3]],
+    });
+  });
+
+  it("masks restored values in a failed query's error", async () => {
+    const inner = _createInnerHost({
+      showQuery: vi.fn().mockResolvedValue({
+        kind: "failed",
+        error: "Conversion Error: Kings is not a number",
+      }),
+    });
+    const host = createPlaceholderRestoringHost(inner, _createVault());
+
+    expect(await host.showQuery({ sql: MODEL_SQL, summary: "s" })).toEqual({
+      kind: "failed",
+      error: "Conversion Error: <value 1> is not a number",
+    });
+  });
+
+  it.each([
+    [`SELECT 1 FROM t WHERE x = '<value 4>'`, "unknown placeholder"],
+    [`SELECT 1 FROM t WHERE x LIKE '%<value 1>%'`, "whole quoted value"],
+  ])("refuses %s without running it", async (sql, problem) => {
+    const inner = _createInnerHost({});
+    const host = createPlaceholderRestoringHost(inner, _createVault());
+
+    const outcome = await host.showQuery({ sql, summary: "s" });
+
+    expect(inner.showQuery).not.toHaveBeenCalled();
+    expect(outcome).toEqual({
+      kind: "failed",
+      error: expect.stringContaining(problem),
+    });
+  });
+
+  it("refuses a lookup with an unknown placeholder without running it", async () => {
+    const inner = _createInnerHost({});
+    const host = createPlaceholderRestoringHost(inner, _createVault());
+
+    const values = await host.readColumnValues(
+      `SELECT 1 WHERE x = '<value 4>'`,
+    );
+
+    expect(inner.readColumnValues).not.toHaveBeenCalled();
+    expect(values).toEqual({ error: expect.stringContaining("unknown") });
+  });
+
+  it("tells tools which placeholders it holds", () => {
+    const host = createPlaceholderRestoringHost(
+      _createInnerHost({}),
+      _createVault(),
+    );
+
+    expect(host.isHeldPlaceholder?.("<value 1>")).toBe(true);
+    expect(host.isHeldPlaceholder?.("<value 2>")).toBe(false);
+  });
+
   it("keeps restored values out of what the model reads", async () => {
     const inner = _createInnerHost({
       showQuery: vi.fn().mockResolvedValue({

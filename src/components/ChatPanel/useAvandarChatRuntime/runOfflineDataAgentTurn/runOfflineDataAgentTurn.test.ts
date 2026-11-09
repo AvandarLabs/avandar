@@ -14,7 +14,9 @@ const {
   return {
     createOfflineDataAgentMock: vi.fn(),
     decideMock: vi.fn(),
-    explorerShowQueryMock: vi.fn(),
+    explorerShowQueryMock: vi
+      .fn()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
     showQueryInChatMock: vi.fn(),
   };
 });
