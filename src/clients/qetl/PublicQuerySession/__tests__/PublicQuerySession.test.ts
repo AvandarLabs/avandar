@@ -1,4 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { makePrincipalKeyFromPublicSession } from "$/models/relations/RelationCacheKey/RelationCacheKey";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -18,19 +26,43 @@ const FIRST_REVISION = "2026-08-14T00:00:00.000Z";
 const SECOND_REVISION = "2026-08-14T01:00:00.000Z";
 const THIRD_REVISION = "2026-08-14T02:00:00.000Z";
 
-const { bulkInsertMock, createMock, listDatasetIdsForDashboardMock } =
-  vi.hoisted(() => {
-    return {
-      bulkInsertMock: vi.fn(),
-      createMock: vi.fn(),
-      listDatasetIdsForDashboardMock: vi.fn(),
-    };
-  });
-
-vi.mock("@avandar/modules", () => {
+const {
+  bulkInsertMock,
+  createMock,
+  datasetColumnGetAllMock,
+  getTableOrViewNamesMock,
+  listDatasetIdsForDashboardMock,
+  runRawQueryMock,
+} = vi.hoisted(() => {
   return {
-    createModule: (_name: string, options: { builder: () => object }) => {
-      return options.builder();
+    bulkInsertMock: vi.fn(),
+    createMock: vi.fn(),
+    datasetColumnGetAllMock: vi.fn(),
+    getTableOrViewNamesMock: vi.fn(),
+    listDatasetIdsForDashboardMock: vi.fn(),
+    runRawQueryMock: vi.fn(),
+  };
+});
+
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      withCache: () => {
+        return {
+          withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+        };
+      },
+    },
+  };
+});
+
+vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
+  return {
+    DuckDbClient: {
+      getTableOrViewNames: getTableOrViewNamesMock,
+      runRawQuery: runRawQueryMock,
     },
   };
 });
@@ -80,6 +112,15 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks();
+});
+
+// The real mediator's import graph is large. Transforming it once here keeps
+// the test that runs a query through it inside the default test timeout.
+beforeAll(async () => {
+  await vi.importActual("@/clients/qetl/QueryMediator/QueryMediator");
+  await vi.importActual(
+    "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator",
+  );
 });
 
 describe("PublicQuerySession.runQuery", () => {
@@ -196,6 +237,45 @@ describe("PublicQuerySession.runQuery", () => {
     });
 
     expect(createMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("runs a query over a preloaded snapshot table without reading dataset columns", async () => {
+    // A snapshot's visitor may have no grant on `dataset_columns`, so any read
+    // of it rejects. The query names one column, which a workspace session
+    // would map to its Parquet header through that table.
+    vi.resetModules();
+    const { QueryMediatorFactory } = await vi.importActual<
+      typeof import("@/clients/qetl/QueryMediator/QueryMediator")
+    >("@/clients/qetl/QueryMediator/QueryMediator");
+    createMock.mockImplementation(QueryMediatorFactory.create);
+    datasetColumnGetAllMock.mockRejectedValue(
+      new Error("permission denied for table dataset_columns"),
+    );
+    getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
+    runRawQueryMock.mockResolvedValue({ data: [{ region: "North" }] });
+    const { DatasetDuckDbCoordinator } =
+      await import("@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator");
+    // What the dashboard viewer's preload records once it loads the snapshot.
+    DatasetDuckDbCoordinator.setPublicSnapshotDatasetOwner({
+      datasetId: DATASET_ID,
+      owner: {
+        bucket: "published",
+        dashboardId: DASHBOARD_ID,
+        snapshotRevision: THIRD_REVISION,
+      },
+    });
+    const { PublicQuerySession } =
+      await import("@/clients/qetl/PublicQuerySession/PublicQuerySession");
+
+    const result = await PublicQuerySession.runQuery({
+      rawSql: `SELECT "region" FROM "${DATASET_ID}"`,
+      dashboardId: DASHBOARD_ID,
+      visibility: "public",
+      snapshotRevision: THIRD_REVISION,
+    });
+
+    expect(result).toEqual({ data: [{ region: "North" }] });
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
   });
 
   it("scopes its storage tier to the committed snapshot revision", async () => {

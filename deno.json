@@ -54,5 +54,6 @@
     "strict": true,
     "types": ["react", "react/jsx-runtime"]
   },
+  "exclude": ["packages/**/dist/"],
   "lock": false
 }

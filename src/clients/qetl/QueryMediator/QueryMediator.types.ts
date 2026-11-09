@@ -119,6 +119,18 @@ export type QetlRunnerOptions = {
   duckDbReadMode?: "public" | "workspace";
   publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
   /**
+   * Where a relation's query-facing column names and types come from.
+   *
+   * `catalog`, the default, reads the dataset's `dataset_columns` rows: they
+   * map a query's column names to Parquet headers, and they rename and cast
+   * columns as a relation loads into DuckDB. `stored` trusts the relation's
+   * own Parquet: query names are its headers, and nothing is renamed or cast.
+   * A published dashboard snapshot is `stored`, because its Parquet is written
+   * with the names its queries use, and its visitor may hold no grant on
+   * `dataset_columns`.
+   */
+  datasetColumnSource?: DatasetColumnSource;
+  /**
    * The storage tier this session may read and write, and the principal every
    * entry in it is scoped to.
    *
@@ -139,6 +151,9 @@ export type QetlRunnerOptions = {
     }>,
   ) => Promise<void>;
 };
+
+/** Where a Qetl session takes a relation's column names and types from. */
+export type DatasetColumnSource = "catalog" | "stored";
 
 /** Datasets grouped by their source type. */
 export type DatasetsBySourceType = Record<Dataset.T["sourceType"], Dataset.T[]>;
