@@ -34,6 +34,8 @@ type DataQueryOptions = {
   rawSql: string | undefined;
 };
 
+type SaveMenuProps = { savableSql: string | undefined };
+
 type FakeSlotProps = {
   getContext: (() => PluginInvocationContext) | undefined;
   getDataExplorerBridge?: (() => DataExplorerBridge) | undefined;
@@ -184,12 +186,48 @@ vi.mock("@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer", () => {
     },
   };
 });
+/**
+ * The block the Save menu stand-in built on its last click, as "Save to
+ * dashboard" would hand it to the dashboard insert or update.
+ */
+const savedBlockRef = vi.hoisted((): { current: unknown } => {
+  return { current: undefined };
+});
+
+/**
+ * A stand-in for the Save menu that builds the dashboard block from the
+ * `savableSql` the explorer passes and the explorer state, the same inputs
+ * `DataExplorerSaveAsMenuItems` gives `SaveToDashboardModal`. The modal's own
+ * test covers that it saves the block it builds.
+ */
 vi.mock(
   "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu",
-  () => {
+  async () => {
+    const { createDataVizBlock } =
+      await import("@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock");
+    const { DataExplorerStateManager: StateManager } =
+      await import("@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager");
     return {
-      DataExplorerSaveMenu: () => {
-        return null;
+      DataExplorerSaveMenu: ({ savableSql }: SaveMenuProps) => {
+        const state = StateManager.useState();
+        return (
+          <button
+            type="button"
+            onClick={() => {
+              if (state.columnBindings && savableSql !== undefined) {
+                savedBlockRef.current = createDataVizBlock({
+                  columnBindings: state.columnBindings,
+                  rawSql: savableSql,
+                  prompt: state.nlPrompt,
+                  vizType: state.vizConfig.vizType,
+                  vizConfig: state.vizConfig,
+                });
+              }
+            }}
+          >
+            Save to dashboard
+          </button>
+        );
       },
     };
   },
@@ -262,6 +300,7 @@ async function _renderExplorerWithBarChart(): Promise<
 }
 
 afterEach(() => {
+  savedBlockRef.current = undefined;
   cleanup();
   act(() => {
     notifications.clean();
@@ -316,4 +355,37 @@ it("restores the SQL and chart config from before the command on Undo", async ()
     expect(session.result.current[0].rawSql).toBe(BASE_SQL);
   });
   expect(session.result.current[0].vizConfig).toEqual(chartBefore);
+});
+
+it("saves the wrapped SQL and the derived column's binding to a dashboard", async () => {
+  const session = await _renderExplorerWithBarChart();
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Double revenue" }),
+  );
+  await waitFor(() => {
+    expect(session.result.current[0].lastResultColumns).toHaveLength(3);
+  });
+  const derivedColumnId = session.result.current[0].lastResultColumns?.find(
+    (column) => {
+      return column.name === "double_revenue";
+    },
+  )?.id;
+
+  fireEvent.click(screen.getByRole("button", { name: "Save to dashboard" }));
+
+  expect(derivedColumnId).toBeDefined();
+  expect(savedBlockRef.current).toMatchObject({
+    props: {
+      nlQuery: { rawSql: WRAPPED_SQL },
+      vizConfig: session.result.current[0].vizConfig,
+      columnBindings: {
+        columns: expect.arrayContaining([
+          expect.objectContaining({
+            id: derivedColumnId,
+            name: "double_revenue",
+          }),
+        ]),
+      },
+    },
+  });
 });
