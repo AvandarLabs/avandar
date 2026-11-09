@@ -39,11 +39,8 @@ function _layerRow(page: Page, layerName: string): Locator {
     .filter({ has: page.getByText(layerName, { exact: true }) });
 }
 
-/** Seeds an empty map, signs in, and opens it. */
-async function _openSeededMap(
-  page: Page,
-  e2eWorkerDb: E2EWorkerDb,
-): Promise<PlacesSession> {
+/** Seeds an empty map and returns what cleanup needs, before any UI step. */
+async function _seedMap(e2eWorkerDb: E2EWorkerDb): Promise<PlacesSession> {
   const supabaseAdminClient = createSupabaseAdminClient();
   const { primaryUser, workspaceSlug } = e2eWorkerDb;
   const workspaceId = await getWorkspaceIdBySlug({
@@ -56,6 +53,20 @@ async function _openSeededMap(
     ownerEmail: primaryUser.email,
     name: MAP_NAME,
   });
+  return {
+    supabaseAdminClient,
+    workspaceId,
+    mapId,
+    datasetName: `E2E exposure sites ${Date.now()}`,
+  };
+}
+
+/** Signs in and opens the seeded map. */
+async function _openSeededMap(
+  page: Page,
+  e2eWorkerDb: E2EWorkerDb,
+): Promise<void> {
+  const { primaryUser, workspaceSlug } = e2eWorkerDb;
   await signInWithEmailPassword(page, {
     email: primaryUser.email,
     password: primaryUser.password,
@@ -64,12 +75,6 @@ async function _openSeededMap(
   await page.getByRole("link", { name: "Maps" }).click();
   await page.getByRole("link", { name: `Open the map ${MAP_NAME}` }).click();
   await expect(_mapRegion(page)).toBeVisible({ timeout: LONG_WAIT });
-  return {
-    supabaseAdminClient,
-    workspaceId,
-    mapId,
-    datasetName: `E2E exposure sites ${Date.now()}`,
-  };
 }
 
 /** Creates a places dataset through the tool and waits for its layer. */
@@ -218,21 +223,37 @@ async function _cleanUp(session: PlacesSession | undefined): Promise<void> {
   if (!session) {
     return;
   }
-  await deleteMapsByIds({
-    admin: session.supabaseAdminClient,
-    mapIds: [session.mapId],
-  });
-  const { data: datasets } = await session.supabaseAdminClient
-    .from("datasets")
-    .select("id")
-    .eq("workspace_id", session.workspaceId)
-    .eq("name", session.datasetName)
-    .throwOnError();
-  for (const dataset of datasets ?? []) {
-    await deleteDatasetAndShares({
-      supabaseAdminClient: session.supabaseAdminClient,
-      datasetId: dataset.id,
+  const failures: unknown[] = [];
+  try {
+    await deleteMapsByIds({
+      admin: session.supabaseAdminClient,
+      mapIds: [session.mapId],
     });
+  } catch (error) {
+    failures.push(error);
+  }
+  try {
+    const { data: datasets } = await session.supabaseAdminClient
+      .from("datasets")
+      .select("id")
+      .eq("workspace_id", session.workspaceId)
+      .eq("name", session.datasetName)
+      .throwOnError();
+    for (const dataset of datasets ?? []) {
+      try {
+        await deleteDatasetAndShares({
+          supabaseAdminClient: session.supabaseAdminClient,
+          datasetId: dataset.id,
+        });
+      } catch (error) {
+        failures.push(error);
+      }
+    }
+  } catch (error) {
+    failures.push(error);
+  }
+  if (failures.length > 0) {
+    throw new AggregateError(failures, "Places e2e cleanup failed.");
   }
 }
 
@@ -242,7 +263,8 @@ test(
   async ({ page, e2eWorkerDb }) => {
     let session: PlacesSession | undefined;
     try {
-      session = await _openSeededMap(page, e2eWorkerDb);
+      session = await _seedMap(e2eWorkerDb);
+      await _openSeededMap(page, e2eWorkerDb);
       await _createPlacesDataset(page, session.datasetName);
 
       await page.getByRole("button", { name: "Click the map" }).click();
@@ -286,7 +308,8 @@ test(
           body: JSON.stringify({ candidates: [GEOCODE_CANDIDATE] }),
         });
       });
-      session = await _openSeededMap(page, e2eWorkerDb);
+      session = await _seedMap(e2eWorkerDb);
+      await _openSeededMap(page, e2eWorkerDb);
       await _createPlacesDataset(page, session.datasetName);
 
       await page
@@ -317,7 +340,8 @@ test(
   async ({ page, e2eWorkerDb }) => {
     let session: PlacesSession | undefined;
     try {
-      session = await _openSeededMap(page, e2eWorkerDb);
+      session = await _seedMap(e2eWorkerDb);
+      await _openSeededMap(page, e2eWorkerDb);
       const openSession = session;
       await _createPlacesDataset(page, session.datasetName);
       await page.getByRole("button", { name: "Click the map" }).click();
