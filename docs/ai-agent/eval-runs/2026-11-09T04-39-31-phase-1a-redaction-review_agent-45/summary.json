@@ -1,0 +1,17 @@
+{
+  "label": "phase-1a-redaction-review:agent-45",
+  "questionCount": 45,
+  "passCount": 43,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 61,
+  "promptTokens": 194780,
+  "cachedPromptTokens": 176385,
+  "completionTokens": 19270,
+  "totalCost": 0.013692924999999998,
+  "costPerQuestion": 0.00030428722222222216,
+  "latencyMedianMs": 2357.0031670000026,
+  "latencyP90Ms": 3438.1937499999995,
+  "failedIds": ["H06", "N04"]
+}

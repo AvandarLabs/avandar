@@ -1,6 +1,6 @@
 {
   "plugin.name": "Epidemiology",
-  "plugin.description": "Statistical modeling tools for public-health data.",
+  "plugin.description": "Outbreak analysis for case data. Chart cases over time as an epidemic curve, compare rates between groups with confidence intervals, and fit a linear regression to a query result.",
   "regression.linear.title": "Linear regression",
   "modal.xColumn": "Predictor (X)",
   "modal.yColumn": "Outcome (Y)",

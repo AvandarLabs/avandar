@@ -1,4 +1,5 @@
 import { ComposerPrimitive } from "@assistant-ui/react";
+import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
@@ -9,12 +10,52 @@ import { OfflineModeControl } from "@/components/ChatPanel/OfflineModeControl/Of
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useChatPanelComposerAutoFocus } from "@/components/ChatPanel/useChatPanelComposerAutoFocus/useChatPanelComposerAutoFocus";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
+import { DataAgentFeature } from "@/lib/agent/dataAgent/browser/DataAgentFeature";
 import css from "./Composer.module.css";
+import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+
+/**
+ * Which placeholder the composer shows. `dashboard` and `data` are specific
+ * to a page. `disabled` explains why the input is off.
+ */
+type ComposerPlaceholderKind = "dashboard" | "data" | "disabled";
+
+/**
+ * Whether the composer accepts input on the current page. With the data agent
+ * on, every page can chat except the case designer, which starts its own chat
+ * from a kickoff flow. With it off, only Data Explorer and Dashboards can.
+ */
+function _isComposerEnabled(app: ChatPageContext.ChatApp): boolean {
+  if (DataAgentFeature.isEnabled()) {
+    return app !== "case-manager";
+  }
+  return app === "data-explorer" || app === "dashboards";
+}
+
+/**
+ * Picks the placeholder for the current page. With the data agent on, the
+ * dashboard placeholder only fits a dashboard editor, so the dashboard list
+ * and every page without its own placeholder use the general data one.
+ */
+function _getPlaceholderKind(
+  context: ChatPageContext.T,
+): ComposerPlaceholderKind {
+  if (!_isComposerEnabled(context.app)) {
+    return "disabled";
+  }
+  if (context.app === "dashboards") {
+    const isDashboardListWithAgent =
+      DataAgentFeature.isEnabled() && context.dashboardId === undefined;
+    return isDashboardListWithAgent ? "data" : "dashboard";
+  }
+  return "data";
+}
 
 /**
  * The message input at the bottom of the thread: a text input, the offline
- * mode control, and the send button. Input and actions are disabled outside
- * the Data Explorer app, where chat actions are not yet available.
+ * mode control, and the send button. Input and actions are disabled where chat
+ * is not available: the case designer, and with the data agent off, every
+ * page other than Data Explorer and Dashboards.
  */
 export function Composer(): React.ReactNode {
   const { isOpen } = ChatPanelStateManager.useState();
@@ -28,16 +69,13 @@ export function Composer(): React.ReactNode {
 
   const context = useChatPageContext();
   const { t } = useLingui();
-  const isChatEnabled =
-    context.app === "data-explorer" || context.app === "dashboards";
-  const chatDisabled = !isChatEnabled;
+  const chatDisabled = !_isComposerEnabled(context.app);
 
-  const placeholder =
-    context.app === "dashboards"
-      ? t`Ask me to add a chart to this dashboard...`
-      : context.app === "data-explorer"
-        ? t`Ask about your data...`
-        : t`Chat is enabled in Data Explorer and Dashboards`;
+  const placeholder = matchLiteral(_getPlaceholderKind(context), {
+    dashboard: t`Ask me to add a chart to this dashboard...`,
+    data: t`Ask about your data...`,
+    disabled: t`Chat is enabled in Data Explorer and Dashboards`,
+  });
 
   return (
     <div

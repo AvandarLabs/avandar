@@ -95,6 +95,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "Hii itaruhusu dataset kuhifadhiwa mtandaoni ili iweze kufikiwa kwenye "
 "vifaa vingine."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "Nyingine"
@@ -323,6 +324,11 @@ msgstr " {chartName} haiwezi kuonyeshwa."
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Select {0}"
 msgstr "Chagua {0}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "A query result's rows, only when you run one of its tools on that result"
+msgstr "Safu za matokeo ya hoja, pale tu unapoendesha mojawapo ya zana zake "
+"kwenye matokeo hayo"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
@@ -1357,6 +1363,10 @@ msgstr "Kutoka kwa seti ya data iliyotokana"
 msgid "Sheet"
 msgstr "Laha"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Imechapishwa kwenye workspace"
@@ -2195,6 +2205,10 @@ msgstr "Futa"
 msgid "One dataset is one tab."
 msgstr "Kila seti ya data ni kichupo kimoja."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Data it can read"
+msgstr "Data inayoweza kusoma"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "Ruhusa zimehifadhiwa"
@@ -2344,6 +2358,14 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "Jumuisha vishikilia nafasi vya z, x na y ambapo seva inatarajia "
 "faharasa ya kigae."
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(Tupu)"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Data Explorer toolbar: {toolbarCommands}"
+msgstr "Upau wa zana wa Kichunguzi cha Data: {toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2945,10 +2967,6 @@ msgstr "Hali mbili zina jina sawa. Zipe kila moja jina lake."
 msgid "Its features are removed from this workspace."
 msgstr "Vipengele vyake vimeondolewa kwenye workspace hii."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "Reads the query result you run it on"
-msgstr "Husoma matokeo ya hoja unayoendesha juu yake"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Ilisasishwa mara ya mwisho"
@@ -3184,6 +3202,10 @@ msgstr "PDF imeshukuliwa."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "Kitambulisho cha eneo la kazi"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "What it adds"
+msgstr "Inachoongeza"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -4876,13 +4898,17 @@ msgstr "Faili chanzo haliko katika muundo ambao Avandar anaweza kuusoma kama "
 msgid "Image"
 msgstr "Picha"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "Haitumii data ya workspace."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "Ficha mhimili wa X"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "Inapakia matokeo"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
@@ -4891,6 +4917,10 @@ msgstr "Maeneo kamili"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "Mazungumzo mapya"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "Matokeo hayapatikani"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5272,6 +5302,10 @@ msgstr "kufunika"
 msgid "Clarification answer"
 msgstr "Jibu la ufafanuzi"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Chart types: {chartTypes}"
+msgstr "Aina za chati: {chartTypes}"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
@@ -5508,6 +5542,10 @@ msgstr "Muda wa nambari"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "Badilisha URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr ""
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -5926,6 +5964,10 @@ msgstr "si"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "Embed"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Nothing yet."
+msgstr "Bado hakuna chochote."
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6423,6 +6465,12 @@ msgstr "Nini maana ya series?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "Latitudo au longitudo si nambari"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Kujibu maswali ya data kunahitaji ufikiaji wa Data Explorer katika "
+"nafasi hii ya kazi."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -8188,6 +8236,10 @@ msgstr "Seti hii ya data ni ya mtandaoni pekee. Bonyeza kuruhusu usawazishaji "
 msgid "Checking your data…"
 msgstr "Inaangalia data yako…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "Matokeo"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Vichujio vya kimataifa"
@@ -8993,6 +9045,10 @@ msgstr "Thamani ya kawaida"
 msgid "{0} areas have no data"
 msgstr "Maeneo {0} hayana data"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Its charts see only the rows of the chart they draw"
+msgstr "Chati zake huona tu safu za chati inayochora"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "Lazima"
@@ -9373,6 +9429,10 @@ msgstr "Baadhi ya safu zina latitudo au longitudo tupu."
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "Hii {resource} inapatikana kwa mtu yeyote mwenye ruhusa ya {app} {0}."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See less"
+msgstr "Onyesha machache"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "Amber"
@@ -9503,11 +9563,21 @@ msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
 msgid "Enter your text here"
 msgstr "Weka maandishi yako hapa"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Mfululizo mmoja huchorwa kwa kila {splitColumnName}. Rangi zimewekwa "
+"kwa ajili yako. Kuongeza mfululizo wa pili huzima hili."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
 msgstr "Kichupo hicho hakipo tena kwenye lahajedwali hili. Huenda kimepewa jina "
 "jipya au kimefutwa. Chagua laha tena kisha uchague kichupo."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See more"
+msgstr "Onyesha zaidi"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -10057,6 +10127,10 @@ msgstr "Kawaida"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "Onyesha kipengee cha Haijaripotiwa"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "Matokeo haya hayakuweza kupakiwa."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -11129,12 +11203,6 @@ msgstr "Anza"
 msgid "Bottom left"
 msgstr "Chini kushoto"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-"other {Adds # buttons to Data Explorer}}"
-msgstr "{dataExplorerToolbarItems, plural, one {Inaongeza kitufe # kwenye Data "
-"Explorer} other {Inaongeza vitufe # kwenye Data Explorer}}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Kichwa cha ukurasa"
@@ -11291,6 +11359,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "{pluginName} imesakinishwa"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "Msaidizi hakuweza kujibu hilo. Jaribu tena baada ya muda mfupi."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

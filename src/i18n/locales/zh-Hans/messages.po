@@ -93,6 +93,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 "other devices."
 msgstr "这将允许数据集在线存储，以便在其他设备上访问。"
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "其他"
@@ -313,6 +314,10 @@ msgstr "无法显示 {chartName}。"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Select {0}"
 msgstr "选择 {0}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "A query result's rows, only when you run one of its tools on that result"
+msgstr "查询结果中的行，仅当您对该结果运行其工具之一时可见"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
@@ -1305,6 +1310,10 @@ msgstr "来自派生数据集"
 msgid "Sheet"
 msgstr "工作表"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "已发布到工作区"
@@ -2112,6 +2121,10 @@ msgstr "撤销"
 msgid "One dataset is one tab."
 msgstr "一个数据集对应一个标签页。"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Data it can read"
+msgstr "它可以读取的数据"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "权限已保存"
@@ -2256,6 +2269,14 @@ msgstr "主机"
 msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "在服务器预期瓦片索引的位置包含 z、x 和 y 占位符。"
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "（空白）"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Data Explorer toolbar: {toolbarCommands}"
+msgstr "数据浏览器工具栏：{toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2838,10 +2859,6 @@ msgstr "两个状态名称相同。请分别为它们命名。"
 msgid "Its features are removed from this workspace."
 msgstr "其功能已从此工作区中移除。"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "Reads the query result you run it on"
-msgstr "读取其所运行查询的结果"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "最近更新"
@@ -3061,6 +3078,10 @@ msgstr "PDF 已下载。"
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "工作区 ID"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "What it adds"
+msgstr "它添加的内容"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -4697,13 +4718,17 @@ msgstr "源文件的格式不是 Avandar 可读取的表格格式。"
 msgid "Image"
 msgstr "图像"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "不使用工作区数据。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "隐藏 X 轴"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "正在加载结果"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
@@ -4712,6 +4737,10 @@ msgstr "精确位置"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "新聊天"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "不可用的结果"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5085,6 +5114,10 @@ msgstr "覆盖率"
 msgid "Clarification answer"
 msgstr "澄清答案"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Chart types: {chartTypes}"
+msgstr "图表类型：{chartTypes}"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
@@ -5314,6 +5347,10 @@ msgstr "数字范围"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "替换 URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr ""
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -5722,6 +5759,10 @@ msgstr "不是"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "嵌入"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Nothing yet."
+msgstr "暂无内容。"
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6201,6 +6242,11 @@ msgstr "什么是系列？"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "纬度或经度不是数字"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "回答数据问题需要拥有此工作区中数据探索器的访问权限。"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -7909,6 +7955,10 @@ msgstr "此数据集仅限离线使用。点击以允许在线同步。"
 msgid "Checking your data…"
 msgstr "正在检查您的数据…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "结果"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "全局过滤器"
@@ -8683,6 +8733,10 @@ msgstr "默认值"
 msgid "{0} areas have no data"
 msgstr "{0} 个区域没有数据"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Its charts see only the rows of the chart they draw"
+msgstr "其图表只能查看所绘制图表中的行"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "必填"
@@ -9052,6 +9106,10 @@ msgstr "部分行的纬度或经度为空。"
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "此 {resource} 对拥有 {app} {0} 权限的任何人可访问。"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See less"
+msgstr "收起"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "琥珀色"
@@ -9180,10 +9238,19 @@ msgstr "工作区 ID 不能包含空格"
 msgid "Enter your text here"
 msgstr "在此输入文本"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "按每个{splitColumnName}各绘制一个系列。颜色已自动设置。添加第二个系列会关闭此功能。"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
 msgstr "该标签页已不在此电子表格中。它可能已被重命名或删除。请重新选择工作表，然后选择一个标签页。"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See more"
+msgstr "展开"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -9711,6 +9778,10 @@ msgstr "常规"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "显示“未报告”条目"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "无法加载此结果。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -10750,12 +10821,6 @@ msgstr "开始使用"
 msgid "Bottom left"
 msgstr "左下方"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-"other {Adds # buttons to Data Explorer}}"
-msgstr "{dataExplorerToolbarItems, plural, one {向数据浏览器添加 # 个按钮} other {向数据浏览器添加 "
-"# 个按钮}}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "页面标题"
@@ -10908,6 +10973,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "已安装 {pluginName}"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "助手无法回答这个问题。请稍后再试。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

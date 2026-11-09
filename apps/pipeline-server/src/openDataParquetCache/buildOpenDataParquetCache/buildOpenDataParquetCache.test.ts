@@ -407,6 +407,58 @@ describe("buildOpenDataParquetCache", () => {
     });
   });
 
+  it("copies a complete sample instead of downloading the source", async () => {
+    const download = _createPagedDownload();
+    const dependencies = _createDependencies({
+      config: { paging: true, pageRows: 2, script: "./download.ts" },
+      download,
+      bucketDir,
+    });
+
+    const copy = await buildOpenDataParquetCache({
+      listing: LISTING,
+      buildId: BUILD_ID,
+      dependencies,
+      completeSampleCsv: "county,cases\nKings,3\nQueens,4\nBronx,5\n",
+    });
+
+    expect(dependencies.downloadToFile).not.toHaveBeenCalled();
+    expect(
+      download.paging && download.readSourceVersion,
+    ).not.toHaveBeenCalled();
+    expect(copy).toMatchObject({
+      folderPath: FOLDER,
+      partCount: 1,
+      sourceVersion: "v1",
+      rowCount: 3,
+      columns: [
+        { name: "county", dataType: "VARCHAR" },
+        { name: "cases", dataType: "BIGINT" },
+      ],
+    });
+    expect(
+      await _readBucket(bucketDir, "SELECT county FROM $copy ORDER BY cases"),
+    ).toEqual([{ county: "Kings" }, { county: "Queens" }, { county: "Bronx" }]);
+  });
+
+  it("fails on a complete sample with no rows", async () => {
+    const dependencies = _createDependencies({
+      config: { paging: true, pageRows: 2, script: "./download.ts" },
+      download: _createPagedDownload(),
+      bucketDir,
+    });
+
+    await expect(
+      buildOpenDataParquetCache({
+        listing: LISTING,
+        buildId: BUILD_ID,
+        dependencies,
+        completeSampleCsv: "county,cases\n",
+      }),
+    ).rejects.toMatchObject({ code: "source-empty" });
+    expect(dependencies.uploadedPaths).toEqual([]);
+  });
+
   it("refuses a script whose download does not match the config's paging", async () => {
     const dependencies = _createDependencies({
       config: { paging: false, script: "./download.ts" },

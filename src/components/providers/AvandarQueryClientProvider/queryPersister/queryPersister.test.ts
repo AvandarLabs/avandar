@@ -12,6 +12,49 @@ import {
 } from "@/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister";
 import type { User } from "$/models/User/User";
 
+/**
+ * Persists `data` under `queryKey` with an older cache schema version, then
+ * restores the cache with the current buster and returns what survived.
+ */
+async function _restorePersistedQueryData(options: {
+  cacheSchemaVersion: string;
+  queryKey: readonly unknown[];
+  data: unknown;
+}): Promise<unknown> {
+  const oldClient = new QueryClient();
+  const restoredClient = new QueryClient();
+  oldClient.setQueryData(options.queryKey, options.data);
+  const storageKey = "avandar-react-query-cache";
+  try {
+    await set(
+      storageKey,
+      JSON.stringify({
+        timestamp: Date.now(),
+        buster: `${options.cacheSchemaVersion}:${import.meta.env.VITE_APP_VERSION ?? "dev"}:anon`,
+        clientState: dehydrate(oldClient),
+      }),
+    );
+    await new Promise<void>((onSuccess) => {
+      render(
+        createElement(PersistQueryClientProvider, {
+          client: restoredClient,
+          persistOptions: {
+            persister: queryPersister,
+            buster: makeCacheBuster(undefined),
+          },
+          onSuccess,
+        }),
+      );
+    });
+    return restoredClient.getQueryData(options.queryKey);
+  } finally {
+    cleanup();
+    await del(storageKey);
+    oldClient.clear();
+    restoredClient.clear();
+  }
+}
+
 describe("makeCacheBuster", () => {
   it("includes user id in the buster", () => {
     expect(makeCacheBuster("user-123" as User.Id)).toContain("user-123");
@@ -22,43 +65,40 @@ describe("makeCacheBuster", () => {
   });
 
   it("discards cached query results from before execution SQL was recorded", async () => {
-    const oldClient = new QueryClient();
-    const restoredClient = new QueryClient();
     const queryKey = ["query-results", "SELECT revenue FROM sales"];
-    oldClient.setQueryData(queryKey, {
-      ...QueryResult.makeEmpty(),
-      columns: [{ name: "revenue", dataType: "double" }],
-      data: [{ revenue: 12 }],
-      numRows: 1,
+    const restoredData = await _restorePersistedQueryData({
+      cacheSchemaVersion: "v8",
+      queryKey,
+      data: {
+        ...QueryResult.makeEmpty(),
+        columns: [{ name: "revenue", dataType: "double" }],
+        data: [{ revenue: 12 }],
+        numRows: 1,
+      },
     });
-    const storageKey = "avandar-react-query-cache";
-    try {
-      await set(
-        storageKey,
-        JSON.stringify({
-          timestamp: Date.now(),
-          buster: `v8:${import.meta.env.VITE_APP_VERSION ?? "dev"}:anon`,
-          clientState: dehydrate(oldClient),
-        }),
-      );
-      await new Promise<void>((onSuccess) => {
-        render(
-          createElement(PersistQueryClientProvider, {
-            client: restoredClient,
-            persistOptions: {
-              persister: queryPersister,
-              buster: makeCacheBuster(undefined),
-            },
-            onSuccess,
-          }),
-        );
-      });
-      expect(restoredClient.getQueryData(queryKey)).toBeUndefined();
-    } finally {
-      cleanup();
-      await del(storageKey);
-      oldClient.clear();
-      restoredClient.clear();
-    }
+    expect(restoredData).toBeUndefined();
+  });
+
+  it("discards cached catalog facets from before keywords were counted", async () => {
+    const queryKey = [
+      "DataCatalogListingClient",
+      "searchFacets",
+      { query: "", filters: {} },
+    ];
+    const restoredData = await _restorePersistedQueryData({
+      cacheSchemaVersion: "v9",
+      queryKey,
+      data: {
+        sources: [],
+        organization2: [],
+        organization2Labels: [],
+        domains: [],
+        formats: [],
+        updatedWithin: { any: 0, pastMonth: 0, pastYear: 0, overAYear: 0 },
+        numUnloadable: 0,
+        numCatalogListings: 0,
+      },
+    });
+    expect(restoredData).toBeUndefined();
   });
 });

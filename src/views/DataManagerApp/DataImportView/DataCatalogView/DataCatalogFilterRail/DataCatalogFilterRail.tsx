@@ -10,6 +10,7 @@ import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatal
 import { DataCatalogOrganization2Facet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet";
 import { DataCatalogUpdatedWithinSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect";
 import type {
+  CatalogFacetOption,
   CatalogFacets,
   CatalogListingFilters,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
@@ -18,7 +19,16 @@ import type { ReactNode } from "react";
 type Props = {
   filters: Readonly<CatalogListingFilters>;
   facets: Readonly<CatalogFacets>;
+
+  /**
+   * The keywords Keywords offers: the top keywords from `facets` until the
+   * user searches there, then the keywords that search found.
+   */
+  keywordOptions: readonly CatalogFacetOption[];
   onFiltersChange: (filters: CatalogListingFilters) => void;
+
+  /** Called with what the user types into Keywords. */
+  onKeywordSearchChange: (keywordSearch: string) => void;
 };
 
 /**
@@ -30,7 +40,9 @@ type Props = {
 export function DataCatalogFilterRail({
   filters,
   facets,
+  keywordOptions,
   onFiltersChange,
+  onKeywordSearchChange,
 }: Props): ReactNode {
   const { t } = useLingui();
 
@@ -70,8 +82,9 @@ export function DataCatalogFilterRail({
         <DataCatalogFacetSelect
           label={t`Keywords`}
           placeholder={t`All keywords`}
-          options={facets.tags}
+          options={keywordOptions}
           chosenValues={filters.tags}
+          onSearchChange={onKeywordSearchChange}
           onChange={(tags) => {
             onFiltersChange({ ...filters, tags });
           }}
@@ -106,7 +119,7 @@ export function DataCatalogFilterRail({
           }}
           label={t`Hide datasets that can't be loaded`}
           description={
-            filters.isLoadableOnly && facets.numUnloadable > 0
+            filters.isLoadableOnly && (facets.numUnloadable ?? 0) > 0
               ? t`${facets.numUnloadable} hidden`
               : undefined
           }

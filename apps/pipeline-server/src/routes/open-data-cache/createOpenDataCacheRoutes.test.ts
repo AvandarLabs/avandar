@@ -60,6 +60,22 @@ describe("createOpenDataCacheRoutes", () => {
     });
   });
 
+  it("queues a build with the complete sample it was handed, however many megabytes", async () => {
+    const completeSampleCsv = `the_geom\n"${"x".repeat(3 * 1024 * 1024)}"\n`;
+
+    const res = await _postBuild({
+      payload: { buildId: BUILD_ID, completeSampleCsv },
+    });
+
+    expect(res.statusCode).toBe(202);
+    expect(enqueueBuild).toHaveBeenCalledWith({
+      catalogListingId: LISTING_ID,
+      buildId: BUILD_ID,
+      completeSampleCsv,
+      supabase: SUPABASE_TARGET,
+    });
+  });
+
   it("says when the same build is already queued", async () => {
     enqueueBuild.mockReturnValue(false);
 

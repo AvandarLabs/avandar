@@ -87,10 +87,15 @@ async function _requestBuild(
   }
 }
 
-/** Whether a failed build may be tried again now. */
+/**
+ * Whether a failed build may be tried again now. A caller holding the whole
+ * source need not wait: the build reads what it hands over, not the source
+ * that may have failed it.
+ */
 function _canRetryFailedBuild(
   listing: ParquetCacheListingState,
   now: Date,
+  hasCompleteSample: boolean,
 ): boolean {
   if (listing.isInvalid) {
     return false;
@@ -100,6 +105,7 @@ function _canRetryFailedBuild(
   }
   const startedAt = listing.parquetCacheBuildStartedAt;
   return (
+    hasCompleteSample ||
     startedAt === undefined ||
     now.getTime() - new Date(startedAt).getTime() >= RETRY_FAILED_BUILD_AFTER_MS
   );
@@ -167,13 +173,14 @@ async function _answerWithCopy(
   listing: ParquetCacheListingState & { parquetCacheFolderPath: string },
   partCount: number,
   deps: ParquetCacheDependencies,
+  hasCompleteSample: boolean,
 ): Promise<ParquetCacheAnswer> {
   const isStale = await _isCopyStale(listing, deps);
   const needsBuild =
     isStale ||
     listing.parquetCacheStatus === "building" ||
     (listing.parquetCacheStatus === "failed" &&
-      _canRetryFailedBuild(listing, deps.now()));
+      _canRetryFailedBuild(listing, deps.now(), hasCompleteSample));
   if (needsBuild && deps.canStartBuilds) {
     await _requestBuild(deps);
   }
@@ -194,10 +201,11 @@ async function _answerWithCopy(
 async function _answerWithoutCopy(
   listing: ParquetCacheListingState,
   deps: ParquetCacheDependencies,
+  hasCompleteSample: boolean,
 ): Promise<ParquetCacheAnswer> {
   if (
     listing.parquetCacheStatus === "failed" &&
-    !_canRetryFailedBuild(listing, deps.now())
+    !_canRetryFailedBuild(listing, deps.now(), hasCompleteSample)
   ) {
     return {
       status: "failed",
@@ -225,20 +233,25 @@ async function _answerWithoutCopy(
  * lost). A failed build is retried at
  * most every 15 minutes, and never for a listing that is invalid or cannot be
  * copied. A build whose start fails releases its claim, so the next request
- * can try again.
+ * can try again. A caller that hands over the whole source, as a complete
+ * column type sample, may retry a failed build at once.
  *
  * @param args.listing The listing, as the caller may see it.
  * @param args.deps The freshness read and its record, the claim, the build
  *   start, and the clock.
+ * @param args.hasCompleteSample True when the build will copy a complete
+ *   sample the caller handed over instead of reading the source.
  * @returns What to answer.
  */
 export async function requestParquetCache(
   args: Readonly<{
     listing: ParquetCacheListingState;
     deps: ParquetCacheDependencies;
+    hasCompleteSample?: boolean;
   }>,
 ): Promise<ParquetCacheAnswer> {
   const { listing, deps } = args;
+  const hasCompleteSample = args.hasCompleteSample ?? false;
   if (listing.accessKind !== "api_resource") {
     return { status: "unavailable", reason: "not-api-backed" };
   }
@@ -249,9 +262,10 @@ export async function requestParquetCache(
       { ...listing, parquetCacheFolderPath: folderPath },
       partCount,
       deps,
+      hasCompleteSample,
     );
   }
-  return await _answerWithoutCopy(listing, deps);
+  return await _answerWithoutCopy(listing, deps, hasCompleteSample);
 }
 
 /**

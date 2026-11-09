@@ -89,8 +89,26 @@ export const DATA_AGENT_TOOLS = [
 ] as const;
 
 /**
- * The version of the data agent's prompt and tools the agent proxy serves.
- * The browser names it in the proxy URL; a new prompt ships as a new id, so
- * a browser tab opened before a deploy keeps getting the prompt it expects.
+ * Every prompt version the agent proxy serves. A tab opened before a deploy
+ * keeps naming the version it loaded, so older versions stay served until
+ * no open tab can still use them.
  */
-export const DATA_AGENT_PROMPT_ID = "data-agent-v1";
+export const DATA_AGENT_PROMPT_IDS = [
+  "data-agent-v1",
+  "data-agent-v2",
+] as const;
+
+/** One served prompt version. */
+export type DataAgentPromptId = (typeof DATA_AGENT_PROMPT_IDS)[number];
+
+/**
+ * The version of the data agent's prompt this build uses. Only the prompt is
+ * versioned: every version shares the same tools. The browser names it in
+ * the proxy URL. v2 adds the current page block.
+ */
+export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v2";
+
+/** Whether the proxy serves a prompt version. */
+export function isDataAgentPromptId(value: string): value is DataAgentPromptId {
+  return (DATA_AGENT_PROMPT_IDS as readonly string[]).includes(value);
+}

@@ -97,6 +97,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "Esto permitirá que el conjunto de datos se almacene en línea para que "
 "pueda ser accedido en otros dispositivos."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "Otro"
@@ -327,6 +328,11 @@ msgstr "El {chartName} no se puede mostrar."
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Select {0}"
 msgstr "Seleccione {0}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "A query result's rows, only when you run one of its tools on that result"
+msgstr "Las filas del resultado de una consulta, solo cuando ejecutas una de "
+"sus herramientas sobre ese resultado"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
@@ -1363,6 +1369,10 @@ msgstr "Desde conjunto de datos derivado"
 msgid "Sheet"
 msgstr "Hoja"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Publicado en el espacio de trabajo"
@@ -2207,6 +2217,10 @@ msgstr "Deshacer"
 msgid "One dataset is one tab."
 msgstr "Un conjunto de datos corresponde a una pestaña."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Data it can read"
+msgstr "Datos que puede leer"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "Permisos guardados"
@@ -2355,6 +2369,14 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "Incluya los marcadores de posición z, x e y donde el servidor espera el "
 "índice de tesela."
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(En blanco)"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Data Explorer toolbar: {toolbarCommands}"
+msgstr "Barra de herramientas del Explorador de datos: {toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2956,10 +2978,6 @@ msgstr "Dos estados tienen el mismo nombre. Asigne un nombre distinto a cada "
 msgid "Its features are removed from this workspace."
 msgstr "Sus funciones se eliminaron de este espacio de trabajo."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "Reads the query result you run it on"
-msgstr "Lee el resultado de la consulta en la que se ejecuta"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Última actualización"
@@ -3194,6 +3212,10 @@ msgstr "PDF descargado."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "ID del espacio de trabajo"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "What it adds"
+msgstr "Lo que agrega"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -4894,13 +4916,17 @@ msgstr "El archivo de origen no está en un formato que Avandar pueda leer como 
 msgid "Image"
 msgstr "Imagen"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "No usa datos del espacio de trabajo."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "Ocultar eje X"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "Cargando el resultado"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
@@ -4909,6 +4935,10 @@ msgstr "Ubicaciones exactas"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "Nuevo chat"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "Resultado no disponible"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5291,6 +5321,10 @@ msgstr "cobertura"
 msgid "Clarification answer"
 msgstr "Respuesta de aclaración"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Chart types: {chartTypes}"
+msgstr "Tipos de gráficos: {chartTypes}"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "Generated SQL"
@@ -5529,6 +5563,10 @@ msgstr "Rango de números"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "Reemplazar URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr ""
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -5950,6 +5988,10 @@ msgstr "no es"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "Insertar"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Nothing yet."
+msgstr "Aún no hay nada."
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6448,6 +6490,12 @@ msgstr "¿Qué es una serie?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "La latitud o longitud no es un número"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Para responder preguntas sobre datos se necesita acceso al Explorador "
+"de Datos en este espacio de trabajo."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -8221,6 +8269,10 @@ msgstr "Este conjunto de datos es solo para uso offline. Haga clic para "
 msgid "Checking your data…"
 msgstr "Comprobando tus datos…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "Resultado"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Filtros globales"
@@ -9032,6 +9084,10 @@ msgstr "Valor predeterminado"
 msgid "{0} areas have no data"
 msgstr "{0} áreas no tienen datos"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Its charts see only the rows of the chart they draw"
+msgstr "Sus gráficos solo ven las filas del gráfico que representan"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "Obligatorio"
@@ -9416,6 +9472,10 @@ msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "Este {resource} es accesible para cualquier persona con permiso {app} "
 "{0}."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See less"
+msgstr "Ver menos"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "Ámbar"
@@ -9547,12 +9607,22 @@ msgstr "El ID del espacio de trabajo no puede contener espacios"
 msgid "Enter your text here"
 msgstr "Ingrese su texto aquí"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Se dibuja una serie por cada {splitColumnName}. Los colores se asignan "
+"automáticamente. Si agregas una segunda serie, esto se desactiva."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
 msgstr "Esa pestaña ya no está en esta hoja de cálculo. Es posible que se haya "
 "cambiado su nombre o eliminado. Seleccione nuevamente la hoja y elija "
 "una pestaña."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See more"
+msgstr "Ver más"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -10106,6 +10176,10 @@ msgstr "General"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "Mostrar una entrada de No reportado"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "No se pudo cargar este resultado."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -11187,12 +11261,6 @@ msgstr "Comenzar"
 msgid "Bottom left"
 msgstr "Abajo a la izquierda"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-"other {Adds # buttons to Data Explorer}}"
-msgstr "{dataExplorerToolbarItems, plural, one {Agrega # botón al Explorador de "
-"datos} other {Agrega # botones al Explorador de datos}}"
-
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Título de la página"
@@ -11352,6 +11420,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "{pluginName} instalado"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "El asistente no pudo responder a eso. Intenta de nuevo en un momento."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

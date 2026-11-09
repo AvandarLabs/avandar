@@ -29,10 +29,22 @@ export function createParquetCopyBuildQueue(
     state: { maxResponseBytes: PROBE_MAX_RESPONSE_BYTES },
   });
   return createParquetCopyQueue<ParquetCopyBuildRequest>({
-    runJob: async ({ catalogListingId, buildId, supabase }) => {
-      log.info({ catalogListingId, buildId }, "Parquet copy build started");
+    runJob: async ({
+      catalogListingId,
+      buildId,
+      completeSampleCsv,
+      supabase,
+    }) => {
+      log.info(
+        {
+          catalogListingId,
+          buildId,
+          isFromCompleteSample: completeSampleCsv !== undefined,
+        },
+        "Parquet copy build started",
+      );
       const outcome = await runParquetCopyBuild({
-        job: { catalogListingId, buildId },
+        job: { catalogListingId, buildId, completeSampleCsv },
         store: createSupabaseParquetCopyStore(supabase),
         loadPipelineDownload: loadPipelineListingDownload,
         downloadToFile: streamUrlToFile,

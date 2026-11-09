@@ -1,13 +1,16 @@
 import { useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
-import { PluginDetails } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails";
-import type { PluginManifest } from "@avandar/plugin-manifest/runtime";
+import { PluginDetails } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetails";
+import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 
 type Props = Readonly<{
-  manifest: PluginManifest;
+  manifestModule: PluginManifestModule;
 
   /** The manifest's description, already translated for the locale. */
   description: string;
+
+  /** The id of the card's heading, which describes the details toggle. */
+  headingId: string;
 }>;
 
 /**
@@ -15,10 +18,12 @@ type Props = Readonly<{
  * settings card shows it whenever this deployment still bundles the plugin.
  */
 export function PluginManifestSummary({
-  manifest,
+  manifestModule,
   description,
+  headingId,
 }: Props): JSX.Element {
   const { t } = useLingui();
+  const { manifest, strings } = manifestModule;
   const publisher = manifest.id.split(".")[0] ?? "";
   const { version } = manifest;
   return (
@@ -27,7 +32,11 @@ export function PluginManifestSummary({
         {t`${publisher} · version ${version}`}
       </Text>
       <Text size="sm">{description}</Text>
-      <PluginDetails manifest={manifest} />
+      <PluginDetails
+        manifest={manifest}
+        strings={strings}
+        headingId={headingId}
+      />
     </>
   );
 }

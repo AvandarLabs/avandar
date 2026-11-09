@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearOpenDataColumnTypeSampleCache } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 import {
   isColumnTypeVerificationDue,
   verifyOpenDataColumnTypes,
@@ -84,6 +85,7 @@ describe("isColumnTypeVerificationDue", () => {
 
 describe("verifyOpenDataColumnTypes", () => {
   beforeEach(() => {
+    clearOpenDataColumnTypeSampleCache();
     getSessionMock.mockResolvedValue({
       data: { session: { access_token: "session-token" } },
     });
@@ -136,6 +138,64 @@ describe("verifyOpenDataColumnTypes", () => {
         }),
       },
     );
+  });
+
+  function _mockSampleAndWriteBack(isComplete: boolean): void {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(
+        new Response("borocode\n1\n", {
+          status: 200,
+          headers: {
+            "X-Ava-Column-Type-Token": "token-1",
+            "X-Ava-Column-Type-Sample-Complete": String(isComplete),
+          },
+        }),
+      )
+      .mockResolvedValueOnce(new Response("{}", { status: 200 }));
+  }
+
+  const inferBorocode = async () => {
+    return [{ name: "borocode", dataType: "BIGINT" }] as const;
+  };
+
+  it("builds the copy from a sample that held the whole source, once its types are written", async () => {
+    _mockSampleAndWriteBack(true);
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify({ status: "building" }), { status: 202 }),
+    );
+
+    await verifyOpenDataColumnTypes(LISTING_ID, {
+      inferColumnTypes: inferBorocode,
+    });
+
+    const [url, init] = vi.mocked(fetch).mock.calls[2] as [string, RequestInit];
+    expect(url).toBe(
+      `${EDGE_FUNCTIONS_URL}/open-data/data-catalog-listings/${LISTING_ID}/parquet-cache`,
+    );
+    expect(JSON.parse(String(init.body))).toEqual({
+      completeSample: { csvText: "borocode\n1\n", token: "token-1" },
+    });
+  });
+
+  it("asks for no copy from a sample that is only the start of the source", async () => {
+    _mockSampleAndWriteBack(false);
+
+    await verifyOpenDataColumnTypes(LISTING_ID, {
+      inferColumnTypes: inferBorocode,
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("still verifies the types when the copy cannot be requested", async () => {
+    _mockSampleAndWriteBack(true);
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("offline"));
+
+    await expect(
+      verifyOpenDataColumnTypes(LISTING_ID, {
+        inferColumnTypes: inferBorocode,
+      }),
+    ).resolves.toBeUndefined();
   });
 
   it("fails when the sample cannot be read, without inferring anything", async () => {

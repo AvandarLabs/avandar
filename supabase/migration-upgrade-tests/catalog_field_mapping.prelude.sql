@@ -13,7 +13,9 @@ begin;
 -- read `organization1_name`. The search functions are dropped by the
 -- signatures the fully migrated database has, which
 -- `20261107180100_catalog_search_organization_filters` widened with the
--- level-2 organization, topic, and keyword filters.
+-- level-2 organization, topic, and keyword filters, and
+-- `20261109065256_catalog_scalable_search` widened with a sort, a page, and
+-- a count cap.
 alter table public.data_catalog_listings drop column search_vector;
 
 -- `20261109020622_catalog_additional_source_metadata` changed the upsert's
@@ -46,7 +48,8 @@ drop function public.rpc_data_catalog_listings__search (
   text[],
   text[],
   text[],
-  text
+  text,
+  integer
 );
 
 drop function public.data_catalog_listings__search_matches (
@@ -57,7 +60,10 @@ drop function public.data_catalog_listings__search_matches (
   boolean,
   text[],
   text[],
-  text[]
+  text[],
+  text,
+  integer,
+  integer
 );
 
 alter table public.data_catalog_listings

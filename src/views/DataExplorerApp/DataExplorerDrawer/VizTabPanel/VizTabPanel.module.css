@@ -2,3 +2,8 @@
   padding: var(--mantine-spacing-lg);
   text-align: center;
 }
+
+/* The note above the settings while the canvas splits the chart. */
+.splitNote {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md) 0;
+}

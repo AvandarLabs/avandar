@@ -199,6 +199,49 @@ describe("requestParquetCache", () => {
     },
   );
 
+  it("retries a failed build at once when the caller holds the whole source", async () => {
+    const deps = _deps();
+
+    await expect(
+      requestParquetCache({
+        listing: {
+          ...NO_COPY,
+          parquetCacheStatus: "failed",
+          parquetCacheFailureCode: "source-download-failed",
+          parquetCacheBuildStartedAt: "2026-11-09T11:59:00.000Z",
+        },
+        deps,
+        hasCompleteSample: true,
+      }),
+    ).resolves.toEqual({ status: "building" });
+    expect(deps.startBuild).toHaveBeenCalledWith("new-build");
+  });
+
+  it.each([
+    ["its listing cannot be copied", "copy-unsupported", false],
+    ["its listing is invalid", "source-empty", true],
+  ])(
+    "does not retry a failed build with the whole source when %s",
+    async (_label, failureCode, isInvalid) => {
+      const deps = _deps();
+
+      await expect(
+        requestParquetCache({
+          listing: {
+            ...NO_COPY,
+            isInvalid,
+            parquetCacheStatus: "failed",
+            parquetCacheFailureCode: failureCode,
+            parquetCacheBuildStartedAt: "2026-11-09T11:59:00.000Z",
+          },
+          deps,
+          hasCompleteSample: true,
+        }),
+      ).resolves.toEqual({ status: "failed", failureCode });
+      expect(deps.claimBuild).not.toHaveBeenCalled();
+    },
+  );
+
   it("refuses a listing that is not API-backed", async () => {
     await expect(
       requestParquetCache({

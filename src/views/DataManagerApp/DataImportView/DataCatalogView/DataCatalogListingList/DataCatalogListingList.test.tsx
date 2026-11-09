@@ -69,7 +69,7 @@ describe("DataCatalogListingList", () => {
     );
 
     const name = screen.getByText(LONG_NAME);
-    expect(name).toHaveClass(css.dataCatalogListingListName);
+    expect(name).toHaveClass(css.dataCatalogListingListName!);
 
     act(() => {
       fireEvent.mouseEnter(name);

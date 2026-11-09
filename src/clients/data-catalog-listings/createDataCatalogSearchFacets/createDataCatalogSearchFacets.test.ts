@@ -5,7 +5,7 @@ import type { DataCatalogSearchFacetDBRow } from "@/clients/data-catalog-listing
 function _row(
   facet: string,
   value: string | null,
-  listingCount: number,
+  listingCount: number | null,
 ): DataCatalogSearchFacetDBRow {
   return { facet, value, listing_count: listingCount };
 }
@@ -133,5 +133,17 @@ describe("createDataCatalogSearchFacets", () => {
     expect(() => {
       return createDataCatalogSearchFacets([{ facet: "source" }]);
     }).toThrow();
+  });
+
+  it("leaves out the counts Postgres could not count", () => {
+    const facets = createDataCatalogSearchFacets([
+      _row("source", "World Bank", null),
+      _row("updated_within", "any", null),
+      _row("unloadable", null, null),
+    ]);
+
+    expect(facets.sources).toEqual([{ value: "World Bank", count: undefined }]);
+    expect(facets.updatedWithin.any).toBeUndefined();
+    expect(facets.numUnloadable).toBeUndefined();
   });
 });

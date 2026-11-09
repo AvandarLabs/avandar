@@ -16,6 +16,7 @@ attribute, and individual. See section 2 of
 4. [How to model relationships](#4-how-to-model-relationships)
 5. [Reference tools](#5-reference-tools)
 6. [Where the current state is documented](#6-where-the-current-state-is-documented)
+7. [Platform fixes and tests to add](#7-platform-fixes-and-tests-to-add)
 
 ## 1. Summary
 
@@ -97,3 +98,39 @@ relationships with exposure details, and transmission chains.
   `supabase/schemas/00.enum.activity_events__kind.sql` and
   [case-activity-architecture.md](case-activity-architecture.md).
 - Status filter: `src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/`.
+
+## 7. Platform fixes and tests to add
+
+These are not case management gaps. They are fixes and tests the platform
+needs, found while running the demo.
+
+### 7.1 Catch a forgotten query cache bump
+
+The React Query cache is saved in IndexedDB and restored on the next load. It
+is only discarded when `CACHE_SCHEMA_VERSION` in
+`src/components/providers/AvandarQueryClientProvider/queryPersister/queryPersister.ts`
+or `package.json`'s version changes, and a deploy does not change the latter.
+When `ad6d300a7` added `tags` to the catalog facets without bumping the
+version, browsers restored facets without `tags` and the whole Add dataset
+view crashed on `options.map`. `dbf921eda` bumped the version to `v10` and
+added a test for that one shape, but nothing stops the next forgotten bump.
+
+Rotating the cache on every deploy (adding the commit SHA to the buster) was
+rejected: it would empty every user's cache on every deploy.
+
+| Option | Would it have caught `tags`? | Noise | Cost |
+| --- | --- | --- | --- |
+| **Shape fingerprint (preferred).** Use the TypeScript compiler to fully expand the return type of every `queries` method on each `createUsableServiceClient(...)`, hash it, and compare against a committed `{ v10: "<hash>" }` table. A shape change fails until the version is bumped and the new hash recorded. | Yes | Low: fires only when cached data changes shape | About 150 lines. Loading the program takes 10 to 30 seconds, so it fits a CI script (`pnpm check:cache-shapes`) better than a unit test. |
+| CI path guard. Fail a PR that touches `shared/models/**/*.types.ts` or `src/clients/**` without touching `queryPersister.ts`, with an opt-out trailer. | Yes | High: comment edits and new mutations trip it | Small |
+| Validate on restore. Drop restored entries that fail a parser. | No: it hides the crash instead of catching the bump | None | Large: most queries have no parser |
+
+The fingerprint does not cover a `useQuery` whose data is built outside a
+client.
+
+### 7.2 Keep hidden tabs from crashing the page
+
+`Tabs` in `@avandar/ui` renders every panel at once, because Mantine's
+`keepMounted` defaults to true. A crash in a tab the user has not opened, like
+the Open data tab above, takes down the page around it. Either mount only the
+active panel where keeping state is not needed, or wrap each panel in an
+error boundary.

@@ -61,8 +61,11 @@ function DataCatalogListingName({
 type Props = {
   /** Every result page loaded so far, in the order search sorted them. */
   displayedListings: readonly DataCatalogListing.SearchResult[];
-  /** How many listings the search and filters match, loaded or not. */
-  totalCount: number;
+  /**
+   * How many listings the search and filters match, loaded or not, or
+   * undefined when more match than were counted.
+   */
+  totalCount: number | undefined;
   /** Currently highlighted catalog listing id. */
   selectedId: string | undefined;
   /** Called when the user picks a row. */
@@ -203,7 +206,8 @@ export function DataCatalogListingList({
               data-index={virtualRow.index}
               role="option"
               aria-selected={isSelected}
-              aria-setsize={totalCount}
+              // -1 tells assistive tech the list's size is unknown.
+              aria-setsize={totalCount ?? -1}
               aria-posinset={virtualRow.index + 1}
               className={clsx(
                 css.dataCatalogListingListRow,

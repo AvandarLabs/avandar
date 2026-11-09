@@ -46,6 +46,7 @@ import { useAddCatalogListing } from "@/views/DataManagerApp/DataImportView/Data
 import { useCatalogListingCompanions } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingCompanions/useCatalogListingCompanions";
 import { useCatalogListingPreview } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
+import { useDataCatalogKeywordOptions } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogKeywordOptions";
 import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
   useColumnTypeVerificationStatus,
@@ -159,6 +160,12 @@ export function DataCatalogView({
   useEffect(() => {
     onCatalogEmptyChange?.(isCatalogEmpty);
   }, [isCatalogEmpty, onCatalogEmptyChange]);
+  const { keywordOptions, onKeywordSearchChange } =
+    useDataCatalogKeywordOptions({
+      query: debouncedSearch,
+      filters,
+      topKeywords: facets?.tags ?? EMPTY_CATALOG_FACETS.tags,
+    });
   const isLoadingCatalog = catalogSearch.isLoading;
   const changeFilters = (nextFilters: CatalogListingFilters): void => {
     setFilters(settleCatalogListingFilters(nextFilters));
@@ -328,7 +335,9 @@ export function DataCatalogView({
     <DataCatalogFilterRail
       filters={filters}
       facets={facets ?? EMPTY_CATALOG_FACETS}
+      keywordOptions={keywordOptions}
       onFiltersChange={changeFilters}
+      onKeywordSearchChange={onKeywordSearchChange}
     />
   );
 
@@ -348,6 +357,7 @@ export function DataCatalogView({
         <section className={css.dataCatalogViewResults} aria-label={t`Results`}>
           <DataCatalogResultsHeader
             numResults={catalogSearch.totalCount}
+            isNumResultsCapped={catalogSearch.isTotalCapped}
             numCatalogListings={facets?.numCatalogListings ?? 0}
             // "X of Y" waits for the catalog's size, which the facet counts
             // carry, rather than reading "X of 0" for a moment.
@@ -419,7 +429,11 @@ export function DataCatalogView({
           ) : (
             <DataCatalogListingList
               displayedListings={catalogSearch.listings}
-              totalCount={catalogSearch.totalCount}
+              totalCount={
+                catalogSearch.isTotalCapped
+                  ? undefined
+                  : catalogSearch.totalCount
+              }
               selectedId={isSelectionShown ? selectedId : undefined}
               onSelect={setSelectedId}
               hasNextPage={catalogSearch.hasNextPage}

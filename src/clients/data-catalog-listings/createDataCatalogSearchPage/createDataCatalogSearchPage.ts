@@ -34,8 +34,14 @@ export type DataCatalogSearchPage = {
   /** The listings on this page, in the order search ranked them. */
   rows: DataCatalogListing.SearchResult[];
 
-  /** How many listings match the search across every page. */
+  /**
+   * How many listings match the search across every page, or, when
+   * `isTotalCapped`, the most that were counted.
+   */
   totalCount: number;
+
+  /** Whether more listings match than were counted. */
+  isTotalCapped: boolean;
 
   /** The page to request next, or undefined once the last match is loaded. */
   nextPage: number | undefined;
@@ -56,7 +62,13 @@ export function createDataCatalogSearchPage({
 }): DataCatalogSearchPage {
   // Every row repeats the total, so an empty page means nothing matched.
   const totalCount = dbRows[0]?.total_count ?? 0;
+  const isTotalCapped = dbRows[0]?.is_total_capped ?? false;
   const loadedCount = (pageNum + 1) * pageSize;
+  // A capped total says nothing about where the matches end, so paging goes
+  // on until a page comes back short.
+  const hasNextPage = isTotalCapped
+    ? dbRows.length === pageSize
+    : loadedCount < totalCount;
   return {
     rows: dbRows.map((dbRow) => {
       return {
@@ -74,6 +86,7 @@ export function createDataCatalogSearchPage({
       };
     }),
     totalCount,
-    nextPage: loadedCount < totalCount ? pageNum + 1 : undefined,
+    isTotalCapped,
+    nextPage: hasNextPage ? pageNum + 1 : undefined,
   };
 }

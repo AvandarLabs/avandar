@@ -2,7 +2,7 @@
 
 **Status:** built on `feat/gho-pipeline` (branched from `demo/measles`),
 except what section 9 defers. A full run against the real API on 2026-11-09
-wrote 3,091 indicator and 202 dimension listings. PR units: F28 and F29 in
+wrote 3,091 indicator and 202 dimension listings. PR units: F29 and F30 in
 [`pr-feature-log.md`](pr-feature-log.md).
 
 This spec adds the World Health Organization's Global Health Observatory

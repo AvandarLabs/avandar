@@ -38,6 +38,8 @@ const _RANGE_NOT_SATISFIABLE_STATUS = 416;
 
 const _NEWLINE_BYTE = 0x0a;
 
+const _QUOTE_CHARACTER = '"';
+
 /** Tab, line feed, carriage return, and space. */
 const _WHITESPACE_BYTES: ReadonlySet<number> = new Set([
   0x09, 0x0a, 0x0d, 0x20,
@@ -57,8 +59,17 @@ export type ReadByteRange = (args: {
  * The start of a source's real data, as raw bytes. Nothing here parses it:
  * the app's DuckDB reads it as CSV, delimiter, quoting, and header
  * included.
+ *
+ * `isComplete` is true when the sample holds the whole source: a Socrata
+ * export with fewer rows than the row limit, or a CKAN file that ended
+ * before the byte limit. A complete sample can be copied as the source
+ * itself, without reading the source again. An OData sample is never
+ * complete, because its copy keeps the types the source's schema declares.
  */
-export type OpenDataColumnTypeSample = Readonly<{ bytes: Uint8Array }>;
+export type OpenDataColumnTypeSample = Readonly<{
+  bytes: Uint8Array;
+  isComplete: boolean;
+}>;
 
 function _readHttpStatus(error: unknown): number | undefined {
   return error instanceof HttpClientError ? error.status : undefined;
@@ -81,6 +92,29 @@ function _trimToLastCompleteLine(args: {
   return lastLineBreak === -1
     ? args.bytes
     : args.bytes.subarray(0, lastLineBreak + 1);
+}
+
+/**
+ * Counts a CSV's records, header included. A line break inside a double
+ * quoted value does not end a record. Only line breaks and quotes are read,
+ * so the count needs no knowledge of the delimiter.
+ */
+function _countCsvRecords(csvText: string): number {
+  let numRecords = 0;
+  let isInQuotes = false;
+  let hasOpenRecord = false;
+  for (const character of csvText) {
+    if (character === _QUOTE_CHARACTER) {
+      isInQuotes = !isInQuotes;
+    }
+    if (character === "\n" && !isInQuotes) {
+      numRecords += 1;
+      hasOpenRecord = false;
+    } else if (character !== "\r") {
+      hasOpenRecord = true;
+    }
+  }
+  return hasOpenRecord ? numRecords + 1 : numRecords;
 }
 
 function _isBlank(bytes: Uint8Array): boolean {
@@ -153,12 +187,15 @@ function _createFileReadFailure(
   return new OpenDataAcquisitionFailed({ code, ckanResourceId }, error);
 }
 
-/** Reads the start of a CKAN file, refusing one with no content. */
+/**
+ * Reads the start of a CKAN file, refusing one with no content. A file that
+ * ended before the byte limit was read whole.
+ */
 async function _readCkanFileStart(args: {
   url: string;
   ckanResourceId: string;
   readByteRange: ReadByteRange;
-}): Promise<Uint8Array> {
+}): Promise<OpenDataColumnTypeSample> {
   let bytes: Uint8Array;
   try {
     bytes = await args.readByteRange({
@@ -174,17 +211,20 @@ async function _readCkanFileStart(args: {
       ckanResourceId: args.ckanResourceId,
     });
   }
-  return _trimToLastCompleteLine({
-    bytes,
-    maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
-  });
+  return {
+    bytes: _trimToLastCompleteLine({
+      bytes,
+      maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
+    }),
+    isComplete: bytes.byteLength < COLUMN_TYPE_SAMPLE_MAX_BYTES,
+  };
 }
 
 async function _sampleCkanResource(args: {
   access: Readonly<OpenDataApiAccessFor<"ckan">>;
   http: Readonly<OpenDataHttp>;
   readByteRange: ReadByteRange;
-}): Promise<Uint8Array> {
+}): Promise<OpenDataColumnTypeSample> {
   const { access } = args;
   const ckanPackage = await _getCkanPackage(args);
   // Only the start of the file is read, so the file's size sets no limit.
@@ -302,7 +342,7 @@ async function _sampleODataResource(args: {
  * @param params.entry - The listing.
  * @param params.http - Reads CKAN metadata, Socrata exports, and OData rows.
  * @param params.readByteRange - Reads the start of a CKAN file.
- * @returns The sample's raw bytes.
+ * @returns The sample's raw bytes, and whether they are the whole source.
  * @throws `OpenDataAcquisitionFailed` when the listing is not API-backed, or
  *   names a CKAN resource that is not a CSV or cannot be read. Its code says
  *   whether the CKAN API failed (`ckan-unreachable`) or the resource did
@@ -321,7 +361,7 @@ export async function acquireOpenDataColumnTypeSample(params: {
       accessKind: params.entry.accessKind,
     });
   }
-  const bytes = await match(access)
+  return await match(access)
     .with({ apiService: "ckan" }, (ckanAccess) => {
       return _sampleCkanResource({ ...params, access: ckanAccess });
     })
@@ -331,11 +371,23 @@ export async function acquireOpenDataColumnTypeSample(params: {
         socrataDatasetId: socrataAccess.externalDatasetId,
         maxRows: COLUMN_TYPE_SAMPLE_MAX_ROWS,
       });
-      return new TextEncoder().encode(csvText);
+      const numRows = _countCsvRecords(csvText) - 1;
+      return {
+        bytes: new TextEncoder().encode(csvText),
+        isComplete: numRows < COLUMN_TYPE_SAMPLE_MAX_ROWS,
+      };
     })
-    .with({ apiService: "odata" }, (odataAccess) => {
-      return _sampleODataResource({ http: params.http, access: odataAccess });
+    .with({ apiService: "odata" }, async (odataAccess) => {
+      return {
+        bytes: await _sampleODataResource({
+          http: params.http,
+          access: odataAccess,
+        }),
+        // An OData listing's copy is built from the source with the column
+        // types its schema declares. A copy of this CSV sample would infer
+        // them from the values instead, so it never stands in for the source.
+        isComplete: false,
+      };
     })
     .exhaustive();
-  return { bytes };
 }

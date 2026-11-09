@@ -5,6 +5,7 @@ import { DuckDBInstance } from "@duckdb/node-api";
 import { buildParquetCachePartPaths } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { refreshCatalogFacetCounts } from "./helpers/refreshCatalogFacetCounts";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Json } from "$/types/database.types";
@@ -338,10 +339,13 @@ test.describe("ODC recommended listings", () => {
     await _deleteFixtures(admin);
     await _seedListing(admin, DIMENSION_LISTING);
     await _seedListing(admin, INDICATOR_LISTING);
+    await refreshCatalogFacetCounts(admin);
   });
 
   test.afterEach(async () => {
-    await _deleteFixtures(createSupabaseAdminClient());
+    const admin = createSupabaseAdminClient();
+    await _deleteFixtures(admin);
+    await refreshCatalogFacetCounts(admin);
   });
 
   test("adds the listing recommended with an indicator from the notification after adding the indicator", async ({
