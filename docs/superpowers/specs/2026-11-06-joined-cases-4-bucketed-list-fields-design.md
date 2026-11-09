@@ -715,11 +715,17 @@ start from this code, not from the plan text.
 5. **Buckets arrive as `YYYY-MM-DD` text.** `arrowTableToJS` turns any date,
    timestamp, or time inside a list element (struct fields included) into
    text. Decimals inside a map or union keep their scale.
+   The Arrow-reader test "returns a struct inside a list with each field
+   converted as at top level" was replaced, because dates inside a struct in a
+   list now become text. Only text and `Date` buckets read as periods: a number
+   is never taken for epoch milliseconds.
 6. **The record page table** shows the six most recent periods with an inline
    "Show all <n> <periods>" toggle (not a modal), locale period labels, and
    values to at most two decimals (`useBucketValueFormatter`, in
    `src/components/caseFields/`). `CaseDetailsRow` carries plan 3's `dataType`,
    not `valueDataType` (section 5.6).
+   An empty per-period field shows "No value", not "No values" as section 5.6
+   says.
 7. **The Data Explorer grid** labels periods with the same locale hooks
    (`Jan 2026: 38.5; Feb 2026: 37.9`), not ISO labels. `bucketGrain` rides on
    result columns and projection descriptors.
