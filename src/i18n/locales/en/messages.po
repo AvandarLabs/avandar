@@ -3066,6 +3066,10 @@ msgstr "PDF downloaded."
 msgid "Workspace ID"
 msgstr "Workspace ID"
 
+#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
+msgid "You haven't chosen: {settingLabel}"
+msgstr "You haven't chosen: {settingLabel}"
+
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
 msgstr "{numUsers} people"
@@ -7429,8 +7433,8 @@ msgid "Could not load this workspace's plugins. Reload to try again."
 msgstr "Could not load this workspace's plugins. Reload to try again."
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
-msgid "Choose a {settingLabel}"
-msgstr "Choose a {settingLabel}"
+#~ msgid "Choose a {settingLabel}"
+#~ msgstr "Choose a {settingLabel}"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -8711,7 +8715,6 @@ msgstr "is at least"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
-#: src/lib/plugins/vizs/useVizTypeLabel/useVizTypeLabel.ts
 msgid "Plugin chart"
 msgstr "Plugin chart"
 
