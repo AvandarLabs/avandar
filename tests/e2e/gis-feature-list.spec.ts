@@ -50,6 +50,7 @@ const SCHOOL_ROW_COUNT = 35;
 const EXPECTED_SCHOOL_COUNT = 16;
 const NEAREST_SCHOOL_NAME = "The Clinton School";
 const NEAREST_SCHOOL_DISTANCE = "0.09 mi";
+const NEAREST_SCHOOL_ADDRESS = "10 East 15th Street";
 
 async function _pickOption(
   page: Page,
@@ -174,18 +175,19 @@ async function _waitForMapToSettle(page: Page): Promise<void> {
 }
 
 /**
- * Shows the nearest school from its row, then frames both half-mile rings
- * for the screenshot of the map beside its list.
+ * Frames both half-mile rings between the layer panel and the inspector,
+ * then waits for every layer to redraw at the new view, for the screenshot.
  */
-async function _showRingsAroundNearestSchool(
-  page: Page,
-  firstRow: Locator,
-): Promise<void> {
-  await firstRow.getByRole("button", { name: /^Show .+ on the map$/ }).click();
-  await _waitForMapToSettle(page);
+async function _frameRings(page: Page): Promise<void> {
   await page.evaluate((bounds) => {
-    window.__avandarE2EMap?.fitBounds(bounds, { padding: 24, duration: 0 });
+    window.__avandarE2EMap?.fitBounds(bounds, {
+      padding: { top: 56, bottom: 48, left: 280, right: 330 },
+      duration: 0,
+    });
   }, RINGS_BOUNDS);
+  await expect(
+    page.getByRole("region", { name: "Layers" }).getByText("Loading"),
+  ).toHaveCount(0, { timeout: LONG_WAIT });
   await _waitForMapToSettle(page);
 }
 
@@ -278,8 +280,14 @@ test.describe("GIS feature list", () => {
         await expect(
           page.getByRole("button", { name: "Expand the legend" }),
         ).toBeVisible();
-        await _showRingsAroundNearestSchool(page, firstRow);
+        await _frameRings(page);
         await page.screenshot({ path: `${SCREENSHOT_DIR}/feature-list.png` });
+
+        // Pressing a row shows its feature's fields beside the list.
+        await firstRow
+          .getByRole("button", { name: /^Show .+ on the map$/ })
+          .click();
+        await expect(page.getByText(NEAREST_SCHOOL_ADDRESS)).toHaveCount(2);
       } finally {
         await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
         for (const datasetId of datasetIds) {
