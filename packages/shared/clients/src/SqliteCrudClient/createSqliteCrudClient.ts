@@ -275,7 +275,7 @@ function _ident(name: string): string {
 /**
  * Build a parameterised WHERE clause from the model's
  * `FiltersByColumn` shape. Supports the same operators as the
- * Supabase client (`eq`, `in`) and emits placeholders rather than
+ * Supabase client (`eq`, `in`, `is`) and emits placeholders rather than
  * interpolating values; the only thing that gets concatenated is the
  * caller-controlled column name.
  */
@@ -315,6 +315,9 @@ function _buildWhereClause<DBRead extends Record<string, unknown>>(
             .join(", ");
           clauses.push(`${quotedColumn} in (${placeholders})`);
           params.push(...values);
+        })
+        .with("is", () => {
+          clauses.push(`${quotedColumn} is null`);
         })
         .exhaustive();
     });

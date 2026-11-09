@@ -129,6 +129,9 @@ export function createSupabaseCrudClient<
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               newQuery = query.in(String(column), value as any);
             })
+            .with("is", () => {
+              newQuery = query.is(String(column), null);
+            })
             .exhaustive();
         });
       }
