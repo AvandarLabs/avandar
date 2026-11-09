@@ -198,6 +198,8 @@ describe("displaceSpatialFeatures", () => {
         type: "bufferOfLayer",
         layerId: jitterLayer.id,
         distanceMeters: 1_000,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
     };

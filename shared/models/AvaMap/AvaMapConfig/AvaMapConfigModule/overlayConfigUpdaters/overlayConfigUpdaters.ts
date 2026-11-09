@@ -62,6 +62,8 @@ function _makeBufferLayer(
         type: "bufferOfLayer",
         layerId: sourceLayer.id,
         distanceMeters: _clampBufferDistanceMeters(distanceMeters),
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve,
       },
     },

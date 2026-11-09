@@ -166,6 +166,7 @@ describe("withBufferLayerInserted", () => {
       type: "bufferOfLayer",
       layerId: source.id,
       distanceMeters: 1000,
+      distanceUnit: "m",
       dissolve: false,
     });
     expect(buffer?.sensitivity.mode).toBe(source.sensitivity.mode);

@@ -59,6 +59,7 @@ describe("AvaMapConfigSchema v4 overlays", () => {
       type: "bufferOfLayer",
       layerId: missingSourceId,
       distanceMeters: 1000,
+      distanceUnit: "m",
       dissolve: false,
     });
   });
@@ -108,6 +109,7 @@ describe("AvaMapConfigSchema v4 overlays", () => {
       type: "bufferOfLayer",
       layerId: sourceId,
       distanceMeters: 1000,
+      distanceUnit: "m",
       dissolve: false,
     });
   });

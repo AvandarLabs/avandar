@@ -88,6 +88,8 @@ describe("MapLayerData.getQueryKeyFromMapLayer", () => {
           type: "bufferOfLayer",
           layerId: source.id,
           distanceMeters: 1000,
+          distanceUnit: "m",
+          labelColumn: undefined,
           dissolve: false,
         },
       },

@@ -158,6 +158,7 @@ export const MapLayerModule = {
       sensitivity: { mode: "exact" },
       timeColumn: undefined,
       applyAoiFilter: true,
+      spatialFilter: undefined,
       popup: { columnIds: "all", action: undefined },
       legend: {
         title: name,

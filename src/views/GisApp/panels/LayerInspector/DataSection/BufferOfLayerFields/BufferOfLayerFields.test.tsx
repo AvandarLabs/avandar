@@ -15,6 +15,8 @@ function _createBufferLayer(): MapLayer.T {
       type: "bufferOfLayer",
       layerId: uuid<MapLayer.Id>(),
       distanceMeters: MapLayer.defaultBufferDistanceMeters,
+      distanceUnit: "m",
+      labelColumn: undefined,
       dissolve: false,
     },
   };
@@ -64,6 +66,8 @@ describe("BufferOfLayerFields", () => {
       const updatedLayer = onLayerChange.mock.calls[0]![0](layer);
       expect(updatedLayer.geoBinding).toMatchObject({
         distanceMeters: expected,
+        distanceUnit: "m",
+        labelColumn: undefined,
       });
     },
   );

@@ -30,6 +30,8 @@ function _makeBufferLayer(
         type: "bufferOfLayer",
         layerId: source.id,
         distanceMeters: 1000,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: options.dissolve ?? false,
       },
     },
@@ -160,6 +162,8 @@ describe("compileBufferOfLayerQuery", () => {
         type: "bufferOfLayer",
         layerId: second.id,
         distanceMeters: 1000,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
     };

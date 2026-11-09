@@ -95,6 +95,8 @@ describe("withPopupColumns", () => {
         type: "bufferOfLayer",
         layerId: uuid<MapLayer.Id>(),
         distanceMeters: MapLayer.defaultBufferDistanceMeters,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
       symbology: MapLayer.createDefaultFillSymbology(),

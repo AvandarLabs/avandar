@@ -63,6 +63,8 @@ function _makeBufferLayer(sourceId: MapLayer.Id): MapLayer.T {
       type: "bufferOfLayer",
       layerId: sourceId,
       distanceMeters: 1000,
+      distanceUnit: "m",
+      labelColumn: undefined,
       dissolve: false,
     },
   };
