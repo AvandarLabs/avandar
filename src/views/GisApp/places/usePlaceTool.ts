@@ -1,5 +1,5 @@
 import { where } from "@avandar/utils";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { VirtualPlacesStore as PlacesStore } from "@/clients/places/VirtualPlacesStore/VirtualPlacesStore";
@@ -45,6 +45,27 @@ function _toDatasetOptions(
 }
 
 /**
+ * Every places dataset id seen since the map opened. A dataset never stops
+ * being a places dataset, so an id that briefly drops out of the list while
+ * it refetches (right after a create, for example) stays known, and the
+ * place tool does not fall back to asking for a dataset.
+ */
+function useKnownPlacesDatasetIds(
+  placesDatasetIds: ReadonlySet<Dataset.Id>,
+): ReadonlySet<Dataset.Id> {
+  const [knownIds, setKnownIds] = useState(placesDatasetIds);
+  const hasNewId = [...placesDatasetIds].some((datasetId) => {
+    return !knownIds.has(datasetId);
+  });
+  if (!hasNewId) {
+    return knownIds;
+  }
+  const mergedIds = new Set([...knownIds, ...placesDatasetIds]);
+  setKnownIds(mergedIds);
+  return mergedIds;
+}
+
+/**
  * Builds the "Add a place" tool's controller from the GIS app state: which
  * places datasets exist and which one this map saves to, plus every write.
  * Called once by `GisAppMapShell`, which hands it to the tool cluster and the
@@ -53,7 +74,9 @@ function _toDatasetOptions(
 export function usePlaceTool(app: GisAppState): PlaceToolController {
   const workspaceId = app.avaMap.workspaceId;
   const user = useCurrentUser();
-  const placesDatasetIds = PlacesStore.usePlacesDatasetIds(workspaceId);
+  const placesDatasetIds = useKnownPlacesDatasetIds(
+    PlacesStore.usePlacesDatasetIds(workspaceId),
+  );
   const [datasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspaceId),
   );
