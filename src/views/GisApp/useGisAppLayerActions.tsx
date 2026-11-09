@@ -183,8 +183,26 @@ function useGisAppLayerDuplication(app: GisAppState): GisAppLayerAction {
   };
 }
 
-/** Deletes a layer and selects its nearest surviving neighbor. */
-function useGisAppLayerDeletion(app: GisAppState): GisAppLayerAction {
+/** The parts of the GIS app state a layer deletion reads and updates. */
+export type GisAppLayerDeletionState = Pick<
+  GisAppState,
+  | "mapConfig"
+  | "updateConfig"
+  | "selectedLayerId"
+  | "setSelectedLayerId"
+  | "closeInspector"
+  | "featureListLayerId"
+  | "closeFeatureList"
+>;
+
+/**
+ * Deletes a layer, selects its nearest surviving neighbor, and closes the
+ * layer's feature list if it was open. Used by `useGisAppLayerActions` for
+ * the layer menu's delete item.
+ */
+export function useGisAppLayerDeletion(
+  app: GisAppLayerDeletionState,
+): GisAppLayerAction {
   return (layerId: MapLayer.Id): void => {
     const nearestSurvivingLayerId = _getNearestSurvivingLayerId({
       layers: app.mapConfig.layers,
@@ -196,6 +214,9 @@ function useGisAppLayerDeletion(app: GisAppState): GisAppLayerAction {
     if (layerId === app.selectedLayerId) {
       app.setSelectedLayerId(nearestSurvivingLayerId);
       app.closeInspector();
+    }
+    if (layerId === app.featureListLayerId) {
+      app.closeFeatureList();
     }
   };
 }
