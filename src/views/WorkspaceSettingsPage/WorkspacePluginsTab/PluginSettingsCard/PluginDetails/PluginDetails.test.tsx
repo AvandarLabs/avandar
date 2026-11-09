@@ -159,6 +159,22 @@ describe("PluginDetails", () => {
     ).toBeInTheDocument();
   });
 
+  it("describes the query:addColumns permission in plain language", async () => {
+    await _renderExpandedDetails(
+      _makeManifest({
+        hasToolbarCommand: true,
+        hasChartTypes: false,
+        permissions: ["data:context", "query:addColumns"],
+      }),
+    );
+
+    expect(
+      screen.getByText(
+        "Add calculated columns to a Data Explorer query when you run one of its tools",
+      ),
+    ).toBeInTheDocument();
+  });
+
   it("says its charts see only their own rows when the plugin adds chart types", async () => {
     await _renderExpandedDetails(EPIDEMIOLOGY_MANIFEST);
 
