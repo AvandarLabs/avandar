@@ -290,7 +290,9 @@ create table public.data_catalog_listings (
   ),
   -- A freshness check records when it ran and what it read, together.
   constraint data_catalog_listings__parquet_cache_check_complete check (
-    (parquet_cache_checked_at is null) = (parquet_cache_checked_source_version is null)
+    (parquet_cache_checked_at is null) = (
+      parquet_cache_checked_source_version is null
+    )
   ),
   constraint data_catalog_listings__companion_listings_is_array check (
     jsonb_typeof(companion_listings) = 'array'

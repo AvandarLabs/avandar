@@ -97,13 +97,13 @@ async function _readListing(client: SupabaseClient, catalogListingId: string) {
     apiResourceId: data.api_resource_id,
     externalDatasetId: data.external_dataset_id,
     apiResourceFormat: data.api_resource_format ?? undefined,
-    ...(data.api_freshness_probe === null ?
-      {}
-    : {
-        freshnessProbe: DataCatalogListingJsonSchemas.freshnessProbe.parse(
-          data.api_freshness_probe,
-        ),
-      }),
+    ...(data.api_freshness_probe === null
+      ? {}
+      : {
+          freshnessProbe: DataCatalogListingJsonSchemas.freshnessProbe.parse(
+            data.api_freshness_probe,
+          ),
+        }),
   };
 }
 
