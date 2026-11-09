@@ -1,16 +1,22 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import { LayerRow } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRow";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 
 vi.mock(
   "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu",
   () => {
     return {
-      LayerActionsMenu: () => {
-        return null;
+      LayerActionsMenu: ({
+        onOpenFeatureList,
+      }: {
+        onOpenFeatureList?: () => void;
+      }) => {
+        return onOpenFeatureList ? <span>Feature list offered</span> : null;
       },
     };
   },
@@ -134,4 +140,51 @@ describe("LayerRow", () => {
       "Press Space or Enter to start dragging. Use the arrow keys to move the layer, then press Space or Enter to drop, or Escape to cancel.",
     );
   });
+
+  it.each([
+    { mode: "exact" as const, isOffered: true },
+    { mode: "aggregateOnly" as const, isOffered: false },
+  ])(
+    "offers a feature list for a $mode point layer: $isOffered",
+    ({ mode, isOffered }) => {
+      const pointLayer: MapLayer.T = {
+        ...MapLayer.makeEmpty("Schools"),
+        geoBinding: {
+          type: "latLngColumns",
+          latitude: uuid<QueryColumn.Id>(),
+          longitude: uuid<QueryColumn.Id>(),
+        },
+      };
+      const layer =
+        mode === "exact"
+          ? pointLayer
+          : MapLayer.withSensitivity(pointLayer, {
+              mode,
+              minCellCount: 5,
+              minGeoLevel: "district",
+            });
+      render(
+        <DragDropProvider>
+          <LayerRow
+            layer={layer}
+            viewState={VIEW_STATE}
+            isSelected={false}
+            rowIndex={0}
+            onSelect={vi.fn()}
+            onToggleVisible={vi.fn()}
+            onMoveByOffset={vi.fn()}
+            onRename={vi.fn()}
+            onDuplicate={vi.fn()}
+            onZoomToLayer={vi.fn()}
+            onDelete={vi.fn()}
+            onOpenFeatureList={vi.fn()}
+          />
+        </DragDropProvider>,
+      );
+
+      expect(screen.queryByText("Feature list offered") !== null).toBe(
+        isOffered,
+      );
+    },
+  );
 });

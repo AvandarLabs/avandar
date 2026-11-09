@@ -20,6 +20,7 @@ export function GisAppMapToolCluster({ app }: { app: GisAppState }): ReactNode {
         layers={app.mapConfig.layers}
         featureCollections={app.layerFeatureCollections}
         requestFitBounds={app.requestFitBounds}
+        onOpenFeatureList={app.openFeatureList}
       />
     </>
   );

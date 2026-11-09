@@ -14,6 +14,7 @@ type GisAppLayerAction = (layerId: MapLayer.Id) => void;
 export type GisAppLayerActions = {
   onDeleteLayer: GisAppLayerAction;
   onDuplicateLayer: GisAppLayerAction;
+  onOpenFeatureList: GisAppLayerAction;
   onRenameLayer: GisAppLayerAction;
   onZoomToLayer: GisAppLayerAction;
   onAddLayerFromSource: (dataSource: QueryDataSource.T) => void;
@@ -217,6 +218,7 @@ export function useGisAppLayerActions(app: GisAppState): GisAppLayerActions {
     ...stackActions,
     onDeleteLayer,
     onDuplicateLayer,
+    onOpenFeatureList: app.openFeatureList,
     onRenameLayer,
     onZoomToLayer,
   };
