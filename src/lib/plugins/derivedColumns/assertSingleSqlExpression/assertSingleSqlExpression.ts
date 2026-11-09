@@ -52,6 +52,27 @@ function _isStarColumn(column: unknown): boolean {
   );
 }
 
+/**
+ * Reads `key` from `value` when it is an object, undefined otherwise. Used for
+ * `Select` fields the parser fills in but the `Select` type omits or types
+ * differently, such as `into`, `top`, and the object form of `distinct`.
+ */
+function _getKeyOrUndefined(value: unknown, key: string): unknown {
+  return typeof value === "object" && value !== null
+    ? Reflect.get(value, key)
+    : undefined;
+}
+
+function _hasModifier(select: Select): boolean {
+  return (
+    _getKeyOrUndefined(select.distinct, "type") != null ||
+    _getKeyOrUndefined(select, "top") != null ||
+    _getKeyOrUndefined(_getKeyOrUndefined(select, "into"), "expr") != null ||
+    select.window != null ||
+    select.qualify != null
+  );
+}
+
 function _hasClause(select: Select): boolean {
   return (
     select.from !== null ||
@@ -62,7 +83,8 @@ function _hasClause(select: Select): boolean {
     select.with !== null ||
     select._next !== undefined ||
     select.set_op !== undefined ||
-    (select.limit?.value.length ?? 0) > 0
+    (select.limit?.value.length ?? 0) > 0 ||
+    _hasModifier(select)
   );
 }
 
