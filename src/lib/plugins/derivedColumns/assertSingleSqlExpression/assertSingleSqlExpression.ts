@@ -15,6 +15,89 @@ const FORBIDDEN_SQL_TOKENS = [";", "--", "/*"] as const;
  */
 const PARSER_DATABASES = ["postgresql", "snowflake"] as const;
 
+/**
+ * DuckDB functions a derived column must not call, because they read files,
+ * run SQL, reach the network, read settings or the environment, change state,
+ * or load extensions. The query engine's analyzer only inspects functions
+ * after `FROM` or `JOIN`, so this list and DuckDB's binder are what stop a
+ * select-list expression from reading a file. Names are matched in lower
+ * case, ignoring any schema prefix.
+ */
+const DENIED_FUNCTION_NAMES = {
+  prefixes: [
+    "read_",
+    "query",
+    "parquet_",
+    "iceberg_",
+    "delta_",
+    "http_",
+    "pragma_",
+    "duckdb_",
+    "sniff_",
+  ],
+  exact: [
+    "glob",
+    "current_setting",
+    "getenv",
+    "nextval",
+    "setval",
+    "currval",
+    "which_secret",
+    "load",
+    "install",
+  ],
+} as const;
+
+const FUNCTION_NODE_TYPES = new Set(["function", "aggr_func", "window_func"]);
+
+/**
+ * The unqualified name of a parser function node. Aggregate and window nodes
+ * carry it as a string. Other function nodes carry `{ name: [...parts] }`
+ * with any schema prefix kept separately, so the last part is the name.
+ */
+function _getFunctionNameOrUndefined(node: object): string | undefined {
+  const name: unknown = Reflect.get(node, "name");
+  if (typeof name === "string") {
+    return name;
+  }
+  const parts: unknown = _getKeyOrUndefined(name, "name");
+  const lastPart: unknown = Array.isArray(parts) ? parts.at(-1) : undefined;
+  const value = _getKeyOrUndefined(lastPart, "value");
+  return typeof value === "string" ? value : undefined;
+}
+
+function _isDeniedFunctionName(name: string): boolean {
+  const lowerName = name.toLowerCase();
+  return (
+    DENIED_FUNCTION_NAMES.prefixes.some((prefix) => {
+      return lowerName.startsWith(prefix);
+    }) ||
+    DENIED_FUNCTION_NAMES.exact.some((exactName) => {
+      return lowerName === exactName;
+    })
+  );
+}
+
+/**
+ * The first denied function name called anywhere in a parsed node, including
+ * nested arguments and `OVER` windows. Undefined when there is none.
+ */
+function _findDeniedFunctionName(node: unknown): string | undefined {
+  if (typeof node !== "object" || node === null) {
+    return undefined;
+  }
+  const nodeType: unknown = Reflect.get(node, "type");
+  if (typeof nodeType === "string" && FUNCTION_NODE_TYPES.has(nodeType)) {
+    const name = _getFunctionNameOrUndefined(node);
+    if (name !== undefined && _isDeniedFunctionName(name)) {
+      return name;
+    }
+  }
+  return Object.values(node).reduce<string | undefined>((found, child) => {
+    return found ?? _findDeniedFunctionName(child);
+  }, undefined);
+}
+
 function _parseSqlOrUndefined(
   sql: string,
   database: (typeof PARSER_DATABASES)[number],
@@ -107,9 +190,10 @@ function _isSingleExpressionSelect(parsed: AST | AST[]): boolean {
 /**
  * Throws `PluginError("InvalidExpression")` unless `expression` is exactly
  * one SQL scalar or window expression: no alias, no clause, no subquery, no
- * second expression, and no `;` or comment. Used before a plugin's
- * expression is spliced into the Data Explorer's SQL, so it can only add a
- * column and never change what the query reads.
+ * second expression, no `;` or comment, and no call to a function in
+ * `DENIED_FUNCTION_NAMES` (file readers, `query`, settings, and the like).
+ * Used before a plugin's expression is spliced into the Data Explorer's SQL,
+ * so it can only add a column and never change what the query reads.
  */
 export function assertSingleSqlExpression(expression: string): void {
   if (
@@ -133,6 +217,13 @@ export function assertSingleSqlExpression(expression: string): void {
     throw new PluginError(
       "InvalidExpression",
       `The expression must be one SQL scalar or window expression, with no alias, clause, or subquery: ${expression}`,
+    );
+  }
+  const deniedName = _findDeniedFunctionName(parsed);
+  if (deniedName !== undefined) {
+    throw new PluginError(
+      "InvalidExpression",
+      `The expression must not call ${deniedName}, which can read files, run SQL, or change state: ${expression}`,
     );
   }
 }

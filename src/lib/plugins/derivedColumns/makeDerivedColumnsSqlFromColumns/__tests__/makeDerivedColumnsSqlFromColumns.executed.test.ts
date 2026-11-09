@@ -55,4 +55,26 @@ describe("makeDerivedColumnsSqlFromColumns in DuckDB", () => {
 
     expect(columnNames).toEqual(["id", "day", "cases", "cases_2d_avg"]);
   });
+
+  it("rejects read_csv used as a column expression in the wrapped query", async () => {
+    // Built by hand in the wrapper's shape, since the host rejects this
+    // expression before it is spliced. DuckDB's binder is a second guard.
+    const wrappedSql = [
+      "WITH ava_source AS (",
+      "  SELECT *, row_number() OVER () AS __ava_row FROM (",
+      "    SELECT 1 AS id",
+      "  )",
+      ")",
+      "SELECT * EXCLUDE (__ava_row),",
+      `  (read_csv('x')) AS "file_contents"`,
+      "FROM ava_source",
+      "ORDER BY __ava_row",
+    ].join("\n");
+
+    await expect(
+      withDuckDb(async (connection) => {
+        await connection.runAndReadAll(wrappedSql);
+      }),
+    ).rejects.toThrow(/table function but it was used as a scalar function/);
+  });
 });

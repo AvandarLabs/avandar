@@ -72,4 +72,60 @@ describe("assertSingleSqlExpression", () => {
   ])("rejects %s with InvalidExpression", (_label, expression) => {
     expect(_getThrownCode(expression)).toBe("InvalidExpression");
   });
+
+  it.each([
+    [
+      "row_number over an ordered window",
+      `row_number() OVER (ORDER BY "date")`,
+    ],
+    ["count of all rows", `count(*)`],
+    ["a qualified function the deny-list does not name", `main.abs("a")`],
+  ])("accepts %s", (_label, expression) => {
+    expect(_getThrownCode(expression)).toBeUndefined();
+  });
+
+  it.each([
+    ["read_csv", `read_csv('/etc/passwd')`],
+    ["read_text in upper case", `READ_TEXT('/etc/passwd')`],
+    ["read_parquet with a schema prefix", `main.read_parquet('x')`],
+    ["a quoted read_csv name", `"read_csv"('x')`],
+    ["query", `query('select 1')`],
+    ["query_table", `query_table('t')`],
+    ["parquet_metadata", `parquet_metadata('x')`],
+    ["iceberg_scan", `iceberg_scan('x')`],
+    ["delta_scan", `delta_scan('x')`],
+    ["http_get", `http_get('https://example.com')`],
+    ["pragma_table_info", `pragma_table_info('t')`],
+    ["duckdb_settings", `duckdb_settings()`],
+    ["sniff_csv", `sniff_csv('x')`],
+    ["glob", `glob('*')`],
+    ["current_setting", `current_setting('home_directory')`],
+    [
+      "current_setting with a schema prefix",
+      `pg_catalog.current_setting('home_directory')`,
+    ],
+    ["getenv", `getenv('HOME')`],
+    ["nextval", `nextval('s')`],
+    ["setval", `setval('s', 1)`],
+    ["currval", `currval('s')`],
+    ["which_secret", `which_secret('s3://x', 's3')`],
+    ["load", `load('httpfs')`],
+    ["install", `install('httpfs')`],
+    ["read_csv nested in coalesce", `coalesce(read_csv('x'), 0)`],
+    ["read_csv nested in arithmetic", `1 + abs(read_text('x'))`],
+    ["read_csv inside an aggregate", `sum(read_csv('x'))`],
+    [
+      "query inside an OVER window",
+      `sum("a") OVER (PARTITION BY query('select 1') ORDER BY "date")`,
+    ],
+    [
+      "getenv inside a window with a date range",
+      `avg("cases") OVER (ORDER BY getenv('x') RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW)`,
+    ],
+  ])(
+    "rejects the denied function %s with InvalidExpression",
+    (_label, expression) => {
+      expect(_getThrownCode(expression)).toBe("InvalidExpression");
+    },
+  );
 });

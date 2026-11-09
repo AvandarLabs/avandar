@@ -345,7 +345,7 @@ Each column is a `DerivedColumn` from `@avandar/plugin-sdk`:
 | Field | Rule |
 | --- | --- |
 | `name` | Lowercase snake case: a letter, then lowercase letters, digits, and underscores (`^[a-z][a-z0-9_]*$`) |
-| `expression` | One SQL scalar or window expression in DuckDB's dialect, such as `{cases} * 2` or `avg({value}) OVER (ORDER BY {date})`. No `SELECT`, subquery, alias, or clause (`FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`, `QUALIFY`, `WINDOW`, `INTO`), and no `DISTINCT` or `TOP`. `;`, `--`, and `/*` are rejected anywhere, even inside a string literal |
+| `expression` | One SQL scalar or window expression in DuckDB's dialect, such as `{cases} * 2` or `avg({value}) OVER (ORDER BY {date})`. No `SELECT`, subquery, alias, or clause (`FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`, `QUALIFY`, `WINDOW`, `INTO`), and no `DISTINCT` or `TOP`. `;`, `--`, and `/*` are rejected anywhere, even inside a string literal. Some DuckDB functions are denied (see below) |
 | `inputs` | Maps each `{placeholder}` in `expression` to the name of a column in the result the command was invoked on, spelled exactly as `avandar.context.columns` lists it |
 
 Never paste a column name into `expression`. Write a placeholder, a letter or
@@ -356,6 +356,15 @@ The expression is checked after the substitution, so a column whose name
 contains `;`, `--`, or `/*` makes `addColumns` reject.
 Write number literals with a decimal point, such as `100000.0` or `9.0`, where
 a division must not truncate.
+
+An expression must not call a function that reads files, runs SQL, reaches
+the network, reads settings or the environment, changes state, or loads an
+extension. Avandar rejects, in any case and with or without a schema prefix,
+every function whose name starts with `read_`, `query`, `parquet_`,
+`iceberg_`, `delta_`, `http_`, `pragma_`, `duckdb_`, or `sniff_`, and the
+functions `glob`, `current_setting`, `getenv`, `nextval`, `setval`, `currval`,
+`which_secret`, `load`, and `install`. The check covers nested calls and
+`OVER` windows too.
 
 When a name is already taken, by a result column or by an earlier column in
 the same call, compared without case, Avandar adds `_2`, then `_3`, and so on.
@@ -380,6 +389,10 @@ Avandar then:
    ORDER BY __ava_row
    ```
 
+   When the query came from the query builder with no SQL of its own, the
+   automatic row limit the Data Explorer applied to it becomes part of the
+   wrapped SQL.
+
 2. Puts the wrapped SQL in the SQL editor and runs it. The query builder no
    longer matches the SQL, and the Data Explorer says so as it does for any
    edited SQL.
@@ -400,7 +413,7 @@ saves the wrapped SQL like any other SQL.
 
 | `code` | When |
 | --- | --- |
-| `InvalidExpression` | The list is empty, a `name` breaks the rule above, a placeholder has no `inputs` entry, an input names a column the result does not have, an `expression` is not exactly one scalar or window expression, or the result has a column named `__ava_row` (any case), which Avandar reserves for the row order |
+| `InvalidExpression` | The list is empty, a `name` breaks the rule above, a placeholder has no `inputs` entry, an input names a column the result does not have, an `expression` is not exactly one scalar or window expression or calls a denied function, or the result has a column named `__ava_row` (any case), which Avandar reserves for the row order |
 | `InvalidHandle` | The Data Explorer no longer shows the result the command was invoked on, for example because the user ran another query while the command's modal was open. The message asks the user to run the command again |
 
 A command that opens a modal and adds columns from its form should await
