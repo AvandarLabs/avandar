@@ -80,6 +80,39 @@ export const DataCatalogListingClient = createUsableServiceClient(
 
           return createDataCatalogSearchFacets(dbFacetRows);
         },
+
+        /**
+         * The keywords containing every fragment of `tagSearch`, at most 50,
+         * each with how many listings matching `query` and every filter but
+         * the keyword filter carry it.
+         */
+        searchTagOptions: async ({
+          tagSearch,
+          query,
+          filters,
+        }: {
+          tagSearch: string;
+          query: string;
+          filters: Readonly<DataCatalogListing.SearchFilters>;
+        }): Promise<DataCatalogListing.FacetOption[]> => {
+          const logger = clientLogger.appendName("searchTagOptions");
+          logger.log("Searching catalog keywords", { tagSearch, query });
+
+          const { data: dbRows } = await dbClient
+            .rpc("rpc_data_catalog_listings__search_tag_options", {
+              p_tag_search: tagSearch,
+              p_query: query,
+              ...buildDataCatalogSearchFilterArgs(filters),
+            })
+            .throwOnError();
+
+          return (dbRows ?? []).map((dbRow) => {
+            // The generated type marks `listing_count` non-null, but it is
+            // null where too many listings match to count them.
+            const listingCount: number | null = dbRow.listing_count;
+            return { value: dbRow.value, count: listingCount ?? undefined };
+          });
+        },
       };
     },
   }),

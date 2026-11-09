@@ -330,6 +330,36 @@ create index data_catalog_listings__domains on public.data_catalog_listings usin
 -- Serves the catalog's keyword filter (`tags && ...`).
 create index data_catalog_listings__tags on public.data_catalog_listings using gin (tags);
 
+-- Serves the catalog's second-level filter on its own, without a publisher.
+create index data_catalog_listings__organization2_name on public.data_catalog_listings (organization2_name);
+
+-- Serves the catalog's format filter. The expression is
+-- `data_catalog_listings__search_matches`'s `file_format`: change them
+-- together.
+create index data_catalog_listings__file_format on public.data_catalog_listings (
+  (
+    case
+      when api_resource_format is not null then upper(api_resource_format)
+      when parquet_file_name is not null then 'PARQUET'
+    end
+  )
+);
+
+-- Serves browsing the catalog most recently updated first, and its update
+-- filter, so a page reads only the listings it shows. The first expression
+-- is `data_catalog_listings__search_matches`'s `last_updated_at`: change them
+-- together.
+create index data_catalog_listings__last_updated_at on public.data_catalog_listings (
+  (
+    coalesce(date_of_last_update, date_of_last_sync)
+  ) desc nulls last,
+  display_name,
+  id
+);
+
+-- Serves browsing the catalog by name.
+create index data_catalog_listings__display_name on public.data_catalog_listings (display_name, id);
+
 -- Enable row level security
 alter table public.data_catalog_listings enable row level security;
 

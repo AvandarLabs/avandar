@@ -9,8 +9,14 @@ const PAGE_SIZE = 50;
 type DataCatalogSearch = {
   /** Every listing loaded so far, in ranked order. */
   listings: readonly DataCatalogListing.SearchResult[];
-  /** How many listings match the search, loaded or not. */
+  /**
+   * How many listings match the search, loaded or not, or, when
+   * `isTotalCapped`, the most that were counted.
+   */
   totalCount: number;
+
+  /** Whether more listings match than were counted. */
+  isTotalCapped: boolean;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   /** True only while the first search has nothing to show yet. */
@@ -66,6 +72,7 @@ export function useDataCatalogSearch(options: {
   return {
     listings,
     totalCount: searchQuery.data?.pages[0]?.totalCount ?? 0,
+    isTotalCapped: searchQuery.data?.pages[0]?.isTotalCapped ?? false,
     hasNextPage: searchQuery.hasNextPage,
     isFetchingNextPage: searchQuery.isFetchingNextPage,
     isLoading: searchQuery.isLoading,

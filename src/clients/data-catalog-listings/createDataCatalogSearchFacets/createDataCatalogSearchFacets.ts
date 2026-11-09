@@ -6,13 +6,14 @@ const DataCatalogSearchFacetDBRowsSchema = z.array(
   z.object({
     facet: z.string(),
     value: z.string().nullable(),
-    listing_count: z.number(),
+    listing_count: z.number().nullable(),
   }),
 );
 
 /**
  * One facet row in the JSON array `rpc_data_catalog_listings__search_facets`
- * returns. `value` is null on the `unloadable` and `catalog` rows.
+ * returns. `value` is null on the `unloadable` and `catalog` rows, and
+ * `listing_count` is null where too many listings match to count them.
  */
 export type DataCatalogSearchFacetDBRow = z.infer<
   typeof DataCatalogSearchFacetDBRowsSchema
@@ -27,7 +28,10 @@ function _toFacetOptions(
       return dbRow.facet === facet && dbRow.value !== null;
     })
     .map((dbRow) => {
-      return { value: dbRow.value ?? "", count: dbRow.listing_count };
+      return {
+        value: dbRow.value ?? "",
+        count: dbRow.listing_count ?? undefined,
+      };
     });
 }
 
@@ -37,35 +41,45 @@ function _toValuesByCount(
 ): string[] {
   return _toFacetOptions(dbRows, facet)
     .toSorted((optionA, optionB) => {
-      return optionB.count - optionA.count;
+      return (optionB.count ?? 0) - (optionA.count ?? 0);
     })
     .map((option) => {
       return option.value;
     });
 }
 
+/**
+ * A row's count: 0 when Postgres returned no row, undefined when it returned
+ * the row without a count.
+ */
+function _toCount(
+  dbRow: DataCatalogSearchFacetDBRow | undefined,
+): number | undefined {
+  return dbRow === undefined ? 0 : (dbRow.listing_count ?? undefined);
+}
+
 function _toSingleCount(
   dbRows: readonly DataCatalogSearchFacetDBRow[],
   facet: string,
-): number {
-  return (
+): number | undefined {
+  return _toCount(
     dbRows.find((dbRow) => {
       return dbRow.facet === facet;
-    })?.listing_count ?? 0
+    }),
   );
 }
 
 function _toUpdatedWithinCount(
   dbRows: readonly DataCatalogSearchFacetDBRow[],
   updatedWithin: DataCatalogListing.UpdatedWithin,
-): number {
-  return (
+): number | undefined {
+  return _toCount(
     dbRows.find((dbRow) => {
       return (
         dbRow.facet === "updated_within" &&
         dbRow.value === UPDATED_WITHIN_DB_VALUES[updatedWithin]
       );
-    })?.listing_count ?? 0
+    }),
   );
 }
 
@@ -94,6 +108,6 @@ export function createDataCatalogSearchFacets(
       overAYear: _toUpdatedWithinCount(dbRows, "overAYear"),
     },
     numUnloadable: _toSingleCount(dbRows, "unloadable"),
-    numCatalogListings: _toSingleCount(dbRows, "catalog"),
+    numCatalogListings: _toSingleCount(dbRows, "catalog") ?? 0,
   };
 }

@@ -77,6 +77,9 @@ values
    null, null,
    'e9007002-0000-4000-8000-000000000002'::uuid);
 
+-- The catalog row and unfiltered counts come from the summary table.
+select public.data_catalog_facet_counts__refresh();
+
 select plan(50);
 
 -- Search filters
@@ -517,7 +520,7 @@ select ok(
 select ok(
   has_function_privilege(
     'authenticated',
-    'public.data_catalog_listings__search_facet_rows(text, text[], text[], text, boolean, text[], text[], text[])',
+    'public.data_catalog_listings__search_facet_rows(text, text[], text[], text, boolean, text[], text[], text[], integer)',
     'execute'
   ),
   'a signed-in user may count the facet rows the RPC runs as them'
@@ -526,7 +529,7 @@ select ok(
 select ok(
   not has_function_privilege(
     'anon',
-    'public.data_catalog_listings__search_facet_rows(text, text[], text[], text, boolean, text[], text[], text[])',
+    'public.data_catalog_listings__search_facet_rows(text, text[], text[], text, boolean, text[], text[], text[], integer)',
     'execute'
   ),
   'a signed-out visitor may not count the facet rows'

@@ -42,6 +42,18 @@ const E2E_CATALOG_LISTINGS = [
 ] as const;
 
 /** Deletes every catalog listing and drive filed under this spec's pipeline. */
+/**
+ * Recounts the catalog's unfiltered facet counts, which the catalog shows
+ * before anything is searched. A pipeline run does this when it finishes, so
+ * listings written straight to the table need it too.
+ */
+async function _refreshCatalogFacetCounts(admin: AdminClient): Promise<void> {
+  const { error } = await admin.rpc("data_catalog_facet_counts__refresh");
+  if (error) {
+    throw new Error(`e2e catalog facet count refresh: ${error.message}`);
+  }
+}
+
 async function _deleteE2ECatalogFixtures(admin: AdminClient): Promise<void> {
   const { error: listingsError } = await admin
     .from("data_catalog_listings")
@@ -57,6 +69,7 @@ async function _deleteE2ECatalogFixtures(admin: AdminClient): Promise<void> {
   if (drivesError) {
     throw new Error(`e2e catalog drive delete: ${drivesError.message}`);
   }
+  await _refreshCatalogFacetCounts(admin);
 }
 
 /**
@@ -193,6 +206,7 @@ test.describe("Open data catalog filters", () => {
     // turn up in this run's search.
     await _deleteE2ECatalogFixtures(admin);
     await _seedE2ECatalogFixtures(admin);
+    await _refreshCatalogFacetCounts(admin);
 
     try {
       await signInWithEmailPassword(page, {

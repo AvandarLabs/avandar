@@ -3,15 +3,7 @@
  * The windows are cumulative: a listing updated last week is also within the
  * past year. A listing with no date is in `any` and in no other window.
  *
- * Windows:
- *
- * `any`: every listing.
- *
- * `past_month`: changed in the last 31 days.
- *
- * `past_year`: changed in the last 365 days.
- *
- * `over_a_year`: last changed more than 365 days ago.
+ * The windows' dates are `data_catalog_listings__updated_window`'s.
  *
  * @param p_last_updated_at When the listing last changed, as the catalog dates
  * it: the source's own update date, otherwise Avandar's last sync.
@@ -25,13 +17,10 @@ create or replace function public.data_catalog_listings__is_updated_within (
   select
     case p_updated_within
       when 'any' then true
-      when 'past_month' then
-        coalesce(p_last_updated_at >= now() - interval '31 days', false)
-      when 'past_year' then
-        coalesce(p_last_updated_at >= now() - interval '365 days', false)
-      when 'over_a_year' then
-        coalesce(p_last_updated_at < now() - interval '365 days', false)
-      else false
+      else coalesce(
+        p_last_updated_at <@ public.data_catalog_listings__updated_window (p_updated_within),
+        false
+      )
     end;
 $$ language sql stable security invoker
 set
