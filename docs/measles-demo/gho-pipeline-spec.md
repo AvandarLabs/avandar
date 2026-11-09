@@ -459,11 +459,11 @@ Revalidation is P0.5's job.
 
 ### 7. Catalog preview
 
-`fetchCatalogListingPreview` reads a sample through the column-type-sample
-route only when `apiResourceFormat` is `CSV`. Any other listing is previewed
-from its copy's first part, and shows the preview's error state until some
-workspace has added it. That would leave most of GHO's 3,091 listings with
-no preview.
+`fetchCatalogListingPreview` reads a stored Parquet copy when one exists.
+With no copy, it reads a sample through the column-type-sample route for
+`CSV` and `ODATA`. Any other listing is previewed from its copy's first
+part, and shows the preview's error state until some workspace has added
+it. GHO listings are OData, so they can be previewed before a copy exists.
 
 - `acquireOpenDataColumnTypeSample` gains an `odata` arm. It sends
   `GET <apiBaseUrl>/<apiResourceId>?$top=200`, reads the `value` array, and
@@ -471,7 +471,9 @@ no preview.
   existing `buildCsvFromDatastoreRecords`. A sample that fills the size cap
   is cut at the last whole row, as CKAN's is.
 - `fetchCatalogListingPreview` reads that sample for `ODATA` listings as well
-  as `CSV` ones.
+  as `CSV` ones when no Parquet copy is stored. A stored copy is the preview,
+  including while a CSV column recheck is reading the sample. The recheck's
+  rows replace the copy only when they differ.
 
 The sample is for the preview only. It never verifies types, because an
 `odata` listing's types are already verified.
