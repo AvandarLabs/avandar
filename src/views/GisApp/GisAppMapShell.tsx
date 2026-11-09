@@ -5,6 +5,7 @@ import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
 import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEntries/getExportLegendEntries";
+import { GisAppFeatureListDrawer } from "@/views/GisApp/GisAppFeatureListDrawer";
 import { GisAppFirstRunCard } from "@/views/GisApp/GisAppFirstRunCard";
 import { GisAppFurnitureBar } from "@/views/GisApp/GisAppFurnitureBar";
 import { GisAppLayerInspector } from "@/views/GisApp/GisAppLayerInspector/GisAppLayerInspector";
@@ -92,6 +93,11 @@ export function GisAppMapShell({ app }: Props): ReactNode {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const workspace = useCurrentWorkspace();
   const basemapAttribution = useBasemapAttribution(app.mapConfig.basemap);
+  // The open list takes over the bottom-center stack (status and time
+  // slider) so the drawer and the floating chrome never overlap.
+  const isFeatureListOpen = app.mapConfig.layers.some((layer) => {
+    return layer.id === app.featureListLayerId;
+  });
 
   return (
     <MapShell
@@ -123,14 +129,16 @@ export function GisAppMapShell({ app }: Props): ReactNode {
         />
       }
       legend={<GisAppMapLegend app={app} />}
-      statusCard={<GisAppStatusCard app={app} />}
+      statusCard={isFeatureListOpen ? null : <GisAppStatusCard app={app} />}
       timeSlider={
-        <MapTimeSlider
-          layers={app.mapConfig.layers}
-          timeRange={app.mapConfig.timeRange}
-          updateConfig={app.updateConfig}
-          workspaceId={app.avaMap.workspaceId}
-        />
+        isFeatureListOpen ? undefined : (
+          <MapTimeSlider
+            layers={app.mapConfig.layers}
+            timeRange={app.mapConfig.timeRange}
+            updateConfig={app.updateConfig}
+            workspaceId={app.avaMap.workspaceId}
+          />
+        )
       }
       toolCluster={<GisAppMapToolCluster app={app} />}
       firstRunCard={
@@ -142,6 +150,7 @@ export function GisAppMapShell({ app }: Props): ReactNode {
       furnitureBar={<GisAppFurnitureBar app={app} />}
       featureDrawer={
         <>
+          <GisAppFeatureListDrawer app={app} canvasRef={mapSurfaceRef} />
           <FeatureInspector
             opened={app.isInspectorOpen}
             onClose={app.closeInspector}

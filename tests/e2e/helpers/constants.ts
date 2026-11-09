@@ -191,6 +191,25 @@ export const GIS_DATED_POINTS_ROW_COUNT = 9;
 /** Parsed row count of {@link GIS_PCODE_POLYGON_CSV_PATH}. */
 export const GIS_PCODE_POLYGON_ROW_COUNT = 1;
 
+/** Two lower-Manhattan exposure sites as latitude and longitude. */
+export const GIS_NYC_EXPOSURE_SITES_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-exposure-sites.csv",
+);
+
+/** Parsed row count of {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}. */
+export const GIS_NYC_EXPOSURE_SITES_ROW_COUNT = 2;
+
+/**
+ * 35 NYC school points (WKT `the_geom`, name in `loc_name`) around
+ * {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, with none near the edge of a
+ * half-mile ring around either site.
+ */
+export const GIS_NYC_SCHOOL_POINTS_PARQUET_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-school-points-near-sites.parquet",
+);
+
 /** Directory of the export and disputed-boundary GIS fixtures. */
 const GIS_WAVE_E_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-e");
 

@@ -67,3 +67,19 @@ time-varying point layers.
 
 One polygon with a `pcode` covering 10°E / 10°N. Use for buffer-of-layer
 creation, go-to pcode lookup, and polygon-backed spatial tools.
+
+### `nyc-exposure-sites.csv`
+
+Two exposure sites in lower Manhattan (Union Square and Washington Square)
+with `site_name`, `latitude`, and `longitude`. Use for buffering a latitude
+and longitude layer and filtering a NYC point layer by that buffer.
+
+### `nyc-school-points-near-sites.parquet`
+
+35 rows of NYC's 2019-2020 School Point Locations (Socrata `a3nt-yts4`) within
+1,300 m of the two `nyc-exposure-sites.csv` sites, with WKT `the_geom` points,
+`loc_code`, `loc_name`, and `address`. Schools between 740 m and 870 m from
+both sites are left out, so no point sits near the edge of a half-mile
+(805 m) ring. Measured in UTM zone 18N: 16 schools fall inside the two rings,
+and the nearest is The Clinton School, 150 m (0.09 mi) from Union Square.
+Seeded as an open data listing copy by `gis-feature-list.spec.ts`.

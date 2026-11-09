@@ -108,7 +108,8 @@ export function FeatureListTable({ list, onRowClick }: Props): ReactNode {
   };
   return (
     <div className={css.featureListScrollArea}>
-      <Table stickyHeader highlightOnHover>
+      {/* Matches the toolbar's inset so columns line up with the count. */}
+      <Table stickyHeader highlightOnHover horizontalSpacing="sm">
         <Table.Thead>
           <Table.Tr>
             {list.columns.map((column) => {
