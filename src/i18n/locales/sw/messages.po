@@ -3460,6 +3460,12 @@ msgstr "Tekeleza kichujio cha eneo"
 msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "URL fupi na rahisi kukumbuka kwa vipeperushi, ripoti na misimbo ya QR."
 
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
+"the first time."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "Using your custom URL."
 msgstr "Unatumia URL yako maalum."
@@ -8821,6 +8827,10 @@ msgstr "portali ya malipo."
 msgid "Column 2"
 msgstr "Safu wima ya 2"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Data not ready"
+msgstr ""
+
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "You haven't chosen a value column"
 msgstr "Hujachagua safu ya thamani"
@@ -8959,6 +8969,10 @@ msgstr "Safu za seti za data"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Details"
 msgstr "Maelezo"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "Preparing your data"
+msgstr ""
 
 #. placeholder {0}: bookmark.name
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/BookmarkMenuItems.tsx
@@ -10465,6 +10479,11 @@ msgstr "Funga"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Link"
 msgstr "Kiungo"
+
+#. placeholder {0}: listing.displayName
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+msgid "We couldn't prepare the data for \"{0}\", so it may not open."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Your workspace has used all {currentSeatUsage} of its {totalSeats} seat."

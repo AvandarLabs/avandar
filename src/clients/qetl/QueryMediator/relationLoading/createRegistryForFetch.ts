@@ -54,6 +54,12 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
       });
       return loaded.parquetData;
     },
+    mergeParquetParts: async (partBlobs: readonly Blob[]) => {
+      return await DuckDbClient.mergeParquetBlobs({
+        parquetBlobs: partBlobs,
+        datasetDuckDbLease,
+      });
+    },
   };
 }
 
