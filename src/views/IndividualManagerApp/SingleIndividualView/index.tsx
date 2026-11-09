@@ -1,4 +1,5 @@
 import { where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
 import { Group } from "@mantine/core";
 import { useMemo } from "react";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
@@ -35,8 +36,8 @@ type Props = {
 
 /**
  * A case's record page: its name, status, and case type in the header band,
- * its activity feed and composer in the content column, and its fields and
- * record facts in the properties rail.
+ * its fields and record facts in a fixed band above the activity, and the
+ * activity feed and composer in the scrolling region under that band.
  *
  * The fields are read through the case type's concept view, so they show the
  * values the Data Explorer and chat see. The status control is a menu for a
@@ -51,6 +52,7 @@ export function SingleIndividualView({
   individual,
   highlightedCommentId,
 }: Props): JSX.Element {
+  const { t } = useLingui();
   const recordFields = useRecordFields({ concept, individual });
   const [members, isLoadingMembers, membersQuery] =
     WorkspaceClient.useGetUsersForWorkspace({
@@ -98,35 +100,37 @@ export function SingleIndividualView({
         facts={[concept.name]}
       />
       {
-        // The body's own padding would leave a gap under the composer, which
-        // docks to the bottom of the scroller. This view pays the same gutter
-        // itself, minus the bottom.
+        // Fill the body and drop its padding. Each region below pays the
+        // gutter itself, and the activity region omits the bottom so the
+        // composer's dock sits flush with the scroller.
       }
-      <AppViewBody
-        noPadding
-        rail={
-          <CaseDetailsRail
-            attributes={recordFields.rows}
-            loadError={
-              recordFields.isLoadError
-                ? {
-                    isRetrying: recordFields.isRetrying,
-                    onRetry: recordFields.retry,
-                  }
-                : undefined
-            }
-          >
-            <RecordFactsGroup individual={individual} />
-          </CaseDetailsRail>
-        }
-      >
-        <div className={css.content}>
-          <CaseActivityFeed
-            workspaceId={individual.workspaceId}
-            individualId={individual.id}
-            members={isLoadingMembers ? undefined : (members ?? EMPTY_MEMBERS)}
-            highlightedCommentId={highlightedCommentId}
-          />
+      <AppViewBody noPadding isFillHeight>
+        <div className={css.column}>
+          <section className={css.detailsBand} aria-label={t`Details`}>
+            <CaseDetailsRail
+              attributes={recordFields.rows}
+              loadError={
+                recordFields.isLoadError
+                  ? {
+                      isRetrying: recordFields.isRetrying,
+                      onRetry: recordFields.retry,
+                    }
+                  : undefined
+              }
+            >
+              <RecordFactsGroup individual={individual} />
+            </CaseDetailsRail>
+          </section>
+          <section className={css.activityPane} aria-label={t`Activity`}>
+            <CaseActivityFeed
+              workspaceId={individual.workspaceId}
+              individualId={individual.id}
+              members={
+                isLoadingMembers ? undefined : (members ?? EMPTY_MEMBERS)
+              }
+              highlightedCommentId={highlightedCommentId}
+            />
+          </section>
         </div>
       </AppViewBody>
     </AppView>
