@@ -15,7 +15,8 @@ export type ChartTheme = Readonly<{
 }>;
 
 // The Mantine palettes Avandar's built-in charts cycle through, in order,
-// each at the shade those charts use.
+// each at the shade those charts use. Keep in step with `CHART_COLORS` in
+// `src/lib/ui/viz/ChartConstants.ts`.
 const SERIES_COLOR_NAMES = [
   "blue",
   "teal",
