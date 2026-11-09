@@ -2,6 +2,10 @@ import { Model } from "@avandar/models";
 import { isDefined, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import {
+  getBufferDistanceFromMeters,
+  getMetersFromBufferDistance,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/bufferDistanceHelpers.ts";
+import {
   areDisputedStatusValuesDisjoint,
   canBindDisputedStatus,
   EMPTY_DISPUTED_STATUS_VALUES,
@@ -92,6 +96,14 @@ function _isAreaGeoBinding(
   );
 }
 
+/** True when a binding draws one point per row. */
+function _isPointGeoBinding(binding: MapLayerRead["geoBinding"]): boolean {
+  return (
+    binding?.type === "latLngColumns" ||
+    (binding?.type === "geometryColumn" && binding.family === "point")
+  );
+}
+
 /** Constructors, defaults, and binding helpers for map layers. */
 export const MapLayerModule = {
   /** Fallback symbol color when the author has not picked one. */
@@ -129,6 +141,24 @@ export const MapLayerModule = {
 
   /** True when no value appears in both the disputed and undetermined lists. */
   areDisputedStatusValuesDisjoint,
+
+  /**
+   * True when a binding outputs polygons, for example to decide whether a
+   * layer can filter another layer by location.
+   */
+  isAreaGeoBinding: _isAreaGeoBinding,
+
+  /**
+   * True when a binding draws one point per row, for example to offer a
+   * layer as the target of "Filter another layer by this buffer".
+   */
+  isPointGeoBinding: _isPointGeoBinding,
+
+  /** Whole meters for a distance typed in a buffer distance unit. */
+  getMetersFromBufferDistance,
+
+  /** A meter distance restated in a buffer distance unit. */
+  getBufferDistanceFromMeters,
 
   /** Resamples a color ramp to one evenly spaced color per class. */
   resampleColorRamp,

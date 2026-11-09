@@ -363,3 +363,56 @@ describe("toPopupColumnNames", () => {
     expect(MapLayer.toPopupColumnNames(layer)).toEqual([]);
   });
 });
+
+describe("MapLayer.isAreaGeoBinding", () => {
+  it("treats a buffer as a polygon output", () => {
+    expect(
+      MapLayer.isAreaGeoBinding({
+        type: "bufferOfLayer",
+        layerId: uuid<MapLayer.Id>(),
+        distanceMeters: 805,
+        distanceUnit: "mi",
+        labelColumn: undefined,
+        dissolve: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("does not treat latitude and longitude points as a polygon output", () => {
+    expect(
+      MapLayer.isAreaGeoBinding({
+        type: "latLngColumns",
+        latitude: uuid<QueryColumn.Id>(),
+        longitude: uuid<QueryColumn.Id>(),
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("MapLayer.isPointGeoBinding", () => {
+  it("treats a point geometry column as points", () => {
+    expect(
+      MapLayer.isPointGeoBinding({
+        type: "geometryColumn",
+        column: uuid<QueryColumn.Id>(),
+        encoding: "wkt",
+        family: "point",
+        simplification: undefined,
+        sourceCrs: undefined,
+      }),
+    ).toBe(true);
+  });
+
+  it("does not treat a polygon geometry column as points", () => {
+    expect(
+      MapLayer.isPointGeoBinding({
+        type: "geometryColumn",
+        column: uuid<QueryColumn.Id>(),
+        encoding: "wkt",
+        family: "polygon",
+        simplification: undefined,
+        sourceCrs: undefined,
+      }),
+    ).toBe(false);
+  });
+});
