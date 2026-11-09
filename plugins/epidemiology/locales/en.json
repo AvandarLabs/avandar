@@ -47,5 +47,19 @@
   "incidence.add": "Add columns",
   "incidence.noNumericColumns": "This command needs a numeric column of case counts.",
   "incidence.unavailable": "Columns can be added only to a query result in the Data Explorer. Run a query there, then try again.",
-  "incidence.failed": "Could not add the columns: {message}"
+  "incidence.failed": "Could not add the columns: {message}",
+  "rollingAverage.description": "Adds a column with the average of a value over the days up to each row's date.",
+  "rollingAverage.valueColumn": "Value column",
+  "rollingAverage.dateColumn": "Date column",
+  "rollingAverage.window": "Window",
+  "rollingAverage.windowUnit": "Window unit",
+  "rollingAverage.windowUnit.day": "Days",
+  "rollingAverage.windowUnit.week": "Weeks",
+  "rollingAverage.groupByColumn": "Group by",
+  "rollingAverage.groupByColumn.none": "None",
+  "rollingAverage.oneRowPerDate": "This command expects one row per date, or one row per date and group. Every row in the window counts, including rows that share a date.",
+  "rollingAverage.add": "Add column",
+  "rollingAverage.missingColumns": "This command needs a numeric column and a date column.",
+  "rollingAverage.unavailable": "Columns can be added only to a query result in the Data Explorer. Run a query there, then try again.",
+  "rollingAverage.failed": "Could not add the column: {message}"
 }
