@@ -2308,6 +2308,160 @@ pnpm test:e2e gis-export-pdf.spec.ts
 
 ---
 
+## F35: Map block in dashboards
+
+Status: not started. Built on `feat/dashboard-map-block`, branched from
+`demo/measles` at `fc48eb670`. The commits below are all of
+`git log --oneline fc48eb670..feat/dashboard-map-block --no-merges`, except
+the formatting-only commit and the ones that only update this log. Two merges of
+`demo/measles` into the branch carry no changes of their own. If `demo/measles`
+already has an F35, renumber on merge.
+
+**Purpose:** A dashboard can hold a Map block. The export sheet's footer gains
+"Add to dashboard": pick or create a dashboard and the map is appended as a
+Map block, with a link to open it. On a workspace dashboard the block draws the
+live map through a read-only `MapViewer` (canvas, legend, attribution, no
+panels or tools), and a reader without access to the map or its datasets sees
+"You don't have access to this map". Publishing a dashboard to the public
+compiles each Map block into a privacy-filtered snapshot instead: one GeoJSON
+feature collection per layer plus the map config and legend, written beside the
+published datasets. The compile applies the saved AOI, time range, spatial
+filters, and sensitivity, keeps only popup columns, refuses names on the
+forbidden property list, and displaces points with a salted HMAC jitter keyed by
+`maps.jitter_salt`. It refuses to publish when a map's filters no longer apply,
+and names the map that blocked it. The public page draws the snapshot without
+DuckDB or spatial. The share modal warns when shared readers cannot open a
+dashboard's map, and the publish preview lists each map layer a public publish
+exposes with its feature count.
+**Value:** A situation map sits on the dashboard the response team already
+reads, live inside the workspace and safe to publish, without a separate
+export.
+
+**Design:** `docs/measles-demo/workflow-b-map-features-design.md` §7. Plan:
+`docs/measles-demo/workflow-b-f5-dashboard-map-block-plan.md`.
+
+**PR title:** `feat(dashboards): add a map block to dashboards`
+
+**Depends on:** F34 (the export sheet footer holds "Add to dashboard"), F33 (the
+snapshot compile reuses the spatial filter query path), and F31 (map config
+version 6 threshold colors are part of the legend a snapshot bakes). The
+dashboard publish pipeline and `AvaPage` blocks this builds on are not
+tracked in this log.
+
+**Commits to read** (from `feat/dashboard-map-block`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `e3ae5747e` | feat(dashboards): accept map snapshot paths in the snapshot buckets | All of it. |
+| `30a1c1e66` | feat(gis): define the published map snapshot file | All of it. |
+| `330e54c04` | feat(dashboards): store map snapshots beside published datasets | All of it. |
+| `9624ea09f` | feat(dashboards): clear map snapshots with their snapshot generation | All of it. |
+| `fa48af5a7` | refactor(gis): run one layer query outside React | All of it. |
+| `25d85e69c` | feat(gis): draw published map snapshots through the layer renderer | All of it. |
+| `ec0724ef6` | refactor(gis): apply layer legend updates as a pure function | All of it. |
+| `7ccebc416` | feat(gis): compile a map into protected public output | All of it. |
+| `35ccfc7da` | feat(gis): salt map displacement with a per-map secret | All of it. |
+| `2fa28196e` | fix(gis): publish only what a public map draws | All of it. |
+| `d9308a376` | feat(gis): compile a saved map by id for publishing | All of it. |
+| `e124d8f4a` | feat(dashboards): read map block settings from a saved dashboard | All of it. |
+| `bcb8f2776` | fix(gis): refuse to publish a map whose filters no longer apply | All of it. |
+| `a01e65b2d` | feat(dashboards): compile and stage a dashboard's map snapshots | All of it. |
+| `01d482e12` | feat(dashboards): publish map snapshots with a public dashboard | All of it. |
+| `4591b5355` | feat(dashboards): name the map that stops a dashboard from publishing | All of it. |
+| `cec1745e8` | fix(dashboards): wait for every map upload before failing a publish | All of it. |
+| `aad4d700d` | refactor(gis): share map hydration and rendering outside the editor | All of it. |
+| `8b48a13bc` | test(gis): keep the shared map rendering stable across renders | All of it. |
+| `a35f7b898` | feat(gis): add read-only map viewer helpers | All of it. |
+| `177135dd0` | fix(gis): keep internal and location fields out of map viewer popups | All of it. |
+| `550ceef12` | feat(gis): add a read-only map viewer with live and snapshot modes | All of it. |
+| `8a55b9562` | fix(gis): wait for access before drawing a viewer map and close its popup with Escape | All of it. |
+| `c7ee91e36` | feat(dashboards): add a Map block to dashboards | All of it. |
+| `33e89c633` | fix(dashboards): keep the map popup and block notes inside the block | All of it. |
+| `d8b7496fc` | fix(dashboards): keep the map legend clear of the zoom controls | All of it. |
+| `ad9faeec1` | fix(gis): scope the map viewer popup keyboard handling | All of it. |
+| `f112e664b` | refactor(dashboards): split the map viewer and block config into smaller units | All of it. |
+| `13ebfefc7` | feat(gis): add a map to a dashboard from the export sheet | All of it. |
+| `b1da1b229` | fix(gis): size the add to dashboard modal like the explorer's | All of it. |
+| `a02d200d2` | fix(gis): fit the camera only to layers added in this session | All of it. |
+| `a3712257a` | fix(gis): save the camera after an instant fit to a new layer | All of it. |
+| `183124966` | feat(dashboards): warn when shared readers cannot open a dashboard map | All of it. |
+| `1c3f735fc` | fix(dashboards): count unreadable maps once in the audience warning | All of it. |
+| `4557a9d5d` | feat(dashboards): preview each map layer a public publish exposes | All of it. |
+| `8efde477a` | fix(dashboards): avoid repeating 'cannot open' in the map audience warning | All of it. |
+| `8c2d21839` | fix(dashboards): recompile the publish map preview each time it opens | All of it. |
+| `c337161bb` | test(dashboards): cover a map block from export sheet to public page | All of it. |
+| `13a441c57` | chore(i18n): extract map block strings | All of it. |
+
+**Files:**
+- Storage paths: `supabase/schemas/16.utils.resource-permissions.sql`,
+  `src/clients/storage/` (`SnapshotStorageUtils`,
+  `PublicDatasetParquetStorageClient`, `PublicMapSnapshotStorageClient`).
+- Jitter salt: `supabase/schemas/10.maps.sql`, `shared/models/AvaMap/`
+  (`AvaMap.types.ts`, `AvaMapParsers.ts`, row parsing test),
+  `src/views/GisApp/layers/jitterCoordinate/` (`jitterCoordinate`,
+  `buildHmacSha256`) and `displaceSpatialFeatures`.
+- Snapshot compile: `src/clients/maps/MapSnapshot/` (`MapSnapshot.types.ts`,
+  `MapSnapshotJson/`, `MapSnapshotPublishError.ts`, `compileMapSnapshot/`,
+  `applySnapshotSensitivity`, `cutSnapshotFeatureProperties`,
+  `getForbiddenMapPropertyNames`, `createMapSnapshotFromMapId/`,
+  `createPublicMapConfigFromMapConfig/`, `getMapSnapshotLayerSummaries/`,
+  `getDatasetIdsFromMapConfig/`).
+- Publish: `src/clients/dashboards/DashboardClient/` (`publishDashboard.ts`,
+  `dashboardMapSnapshots/`, the transition fixtures and snapshot tests) and
+  `DashboardMapBlocks/`.
+- Shared rendering: `src/views/GisApp/layers/` (`runMapLayerQuery`,
+  `useMapLayersData`, `useMapLayerRendering`, `useAvaMapRender`,
+  `createMapOverlayFromMapConfig`, `makeFeatureCollectionFromRows`,
+  `PersistedLayerLegends`, `createLayerGeometryCache`,
+  `MapLayerDataResult.types.ts`), `useHydratedMapSources/useHydratedMapConfig.ts`,
+  and `useGisApp/useGisAppRendering.ts`.
+- Viewer: `src/views/GisApp/MapViewer/` (`MapViewer` with its live and
+  snapshot variants, frame, furniture, legend, popup card, state,
+  `getMapViewerPopupFromClick`, `useMapInteractionMode`,
+  `useMapViewerPopupKeyboard`, `createSnapshotLayerQueryStates`,
+  `mapViewerCameraToViewState`).
+- Dashboard block: `src/views/DashboardApp/AvaPage/` (`AvaPage.types.ts`,
+  `pblocks/MapPBlock/`, `pfields/MapPickerPField`, `pfields/MapViewPField`,
+  `useDashboardPuckConfig.tsx`).
+- Share modal: `src/views/DashboardApp/DashboardShareModal/`
+  (`DashboardMapAudienceAlert`, `getLimitedAudienceMapNames`,
+  `useLimitedAudienceMapNames`, `PublishMapLayersPreview`,
+  `PublishMapLayersList`, `PublishingSection.tsx`,
+  `usePublishDashboardMutation`).
+- Add to dashboard: `src/views/GisApp/export/ExportSheet/ExportSheet.tsx`
+  and `src/views/GisApp/export/AddMapToDashboardModal/`
+  (`AddMapToDashboardModal`, `useAddMapToDashboard`,
+  `MapPBlockDashboardConfigs`).
+- GIS fixes: `src/views/GisApp/GisAppMapShell.tsx`,
+  `layers/FitBoundsRequest/` (fit the camera only to layers added this
+  session), `MapCanvas/useMapViewSync/` (save the camera after an instant fit).
+- E2E and test fixtures: `tests/e2e/dashboard-map-block.spec.ts`,
+  `supabase/tests/database/dashboards/storage_map_snapshot_paths.test.sql`,
+  `supabase/tests/database/permissions/rls_maps.test.sql`, and one-line
+  `jitterSalt` additions to the existing GIS fixtures and tests.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** two migrations. Regenerate both, never copy:
+`supabase/migrations/*_dashboard_map_snapshot_paths.sql` teaches
+`util__storage_object_dashboard_id` and its sibling path parser the
+`revisions/<rev>/maps/<uuid>.json` shape, so the existing storage policies
+cover map files. `supabase/migrations/*_add_maps_jitter_salt.sql` adds
+`maps.jitter_salt`. Regenerate `shared/types/database.types.ts` with
+`pnpm db:gen-types`.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp src/views/DashboardApp src/clients/maps src/clients/storage src/clients/dashboards
+pnpm tsc -b --force
+pnpm vitest run src/clients/maps src/clients/storage src/clients/dashboards src/views/GisApp src/views/DashboardApp
+pnpm test:db
+pnpm test:e2e dashboard-map-block.spec.ts
+```
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
