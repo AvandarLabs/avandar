@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import { promiseMapSequential } from "@avandar/utils";
 import { buildListingRowFromRelation } from "@etl/EtlEngine/buildListingRowFromRelation/buildListingRowFromRelation";
@@ -30,6 +31,16 @@ export const LISTING_CHUNK_SIZE = 200;
  * written alone, since a listing and its columns are never split.
  */
 export const COLUMNS_PER_WRITE = 5000;
+
+/**
+ * The most JSON bytes, listings and columns together, one write carries. A
+ * write's time grows with its size, and a hosted database bounds both: on
+ * the demo instance a write took about 0.3 s per MB against an 8 s
+ * statement timeout, a 22 MB write timed out, and a 100 MB one ran the
+ * database out of memory. A listing larger than this is written alone,
+ * since a listing and its columns are never split.
+ */
+export const BYTES_PER_WRITE = 4 * 1024 * 1024;
 
 /** The metadata key holding a SHA-256 of a row's declared relation columns. */
 const COLUMNS_FINGERPRINT_KEY = "relation_columns_sha256";
@@ -259,28 +270,41 @@ function _countConsidered(args: {
   });
 }
 
+/** How many JSON bytes a listing and its columns add to a write. */
+function _measureWriteBytes(prepared: _PreparedRelation): number {
+  return Buffer.byteLength(
+    JSON.stringify({ row: prepared.row, columns: prepared.columns }),
+  );
+}
+
 /**
  * Splits relations into write batches of at most `LISTING_CHUNK_SIZE`
- * listings and `COLUMNS_PER_WRITE` columns, keeping their order. Each
- * listing goes into one batch with all of its columns.
+ * listings, `COLUMNS_PER_WRITE` columns, and `BYTES_PER_WRITE` bytes,
+ * keeping their order. Each listing goes into one batch with all of its
+ * columns.
  */
 function _splitIntoWriteBatches(
   preparedRelations: readonly _PreparedRelation[],
 ): _PreparedRelation[][] {
   const batches: _PreparedRelation[][] = [];
   let columnCount = 0;
+  let byteCount = 0;
   preparedRelations.forEach((prepared) => {
     const lastBatch = batches.at(-1);
+    const writeBytes = _measureWriteBytes(prepared);
     const fitsLastBatch =
       lastBatch !== undefined &&
       lastBatch.length < LISTING_CHUNK_SIZE &&
-      columnCount + prepared.columns.length <= COLUMNS_PER_WRITE;
+      columnCount + prepared.columns.length <= COLUMNS_PER_WRITE &&
+      byteCount + writeBytes <= BYTES_PER_WRITE;
     if (fitsLastBatch) {
       lastBatch.push(prepared);
       columnCount += prepared.columns.length;
+      byteCount += writeBytes;
     } else {
       batches.push([prepared]);
       columnCount = prepared.columns.length;
+      byteCount = writeBytes;
     }
   });
   return batches;

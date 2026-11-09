@@ -25,7 +25,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D15 | The agent is off by default, behind a switch | Spike |
 | D16 | The eval is the gate for every harness change | Spike |
 | D17 | The chat function reports billed cost | Spike |
-| D18 | Metering and plan budgets live in the proxy | Deferred (roadmap) |
+| D18 | Metering and plan budgets live in the proxy | Future work, before `develop` |
 | D19 | A local embedding router picks tool packs for the full agent | Proposed |
 | D20 | Mutating tools ask for confirmation | Proposed |
 | D21 | Fix today's harness for the N11 bug | Done |
@@ -40,6 +40,7 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D30 | The offline model | See entry |
 | D31 | Today's chat answers with Claude Haiku 5.5 | Done |
 | D32 | The PDF table assistant gets its own route, measured by its own eval | Done |
+| D33 | The plan to the full Avandar agent | Approved |
 
 ---
 
@@ -264,9 +265,9 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 
 ## D18. Metering and plan budgets live in the proxy (deferred, on the roadmap)
 
-- **Decision (Pablo, 2026-11-07).** Not needed for the demo. Deferred, and
-  tracked as a required item in [roadmap.md](roadmap.md) before the agent is
-  on by default.
+- **Decision (Pablo, 2026-11-07, confirmed 2026-11-08).** Not needed for
+  the demo: `demo/measles` is a demo branch. Tracked with the free plan's cap
+  as future work before the agent moves to `develop` (roadmap F1 and F2).
 - **Proposal.** The proxy records each request's billed cost (Pi reports it
   in the `done` event) against the user, workspace, and plan, and refuses
   requests past the plan's monthly AI budget with a readable message.
@@ -513,4 +514,27 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Verified end to end** against the local edge function: a valid ack
   returns the figures; an ack for different text is refused
   (`payload_hash_mismatch`); a request without one fails validation.
+
+## D33. The plan to the full Avandar agent (approved)
+
+- **Decision (Pablo, 2026-11-08).** Approved the four phases in
+  [roadmap.md](roadmap.md): (1) the data agent becomes the default, (2) the
+  shared foundations (tool registry, router, confirmation for changes, a
+  general host, context management, an eval per area, untrusted data), (3)
+  areas one at a time, (4) one agent, retiring today's chat function.
+- **Choices made with it.**
+  - **Order of areas:** dashboards, platform help, dataset management,
+    interpretation, ontology and case management, workspace management.
+    Dashboards first, because it is the last thing today's chat does that
+    the agent cannot, which unblocks retiring today's chat.
+  - **Confirmation:** a card in the chat that shows exactly what will
+    change, with Confirm and Cancel, before any tool that creates, edits, or
+    deletes runs.
+  - **Interpretation:** consent every time, showing the exact summary that
+    will be sent.
+  - **Metering and the free plan's cap:** not for the demo; future work
+    before `develop` (D18).
+- **The bar stays:** each area's eval exists before it ships, and the new
+  setup loses no accuracy against what it replaces, invents nothing, and
+  uses the cheapest model that passes.
 

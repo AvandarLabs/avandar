@@ -4,6 +4,7 @@ import type {
   OpenDataAccessKind,
   OpenDataApiService,
   InvalidDatasetReason as InvalidDatasetReasonType,
+  ParquetCacheStatus as ParquetCacheStatusType,
   DataCatalogListingId,
   DataCatalogListingModel,
   DataCatalogListingSearchResult,
@@ -33,6 +34,9 @@ export namespace DataCatalogListing {
 
   /** Why an entry's dataset cannot be loaded. */
   export type InvalidDatasetReason = InvalidDatasetReasonType;
+
+  /** Where an `api_resource` listing's Parquet copy stands. */
+  export type ParquetCacheStatus = ParquetCacheStatusType;
 
   /** One listing as catalog search returns it, with only the list's columns. */
   export type SearchResult = DataCatalogListingSearchResult;

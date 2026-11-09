@@ -1,6 +1,6 @@
 import { Agent } from "@earendil-works/pi-agent-core";
-import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";

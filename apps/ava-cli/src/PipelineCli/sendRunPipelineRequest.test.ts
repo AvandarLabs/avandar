@@ -25,6 +25,8 @@ describe("sendRunPipelineRequest", () => {
     vi.unstubAllGlobals();
     process.env.AVA_PIPELINE_SERVER_URL = "https://pipeline.example/";
     process.env.AVA_PIPELINE_SERVER_SECRET = "secret";
+    process.env.VITE_SUPABASE_API_URL = "https://abcd.supabase.co/";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-key";
   });
 
   it("waits up to two hours for the response headers and body", async () => {
@@ -73,5 +75,23 @@ describe("sendRunPipelineRequest", () => {
         actor: "pablo@laptop",
       },
     ]);
+  });
+
+  it("sends the loaded env file's Supabase project for the run to load into", async () => {
+    const fetchMock = vi.fn(async () => {
+      return new Response(JSON.stringify(REPORT), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await sendRunPipelineRequest({ pipelineName: "hdx", runOptions: {} });
+
+    const init = (fetchMock.mock.calls[0] as unknown[] | undefined)?.[1] as
+      | { headers: Record<string, string>; body?: string }
+      | undefined;
+    expect(init?.headers).toMatchObject({
+      "x-ava-supabase-url": "https://abcd.supabase.co",
+      "x-ava-supabase-service-role-key": "service-role-key",
+    });
+    expect(init?.body ?? "").not.toContain("service-role-key");
   });
 });

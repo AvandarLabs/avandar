@@ -230,11 +230,13 @@ first three. It is required when the config has `incremental`.
 
 **Writes.** A page loads in connection order. Parquet objects upload before
 any row is written, then changed rows are written in batches of at most 200
-listings and `COLUMNS_PER_WRITE` (5,000) relation columns. Each batch is one
+listings, `COLUMNS_PER_WRITE` (5,000) relation columns, and `BYTES_PER_WRITE`
+(4 MiB of JSON), since a hosted database's statement timeout and memory bound
+how large one write can be. Each batch is one
 `upsertListingsWithColumns` call, which writes every row together with its
 whole column set in one transaction. A listing is never split from its
 columns across batches, so the two are always written together: a listing
-with more columns than the cap is written alone. The Supabase store
+with more columns or bytes than a cap is written alone. The Supabase store
 reads stored rows a few at a time to keep request URLs short.
 
 **Relation columns.** An `api_resource` relation declares its `columns`,

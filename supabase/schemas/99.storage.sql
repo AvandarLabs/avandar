@@ -330,20 +330,11 @@ create policy "Users can DELETE private published datasets" on storage.objects f
 );
 
 --
--- Bucket `opendata` (public catalogue data). No path-shape restriction: the
--- whole bucket is public read, authenticated write.
+-- Bucket `opendata` (public catalogue data). The whole bucket is public read.
+-- Only the service role writes to it, and it bypasses these policies, so no
+-- role is granted a write.
 --
 create policy "Anyone can select open data datasets" on storage.objects for
 select
   to authenticated,
   anon using (bucket_id = 'opendata');
-
-create policy "Auth users can upload open data datasets" on storage.objects for insert to authenticated
-with
-  check (bucket_id = 'opendata');
-
-create policy "Auth users can update open data datasets" on storage.objects
-for update
-  to authenticated using (bucket_id = 'opendata')
-with
-  check (bucket_id = 'opendata');

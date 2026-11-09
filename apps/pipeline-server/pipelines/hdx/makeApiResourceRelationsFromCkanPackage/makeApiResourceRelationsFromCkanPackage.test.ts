@@ -353,12 +353,10 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
     expect(relations[0]?.sourceSizeBytes).toBe(4096);
   });
 
-  it("gives every resource relation of a package the same mapped fields and raw record", async () => {
+  it("gives every resource relation of a package the same mapped fields", async () => {
     const [csvResource] = _packageWithOneCsv({}).resources;
-    const sourceRecord = { name: "movement-range-maps", tags: [{ name: "x" }] };
     const ckanPackage: CkanPackage = {
       ..._packageWithOneCsv({ fileHeaders: ["adm1"] }),
-      sourceRecord,
       resources: [
         { ...csvResource!, fileHeaders: ["adm1"] },
         { ...csvResource!, id: "csv-2", fileHeaders: ["adm2"] },
@@ -376,11 +374,75 @@ describe("makeApiResourceRelationsFromCkanPackage", () => {
 
     expect(
       relations.map((relation) => {
-        return [relation.apiResourceId, relation.tags, relation.sourceMetadata];
+        return [relation.apiResourceId, relation.tags];
       }),
     ).toEqual([
-      ["csv-1", ["x"], sourceRecord],
-      ["csv-2", ["x"], sourceRecord],
+      ["csv-1", ["x"]],
+      ["csv-2", ["x"]],
     ]);
+  });
+
+  it("keeps the raw package with only the relation's own raw resource", async () => {
+    const [csvResource] = _packageWithOneCsv({}).resources;
+    const rawCsv1 = { id: "csv-1", format: "CSV", sdd_report: { rows: 9 } };
+    const rawCsv2 = { id: "csv-2", format: "CSV", sdd_report: { rows: 4 } };
+    const rawPdf = { id: "pdf-1", format: "PDF" };
+    const ckanPackage: CkanPackage = {
+      ..._packageWithOneCsv({ fileHeaders: ["adm1"] }),
+      sourceRecord: {
+        name: "movement-range-maps",
+        notes: "Movement range maps.",
+        resources: [rawCsv1, rawCsv2, rawPdf],
+      },
+      resources: [
+        { ...csvResource!, fileHeaders: ["adm1"] },
+        { ...csvResource!, id: "csv-2", fileHeaders: ["adm2"] },
+      ],
+    };
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
+      ckanPackage,
+      scope: CSV_SCOPE,
+      readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(
+      relations.map((relation) => {
+        return relation.sourceMetadata;
+      }),
+    ).toEqual([
+      {
+        name: "movement-range-maps",
+        notes: "Movement range maps.",
+        resources: [rawCsv1],
+      },
+      {
+        name: "movement-range-maps",
+        notes: "Movement range maps.",
+        resources: [rawCsv2],
+      },
+    ]);
+  });
+
+  it("keeps a raw package whose resource list it cannot read as it is", async () => {
+    const sourceRecord = { name: "movement-range-maps", resources: "none" };
+    const ckanPackage: CkanPackage = {
+      ..._packageWithOneCsv({ fileHeaders: ["adm1"] }),
+      sourceRecord,
+    };
+
+    const relations = await makeApiResourceRelationsFromCkanPackage({
+      drive: CKAN_DRIVE,
+      mappedFields: MAPPED_FIELDS,
+      ckanPackage,
+      scope: CSV_SCOPE,
+      readFileColumns: _readSniffedColumns,
+      metrics: _metrics().metrics,
+    });
+
+    expect(relations[0]?.sourceMetadata).toEqual(sourceRecord);
   });
 });
