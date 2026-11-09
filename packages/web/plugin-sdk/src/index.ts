@@ -12,9 +12,11 @@ export { PluginError } from "@plugin-sdk/PluginError/PluginError";
 export { PluginVizProvider } from "@plugin-sdk/PluginVizContext/PluginVizContext";
 export type { PluginErrorCode } from "@plugin-sdk/PluginError/PluginError";
 export type {
+  AddColumnsResult,
   AvandarApi,
   CommandHandler,
   DataExplorerToolbarContext,
+  DerivedColumn,
   FetchRowsOptions,
   FetchRowsResult,
   PluginColumnDataType,

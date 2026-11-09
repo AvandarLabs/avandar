@@ -6,7 +6,8 @@ import { makePluginApi } from "@/lib/plugins/makePluginApi/makePluginApi";
 import { PluginDrawerHost } from "@/lib/plugins/PluginDrawerHost/PluginDrawerHost";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
-import { act, cleanup, render, screen } from "@/test-utils";
+import { act, cleanup, render, screen, waitFor } from "@/test-utils";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type {
   AvandarApi,
   DataExplorerToolbarContext,
@@ -21,11 +22,14 @@ const ROWS = [
   { x: 2, y: "b" },
 ];
 
-function _makeApiFromRows(): AvandarApi {
+function _makeApiFromRows(dataExplorerBridge?: DataExplorerBridge): AvandarApi {
   const context: DataExplorerToolbarContext = {
     slotId: "dataExplorer.toolbar",
     queryHandle: QueryHandleRegistry.getOrCreate(ROWS),
-    columns: [],
+    columns: [
+      { name: "x", dataType: "bigint" },
+      { name: "y", dataType: "varchar" },
+    ],
     rowCount: ROWS.length,
   };
   return makePluginApi({
@@ -33,7 +37,19 @@ function _makeApiFromRows(): AvandarApi {
     context,
     workspace: { id: "w", slug: "w", locale: "es" },
     messages: { en: { greeting: "Hello" }, es: { greeting: "Hola" } },
+    dataExplorerBridge,
   });
+}
+
+function _makeBridge(): DataExplorerBridge & {
+  applyDerivedColumnsSql: ReturnType<typeof vi.fn>;
+} {
+  return {
+    baseSql: `SELECT * FROM "t"`,
+    applyDerivedColumnsSql: vi.fn(() => {
+      return true;
+    }),
+  };
 }
 
 function ContextProbe(): ReactNode {
@@ -214,6 +230,78 @@ describe("makePluginApi", () => {
 
     expect(screen.getByText("fresh body")).toBeInTheDocument();
     expect(screen.queryByText("stale body")).not.toBeInTheDocument();
+  });
+
+  it("closes the modal the invocation opened", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+    const api = _makeApiFromRows();
+    act(() => {
+      api.ui.openModal({ title: "Details", content: <p>modal body</p> });
+    });
+    await screen.findByText("modal body");
+
+    act(() => {
+      api.ui.closeModal();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("modal body")).not.toBeInTheDocument();
+    });
+  });
+
+  it("leaves open a modal another invocation opened", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+    act(() => {
+      _makeApiFromRows().ui.openModal({
+        title: "Other",
+        content: <p>other body</p>,
+      });
+    });
+    await screen.findByText("other body");
+
+    act(() => {
+      _makeApiFromRows().ui.closeModal();
+    });
+
+    expect(screen.getByText("other body")).toBeInTheDocument();
+  });
+
+  it("adds columns through the Data Explorer bridge", async () => {
+    const bridge = _makeBridge();
+    const api = _makeApiFromRows(bridge);
+
+    const result = await api.dataExplorer?.addColumns([
+      { name: "double_x", expression: "{x} * 2", inputs: { x: "x" } },
+    ]);
+
+    expect(result).toEqual({ columnNames: ["double_x"] });
+    expect(bridge.applyDerivedColumnsSql).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects addColumns with InvalidExpression for an invalid column", async () => {
+    const api = _makeApiFromRows(_makeBridge());
+
+    await expect(api.dataExplorer?.addColumns([])).rejects.toMatchObject({
+      code: "InvalidExpression",
+    });
+  });
+
+  it("rejects addColumns with InvalidHandle for an api made before the host unmounted", async () => {
+    const previousHost = render(<PluginDrawerHost />);
+    const bridge = _makeBridge();
+    const staleApi = _makeApiFromRows(bridge);
+    previousHost.unmount();
+
+    await expect(
+      staleApi.dataExplorer?.addColumns([
+        { name: "double_x", expression: "{x} * 2", inputs: { x: "x" } },
+      ]),
+    ).rejects.toMatchObject({ code: "InvalidHandle" });
+    expect(bridge.applyDerivedColumnsSql).not.toHaveBeenCalled();
+  });
+
+  it("gives no dataExplorer API to an invocation without a bridge", () => {
+    expect(_makeApiFromRows().dataExplorer).toBeUndefined();
   });
 
   it("names the modal's close button", async () => {

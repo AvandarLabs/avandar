@@ -32,8 +32,13 @@ const WHEN_OPERATORS = [
 const EMPTY_COMBINATOR_MESSAGE = "needs at least one condition";
 const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or "{ <fact>: { <operator>: value } }" with an operator of ${WHEN_OPERATORS.join(", ")}`;
 
-/** Permissions a manifest may request in this version of the schema. */
-export const PLUGIN_PERMISSIONS = ["data:context"] as const;
+/**
+ * Permissions a manifest may request in this version of the schema.
+ * `data:context` lets a command read the rows of the result it was invoked
+ * on, and `query:addColumns` lets a Data Explorer toolbar command add
+ * computed columns to that result's query.
+ */
+export const PLUGIN_PERMISSIONS = ["data:context", "query:addColumns"] as const;
 
 /**
  * A permission a plugin may request in `permissions`, for typing code that

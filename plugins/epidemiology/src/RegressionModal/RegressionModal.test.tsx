@@ -53,7 +53,12 @@ function _renderModal(options: {
     },
     workspace: { id: "workspace-1", slug: "workspace", locale: "en-US" },
     data: { fetchRows },
-    ui: { openModal: vi.fn(), openDrawer: vi.fn(), notify: vi.fn() },
+    ui: {
+      openModal: vi.fn(),
+      closeModal: vi.fn(),
+      openDrawer: vi.fn(),
+      notify: vi.fn(),
+    },
     i18n: {
       t:
         options.t ??
