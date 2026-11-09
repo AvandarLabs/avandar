@@ -1,5 +1,14 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
+
+/**
+ * SHA-256 of prompt v1's instructions (everything before DATASETS), as
+ * first shipped. Tabs opened before a deploy still request v1, so any
+ * change to its text, including to the rules v1 and v2 share, fails here.
+ */
+const V1_INSTRUCTIONS_SHA256 =
+  "23d53c25615269437123e9c8323987fa92732b318ee3401cdb3416a50e6b6c4b";
 
 const DATASETS = [
   {
@@ -62,6 +71,20 @@ describe("buildDataAgentSystemPrompt", () => {
       ),
     ).toBe(true);
     expect(prompt).not.toContain("CURRENT PAGE");
+  });
+
+  it("keeps every character of v1's instructions", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-08",
+      promptId: "data-agent-v1",
+    });
+    const instructions = prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+
+    expect(instructions.length).toBe(4167);
+    expect(createHash("sha256").update(instructions).digest("hex")).toBe(
+      V1_INSTRUCTIONS_SHA256,
+    );
   });
 
   it("tells v2 how to read the current page block", () => {
