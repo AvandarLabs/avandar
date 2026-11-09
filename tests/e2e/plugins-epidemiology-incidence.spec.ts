@@ -41,10 +41,19 @@ function _getColumnHeader(
   });
 }
 
+/**
+ * Installs the plugin from Settings. Calls `onInstallConfirmed` as soon as
+ * the install is confirmed, before waiting for "Installed", so a caller can
+ * clean up an install whose card never updates.
+ */
 async function _installPlugin(
-  options: Readonly<{ page: Page; workspaceSlug: string }>,
+  options: Readonly<{
+    page: Page;
+    workspaceSlug: string;
+    onInstallConfirmed: () => void;
+  }>,
 ): Promise<void> {
-  const { page, workspaceSlug } = options;
+  const { page, workspaceSlug, onInstallConfirmed } = options;
   await page.goto(`/${workspaceSlug}/settings/plugins`);
   const card = _getPluginCard(page);
   await expect(card.getByText("Not installed", { exact: true })).toBeVisible({
@@ -55,6 +64,7 @@ async function _installPlugin(
     .getByRole("dialog", { name: "Install Epidemiology?" })
     .getByRole("button", { name: "Install", exact: true })
     .click();
+  onInstallConfirmed();
   await expect(card.getByText("Installed", { exact: true })).toBeVisible({
     timeout: MEDIUM_WAIT,
   });
@@ -133,8 +143,8 @@ test.describe("Epidemiology plugin incidence", () => {
       supabaseAdminClient,
       slug: workspaceSlug,
     });
-    // Set once the Settings install succeeded, so cleanup never deletes an
-    // install this spec did not make.
+    // Set once the Settings install is confirmed, so cleanup never deletes
+    // an install this spec did not make.
     let didInstall = false;
     try {
       await signInWithEmailPassword(page, {
@@ -142,8 +152,13 @@ test.describe("Epidemiology plugin incidence", () => {
         password: primaryUser.password,
         workspaceSlug,
       });
-      await _installPlugin({ page, workspaceSlug });
-      didInstall = true;
+      await _installPlugin({
+        page,
+        workspaceSlug,
+        onInstallConfirmed: () => {
+          didInstall = true;
+        },
+      });
       // The `?sql=` deep link stands in for typing the query: the editor is
       // not what this spec covers, and the command is still driven by clicks.
       await page.goto(
