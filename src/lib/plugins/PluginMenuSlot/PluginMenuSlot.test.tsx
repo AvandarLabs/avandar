@@ -2,6 +2,7 @@ import { IconPuzzle } from "@tabler/icons-react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PluginMenuSlot } from "@/lib/plugins/PluginMenuSlot/PluginMenuSlot";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 import type { PluginIconComponent } from "@/lib/plugins/PluginIndex.types";
 import type {
@@ -16,6 +17,7 @@ const mocks = vi.hoisted(() => {
     notifyError: vi.fn(),
     usePluginMenuItems: vi.fn(),
     getContext: vi.fn(),
+    getDataExplorerBridge: vi.fn(),
   };
 });
 
@@ -41,6 +43,13 @@ vi.mock("@/utils/Logger", () => {
 vi.mock("@/utils/notifications/notify", () => {
   return { notifyError: mocks.notifyError };
 });
+
+const BRIDGE: DataExplorerBridge = {
+  baseSql: "SELECT 1",
+  applyDerivedColumnsSql: () => {
+    return true;
+  },
+};
 
 const SLOT_ID = "dataExplorer.toolbar";
 const CONTEXT: DataExplorerToolbarContext = {
@@ -82,6 +91,7 @@ function _renderSlotWithItems(options: {
       getContext={
         "getContext" in options ? options.getContext : mocks.getContext
       }
+      getDataExplorerBridge={mocks.getDataExplorerBridge}
       facts={{ rowCount: 1 }}
     />,
   );
@@ -95,6 +105,8 @@ describe("PluginMenuSlot", () => {
     mocks.notifyError.mockReset();
     mocks.getContext.mockReset();
     mocks.getContext.mockReturnValue(CONTEXT);
+    mocks.getDataExplorerBridge.mockReset();
+    mocks.getDataExplorerBridge.mockReturnValue(BRIDGE);
   });
 
   it("does not load the runner when the slot renders", () => {
@@ -119,6 +131,26 @@ describe("PluginMenuSlot", () => {
       expect(mocks.runPluginCommand).toHaveBeenCalled();
     });
     expect(mocks.getContext).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not build the Data Explorer bridge when the slot renders", () => {
+    _renderSlotWithItems({ itemCount: 2 });
+
+    expect(mocks.getDataExplorerBridge).not.toHaveBeenCalled();
+  });
+
+  it("runs the clicked command with the Data Explorer bridge it builds", async () => {
+    mocks.runPluginCommand.mockResolvedValue(undefined);
+    _renderSlotWithItems({ itemCount: 2 });
+
+    fireEvent.click(screen.getByRole("button", { name: "Command 1" }));
+
+    await waitFor(() => {
+      expect(mocks.runPluginCommand).toHaveBeenCalledWith(
+        expect.objectContaining({ dataExplorerBridge: BRIDGE }),
+      );
+    });
+    expect(mocks.getDataExplorerBridge).toHaveBeenCalledTimes(1);
   });
 
   it("loads the runner when a command is clicked", async () => {

@@ -2,9 +2,11 @@ import { AvandarProvider, makePluginTranslator } from "@avandar/plugin-sdk";
 import { t } from "@lingui/core/macro";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { addColumnsForInvocation } from "@/lib/plugins/derivedColumns/addColumnsForInvocation/addColumnsForInvocation";
 import { fetchRowsForInvocation } from "@/lib/plugins/fetchRowsForInvocation/fetchRowsForInvocation";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { PluginErrorBoundary } from "@/lib/plugins/PluginErrorBoundary/PluginErrorBoundary";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type {
   AvandarApi,
   PluginInvocationContext,
@@ -23,6 +25,22 @@ function _makeDataApi(context: PluginInvocationContext): AvandarApi["data"] {
         columns: fetchOptions.columns,
         limit: fetchOptions.limit,
       });
+    },
+  };
+}
+
+function _makeDataExplorerApi(
+  context: PluginInvocationContext,
+  bridge: DataExplorerBridge | undefined,
+): AvandarApi["dataExplorer"] {
+  if (context.slotId !== "dataExplorer.toolbar" || bridge === undefined) {
+    return undefined;
+  }
+  return {
+    // `async` turns a thrown `PluginError` into a rejected promise, which is
+    // how a plugin receives it.
+    addColumns: async (columns) => {
+      return addColumnsForInvocation({ context, bridge, columns });
     },
   };
 }
@@ -85,7 +103,9 @@ function _makeUiApi(
  * `runPluginCommand` calls it once per invocation and passes the result to the
  * plugin's command handler. Its `openModal` and `openDrawer` do nothing once
  * the drawer host has unmounted, so a command left running by a workspace
- * switch cannot open a modal or a drawer in the next workspace.
+ * switch cannot open a modal or a drawer in the next workspace. Its
+ * `dataExplorer` is set only for a Data Explorer toolbar invocation that came
+ * with a `dataExplorerBridge`.
  *
  * It pulls in the plugin SDK runtime and Lingui's message compiler, so import
  * it lazily, at the time a command runs, to keep them out of the main bundle.
@@ -96,9 +116,11 @@ export function makePluginApi(
     context: PluginInvocationContext;
     workspace: AvandarApi["workspace"];
     messages: PluginMessages;
+    dataExplorerBridge?: DataExplorerBridge;
   }>,
 ): AvandarApi {
-  const { pluginName, context, workspace, messages } = options;
+  const { pluginName, context, workspace, messages, dataExplorerBridge } =
+    options;
   // Overlay content renders after this function returns, so it can read
   // `api` through the closure to give plugin UI its own scoped API.
   const wrapContent = (content: ReactNode): ReactNode => {
@@ -120,6 +142,7 @@ export function makePluginApi(
     i18n: {
       t: makePluginTranslator({ locale: workspace.locale, messages }),
     },
+    dataExplorer: _makeDataExplorerApi(context, dataExplorerBridge),
   };
   return api;
 }

@@ -7,6 +7,7 @@ import { PluginDrawerHost } from "@/lib/plugins/PluginDrawerHost/PluginDrawerHos
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import { act, cleanup, render, screen, waitFor } from "@/test-utils";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type {
   AvandarApi,
   DataExplorerToolbarContext,
@@ -21,11 +22,14 @@ const ROWS = [
   { x: 2, y: "b" },
 ];
 
-function _makeApiFromRows(): AvandarApi {
+function _makeApiFromRows(dataExplorerBridge?: DataExplorerBridge): AvandarApi {
   const context: DataExplorerToolbarContext = {
     slotId: "dataExplorer.toolbar",
     queryHandle: QueryHandleRegistry.getOrCreate(ROWS),
-    columns: [],
+    columns: [
+      { name: "x", dataType: "bigint" },
+      { name: "y", dataType: "varchar" },
+    ],
     rowCount: ROWS.length,
   };
   return makePluginApi({
@@ -33,7 +37,19 @@ function _makeApiFromRows(): AvandarApi {
     context,
     workspace: { id: "w", slug: "w", locale: "es" },
     messages: { en: { greeting: "Hello" }, es: { greeting: "Hola" } },
+    dataExplorerBridge,
   });
+}
+
+function _makeBridge(): DataExplorerBridge & {
+  applyDerivedColumnsSql: ReturnType<typeof vi.fn>;
+} {
+  return {
+    baseSql: `SELECT * FROM "t"`,
+    applyDerivedColumnsSql: vi.fn(() => {
+      return true;
+    }),
+  };
 }
 
 function ContextProbe(): ReactNode {
@@ -248,6 +264,30 @@ describe("makePluginApi", () => {
     });
 
     expect(screen.getByText("other body")).toBeInTheDocument();
+  });
+
+  it("adds columns through the Data Explorer bridge", async () => {
+    const bridge = _makeBridge();
+    const api = _makeApiFromRows(bridge);
+
+    const result = await api.dataExplorer?.addColumns([
+      { name: "double_x", expression: "{x} * 2", inputs: { x: "x" } },
+    ]);
+
+    expect(result).toEqual({ columnNames: ["double_x"] });
+    expect(bridge.applyDerivedColumnsSql).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects addColumns with InvalidExpression for an invalid column", async () => {
+    const api = _makeApiFromRows(_makeBridge());
+
+    await expect(api.dataExplorer?.addColumns([])).rejects.toMatchObject({
+      code: "InvalidExpression",
+    });
+  });
+
+  it("gives no dataExplorer API to an invocation without a bridge", () => {
+    expect(_makeApiFromRows().dataExplorer).toBeUndefined();
   });
 
   it("names the modal's close button", async () => {
