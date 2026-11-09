@@ -477,5 +477,10 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
     previewRows,
     dataSourceMetadata,
     setDataSourceMetadata,
+    clearLoadedFile: () => {
+      setDataSourceMetadata(undefined);
+      setPreviewRows(undefined);
+      pendingPreviewRowsRef.value = undefined;
+    },
   };
 }

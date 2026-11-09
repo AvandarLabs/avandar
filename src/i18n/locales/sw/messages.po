@@ -477,6 +477,10 @@ msgstr "Haiwezekani kupakia swali la SQL la dataset."
 msgid "Avandar"
 msgstr "Avandar"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't download from a private or local address."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
 msgstr "Inahitaji kukaguliwa"
@@ -675,6 +679,10 @@ msgstr "Safu {0} ni ya jumla pekee na haiwezi kuchorwa kama alama mahususi."
 msgid "When"
 msgstr "Lini"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive doesn't contain a CSV, Excel, or PDF file."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
 msgstr "Hifadhi na rudia swali"
@@ -831,6 +839,11 @@ msgstr "Bure"
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "Mwangaza wa meza haina mipangilio ya ziada."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't public. Avandar can only download a file anyone can "
+"open."
+msgstr ""
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
@@ -1306,10 +1319,10 @@ msgid "Saved datasets"
 msgstr "Seti za data zilizohifadhiwa"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-"you save the dataset."
-msgstr "Avandar husoma faili kwenye kivinjari chako. Hakuna kinachoondoka "
-"kwenye kifaa hiki hadi uhifadhi seti ya data."
+#~ msgid "Avandar reads the file in your browser. Nothing leaves this device until "
+#~ "you save the dataset."
+#~ msgstr "Avandar husoma faili kwenye kivinjari chako. Hakuna kinachoondoka "
+#~ "kwenye kifaa hiki hadi uhifadhi seti ya data."
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
@@ -1363,6 +1376,12 @@ msgstr "Kutoka kwa seti ya data iliyotokana"
 msgid "Sheet"
 msgstr "Laha"
 
+#. placeholder {0}: status.fileName
+#. placeholder {1}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Getting {0} from {1}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
 msgstr "seti data zaidi ya {formattedNumResults} kati ya "
@@ -1391,6 +1410,10 @@ msgstr "Imefunguliwa na inashughulikiwa."
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Derived dataset"
 msgstr "Seti ya data inayotokana"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "This link has more than one data file."
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1681,6 +1704,11 @@ msgstr "Jibu bila mtandao"
 msgid "Expand the layers panel"
 msgstr "Panua kidirisha cha tabaka"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive only contains another archive. Paste a link to the file "
+"itself."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
 msgstr "{featureCount} pointi"
@@ -1835,6 +1863,11 @@ msgstr "Thibitisha"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "ni sawa na..."
+
+#. placeholder {0}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Downloading from {0}"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -2350,6 +2383,11 @@ msgstr "Mistari kutoka kwenye vizuizi hivi"
 msgid "Chat"
 msgstr "Mazungumzo"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't import a Google Doc or a Slides deck. Paste a link to a "
+"CSV, Excel, or PDF file."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
 msgstr "Mwenyeji"
@@ -2478,6 +2516,10 @@ msgstr "Futa aina ya kesi"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Offline mode"
 msgstr "Hali ya nje ya mtandao"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar couldn't download that link. Check it and try again."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2888,6 +2930,10 @@ msgstr "Andika au bandika barua pepe hapa chini. Eneo lako la kazi litatozwa "
 msgid "{0} was deleted."
 msgstr "{0} ilifutwa."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can only download a public http or https link."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Pendekezo lililotumika"
@@ -2927,6 +2973,11 @@ msgstr "Kitambulisho cha workspace hakiwezi kuwa tupu"
 msgid "By default we use a direct UUID-based link."
 msgstr "Kwa chaguomsingi tunatumia kiungo cha moja kwa moja kinachotegemea "
 "UUID."
+
+#. placeholder {0}: member.path
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Import {0}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
@@ -3183,6 +3234,10 @@ msgstr "Workspace yako iko kwenye mpango wa Free, unaokuruhusu kushiriki au "
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable"
 msgstr "Zima"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is no longer in the download. Choose another one."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -3838,6 +3893,10 @@ msgstr "Mkusanyiko huu wa data umewekewa faharasa katika {serviceName}, lakini "
 msgid "You'll be asked to confirm your current password."
 msgstr "Utatazamiwa kuthibitisha nenosiri lako la sasa."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Which file should Avandar import?"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
@@ -4492,6 +4551,10 @@ msgstr "Nambari ya QR"
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "SQL ina taarifa nyingi; fomu inaweka ya kwanza pekee."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Or provide a link to a file"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
 msgstr "Mada: {topic}"
@@ -5144,6 +5207,11 @@ msgid "{filterCount} filters are active on this layer. They may be excluding "
 msgstr "Vichujio {filterCount} vinatumika kwenye safu hii. Huenda vinaondoa "
 "kila kitu."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "A file you drop stays on this device until you save. A link is "
+"downloaded by Avandar first, then read here the same way."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (chaguo la kawaida)"
@@ -5324,6 +5392,11 @@ msgstr " m"
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "You need access"
 msgstr "Unahitaji ufikiaji"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is larger than {limitLabel}, which is the most Avandar can "
+"download from a link."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
@@ -6451,6 +6524,7 @@ msgid "All results"
 msgstr "Matokeo yote"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Add"
 msgstr "Ongeza"
 
@@ -6522,6 +6596,10 @@ msgstr "{periodCount, plural, one {Onyesha robo mwaka #} other {Onyesha robo "
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "Futa madondoo"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Use a different link"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -6729,6 +6807,10 @@ msgstr "Kwa chaguo-msingi tunatumia kiungo cha moja kwa moja kinachotegemea "
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "Fanya iwe ya ndani"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
@@ -7768,6 +7850,10 @@ msgstr "Toa kwa kutumia msaidizi"
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Hesabu safu katika {datasetName} kwa {secondGroupByColumn}"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Dropbox link is a folder. Paste a link to one file."
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
 msgstr "Malipo yako yalifanikiwa!"
@@ -7981,6 +8067,10 @@ msgstr "Kukutana na hitilafu wakati wa kuhifadhi seti ya data"
 msgid "Maps"
 msgstr "Ramani"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't a CSV, Excel, or PDF file."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Ingiza seti ya data"
@@ -8124,6 +8214,11 @@ msgstr "Njano"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "Mtu yeyote aliye na kiungo"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This GitHub link is a page, not a file. Open the file and paste that "
+"link."
+msgstr ""
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -8418,6 +8513,10 @@ msgstr "Karibu kwenye kidhibiti chako cha chanzo cha data. Chagua faili la CSV "
 msgid "Geometry unavailable"
 msgstr "Jiometri haipatikani"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
+msgid "Use a link"
+msgstr ""
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "Inapakia dashibodi"
@@ -8451,6 +8550,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "Sikuweza kutengeneza SQL bila mtandao. Jaribu kuandika upya au "
 "uunganishe tena ili kutumia mazungumzo ya wingu."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Enter a link that starts with http:// or https://."
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
@@ -10243,6 +10346,10 @@ msgstr "Kwa sasa umejiandikisha kwa mpango huu."
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "Pakia seti ya data"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Google Drive link is a folder. Paste a link to one file."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"

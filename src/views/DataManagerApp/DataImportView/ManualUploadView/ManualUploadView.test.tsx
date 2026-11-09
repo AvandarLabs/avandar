@@ -36,12 +36,14 @@ const FIXTURE_CSV_PATH = path.resolve(
  */
 const COVID_SAMPLE_NUM_ROWS = 14_700;
 
-const { startCsvImportMock, dropLocalDatasetMock } = vi.hoisted(() => {
-  return {
-    startCsvImportMock: vi.fn(),
-    dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
-  };
-});
+const { startCsvImportMock, dropLocalDatasetMock, requestFileFromUrlMock } =
+  vi.hoisted(() => {
+    return {
+      startCsvImportMock: vi.fn(),
+      dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
+      requestFileFromUrlMock: vi.fn(),
+    };
+  });
 
 vi.mock("@/hooks/users/useCurrentUser", () => {
   return {
@@ -99,6 +101,12 @@ vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
       startCsvImport: startCsvImportMock,
       dropLocalDataset: dropLocalDatasetMock,
     },
+  };
+});
+
+vi.mock("@/clients/fileUrl/requestFileFromUrl", () => {
+  return {
+    requestFileFromUrl: requestFileFromUrlMock,
   };
 });
 
@@ -247,6 +255,7 @@ describe("ManualUploadView", () => {
 
     dropLocalDatasetMock.mockClear();
     startCsvImportMock.mockClear();
+    requestFileFromUrlMock.mockClear();
 
     startCsvImportMock.mockImplementation(async (params) => {
       const csvName = params.file?.name ?? "fixture.csv";
@@ -372,5 +381,70 @@ describe("ManualUploadView", () => {
     expect(
       screen.getByRole("button", { name: /replace the uploaded file/i }),
     ).not.toHaveAttribute("data-loading", "true");
+  });
+
+  it("imports a pasted GitHub file link as a dropped file", async () => {
+    requestFileFromUrlMock.mockResolvedValue({
+      outcome: "file",
+      bytes: new Uint8Array([1]),
+      fileName: "Main_Routine_Vaccine_Geo.csv",
+      mediaType: "text/csv",
+      sourceLabel: "GitHub",
+    });
+
+    renderWithProviders(<ManualUploadView />);
+    fireEvent.change(screen.getByLabelText("Or provide a link to a file"), {
+      target: {
+        value:
+          "https://github.com/nychealth/immunization-data/blob/main/geo/Main_Routine_Vaccine_Geo.csv",
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/6 detected/)).toBeInTheDocument();
+    });
+    expect(screen.getByText("Main_Routine_Vaccine_Geo.csv")).toBeInTheDocument();
+    expect(requestFileFromUrlMock).toHaveBeenCalledWith({
+      url: "https://github.com/nychealth/immunization-data/blob/main/geo/Main_Routine_Vaccine_Geo.csv",
+    });
+  });
+
+  it("refuses a Google Sheet link without downloading it", async () => {
+    renderWithProviders(<ManualUploadView />);
+    fireEvent.change(screen.getByLabelText("Or provide a link to a file"), {
+      target: {
+        value: "https://docs.google.com/spreadsheets/d/abc123/edit",
+      },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+
+    expect(
+      await screen.findByText(/Add it from Connectors/),
+    ).toBeInTheDocument();
+    expect(requestFileFromUrlMock).not.toHaveBeenCalled();
+  });
+
+  it("asks which data file to import when a link holds several", async () => {
+    requestFileFromUrlMock.mockResolvedValue({
+      outcome: "choice",
+      sourceLabel: "GitHub",
+      members: [
+        { path: "cases.csv", size: 12, mediaType: "text/csv" },
+        { path: "notes/summary.xlsx", size: 40, mediaType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+      ],
+    });
+
+    renderWithProviders(<ManualUploadView />);
+    fireEvent.change(screen.getByLabelText("Or provide a link to a file"), {
+      target: { value: "https://example.com/reports.zip" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+
+    expect(
+      await screen.findByText("Which file should Avandar import?"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("cases.csv")).toBeInTheDocument();
+    expect(screen.getByText("notes/summary.xlsx")).toBeInTheDocument();
   });
 });
