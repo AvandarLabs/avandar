@@ -9,6 +9,7 @@ import {
   createGridBinLayerFixture,
 } from "../compileMapLayerSpatialQuery/__tests__/compileMapLayerSpatialQuery.fixtures";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 
 const emptyOverlay: CompileOptions["overlay"] = {
@@ -21,6 +22,7 @@ function _makeBufferLayer(
   options: {
     dissolve?: boolean;
     sensitivity?: MapLayer.T["sensitivity"];
+    labelColumn?: QueryColumn.Id;
   } = {},
 ): MapLayer.T {
   return MapLayer.withSensitivity(
@@ -31,7 +33,7 @@ function _makeBufferLayer(
         layerId: source.id,
         distanceMeters: 1000,
         distanceUnit: "m",
-        labelColumn: undefined,
+        labelColumn: options.labelColumn,
         dissolve: options.dissolve ?? false,
       },
     },
@@ -214,5 +216,59 @@ describe("compileBufferOfLayerQuery", () => {
       ]),
     );
     expect(aggregateBufferPlan.rawSql).not.toContain('"latitude"');
+  });
+  it("buffers a latitude and longitude source from its points", () => {
+    const { layer: geometrySource, metadata } = createGeometryLayerFixture();
+    const [latitude, longitude] = geometrySource.source.queryColumns;
+    const latLngSource: MapLayer.T = {
+      ...geometrySource,
+      sensitivity: { mode: "exact" },
+      geoBinding: {
+        type: "latLngColumns",
+        latitude: latitude!.id,
+        longitude: longitude!.id,
+      },
+    };
+    const bufferLayer = _makeBufferLayer(latLngSource);
+    const { rawSql } = compileMapLayerSpatialQuery(
+      _compileOptions(bufferLayer, metadata, [latLngSource, bufferLayer]),
+    );
+
+    expect(rawSql).toContain("source_features_rows AS (");
+    expect(rawSql).toContain('TRY(ST_Point(TRY_CAST("label" AS DOUBLE)');
+    expect(rawSql).toContain("ST_Buffer");
+    expect(DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(rawSql).kind).toBe(
+      "read",
+    );
+  });
+
+  it("labels each ring with the source's label column", () => {
+    const { layer: polygonSource, metadata } = createGeometryLayerFixture();
+    const labelColumn = polygonSource.source.queryColumns[1]!;
+    const bufferLayer = _makeBufferLayer(polygonSource, {
+      labelColumn: labelColumn.id,
+    });
+    const plan = compileMapLayerSpatialQuery(
+      _compileOptions(bufferLayer, metadata, [polygonSource, bufferLayer]),
+    );
+
+    expect(plan.rawSql).toContain(
+      "json_extract_string(properties, '/label') AS label",
+    );
+    expect(plan.rawSql).toContain("json_object('label', label)");
+    expect(plan.sourcePropertyColumnNames).toEqual(["label"]);
+  });
+
+  it("drops ring labels when rings are dissolved", () => {
+    const { layer: polygonSource, metadata } = createGeometryLayerFixture();
+    const bufferLayer = _makeBufferLayer(polygonSource, {
+      dissolve: true,
+      labelColumn: polygonSource.source.queryColumns[1]!.id,
+    });
+    const { rawSql } = compileMapLayerSpatialQuery(
+      _compileOptions(bufferLayer, metadata, [polygonSource, bufferLayer]),
+    );
+
+    expect(rawSql).not.toContain("json_extract_string(properties");
   });
 });
