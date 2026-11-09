@@ -131,6 +131,62 @@ describe("extractGhoDrive", () => {
     ).toEqual([["A", "B"], ["C"]]);
   });
 
+  it("probes a batch's indicators at once, and keeps them in order", async () => {
+    const codes = ["A", "B", "C"];
+    const api = createFakeGhoApi({
+      indicators: codes.map((code) => {
+        return { code, name: `Indicator ${code}` };
+      }),
+    });
+    const indicatorSchemas = await readGhoIndicatorSchemas({
+      http: api.http,
+      baseUrl: FAKE_GHO_BASE_URL,
+    });
+    let numInFlight = 0;
+    let maxInFlight = 0;
+    const http = {
+      ...api.http,
+      get: async (url: string) => {
+        if (!url.includes("$orderby")) {
+          return await api.http.get(url);
+        }
+        numInFlight += 1;
+        maxInFlight = Math.max(maxInFlight, numInFlight);
+        // Later indicators answer first, so order must not come from timing.
+        const delayMs =
+          (codes.length -
+            codes.indexOf(url.split("/").at(-1)!.split("?")[0]!)) *
+          10;
+        await new Promise((resolve) => {
+          setTimeout(resolve, delayMs);
+        });
+        numInFlight -= 1;
+        return await api.http.get(url);
+      },
+    };
+
+    const pages: GhoConnection[][] = [];
+    for await (const page of extractGhoDrive({
+      drive: {
+        baseUrl: FAKE_GHO_BASE_URL,
+        organizationLabels: {},
+        indicatorSchemas,
+        checkedAt: new Date("2026-11-09T06:00:00.000Z"),
+      },
+      scope: { key: "indicators" },
+      http,
+    })) {
+      pages.push([...page]);
+    }
+
+    expect(maxInFlight).toBe(codes.length);
+    expect(
+      pages.flat().map((connection) => {
+        return connection.code;
+      }),
+    ).toEqual(codes);
+  });
+
   it("marks an indicator whose entity type drifted, and warns about it", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 

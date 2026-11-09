@@ -1831,6 +1831,7 @@ to a workspace and joined to country names, without a hardcoded connector.
 | `66be5b816` | feat(pipelines): add the WHO GHO pipeline | All of it. |
 | `93382fb3e` | feat(open-data): throttle freshness checks per listing, and sample OData listings | All of it. |
 | `a72e8a6c7` | test(catalog): add a recommended listing from the notification after adding an indicator | All of it. |
+| (this branch's commit) | perf(pipelines): probe GHO indicators eight at a time | All of it. |
 | `dc5174b7c` | fix(open-data): re-check API-backed listing copies after 15 minutes | Only `openDataFreshnessRecheckAfterMs` in `GlobalAppConfig.ts` (the rest is F29). |
 
 **Files:** `apps/pipeline-server/pipelines/gho/`;
@@ -1866,7 +1867,7 @@ pnpm --filter @avandar/pipeline-server test
 npx vitest run packages/node/etl shared/connectors/open-data supabase/functions/open-data shared/models/data-catalog-listings src/views/DataManagerApp/DataImportView src/lib/openData
 pnpm test:db
 pnpm test:e2e odc-recommended-listings.spec.ts
-ava pipeline run gho --local   # about 55 minutes against the real API
+ava pipeline run gho --local   # about 10 minutes against the real API
 ```
 
 **Follow-ups, not done here:** the deferred items in the spec's section 9

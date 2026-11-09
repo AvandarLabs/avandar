@@ -171,10 +171,15 @@ gho/
 | Indicator probe: `GET /<code>?$orderby=Date desc&$top=1000&$select=Date,SpatialDimType,Dim1Type,Dim2Type,Dim3Type,DataSourceDimType&$count=true` | 3,091 | The row count, the newest `Date` (first row), and which dimension each code column holds in the 1,000 newest rows (section 5) |
 | Dimension probe: `GET /DIMENSION/<code>/DimensionValues` | 202 | The value count and the body hash |
 
-The client runs four requests a second (`withRateLimit({ minTimeMs: 250 })`)
-and retries an HTTP 429 three times with backoff, as HDX's does. A full
-run took 55 minutes on 2026-11-09 (53 for indicators, whose probes return up
-to 1,000 rows each, and 2 for dimensions). It runs weekly (decision 4).
+Each request takes about a second, so the time goes into waiting on GHO,
+not into data volume. The extract sends a batch's 50 probes together, and
+the client runs up to eight at once, started at most eight a second
+(`withRateLimit({ minTimeMs: 125, maxConcurrent: 8 })`). It retries an HTTP
+429 three times with backoff, as HDX's does. Probing one at a time, a full
+run took 55 minutes on 2026-11-09 (53 for indicators and 2 for
+dimensions). With eight at once, 160 real probes took 0.17 s each rather
+than 1.03 s, so a full run takes about 10 minutes. It runs weekly
+(decision 4).
 
 **No incremental runs.** `/Indicator` has no modified time and cannot be
 sorted by one, so there is no checkpoint to resume from. Every run probes

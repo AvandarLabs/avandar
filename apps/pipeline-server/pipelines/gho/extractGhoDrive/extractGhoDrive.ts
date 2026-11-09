@@ -1,4 +1,4 @@
-import { promiseMapSequential } from "@avandar/utils";
+import { promiseMap } from "@avandar/utils";
 import { GhoDimensionIds } from "@pipelines/gho/GhoDimensionIds";
 import { hasGhoFactSchema } from "@pipelines/gho/ghoFactColumns/ghoFactColumns";
 import { match } from "ts-pattern";
@@ -152,6 +152,11 @@ async function _probeOrSkip<TItem>(
   }
 }
 
+/**
+ * Probes each batch's items at once and yields them in their listed order.
+ * The GHO client's rate limiter decides how many requests actually run
+ * together, so a batch never sends more than GHO is asked to take.
+ */
 async function* _probeInBatches<TItem>(
   args: Readonly<{
     items: readonly TItem[];
@@ -162,7 +167,7 @@ async function* _probeInBatches<TItem>(
 ): AsyncGenerator<readonly GhoConnection[]> {
   for (let start = 0; start < args.items.length; start += args.batchSize) {
     const batch = args.items.slice(start, start + args.batchSize);
-    const probed = await promiseMapSequential(batch, (item) => {
+    const probed = await promiseMap(batch, (item) => {
       return _probeOrSkip(item, {
         code: args.getCode(item),
         probe: args.probe,
@@ -213,7 +218,10 @@ async function* _extractDimensions(
 }
 
 /**
- * Lists one GHO scope and probes each of its items, one page per batch.
+ * Lists one GHO scope and probes each of its items, one page per batch. A
+ * batch's probes are sent together, so a run is not one request after
+ * another: each takes about a second, and the GHO client runs up to eight
+ * at once.
  *
  * The `indicators` scope reads `GET /Indicator`, then probes each indicator
  * for its row count and its 1,000 newest rows' `Date` and dimension type
