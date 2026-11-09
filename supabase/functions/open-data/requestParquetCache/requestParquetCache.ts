@@ -1,3 +1,4 @@
+import { GlobalAppConfig } from "$/config/GlobalAppConfig.ts";
 import { buildParquetCachePartPaths } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 
@@ -14,6 +15,8 @@ export type ParquetCacheListingState = Pick<
   | "parquetCacheSourceVersion"
   | "parquetCacheRowCount"
   | "parquetCacheByteSize"
+  | "parquetCacheCheckedAt"
+  | "parquetCacheCheckedSourceVersion"
 >;
 
 /** What a copy request answers. */
@@ -47,6 +50,12 @@ export type ParquetCacheDependencies = Readonly<{
   startBuild: (buildId: string) => Promise<void>;
   /** Records that a claimed build could not be started. */
   recordStartFailure: (buildId: string, failureCode: string) => Promise<void>;
+  /**
+   * Records a freshness token just read from the source, so requests in the
+   * next few minutes reuse it instead of reading the source again.
+   */
+  recordFreshnessCheck: (sourceVersion: string) => Promise<void>;
+  /** The current time, injected so tests can decide where the clock is. */
   now: () => Date;
 }>;
 
@@ -96,16 +105,61 @@ function _canRetryFailedBuild(
   );
 }
 
+/**
+ * The token a check under `openDataFreshnessRecheckAfterMs` ago read, or
+ * `undefined` when the source must be read again.
+ */
+function _readRecentCheckToken(
+  listing: ParquetCacheListingState,
+  now: Date,
+): string | undefined {
+  const checkedAt = listing.parquetCacheCheckedAt;
+  if (checkedAt === undefined) {
+    return undefined;
+  }
+  const checkAgeMs = now.getTime() - new Date(checkedAt).getTime();
+  return checkAgeMs < GlobalAppConfig.timing.openDataFreshnessRecheckAfterMs
+    ? listing.parquetCacheCheckedSourceVersion
+    : undefined;
+}
+
+/** Records a check, logging rather than failing when it cannot be written. */
+async function _recordFreshnessCheck(
+  token: string,
+  deps: ParquetCacheDependencies,
+): Promise<void> {
+  try {
+    await deps.recordFreshnessCheck(token);
+  } catch (error) {
+    console.error("Could not record an open data freshness check", error);
+  }
+}
+
+/**
+ * Whether the copy's source has changed since it was built. A recent check's
+ * token is reused. Otherwise the source is read and the token recorded. A
+ * read that fails calls the copy current and records nothing, so the next
+ * request reads again.
+ */
 async function _isCopyStale(
   listing: ParquetCacheListingState,
   deps: ParquetCacheDependencies,
 ): Promise<boolean> {
+  const recentToken = _readRecentCheckToken(listing, deps.now());
+  if (recentToken !== undefined) {
+    return recentToken !== listing.parquetCacheSourceVersion;
+  }
+  let token: string | undefined;
   try {
-    const token = await deps.readFreshnessToken();
-    return token !== undefined && token !== listing.parquetCacheSourceVersion;
+    token = await deps.readFreshnessToken();
   } catch {
     return false;
   }
+  if (token === undefined) {
+    return false;
+  }
+  await _recordFreshnessCheck(token, deps);
+  return token !== listing.parquetCacheSourceVersion;
 }
 
 /** Serves an existing copy, asking for a rebuild when it needs one. */
@@ -164,14 +218,18 @@ async function _answerWithoutCopy(
  * and asks for a build when one is needed. An existing copy is always
  * served, even while it is rebuilt: an old copy now is better than a correct
  * one in ten minutes. A copy is rebuilt when its source's freshness token has
- * moved, and a build that has run too long is claimed again (the claim RPC
- * decides when a running build counts as lost). A failed build is retried at
+ * moved. The source is read at most once per
+ * `openDataFreshnessRecheckAfterMs` for each listing, and requests in
+ * between reuse the token that read recorded. A build that has run too long
+ * is claimed again (the claim RPC decides when a running build counts as
+ * lost). A failed build is retried at
  * most every 15 minutes, and never for a listing that is invalid or cannot be
  * copied. A build whose start fails releases its claim, so the next request
  * can try again.
  *
  * @param args.listing The listing, as the caller may see it.
- * @param args.deps The freshness read, the claim, and the build start.
+ * @param args.deps The freshness read and its record, the claim, the build
+ *   start, and the clock.
  * @returns What to answer.
  */
 export async function requestParquetCache(

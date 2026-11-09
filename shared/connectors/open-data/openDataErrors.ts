@@ -94,7 +94,13 @@ export type OpenDataAcquisitionFailure =
    * The listing's freshness probe could not produce a token: its URL is not
    * allowed, or the source's answer does not fit it.
    */
-  | { code: "freshness-probe-invalid"; problem: FreshnessProbeProblem };
+  | { code: "freshness-probe-invalid"; problem: FreshnessProbeProblem }
+  /** The OData request failed before it answered with rows. */
+  | { code: "odata-unreachable"; apiResourceId: string }
+  /** The OData answer has no `value` array of row objects. */
+  | { code: "odata-response-invalid"; apiResourceId: string }
+  /** The OData resource answered with no rows. */
+  | { code: "odata-empty"; apiResourceId: string };
 
 /** Machine-readable reason an open data acquisition was refused. */
 export type OpenDataAcquisitionFailureCode = OpenDataAcquisitionFailure["code"];
@@ -133,6 +139,12 @@ function _buildFailureMessage(failure: OpenDataAcquisitionFailure): string {
       return `Socrata dataset '${failure.socrataDatasetId}' could not be read.`;
     case "freshness-probe-invalid":
       return `The listing's freshness probe could not produce a token: ${failure.problem}.`;
+    case "odata-unreachable":
+      return `OData resource '${failure.apiResourceId}' could not be read.`;
+    case "odata-response-invalid":
+      return `OData resource '${failure.apiResourceId}' did not answer with a 'value' array of rows.`;
+    case "odata-empty":
+      return `OData resource '${failure.apiResourceId}' has no rows.`;
   }
 }
 

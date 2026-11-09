@@ -22,6 +22,9 @@ const ALL_CODES: readonly OpenDataAcquisitionFailureCode[] = [
   "ckan-unreachable",
   "access-shape-invalid",
   "freshness-probe-invalid",
+  "odata-unreachable",
+  "odata-response-invalid",
+  "odata-empty",
 ];
 
 describe("statusFromOpenDataFailure", () => {
@@ -39,6 +42,9 @@ describe("statusFromOpenDataFailure", () => {
     ["resource-host-mismatch", 409],
     ["access-shape-invalid", 409],
     ["freshness-probe-invalid", 409],
+    ["odata-unreachable", 502],
+    ["odata-response-invalid", 502],
+    ["odata-empty", 409],
   ] as const)("maps %s to %i", (code, status) => {
     expect(statusFromOpenDataFailure(code)).toBe(status);
   });

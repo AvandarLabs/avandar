@@ -2,7 +2,7 @@ import {
   parquetCacheAnswerToStatus,
   requestParquetCache,
 } from "@sbfn/open-data/requestParquetCache/requestParquetCache.ts";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
   ParquetCacheDependencies,
   ParquetCacheListingState,
@@ -22,6 +22,8 @@ const NO_COPY: ParquetCacheListingState = {
   parquetCacheSourceVersion: undefined,
   parquetCacheRowCount: undefined,
   parquetCacheByteSize: undefined,
+  parquetCacheCheckedAt: undefined,
+  parquetCacheCheckedSourceVersion: undefined,
 };
 
 const READY: ParquetCacheListingState = {
@@ -52,6 +54,7 @@ function _deps(
     claimBuild: vi.fn().mockResolvedValue("new-build"),
     startBuild: vi.fn().mockResolvedValue(undefined),
     recordStartFailure: vi.fn().mockResolvedValue(undefined),
+    recordFreshnessCheck: vi.fn().mockResolvedValue(undefined),
     now: () => {
       return NOW;
     },
@@ -78,7 +81,7 @@ describe("requestParquetCache", () => {
     expect(deps.startBuild).toHaveBeenCalledWith("new-build");
   });
 
-  it("serves the copy when the source's freshness cannot be read", async () => {
+  it("serves the copy as current, and records nothing, when the source's freshness cannot be read", async () => {
     const deps = _deps({
       readFreshnessToken: vi.fn().mockRejectedValue(new Error("down")),
     });
@@ -87,6 +90,7 @@ describe("requestParquetCache", () => {
       requestParquetCache({ listing: READY, deps }),
     ).resolves.toMatchObject({ status: "ready", isStale: false });
     expect(deps.claimBuild).not.toHaveBeenCalled();
+    expect(deps.recordFreshnessCheck).not.toHaveBeenCalled();
   });
 
   it("claims and starts a build for a listing with no copy", async () => {
@@ -223,6 +227,94 @@ describe("requestParquetCache", () => {
       requestParquetCache({ listing: READY, deps }),
     ).resolves.toMatchObject({ status: "ready", isStale: true });
     expect(deps.claimBuild).not.toHaveBeenCalled();
+  });
+});
+
+describe("requestParquetCache's throttled freshness checks", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** A copy whose source was last checked at `checkedAt`, reading `token`. */
+  function _checkedCopy(
+    checkedAt: string,
+    token: string,
+  ): ParquetCacheListingState {
+    return {
+      ...READY,
+      parquetCacheCheckedAt: checkedAt,
+      parquetCacheCheckedSourceVersion: token,
+    };
+  }
+
+  it("reuses a check made under 15 minutes ago without reading the source", async () => {
+    const deps = _deps({ readFreshnessToken: vi.fn().mockResolvedValue("v2") });
+
+    await expect(
+      requestParquetCache({
+        listing: _checkedCopy("2026-11-09T11:50:00.000Z", "v1"),
+        deps,
+      }),
+    ).resolves.toEqual({ ...READY_ANSWER, isStale: false });
+    expect(deps.readFreshnessToken).not.toHaveBeenCalled();
+    expect(deps.recordFreshnessCheck).not.toHaveBeenCalled();
+    expect(deps.claimBuild).not.toHaveBeenCalled();
+  });
+
+  it("calls a copy stale, and asks for a rebuild, when the recent check read another token", async () => {
+    const deps = _deps();
+
+    await expect(
+      requestParquetCache({
+        listing: _checkedCopy("2026-11-09T11:50:00.000Z", "v2"),
+        deps,
+      }),
+    ).resolves.toEqual({ ...READY_ANSWER, isStale: true });
+    expect(deps.readFreshnessToken).not.toHaveBeenCalled();
+    expect(deps.startBuild).toHaveBeenCalledWith("new-build");
+  });
+
+  it.each([
+    ["was never checked", undefined],
+    ["was checked exactly 15 minutes ago", "2026-11-09T11:45:00.000Z"],
+    ["was checked over 15 minutes ago", "2026-11-09T11:30:00.000Z"],
+  ])(
+    "reads the source and records the token when the copy %s",
+    async (_label, checkedAt) => {
+      const deps = _deps({
+        readFreshnessToken: vi.fn().mockResolvedValue("v2"),
+      });
+
+      await expect(
+        requestParquetCache({
+          listing: {
+            ...READY,
+            parquetCacheCheckedAt: checkedAt,
+            parquetCacheCheckedSourceVersion:
+              checkedAt === undefined ? undefined : "v1",
+          },
+          deps,
+        }),
+      ).resolves.toEqual({ ...READY_ANSWER, isStale: true });
+      expect(deps.readFreshnessToken).toHaveBeenCalledTimes(1);
+      expect(deps.recordFreshnessCheck).toHaveBeenCalledWith("v2");
+      expect(deps.startBuild).toHaveBeenCalledWith("new-build");
+    },
+  );
+
+  it("still answers when the check cannot be recorded", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {
+      return undefined;
+    });
+    const deps = _deps({
+      recordFreshnessCheck: vi.fn().mockRejectedValue(new Error("db down")),
+    });
+
+    await expect(
+      requestParquetCache({ listing: READY, deps }),
+    ).resolves.toEqual({ ...READY_ANSWER, isStale: false });
+    expect(deps.recordFreshnessCheck).toHaveBeenCalledWith("v1");
+    expect(consoleError).toHaveBeenCalled();
   });
 });
 

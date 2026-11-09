@@ -10,7 +10,8 @@ import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCata
  * failure (`ckan-unreachable`, `ckan-action-failed`) is its outage, not the
  * dataset's. Socrata serves a dataset's metadata and rows from the same
  * portal, so `socrata-unreachable` cannot tell a portal outage from a dead
- * dataset and leaves the listing valid.
+ * dataset and leaves the listing valid. An OData request that fails, or
+ * answers with no rows array, is the same: one host serves both.
  *
  * @param failure - Why the read failed.
  * @returns The reason to mark the listing invalid with, if any.
@@ -20,6 +21,7 @@ export function failureToInvalidDatasetReason(
 ): DataCatalogListing.InvalidDatasetReason | undefined {
   switch (failure.code) {
     case "resource-empty":
+    case "odata-empty":
       return "empty_dataset";
     case "resource-not-found":
       return "dataset_not_found";
@@ -41,6 +43,8 @@ export function failureToInvalidDatasetReason(
     case "resource-too-large":
     case "access-shape-invalid":
     case "freshness-probe-invalid":
+    case "odata-unreachable":
+    case "odata-response-invalid":
       return undefined;
   }
 }

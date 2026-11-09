@@ -61,6 +61,10 @@ function _entry(
     parquetCacheBuiltAt: undefined,
     parquetCacheRowCount: undefined,
     parquetCacheByteSize: undefined,
+    parquetCacheCheckedAt: undefined,
+    parquetCacheCheckedSourceVersion: undefined,
+    companionListings: [],
+    apiFreshnessProbe: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
@@ -141,6 +145,44 @@ function _socrataHttp(options: { rowsUpdatedAt?: number } = {}): OpenDataHttp {
   } as unknown as OpenDataHttp;
 }
 
+const GHO_BASE_URL = "https://ghoapi.azureedge.net/api";
+const GHO_INDICATOR = "WHS3_62";
+const GHO_PROBE_URL = `${GHO_BASE_URL}/${GHO_INDICATOR}?$top=1&$select=Date&$count=true`;
+
+function _odataEntry(
+  overrides: Partial<DataCatalogListing.T> = {},
+): DataCatalogListing.T {
+  return _entry({
+    apiService: "odata",
+    apiBaseUrl: GHO_BASE_URL,
+    externalDatasetId: "gho",
+    apiResourceId: GHO_INDICATOR,
+    apiResourceFormat: "ODATA",
+    apiFreshnessProbe: {
+      url: GHO_PROBE_URL,
+      token: {
+        kind: "json-paths",
+        paths: [["value", 0, "Date"], ["@odata.count"]],
+      },
+    },
+    ...overrides,
+  });
+}
+
+/** An HttpClient that answers a probe's GET with this JSON body. */
+function _probeHttp(body: unknown): OpenDataHttp {
+  return {
+    get: vi.fn(async () => {
+      throw new Error("a probe is read as bytes, never through get");
+    }),
+    getBytes: vi.fn(async () => {
+      return new TextEncoder().encode(
+        JSON.stringify(body),
+      ) as Uint8Array<ArrayBuffer>;
+    }),
+  };
+}
+
 async function _failureCode(
   run: () => Promise<unknown>,
 ): Promise<OpenDataAcquisitionFailureCode> {
@@ -188,6 +230,52 @@ describe("readOpenDataFreshnessToken", () => {
     });
 
     expect(token).toBe("socrata:rowsUpdatedAt:1792114673");
+    expect(http.getBytes).not.toHaveBeenCalled();
+  });
+
+  it("reads an OData listing's token from its own freshness probe", async () => {
+    const http = _probeHttp({
+      "@odata.count": 9640,
+      value: [{ Date: "2026-03-01T10:00:00+01:00" }],
+    });
+
+    const token = await readOpenDataFreshnessToken({
+      entry: _odataEntry(),
+      http,
+    });
+
+    expect(token).toBe("2026-03-01T10:00:00+01:00|9640");
+    expect(http.getBytes).toHaveBeenCalledWith(GHO_PROBE_URL);
+  });
+
+  it("uses a listing's probe whatever its API service", async () => {
+    const http = _probeHttp({ "@odata.count": 12 });
+
+    const token = await readOpenDataFreshnessToken({
+      entry: _entry({
+        apiFreshnessProbe: {
+          url: `${BASE_URL}/api/3/action/package_show?id=${DATASET_ID}`,
+          token: { kind: "json-paths", paths: [["@odata.count"]] },
+        },
+      }),
+      http,
+    });
+
+    expect(token).toBe("12");
+    expect(http.get).not.toHaveBeenCalled();
+  });
+
+  it("refuses an OData listing with no freshness probe", async () => {
+    const http = _probeHttp({});
+
+    expect(
+      await _failureCode(() => {
+        return readOpenDataFreshnessToken({
+          entry: _odataEntry({ apiFreshnessProbe: undefined }),
+          http,
+        });
+      }),
+    ).toBe("access-shape-invalid");
     expect(http.getBytes).not.toHaveBeenCalled();
   });
 

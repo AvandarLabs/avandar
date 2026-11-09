@@ -43,6 +43,27 @@ const MAX_FRESHNESS_RESPONSE_BYTES = 10 * 1024 * 1024;
 const LOST_BUILD_AFTER = "30 minutes";
 
 /**
+ * Records a freshness token the `parquet-cache` route just read from a
+ * listing's source, so its requests in the next few minutes reuse it. Written
+ * with the admin client, since only the service role may record a check.
+ */
+async function _recordFreshnessCheck(
+  catalogListingId: string,
+  sourceVersion: string,
+): Promise<void> {
+  const { error } = await SupabaseAdmin.rpc(
+    "rpc_data_catalog_listings__record_freshness_check",
+    {
+      p_catalog_listing_id: catalogListingId,
+      p_source_version: sourceVersion,
+    },
+  );
+  if (error) {
+    throw error;
+  }
+}
+
+/**
  * Wires a copy request to its listing's freshness check, the build claim,
  * and the pipeline server. Claims and failures are written with the admin
  * client, after the caller's own read showed they may see the listing.
@@ -96,6 +117,9 @@ function _createParquetCacheDependencies(
       if (error) {
         throw error;
       }
+    },
+    recordFreshnessCheck: (sourceVersion) => {
+      return _recordFreshnessCheck(entry.id, sourceVersion);
     },
     now: () => {
       return new Date();

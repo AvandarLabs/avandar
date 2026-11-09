@@ -66,6 +66,10 @@ function _entry(
     parquetCacheBuiltAt: undefined,
     parquetCacheRowCount: undefined,
     parquetCacheByteSize: undefined,
+    parquetCacheCheckedAt: undefined,
+    parquetCacheCheckedSourceVersion: undefined,
+    companionListings: [],
+    apiFreshnessProbe: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
@@ -132,6 +136,28 @@ function _statusError(status: number): HttpClientError {
 }
 
 const NETWORK_ERROR = new HttpClientError({ kind: "network", method: "GET" });
+
+const GHO_BASE_URL = "https://ghoapi.azureedge.net/api";
+
+function _odataEntry(apiResourceId = "WHS3_62"): DataCatalogListing.T {
+  return _entry({
+    apiService: "odata",
+    apiBaseUrl: GHO_BASE_URL,
+    externalDatasetId: "gho",
+    apiResourceId,
+    apiResourceFormat: "ODATA",
+  });
+}
+
+/** An HttpClient that answers an OData request with this JSON body. */
+function _odataHttp(body: unknown): OpenDataHttp {
+  return {
+    get: vi.fn(async () => {
+      return body;
+    }),
+    getBytes: vi.fn(),
+  };
+}
 
 /** The failure code a sample attempt rejected with. */
 async function _readFailureCode(
@@ -226,6 +252,106 @@ describe("acquireOpenDataColumnTypeSample", () => {
       `https://data.cityofnewyork.us/resource/erm2-nwe9.csv?%24limit=${COLUMN_TYPE_SAMPLE_MAX_ROWS}`,
     );
   });
+
+  it("writes an OData listing's first rows as CSV, with every column any row has", async () => {
+    const http = _odataHttp({
+      "@odata.context": `${GHO_BASE_URL}/$metadata#WHS3_62`,
+      value: [
+        { Id: 1, SpatialDim: "KEN", NumericValue: 1.5, Comments: null },
+        { Id: 2, SpatialDim: "UGA", Comments: "a, b", Extra: true },
+      ],
+    });
+
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _odataEntry(),
+      http,
+      readByteRange: _readByteRange(""),
+    });
+
+    expect(new TextDecoder().decode(sample.bytes)).toBe(
+      'Id,SpatialDim,NumericValue,Comments,Extra\n1,KEN,1.5,,\n2,UGA,,"a, b",true\n',
+    );
+  });
+
+  it.each([
+    ["an indicator", "WHS3_62", `${GHO_BASE_URL}/WHS3_62?$top=200`],
+    [
+      "a dimension's value list",
+      "DIMENSION/COUNTRY/DimensionValues",
+      `${GHO_BASE_URL}/DIMENSION/COUNTRY/DimensionValues?$top=200`,
+    ],
+    ["a code with a space", "A B", `${GHO_BASE_URL}/A%20B?$top=200`],
+  ])(
+    "asks OData for the first 200 rows of %s",
+    async (_label, apiResourceId, expectedUrl) => {
+      const http = _odataHttp({ value: [{ Code: "KEN" }] });
+
+      await acquireOpenDataColumnTypeSample({
+        entry: _odataEntry(apiResourceId),
+        http,
+        readByteRange: _readByteRange(""),
+      });
+
+      expect(http.get).toHaveBeenCalledWith(expectedUrl);
+    },
+  );
+
+  it("cuts an OData sample that fills the byte limit back to its last whole row", async () => {
+    const rowCount = 200;
+    const value = Array.from({ length: rowCount }, (_unused, index) => {
+      return { Id: index, Text: "x".repeat(30_000) };
+    });
+
+    const sample = await acquireOpenDataColumnTypeSample({
+      entry: _odataEntry(),
+      http: _odataHttp({ value }),
+      readByteRange: _readByteRange(""),
+    });
+
+    const text = new TextDecoder().decode(sample.bytes);
+    const lines = text.split("\n").slice(0, -1);
+    expect(sample.bytes.byteLength).toBeLessThanOrEqual(
+      COLUMN_TYPE_SAMPLE_MAX_BYTES,
+    );
+    expect(text.endsWith("\n")).toBe(true);
+    expect(lines.length).toBeGreaterThan(1);
+    expect(lines.length).toBeLessThan(rowCount + 1);
+    expect(lines.at(-1)).toBe(`${lines.length - 2},${"x".repeat(30_000)}`);
+  });
+
+  it.each([
+    ["a request that fails", "odata-unreachable", NETWORK_ERROR],
+    ["a body with no value array", "odata-response-invalid", { error: "x" }],
+    [
+      "a value array that holds no row objects",
+      "odata-response-invalid",
+      { value: [1, 2] },
+    ],
+    ["no rows", "odata-empty", { value: [] }],
+  ])(
+    "reports an OData listing with %s as %s",
+    async (_label, expectedCode, answer) => {
+      const http: OpenDataHttp = {
+        get: vi.fn(async () => {
+          if (answer instanceof Error) {
+            throw answer;
+          }
+          return answer;
+        }),
+        getBytes: vi.fn(),
+      };
+
+      const code = await _readFailureCode(
+        acquireOpenDataColumnTypeSample({
+          entry: _odataEntry(),
+          http,
+          readByteRange: _readByteRange(""),
+        }),
+      );
+
+      expect(code).toBe(expectedCode);
+    },
+  );
 
   it("refuses a pipeline Parquet listing", async () => {
     await expect(

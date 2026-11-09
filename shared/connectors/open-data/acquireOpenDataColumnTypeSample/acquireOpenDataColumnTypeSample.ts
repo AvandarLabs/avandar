@@ -1,4 +1,6 @@
+import { isPlainObject } from "@avandar/utils";
 import { match } from "ts-pattern";
+import { buildCsvFromDatastoreRecords } from "$/connectors/open-data/buildCsvFromDatastoreRecords.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
@@ -7,6 +9,7 @@ import { createSocrataClient } from "$/connectors/open-data/SocrataClient/Socrat
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
 import type {
+  CkanDatastoreField,
   CkanPackage,
   OpenDataHttp,
 } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
@@ -15,7 +18,10 @@ import type { OpenDataApiAccessFor } from "$/connectors/open-data/OpenDataApiAcc
 /** Rows of a Socrata dataset a sample holds. */
 export const COLUMN_TYPE_SAMPLE_MAX_ROWS = 10_000;
 
-/** Bytes of a CKAN file a sample holds. */
+/** Rows of an OData resource a sample holds. */
+export const ODATA_COLUMN_TYPE_SAMPLE_MAX_ROWS = 200;
+
+/** Bytes of a CKAN file, or of an OData sample's CSV, a sample holds. */
 export const COLUMN_TYPE_SAMPLE_MAX_BYTES = 5 * 1024 * 1024;
 
 /** HTTP statuses saying the dataset or file no longer exists. */
@@ -204,20 +210,104 @@ async function _sampleCkanResource(args: {
 }
 
 /**
+ * The URL of an OData resource's first rows. Each path segment is encoded on
+ * its own, so a resource such as `DIMENSION/COUNTRY/DimensionValues` keeps
+ * its slashes. `$top` is an OData query option, so it stays literal.
+ */
+function _buildODataSampleUrl(
+  access: Readonly<OpenDataApiAccessFor<"odata">>,
+): string {
+  const root = access.apiBaseUrl.replace(/\/+$/, "");
+  const resourcePath = access.apiResourceId
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/");
+  return `${root}/${resourcePath}?$top=${ODATA_COLUMN_TYPE_SAMPLE_MAX_ROWS}`;
+}
+
+/** Reads an OData resource's first rows, from its answer's `value` array. */
+async function _getODataRows(args: {
+  access: Readonly<OpenDataApiAccessFor<"odata">>;
+  http: Readonly<OpenDataHttp>;
+}): Promise<ReadonlyArray<Readonly<Record<string, unknown>>>> {
+  const { apiResourceId } = args.access;
+  let body: unknown;
+  try {
+    body = await args.http.get(_buildODataSampleUrl(args.access));
+  } catch (cause) {
+    throw new OpenDataAcquisitionFailed(
+      { code: "odata-unreachable", apiResourceId },
+      cause,
+    );
+  }
+  const rows: unknown = isPlainObject(body) ? body["value"] : undefined;
+  if (!Array.isArray(rows) || !rows.every(isPlainObject)) {
+    throw new OpenDataAcquisitionFailed({
+      code: "odata-response-invalid",
+      apiResourceId,
+    });
+  }
+  if (rows.length === 0) {
+    throw new OpenDataAcquisitionFailed({ code: "odata-empty", apiResourceId });
+  }
+  return rows;
+}
+
+/**
+ * Every key any row holds, in the order they first appear. OData leaves a
+ * null value out of a row, so no single row is sure to name every column.
+ */
+function _readODataFields(
+  rows: ReadonlyArray<Readonly<Record<string, unknown>>>,
+): CkanDatastoreField[] {
+  const columnNames = new Set(
+    rows.flatMap((row) => {
+      return Object.keys(row);
+    }),
+  );
+  return Array.from(columnNames, (columnName) => {
+    return { id: columnName, type: undefined };
+  });
+}
+
+/**
+ * Writes an OData resource's first rows as CSV. A sample that fills the byte
+ * limit is cut back to its last whole row, as a CKAN file's is.
+ */
+async function _sampleODataResource(args: {
+  access: Readonly<OpenDataApiAccessFor<"odata">>;
+  http: Readonly<OpenDataHttp>;
+}): Promise<Uint8Array> {
+  const rows = await _getODataRows(args);
+  const csvText = buildCsvFromDatastoreRecords({
+    fields: _readODataFields(rows),
+    records: rows,
+  });
+  const bytes = new TextEncoder().encode(csvText);
+  return _trimToLastCompleteLine({
+    bytes: bytes.subarray(0, COLUMN_TYPE_SAMPLE_MAX_BYTES),
+    maxBytes: COLUMN_TYPE_SAMPLE_MAX_BYTES,
+  });
+}
+
+/**
  * Reads a sample of an API-backed catalog listing's real data, to infer its
  * column types from: the first `COLUMN_TYPE_SAMPLE_MAX_ROWS` rows of a
- * Socrata dataset's CSV export, or the first `COLUMN_TYPE_SAMPLE_MAX_BYTES`
- * of a CKAN CSV file, cut back to a complete line. A CKAN resource is found
- * and host-checked by `getCkanResourceFromPackage`.
+ * Socrata dataset's CSV export, the first `COLUMN_TYPE_SAMPLE_MAX_BYTES`
+ * of a CKAN CSV file, cut back to a complete line, or the first
+ * `ODATA_COLUMN_TYPE_SAMPLE_MAX_ROWS` rows of an OData resource written as
+ * CSV. A CKAN resource is found and host-checked by
+ * `getCkanResourceFromPackage`.
  *
  * @param params.entry - The listing.
- * @param params.http - Reads CKAN metadata and Socrata exports.
+ * @param params.http - Reads CKAN metadata, Socrata exports, and OData rows.
  * @param params.readByteRange - Reads the start of a CKAN file.
  * @returns The sample's raw bytes.
  * @throws `OpenDataAcquisitionFailed` when the listing is not API-backed, or
  *   names a CKAN resource that is not a CSV or cannot be read. Its code says
  *   whether the CKAN API failed (`ckan-unreachable`) or the resource did
- *   (`resource-empty`, `resource-unreachable`, and the rest).
+ *   (`resource-empty`, `resource-unreachable`, and the rest). An OData
+ *   resource that cannot be read fails with an `odata-*` code.
  */
 export async function acquireOpenDataColumnTypeSample(params: {
   entry: Readonly<DataCatalogListing.T>;
@@ -242,6 +332,9 @@ export async function acquireOpenDataColumnTypeSample(params: {
         maxRows: COLUMN_TYPE_SAMPLE_MAX_ROWS,
       });
       return new TextEncoder().encode(csvText);
+    })
+    .with({ apiService: "odata" }, (odataAccess) => {
+      return _sampleODataResource({ http: params.http, access: odataAccess });
     })
     .exhaustive();
   return { bytes };
