@@ -1299,7 +1299,7 @@ msgstr "Chapisha hadharani"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Choose a column"
-msgstr ""
+msgstr "Chagua safu"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -2775,7 +2775,7 @@ msgstr "Mwili"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Add a dataset"
-msgstr ""
+msgstr "Ongeza dataset"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -3509,6 +3509,7 @@ msgstr "Kuu"
 msgid "Unable to publish dashboard"
 msgstr "Imeshindikana kuchapisha dashibodi"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
 msgstr "Pima"
@@ -3764,11 +3765,11 @@ msgstr "Kagua zinazolingana"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Dataset {datasetName}"
-msgstr ""
+msgstr "Dataset {datasetName}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset"
-msgstr ""
+msgstr "Chagua dataset"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
@@ -4542,7 +4543,7 @@ msgstr "Weka vipimo kama vilivyopatikana"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
-msgstr ""
+msgstr "Ongeza sehemu"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -6503,7 +6504,7 @@ msgstr "Tuambie kuhusu mahali ambapo data ya {singularConceptName} inapaswa "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset to join"
-msgstr ""
+msgstr "Chagua dataset ya kuunganisha"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -7596,7 +7597,7 @@ msgstr "Jina la dataset linapaswa kuwa na angalau herufi 2."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "No datasets"
-msgstr ""
+msgstr "Hakuna dataset"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
@@ -9926,6 +9927,7 @@ msgid "Dataset columns"
 msgstr "Safu za seti za data"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
 msgstr "Maelezo"
 
@@ -10746,7 +10748,7 @@ msgstr "{0, plural, one {# hifadhidata iliyohifadhiwa inapatikana} other {# "
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field from {datasetName}"
-msgstr ""
+msgstr "Ongeza sehemu kutoka {datasetName}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -11041,6 +11043,7 @@ msgstr "Isiyoonekana sana"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
 msgstr "Shughuli"
 

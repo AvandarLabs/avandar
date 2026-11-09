@@ -1305,7 +1305,7 @@ msgstr "Publicar publicamente"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Choose a column"
-msgstr ""
+msgstr "Escolha uma coluna"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -2779,7 +2779,7 @@ msgstr "Corpo"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Add a dataset"
-msgstr ""
+msgstr "Adicionar um conjunto de dados"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
@@ -3511,6 +3511,7 @@ msgstr "Principal"
 msgid "Unable to publish dashboard"
 msgstr "Não foi possível publicar o dashboard"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
 msgstr "Medir"
@@ -3768,11 +3769,11 @@ msgstr "Revisar correspondências"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Dataset {datasetName}"
-msgstr ""
+msgstr "Conjunto de dados {datasetName}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset"
-msgstr ""
+msgstr "Escolha um conjunto de dados"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
@@ -4547,7 +4548,7 @@ msgstr "Manter as medições como encontradas"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field"
-msgstr ""
+msgstr "Adicionar um campo"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -6508,7 +6509,7 @@ msgstr "Conte-nos de onde os dados do {singularConceptName} devem vir..."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset to join"
-msgstr ""
+msgstr "Escolha um conjunto de dados para combinar"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -7605,7 +7606,7 @@ msgstr "O nome do conjunto de dados deve ter pelo menos 2 caracteres."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "No datasets"
-msgstr ""
+msgstr "Nenhum conjunto de dados"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
@@ -9943,6 +9944,7 @@ msgid "Dataset columns"
 msgstr "Colunas do conjunto de dados"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
 msgstr "Detalhes"
 
@@ -10765,7 +10767,7 @@ msgstr "{0, plural, one {# banco de dados salvo disponível} other {# bancos de 
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Add a field from {datasetName}"
-msgstr ""
+msgstr "Adicionar um campo de {datasetName}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -11060,6 +11062,7 @@ msgstr "Sutil"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
 msgstr "Atividade"
 
