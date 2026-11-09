@@ -7,6 +7,10 @@ import {
   EMPTY_DISPUTED_STATUS_VALUES,
 } from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
 import {
+  getGraduatedClassCount,
+  resampleColorRamp,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/graduatedColorHelpers.ts";
+import {
   QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import {
@@ -125,6 +129,12 @@ export const MapLayerModule = {
 
   /** True when no value appears in both the disputed and undetermined lists. */
   areDisputedStatusValuesDisjoint,
+
+  /** Resamples a color ramp to one evenly spaced color per class. */
+  resampleColorRamp,
+
+  /** How many classes a graduated classification asks for. */
+  getGraduatedClassCount,
 
   /**
    * A new, unbound layer: visible, exact, drawn as a flat circle, with no
