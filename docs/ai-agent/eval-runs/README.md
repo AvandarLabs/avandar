@@ -112,3 +112,14 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T04-39-55](2026-11-09T04-39-55-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 2/2 | 0 | 0 | $0.00036 | 3.6 s / 3.6 s | none |
 | [2026-11-09T04-40-01](2026-11-09T04-40-01-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 1/2 | 0 | 0 | $0.00039 | 3.7 s / 3.7 s | H06 |
 | [2026-11-09T04-40-06](2026-11-09T04-40-06-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 2/2 | 0 | 0 | $0.00032 | 3.2 s / 3.2 s | none |
+| [2026-11-09T04-58-02](2026-11-09T04-58-02-phase-1a-redaction-review2_agent-page/results.jsonl) | `phase-1a-redaction-review2:agent-page` | 6/7 | 0 | 1 | $0.00034 | 1.9 s / 2.1 s | P04 |
+| [2026-11-09T04-58-42](2026-11-09T04-58-42-phase-1a-redaction-review2_agent-45/results.jsonl) | `phase-1a-redaction-review2:agent-45` | 43/45 | 0 | 0 | $0.00062 | 2.1 s / 3.3 s | N02 N04 |
+| [2026-11-09T04-59-12](2026-11-09T04-59-12-phase-1a-redaction-review2_rerun/results.jsonl) | `phase-1a-redaction-review2:rerun` | 2/3 | 0 | 2 | $0.00018 | 2.1 s / 2.3 s | P04 |
+| [2026-11-09T04-59-17](2026-11-09T04-59-17-phase-1a-redaction-review2_rerun/results.jsonl) | `phase-1a-redaction-review2:rerun` | 2/3 | 0 | 0 | $0.00026 | 3.1 s / 3.5 s | N04 |
+| [2026-11-09T04-59-22](2026-11-09T04-59-22-phase-1a-redaction-review2_rerun/results.jsonl) | `phase-1a-redaction-review2:rerun` | 1/3 | 0 | 2 | $0.00019 | 2.3 s / 2.7 s | N04 P04 |
+| [2026-11-09T04-59-49](2026-11-09T04-59-49-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00049 | 3.0 s / 3.0 s | none |
+| [2026-11-09T04-59-55](2026-11-09T04-59-55-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00024 | 2.8 s / 2.8 s | none |
+| [2026-11-09T05-00-00](2026-11-09T05-00-00-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00023 | 2.9 s / 2.9 s | none |
+| [2026-11-09T05-00-05](2026-11-09T05-00-05-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00023 | 3.1 s / 3.1 s | none |
+| [2026-11-09T05-00-55](2026-11-09T05-00-55-phase-1a-redaction-review2_agent-45-final/results.jsonl) | `phase-1a-redaction-review2:agent-45-final` | 44/45 | 0 | 0 | $0.00026 | 2.1 s / 3.2 s | N04 |
+| [2026-11-09T05-01-03](2026-11-09T05-01-03-phase-1a-redaction-review2_agent-page-final/results.jsonl) | `phase-1a-redaction-review2:agent-page-final` | 7/7 | 0 | 0 | $0.00020 | 1.7 s / 2.8 s | none |
