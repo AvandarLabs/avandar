@@ -8,8 +8,8 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
  * which is why its `returnType` is `Response`. A CKAN resource is a file of
  * arbitrary size, and `responseSuccess` would have to base64 it into a JSON
  * envelope at a 33% cost. The column type sample route answers with CSV text
- * the same way, and the column types route builds its own JSON `Response`
- * so each failure carries its own status and code.
+ * the same way, and the column types and Parquet cache routes build their
+ * own JSON `Response` so each answer carries its own status.
  */
 export type OpenDataAPI = APITypeDef<
   "open-data",
@@ -18,6 +18,7 @@ export type OpenDataAPI = APITypeDef<
     "/data-catalog-listings/:catalogListingId/column-type-sample",
     "/data-catalog-listings/:catalogListingId/column-types",
     "/data-catalog-listings/:catalogListingId/unparseable",
+    "/data-catalog-listings/:catalogListingId/parquet-cache",
   ],
   {
     "/data-catalog-listings/:catalogListingId/resource": {
@@ -50,6 +51,13 @@ export type OpenDataAPI = APITypeDef<
         returnType: Response;
         pathParams: { catalogListingId: string };
         body: { token: string };
+      };
+    };
+    "/data-catalog-listings/:catalogListingId/parquet-cache": {
+      POST: {
+        returnType: Response;
+        pathParams: { catalogListingId: string };
+        body: Record<string, never>;
       };
     };
   }

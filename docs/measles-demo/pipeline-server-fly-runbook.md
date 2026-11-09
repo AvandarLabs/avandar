@@ -96,6 +96,48 @@ own.
    fly scale show --app "$FLY_APP_NAME"              # performance-1x, 2048 MB, 1 machine
    ```
 
+## Let each Avandar instance request copies
+
+Each instance's `open-data` edge function asks the server for Parquet copy
+builds, so it needs the server's URL and secret as edge secrets. Until they
+are set, its copy requests answer 503 and nothing else changes.
+
+**Demo.** The Demo deploy workflow sets both from the `Staging` GitHub
+environment. Set the URL once, then the next Demo deploy carries it:
+
+```bash
+gh variable set AVA_PIPELINE_SERVER_URL --env Staging \
+  --body "https://$FLY_APP_NAME.fly.dev"
+gh secret set AVA_PIPELINE_SERVER_SECRET --env Staging   # the server secret
+```
+
+**Production.** Production's edge secrets are set by hand. It also needs the
+catalog's migrations first, since it has no catalog tables yet.
+
+```bash
+# 1. Record which secrets exist now (values cannot be read back).
+supabase secrets list --project-ref <production project ref> \
+  > production-edge-secrets-before.txt
+
+# 2. Set the two secrets.
+supabase secrets set --project-ref <production project ref> \
+  AVA_PIPELINE_SERVER_URL="https://$FLY_APP_NAME.fly.dev" \
+  AVA_PIPELINE_SERVER_SECRET=<the server secret>
+
+# To undo: remove exactly these two. Nothing else was changed.
+supabase secrets unset --project-ref <production project ref> \
+  AVA_PIPELINE_SERVER_URL AVA_PIPELINE_SERVER_SECRET
+```
+
+**Local.** Add these to `.env.development.edge`, then run
+`pnpm fns:update-env` and restart your stack:
+
+```bash
+AVA_PIPELINE_SERVER_URL=http://host.docker.internal:4611
+AVA_PIPELINE_SERVER_SECRET=<AVA_PIPELINE_SERVER_SECRET from .env.development>
+AVA_PIPELINE_SERVER_SUPABASE_URL=<your stack's API URL from ava supabase status>
+```
+
 ## Deploying from CI (optional)
 
 Create a token that can only deploy this app, and store it as a CI secret or
