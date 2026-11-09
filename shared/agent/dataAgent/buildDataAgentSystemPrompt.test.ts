@@ -172,4 +172,22 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(v3).toContain('An @"Name" outranks the page');
     expect(v3).toContain("CURRENT PAGE");
   });
+
+  it("tells v3 to answer a column question from the schema, without a query", () => {
+    const v3 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v3",
+    });
+    const v2 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v2",
+    });
+
+    expect(v3).toContain("whether their rows");
+    expect(v3).toContain("can be appended or stacked");
+    expect(v3).toContain("call run_query to list or compare columns");
+    expect(v2).not.toContain("call run_query to list or compare columns");
+  });
 });

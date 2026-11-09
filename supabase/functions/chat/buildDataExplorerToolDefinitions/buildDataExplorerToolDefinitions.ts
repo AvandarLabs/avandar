@@ -20,7 +20,7 @@ const GENERATE_SQL_TOOL = {
   function: {
     name: "generateSql",
     description:
-      "Submit a DuckDB SELECT statement that answers the user's data question. Use this whenever the user asks about their data.",
+      "Submit a DuckDB SELECT that answers a question about rows, totals, or trends. The Data Explorer shows the result. Do not use this to list or compare columns: those are already in the schema.",
     parameters: {
       type: "object",
       properties: {

@@ -80,6 +80,47 @@ describe("gradeEvalAnswer with expectsNoQuery", () => {
     expect(graded.pass).toBe(true);
   });
 
+  it("fails a schema answer that showed a query", () => {
+    const graded = gradeEvalAnswer(
+      {
+        ...NO_QUERY_QUESTION,
+        expectsNoQuery: false,
+        gradeText: () => {
+          return { pass: true, detail: "text was fine" };
+        },
+      },
+      _createAnswer({
+        finalSql: "SELECT 1",
+        error: undefined,
+        assistantText: "The columns differ.",
+        result: { columns: [{ name: "x", type: "int" }], rows: [[1]] },
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+    expect(graded.detail).toBe("showed a query for a schema question");
+  });
+
+  it("grades a schema answer from its text when no query was shown", () => {
+    const graded = gradeEvalAnswer(
+      {
+        ...NO_QUERY_QUESTION,
+        expectsNoQuery: false,
+        gradeText: () => {
+          return { pass: true, detail: "named the differing columns" };
+        },
+      },
+      _createAnswer({
+        assistantText: "They cannot be stacked as they are.",
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+    expect(graded.detail).toBe("named the differing columns");
+  });
+
   it("fails an answer that ran a query", () => {
     const graded = gradeEvalAnswer(
       NO_QUERY_QUESTION,

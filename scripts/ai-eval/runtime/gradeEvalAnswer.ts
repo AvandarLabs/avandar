@@ -54,6 +54,15 @@ function _gradeResult(
   answer: EvalAnswer,
   truth: Readonly<Record<string, EvalQueryResult>>,
 ): { pass: boolean; detail: string } {
+  if (question.gradeText) {
+    if (answer.finalSql !== undefined || answer.result) {
+      return {
+        pass: false,
+        detail: "showed a query for a schema question",
+      };
+    }
+    return question.gradeText(answer.assistantText);
+  }
   if (question.expectsNoQuery) {
     return _gradeNoQuery(answer);
   }

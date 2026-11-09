@@ -101,8 +101,22 @@ ATTACHED AND MENTIONED
 /**
  * v3: v2's rules, plus how to read the attached and mentioned blocks.
  */
+const SCHEMA_ANSWER_RULES = `
+
+SCHEMA
+- A question about the columns themselves (which columns a dataset has,
+  whether two datasets have the same or similar columns, whether their rows
+  can be appended or stacked) is answered from DATASETS, in plain text, with
+  no tool. This includes a follow-up that only asks you to try again. Do not
+  call run_query to list or compare columns: that shows a table in the Data
+  Explorer, and a failed query is not an answer. Say whether the rows can be
+  stacked as they are, and name columns that match and columns that differ,
+  including names that differ only by a character such as _ or /.`;
+
 const DATA_AGENT_INSTRUCTIONS_V3 =
-  DATA_AGENT_INSTRUCTIONS_V2 + ATTACHED_AND_MENTIONED_RULES;
+  DATA_AGENT_INSTRUCTIONS_V2 +
+  ATTACHED_AND_MENTIONED_RULES +
+  SCHEMA_ANSWER_RULES;
 
 const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
   "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,

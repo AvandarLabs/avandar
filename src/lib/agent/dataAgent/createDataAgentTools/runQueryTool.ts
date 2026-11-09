@@ -2,6 +2,7 @@ import { RUN_QUERY_TOOL } from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { extractSingleQuotedSqlLiterals } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { sanitizeQueryError } from "@/lib/agent/dataAgent/sanitizeQueryError/sanitizeQueryError";
+import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn";
 import type {
   DataAgentHost,
   DataAgentQueryOutcome,
@@ -115,15 +116,35 @@ export type QueryToolContext = Readonly<{
   previewRowCount?: number;
 }>;
 
+/** What the model reads when the question is about columns, not rows. */
+function _schemaAnswerResult(
+  sql: string,
+): AgentToolResult<{ sql: string; outcome: string }> {
+  return {
+    content: [
+      {
+        type: "text",
+        text: "The columns are already listed under DATASETS. Answer in plain text. Do not run a query: nothing should appear in the Data Explorer for this question.",
+      },
+    ],
+    details: { sql, outcome: "schema" },
+  };
+}
+
 /**
  * Runs SQL written over the dataset aliases for the user: asks consent for
  * the filter values when they call for it, shows the result, records it,
  * and returns what the model should read next. Every query tool ends here.
+ * A question about columns is answered from the schema instead, and the
+ * explorer is left unchanged.
  */
 export async function runQueryForUser(
   context: QueryToolContext,
   request: Readonly<{ aliasSql: string; summary: string; chart?: string }>,
 ): Promise<AgentToolResult<{ sql: string; outcome: string }>> {
+  if (isSchemaAnswerTurn(context.state.userTexts)) {
+    return _schemaAnswerResult(request.aliasSql);
+  }
   const sql = SqlTableAlias.applyToSql(request.aliasSql, context.aliases);
   const isApproved = await context.host.approveValuesForModel({
     values: extractSingleQuotedSqlLiterals(sql),
