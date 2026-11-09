@@ -89,7 +89,10 @@ function _lastAgentOptions(): CreateOfflineDataAgentOptions {
 describe("runOfflineDataAgentTurn", () => {
   beforeEach(() => {
     createOfflineDataAgentMock.mockReset().mockImplementation(() => {
-      return { agent: {}, ask: vi.fn().mockResolvedValue({ text: "42" }) };
+      return {
+        agent: { abort: vi.fn() },
+        ask: vi.fn().mockResolvedValue({ text: "42" }),
+      };
     });
     decideMock.mockReset();
   });

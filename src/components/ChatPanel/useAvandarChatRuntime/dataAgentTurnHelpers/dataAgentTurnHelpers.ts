@@ -13,6 +13,7 @@ import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPro
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatDashboardVizType } from "$/types/chat.types";
+import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type {
   AgentConversationState,
   DataAgentConversation,
@@ -187,7 +188,10 @@ export function buildConversationKey(
   return `${turn.workspaceId}:${turn.chatGeneration}`;
 }
 
-/** Drops the workspace's other chats: a new chat replaces the old one. */
+/**
+ * Drops the workspace's other chats, stopping any run still in progress: a
+ * new chat replaces the old one.
+ */
 function _dropOtherChats(
   conversations: Map<string, DataAgentConversation>,
   turn: Readonly<DataAgentTurnOptions>,
@@ -195,6 +199,7 @@ function _dropOtherChats(
   const key = buildConversationKey(turn);
   [...conversations.keys()].forEach((otherKey) => {
     if (otherKey !== key && otherKey.startsWith(`${turn.workspaceId}:`)) {
+      conversations.get(otherKey)?.dataAgent.agent.abort();
       conversations.delete(otherKey);
     }
   });
@@ -273,8 +278,10 @@ export async function askConversationDataAgent(
   while (conversation.activeAsk) {
     await _stopAsk(conversation, conversation.activeAsk);
   }
+  // A fresh list per turn: a stopped run's late results land in its own.
+  const results: AgentQueryResultData[] = [];
   conversation.turnRef.current = turn;
-  conversation.results.length = 0;
+  conversation.results = results;
   turn.chatPanelDispatch.setPendingClarification(undefined);
   const reply = await _askAgent(
     conversation,
@@ -288,7 +295,7 @@ export async function askConversationDataAgent(
   return {
     content: [
       { type: "text", text: reply.text },
-      ...conversation.results.map(AgentQueryResult.toDataPart),
+      ...results.map(AgentQueryResult.toDataPart),
     ],
   };
 }

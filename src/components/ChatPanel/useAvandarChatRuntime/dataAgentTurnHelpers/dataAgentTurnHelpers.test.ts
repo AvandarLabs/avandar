@@ -296,11 +296,11 @@ describe("askConversationDataAgent", () => {
     );
   });
 
-  it("drops the workspace's older chats when a new chat starts", async () => {
-    const otherWorkspace = _fakeConversation();
+  it("drops and stops the workspace's older chats when a new chat starts", async () => {
+    const olderChat = _fakeConversation();
     const conversations = new Map<string, DataAgentConversation>([
-      ["workspace-1:0", _fakeConversation()],
-      ["workspace-2:0", otherWorkspace],
+      ["workspace-1:0", olderChat],
+      ["workspace-2:0", _fakeConversation()],
     ]);
     const conversation = _fakeConversation();
 
@@ -315,6 +315,44 @@ describe("askConversationDataAgent", () => {
     expect([...conversations.keys()]).toEqual([
       "workspace-2:0",
       "workspace-1:1",
+    ]);
+    expect(olderChat.dataAgent.agent.abort).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a stopped turn's late results out of the next turn", async () => {
+    let firstTurnResults: DataAgentConversation["results"] = [];
+    let finishFirstRun: (() => void) | undefined;
+    const conversation = _fakeConversation(async (text) => {
+      if (text === "First?") {
+        firstTurnResults = conversation.results;
+        await new Promise<void>((resolve) => {
+          finishFirstRun = resolve;
+        });
+        return { text: "Stopped." };
+      }
+      // A query the stopped run started finishes during this turn.
+      firstTurnResults.push(
+        AgentQueryResult.create({ sql: "SELECT 1", title: "late" }),
+      );
+      conversation.results.push(
+        AgentQueryResult.create({ sql: "SELECT 2", title: "second" }),
+      );
+      return { text: "Second." };
+    });
+    vi.mocked(conversation.dataAgent.agent.abort).mockImplementation(() => {
+      finishFirstRun?.();
+    });
+    const conversations = new Map([["workspace-1:0", conversation]]);
+
+    const firstReply = _ask(conversations, _turn("First?"));
+    const secondReply = _ask(conversations, _turn("Second?"));
+    await firstReply;
+
+    expect((await secondReply).content).toEqual([
+      { type: "text", text: "Second." },
+      AgentQueryResult.toDataPart(
+        AgentQueryResult.create({ sql: "SELECT 2", title: "second" }),
+      ),
     ]);
   });
 
