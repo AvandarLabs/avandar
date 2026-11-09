@@ -5,6 +5,7 @@
   background: var(--ava-overlay-background);
   border: none;
   cursor: pointer;
+
   /*
    * Full bleed under the expanded panel. The panel paints above this layer,
    * and its gutter is transparent, so stopping at the panel's outer edge

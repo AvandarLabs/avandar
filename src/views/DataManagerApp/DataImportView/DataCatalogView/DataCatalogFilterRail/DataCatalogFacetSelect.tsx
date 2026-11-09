@@ -90,7 +90,8 @@ export function DataCatalogFacetSelect({
   // A facet with nothing to offer stays on screen and says so. While counts
   // are still loading, the ordinary placeholder stays: "No topics" would
   // claim the search had none before the search had answered.
-  const closedPlaceholder = isCountLoading || !isEmpty ? placeholder : emptyPlaceholder;
+  const closedPlaceholder =
+    isCountLoading || !isEmpty ? placeholder : emptyPlaceholder;
 
   return (
     <MultiSelect
