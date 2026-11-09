@@ -272,4 +272,26 @@ describe("BufferMapTool", () => {
       targetLayerId: schools.id,
     });
   });
+
+  it("anchors the popover to the tool button", async () => {
+    spatialAvailability.value = "available";
+    render(
+      <BufferMapTool
+        selectedLayer={_createPolygonLayer()}
+        onBufferConfirm={vi.fn()}
+      />,
+    );
+    const trigger = screen.getByRole("button", {
+      name: "Buffer around a layer",
+    });
+
+    expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await _openBufferForm();
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(trigger).toHaveAttribute(
+      "aria-controls",
+      screen.getByRole("dialog").id,
+    );
+  });
 });

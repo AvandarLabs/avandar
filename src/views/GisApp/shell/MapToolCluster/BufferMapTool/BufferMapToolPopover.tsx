@@ -173,6 +173,9 @@ export function BufferMapToolPopover({
       shadow="md"
       withinPortal
       transitionProps={{ duration: 0 }}
+      // The tool cluster floats over the map and never scrolls away, so
+      // there is no detached state to hide the dropdown for.
+      hideDetached={false}
     >
       <Popover.Target>
         <BufferMapToolTrigger
