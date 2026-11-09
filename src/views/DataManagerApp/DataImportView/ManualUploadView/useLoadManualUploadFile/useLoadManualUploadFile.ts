@@ -121,6 +121,9 @@ type UseLoadManualUploadFileResult = {
     newDataSourceMetadata: ManualUploadDataSourceMetadata | undefined,
   ) => void;
   previewRows: UnknownRow[] | undefined;
+
+  /** Forgets the loaded file's metadata and preview rows. */
+  clearLoadedFile: () => void;
 };
 
 const EMPTY_PARQUET_PLACEHOLDER = new Blob([], {
