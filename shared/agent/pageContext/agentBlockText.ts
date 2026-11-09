@@ -34,7 +34,7 @@ export type BlockRenderOptions = Readonly<{
 /**
  * A name as a JSON string literal, so quotes and line breaks are escaped,
  * including the line and paragraph separators JSON leaves raw. Every `<`
- * but a placeholder's becomes `<`, so a name can never spell out a
+ * but a placeholder's becomes `\u003c`, so a name can never spell out a
  * block tag.
  */
 export function quoteBlockText(name: string): string {
@@ -47,7 +47,7 @@ export function quoteBlockText(name: string): string {
 /**
  * Text that is not quoted (column names, types, chart types) kept on one
  * line: line breaks become spaces and every `<` but a placeholder's becomes
- * `<`, so it can neither start a new line nor spell out a block tag.
+ * `\u003c`, so it can neither start a new line nor spell out a block tag.
  */
 export function inlineBlockText(text: string): string {
   return text.replace(LINE_BREAKS, " ").replace(NON_PLACEHOLDER_LT, "\\u003c");
