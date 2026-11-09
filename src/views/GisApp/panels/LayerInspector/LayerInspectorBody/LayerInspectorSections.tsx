@@ -55,6 +55,7 @@ export function LayerInspectorSections({
       <SensitivitySection layer={layer} onLayerChange={onLayerChange} />
       <FilterSection
         layer={layer}
+        layers={layers}
         onLayerChange={onLayerChange}
         focusRequest={filterFocusRequest}
         showApplyAoiFilterSwitch={layer.geoBinding?.type !== "bufferOfLayer"}

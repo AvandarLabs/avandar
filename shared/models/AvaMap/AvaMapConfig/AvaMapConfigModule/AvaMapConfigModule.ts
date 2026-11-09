@@ -79,7 +79,7 @@ export const AvaMapConfigModule = {
   /** A new, empty config with the default basemap and camera and no layers. */
   makeEmpty: (): AvaMapConfigRead => {
     return Model.make("AvaMapConfig", {
-      version: 6,
+      version: 7,
       basemap: { type: "builtIn", style: "avandar" },
       view: DEFAULT_MAP_VIEW_STATE,
       bookmarks: [],
@@ -150,9 +150,17 @@ export const AvaMapConfigModule = {
   ): AvaMapConfigRead => {
     const { config, layerId } = options;
     const nextLayers = config.layers.filter(propNotEq("id", layerId));
-    return nextLayers.length === config.layers.length
-      ? config
-      : { ...config, layers: nextLayers };
+    if (nextLayers.length === config.layers.length) {
+      return config;
+    }
+    return {
+      ...config,
+      layers: nextLayers.map((layer) => {
+        return layer.spatialFilter?.layerId === layerId
+          ? { ...layer, spatialFilter: undefined }
+          : layer;
+      }),
+    };
   },
 
   /**

@@ -6,6 +6,7 @@ import { annotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationText
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
 import { useGisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
+import { useGisAppFeatureList } from "@/views/GisApp/useGisApp/useGisAppFeatureList";
 import { useGisAppLayerSelection } from "@/views/GisApp/useGisApp/useGisAppLayerSelection";
 import { useGisAppMapCallbacks } from "@/views/GisApp/useGisApp/useGisAppMapCallbacks";
 import { useGisAppRendering } from "@/views/GisApp/useGisApp/useGisAppRendering";
@@ -18,6 +19,7 @@ import type { LayerInspectorView } from "@/views/GisApp/panels/LayerInspector/La
 import type { PlaceToolState } from "@/views/GisApp/places/PlaceTool.types";
 import type { AnnotationTextOverlayTarget } from "@/views/GisApp/shell/AnnotationTextOverlay/annotationTextOverlayTarget";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
+import type { GisAppFeatureList } from "@/views/GisApp/useGisApp/useGisAppFeatureList";
 import type { Dispatch, SetStateAction } from "react";
 
 type UseGisAppCanvasOptions = {
@@ -191,6 +193,7 @@ export function useGisAppState(
   ReturnType<typeof useGisAppRendering> &
   ReturnType<typeof useGisAppLayerSelection> &
   ReturnType<typeof useGisAppToolMode> &
+  GisAppFeatureList &
   GisAppStateExtras {
   const draftEditor = useAvaMapEditor(avaMap);
   const editor = useHydratedMapSources({
@@ -206,6 +209,7 @@ export function useGisAppState(
     AvaMapConfig.AnnotationFeatureId | undefined
   >();
   const toolMode = useGisAppToolMode();
+  const featureList = useGisAppFeatureList();
   const placeToolState = usePlaceToolState();
   const textOverlayTarget = annotationTextOverlayTarget({
     annotationFeatures: editor.mapConfig.annotations.features,
@@ -263,6 +267,7 @@ export function useGisAppState(
     ...rendering,
     ...selection,
     ...toolMode,
+    ...featureList,
     annotationTextOverlayTarget: textOverlayTarget,
     avaMap,
     placeToolState,

@@ -1,8 +1,14 @@
 import { isNumber } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { NumberInput, Switch, TextInput } from "@mantine/core";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import {
+  clampBufferDistance,
+  convertBufferDistance,
+  getBufferDistanceLimitsFromUnit,
+} from "@/views/GisApp/layers/bufferDistanceLimits/bufferDistanceLimits";
+import { BUFFER_DISTANCE_UNIT_LABELS } from "@/views/GisApp/layers/BufferDistanceUnit.constants";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
@@ -12,13 +18,22 @@ type Props = {
   onLayerChange: LayerChangeHandler;
 };
 
+/** Stores a distance typed in the buffer's own unit as whole meters. */
 function _bindBufferDistance(
-  onLayerChange: LayerChangeHandler,
-  distanceMeters: string | number,
+  options: Readonly<{
+    onLayerChange: LayerChangeHandler;
+    distance: string | number;
+    unit: MapLayer.BufferDistanceUnit;
+  }>,
 ): void {
-  if (!isNumber(distanceMeters)) {
+  const { onLayerChange, distance, unit } = options;
+  if (!isNumber(distance)) {
     return;
   }
+  const distanceMeters = MapLayer.getMetersFromBufferDistance({
+    distance: clampBufferDistance({ distance, unit }),
+    unit,
+  });
   onLayerChange((current) => {
     return MapLayerUpdates.withBufferDistanceMeters({
       layer: current,
@@ -36,6 +51,41 @@ function _bindBufferDissolve(
   });
 }
 
+type DistanceInputProps = {
+  binding: MapLayer.BufferOfLayerBinding;
+  onLayerChange: LayerChangeHandler;
+};
+
+/** The buffer distance, shown and edited in the unit it was typed in. */
+function BufferDistanceInput({
+  binding,
+  onLayerChange,
+}: DistanceInputProps): ReactNode {
+  const { i18n, t } = useLingui();
+  const unit = binding.distanceUnit;
+  const unitLabel = i18n._(BUFFER_DISTANCE_UNIT_LABELS[unit]);
+  const { minDistance, maxDistance } = getBufferDistanceLimitsFromUnit(unit);
+  return (
+    <NumberInput
+      label={t`Distance (${unitLabel})`}
+      description={t`At least ${minDistance} ${unitLabel}`}
+      value={convertBufferDistance({
+        distance: binding.distanceMeters,
+        fromUnit: "m",
+        toUnit: unit,
+      })}
+      min={minDistance}
+      max={maxDistance}
+      clampBehavior="blur"
+      allowNegative={false}
+      decimalScale={2}
+      onChange={(distance) => {
+        _bindBufferDistance({ onLayerChange, distance, unit });
+      }}
+    />
+  );
+}
+
 /** Inspector fields for a buffer-of-layer binding. */
 export function BufferOfLayerFields({
   layer,
@@ -50,17 +100,7 @@ export function BufferOfLayerFields({
   return (
     <>
       <TextInput label={t`Source`} value={sourceName} readOnly />
-      <NumberInput
-        label={t`Distance (meters)`}
-        value={binding.distanceMeters}
-        min={100}
-        max={1_000_000}
-        clampBehavior="blur"
-        allowDecimal={false}
-        onChange={(distanceMeters) => {
-          _bindBufferDistance(onLayerChange, distanceMeters);
-        }}
-      />
+      <BufferDistanceInput binding={binding} onLayerChange={onLayerChange} />
       <Switch
         label={t`Dissolve`}
         checked={binding.dissolve}

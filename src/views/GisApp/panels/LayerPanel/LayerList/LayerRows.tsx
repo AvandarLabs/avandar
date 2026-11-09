@@ -25,6 +25,7 @@ type Props = {
   onDuplicateLayer: (id: MapLayer.Id) => void;
   onZoomToLayer: (id: MapLayer.Id) => void;
   onDeleteLayer: (id: MapLayer.Id) => void;
+  onOpenFeatureList?: (id: MapLayer.Id) => void;
 };
 
 function _renderLayerRow(
@@ -54,6 +55,9 @@ function _renderLayerRow(
       onDuplicate={bind(props.onDuplicateLayer)}
       onZoomToLayer={bind(props.onZoomToLayer)}
       onDelete={bind(props.onDeleteLayer)}
+      onOpenFeatureList={
+        props.onOpenFeatureList ? bind(props.onOpenFeatureList) : undefined
+      }
       onMoveByOffset={(offset) => {
         props.onStackOrderChange(
           makeStackOrderFromLayerMove({
@@ -85,6 +89,7 @@ export function LayerRows({
   onDuplicateLayer,
   onZoomToLayer,
   onDeleteLayer,
+  onOpenFeatureList,
 }: Props): ReactNode {
   const rowProps: Props = {
     items,
@@ -103,6 +108,7 @@ export function LayerRows({
     onDuplicateLayer,
     onZoomToLayer,
     onDeleteLayer,
+    onOpenFeatureList,
   };
   return items.map((item) => {
     return match(item)

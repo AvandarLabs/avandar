@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { displaceSpatialFeatures } from "@/views/GisApp/layers/displaceSpatialFeatures/displaceSpatialFeatures";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import { createSpatialLayer } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 const METERS_PER_DEGREE_LATITUDE = 111_320;
 const RADIUS_METERS = 500;
@@ -198,6 +200,8 @@ describe("displaceSpatialFeatures", () => {
         type: "bufferOfLayer",
         layerId: jitterLayer.id,
         distanceMeters: 1_000,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
     };
@@ -206,6 +210,35 @@ describe("displaceSpatialFeatures", () => {
       return displaceSpatialFeatures({
         layer: bufferLayer,
         sourceLayer: jitterLayer,
+        featureCollection: { type: "FeatureCollection", features: [] },
+      });
+    }).toThrow(SensitivityViolationError);
+  });
+  it("refuses to buffer a jitter-mode latitude and longitude layer, whose buffers would center on exact points", () => {
+    const latLngSource: MapLayer.Standard = {
+      ...jitterLayer,
+      geoBinding: {
+        type: "latLngColumns",
+        latitude: uuid<QueryColumn.Id>(),
+        longitude: uuid<QueryColumn.Id>(),
+      },
+    };
+    const bufferLayer: MapLayer.Standard = {
+      ...jitterLayer,
+      geoBinding: {
+        type: "bufferOfLayer",
+        layerId: latLngSource.id,
+        distanceMeters: 1_000,
+        distanceUnit: "m",
+        labelColumn: undefined,
+        dissolve: false,
+      },
+    };
+
+    expect(() => {
+      return displaceSpatialFeatures({
+        layer: bufferLayer,
+        sourceLayer: latLngSource,
         featureCollection: { type: "FeatureCollection", features: [] },
       });
     }).toThrow(SensitivityViolationError);

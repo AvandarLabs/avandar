@@ -1,7 +1,9 @@
-import { makeIdLookupMap } from "@avandar/utils";
 import { useQueries } from "@tanstack/react-query";
-import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
-import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
+import { compileSpatialFilteredQuery } from "@/clients/maps/MapLayerSpatialQuery/compileSpatialFilteredQuery/compileSpatialFilteredQuery";
+import {
+  getCompileMetadataFromMapLayer,
+  getLeafSourceLayerFromMapLayer,
+} from "@/clients/maps/MapLayerSpatialQuery/getCompileMetadataFromMapLayer/getCompileMetadataFromMapLayer";
 import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { displaceSpatialFeatures } from "@/views/GisApp/layers/displaceSpatialFeatures/displaceSpatialFeatures";
@@ -13,7 +15,10 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
-import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type {
+  MapOverlay,
+  SpatialFilterCompileOptions,
+} from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { UseQueryOptions } from "@tanstack/react-query";
 
@@ -22,10 +27,9 @@ type RunSpatialLayerOptions = {
   workspaceId: Workspace.Id;
   zoomBand: number;
   simplificationReferenceLatitude: number;
-  datasets: readonly Dataset.T[];
-  datasetColumns: readonly DatasetColumn.T[];
   overlay: MapOverlay;
   stack: readonly MapLayer.T[];
+  resolveMetadata: SpatialFilterCompileOptions["resolveMetadata"];
   signal?: AbortSignal;
 };
 
@@ -64,7 +68,7 @@ function _isSpatialBinding(layer: MapLayer.T): boolean {
 
 /** True when the layer query uses DuckDB Spatial functions. */
 function _layerNeedsSpatial(layer: MapLayer.T, overlay: MapOverlay): boolean {
-  if (_isSpatialBinding(layer)) {
+  if (_isSpatialBinding(layer) || layer.spatialFilter !== undefined) {
     return true;
   }
   return (
@@ -94,45 +98,26 @@ function _getCapabilityError(
     : undefined;
 }
 
-/** Walks bufferOfLayer links to the layer whose metadata should compile. */
-function _getLeafSpatialSource(
-  layer: MapLayer.T,
-  stack: readonly MapLayer.T[],
-): MapLayer.T {
-  const byId = makeIdLookupMap(stack);
-  const seen = new Set<MapLayer.Id>();
-  let current = layer;
-  while (current.geoBinding?.type === "bufferOfLayer") {
-    if (seen.has(current.id)) {
-      return current;
-    }
-    seen.add(current.id);
-    const source = byId.get(current.geoBinding.layerId);
-    if (!source) {
-      return current;
-    }
-    current = source;
-  }
-  return current;
-}
+type LayerQueryContext = {
+  layers: readonly MapLayer.T[];
+  workspaceId: Workspace.Id;
+  zoomBand: number;
+  simplificationReferenceLatitude: number;
+  datasets: readonly Dataset.T[];
+  datasetColumns: readonly DatasetColumn.T[];
+  overlay: MapOverlay;
+  spatialAvailability: DuckDbSpatialAvailability;
+};
 
 /**
- * Compiles, executes, and parses one spatial layer, then applies its
- * sensitivity policy so no consumer of the query data sees exact points.
+ * Compiles, executes, and parses one spatial layer, keeping only the
+ * features inside its spatial filter layer, then applies its sensitivity
+ * policy so no consumer of the query data sees exact points.
  */
 async function _runSpatialLayer(
   options: RunSpatialLayerOptions,
 ): Promise<MapLayerDataResult> {
-  const sourceLayer = _getLeafSpatialSource(options.layer, options.stack);
-  const metadata = getResolvedMapLayerMetadata({
-    layer: sourceLayer,
-    datasets: options.datasets,
-    datasetColumns: options.datasetColumns,
-  });
-  if (metadata.type === "rebindRequired") {
-    throw new Error(`Map geometry requires rebinding: ${metadata.reason}`);
-  }
-  const plan = compileMapLayerSpatialQuery({ ...options, metadata });
+  const plan = compileSpatialFilteredQuery(options);
   const queryResult = await WorkspaceQuerySession.runQuery({
     rawSql: plan.rawSql,
     workspaceId: options.workspaceId,
@@ -146,23 +131,26 @@ async function _runSpatialLayer(
     type: "spatial",
     featureCollection: displaceSpatialFeatures({
       layer: options.layer,
-      sourceLayer,
+      sourceLayer: getLeafSourceLayerFromMapLayer(options.layer, options.stack),
       featureCollection: parsed.featureCollection,
     }),
     diagnostics: parsed.diagnostics,
   };
 }
 
-type LayerQueryContext = {
-  layers: readonly MapLayer.T[];
-  workspaceId: Workspace.Id;
-  zoomBand: number;
-  simplificationReferenceLatitude: number;
-  datasets: readonly Dataset.T[];
-  datasetColumns: readonly DatasetColumn.T[];
-  overlay: MapOverlay;
-  spatialAvailability: DuckDbSpatialAvailability;
-};
+/** Resolves any stacked layer's compile metadata from the loaded datasets. */
+function _createMetadataResolver(
+  context: LayerQueryContext,
+): SpatialFilterCompileOptions["resolveMetadata"] {
+  return (layer) => {
+    return getCompileMetadataFromMapLayer({
+      layer,
+      stack: context.layers,
+      datasets: context.datasets,
+      datasetColumns: context.datasetColumns,
+    });
+  };
+}
 
 function _createLayerQuery(
   layer: MapLayer.T,
@@ -214,27 +202,20 @@ function _createLayerQuery(
           }
         : undefined,
     queryFn: async ({ signal }): Promise<MapLayerDataResult> => {
-      if (_isSpatialBinding(layer)) {
-        return await _runSpatialLayer({
-          layer,
-          workspaceId: context.workspaceId,
-          zoomBand: context.zoomBand,
-          simplificationReferenceLatitude:
-            context.simplificationReferenceLatitude,
-          datasets: context.datasets,
-          datasetColumns: context.datasetColumns,
-          overlay: context.overlay,
-          stack: context.layers,
-          signal,
-        });
-      }
-      return await runLatLngLayer({
+      const runOptions = {
         layer,
         workspaceId: context.workspaceId,
-        overlay: context.overlay,
         zoomBand: context.zoomBand,
+        simplificationReferenceLatitude:
+          context.simplificationReferenceLatitude,
+        overlay: context.overlay,
+        stack: context.layers,
+        resolveMetadata: _createMetadataResolver(context),
         signal,
-      });
+      };
+      return _isSpatialBinding(layer)
+        ? await _runSpatialLayer(runOptions)
+        : await runLatLngLayer(runOptions);
     },
   };
 }

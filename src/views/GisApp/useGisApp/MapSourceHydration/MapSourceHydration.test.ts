@@ -131,3 +131,69 @@ it("points a saved case type layer at the view column its renamed field reads", 
     '"external_id_2" as "external_id"',
   );
 });
+
+function _makeSchoolsFixture(): {
+  config: AvaMapConfig.T;
+  columns: DatasetColumn.T[];
+} {
+  const dataset = Model.make("Dataset", {
+    id: "schools",
+    name: "schools",
+  }) as Dataset.T;
+  const columns = ["the_geom", "loc_name", "address"].map((name, index) => {
+    return Model.make("DatasetColumn", {
+      id: `dc_${name}`,
+      datasetId: dataset.id,
+      name,
+      originalName: name,
+      dataType: "varchar",
+      columnIdx: index,
+    }) as DatasetColumn.T;
+  });
+  const geometryColumn = QueryColumn.makeFromDatasetColumn(columns[0]!);
+  const layer = MapLayer.makeEmpty("schools");
+  return {
+    columns,
+    config: {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [
+        {
+          ...layer,
+          source: {
+            ...layer.source,
+            dataSource: dataset,
+            queryColumns: [geometryColumn],
+          },
+          geoBinding: {
+            type: "geometryColumn",
+            column: geometryColumn.id,
+            encoding: "wkt",
+            family: "point",
+            simplification: undefined,
+            sourceCrs: undefined,
+          },
+        },
+      ],
+    },
+  };
+}
+
+it("keeps a geometry layer's saved query columns, so a save never widens them", () => {
+  const { config, columns } = _makeSchoolsFixture();
+
+  const loaded = MapSourceHydration.fromMetadata({
+    config,
+    datasetColumns: columns,
+    conceptAttributes: undefined,
+  });
+
+  const source = loaded.config.layers[0]!.source;
+  expect(source.queryColumns.map(prop("baseColumn.name"))).toEqual([
+    "the_geom",
+  ]);
+  expect(source.sourceColumns?.map(prop("baseColumn.name"))).toEqual([
+    "the_geom",
+    "loc_name",
+    "address",
+  ]);
+});

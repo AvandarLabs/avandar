@@ -9,6 +9,7 @@ import {
   spatialAvailability,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { DataSection } from "@/views/GisApp/panels/LayerInspector/DataSection/DataSection";
+import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 
 beforeEach(() => {
   resetDataSectionFixtures();
@@ -108,5 +109,24 @@ describe("DataSection geometry", () => {
     render(<DataSection layer={createBoundLayer()} onLayerChange={vi.fn()} />);
 
     expect(duckDbEnsureSpatial).not.toHaveBeenCalled();
+  });
+
+  it("defaults the popup fields when a geometry column is picked", () => {
+    fixtures.sourceColumns = [fixtures.geometryColumn, fixtures.nameColumn];
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+    render(
+      <DataSection
+        layer={createGeometryLayer()}
+        onLayerChange={onLayerChange}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Geometry column" }));
+
+    const update = onLayerChange.mock.calls.at(-1)![0];
+    expect(update(createGeometryLayer()).popup.columnIds).toEqual([
+      fixtures.geometryColumn.id,
+      fixtures.nameColumn.id,
+    ]);
   });
 });

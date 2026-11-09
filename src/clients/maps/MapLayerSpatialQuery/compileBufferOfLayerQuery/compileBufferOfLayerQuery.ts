@@ -1,12 +1,21 @@
 import { propEq } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle";
+import { isBufferOfDisplacedPoints } from "$/models/AvaMap/AvaMapConfig/isBufferOfDisplacedPoints/isBufferOfDisplacedPoints";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
+import { compileLatLngLayerSourceSql } from "../compileLatLngLayerSourceSql/compileLatLngLayerSourceSql";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { makeSpatialQueryPlan } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQueryHelpers";
+import {
+  makeFeaturesCteSqlFromFeatureSource,
+  makeJsonPointerFromPropertyName,
+} from "../FeatureSourceSqlHelpers/FeatureSourceSqlHelpers";
 import { makeMetersCrsSql } from "../makeMetersCrsSql";
 import { MapLayerSpatialQueryColumns } from "../MapLayerSpatialQuery.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { CompileOptions } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type { MapLayerFeatureSource } from "../FeatureSourceSqlHelpers/FeatureSourceSqlHelpers";
 import type { MapLayerSpatialQueryPlan } from "../MapLayerSpatialQuery.types";
 
 function _getBufferBinding(layer: MapLayer.T): MapLayer.BufferOfLayerBinding {
@@ -38,30 +47,58 @@ function _assertBufferInvariants(
   if (options.layer.sensitivity.mode !== source.sensitivity.mode) {
     throw new Error("Buffer sensitivity must match the source layer");
   }
+  // Rings around a displaced layer's exact points would reveal them, whether
+  // drawn, used as a spatial filter, or listed.
+  if (isBufferOfDisplacedPoints(options.stack, options.layer.id)) {
+    throw new SensitivityViolationError(
+      "jitterRequiresPoints",
+      options.layer.name,
+    );
+  }
 }
 
-function _buildSourceFeaturesSql(
-  sourceSql: string,
-  featureCollectionColumn: string,
-): string {
-  return `source_envelope AS (
-  ${sourceSql}
-),
-source_features AS (
-  SELECT ST_GeomFromGeoJSON(
-    json_extract_string(feature.value, '$.geometry')
-  ) AS geom
-  FROM source_envelope,
-    json_each(
-      json_extract(
-        source_envelope.${featureCollectionColumn},
-        '$.features'
-      )
-    ) AS feature
-)`;
+/** The source column each ring carries, or none for dissolved rings. */
+function _getLabelColumn(
+  source: MapLayer.T,
+  binding: MapLayer.BufferOfLayerBinding,
+): QueryColumn.T | undefined {
+  if (!binding.labelColumn || binding.dissolve) {
+    return undefined;
+  }
+  return source.source.queryColumns.find(propEq("id", binding.labelColumn));
 }
 
-function _buildProjectedSql(): string {
+/** The buffer source's features, with the label column among its properties. */
+function _compileSourceFeatures(
+  options: Readonly<CompileOptions>,
+  source: MapLayer.T,
+  labelColumn: QueryColumn.T | undefined,
+): MapLayerFeatureSource {
+  if (source.geoBinding?.type === "latLngColumns") {
+    const rows = compileLatLngLayerSourceSql({
+      layer: source,
+      overlay: options.overlay,
+      spatialFilterEnvelopeSql: undefined,
+    });
+    if (!rows) {
+      throw new Error("Buffer source coordinates are incomplete");
+    }
+    return rows;
+  }
+  const labelledSource: MapLayer.T = labelColumn
+    ? { ...source, popup: { ...source.popup, columnIds: [labelColumn.id] } }
+    : source;
+  return {
+    type: "envelope",
+    sql: compileMapLayerSpatialQuery({ ...options, layer: labelledSource })
+      .rawSql,
+  };
+}
+
+function _buildProjectedSql(labelColumnName: string | undefined): string {
+  const labelSql = labelColumnName
+    ? `json_extract_string(properties, ${quoteSqlLiteral(makeJsonPointerFromPropertyName(labelColumnName))})`
+    : "CAST(NULL AS VARCHAR)";
   return `buffer_crs AS (
   SELECT ${makeMetersCrsSql()} AS meters_crs
   FROM (
@@ -73,7 +110,7 @@ function _buildProjectedSql(): string {
 projected AS (
   SELECT ST_Transform(
     geom, 'EPSG:4326', meters_crs, always_xy := true
-  ) AS geom, meters_crs
+  ) AS geom, meters_crs, ${labelSql} AS label
   FROM source_features, buffer_crs
 )`;
 }
@@ -83,7 +120,7 @@ function _buildBufferedSql(distanceMeters: number): string {
   SELECT ST_Transform(
     ST_Buffer(geom, ${distanceMeters}),
     meters_crs, 'EPSG:4326', always_xy := true
-  ) AS geom
+  ) AS geom, label
   FROM projected
 )`;
 }
@@ -91,24 +128,30 @@ function _buildBufferedSql(distanceMeters: number): string {
 function _buildOutputGeomsSql(dissolve: boolean): string {
   if (dissolve) {
     return `output_geoms AS (
-  SELECT ST_Union_Agg(geom) AS geom FROM buffered
+  SELECT ST_Union_Agg(geom) AS geom, CAST(NULL AS VARCHAR) AS label
+  FROM buffered
 )`;
   }
   return `output_geoms AS (
-  SELECT geom FROM buffered
+  SELECT geom, label FROM buffered
 )`;
 }
 
-function _buildBufferEnvelopeSelect(): string {
+function _buildBufferEnvelopeSelect(
+  labelColumnName: string | undefined,
+): string {
   const featureAlias = quoteSqlIdentifier(
     MapLayerSpatialQueryColumns.featureCollection,
   );
   const diagnosticAlias = quoteSqlIdentifier(
     MapLayerSpatialQueryColumns.diagnostics,
   );
+  const propertiesSql = labelColumnName
+    ? `json_object(${quoteSqlLiteral(labelColumnName)}, label)`
+    : "json_object()";
   return `feature_rows AS (
   SELECT json_object('type', 'Feature', 'geometry', json(ST_AsGeoJSON(geom)),
-    'properties', json_object()) AS feature
+    'properties', ${propertiesSql}) AS feature
   FROM output_geoms
   WHERE geom IS NOT NULL
 ),
@@ -130,21 +173,24 @@ FROM diagnostic_summary`;
 }
 
 function _buildBufferSql(
-  sourcePlan: MapLayerSpatialQueryPlan,
-  binding: MapLayer.BufferOfLayerBinding,
+  options: Readonly<{
+    featureSource: MapLayerFeatureSource;
+    binding: MapLayer.BufferOfLayerBinding;
+    labelColumnName: string | undefined;
+  }>,
 ): string {
-  const featureCollectionColumn = quoteSqlIdentifier(
-    MapLayerSpatialQueryColumns.featureCollection,
-  );
-  return `WITH ${_buildSourceFeaturesSql(sourcePlan.rawSql, featureCollectionColumn)},
-${_buildProjectedSql()},
-${_buildBufferedSql(binding.distanceMeters)},
-${_buildOutputGeomsSql(binding.dissolve)},
-${_buildBufferEnvelopeSelect()}`;
+  return `WITH ${makeFeaturesCteSqlFromFeatureSource({ cteName: "source_features", source: options.featureSource })},
+${_buildProjectedSql(options.labelColumnName)},
+${_buildBufferedSql(options.binding.distanceMeters)},
+${_buildOutputGeomsSql(options.binding.dissolve)},
+${_buildBufferEnvelopeSelect(options.labelColumnName)}`;
 }
 
 /**
  * Compiles a buffer-of-layer binding as polygons in a derived meters CRS.
+ * Point, line, polygon, and latitude and longitude sources all buffer. When
+ * rings are not dissolved and the binding names a label column, each ring
+ * carries that source value as its one property.
  */
 export function compileBufferOfLayerQuery(
   options: Readonly<CompileOptions>,
@@ -152,14 +198,18 @@ export function compileBufferOfLayerQuery(
   const binding = _getBufferBinding(options.layer);
   const source = _getSourceLayer(options.stack, binding.layerId);
   _assertBufferInvariants(options, source);
-  const sourcePlan = compileMapLayerSpatialQuery({
-    ...options,
-    layer: source,
-  });
+  const labelColumn = _getLabelColumn(source, binding);
+  const labelColumnName = labelColumn
+    ? QueryColumn.getDerivedColumnName(labelColumn)
+    : undefined;
   return makeSpatialQueryPlan({
     compile: options,
-    rawSql: _buildBufferSql(sourcePlan, binding),
+    rawSql: _buildBufferSql({
+      featureSource: _compileSourceFeatures(options, source, labelColumn),
+      binding,
+      labelColumnName,
+    }),
     family: "polygon",
-    sourcePropertyColumnNames: [],
+    sourcePropertyColumnNames: labelColumnName ? [labelColumnName] : [],
   });
 }

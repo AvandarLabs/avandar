@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
 import { LayerStatusBadge } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 
 function _makeViewState(
@@ -68,5 +69,61 @@ describe("LayerStatusBadge", () => {
     );
 
     expect(screen.getByText("4 no data")).toBeInTheDocument();
+  });
+
+  it.each([
+    [
+      { type: "latLngColumns", latitude: undefined, longitude: undefined },
+      "2 points",
+    ],
+    [
+      {
+        type: "bufferOfLayer",
+        layerId: "sites",
+        distanceMeters: 805,
+        distanceUnit: "mi",
+        labelColumn: undefined,
+        dissolve: false,
+      },
+      "2 areas",
+    ],
+    [
+      {
+        type: "geometryColumn",
+        column: "geom",
+        encoding: "wkt",
+        family: "line",
+        simplification: undefined,
+        sourceCrs: undefined,
+      },
+      "2 features",
+    ],
+  ] as const)("names what a ready layer draws", (geoBinding, label) => {
+    render(
+      <LayerStatusBadge
+        viewState={_makeViewState({ featureCount: 2 })}
+        geoBinding={geoBinding as MapLayer.GeoBinding}
+      />,
+    );
+
+    expect(screen.getByText(label)).toBeInTheDocument();
+  });
+
+  it("says one area for a single buffer ring", () => {
+    render(
+      <LayerStatusBadge
+        viewState={_makeViewState({ featureCount: 1 })}
+        geoBinding={{
+          type: "bufferOfLayer",
+          layerId: "sites" as MapLayer.Id,
+          distanceMeters: 805,
+          distanceUnit: "mi",
+          labelColumn: undefined,
+          dissolve: false,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("1 area")).toBeInTheDocument();
   });
 });

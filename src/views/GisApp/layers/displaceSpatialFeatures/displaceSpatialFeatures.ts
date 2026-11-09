@@ -77,10 +77,13 @@ function _isUndisplaceable(
     return binding.family !== "point";
   }
   // A buffer ring stays centered on the exact point it was drawn around, so
-  // buffering a point layer would reveal the locations jitter hides.
+  // buffering a point layer would reveal the locations jitter hides. That
+  // holds for geometry-column and latitude and longitude sources alike.
+  const sourceBindingType = sourceLayer.geoBinding?.type;
   return (
     binding?.type === "bufferOfLayer" &&
-    sourceLayer.geoBinding?.type === "geometryColumn"
+    (sourceBindingType === "geometryColumn" ||
+      sourceBindingType === "latLngColumns")
   );
 }
 
