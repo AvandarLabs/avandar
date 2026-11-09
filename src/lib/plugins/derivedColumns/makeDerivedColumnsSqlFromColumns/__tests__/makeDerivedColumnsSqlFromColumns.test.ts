@@ -1,0 +1,156 @@
+import { PluginError } from "@avandar/plugin-sdk";
+import { describe, expect, it } from "vitest";
+import { makeDerivedColumnsSqlFromColumns } from "@/lib/plugins/derivedColumns/makeDerivedColumnsSqlFromColumns/makeDerivedColumnsSqlFromColumns";
+import type { DerivedColumn } from "@avandar/plugin-sdk";
+
+const BASE_SQL = `SELECT "borough", "cases", "pop" FROM "nyc"`;
+
+const EXISTING_COLUMN_NAMES = ["borough", "cases", "pop"];
+
+const RATE_COLUMN: DerivedColumn = {
+  name: "rate",
+  expression: "{cases} * 100000.0 / NULLIF({population}, 0)",
+  inputs: { cases: "cases", population: "pop" },
+};
+
+function _makeSqlFromColumns(
+  columns: readonly DerivedColumn[],
+  existingColumnNames: readonly string[] = EXISTING_COLUMN_NAMES,
+): Readonly<{ sql: string; columnNames: readonly string[] }> {
+  return makeDerivedColumnsSqlFromColumns({
+    baseSql: BASE_SQL,
+    existingColumnNames,
+    columns,
+  });
+}
+
+/**
+ * The `PluginError` code `makeDerivedColumnsSqlFromColumns` throws for
+ * `columns`, undefined when it does not throw.
+ */
+function _getThrownCode(columns: readonly DerivedColumn[]): string | undefined {
+  try {
+    _makeSqlFromColumns(columns);
+    return undefined;
+  } catch (error) {
+    return error instanceof PluginError ? error.code : "not a PluginError";
+  }
+}
+
+describe("makeDerivedColumnsSqlFromColumns", () => {
+  it("wraps the base SQL and appends each column in order", () => {
+    const { sql } = _makeSqlFromColumns([
+      RATE_COLUMN,
+      { name: "double_cases", expression: "{c} * 2", inputs: { c: "cases" } },
+    ]);
+
+    expect(sql).toBe(
+      [
+        "WITH ava_source AS (",
+        "  SELECT *, row_number() OVER () AS __ava_row FROM (",
+        `SELECT "borough", "cases", "pop" FROM "nyc"`,
+        "  )",
+        ")",
+        "SELECT * EXCLUDE (__ava_row),",
+        `  ("cases" * 100000.0 / NULLIF("pop", 0)) AS "rate",`,
+        `  ("cases" * 2) AS "double_cases"`,
+        "FROM ava_source",
+        "ORDER BY __ava_row",
+      ].join("\n"),
+    );
+  });
+
+  it("quotes an input column whose name has spaces and a double quote", () => {
+    const { sql } = _makeSqlFromColumns(
+      [{ name: "doubled", expression: "{c} * 2", inputs: { c: 'case "n" 1' } }],
+      ['case "n" 1'],
+    );
+
+    expect(sql).toContain(`  ("case ""n"" 1" * 2) AS "doubled"`);
+  });
+
+  it("drops a trailing semicolon and line comment from the base SQL", () => {
+    const { sql } = makeDerivedColumnsSqlFromColumns({
+      baseSql: `  SELECT * FROM "nyc"; -- every borough\n`,
+      existingColumnNames: EXISTING_COLUMN_NAMES,
+      columns: [RATE_COLUMN],
+    });
+
+    expect(sql).toContain(`FROM (\nSELECT * FROM "nyc"\n  )\n)`);
+  });
+
+  it("returns the added names in input order", () => {
+    const { columnNames } = _makeSqlFromColumns([
+      RATE_COLUMN,
+      { name: "double_cases", expression: "{c} * 2", inputs: { c: "cases" } },
+    ]);
+
+    expect(columnNames).toEqual(["rate", "double_cases"]);
+  });
+
+  it("suffixes _2 to a name an existing column has in another case", () => {
+    const { sql, columnNames } = _makeSqlFromColumns(
+      [RATE_COLUMN],
+      [...EXISTING_COLUMN_NAMES, "Rate"],
+    );
+
+    expect(columnNames).toEqual(["rate_2"]);
+    expect(sql).toContain(`AS "rate_2"`);
+  });
+
+  it("suffixes _3 when the _2 name is taken too", () => {
+    const { columnNames } = _makeSqlFromColumns(
+      [RATE_COLUMN],
+      [...EXISTING_COLUMN_NAMES, "rate", "rate_2"],
+    );
+
+    expect(columnNames).toEqual(["rate_3"]);
+  });
+
+  it("suffixes a name that an earlier added column took", () => {
+    const { columnNames } = _makeSqlFromColumns([RATE_COLUMN, RATE_COLUMN]);
+
+    expect(columnNames).toEqual(["rate", "rate_2"]);
+  });
+
+  it.each([
+    ["an uppercase letter", "Rate"],
+    ["a leading digit", "1rate"],
+    ["a hyphen", "rate-x"],
+    ["an empty string", ""],
+  ])("rejects a name with %s", (_label, name) => {
+    expect(_getThrownCode([{ ...RATE_COLUMN, name }])).toBe(
+      "InvalidExpression",
+    );
+  });
+
+  it("rejects a placeholder with no input", () => {
+    expect(
+      _getThrownCode([{ ...RATE_COLUMN, inputs: { cases: "cases" } }]),
+    ).toBe("InvalidExpression");
+  });
+
+  it("rejects an input naming a column the result does not have", () => {
+    expect(
+      _getThrownCode([
+        { ...RATE_COLUMN, inputs: { cases: "cases", population: "people" } },
+      ]),
+    ).toBe("InvalidExpression");
+  });
+
+  it("rejects an empty column list", () => {
+    expect(_getThrownCode([])).toBe("InvalidExpression");
+  });
+
+  it("rejects an expression that is not a single SQL expression", () => {
+    expect(
+      _getThrownCode([
+        {
+          name: "leak",
+          expression: "{c} FROM secrets",
+          inputs: { c: "cases" },
+        },
+      ]),
+    ).toBe("InvalidExpression");
+  });
+});
