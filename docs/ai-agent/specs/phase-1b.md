@@ -271,17 +271,33 @@ which carry counts only.
 A second review round found two more, also fixed:
 
 5. Offline turns read real mention names, so an offline reply could quote
-   one, and that stored reply was replayed to hosted models. The agent
-   recap now replaces each loaded gadget's real name in an assistant reply
-   with its masked name and masks the reply with the vault, after all of
-   the turn's redaction. Today's chat replaces each loaded gadget's real
-   name in a reply with its type name. Names match as whole words, ignoring
-   case, longest first.
+   one, and that stored reply was replayed to hosted models. The first fix
+   swapped real names in replies; a third round showed that name scrubbing
+   misses partial quotes, renames, and turns whose load failed, so it was
+   replaced (see 7).
 6. Block tags hidden by control characters (such as escape or delete),
    invisible characters inside the tag name, the Hangul fillers, or the
    braille blank got through chart SQL. These are now allowed anywhere in a
    tag's spelling when escaping, and comparisons such as `a < b` stay
    readable.
+
+A third round found two more, also fixed:
+
+7. Name scrubbing could not keep an offline reply's quotes off hosted
+   requests. Every answer an offline turn produces is now marked in its
+   message metadata (`OfflineAnswerMessage`), which the stored thread keeps
+   across a reload. Today's chat and the agent's recap read the fixed line
+   `[An answer from the offline model, not shown]` in its place. Offline
+   turns still read their own answers, and other assistant replies in the
+   agent's recap are still masked with the vault.
+8. The block tag escape backtracked quadratically on a `<` followed by a
+   long invisible run. Tags are now found on a copy with invisible
+   characters removed, mapped back to the original `<`, and SQL is cut to
+   twice its cap before escaping.
+
+Accepted: offline replies stored before the mark existed carry no mark and
+are sent to hosted requests as written. None of them could have read a
+mention name, since mentions ship with the mark.
 
 Still open, untested: a map layer's own filter value appearing in that
 layer's name. Layer queries are not vaulted.
