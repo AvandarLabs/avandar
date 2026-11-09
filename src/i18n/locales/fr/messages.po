@@ -1382,7 +1382,8 @@ msgstr "Feuille"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "Plus de {formattedNumResults} sur {formattedNumCatalogListings} jeux de "
+"données"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -5585,7 +5586,7 @@ msgstr "Remplacer l’URL"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ datasets"
-msgstr ""
+msgstr "Plus de {formattedNumResults} jeux de données"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts

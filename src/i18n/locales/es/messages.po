@@ -1371,7 +1371,8 @@ msgstr "Hoja"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "Más de {formattedNumResults} de {formattedNumCatalogListings} conjuntos "
+"de datos"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -5543,7 +5544,7 @@ msgstr "Reemplazar URL"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ datasets"
-msgstr ""
+msgstr "Más de {formattedNumResults} conjuntos de datos"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
