@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { DashboardMapBlocks } from "@/clients/dashboards/DashboardMapBlocks/DashboardMapBlocks";
 import { createMapSnapshotFromMapId } from "@/clients/maps/MapSnapshot/createMapSnapshotFromMapId/createMapSnapshotFromMapId";
 import { PublicMapSnapshotStorageClient } from "@/clients/storage/PublicMapSnapshotStorageClient/PublicMapSnapshotStorageClient";
@@ -37,7 +38,11 @@ export async function prepareMapSnapshots(
   return snapshots;
 }
 
-/** Writes compiled map snapshots into a staged snapshot generation. */
+/**
+ * Writes compiled map snapshots into a staged snapshot generation. Every
+ * upload settles before the first failure is rethrown, so the publish never
+ * cleans up a generation while a map is still being written into it.
+ */
 export async function uploadMapSnapshots(
   options: Readonly<{
     bucket: SnapshotBucketName;
@@ -46,7 +51,7 @@ export async function uploadMapSnapshots(
     mapSnapshots: readonly MapSnapshot[];
   }>,
 ): Promise<void> {
-  await Promise.all(
+  const uploadResults = await Promise.allSettled(
     options.mapSnapshots.map((snapshot) => {
       return PublicMapSnapshotStorageClient.uploadMapSnapshot({
         bucket: options.bucket,
@@ -56,4 +61,8 @@ export async function uploadMapSnapshots(
       });
     }),
   );
+  const failedUpload = uploadResults.find(propEq("status", "rejected"));
+  if (failedUpload?.status === "rejected") {
+    throw failedUpload.reason;
+  }
 }

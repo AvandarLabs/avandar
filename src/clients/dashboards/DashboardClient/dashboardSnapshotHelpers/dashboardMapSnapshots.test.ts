@@ -105,4 +105,39 @@ describe("dashboardMapSnapshots", () => {
       snapshot: SNAPSHOT,
     });
   });
+
+  it("waits for every upload to settle before rejecting with the first failure", async () => {
+    const uploadFailure = new Error("upload failed");
+    let resolveSlowUpload: () => void = () => {};
+    let hasSlowUploadSettled = false;
+    uploadMapSnapshotMock
+      .mockRejectedValueOnce(uploadFailure)
+      .mockImplementationOnce(() => {
+        return new Promise<void>((resolve) => {
+          resolveSlowUpload = () => {
+            hasSlowUploadSettled = true;
+            resolve();
+          };
+        });
+      });
+
+    const uploadPromise = uploadMapSnapshots({
+      bucket: "published",
+      dashboardId: DASHBOARD.id,
+      snapshotRevision: SNAPSHOT_REVISION,
+      mapSnapshots: [SNAPSHOT, { ...SNAPSHOT, mapName: "Second map" }],
+    });
+    let hasUploadRejected = false;
+    uploadPromise.catch(() => {
+      hasUploadRejected = true;
+    });
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    expect(hasUploadRejected).toBe(false);
+
+    resolveSlowUpload();
+    await expect(uploadPromise).rejects.toBe(uploadFailure);
+    expect(hasSlowUploadSettled).toBe(true);
+  });
 });
