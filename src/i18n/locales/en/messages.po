@@ -1760,10 +1760,6 @@ msgid "That archive only contains another archive. Paste a link to the file "
 msgstr "That archive only contains another archive. Paste a link to the file "
 "itself."
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{featureCount} points"
-#~ msgstr "{featureCount} points"
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
 msgstr "Close chat (⌘/)"
@@ -2959,10 +2955,6 @@ msgid "A local record of every time you approved (or cancelled) sending data to 
 msgstr "A local record of every time you approved (or cancelled) sending data "
 "to an AI provider in this workspace. Last 90 days, stored on this "
 "device only."
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "1 point"
-#~ msgstr "1 point"
 
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
@@ -4715,11 +4707,6 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
-#~ msgid "Distance (meters)"
-#~ msgstr "Distance (meters)"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Preparing offline models"
@@ -7102,10 +7089,6 @@ msgstr "Cluster radius"
 msgid "No saved datasets found."
 msgstr "No saved datasets found."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-#~ msgid "Expand the inspector"
-#~ msgstr "Expand the inspector"
-
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/index.tsx
@@ -7272,12 +7255,6 @@ msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
-
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
-#~ "columns."
-#~ msgstr "Buffer needs a layer with compiled geometry, not latitude and longitude "
-#~ "columns."
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -7665,10 +7642,6 @@ msgstr "Filter"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
-
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
-#~ msgstr "{countText} {layerName} within {distanceText} of {sourceLayerName}"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
@@ -9278,10 +9251,6 @@ msgstr "{0} and its layers will be removed. This cannot be undone."
 msgid "... and {remainingCount} more"
 msgstr "... and {remainingCount} more"
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-#~ msgid "Collapse the inspector"
-#~ msgstr "Collapse the inspector"
-
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "Just what's queried"
@@ -9779,10 +9748,6 @@ msgstr "Could not delete the place."
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "Switch Workspace"
-
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName}"
-#~ msgstr "{countText} {layerName}"
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
