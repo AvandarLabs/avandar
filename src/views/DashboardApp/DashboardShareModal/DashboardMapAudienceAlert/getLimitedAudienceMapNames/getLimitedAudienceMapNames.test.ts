@@ -7,7 +7,7 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const OPEN_MAP_ID = "00000000-0000-4000-8000-0000000000f1" as AvaMap.Id;
 const HIDDEN_MAP_ID = "00000000-0000-4000-8000-0000000000f2" as AvaMap.Id;
-const UNAVAILABLE_LABEL = "a map you cannot open";
+const OTHER_HIDDEN_MAP_ID = "00000000-0000-4000-8000-0000000000f3" as AvaMap.Id;
 
 function _makeMap(overrides: Partial<AvaMap.T>): AvaMap.T {
   return {
@@ -41,9 +41,8 @@ describe("getLimitedAudienceMapNames", () => {
         mapIds: [OPEN_MAP_ID],
         maps: [_makeMap({ name: "Case homes", isRestricted: true })],
         datasets: [],
-        unavailableMapLabel: UNAVAILABLE_LABEL,
       }),
-    ).toEqual(["Case homes"]);
+    ).toEqual({ mapNames: ["Case homes"], numUnavailableMaps: 0 });
   });
 
   it("names a map whose dataset is restricted", () => {
@@ -54,9 +53,8 @@ describe("getLimitedAudienceMapNames", () => {
         mapIds: [OPEN_MAP_ID],
         maps: [_makeMapWithDataset(dataset)],
         datasets: [dataset],
-        unavailableMapLabel: UNAVAILABLE_LABEL,
       }),
-    ).toEqual(["Schools"]);
+    ).toEqual({ mapNames: ["Schools"], numUnavailableMaps: 0 });
   });
 
   it("names a map whose dataset the author cannot read", () => {
@@ -65,9 +63,8 @@ describe("getLimitedAudienceMapNames", () => {
         mapIds: [OPEN_MAP_ID],
         maps: [_makeMapWithDataset(_getDataset())],
         datasets: [],
-        unavailableMapLabel: UNAVAILABLE_LABEL,
       }),
-    ).toEqual(["Schools"]);
+    ).toEqual({ mapNames: ["Schools"], numUnavailableMaps: 0 });
   });
 
   it("does not name a map whose datasets are all open", () => {
@@ -78,20 +75,18 @@ describe("getLimitedAudienceMapNames", () => {
         mapIds: [OPEN_MAP_ID],
         maps: [_makeMapWithDataset(dataset)],
         datasets: [dataset],
-        unavailableMapLabel: UNAVAILABLE_LABEL,
       }),
-    ).toEqual([]);
+    ).toEqual({ mapNames: [], numUnavailableMaps: 0 });
   });
 
-  it("labels a map the author cannot read", () => {
+  it("counts the maps the author cannot read instead of naming them", () => {
     expect(
       getLimitedAudienceMapNames({
-        mapIds: [HIDDEN_MAP_ID],
+        mapIds: [HIDDEN_MAP_ID, OTHER_HIDDEN_MAP_ID],
         maps: [],
         datasets: [],
-        unavailableMapLabel: UNAVAILABLE_LABEL,
       }),
-    ).toEqual([UNAVAILABLE_LABEL]);
+    ).toEqual({ mapNames: [], numUnavailableMaps: 2 });
   });
 
   it("names nothing when every map and dataset is open", () => {
@@ -100,8 +95,7 @@ describe("getLimitedAudienceMapNames", () => {
         mapIds: [OPEN_MAP_ID],
         maps: [_makeMap({})],
         datasets: [],
-        unavailableMapLabel: UNAVAILABLE_LABEL,
       }),
-    ).toEqual([]);
+    ).toEqual({ mapNames: [], numUnavailableMaps: 0 });
   });
 });
