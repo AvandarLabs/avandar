@@ -67,7 +67,7 @@ function _buildGroupByChoices(
 export function useRollingAverageForm(
   options: Readonly<{
     columnNames: readonly string[];
-    initialValueColumn: string;
+    initialValueColumn: string | undefined;
     initialDateColumn: string;
   }>,
 ): RollingAverageFormState {

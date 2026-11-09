@@ -75,4 +75,51 @@ describe("makeRollingAverageColumnFromOptions", () => {
       _makeColumn({ window: { size, unit: "day" } });
     }).toThrow(RangeError);
   });
+
+  it("counts each row as 1 over a 7-day window when no value column is set", () => {
+    const column = makeRollingAverageColumnFromOptions({
+      valueColumn: undefined,
+      dateColumn: "report_date",
+      window: { size: 7, unit: "day" },
+      groupByColumn: undefined,
+    });
+    expect(column).toEqual({
+      name: "count_7d_avg",
+      expression:
+        "count(*) OVER (ORDER BY {date} " +
+        "RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW) / 7.0",
+      inputs: { date: "report_date" },
+    });
+  });
+
+  it("divides a 2-week row count by the 14 days in the window", () => {
+    const column = makeRollingAverageColumnFromOptions({
+      valueColumn: undefined,
+      dateColumn: "report_date",
+      window: { size: 2, unit: "week" },
+      groupByColumn: undefined,
+    });
+    expect(column.name).toBe("count_2w_avg");
+    expect(column.expression).toBe(
+      "count(*) OVER (ORDER BY {date} " +
+        "RANGE BETWEEN INTERVAL 13 DAY PRECEDING AND CURRENT ROW) / 14.0",
+    );
+  });
+
+  it("partitions a row count by the group and does not bind a value", () => {
+    const column = makeRollingAverageColumnFromOptions({
+      valueColumn: undefined,
+      dateColumn: "report_date",
+      window: { size: 7, unit: "day" },
+      groupByColumn: "borough",
+    });
+    expect(column.expression).toBe(
+      "count(*) OVER (PARTITION BY {group} ORDER BY {date} " +
+        "RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW) / 7.0",
+    );
+    expect(column.inputs).toEqual({
+      date: "report_date",
+      group: "borough",
+    });
+  });
 });

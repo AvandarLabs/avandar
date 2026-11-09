@@ -24,13 +24,17 @@ export function ColumnPickers(props: Readonly<Props>): ReactNode {
     <Stack gap="xs">
       <Select
         label={t("rollingAverage.valueColumn")}
+        placeholder={t("rollingAverage.valueColumn.none")}
         data={props.numericColumnNames}
-        value={value.valueColumn}
-        allowDeselect={false}
+        value={value.valueColumn ?? null}
+        clearable
+        clearButtonProps={{
+          "aria-label": t("rollingAverage.valueColumn.clear"),
+          "aria-hidden": false,
+          tabIndex: 0,
+        }}
         onChange={(valueColumn) => {
-          if (valueColumn !== null) {
-            onChange({ ...value, valueColumn });
-          }
+          onChange({ ...value, valueColumn: valueColumn ?? undefined });
         }}
       />
       <Select

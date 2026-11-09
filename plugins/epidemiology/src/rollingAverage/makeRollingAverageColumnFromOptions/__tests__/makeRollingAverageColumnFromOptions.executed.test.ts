@@ -23,6 +23,15 @@ const FIXTURE_SQL = `
     ('B', DATE '2024-01-05', 50)
   ) AS t(borough, report_date, cases);
 
+  CREATE TABLE line_list AS SELECT * FROM (VALUES
+    ('A', DATE '2024-01-01'),
+    ('A', DATE '2024-01-01'),
+    ('A', DATE '2024-01-03'),
+    ('B', DATE '2024-01-01'),
+    ('B', DATE '2024-01-02'),
+    ('B', DATE '2024-01-04')
+  ) AS t(borough, onset);
+
   CREATE TABLE daily_cases AS
     SELECT
       report_date,
@@ -60,10 +69,12 @@ async function _readAverages(
     dateColumn?: string;
     window: RollingWindow;
     groupByColumn?: string;
+    /** True to count each row as 1 instead of averaging a value column. */
+    countRows?: boolean;
   }>,
 ): Promise<Map<string, number>> {
   const column = makeRollingAverageColumnFromOptions({
-    valueColumn: "cases",
+    valueColumn: options.countRows ? undefined : "cases",
     dateColumn: options.dateColumn ?? "report_date",
     window: options.window,
     groupByColumn: options.groupByColumn,
@@ -146,6 +157,47 @@ describe("makeRollingAverageColumnFromOptions executed", () => {
       expect(averages.get(day)).toBe(average);
     },
   );
+
+  it("counts each line-list row as 1 and divides by the window length", async () => {
+    const averages = await _readAverages({
+      table: "line_list",
+      key: "borough || ' ' || onset",
+      dateColumn: "onset",
+      window: { size: 3, unit: "day" },
+      countRows: true,
+    });
+    // Jan 1 holds 3 rows. A 1-day window is that count, not the average of
+    // the constant 1, which would be 1.
+    const oneDay = await _readAverages({
+      table: "line_list",
+      key: "onset",
+      dateColumn: "onset",
+      window: { size: 1, unit: "day" },
+      countRows: true,
+    });
+    expect(oneDay.get("2024-01-01")).toBe(3);
+    // 3-day windows, with a day that has no row counting as zero: Jan 1 is
+    // 3/3, Jan 2 is 4/3, Jan 3 is 5/3, and Jan 4 is 3/3.
+    expect(averages.get("A 2024-01-01")).toBeCloseTo(1);
+    expect(averages.get("B 2024-01-02")).toBeCloseTo(4 / 3);
+    expect(averages.get("A 2024-01-03")).toBeCloseTo(5 / 3);
+    expect(averages.get("B 2024-01-04")).toBeCloseTo(1);
+  });
+
+  it("counts each group's rows on their own when no value column is set", async () => {
+    const averages = await _readAverages({
+      table: "line_list",
+      key: "borough || ' ' || onset",
+      dateColumn: "onset",
+      window: { size: 3, unit: "day" },
+      groupByColumn: "borough",
+      countRows: true,
+    });
+    // A's Jan 3 window holds its two Jan 1 rows and its Jan 3 row, not B's.
+    expect(averages.get("A 2024-01-01")).toBeCloseTo(2 / 3);
+    expect(averages.get("A 2024-01-03")).toBeCloseTo(1);
+    expect(averages.get("B 2024-01-04")).toBeCloseTo(2 / 3);
+  });
 
   it("reaches back whole days from a timestamp column", async () => {
     const averages = await _readAverages({

@@ -11,14 +11,14 @@ type Props = {
   columnNames: readonly string[];
   numericColumnNames: readonly string[];
   dateColumnNames: readonly string[];
-  initialValueColumn: string;
+  initialValueColumn: string | undefined;
   initialDateColumn: string;
 };
 
 /**
  * The column pickers, the window fields, and the button that adds the
  * rolling average column. `RollingAverageModal` renders it once the result
- * has a numeric and a date column.
+ * has a date column. The value column can be left empty.
  */
 export function RollingAverageForm(props: Readonly<Props>): ReactNode {
   const t = useT();
@@ -37,7 +37,9 @@ export function RollingAverageForm(props: Readonly<Props>): ReactNode {
       />
       <WindowFields value={form.windowInput} onChange={form.setWindowInput} />
       <Text size="sm" c="dimmed">
-        {t("rollingAverage.oneRowPerDate")}
+        {form.columnsInput.valueColumn === undefined
+          ? t("rollingAverage.eachRowCounts")
+          : t("rollingAverage.oneRowPerDate")}
       </Text>
       <AddColumnsFooter
         buttonLabel={t("rollingAverage.add")}
