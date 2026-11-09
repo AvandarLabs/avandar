@@ -11,8 +11,15 @@ import type { FetchLike } from "$/utils/HttpClientFactory/HttpClientFactory.type
  */
 const MAX_RESPONSE_BYTES = 32 * 1024 * 1024;
 
-/** Four requests a second: a full run of about 3,300 takes 14 minutes. */
-const MIN_TIME_BETWEEN_REQUESTS_MS = 250;
+/**
+ * At most eight request starts a second. Each GHO request takes about a
+ * second, so with `MAX_REQUESTS_IN_FLIGHT` a full run of about 3,300
+ * requests takes about 7 minutes rather than the 55 it takes one at a time.
+ */
+const MIN_TIME_BETWEEN_REQUESTS_MS = 125;
+
+/** The most GHO requests the pipeline has waiting on an answer at once. */
+const MAX_REQUESTS_IN_FLIGHT = 8;
 
 /** A 429 is retried this many times, backing off as HDX's client does. */
 const MAX_RETRIES_ON_TOO_MANY_REQUESTS = 3;
@@ -22,8 +29,9 @@ const INITIAL_RETRY_DELAY_MS = 5000;
 
 /**
  * Creates the rate-limited HTTP client the GHO pipeline reads GHO's OData
- * API with. GHO needs no credentials. A 429 is retried up to three times,
- * waiting 5, 10, then 20 seconds.
+ * API with: up to eight requests at once, started at most eight a second.
+ * GHO needs no credentials. A 429 is retried up to three times, waiting 5,
+ * 10, then 20 seconds.
  *
  * @param params.baseUrl - The GHO drive's base URL.
  * @param params.fetchImpl - Replaces `fetch`, for tests.
@@ -48,7 +56,10 @@ export function createGhoHttpClient(params: {
         initialDelayMs: INITIAL_RETRY_DELAY_MS,
         sleep,
       }),
-      withRateLimit({ minTimeMs: MIN_TIME_BETWEEN_REQUESTS_MS }),
+      withRateLimit({
+        minTimeMs: MIN_TIME_BETWEEN_REQUESTS_MS,
+        maxConcurrent: MAX_REQUESTS_IN_FLIGHT,
+      }),
     ],
   });
 }

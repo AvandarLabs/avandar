@@ -1,0 +1,31 @@
+.choiceRow {
+  align-items: center;
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  gap: var(--mantine-spacing-sm);
+  justify-content: space-between;
+  min-width: 0;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  text-align: start;
+  width: 100%;
+}
+
+.choiceRow:hover {
+  background-color: var(--ava-surface-sunken);
+}
+
+.choiceRow:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}
+
+.choiceName {
+  min-width: 0;
+}
+
+.choiceSize {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}

@@ -35,11 +35,19 @@ function _getSchema({
   ) {
     return undefined;
   }
+  // A seed keyed to this SQL wins over earlier bindings keyed to other SQL.
+  // The Data Explorer re-keys its bindings that way when it wraps its SQL,
+  // so the columns the wrapper passes through keep their IDs.
+  const isSeedForThisSql =
+    options.initialRegistry?.sqlKey === sqlKey &&
+    previous?.registry.sqlKey !== sqlKey;
   const schema = reconcileQueryResultColumnBindings({
     ...options,
     sqlKey,
     columns: options.result.columns,
-    previous: previous?.registry ?? options.initialRegistry,
+    previous: isSeedForThisSql
+      ? options.initialRegistry
+      : (previous?.registry ?? options.initialRegistry),
   });
   return schema.registry === previous?.registry &&
     JSON.stringify(schema.issues) === JSON.stringify(previous.issues)

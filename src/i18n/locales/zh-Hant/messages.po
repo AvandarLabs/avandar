@@ -461,6 +461,10 @@ msgstr "無法載入資料集的 SQL 查詢。"
 msgid "Avandar"
 msgstr "Avandar"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't download from a private or local address."
+msgstr "Avandar 無法從私人或本機位址下載。"
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
 msgstr "需要審查"
@@ -654,6 +658,10 @@ msgstr "圖層 {0} 僅支援彙總，無法以個別符號繪製。"
 msgid "When"
 msgstr "當"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive doesn't contain a CSV, Excel, or PDF file."
+msgstr "該壓縮檔不包含 CSV、Excel 或 PDF 檔案。"
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
 msgstr "保存並重新執行查詢"
@@ -810,6 +818,11 @@ msgstr "免費"
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "表格視覺化沒有額外的設置。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't public. Avandar can only download a file anyone can "
+"open."
+msgstr "該連結不是公開連結。Avandar 只能下載任何人都能開啟的檔案。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
@@ -1260,11 +1273,6 @@ msgstr "此記錄載入失敗"
 msgid "Saved datasets"
 msgstr "已保存的數據集"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-"you save the dataset."
-msgstr "Avandar 會在您的瀏覽器中讀取檔案。在您儲存資料集之前，任何內容都不會離開此裝置。"
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
@@ -1314,6 +1322,12 @@ msgstr "來自衍生數據集"
 msgid "Sheet"
 msgstr "工作表"
 
+#. placeholder {0}: status.fileName
+#. placeholder {1}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Getting {0} from {1}"
+msgstr "正在從 {1} 取得 {0}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
 msgstr "{formattedNumResults}+ 個（共 {formattedNumCatalogListings} 個資料集）"
@@ -1341,6 +1355,10 @@ msgstr "已開啟並處理中。"
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Derived dataset"
 msgstr "衍生資料集"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "This link has more than one data file."
+msgstr "此連結包含多個資料檔案。"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1620,6 +1638,11 @@ msgstr "離線回答"
 msgid "Expand the layers panel"
 msgstr "展開圖層面板"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive only contains another archive. Paste a link to the file "
+"itself."
+msgstr "該壓縮檔只包含另一個壓縮檔。請貼上檔案本身的連結。"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
 msgstr "{featureCount} 個點"
@@ -1729,7 +1752,7 @@ msgstr "儀表板"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add {displayName} to workspace"
-msgstr ""
+msgstr "將 {displayName} 新增至工作區"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -1770,6 +1793,11 @@ msgstr "確認"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "等於..."
+
+#. placeholder {0}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Downloading from {0}"
+msgstr "正在從 {0} 下載"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -2122,6 +2150,7 @@ msgid "Boundary disclaimer (Always included)"
 msgstr "邊界免責聲明（一定包含）"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
 msgstr "撤銷"
 
@@ -2269,6 +2298,11 @@ msgstr "來自這些區塊的列"
 msgid "Chat"
 msgstr "聊天"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't import a Google Doc or a Slides deck. Paste a link to a "
+"CSV, Excel, or PDF file."
+msgstr "Avandar 無法匯入 Google 文件或 Google 簡報。請貼上 CSV、Excel 或 PDF 檔案的連結。"
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
 msgstr "主機"
@@ -2330,7 +2364,7 @@ msgstr "開放資料"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "This dataset has no data yet"
-msgstr ""
+msgstr "此資料集目前尚無資料"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -2396,6 +2430,10 @@ msgstr "刪除個案類型"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Offline mode"
 msgstr "離線模式"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar couldn't download that link. Check it and try again."
+msgstr "Avandar 無法下載該連結。請檢查連結後再試一次。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2788,6 +2826,10 @@ msgstr "在下方輸入或粘貼電子郵件。您的工作區將按成員計費
 msgid "{0} was deleted."
 msgstr "已刪除 {0}。"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can only download a public http or https link."
+msgstr "Avandar 只能下載公開的 http 或 https 連結。"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "使用的建議"
@@ -2826,6 +2868,11 @@ msgstr "工作區 ID 不得為空"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "預設使用直接以 UUID 為基礎的連結。"
+
+#. placeholder {0}: member.path
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Import {0}"
+msgstr "匯入 {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
@@ -3068,6 +3115,10 @@ msgstr "您的工作區使用 Free 方案，可分享或發布一個儀表板。
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable"
 msgstr "停用"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is no longer in the download. Choose another one."
+msgstr "該檔案已不在下載內容中。請選擇其他檔案。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -3466,7 +3517,7 @@ msgstr "至"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
-msgstr ""
+msgstr "在目錄中找不到「{displayName}」。請再次嘗試新增。"
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
@@ -3700,6 +3751,10 @@ msgstr "此資料集已在 {serviceName} 中建立索引，但無法載入。"
 msgid "You'll be asked to confirm your current password."
 msgstr "系統將要求您確認當前密碼。"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Which file should Avandar import?"
+msgstr "Avandar 應匯入哪個檔案？"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
@@ -3827,6 +3882,10 @@ msgstr "顯示資料點"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try asking"
 msgstr "試著問問"
+
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
+msgid "Columns added"
+msgstr "已新增欄位"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -4137,7 +4196,7 @@ msgstr "請檢查您的電子郵件"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Add them too"
-msgstr ""
+msgstr "也一併新增"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -4266,7 +4325,7 @@ msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
-msgstr ""
+msgstr "推薦搭配此資料集"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4306,6 +4365,12 @@ msgstr "Google 正在限制此要求的頻率"
 msgid "Plan Features:"
 msgstr "計劃功能："
 
+#: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
+msgid "Choose Aggregate only when the layer holds protection or health data "
+"that must not be mapped to a household. Displace is unavailable because "
+"it only works for layers that show points."
+msgstr "只有當圖層包含不得對應至個別家庭的保護或健康資料時，才選擇「彙總」。由於「位移」僅適用於顯示點的圖層，因此無法使用。"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
 msgstr "隱藏圖層 {layerName}"
@@ -4335,6 +4400,10 @@ msgstr "QR 碼"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "SQL 包含多個陳述式；表單僅對應第一個。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Or provide a link to a file"
+msgstr "或提供檔案連結"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
@@ -4378,6 +4447,12 @@ msgstr "草稿案件類型"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Import one tab of a spreadsheet in your Google Drive"
 msgstr "從您的 Google Drive 匯入試算表中的一個工作表"
+
+#. placeholder {0}: error.layerName ?? ""
+#: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
+msgid "Layer {0} is set to Displace, which only works for points. Choose "
+"another handling option in its Sensitivity settings."
+msgstr "圖層 {0} 設為「位移」，但此選項僅適用於點。請在其敏感度設定中選擇其他處理選項。"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -4972,6 +5047,11 @@ msgid "{filterCount} filters are active on this layer. They may be excluding "
 "everything."
 msgstr "此圖層有 {filterCount} 個篩選條件正在作用中。它們可能排除了所有內容。"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "A file you drop stays on this device until you save. A link is "
+"downloaded by Avandar first, then read here the same way."
+msgstr "您拖放的檔案會留在此裝置上，直到您儲存為止。Avandar 會先下載連結中的檔案，然後以相同方式在此讀取。"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar（預設）"
@@ -5153,6 +5233,11 @@ msgstr " m"
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "You need access"
 msgstr "您需要存取權限"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is larger than {limitLabel}, which is the most Avandar can "
+"download from a link."
+msgstr "該檔案大於 {limitLabel}，這是 Avandar 從連結下載的大小上限。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
@@ -5718,6 +5803,11 @@ msgstr "您可以查看此資料集，因為它已與您共享。"
 msgid "Break {0} of {1}, {value}"
 msgstr "第 {0} 個斷點，共 {1} 個，{value}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Add calculated columns to a Data Explorer query when you run one of its "
+"tools"
+msgstr "執行資料探索工具時，將計算欄位新增至資料探索查詢"
+
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
 msgstr "查看記錄"
@@ -6257,8 +6347,9 @@ msgid "All results"
 msgstr "所有結果"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Add"
-msgstr ""
+msgstr "新增"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6325,6 +6416,10 @@ msgstr "{periodCount, plural, one {顯示全部 # 個季度} other {顯示全部
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "清除註解"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Use a different link"
+msgstr "使用其他連結"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -6531,6 +6626,10 @@ msgstr "根據預設，我們會使用直接的 UUID 連結。請在下方新增
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "設為內部"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
+msgstr "這是 Google 試算表。請從「連接器」新增，讓它保持連線。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
@@ -7121,7 +7220,7 @@ msgstr "此圖層有一個作用中的篩選條件，可能會排除所有內容
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Recommended with it: {companionNames}"
-msgstr ""
+msgstr "推薦搭配：{companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -7416,6 +7515,10 @@ msgstr "折線圖"
 msgid "Your session has expired"
 msgstr "您的會話已過期"
 
+#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
+msgid "The query changed after the columns were added."
+msgstr "新增欄位後，查詢內容已變更。"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "在此輸入您的段落…"
@@ -7551,6 +7654,10 @@ msgstr "使用助理擷取"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "依據 {secondGroupByColumn} 計算 {datasetName} 中的資料列數"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Dropbox link is a folder. Paste a link to one file."
+msgstr "此 Dropbox 連結指向資料夾。請貼上一個檔案的連結。"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -7758,6 +7865,10 @@ msgstr "儲存資料集時發生錯誤"
 msgid "Maps"
 msgstr "地圖"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't a CSV, Excel, or PDF file."
+msgstr "該連結不是 CSV、Excel 或 PDF 檔案。"
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "匯入資料集"
@@ -7901,6 +8012,11 @@ msgstr "黃色"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "任何取得連結的人"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This GitHub link is a page, not a file. Open the file and paste that "
+"link."
+msgstr "此 GitHub 連結指向頁面，而不是檔案。請開啟檔案後貼上該連結。"
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -8184,6 +8300,10 @@ msgstr "幾何功能不可用"
 msgid "Custom colors"
 msgstr ""
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
+msgid "Use a link"
+msgstr "使用連結"
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "正在載入儀表板"
@@ -8215,6 +8335,10 @@ msgstr "儀表板已發佈！"
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "無法在離線狀態下產生 SQL。請嘗試改寫內容，或重新連線以使用雲端聊天。"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Enter a link that starts with http:// or https://."
+msgstr "請輸入以 http:// 或 https:// 開頭的連結。"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
@@ -9858,7 +9982,7 @@ msgstr "藍綠色"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
-msgstr ""
+msgstr "發布者尚未在其中新增任何資料列。您仍可開啟發布原始資料的位置。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
@@ -9950,6 +10074,10 @@ msgstr "您目前已訂閱此計劃。"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "上傳數據集"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Google Drive link is a folder. Paste a link to one file."
+msgstr "此 Google 雲端硬碟連結指向資料夾。請貼上一個檔案的連結。"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"
@@ -10225,7 +10353,7 @@ msgstr "此查詢將某種值視為另一種值，例如將文字視為數字或
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "In your workspace"
-msgstr ""
+msgstr "在您的工作區中"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10598,6 +10726,10 @@ msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
 
+#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
+msgid "Nothing to undo"
+msgstr "沒有可復原的操作"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
 msgstr "移除此資料集"
@@ -10637,7 +10769,7 @@ msgstr "載入中"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Names the codes in {columnList}"
-msgstr ""
+msgstr "為 {columnList} 中的代碼命名"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
@@ -11050,6 +11182,10 @@ msgstr "來自欄位：<0>{columnName}</0>"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr "底端"
+
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
+msgid "Added {columnList}"
+msgstr "已新增 {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"

@@ -21,6 +21,43 @@ describe("createGhoHttpClient", () => {
     expect(headers.has("authorization")).toBe(false);
   });
 
+  it("lets eight requests run at once, and holds a ninth until one answers", async () => {
+    let numInFlight = 0;
+    const releases: Array<() => void> = [];
+    const fetchImpl: FetchLike = vi.fn(async () => {
+      numInFlight += 1;
+      await new Promise<void>((resolve) => {
+        releases.push(resolve);
+      });
+      numInFlight -= 1;
+      return new Response("{}");
+    });
+    const http = createGhoHttpClient({ baseUrl: GHO_BASE_URL, fetchImpl });
+
+    const requests = Array.from({ length: 9 }, (_unused, index) => {
+      return http.get(`${GHO_BASE_URL}/I${index}`);
+    });
+    await vi.waitFor(
+      () => {
+        expect(numInFlight).toBe(8);
+      },
+      { timeout: 3000 },
+    );
+    await new Promise((resolve) => {
+      setTimeout(resolve, 300);
+    });
+
+    expect(numInFlight).toBe(8);
+    releases.forEach((release) => {
+      release();
+    });
+    await vi.waitFor(() => {
+      expect(releases).toHaveLength(9);
+    });
+    releases.at(-1)?.();
+    await Promise.all(requests);
+  });
+
   it("retries a 429 from GHO", async () => {
     let calls = 0;
     const fetchImpl: FetchLike = vi.fn(async () => {

@@ -189,6 +189,14 @@ describe("PluginManifestSchema", () => {
     );
   });
 
+  it("accepts the query:addColumns permission", () => {
+    const result = PluginManifestSchema.parse({
+      ..._makeValidManifest(),
+      permissions: ["data:context", "query:addColumns"],
+    });
+    expect(result.permissions).toEqual(["data:context", "query:addColumns"]);
+  });
+
   it("rejects a permission this schema version does not support", () => {
     const issues = _getIssues({
       ..._makeValidManifest(),

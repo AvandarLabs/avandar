@@ -7,6 +7,7 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useMemo, type ReactNode } from "react";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import { DatasetPreviewSection } from "@/components/DatasetPreviewSection/DatasetPreviewSection";
@@ -30,7 +31,6 @@ import type { DataCatalogListingRead } from "$/models/data-catalog-listings/Data
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import type { CatalogListingPreviewState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
-import { useMemo, type ReactNode } from "react";
 
 /**
  * How tall the description runs before "Show more": about six lines of

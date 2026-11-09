@@ -58,6 +58,28 @@ export type FetchRowsResult = Readonly<{
   isTruncated: boolean;
 }>;
 
+/** One computed column for `avandar.dataExplorer.addColumns`. */
+export type DerivedColumn = Readonly<{
+  /** Lowercase snake case, matching `^[a-z][a-z0-9_]*$`. */
+  name: string;
+  /**
+   * One SQL scalar or window expression. `{placeholder}`s name keys of
+   * `inputs`.
+   */
+  expression: string;
+  /** Placeholder to the name of a column in the invoked-on result. */
+  inputs: Readonly<Record<string, string>>;
+}>;
+
+/** What `avandar.dataExplorer.addColumns` resolves to. */
+export type AddColumnsResult = Readonly<{
+  /**
+   * The names the columns were added under, after `_2`, `_3` clash suffixes,
+   * in input order.
+   */
+  columnNames: readonly string[];
+}>;
+
 /** Values interpolated into an ICU message. */
 export type TranslationValues = Readonly<Record<string, string | number>>;
 
@@ -107,11 +129,31 @@ export type AvandarApi = Readonly<{
   }>;
   ui: Readonly<{
     openModal: (options: PluginOverlayOptions) => void;
+    /**
+     * Closes the modal this invocation opened last. Does nothing when it
+     * opened none or that modal is already closed.
+     */
+    closeModal: () => void;
     openDrawer: (options: PluginOverlayOptions) => void;
     notify: (options: PluginNotifyOptions) => void;
   }>;
   i18n: Readonly<{
     t: (key: string, values?: TranslationValues) => string;
+  }>;
+  /**
+   * Changes the Data Explorer query the command was invoked on. Present only
+   * for commands run from the `dataExplorer.toolbar` slot.
+   */
+  dataExplorer?: Readonly<{
+    /**
+     * Adds computed columns to the query, reruns it, and offers the user
+     * Undo. Rejects with a `PluginError`: `InvalidExpression` for a column
+     * the host cannot add, `InvalidHandle` when the user changed the query
+     * since invoking the command.
+     */
+    addColumns: (
+      columns: readonly DerivedColumn[],
+    ) => Promise<AddColumnsResult>;
   }>;
 }>;
 

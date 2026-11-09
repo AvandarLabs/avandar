@@ -1,5 +1,6 @@
 import { isPluginDefinition } from "@avandar/plugin-sdk";
 import { makePluginApi } from "@/lib/plugins/makePluginApi/makePluginApi";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type { ActivePlugin } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
 import type {
   PluginCodeModule,
@@ -64,6 +65,9 @@ export async function runPluginCommand(
     commandId: string;
     context: PluginInvocationContext;
     workspace: AvandarApi["workspace"];
+
+    /** What a Data Explorer toolbar command changes its query through. */
+    dataExplorerBridge?: DataExplorerBridge;
     loadCode: (
       entry: PluginIndexEntry,
     ) => Promise<PluginCodeModule | undefined>;
@@ -90,6 +94,7 @@ export async function runPluginCommand(
       context,
       workspace,
       messages: codeModule.messages,
+      dataExplorerBridge: options.dataExplorerBridge,
     });
     await handler(api);
     return undefined;

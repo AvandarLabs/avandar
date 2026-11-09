@@ -21,6 +21,12 @@ held the whole source, which adding the listing hands back to build the
 listing's shared Parquet copy from. Do not force it into
 the shape below, and do not take it as the example to copy.
 
+A pasted link on `ManualUploadView` is still a manual upload. Avandar's
+server downloads the public file, the browser sniffs the bytes, and the
+review form is the same one a dropped file uses. The link is not stored and
+a refresh does not fetch it again. An archive or a portal page with more
+than one data file stops to ask which one, then continues as a single file.
+
 ## The shape
 
 Two parts, in this order, and nothing else in the view:

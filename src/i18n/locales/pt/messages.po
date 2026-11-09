@@ -478,6 +478,10 @@ msgstr "Não foi possível carregar a consulta SQL do conjunto de dados."
 msgid "Avandar"
 msgstr "Avandar"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't download from a private or local address."
+msgstr "O Avandar não pode baixar de um endereço privado ou local."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
 msgstr "Revisão necessária"
@@ -678,6 +682,10 @@ msgstr "A camada {0} é apenas agregada e não pode ser desenhada como símbolos
 msgid "When"
 msgstr "Quando"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive doesn't contain a CSV, Excel, or PDF file."
+msgstr "Esse arquivo compactado não contém um arquivo CSV, Excel ou PDF."
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
 msgstr "Salvar e reexecutar consulta"
@@ -838,6 +846,12 @@ msgstr "Gratuito"
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "A visualização da tabela não possui configurações extras."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't public. Avandar can only download a file anyone can "
+"open."
+msgstr "Esse link não é público. O Avandar só pode baixar um arquivo que "
+"qualquer pessoa possa abrir."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
@@ -1315,12 +1329,6 @@ msgstr "Não foi possível carregar este registro"
 msgid "Saved datasets"
 msgstr "Conjuntos de dados salvos"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-"you save the dataset."
-msgstr "O Avandar lê o arquivo no seu navegador. Nada sai deste dispositivo até "
-"que você salve o conjunto de dados."
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
@@ -1373,6 +1381,12 @@ msgstr "Do conjunto de dados derivado"
 msgid "Sheet"
 msgstr "Planilha"
 
+#. placeholder {0}: status.fileName
+#. placeholder {1}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Getting {0} from {1}"
+msgstr "Obtendo {0} de {1}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
 msgstr "+ de {formattedNumCatalogListings} conjuntos de dados, de um total de "
@@ -1401,6 +1415,10 @@ msgstr "Aberto e em andamento."
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Derived dataset"
 msgstr "Conjunto de dados derivado"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "This link has more than one data file."
+msgstr "Esse link contém mais de um arquivo de dados."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1692,6 +1710,12 @@ msgstr "Responder offline"
 msgid "Expand the layers panel"
 msgstr "Expandir o painel de camadas"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive only contains another archive. Paste a link to the file "
+"itself."
+msgstr "Esse arquivo compactado contém apenas outro arquivo compactado. Cole um "
+"link para o próprio arquivo."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
 msgstr "{featureCount} pontos"
@@ -1803,7 +1827,7 @@ msgstr "Dashboard"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Add {displayName} to workspace"
-msgstr ""
+msgstr "Adicionar {displayName} ao espaço de trabalho"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -1846,6 +1870,11 @@ msgstr "Confirmar"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "é igual a..."
+
+#. placeholder {0}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Downloading from {0}"
+msgstr "Baixando de {0}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -2212,6 +2241,7 @@ msgid "Boundary disclaimer (Always included)"
 msgstr "Aviso sobre limites (Sempre incluído)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
 msgstr "Desfazer"
 
@@ -2361,6 +2391,12 @@ msgstr "Linhas destes blocos"
 msgid "Chat"
 msgstr "Chat"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't import a Google Doc or a Slides deck. Paste a link to a "
+"CSV, Excel, or PDF file."
+msgstr "O Avandar não pode importar um Google Doc ou uma apresentação do Google "
+"Slides. Cole um link para um arquivo CSV, Excel ou PDF."
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
 msgstr "Host"
@@ -2422,7 +2458,7 @@ msgstr "Dados Abertos"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "This dataset has no data yet"
-msgstr ""
+msgstr "Este conjunto de dados ainda não contém dados"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -2489,6 +2525,11 @@ msgstr "Excluir tipo de caso"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Offline mode"
 msgstr "Modo offline"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar couldn't download that link. Check it and try again."
+msgstr "O Avandar não conseguiu baixar esse link. Verifique-o e tente "
+"novamente."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2899,6 +2940,10 @@ msgstr "Digite ou cole um e-mail abaixo. Seu espaço de trabalho será cobrado "
 msgid "{0} was deleted."
 msgstr "{0} foi excluído."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can only download a public http or https link."
+msgstr "O Avandar só pode baixar um link público http ou https."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Sugestão usada"
@@ -2937,6 +2982,11 @@ msgstr "O ID do workspace não pode estar vazio"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "Por padrão, usamos um link direto baseado em UUID."
+
+#. placeholder {0}: member.path
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Import {0}"
+msgstr "Importar {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
@@ -3192,6 +3242,10 @@ msgstr "Seu workspace está no plano Free, que permite compartilhar ou publicar 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable"
 msgstr "Desativar"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is no longer in the download. Choose another one."
+msgstr "Esse arquivo não está mais disponível para download. Escolha outro."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -3606,7 +3660,8 @@ msgstr "para"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
-msgstr ""
+msgstr "Não encontramos \"{displayName}\" no catálogo. Tente adicioná-lo "
+"novamente."
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
@@ -3852,6 +3907,10 @@ msgstr "Este conjunto de dados está indexado em {serviceName}, mas não pode se
 msgid "You'll be asked to confirm your current password."
 msgstr "Você será solicitado a confirmar sua senha atual."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Which file should Avandar import?"
+msgstr "Qual arquivo o Avandar deve importar?"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
@@ -3986,6 +4045,10 @@ msgstr "Mostrar pontos"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try asking"
 msgstr "Experimente perguntar"
+
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
+msgid "Columns added"
+msgstr "Colunas adicionadas"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -4307,7 +4370,7 @@ msgstr "Por favor, verifique seu e-mail"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Add them too"
-msgstr ""
+msgstr "Adicione-os também"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -4440,7 +4503,7 @@ msgstr "Adicione um bloco de Filtro ao painel para habilitar filtragem global "
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
-msgstr ""
+msgstr "Recomendado com este conjunto de dados"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4481,6 +4544,14 @@ msgstr "O Google está limitando a taxa desta solicitação"
 msgid "Plan Features:"
 msgstr "Recursos do Plano:"
 
+#: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
+msgid "Choose Aggregate only when the layer holds protection or health data "
+"that must not be mapped to a household. Displace is unavailable because "
+"it only works for layers that show points."
+msgstr "Escolha Agregar somente quando a camada contiver dados de proteção ou "
+"saúde que não devam ser associados a uma residência. Deslocar não está "
+"disponível porque funciona apenas com camadas que mostram pontos."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
 msgstr "Ocultar a camada {layerName}"
@@ -4510,6 +4581,10 @@ msgstr "Código QR"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "O SQL contém várias instruções; o formulário mapeia apenas a primeira."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Or provide a link to a file"
+msgstr "Ou forneça um link para um arquivo"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
@@ -4554,6 +4629,14 @@ msgstr "Tipo de caso em rascunho"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Import one tab of a spreadsheet in your Google Drive"
 msgstr "Importe uma aba de uma planilha no seu Google Drive"
+
+#. placeholder {0}: error.layerName ?? ""
+#: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
+msgid "Layer {0} is set to Displace, which only works for points. Choose "
+"another handling option in its Sensitivity settings."
+msgstr "A camada {0} está configurada como Deslocar, opção que funciona apenas "
+"com pontos. Escolha outra opção de tratamento nas configurações de "
+"Sensibilidade."
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -5163,6 +5246,13 @@ msgid "{filterCount} filters are active on this layer. They may be excluding "
 msgstr "Há {filterCount} filtros ativos nesta camada. Eles podem estar "
 "excluindo tudo."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "A file you drop stays on this device until you save. A link is "
+"downloaded by Avandar first, then read here the same way."
+msgstr "Um arquivo que você arrastar permanecerá neste dispositivo até ser "
+"salvo. Um link é baixado primeiro pelo Avandar e, em seguida, lido aqui "
+"da mesma forma."
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (padrão)"
@@ -5347,6 +5437,12 @@ msgstr " m"
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "You need access"
 msgstr "Você precisa de acesso"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is larger than {limitLabel}, which is the most Avandar can "
+"download from a link."
+msgstr "Esse arquivo é maior que {limitLabel}, o tamanho máximo que o Avandar "
+"pode baixar de um link."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
@@ -5929,6 +6025,12 @@ msgstr "Você pode visualizar este conjunto de dados porque ele foi "
 msgid "Break {0} of {1}, {value}"
 msgstr "Intervalo {0} de {1}, {value}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Add calculated columns to a Data Explorer query when you run one of its "
+"tools"
+msgstr "Adicione colunas calculadas a uma consulta do Data Explorer ao executar "
+"uma de suas ferramentas"
+
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
 msgstr "Ver registros"
@@ -6487,8 +6589,9 @@ msgid "All results"
 msgstr "Todos os resultados"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Add"
-msgstr ""
+msgstr "Adicionar"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6559,6 +6662,10 @@ msgstr "{periodCount, plural, one {Mostrar # trimestre} other {Mostrar todos os 
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "Apagar anotações"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Use a different link"
+msgstr "Use um link diferente"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -6770,6 +6877,11 @@ msgstr "Por padrão, usamos um link direto baseado em UUID. Adicione um caminho 
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "Tornar interno"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
+msgstr "Esta é uma Planilha Google. Adicione-a em Conectores para mantê-la "
+"conectada."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
@@ -7376,7 +7488,7 @@ msgstr "Há um filtro ativo nesta camada. Ele pode estar excluindo tudo."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Recommended with it: {companionNames}"
-msgstr ""
+msgstr "Recomendado com ele: {companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -7681,6 +7793,10 @@ msgstr "Gráfico de linhas"
 msgid "Your session has expired"
 msgstr "Sua sessão expirou"
 
+#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
+msgid "The query changed after the columns were added."
+msgstr "A consulta foi alterada após a adição das colunas."
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "Escreva seu parágrafo aqui..."
@@ -7822,6 +7938,10 @@ msgstr "Extrair com o assistente"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Contar linhas em {datasetName} por {secondGroupByColumn}"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Dropbox link is a folder. Paste a link to one file."
+msgstr "Este link do Dropbox é uma pasta. Cole um link para um único arquivo."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -8037,6 +8157,10 @@ msgstr "Ocorreu um erro ao salvar o conjunto de dados"
 msgid "Maps"
 msgstr "Mapas"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't a CSV, Excel, or PDF file."
+msgstr "Esse link não é um arquivo CSV, Excel ou PDF."
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Importar conjunto de dados"
@@ -8185,6 +8309,12 @@ msgstr "Amarelo"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "Qualquer pessoa com o link"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This GitHub link is a page, not a file. Open the file and paste that "
+"link."
+msgstr "Este link do GitHub é uma página, não um arquivo. Abra o arquivo e cole "
+"esse link."
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -8486,6 +8616,10 @@ msgstr "Geometria indisponível"
 msgid "Custom colors"
 msgstr ""
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
+msgid "Use a link"
+msgstr "Usar um link"
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "Carregando dashboard"
@@ -8519,6 +8653,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "Não foi possível gerar SQL offline. Tente reformular ou reconecte-se "
 "para usar o chat na nuvem."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Enter a link that starts with http:// or https://."
+msgstr "Insira um link que comece com http:// ou https://."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
@@ -10225,7 +10363,8 @@ msgstr "Verde-azulado"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
 msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
-msgstr ""
+msgstr "O publicador ainda não adicionou nenhuma linha a ele. Você ainda pode "
+"abrir o original, onde ele está publicado."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
@@ -10318,6 +10457,11 @@ msgstr "Você está atualmente inscrito neste plano."
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload a dataset"
 msgstr "Carregar um conjunto de dados"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Google Drive link is a folder. Paste a link to one file."
+msgstr "Este link do Google Drive é uma pasta. Cole um link para um único "
+"arquivo."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"
@@ -10604,7 +10748,7 @@ msgstr "Esta consulta trata um tipo de valor como outro, como texto como número
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "In your workspace"
-msgstr ""
+msgstr "No seu espaço de trabalho"
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -10993,6 +11137,10 @@ msgid "The values you selected may contain personal information. The AI "
 msgstr "Os valores que você selecionou podem conter informações pessoais. O "
 "provedor de IA os receberá e pode registrar a solicitação."
 
+#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
+msgid "Nothing to undo"
+msgstr "Nada para desfazer"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
 msgstr "Remover este conjunto de dados"
@@ -11035,7 +11183,7 @@ msgstr "Carregando"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Names the codes in {columnList}"
-msgstr ""
+msgstr "Nomeia os códigos em {columnList}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
@@ -11463,6 +11611,10 @@ msgstr "Da coluna: <0>{columnName}</0>"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr "Inferior"
+
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
+msgid "Added {columnList}"
+msgstr "Adicionadas {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"

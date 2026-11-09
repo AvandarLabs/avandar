@@ -4,6 +4,7 @@ import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery
 import { getResolvedMapLayerMetadata } from "@/clients/maps/MapLayerSpatialQuery/getResolvedMapLayerMetadata/getResolvedMapLayerMetadata";
 import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { displaceSpatialFeatures } from "@/views/GisApp/layers/displaceSpatialFeatures/displaceSpatialFeatures";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
 import { runLatLngLayer } from "./runLatLngLayer";
@@ -115,12 +116,16 @@ function _getLeafSpatialSource(
   return current;
 }
 
-/** Compiles, executes, and parses one spatial layer. */
+/**
+ * Compiles, executes, and parses one spatial layer, then applies its
+ * sensitivity policy so no consumer of the query data sees exact points.
+ */
 async function _runSpatialLayer(
   options: RunSpatialLayerOptions,
 ): Promise<MapLayerDataResult> {
+  const sourceLayer = _getLeafSpatialSource(options.layer, options.stack);
   const metadata = getResolvedMapLayerMetadata({
-    layer: _getLeafSpatialSource(options.layer, options.stack),
+    layer: sourceLayer,
     datasets: options.datasets,
     datasetColumns: options.datasetColumns,
   });
@@ -133,12 +138,18 @@ async function _runSpatialLayer(
     workspaceId: options.workspaceId,
     signal: options.signal,
   });
+  const parsed = parseMapLayerSpatialResult({
+    queryResult,
+    family: plan.family,
+  });
   return {
     type: "spatial",
-    ...parseMapLayerSpatialResult({
-      queryResult,
-      family: plan.family,
+    featureCollection: displaceSpatialFeatures({
+      layer: options.layer,
+      sourceLayer,
+      featureCollection: parsed.featureCollection,
     }),
+    diagnostics: parsed.diagnostics,
   };
 }
 

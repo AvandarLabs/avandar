@@ -1,9 +1,11 @@
 import { assertIsDefined } from "@avandar/utils";
 import { modals } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
 import { SensitivitySection } from "@/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
@@ -43,21 +45,29 @@ vi.mock("@mantine/core", async (importOriginal) => {
     Select: Object.assign(
       ({
         data,
+        description,
         label,
         onChange,
       }: {
-        data: ReadonlyArray<{ label: string; value: string }>;
+        data: ReadonlyArray<{
+          label: string;
+          value: string;
+          disabled?: boolean;
+        }>;
+        description?: ReactNode;
         label: string;
         onChange: (value: string | null) => void;
       }) => {
         return (
           <div>
             <span>{label}</span>
+            {description ? <p>{description}</p> : null}
             {data.map((option) => {
               return (
                 <button
                   key={option.value}
                   type="button"
+                  disabled={option.disabled}
                   onClick={() => {
                     onChange(option.value);
                   }}
@@ -141,6 +151,54 @@ describe("SensitivitySection", () => {
       mode: "jitter",
       radiusMeters: 500,
     });
+  });
+
+  it.each(["line", "polygon"] as const)(
+    "disables Displace and says why for a %s geometry layer",
+    (family) => {
+      const onLayerChange = vi.fn<LayerChangeHandler>();
+      const layer: MapLayer.T = {
+        ...MapLayer.makeEmpty("Roads"),
+        geoBinding: {
+          type: "geometryColumn",
+          column: uuid<QueryColumn.Id>(),
+          encoding: "wkt",
+          family,
+          simplification: undefined,
+          sourceCrs: undefined,
+        },
+      };
+
+      render(
+        <SensitivitySection layer={layer} onLayerChange={onLayerChange} />,
+      );
+
+      expect(screen.getByRole("button", { name: "Displace" })).toBeDisabled();
+      expect(
+        screen.getByText(
+          "Displace is unavailable because it only works for layers that show points.",
+          { exact: false },
+        ),
+      ).toBeInTheDocument();
+    },
+  );
+
+  it("keeps Displace available for a point geometry layer", () => {
+    const layer: MapLayer.T = {
+      ...MapLayer.makeEmpty("Cases"),
+      geoBinding: {
+        type: "geometryColumn",
+        column: uuid<QueryColumn.Id>(),
+        encoding: "wkt",
+        family: "point",
+        simplification: undefined,
+        sourceCrs: undefined,
+      },
+    };
+
+    render(<SensitivitySection layer={layer} onLayerChange={vi.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Displace" })).toBeEnabled();
   });
 
   it("shows the aggregate warning and default threshold", () => {

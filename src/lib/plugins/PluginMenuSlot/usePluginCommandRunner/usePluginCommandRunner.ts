@@ -7,17 +7,23 @@ import { PluginModuleCache } from "@/lib/plugins/makePluginModuleCache/makePlugi
 import { loadRunPluginCommand } from "@/lib/plugins/PluginMenuSlot/loadRunPluginCommand/loadRunPluginCommand";
 import { Logger } from "@/utils/Logger";
 import { notifyError } from "@/utils/notifications/notify";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 import type { PluginCommandFailure } from "@/lib/plugins/runPluginCommand/runPluginCommand";
 import type { PluginInvocationContext } from "@avandar/plugin-sdk";
 import type { I18n } from "@lingui/core";
 
-function _runCommandWithLazyRunner(options: {
+type LazyCommandRun = Readonly<{
   item: PluginMenuItem;
   context: PluginInvocationContext;
+  dataExplorerBridge: DataExplorerBridge | undefined;
   workspace: { id: string; slug: string; locale: string };
-}): Promise<PluginCommandFailure | undefined> {
-  const { item, context, workspace } = options;
+}>;
+
+function _runCommandWithLazyRunner(
+  options: LazyCommandRun,
+): Promise<PluginCommandFailure | undefined> {
+  const { item, context, dataExplorerBridge, workspace } = options;
   return loadRunPluginCommand().then(
     (runCommand) => {
       return runCommand({
@@ -26,6 +32,7 @@ function _runCommandWithLazyRunner(options: {
         commandId: item.commandId,
         context,
         workspace,
+        dataExplorerBridge,
         loadCode: PluginModuleCache.loadCode,
       });
     },
@@ -81,11 +88,15 @@ function _reportFailure(options: {
  * Runs the plugin commands a slot offers and reports failures to the user in
  * a notification. `runningKey` is the key of the item whose command has not
  * finished yet, so a slot can show it as loading. Each run builds its
- * invocation context with `getContext` at that moment, and nothing runs when
- * there is no `getContext`.
+ * invocation context with `getContext`, and its Data Explorer bridge with
+ * `getDataExplorerBridge` when there is one, at that moment. Nothing runs
+ * when there is no `getContext`.
  */
 export function usePluginCommandRunner(
-  getContext: (() => PluginInvocationContext) | undefined,
+  options: Readonly<{
+    getContext: (() => PluginInvocationContext) | undefined;
+    getDataExplorerBridge?: (() => DataExplorerBridge) | undefined;
+  }>,
 ): Readonly<{
   runningKey: string | undefined;
   run: (item: PluginMenuItem) => Promise<void>;
@@ -95,16 +106,19 @@ export function usePluginCommandRunner(
   const [runningKey, setRunningKey] = useState<string>();
 
   const run = async (item: PluginMenuItem): Promise<void> => {
+    const { getContext, getDataExplorerBridge } = options;
     if (getContext === undefined) {
       return;
     }
     const context = getContext();
+    const dataExplorerBridge = getDataExplorerBridge?.();
     setRunningKey(item.key);
     let failure: PluginCommandFailure | undefined;
     try {
       failure = await _runCommandWithLazyRunner({
         item,
         context,
+        dataExplorerBridge,
         workspace: {
           id: workspace.id,
           slug: workspace.slug,
