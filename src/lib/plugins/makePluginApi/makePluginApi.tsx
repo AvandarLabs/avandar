@@ -42,17 +42,26 @@ function _makeUiApi(
   const isFromCurrentHost = (): boolean => {
     return PluginDrawerStore.getGeneration() === hostGeneration;
   };
+  // The id of the modal this invocation opened last, which `closeModal`
+  // closes. Other invocations' modals are never touched.
+  let lastModalId: string | undefined;
   return {
     openModal: ({ title, content }) => {
       if (!isFromCurrentHost()) {
         return;
       }
-      modals.open({
+      lastModalId = modals.open({
         title,
         size: "lg",
         children: wrapContent(content),
         closeButtonProps: { "aria-label": t`Close` },
       });
+    },
+    closeModal: () => {
+      if (lastModalId !== undefined) {
+        modals.close(lastModalId);
+        lastModalId = undefined;
+      }
     },
     openDrawer: ({ title, content }) => {
       if (!isFromCurrentHost()) {

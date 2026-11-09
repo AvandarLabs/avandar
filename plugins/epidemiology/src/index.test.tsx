@@ -24,7 +24,12 @@ function _makeApi(openModal: AvandarApi["ui"]["openModal"]): AvandarApi {
         return Promise.resolve({ rows: [], isTruncated: false });
       }),
     },
-    ui: { openModal, openDrawer: vi.fn(), notify: vi.fn() },
+    ui: {
+      openModal,
+      closeModal: vi.fn(),
+      openDrawer: vi.fn(),
+      notify: vi.fn(),
+    },
     i18n: {
       t: (key) => {
         return `translated:${key}`;

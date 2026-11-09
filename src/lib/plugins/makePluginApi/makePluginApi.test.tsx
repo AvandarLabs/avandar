@@ -6,7 +6,7 @@ import { makePluginApi } from "@/lib/plugins/makePluginApi/makePluginApi";
 import { PluginDrawerHost } from "@/lib/plugins/PluginDrawerHost/PluginDrawerHost";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
-import { act, cleanup, render, screen } from "@/test-utils";
+import { act, cleanup, render, screen, waitFor } from "@/test-utils";
 import type {
   AvandarApi,
   DataExplorerToolbarContext,
@@ -214,6 +214,40 @@ describe("makePluginApi", () => {
 
     expect(screen.getByText("fresh body")).toBeInTheDocument();
     expect(screen.queryByText("stale body")).not.toBeInTheDocument();
+  });
+
+  it("closes the modal the invocation opened", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+    const api = _makeApiFromRows();
+    act(() => {
+      api.ui.openModal({ title: "Details", content: <p>modal body</p> });
+    });
+    await screen.findByText("modal body");
+
+    act(() => {
+      api.ui.closeModal();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText("modal body")).not.toBeInTheDocument();
+    });
+  });
+
+  it("leaves open a modal another invocation opened", async () => {
+    render(<ModalsProvider>{null}</ModalsProvider>);
+    act(() => {
+      _makeApiFromRows().ui.openModal({
+        title: "Other",
+        content: <p>other body</p>,
+      });
+    });
+    await screen.findByText("other body");
+
+    act(() => {
+      _makeApiFromRows().ui.closeModal();
+    });
+
+    expect(screen.getByText("other body")).toBeInTheDocument();
   });
 
   it("names the modal's close button", async () => {
