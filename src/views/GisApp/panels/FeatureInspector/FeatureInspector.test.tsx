@@ -1,7 +1,13 @@
+import { Model } from "@avandar/models";
 import { createRef } from "react";
 import { describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen } from "@/test-utils";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { User } from "$/models/User/User";
+import type { UserProfile } from "$/models/User/UserProfile";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";
 import type { ComponentProps } from "react";
 
@@ -133,5 +139,88 @@ describe("FeatureInspector", () => {
       screen.queryByRole("button", { name: /back/i }),
     ).not.toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Feature" })).toBeInTheDocument();
+  });
+});
+
+function _makePlacesLayer(datasetId: Dataset.Id): MapLayer.T {
+  const layer = MapLayer.makeEmpty("Exposure sites");
+  const dataset = Model.make("Dataset", {
+    id: datasetId,
+    createdAt: "2026-11-09T00:00:00.000Z",
+    updatedAt: "2026-11-09T00:00:00.000Z",
+    dateOfLastSync: undefined,
+    description: undefined,
+    isRestricted: false,
+    name: "Exposure sites",
+    sourceType: "virtual",
+    ownerId: uuid<User.Id>(),
+    ownerProfileId: uuid<UserProfile.Id>(),
+    workspaceId: uuid<Workspace.Id>(),
+  });
+  return { ...layer, source: { ...layer.source, dataSource: dataset } };
+}
+
+describe("FeatureInspector place actions", () => {
+  const placesDatasetId = uuid<Dataset.Id>();
+  const placeActions = {
+    placesDatasetIds: new Set([placesDatasetId]),
+    onEdit: vi.fn(),
+    onMove: vi.fn(),
+    onDelete: vi.fn(),
+  };
+  const placeFeature: GeoJSON.Feature = {
+    type: "Feature",
+    properties: { place_id: "p1", name: "Clinic" },
+    geometry: { type: "Point", coordinates: [-73.9885, 40.7603] },
+  };
+
+  it("offers Edit, Move, and Delete for a place from a places dataset", () => {
+    _renderInspector({
+      feature: placeFeature,
+      layer: _makePlacesLayer(placesDatasetId),
+      placeActions,
+    });
+
+    expect(screen.getByRole("button", { name: "Edit place" })).toBeVisible();
+  });
+
+  it("edits the place the feature's hidden place_id names", () => {
+    _renderInspector({
+      feature: placeFeature,
+      layer: _makePlacesLayer(placesDatasetId),
+      placeActions,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit place" }));
+
+    expect(placeActions.onEdit).toHaveBeenCalledWith({
+      datasetId: placesDatasetId,
+      placeId: "p1",
+    });
+  });
+
+  it("hides the internal place_id from a place's fields", () => {
+    _renderInspector({
+      feature: placeFeature,
+      layer: _makePlacesLayer(placesDatasetId),
+      placeActions,
+    });
+
+    expect(screen.getByText("Clinic")).toBeInTheDocument();
+    expect(screen.queryByText("place_id")).not.toBeInTheDocument();
+    expect(screen.queryByText("p1")).not.toBeInTheDocument();
+  });
+
+  it("offers no place actions for a dataset that is not a places dataset", () => {
+    _renderInspector({
+      feature: placeFeature,
+      layer: _makePlacesLayer(uuid<Dataset.Id>()),
+      placeActions,
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Edit place" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("place_id")).toBeInTheDocument();
   });
 });

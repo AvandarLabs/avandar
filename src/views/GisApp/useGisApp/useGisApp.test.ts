@@ -104,6 +104,16 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
+vi.mock("@/clients/places/VirtualPlacesStore/VirtualPlacesStore", () => {
+  return {
+    VirtualPlacesStore: {
+      usePlacesDatasetIds: () => {
+        return new Set();
+      },
+    },
+  };
+});
+
 vi.mock("@/views/GisApp/layers/useMapLayersData/useMapLayersData", () => {
   return {
     useMapLayersData: () => {

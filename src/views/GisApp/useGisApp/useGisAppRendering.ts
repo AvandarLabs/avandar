@@ -6,6 +6,7 @@ import { FitBoundsRequest } from "@/views/GisApp/layers/FitBoundsRequest/FitBoun
 import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
 import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+import { useMapConfigWithPlaceIds } from "@/views/GisApp/places/useMapConfigWithPlaceIds";
 import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -55,8 +56,13 @@ export function useGisAppRendering(
     // Capture latitude only when a new integer zoom band begins.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomBand]);
+  const renderedMapConfig = useMapConfigWithPlaceIds({
+    mapConfig: options.editor.mapConfig,
+    workspaceId: options.avaMap.workspaceId,
+    datasetColumns,
+  });
   const layerQueryStates = useMapLayersData({
-    layers: options.editor.mapConfig.layers,
+    layers: renderedMapConfig.layers,
     workspaceId: options.avaMap.workspaceId,
     zoom: options.editor.mapConfig.view.zoom,
     simplificationReferenceLatitude,
@@ -69,7 +75,7 @@ export function useGisAppRendering(
   });
   const rendering = useAvaMapRender({
     layerQueryStates,
-    mapConfig: options.editor.mapConfig,
+    mapConfig: renderedMapConfig,
     hiddenAnnotationFeatureIds: options.hiddenAnnotationFeatureIds,
   });
   PersistedLayerLegends.usePersistedLayerLegends({

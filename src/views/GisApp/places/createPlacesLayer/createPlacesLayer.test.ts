@@ -85,7 +85,7 @@ describe("createPlacesLayer", () => {
     expect(_columnName(layer, layer.timeColumn)).toBe("starts_at");
   });
 
-  it("shows every places column, place_id included, in the popup", () => {
+  it("shows every places column but the internal place_id in the popup", () => {
     const layer = createPlacesLayer({
       dataset: DATASET,
       datasetColumns: ALL_COLUMNS,
@@ -99,6 +99,8 @@ describe("createPlacesLayer", () => {
     ).toEqual(
       PLACES_COLUMNS.map((column) => {
         return column.name;
+      }).filter((name) => {
+        return name !== "place_id";
       }),
     );
   });

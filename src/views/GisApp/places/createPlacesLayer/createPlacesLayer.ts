@@ -1,14 +1,15 @@
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { PLACE_ID_COLUMN_NAME } from "@/views/GisApp/places/withPlaceIdColumn/withPlaceIdColumn";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 /**
  * A point layer showing a places dataset: bound by `latitude` and
- * `longitude`, every column in its popup, and `starts_at` driving the map's
- * time slider. The place tool adds it when a places dataset is created or
- * chosen for a map.
+ * `longitude`, every column but the internal `place_id` in its popup, and
+ * `starts_at` driving the map's time slider. The place tool adds it when a
+ * places dataset is created or chosen for a map.
  */
 export function createPlacesLayer(
   options: Readonly<{
@@ -52,7 +53,9 @@ export function createPlacesLayer(
   });
   const withPopup = MapLayerUpdates.withPopupColumns({
     layer: withBoth,
-    columns,
+    columns: columns.filter((column) => {
+      return QueryColumn.getDerivedColumnName(column) !== PLACE_ID_COLUMN_NAME;
+    }),
   });
   const startsAt = findColumn("starts_at");
   return startsAt

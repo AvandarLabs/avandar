@@ -154,6 +154,7 @@ export function GisAppMapShell({ app }: Props): ReactNode {
             mapRef={app.mapInstance.mapRef}
             onRowClick={app.onRowClick}
             onBackToTable={app.onBackToTable}
+            placeActions={placeTool.featureActions}
           />
           <ExportSheet
             opened={isExportOpen}
