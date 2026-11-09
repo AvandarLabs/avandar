@@ -24,6 +24,7 @@ type Props = {
   legendEntries: readonly ExportLegendEntry[];
   hasDrawnDisputedFeature: boolean;
   onConfigChange: (update: (config: AvaMapConfig.T) => AvaMapConfig.T) => void;
+  onAddToDashboard: () => void;
 };
 
 /**
@@ -36,7 +37,8 @@ type Props = {
  * `AvaMapConfig.withLayerRemoved`, which clears a feature list whose layer
  * is removed. Download is never gated by anything the sheet checks, because
  * Export snapshots whatever the screen already shows; a failed download
- * leaves the button enabled so the same click can retry.
+ * leaves the button enabled so the same click can retry. Its footer also
+ * hands the map to a dashboard through `onAddToDashboard`.
  */
 export function ExportSheet({
   opened,
@@ -51,6 +53,7 @@ export function ExportSheet({
   legendEntries,
   hasDrawnDisputedFeature,
   onConfigChange,
+  onAddToDashboard,
 }: Props): ReactNode {
   const { t } = useLingui();
   const { status, errorMessage, download } = useExportPdfDownload({
@@ -100,6 +103,9 @@ export function ExportSheet({
             {errorMessage}
           </Text>
         ) : null}
+        <Button variant="default" onClick={onAddToDashboard}>
+          {t`Add to dashboard`}
+        </Button>
       </Stack>
     </Drawer>
   );
