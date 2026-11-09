@@ -16,10 +16,10 @@ import type { DuckDBConnection } from "@duckdb/node-api";
  * Reference values. Exact Poisson 95% limits (Garwood, 1936): the lower limit
  * L solves P(X >= a | L) = 0.025 and the upper limit U solves
  * P(X <= a | U) = 0.025, equal to chi2(0.025, 2a) / 2 and
- * chi2(0.975, 2a + 2) / 2, listed to 5 significant figures. Byar's
- * approximation of them is as given in Rothman and Boice, Epidemiologic
- * Analysis with a Programmable Calculator (1979), listed to 4 significant
- * figures. All values are in cases.
+ * chi2(0.975, 2a + 2) / 2, listed to 5 significant figures. The Byar values
+ * are computed from Byar's approximation, in the form given by Rothman and
+ * Boice, Epidemiologic Analysis with a Programmable Calculator (1979), and
+ * listed to 4 significant figures. All values are in cases.
  */
 const REFERENCE_LIMITS = [
   { cases: 0, exact: [0, 3.6889], byar: [0, 3.668] },
