@@ -79,6 +79,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F29 | API-backed listing copies expire, so workspaces see a changed source | not started | F25 | |
 | F30 | WHO GHO pipeline, recommended listings, and listing freshness probes | not started | F4, F16, F17, F19, F23, F24, F25, F28, F29 | |
 | F31 | Threshold colors: map config version 6 with one color and label per graduated class | not started | none (its e2e spec needs F19, F25) | |
+| F33 | Filter a map layer by another layer, and the feature list: map config version 7 | not started | F31 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -115,6 +116,7 @@ API. It's new work, not something this branch built.
 | 17 | F29 | Changes how `DatasetParquetWrapper` and the pipeline server's copy store treat F25's Parquet copies. Merge after F25. |
 | 18 | F30 | Extends the listings table, upsert, model and catalog detail that F4, F16, F17, F19, F23 and F24 built, the copy builder and `parquet-cache` route F25 and F28 changed, and reads F29's max age. Merge after all of them. |
 | any | F31 | Self-contained GIS change: the map config version 6 migration, the graduated class editor, and three bug fixes. Its e2e spec adds listings through the catalog, so run that spec after F19 and F25. |
+| after F31 | F33 | Map config version 7 migrates from version 6, which F31 introduces. Its e2e spec needs the catalog browser (F19) and Parquet copies (F25). |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -1986,6 +1988,117 @@ pnpm tsc -b --force
 pnpm vitest run shared/models/AvaMap src/views/GisApp src/clients/maps
 pnpm vitest run src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing
 pnpm test:e2e gis-threshold-colors.spec.ts
+```
+
+---
+
+## F33: Filter a map layer by another layer, and the feature list (map config version 7)
+
+Status: not started. Built on `feat/gis-filter-by-layer`, branched from
+`demo/measles` at `81f57a979`. The commits below are all of
+`git log --oneline 81f57a979..feat/gis-filter-by-layer --no-merges`. This
+branch carried only F31 in the log, so F33 is the next free number here. If
+`demo/measles` already has an F32 or F33, renumber on merge.
+
+**Purpose:** A layer can keep only the features inside another layer's
+polygons (for example schools within half a mile of exposure sites).
+`MapLayerCommon.spatialFilter` names a polygon-output layer, and map config
+version 7 persists it plus a buffer's distance unit and ring label. Every
+spatial compile is wrapped once in a filter pass, and latitude/longitude layers
+get the same predicate. The buffer tool takes m, km, ft, or mi, can buffer
+latitude/longitude layers, labels its rings, and offers to filter another layer
+by the new buffer. A layer's menu opens a feature list drawer: rows after the
+AOI, time, and spatial filters, sortable, downloadable as CSV, with distance to
+the nearest buffered site and its label. Jitter layers show a count only, and
+aggregate-only layers offer no list.
+**Value:** "Which schools are within half a mile of these sites, and how far
+is each?" is one buffer, one filter, and one table.
+
+**PR title:** `feat(gis): filter a map layer by another layer and list its features`
+
+**Depends on:** F31 (map config version 6 is the base for version 7).
+
+**Commits to read** (from `feat/gis-filter-by-layer`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `8654bc93f` | feat(gis): add spatial filter and buffer unit and label fields to map layers | All of it. |
+| `69af8ce4c` | feat(gis): add buffer unit conversions and geometry kind checks to MapLayer | All of it. |
+| `5b079fe06` | feat(gis): detect spatial filter cycles and list filter candidates | All of it. |
+| `1a119476f` | feat(gis): add AvaMapConfig v7 with spatial filters and buffer units | All of it. |
+| `3ac204a71` | feat(gis): clear dangling spatial filters and insert labelled buffers | All of it. |
+| `bff134fd7` | feat(gis): add feature source and spatial filter SQL helpers | All of it. |
+| `62999adfc` | refactor(gis): resolve compile metadata from a map layer in the client | All of it. |
+| `8f96a6860` | feat(gis): compile map layers with their spatial filter | All of it. |
+| `40a11ae9f` | feat(gis): apply spatial filters to latitude and longitude layers | All of it. |
+| `a48efb85f` | feat(gis): buffer latitude and longitude layers and label rings | All of it. |
+| `e9f13eed4` | fix(gis): never buffer the exact points of a displaced layer | All of it. |
+| `1032b913d` | feat(gis): draw map layers through their spatial filter | All of it. |
+| `e29e4d9f0` | fix(gis): key filtered layers on their whole filter chain | All of it. |
+| `2a5d0bbe4` | feat(gis): define the map layer feature list contract | All of it. |
+| `8f8c3e42d` | feat(gis): compile feature list SQL with nearest-site distance | All of it. |
+| `949b09b45` | perf(gis): project feature list geometries once before measuring | All of it. |
+| `e313d9956` | feat(gis): compile a listable layer as a filtered feature source | All of it. |
+| `e6ed4b39d` | feat(gis): fetch a map layer's feature list and feature count | All of it. |
+| `32868e6b1` | fix(gis): refuse nearest-site distances from a displaced layer | All of it. |
+| `a56919bdd` | feat(gis): let a layer show only features inside another layer | All of it. |
+| `002fef777` | fix(gis): let a stale spatial filter be cleared | All of it. |
+| `e9525ea37` | feat(gis): buffer in friendly units, label rings, and offer to filter by a buffer | All of it. |
+| `d329090ab` | fix(gis): anchor the buffer popover to its tool button | All of it. |
+| `9bb38103f` | fix(gis): keep buffer distances within limits in the chosen unit | All of it. |
+| `6a2b02de2` | fix(gis): show a buffer's distance in its own unit in the inspector | All of it. |
+| `3b38c9149` | fix(gis): keep focus and explain empty targets in the buffer filter step | All of it. |
+| `bae548159` | feat(gis): open a layer's feature list from its menu | All of it. |
+| `6c5c13fdb` | feat(gis): add the feature list drawer | All of it. |
+| `82060dc5b` | fix(gis): close a layer's feature list when the layer is deleted | All of it. |
+| `7bb0c99d4` | fix(gis): refetch a feature list only when its result can change | All of it. |
+| `e5ab6a793` | fix(gis): keep the buffer tool open while picking from its selects | All of it. |
+| `73a136fb9` | feat(gis): show the feature list drawer under the map | All of it. |
+| `8efa8a80d` | fix(gis): give geometry-column layers default popup fields | All of it. |
+| `0b7e2f726` | fix(gis): keep the legend clear of the layer list when the feature list is open | All of it. |
+| `771b78dc7` | test(gis): frame both buffer rings in the feature list screenshot | All of it. |
+| `463a4ad4f` | fix(gis): query every source column when a popup shows all fields | All of it. |
+| `b210d3bcf` | test(gis): frame the rings before showing a listed feature | All of it. |
+| `9856a6b7c` | fix(gis): show a listed feature in place of the list, with a way back | All of it. |
+| `e9aaebffc` | fix(gis): name feature list rows by a name-like column | All of it. |
+| `33f87025a` | fix(gis): count a layer's areas as areas in the layer list | All of it. |
+| `7608b1fa9` | test(gis): show a listed feature in the list's place and come back | All of it. |
+| `e89152e5e` | fix(gis): never widen a displaced layer's popup and never save widened columns | All of it. |
+| `5844fdab3` | chore(i18n): extract the filter by layer strings | All of it. |
+
+**Files:**
+- Model: `shared/models/AvaMap/MapLayer/` (`GeoBinding.types.ts`,
+  `MapLayer.types.ts`, `MapLayer.ts`, `MapLayerModule/`), and
+  `AvaMapConfig/` (`hasSpatialFilterCycle`,
+  `getSpatialFilterCandidatesFromLayers`, `AvaMapConfigSchema/AvaMapConfigV7Schema.ts`,
+  `migrateAvaMapConfig.ts`, `AvaMapConfigModule`, `overlayConfigUpdaters`, and
+  the version 7 suites).
+- Spatial query client: `src/clients/maps/MapLayerSpatialQuery/` (feature
+  source and spatial filter SQL helpers, `compileSpatialFilteredQuery`,
+  `getCompileMetadataFromMapLayer`, lat/lng overlay and layer source
+  compilers, buffer compiler).
+- Feature list client: `src/clients/maps/MapLayerFeatureList/` (contract
+  types, SQL compiler, `fetchMapLayerFeatureList`, count, sort, access).
+- GIS app: `src/views/GisApp/` (layer updates, `useMapLayersData`, filter
+  select in the layer inspector, buffer tool, feature list drawer and state,
+  layer menu item, map shell wiring).
+- E2E and fixtures: `tests/e2e/gis-feature-list.spec.ts`,
+  `tests/data/gis/nyc-exposure-sites.csv`, `tests/data/gis/README.md`,
+  `tests/e2e/helpers/constants.ts`.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** none. Map config version 7 is stored in the existing `config`
+JSON, and the 6 to 7 migration runs on read.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm tsc -b --force
+pnpm vitest run shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm test:executed src/clients/maps
+pnpm test:e2e gis-feature-list.spec.ts
 ```
 
 ---
