@@ -36,13 +36,18 @@ const FACETS_WITH_KEYWORDS: CatalogFacets = {
 function _renderRail(options: {
   filters?: Partial<CatalogListingFilters>;
   facets?: CatalogFacets;
+  keywordOptions?: CatalogFacets["tags"];
   onFiltersChange?: (filters: CatalogListingFilters) => void;
-}): void {
-  render(
+  onKeywordSearchChange?: (keywordSearch: string) => void;
+}): ReturnType<typeof render> {
+  const facets = options.facets ?? FACETS_WITH_AGENCIES;
+  return render(
     <DataCatalogFilterRail
       filters={{ ...EMPTY_CATALOG_LISTING_FILTERS, ...options.filters }}
-      facets={options.facets ?? FACETS_WITH_AGENCIES}
+      facets={facets}
+      keywordOptions={options.keywordOptions ?? facets.tags}
       onFiltersChange={options.onFiltersChange ?? vi.fn()}
+      onKeywordSearchChange={options.onKeywordSearchChange ?? vi.fn()}
     />,
   );
 }
@@ -256,6 +261,38 @@ describe("DataCatalogFilterRail", () => {
     expect(onFiltersChange).toHaveBeenCalledWith(
       expect.objectContaining({ tags: ["taxi"] }),
     );
+  });
+
+  it("reports what is typed into Keywords, so the keywords can be searched", () => {
+    const onKeywordSearchChange = vi.fn();
+    _renderRail({ facets: FACETS_WITH_KEYWORDS, onKeywordSearchChange });
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Keywords" }), {
+      target: { value: "fer" },
+    });
+
+    expect(onKeywordSearchChange).toHaveBeenLastCalledWith("fer");
+  });
+
+  it("keeps Keywords on screen while a search there finds nothing", () => {
+    const { rerender } = _renderRail({ facets: FACETS_WITH_KEYWORDS });
+    const combobox = screen.getByRole("combobox", { name: "Keywords" });
+    fireEvent.click(combobox);
+    fireEvent.change(combobox, { target: { value: "zzz" } });
+
+    rerender(
+      <DataCatalogFilterRail
+        filters={EMPTY_CATALOG_LISTING_FILTERS}
+        facets={FACETS_WITH_KEYWORDS}
+        keywordOptions={[]}
+        onFiltersChange={vi.fn()}
+        onKeywordSearchChange={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("combobox", { name: "Keywords" }),
+    ).toBeInTheDocument();
   });
 
   it("drops a keyword from the filters when its pill is removed", () => {

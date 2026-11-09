@@ -75,6 +75,9 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F23 | Catalog field mapping: per-pipeline YAML metadata mapping, drives, and publisher, agency, topic, and keyword filters | not started | F4, F6, F7, F16, F17, F19 | |
 | F24 | ODC listing data preview and full-screen detail | not started | F12, F16, F19, F23 | |
 | F27 | Pipeline runs pace their writes to the database and retry transient failures | not started | F4, F11, F23 | |
+| F28 | Build an ODC listing's Parquet copy from a column type sample that holds the whole source | not started | F12, F24, F25 | |
+| F29 | API-backed listing copies expire, so workspaces see a changed source | not started | F25 | |
+| F30 | WHO GHO pipeline, recommended listings, and listing freshness probes | not started | F4, F16, F17, F19, F23, F24, F25, F28, F29 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -107,7 +110,10 @@ API. It's new work, not something this branch built.
 | 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
 | 15 | F24 | Adds the data preview and full-screen modal to the detail pane F19 built and F23 regrouped. Merge after both. |
 | 16 | F27 | Rewrites the write loop in `loadRelationsPage` that F4 built and F23's byte cap changed, and adds a stage to the progress events F11 added. Merge after F23. |
-| 17 | F9 | Last, because the docs describe the merged features. |
+| after F25 | F28 | Extends F25's copy request, build route, and build, and the column type sample F12 reworked. The pipeline server half must deploy before the edge function half: an older build route refuses the new `completeSampleCsv` key. |
+| 17 | F29 | Changes how `DatasetParquetWrapper` and the pipeline server's copy store treat F25's Parquet copies. Merge after F25. |
+| 18 | F30 | Extends the listings table, upsert, model and catalog detail that F4, F16, F17, F19, F23 and F24 built, the copy builder and `parquet-cache` route F25 and F28 changed, and reads F29's max age. Merge after all of them. |
+| 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -1341,6 +1347,10 @@ commits belong to the features that own them, not here.
 | `bc4baf853` | test(catalog): filter the open data catalog by publisher, agency, and keyword end to end | All of it |
 | `ad6d300a7` | feat(catalog): offer keywords in the rail and return every facet in one value | All of it. Supersedes `d90481335`'s Keywords chips (`DataCatalogKeywordFacet.tsx` is deleted) and moves the facet rows into `52.data_catalog_listings__search_facet_rows.sql`, with the RPC in `53.`. Regenerate the migration, types, desktop migration, and `.po` catalogs. |
 | `dbf921eda` | fix(catalog): bust the persisted query cache for the new facet shape | All of it. Must ship with `ad6d300a7`: it bumps `CACHE_SCHEMA_VERSION` so browsers drop facets cached without `tags`. If `develop` has bumped the version since, bump to the next one instead of taking `v10`. |
+| `a8e99dc8a` | feat(catalog): search keywords on the server and count every facet in one pass | All of it, on top of `ad6d300a7`. Adds `52.rpc_data_catalog_listings__search_tag_options.sql`, rewrites `52.data_catalog_listings__search_facet_rows.sql`, and adds `useDataCatalogKeywordOptions`. `catalog-search-performance.md` goes with F9. Regenerate the migration, types, and desktop migration. Built on `feat/catalog-keyword-search`. |
+| `6c0ac89b9` | feat(catalog): keep catalog search fast as the catalog grows | All of it, on top of `a8e99dc8a`. Adds `10.data_catalog_facet_counts.sql`, `50.data_catalog_listings__updated_window.sql`, `52.data_catalog_facet_counts__refresh.sql`, `53.data_catalog_listings__count_facet.sql`, and `54.data_catalog_listings__facet_value_rows.sql`, renumbers the other search schemas and `rpc_pipeline_executions__finish`, adds the listings' new indexes, and excludes `data_catalog_facet_counts` from desktop sync. The populate migration is hand-written. Regenerate the rest. Built on `feat/catalog-scalable-search`. |
+| `db8d5f86c` | fix(db): load pg_trgm before the scalable search migration sets its threshold | All of it. Hand-written header on the generated migration, as the earlier catalog search migrations have. |
+| `4fd222156` | fix(catalog): read the update windows once per facet count refresh | All of it. The generated `20261109082121_faster_catalog_facet_counts_refresh.sql` replaces only the refresh. |
 
 *Docs, which go with F9:*
 
@@ -1390,7 +1400,13 @@ its `drop column source_metadata` is intended, since the old values hold
 mapped fields the new column must not). Last,
 `20261109041614_catalog_facets_as_one_value_with_keywords.sql` (generated:
 it drops the row-returning facet RPC and recreates it returning `jsonb`, over
-the new `data_catalog_listings__search_facet_rows`).
+the new `data_catalog_listings__search_facet_rows`), then
+`20261109052742_catalog_single_pass_facets_and_keyword_search.sql`
+(generated: the one-pass facet rows and the keyword search RPC), then
+`20261109065256_catalog_scalable_search.sql` (generated, plus the
+hand-written pg_trgm load header) and
+`20261109065300_populate_catalog_facet_counts.sql` (hand-written: fills the
+summary table once).
 
 **Verification:**
 ```sh
@@ -1444,12 +1460,11 @@ rejects the new listing shape, so the catalog would not load.
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
   manually.
-- The facet RPC with nothing searched took 5.2s on the demo catalog (196k
-  listings) on 2026-11-08, before the keyword facet, which adds about 1s.
-  `authenticated` has an 8s `statement_timeout`, and a timed-out facet call
-  leaves the rail with no facets. With nothing searched it also returns
-  every keyword (6,443 on demo) on each filter change. Consider caching the
-  blank-search counts or capping the keyword options.
+- `docs/measles-demo/catalog-search-performance.md` (goes with F9) records
+  how catalog search stays bounded as the catalog grows, what was rejected,
+  and the work held back: refreshing the summary outside the finish call and
+  building indexes concurrently before the catalog reaches millions of
+  listings, keyset paging, and server-side search for publishers.
 
 ---
 
@@ -1747,6 +1762,120 @@ ava pipeline run hdx --local --scope format:csv --since 2026-10-14T00:00:00Z --u
 
 ---
 
+## F29: API-backed listing copies expire, so workspaces see a changed source
+
+**Purpose:** A Parquet copy of an API-backed listing (F25) that was current
+when a workspace loaded it had no max age, so the workspace never asked the
+`parquet-cache` route again and kept the old rows until IndexedDB evicted
+them. A current copy now expires after
+`GlobalAppConfig.timing.openDataCopyMaxAgeMs` (15 minutes); a stale one
+still expires after 5. Copy parts are uploaded with a one-year
+`cacheControl`, since each build writes its own folder, so re-checking an
+unchanged copy reads its parts from the browser cache.
+**Value:** Socrata, HDX and GHO datasets pick up source changes within
+15 minutes, at the cost of one route call when nothing changed.
+
+**PR title:** `fix(open-data): re-check API-backed listing copies after 15 minutes`
+
+**Commits to read** (from `feat/gho-pipeline`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `dc5174b7c` | fix(open-data): re-check API-backed listing copies after 15 minutes | All of it, except `openDataFreshnessRecheckAfterMs` in `GlobalAppConfig.ts`, which goes with F30. |
+
+**Files:** `shared/config/GlobalAppConfig.ts` (`openDataCopyMaxAgeMs`),
+`src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts`
+and its test, `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts`
+(comment only), and
+`apps/pipeline-server/src/openDataParquetCache/createSupabaseParquetCopyStore/createSupabaseParquetCopyStore.ts`
+and its new test (only the upload test and `COPY_PART_CACHE_CONTROL_SECONDS`;
+the probe read goes with F30).
+
+**Schema:** none.
+
+**Verification:**
+```sh
+npx vitest run src/clients/qetl/wrappers
+pnpm --filter @avandar/pipeline-server test
+```
+
+---
+
+## F30: WHO GHO pipeline, recommended listings, and listing freshness probes
+
+**Purpose:** Adds the World Health Organization's Global Health Observatory
+to the catalog as a drive: each of its 3,091 indicators and 202 dimension
+value lists becomes an OData listing (`api_service = 'odata'`) with column
+types declared from GHO's schema. Listings can name recommended listings in
+the same drive (`companion_listings`), which the catalog detail shows with
+why and an Add button, and which the "Dataset added" notification offers to
+add too. Pipelines can write a freshness probe onto a listing
+(`api_freshness_probe`) that the edge function and copy builder run with no
+code per API, and the `parquet-cache` route reuses a listing's last check
+for 15 minutes. The copy builder reads JSON sources. Spec:
+`docs/measles-demo/gho-pipeline-spec.md`.
+**Value:** Measles case counts and every other WHO indicator can be added
+to a workspace and joined to country names, without a hardcoded connector.
+
+**PR title:** `feat(open-data): add the WHO GHO pipeline and recommended listings`
+
+**Commits to read** (from `feat/gho-pipeline`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `781a48f9e` | docs(open-data): spec the WHO GHO pipeline, recommended listings, and copy freshness | All of it. The `production-plan-world-humanitarian-day.md` and `open-data-catalog-architecture.md` hunks go with F9. |
+| `f42fe266e` | docs(open-data): record the GHO spec's decisions | All of it. |
+| `905503037` | feat(open-data): store listing companions and freshness probes | All of it. |
+| `6dde864dd` | feat(catalog): recommend listings to add together, and say when a listing has no data | All of it. |
+| `3f74d5002` | feat(open-data): copy JSON sources, and check freshness by each listing's own probe | All of it. |
+| `66be5b816` | feat(pipelines): add the WHO GHO pipeline | All of it. |
+| `93382fb3e` | feat(open-data): throttle freshness checks per listing, and sample OData listings | All of it. |
+| `a72e8a6c7` | test(catalog): add a recommended listing from the notification after adding an indicator | All of it. |
+| `dc5174b7c` | fix(open-data): re-check API-backed listing copies after 15 minutes | Only `openDataFreshnessRecheckAfterMs` in `GlobalAppConfig.ts` (the rest is F29). |
+
+**Files:** `apps/pipeline-server/pipelines/gho/`;
+`supabase/schemas/00.enum.data_catalog_listings__api_service.sql`,
+`11.data_catalog_listings.sql`,
+`50.rpc_data_catalog_listings__upsert_with_relation_columns.sql`,
+`50.rpc_data_catalog_listings__write_parquet_cache.sql`, and the new
+`50.rpc_data_catalog_listings__get_companions.sql` and
+`50.rpc_data_catalog_listings__record_freshness_check.sql`, with their pgTAP
+tests; `shared/connectors/open-data/readFreshnessProbeToken/`,
+`readOpenDataFreshnessToken`, `acquireOpenDataColumnTypeSample`,
+`openDataErrors.ts` and the two failure-code switches;
+`shared/models/data-catalog-listings/DataCatalogListing/`;
+`packages/node/etl` (relation companions and probes, the JSON
+`ListingDownload` variant); the pipeline server's copy builder
+(`convertJsonFileToParquetParts`, probe checks, `copy-too-large`) and the
+probe read in `createSupabaseParquetCopyStore`;
+`supabase/functions/open-data/requestParquetCache` and `OpenDataRoutes.ts`;
+`src/clients/data-catalog-listings/`; the catalog view's
+`DataCatalogRecommendedListings/`, `useAddCatalogListing/`,
+`useCatalogListingCompanions/`, `getCompanionsToRecommend/`,
+`notifyDatasetAdded/`, `DataCatalogListingDetail`,
+`DataCatalogUnsupportedNotice` and `DataCatalogView.tsx`;
+`fetchCatalogListingPreview`; `tests/e2e/odc-recommended-listings.spec.ts`.
+
+**Schema:** migration `20261109082310_gho_listing_companions_and_freshness_probes.sql`
+(regenerate it; it adds an enum value by rename-and-recreate). Regenerate
+`shared/types/database.types.ts` and the desktop SQLite mirror.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/pipeline-server test
+npx vitest run packages/node/etl shared/connectors/open-data supabase/functions/open-data shared/models/data-catalog-listings src/views/DataManagerApp/DataImportView src/lib/openData
+pnpm test:db
+pnpm test:e2e odc-recommended-listings.spec.ts
+ava pipeline run gho --local   # about 55 minutes against the real API
+```
+
+**Follow-ups, not done here:** the deferred items in the spec's section 9
+(paged JSON downloads, cross-drive recommendations, passing join pairs to
+chat, a Refresh action for open data datasets, moving CKAN and Socrata onto
+listing probes) and P6.13, partitioned live connections.
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -1908,8 +2037,9 @@ Its commits are covered by F19, not numbered here.
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
-under F21 in the same way, F25's (merged in `a9d2ec770`) under F25, and
-F26's (merged in `d0af42ce6`) under F26.
+under F21 in the same way, F25's (merged in `a9d2ec770`) under F25,
+F26's (merged in `d0af42ce6`) under F26, and F29's and F30's (from
+`feat/gho-pipeline`) under F29 and F30.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
@@ -1920,6 +2050,40 @@ Commits that only update this log are branch-only and are not listed.
 - `b920bee1b` (desktop SQLite generator catch-up) is on the Postgres branch.
 - `7dbb2210a`'s non-open-data files (`db_connections*`, `PostgresTableWrapper*`, the Postgres import views, `supabase/functions/connectors/*`, `supabase/functions/_shared/*`, `createRegistryForFetch.ts`, `http-api.types.ts`, `ConnectorsAdvisory.tsx`, `save*Dataset.ts`, `postgres-connector-option-a-prototype.html`, `tests/e2e/postgres-connector-import.spec.ts`) are formatting and Postgres work. They belong to the Postgres branch, not to any feature here.
 - `supabase/config.toml`: `7dbb2210a` committed this branch's Supabase switch (project `feat-demo-measles`, ports 553xx). Never port it. Run `ava supabase restore` and commit the standard config before this branch itself is ever merged anywhere. Done in `f710dcb68`.
+
+## F28: Build an ODC listing's Parquet copy from a sample that holds the whole source
+
+Status: not started. Built on `feat/catalog-complete-sample`, branched from
+`demo/measles`.
+
+**Purpose:** The column type sample reads up to 10,000 Socrata rows or the
+first 5 MB of a CKAN file. For a small listing that read is the whole
+source, yet the Parquet copy build read the source again, and a flaky
+source could fail the second read: Borough Boundaries (`gthc-hcne`) could
+not be added because Socrata intermittently answers 503 for its
+geometry-heavy rows. The sample route now says when a sample is complete
+and signs the SHA-256 of its text into the sample token. The browser hands
+the text back to `/parquet-cache` right after writing the verified column
+types, and on "Add to workspace" when the preview read a complete sample.
+The edge function copies the text only when the token vouches for exactly
+that text, forwards it to the pipeline server as `completeSampleCsv`, and
+lets a failed build retry at once. **Value:** small listings get their copy
+the moment their columns are checked, with no second read of the source,
+and no caller can put rows of its own into a copy every workspace reads.
+Design: `docs/measles-demo/odc-parquet-cache-spec.md`, "A complete sample
+becomes the copy".
+
+**PR title:** `feat(open-data): build a listing's Parquet copy from a sample that holds the whole source`
+
+**Depends on:** F12 (the column type sample route and token), F24 (the
+preview that reads the sample), and F25 (the copy request, build route,
+and build).
+
+**Commits to read:**
+
+| SHA | Subject | Take |
+|---|---|---|
+| `0a25bc0df` | feat(open-data): build a listing's Parquet copy from a sample that holds the whole source | All of it, including the `DataImportView/CLAUDE.md` note and the spec section. |
 
 ## F22: AI harness audit fixes
 

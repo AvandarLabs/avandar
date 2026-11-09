@@ -16,8 +16,17 @@ export type ParquetCopyFailure = Readonly<{
   invalidReason?: DataCatalogListing.InvalidDatasetReason;
 }>;
 
-/** DuckDB's messages for a CSV it cannot read as the table it declares. */
-const _UNPARSEABLE_MESSAGE = /CSV Error|Conversion Error/;
+/**
+ * DuckDB's messages for a CSV or JSON file it cannot read as the table it
+ * declares.
+ */
+const _UNPARSEABLE_MESSAGE = /CSV Error|Conversion Error|JSON transform error/;
+
+/**
+ * DuckDB's message for a conversion that reached its memory limit, such as a
+ * JSON source whose one response is larger than a JSON copy may hold.
+ */
+const _OUT_OF_MEMORY_MESSAGE = /Out of Memory Error/;
 
 function _fromDownloadStatus(status: number): ParquetCopyFailure {
   if (status === 404 || status === 410) {
@@ -35,8 +44,10 @@ function _fromDownloadStatus(status: number): ParquetCopyFailure {
 /**
  * Turns a failed build's error into the failure its listing records. A
  * failure that only shows a service is down, or that is the server's own,
- * never marks the listing invalid. Failure codes from reading the source
- * through a catalog API are the same ones the column type sample records.
+ * never marks the listing invalid. A source too large for the conversion's
+ * memory limit is `copy-too-large`, which leaves the listing valid. Failure
+ * codes from reading the source through a catalog API are the same ones the
+ * column type sample records.
  *
  * @param error - What the build threw.
  * @returns The failure code, and the invalid reason when there is one.
@@ -62,6 +73,9 @@ export function toParquetCopyFailure(error: unknown): ParquetCopyFailure {
   }
   if (error.name === PIPELINE_DOWNLOAD_MISSING_ERROR_NAME) {
     return { code: "copy-unsupported" };
+  }
+  if (_OUT_OF_MEMORY_MESSAGE.test(error.message)) {
+    return { code: "copy-too-large" };
   }
   if (_UNPARSEABLE_MESSAGE.test(error.message)) {
     return { code: "source-unparseable", invalidReason: "unparseable_dataset" };

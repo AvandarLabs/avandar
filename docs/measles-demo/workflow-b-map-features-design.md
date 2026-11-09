@@ -46,6 +46,16 @@ F2 lands. F5 is the largest and touches dashboard publishing.
 Each feature is its own branch and PR, built in its own worktree from
 `demo/measles`, then logged in [pr-feature-log.md](pr-feature-log.md).
 
+Implementation plans:
+
+| Feature | Plan | Branch | Map config version |
+| --- | --- | --- | --- |
+| F1 | [workflow-b-f1-threshold-colors-plan.md](workflow-b-f1-threshold-colors-plan.md) | `feat/gis-threshold-colors` | 6 |
+| F2 | [workflow-b-f2-places-plan.md](workflow-b-f2-places-plan.md) | `feat/gis-places` | none |
+| F3 | [workflow-b-f3-filter-by-layer-plan.md](workflow-b-f3-filter-by-layer-plan.md) | `feat/gis-filter-by-layer` | 7, after F1 |
+| F4 | [workflow-b-f4-pdf-feature-list-plan.md](workflow-b-f4-pdf-feature-list-plan.md) | `feat/gis-pdf-feature-list` | 8, after F3 |
+| F5 | [workflow-b-f5-dashboard-map-block-plan.md](workflow-b-f5-dashboard-map-block-plan.md) | `feat/dashboard-map-block` | none |
+
 ---
 
 ## 3. F1: Threshold colors
@@ -110,6 +120,10 @@ In the Style section's ClassificationEditor:
   `threshold` preset, and labels `Below {value}` and `{value} or above`.
   It is a shortcut that writes ordinary fields, not a new classification
   method.
+- Fractions: the School Immunization Survey stores coverage as a fraction
+  (`0.98`), not a percent. When every classified value is between 0 and 1,
+  the shortcut's input is shown and typed as a percent (95) and stored as a
+  fraction (0.95), and its labels read `Below 95%` and `95% or above`.
 
 ### 3.5 Tests
 
@@ -211,9 +225,11 @@ Provider choice:
 | Mapbox, Google | Global | Not on standard terms | Yes | Storing geocodes needs a permanent-geocoding plan |
 | NYC GeoSearch (Planning Labs) | NYC only | Yes, public data | No | Built on the city's own address database |
 
-Recommendation: an OSM-based keyed provider (Geoapify or LocationIQ) behind a
-provider interface, because places are stored. Confirm the provider's terms
-before signing up.
+Decision: **Geoapify**, behind a provider interface. It is OSM-based, so
+storing results is allowed with OpenStreetMap attribution, which places need.
+It has a free tier and a bias-by-rectangle parameter for the map view. The
+key is the edge secret `GEOAPIFY_API_KEY`. The place form shows
+"© OpenStreetMap contributors" under address results.
 
 Privacy: Workflow A contact home addresses are protected health information
 and must not go to a third-party geocoder without a data processing
@@ -480,17 +496,16 @@ product features. Track them separately.
 | Gap | Fix |
 | --- | --- |
 | No ZIP-level childhood MMR coverage in the catalog. It lives on DOHMH's GitHub, not Socrata. | Upload the CSV, or add a GitHub source to a pipeline. Replace `10_nyc_district_child_mmr_2018_19_ALL_MONTHS_SIMULATED.csv` in the "NYC Doh" workspace, since Workflow B uses real data only. |
-| `btkd-y8bp` reports NYC by district, and no school-district polygons are loadable. | Find a school-district boundary dataset on NYC Open Data, or flag districts as points. |
-| School Point Locations (`jfju-ynrr`) is a ZIP shapefile and not loadable. | Use `a3nt-yts4` (WKT points) or `wg9x-4ke6` (latitude and longitude). |
+| `btkd-y8bp` reports NYC public schools by district, and no school-district polygons are loadable. It does carry 1,647 NYC schools (mostly private and charter) as individual rows with a WKT `location` point and their own coverage. | Use those school points for step 3 and for a points-to-ZIP choropleth (`aggregatePointsToBoundaries` onto MODZCTA). Find school-district polygons for the public-school district rows. |
+| School Point Locations (`jfju-ynrr`) is a ZIP shapefile and not loadable. | Use `a3nt-yts4` (1,992 schools, WKT points, cached on demo since 2026-11-09). Shapefile support: [shapefile-import-design.md](shapefile-import-design.md). |
 | Plan's childcare dataset `dsg6-ifza` has no coordinates. | Use `gy3q-4tzp` (Active Child Care Programs) or `kiyv-ks3f` (UPK sites). |
 | The catalog casts latitude and longitude to `VARCHAR` on `gy3q-4tzp`, `wg9x-4ke6`, and `kiyv-ks3f`. | Check that a `latLngColumns` binding accepts them, or fix the catalog cast. |
-| Borough Boundaries `gthc-hcne` cache build failed (`source-download-failed`). | Retry the build, or use `wh2p-dxnf`. |
+| Childcare points: the cached childcare dataset `dsg6-ifza` has no coordinates. | Cache `gy3q-4tzp` on demo, or geocode `dsg6-ifza` addresses in a pipeline. |
 | Spatial SQL in Data Explorer may only work after the GIS app has loaded the extension in the same session. | Test it. Load `spatial` on first use of an `ST_` function if not. |
 
 ## 9. Open questions
 
-1. Geocoding provider and account (section 4.5). Recommendation: an
-   OSM-based keyed provider.
+1. Geocoding provider: decided, Geoapify (section 4.5).
 2. Whether F5's public snapshot should also cover workspace dashboards as an
    opt-in "freeze this map" setting. Recommendation: no, until someone asks.
 3. Whether a places dataset should support import from the address column of

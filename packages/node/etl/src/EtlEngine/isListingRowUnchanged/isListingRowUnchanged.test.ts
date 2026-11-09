@@ -1,5 +1,6 @@
 import { isListingRowUnchanged } from "@etl/EtlEngine/isListingRowUnchanged/isListingRowUnchanged";
 import { describe, expect, it } from "vitest";
+import type { ListingCompanion } from "@etl/EtlEngine/EtlEngine.types";
 import type {
   ListingRowValues,
   StoredListingRow,
@@ -42,6 +43,8 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     tags: null,
     additional_source_metadata: null,
     drive_id: null,
+    companion_listings: [],
+    api_freshness_probe: null,
     ...overrides,
   };
 }
@@ -50,7 +53,50 @@ function _stored(overrides: Partial<ListingRowValues> = {}): StoredListingRow {
   return { ..._row(overrides), id: "listing-1" };
 }
 
+const COUNTRY_COMPANION: ListingCompanion = {
+  kind: "lookup",
+  externalDatasetId: "DIMENSION/COUNTRY",
+  apiResourceId: "DIMENSION/COUNTRY/DimensionValues",
+  joinOn: [{ column: "SpatialDim", companionColumn: "Code" }],
+};
+
 describe("isListingRowUnchanged", () => {
+  it("counts a change to companion_listings", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ companion_listings: [] }),
+        next: _row({ companion_listings: [COUNTRY_COMPANION] }),
+      }),
+    ).toBe(false);
+  });
+
+  it("ignores companion_listings whose keys come back in another order", () => {
+    // Postgres jsonb does not keep an object's key order.
+    const { joinOn, kind, ...identity } = COUNTRY_COMPANION;
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({
+          companion_listings: [{ joinOn, ...identity, kind }],
+        }),
+        next: _row({ companion_listings: [COUNTRY_COMPANION] }),
+      }),
+    ).toBe(true);
+  });
+
+  it("counts a change to api_freshness_probe", () => {
+    expect(
+      isListingRowUnchanged({
+        stored: _stored({ api_freshness_probe: null }),
+        next: _row({
+          api_freshness_probe: {
+            url: "https://data.cityofnewyork.us/abcd-1234",
+            token: { kind: "body-sha256" },
+          },
+        }),
+      }),
+    ).toBe(false);
+  });
+
   it("ignores a change to additional_source_metadata alone", () => {
     // Socrata's record carries page_views and download_count, which change
     // daily: counting them would rewrite every listing on every full run.

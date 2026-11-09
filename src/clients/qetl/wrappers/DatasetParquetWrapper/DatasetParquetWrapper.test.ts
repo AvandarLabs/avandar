@@ -255,8 +255,31 @@ describe("DatasetParquetWrapper", () => {
 
     expect(acquired.parquetBlob).toBe(partBlob);
     expect(acquired.sourceVersion).toBe("socrata:1");
-    expect(acquired.maxAgeMs).toBeUndefined();
     expect(mergeParquetParts).not.toHaveBeenCalled();
+  });
+
+  it("serves a current copy for 15 minutes, so a changed source is noticed", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return {
+          partBlobs: [new Blob(["part"])],
+          sourceVersion: "socrata:1",
+          isStale: false,
+        };
+      },
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.maxAgeMs).toBe(15 * 60_000);
   });
 
   it("merges a copy's parts, in row order, into one Parquet blob", async () => {

@@ -5,9 +5,41 @@ import { runOfflineDataAgentTurn } from "./runOfflineDataAgentTurn";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
 import type { CreateOfflineDataAgentOptions } from "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent";
 
-const { createOfflineDataAgentMock, decideMock } = vi.hoisted(() => {
-  return { createOfflineDataAgentMock: vi.fn(), decideMock: vi.fn() };
+const {
+  createOfflineDataAgentMock,
+  decideMock,
+  explorerShowQueryMock,
+  showQueryInChatMock,
+} = vi.hoisted(() => {
+  return {
+    createOfflineDataAgentMock: vi.fn(),
+    decideMock: vi.fn(),
+    explorerShowQueryMock: vi
+      .fn()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+    showQueryInChatMock: vi.fn(),
+  };
 });
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat",
+  () => {
+    return { showQueryInChat: showQueryInChatMock };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers",
+  async (importOriginal) => {
+    const original = await importOriginal<object>();
+    return {
+      ...original,
+      createExplorerShowQuery: () => {
+        return explorerShowQueryMock;
+      },
+    };
+  },
+);
 
 vi.mock(
   "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent",
@@ -59,7 +91,10 @@ function _lastAgentOptions(): CreateOfflineDataAgentOptions {
 describe("runOfflineDataAgentTurn", () => {
   beforeEach(() => {
     createOfflineDataAgentMock.mockReset().mockImplementation(() => {
-      return { agent: {}, ask: vi.fn().mockResolvedValue({ text: "42" }) };
+      return {
+        agent: { abort: vi.fn() },
+        ask: vi.fn().mockResolvedValue({ text: "42" }),
+      };
     });
     decideMock.mockReset();
   });
@@ -102,5 +137,14 @@ describe("runOfflineDataAgentTurn", () => {
     await runOfflineDataAgentTurn(_createTurnOptions({ chatGeneration: 4 }));
 
     expect(createOfflineDataAgentMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows results in the Data Explorer", async () => {
+    await runOfflineDataAgentTurn(_createTurnOptions({ chatGeneration: 5 }));
+
+    await _lastAgentOptions().host.showQuery({ sql: "SELECT 1", summary: "s" });
+
+    expect(explorerShowQueryMock).toHaveBeenCalled();
+    expect(showQueryInChatMock).not.toHaveBeenCalled();
   });
 });

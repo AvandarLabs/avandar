@@ -16,7 +16,9 @@ both of these, and any new connector will be too.
 catalog entry to the workspace, so it never renders `DatasetImportForm`. It
 does show a read-only preview of a listing's first rows
 (`useCatalogListingPreview`), but that preview is for browsing: nothing it
-reads is saved, and adding the listing does not use it. Do not force it into
+reads is saved as the dataset. The one exception is a preview sample that
+held the whole source, which adding the listing hands back to build the
+listing's shared Parquet copy from. Do not force it into
 the shape below, and do not take it as the example to copy.
 
 A pasted link on `ManualUploadView` is still a manual upload. Avandar's

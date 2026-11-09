@@ -14,10 +14,12 @@ export type CatalogListingPreview = {
   /** Every column, in the source's order. */
   columnNames: readonly string[];
   /**
-   * The columns DuckDB read as dates or times. Their values arrive as epoch
-   * milliseconds, so the grid has to be told to format them.
+   * The columns DuckDB read as dates or times, in source order. Their values
+   * arrive as epoch milliseconds, so the grid has to be told to format them.
+   * A list, because this preview is stored in the JSON query cache: a Set
+   * comes back as an object, and the grid crashes calling `.has` on it.
    */
-  dateColumnNames: ReadonlySet<string>;
+  dateColumnNames: readonly string[];
   rows: readonly UnknownRow[];
 };
 
@@ -30,7 +32,10 @@ type SniffedPreview = Readonly<{
 export type CatalogListingPreviewDependencies = {
   /** Downloads one part of a listing's Parquet copy from Storage. */
   fetchCopyPart: (partPath: string) => Promise<Blob>;
-  /** Reads the start of an API-backed CSV listing's data, as CSV text. */
+  /**
+   * Reads the start of an API-backed CSV or OData listing's data, as CSV
+   * text.
+   */
   fetchCsvSample: (catalogListingId: DataCatalogListing.Id) => Promise<string>;
   fetchParquetUrl: (url: string) => Promise<Blob>;
   sniffCsv: (options: {
@@ -83,17 +88,28 @@ function _toPreview(sniffed: SniffedPreview): CatalogListingPreview {
     columnNames: sniffed.columns.map((column) => {
       return column.column_name;
     }),
-    dateColumnNames: new Set(
-      sniffed.columns
-        .filter((column) => {
-          return DuckDbDataTypeUtils.isDateOrTimestamp(column.column_type);
-        })
-        .map((column) => {
-          return column.column_name;
-        }),
-    ),
+    dateColumnNames: sniffed.columns
+      .filter((column) => {
+        return DuckDbDataTypeUtils.isDateOrTimestamp(column.column_type);
+      })
+      .map((column) => {
+        return column.column_name;
+      }),
     rows: sniffed.previewRows,
   };
+}
+
+/**
+ * The resource formats whose preview reads the column-type sample route,
+ * which returns CSV text, rather than the listing's Parquet copy.
+ */
+const CSV_SAMPLE_FORMATS: ReadonlySet<string> = new Set(["CSV", "ODATA"]);
+
+function _isReadFromCsvSample(apiResourceFormat: string | undefined): boolean {
+  return (
+    apiResourceFormat !== undefined &&
+    CSV_SAMPLE_FORMATS.has(apiResourceFormat.toUpperCase())
+  );
 }
 
 /**
@@ -102,11 +118,13 @@ function _toPreview(sniffed: SniffedPreview): CatalogListingPreview {
  *
  * An API-backed CSV listing is read from the start of its file, the same
  * sample its column types are verified from, so a source of any size can be
- * previewed. Any other API-backed listing is read from the first part of its
- * Parquet copy, and has no preview until a workspace adds it and the copy is
- * built: browsing never starts a build. A pipeline listing is read from the
- * Parquet URL its catalog row names. Either way DuckDB reads only the
- * preview's rows and nothing is kept once they are read.
+ * previewed. An OData listing is read from the same sample route, which
+ * writes its first rows as CSV. Any other API-backed listing is read from
+ * the first part of its Parquet copy, and has no preview until a workspace
+ * adds it and the copy is built: browsing never starts a build. A pipeline
+ * listing is read from the Parquet URL its catalog row names. Either way
+ * DuckDB reads only the preview's rows and nothing is kept once they are
+ * read.
  *
  * @param options.listing The listing to preview.
  * @param options.maxPreviewRows How many rows to read at most.
@@ -131,7 +149,7 @@ export async function fetchCatalogListingPreview(
   const dependencies = options.dependencies ?? DEFAULT_DEPENDENCIES;
 
   if (listing.accessKind === "api_resource") {
-    if (listing.apiResourceFormat?.toUpperCase() === "CSV") {
+    if (_isReadFromCsvSample(listing.apiResourceFormat)) {
       const csvText = await dependencies.fetchCsvSample(listing.id);
       return _toPreview(
         await _sniffCsvFile(dependencies, csvText, maxPreviewRows),

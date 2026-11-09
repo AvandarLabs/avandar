@@ -50,6 +50,31 @@ describe("startParquetCopyBuild", () => {
     });
   });
 
+  it("hands the pipeline server a complete sample to copy instead of the source", async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response(JSON.stringify({ ok: true, isQueued: true }), {
+        status: 202,
+      });
+    });
+
+    await startParquetCopyBuild({
+      target: TARGET,
+      catalogListingId: LISTING_ID,
+      buildId: BUILD_ID,
+      completeSampleCsv: "borocode\n1\n",
+      fetchImpl,
+    });
+
+    const [, init] = fetchImpl.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
+    expect(JSON.parse(String(init.body))).toEqual({
+      buildId: BUILD_ID,
+      completeSampleCsv: "borocode\n1\n",
+    });
+  });
+
   it("throws when the pipeline server refuses, without repeating the key", async () => {
     const fetchImpl = vi.fn(async () => {
       return new Response("nope", { status: 401 });

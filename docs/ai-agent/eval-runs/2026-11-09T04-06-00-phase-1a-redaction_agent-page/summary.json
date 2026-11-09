@@ -1,0 +1,17 @@
+{
+  "label": "phase-1a-redaction:agent-page",
+  "questionCount": 7,
+  "passCount": 6,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 9,
+  "promptTokens": 28240,
+  "cachedPromptTokens": 27273,
+  "completionTokens": 2158,
+  "totalCost": 0.001471805,
+  "costPerQuestion": 0.00021025785714285714,
+  "latencyMedianMs": 1838.831416,
+  "latencyP90Ms": 2664.3361659999996,
+  "failedIds": ["P07"]
+}

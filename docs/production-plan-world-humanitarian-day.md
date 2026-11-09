@@ -405,6 +405,39 @@ Postgres/direct-DB source type.** Open-data catalog is generic + Beta with
     the listing's current one, so a rebuild never deletes a copy a frozen
     dataset still uses.
   Depends on P6.9.
+- P6.12 `[NEW]` **WHO GHO pipeline, recommended listings, and copy
+  freshness**: a `gho` pipeline lists each of GHO's 3,091 indicators, and
+  each dimension's value list, as an API-backed listing copied from OData
+  JSON. Listings can name recommended listings to add with them (an
+  indicator recommends the country list its `SpatialDim` codes come from).
+  API-backed copies get a 15-minute max age in the browser. Today a copy
+  that was current when it loaded is never re-checked, for Socrata and HDX
+  too. Freshness checks are throttled per listing and described by the
+  listing rather than hardcoded per API. Spec:
+  `docs/measles-demo/gho-pipeline-spec.md`. Follow-ups listed in that spec's
+  section 9: paged JSON downloads, recommendations across drives, passing
+  join pairs to chat, a Refresh action for open data datasets, and moving
+  CKAN and Socrata freshness onto listing probes. Depends on P6.9.
+- P6.13 `[NEW]` `[DEFERRED]` **Partitioned live connections**: one listing
+  for a whole API (all of GHO as one table) instead of one per resource.
+  QETL would pull the query's equality, `IN` and range filters on the
+  partition keys the API declares (GHO: `IndicatorCode`, optionally
+  `SpatialDim` and `TimeDim`), send only those to the API (GHO: OData
+  `$filter`), and apply the full `WHERE` in DuckDB, so a result is correct
+  whenever the fetched partitions cover the query. Each partition is cached
+  on its own, and a cache hit is set containment over partition ids, as
+  exact and cheap as the column check, rather than predicate containment.
+  Needs: a SQL syntax tree in the analyzer (DuckDB's `json_serialize_sql`)
+  to extract filters, failing closed when a restriction cannot be proven;
+  more than one live cache entry per relation in both tiers, with the DuckDB
+  table becoming a view over the loaded partitions; per-partition copies in
+  Storage with single-flight builds; a fast route that returns a small
+  partition at once; and small reference relations (indicator and dimension
+  lists) still read whole, so `SELECT DISTINCT IndicatorCode` works.
+  Deferred because every relation so far can be copied whole (GHO's largest
+  indicator is 268,128 rows). It becomes necessary for a source too big to
+  copy, or a paid API where copying whole costs too much. Overlaps P0.2.
+  Background: `docs/measles-demo/gho-pipeline-spec.md` section 9.
 - `[Depends on: P0 (live-source extractors P0.8) for Sheets/Postgres; pipeline
   framework already exists for HDX]`
 

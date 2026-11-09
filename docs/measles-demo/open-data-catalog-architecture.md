@@ -650,6 +650,14 @@ relation's object before writing the row that points at it.
    - **It stays separate from `is_invalid`.** `is_invalid` means a dataset
      was sampled and turned out broken, and a pipeline rewrite clears it.
      An unloadable listing is never sampled.
+8. Partitioned live connections. A whole API as one listing, such as all of
+   WHO GHO as one table, read by sending the query's filters on declared
+   partition keys to the API and caching each partition separately. Deferred
+   because every listing so far, GHO's indicators included, can be copied
+   whole, so GHO is modelled as a drive with one listing per indicator
+   instead. What it would need is in
+   [`gho-pipeline-spec.md`](gho-pipeline-spec.md) section 9, and it is
+   tracked as P6.13 in `production-plan-world-humanitarian-day.md`.
 
 ## 8. Testing references to add
 

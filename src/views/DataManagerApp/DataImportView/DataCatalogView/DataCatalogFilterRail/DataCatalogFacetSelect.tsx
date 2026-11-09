@@ -18,6 +18,12 @@ type Props = {
   options: readonly CatalogFacetOption[];
   chosenValues: readonly string[];
   onChange: (chosenValues: string[]) => void;
+
+  /**
+   * Called with what the user types into the combobox, for a facet whose
+   * options are searched outside it.
+   */
+  onSearchChange?: (search: string) => void;
 };
 
 /** Ranks the dropdown's options by how well they match what was typed. */
@@ -42,6 +48,7 @@ export function DataCatalogFacetSelect({
   options,
   chosenValues,
   onChange,
+  onSearchChange,
 }: Props): ReactNode {
   const { t } = useLingui();
   const [search, setSearch] = useState("");
@@ -68,7 +75,13 @@ export function DataCatalogFacetSelect({
     });
   }, [options, chosenValues, countsByValue]);
 
-  if (options.length === 0 && chosenValues.length === 0) {
+  // While the user is searching the facet, it stays put even when nothing
+  // matches, or the field they are typing into would vanish.
+  if (
+    options.length === 0 &&
+    chosenValues.length === 0 &&
+    search.trim() === ""
+  ) {
     return null;
   }
 
@@ -81,7 +94,10 @@ export function DataCatalogFacetSelect({
       onChange={onChange}
       searchable
       searchValue={search}
-      onSearchChange={setSearch}
+      onSearchChange={(nextSearch) => {
+        setSearch(nextSearch);
+        onSearchChange?.(nextSearch);
+      }}
       filter={_filterBySearch}
       nothingFoundMessage={t`No matches`}
       comboboxProps={FACET_DROPDOWN_PROPS}
@@ -109,7 +125,7 @@ export function DataCatalogFacetSelect({
         return (
           <DataCatalogFacetOption
             label={option.label}
-            count={countsByValue.get(option.value) ?? 0}
+            count={countsByValue.get(option.value)}
             search={search}
             isChecked={checked === true}
           />

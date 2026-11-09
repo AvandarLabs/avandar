@@ -99,6 +99,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "Cela permettra à l'ensemble de données d'être stocké en ligne afin "
 "qu'il puisse être accessible sur d'autres appareils."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "Autre"
@@ -575,7 +576,7 @@ msgstr "Choisissez la valeur qui vient en premier par ordre alphabétique"
 msgid "Latitude and longitude look swapped"
 msgstr "La latitude et la longitude semblent inversées"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
 msgstr "Impossible d'ajouter l'ensemble de données"
 
@@ -1398,6 +1399,11 @@ msgstr "Feuille"
 msgid "Getting {0} from {1}"
 msgstr ""
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+msgstr "Plus de {formattedNumResults} sur {formattedNumCatalogListings} jeux de "
+"données"
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Publié dans l’espace de travail"
@@ -1835,6 +1841,10 @@ msgstr "Nouveau groupe de rôles"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Dashboard"
 msgstr "Tableau de bord"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add {displayName} to workspace"
+msgstr "Ajouter {displayName} à l’espace de travail"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2350,7 +2360,7 @@ msgstr "Préréglages intégrés"
 msgid "Select a data layer to buffer."
 msgstr "Sélectionnez une couche de données à mettre en zone tampon."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset yet"
 msgstr "Impossible d’ajouter le jeu de données pour le moment"
 
@@ -2363,7 +2373,7 @@ msgid "Select a {conceptName}"
 msgstr "Sélectionnez un(e) {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" est maintenant dans votre espace de travail."
 
@@ -2415,6 +2425,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 msgstr "Incluez les paramètres z, x et y à l’emplacement où le serveur attend "
 "l’index de tuile."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(Vide)"
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Data Explorer toolbar: {toolbarCommands}"
 msgstr "Barre d’outils de l’explorateur de données : {toolbarCommands}"
@@ -2460,6 +2474,10 @@ msgstr "Opacité"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Open Data"
 msgstr "Données ouvertes"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "This dataset has no data yet"
+msgstr "Ce jeu de données ne contient encore aucune donnée"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3664,6 +3682,11 @@ msgstr "Veuillez vous reconnecter pour continuer. Si la connexion ne fonctionne 
 msgid "to"
 msgstr "à"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+msgstr "Nous n’avons pas trouvé « {displayName} » dans le catalogue. Essayez de "
+"l’ajouter à nouveau."
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Examiner les correspondances"
@@ -3711,7 +3734,7 @@ msgstr "Une URL courte et facile à retenir pour les prospectus, les rapports et
 "les codes QR."
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
 msgstr "« {0} » est en cours de préparation. L’ouverture de jeux de données "
@@ -4372,6 +4395,10 @@ msgstr "Vous n'avez pas la permission d'ouvrir cette partie de l'espace de "
 msgid "Please check your email"
 msgstr "Veuillez vérifier votre e-mail"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Add them too"
+msgstr "Ajoutez-les également"
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "Sélectionnez des colonnes et ajoutez des contraintes de ligne "
@@ -4500,6 +4527,10 @@ msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
 msgstr "Ajoutez un bloc de filtre au tableau de bord pour activer le filtrage "
 "global pour cette visualisation."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Recommended with this dataset"
+msgstr "Recommandé avec ce jeu de données"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4875,6 +4906,7 @@ msgstr "Vous seul pouvez accéder à ce {resource}. Toutes les autres personnes 
 "perdent l’accès, y compris les administrateurs de l’espace de travail."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Can't be loaded"
 msgstr "Impossible de charger"
 
@@ -4995,6 +5027,10 @@ msgstr "N’utilise aucune donnée de l’espace de travail."
 msgid "Hide X axis"
 msgstr "Masquer l’axe X"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "Chargement du résultat"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Emplacements exacts"
@@ -5002,6 +5038,10 @@ msgstr "Emplacements exacts"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "Nouvelle conversation"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "Résultat indisponible"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5038,10 +5078,6 @@ msgstr "Mis à jour au cours de l’année dernière"
 #: src/views/GisApp/panels/LayerInspector/FilterSection/FilterSection.tsx
 msgid "1 filter"
 msgstr "1 filtre"
-
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
-#~ msgid "Link to a file"
-#~ msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
@@ -5540,7 +5576,9 @@ msgstr "Revoyez la création et le partage d’un tableau de bord, depuis le "
 "début."
 
 #. placeholder {0}: columns.length
+#. placeholder {0}: companions.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "{0}"
 msgstr "{0}"
 
@@ -5610,7 +5648,7 @@ msgstr "Générer la requête"
 msgid "No frequency data available."
 msgstr "Aucune donnée de fréquence disponible."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't check this dataset's columns. Try adding it again."
 msgstr "Nous n’avons pas pu vérifier les colonnes de ce jeu de données. Essayez "
 "de l’ajouter à nouveau."
@@ -5642,6 +5680,10 @@ msgstr "Plage de nombres"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "Remplacer l’URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr "Plus de {formattedNumResults} jeux de données"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -6367,7 +6409,7 @@ msgstr "Cette coordonnée est hors limites."
 msgid "Open the record"
 msgstr "Ouvrir l’enregistrement"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "Jeu de données ajouté"
 
@@ -6517,6 +6559,7 @@ msgid "Tool"
 msgstr "Outil"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Not supported yet"
 msgstr "Pas encore pris en charge"
 
@@ -6552,9 +6595,10 @@ msgstr "Aucun champ n'a été ajouté"
 msgid "All results"
 msgstr "Tous les résultats"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6569,6 +6613,12 @@ msgstr "Qu'est-ce qu'une série ?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "La latitude ou la longitude n’est pas un nombre"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Pour répondre aux questions sur les données, il faut avoir accès à "
+"l'Explorateur de données dans cet espace de travail."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -7433,6 +7483,10 @@ msgstr "ne contient pas"
 msgid "One filter is active on this layer. It may be excluding everything."
 msgstr "Un filtre est actif sur cette couche. Il peut exclure tous les "
 "éléments."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Recommended with it: {companionNames}"
+msgstr "Recommandé avec celui-ci : {companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -8371,6 +8425,10 @@ msgstr "Ce jeu de données est uniquement hors ligne. Cliquez pour autoriser la 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryBody/DiscoveryLoadingBody.tsx
 msgid "Checking your data…"
 msgstr "Vérification de vos données…"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "Résultat"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
@@ -9468,7 +9526,7 @@ msgstr "portail de facturation."
 msgid "Column 2"
 msgstr "Colonne 2"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "Données non prêtes"
 
@@ -9622,7 +9680,7 @@ msgstr "Colonnes de l'ensemble de données"
 msgid "Details"
 msgstr "Détails"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
 msgstr "Préparation de vos données"
 
@@ -9716,6 +9774,12 @@ msgstr "L’identifiant de l’espace de travail ne peut pas contenir d’espace
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
 msgstr "Saisissez votre texte ici"
+
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Une série est tracée pour chaque {splitColumnName}. Les couleurs sont "
+"choisies pour vous. Ajouter une deuxième série désactive ce mode."
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
@@ -10287,6 +10351,10 @@ msgstr "Général"
 msgid "Show a Not reported entry"
 msgstr "Afficher une entrée « Non renseigné »"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "Impossible de charger ce résultat."
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
 msgstr "Groupes d'utilisateurs pour l'invité"
@@ -10298,6 +10366,12 @@ msgstr "Recommandé"
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Teal"
 msgstr "Sarcelle"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+msgstr "L’éditeur n’y a encore ajouté aucune ligne. Vous pouvez tout de même "
+"ouvrir l’original à l’endroit où il est publié."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
@@ -10682,6 +10756,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 msgstr "Cette requête traite un type de valeur comme un autre, par exemple du "
 "texte comme un nombre ou une date, et n’a donc pas pu être exécutée."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "In your workspace"
+msgstr "Dans votre espace de travail"
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10985,7 +11063,7 @@ msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING utilise l’opérateur « {operator} », qui n’est pas pris en charge "
 "par le formulaire."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr "Cette entrée du catalogue ne contient aucune métadonnée de colonne. "
 "Elle ne peut pas encore être importée."
@@ -11115,6 +11193,10 @@ msgstr "{0} (limite)"
 msgid "Loading"
 msgstr "Chargement"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Names the codes in {columnList}"
+msgstr "Nomme les codes dans {columnList}"
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
@@ -11240,7 +11322,7 @@ msgid "Link"
 msgstr "Lien"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
 msgstr "Nous n’avons pas pu préparer les données pour « {0} » ; leur ouverture "
 "pourrait donc échouer."
@@ -11525,6 +11607,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "{pluginName} installé"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "L'assistant n'a pas pu répondre. Réessayez dans un instant."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

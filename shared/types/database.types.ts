@@ -835,17 +835,49 @@ export type Database = {
         }
         Relationships: []
       }
+      data_catalog_facet_counts: {
+        Row: {
+          facet: string
+          id: number
+          is_loadable_only: boolean
+          listing_count: number
+          parent_value: string | null
+          refreshed_at: string
+          value: string | null
+        }
+        Insert: {
+          facet: string
+          id?: never
+          is_loadable_only: boolean
+          listing_count: number
+          parent_value?: string | null
+          refreshed_at?: string
+          value?: string | null
+        }
+        Update: {
+          facet?: string
+          id?: never
+          is_loadable_only?: boolean
+          listing_count?: number
+          parent_value?: string | null
+          refreshed_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
       data_catalog_listings: {
         Row: {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
           additional_source_metadata: Json | null
           api_base_url: string | null
+          api_freshness_probe: Json | null
           api_resource_format: string | null
           api_resource_id: string | null
           api_service:
             | Database["public"]["Enums"]["data_catalog_listings__api_service"]
             | null
           canonical_urls: string[] | null
+          companion_listings: Json
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
@@ -875,6 +907,8 @@ export type Database = {
           parquet_cache_build_started_at: string | null
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
+          parquet_cache_checked_at: string | null
+          parquet_cache_checked_source_version: string | null
           parquet_cache_failure_code: string | null
           parquet_cache_folder_path: string | null
           parquet_cache_part_count: number | null
@@ -899,12 +933,14 @@ export type Database = {
           access_kind?: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
           additional_source_metadata?: Json | null
           api_base_url?: string | null
+          api_freshness_probe?: Json | null
           api_resource_format?: string | null
           api_resource_id?: string | null
           api_service?:
             | Database["public"]["Enums"]["data_catalog_listings__api_service"]
             | null
           canonical_urls?: string[] | null
+          companion_listings?: Json
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
@@ -934,6 +970,8 @@ export type Database = {
           parquet_cache_build_started_at?: string | null
           parquet_cache_built_at?: string | null
           parquet_cache_byte_size?: number | null
+          parquet_cache_checked_at?: string | null
+          parquet_cache_checked_source_version?: string | null
           parquet_cache_failure_code?: string | null
           parquet_cache_folder_path?: string | null
           parquet_cache_part_count?: number | null
@@ -958,12 +996,14 @@ export type Database = {
           access_kind?: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
           additional_source_metadata?: Json | null
           api_base_url?: string | null
+          api_freshness_probe?: Json | null
           api_resource_format?: string | null
           api_resource_id?: string | null
           api_service?:
             | Database["public"]["Enums"]["data_catalog_listings__api_service"]
             | null
           canonical_urls?: string[] | null
+          companion_listings?: Json
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
@@ -993,6 +1033,8 @@ export type Database = {
           parquet_cache_build_started_at?: string | null
           parquet_cache_built_at?: string | null
           parquet_cache_byte_size?: number | null
+          parquet_cache_checked_at?: string | null
+          parquet_cache_checked_source_version?: string | null
           parquet_cache_failure_code?: string | null
           parquet_cache_folder_path?: string | null
           parquet_cache_part_count?: number | null
@@ -2708,12 +2750,56 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      data_catalog_facet_counts__refresh: { Args: never; Returns: undefined }
+      data_catalog_listings__count_facet: {
+        Args: {
+          p_count_cap: number
+          p_domains: string[]
+          p_facet: string
+          p_formats: string[]
+          p_is_loadable_only: boolean
+          p_organization2_names: string[]
+          p_query: string
+          p_sources: string[]
+          p_tags: string[]
+          p_updated_within: string
+        }
+        Returns: {
+          is_counted: boolean
+          listing_count: number
+          value: string
+        }[]
+      }
+      data_catalog_listings__facet_value_rows: {
+        Args: {
+          p_chosen_values: string[]
+          p_count_cap: number
+          p_domains: string[]
+          p_facet: string
+          p_formats: string[]
+          p_is_catalog_wide: boolean
+          p_is_loadable_only: boolean
+          p_organization2_names: string[]
+          p_parent_values: string[]
+          p_query: string
+          p_sources: string[]
+          p_tags: string[]
+          p_updated_within: string
+          p_value_limit: number
+          p_value_search: string
+        }
+        Returns: {
+          listing_count: number
+          value: string
+        }[]
+      }
       data_catalog_listings__is_updated_within: {
         Args: { p_last_updated_at: string; p_updated_within: string }
         Returns: boolean
       }
       data_catalog_listings__search_facet_rows: {
         Args: {
+          p_count_cap?: number
           p_domains?: string[]
           p_formats?: string[]
           p_is_loadable_only?: boolean
@@ -2734,8 +2820,11 @@ export type Database = {
           p_domains: string[]
           p_formats: string[]
           p_is_loadable_only: boolean
+          p_limit?: number
+          p_offset?: number
           p_organization2_names: string[]
           p_query: string
+          p_sort_by?: string
           p_sources: string[]
           p_tags: string[]
           p_updated_within: string
@@ -2753,17 +2842,14 @@ export type Database = {
           organization2_name: string
           organization3_name: string
           organization4_name: string
-          passes_domain: boolean
-          passes_format: boolean
-          passes_loadable: boolean
-          passes_organization2: boolean
-          passes_source: boolean
-          passes_tag: boolean
-          passes_updated: boolean
           pipeline_name: string
           score: number
           tags: string[]
         }[]
+      }
+      data_catalog_listings__updated_window: {
+        Args: { p_updated_within: string }
+        Returns: unknown
       }
       datasets__auth_user_may_add_column: {
         Args: { p_dataset_id: string }
@@ -2866,6 +2952,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      rpc_data_catalog_listings__get_companions: {
+        Args: { p_catalog_listing_id: string; p_workspace_id: string }
+        Returns: {
+          catalog_listing_id: string
+          display_name: string
+          is_in_workspace: boolean
+          is_invalid: boolean
+          is_workspace_loadable: boolean
+          join_on: Json
+          kind: string
+        }[]
+      }
       rpc_data_catalog_listings__list_pipeline_scopes: {
         Args: { p_pipeline_name: string }
         Returns: {
@@ -2882,12 +2980,14 @@ export type Database = {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
           additional_source_metadata: Json | null
           api_base_url: string | null
+          api_freshness_probe: Json | null
           api_resource_format: string | null
           api_resource_id: string | null
           api_service:
             | Database["public"]["Enums"]["data_catalog_listings__api_service"]
             | null
           canonical_urls: string[] | null
+          companion_listings: Json
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
@@ -2917,6 +3017,8 @@ export type Database = {
           parquet_cache_build_started_at: string | null
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
+          parquet_cache_checked_at: string | null
+          parquet_cache_checked_source_version: string | null
           parquet_cache_failure_code: string | null
           parquet_cache_folder_path: string | null
           parquet_cache_part_count: number | null
@@ -2958,12 +3060,17 @@ export type Database = {
           listings_kept_in_use: number
         }[]
       }
+      rpc_data_catalog_listings__record_freshness_check: {
+        Args: { p_catalog_listing_id: string; p_source_version: string }
+        Returns: boolean
+      }
       rpc_data_catalog_listings__request_parquet_cache: {
         Args: { p_catalog_listing_id: string; p_lost_build_after: string }
         Returns: string
       }
       rpc_data_catalog_listings__search: {
         Args: {
+          p_count_cap?: number
           p_domains?: string[]
           p_formats?: string[]
           p_is_loadable_only?: boolean
@@ -2981,6 +3088,7 @@ export type Database = {
           file_format: string
           id: string
           is_invalid: boolean
+          is_total_capped: boolean
           is_workspace_loadable: boolean
           last_updated_at: string
           organization1_name: string
@@ -3003,6 +3111,23 @@ export type Database = {
           p_updated_within?: string
         }
         Returns: Json
+      }
+      rpc_data_catalog_listings__search_tag_options: {
+        Args: {
+          p_domains?: string[]
+          p_formats?: string[]
+          p_is_loadable_only?: boolean
+          p_organization2_names?: string[]
+          p_query: string
+          p_sources?: string[]
+          p_tag_search: string
+          p_tags?: string[]
+          p_updated_within?: string
+        }
+        Returns: {
+          listing_count: number
+          value: string
+        }[]
       }
       rpc_data_catalog_listings__upsert_with_relation_columns: {
         Args: { p_listings: Json }
@@ -3029,12 +3154,14 @@ export type Database = {
           access_kind: Database["public"]["Enums"]["data_catalog_listings__access_kind"]
           additional_source_metadata: Json | null
           api_base_url: string | null
+          api_freshness_probe: Json | null
           api_resource_format: string | null
           api_resource_id: string | null
           api_service:
             | Database["public"]["Enums"]["data_catalog_listings__api_service"]
             | null
           canonical_urls: string[] | null
+          companion_listings: Json
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
@@ -3064,6 +3191,8 @@ export type Database = {
           parquet_cache_build_started_at: string | null
           parquet_cache_built_at: string | null
           parquet_cache_byte_size: number | null
+          parquet_cache_checked_at: string | null
+          parquet_cache_checked_source_version: string | null
           parquet_cache_failure_code: string | null
           parquet_cache_folder_path: string | null
           parquet_cache_part_count: number | null
@@ -3663,7 +3792,7 @@ export type Database = {
         | "delete"
       dashboard_visibility: "draft" | "workspace" | "public"
       data_catalog_listings__access_kind: "pipeline_parquet" | "api_resource"
-      data_catalog_listings__api_service: "ckan" | "socrata"
+      data_catalog_listings__api_service: "ckan" | "socrata" | "odata"
       data_catalog_listings__invalid_dataset_reason:
         | "empty_dataset"
         | "dataset_not_found"
@@ -3969,7 +4098,7 @@ export const Constants = {
       ],
       dashboard_visibility: ["draft", "workspace", "public"],
       data_catalog_listings__access_kind: ["pipeline_parquet", "api_resource"],
-      data_catalog_listings__api_service: ["ckan", "socrata"],
+      data_catalog_listings__api_service: ["ckan", "socrata", "odata"],
       data_catalog_listings__invalid_dataset_reason: [
         "empty_dataset",
         "dataset_not_found",

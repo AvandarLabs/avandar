@@ -1,4 +1,8 @@
-import type { EtlOrganizationLabels } from "@etl/EtlEngine/EtlEngine.types";
+import type {
+  EtlOrganizationLabels,
+  FreshnessProbe,
+  ListingCompanion,
+} from "@etl/EtlEngine/EtlEngine.types";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 /** Which of the two listing shapes a row is. */
@@ -57,6 +61,10 @@ export type ListingRowValues = Readonly<{
   additional_source_metadata: unknown;
   /** The drive's `data_catalog_drives.id`, when the run has a drives store. */
   drive_id: string | null;
+  /** Listings usually added with this one. Empty when there are none. */
+  companion_listings: readonly ListingCompanion[];
+  /** How to read the listing's freshness token, or `null` when not set. */
+  api_freshness_probe: FreshnessProbe | null;
 }>;
 
 /** A listing row as stored, with its primary key. */

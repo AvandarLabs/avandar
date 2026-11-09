@@ -178,6 +178,49 @@ describe("buildListingRowFromRelation", () => {
     ).toEqual([]);
   });
 
+  it("writes an API relation's companions and freshness probe", () => {
+    const companions = [
+      {
+        kind: "lookup",
+        externalDatasetId: "DIMENSION/COUNTRY",
+        apiResourceId: "DIMENSION/COUNTRY/DimensionValues",
+        joinOn: [
+          { column: "SpatialDimType", companionColumn: "Dimension" },
+          { column: "SpatialDim", companionColumn: "Code" },
+        ],
+      },
+    ] as const;
+    const freshnessProbe = {
+      url: `${DRIVE_KEY}/abcd-1234`,
+      token: { kind: "body-sha256" },
+    } as const;
+
+    const row = _build({ ...API_RELATION, companions, freshnessProbe });
+
+    expect([row.companion_listings, row.api_freshness_probe]).toEqual([
+      companions,
+      freshnessProbe,
+    ]);
+  });
+
+  it("writes no companions and no freshness probe when an API relation has none", () => {
+    const row = _build(API_RELATION);
+
+    expect([row.companion_listings, row.api_freshness_probe]).toEqual([
+      [],
+      null,
+    ]);
+  });
+
+  it("writes no companions and no freshness probe for a Parquet relation", () => {
+    const row = _build(PARQUET_RELATION, { service: undefined });
+
+    expect([row.companion_listings, row.api_freshness_probe]).toEqual([
+      [],
+      null,
+    ]);
+  });
+
   it("refuses an API relation when the engine has no service", () => {
     expect(() => {
       return _build(API_RELATION, { service: undefined });

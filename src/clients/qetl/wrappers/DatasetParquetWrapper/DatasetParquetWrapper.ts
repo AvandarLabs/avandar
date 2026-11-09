@@ -1,5 +1,6 @@
 import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
@@ -230,7 +231,9 @@ async function _downloadApiOpenData(
   return {
     parquetBlob: await _mergeCopyParts({ ...options, copy }),
     sourceVersion: copy.sourceVersion,
-    maxAgeMs: copy.isStale ? STALE_COPY_MAX_AGE_MS : undefined,
+    maxAgeMs: copy.isStale
+      ? STALE_COPY_MAX_AGE_MS
+      : GlobalAppConfig.timing.openDataCopyMaxAgeMs,
   };
 }
 

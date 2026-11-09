@@ -1,9 +1,10 @@
 /**
  * Copies every eval run's results from `.temp/ai-eval/runs/` and
  * `.temp/ai-eval/pdf-runs/` (gitignored) into `docs/ai-agent/eval-runs/` and
- * `docs/ai-agent/eval-runs/pdf/`, and writes an index of each, so the
- * numbers in `docs/ai-agent/eval.md` can be traced to the answers behind
- * them after the local runs are gone.
+ * `docs/ai-agent/eval-runs/pdf/`. Then it writes an index of each from every
+ * run in the archive, not only the local ones, so the numbers in
+ * `docs/ai-agent/eval.md` can be traced to the answers behind them after the
+ * local runs are gone.
  *
  * Usage: pnpm vite-script scripts/ai-eval/archiveEvalRuns.ts
  */
@@ -28,15 +29,11 @@ const ARCHIVED_FILES = ["summary.json", "results.jsonl"] as const;
 
 type ArchivedRun = { runId: string; summary: EvalRunSummary };
 
-/** Copies one run's files and returns its summary, or nothing if unfinished. */
-function _archiveRun<TSummary>(
-  runsDir: string,
-  archiveDir: string,
-  runId: string,
-): { runId: string; summary: TSummary } | undefined {
+/** Copies one run's files. Returns false if the run is unfinished. */
+function _copyRun(runsDir: string, archiveDir: string, runId: string): boolean {
   const source = join(runsDir, runId);
   if (!existsSync(join(source, "summary.json"))) {
-    return undefined;
+    return false;
   }
   const target = join(archiveDir, runId);
   mkdirSync(target, { recursive: true });
@@ -45,25 +42,37 @@ function _archiveRun<TSummary>(
       copyFileSync(join(source, fileName), join(target, fileName));
     }
   }
-  const summary = JSON.parse(
-    readFileSync(join(source, "summary.json"), "utf8"),
-  ) as TSummary;
-  return { runId, summary };
+  return true;
 }
 
-function _archiveAll<TSummary>(
-  runsDir: string,
-  archiveDir: string,
-): Array<{ runId: string; summary: TSummary }> {
+/** Copies every finished run from `runsDir` into `archiveDir`. */
+function _copyRunsToArchive(runsDir: string, archiveDir: string): number {
   mkdirSync(archiveDir, { recursive: true });
   if (!existsSync(runsDir)) {
-    return [];
+    return 0;
   }
-  return readdirSync(runsDir)
+  return readdirSync(runsDir).filter((runId) => {
+    return _copyRun(runsDir, archiveDir, runId);
+  }).length;
+}
+
+/**
+ * Reads every archived run's summary from `archiveDir`, in run id order.
+ * The indexes are built from the archive, not from the local runs folder,
+ * so a fresh worktree with few local runs keeps every older row.
+ */
+function _readArchive<TSummary>(
+  archiveDir: string,
+): Array<{ runId: string; summary: TSummary }> {
+  return readdirSync(archiveDir)
     .sort()
     .flatMap((runId) => {
-      const run = _archiveRun<TSummary>(runsDir, archiveDir, runId);
-      return run ? [run] : [];
+      const summaryPath = join(archiveDir, runId, "summary.json");
+      if (!existsSync(summaryPath)) {
+        return [];
+      }
+      const summary = JSON.parse(readFileSync(summaryPath, "utf8")) as TSummary;
+      return [{ runId, summary }];
     });
 }
 
@@ -148,15 +157,15 @@ ${rows.join("\n")}
 }
 
 function main(): void {
-  const runs = _archiveAll<EvalRunSummary>(RUNS_DIR, ARCHIVE_DIR);
+  const copiedCount = _copyRunsToArchive(RUNS_DIR, ARCHIVE_DIR);
+  const runs = _readArchive<EvalRunSummary>(ARCHIVE_DIR);
   writeFileSync(join(ARCHIVE_DIR, "README.md"), _buildIndex(runs));
-  const pdfRuns = _archiveAll<PdfAssistRunSummary>(
-    PDF_RUNS_DIR,
-    PDF_ARCHIVE_DIR,
-  );
+  const copiedPdfCount = _copyRunsToArchive(PDF_RUNS_DIR, PDF_ARCHIVE_DIR);
+  const pdfRuns = _readArchive<PdfAssistRunSummary>(PDF_ARCHIVE_DIR);
   writeFileSync(join(PDF_ARCHIVE_DIR, "README.md"), _buildPdfIndex(pdfRuns));
   console.log(
-    `Archived ${runs.length} chat runs and ${pdfRuns.length} PDF assistant runs to ${ARCHIVE_DIR}`,
+    `Copied ${copiedCount} chat runs and ${copiedPdfCount} PDF assistant runs. ` +
+      `Indexed ${runs.length} chat runs and ${pdfRuns.length} PDF assistant runs in ${ARCHIVE_DIR}`,
   );
 }
 

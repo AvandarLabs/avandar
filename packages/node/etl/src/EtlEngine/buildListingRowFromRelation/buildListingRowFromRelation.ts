@@ -28,6 +28,8 @@ type _SharedColumns = Omit<
   | "parquet_file_name"
   | "date_column_type_last_verified"
   | "is_workspace_loadable"
+  | "companion_listings"
+  | "api_freshness_probe"
 >;
 
 type _DateField = "sourceUpdatedAt" | "coverageStartDate" | "coverageEndDate";
@@ -95,7 +97,9 @@ function _isApiRelationLoadable(
 
 /**
  * Builds the listings-table row one relation becomes, writing every contract
- * column and setting the other kind's columns to `null`.
+ * column and setting the other kind's columns to `null`. Companions and the
+ * freshness probe are written only for an `api_resource` row: a
+ * `pipeline_parquet` row gets no companions and no probe.
  *
  * @param args.relation - The relation a pipeline's `transform` returned.
  * @param args.pipelineName - Written to `pipeline_name`.
@@ -131,6 +135,8 @@ export function buildListingRowFromRelation(
       // Read from the Parquet file the engine writes, so always verified.
       date_column_type_last_verified: args.syncedAt.toISOString(),
       is_workspace_loadable: true,
+      companion_listings: [],
+      api_freshness_probe: null,
     };
   }
   if (args.service === undefined) {
@@ -152,5 +158,7 @@ export function buildListingRowFromRelation(
       relation,
       args.workspaceLoadability,
     ),
+    companion_listings: relation.companions ? [...relation.companions] : [],
+    api_freshness_probe: relation.freshnessProbe ?? null,
   };
 }

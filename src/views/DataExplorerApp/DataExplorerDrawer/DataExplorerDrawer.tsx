@@ -30,6 +30,12 @@ type Props = {
   data: UnknownDataFrame;
 
   /**
+   * The column the canvas splits the chart by, drawing one series per value,
+   * so the chart settings can say so. Undefined when nothing is split.
+   */
+  splitColumnName: string | undefined;
+
+  /**
    * The chart area the drawer is docked beneath. Its height plus the drawer's
    * own is the region the two share, which is what caps the drag.
    */
@@ -48,6 +54,7 @@ type Props = {
 export function DataExplorerDrawer({
   columns,
   data,
+  splitColumnName,
   chartRef,
 }: Props): ReactNode {
   const { t } = useLingui();
@@ -115,6 +122,7 @@ export function DataExplorerDrawer({
                   columns={columns}
                   data={data}
                   vizConfig={vizConfig}
+                  splitColumnName={splitColumnName}
                   onVizConfigChange={dispatch.setVizConfig}
                 />
               </div>

@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
 import { applyChatModelTurnResponse } from "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse";
@@ -12,6 +13,7 @@ import {
   extractText,
 } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { runLocalChatTurn } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/runLocalChatTurn";
+import { isAgentAccessDenied } from "@/components/ChatPanel/useAvandarChatRuntime/isAgentAccessDenied";
 import { isNetworkChatFailure } from "@/components/ChatPanel/useAvandarChatRuntime/isNetworkChatFailure";
 import { offerOfflineChatFallback } from "@/components/ChatPanel/useAvandarChatRuntime/offerOfflineChatFallback";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
@@ -43,6 +45,26 @@ type LastCompletedTurn = {
   response: ChatResponse.T;
 };
 
+/**
+ * A user message's text as the model reads it. Discovery continuations get
+ * their model wording. View-change lines, recognized the way the stored
+ * thread and the hidden-message filter recognize them (the view-change
+ * metadata flag, or the line's prefix for lines whose metadata was lost),
+ * get any case id hidden. Anything else the user typed is sent as is.
+ */
+function _userModelContent(
+  metadata: Readonly<{ custom?: Record<string, unknown> }> | undefined,
+  content: string,
+): string {
+  if (DiscoveryContinuationMessage.isInternal(metadata)) {
+    return DiscoveryContinuationMessage.toModelContent(content);
+  }
+  const isViewChange =
+    ChatViewEvent.isInternal(metadata) ||
+    ChatViewEvent.isViewChangeContent(content);
+  return isViewChange ? ChatViewEvent.toModelContent(content) : content;
+}
+
 /** Refs and dispatches the chat model adapter reads on each turn. */
 export type CreateChatModelAdapterOptions = {
   chatGenerationRef: MutableRefObject<number>;
@@ -51,6 +73,7 @@ export type CreateChatModelAdapterOptions = {
   userRef: MutableRefObject<User.T | undefined>;
   workspaceIdRef: MutableRefObject<Workspace.Id>;
   workspaceRef: MutableRefObject<Workspace.T>;
+  pathnameRef: MutableRefObject<string>;
   dashboardEditorStateRef: MutableRefObject<DashboardEditorAppState>;
   parseSqlRef: MutableRefObject<
     ReturnType<typeof useSqlToStructuredQuery>["parseSql"]
@@ -62,6 +85,104 @@ export type CreateChatModelAdapterOptions = {
   >;
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
 };
+
+/**
+ * Runs a turn with the data agent on any page. The agent, and the code
+ * that reads the page, load on first use so they stay out of the main
+ * bundle. The case designer keeps today's chat until case management
+ * moves into the agent.
+ */
+async function _runAgentTurn(
+  options: Readonly<{
+    dataAgentTurn: DataAgentTurnOptions;
+    pathname: string;
+    chatPageContext: ChatPageContext.T;
+    dashboardEditorState: DashboardEditorAppState;
+  }>,
+): Promise<ChatModelRunResult> {
+  const { runDataAgentTurn } =
+    await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
+  return runDataAgentTurn(options.dataAgentTurn, {
+    pathname: options.pathname,
+    chatPageContext: options.chatPageContext,
+    dashboardEditorState: options.dashboardEditorState,
+  });
+}
+
+/**
+ * Handles a failed cloud turn. A network failure with the offline models
+ * downloaded offers to answer offline instead, and runs the offline turn
+ * when accepted. A chat reset during the failure ends the turn quietly.
+ * Anything else is rethrown for the chat to show.
+ */
+async function _recoverFromChatFailure(
+  options: Readonly<{
+    error: unknown;
+    isGenerationStale: () => boolean;
+    copy: ChatRuntimeCopy;
+    runOfflineTurn: () => Promise<ChatModelRunResult>;
+  }>,
+): Promise<ChatModelRunResult> {
+  const { error, isGenerationStale, copy, runOfflineTurn } = options;
+  if (isGenerationStale()) {
+    return { content: [] };
+  }
+  const fallbackMode = resolveChatRuntimeMode({
+    navigatorOnLine: navigator.onLine,
+    isOfflineModeOn: false,
+    isBundleDownloaded: LocalChatModelStore.isBundleDownloaded(),
+    chatPostFailed: isNetworkChatFailure(error),
+  });
+  if (fallbackMode.kind === "offer_local_fallback") {
+    const accepted = await offerOfflineChatFallback({
+      title: copy.fallbackTitle,
+      message: copy.fallbackMessage,
+      action: copy.fallbackAction,
+    });
+    if (isGenerationStale()) {
+      return { content: [] };
+    }
+    if (accepted) {
+      return runOfflineTurn();
+    }
+  }
+  throw error;
+}
+
+function _isAbortError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { name?: unknown }).name === "AbortError"
+  );
+}
+
+/**
+ * Handles a failed agent turn like `_recoverFromChatFailure`, except for its
+ * last step: a failure that would be rethrown becomes a reply instead, so
+ * the chat never shows a turn with no content. A refused role gets the
+ * access message, and anything else (including a declined or unavailable
+ * offline offer) says the assistant could not answer. A chat reset still
+ * ends the turn quietly, and a stopped turn is still rethrown.
+ */
+async function _recoverFromAgentFailure(
+  options: Readonly<Parameters<typeof _recoverFromChatFailure>[0]>,
+): Promise<ChatModelRunResult> {
+  try {
+    return await _recoverFromChatFailure(options);
+  } catch (error) {
+    if (options.isGenerationStale()) {
+      return { content: [] };
+    }
+    if (_isAbortError(error)) {
+      throw error;
+    }
+    const text = isAgentAccessDenied(error)
+      ? options.copy.agentAccessDenied
+      : options.copy.agentUnavailable;
+    return { content: [{ type: "text", text }] };
+  }
+}
 
 /**
  * Builds the Assistant UI model adapter that posts each turn and applies
@@ -77,6 +198,7 @@ export function createChatModelAdapter(
     userRef,
     workspaceIdRef,
     workspaceRef,
+    pathnameRef,
     dashboardEditorStateRef,
     parseSqlRef,
     copyRef,
@@ -113,11 +235,7 @@ export function createChatModelAdapter(
             }),
             user: Model.make("ChatClientMessage", {
               role: "user" as const,
-              content: DiscoveryContinuationMessage.isInternal(
-                threadMessage.metadata,
-              )
-                ? DiscoveryContinuationMessage.toModelContent(content)
-                : content,
+              content: _userModelContent(threadMessage.metadata, content),
             }),
           });
         })
@@ -134,7 +252,11 @@ export function createChatModelAdapter(
         .find(propEq("role", "user"));
       const currentUser = userRef.current;
       const workspaceId = workspaceIdRef.current;
+      // The page is read once, here, so consent waits and navigation during
+      // the turn cannot mix one page's context with another page's route.
       const currentPageContext = pageContextRef.current;
+      const currentPathname = pathnameRef.current;
+      const currentDashboardEditorState = dashboardEditorStateRef.current;
 
       if (
         lastUserMessage &&
@@ -290,13 +412,26 @@ export function createChatModelAdapter(
       }
 
       if (
-        currentPageContext.app === "data-explorer" &&
+        currentPageContext.app !== "case-manager" &&
         DataAgentFeature.isEnabled()
       ) {
-        // Loaded on first use so the agent stays out of the main bundle.
-        const { runDataAgentTurn } =
-          await import("@/components/ChatPanel/useAvandarChatRuntime/runDataAgentTurn/runDataAgentTurn");
-        return finishIfCurrent(await runDataAgentTurn(dataAgentTurn));
+        try {
+          return finishIfCurrent(
+            await _runAgentTurn({
+              dataAgentTurn,
+              pathname: currentPathname,
+              chatPageContext: currentPageContext,
+              dashboardEditorState: currentDashboardEditorState,
+            }),
+          );
+        } catch (error) {
+          return _recoverFromAgentFailure({
+            error,
+            isGenerationStale,
+            copy: copyRef.current,
+            runOfflineTurn,
+          });
+        }
       }
 
       const currentMessagesKey = chatMessagesKey(apiMessages);
@@ -326,29 +461,12 @@ export function createChatModelAdapter(
         };
         return applyResponseIfCurrent(response);
       } catch (error) {
-        if (isGenerationStale()) {
-          return { content: [] };
-        }
-        const fallbackMode = resolveChatRuntimeMode({
-          navigatorOnLine: navigator.onLine,
-          isOfflineModeOn: false,
-          isBundleDownloaded: LocalChatModelStore.isBundleDownloaded(),
-          chatPostFailed: isNetworkChatFailure(error),
+        return _recoverFromChatFailure({
+          error,
+          isGenerationStale,
+          copy: copyRef.current,
+          runOfflineTurn,
         });
-        if (fallbackMode.kind === "offer_local_fallback") {
-          const accepted = await offerOfflineChatFallback({
-            title: copyRef.current.fallbackTitle,
-            message: copyRef.current.fallbackMessage,
-            action: copyRef.current.fallbackAction,
-          });
-          if (isGenerationStale()) {
-            return { content: [] };
-          }
-          if (accepted) {
-            return runOfflineTurn();
-          }
-        }
-        throw error;
       }
     },
   };

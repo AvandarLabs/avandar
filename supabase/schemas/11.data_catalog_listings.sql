@@ -183,6 +183,27 @@ create table public.data_catalog_listings (
   -- stored twice. Keeps the rest so a later column can be filled from it
   -- without re-crawling. As of the last write that changed another column.
   additional_source_metadata jsonb,
+  -- Other listings in the same drive that are usually added with this one,
+  -- such as the list of country codes a column holds. Each member is
+  -- `{kind, externalDatasetId, apiResourceId, joinOn}` and names its
+  -- listing by the API key `data_catalog_listings__api_resource_unique`
+  -- covers, together with this listing's `api_service` and `api_base_url`,
+  -- because a member may be written before or after this listing is.
+  -- `rpc_data_catalog_listings__get_companions` resolves them.
+  companion_listings jsonb not null default '[]'::jsonb,
+  -- How to read a token that changes when this listing's source changes:
+  -- `{url, token}`, where `token` is `{kind: "json-paths", paths}` or
+  -- `{kind: "body-sha256"}`. Written by the pipeline, so the `open-data`
+  -- edge function and the Parquet copy builder check any API's freshness
+  -- with no code of their own for it. Null for a listing whose service has
+  -- a built-in check.
+  api_freshness_probe jsonb,
+  -- When the `open-data` edge function last read this listing's freshness
+  -- token, so it reads the source at most once per recheck window however
+  -- many workspaces ask.
+  parquet_cache_checked_at timestamptz,
+  -- The token that read returned.
+  parquet_cache_checked_source_version text,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
@@ -267,6 +288,19 @@ create table public.data_catalog_listings (
       parquet_cache_failure_code is not null
     )
   ),
+  -- A freshness check records when it ran and what it read, together.
+  constraint data_catalog_listings__parquet_cache_check_complete check (
+    (parquet_cache_checked_at is null) = (
+      parquet_cache_checked_source_version is null
+    )
+  ),
+  constraint data_catalog_listings__companion_listings_is_array check (
+    jsonb_typeof(companion_listings) = 'array'
+  ),
+  constraint data_catalog_listings__api_freshness_probe_is_object check (
+    api_freshness_probe is null or
+    jsonb_typeof(api_freshness_probe) = 'object'
+  ),
   -- An invalid listing says why, and a valid one carries no reason.
   constraint data_catalog_listings__invalid_reason_complete check (
     is_invalid = (invalid_dataset_reason is not null)
@@ -329,6 +363,36 @@ create index data_catalog_listings__domains on public.data_catalog_listings usin
 
 -- Serves the catalog's keyword filter (`tags && ...`).
 create index data_catalog_listings__tags on public.data_catalog_listings using gin (tags);
+
+-- Serves the catalog's second-level filter on its own, without a publisher.
+create index data_catalog_listings__organization2_name on public.data_catalog_listings (organization2_name);
+
+-- Serves the catalog's format filter. The expression is
+-- `data_catalog_listings__search_matches`'s `file_format`: change them
+-- together.
+create index data_catalog_listings__file_format on public.data_catalog_listings (
+  (
+    case
+      when api_resource_format is not null then upper(api_resource_format)
+      when parquet_file_name is not null then 'PARQUET'
+    end
+  )
+);
+
+-- Serves browsing the catalog most recently updated first, and its update
+-- filter, so a page reads only the listings it shows. The first expression
+-- is `data_catalog_listings__search_matches`'s `last_updated_at`: change them
+-- together.
+create index data_catalog_listings__last_updated_at on public.data_catalog_listings (
+  (
+    coalesce(date_of_last_update, date_of_last_sync)
+  ) desc nulls last,
+  display_name,
+  id
+);
+
+-- Serves browsing the catalog by name.
+create index data_catalog_listings__display_name on public.data_catalog_listings (display_name, id);
 
 -- Enable row level security
 alter table public.data_catalog_listings enable row level security;

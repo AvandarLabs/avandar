@@ -5,6 +5,7 @@ import { DuckDBInstance } from "@duckdb/node-api";
 import { buildParquetCachePartPaths } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { refreshCatalogFacetCounts } from "./helpers/refreshCatalogFacetCounts";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
@@ -269,6 +270,7 @@ test.describe("ODC Parquet copies", () => {
     // turn up in this run's search.
     await _deleteFixtures(admin);
     await _seedListingWithCopy(admin);
+    await refreshCatalogFacetCounts(admin);
 
     try {
       await signInWithEmailPassword(page, {
@@ -306,6 +308,7 @@ test.describe("ODC Parquet copies", () => {
       });
     } finally {
       await _deleteFixtures(admin);
+      await refreshCatalogFacetCounts(admin);
     }
   });
 });

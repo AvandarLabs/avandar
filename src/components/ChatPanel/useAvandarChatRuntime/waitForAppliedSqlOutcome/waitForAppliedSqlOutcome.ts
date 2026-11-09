@@ -93,6 +93,11 @@ function _getSettledOutcome(
  * new `rawSql`, so this watches the shared query cache rather than running
  * the SQL a second time.
  *
+ * A result card in the chat runs its SQL through `useDataQuery` too, so a
+ * mounted card running the same statement in the same workspace also
+ * matches. Its outcome is equivalent: the same SQL against the same
+ * workspace through the same query path.
+ *
  * @param options.queryCache The cache the explorer's queries live in.
  * @param options.workspaceId The workspace the explorer runs the SQL against.
  * @param options.rawSql The exact statement handed to the explorer.

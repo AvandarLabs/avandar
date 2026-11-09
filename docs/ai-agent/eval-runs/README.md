@@ -96,3 +96,32 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-08T15-12-24](2026-11-08T15-12-24-d04_h06_2/results.jsonl) | `d04:h06#2` | 1/1 | 0 | 0 | $0.00036 | 3.2 s / 3.2 s | none |
 | [2026-11-08T15-12-28](2026-11-08T15-12-28-d04_h06_3/results.jsonl) | `d04:h06#3` | 1/1 | 0 | 0 | $0.00033 | 3.0 s / 3.0 s | none |
 | [2026-11-08T15-12-33](2026-11-08T15-12-33-d04_h06_4/results.jsonl) | `d04:h06#4` | 1/1 | 0 | 0 | $0.00033 | 2.9 s / 2.9 s | none |
+| [2026-11-09T00-15-53](2026-11-09T00-15-53-phase-1a_agent-45/results.jsonl) | `phase-1a:agent-45` | 45/45 | 0 | 0 | $0.00030 | 2.7 s / 8.8 s | none |
+| [2026-11-09T00-16-32](2026-11-09T00-16-32-phase-1a_agent-page/results.jsonl) | `phase-1a:agent-page` | 6/6 | 0 | 0 | $0.00021 | 5.5 s / 5.9 s | none |
+| [2026-11-09T00-17-00](2026-11-09T00-17-00-phase-1a_agent-page_2/results.jsonl) | `phase-1a:agent-page #2` | 6/6 | 0 | 0 | $0.00019 | 5.4 s / 6.0 s | none |
+| [2026-11-09T00-17-35](2026-11-09T00-17-35-phase-1a_agent-page_3/results.jsonl) | `phase-1a:agent-page #3` | 6/6 | 0 | 0 | $0.00019 | 7.9 s / 8.3 s | none |
+| [2026-11-09T00-18-12](2026-11-09T00-18-12-phase-1a_today-page/results.jsonl) | `phase-1a:today-page` | 2/3 | 1 | 0 | $0.00190 | 6.3 s / 7.1 s | P01 |
+| [2026-11-09T04-05-30](2026-11-09T04-05-30-phase-1a-redaction_agent-page/results.jsonl) | `phase-1a-redaction:agent-page` | 7/7 | 0 | 0 | $0.00036 | 2.2 s / 2.7 s | none |
+| [2026-11-09T04-06-00](2026-11-09T04-06-00-phase-1a-redaction_agent-page/results.jsonl) | `phase-1a-redaction:agent-page` | 6/7 | 1 | 0 | $0.00021 | 1.8 s / 2.7 s | P07 |
+| [2026-11-09T04-06-49](2026-11-09T04-06-49-phase-1a-redaction_agent-page/results.jsonl) | `phase-1a-redaction:agent-page` | 7/7 | 0 | 0 | $0.00031 | 1.8 s / 2.9 s | none |
+| [2026-11-09T04-07-01](2026-11-09T04-07-01-phase-1a-redaction_p07-repeat/results.jsonl) | `phase-1a-redaction:p07-repeat` | 1/1 | 0 | 0 | $0.00019 | 2.0 s / 2.0 s | none |
+| [2026-11-09T04-07-05](2026-11-09T04-07-05-phase-1a-redaction_p07-repeat/results.jsonl) | `phase-1a-redaction:p07-repeat` | 1/1 | 0 | 0 | $0.00019 | 2.0 s / 2.0 s | none |
+| [2026-11-09T04-08-54](2026-11-09T04-08-54-phase-1a-redaction_agent-45/results.jsonl) | `phase-1a-redaction:agent-45` | 45/45 | 0 | 0 | $0.00026 | 2.1 s / 3.3 s | none |
+| [2026-11-09T04-39-31](2026-11-09T04-39-31-phase-1a-redaction-review_agent-45/results.jsonl) | `phase-1a-redaction-review:agent-45` | 43/45 | 0 | 0 | $0.00030 | 2.4 s / 3.4 s | H06 N04 |
+| [2026-11-09T04-39-38](2026-11-09T04-39-38-phase-1a-redaction-review_agent-page/results.jsonl) | `phase-1a-redaction-review:agent-page` | 7/7 | 0 | 0 | $0.00022 | 1.8 s / 2.6 s | none |
+| [2026-11-09T04-39-55](2026-11-09T04-39-55-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 2/2 | 0 | 0 | $0.00036 | 3.6 s / 3.6 s | none |
+| [2026-11-09T04-40-01](2026-11-09T04-40-01-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 1/2 | 0 | 0 | $0.00039 | 3.7 s / 3.7 s | H06 |
+| [2026-11-09T04-40-06](2026-11-09T04-40-06-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 2/2 | 0 | 0 | $0.00032 | 3.2 s / 3.2 s | none |
+| [2026-11-09T04-58-02](2026-11-09T04-58-02-phase-1a-redaction-review2_agent-page/results.jsonl) | `phase-1a-redaction-review2:agent-page` | 6/7 | 0 | 1 | $0.00034 | 1.9 s / 2.1 s | P04 |
+| [2026-11-09T04-58-42](2026-11-09T04-58-42-phase-1a-redaction-review2_agent-45/results.jsonl) | `phase-1a-redaction-review2:agent-45` | 43/45 | 0 | 0 | $0.00062 | 2.1 s / 3.3 s | N02 N04 |
+| [2026-11-09T04-59-12](2026-11-09T04-59-12-phase-1a-redaction-review2_rerun/results.jsonl) | `phase-1a-redaction-review2:rerun` | 2/3 | 0 | 2 | $0.00018 | 2.1 s / 2.3 s | P04 |
+| [2026-11-09T04-59-17](2026-11-09T04-59-17-phase-1a-redaction-review2_rerun/results.jsonl) | `phase-1a-redaction-review2:rerun` | 2/3 | 0 | 0 | $0.00026 | 3.1 s / 3.5 s | N04 |
+| [2026-11-09T04-59-22](2026-11-09T04-59-22-phase-1a-redaction-review2_rerun/results.jsonl) | `phase-1a-redaction-review2:rerun` | 1/3 | 0 | 2 | $0.00019 | 2.3 s / 2.7 s | N04 P04 |
+| [2026-11-09T04-59-49](2026-11-09T04-59-49-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00049 | 3.0 s / 3.0 s | none |
+| [2026-11-09T04-59-55](2026-11-09T04-59-55-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00024 | 2.8 s / 2.8 s | none |
+| [2026-11-09T05-00-00](2026-11-09T05-00-00-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00023 | 2.9 s / 2.9 s | none |
+| [2026-11-09T05-00-05](2026-11-09T05-00-05-phase-1a-redaction-review2_p04-check/results.jsonl) | `phase-1a-redaction-review2:p04-check` | 2/2 | 0 | 0 | $0.00023 | 3.1 s / 3.1 s | none |
+| [2026-11-09T05-00-55](2026-11-09T05-00-55-phase-1a-redaction-review2_agent-45-final/results.jsonl) | `phase-1a-redaction-review2:agent-45-final` | 44/45 | 0 | 0 | $0.00026 | 2.1 s / 3.2 s | N04 |
+| [2026-11-09T05-01-03](2026-11-09T05-01-03-phase-1a-redaction-review2_agent-page-final/results.jsonl) | `phase-1a-redaction-review2:agent-page-final` | 7/7 | 0 | 0 | $0.00020 | 1.7 s / 2.8 s | none |
+| [2026-11-09T05-27-25](2026-11-09T05-27-25-phase-1a-fixes_agent-page/results.jsonl) | `phase-1a-fixes:agent-page` | 7/7 | 0 | 0 | $0.00036 | 1.9 s / 2.5 s | none |
+| [2026-11-09T05-28-14](2026-11-09T05-28-14-phase-1a-fixes_agent-45/results.jsonl) | `phase-1a-fixes:agent-45` | 45/45 | 0 | 0 | $0.00028 | 2.2 s / 3.3 s | none |

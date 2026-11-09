@@ -13,6 +13,11 @@ import type { ParquetCopyFailure } from "@pipeline-server/openDataParquetCache/t
 export type ParquetCopyJob = Readonly<{
   catalogListingId: string;
   buildId: string;
+  /**
+   * A column type sample vouched for as the whole source, copied instead of
+   * downloading the source.
+   */
+  completeSampleCsv?: string;
 }>;
 
 /** A listing as a build reads it. */
@@ -81,6 +86,7 @@ type RunParquetCopyBuildOptions = Readonly<{
   store: ParquetCopyStore;
   loadPipelineDownload: OpenDataParquetCacheDependencies["loadPipelineDownload"];
   downloadToFile: OpenDataParquetCacheDependencies["downloadToFile"];
+  probeHttp: OpenDataParquetCacheDependencies["probeHttp"];
   /** Replaces the copy builder, for tests. */
   buildCopy?: typeof buildOpenDataParquetCache;
 }>;
@@ -157,15 +163,20 @@ async function _recordCopy(
  * copy's column types are written back as the listing's verified types,
  * since a read of the whole source is more authoritative than a sample. A
  * copy that shares no column with the listing keeps the listing's columns.
+ * A job carrying a complete column type sample builds from the sample.
  *
- * @param options.job The listing and the build id its claim gave it.
- * @param options.store The listing's Supabase project.
+ * @param runOptions.job The listing and the build id its claim gave it.
+ * @param runOptions.store The listing's Supabase project.
  * @returns How the build ended.
  */
 export async function runParquetCopyBuild(
-  options: RunParquetCopyBuildOptions,
+  runOptions: RunParquetCopyBuildOptions,
 ): Promise<ParquetCopyBuildOutcome> {
-  const { job, store } = options;
+  // The store records a build by its listing and id, so the sample, which
+  // can be megabytes, stays with the build alone.
+  const { completeSampleCsv, ...job } = runOptions.job;
+  const options = { ...runOptions, job };
+  const { store } = options;
   const listing = await store.readListing(job.catalogListingId);
   if (listing === undefined || listing.currentBuildId !== job.buildId) {
     return { status: "superseded" };
@@ -179,9 +190,11 @@ export async function runParquetCopyBuild(
     copy = await buildCopy({
       listing: { ...listing, pipelineName: listing.pipelineName },
       buildId: job.buildId,
+      completeSampleCsv,
       dependencies: {
         loadPipelineDownload: options.loadPipelineDownload,
         downloadToFile: options.downloadToFile,
+        probeHttp: options.probeHttp,
         uploadPart: store.uploadPart,
         removeFolder: store.removeFolder,
       },

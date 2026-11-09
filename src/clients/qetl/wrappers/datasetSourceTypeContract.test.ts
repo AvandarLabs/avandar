@@ -81,7 +81,9 @@ const SOURCE_TYPE_CONTRACTS: Record<
   csv_file: { isLive: false },
   xlsx_file: { isLive: false },
   pdf_file: { isLive: false },
-  // Acquired as a published catalog resource, with no max age.
+  // Read from a published catalog copy. An API-backed copy has a max age
+  // (GlobalAppConfig.timing.openDataCopyMaxAgeMs) but no Refresh action or
+  // dataset-keyed route, so it is not held to the live source contract.
   open_data: { isLive: false },
   // Derived from other datasets, which go stale on their own.
   virtual: { isLive: false },

@@ -62,6 +62,10 @@ function _createListing(
     parquetCacheBuiltAt: undefined,
     parquetCacheRowCount: undefined,
     parquetCacheByteSize: undefined,
+    parquetCacheCheckedAt: undefined,
+    parquetCacheCheckedSourceVersion: undefined,
+    companionListings: [],
+    apiFreshnessProbe: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
@@ -88,6 +92,7 @@ type DetailOptions = {
   preview?: CatalogListingPreviewState;
   isExpanded?: boolean;
   onExpand?: () => void;
+  companions?: readonly DataCatalogListing.ResolvedCompanion[];
 };
 
 const NO_PREVIEW: CatalogListingPreviewState = {
@@ -115,6 +120,10 @@ function _buildDetail(options: DetailOptions): ReactElement {
       preview={options.preview ?? NO_PREVIEW}
       isExpanded={options.isExpanded}
       onExpand={options.onExpand}
+      companions={options.companions ?? []}
+      addingListingIds={new Set()}
+      onSelectListing={vi.fn()}
+      onAddCompanion={vi.fn()}
     />
   );
 }
@@ -136,7 +145,7 @@ describe("DataCatalogListingDetail", () => {
       preview: {
         preview: {
           columnNames: ["country"],
-          dateColumnNames: new Set(),
+          dateColumnNames: [],
           rows: Array.from({ length: 200 }, () => {
             return { country: "Chad" };
           }),
@@ -156,10 +165,106 @@ describe("DataCatalogListingDetail", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows the preview after date column names were saved and read back as JSON", () => {
+    // A Set becomes {} in the persisted query cache. That is what the grid
+    // reads the next time this listing is opened.
+    const storedPreview = JSON.parse(
+      JSON.stringify({
+        columnNames: ["boro_name"],
+        dateColumnNames: new Set<string>(),
+        rows: [{ boro_name: "Bronx" }],
+      }),
+    );
+    _renderDetail({
+      listing: _createListing({ displayName: "Borough boundaries" }),
+      preview: {
+        preview: storedPreview,
+        isLoading: false,
+        isError: false,
+        isAvailable: true,
+      },
+    });
+
+    expect(screen.getByText("Data preview")).toBeInTheDocument();
+    expect(screen.getByText("First 1 rows")).toBeInTheDocument();
+  });
+
+  it("shows the preview when date column names are a list", () => {
+    _renderDetail({
+      listing: _createListing(),
+      preview: {
+        preview: {
+          columnNames: ["boro_name", "report_date"],
+          dateColumnNames: ["report_date"],
+          rows: [{ boro_name: "Bronx", report_date: Date.UTC(2022, 0, 1) }],
+        },
+        isLoading: false,
+        isError: false,
+        isAvailable: true,
+      },
+    });
+
+    expect(screen.getByText("Data preview")).toBeInTheDocument();
+    expect(screen.getByText("First 1 rows")).toBeInTheDocument();
+  });
+
   it("leaves the preview out for a listing with no data to read", () => {
     _renderDetail({ listing: _createListing({ isWorkspaceLoadable: false }) });
 
     expect(screen.queryByText("Data preview")).toBeNull();
+  });
+
+  it("says an unloadable listing whose source has no rows has no data yet", () => {
+    _renderDetail({
+      listing: _createListing({
+        isWorkspaceLoadable: false,
+        metadata: { row_count: 0 },
+      }),
+    });
+
+    expect(screen.getByText("This dataset has no data yet")).toBeVisible();
+    expect(
+      screen.queryByText("Avandar can't add this kind of dataset yet."),
+    ).toBeNull();
+  });
+
+  it("says an unloadable listing with rows is a kind Avandar can't add yet", () => {
+    _renderDetail({
+      listing: _createListing({
+        isWorkspaceLoadable: false,
+        metadata: { row_count: 12 },
+      }),
+    });
+
+    expect(
+      screen.getByText("Avandar can't add this kind of dataset yet."),
+    ).toBeVisible();
+  });
+
+  it("shows the listings recommended with it after its columns", () => {
+    _renderDetail({
+      listing: _createListing(),
+      companions: [
+        {
+          catalogListingId: "listing-country" as DataCatalogListing.Id,
+          displayName: "Country (GHO dimension values)",
+          isWorkspaceLoadable: true,
+          isInvalid: false,
+          kind: "lookup",
+          joinOn: [{ column: "SpatialDim", companionColumn: "Code" }],
+          isInWorkspace: false,
+        },
+      ],
+    });
+
+    const columnsHeading = screen.getByText("Columns");
+    const recommendedHeading = screen.getByText(
+      "Recommended with this dataset",
+    );
+    expect(
+      columnsHeading.compareDocumentPosition(recommendedHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("opens the listing in full screen from the expand button", () => {

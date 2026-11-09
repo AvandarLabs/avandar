@@ -39,7 +39,11 @@ const DUCKDB_DATA_TYPES: ReadonlySet<string> = new Set(
 /** How DuckDB's sniffer reports an option it found no character for. */
 const SNIFFED_EMPTY = "(empty)";
 
-function _quoteText(value: string): string {
+/**
+ * Quotes a value as a SQL string literal, such as a file path, for the
+ * conversions here and in `convertJsonFileToParquetParts`.
+ */
+export function quoteSqlText(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }
 
@@ -48,26 +52,43 @@ function _quoteIdentifier(name: string): string {
 }
 
 function _toParquetList(paths: readonly string[]): string {
-  return `read_parquet([${paths.map(_quoteText).join(", ")}])`;
+  return `read_parquet([${paths.map(quoteSqlText).join(", ")}])`;
 }
 
 /**
  * Opens a DuckDB that spills to the temp directory, which the server's
  * config points at its data volume, once it reaches its memory limit.
  */
-async function _openDuckDb(): Promise<NodeDuckDb> {
+async function _openDuckDb(
+  memoryLimit: string | undefined,
+): Promise<NodeDuckDb> {
   const db = new NodeDuckDb();
-  const memoryLimit =
-    process.env.AVA_DUCKDB_MEMORY_LIMIT?.trim() || DEFAULT_DUCKDB_MEMORY_LIMIT;
+  const limit =
+    memoryLimit ??
+    (process.env.AVA_DUCKDB_MEMORY_LIMIT?.trim() ||
+      DEFAULT_DUCKDB_MEMORY_LIMIT);
   await db.execSQL(
-    `SET memory_limit=${_quoteText(memoryLimit)}; ` +
-      `SET temp_directory=${_quoteText(tmpdir())};`,
+    `SET memory_limit=${quoteSqlText(limit)}; ` +
+      `SET temp_directory=${quoteSqlText(tmpdir())};`,
   );
   return db;
 }
 
-async function _withDuckDb<T>(run: (db: NodeDuckDb) => Promise<T>): Promise<T> {
-  const db = await _openDuckDb();
+/**
+ * Runs one conversion on its own DuckDB connection, closed when it ends,
+ * that spills to the temp directory once it reaches its memory limit. Use it
+ * for every Parquet copy conversion, such as reading a downloaded CSV or
+ * JSON file.
+ *
+ * @param run The conversion.
+ * @param options.memoryLimit DuckDB's `memory_limit`, such as `1.5GB`.
+ *   Defaults to `AVA_DUCKDB_MEMORY_LIMIT`, or 1GB.
+ */
+export async function withConversionDuckDb<T>(
+  run: (db: NodeDuckDb) => Promise<T>,
+  options: Readonly<{ memoryLimit?: string }> = {},
+): Promise<T> {
+  const db = await _openDuckDb(options.memoryLimit);
   try {
     return await run(db);
   } finally {
@@ -97,7 +118,7 @@ function _toKnownDataType(
 export async function summarizeParquetParts(
   partPaths: readonly string[],
 ): Promise<ParquetFileSummary> {
-  return await _withDuckDb(async (db) => {
+  return await withConversionDuckDb(async (db) => {
     const source = _toParquetList(partPaths);
     const [count] = await db.runRawQuery<{ rowCount: string }>(
       `SELECT count(*)::VARCHAR AS rowCount FROM ${source}`,
@@ -130,12 +151,14 @@ async function _sniffDialectOptions(
     Delimiter: string;
     Quote: string;
     Escape: string;
-  }>(`SELECT Delimiter, Quote, Escape FROM sniff_csv(${_quoteText(csvPath)})`);
+  }>(
+    `SELECT Delimiter, Quote, Escape FROM sniff_csv(${quoteSqlText(csvPath)})`,
+  );
   if (dialect === undefined) {
     throw new Error("DuckDB detected no CSV dialect");
   }
   const toOption = (name: string, character: string): string => {
-    return `${name}=${_quoteText(character === SNIFFED_EMPTY ? "" : character)}`;
+    return `${name}=${quoteSqlText(character === SNIFFED_EMPTY ? "" : character)}`;
   };
   return [
     toOption("delim", dialect.Delimiter),
@@ -147,16 +170,17 @@ async function _sniffDialectOptions(
 /**
  * Writes a query's rows into ZSTD Parquet parts of about `maxPartBytes`
  * each, named `part-00000.parquet` onward in row order, and returns their
- * paths in that order.
+ * paths in that order. Every whole-file conversion ends here, such as a
+ * CSV's or a JSON file's.
  */
-async function _copyRowsToParts(args: {
+export async function copyQueryRowsToParquetParts(args: {
   db: NodeDuckDb;
   selectSql: string;
   partsDir: string;
   maxPartBytes: number;
 }): Promise<string[]> {
   await args.db.execSQL(
-    `COPY (${args.selectSql}) TO ${_quoteText(args.partsDir)} ` +
+    `COPY (${args.selectSql}) TO ${quoteSqlText(args.partsDir)} ` +
       `(FORMAT PARQUET, COMPRESSION ZSTD, ` +
       `FILE_SIZE_BYTES ${args.maxPartBytes}, FILENAME_PATTERN 'raw-{i}');`,
   );
@@ -209,12 +233,12 @@ export async function convertCsvFileToParquetParts(
     maxPartBytes: number;
   }>,
 ): Promise<string[]> {
-  return await _withDuckDb(async (db) => {
+  return await withConversionDuckDb(async (db) => {
     const dialectOptions = await _sniffDialectOptions(db, options.csvPath);
-    return await _copyRowsToParts({
+    return await copyQueryRowsToParquetParts({
       db,
       selectSql:
-        `SELECT * FROM read_csv(${_quoteText(options.csvPath)}, ` +
+        `SELECT * FROM read_csv(${quoteSqlText(options.csvPath)}, ` +
         `header=true, auto_detect=true, sample_size=-1, ${dialectOptions})`,
       partsDir: options.partsDir,
       maxPartBytes: options.maxPartBytes,
@@ -237,8 +261,8 @@ export async function splitParquetFileIntoParts(
     maxPartBytes: number;
   }>,
 ): Promise<string[]> {
-  return await _withDuckDb(async (db) => {
-    return await _copyRowsToParts({
+  return await withConversionDuckDb(async (db) => {
+    return await copyQueryRowsToParquetParts({
       db,
       selectSql: `SELECT * FROM ${_toParquetList([options.parquetPath])}`,
       partsDir: options.partsDir,
@@ -251,7 +275,7 @@ function _toColumnTypesStruct(
   columns: readonly ListingDownloadColumn[],
 ): string {
   const entries = columns.map((column) => {
-    return `${_quoteText(column.name)}: ${_quoteText(column.dataType)}`;
+    return `${quoteSqlText(column.name)}: ${quoteSqlText(column.dataType)}`;
   });
   return `{${entries.join(", ")}}`;
 }
@@ -282,11 +306,11 @@ export async function convertCsvPageToParquetFile(
     { name: options.cursorColumn, dataType: "VARCHAR" },
     ...options.columns,
   ]);
-  return await _withDuckDb(async (db) => {
+  return await withConversionDuckDb(async (db) => {
     await db.execSQL(
-      `COPY (SELECT * FROM read_csv(${_quoteText(options.csvPath)}, ` +
+      `COPY (SELECT * FROM read_csv(${quoteSqlText(options.csvPath)}, ` +
         `header=true, delim=',', quote='"', escape='"', types=${types})) ` +
-        `TO ${_quoteText(options.parquetPath)} ` +
+        `TO ${quoteSqlText(options.parquetPath)} ` +
         `(FORMAT PARQUET, COMPRESSION ZSTD);`,
     );
     const page = _toParquetList([options.parquetPath]);
@@ -320,11 +344,11 @@ export async function mergeParquetFilesIntoPart(
     excludedColumn: string;
   }>,
 ): Promise<void> {
-  await _withDuckDb(async (db) => {
+  await withConversionDuckDb(async (db) => {
     await db.execSQL(
       `COPY (SELECT * EXCLUDE (${_quoteIdentifier(options.excludedColumn)}) ` +
         `FROM ${_toParquetList(options.parquetPaths)}) ` +
-        `TO ${_quoteText(options.partPath)} (FORMAT PARQUET, COMPRESSION ZSTD);`,
+        `TO ${quoteSqlText(options.partPath)} (FORMAT PARQUET, COMPRESSION ZSTD);`,
     );
   });
 }

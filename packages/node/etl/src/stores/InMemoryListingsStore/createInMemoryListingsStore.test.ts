@@ -46,6 +46,8 @@ function _row(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     tags: null,
     additional_source_metadata: null,
     drive_id: null,
+    companion_listings: [],
+    api_freshness_probe: null,
     ...overrides,
   };
 }

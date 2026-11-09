@@ -14,6 +14,12 @@ export type ActiveCatalogFilter = {
 
 type Props = {
   numResults: number;
+
+  /**
+   * Whether more datasets match than were counted, so `numResults` is a
+   * floor rather than the count.
+   */
+  isNumResultsCapped: boolean;
   numCatalogListings: number;
 
   /**
@@ -41,6 +47,7 @@ type Props = {
  */
 export function DataCatalogResultsHeader({
   numResults,
+  isNumResultsCapped,
   numCatalogListings,
   isNarrowed,
   activeFilters,
@@ -68,10 +75,16 @@ export function DataCatalogResultsHeader({
           className={css.dataCatalogResultsHeaderCount}
           aria-live="polite"
         >
-          {isNarrowed ? (
+          {isNarrowed && isNumResultsCapped ? (
+            <Trans>
+              {formattedNumResults}+ of {formattedNumCatalogListings} datasets
+            </Trans>
+          ) : isNarrowed ? (
             <Trans>
               {formattedNumResults} of {formattedNumCatalogListings} datasets
             </Trans>
+          ) : isNumResultsCapped ? (
+            <Trans>{formattedNumResults}+ datasets</Trans>
           ) : (
             <Plural value={numResults} one="# dataset" other="# datasets" />
           )}
