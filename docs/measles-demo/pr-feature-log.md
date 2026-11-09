@@ -78,6 +78,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F28 | Build an ODC listing's Parquet copy from a column type sample that holds the whole source | not started | F12, F24, F25 | |
 | F29 | API-backed listing copies expire, so workspaces see a changed source | not started | F25 | |
 | F30 | WHO GHO pipeline, recommended listings, and listing freshness probes | not started | F4, F16, F17, F19, F23, F24, F25, F28, F29 | |
+| F31 | Threshold colors: map config version 6 with one color and label per graduated class | not started | none (its e2e spec needs F19, F25) | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -113,6 +114,7 @@ API. It's new work, not something this branch built.
 | after F25 | F28 | Extends F25's copy request, build route, and build, and the column type sample F12 reworked. The pipeline server half must deploy before the edge function half: an older build route refuses the new `completeSampleCsv` key. |
 | 17 | F29 | Changes how `DatasetParquetWrapper` and the pipeline server's copy store treat F25's Parquet copies. Merge after F25. |
 | 18 | F30 | Extends the listings table, upsert, model and catalog detail that F4, F16, F17, F19, F23 and F24 built, the copy builder and `parquet-cache` route F25 and F28 changed, and reads F29's max age. Merge after all of them. |
+| any | F31 | Self-contained GIS change: the map config version 6 migration, the graduated class editor, and three bug fixes. Its e2e spec adds listings through the catalog, so run that spec after F19 and F25. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -1876,6 +1878,117 @@ listing probes) and P6.13, partitioned live connections.
 
 ---
 
+## F31: Threshold colors (map config version 6)
+
+Status: not started. Built on `feat/gis-threshold-colors`, branched from
+`demo/measles` at `b0b9f00b2`. The commits below are all of
+`git log --oneline b0b9f00b2..feat/gis-threshold-colors --no-merges`.
+
+**Purpose:** A graduated map layer could only take a preset ramp, so a
+choropleth could not say "red below 95%, neutral at or above". Map config
+version 6 stores exactly one color per class in `ramp` and an optional legend
+label per class in `classLabels`. A preset is now a UI action that rewrites
+the colors. Changing the class count resamples them from the preset they came
+from, or from the hand-edited colors. New `red`, `redBlue`, and `threshold`
+presets and a Reverse button sit next to the ramp select. Each class gets a
+swatch with a color picker and a label input. "Highlight values below" sets one
+break, applies the threshold preset, and labels the classes `Below 95%` and
+`95% or above` (a layer whose values all lie in [0, 1] takes the percent and
+stores the fraction). The labels flow into the persisted legend, so the live
+map, the PDF, and the embed match. Migration 5 to 6 resamples every saved
+graduated ramp to its class count.
+**Value:** A "below the 95% herd immunity line" map is two clicks, and any
+class can carry its own color and wording.
+
+**PR title:** `feat(gis): threshold colors with per-class colors and labels`
+
+**Depends on:** none for the map half. The `useAddCatalogListing` fix and the
+e2e spec need the catalog browser (F19) and Parquet copies (F25), because the
+spec adds two open data listings through the UI.
+
+**Commits to read** (from `feat/gis-threshold-colors`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `5f4250a84` | feat(gis): resample graduated color ramps to one color per class | All of it: `graduatedColorHelpers.ts`, its `MapLayerModule` export, and the resampling tests. |
+| `202c82504` | feat(gis): add per-class legend labels to graduated colors | All of it: `classLabels` on the graduated `ColorSpec` and the fixtures that now carry it. |
+| `02d0bd709` | feat(gis): add map config version 6 with one color and label per class | All of it: `AvaMapConfigV6Schema.ts`, the 5 to 6 migration, and the version 6 suites. |
+| `0a722b58c` | feat(gis): add red, red-blue, and threshold graduated ramp presets | All of it, including deleting `GraduatedControls.constants.ts`. |
+| `4ce3228ba` | style(gis): format graduated ramp presets | All of it. |
+| `15f784063` | feat(gis): fit graduated colors to the class count and edit each class | All of it: `graduatedColorUpdates.ts` and `withLayerColor`. |
+| `54a354ede` | feat(gis): write custom class labels into the classified legend | All of it. |
+| `eb9849e67` | feat(gis): expose the classified value range on the layer view state | All of it. |
+| `f1b5167a1` | feat(gis): pick and reverse graduated ramp presets | All of it. |
+| `ad57a6aff` | feat(gis): edit each graduated class's color and legend label | All of it: `GraduatedClassList`, `GraduatedClassRow`, and the stylesheet. |
+| `27ca7659e` | feat(gis): add the highlight values below shortcut | All of it: `HighlightValuesBelowInput.tsx` and its wiring. |
+| `513d3ebca` | fix(gis): store highlight percents without float drift | All of it. |
+| `0032f6c3c` | chore(i18n): extract the class color strings | Only the `LayerSymbology.types.ts` doc change. Regenerate the `.po` catalogs, never copy them. |
+| `46cfb9346` | fix(catalog): refresh dataset columns after adding a catalog listing | All of it. Bug fix: after "Add to workspace" the dataset's columns were stale until a reload. |
+| `6c287ea2c` | fix(gis): keep point geometry column ids stable when aggregating to boundaries | All of it. Bug fix: `findSourceColumnId.ts` keeps the point geometry column ids from changing. |
+| `41def8b14` | test(gis): cover a ZIP choropleth legend that reads Below 95% | All of it: the e2e spec, the two Parquet fixtures, and the seeding helper. |
+| `304a04257` | fix(gis): let point geometry bindings round-trip through saved map config | All of it. Bug fix: `AvaMapConfigV2Schema.ts` dropped point geometry bindings on save and load. |
+
+**Files:**
+- Model: `shared/models/AvaMap/MapLayer/LayerSymbology.types.ts`,
+  `MapLayer/MapLayerModule/{graduatedColorHelpers.ts,MapLayerModule.ts}` and
+  `__tests__/MapLayerModule.graduatedColor.test.ts`.
+- Config version 6: `AvaMapConfig/AvaMapConfig.types.ts`,
+  `AvaMapConfigModule/AvaMapConfigModule.{ts,test.ts}`, and under
+  `AvaMapConfigSchema/`: `AvaMapConfigV6Schema.ts` (new),
+  `AvaMapConfigSchema.ts`, `migrateAvaMapConfig.ts`, and the test folder's
+  `v6SchemaSuites.ts` (new), `schemaTestFixtures.ts`,
+  `AvaMapConfigSchema.test.ts`, `v4SchemaSuites.ts`, `v5SchemaSuites.ts`.
+- Point geometry round trip (`304a04257`): `AvaMapConfigV2Schema.ts` and the
+  test folder's `pointGeometrySchemaSuites.ts` (new).
+- Presets: `src/views/GisApp/layers/GraduatedRamps/GraduatedRamps.{ts,test.ts}`
+  (new), and `GraduatedControls.constants.ts` (deleted).
+- Updaters: `src/views/GisApp/layers/MapLayerUpdates/{graduatedColorUpdates.ts
+  (new),layerMetaUpdates.ts,MapLayerUpdates.ts}` and
+  `__tests__/MapLayerUpdates.graduatedColor.test.ts` (new).
+- Rendering: `classifyLayerValues/classifyLayerValues.{ts,test.ts}`,
+  `useAvaMapRender/{classifyLayerGeometry.ts,makeLayerRender.ts,
+  useAvaMapRender.test.ts}`, and `MapLayerViewState.types.ts`.
+- Inspector UI under `src/views/GisApp/panels/LayerInspector/`:
+  `ClassificationEditor/{ClassificationEditor.tsx,ClassificationEditor.test.tsx,
+  ClassificationColorModeSelect.tsx}`, `GraduatedControls/{GraduatedControls.tsx,
+  GraduatedMethodControls.tsx,GraduatedRampSelect.tsx,
+  HighlightValuesBelowInput.tsx (new)}`,
+  `GraduatedControls/GraduatedClassList/{GraduatedClassList.tsx,
+  GraduatedClassRow.tsx,GraduatedClassList.module.css}` (new), and
+  `LayerInspectorBody/LayerInspectorFocusedView.tsx`.
+- Point aggregation fix (`6c287ea2c`): `DataSection/PointAggregationControls/
+  {findSourceColumnId.ts (new),PointAggregationControls.tsx,
+  PointAggregationControls.test.tsx,PointCoordinateSelect.tsx,
+  PointInputControls.tsx}`.
+- Catalog fix (`46cfb9346`): `src/views/DataManagerApp/DataImportView/
+  DataCatalogView/useAddCatalogListing/useAddCatalogListing.{ts,test.ts}`.
+- Test fixtures and seeding helper (`41def8b14`): `tests/e2e/gis-threshold-colors.spec.ts`,
+  `tests/e2e/helpers/seedOpenDataListingCopy.ts` (writes a local Parquet file
+  into the `opendata` bucket as a listing's copy, so the spec needs no
+  network), the `tests/e2e/helpers/constants.ts` additions, and
+  `tests/data/gis-threshold-colors/{modzcta-manhattan,
+  school-immunization-manhattan}.parquet`. Port the Parquet files as binaries.
+- Fixtures that gained `classLabels` (inside the commits above):
+  `getResolvedMapLayerMetadata.test.ts`, `MapLayerUpdates.classification.test.ts`,
+  `MapLayerUpdates.symbology.test.ts`, `makeLayerSpecFromMapLayer.fill.test.ts`.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy (`0032f6c3c`).
+
+**Schema:** none. Map config version 6 is stored in the existing `config`
+JSON, and the 5 to 6 migration runs on read.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp
+pnpm tsc -b --force
+pnpm vitest run shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm vitest run src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing
+pnpm test:e2e gis-threshold-colors.spec.ts
+```
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -2039,7 +2152,8 @@ F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
 under F21 in the same way, F25's (merged in `a9d2ec770`) under F25,
 F26's (merged in `d0af42ce6`) under F26, and F29's and F30's (from
-`feat/gho-pipeline`) under F29 and F30.
+`feat/gho-pipeline`) under F29 and F30, and F31's (from
+`feat/gis-threshold-colors`) under F31.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
