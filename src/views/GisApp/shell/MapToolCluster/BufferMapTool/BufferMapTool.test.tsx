@@ -200,10 +200,10 @@ describe("BufferMapTool", () => {
     );
 
     await _openBufferForm();
+    pickMantineSelectOption("Unit", "mi");
     fireEvent.change(screen.getByRole("textbox", { name: "Distance" }), {
       target: { value: "0.5" },
     });
-    pickMantineSelectOption("Unit", "mi");
     fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
 
     expect(onBufferConfirm).toHaveBeenCalledWith({
@@ -212,6 +212,46 @@ describe("BufferMapTool", () => {
       dissolve: false,
       labelColumn: undefined,
     });
+  });
+
+  it("restates the distance when the unit changes", async () => {
+    spatialAvailability.value = "available";
+    render(
+      <BufferMapTool
+        selectedLayer={_createPolygonLayer()}
+        onBufferConfirm={vi.fn()}
+      />,
+    );
+
+    await _openBufferForm();
+    pickMantineSelectOption("Unit", "mi");
+
+    expect(screen.getByRole("textbox", { name: "Distance" })).toHaveValue(
+      "0.62",
+    );
+  });
+
+  it("raises a distance below the limit to the smallest one in its unit", async () => {
+    spatialAvailability.value = "available";
+    const onBufferConfirm = vi.fn();
+    render(
+      <BufferMapTool
+        selectedLayer={_createPolygonLayer()}
+        onBufferConfirm={onBufferConfirm}
+      />,
+    );
+
+    await _openBufferForm();
+    pickMantineSelectOption("Unit", "ft");
+    expect(screen.getByText("At least 328.09 ft")).toBeInTheDocument();
+    fireEvent.change(screen.getByRole("textbox", { name: "Distance" }), {
+      target: { value: "300" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(onBufferConfirm).toHaveBeenCalledWith(
+      expect.objectContaining({ distanceMeters: 100, distanceUnit: "ft" }),
+    );
   });
 
   it("carries the chosen ring label column", async () => {

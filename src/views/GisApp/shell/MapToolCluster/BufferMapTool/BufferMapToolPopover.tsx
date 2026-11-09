@@ -1,6 +1,10 @@
 import { Popover } from "@mantine/core";
 import { useState } from "react";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import {
+  clampBufferDistance,
+  convertBufferDistance,
+} from "@/views/GisApp/layers/bufferDistanceLimits/bufferDistanceLimits";
 import { BufferFilterStep } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep";
 import { BufferMapToolForm } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm";
 import { BufferMapToolTrigger } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolTrigger";
@@ -22,12 +26,6 @@ type Props = {
   onFilterByBuffer: (options: FilterByBufferOptions) => void;
 };
 
-/** Smallest buffer distance the tool inserts, in meters. */
-const MIN_BUFFER_DISTANCE_METERS = 100;
-
-/** Largest buffer distance the tool inserts, in meters. */
-const MAX_BUFFER_DISTANCE_METERS = 1_000_000;
-
 type BufferFormState = {
   distance: number;
   distanceUnit: MapLayer.BufferDistanceUnit;
@@ -40,18 +38,31 @@ type BufferFormState = {
   reset: () => void;
 };
 
-/** The form's values, reset to 1000 m each time the popover opens. */
+/**
+ * The form's values, reset to 1000 m each time the popover opens. Changing
+ * the unit restates the current distance in the new unit.
+ */
 function useBufferFormState(): BufferFormState {
   const [distance, setDistance] = useState<number>(
     MapLayer.defaultBufferDistanceMeters,
   );
-  const [distanceUnit, setDistanceUnit] =
+  const [distanceUnit, setDistanceUnitState] =
     useState<MapLayer.BufferDistanceUnit>("m");
   const [dissolve, setDissolve] = useState(false);
   const [labelColumn, setLabelColumn] = useState<QueryColumn.Id>();
+  const setDistanceUnit = (nextUnit: MapLayer.BufferDistanceUnit): void => {
+    setDistance(
+      convertBufferDistance({
+        distance,
+        fromUnit: distanceUnit,
+        toUnit: nextUnit,
+      }),
+    );
+    setDistanceUnitState(nextUnit);
+  };
   const reset = (): void => {
     setDistance(MapLayer.defaultBufferDistanceMeters);
-    setDistanceUnit("m");
+    setDistanceUnitState("m");
     setDissolve(false);
     setLabelColumn(undefined);
   };
@@ -69,15 +80,15 @@ function useBufferFormState(): BufferFormState {
 }
 
 function _makeConfirmOptions(form: BufferFormState): BufferConfirmOptions {
-  const distanceMeters = MapLayer.getMetersFromBufferDistance({
+  const distance = clampBufferDistance({
     distance: form.distance,
     unit: form.distanceUnit,
   });
   return {
-    distanceMeters: Math.min(
-      MAX_BUFFER_DISTANCE_METERS,
-      Math.max(MIN_BUFFER_DISTANCE_METERS, distanceMeters),
-    ),
+    distanceMeters: MapLayer.getMetersFromBufferDistance({
+      distance,
+      unit: form.distanceUnit,
+    }),
     distanceUnit: form.distanceUnit,
     dissolve: form.dissolve,
     labelColumn: form.dissolve ? undefined : form.labelColumn,

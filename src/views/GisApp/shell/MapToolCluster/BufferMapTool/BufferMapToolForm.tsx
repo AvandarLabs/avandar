@@ -9,6 +9,7 @@ import {
   Switch,
 } from "@mantine/core";
 import { BUFFER_DISTANCE_UNITS } from "$/models/AvaMap/MapLayer/MapLayer";
+import { getBufferDistanceLimitsFromUnit } from "@/views/GisApp/layers/bufferDistanceLimits/bufferDistanceLimits";
 import { BUFFER_DISTANCE_UNIT_LABELS } from "@/views/GisApp/layers/BufferDistanceUnit.constants";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -33,7 +34,10 @@ type DistanceFieldsProps = Pick<
   "distance" | "distanceUnit" | "onDistanceChange" | "onDistanceUnitChange"
 >;
 
-/** The distance number and its unit, side by side. */
+/**
+ * The distance number and its unit, side by side. The number is held within
+ * the buffer limits restated in the chosen unit.
+ */
 function BufferDistanceFields({
   distance,
   distanceUnit,
@@ -41,14 +45,20 @@ function BufferDistanceFields({
   onDistanceUnitChange,
 }: DistanceFieldsProps): ReactNode {
   const { i18n, t } = useLingui();
+  const { minDistance, maxDistance } =
+    getBufferDistanceLimitsFromUnit(distanceUnit);
+  const unitLabel = i18n._(BUFFER_DISTANCE_UNIT_LABELS[distanceUnit]);
   return (
-    <Group gap="xs" wrap="nowrap" align="flex-end">
+    <Group gap="xs" wrap="nowrap" align="flex-start">
       <NumberInput
         label={t`Distance`}
+        description={t`At least ${minDistance} ${unitLabel}`}
         value={distance}
-        min={0}
+        min={minDistance}
+        max={maxDistance}
+        clampBehavior="blur"
         allowNegative={false}
-        decimalScale={3}
+        decimalScale={2}
         onChange={(value) => {
           if (isNumber(value)) {
             onDistanceChange(value);
