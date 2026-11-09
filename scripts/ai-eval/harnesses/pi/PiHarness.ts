@@ -1,6 +1,10 @@
 import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
-import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageContextBlock";
+import {
+  buildAgentContextBlocks,
+  buildAgentGadgetModelName,
+} from "$/agent/mentions/buildAgentContextBlocks";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import {
@@ -16,6 +20,9 @@ import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
 import { EMPTY_EVAL_USAGE } from "../EvalHarness";
 import { PI_EVAL_CONFIGS } from "./piEvalConfigs";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
+import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
 import type {
@@ -47,6 +54,12 @@ const COVID_COLUMN_NAMES: ReadonlySet<string> = new Set(
     });
   }),
 );
+
+/** One turn's context blocks, and how a mention token is named. */
+type TurnInputs = {
+  blocks: AgentContextBlocks;
+  nameOf: (ref: Gadget.Ref) => string;
+};
 
 type QuestionRecorder = {
   question?: EvalQuestion;
@@ -219,16 +232,17 @@ function _toFailedEvalAnswer(
 }
 
 /**
- * The page block as the browser builds it: personal values in page SQL
- * become placeholders from the conversation's vault, and are masked in the
- * page's names and titles. A column is personal when its name looks
- * personal, when the question lists it, or when it is none of the COVID
- * datasets' columns (an alias).
+ * The turn's blocks and mention names as the browser builds them: every
+ * piece of SQL is redacted through the conversation's vault in one pass,
+ * then names are masked with the same vault. A column is personal when its
+ * name looks personal, when the question lists it, or when it is none of
+ * the COVID datasets' columns (an alias). A mention the question gives no
+ * context for is unavailable.
  */
-function _buildPageBlock(
+function _buildTurnInputs(
   question: EvalQuestion,
   vault: SqlPlaceholderVault,
-): string | undefined {
+): TurnInputs {
   const personalColumns = new Set(question.personalColumns ?? []);
   const detectors: SqlLiteralDetectors = {
     isSensitiveColumn: (columnName) => {
@@ -239,17 +253,41 @@ function _buildPageBlock(
     isSensitiveValue: isPersonalDataText,
     knownColumnNames: COVID_COLUMN_NAMES,
   };
-  return question.pageContext
-    ? buildAgentPageContextBlock({
-        context: question.pageContext,
-        aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
+  const known = new Map(
+    [...(question.attached ?? []), ...(question.mentions ?? [])].map(
+      (context) => {
+        return [ChatMentionToken.buildRefKey(context.ref), context] as const;
+      },
+    ),
+  );
+  const toContext = (ref: Gadget.Ref): AgentGadgetContext => {
+    return (
+      known.get(ChatMentionToken.buildRefKey(ref)) ?? {
+        kind: "unavailable",
+        ref,
+      }
+    );
+  };
+  const blocks = buildAgentContextBlocks({
+    page: question.pageContext,
+    attached: question.attached ?? [],
+    mentioned: ChatMentionToken.refsFromText(question.prompt).map(toContext),
+    aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
+    isSensitive: isPersonalDataText,
+    redactSql: (sql) => {
+      return vault.redact(sql, detectors);
+    },
+    maskText: vault.maskText,
+  });
+  return {
+    blocks,
+    nameOf: (ref) => {
+      return buildAgentGadgetModelName(toContext(ref), {
         isSensitive: isPersonalDataText,
-        redactSql: (sql) => {
-          return vault.redact(sql, detectors);
-        },
-        maskText: vault.maskText,
-      })
-    : undefined;
+        mask: vault.maskText,
+      });
+    },
+  };
 }
 
 /**
@@ -268,6 +306,7 @@ export function createPiConversation(
   const recorder: QuestionRecorder = { consentPrompts: 0 };
   const vault = createSqlPlaceholderVault();
   let lastPageBlock: string | undefined;
+  let lastAttachedBlock: string | undefined;
   const dataAgent = options.createAgent(
     createPlaceholderRestoringHost(
       _createEvalHost(options.database, recorder),
@@ -285,16 +324,23 @@ export function createPiConversation(
       });
       const startedAt = performance.now();
       const firstMessageIndex = dataAgent.agent.state.messages.length;
-      const pageBlock = _buildPageBlock(question, vault);
+      const inputs = _buildTurnInputs(question, vault);
       try {
         const reply = await dataAgent.ask(
           buildAgentTurnText({
-            message: question.prompt,
-            pageBlock,
+            message: ChatMentionToken.toModelText(
+              question.prompt,
+              inputs.nameOf,
+            ),
+            pageBlock: inputs.blocks.pageBlock,
             previousPageBlock: lastPageBlock,
+            attachedBlock: inputs.blocks.attachedBlock,
+            previousAttachedBlock: lastAttachedBlock,
+            mentionedBlock: inputs.blocks.mentionedBlock,
           }),
         );
-        lastPageBlock = pageBlock ?? lastPageBlock;
+        lastPageBlock = inputs.blocks.pageBlock ?? lastPageBlock;
+        lastAttachedBlock = inputs.blocks.attachedBlock;
         return _toEvalAnswer(reply, recorder, startedAt);
       } catch (error) {
         const usage = _usageSince(dataAgent, firstMessageIndex);

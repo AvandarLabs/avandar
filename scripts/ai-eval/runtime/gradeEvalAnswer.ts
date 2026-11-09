@@ -22,11 +22,34 @@ export type GradedAnswer = {
   };
 };
 
+/** Words an answer uses to say it cannot see what was asked about. */
+const CANNOT_SEE_PATTERN =
+  /\b(can(?:no|['’])t|can not|unable|not able|no access|don['’]t have access|do not have access)\b/i;
+
+/**
+ * A question whose right answer runs no query: pass when the assistant ran
+ * none and says it cannot see the gadget.
+ */
+function _gradeNoQuery(answer: EvalAnswer): {
+  pass: boolean;
+  detail: string;
+} {
+  if (answer.finalSql !== undefined || answer.result) {
+    return { pass: false, detail: "ran a query it should not have run" };
+  }
+  return CANNOT_SEE_PATTERN.test(answer.assistantText)
+    ? { pass: true, detail: "ran no query and said it cannot see it" }
+    : { pass: false, detail: "ran no query but did not say it cannot see it" };
+}
+
 function _gradeResult(
   question: EvalQuestion,
   answer: EvalAnswer,
   truth: Readonly<Record<string, EvalQueryResult>>,
 ): { pass: boolean; detail: string } {
+  if (question.expectsNoQuery) {
+    return _gradeNoQuery(answer);
+  }
   if (!answer.result) {
     return { pass: false, detail: answer.error ?? "no result" };
   }

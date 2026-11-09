@@ -1,3 +1,4 @@
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { Verdict } from "./grading/ResultMatchers";
 import type { EvalQueryResult } from "./runtime/EvalDatabase";
@@ -30,7 +31,8 @@ export type EvalQuestion = {
     | "hard"
     | "non_technical"
     | "follow_up"
-    | "page_context";
+    | "page_context"
+    | "mentions";
   prompt: string;
   /** The question this one follows in the same conversation. */
   followsId?: string;
@@ -60,4 +62,22 @@ export type EvalQuestion = {
   personalColumns?: readonly string[];
   /** The user asked for a chart, so a table alone is a miss. */
   expectsChart?: boolean;
+  /**
+   * Gadgets the user attached to the chat, as the browser would have loaded
+   * them. The Pi harness renders them with `buildAgentContextBlocks` and
+   * the conversation's vault. A follow-up that repeats its parent's
+   * `attached` is sent the "unchanged" line, as in the browser.
+   */
+  attached?: readonly AgentGadgetContext[];
+  /**
+   * Gadgets `prompt` mentions. Write each in `prompt` as its token
+   * (`ChatMentionToken.buildToken(context.ref)`). The harness names it the
+   * way the browser does.
+   */
+  mentions?: readonly AgentGadgetContext[];
+  /**
+   * The right answer runs no query: the assistant says it cannot see what
+   * the question asks about. Any query it runs is a miss.
+   */
+  expectsNoQuery?: boolean;
 };
