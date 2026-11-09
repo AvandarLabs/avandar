@@ -4,8 +4,14 @@ import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
 
-/** How many source columns the default popup selects. */
-const DEFAULT_POPUP_COLUMN_LIMIT = 12;
+/**
+ * Length of the popup saved when the default was the source's first columns.
+ *
+ * A selection of exactly this many columns, in source order, is that old
+ * default. It is widened to the whole row. Any other explicit selection was
+ * chosen by the author and stays as it is.
+ */
+const LEGACY_DEFAULT_POPUP_COLUMN_COUNT = 12;
 
 /** Finds a query column already selected on the layer by its id. */
 function getQueryColumnFromLayer(
@@ -98,7 +104,36 @@ function withPopupColumns(
   };
 }
 
-/** Selects capped source columns while the popup uses its default. */
+/** Whether the popup is still the old first-twelve-column default. */
+function _isLegacyCappedPopup(
+  options: Readonly<{
+    layer: MapLayer.T;
+    availableColumns: readonly QueryColumn.T[];
+  }>,
+): boolean {
+  const { layer, availableColumns } = options;
+  const { columnIds } = layer.popup;
+  if (
+    columnIds === "all" ||
+    columnIds.length !== LEGACY_DEFAULT_POPUP_COLUMN_COUNT ||
+    availableColumns.length <= LEGACY_DEFAULT_POPUP_COLUMN_COUNT
+  ) {
+    return false;
+  }
+  const prefix = availableColumns.slice(0, LEGACY_DEFAULT_POPUP_COLUMN_COUNT);
+  return columnIds.every((columnId, index) => {
+    const column = layer.source.queryColumns.find(propEq("id", columnId));
+    return column?.baseColumn.id === prefix[index]?.baseColumn.id;
+  });
+}
+
+/**
+ * Selects every source column while the popup is still the default, so a
+ * clicked feature shows the whole row.
+ *
+ * A popup that is exactly the first twelve source columns is the previous
+ * default, so it is widened too. Any other explicit selection is unchanged.
+ */
 function withDefaultPopupColumns(
   options: Readonly<{
     layer: MapLayer.T;
@@ -106,13 +141,13 @@ function withDefaultPopupColumns(
   }>,
 ): MapLayer.T {
   const { layer, availableColumns } = options;
-  if (layer.popup.columnIds !== "all") {
+  if (
+    layer.popup.columnIds !== "all" &&
+    !_isLegacyCappedPopup({ layer, availableColumns })
+  ) {
     return layer;
   }
-  return withPopupColumns({
-    layer,
-    columns: availableColumns.slice(0, DEFAULT_POPUP_COLUMN_LIMIT),
-  });
+  return withPopupColumns({ layer, columns: availableColumns });
 }
 
 /** Sets the popup's optional click-through link. */

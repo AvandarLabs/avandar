@@ -220,4 +220,34 @@ describe("withDefaultPopupColumns", () => {
       }),
     ).toBe(chosen);
   });
+
+  it("selects every source column when the popup is still the default", () => {
+    const columns = Array.from({ length: 14 }, (_, index) => {
+      return QueryColumn.makeFromDatasetColumn(
+        createNumericColumn(`field_${index}`),
+      );
+    });
+    const updatedLayer = MapLayerUpdates.withDefaultPopupColumns({
+      layer: MapLayer.makeEmpty("Schools"),
+      availableColumns: columns,
+    });
+    expect(updatedLayer.popup.columnIds).toEqual(columns.map(prop("id")));
+  });
+
+  it("replaces a popup that is only the first twelve columns with the whole row", () => {
+    const columns = Array.from({ length: 14 }, (_, index) => {
+      return QueryColumn.makeFromDatasetColumn(
+        createNumericColumn(`field_${index}`),
+      );
+    });
+    const capped = MapLayerUpdates.withPopupColumns({
+      layer: MapLayer.makeEmpty("Schools"),
+      columns: columns.slice(0, 12),
+    });
+    const updatedLayer = MapLayerUpdates.withDefaultPopupColumns({
+      layer: capped,
+      availableColumns: columns,
+    });
+    expect(updatedLayer.popup.columnIds).toEqual(columns.map(prop("id")));
+  });
 });
