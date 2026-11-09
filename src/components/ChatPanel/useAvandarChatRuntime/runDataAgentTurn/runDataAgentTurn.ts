@@ -15,6 +15,7 @@ import {
   buildConversationKey,
   loadDataAgentDatasets,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import { isPersonalDataText } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
@@ -115,7 +116,8 @@ async function _readPageContext(
 /**
  * Answers a chat message on any page with the Pi-based data agent. The
  * agent runs in the browser; only model requests go to the server, through
- * the agent proxy. The current page starts each turn's message. Datasets
+ * the agent proxy. The current page starts each turn's message, with
+ * personal data in dashboard charts redacted. Datasets
  * load once per conversation: the agent's table aliases are positional, so
  * the page block must name tables from the same list the agent was given.
  */
@@ -136,6 +138,7 @@ export async function runDataAgentTurn(
       ? buildAgentPageContextBlock({
           context: pageContext,
           aliases: SqlTableAlias.fromSchema({ datasets }),
+          isSensitive: isPersonalDataText,
         })
       : undefined,
     createConversation: async (turnRef) => {

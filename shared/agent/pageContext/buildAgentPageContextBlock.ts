@@ -2,6 +2,7 @@ import {
   MAX_PAGE_SQL_CHARACTERS,
   MAX_PAGE_TILES,
 } from "$/agent/pageContext/AgentPageContext.ts";
+import { redactSqlLiterals } from "$/agent/pageContext/redactSqlLiterals.ts";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import type {
   AgentPageApp,
@@ -31,7 +32,13 @@ const LINE_BREAKS = /\s*[\r\n\u2028\u2029]+\s*/g;
  */
 const PAGE_TAG_START = /<(?=\s*\/?\s*current_page)/gi;
 
+/** A chart's title in the block when its own looks like personal data. */
+const REDACTED_TILE_TITLE = "Untitled chart";
+
 type Aliases = readonly SqlTableAlias.T[];
+
+/** True when a piece of page text looks like personal data. */
+type IsSensitive = (text: string) => boolean;
 
 /**
  * A name as a JSON string literal, so quotes and line breaks are escaped,
@@ -97,19 +104,30 @@ function _explorerLines(
   ];
 }
 
+/**
+ * One chart's line. With `isSensitive`, a title that looks like personal
+ * data becomes "Untitled chart", and each such string literal in its SQL
+ * becomes `'<redacted>'`, before anything is cut or escaped.
+ */
 function _tileLine(
   tile: AgentPageTile,
   index: number,
-  aliases: Aliases,
+  options: Readonly<{ aliases: Aliases; isSensitive?: IsSensitive }>,
 ): string {
-  const sql = _formatSql(tile.sql, aliases);
-  const heading = `${index + 1}. ${_quote(tile.title)} (${_inline(tile.chartType)})`;
+  const { aliases, isSensitive } = options;
+  const title =
+    isSensitive && isSensitive(tile.title) ? REDACTED_TILE_TITLE : tile.title;
+  const sql = _formatSql(
+    isSensitive ? redactSqlLiterals(tile.sql, isSensitive) : tile.sql,
+    aliases,
+  );
+  const heading = `${index + 1}. ${_quote(title)} (${_inline(tile.chartType)})`;
   return sql === "" ? heading : `${heading}: ${sql}`;
 }
 
 function _dashboardLines(
   dashboard: NonNullable<AgentPageContext["dashboard"]>,
-  aliases: Aliases,
+  options: Readonly<{ aliases: Aliases; isSensitive?: IsSensitive }>,
 ): string[] {
   const listed = dashboard.tiles.slice(0, MAX_PAGE_TILES);
   const hiddenCount = dashboard.tiles.length - listed.length;
@@ -117,7 +135,7 @@ function _dashboardLines(
     `Dashboard: ${_quote(dashboard.name)}`,
     ...(listed.length > 0 ? ["Charts on this dashboard:"] : []),
     ...listed.map((tile, index) => {
-      return _tileLine(tile, index, aliases);
+      return _tileLine(tile, index, options);
     }),
     ...(hiddenCount > 0
       ? [
@@ -144,16 +162,26 @@ function _caseLines(context: AgentPageContext): string[] {
  * `aliases` are shown as their alias. Names are written as quoted JSON
  * strings and SQL is collapsed to one line, so neither can start a new line
  * or end the block.
+ *
+ * `isSensitive` flags text that looks like personal data. Dashboard chart
+ * titles and the string literals in their SQL go through it, so a filter
+ * value such as an email address is redacted before the block leaves the
+ * device. The Data Explorer's SQL is not checked: today's chat already sends
+ * it unredacted as `lastSql`, and the block keeps parity with that.
  */
 export function buildAgentPageContextBlock(
-  options: Readonly<{ context: AgentPageContext; aliases: Aliases }>,
+  options: Readonly<{
+    context: AgentPageContext;
+    aliases: Aliases;
+    isSensitive?: IsSensitive;
+  }>,
 ): string {
   const { context, aliases } = options;
   const lines = [
     `Page: ${APP_LABELS[context.app]}`,
     ...(context.dataset ? [_datasetLine(context.dataset, aliases)] : []),
     ...(context.explorer ? _explorerLines(context.explorer, aliases) : []),
-    ...(context.dashboard ? _dashboardLines(context.dashboard, aliases) : []),
+    ...(context.dashboard ? _dashboardLines(context.dashboard, options) : []),
     ...(context.map ? [`Map: ${_quote(context.map.name)}`] : []),
     ..._caseLines(context),
   ];

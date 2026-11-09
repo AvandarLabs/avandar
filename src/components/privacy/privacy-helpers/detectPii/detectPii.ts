@@ -348,3 +348,13 @@ export function detectPii(input: {
 
   return { severity, hits, isMedical };
 }
+
+/**
+ * True when a piece of free text, such as a chart title or a SQL string
+ * literal, contains a value that looks like personal data (an email, phone
+ * number, government id, and so on). Uses the same content patterns as
+ * {@link detectPii}, and counts warnings as well as critical hits.
+ */
+export function isPersonalDataText(text: string): boolean {
+  return detectPii({ values: [text] }).severity !== "clean";
+}

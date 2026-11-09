@@ -256,6 +256,63 @@ describe("buildAgentPageContextBlock", () => {
     expect(block).toContain("Result columns: a b int");
   });
 
+  it("redacts sensitive literals and titles in dashboard charts", () => {
+    const isSensitive = (text: string): boolean => {
+      return text.includes("@");
+    };
+    const block = buildAgentPageContextBlock({
+      aliases: ALIASES,
+      isSensitive,
+      context: {
+        app: "dashboard",
+        dashboard: {
+          id: "d1",
+          name: "D",
+          tiles: [
+            {
+              title: "Cases for jane.doe@example.com",
+              chartType: "table",
+              sql: `SELECT * FROM "${TABLE}" WHERE "email" = 'jane.doe@example.com' AND "state" = 'Texas'`,
+            },
+          ],
+        },
+      },
+    });
+
+    expect(block).toContain(
+      `1. "Untitled chart" (table): SELECT * FROM "t0" WHERE "email" = '<redacted>' AND "state" = 'Texas'`,
+    );
+    expect(block).not.toContain("jane.doe");
+  });
+
+  it("leaves the explorer's SQL unredacted, as today's chat sends it", () => {
+    const block = buildAgentPageContextBlock({
+      aliases: ALIASES,
+      isSensitive: () => {
+        return true;
+      },
+      context: {
+        app: "data-explorer",
+        explorer: { sql: "SELECT 'a@b.co'", resultColumns: [] },
+      },
+    });
+
+    expect(block).toContain("Query on screen: SELECT 'a@b.co'");
+  });
+
+  it("keeps tiles as written without a sensitivity check", () => {
+    const block = _block({
+      app: "dashboard",
+      dashboard: {
+        id: "d1",
+        name: "D",
+        tiles: [{ title: "a@b.co", chartType: "bar", sql: "SELECT 'a@b.co'" }],
+      },
+    });
+
+    expect(block).toContain(`1. "a@b.co" (bar): SELECT 'a@b.co'`);
+  });
+
   it("escapes line separators inside quoted names", () => {
     const block = _block({
       app: "dataset",

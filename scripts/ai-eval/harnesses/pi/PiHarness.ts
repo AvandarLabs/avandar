@@ -3,7 +3,10 @@ import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageContextBlock";
 import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
-import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import {
+  detectPii,
+  isPersonalDataText,
+} from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
@@ -140,6 +143,7 @@ export function createPiConversation(
         ? buildAgentPageContextBlock({
             context: question.pageContext,
             aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
+            isSensitive: isPersonalDataText,
           })
         : undefined;
       const reply = await dataAgent.ask(

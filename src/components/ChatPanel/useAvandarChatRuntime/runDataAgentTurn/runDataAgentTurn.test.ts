@@ -162,4 +162,32 @@ describe("runDataAgentTurn", () => {
     expect(_askedTexts()[0]).toContain("Page: Dashboard");
     expect(showQueryInChatMock).toHaveBeenCalled();
   });
+
+  it("redacts personal data in dashboard charts before asking", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock.mockResolvedValueOnce({
+      app: "dashboard",
+      dashboard: {
+        id: DASHBOARD_ID,
+        name: "Outbreak",
+        tiles: [
+          {
+            title: "Calls to 555-123-4567",
+            chartType: "table",
+            sql: `SELECT * FROM t WHERE "email" = 'jane.doe@example.com' AND "state" = 'Texas'`,
+          },
+        ],
+      },
+    });
+
+    await runDataAgentTurn(
+      _turn("workspace-redaction", "What is this?"),
+      _page(`/acme/dashboards/edit/${DASHBOARD_ID}`),
+    );
+
+    expect(_askedTexts()[0]).toContain(
+      `1. "Untitled chart" (table): SELECT * FROM t WHERE "email" = '<redacted>' AND "state" = 'Texas'`,
+    );
+    expect(_askedTexts()[0]).not.toContain("jane.doe");
+  });
 });
