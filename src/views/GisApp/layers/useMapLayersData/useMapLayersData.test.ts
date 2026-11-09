@@ -4,6 +4,7 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { renderHook, waitFor } from "@/test-utils";
+import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
   createQueryableLayer,
@@ -804,5 +805,62 @@ describe("useMapLayersData", () => {
     expect(makeExecutableQueryFromManualQueryMock).not.toHaveBeenCalled();
     expect(expectedSql).not.toMatch(/limit/i);
     expect(getDataSql()).toEqual([expectedSql]);
+  });
+});
+
+/**
+ * A hydrated WKT point layer whose popup shows all fields, as a map's
+ * schools layer is: only the geometry column is selected, and a name column
+ * waits in its source columns for the query-time widening to add.
+ */
+function _createPopupAllPointLayer(): MapLayer.T {
+  const layer = createSpatialLayer();
+  const nameColumn = QueryColumn.makeFromDatasetColumn({
+    ...layer.source.queryColumns[0]!.baseColumn,
+    id: uuid(),
+    name: "loc_name",
+  } as Parameters<typeof QueryColumn.makeFromDatasetColumn>[0]);
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      sourceColumns: [layer.source.queryColumns[0]!, nameColumn],
+    },
+  };
+}
+
+describe("useMapLayersData with query-time widened layers", () => {
+  const workspaceId = uuid<Workspace.Id>();
+
+  beforeEach(() => {
+    runSpatialQueryMock.mockReset();
+    spatialAvailability.value = "available";
+  });
+
+  it("runs a popup-all layer's query once across re-renders with new layer objects", async () => {
+    const savedLayer = _createPopupAllPointLayer();
+    runSpatialQueryMock.mockResolvedValue(_createSpatialEnvelopeResult([]));
+    const { result, rerender } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: getQueryLayersFromMapLayers([structuredClone(savedLayer)]),
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+    await waitFor(() => {
+      expect(result.current.get(savedLayer.id)?.data?.type).toBe("spatial");
+    });
+    for (let renderCount = 0; renderCount < 5; renderCount += 1) {
+      rerender();
+    }
+
+    await waitFor(() => {
+      expect(result.current.get(savedLayer.id)?.isLoading).toBe(false);
+    });
+    expect(runSpatialQueryMock).toHaveBeenCalledTimes(1);
+    expect(runSpatialQueryMock.mock.calls[0]![0].rawSql).toContain("loc_name");
   });
 });
