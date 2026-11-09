@@ -48,6 +48,17 @@ vi.mock(
   },
 );
 
+vi.mock(
+  "@/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview",
+  () => {
+    return {
+      PublishMapLayersPreview: () => {
+        return <div>Map layers preview</div>;
+      },
+    };
+  },
+);
+
 function _makePublishing(
   visibility: Dashboard.Visibility = "draft",
 ): ReturnType<typeof useDashboardPublishingControl> {
@@ -111,5 +122,22 @@ describe("PublishingSection", () => {
     render(<PublishingSection publishing={_makePublishing("workspace")} />);
 
     expect(screen.queryByText("Custom URL (optional)")).toBeNull();
+  });
+
+  it("previews the published map layers for a public publish", async () => {
+    render(<PublishingSection publishing={_makePublishing("public")} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Advanced options" }));
+
+    expect(await screen.findByText("Map layers preview")).toBeInTheDocument();
+  });
+
+  it("does not preview map layers for a workspace publish", async () => {
+    render(<PublishingSection publishing={_makePublishing("workspace")} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Advanced options" }));
+
+    expect(await screen.findByText("Data scope")).toBeInTheDocument();
+    expect(screen.queryByText("Map layers preview")).toBeNull();
   });
 });
