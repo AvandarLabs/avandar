@@ -178,7 +178,7 @@ function _makeSchoolsFixture(): {
   };
 }
 
-it("queries every source column of a geometry layer whose popup shows all fields", () => {
+it("keeps a geometry layer's saved query columns, so a save never widens them", () => {
   const { config, columns } = _makeSchoolsFixture();
 
   const loaded = MapSourceHydration.fromMetadata({
@@ -187,52 +187,13 @@ it("queries every source column of a geometry layer whose popup shows all fields
     conceptAttributes: undefined,
   });
 
-  const layer = loaded.config.layers[0]!;
-  expect(layer.popup.columnIds).toBe("all");
-  expect(layer.source.queryColumns.map(prop("baseColumn.name"))).toEqual([
+  const source = loaded.config.layers[0]!.source;
+  expect(source.queryColumns.map(prop("baseColumn.name"))).toEqual([
+    "the_geom",
+  ]);
+  expect(source.sourceColumns?.map(prop("baseColumn.name"))).toEqual([
     "the_geom",
     "loc_name",
     "address",
   ]);
-  expect(structuredQueryToSql(layer.source)).toContain('"loc_name"');
-});
-
-it("keeps the queried columns' ids stable across hydrations", () => {
-  const { config, columns } = _makeSchoolsFixture();
-  const loaded = MapSourceHydration.fromMetadata({
-    config,
-    datasetColumns: columns,
-    conceptAttributes: undefined,
-  });
-
-  const reloaded = MapSourceHydration.fromMetadata({
-    config: loaded.config,
-    previousInput: loaded.config,
-    previousConfig: loaded.config,
-    datasetColumns: columns,
-    conceptAttributes: undefined,
-  });
-
-  expect(
-    reloaded.config.layers[0]!.source.queryColumns.map(prop("id")),
-  ).toEqual(loaded.config.layers[0]!.source.queryColumns.map(prop("id")));
-});
-
-it("leaves a popup's chosen fields as the only queried columns", () => {
-  const { config, columns } = _makeSchoolsFixture();
-  const layer = config.layers[0]!;
-  const chosen = {
-    ...config,
-    layers: [{ ...layer, popup: { ...layer.popup, columnIds: [] } }],
-  };
-
-  const loaded = MapSourceHydration.fromMetadata({
-    config: chosen,
-    datasetColumns: columns,
-    conceptAttributes: undefined,
-  });
-
-  expect(
-    loaded.config.layers[0]!.source.queryColumns.map(prop("baseColumn.name")),
-  ).toEqual(["the_geom"]);
 });

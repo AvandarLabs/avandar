@@ -15,10 +15,10 @@ type Props = {
 };
 
 /**
- * Selects the encoded geometry column for a direct geometry binding. Picking
- * one also gives a popup that still shows "all" fields its default fields,
- * as binding latitude and longitude does, so the layer's popup and feature
- * list have columns to show.
+ * Selects the encoded geometry column for a direct geometry binding. When
+ * the popup is still set to all fields, picking a column also replaces that
+ * setting with the default list of fields, the same way binding latitude and
+ * longitude does.
  */
 export function GeometrySourceColumnSelect({
   layer,

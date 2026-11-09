@@ -1,11 +1,13 @@
 import { useQuery } from "@avandar/query-hooks";
 import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { fetchMapLayerFeatureCount } from "@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureCount/fetchMapLayerFeatureCount";
 import { fetchMapLayerFeatureList } from "@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList";
 import { getFeatureListAccessFromMapLayer } from "@/clients/maps/MapLayerFeatureList/getFeatureListAccessFromMapLayer/getFeatureListAccessFromMapLayer";
+import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
 import { getFeatureListQueryKey } from "@/views/GisApp/panels/FeatureListDrawer/getFeatureListQueryKey/getFeatureListQueryKey";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -59,6 +61,16 @@ type FeatureListQueryInputs = {
    */
   keyParts: readonly unknown[];
 };
+
+/**
+ * The map config as its layer queries run, so the list reads the same
+ * columns the map draws. Never saved.
+ */
+function useQueryConfig(config: AvaMapConfig.T): AvaMapConfig.T {
+  return useMemo(() => {
+    return { ...config, layers: getQueryLayersFromMapLayers(config.layers) };
+  }, [config]);
+}
 
 /** Every row of an exact layer's feature list, when `isEnabled`. */
 function useFeatureListRows(
@@ -130,7 +142,8 @@ export function useFeatureListQuery(
     workspaceId: Workspace.Id;
   }>,
 ): FeatureListQueryState {
-  const { config, workspaceId } = options;
+  const { workspaceId } = options;
+  const config = useQueryConfig(options.config);
   const metadata = useWorkspaceColumnMetadata(workspaceId);
   const layerId = options.layer?.id;
   const access = options.layer
@@ -144,7 +157,12 @@ export function useFeatureListQuery(
     keyParts: [
       workspaceId,
       layerId,
-      ...getFeatureListQueryKey({ config, layer: options.layer }),
+      ...getFeatureListQueryKey({
+        config,
+        layer: config.layers.find((candidate) => {
+          return candidate.id === layerId;
+        }),
+      }),
     ],
   };
   const [list, isListLoading, listQuery] = useFeatureListRows({

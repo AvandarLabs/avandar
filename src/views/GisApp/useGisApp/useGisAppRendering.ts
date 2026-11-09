@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { FitBoundsRequest } from "@/views/GisApp/layers/FitBoundsRequest/FitBoundsRequest";
+import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
 import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
 import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
@@ -55,8 +56,12 @@ export function useGisAppRendering(
     // Capture latitude only when a new integer zoom band begins.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomBand]);
+  const savedLayers = options.editor.mapConfig.layers;
+  const queryLayers = useMemo(() => {
+    return getQueryLayersFromMapLayers(savedLayers);
+  }, [savedLayers]);
   const layerQueryStates = useMapLayersData({
-    layers: options.editor.mapConfig.layers,
+    layers: queryLayers,
     workspaceId: options.avaMap.workspaceId,
     zoom: options.editor.mapConfig.view.zoom,
     simplificationReferenceLatitude,
