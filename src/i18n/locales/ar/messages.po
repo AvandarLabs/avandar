@@ -473,7 +473,7 @@ msgstr "أفاندار"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can't download from a private or local address."
-msgstr ""
+msgstr "لا يمكن لـ Avandar التنزيل من عنوان خاص أو محلي."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
@@ -673,7 +673,7 @@ msgstr "متى"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That archive doesn't contain a CSV, Excel, or PDF file."
-msgstr ""
+msgstr "لا يحتوي هذا الأرشيف على ملف CSV أو Excel أو PDF."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
@@ -832,7 +832,7 @@ msgstr "لا تحتوي تصور الجدول على إعدادات إضافية
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That link isn't public. Avandar can only download a file anyone can "
 "open."
-msgstr ""
+msgstr "هذا الرابط غير عام. لا يمكن لـ Avandar تنزيل سوى ملف يمكن لأي شخص فتحه."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
@@ -1300,12 +1300,6 @@ msgstr "تعذّر تحميل هذا السجل"
 msgid "Saved datasets"
 msgstr "مجموعات البيانات المحفوظة"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-#~ "you save the dataset."
-#~ msgstr "يقرأ Avandar الملف في متصفحك. لا يغادر أي شيء هذا الجهاز حتى تحفظ "
-#~ "مجموعة البيانات."
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
@@ -1361,7 +1355,7 @@ msgstr "ورقة"
 #. placeholder {1}: status.sourceLabel
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Getting {0} from {1}"
-msgstr ""
+msgstr "جارٍ الحصول على {0} من {1}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
@@ -1394,7 +1388,7 @@ msgstr "مجموعة بيانات مشتقة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "This link has more than one data file."
-msgstr ""
+msgstr "يحتوي هذا الرابط على أكثر من ملف بيانات واحد."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1686,7 +1680,7 @@ msgstr "توسيع لوحة الطبقات"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That archive only contains another archive. Paste a link to the file "
 "itself."
-msgstr ""
+msgstr "يحتوي هذا الأرشيف على أرشيف آخر فقط. الصق رابطًا للملف نفسه."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
@@ -1844,7 +1838,7 @@ msgstr "يساوي..."
 #. placeholder {0}: status.sourceLabel
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Downloading from {0}"
-msgstr ""
+msgstr "جارٍ التنزيل من {0}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -2357,7 +2351,8 @@ msgstr "محادثة"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can't import a Google Doc or a Slides deck. Paste a link to a "
 "CSV, Excel, or PDF file."
-msgstr ""
+msgstr "لا يمكن لـ Avandar استيراد مستند Google أو عرض تقديمي في Slides. الصق "
+"رابطًا لملف CSV أو Excel أو PDF."
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
@@ -2489,7 +2484,7 @@ msgstr "وضع عدم الاتصال"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar couldn't download that link. Check it and try again."
-msgstr ""
+msgstr "تعذّر على Avandar تنزيل هذا الرابط. تحقّق منه وحاول مرة أخرى."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2895,7 +2890,7 @@ msgstr "تم حذف {0}."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can only download a public http or https link."
-msgstr ""
+msgstr "يمكن لـ Avandar تنزيل رابط عام يبدأ بـ http أو https فقط."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -2939,7 +2934,7 @@ msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إ�
 #. placeholder {0}: member.path
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Import {0}"
-msgstr ""
+msgstr "استيراد {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
@@ -3193,7 +3188,7 @@ msgstr "تعطيل"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That file is no longer in the download. Choose another one."
-msgstr ""
+msgstr "لم يعد هذا الملف متاحًا للتنزيل. اختر ملفًا آخر."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -3841,7 +3836,7 @@ msgstr "سيُطلب منك تأكيد كلمة المرور الحالية."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Which file should Avandar import?"
-msgstr ""
+msgstr "ما الملف الذي تريد من Avandar استيراده؟"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
@@ -4470,7 +4465,9 @@ msgstr "ميزات الخطة:"
 msgid "Choose Aggregate only when the layer holds protection or health data "
 "that must not be mapped to a household. Displace is unavailable because "
 "it only works for layers that show points."
-msgstr ""
+msgstr "استخدم «تجميع» فقط عندما تحتوي الطبقة على بيانات الحماية أو الصحة التي "
+"يجب ألا تُربط بأسرة. لا يتوفر «الإزاحة» لأنه يعمل فقط مع الطبقات التي "
+"تعرض نقاطًا."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
@@ -4504,7 +4501,7 @@ msgstr "تحتوي SQL على عبارات متعددة؛ يطابق النمو�
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Or provide a link to a file"
-msgstr ""
+msgstr "أو أدخل رابطًا لملف"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
@@ -4553,7 +4550,8 @@ msgstr "استيراد علامة تبويب واحدة من جدول بيانا
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Layer {0} is set to Displace, which only works for points. Choose "
 "another handling option in its Sensitivity settings."
-msgstr ""
+msgstr "تم ضبط الطبقة {0} على «الإزاحة»، وهي تعمل فقط مع النقاط. اختر خيار "
+"معالجة آخر من إعدادات الحساسية الخاصة بها."
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -5162,7 +5160,8 @@ msgstr "توجد عوامل تصفية نشطة على هذه الطبقة وع�
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "A file you drop stays on this device until you save. A link is "
 "downloaded by Avandar first, then read here the same way."
-msgstr ""
+msgstr "يبقى الملف الذي تُسقطه على هذا الجهاز حتى تحفظه. أما الرابط، فينزّله "
+"Avandar أولًا ثم يقرأه هنا بالطريقة نفسها."
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -5348,7 +5347,8 @@ msgstr "تحتاج إلى الوصول"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That file is larger than {limitLabel}, which is the most Avandar can "
 "download from a link."
-msgstr ""
+msgstr "حجم هذا الملف أكبر من {limitLabel}، وهو الحد الأقصى الذي يمكن لـ "
+"Avandar تنزيله من رابط."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
@@ -6540,7 +6540,7 @@ msgstr "مسح التعليقات التوضيحية"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Use a different link"
-msgstr ""
+msgstr "استخدم رابطًا مختلفًا"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -6750,7 +6750,7 @@ msgstr "جعله داخليًا"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
-msgstr ""
+msgstr "هذه Google Sheet. أضفها من «الموصلات» لتبقى متصلة."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
@@ -7783,7 +7783,7 @@ msgstr "عدّ الصفوف في {datasetName} حسب {secondGroupByColumn}"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Dropbox link is a folder. Paste a link to one file."
-msgstr ""
+msgstr "رابط Dropbox هذا لمجلد. الصق رابطًا لملف واحد."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -7997,7 +7997,7 @@ msgstr "الخرائط"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That link isn't a CSV, Excel, or PDF file."
-msgstr ""
+msgstr "هذا الرابط ليس لملف CSV أو Excel أو PDF."
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
@@ -8143,7 +8143,7 @@ msgstr "أي شخص لديه الرابط"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This GitHub link is a page, not a file. Open the file and paste that "
 "link."
-msgstr ""
+msgstr "رابط GitHub هذا لصفحة وليس لملف. افتح الملف والصق رابطه."
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -8439,7 +8439,7 @@ msgstr "الأشكال الهندسية غير متاحة"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
 msgid "Use a link"
-msgstr ""
+msgstr "استخدم رابطًا"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
@@ -8476,7 +8476,7 @@ msgstr "تعذّر إنشاء SQL دون اتصال. حاول إعادة الص�
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Enter a link that starts with http:// or https://."
-msgstr ""
+msgstr "أدخل رابطًا يبدأ بـ http:// أو https://."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
@@ -10255,7 +10255,7 @@ msgstr "تحميل مجموعة بيانات"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
-msgstr ""
+msgstr "رابط Google Drive هذا لمجلد. الصق رابطًا لملف واحد."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"

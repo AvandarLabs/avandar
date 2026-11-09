@@ -1306,12 +1306,6 @@ msgstr "This record failed to load"
 msgid "Saved datasets"
 msgstr "Saved datasets"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-#~ "you save the dataset."
-#~ msgstr "Avandar reads the file in your browser. Nothing leaves this device "
-#~ "until you save the dataset."
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"

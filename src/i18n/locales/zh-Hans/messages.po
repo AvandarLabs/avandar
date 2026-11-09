@@ -463,7 +463,7 @@ msgstr "Avandar"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can't download from a private or local address."
-msgstr ""
+msgstr "Avandar 无法从私人或本地地址下载。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
@@ -660,7 +660,7 @@ msgstr "何时"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That archive doesn't contain a CSV, Excel, or PDF file."
-msgstr ""
+msgstr "该压缩包不包含 CSV、Excel 或 PDF 文件。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
@@ -818,7 +818,7 @@ msgstr "表格可视化没有额外设置。"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That link isn't public. Avandar can only download a file anyone can "
 "open."
-msgstr ""
+msgstr "该链接不是公开链接。Avandar 只能下载任何人都能打开的文件。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
@@ -1269,11 +1269,6 @@ msgstr "此记录加载失败"
 msgid "Saved datasets"
 msgstr "已保存的数据集"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-#~ msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-#~ "you save the dataset."
-#~ msgstr "Avandar 会在浏览器中读取文件。在您保存数据集之前，任何内容都不会离开此设备。"
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
@@ -1327,7 +1322,7 @@ msgstr "工作表"
 #. placeholder {1}: status.sourceLabel
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Getting {0} from {1}"
-msgstr ""
+msgstr "正在从 {1} 获取 {0}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
@@ -1359,7 +1354,7 @@ msgstr "派生数据集"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "This link has more than one data file."
-msgstr ""
+msgstr "该链接包含多个数据文件。"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1642,7 +1637,7 @@ msgstr "展开图层面板"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That archive only contains another archive. Paste a link to the file "
 "itself."
-msgstr ""
+msgstr "该压缩包只包含另一个压缩包。请粘贴文件本身的链接。"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
@@ -1798,7 +1793,7 @@ msgstr "等于..."
 #. placeholder {0}: status.sourceLabel
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Downloading from {0}"
-msgstr ""
+msgstr "正在从 {0} 下载"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -2298,7 +2293,7 @@ msgstr "聊天"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can't import a Google Doc or a Slides deck. Paste a link to a "
 "CSV, Excel, or PDF file."
-msgstr ""
+msgstr "Avandar 无法导入 Google 文档或 Google 幻灯片。请粘贴 CSV、Excel 或 PDF 文件的链接。"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
@@ -2430,7 +2425,7 @@ msgstr "离线模式"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar couldn't download that link. Check it and try again."
-msgstr ""
+msgstr "Avandar 无法下载该链接。请检查链接后重试。"
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2825,7 +2820,7 @@ msgstr "已删除 {0}。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can only download a public http or https link."
-msgstr ""
+msgstr "Avandar 只能下载公开的 http 或 https 链接。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
@@ -2869,7 +2864,7 @@ msgstr "默认情况下，我们使用基于 UUID 的直接链接。"
 #. placeholder {0}: member.path
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Import {0}"
-msgstr ""
+msgstr "导入 {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
@@ -3115,7 +3110,7 @@ msgstr "禁用"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That file is no longer in the download. Choose another one."
-msgstr ""
+msgstr "该文件已不在下载内容中。请选择其他文件。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -3746,7 +3741,7 @@ msgstr "系统将要求您确认当前密码。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Which file should Avandar import?"
-msgstr ""
+msgstr "Avandar 应导入哪个文件？"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
@@ -4359,7 +4354,7 @@ msgstr "计划功能："
 msgid "Choose Aggregate only when the layer holds protection or health data "
 "that must not be mapped to a household. Displace is unavailable because "
 "it only works for layers that show points."
-msgstr ""
+msgstr "仅当图层包含不得映射到家庭的数据（例如保护或健康数据）时，才选择“聚合”。“偏移”不可用，因为它仅适用于显示点的图层。"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
@@ -4393,7 +4388,7 @@ msgstr "SQL 包含多个语句；表单仅映射第一个。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
 msgid "Or provide a link to a file"
-msgstr ""
+msgstr "或提供文件链接"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
@@ -4442,7 +4437,7 @@ msgstr "导入 Google Drive 中电子表格的一个工作表"
 #: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
 msgid "Layer {0} is set to Displace, which only works for points. Choose "
 "another handling option in its Sensitivity settings."
-msgstr ""
+msgstr "图层 {0} 已设置为“偏移”，但该选项仅适用于点。请在其敏感性设置中选择其他处理选项。"
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -5040,7 +5035,7 @@ msgstr "此图层已启用 {filterCount} 个筛选器。它们可能会排除所
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
 msgid "A file you drop stays on this device until you save. A link is "
 "downloaded by Avandar first, then read here the same way."
-msgstr ""
+msgstr "拖放的文件会一直保留在此设备上，直到你保存。链接会先由 Avandar 下载，然后以相同方式在此处读取。"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -5223,7 +5218,7 @@ msgstr "您需要访问权限"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That file is larger than {limitLabel}, which is the most Avandar can "
 "download from a link."
-msgstr ""
+msgstr "该文件大于 {limitLabel}，这是 Avandar 从链接下载的最大大小。"
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
@@ -6393,7 +6388,7 @@ msgstr "擦除注释"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "Use a different link"
-msgstr ""
+msgstr "使用其他链接"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -6599,7 +6594,7 @@ msgstr "设为内部"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
-msgstr ""
+msgstr "这是 Google Sheet。请从“连接器”中添加，以保持连接。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
@@ -7615,7 +7610,7 @@ msgstr "按 {secondGroupByColumn} 对 {datasetName} 中的行进行计数"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Dropbox link is a folder. Paste a link to one file."
-msgstr ""
+msgstr "此 Dropbox 链接指向一个文件夹。请粘贴单个文件的链接。"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -7825,7 +7820,7 @@ msgstr "地图"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That link isn't a CSV, Excel, or PDF file."
-msgstr ""
+msgstr "该链接不是 CSV、Excel 或 PDF 文件。"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
@@ -7970,7 +7965,7 @@ msgstr "任何拥有链接的人"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This GitHub link is a page, not a file. Open the file and paste that "
 "link."
-msgstr ""
+msgstr "此 GitHub 链接指向页面，而不是文件。请打开文件并粘贴该链接。"
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -8251,7 +8246,7 @@ msgstr "几何功能不可用"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
 msgid "Use a link"
-msgstr ""
+msgstr "使用链接"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
@@ -8287,7 +8282,7 @@ msgstr "离线无法生成 SQL。请尝试改写内容，或重新连接以使�
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Enter a link that starts with http:// or https://."
-msgstr ""
+msgstr "请输入以 http:// 或 https:// 开头的链接。"
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
@@ -10022,7 +10017,7 @@ msgstr "上传数据集"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This Google Drive link is a folder. Paste a link to one file."
-msgstr ""
+msgstr "此 Google Drive 链接指向一个文件夹。请粘贴单个文件的链接。"
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"
