@@ -5,8 +5,13 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ResolvedMapLayerMetadata } from "../MapLayerSpatialQuery.types";
 
-/** Walks bufferOfLayer links to the layer whose columns a compile reads. */
-function _getLeafSpatialSource(
+/**
+ * Walks bufferOfLayer links to the layer whose columns a compile reads, or
+ * `layer` itself when it buffers nothing. Use it wherever a policy depends on
+ * the layer a buffer is ultimately drawn around, such as jitter displacement.
+ * A missing source or a cycle stops the walk at the last layer reached.
+ */
+export function getLeafSourceLayerFromMapLayer(
   layer: MapLayer.T,
   stack: readonly MapLayer.T[],
 ): MapLayer.T {
@@ -43,7 +48,7 @@ export function getCompileMetadataFromMapLayer(
   }>,
 ): ResolvedMapLayerMetadata {
   const metadata = getResolvedMapLayerMetadata({
-    layer: _getLeafSpatialSource(options.layer, options.stack),
+    layer: getLeafSourceLayerFromMapLayer(options.layer, options.stack),
     datasets: options.datasets,
     datasetColumns: options.datasetColumns,
   });

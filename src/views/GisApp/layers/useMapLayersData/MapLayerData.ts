@@ -1,4 +1,4 @@
-import { propEq } from "@avandar/utils";
+import { isDefined, propEq } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -44,6 +44,47 @@ function _getBufferSourceQueryKey(
   };
 }
 
+/** Cache key parts of the layer `layer` is spatially filtered by. */
+function _getSpatialFilterQueryKey(
+  layer: MapLayer.T,
+  stack: readonly MapLayer.T[],
+): unknown {
+  const filterLayer = layer.spatialFilter
+    ? stack.find(propEq("id", layer.spatialFilter.layerId))
+    : undefined;
+  if (!filterLayer) {
+    return undefined;
+  }
+  return {
+    id: filterLayer.id,
+    source: filterLayer.source,
+    geoBinding: filterLayer.geoBinding,
+    sensitivity: filterLayer.sensitivity,
+    timeColumn: filterLayer.timeColumn,
+    applyAoiFilter: filterLayer.applyAoiFilter,
+    spatialFilter: filterLayer.spatialFilter,
+    bufferSource: _getBufferSourceQueryKey(filterLayer, stack),
+  };
+}
+
+/** Layers a layer's query reads: its buffer source and its filter layer. */
+function _getDependencyLayers(
+  layer: MapLayer.T,
+  stack: readonly MapLayer.T[],
+): MapLayer.T[] {
+  const dependencyIds = [
+    ...(layer.geoBinding?.type === "bufferOfLayer"
+      ? [layer.geoBinding.layerId]
+      : []),
+    ...(layer.spatialFilter ? [layer.spatialFilter.layerId] : []),
+  ];
+  return dependencyIds
+    .map((dependencyId) => {
+      return stack.find(propEq("id", dependencyId));
+    })
+    .filter(isDefined);
+}
+
 function _hasColumnIdFilterTargets(
   filters: StructuredQuery.FilterGroup,
 ): boolean {
@@ -70,11 +111,12 @@ function _hasReadySourceFilters(layer: MapLayer.T): boolean {
 /** Queryability and cache-key helpers for map-layer data. */
 export const MapLayerData = {
   /**
-   * True when the filters and having clauses of this layer, and of each layer
-   * it buffers, are hydrated, with every rule targeting a column ID. Check it
-   * before running a layer's SQL, for example to hold a layer's data query or
-   * the time slider's extent until saved filters can apply. Missing sources
-   * and cycles return true, so the compiler can report them.
+   * True when the filters and having clauses of this layer, of each layer it
+   * buffers, and of each layer it is spatially filtered by are hydrated, with
+   * every rule targeting a column ID. Check it before running a layer's SQL,
+   * for example to hold a layer's data query or the time slider's extent
+   * until saved filters can apply. Missing layers and cycles return true, so
+   * the compiler can report them.
    */
   hasReadySourceFilters: ({
     layer,
@@ -83,17 +125,20 @@ export const MapLayerData = {
     layer: MapLayer.T;
     stack: readonly MapLayer.T[];
   }>): boolean => {
-    const visited = new Set<MapLayer.Id>();
-    let current: MapLayer.T | undefined = layer;
-    while (current && !visited.has(current.id)) {
-      if (!_hasReadySourceFilters(current)) {
-        return false;
+    const visitedIds = new Set<MapLayer.Id>();
+    const pendingLayers: MapLayer.T[] = [layer];
+    for (
+      let current = pendingLayers.pop();
+      current !== undefined;
+      current = pendingLayers.pop()
+    ) {
+      if (!visitedIds.has(current.id)) {
+        if (!_hasReadySourceFilters(current)) {
+          return false;
+        }
+        visitedIds.add(current.id);
+        pendingLayers.push(..._getDependencyLayers(current, stack));
       }
-      visited.add(current.id);
-      current =
-        current.geoBinding?.type === "bufferOfLayer"
-          ? stack.find(propEq("id", current.geoBinding.layerId))
-          : undefined;
     }
     return true;
   },
@@ -149,6 +194,7 @@ export const MapLayerData = {
     pointContext?: { zoomBand: number },
   ): unknown[] => {
     const sourceKey = _getBufferSourceQueryKey(layer, stack);
+    const filterKey = _getSpatialFilterQueryKey(layer, stack);
     return [
       "mapLayerData",
       layer.id,
@@ -157,6 +203,7 @@ export const MapLayerData = {
       layer.sensitivity,
       layer.timeColumn,
       layer.applyAoiFilter,
+      layer.spatialFilter,
       layer.disputedStatusColumn,
       layer.disputedStatusValues,
       overlay?.timeRange,
@@ -164,6 +211,7 @@ export const MapLayerData = {
       ...(spatialContext ? [spatialContext] : []),
       ...(pointContext ? [pointContext] : []),
       ...(sourceKey ? [sourceKey] : []),
+      ...(filterKey ? [filterKey] : []),
     ];
   },
 };
