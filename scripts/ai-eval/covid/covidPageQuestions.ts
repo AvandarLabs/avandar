@@ -9,6 +9,7 @@ import type { Verdict } from "../grading/ResultMatchers";
 
 const ALIASES = SqlTableAlias.fromDatasets(COVID_DATASETS);
 
+/** The table alias the app gives a COVID dataset, by its file name. */
 function _aliasOf(fileName: string): string {
   const dataset = COVID_DATASETS.find((candidate) => {
     return candidate.fileName === fileName;
@@ -67,6 +68,7 @@ const ONE_TILE_DASHBOARD: AgentPageContext = {
   dashboard: { id: "dash-1", name: "COVID 2022", tiles: [CASES_TILE] },
 };
 
+/** The first cell of a truth result as a number, or NaN when absent. */
 function _scalar(context: GradeContext, name: string): number {
   return MatcherText.toNumber(context.truth[name]?.rows[0]?.[0]) ?? Number.NaN;
 }
@@ -100,16 +102,33 @@ function _totalOrSum(context: GradeContext): Verdict {
   ]);
 }
 
+/**
+ * A breakdown by state: one row per state with its 2021 deaths, or rows by
+ * state and month that add up to the 2021 total. Counties do not pass.
+ */
 function _stateBreakdown(context: GradeContext): Verdict {
-  if (context.result.rows.length < 50) {
-    return {
-      pass: false,
-      detail: "fewer than 50 rows is not a breakdown by state",
-    };
-  }
-  return ResultChecks.hasColumnSum(context.result, _scalar(context, "total"), {
-    tolerance: 0.001,
+  const byState = context.truth.byState!;
+  const stateNames = byState.rows.map((row) => {
+    return String(row[0]);
   });
+  return ResultChecks.anyOf([
+    () => {
+      return ResultChecks.matchTruthRows(context.result, byState, {
+        keys: ["name"],
+        values: ["value"],
+        mode: "all",
+        minShare: 0.95,
+      });
+    },
+    () => {
+      const keySet = ResultChecks.hasKeySet(context.result, stateNames);
+      return keySet.pass
+        ? ResultChecks.hasColumnSum(context.result, _scalar(context, "total"), {
+            tolerance: 0.001,
+          })
+        : keySet;
+    },
+  ]);
 }
 
 const SCREEN_QUESTIONS: readonly EvalQuestion[] = [
@@ -142,7 +161,12 @@ const SCREEN_QUESTIONS: readonly EvalQuestion[] = [
         ],
       },
     },
-    truth: { total: Sql.total("us_deaths", `year("date") = 2021`) },
+    truth: {
+      total: Sql.total("us_deaths", `year("date") = 2021`),
+      byState: Sql.ranked("us_deaths", `"Province_State"`, {
+        where: `year("date") = 2021`,
+      }),
+    },
     grade: _stateBreakdown,
   },
   {
@@ -162,7 +186,7 @@ const SCREEN_QUESTIONS: readonly EvalQuestion[] = [
     prompt: "make this a pie chart",
     clarification: "expected",
     expectsChart: true,
-    user: { choose: /death/i, say: "the deaths chart" },
+    user: { choose: /deaths (chart|in 2022)/i, say: "the deaths chart" },
     pageContext: {
       app: "dashboard",
       dashboard: {
