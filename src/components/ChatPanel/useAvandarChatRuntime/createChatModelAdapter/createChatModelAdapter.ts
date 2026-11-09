@@ -7,7 +7,6 @@ import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEven
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { OfflineAnswerMessage } from "@/components/ChatPanel/OfflineAnswerMessage/OfflineAnswerMessage";
 import { devLogOfflineChat } from "@/components/ChatPanel/offlineChatHelpers/devLogOfflineChat";
-import { createAgentGadgetContextLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader";
 import {
   buildLocalGadgetName,
   loadTurnGadgetContext,
@@ -143,11 +142,54 @@ type TurnMessages = {
    */
   hostedChatMessages: readonly ChatClientMessage.T[];
   gadgetContext: AgentTurnGadgetContext | undefined;
-  /** Gadgets the latest user message mentions. */
-  mentionCount: number;
+  /**
+   * Gadgets the last real question mentions, so a clarification answer
+   * does not hide them. Undefined off the agent path.
+   */
+  mentionCount: number | undefined;
   /** The last question as labels show it, each mention as `@Name`. */
   questionLabel: string;
 };
+
+/** Whether the tray or any user message holds a gadget to load. */
+function _hasGadgetRefs(
+  apiMessages: readonly ChatClientMessage.T[],
+  attachedRefs: readonly Gadget.Ref[],
+): boolean {
+  return (
+    attachedRefs.length > 0 ||
+    apiMessages.some((message) => {
+      return (
+        message.role === "user" &&
+        ChatMentionToken.refsFromText(message.content).length > 0
+      );
+    })
+  );
+}
+
+/**
+ * Loads the turn's gadgets, or nothing when there are none. The loader and
+ * the gadget clients behind it load on first use so they stay out of the
+ * main bundle.
+ */
+async function _loadGadgetContext(
+  options: Readonly<{
+    apiMessages: readonly ChatClientMessage.T[];
+    attachedRefs: readonly Gadget.Ref[];
+    workspaceId: Workspace.Id;
+  }>,
+): Promise<AgentTurnGadgetContext | undefined> {
+  if (!_hasGadgetRefs(options.apiMessages, options.attachedRefs)) {
+    return undefined;
+  }
+  const { createAgentGadgetContextLoader } =
+    await import("@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader");
+  return loadTurnGadgetContext({
+    apiMessages: options.apiMessages,
+    attachedRefs: options.attachedRefs,
+    loader: createAgentGadgetContextLoader(options.workspaceId),
+  });
+}
 
 /**
  * Builds the turn's thread and loads its attached and mentioned gadgets
@@ -160,19 +202,17 @@ async function _prepareTurnMessages(
     messages: ThreadMessages;
     attachedRefs: readonly Gadget.Ref[];
     workspaceId: Workspace.Id;
+    isAgentTurn: boolean;
   }>,
 ): Promise<TurnMessages> {
   const apiMessages = _toApiMessages(options.messages, {
     hideOfflineAnswers: true,
   });
-  const gadgetContext = await loadTurnGadgetContext({
+  const gadgetContext = await _loadGadgetContext({
     apiMessages,
     attachedRefs: options.attachedRefs,
-    loader: createAgentGadgetContextLoader(options.workspaceId),
+    workspaceId: options.workspaceId,
   });
-  const lastUserMessage = [...apiMessages]
-    .reverse()
-    .find(propEq("role", "user"));
   return {
     apiMessages,
     // Offline answers stay readable on the device.
@@ -182,8 +222,10 @@ async function _prepareTurnMessages(
     ),
     hostedChatMessages: toHostedChatMessages(apiMessages),
     gadgetContext,
-    mentionCount: ChatMentionToken.refsFromText(lastUserMessage?.content ?? "")
-      .length,
+    mentionCount: options.isAgentTurn
+      ? ChatMentionToken.refsFromText(getLastQuestionFromMessages(apiMessages))
+          .length
+      : undefined,
     questionLabel: getLastQuestionFromMessages(
       apiMessages,
       buildLocalGadgetName(gadgetContext),
@@ -364,6 +406,7 @@ export function createChatModelAdapter(
         messages,
         attachedRefs,
         workspaceId,
+        isAgentTurn,
       });
       if (isGenerationStale()) {
         return { content: [] };

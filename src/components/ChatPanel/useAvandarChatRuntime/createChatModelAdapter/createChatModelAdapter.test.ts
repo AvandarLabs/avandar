@@ -25,9 +25,11 @@ const {
   detectBiasMock,
   decideConsentMock,
   applyResponseMock,
+  createLoaderMock,
 } = vi.hoisted(() => {
   return {
     applyResponseMock: vi.fn(),
+    createLoaderMock: vi.fn(),
     loadGadgetsMock: vi.fn(),
     detectBiasMock: vi.fn(),
     decideConsentMock: vi.fn(),
@@ -84,7 +86,8 @@ vi.mock(
   "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader",
   () => {
     return {
-      createAgentGadgetContextLoader: () => {
+      createAgentGadgetContextLoader: (...args: unknown[]) => {
+        createLoaderMock(...args);
         return { load: loadGadgetsMock };
       },
     };
@@ -624,6 +627,7 @@ describe("createChatModelAdapter with mentions", () => {
       .mockReset()
       .mockResolvedValue({ assistantText: "offline pipeline reply" });
     loadGadgetsMock.mockReset().mockResolvedValue(LOADED_CONTEXTS);
+    createLoaderMock.mockClear();
     applyResponseMock.mockClear();
     detectBiasMock.mockReset().mockReturnValue({ hits: [] });
     decideConsentMock.mockReset().mockResolvedValue({ approved: true });
@@ -818,6 +822,70 @@ describe("createChatModelAdapter with mentions", () => {
 
     const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
     expect(event.payload).not.toHaveProperty("attachedCount");
+  });
+
+  it("loads no gadgets when nothing is mentioned or attached", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _createAdapter("dashboards", {
+      contextTrayRef: { current: [] },
+    }).run({
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: "How many cases?" }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+
+    expect(createLoaderMock).not.toHaveBeenCalled();
+    expect(loadGadgetsMock).not.toHaveBeenCalled();
+  });
+
+  it("counts mentions in the last question, not an earlier one", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _createAdapter("dashboards", {
+      contextTrayRef: { current: [] },
+    }).run({
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: `Show ${DATASET_TOKEN}` }],
+          metadata: {},
+        },
+        {
+          role: "assistant",
+          content: [{ type: "text", text: "Sure." }],
+          metadata: {},
+        },
+        {
+          role: "user",
+          content: [{ type: "text", text: "And by state?" }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).toMatchObject({ mentionCount: 0 });
+  });
+
+  it("leaves the mention count out with the switch off", async () => {
+    await _askWithMention("dashboards");
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).not.toHaveProperty("mentionCount");
+  });
+
+  it("leaves the mention count out in the case designer", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _askWithMention("case-manager");
+
+    const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+    expect(event.payload).not.toHaveProperty("mentionCount");
   });
 
   it("does not load the tray in the case designer", async () => {
