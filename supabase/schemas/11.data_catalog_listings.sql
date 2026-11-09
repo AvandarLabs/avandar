@@ -81,18 +81,6 @@ create table public.data_catalog_listings (
   -- call; the live value stays authoritative and a mismatch is an error
   -- rather than a reason to parse the bytes as something else.
   api_resource_format text,
-  -- Where this listing's cached copy lives in the `open-data-catalog`
-  -- bucket, once one has been written. Null until the first successful
-  -- fetch. Only ever set on an `api_resource` listing: a `pipeline_parquet`
-  -- listing already has a stable Parquet object named by `parquet_file_name`
-  -- and never needs a cache.
-  cached_object_path text,
-  -- The freshness token captured when the cache was last written. Compared
-  -- against a live metadata read before serving the cache; never parsed.
-  cached_source_version text,
-  -- When the cache was last written. Informational only:
-  -- cached_source_version is what correctness depends on.
-  cached_at timestamptz,
   -- The scopes of `pipeline_name` that produce this listing, in the order
   -- they first wrote it. `@avandar/etl` adds a crawl's scope key when it
   -- writes the row, and pruning a retired scope removes it. Empty on a
@@ -209,9 +197,6 @@ create table public.data_catalog_listings (
       api_base_url is null and
       api_resource_id is null and
       api_resource_format is null and
-      cached_object_path is null and
-      cached_source_version is null and
-      cached_at is null and
       parquet_cache_status is null and
       parquet_cache_folder_path is null
     )
@@ -232,20 +217,6 @@ create table public.data_catalog_listings (
       ) and
       external_dataset_id is not null and
       parquet_file_name is null
-    )
-  ),
-  -- A cache is written atomically or not at all: either every column is set,
-  -- or every column is null. There is no state where only one has a value.
-  constraint data_catalog_listings__cache_complete check (
-    (
-      cached_object_path is null and
-      cached_source_version is null and
-      cached_at is null
-    ) or
-    (
-      cached_object_path is not null and
-      cached_source_version is not null and
-      cached_at is not null
     )
   ),
   -- A Parquet copy is written whole or not at all.

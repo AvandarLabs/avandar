@@ -6,11 +6,11 @@ import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
-import type { OpenDataApiAccessFor } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type {
   CkanPackage,
   OpenDataHttp,
 } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataApiAccessFor } from "$/connectors/open-data/OpenDataApiAccess.types.ts";
 
 /** Rows of a Socrata dataset a sample holds. */
 export const COLUMN_TYPE_SAMPLE_MAX_ROWS = 10_000;
@@ -208,7 +208,7 @@ async function _sampleCkanResource(args: {
  * column types from: the first `COLUMN_TYPE_SAMPLE_MAX_ROWS` rows of a
  * Socrata dataset's CSV export, or the first `COLUMN_TYPE_SAMPLE_MAX_BYTES`
  * of a CKAN CSV file, cut back to a complete line. A CKAN resource is found
- * and host-checked the same way `acquireOpenDataResource` does.
+ * and host-checked by `getCkanResourceFromPackage`.
  *
  * @param params.entry - The listing.
  * @param params.http - Reads CKAN metadata and Socrata exports.

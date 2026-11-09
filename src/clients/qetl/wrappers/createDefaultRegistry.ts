@@ -7,7 +7,6 @@ import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsW
 import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
 import { fetchOpenDataParquetCopy } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -19,7 +18,6 @@ import type {
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import type { FetchedOpenDataParquetCopy } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
@@ -65,27 +63,13 @@ export type DefaultRegistryOptions = {
    */
   readRelationCsv?: RelationCsvReader;
 
-  /**
-   * Reads an API-backed catalog listing's Parquet copy, or `undefined` when
-   * this Avandar instance builds no copies.
-   */
+  /** Reads an API-backed catalog listing's Parquet copy. */
   fetchApiOpenDataParquetCopy?: (
     catalogListingId: DataCatalogListing.Id,
-  ) => Promise<FetchedOpenDataParquetCopy | undefined>;
+  ) => Promise<FetchedOpenDataParquetCopy>;
 
   /** Merges a Parquet copy's parts under the caller's DuckDB lease. */
   mergeParquetParts?: (partBlobs: readonly Blob[]) => Promise<Blob>;
-
-  /** Fetches one API-backed catalog resource through the open-data proxy. */
-  fetchApiOpenDataResource?: (
-    catalogListingId: DataCatalogListing.Id,
-  ) => Promise<FetchedApiOpenDataResource>;
-
-  /** Transcodes CSV bytes into Parquet under the caller's DuckDB lease. */
-  transcodeCsvToParquet?: (params: {
-    datasetId: Dataset.Id;
-    bytes: Uint8Array<ArrayBuffer>;
-  }) => Promise<Blob>;
 };
 
 /**
@@ -243,9 +227,6 @@ export function createDefaultRegistry(
         fetchApiOpenDataParquetCopy:
           options.fetchApiOpenDataParquetCopy ?? fetchOpenDataParquetCopy,
         mergeParquetParts: options.mergeParquetParts,
-        fetchApiOpenDataResource:
-          options.fetchApiOpenDataResource ?? fetchOpenDataCatalogResource,
-        transcodeCsvToParquet: options.transcodeCsvToParquet,
       }),
       virtual: createVirtualDatasetWrapper({
         runParquetQuery: options.runParquetQuery,

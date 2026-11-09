@@ -2,7 +2,6 @@ import { makeIdLookupRecord, makeObject, prop } from "@avandar/utils";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { readRelationCsv } from "@/clients/qetl/QueryMediator/relationLoading/readRelationCsv/readRelationCsv";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCsvReader } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
@@ -39,20 +38,6 @@ function _leaseBoundTranscoders(datasetDuckDbLease: DatasetDuckDbLease) {
   return {
     readRelationCsv: async (params: Parameters<RelationCsvReader>[0]) => {
       return await readRelationCsv({ ...params, datasetDuckDbLease });
-    },
-    transcodeCsvToParquet: async ({
-      datasetId,
-      bytes,
-    }: {
-      datasetId: Dataset.Id;
-      bytes: Uint8Array<ArrayBuffer>;
-    }) => {
-      const loaded = await DuckDbClient.loadCsv({
-        tableName: datasetId,
-        fileText: new TextDecoder().decode(bytes),
-        datasetDuckDbLease,
-      });
-      return loaded.parquetData;
     },
     mergeParquetParts: async (partBlobs: readonly Blob[]) => {
       return await DuckDbClient.mergeParquetBlobs({

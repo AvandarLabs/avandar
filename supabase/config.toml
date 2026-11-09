@@ -67,6 +67,7 @@ sql_paths = [
   "./migrations/20260813214231_STORAGE-restore-dropped-object-policies.sql",
   "./migrations/20260816020300_STORAGE-dashboard-snapshot-buckets.sql",
   "./migrations/20261107220000_STORAGE-opendata-service-role-writes-only.sql",
+  "./migrations/20261109030000_STORAGE-drop-open-data-catalog-bucket.sql",
 ]
 
 [realtime]

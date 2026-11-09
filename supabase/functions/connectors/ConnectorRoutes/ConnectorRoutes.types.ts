@@ -59,17 +59,15 @@ export type ConnectorsApi = APITypeDef<
         // The handler returns a raw `Response` with `Content-Type: text/csv`
         // - `ValidReturnType` (`MiniServer/api.types.ts`) only allows
         // `Record<string, unknown> | void | Response` here, so this must
-        // stay `Response`, matching the one other route in this codebase
-        // that also returns raw bytes (`open-data`'s
-        // `/data-catalog-listings/:catalogListingId/resource`, same
-        // `returnType: Response`). That precedent is never called through
+        // stay `Response`, matching `open-data`'s column type sample route,
+        // which also answers with raw CSV text. Neither is called through
         // `APIClient`/`supabase.functions.invoke` for exactly this reason:
         // `functions.invoke`'s own content-type-based parsing resolves
         // `text/csv` to a plain string, not a `Response` object, so a caller
         // going through it could never get a real `Response` back no matter
         // what this type says. `acquirePostgresTableRelation.ts` instead
         // does its own authenticated `fetch`, mirroring
-        // `fetchOpenDataCatalogResource.ts`, and reads the body itself. An
+        // `fetchOpenDataColumnTypeSample.ts`, and reads the body itself. An
         // error response is still JSON (MiniServer's default wrapping), so
         // it comes back as the usual `ConnectorErrorResponse` shape.
         returnType: Response | ConnectorErrorResponse;
