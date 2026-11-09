@@ -1,0 +1,55 @@
+.mapViewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+}
+
+.mapViewerCanvas {
+  background: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* A fixed picture offers no zoom buttons, since nothing on it moves. */
+.mapViewerCanvas--fixed :global(.maplibregl-ctrl-top-right) {
+  display: none;
+}
+
+.mapViewerLegend {
+  inset-block-end: var(--mantine-spacing-sm);
+  inset-inline-end: var(--mantine-spacing-sm);
+  max-height: calc(100% - 2 * var(--mantine-spacing-sm));
+  overflow: auto;
+  position: absolute;
+  z-index: 1;
+}
+
+.mapViewerPopup {
+  inset-block-start: var(--mantine-spacing-sm);
+  inset-inline-start: var(--mantine-spacing-sm);
+  max-width: 280px;
+  position: absolute;
+  z-index: 2;
+}
+
+.mapViewerPopupRow {
+  overflow-wrap: anywhere;
+}
+
+.mapViewerState {
+  align-items: center;
+  background: var(--ava-surface-body);
+  border: 1px dashed var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  justify-content: center;
+  padding: var(--mantine-spacing-md);
+}
+
+.mapViewerStateMessage {
+  max-width: 40ch;
+  text-wrap: balance;
+}
