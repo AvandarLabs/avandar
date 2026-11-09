@@ -32,7 +32,8 @@ export type EvalQuestion = {
     | "non_technical"
     | "follow_up"
     | "page_context"
-    | "mentions";
+    | "mentions"
+    | "schema";
   prompt: string;
   /** The question this one follows in the same conversation. */
   followsId?: string;
@@ -80,4 +81,9 @@ export type EvalQuestion = {
    * the question asks about. Any query it runs is a miss.
    */
   expectsNoQuery?: boolean;
+  /**
+   * Grades the reply text. Set when the right answer is prose from the
+   * schema, so a query shown to the user is a miss. `grade` is not called.
+   */
+  gradeText?: (assistantText: string) => Verdict;
 };

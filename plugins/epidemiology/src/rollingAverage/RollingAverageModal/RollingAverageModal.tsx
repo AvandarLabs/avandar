@@ -10,10 +10,11 @@ import type { ReactNode } from "react";
 
 /**
  * The content of the "Rolling average" command's modal. The user picks a
- * numeric value column, a date column, a window in days or weeks, and an
- * optional group-by column, and the command adds the rolling average to the
- * Data Explorer query as one column. Without a numeric and a date column, or
- * outside the Data Explorer, it explains why instead.
+ * an optional numeric value column, a date column, a window in days or weeks,
+ * and an optional group-by column, and the command adds the rolling average
+ * to the Data Explorer query as one column. With no value column, each row
+ * counts as 1. Without a date column, or outside the Data Explorer, it
+ * explains why instead.
  */
 export function RollingAverageModal(): ReactNode {
   const avandar = useAvandar();
@@ -32,7 +33,7 @@ export function RollingAverageModal(): ReactNode {
   if (avandar.dataExplorer === undefined) {
     return <Alert color="yellow">{t("rollingAverage.unavailable")}</Alert>;
   }
-  if (firstNumericColumn === undefined || firstDateColumn === undefined) {
+  if (firstDateColumn === undefined) {
     return <Alert color="yellow">{t("rollingAverage.missingColumns")}</Alert>;
   }
   return (

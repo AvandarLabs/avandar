@@ -128,10 +128,12 @@ function _selectQuestions(ids: string): readonly EvalQuestion[] {
   if (!ids) {
     // The default run stays the audit's 45 questions, so archived runs
     // compare. Page questions run with `--questions P`, mention questions
-    // with `--questions M`.
+    // with `--questions M`, schema questions with `--questions S`.
     return COVID_QUESTIONS.filter((question) => {
       return (
-        question.category !== "page_context" && question.category !== "mentions"
+        question.category !== "page_context" &&
+        question.category !== "mentions" &&
+        question.category !== "schema"
       );
     });
   }

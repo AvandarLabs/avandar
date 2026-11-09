@@ -1,8 +1,6 @@
-import { where } from "@avandar/utils";
 import { Box } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { makeDateColumnOptions } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
@@ -54,39 +52,39 @@ function _makeDateColumnOptionsByDatasetId(
 }
 
 /**
- * The catalog the card reads for its source datasets: names, column types,
- * and each dataset's date columns.
+ * The workspace catalog the card reads while a draft is edited: every
+ * dataset, so one the model left out can still be joined, plus each
+ * dataset's columns, types, and date columns.
  *
  * Names are read from the catalog rather than the proposal, so a dataset or
- * column the model mislabelled still displays what it really is. Every source
- * dataset is fetched, not just the first, because the card shows them all.
- * The proposal's datasets are fetched rather than the edited draft's: the
- * card can only remove a dataset, and the editor needs the date columns
- * before it exists.
+ * column the model mislabelled still displays what it really is.
  */
-function useDraftCatalog(draft: ChatProposedCaseType) {
-  const sourceDatasetIds = draft.sourceDatasets.map((sourceDataset) => {
-    return sourceDataset.datasetId;
-  });
-  const [datasetColumns] = DatasetColumnClient.useGetAll(
-    where("dataset_id", "in", sourceDatasetIds),
-  );
-  const [datasets] = DatasetClient.useGetAll(
-    where("id", "in", sourceDatasetIds),
-  );
+function useDraftCatalog() {
+  const [datasetsWithColumns] = DatasetClient.useGetAllDatasetsWithColumns();
   return useMemo(() => {
+    const datasets = datasetsWithColumns ?? [];
+    const columns = datasets.flatMap((dataset) => {
+      return dataset.columns;
+    });
     return {
-      columnNamesById: _makeNamesById(datasetColumns),
+      datasets: datasets.map((dataset) => {
+        return { id: dataset.id, name: dataset.name };
+      }),
+      columnsByDatasetId: Object.fromEntries(
+        datasets.map((dataset) => {
+          return [dataset.id, dataset.columns];
+        }),
+      ),
+      columnNamesById: _makeNamesById(columns),
       columnDataTypesById: Object.fromEntries(
-        (datasetColumns ?? []).map((column) => {
+        columns.map((column) => {
           return [column.id, column.dataType];
         }),
       ),
-      dateColumnOptionsByDatasetId:
-        _makeDateColumnOptionsByDatasetId(datasetColumns),
+      dateColumnOptionsByDatasetId: _makeDateColumnOptionsByDatasetId(columns),
       datasetNamesById: _makeNamesById(datasets),
     };
-  }, [datasetColumns, datasets]);
+  }, [datasetsWithColumns]);
 }
 
 /**
@@ -99,11 +97,13 @@ function CaseTypeDraftCardContainer({
   const workspace = useCurrentWorkspace();
   const dispatch = ChatPanelStateManager.useDispatch();
   const {
+    datasets,
+    columnsByDatasetId,
     columnNamesById,
     columnDataTypesById,
     dateColumnOptionsByDatasetId,
     datasetNamesById,
-  } = useDraftCatalog(draft);
+  } = useDraftCatalog();
   const editor = useCaseTypeDraftEditor({
     proposedDraft: draft,
     dateColumnOptionsByDatasetId,
@@ -117,6 +117,8 @@ function CaseTypeDraftCardContainer({
     <Box px="md" pb="xs">
       <CaseTypeDraftCard
         editor={editor}
+        datasets={datasets}
+        columnsByDatasetId={columnsByDatasetId}
         datasetNamesById={datasetNamesById}
         columnNamesById={columnNamesById}
         columnDataTypesById={columnDataTypesById}

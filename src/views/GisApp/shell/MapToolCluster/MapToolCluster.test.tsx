@@ -7,6 +7,7 @@ import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { act, fireEvent, render, screen, within } from "@/test-utils";
+import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import {
   createFakeMap,
   emitWindowPointer,
@@ -491,6 +492,7 @@ describe("MapToolCluster", () => {
       type: "bufferOfLayer",
       layerId: source.id,
       distanceMeters: 1000,
+      distanceUnit: "m",
       dissolve: false,
     });
   });
@@ -522,6 +524,63 @@ describe("MapToolCluster", () => {
     expect(screen.getByRole("status")).toHaveTextContent(
       "Close a valid ring that does not cross itself.",
     );
+  });
+  it("filters the picked point layer by the new buffer and opens its list", async () => {
+    spatialAvailability.value = "available";
+    const makePointLayer = (name: string): MapLayer.T => {
+      return {
+        ...MapLayer.makeEmpty(name),
+        geoBinding: {
+          type: "latLngColumns",
+          latitude: uuid<QueryColumn.Id>(),
+          longitude: uuid<QueryColumn.Id>(),
+        },
+      };
+    };
+    const sites = makePointLayer("Sites");
+    const schools = makePointLayer("Schools");
+    let config: AvaMapConfig.T = {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [sites, schools],
+    };
+    const updateConfig = vi.fn(
+      (update: (current: AvaMapConfig.T) => AvaMapConfig.T) => {
+        config = update(config);
+      },
+    );
+    const onOpenFeatureList = vi.fn();
+    const renderCluster = () => {
+      return (
+        <MapToolCluster
+          mapToolMode={{ type: "pan" }}
+          onMapToolModeChange={vi.fn()}
+          selectedLayer={sites}
+          updateConfig={updateConfig}
+          layers={config.layers}
+          onOpenFeatureList={onOpenFeatureList}
+        />
+      );
+    };
+    const { rerender } = render(renderCluster());
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Buffer around a layer" }),
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Confirm" }));
+    rerender(renderCluster());
+    pickMantineSelectOption("Filter another layer by this buffer", "Schools");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Filter and show list" }),
+    );
+
+    const buffer = config.layers.find((layer) => {
+      return layer.geoBinding?.type === "bufferOfLayer";
+    });
+    const filteredSchools = config.layers.find((layer) => {
+      return layer.id === schools.id;
+    });
+    expect(filteredSchools?.spatialFilter).toEqual({ layerId: buffer?.id });
+    expect(onOpenFeatureList).toHaveBeenCalledWith(schools.id);
   });
 
   it("places Add a place right after Buffer when the map can hold places", () => {

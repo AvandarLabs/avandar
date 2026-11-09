@@ -27,7 +27,7 @@ export const RUN_QUERY_TOOL = {
   name: "run_query",
   label: "Run query",
   description:
-    "Runs the one DuckDB query that answers the question and shows its result to the user as a table or chart. Returns only the row count and column names. A result ends your turn.",
+    "Runs the one DuckDB query that answers a question about rows and shows its result to the user as a table or chart. Returns only the row count and column names. A result ends your turn. Do not use it to list or compare columns: those are already under DATASETS.",
   parameters: RUN_QUERY_PARAMETERS,
 };
 

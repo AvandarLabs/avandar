@@ -50,9 +50,9 @@ type Props = {
  * tab, plus the collapse toggle. Rendered through the shared `Tabs`
  * `listRightSection` slot so it shares the row with the tab list.
  *
- * While the drawer is shut there is no open tab, so the tab-scoped control is
- * hidden. The out-of-sync badge is not tab-scoped: it reports on the query
- * itself, so it survives collapsing whichever tab was last showing.
+ * While the drawer is shut there is no open tab, so the tab-scoped control
+ * and the out-of-sync badge stay hidden. The badge reports on the query
+ * itself, so it returns on either tab once the drawer opens.
  */
 export function DataExplorerDrawerRail({
   activeTab,
@@ -111,7 +111,7 @@ export function DataExplorerDrawerRail({
 
   return (
     <Group gap="xs" wrap="nowrap">
-      {isStructuredQueryInSync ? null : (
+      {isCollapsed || isStructuredQueryInSync ? null : (
         <Tooltip
           label={t`Parts of the SQL cannot be represented in the manual form.`}
         >

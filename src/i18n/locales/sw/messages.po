@@ -17,6 +17,10 @@ msgstr ""
 msgid "Publisher"
 msgstr "Mchapishaji"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
+msgid "Filter another layer by this buffer"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
 msgstr "Mabadiliko ya njia yako ya malipo yanaweza kufanywa katika yako"
@@ -246,7 +250,7 @@ msgstr "Tafuta datasets..."
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "Latitude and longitude"
-msgstr ""
+msgstr "Latitudo na longitudo"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
@@ -297,6 +301,10 @@ msgstr "ya hivi karibuni zaidi"
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "PII detected:"
 msgstr "PII kugunduliwa:"
+
+#: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
+msgid "Nearest {sourceName}"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
@@ -554,7 +562,7 @@ msgstr "Imeunganishwa kama {0}"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Could not open the place."
-msgstr ""
+msgstr "Haikuweza kufungua eneo."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -568,6 +576,10 @@ msgstr "Jukumu la kawaida"
 #: src/routes/signin.tsx
 msgid "Create account"
 msgstr "Unda akaunti"
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
+msgid "No layer can be filtered by this buffer."
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Views"
@@ -600,7 +612,8 @@ msgstr "Wajumbe bado waliotengwa kwa kundi hili lazima wahamishwe kwanza."
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 msgid "The place is removed from its dataset, so it disappears from every map "
 "and chart that uses it."
-msgstr ""
+msgstr "Eneo limeondolewa kwenye mkusanyiko wake wa data, kwa hivyo linatoweka "
+"kwenye kila ramani na chati inayolitumia."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar layout"
@@ -826,6 +839,10 @@ msgstr "Je, unataka kuagiza \"{fileName}\" kama dataset mpya?"
 msgid "Classes"
 msgstr "Madarasa"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
+msgid "Filter and show list"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "For more control over your subscription, you can manage your "
 "subscription in your"
@@ -900,6 +917,10 @@ msgstr "Tumia ramani hii ya msingi"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "Vichwa vya monospace"
+
+#: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
+msgid "Only show features inside"
+msgstr ""
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Quarter"
@@ -1261,6 +1282,10 @@ msgstr "SQL ya sasa ina sehemu ambazo fomu haikuweza kuwakilisha. Ukiendelea, "
 "SQL hiyo itafutwa na kubadilishwa na SQL inayozalishwa kutoka kwenye "
 "fomu."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No keywords"
+msgstr "Hakuna maneno muhimu"
+
 #. placeholder {0}: formatCatalogListingDate(updatedDate)
 #. placeholder {0}: formatDashboardDate(dashboard.updatedAt, i18n)
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
@@ -1291,6 +1316,10 @@ msgstr "Kima cha chini cha mhimili wa Y"
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Publish publicly"
 msgstr "Chapisha hadharani"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Choose a column"
+msgstr "Chagua safu"
 
 #. placeholder {0}: user.email
 #: src/routes/update-password.tsx
@@ -1470,13 +1499,19 @@ msgstr "Seti ya data imehifadhiwa."
 msgid "There are no numeric columns"
 msgstr "Hakuna safu za nambari"
 
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "This layer shows approximate locations, so its features are not listed "
+"one by one. Listing exact rows would undo that protection."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " permission"
 msgstr " ruhusa"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Places are saved in a dataset, so any map, chart, or query can use them."
-msgstr ""
+msgstr "Maeneo huhifadhiwa kwenye mkusanyiko wa data, kwa hivyo ramani, chati "
+"au swali lolote linaweza kuyatumia."
 
 #: src/components/ChatPanel/PendingClarificationBlock/useDiscoveryResolver.ts
 msgid "Discovery query failed."
@@ -1735,8 +1770,8 @@ msgstr "Kumbukumbu hiyo ina kumbukumbu nyingine pekee. Bandika kiungo cha faili 
 "lenyewe."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-msgid "{featureCount} points"
-msgstr "{featureCount} pointi"
+#~ msgid "{featureCount} points"
+#~ msgstr "{featureCount} pointi"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -1821,6 +1856,10 @@ msgstr "Inapakia mipango..."
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "User groups"
 msgstr "Makundi ya watumiaji"
+
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListTable.tsx
+msgid "Actions"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "Assignment not changed"
@@ -2070,6 +2109,10 @@ msgstr "Muda wa alama za mhimili wa Y"
 msgid "No records have these statuses"
 msgstr "Hakuna rekodi zilizo na hali hizi"
 
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
+msgid "Show"
+msgstr ""
+
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "{0}, and {remainingCount} more naming the page and the document"
@@ -2099,7 +2142,7 @@ msgstr "Nenosiri"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Exposure sites"
-msgstr ""
+msgstr "Maeneo ya kukabiliwa"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Show the first 20 rows of {datasetName}"
@@ -2161,12 +2204,16 @@ msgstr "Imetolewa {0}"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Exposure ends"
-msgstr ""
+msgstr "Kukabiliwa kunaisha"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign"
 msgstr "Hamishia umiliki"
+
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListDrawer.tsx
+msgid "Feature list: {layerName}"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
@@ -2237,7 +2284,7 @@ msgstr "Pangilia"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Give the place a name."
-msgstr ""
+msgstr "Lipe eneo jina."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
@@ -2284,6 +2331,10 @@ msgstr "Futa"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "One dataset is one tab."
 msgstr "Kila seti ya data ni kichupo kimoja."
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Label each ring with"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
@@ -2489,7 +2540,7 @@ msgstr "Chagua chanzo cha data"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the name under 200 characters."
-msgstr ""
+msgstr "Jina liwe na herufi zisizozidi 200."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Opacity"
@@ -2531,6 +2582,10 @@ msgstr "Badilisha kuwa mpango wa Bure"
 #: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
 msgid "Something went wrong while running this query."
 msgstr "Hitilafu imetokea wakati wa kuendesha hoja hii."
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Unit"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -2598,7 +2653,7 @@ msgstr "Sanidi hali ya nje ya mtandao ili kuzungumza bila muunganisho wa "
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved. Reload the map to see it."
-msgstr ""
+msgstr "Eneo limehifadhiwa. Pakia upya ramani ili kuliona."
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Permanently delete <0>{openDatasetName}</0>?"
@@ -2763,6 +2818,10 @@ msgstr "Plugin ya {pluginId} imekumbana na hitilafu ilipokuwa ikichora chati "
 msgid "Body"
 msgstr "Mwili"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Add a dataset"
+msgstr "Ongeza dataset"
+
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "The name other members see in {workspaceName}."
 msgstr "Jina ambalo wanachama wengine wanaona katika {workspaceName}."
@@ -2854,6 +2913,10 @@ msgstr "Hakuna thamani zilizorejeshwa kutoka {column}. Eleza unachohitaji "
 msgid "Open map"
 msgstr "Fungua ramani"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No formats"
+msgstr "Hakuna miundo"
+
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models removed"
 msgstr "Modeli za nje ya mtandao zimeondolewa"
@@ -2911,8 +2974,8 @@ msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa "
 "zimehifadhiwa kwenye kifaa hiki pekee."
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-msgid "1 point"
-msgstr "Pointi 1"
+#~ msgid "1 point"
+#~ msgstr "Pointi 1"
 
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
@@ -3064,7 +3127,7 @@ msgstr "Kamili"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place deleted."
-msgstr ""
+msgstr "Eneo limefutwa."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Discard"
@@ -3089,7 +3152,7 @@ msgstr "Ramani ya msingi yenye giza au ya satelaiti inaweza kunakiliwa vibaya "
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Could not save the place."
-msgstr ""
+msgstr "Haikuweza kuhifadhi eneo."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is before"
@@ -3112,7 +3175,8 @@ msgstr "Majukumu & Ruhusa"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
 msgid "For public places only. The search goes to an outside service, so never "
 "type a person's home address."
-msgstr ""
+msgstr "Kwa maeneo ya umma pekee. Utafutaji huenda kwenye huduma ya nje, kwa "
+"hivyo usiwahi kuandika anwani ya nyumbani ya mtu."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall {pluginName}?"
@@ -3137,6 +3201,10 @@ msgstr "Haikuweza kupata seti ya data inayojulikana inayolingana na "
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
 msgstr "Uonyeshaji wa Data"
+
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
+msgid "Show {rowLabel} on the map"
+msgstr ""
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -3168,7 +3236,7 @@ msgstr "Sogeza, kukuza na uguse kipengele ili kukisoma. Ili kuhariri tabaka, "
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Could not create the places dataset."
-msgstr ""
+msgstr "Haikuweza kuunda mkusanyiko wa data wa maeneo."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Info"
@@ -3236,6 +3304,10 @@ msgstr "Hatua"
 #: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
 msgid "Former member"
 msgstr "Mwanachama wa zamani"
+
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "Loading features..."
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
@@ -3342,7 +3414,7 @@ msgstr "Inachoongeza"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The longitude must be between -180 and 180."
-msgstr ""
+msgstr "Longitudo lazima iwe kati ya -180 na 180."
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -3447,6 +3519,10 @@ msgstr "Uchapishaji wa dashibodi umeondolewa."
 msgid "Show SQL"
 msgstr "Onyesha SQL"
 
+#: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
+msgid "Feature list"
+msgstr ""
+
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
@@ -3490,6 +3566,7 @@ msgstr "Kuu"
 msgid "Unable to publish dashboard"
 msgstr "Imeshindikana kuchapisha dashibodi"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
 msgstr "Pima"
@@ -3704,7 +3781,7 @@ msgstr "Rangi ya mistari ya gridi"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Add to map"
-msgstr ""
+msgstr "Ongeza kwenye ramani"
 
 #: src/views/GisApp/useBasemapAttribution.ts
 msgid "MapLibre, OpenStreetMap contributors"
@@ -3743,10 +3820,19 @@ msgstr "Hatukuweza kupata \"{displayName}\" kwenye katalogi. Jaribu kuiongeza "
 msgid "Review matches"
 msgstr "Kagua zinazolingana"
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Dataset {datasetName}"
+msgstr "Dataset {datasetName}"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Choose a dataset"
+msgstr "Chagua dataset"
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceModalFooter.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Done"
 msgstr "Imekamilika"
 
@@ -3797,7 +3883,7 @@ msgstr "Unatumia URL yako maalum."
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Address"
-msgstr ""
+msgstr "Anwani"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
@@ -4015,6 +4101,10 @@ msgstr "Chapisha"
 msgid "Rows {rowIndexes}."
 msgstr "Safu mlalo {rowIndexes}."
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "No label"
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
 msgstr "Futa: {openDatasetName}"
@@ -4211,7 +4301,7 @@ msgstr "Filita za ndani (zinazoweza kuhaririwa na mtazamaji, chati hii pekee)"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "Press Enter to use it."
-msgstr ""
+msgstr "Bonyeza Enter ili kuitumia."
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Invalid X axis selected"
@@ -4311,9 +4401,17 @@ msgstr "Unda dashibodi & hifadhi"
 msgid "Your data is summarized"
 msgstr "Data yako imefupishwa"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No topics"
+msgstr "Hakuna mada"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Pengo la ndani"
+
+#: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
+msgid "ft"
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "The layer configuration is saved. Try again once your connection is "
@@ -4406,7 +4504,7 @@ msgstr "Ufafanuzi {turnNumber} wa 3"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the address under 500 characters."
-msgstr ""
+msgstr "Anwani iwe na herufi zisizozidi 500."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Fix the fields above, then save."
@@ -4502,11 +4600,16 @@ msgstr "Inanasa dashibodi…"
 #: src/views/GisApp/places/usePlacesErrorMessage.ts
 msgid "This places dataset was changed outside the map and can no longer be "
 "edited here."
-msgstr ""
+msgstr "Mkusanyiko huu wa data wa maeneo ulibadilishwa nje ya ramani na hauwezi "
+"tena kuhaririwa hapa."
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the measurements as found"
 msgstr "Weka vipimo kama vilivyopatikana"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Add a field"
+msgstr "Ongeza sehemu"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "A secure connection is required"
@@ -4589,7 +4692,7 @@ msgstr "Baadhi ya viwianishi ni 0, 0."
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The exposure must end after it starts."
-msgstr ""
+msgstr "Muda wa kukabiliwa lazima uishe baada ya kuanza."
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
@@ -4608,6 +4711,12 @@ msgstr "Kamili"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchStatus.tsx
 msgid "{resultCount, plural, =0 {No addresses found} one {# address found} "
 "other {# addresses found}}"
+msgstr "{resultCount, plural, =0 {Hakuna anwani zilizopatikana} one {Anwani # "
+"imepatikana} other {Anwani # zimepatikana}}"
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
+msgid "Buffers are off for layers set to Displace, since rings would reveal "
+"their exact locations."
 msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
@@ -4626,8 +4735,8 @@ msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
-msgid "Distance (meters)"
-msgstr "Umbali (mita)"
+#~ msgid "Distance (meters)"
+#~ msgstr "Umbali (mita)"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Preparing offline models"
@@ -4835,6 +4944,10 @@ msgstr "Futa dashibodi?"
 msgid "Every value"
 msgstr "Thamani zote"
 
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "Distance"
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "Napenda"
@@ -4872,7 +4985,7 @@ msgstr "Hakuna maeneo"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Places dataset"
-msgstr ""
+msgstr "Mkusanyiko wa data wa maeneo"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
@@ -4970,6 +5083,10 @@ msgstr "Dashibodi haijakamilika"
 msgid "Pay monthly"
 msgstr "Lipa kila mwezi"
 
+#: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
+msgid "m"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
 msgstr "haianzi na"
@@ -5023,6 +5140,10 @@ msgstr "Punguza"
 msgid "Cap reached"
 msgstr "Kikomo kimefikiwa"
 
+#: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
+msgid "Unavailable layer"
+msgstr ""
+
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Month"
 msgstr "Mwezi"
@@ -5046,6 +5167,10 @@ msgstr "Google Sheet ni kubwa sana"
 #: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
 msgid "Choose a date column"
 msgstr "Chagua safu ya tarehe"
+
+#: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
+msgid "Distance to nearest {sourceName}"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -5111,6 +5236,10 @@ msgstr "Picha"
 msgid "Uses no workspace data."
 msgstr "Haitumii data ya workspace."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
+msgid "No organizations"
+msgstr "Hakuna mashirika"
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "Ficha mhimili wa X"
@@ -5133,7 +5262,7 @@ msgstr "Matokeo hayapatikani"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Create places dataset"
-msgstr ""
+msgstr "Unda mkusanyiko wa data wa maeneo"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5201,6 +5330,10 @@ msgstr "Sambaza ndani ya"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
 msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
+
+#: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
+msgid "Anywhere"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
@@ -5330,7 +5463,7 @@ msgstr "{offlineOnlyTitle}: itaishi kwenye kompyuta hii pekee, na hakuna mtu "
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "This place was already deleted."
-msgstr ""
+msgstr "Eneo hili lilikuwa tayari limefutwa."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -5900,7 +6033,7 @@ msgstr "Ukubwa wa faili"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "Type a latitude and longitude, like 40.7603, -73.9885."
-msgstr ""
+msgstr "Andika latitudo na longitudo, kwa mfano 40.7603, -73.9885."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Labelled graphic (map, chart, tiles)"
@@ -6262,6 +6395,10 @@ msgstr "Nene"
 msgid "Alphabetically first"
 msgstr "Wa kwanza kialfabeti"
 
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "Download CSV"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
 msgstr "Nunua kiti {seatsToAdd}"
@@ -6372,7 +6509,7 @@ msgstr "Dashibodi hii bado iko hadharani kwenye wavuti. Mtu yeyote aliye na "
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Enter each exposure time as a date and a time."
-msgstr ""
+msgstr "Weka kila muda wa kukabiliwa kama tarehe na saa."
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "Filter by status"
@@ -6459,6 +6596,10 @@ msgstr "Idhini"
 msgid "Tell us about where the {singularConceptName} data should come from..."
 msgstr "Tuambie kuhusu mahali ambapo data ya {singularConceptName} inapaswa "
 "kutokea..."
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
+msgid "Choose a dataset to join"
+msgstr "Chagua dataset ya kuunganisha"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Edit user group"
@@ -6555,6 +6696,10 @@ msgstr "Inasawazisha seti ya data mtandaoni"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "WMTS"
 msgstr "WMTS"
+
+#: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
+msgid "Back to the feature list"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -6713,6 +6858,10 @@ msgstr "Thamani zisizoamuliwa"
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
 msgid "Another status has this name."
 msgstr "Hali nyingine ina jina hili."
+
+#: src/views/GisApp/panels/FeatureListDrawer/makeCsvRowsFromFeatureList/makeCsvRowsFromFeatureList.ts
+msgid "{columnLabel} ({unitLabel})"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -7003,7 +7152,7 @@ msgstr "Imejengwa ndani"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Location: {latitude}, {longitude}"
-msgstr ""
+msgstr "Mahali: {latitude}, {longitude}"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link. Add a custom path below for "
@@ -7084,6 +7233,10 @@ msgstr "SQL"
 msgid "Ordered"
 msgstr "Yenye mpangilio"
 
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "Fewer than {MIN_EXACT_APPROXIMATE_COUNT} features"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
 "selected columns)."
@@ -7153,10 +7306,10 @@ msgstr "Tumegundua taarifa za kibinafsi zinazoweza kuwa na upendeleo wa lugha "
 "katika jibu la AI. Angalia zote hapa chini."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
-"columns."
-msgstr "Bafa inahitaji safu iliyo na jiometri iliyokusanywa, si safu za "
-"latitudo na longitudo."
+#~ msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
+#~ "columns."
+#~ msgstr "Bafa inahitaji safu iliyo na jiometri iliyokusanywa, si safu za "
+#~ "latitudo na longitudo."
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -7446,6 +7599,10 @@ msgstr "Hitilafu imetokea"
 msgid "Select a dataset"
 msgstr "Chagua mkusanyiko wa data"
 
+#: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
+msgid "mi"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
 msgstr "Ruhusu usawazishaji"
@@ -7541,6 +7698,10 @@ msgstr "Filter"
 msgid "This cannot be undone."
 msgstr "Hali hii haiwezi kubadilishwa."
 
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "{count, plural, one {# feature} other {# features}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
 msgstr "Mistari kutoka kwenye jedwali hili"
@@ -7548,6 +7709,10 @@ msgstr "Mistari kutoka kwenye jedwali hili"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "Jina la dataset linapaswa kuwa na angalau herufi 2."
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+msgid "No datasets"
+msgstr "Hakuna dataset"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "US Letter"
@@ -7806,7 +7971,7 @@ msgstr "Ukali ({0})"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
 msgid "Search an address"
-msgstr ""
+msgstr "Tafuta anwani"
 
 #. placeholder {0}: columns.length
 #. placeholder {1}: numRows.toLocaleString(i18n.locale)
@@ -7838,7 +8003,7 @@ msgstr "Uhusishaji"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "New places dataset name"
-msgstr ""
+msgstr "Jina jipya la mkusanyiko wa data wa maeneo"
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Column types updated"
@@ -7862,7 +8027,7 @@ msgstr "Maelezo ya chanzo (Hujumuishwa kila wakati)"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchField.tsx
 msgid "Address search is not available right now."
-msgstr ""
+msgstr "Utafutaji wa anwani haupatikani kwa sasa."
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 msgid "Status name"
@@ -7905,6 +8070,10 @@ msgstr "Si sasa"
 msgid "Shared dashboard limit reached"
 msgstr "Kikomo cha dashibodi zilizoshirikiwa kimefikiwa"
 
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
+msgid "{featureCount, plural, one {# area} other {# areas}}"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
 msgstr "Bafa ya {sourceName}"
@@ -7944,6 +8113,10 @@ msgstr "Chati ya mistari"
 #: src/utils/notifications/notifyExpiredSession.ts
 msgid "Your session has expired"
 msgstr "Kikao chako kimeisha"
+
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "The feature list could not load."
+msgstr ""
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
@@ -8059,6 +8232,10 @@ msgid "Try again in a moment, or reach out to support if it keeps happening."
 msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
 "litaendelea."
 
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
+msgid "{featureCount, plural, one {# point} other {# points}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
@@ -8067,7 +8244,7 @@ msgstr "Mtumiaji wa hifadhidata anapaswa kuwa na ufikiaji wa kusoma pekee "
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The latitude must be between -90 and 90."
-msgstr ""
+msgstr "Latitudo lazima iwe kati ya -90 na 90."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Neutral"
@@ -8698,7 +8875,7 @@ msgstr "Vipengele vyake vitatoweka kwa kila mwanachama hadi uiwashe tena."
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/GeoapifyAttribution.tsx
 msgid "Powered by Geoapify"
-msgstr ""
+msgstr "Inaendeshwa na Geoapify"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
@@ -8706,7 +8883,8 @@ msgstr "Fanya kuwa ya mtandaoni pekee"
 
 #: src/views/GisApp/places/usePlacesErrorMessage.ts
 msgid "This dataset isn't a places dataset, so places can't be added to it."
-msgstr ""
+msgstr "Mkusanyiko huu wa data si wa maeneo, kwa hivyo maeneo hayawezi "
+"kuongezwa kwake."
 
 #: src/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField.tsx
 msgid "Custom URL is available"
@@ -8916,7 +9094,7 @@ msgstr "Ni baadhi tu ya watu wanaoweza kufungua seti hii ya data. Wenzako wa "
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place deleted. Reload the map to see the change."
-msgstr ""
+msgstr "Eneo limefutwa. Pakia upya ramani ili kuona mabadiliko."
 
 #. placeholder {0}: value.length
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
@@ -8966,7 +9144,7 @@ msgstr "Chagua dokezo kwenye ramani ili kulihariri."
 
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 msgid "Delete this place?"
-msgstr ""
+msgstr "Ufute eneo hili?"
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
@@ -9012,6 +9190,7 @@ msgstr "Mabadiliko yasiyohifadhiwa hayawezi kuonekana kwenye mapitio. Hifadhi "
 msgid "This workspace does not have a valid subscription."
 msgstr "Workspace hii haina usajili halali."
 
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Dataset"
@@ -9031,9 +9210,17 @@ msgstr "Maamuzi yote"
 msgid "series.cases"
 msgstr "mfululizo.kesi"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFacetOption.tsx
+msgid "Loading count"
+msgstr "Inapakia idadi"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
 msgstr "Mada"
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
+msgid "Pick a point layer"
+msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
@@ -9062,7 +9249,7 @@ msgstr "(Malipo ya kila mwezi)"
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToAddPlaceButton.tsx
 msgid "Add a place here"
-msgstr ""
+msgstr "Ongeza eneo hapa"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "What to read"
@@ -9082,7 +9269,7 @@ msgstr "{threshold} au zaidi"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Place saved."
-msgstr ""
+msgstr "Eneo limehifadhiwa."
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -9096,6 +9283,10 @@ msgstr "Decimal"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "Kosa"
+
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
+msgid "Show feature {position} on the map"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9440,7 +9631,7 @@ msgstr "Chati zake huona tu safu za chati inayochora"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/OpenStreetMapAttribution.tsx
 msgid "© OpenStreetMap contributors"
-msgstr ""
+msgstr "© Wachangiaji wa OpenStreetMap"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
@@ -9462,6 +9653,11 @@ msgstr "Zilizowekwa katika makundi"
 msgid "You need admin access on this resource to manage sharing."
 msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 "kushiriki."
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
+msgid "At least {minDistance} {unitLabel}"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Displace"
@@ -9516,6 +9712,10 @@ msgid "Each series is one (X, Y) cloud of points. Add more to compare multiple "
 "metric pairs on the same chart."
 msgstr "Kila series ni wingu moja la (X, Y) la alama. Ongeza zaidi ili "
 "kulinganisha jozi nyingi za metriki kwenye chati moja."
+
+#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
+msgid "{featureCount, plural, one {# feature} other {# features}}"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Polygon"
@@ -9597,7 +9797,7 @@ msgstr "Tafadhali jaribu tena baada ya muda mfupi."
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "Could not delete the place."
-msgstr ""
+msgstr "Haikuweza kufuta eneo."
 
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
@@ -9724,6 +9924,10 @@ msgstr "Hujachagua safu ya thamani"
 msgid "Text contains"
 msgstr "Maandishi yana"
 
+#: src/views/GisApp/panels/FeatureListDrawer/formatFeatureListCell/formatFeatureListCell.ts
+msgid "{distance} {unit}"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Saving"
 msgstr "Inahifadhi"
@@ -9829,7 +10033,7 @@ msgstr "Hii {resource} inapatikana kwa mtu yeyote mwenye ruhusa ya {app} {0}."
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool.tsx
 msgid "Edit place"
-msgstr ""
+msgstr "Hariri eneo"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
 msgid "See less"
@@ -9843,6 +10047,10 @@ msgstr "Amber"
 msgid "Configure how to join datasets"
 msgstr "Sanidi jinsi ya kuungana na seti za data"
 
+#: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
+msgid "Add an area layer, such as a buffer, to filter by it."
+msgstr ""
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it"
 msgstr "Ihifadhi"
@@ -9853,7 +10061,7 @@ msgstr "Ficha mafunzo"
 
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 msgid "Move place"
-msgstr ""
+msgstr "Hamisha mahali"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
 msgid "{rowCount, plural, one {Built from the first row of the result.} other "
@@ -9871,8 +10079,13 @@ msgid "Dataset columns"
 msgstr "Safu za seti za data"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
 msgstr "Maelezo"
+
+#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
+msgid "Buffer added."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
@@ -9995,7 +10208,7 @@ msgstr "ina"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the notes under 2,000 characters."
-msgstr ""
+msgstr "Weka madokezo yasizidi herufi 2,000."
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
@@ -10270,7 +10483,7 @@ msgstr "Hariri kundi la jukumu"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "A places dataset holds at most {maxPlaces} places."
-msgstr ""
+msgstr "Seti ya data ya maeneo inaweza kuwa na maeneo yasiyozidi {maxPlaces}."
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
@@ -10400,6 +10613,10 @@ msgstr "Haiwezekani kusoma faili"
 msgid "Check your connection and click the button again to retry."
 msgstr "Kagua muunganisho wako na ubofye kitufe tena ili ujaribu upya."
 
+#: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
+msgid "This layer's features cannot be listed."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
 msgstr "Safu wima ya 6"
@@ -10507,7 +10724,7 @@ msgstr "Avandar bado iko kwenye beta. Vipengele vingine vinaweza kutofanya kazi 
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Exposure starts"
-msgstr ""
+msgstr "Mfiduo unaanza"
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
@@ -10688,6 +10905,10 @@ msgid "{0, plural, one {# saved database available} other {# saved databases "
 "available}}"
 msgstr "{0, plural, one {# hifadhidata iliyohifadhiwa inapatikana} other {# "
 "hifadhidata zilizohifadhiwa zinapatikana}}"
+
+#: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+msgid "Add a field from {datasetName}"
+msgstr "Ongeza sehemu kutoka {datasetName}"
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
@@ -10982,6 +11203,7 @@ msgstr "Isiyoonekana sana"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Activity"
 msgstr "Shughuli"
 
@@ -11127,7 +11349,7 @@ msgstr "+ Sharti"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "Click the map"
-msgstr ""
+msgstr "Bofya ramani"
 
 #: src/views/GisApp/MapListView/EmptyMapList.tsx
 msgid "No maps yet"
@@ -11212,6 +11434,10 @@ msgstr "Andika taarifa"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useCaseTypeDraftCreation.ts
 msgid "Could not create that case type"
 msgstr "Imeshindwa kuunda aina hiyo ya kesi"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+msgid "No publishers"
+msgstr "Hakuna wachapishaji"
 
 #: src/components/badges/BetaBadge/BetaBadge.tsx
 msgid "Beta"
@@ -11377,6 +11603,10 @@ msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
 msgstr "Pakia faili ya CSV, Excel au PDF, unganisha Google Sheet, au vinjari "
 "katalogi ya data iliyo wazi. Kila kitu kingine katika Avandar hujengwa "
 "kutokana na unacholeta hapa."
+
+#: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
+msgid "km"
+msgstr ""
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
@@ -11569,7 +11799,7 @@ msgstr "Upana wa juu zaidi"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Change location"
-msgstr ""
+msgstr "Badilisha mahali"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Not offline"
@@ -11649,7 +11879,7 @@ msgstr "Anza"
 
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 msgid "Delete place"
-msgstr ""
+msgstr "Futa mahali"
 
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendPositionSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
@@ -11704,7 +11934,7 @@ msgstr "Seti ya data imehifadhiwa, lakini faili yake asili imeshindwa kupakiwa"
 
 #: src/views/GisApp/places/usePlacesActions.ts
 msgid "This place no longer exists. Someone may have deleted it."
-msgstr ""
+msgstr "Mahali hapa hapapo tena. Huenda mtu amepafuta."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapForm.tsx
@@ -11805,7 +12035,7 @@ msgstr "Usemi wa SELECT wa aina \"{exprType}\" hautumiki na fomu."
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceMapTool.tsx
 msgid "Add a place"
-msgstr ""
+msgstr "Ongeza mahali"
 
 #: src/views/GisApp/shell/MapToolCluster/AnnotateMapTool/AnnotateMapToolSubCluster.tsx
 msgid "Draw an annotation area"
@@ -11857,7 +12087,7 @@ msgstr "Aina ya kesi haipatikani"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Save place"
-msgstr ""
+msgstr "Hifadhi mahali"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions.tsx
 msgid "Reactions"
@@ -11866,6 +12096,10 @@ msgstr "Miitikio"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Swap latitude and longitude"
 msgstr "Badilisha latitudo na longitudo"
+
+#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
+msgid "Distance ({unitLabel})"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
@@ -11889,7 +12123,7 @@ msgstr "Wiki"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Place name"
-msgstr ""
+msgstr "Jina la mahali"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "The record keeps its previous assignee. Try again in a moment."

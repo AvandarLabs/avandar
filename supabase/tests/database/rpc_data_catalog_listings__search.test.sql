@@ -28,7 +28,7 @@ values
 -- An unsearched, unfiltered total is the summary's, as of its last refresh.
 select public.data_catalog_facet_counts__refresh();
 
-select plan(13);
+select plan(15);
 
 select bag_eq(
   $$select id from public.rpc_data_catalog_listings__search('zorbleton', 50, 0)$$,
@@ -99,6 +99,49 @@ select results_eq(
     from public.rpc_data_catalog_listings__search('   ', 1, 0)$$,
   $$select count(*) from public.data_catalog_listings$$,
   'a blank query matches every listing'
+);
+
+insert into public.data_catalog_listings
+  (id, display_name, organization1_name, description,
+   parquet_file_name, pipeline_name, pipeline_run_id)
+select
+  ('e9006001-0000-4000-8000-0000000001' || lpad(listing_num::text, 2, '0'))::uuid,
+  'Plain report ' || listing_num,
+  'Fixture Health Department',
+  'zorbleton notes',
+  'search-bulk-' || listing_num || '.parquet',
+  'pgtap-fixture-search',
+  'run-1'
+from
+  generate_series(1, 47) as listing_num;
+
+insert into public.data_catalog_listings
+  (id, display_name, organization1_name, description,
+   parquet_file_name, pipeline_name, pipeline_run_id)
+values
+  ('e9006001-0000-4000-8000-000000000099'::uuid,
+   'zorblaton coverage', 'Fixture Health Department',
+   'bridge work', 'search-similar.parquet', 'pgtap-fixture-search', 'run-1');
+
+select is_empty(
+  $$select id from public.rpc_data_catalog_listings__search('zorbleton', 200, 0)
+    where id = 'e9006001-0000-4000-8000-000000000099'::uuid$$,
+  'a word with a page of whole-word matches leaves out a name that only resembles it'
+);
+
+select ok(
+  exists (
+    select
+      1
+    from
+      pg_indexes
+    where
+      schemaname = 'public' and
+      indexname = 'data_catalog_listings__search_vector_loadable' and
+      indexdef ilike '%is_workspace_loadable%' and
+      indexdef ilike '%is_invalid%'
+  ),
+  'loadable catalog search has its own search index'
 );
 
 select ok(

@@ -314,7 +314,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config single --mo
 # The offline agent on one in-browser model (WebLLM id); needs no API key
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --model Qwen3-4B-q4f16_1-MLC
 
-# A subset: question ids, or a category letter (B, I, H, N, F)
+# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S)
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions H,N11
 ```
 
@@ -465,7 +465,8 @@ has:
 
 A question passes when the final result matches the truth, and, when the
 user asked for a chart, the answer is a chart. Answering in words without
-running a query fails.
+running a query fails, except for a schema question: that passes only as
+prose and fails if a query is shown.
 
 `covid/covidPageQuestions.ts` adds seven page-context questions, P01 to P07,
 for the page-agnostic agent. Each carries a `pageContext`: what the user
@@ -497,6 +498,14 @@ does. They run only with `--questions M`.
 | M04 | Two datasets mentioned | "Compare these" by month |
 | M05 | An unavailable dashboard mentioned | Must run no query, say it cannot see it, and state no numbers |
 | M06 | The Kings County chart mentioned, `Admin2` personal | "Show this by week", keeping `'<value 1>'` |
+
+`covid/covidSchemaQuestions.ts` adds S01 and S02. They ask whether
+`long-us-deaths.csv` and `long-global-deaths.csv` can be appended. The
+columns are already in the prompt, so the reply is prose: the rows cannot
+be stacked as stored, and it names a real difference (a near-match such as
+`Country_Region` and `Country/Region`, or a column only the US file has).
+S02 is "Try again" in the same conversation. Any query shown to the user
+fails the question. They run only with `--questions S`.
 
 ### Metrics
 

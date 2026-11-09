@@ -14,6 +14,9 @@ describe("makeChatTurnSuffixFromOptions", () => {
       "currently in the data explorer",
     );
     expect(unifiedSystemPrefix).toContain('FROM "t0"');
+    expect(unifiedSystemPrefix).toContain(
+      "A question about the schema (which columns a dataset has",
+    );
     expect(unifiedSystemPrefix).not.toContain("dataset ids");
     const suffix = makeChatTurnSuffixFromOptions({
       context: ChatPageContext.createDataExplorerViewContext({

@@ -72,7 +72,10 @@ All under `src/components/layouts/`.
 
 ## The rail
 
-Detail views get a rail. Lists and task flows do not.
+Detail views get a rail. Lists and task flows do not. The case record page
+is the exception: its fields are what someone reads while working the case,
+so they sit in a fixed band above the activity feed instead of a side rail.
+See `SingleIndividualView`.
 
 It holds **reference material**: how a record was made, where its bytes live,
 when it arrived, and the outline of what is in it. This is the answer to
@@ -152,7 +155,7 @@ Structure that labels nothing is noise. Three rules, all live in
   text" tells a user nothing they did not already know.
   - **Exception: a record's fields.** A case type's fields are a schema the
     user defined, so every record is expected to have each one. A blank there
-    is information: the data is missing. The record page's Details rail lists
+    is information: the data is missing. The record page's details band lists
     every field and shows a dimmed "No value" for an empty one, rather than
     dropping the row. See `CaseDetailsRail`.
 

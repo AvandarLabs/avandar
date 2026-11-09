@@ -42,6 +42,15 @@
 }
 
 /*
+ * `noPadding` means no padding, including the trailing padding a fill-height
+ * column otherwise keeps. A view that paints its own regions (the case
+ * record page) uses both so those regions can reach the bottom of the slate.
+ */
+.appViewBodyContentNoPadding.appViewBodyContentFillHeight {
+  padding-bottom: 0;
+}
+
+/*
  * The rail sits on the tinted body surface so the content column stays the
  * only lit region. It scrolls on its own: a fifty-column outline should not
  * drag the record's facts off screen.

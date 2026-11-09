@@ -27,6 +27,7 @@ export function GisAppMapToolCluster({
         layers={app.mapConfig.layers}
         featureCollections={app.layerFeatureCollections}
         requestFitBounds={app.requestFitBounds}
+        onOpenFeatureList={app.openFeatureList}
         placeTool={placeTool}
       />
     </>

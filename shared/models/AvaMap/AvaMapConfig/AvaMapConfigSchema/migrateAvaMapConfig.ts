@@ -20,6 +20,7 @@ import {
   AvaMapConfigV6LayerSchema,
   AvaMapConfigV6Schema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV6Schema.ts";
+import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 // eslint-disable-next-line no-restricted-imports
 import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
@@ -32,6 +33,7 @@ type ConfigV3 = z.infer<typeof AvaMapConfigV3Schema>;
 type ConfigV4 = z.infer<typeof AvaMapConfigV4Schema>;
 type ConfigV5 = z.infer<typeof AvaMapConfigV5Schema>;
 type ConfigV5Layer = ConfigV5["layers"][number];
+type ConfigV6 = z.infer<typeof AvaMapConfigV6Schema>;
 type ConfigV6Layer = z.infer<typeof AvaMapConfigV6LayerSchema>;
 
 /** Migrates one version 1 layer without weakening its sensitivity. */
@@ -174,12 +176,36 @@ function _migrateVersion5Layer(layer: ConfigV5Layer): ConfigV6Layer {
   });
 }
 
-/** Migrates a valid version 5 config into the current persisted shape. */
-function _migrateVersion5(config: ConfigV5): AvaMapConfigRead {
+/** Migrates a valid version 5 config into the version 6 representation. */
+function _migrateVersion5(config: ConfigV5): ConfigV6 {
   return AvaMapConfigV6Schema.parse({
     ...config,
     version: 6,
     layers: config.layers.map(_migrateVersion5Layer),
+  });
+}
+
+/** Adds the version 7 buffer fields: a meters unit and no ring label. */
+function _migrateVersion6GeoBinding(
+  binding: ConfigV6Layer["geoBinding"],
+): unknown {
+  return binding?.type === "bufferOfLayer"
+    ? { ...binding, distanceUnit: "m", labelColumn: undefined }
+    : binding;
+}
+
+/** Migrates a valid version 6 config into the current persisted shape. */
+function _migrateVersion6(config: ConfigV6): AvaMapConfigRead {
+  return AvaMapConfigV7Schema.parse({
+    ...config,
+    version: 7,
+    layers: config.layers.map((layer) => {
+      return {
+        ...layer,
+        geoBinding: _migrateVersion6GeoBinding(layer.geoBinding),
+        spatialFilter: undefined,
+      };
+    }),
     // The cast bridges `PopupConfig.action`, a required `| undefined` field
     // on `MapLayer.T` that `PopupSchema` still infers as an optional key.
   }) as AvaMapConfigRead;
@@ -189,30 +215,29 @@ function _migrateVersion5(config: ConfigV5): AvaMapConfigRead {
 export const migrateAvaMapConfig = {
   /** Migrates a valid version 1 config into the current representation. */
   fromV1: (config: ConfigV1): AvaMapConfigRead => {
-    return _migrateVersion5(
-      _migrateVersion4(
-        _migrateVersion3(_migrateVersion2(_migrateVersion1(config))),
-      ),
-    );
+    return migrateAvaMapConfig.fromV2(_migrateVersion1(config));
   },
 
   /** Migrates a valid version 2 config into the current representation. */
   fromV2: (config: ConfigV2): AvaMapConfigRead => {
-    return _migrateVersion5(
-      _migrateVersion4(_migrateVersion3(_migrateVersion2(config))),
-    );
+    return migrateAvaMapConfig.fromV3(_migrateVersion2(config));
   },
 
   /** Migrates a valid version 3 config into the current representation. */
   fromV3: (config: ConfigV3): AvaMapConfigRead => {
-    return _migrateVersion5(_migrateVersion4(_migrateVersion3(config)));
+    return migrateAvaMapConfig.fromV4(_migrateVersion3(config));
   },
 
   /** Migrates a valid version 4 config into the current representation. */
   fromV4: (config: ConfigV4): AvaMapConfigRead => {
-    return _migrateVersion5(_migrateVersion4(config));
+    return migrateAvaMapConfig.fromV5(_migrateVersion4(config));
   },
 
   /** Migrates a valid version 5 config into the current representation. */
-  fromV5: _migrateVersion5,
+  fromV5: (config: ConfigV5): AvaMapConfigRead => {
+    return migrateAvaMapConfig.fromV6(_migrateVersion5(config));
+  },
+
+  /** Migrates a valid version 6 config into the current representation. */
+  fromV6: _migrateVersion6,
 };

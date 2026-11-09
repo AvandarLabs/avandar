@@ -26,6 +26,7 @@ type Props = {
   onDuplicateLayer: (layerId: MapLayer.Id) => void;
   onZoomToLayer: (layerId: MapLayer.Id) => void;
   onDeleteLayer: (layerId: MapLayer.Id) => void;
+  onOpenFeatureList?: (layerId: MapLayer.Id) => void;
 };
 
 function _noopMove(_offset: -1 | 1): void {
@@ -50,6 +51,7 @@ export function LayerList({
   onDuplicateLayer,
   onZoomToLayer,
   onDeleteLayer,
+  onOpenFeatureList,
 }: Props): ReactNode {
   const { t } = useLingui();
   const rowIds = rows.map(prop("id"));
@@ -79,6 +81,7 @@ export function LayerList({
       onDuplicateLayer={onDuplicateLayer}
       onZoomToLayer={onZoomToLayer}
       onDeleteLayer={onDeleteLayer}
+      onOpenFeatureList={onOpenFeatureList}
     />
   );
 }

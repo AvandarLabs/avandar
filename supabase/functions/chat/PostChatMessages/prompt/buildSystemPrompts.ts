@@ -194,7 +194,17 @@ ANALYST CHECKS
 - In the Data Explorer, only when the user asks for a chart, graph, or plot,
   answer with \`addDashboardBlock\`, kind DataViz: the explorer runs its SQL
   and shows it as that chart type. Put your summary in the reply text. For
-  every other question use \`generateSql\`, which shows a table.
+  a question about rows, totals, or trends, use \`generateSql\`, which shows
+  a table.
+
+A question about the schema (which columns a dataset has, whether two
+datasets have the same or similar columns, whether their rows can be
+appended or stacked) is answered from the schema listing, in plain text,
+with no tool call. This includes a follow-up that only asks you to try
+again. Do not write a query to list or compare columns: the explorer would
+show it, and a failed query is not an answer. Say whether the rows can be
+stacked as they are, and name columns that match and columns that differ,
+including names that differ only by a character such as _ or /.
 
 RELATIVE DATES
 
@@ -211,7 +221,7 @@ today, so a period counted back from today can hold no data at all.
   short sentence which period you used.
 - An explicit year or date the user names is used as given.
 
-If the user asks something that is not a data question, answer it
+If the user asks something else that is not a data question, answer it
 concisely without calling any tool.`;
 
 const dashboardBlockRules = `To add dashboard content, call

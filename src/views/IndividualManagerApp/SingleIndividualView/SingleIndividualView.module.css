@@ -1,8 +1,59 @@
 /*
- * AppViewBody's gutter on every side but the bottom. The feed's composer
- * docks to the bottom of the scroller, so bottom padding would leave a band
- * of empty space under it.
+ * One column that fills the view. Details stay put in their own band. The
+ * activity feed scrolls underneath that band, so reading a long update never
+ * moves the case's fields off screen.
  */
-.content {
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/*
+ * A fixed slice of the view, tall enough to read several fields, short
+ * enough that the activity feed keeps the rest. Extra fields scroll inside
+ * the band.
+ */
+.detailsBand {
+  border-bottom: 1px solid var(--ava-border-default);
+  flex: 0 0 auto;
+  height: 15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--mantine-spacing-lg) var(--mantine-spacing-lg)
+    var(--mantine-spacing-md);
+  scrollbar-width: thin;
+}
+
+/*
+ * The fact track is sized for a narrow rail. In this band the same facts
+ * span the content width, so a label stays on one line and the value keeps
+ * the rest of the row.
+ */
+.detailsBand dl {
+  gap: var(--mantine-spacing-xs);
+}
+
+.detailsBand dl:empty {
+  display: none;
+}
+
+.detailsBand dl > div {
+  column-gap: var(--mantine-spacing-lg);
+  grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr);
+}
+
+.detailsBand dd {
+  overflow-wrap: break-word;
+}
+
+.activityPane {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--mantine-spacing-lg) var(--mantine-spacing-lg) 0;
+  scrollbar-width: thin;
 }

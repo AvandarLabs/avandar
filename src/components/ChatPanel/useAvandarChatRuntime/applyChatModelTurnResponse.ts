@@ -20,6 +20,7 @@ import {
   reviewGeneratedSqlAssumptions,
 } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError } from "@/utils/notifications/notify";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
@@ -168,7 +169,14 @@ export async function applyChatModelTurnResponse(
   const options = explorerResponse
     ? { ...rawOptions, response: explorerResponse.response }
     : rawOptions;
-  const generatedSql = options.response.generatedSql?.sql;
+  const userTexts = options.apiMessages.flatMap((message) => {
+    return message.role === "user" ? [message.content] : [];
+  });
+  // A column question is answered from the schema. Applying its SQL paints
+  // a failed query on the explorer beside a reply that did not need one.
+  const generatedSql = isSchemaAnswerTurn(userTexts)
+    ? undefined
+    : options.response.generatedSql?.sql;
   const sqlApplied = generatedSql
     ? await reviewAndApplySql({ ...options, sql: generatedSql })
     : false;

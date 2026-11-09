@@ -29,6 +29,11 @@ export type DataAgentRunState = {
   isWaitingForUser: boolean;
   /** Stored data values that were sent to the model (matched or picked). */
   valuesSentToModel: string[];
+  /**
+   * User texts of this conversation, oldest first. A query tool reads them
+   * to tell a column question from a question about rows.
+   */
+  userTexts: string[];
 };
 
 /** A fresh run state for a new user message. */
@@ -39,5 +44,20 @@ export function createDataAgentRunState(): DataAgentRunState {
     questions: [],
     isWaitingForUser: false,
     valuesSentToModel: [],
+    userTexts: [],
+  };
+}
+
+/**
+ * The run state for one new user message. Query bookkeeping starts over.
+ * Earlier user texts stay, so a retry of a column question is still one.
+ */
+export function beginDataAgentRun(
+  previous: DataAgentRunState,
+  message: string,
+): DataAgentRunState {
+  return {
+    ...createDataAgentRunState(),
+    userTexts: [...previous.userTexts, message],
   };
 }
