@@ -10,6 +10,13 @@
  * wait for each other.
  */
 create or replace function public.data_catalog_facet_counts__refresh () returns void as $$
+declare
+  -- The windows' dates, read once: checking each listing with
+  -- `data_catalog_listings__is_updated_within` calls a function per listing
+  -- and window, which made a refresh of the demo catalog take 20s, not 2s.
+  v_past_month_start timestamptz := lower(public.data_catalog_listings__updated_window ('past_month'));
+  v_past_year_start timestamptz := lower(public.data_catalog_listings__updated_window ('past_year'));
+  v_over_a_year_end timestamptz := upper(public.data_catalog_listings__updated_window ('over_a_year'));
 begin
   lock table public.data_catalog_facet_counts in exclusive mode;
 
@@ -63,30 +70,30 @@ begin
         ) as num_loadable,
         count(*) filter (
           where
-            public.data_catalog_listings__is_updated_within (listing.last_updated_at, 'past_month')
+            listing.last_updated_at >= v_past_month_start
         ) as num_past_month,
         count(*) filter (
           where
             listing.is_loadable and
-            public.data_catalog_listings__is_updated_within (listing.last_updated_at, 'past_month')
+            listing.last_updated_at >= v_past_month_start
         ) as num_loadable_past_month,
         count(*) filter (
           where
-            public.data_catalog_listings__is_updated_within (listing.last_updated_at, 'past_year')
+            listing.last_updated_at >= v_past_year_start
         ) as num_past_year,
         count(*) filter (
           where
             listing.is_loadable and
-            public.data_catalog_listings__is_updated_within (listing.last_updated_at, 'past_year')
+            listing.last_updated_at >= v_past_year_start
         ) as num_loadable_past_year,
         count(*) filter (
           where
-            public.data_catalog_listings__is_updated_within (listing.last_updated_at, 'over_a_year')
+            listing.last_updated_at < v_over_a_year_end
         ) as num_over_a_year,
         count(*) filter (
           where
             listing.is_loadable and
-            public.data_catalog_listings__is_updated_within (listing.last_updated_at, 'over_a_year')
+            listing.last_updated_at < v_over_a_year_end
         ) as num_loadable_over_a_year
       from
         listing
