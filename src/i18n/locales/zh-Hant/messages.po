@@ -1312,7 +1312,7 @@ msgstr "工作表"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "{formattedNumResults}+ 個（共 {formattedNumCatalogListings} 個資料集）"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -5349,7 +5349,7 @@ msgstr "取代 URL"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ datasets"
-msgstr ""
+msgstr "{formattedNumResults}+ 個資料集"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts

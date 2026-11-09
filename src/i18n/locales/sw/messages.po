@@ -1365,7 +1365,8 @@ msgstr "Laha"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "seti data zaidi ya {formattedNumResults} kati ya "
+"{formattedNumCatalogListings}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -5545,7 +5546,7 @@ msgstr "Badilisha URL"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ datasets"
-msgstr ""
+msgstr "seti data zaidi ya {formattedNumResults}"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts

@@ -1346,7 +1346,8 @@ msgstr "ورقة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr ""
+msgstr "أكثر من {formattedNumResults} من أصل {formattedNumCatalogListings} "
+"مجموعة بيانات"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -5478,7 +5479,7 @@ msgstr "استبدال عنوان URL"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "{formattedNumResults}+ datasets"
-msgstr ""
+msgstr "أكثر من {formattedNumResults} مجموعة بيانات"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
