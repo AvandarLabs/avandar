@@ -184,8 +184,11 @@ export function BufferMapToolPopover({
       shadow="md"
       withinPortal
       transitionProps={{ duration: 0 }}
-      // The tool cluster floats over the map and never scrolls away, so
-      // there is no detached state to hide the dropdown for.
+      trapFocus
+      // Mantine hides a dropdown whose anchor reports zero size. Under
+      // happy-dom every anchor does, so the unit tests could not see the
+      // form. The tool cluster floats over the map and never scrolls away,
+      // so a real browser never needs the detached state either.
       hideDetached={false}
     >
       <Popover.Target>

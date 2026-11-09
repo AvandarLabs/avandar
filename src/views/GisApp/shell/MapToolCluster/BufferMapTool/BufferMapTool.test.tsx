@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { BufferMapTool } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -77,6 +77,20 @@ function _createLatLngLayer(name: string): MapLayer.T {
       type: "latLngColumns",
       latitude: uuid<QueryColumn.Id>(),
       longitude: uuid<QueryColumn.Id>(),
+    },
+  };
+}
+
+function _makeBufferOf(source: MapLayer.T): MapLayer.T {
+  return {
+    ...MapLayer.createArea(`Buffer of ${source.name}`),
+    geoBinding: {
+      type: "bufferOfLayer",
+      layerId: source.id,
+      distanceMeters: 805,
+      distanceUnit: "mi",
+      labelColumn: undefined,
+      dissolve: false,
     },
   };
 }
@@ -333,5 +347,64 @@ describe("BufferMapTool", () => {
       "aria-controls",
       screen.getByRole("dialog").id,
     );
+  });
+
+  it("says so when no layer can be filtered by the new buffer", async () => {
+    spatialAvailability.value = "available";
+    const schools = _createLatLngLayer("Schools");
+    const schoolsBuffer = _makeBufferOf(schools);
+    const sites: MapLayer.T = {
+      ..._createLatLngLayer("Sites"),
+      spatialFilter: { layerId: schoolsBuffer.id },
+    };
+    const sitesBuffer = _makeBufferOf(sites);
+    render(
+      <BufferMapTool
+        selectedLayer={sites}
+        layers={[sites, sitesBuffer, schools, schoolsBuffer]}
+        onBufferConfirm={() => {
+          return sitesBuffer.id;
+        }}
+      />,
+    );
+
+    await _openBufferForm();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(
+      screen.getByText("No layer can be filtered by this buffer."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("combobox", {
+        name: "Filter another layer by this buffer",
+      }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Done" })).toHaveFocus();
+  });
+
+  it("announces the new buffer and keeps focus in the popover", async () => {
+    spatialAvailability.value = "available";
+    const sites = _createLatLngLayer("Sites");
+    const schools = _createLatLngLayer("Schools");
+    const buffer = _makeBufferOf(sites);
+    render(
+      <BufferMapTool
+        selectedLayer={sites}
+        layers={[sites, buffer, schools]}
+        onBufferConfirm={() => {
+          return buffer.id;
+        }}
+      />,
+    );
+
+    await _openBufferForm();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Buffer added.");
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toContainElement(
+        document.activeElement as HTMLElement,
+      );
+    });
   });
 });
