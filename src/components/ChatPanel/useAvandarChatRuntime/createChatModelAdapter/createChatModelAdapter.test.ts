@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
+import { OfflineAnswerMessage } from "@/components/ChatPanel/OfflineAnswerMessage/OfflineAnswerMessage";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
@@ -11,7 +12,7 @@ import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { CreateChatModelAdapterOptions } from "./createChatModelAdapter";
-import type { ChatModelAdapter } from "@assistant-ui/react";
+import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 
 const {
   apiPostMock,
@@ -266,9 +267,11 @@ describe("createChatModelAdapter", () => {
 
     const result = await _ask(_createAdapter("data-explorer"));
 
-    expect(result).toEqual({
-      content: [{ type: "text", text: "offline agent reply" }],
-    });
+    expect(result).toEqual(
+      OfflineAnswerMessage.mark({
+        content: [{ type: "text", text: "offline agent reply" }],
+      }),
+    );
     expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
     expect(apiPostMock).not.toHaveBeenCalled();
   });
@@ -278,9 +281,11 @@ describe("createChatModelAdapter", () => {
 
     const result = await _ask(_createAdapter("dashboards"));
 
-    expect(result).toEqual({
-      content: [{ type: "text", text: "offline pipeline reply" }],
-    });
+    expect(result).toEqual(
+      OfflineAnswerMessage.mark({
+        content: [{ type: "text", text: "offline pipeline reply" }],
+      }),
+    );
     expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
     expect(apiPostMock).not.toHaveBeenCalled();
   });
@@ -300,9 +305,11 @@ describe("createChatModelAdapter", () => {
 
     const result = await _ask(_createAdapter("data-explorer"));
 
-    expect(result).toEqual({
-      content: [{ type: "text", text: OFFLINE_MODEL_REQUIRED }],
-    });
+    expect(result).toEqual(
+      OfflineAnswerMessage.mark({
+        content: [{ type: "text", text: OFFLINE_MODEL_REQUIRED }],
+      }),
+    );
     expect(apiPostMock).not.toHaveBeenCalled();
     expect(runOfflineDataAgentTurnMock).not.toHaveBeenCalled();
   });
@@ -419,9 +426,11 @@ describe("createChatModelAdapter with the agent on", () => {
 
     expect(offerOfflineFallbackMock).toHaveBeenCalledTimes(1);
     expect(runOfflineDataAgentTurnMock).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({
-      content: [{ type: "text", text: "offline agent reply" }],
-    });
+    expect(result).toEqual(
+      OfflineAnswerMessage.mark({
+        content: [{ type: "text", text: "offline agent reply" }],
+      }),
+    );
   });
 
   it("says it could not answer when the offline offer is declined", async () => {
@@ -1020,7 +1029,7 @@ describe("createChatModelAdapter offline reply privacy leaks", () => {
           content: [
             { type: "text", text: '"Visits by Jane Doe" has two rows.' },
           ],
-          metadata: {},
+          metadata: OfflineAnswerMessage.mark({}).metadata,
         },
         {
           role: "user",
@@ -1032,5 +1041,239 @@ describe("createChatModelAdapter offline reply privacy leaks", () => {
 
     const sent = JSON.stringify(apiPostMock.mock.calls[0]![0].body);
     expect(sent).not.toContain("Jane");
+  });
+});
+
+/*
+ * Written by the third 1B privacy review. `replaceGadgetNames` swaps only a
+ * gadget's exact current name, and only when this turn loaded it. An
+ * offline reply that quotes part of the name, the name before a rename, or
+ * any name on a turn whose load failed still reaches today's chat.
+ */
+describe("createChatModelAdapter offline reply name scrub bypasses", () => {
+  const PERSONAL_TILE = {
+    kind: "dashboard_tile",
+    ref: PERSONAL_TILE_REF,
+    dashboardName: "Clinic",
+    tile: {
+      title: "Visits by Jane Doe",
+      chartType: "bar",
+      sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
+    },
+  } satisfies AgentGadgetContext;
+
+  async function _postAfterOfflineReply(reply: string): Promise<string> {
+    await _createAdapter("dashboards").run({
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: `Who is in ${PERSONAL_TILE_TOKEN}?` },
+          ],
+          metadata: {},
+        },
+        {
+          // Stored with the offline answer mark, as an offline turn makes it.
+          role: "assistant",
+          content: [{ type: "text", text: reply }],
+          metadata: OfflineAnswerMessage.mark({}).metadata,
+        },
+        {
+          role: "user",
+          content: [{ type: "text", text: "And in total?" }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+    return JSON.stringify(apiPostMock.mock.calls[0]![0].body);
+  }
+
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    isAgentEnabledMock.mockReturnValue(false);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    detectBiasMock.mockReset().mockReturnValue({ hits: [] });
+    loadGadgetsMock
+      .mockReset()
+      .mockResolvedValue(
+        new Map([
+          [ChatMentionToken.buildRefKey(PERSONAL_TILE_REF), PERSONAL_TILE],
+        ]),
+      );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it("never posts part of a mention's name that an offline reply quoted", async () => {
+    const sent = await _postAfterOfflineReply("Jane Doe had two visits.");
+
+    expect(sent).not.toContain("Jane");
+  });
+
+  it("never posts a quoted name split across lines", async () => {
+    const sent = await _postAfterOfflineReply(
+      'The chart "Visits by\nJane Doe" has two rows.',
+    );
+
+    expect(sent).not.toContain("Jane");
+  });
+
+  it("never posts a quoted name when this turn's gadget load failed", async () => {
+    loadGadgetsMock.mockRejectedValue(new Error("network"));
+
+    const sent = await _postAfterOfflineReply(
+      '"Visits by Jane Doe" has two rows.',
+    );
+
+    expect(sent).not.toContain("Jane");
+  });
+
+  it("never posts a name the offline reply quoted before the chart was renamed", async () => {
+    loadGadgetsMock.mockResolvedValue(
+      new Map([
+        [
+          ChatMentionToken.buildRefKey(PERSONAL_TILE_REF),
+          {
+            ...PERSONAL_TILE,
+            tile: { ...PERSONAL_TILE.tile, title: "Weekly visits" },
+          },
+        ],
+      ]),
+    );
+
+    const sent = await _postAfterOfflineReply(
+      '"Visits by Jane Doe" has two rows.',
+    );
+
+    expect(sent).not.toContain("Jane");
+  });
+});
+
+describe("createChatModelAdapter offline answers in hosted requests", () => {
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    OfflineModeStore.setOn(false);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    runDataAgentTurnMock.mockReset().mockResolvedValue({
+      content: [{ type: "text", text: "agent reply" }],
+    });
+    runOfflineChatTurnMock
+      .mockReset()
+      .mockResolvedValue({ assistantText: "Jane Doe had two visits." });
+    detectBiasMock.mockReset().mockReturnValue({ hits: [] });
+    loadGadgetsMock.mockReset().mockResolvedValue(new Map());
+    LocalChatModel.getModelIdsFromBundle(LocalChatModel.OFFLINE_BUNDLE).forEach(
+      LocalChatModelStore.markDownloaded,
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  /** A thread whose middle reply is `reply`, stored with `metadata`. */
+  function _threadWithReply(
+    metadata: Record<string, unknown>,
+  ): Parameters<ChatModelAdapter["run"]>[0] {
+    return {
+      messages: [
+        {
+          role: "user",
+          content: [{ type: "text", text: "Who called?" }],
+          metadata: {},
+        },
+        {
+          role: "assistant",
+          content: [{ type: "text", text: "jane.doe@example.com called." }],
+          metadata,
+        },
+        {
+          role: "user",
+          content: [{ type: "text", text: "And in total?" }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0];
+  }
+
+  it("marks the answer an offline turn produces", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+    OfflineModeStore.setOn(true);
+
+    const result = (await _createAdapter("dashboards").run(
+      _threadWithReply({}),
+    )) as ChatModelRunResult;
+
+    expect(OfflineAnswerMessage.isOfflineAnswer(result.metadata)).toBe(true);
+  });
+
+  it("does not mark a hosted answer", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    const result = (await _createAdapter("dashboards").run(
+      _threadWithReply({}),
+    )) as ChatModelRunResult;
+
+    expect(OfflineAnswerMessage.isOfflineAnswer(result.metadata)).toBe(false);
+  });
+
+  it("hands the agent's recap the fixed line for an offline answer", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    await _createAdapter("dashboards").run(
+      _threadWithReply({ custom: { isOfflineAnswer: true } }),
+    );
+
+    const turn = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(turn.apiMessages[1].content).toBe(
+      OfflineAnswerMessage.hostedContent,
+    );
+    expect(JSON.stringify(turn.apiMessages)).not.toContain("jane.doe");
+  });
+
+  it("posts today's chat the fixed line for an offline answer", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    await _createAdapter("dashboards").run(
+      _threadWithReply({ custom: { isOfflineAnswer: true } }),
+    );
+
+    const body = apiPostMock.mock.calls[0]![0].body;
+    expect(body.messages[1].content).toBe(OfflineAnswerMessage.hostedContent);
+    expect(JSON.stringify(body)).not.toContain("jane.doe");
+  });
+
+  it("lets an offline turn read its own earlier answer", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+    OfflineModeStore.setOn(true);
+
+    await _createAdapter("dashboards").run(
+      _threadWithReply({ custom: { isOfflineAnswer: true } }),
+    );
+
+    const offline = runOfflineChatTurnMock.mock.calls[0]![0];
+    expect(offline.messages[1].content).toBe("jane.doe@example.com called.");
+  });
+
+  it("keeps an unmarked hosted answer as written", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    await _createAdapter("dashboards").run(_threadWithReply({}));
+
+    expect(apiPostMock.mock.calls[0]![0].body.messages[1].content).toBe(
+      "jane.doe@example.com called.",
+    );
   });
 });

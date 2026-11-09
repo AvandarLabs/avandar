@@ -4,12 +4,9 @@ import {
   getUnavailableGadgetName,
 } from "$/agent/mentions/AgentGadgetContext";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
-import { replaceGadgetNames } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/replaceGadgetNames";
-import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { AgentGadgetContextLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/createAgentGadgetContextLoader";
-import type { GadgetNameReplacement } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/replaceGadgetNames";
 import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 
 /** The refs a thread's user messages mention, in order. */
@@ -119,75 +116,14 @@ export function toLocalModelMessages(
 }
 
 /**
- * Each loaded gadget's real names (its own name or title, and a tile's
- * dashboard name) with the text `rename` gives them. Unavailable gadgets
- * have no real name.
- */
-export function buildGadgetNameReplacements(
-  gadgetContext: AgentTurnGadgetContext | undefined,
-  rename: (
-    context: AgentGadgetContext,
-    name: Readonly<{ text: string; isDashboardOfTile: boolean }>,
-  ) => string,
-): GadgetNameReplacement[] {
-  return [...(gadgetContext?.contexts?.values() ?? [])].flatMap((context) => {
-    if (context.kind === "unavailable") {
-      return [];
-    }
-    const own = getAgentGadgetName(context);
-    const ownName = {
-      name: own,
-      replacement: rename(context, { text: own, isDashboardOfTile: false }),
-    };
-    if (context.kind !== "dashboard_tile") {
-      return [ownName];
-    }
-    const dashboardName = {
-      name: context.dashboardName,
-      replacement: rename(context, {
-        text: context.dashboardName,
-        isDashboardOfTile: true,
-      }),
-    };
-    return [ownName, dashboardName];
-  });
-}
-
-/**
  * The thread as today's hosted chat receives it: each mention named by its
- * type only, such as `@"a chart"`, and each loaded gadget's real name in an
- * assistant reply (an offline reply may quote one) replaced by its type the
- * same way. Today's chat has no vault to mask names with, so it never gets
- * a real name, a token, or an id. The loaded gadgets are read only to find
- * their names.
+ * type only, such as `@"a chart"`. Today's chat has no vault to mask names
+ * with, so it takes no loaded context and can never get a real name, a
+ * token, or an id. Offline answers, which read real names, are hidden
+ * before this, where the thread is read.
  */
 export function toHostedChatMessages(
   apiMessages: readonly ChatClientMessage.T[],
-  gadgetContext: AgentTurnGadgetContext | undefined,
 ): readonly ChatClientMessage.T[] {
-  const replacements = buildGadgetNameReplacements(
-    gadgetContext,
-    (context, name) => {
-      return name.isDashboardOfTile
-        ? getGadgetTypeName({ ...context.ref, gadgetType: "dashboard" })
-        : getGadgetTypeName(context.ref);
-    },
-  );
-  return apiMessages.map((message) => {
-    if (message.role === "user") {
-      return {
-        ...message,
-        content: ChatMentionToken.toModelText(
-          message.content,
-          getGadgetTypeName,
-        ),
-      };
-    }
-    return replacements.length > 0
-      ? {
-          ...message,
-          content: replaceGadgetNames(message.content, replacements),
-        }
-      : message;
-  });
+  return _nameUserMessageTokens(apiMessages, getGadgetTypeName);
 }
