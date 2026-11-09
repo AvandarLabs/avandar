@@ -134,4 +134,15 @@ describe("FeatureInspector", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Feature" })).toBeInTheDocument();
   });
+
+  it("offers a way back to the feature list it replaced, and invokes it", () => {
+    const onBackToList = vi.fn();
+    _renderInspector({ feature: FEATURE, cluster: undefined, onBackToList });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Back to the feature list" }),
+    );
+
+    expect(onBackToList).toHaveBeenCalledOnce();
+  });
 });

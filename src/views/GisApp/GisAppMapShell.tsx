@@ -150,7 +150,11 @@ export function GisAppMapShell({ app }: Props): ReactNode {
       furnitureBar={<GisAppFurnitureBar app={app} />}
       featureDrawer={
         <>
-          <GisAppFeatureListDrawer app={app} canvasRef={mapSurfaceRef} />
+          {/* A feature opened over a list takes the list's slot rather than
+              stacking under it, and offers the way back. */}
+          {app.isInspectorOpen ? null : (
+            <GisAppFeatureListDrawer app={app} canvasRef={mapSurfaceRef} />
+          )}
           <FeatureInspector
             opened={app.isInspectorOpen}
             onClose={app.closeInspector}
@@ -161,6 +165,7 @@ export function GisAppMapShell({ app }: Props): ReactNode {
             mapRef={app.mapInstance.mapRef}
             onRowClick={app.onRowClick}
             onBackToTable={app.onBackToTable}
+            onBackToList={isFeatureListOpen ? app.closeInspector : undefined}
           />
           <ExportSheet
             opened={isExportOpen}

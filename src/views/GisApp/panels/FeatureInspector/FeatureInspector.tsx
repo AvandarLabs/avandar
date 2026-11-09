@@ -31,11 +31,18 @@ type Props = {
 
   /** The layer the feature or cluster came from, source of its popup config. */
   layer: MapLayer.T | undefined;
+
+  /**
+   * Returns to the feature list this drawer replaced. Set while a list is
+   * open, since the two share the drawer slot under the map.
+   */
+  onBackToList?: () => void;
 };
 
 /**
  * Shows a cluster's member features as a table, or one selected feature's
- * fields. A feature reached by drilling into the table can return to it.
+ * fields. A feature reached by drilling into the table can return to it, and
+ * one opened over a feature list can return to the list.
  */
 export function FeatureInspector({
   opened,
@@ -47,6 +54,7 @@ export function FeatureInspector({
   mapRef,
   onRowClick,
   onBackToTable,
+  onBackToList,
 }: Props): ReactNode {
   const { t } = useLingui();
   const popup = layer?.popup;
@@ -85,6 +93,17 @@ export function FeatureInspector({
                   style={{ alignSelf: "flex-start" }}
                 >
                   {t`Back to results`}
+                </Button>
+              ) : null}
+              {onBackToList && !showBackToTable ? (
+                <Button
+                  variant="subtle"
+                  size="xs"
+                  leftSection={<IconArrowLeft size={14} aria-hidden />}
+                  onClick={onBackToList}
+                  className={css.featureInspectorBackButton}
+                >
+                  {t`Back to the feature list`}
                 </Button>
               ) : null}
               <FeatureFields properties={properties} />
