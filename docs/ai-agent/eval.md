@@ -183,6 +183,18 @@ column and fixed large ids (D39). Runs archived under the
   rerun; N04 left out zero-death countries, as it does on some runs.
 - The second review's runs cost $0.048.
 
+Then the page block named the open dataset before its alias
+(`"Response cases" (query it as t0)`), prompt v2 said never to show the
+user an alias such as `t0`, and view-change lines stopped carrying a
+case's id. Runs archived under the `phase-1a-fixes` label.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| phase-1a-fixes:agent-page (P01-P07) | 7/7 | 0 / 0 | $0.00036 | 3,280 | 1.9 s / 2.5 s |
+| phase-1a-fixes:agent-45 | 45/45 | 0 / 0 | $0.00028 | 3,232 | 2.2 s / 3.3 s |
+
+- No reply in either run named a table alias. Both runs cost $0.015.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -551,7 +563,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 110 runs (every
+chat index lists all 112 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

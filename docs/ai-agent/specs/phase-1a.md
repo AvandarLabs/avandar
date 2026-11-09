@@ -96,7 +96,9 @@ from the page.
 app and route, then what is open:
 
 - **Data Explorer:** the open dataset, and the current SQL (cut at 1,500
-  characters) with its result columns.
+  characters) with its result columns. The dataset's name comes first and
+  its alias follows as a note for SQL: `Open dataset: "Response cases"
+  (query it as t0)`.
 - **Dashboard:** the dashboard's name and its tiles in page order, at most
   12, each with title, chart type, and SQL (cut at 1,500 characters). A
   title that looks like personal data, and personal values in the SQL, are
@@ -131,6 +133,8 @@ block:
 - SQL ending in "..." was cut. Do not copy it as if it were complete.
 - A quoted `'<value N>'` in page SQL is a value hidden for privacy. Keep it
   exactly as written; the device fills it in before the query runs.
+- Never show the user the tag or a table alias such as `t0`; call datasets
+  by their names.
 
 ## One turn
 
@@ -212,6 +216,7 @@ the adapter. A stopped run (`aborted`) is not a failure.
 | Dashboard tiles: title, chart type, SQL | At most 12 tiles, in page order, each SQL cut at 1,500 characters. A title the browser's PII check flags (`isPersonalDataText`, built on `detectPii`) becomes "Untitled chart". |
 | Literals in page SQL | Strings and numbers in any expression that reads a personal column or an alias, `VALUES` literals, strings whose value looks personal, and every literal in SQL that cannot be parsed become `'<value N>'`. Comments are dropped. Values the SQL revealed are masked in titles, page names, and result columns, and in whatever comes back from a query (D39, [phase-1a-redaction.md](phase-1a-redaction.md)). The browser keeps the map per conversation and restores the values before the agent's SQL runs; the model never receives it. Other literals, such as `'Texas'`, are sent as written. The eval renders blocks the same way. |
 | An open case | The case type name and "one case is open" only. Never the case's name or field values. |
+| Hidden `[View changed: ...]` thread lines (today's chat requests and the agent's recap) | App, route, open dataset id, and dashboard id. A case page's route keeps the case type id and writes the case's id as `<case>`. `ChatViewEvent.format` writes it that way, and the chat adapter rewrites older stored lines the same way before any request. |
 | Rows | Never. |
 
 Page text is escaped and marked as data, so a name or SQL string cannot give
