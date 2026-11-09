@@ -93,6 +93,7 @@ export function MapToolClusterToolbar({
         layers={layers}
         featureCollections={featureCollections}
         requestFitBounds={requestFitBounds}
+        onAddPlaceAt={placeTool?.state.onPlacePicked}
       />
     </div>
   );

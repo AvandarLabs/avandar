@@ -164,4 +164,38 @@ describe("GoToMapTool", () => {
       [2, 2],
     ]);
   });
+  it("offers to add a place at a coordinate it flew to", () => {
+    const onAddPlaceAt = vi.fn();
+    render(
+      <GoToMapTool requestFitBounds={vi.fn()} onAddPlaceAt={onAddPlaceAt} />,
+    );
+
+    _submitGoTo("40.7603, -73.9885");
+    fireEvent.click(screen.getByRole("button", { name: "Add a place here" }));
+
+    expect(onAddPlaceAt).toHaveBeenCalledWith({
+      latitude: 40.7603,
+      longitude: -73.9885,
+    });
+  });
+
+  it("offers no place before a coordinate is found", () => {
+    render(<GoToMapTool requestFitBounds={vi.fn()} onAddPlaceAt={vi.fn()} />);
+
+    _submitGoTo("200, 200");
+
+    expect(
+      screen.queryByRole("button", { name: "Add a place here" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers no place where places cannot be added", () => {
+    render(<GoToMapTool requestFitBounds={vi.fn()} />);
+
+    _submitGoTo("40.7603, -73.9885");
+
+    expect(
+      screen.queryByRole("button", { name: "Add a place here" }),
+    ).not.toBeInTheDocument();
+  });
 });
