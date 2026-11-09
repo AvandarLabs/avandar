@@ -34,5 +34,18 @@
   "viz.ratePlot.sort.label": "Label",
   "viz.ratePlot.rateText": "{rate, number}",
   "viz.ratePlot.intervalText": "{rate, number} ({lower, number}–{upper, number})",
-  "viz.ratePlot.empty": "No rows have a numeric rate to plot."
+  "viz.ratePlot.empty": "No rows have a numeric rate to plot.",
+  "incidence.description": "Adds three columns: the rate, and the lower and upper limits of its 95% confidence interval.",
+  "incidence.casesColumn": "Cases column",
+  "incidence.population": "Population",
+  "incidence.population.column": "Column",
+  "incidence.population.fixed": "Fixed number",
+  "incidence.populationColumn": "Population column",
+  "incidence.populationSize": "Population size",
+  "incidence.base": "Rate per",
+  "incidence.base.option": "{base, number}",
+  "incidence.add": "Add columns",
+  "incidence.noNumericColumns": "This command needs a numeric column of case counts.",
+  "incidence.unavailable": "Columns can be added only to a query result in the Data Explorer. Run a query there, then try again.",
+  "incidence.failed": "Could not add the columns: {message}"
 }
