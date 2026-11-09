@@ -30,9 +30,16 @@
 .mapViewerPopup {
   inset-block-start: var(--mantine-spacing-sm);
   inset-inline-start: var(--mantine-spacing-sm);
+  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm));
   max-inline-size: 280px;
+  overflow: auto;
   position: absolute;
   z-index: 2;
+}
+
+/* Keeps the attribution and disclaimer off the block's edge. */
+.mapViewerFurniture {
+  padding-inline: var(--mantine-spacing-xs);
 }
 
 .mapViewerPopupRow {

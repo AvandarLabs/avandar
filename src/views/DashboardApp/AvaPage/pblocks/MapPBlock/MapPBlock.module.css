@@ -7,3 +7,8 @@
   justify-content: center;
   padding: var(--mantine-spacing-md);
 }
+
+/* Keeps the authoring note off the block's edge. */
+.mapPBlockNote {
+  padding-inline: var(--mantine-spacing-xs);
+}

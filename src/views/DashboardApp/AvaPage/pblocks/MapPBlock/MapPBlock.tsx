@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { createMapViewerSourceFromMetadata } from "@/views/DashboardApp/AvaPage/pblocks/MapPBlock/createMapViewerSourceFromMetadata/createMapViewerSourceFromMetadata";
+import css from "@/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock.module.css";
 import { MapPBlockEmptyState } from "@/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlockEmptyState";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { MapViewer } from "@/views/GisApp/MapViewer/MapViewer";
@@ -43,7 +44,7 @@ export function MapPBlock(
         />
       )}
       {props.puck.isEditing ? (
-        <Text size="xs" c="dimmed">
+        <Text size="xs" c="dimmed" className={css.mapPBlockNote}>
           <Trans>Dashboard filters don't apply to this map yet.</Trans>
         </Text>
       ) : null}
