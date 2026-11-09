@@ -10,15 +10,30 @@ import type { AgentPageTile } from "$/agent/pageContext/AgentPageContext.ts";
 const LINE_BREAKS = /\s*[\r\n\v\f\u0085\u2028\u2029]+\s*/g;
 
 /**
+ * Characters a reader or model may not see, allowed anywhere inside a
+ * block tag's spelling: whitespace, control characters (`Cc`), space
+ * separators (`Zs`), format characters (`Cf`, such as a zero-width space or
+ * soft hyphen), combining marks (`Mn`), and the Hangul fillers and braille
+ * blank, which render as blanks.
+ */
+const INVISIBLE_RUN =
+  "[\\s\\p{Cc}\\p{Cf}\\p{Mn}\\p{Zs}\\u115f\\u1160\\u3164\\uffa0\\u2800]*";
+
+/** The agent block tag names, as `BLOCK_TAG_START` looks for them. */
+const BLOCK_TAG_NAMES = ["current_page", "attached", "mentioned"];
+
+/**
  * A `<` that would start an agent block tag (`current_page`, `attached`,
  * `mentioned`), opening or closing, including spellings with spaces such
  * as `< /attached>` or with invisible characters between `<`, the `/`, and
- * the name: any whitespace, space separator (`Zs`), format character
- * (`Cf`, such as a zero-width space or soft hyphen), or combining mark
- * (`Mn`, such as a combining grapheme joiner).
+ * the name, or between the name's own letters.
  */
-const BLOCK_TAG_START =
-  /<(?=[\s\p{Zs}\p{Cf}\p{Mn}]*\/?[\s\p{Zs}\p{Cf}\p{Mn}]*(?:current_page|attached|mentioned))/giu;
+const BLOCK_TAG_START = new RegExp(
+  `<(?=${INVISIBLE_RUN}\\/?${INVISIBLE_RUN}(?:${BLOCK_TAG_NAMES.map((name) => {
+    return [...name].join(INVISIBLE_RUN);
+  }).join("|")}))`,
+  "giu",
+);
 
 /**
  * A `<` that does not start a page placeholder (`<value 3>`). A placeholder
