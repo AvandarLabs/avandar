@@ -1,6 +1,10 @@
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { GraduatedRamps } from "@/views/GisApp/layers/GraduatedRamps/GraduatedRamps";
 
-/** Replaces color behavior and invalidates its derived legend output. */
+/**
+ * Replaces color behavior and invalidates its derived legend output. A
+ * graduated color is fitted to one color and one label per class.
+ */
 function withLayerColor(
   options: Readonly<{ layer: MapLayer.T; color: MapLayer.Color }>,
 ): MapLayer.T {
@@ -10,7 +14,13 @@ function withLayerColor(
   }
   return {
     ...layer,
-    symbology: { ...layer.symbology, color },
+    symbology: {
+      ...layer.symbology,
+      color:
+        color.type === "graduated"
+          ? GraduatedRamps.fitColorToClassCount(color)
+          : color,
+    },
     legend: { ...layer.legend, breaks: [], entries: [] },
   } as MapLayer.T;
 }
