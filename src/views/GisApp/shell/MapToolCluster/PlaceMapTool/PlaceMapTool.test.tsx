@@ -140,6 +140,27 @@ describe("PlaceMapTool", () => {
     expect(screen.getByRole("textbox", { name: /Place name/ })).toBeVisible();
   });
 
+  it("anchors the popover to the tool button", () => {
+    const controller = _withDraft(NEW_DRAFT, { targetDatasetId: DATASET_ID });
+    render(<PlaceMapTool controller={controller} />);
+    const trigger = screen.getByRole("button", { name: "Add a place" });
+    const dropdownId = trigger.getAttribute("aria-controls");
+    expect(dropdownId).toBeTruthy();
+    expect(document.getElementById(dropdownId!)).toContainElement(
+      screen.getByRole("button", { name: "Click the map" }),
+    );
+  });
+
+  it("hides the tool's tooltip while the popover is open", async () => {
+    const controller = _withDraft(NEW_DRAFT, { targetDatasetId: DATASET_ID });
+    render(<PlaceMapTool controller={controller} />);
+    fireEvent.mouseEnter(screen.getByRole("button", { name: "Add a place" }));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    });
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+  });
+
   it("gets out of the way while waiting for the map click", () => {
     const controller = _withDraft(NEW_DRAFT, {
       targetDatasetId: DATASET_ID,

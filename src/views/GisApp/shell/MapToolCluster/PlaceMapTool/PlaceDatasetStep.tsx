@@ -52,9 +52,10 @@ export function PlaceDatasetStep({ controller }: Props): ReactNode {
       {controller.placesDatasetOptions.length > 0 ? (
         <ExistingPlacesDatasetPicker controller={controller} />
       ) : null}
-      <Group align="flex-end" gap="xs" wrap="nowrap">
+      <Stack gap="xs" align="flex-start">
         <TextInput
           size="xs"
+          w="100%"
           label={t`New places dataset name`}
           value={datasetName}
           onChange={(event) => {
@@ -71,7 +72,7 @@ export function PlaceDatasetStep({ controller }: Props): ReactNode {
         >
           {t`Create places dataset`}
         </Button>
-      </Group>
+      </Stack>
     </Stack>
   );
 }
