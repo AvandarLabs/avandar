@@ -1,7 +1,8 @@
-import { isDefined, propEq } from "@avandar/utils";
+import { isDefined } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { getForbiddenMapPropertyNames } from "@/clients/maps/getForbiddenMapPropertyNames/getForbiddenMapPropertyNames";
+import { getMapLayerColumnNameById } from "@/clients/maps/getMapLayerColumnNameById/getMapLayerColumnNameById";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
@@ -24,14 +25,6 @@ const RENDER_PROPERTY_NAMES: readonly string[] = [
   PointAggregateProperties.abbreviated,
 ];
 
-function _getColumnNameById(
-  layer: MapLayer.T,
-  columnId: QueryColumn.Id,
-): string | undefined {
-  const column = layer.source.queryColumns.find(propEq("id", columnId));
-  return column ? QueryColumn.getDerivedColumnName(column) : undefined;
-}
-
 /** The column a layer's classified color reads, which the renderer needs. */
 function _getColorValueColumnName(layer: MapLayer.T): string | undefined {
   const { symbology } = layer;
@@ -42,7 +35,7 @@ function _getColorValueColumnName(layer: MapLayer.T): string | undefined {
   ) {
     return undefined;
   }
-  return _getColumnNameById(layer, symbology.color.value.column);
+  return getMapLayerColumnNameById(layer, symbology.color.value.column);
 }
 
 /** The popup's columns, with "all fields" meaning every queried column. */

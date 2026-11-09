@@ -1,9 +1,10 @@
-import { isDefined, propEq } from "@avandar/utils";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { isDefined } from "@avandar/utils";
+import { getMapLayerColumnNameById } from "@/clients/maps/getMapLayerColumnNameById/getMapLayerColumnNameById";
 import { getPlacesLayerDatasetId } from "@/views/GisApp/places/getPlacesLayerDatasetId/getPlacesLayerDatasetId";
 import { PLACE_ID_COLUMN_NAME } from "@/views/GisApp/places/withPlaceIdColumn/withPlaceIdColumn";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /** The query column ids a binding reads a location from. */
 function _getBoundLocationColumnIds(layer: MapLayer.T): QueryColumn.Id[] {
@@ -22,14 +23,6 @@ function _getBoundLocationColumnIds(layer: MapLayer.T): QueryColumn.Id[] {
   return [];
 }
 
-function _getColumnNameById(
-  layer: MapLayer.T,
-  columnId: QueryColumn.Id,
-): string | undefined {
-  const column = layer.source.queryColumns.find(propEq("id", columnId));
-  return column ? QueryColumn.getDerivedColumnName(column) : undefined;
-}
-
 /**
  * Column names a viewer of a map must never see: the bound location columns,
  * which hold the exact position, and a places layer's internal `place_id`.
@@ -46,7 +39,7 @@ export function getForbiddenMapPropertyNames(
 ): ReadonlySet<string> {
   const locationNames = _getBoundLocationColumnIds(layer)
     .map((columnId) => {
-      return _getColumnNameById(layer, columnId);
+      return getMapLayerColumnNameById(layer, columnId);
     })
     .filter(isDefined);
   const isPlacesLayer =
