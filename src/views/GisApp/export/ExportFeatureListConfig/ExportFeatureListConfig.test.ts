@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
@@ -48,6 +49,24 @@ function _schoolsLayer(): MapLayer.T {
   };
 }
 
+/**
+ * A hydrated "Schools" layer whose popup shows all fields but whose saved
+ * query holds only its WKT location column, as a geometry column layer is
+ * saved before any field is chosen.
+ */
+function _popupAllSchoolsLayer(): MapLayer.T {
+  const layer = _schoolsLayer();
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      queryColumns: [LOCATION],
+      sourceColumns: [NAME, RATE, LOCATION],
+    },
+    popup: { columnIds: "all", action: undefined },
+  };
+}
+
 describe("ExportFeatureListConfig", () => {
   it("offers only layers whose rows can be listed, top of the stack first", () => {
     const bottom = _pointLayer("Bottom");
@@ -78,6 +97,22 @@ describe("ExportFeatureListConfig", () => {
         return layer.name;
       }),
     ).toEqual(["Top", "Bottom"]);
+  });
+
+  it("offers and starts from every source column when the popup shows all fields", () => {
+    const config = {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [_popupAllSchoolsLayer()],
+    };
+    const [layer] = ExportFeatureListConfig.getEligibleLayers(config);
+
+    expect(layer!.source.queryColumns.map(prop("id"))).toEqual(
+      expect.arrayContaining([NAME.id, RATE.id]),
+    );
+    expect(ExportFeatureListConfig.createFromLayer(layer!).columnIds).toEqual([
+      NAME.id,
+      RATE.id,
+    ]);
   });
 
   it("starts from the popup's columns when the popup lists them", () => {

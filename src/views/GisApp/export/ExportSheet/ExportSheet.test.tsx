@@ -456,6 +456,46 @@ describe("ExportSheet", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("offers and saves the source columns a popup-all layer's PDF prints", () => {
+    const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
+    const [geometry, schoolName, address] = [
+      "the_geom",
+      "school_name",
+      "address",
+    ].map((name) => {
+      return createDatasetQueryColumn({ name, dataType: "varchar" });
+    });
+    const emptyLayer = MapLayer.makeEmpty("Schools");
+    const layer: MapLayer.T = {
+      ...emptyLayer,
+      source: {
+        ...emptyLayer.source,
+        queryColumns: [geometry!],
+        sourceColumns: [geometry!, schoolName!, address!],
+      },
+      geoBinding: {
+        type: "geometryColumn",
+        column: geometry!.id,
+        encoding: "wkt",
+        family: "point",
+        simplification: undefined,
+        sourceCrs: undefined,
+      },
+      popup: { columnIds: "all", action: undefined },
+    };
+    const config = _configWithLayer({ layer });
+    render(<ExportSheet {..._props({ onConfigChange })} config={config} />);
+
+    fireEvent.click(
+      screen.getByRole("switch", { name: "Include a feature list" }),
+    );
+
+    expect(
+      onConfigChange.mock.calls.at(-1)![0](config).exportLayout.featureList
+        ?.columnIds,
+    ).toEqual([schoolName!.id, address!.id]);
+  });
+
   it("persists the feature list's maximum rows", () => {
     const onConfigChange = vi.fn<(update: ConfigUpdate) => void>();
     const layer = _pointLayer();

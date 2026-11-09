@@ -108,7 +108,8 @@ function _withRingLabelColumnsQueried(
  * This is for running queries only. Never save its result: the saved map
  * keeps the columns its author chose, so a layer later set to Displace
  * stops querying the extra columns at once. Used by `useGisAppRendering`,
- * `useFeatureListQuery`, and `loadExportFeatureTable`.
+ * `useFeatureListQuery`, `loadExportFeatureTable`, and the export sheet's
+ * `ExportFeatureListConfig`, which saves only column ids.
  */
 export function getQueryLayersFromMapLayers(
   layers: readonly MapLayer.T[],

@@ -3,6 +3,7 @@ import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues";
 import { getFeatureListAccessFromMapLayer } from "@/clients/maps/MapLayerFeatureList/getFeatureListAccessFromMapLayer/getFeatureListAccessFromMapLayer";
 import { getFeatureListQueryColumns } from "@/clients/maps/MapLayerFeatureList/getFeatureListQueryColumns/getFeatureListQueryColumns";
+import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
@@ -34,9 +35,19 @@ export const ExportFeatureListConfig = {
    * feature list drawer lists rows for. A jittered or aggregate-only layer
    * is left out because exact rows would undo its protection, and a boundary
    * join, bin, or buffer because its features are not rows.
+   *
+   * Each layer is returned as its query runs (`getQueryLayersFromMapLayers`),
+   * as the PDF fetches it, so a layer whose popup shows all fields offers
+   * every source column even when its saved query holds only its location.
+   * The added columns keep their source ids, so the saved column and sort
+   * ids match the columns the PDF prints.
    */
   getEligibleLayers: (config: AvaMapConfig.T): MapLayer.T[] => {
-    return AvaMapConfig.toStackOrder(config).filter((layer) => {
+    const queryConfig = {
+      ...config,
+      layers: getQueryLayersFromMapLayers(config.layers),
+    };
+    return AvaMapConfig.toStackOrder(queryConfig).filter((layer) => {
       return getFeatureListAccessFromMapLayer(layer) === "rows";
     });
   },
