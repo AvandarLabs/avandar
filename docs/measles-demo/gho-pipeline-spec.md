@@ -1,7 +1,9 @@
 # WHO GHO pipeline: spec
 
-**Status:** proposed, on `feat/gho-pipeline` (branched from `demo/measles`).
-Nothing in this spec is built yet.
+**Status:** built on `feat/gho-pipeline` (branched from `demo/measles`),
+except what section 9 defers. A full run against the real API on 2026-11-09
+wrote 3,091 indicator and 202 dimension listings. PR units: F28 and F29 in
+[`pr-feature-log.md`](pr-feature-log.md).
 
 This spec adds the World Health Organization's Global Health Observatory
 (GHO) OData API to the Open Data Catalog (ODC). It also covers three changes
@@ -170,9 +172,9 @@ gho/
 | Dimension probe: `GET /DIMENSION/<code>/DimensionValues` | 202 | The value count and the body hash |
 
 The client runs four requests a second (`withRateLimit({ minTimeMs: 250 })`)
-and retries an HTTP 429 three times with backoff, as HDX's does. GHO is
-served from a CDN, so a full run takes about 14 minutes. It runs weekly
-(decision 4).
+and retries an HTTP 429 three times with backoff, as HDX's does. A full
+run took 55 minutes on 2026-11-09 (53 for indicators, whose probes return up
+to 1,000 rows each, and 2 for dimensions). It runs weekly (decision 4).
 
 **No incremental runs.** `/Indicator` has no modified time and cannot be
 sorted by one, so there is no checkpoint to resume from. Every run probes
@@ -479,7 +481,7 @@ after `ava supabase switch`):
 | `api_service` gains `odata` | `00.enum.data_catalog_listings__api_service.sql` |
 | `companion_listings`, `api_freshness_probe`, `parquet_cache_checked_at`, `parquet_cache_checked_source_version`, and their checks | `11.data_catalog_listings.sql` |
 | Write `companion_listings` and `api_freshness_probe` | `50.rpc_data_catalog_listings__upsert_with_relation_columns.sql` |
-| New RPCs | `50.rpc_data_catalog_listings__record_freshness_check.sql`, `52.rpc_data_catalog_listings__get_companions.sql` |
+| New RPCs | `50.rpc_data_catalog_listings__record_freshness_check.sql`, `50.rpc_data_catalog_listings__get_companions.sql` |
 
 Then:
 
@@ -497,9 +499,13 @@ Then:
 | `shared/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts` | `z.enum`, tied to the generated types |
 
 **New failure codes** go in `shared/connectors/open-data/openDataErrors.ts`:
-`freshness-probe-invalid`, `copy-too-large`, and the `odata-*` codes the new
-arms raise. They also go in the two switches with no default:
+`freshness-probe-invalid`, and the `odata-unreachable`,
+`odata-response-invalid` and `odata-empty` codes the sample arm raises
+(`odata-empty` marks a listing `empty_dataset`, as CKAN's `resource-empty`
+does). They also go in the two switches with no default:
 `statusFromOpenDataFailure.ts` and `failureToInvalidDatasetReason.ts`.
+`copy-too-large` is a build failure, so it is mapped in the pipeline
+server's `toParquetCopyFailure`, from DuckDB's out-of-memory error.
 
 **Model.** `DataCatalogListing` gains `companionListings`,
 `apiFreshnessProbe`, `parquetCacheCheckedAt` and

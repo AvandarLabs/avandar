@@ -107,7 +107,9 @@ API. It's new work, not something this branch built.
 | 14 | F23 | Renames a column that F4, F6, F7, F16, F17 and F19 all read, replaces the hardcoded drive lists F6 and F7 added (`configuredDrives.ts` and `hdxDrive.ts`), and extends the search and filter rail F17 and F19 built. Merge after all of them. |
 | 15 | F24 | Adds the data preview and full-screen modal to the detail pane F19 built and F23 regrouped. Merge after both. |
 | 16 | F27 | Rewrites the write loop in `loadRelationsPage` that F4 built and F23's byte cap changed, and adds a stage to the progress events F11 added. Merge after F23. |
-| 17 | F9 | Last, because the docs describe the merged features. |
+| 17 | F28 | Changes how `DatasetParquetWrapper` and the pipeline server's copy store treat F25's Parquet copies. Merge after F25. |
+| 18 | F29 | Extends the listings table, upsert, model and catalog detail that F4, F16, F17, F19, F23 and F24 built, the copy builder and `parquet-cache` route F25 added, and reads F28's max age. Merge after all of them. |
+| 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
 `connectors` rename.
@@ -1746,6 +1748,120 @@ ava pipeline run hdx --local --scope format:csv --since 2026-10-14T00:00:00Z --u
 
 ---
 
+## F28: API-backed listing copies expire, so workspaces see a changed source
+
+**Purpose:** A Parquet copy of an API-backed listing (F25) that was current
+when a workspace loaded it had no max age, so the workspace never asked the
+`parquet-cache` route again and kept the old rows until IndexedDB evicted
+them. A current copy now expires after
+`GlobalAppConfig.timing.openDataCopyMaxAgeMs` (15 minutes); a stale one
+still expires after 5. Copy parts are uploaded with a one-year
+`cacheControl`, since each build writes its own folder, so re-checking an
+unchanged copy reads its parts from the browser cache.
+**Value:** Socrata, HDX and GHO datasets pick up source changes within
+15 minutes, at the cost of one route call when nothing changed.
+
+**PR title:** `fix(open-data): re-check API-backed listing copies after 15 minutes`
+
+**Commits to read** (from `feat/gho-pipeline`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `dc5174b7c` | fix(open-data): re-check API-backed listing copies after 15 minutes | All of it, except `openDataFreshnessRecheckAfterMs` in `GlobalAppConfig.ts`, which goes with F29. |
+
+**Files:** `shared/config/GlobalAppConfig.ts` (`openDataCopyMaxAgeMs`),
+`src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts`
+and its test, `src/clients/qetl/wrappers/datasetSourceTypeContract.test.ts`
+(comment only), and
+`apps/pipeline-server/src/openDataParquetCache/createSupabaseParquetCopyStore/createSupabaseParquetCopyStore.ts`
+and its new test (only the upload test and `COPY_PART_CACHE_CONTROL_SECONDS`;
+the probe read goes with F29).
+
+**Schema:** none.
+
+**Verification:**
+```sh
+npx vitest run src/clients/qetl/wrappers
+pnpm --filter @avandar/pipeline-server test
+```
+
+---
+
+## F29: WHO GHO pipeline, recommended listings, and listing freshness probes
+
+**Purpose:** Adds the World Health Organization's Global Health Observatory
+to the catalog as a drive: each of its 3,091 indicators and 202 dimension
+value lists becomes an OData listing (`api_service = 'odata'`) with column
+types declared from GHO's schema. Listings can name recommended listings in
+the same drive (`companion_listings`), which the catalog detail shows with
+why and an Add button, and which the "Dataset added" notification offers to
+add too. Pipelines can write a freshness probe onto a listing
+(`api_freshness_probe`) that the edge function and copy builder run with no
+code per API, and the `parquet-cache` route reuses a listing's last check
+for 15 minutes. The copy builder reads JSON sources. Spec:
+`docs/measles-demo/gho-pipeline-spec.md`.
+**Value:** Measles case counts and every other WHO indicator can be added
+to a workspace and joined to country names, without a hardcoded connector.
+
+**PR title:** `feat(open-data): add the WHO GHO pipeline and recommended listings`
+
+**Commits to read** (from `feat/gho-pipeline`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `781a48f9e` | docs(open-data): spec the WHO GHO pipeline, recommended listings, and copy freshness | All of it. The `production-plan-world-humanitarian-day.md` and `open-data-catalog-architecture.md` hunks go with F9. |
+| `f42fe266e` | docs(open-data): record the GHO spec's decisions | All of it. |
+| `905503037` | feat(open-data): store listing companions and freshness probes | All of it. |
+| `6dde864dd` | feat(catalog): recommend listings to add together, and say when a listing has no data | All of it. |
+| `3f74d5002` | feat(open-data): copy JSON sources, and check freshness by each listing's own probe | All of it. |
+| `66be5b816` | feat(pipelines): add the WHO GHO pipeline | All of it. |
+| `93382fb3e` | feat(open-data): throttle freshness checks per listing, and sample OData listings | All of it. |
+| `a72e8a6c7` | test(catalog): add a recommended listing from the notification after adding an indicator | All of it. |
+| `dc5174b7c` | fix(open-data): re-check API-backed listing copies after 15 minutes | Only `openDataFreshnessRecheckAfterMs` in `GlobalAppConfig.ts` (the rest is F28). |
+
+**Files:** `apps/pipeline-server/pipelines/gho/`;
+`supabase/schemas/00.enum.data_catalog_listings__api_service.sql`,
+`11.data_catalog_listings.sql`,
+`50.rpc_data_catalog_listings__upsert_with_relation_columns.sql`,
+`50.rpc_data_catalog_listings__write_parquet_cache.sql`, and the new
+`50.rpc_data_catalog_listings__get_companions.sql` and
+`50.rpc_data_catalog_listings__record_freshness_check.sql`, with their pgTAP
+tests; `shared/connectors/open-data/readFreshnessProbeToken/`,
+`readOpenDataFreshnessToken`, `acquireOpenDataColumnTypeSample`,
+`openDataErrors.ts` and the two failure-code switches;
+`shared/models/data-catalog-listings/DataCatalogListing/`;
+`packages/node/etl` (relation companions and probes, the JSON
+`ListingDownload` variant); the pipeline server's copy builder
+(`convertJsonFileToParquetParts`, probe checks, `copy-too-large`) and the
+probe read in `createSupabaseParquetCopyStore`;
+`supabase/functions/open-data/requestParquetCache` and `OpenDataRoutes.ts`;
+`src/clients/data-catalog-listings/`; the catalog view's
+`DataCatalogRecommendedListings/`, `useAddCatalogListing/`,
+`useCatalogListingCompanions/`, `getCompanionsToRecommend/`,
+`notifyDatasetAdded/`, `DataCatalogListingDetail`,
+`DataCatalogUnsupportedNotice` and `DataCatalogView.tsx`;
+`fetchCatalogListingPreview`; `tests/e2e/odc-recommended-listings.spec.ts`.
+
+**Schema:** migration `20261109065317_gho_listing_companions_and_freshness_probes.sql`
+(regenerate it; it adds an enum value by rename-and-recreate). Regenerate
+`shared/types/database.types.ts` and the desktop SQLite mirror.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/pipeline-server test
+npx vitest run packages/node/etl shared/connectors/open-data supabase/functions/open-data shared/models/data-catalog-listings src/views/DataManagerApp/DataImportView src/lib/openData
+pnpm test:db
+pnpm test:e2e odc-recommended-listings.spec.ts
+ava pipeline run gho --local   # about 55 minutes against the real API
+```
+
+**Follow-ups, not done here:** the deferred items in the spec's section 9
+(paged JSON downloads, cross-drive recommendations, passing join pairs to
+chat, a Refresh action for open data datasets, moving CKAN and Socrata onto
+listing probes) and P6.13, partitioned live connections.
+
+---
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -1905,8 +2021,9 @@ Its commits are covered by F19, not numbered here.
 
 F18's commits came in through the `e331cbdcc` merge and are listed in full
 under F18 above rather than numbered here. F21's commits are listed in full
-under F21 in the same way, F25's (merged in `a9d2ec770`) under F25, and
-F26's (merged in `d0af42ce6`) under F26.
+under F21 in the same way, F25's (merged in `a9d2ec770`) under F25,
+F26's (merged in `d0af42ce6`) under F26, and F28's and F29's (from
+`feat/gho-pipeline`) under F28 and F29.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
