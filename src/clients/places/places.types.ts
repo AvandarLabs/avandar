@@ -15,7 +15,7 @@ export type PlaceInput = {
   latitude: number;
   longitude: number;
 
-  /** Local wall-clock time, `YYYY-MM-DDTHH:mm`, as a `datetime-local` writes it. */
+  /** Local wall-clock time, `YYYY-MM-DDTHH:mm` (a `datetime-local` value). */
   startsAt: string | undefined;
 
   /** Local wall-clock time, `YYYY-MM-DDTHH:mm`. */

@@ -1,7 +1,7 @@
-import type { DatasetColumnInput } from "@/clients/datasets/DatasetClient/DatasetClient.types";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { DatasetColumnInput } from "@/clients/datasets/DatasetClient/DatasetClient.types";
 
-/** Most places one places dataset holds: it is for hand-placed sites, not imports. */
+/** Most places one dataset holds: it is for hand-placed sites, not imports. */
 export const PLACES_MAX_ROWS = 500;
 
 /**
