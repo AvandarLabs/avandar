@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ClassificationBreakHandles } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles/ClassificationBreakHandles";
+import { GraduatedClassList } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList";
 import { GraduatedMethodControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls";
 import { GraduatedRampSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect";
 import { NormalizationControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls";
@@ -43,6 +44,11 @@ export function GraduatedControls({
         onLayerChange={onLayerChange}
       />
       <GraduatedRampSelect color={color} onLayerChange={onLayerChange} />
+      <GraduatedClassList
+        layer={layer}
+        color={color}
+        onLayerChange={onLayerChange}
+      />
       <NormalizationControls layer={layer} onLayerChange={onLayerChange} />
       <ClassificationBreakHandles
         layer={layer}

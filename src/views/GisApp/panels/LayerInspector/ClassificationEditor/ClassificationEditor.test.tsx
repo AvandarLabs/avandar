@@ -406,4 +406,85 @@ describe("ClassificationEditor", () => {
       classification: { method: "manual", breaks: [11] },
     });
   });
+
+  it("shows one label input per class", () => {
+    boundarySourceState.options = [];
+    render(
+      <ClassificationEditor
+        layer={_createLayer()}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getAllByRole("textbox", { name: /^Class \d label$/ }),
+    ).toHaveLength(5);
+  });
+
+  it("shows the generated interval as a class label placeholder", () => {
+    boundarySourceState.options = [];
+    render(
+      <ClassificationEditor
+        layer={_createLayer()}
+        onLayerChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("textbox", { name: "Class 1 label" }),
+    ).toHaveAttribute("placeholder", "< 10");
+  });
+
+  it("writes a typed label to its class", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Class 2 label" }), {
+      target: { value: "95% or above" },
+    });
+
+    const updated = onLayerChange.mock.calls[0]![0](layer);
+    expect(updated.symbology.color.classLabels).toEqual([
+      undefined,
+      "95% or above",
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("writes a picked swatch color to its class", async () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Class 1 color" }));
+    fireEvent.click(await screen.findByRole("button", { name: "#d7301f" }));
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color.ramp).toEqual([
+      "#d7301f",
+      "#bdd7e7",
+      "#6baed6",
+      "#2171b5",
+      "#08306b",
+    ]);
+  });
 });
