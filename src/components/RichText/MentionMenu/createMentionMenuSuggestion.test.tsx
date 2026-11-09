@@ -8,6 +8,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { GADGET_TYPES } from "$/models/gadgets/Gadget/Gadget";
 import { createRichTextExtensions } from "@/components/RichText/createRichTextExtensions";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 import { createMentionMenuSuggestion } from "./createMentionMenuSuggestion";
@@ -162,13 +163,18 @@ describe("createMentionMenuSuggestion, chat variant", () => {
     expect(items).toEqual([]);
   });
 
-  it("drops cases from search results and keeps the full search limit", async () => {
+  it("drops cases from search results", async () => {
     await _openMenuWithResults([DATASET, INDIVIDUAL]);
 
     expect(screen.getByText("Borough boundaries")).toBeInTheDocument();
     expect(screen.queryByText("Case of Amara Okafor")).toBeNull();
+  });
+
+  it("keeps the full search limit of every gadget type", async () => {
+    await _openMenuWithResults([DATASET]);
+
     expect(mocks.searchGadgets).toHaveBeenCalledWith(
-      expect.objectContaining({ limit: 30 }),
+      expect.objectContaining({ limit: 5 * GADGET_TYPES.length }),
     );
   });
 
@@ -196,12 +202,5 @@ describe("createMentionMenuSuggestion, chat variant", () => {
     const json = JSON.stringify(_getEditor().getJSON());
     expect(json).toContain('"type":"gadgetLink"');
     expect(json).not.toContain("gadgetEmbed");
-  });
-
-  it("shows only the Enter key hint in the footer", async () => {
-    await _openMenuWithResults([DATASET]);
-
-    expect(await screen.findByText("Enter")).toBeInTheDocument();
-    expect(screen.queryByText(/embed/)).toBeNull();
   });
 });

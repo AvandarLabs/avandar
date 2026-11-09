@@ -64,7 +64,12 @@ export function useAvandarChatRuntime(): {
   const parseSqlRef = useRef(parseSql);
   const userRef = useRef(user);
   const contextTrayRef = useRef(contextTray);
+  // Relies on the workspace layout remounting per workspace
+  // (`key={workspace.id}`).
   const hasHydratedTrayRef = useRef(false);
+  // Set by hydration so the persist effect of that same commit, which still
+  // sees the empty tray, does not overwrite what was just loaded.
+  const skipNextTrayPersistRef = useRef(false);
   const workspaceIdRef = useRef(workspace.id);
   const workspaceRef = useRef(workspace);
   const chatGenerationRef = useRef(0);
@@ -210,6 +215,7 @@ export function useAvandarChatRuntime(): {
         return;
       }
       hasHydratedTrayRef.current = true;
+      skipNextTrayPersistRef.current = true;
       chatPanelDispatch.setContextTray(
         ChatContextTrayStore.read({
           workspaceId: workspace.id,
@@ -225,11 +231,16 @@ export function useAvandarChatRuntime(): {
       if (!hasHydratedTrayRef.current || !user || !workspace.id) {
         return;
       }
-      ChatContextTrayStore.write({
-        workspaceId: workspace.id,
-        userId: user.id,
-        refs: contextTray,
-      });
+      if (skipNextTrayPersistRef.current) {
+        skipNextTrayPersistRef.current = false;
+        return;
+      }
+      const identity = { workspaceId: workspace.id, userId: user.id };
+      if (contextTray.length === 0) {
+        ChatContextTrayStore.clear(identity);
+        return;
+      }
+      ChatContextTrayStore.write({ ...identity, refs: contextTray });
     },
     [contextTray, user, workspace.id],
   );

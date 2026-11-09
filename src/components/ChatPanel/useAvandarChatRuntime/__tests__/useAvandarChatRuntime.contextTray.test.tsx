@@ -49,6 +49,26 @@ describe("useAvandarChatRuntime context tray", () => {
     expect(ChatContextTrayStore.read(IDENTITY)).toEqual([DATASET_REF]);
   });
 
+  it("never writes or clears an empty tray while mounting a stored one", async () => {
+    ChatContextTrayStore.write({ ...IDENTITY, refs: [DATASET_REF] });
+    const writeSpy = vi.spyOn(ChatContextTrayStore, "write");
+    const clearSpy = vi.spyOn(ChatContextTrayStore, "clear");
+
+    await renderAppAt("/alpha/data-explorer");
+    await waitFor(() => {
+      expect(harness.chatPanelState?.contextTray).toEqual([DATASET_REF]);
+    });
+
+    expect(
+      writeSpy.mock.calls.filter(([options]) => {
+        return options.refs.length === 0;
+      }),
+    ).toEqual([]);
+    expect(clearSpy).not.toHaveBeenCalled();
+    writeSpy.mockRestore();
+    clearSpy.mockRestore();
+  });
+
   it("saves refs the user adds", async () => {
     await renderAppAt("/alpha/data-explorer");
 
@@ -75,6 +95,8 @@ describe("useAvandarChatRuntime context tray", () => {
     await waitFor(() => {
       expect(harness.chatPanelState?.contextTray).toEqual([]);
     });
-    expect(ChatContextTrayStore.read(IDENTITY)).toEqual([]);
+    expect(
+      window.localStorage.getItem(ChatContextTrayStore.storageKey(IDENTITY)),
+    ).toBeNull();
   });
 });
