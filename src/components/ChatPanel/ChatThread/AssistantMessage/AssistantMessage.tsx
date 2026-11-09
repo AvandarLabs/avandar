@@ -7,21 +7,22 @@ import { useLingui } from "@lingui/react/macro";
 import { Loader } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
-import { AgentQueryResultPart } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart";
+import { AgentQueryResultPartLazy } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPartLazy";
 import { isHiddenChatThreadMessage } from "@/components/ChatPanel/ChatThread/isHiddenChatThreadMessage";
 import { MarkdownTextPart } from "@/components/ChatPanel/ChatThread/MarkdownTextPart/MarkdownTextPart";
 import css from "./AssistantMessage.module.css";
 
 /**
  * How `MessagePrimitive.Parts` draws each part of an assistant message:
- * text as Markdown, and the agent's query results as result cards or chips.
- * Kept at module level so it is not rebuilt on every render.
+ * text as Markdown, and the agent's query results as result cards or chips,
+ * whose chart code loads on first use. Kept at module level so it is not
+ * rebuilt on every render.
  */
 const MESSAGE_PART_COMPONENTS = {
   Text: MarkdownTextPart,
   data: {
     by_name: {
-      [AgentQueryResult.PART_NAME]: AgentQueryResultPart,
+      [AgentQueryResult.PART_NAME]: AgentQueryResultPartLazy,
     },
   },
 };

@@ -2,7 +2,7 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
-import { AgentQueryResultPart } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart";
+import { AgentQueryResultPartLazy } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPartLazy";
 import { render } from "@/test-utils";
 import { AssistantMessage } from "./AssistantMessage";
 import type { ReactNode } from "react";
@@ -79,14 +79,14 @@ describe("AssistantMessage", () => {
     expect(screen.getByTestId("message-root")).toBeVisible();
   });
 
-  it("draws agent query results with the result part", () => {
+  it("draws agent query results with the lazily loaded result part", () => {
     render(<AssistantMessage />);
 
     const props = partsProps.current as {
       components: { data: { by_name: Record<string, unknown> } };
     };
     expect(props.components.data.by_name[AgentQueryResult.PART_NAME]).toBe(
-      AgentQueryResultPart,
+      AgentQueryResultPartLazy,
     );
   });
 });

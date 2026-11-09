@@ -1,4 +1,3 @@
-import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Skeleton } from "@mantine/core";
 import { IconChartBar } from "@tabler/icons-react";
@@ -6,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import clsx from "clsx";
 import { useId } from "react";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
+import { AGENT_QUERY_RESULT_DEFINITION } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition";
 import classes from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.module.css";
 import { useAgentQueryResultView } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/useAgentQueryResultView";
 import cardClasses from "@/components/RichText/Gadget/GadgetCard/GadgetCard.module.css";
@@ -19,14 +19,6 @@ import type { AgentQueryResultView } from "@/components/ChatPanel/ChatThread/Age
 import type { GadgetLinkTarget } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
 import type { DataMessagePartProps } from "@assistant-ui/react";
 import type { ReactNode } from "react";
-
-/** The result card's header copy, in the gadget card's shape. */
-const RESULT_DEFINITION = {
-  Icon: IconChartBar,
-  label: msg`Result`,
-  loadingLabel: msg`Loading result`,
-  unavailableLabel: msg`Unavailable result`,
-};
 
 function _openLink(
   result: AgentQueryResultData,
@@ -43,7 +35,7 @@ function _openLink(
 function useResultTitle(result: AgentQueryResultData): string {
   const { i18n } = useLingui();
   const title = result.title.trim();
-  return title === "" ? i18n._(RESULT_DEFINITION.label) : title;
+  return title === "" ? i18n._(AGENT_QUERY_RESULT_DEFINITION.label) : title;
 }
 
 /** The card's body: the chart once the result is in, else its state. */
@@ -83,7 +75,7 @@ function ResultCard({ result }: { result: AgentQueryResultData }): ReactNode {
       className={clsx(cardClasses.card, classes.root)}
     >
       <GadgetCardHeader
-        definition={RESULT_DEFINITION}
+        definition={AGENT_QUERY_RESULT_DEFINITION}
         summary={{
           status: "available",
           name: title,
@@ -119,8 +111,7 @@ function ResultChip({ result }: { result: AgentQueryResultData }): ReactNode {
  * embed card with the live chart or table and an Open link to the Data
  * Explorer, or an inline chip. Reuses the gadget card and chip, so results
  * read like the dashboards and datasets linked in comments. Rendered by
- * `MessagePrimitive.Parts` for `data` parts named
- * `AgentQueryResult.PART_NAME`.
+ * `AgentQueryResultPartLazy`, which loads this module on first use.
  */
 export function AgentQueryResultPart({
   data,
