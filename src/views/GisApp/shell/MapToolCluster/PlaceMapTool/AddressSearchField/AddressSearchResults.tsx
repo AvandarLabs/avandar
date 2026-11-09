@@ -1,4 +1,4 @@
-import { Button, Group, Stack } from "@mantine/core";
+import { Group, Stack, UnstyledButton } from "@mantine/core";
 import css from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchResults.module.css";
 import { GeoapifyAttribution } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/GeoapifyAttribution";
 import { OpenStreetMapAttribution } from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/OpenStreetMapAttribution";
@@ -23,19 +23,14 @@ export function AddressSearchResults({ candidates, onPick }: Props): ReactNode {
             <li
               key={`${candidate.label}-${candidate.latitude}-${candidate.longitude}`}
             >
-              <Button
-                size="compact-xs"
-                variant="subtle"
-                color="neutral"
-                justify="flex-start"
-                fullWidth
-                aria-label={candidate.label}
+              <UnstyledButton
+                className={css.addressSearchResult}
                 onClick={() => {
                   onPick(candidate);
                 }}
               >
                 {candidate.label}
-              </Button>
+              </UnstyledButton>
             </li>
           );
         })}

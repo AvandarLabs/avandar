@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
+import css from "@/views/GisApp/shell/MapToolCluster/PlaceMapTool/AddressSearchField/AddressSearchResults.module.css";
 import type { ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
@@ -110,6 +111,14 @@ describe("AddressSearchField", () => {
     expect(
       within(items[0]!).getByRole("button", { name: CANDIDATE.label }),
     ).toBeVisible();
+  });
+
+  it("shows each result's full address, wrapping instead of clipping", async () => {
+    _renderField();
+    _search("W 46th St");
+    const result = await _findCandidate();
+    expect(result).toHaveTextContent(CANDIDATE.label);
+    expect(result).toHaveClass(css.addressSearchResult!);
   });
 
   it("announces how many addresses were found", async () => {
