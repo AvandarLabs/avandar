@@ -1,11 +1,10 @@
 import { isDefined, propEq } from "@avandar/utils";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { getForbiddenMapPropertyNames } from "@/clients/maps/getForbiddenMapPropertyNames/getForbiddenMapPropertyNames";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { PointAggregateProperties } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.constants";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
-import { getPlacesLayerDatasetId } from "@/views/GisApp/places/getPlacesLayerDatasetId/getPlacesLayerDatasetId";
-import { PLACE_ID_COLUMN_NAME } from "@/views/GisApp/places/withPlaceIdColumn/withPlaceIdColumn";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /**
@@ -54,49 +53,12 @@ function _getPopupPropertyNames(layer: MapLayer.T): readonly string[] {
     : propertyNames;
 }
 
-/** The query column ids a binding reads a location from. */
-function _getBoundLocationColumnIds(layer: MapLayer.T): QueryColumn.Id[] {
-  const binding = layer.geoBinding;
-  const pointBinding =
-    binding?.type === "binPointsToGrid" ||
-    binding?.type === "aggregatePointsToBoundaries"
-      ? binding.points
-      : binding;
-  if (pointBinding?.type === "geometryColumn") {
-    return [pointBinding.column];
-  }
-  if (pointBinding?.type === "latLngColumns") {
-    return [pointBinding.latitude, pointBinding.longitude].filter(isDefined);
-  }
-  return [];
-}
-
-/**
- * Column names that never go public: the bound location columns, which hold
- * the exact position, and a places layer's internal `place_id`.
- */
-function _getForbiddenPropertyNames(
-  layer: MapLayer.T,
-  placesDatasetIds: ReadonlySet<Dataset.Id>,
-): ReadonlySet<string> {
-  const locationNames = _getBoundLocationColumnIds(layer)
-    .map((columnId) => {
-      return _getColumnNameById(layer, columnId);
-    })
-    .filter(isDefined);
-  const isPlacesLayer =
-    getPlacesLayerDatasetId(layer, placesDatasetIds) !== undefined;
-  return new Set(
-    isPlacesLayer ? [...locationNames, PLACE_ID_COLUMN_NAME] : locationNames,
-  );
-}
-
 /** Every property name a published feature of `layer` may carry. */
 function _getAllowedPropertyNames(
   layer: MapLayer.T,
   placesDatasetIds: ReadonlySet<Dataset.Id>,
 ): ReadonlySet<string> {
-  const forbidden = _getForbiddenPropertyNames(layer, placesDatasetIds);
+  const forbidden = getForbiddenMapPropertyNames(layer, placesDatasetIds);
   const candidates = [
     ..._getPopupPropertyNames(layer),
     getPaintValueColumnName(layer),
