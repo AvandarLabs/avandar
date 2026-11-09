@@ -358,12 +358,14 @@ Write number literals with a decimal point, such as `100000.0` or `9.0`, where
 a division must not truncate.
 
 An expression must not call a function that reads files, runs SQL, reaches
-the network, reads settings or the environment, changes state, or loads an
-extension. Avandar rejects, in any case and with or without a schema prefix,
+the network or another database, reads settings, variables, or the
+environment, changes state, or loads an extension. Avandar rejects, in any case and with or without a schema prefix,
 every function whose name starts with `read_`, `query`, `parquet_`,
-`iceberg_`, `delta_`, `http_`, `pragma_`, `duckdb_`, or `sniff_`, and the
-functions `glob`, `current_setting`, `getenv`, `nextval`, `setval`, `currval`,
-`which_secret`, `load`, and `install`. The check covers nested calls and
+`iceberg_`, `delta_`, `http_`, `pragma_`, `duckdb_`, `sniff_`, `sqlite_`,
+`postgres_`, `mysql_`, `ducklake_`, or `json_execute_`, and the functions
+`glob`, `current_setting`, `getenv`, `nextval`, `setval`, `currval`,
+`which_secret`, `load`, `install`, `checkpoint`, `force_checkpoint`, and
+`getvariable`. The check covers nested calls and
 `OVER` windows too.
 
 When a name is already taken, by a result column or by an earlier column in

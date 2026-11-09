@@ -17,11 +17,11 @@ const PARSER_DATABASES = ["postgresql", "snowflake"] as const;
 
 /**
  * DuckDB functions a derived column must not call, because they read files,
- * run SQL, reach the network, read settings or the environment, change state,
- * or load extensions. The query engine's analyzer only inspects functions
- * after `FROM` or `JOIN`, so this list and DuckDB's binder are what stop a
- * select-list expression from reading a file. Names are matched in lower
- * case, ignoring any schema prefix.
+ * run SQL, reach the network or another database, read settings, variables,
+ * or the environment, change state, or load extensions. The query engine's
+ * analyzer only inspects functions after `FROM` or `JOIN`, so this list and
+ * DuckDB's binder are what stop a select-list expression from reading a
+ * file. Names are matched in lower case, ignoring any schema prefix.
  */
 const DENIED_FUNCTION_NAMES = {
   prefixes: [
@@ -34,6 +34,11 @@ const DENIED_FUNCTION_NAMES = {
     "pragma_",
     "duckdb_",
     "sniff_",
+    "sqlite_",
+    "postgres_",
+    "mysql_",
+    "ducklake_",
+    "json_execute_",
   ],
   exact: [
     "glob",
@@ -45,6 +50,9 @@ const DENIED_FUNCTION_NAMES = {
     "which_secret",
     "load",
     "install",
+    "checkpoint",
+    "force_checkpoint",
+    "getvariable",
   ],
 } as const;
 
