@@ -133,6 +133,9 @@ test.describe("Epidemiology plugin incidence", () => {
       supabaseAdminClient,
       slug: workspaceSlug,
     });
+    // Set once the Settings install succeeded, so cleanup never deletes an
+    // install this spec did not make.
+    let didInstall = false;
     try {
       await signInWithEmailPassword(page, {
         email: primaryUser.email,
@@ -140,6 +143,7 @@ test.describe("Epidemiology plugin incidence", () => {
         workspaceSlug,
       });
       await _installPlugin({ page, workspaceSlug });
+      didInstall = true;
       // The `?sql=` deep link stands in for typing the query: the editor is
       // not what this spec covers, and the command is still driven by clicks.
       await page.goto(
@@ -177,11 +181,13 @@ test.describe("Epidemiology plugin incidence", () => {
       );
     } finally {
       // Removes only the install this spec made through Settings.
-      await supabaseAdminClient
-        .from("plugin_installations")
-        .delete()
-        .eq("workspace_id", workspaceId)
-        .eq("plugin_id", PLUGIN_ID);
+      if (didInstall) {
+        await supabaseAdminClient
+          .from("plugin_installations")
+          .delete()
+          .eq("workspace_id", workspaceId)
+          .eq("plugin_id", PLUGIN_ID);
+      }
     }
   });
 });
