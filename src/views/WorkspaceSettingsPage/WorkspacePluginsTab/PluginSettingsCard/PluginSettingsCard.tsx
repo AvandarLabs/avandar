@@ -55,7 +55,7 @@ export function PluginSettingsCard({
             }
             status={status}
           />
-          {manifest === undefined ? (
+          {manifestModule === undefined ? (
             <Text size="sm" c="dimmed">
               <Trans>
                 No longer included in this deployment. Uninstall to remove it
@@ -64,8 +64,9 @@ export function PluginSettingsCard({
             </Text>
           ) : (
             <PluginManifestSummary
-              manifest={manifest}
+              manifestModule={manifestModule}
               description={description}
+              headingId={headingId}
             />
           )}
         </Stack>
