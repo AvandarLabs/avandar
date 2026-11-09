@@ -8,6 +8,7 @@ import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatial
 import { renderHook } from "@/test-utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
+import { createQueryableLayer } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
 import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 
 /**
@@ -264,5 +265,58 @@ describe("useAvaMapRender classified values", () => {
     expect(
       result.current.layerViewStates.get(layer.id)?.classifiedValueDomain,
     ).toEqual([0.82, 0.97]);
+  });
+});
+
+describe("useAvaMapRender snapshot layers", () => {
+  it("draws a snapshot's points where the snapshot put them", () => {
+    const layer = MapLayer.withSensitivity(createQueryableLayer(), {
+      mode: "jitter",
+      radiusMeters: 500,
+    });
+    const snapshotGeometry: GeoJSON.Point = {
+      type: "Point",
+      coordinates: [-73.9812, 40.7514],
+    };
+    const { result } = renderHook(() => {
+      return useAvaMapRender({
+        mapConfig: {
+          ...AvaMapConfig.makeEmpty(),
+          layers: [layer],
+        },
+        layerQueryStates: new Map([
+          [
+            layer.id,
+            {
+              data: {
+                type: "snapshot",
+                featureCollection: {
+                  type: "FeatureCollection",
+                  features: [
+                    {
+                      type: "Feature",
+                      id: 0,
+                      geometry: snapshotGeometry,
+                      properties: {},
+                    },
+                  ],
+                },
+                aggregation: undefined,
+              },
+              isLoading: false,
+              isRefreshing: false,
+              error: undefined,
+              refetch: () => {
+                return undefined;
+              },
+            },
+          ],
+        ]),
+      });
+    });
+
+    const source =
+      result.current.spec.sources[MapLayerIds.toSourceId(layer.id)];
+    expect(source?.data.features[0]?.geometry).toEqual(snapshotGeometry);
   });
 });
