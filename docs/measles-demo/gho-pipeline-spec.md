@@ -103,8 +103,9 @@ two scopes.
 | `display_name` | `IndicatorName` |
 | `organization1_name`, `organization2_name` | `World Health Organization`, `Global Health Observatory` |
 | `tags` | `Archived` for an indicator whose name starts with "Archived" |
-| `source_url` | The indicator's API URL (open question 1) |
-| `is_workspace_loadable` | `false` when the indicator has no rows (open question 2) |
+| `source_url` | The indicator's API URL, e.g. `https://ghoapi.azureedge.net/api/WHS3_62` (decision 1) |
+| `is_workspace_loadable` | `false` when the indicator has no rows (decision 2) |
+| `metadata` | `{ "row_count": <n> }`, from the probe. The detail view reads it to say "This dataset has no data yet" rather than "Avandar can't add this kind of dataset yet" (decision 2) |
 | `date_of_last_update` | The newest row's `Date` |
 | `api_freshness_probe` | New column, section 3 |
 | `companion_listings` | New column, section 5 |
@@ -166,11 +167,12 @@ gho/
 | `GET /$metadata` | 1 | The schema check above |
 | `GET /Dimension` | 1 | Every dimension code and title |
 | Indicator probe: `GET /<code>?$orderby=Date desc&$top=1000&$select=Date,SpatialDimType,Dim1Type,Dim2Type,Dim3Type,DataSourceDimType&$count=true` | 3,091 | The row count, the newest `Date` (first row), and which dimension each code column holds in the 1,000 newest rows (section 5) |
-| Dimension probe: `GET /DIMENSION/<code>/DimensionValues?$top=0&$count=true` | 202 | The value count |
+| Dimension probe: `GET /DIMENSION/<code>/DimensionValues` | 202 | The value count and the body hash |
 
 The client runs four requests a second (`withRateLimit({ minTimeMs: 250 })`)
 and retries an HTTP 429 three times with backoff, as HDX's does. GHO is
-served from a CDN, so a full run takes about 14 minutes.
+served from a CDN, so a full run takes about 14 minutes. It runs weekly
+(decision 4).
 
 **No incremental runs.** `/Indicator` has no modified time and cannot be
 sorted by one, so there is no checkpoint to resume from. Every run probes
@@ -193,7 +195,7 @@ New nullable column `data_catalog_listings.api_freshness_probe jsonb`:
 ```json
 {
   "url": "https://ghoapi.azureedge.net/api/WHS3_62?$orderby=Date%20desc&$top=1&$select=Date&$count=true",
-  "tokenPaths": [["value", 0, "Date"], ["@odata.count"]]
+  "token": { "kind": "json-paths", "paths": [["value", 0, "Date"], ["@odata.count"]] }
 }
 ```
 
@@ -201,14 +203,17 @@ New nullable column `data_catalog_listings.api_freshness_probe jsonb`:
   start with the listing's `api_base_url` followed by `/`. The probe is only
   ever written by the service role, but the check still stops a bad row from
   sending the edge function to another host.
-- **`tokenPaths`** are paths into the JSON body, given as arrays of keys and
-  indexes because keys such as `@odata.count` contain dots. The token is the
-  values at those paths, in order, joined by `|`. A missing path fails the
-  check with the new failure code `freshness-probe-invalid`.
-- A dimension listing's probe is the value count alone
-  (`?$top=0&$count=true`, `[["@odata.count"]]`), because dimension values
-  carry no modified time. A changed title with an unchanged count goes
-  unnoticed until the count changes (open question 3).
+- **`token`** says how the response becomes a token. There are two kinds:
+  - **`json-paths`**: paths into the JSON body, given as arrays of keys and
+    indexes because keys such as `@odata.count` contain dots. The token is
+    the values at those paths, in order, joined by `|`. A missing path fails
+    the check with the new failure code `freshness-probe-invalid`.
+  - **`body-sha256`**: the SHA-256 of the whole response body. It suits a
+    small source with no modified time.
+- A dimension listing's probe is the whole value list
+  (`DIMENSION/<code>/DimensionValues`) with `body-sha256`, because dimension
+  values carry no modified time. `COUNTRY`'s list is 31 KB, well under the
+  1 MB cap, and a renamed value changes the hash (decision 3).
 
 One shared function, `readFreshnessProbeToken` in
 `shared/connectors/open-data/`, runs a probe. **Both the edge function and
@@ -543,25 +548,40 @@ arms raise. They also go in the two switches with no default:
 | `record_freshness_check` is service-role only and sets both columns. The new checks hold | pgTAP, extending `rpc_data_catalog_listings__parquet_cache.test.sql` and `data_catalog_listings_access.test.sql` |
 | The recommendation flow through the UI | S8's e2e spec |
 
-## 12. Open questions
+## 12. Decisions
 
-1. **`source_url`.** GHO's human-readable indicator pages use a slug that
-   cannot be derived from the code. Until a source for it is found, the link
-   is the API URL. WHO's Indicator Metadata Registry may hold both the slug
-   and a description. That would also fill `description`, which GHO leaves
-   empty.
-2. **Indicators with no rows (600).** They are listed as not loadable, and
-   the detail view then says "Avandar can't add this kind of dataset yet",
-   which is wrong for an indicator with no data. Options: a new
-   `invalid_dataset_reason` (`no_rows`), or a variant of the notice keyed on
-   a row count kept in `metadata`. The default in this spec is the second.
-3. **Dimension freshness.** A dimension's token is its value count only. A
-   renamed value goes unnoticed until the count changes. Hashing the whole
-   value list (31 KB for `COUNTRY`) is cheap, but `tokenPaths` cannot
-   express a hash. Accept the gap, or add a `hash: "body"` probe option?
-4. **Run schedule.** A full run is about 3,300 requests and 14 minutes.
-   Daily or weekly? The listing probes keep copies current either way. The
-   schedule only affects new indicators, names, and recommendations.
-5. **API lifetime.** WHO may be moving GHO to a newer API at
-   `data.who.int`. No deprecation date was found. The drive URL is
-   configuration, but a different API would need a new download script.
+These were open questions, decided on 2026-11-09.
+
+1. **`source_url` is the indicator's API URL.** GHO's human-readable
+   indicator pages cannot be found from the code: building the address from
+   the name worked for 5 of 40 sampled indicators, and WHO's indicator index
+   names only 82 indicators the way the API does. The API URL is the real
+   source, for every indicator, at no cost. It opens as raw JSON.
+2. **Indicators with no rows (600) are listed as not loadable**, with the
+   row count in `metadata.row_count`. The detail view says "This dataset has
+   no data yet" when that count is 0, rather than "Avandar can't add this
+   kind of dataset yet". A run that finds rows makes the listing loadable.
+   Rejected: a new `invalid_dataset_reason` (an empty indicator is not
+   broken), and leaving them out (a pipeline lists everything it finds).
+3. **Dimension listings hash the whole value list** (`body-sha256`, section
+   3), so a renamed value is noticed. Rejected: the value count alone, which
+   misses renames.
+4. **The pipeline runs weekly.** Listing probes keep added datasets current
+   between runs. A run only finds new indicators, renames and
+   recommendations, and WHO publishes in batches.
+5. **This builds on `ghoapi.azureedge.net`, for the demo.** WHO's legacy GHO
+   page lists it as "deprecated end of 2025", and names a "World Health Data
+   Hub OData API" as its replacement, but that link is still a placeholder
+   (`#`) and no replacement is documented. The old API stopped answering
+   (HTTP 500 on every route) around 2026-10-30 and was back by 2026-11-05.
+   Everything GHO-specific stays inside `apps/pipeline-server/pipelines/gho/`,
+   and a run fails loudly when the schema check fails. Candidates for the
+   move, not yet evaluated:
+   - The Data Hub's per-indicator CSV files
+     (`srhdpeuwpubsa.blob.core.windows.net/whdh/DATADOT/INDICATOR/<id>_ALL_LATEST.csv`).
+     These would use the copy builder's existing CSV path.
+   - `xmart-api-public.who.int/DATA_`, an undocumented OData service that
+     looks like the Data Hub's backend. Measles was not found in it under
+     its GHO code.
+
+   Moving creates new listings, so workspaces would re-add their datasets.
