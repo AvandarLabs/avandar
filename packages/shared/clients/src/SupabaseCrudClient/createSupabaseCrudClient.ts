@@ -189,6 +189,10 @@ export function createSupabaseCrudClient<
 
       getPage: async (params: {
         where?: FiltersByColumn<M["DBRead"]>;
+        orderBy?: ReadonlyArray<{
+          column: keyof M["DBRead"] & string;
+          direction: "asc" | "desc";
+        }>;
         pageSize: number;
         pageNum: number;
         logger: ILogger;
@@ -200,6 +204,12 @@ export function createSupabaseCrudClient<
 
         if (where) {
           query = _applyFiltersToSupabaseQuery(query, where);
+        }
+
+        for (const order of params.orderBy ?? []) {
+          query = query.order(String(order.column), {
+            ascending: order.direction === "asc",
+          });
         }
 
         if (pageSize > MAXIMUM_PAGE_SIZE) {
