@@ -25,8 +25,11 @@ const APP_LABELS: Record<AgentPageApp, string> = {
 /** A run of line breaks (CR, LF, line and paragraph separators) and spaces. */
 const LINE_BREAKS = /\s*[\r\n\u2028\u2029]+\s*/g;
 
-/** A `<` that would start `<current_page>` or `</current_page>`. */
-const PAGE_TAG_START = /<(?=\/?current_page)/gi;
+/**
+ * A `<` that would start `<current_page>` or `</current_page>`, including
+ * spellings with spaces such as `< /current_page>` or `</ current_page>`.
+ */
+const PAGE_TAG_START = /<(?=\s*\/?\s*current_page)/gi;
 
 type Aliases = readonly SqlTableAlias.T[];
 

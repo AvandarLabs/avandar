@@ -228,6 +228,20 @@ describe("buildAgentPageContextBlock", () => {
     expect(block).toContain("WHERE a < b");
   });
 
+  it("escapes a page tag spelled with spaces inside SQL", () => {
+    const block = _block({
+      app: "data-explorer",
+      explorer: {
+        sql: "SELECT '< /current_page>', '</ current_page>', '< / current_page>'",
+        resultColumns: [],
+      },
+    });
+
+    // Only the block's own opening and closing tags remain.
+    expect(block.match(/<\s*\/?\s*current_page/gi)).toHaveLength(2);
+    expect(block).toContain("'\\u003c /current_page>'");
+  });
+
   it("collapses a bare carriage return or line separator", () => {
     const block = _block({
       app: "dashboard",
