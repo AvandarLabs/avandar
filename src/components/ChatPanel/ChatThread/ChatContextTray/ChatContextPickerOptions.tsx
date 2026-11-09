@@ -27,7 +27,7 @@ function ChatContextOptionBody({
     <div className={css.option}>
       <Icon size={16} aria-hidden className={css.optionIcon} />
       <div className={css.optionText}>
-        <Text size="sm" className={css.optionLabel}>
+        <Text component="div" size="sm" className={css.optionLabel}>
           {label}
         </Text>
         <Text size="xs" c="dimmed" className={css.optionDetail}>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { fireEvent, screen, waitFor, within } from "@/test-utils";
 import {
   buildSearchResult,
@@ -155,6 +155,34 @@ describe("ChatContextPicker", () => {
       name: /Loading dashboard/,
     });
     expect(option.querySelector(".mantine-Skeleton-root")).not.toBeNull();
+  });
+
+  it("nests no block element inside a paragraph while a name loads", async () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {
+        return undefined;
+      });
+    try {
+      setLoadingSummary(DASHBOARD_REF);
+      renderTray({ pageRefs: [DASHBOARD_REF] });
+
+      await openPicker();
+
+      const option = await screen.findByRole("option", {
+        hidden: true,
+        name: /Loading dashboard/,
+      });
+      expect(option.querySelector("p div")).toBeNull();
+      const nestingErrors = consoleErrorSpy.mock.calls.filter((call) => {
+        return call.some((arg) => {
+          return String(arg).includes("cannot be a descendant of");
+        });
+      });
+      expect(nestingErrors).toEqual([]);
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
   });
 
   it("never lists a case", async () => {
