@@ -2147,8 +2147,8 @@ msgid "Manage seats in billing portal →"
 msgstr "Simamia viti katika lango la malipo →"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-msgid "Source record"
-msgstr "Rekodi chanzo"
+#~ msgid "Source record"
+#~ msgstr "Rekodi chanzo"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
@@ -9718,6 +9718,10 @@ msgstr "{0, plural, one {# hifadhidata iliyohifadhiwa inapatikana} other {# "
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "Iliyopangwa kwa viwango"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "More from the source"
+msgstr "Maelezo zaidi kutoka kwa chanzo"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."

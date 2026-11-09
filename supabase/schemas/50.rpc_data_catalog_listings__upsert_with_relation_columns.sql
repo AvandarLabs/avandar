@@ -30,18 +30,24 @@
  *   empty, of `{ column_name, display_order, original_data_type,
  *   cast_data_type }`.
  *
- * @returns The stored listings, in input order.
+ * Only the stored listings' ids are returned, never the rows: returning
+ * every row buffered each call's listings in a temp file and sent them all
+ * back to the caller. The input array is read one element at a time for
+ * the same reason.
+ *
+ * @returns The stored listings' ids, in input order.
  *
  * @throws When `p_listings` is not an array, when an element's
  *   `relation_columns` is not an array, and when two elements share a
  *   conflict key.
  */
-create or replace function public.rpc_data_catalog_listings__upsert_with_relation_columns (p_listings jsonb) returns setof public.data_catalog_listings as $$
+create or replace function public.rpc_data_catalog_listings__upsert_with_relation_columns (p_listings jsonb) returns setof uuid as $$
 declare
   v_item jsonb;
+  v_index integer;
   v_input public.data_catalog_listings;
   v_stored public.data_catalog_listings;
-  v_listing public.data_catalog_listings;
+  v_listing_id uuid;
   v_is_keeping_stored_columns boolean;
   v_written_ids uuid[] := '{}';
 begin
@@ -49,7 +55,8 @@ begin
     raise exception 'rpc_data_catalog_listings__upsert_with_relation_columns needs a JSON array of listings';
   end if;
 
-  for v_item in select value from jsonb_array_elements(p_listings) loop
+  for v_index in 0..jsonb_array_length(p_listings) - 1 loop
+    v_item := p_listings -> v_index;
     if jsonb_typeof(v_item -> 'relation_columns') is distinct from 'array' then
       raise exception 'Listing "%" needs a relation_columns array, which may be empty.',
         v_item -> 'listing' ->> 'display_name';
@@ -142,7 +149,7 @@ begin
       organization4_name,
       domains,
       tags,
-      source_metadata,
+      additional_source_metadata,
       drive_id
     ) values (
       coalesce(v_input.id, gen_random_uuid()),
@@ -181,7 +188,7 @@ begin
       v_input.organization4_name,
       v_input.domains,
       v_input.tags,
-      v_input.source_metadata,
+      v_input.additional_source_metadata,
       v_input.drive_id
     )
     on conflict (id) do update set
@@ -220,19 +227,19 @@ begin
       organization4_name = excluded.organization4_name,
       domains = excluded.domains,
       tags = excluded.tags,
-      source_metadata = excluded.source_metadata,
+      additional_source_metadata = excluded.additional_source_metadata,
       drive_id = excluded.drive_id
-    returning * into v_listing;
+    returning id into v_listing_id;
 
-    v_written_ids := v_written_ids || v_listing.id;
+    v_written_ids := v_written_ids || v_listing_id;
 
     if v_is_keeping_stored_columns then
-      return next v_listing;
+      return next v_listing_id;
       continue;
     end if;
 
     delete from public.data_catalog_listings__relation_columns relation_column
-    where relation_column.catalog_listing_id = v_listing.id;
+    where relation_column.catalog_listing_id = v_listing_id;
 
     insert into public.data_catalog_listings__relation_columns (
       catalog_listing_id,
@@ -242,7 +249,7 @@ begin
       cast_data_type
     )
     select
-      v_listing.id,
+      v_listing_id,
       input_column.column_name,
       input_column.display_order,
       input_column.original_data_type,
@@ -254,7 +261,7 @@ begin
       cast_data_type public.datasets__duckdb_data_type
     );
 
-    return next v_listing;
+    return next v_listing_id;
   end loop;
 end;
 $$ language plpgsql volatile security invoker

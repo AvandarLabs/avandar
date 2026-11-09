@@ -2066,8 +2066,8 @@ msgid "Manage seats in billing portal →"
 msgstr "在计费门户中管理席位 →"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-msgid "Source record"
-msgstr "源记录"
+#~ msgid "Source record"
+#~ msgstr "源记录"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
@@ -9386,6 +9386,10 @@ msgstr "{0, plural, one {# 个已保存的数据库可用} other {# 个已保存
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "分级"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "More from the source"
+msgstr "来自来源的更多信息"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."

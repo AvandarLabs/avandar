@@ -1,3 +1,4 @@
+import { omitRecordPaths } from "@avandar/etl";
 import { promiseMapSequential } from "@avandar/utils";
 import { getHdxDatasetTimestamp } from "@pipelines/hdx/getHdxDatasetTimestamp/getHdxDatasetTimestamp";
 import { readHdxResourceColumns } from "@pipelines/hdx/readHdxResourceColumns/readHdxResourceColumns";
@@ -67,126 +68,106 @@ async function _readResource(params: {
 }
 
 /**
- * Package fields left out of `sourceMetadata`. `license_other` is the full
- * text of a custom license, repeated on every resource listing of a package:
- * on the demo instance it was 36% of HDX's raw JSON. The license's name
- * stays in the listing's `license`. `notes` and `caveats` are copied whole
- * into the listing's `description` and `notes` by `hdx.pipeline.yaml`, so
- * keeping them here stored each one twice per listing.
+ * Package fields the pipeline maps in code: `name` becomes the listing's
+ * `external_dataset_id` and `metadata_modified` its `date_of_last_update`.
+ * `resources` is replaced by the relation's own resource.
  */
-const OMITTED_PACKAGE_FIELDS = ["license_other", "notes", "caveats"];
+const PACKAGE_FIELDS_MAPPED_IN_CODE = [
+  "name",
+  "metadata_modified",
+  "resources",
+];
 
 /**
- * Package fields whose objects keep only the keys that identify them. HDX
- * repeats an organization's description and logo, and each tag's and
- * group's ids and display copies, on every resource listing of a package.
- * The kept keys are the ones `hdx.pipeline.yaml`'s mappers read, so a
- * later column can still be filled from `sourceMetadata`.
+ * Resource fields left out of a listing's additional source metadata. `id`,
+ * `name`, `format`, `url`, and `url_type` become listing columns.
+ * `download_url` and `hdx_rel_url` are copies of `url`, and `package_id` of
+ * the package's `id`. `fs_check_info` is HDX's file check report, 19% of
+ * HDX's raw JSON on the demo instance, whose headers the CKAN client
+ * already reads into `fileHeaders`.
  */
-const KEPT_KEYS_BY_PACKAGE_FIELD: Readonly<Record<string, readonly string[]>> =
-  {
-    organization: ["id", "name", "title"],
-    tags: ["name", "vocabulary_id"],
-    groups: ["name", "title"],
-  };
+const RESOURCE_FIELDS_LEFT_OUT = [
+  "id",
+  "name",
+  "format",
+  "url",
+  "url_type",
+  "download_url",
+  "hdx_rel_url",
+  "package_id",
+  "fs_check_info",
+];
 
-/**
- * Resource fields left out of `sourceMetadata`. `fs_check_info` is HDX's
- * file check report, 19% of HDX's raw JSON on the demo instance. The CKAN
- * client already reads its headers into `fileHeaders`.
- */
-const OMITTED_RESOURCE_FIELDS = ["fs_check_info"];
-
-function _omitFields(record: object, fields: readonly string[]): object {
-  return Object.fromEntries(
-    Object.entries(record).filter(([field]) => {
-      return !fields.includes(field);
-    }),
+function _isNonEmptyObject(value: unknown): value is object {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.keys(value).length > 0
   );
 }
 
-function _pickKeys(value: unknown, keys: readonly string[]): unknown {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return value;
+function _findRawResource(record: object, resourceId: string): unknown {
+  const { resources } = record as { resources?: unknown };
+  if (!Array.isArray(resources)) {
+    return undefined;
   }
-  return Object.fromEntries(
-    Object.entries(value).filter(([key]) => {
-      return keys.includes(key);
-    }),
-  );
+  return resources.find((rawResource: unknown) => {
+    return (rawResource as { id?: unknown } | null)?.id === resourceId;
+  });
 }
 
 /**
- * Narrows each field in `KEPT_KEYS_BY_PACKAGE_FIELD` to its kept keys: an
- * object field itself, and an array field's object entries. A value of any
- * other shape is kept as it is.
+ * What a resource's listing keeps of its package and of itself that no
+ * listing column holds, as `{ package, resource }`. `unmappedSourceRecord` is
+ * the package already without the paths its field mappings consume, so this
+ * only leaves out the fields mapped in code and the resource's copies. A
+ * part with nothing left is left out, and so is the whole when both are.
  */
-function _narrowPackageFields(record: object): object {
-  return Object.fromEntries(
-    Object.entries(record).map(([field, value]) => {
-      const keptKeys = Object.hasOwn(KEPT_KEYS_BY_PACKAGE_FIELD, field)
-        ? KEPT_KEYS_BY_PACKAGE_FIELD[field]
-        : undefined;
-      if (keptKeys === undefined) {
-        return [field, value];
-      }
-      return [
-        field,
-        Array.isArray(value)
-          ? value.map((entry: unknown) => {
-              return _pickKeys(entry, keptKeys);
-            })
-          : _pickKeys(value, keptKeys),
-      ];
-    }),
-  );
-}
-
-/**
- * The raw CKAN package as a resource's listing keeps it: with only that
- * resource left in its `resources`, without the fields above that are bulky
- * or already stored in a listing column, and with its organization, tags,
- * and groups narrowed to their identifying keys. A package lists every
- * resource, so storing it whole on each resource's listing grows a
- * package's write with the square of its resource count: a WHO country
- * package's 73 listings carried 42 MB. A record whose resource list cannot
- * be read is kept as it is.
- */
-function _buildSourceMetadata(
-  sourceRecord: unknown,
+function _buildAdditionalSourceMetadata(
+  unmappedSourceRecord: unknown,
   resourceId: string,
 ): unknown {
-  if (typeof sourceRecord !== "object" || sourceRecord === null) {
-    return sourceRecord;
+  if (
+    typeof unmappedSourceRecord !== "object" ||
+    unmappedSourceRecord === null
+  ) {
+    return undefined;
   }
-  const { resources } = sourceRecord as { resources?: unknown };
-  if (!Array.isArray(resources)) {
-    return sourceRecord;
-  }
-  return {
-    ..._narrowPackageFields(_omitFields(sourceRecord, OMITTED_PACKAGE_FIELDS)),
-    resources: resources.flatMap((rawResource: unknown) => {
-      const isOwnResource =
-        (rawResource as { id?: unknown } | null)?.id === resourceId;
-      return isOwnResource
-        ? [_omitFields(rawResource as object, OMITTED_RESOURCE_FIELDS)]
-        : [];
-    }),
+  const packagePart = omitRecordPaths(
+    unmappedSourceRecord,
+    PACKAGE_FIELDS_MAPPED_IN_CODE,
+  );
+  const resourcePart = omitRecordPaths(
+    _findRawResource(unmappedSourceRecord, resourceId),
+    RESOURCE_FIELDS_LEFT_OUT,
+  );
+  const parts = {
+    ...(_isNonEmptyObject(packagePart) ? { package: packagePart } : {}),
+    ...(_isNonEmptyObject(resourcePart) ? { resource: resourcePart } : {}),
   };
+  return Object.keys(parts).length > 0 ? parts : undefined;
 }
 
 function _toRelation(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
+  unmappedSourceRecord: unknown;
   resource: Readonly<CkanResource>;
   sourceUpdatedAt: Date;
   readability: _ResourceReadability;
   mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
 }): ApiResourceRelation {
   const { drive, ckanPackage, resource, readability } = params;
+  const additionalSourceMetadata = _buildAdditionalSourceMetadata(
+    params.unmappedSourceRecord,
+    resource.id,
+  );
   return {
     ...params.mappedFields,
-    sourceMetadata: _buildSourceMetadata(ckanPackage.sourceRecord, resource.id),
+    ...(additionalSourceMetadata === undefined
+      ? {}
+      : { additionalSourceMetadata }),
     kind: "api_resource",
     externalDatasetId: ckanPackage.name,
     apiResourceId: resource.id,
@@ -219,16 +200,18 @@ function _toRelation(params: {
  *
  * The catalog metadata (organizations, description, domains, tags, and the
  * rest) comes from the pipeline config's field mapping, which every
- * resource of a package shares. Each relation keeps the raw CKAN package as
- * `sourceMetadata`, with its `resources` narrowed to the relation's own raw
- * resource, its bulkiest fields and the ones a listing column already holds
- * left out (`license_other`, `notes`, `caveats`, `fs_check_info`), and its
- * organization, tags, and groups narrowed to their identifying keys. The
- * mapped fields are spread first, so a mapping can never
- * overwrite a field computed here.
+ * resource of a package shares. Each relation's `additionalSourceMetadata`
+ * keeps what the package and the relation's own resource say that no
+ * listing column holds, as `{ package, resource }`: `unmappedSourceRecord`
+ * without the fields mapped here and without the resource's copies of
+ * them. The mapped fields are spread first, so a mapping can never overwrite
+ * a field computed here.
  *
  * @param params.mappedFields - The package's mapped catalog metadata, which
  *   must name its level 1 organization.
+ * @param params.unmappedSourceRecord - The raw package without the paths
+ *   its field mappings consume and the config omits
+ *   (`CatalogFieldMapper.omitMappedPaths`).
  * @param params.scope - The scope being crawled. Only its resources become
  *   relations.
  * @param params.readFileColumns - Reads a resource's columns from its file
@@ -242,6 +225,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
   drive: Readonly<HdxDrive>;
   ckanPackage: Readonly<CkanPackage>;
   mappedFields: CatalogMappedFields & Readonly<{ organization1Name: string }>;
+  unmappedSourceRecord: unknown;
   scope: HdxScope;
   readFileColumns: HdxFileColumnReader;
   metrics: EtlPipelineMetrics;
@@ -269,6 +253,7 @@ export async function makeApiResourceRelationsFromCkanPackage(params: {
         sourceUpdatedAt,
         readability,
         mappedFields: params.mappedFields,
+        unmappedSourceRecord: params.unmappedSourceRecord,
       });
     },
   );

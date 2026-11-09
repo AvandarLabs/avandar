@@ -63,7 +63,7 @@ function _apiRow(overrides: Partial<ListingRowValues> = {}): ListingRowValues {
     organization4_name: null,
     domains: null,
     tags: null,
-    source_metadata: null,
+    additional_source_metadata: null,
     drive_id: null,
     ...overrides,
   };
@@ -168,10 +168,15 @@ afterEach(async () => {
 
 describe("createSupabaseListingsStore", () => {
   it("upserts an API relation onto one row by its conflict key", async () => {
-    await _upsert([_apiRow()]);
-    const [second] = await _upsert([_apiRow({ display_name: "Renamed" })]);
+    const [firstId] = await _upsert([_apiRow()]);
+    const [secondId] = await _upsert([_apiRow({ display_name: "Renamed" })]);
+    const [stored] = await store.readRowsMatching([_apiRow()]);
 
-    expect([await _countRows(), second?.display_name]).toEqual([1, "Renamed"]);
+    expect([await _countRows(), secondId, stored?.display_name]).toEqual([
+      1,
+      firstId,
+      "Renamed",
+    ]);
   });
 
   it("upserts a Parquet relation onto one row by its conflict key", async () => {
@@ -210,26 +215,26 @@ describe("createSupabaseListingsStore", () => {
   });
 
   it("stores a listing with every one of its columns", async () => {
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       { row: _apiRow(), columns: [_column("a", 0), _column("b", 1)] },
     ]);
 
-    expect(await _readColumnNames(stored?.id ?? "")).toEqual(["a", "b"]);
+    expect(await _readColumnNames(storedId ?? "")).toEqual(["a", "b"]);
   });
 
   it("stores an entry with no columns, with an empty column set", async () => {
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       { row: _apiRow(), columns: [] },
     ]);
 
     expect([
       await _countRows(),
-      await _readColumnNames(stored?.id ?? ""),
+      await _readColumnNames(storedId ?? ""),
     ]).toEqual([1, []]);
   });
 
   it("keeps a stored listing's columns when a later entry in the call fails", async () => {
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       { row: _apiRow(), columns: [_column("old")] },
     ]);
 
@@ -245,7 +250,7 @@ describe("createSupabaseListingsStore", () => {
         },
       ]),
     ).rejects.toThrow("appears twice in one call");
-    expect(await _readColumnNames(stored?.id ?? "")).toEqual(["old"]);
+    expect(await _readColumnNames(storedId ?? "")).toEqual(["old"]);
   });
 
   it("refuses more listings than PostgREST returns in one response", async () => {
@@ -261,12 +266,12 @@ describe("createSupabaseListingsStore", () => {
       cached_object_path: "etl-fixture/stray.csv",
     };
 
-    const [stored] = await _upsert([rowWithCacheColumn]);
+    const [storedId] = await _upsert([rowWithCacheColumn]);
 
     const { data } = await client
       .from(LISTINGS_TABLE)
       .select("cached_object_path")
-      .eq("id", stored?.id ?? "")
+      .eq("id", storedId ?? "")
       .single();
     expect(data).toEqual({ cached_object_path: null });
   });
@@ -365,7 +370,7 @@ describe("createSupabaseListingsStore", () => {
 
   it("keeps verified columns when an unverified rewrite has the same columns fingerprint", async () => {
     const metadata = { relation_columns_sha256: "fp-1" };
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       {
         row: _apiRow({
           metadata,
@@ -375,17 +380,18 @@ describe("createSupabaseListingsStore", () => {
       },
     ]);
 
-    const [rewritten] = await store.upsertListingsWithColumns([
+    await store.upsertListingsWithColumns([
       {
         row: _apiRow({ metadata, display_name: "Renamed" }),
         columns: [_column("piped")],
       },
     ]);
+    const [rewritten] = await store.readRowsMatching([_apiRow()]);
 
     expect([
       rewritten?.display_name,
       Date.parse(rewritten?.date_column_type_last_verified ?? ""),
-      await _readColumnNames(stored?.id ?? ""),
+      await _readColumnNames(storedId ?? ""),
     ]).toEqual([
       "Renamed",
       Date.parse("2026-10-20T00:00:00.000Z"),
@@ -397,11 +403,11 @@ describe("createSupabaseListingsStore", () => {
     await store.upsertListingsWithColumns([
       { row: _apiRow(), columns: [_column("a", 0), _column("b", 1)] },
     ]);
-    const [stored] = await store.upsertListingsWithColumns([
+    const [storedId] = await store.upsertListingsWithColumns([
       { row: _apiRow(), columns: [_column("c", 0)] },
     ]);
 
-    expect(await _readColumnNames(stored?.id ?? "")).toEqual(["c"]);
+    expect(await _readColumnNames(storedId ?? "")).toEqual(["c"]);
   });
 
   it("round-trips a row with every contract column set", async () => {
@@ -425,7 +431,7 @@ describe("createSupabaseListingsStore", () => {
   });
 
   it("leaves an existing row's cache columns untouched", async () => {
-    const [stored] = await _upsert([_apiRow()]);
+    const [storedId] = await _upsert([_apiRow()]);
     await client
       .from(LISTINGS_TABLE)
       .update({
@@ -433,14 +439,14 @@ describe("createSupabaseListingsStore", () => {
         cached_source_version: "v1",
         cached_at: "2026-10-20T00:00:00.000Z",
       })
-      .eq("id", stored?.id ?? "");
+      .eq("id", storedId ?? "");
 
     await _upsert([_apiRow({ display_name: "Renamed" })]);
 
     const { data } = await client
       .from(LISTINGS_TABLE)
       .select("cached_object_path")
-      .eq("id", stored?.id ?? "")
+      .eq("id", storedId ?? "")
       .single();
     expect(data).toEqual({ cached_object_path: "etl-fixture/cache.csv" });
   });

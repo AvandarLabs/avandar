@@ -15,6 +15,12 @@ const BOUND_GROUP_BY_FIELD: Readonly<Record<string, number>> = {
 };
 
 /**
+ * The source record paths this field holds, left out of a listing's additional
+ * source metadata. The `dataset_date` range both coverage fields are read from.
+ */
+export const reads = ["dataset_date"];
+
+/**
  * Mapper script for `coverage_start_date` and `coverage_end_date`: the
  * matching end of the package's date range. HDX writes its bounds in UTC
  * without saying so, so each is marked as UTC. An open end (`*`) or a date

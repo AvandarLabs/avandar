@@ -2121,8 +2121,8 @@ msgid "Manage seats in billing portal →"
 msgstr "Manage seats in billing portal →"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
-msgid "Source record"
-msgstr "Source record"
+#~ msgid "Source record"
+#~ msgstr "Source record"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Download offline models"
@@ -9619,6 +9619,10 @@ msgstr "{0, plural, one {# saved database available} other {# saved databases "
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationColorModeSelect.tsx
 msgid "Graduated"
 msgstr "Graduated"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
+msgid "More from the source"
+msgstr "More from the source"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Please try again. Your dashboard is still published."

@@ -19,17 +19,18 @@ type TechnicalFact = {
 };
 
 /**
- * The disclosure's contents: the technical facts, then the source record as
- * formatted JSON. Either is left out when it has nothing to show.
+ * The disclosure's contents: the technical facts, then what the source says
+ * that the listing shows nowhere else, as formatted JSON. Either is left out
+ * when it has nothing to show.
  */
 function TechnicalDetailsBody({
   facts,
-  sourceRecord,
+  sourceDetails,
 }: {
   facts: readonly TechnicalFact[];
-  sourceRecord: Json | undefined;
+  sourceDetails: Json | undefined;
 }): ReactNode {
-  const sourceRecordLabelId = useId();
+  const sourceDetailsLabelId = useId();
   return (
     <Stack gap="sm">
       {facts.length > 0 ? (
@@ -43,24 +44,24 @@ function TechnicalDetailsBody({
           })}
         </AppViewRail.Group>
       ) : null}
-      {sourceRecord === undefined ? null : (
+      {sourceDetails === undefined ? null : (
         <figure
-          aria-labelledby={sourceRecordLabelId}
+          aria-labelledby={sourceDetailsLabelId}
           className={css.dataCatalogListingDetailSourceRecord}
         >
           <Text
             component="figcaption"
-            id={sourceRecordLabelId}
+            id={sourceDetailsLabelId}
             className={css.dataCatalogListingDetailSourceRecordLabel}
           >
-            <Trans>Source record</Trans>
+            <Trans>More from the source</Trans>
           </Text>
           <Text
             component="pre"
             size="xs"
             className={css.dataCatalogListingDetailRawMetadata}
           >
-            {JSON.stringify(sourceRecord, undefined, 2)}
+            {JSON.stringify(sourceDetails, undefined, 2)}
           </Text>
         </figure>
       )}
@@ -103,14 +104,15 @@ function _TechnicalDetailsToggle({
 /**
  * How the catalog got the listing, behind a disclosure that starts closed:
  * the pipeline that indexed it, its last run, when it was last indexed, and
- * the source record it was built from (its raw metadata when it has none).
+ * what its source says that no other field shows (its raw metadata when it
+ * has none).
  * Reference material only an expert reads. Not rendered when the listing
  * has none of it.
  */
 export function DataCatalogTechnicalDetails({ listing }: Props): ReactNode {
   const { t } = useLingui();
   const [isOpen, disclosure] = useDisclosure(false);
-  const sourceRecord = listing.sourceMetadata ?? listing.metadata;
+  const sourceDetails = listing.additionalSourceMetadata ?? listing.metadata;
   const lastIndexedDate = listing.dateOfLastSync;
   const facts = [
     { label: t`Indexed by`, value: listing.pipelineName },
@@ -124,7 +126,7 @@ export function DataCatalogTechnicalDetails({ listing }: Props): ReactNode {
   ].filter((fact): fact is TechnicalFact => {
     return Boolean(fact.value);
   });
-  if (facts.length === 0 && sourceRecord === undefined) {
+  if (facts.length === 0 && sourceDetails === undefined) {
     return null;
   }
 
@@ -132,7 +134,7 @@ export function DataCatalogTechnicalDetails({ listing }: Props): ReactNode {
     <Stack gap="xs" align="flex-start">
       <_TechnicalDetailsToggle isOpen={isOpen} onToggle={disclosure.toggle} />
       <Collapse expanded={isOpen} w="100%">
-        <TechnicalDetailsBody facts={facts} sourceRecord={sourceRecord} />
+        <TechnicalDetailsBody facts={facts} sourceDetails={sourceDetails} />
       </Collapse>
     </Stack>
   );

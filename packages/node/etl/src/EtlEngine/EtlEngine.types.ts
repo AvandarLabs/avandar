@@ -168,10 +168,12 @@ export type RelationDescription = Readonly<{
   /** The source's free-form keywords. */
   tags?: readonly string[];
   /**
-   * The source record the relation was built from, untouched, written to
-   * `source_metadata`. Must survive `JSON.stringify`.
+   * What the source record says that no listing column holds, written to
+   * `additional_source_metadata`: the record without the paths the field
+   * mappings consume (`CatalogFieldMapper.omitMappedPaths`) and without the
+   * fields the pipeline maps in code. Must survive `JSON.stringify`.
    */
-  sourceMetadata?: unknown;
+  additionalSourceMetadata?: unknown;
   /**
    * The connection's source modification time, written to
    * `date_of_last_update`.

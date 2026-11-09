@@ -95,6 +95,10 @@ export function createSocrataEtlEngine(
           drive,
           result: connection,
           mappedFields: { ...fields, organization1Name },
+          unmappedSourceRecord: mapper.omitMappedPaths(
+            connection.sourceRecord,
+            drive.baseUrl,
+          ),
         }),
       ];
     },

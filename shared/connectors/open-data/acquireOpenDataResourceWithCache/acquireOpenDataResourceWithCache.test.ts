@@ -36,7 +36,7 @@ function _entry(
     organization4Name: undefined,
     domains: undefined,
     tags: undefined,
-    sourceMetadata: undefined,
+    additionalSourceMetadata: undefined,
     driveId: undefined,
     canonicalUrls: undefined,
     license: undefined,

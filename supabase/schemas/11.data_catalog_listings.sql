@@ -133,11 +133,6 @@ create table public.data_catalog_listings (
   domains text[],
   -- The source's free-form keywords.
   tags text[],
-  -- The source record this listing was built from, untouched, such as a
-  -- Socrata Discovery API result or a CKAN package. Keeps source metadata
-  -- that has no column of its own, so a later column can be filled from it
-  -- without re-crawling. As of the last write that changed another column.
-  source_metadata jsonb,
   -- The drive that produced this listing. Null on a listing no drive-index
   -- pipeline wrote.
   drive_id uuid references public.data_catalog_drives (id) on delete set null,
@@ -194,6 +189,12 @@ create table public.data_catalog_listings (
       'C'
     )
   ) stored,
+  -- What the source record this listing was built from says that no other
+  -- column holds, such as a CKAN package's title or a Socrata asset's
+  -- owner. A field the pipeline maps to a column is left out, so nothing is
+  -- stored twice. Keeps the rest so a later column can be filled from it
+  -- without re-crawling. As of the last write that changed another column.
+  additional_source_metadata jsonb,
   constraint unique_parquet_file_pipeline unique (parquet_file_name, pipeline_name),
   -- A pipeline listing carries every pipeline column and no API column. The
   -- negative half is what stops a row from setting everything and meaning
