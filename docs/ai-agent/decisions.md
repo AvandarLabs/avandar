@@ -583,7 +583,10 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 - **Privacy.** The block carries metadata, the explorer's current SQL (as
   today's chat already sends), and up to 12 dashboard tiles' titles, chart
   types, and SQL, in page order (cut at 1,500 characters each). Never rows.
-  A case's name is never sent, only its case type's name, because a case's
+  A tile title, or a string literal in a tile's SQL, that the browser's PII
+  check (`detectPii`) flags is replaced ("Untitled chart", `'<redacted>'`)
+  before the block is sent. The explorer's SQL is not redacted, to match
+  what today's chat sends. A case's name is never sent, only its case type's name, because a case's
   name is usually a person's name. A case's field values are never sent
   either. Page text is escaped and marked as data in the block, and prompt
   v2 tells the model never to follow instructions inside it.
@@ -611,6 +614,11 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   cannot be reached, the chat offers "Answer offline", as today's chat does
   (`_recoverFromChatFailure`). Accepting it reruns the question with the
   offline model (D25) and the Data Explorer as the destination.
+- **How a failure is seen.** Pi never rejects `agent.prompt` for a failed
+  model call: `streamProxy` catches the failed fetch, and the agent loop
+  records it as an assistant message with `stopReason: "error"`. The data
+  agent (`createDataAgent`) rethrows that message's error, so the adapter
+  sees the failure. A stopped run (`aborted`) is not a failure.
 - **Why.** Today's chat already recovers this way. Turning the agent on
   everywhere would otherwise make a dropped connection a dead end on pages
   where the old path offered a way out, and offline mode is the one choice

@@ -78,6 +78,8 @@ describes what was built.
 | `showQueryInChat` | `.../dataAgentTurnHelpers/` | Runs a query for the chat destination and adds a result part to the turn's results. |
 | `createBrowserDataAgentHost` | `src/lib/agent/dataAgent/browser/` | The browser host. It takes `showQuery`, so the same host serves both destinations. `askUser`, `readColumnValues`, and `approveValuesForModel` are unchanged. |
 | `AgentQueryResult`, `AgentQueryResultPart` | `src/components/ChatPanel/ChatThread/AgentQueryResultPart/` | The stored result (SQL, chart type, title) and its two looks: an inline chip, and an embed card. The card is the `GadgetCard` header over a live body built on `DataVizContent`, re-run in DuckDB-Wasm when shown. `useAgentQueryResultView` runs the SQL and builds the chart config. |
+| `AgentQueryResultPartLazy` | same folder | What the chat registers for result parts. Loads `AgentQueryResultPart` on first use, so the chart libraries and the query hook stay out of the app shell's bundle, and shows a placeholder of the card's size (header and 260px body) meanwhile. |
+| `redactSqlLiterals` | `shared/agent/pageContext/` | Replaces each single-quoted SQL literal a check flags with `'<redacted>'`, reading doubled quotes and skipping double-quoted identifiers. |
 | Prompt and tools | `shared/agent/dataAgent/` | Prompt v2 (below). `DATA_AGENT_PROMPT_IDS` lists `data-agent-v1` and `data-agent-v2`, and the proxy serves both, so tabs opened before the deploy keep working. |
 | `ChatThreadStore` | `src/components/ChatPanel/ChatThreadStore/` | Persists the result part (its SQL, chart type, and title), so a reloaded thread re-runs its results. |
 | Chat routing | `createChatModelAdapter.ts` | With the switch on, every online turn outside the case designer goes to the agent. Offline turns are unchanged. |
@@ -94,7 +96,9 @@ app and route, then what is open:
 - **Data Explorer:** the open dataset, and the current SQL (cut at 1,500
   characters) with its result columns.
 - **Dashboard:** the dashboard's name and its tiles in page order, at most
-  12, each with title, chart type, and SQL (cut at 1,500 characters). Page
+  12, each with title, chart type, and SQL (cut at 1,500 characters). A
+  title or SQL string literal that looks like personal data is redacted
+  first (see Privacy). Page
   order is what the user scrolls through, because the editor has no viewport
   tracking. Published dashboards at `/d/<slug>` are resolved by slug, among
   workspace-visibility dashboards only. Charts are collected with the shared
@@ -126,9 +130,11 @@ block:
 
 ## One turn
 
-1. The user sends a message from any page. The adapter runs today's consent
-   check on the message, captures the `AgentPageContext` at that moment, and
-   asks the conversation's agent with `buildAgentTurnText`'s output.
+1. The user sends a message from any page. The adapter captures the page
+   (its `ChatPageContext`, route, and dashboard editor state, all at once),
+   runs today's consent check on the message, builds the `AgentPageContext`
+   from what it captured, and asks the conversation's agent with
+   `buildAgentTurnText`'s output.
 2. The model calls `run_query`. `createConversationAgentHost` reads the
    current turn through `turnRef` and routes the result:
    - On the Data Explorer, or on an offline turn (`isOffline`), the host
@@ -150,13 +156,28 @@ block:
   its own results list, so a late result cannot land in a newer turn.
 - Older chat generations are evicted and aborted.
 
-### Offline answers
+### Offline answers and failures
 
-The agent path offers "Answer offline" on a network failure, like today's
-chat (`_recoverFromChatFailure`, D37).
+Pi does not reject `agent.prompt` when a model call fails: `streamProxy`
+catches the failed request and the run ends on an assistant message with
+`stopReason: "error"`. `createDataAgent` rethrows that message's error
+(`errorMessage`, or "The assistant could not answer."), so failures reach
+the adapter. A stopped run (`aborted`) is not a failure.
+
+- A network failure (the browser's "Failed to fetch", "Load failed", or
+  "NetworkError ...") offers "Answer offline", like today's chat
+  (`_recoverFromChatFailure`, D37).
+- Any other failure, such as the proxy refusing the request
+  ("Proxy error: ..."), is rethrown to assistant-ui, which marks the
+  message as failed. This is the same path today's chat takes.
+- The offline agent uses the same `ask`, so an on-device engine error now
+  surfaces too, and a prompt too long for the offline models becomes the
+  chat's "too long" reply.
 
 ## The result card
 
+- The card's code loads the first time a result is shown, behind a
+  placeholder with the card's header and 260px body, so nothing shifts.
 - The card always shows its title. Titles fall back to the result's summary
   when the question is blank.
 - While the query runs it shows a skeleton. If it fails it shows "This
@@ -170,8 +191,8 @@ chat (`_recoverFromChatFailure`, D37).
 | The page block carries | Rule |
 |---|---|
 | App, route, names of the open dataset, dashboard, map, and case type, and column names and types | Metadata, sent freely, as in the system prompt. |
-| The Data Explorer's current SQL and result columns | Sent as today's chat already sends them (`lastSql` in `ChatPageContext`), so nothing new crosses. Cut at 1,500 characters. |
-| Dashboard tiles: title, chart type, SQL | Sent on the same basis as the explorer's SQL. At most 12 tiles, in page order, each SQL cut at 1,500 characters. |
+| The Data Explorer's current SQL and result columns | Sent as today's chat already sends them (`lastSql` in `ChatPageContext`), so nothing new crosses. Cut at 1,500 characters, and not redacted, to keep parity with today's chat. |
+| Dashboard tiles: title, chart type, SQL | At most 12 tiles, in page order, each SQL cut at 1,500 characters. Titles and SQL string literals go through the browser's PII check first (`isPersonalDataText`, built on `detectPii`, passed to `buildAgentPageContextBlock` as `isSensitive`): a flagged title becomes "Untitled chart" and a flagged literal becomes `'<redacted>'`. The eval renders blocks with the same check. |
 | An open case | The case type name and "one case is open" only. Never the case's name or field values. |
 | Rows | Never. |
 
@@ -187,8 +208,8 @@ the model instructions (D35).
 | A chat result's query fails | Recorded under the `data_explorer` analytics app with surface `chat_result`, because the app enum has no chat value. |
 | "This" could mean several things (several tiles, none named) | The agent asks with a question card whose options are the tile titles (up to five). |
 | The user navigates during a turn | The context captured at send time stands. The result still lands in the chat. |
-| The network fails | The chat offers "Answer offline" (D37). |
-| The user lacks Data Explorer access | The proxy refuses, as today (D03), and the chat says data questions need access to the Data Explorer. 1D revisits roles per tool. |
+| The network fails | The agent's answer rejects with the fetch error, and the chat offers "Answer offline" (D37). |
+| The user lacks Data Explorer access | The proxy refuses, as today (D03). The agent's answer rejects with "Proxy error: ...", which reaches assistant-ui's error state as today's chat does. 1D revisits roles per tool. |
 | The page context is missing or fails to load | The turn runs, and results go to the chat. |
 | A page with nothing to describe (settings) | The block names only the app. |
 
@@ -197,8 +218,11 @@ the model instructions (D35).
 Red/green TDD with Vitest, plus one browser spec:
 
 - `buildAgentPageContextBlock` and `buildAgentTurnText`: every app, the
-  12-tile and 1,500-character caps, the unchanged line, escaping, and a case
-  page that never names the case.
+  12-tile and 1,500-character caps, the unchanged line, escaping (including
+  page tags written with spaces), a case page that never names the case,
+  and redaction of a tile's sensitive title and SQL literal while a literal
+  like `'Texas'` is kept. `redactSqlLiterals`: doubled quotes,
+  double-quoted identifiers, and unterminated literals.
 - `createAgentPageContext`, `parseAgentPageRoute`, `extractDashboardTiles`,
   and the name loader: from route, explorer, and dashboard editor state.
 - `createConversationAgentHost`: the explorer destination on the Data
@@ -208,18 +232,27 @@ Red/green TDD with Vitest, plus one browser spec:
   trip and stores no rows.
 - `AgentQueryResultPart` and `useAgentQueryResultView`: loading, rows,
   chart, and failed states, as chip and as embed.
+  `AgentQueryResultPartLazy`: the card-sized placeholder while the card
+  loads, then the card.
+- `createDataAgent`, with a real Pi `Agent`: a failed model call rejects
+  `ask`, a stopped one does not. `isNetworkChatFailure`, through Pi's real
+  `streamProxy` with only `fetch` stubbed: each browser's fetch failure is a
+  network failure, a 403 is not. The offline agent rejects on an engine
+  error.
 - `createChatModelAdapter`: with the switch on, the agent answers on every
-  page except the case designer. Offline routing is unchanged.
+  page except the case designer, and a navigation during the consent wait
+  does not change the page the turn uses. Offline routing is unchanged.
 - The proxy serves `data-agent-v1` and `data-agent-v2`.
 - `tests/e2e/agent-chat-result.spec.ts`: the agent proxy's stream is mocked,
   as `dashboard-chat-block.spec.ts` mocks today's chat. Turn the switch on,
-  open a dashboard, ask a question, see the result embed in the chat, reload,
-  and see the result run again. The full agent browser test is 1F.
+  open a dashboard, ask a question, see the result embed in the chat with its
+  rows, reload, and see the result run again. The full agent browser test is 1F.
 
 ## Eval
 
 - `EvalQuestion` gained an optional `pageContext`. The Pi harness renders it
-  with `buildAgentPageContextBlock`, and the baseline harness passes the
+  with `buildAgentPageContextBlock` and the same PII check as the browser
+  (P01 to P06 contain nothing it redacts), and the baseline harness passes the
   matching `ChatPageContext` where today's chat has one. The default run
   stays at the original 45 questions. `--questions P` runs the six below.
 - Six questions, P01 to P06, on the COVID datasets:
@@ -259,10 +292,23 @@ Red/green TDD with Vitest, plus one browser spec:
 - Give the chat result query a fixed id, so cached results survive a page
   reload.
 - An auto-height body for a failed card.
-- Drop the unused "Loading result" and "Unavailable result" labels by
-  narrowing `GadgetCardHeader`'s prop further.
-- SQL string literals in page SQL can carry user-typed values (the same as
-  today's chat's `lastSql`).
+- Drop the unused "Unavailable result" label by narrowing
+  `GadgetCardHeader`'s prop further. ("Loading result" now names the
+  placeholder shown while the card loads.)
+- The explorer's SQL is sent unredacted (the same as today's chat's
+  `lastSql`); only dashboard tiles are redacted. The PII check is
+  pattern-based, so a plain name in a literal (`'Jane Doe'`) is not caught.
+- The proxy rebuilds table aliases from the workspace's current datasets on
+  every request, while the browser keeps a conversation's first dataset
+  list. A dataset added mid-conversation can still shift the server's
+  aliases away from the browser's (this predates 1A).
+- Each chat result runs twice: once in the host, to give the model its row
+  count and columns, and again in the card. The two runs can apply
+  different automatic row limits.
+- The chat shows no error text for a failed turn: the failed message has
+  no content, so `AssistantMessage` keeps showing its typing dots and no
+  "Try again". Today's chat behaves the same; render the message's error
+  status (assistant-ui's `incomplete`/`error`).
 - Rename `agentPageNameLoader.ts` to match its export,
   `createAgentPageNameLoader`.
 - A manual check in the real app with live models is still owed.
