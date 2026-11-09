@@ -144,6 +144,57 @@ describe("loadCatalogFieldMapper", () => {
     ).rejects.toThrow("missing.ts");
   });
 
+  it("omits every path a mapping consumes, and the config's omitted paths, from the record", async () => {
+    const mapper = await loadCatalogFieldMapper({
+      config: {
+        ..._config({
+          description: { from: "info.summary" },
+          organization2_name: { script: "./__fixtures__/readsName.ts" },
+        }),
+        additionalSourceMetadata: { omit: ["license_text"] },
+      },
+      configDir: CONFIG_DIR,
+    });
+
+    expect(
+      mapper.omitMappedPaths(
+        {
+          name: "tlc",
+          info: { summary: "Trips", owner: "TLC" },
+          license_text: "The full text.",
+          title: "Trips",
+        },
+        DRIVE,
+      ),
+    ).toEqual({ info: { owner: "TLC" }, title: "Trips" });
+  });
+
+  it("keeps the paths a script reads when it does not declare them", async () => {
+    const mapper = await loadCatalogFieldMapper({
+      config: _config({
+        organization2_name: { script: "./__fixtures__/upperCaseName.ts" },
+      }),
+      configDir: CONFIG_DIR,
+    });
+
+    expect(mapper.omitMappedPaths({ name: "tlc" }, DRIVE)).toEqual({
+      name: "tlc",
+    });
+  });
+
+  it("fails to load when a script's reads are not dotted paths", async () => {
+    await expect(
+      loadCatalogFieldMapper({
+        config: _config({
+          notes: { script: "./__fixtures__/invalidReads.ts" },
+        }),
+        configDir: CONFIG_DIR,
+      }),
+    ).rejects.toThrow(
+      "invalidReads.ts must export reads as a list of dotted paths, such as organization.title.",
+    );
+  });
+
   it("refuses a drive the config does not list", async () => {
     const mapper = await loadCatalogFieldMapper({
       config: _config({}),
@@ -152,6 +203,11 @@ describe("loadCatalogFieldMapper", () => {
 
     expect(() => {
       return mapper.mapFields({}, "https://unknown.example.gov");
+    }).toThrow(
+      "https://unknown.example.gov is not a drive in this pipeline's config",
+    );
+    expect(() => {
+      return mapper.omitMappedPaths({}, "https://unknown.example.gov");
     }).toThrow(
       "https://unknown.example.gov is not a drive in this pipeline's config",
     );

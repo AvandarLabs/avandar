@@ -1,13 +1,11 @@
 import {
+  CATALOG_FIELD_PATH_PATTERN,
   CATALOG_MAPPABLE_FIELDS,
   REQUIRED_CATALOG_FIELD,
 } from "@etl/EtlConfig/PipelineConfig.types";
 import { parse } from "yaml";
 import { z } from "zod";
 import type { PipelineConfig } from "@etl/EtlConfig/PipelineConfig.types";
-
-/** Dotted segments of letters, digits, `_`, and `-`, such as `a.b.0`. */
-const FIELD_PATH_PATTERN = /^[\w-]+(\.[\w-]+)*$/;
 
 /**
  * Whether a mapping is exactly `{ value: ... }` with something that is
@@ -28,7 +26,7 @@ function _isNonTextValueSource(input: unknown): boolean {
 
 const FieldSourceSchema = z.union(
   [
-    z.strictObject({ from: z.string().regex(FIELD_PATH_PATTERN) }),
+    z.strictObject({ from: z.string().regex(CATALOG_FIELD_PATH_PATTERN) }),
     z.strictObject({
       value: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]),
     }),
@@ -95,6 +93,11 @@ const PipelineConfigSchema = z.strictObject({
     })
     .optional(),
   download: DownloadSchema.optional(),
+  additionalSourceMetadata: z
+    .strictObject({
+      omit: z.array(z.string().regex(CATALOG_FIELD_PATH_PATTERN)).optional(),
+    })
+    .optional(),
 });
 
 /**
