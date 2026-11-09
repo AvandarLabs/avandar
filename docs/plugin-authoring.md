@@ -68,6 +68,15 @@ holds at most one `*.test.ts(x)` file outside a `__tests__/` directory (see
 plugins/epidemiology/src/
   index.tsx                                  the plugin entry
   index.test.tsx
+  derivedColumns/                            shared by the column commands
+    AddColumnsFooter.tsx
+    useAddColumns.ts
+    getColumnNamesFromColumns/
+      getColumnNamesFromColumns.ts
+      getColumnNamesFromColumns.test.ts
+    makeColumnNameSlugFromName/
+      makeColumnNameSlugFromName.ts
+      makeColumnNameSlugFromName.test.ts
   epicurve/                                  the epicurve chart type
     getBucketStartFromDate/
       getBucketStartFromDate.ts
@@ -84,6 +93,20 @@ plugins/epidemiology/src/
   getNumberFromCellValue/
     getNumberFromCellValue.ts
     getNumberFromCellValue.test.ts
+  incidence/                                 the "Incidence per 100k" command
+    makeIncidenceColumnsFromOptions/
+      makeIncidenceColumnsFromOptions.ts
+      __tests__/
+        makeIncidenceColumnsFromOptions.test.ts
+        makeIncidenceColumnsFromOptions.executed.test.ts
+    IncidenceModal/
+      IncidenceModal.tsx
+      IncidenceModal.test.tsx
+      IncidenceModal.types.ts
+      IncidenceForm.tsx
+      PopulationFields.tsx
+      RateBaseControl.tsx
+      useIncidenceForm.ts
   makeRegressionPointsFromRows/
     makeRegressionPointsFromRows.ts
     makeRegressionPointsFromRows.test.ts
@@ -112,9 +135,28 @@ plugins/epidemiology/src/
     makeStatisticTextFromNumber/
       makeStatisticTextFromNumber.ts
       makeStatisticTextFromNumber.test.ts
+  rollingAverage/                            the "Rolling average" command
+    makeRollingAverageColumnFromOptions/
+      makeRollingAverageColumnFromOptions.ts
+      __tests__/
+        makeRollingAverageColumnFromOptions.test.ts
+        makeRollingAverageColumnFromOptions.executed.test.ts
+    RollingAverageModal/
+      RollingAverageModal.tsx
+      RollingAverageModal.test.tsx
+      RollingAverageModal.types.ts
+      RollingAverageForm.tsx
+      ColumnPickers.tsx
+      WindowFields.tsx
+      useRollingAverageForm.ts
 ```
 
 Plugin tests run with the repo's Vitest setup (`pnpm vitest run plugins/<name>`).
+Tests named `*.executed.test.ts` run SQL in real DuckDB instead, with
+`pnpm test:executed plugins/<name>`. They cannot import the repo's
+executed-test helpers under `tests/`, because no plugin file may import from
+outside its folder, so they open their own database with
+`DuckDBInstance.create(":memory:")` from `@duckdb/node-api`.
 
 ## 3. Write the manifest
 
@@ -155,7 +197,7 @@ contributes:
 | `name`, `description`, command `title` | A `%key%` reference to `locales/en.json`, such as `"%plugin.name%"`. The text is plain, with no ICU arguments. A key missing from `en.json` fails |
 | `icon` (plugin and command) | A Tabler icon name in kebab-case, such as `trending-up`. It must be a real icon in `@tabler/icons-react`, matched with exact case |
 | `entry` | A relative `.ts` or `.tsx` path inside the plugin folder. The file must exist |
-| `permissions` | A list. `data:context` is the only accepted value |
+| `permissions` | A list of `data:context` and `query:addColumns` (see the API table in section 5) |
 | `contributes.commands[].id` | Lowercase letters, digits, and hyphens in dot-separated words. Unique within the plugin |
 | `contributes.menus.<slot>[].command` | The id of a command declared in the same manifest |
 
@@ -243,6 +285,8 @@ The `avandar` API, from `@avandar/plugin-sdk`:
 | `avandar.ui.openModal({ title, content })` | Opens a modal. `content` is a React tree built from `@avandar/plugin-ui` | none |
 | `avandar.ui.openDrawer({ title, content })` | Opens a drawer with the same options | none |
 | `avandar.ui.notify({ title?, message, color? })` | Shows a notification. `title` defaults to the plugin name. `color` is `blue` (default), `green`, `red`, or `yellow` | none |
+| `avandar.ui.closeModal()` | Closes the modal this invocation opened last. Does nothing when it opened none, or the user already closed it | none |
+| `avandar.dataExplorer.addColumns(columns)` | Adds computed columns to the Data Explorer query the command was invoked on, and resolves `{ columnNames }`. `avandar.dataExplorer` is undefined outside a Data Explorer toolbar command (see section 6) | `query:addColumns` |
 | `avandar.i18n.t(key, values?)` | Synchronous. Formats a message from `locales/` for the workspace locale | none |
 | `avandar.workspace` | `{ id, slug, locale }`, read-only | none |
 
@@ -273,7 +317,99 @@ function RowCount() {
 }
 ```
 
-## 6. Declare a chart type
+## 6. Add columns to the Data Explorer query
+
+A Data Explorer toolbar command can add computed columns to the query it was
+invoked on, such as an incidence rate or a rolling average. The columns are
+part of the query, so they can be charted, filtered, and saved to a dashboard
+like any other column. Declare `query:addColumns` in the manifest's
+`permissions` and call `avandar.dataExplorer.addColumns`:
+
+```ts
+const result = await avandar.dataExplorer?.addColumns([
+  {
+    name: "incidence_per_100k",
+    expression: "{cases} * 100000.0 / NULLIF({population}, 0)",
+    inputs: { cases: "case_count", population: "pop_2024" },
+  },
+]);
+```
+
+`avandar.dataExplorer` is defined only for a command run from the
+`dataExplorer.toolbar` slot while a finished result is on screen (it is
+undefined while a query is still running). Check it before you
+use it, and tell the user why nothing can be added when it is undefined.
+
+Each column is a `DerivedColumn` from `@avandar/plugin-sdk`:
+
+| Field | Rule |
+| --- | --- |
+| `name` | Lowercase snake case: a letter, then lowercase letters, digits, and underscores (`^[a-z][a-z0-9_]*$`) |
+| `expression` | One SQL scalar or window expression in DuckDB's dialect, such as `{cases} * 2` or `avg({value}) OVER (ORDER BY {date})`. No `SELECT`, subquery, alias, or clause (`FROM`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, `LIMIT`, `QUALIFY`, `WINDOW`, `INTO`), and no `DISTINCT` or `TOP`. `;`, `--`, and `/*` are rejected anywhere, even inside a string literal |
+| `inputs` | Maps each `{placeholder}` in `expression` to the name of a column in the result the command was invoked on, spelled exactly as `avandar.context.columns` lists it |
+
+Never paste a column name into `expression`. Write a placeholder, a letter or
+underscore followed by letters, digits, and underscores in braces, and bind it
+in `inputs`. Avandar replaces it with the column's quoted identifier, so a
+column named `Case count` or `a"b` works without any quoting on your side.
+The expression is checked after the substitution, so a column whose name
+contains `;`, `--`, or `/*` makes `addColumns` reject.
+Write number literals with a decimal point, such as `100000.0` or `9.0`, where
+a division must not truncate.
+
+When a name is already taken, by a result column or by an earlier column in
+the same call, compared without case, Avandar adds `_2`, then `_3`, and so on.
+`addColumns` resolves `{ columnNames }`: the names the columns were added
+under, in the order you passed them. A command that calls `addColumns` again
+on its own output should read these names rather than assume its own.
+
+Avandar then:
+
+1. Wraps the SQL behind the result, whether it was typed or built from the
+   query builder, so every row keeps its order:
+
+   ```sql
+   WITH ava_source AS (
+     SELECT *, row_number() OVER () AS __ava_row FROM (
+   <the query's SQL>
+     )
+   )
+   SELECT * EXCLUDE (__ava_row),
+     (<expression>) AS "<name>"
+   FROM ava_source
+   ORDER BY __ava_row
+   ```
+
+2. Puts the wrapped SQL in the SQL editor and runs it. The query builder no
+   longer matches the SQL, and the Data Explorer says so as it does for any
+   edited SQL.
+3. Shows a "Columns added" notification that lists the new columns, with an
+   **Undo** button. The notification closes after 10 seconds, and a newer one
+   replaces it. Undo restores the SQL, the query builder state, and the chart
+   settings from before the command, and runs that query again. If the SQL in
+   the editor is no longer the SQL the command added, Undo changes nothing
+   and shows "Nothing to undo".
+
+`addColumns` resolves once the wrapped SQL is in the editor and running. If
+the SQL then fails, for example because DuckDB rejects the expression for a
+column's type, the Data Explorer shows the query error as it does for any
+query, and Undo still restores the query from before. "Save to dashboard"
+saves the wrapped SQL like any other SQL.
+
+`addColumns` rejects with a `PluginError` and changes nothing when:
+
+| `code` | When |
+| --- | --- |
+| `InvalidExpression` | The list is empty, a `name` breaks the rule above, a placeholder has no `inputs` entry, an input names a column the result does not have, an `expression` is not exactly one scalar or window expression, or the result has a column named `__ava_row` (any case), which Avandar reserves for the row order |
+| `InvalidHandle` | The Data Explorer no longer shows the result the command was invoked on, for example because the user ran another query while the command's modal was open. The message asks the user to run the command again |
+
+A command that opens a modal and adds columns from its form should await
+`addColumns`, then call `avandar.ui.closeModal()` to close the modal. On a
+rejection, keep the modal open and show the error's `message` in it, so the
+user can change a field and try again. The epidemiology plugin's incidence
+and rolling average commands work this way (`src/derivedColumns/useAddColumns.ts`).
+
+## 7. Declare a chart type
 
 A chart type adds an entry to the chart type pickers of the Data Explorer and
 the dashboard editor, in a "Plugins" group that lists the chart types of
@@ -337,7 +473,7 @@ its control, and a `number` whose `min` is above its `max` all fail
 validation. Chart types need no permission: a chart receives only rows its
 viewer can already see.
 
-## 7. Draw a chart type
+## 8. Draw a chart type
 
 Give each chart type its code under `vizTypes` in `definePlugin`, keyed by its
 manifest `id`. A `transform` chart type provides `transform`, and a
@@ -504,7 +640,7 @@ goes wrong, the chart area shows what, and the rest of the page is unaffected:
 A chart that crashed draws again when its settings, its data, or its chart type
 change, so fixing a setting clears the error without a reload.
 
-## 8. Translate plugin strings
+## 9. Translate plugin strings
 
 Every user-visible string lives in `locales/<lang>.json`, as a flat map of key
 to text. `en.json` is required and must define every `%key%` the manifest uses.
@@ -528,7 +664,7 @@ avandar.i18n.t("modal.truncated", { count: 50000 });
 A message that cannot be compiled or formatted is returned as written instead
 of throwing.
 
-## 9. Stay within the import allowlist
+## 10. Stay within the import allowlist
 
 Plugin code may import only:
 
@@ -554,7 +690,7 @@ or fire-and-forget and passes serializable data, with three exceptions: the
 synchronous `i18n.t`, the React `content` of `openModal` and `openDrawer`, and
 chart components, which are React components too.
 
-## 10. Validate
+## 11. Validate
 
 ```bash
 ava plugin validate case-tools
@@ -584,8 +720,11 @@ budget.
 - **Permissions are declared, not enforced.** A manifest lists the permissions
   it needs and Settings → Plugins shows them to admins. The host does not
   enforce them: bundled plugins run in-process. Declare `data:context`
-  whenever the plugin calls `fetchRows`, so the manifest states what the
-  plugin does.
+  whenever the plugin calls `fetchRows`, and `query:addColumns` whenever it
+  calls `avandar.dataExplorer.addColumns`, so the manifest states what the
+  plugin does. Adding a permission to a plugin that workspaces already
+  installed hides its contributions there until a settings admin approves
+  it under "Review new permissions" in Settings → Plugins.
 - **Never bundle a contract plugin.** This repository is public. A plugin that
   carries a customer's logic or data must wait for a distribution path that
   keeps it out of this repository.
