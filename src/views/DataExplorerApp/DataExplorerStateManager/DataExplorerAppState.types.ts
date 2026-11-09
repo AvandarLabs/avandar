@@ -113,9 +113,10 @@ export type DataExplorerAppState = {
    * from a plugin chart and back restores its settings.
    *
    * Kept apart from `vizConfigMemory` because every plugin config shares the
-   * one `"plugin"` viz type. Written on the way out of a plugin chart type and
-   * reconciled against the current result columns the same way, and
-   * in-memory only.
+   * one `"plugin"` viz type. Written on the way out of a plugin chart type.
+   * On the way back in, a remembered column setting is kept only while its
+   * column is still in `lastResultColumns` (or while that is unset), and the
+   * picked config fills the rest. In-memory only.
    */
   pluginVizConfigMemory: Readonly<Record<string, AvaVizConfig.Plugin>>;
 

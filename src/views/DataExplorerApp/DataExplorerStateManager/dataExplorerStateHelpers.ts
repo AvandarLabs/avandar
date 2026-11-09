@@ -1,4 +1,4 @@
-import { objectValuesMap } from "@avandar/utils";
+import { objectFilter, objectValuesMap } from "@avandar/utils";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { makePluginVizMemoryKey } from "@/lib/plugins/vizs/pluginVizOptionHelpers";
@@ -25,6 +25,35 @@ function _regenerateRawSqlFromQuery(
   } catch {
     return undefined;
   }
+}
+
+function _makeRestoredPluginVizConfig(
+  options: Readonly<{
+    rememberedConfig: AvaVizConfig.Plugin;
+    pickedConfig: AvaVizConfig.Plugin;
+    resultColumns: readonly QueryResult.ColumnWithId[] | undefined;
+  }>,
+): AvaVizConfig.Plugin {
+  const { rememberedConfig, pickedConfig, resultColumns } = options;
+  // With no result yet there are no columns to check the settings against.
+  if (resultColumns === undefined) {
+    return rememberedConfig;
+  }
+  const resultColumnIds = new Set(
+    resultColumns.map((column) => {
+      return column.id;
+    }),
+  );
+  const keptColumnSettings = objectFilter(
+    rememberedConfig.columnSettings,
+    (_settingKey, columnId) => {
+      return columnId !== undefined && resultColumnIds.has(columnId);
+    },
+  );
+  return {
+    ...rememberedConfig,
+    columnSettings: { ...pickedConfig.columnSettings, ...keptColumnSettings },
+  };
 }
 
 /**
@@ -123,8 +152,12 @@ export function makeVizConfigMemoriesFromState(
 /**
  * Activates a plugin chart config picked in the viz type picker, or the
  * config remembered for the same plugin chart type when there is one, and
- * files the outgoing config. Returns `state` unchanged when that plugin chart
- * type is already active. Called by `setActiveVizType` for a plugin target.
+ * files the outgoing config. A remembered config keeps its other settings,
+ * and keeps each column setting whose column is still in the last result
+ * (all of them while there is no result). Every other column setting takes
+ * the picked config's value. Returns
+ * `state` unchanged when that plugin chart type is already active. Called by
+ * `setActiveVizType` for a plugin target.
  */
 export function makeStateFromPluginVizConfig(
   options: Readonly<{
@@ -140,10 +173,18 @@ export function makeStateFromPluginVizConfig(
   ) {
     return state;
   }
+  const rememberedConfig = state.pluginVizConfigMemory[memoryKey];
   return {
     ...state,
     ...makeVizConfigMemoriesFromState(state),
-    vizConfig: state.pluginVizConfigMemory[memoryKey] ?? pluginVizConfig,
+    vizConfig:
+      rememberedConfig === undefined
+        ? pluginVizConfig
+        : _makeRestoredPluginVizConfig({
+            rememberedConfig,
+            pickedConfig: pluginVizConfig,
+            resultColumns: state.lastResultColumns,
+          }),
     pendingUrlVizConfig: undefined,
   };
 }

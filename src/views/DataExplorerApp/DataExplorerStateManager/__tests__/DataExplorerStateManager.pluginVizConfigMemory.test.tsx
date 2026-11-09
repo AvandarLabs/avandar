@@ -10,6 +10,7 @@ import { makePluginVizMemoryKey } from "@/lib/plugins/vizs/pluginVizOptionHelper
 import { act, renderHook } from "@/test-utils";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
@@ -85,6 +86,24 @@ const UI_EPICURVE_CONFIG: UiVizConfig = {
   settings: { interval: "month" },
 };
 
+const ONSET_COLUMN: QueryResult.ColumnWithId = {
+  id: "onset" as QueryColumn.Id,
+  name: "onset",
+  dataType: "date",
+};
+
+const REPORT_COLUMN: QueryResult.ColumnWithId = {
+  id: "report" as QueryColumn.Id,
+  name: "report",
+  dataType: "date",
+};
+
+/** The epicurve config the picker builds once onset leaves the result. */
+const FRESH_EPICURVE_CONFIG: AvaVizConfig.Plugin = {
+  ...EPICURVE_CONFIG,
+  columnSettings: { dateColumn: REPORT_COLUMN.id },
+};
+
 function _Wrapper({ children }: { children: ReactNode }): ReactNode {
   return (
     <DataExplorerStateManager.Provider>
@@ -103,6 +122,35 @@ function _renderStateManager(): RenderHookResult<
     },
     { wrapper: _Wrapper },
   );
+}
+
+/**
+ * Runs a result with `columns`, then edits an epicurve on the onset column
+ * and switches to a bar chart, so the epicurve is remembered.
+ */
+function _rememberEditedEpicurve(
+  result: { current: ReturnType<typeof DataExplorerStateManager.useContext> },
+  columns: readonly QueryResult.ColumnWithId[],
+): void {
+  act(() => {
+    result.current[1].syncVizFromQueryResult(columns);
+  });
+  act(() => {
+    result.current[1].setActiveVizType(EPICURVE_CONFIG);
+  });
+  act(() => {
+    result.current[1].setVizConfig(EDITED_EPICURVE_CONFIG);
+  });
+  act(() => {
+    result.current[1].setActiveVizType("bar");
+  });
+}
+
+function _getActivePluginConfig(result: {
+  current: ReturnType<typeof DataExplorerStateManager.useContext>;
+}): AvaVizConfig.Plugin | undefined {
+  const { vizConfig } = result.current[0];
+  return vizConfig.vizType === "plugin" ? vizConfig : undefined;
 }
 
 describe("Data Explorer plugin viz config memory", () => {
@@ -209,6 +257,67 @@ describe("Data Explorer plugin viz config memory", () => {
         makePluginVizMemoryKey(EPICURVE_CONFIG)
       ]?.columnSettings,
     ).toStrictEqual({ dateColumn: STRUCTURED_COLUMN_ID });
+  });
+
+  it("keeps a remembered column setting whose column is still in the result", () => {
+    const { result } = _renderStateManager();
+    _rememberEditedEpicurve(result, [ONSET_COLUMN, REPORT_COLUMN]);
+
+    act(() => {
+      result.current[1].setActiveVizType(FRESH_EPICURVE_CONFIG);
+    });
+
+    expect(_getActivePluginConfig(result)?.columnSettings).toStrictEqual({
+      dateColumn: ONSET_COLUMN.id,
+    });
+  });
+
+  it("takes the fresh config's column setting when the remembered column left the result", () => {
+    const { result } = _renderStateManager();
+    _rememberEditedEpicurve(result, [ONSET_COLUMN, REPORT_COLUMN]);
+    act(() => {
+      result.current[1].syncVizFromQueryResult([REPORT_COLUMN]);
+    });
+
+    act(() => {
+      result.current[1].setActiveVizType(FRESH_EPICURVE_CONFIG);
+    });
+
+    expect(_getActivePluginConfig(result)?.columnSettings).toStrictEqual({
+      dateColumn: REPORT_COLUMN.id,
+    });
+  });
+
+  it("keeps remembered non-column settings when a column setting is replaced", () => {
+    const { result } = _renderStateManager();
+    _rememberEditedEpicurve(result, [ONSET_COLUMN, REPORT_COLUMN]);
+    act(() => {
+      result.current[1].syncVizFromQueryResult([REPORT_COLUMN]);
+    });
+
+    act(() => {
+      result.current[1].setActiveVizType(FRESH_EPICURVE_CONFIG);
+    });
+
+    expect(_getActivePluginConfig(result)?.settings).toStrictEqual(
+      EDITED_EPICURVE_CONFIG.settings,
+    );
+  });
+
+  it("keeps a remembered column setting while no result has columns", () => {
+    const { result } = _renderStateManager();
+    _rememberEditedEpicurve(result, [ONSET_COLUMN]);
+    act(() => {
+      result.current[1].setRawSql("select report from cases");
+    });
+
+    act(() => {
+      result.current[1].setActiveVizType(FRESH_EPICURVE_CONFIG);
+    });
+
+    expect(_getActivePluginConfig(result)?.columnSettings).toStrictEqual({
+      dateColumn: ONSET_COLUMN.id,
+    });
   });
 
   it("shows a plugin chart restored from the URL without column settings until a result binds it", () => {
