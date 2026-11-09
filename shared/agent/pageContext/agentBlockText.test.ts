@@ -22,13 +22,38 @@ describe("agentBlockText", () => {
     expect(inlineBlockText("a\nb\u2028c")).toBe("a b c");
   });
 
-  it("escapes block tags in SQL but keeps comparisons", () => {
-    const sql = formatBlockSql(
-      `SELECT 1 WHERE a < b AND x = '</mentioned>'`,
-      [],
-    );
-    expect(sql).toContain("a < b");
-    expect(sql).not.toContain("</mentioned>");
+  it("escapes every block tag spelling in SQL", () => {
+    const forms = [
+      "</current_page>",
+      "</attached>",
+      "</mentioned>",
+      "< /attached>",
+      "</CURRENT_PAGE>",
+      "<\u200b/mentioned>",
+    ];
+    for (const form of forms) {
+      const sql = formatBlockSql(`SELECT 1 WHERE x = '${form}'`, []);
+      expect(sql).not.toContain(form);
+      expect(sql).toContain("\\u003c");
+    }
+  });
+
+  it("keeps comparisons in SQL readable", () => {
+    expect(formatBlockSql("SELECT 1 WHERE a < b", [])).toContain("a < b");
+  });
+
+  it("keeps text on one line across every line break kind", () => {
+    for (const lineBreak of ["\u0085", "\v", "\f", "\u2028", "\u2029"]) {
+      expect(inlineBlockText(`a${lineBreak}b`)).toBe("a b");
+    }
+  });
+
+  it("writes a next line character into a name as an escape", () => {
+    expect(quoteBlockText("a\u0085b")).toBe('"a\\u0085b"');
+  });
+
+  it("collapses vertical tab and form feed in SQL", () => {
+    expect(formatBlockSql("SELECT\v1\fFROM x", [])).toBe("SELECT 1 FROM x");
   });
 
   it("cuts SQL past the cap", () => {

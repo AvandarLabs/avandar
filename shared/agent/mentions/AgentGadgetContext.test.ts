@@ -15,6 +15,16 @@ describe("getAgentGadgetName", () => {
     expect(getAgentGadgetName(context)).toBe("Weekly cases");
   });
 
+  it("names a dataset by its name", () => {
+    expect(
+      getAgentGadgetName({
+        kind: "dataset",
+        ref: { gadgetType: "dataset", gadgetId: ID, subId: null },
+        name: "Measles cases",
+      }),
+    ).toBe("Measles cases");
+  });
+
   it("names an unavailable gadget by its type only", () => {
     expect(
       getAgentGadgetName({

@@ -50,6 +50,21 @@ describe("ChatMentionToken", () => {
     ]);
   });
 
+  it("reads an uppercase uuid as the lowercase ref", () => {
+    const token = `@{dashboard:${DASHBOARD.gadgetId.toUpperCase()}}`;
+    expect(ChatMentionToken.parse(token)).toEqual([
+      { kind: "mention", ref: DASHBOARD },
+    ]);
+  });
+
+  it("lists one ref for an uppercase and a lowercase copy", () => {
+    const lower = ChatMentionToken.buildToken(DASHBOARD);
+    const upper = `@{dashboard:${DASHBOARD.gadgetId.toUpperCase()}}`;
+    expect(ChatMentionToken.refsFromText(`${lower} ${upper}`)).toEqual([
+      DASHBOARD,
+    ]);
+  });
+
   it("writes names for the model as quoted text", () => {
     const text = `Use ${ChatMentionToken.buildToken(DASHBOARD)} please`;
     expect(

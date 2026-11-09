@@ -3,15 +3,19 @@ import { SqlLiterals } from "$/agent/pageContext/SqlLiterals.ts";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
 import type { AgentPageTile } from "$/agent/pageContext/AgentPageContext.ts";
 
-/** A run of line breaks (CR, LF, line and paragraph separators) and spaces. */
-const LINE_BREAKS = /\s*[\r\n\u2028\u2029]+\s*/g;
+/**
+ * A run of line breaks (CR, LF, vertical tab, form feed, next line, line
+ * and paragraph separators) and spaces.
+ */
+const LINE_BREAKS = /\s*[\r\n\v\f\u0085\u2028\u2029]+\s*/g;
 
 /**
  * A `<` that would start an agent block tag (`current_page`, `attached`,
  * `mentioned`), opening or closing, including spellings with spaces such
- * as `< /attached>`.
+ * as `< /attached>` or with zero-width characters between `<` and the name.
  */
-const BLOCK_TAG_START = /<(?=\s*\/?\s*(?:current_page|attached|mentioned))/gi;
+const BLOCK_TAG_START =
+  /<(?=[\s\u200b-\u200d\u2060\ufeff]*\/?[\s\u200b-\u200d\u2060\ufeff]*(?:current_page|attached|mentioned))/gi;
 
 /**
  * A `<` that does not start a page placeholder (`<value 3>`). A placeholder
@@ -33,13 +37,15 @@ export type BlockRenderOptions = Readonly<{
 
 /**
  * A name as a JSON string literal, so quotes and line breaks are escaped,
- * including the line and paragraph separators JSON leaves raw. Every `<`
+ * including the next line, line and paragraph separators JSON leaves raw.
+ * Every `<`
  * but a placeholder's becomes `\u003c`, so a name can never spell out a
  * block tag.
  */
 export function quoteBlockText(name: string): string {
   return JSON.stringify(name)
     .replace(NON_PLACEHOLDER_LT, "\\u003c")
+    .replace(/\u0085/g, "\\u0085")
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
 }
