@@ -3,9 +3,9 @@
  * its chart's query against the published snapshot and shows the rows.
  *
  * The chart reads a column the owner renamed, and the dataset is published
- * whole. A whole-dataset snapshot used to be a copy of the stored upload,
- * which keeps the original column name, so this pins that the snapshot is
- * published with the name the chart's query uses.
+ * whole. The stored upload keeps the original column name, so this pins that
+ * a whole-dataset snapshot of a renamed column is published with the name the
+ * chart's query uses rather than as a copy of that upload.
  *
  * The dataset is imported and its column renamed in `beforeAll`, in a browser
  * context of its own, so the session under test starts after both exist.
@@ -228,12 +228,14 @@ test.describe("public dashboard link", () => {
         await visitorPage.goto(`/d/${dashboardId}`, {
           waitUntil: "domcontentloaded",
         });
+        // The dashboard's only tile is the table chart.
+        const chartTable = visitorPage.getByRole("grid");
         await expect(
-          visitorPage.getByText(EXPECTED_COUNTIES[0], { exact: true }),
+          chartTable.getByRole("columnheader", { name: RENAMED_COLUMN_NAME }),
         ).toBeVisible({ timeout: LONG_WAIT });
         for (const county of EXPECTED_COUNTIES) {
           await expect(
-            visitorPage.getByText(county, { exact: true }),
+            chartTable.getByRole("gridcell", { name: county, exact: true }),
           ).toBeVisible();
         }
         await expect(

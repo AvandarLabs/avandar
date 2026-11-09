@@ -6,6 +6,7 @@ import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__test
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
+import type { DatasetColumnSource } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 
 const DATASET_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
@@ -406,7 +407,7 @@ const RENAMED_COLUMN = {
 };
 
 async function _runRegionSelect(
-  datasetColumnSource: "catalog" | "stored" | undefined,
+  datasetColumnSource: DatasetColumnSource | undefined,
 ): Promise<void> {
   const mediator = QueryMediatorFactory.create("QueryMediator", {
     state: {
@@ -454,9 +455,11 @@ describe("QueryMediator dataset column source", () => {
   });
 
   it("loads a cached relation as stored when the catalog is unreadable", async () => {
-    // An anonymous visitor has no grant on `dataset_columns`, so any read of
-    // it rejects. The table is missing from DuckDB, so the relation comes
-    // from the storage tier instead of the snapshot preload.
+    // Any read of `dataset_columns` rejects here, as it does for a caller
+    // with no grant on it. The table is missing from DuckDB, so the relation
+    // comes from the storage tier. This runs the mediator without the public
+    // session's owner check, which refuses a table its snapshot did not load,
+    // so it pins the `stored` load path rather than a public query flow.
     datasetColumnGetAllMock.mockRejectedValue(
       new Error("permission denied for table dataset_columns"),
     );

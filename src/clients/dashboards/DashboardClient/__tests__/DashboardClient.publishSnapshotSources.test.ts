@@ -223,7 +223,7 @@ describe("publishing a whole-dataset (all_columns) slice", () => {
 
 describe("publishing a whole-dataset slice of a renamed or retyped dataset", () => {
   it.each(["csv_file", "xlsx_file", "pdf_file", "open_data"] as const)(
-    "publishes a %s dataset with a renamed column through the workspace query",
+    "publishes a %s dataset whose catalog renames or casts a column through the workspace query",
     async (sourceType) => {
       // The stored Parquet keeps the original headers and types, while every
       // query names the renamed, retyped columns. Copying the file would
