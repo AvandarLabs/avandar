@@ -113,6 +113,7 @@ function _getLatLngOverlayRawSql(options: {
       options.layer,
       options.layer.timeColumn,
     ),
+    spatialFilterEnvelopeSql: undefined,
   });
 }
 
