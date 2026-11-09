@@ -165,7 +165,13 @@ v1 and v2 stay served, so tabs opened before the deploy keep working.
 - **Offline turns:** no blocks, as today. Tokens become `@"Name"` text so the
   offline model reads names, not ids.
 - **Today's chat:** a thread started with the switch on and continued with it
-  off sends `@"Name"` text, never a token.
+  off, or any chat in the case designer, names each mention by its type
+  only (`@"a chart"`, `@"a dataset"`, `@"a dashboard"`, `@"a map"`,
+  `@"a case type"`), never its name, a token, or an id. Today's chat has no
+  vault to mask names with. Its consent check runs on that same text, so a
+  consent ack matches the posted message. Offline turns, the agent path's
+  consent check, and labels keep real names, since they stay on the
+  device.
 
 ## Errors
 
@@ -203,8 +209,8 @@ Red/green TDD with Vitest, plus one browser spec:
   running states.
 - `ChatContextTray` and `ChatContextPicker`: "On this page", "Recent", added
   items, the 5-item limit.
-- `createChatModelAdapter`: tokens become `@"Name"` on the agent, offline, and
-  today's-chat paths, and in the recap.
+- `createChatModelAdapter`: tokens become `@"Name"` on the agent and offline
+  paths and in the recap, and `@"a chart"` (type only) on today's chat.
 - The proxy serves `data-agent-v1`, `v2`, and `v3`.
 - An adversarial privacy review that writes real attack tests: forged tokens,
   names through mentioned titles, map layers, and case type fields, and the
@@ -233,6 +239,37 @@ the COVID datasets, run with `--questions M`:
 still pass and the 45 questions score 44 or 45 (a miss is rerun before it
 counts). Cost per question is reported against v2. Runs are archived under a
 `phase-1b` label. Then a live check with live models in the real app.
+
+## Privacy review
+
+An adversarial review wrote attack tests against the built feature
+(`mentionPrivacyLeaks.test.ts` and the "privacy leaks" blocks in the
+adapter, turn, and serializer tests). Four leaks were found and fixed:
+
+1. Today's chat received mentions' real names. It now names each mention by
+   its type only.
+2. Caps emptied SQL before redaction, so a value only a capped chart's SQL
+   filtered on stayed readable in its name: the sixth mention's pointer,
+   tiles past the 24-chart budget, dashboard charts past 12 (in the mention
+   blocks and the page block), and attached-above pointers. Every loaded
+   gadget's SQL is now redacted before any name is masked, while only the
+   SQL the caps allow is sent.
+3. A block tag spelled with an invisible character such as a soft hyphen or
+   a combining grapheme joiner got through chart SQL. Any whitespace, space
+   separator, format character, or combining mark is now allowed between
+   `<`, `/`, and the tag name when escaping.
+4. A tile chip whose block id the token parser rejects (a space, `/`, `}`,
+   or over 200 characters) was written as raw text holding its uuid. Such a
+   chip is now dropped, and never pastes as a chip.
+
+Attacks that held: masking of filtered values in names, titles, map layers
+and their sources, case type fields, pointers within the budget, and the
+recap; block tags and line separators spelled in names; standard tag
+spellings in SQL; forged tokens; tray validation; and analytics payloads,
+which carry counts only.
+
+Still open, untested: a map layer's own filter value appearing in that
+layer's name. Layer queries are not vaulted.
 
 ## Done when
 
