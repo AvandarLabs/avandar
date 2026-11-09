@@ -70,3 +70,40 @@ describe("agentBlockText", () => {
     expect(sql.endsWith(" ...")).toBe(true);
   });
 });
+
+/*
+ * Written by the third 1B privacy review. `BLOCK_TAG_START`'s lookahead
+ * holds two unbounded invisible runs around an optional `/`, so a `<`
+ * followed by a long invisible run that spells no tag backtracks
+ * quadratically. Chart SQL is unbounded and escaped before it is cut.
+ */
+describe("formatBlockSql on pathological input", () => {
+  it("escapes a long invisible run after a `<` in linear time", () => {
+    const sql = `SELECT 1 AS "<${"\u200b".repeat(30_000)}x" FROM t`;
+
+    const startedAt = performance.now();
+    formatBlockSql(sql, []);
+
+    expect(performance.now() - startedAt).toBeLessThan(250);
+  });
+});
+
+describe("formatBlockSql block tag escaping", () => {
+  it("escapes the right `<` after characters outside the basic plane", () => {
+    expect(
+      formatBlockSql('SELECT 1 AS "\u{1F600}\u200b</mentioned>"', []),
+    ).toBe('SELECT 1 AS "\u{1F600}\u200b\\u003c/mentioned>"');
+  });
+
+  it("escapes a tag whose name is split by invisible characters", () => {
+    expect(formatBlockSql("SELECT '<\u00ad/ment\u200bioned>'", [])).toBe(
+      "SELECT '\\u003c\u00ad/ment\u200bioned>'",
+    );
+  });
+
+  it("keeps comparisons readable", () => {
+    expect(formatBlockSql("SELECT 1 WHERE a < b", [])).toBe(
+      "SELECT 1 WHERE a < b",
+    );
+  });
+});

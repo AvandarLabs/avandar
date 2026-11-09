@@ -10,30 +10,62 @@ import type { AgentPageTile } from "$/agent/pageContext/AgentPageContext.ts";
 const LINE_BREAKS = /\s*[\r\n\v\f\u0085\u2028\u2029]+\s*/g;
 
 /**
- * Characters a reader or model may not see, allowed anywhere inside a
- * block tag's spelling: whitespace, control characters (`Cc`), space
- * separators (`Zs`), format characters (`Cf`, such as a zero-width space or
- * soft hyphen), combining marks (`Mn`), and the Hangul fillers and braille
+ * One character a reader or model may not see, skipped when looking for a
+ * block tag: whitespace, control characters (`Cc`), space separators
+ * (`Zs`), format characters (`Cf`, such as a zero-width space or soft
+ * hyphen), combining marks (`Mn`), and the Hangul fillers and braille
  * blank, which render as blanks.
  */
-const INVISIBLE_RUN =
-  "[\\s\\p{Cc}\\p{Cf}\\p{Mn}\\p{Zs}\\u115f\\u1160\\u3164\\uffa0\\u2800]*";
+const INVISIBLE_CHARACTER =
+  /^[\s\p{Cc}\p{Cf}\p{Mn}\p{Zs}\u115f\u1160\u3164\uffa0\u2800]$/u;
 
-/** The agent block tag names, as `BLOCK_TAG_START` looks for them. */
-const BLOCK_TAG_NAMES = ["current_page", "attached", "mentioned"];
+/** An agent block tag's start, opening or closing, spelled plainly. */
+const PLAIN_BLOCK_TAG_START = /<\/?(?:current_page|attached|mentioned)/gi;
 
 /**
- * A `<` that would start an agent block tag (`current_page`, `attached`,
- * `mentioned`), opening or closing, including spellings with spaces such
- * as `< /attached>` or with invisible characters between `<`, the `/`, and
- * the name, or between the name's own letters.
+ * SQL is cut to this length before its block tags are escaped, so the
+ * escape's work is bounded. Twice the cap leaves room for aliases, which
+ * can lengthen it, before the final cut at the cap.
  */
-const BLOCK_TAG_START = new RegExp(
-  `<(?=${INVISIBLE_RUN}\\/?${INVISIBLE_RUN}(?:${BLOCK_TAG_NAMES.map((name) => {
-    return [...name].join(INVISIBLE_RUN);
-  }).join("|")}))`,
-  "giu",
-);
+const MAX_ESCAPED_SQL_CHARACTERS = MAX_PAGE_SQL_CHARACTERS * 2;
+
+/**
+ * The text with every `<` that would start an agent block tag
+ * (`current_page`, `attached`, `mentioned`) escaped as `\u003c`, including
+ * spellings with invisible characters anywhere in the tag, such as
+ * `< /attached>` or `</ment\u200bioned>`. Tags are found on a copy with
+ * invisible characters removed, with each kept character's index in the
+ * original, so the work is linear in the text's length. Every other `<`
+ * stays, so comparisons such as `a < b` stay readable.
+ */
+function _escapeBlockTagStarts(text: string): string {
+  let visible = "";
+  // The index in `text` of each UTF-16 unit of `visible`.
+  const originalIndexes: number[] = [];
+  let index = 0;
+  for (const character of text) {
+    if (!INVISIBLE_CHARACTER.test(character)) {
+      visible += character;
+      for (let unit = 0; unit < character.length; unit += 1) {
+        originalIndexes.push(index + unit);
+      }
+    }
+    index += character.length;
+  }
+  const tagStarts = [...visible.matchAll(PLAIN_BLOCK_TAG_START)].map(
+    (match) => {
+      return originalIndexes[match.index ?? 0] ?? 0;
+    },
+  );
+  const pieces: string[] = [];
+  let pieceStart = 0;
+  tagStarts.forEach((tagStart) => {
+    pieces.push(text.slice(pieceStart, tagStart), "\\u003c");
+    pieceStart = tagStart + 1;
+  });
+  pieces.push(text.slice(pieceStart));
+  return pieces.join("");
+}
 
 /**
  * A `<` that does not start a page placeholder (`<value 3>`). A placeholder
@@ -101,10 +133,15 @@ export function formatBlockSql(
   sql: string,
   aliases: readonly SqlTableAlias.T[],
 ): string {
-  const singleLine = sql.trim().replace(LINE_BREAKS, " ");
-  const aliased = SqlTableAlias.toAliasedSql(singleLine, aliases).replace(
-    BLOCK_TAG_START,
-    "\\u003c",
+  const singleLine = sql
+    .trim()
+    .slice(0, MAX_ESCAPED_SQL_CHARACTERS)
+    .replace(LINE_BREAKS, " ");
+  const aliased = _escapeBlockTagStarts(
+    SqlTableAlias.toAliasedSql(singleLine, aliases).slice(
+      0,
+      MAX_ESCAPED_SQL_CHARACTERS,
+    ),
   );
   return aliased.length > MAX_PAGE_SQL_CHARACTERS
     ? `${aliased.slice(0, MAX_PAGE_SQL_CHARACTERS)} ...`
