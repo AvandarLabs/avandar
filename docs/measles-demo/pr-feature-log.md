@@ -1343,6 +1343,7 @@ commits belong to the features that own them, not here.
 | `a8e99dc8a` | feat(catalog): search keywords on the server and count every facet in one pass | All of it, on top of `ad6d300a7`. Adds `52.rpc_data_catalog_listings__search_tag_options.sql`, rewrites `52.data_catalog_listings__search_facet_rows.sql`, and adds `useDataCatalogKeywordOptions`. `catalog-search-performance.md` goes with F9. Regenerate the migration, types, and desktop migration. Built on `feat/catalog-keyword-search`. |
 | `6c0ac89b9` | feat(catalog): keep catalog search fast as the catalog grows | All of it, on top of `a8e99dc8a`. Adds `10.data_catalog_facet_counts.sql`, `50.data_catalog_listings__updated_window.sql`, `52.data_catalog_facet_counts__refresh.sql`, `53.data_catalog_listings__count_facet.sql`, and `54.data_catalog_listings__facet_value_rows.sql`, renumbers the other search schemas and `rpc_pipeline_executions__finish`, adds the listings' new indexes, and excludes `data_catalog_facet_counts` from desktop sync. The populate migration is hand-written. Regenerate the rest. Built on `feat/catalog-scalable-search`. |
 | `db8d5f86c` | fix(db): load pg_trgm before the scalable search migration sets its threshold | All of it. Hand-written header on the generated migration, as the earlier catalog search migrations have. |
+| `4fd222156` | fix(catalog): read the update windows once per facet count refresh | All of it. The generated `20261109082121_faster_catalog_facet_counts_refresh.sql` replaces only the refresh. |
 
 *Docs, which go with F9:*
 
