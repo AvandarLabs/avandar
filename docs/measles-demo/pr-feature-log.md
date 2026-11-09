@@ -78,6 +78,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F28 | Build an ODC listing's Parquet copy from a column type sample that holds the whole source | not started | F12, F24, F25 | |
 | F29 | API-backed listing copies expire, so workspaces see a changed source | not started | F25 | |
 | F30 | WHO GHO pipeline, recommended listings, and listing freshness probes | not started | F4, F16, F17, F19, F23, F24, F25, F28, F29 | |
+| F32 | Add places to a map: click, coordinates, or address search, stored as a dataset | not started | none (its e2e spec needs no catalog) | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -113,6 +114,7 @@ API. It's new work, not something this branch built.
 | after F25 | F28 | Extends F25's copy request, build route, and build, and the column type sample F12 reworked. The pipeline server half must deploy before the edge function half: an older build route refuses the new `completeSampleCsv` key. |
 | 17 | F29 | Changes how `DatasetParquetWrapper` and the pipeline server's copy store treat F25's Parquet copies. Merge after F25. |
 | 18 | F30 | Extends the listings table, upsert, model and catalog detail that F4, F16, F17, F19, F23 and F24 built, the copy builder and `parquet-cache` route F25 and F28 changed, and reads F29's max age. Merge after all of them. |
+| any | F32 | Self-contained: one schema migration, one new edge function, and a new map tool. It adds an ordinary `latLngColumns` layer, so it needs no map config version and merges before or after F31. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -1874,6 +1876,123 @@ ava pipeline run gho --local   # about 10 minutes against the real API
 (paged JSON downloads, cross-drive recommendations, passing join pairs to
 chat, a Refresh action for open data datasets, moving CKAN and Socrata onto
 listing probes) and P6.13, partitioned live connections.
+
+---
+
+## F32: Places: add real exposure sites to a map
+
+Status: not started. Built on `feat/gis-places`, branched at `959281871`. The
+commits below are all of
+`git log --oneline 959281871..feat/gis-places --no-merges`.
+
+**Purpose:** A user adds sites to a map by clicking the map, typing
+coordinates, or searching an address, and the sites are stored as an ordinary
+dataset. A places dataset is a virtual dataset (`datasets__virtual`, flagged
+`is_places`) whose `raw_sql` is a typed `VALUES` query. Every edit reads the
+rows through `WorkspaceQuerySession`, rewrites `raw_sql`, and drops each cached
+copy of the rows so the map, Data Explorer, and charts re-read it. A new
+`geocode` edge function proxies address search to Geoapify behind a provider
+interface and never logs the query. The "Add a place" tool opens a popover
+(dataset, location, form), the Go-to tool offers "Add a place here" on a
+coordinate, and the feature inspector edits, moves, and deletes a place.
+**Value:** A user plots real exposure sites in under a minute, and buffers,
+filters, and dashboards read them like any other dataset.
+
+**PR title:** `feat(gis): add places to a map by click, coordinates, or address`
+
+**Depends on:** none.
+
+**Commits to read** (from `feat/gis-places`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `d89306675` | test(places): prove a VALUES virtual dataset loads through QETL | All of it. |
+| `18c5e527c` | feat(places): flag virtual datasets as places and add their create RPC | All of it. |
+| `e87246716` | feat(places): read is_places on the VirtualDataset model | All of it. |
+| `f341e1571` | feat(places): define place rows, the store contract, and the places columns | All of it. |
+| `ebfdb24a3` | style(places): format the places model and types | All of it. |
+| `07428ecea` | feat(places): validate and normalize place form input | All of it. |
+| `7ca7ca38f` | feat(places): add, replace, and remove place rows under a 500-row cap | All of it. |
+| `a266f04ae` | fix(places): reject impossible place dates | All of it. |
+| `13b8b33e6` | feat(places): write place rows as a typed VALUES query | All of it. |
+| `2128f6805` | feat(places): read place rows back from their stored SQL | All of it. |
+| `01202ef45` | fix(places): satisfy strict indexing in the date check | All of it. |
+| `1f4e0ed46` | feat(places): store places as a rewritable VALUES virtual dataset | All of it. |
+| `270ec04ec` | feat(geocode): look up addresses through Geoapify behind a provider interface | All of it. |
+| `02dbcfa0c` | fix(geocode): time out and sanitize Geoapify failures | All of it. |
+| `99576284b` | feat(geocode): add an address search edge function that never logs queries | All of it. |
+| `37afbce81` | fix(ci): keep a demo Geoapify key set outside GitHub | All of it. |
+| `a451a2caf` | test(geocode): narrow provider errors for deno check | All of it. |
+| `27461b421` | feat(gis): add a place tool mode whose click picks a point | All of it. |
+| `2fd2013e8` | feat(gis): hold the place tool's draft in the GIS app state | All of it. |
+| `431c77779` | feat(gis): build a bound point layer for a places dataset | All of it. |
+| `977754da6` | feat(gis): drop every cached copy of a places dataset after an edit | All of it. |
+| `6d2b7bd55` | feat(gis): wire places writes and the place tool controller into the map shell | All of it. |
+| `cb65051a0` | fix(gis): do not report a saved place as failed when only the refresh fails | All of it. |
+| `d360ace96` | feat(gis): add the place form with exposure window and OSM credit | All of it. |
+| `91be74135` | feat(gis): search public addresses for a place, with privacy help and OSM credit | All of it. |
+| `846be95b2` | fix(gis): tighten address search links and results semantics | All of it. |
+| `5e56afbc9` | feat(gis): add the Add a place tool to the map tool cluster | All of it. |
+| `21e1d9064` | fix(gis): anchor the Add a place popover to its tool button | All of it. |
+| `2d379041a` | fix(gis): keep the place tool on the location step while datasets refetch | All of it. |
+| `0578ef139` | fix(gis): show full address search results | All of it. |
+| `e75ad44fb` | feat(gis): title the place tool popover | All of it. |
+| `4007ac589` | style(gis): format the place tool test | All of it. |
+| `8483a18c6` | feat(gis): turn a Go-to coordinate into a place in one click | All of it. |
+| `cf4a00d8a` | feat(gis): edit, move, and delete a place from the feature inspector | All of it. |
+| `7e888f8f5` | fix(gis): close the feature inspector after deleting its place | All of it. |
+| `1e4fb4114` | fix(gis): keep the place id out of every place table | All of it. |
+| `5df59981e` | test(gis): cover adding, searching, editing, and deleting places end to end | All of it. |
+| `68bbc6c06` | test(gis): always clean up seeded places maps | All of it. |
+| `a4cb2b15d` | docs(gis): record how a tool takes a point the user places | All of it. |
+| `a83898e9f` | style(places): format the row edits test | All of it. |
+| `e1b652bce` | chore(i18n): extract the place tool strings | All of it. |
+
+**Files:**
+- Schema: `supabase/schemas/20.datasets__virtual.sql`,
+  `supabase/schemas/70.rpc_datasets__add_places_dataset.sql` (new) and
+  `supabase/tests/database/rpc_datasets__add_places_dataset.test.sql` (new).
+- Places core: `src/clients/places/**` (new), and `is_places` on
+  `shared/models/datasets/VirtualDataset/{VirtualDataset.types.ts,
+  VirtualDatasetParsers.ts}`.
+- Edge function: `supabase/functions/geocode/**` (new), the
+  `[functions.geocode]` block in `supabase/config.toml`, `GEOAPIFY_API_KEY=` in
+  `.env.example.edge`, the demo Geoapify key line in
+  `.github/workflows/demo.yaml`, and `GeocodeAPI` in
+  `src/types/http-api.types.ts`.
+- GIS app: `src/views/GisApp/places/**` (new), `MapToolMode.types.ts`,
+  `mapToolCursor`, `MapCanvas/useMapToolGestures/**`,
+  `useGisApp/useGisAppState.ts`, `GisAppMapShell.tsx`,
+  `GisAppMapToolCluster.tsx`, `shell/MapToolCluster/**` (`PlaceMapTool/**`
+  new, `GoToMapTool/**`), `panels/FeatureInspector/**`
+  (`PlaceFeatureActions/` new, cluster table columns) and
+  `panels/LayerInspector/PopupSection`.
+- Docs: `docs/design/gis/feature-home-inventory.md`.
+- Tests: `tests/e2e/places-values-dataset.spec.ts` and
+  `tests/e2e/gis-places.spec.ts`. The second stubs address search in the
+  browser, so CI needs no Geoapify key.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** `supabase/migrations/20261109103343_add_places_datasets.sql` and
+its desktop twin `apps/desktop/migrations/20261109103343_add_places_datasets.gen.sql`.
+Regenerate both with the `supabase-declarative-schema` skill, then
+`pnpm db:gen-types` and `pnpm desktop:sqlite:gen-migrations`. Never copy them.
+
+**Secrets:** `GEOAPIFY_API_KEY`. Set it on each Supabase project with
+`supabase secrets set GEOAPIFY_API_KEY=<key> --project-ref <ref>` and in
+`.env.development.edge` locally, then `pnpm fns:update-env`. Without it,
+address search returns an error and click and coordinate entry still work.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint src/clients/places src/views/GisApp supabase/functions/geocode
+pnpm tsc -b --force
+pnpm vitest run src/views/GisApp src/clients/places supabase/functions/geocode shared/models
+deno check supabase/functions/geocode
+pnpm test:e2e gis-places.spec.ts
+```
 
 ---
 
