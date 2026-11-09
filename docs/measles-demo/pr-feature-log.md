@@ -1502,8 +1502,8 @@ Status: in progress. The pipeline server builds copies on request through
 function requests them through
 `POST /data-catalog-listings/:id/parquet-cache`. Workspaces read API-backed
 listings only from their copies: the 25 MB relay, its raw-bytes cache, and
-the `cached_*` columns are removed. An E2E test is still to come (see the
-spec's slices).
+the `cached_*` columns are removed. An E2E test adds a listing whose copy has
+several parts and checks every part loads, in order.
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1549,6 +1549,7 @@ added to a workspace and load from Storage instead of the source.
 | `2e0039c62` | feat(open-data): load ODC listings from their Parquet copies | All of it, including the four new messages in every `src/i18n/locales/*/messages.po` and `messages.ts`. Merged in `cc10b08f2`. |
 | `a285a3612` | docs: record how the app reads ODC listings' Parquet copies | All of it. Merged in `cc10b08f2`. |
 | `86f234dc1` | refactor(open-data): remove the 25 MB relay and its raw-bytes cache | All of it, including the desktop SQLite migrations it adds for the earlier F25 migrations. Merged in `ba9724f2a`. |
+| `8c6ea04f2` | test(open-data): add an ODC listing and load its multi-part Parquet copy end to end | All of it. Merged in `121737460`. |
 | `37c7cb7d1` | Merge branch 'demo/measles' into feat/odc-parquet-cache, and remove the empty open-data-catalog bucket | Its own changes only: `20261109030000_STORAGE-drop-open-data-catalog-bucket.sql`, its `sql_paths` entry in `supabase/config.toml`, the rewritten `storage_open_data_catalog_bucket.test.sql`, and the regenerated `database.types.ts`. Merged in `ba9724f2a`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
@@ -1602,6 +1603,7 @@ pnpm --filter @avandar/etl test
 pnpm exec vitest run supabase/functions/open-data shared/connectors/open-data
 pnpm exec vitest run src/clients/qetl src/lib/openData src/clients/DuckDbClient src/views/DataManagerApp/DataImportView
 pnpm test:executed src/clients/DuckDbClient/mergeParquetBlobs
+pnpm test:e2e odc-parquet-copy.spec.ts
 supabase test db supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql
 ```
 Then build the image (`docker build -f apps/pipeline-server/Dockerfile .`),
