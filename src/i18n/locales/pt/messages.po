@@ -1388,9 +1388,9 @@ msgid "Getting {0} from {1}"
 msgstr "Obtendo {0} de {1}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr "+ de {formattedNumCatalogListings} conjuntos de dados, de um total de "
-"{formattedNumResults}+"
+#~ msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+#~ msgstr "+ de {formattedNumCatalogListings} conjuntos de dados, de um total de "
+#~ "{formattedNumResults}+"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -9030,9 +9030,9 @@ msgid "First"
 msgstr "Primeiro"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults} de {formattedNumCatalogListings} conjuntos de "
-"dados"
+#~ msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
+#~ msgstr "{formattedNumResults} de {formattedNumCatalogListings} conjuntos de "
+#~ "dados"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"

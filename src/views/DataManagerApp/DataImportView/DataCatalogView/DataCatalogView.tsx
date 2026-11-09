@@ -359,13 +359,6 @@ export function DataCatalogView({
           <DataCatalogResultsHeader
             numResults={catalogSearch.totalCount}
             isNumResultsCapped={catalogSearch.isTotalCapped}
-            numCatalogListings={facets?.numCatalogListings ?? 0}
-            // "X of Y" waits for the catalog's size, which the facet counts
-            // carry, rather than reading "X of 0" for a moment.
-            isNarrowed={
-              (isSearching || hasActiveCatalogFilters(filters)) &&
-              facets !== undefined
-            }
             activeFilters={activeFilters}
             onClearAll={() => {
               setFilters(EMPTY_CATALOG_LISTING_FILTERS);

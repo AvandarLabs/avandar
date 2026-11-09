@@ -1400,9 +1400,9 @@ msgid "Getting {0} from {1}"
 msgstr "Récupération de {0} depuis {1}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr "Plus de {formattedNumResults} sur {formattedNumCatalogListings} jeux de "
-"données"
+#~ msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+#~ msgstr "Plus de {formattedNumResults} sur {formattedNumCatalogListings} jeux de "
+#~ "données"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -9122,8 +9122,8 @@ msgid "First"
 msgstr "Premier"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults} sur {formattedNumCatalogListings} jeux de données"
+#~ msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
+#~ msgstr "{formattedNumResults} sur {formattedNumCatalogListings} jeux de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"

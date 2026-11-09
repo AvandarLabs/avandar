@@ -1382,9 +1382,9 @@ msgid "Getting {0} from {1}"
 msgstr "Inapata {0} kutoka {1}"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
-msgstr "seti data zaidi ya {formattedNumResults} kati ya "
-"{formattedNumCatalogListings}"
+#~ msgid "{formattedNumResults}+ of {formattedNumCatalogListings} datasets"
+#~ msgstr "seti data zaidi ya {formattedNumResults} kati ya "
+#~ "{formattedNumCatalogListings}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
@@ -9018,9 +9018,9 @@ msgid "First"
 msgstr "Kwanza"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "Seti za data {formattedNumResults} kati ya "
-"{formattedNumCatalogListings}"
+#~ msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
+#~ msgstr "Seti za data {formattedNumResults} kati ya "
+#~ "{formattedNumCatalogListings}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
