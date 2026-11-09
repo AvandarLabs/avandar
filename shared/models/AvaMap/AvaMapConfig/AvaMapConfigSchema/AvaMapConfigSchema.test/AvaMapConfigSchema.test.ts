@@ -9,6 +9,7 @@ import {
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/schemaTestFixtures.ts";
 import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v4SchemaSuites.ts";
 import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v5SchemaSuites.ts";
+import "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.test/v6SchemaSuites.ts";
 import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigSchema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
@@ -17,7 +18,7 @@ describe("AvaMapConfigSchema", () => {
   it("migrates an empty version 1 config to the current version", () => {
     expect(AvaMapConfigSchema.fromJson(createVersion1Json())).toEqual({
       ...createVersion1Json(),
-      version: 5,
+      version: 6,
       aoi: undefined,
       timeRange: undefined,
       annotations: { isVisible: true, features: [] },
@@ -44,7 +45,7 @@ describe("AvaMapConfigSchema", () => {
       ],
     });
 
-    expect(parsed.version).toBe(5);
+    expect(parsed.version).toBe(6);
     expect(parsed.layers[0]).toMatchObject({
       id: currentLayer.id,
       name: "Cases",
@@ -107,7 +108,7 @@ describe("AvaMapConfigSchema", () => {
       ],
     });
 
-    expect(parsed.version).toBe(5);
+    expect(parsed.version).toBe(6);
     expect(parsed.layers[0]?.legend.sizeStops).toEqual([]);
     expect(parsed.layers[0]?.symbology).toEqual(currentLayer.symbology);
   });
@@ -202,7 +203,7 @@ describe("AvaMapConfigSchema", () => {
   it("rejects a config written by a future version", () => {
     const config = AvaMapConfig.makeEmpty();
     const json = AvaMapConfigSchema.toJson(config) as Record<string, unknown>;
-    const future = { ...json, version: 6 };
+    const future = { ...json, version: 7 };
     expect(() => {
       return AvaMapConfigSchema.fromJson(future);
     }).toThrow();
