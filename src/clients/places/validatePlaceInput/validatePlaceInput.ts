@@ -38,9 +38,8 @@ function _cleanText(value: string): string | undefined {
 }
 
 function _isRealDateTime(value: string): boolean {
-  const [year, month, day, hour, minute, second] = value
-    .split(/[-T:]/)
-    .map(Number);
+  const [year = 0, month = 0, day = 0, hour = 99, minute = 99, second = 0] =
+    value.split(/[-T:]/).map(Number);
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
   return (
     month >= 1 &&
@@ -49,7 +48,7 @@ function _isRealDateTime(value: string): boolean {
     day <= daysInMonth &&
     hour <= 23 &&
     minute <= 59 &&
-    (second ?? 0) <= 59
+    second <= 59
   );
 }
 
