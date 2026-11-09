@@ -47,6 +47,9 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D37 | The agent path offers offline answers on network failure | Built |
 | D38 | Page context never routes results to the Data Explorer by default | Built |
 | D39 | Personal values in page SQL become placeholders the browser maps back | Built |
+| D40 | 1E brings the agent's question cards and analytics to parity | Approved |
+| D41 | Attachable context: inline mentions plus a chat-long tray | Built |
+| D42 | Mentions add three privacy rules beyond the page block | Built |
 
 ---
 
@@ -744,3 +747,29 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   (fragile).
 - **Left out.** Cases, until Phase 3.5 adds consent for personal data, and
   teammates, which are not data.
+
+## D42. Mentions add three privacy rules beyond the page block (built)
+
+- **Decision (2026-11-09, from the Phase 1B privacy review).** Three rules
+  on top of D41's redaction. Today's hosted chat names each mention by its
+  type only (`@"a dashboard"`), and its consent check runs on that text.
+  Every answer an offline turn produces is marked in its message metadata
+  (`OfflineAnswerMessage`), and every hosted request reads the fixed line
+  `[An answer from the offline model, not shown]` in its place. All the
+  SQL of every loaded gadget is redacted before any cap cuts what is sent,
+  so the vault holds every value a gadget filters on before any name is
+  masked.
+- **Why.** Today's chat has no vault, so a real name could carry a personal
+  value to the model. Offline turns read real names, so an offline reply
+  can quote one; scrubbing names from replies missed partial quotes,
+  renames, and turns whose load failed. A cap that emptied SQL before
+  redaction left a value only that SQL filtered on readable in the
+  gadget's name.
+- **Alternatives.** Masking today's chat with a vault of its own (a second
+  vault to keep in step). Scrubbing names from offline replies (tried
+  first; it leaked). Redacting only the SQL that is sent (the original
+  build; it leaked).
+- **Cost.** Today's chat cannot tell two mentions of the same type apart,
+  and hosted models never see an offline answer's text. Offline replies
+  stored before the mark existed are sent as written; none could have read
+  a mention name.

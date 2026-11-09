@@ -71,6 +71,20 @@ check that the gadget exists or is in the comment's workspace, so **any
 reader of `comment_gadget_refs` must also filter by the gadget's own
 workspace**. Members can select the table; only the trigger writes it.
 
+The chat composer has its own `@` menu, shown with the agent switch on
+(`variant: "chat"` on the same `MentionMenu`, the same gadget search, and the
+same chip). It lists only the chat's gadget types (dashboards, tiles,
+datasets, maps, and case types), never cases or teammates, and inserts links
+only: there is no embed and no audience hint, since only the user sees their
+chat. Each chip is written into the message text as a ref token such as
+`@{dataset:<uuid>}` (`ChatMentionToken`), never as a name, and sent messages
+draw the tokens back as chips. The context tray above the composer, filled by
+the "Add context" picker, holds up to five refs per chat in localStorage, and
+stores no names either. Names are resolved with the user's own access each
+time, so an unavailable gadget shows its unavailable label. See
+[the Phase 1B spec](../ai-agent/specs/phase-1b.md) for what reaches the
+agent.
+
 ## Gadgets
 
 | Gadget type | Table | User-facing noun | Id | Open goes to | Card facts |
@@ -160,5 +174,6 @@ Notes:
   `allowSpaces: false`), so "measles by borough" is found by typing one word.
   Allowing spaces needs a rule for when the menu closes instead. This also
   applies to mentioning a teammate by full name.
-- Comments, saved queries, and catalog listings as gadgets, and gadgets
-  outside case comments (dashboard text blocks, notes).
+- Comments, saved queries, and catalog listings as gadgets, and gadgets in
+  dashboard text blocks and notes. The chat already references gadgets
+  (above).

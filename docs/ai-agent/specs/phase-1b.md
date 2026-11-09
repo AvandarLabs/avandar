@@ -1,6 +1,8 @@
 # Phase 1B: attachable context
 
-Status: designed with Pablo on 2026-11-09, not yet built. Part of
+Status: designed with Pablo on 2026-11-09 and built on `feat/agent-context`
+the same day. Eval labels `phase-1b:agent-mentions`, `phase-1b:agent-page`,
+and `phase-1b:agent-45` ([results](../eval.md#phase-1b)). Part of
 [Phase 1](phase-1.md); follows rules R1 to R3 there. Decision D41 in
 [decisions.md](../decisions.md). Builds on [phase-1a.md](phase-1a.md) and
 its redaction, [phase-1a-redaction.md](phase-1a-redaction.md).
@@ -50,6 +52,23 @@ Out:
 | What the picker shows | A search box; before typing, "On this page" then "Recent" | The page's own items are the most likely picks. |
 | How to build the composer | A TipTap editor (approach A) | A textarea cannot draw inline chips. assistant-ui's `unstable_useMentionAdapter` keeps the textarea, so it shows raw directive text, and its API is marked deprecated. A textarea with a mirrored overlay breaks on wrapping, IME, and selection. |
 | Where refs live | Tokens inside the message text; the tray in `ChatThreadStore` | The message stays one text part, so assistant-ui, the store, and `apiMessages` keep their shape. |
+
+## Decisions made while planning
+
+| Spec says | Built | Why |
+|---|---|---|
+| The search limit counts only the allowed types | The chat menu keeps the full limit (5 rows times every gadget type) and drops cases client-side | `rpc_gadgets__search` caps rows per type, then cuts at the limit across all types. A smaller limit could cut an allowed type's row while a case row used a slot. |
+| `<attached>` "nothing" when the tray is empty | When the tray empties after it held something, the turn sends `<attached>Nothing is attached any more.</attached>` once | Otherwise the model's last `<attached>` block would still hold. |
+| The loader is built per conversation | One loader per turn, independent of the conversation; the dataset alias is resolved at render time from the conversation's aliases | The adapter needs names before the agent path (consent, today's chat, offline). |
+| The chat menu's footer | A `variant: "chat"` on the menu: no audience hint, one "Enter" key hint, links only | Only the user sees their chat, and chat chips are links only. |
+| Five mentions are described | A mention that points to the tray or to the page's dashboard is one pointer line and does not count toward the five | A pointer costs one line, so it should not push a real description out. |
+| Unavailable gadgets are named | An unavailable gadget's fixed type phrase is never masked | It holds no user data, and masking it would hide what the model must say it cannot see. |
+| The tray is stored per chat | Hydrating the tray on mount never writes the store | A mount write raced the stored value and could empty a saved tray. |
+| Chips in the composer | The chat composer accepts only chat gadget types, as links, and only chips whose ref makes a token that parses | A pasted case, embed, or tile with an unparseable block id would otherwise reach the message text. |
+| Other paths get `@"Name"` text | Today's hosted chat names each mention by its type only (`@"a dashboard"`), and consent runs on that text | Today's chat has no vault, so a real name could carry a personal value. |
+| Offline turns read real names | Every offline answer is marked in its message metadata and replaced by a fixed line on every hosted request | An offline reply can quote a name; scrubbing names cannot catch partial quotes or renames. |
+| The caps cut what is sent | All gadget SQL is redacted before any cap, and a chart with no SQL never spends the 24-chart budget | A value only capped SQL filters on must still be masked in the gadget's name. |
+| Gadget search finds tiles by their prompt | The search reads the stored `nl_query` key, falling back to `nlQuery` (commit `ee2206125`, migration `20261109134745`) | Saved dashboard configs are snake-cased, so no saved tile was ever found. |
 
 ## Components
 
@@ -301,6 +320,35 @@ mention name, since mentions ship with the mark.
 
 Still open, untested: a map layer's own filter value appearing in that
 layer's name. Layer queries are not vaulted.
+
+## Live check
+
+Run on 2026-11-09 in the real app with live models. All six steps passed.
+Screenshots are in `.temp/feat-agent-context/live/` (gitignored). Findings,
+each fixed on this branch:
+
+- Gadget search never found a saved dashboard tile: it read `nlQuery`, but
+  saved configs store `nl_query`. Fixed in `ee2206125`.
+- The picker nested a loading skeleton (a `div`) inside a paragraph, which
+  React warned about. The name is now drawn in a `div`.
+- With the agent switch on, the chat's empty state on a map still said chat
+  works only in the Data Explorer and Dashboards. It now invites a question
+  and mentions `@`.
+- A dashboard chart with empty SQL still spent the 24-chart budget. It is
+  now free, as a single tile with empty SQL already was.
+
+## Known follow-ups
+
+- A map layer's own filter value can appear in that layer's name. Layer
+  queries are not vaulted.
+- The agent occasionally invents row details it never saw.
+- The e2e helpers `seedDashboardWithTile.ts` and
+  `createDashboardWithDataVizBlock.ts` write camelCase configs, unlike the
+  app, which snake-cases them on save.
+- Offline replies stored before the offline answer mark existed carry no
+  mark and reach hosted requests as written (accepted above).
+- Done: the unused `MessageTextPart` was removed in `cf595bb2b`, and its
+  styles moved to `UserMessageTextPart`, which draws tokens as chips.
 
 ## Done when
 
