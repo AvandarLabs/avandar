@@ -487,4 +487,55 @@ describe("ClassificationEditor", () => {
       "#08306b",
     ]);
   });
+
+  it("stores a typed percent as a fraction when every value is a fraction", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        classifiedValueDomain={[0.62, 1]}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Highlight values below" }),
+      { target: { value: "95" } },
+    );
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color).toMatchObject({
+      classification: { method: "manual", breaks: [0.95] },
+      ramp: ["#d7301f", "#d9d9d9"],
+      classLabels: ["Below 95%", "95% or above"],
+    });
+  });
+
+  it("stores the typed number as is when values are not fractions", () => {
+    boundarySourceState.options = [];
+    const layer = _createLayer();
+    const onLayerChange = vi.fn();
+    render(
+      <ClassificationEditor
+        layer={layer}
+        classifiedValueDomain={[3, 410]}
+        onLayerChange={onLayerChange}
+        onBack={vi.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Highlight values below" }),
+      { target: { value: "100" } },
+    );
+
+    const updated = onLayerChange.mock.calls.at(-1)![0](layer);
+    expect(updated.symbology.color).toMatchObject({
+      classification: { method: "manual", breaks: [100] },
+      classLabels: ["Below 100", "100 or above"],
+    });
+  });
 });

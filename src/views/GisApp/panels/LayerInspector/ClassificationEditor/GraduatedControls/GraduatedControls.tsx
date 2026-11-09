@@ -14,6 +14,7 @@ type Props = {
   layer: MapLayer.T;
   color: GraduatedColor;
   manualBreaks: readonly number[];
+  classifiedValueDomain: readonly [number, number] | undefined;
   onLayerChange: LayerChangeHandler;
 };
 
@@ -28,6 +29,7 @@ export function GraduatedControls({
   layer,
   color,
   manualBreaks,
+  classifiedValueDomain,
   onLayerChange,
 }: Props): ReactNode {
   const { t } = useLingui();
@@ -41,6 +43,7 @@ export function GraduatedControls({
         color={color}
         classCount={_getClassCount(color)}
         manualBreaks={manualBreaks}
+        classifiedValueDomain={classifiedValueDomain}
         onLayerChange={onLayerChange}
       />
       <GraduatedRampSelect color={color} onLayerChange={onLayerChange} />
