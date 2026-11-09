@@ -231,9 +231,8 @@ async function _downloadApiOpenData(
   return {
     parquetBlob: await _mergeCopyParts({ ...options, copy }),
     sourceVersion: copy.sourceVersion,
-    maxAgeMs:
-      copy.isStale ?
-        STALE_COPY_MAX_AGE_MS
+    maxAgeMs: copy.isStale
+      ? STALE_COPY_MAX_AGE_MS
       : GlobalAppConfig.timing.openDataCopyMaxAgeMs,
   };
 }
