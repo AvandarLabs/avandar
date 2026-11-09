@@ -49,7 +49,39 @@ function _makeRecordLink(options: {
   };
 }
 
-/** One section per case type, each listing its loaded records. */
+/** One case type's section, listing its loaded records. */
+function AssignedCaseTypeSection({
+  group,
+  concept,
+  statusesById,
+}: Readonly<{
+  group: CaseTypeRecordGroup;
+  concept: Concept.T | undefined;
+  statusesById: Props["statusesById"];
+}>): ReactNode {
+  const { t } = useLingui();
+  const workspace = useCurrentWorkspace();
+
+  return (
+    <AppViewSection
+      title={concept?.name ?? t`Case type`}
+      meta={String(group.records.length)}
+    >
+      <NavLinkList
+        gap="xs"
+        links={group.records.map((record) => {
+          return _makeRecordLink({
+            workspaceSlug: workspace.slug,
+            record,
+            statusesById,
+          });
+        })}
+      />
+    </AppViewSection>
+  );
+}
+
+/** One section per case type, then Show more while another page exists. */
 export function AssignedRecordGroups({
   groups,
   conceptsById,
@@ -58,30 +90,16 @@ export function AssignedRecordGroups({
   isFetchingNextPage,
   onShowMore,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
-  const workspace = useCurrentWorkspace();
-
   return (
     <Stack gap="xl">
       {groups.map((group) => {
-        const concept = conceptsById.get(group.conceptId);
         return (
-          <AppViewSection
+          <AssignedCaseTypeSection
             key={group.conceptId}
-            title={concept?.name ?? t`Case type`}
-            meta={String(group.records.length)}
-          >
-            <NavLinkList
-              gap="xs"
-              links={group.records.map((record) => {
-                return _makeRecordLink({
-                  workspaceSlug: workspace.slug,
-                  record,
-                  statusesById,
-                });
-              })}
-            />
-          </AppViewSection>
+            group={group}
+            concept={conceptsById.get(group.conceptId)}
+            statusesById={statusesById}
+          />
         );
       })}
       {hasNextPage ? (
