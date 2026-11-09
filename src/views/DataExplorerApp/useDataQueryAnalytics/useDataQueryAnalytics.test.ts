@@ -250,6 +250,26 @@ describe("useDataQueryAnalytics", () => {
     });
   });
 
+  it("records query.failed for a chat result under the Data Explorer", () => {
+    _renderAnalytics({
+      surface: "chat_result",
+      runMetadata: _failedRun(
+        new Error("permission denied for table datasets"),
+      ),
+      queryResult: {
+        status: "error",
+        fetchStatus: "idle",
+      },
+    });
+
+    expect(logEventMock).toHaveBeenCalledTimes(1);
+    expect(logEventMock.mock.calls[0]?.[0]).toMatchObject({
+      event: "query.failed",
+      app: "data_explorer",
+      payload: { errorClass: "permission", surface: "chat_result" },
+    });
+  });
+
   it("records nothing while a retry is paused rather than fetching", () => {
     // A retry pauses when the tab is hidden or the device drops offline. The
     // observer keeps reporting success over its stale cached rows, so a guard

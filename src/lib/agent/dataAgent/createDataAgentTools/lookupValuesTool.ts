@@ -19,10 +19,40 @@ type LookupContext = Readonly<{
 
 type LookupMatch = { named: string; storedValue: string | undefined };
 
+/** Text the model may have meant as a page placeholder, with any spacing. */
+const PLACEHOLDER_LIKE = /^['"`]?\s*<\s*value\s*(\d+)\s*>\s*['"`]?$/i;
+
+/**
+ * The page placeholder (`<value N>`) a looked-up value or one of its forms
+ * names, ignoring quotes, case, and spacing, or undefined for a plain value.
+ */
+function _readPlaceholder(
+  value: Readonly<{ named: string; forms: readonly string[] }>,
+): string | undefined {
+  return [value.named, ...value.forms]
+    .map((text) => {
+      const number = PLACEHOLDER_LIKE.exec(text.trim())?.[1];
+      return number === undefined ? undefined : `<value ${Number(number)}>`;
+    })
+    .find((placeholder) => {
+      return placeholder !== undefined;
+    });
+}
+
+/**
+ * How a value is stored. A page placeholder the host holds (`<value 1>`)
+ * is already the stored value as far as the model knows, so it matches
+ * itself without a query: a lookup would compare its value in lower case,
+ * miss a mixed-case value, and could tell the model what it stands for.
+ */
 async function _findStoredValue(
   context: LookupContext,
   value: Readonly<{ named: string; forms: readonly string[] }>,
 ): Promise<LookupMatch> {
+  const placeholder = _readPlaceholder(value);
+  if (placeholder && context.host.isHeldPlaceholder?.(placeholder)) {
+    return { named: placeholder, storedValue: placeholder };
+  }
   const candidateValues = [value.named, ...value.forms];
   const sql = buildCandidateLookupSqlFromDiscovery({
     discoveryQuery: `SELECT DISTINCT ${quoteSqlIdentifier(context.column)} FROM ${quoteSqlIdentifier(context.tableName)}`,
@@ -129,6 +159,35 @@ function _describeMatches(matches: readonly LookupMatch[]): string {
     .join("; ");
 }
 
+/**
+ * The tool's error result when a value names a page placeholder the host
+ * does not hold, so the model fixes it instead of the user seeing a card.
+ * Undefined for a host without placeholders.
+ */
+function _getUnknownPlaceholderResult(
+  context: LookupContext,
+  values: ReadonlyArray<{ named: string; forms: readonly string[] }>,
+): AgentToolResult<undefined> | undefined {
+  const { isHeldPlaceholder } = context.host;
+  const unknown = isHeldPlaceholder
+    ? values.map(_readPlaceholder).find((placeholder) => {
+        return placeholder !== undefined && !isHeldPlaceholder(placeholder);
+      })
+    : undefined;
+  return unknown === undefined
+    ? undefined
+    : {
+        content: [
+          {
+            type: "text",
+            text: `${unknown} is an unknown placeholder: use only the placeholders shown on the page.`,
+          },
+        ],
+        details: undefined,
+        isError: true,
+      };
+}
+
 async function _execute(
   context: LookupContext,
   params: Readonly<{
@@ -136,6 +195,10 @@ async function _execute(
     question: string;
   }>,
 ): Promise<AgentToolResult<undefined>> {
+  const placeholderError = _getUnknownPlaceholderResult(context, params.values);
+  if (placeholderError) {
+    return placeholderError;
+  }
   const lookups = await Promise.all(
     params.values.map((value) => {
       return _findStoredValue(context, value);

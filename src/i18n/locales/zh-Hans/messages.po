@@ -93,6 +93,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 "other devices."
 msgstr "这将允许数据集在线存储，以便在其他设备上访问。"
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "其他"
@@ -2260,6 +2261,10 @@ msgstr "主机"
 msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "在服务器预期瓦片索引的位置包含 z、x 和 y 占位符。"
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "（空白）"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Data Explorer toolbar: {toolbarCommands}"
@@ -4696,6 +4701,10 @@ msgstr "不使用工作区数据。"
 msgid "Hide X axis"
 msgstr "隐藏 X 轴"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "正在加载结果"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "精确位置"
@@ -4703,6 +4712,10 @@ msgstr "精确位置"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "新聊天"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "不可用的结果"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -6193,6 +6206,11 @@ msgstr "什么是系列？"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "纬度或经度不是数字"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "回答数据问题需要拥有此工作区中数据探索器的访问权限。"
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -7897,6 +7915,10 @@ msgstr "此数据集仅限离线使用。点击以允许在线同步。"
 msgid "Checking your data…"
 msgstr "正在检查您的数据…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "结果"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "全局过滤器"
@@ -9176,6 +9198,11 @@ msgstr "工作区 ID 不能包含空格"
 msgid "Enter your text here"
 msgstr "在此输入文本"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "按每个{splitColumnName}各绘制一个系列。颜色已自动设置。添加第二个系列会关闭此功能。"
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
@@ -9711,6 +9738,10 @@ msgstr "常规"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "显示“未报告”条目"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "无法加载此结果。"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -10889,6 +10920,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "已安装 {pluginName}"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "助手无法回答这个问题。请稍后再试。"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

@@ -1,5 +1,6 @@
 import { Agent } from "@earendil-works/pi-agent-core";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
@@ -7,6 +8,7 @@ import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import { createDataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type {
@@ -65,6 +67,16 @@ export type DataAgent = {
   ask: (message: string) => Promise<DataAgentReply>;
 };
 
+/** The usage of an answer before any model call. */
+const EMPTY_USAGE: DataAgentUsage = {
+  calls: 0,
+  inputTokens: 0,
+  cachedInputTokens: 0,
+  outputTokens: 0,
+  reasoningTokens: 0,
+  cost: 0,
+};
+
 function _addUsage(total: DataAgentUsage, usage: Usage): DataAgentUsage {
   return {
     calls: total.calls + 1,
@@ -77,6 +89,31 @@ function _addUsage(total: DataAgentUsage, usage: Usage): DataAgentUsage {
   };
 }
 
+/** What the error says when a failed model call gave no message. */
+const FALLBACK_ERROR_MESSAGE = "The assistant could not answer.";
+
+function _findLastAssistant(
+  messages: Agent["state"]["messages"],
+): AssistantMessage | undefined {
+  return [...messages].reverse().find((message) => {
+    return message.role === "assistant";
+  }) as AssistantMessage | undefined;
+}
+
+/**
+ * Throws when the answer ended on a failed model call. Pi does not reject
+ * `prompt` for one: a failed request (for example a fetch that never
+ * reached the proxy, or the proxy refusing it) ends the run with an
+ * assistant message whose `stopReason` is `error`. A stopped run
+ * (`aborted`) is not a failure.
+ */
+function _throwIfModelCallFailed(messages: Agent["state"]["messages"]): void {
+  const lastAssistant = _findLastAssistant(messages);
+  if (lastAssistant?.stopReason === "error") {
+    throw new Error(lastAssistant.errorMessage || FALLBACK_ERROR_MESSAGE);
+  }
+}
+
 /**
  * The reply to show. When the turn ended on a query, the query's summary is
  * the answer; any text the model wrote beside the tool call is narration
@@ -86,9 +123,7 @@ function _getReplyText(
   messages: Agent["state"]["messages"],
   state: DataAgentRunState,
 ): string {
-  const lastAssistant = [...messages].reverse().find((message) => {
-    return message.role === "assistant";
-  }) as AssistantMessage | undefined;
+  const lastAssistant = _findLastAssistant(messages);
   const endedOnToolCall = (lastAssistant?.content ?? []).some((block) => {
     return block.type === "toolCall";
   });
@@ -147,6 +182,7 @@ function _createAgent(
       systemPrompt: buildDataAgentSystemPrompt({
         datasets: options.datasets,
         today: options.today,
+        promptId: options.promptId ?? DATA_AGENT_PROMPT_ID,
       }),
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
@@ -179,6 +215,12 @@ export type CreateDataAgentOptions = {
   /** Lets providers route a conversation's calls to one prompt cache. */
   sessionId?: string;
   /**
+   * The prompt version of the local system prompt this agent builds (the
+   * offline agent and evals). The online proxy builds its own prompt from
+   * the version in its URL. Defaults to `DATA_AGENT_PROMPT_ID`.
+   */
+  promptId?: DataAgentPromptId;
+  /**
    * Rows the model sees after each query, to check its answer. Only for a
    * model on the user's device; a hosted model never sees rows.
    */
@@ -195,7 +237,8 @@ export type CreateDataAgentOptions = {
  * Creates the Pi-based data agent for one conversation: three tools (run a
  * query, look up stored values, ask the user), a cache-friendly system
  * prompt, and a model policy that escalates to a stronger model only when a
- * query fails or comes back empty.
+ * query fails or comes back empty. `ask` rejects when a model call fails,
+ * so callers can show the error or offer another way to answer.
  */
 export function createDataAgent(
   options: Readonly<CreateDataAgentOptions>,
@@ -210,14 +253,7 @@ export function createDataAgent(
       turnCounter.turns = 0;
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;
-      let usage: DataAgentUsage = {
-        calls: 0,
-        inputTokens: 0,
-        cachedInputTokens: 0,
-        outputTokens: 0,
-        reasoningTokens: 0,
-        cost: 0,
-      };
+      let usage: DataAgentUsage = EMPTY_USAGE;
       const modelIds: string[] = [];
       const unsubscribe = agent.subscribe((event: AgentEvent) => {
         if (
@@ -233,6 +269,7 @@ export function createDataAgent(
       } finally {
         unsubscribe();
       }
+      _throwIfModelCallFailed(agent.state.messages);
       return {
         text: _getReplyText(agent.state.messages, state),
         state,

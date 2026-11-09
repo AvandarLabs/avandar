@@ -30,6 +30,10 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   /** The button that answers the failed message offline. */
   fallbackAction: string;
   contextWindowExceeded: string;
+  /** The agent's reply when the proxy refuses the user's role. */
+  agentAccessDenied: string;
+  /** The agent's reply when a turn fails and cannot be answered offline. */
+  agentUnavailable: string;
 };
 
 /**

@@ -1,0 +1,17 @@
+/*
+ * A result card or chip in an assistant message. It follows the reply's
+ * text or another result, so it keeps a gap above it.
+ */
+.root {
+  margin-block-start: var(--mantine-spacing-sm);
+}
+
+/*
+ * The chart body inside a result card in the chat. The chat column is
+ * narrow, so the chart takes a fixed height and the full width. The height
+ * holds while the result loads, so the card does not jump when it arrives.
+ */
+.body {
+  block-size: calc(260px * var(--mantine-scale));
+  padding: var(--mantine-spacing-xs);
+}

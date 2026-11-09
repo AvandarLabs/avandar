@@ -78,4 +78,11 @@ export type DataAgentHost = {
       reason: "matched_lookup" | "picked_lookup" | "query_filter";
     }>,
   ) => Promise<boolean>;
+  /**
+   * True when `text` is exactly a page placeholder (`<value 1>`) this host
+   * restores before SQL runs. A lookup treats such a value as already
+   * stored, since the value it stands for never reaches the model. Absent
+   * for a host whose model sees no placeholders.
+   */
+  isHeldPlaceholder?: (text: string) => boolean;
 };

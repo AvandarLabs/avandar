@@ -8,6 +8,9 @@
  *     [--questions B01,B02]
  *     [--concurrency 4]
  *
+ * With no `--questions`, the run asks the 45 original questions. `--questions
+ * P` runs the page-context questions (what is on screen when the user asks).
+ *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.
  *
@@ -121,7 +124,11 @@ function _parseOptions() {
 
 function _selectQuestions(ids: string): readonly EvalQuestion[] {
   if (!ids) {
-    return COVID_QUESTIONS;
+    // The default run stays the audit's 45 questions, so archived runs
+    // compare. Page questions run with `--questions P`.
+    return COVID_QUESTIONS.filter((question) => {
+      return question.category !== "page_context";
+    });
   }
   const wanted = new Set(ids.split(","));
   return COVID_QUESTIONS.filter((question) => {

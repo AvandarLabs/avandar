@@ -96,6 +96,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "سيسمح ذلك بتخزين مجموعة البيانات على الإنترنت بحيث يمكن الوصول إليها من "
 "أجهزة أخرى."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "أخرى"
@@ -2318,6 +2319,10 @@ msgstr "المضيف"
 msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "أدرج العناصر النائبة z وx وy حيث يتوقع الخادم فهرس التجانب."
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(فارغ)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Data Explorer toolbar: {toolbarCommands}"
@@ -4813,6 +4818,10 @@ msgstr "لا يستخدم أي بيانات من مساحة العمل."
 msgid "Hide X axis"
 msgstr "إخفاء المحور X"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "جارٍ تحميل النتيجة"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "المواقع الدقيقة"
@@ -4820,6 +4829,10 @@ msgstr "المواقع الدقيقة"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "محادثة جديدة"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "نتيجة غير متاحة"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -6335,6 +6348,12 @@ msgstr "ما هي السلسلة؟"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "خط العرض أو خط الطول ليس رقمًا"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "تتطلب الإجابة عن أسئلة البيانات الوصول إلى مستكشف البيانات في مساحة "
+"العمل هذه."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -8077,6 +8096,10 @@ msgstr "هذه مجموعة البيانات متاحة فقط عند عدم ا�
 msgid "Checking your data…"
 msgstr "جارٍ التحقق من بياناتك…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "النتيجة"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "الفلاتر العالمية"
@@ -9388,6 +9411,12 @@ msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على م
 msgid "Enter your text here"
 msgstr "أدخل نصك هنا"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "تُرسم سلسلة واحدة لكل {splitColumnName}. تُحدَّد الألوان تلقائيًا. "
+"إضافة سلسلة ثانية توقف ذلك."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
@@ -9940,6 +9969,10 @@ msgstr "عام"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "إظهار إدخال «غير مُبلّغ عنه»"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "تعذّر تحميل هذه النتيجة."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -11144,6 +11177,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "تم تثبيت {pluginName}"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "تعذر على المساعد الإجابة عن ذلك. حاول مرة أخرى بعد قليل."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

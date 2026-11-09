@@ -99,6 +99,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "Cela permettra à l'ensemble de données d'être stocké en ligne afin "
 "qu'il puisse être accessible sur d'autres appareils."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "Autre"
@@ -2376,6 +2377,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "Incluez les paramètres z, x et y à l’emplacement où le serveur attend "
 "l’index de tuile."
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(Vide)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Data Explorer toolbar: {toolbarCommands}"
@@ -4932,6 +4937,10 @@ msgstr "N’utilise aucune donnée de l’espace de travail."
 msgid "Hide X axis"
 msgstr "Masquer l’axe X"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "Chargement du résultat"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Emplacements exacts"
@@ -4939,6 +4948,10 @@ msgstr "Emplacements exacts"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "Nouvelle conversation"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "Résultat indisponible"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -6488,6 +6501,12 @@ msgstr "Qu'est-ce qu'une série ?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "La latitude ou la longitude n’est pas un nombre"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Pour répondre aux questions sur les données, il faut avoir accès à "
+"l'Explorateur de données dans cet espace de travail."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -8270,6 +8289,10 @@ msgstr "Ce jeu de données est uniquement hors ligne. Cliquez pour autoriser la 
 msgid "Checking your data…"
 msgstr "Vérification de vos données…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "Résultat"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Filtres globaux"
@@ -9607,6 +9630,12 @@ msgstr "L’identifiant de l’espace de travail ne peut pas contenir d’espace
 msgid "Enter your text here"
 msgstr "Saisissez votre texte ici"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Une série est tracée pour chaque {splitColumnName}. Les couleurs sont "
+"choisies pour vous. Ajouter une deuxième série désactive ce mode."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
@@ -10176,6 +10205,10 @@ msgstr "Général"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "Afficher une entrée « Non renseigné »"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "Impossible de charger ce résultat."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -11411,6 +11444,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "{pluginName} installé"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "L'assistant n'a pas pu répondre. Réessayez dans un instant."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

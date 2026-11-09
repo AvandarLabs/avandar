@@ -95,6 +95,7 @@ msgid "This will allow the dataset to be stored online so it can be accessed in 
 msgstr "Hii itaruhusu dataset kuhifadhiwa mtandaoni ili iweze kufikiwa kwenye "
 "vifaa vingine."
 
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/LegendEntries.tsx
 msgid "Other"
 msgstr "Nyingine"
@@ -2349,6 +2350,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "Jumuisha vishikilia nafasi vya z, x na y ambapo seva inatarajia "
 "faharasa ya kigae."
+
+#: src/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput.ts
+msgid "(Blank)"
+msgstr "(Tupu)"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Data Explorer toolbar: {toolbarCommands}"
@@ -4876,6 +4881,10 @@ msgstr "Haitumii data ya workspace."
 msgid "Hide X axis"
 msgstr "Ficha mhimili wa X"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Loading result"
+msgstr "Inapakia matokeo"
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Exact locations"
 msgstr "Maeneo kamili"
@@ -4883,6 +4892,10 @@ msgstr "Maeneo kamili"
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "New chat"
 msgstr "Mazungumzo mapya"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Unavailable result"
+msgstr "Matokeo hayapatikani"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -6416,6 +6429,12 @@ msgstr "Nini maana ya series?"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude or longitude is not a number"
 msgstr "Latitudo au longitudo si nambari"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "Answering data questions needs access to the Data Explorer in this "
+"workspace."
+msgstr "Kujibu maswali ya data kunahitaji ufikiaji wa Data Explorer katika "
+"nafasi hii ya kazi."
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Numbered list"
@@ -8177,6 +8196,10 @@ msgstr "Seti hii ya data ni ya mtandaoni pekee. Bonyeza kuruhusu usawazishaji "
 msgid "Checking your data…"
 msgstr "Inaangalia data yako…"
 
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
+msgid "Result"
+msgstr "Matokeo"
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "Vichujio vya kimataifa"
@@ -9500,6 +9523,12 @@ msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
 msgid "Enter your text here"
 msgstr "Weka maandishi yako hapa"
 
+#: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
+msgid "Drawn as one series per {splitColumnName}. Colors are set for you. "
+"Adding a second series turns this off."
+msgstr "Mfululizo mmoja huchorwa kwa kila {splitColumnName}. Rangi zimewekwa "
+"kwa ajili yako. Kuongeza mfululizo wa pili huzima hili."
+
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
@@ -10058,6 +10087,10 @@ msgstr "Kawaida"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendNoDataSwitch.tsx
 msgid "Show a Not reported entry"
 msgstr "Onyesha kipengee cha Haijaripotiwa"
+
+#: src/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPart.tsx
+msgid "This result could not be loaded."
+msgstr "Matokeo haya hayakuweza kupakiwa."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "User groups for invitee"
@@ -11273,6 +11306,10 @@ msgstr "https://example.org"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
 msgstr "{pluginName} imesakinishwa"
+
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
+msgid "The assistant could not answer that. Try again in a moment."
+msgstr "Msaidizi hakuweza kujibu hilo. Jaribu tena baada ya muda mfupi."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

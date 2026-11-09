@@ -1,24 +1,52 @@
 import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
-import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import { buildAgentPageContextBlock } from "$/agent/pageContext/buildAgentPageContextBlock";
+import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
+import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import {
+  detectPii,
+  isPersonalDataText,
+} from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
+import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
+import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
+import { EMPTY_EVAL_USAGE } from "../EvalHarness";
 import { PI_EVAL_CONFIGS } from "./piEvalConfigs";
 import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
-import type { EvalAnswer, EvalConversation, EvalHarness } from "../EvalHarness";
+import type {
+  EvalAnswer,
+  EvalConversation,
+  EvalHarness,
+  EvalUsage,
+} from "../EvalHarness";
 import type { PiEvalModelSpec } from "./piEvalConfigs";
 import type {
   DataAgent,
   DataAgentModelPolicy,
+  DataAgentReply,
 } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type {
   DataAgentHost,
   DataAgentUserAnswer,
 } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { SqlLiteralDetectors } from "@/lib/agent/dataAgent/pagePrivacy/findSensitiveSqlLiterals";
+import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
+import type { AssistantMessage } from "@earendil-works/pi-ai";
+
+/** Every COVID dataset column name, lowercased, for the page SQL check. */
+const COVID_COLUMN_NAMES: ReadonlySet<string> = new Set(
+  COVID_DATASETS.flatMap((dataset) => {
+    return dataset.columns.map((column) => {
+      return column.name.toLowerCase();
+    });
+  }),
+);
 
 type QuestionRecorder = {
   question?: EvalQuestion;
@@ -108,9 +136,128 @@ function _createPolicy(
   };
 }
 
+/** What a finished answer produced, in the eval's shape. */
+function _toEvalAnswer(
+  reply: DataAgentReply,
+  recorder: QuestionRecorder,
+  startedAt: number,
+): EvalAnswer {
+  const lastQuery = reply.state.lastQuery;
+  return {
+    finalSql: lastQuery?.sql,
+    vizType: recorder.vizType,
+    result: recorder.result,
+    error: lastQuery
+      ? recorder.error
+      : "Answered in text without running a query",
+    assistantText: reply.text,
+    clarifications: reply.state.questions.map((record) => {
+      return {
+        kind: record.kind === "values" ? "discovery" : "fixed_options",
+        question: record.question,
+        answer: record.answer,
+        isAutomatic: record.isAutomatic,
+      };
+    }),
+    consentPrompts: recorder.consentPrompts,
+    valuesSentToModel: reply.state.valuesSentToModel,
+    usage: {
+      calls: reply.usage.calls,
+      promptTokens: reply.usage.inputTokens,
+      cachedPromptTokens: reply.usage.cachedInputTokens,
+      completionTokens: reply.usage.outputTokens,
+      reasoningTokens: reply.usage.reasoningTokens,
+      cost: reply.usage.cost,
+    },
+    latencyMs: performance.now() - startedAt,
+  };
+}
+
+/**
+ * The usage of the model calls an answer made before it failed: the
+ * assistant messages the agent recorded after `firstIndex`.
+ */
+function _usageSince(dataAgent: DataAgent, firstIndex: number): EvalUsage {
+  const replies = dataAgent.agent.state.messages
+    .slice(firstIndex)
+    .filter((message): message is AssistantMessage => {
+      return message.role === "assistant";
+    });
+  return replies.reduce<EvalUsage>((total, message) => {
+    const usage = message.usage;
+    return {
+      calls: total.calls + 1,
+      promptTokens:
+        total.promptTokens + usage.input + usage.cacheRead + usage.cacheWrite,
+      cachedPromptTokens: total.cachedPromptTokens + usage.cacheRead,
+      completionTokens: total.completionTokens + usage.output,
+      reasoningTokens: total.reasoningTokens + (usage.reasoning ?? 0),
+      cost: total.cost + usage.cost.total,
+    };
+  }, EMPTY_EVAL_USAGE);
+}
+
+/**
+ * A question whose answer failed on a model call (a rate limit or a server
+ * error, for example). It grades as a miss, so one failed call does not end
+ * the whole run.
+ */
+function _toFailedEvalAnswer(
+  error: unknown,
+  usage: EvalUsage,
+  startedAt: number,
+): EvalAnswer {
+  return {
+    error: error instanceof Error ? error.message : String(error),
+    assistantText: "",
+    clarifications: [],
+    consentPrompts: 0,
+    valuesSentToModel: [],
+    usage,
+    latencyMs: performance.now() - startedAt,
+  };
+}
+
+/**
+ * The page block as the browser builds it: personal values in page SQL
+ * become placeholders from the conversation's vault, and are masked in the
+ * page's names and titles. A column is personal when its name looks
+ * personal, when the question lists it, or when it is none of the COVID
+ * datasets' columns (an alias).
+ */
+function _buildPageBlock(
+  question: EvalQuestion,
+  vault: SqlPlaceholderVault,
+): string | undefined {
+  const personalColumns = new Set(question.personalColumns ?? []);
+  const detectors: SqlLiteralDetectors = {
+    isSensitiveColumn: (columnName) => {
+      return (
+        personalColumns.has(columnName) || isPersonalColumnName(columnName)
+      );
+    },
+    isSensitiveValue: isPersonalDataText,
+    knownColumnNames: COVID_COLUMN_NAMES,
+  };
+  return question.pageContext
+    ? buildAgentPageContextBlock({
+        context: question.pageContext,
+        aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
+        isSensitive: isPersonalDataText,
+        redactSql: (sql) => {
+          return vault.redact(sql, detectors);
+        },
+        maskText: vault.maskText,
+      })
+    : undefined;
+}
+
 /**
  * One eval conversation with a data agent built by `createAgent` over a host
- * backed by DuckDB and the simulated user.
+ * backed by DuckDB and the simulated user. Like the browser, it keeps one
+ * placeholder vault per conversation and restores placeholders before SQL
+ * runs. A question whose model call fails comes back as an answer with that
+ * error, not a rejection.
  */
 export function createPiConversation(
   options: Readonly<{
@@ -119,8 +266,13 @@ export function createPiConversation(
   }>,
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
+  const vault = createSqlPlaceholderVault();
+  let lastPageBlock: string | undefined;
   const dataAgent = options.createAgent(
-    _createEvalHost(options.database, recorder),
+    createPlaceholderRestoringHost(
+      _createEvalHost(options.database, recorder),
+      vault,
+    ),
   );
   return {
     ask: async (question) => {
@@ -132,37 +284,22 @@ export function createPiConversation(
         consentPrompts: 0,
       });
       const startedAt = performance.now();
-      const reply = await dataAgent.ask(question.prompt);
-      const lastQuery = reply.state.lastQuery;
-      const answer: EvalAnswer = {
-        finalSql: lastQuery?.sql,
-        vizType: recorder.vizType,
-        result: recorder.result,
-        error: lastQuery
-          ? recorder.error
-          : "Answered in text without running a query",
-        assistantText: reply.text,
-        clarifications: reply.state.questions.map((record) => {
-          return {
-            kind: record.kind === "values" ? "discovery" : "fixed_options",
-            question: record.question,
-            answer: record.answer,
-            isAutomatic: record.isAutomatic,
-          };
-        }),
-        consentPrompts: recorder.consentPrompts,
-        valuesSentToModel: reply.state.valuesSentToModel,
-        usage: {
-          calls: reply.usage.calls,
-          promptTokens: reply.usage.inputTokens,
-          cachedPromptTokens: reply.usage.cachedInputTokens,
-          completionTokens: reply.usage.outputTokens,
-          reasoningTokens: reply.usage.reasoningTokens,
-          cost: reply.usage.cost,
-        },
-        latencyMs: performance.now() - startedAt,
-      };
-      return answer;
+      const firstMessageIndex = dataAgent.agent.state.messages.length;
+      const pageBlock = _buildPageBlock(question, vault);
+      try {
+        const reply = await dataAgent.ask(
+          buildAgentTurnText({
+            message: question.prompt,
+            pageBlock,
+            previousPageBlock: lastPageBlock,
+          }),
+        );
+        lastPageBlock = pageBlock ?? lastPageBlock;
+        return _toEvalAnswer(reply, recorder, startedAt);
+      } catch (error) {
+        const usage = _usageSince(dataAgent, firstMessageIndex);
+        return _toFailedEvalAnswer(error, usage, startedAt);
+      }
     },
   };
 }

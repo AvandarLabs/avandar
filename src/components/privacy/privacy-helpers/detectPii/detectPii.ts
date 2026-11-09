@@ -135,6 +135,16 @@ const COLUMN_NAME_KEYWORDS: Array<{
   },
 ];
 
+/**
+ * Every keyword the column-name check looks for, such as `email` or
+ * `date_of_birth`. Exported for checks that match the same words more
+ * strictly, for example as whole words of a normalized column name.
+ */
+export const PII_COLUMN_NAME_KEYWORDS: readonly string[] =
+  COLUMN_NAME_KEYWORDS.flatMap((entry) => {
+    return entry.keywords;
+  });
+
 // Standalone "name" (not in a compound like "first_name") is a direct
 // identifier hit. We add it after the table to keep compound matching from
 // double-firing.
@@ -347,4 +357,14 @@ export function detectPii(input: {
   });
 
   return { severity, hits, isMedical };
+}
+
+/**
+ * True when a piece of free text, such as a chart title or a SQL string
+ * literal, contains a value that looks like personal data (an email, phone
+ * number, government id, and so on). Uses the same content patterns as
+ * {@link detectPii}, and counts warnings as well as critical hits.
+ */
+export function isPersonalDataText(text: string): boolean {
+  return detectPii({ values: [text] }).severity !== "clean";
 }

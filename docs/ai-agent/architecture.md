@@ -37,7 +37,8 @@ Browser                                                   Edge (Supabase)       
 |   |                                             |               | and tools, model   |
 |   v                                             |               | allowlist, caps    |
 | Tools (execute in the browser)                   |               +--------------------+
-|   run_query ----> Data Explorer -> DuckDB-Wasm   |
+|   run_query ----> Data Explorer or chat result   |
+|                   -> DuckDB-Wasm                 |
 |   lookup_values -> local query (QETL)            |
 |   ask_user -----> question card in the chat      |
 |   (future) dashboards, datasets, ontology, ...   |
@@ -83,9 +84,11 @@ Code: `src/lib/agent/dataAgent/`.
 |---|---|---|
 | Agent factory | `createDataAgent/createDataAgent.ts` | Builds the Pi `Agent` with the prompt, three tools, the model policy, a 6-request cap per answer, and usage tracking. |
 | Prompt | `buildDataAgentSystemPrompt/buildDataAgentSystemPrompt.ts` | About 1,200 tokens: fixed rules, then the datasets with column types, then today's date (today's harness sends about 3,400 tokens of rules alone). The fixed part is identical across turns, so providers cache it. |
-| `run_query` | `createDataAgentTools/runQueryTool.ts` | Runs one query in the Data Explorer. The model gets back only the row count and column names. A clean result ends the turn, so a typical answer is one model call. An error (with literals stripped) or an empty result goes back to the model for a fix, at most 3 runs per answer. |
+| `run_query` | `createDataAgentTools/runQueryTool.ts` | Runs one query and hands it to the host, which shows it in the Data Explorer or in the chat (D38). The model gets back only the row count and column names. A clean result ends the turn, so a typical answer is one model call. An error (with literals stripped) or an empty result goes back to the model for a fix, at most 3 runs per answer. |
 | `lookup_values` | `createDataAgentTools/lookupValuesTool.ts` | Finds how named values are stored. Exact matches (ignoring case and spaces) run locally and answer on their own; anything else shows the user a card of stored values. Only matched or picked values reach the model, through the privacy check. |
 | `ask_user` | `createDataAgentTools/askUserTool.ts` | One question card with 2 to 5 options, at most 2 per answer. Built-in options ("Something else") are filtered. |
+| Page block | `shared/agent/pageContext/buildAgentPageContextBlock.ts` | The `<current_page>` block that starts each turn's message: the app, the open dataset, dashboard tiles (at most 12), explorer SQL, map, case type, and for a case only its case type. Page text is escaped and marked as data. An "unchanged" line replaces it when the page has not changed. Prompt v2 (`data-agent-v2`) tells the model how to read it (D35). |
+| Chat result part | `src/components/ChatPanel/ChatThread/AgentQueryResultPart/` | `AgentQueryResult` stores a result outside the Data Explorer as SQL, chart type, and title, never rows. `AgentQueryResultPart` draws it as a chip or an embed card that re-runs the SQL in DuckDB-Wasm (D36). |
 | Host interface | `DataAgentHost.ts` | Everything the tools need from where they run. The browser host (`browser/createBrowserDataAgentHost.ts`) drives the Data Explorer and chat cards; the eval host drives DuckDB in Node and a simulated user. |
 | Browser switch | `browser/DataAgentFeature.ts` | Off by default. `localStorage["avandar:data-agent"] = "on"` or `VITE_AVA_DATA_AGENT=on` sends Data Explorer chat through the agent. The agent code loads only when used. |
 | Proxy | `supabase/functions/chat/PostAgentStream/` | The server side described above, tested against Pi's own proxy client. |
@@ -184,7 +187,9 @@ section is the design behind it.
 
 1. Move the remaining Data Explorer features into the agent path: charts
    (done through `run_query`'s `chart`), dashboards (`add_dashboard_block`),
-   and "Try again".
+   and "Try again". Phase 1A is done: the agent answers on every page and
+   results outside the Data Explorer show in the chat
+   ([spec](specs/phase-1a.md)).
 2. Define one **tool registry** for Avandar operations: name, schema, area,
    what it exposes, whether it changes anything, and whether it needs
    confirmation. Each tool calls the existing clients (`DatasetClient`,

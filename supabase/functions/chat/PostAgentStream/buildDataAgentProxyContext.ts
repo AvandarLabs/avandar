@@ -3,6 +3,7 @@ import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
 import { DATA_AGENT_TOOLS } from "$/agent/dataAgent/dataAgentTools.ts";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
+import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 import type { Context, Message } from "@earendil-works/pi-ai";
 
 const CONVERSATION_ROLES = new Set(["user", "assistant", "toolResult"]);
@@ -51,6 +52,7 @@ export function buildDataAgentProxyContext(
     clientMessages: readonly unknown[];
     datasets: readonly DataAgentDataset[];
     today: string;
+    promptId: DataAgentPromptId;
   }>,
 ): Context {
   const messages = options.clientMessages.filter((message) => {
@@ -62,6 +64,7 @@ export function buildDataAgentProxyContext(
     systemPrompt: buildDataAgentSystemPrompt({
       datasets: options.datasets,
       today: options.today,
+      promptId: options.promptId,
     }),
     tools: DATA_AGENT_TOOLS.map((tool) => {
       return {

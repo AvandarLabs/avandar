@@ -274,6 +274,26 @@ describe("createOfflineDataAgent", () => {
     expect(JSON.stringify(requests[0]?.jsonSchema)).toContain('"reply"');
     expect(reply.text).toBe("Hello!");
   });
+
+  it("rejects with the engine's error when the local model fails", async () => {
+    const agent = createOfflineDataAgent({
+      datasets: [US],
+      host: _createHost(),
+      llm: {
+        complete: async () => {
+          throw new Error(
+            "Prompt tokens exceed context window size: number of prompt tokens: 9000",
+          );
+        },
+      },
+      models: { answer: "answer-model" },
+      contextWindow: 8192,
+      today: "2026-11-07",
+    });
+
+    // The chat turns this message into its "too long" reply.
+    await expect(agent.ask("hi there")).rejects.toThrow(/context window/);
+  });
 });
 
 describe("routeOfflineMessageByRules", () => {

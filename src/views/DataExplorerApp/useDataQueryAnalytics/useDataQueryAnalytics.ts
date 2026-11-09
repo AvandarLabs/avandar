@@ -25,12 +25,17 @@ export type QueryAnalyticsObserverState = Pick<
   "status" | "fetchStatus"
 >;
 
-/** The app surface each query surface reports its events under. */
+/**
+ * The app surface each query surface reports its events under. A chat
+ * result reports under the Data Explorer: it runs through the explorer's
+ * query hook and opens in the explorer, and the chat has no app of its own.
+ */
 function _getAppFromSurface(surface: QueryAnalyticsSurface): AnalyticsApp {
   return matchLiteral(surface, {
     data_explorer: "data_explorer",
     dashboard_block: "dashboards",
     viz_config: "dashboards",
+    chat_result: "data_explorer",
   } as const);
 }
 
