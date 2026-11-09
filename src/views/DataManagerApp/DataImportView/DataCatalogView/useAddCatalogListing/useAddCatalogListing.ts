@@ -5,6 +5,7 @@ import { uuid } from "$/lib/uuid";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ColumnTypeVerifications } from "@/lib/openData/ColumnTypeVerifications";
 import { readRememberedCompleteSample } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
@@ -60,9 +61,12 @@ export function useAddCatalogListing(): CatalogListingAdder {
   const [waitingToAddListingId, setWaitingToAddListingId] = useState<
     DataCatalogListing.Id | undefined
   >();
+  // The map reads workspace-wide column lists to offer boundary datasets, so
+  // they are refreshed with the dataset list.
   const [, , insertMutation] = DatasetClient.useInsertOpenDataDataset({
     queriesToInvalidate: [
       DatasetClient.QueryKeys.getAll(),
+      DatasetColumnClient.QueryKeys.getAll(),
       CATALOG_LISTING_COMPANIONS_QUERY_KEY,
     ],
   });
