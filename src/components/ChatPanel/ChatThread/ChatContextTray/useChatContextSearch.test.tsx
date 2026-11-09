@@ -1,3 +1,4 @@
+import { AvaQueryProvider } from "@avandar/query-hooks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useChatContextSearch } from "@/components/ChatPanel/ChatThread/ChatContextTray/useChatContextSearch";
@@ -43,8 +44,10 @@ const CASE_RESULT: GadgetSearchResult = {
   hasLimitedAudience: false,
 };
 
+let queryClient: QueryClient;
+
 function _renderSearch(query: string, isEnabled = true) {
-  const queryClient = new QueryClient({
+  queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
   const wrapper = ({ children }: { children: ReactNode }) => {
@@ -107,6 +110,52 @@ describe("useChatContextSearch", () => {
     });
     expect(mocks.searchGadgets).not.toHaveBeenCalled();
     expect(result.current.results).toEqual([]);
+  });
+
+  it("keeps results out of the persisted cache and refreshes them", async () => {
+    mocks.searchGadgets.mockResolvedValue([DATASET_RESULT]);
+
+    const { result } = _renderSearch("us");
+
+    await waitFor(() => {
+      expect(result.current.results).toEqual([DATASET_RESULT]);
+    });
+    const [query] = queryClient.getQueryCache().getAll();
+    expect(query?.meta).toEqual({ persist: false });
+    expect(query?.observers[0]?.options.staleTime).toBe(30_000);
+  });
+
+  it("reports a failed search without the generic error popup", async () => {
+    const onError = vi.fn();
+    mocks.searchGadgets.mockRejectedValue(new Error("offline"));
+
+    const { result } = renderHook(
+      () => {
+        return useChatContextSearch("us", { isEnabled: true });
+      },
+      {
+        wrapper: ({ children }: { children: ReactNode }) => {
+          return (
+            <AvaQueryProvider onError={onError}>
+              <QueryClientProvider
+                client={
+                  new QueryClient({
+                    defaultOptions: { queries: { retry: false } },
+                  })
+                }
+              >
+                {children}
+              </QueryClientProvider>
+            </AvaQueryProvider>
+          );
+        },
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current.searchFailed).toBe(true);
+    });
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it("reports a failed search", async () => {

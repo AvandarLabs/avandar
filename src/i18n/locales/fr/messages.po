@@ -3691,10 +3691,6 @@ msgstr "« {0} » est en cours de préparation. L’ouverture de jeux de donn�
 msgid "Using your custom URL."
 msgstr "Utilisation de votre URL personnalisée."
 
-#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
-msgid "Searching..."
-msgstr "Recherche..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "Vous ne pouvez pas enregistrer dans un tableau de bord tant que vous "
@@ -8695,6 +8691,7 @@ msgstr "Entrez le nom de l'ensemble de données"
 msgid "Select an annotation on the map to edit it."
 msgstr "Sélectionnez une annotation sur la carte pour la modifier."
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "Recherche…"

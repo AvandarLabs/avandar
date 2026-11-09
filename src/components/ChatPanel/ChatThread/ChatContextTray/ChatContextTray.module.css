@@ -23,7 +23,7 @@
   align-items: center;
   display: inline-flex;
   font-size: var(--mantine-font-size-xs);
-  gap: 2px;
+  gap: var(--mantine-spacing-xxxs);
   max-width: 100%;
 }
 
@@ -58,25 +58,4 @@
 
 .optionAdded {
   flex: none;
-}
-
-.optionSkeleton {
-  animation: chat-context-option-pulse 1.5s ease-in-out infinite;
-  background-color: var(--mantine-color-neutral-2);
-  block-size: 12px;
-  border-radius: var(--mantine-radius-xs);
-  display: inline-block;
-  inline-size: 120px;
-}
-
-@keyframes chat-context-option-pulse {
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .optionSkeleton {
-    animation: none;
-  }
 }

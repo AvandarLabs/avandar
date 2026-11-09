@@ -3652,10 +3652,6 @@ msgstr "\"{0}\" inatayarishwa. Seti kubwa za data zinaweza kuchukua dakika "
 msgid "Using your custom URL."
 msgstr "Unatumia URL yako maalum."
 
-#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
-msgid "Searching..."
-msgstr "Inatafuta..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "Huwezi kuhifadhi kwenye dashibodi hadi utekeleze swali."
@@ -8596,6 +8592,7 @@ msgstr "Ingiza jina la seti ya data"
 msgid "Select an annotation on the map to edit it."
 msgstr "Chagua dokezo kwenye ramani ili kulihariri."
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "Inatafuta…"

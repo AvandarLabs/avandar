@@ -8,7 +8,7 @@ import {
   VisuallyHidden,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { MAX_ATTACHED_GADGETS } from "$/agent/mentions/AgentGadgetContext";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -75,6 +75,9 @@ function _buildListing(
 
 type TriggerProps = {
   combobox: ComboboxStore;
+
+  /** The id of the list of choices, which the button controls. */
+  listId: string;
   isTrayFull: boolean;
   triggerRef: Props["triggerRef"];
 };
@@ -87,6 +90,7 @@ type TriggerProps = {
  */
 function ChatContextPickerTrigger({
   combobox,
+  listId,
   isTrayFull,
   triggerRef,
 }: TriggerProps): ReactNode {
@@ -96,7 +100,12 @@ function ChatContextPickerTrigger({
   return (
     <Tooltip label={reason} disabled={!isTrayFull}>
       <span>
-        <Combobox.Target withAriaAttributes={false}>
+        {/* Without keyboard handling here, the arrows cannot open a full
+            tray's list. The search box handles the keys once it is open. */}
+        <Combobox.Target
+          withAriaAttributes={false}
+          withKeyboardNavigation={!isTrayFull}
+        >
           <Button
             ref={triggerRef}
             variant="subtle"
@@ -106,6 +115,7 @@ function ChatContextPickerTrigger({
             leftSection={<IconPlus size={12} aria-hidden />}
             aria-haspopup="listbox"
             aria-expanded={combobox.dropdownOpened}
+            aria-controls={combobox.dropdownOpened ? listId : undefined}
             aria-disabled={isTrayFull || undefined}
             data-disabled={isTrayFull || undefined}
             aria-describedby={isTrayFull ? reasonId : undefined}
@@ -132,6 +142,10 @@ type GroupsProps = {
   listing: PickerListing;
   attachedKeys: ReadonlySet<string>;
   hasQuery: boolean;
+
+  /** False when every page item is one the user cannot open. */
+  hasOpenablePageRefs: boolean;
+  onPageRefLockedChange: (key: string, isLocked: boolean) => void;
 };
 
 /** "On this page" while the query is blank, then "Recent" or "Results". */
@@ -139,6 +153,8 @@ function ChatContextPickerGroups({
   listing,
   attachedKeys,
   hasQuery,
+  hasOpenablePageRefs,
+  onPageRefLockedChange,
 }: GroupsProps): ReactNode {
   const { t } = useLingui();
   const isAttached = (ref: Gadget.Ref): boolean => {
@@ -147,13 +163,15 @@ function ChatContextPickerGroups({
   return (
     <>
       {listing.pageRefs.length > 0 ? (
-        <Combobox.Group label={t`On this page`}>
+        // Hidden rather than removed, so its items keep loading their names.
+        <Combobox.Group label={t`On this page`} hidden={!hasOpenablePageRefs}>
           {listing.pageRefs.map((ref) => {
             return (
               <ChatContextPickerPageOption
                 key={ChatMentionToken.buildRefKey(ref)}
                 gadgetRef={ref}
                 isAttached={isAttached(ref)}
+                onLockedChange={onPageRefLockedChange}
               />
             );
           })}
@@ -178,6 +196,13 @@ function ChatContextPickerGroups({
 
 type PickerState = {
   combobox: ComboboxStore;
+
+  /** Set on the list of choices, so the button can point at it. */
+  listId: string;
+
+  /** Whether any listed page item is one the user can open. */
+  hasOpenablePageRefs: boolean;
+  setPageRefLocked: (key: string, isLocked: boolean) => void;
   query: string;
   setQuery: (query: string) => void;
   hasQuery: boolean;
@@ -189,8 +214,40 @@ type PickerState = {
  * The picker's combobox, query, and what it lists. Closing it clears the
  * query, and the search runs only while it is open.
  */
+/**
+ * Which listed page items turned out to be ones the user cannot open, as
+ * each item reports once its summary loads, so the picker can hide the
+ * page group when none is left.
+ */
+function useLockedPageRefs(
+  pageRefs: readonly Gadget.Ref[],
+): Pick<PickerState, "hasOpenablePageRefs" | "setPageRefLocked"> {
+  const [lockedKeys, setLockedKeys] = useState<ReadonlySet<string>>(() => {
+    return new Set();
+  });
+  const setPageRefLocked = useCallback((key: string, isLocked: boolean) => {
+    setLockedKeys((current) => {
+      if (current.has(key) === isLocked) {
+        return current;
+      }
+      const updated = new Set(current);
+      if (isLocked) {
+        updated.add(key);
+      } else {
+        updated.delete(key);
+      }
+      return updated;
+    });
+  }, []);
+  const hasOpenablePageRefs = pageRefs.some((ref) => {
+    return !lockedKeys.has(ChatMentionToken.buildRefKey(ref));
+  });
+  return { hasOpenablePageRefs, setPageRefLocked };
+}
+
 function useChatContextPickerState(): PickerState {
   const [query, setQuery] = useState("");
+  const listId = useId();
   const combobox = useCombobox({
     onDropdownOpen: () => {
       combobox.focusSearchInput();
@@ -216,7 +273,17 @@ function useChatContextPickerState(): PickerState {
     },
     [combobox, search.results, hasQuery],
   );
-  return { combobox, query, setQuery, hasQuery, listing, search };
+  const lockedPageRefs = useLockedPageRefs(listing.pageRefs);
+  return {
+    combobox,
+    listId,
+    query,
+    setQuery,
+    hasQuery,
+    listing,
+    search,
+    ...lockedPageRefs,
+  };
 }
 
 type DropdownProps = {
@@ -248,18 +315,20 @@ function ChatContextPickerDropdown({
           }
         }}
       />
-      <Combobox.Options aria-label={t`Add context`}>
+      <Combobox.Options id={state.listId} aria-label={t`Add context`}>
         <ScrollArea.Autosize mah={OPTIONS_MAX_HEIGHT} type="scroll">
           <ChatContextPickerGroups
             listing={listing}
             attachedKeys={attachedKeys}
             hasQuery={state.hasQuery}
+            hasOpenablePageRefs={state.hasOpenablePageRefs}
+            onPageRefLockedChange={state.setPageRefLocked}
           />
           <ChatContextPickerSearchStatus
             isSearching={search.isSearching}
             searchFailed={search.searchFailed}
             hasResults={listing.results.length > 0}
-            hasOtherOptions={listing.pageRefs.length > 0}
+            hasOtherOptions={state.hasOpenablePageRefs}
           />
         </ScrollArea.Autosize>
       </Combobox.Options>
@@ -298,6 +367,7 @@ export function ChatContextPicker({ triggerRef }: Props): ReactNode {
     >
       <ChatContextPickerTrigger
         combobox={combobox}
+        listId={state.listId}
         isTrayFull={contextTray.length >= MAX_ATTACHED_GADGETS}
         triggerRef={triggerRef}
       />

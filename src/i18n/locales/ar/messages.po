@@ -3603,10 +3603,6 @@ msgstr "جارٍ تجهيز \"{0}\". قد تستغرق مجموعات البيا
 msgid "Using your custom URL."
 msgstr "استخدام عنوان URL المخصص."
 
-#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
-msgid "Searching..."
-msgstr "جارٍ البحث..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "لا يمكنك الحفظ في لوحة المعلومات حتى تُجري استعلامًا."
@@ -8492,6 +8488,7 @@ msgstr "أدخل اسم مجموعة البيانات"
 msgid "Select an annotation on the map to edit it."
 msgstr "حدّد تعليقًا توضيحيًا على الخريطة لتحريره."
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "جارٍ البحث…"

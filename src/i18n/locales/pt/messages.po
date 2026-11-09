@@ -3656,10 +3656,6 @@ msgstr "\"{0}\" está sendo preparado. Conjuntos de dados grandes podem levar "
 msgid "Using your custom URL."
 msgstr "Usando sua URL personalizada."
 
-#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
-msgid "Searching..."
-msgstr "Pesquisando..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "Você não pode salvar em um painel até executar uma consulta."
@@ -8608,6 +8604,7 @@ msgstr "Digite o nome do conjunto de dados"
 msgid "Select an annotation on the map to edit it."
 msgstr "Selecione uma anotação no mapa para editá-la."
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "Pesquisando…"

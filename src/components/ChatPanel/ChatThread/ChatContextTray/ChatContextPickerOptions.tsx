@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Combobox, Text, VisuallyHidden } from "@mantine/core";
+import { Combobox, Skeleton, Text, VisuallyHidden } from "@mantine/core";
+import { useEffect } from "react";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { GADGET_REGISTRY } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
 import css from "./ChatContextTray.module.css";
@@ -61,14 +62,28 @@ function ChatContextOption({
   );
 }
 
+type PageOptionProps = ChoiceProps & {
+  /** Told whether the user cannot open this item, once that is known. */
+  onLockedChange: (key: string, isLocked: boolean) => void;
+};
+
 function ChatContextPickerPageOptionContent({
   gadgetRef,
   isAttached,
-}: ChoiceProps): ReactNode {
+  onLockedChange,
+}: PageOptionProps): ReactNode {
   const { i18n } = useLingui();
   const definition = GADGET_REGISTRY[gadgetRef.gadgetType];
   const summary = definition.useGadgetSummary(gadgetRef, { withFacts: false });
-  if (summary.status === "unavailable") {
+  const key = ChatMentionToken.buildRefKey(gadgetRef);
+  const isLocked = summary.status === "unavailable";
+  useEffect(
+    function reportLocked() {
+      onLockedChange(key, isLocked);
+    },
+    [onLockedChange, key, isLocked],
+  );
+  if (isLocked) {
     return null;
   }
   const label =
@@ -76,7 +91,7 @@ function ChatContextPickerPageOptionContent({
       summary.name
     ) : (
       <>
-        <span className={css.optionSkeleton} aria-hidden />
+        <Skeleton height={12} width={120} radius="xs" aria-hidden />
         <VisuallyHidden>{i18n._(definition.loadingLabel)}</VisuallyHidden>
       </>
     );
@@ -96,7 +111,7 @@ function ChatContextPickerPageOptionContent({
  * A gadget on the current page, named from its summary since the page
  * holds only its ref. A gadget the user cannot open is left out.
  */
-export function ChatContextPickerPageOption(props: ChoiceProps): ReactNode {
+export function ChatContextPickerPageOption(props: PageOptionProps): ReactNode {
   // Each type calls different hooks, so a type change in place remounts.
   return (
     <ChatContextPickerPageOptionContent
@@ -140,33 +155,35 @@ type SearchStatusProps = {
   hasOtherOptions: boolean;
 };
 
-/** The search's state when it has nothing to list, or nothing at all. */
-export function ChatContextPickerSearchStatus({
+function _renderSearchStatusText({
   isSearching,
   searchFailed,
   hasResults,
   hasOtherOptions,
 }: SearchStatusProps): ReactNode {
   if (searchFailed) {
-    return (
-      <Combobox.Empty>
-        <Trans>Search failed. Try again.</Trans>
-      </Combobox.Empty>
-    );
+    return <Trans>Search failed. Try again.</Trans>;
   }
   if (hasResults) {
     return null;
   }
   if (isSearching) {
-    return (
-      <Combobox.Empty>
-        <Trans>Searching...</Trans>
-      </Combobox.Empty>
-    );
+    return <Trans>Searching…</Trans>;
   }
-  return hasOtherOptions ? null : (
-    <Combobox.Empty>
-      <Trans>Nothing found</Trans>
-    </Combobox.Empty>
+  return hasOtherOptions ? null : <Trans>Nothing found</Trans>;
+}
+
+/**
+ * The search's state when it has nothing to list, or nothing at all, in a
+ * polite live region that stays mounted so each change is announced.
+ */
+export function ChatContextPickerSearchStatus(
+  props: SearchStatusProps,
+): ReactNode {
+  const text = _renderSearchStatusText(props);
+  return (
+    <div role="status" aria-live="polite">
+      {text === null ? null : <Combobox.Empty>{text}</Combobox.Empty>}
+    </div>
   );
 }

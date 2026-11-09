@@ -1,5 +1,5 @@
-import { useQuery } from "@avandar/query-hooks";
 import { useDebouncedValue } from "@mantine/hooks";
+import { useQuery } from "@tanstack/react-query";
 import { isChatMentionType } from "$/agent/mentions/ChatMentionToken";
 import { GADGET_TYPES } from "$/models/gadgets/Gadget/Gadget";
 import { searchGadgets } from "@/clients/gadgets/searchGadgets/searchGadgets";
@@ -21,6 +21,9 @@ const SEARCH_ROWS_PER_TYPE = 5;
  */
 const CHAT_CONTEXT_SEARCH_LIMIT = SEARCH_ROWS_PER_TYPE * GADGET_TYPES.length;
 
+/** How long a query's results are reused before reopening searches again. */
+const SEARCH_STALE_TIME_MS = 30_000;
+
 type ChatContextSearchState = {
   results: GadgetSearchResult[];
 
@@ -31,9 +34,12 @@ type ChatContextSearchState = {
 
 /**
  * Gadget search for the context picker: the chat's types only (never a
- * case), debounced, and cached per query. A blank query lists recently
- * updated gadgets. Nothing is fetched while `isEnabled` is false, such as
- * while the picker is closed.
+ * case), debounced, and cached per query for a short while, so a new
+ * gadget shows up soon. Results are never written to the persisted query
+ * cache, since they hold gadget names. A blank query lists recently updated
+ * gadgets. Nothing is fetched while `isEnabled` is false, such as while the
+ * picker is closed. A failure is shown by the picker itself, so this uses
+ * TanStack's `useQuery` rather than the wrapper that also pops up an error.
  */
 export function useChatContextSearch(
   query: string,
@@ -42,9 +48,11 @@ export function useChatContextSearch(
   const workspace = useCurrentWorkspace();
   const trimmedQuery = query.trim();
   const [debouncedQuery] = useDebouncedValue(trimmedQuery, SEARCH_DEBOUNCE_MS);
-  const [results, , search] = useQuery({
+  const search = useQuery({
     queryKey: ["chatContextSearch", workspace.id, debouncedQuery],
     enabled: options.isEnabled,
+    staleTime: SEARCH_STALE_TIME_MS,
+    meta: { persist: false },
     queryFn: async ({ signal }) => {
       const allResults = await searchGadgets({
         workspaceId: workspace.id,
@@ -60,7 +68,7 @@ export function useChatContextSearch(
   const isWaitingForDebounce =
     options.isEnabled && trimmedQuery !== debouncedQuery;
   return {
-    results: results ?? [],
+    results: search.data ?? [],
     isSearching: search.isFetching || isWaitingForDebounce,
     searchFailed: search.isError && !search.isFetching,
   };

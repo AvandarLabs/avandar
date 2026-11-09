@@ -8,6 +8,7 @@ import {
   trayMocks as mocks,
   openPicker,
   renderTray,
+  setLoadingSummary,
   TILE_REF,
 } from "./ChatContextTrayTestFixtures";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
@@ -122,6 +123,38 @@ describe("ChatContextPicker", () => {
     expect(
       within(pageGroup).getAllByRole("option", { hidden: true }),
     ).toHaveLength(1);
+    expect(pageGroup).not.toHaveAttribute("hidden");
+  });
+
+  it("hides this page's group when none of its items can be opened", async () => {
+    const lockedRef = {
+      ...DATASET_REF,
+      gadgetId: "99999999-9999-4999-8999-999999999999",
+    };
+    renderTray({ pageRefs: [lockedRef] });
+
+    await openPicker();
+
+    // A hidden group's label no longer names it, so find it by its label.
+    await waitFor(() => {
+      expect(
+        screen.getByText("On this page").closest('[role="group"]'),
+      ).toHaveAttribute("hidden");
+    });
+    expect(await screen.findByText("Nothing found")).toBeInTheDocument();
+  });
+
+  it("shows a loading page item with a skeleton and its loading label", async () => {
+    setLoadingSummary(DASHBOARD_REF);
+    renderTray({ pageRefs: [DASHBOARD_REF] });
+
+    await openPicker();
+
+    const option = await screen.findByRole("option", {
+      hidden: true,
+      name: /Loading dashboard/,
+    });
+    expect(option.querySelector(".mantine-Skeleton-root")).not.toBeNull();
   });
 
   it("never lists a case", async () => {
@@ -285,7 +318,41 @@ describe("ChatContextPicker", () => {
 
     await openPicker();
 
-    expect(await screen.findByText("Searching...")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("status", { hidden: true }),
+    ).toHaveTextContent("Searching…");
+  });
+
+  it("announces search failures politely", async () => {
+    mocks.searchGadgets.mockRejectedValue(new Error("offline"));
+    renderTray();
+
+    await openPicker();
+
+    await waitFor(() => {
+      expect(screen.getByRole("status", { hidden: true })).toHaveTextContent(
+        "Search failed. Try again.",
+      );
+    });
+    expect(screen.getByRole("status", { hidden: true })).toHaveAttribute(
+      "aria-live",
+      "polite",
+    );
+  });
+
+  it("points the open button at the list it controls", async () => {
+    renderTray();
+
+    await openPicker();
+
+    const listbox = screen.getByRole("listbox", {
+      hidden: true,
+      name: "Add context",
+    });
+    expect(screen.getByRole("button", { name: "Add context" })).toHaveAttribute(
+      "aria-controls",
+      listbox.id,
+    );
   });
 
   it("labels the list of choices", async () => {

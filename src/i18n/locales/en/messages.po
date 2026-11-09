@@ -3606,10 +3606,6 @@ msgstr "\"{0}\" is being prepared. Large datasets can take a few minutes to "
 msgid "Using your custom URL."
 msgstr "Using your custom URL."
 
-#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
-msgid "Searching..."
-msgstr "Searching..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "You can't save to a dashboard until you've run a query."
@@ -8504,6 +8500,7 @@ msgstr "Enter dataset name"
 msgid "Select an annotation on the map to edit it."
 msgstr "Select an annotation on the map to edit it."
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "Searching…"

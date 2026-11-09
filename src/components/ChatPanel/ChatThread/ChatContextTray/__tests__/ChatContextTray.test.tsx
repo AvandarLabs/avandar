@@ -109,6 +109,26 @@ describe("ChatContextTray", () => {
     );
   });
 
+  it("does not open the picker from the keyboard while the tray is full", async () => {
+    renderTray({
+      contextTray: [1, 2, 3, 4, 5].map(buildDatasetRef),
+    });
+    const addButton = screen.getByRole("button", { name: "Add context" });
+    addButton.focus();
+
+    fireEvent.keyDown(addButton, { key: "ArrowDown", code: "ArrowDown" });
+    fireEvent.keyDown(addButton, { key: "ArrowUp", code: "ArrowUp" });
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("textbox", {
+          name: "Search dashboards, datasets, maps...",
+        }),
+      ).not.toBeInTheDocument();
+    });
+    expect(addButton).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("does not open the picker while the tray is full", async () => {
     renderTray({
       contextTray: [1, 2, 3, 4, 5].map(buildDatasetRef),

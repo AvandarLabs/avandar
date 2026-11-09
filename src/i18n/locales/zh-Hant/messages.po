@@ -3515,10 +3515,6 @@ msgstr "正在準備「{0}」。大型資料集第一次開啟可能需要幾分
 msgid "Using your custom URL."
 msgstr "使用您的自訂網址。"
 
-#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
-msgid "Searching..."
-msgstr "搜尋中..."
-
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "You can't save to a dashboard until you've run a query."
 msgstr "執行查詢後才能儲存至儀表板。"
@@ -8298,6 +8294,7 @@ msgstr "輸入數據集名稱"
 msgid "Select an annotation on the map to edit it."
 msgstr "在地圖上選取註記以進行編輯。"
 
+#: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuSearchStatus.tsx
 msgid "Searching…"
 msgstr "搜尋中…"
