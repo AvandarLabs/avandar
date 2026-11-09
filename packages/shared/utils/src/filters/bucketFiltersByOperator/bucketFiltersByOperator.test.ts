@@ -14,6 +14,18 @@ describe("bucketFiltersByOperator", () => {
     });
   });
 
+  it("keeps an is-null filter in the operator shape", () => {
+    const result = bucketFiltersByOperator({
+      assignee: { is: null },
+      status: { eq: "active" },
+    });
+
+    expect(result).toEqual({
+      is: [["assignee", null]],
+      eq: [["status", "active"]],
+    });
+  });
+
   it("ignores operator values with invalid types", () => {
     const result = bucketFiltersByOperator({
       status: { eq: ["bad", "value"] as unknown as string },

@@ -11,5 +11,8 @@ export const isArrayValueOperator = (
     .with("in", () => {
       return true;
     })
+    .with("is", () => {
+      return false;
+    })
     .exhaustive();
 };

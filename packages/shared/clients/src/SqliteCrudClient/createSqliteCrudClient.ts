@@ -122,7 +122,7 @@ export function createSqliteCrudClient<
       getPage: async (params) => {
         const { where, params: bindings } = _buildWhereClause(params.where);
         const offset = params.pageNum * params.pageSize;
-        const sql = `select * from ${table}${where} limit ? offset ?`;
+        const sql = `select * from ${table}${where}${_orderByClause(params.orderBy)} limit ? offset ?`;
         const { rows } = await sqliteTransport.query({
           sql,
           params: [...bindings, params.pageSize, offset],
@@ -272,10 +272,35 @@ function _ident(name: string): string {
   return `"${name.replaceAll('"', '""')}"`;
 }
 
+/** Column names an `orderBy` entry may reference. */
+const ORDER_COLUMN = /^[a-z_][a-z0-9_]*$/;
+
+/**
+ * Build an ` order by` clause from the caller's `orderBy`. Returns an empty
+ * string when no ordering was requested, so unordered pages are unchanged.
+ * Throws if a column name falls outside `ORDER_COLUMN`.
+ */
+function _orderByClause(
+  orderBy:
+    | ReadonlyArray<{ column: string; direction: "asc" | "desc" }>
+    | undefined,
+): string {
+  if (!orderBy || orderBy.length === 0) {
+    return "";
+  }
+  const parts = orderBy.map((order) => {
+    if (!ORDER_COLUMN.test(order.column)) {
+      throw new Error(`Unsupported order column: ${order.column}`);
+    }
+    return `${_ident(order.column)} ${order.direction}`;
+  });
+  return ` order by ${parts.join(", ")}`;
+}
+
 /**
  * Build a parameterised WHERE clause from the model's
  * `FiltersByColumn` shape. Supports the same operators as the
- * Supabase client (`eq`, `in`) and emits placeholders rather than
+ * Supabase client (`eq`, `in`, `is`) and emits placeholders rather than
  * interpolating values; the only thing that gets concatenated is the
  * caller-controlled column name.
  */
@@ -315,6 +340,9 @@ function _buildWhereClause<DBRead extends Record<string, unknown>>(
             .join(", ");
           clauses.push(`${quotedColumn} in (${placeholders})`);
           params.push(...values);
+        })
+        .with("is", () => {
+          clauses.push(`${quotedColumn} is null`);
         })
         .exhaustive();
     });

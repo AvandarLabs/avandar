@@ -166,6 +166,25 @@ describe("createSqliteCrudClient", () => {
     expect(received?.params).toEqual(["red", 10, 0]);
   });
 
+  it("getPage orders by the requested columns before the page window", async () => {
+    let received: Record<string, unknown> | undefined;
+    sqliteTransport.query.mockImplementation((payload) => {
+      received = payload as Record<string, unknown>;
+      return { rows: [] };
+    });
+    const client = makeClient();
+    await client.getPage({
+      pageSize: 10,
+      pageNum: 0,
+      orderBy: [
+        { column: "color", direction: "asc" },
+        { column: "name", direction: "desc" },
+      ],
+    });
+    expect(received?.sql).toMatch(/order by "color" asc, "name" desc limit \?/);
+    expect(received?.params).toEqual([10, 0]);
+  });
+
   it("getPage applies WHERE filters with in", async () => {
     let received: Record<string, unknown> | undefined;
     sqliteTransport.query.mockImplementation((payload) => {
@@ -180,6 +199,22 @@ describe("createSqliteCrudClient", () => {
     });
     expect(received?.sql).toMatch(/where "color" in \(\?, \?\)/);
     expect(received?.params).toEqual(["red", "blue", 10, 0]);
+  });
+
+  it("getPage applies WHERE filters with is null and binds no value", async () => {
+    let received: Record<string, unknown> | undefined;
+    sqliteTransport.query.mockImplementation((payload) => {
+      received = payload as Record<string, unknown>;
+      return { rows: [] };
+    });
+    const client = makeClient();
+    await client.getPage({
+      pageSize: 10,
+      pageNum: 0,
+      where: { color: { is: null } },
+    });
+    expect(received?.sql).toMatch(/where "color" is null/);
+    expect(received?.params).toEqual([10, 0]);
   });
 
   it("getPage degrades an empty IN to a contradiction so no rows return", async () => {

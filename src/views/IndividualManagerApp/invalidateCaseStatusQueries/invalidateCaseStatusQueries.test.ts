@@ -6,7 +6,7 @@ import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
 import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
 import { invalidateCaseStatusQueries } from "@/views/IndividualManagerApp/invalidateCaseStatusQueries/invalidateCaseStatusQueries";
-import { makeRecordsWhereFromStatusFilter } from "@/views/IndividualManagerApp/makeRecordsWhereFromStatusFilter/makeRecordsWhereFromStatusFilter";
+import { makeRecordsListWhere } from "@/views/IndividualManagerApp/makeRecordsListWhere/makeRecordsListWhere";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { QueryKey } from "@tanstack/react-query";
@@ -19,6 +19,7 @@ type SeededKeys = {
   filteredRecords: QueryKey;
   recordCount: QueryKey;
   otherCaseTypeRecords: QueryKey;
+  assigneeQueue: QueryKey;
   statuses: QueryKey;
   statusRecordCounts: QueryKey;
   caseType: QueryKey;
@@ -29,23 +30,32 @@ function _makeSeededCache(): { queryClient: QueryClient; keys: SeededKeys } {
   const queryClient = new QueryClient();
   const keys: SeededKeys = {
     filteredRecords: IndividualClient.QueryKeys.getAll(
-      makeRecordsWhereFromStatusFilter({
+      makeRecordsListWhere({
         conceptId: CONCEPT_ID,
         statusIds: [STATUS_ID],
+        assignee: { kind: "anyone" },
       }),
     ),
     recordCount: IndividualClient.QueryKeys.getCount(
-      makeRecordsWhereFromStatusFilter({
+      makeRecordsListWhere({
         conceptId: CONCEPT_ID,
         statusIds: [],
+        assignee: { kind: "anyone" },
       }),
     ),
     otherCaseTypeRecords: IndividualClient.QueryKeys.getAll(
-      makeRecordsWhereFromStatusFilter({
+      makeRecordsListWhere({
         conceptId: OTHER_CONCEPT_ID,
         statusIds: [],
+        assignee: { kind: "anyone" },
       }),
     ),
+    assigneeQueue: IndividualClient.QueryKeys.getAll({
+      where: {
+        assigned_to: { eq: "00000000-0000-4000-8000-0000000000b1" },
+        workspace_id: { eq: "00000000-0000-4000-8000-0000000000d1" },
+      },
+    }),
     statuses: ConceptStatusClient.QueryKeys.getAll(
       where("concept_id", "eq", CONCEPT_ID),
     ),
@@ -92,6 +102,23 @@ describe("invalidateCaseStatusQueries", () => {
     expect(_isStale(queryClient, keys.filteredRecords)).toBe(true);
     expect(_isStale(queryClient, keys.recordCount)).toBe(true);
     expect(_isStale(queryClient, keys.statusRecordCounts)).toBe(true);
+  });
+
+  it("marks the assignee queue stale when a record's assignee changes, and leaves another case type's list alone", async () => {
+    const { queryClient, keys } = _makeSeededCache();
+    const router = _makeRouter();
+
+    await invalidateCaseStatusQueries({
+      queryClient,
+      router,
+      conceptId: CONCEPT_ID,
+      change: "recordAssignment",
+    });
+
+    expect(_isStale(queryClient, keys.assigneeQueue)).toBe(true);
+    expect(_isStale(queryClient, keys.filteredRecords)).toBe(true);
+    expect(_isStale(queryClient, keys.otherCaseTypeRecords)).toBe(false);
+    expect(router.invalidate).toHaveBeenCalledOnce();
   });
 
   it("leaves another case type's records alone", async () => {

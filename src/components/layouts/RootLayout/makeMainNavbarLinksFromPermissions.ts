@@ -33,6 +33,8 @@ export function makeMainNavbarLinksFromPermissions({
     canAccessCaseTypes
       ? NavbarLinks.ontologyDesignerHome(workspaceSlug)
       : undefined,
-    ...(canAccessCaseRecords ? individualManagerLinks : []),
+    ...(canAccessCaseRecords
+      ? [NavbarLinks.assignedToMe(workspaceSlug), ...individualManagerLinks]
+      : []),
   ].filter(isDefined);
 }

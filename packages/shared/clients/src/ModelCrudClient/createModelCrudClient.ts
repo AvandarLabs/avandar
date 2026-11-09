@@ -61,6 +61,10 @@ export function createModelCrudClient<
 >): ModelCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
   const _getPage = async (params: {
     where: FiltersByColumn<M["DBRead"]> | undefined;
+    orderBy?: ReadonlyArray<{
+      column: keyof M["DBRead"] & string;
+      direction: "asc" | "desc";
+    }>;
     pageSize: number;
     pageNum: number;
     logger: ILogger;
@@ -166,6 +170,10 @@ export function createModelCrudClient<
 
       getPage: async (params: {
         where?: FiltersByColumn<M["DBRead"]>;
+        orderBy?: ReadonlyArray<{
+          column: keyof M["DBRead"] & string;
+          direction: "asc" | "desc";
+        }>;
         pageSize: number;
         pageNum: number;
       }): Promise<ModelCrudPage<M["Read"]>> => {
@@ -175,6 +183,7 @@ export function createModelCrudClient<
           pageNum,
           pageSize,
           where,
+          orderBy: params.orderBy,
           logger,
           totalRows: undefined,
         });

@@ -427,6 +427,10 @@ msgstr "Depuis un PDF"
 msgid "Avandar {appVersion}"
 msgstr "Avandar {appVersion}"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records are unassigned"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "Télécharger Excel"
@@ -832,6 +836,10 @@ msgstr "1 personne"
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
 msgstr "Renommer"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Filter by assignee"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
 #~ msgid "Remove keyword {keyword}"
@@ -1295,6 +1303,10 @@ msgid "Please check your email for a confirmation link. It may take a few "
 msgstr "Veuillez vérifier votre e-mail pour un lien de confirmation. Cela peut "
 "prendre quelques minutes pour arriver."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+msgid "Assign to"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share “{resourceName}”"
@@ -1699,6 +1711,10 @@ msgstr "Chargement des plans..."
 msgid "User groups"
 msgstr "Groupes d'utilisateurs"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "Assignment not changed"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "Tapez votre réponse…"
@@ -1917,7 +1933,7 @@ msgstr "Horodatage"
 msgid "Y axis tick interval"
 msgstr "Intervalle des graduations de l’axe Y"
 
-#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records have these statuses"
 msgstr "Aucun dossier ne possède ces statuts"
 
@@ -2976,6 +2992,8 @@ msgstr "Étape"
 #: src/components/RichText/RichTextView/RichTextView.tsx
 #: src/components/RichText/UserMention/UserMentionChip.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
 msgid "Former member"
 msgstr "Ancien membre"
 
@@ -3604,6 +3622,10 @@ msgstr "Aucune colonne dans {0} n’a été reconnue comme une coordonnée d’a
 "son nom. Sélectionnez les colonnes de latitude et de longitude "
 "ci-dessus, ou associez plutôt une colonne de géométrie."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+msgid "Assignee unavailable"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
 msgstr "Réattribuez d’abord les ressources privées"
@@ -3623,6 +3645,13 @@ msgstr "Déposez un fichier ici ou cliquez pour parcourir vos fichiers"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
 msgstr "Aller à l'Explorateur de données"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
+msgid "Unassigned"
+msgstr ""
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
@@ -4054,6 +4083,7 @@ msgid "There are no values"
 msgstr "Il n'y a pas de valeurs"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
 msgid "Show more"
 msgstr "Afficher plus"
 
@@ -4468,6 +4498,10 @@ msgstr "Aucun champ"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
 msgstr "Échec de la mise à jour du nom de l'espace de travail"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Show every assignee"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
@@ -5134,6 +5168,11 @@ msgstr "Déposer pour importer"
 msgid "Date range"
 msgstr "Plage de dates"
 
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
+msgid "Assigned to me"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "Ajouter le jeu de données à l'espace de travail"
@@ -5650,6 +5689,7 @@ msgstr "Créer un espace de travail"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
@@ -6120,6 +6160,10 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 msgstr "Aucune clarification pour le moment. Le journal se remplit au fur et à "
 "mesure que le chat pose des questions de clarification."
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+msgid "Assigned to"
+msgstr ""
+
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
@@ -6215,6 +6259,10 @@ msgstr "Voici l’explorateur de données. Posez une question avec vos propres "
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "Contexte"
+
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
+msgid "{count, plural, one {# record} other {# records}}"
+msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -6735,6 +6783,10 @@ msgstr "Modifier la classification"
 msgid "all members of "
 msgstr "tous les membres de "
 
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "That person is not a member of this workspace."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "Certaines données doivent être saisies manuellement"
@@ -6977,6 +7029,10 @@ msgid "Nothing you ask, and none of your data, leaves this computer."
 msgstr "Aucune de vos questions ni aucune de vos données ne quitte cet "
 "ordinateur."
 
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
+msgid "These records failed to load"
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "Aucun champ n'a encore été configuré"
@@ -7054,6 +7110,10 @@ msgstr "Tableaux de bord privés"
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
 msgstr "Télécharger"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+msgid "Assigned to: {label}"
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove {datasetName}"
@@ -7383,6 +7443,7 @@ msgstr "Créer un nouvel espace de travail. Vous pouvez toujours le modifier "
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
@@ -9454,6 +9515,10 @@ msgstr "Modifier le groupe de rôles"
 msgid "Profiles"
 msgstr "Profils"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records are assigned to this person"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "Mettre à jour et republier"
@@ -9678,6 +9743,7 @@ msgstr "Merci de votre intérêt !"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
 msgstr "Type de dossier"
@@ -9695,6 +9761,7 @@ msgstr "Vignette du tableau de bord"
 msgid "Source"
 msgstr "Source"
 
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
 msgstr "Chargement des enregistrements"
@@ -9926,6 +9993,10 @@ msgstr "Supprimer la carte {0}"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
 msgstr "Interprété comme"
+
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
+msgid "Nothing is assigned to you."
+msgstr ""
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
@@ -10296,6 +10367,10 @@ msgstr "Google peut exporter au maximum 10 Mo d’une feuille de calcul à la "
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "Quel champ doit être utilisé comme nom d'un {singularConceptName} ?"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "You need Case Records editor access to assign a record."
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
@@ -10676,6 +10751,10 @@ msgstr "Tuile de tableau de bord indisponible"
 msgid "Not reported"
 msgstr "Non renseigné"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Anyone"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
@@ -10685,6 +10764,10 @@ msgstr "Partager"
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "Ensemble de données complet"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records match these filters"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Or"
@@ -10914,6 +10997,10 @@ msgstr "Afficher le code QR"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "Année dernière"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "The record keeps its previous assignee. Try again in a moment."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"

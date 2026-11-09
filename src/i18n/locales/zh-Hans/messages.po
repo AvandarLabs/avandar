@@ -409,6 +409,10 @@ msgstr "来自 PDF"
 msgid "Avandar {appVersion}"
 msgstr "Avandar {appVersion}"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records are unassigned"
+msgstr ""
+
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload Excel"
 msgstr "上传 Excel"
@@ -801,6 +805,10 @@ msgstr "1 人"
 #: src/views/GisApp/useGisAppLayerActions.tsx
 msgid "Rename"
 msgstr "重命名"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Filter by assignee"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogKeywordFacet.tsx
 #~ msgid "Remove keyword {keyword}"
@@ -1228,6 +1236,10 @@ msgid "Please check your email for a confirmation link. It may take a few "
 "minutes to arrive."
 msgstr "请检查您的电子邮件以获取确认链接。可能需要几分钟才能到达。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+msgid "Assign to"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share “{resourceName}”"
@@ -1612,6 +1624,10 @@ msgstr "加载计划中..."
 msgid "User groups"
 msgstr "用户组"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "Assignment not changed"
+msgstr ""
+
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
 msgstr "输入您的答案…"
@@ -1822,7 +1838,7 @@ msgstr "时间戳"
 msgid "Y axis tick interval"
 msgstr "Y 轴刻度间隔"
 
-#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbarRows.tsx
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records have these statuses"
 msgstr "没有记录处于这些状态"
 
@@ -2829,6 +2845,8 @@ msgstr "阶梯"
 #: src/components/RichText/RichTextView/RichTextView.tsx
 #: src/components/RichText/UserMention/UserMentionChip.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCard.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
 msgid "Former member"
 msgstr "前成员"
 
@@ -3427,6 +3445,10 @@ msgid "No column in {0} was recognized as a coordinate by name. Pick the "
 "latitude and longitude columns above, or bind a geometry column instead."
 msgstr "未在 {0} 中识别出名称表示坐标的列。请在上方选择纬度和经度列，或改为绑定几何列。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+msgid "Assignee unavailable"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Reassign private resources first"
 msgstr "请先重新分配私有资源"
@@ -3446,6 +3468,13 @@ msgstr "将文件拖放到此处，或点击浏览"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
 msgstr "前往数据探索器"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+#: src/views/IndividualManagerApp/useVirtualIndividualLinks.tsx
+msgid "Unassigned"
+msgstr ""
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Radar Chart"
@@ -3852,6 +3881,7 @@ msgid "There are no values"
 msgstr "没有值"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
 msgid "Show more"
 msgstr "显示更多"
 
@@ -4253,6 +4283,10 @@ msgstr "没有字段"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Failed to update workspace name"
 msgstr "更新工作区名称失败"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Show every assignee"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
@@ -4896,6 +4930,11 @@ msgstr "拖放以导入"
 msgid "Date range"
 msgstr "日期范围"
 
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
+msgid "Assigned to me"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
 msgstr "将数据集添加到工作区"
@@ -5391,6 +5430,7 @@ msgstr "创建工作区"
 
 #: src/components/AppErrorBoundary/GenericError.tsx
 #: src/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/EarlierActivityControl.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
@@ -5838,6 +5878,10 @@ msgid "No clarifications yet. The log fills in as the chat asks clarifying "
 "questions."
 msgstr "尚无澄清。日志会随着聊天提出澄清问题而填充。"
 
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl.tsx
+msgid "Assigned to"
+msgstr ""
+
 #. placeholder {0}: outcome.addedRowCount
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Added {0} rows from the assistant. Check them before saving."
@@ -5928,6 +5972,10 @@ msgstr "这是数据浏览器。请用自己的话提问，例如“我们的项
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Context"
 msgstr "上下文"
+
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
+msgid "{count, plural, one {# record} other {# records}}"
+msgstr ""
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
@@ -6430,6 +6478,10 @@ msgstr "编辑分类"
 msgid "all members of "
 msgstr "所有成员的 "
 
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "That person is not a member of this workspace."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Some data should be manually entered"
 msgstr "某些数据应手动输入"
@@ -6664,6 +6716,10 @@ msgstr "标记为未完成"
 msgid "Nothing you ask, and none of your data, leaves this computer."
 msgstr "您提出的问题以及您的任何数据都不会离开此计算机。"
 
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
+msgid "These records failed to load"
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "No fields have been configured yet"
 msgstr "尚未配置任何字段"
@@ -6735,6 +6791,10 @@ msgstr "私有仪表板"
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
 msgstr "上传"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
+msgid "Assigned to: {label}"
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove {datasetName}"
@@ -7056,6 +7116,7 @@ msgstr "创建一个新的工作区。您可以随时稍后编辑它。"
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeedContent.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 msgid "Try again in a moment, or reach out to support if it keeps happening."
@@ -9023,6 +9084,10 @@ msgstr "编辑角色组"
 msgid "Profiles"
 msgstr "配置文件"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records are assigned to this person"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Update & republish"
 msgstr "更新并重新发布"
@@ -9234,6 +9299,7 @@ msgstr "感谢您的关注！"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Case type"
 msgstr "案例类型"
@@ -9251,6 +9317,7 @@ msgstr "仪表板磁贴"
 msgid "Source"
 msgstr "来源"
 
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
 msgstr "正在加载记录"
@@ -9475,6 +9542,10 @@ msgstr "删除地图 {0}"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Read as"
 msgstr "读取为"
+
+#: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
+msgid "Nothing is assigned to you."
+msgstr ""
 
 #: src/components/VisualizationContainer/VisualizationContainer.tsx
 msgid "Invalid value column selected"
@@ -9825,6 +9896,10 @@ msgstr "Google 每次最多只能导出电子表格中的 10 MB 数据。请拆�
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What field should be used as a {singularConceptName}'s name?"
 msgstr "应使用哪个字段作为 {singularConceptName} 的名称？"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "You need Case Records editor access to assign a record."
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Ask your first question"
@@ -10185,6 +10260,10 @@ msgstr "不可用的仪表板图块"
 msgid "Not reported"
 msgstr "未报告"
 
+#: src/views/IndividualManagerApp/IndividualNavbar/AssigneeFilter/AssigneeFilter.tsx
+msgid "Anyone"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
@@ -10194,6 +10273,10 @@ msgstr "分享"
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Whole dataset"
 msgstr "整个数据集"
+
+#: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
+msgid "No records match these filters"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Or"
@@ -10415,6 +10498,10 @@ msgstr "显示二维码"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past year"
 msgstr "过去一年"
+
+#: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
+msgid "The record keeps its previous assignee. Try again in a moment."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
 msgid "Choose the minimum value"
