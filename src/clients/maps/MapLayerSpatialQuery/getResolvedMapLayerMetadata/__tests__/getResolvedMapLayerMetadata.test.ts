@@ -176,6 +176,7 @@ describe("getResolvedMapLayerMetadata", () => {
           type: "graduated",
           value: { type: "queryColumn", column: measureColumn.id },
           ramp: ["#f1f5f9", "#1d4ed8"],
+          classLabels: [undefined, undefined],
           classification: { method: "quantile", classCount: 5 },
           normalization: {
             denominator: {

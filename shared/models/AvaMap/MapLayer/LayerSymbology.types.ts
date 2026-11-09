@@ -75,10 +75,16 @@ export type ColorSpec =
   | {
       type: "graduated";
       value: LayerValueRef;
+      /** Exactly one color per class, in class order. */
       ramp: readonly string[];
       classification: ClassificationConfig;
       normalization: NormalizationConfig | undefined;
       noData: NoDataStyle;
+      /**
+       * One legend label per class, in class order. `undefined` keeps the
+       * generated interval label, such as `< 95`.
+       */
+      classLabels: readonly (string | undefined)[];
     };
 
 /** A flat or value-sized point style. */

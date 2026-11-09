@@ -70,6 +70,7 @@ describe("withSymbology", () => {
           type: "graduated" as const,
           value: { type: "queryColumn" as const, column: valueColumn.id },
           ramp: ["#123456", "#abcdef"],
+          classLabels: [undefined, undefined],
           classification: { method: "quantile" as const, classCount: 2 },
           normalization: undefined,
           noData: { color: "#cccccc", label: "" },

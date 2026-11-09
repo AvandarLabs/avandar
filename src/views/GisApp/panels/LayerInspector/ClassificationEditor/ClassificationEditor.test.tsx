@@ -52,6 +52,7 @@ function _createLayer(): MapLayer.T {
         type: "graduated",
         value: { type: "queryColumn", column: column.id },
         ramp: ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+        classLabels: [undefined, undefined, undefined, undefined, undefined],
         classification: { method: "quantile", classCount: 5 },
         normalization: undefined,
         noData: { color: "#ced4da", label: "" },

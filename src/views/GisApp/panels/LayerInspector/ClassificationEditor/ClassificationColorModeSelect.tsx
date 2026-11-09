@@ -64,6 +64,9 @@ function _createColor(
       classification: { method: "quantile", classCount: 5 },
       normalization: undefined,
       noData,
+      classLabels: Array.from({ length: 5 }, () => {
+        return undefined;
+      }),
     };
   }
   return {
