@@ -2,8 +2,9 @@
 const STORAGE_KEY = "avandar:data-agent";
 
 /**
- * Whether Data Explorer chat runs through the Pi-based data agent instead of
- * the `chat` edge function's single-call harness. Off unless the build sets
+ * Whether chat on every page except the case designer runs through the
+ * Pi-based data agent instead of the `chat` edge function's single-call
+ * harness. Off unless the build sets
  * `VITE_AVA_DATA_AGENT=on` or this browser's local storage sets
  * `avandar:data-agent` to `on`, so the agent can be tried in a demo without
  * changing anyone else's chat.

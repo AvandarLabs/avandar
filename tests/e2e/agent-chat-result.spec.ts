@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
@@ -14,6 +15,21 @@ import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
  */
 
 const RESULT_SQL = `SELECT 'California' AS "state", 42 AS "cases"`;
+
+/**
+ * Where this spec's screenshots go: `.temp/<branch>/`, with the current
+ * branch kebab-cased so it is a safe directory name.
+ */
+function _buildScreenshotPath(fileName: string): string {
+  const branch = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+    encoding: "utf8",
+  }).trim();
+  const directory = branch
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `.temp/${directory}/${fileName}`;
+}
 
 /** Pi `streamProxy` events for one `run_query` call that ends the turn. */
 function _runQueryStream(): string {
@@ -108,12 +124,17 @@ test.describe("agent results in the chat", () => {
       await expect(card.getByRole("link", { name: /^Open / })).toBeVisible({
         timeout: MEDIUM_WAIT,
       });
+      // The Open link shows while the result loads or after it fails, so
+      // the result's own rows must show too.
+      await expect(card.getByText("California", { exact: true })).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
       await expect(page.getByText("Cases in California.")).toBeVisible();
       expect(page.url()).toBe(dashboardUrl);
       expect(proxyBodies[0]).toContain("<current_page>");
       expect(proxyBodies[0]).toContain("Page: Dashboard");
       await page.screenshot({
-        path: ".temp/feat-agent-default/agent-chat-result.png",
+        path: _buildScreenshotPath("agent-chat-result.png"),
       });
 
       await page.reload();
@@ -121,6 +142,9 @@ test.describe("agent results in the chat", () => {
         await chatToggle.click();
       }
       await expect(card.getByRole("link", { name: /^Open / })).toBeVisible({
+        timeout: MEDIUM_WAIT,
+      });
+      await expect(card.getByText("California", { exact: true })).toBeVisible({
         timeout: MEDIUM_WAIT,
       });
     } finally {
