@@ -15,6 +15,7 @@ function _makeApi(openModal: AvandarApi["ui"]["openModal"]): AvandarApi {
       columns: [
         { name: "age", dataType: "bigint" },
         { name: "weight", dataType: "double" },
+        { name: "visit_date", dataType: "date" },
       ],
       rowCount: 5,
     },
@@ -26,9 +27,14 @@ function _makeApi(openModal: AvandarApi["ui"]["openModal"]): AvandarApi {
     },
     ui: {
       openModal,
-      closeModal: vi.fn(),
       openDrawer: vi.fn(),
       notify: vi.fn(),
+      closeModal: vi.fn(),
+    },
+    dataExplorer: {
+      addColumns: vi.fn(() => {
+        return Promise.resolve({ columnNames: [] });
+      }),
     },
     i18n: {
       t: (key) => {
@@ -39,24 +45,31 @@ function _makeApi(openModal: AvandarApi["ui"]["openModal"]): AvandarApi {
 }
 
 describe("the epidemiology plugin", () => {
-  it("opens the linear regression modal under its translated title", () => {
-    const openModal = vi.fn();
-    const api = _makeApi(openModal);
-    void plugin.commands["regression.linear"]?.(api);
-    expect(openModal).toHaveBeenCalledTimes(1);
-    const [options] = openModal.mock.calls[0] as Parameters<
-      AvandarApi["ui"]["openModal"]
-    >;
-    expect(options.title).toBe("translated:regression.linear.title");
-    render(
-      <MantineProvider>
-        <AvandarProvider api={api}>{options.content}</AvandarProvider>
-      </MantineProvider>,
-    );
-    expect(
-      screen.getByRole("button", { name: "translated:modal.fit" }),
-    ).toBeInTheDocument();
-  });
+  it.each([
+    ["regression.linear", "regression.linear.title", "modal.fit"],
+    ["incidence.rate", "incidence.title", "incidence.add"],
+    ["rolling.average", "rollingAverage.title", "rollingAverage.add"],
+  ])(
+    "opens the %s modal under its translated title",
+    (commandId, titleKey, buttonKey) => {
+      const openModal = vi.fn();
+      const api = _makeApi(openModal);
+      void plugin.commands[commandId]?.(api);
+      expect(openModal).toHaveBeenCalledTimes(1);
+      const [options] = openModal.mock.calls[0] as Parameters<
+        AvandarApi["ui"]["openModal"]
+      >;
+      expect(options.title).toBe(`translated:${titleKey}`);
+      render(
+        <MantineProvider>
+          <AvandarProvider api={api}>{options.content}</AvandarProvider>
+        </MantineProvider>,
+      );
+      expect(
+        screen.getByRole("button", { name: `translated:${buttonKey}` }),
+      ).toBeInTheDocument();
+    },
+  );
 
   it("draws the epicurve chart type with the epicurve transform", () => {
     expect(plugin.vizTypes.epicurve?.transform).toBe(makeEpicurveFromRows);

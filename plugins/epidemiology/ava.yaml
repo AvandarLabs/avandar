@@ -10,16 +10,31 @@ entry: src/index.tsx
 icon: chart-dots
 permissions:
   - data:context
+  - query:addColumns
 contributes:
   commands:
     - id: regression.linear
       title: "%regression.linear.title%"
       icon: trending-up
+    - id: incidence.rate
+      title: "%incidence.title%"
+      icon: percentage
+    - id: rolling.average
+      title: "%rollingAverage.title%"
+      icon: chart-line
   menus:
     dataExplorer.toolbar:
       - command: regression.linear
         when:
           numericColumnCount: { gte: 2 }
+      - command: incidence.rate
+        when:
+          numericColumnCount: { gte: 1 }
+      - command: rolling.average
+        when:
+          all:
+            - dateColumnCount: { gte: 1 }
+            - numericColumnCount: { gte: 1 }
   vizTypes:
     - id: epicurve
       title: "%viz.epicurve.title%"
