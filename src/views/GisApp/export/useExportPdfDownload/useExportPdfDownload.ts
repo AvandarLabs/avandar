@@ -198,6 +198,7 @@ function _buildComposePdfInput(
     pageNumberLabel: ({ page: pageNumber, total }) => {
       return i18n._(msg`Page ${pageNumber} of ${total}`);
     },
+    featureTable: undefined,
   };
 }
 

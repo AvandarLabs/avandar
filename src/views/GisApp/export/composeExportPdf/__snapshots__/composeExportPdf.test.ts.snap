@@ -1,0 +1,166 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`composeExportPdf > draws a small table's text, fonts, and header rule 1`] = `
+{
+  "line": [
+    [
+      269,
+      178,
+      269,
+      172,
+    ],
+    [
+      12,
+      26,
+      285,
+      26,
+    ],
+  ],
+  "setFont": [
+    [
+      "helvetica",
+      "normal",
+    ],
+    [
+      "helvetica",
+      "bold",
+    ],
+    [
+      "helvetica",
+      "bold",
+    ],
+    [
+      "helvetica",
+      "normal",
+    ],
+    [
+      "helvetica",
+      "normal",
+    ],
+    [
+      "helvetica",
+      "normal",
+    ],
+    [
+      "helvetica",
+      "normal",
+    ],
+    [
+      "helvetica",
+      "normal",
+    ],
+  ],
+  "text": [
+    [
+      "Cholera response",
+      12,
+      17,
+    ],
+    [
+      "Case density",
+      12,
+      22,
+    ],
+    [
+      "Avandar",
+      12,
+      27,
+    ],
+    [
+      "Produced 2026-08-18",
+      12,
+      32,
+    ],
+    [
+      "Layer 0",
+      247,
+      33.5,
+    ],
+    [
+      "Layer 1",
+      247,
+      39.5,
+    ],
+    [
+      "Layer 2",
+      247,
+      45.5,
+    ],
+    [
+      "N",
+      271,
+      172,
+    ],
+    [
+      "0    50    100 km",
+      241,
+      181,
+    ],
+    [
+      "Health cluster, OpenStreetMap contributors",
+      12,
+      187,
+    ],
+    [
+      "Boundaries are not authoritative.",
+      12,
+      192,
+    ],
+    [
+      "Page 1 of 2",
+      12,
+      198,
+    ],
+    [
+      "2 Schools",
+      12,
+      15,
+    ],
+    [
+      "School",
+      13.5,
+      23.5,
+    ],
+    [
+      "Distance",
+      150,
+      23.5,
+    ],
+    [
+      "School 0",
+      13.5,
+      30.5,
+    ],
+    [
+      "0 mi",
+      150,
+      30.5,
+    ],
+    [
+      "School 1",
+      13.5,
+      37.5,
+    ],
+    [
+      "1 mi",
+      150,
+      37.5,
+    ],
+    [
+      "Health cluster, OpenStreetMap contributors",
+      12,
+      187,
+    ],
+    [
+      "Boundaries are not authoritative.",
+      12,
+      192,
+    ],
+    [
+      "Page 2 of 2",
+      12,
+      198,
+    ],
+  ],
+}
+`;
