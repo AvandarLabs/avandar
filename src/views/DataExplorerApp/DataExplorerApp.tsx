@@ -38,6 +38,7 @@ import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBa
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryExplorerResultsChrome } from "@/views/DataExplorerApp/QueryExplorerResultsChrome";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
+import { useDataExplorerPluginBridge } from "@/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge";
 import { useDataExplorerPluginContext } from "@/views/DataExplorerApp/useDataExplorerPluginContext/useDataExplorerPluginContext";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
@@ -217,6 +218,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     queryResults,
     isLoadingResults,
   });
+  const pluginBridge = useDataExplorerPluginBridge({
+    executedSql: isLoadingResults ? undefined : queryResults?.executedSql,
+  });
   const dateColumns = useMemo(() => {
     return getDateColumns(queryResultColumns, queryResultData);
   }, [queryResultColumns, queryResultData]);
@@ -260,6 +264,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           <PluginMenuSlot
             slotId="dataExplorer.toolbar"
             getContext={pluginContext.getContext}
+            getDataExplorerBridge={pluginBridge}
             facts={pluginContext.facts}
           />
           <Button

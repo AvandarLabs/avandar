@@ -57,6 +57,10 @@ function _entry(
     parquetCacheBuiltAt: undefined,
     parquetCacheRowCount: undefined,
     parquetCacheByteSize: undefined,
+    parquetCacheCheckedAt: undefined,
+    parquetCacheCheckedSourceVersion: undefined,
+    companionListings: [],
+    apiFreshnessProbe: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
@@ -131,5 +135,55 @@ describe("DataCatalogListing.toAccess", () => {
         _entry({ ...COMPLETE_PIPELINE_FIELDS, ...missing }),
       ),
     ).toBeUndefined();
+  });
+});
+
+describe("DataCatalogListing.getMetadataRowCount", () => {
+  it("reads the row count the pipeline wrote into the metadata", () => {
+    expect(
+      DataCatalogListing.getMetadataRowCount(
+        _entry({ metadata: { row_count: 0 } }),
+      ),
+    ).toBe(0);
+  });
+
+  it.each([
+    ["no metadata", undefined],
+    ["metadata without a row count", { title: "Measles" }],
+    ["a row count that is not a number", { row_count: "12" }],
+    ["metadata that is not an object", ["row_count"]],
+  ])("reads %s as no row count", (_case, metadata) => {
+    expect(
+      DataCatalogListing.getMetadataRowCount(_entry({ metadata })),
+    ).toBeUndefined();
+  });
+});
+
+describe("DataCatalogListing.toCompanionCodeColumns", () => {
+  it("names the code column of each pair, not the column naming its type", () => {
+    expect(
+      DataCatalogListing.toCompanionCodeColumns([
+        { column: "SpatialDimType", companionColumn: "Dimension" },
+        { column: "SpatialDim", companionColumn: "Code" },
+      ]),
+    ).toEqual(["SpatialDim"]);
+  });
+
+  it("names every code column when several join the listings", () => {
+    expect(
+      DataCatalogListing.toCompanionCodeColumns([
+        { column: "Dim1Type", companionColumn: "Dimension" },
+        { column: "Dim1", companionColumn: "Code" },
+        { column: "Dim2", companionColumn: "Code" },
+      ]),
+    ).toEqual(["Dim1", "Dim2"]);
+  });
+
+  it("falls back to every column when each one names a type", () => {
+    expect(
+      DataCatalogListing.toCompanionCodeColumns([
+        { column: "SpatialDimType", companionColumn: "Dimension" },
+      ]),
+    ).toEqual(["SpatialDimType"]);
   });
 });

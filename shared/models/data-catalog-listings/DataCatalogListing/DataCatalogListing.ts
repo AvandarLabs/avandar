@@ -13,6 +13,11 @@ import type {
   DataCatalogListingSearchFilters,
   DataCatalogListingFacetOption,
   DataCatalogListingSearchFacets,
+  DataCatalogListingCompanion,
+  DataCatalogListingCompanionJoinPair,
+  DataCatalogListingCompanionKind,
+  DataCatalogListingResolvedCompanion,
+  DataCatalogListingFreshnessProbe,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 
 export { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
@@ -55,4 +60,19 @@ export namespace DataCatalogListing {
 
   /** What each search filter would keep. */
   export type SearchFacets = DataCatalogListingSearchFacets;
+
+  /** One listing recommended alongside another, as the listing names it. */
+  export type Companion = DataCatalogListingCompanion;
+
+  /** One pair of columns that joins a listing to a companion. */
+  export type CompanionJoinPair = DataCatalogListingCompanionJoinPair;
+
+  /** Why a listing is recommended alongside another. */
+  export type CompanionKind = DataCatalogListingCompanionKind;
+
+  /** A companion matched to its listing, with whether it can be added. */
+  export type ResolvedCompanion = DataCatalogListingResolvedCompanion;
+
+  /** How to read a listing's freshness token from its source. */
+  export type FreshnessProbe = DataCatalogListingFreshnessProbe;
 }

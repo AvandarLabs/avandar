@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { setValue } from "@avandar/utils";
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -22,6 +23,7 @@ import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   DataExplorerAppState,
+  DerivedColumnsSnapshot,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
@@ -336,6 +338,49 @@ export const DataExplorerStateManager = createAppStateManager({
         lastResultColumns: undefined,
         isStructuredQueryInSync: false,
         sqlSyncWarnings: state.sqlSyncWarnings,
+      };
+    },
+
+    /**
+     * Runs the SQL a plugin command built to add derived columns to the
+     * current result. Keeps the chart, and moves the column bindings to the
+     * new SQL so the columns it passes through keep their IDs. Does not parse
+     * the SQL, so the structured query stays as it was, out of sync.
+     */
+    applyDerivedColumnsSql: (
+      state: DataExplorerAppState,
+      sql: string,
+    ): DataExplorerAppState => {
+      const { columnBindings } = state;
+      return {
+        ...state,
+        rawSql: sql,
+        queryTrigger: "plugin_command",
+        isStructuredQueryInSync: false,
+        lastResultColumns: undefined,
+        pendingUrlVizConfig: undefined,
+        nlPrompt: undefined,
+        columnBindings: columnBindings
+          ? { ...columnBindings, sqlKey: normalizeSqlForSubquery(sql) }
+          : undefined,
+      };
+    },
+
+    /**
+     * Puts back what `applyDerivedColumnsSql` replaced, from a snapshot taken
+     * before it ran, and runs that query again. Used by the Undo action of the
+     * derived columns notification.
+     */
+    restoreDerivedColumnsSnapshot: (
+      state: DataExplorerAppState,
+      snapshot: DerivedColumnsSnapshot,
+    ): DataExplorerAppState => {
+      return {
+        ...state,
+        ...snapshot,
+        queryTrigger: "plugin_command",
+        lastResultColumns: undefined,
+        pendingUrlVizConfig: undefined,
       };
     },
 

@@ -65,6 +65,20 @@ describe("toParquetCopyFailure", () => {
       { code: "source-unparseable", invalidReason: "unparseable_dataset" },
     ],
     [
+      "a JSON value that does not fit its declared type",
+      new Error(
+        'Invalid Input Error: JSON transform error in file "source.json.gz", in record/value 2: Failed to cast value to numerical: "seven"',
+      ),
+      { code: "source-unparseable", invalidReason: "unparseable_dataset" },
+    ],
+    [
+      "a source too large for the conversion's memory limit",
+      new Error(
+        "Out of Memory Error: failed to allocate data of size 16.0 MiB (15.9 MiB/19.0 MiB used)",
+      ),
+      { code: "copy-too-large" },
+    ],
+    [
       "a pipeline whose listings cannot be copied",
       _namedError(PIPELINE_DOWNLOAD_MISSING_ERROR_NAME),
       { code: "copy-unsupported" },

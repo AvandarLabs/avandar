@@ -5,7 +5,12 @@ import { gzipSync } from "node:zlib";
 import { NodeDuckDb } from "@avandar/etl";
 import { buildOpenDataParquetCache } from "@pipeline-server/openDataParquetCache/buildOpenDataParquetCache/buildOpenDataParquetCache";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { ListingDownload, PipelineDownloadConfig } from "@avandar/etl";
+import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types";
+import type {
+  FreshnessProbe,
+  ListingDownload,
+  PipelineDownloadConfig,
+} from "@avandar/etl";
 import type { OpenDataParquetCacheDependencies } from "@pipeline-server/openDataParquetCache/buildOpenDataParquetCache/buildOpenDataParquetCache";
 
 const LISTING = {
@@ -47,12 +52,33 @@ function _createPagedDownload(
   };
 }
 
+const PROBE: FreshnessProbe = {
+  url: `${LISTING.apiBaseUrl}/abcd-1234?$top=1`,
+  token: { kind: "json-paths", paths: [["count"]] },
+};
+
+/** A probe client whose answers count up through `counts`, one per read. */
+function _createProbeHttp(counts: readonly number[]): OpenDataHttp {
+  let readIndex = 0;
+  return {
+    get: vi.fn(),
+    getBytes: vi.fn(async () => {
+      const count = counts[Math.min(readIndex, counts.length - 1)];
+      readIndex += 1;
+      return new TextEncoder().encode(
+        JSON.stringify({ count }),
+      ) as Uint8Array<ArrayBuffer>;
+    }),
+  };
+}
+
 /** Uploads land in a local folder, so a test reads what was uploaded. */
 function _createDependencies(args: {
   config: PipelineDownloadConfig;
   download: ListingDownload;
   bucketDir: string;
   files?: Readonly<Record<string, string>>;
+  probeCounts?: readonly number[];
 }): OpenDataParquetCacheDependencies & {
   uploadedPaths: string[];
   script: ReturnType<typeof vi.fn>;
@@ -62,6 +88,7 @@ function _createDependencies(args: {
   return {
     uploadedPaths,
     script,
+    probeHttp: _createProbeHttp(args.probeCounts ?? [1]),
     loadPipelineDownload: vi.fn().mockResolvedValue({
       download: args.config,
       script,
@@ -276,6 +303,160 @@ describe("buildOpenDataParquetCache", () => {
         { name: "cases", dataType: "BIGINT" },
       ],
     });
+  });
+
+  describe("a JSON source", () => {
+    const JSON_DOWNLOAD: ListingDownload = {
+      paging: false,
+      url: "file:json",
+      contentKind: "json",
+      recordsField: "value",
+      columns: [
+        { name: "SpatialDim", dataType: "VARCHAR" },
+        { name: "NumericValue", dataType: "DOUBLE" },
+        { name: "Date", dataType: "TIMESTAMP" },
+      ],
+      sourceVersion: "from-script",
+    };
+    const JSON_FILES = {
+      "file:json": JSON.stringify({
+        value: [
+          {
+            SpatialDim: "SDN",
+            NumericValue: 3,
+            Date: "2016-09-21T13:42:00+02:00",
+          },
+          { SpatialDim: "TCD", NumericValue: 4, Date: "2017-01-01T00:00:00Z" },
+        ],
+      }),
+    };
+
+    it("downloads it gzipped and copies its rows with the declared types", async () => {
+      const dependencies = _createDependencies({
+        config: { paging: false, script: "./download.ts" },
+        download: JSON_DOWNLOAD,
+        bucketDir,
+        files: JSON_FILES,
+      });
+
+      const copy = await buildOpenDataParquetCache({
+        listing: LISTING,
+        buildId: BUILD_ID,
+        dependencies,
+      });
+
+      expect([
+        vi.mocked(dependencies.downloadToFile).mock.calls[0]?.[0],
+        copy.columns,
+        await _readBucket(
+          bucketDir,
+          'SELECT SpatialDim, "Date"::VARCHAR AS d FROM $copy',
+        ),
+      ]).toEqual([
+        expect.objectContaining({
+          filePath: expect.stringMatching(/source\.json\.gz$/),
+          isGzipped: true,
+        }),
+        [
+          { name: "SpatialDim", dataType: "VARCHAR" },
+          { name: "NumericValue", dataType: "DOUBLE" },
+          { name: "Date", dataType: "TIMESTAMP" },
+        ],
+        [
+          { SpatialDim: "SDN", d: "2016-09-21 11:42:00" },
+          { SpatialDim: "TCD", d: "2017-01-01 00:00:00" },
+        ],
+      ]);
+    });
+
+    it("records the listing's probe token as the copy's source version, not the script's", async () => {
+      const dependencies = _createDependencies({
+        config: { paging: false, script: "./download.ts" },
+        download: JSON_DOWNLOAD,
+        bucketDir,
+        files: JSON_FILES,
+        probeCounts: [2],
+      });
+
+      const copy = await buildOpenDataParquetCache({
+        listing: { ...LISTING, freshnessProbe: PROBE },
+        buildId: BUILD_ID,
+        dependencies,
+      });
+
+      expect(copy.sourceVersion).toBe("2");
+    });
+
+    it("fails, and deletes what it uploaded, when the probe token moved during the download", async () => {
+      const dependencies = _createDependencies({
+        config: { paging: false, script: "./download.ts" },
+        download: JSON_DOWNLOAD,
+        bucketDir,
+        files: JSON_FILES,
+        probeCounts: [2, 3],
+      });
+
+      await expect(
+        buildOpenDataParquetCache({
+          listing: { ...LISTING, freshnessProbe: PROBE },
+          buildId: BUILD_ID,
+          dependencies,
+        }),
+      ).rejects.toMatchObject({ code: "source-changed" });
+      expect(dependencies.removeFolder).toHaveBeenCalledWith(FOLDER);
+    });
+  });
+
+  it("copies a complete sample instead of downloading the source", async () => {
+    const download = _createPagedDownload();
+    const dependencies = _createDependencies({
+      config: { paging: true, pageRows: 2, script: "./download.ts" },
+      download,
+      bucketDir,
+    });
+
+    const copy = await buildOpenDataParquetCache({
+      listing: LISTING,
+      buildId: BUILD_ID,
+      dependencies,
+      completeSampleCsv: "county,cases\nKings,3\nQueens,4\nBronx,5\n",
+    });
+
+    expect(dependencies.downloadToFile).not.toHaveBeenCalled();
+    expect(
+      download.paging && download.readSourceVersion,
+    ).not.toHaveBeenCalled();
+    expect(copy).toMatchObject({
+      folderPath: FOLDER,
+      partCount: 1,
+      sourceVersion: "v1",
+      rowCount: 3,
+      columns: [
+        { name: "county", dataType: "VARCHAR" },
+        { name: "cases", dataType: "BIGINT" },
+      ],
+    });
+    expect(
+      await _readBucket(bucketDir, "SELECT county FROM $copy ORDER BY cases"),
+    ).toEqual([{ county: "Kings" }, { county: "Queens" }, { county: "Bronx" }]);
+  });
+
+  it("fails on a complete sample with no rows", async () => {
+    const dependencies = _createDependencies({
+      config: { paging: true, pageRows: 2, script: "./download.ts" },
+      download: _createPagedDownload(),
+      bucketDir,
+    });
+
+    await expect(
+      buildOpenDataParquetCache({
+        listing: LISTING,
+        buildId: BUILD_ID,
+        dependencies,
+        completeSampleCsv: "county,cases\n",
+      }),
+    ).rejects.toMatchObject({ code: "source-empty" });
+    expect(dependencies.uploadedPaths).toEqual([]);
   });
 
   it("refuses a script whose download does not match the config's paging", async () => {

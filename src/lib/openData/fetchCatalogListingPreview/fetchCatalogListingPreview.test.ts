@@ -51,8 +51,84 @@ describe("fetchCatalogListingPreview", () => {
     );
     expect(dependencies.previewParquetBlob).not.toHaveBeenCalled();
     expect(preview.columnNames).toEqual(["country", "report_date"]);
-    expect([...preview.dateColumnNames]).toEqual(["report_date"]);
+    expect(preview.dateColumnNames).toEqual(["report_date"]);
     expect(preview.rows).toEqual(SNIFFED.previewRows);
+    // The preview is a persisted query. A Set would come back as {}, and the
+    // grid would crash the next time the listing opened.
+    expect(JSON.parse(JSON.stringify(preview)).dateColumnNames).toEqual([
+      "report_date",
+    ]);
+  });
+
+  it("reads an API-backed CSV listing from its stored Parquet copy instead of the API", async () => {
+    const partBlob = new Blob(["part"]);
+    const dependencies = _createDependencies({
+      fetchCopyPart: vi.fn().mockResolvedValue(partBlob),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "csv",
+        canonicalUrls: undefined,
+        parquetCacheFolderPath: "catalog-cache/listing-1/build-1",
+      },
+      maxPreviewRows: 200,
+      dependencies,
+    });
+
+    expect(dependencies.fetchCopyPart).toHaveBeenCalledWith(
+      "catalog-cache/listing-1/build-1/part-00000.parquet",
+    );
+    expect(dependencies.previewParquetBlob).toHaveBeenCalledWith({
+      parquetBlob: partBlob,
+      maxPreviewRows: 200,
+    });
+    expect(dependencies.fetchCsvSample).not.toHaveBeenCalled();
+  });
+
+  it("reads the API sample of a stored CSV listing when a column recheck asks for it", async () => {
+    const dependencies = _createDependencies({
+      fetchCsvSample: vi.fn().mockResolvedValue("country,report_date\n"),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "csv",
+        canonicalUrls: undefined,
+        parquetCacheFolderPath: "catalog-cache/listing-1/build-1",
+      },
+      maxPreviewRows: 200,
+      source: "live-sample",
+      dependencies,
+    });
+
+    expect(dependencies.fetchCsvSample).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchCopyPart).not.toHaveBeenCalled();
+  });
+
+  it("reads an API-backed OData listing from its CSV sample", async () => {
+    const dependencies = _createDependencies({
+      fetchCsvSample: vi.fn().mockResolvedValue("country,report_date\n"),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "odata",
+        canonicalUrls: undefined,
+        parquetCacheFolderPath: undefined,
+      },
+      maxPreviewRows: 200,
+      dependencies,
+    });
+
+    expect(dependencies.fetchCsvSample).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchCopyPart).not.toHaveBeenCalled();
   });
 
   it("reads any other API-backed listing from the first part of its Parquet copy", async () => {

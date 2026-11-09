@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { usePluginCommandRunner } from "@/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner";
 import { act, renderHook, TestProviders } from "@/test-utils";
+import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
 import type { PluginMenuItem } from "@/lib/plugins/getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins";
 import type {
   DataExplorerToolbarContext,
@@ -42,6 +43,13 @@ const CONTEXT: DataExplorerToolbarContext = {
   rowCount: 1,
 };
 
+const BRIDGE: DataExplorerBridge = {
+  baseSql: "SELECT 1",
+  applyDerivedColumnsSql: () => {
+    return true;
+  },
+};
+
 const ITEM = {
   key: "avandar.epidemiology/run",
   plugin: { entry: { id: "avandar.epidemiology" } },
@@ -60,8 +68,10 @@ describe("usePluginCommandRunner", () => {
     mocks.runPluginCommand.mockRejectedValue(new Error("runner crashed"));
     const { result } = renderHook(
       () => {
-        return usePluginCommandRunner(() => {
-          return CONTEXT;
+        return usePluginCommandRunner({
+          getContext: () => {
+            return CONTEXT;
+          },
         });
       },
       { wrapper: TestProviders },
@@ -74,12 +84,41 @@ describe("usePluginCommandRunner", () => {
     expect(result.current.runningKey).toBeUndefined();
   });
 
+  it("runs the command with the bridge it builds when the command runs", async () => {
+    mocks.runPluginCommand.mockResolvedValue(undefined);
+    const getDataExplorerBridge = vi.fn(() => {
+      return BRIDGE;
+    });
+    const { result } = renderHook(
+      () => {
+        return usePluginCommandRunner({
+          getContext: () => {
+            return CONTEXT;
+          },
+          getDataExplorerBridge,
+        });
+      },
+      { wrapper: TestProviders },
+    );
+    expect(getDataExplorerBridge).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.run(ITEM);
+    });
+
+    expect(mocks.runPluginCommand).toHaveBeenCalledWith(
+      expect.objectContaining({ dataExplorerBridge: BRIDGE }),
+    );
+  });
+
   it("clears the running key once the command finishes", async () => {
     mocks.runPluginCommand.mockResolvedValue(undefined);
     const { result } = renderHook(
       () => {
-        return usePluginCommandRunner(() => {
-          return CONTEXT;
+        return usePluginCommandRunner({
+          getContext: () => {
+            return CONTEXT;
+          },
         });
       },
       { wrapper: TestProviders },

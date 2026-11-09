@@ -4,6 +4,7 @@ import {
   readOpenDataAccessToken,
 } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
+import type { OpenDataCompleteSample } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
 
 /**
  * What the open-data edge function says about an ODC listing's Parquet copy.
@@ -71,15 +72,22 @@ async function _readAnswer(
  * starts a build when the listing has no copy, or a rebuild when its copy is
  * stale, so this is also how a copy is first requested.
  *
+ * A complete column type sample, handed back with the token it was served
+ * with, is copied instead of the source, so the source is not read again.
+ *
  * @param catalogListingId The listing.
  * @param options.accessToken The caller's token, when it is already read.
+ * @param options.completeSample A sample that holds the whole source.
  * @returns The copy's state.
  * @throws When the route answers with anything but a copy answer, such as a
  *   listing the caller cannot see.
  */
 export async function requestOpenDataParquetCopy(
   catalogListingId: DataCatalogListing.Id,
-  options: { accessToken?: string } = {},
+  options: {
+    accessToken?: string;
+    completeSample?: OpenDataCompleteSample;
+  } = {},
 ): Promise<OpenDataParquetCopyAnswer> {
   const accessToken = options.accessToken ?? (await readOpenDataAccessToken());
   const response = await fetch(
@@ -90,8 +98,13 @@ export async function requestOpenDataParquetCopy(
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      // The route parses a JSON body on every POST, so it gets an empty one.
-      body: "{}",
+      // The route parses a JSON body on every POST, so it gets an empty one
+      // when there is no sample to hand back.
+      body: JSON.stringify(
+        options.completeSample === undefined
+          ? {}
+          : { completeSample: options.completeSample },
+      ),
     },
   );
   const answer = await _readAnswer(response);

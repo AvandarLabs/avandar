@@ -30,13 +30,17 @@ export function statusFromOpenDataFailure(
     case "resource-authorization-required":
     case "resource-unreachable":
     case "socrata-unreachable":
+    case "odata-unreachable":
+    case "odata-response-invalid":
       return 502;
     case "access-shape-invalid":
+    case "freshness-probe-invalid":
     case "resource-is-remote-api":
     case "resource-format-unsupported":
     case "resource-format-changed":
     case "resource-host-mismatch":
     case "resource-empty":
+    case "odata-empty":
       return 409;
   }
 }

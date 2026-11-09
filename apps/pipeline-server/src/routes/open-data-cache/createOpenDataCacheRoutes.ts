@@ -10,8 +10,14 @@ export type ParquetCopyBuildRequest = ParquetCopyJob &
 
 type BuildRequest = FastifyRequest<{
   Params: { catalogListingId: string };
-  Body: { buildId: string };
+  Body: { buildId: string; completeSampleCsv?: string };
 }>;
+
+/**
+ * The largest build request the route reads: a complete sample of up to
+ * 25 MB of text, with room for its JSON escaping.
+ */
+const BUILD_BODY_LIMIT_BYTES = 64 * 1024 * 1024;
 
 const UUID_SCHEMA = { type: "string", format: "uuid" } as const;
 
@@ -29,8 +35,11 @@ const BUILD_ROUTE_SCHEMA = {
   body: {
     type: "object",
     required: ["buildId"],
-    properties: { buildId: UUID_SCHEMA },
-    propertyNames: { enum: ["buildId"] },
+    properties: {
+      buildId: UUID_SCHEMA,
+      completeSampleCsv: { type: "string", minLength: 1 },
+    },
+    propertyNames: { enum: ["buildId", "completeSampleCsv"] },
   },
 } as const;
 
@@ -52,9 +61,11 @@ async function _requestBuild(
     const message = error instanceof Error ? error.message : "Invalid target.";
     return await reply.status(400).send({ ok: false, error: message });
   }
+  const { completeSampleCsv } = request.body;
   const isQueued = enqueueBuild({
     catalogListingId: request.params.catalogListingId,
     buildId: request.body.buildId,
+    ...(completeSampleCsv === undefined ? {} : { completeSampleCsv }),
     supabase,
   });
   return await reply.status(202).send({ ok: true, isQueued });
@@ -65,7 +76,10 @@ async function _requestBuild(
  * build of a catalog listing's Parquet copy and answers 202 straight away.
  * The body carries the build id the caller claimed for the listing
  * (`rpc_data_catalog_listings__request_parquet_cache`), and the headers name
- * the Supabase project the listing lives in, as for a pipeline run.
+ * the Supabase project the listing lives in, as for a pipeline run. The body
+ * may also carry `completeSampleCsv`, a column type sample the open-data
+ * edge function vouched for as the whole source, which the build copies
+ * instead of downloading the source.
  * `isQueued` is false when the same build is already queued or running.
  *
  * Auth is checked before anything else, so an unauthenticated caller gets
@@ -83,6 +97,7 @@ export function createOpenDataCacheRoutes(deps: {
       "/open-data-cache/:catalogListingId/build",
       {
         schema: BUILD_ROUTE_SCHEMA,
+        bodyLimit: BUILD_BODY_LIMIT_BYTES,
         attachValidation: true,
         preValidation: async (request, reply) => {
           return await requireServerAuth({ request, reply });

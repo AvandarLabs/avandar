@@ -18,6 +18,7 @@ function _dbRow(
     file_format: "CSV",
     last_updated_at: null,
     total_count: 120,
+    is_total_capped: false,
     ...overrides,
   };
 }
@@ -103,6 +104,37 @@ describe("createDataCatalogSearchPage", () => {
       dbRows: [_dbRow({ total_count: 100 })],
       pageNum: 1,
       pageSize: 50,
+    });
+
+    expect(page.nextPage).toBeUndefined();
+  });
+
+  it("says when the total stopped at the count cap", () => {
+    const page = createDataCatalogSearchPage({
+      dbRows: [_dbRow({ total_count: 10000, is_total_capped: true })],
+      pageNum: 0,
+      pageSize: 1,
+    });
+
+    expect(page.totalCount).toBe(10000);
+    expect(page.isTotalCapped).toBe(true);
+  });
+
+  it("keeps paging past a capped total while pages come back full", () => {
+    const page = createDataCatalogSearchPage({
+      dbRows: [_dbRow({ total_count: 2, is_total_capped: true }), _dbRow()],
+      pageNum: 4,
+      pageSize: 2,
+    });
+
+    expect(page.nextPage).toBe(5);
+  });
+
+  it("stops paging past a capped total at the first short page", () => {
+    const page = createDataCatalogSearchPage({
+      dbRows: [_dbRow({ total_count: 2, is_total_capped: true })],
+      pageNum: 4,
+      pageSize: 2,
     });
 
     expect(page.nextPage).toBeUndefined();

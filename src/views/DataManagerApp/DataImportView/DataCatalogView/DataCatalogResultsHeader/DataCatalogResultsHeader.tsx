@@ -14,13 +14,12 @@ export type ActiveCatalogFilter = {
 
 type Props = {
   numResults: number;
-  numCatalogListings: number;
 
   /**
-   * Whether a search or a non-default filter is narrowing the results. Only
-   * then is the catalog's total worth stating beside the count.
+   * Whether more datasets match than were counted, so `numResults` is a
+   * floor rather than the count.
    */
-  isNarrowed: boolean;
+  isNumResultsCapped: boolean;
   activeFilters: readonly ActiveCatalogFilter[];
   onClearAll: () => void;
   sortBy: CatalogSortBy;
@@ -35,14 +34,12 @@ type Props = {
 };
 
 /**
- * The line that says how much of the catalog is in view. The count is the
- * focal point: it shows how big the catalog is and what every filter just
- * did to it, so it is announced to screen readers as it changes.
+ * The line that says how many datasets are in view. The count is announced
+ * to screen readers as it changes.
  */
 export function DataCatalogResultsHeader({
   numResults,
-  numCatalogListings,
-  isNarrowed,
+  isNumResultsCapped,
   activeFilters,
   onClearAll,
   sortBy,
@@ -53,7 +50,6 @@ export function DataCatalogResultsHeader({
   const { t, i18n } = useLingui();
   const numberFormat = new Intl.NumberFormat(i18n.locale);
   const formattedNumResults = numberFormat.format(numResults);
-  const formattedNumCatalogListings = numberFormat.format(numCatalogListings);
   const sortOptions = [
     ...(isSearching ? [{ value: "relevance", label: t`Best match` }] : []),
     { value: "updated", label: t`Recently updated` },
@@ -68,10 +64,8 @@ export function DataCatalogResultsHeader({
           className={css.dataCatalogResultsHeaderCount}
           aria-live="polite"
         >
-          {isNarrowed ? (
-            <Trans>
-              {formattedNumResults} of {formattedNumCatalogListings} datasets
-            </Trans>
+          {isNumResultsCapped ? (
+            <Trans>{formattedNumResults}+ datasets</Trans>
           ) : (
             <Plural value={numResults} one="# dataset" other="# datasets" />
           )}

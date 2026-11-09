@@ -3,15 +3,22 @@
  *
  * - `PermissionDenied`: the plugin did not request, or was not granted, the
  *   permission the call needs.
- * - `InvalidHandle`: the call named a `QueryHandle` the host does not know.
+ * - `InvalidHandle`: the call named a `QueryHandle` the host does not know,
+ *   or the Data Explorer no longer shows the result the command was invoked
+ *   on.
  * - `LoadFailed`: the plugin's code or data could not be loaded.
  * - `CommandFailed`: a command handler, or SDK code it called, threw.
+ * - `InvalidExpression`: `avandar.dataExplorer.addColumns` got a column it
+ *   cannot add: a bad name, a placeholder with no input, an input naming a
+ *   column the result does not have, an expression that is not exactly one
+ *   SQL scalar or window expression, or an empty list.
  */
 export type PluginErrorCode =
   | "PermissionDenied"
   | "InvalidHandle"
   | "LoadFailed"
-  | "CommandFailed";
+  | "CommandFailed"
+  | "InvalidExpression";
 
 /**
  * A typed error from the plugin API. A plugin command can branch on `code`

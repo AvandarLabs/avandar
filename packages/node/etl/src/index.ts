@@ -87,6 +87,8 @@ export type {
   EtlRunWindow,
   EtlScope,
   EtlStores,
+  FreshnessProbe,
+  ListingCompanion,
   PipelineParquetRelation,
   Relation,
   RelationColumn,

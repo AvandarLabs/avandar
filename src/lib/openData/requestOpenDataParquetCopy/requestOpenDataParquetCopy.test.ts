@@ -56,6 +56,22 @@ describe("requestOpenDataParquetCopy", () => {
     );
   });
 
+  it("hands back a complete sample to build the copy from", async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      _jsonResponse(202, { status: "building" }),
+    );
+
+    await requestOpenDataParquetCopy(CATALOG_LISTING_ID, {
+      accessToken: ACCESS_TOKEN,
+      completeSample: { csvText: "borocode\n1\n", token: "sample-token" },
+    });
+
+    const [, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(JSON.parse(String(init.body))).toEqual({
+      completeSample: { csvText: "borocode\n1\n", token: "sample-token" },
+    });
+  });
+
   it("returns a ready copy's parts and whether it is stale", async () => {
     vi.mocked(fetch).mockResolvedValue(
       _jsonResponse(200, {

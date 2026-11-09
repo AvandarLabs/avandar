@@ -7,7 +7,9 @@ import {
   IconPlus,
 } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useMemo, type ReactNode } from "react";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
+import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import { DatasetPreviewSection } from "@/components/DatasetPreviewSection/DatasetPreviewSection";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
@@ -21,6 +23,7 @@ import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatal
 import { DataCatalogPublishedByGroup } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup";
 import { DataCatalogSourceGroup } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup";
 import { DataCatalogTechnicalDetails } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails";
+import { DataCatalogRecommendedListings } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings";
 import { DataCatalogUnsupportedNotice } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice";
 import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
 import type { DataCatalogDrive } from "$/models/data-catalog-listings/DataCatalogDrive/DataCatalogDrive";
@@ -28,7 +31,6 @@ import type { DataCatalogListingRead } from "$/models/data-catalog-listings/Data
 import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { ColumnTypeState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns";
 import type { CatalogListingPreviewState } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
-import type { ReactNode } from "react";
 
 /**
  * How tall the description runs before "Show more": about six lines of
@@ -94,6 +96,14 @@ type Props = {
    * this is set and the detail is not already expanded.
    */
   onExpand?: () => void;
+  /** The listings recommended alongside this one, in display order. */
+  companions: readonly DataCatalogListing.ResolvedCompanion[];
+  /** The listings being added to the workspace right now. */
+  addingListingIds: ReadonlySet<DataCatalogListing.Id>;
+  /** Opens another listing in the catalog, as picking a result does. */
+  onSelectListing: (catalogListingId: DataCatalogListing.Id) => void;
+  /** Adds a recommended listing to the workspace. */
+  onAddCompanion: (companion: DataCatalogListing.ResolvedCompanion) => void;
 };
 
 /**
@@ -142,8 +152,10 @@ function ListingDescription({
  * into a page of headings. How the catalog indexed the listing is reference
  * only an expert reads, so it waits behind a disclosure at the end.
  *
- * Under the columns sits a preview of the listing's first rows, read without
- * adding it to the workspace. The pane is narrow, so the expand button opens
+ * Under the columns sit the listings usually added with this one, since
+ * their reasons name columns the user has just read. Then comes a preview of
+ * the listing's first rows, read without adding it to the workspace. The
+ * pane is narrow, so the expand button opens
  * the same detail in a full-screen modal, where the facts move into a rail
  * beside the description, columns, and preview.
  *
@@ -168,9 +180,16 @@ export function DataCatalogListingDetail({
   preview,
   isExpanded = false,
   onExpand,
+  companions,
+  addingListingIds,
+  onSelectListing,
+  onAddCompanion,
 }: Props): ReactNode {
   const { t } = useLingui();
   const offline = useOfflineGate();
+  const dateColumnNames = useMemo(() => {
+    return _dateColumnNamesForGrid(preview.preview?.dateColumnNames);
+  }, [preview.preview?.dateColumnNames]);
 
   if (!listing) {
     return (
@@ -269,6 +288,7 @@ export function DataCatalogListingDetail({
           <DataCatalogUnsupportedNotice
             serviceName={listing.organization1Name}
             sourceUrl={listing.sourceUrl}
+            hasNoRows={DataCatalogListing.getMetadataRowCount(listing) === 0}
           />
         ) : null}
 
@@ -307,12 +327,20 @@ export function DataCatalogListingDetail({
               columnTypeState={columnTypeState}
             />
 
+            <DataCatalogRecommendedListings
+              companions={companions}
+              isAddAllowed={isAddAllowed}
+              addingListingIds={addingListingIds}
+              onSelectListing={onSelectListing}
+              onAddCompanion={onAddCompanion}
+            />
+
             {preview.isAvailable ? (
               <DatasetPreviewSection
                 columnNames={preview.preview?.columnNames ?? []}
                 rows={preview.preview?.rows}
                 maxPreviewRows={GlobalAppConfig.dataManagerApp.maxPreviewRows}
-                dateColumnNames={preview.preview?.dateColumnNames}
+                dateColumnNames={dateColumnNames}
                 isLoading={preview.isLoading}
                 isError={preview.isError}
                 gridHeight={isExpanded ? undefined : PANE_PREVIEW_GRID_HEIGHT}
@@ -362,4 +390,19 @@ export function DataCatalogListingDetail({
       </div>
     </div>
   );
+}
+
+/**
+ * The date columns the preview grid should format. A list becomes the set
+ * the grid queries. Anything else, including a preview restored from a cache
+ * that stored a Set as JSON, counts as no date columns, so the grid still
+ * renders.
+ */
+function _dateColumnNamesForGrid(
+  dateColumnNames: readonly string[] | undefined,
+): ReadonlySet<string> | undefined {
+  if (!Array.isArray(dateColumnNames)) {
+    return undefined;
+  }
+  return new Set(dateColumnNames);
 }

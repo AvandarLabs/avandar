@@ -1,3 +1,4 @@
+import type { FreshnessProbe } from "@etl/EtlEngine/EtlEngine.types";
 import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDataType";
 
 /** The listing fields a download script reads to find the listing's source. */
@@ -8,23 +9,50 @@ export type DownloadableListing = Readonly<{
   externalDatasetId: string;
   /** The format the resource is read as, such as `CSV`, when known. */
   apiResourceFormat: string | undefined;
+  /**
+   * How to read the source's freshness token, when the listing has one.
+   * The copy builder then reads it before and after the download and records
+   * it as the copy's source version.
+   */
+  freshnessProbe?: FreshnessProbe;
 }>;
 
-/** One column of a paged listing, as its source declares it. */
+/**
+ * One column of a paged or JSON listing, as its source declares it.
+ */
 export type ListingDownloadColumn = Readonly<{
-  /** The column's name in each page's CSV header. */
+  /** The column's name in each page's CSV header, or each JSON record. */
   name: string;
   dataType: DuckDbSniffableDataType;
 }>;
 
-/** A listing downloaded as one file, for an API that does not page. */
-export type WholeFileListingDownload = Readonly<{
-  paging: false;
-  url: string;
-  contentKind: "csv" | "parquet";
-  /** The source's freshness token, when it reports one. */
-  sourceVersion: string | undefined;
-}>;
+/**
+ * A listing downloaded as one file, for an API that does not page.
+ *
+ * A `csv` or `parquet` file's column types are read from the file. A `json`
+ * file is one object whose `recordsField` holds an array of row objects,
+ * read with the declared `columns`, so a value that does not fit its type
+ * fails the copy. A JSON API such as GHO's OData answers this way.
+ */
+export type WholeFileListingDownload =
+  | Readonly<{
+      paging: false;
+      url: string;
+      contentKind: "csv" | "parquet";
+      /** The source's freshness token, when it reports one. */
+      sourceVersion: string | undefined;
+    }>
+  | Readonly<{
+      paging: false;
+      url: string;
+      contentKind: "json";
+      /** The top-level field holding the array of row objects, e.g. `value`. */
+      recordsField: string;
+      /** Every column, typed by the source's schema. */
+      columns: readonly ListingDownloadColumn[];
+      /** The source's freshness token, when it reports one. */
+      sourceVersion: string | undefined;
+    }>;
 
 /**
  * A listing downloaded one CSV page at a time, for an API that pages.

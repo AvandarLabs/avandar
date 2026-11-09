@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
 import type { DataCatalogListingModel } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
+import type { Json } from "$/types/database.types.ts";
 
 const TIMESTAMP = "2026-08-19T00:00:00+00:00";
 
@@ -34,6 +35,10 @@ const SHARED_DB_COLUMNS = {
   parquet_cache_built_at: null,
   parquet_cache_row_count: null,
   parquet_cache_byte_size: null,
+  parquet_cache_checked_at: null,
+  parquet_cache_checked_source_version: null,
+  companion_listings: [] as Json[],
+  api_freshness_probe: null,
   pipeline_scope_keys: [] as string[],
   date_column_type_last_verified: null,
   is_invalid: false,
@@ -173,6 +178,168 @@ describe("DataCatalogListingParsers", () => {
     expect(() => {
       return DataCatalogListingParsers.DBReadSchema.parse(row);
     }).toThrow();
+  });
+
+  it("reads an OData entry", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        api_service: "odata",
+      }),
+    );
+
+    expect(entry.apiService).toBe("odata");
+  });
+
+  it("reads the recommended listings with their keys as the pipeline wrote them", () => {
+    const companion = {
+      kind: "lookup",
+      externalDatasetId: "DIMENSION/COUNTRY",
+      apiResourceId: "DIMENSION/COUNTRY/DimensionValues",
+      joinOn: [
+        { column: "SpatialDimType", companionColumn: "Dimension" },
+        { column: "SpatialDim", companionColumn: "Code" },
+      ],
+    };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        companion_listings: [companion],
+      }),
+    );
+
+    expect(entry.companionListings).toEqual([companion]);
+  });
+
+  it("reads a listing with no recommended listings as an empty list", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
+    );
+
+    expect(entry.companionListings).toEqual([]);
+  });
+
+  it("rejects a recommended listing of an unknown kind", () => {
+    const row = DataCatalogListingParsers.DBReadSchema.parse({
+      ..._apiDBRow(),
+      companion_listings: [
+        {
+          kind: "sibling",
+          externalDatasetId: "DIMENSION/COUNTRY",
+          apiResourceId: "DIMENSION/COUNTRY/DimensionValues",
+          joinOn: [],
+        },
+      ],
+    });
+
+    expect(() => {
+      return DataCatalogListingParsers.fromDBReadToModelRead(row);
+    }).toThrow();
+  });
+
+  it("rejects a recommended listing with no API identity", () => {
+    const row = DataCatalogListingParsers.DBReadSchema.parse({
+      ..._apiDBRow(),
+      companion_listings: [{ kind: "lookup", joinOn: [] }],
+    });
+
+    expect(() => {
+      return DataCatalogListingParsers.fromDBReadToModelRead(row);
+    }).toThrow();
+  });
+
+  it("reads a freshness probe whose paths mix keys and indexes", () => {
+    const probe = {
+      url: "https://ghoapi.azureedge.net/api/WHS3_62?$top=1",
+      token: {
+        kind: "json-paths",
+        paths: [["value", 0, "Date"], ["@odata.count"]],
+      },
+    };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        api_freshness_probe: probe,
+      }),
+    );
+
+    expect(entry.apiFreshnessProbe).toEqual(probe);
+  });
+
+  it("reads a body hash freshness probe", () => {
+    const probe = {
+      url: "https://ghoapi.azureedge.net/api/DIMENSION/SEX/DimensionValues",
+      token: { kind: "body-sha256" },
+    };
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        api_freshness_probe: probe,
+      }),
+    );
+
+    expect(entry.apiFreshnessProbe).toEqual(probe);
+  });
+
+  it("reads a listing with no freshness probe as undefined", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse(_apiDBRow()),
+    );
+
+    expect(entry.apiFreshnessProbe).toBeUndefined();
+  });
+
+  it("rejects a freshness probe with an unknown token kind", () => {
+    const row = DataCatalogListingParsers.DBReadSchema.parse({
+      ..._apiDBRow(),
+      api_freshness_probe: {
+        url: "https://ghoapi.azureedge.net/api/WHS3_62",
+        token: { kind: "etag" },
+      },
+    });
+
+    expect(() => {
+      return DataCatalogListingParsers.fromDBReadToModelRead(row);
+    }).toThrow();
+  });
+
+  it("reads when the copy was last checked and the token it saw", () => {
+    const entry = DataCatalogListingParsers.fromDBReadToModelRead(
+      DataCatalogListingParsers.DBReadSchema.parse({
+        ..._apiDBRow(),
+        parquet_cache_checked_at: TIMESTAMP,
+        parquet_cache_checked_source_version: "2026-11-01|412",
+      }),
+    );
+
+    expect([
+      entry.parquetCacheCheckedAt,
+      entry.parquetCacheCheckedSourceVersion,
+    ]).toEqual([TIMESTAMP, "2026-11-01|412"]);
+  });
+
+  it("writes the recommended listings and the probe back with their keys unchanged", () => {
+    const companion = {
+      kind: "lookup" as const,
+      externalDatasetId: "DIMENSION/COUNTRY",
+      apiResourceId: "DIMENSION/COUNTRY/DimensionValues",
+      joinOn: [{ column: "SpatialDim", companionColumn: "Code" }],
+    };
+    const probe = {
+      url: "https://ghoapi.azureedge.net/api/WHS3_62?$top=1",
+      token: { kind: "json-paths" as const, paths: [["@odata.count"]] },
+    };
+    const dbUpdate = DataCatalogListingParsers.fromModelUpdateToDBUpdate({
+      companionListings: [companion],
+      apiFreshnessProbe: probe,
+      parquetCacheCheckedAt: TIMESTAMP,
+    });
+
+    expect(dbUpdate).toEqual({
+      companion_listings: [companion],
+      api_freshness_probe: probe,
+      parquet_cache_checked_at: TIMESTAMP,
+    });
   });
 
   it("writes an API entry back to snake case", () => {

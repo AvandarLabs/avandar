@@ -7,7 +7,7 @@ begin;
 
 set search_path to extensions, public;
 
-select plan(41);
+select plan(42);
 
 -- ---------------------------------------------------------------------------
 -- pipeline_executions
@@ -393,6 +393,14 @@ select results_eq(
   $$values ('partially_failed', 'source answered 500', 4000::bigint,
       28::bigint, 3, 2, 1, 2, 1, 2)$$,
   'finish closes the execution, adds the run''s own setup, and counts the catalog after'
+);
+
+select results_eq(
+  $$select listing_count
+    from public.data_catalog_facet_counts
+    where facet = 'catalog'$$,
+  $$select count(*) from public.data_catalog_listings$$,
+  'finish refreshes the catalog''s facet counts'
 );
 
 select public.rpc_pipeline_executions__start(jsonb_build_object(

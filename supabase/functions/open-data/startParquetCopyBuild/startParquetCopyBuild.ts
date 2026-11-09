@@ -13,6 +13,12 @@ export type PipelineServerTarget = Readonly<{
 /** How long the pipeline server has to accept a build. It answers at once. */
 const START_TIMEOUT_MS = 10_000;
 
+/**
+ * How long a build that carries a complete sample has to be accepted: the
+ * sample, up to tens of megabytes, is uploaded with the request.
+ */
+const SAMPLE_START_TIMEOUT_MS = 60_000;
+
 function _read(
   getEnv: (name: string) => string | undefined,
   name: string,
@@ -59,6 +65,8 @@ export function readPipelineServerTarget(
  * @param args.target Where the build goes, and the project it builds in.
  * @param args.catalogListingId The listing.
  * @param args.buildId The build id the claim returned.
+ * @param args.completeSampleCsv A column type sample that holds the whole
+ *   source, which the server copies instead of reading the source again.
  * @param args.fetchImpl Replaces `fetch`, for tests.
  * @throws When the server cannot be reached or does not accept the build.
  */
@@ -67,6 +75,7 @@ export async function startParquetCopyBuild(
     target: PipelineServerTarget;
     catalogListingId: string;
     buildId: string;
+    completeSampleCsv?: string;
     fetchImpl?: typeof fetch;
   }>,
 ): Promise<void> {
@@ -84,8 +93,17 @@ export async function startParquetCopyBuild(
         "x-ava-supabase-url": target.supabaseUrl,
         "x-ava-supabase-service-role-key": target.serviceRoleKey,
       },
-      body: JSON.stringify({ buildId: args.buildId }),
-      signal: AbortSignal.timeout(START_TIMEOUT_MS),
+      body: JSON.stringify({
+        buildId: args.buildId,
+        ...(args.completeSampleCsv === undefined
+          ? {}
+          : { completeSampleCsv: args.completeSampleCsv }),
+      }),
+      signal: AbortSignal.timeout(
+        args.completeSampleCsv === undefined
+          ? START_TIMEOUT_MS
+          : SAMPLE_START_TIMEOUT_MS,
+      ),
     },
   );
   if (!response.ok) {

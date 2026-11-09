@@ -485,6 +485,10 @@ msgstr "Impossible de charger la requête SQL de l'ensemble de données."
 msgid "Avandar"
 msgstr "Avandar"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't download from a private or local address."
+msgstr "Avandar ne peut pas télécharger depuis une adresse privée ou locale."
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
 msgstr "À examiner"
@@ -576,7 +580,7 @@ msgstr "Choisissez la valeur qui vient en premier par ordre alphabétique"
 msgid "Latitude and longitude look swapped"
 msgstr "La latitude et la longitude semblent inversées"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
 msgstr "Impossible d'ajouter l'ensemble de données"
 
@@ -689,6 +693,10 @@ msgstr "La couche {0} est réservée aux agrégats et ne peut pas être affiché
 msgid "When"
 msgstr "Quand"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive doesn't contain a CSV, Excel, or PDF file."
+msgstr "Cette archive ne contient aucun fichier CSV, Excel ou PDF."
+
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 msgid "Save and re-run query"
 msgstr "Enregistrer et relancer la requête"
@@ -697,6 +705,11 @@ msgstr "Enregistrer et relancer la requête"
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Saved as \"{0}\"."
 msgstr "Enregistré sous \"{0}\"."
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "These values are fractions, so type a percent such as 95."
+msgstr "Ces valeurs sont des fractions ; saisissez donc un pourcentage, par "
+"exemple 95."
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
@@ -847,6 +860,12 @@ msgstr "Gratuit"
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigContent.tsx
 msgid "The table visualization has no extra settings."
 msgstr "La visualisation du tableau n'a pas de paramètres supplémentaires."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't public. Avandar can only download a file anyone can "
+"open."
+msgstr "Ce lien n’est pas public. Avandar peut uniquement télécharger un "
+"fichier que tout le monde peut ouvrir."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "About you"
@@ -1333,12 +1352,6 @@ msgstr "Échec du chargement de cet enregistrement"
 msgid "Saved datasets"
 msgstr "Ensembles de données sauvegardés"
 
-#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
-msgid "Avandar reads the file in your browser. Nothing leaves this device until "
-"you save the dataset."
-msgstr "Avandar lit le fichier dans votre navigateur. Rien ne quitte cet "
-"appareil tant que vous n’avez pas enregistré le jeu de données."
-
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Could not load"
@@ -1392,6 +1405,12 @@ msgstr "À partir du jeu de données dérivé"
 msgid "Sheet"
 msgstr "Feuille"
 
+#. placeholder {0}: status.fileName
+#. placeholder {1}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Getting {0} from {1}"
+msgstr "Récupération de {0} depuis {1}"
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Publié dans l’espace de travail"
@@ -1416,6 +1435,10 @@ msgstr "Ouvert et en cours de traitement."
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Derived dataset"
 msgstr "Jeu de données dérivé"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "This link has more than one data file."
+msgstr "Ce lien contient plusieurs fichiers de données."
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1711,6 +1734,12 @@ msgstr "Répondre hors ligne"
 msgid "Expand the layers panel"
 msgstr "Développer le panneau des calques"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That archive only contains another archive. Paste a link to the file "
+"itself."
+msgstr "Cette archive contient uniquement une autre archive. Collez un lien "
+"vers le fichier lui-même."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount} points"
 msgstr "{featureCount} points"
@@ -1825,6 +1854,10 @@ msgstr "Nouveau groupe de rôles"
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add {displayName} to workspace"
+msgstr "Ajouter {displayName} à l’espace de travail"
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
 "below to apply your change."
@@ -1866,6 +1899,11 @@ msgstr "Confirmer"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "is equal to..."
 msgstr "est égal à..."
+
+#. placeholder {0}: status.sourceLabel
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Downloading from {0}"
+msgstr "Téléchargement depuis {0}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numGroups} groups"
@@ -2176,6 +2214,10 @@ msgstr "Détecté :"
 msgid "The record keeps its previous status. Try again in a moment."
 msgstr "Le dossier conserve son statut précédent. Réessayez dans un instant."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "%"
+msgstr "%"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "Colonne 3"
@@ -2231,6 +2273,7 @@ msgid "Boundary disclaimer (Always included)"
 msgstr "Clause de non-responsabilité concernant les limites (Toujours incluse)"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
 msgid "Undo"
 msgstr "Annuler"
 
@@ -2334,7 +2377,7 @@ msgstr "Préréglages intégrés"
 msgid "Select a data layer to buffer."
 msgstr "Sélectionnez une couche de données à mettre en zone tampon."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset yet"
 msgstr "Impossible d’ajouter le jeu de données pour le moment"
 
@@ -2347,7 +2390,7 @@ msgid "Select a {conceptName}"
 msgstr "Sélectionnez un(e) {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" est maintenant dans votre espace de travail."
 
@@ -2383,6 +2426,12 @@ msgstr "Lignes de ces blocs"
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Chat"
 msgstr "Chat"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can't import a Google Doc or a Slides deck. Paste a link to a "
+"CSV, Excel, or PDF file."
+msgstr "Avandar ne peut pas importer un document Google ni une présentation "
+"Google Slides. Collez un lien vers un fichier CSV, Excel ou PDF."
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Host"
@@ -2443,6 +2492,10 @@ msgstr "Opacité"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Open Data"
 msgstr "Données ouvertes"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "This dataset has no data yet"
+msgstr "Ce jeu de données ne contient encore aucune donnée"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -2509,6 +2562,10 @@ msgstr "Supprimer le type de dossier"
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "Offline mode"
 msgstr "Mode hors ligne"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar couldn't download that link. Check it and try again."
+msgstr "Avandar n’a pas pu télécharger ce lien. Vérifiez-le, puis réessayez."
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
@@ -2923,6 +2980,10 @@ msgstr "Tapez ou collez un e-mail ci-dessous. Votre espace de travail sera "
 msgid "{0} was deleted."
 msgstr "{0} a été supprimé."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Avandar can only download a public http or https link."
+msgstr "Avandar peut uniquement télécharger un lien public en http ou https."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Used suggestion"
 msgstr "Suggestion utilisée"
@@ -2962,6 +3023,11 @@ msgstr "L’identifiant de l’espace de travail ne peut pas être vide"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "Par défaut, nous utilisons un lien direct basé sur un UUID."
+
+#. placeholder {0}: member.path
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Import {0}"
+msgstr "Importer {0}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Readings with source columns"
@@ -3227,6 +3293,11 @@ msgstr "Votre espace de travail utilise le forfait Free, qui vous permet de "
 msgid "Disable"
 msgstr "Désactiver"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is no longer in the download. Choose another one."
+msgstr "Ce fichier ne se trouve plus dans le téléchargement. Choisissez-en un "
+"autre."
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
 "column reference."
@@ -3317,6 +3388,10 @@ msgstr "Synchronisé avec le cloud"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NoDataControls.tsx
 msgid "No data color"
 msgstr "Aucune couleur de données"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Highlight values below"
+msgstr "Mettre en évidence les valeurs inférieures à"
 
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
@@ -3634,6 +3709,11 @@ msgstr "Veuillez vous reconnecter pour continuer. Si la connexion ne fonctionne 
 msgid "to"
 msgstr "à"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+msgstr "Nous n’avons pas trouvé « {displayName} » dans le catalogue. Essayez de "
+"l’ajouter à nouveau."
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Examiner les correspondances"
@@ -3681,7 +3761,7 @@ msgstr "Une URL courte et facile à retenir pour les prospectus, les rapports et
 "les codes QR."
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
 msgstr "« {0} » est en cours de préparation. L’ouverture de jeux de données "
@@ -3881,6 +3961,10 @@ msgstr "Ce jeu de données est indexé dans {serviceName}, mais il ne peut pas "
 msgid "You'll be asked to confirm your current password."
 msgstr "Vous serez invité à confirmer votre mot de passe actuel."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Which file should Avandar import?"
+msgstr "Quel fichier Avandar doit-il importer ?"
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerRowInstructions/LayerRowInstructions.tsx
 msgid "Press Space or Enter to start dragging. Use the arrow keys to move the "
 "layer, then press Space or Enter to drop, or Escape to cancel."
@@ -4017,6 +4101,10 @@ msgstr "Afficher les points"
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Try asking"
 msgstr "Essayez de demander"
+
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
+msgid "Columns added"
+msgstr "Colonnes ajoutées"
 
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
@@ -4215,6 +4303,10 @@ msgstr "{plainTextLength} sur {RICH_TEXT_MAX_TEXT_LENGTH} caractères"
 msgid "Theme"
 msgstr "Thème"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Reverse colors"
+msgstr "Inverser les couleurs"
+
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "S'inscrire"
@@ -4337,6 +4429,10 @@ msgstr "Vous n'avez pas la permission d'ouvrir cette partie de l'espace de "
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Veuillez vérifier votre e-mail"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Add them too"
+msgstr "Ajoutez-les également"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
@@ -4467,6 +4563,10 @@ msgid "Add a Filter block to the dashboard to enable global filtering for this "
 msgstr "Ajoutez un bloc de filtre au tableau de bord pour activer le filtrage "
 "global pour cette visualisation."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Recommended with this dataset"
+msgstr "Recommandé avec ce jeu de données"
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
 msgstr "Complet"
@@ -4506,6 +4606,15 @@ msgstr "Google limite le débit de cette requête"
 msgid "Plan Features:"
 msgstr "Fonctionnalités du plan :"
 
+#: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
+msgid "Choose Aggregate only when the layer holds protection or health data "
+"that must not be mapped to a household. Displace is unavailable because "
+"it only works for layers that show points."
+msgstr "Choisissez « Agréger » uniquement lorsque la couche contient des "
+"données de protection ou de santé qui ne doivent pas être associées à "
+"un foyer. « Déplacer » n’est pas disponible, car cette option ne "
+"fonctionne qu’avec les couches qui affichent des points."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
 msgstr "Masquer la couche {layerName}"
@@ -4537,6 +4646,10 @@ msgstr "Code QR"
 msgid "SQL contains multiple statements; the form maps only the first."
 msgstr "Le SQL contient plusieurs instructions ; le formulaire ne prend en "
 "charge que la première."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Or provide a link to a file"
+msgstr "Ou fournissez un lien vers un fichier"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
@@ -4582,6 +4695,14 @@ msgstr "Type de dossier brouillon"
 msgid "Import one tab of a spreadsheet in your Google Drive"
 msgstr "Importez un onglet d’une feuille de calcul stockée dans votre Google "
 "Drive"
+
+#. placeholder {0}: error.layerName ?? ""
+#: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
+msgid "Layer {0} is set to Displace, which only works for points. Choose "
+"another handling option in its Sensitivity settings."
+msgstr "La couche {0} est configurée sur « Déplacer », une option qui ne "
+"fonctionne qu’avec des points. Choisissez une autre option de "
+"traitement dans ses paramètres de sensibilité."
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
@@ -4837,6 +4958,7 @@ msgstr "Vous seul pouvez accéder à ce {resource}. Toutes les autres personnes 
 "perdent l’accès, y compris les administrateurs de l’espace de travail."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Can't be loaded"
 msgstr "Impossible de charger"
 
@@ -5195,6 +5317,13 @@ msgid "{filterCount} filters are active on this layer. They may be excluding "
 msgstr "{filterCount} filtres sont actifs sur cette couche. Ils excluent "
 "peut-être tous les éléments."
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView.tsx
+msgid "A file you drop stays on this device until you save. A link is "
+"downloaded by Avandar first, then read here the same way."
+msgstr "Un fichier que vous déposez reste sur cet appareil jusqu’à ce que vous "
+"l’enregistriez. Un lien est d’abord téléchargé par Avandar, puis lu ici "
+"de la même manière."
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar (par défaut)"
@@ -5374,6 +5503,10 @@ msgstr "Types de graphiques : {chartTypes}"
 msgid "Generated SQL"
 msgstr "SQL généré"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class colors"
+msgstr "Couleurs des classes"
+
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
 msgstr "<0>Maj</0> <1>Entrée</1> intégrer"
@@ -5385,6 +5518,12 @@ msgstr " m"
 #: src/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView.tsx
 msgid "You need access"
 msgstr "Vous devez disposer d’un accès"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That file is larger than {limitLabel}, which is the most Avandar can "
+"download from a link."
+msgstr "Ce fichier dépasse la taille de {limitLabel}, qui correspond à la "
+"taille maximale qu’Avandar peut télécharger depuis un lien."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields.tsx
 msgid "Maximum rows to return"
@@ -5505,7 +5644,9 @@ msgstr "Revoyez la création et le partage d’un tableau de bord, depuis le "
 "début."
 
 #. placeholder {0}: columns.length
+#. placeholder {0}: companions.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "{0}"
 msgstr "{0}"
 
@@ -5575,7 +5716,7 @@ msgstr "Générer la requête"
 msgid "No frequency data available."
 msgstr "Aucune donnée de fréquence disponible."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't check this dataset's columns. Try adding it again."
 msgstr "Nous n’avons pas pu vérifier les colonnes de ce jeu de données. Essayez "
 "de l’ajouter à nouveau."
@@ -5607,6 +5748,10 @@ msgstr "Plage de nombres"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "Remplacer l’URL"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
+msgid "{formattedNumResults}+ datasets"
+msgstr "Plus de {formattedNumResults} jeux de données"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -5704,6 +5849,10 @@ msgstr "Hypothèses SQL générées"
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "Import failed: {reason}"
 msgstr "Échec de l'importation : {reason}"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} label"
+msgstr "Libellé de la classe {classNumber}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
@@ -5943,6 +6092,10 @@ msgstr "Email de réinitialisation du mot de passe envoyé"
 msgid "Aggregation"
 msgstr "Agrégation"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}"
+msgstr "Inférieur à {threshold}"
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
 msgstr "Sélectionnez la colonne par laquelle trier"
@@ -5956,6 +6109,12 @@ msgstr "Vous pouvez voir ce jeu de données car il a été partagé avec vous."
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles/ClassificationBreakHandles.tsx
 msgid "Break {0} of {1}, {value}"
 msgstr "Segment {0} sur {1}, {value}"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Add calculated columns to a Data Explorer query when you run one of its "
+"tools"
+msgstr "Ajoutez des colonnes calculées à une requête Data Explorer lorsque vous "
+"exécutez l’un de ses outils"
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/ViewRecordsButton.tsx
 msgid "View records"
@@ -6031,6 +6190,10 @@ msgstr "Intégrer"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Nothing yet."
 msgstr "Rien pour le moment."
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class {classNumber}"
+msgstr "Classe {classNumber}"
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6333,7 +6496,7 @@ msgstr "Cette coordonnée est hors limites."
 msgid "Open the record"
 msgstr "Ouvrir l’enregistrement"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "Jeu de données ajouté"
 
@@ -6487,6 +6650,7 @@ msgid "Tool"
 msgstr "Outil"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Not supported yet"
 msgstr "Pas encore pris en charge"
 
@@ -6521,6 +6685,11 @@ msgstr "Aucun champ n'a été ajouté"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
 msgstr "Tous les résultats"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField.tsx
+msgid "Add"
+msgstr "Ajouter"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6592,6 +6761,10 @@ msgstr "{periodCount, plural, one {Afficher # trimestre} other {Afficher les # "
 #: src/views/GisApp/shell/MapToolCluster/EraseMapTool.tsx
 msgid "Erase annotations"
 msgstr "Effacer les annotations"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
+msgid "Use a different link"
+msgstr "Utiliser un autre lien"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/useReassignOwnerModal.ts
 msgid "Reassign failed"
@@ -6680,6 +6853,10 @@ msgstr "Aucun jeu de données ne correspond à votre filtre"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
 msgstr "Courbe"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold}% or above"
+msgstr "{threshold}% ou plus"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -6802,6 +6979,11 @@ msgstr "Par défaut, nous utilisons un lien direct basé sur un UUID. Ajoutez un
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "Rendre interne"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
+msgstr "Il s’agit d’une feuille Google. Ajoutez-la depuis Connecteurs pour "
+"qu’elle reste connectée."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Detected"
@@ -7028,6 +7210,10 @@ msgstr "Point"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "kind"
 msgstr "type"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}%"
+msgstr "Inférieur à {threshold}%"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
@@ -7295,6 +7481,10 @@ msgstr "E-mail"
 msgid "Y axis tick color"
 msgstr "Couleur des graduations de l’axe Y"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} color"
+msgstr "Couleur de la classe {classNumber}"
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "Traiter à nouveau les données"
@@ -7348,6 +7538,10 @@ msgstr "« {operator} » n’est pas un opérateur compris par ce formulaire."
 msgid "Open sidebar"
 msgstr "Ouvrir la barre latérale"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Red to blue"
+msgstr "Du rouge au bleu"
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
 msgstr "Télécharger le jeu de données"
@@ -7397,6 +7591,10 @@ msgstr "ne contient pas"
 msgid "One filter is active on this layer. It may be excluding everything."
 msgstr "Un filtre est actif sur cette couche. Il peut exclure tous les "
 "éléments."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Recommended with it: {companionNames}"
+msgstr "Recommandé avec celui-ci : {companionNames}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
@@ -7705,6 +7903,10 @@ msgstr "Graphique en courbes"
 msgid "Your session has expired"
 msgstr "Votre session a expiré"
 
+#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
+msgid "The query changed after the columns were added."
+msgstr "La requête a été modifiée après l’ajout des colonnes."
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "Écrivez votre paragraphe ici..."
@@ -7849,6 +8051,11 @@ msgstr "Extraire avec l’assistant"
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Count rows in {datasetName} by {secondGroupByColumn}"
 msgstr "Compter les lignes de {datasetName} par {secondGroupByColumn}"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Dropbox link is a folder. Paste a link to one file."
+msgstr "Ce lien Dropbox correspond à un dossier. Collez un lien vers un seul "
+"fichier."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
@@ -8067,6 +8274,10 @@ msgstr "Une erreur est survenue lors de la sauvegarde du jeu de données"
 msgid "Maps"
 msgstr "Cartes"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "That link isn't a CSV, Excel, or PDF file."
+msgstr "Ce lien ne correspond pas à un fichier CSV, Excel ou PDF."
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Import dataset"
 msgstr "Importer le jeu de données"
@@ -8168,6 +8379,10 @@ msgstr "Sélectionnez les colonnes que vous souhaitez dans ce {conceptName}"
 msgid "Visualization Settings"
 msgstr "Paramètres de visualisation"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Threshold"
+msgstr "Seuil"
+
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -8212,6 +8427,12 @@ msgstr "Jaune"
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "Toute personne disposant du lien"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This GitHub link is a page, not a file. Open the file and paste that "
+"link."
+msgstr "Ce lien GitHub correspond à une page, pas à un fichier. Ouvrez le "
+"fichier et collez son lien."
 
 #. placeholder {0}: dataRows.length
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
@@ -8512,6 +8733,14 @@ msgstr "Bienvenue dans le gestionnaire de vos sources de données. Sélectionnez
 msgid "Geometry unavailable"
 msgstr "Géométrie indisponible"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Custom colors"
+msgstr "Couleurs personnalisées"
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
+msgid "Use a link"
+msgstr "Utiliser un lien"
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "Chargement du tableau de bord"
@@ -8545,6 +8774,10 @@ msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
 msgstr "Je n’ai pas pu générer de SQL hors ligne. Reformulez votre demande ou "
 "reconnectez-vous pour utiliser le chat cloud."
+
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "Enter a link that starts with http:// or https://."
+msgstr "Saisissez un lien commençant par http:// ou https://."
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
@@ -8794,6 +9027,10 @@ msgstr "Taille du symbole {firstLabel}"
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold} or above"
+msgstr "{threshold} ou plus"
+
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
 msgstr "Échec du chargement de l'ensemble de données"
@@ -8918,10 +9155,6 @@ msgstr "Nous n'avons pas pu mettre à jour votre abonnement. Veuillez contacter 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "First"
 msgstr "Premier"
-
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
-msgid "{formattedNumResults} of {formattedNumCatalogListings} datasets"
-msgstr "{formattedNumResults} sur {formattedNumCatalogListings} jeux de données"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
@@ -9427,7 +9660,7 @@ msgstr "portail de facturation."
 msgid "Column 2"
 msgstr "Colonne 2"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "Données non prêtes"
 
@@ -9581,7 +9814,7 @@ msgstr "Colonnes de l'ensemble de données"
 msgid "Details"
 msgstr "Détails"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
 msgstr "Préparation de vos données"
 
@@ -10268,6 +10501,12 @@ msgstr "Recommandé"
 msgid "Teal"
 msgstr "Sarcelle"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+msgstr "L’éditeur n’y a encore ajouté aucune ligne. Vous pouvez tout de même "
+"ouvrir l’original à l’endroit où il est publié."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
 msgstr "Indexé par"
@@ -10362,6 +10601,11 @@ msgstr "Vous êtes actuellement abonné à ce plan."
 msgid "Upload a dataset"
 msgstr "Télécharger un ensemble de données"
 
+#: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
+msgid "This Google Drive link is a folder. Paste a link to one file."
+msgstr "Ce lien Google Drive correspond à un dossier. Collez un lien vers un "
+"seul fichier."
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Square root"
 msgstr "Racine carrée"
@@ -10399,6 +10643,7 @@ msgid "Please try again. Your dashboard is still published."
 msgstr "Veuillez réessayer. Votre tableau de bord est toujours publié."
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red"
 msgstr "Rouge"
 
@@ -10650,6 +10895,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 "or a date, so it couldn't run."
 msgstr "Cette requête traite un type de valeur comme un autre, par exemple du "
 "texte comme un nombre ou une date, et n’a donc pas pu être exécutée."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "In your workspace"
+msgstr "Dans votre espace de travail"
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "On this page"
@@ -10962,7 +11211,7 @@ msgstr "HAVING utilise l’opérateur « {operator} », qui n’est pas pris en 
 msgid "Search failed. Try again."
 msgstr "La recherche a échoué. Réessayez."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr "Cette entrée du catalogue ne contient aucune métadonnée de colonne. "
 "Elle ne peut pas encore être importée."
@@ -11052,6 +11301,10 @@ msgstr "Les valeurs que vous avez sélectionnées peuvent contenir des "
 "informations personnelles. Le fournisseur d'IA les recevra et pourra "
 "enregistrer la demande."
 
+#: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
+msgid "Nothing to undo"
+msgstr "Rien à annuler"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove this dataset"
 msgstr "Supprimer ce jeu de données"
@@ -11091,6 +11344,10 @@ msgstr "{0} (limite)"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Loading"
 msgstr "Chargement"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Names the codes in {columnList}"
+msgstr "Nomme les codes dans {columnList}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
@@ -11217,7 +11474,7 @@ msgid "Link"
 msgstr "Lien"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
 msgstr "Nous n’avons pas pu préparer les données pour « {0} » ; leur ouverture "
 "pourrait donc échouer."
@@ -11524,6 +11781,10 @@ msgstr "De la colonne : <0>{columnName}</0>"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bottom"
 msgstr "Bas"
+
+#: src/views/DataExplorerApp/notifyDerivedColumnsAdded/notifyDerivedColumnsAdded.tsx
+msgid "Added {columnList}"
+msgstr "Ajouté : {columnList}"
 
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Offline ready"

@@ -189,6 +189,96 @@ export type DataCatalogListingRead = {
 
   /** The copy's size in bytes. */
   parquetCacheByteSize: number | undefined;
+
+  /**
+   * When the source's freshness token was last read to check the copy.
+   * Checks inside a short window reuse the token recorded here instead of
+   * calling the source again.
+   */
+  parquetCacheCheckedAt: string | undefined;
+
+  /** The freshness token that last check read. Never parsed. */
+  parquetCacheCheckedSourceVersion: string | undefined;
+
+  /**
+   * Listings in the same drive that are usually added with this one, in the
+   * order they should be shown. Empty when there are none.
+   */
+  companionListings: readonly DataCatalogListingCompanion[];
+
+  /**
+   * How to read the source's freshness token for this listing, when its
+   * pipeline describes one. Undefined when the token is read the way its
+   * `apiService` always reads it.
+   */
+  apiFreshnessProbe: DataCatalogListingFreshnessProbe | undefined;
+};
+
+/** Why a listing is recommended alongside another. */
+export type DataCatalogListingCompanionKind =
+  /** It names the codes a column of the other listing holds. */
+  "lookup";
+
+/** One pair of columns that joins a listing to a companion. */
+export type DataCatalogListingCompanionJoinPair = Readonly<{
+  /** The column in the listing that names the companion. */
+  column: string;
+  /** The matching column in the companion. */
+  companionColumn: string;
+}>;
+
+/**
+ * One listing recommended alongside another, in the same drive. It is named
+ * by its API identity rather than its id, because it may not be written yet
+ * when the listing naming it is.
+ */
+export type DataCatalogListingCompanion = Readonly<{
+  kind: DataCatalogListingCompanionKind;
+  externalDatasetId: string;
+  apiResourceId: string;
+  /** Column pairs that join this listing to the companion. */
+  joinOn: readonly DataCatalogListingCompanionJoinPair[];
+}>;
+
+/**
+ * A companion matched to the listing it names, with what a workspace needs
+ * to know to add it.
+ */
+export type DataCatalogListingResolvedCompanion = {
+  catalogListingId: DataCatalogListingId;
+  displayName: string;
+  isWorkspaceLoadable: boolean;
+  isInvalid: boolean;
+  kind: DataCatalogListingCompanionKind;
+  joinOn: readonly DataCatalogListingCompanionJoinPair[];
+  /** Whether the workspace asked about already has a dataset from it. */
+  isInWorkspace: boolean;
+};
+
+/**
+ * How a freshness probe's response body becomes a token.
+ *
+ * - `json-paths`: the values at these paths into the JSON body, in order,
+ *   joined by `|`. Each path is a list of keys and array indexes, because a
+ *   key such as `@odata.count` contains dots.
+ * - `body-sha256`: the SHA-256 of the whole body.
+ */
+export type DataCatalogListingFreshnessProbeTokenRule =
+  | {
+      kind: "json-paths";
+      paths: ReadonlyArray<ReadonlyArray<string | number>>;
+    }
+  | { kind: "body-sha256" };
+
+/**
+ * A listing's own description of how to read its source's freshness token:
+ * one GET under the listing's `apiBaseUrl`, and how its body becomes the
+ * token.
+ */
+export type DataCatalogListingFreshnessProbe = {
+  /** An `https` URL under the listing's `apiBaseUrl`. */
+  url: string;
+  token: DataCatalogListingFreshnessProbeTokenRule;
 };
 
 /**
@@ -262,10 +352,13 @@ export type DataCatalogListingSearchFilters = {
   isLoadableOnly: boolean;
 };
 
-/** One choosable value of a facet and how many listings it would keep. */
+/**
+ * One choosable value of a facet and how many listings it would keep. The
+ * count is undefined where too many listings match to count them quickly.
+ */
 export type DataCatalogListingFacetOption = {
   value: string;
-  count: number;
+  count: number | undefined;
 };
 
 /**
@@ -290,10 +383,14 @@ export type DataCatalogListingSearchFacets = {
   /** The sources' free-form keywords on the listings in view. */
   tags: DataCatalogListingFacetOption[];
   formats: DataCatalogListingFacetOption[];
-  updatedWithin: Record<DataCatalogListingUpdatedWithin, number>;
+  /** Undefined for a window too many listings match to count quickly. */
+  updatedWithin: Record<DataCatalogListingUpdatedWithin, number | undefined>;
 
-  /** Unloadable listings that match everything except loadable-only. */
-  numUnloadable: number;
+  /**
+   * Unloadable listings that match everything except loadable-only, or
+   * undefined where too many listings match to count them quickly.
+   */
+  numUnloadable: number | undefined;
 
   /** Every listing in the catalog, unsearched and unfiltered. */
   numCatalogListings: number;
@@ -325,7 +422,7 @@ export type ParquetCacheStatus = "building" | "ready" | "failed";
 export type OpenDataAccessKind = "pipeline_parquet" | "api_resource";
 
 /** The API protocol an `api_resource` entry speaks, not the host serving it. */
-export type OpenDataApiService = "ckan" | "socrata";
+export type OpenDataApiService = "ckan" | "socrata" | "odata";
 
 /**
  * An entry's access shape, with the null checks already done. Every member is
@@ -378,6 +475,10 @@ export type DataCatalogListingModel = SupabaseCrudModelSpec<
         | "parquetCacheBuiltAt"
         | "parquetCacheRowCount"
         | "parquetCacheByteSize"
+        | "parquetCacheCheckedAt"
+        | "parquetCacheCheckedSourceVersion"
+        | "companionListings"
+        | "apiFreshnessProbe"
       >;
       Update: Partial<DataCatalogListingRead>;
     };

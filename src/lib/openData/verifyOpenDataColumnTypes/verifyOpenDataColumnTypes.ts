@@ -5,6 +5,8 @@ import {
   fetchOpenDataColumnTypeSample,
   readOpenDataAccessToken,
 } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
+import { requestOpenDataParquetCopy } from "@/lib/openData/requestOpenDataParquetCopy/requestOpenDataParquetCopy";
+import { Logger } from "@/utils/Logger";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Enums } from "$/types/database.types";
 
@@ -128,6 +130,11 @@ async function _inferOrReportUnparseable(args: {
  * listing unparseable, and a sample the server cannot read at all may mark
  * it invalid on the server's side.
  *
+ * A sample that held the whole source is then handed back to build the
+ * listing's Parquet copy from, so the copy is under way without the source
+ * being read again. A copy that cannot be requested is logged, and leaves
+ * the verification itself standing.
+ *
  * Inferring in the browser is temporary: once DuckDB can run server-side,
  * the server should read the sample and infer the types itself.
  *
@@ -142,7 +149,7 @@ export async function verifyOpenDataColumnTypes(
 ): Promise<void> {
   const accessToken = await readOpenDataAccessToken();
   const listingUrl = buildOpenDataListingUrl(catalogListingId);
-  const { csvText, token } = await fetchOpenDataColumnTypeSample(
+  const { csvText, token, isComplete } = await fetchOpenDataColumnTypeSample(
     catalogListingId,
     { accessToken },
   );
@@ -163,5 +170,34 @@ export async function verifyOpenDataColumnTypes(
   });
   if (!writeResponse.ok) {
     throw new Error(`Column type write-back failed: ${writeResponse.status}`);
+  }
+  if (isComplete) {
+    await _requestCopyFromCompleteSample({
+      catalogListingId,
+      accessToken,
+      completeSample: { csvText, token },
+    });
+  }
+}
+
+/**
+ * Asks for a listing's copy to be built from a sample that held its whole
+ * source. A failure is only logged: adding the listing asks again.
+ */
+async function _requestCopyFromCompleteSample(args: {
+  catalogListingId: DataCatalogListing.Id;
+  accessToken: string;
+  completeSample: Readonly<{ csvText: string; token: string }>;
+}): Promise<void> {
+  try {
+    await requestOpenDataParquetCopy(args.catalogListingId, {
+      accessToken: args.accessToken,
+      completeSample: args.completeSample,
+    });
+  } catch (error) {
+    Logger.warn("Could not build a catalog listing's copy from its sample", {
+      catalogListingId: args.catalogListingId,
+      error,
+    });
   }
 }

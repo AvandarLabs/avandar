@@ -1,12 +1,21 @@
 import { readFile } from "node:fs/promises";
 import { getPipelineEtlDestination } from "@pipelines/shared/getPipelineEtlDestination/getPipelineEtlDestination";
 import { createClient } from "@supabase/supabase-js";
+import { DataCatalogListingJsonSchemas } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers";
 import type { Database } from "$/types/database.types";
 import type { ParquetCopyStore } from "@pipeline-server/openDataParquetCache/runParquetCopyBuild/runParquetCopyBuild";
 import type { PipelineSupabaseTarget } from "@pipelines/shared/PipelineRunOptions.types";
 
 /** The content type every pipeline uploads Parquet with. */
 const PARQUET_CONTENT_TYPE = "application/vnd.apache.parquet";
+
+/**
+ * How long, in seconds, a browser may cache a copy's part. A part never
+ * changes once uploaded, because each build writes to a folder of its own,
+ * so a workspace that re-checks an unchanged copy reads its parts from the
+ * browser's cache rather than downloading them again.
+ */
+const COPY_PART_CACHE_CONTROL_SECONDS = "31536000";
 
 /** The most objects one Storage list call returns, and one remove takes. */
 const STORAGE_PAGE_SIZE = 1000;
@@ -65,7 +74,7 @@ async function _readListing(client: SupabaseClient, catalogListingId: string) {
   const { data, error } = await client
     .from("data_catalog_listings")
     .select(
-      "id, access_kind, pipeline_name, parquet_cache_build_id, api_base_url, api_resource_id, external_dataset_id, api_resource_format",
+      "id, access_kind, pipeline_name, parquet_cache_build_id, api_base_url, api_resource_id, external_dataset_id, api_resource_format, api_freshness_probe",
     )
     .eq("id", catalogListingId)
     .maybeSingle();
@@ -88,6 +97,13 @@ async function _readListing(client: SupabaseClient, catalogListingId: string) {
     apiResourceId: data.api_resource_id,
     externalDatasetId: data.external_dataset_id,
     apiResourceFormat: data.api_resource_format ?? undefined,
+    ...(data.api_freshness_probe === null
+      ? {}
+      : {
+          freshnessProbe: DataCatalogListingJsonSchemas.freshnessProbe.parse(
+            data.api_freshness_probe,
+          ),
+        }),
   };
 }
 
@@ -182,6 +198,7 @@ export function createSupabaseParquetCopyStore(
         await readFile(partPath),
         {
           contentType: PARQUET_CONTENT_TYPE,
+          cacheControl: COPY_PART_CACHE_CONTROL_SECONDS,
           upsert: true,
         },
       );

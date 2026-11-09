@@ -16,11 +16,9 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { IconWorldSearch } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import { uuid } from "$/lib/uuid";
 import { DataCatalogDriveClient } from "@/clients/data-catalog-listings/DataCatalogDriveClient";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DataCatalogRelationColumnClient } from "@/clients/data-catalog-listings/DataCatalogRelationColumnClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmptyState";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
@@ -29,15 +27,7 @@ import {
 import { MODAL_ABOVE_NUX_TOUR_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ColumnTypeVerifications } from "@/lib/openData/ColumnTypeVerifications";
-import { requestOpenDataParquetCopy } from "@/lib/openData/requestOpenDataParquetCopy/requestOpenDataParquetCopy";
 import { isColumnTypeVerificationDue } from "@/lib/openData/verifyOpenDataColumnTypes/verifyOpenDataColumnTypes";
-import { Logger } from "@/utils/Logger";
-import {
-  notifyError,
-  notifySuccess,
-  notifyWarning,
-} from "@/utils/notifications/notify";
-import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOpenDataDatasetColumnInputs";
 import {
   addCatalogFilterValue,
   EMPTY_CATALOG_FACETS,
@@ -51,11 +41,12 @@ import { DataCatalogListingDetail } from "@/views/DataManagerApp/DataImportView/
 import { DataCatalogListingList } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList";
 import { DataCatalogResultsHeader } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.module.css";
-import { readCatalogColumnsForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/readCatalogColumnsForAdding/readCatalogColumnsForAdding";
-import { requestParquetCopyForAdding } from "@/views/DataManagerApp/DataImportView/DataCatalogView/requestParquetCopyForAdding/requestParquetCopyForAdding";
 import { useActiveCatalogFilters } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters";
+import { useAddCatalogListing } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing";
+import { useCatalogListingCompanions } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingCompanions/useCatalogListingCompanions";
 import { useCatalogListingPreview } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
+import { useDataCatalogKeywordOptions } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogKeywordOptions";
 import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
   useColumnTypeVerificationStatus,
@@ -63,7 +54,6 @@ import {
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useVerifyColumnTypesOnDwell/useVerifyColumnTypesOnDwell";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { DataCatalogListingRead } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types";
-import type { DataCatalogRelationColumn } from "$/models/data-catalog-listings/DataCatalogRelationColumn/DataCatalogRelationColumn";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   CatalogListingFilters,
@@ -144,6 +134,17 @@ export function DataCatalogView({
   const [selectedId, setSelectedId] = useState<
     DataCatalogListing.Id | undefined
   >();
+  // A listing opened from another's recommendations, with the search and
+  // filters it was opened under. It is shown though the results may not
+  // contain it, until the search or filters change.
+  const [openedRecommendation, setOpenedRecommendation] = useState<
+    | {
+        catalogListingId: DataCatalogListing.Id;
+        query: string;
+        filters: CatalogListingFilters;
+      }
+    | undefined
+  >();
   const [debouncedSearch] = useDebouncedValue(search.trim(), 150);
   const isSearching = debouncedSearch !== "";
   const sortBy = resolveCatalogSortBy({ chosenSortBy, isSearching });
@@ -159,6 +160,12 @@ export function DataCatalogView({
   useEffect(() => {
     onCatalogEmptyChange?.(isCatalogEmpty);
   }, [isCatalogEmpty, onCatalogEmptyChange]);
+  const { keywordOptions, onKeywordSearchChange } =
+    useDataCatalogKeywordOptions({
+      query: debouncedSearch,
+      filters,
+      topKeywords: facets?.tags ?? EMPTY_CATALOG_FACETS.tags,
+    });
   const isLoadingCatalog = catalogSearch.isLoading;
   const changeFilters = (nextFilters: CatalogListingFilters): void => {
     setFilters(settleCatalogListingFilters(nextFilters));
@@ -177,12 +184,20 @@ export function DataCatalogView({
     });
 
   // A selection the current results do not show is not shown, so the detail
-  // never describes a dataset the list no longer contains.
+  // never describes a dataset the list no longer contains. A listing opened
+  // from a recommendation is the exception until the search or filters
+  // change, since it was never picked from the list.
+  const isOpenedRecommendationShown =
+    openedRecommendation !== undefined &&
+    openedRecommendation.catalogListingId === selectedId &&
+    openedRecommendation.query === debouncedSearch &&
+    openedRecommendation.filters === filters;
   const isSelectionShown =
     selectedId !== undefined &&
-    catalogSearch.listings.some((listing) => {
-      return listing.id === selectedId;
-    });
+    (isOpenedRecommendationShown ||
+      catalogSearch.listings.some((listing) => {
+        return listing.id === selectedId;
+      }));
   const [fetchedListing, isLoadingSelectedListing] =
     DataCatalogListingClient.useGetById({
       id: selectedId,
@@ -200,8 +215,6 @@ export function DataCatalogView({
     },
   });
 
-  const selectedListingPreview = useCatalogListingPreview(selectedListing);
-
   useVerifyColumnTypesOnDwell({
     listing: selectedListing,
     coordinator: ColumnTypeVerifications,
@@ -210,81 +223,15 @@ export function DataCatalogView({
     catalogListingId: selectedListing?.id,
     coordinator: ColumnTypeVerifications,
   });
-  // The listing whose "Add to workspace" is waiting for its column types to
-  // be verified before it saves.
-  const [waitingToAddListingId, setWaitingToAddListingId] = useState<
-    DataCatalogListing.Id | undefined
-  >();
-
-  const [insertOpenDataDataset, isInsertPending] =
-    DatasetClient.useInsertOpenDataDataset({
-      onSuccess: (dataset) => {
-        notifySuccess({
-          title: t`Dataset added`,
-          message: t`"${dataset.name}" is now in your workspace.`,
-        });
-        onSaveSuccess?.(dataset);
-      },
-      queriesToInvalidate: [DatasetClient.QueryKeys.getAll()],
-    });
-
-  async function _readColumnsForAdding(
-    listing: DataCatalogListingRead,
-  ): Promise<readonly DataCatalogRelationColumn.T[] | undefined> {
-    setWaitingToAddListingId(listing.id);
-    try {
-      return await readCatalogColumnsForAdding({
-        listing,
-        coordinator: ColumnTypeVerifications,
-        readColumns: (catalogListingId) => {
-          return DataCatalogRelationColumnClient.getAll(
-            where("catalog_listing_id", "eq", catalogListingId),
-          );
-        },
-      });
-    } catch (error) {
-      Logger.warn("Could not verify a catalog listing's columns to add it", {
-        catalogListingId: listing.id,
-        error,
-      });
-      notifyError({
-        title: t`Cannot add dataset yet`,
-        message: t`We couldn't check this dataset's columns. Try adding it again.`,
-      });
-      return undefined;
-    } finally {
-      setWaitingToAddListingId(undefined);
-    }
-  }
-
-  // Starts the listing's Parquet copy as it is added, so the first build is
-  // under way before the dataset is first opened.
-  async function _requestParquetCopy(
-    listing: DataCatalogListingRead,
-  ): Promise<void> {
-    try {
-      const copyStatus = await requestParquetCopyForAdding({
-        listing,
-        requestCopy: requestOpenDataParquetCopy,
-      });
-      if (copyStatus === "preparing") {
-        notifySuccess({
-          title: t`Preparing your data`,
-          message: t`"${listing.displayName}" is being prepared. Large datasets can take a few minutes to open the first time.`,
-        });
-      } else if (copyStatus === "failed") {
-        notifyWarning({
-          title: t`Data not ready`,
-          message: t`We couldn't prepare the data for "${listing.displayName}", so it may not open.`,
-        });
-      }
-    } catch (error) {
-      Logger.warn("Could not request a catalog listing's Parquet copy", {
-        catalogListingId: listing.id,
-        error,
-      });
-    }
-  }
+  const selectedListingPreview = useCatalogListingPreview(selectedListing, {
+    isRecheckingColumns: columnTypeVerificationStatus === "verifying",
+  });
+  const selectedListingCompanions = useCatalogListingCompanions({
+    catalogListingId: selectedListing?.id,
+    workspaceId: workspace.id,
+  });
+  const catalogListingAdder = useAddCatalogListing();
+  const { addingListingIds, waitingToAddListingId } = catalogListingAdder;
 
   async function onAddToWorkspace(): Promise<void> {
     // An invalid or unsupported listing's button is only styled disabled,
@@ -296,31 +243,10 @@ export function DataCatalogView({
     ) {
       return;
     }
-    const listing = selectedListing;
-    const columns = await _readColumnsForAdding(listing);
-    if (columns === undefined) {
-      return;
+    const dataset = await catalogListingAdder.addListing(selectedListing);
+    if (dataset !== undefined) {
+      onSaveSuccess?.(dataset);
     }
-    const columnInputs = resolveOpenDataDatasetColumnInputs({
-      catalogColumns: [...columns],
-      metadata: listing.metadata,
-    });
-    if (!columnInputs) {
-      notifyError({
-        title: t`Cannot add dataset`,
-        message: t`This catalog listing has no column metadata. It cannot be imported yet.`,
-      });
-      return;
-    }
-    insertOpenDataDataset({
-      catalogListingId: listing.id,
-      columns: columnInputs,
-      datasetDescription: listing.description ?? "",
-      datasetId: uuid(),
-      datasetName: listing.displayName,
-      workspaceId: workspace.id,
-    });
-    void _requestParquetCopy(listing);
   }
 
   const requestDatasetButton = (
@@ -373,7 +299,8 @@ export function DataCatalogView({
       columnTypeVerificationStatus,
     ),
     isAddAllowed,
-    isAdding: isInsertPending,
+    isAdding:
+      selectedListing !== undefined && addingListingIds.has(selectedListing.id),
     isWaitingForColumnTypes:
       waitingToAddListingId !== undefined &&
       waitingToAddListingId === selectedListing?.id,
@@ -393,12 +320,25 @@ export function DataCatalogView({
       setIsDetailExpanded(false);
       changeFilters(addCatalogFilterValue(filters, "tags", tag));
     },
+    companions: selectedListingCompanions,
+    addingListingIds,
+    onSelectListing: (catalogListingId: DataCatalogListing.Id) => {
+      setSelectedId(catalogListingId);
+      setOpenedRecommendation({
+        catalogListingId,
+        query: debouncedSearch,
+        filters,
+      });
+    },
+    onAddCompanion: catalogListingAdder.addCompanion,
   };
   const filterRail = (
     <DataCatalogFilterRail
       filters={filters}
       facets={facets ?? EMPTY_CATALOG_FACETS}
+      keywordOptions={keywordOptions}
       onFiltersChange={changeFilters}
+      onKeywordSearchChange={onKeywordSearchChange}
     />
   );
 
@@ -418,13 +358,7 @@ export function DataCatalogView({
         <section className={css.dataCatalogViewResults} aria-label={t`Results`}>
           <DataCatalogResultsHeader
             numResults={catalogSearch.totalCount}
-            numCatalogListings={facets?.numCatalogListings ?? 0}
-            // "X of Y" waits for the catalog's size, which the facet counts
-            // carry, rather than reading "X of 0" for a moment.
-            isNarrowed={
-              (isSearching || hasActiveCatalogFilters(filters)) &&
-              facets !== undefined
-            }
+            isNumResultsCapped={catalogSearch.isTotalCapped}
             activeFilters={activeFilters}
             onClearAll={() => {
               setFilters(EMPTY_CATALOG_LISTING_FILTERS);
@@ -489,7 +423,11 @@ export function DataCatalogView({
           ) : (
             <DataCatalogListingList
               displayedListings={catalogSearch.listings}
-              totalCount={catalogSearch.totalCount}
+              totalCount={
+                catalogSearch.isTotalCapped
+                  ? undefined
+                  : catalogSearch.totalCount
+              }
               selectedId={isSelectionShown ? selectedId : undefined}
               onSelect={setSelectedId}
               hasNextPage={catalogSearch.hasNextPage}

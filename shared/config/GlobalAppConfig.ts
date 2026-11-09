@@ -52,6 +52,23 @@ export const GlobalAppConfig = {
      * and the source's "Refresh" action is the escape hatch for not waiting.
      */
     liveRelationMaxAgeMs: 5 * 60_000,
+
+    /**
+     * How long a current Parquet copy of an API-backed Open Data Catalog
+     * listing may be served from a browser cache before its listing is asked
+     * again whether the source changed. The `open-data` edge function checks
+     * the source at most once per `openDataFreshnessRecheckAfterMs` for every
+     * workspace, so asking costs no request to the source most of the time.
+     */
+    openDataCopyMaxAgeMs: 15 * 60_000,
+
+    /**
+     * How long the `open-data` edge function reuses its last read of an
+     * API-backed listing's freshness token before reading the source again.
+     * It bounds requests to a third-party API by listing rather than by
+     * workspace or by load.
+     */
+    openDataFreshnessRecheckAfterMs: 15 * 60_000,
   },
 
   /**

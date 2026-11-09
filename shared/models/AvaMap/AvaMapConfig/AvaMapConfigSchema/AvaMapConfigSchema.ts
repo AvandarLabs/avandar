@@ -4,6 +4,7 @@ import { AvaMapConfigV2Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigS
 import { AvaMapConfigV3Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV3Schema.ts";
 import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV4Schema.ts";
 import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts";
+import { AvaMapConfigV6Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV6Schema.ts";
 import { migrateAvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/migrateAvaMapConfig.ts";
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
@@ -26,7 +27,7 @@ function _assertBufferInvariants(layers: readonly MapLayer.T[]): void {
 function _parseCurrentConfig(json: unknown): AvaMapConfigRead {
   // The cast bridges `PopupConfig.action`, a required `| undefined` field on
   // `MapLayer.T` that `PopupSchema` still infers as an optional key.
-  const parsed = AvaMapConfigV5Schema.parse(json) as AvaMapConfigRead;
+  const parsed = AvaMapConfigV6Schema.parse(json) as AvaMapConfigRead;
   return {
     ...parsed,
     aoi: parsed.aoi,
@@ -54,13 +55,16 @@ function _parseAnyVersion(json: unknown): AvaMapConfigRead {
   if (version === 4) {
     return migrateAvaMapConfig.fromV4(AvaMapConfigV4Schema.parse(json));
   }
+  if (version === 5) {
+    return migrateAvaMapConfig.fromV5(AvaMapConfigV5Schema.parse(json));
+  }
   return _parseCurrentConfig(json);
 }
 
 /** Reads and writes the persisted JSON representation of a map config. */
 export const AvaMapConfigSchema = {
   /** The Zod schema used to validate current persisted map configuration. */
-  schema: AvaMapConfigV5Schema,
+  schema: AvaMapConfigV6Schema,
 
   /**
    * Validates and migrates a raw JSON value to the current config shape. The
@@ -76,6 +80,6 @@ export const AvaMapConfigSchema = {
 
   /** Serializes a current map config into plain JSON for persistence. */
   toJson: (config: AvaMapConfigRead): Json => {
-    return JSON.parse(JSON.stringify(AvaMapConfigV5Schema.parse(config)));
+    return JSON.parse(JSON.stringify(AvaMapConfigV6Schema.parse(config)));
   },
 };

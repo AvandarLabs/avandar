@@ -1,6 +1,63 @@
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import { GraduatedRamps } from "@/views/GisApp/layers/GraduatedRamps/GraduatedRamps";
 
-/** Replaces color behavior and invalidates its derived legend output. */
+type GraduatedClassification = Extract<
+  MapLayer.Color,
+  { type: "graduated" }
+>["classification"];
+
+/** Whether two classifications cut the values into the same intervals. */
+function _isSameClassification(
+  first: GraduatedClassification,
+  second: GraduatedClassification,
+): boolean {
+  if (first.method !== second.method) {
+    return false;
+  }
+  if (first.method === "manual" && second.method === "manual") {
+    return (
+      first.breaks.length === second.breaks.length &&
+      first.breaks.every((breakValue, index) => {
+        return breakValue === second.breaks[index];
+      })
+    );
+  }
+  return (
+    MapLayer.getGraduatedClassCount(first) ===
+    MapLayer.getGraduatedClassCount(second)
+  );
+}
+
+/**
+ * Drops class labels that the caller left untouched when the classification
+ * changed, because a label written for one interval must not move to another.
+ */
+function _clearStaleClassLabels(
+  options: Readonly<{ current: MapLayer.Color; color: MapLayer.Color }>,
+): MapLayer.Color {
+  const { current, color } = options;
+  if (
+    current.type !== "graduated" ||
+    color.type !== "graduated" ||
+    color.classLabels !== current.classLabels ||
+    _isSameClassification(color.classification, current.classification)
+  ) {
+    return color;
+  }
+  const classCount = MapLayer.getGraduatedClassCount(color.classification);
+  return {
+    ...color,
+    classLabels: Array.from({ length: classCount }, () => {
+      return undefined;
+    }),
+  };
+}
+
+/**
+ * Replaces color behavior and invalidates its derived legend output. A
+ * graduated color is fitted to one color and one label per class, and its
+ * labels are cleared when the classification intervals change.
+ */
 function withLayerColor(
   options: Readonly<{ layer: MapLayer.T; color: MapLayer.Color }>,
 ): MapLayer.T {
@@ -8,9 +65,19 @@ function withLayerColor(
   if (layer.symbology.type === "heatmap") {
     return layer;
   }
+  const nextColor = _clearStaleClassLabels({
+    current: layer.symbology.color,
+    color,
+  });
   return {
     ...layer,
-    symbology: { ...layer.symbology, color },
+    symbology: {
+      ...layer.symbology,
+      color:
+        nextColor.type === "graduated"
+          ? GraduatedRamps.fitColorToClassCount(nextColor)
+          : nextColor,
+    },
     legend: { ...layer.legend, breaks: [], entries: [] },
   } as MapLayer.T;
 }

@@ -22,7 +22,13 @@ export type EdgeFunctionFetch = (
  * @throws When there is no signed-in session to call the route with.
  */
 export async function fetchEdgeFunctionRoute(
-  options: Readonly<{ path: string; fetch?: EdgeFunctionFetch }>,
+  options: Readonly<{
+    path: string;
+    fetch?: EdgeFunctionFetch;
+    method?: "GET" | "POST";
+    body?: BodyInit;
+    headers?: Record<string, string>;
+  }>,
 ): Promise<Response> {
   const { data } = await AvaSupabase.db().auth.getSession();
   const accessToken = data.session?.access_token;
@@ -30,7 +36,19 @@ export async function fetchEdgeFunctionRoute(
     throw new Error(`No session is available to call '${options.path}'`);
   }
   const doFetch = options.fetch ?? fetch;
-  return await doFetch(`${AvaSupabase.getEdgeFunctionsURL()}/${options.path}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    ...options.headers,
+  };
+  const init: RequestInit = { headers };
+  if (options.method !== undefined) {
+    init.method = options.method;
+  }
+  if (options.body !== undefined) {
+    init.body = options.body;
+  }
+  return await doFetch(
+    `${AvaSupabase.getEdgeFunctionsURL()}/${options.path}`,
+    init,
+  );
 }

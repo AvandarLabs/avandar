@@ -1,6 +1,8 @@
+import { isPlainObject } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type {
   OpenDataAccess,
+  DataCatalogListingCompanionJoinPair,
   DataCatalogListingRead,
 } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.types.ts";
 
@@ -85,5 +87,38 @@ export const DataCatalogListingModule = {
         return _apiAccess(entry);
       })
       .exhaustive();
+  },
+
+  /**
+   * The number of rows the listing's pipeline found at the source, from the
+   * `row_count` it wrote into the listing's metadata. Undefined when the
+   * pipeline did not record one.
+   */
+  getMetadataRowCount(
+    entry: Readonly<Pick<DataCatalogListingRead, "metadata">>,
+  ): number | undefined {
+    const { metadata } = entry;
+    if (!isPlainObject(metadata)) {
+      return undefined;
+    }
+    const rowCount = metadata["row_count"];
+    return typeof rowCount === "number" ? rowCount : undefined;
+  },
+
+  /**
+   * The columns of a listing whose codes a `lookup` companion names. A pair
+   * whose column ends in `Type` only says which list a code belongs to, so it
+   * is left out, unless every pair is one.
+   */
+  toCompanionCodeColumns(
+    joinOn: readonly DataCatalogListingCompanionJoinPair[],
+  ): string[] {
+    const columns = joinOn.map((pair) => {
+      return pair.column;
+    });
+    const codeColumns = columns.filter((column) => {
+      return !column.endsWith("Type");
+    });
+    return codeColumns.length > 0 ? codeColumns : columns;
   },
 };

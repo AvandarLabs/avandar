@@ -7,6 +7,7 @@ const RESOURCE = { ckanResourceId: "r1" };
 describe("failureToInvalidDatasetReason", () => {
   it.each<[OpenDataAcquisitionFailure, string]>([
     [{ code: "resource-empty", ...RESOURCE }, "empty_dataset"],
+    [{ code: "odata-empty", apiResourceId: "WHS3_62" }, "empty_dataset"],
     [{ code: "resource-not-found", ...RESOURCE }, "dataset_not_found"],
     [
       { code: "resource-authorization-required", ...RESOURCE },
@@ -58,6 +59,9 @@ describe("failureToInvalidDatasetReason", () => {
     ],
     [{ code: "socrata-unreachable", socrataDatasetId: "erm2-nwe9" }],
     [{ code: "access-shape-invalid", accessKind: "api_resource" }],
+    [{ code: "freshness-probe-invalid", problem: "path-missing" }],
+    [{ code: "odata-unreachable", apiResourceId: "WHS3_62" }],
+    [{ code: "odata-response-invalid", apiResourceId: "WHS3_62" }],
   ])(
     "leaves the listing valid for %o, which says nothing about the dataset",
     (failure) => {

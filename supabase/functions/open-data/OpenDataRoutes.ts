@@ -6,8 +6,10 @@ import {
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import {
+  CompleteSampleBodySchema,
   markColumnTypeSampleUnparseable,
   markListingInvalid,
+  readVouchedCompleteSample,
   respondWithColumnTypeSample,
   UnparseableSampleBodySchema,
   VerifiedColumnTypesBodySchema,
@@ -43,12 +45,36 @@ const MAX_FRESHNESS_RESPONSE_BYTES = 10 * 1024 * 1024;
 const LOST_BUILD_AFTER = "30 minutes";
 
 /**
+ * Records a freshness token the `parquet-cache` route just read from a
+ * listing's source, so its requests in the next few minutes reuse it. Written
+ * with the admin client, since only the service role may record a check.
+ */
+async function _recordFreshnessCheck(
+  catalogListingId: string,
+  sourceVersion: string,
+): Promise<void> {
+  const { error } = await SupabaseAdmin.rpc(
+    "rpc_data_catalog_listings__record_freshness_check",
+    {
+      p_catalog_listing_id: catalogListingId,
+      p_source_version: sourceVersion,
+    },
+  );
+  if (error) {
+    throw error;
+  }
+}
+
+/**
  * Wires a copy request to its listing's freshness check, the build claim,
  * and the pipeline server. Claims and failures are written with the admin
- * client, after the caller's own read showed they may see the listing.
+ * client, after the caller's own read showed they may see the listing. A
+ * build started with a complete sample copies the sample instead of the
+ * source.
  */
 function _createParquetCacheDependencies(
   entry: Readonly<DataCatalogListing.T>,
+  completeSampleCsv: string | undefined,
 ): ParquetCacheDependencies {
   const target = readPipelineServerTarget((name) => {
     return Deno.env.get(name);
@@ -82,6 +108,7 @@ function _createParquetCacheDependencies(
         target,
         catalogListingId: entry.id,
         buildId,
+        completeSampleCsv,
       });
     },
     recordStartFailure: async (buildId, failureCode) => {
@@ -96,6 +123,9 @@ function _createParquetCacheDependencies(
       if (error) {
         throw error;
       }
+    },
+    recordFreshnessCheck: (sourceVersion) => {
+      return _recordFreshnessCheck(entry.id, sourceVersion);
     },
     now: () => {
       return new Date();
@@ -207,26 +237,39 @@ export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
       path: "/data-catalog-listings/:catalogListingId/parquet-cache",
       schema: { catalogListingId: string().uuid() },
     })
-      // Every POST here parses a JSON body, so the caller sends `{}`.
-      .bodySchema(object({}).strict())
-      .action(async ({ pathParams, supabaseClient }): Promise<Response> => {
-        // Read as the caller first, so only a listing they can see is built.
-        const entry = await _readCatalogListing(
-          supabaseClient,
-          pathParams.catalogListingId,
-        );
-        if (entry instanceof Response) {
-          return entry;
-        }
-        const answer = await requestParquetCache({
-          listing: entry,
-          deps: _createParquetCacheDependencies(entry),
-        });
-        return new Response(JSON.stringify(answer), {
-          status: parquetCacheAnswerToStatus(answer),
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }),
+      // Every POST here parses a JSON body, so a caller with no complete
+      // sample to hand back sends `{}`.
+      .bodySchema(
+        object({
+          completeSample: CompleteSampleBodySchema.optional(),
+        }).strict(),
+      )
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // built.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          const completeSampleCsv = await readVouchedCompleteSample({
+            catalogListingId: entry.id,
+            completeSample: body.completeSample,
+          });
+          const answer = await requestParquetCache({
+            listing: entry,
+            deps: _createParquetCacheDependencies(entry, completeSampleCsv),
+            hasCompleteSample: completeSampleCsv !== undefined,
+          });
+          return new Response(JSON.stringify(answer), {
+            status: parquetCacheAnswerToStatus(answer),
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        },
+      ),
   },
   "/data-catalog-listings/:catalogListingId/unparseable": {
     POST: POST({

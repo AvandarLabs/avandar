@@ -183,6 +183,7 @@
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
     "exceljs": "^4.4.0",
+    "fflate": "0.8.3",
     "fuse.js": "^7.1.0",
     "html-to-image": "^1.11.13",
     "idb-keyval": "^6.2.5",

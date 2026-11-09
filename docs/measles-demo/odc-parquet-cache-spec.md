@@ -160,9 +160,10 @@ count matched Socrata's live count exactly.
 ### 2. When a copy is built: on first use, refreshed when stale
 
 An edge route in the `open-data` function,
-`POST /data-catalog-listings/:id/parquet-cache` with a body of `{}`, reads
-the listing as the caller so RLS decides whether they can see it, then
-decides with `requestParquetCache`:
+`POST /data-catalog-listings/:id/parquet-cache` with a body of `{}`, or of
+`{ completeSample: { token, csvText } }` (see "A complete sample becomes the
+copy" below), reads the listing as the caller so RLS decides whether they
+can see it, then decides with `requestParquetCache`:
 
 | Listing state | Response | Side effect |
 |---|---|---|
@@ -173,7 +174,7 @@ decides with `requestParquetCache`:
 | `building`, started within the last 30 minutes | `202 { status: "building" }` | none: the claim returns no id |
 | `building`, started over 30 minutes ago | `202 { status: "building" }` | the claim treats the build as lost and gives a new id |
 | `failed`, under 15 minutes ago, or the listing is invalid, or `copy-unsupported` | `409 { status: "failed", failureCode }` | none |
-| `failed`, over 15 minutes ago | `202 { status: "building" }` | retries the build |
+| `failed`, over 15 minutes ago, or under 15 minutes ago with a vouched complete sample | `202 { status: "building" }` | retries the build |
 | The pipeline server does not accept the build | `409 { status: "failed", failureCode: "pipeline-server-unreachable" }` | releases the claim as that failure, so a later request retries |
 | Not API-backed | `409 { status: "unavailable", reason: "not-api-backed" }` | none |
 | No pipeline server configured | `503 { status: "unavailable", reason: "copies-unavailable" }` | none; an existing copy is still served |
@@ -193,10 +194,41 @@ Demo deploy workflow sets both on the demo project from the `Staging`
 environment's `AVA_PIPELINE_SERVER_URL` variable and secret. Staging and
 production edge secrets are set by hand.
 
-**Callers:** "Add to workspace" and every later load of an added listing.
-Browsing the catalog never starts a build. The preview keeps reading the
-start-of-file sample, so opening a listing never pulls a multi-gigabyte
-source.
+**Callers:** "Add to workspace" and every later load of an added listing,
+plus a column type verification whose sample turned out to be the whole
+source. Browsing the catalog otherwise never starts a build. The preview
+reads a stored Parquet copy when one exists, so opening a listing does not
+call the source API. A CSV or OData listing with no copy yet still reads
+the start-of-file sample, which is capped, so browsing never pulls a
+multi-gigabyte source. While a column recheck is reading that sample, the
+preview keeps showing the copy and replaces it only if the sample's rows
+differ.
+
+#### A complete sample becomes the copy
+
+The column type sample route reads up to 10,000 rows of a Socrata export or
+the first 5 MB of a CKAN file. When that read is the whole source (fewer
+than 10,000 rows, counted without splitting quoted line breaks, or a CKAN
+file that ended before 5 MB), the route answers
+`X-Ava-Column-Type-Sample-Complete: true` and signs the SHA-256 of the
+sample's text, as a browser decodes it, into the sample token.
+
+The browser hands that text back with its token to `/parquet-cache`:
+right after it writes the verified column types, and again on "Add to
+workspace" if the preview read a complete sample in the last 14 minutes.
+The route copies the text only when the token is valid for the listing and
+the text hashes to the signed value, so a caller cannot put rows of its own
+into a copy every workspace reads. Anything else is ignored and the build
+reads the source as usual. A vouched sample also skips the 15-minute wait
+after a failed build, since the build no longer reads the source that
+failed it.
+
+The edge function forwards the text to the pipeline server as
+`completeSampleCsv` in the build request (the route accepts bodies up to
+64 MB). The build still asks the pipeline's download script for the
+source's version, a metadata read only, then converts the text with the
+whole-file CSV reader, so its column types come from every row rather than
+from the Socrata schema the paged reader uses.
 
 ### 3. Who reads the copy
 
@@ -222,12 +254,14 @@ source.
   notification says the data is being prepared and that large datasets can
   take a few minutes to open the first time. A failed build gets a warning
   that the dataset may not open.
-- The catalog preview reads an API-backed CSV listing from the start of its
-  file, as before. Any other API-backed listing (in demo, only Parquet ones)
-  is previewed from its copy's first part, read straight from Storage
-  without calling the route, so browsing never starts a build. Until a
-  workspace adds it and the copy is built, it shows the preview's error
-  state.
+- The catalog preview reads an API-backed listing from its copy's first
+  part when a copy is stored, straight from Storage, so browsing never
+  starts a build and does not call the source API. A CSV or OData listing
+  with no copy yet is read from the column-type sample route. Any other
+  API-backed listing shows the preview's error state until a workspace
+  adds it and the copy is built. While a CSV listing's column types are
+  being rechecked, the preview still shows the copy first and replaces it
+  only if the recheck's rows differ.
 
 ### 4. Schema
 
