@@ -1,11 +1,30 @@
 import { Model } from "@avandar/models";
 import { prop } from "@avandar/utils";
-import { describe, expect, it } from "vitest";
+import { i18n } from "@lingui/core";
+import { describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { fetchMapLayerFeatureList } from "@/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList";
+import { MAP_LAYER_FEATURE_LIST_ROW_KEYS } from "@/clients/maps/MapLayerFeatureList/MapLayerFeatureList.constants";
+import { createSitesAndSchoolsFixture } from "@/clients/maps/MapLayerFeatureList/MapLayerFeatureList.fixtures";
+import { createGeometryLayerFixture } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/__tests__/compileMapLayerSpatialQuery.fixtures";
+import { compileMapLayerSpatialQuery } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
+  return {
+    WorkspaceQuerySession: {
+      runQuery: vi
+        .fn()
+        .mockResolvedValue({ columns: [], data: [], numRows: 0 }),
+    },
+  };
+});
 
 /** A hydrated schools layer drawn from its WKT column, popup on all fields. */
 function _makeSchoolsLayer(): MapLayer.T {
@@ -105,5 +124,129 @@ describe("getQueryLayersFromMapLayers", () => {
     const layer = MapLayer.makeEmpty("unbound");
 
     expect(getQueryLayersFromMapLayers([layer])[0]).toBe(layer);
+  });
+});
+
+/**
+ * Sites as a new latitude and longitude layer has them (only the coordinates
+ * queried, popup on chosen fields), a buffer of them labelled by
+ * `site_name`, and schools filtered by that buffer.
+ */
+function _makeLabelledBufferConfig(): {
+  config: AvaMapConfig.T;
+  sites: MapLayer.T;
+  buffer: MapLayer.T;
+  schools: MapLayer.T;
+} {
+  const fixture = createSitesAndSchoolsFixture();
+  const [siteName, latitude, longitude] = fixture.sites.source.queryColumns;
+  const sites: MapLayer.T = {
+    ...fixture.sites,
+    source: {
+      ...fixture.sites.source,
+      queryColumns: [latitude!, longitude!],
+      sourceColumns: [
+        siteName!,
+        { ...latitude!, id: uuid<QueryColumn.Id>() },
+        { ...longitude!, id: uuid<QueryColumn.Id>() },
+      ],
+    },
+    popup: { columnIds: [], action: undefined },
+  };
+  return {
+    config: {
+      ...fixture.config,
+      layers: [sites, fixture.buffer, fixture.schools],
+    },
+    sites,
+    buffer: fixture.buffer,
+    schools: fixture.schools,
+  };
+}
+
+/** The names of the columns the sites layer, listed first, queries. */
+function _getQueriedSiteNames(layers: readonly MapLayer.T[]): string[] {
+  return getQueryLayersFromMapLayers(layers)[0]!.source.queryColumns.map(
+    prop("baseColumn.name"),
+  );
+}
+
+describe("getQueryLayersFromMapLayers with a labelled buffer", () => {
+  it("queries the ring label column of a source whose popup lists other fields", () => {
+    const { config, sites, buffer } = _makeLabelledBufferConfig();
+    const [querySites] = getQueryLayersFromMapLayers(config.layers);
+
+    expect(querySites!.source.queryColumns.map(prop("id"))).toEqual([
+      ...sites.source.queryColumns.map(prop("id")),
+      buffer.geoBinding?.type === "bufferOfLayer"
+        ? buffer.geoBinding.labelColumn
+        : undefined,
+    ]);
+  });
+
+  it("labels each ring with the site name", () => {
+    const { config, buffer } = _makeLabelledBufferConfig();
+    const plan = compileMapLayerSpatialQuery({
+      layer: buffer,
+      metadata: createGeometryLayerFixture().metadata,
+      overlay: { aoi: undefined, timeRange: undefined },
+      stack: getQueryLayersFromMapLayers(config.layers),
+      zoomBand: 0,
+      simplificationReferenceLatitude: 0,
+    });
+
+    expect(plan.sourcePropertyColumnNames).toEqual(["site_name"]);
+  });
+
+  it("shows the nearest site's name in the feature list", async () => {
+    i18n.loadAndActivate({ locale: "en", messages: {} });
+    const { config, schools } = _makeLabelledBufferConfig();
+    const list = await fetchMapLayerFeatureList({
+      config: { ...config, layers: getQueryLayersFromMapLayers(config.layers) },
+      layerId: schools.id,
+      columnIds: "popup",
+      sort: undefined,
+      limit: undefined,
+      workspaceId: uuid<Workspace.Id>(),
+      datasets: [],
+      datasetColumns: [],
+      i18n,
+    });
+
+    expect(list.columns.map(prop("key"))).toContain(
+      MAP_LAYER_FEATURE_LIST_ROW_KEYS.nearestLabel,
+    );
+  });
+
+  it("leaves a dissolved buffer's source alone", () => {
+    const { config, buffer } = _makeLabelledBufferConfig();
+    const dissolved: MapLayer.T =
+      buffer.geoBinding?.type === "bufferOfLayer"
+        ? { ...buffer, geoBinding: { ...buffer.geoBinding, dissolve: true } }
+        : buffer;
+
+    expect(
+      _getQueriedSiteNames(
+        config.layers.map((layer) => {
+          return layer.id === buffer.id ? dissolved : layer;
+        }),
+      ),
+    ).toEqual(["latitude", "longitude"]);
+  });
+
+  it("never adds a label column to a displaced source", () => {
+    const { config, sites } = _makeLabelledBufferConfig();
+    const displaced = MapLayer.withSensitivity(sites, {
+      mode: "jitter",
+      radiusMeters: 500,
+    });
+
+    expect(
+      _getQueriedSiteNames(
+        config.layers.map((layer) => {
+          return layer.id === sites.id ? displaced : layer;
+        }),
+      ),
+    ).toEqual(["latitude", "longitude"]);
   });
 });

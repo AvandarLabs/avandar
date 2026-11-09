@@ -67,16 +67,31 @@ function _makeQueryColumn(name: string): QueryColumn.T {
   );
 }
 
+/**
+ * A latitude and longitude layer as a new layer has it: only the bound
+ * coordinate columns are queried, and the source's other columns are only
+ * in its hydrated source columns.
+ */
 function _createLatLngLayer(name: string): MapLayer.T {
   const siteName = _makeQueryColumn("site_name");
+  const latitude = _makeQueryColumn("latitude");
+  const longitude = _makeQueryColumn("longitude");
   const layer = MapLayer.makeEmpty(name);
   return {
     ...layer,
-    source: { ...layer.source, queryColumns: [siteName] },
+    source: {
+      ...layer.source,
+      queryColumns: [latitude, longitude],
+      sourceColumns: [
+        siteName,
+        { ...latitude, id: uuid<QueryColumn.Id>() },
+        { ...longitude, id: uuid<QueryColumn.Id>() },
+      ],
+    },
     geoBinding: {
       type: "latLngColumns",
-      latitude: uuid<QueryColumn.Id>(),
-      longitude: uuid<QueryColumn.Id>(),
+      latitude: latitude.id,
+      longitude: longitude.id,
     },
   };
 }
@@ -300,9 +315,33 @@ describe("BufferMapTool", () => {
 
     expect(onBufferConfirm).toHaveBeenCalledWith(
       expect.objectContaining({
-        labelColumn: sites.source.queryColumns[0]!.id,
+        labelColumn: sites.source.sourceColumns![0]!.id,
       }),
     );
+  });
+
+  it("offers every site column but the bound coordinates as a ring label", async () => {
+    spatialAvailability.value = "available";
+    render(
+      <BufferMapTool
+        selectedLayer={_createLatLngLayer("Sites")}
+        onBufferConfirm={vi.fn()}
+      />,
+    );
+
+    await _openBufferForm();
+    fireEvent.click(
+      screen.getByRole("combobox", { name: "Label each ring with" }),
+    );
+    const optionNames = screen
+      .getAllByRole("option", { hidden: true })
+      .map((option) => {
+        return option.textContent;
+      });
+
+    expect(optionNames).toContain("site_name");
+    expect(optionNames).not.toContain("latitude");
+    expect(optionNames).not.toContain("longitude");
   });
 
   it("offers to filter a point layer by the new buffer", async () => {

@@ -52,6 +52,9 @@ const NEAREST_SCHOOL_NAME = "The Clinton School";
 const NEAREST_SCHOOL_DISTANCE = "0.09 mi";
 const NEAREST_SCHOOL_ADDRESS = "10 East 15th Street";
 
+/** The site nearest the nearest school, which the rings are labelled with. */
+const NEAREST_SITE_NAME = "Union Square";
+
 async function _pickOption(
   page: Page,
   scope: Locator,
@@ -132,7 +135,10 @@ async function _addSchoolsLayer(page: Page): Promise<void> {
   ).toBeVisible({ timeout: LONG_WAIT });
 }
 
-/** Buffers the selected sites by half a mile and filters schools by it. */
+/**
+ * Buffers the selected sites by half a mile, labelling each ring with its
+ * site's name, and filters schools by it.
+ */
 async function _bufferSitesAndFilterSchools(page: Page): Promise<void> {
   await page
     .getByRole("button", { name: "Buffer around a layer", exact: true })
@@ -141,6 +147,7 @@ async function _bufferSitesAndFilterSchools(page: Page): Promise<void> {
   // The unit goes first: changing it restates the distance already entered.
   await _pickOption(page, bufferForm, "Unit", "mi");
   await bufferForm.getByRole("textbox", { name: "Distance" }).fill("0.5");
+  await _pickOption(page, bufferForm, "Label each ring with", "site_name");
   await bufferForm.getByRole("button", { name: "Confirm" }).click();
   await _pickOption(
     page,
@@ -272,6 +279,7 @@ test.describe("GIS feature list", () => {
         const firstRow = featureList.getByRole("row").nth(1);
         await expect(firstRow).toContainText(NEAREST_SCHOOL_NAME);
         await expect(firstRow).toContainText(NEAREST_SCHOOL_DISTANCE);
+        await expect(firstRow).toContainText(NEAREST_SITE_NAME);
         await featureList.screenshot({
           path: `${SCREENSHOT_DIR}/feature-list-drawer.png`,
         });

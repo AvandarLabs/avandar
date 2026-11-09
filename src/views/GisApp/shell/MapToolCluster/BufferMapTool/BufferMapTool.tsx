@@ -6,6 +6,7 @@ import { useSyncExternalStore } from "react";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { getBufferLabelColumnsFromMapLayer } from "@/views/GisApp/layers/getBufferLabelColumnsFromMapLayer/getBufferLabelColumnsFromMapLayer";
 import { BufferMapToolPopover } from "@/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolPopover";
 import { UnavailableMapTool } from "@/views/GisApp/shell/MapToolCluster/UnavailableMapTool";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
@@ -76,11 +77,10 @@ function _bufferUnavailableReason(
 function _getLabelColumnOptions(
   layer: MapLayer.T | undefined,
 ): BufferLabelColumnOption[] {
-  const bindingType = layer?.geoBinding?.type;
-  if (bindingType !== "latLngColumns" && bindingType !== "geometryColumn") {
+  if (!layer) {
     return [];
   }
-  return (layer?.source.queryColumns ?? []).map((column) => {
+  return getBufferLabelColumnsFromMapLayer(layer).map((column) => {
     return {
       value: column.id,
       label: QueryColumn.getDerivedColumnName(column),
