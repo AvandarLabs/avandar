@@ -1,6 +1,8 @@
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -10,6 +12,21 @@ import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlP
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { MutableRefObject } from "react";
+
+/**
+ * The chat's attached gadgets and what every gadget the thread mentions
+ * holds, loaded once when the turn starts.
+ */
+export type AgentTurnGadgetContext = {
+  /** The tray, in order. */
+  attachedRefs: readonly Gadget.Ref[];
+  /**
+   * Each referenced gadget's context by `ChatMentionToken.buildRefKey`, or
+   * undefined when loading failed. Then the turn sends no attached or
+   * mentioned block and names every mention as unavailable.
+   */
+  contexts: ReadonlyMap<string, AgentGadgetContext> | undefined;
+};
 
 /** The chat runtime pieces a data agent turn uses, online or offline. */
 export type DataAgentTurnOptions = {
@@ -34,6 +51,12 @@ export type DataAgentTurnOptions = {
    * in the Data Explorer, so their results always go there.
    */
   isOffline?: boolean;
+  /**
+   * Set when the chat has attached gadgets or the thread mentions any.
+   * `apiMessages` then still hold ref tokens: only the agent path reads
+   * them, and it converts them with the conversation's vault.
+   */
+  gadgetContext?: AgentTurnGadgetContext;
 };
 
 /**
@@ -63,6 +86,11 @@ export type DataAgentConversation = AgentConversationState & {
   datasets: readonly DataAgentDataset[];
   /** The page block sent last, to send "unchanged" instead of repeats. */
   lastPageBlock?: string;
+  /**
+   * The attached block built last turn, to send "unchanged" or "cleared"
+   * lines.
+   */
+  lastAttachedBlock?: string;
   /** The agent's run in progress, if any. A conversation runs one at once. */
   activeAsk?: Promise<unknown>;
 };
