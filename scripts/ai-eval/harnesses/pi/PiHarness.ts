@@ -9,6 +9,7 @@ import {
 } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
+import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
@@ -33,9 +34,19 @@ import type {
   DataAgentHost,
   DataAgentUserAnswer,
 } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { SqlLiteralDetectors } from "@/lib/agent/dataAgent/pagePrivacy/findSensitiveSqlLiterals";
 import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type { AssistantMessage } from "@earendil-works/pi-ai";
+
+/** Every COVID dataset column name, lowercased, for the page SQL check. */
+const COVID_COLUMN_NAMES: ReadonlySet<string> = new Set(
+  COVID_DATASETS.flatMap((dataset) => {
+    return dataset.columns.map((column) => {
+      return column.name.toLowerCase();
+    });
+  }),
+);
 
 type QuestionRecorder = {
   question?: EvalQuestion;
@@ -209,30 +220,34 @@ function _toFailedEvalAnswer(
 
 /**
  * The page block as the browser builds it: personal values in page SQL
- * become placeholders from the conversation's vault. A column is personal
- * when `detectPii` flags its name or the question lists it.
+ * become placeholders from the conversation's vault, and are masked in the
+ * page's names and titles. A column is personal when its name looks
+ * personal, when the question lists it, or when it is none of the COVID
+ * datasets' columns (an alias).
  */
 function _buildPageBlock(
   question: EvalQuestion,
   vault: SqlPlaceholderVault,
 ): string | undefined {
   const personalColumns = new Set(question.personalColumns ?? []);
+  const detectors: SqlLiteralDetectors = {
+    isSensitiveColumn: (columnName) => {
+      return (
+        personalColumns.has(columnName) || isPersonalColumnName(columnName)
+      );
+    },
+    isSensitiveValue: isPersonalDataText,
+    knownColumnNames: COVID_COLUMN_NAMES,
+  };
   return question.pageContext
     ? buildAgentPageContextBlock({
         context: question.pageContext,
         aliases: SqlTableAlias.fromDatasets(COVID_DATASETS),
         isSensitive: isPersonalDataText,
         redactSql: (sql) => {
-          return vault.redact(sql, {
-            isSensitiveColumn: (columnName) => {
-              return (
-                personalColumns.has(columnName) ||
-                detectPii({ columnName }).hits.length > 0
-              );
-            },
-            isSensitiveValue: isPersonalDataText,
-          });
+          return vault.redact(sql, detectors);
         },
+        maskText: vault.maskText,
       })
     : undefined;
 }
