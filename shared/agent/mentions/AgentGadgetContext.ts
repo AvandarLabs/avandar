@@ -62,6 +62,24 @@ export function getUnavailableGadgetName(ref: Gadget.Ref): string {
   return UNAVAILABLE_NAMES[ref.gadgetType];
 }
 
+const TYPE_NAMES: Readonly<Record<Gadget.Type, string>> = {
+  dashboard: "a dashboard",
+  dashboard_tile: "a chart",
+  dataset: "a dataset",
+  map: "a map",
+  concept: "a case type",
+  individual: "a case",
+};
+
+/**
+ * A gadget named by its type only, such as "a chart". Today's hosted chat
+ * hears mentions this way: it has no vault to mask names with, so it never
+ * gets a gadget's real name. Model-facing English.
+ */
+export function getGadgetTypeName(ref: Gadget.Ref): string {
+  return TYPE_NAMES[ref.gadgetType];
+}
+
 /**
  * A gadget's own name before any masking: a tile's title, an unavailable
  * gadget's type phrase, and every other gadget's name. Use it where the

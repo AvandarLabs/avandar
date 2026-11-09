@@ -10,7 +10,8 @@ import { createAgentGadgetContextLoader } from "@/components/ChatPanel/useAvanda
 import {
   buildLocalGadgetName,
   loadTurnGadgetContext,
-  toModelMessages,
+  toHostedChatMessages,
+  toLocalModelMessages,
 } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
 import { applyChatModelTurnResponse } from "@/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
@@ -110,8 +111,18 @@ function _toApiMessages(messages: ThreadMessages): ChatClientMessage.T[] {
 type TurnMessages = {
   /** The thread with its ref tokens. Only the agent path reads it. */
   apiMessages: ChatClientMessage.T[];
-  /** The thread with each mention as `@"Name"`, for every other path. */
-  modelMessages: readonly ChatClientMessage.T[];
+  /**
+   * The thread with each mention as `@"Name"` with its real name, for uses
+   * on the device: offline turns, the agent path's consent check, and
+   * applying a response. Never posted to a hosted model.
+   */
+  localMessages: readonly ChatClientMessage.T[];
+  /**
+   * The thread as today's hosted chat receives it, each mention named by
+   * its type only (`@"a chart"`). Its consent check runs on this text, so
+   * a consent ack matches the message it is posted with.
+   */
+  hostedChatMessages: readonly ChatClientMessage.T[];
   gadgetContext: AgentTurnGadgetContext | undefined;
   /** Gadgets the latest user message mentions. */
   mentionCount: number;
@@ -122,8 +133,8 @@ type TurnMessages = {
 /**
  * Builds the turn's thread and loads its attached and mentioned gadgets
  * once. Ref tokens reach only the agent path, which names them with the
- * conversation's vault. Everything else (the consent check, today's chat,
- * offline turns, analytics) reads `@"Name"`.
+ * conversation's vault. Offline turns and labels read real names; today's
+ * hosted chat reads each mention's type only.
  */
 async function _prepareTurnMessages(
   options: Readonly<{
@@ -143,7 +154,8 @@ async function _prepareTurnMessages(
     .find(propEq("role", "user"));
   return {
     apiMessages,
-    modelMessages: toModelMessages(apiMessages, gadgetContext),
+    localMessages: toLocalModelMessages(apiMessages, gadgetContext),
+    hostedChatMessages: toHostedChatMessages(apiMessages),
     gadgetContext,
     mentionCount: ChatMentionToken.refsFromText(lastUserMessage?.content ?? "")
       .length,
@@ -331,13 +343,18 @@ export function createChatModelAdapter(
       if (isGenerationStale()) {
         return { content: [] };
       }
-      const { apiMessages, modelMessages, gadgetContext } = turnMessages;
+      const { apiMessages, localMessages, hostedChatMessages, gadgetContext } =
+        turnMessages;
+      // The text the consent check reads: real names on the agent path,
+      // and on today's chat the type-only text it posts, so the consent
+      // ack's hash matches the posted message.
+      const consentMessages = isAgentTurn ? localMessages : hostedChatMessages;
 
       // Bias-check the latest user-typed message before it leaves the
       // browser. Clarification-answer markers and hidden view-change lines
       // skip consent here (clarification answers are pre-vetted via
       // `crossBoundary`; view events are synthetic).
-      const lastUserMessage = [...modelMessages]
+      const lastUserMessage = [...consentMessages]
         .reverse()
         .find(propEq("role", "user"));
 
@@ -379,7 +396,7 @@ export function createChatModelAdapter(
       // entries here and attach them to the backend request.
       const consentAcks = (
         await Promise.all(
-          modelMessages.map(
+          consentMessages.map(
             async (message, messageIndex): Promise<ConsentAck | undefined> => {
               if (message.role !== "user") {
                 return undefined;
@@ -447,7 +464,7 @@ export function createChatModelAdapter(
       ): Promise<ChatModelRunResult> => {
         return applyChatModelTurnResponse({
           response,
-          apiMessages: modelMessages,
+          apiMessages: localMessages,
           questionLabel: turnMessages.questionLabel,
           currentUser,
           currentPageContext,
@@ -486,7 +503,7 @@ export function createChatModelAdapter(
         return runLocalChatTurn({
           dataAgentTurn: {
             ...dataAgentTurn,
-            apiMessages: modelMessages,
+            apiMessages: localMessages,
             gadgetContext: undefined,
             questionLabel: turnMessages.questionLabel,
           },
@@ -523,7 +540,7 @@ export function createChatModelAdapter(
         }
       }
 
-      const currentMessagesKey = chatMessagesKey(modelMessages);
+      const currentMessagesKey = chatMessagesKey(hostedChatMessages);
       const cachedTurn = lastTurnRef.current;
       const retryContext =
         cachedTurn && cachedTurn.messagesKey === currentMessagesKey
@@ -535,7 +552,7 @@ export function createChatModelAdapter(
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId },
           body: {
-            messages: [...modelMessages],
+            messages: [...hostedChatMessages],
             context: currentPageContext,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
             ...(retryContext ? { retryContext } : {}),

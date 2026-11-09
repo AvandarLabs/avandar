@@ -3,7 +3,8 @@ import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import {
   buildLocalGadgetName,
   loadTurnGadgetContext,
-  toModelMessages,
+  toHostedChatMessages,
+  toLocalModelMessages,
 } from "./loadTurnGadgetContext";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
@@ -89,21 +90,21 @@ describe("buildLocalGadgetName", () => {
   });
 });
 
-describe("toModelMessages", () => {
-  it("names each token for every non-agent path", () => {
-    const messages = toModelMessages([_message("user", `Show ${TOKEN_A}`)], {
-      attachedRefs: [],
-      contexts: new Map([[KEY_A, DATASET_A]]),
-    });
+describe("toLocalModelMessages", () => {
+  it("names each token with its real name for on-device uses", () => {
+    const messages = toLocalModelMessages(
+      [_message("user", `Show ${TOKEN_A}`)],
+      { attachedRefs: [], contexts: new Map([[KEY_A, DATASET_A]]) },
+    );
 
     expect(messages[0]?.content).toBe('Show @"US deaths"');
   });
 
   it("names unknown mentions as unavailable", () => {
-    const messages = toModelMessages([_message("user", `Show ${TOKEN_A}`)], {
-      attachedRefs: [],
-      contexts: undefined,
-    });
+    const messages = toLocalModelMessages(
+      [_message("user", `Show ${TOKEN_A}`)],
+      { attachedRefs: [], contexts: undefined },
+    );
 
     expect(messages[0]?.content).toBe('Show @"an unavailable dataset"');
   });
@@ -111,7 +112,7 @@ describe("toModelMessages", () => {
   it("leaves assistant messages alone", () => {
     const reply = _message("assistant", `I saw ${TOKEN_A}`);
 
-    const messages = toModelMessages([reply], {
+    const messages = toLocalModelMessages([reply], {
       attachedRefs: [],
       contexts: undefined,
     });
@@ -122,6 +123,30 @@ describe("toModelMessages", () => {
   it("returns the same messages when there is no context", () => {
     const apiMessages = [_message("user", "hi")];
 
-    expect(toModelMessages(apiMessages, undefined)).toBe(apiMessages);
+    expect(toLocalModelMessages(apiMessages, undefined)).toBe(apiMessages);
+  });
+});
+
+describe("toHostedChatMessages", () => {
+  it("names each mention by its type only, never its name or id", () => {
+    const tileRef: Gadget.Ref = {
+      gadgetType: "dashboard_tile",
+      gadgetId: REF_B.gadgetId,
+      subId: "block-1",
+    };
+    const messages = toHostedChatMessages([
+      _message(
+        "user",
+        `Show ${TOKEN_A} and ${ChatMentionToken.buildToken(tileRef)}`,
+      ),
+    ]);
+
+    expect(messages[0]?.content).toBe('Show @"a dataset" and @"a chart"');
+  });
+
+  it("leaves assistant messages alone", () => {
+    const reply = _message("assistant", `I saw ${TOKEN_A}`);
+
+    expect(toHostedChatMessages([reply])[0]).toBe(reply);
   });
 });

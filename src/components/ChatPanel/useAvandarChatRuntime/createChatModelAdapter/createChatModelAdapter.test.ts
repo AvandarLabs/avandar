@@ -629,28 +629,48 @@ describe("createChatModelAdapter with mentions", () => {
     window.localStorage.clear();
   });
 
-  it("sends today's chat names, never tokens", async () => {
+  it("sends today's chat each mention's type, never its name or token", async () => {
     await _askWithMention("dashboards");
 
     expect(loadGadgetsMock).toHaveBeenCalledWith([DATASET_REF]);
     expect(_postedLastMessage()).toMatchObject({
       role: "user",
-      content: 'Show @"US deaths"',
+      content: 'Show @"a dataset"',
     });
-    expect(JSON.stringify(apiPostMock.mock.calls[0]![0].body)).not.toContain(
-      "@{",
-    );
+    const body = JSON.stringify(apiPostMock.mock.calls[0]![0].body);
+    expect(body).not.toContain("@{");
+    expect(body).not.toContain("US deaths");
+    expect(body).not.toContain(DATASET_REF.gadgetId);
   });
 
-  it("names mentions as unavailable in today's chat when loading fails", async () => {
+  it("names mentions by type in today's chat when loading fails", async () => {
     loadGadgetsMock.mockRejectedValue(new Error("network"));
 
     await _askWithMention("dashboards");
 
-    expect(_postedLastMessage().content).toBe('Show @"an unavailable dataset"');
+    expect(_postedLastMessage().content).toBe('Show @"a dataset"');
   });
 
-  it("runs the consent check on the named text", async () => {
+  it("runs today's chat consent check on the text it posts", async () => {
+    detectBiasMock.mockReturnValue({
+      hits: [{ category: "loaded_framing", label: "x", sample: "x" }],
+    });
+
+    await _askWithMention("dashboards", [], {
+      userRef: { current: { id: "user-1" } },
+    } as unknown as Partial<CreateChatModelAdapterOptions>);
+
+    expect(detectBiasMock).toHaveBeenCalledWith('Show @"a dataset"');
+    expect(decideConsentMock).toHaveBeenCalledWith(
+      expect.objectContaining({ text: 'Show @"a dataset"' }),
+    );
+    expect(PendingAcks.consumeAckForText).toHaveBeenCalledWith(
+      'Show @"a dataset"',
+    );
+  });
+
+  it("runs the agent path's consent check on the named text", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
     detectBiasMock.mockReturnValue({
       hits: [{ category: "loaded_framing", label: "x", sample: "x" }],
     });
@@ -847,5 +867,98 @@ describe("createChatModelAdapter with mentions", () => {
 
     expect(result).toEqual({ content: [] });
     expect(apiPostMock).not.toHaveBeenCalled();
+  });
+});
+
+/*
+ * Written by the 1B adversarial privacy review. Today's chat goes to the
+ * hosted model, so a mention it names must be hidden the way the agent
+ * path hides it: a title that looks personal becomes "Untitled chart", and
+ * a value the gadget's own SQL filters on never reaches the request.
+ */
+const PERSONAL_TILE_REF: Gadget.Ref = {
+  gadgetType: "dashboard_tile",
+  gadgetId: "ffffffff-6666-4666-8666-ffffffffffff",
+  subId: "block-1",
+};
+const PERSONAL_TILE_TOKEN = ChatMentionToken.buildToken(PERSONAL_TILE_REF);
+
+/** A thread that mentioned a tile with the switch on, then a follow-up. */
+async function _askAfterTileMention(
+  app: ChatPageContext.T["app"],
+  tile: { title: string; sql: string },
+): Promise<string> {
+  loadGadgetsMock.mockResolvedValue(
+    new Map([
+      [
+        ChatMentionToken.buildRefKey(PERSONAL_TILE_REF),
+        {
+          kind: "dashboard_tile",
+          ref: PERSONAL_TILE_REF,
+          dashboardName: "Clinic",
+          tile: { ...tile, chartType: "bar" },
+        } satisfies AgentGadgetContext,
+      ],
+    ]),
+  );
+  await _createAdapter(app).run({
+    messages: [
+      {
+        role: "user",
+        content: [{ type: "text", text: `Who is in ${PERSONAL_TILE_TOKEN}?` }],
+        metadata: {},
+      },
+      {
+        role: "assistant",
+        content: [{ type: "text", text: "Two people." }],
+        metadata: {},
+      },
+      {
+        role: "user",
+        content: [{ type: "text", text: "And in total?" }],
+        metadata: {},
+      },
+    ],
+  } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+  return JSON.stringify(apiPostMock.mock.calls[0]![0].body);
+}
+
+describe("createChatModelAdapter mention privacy leaks", () => {
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    loadGadgetsMock.mockReset();
+    detectBiasMock.mockReset().mockReturnValue({ hits: [] });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it("never sends today's chat a mentioned title that looks personal, with the switch off", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    const sent = await _askAfterTileMention("dashboards", {
+      title: "Calls to jane.doe@example.com",
+      sql: "SELECT 1",
+    });
+
+    expect(sent).not.toContain("jane.doe");
+  });
+
+  it("never sends today's chat a value the mentioned tile's own SQL filters on, in the case designer", async () => {
+    isAgentEnabledMock.mockReturnValue(true);
+
+    const sent = await _askAfterTileMention("case-manager", {
+      title: "Visits by Jane Doe",
+      sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
+    });
+
+    expect(sent).not.toContain("Jane");
   });
 });

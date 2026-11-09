@@ -1,5 +1,6 @@
 import {
   getAgentGadgetName,
+  getGadgetTypeName,
   getUnavailableGadgetName,
 } from "$/agent/mentions/AgentGadgetContext";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
@@ -63,8 +64,9 @@ export async function loadTurnGadgetContext(
 
 /**
  * A gadget's name as the user's own device shows it, unmasked. For labels,
- * the consent check, today's chat, and offline turns. Never for the agent
- * path, which masks names first.
+ * the agent path's consent check, and offline turns. Never for a hosted
+ * request: the agent path masks names first, and today's chat names each
+ * mention by its type only.
  */
 export function buildLocalGadgetName(
   gadgetContext: AgentTurnGadgetContext | undefined,
@@ -79,18 +81,11 @@ export function buildLocalGadgetName(
   };
 }
 
-/**
- * The thread with each user message's tokens written as `@"Name"`, for
- * every path but the agent's. The same array when there is no context.
- */
-export function toModelMessages(
+/** The thread with each user message's tokens written by `nameOf`. */
+function _nameUserMessageTokens(
   apiMessages: readonly ChatClientMessage.T[],
-  gadgetContext: AgentTurnGadgetContext | undefined,
+  nameOf: (ref: Gadget.Ref) => string,
 ): readonly ChatClientMessage.T[] {
-  if (!gadgetContext) {
-    return apiMessages;
-  }
-  const nameOf = buildLocalGadgetName(gadgetContext);
   return apiMessages.map((message) => {
     return message.role === "user"
       ? {
@@ -99,4 +94,35 @@ export function toModelMessages(
         }
       : message;
   });
+}
+
+/**
+ * The thread with each user message's tokens written as `@"Name"` with
+ * real, unmasked names, for uses that stay on the device: offline models,
+ * the agent path's consent check, and labels. Never send it to a hosted
+ * model. The same array when there is no context.
+ */
+export function toLocalModelMessages(
+  apiMessages: readonly ChatClientMessage.T[],
+  gadgetContext: AgentTurnGadgetContext | undefined,
+): readonly ChatClientMessage.T[] {
+  if (!gadgetContext) {
+    return apiMessages;
+  }
+  return _nameUserMessageTokens(
+    apiMessages,
+    buildLocalGadgetName(gadgetContext),
+  );
+}
+
+/**
+ * The thread as today's hosted chat receives it: each mention named by its
+ * type only, such as `@"a chart"`. Today's chat has no vault to mask names
+ * with, so it takes no loaded context and can never get a real name, a
+ * token, or an id.
+ */
+export function toHostedChatMessages(
+  apiMessages: readonly ChatClientMessage.T[],
+): readonly ChatClientMessage.T[] {
+  return _nameUserMessageTokens(apiMessages, getGadgetTypeName);
 }

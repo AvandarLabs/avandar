@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getAgentGadgetName } from "$/agent/mentions/AgentGadgetContext.ts";
+import {
+  getAgentGadgetName,
+  getGadgetTypeName,
+} from "$/agent/mentions/AgentGadgetContext.ts";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext.ts";
 
 const ID = "11111111-1111-4111-8111-111111111111";
@@ -32,5 +35,24 @@ describe("getAgentGadgetName", () => {
         ref: { gadgetType: "map", gadgetId: ID, subId: null },
       }),
     ).toBe("an unavailable map");
+  });
+});
+
+describe("getGadgetTypeName", () => {
+  it.each([
+    ["dashboard", "a dashboard"],
+    ["dashboard_tile", "a chart"],
+    ["dataset", "a dataset"],
+    ["map", "a map"],
+    ["concept", "a case type"],
+    ["individual", "a case"],
+  ] as const)("names a %s by its type only", (gadgetType, name) => {
+    expect(
+      getGadgetTypeName({
+        gadgetType,
+        gadgetId: "11111111-1111-4111-8111-111111111111",
+        subId: null,
+      }),
+    ).toBe(name);
   });
 });
