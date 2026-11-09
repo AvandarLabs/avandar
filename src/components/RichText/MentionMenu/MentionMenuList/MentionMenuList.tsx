@@ -26,8 +26,18 @@ export type MentionMenuSelection =
   | { kind: "person"; candidate: MentionCandidate }
   | { kind: "gadget"; display: "link" | "embed"; result: GadgetSearchResult };
 
+/**
+ * Where the menu runs. `comment` offers members and every gadget, inserted
+ * as a link or an embed. `chat` offers the chat's gadget types as links
+ * only, with no audience warning, because only the user sees their chat.
+ */
+export type MentionMenuVariant = "comment" | "chat";
+
 /** The props `createMentionMenuSuggestion` renders the list with. */
 export type MentionMenuListProps = {
+  /** Defaults to `comment`. */
+  variant?: MentionMenuVariant;
+
   groups: readonly MentionMenuGroup[];
 
   /**
@@ -132,7 +142,10 @@ export const MentionMenuList = forwardRef<
             buildOptionId={buildOptionId}
           />
           {highlightedItem?.kind === "gadget" ? (
-            <MentionMenuFooter result={highlightedItem.result} />
+            <MentionMenuFooter
+              result={highlightedItem.result}
+              variant={props.variant}
+            />
           ) : null}
         </Combobox.Dropdown>
       </Combobox>

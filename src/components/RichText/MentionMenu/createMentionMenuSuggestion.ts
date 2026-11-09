@@ -1,4 +1,5 @@
 import { ReactRenderer } from "@tiptap/react";
+import { isChatMentionType } from "$/agent/mentions/ChatMentionToken";
 import { GADGET_TYPES } from "$/models/gadgets/Gadget/Gadget";
 import { searchGadgets } from "@/clients/gadgets/searchGadgets/searchGadgets";
 import { buildMentionMenuGroups } from "@/components/RichText/MentionMenu/buildMentionMenuGroups/buildMentionMenuGroups";
@@ -9,6 +10,7 @@ import type {
   MentionMenuListHandle,
   MentionMenuListProps,
   MentionMenuSelection,
+  MentionMenuVariant,
 } from "@/components/RichText/MentionMenu/MentionMenuList/MentionMenuList";
 import type { MentionCandidate } from "@/components/RichText/UserMention/filterMentionCandidates";
 import type { Editor, Range } from "@tiptap/core";
@@ -54,16 +56,18 @@ function _getQueryRangeWithSpace(editor: Editor, range: Range): Range {
 /**
  * Inserts what the author chose, in place of the typed `@` query: a member
  * as a mention followed by a space, or a gadget as a link or an embed. An
- * embed that cannot go at the cursor is inserted as a link instead.
+ * embed that cannot go at the cursor is inserted as a link instead. The
+ * chat variant always inserts a link.
  */
 function _insertSelection(
   options: Readonly<{
     editor: Editor;
     range: Range;
     selection: MentionMenuSelection;
+    variant: MentionMenuVariant;
   }>,
 ): void {
-  const { editor, selection } = options;
+  const { editor, selection, variant } = options;
   const queryRange = _getQueryRangeWithSpace(editor, options.range);
   if (selection.kind === "person") {
     editor
@@ -83,7 +87,7 @@ function _insertSelection(
     .focus()
     .deleteRange(queryRange)
     .command(({ commands }) => {
-      return selection.display === "embed"
+      return variant === "comment" && selection.display === "embed"
         ? commands.insertGadgetEmbed(ref) || commands.insertGadgetLink(ref)
         : commands.insertGadgetLink(ref);
     })
@@ -138,20 +142,39 @@ function _startGadgetSearch(
   };
 }
 
+/** The search results the variant offers: the chat leaves out cases. */
+function _filterGadgetsForVariant(
+  gadgets: readonly GadgetSearchResult[],
+  variant: MentionMenuVariant,
+): readonly GadgetSearchResult[] {
+  return variant === "chat"
+    ? gadgets.filter((result) => {
+        return isChatMentionType(result.ref.gadgetType);
+      })
+    : gadgets;
+}
+
 function _buildListProps(
   props: SuggestionProps<MentionCandidate>,
   search: GadgetSearchState,
+  variant: MentionMenuVariant,
 ): MentionMenuListProps {
   return {
+    variant,
     groups: buildMentionMenuGroups({
-      gadgets: search.gadgets,
+      gadgets: _filterGadgetsForVariant(search.gadgets, variant),
       people: props.items,
     }),
     isSearching: search.isSearching,
     searchFailed: search.searchFailed,
     clientRect: props.clientRect,
     command: (selection) => {
-      _insertSelection({ editor: props.editor, range: props.range, selection });
+      _insertSelection({
+        editor: props.editor,
+        range: props.range,
+        selection,
+        variant,
+      });
     },
     editingArea: props.editor.view.dom,
   };
@@ -214,7 +237,10 @@ function _createGadgetSearchSession(
  * query: people filter at once, and gadgets reload through a debounced
  * search whenever a workspace is known.
  */
-function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
+function _createMentionMenuRenderer(
+  getWorkspaceId: () => string | undefined,
+  variant: MentionMenuVariant,
+) {
   let renderer:
     | ReactRenderer<MentionMenuListHandle, MentionMenuListProps>
     | undefined;
@@ -222,7 +248,7 @@ function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
   const rerender = () => {
     if (latestProps) {
       renderer?.updateProps(
-        _buildListProps(latestProps, gadgetSearch.getState()),
+        _buildListProps(latestProps, gadgetSearch.getState(), variant),
       );
     }
   };
@@ -232,7 +258,7 @@ function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
     onStart: (props: SuggestionProps<MentionCandidate>) => {
       latestProps = props;
       renderer = new ReactRenderer(MentionMenuList, {
-        props: _buildListProps(props, gadgetSearch.getState()),
+        props: _buildListProps(props, gadgetSearch.getState(), variant),
         editor: props.editor,
       });
       document.body.appendChild(renderer.element);
@@ -259,25 +285,32 @@ function _createMentionMenuRenderer(getWorkspaceId: () => string | undefined) {
 }
 
 /**
- * Suggestion options for the comment composer's `@` menu, which offers
- * workspace members and, when `getWorkspaceId` returns a workspace, the
- * gadgets the author can open there. Both getters are read on every
- * keystroke, so the menu follows the latest members and workspace. Without
- * a workspace the gadget search never runs.
+ * Suggestion options for the `@` menu. The default `comment` variant is the
+ * comment composer's: workspace members and, when `getWorkspaceId` returns a
+ * workspace, the gadgets the author can open there. The `chat` variant
+ * offers no members and drops cases from the search, so it needs no
+ * `getCandidates`. Both getters are read on every keystroke, so the menu
+ * follows the latest members and workspace. Without a workspace the gadget
+ * search never runs.
  */
 export function createMentionMenuSuggestion(
   options: Readonly<{
-    getCandidates: () => readonly MentionCandidate[];
+    getCandidates?: () => readonly MentionCandidate[];
     getWorkspaceId: () => string | undefined;
+    /** Defaults to `comment`. */
+    variant?: MentionMenuVariant;
   }>,
 ): MentionOptions["suggestion"] {
+  const variant = options.variant ?? "comment";
   return {
     char: "@",
     items: ({ query }) => {
-      return filterMentionCandidates(options.getCandidates(), query);
+      return variant === "chat"
+        ? []
+        : filterMentionCandidates(options.getCandidates?.() ?? [], query);
     },
     render: () => {
-      return _createMentionMenuRenderer(options.getWorkspaceId);
+      return _createMentionMenuRenderer(options.getWorkspaceId, variant);
     },
   };
 }
