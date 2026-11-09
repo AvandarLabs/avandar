@@ -328,6 +328,11 @@ msgstr "Le {chartName} ne peut pas être affiché."
 msgid "Select {0}"
 msgstr "Sélectionnez {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "A query result's rows, only when you run one of its tools on that result"
+msgstr "Les lignes du résultat d’une requête, uniquement lorsque vous exécutez "
+"l’un de ses outils sur ce résultat"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "Autoriser la synchronisation en ligne"
@@ -2216,6 +2221,10 @@ msgstr "Annuler"
 msgid "One dataset is one tab."
 msgstr "Un jeu de données correspond à un onglet."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Data it can read"
+msgstr "Données qu’il peut lire"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "Permissions enregistrées"
@@ -2367,6 +2376,10 @@ msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "Incluez les paramètres z, x et y à l’emplacement où le serveur attend "
 "l’index de tuile."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Data Explorer toolbar: {toolbarCommands}"
+msgstr "Barre d’outils de l’explorateur de données : {toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2969,10 +2982,6 @@ msgstr "Deux statuts portent le même nom. Donnez à chacun son propre nom."
 msgid "Its features are removed from this workspace."
 msgstr "Ses fonctionnalités sont supprimées de cet espace de travail."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "Reads the query result you run it on"
-msgstr "Lit le résultat de la requête sur lequel vous l’exécutez"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Dernière mise à jour"
@@ -3212,6 +3221,10 @@ msgstr "PDF téléchargé."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "ID de l'espace de travail"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "What it adds"
+msgstr "Ce qu’il ajoute"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -4911,7 +4924,7 @@ msgstr "Le fichier source n’est pas dans un format qu’Avandar peut lire comm
 msgid "Image"
 msgstr "Image"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "N’utilise aucune donnée de l’espace de travail."
 
@@ -5309,6 +5322,10 @@ msgstr "couverture"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clarification answer"
 msgstr "Réponse de clarification"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Chart types: {chartTypes}"
+msgstr "Types de graphiques : {chartTypes}"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
@@ -5968,6 +5985,10 @@ msgstr "n’est pas"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "Intégrer"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Nothing yet."
+msgstr "Rien pour le moment."
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -9063,6 +9084,11 @@ msgstr "Valeur par défaut"
 msgid "{0} areas have no data"
 msgstr "{0} zones n’ont pas de données"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Its charts see only the rows of the chart they draw"
+msgstr "Ses graphiques n’affichent que les lignes du graphique qu’ils "
+"représentent"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "Obligatoire"
@@ -9447,6 +9473,10 @@ msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "Cette {resource} est accessible à toute personne ayant la permission "
 "{app} {0}."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See less"
+msgstr "Voir moins"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "Ambre"
@@ -9583,6 +9613,10 @@ msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 msgstr "Cet onglet ne se trouve plus dans cette feuille de calcul. Il a "
 "peut-être été renommé ou supprimé. Sélectionnez à nouveau la feuille, "
 "puis choisissez un onglet."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See more"
+msgstr "Voir plus"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -11216,12 +11250,6 @@ msgstr "Commencer"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
 msgstr "En bas à gauche"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-"other {Adds # buttons to Data Explorer}}"
-msgstr "{dataExplorerToolbarItems, plural, one {Ajoute # bouton à l’Explorateur "
-"de données} other {Ajoute # boutons à l’Explorateur de données}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"

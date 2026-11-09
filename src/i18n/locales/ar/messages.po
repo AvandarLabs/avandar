@@ -322,6 +322,10 @@ msgstr "لا يمكن عرض {chartName}."
 msgid "Select {0}"
 msgstr "حدّد {0}"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "A query result's rows, only when you run one of its tools on that result"
+msgstr "صفوف نتيجة استعلام، فقط عند تشغيل إحدى أدواته على تلك النتيجة"
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow online syncing"
 msgstr "السماح بالمزامنة عبر الإنترنت"
@@ -2164,6 +2168,10 @@ msgstr "تراجع"
 msgid "One dataset is one tab."
 msgstr "كل مجموعة بيانات هي علامة تبويب واحدة."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Data it can read"
+msgstr "البيانات التي يمكنه قراءتها"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
 msgstr "تم حفظ الأذونات"
@@ -2310,6 +2318,10 @@ msgstr "المضيف"
 msgid "Include the z, x and y placeholders where the server expects the tile "
 "index."
 msgstr "أدرج العناصر النائبة z وx وy حيث يتوقع الخادم فهرس التجانب."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Data Explorer toolbar: {toolbarCommands}"
+msgstr "شريط أدوات مستكشف البيانات: {toolbarCommands}"
 
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
@@ -2899,10 +2911,6 @@ msgstr "هناك حالتان تحملان الاسم نفسه. امنح كل و
 msgid "Its features are removed from this workspace."
 msgstr "تمت إزالة ميزاته من مساحة العمل هذه."
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "Reads the query result you run it on"
-msgstr "يقرأ نتيجة الاستعلام الذي تشغّله عليه"
-
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "آخر تحديث"
@@ -3131,6 +3139,10 @@ msgstr "تم تنزيل PDF."
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "What it adds"
+msgstr "ما يضيفه"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
@@ -4793,7 +4805,7 @@ msgstr "الملف المصدر ليس بتنسيق يستطيع Avandar قرا�
 msgid "Image"
 msgstr "صورة"
 
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Uses no workspace data."
 msgstr "لا يستخدم أي بيانات من مساحة العمل."
 
@@ -5187,6 +5199,10 @@ msgstr "التغطية"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Clarification answer"
 msgstr "إجابة توضيحية"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Chart types: {chartTypes}"
+msgstr "أنواع المخططات: {chartTypes}"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
@@ -5832,6 +5848,10 @@ msgstr "ليس"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "تضمين"
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
+msgid "Nothing yet."
+msgstr "لا شيء حتى الآن."
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -8853,6 +8873,10 @@ msgstr "القيمة الافتراضية"
 msgid "{0} areas have no data"
 msgstr "لا تحتوي {0} مناطق على بيانات"
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
+msgid "Its charts see only the rows of the chart they draw"
+msgstr "لا ترى مخططاته سوى صفوف المخطط الذي ترسمه"
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 msgid "Required"
 msgstr "مطلوب"
@@ -9230,6 +9254,10 @@ msgstr "تحتوي بعض الصفوف على خط عرض أو خط طول فا�
 msgid "This {resource} is accessible to anyone with {app} {0} permission."
 msgstr "هذا {resource} متاح لأي شخص لديه إذن {app} {0}."
 
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See less"
+msgstr "عرض أقل"
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Amber"
 msgstr "كهرماني"
@@ -9365,6 +9393,10 @@ msgid "That tab is no longer in this spreadsheet. It may have been renamed or "
 "deleted. Pick the sheet again and choose a tab."
 msgstr "لم تعد علامة التبويب هذه موجودة في جدول البيانات. ربما تمت إعادة "
 "تسميتها أو حذفها. اختر الورقة مرة أخرى وحدد علامة تبويب."
+
+#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDetailsToggle.tsx
+msgid "See more"
+msgstr "عرض المزيد"
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 msgid "Try again."
@@ -10957,12 +10989,6 @@ msgstr "ابدأ الآن"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Bottom left"
 msgstr "أسفل اليسار"
-
-#: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
-msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
-"other {Adds # buttons to Data Explorer}}"
-msgstr "{dataExplorerToolbarItems, plural, one {يضيف زرًا واحدًا إلى Data "
-"Explorer} other {يضيف # أزرار إلى Data Explorer}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"

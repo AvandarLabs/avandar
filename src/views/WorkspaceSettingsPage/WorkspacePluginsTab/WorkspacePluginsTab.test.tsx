@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
-import { cleanup, render, screen, within } from "@/test-utils";
+import { cleanup, fireEvent, render, screen, within } from "@/test-utils";
 import { WorkspacePluginsTab } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type {
@@ -99,13 +99,17 @@ function _makeManifestModule(
       icon: "chart-dots",
       permissions: ["data:context"],
       contributes: {
-        commands: [{ id: "run", title: "%name%", icon: "chart-dots" }],
+        commands: [{ id: "run", title: "%run.title%", icon: "chart-dots" }],
         menus: { "dataExplorer.toolbar": [{ command: "run" }] },
         vizTypes: [],
       },
     },
     strings: {
-      en: { name: "Epidemiology", description: "Charts disease spread." },
+      en: {
+        name: "Epidemiology",
+        description: "Charts disease spread.",
+        "run.title": "Linear regression",
+      },
     },
     icons,
   } as unknown as PluginManifestModule;
@@ -179,7 +183,7 @@ describe("WorkspacePluginsTab", () => {
       within(card).getByText("Charts disease spread."),
     ).toBeInTheDocument();
     expect(within(card).getByText("Not installed")).toBeInTheDocument();
-    expect(_getButtonLabelsIn(card)).toEqual(["Install"]);
+    expect(_getButtonLabelsIn(card)).toEqual(["See more", "Install"]);
   });
 
   it("offers Disable and Uninstall for an installed plugin", async () => {
@@ -190,7 +194,37 @@ describe("WorkspacePluginsTab", () => {
 
     const card = await screen.findByRole("region", { name: "Epidemiology" });
     expect(within(card).getByText("Installed")).toBeInTheDocument();
-    expect(_getButtonLabelsIn(card)).toEqual(["Disable", "Uninstall"]);
+    expect(_getButtonLabelsIn(card)).toEqual([
+      "See more",
+      "Disable",
+      "Uninstall",
+    ]);
+  });
+
+  it("starts a bundled plugin's card collapsed, hiding what it adds", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    expect(
+      within(card).getByRole("button", { name: "See more" }),
+    ).toHaveAttribute("aria-expanded", "false");
+    expect(
+      within(card).queryByRole("heading", { name: "What it adds" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("lists a toolbar command by the title in the plugin's own strings once expanded", async () => {
+    _addBundledPlugin();
+
+    _renderTab();
+
+    const card = await screen.findByRole("region", { name: "Epidemiology" });
+    fireEvent.click(within(card).getByRole("button", { name: "See more" }));
+    expect(
+      await within(card).findByText("Data Explorer toolbar: Linear regression"),
+    ).toBeInTheDocument();
   });
 
   it("offers only Uninstall for an install whose plugin is no longer bundled", async () => {
