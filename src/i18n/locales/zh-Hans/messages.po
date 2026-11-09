@@ -663,6 +663,10 @@ msgstr "保存并重新运行查询"
 msgid "Saved as \"{0}\"."
 msgstr "已保存为 \"{0}\"。"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "These values are fractions, so type a percent such as 95."
+msgstr ""
+
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr "此服务器需要 SSL。请将 SSL 模式设置为“Require”，然后重试。"
@@ -2061,6 +2065,10 @@ msgstr "检测到："
 msgid "The record keeps its previous status. Try again in a moment."
 msgstr "记录保留其之前的状态。请稍后重试。"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "%"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "第 3 列"
@@ -3150,6 +3158,10 @@ msgstr "已同步到云端"
 msgid "No data color"
 msgstr "无数据颜色"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Highlight values below"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
@@ -4006,6 +4018,10 @@ msgstr "{plainTextLength}/{RICH_TEXT_MAX_TEXT_LENGTH} 个字符"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "主题"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Reverse colors"
+msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -5123,6 +5139,10 @@ msgstr "图表类型：{chartTypes}"
 msgid "Generated SQL"
 msgstr "生成的 SQL"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class colors"
+msgstr ""
+
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
 msgstr "<0>Shift</0> <1>Enter</1> 嵌入"
@@ -5444,6 +5464,10 @@ msgstr "生成的 SQL 假设"
 msgid "Import failed: {reason}"
 msgstr "导入失败：{reason}"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} label"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "时间戳格式"
@@ -5677,6 +5701,10 @@ msgstr "已发送密码重置电子邮件"
 msgid "Aggregation"
 msgstr "聚合"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
 msgstr "选择排序列"
@@ -5763,6 +5791,10 @@ msgstr "嵌入"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Nothing yet."
 msgstr "暂无内容。"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class {classNumber}"
+msgstr ""
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6378,6 +6410,10 @@ msgstr "没有符合筛选条件的数据集"
 msgid "Curve"
 msgstr "曲线"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold}% or above"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
@@ -6713,6 +6749,10 @@ msgstr "点"
 msgid "kind"
 msgstr "类型"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}%"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
 msgstr "所有更改已保存"
@@ -6971,6 +7011,10 @@ msgstr "电子邮件"
 msgid "Y axis tick color"
 msgstr "Y 轴刻度颜色"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} color"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "重新处理数据"
@@ -7023,6 +7067,10 @@ msgstr "“{operator}”不是此表单支持的运算符。"
 #: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "打开侧边栏"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Red to blue"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
@@ -7807,6 +7855,10 @@ msgstr "选择您想要在此 {conceptName} 中的列"
 msgid "Visualization Settings"
 msgstr "可视化设置"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Threshold"
+msgstr ""
+
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -8128,6 +8180,10 @@ msgstr "欢迎使用数据源管理器。从电脑中选择一个 CSV 或 Excel 
 msgid "Geometry unavailable"
 msgstr "几何功能不可用"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Custom colors"
+msgstr ""
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "正在加载仪表板"
@@ -8391,6 +8447,10 @@ msgstr "符号大小 {firstLabel}"
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
 msgstr "还没有账户？"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold} or above"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -9927,6 +9987,7 @@ msgid "Please try again. Your dashboard is still published."
 msgstr "请重试。您的仪表板仍处于已发布状态。"
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red"
 msgstr "红色"
 

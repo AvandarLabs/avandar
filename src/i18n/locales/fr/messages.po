@@ -690,6 +690,10 @@ msgstr "Enregistrer et relancer la requête"
 msgid "Saved as \"{0}\"."
 msgstr "Enregistré sous \"{0}\"."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "These values are fractions, so type a percent such as 95."
+msgstr ""
+
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr "Ce serveur nécessite SSL. Définissez le mode SSL sur « Require », puis "
@@ -2169,6 +2173,10 @@ msgstr "Détecté :"
 msgid "The record keeps its previous status. Try again in a moment."
 msgstr "Le dossier conserve son statut précédent. Réessayez dans un instant."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "%"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "Colonne 3"
@@ -3311,6 +3319,10 @@ msgstr "Synchronisé avec le cloud"
 msgid "No data color"
 msgstr "Aucune couleur de données"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Highlight values below"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
@@ -4211,6 +4223,10 @@ msgstr "{plainTextLength} sur {RICH_TEXT_MAX_TEXT_LENGTH} caractères"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "Thème"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Reverse colors"
+msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -5371,6 +5387,10 @@ msgstr "Types de graphiques : {chartTypes}"
 msgid "Generated SQL"
 msgstr "SQL généré"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class colors"
+msgstr ""
+
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
 msgstr "<0>Maj</0> <1>Entrée</1> intégrer"
@@ -5708,6 +5728,10 @@ msgstr "Hypothèses SQL générées"
 msgid "Import failed: {reason}"
 msgstr "Échec de l'importation : {reason}"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} label"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "Format de l'horodatage"
@@ -5946,6 +5970,10 @@ msgstr "Email de réinitialisation du mot de passe envoyé"
 msgid "Aggregation"
 msgstr "Agrégation"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
 msgstr "Sélectionnez la colonne par laquelle trier"
@@ -6034,6 +6062,10 @@ msgstr "Intégrer"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Nothing yet."
 msgstr "Rien pour le moment."
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class {classNumber}"
+msgstr ""
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6684,6 +6716,10 @@ msgstr "Aucun jeu de données ne correspond à votre filtre"
 msgid "Curve"
 msgstr "Courbe"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold}% or above"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
@@ -7032,6 +7068,10 @@ msgstr "Point"
 msgid "kind"
 msgstr "type"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}%"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
 msgstr "Toutes les modifications ont été enregistrées"
@@ -7298,6 +7338,10 @@ msgstr "E-mail"
 msgid "Y axis tick color"
 msgstr "Couleur des graduations de l’axe Y"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} color"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "Traiter à nouveau les données"
@@ -7350,6 +7394,10 @@ msgstr "« {operator} » n’est pas un opérateur compris par ce formulaire."
 #: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Ouvrir la barre latérale"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Red to blue"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
@@ -8170,6 +8218,10 @@ msgstr "Sélectionnez les colonnes que vous souhaitez dans ce {conceptName}"
 msgid "Visualization Settings"
 msgstr "Paramètres de visualisation"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Threshold"
+msgstr ""
+
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -8514,6 +8566,10 @@ msgstr "Bienvenue dans le gestionnaire de vos sources de données. Sélectionnez
 msgid "Geometry unavailable"
 msgstr "Géométrie indisponible"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Custom colors"
+msgstr ""
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "Chargement du tableau de bord"
@@ -8794,6 +8850,10 @@ msgstr "Taille du symbole {firstLabel}"
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold} or above"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -10399,6 +10459,7 @@ msgid "Please try again. Your dashboard is still published."
 msgstr "Veuillez réessayer. Votre tableau de bord est toujours publié."
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red"
 msgstr "Rouge"
 

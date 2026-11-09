@@ -84,7 +84,7 @@ export type ColorSpec =
        * One legend label per class, in class order. `undefined` keeps the
        * generated interval label, such as `< 95`.
        */
-      classLabels: readonly (string | undefined)[];
+      classLabels: ReadonlyArray<string | undefined>;
     };
 
 /** A flat or value-sized point style. */
