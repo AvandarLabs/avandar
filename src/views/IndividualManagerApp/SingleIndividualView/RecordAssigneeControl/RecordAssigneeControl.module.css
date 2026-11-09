@@ -1,0 +1,29 @@
+/*
+ * The trigger reads as the assignee's name plus a chevron. The fill only
+ * appears on hover and while the menu is open, like a subtle button.
+ */
+.recordAssigneeControlTrigger {
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  display: inline-flex;
+  gap: var(--mantine-spacing-xxs);
+  max-width: 16rem;
+  padding: 2px var(--mantine-spacing-xxs) 2px 2px;
+  transition: var(--ava-transition-interactive);
+}
+
+.recordAssigneeControlTrigger:hover,
+.recordAssigneeControlTrigger[data-expanded] {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+.recordAssigneeControlLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recordAssigneeControlChevron {
+  color: var(--mantine-color-neutral-6);
+  flex-shrink: 0;
+}
