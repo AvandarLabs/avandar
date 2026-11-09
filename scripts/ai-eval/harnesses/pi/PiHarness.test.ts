@@ -305,15 +305,16 @@ function _blockOf(text: string, tag: string): string {
 }
 
 describe("the mention questions", () => {
-  it.each(MENTION_QUESTIONS.map((question) => {return question.id}))(
-    "%s sends no token and no gadget id",
-    async (id) => {
-      const asked = await _askAll(id === "M03b" ? ["M03", id] : [id]);
+  it.each(
+    MENTION_QUESTIONS.map((question) => {
+      return question.id;
+    }),
+  )("%s sends no token and no gadget id", async (id) => {
+    const asked = await _askAll(id === "M03b" ? ["M03", id] : [id]);
 
-      expect(asked.join("\n")).not.toContain("@{");
-      expect(asked.join("\n")).not.toMatch(UUID_PATTERN);
-    },
-  );
+    expect(asked.join("\n")).not.toContain("@{");
+    expect(asked.join("\n")).not.toMatch(UUID_PATTERN);
+  });
 
   it("M01 names the US deaths dataset in the mentioned block", async () => {
     const [text = ""] = await _askAll(["M01"]);
@@ -368,5 +369,28 @@ describe("the mention questions", () => {
 
     expect(text).toContain("'<value 1>'");
     expect(text).not.toContain("Kings");
+  });
+});
+
+describe("createPiConversation mention placeholders", () => {
+  it("restores M06's county placeholder before its SQL runs", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "x", type: "varchar" }], rows: [["Kings"]] },
+    });
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createPlaceholderAgent(host, []);
+      },
+    });
+
+    await conversation.ask(_questionById("M06"));
+
+    expect(runEvalSqlMock).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      `SELECT 1 FROM t WHERE "Admin2" = 'Kings'`,
+    );
   });
 });
