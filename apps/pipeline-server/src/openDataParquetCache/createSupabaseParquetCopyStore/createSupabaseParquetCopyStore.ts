@@ -8,6 +8,14 @@ import type { PipelineSupabaseTarget } from "@pipelines/shared/PipelineRunOption
 /** The content type every pipeline uploads Parquet with. */
 const PARQUET_CONTENT_TYPE = "application/vnd.apache.parquet";
 
+/**
+ * How long, in seconds, a browser may cache a copy's part. A part never
+ * changes once uploaded, because each build writes to a folder of its own,
+ * so a workspace that re-checks an unchanged copy reads its parts from the
+ * browser's cache rather than downloading them again.
+ */
+const COPY_PART_CACHE_CONTROL_SECONDS = "31536000";
+
 /** The most objects one Storage list call returns, and one remove takes. */
 const STORAGE_PAGE_SIZE = 1000;
 
@@ -182,6 +190,7 @@ export function createSupabaseParquetCopyStore(
         await readFile(partPath),
         {
           contentType: PARQUET_CONTENT_TYPE,
+          cacheControl: COPY_PART_CACHE_CONTROL_SECONDS,
           upsert: true,
         },
       );
