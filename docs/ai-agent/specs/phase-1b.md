@@ -268,6 +268,21 @@ recap; block tags and line separators spelled in names; standard tag
 spellings in SQL; forged tokens; tray validation; and analytics payloads,
 which carry counts only.
 
+A second review round found two more, also fixed:
+
+5. Offline turns read real mention names, so an offline reply could quote
+   one, and that stored reply was replayed to hosted models. The agent
+   recap now replaces each loaded gadget's real name in an assistant reply
+   with its masked name and masks the reply with the vault, after all of
+   the turn's redaction. Today's chat replaces each loaded gadget's real
+   name in a reply with its type name. Names match as whole words, ignoring
+   case, longest first.
+6. Block tags hidden by control characters (such as escape or delete),
+   invisible characters inside the tag name, the Hangul fillers, or the
+   braille blank got through chart SQL. These are now allowed anywhere in a
+   tag's spelling when escaping, and comparisons such as `a < b` stay
+   readable.
+
 Still open, untested: a map layer's own filter value appearing in that
 layer's name. Layer queries are not vaulted.
 
