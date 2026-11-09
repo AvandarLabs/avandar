@@ -196,6 +196,10 @@ describe("askConversationDataAgent", () => {
     return "";
   }
 
+  function _keepText(text: string): string {
+    return text;
+  }
+
   function _fakeConversation(
     ask?: (text: string) => Promise<{ text: string }>,
   ): FakeConversation {
@@ -246,7 +250,11 @@ describe("askConversationDataAgent", () => {
       conversations,
       turn,
       buildTurnInputs: () => {
-        return { blocks: { pageBlock }, nameOf: _noName };
+        return {
+          blocks: { pageBlock },
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+        };
       },
       createConversation: vi.fn(),
     });
@@ -345,7 +353,11 @@ describe("askConversationDataAgent", () => {
       conversations: new Map(),
       turn: _turn(["How many?", "42.", "And deaths?"]),
       buildTurnInputs: () => {
-        return { blocks: { pageBlock: PAGE_BLOCK }, nameOf: _noName };
+        return {
+          blocks: { pageBlock: PAGE_BLOCK },
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+        };
       },
       createConversation: async () => {
         return conversation;
@@ -370,7 +382,11 @@ describe("askConversationDataAgent", () => {
       conversations: new Map(),
       turn: _turn([caseView, "42.", "And deaths?"]),
       buildTurnInputs: () => {
-        return { blocks: { pageBlock: PAGE_BLOCK }, nameOf: _noName };
+        return {
+          blocks: { pageBlock: PAGE_BLOCK },
+          nameOf: _noName,
+          maskAssistantText: _keepText,
+        };
       },
       createConversation: async () => {
         return conversation;
@@ -384,7 +400,11 @@ describe("askConversationDataAgent", () => {
   it("builds the page block from the conversation it asks", async () => {
     const conversation = _fakeConversation();
     const buildTurnInputs = vi.fn(() => {
-      return { blocks: { pageBlock: PAGE_BLOCK }, nameOf: _noName };
+      return {
+        blocks: { pageBlock: PAGE_BLOCK },
+        nameOf: _noName,
+        maskAssistantText: _keepText,
+      };
     });
 
     await askConversationDataAgent({
@@ -398,6 +418,32 @@ describe("askConversationDataAgent", () => {
 
     expect(buildTurnInputs).toHaveBeenCalledWith(conversation);
     expect(conversation.asked[0]).toBe(`${PAGE_BLOCK}\n\nHow many?`);
+  });
+
+  it("masks each assistant reply in the recap", async () => {
+    const conversation = _fakeConversation();
+
+    await askConversationDataAgent({
+      conversations: new Map(),
+      turn: _turn(["Who?", "Jane Doe visits has two rows.", "Total?"]),
+      buildTurnInputs: () => {
+        return {
+          blocks: {},
+          nameOf: _noName,
+          maskAssistantText: (text) => {
+            return text.replace("Jane Doe", "<value 1>");
+          },
+        };
+      },
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect(conversation.asked[0]).toBe(
+      "Earlier in this conversation:\nUser: Who?\n" +
+        "Assistant: <value 1> visits has two rows.\n\nTotal?",
+    );
   });
 
   it("sends the attached and mentioned blocks and names each mention", async () => {
@@ -422,6 +468,7 @@ describe("askConversationDataAgent", () => {
             mentionedBlock: "<mentioned>\nM\n</mentioned>",
           },
           nameOf,
+          maskAssistantText: _keepText,
         };
       },
       createConversation: async () => {

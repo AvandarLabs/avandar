@@ -595,3 +595,45 @@ describe("runDataAgentTurn mention privacy leaks", () => {
     expect(_askedTexts()[0]).not.toContain("Jane");
   });
 });
+
+/*
+ * Written by the second 1B privacy review. An offline turn reads real
+ * mention names, so its stored reply can quote one. After a reload the
+ * agent's recap replays every assistant message as written, even though
+ * the vault holds the value the mentioned tile filters on.
+ */
+describe("runDataAgentTurn offline reply privacy leaks", () => {
+  it("masks a mention's real name that an offline reply quoted, in the recap", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const tileRef: Gadget.Ref = {
+      gadgetType: "dashboard_tile",
+      gadgetId: DASHBOARD_REF.gadgetId,
+      subId: "block-1",
+    };
+
+    await runDataAgentTurn({
+      ..._turn("workspace-offline-reply-recap", [
+        `Who is in ${ChatMentionToken.buildToken(tileRef)}?`,
+        '"Jane Doe visits" has two rows.',
+        "And in total?",
+      ]),
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: _contexts({
+          kind: "dashboard_tile",
+          ref: tileRef,
+          dashboardName: "Clinic",
+          tile: {
+            title: "Jane Doe visits",
+            chartType: "table",
+            sql: `SELECT * FROM t WHERE "patient_name" = 'Jane Doe'`,
+          },
+        }),
+      },
+    });
+
+    const asked = _askedTexts()[0]!;
+    expect(asked).toContain("Earlier in this conversation:");
+    expect(asked).not.toContain("Jane");
+  });
+});

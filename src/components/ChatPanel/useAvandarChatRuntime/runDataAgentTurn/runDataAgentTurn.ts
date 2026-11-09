@@ -10,6 +10,8 @@ import {
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { buildGadgetNameReplacements } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
+import { replaceGadgetNames } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/replaceGadgetNames";
 import { createAgentPageNameLoader } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/agentPageNameLoader";
 import { createAgentPageContext } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/createAgentPageContext";
 import { parseAgentPageRoute } from "@/components/ChatPanel/useAvandarChatRuntime/agentPageContext/parseAgentPageRoute";
@@ -277,6 +279,36 @@ function _buildTurnInputs(
         mask: conversation.sqlVault.maskText,
       });
     },
+    maskAssistantText: _createAssistantTextMask(
+      gadgetContext,
+      conversation.sqlVault.maskText,
+    ),
+  };
+}
+
+/**
+ * Masks an earlier assistant reply for the recap. An offline reply read
+ * real mention names, so it may quote one: each loaded gadget's real name
+ * becomes its masked model name, then the vault masks the values it holds.
+ * Call it only after every piece of the turn's SQL is redacted.
+ */
+function _createAssistantTextMask(
+  gadgetContext: AgentTurnGadgetContext | undefined,
+  mask: (text: string) => string,
+): (text: string) => string {
+  const replacements = buildGadgetNameReplacements(
+    gadgetContext,
+    (context, name) => {
+      return name.isDashboardOfTile
+        ? mask(name.text)
+        : buildAgentGadgetModelName(context, {
+            isSensitive: isPersonalDataText,
+            mask,
+          });
+    },
+  );
+  return (text) => {
+    return mask(replaceGadgetNames(text, replacements));
   };
 }
 

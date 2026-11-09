@@ -962,3 +962,75 @@ describe("createChatModelAdapter mention privacy leaks", () => {
     expect(sent).not.toContain("Jane");
   });
 });
+
+/*
+ * Written by the second 1B privacy review. An offline turn reads real
+ * mention names (`toLocalModelMessages`), so the offline model's reply can
+ * quote one. That reply is stored as an assistant message, and today's
+ * hosted chat posts every assistant message as written.
+ */
+describe("createChatModelAdapter offline reply privacy leaks", () => {
+  beforeEach(() => {
+    _setNavigatorOnLine(true);
+    apiPostMock
+      .mockReset()
+      .mockResolvedValue(
+        Model.make("ChatResponse", { assistantText: "cloud reply" }),
+      );
+    detectBiasMock.mockReset().mockReturnValue({ hits: [] });
+    loadGadgetsMock.mockReset().mockResolvedValue(
+      new Map([
+        [
+          ChatMentionToken.buildRefKey(PERSONAL_TILE_REF),
+          {
+            kind: "dashboard_tile",
+            ref: PERSONAL_TILE_REF,
+            dashboardName: "Clinic",
+            tile: {
+              title: "Visits by Jane Doe",
+              chartType: "bar",
+              sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
+            },
+          } satisfies AgentGadgetContext,
+        ],
+      ]),
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    window.localStorage.clear();
+  });
+
+  it("never posts a mention's real name that an offline reply quoted to today's chat", async () => {
+    isAgentEnabledMock.mockReturnValue(false);
+
+    await _createAdapter("dashboards").run({
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: `Who is in ${PERSONAL_TILE_TOKEN}?` },
+          ],
+          metadata: {},
+        },
+        {
+          // The offline model's reply, written from the real name it read.
+          role: "assistant",
+          content: [
+            { type: "text", text: '"Visits by Jane Doe" has two rows.' },
+          ],
+          metadata: {},
+        },
+        {
+          role: "user",
+          content: [{ type: "text", text: "And in total?" }],
+          metadata: {},
+        },
+      ],
+    } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+
+    const sent = JSON.stringify(apiPostMock.mock.calls[0]![0].body);
+    expect(sent).not.toContain("Jane");
+  });
+});

@@ -134,19 +134,52 @@ describe("toHostedChatMessages", () => {
       gadgetId: REF_B.gadgetId,
       subId: "block-1",
     };
-    const messages = toHostedChatMessages([
-      _message(
-        "user",
-        `Show ${TOKEN_A} and ${ChatMentionToken.buildToken(tileRef)}`,
-      ),
-    ]);
+    const messages = toHostedChatMessages(
+      [
+        _message(
+          "user",
+          `Show ${TOKEN_A} and ${ChatMentionToken.buildToken(tileRef)}`,
+        ),
+      ],
+      undefined,
+    );
 
     expect(messages[0]?.content).toBe('Show @"a dataset" and @"a chart"');
   });
 
-  it("leaves assistant messages alone", () => {
-    const reply = _message("assistant", `I saw ${TOKEN_A}`);
+  it("names a loaded gadget's real name in an assistant reply by its type", () => {
+    const tileRef: Gadget.Ref = {
+      gadgetType: "dashboard_tile",
+      gadgetId: REF_B.gadgetId,
+      subId: "block-1",
+    };
+    const messages = toHostedChatMessages(
+      [_message("assistant", '"US deaths" and "Jane Doe visits" on Clinic.')],
+      {
+        attachedRefs: [],
+        contexts: new Map<string, AgentGadgetContext>([
+          [KEY_A, DATASET_A],
+          [
+            ChatMentionToken.buildRefKey(tileRef),
+            {
+              kind: "dashboard_tile",
+              ref: tileRef,
+              dashboardName: "Clinic",
+              tile: { title: "Jane Doe visits", chartType: "bar", sql: "" },
+            },
+          ],
+        ]),
+      },
+    );
 
-    expect(toHostedChatMessages([reply])[0]).toBe(reply);
+    expect(messages[0]?.content).toBe(
+      '"a dataset" and "a chart" on a dashboard.',
+    );
+  });
+
+  it("leaves an assistant reply as written with nothing loaded", () => {
+    const reply = _message("assistant", "Two rows.");
+
+    expect(toHostedChatMessages([reply], undefined)[0]).toEqual(reply);
   });
 });

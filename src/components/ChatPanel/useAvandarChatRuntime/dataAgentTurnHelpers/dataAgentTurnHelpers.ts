@@ -274,6 +274,13 @@ export type AgentTurnInputs = {
   blocks: AgentContextBlocks;
   /** How the model hears each mention, masked with the vault. */
   nameOf: (ref: Gadget.Ref) => string;
+  /**
+   * An earlier assistant reply as the model reads it in the recap: each
+   * loaded gadget's real name (an offline reply may quote one) as its
+   * masked name, then masked with the vault. Built after every redaction
+   * of the turn.
+   */
+  maskAssistantText: (text: string) => string;
 };
 
 type AskConversationDataAgentOptions = {
@@ -291,7 +298,8 @@ type AskConversationDataAgentOptions = {
 
 /**
  * The thread as the agent reads it: each user message's mentions as
- * `@"Name"` with the turn's masked names. Without inputs, the thread as is.
+ * `@"Name"` with the turn's masked names, and each assistant reply with
+ * gadget names and vault values masked. Without inputs, the thread as is.
  */
 function _namedMessages(
   turn: Readonly<DataAgentTurnOptions>,
@@ -306,7 +314,10 @@ function _namedMessages(
           role: message.role,
           content: ChatMentionToken.toModelText(message.content, inputs.nameOf),
         }
-      : message;
+      : {
+          role: message.role,
+          content: inputs.maskAssistantText(message.content),
+        };
   });
 }
 

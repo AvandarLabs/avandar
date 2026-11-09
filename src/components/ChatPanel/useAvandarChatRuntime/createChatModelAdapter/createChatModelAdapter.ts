@@ -119,8 +119,9 @@ type TurnMessages = {
   localMessages: readonly ChatClientMessage.T[];
   /**
    * The thread as today's hosted chat receives it, each mention named by
-   * its type only (`@"a chart"`). Its consent check runs on this text, so
-   * a consent ack matches the message it is posted with.
+   * its type only (`@"a chart"`), in user messages and in replies. Its
+   * consent check runs on this text, so a consent ack matches the message
+   * it is posted with.
    */
   hostedChatMessages: readonly ChatClientMessage.T[];
   gadgetContext: AgentTurnGadgetContext | undefined;
@@ -155,7 +156,7 @@ async function _prepareTurnMessages(
   return {
     apiMessages,
     localMessages: toLocalModelMessages(apiMessages, gadgetContext),
-    hostedChatMessages: toHostedChatMessages(apiMessages),
+    hostedChatMessages: toHostedChatMessages(apiMessages, gadgetContext),
     gadgetContext,
     mentionCount: ChatMentionToken.refsFromText(lastUserMessage?.content ?? "")
       .length,
