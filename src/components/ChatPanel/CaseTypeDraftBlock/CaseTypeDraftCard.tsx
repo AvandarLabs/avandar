@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
 import css from "./CaseTypeDraftCard.module.css";
+import { CaseTypeDraftDatasetPicker } from "./CaseTypeDraftDatasetPicker";
 import { CaseTypeDraftIdentityFields } from "./CaseTypeDraftIdentityFields";
 import { CaseTypeDraftManualEntrySection } from "./CaseTypeDraftManualEntrySection";
 import { CaseTypeDraftSourceSection } from "./CaseTypeDraftSourceSection";
@@ -20,6 +21,12 @@ import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOpt
 
 type Props = {
   editor: CaseTypeDraftEditor;
+  /** Workspace datasets the draft can switch to or join. */
+  datasets: ReadonlyArray<{ id: string; name: string }>;
+  /** Catalog columns keyed by dataset id, for join keys and added fields. */
+  columnsByDatasetId: Readonly<
+    Record<string, ReadonlyArray<{ id: string; name: string }>>
+  >;
   /** Catalog dataset names, keyed by dataset id. */
   datasetNamesById: Readonly<Record<string, string>>;
   /** Catalog column names, keyed by column id, for the rows and pickers. */
@@ -40,6 +47,40 @@ type Props = {
 };
 
 /**
+ * Datasets this section may switch to: the one it uses, plus any the draft
+ * does not already pull from. The current one stays listed even before the
+ * catalog has loaded its name.
+ */
+function _datasetOptions(options: {
+  datasets: ReadonlyArray<{ id: string; name: string }>;
+  datasetId: string;
+  datasetName: string;
+  usedDatasetIds: ReadonlySet<string>;
+}): Array<{ value: string; label: string }> {
+  const available = options.datasets
+    .filter((dataset) => {
+      return (
+        dataset.id === options.datasetId ||
+        !options.usedDatasetIds.has(dataset.id)
+      );
+    })
+    .map((dataset) => {
+      return { value: dataset.id, label: dataset.name };
+    });
+  if (
+    available.some((dataset) => {
+      return dataset.value === options.datasetId;
+    })
+  ) {
+    return available;
+  }
+  return [
+    { value: options.datasetId, label: options.datasetName },
+    ...available,
+  ];
+}
+
+/**
  * The editable case type draft the Case Manager model proposed. Every field
  * arrives prefilled, so confirming without edits is a valid path.
  *
@@ -49,6 +90,8 @@ type Props = {
  */
 export function CaseTypeDraftCard({
   editor,
+  datasets,
+  columnsByDatasetId,
   datasetNamesById,
   columnNamesById,
   columnDataTypesById,
@@ -59,6 +102,11 @@ export function CaseTypeDraftCard({
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
   const { draft, sourceGroups } = editor;
+  const usedDatasetIds = new Set(
+    sourceGroups.map((group) => {
+      return group.datasetId;
+    }),
+  );
   const labelOptions = draft.attributes
     .filter((attribute) => {
       return attribute.isIncluded;
@@ -70,9 +118,11 @@ export function CaseTypeDraftCard({
       };
     });
   const sourceCountLabel =
-    sourceGroups.length === 1
-      ? t`1 dataset`
-      : t`${sourceGroups.length} datasets joined`;
+    sourceGroups.length === 0
+      ? t`No datasets`
+      : sourceGroups.length === 1
+        ? t`1 dataset`
+        : t`${sourceGroups.length} datasets joined`;
 
   return (
     <Paper withBorder shadow="xs" radius="md" p="md" bg="blue.0">
@@ -99,24 +149,37 @@ export function CaseTypeDraftCard({
               variant="dashed"
             />
             {sourceGroups.map((group) => {
+              const datasetName =
+                datasetNamesById[group.datasetId] ?? group.datasetId;
+              const datasetOptions = _datasetOptions({
+                datasets,
+                datasetId: group.datasetId,
+                datasetName,
+                usedDatasetIds,
+              });
               return (
                 <CaseTypeDraftSourceSection
                   key={group.datasetId}
                   group={group}
-                  datasetName={
-                    datasetNamesById[group.datasetId] ?? group.datasetId
-                  }
+                  datasetName={datasetName}
+                  datasetOptions={datasetOptions}
+                  columns={columnsByDatasetId[group.datasetId] ?? []}
                   columnNamesById={columnNamesById}
                   labelColumnId={draft.labelColumnId}
                   columnDataTypesById={columnDataTypesById}
                   dateColumnOptions={
                     dateColumnOptionsByDatasetId[group.datasetId] ?? []
                   }
-                  canRemove={sourceGroups.length > 1}
                   editor={editor}
                 />
               );
             })}
+            <CaseTypeDraftDatasetPicker
+              datasets={datasets}
+              usedDatasetIds={usedDatasetIds}
+              isEmpty={sourceGroups.length === 0}
+              onPick={editor.addSourceDataset}
+            />
             <CaseTypeDraftManualEntrySection editor={editor} />
             <CaseTypeDraftStatusSection editor={editor} />
             <Checkbox
