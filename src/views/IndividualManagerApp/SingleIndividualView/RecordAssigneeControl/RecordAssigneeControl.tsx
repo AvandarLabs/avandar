@@ -28,14 +28,14 @@ function useAssigneeLabel(
 ): string | undefined {
   const { t } = useLingui();
   const { members, isMembersError, assigneeId } = props;
+  if (members === undefined && !isMembersError) {
+    return undefined;
+  }
   if (assigneeId === undefined) {
     return t`Unassigned`;
   }
-  if (isMembersError) {
+  if (members === undefined || isMembersError) {
     return t`Assignee unavailable`;
-  }
-  if (members === undefined) {
-    return undefined;
   }
   const member = members.find((candidate) => {
     return candidate.userId === assigneeId;

@@ -94,4 +94,20 @@ describe("RecordAssigneeControl", () => {
     const trigger = screen.getByRole("button", { name: "Assigned to" });
     expect((trigger as HTMLButtonElement).disabled).toBe(true);
   });
+
+  it("holds its place for an unassigned record while members load", () => {
+    _renderControl({ members: undefined, assigneeId: undefined });
+
+    const trigger = screen.getByRole("button", { name: "Assigned to" });
+    expect((trigger as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByText("Unassigned")).toBeNull();
+  });
+
+  it("opens the menu on Unassigned once the members have loaded", () => {
+    _renderControl({ assigneeId: undefined });
+
+    expect(
+      screen.getByRole("button", { name: "Assigned to: Unassigned" }),
+    ).toBeTruthy();
+  });
 });
