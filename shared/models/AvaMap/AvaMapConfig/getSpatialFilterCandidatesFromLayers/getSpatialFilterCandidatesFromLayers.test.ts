@@ -55,4 +55,30 @@ describe("getSpatialFilterCandidatesFromLayers", () => {
 
     expect(candidates).toEqual([]);
   });
+
+  it("leaves out a buffer of a displaced point layer", () => {
+    const exactSites = _makePointLayer("Exact sites");
+    const jitterSites: MapLayer.T = {
+      ..._makePointLayer("Jitter sites"),
+      sensitivity: { mode: "jitter", radiusMeters: 500 },
+    };
+    const exactBuffer = _makeBufferOf(exactSites);
+    const jitterBuffer = _makeBufferOf(jitterSites);
+    const chainedBuffer = _makeBufferOf(jitterBuffer);
+    const schools = _makePointLayer("Schools");
+
+    const candidates = getSpatialFilterCandidatesFromLayers({
+      layers: [
+        exactSites,
+        jitterSites,
+        exactBuffer,
+        jitterBuffer,
+        chainedBuffer,
+        schools,
+      ],
+      layerId: schools.id,
+    });
+
+    expect(candidates.map(prop("name"))).toEqual(["Buffer of Exact sites"]);
+  });
 });

@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
  */
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
   createGeometryLayerFixture,
   createGridBinLayerFixture,
@@ -270,5 +271,92 @@ describe("compileBufferOfLayerQuery", () => {
     );
 
     expect(rawSql).not.toContain("json_extract_string(properties");
+  });
+  describe("a displaced source", () => {
+    const jitter = { mode: "jitter", radiusMeters: 500 } as const;
+
+    function _makeJitterLatLngSource(): {
+      source: MapLayer.T;
+      metadata: CompileOptions["metadata"];
+    } {
+      const { layer, metadata } = createGeometryLayerFixture();
+      const [latitude, longitude] = layer.source.queryColumns;
+      return {
+        source: {
+          ...layer,
+          sensitivity: jitter,
+          geoBinding: {
+            type: "latLngColumns",
+            latitude: latitude!.id,
+            longitude: longitude!.id,
+          },
+        },
+        metadata,
+      };
+    }
+
+    function _expectViolation(options: CompileOptions): void {
+      let thrown: unknown;
+      try {
+        compileMapLayerSpatialQuery(options);
+      } catch (error) {
+        thrown = error;
+      }
+      expect(thrown).toBeInstanceOf(SensitivityViolationError);
+      expect((thrown as SensitivityViolationError).code).toBe(
+        "jitterRequiresPoints",
+      );
+    }
+
+    it("refuses to buffer a latitude and longitude source", () => {
+      const { source, metadata } = _makeJitterLatLngSource();
+      const bufferLayer = _makeBufferLayer(source);
+      _expectViolation(
+        _compileOptions(bufferLayer, metadata, [source, bufferLayer]),
+      );
+    });
+
+    it("refuses to buffer a point geometry column source", () => {
+      const { layer, metadata } = createGeometryLayerFixture();
+      const binding = layer.geoBinding;
+      if (binding?.type !== "geometryColumn") {
+        throw new Error("The fixture binds a geometry column");
+      }
+      const source: MapLayer.T = {
+        ...layer,
+        sensitivity: jitter,
+        geoBinding: { ...binding, family: "point", simplification: undefined },
+      };
+      const bufferLayer = _makeBufferLayer(source);
+      _expectViolation(
+        _compileOptions(bufferLayer, metadata, [source, bufferLayer]),
+      );
+    });
+
+    it("refuses a buffer chained onto a buffer of the source", () => {
+      const { source, metadata } = _makeJitterLatLngSource();
+      const firstBuffer = _makeBufferLayer(source);
+      const secondBuffer = _makeBufferLayer(firstBuffer);
+      _expectViolation(
+        _compileOptions(secondBuffer, metadata, [
+          source,
+          firstBuffer,
+          secondBuffer,
+        ]),
+      );
+    });
+
+    it("still buffers an exact point source", () => {
+      const { source, metadata } = _makeJitterLatLngSource();
+      const exactSource = {
+        ...source,
+        sensitivity: { mode: "exact" } as const,
+      };
+      const bufferLayer = _makeBufferLayer(exactSource);
+      const { rawSql } = compileMapLayerSpatialQuery(
+        _compileOptions(bufferLayer, metadata, [exactSource, bufferLayer]),
+      );
+      expect(rawSql).toContain("ST_Buffer");
+    });
   });
 });

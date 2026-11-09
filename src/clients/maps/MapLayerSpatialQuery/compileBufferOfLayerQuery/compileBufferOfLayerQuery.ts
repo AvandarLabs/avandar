@@ -1,7 +1,9 @@
 import { propEq } from "@avandar/utils";
 import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle";
+import { isBufferOfDisplacedPoints } from "$/models/AvaMap/AvaMapConfig/isBufferOfDisplacedPoints/isBufferOfDisplacedPoints";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import { compileLatLngLayerSourceSql } from "../compileLatLngLayerSourceSql/compileLatLngLayerSourceSql";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQuery";
 import { makeSpatialQueryPlan } from "../compileMapLayerSpatialQuery/compileMapLayerSpatialQueryHelpers";
@@ -44,6 +46,14 @@ function _assertBufferInvariants(
   }
   if (options.layer.sensitivity.mode !== source.sensitivity.mode) {
     throw new Error("Buffer sensitivity must match the source layer");
+  }
+  // Rings around a displaced layer's exact points would reveal them, whether
+  // drawn, used as a spatial filter, or listed.
+  if (isBufferOfDisplacedPoints(options.stack, options.layer.id)) {
+    throw new SensitivityViolationError(
+      "jitterRequiresPoints",
+      options.layer.name,
+    );
   }
 }
 

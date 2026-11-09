@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
   createGeometryLayerFixture,
   createGridBinLayerFixture,
@@ -267,5 +268,45 @@ describe("compileSpatialFilteredQuery", () => {
         _makeOptions(filtered, [loopedFilter, target]),
       );
     }).toThrow("Spatial filter chain contains a cycle");
+  });
+
+  it("fails closed when the filter layer buffers a displaced point layer", () => {
+    const jitterPoints = _createPointFixture();
+    const jitterSource = {
+      ...jitterPoints,
+      layer: {
+        ...jitterPoints.layer,
+        sensitivity: { mode: "jitter", radiusMeters: 500 } as const,
+      },
+    };
+    const bufferFilter = MapLayer.withSensitivity(
+      {
+        ...MapLayer.createArea("Rings"),
+        geoBinding: {
+          type: "bufferOfLayer",
+          layerId: jitterSource.layer.id,
+          distanceMeters: 1000,
+          distanceUnit: "m",
+          labelColumn: undefined,
+          dissolve: false,
+        },
+      },
+      jitterSource.layer.sensitivity,
+    );
+    const target = _createPointFixture();
+    const filtered = {
+      ...target.layer,
+      spatialFilter: { layerId: bufferFilter.id },
+    };
+    const bufferFixture = {
+      layer: bufferFilter,
+      metadata: jitterSource.metadata,
+    };
+
+    expect(() => {
+      return compileSpatialFilteredQuery(
+        _makeOptions(filtered, [jitterSource, bufferFixture, target]),
+      );
+    }).toThrow(SensitivityViolationError);
   });
 });
