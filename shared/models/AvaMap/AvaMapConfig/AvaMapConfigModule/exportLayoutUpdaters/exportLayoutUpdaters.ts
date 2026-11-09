@@ -1,3 +1,4 @@
+import { AvaMapConfigValues } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigValues.ts";
 import type { AvaMapConfigRead } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 import type {
   ExportLayout, // oxfmt-ignore
@@ -22,6 +23,28 @@ function _normalizeDisclaimer(
   disclaimer: string | undefined,
 ): string | undefined {
   return disclaimer?.trim() || undefined;
+}
+
+/**
+ * Keeps a feature list's row cap a whole number from 1 to 1,000, so a typed
+ * value can never make the persisted config fail its schema. A value that is
+ * not a number falls back to the default cap.
+ */
+function _normalizeFeatureList(
+  featureList: ExportLayout["featureList"],
+): ExportLayout["featureList"] {
+  if (featureList === undefined) {
+    return undefined;
+  }
+  const maxRows = Number.isFinite(featureList.maxRows)
+    ? Math.min(
+        AvaMapConfigValues.exportFeatureListMaxRows,
+        Math.max(1, Math.round(featureList.maxRows)),
+      )
+    : AvaMapConfigValues.exportFeatureListDefaultMaxRows;
+  return maxRows === featureList.maxRows
+    ? featureList
+    : { ...featureList, maxRows };
 }
 
 /** True when two header lines are equal. */
@@ -97,7 +120,8 @@ export const exportLayoutUpdaters = {
    * Replaces the map's export furniture.
    *
    * A blank disclaimer is normalized to unset, so the furniture strip and the
-   * page fall back to the localized default instead of showing nothing.
+   * page fall back to the localized default instead of showing nothing. A
+   * feature list's row cap is kept a whole number from 1 to 1,000.
    */
   withExportLayout: (
     options: Readonly<{
@@ -109,6 +133,7 @@ export const exportLayoutUpdaters = {
     const normalizedExportLayout: ExportLayout = {
       ...exportLayout,
       disclaimer: _normalizeDisclaimer(exportLayout.disclaimer),
+      featureList: _normalizeFeatureList(exportLayout.featureList),
     };
     return _isSameLayout(config.exportLayout, normalizedExportLayout)
       ? config

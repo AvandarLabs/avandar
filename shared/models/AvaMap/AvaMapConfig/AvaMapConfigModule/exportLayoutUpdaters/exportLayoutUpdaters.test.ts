@@ -115,4 +115,29 @@ describe("exportLayoutUpdaters", () => {
       }),
     ).toBe(config);
   });
+
+  it.each([
+    { typedRows: 5000, storedRows: 1000 },
+    { typedRows: 0, storedRows: 1 },
+    { typedRows: 12.6, storedRows: 13 },
+    { typedRows: Number.NaN, storedRows: 200 },
+  ])(
+    "stores a typed row cap of $typedRows as $storedRows",
+    ({ typedRows, storedRows }) => {
+      const config = AvaMapConfig.withExportLayout({
+        config: AvaMapConfig.makeEmpty(),
+        exportLayout: {
+          ...AvaMapConfig.defaultExportLayout,
+          featureList: {
+            layerId: uuid<MapLayer.Id>(),
+            columnIds: [],
+            sort: undefined,
+            maxRows: typedRows,
+          },
+        },
+      });
+
+      expect(config.exportLayout.featureList?.maxRows).toBe(storedRows);
+    },
+  );
 });
