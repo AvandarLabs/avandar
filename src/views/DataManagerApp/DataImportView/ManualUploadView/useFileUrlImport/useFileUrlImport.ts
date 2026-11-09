@@ -159,7 +159,9 @@ async function _loadFileUrl(input: {
     input.setPhase("idle");
     input.setMembers([]);
     input.onFileReady(
-      new File([acquired.bytes], acquired.fileName, {
+      // Downloaded bytes are always backed by a plain ArrayBuffer, which is
+      // what a File part takes.
+      new File([acquired.bytes as Uint8Array<ArrayBuffer>], acquired.fileName, {
         type: acquired.mediaType,
       }),
     );

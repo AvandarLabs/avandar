@@ -15,7 +15,9 @@ const BAD_GATEWAY = 502;
  */
 export function acquiredFileResponse(acquired: AcquiredPastedFile): Response {
   if (acquired.outcome === "file") {
-    return new Response(acquired.bytes, {
+    // Downloaded and unzipped bytes are always backed by a plain
+    // ArrayBuffer, which is what a Response body takes.
+    return new Response(acquired.bytes as Uint8Array<ArrayBuffer>, {
       status: 200,
       headers: {
         "Content-Type": acquired.mediaType,

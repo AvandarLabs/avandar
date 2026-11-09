@@ -6,7 +6,10 @@ import { PrivateFileHostError } from "$/fileUrl/PrivateFileHostError.ts";
 const CSV = strToU8("borough,doses\nManhattan,10\n");
 
 function _ok(bytes: Uint8Array, headers: Record<string, string>): Response {
-  return new Response(bytes, { status: 200, headers });
+  return new Response(bytes as Uint8Array<ArrayBuffer>, {
+    status: 200,
+    headers,
+  });
 }
 
 function _fetchFrom(routes: Record<string, Response>): typeof fetch {
@@ -17,7 +20,7 @@ function _fetchFrom(routes: Record<string, Response>): typeof fetch {
       throw new Error(`No fixture for ${url}`);
     }
     return response;
-  }) as typeof fetch;
+  }) as unknown as typeof fetch;
 }
 
 const allowPublicHost = vi.fn(async () => {});
@@ -53,7 +56,7 @@ describe("acquirePastedFile", () => {
 
     const acquired = await acquirePastedFile({
       url: "https://files.example.com/vaccines.csv",
-      fetch: fetchImpl as typeof fetch,
+      fetch: fetchImpl as unknown as typeof fetch,
       assertPublicHost: async () => {
         throw new PrivateFileHostError("files.example.com");
       },
@@ -289,7 +292,7 @@ describe("acquirePastedFile", () => {
 
     const acquired = await acquirePastedFile({
       url: "https://docs.google.com/spreadsheets/d/1AbC/edit",
-      fetch: fetchImpl as typeof fetch,
+      fetch: fetchImpl as unknown as typeof fetch,
       assertPublicHost: allowPublicHost,
     });
 
