@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { displaceSpatialFeatures } from "@/views/GisApp/layers/displaceSpatialFeatures/displaceSpatialFeatures";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
@@ -100,7 +101,7 @@ describe("displaceSpatialFeatures", () => {
     });
   });
 
-  it("displaces a WKT point exactly as a lat/lng row at the same index is displaced", () => {
+  it("displaces a WKT point exactly as a lat/lng row at the same coordinates is displaced", () => {
     const displaced = displaceSpatialFeatures({
       layer: jitterLayer,
       sourceLayer: jitterLayer,
@@ -113,7 +114,11 @@ describe("displaceSpatialFeatures", () => {
       latitude: goma[1] ?? 0,
       radiusMeters: RADIUS_METERS,
       salt: MAP_SALT,
-      seed: `${jitterLayer.id}:1`,
+      seed: buildJitterSeed({
+        layerId: jitterLayer.id,
+        longitude: goma[0] ?? 0,
+        latitude: goma[1] ?? 0,
+      }),
     });
     expect(_getPointPositions(displaced)[1]).toEqual([
       expected.longitude,
@@ -135,6 +140,26 @@ describe("displaceSpatialFeatures", () => {
       jitterSalt: MAP_SALT,
     });
     expect(_getPointPositions(second)).toEqual(_getPointPositions(first));
+  });
+
+  it("displaces the same real point identically whatever its feature order", () => {
+    const inOrder = displaceSpatialFeatures({
+      layer: jitterLayer,
+      sourceLayer: jitterLayer,
+      featureCollection: _createPointCollection([kinshasa, goma]),
+      jitterSalt: MAP_SALT,
+    });
+    const reordered = displaceSpatialFeatures({
+      layer: jitterLayer,
+      sourceLayer: jitterLayer,
+      featureCollection: _createPointCollection([goma, kinshasa]),
+      jitterSalt: MAP_SALT,
+    });
+
+    const [kinshasaFirst, gomaFirst] = _getPointPositions(inOrder);
+    const [gomaReordered, kinshasaReordered] = _getPointPositions(reordered);
+    expect(kinshasaReordered).toEqual(kinshasaFirst);
+    expect(gomaReordered).toEqual(gomaFirst);
   });
 
   it("keys each point's displacement with the map's salt", () => {
@@ -159,7 +184,11 @@ describe("displaceSpatialFeatures", () => {
         latitude: source[1] ?? 0,
         radiusMeters: RADIUS_METERS,
         salt: "",
-        seed: `${jitterLayer.id}:${index}`,
+        seed: buildJitterSeed({
+          layerId: jitterLayer.id,
+          longitude: source[0] ?? 0,
+          latitude: source[1] ?? 0,
+        }),
       });
       expect(positions[index]).not.toEqual([
         unsalted.longitude,
@@ -168,7 +197,7 @@ describe("displaceSpatialFeatures", () => {
     });
   });
 
-  it("moves each member of a MultiPoint independently", () => {
+  it("moves each member of a MultiPoint by its own coordinates", () => {
     const displaced = displaceSpatialFeatures({
       layer: jitterLayer,
       sourceLayer: jitterLayer,
@@ -178,7 +207,10 @@ describe("displaceSpatialFeatures", () => {
         features: [
           {
             type: "Feature",
-            geometry: { type: "MultiPoint", coordinates: [kinshasa, kinshasa] },
+            geometry: {
+              type: "MultiPoint",
+              coordinates: [kinshasa, goma, kinshasa],
+            },
             properties: {},
           },
         ],
@@ -189,10 +221,15 @@ describe("displaceSpatialFeatures", () => {
     if (geometry?.type !== "MultiPoint") {
       throw new Error("Expected a MultiPoint feature");
     }
-    const [firstMember, secondMember] = geometry.coordinates;
-    expect(firstMember).not.toEqual(kinshasa);
-    expect(secondMember).not.toEqual(kinshasa);
-    expect(firstMember).not.toEqual(secondMember);
+    const [firstKinshasa, gomaMember, secondKinshasa] = geometry.coordinates;
+    expect(firstKinshasa).not.toEqual(kinshasa);
+    expect(gomaMember).not.toEqual(goma);
+    // Two copies of one real point land together, so they cannot be averaged
+    // back to the real point.
+    expect(secondKinshasa).toEqual(firstKinshasa);
+    expect(_getDistanceMeters(goma, gomaMember ?? goma)).toBeLessThanOrEqual(
+      RADIUS_METERS,
+    );
   });
 
   it("keeps feature properties while moving the geometry", () => {

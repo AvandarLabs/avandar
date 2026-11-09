@@ -16,6 +16,7 @@ import {
   UNIT_CELL,
 } from "@/clients/maps/MapSnapshot/compileMapSnapshot/compileMapSnapshot.fixtures";
 import { MapSnapshotJson } from "@/clients/maps/MapSnapshot/MapSnapshotJson/MapSnapshotJson";
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
@@ -436,16 +437,20 @@ describe("compileMapSnapshot queries", () => {
   });
 });
 
-/** The displaced position the map's salt gives `position` as row `rowIndex`. */
+/** The displaced position the map's salt gives the school's position. */
 function _getSaltedPosition(
-  options: Readonly<{ layerId: MapLayer.Id; salt: string; rowIndex: number }>,
+  options: Readonly<{ layerId: MapLayer.Id; salt: string }>,
 ): GeoJSON.Position {
   const displaced = jitterCoordinate({
     longitude: SCHOOL_POSITION[0],
     latitude: SCHOOL_POSITION[1],
     radiusMeters: JITTER.radiusMeters,
     salt: options.salt,
-    seed: `${options.layerId}:${options.rowIndex}`,
+    seed: buildJitterSeed({
+      layerId: options.layerId,
+      longitude: SCHOOL_POSITION[0],
+      latitude: SCHOOL_POSITION[1],
+    }),
   });
   return [displaced.longitude, displaced.latitude];
 }
@@ -462,10 +467,10 @@ describe("compileMapSnapshot displacement salt", () => {
     const point = _getFirstPoint(await _compile([layer]));
 
     expect(point).toEqual(
-      _getSaltedPosition({ layerId: layer.id, salt: MAP_SALT, rowIndex: 0 }),
+      _getSaltedPosition({ layerId: layer.id, salt: MAP_SALT }),
     );
     expect(point).not.toEqual(
-      _getSaltedPosition({ layerId: layer.id, salt: "", rowIndex: 0 }),
+      _getSaltedPosition({ layerId: layer.id, salt: "" }),
     );
   });
 
@@ -480,10 +485,10 @@ describe("compileMapSnapshot displacement salt", () => {
     const point = _getFirstPoint(await _compile([layer]));
 
     expect(point).toEqual(
-      _getSaltedPosition({ layerId: layer.id, salt: MAP_SALT, rowIndex: 0 }),
+      _getSaltedPosition({ layerId: layer.id, salt: MAP_SALT }),
     );
     expect(point).not.toEqual(
-      _getSaltedPosition({ layerId: layer.id, salt: "", rowIndex: 0 }),
+      _getSaltedPosition({ layerId: layer.id, salt: "" }),
     );
   });
 

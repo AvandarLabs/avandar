@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -246,14 +247,22 @@ describe("makeFeatureCollectionFromRows", () => {
       latitude: -4.44,
       radiusMeters: 500,
       salt: MAP_SALT,
-      seed: "layer-1:0",
+      seed: buildJitterSeed({
+        layerId: "layer-1",
+        longitude: 15.27,
+        latitude: -4.44,
+      }),
     });
     const unsalted = jitterCoordinate({
       longitude: 15.27,
       latitude: -4.44,
       radiusMeters: 500,
       salt: "",
-      seed: "layer-1:0",
+      seed: buildJitterSeed({
+        layerId: "layer-1",
+        longitude: 15.27,
+        latitude: -4.44,
+      }),
     });
 
     expect(makeJitteredPosition(MAP_SALT)).toEqual([
@@ -267,6 +276,37 @@ describe("makeFeatureCollectionFromRows", () => {
     expect(makeJitteredPosition("another-map-salt")).not.toEqual(
       makeJitteredPosition(MAP_SALT),
     );
+  });
+
+  it("displaces the same real point identically whatever its row order", () => {
+    const makeJitteredPositions = (
+      rows: ReadonlyArray<{ lat: number; lon: number }>,
+    ): GeoJSON.Position[] => {
+      const result = makeFeatureCollectionFromRows({
+        rows: [...rows],
+        binding,
+        propertyColumnNames: "all",
+        sensitivity: { mode: "jitter", radiusMeters: 500 },
+        layerId: "layer-1",
+        jitterSalt: MAP_SALT,
+      });
+      return result.featureCollection.features.map((feature) => {
+        return (feature.geometry as GeoJSON.Point).coordinates;
+      });
+    };
+    const kinshasa = { lat: -4.44, lon: 15.27 };
+    const goma = { lat: -1.68, lon: 29.22 };
+    const added = { lat: -2.5, lon: 28.86 };
+
+    const [kinshasaFirst, gomaFirst] = makeJitteredPositions([kinshasa, goma]);
+    const [, gomaReordered, kinshasaReordered] = makeJitteredPositions([
+      added,
+      goma,
+      kinshasa,
+    ]);
+
+    expect(kinshasaReordered).toEqual(kinshasaFirst);
+    expect(gomaReordered).toEqual(gomaFirst);
   });
 
   it("refuses to build exact points for an aggregate-only layer", () => {

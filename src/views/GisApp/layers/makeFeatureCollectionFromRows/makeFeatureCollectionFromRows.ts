@@ -8,6 +8,7 @@ import {
   prop,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -43,7 +44,6 @@ type PlaceCoordinateInput = {
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
   jitterSalt: string;
-  rowIndex: number;
 };
 
 type CreatePointFeatureInput = {
@@ -118,7 +118,6 @@ function _placeCoordinate({
   sensitivity,
   layerId,
   jitterSalt,
-  rowIndex,
 }: PlaceCoordinateInput): { longitude: number; latitude: number } {
   return match(sensitivity)
     .with({ mode: "exact" }, () => {
@@ -130,7 +129,7 @@ function _placeCoordinate({
         latitude,
         radiusMeters: policy.radiusMeters,
         salt: jitterSalt,
-        seed: `${layerId}:${rowIndex}`,
+        seed: buildJitterSeed({ layerId, longitude, latitude }),
       });
     })
     .with({ mode: "aggregateOnly" }, () => {
@@ -230,7 +229,6 @@ function _placeRow({
     sensitivity,
     layerId,
     jitterSalt,
-    rowIndex,
   });
 
   return {
@@ -300,9 +298,9 @@ function _buildConversionResult(
  * from the layer's popup config. `"all"` keeps everything except the bound
  * coordinate columns.
  * @param params.sensitivity Spatial privacy policy applied to each geometry.
- * @param params.layerId Used with the row index to seed jitter.
+ * @param params.layerId Used with each point's coordinates to seed jitter.
  * @param params.jitterSalt The map's secret key for jitter, so a published
- * displaced point cannot be reversed from its layer id and row index.
+ * displaced point cannot be reversed from its public seed.
  * @returns The converted features and a report for every row that was dropped.
  * @throws SensitivityViolationError when the policy is `aggregateOnly`, which
  * no geometry binding can satisfy yet.

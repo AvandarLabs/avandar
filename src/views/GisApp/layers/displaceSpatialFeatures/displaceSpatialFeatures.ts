@@ -1,3 +1,4 @@
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -9,13 +10,16 @@ type DisplaceSpatialFeaturesInput = {
   jitterSalt: string;
 };
 
-/** Displaces one position with the seed lat/lng layers use for a row. */
+/**
+ * Displaces one position with the seed a lat/lng row at the same coordinates
+ * uses, so a point moves the same way whichever binding draws it.
+ */
 function _jitterPosition(
   options: Readonly<{
     position: GeoJSON.Position;
     radiusMeters: number;
     salt: string;
-    seed: string;
+    layerId: string;
   }>,
 ): GeoJSON.Position {
   const [longitude = 0, latitude = 0] = options.position;
@@ -24,7 +28,7 @@ function _jitterPosition(
     latitude,
     radiusMeters: options.radiusMeters,
     salt: options.salt,
-    seed: options.seed,
+    seed: buildJitterSeed({ layerId: options.layerId, longitude, latitude }),
   });
   return [displaced.longitude, displaced.latitude];
 }
@@ -38,11 +42,11 @@ function _jitterGeometry(
     geometry: GeoJSON.Geometry;
     radiusMeters: number;
     salt: string;
-    seed: string;
+    layerId: string;
     layerName: string;
   }>,
 ): GeoJSON.Geometry {
-  const { geometry, radiusMeters, salt, seed } = options;
+  const { geometry, radiusMeters, salt, layerId } = options;
   if (geometry.type === "Point") {
     return {
       type: "Point",
@@ -50,20 +54,15 @@ function _jitterGeometry(
         position: geometry.coordinates,
         radiusMeters,
         salt,
-        seed,
+        layerId,
       }),
     };
   }
   if (geometry.type === "MultiPoint") {
     return {
       type: "MultiPoint",
-      coordinates: geometry.coordinates.map((position, memberIndex) => {
-        return _jitterPosition({
-          position,
-          radiusMeters,
-          salt,
-          seed: `${seed}:${memberIndex}`,
-        });
+      coordinates: geometry.coordinates.map((position) => {
+        return _jitterPosition({ position, radiusMeters, salt, layerId });
       }),
     };
   }
@@ -98,10 +97,11 @@ function _isUndisplaceable(
  * query returned, so a displaced layer never exposes exact positions to the
  * map, its popups, or the map tools that read the same features.
  *
- * Each point moves exactly as a lat/lng row at the same index does: the same
- * `jitterCoordinate` keyed by the map's secret salt, with the seed
- * `${layerId}:${featureIndex}`. Members of a
- * multipoint add their own index to that seed so they do not move together.
+ * Each point moves exactly as a lat/lng row at the same coordinates does: the
+ * same `jitterCoordinate` keyed by the map's secret salt, seeded by the layer
+ * and the point's own original coordinates (`buildJitterSeed`). Each member
+ * of a multipoint is seeded by its own coordinates, so members at different
+ * places move independently.
  *
  * Aggregated bindings (boundary joins, point aggregation, grid bins) are
  * returned unchanged: they draw areas and counts, never individual points.
@@ -135,14 +135,14 @@ export function displaceSpatialFeatures({
   }
   return {
     ...featureCollection,
-    features: featureCollection.features.map((feature, featureIndex) => {
+    features: featureCollection.features.map((feature) => {
       return {
         ...feature,
         geometry: _jitterGeometry({
           geometry: feature.geometry,
           radiusMeters: sensitivity.radiusMeters,
           salt: jitterSalt,
-          seed: `${layer.id}:${featureIndex}`,
+          layerId: layer.id,
           layerName: layer.name,
         }),
       };
