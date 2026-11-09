@@ -394,6 +394,10 @@ msgid "No filters yet. Add one to let viewers refine this chart without "
 "affecting any others."
 msgstr "尚未添加過濾器。添加一個以讓觀眾在不影響其他圖表的情況下精煉此圖表。"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
+msgid "Not everyone can see every map"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
 msgstr "Excel 檔案"
@@ -1163,6 +1167,8 @@ msgstr "該工作表有一個標題列"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/config/AppLinks/AppLinks.tsx
+#: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/useMapPBlockConfig.tsx
+#: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Map"
 msgstr "地圖"
 
@@ -1364,6 +1370,10 @@ msgstr "指派給"
 #: src/views/DashboardApp/DashboardShareModal/DashboardShareButton.tsx
 msgid "Share “{resourceName}”"
 msgstr "分享 “{resourceName}”"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
+msgid "Checking what each map publishes"
+msgstr ""
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/signin.tsx
@@ -1720,6 +1730,10 @@ msgstr "關閉聊天 (⌘/)"
 msgid "Create failed"
 msgstr "創建失敗"
 
+#: src/views/GisApp/MapViewer/MapViewerState.tsx
+msgid "Ask the map's owner to share the map and its data with you."
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per month"
 msgstr "{fieldName}（每月）"
@@ -1984,6 +1998,11 @@ msgstr "指北針"
 msgid "The offline models did not download"
 msgstr "離線模型未下載"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
+msgid "Some people who can open this dashboard cannot open {mapList}. They will "
+"see \"You don't have access to this map\" in its place."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "Defaults to \"Y vs X\""
@@ -2079,7 +2098,9 @@ msgid "Show the first 20 rows of {datasetName}"
 msgstr "顯示 {datasetName} 的前 20 行"
 
 #. placeholder {0}: app.name
+#. placeholder {0}: props.mapName
 #: src/views/GisApp/GisAppMapShell.tsx
+#: src/views/GisApp/MapViewer/MapViewerFrame.tsx
 msgid "Map of {0}"
 msgstr "{0} 的地圖"
 
@@ -2242,6 +2263,11 @@ msgstr "{code} - UTM 南部區域 {0}"
 msgid "Hold Alt and press the up or down arrow to move this layer."
 msgstr "按住 Alt 並按向上或向下箭頭鍵即可移動此圖層。"
 
+#: src/views/GisApp/MapViewer/MapViewerState.tsx
+msgid "This map was added after the dashboard was last published. Publish again "
+"to show it here."
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
 msgstr "Positron"
@@ -2287,6 +2313,10 @@ msgstr "Excel 檔案"
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture the dashboard for annotation."
 msgstr "無法捕捉儀表板以進行註解。"
+
+#: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock.tsx
+msgid "Dashboard filters don't apply to this map yet."
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "It may take a few minutes for your subscription to take effect."
@@ -2553,6 +2583,7 @@ msgid "Default value (optional)"
 msgstr "預設值（可選）"
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+#: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Your user profile is not loaded yet. Please retry."
 msgstr "您的用戶檔案尚未加載。請重試。"
 
@@ -2639,6 +2670,7 @@ msgstr "預覽 {0} 的數據"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetSourceAndDisclaimerFields.tsx
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
+#: src/views/GisApp/MapViewer/MapViewerFurniture.tsx
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "The boundaries and names shown do not imply official endorsement or "
 "acceptance."
@@ -3370,6 +3402,10 @@ msgstr "標註後再匯出"
 msgid "{0}, {1}, and {2} are fixed for every workspace."
 msgstr "{0}、{1} 和 {2} 對每個工作區都是固定的。"
 
+#: src/views/GisApp/MapViewer/MapViewerState.tsx
+msgid "You don't have access to this map"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
 msgstr "已同步至雲端"
@@ -4045,6 +4081,10 @@ msgstr "無法使用的案件"
 msgid "Type a value"
 msgstr "輸入值"
 
+#: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
+msgid "Opens on"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
 msgstr "第 11 欄"
@@ -4678,6 +4718,11 @@ msgstr "您目前處於離線狀態"
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Filter datasets"
 msgstr "篩選資料集"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
+msgid "A map could not be prepared for publishing. Open it in Maps to check its "
+"layers."
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
@@ -5328,6 +5373,11 @@ msgid "A file you drop stays on this device until you save. A link is "
 "downloaded by Avandar first, then read here the same way."
 msgstr "您拖放的檔案會留在此裝置上，直到您儲存為止。Avandar 會先下載連結中的檔案，然後以相同方式在此讀取。"
 
+#: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
+#: src/views/GisApp/GisAppMapShell.tsx
+msgid "Add to dashboard"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
 msgstr "Avandar（預設）"
@@ -5339,6 +5389,10 @@ msgstr "新增您的第一個資料集"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
 msgstr "寬"
+
+#: src/views/GisApp/MapViewer/MapViewerState.tsx
+msgid "Loading the map"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
@@ -5398,6 +5452,11 @@ msgstr "哪個 {groupByColumn} 的 {measureColumn} 總計最高？"
 #: src/components/RichText/Gadget/GadgetChip/GadgetChip.tsx
 msgid "Unavailable item"
 msgstr "無法使用的項目"
+
+#. placeholder {0}: error.message
+#: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
+msgid "Could not add the map: {0}"
+msgstr ""
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -5936,6 +5995,7 @@ msgstr "{0} 刪除成功"
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+#: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Open dashboard"
 msgstr "打開儀表板"
 
@@ -5966,6 +6026,10 @@ msgstr "開啟儀表板圖塊"
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Per month"
 msgstr "按月"
+
+#: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
+msgid "No maps match"
+msgstr ""
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -6525,6 +6589,10 @@ msgstr "共用雲端硬碟"
 msgid "H3"
 msgstr "H3"
 
+#: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
+msgid "Pick a map"
+msgstr ""
+
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/useRegistrationForm.ts
 msgid "Passwords do not match"
@@ -6827,6 +6895,11 @@ msgstr "曲線"
 msgid "{threshold}% or above"
 msgstr "{threshold}% 或以上"
 
+#. placeholder {0}: summary.featureCount
+#: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
+msgid "{0, plural, one {# feature} other {# features}}"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
@@ -6949,6 +7022,11 @@ msgstr "根據預設，我們會使用直接的 UUID 連結。請在下方新增
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PrimaryActionLabel.tsx
 msgid "Make internal"
 msgstr "設為內部"
+
+#: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
+msgid "The map \"{mapName}\" has filters that no longer match its data. Open "
+"the map and fix them before publishing."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
@@ -7486,6 +7564,11 @@ msgstr ""
 msgid "Rows from this table"
 msgstr "來自這張表格的列"
 
+#: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
+msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
+"hidden from you}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
 msgstr "資料集名稱必須至少 2 個字元。"
@@ -7946,6 +8029,11 @@ msgstr "第 {rowIndexes} 列。"
 msgid "A confirmation email has been sent to your email address."
 msgstr "確認電子郵件已發送至您的電子郵件地址。"
 
+#. placeholder {0}: error.message
+#: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
+msgid "Could not create the dashboard: {0}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
 msgstr "顯示精確位置？"
@@ -8256,6 +8344,7 @@ msgstr "儲存資料集時發生錯誤"
 #: shared/copy/appLabel.ts
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/config/AppLinks/AppLinks.tsx
+#: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 #: src/views/GisApp/MapListView/MapListView.tsx
 msgid "Maps"
 msgstr "地圖"
@@ -9402,6 +9491,10 @@ msgid "This workspace no longer exists or your access has been revoked. If you "
 "think this is a mistake, contact your workspace owner."
 msgstr "此工作區已不存在，或您已被撤銷存取權。如果您認為這是錯誤，請聯絡工作區擁有者。"
 
+#: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
+msgid "Loading maps"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "This tool turns on when geometry support finishes downloading."
@@ -9651,6 +9744,10 @@ msgstr "第 2 欄"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "資料尚未準備就緒"
+
+#: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
+msgid "The map's saved view"
+msgstr ""
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
@@ -10950,6 +11047,10 @@ msgstr "無法載入此案件的活動"
 msgid "That query failed"
 msgstr "該查詢失敗"
 
+#: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlockEmptyState.tsx
+msgid "Pick a map in this block's settings."
+msgstr ""
+
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer to plot a dataset, a derived dataset, or a profile. You can "
 "add as many as you need and reorder them."
@@ -11281,6 +11382,11 @@ msgid "Upload a CSV, Excel, or PDF file, connect a Google Sheet, or browse the "
 msgstr "上傳 CSV、Excel 或 PDF 檔案、連結 Google Sheet，或瀏覽開放資料目錄。Avandar "
 "中的其他功能都建立在您從這裡匯入的內容之上。"
 
+#. placeholder {0}: dashboard.name
+#: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
+msgid "Added this map to \"{0}\""
+msgstr ""
+
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
 msgstr ""
@@ -11326,6 +11432,7 @@ msgstr "類別 {0}"
 #: src/views/DashboardApp/DashboardListView/DashboardListView.tsx
 #: src/views/DashboardApp/DashboardViewerView/DashboardViewerView.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
+#: src/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal.tsx
 msgid "Untitled dashboard"
 msgstr "無標題儀表板"
 
@@ -11418,6 +11525,7 @@ msgstr "大於"
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/lib/plugins/makePluginApi/makePluginApi.tsx
 #: src/lib/plugins/PluginDrawerHost/PluginDrawerHost.tsx
+#: src/views/GisApp/MapViewer/MapViewerPopupCard.tsx
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspectorHeader/FeatureInspectorHeader.tsx
 msgid "Close"
 msgstr "關閉"
@@ -11530,6 +11638,11 @@ msgstr "熱度"
 msgid "Skip to layer settings"
 msgstr "跳至圖層設定"
 
+#. placeholder {0}: dashboard.name
+#: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
+msgid "Created \"{0}\" with this map"
+msgstr ""
+
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
 #: src/routes/_auth/$workspaceSlug/ontology-designer/index.tsx
@@ -11573,6 +11686,12 @@ msgstr "箭頭"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 10"
 msgstr "第 10 欄"
+
+#: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
+msgid "Maps are published as what they show: each layer's shapes and popup "
+"columns, with displaced and aggregated layers already protected. The "
+"data behind them is not published."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
@@ -11731,6 +11850,10 @@ msgstr "助手無法回答這個問題。請稍後再試。"
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
 msgstr "推薦的下一步"
+
+#: src/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal.tsx
+msgid "Pick a dashboard to add this map to, or create one."
+msgstr ""
 
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
