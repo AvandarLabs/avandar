@@ -1,11 +1,13 @@
 import {
   isNonNullish,
+  isPlainObject,
   makeObjectFromEntries,
   prop,
   propEq,
 } from "@avandar/utils";
 import { z } from "zod";
 import { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { UiPluginVizConfigSchema } from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
@@ -68,6 +70,30 @@ export type ParsedUrlState = {
   openDataset?: OpenDatasetInfo;
 };
 
+/** The value a JSON string holds, or undefined when the string is not JSON. */
+function _parseJson(text: string): unknown {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The chart config a `vc` param holds, or undefined when it is not JSON. A
+ * plugin chart config must also pass `UiPluginVizConfigSchema`, since nothing
+ * downstream can repair one that names no plugin chart type, so a failing one
+ * is dropped and the Explorer opens on the table view.
+ */
+function _getUiVizConfigFromParam(vc: string): UiVizConfig | undefined {
+  const parsed = _parseJson(vc);
+  if (isPlainObject(parsed) && parsed["vizType"] === "plugin") {
+    const pluginVizConfig = UiPluginVizConfigSchema.safeParse(parsed);
+    return pluginVizConfig.success ? pluginVizConfig.data : undefined;
+  }
+  return parsed as UiVizConfig | undefined;
+}
+
 /**
  * Parses the raw URL search params into typed, structured state that the
  * Data Explorer can use to restore its session.
@@ -117,10 +143,9 @@ export function parseUrlSearch(search: DataExplorerUrlSearch): ParsedUrlState {
   }
 
   if (search.vc) {
-    try {
-      result.vizConfig = JSON.parse(search.vc) as UiVizConfig;
-    } catch {
-      // Ignore malformed JSON — the viz will fall back to defaults.
+    const vizConfig = _getUiVizConfigFromParam(search.vc);
+    if (vizConfig) {
+      result.vizConfig = vizConfig;
     }
   }
 

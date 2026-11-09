@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { makeCaseDetailsRowsFromAttributes } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordFields/makeCaseDetailsRowsFromAttributes/makeCaseDetailsRowsFromAttributes";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
@@ -21,6 +22,9 @@ function _makeAttribute(
   options: Readonly<{
     name: string;
     mappingType?: ConceptAttribute.T["mappingType"];
+    dataType?: AvaDataType.T;
+    isArray?: boolean;
+    bucketGrain?: ConceptAttribute.BucketGrain;
   }>,
 ): ConceptAttribute.T {
   return Model.make("ConceptAttribute", {
@@ -31,12 +35,13 @@ function _makeAttribute(
     description: undefined,
     createdAt: NOW,
     updatedAt: NOW,
-    dataType: "varchar",
+    dataType: options.dataType ?? "varchar",
     mappingType: options.mappingType ?? "dataset_column",
     isLabel: false,
     isIdentifier: false,
     allowManualEdit: false,
-    isArray: false,
+    isArray: options.isArray ?? false,
+    bucketGrain: options.bucketGrain,
   });
 }
 
@@ -67,6 +72,7 @@ function _makeMapping(
     valuePickerRuleType: "first",
     datasetId: options.dataset.id,
     datasetColumnId: uuid<DatasetColumn.Id>(),
+    bucketColumnId: undefined,
     createdAt: NOW,
     updatedAt: NOW,
   };
@@ -94,6 +100,67 @@ describe("makeCaseDetailsRowsFromAttributes", () => {
 
   // Provenance belongs to the field's mappings, not to a value: a field may
   // read several datasets.
+  it("gives each row its field's data type", () => {
+    const onset = _makeAttribute({ name: "rash onset", dataType: "date" });
+
+    const [row] = makeCaseDetailsRowsFromAttributes({
+      attributes: [onset],
+      valuesByAttributeId: { [onset.id]: 1_709_596_800_000 },
+      mappings: [],
+      datasets: [],
+    });
+
+    expect(row?.dataType).toBe("date");
+  });
+
+  it("gives each row its field's value shape", () => {
+    const county = _makeAttribute({ name: "county" });
+    const dailyCases = _makeAttribute({ name: "daily cases", isArray: true });
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [county, dailyCases],
+      valuesByAttributeId: {
+        [county.id]: "Alameda",
+        [dailyCases.id]: [31, 48],
+      },
+      mappings: [],
+      datasets: [],
+    });
+
+    expect(
+      rows.map((row) => {
+        return [row.name, row.valueShape];
+      }),
+    ).toEqual([
+      ["county", "single"],
+      ["daily cases", "list"],
+    ]);
+  });
+
+  it("gives a per-month field's row its period and the type of each value", () => {
+    const temperature = _makeAttribute({
+      name: "temperature",
+      dataType: "double",
+      isArray: true,
+      bucketGrain: "month",
+    });
+
+    const rows = makeCaseDetailsRowsFromAttributes({
+      attributes: [temperature],
+      valuesByAttributeId: {
+        [temperature.id]: [{ bucket: "2026-01-01", value: 38.5 }],
+      },
+      mappings: [],
+      datasets: [],
+    });
+
+    expect(rows[0]).toMatchObject({
+      valueShape: "bucketed_list",
+      bucketGrain: "month",
+      dataType: "double",
+    });
+  });
+
   it("names the dataset each of a field's mappings reads, and none for a manual-entry field", () => {
     const region = _makeAttribute({ name: "region" });
     const note = _makeAttribute({ name: "note", mappingType: "manual_entry" });

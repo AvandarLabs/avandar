@@ -6370,7 +6370,7 @@ git commit -m "docs(joined-cases): describe per-period fields in the ontology ar
 - [ ] `pnpm test:executed` passes, including every rule per period in `buildBucketedListValueSql.executed.test.ts`.
 - [ ] `pnpm test:frontend`, `pnpm type-check`, and `pnpm lint` pass.
 - [ ] `pnpm test:frontend duckDbArrowResults` passes, including the map, map-in-a-list, and union decimals Task 5 added.
-- [ ] `RecordFieldPeriodTable` formats its values through `useFieldValueFormatter` (`rg -n "useFieldValueFormatter" src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable` finds `useBucketValueFormatter.ts`).
+- [ ] `RecordFieldPeriodTable` formats its values through `useFieldValueFormatter` (`rg -n "useFieldValueFormatter" src/components/caseFields/useBucketValueFormatter` finds `useBucketValueFormatter.ts`).
 - [ ] `pnpm test:e2e case-bucketed-fields.spec.ts` and `pnpm test:e2e case-list-field.spec.ts` pass, each run on its own.
 - [ ] `pnpm i18n:check` and `pnpm desktop:sqlite:check-migrations` are clean.
 - [ ] The Task 17 screenshots show the form's period controls, the case type page's badge, and the record page's table.

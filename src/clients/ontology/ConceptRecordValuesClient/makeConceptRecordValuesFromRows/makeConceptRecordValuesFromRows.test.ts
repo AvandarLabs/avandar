@@ -13,12 +13,14 @@ const COLUMNS: ConceptAttributeColumn[] = [
     attributeId: AGE_ID,
     attributeName: "age",
     duckDbDataType: "BIGINT",
+    valueShape: "single",
   },
   {
     kind: "unmapped",
     attributeId: SECOND_AGE_ID,
     attributeName: "age_2",
     duckDbDataType: "BIGINT",
+    valueShape: "single",
   },
 ];
 
@@ -78,6 +80,7 @@ describe("makeConceptRecordValuesFromRows", () => {
           attributeId: AGE_ID,
           attributeName: "constructor",
           duckDbDataType: "BIGINT",
+          valueShape: "single",
         },
       ],
       externalIds: ["p1"],

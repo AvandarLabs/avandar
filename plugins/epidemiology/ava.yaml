@@ -1,0 +1,74 @@
+# The epidemiology plugin: statistical tools for public-health data.
+id: avandar.epidemiology
+name: "%plugin.name%"
+description: "%plugin.description%"
+version: "0.1.0"
+license: MIT
+engines:
+  avandar: "^1"
+entry: src/index.tsx
+icon: chart-dots
+permissions:
+  - data:context
+contributes:
+  commands:
+    - id: regression.linear
+      title: "%regression.linear.title%"
+      icon: trending-up
+  menus:
+    dataExplorer.toolbar:
+      - command: regression.linear
+        when:
+          numericColumnCount: { gte: 2 }
+  vizTypes:
+    - id: epicurve
+      title: "%viz.epicurve.title%"
+      icon: chart-histogram
+      render: transform
+      settings:
+        - key: dateColumn
+          label: "%viz.epicurve.dateColumn%"
+          control: { kind: columnPicker, dataType: temporal }
+          required: true
+        - key: countColumn
+          label: "%viz.epicurve.countColumn%"
+          control: { kind: columnPicker, dataType: numeric }
+        - key: interval
+          label: "%viz.epicurve.interval%"
+          control:
+            kind: segmented
+            options:
+              - { value: day, label: "%viz.epicurve.interval.day%" }
+              - { value: epiWeek, label: "%viz.epicurve.interval.epiWeek%" }
+              - { value: month, label: "%viz.epicurve.interval.month%" }
+          default: epiWeek
+        - key: stackByColumn
+          label: "%viz.epicurve.stackByColumn%"
+          control: { kind: columnPicker, dataType: text }
+    - id: rate-plot
+      title: "%viz.ratePlot.title%"
+      icon: chart-dots-3
+      render: component
+      settings:
+        - key: labelColumn
+          label: "%viz.ratePlot.labelColumn%"
+          control: { kind: columnPicker, dataType: text }
+          required: true
+        - key: rateColumn
+          label: "%viz.ratePlot.rateColumn%"
+          control: { kind: columnPicker, dataType: numeric }
+          required: true
+        - key: lowerColumn
+          label: "%viz.ratePlot.lowerColumn%"
+          control: { kind: columnPicker, dataType: numeric }
+        - key: upperColumn
+          label: "%viz.ratePlot.upperColumn%"
+          control: { kind: columnPicker, dataType: numeric }
+        - key: sort
+          label: "%viz.ratePlot.sort%"
+          control:
+            kind: segmented
+            options:
+              - { value: rate, label: "%viz.ratePlot.sort.rate%" }
+              - { value: label, label: "%viz.ratePlot.sort.label%" }
+          default: rate

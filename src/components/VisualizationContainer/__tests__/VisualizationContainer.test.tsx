@@ -27,9 +27,14 @@ vi.mock("@/lib/ui/viz/DataGrid", () => {
     DataGrid: (props: {
       columnNames: readonly string[];
       data: UnknownDataFrame;
+      bucketGrains?: Readonly<Record<string, string>>;
     }) => {
       return (
-        <div data-testid="data-grid" data-row-count={props.data.length}>
+        <div
+          data-testid="data-grid"
+          data-row-count={props.data.length}
+          data-bucket-grains={JSON.stringify(props.bucketGrains ?? {})}
+        >
           {props.columnNames.map((name) => {
             return <span key={name}>{name}</span>;
           })}
@@ -314,6 +319,18 @@ describe("VisualizationContainer", () => {
     expect(bubble).toHaveAttribute("data-size", "value");
   });
 
+  it("shows the missing plugin placeholder for a plugin chart", async () => {
+    renderViz({
+      vizType: "plugin",
+      pluginId: "avandar.epidemiology",
+      pluginVizId: "epicurve",
+      columnSettings: {},
+      settings: {},
+    });
+    expect(await screen.findByText("Plugin not available")).toBeInTheDocument();
+    expect(screen.getByText(/avandar\.epidemiology/)).toBeInTheDocument();
+  });
+
   it("passes truncated data to bar charts over the render limit", () => {
     const barMax = VIZ_RENDER_LIMITS.bar!.max;
     const overLimitData: UnknownDataFrame = Array.from(
@@ -374,5 +391,31 @@ it("retains raw table metadata when a column cannot receive a unique identity", 
   expect(screen.getByTestId("data-grid")).toHaveAttribute(
     "data-row-count",
     "1",
+  );
+});
+
+it("tells the table which period each per-period column holds", () => {
+  render(
+    <AvandarAppProvider>
+      <VisualizationContainer
+        columns={[
+          {
+            id: "temperature" as QueryColumn.Id,
+            name: "Temperature",
+            dataType: "varchar",
+            isArray: true,
+            bucketGrain: "month",
+          },
+          { id: "name" as QueryColumn.Id, name: "Name", dataType: "varchar" },
+        ]}
+        data={[{ Temperature: [], Name: "Ana" }]}
+        dateColumns={new Set()}
+        vizConfig={{ vizType: "table" }}
+      />
+    </AvandarAppProvider>,
+  );
+  expect(screen.getByTestId("data-grid")).toHaveAttribute(
+    "data-bucket-grains",
+    JSON.stringify({ Temperature: "month" }),
   );
 });

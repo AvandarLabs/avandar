@@ -1,11 +1,15 @@
+import { omit } from "@avandar/utils";
 import { parseProposedCaseStatuses } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DatasetColumnMappings } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMappings.ts";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule.ts";
 import type {
+  ChatCaseBucketGrain,
   ChatCaseSourceDataset,
   ChatCaseValuePickerRuleType,
+  ChatCaseValueShape,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
   ChatProposedManualEntryAttribute,
@@ -15,21 +19,32 @@ import type { DatasetColumn } from "@sbfn/chat/PostChatMessages/schema/fetchWork
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-/** The catalog columns' ids and Ava types, as `dataset_columns` stores them. */
-type CatalogColumn = Pick<DatasetColumn, "id" | "data_type">;
+/**
+ * The catalog columns' ids, datasets, and Ava types, as `dataset_columns`
+ * stores them.
+ */
+type CatalogColumn = Pick<DatasetColumn, "id" | "dataset_id" | "data_type">;
 
-/** Each catalog column's Ava data type, by column id. */
-type ColumnDataTypesById = Map<string, AvaDataType.T>;
+/** A catalog column's dataset and Ava data type. */
+type CatalogColumnInfo = Readonly<{
+  datasetId: string;
+  dataType: AvaDataType.T;
+}>;
 
-function _createColumnDataTypesByIdFromColumns(
+/** Each catalog column's dataset and Ava data type, by column id. */
+type ColumnInfosById = ReadonlyMap<string, CatalogColumnInfo>;
+
+function _createColumnInfosByIdFromColumns(
   columns: readonly CatalogColumn[],
-): ColumnDataTypesById {
+): ColumnInfosById {
   return new Map(
     columns.flatMap((column) => {
       const dataType = AvaDataType.Types.find((type) => {
         return type === column.data_type;
       });
-      return column.id && dataType ? [[column.id, dataType] as const] : [];
+      return column.id && dataType
+        ? [[column.id, { datasetId: column.dataset_id, dataType }] as const]
+        : [];
     }),
   );
 }
@@ -57,6 +72,76 @@ function _asValuePickerRuleType(value: unknown): ChatCaseValuePickerRuleType {
       return rule === text;
     }) ?? ValuePickerRule.DEFAULT_RULE_TYPE
   );
+}
+
+/**
+ * Anything but an explicit list keeps one value, which is the safe reading
+ * of a malformed proposal: the user can still switch it in the card.
+ */
+function _asValueShape(value: unknown): ChatCaseValueShape {
+  return value === "list" ? "list" : "single";
+}
+
+function _asBucketGrain(value: unknown): ChatCaseBucketGrain | undefined {
+  const text = _asTrimmedString(value);
+  return ConceptAttribute.BUCKET_GRAINS.find((bucketGrain) => {
+    return bucketGrain === text;
+  });
+}
+
+/**
+ * The id of a date or timestamp column of `datasetId`, when the catalog lists
+ * the column as one. A column the catalog does not list is refused, unlike a
+ * value column: a per-period field cannot be built without a date column, so
+ * the proposal falls back to one value instead of reaching the client with a
+ * column it would have to refuse.
+ */
+function _asCatalogBucketColumnId(
+  options: Readonly<{
+    rawColumnId: unknown;
+    datasetId: string;
+    columnInfosById: ColumnInfosById;
+  }>,
+): string | undefined {
+  const columnId = _asUuid(options.rawColumnId);
+  const column = columnId ? options.columnInfosById.get(columnId) : undefined;
+  return columnId &&
+    column?.datasetId === options.datasetId &&
+    ConceptAttribute.isBucketDateColumnType(column.dataType)
+    ? columnId
+    : undefined;
+}
+
+/**
+ * An attribute's shape and, for a per-period one, its period and date
+ * column. A per-period proposal without a known period and a date column of
+ * the same dataset falls back to one value, like an unknown rule: the user
+ * can still choose a period in the card. A period sent with any other shape
+ * is dropped.
+ */
+function _parseValueShape(
+  options: Readonly<{
+    record: Readonly<Record<string, unknown>>;
+    datasetId: string;
+    columnInfosById: ColumnInfosById;
+  }>,
+): Pick<
+  ChatProposedCaseAttribute,
+  "valueShape" | "bucketGrain" | "bucketColumnId"
+> {
+  const { record } = options;
+  if (record.valueShape !== "bucketed_list") {
+    return { valueShape: _asValueShape(record.valueShape) };
+  }
+  const bucketGrain = _asBucketGrain(record.bucketGrain);
+  const bucketColumnId = _asCatalogBucketColumnId({
+    rawColumnId: record.bucketColumnId,
+    datasetId: options.datasetId,
+    columnInfosById: options.columnInfosById,
+  });
+  return bucketGrain && bucketColumnId
+    ? { valueShape: "bucketed_list", bucketGrain, bucketColumnId }
+    : { valueShape: "single" };
 }
 
 /**
@@ -96,7 +181,7 @@ function _parseSourceDataset(raw: unknown): ChatCaseSourceDataset | undefined {
 
 function _parseAttribute(
   raw: unknown,
-  columnDataTypesById: ReadonlyMap<string, AvaDataType.T>,
+  columnInfosById: ColumnInfosById,
 ): ChatProposedCaseAttribute | undefined {
   if (!raw || typeof raw !== "object") {
     return undefined;
@@ -116,9 +201,10 @@ function _parseAttribute(
     // is common, so the attribute is renamed rather than dropped.
     name: ConceptStatus.toNonReservedAttributeName(name),
     isIncluded: record.isIncluded !== false,
+    ..._parseValueShape({ record, datasetId, columnInfosById }),
     valuePickerRuleType: _toCatalogAllowedRuleType({
       rawRuleType: record.valuePickerRuleType,
-      columnDataType: columnDataTypesById.get(columnId),
+      columnDataType: columnInfosById.get(columnId)?.dataType,
     }),
     ...(description ? { description } : {}),
   };
@@ -176,13 +262,15 @@ function _dedupeSourceDatasets(
 /**
  * The proposed dataset attributes that read a declared source. An attribute
  * naming a dataset with no join key would make the whole concept unqueryable,
- * so it is dropped here instead of surfacing later as a failed query.
+ * so it is dropped here instead of surfacing later as a failed query. A join
+ * key and the label column keep one value whatever the model proposed.
  */
 function _parseSourceAttributes(
   options: Readonly<{
     rawAttributes: unknown;
     sourceDatasets: readonly ChatCaseSourceDataset[];
-    columnDataTypesById: ReadonlyMap<string, AvaDataType.T>;
+    columnInfosById: ColumnInfosById;
+    labelColumnId: string | undefined;
   }>,
 ): ChatProposedCaseAttribute[] {
   const sourceDatasetIds = new Set(
@@ -190,10 +278,43 @@ function _parseSourceAttributes(
       return sourceDataset.datasetId;
     }),
   );
-  return _parseList(options.rawAttributes, (item) => {
-    return _parseAttribute(item, options.columnDataTypesById);
+  const sourceAttributes = _parseList(options.rawAttributes, (item) => {
+    return _parseAttribute(item, options.columnInfosById);
   }).filter((attribute) => {
     return sourceDatasetIds.has(attribute.datasetId);
+  });
+  return _withKeyAndLabelColumnsSingle({
+    attributes: sourceAttributes,
+    sourceDatasets: options.sourceDatasets,
+    labelColumnId: options.labelColumnId,
+  });
+}
+
+/**
+ * A join key matches rows to a case and the label names it, and neither can
+ * be a list of either kind, so those columns keep one value, without a
+ * period, whatever the model proposed.
+ */
+function _withKeyAndLabelColumnsSingle(
+  options: Readonly<{
+    attributes: readonly ChatProposedCaseAttribute[];
+    sourceDatasets: readonly ChatCaseSourceDataset[];
+    labelColumnId: string | undefined;
+  }>,
+): ChatProposedCaseAttribute[] {
+  const singleColumnIds = new Set([
+    ...options.sourceDatasets.map((sourceDataset) => {
+      return sourceDataset.primaryKeyColumnId;
+    }),
+    ...(options.labelColumnId ? [options.labelColumnId] : []),
+  ]);
+  return options.attributes.map((attribute) => {
+    return singleColumnIds.has(attribute.columnId)
+      ? {
+          ...omit(attribute, ["bucketGrain", "bucketColumnId"]),
+          valueShape: "single",
+        }
+      : attribute;
   });
 }
 
@@ -222,7 +343,10 @@ function _parseArgsRecord(
  * set.
  *
  * A value rule its column's catalog type does not allow becomes
- * `most_frequent`.
+ * `most_frequent`. A list or per-period field keeps its rule too, so the card
+ * can switch it back to one value. A per-period field needs a period and a
+ * date or timestamp column of its dataset that the catalog lists, or it is
+ * read as one value. A join key and the label column always keep one value.
  */
 export function parseProposeCaseType(
   argsJson: string | undefined,
@@ -241,12 +365,13 @@ export function parseProposeCaseType(
     return undefined;
   }
 
+  const labelColumnId = _asUuid(record.labelColumnId);
   const attributes = _parseSourceAttributes({
     rawAttributes: record.attributes,
     sourceDatasets,
-    columnDataTypesById: _createColumnDataTypesByIdFromColumns(options.columns),
+    columnInfosById: _createColumnInfosByIdFromColumns(options.columns),
+    labelColumnId,
   });
-  const labelColumnId = _asUuid(record.labelColumnId);
   const hasLabelAttribute = attributes.some((attribute) => {
     return attribute.columnId === labelColumnId;
   });

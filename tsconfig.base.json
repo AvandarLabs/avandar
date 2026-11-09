@@ -51,6 +51,12 @@
       "@query-hooks/*": ["./packages/web/query-hooks/src/*"],
       "@browser-utils": ["./packages/web/browser-utils/src/index.ts"],
       "@browser-utils/*": ["./packages/web/browser-utils/src/*"],
+      "@plugin-manifest": ["./packages/shared/plugin-manifest/src/index.ts"],
+      "@plugin-manifest/*": ["./packages/shared/plugin-manifest/src/*"],
+      "@plugin-sdk": ["./packages/web/plugin-sdk/src/index.ts"],
+      "@plugin-sdk/*": ["./packages/web/plugin-sdk/src/*"],
+      "@plugin-ui": ["./packages/web/plugin-ui/src/index.ts"],
+      "@plugin-ui/*": ["./packages/web/plugin-ui/src/*"],
       "@product-assets/*": ["./public/*"],
 
       /* Apps */

@@ -13,6 +13,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import { denoRestrictions } from "./eslint/deno-restrictions.js";
 import { packageRestrictions } from "./eslint/package-restrictions.js";
+import { pluginRestrictions } from "./eslint/plugin-restrictions.js";
 import { privacyChokepoint } from "./eslint/privacy-chokepoint.js";
 
 export default [
@@ -240,6 +241,7 @@ export default [
   },
   ...denoRestrictions,
   ...packageRestrictions,
+  ...pluginRestrictions,
   {
     files: ["**/vitest.config.ts"],
     rules: {

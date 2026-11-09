@@ -19,7 +19,7 @@ import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizCon
 import type { AvaTableVizConfig } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfig.types.ts";
 import type {
   AvaVizConfigType,
-  VizType,
+  BuiltInVizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 import type {
@@ -35,6 +35,11 @@ const BAR_LAYOUT_OPTIONS = [
   { value: "percent", label: "100% stacked" },
 ] as const;
 
+const BAR_GAP_OPTIONS = [
+  { value: "default", label: "Default" },
+  { value: "none", label: "None" },
+] as const;
+
 const descriptors: VizSettingDescriptors<AvaBarChartVizConfig, AvaBarSeries> = {
   chart: [
     {
@@ -42,6 +47,12 @@ const descriptors: VizSettingDescriptors<AvaBarChartVizConfig, AvaBarSeries> = {
       label: "Bar layout",
       group: "Layout",
       control: { kind: "segmented", options: BAR_LAYOUT_OPTIONS },
+    },
+    {
+      key: "barGap",
+      label: "Bar gap",
+      group: "Style",
+      control: { kind: "segmented", options: BAR_GAP_OPTIONS },
     },
     {
       key: "withLegend",
@@ -126,14 +137,14 @@ export const AvaBarChartVizConfigs = {
     return hydrateXYSeriesFromQueryResult(vizConfig, columns, "bar");
   },
 
-  convertVizConfig: <K extends VizType = VizType>(
+  convertVizConfig: <K extends BuiltInVizType = BuiltInVizType>(
     vizConfig: AvaBarChartVizConfig,
     newVizType: K,
   ): AvaVizConfigType<K> => {
     const { xAxisKey, series, layout, withLegend, chartStyle } = vizConfig;
     const firstSeries = series[0];
     const pieAxes = { nameKey: xAxisKey, valueKey: firstSeries?.key };
-    return match<VizType>(newVizType)
+    return match<BuiltInVizType>(newVizType)
       .with("table", (vizType): AvaTableVizConfig => {
         return { vizType };
       })

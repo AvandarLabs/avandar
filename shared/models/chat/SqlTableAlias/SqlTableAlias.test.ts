@@ -22,6 +22,8 @@ const CONCEPT_B = {
   id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
   name: "Case",
 };
+const FIELD_A_ID = "11111111-1111-4111-8111-111111111111";
+const FIELD_B_ID = "22222222-2222-4222-8222-222222222222";
 
 describe("SqlTableAlias.fromDatasets", () => {
   it("assigns tN by dataset id so input order does not change aliases", () => {
@@ -127,6 +129,89 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
     expect(block).not.toContain(CONCEPT_B.id);
   });
 
+  it("marks a field that keeps every value as a list", () => {
+    const aliases = SqlTableAlias.fromConcepts([
+      { id: CONCEPT_B.id, name: "Measles case" },
+    ]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { concept_id: CONCEPT_B.id, name: "age" },
+        { concept_id: CONCEPT_B.id, name: "Symptoms", is_array: true },
+      ],
+    });
+
+    expect(block).toBe("- c0: Measles case (age, Symptoms (list))");
+  });
+
+  it("lists a field named like the record key under its suffixed column", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { id: FIELD_A_ID, concept_id: CONCEPT_B.id, name: "external_id" },
+        { id: FIELD_B_ID, concept_id: CONCEPT_B.id, name: "district" },
+      ],
+    });
+
+    expect(block).toBe(
+      '- c0: Case (external_id_2 (field "external_id"), district)',
+    );
+  });
+
+  it("lists two fields whose names differ only by case under distinct columns", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        { id: FIELD_A_ID, concept_id: CONCEPT_B.id, name: "Age" },
+        { id: FIELD_B_ID, concept_id: CONCEPT_B.id, name: "age" },
+      ],
+    });
+
+    expect(block).toBe('- c0: Case (Age_2 (field "Age"), age)');
+  });
+
+  it("keeps the list marker on a field listed under a suffixed column", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [
+        {
+          id: FIELD_A_ID,
+          concept_id: CONCEPT_B.id,
+          name: "external_id",
+          is_array: true,
+        },
+        {
+          id: FIELD_B_ID,
+          concept_id: CONCEPT_B.id,
+          name: "Symptoms",
+          is_array: true,
+        },
+      ],
+    });
+
+    expect(block).toBe(
+      '- c0: Case (external_id_2 (list, field "external_id"), Symptoms (list))',
+    );
+  });
+
+  it("lists the bare name for a field cached without an id", () => {
+    const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [],
+      conceptAttributes: [{ concept_id: CONCEPT_B.id, name: "external_id" }],
+    });
+
+    expect(block).toBe("- c0: Case (external_id)");
+  });
+
   it("lists a case type's statuses in position order after its attributes", () => {
     const aliases = SqlTableAlias.fromConcepts([
       { id: CONCEPT_B.id, name: "Cholera case" },
@@ -203,5 +288,101 @@ describe("SqlTableAlias.applyToSql", () => {
 
     expect(sql).toBe(`SELECT 1 FROM "concept_${sorted[10]!.id}"`);
     expect(sql).not.toContain(`concept_${sorted[1]!.id}`);
+  });
+});
+
+describe("SqlTableAlias.formatListFieldNote", () => {
+  it("explains list SQL only when a field is a list", () => {
+    expect(
+      SqlTableAlias.formatListFieldNote([
+        { concept_id: CONCEPT_B.id, name: "Symptoms", is_array: true },
+      ]),
+    ).toContain("list_contains(\"field\", 'value')");
+    expect(
+      SqlTableAlias.formatListFieldNote([
+        { concept_id: CONCEPT_B.id, name: "age" },
+      ]),
+    ).toBe("");
+  });
+});
+
+const PER_MONTH_SCHEMA = {
+  aliases: SqlTableAlias.fromSchema({
+    datasets: [],
+    concepts: [{ id: "concept-visits", name: "Patient" }],
+  }),
+  columns: [],
+  conceptAttributes: [
+    { concept_id: "concept-visits", name: "Name" },
+    {
+      concept_id: "concept-visits",
+      name: "Temperature",
+      is_array: true,
+      bucket_grain: "month",
+      data_type: "double",
+    },
+  ],
+};
+
+describe("SqlTableAlias and per-period fields", () => {
+  it("writes a per-month field with the struct its entries hold", () => {
+    expect(SqlTableAlias.formatSchemaBlock(PER_MONTH_SCHEMA)).toBe(
+      "- c0: Patient (Name, Temperature [per month: STRUCT(bucket DATE, value DOUBLE)[]])",
+    );
+  });
+
+  it("leaves the value type as T when a cached field has no data type", () => {
+    expect(
+      SqlTableAlias.formatSchemaBlock({
+        ...PER_MONTH_SCHEMA,
+        conceptAttributes: [
+          {
+            concept_id: "concept-visits",
+            name: "Temperature",
+            is_array: true,
+            bucket_grain: "month",
+          },
+        ],
+      }),
+    ).toBe(
+      "- c0: Patient (Temperature [per month: STRUCT(bucket DATE, value T)[]])",
+    );
+  });
+
+  it("keeps a renamed per-period field's own name beside its column name", () => {
+    expect(
+      SqlTableAlias.formatSchemaBlock({
+        ...PER_MONTH_SCHEMA,
+        conceptAttributes: [
+          {
+            id: FIELD_A_ID,
+            concept_id: "concept-visits",
+            name: "external_id",
+            is_array: true,
+            bucket_grain: "week",
+            data_type: "varchar",
+          },
+        ],
+      }),
+    ).toBe(
+      '- c0: Patient (external_id_2 [per week: STRUCT(bucket DATE, value VARCHAR)[]] (field "external_id"))',
+    );
+  });
+
+  it("explains how to unnest a per-period field only when the schema has one", () => {
+    expect(
+      SqlTableAlias.formatBucketedFieldNote(PER_MONTH_SCHEMA.conceptAttributes),
+    ).toContain('UNNEST(c."Temperature") AS p(entry)');
+    expect(
+      SqlTableAlias.formatBucketedFieldNote([
+        { concept_id: "concept-visits", name: "Name" },
+      ]),
+    ).toBe("");
+  });
+
+  it("does not give a per-period field the plain list note", () => {
+    expect(
+      SqlTableAlias.formatListFieldNote(PER_MONTH_SCHEMA.conceptAttributes),
+    ).toBe("");
   });
 });

@@ -112,6 +112,36 @@ describe("useDashboardTileSummary", () => {
     ]);
   });
 
+  it("shows Plugin chart as the Chart fact of a plugin chart tile", () => {
+    mocks.useDashboardById.mockReturnValue([
+      {
+        ...DASHBOARD,
+        config: {
+          content: [
+            {
+              type: "DataViz",
+              props: {
+                id: "DataViz-plugin",
+                nlQuery: { prompt: "Cases by onset week" },
+                vizType: "plugin",
+              },
+            },
+          ],
+        },
+      },
+      false,
+    ]);
+    const summary = _renderSummary(
+      useDashboardTileSummary,
+      _ref("dashboard_tile", DASHBOARD_ID, "DataViz-plugin"),
+    );
+    expect(_factPairs(summary)).toEqual([
+      ["Dashboard", "Measles by borough"],
+      ["Chart", "Plugin chart"],
+      ["Updated", UPDATED_LABEL],
+    ]);
+  });
+
   it("is unavailable for a tile of a dashboard in another workspace", () => {
     mocks.useDashboardById.mockReturnValue([
       { ...DASHBOARD, workspaceId: OTHER_WORKSPACE_ID },

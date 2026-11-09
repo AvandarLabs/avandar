@@ -558,3 +558,90 @@ No shared name changes. Four refinements and one finding:
    "has any of" and "has all of" are the two candidate operators, and the
    choice between them per filter is the product decision. Default if
    unanswered: not in this effort.
+
+## 11. Implementation notes
+
+Plan 3 shipped on `feat/joined-cases`. Code review during execution changed
+the built code in the ways below. Later plans must start from this code, not
+from the plan text.
+
+### What differs from the plan text
+
+1. **Public snapshot reads (security).** Public mode refuses any relation
+   that is not a dataset, and any internal table (Sync staging tables,
+   `reject_errors`, `reject_scans`), which the analyzer now reports in a
+   required `internalTableNames`. Review found that the hand-written SQL
+   tokenizer disagreed with DuckDB in 16 ways that hid a read of a private
+   view, each confirmed against DuckDB. All are closed and tested: `TABLE`,
+   `PIVOT_WIDER`, `PIVOT_LONGER`, and `SHOW` read as sources; a CTE's scope
+   starts after its body (a recursive CTE's at its last top-level `UNION`,
+   unless a top-level `EXCEPT` or `INTERSECT` follows); only `WITH` lists
+   declare CTEs; only symbol tokens count as structure; a parenthesized
+   join's first table and a table after a join's `ON` are read; a line
+   comment ends at `\r`; dollar quotes, E strings, and nested block comments
+   are refused as `unsupported-syntax` everywhere; every statement must start
+   with a read keyword, and `PRAGMA`, transaction, and `PREPARE`/`EXECUTE`
+   statements are refused everywhere; public mode allows one plain query.
+   Staging table names need a UUID suffix.
+2. **View column names.** `ConceptAttribute.getViewColumnNames` returns
+   `{ columnName, resultName }` per field and drives the view, structured
+   queries, map layers, and chat's SQL context. A field that shares its name
+   with another field ignoring case gets a distinct result name (`Age_2`); a
+   field suffixed only for a reserved name keeps its name in results.
+   `Concept.RECORD_KEY_COLUMN_NAME` and `Concept.STATUS_COLUMN_NAME` are the
+   single source for `external_id` and `status`. `QueryColumn` carries
+   `sourceColumnName` and `resultColumnName`; held columns refresh through
+   `QueryColumn.refreshFromSourceColumn`.
+3. **The form keeps key and title fields single.** The form's switch is
+   locked, with a note, for ID columns and the title field, and the field is
+   stored with `isArray: false` when it becomes either. The draft card locks
+   join keys and the label the same way.
+4. **Saved state on a list field.** A saved aggregation a list cannot take is
+   reset to `none` before SQL runs (lists only; other columns keep `max` and
+   `min`). A saved local filter on a list reports `unsupported`; a saved
+   explorer rule on a list is dropped with a translated reason. GIS measure,
+   operation, time, size-by, and data-key pickers leave lists out.
+5. **List values in JS.** A list's dates arrive as `YYYY-MM-DD`, timestamps as
+   ISO strings, and times as `HH:MM:SS(.ffffff)`. Grid cells drop NULL items.
+6. **Record page values.** `createFieldValueFormatter` shows numbers at full
+   precision with locale grouping, accepts bigints, reads zone-less timestamp
+   text as UTC, parses time text, treats `""` as no value, and takes optional
+   `booleanLabels`. `RecordFieldValue` drops NULL and empty items from a list.
+   The Arabic "Show all <n> values" carries all six plural forms. Each field's
+   sources are a list named "Sources of <field>".
+7. **Chat.** Its SQL context lists each case type field under its view column
+   name and marks lists, online and offline. Its model imports must not reach
+   `shared/lib/uuid.ts`: a bare `uuid` import broke the chat and queries edge
+   functions at boot while `deno check` passed. `deno info` per function
+   catches this.
+8. **Desktop.** `attribute_mappings__dataset_column` is synced to desktop, so
+   its SQLite table is rebuilt to allow a NULL rule. Plan 2's migration also
+   got its missing desktop mirror.
+9. **`@avandar/ui`.** `Callout` gained `titleOrder`, a new API.
+
+### Follow-ups
+
+1. **A stronger public read boundary.** The analyzer is still a hand
+   tokenizer. Run public snapshot SQL in a separate DuckDB database holding
+   only published datasets, or take table references from DuckDB's own parser
+   (`json_serialize_sql`). Today's impact is limited: a malicious dashboard
+   author could show a viewer that viewer's own workspace data in that
+   viewer's browser; nothing leaves the browser.
+2. **Edge function boot check.** Add `deno info` per function (or an
+   equivalent) to `pnpm type-check:deno` or CI.
+3. **Map "Size by" on a list** is cleared silently when the inspector opens.
+   Keep it and show an issue instead.
+4. **No "is empty" filter for lists** (`IS NULL` misses `[]`).
+5. **Dashboard global Filter block** takes a free-text column name, so a list
+   field's name yields `IN`/`ILIKE` on a list. Validate against result columns.
+6. **A saved local filter on a list** shows a blank Column select in the
+   dashboard editor.
+7. **`arrowTableToJS` converts BIGINT with `Number()`**, losing precision above
+   2^53 before formatting.
+8. **Video producer cursor targets** (`mapping-single-value`) are stale and
+   need `component:measure`, which needs Remotion license keys.
+9. **The list-key invariant is enforced only in `rpc_concepts__create`.** A
+   check constraint on `concept_attributes` would harden it once production
+   data is confirmed to satisfy it.
+10. **Release.** The PR that lands this on `develop` should be titled
+    `feat(...)` so `@avandar/ui` gets a minor bump.

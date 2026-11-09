@@ -1,8 +1,8 @@
 /**
  * The Deno-safe `@avandar/*` packages are exactly those mapped in every
- * `deno.json` import map: clients, logger, models, modules, and utils. The rest
- * are browser- or Node-only, have no Deno mapping, and will fail `deno check`
- * if they reach Deno-allowable code.
+ * `deno.json` import map: clients, logger, models, modules, plugin-manifest,
+ * and utils. The rest are browser- or Node-only, have no Deno mapping, and will
+ * fail `deno check` if they reach Deno-allowable code.
  */
 export const DENO_UNSAFE_PACKAGES = [
   { name: "@avandar/etl", runtime: "Node-only" },
@@ -10,6 +10,8 @@ export const DENO_UNSAFE_PACKAGES = [
   { name: "@avandar/browser-utils", runtime: "browser-only" },
   { name: "@avandar/hooks", runtime: "browser-only" },
   { name: "@avandar/ui", runtime: "browser-only" },
+  { name: "@avandar/plugin-sdk", runtime: "browser-only" },
+  { name: "@avandar/plugin-ui", runtime: "browser-only" },
 ].map(({ name, runtime }) => {
   return {
     name,

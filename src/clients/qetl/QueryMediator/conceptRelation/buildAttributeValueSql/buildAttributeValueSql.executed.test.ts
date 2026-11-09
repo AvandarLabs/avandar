@@ -27,7 +27,7 @@ const BASE_OPTIONS: AttributeValueSqlOptions = {
   datasetId: DATASET_ID,
   columnDataType: "varchar",
   valuePickerRuleType: "first",
-  isArray: false,
+  valueShape: "single",
   outputColumnName: "value",
   externalIdsTable: SPINE,
   externalIdColumn: "external_id",
@@ -162,7 +162,7 @@ describe("buildAttributeValueSql", () => {
   });
 
   it("keeps every non-NULL value in file order as a list, and an empty list when there is none", async () => {
-    const records = await _readRecords({ regions: { isArray: true } });
+    const records = await _readRecords({ regions: { valueShape: "list" } });
 
     expect(_getColumn(records, "regions")).toEqual({
       p1: ["North", "South"],
@@ -171,6 +171,26 @@ describe("buildAttributeValueSql", () => {
       p4: ["West", "East"],
       p5: [],
     });
+  });
+
+  // One value needs a rule to pick it. A guessed rule would answer with a
+  // value nobody chose, so the SQL is refused rather than built.
+  it("refuses to read one value without a value rule", () => {
+    expect(() => {
+      return buildAttributeValueSql({
+        ...BASE_OPTIONS,
+        valuePickerRuleType: undefined,
+      });
+    }).toThrow(/names no value rule/);
+  });
+
+  // A list keeps every value whatever rule it is handed.
+  it("keeps every value of a list even when it is handed a rule", async () => {
+    const records = await _readRecords({
+      regions: { valueShape: "list", valuePickerRuleType: "max" },
+    });
+
+    expect(_getColumn(records, "regions").p1).toEqual(["North", "South"]);
   });
 
   it("ignores NULL in sum, avg, count, max, and min", async () => {

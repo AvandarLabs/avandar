@@ -45,6 +45,34 @@ function _getIdentifierColumnIds(
   );
 }
 
+/**
+ * Sets every field that is an ID column or the title to keep one value, with
+ * no period or date column. The form stores a field's choice even while its
+ * switch is locked, and the ID and the title are keys the case type reads
+ * one value from.
+ */
+function _keepKeyFieldsSingle(conceptForm: ConceptFormType): void {
+  const { datasetColumnAttributes, sourceDatasets, labelAttributeId } =
+    conceptForm.getValues();
+  const identifierColumnIds = _getIdentifierColumnIds(sourceDatasets);
+  datasetColumnAttributes.forEach((attribute, attributeIdx) => {
+    const { datasetColumnId } = attribute.mappings.datasetColumn;
+    const isKey =
+      attribute.id === labelAttributeId ||
+      (datasetColumnId !== undefined &&
+        identifierColumnIds.has(datasetColumnId));
+    if (isKey && (attribute.isArray || attribute.bucketGrain !== undefined)) {
+      const path = `datasetColumnAttributes.${attributeIdx}` as const;
+      conceptForm.setFieldValue(`${path}.isArray`, false);
+      conceptForm.setFieldValue(`${path}.bucketGrain`, undefined);
+      conceptForm.setFieldValue(
+        `${path}.mappings.datasetColumn.bucketColumnId`,
+        undefined,
+      );
+    }
+  });
+}
+
 export function DatasetColumnAttributesBlock({
   conceptForm,
   conceptId,
@@ -189,17 +217,21 @@ export function DatasetColumnAttributesBlock({
     updateAttributeToColumnMap,
   ]);
 
-  const { sourceDatasets } = conceptForm.getValues();
+  const { sourceDatasets, labelAttributeId } = conceptForm.getValues();
 
-  // The ID selects are uncontrolled, so a pick does not re-render this block
-  // by itself. The watch only triggers a re-render. The ID columns are read
-  // from the form each render, so a form reset is reflected too.
-  const [, setIdentifierPickCount] = useState(0);
-  conceptForm.useFieldWatch("sourceDatasets", () => {
-    setIdentifierPickCount((pickCount) => {
+  // The ID and title selects are uncontrolled, so a pick does not re-render
+  // this block by itself. The watches trigger a re-render and keep the picked
+  // field to one value. The ID columns and the title are read from the form
+  // each render, so a form reset is reflected too.
+  const [, setKeyPickCount] = useState(0);
+  const handleKeyPick = (): void => {
+    _keepKeyFieldsSingle(conceptForm);
+    setKeyPickCount((pickCount) => {
       return pickCount + 1;
     });
-  });
+  };
+  conceptForm.useFieldWatch("sourceDatasets", handleKeyPick);
+  conceptForm.useFieldWatch("labelAttributeId", handleKeyPick);
   const identifierColumnIds = _getIdentifierColumnIds(sourceDatasets);
 
   // The field being configured. Until submit its `dataType` is its column's
@@ -292,6 +324,7 @@ export function DatasetColumnAttributesBlock({
                   selectedColumnId !== undefined &&
                   identifierColumnIds.has(selectedColumnId)
                 }
+                isLabelColumn={selectedAttribute.id === labelAttributeId}
               />
             </Box>
           ) : null}

@@ -86,7 +86,9 @@ names. Do not put DL terms in UI strings.
 - **RLS tests**: `supabase/tests/database/permissions/rls_{concepts,concept_attributes,individuals,attribute_mappings__dataset_column,attribute_mappings__manual_entry}.test.sql`
 - **Shared models and parsers**: `shared/models/ontology/`
 - **CRUD clients and mapping dispatch**: `src/clients/ontology/`
-- **Value rules (the only value implementation)**: `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/`
+- **Value rules (the implementation for one value or every value)**: `src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/`
+- **Per-period values (the same rules, applied once per period)**: `src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/`
+- **Field controls and formatters shared by the form, the draft card, the record page, and the results grid**: `src/components/caseFields/`
 - **Record values for screens**: `src/clients/ontology/ConceptRecordValuesClient/`
 - **Concepts as QETL relations**: `src/clients/qetl/QueryMediator/conceptRelation/`
 - **Data Explorer status column**: `shared/models/queries/ConceptStatusColumn/`, `src/views/DataExplorerApp/makeQueryColumnsFromConcept/`
@@ -158,6 +160,7 @@ erDiagram
     bool is_label
     bool is_identifier
     bool is_array
+    enum bucket_grain "null unless one value per period"
   }
   individuals {
     text external_id
@@ -168,7 +171,8 @@ erDiagram
   attribute_mappings__dataset_column {
     uuid dataset_id "no foreign key"
     uuid dataset_column_id "no foreign key"
-    enum value_picker_rule_type
+    enum value_picker_rule_type "null for a list field"
+    uuid bucket_column_id "no foreign key, set for a per-period field"
   }
   attribute_mappings__manual_entry {
     uuid concept_attribute_id
@@ -182,8 +186,8 @@ names. Every table also carries `workspace_id`, which the policies test. `concep
 | --- | --- | --- |
 | `concepts` | A case type | `allow_manual_creation` is stored; nothing reads it yet. `default_status_id` is the status new records start in |
 | `concept_statuses` | A status a case type's records can be in | Name unique per case type ignoring case; `color` is lowercase `#rrggbb`; `position` orders the set; `unique (id, concept_id)` is the target of both status foreign keys |
-| `concept_attributes` | A field of a case type | `mapping_type` (`dataset_column`, `manual_entry`) discriminates which mapping table holds its mapping |
-| `attribute_mappings__dataset_column` | "This field reads this column of this dataset, collapsed by this value picker" | `dataset_id` and `dataset_column_id` are bare ids, not foreign keys |
+| `concept_attributes` | A field of a case type | `mapping_type` (`dataset_column`, `manual_entry`) discriminates which mapping table holds its mapping. `bucket_grain` makes a list field keep one value per period |
+| `attribute_mappings__dataset_column` | "This field reads this column of this dataset, collapsed by this value picker" | `dataset_id`, `dataset_column_id`, and `bucket_column_id` are bare ids, not foreign keys. The value picker is NULL for a field that keeps every value (`is_array` with no `bucket_grain`). `bucket_column_id` names the date column a per-period field groups its rows by |
 | `attribute_mappings__manual_entry` | "This field is typed by hand" | Holds no value; no table stores entered values yet |
 | `individuals` | A record: one key of one case type | `unique (concept_id, external_id)`; `name` is `not null`; `status_id` and `assigned_to` are the only per-case state |
 
@@ -227,6 +231,32 @@ Every `UPDATE` policy on these tables has both `using` and `with check`.
   before mappings, so the join to the mapping table is empty when it runs and
   the check passes vacuously. No trigger on the mapping tables re-checks it. See
   section 10 for where the rule is enforced instead.
+- A field with a `bucket_grain` is a dataset list field that is neither the
+  label nor an identifier (`concept_attributes__bucket_grain_requires_array`,
+  `concept_attributes__bucket_grain_dataset_value_only`). Both are table
+  checks, so they hold for every write.
+- A dataset-column mapping names a `bucket_column_id` exactly when its field
+  has a `bucket_grain`, and then a `date` or `timestamp` column of its own
+  dataset (`tr__attribute_mappings__dataset_column__validate_bucket_column`,
+  hints `bucket_column_not_allowed`, `bucket_column_required`,
+  `bucket_column_not_in_dataset`, `bucket_column_not_a_date`). It runs on the
+  mapping, after the RPC has written the field, so unlike the identifier check
+  it never runs too early. It is `SECURITY DEFINER`, because it must read the
+  field and the column whatever the caller's RLS allows, and a `BEFORE`
+  trigger runs ahead of the RLS `with check`. So it looks up both only inside
+  the mapping's own workspace, a field or column of another workspace reads
+  as missing, and its errors name only ids the caller sent. It fires on an
+  insert and on an update of `concept_attribute_id`, `dataset_id`, or
+  `bucket_column_id`, so retyping a date column later does not lock other
+  edits to the mapping.
+- `rpc_concepts__create` writes `bucket_grain` and `bucket_column_id`. It
+  refuses a dataset field whose value picker does not match its shape: a
+  field that keeps every value names none, and every other dataset field, a
+  per-period one included, names one (hint `value_rule_mismatch`, the check
+  `(is_array and bucket_grain is null) = (rule is not null)`). It also refuses
+  a list field that is the label or an identifier (hint
+  `list_field_is_key_or_label`). Both raise `23514`. They check only case
+  types created through the RPC.
 
 ## 5. Authoring a case type
 
@@ -293,6 +323,30 @@ to it; it is reached from Spotlight or by URL.
   otherwise. An identifier field always uses `most_frequent`: the select is
   disabled with the note "ID fields keep their value as is.", and
   `withDefaultValueRule` resets an identifier's rule to the default on submit.
+- Each dataset field has a **One value** / **Every value** / **Per period**
+  switch (`ValueShapeControl`). The value picker shows for one value and for a
+  period, where it reduces each period's rows, and its label says so.
+  **Per period** adds `PeriodControls`: a period select and a date column
+  select over the date and timestamp columns of the field's dataset. It starts
+  at month and the dataset's first date column. The switch is locked to One
+  value, with a note, on a dataset's ID column and on the title field
+  (`ValueShapeFields`), and choosing a field as either clears its period and
+  date column. The submit transform also keeps identifiers and the label to one
+  value with no period (`keepKeyAndLabelFieldsSingle`), and
+  `insertConceptFromFormValues` writes no value picker for a list but keeps
+  one for a per-period field.
+- A per-period field with no date column fails validation
+  (`createBucketColumnValidator`): the date column select shows "Choose the
+  date column for this field" and the submit stops. The error is stored at the
+  field's `bucketGrain` path, so choosing a period or a date column through
+  `writeFormShapeFields` clears it. A dataset with no date column locks the
+  select and says so under it.
+
+A field can also keep one value per period (`bucketed_list`): per day, week,
+month, quarter, or year of a date or timestamp column of its dataset, each
+period reduced by the field's rule. The form and the draft card offer it as a
+third choice, **Per period**, beside **One value** and **Every value**. Chat
+proposes it when the user asks for a value "per month" or another period.
 
 ### 5.3 Chat path (design session and draft card)
 
@@ -311,7 +365,10 @@ On the edge function (`PostChatMessages`, context `case-manager`):
   type names), never row values.
   It tells the model every case type already has a built-in status, and asks
   for a status set, each status with a one-sentence description for the people
-  working the cases, when the case type implies a workflow.
+  working the cases, when the case type implies a workflow. It also tells the
+  model to propose a per-period field, with a period and a date column of the
+  same dataset, when the user wants a value per day, week, month, quarter, or
+  year.
 - Tools offered: `clarify`, `proposeCaseType`, `createCaseTypes`. The prompt
   tells the model to open with one clarification, then propose a fully
   prefilled draft (clarifying again only for a genuine ambiguity), and not to
@@ -321,6 +378,13 @@ On the edge function (`PostChatMessages`, context `case-manager`):
   not one of the attributes, defaults unknown value pickers to
   `most_frequent`, and replaces a value picker its column's catalog type does
   not allow with `most_frequent` too (`ValuePickerRule.toAllowedRuleType`).
+  It reads each attribute's `valueShape` (`single` unless the model said
+  `list` or `bucketed_list`) and keeps every join key and the label column to
+  `single`, with no period. It keeps a per-period proposal only when it names
+  a known period and a `date` or `timestamp` column of the same dataset that
+  the catalog lists. Otherwise the field falls back to `single` with no period
+  and the user can choose one in the card. A period sent with any other shape
+  is dropped.
   The catalog columns are required at every level, from `fetchWorkspaceSchema`
   through `runChatAttemptsWithEscalation`. A column the catalog does not list
   keeps the proposed rule, and the client drops that attribute.
@@ -337,6 +401,13 @@ The card lists the proposed statuses, or the translated default set for a
 proposal with none, each badge beside its description, and swaps the list for
 `StatusSetEditor` when the user chooses Edit statuses. An attribute or
 hand-filled field named "status" is flagged and blocks Create.
+Each attribute row has a **One value** / **Every value** / **Per period**
+switch, locked on join keys and the label. Choosing a field as a join key or
+label switches it to one value and drops its period. **Per period** shows
+`PeriodControls` beside the rule select, with the date columns of the field's
+dataset, which the card reads from the catalog. Create is disabled while an
+included per-period field's date column is missing or is not one of its
+dataset's date columns, which includes the moment before the catalog loads.
 The session as a state machine:
 
 ```mermaid
@@ -376,16 +447,23 @@ The draft card converts to the insert payload in two steps that do no I/O:
 1. `proposedCaseTypeToCreatedCaseType` applies the user's edits: keeps checked
    attributes, re-includes every join key, drops sources left with no
    attribute, and falls back to the first join key as the label.
+   It carries each attribute's `valueShape`, forced to `single` for the label
+   and join keys, and its value picker for one value and for a period only. A
+   per-period attribute also carries its period and date column.
    It also carries the card's status set as `statuses` and
    `defaultStatusName`.
 2. `createdCaseTypeToFormValues` (called by `applyCreatedCaseTypes`) resolves
    column ids against the workspace's `dataset_columns` (unknown ids are
-   dropped), adds a missing identifier attribute for any source whose join key
-   was not an attribute, and makes the first identifier the label when none is
-   set.
+   dropped, and so is a per-period attribute whose date column is not a date
+   or timestamp column of its own dataset), adds a missing identifier
+   attribute for any source whose join key was not an attribute, and makes the
+   first identifier the label when none is set.
    It holds each field's rule to its column's type and stores the rule's
    output type as the field's `data_type`. An identifier field always gets
-   `most_frequent` and keeps its key column's type.
+   `most_frequent` and keeps its key column's type. Each mapped attribute's
+   `isArray` and `dataType` come from `ConceptAttribute.valueShapeToIsArray`
+   and `ConceptAttribute.getOutputDataType`, so a per-period field's type is
+   its rule's output type.
    It builds the status set with `makeStatusSetValueFromChatStatuses`: chat's
    statuses with fresh ids and the named default, or the default set when chat
    sent none, which is always the case for `createCaseTypes`.
@@ -443,23 +521,68 @@ names and new rows take defaults. See section 13.
 
 ## 7. Reading attribute values
 
+A field has a **value shape** (`ConceptAttribute.ValueShape`, derived from
+`bucket_grain` and `is_array` by `ConceptAttribute.getValueShape`):
+
+| Shape | `is_array` | `bucket_grain` | Value picker | Value |
+| --- | --- | --- | --- | --- |
+| `single` | false | NULL | required | One value, picked by the rule |
+| `list` | true | NULL | NULL | Every non-NULL value in `file_row_number` order, `[]` when there is none |
+| `bucketed_list` | true | set | required | One entry per period that has a value, oldest first, `[]` when there is none |
+
+A list or per-period field is never the label or an identifier. A list field's
+`data_type` is its column's type, the type of one element. A per-period field's
+is its rule's output type, the type of one period's value.
+
+A per-period field is `STRUCT(bucket DATE, value R)[]`: one entry per period
+with a non-NULL value, ordered by `bucket`, `[]` when none. `bucket` is
+`CAST(date_trunc(<period>, <date column>) AS DATE)`, so weeks start on Monday
+and quarters are calendar quarters. A missing period means no data, not zero.
+`buildBucketedListValueSql`
+(`src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql.ts`)
+normalizes the record's rows to `(bucket, value, row_order)`, where
+`row_order` is `file_row_number`. It drops rows with a NULL value or a NULL
+date, and applies the rule per period:
+
+| Rule | Per period | `R` |
+| --- | --- | --- |
+| `first` | `first(value ORDER BY row_order)` | column type |
+| `most_frequent` | count each value, then the highest count, ties by value | column type |
+| `sum`, `avg` | `CAST(... AS DOUBLE)` | `DOUBLE` |
+| `count` | `COUNT(value)` | `BIGINT` |
+| `max`, `min` | `MAX`, `MIN`, uncast. A text column uses the same `arg_max` and `arg_min` as the single-value rule | column type |
+
+A plain `TIMESTAMP` or `DATE` column is cut on its stored wall clock. A
+`TIMESTAMP WITH TIME ZONE` column is read in UTC first
+(`timezone('UTC', <column>)`), so a record's periods do not move with the
+viewer's session time zone. Planning decides which it is (`isBucketColumnZoned`
+in `makeConceptAttributeColumnsFromMetadata`), from the column's stored type
+and its `detectedDataType`: it is zoned when the stored type is `timestamp`
+and the detected type is `TIMESTAMP_TZ` or `TIMESTAMP WITH TIME ZONE`. A column
+retyped to `timestamp` from another detected type is cast to a plain
+`TIMESTAMP` on load, and is not zoned.
+
 Attribute values are computed per read, by one function.
 `buildAttributeValueSql`
 (`src/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql.ts`)
 turns one dataset-column mapping into a correlated subquery over one dataset,
 keyed by the outer row's record key. The concept view uses it for every
-dataset-backed attribute and Sync uses it for each record's name. Every other
-reader, the record page included, reads the view.
+dataset-backed attribute that is not per-period, and Sync uses it for each
+record's name. A per-period field is built by `buildBucketedListValueSql`,
+which applies the same rules once per period. Every other reader, the record
+page included, reads the view.
 
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '14px'}}}%%
 flowchart TD
   B["buildAttributeValueSql:<br/>every rule skips NULL"]
+  BP["buildBucketedListValueSql:<br/>the same rules per period"]
   V["QETL concept view<br/>(buildConceptViewSql)"]
   N["Sync records: each<br/>individual's name<br/>(generateIndividuals)"]
   R["Record page Details rail<br/>(ConceptRecordValuesClient,<br/>restricted spine)"]
   Q["Data Explorer, chat,<br/>dashboards"]
   B -- "used by" --> V
+  BP -- "used by" --> V
   B -- "used by" --> N
   V -- "read by" --> R
   V -- "read by" --> Q
@@ -470,17 +593,19 @@ Where:
 - **Restricted spine** - a spine holding only the records a caller named
   (section 7.3).
 
-_Changing a value rule means changing `buildAttributeValueSql`. The record
-page, the Data Explorer, chat, dashboards, and Sync's names all follow._
+_Changing a value rule means changing `buildAttributeValueSql`, and
+`buildBucketedListValueSql` for a per-period field. The record page, the Data
+Explorer, chat, dashboards, and Sync's names all follow._
 
 ### 7.1 Value pickers
 
 A dataset is usually finer-grained than the case type, so each dataset-column
 mapping names one of seven rules (a Postgres enum,
-`attribute_mappings__value_picker_rule_type`), and an `is_array` attribute
-keeps every value instead. Each renders as a correlated scalar subquery over
-one dataset, filtered by the outer row's key and by `IS NOT NULL` on the
-value.
+`attribute_mappings__value_picker_rule_type`), and an `is_array` attribute with
+no `bucket_grain` keeps every value instead and names no rule. A per-period
+field names a rule too and applies it to each period (section 7). Each renders
+as a correlated scalar subquery over one dataset, filtered by the outer row's
+key and by `IS NOT NULL` on the value.
 
 | Shape | SQL shape | Determinism |
 | --- | --- | --- |
@@ -493,7 +618,8 @@ value.
 
 **NULL means "no value".** No rule reads a NULL cell: `first` returns the
 first non-NULL value, `most_frequent` the most frequent non-NULL value, a list
-leaves NULL out, and the aggregates skip NULL as they always have.
+leaves NULL out, a per-period field ignores a row whose value or date is NULL,
+and the aggregates skip NULL as they always have.
 
 Key comparison is always
 `CAST(outer."external_id" AS VARCHAR) = CAST(dataset."<key>" AS VARCHAR)`
@@ -510,6 +636,12 @@ tool's JSON schema in `makeChatToolConfigFromOptions.ts`.
 `ValuePickerRule` matches the rules exhaustively, so a new enum value does not
 compile until its output type and allowed column types are declared. The
 correction migration also lists them, once, in SQL.
+
+Value shapes are hand-written in five places too: `ConceptAttributeValueShape`,
+`ChatCaseValueShape`, `parseProposeCaseType`, `parseCreateCaseTypes`, and both
+tool schemas in `makeChatToolConfigFromOptions.ts`. Branches on a shape are
+exhaustive `match`es, so widening `ConceptAttributeValueShape` makes
+`pnpm type-check` list every other site.
 
 **Typed rules.** Every rule has an output type, and a field's `data_type` is
 always that type: `first`, `most_frequent`, `max`, and `min` keep the column's
@@ -559,11 +691,14 @@ valuesByAttributeId }`) for each key that names a record, in request order.
 Rows reach JavaScript through `arrowTableToJS`
 (`src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.ts`), which
 turns lists into plain arrays and converts the fields of structs and maps, list
-items included, the way it converts a top-level value.
+items included, the way it converts a top-level value. That is how a per-period
+entry's `bucket` arrives in JavaScript: as `YYYY-MM-DD` text.
 
 The rail shows every field of the case type in name order:
 
 - a NULL value (a manual-entry field is always one) as "No value";
+- a per-period field as a table of its periods and their values (section 9),
+  or "No value" when it has none;
 - under each value, the names of the datasets the field's mappings read;
 - on a failed read of the fields or the values, a callout with Try again
   instead of placeholder rows.
@@ -596,7 +731,9 @@ record has no spine row, and an empty restriction gives an empty spine.
 
 The spine and the view keep their usual names. Every query that names the
 concept rebuilds both inside its own lease, so a restricted view never answers
-another workspace query (see section 16 for the public session).
+another workspace query. A public snapshot query never reads a concept view:
+`runDuckDbRawQuery` refuses any relation but a dataset in public mode, and
+refuses an internal table such as an individuals staging table.
 
 ## 8. Concepts as QETL relations
 
@@ -638,9 +775,10 @@ defined, so the datasets and the spine must already exist._
 | Piece | File | What it guarantees |
 | --- | --- | --- |
 | Planning | `conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql.ts` | No Postgres read for SQL that names no concept; foreign concepts and contributors throw (fail closed); statuses are read once per concept and matched to each record by `statusId`, and a record whose status is missing throws; a caller's `conceptSpineRestrictions` narrow a spine to the named records (section 7.3) |
-| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` and `external_id` are taken before any attribute, and duplicate names (including an attribute named `status` or `external_id`) are suffixed `_2`, `_3`, ignoring case as DuckDB does (`EXTERNAL_ID` becomes `EXTERNAL_ID_2`; `age` and `Age` become `age` and `Age_2`); each column carries its attribute's id (`attributeId`); manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws; a single-value attribute whose rule its column's type does not allow throws, naming the field |
+| Column resolution | `conceptRelation/makeConceptAttributeColumnsFromMetadata.ts` | One column per attribute; one key column per dataset; `status` and `external_id` are taken before any attribute (`ConceptModule.STATUS_COLUMN_NAME`, `ConceptModule.RECORD_KEY_COLUMN_NAME`), and duplicate names (including an attribute named `status` or `external_id`) are suffixed `_2`, `_3`, ignoring case as DuckDB does (`EXTERNAL_ID` becomes `EXTERNAL_ID_2`; `age` and `Age` become `age` and `Age_2`). The names come from `ConceptAttribute.getViewColumnNames`, which gives each field a `columnName` (the view column) and a `resultName` (the name its value carries in a query result: the field's own name, unless an earlier field has the same name ignoring case, then its `columnName`). `QueryColumn.makeFromConceptAttributes` calls it too, so a structured query reads a suffixed field from its own column (`QueryColumn.sourceColumnName`) and still names the result column after the field; each column carries its attribute's id (`attributeId`); manual-entry and unmapped attributes become typed NULL columns; a missing dataset column or key column throws; a single-value attribute whose rule its column's type does not allow throws, naming the field. A per-period attribute needs a rule and a date column that exists, belongs to the dataset its mapping reads, and is a `date` or `timestamp`, and throws naming the field otherwise, as does a field with no period whose mapping names a date column. `getConceptAttributeColumnsFromConceptId` fetches each per-period mapping's date column along with its value column, and the resolved column carries `bucketGrain`, `bucketColumnName`, and `isBucketColumnZoned` |
 | Spine | `conceptRelation/loadConceptSpine/loadConceptSpine.ts`, `conceptRelation/toCsvRows/toCsvRows.ts` | Keys and status names travel as RFC 4180 CSV, never spliced into SQL; both columns pinned to `VARCHAR`; empty `external_id` refused; empty concept gets an empty table with both typed columns |
-| View | `conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; `external_id` and `status` come from the spine and win over an attribute of the same name, compared ignoring case; attribute columns sorted by name for byte-stable SQL; every dataset-backed value from `buildAttributeValueSql` |
+| View | `conceptRelation/buildConceptViewSql/buildConceptViewSql.ts` | `FROM` is the spine alone, every attribute a correlated subquery, so the grain is one row per individual and a missing contribution is NULL; `external_id` and `status` come from the spine and win over an attribute of the same name, compared ignoring case; attribute columns sorted by name for byte-stable SQL; every dataset-backed value from `buildAttributeValueSql`, or from `buildBucketedListValueSql` for a per-period attribute. A list attribute reads every non-NULL value through `buildAttributeValueSql` and ignores any value picker its mapping still stores. An unmapped list attribute is `CAST([] AS <type>[])`, and an unmapped per-period attribute is `CAST([] AS STRUCT("bucket" DATE, "value" <type>)[])`. A single attribute with no value picker throws at planning (`makeConceptAttributeColumnsFromMetadata`) and when its SQL is built (`buildAttributeValueSql`) |
+| Per-period columns | `conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql.ts` | One entry per period that has a value, ordered by period, `[]` when none; a row with a NULL value or date never reaches a rule; a zoned timestamp is cut in UTC; an unmapped per-period field is a typed `[]`; a missing, foreign, or non-date date column throws at planning |
 | Ordering and lease | `src/clients/qetl/QueryMediator/queryRunner.ts`, `conceptRelation/loadConceptRelations.ts` | Datasets, then spine, then view, then user SQL; spine names included in the lease |
 
 **Naming.** `concept_<id>` is the view; `concept_<id>__individuals` is the
@@ -651,6 +789,11 @@ edge function; see
 Structured queries reach the view through `structuredQueryToSql`, which emits
 `concept_<id>` for a concept data source, including a form that is out of
 sync with its SQL.
+
+**Projected loads.** `getNeededColumnsFromQuery` lets a query load only the
+columns it reads. For a concept view that is each dataset-backed attribute's
+value column and its dataset's key column, and a per-period field's date column
+too: a load without it would leave the view unable to bind.
 
 **The status column.** Every concept view has a `status` column holding each
 record's status name. The Data Explorer offers it after the attributes as a
@@ -666,23 +809,60 @@ case type's statuses in position order (`- c0: Cholera case (age, status:
 Suspected | Confirmed)`), online through `fetchWorkspaceSchema` and offline
 through `fetchOfflineChatSchema`.
 
+**List columns in the explorer and dashboards.** List cells reach JavaScript
+as plain arrays (`arrowTableToJS`), a list's dates as `YYYY-MM-DD` and its
+timestamps as ISO strings, and a list result column is
+`{ dataType: "varchar", isArray: true }`. A list query column
+(`QueryColumn.isList`) can be shown, sorted, grouped, and counted; it is not
+offered to filters, number aggregations, chart measures
+(`QueryColumn.isNumeric` is false), or dashboard local filters. A saved
+aggregation a list does not allow is reset to none before the SQL is built,
+and a saved filter on a list is reported or dropped. The results grid joins a
+list's values with `; `. Chat's schema line marks a list field
+`<name> (list)` and lists each field under its view column name.
+`SqlTableAlias.formatListFieldNote` explains `list_contains`, `len`, and
+`UNNEST`, online and offline.
+
+**Per-period columns in the explorer and chat.** A per-period field is a list
+in every Data Explorer gate (`QueryColumn.isList`): it can be shown, sorted,
+grouped, and counted, and is kept out of filters, number aggregations, chart
+measures, and dashboard local filters. Its result column is a list's, with
+`bucketGrain` added when the query reads the field whole (no aggregation, or
+group by): `QueryColumn.getBucketGrain` sets it on the projection descriptor,
+binding copies it onto the result column, and
+`reconcileQueryResultColumnBindings` compares it. The results grid reads each cell as `label: value; label: value`
+(`makeDataGridColumnDefs`), with each period labelled in the user's locale by
+its length and each value kept to two decimals
+(`useDataGridPeriodFormatters`). Chat's schema line marks a per-period field
+`Temperature [per month: STRUCT(bucket DATE, value DOUBLE)[]]`, ahead of any
+`(field "...")` note, and does not call it a list.
+`SqlTableAlias.formatBucketedFieldNote` explains reading the entries with
+`UNNEST`. `fetchWorkspaceSchema` and
+`fetchOfflineChatSchema` supply `bucket_grain` and `data_type` for the marker.
+
 ## 9. UI map
 
 | Route (under `src/routes/_auth/$workspaceSlug/`) | Renders | Key files |
 | --- | --- | --- |
 | `ontology-designer/route.tsx` | Case Manager slate; list pane on detail routes | `src/views/OntologyDesignerApp/index.tsx`, `ConceptNavbar.tsx`, `NewCaseTypeButton.tsx` |
 | `ontology-designer/index.tsx` | Home grid of case types, delete with confirm | `src/views/OntologyDesignerApp/CaseTypeHome/` |
-| `ontology-designer/$conceptId.tsx` | Case type page (`AppView`): record and attribute counts, Description, Attributes, and Statuses with a record count per status. Refresh records, View records, and Delete (in the overflow menu) are each hidden without the permission they need. Statuses are the only part editable after creation, through the Edit statuses modal | `src/views/OntologyDesignerApp/ConceptMetaView/` (`CaseTypeActions.tsx`, `CaseTypeAttributesList.tsx`, `CaseTypeStatusesSection.tsx`, `CaseTypeStatusList/`, `EditStatusesModal/`, `CaseTypeRail.tsx`, `useHydratedConcept.ts`) |
+| `ontology-designer/$conceptId.tsx` | Case type page (`AppView`): record and attribute counts, Description, Attributes, and Statuses with a record count per status. Refresh records, View records, and Delete (in the overflow menu) are each hidden without the permission they need. Statuses are the only part editable after creation, through the Edit statuses modal. List fields carry an Every value badge, and per-period fields a badge naming the period (`useBucketGrainLabels`) | `src/views/OntologyDesignerApp/ConceptMetaView/` (`CaseTypeActions.tsx`, `CaseTypeAttributesList.tsx`, `CaseTypeStatusesSection.tsx`, `CaseTypeStatusList/`, `EditStatusesModal/`, `CaseTypeRail.tsx`, `useHydratedConcept.ts`) |
 | `ontology-designer/concept-creator.tsx` | Concept creator form, with a Statuses section that starts from the default set | `src/views/OntologyDesignerApp/ConceptCreatorView/` (`ConceptStatusesFieldset/`) |
 | `individual-manager/index.tsx` | Redirect to Case Manager home | |
 | `individual-manager/$conceptId/route.tsx` | Records slate: an `AppListPane` with a status filter and the count of records it matches, each row marked with its status color, plus the outlet | `src/views/IndividualManagerApp/index.tsx`, `IndividualNavbar/` (`StatusFilter/`), `makeRecordsListWhere/`, `useConceptIndividuals.ts`, `useVirtualIndividualLinks.tsx`, `EditCaseTypeButton.tsx` |
 | `individual-manager/$conceptId/index.tsx` | Select-a-record or sync-first empty state | `src/views/IndividualManagerApp/IndividualSelectionEmptyState/` |
-| `individual-manager/$conceptId/$individualId.tsx` | Record page (`AppView`): the status beside the name (a menu for a Case Records editor, a badge for everyone else, each status's description on hover and focus), the activity feed and composer, and a rail of the case's fields (each with the datasets it reads, "No value" when empty, and a retry on failure) and record facts | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordStatusControl/`, `useRecordStatusChange/`, `CaseActivityFeed/`, `CaseDetailsRail.tsx`, `useRecordFields/`, `RecordFactsGroup/`) |
+| `individual-manager/$conceptId/$individualId.tsx` | Record page (`AppView`): the status beside the name (a menu for a Case Records editor, a badge for everyone else, each status's description on hover and focus), the activity feed and composer, and a rail of the case's fields (each with the datasets it reads, "No value" when empty, and a retry on failure) and record facts. Each value reads by its field's type (`createFieldValueFormatter`: dates and timestamps as dates in UTC, times as times, numbers grouped and at full precision, yes or no in words). A list field shows every value, formatted the same way: a list longer than five shows its first five and a Show all toggle. A per-period field shows as a table of period and value (`RecordFieldPeriodTable`): the six most recent periods, and an inline Show all toggle for the rest when there are more. Periods are labelled in the user's locale, and values keep at most two decimals. Each field's sources are a list named "Sources of <field>" | `src/views/IndividualManagerApp/SingleIndividualView/` (`RecordStatusControl/`, `useRecordStatusChange/`, `CaseActivityFeed/`, `CaseDetailsRail.tsx`, `useRecordFields/`, `RecordFactsGroup/`, `RecordFieldValue/`, `DetailsStatus/`), `src/components/caseFields/useFieldValueFormatter/`, `src/components/caseFields/useBucketPeriodFormatter/`, `src/components/caseFields/useBucketValueFormatter/` |
 
 Outside the routes:
 
 - **Chat draft card**: `src/components/ChatPanel/CaseTypeDraftBlock/`, rendered
   by `ChatThread` when `pendingCaseTypeDraft` is set.
+- **Field controls and formatters**: `src/components/caseFields/` holds
+  `ValueShapeControl` (One value, Every value, Per period) and `PeriodControls`
+  (the period and date column selects), which the draft card and the case type
+  form share, `makeDateColumnOptions`, `useBucketGrainLabels`, and the
+  formatters `useBucketPeriodFormatter` and `useBucketValueFormatter`, which
+  the record page and the results grid share.
 - **Status components**: `src/components/caseStatuses/` holds `StatusSetEditor`
   (the controlled status set editor), `StatusBadge`, `StatusDot`, and
   `StatusColorPicker`. The create form and the Edit statuses modal use the
@@ -719,16 +899,23 @@ Outside the routes:
 | A bare UUID DuckDB table name means a dataset | `RelationRef.fromTableName` (`shared/models/relations/RelationRef/`) | Hence `concept_`, `ava_rows_`, `ava_staging_individuals_` prefixes and the `__individuals` suffix (`src/clients/DuckDbClient/duckDbSqlText.ts`, `loadConceptSpine.ts`) |
 | Keys are compared as text | `getEntityKeyComparisonSql`, `duckDbSqlText.ts` | Applies to every value read: the view and Sync |
 | No user data spliced into concept SQL | `loadConceptSpine` loads keys and status names as CSV through `toCsvRows`; spine restrictions travel as data to `getIndividualsByExternalIds` | A restricted read narrows the spine, never the SQL |
-| No value rule reads a NULL cell | `buildAttributeValueSql` | NULL means "no value": `first` and `most_frequent` skip it, lists leave it out |
+| No value rule reads a NULL cell | `buildAttributeValueSql`, `buildBucketedListValueSql` | NULL means "no value": `first` and `most_frequent` skip it, lists leave it out, and a per-period field drops a row whose value or date is NULL |
 | Identifiers in value SQL are quoted | `buildAttributeValueSql`, `getEntityKeyComparisonSql` (`quoteSqlIdentifier`) | A column name may contain `"` |
 | A spine restriction names a concept the query reads, once, with at most 500 distinct keys | `getConceptRelationPlansFromSql` | Fails closed before any read |
 | A concept view's `status` is the record's status | `makeConceptAttributeColumnsFromMetadata` reserves the name; `buildConceptViewSql` drops an attribute column of that name | Behind the `concept_attributes__name_not_reserved` check |
-| `first` and arrays order by `file_row_number` | `buildAttributeValueSql`; the `ava_rows_` view is created by `src/clients/DuckDbClient/duckDbParquetLoad.ts` | Never use `row_number() OVER ()`; parallel scan order is unstable |
+| `first` and lists order by `file_row_number` | `buildAttributeValueSql` and `buildBucketedListValueSql` (`row_order`); the `ava_rows_` view is created by `src/clients/DuckDbClient/duckDbParquetLoad.ts` | Never use `row_number() OVER ()`; parallel scan order is unstable |
 | Concept refs and contributors outside the workspace throw | `getConceptRelationPlansFromSql` | Do not change this to dropping the reference: a stale view could answer |
 | Datasets and the spine before the view | `queryRunner._runLeasedQuery`, `loadConceptRelations` | DuckDB binds a view's sources when it is defined; the code loads datasets, then the spine, then the view. The lease must include each spine name (`_getLeaseNames`) |
+| An edge function's model imports stay free of `shared/lib/uuid.ts` | Nothing automatic. `deno info --config supabase/functions/<fn>/deno.json supabase/functions/<fn>/index.ts` lists an import that does not resolve, which `deno check` (`pnpm type-check:deno`) does not | `uuid` is a bare specifier that `supabase/functions/chat/deno.json` does not map, so a model that reaches that file stops the function from booting. `ConceptModule.STATUS_COLUMN_NAME` has no dependencies for this reason: `ConceptAttributeModule` reads the name from it instead of importing the status column model |
 | Chat prompt sees catalog metadata only | `buildCaseManagerSystemPrompt` | Never add row values |
 | A field's `data_type` is its rule's output type (its column's type for a list field or an identifier) | `ValuePickerRule.getOutputDataType` in `createdCaseTypeToFormValues` and the form's `withFieldDataTypes`; the correction migration for older rows | A column type edited later in the Data Manager can leave it stale (section 16) |
-| A stored rule is one its column's type allows | Option lists use `ValuePickerRule.getAllowedRuleTypes`; `parseProposeCaseType`, `createdCaseTypeToFormValues`, and `withFieldDataTypes` replace a disallowed rule; `makeConceptAttributeColumnsFromMetadata` throws on one | List fields apply no rule and are not checked |
+| A dataset field names a value picker exactly unless it keeps every value | `rpc_concepts__create` (`(is_array and bucket_grain is null) = (rule is not null)`); `makeConceptAttributeColumnsFromMetadata` throws for a single or per-period field without one | Case types created before list fields could store no rule may keep an unread rule on a list field |
+| A list field is never the label or an identifier | `rpc_concepts__create`; `parseProposeCaseType`, `parseCreateCaseTypes`, `useCaseTypeDraftEditor`, `proposedCaseTypeToCreatedCaseType`, `createdCaseTypeToFormValues`, `keepKeyAndLabelFieldsSingle` | Sync and record names read the label as one value. A per-period field is a list for this rule, and the form's ID and title controls also clear its period and date column |
+| A field with a `bucket_grain` is a dataset list field that is neither the label nor an identifier | `concept_attributes__bucket_grain_requires_array` and `concept_attributes__bucket_grain_dataset_value_only`, `supabase/schemas/20.concept_attributes.sql` | Table checks, so they hold for every write |
+| A mapping names a `bucket_column_id` exactly when its field has a `bucket_grain`, and then a `date` or `timestamp` column of its own dataset | Trigger `tr__attribute_mappings__dataset_column__validate_bucket_column`, `supabase/schemas/30.attribute_mappings__dataset_column.sql` | `SECURITY DEFINER`, scoped to the mapping's workspace, fired only by an insert or an update of its three columns (section 4). Planning checks the same three facts again for a column retyped later |
+| A zoned timestamp is cut into periods in UTC | `buildBucketedListValueSql`, through `isBucketColumnZoned` from `makeConceptAttributeColumnsFromMetadata` | Only a `timestamp` column detected as `TIMESTAMP_TZ` or `TIMESTAMP WITH TIME ZONE` is zoned. Passing the flag for a plain `TIMESTAMP` reverses its meaning |
+| A per-period field is a list in every Data Explorer gate | `QueryColumn.isList` | Sort, group by, and count only. No filter, sum, or chart measure |
+| A stored rule is one its column's type allows | Option lists use `ValuePickerRule.getAllowedRuleTypes`; `parseProposeCaseType`, `createdCaseTypeToFormValues`, and `withFieldDataTypes` replace a disallowed rule; `makeConceptAttributeColumnsFromMetadata` throws on one | List fields apply no rule and are not checked. A per-period field is checked like a single value |
 | Every draft attribute names a declared source with a join key | `parseProposeCaseType`, `parseCreateCaseTypes`, `useCaseTypeDraftEditor` | Otherwise column resolution throws at query time |
 
 ## 11. Design patterns and their caveats
@@ -828,7 +1015,24 @@ Why it is scattered, and what would consolidate it:
   registry (client, record reader, view-column builder, form block) per kind
   would collapse items 7, 8, 9, 11, 12, 16, 27 and 30.
 - Form state and the chat contract keep one list per kind; a single attribute
-  list with a discriminated mapping removes items 13, 14, 25 and 26.
+  list removes items 13, 14, 25 and 26.
+
+### 12.1 Adding a value shape
+
+A new value shape (`single`, `list`, and `bucketed_list` exist) starts by
+widening `ConceptAttributeValueShape` and `ChatCaseValueShape`; `pnpm
+type-check` then lists every exhaustive branch. These sites compile without
+change and must be found by hand:
+
+| Site | Failure if missed |
+| --- | --- |
+| `rpc_concepts__create` column lists and its `value_rule_mismatch` check | Columns silently not written; fields refused |
+| The model parsers' `DBReadSchema` | Columns dropped from reads and from the insert payload |
+| `getConceptAttributeColumnsFromConceptId` (the dataset columns it fetches for a mapping) | Planning cannot find a column the shape reads |
+| `getNeededColumnsFromQuery` (the columns it unions per dataset) | A projected load omits it and the view fails to bind |
+| `parseProposeCaseType` and the key and label coercion in the parser, the draft editor, `_keepKeyFieldsSingle` in the form, and `keepKeyAndLabelFieldsSingle` | The shape is read as one value, or kept on a key |
+| `SqlTableAlias.formatSchemaBlock`'s markers and notes, `fetchWorkspaceSchema`, `fetchOfflineChatSchema` | Chat writes SQL for the wrong shape |
+| `makeDataGridColumnDefs` | The grid prints `[object Object]` |
 
 ## 13. How to add a per-case capability
 
@@ -918,6 +1122,10 @@ Follow [rules/testing.md](rules/testing.md). Existing coverage:
 | Edge function parsing and prompt | `supabase/functions/chat/PostChatMessages/parsing/parseProposeCaseType.test.ts`, `parseCreateCaseTypes.test.ts`, `prompt/buildCaseManagerSystemPrompt.test.ts` | `pnpm vitest run <paths>` |
 | Records UI | `src/views/IndividualManagerApp/**/*.test.tsx` | `pnpm vitest run <paths>` |
 | Record values and the record page rail | `src/clients/ontology/ConceptRecordValuesClient/**/*.test.ts`, `src/views/IndividualManagerApp/SingleIndividualView/useRecordFields/**/*.test.ts`, `tests/e2e/record-page-field-values.spec.ts` | `pnpm vitest run <paths>`; the spec with `pnpm test:e2e record-page-field-values.spec.ts`, on its own |
+| A list field from the chat draft to the record page | `tests/e2e/case-list-field.spec.ts` | `pnpm test:e2e case-list-field.spec.ts`, on its own |
+| Per-period fields: the table checks, the mapping trigger, and the RPC | `supabase/tests/database/concept_attributes__bucketed_list.test.sql` | `pnpm test:db`, after the switch check |
+| Per-period values against real DuckDB: each rule, NULLs, ties, zoned timestamps | `src/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql.executed.test.ts`, `src/clients/qetl/QueryMediator/conceptRelation/__tests__/perPeriodConceptQuery.integration.executed.test.ts` | `pnpm test:executed <file>` |
+| A per-month field on the record page and in the Data Explorer | `tests/e2e/case-bucketed-fields.spec.ts` | `pnpm test:e2e case-bucketed-fields.spec.ts`, on its own |
 | Status column end to end | `tests/e2e/case-statuses-data-explorer.spec.ts` | `pnpm test:e2e case-statuses-data-explorer.spec.ts`, on its own |
 
 Gaps to close when touching the code: no test covers
@@ -944,14 +1152,21 @@ means established from the code.
 | Composer disabled in Case Manager | The prompt's "revise the draft" turn is unreachable, and a kickoff that fails (shown with no error, a separate gap) can be retried only through New chat or New case type | Verified (app) |
 | Draft card join key options are the proposed attributes only | A key column the model did not list cannot be chosen | Read |
 | The form allows a manual-entry label | Sync then fails with a TypeError | Read |
-| A restricted read leaves a view covering only its records in the tab's DuckDB catalog | A session that does not rebuild views (a public session reading a `concept_<id>` a workspace query left behind) would see that subset | Read |
 | Only a Google Sheets or Postgres refresh marks record values stale | Re-uploading a CSV or XLSX, deleting a dataset, or a live source going stale leaves an open record page on its cached values | Read |
-| Structured queries select a concept column by the attribute's name, not its emitted column name | A query on an attribute whose column was suffixed (one named `status` or `external_id`, or a duplicate name) reads the spine's column or the other attribute instead; the Data Explorer builds such queries | Read |
+| A global dashboard filter bound to a list column's name | It emits `IN`, `ILIKE`, or `=`, which fail on a list, so that block's query fails | Read |
+| Saving a result with a list column as a new dataset | The column is saved with a `varchar` type over a list | Read |
+| The Data Explorer cannot filter inside a list | Filtering by a value a list contains needs chat SQL (`list_contains`) | Read |
+| Per-period fields have only a list's Data Explorer operations | Filtering or charting by period needs chat SQL | Read |
+| Periods never follow a local time zone | A plain `timestamp` is cut on its stored wall clock and a zoned one in UTC, so a moment just after local midnight can count toward the previous UTC day | Read |
+| A date column retyped after a per-period field is created | If it is no longer a date or timestamp, every query of the case type fails at planning, naming the field, until the field is fixed | Read |
+| Nothing refuses a later change to `bucket_grain` on a field that has a mapping | A direct update by a Case Types editor can leave a period with no date column, or a date column with no period, and every query of the case type then fails at planning | Read |
+| A per-period date or boolean value shows raw in the results grid | The grid reads every per-period value as a decimal, since the result column carries no value type | Read |
+| A raw SQL result has no period length | A per-period column's entries show their periods as `YYYY-MM-DD` | Read |
 
 Not built: roles between concepts, subsumption, status change history,
 assignment, activity log, manual entry storage, editing a case type, manual
 creation of individuals, a records grid with filters, incremental sync,
-concepts on public dashboards (`PublicQuerySession` has no concept planner),
+concepts on public dashboards (`PublicQuerySession` has no concept planner, and public reads refuse concept views),
 and the auto-limit guard for large concepts.
 
 ## 17. Roadmap and specs

@@ -1,13 +1,14 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { ActionIcon, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
-import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow";
+import { CaseTypeDraftAttributeRow } from "./CaseTypeDraftAttributeRow/CaseTypeDraftAttributeRow";
 import css from "./CaseTypeDraftCard.module.css";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type {
   CaseTypeDraftEditor,
   CaseTypeDraftSourceGroup,
 } from "./useCaseTypeDraftEditor";
+import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 
 type Props = {
   group: CaseTypeDraftSourceGroup;
@@ -16,6 +17,8 @@ type Props = {
   labelColumnId: string | undefined;
   /** Catalog column types, keyed by column id, for each row's value rules. */
   columnDataTypesById: Readonly<Record<string, AvaDataType.T>>;
+  /** This dataset's date and timestamp columns, for per-period fields. */
+  dateColumnOptions: readonly DateColumnOption[];
   /** Removal is hidden for the last source, which the case type cannot lose. */
   canRemove: boolean;
   editor: CaseTypeDraftEditor;
@@ -32,6 +35,7 @@ export function CaseTypeDraftSourceSection({
   columnNamesById,
   labelColumnId,
   columnDataTypesById,
+  dateColumnOptions,
   canRemove,
   editor,
 }: Readonly<Props>): React.ReactNode {
@@ -98,6 +102,7 @@ export function CaseTypeDraftSourceSection({
               isPrimaryKey={attribute.columnId === group.primaryKeyColumnId}
               isLabelColumn={attribute.columnId === labelColumnId}
               columnDataType={columnDataTypesById[attribute.columnId]}
+              dateColumnOptions={dateColumnOptions}
               editor={editor}
             />
           );

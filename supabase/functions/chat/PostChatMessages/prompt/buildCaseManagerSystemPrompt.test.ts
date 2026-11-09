@@ -115,4 +115,29 @@ describe("buildCaseManagerSystemPrompt", () => {
       "compare alphabetically, ignoring case and accents",
     );
   });
+
+  it("tells the model when a field should keep every value", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain("Set `valueShape` to `list` only when");
+    expect(prompt).toContain("always for the label column and every join key");
+  });
+
+  it("tells the model to keep a value per period when the user asks for one", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain('`valueShape: "bucketed_list"`');
+    expect(prompt).toContain("per day, week, month, quarter, or year");
+    expect(prompt).toContain(
+      "Never make a per-period field the label or a join key",
+    );
+  });
 });

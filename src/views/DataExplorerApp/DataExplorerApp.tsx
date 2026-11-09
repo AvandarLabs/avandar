@@ -24,6 +24,7 @@ import { NuxStepFactsStore } from "@/components/Nux/NuxTour/NuxStepFactsStore/Nu
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { PluginMenuSlot } from "@/lib/plugins/PluginMenuSlot/PluginMenuSlot";
 import css from "@/views/DataExplorerApp/DataExplorerApp.module.css";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerSaveMenu } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu";
@@ -36,6 +37,7 @@ import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBa
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryExplorerResultsChrome } from "@/views/DataExplorerApp/QueryExplorerResultsChrome";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
+import { useDataExplorerPluginContext } from "@/views/DataExplorerApp/useDataExplorerPluginContext/useDataExplorerPluginContext";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
 import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
@@ -204,6 +206,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   );
 
   const queryResultData = queryResults?.data ?? [];
+  const pluginContext = useDataExplorerPluginContext({
+    queryResults,
+    isLoadingResults,
+  });
   const dateColumns = getDateColumns(queryResultColumns, queryResultData);
 
   useEffect(
@@ -233,6 +239,11 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           pos="relative"
           style={styles.toolbar}
         >
+          <PluginMenuSlot
+            slotId="dataExplorer.toolbar"
+            getContext={pluginContext.getContext}
+            facts={pluginContext.facts}
+          />
           <Button
             variant="subtle"
             color="neutral"

@@ -38,6 +38,8 @@ export function getRowNumberedViewName(tableName: string): string {
  * resolve it.
  */
 const STAGING_INDIVIDUALS_TABLE_PREFIX = "ava_staging_individuals_";
+const STAGING_INDIVIDUALS_ID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Names the table that individual generation writes its rows to before they
@@ -57,7 +59,7 @@ export function getStagingIndividualsTableName(conceptId: string): string {
 
 /**
  * Reports whether a DuckDB table name is an individual-generation staging
- * table.
+ * table: the prefix followed by a concept id.
  *
  * The SQL analyzer needs this for the same reason it needs
  * `getTableNameFromRowNumberedViewName`: it fails closed on any source name it
@@ -73,7 +75,12 @@ export function getStagingIndividualsTableName(conceptId: string): string {
  * authorized for, so it contributes no relation and needs no lease of its own.
  */
 export function isStagingIndividualsTableName(tableName: string): boolean {
-  return tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX);
+  return (
+    tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX) &&
+    STAGING_INDIVIDUALS_ID_REGEX.test(
+      tableName.slice(STAGING_INDIVIDUALS_TABLE_PREFIX.length),
+    )
+  );
 }
 
 /**
@@ -92,6 +99,32 @@ export function getTableNameFromRowNumberedViewName(
   return viewName.startsWith(ROW_NUMBERED_VIEW_PREFIX)
     ? viewName.slice(ROW_NUMBERED_VIEW_PREFIX.length)
     : undefined;
+}
+
+/**
+ * The alias every subquery reads its dataset rows under. It must stay
+ * `dataset`: `getEntityKeyComparisonSql` qualifies the key with it.
+ */
+export const DATASET_ALIAS = "dataset";
+
+/**
+ * The aggregate that picks a text column's last or first value
+ * alphabetically, as `arg_max` or `arg_min`.
+ *
+ * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
+ * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
+ * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
+ * a struct, which compares field by field, so values that share a key
+ * ("apple" and "Apple") tie-break by the value itself in byte order, in the
+ * same direction. The pick never depends on scan order, and the aggregate
+ * returns the original value.
+ */
+export function buildTextExtremeSql(
+  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
+): string {
+  const { value, aggregate } = options;
+  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
+  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
 }
 
 /**
@@ -127,7 +160,7 @@ export function getEntityKeyComparisonSql(
   // Quoted rather than wrapped in bare double quotes, so a key column whose
   // name contains `"` still compiles.
   const outerKey = `${quoteSqlIdentifier(options.externalIdsTable)}.${quoteSqlIdentifier(options.externalIdColumn)}`;
-  const datasetKey = `dataset.${quoteSqlIdentifier(options.primaryKeyColumnName)}`;
+  const datasetKey = `${DATASET_ALIAS}.${quoteSqlIdentifier(options.primaryKeyColumnName)}`;
   return `CAST(${outerKey} AS VARCHAR) = CAST(${datasetKey} AS VARCHAR)`;
 }
 

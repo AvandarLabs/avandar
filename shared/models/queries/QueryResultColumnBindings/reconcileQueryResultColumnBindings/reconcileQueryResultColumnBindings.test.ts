@@ -266,3 +266,40 @@ it("rejects ambiguous persisted opaque labels instead of inheriting arbitrary li
     reason: "ambiguous",
   });
 });
+it("gives a bound result column the period its projection predicted", () => {
+  const { columns } = reconcileQueryResultColumnBindings({
+    scopeKey: "owner",
+    sqlKey: "per-month",
+    previous: undefined,
+    columns: [{ name: "Temperature", dataType: "varchar", isArray: true }],
+    projections: [
+      {
+        ..._projection({ queryResultColumnName: "Temperature" }),
+        bucketGrain: "month",
+      },
+    ],
+  });
+
+  expect(columns[0]?.bucketGrain).toBe("month");
+});
+it("does not reuse a previous binding that carries a different period", () => {
+  const options = {
+    scopeKey: "owner",
+    sqlKey: "per-period",
+    columns: [{ name: "Temperature", dataType: "varchar", isArray: true }],
+  } as const;
+  const projection = _projection({ queryResultColumnName: "Temperature" });
+  const first = reconcileQueryResultColumnBindings({
+    ...options,
+    previous: undefined,
+    projections: [{ ...projection, bucketGrain: "month" }],
+  });
+
+  const second = reconcileQueryResultColumnBindings({
+    ...options,
+    previous: first.registry,
+    projections: [{ ...projection, bucketGrain: "year" }],
+  });
+
+  expect(second.columns[0]?.bucketGrain).toBe("year");
+});

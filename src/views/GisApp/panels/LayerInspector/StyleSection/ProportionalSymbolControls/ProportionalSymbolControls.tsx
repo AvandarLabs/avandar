@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { useLingui } from "@lingui/react/macro";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect/QueryColumnSingleSelect";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ProportionalSizeControls } from "@/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalSizeControls";
@@ -29,6 +30,7 @@ export function ProportionalSymbolControls({
         label={t`Size by`}
         placeholder={t`Select a column`}
         dataSourceId={dataSourceId}
+        isColumnSelectable={QueryColumn.isNotList}
         value={
           MapLayerUpdates.getQueryColumnFromLayer({
             layer,

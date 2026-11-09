@@ -1,27 +1,56 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { match } from "ts-pattern";
+import { Concept } from "$/models/ontology/Concept/Concept";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
+import {
+  buildBucketedListTypeSql,
+  buildBucketedListValueSql,
+} from "@/clients/qetl/QueryMediator/conceptRelation/buildBucketedListValueSql/buildBucketedListValueSql";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 
 /** The spine's alias inside the view, and the columns it exposes. */
 const SPINE_ALIAS = "individuals";
 /** The view's record key column, read from the spine. */
-export const EXTERNAL_ID_COLUMN = "external_id";
+export const EXTERNAL_ID_COLUMN = Concept.RECORD_KEY_COLUMN_NAME;
 const STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
+
+/**
+ * How a dataset-column attribute's rows become its value: reduced to one
+ * value by a rule, kept whole as a list, or reduced by the rule once per
+ * period of a date column. Built from the attribute's value shape by
+ * `makeConceptAttributeColumnsFromMetadata` and read by the view's
+ * selectors.
+ */
+export type ConceptAttributeValueRule =
+  | { valueShape: "single"; valuePickerRuleType: ValuePickerRule.T }
+  | { valueShape: "list" }
+  | {
+      valueShape: "bucketed_list";
+      valuePickerRuleType: ValuePickerRule.T;
+      bucketGrain: ConceptAttribute.BucketGrain;
+      /** The dataset column that places each row in a period. */
+      bucketColumnName: string;
+      /** Whether that column is a `TIMESTAMP WITH TIME ZONE`. */
+      isBucketColumnZoned: boolean;
+    };
 
 /** One column of the concept relation, already resolved to what it reads. */
 export type ConceptAttributeColumn =
-  | {
+  | ({
       kind: "dataset_column";
       /**
        * The attribute this column holds. It survives a renamed column, so a
        * reader of the view maps a column back to its attribute by this.
        */
       attributeId: ConceptAttribute.Id;
-      /** The relation's column name, which is the attribute's name. */
+      /**
+       * The view column name from `ConceptAttribute.getViewColumnNames`,
+       * suffixed when another column took the name.
+       */
       attributeName: string;
       /** The contributing dataset's column this attribute reads. */
       selectColumnName: string;
@@ -30,21 +59,21 @@ export type ConceptAttributeColumn =
       columnDataType: AvaDataType.T;
       /** The dataset column mapped to the concept's identifier attribute. */
       primaryKeyColumnName: string;
-      valuePickerRuleType: DatasetColumnMapping["valuePickerRuleType"];
-      isArray: boolean;
-    }
+    } & ConceptAttributeValueRule)
   | {
       /**
        * An attribute with no dataset contribution to read, which today means a
-       * manual-entry mapping. It becomes a typed NULL so the relation's schema
-       * is stable whether or not a value exists, rather than the column
-       * vanishing and breaking a saved query.
+       * manual-entry mapping. It becomes a typed NULL, or an empty list for a
+       * list or per-period attribute, so the relation's schema is stable
+       * whether or not a value exists, rather than the column vanishing and
+       * breaking a saved query.
        */
       kind: "unmapped";
       /** The attribute this column holds, as on the other arm. */
       attributeId: ConceptAttribute.Id;
       attributeName: string;
       duckDbDataType: DuckDbDataType;
+      valueShape: ConceptAttribute.ValueShape;
     };
 
 /**
@@ -76,7 +105,7 @@ export function buildConceptViewSql(
   }>,
 ): string {
   const orderedColumns = [...options.attributeColumns].sort((left, right) => {
-    return left.attributeName.localeCompare(right.attributeName);
+    return left.attributeName.localeCompare(right.attributeName, "en");
   });
 
   const selectors = [
@@ -111,7 +140,21 @@ FROM ${quoteSqlIdentifier(options.spineTableName)} ${SPINE_ALIAS}`;
 
 function _buildColumnSelector(column: ConceptAttributeColumn): string {
   if (column.kind === "unmapped") {
-    return `CAST(NULL AS ${column.duckDbDataType}) AS ${quoteSqlIdentifier(column.attributeName)}`;
+    return _buildUnmappedSelector(column);
+  }
+  if (column.valueShape === "bucketed_list") {
+    return `${buildBucketedListValueSql({
+      datasetId: column.datasetId,
+      selectColumnName: column.selectColumnName,
+      columnDataType: column.columnDataType,
+      primaryKeyColumnName: column.primaryKeyColumnName,
+      bucketColumnName: column.bucketColumnName,
+      isBucketColumnZoned: column.isBucketColumnZoned,
+      bucketGrain: column.bucketGrain,
+      ruleType: column.valuePickerRuleType,
+      externalIdsTable: SPINE_ALIAS,
+      externalIdColumn: EXTERNAL_ID_COLUMN,
+    })} AS ${quoteSqlIdentifier(column.attributeName)}`;
   }
 
   // Single values and lists alike: one function owns every value rule, so the
@@ -121,10 +164,35 @@ function _buildColumnSelector(column: ConceptAttributeColumn): string {
     primaryKeyColumnName: column.primaryKeyColumnName,
     datasetId: column.datasetId,
     columnDataType: column.columnDataType,
-    valuePickerRuleType: column.valuePickerRuleType,
-    isArray: column.isArray,
+    valueShape: column.valueShape,
+    // A list column carries no rule.
+    valuePickerRuleType:
+      column.valueShape === "single" ? column.valuePickerRuleType : undefined,
     outputColumnName: column.attributeName,
     externalIdsTable: SPINE_ALIAS,
     externalIdColumn: EXTERNAL_ID_COLUMN,
   });
+}
+
+/**
+ * The typed column for an attribute with nothing to read. A list or
+ * per-period attribute is an empty list of its type rather than NULL, which
+ * is what every list holds when no value exists, so SQL that reads it as a
+ * list still binds.
+ */
+function _buildUnmappedSelector(
+  column: Extract<ConceptAttributeColumn, { kind: "unmapped" }>,
+): string {
+  const alias = quoteSqlIdentifier(column.attributeName);
+  return match(column.valueShape)
+    .with("single", () => {
+      return `CAST(NULL AS ${column.duckDbDataType}) AS ${alias}`;
+    })
+    .with("list", () => {
+      return `CAST([] AS ${column.duckDbDataType}[]) AS ${alias}`;
+    })
+    .with("bucketed_list", () => {
+      return `CAST([] AS ${buildBucketedListTypeSql(column.duckDbDataType)}) AS ${alias}`;
+    })
+    .exhaustive();
 }

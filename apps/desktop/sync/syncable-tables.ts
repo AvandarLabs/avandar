@@ -197,6 +197,8 @@ export const EXCLUDED_TABLES = [
   // debugging. Nothing the desktop renders.
   "pipeline_executions",
   "pipeline_execution_scopes",
+  // Plugin installs are not mirrored to desktop SQLite yet.
+  "plugin_installations",
 ] as const;
 
 /**

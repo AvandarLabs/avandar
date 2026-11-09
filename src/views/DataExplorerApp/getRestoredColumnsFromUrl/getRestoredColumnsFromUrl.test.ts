@@ -48,6 +48,7 @@ function _makeConceptAttribute(name: string): ConceptAttribute.T {
     isIdentifier: false,
     allowManualEdit: true,
     isArray: false,
+    bucketGrain: undefined,
   });
 }
 

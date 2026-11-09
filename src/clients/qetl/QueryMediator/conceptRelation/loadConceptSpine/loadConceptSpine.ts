@@ -1,4 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { Concept } from "$/models/ontology/Concept/Concept";
 import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -21,7 +22,7 @@ import type { ConceptSpineRow } from "@/clients/qetl/QueryMediator/conceptRelati
  * view, and the column a user picks all say `status`.
  */
 const SPINE_TABLE_SUFFIX = "__individuals";
-const SPINE_KEY_COLUMN = "external_id";
+const SPINE_KEY_COLUMN = Concept.RECORD_KEY_COLUMN_NAME;
 const SPINE_STATUS_COLUMN = ConceptStatusColumn.COLUMN_NAME;
 
 /** Names the spine table that holds one concept's authoritative rows. */

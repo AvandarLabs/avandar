@@ -12,6 +12,7 @@ import {
   AvaVizConfig,
   AvaVizConfigType,
   AvaVizConfigUtilRegistry,
+  BuiltInVizType,
   VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/AvaVizConfig/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
@@ -33,7 +34,7 @@ const AvaVizConfigModulesRegistry = {
   bubble: AvaBubbleChartVizConfigs,
 } as const satisfies AvaVizConfigUtilRegistry;
 
-export const VizTypes = registry<VizType>().keys(
+export const VizTypes = registry<BuiltInVizType>().keys(
   "table",
   "bar",
   "line",
@@ -49,7 +50,7 @@ export const VizTypes = registry<VizType>().keys(
  * Looks up the `IAvaVizConfigModule` for a viz type, so each `AvaVizConfigs`
  * method can dispatch to that type's implementation.
  */
-function _getVizTypeModule<VType extends VizType>(
+function _getVizTypeModule<VType extends BuiltInVizType>(
   type: VType,
 ): IAvaVizConfigModule<VType, AvaVizConfigType<VType>> {
   return AvaVizConfigModulesRegistry[type] as unknown as IAvaVizConfigModule<
@@ -65,13 +66,13 @@ export const AvaVizConfigs = {
    * series-level controls (including from foreign viz types when a
    * series's `renderAs` differs from the host).
    */
-  getDescriptors: <VType extends VizType>(
+  getDescriptors: <VType extends BuiltInVizType>(
     type: VType,
   ): IAvaVizConfigModule<VType, AvaVizConfigType<VType>>["descriptors"] => {
     return _getVizTypeModule(type).descriptors;
   },
 
-  makeEmptyConfig: <VType extends VizType>(
+  makeEmptyConfig: <VType extends BuiltInVizType>(
     type: VType,
   ): AvaVizConfigType<VType> => {
     return _getVizTypeModule(type).makeEmptyConfig();
@@ -81,14 +82,21 @@ export const AvaVizConfigs = {
    * Converts a viz config to another viz type, keeping as many of its columns
    * and settings as the new type can hold. Use it when a chart's type
    * changes, for example when the user picks a new type for a chart.
+   *
+   * A plugin config has no built-in slots to carry over, so it converts to
+   * the new type's empty config. Callers hydrate the result from the current
+   * query or result, as they do for a fresh selection.
    * @param currentConfig The current viz config
    * @param newVizType The viz type we are converting to
    * @returns The new viz config
    */
-  convertVizConfig: <NewVType extends VizType>(
+  convertVizConfig: <NewVType extends BuiltInVizType>(
     currentConfig: AvaVizConfig,
     newVizType: NewVType,
   ): AvaVizConfigType<NewVType> => {
+    if (currentConfig.vizType === "plugin") {
+      return _getVizTypeModule(newVizType).makeEmptyConfig();
+    }
     const vizUtils = _getVizTypeModule(currentConfig.vizType);
     return vizUtils.convertVizConfig(currentConfig, newVizType);
   },
@@ -97,6 +105,9 @@ export const AvaVizConfigs = {
    * Fills a viz config's empty slots with columns picked from a structured
    * query, keeping every slot already set. Use it when the structured query
    * changes, for example when the user changes a column's aggregation.
+   *
+   * Returns a plugin config unchanged: it is filled from its plugin's
+   * manifest when its chart type is picked.
    * @param vizConfig The viz config
    * @param query The query to hydrate values from
    * @returns The new viz config
@@ -105,14 +116,21 @@ export const AvaVizConfigs = {
     vizConfig: AvaVizConfigType<VType>,
     query: PartialStructuredQuery,
   ): AvaVizConfigType<VType> => {
-    const vizUtils = _getVizTypeModule(vizConfig.vizType as VType);
-    return vizUtils.hydrateFromQuery(vizConfig, query);
+    const config: AvaVizConfig = vizConfig;
+    if (config.vizType === "plugin") {
+      return vizConfig;
+    }
+    const vizUtils = _getVizTypeModule(config.vizType);
+    return vizUtils.hydrateFromQuery(config, query) as AvaVizConfigType<VType>;
   },
 
   /**
    * Fills a viz config's empty slots from a query result's columns, keeping
    * every slot already set. Use it once a result arrives, for example from
    * raw SQL, where there is no structured query to seed from.
+   *
+   * Returns a plugin config unchanged: it is filled from its plugin's
+   * manifest when its chart type is picked.
    * @param vizConfig The viz config
    * @param columns Columns from the executed query result
    * @returns The updated viz config
@@ -121,8 +139,15 @@ export const AvaVizConfigs = {
     vizConfig: AvaVizConfigType<VType>,
     columns: readonly QueryResult.ColumnWithId[],
   ): AvaVizConfigType<VType> => {
-    const vizUtils = _getVizTypeModule(vizConfig.vizType as VType);
-    return vizUtils.hydrateFromQueryResult(vizConfig, columns);
+    const config: AvaVizConfig = vizConfig;
+    if (config.vizType === "plugin") {
+      return vizConfig;
+    }
+    const vizUtils = _getVizTypeModule(config.vizType);
+    return vizUtils.hydrateFromQueryResult(
+      config,
+      columns,
+    ) as AvaVizConfigType<VType>;
   },
 
   /**

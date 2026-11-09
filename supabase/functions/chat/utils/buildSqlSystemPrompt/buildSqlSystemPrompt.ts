@@ -7,7 +7,14 @@ const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
 type Dataset = { id: string; name: string };
 type DatasetColumn = { dataset_id: string; name: string; data_type: string };
 type Concept = { id: string; name: string };
-type ConceptAttribute = { concept_id: string; name: string };
+type ConceptAttribute = {
+  id?: string;
+  concept_id: string;
+  name: string;
+  is_array?: boolean;
+  bucket_grain?: string | null;
+  data_type?: string;
+};
 type ConceptStatus = { concept_id: string; name: string; position: number };
 
 /**
@@ -76,6 +83,9 @@ export function buildSqlSystemPrompt(
     conceptAttributes,
     conceptStatuses,
   });
+  const listFieldNote = SqlTableAlias.formatListFieldNote(conceptAttributes);
+  const bucketedFieldNote =
+    SqlTableAlias.formatBucketedFieldNote(conceptAttributes);
   const spatialDocs = includeSpatialDocumentation
     ? makeSpatialSqlDocumentationFromPrompt(prompt)
     : "";
@@ -93,7 +103,7 @@ Notes:
 - Do not invent datasets, concepts, or columns.
 - The query will run in DuckDB and should only use DuckDB functions supported
   by DuckDB.
-
+${listFieldNote ? `${listFieldNote}\n` : ""}${bucketedFieldNote ? `${bucketedFieldNote}\n` : ""}
 Output:
 Generate only the SQL query, no explanations.
 

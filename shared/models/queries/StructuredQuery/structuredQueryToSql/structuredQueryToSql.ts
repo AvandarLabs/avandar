@@ -99,7 +99,9 @@ export function structuredQueryToSql(
         aggregation === "group_by") &&
       atLeastOneColumnHasAggregation
     ) {
-      groupByColumnNames.push(column.baseColumn.name);
+      // The source column, not the result name: on a case type a renamed
+      // field's name is also the record key's or another field's column.
+      groupByColumnNames.push(QueryColumn.getSourceColumnName(column));
     }
   });
 

@@ -108,6 +108,7 @@ function _makeMapping(args: {
     valuePickerRuleType: args.valuePickerRuleType ?? "first",
     datasetId: DATASET_ID,
     datasetColumnId: args.datasetColumnId,
+    bucketColumnId: undefined,
     createdAt: "2026-08-19T00:00:00.000Z",
     updatedAt: "2026-08-19T00:00:00.000Z",
   };
@@ -146,6 +147,7 @@ function _makeConcept(
         isIdentifier: args.isIdentifier,
         allowManualEdit: false,
         isArray: false,
+        bucketGrain: undefined,
       }),
       mapping: _makeMapping({
         conceptAttributeId: args.id,
@@ -458,5 +460,23 @@ describe("generateIndividuals", () => {
       current: 2,
       total: 3,
     });
+  });
+
+  // The label names each record with one value. A label whose mapping names
+  // no rule cannot pick one, so the sync fails rather than guessing.
+  it("refuses to sync a case type whose label names no value rule", async () => {
+    const concept = _makeConcept();
+    const attributes = concept.attributes.map((attribute) => {
+      return attribute.isLabel && attribute.mapping.type === "dataset_column"
+        ? {
+            ...attribute,
+            mapping: { ...attribute.mapping, valuePickerRuleType: undefined },
+          }
+        : attribute;
+    });
+
+    await expect(
+      generateIndividuals({ ...concept, attributes }),
+    ).rejects.toThrow(/label attribute .full_name.*names no value rule/i);
   });
 });

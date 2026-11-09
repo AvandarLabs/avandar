@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { DataVizConfigMemory } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 
@@ -26,6 +28,14 @@ const STYLED_BAR_CONFIG: AvaBarChartVizConfig = {
   layout: "stack",
   withLegend: false,
   chartStyle: { legend: { position: "left" }, grid: { color: "#e0e0e0" } },
+};
+
+const EPICURVE_CONFIG: AvaVizConfig.Plugin = {
+  vizType: "plugin",
+  pluginId: "avandar.epidemiology",
+  pluginVizId: "epicurve",
+  columnSettings: { dateColumn: "onset" as QueryColumn.Id },
+  settings: { interval: "epiWeek" },
 };
 
 describe("makeDataVizPBlockStateFromProps", () => {
@@ -320,5 +330,31 @@ describe("makeDataVizPBlockStateFromProps viz config memory", () => {
     expect(configChangeState.vizConfigMemory["block-1"]?.bar).toStrictEqual(
       STYLED_BAR_CONFIG,
     );
+  });
+});
+
+describe("makeDataVizPBlockStateFromProps plugin charts", () => {
+  it("keeps a plugin chart's config when its type and config arrive together", () => {
+    const actualProps = _getDataVizPBlockProps({
+      props: {
+        nlQuery: { prompt: "", rawSql: "", generations: [] },
+        vizType: "plugin",
+        vizConfig: EPICURVE_CONFIG,
+      },
+      changed: { vizType: true, vizConfig: true },
+    });
+    expect(actualProps.vizConfig).toStrictEqual(EPICURVE_CONFIG);
+  });
+
+  it("switches a plugin chart to an empty chart of the picked built-in type", () => {
+    const actualProps = _getDataVizPBlockProps({
+      props: {
+        nlQuery: { prompt: "", rawSql: "", generations: [] },
+        vizType: "bar",
+        vizConfig: EPICURVE_CONFIG,
+      },
+      changed: { vizType: true },
+    });
+    expect(actualProps.vizConfig).toEqual(AvaVizConfigs.makeEmptyConfig("bar"));
   });
 });

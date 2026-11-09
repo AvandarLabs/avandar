@@ -36,9 +36,7 @@ export function getRestoredColumnsFromUrl(
           conceptId,
           attributes: conceptAttributes,
         })
-      : (conceptAttributes ?? []).map((col) => {
-          return QueryColumn.makeFromConceptAttribute(col);
-        });
+      : QueryColumn.makeFromConceptAttributes(conceptAttributes ?? []);
   const allQueryColumns = [
     ...(datasetColumns ?? []).map((col) => {
       return QueryColumn.makeFromDatasetColumn(col);

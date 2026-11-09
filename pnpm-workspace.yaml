@@ -3,6 +3,7 @@ packages:
   - "packages/shared/*"
   - "packages/web/*"
   - "packages/node/*"
+  - "plugins/*"
 
 # Singleton runtime dependencies. These must resolve to exactly one copy across
 # the whole workspace: they carry React context or module-level identity, so a

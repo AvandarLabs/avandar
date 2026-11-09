@@ -1,11 +1,15 @@
+import { omit } from "@avandar/utils";
 import { useState } from "react";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { makeStatusSetValueFromChatStatuses } from "@/views/OntologyDesignerApp/makeStatusSetValueFromChatStatuses/makeStatusSetValueFromChatStatuses";
 import type {
+  ChatCaseBucketGrain,
   ChatCaseValuePickerRuleType,
+  ChatCaseValueShape,
   ChatProposedCaseAttribute,
   ChatProposedCaseType,
 } from "$/types/chat.types";
+import type { DateColumnOption } from "@/components/caseFields/makeDateColumnOptions/makeDateColumnOptions";
 
 /** One contributing dataset's attributes, for rendering the card per source. */
 export type CaseTypeDraftSourceGroup = {
@@ -34,6 +38,22 @@ export type CaseTypeDraftEditor = {
     columnId: string,
     valuePickerRuleType: ChatCaseValuePickerRuleType,
   ) => void;
+  setAttributeValueShape: (
+    columnId: string,
+    valueShape: Exclude<ChatCaseValueShape, "bucketed_list">,
+  ) => void;
+  /**
+   * Keeps one value per period for a column: sets its shape, its period,
+   * and the date column that places each row in a period. A join key and
+   * the label keep one value.
+   */
+  setAttributeBucket: (
+    columnId: string,
+    bucket: Readonly<{
+      bucketGrain: ChatCaseBucketGrain;
+      bucketColumnId: string | undefined;
+    }>,
+  ) => void;
   toggleAttribute: (columnId: string) => void;
   toggleManualEntryAttribute: (name: string) => void;
   addManualEntryAttribute: (name: string) => void;
@@ -53,17 +73,35 @@ function _mapAttribute(
 }
 
 /**
- * Forces a column into the mapped set. A join key is what matches its dataset's
- * rows to a case, and the label names the case, so neither can point at an
- * excluded column.
+ * Forces a column into the mapped set as one value. A join key is what
+ * matches its dataset's rows to a case, and the label names the case, so
+ * neither can point at an excluded column or at one that keeps more than
+ * one value.
  */
-function _withIncludedColumn(
+function _withKeyOrLabelColumn(
   draft: ChatProposedCaseType,
   columnId: string,
 ): ChatProposedCaseType {
   return _mapAttribute(draft, columnId, (attribute) => {
-    return { ...attribute, isIncluded: true };
+    return {
+      ...omit(attribute, ["bucketGrain", "bucketColumnId"]),
+      isIncluded: true,
+      valueShape: "single",
+    };
   });
+}
+
+/** Whether a column is the draft's label or one of its join keys. */
+function _isKeyOrLabelColumn(
+  draft: ChatProposedCaseType,
+  columnId: string,
+): boolean {
+  return (
+    draft.labelColumnId === columnId ||
+    draft.sourceDatasets.some((sourceDataset) => {
+      return sourceDataset.primaryKeyColumnId === columnId;
+    })
+  );
 }
 
 /**
@@ -107,6 +145,32 @@ function _hasReservedAttributeName(draft: ChatProposedCaseType): boolean {
 }
 
 /**
+ * Whether an included per-period field still has no date column of its own
+ * dataset, which the card shows on the row and refuses to create. A date
+ * column the dataset does not offer counts as none: creation would drop the
+ * field.
+ */
+function _hasPeriodWithoutDateColumn(
+  options: Readonly<{
+    draft: ChatProposedCaseType;
+    dateColumnOptionsByDatasetId: Readonly<
+      Record<string, readonly DateColumnOption[]>
+    >;
+  }>,
+): boolean {
+  return options.draft.attributes.some((attribute) => {
+    if (!attribute.isIncluded || attribute.valueShape !== "bucketed_list") {
+      return false;
+    }
+    const dateColumnOptions =
+      options.dateColumnOptionsByDatasetId[attribute.datasetId] ?? [];
+    return !dateColumnOptions.some((option) => {
+      return option.value === attribute.bucketColumnId;
+    });
+  });
+}
+
+/**
  * Holds the user's edits to a proposed case type draft. Re-initializes when the
  * model proposes a revised draft, so a fresh proposal replaces stale local
  * edits rather than silently merging with them.
@@ -120,8 +184,18 @@ function _hasReservedAttributeName(draft: ChatProposedCaseType): boolean {
  * is how chat and the create path describe statuses.
  */
 export function useCaseTypeDraftEditor(
-  proposedDraft: ChatProposedCaseType,
+  options: Readonly<{
+    proposedDraft: ChatProposedCaseType;
+    /**
+     * Each source dataset's date and timestamp columns. A per-period field
+     * may only group its rows by one of its own dataset's.
+     */
+    dateColumnOptionsByDatasetId: Readonly<
+      Record<string, readonly DateColumnOption[]>
+    >;
+  }>,
 ): CaseTypeDraftEditor {
+  const { proposedDraft } = options;
   const proposalKey = JSON.stringify(proposedDraft);
   const [draft, setDraft] = useState(proposedDraft);
   const [statusSet, setStatusSet] = useState<ConceptStatus.SetValue>(() => {
@@ -152,6 +226,10 @@ export function useCaseTypeDraftEditor(
       draft.name.trim().length > 0 &&
       draft.sourceDatasets.length > 0 &&
       !_hasReservedAttributeName(draft) &&
+      !_hasPeriodWithoutDateColumn({
+        draft,
+        dateColumnOptionsByDatasetId: options.dateColumnOptionsByDatasetId,
+      }) &&
       ConceptStatus.findSetIssues({ value: statusSet }).length === 0,
     setName: (name) => {
       setDraft((current) => {
@@ -171,7 +249,7 @@ export function useCaseTypeDraftEditor(
     setPrimaryKeyColumnId: (datasetId, columnId) => {
       setDraft((current) => {
         return {
-          ..._withIncludedColumn(current, columnId),
+          ..._withKeyOrLabelColumn(current, columnId),
           sourceDatasets: current.sourceDatasets.map((sourceDataset) => {
             return sourceDataset.datasetId === datasetId
               ? { ...sourceDataset, primaryKeyColumnId: columnId }
@@ -198,7 +276,7 @@ export function useCaseTypeDraftEditor(
     setLabelColumnId: (columnId) => {
       setDraft((current) => {
         return {
-          ..._withIncludedColumn(current, columnId),
+          ..._withKeyOrLabelColumn(current, columnId),
           labelColumnId: columnId,
         };
       });
@@ -214,6 +292,36 @@ export function useCaseTypeDraftEditor(
       setDraft((current) => {
         return _mapAttribute(current, columnId, (attribute) => {
           return { ...attribute, valuePickerRuleType };
+        });
+      });
+    },
+    setAttributeValueShape: (columnId, valueShape) => {
+      setDraft((current) => {
+        // The card locks these columns. This keeps the draft right even if a
+        // caller does not.
+        if (valueShape !== "single" && _isKeyOrLabelColumn(current, columnId)) {
+          return current;
+        }
+        return _mapAttribute(current, columnId, (attribute) => {
+          return {
+            ...omit(attribute, ["bucketGrain", "bucketColumnId"]),
+            valueShape,
+          };
+        });
+      });
+    },
+    setAttributeBucket: (columnId, bucket) => {
+      setDraft((current) => {
+        if (_isKeyOrLabelColumn(current, columnId)) {
+          return current;
+        }
+        return _mapAttribute(current, columnId, (attribute) => {
+          return {
+            ...attribute,
+            valueShape: "bucketed_list",
+            bucketGrain: bucket.bucketGrain,
+            bucketColumnId: bucket.bucketColumnId,
+          };
         });
       });
     },

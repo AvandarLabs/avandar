@@ -13,8 +13,12 @@ export type Concept = {
   description?: string | null;
 };
 export type ConceptAttribute = {
+  id: string;
   concept_id: string;
   name: string;
+  is_array: boolean;
+  bucket_grain: string | null;
+  data_type: string;
 };
 export type ConceptStatus = {
   concept_id: string;
@@ -91,7 +95,7 @@ async function _fetchConcepts(options: {
     await Promise.all([
       options.supabaseClient
         .from("concept_attributes")
-        .select("concept_id, name")
+        .select("id, concept_id, name, is_array, bucket_grain, data_type")
         .eq("workspace_id", options.workspaceId)
         .in("concept_id", conceptIds)
         .throwOnError(),

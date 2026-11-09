@@ -68,7 +68,7 @@ const caseManagerRules = `You are helping the user design one case type (concept
 
 NEVER inspect or request raw row values. You may only use dataset names, descriptions, and column names/types from the catalog below.
 
-Your goal is a complete case type: a name, a description, every dataset that contributes fields together with the join key each one is matched on, the label column that names each case, every attribute worth mapping with its value picker, any manual-entry fields, a status set when the case type has a workflow, and whether users may create cases by hand.
+Your goal is a complete case type: a name, a description, every dataset that contributes fields together with the join key each one is matched on, the label column that names each case, every attribute worth mapping with its value picker, or as a list of every value, or one value per period, any manual-entry fields, a status set when the case type has a workflow, and whether users may create cases by hand.
 
 Reach that goal in as few turns as possible by proposing rather than interrogating.
 
@@ -90,6 +90,8 @@ Other rules for a good draft:
 - Include an attribute for every column a user would plausibly want, with \`isIncluded: true\` for the clearly useful ones and \`isIncluded: false\` for the marginal ones (internal codes, redundant ids). Do not silently omit columns; offer them unchecked instead.
 - Humanize each attribute name from its column name: deaths_total becomes Total deaths. Name it for what it means to the case type, not for its dataset, and keep names unique across datasets so two sources do not both contribute "name".
 - Choose the value picker per column: sum or max for cumulative measures, first for dates, most_frequent for categories and text. A dataset at a finer grain than the case type usually needs sum or max.
+- Set \`valueShape\` to \`list\` only when one case can genuinely have several values of the column and a person would want to see each of them, not a summary: symptoms recorded at several visits, every phone number, every test date. Judge this from column names, dataset descriptions, and the case type's grain. Keep \`single\` for anything that is one fact per case (age, county, name), for measures you summarize with a value picker (totals, averages, latest), and always for the label column and every join key. A list keeps every non-empty value in dataset order. Still give it the value picker it would use if the user switches it to one value.
+- When the user wants a value per day, week, month, quarter, or year (for example "monthly average temperature" or "cases per week"), propose that column with \`valueShape: "bucketed_list"\`, the period as \`bucketGrain\`, and a date or timestamp column of the same dataset as \`bucketColumnId\`. The value picker then applies within each period: avg for a monthly average, count for cases per week. If the dataset has no date or timestamp column, propose one value instead. Never make a per-period field the label or a join key.
 - sum and avg only work on bigint and double columns. max and min work on every column type except boolean, and on a varchar column they compare alphabetically, ignoring case and accents, so "10" comes before "9": never use them for numbers stored as text. count, first, and most_frequent work on every column.
 - Offer manual-entry attributes only when they add something no column supplies, such as review notes. Leave them \`isIncluded: false\` so the user opts in.
 

@@ -11,7 +11,7 @@ import type {
 
 type ColumnBindingIssue = {
   nodeId: string | undefined;
-  reason: "missing" | "ambiguous";
+  reason: "missing" | "ambiguous" | "unsupported";
 };
 type NodeOutcome = {
   rules: QueryFilterGroup["rules"];
@@ -71,6 +71,23 @@ function _getColumnIdRule({
   return { ...rule, columnId: column.id, columnDataType };
 }
 
+/**
+ * Whether a filter on this column fails in DuckDB. A list fails in WHERE, and
+ * in HAVING unless it is counted, since a count is a number.
+ */
+function _isUnfilterableList({
+  column,
+  clause,
+}: {
+  column: QueryColumn.T;
+  clause: "where" | "having";
+}): boolean {
+  return (
+    QueryColumn.isList(column) &&
+    (clause === "where" || column.aggregation !== "count")
+  );
+}
+
 function _getRuleOutcome({
   node,
   columns,
@@ -82,6 +99,12 @@ function _getRuleOutcome({
 }): NodeOutcome {
   const matches = _getMatches({ node, columns, clause });
   const column = matches.length === 1 ? matches[0] : undefined;
+  if (column && _isUnfilterableList({ column, clause })) {
+    return {
+      rules: [],
+      issues: [{ nodeId: node.id, reason: "unsupported" }],
+    };
+  }
   return column
     ? {
         rules: [
@@ -105,7 +128,8 @@ function _getRuleOutcome({
 /**
  * Binds each column-name rule in a filter tree to the ID of the one column it
  * names, and keeps a column-ID rule only while its column exists. A rule that
- * matches no column or several is dropped and reported as an issue.
+ * matches no column or several, or that filters a list, is dropped and
+ * reported as an issue.
  *
  * Use it wherever filters enter a structured query, for example when SQL is
  * parsed into one or a saved map layer is loaded against fresh metadata.
