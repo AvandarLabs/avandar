@@ -5,8 +5,10 @@ import { AvaMapConfigV3Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigS
 import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV4Schema.ts";
 import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts";
 import { AvaMapConfigV6Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV6Schema.ts";
+import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
 import { migrateAvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/migrateAvaMapConfig.ts";
 import { hasBufferCycle } from "$/models/AvaMap/AvaMapConfig/hasBufferCycle.ts";
+import { hasSpatialFilterCycle } from "$/models/AvaMap/AvaMapConfig/hasSpatialFilterCycle/hasSpatialFilterCycle.ts";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type { Json } from "$/types/database.types.ts";
 // eslint-disable-next-line no-restricted-imports
@@ -24,10 +26,22 @@ function _assertBufferInvariants(layers: readonly MapLayer.T[]): void {
   }
 }
 
+function _assertSpatialFilterInvariants(layers: readonly MapLayer.T[]): void {
+  const hasCycle = layers.some((layer) => {
+    return (
+      layer.spatialFilter !== undefined &&
+      hasSpatialFilterCycle(layers, layer.id)
+    );
+  });
+  if (hasCycle) {
+    throw new Error("Spatial filter chain contains a cycle");
+  }
+}
+
 function _parseCurrentConfig(json: unknown): AvaMapConfigRead {
   // The cast bridges `PopupConfig.action`, a required `| undefined` field on
   // `MapLayer.T` that `PopupSchema` still infers as an optional key.
-  const parsed = AvaMapConfigV6Schema.parse(json) as AvaMapConfigRead;
+  const parsed = AvaMapConfigV7Schema.parse(json) as AvaMapConfigRead;
   return {
     ...parsed,
     aoi: parsed.aoi,
@@ -58,28 +72,32 @@ function _parseAnyVersion(json: unknown): AvaMapConfigRead {
   if (version === 5) {
     return migrateAvaMapConfig.fromV5(AvaMapConfigV5Schema.parse(json));
   }
+  if (version === 6) {
+    return migrateAvaMapConfig.fromV6(AvaMapConfigV6Schema.parse(json));
+  }
   return _parseCurrentConfig(json);
 }
 
 /** Reads and writes the persisted JSON representation of a map config. */
 export const AvaMapConfigSchema = {
   /** The Zod schema used to validate current persisted map configuration. */
-  schema: AvaMapConfigV6Schema,
+  schema: AvaMapConfigV7Schema,
 
   /**
    * Validates and migrates a raw JSON value to the current config shape. The
-   * buffer-cycle invariant is checked once here, after migration, so a cycle
-   * persisted under any past version is rejected exactly like one written
-   * under the current version.
+   * buffer-cycle and spatial-filter-cycle invariants are checked once here,
+   * after migration, so a cycle persisted under any past version is rejected
+   * exactly like one written under the current version.
    */
   fromJson: (json: unknown): AvaMapConfigRead => {
     const config = _parseAnyVersion(json);
     _assertBufferInvariants(config.layers);
+    _assertSpatialFilterInvariants(config.layers);
     return config;
   },
 
   /** Serializes a current map config into plain JSON for persistence. */
   toJson: (config: AvaMapConfigRead): Json => {
-    return JSON.parse(JSON.stringify(AvaMapConfigV6Schema.parse(config)));
+    return JSON.parse(JSON.stringify(AvaMapConfigV7Schema.parse(config)));
   },
 };

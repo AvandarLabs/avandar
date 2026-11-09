@@ -262,7 +262,7 @@ export function createVersion5OverlappingDisputedJson() {
     ...createEmptyVersion5Json(),
     layers: [
       {
-        ...layer,
+        ...omitSpatialFilterField(layer),
         disputedStatusColumn: {
           type: "queryColumn",
           column: uuid<QueryColumn.Id>(),
@@ -314,7 +314,7 @@ export function createVersion5JsonWithGraduatedLayer() {
     ...createEmptyVersion5Json(),
     layers: [
       {
-        ...layer,
+        ...omitSpatialFilterField(layer),
         symbology: {
           ...MapLayer.createDefaultFillSymbology(),
           color: {
@@ -366,5 +366,41 @@ export function createGraduatedAreaLayer(): MapLayer.T {
         classLabels: ["Below 95%", undefined],
       },
     },
+  };
+}
+
+/** A version 6 polygon source layer and a buffer of it, before unit fields. */
+export function createVersion6BufferJson() {
+  const config = AvaMapConfig.makeEmpty();
+  const source = {
+    ...MapLayer.createArea("Sites"),
+    geoBinding: {
+      type: "geometryColumn" as const,
+      column: uuid<QueryColumn.Id>(),
+      encoding: "wkt" as const,
+      family: "polygon" as const,
+      simplification: undefined,
+      sourceCrs: undefined,
+    },
+  };
+  const buffer = {
+    ...MapLayer.createArea("Buffer of Sites"),
+    geoBinding: {
+      type: "bufferOfLayer" as const,
+      layerId: source.id,
+      distanceMeters: 805,
+      dissolve: false,
+    },
+  };
+  return {
+    __type: config.__type,
+    version: 6,
+    basemap: config.basemap,
+    view: config.view,
+    bookmarks: config.bookmarks,
+    layers: [omitSpatialFilterField(source), omitSpatialFilterField(buffer)],
+    annotations: config.annotations,
+    annotationsZIndex: 0,
+    exportLayout: config.exportLayout,
   };
 }
