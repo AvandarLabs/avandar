@@ -53,11 +53,24 @@ describe("validatePlaceInput", () => {
     [{ latitude: Number.NaN }, "latitudeOutOfRange"],
     [{ longitude: -180.5 }, "longitudeOutOfRange"],
     [{ startsAt: "10/02/2026" }, "invalidDateTime"],
+    [{ startsAt: "2026-13-45T99:99" }, "invalidDateTime"],
+    [{ startsAt: "2026-02-29T10:00" }, "invalidDateTime"],
+    [{ startsAt: "2026-04-31T10:00" }, "invalidDateTime"],
+    [{ endsAt: "2026-10-02T24:00" }, "invalidDateTime"],
+    [{ endsAt: "2026-10-02T23:60" }, "invalidDateTime"],
+    [{ endsAt: "2026-10-02T23:59:60" }, "invalidDateTime"],
     [{ endsAt: "2026-10-02T17:00" }, "endsBeforeStarts"],
   ])("refuses %o as %s", (override, reason) => {
     expect(validatePlaceInput({ ...DRAFT, ...override })).toEqual({
       type: "invalid",
       reason,
     });
+  });
+
+  it("accepts a leap day", () => {
+    expect(
+      validatePlaceInput({ ...DRAFT, startsAt: "2028-02-29T10:00", endsAt: "" })
+        .type,
+    ).toBe("valid");
   });
 });

@@ -37,12 +37,29 @@ function _cleanText(value: string): string | undefined {
   return cleaned === "" ? undefined : cleaned;
 }
 
+function _isRealDateTime(value: string): boolean {
+  const [year, month, day, hour, minute, second] = value
+    .split(/[-T:]/)
+    .map(Number);
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return (
+    month >= 1 &&
+    month <= 12 &&
+    day >= 1 &&
+    day <= daysInMonth &&
+    hour <= 23 &&
+    minute <= 59 &&
+    (second ?? 0) <= 59
+  );
+}
+
 function _cleanDateTime(value: string): string | undefined | "invalid" {
   const trimmed = value.trim();
   if (trimmed === "") {
     return undefined;
   }
-  return DATE_TIME_PATTERN.test(trimmed) ? trimmed.slice(0, 16) : "invalid";
+  const isValid = DATE_TIME_PATTERN.test(trimmed) && _isRealDateTime(trimmed);
+  return isValid ? trimmed.slice(0, 16) : "invalid";
 }
 
 function _isInRange(value: number, limit: number): boolean {
