@@ -151,6 +151,51 @@ export type EtlDriveDescription = Readonly<{
   organizationLabels: EtlOrganizationLabels;
 }>;
 
+/**
+ * One listing usually added together with another, in the same drive,
+ * written to the listing's `companion_listings`. The catalog shows it as
+ * "recommended" beside the listing that names it.
+ *
+ * A companion is named by its API identity rather than its listing id,
+ * because it may be written later in the run, in another scope, or in a
+ * later run. For example, a GHO indicator names the dimension listing that
+ * holds the country names for its `SpatialDim` codes.
+ */
+export type ListingCompanion = {
+  /** Why it is recommended. `lookup`: it names the codes a column holds. */
+  kind: "lookup";
+  /** The companion's `external_dataset_id`, in this listing's drive. */
+  externalDatasetId: string;
+  /** The companion's `api_resource_id`, in this listing's drive. */
+  apiResourceId: string;
+  /** Column pairs that join this listing to the companion. */
+  joinOn: ReadonlyArray<{ column: string; companionColumn: string }>;
+};
+
+/**
+ * How to read a listing's freshness token with one GET, written to the
+ * listing's `api_freshness_probe`. The edge function's freshness check and
+ * the Parquet copy builder both run it through `readFreshnessProbeToken`.
+ *
+ * Structurally identical to `FreshnessProbe` in
+ * `shared/connectors/open-data/`, which this package cannot import: keep the
+ * two in step.
+ *
+ * - `json-paths`: the values at these paths into the JSON body, in order,
+ *   joined by `|`. A path is a list of keys and indexes.
+ * - `body-sha256`: the SHA-256 of the whole body.
+ */
+export type FreshnessProbe = {
+  /** An `https` URL under the listing's `api_base_url`. */
+  url: string;
+  token:
+    | {
+        kind: "json-paths";
+        paths: ReadonlyArray<ReadonlyArray<string | number>>;
+      }
+    | { kind: "body-sha256" };
+};
+
 /** The descriptive listing fields every relation carries or may carry. */
 export type RelationDescription = Readonly<{
   /** The connection's id in the source, written to `external_dataset_id`. */
@@ -203,6 +248,16 @@ export type RelationDescription = Readonly<{
    * `sourceBytesReported`.
    */
   sourceSizeBytes?: number;
+  /**
+   * Listings usually added with this one, written to `companion_listings`.
+   * Only an `api_resource` relation's are written.
+   */
+  companions?: readonly ListingCompanion[];
+  /**
+   * How to read this relation's freshness token, written to
+   * `api_freshness_probe`. Only an `api_resource` relation's is written.
+   */
+  freshnessProbe?: FreshnessProbe;
 }>;
 
 /** One column of an API relation, written to the relation columns table. */

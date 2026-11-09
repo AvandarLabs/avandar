@@ -43,4 +43,6 @@ export const LISTING_CONTRACT_COLUMNS = [
   "tags",
   "additional_source_metadata",
   "drive_id",
+  "companion_listings",
+  "api_freshness_probe",
 ] as const satisfies ReadonlyArray<keyof ListingRowValues>;

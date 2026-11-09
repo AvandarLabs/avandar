@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { buildParquetCacheFolderPath } from "@pipeline-server/openDataParquetCache/buildParquetCacheFolderPath/buildParquetCacheFolderPath";
+import { convertJsonFileToParquetParts } from "@pipeline-server/openDataParquetCache/convertToParquetParts/convertJsonFileToParquetParts/convertJsonFileToParquetParts";
 import {
   convertCsvFileToParquetParts,
   convertCsvPageToParquetFile,
@@ -9,9 +10,13 @@ import {
   splitParquetFileIntoParts,
   summarizeParquetParts,
 } from "@pipeline-server/openDataParquetCache/convertToParquetParts/convertToParquetParts";
+import { match } from "ts-pattern";
 import { buildParquetCachePartName } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath";
+import { readFreshnessProbeToken } from "$/connectors/open-data/readFreshnessProbeToken/readFreshnessProbeToken";
+import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types";
 import type {
   DownloadableListing,
+  ListingDownload,
   ListingDownloadScript,
   PagedListingDownload,
   PipelineDownloadConfig,
@@ -39,6 +44,8 @@ export type OpenDataParquetCacheDependencies = {
   uploadPart: (args: { objectPath: string; partPath: string }) => Promise<void>;
   /** Deletes every object under a folder of the `opendata` bucket. */
   removeFolder: (folderPath: string) => Promise<void>;
+  /** Reads a listing's freshness probe, when the listing has one. */
+  probeHttp: OpenDataHttp;
 };
 
 /** The Parquet copy a build wrote. */
@@ -119,36 +126,74 @@ async function _uploadParts(
   return byteSize;
 }
 
+/** Where a whole-file source lands in the build's temp folder. */
+function _getSourceFileName(download: WholeFileListingDownload): string {
+  return match(download.contentKind)
+    .with("csv", () => {
+      return "source.csv.gz";
+    })
+    .with("json", () => {
+      return "source.json.gz";
+    })
+    .with("parquet", () => {
+      return "source.parquet";
+    })
+    .exhaustive();
+}
+
+async function _convertWholeFile(args: {
+  download: WholeFileListingDownload;
+  sourcePath: string;
+  partsDir: string;
+  maxPartBytes: number;
+}): Promise<string[]> {
+  const { download, sourcePath, ...partOptions } = args;
+  return await match(download)
+    .with({ contentKind: "csv" }, async () => {
+      return await convertCsvFileToParquetParts({
+        csvPath: sourcePath,
+        ...partOptions,
+      });
+    })
+    .with({ contentKind: "json" }, async (jsonDownload) => {
+      return await convertJsonFileToParquetParts({
+        jsonPath: sourcePath,
+        recordsField: jsonDownload.recordsField,
+        columns: jsonDownload.columns,
+        ...partOptions,
+      });
+    })
+    .with({ contentKind: "parquet" }, async () => {
+      return await splitParquetFileIntoParts({
+        parquetPath: sourcePath,
+        ...partOptions,
+      });
+    })
+    .exhaustive();
+}
+
 /**
- * Downloads a source that is one file, gzipped on disk when it is a CSV,
- * converts it into parts, and uploads them.
+ * Downloads a source that is one file, gzipped on disk when it is a CSV or
+ * JSON, converts it into parts, and uploads them.
  */
 async function _copyWholeFile(
   context: CopyContext,
   download: WholeFileListingDownload,
 ): Promise<WrittenParts> {
-  const isCsv = download.contentKind === "csv";
-  const sourcePath = join(
-    context.tempDir,
-    isCsv ? "source.csv.gz" : "source.parquet",
-  );
+  const sourcePath = join(context.tempDir, _getSourceFileName(download));
   await context.dependencies.downloadToFile({
     url: download.url,
     filePath: sourcePath,
-    isGzipped: isCsv,
+    isGzipped: download.contentKind !== "parquet",
   });
   const partsDir = join(context.tempDir, "parts");
   await mkdir(partsDir);
-  const partOptions = { partsDir, maxPartBytes: context.maxPartBytes };
-  const partPaths = isCsv
-    ? await convertCsvFileToParquetParts({
-        csvPath: sourcePath,
-        ...partOptions,
-      })
-    : await splitParquetFileIntoParts({
-        parquetPath: sourcePath,
-        ...partOptions,
-      });
+  const partPaths = await _convertWholeFile({
+    download,
+    sourcePath,
+    partsDir,
+    maxPartBytes: context.maxPartBytes,
+  });
   // The source can be far larger than its parts, so it goes first.
   await rm(sourcePath, { force: true });
   const summary = await summarizeParquetParts(partPaths);
@@ -281,8 +326,68 @@ async function _copyPages(
   return { ...written, columns: download.columns };
 }
 
+/** The listing a build copies, with the pipeline that wrote it. */
+type BuildListing = DownloadableListing & Readonly<{ pipelineName: string }>;
+
+/** The listing's probe token, or `undefined` when it has no probe. */
+async function _readProbeToken(
+  listing: BuildListing,
+  dependencies: OpenDataParquetCacheDependencies,
+): Promise<string | undefined> {
+  if (listing.freshnessProbe === undefined) {
+    return undefined;
+  }
+  return await readFreshnessProbeToken({
+    probe: listing.freshnessProbe,
+    apiBaseUrl: listing.apiBaseUrl,
+    http: dependencies.probeHttp,
+  });
+}
+
+/**
+ * The source version a copy is built from. A listing's probe is what the
+ * freshness check compares a copy against, so its token, when the listing
+ * has one, wins over the download script's.
+ */
+async function _readStartingSourceVersion(
+  listing: BuildListing,
+  download: ListingDownload,
+  dependencies: OpenDataParquetCacheDependencies,
+): Promise<string> {
+  return (
+    (await _readProbeToken(listing, dependencies)) ??
+    download.sourceVersion ??
+    `built:${new Date().toISOString()}`
+  );
+}
+
+/**
+ * Fails the build when the source moved away from `sourceVersion` while it
+ * was copied: by the listing's probe when it has one, or else by a paged
+ * download's own freshness token. A whole file with no probe is never
+ * re-checked.
+ *
+ * @throws `ParquetCopyError` `source-changed` when it moved.
+ */
+async function _assertSourceUnchanged(args: {
+  listing: BuildListing;
+  download: ListingDownload;
+  dependencies: OpenDataParquetCacheDependencies;
+  sourceVersion: string;
+}): Promise<void> {
+  const { listing, download, sourceVersion } = args;
+  const isChanged =
+    listing.freshnessProbe === undefined
+      ? download.paging &&
+        (await download.readSourceVersion()) !== sourceVersion
+      : (await _readProbeToken(listing, args.dependencies)) !== sourceVersion;
+  if (isChanged) {
+    throw new ParquetCopyError("source-changed");
+  }
+}
+
 async function _readDownload(
-  listing: DownloadableListing & Readonly<{ pipelineName: string }>,
+  listing: BuildListing,
   dependencies: OpenDataParquetCacheDependencies,
 ) {
   const { download: config, script } = await dependencies.loadPipelineDownload(
@@ -307,12 +412,14 @@ async function _readDownload(
  * where each page or file is. This server knows nothing about any one API.
  * A paged source is downloaded, converted, and uploaded one part at a time,
  * so a source of any size needs only about one part of disk. A source that
- * is one file is downloaded whole, gzipped on disk when it is a CSV.
+ * is one file is downloaded whole, gzipped on disk when it is a CSV or JSON.
  *
- * A paged copy whose source changed while it downloaded mixes two versions,
- * so it fails. A failed build deletes the parts it uploaded. Recording a
- * copy on the listing, and deleting the copy it replaces, is the caller's
- * job.
+ * A listing with a freshness probe has its probe read before and after the
+ * download, and its token is the copy's source version. A copy whose source
+ * changed while it downloaded mixes two versions, so it fails: by the probe
+ * when there is one, or else by a paged download's own token. A failed
+ * build deletes the parts it uploaded. Recording a copy on the listing, and
+ * deleting the copy it replaces, is the caller's job.
  *
  * @param options.listing The listing, with the pipeline that wrote it.
  * @param options.buildId The build's id, which names the copy's folder.
@@ -325,7 +432,7 @@ async function _readDownload(
  */
 export async function buildOpenDataParquetCache(
   options: Readonly<{
-    listing: DownloadableListing & Readonly<{ pipelineName: string }>;
+    listing: BuildListing;
     buildId: string;
     dependencies: OpenDataParquetCacheDependencies;
     maxPartBytes?: number;
@@ -334,8 +441,11 @@ export async function buildOpenDataParquetCache(
 ): Promise<OpenDataParquetCache> {
   const { listing, dependencies } = options;
   const { download, pageRows } = await _readDownload(listing, dependencies);
-  const sourceVersion =
-    download.sourceVersion ?? `built:${new Date().toISOString()}`;
+  const sourceVersion = await _readStartingSourceVersion(
+    listing,
+    download,
+    dependencies,
+  );
   const folderPath = buildParquetCacheFolderPath({
     catalogListingId: listing.id,
     buildId: options.buildId,
@@ -353,12 +463,7 @@ export async function buildOpenDataParquetCache(
     const parts = download.paging
       ? await _copyPages(context, download, pageRows)
       : await _copyWholeFile(context, download);
-    if (
-      download.paging &&
-      (await download.readSourceVersion()) !== sourceVersion
-    ) {
-      throw new ParquetCopyError("source-changed");
-    }
+    await _assertSourceUnchanged({ ...options, download, sourceVersion });
     return { folderPath, sourceVersion, ...parts };
   } catch (error) {
     await dependencies.removeFolder(folderPath);

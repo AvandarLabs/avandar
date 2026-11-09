@@ -285,6 +285,33 @@ describe("loadRelationsPage", () => {
     expect(result).toEqual({ written: 1, unchanged: 0 });
   });
 
+  it("rewrites a relation whose only change is its companions, storing them", async () => {
+    const listings = createInMemoryListingsStore();
+    const stores = { listings, objects: undefined };
+    const companions = [
+      {
+        kind: "lookup" as const,
+        externalDatasetId: "DIMENSION/COUNTRY",
+        apiResourceId: "DIMENSION/COUNTRY/DimensionValues",
+        joinOn: [{ column: "SpatialDim", companionColumn: "Code" }],
+      },
+    ];
+    await loadRelationsPage({
+      relations: [_apiRelation(1)],
+      context: _context(stores),
+    });
+
+    const result = await loadRelationsPage({
+      relations: [_apiRelation(1, { companions })],
+      context: _context(stores),
+    });
+
+    expect([result, listings.getRows()[0]?.companion_listings]).toEqual([
+      { written: 1, unchanged: 0 },
+      companions,
+    ]);
+  });
+
   it("counts a row as unchanged when only the run and sync time differ", async () => {
     const stores = {
       listings: createInMemoryListingsStore(),

@@ -32,6 +32,7 @@ export function statusFromOpenDataFailure(
     case "socrata-unreachable":
       return 502;
     case "access-shape-invalid":
+    case "freshness-probe-invalid":
     case "resource-is-remote-api":
     case "resource-format-unsupported":
     case "resource-format-changed":

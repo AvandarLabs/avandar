@@ -40,6 +40,7 @@ export function failureToInvalidDatasetReason(
     case "socrata-too-large":
     case "resource-too-large":
     case "access-shape-invalid":
+    case "freshness-probe-invalid":
       return undefined;
   }
 }

@@ -21,6 +21,7 @@ const ALL_CODES: readonly OpenDataAcquisitionFailureCode[] = [
   "resource-authorization-required",
   "ckan-unreachable",
   "access-shape-invalid",
+  "freshness-probe-invalid",
 ];
 
 describe("statusFromOpenDataFailure", () => {
@@ -37,6 +38,7 @@ describe("statusFromOpenDataFailure", () => {
     ["resource-format-changed", 409],
     ["resource-host-mismatch", 409],
     ["access-shape-invalid", 409],
+    ["freshness-probe-invalid", 409],
   ] as const)("maps %s to %i", (code, status) => {
     expect(statusFromOpenDataFailure(code)).toBe(status);
   });

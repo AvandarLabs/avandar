@@ -43,6 +43,8 @@ function _createStore(overrides: Partial<ParquetCopyStore> = {}) {
   } satisfies ParquetCopyStore;
 }
 
+const PROBE_HTTP = { get: vi.fn(), getBytes: vi.fn() };
+
 function _run(
   store: ParquetCopyStore,
   buildCopy = vi.fn().mockResolvedValue(COPY),
@@ -54,12 +56,32 @@ function _run(
       store,
       loadPipelineDownload: vi.fn(),
       downloadToFile: vi.fn(),
+      probeHttp: PROBE_HTTP,
       buildCopy,
     }),
   };
 }
 
 describe("runParquetCopyBuild", () => {
+  it("builds with the listing's freshness probe and the probe client", async () => {
+    const freshnessProbe = {
+      url: `${LISTING.apiBaseUrl}/3h2n-5cm9`,
+      token: { kind: "body-sha256" },
+    } as const;
+    const store = _createStore({
+      readListing: vi.fn().mockResolvedValue({ ...LISTING, freshnessProbe }),
+    });
+    const { buildCopy, outcome } = _run(store);
+    await outcome;
+
+    expect(buildCopy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        listing: expect.objectContaining({ freshnessProbe }),
+        dependencies: expect.objectContaining({ probeHttp: PROBE_HTTP }),
+      }),
+    );
+  });
+
   it("records the copy, deletes the one it replaced, and verifies the columns", async () => {
     const store = _createStore({
       writeCopy: vi.fn().mockResolvedValue({

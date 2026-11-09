@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { getPipelineEtlDestination } from "@pipelines/shared/getPipelineEtlDestination/getPipelineEtlDestination";
 import { createClient } from "@supabase/supabase-js";
+import { DataCatalogListingJsonSchemas } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers";
 import type { Database } from "$/types/database.types";
 import type { ParquetCopyStore } from "@pipeline-server/openDataParquetCache/runParquetCopyBuild/runParquetCopyBuild";
 import type { PipelineSupabaseTarget } from "@pipelines/shared/PipelineRunOptions.types";
@@ -73,7 +74,7 @@ async function _readListing(client: SupabaseClient, catalogListingId: string) {
   const { data, error } = await client
     .from("data_catalog_listings")
     .select(
-      "id, access_kind, pipeline_name, parquet_cache_build_id, api_base_url, api_resource_id, external_dataset_id, api_resource_format",
+      "id, access_kind, pipeline_name, parquet_cache_build_id, api_base_url, api_resource_id, external_dataset_id, api_resource_format, api_freshness_probe",
     )
     .eq("id", catalogListingId)
     .maybeSingle();
@@ -96,6 +97,13 @@ async function _readListing(client: SupabaseClient, catalogListingId: string) {
     apiResourceId: data.api_resource_id,
     externalDatasetId: data.external_dataset_id,
     apiResourceFormat: data.api_resource_format ?? undefined,
+    ...(data.api_freshness_probe === null ?
+      {}
+    : {
+        freshnessProbe: DataCatalogListingJsonSchemas.freshnessProbe.parse(
+          data.api_freshness_probe,
+        ),
+      }),
   };
 }
 

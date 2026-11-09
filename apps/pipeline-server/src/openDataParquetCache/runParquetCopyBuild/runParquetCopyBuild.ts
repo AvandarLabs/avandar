@@ -81,6 +81,7 @@ type RunParquetCopyBuildOptions = Readonly<{
   store: ParquetCopyStore;
   loadPipelineDownload: OpenDataParquetCacheDependencies["loadPipelineDownload"];
   downloadToFile: OpenDataParquetCacheDependencies["downloadToFile"];
+  probeHttp: OpenDataParquetCacheDependencies["probeHttp"];
   /** Replaces the copy builder, for tests. */
   buildCopy?: typeof buildOpenDataParquetCache;
 }>;
@@ -182,6 +183,7 @@ export async function runParquetCopyBuild(
       dependencies: {
         loadPipelineDownload: options.loadPipelineDownload,
         downloadToFile: options.downloadToFile,
+        probeHttp: options.probeHttp,
         uploadPart: store.uploadPart,
         removeFolder: store.removeFolder,
       },

@@ -1,3 +1,5 @@
+import type { FreshnessProbeProblem } from "$/connectors/open-data/readFreshnessProbeToken/readFreshnessProbeToken.types.ts";
+
 /**
  * Why an open data acquisition could not produce bytes. Callers branch on
  * `code` rather than on message prose, and each member carries only the
@@ -87,7 +89,12 @@ export type OpenDataAcquisitionFailure =
       maxRows: number;
     }
   /** The Socrata metadata or data request failed. */
-  | { code: "socrata-unreachable"; socrataDatasetId: string };
+  | { code: "socrata-unreachable"; socrataDatasetId: string }
+  /**
+   * The listing's freshness probe could not produce a token: its URL is not
+   * allowed, or the source's answer does not fit it.
+   */
+  | { code: "freshness-probe-invalid"; problem: FreshnessProbeProblem };
 
 /** Machine-readable reason an open data acquisition was refused. */
 export type OpenDataAcquisitionFailureCode = OpenDataAcquisitionFailure["code"];
@@ -124,6 +131,8 @@ function _buildFailureMessage(failure: OpenDataAcquisitionFailure): string {
       return `Socrata dataset '${failure.socrataDatasetId}' has ${failure.rowCount} rows, above the ${failure.maxRows} row limit.`;
     case "socrata-unreachable":
       return `Socrata dataset '${failure.socrataDatasetId}' could not be read.`;
+    case "freshness-probe-invalid":
+      return `The listing's freshness probe could not produce a token: ${failure.problem}.`;
   }
 }
 
