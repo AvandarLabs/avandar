@@ -1,0 +1,463 @@
+import {
+  getAgentGadgetName,
+  MAX_ATTACHED_GADGETS,
+  MAX_CASE_TYPE_FIELDS,
+  MAX_DESCRIBED_MENTIONS,
+  MAX_GADGET_BLOCK_TILES,
+} from "$/agent/mentions/AgentGadgetContext.ts";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken.ts";
+import {
+  formatBlockSql,
+  formatTileLine,
+  formatTileTitle,
+  inlineBlockText,
+  quoteBlockText,
+  redactBlockSql,
+} from "$/agent/pageContext/agentBlockText.ts";
+import { MAX_PAGE_TILES } from "$/agent/pageContext/AgentPageContext.ts";
+import {
+  redactAgentPageContext,
+  renderAgentPageContextBlock,
+} from "$/agent/pageContext/buildAgentPageContextBlock.ts";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext.ts";
+import type { BlockRenderOptions } from "$/agent/pageContext/agentBlockText.ts";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext.ts";
+import type { RedactedPageContext } from "$/agent/pageContext/buildAgentPageContextBlock.ts";
+import type { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
+
+/**
+ * The blocks that start an agent turn, each left out when empty. Built by
+ * `buildAgentContextBlocks` and joined into the turn's text by
+ * `buildAgentTurnText`.
+ */
+export type AgentContextBlocks = {
+  pageBlock?: string;
+  attachedBlock?: string;
+  mentionedBlock?: string;
+};
+
+type HideText = (text: string) => string;
+
+/** The inputs of one turn's blocks. */
+type ContextBlockOptions = Readonly<{
+  page?: AgentPageContext;
+  attached: readonly AgentGadgetContext[];
+  mentioned: readonly AgentGadgetContext[];
+  aliases: readonly SqlTableAlias.T[];
+  isSensitive?: (text: string) => boolean;
+  redactSql?: HideText;
+  maskText?: HideText;
+}>;
+
+/**
+ * A gadget with only the charts a block lists. A chart left out by the
+ * tile budget has empty SQL; charts past 12 on a dashboard are counted.
+ */
+type ListedGadget = AgentGadgetContext & { hiddenTileCount?: number };
+
+/** Why a mention is one short line instead of a description. */
+type MentionPointer = "attached" | "page" | "not_described";
+
+/** A mention as it will be drawn in the mentioned block. */
+type PlannedMention =
+  | { kind: "described"; context: ListedGadget }
+  | { kind: "pointer"; context: AgentGadgetContext; pointer: MentionPointer };
+
+/** What each block holds before rendering. */
+type PlannedBlocks<Page> = Readonly<{
+  page?: Page;
+  attached: readonly ListedGadget[];
+  mentioned: readonly PlannedMention[];
+}>;
+
+type BudgetedItem<Item> = { item: Item; sqlTileCount: number };
+
+/**
+ * A gadget cut to the charts a block lists: 12 per dashboard, and the
+ * first `remaining` of those keep their SQL. The rest keep their titles.
+ */
+function _listTiles(
+  context: AgentGadgetContext,
+  remaining: number,
+): BudgetedItem<ListedGadget> {
+  if (context.kind === "dashboard_tile") {
+    const hasSql = remaining > 0;
+    return {
+      item: hasSql
+        ? context
+        : { ...context, tile: { ...context.tile, sql: "" } },
+      sqlTileCount: hasSql ? 1 : 0,
+    };
+  }
+  if (context.kind !== "dashboard") {
+    return { item: context, sqlTileCount: 0 };
+  }
+  const listed = context.tiles.slice(0, MAX_PAGE_TILES);
+  const sqlTileCount = Math.min(listed.length, Math.max(remaining, 0));
+  return {
+    item: {
+      ...context,
+      tiles: listed.map((tile, index) => {
+        return index < sqlTileCount ? tile : { ...tile, sql: "" };
+      }),
+      hiddenTileCount: Math.max(context.tiles.length - MAX_PAGE_TILES, 0),
+    },
+    sqlTileCount,
+  };
+}
+
+/** Lists each item's charts in order, spending one shared tile budget. */
+function _spendTileBudget<Item, Listed>(
+  items: readonly Item[],
+  remaining: number,
+  list: (item: Item, remaining: number) => BudgetedItem<Listed>,
+): { items: Listed[]; remaining: number } {
+  return items.reduce<{ items: Listed[]; remaining: number }>(
+    (spent, item) => {
+      const budgeted = list(item, spent.remaining);
+      return {
+        items: [...spent.items, budgeted.item],
+        remaining: spent.remaining - budgeted.sqlTileCount,
+      };
+    },
+    { items: [], remaining },
+  );
+}
+
+/**
+ * Each mention as a description or a pointer: to the tray when it is
+ * attached, to the page when it is the page's dashboard, and "not
+ * described" past the first five.
+ */
+function _planMentions(
+  mentioned: readonly AgentGadgetContext[],
+  attached: readonly AgentGadgetContext[],
+  page: AgentPageContext | undefined,
+): PlannedMention[] {
+  const attachedKeys = new Set(
+    attached.map((context) => {
+      return ChatMentionToken.buildRefKey(context.ref);
+    }),
+  );
+  return mentioned.map((context, index): PlannedMention => {
+    if (attachedKeys.has(ChatMentionToken.buildRefKey(context.ref))) {
+      return { kind: "pointer", context, pointer: "attached" };
+    }
+    if (
+      context.kind === "dashboard" &&
+      page?.dashboard?.id === context.ref.gadgetId
+    ) {
+      return { kind: "pointer", context, pointer: "page" };
+    }
+    return index < MAX_DESCRIBED_MENTIONS
+      ? { kind: "described", context }
+      : { kind: "pointer", context, pointer: "not_described" };
+  });
+}
+
+/**
+ * The turn's gadgets cut to the caps: 5 attached, 5 described mentions,
+ * and 24 charts with SQL across the attached and described mentions.
+ */
+function _planBlocks(
+  options: ContextBlockOptions,
+): PlannedBlocks<AgentPageContext> {
+  const attached = _spendTileBudget(
+    options.attached.slice(0, MAX_ATTACHED_GADGETS),
+    MAX_GADGET_BLOCK_TILES,
+    _listTiles,
+  );
+  const mentioned = _spendTileBudget(
+    _planMentions(options.mentioned, attached.items, options.page),
+    attached.remaining,
+    (item, remaining): BudgetedItem<PlannedMention> => {
+      if (item.kind === "pointer") {
+        return { item, sqlTileCount: 0 };
+      }
+      const listed = _listTiles(item.context, remaining);
+      return { ...listed, item: { ...item, context: listed.item } };
+    },
+  );
+  return {
+    page: options.page,
+    attached: attached.items,
+    mentioned: mentioned.items,
+  };
+}
+
+/** The gadget with each listed chart's SQL redacted. Empty SQL is skipped. */
+function _redactGadgetSql(
+  context: ListedGadget,
+  redactSql: HideText | undefined,
+): ListedGadget {
+  const redact = (sql: string): string => {
+    return sql === "" ? "" : redactBlockSql(sql, redactSql);
+  };
+  if (context.kind === "dashboard") {
+    return {
+      ...context,
+      tiles: context.tiles.map((tile) => {
+        return { ...tile, sql: redact(tile.sql) };
+      }),
+    };
+  }
+  return context.kind === "dashboard_tile"
+    ? { ...context, tile: { ...context.tile, sql: redact(context.tile.sql) } }
+    : context;
+}
+
+/**
+ * Every piece of SQL the blocks will show, redacted. Pointer mentions are
+ * not redacted: their SQL is never shown, so the vault never holds it.
+ */
+function _redactBlocks(
+  planned: PlannedBlocks<AgentPageContext>,
+  redactSql: HideText | undefined,
+): PlannedBlocks<RedactedPageContext> {
+  return {
+    page: planned.page
+      ? redactAgentPageContext(planned.page, redactSql)
+      : undefined,
+    attached: planned.attached.map((context) => {
+      return _redactGadgetSql(context, redactSql);
+    }),
+    mentioned: planned.mentioned.map((item) => {
+      return item.kind === "described"
+        ? { ...item, context: _redactGadgetSql(item.context, redactSql) }
+        : item;
+    }),
+  };
+}
+
+function _quoted(text: string, render: BlockRenderOptions): string {
+  return quoteBlockText(render.mask(text));
+}
+
+function _datasetText(
+  context: Extract<AgentGadgetContext, { kind: "dataset" }>,
+  render: BlockRenderOptions,
+): string {
+  const entry = render.aliases.find((candidate) => {
+    return (
+      candidate.kind === "dataset" &&
+      candidate.datasetId === context.ref.gadgetId
+    );
+  });
+  const name = _quoted(context.name, render);
+  return entry
+    ? `Dataset ${name} (query it as ${entry.alias})`
+    : `Dataset ${name}, not queryable in this chat`;
+}
+
+function _mapText(
+  context: Extract<AgentGadgetContext, { kind: "map" }>,
+  render: BlockRenderOptions,
+): string {
+  const layers = context.layers.map((layer) => {
+    const source = layer.sourceName
+      ? ` from ${_quoted(layer.sourceName, render)}`
+      : "";
+    return `${_quoted(layer.name, render)}${source}`;
+  });
+  const name = `Map ${_quoted(context.name, render)}`;
+  return layers.length > 0 ? `${name}, layers: ${layers.join("; ")}` : name;
+}
+
+function _conceptText(
+  context: Extract<AgentGadgetContext, { kind: "concept" }>,
+  render: BlockRenderOptions,
+): string {
+  const listed = context.fieldNames.slice(0, MAX_CASE_TYPE_FIELDS);
+  const hiddenCount = context.fieldNames.length - listed.length;
+  const fields = listed.map((field) => {
+    return _quoted(field, render);
+  });
+  const more = hiddenCount > 0 ? `, and ${hiddenCount} more` : "";
+  const name = `Case type ${_quoted(context.name, render)}`;
+  return fields.length > 0
+    ? `${name}, fields: ${fields.join(", ")}${more}`
+    : name;
+}
+
+function _dashboardLines(
+  context: Extract<ListedGadget, { kind: "dashboard" }>,
+  render: BlockRenderOptions,
+): string[] {
+  const hiddenCount = context.hiddenTileCount ?? 0;
+  const nested = [
+    ...(context.tiles.length > 0 ? ["Charts on this dashboard:"] : []),
+    ...context.tiles.map((tile, index) => {
+      return formatTileLine(tile, index, render);
+    }),
+    ...(hiddenCount > 0
+      ? [
+          `${hiddenCount} more ${hiddenCount === 1 ? "chart" : "charts"} not listed.`,
+        ]
+      : []),
+  ];
+  return [
+    `Dashboard ${_quoted(context.name, render)}`,
+    ...nested.map((line) => {
+      return `   ${line}`;
+    }),
+  ];
+}
+
+function _tileText(
+  context: Extract<AgentGadgetContext, { kind: "dashboard_tile" }>,
+  render: BlockRenderOptions,
+): string {
+  const { tile } = context;
+  const title = quoteBlockText(formatTileTitle(tile.title, render));
+  const dashboardName = _quoted(context.dashboardName, render);
+  const chartType = inlineBlockText(tile.chartType);
+  const heading = `Chart ${title} on dashboard ${dashboardName} (${chartType})`;
+  return tile.sql === ""
+    ? heading
+    : `${heading}: ${formatBlockSql(tile.sql, render.aliases)}`;
+}
+
+/** A gadget's description: its first line, then any nested lines. */
+function _describe(
+  context: ListedGadget,
+  render: BlockRenderOptions,
+): string[] {
+  switch (context.kind) {
+    case "dashboard":
+      return _dashboardLines(context, render);
+    case "dashboard_tile":
+      return [_tileText(context, render)];
+    case "dataset":
+      return [_datasetText(context, render)];
+    case "map":
+      return [_mapText(context, render)];
+    case "concept":
+      return [_conceptText(context, render)];
+    case "unavailable": {
+      const name = getAgentGadgetName(context);
+      return [`${name[0]?.toUpperCase()}${name.slice(1)}. You cannot see it.`];
+    }
+  }
+}
+
+/**
+ * How the agent's model hears a gadget's name, in the blocks and in the
+ * message's `@"Name"`: a tile title that looks personal becomes "Untitled
+ * chart", and every name is masked with the conversation's vault. Call it
+ * only after every piece of SQL in the turn is redacted, for example once
+ * `buildAgentContextBlocks` has built the turn's blocks.
+ */
+export function buildAgentGadgetModelName(
+  context: AgentGadgetContext,
+  options: Readonly<{
+    isSensitive?: (text: string) => boolean;
+    mask: HideText;
+  }>,
+): string {
+  return context.kind === "dashboard_tile"
+    ? formatTileTitle(context.tile.title, { aliases: [], ...options })
+    : options.mask(getAgentGadgetName(context));
+}
+
+function _attachedBlock(
+  attached: readonly ListedGadget[],
+  render: BlockRenderOptions,
+): string | undefined {
+  if (attached.length === 0) {
+    return undefined;
+  }
+  const lines = attached.flatMap((context, index) => {
+    const [first = "", ...nested] = _describe(context, render);
+    return [`${index + 1}. ${first}`, ...nested];
+  });
+  return [
+    "<attached>",
+    "Pinned by the user for this whole chat:",
+    ...lines,
+    "</attached>",
+  ].join("\n");
+}
+
+/** A pointer's text, with any name masked here, after every redaction. */
+function _pointerText(
+  item: Extract<PlannedMention, { kind: "pointer" }>,
+  render: BlockRenderOptions,
+): string {
+  switch (item.pointer) {
+    case "attached":
+      return "attached above";
+    case "not_described":
+      return "mentioned, not described";
+    case "page": {
+      const name = _quoted(getAgentGadgetName(item.context), render);
+      return `Dashboard ${name}, the dashboard on the current page`;
+    }
+  }
+}
+
+function _mentionedBlock(
+  planned: readonly PlannedMention[],
+  render: BlockRenderOptions,
+): string | undefined {
+  if (planned.length === 0) {
+    return undefined;
+  }
+  const lines = planned.flatMap((item) => {
+    const modelName = buildAgentGadgetModelName(item.context, render);
+    const name = `@${quoteBlockText(modelName)}`;
+    if (item.kind === "pointer") {
+      return [`${name}: ${_pointerText(item, render)}`];
+    }
+    const [first = "", ...nested] = _describe(item.context, render);
+    return [`${name}: ${first}`, ...nested];
+  });
+  return [
+    "<mentioned>",
+    "What each @ in the message refers to:",
+    ...lines,
+    "</mentioned>",
+  ].join("\n");
+}
+
+function _withoutUndefined(blocks: AgentContextBlocks): AgentContextBlocks {
+  return Object.fromEntries(
+    Object.entries(blocks).filter(([, block]) => {
+      return block !== undefined;
+    }),
+  );
+}
+
+/**
+ * The blocks that start an agent turn: the current page, the gadgets the
+ * user attached to the chat, and what this message's `@` mentions refer
+ * to. Every piece of SQL in all three is redacted with `redactSql` before
+ * any name, title, or column is masked with `maskText`, so a value one
+ * chart filters on is hidden in every title, wherever that title appears.
+ * SQL a cap leaves out is never redacted, so the vault holds only values
+ * the model could see. Caps: 5 attached, 5 described mentions, 12 charts
+ * per dashboard, and 24 charts with SQL across the attached and mentioned
+ * blocks. A mention of the page's dashboard, or of an attached gadget, is
+ * one pointer line.
+ */
+export function buildAgentContextBlocks(
+  options: ContextBlockOptions,
+): AgentContextBlocks {
+  // Every redaction happens here, before anything below masks a name.
+  const redacted = _redactBlocks(_planBlocks(options), options.redactSql);
+  const render: BlockRenderOptions = {
+    aliases: options.aliases,
+    isSensitive: options.isSensitive,
+    mask:
+      options.maskText ??
+      ((text) => {
+        return text;
+      }),
+  };
+  return _withoutUndefined({
+    pageBlock: redacted.page
+      ? renderAgentPageContextBlock(redacted.page, render)
+      : undefined,
+    attachedBlock: _attachedBlock(redacted.attached, render),
+    mentionedBlock: _mentionedBlock(redacted.mentioned, render),
+  });
+}
