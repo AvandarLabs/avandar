@@ -107,3 +107,8 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T04-07-01](2026-11-09T04-07-01-phase-1a-redaction_p07-repeat/results.jsonl) | `phase-1a-redaction:p07-repeat` | 1/1 | 0 | 0 | $0.00019 | 2.0 s / 2.0 s | none |
 | [2026-11-09T04-07-05](2026-11-09T04-07-05-phase-1a-redaction_p07-repeat/results.jsonl) | `phase-1a-redaction:p07-repeat` | 1/1 | 0 | 0 | $0.00019 | 2.0 s / 2.0 s | none |
 | [2026-11-09T04-08-54](2026-11-09T04-08-54-phase-1a-redaction_agent-45/results.jsonl) | `phase-1a-redaction:agent-45` | 45/45 | 0 | 0 | $0.00026 | 2.1 s / 3.3 s | none |
+| [2026-11-09T04-39-31](2026-11-09T04-39-31-phase-1a-redaction-review_agent-45/results.jsonl) | `phase-1a-redaction-review:agent-45` | 43/45 | 0 | 0 | $0.00030 | 2.4 s / 3.4 s | H06 N04 |
+| [2026-11-09T04-39-38](2026-11-09T04-39-38-phase-1a-redaction-review_agent-page/results.jsonl) | `phase-1a-redaction-review:agent-page` | 7/7 | 0 | 0 | $0.00022 | 1.8 s / 2.6 s | none |
+| [2026-11-09T04-39-55](2026-11-09T04-39-55-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 2/2 | 0 | 0 | $0.00036 | 3.6 s / 3.6 s | none |
+| [2026-11-09T04-40-01](2026-11-09T04-40-01-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 1/2 | 0 | 0 | $0.00039 | 3.7 s / 3.7 s | H06 |
+| [2026-11-09T04-40-06](2026-11-09T04-40-06-phase-1a-redaction-review_rerun/results.jsonl) | `phase-1a-redaction-review:rerun` | 2/2 | 0 | 0 | $0.00032 | 3.2 s / 3.2 s | none |
