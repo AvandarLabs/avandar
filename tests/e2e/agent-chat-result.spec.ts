@@ -111,10 +111,9 @@ test.describe("agent results in the chat", () => {
       if (await chatToggle.isVisible()) {
         await chatToggle.click();
       }
-      const composer = page
-        .getByPlaceholder(/Ask me/i)
-        .or(page.locator('[data-testid="composer-input"]'))
-        .first();
+      // With the agent on, the message box is a rich text editor named
+      // "Message", which has no placeholder attribute.
+      const composer = page.getByLabel("Message", { exact: true });
       await composer.fill("How many cases in California?");
       await composer.press("Enter");
 
