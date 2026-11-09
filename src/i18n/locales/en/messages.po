@@ -843,10 +843,6 @@ msgstr "Use this basemap"
 msgid "Monospace headlines"
 msgstr "Monospace headlines"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
-#~ msgstr "Recommended if you have 4 GB RAM or need the lightest download."
-
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Quarter"
 msgstr "Quarter"
@@ -982,10 +978,6 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 msgstr "Your current plan only supports up to {0} datasets. To increase the "
 "number of datasets you can add to your workspace you can purchase more "
 "seats. Each seat allows you to add 10 more datasets!"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-#~ msgid "Only allow one value"
-#~ msgstr "Only allow one value"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -4354,10 +4346,6 @@ msgstr "Hide the layer {layerName}"
 msgid "Start your journey with us"
 msgstr "Start your journey with us"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 7B (offline)"
-#~ msgstr "Qwen 2.5 7B (offline)"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Fields that keep every value cannot be filtered on."
@@ -4383,11 +4371,6 @@ msgstr "SQL contains multiple statements; the form maps only the first."
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
 msgstr "Topic: {topic}"
-
-#. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-#~ msgid "If each {0} can only have one {attributeName} value, check this box."
-#~ msgstr "If each {0} can only have one {attributeName} value, check this box."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -4988,10 +4971,6 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
-
-#: src/components/caseFields/ValueShapeControl.tsx
-#~ msgid "One value or every value for {fieldName}"
-#~ msgstr "One value or every value for {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -6734,10 +6713,6 @@ msgstr "Unable to load dashboard datasets"
 msgid "No description has been added yet."
 msgstr "No description has been added yet."
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 3B"
-#~ msgstr "Qwen 2.5 3B"
-
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "In each period, if there are multiple {attributeName} values, then..."
 msgstr "In each period, if there are multiple {attributeName} values, then..."
@@ -7583,10 +7558,6 @@ msgstr "Dark"
 msgid "Could not load this workspace's plugins. Reload to try again."
 msgstr "Could not load this workspace's plugins. Reload to try again."
 
-#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
-#~ msgid "Choose a {settingLabel}"
-#~ msgstr "Choose a {settingLabel}"
-
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
 msgstr "Records"
@@ -8380,10 +8351,6 @@ msgstr "You're offline. Your draft is saved on this device and you can post "
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
 msgid "Enter dataset name"
 msgstr "Enter dataset name"
-
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-#~ msgid "Sources"
-#~ msgstr "Sources"
 
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."

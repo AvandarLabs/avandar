@@ -141,7 +141,7 @@ msgstr "儲存目前檢視"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Review new permissions"
-msgstr ""
+msgstr "審查新權限"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls.tsx
 msgid "Cell size (meters)"
@@ -320,7 +320,7 @@ msgstr "允許在線同步"
 
 #: src/lib/plugins/PluginErrorBoundary/PluginErrorBoundary.tsx
 msgid "Something went wrong in this plugin. Close this panel and try again."
-msgstr ""
+msgstr "此外掛發生問題。請關閉此面板後再試一次。"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Works without an internet connection."
@@ -358,7 +358,7 @@ msgstr "重新排序 {statusName}"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart needs the {pluginId} plugin, which is not available."
-msgstr ""
+msgstr "此圖表需要 {pluginId} 外掛，但該外掛目前無法使用。"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -388,7 +388,7 @@ msgstr "以自然語言輸入您的問題或指示以生成 SQL 查詢"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "Could not update {pluginName}"
-msgstr ""
+msgstr "無法更新 {pluginName}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H4"
@@ -454,7 +454,7 @@ msgstr "Avandar"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
-msgstr ""
+msgstr "需要審查"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Disputed values"
@@ -701,7 +701,7 @@ msgstr "資料來源"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader.tsx
 msgid "Loading chart"
-msgstr ""
+msgstr "正在載入圖表"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand drawer"
@@ -826,10 +826,6 @@ msgstr "使用此底圖"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "等寬標題"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
-#~ msgstr "如果您有 4 GB RAM，或需要最精簡的下載內容，建議使用此選項。"
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Quarter"
@@ -959,10 +955,6 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 "number of datasets you can add to your workspace you can purchase more "
 "seats. Each seat allows you to add 10 more datasets!"
 msgstr "您目前的計劃僅支持最多 {0} 個資料集。要增加可以添加到工作區的資料集數量，您可以購買更多席位。每個席位允許您添加 10 個額外的資料集！"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-#~ msgid "Only allow one value"
-#~ msgstr "僅允許一個值"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -1128,7 +1120,7 @@ msgstr "橘色"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 msgid "Plugins add features to this workspace. Installing or removing a plugin "
 "affects every member."
-msgstr ""
+msgstr "外掛會為此工作區新增功能。安裝或移除外掛會影響所有成員。"
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -1319,7 +1311,7 @@ msgstr "不過，我們目前不允許新的註冊。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Not installed"
-msgstr ""
+msgstr "未安裝"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
@@ -1339,7 +1331,7 @@ msgstr "「{value}」不是日期。請使用 YYYY-MM-DD。"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "Plugin not available"
-msgstr ""
+msgstr "外掛無法使用"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
@@ -1729,7 +1721,7 @@ msgstr "SQL 中的列名"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart's saved settings are not valid, so it cannot be displayed."
-msgstr ""
+msgstr "此圖表儲存的設定無效，因此無法顯示。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field, e.g. Review notes"
@@ -1773,7 +1765,7 @@ msgstr "某些數據應來自現有數據集"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "The plugin may be out of date. Ask an admin to check Settings → Plugins."
-msgstr ""
+msgstr "外掛可能已過時。請要求管理員檢查「設定」→「外掛」。"
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Start of time range: {startLabel}"
@@ -2529,7 +2521,7 @@ msgstr "檢測到偏見："
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin ran into an error while drawing this chart."
-msgstr ""
+msgstr "{pluginId} 外掛在繪製此圖表時發生錯誤。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
@@ -2824,11 +2816,11 @@ msgstr "有兩個狀態名稱相同。請分別為它們命名。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace."
-msgstr ""
+msgstr "其功能已從此工作區移除。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
 msgid "Reads the query result you run it on"
-msgstr ""
+msgstr "讀取其執行所在的查詢結果"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
@@ -2857,7 +2849,7 @@ msgstr "角色與權限"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall {pluginName}?"
-msgstr ""
+msgstr "要解除安裝 {pluginName} 嗎？"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
@@ -3050,7 +3042,7 @@ msgstr "工作區 ID"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
-msgstr ""
+msgstr "您尚未選擇：{settingLabel}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -3243,7 +3235,7 @@ msgstr "狀態"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} uninstalled"
-msgstr ""
+msgstr "已解除安裝 {pluginName}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -3547,7 +3539,7 @@ msgstr "{layerName} 未傳回任何資料列"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Disabled"
-msgstr ""
+msgstr "已停用"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
@@ -3786,7 +3778,7 @@ msgstr "識別"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Installed"
-msgstr ""
+msgstr "已安裝"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
@@ -3852,7 +3844,7 @@ msgstr "X 軸最大值"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "{pluginName} will be available to every member of this workspace."
-msgstr ""
+msgstr "{pluginName} 將可供此工作區的所有成員使用。"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "ends with"
@@ -4030,7 +4022,7 @@ msgstr "修正上方欄位後再儲存。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall"
-msgstr ""
+msgstr "解除安裝"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
@@ -4122,7 +4114,7 @@ msgstr "X 軸刻度間隔"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 msgid "You do not have permission to manage plugins. Ask a workspace admin to "
 "make changes."
-msgstr ""
+msgstr "您沒有管理外掛的權限。請要求工作區管理員進行變更。"
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -4239,10 +4231,6 @@ msgstr "隱藏圖層 {layerName}"
 msgid "Start your journey with us"
 msgstr "與我們一起開始您的旅程"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 7B (offline)"
-#~ msgstr "Qwen 2.5 7B（離線）"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Fields that keep every value cannot be filtered on."
@@ -4268,11 +4256,6 @@ msgstr "SQL 包含多個陳述式；表單僅對應第一個。"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
 msgstr "主題：{topic}"
-
-#. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-#~ msgid "If each {0} can only have one {attributeName} value, check this box."
-#~ msgstr "如果每個 {0} 只能有一個 {attributeName} 值，請勾選此框。"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -4640,7 +4623,7 @@ msgstr "未命名地圖"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve new permissions for {pluginName}?"
-msgstr ""
+msgstr "要核准 {pluginName} 的新權限嗎？"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "That region is not on a page we read. Kept the rule-based results."
@@ -4664,7 +4647,7 @@ msgstr "圖片"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
 msgid "Uses no workspace data."
-msgstr ""
+msgstr "不使用工作區資料。"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
@@ -4797,7 +4780,7 @@ msgstr "第一個點"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Enable {pluginName}?"
-msgstr ""
+msgstr "要啟用 {pluginName} 嗎？"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -4866,10 +4849,6 @@ msgstr "和"
 msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}：此資料集只會存在於這台電腦上，團隊中的其他人都無法開啟。"
-
-#: src/components/caseFields/ValueShapeControl.tsx
-#~ msgid "One value or every value for {fieldName}"
-#~ msgstr "{fieldName} 的一個值或所有值"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -5331,7 +5310,7 @@ msgstr "WKB"
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "The plugin behind this chart is not available, so its settings cannot be "
 "shown."
-msgstr ""
+msgstr "此圖表所使用的外掛無法使用，因此無法顯示其設定。"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
@@ -5544,7 +5523,7 @@ msgstr "分位數"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
 msgid "No plugins are available in this deployment."
-msgstr ""
+msgstr "此部署中沒有可用的外掛。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
@@ -5777,7 +5756,7 @@ msgstr "讓 AI 決定 (舊版)"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "This version asks for permissions listed on its card. It stays hidden "
 "until you approve them."
-msgstr ""
+msgstr "此版本要求其卡片上列出的權限。核准前，該版本會保持隱藏。"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -6235,7 +6214,7 @@ msgstr "儀表板已成功刪除！"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin's chart code didn't load."
-msgstr ""
+msgstr "{pluginId} 外掛的圖表程式碼未載入。"
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
@@ -6287,7 +6266,7 @@ msgstr "此案件類型代表什麼？"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary.tsx
 msgid "{publisher} · version {version}"
-msgstr ""
+msgstr "{publisher} · 版本 {version}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -6330,7 +6309,7 @@ msgstr "顯示圖層 {layerName}"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "{pluginName}: the command failed"
-msgstr ""
+msgstr "{pluginName}：指令失敗"
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
@@ -6572,10 +6551,6 @@ msgstr "無法加載儀表板資料集"
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "尚未添加描述。"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 3B"
-#~ msgstr "Qwen 2.5 3B"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "In each period, if there are multiple {attributeName} values, then..."
@@ -6844,7 +6819,7 @@ msgstr "此 SQL 的部分無法以手動形式表示。該表單顯示最佳努�
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart couldn't render"
-msgstr ""
+msgstr "此圖表無法呈現"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
@@ -6956,7 +6931,7 @@ msgstr "尚未配置任何字段"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Plugins"
-msgstr ""
+msgstr "外掛"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not contain"
@@ -7104,7 +7079,7 @@ msgstr "{code} - UTM 北帶 {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
 msgid "Some plugins could not be loaded. Reload the page to try again."
-msgstr ""
+msgstr "部分外掛無法載入。請重新載入頁面再試一次。"
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -7202,7 +7177,7 @@ msgstr "再次登入"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Enable"
-msgstr ""
+msgstr "啟用"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
@@ -7404,11 +7379,7 @@ msgstr "深色"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
 msgid "Could not load this workspace's plugins. Reload to try again."
-msgstr ""
-
-#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
-#~ msgid "Choose a {settingLabel}"
-#~ msgstr ""
+msgstr "無法載入此工作區的外掛。請重新載入後再試一次。"
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -7618,7 +7589,7 @@ msgstr "只有工作區設定管理員可以打開工作區設定。"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "Could not load {pluginName}"
-msgstr ""
+msgstr "無法載入 {pluginName}"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Pick which global filters apply to this visualization."
@@ -7758,7 +7729,7 @@ msgstr "此資料集現在反映工作表的目前內容。"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install {pluginName}?"
-msgstr ""
+msgstr "要安裝 {pluginName} 嗎？"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
@@ -7949,7 +7920,7 @@ msgstr "行"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features disappear for every member until you enable it again."
-msgstr ""
+msgstr "在您再次啟用前，所有成員都無法使用其功能。"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
@@ -8177,10 +8148,6 @@ msgstr "您目前離線。草稿已儲存至此裝置，重新連線後即可發
 msgid "Enter dataset name"
 msgstr "輸入數據集名稱"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-#~ msgid "Sources"
-#~ msgstr "來源"
-
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
 msgstr "在地圖上選取註記以進行編輯。"
@@ -8231,7 +8198,7 @@ msgstr "資料集"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "Try again. If it keeps failing, contact the plugin's publisher."
-msgstr ""
+msgstr "請再試一次。如果問題持續發生，請聯絡此外掛的發佈者。"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
@@ -8240,7 +8207,7 @@ msgstr "所有決策"
 #. js-lingui-explicit-id
 #: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
 msgid "series.cases"
-msgstr ""
+msgstr "series.cases"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
@@ -8436,7 +8403,7 @@ msgstr "正在載入作者"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable {pluginName}?"
-msgstr ""
+msgstr "停用 {pluginName}？"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -8603,7 +8570,7 @@ msgstr "此圖層會擷取這些欄位，因此新增欄位後也能用於篩選
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install"
-msgstr ""
+msgstr "安裝"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
@@ -8668,7 +8635,7 @@ msgstr "至少為"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 msgid "Plugin chart"
-msgstr ""
+msgstr "插件圖表"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -9011,7 +8978,7 @@ msgstr "隱藏教學"
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
 msgid "{rowCount, plural, one {Built from the first row of the result.} other "
 "{Built from the first # rows of the result.}}"
-msgstr ""
+msgstr "{rowCount, plural, one {根據結果的第一列建立。} other {根據結果的前 # 列建立。}}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -9082,7 +9049,7 @@ msgstr "側邊欄"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "{pluginName}: this command is not available"
-msgstr ""
+msgstr "{pluginName}：此指令無法使用"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -9175,7 +9142,7 @@ msgstr "新增篩選器"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
 msgid "Loading plugins"
-msgstr ""
+msgstr "正在載入插件"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
@@ -9509,7 +9476,7 @@ msgstr "無法讀取檔案"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "Check your connection and click the button again to retry."
-msgstr ""
+msgstr "請檢查您的連線，然後再次點擊按鈕以重試。"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
@@ -9566,7 +9533,7 @@ msgstr "您目前的計畫僅支援最多 {0} 個資料集。升級到我們的�
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features come back for every member."
-msgstr ""
+msgstr "每位成員都會恢復使用其功能。"
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
@@ -9669,7 +9636,7 @@ msgstr "全選"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "Invalid chart settings"
-msgstr ""
+msgstr "圖表設定無效"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
@@ -9960,7 +9927,7 @@ msgstr "低至高"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar gap"
-msgstr ""
+msgstr "長條圖間距"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -10077,7 +10044,7 @@ msgstr "每位可以開啟 {app} 應用程式的工作區成員，都會在此 {
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "{title} couldn't render"
-msgstr ""
+msgstr "{title} 無法呈現"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -10107,7 +10074,7 @@ msgstr "提及團隊成員"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginSettingsCard.tsx
 msgid "No longer included in this deployment. Uninstall to remove it from this "
 "workspace."
-msgstr ""
+msgstr "此部署已不再包含此項目。解除安裝即可從此工作區移除。"
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
@@ -10603,7 +10570,7 @@ msgstr "未回報"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve"
-msgstr ""
+msgstr "核准"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -10658,7 +10625,8 @@ msgstr "左下"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
 msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
 "other {Adds # buttons to Data Explorer}}"
-msgstr ""
+msgstr "{dataExplorerToolbarItems, plural, one {將 # 個按鈕新增至 Data Explorer} other "
+"{將 # 個按鈕新增至 Data Explorer}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -10725,7 +10693,7 @@ msgstr "最常見的值是 <0>{0}</0>，出現在 <1>{1}</1> 的資料列中。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"
-msgstr ""
+msgstr "正在載入圖表設定"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"
@@ -10775,7 +10743,7 @@ msgstr "藍色"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart couldn't load"
-msgstr ""
+msgstr "此圖表無法載入"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
@@ -10811,7 +10779,7 @@ msgstr "https://example.org"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
-msgstr ""
+msgstr "已安裝 {pluginName}"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"

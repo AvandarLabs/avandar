@@ -144,7 +144,7 @@ msgstr "Hifadhi mwonekano wa sasa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Review new permissions"
-msgstr ""
+msgstr "Kagua ruhusa mpya"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls.tsx
 msgid "Cell size (meters)"
@@ -330,7 +330,8 @@ msgstr "Ruhusu usawazishaji mtandaoni"
 
 #: src/lib/plugins/PluginErrorBoundary/PluginErrorBoundary.tsx
 msgid "Something went wrong in this plugin. Close this panel and try again."
-msgstr ""
+msgstr "Hitilafu imetokea kwenye plugin hii. Funga paneli hii kisha ujaribu "
+"tena."
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Works without an internet connection."
@@ -369,7 +370,7 @@ msgstr "Panga upya {statusName}"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart needs the {pluginId} plugin, which is not available."
-msgstr ""
+msgstr "Chati hii inahitaji plugin ya {pluginId}, ambayo haipatikani."
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
@@ -402,7 +403,7 @@ msgstr "Ingiza swali lako au maelekezo kwa lugha ya kawaida ili kuunda swali la 
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "Could not update {pluginName}"
-msgstr ""
+msgstr "Imeshindikana kusasisha {pluginName}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "H4"
@@ -468,7 +469,7 @@ msgstr "Avandar"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
-msgstr ""
+msgstr "Inahitaji kukaguliwa"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusValueFields.tsx
 msgid "Disputed values"
@@ -722,7 +723,7 @@ msgstr "Vyanzo vya Data"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader.tsx
 msgid "Loading chart"
-msgstr ""
+msgstr "Inapakia chati"
 
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
 msgid "Expand drawer"
@@ -849,11 +850,6 @@ msgstr "Tumia ramani hii ya msingi"
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Monospace headlines"
 msgstr "Vichwa vya monospace"
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Recommended if you have 4 GB RAM or need the lightest download."
-#~ msgstr "Inapendekezwa ikiwa una RAM ya GB 4 au unahitaji upakuaji mwepesi "
-#~ "zaidi."
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Quarter"
@@ -990,10 +986,6 @@ msgid "Your current plan only supports up to {0} datasets. To increase the "
 msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Ili kuongeza idadi ya "
 "datasets unazoweza kuongeza kwenye eneo lako la kazi unaweza kununua "
 "viti zaidi. Kila kiti kinakuruhusu kuongeza datasets 10 zaidi!"
-
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-#~ msgid "Only allow one value"
-#~ msgstr "Ruhusu thamani moja tu"
 
 #: shared/copy/vizTypeLabel.ts
 msgid "Pie Chart"
@@ -1165,7 +1157,8 @@ msgstr "Machungwa"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 msgid "Plugins add features to this workspace. Installing or removing a plugin "
 "affects every member."
-msgstr ""
+msgstr "Plugin huongeza vipengele kwenye workspace hii. Kusakinisha au kuondoa "
+"plugin huathiri kila mwanachama."
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -1370,7 +1363,7 @@ msgstr "Hata hivyo, haturuhusu usajili mpya kwa sasa."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Not installed"
-msgstr ""
+msgstr "Haijasakinishwa"
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
@@ -1390,7 +1383,7 @@ msgstr "\"{value}\" si tarehe. Tumia YYYY-MM-DD."
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "Plugin not available"
-msgstr ""
+msgstr "Plugin haipatikani"
 
 #. placeholder {0}: avaMap.name
 #: src/views/GisApp/MapListView/MapCard.tsx
@@ -1794,7 +1787,8 @@ msgstr "Jina la safu katika SQL"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart's saved settings are not valid, so it cannot be displayed."
-msgstr ""
+msgstr "Mipangilio iliyohifadhiwa ya chati hii si sahihi, kwa hiyo haiwezi "
+"kuonyeshwa."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftManualEntrySection.tsx
 msgid "Add a field, e.g. Review notes"
@@ -1839,7 +1833,8 @@ msgstr "Data fulani inapaswa kuja kutoka kwa seti za data zilizopo"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "The plugin may be out of date. Ask an admin to check Settings → Plugins."
-msgstr ""
+msgstr "Huenda plugin imepitwa na wakati. Mwombe msimamizi aangalie Mipangilio "
+"→ Plugins."
 
 #: src/views/GisApp/shell/MapTimeSlider/MapTimeSliderBar.tsx
 msgid "Start of time range: {startLabel}"
@@ -2621,7 +2616,8 @@ msgstr "Upendeleo umegunduliwa:"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin ran into an error while drawing this chart."
-msgstr ""
+msgstr "Plugin ya {pluginId} imekumbana na hitilafu ilipokuwa ikichora chati "
+"hii."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
@@ -2927,11 +2923,11 @@ msgstr "Hali mbili zina jina sawa. Zipe kila moja jina lake."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace."
-msgstr ""
+msgstr "Vipengele vyake vimeondolewa kwenye workspace hii."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
 msgid "Reads the query result you run it on"
-msgstr ""
+msgstr "Husoma matokeo ya hoja unayoendesha juu yake"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
@@ -2962,7 +2958,7 @@ msgstr "Majukumu & Ruhusa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall {pluginName}?"
-msgstr ""
+msgstr "Uondoe {pluginName}?"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
@@ -3169,7 +3165,7 @@ msgstr "Kitambulisho cha eneo la kazi"
 
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
 msgid "You haven't chosen: {settingLabel}"
-msgstr ""
+msgstr "Hujachagua: {settingLabel}"
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "{numUsers} people"
@@ -3368,7 +3364,7 @@ msgstr "Hali"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} uninstalled"
-msgstr ""
+msgstr "{pluginName} imeondolewa"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
@@ -3683,7 +3679,7 @@ msgstr "{layerName} haikurejesha safu yoyote"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Disabled"
-msgstr ""
+msgstr "Imezimwa"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is at most"
@@ -3937,7 +3933,7 @@ msgstr "Utambulisho"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Installed"
-msgstr ""
+msgstr "Imesakinishwa"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 #: src/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePickerDropdown.tsx
@@ -4005,7 +4001,7 @@ msgstr "Kima cha juu cha mhimili wa X"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "{pluginName} will be available to every member of this workspace."
-msgstr ""
+msgstr "{pluginName} itapatikana kwa kila mwanachama wa workspace hii."
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "ends with"
@@ -4187,7 +4183,7 @@ msgstr "Rekebisha sehemu zilizo hapo juu, kisha uhifadhi."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall"
-msgstr ""
+msgstr "Ondoa"
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
@@ -4283,7 +4279,8 @@ msgstr "Muda wa alama za mhimili wa X"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 msgid "You do not have permission to manage plugins. Ask a workspace admin to "
 "make changes."
-msgstr ""
+msgstr "Huna ruhusa ya kudhibiti plugins. Mwombe msimamizi wa workspace afanye "
+"mabadiliko."
 
 #: src/components/permissions/ShareResourceModal/useGeneralAccessControl.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/usePdfDashboardCapture.ts
@@ -4403,10 +4400,6 @@ msgstr "Ficha safu {layerName}"
 msgid "Start your journey with us"
 msgstr "Anza safari yako nasi"
 
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 7B (offline)"
-#~ msgstr "Qwen 2.5 7B (offline)"
-
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/useManualQueryFilterState.ts
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField.tsx
 msgid "Fields that keep every value cannot be filtered on."
@@ -4432,12 +4425,6 @@ msgstr "SQL ina taarifa nyingi; fomu inaweka ya kwanza pekee."
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Topic: {topic}"
 msgstr "Mada: {topic}"
-
-#. placeholder {0}: state.singularConceptName
-#: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator.tsx
-#~ msgid "If each {0} can only have one {attributeName} value, check this box."
-#~ msgstr "Ikiwa kila {0} inaweza kuwa na thamani moja ya {attributeName}, angalia "
-#~ "kisanduku hiki."
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role"
@@ -4814,7 +4801,7 @@ msgstr "Ramani isiyo na jina"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve new permissions for {pluginName}?"
-msgstr ""
+msgstr "Uidhinishe ruhusa mpya za {pluginName}?"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "That region is not on a page we read. Kept the rule-based results."
@@ -4840,7 +4827,7 @@ msgstr "Picha"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
 msgid "Uses no workspace data."
-msgstr ""
+msgstr "Haitumii data ya workspace."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
@@ -4975,7 +4962,7 @@ msgstr "Hatua ya kwanza"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Enable {pluginName}?"
-msgstr ""
+msgstr "Washa {pluginName}?"
 
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
 msgid "less than a minute"
@@ -5045,10 +5032,6 @@ msgid "{offlineOnlyTitle}: it will live only on this computer, and nobody else "
 "on your team will be able to open it."
 msgstr "{offlineOnlyTitle}: itaishi kwenye kompyuta hii pekee, na hakuna mtu "
 "mwingine kwenye timu yako atakayeweza kuifungua."
-
-#: src/components/caseFields/ValueShapeControl.tsx
-#~ msgid "One value or every value for {fieldName}"
-#~ msgstr "Thamani moja au thamani zote za {fieldName}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "A4"
@@ -5526,7 +5509,8 @@ msgstr "WKB"
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "The plugin behind this chart is not available, so its settings cannot be "
 "shown."
-msgstr ""
+msgstr "Plugin iliyo nyuma ya chati hii haipatikani, kwa hiyo mipangilio yake "
+"haiwezi kuonyeshwa."
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
@@ -5743,7 +5727,7 @@ msgstr "Kiwango cha asilimia"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
 msgid "No plugins are available in this deployment."
-msgstr ""
+msgstr "Hakuna plugins zinazopatikana katika deployment hii."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index.tsx
 msgid "Select column"
@@ -5984,7 +5968,8 @@ msgstr "Acha AI iamue (urithi)"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "This version asks for permissions listed on its card. It stays hidden "
 "until you approve them."
-msgstr ""
+msgstr "Toleo hili linaomba ruhusa zilizoorodheshwa kwenye kadi yake. Litasalia "
+"kufichwa hadi uziidhinishe."
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
@@ -6457,7 +6442,7 @@ msgstr "Dashibodi imefutwa kwa mafanikio!"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin's chart code didn't load."
-msgstr ""
+msgstr "Msimbo wa chati wa plugin ya {pluginId} haukupakia."
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
@@ -6510,7 +6495,7 @@ msgstr "Aina hii ya kesi inawakilisha nini?"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary.tsx
 msgid "{publisher} · version {version}"
-msgstr ""
+msgstr "{publisher} · toleo {version}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -6553,7 +6538,7 @@ msgstr "Onyesha safu {layerName}"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "{pluginName}: the command failed"
-msgstr ""
+msgstr "{pluginName}: amri imeshindikana"
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
@@ -6803,10 +6788,6 @@ msgstr "Haiwezekani kupakia datasets za dashibodi"
 #: src/views/OntologyDesignerApp/CaseTypeHome/CaseTypeCard.tsx
 msgid "No description has been added yet."
 msgstr "Maelezo hayajajumuishwa bado."
-
-#: src/hooks/localChatModels/useLocalChatModelCopy/useLocalChatModelCopy.ts
-#~ msgid "Qwen 2.5 3B"
-#~ msgstr "Qwen 2.5 3B"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "In each period, if there are multiple {attributeName} values, then..."
@@ -7082,7 +7063,7 @@ msgstr "Sehemu za SQL hii haziwezi kuwakilishwa katika fomu ya Kichwa. Fomu "
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart couldn't render"
-msgstr ""
+msgstr "Chati hii haikuweza kuonyeshwa"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Please try again. Your dashboard has not been published."
@@ -7195,7 +7176,7 @@ msgstr "Hakuna maeneo yaliyowekwa bado"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Plugins"
-msgstr ""
+msgstr "Plugins"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not contain"
@@ -7350,7 +7331,8 @@ msgstr "{code} - ukanda wa kaskazini wa UTM {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabContent.tsx
 msgid "Some plugins could not be loaded. Reload the page to try again."
-msgstr ""
+msgstr "Baadhi ya plugins hazikuweza kupakiwa. Pakia upya ukurasa ili ujaribu "
+"tena."
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -7448,7 +7430,7 @@ msgstr "Ingia tena"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Enable"
-msgstr ""
+msgstr "Washa"
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "The first value must not be greater than the second."
@@ -7657,11 +7639,8 @@ msgstr "Giza"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
 msgid "Could not load this workspace's plugins. Reload to try again."
-msgstr ""
-
-#: src/lib/plugins/vizs/PluginVizRenderer/PluginVizMissingSettings.tsx
-#~ msgid "Choose a {settingLabel}"
-#~ msgstr ""
+msgstr "Imeshindikana kupakia plugins za workspace hii. Pakia upya ili ujaribu "
+"tena."
 
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Records"
@@ -7878,7 +7857,7 @@ msgstr "Ni wasimamizi pekee wa mipangilio ya eneo la kazi wanaweza kufungua "
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "Could not load {pluginName}"
-msgstr ""
+msgstr "Imeshindikana kupakia {pluginName}"
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Pick which global filters apply to this visualization."
@@ -8023,7 +8002,7 @@ msgstr "Seti hii ya data sasa inaakisi maudhui ya sasa ya laha."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install {pluginName}?"
-msgstr ""
+msgstr "Sakinisha {pluginName}?"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
@@ -8223,7 +8202,7 @@ msgstr "Mstari"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features disappear for every member until you enable it again."
-msgstr ""
+msgstr "Vipengele vyake vitatoweka kwa kila mwanachama hadi uiwashe tena."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
@@ -8465,10 +8444,6 @@ msgstr "Huna muunganisho wa intaneti. Rasimu yako imehifadhiwa kwenye kifaa "
 msgid "Enter dataset name"
 msgstr "Ingiza jina la seti ya data"
 
-#: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
-#~ msgid "Sources"
-#~ msgstr "Vyanzo"
-
 #: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 msgid "Select an annotation on the map to edit it."
 msgstr "Chagua dokezo kwenye ramani ili kulihariri."
@@ -8523,7 +8498,8 @@ msgstr "Seti ya data"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "Try again. If it keeps failing, contact the plugin's publisher."
-msgstr ""
+msgstr "Jaribu tena. Ikiendelea kushindikana, wasiliana na mchapishaji wa "
+"plugin."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "All decisions"
@@ -8532,7 +8508,7 @@ msgstr "Maamuzi yote"
 #. js-lingui-explicit-id
 #: src/lib/plugins/vizs/PluginVizRuntime/PluginVizRuntime.test.tsx
 msgid "series.cases"
-msgstr ""
+msgstr "mfululizo.kesi"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Topics"
@@ -8731,7 +8707,7 @@ msgstr "Inapakia mwandishi"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Disable {pluginName}?"
-msgstr ""
+msgstr "Lemaza {pluginName}?"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Original kept"
@@ -8903,7 +8879,7 @@ msgstr "Tabaka hupata sehemu hizi haswa, kwa hivyo kuongeza sehemu pia huifanya 
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install"
-msgstr ""
+msgstr "Sakinisha"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Require"
@@ -8971,7 +8947,7 @@ msgstr "ni angalau"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/components/VisualizationContainer/VizSettingsForm/VizTypeSelect/VizTypeSelect.tsx
 msgid "Plugin chart"
-msgstr ""
+msgstr "Chati ya Plugin"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
@@ -9323,7 +9299,8 @@ msgstr "Ficha mafunzo"
 #: src/lib/plugins/vizs/PluginVizRenderer/PluginVizTransformChart.tsx
 msgid "{rowCount, plural, one {Built from the first row of the result.} other "
 "{Built from the first # rows of the result.}}"
-msgstr ""
+msgstr "{rowCount, plural, one {Imeundwa kutoka safu mlalo ya kwanza ya "
+"matokeo.} other {Imeundwa kutoka safu mlalo # za kwanza za matokeo.}}"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -9394,7 +9371,7 @@ msgstr "Upau wa kando"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "{pluginName}: this command is not available"
-msgstr ""
+msgstr "{pluginName}: amri hii haipatikani"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "This dataset is synced online. Click to make offline-only."
@@ -9490,7 +9467,7 @@ msgstr "Ongeza chujio"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/WorkspacePluginsTab.tsx
 msgid "Loading plugins"
-msgstr ""
+msgstr "Inapakia plugins"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Schema version"
@@ -9840,7 +9817,7 @@ msgstr "Haiwezekani kusoma faili"
 
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "Check your connection and click the button again to retry."
-msgstr ""
+msgstr "Kagua muunganisho wako na ubofye kitufe tena ili ujaribu upya."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
@@ -9899,7 +9876,7 @@ msgstr "Mpango wako wa sasa unasaidia hadi {0} datasets. Pandisha hadhi kwenye "
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features come back for every member."
-msgstr ""
+msgstr "Vipengele vyake vitarudi kwa kila mwanachama."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/PromptTabPanel.tsx
@@ -10005,7 +9982,7 @@ msgstr "Chagua yote"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "Invalid chart settings"
-msgstr ""
+msgstr "Mipangilio batili ya chati"
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Only what's queried (recommended)"
@@ -10306,7 +10283,7 @@ msgstr "Chini hadi Juu"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Bar gap"
-msgstr ""
+msgstr "Pengo la pau"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
@@ -10428,7 +10405,7 @@ msgstr "Kila mwanachama wa nafasi ya kazi anayeweza kufungua programu ya {app} "
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "{title} couldn't render"
-msgstr ""
+msgstr "{title} haikuweza kuonyeshwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "{formattedPriceToDisplay}/seat"
@@ -10459,7 +10436,8 @@ msgstr "Mtaje mshiriki wa timu"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginSettingsCard.tsx
 msgid "No longer included in this deployment. Uninstall to remove it from this "
 "workspace."
-msgstr ""
+msgstr "Haijajumuishwa tena katika deployment hii. Ondoa usakinishaji ili "
+"kuiondoa kwenye workspace hii."
 
 #: src/routes/forgot-password.tsx
 msgid "Enter your email address"
@@ -10971,7 +10949,7 @@ msgstr "Haijaripotiwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve"
-msgstr ""
+msgstr "Idhinisha"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton.tsx
@@ -11026,7 +11004,8 @@ msgstr "Chini kushoto"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails.tsx
 msgid "{dataExplorerToolbarItems, plural, one {Adds # button to Data Explorer} "
 "other {Adds # buttons to Data Explorer}}"
-msgstr ""
+msgstr "{dataExplorerToolbarItems, plural, one {Inaongeza kitufe # kwenye Data "
+"Explorer} other {Inaongeza vitufe # kwenye Data Explorer}}"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
@@ -11094,7 +11073,7 @@ msgstr "Thamani inayojulikana zaidi ni <0>{0}</0>, katika <1>{1}</1> ya safu "
 
 #: src/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm.tsx
 msgid "Loading chart settings"
-msgstr ""
+msgstr "Inapakia mipangilio ya chati"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundaryJoinControls/BoundaryJoinKeyFields.tsx
 msgid "Data key column"
@@ -11147,7 +11126,7 @@ msgstr "Bluu"
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "This chart couldn't load"
-msgstr ""
+msgstr "Chati hii haikuweza kupakiwa"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters.ts
 msgid "Including datasets that can't be loaded"
@@ -11183,7 +11162,7 @@ msgstr "https://example.org"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"
-msgstr ""
+msgstr "{pluginName} imesakinishwa"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Recommended next steps"
