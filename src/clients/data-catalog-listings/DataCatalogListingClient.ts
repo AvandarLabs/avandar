@@ -1,10 +1,12 @@
 import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { buildDataCatalogSearchFilterArgs } from "@/clients/data-catalog-listings/buildDataCatalogSearchFilterArgs/buildDataCatalogSearchFilterArgs";
+import { createDataCatalogResolvedCompanions } from "@/clients/data-catalog-listings/createDataCatalogResolvedCompanions/createDataCatalogResolvedCompanions";
 import { createDataCatalogSearchFacets } from "@/clients/data-catalog-listings/createDataCatalogSearchFacets/createDataCatalogSearchFacets";
 import { createDataCatalogSearchPage } from "@/clients/data-catalog-listings/createDataCatalogSearchPage/createDataCatalogSearchPage";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DataCatalogSearchPage } from "@/clients/data-catalog-listings/createDataCatalogSearchPage/createDataCatalogSearchPage";
 
 export const DataCatalogListingClient = createUsableServiceClient(
@@ -79,6 +81,34 @@ export const DataCatalogListingClient = createUsableServiceClient(
             .throwOnError();
 
           return createDataCatalogSearchFacets(dbFacetRows);
+        },
+
+        /**
+         * The listings recommended alongside a listing, in the order it names
+         * them, with whether each is already in `workspaceId`. A companion
+         * no listing matches yet is left out.
+         */
+        getCompanions: async ({
+          catalogListingId,
+          workspaceId,
+        }: {
+          catalogListingId: DataCatalogListing.Id;
+          workspaceId: Workspace.Id;
+        }): Promise<DataCatalogListing.ResolvedCompanion[]> => {
+          const logger = clientLogger.appendName("getCompanions");
+          logger.log("Getting a catalog listing's companions", {
+            catalogListingId,
+            workspaceId,
+          });
+
+          const { data: dbRows } = await dbClient
+            .rpc("rpc_data_catalog_listings__get_companions", {
+              p_catalog_listing_id: catalogListingId,
+              p_workspace_id: workspaceId,
+            })
+            .throwOnError();
+
+          return createDataCatalogResolvedCompanions(dbRows ?? []);
         },
       };
     },

@@ -62,6 +62,10 @@ function _createListing(
     parquetCacheBuiltAt: undefined,
     parquetCacheRowCount: undefined,
     parquetCacheByteSize: undefined,
+    parquetCacheCheckedAt: undefined,
+    parquetCacheCheckedSourceVersion: undefined,
+    companionListings: [],
+    apiFreshnessProbe: undefined,
     pipelineScopeKeys: [],
     dateColumnTypeLastVerified: undefined,
     isInvalid: false,
@@ -88,6 +92,7 @@ type DetailOptions = {
   preview?: CatalogListingPreviewState;
   isExpanded?: boolean;
   onExpand?: () => void;
+  companions?: readonly DataCatalogListing.ResolvedCompanion[];
 };
 
 const NO_PREVIEW: CatalogListingPreviewState = {
@@ -115,6 +120,10 @@ function _buildDetail(options: DetailOptions): ReactElement {
       preview={options.preview ?? NO_PREVIEW}
       isExpanded={options.isExpanded}
       onExpand={options.onExpand}
+      companions={options.companions ?? []}
+      addingListingIds={new Set()}
+      onSelectListing={vi.fn()}
+      onAddCompanion={vi.fn()}
     />
   );
 }
@@ -160,6 +169,59 @@ describe("DataCatalogListingDetail", () => {
     _renderDetail({ listing: _createListing({ isWorkspaceLoadable: false }) });
 
     expect(screen.queryByText("Data preview")).toBeNull();
+  });
+
+  it("says an unloadable listing whose source has no rows has no data yet", () => {
+    _renderDetail({
+      listing: _createListing({
+        isWorkspaceLoadable: false,
+        metadata: { row_count: 0 },
+      }),
+    });
+
+    expect(screen.getByText("This dataset has no data yet")).toBeVisible();
+    expect(
+      screen.queryByText("Avandar can't add this kind of dataset yet."),
+    ).toBeNull();
+  });
+
+  it("says an unloadable listing with rows is a kind Avandar can't add yet", () => {
+    _renderDetail({
+      listing: _createListing({
+        isWorkspaceLoadable: false,
+        metadata: { row_count: 12 },
+      }),
+    });
+
+    expect(
+      screen.getByText("Avandar can't add this kind of dataset yet."),
+    ).toBeVisible();
+  });
+
+  it("shows the listings recommended with it after its columns", () => {
+    _renderDetail({
+      listing: _createListing(),
+      companions: [
+        {
+          catalogListingId: "listing-country" as DataCatalogListing.Id,
+          displayName: "Country (GHO dimension values)",
+          isWorkspaceLoadable: true,
+          isInvalid: false,
+          kind: "lookup",
+          joinOn: [{ column: "SpatialDim", companionColumn: "Code" }],
+          isInWorkspace: false,
+        },
+      ],
+    });
+
+    const columnsHeading = screen.getByText("Columns");
+    const recommendedHeading = screen.getByText(
+      "Recommended with this dataset",
+    );
+    expect(
+      columnsHeading.compareDocumentPosition(recommendedHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it("opens the listing in full screen from the expand button", () => {

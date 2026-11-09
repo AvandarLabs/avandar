@@ -545,7 +545,7 @@ msgstr "选择按字母顺序排在最前的值"
 msgid "Latitude and longitude look swapped"
 msgstr "纬度和经度似乎颠倒了"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
 msgstr "无法添加数据集"
 
@@ -1461,7 +1461,7 @@ msgstr "无法重新序列化位置 {index} 的 JOIN 子查询。"
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "输入问题，我会为您生成 SQL 并执行。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "搜索数据集"
 
@@ -1713,6 +1713,10 @@ msgstr "新角色组"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Dashboard"
 msgstr "仪表板"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add {displayName} to workspace"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2195,7 +2199,7 @@ msgstr "内置预设"
 msgid "Select a data layer to buffer."
 msgstr "选择要创建缓冲区的数据图层。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset yet"
 msgstr "暂时无法添加数据集"
 
@@ -2208,7 +2212,7 @@ msgid "Select a {conceptName}"
 msgstr "选择一个 {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" 现在在您的工作区中。"
 
@@ -2294,6 +2298,10 @@ msgstr "不透明度"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Open Data"
 msgstr "开放数据"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "This dataset has no data yet"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3423,6 +3431,10 @@ msgstr "请重新登录以继续。如果无法登录，请重置应用以清除
 msgid "to"
 msgstr "到"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "审核匹配项"
@@ -3469,7 +3481,7 @@ msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "适用于传单、报告和二维码的简短易记 URL。"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
 msgstr "正在准备“{0}”。大型数据集首次打开可能需要几分钟。"
@@ -4087,6 +4099,10 @@ msgstr "您没有权限打开工作区的此部分。"
 msgid "Please check your email"
 msgstr "请检查您的电子邮件"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Add them too"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "选择列并添加行约束（枚举、数字范围、日期范围）。"
@@ -4211,6 +4227,10 @@ msgstr "部分坐标为 0, 0。"
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
 msgstr "向仪表板添加过滤器块，以启用此可视化的全局过滤。"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Recommended with this dataset"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4567,6 +4587,7 @@ msgid "Only you can access this {resource}. Everyone else loses access, "
 msgstr "只有你可以访问此 {resource}。其他所有人都将失去访问权限，包括工作区管理员。"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Can't be loaded"
 msgstr "无法加载"
 
@@ -5193,7 +5214,9 @@ msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "再次从头开始，了解如何创建和共享仪表板。"
 
 #. placeholder {0}: columns.length
+#. placeholder {0}: companions.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "{0}"
 msgstr "{0}"
 
@@ -5260,7 +5283,7 @@ msgstr "生成查询"
 msgid "No frequency data available."
 msgstr "没有可用的频率数据。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't check this dataset's columns. Try adding it again."
 msgstr "无法检查此数据集的列。请再次尝试添加。"
 
@@ -5984,7 +6007,7 @@ msgstr "该坐标超出范围。"
 msgid "Open the record"
 msgstr "打开记录"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "数据集已添加"
 
@@ -6126,6 +6149,7 @@ msgid "Tool"
 msgstr "工具"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Not supported yet"
 msgstr "暂不支持"
 
@@ -6159,6 +6183,10 @@ msgstr "尚未添加任何字段"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
 msgstr "所有结果"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add"
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -6998,11 +7026,15 @@ msgstr "不包含"
 msgid "One filter is active on this layer. It may be excluding everything."
 msgstr "此图层有一个活动筛选条件，可能会排除所有内容。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Recommended with it: {companionNames}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "工作区名称已更新"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "搜索开放数据"
 
@@ -8910,7 +8942,7 @@ msgstr "账单门户。"
 msgid "Column 2"
 msgstr "第 2 列"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "数据尚未就绪"
 
@@ -9054,7 +9086,7 @@ msgstr "数据集列"
 msgid "Details"
 msgstr "详细信息"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
 msgstr "正在准备您的数据"
 
@@ -9170,7 +9202,7 @@ msgstr "如果一个 {0} 有多个 {attributeName} 值，那么..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "SELECT 中的列表达式未命名；已跳过。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "清除搜索"
@@ -9692,6 +9724,11 @@ msgstr "推荐"
 msgid "Teal"
 msgstr "青绿色"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
 msgstr "索引者"
@@ -10054,6 +10091,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 "or a date, so it couldn't run."
 msgstr "此查询将一种类型的值当作另一种类型处理，例如将文本当作数字或日期，因此无法运行。"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "In your workspace"
+msgstr ""
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10344,7 +10385,7 @@ msgstr "案例类型已删除"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING 使用了表单不支持的运算符“{operator}”。"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr "此目录条目没有列元数据，暂时无法导入。"
 
@@ -10461,6 +10502,10 @@ msgstr "{0}（边界）"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Loading"
 msgstr "正在加载"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Names the codes in {columnList}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
@@ -10582,7 +10627,7 @@ msgid "Link"
 msgstr "链接"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
 msgstr "我们无法准备“{0}”的数据，因此可能无法打开。"
 

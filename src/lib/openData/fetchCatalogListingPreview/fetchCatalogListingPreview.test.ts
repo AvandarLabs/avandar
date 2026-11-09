@@ -55,6 +55,27 @@ describe("fetchCatalogListingPreview", () => {
     expect(preview.rows).toEqual(SNIFFED.previewRows);
   });
 
+  it("reads an API-backed OData listing from its CSV sample", async () => {
+    const dependencies = _createDependencies({
+      fetchCsvSample: vi.fn().mockResolvedValue("country,report_date\n"),
+    });
+
+    await fetchCatalogListingPreview({
+      listing: {
+        id: LISTING_ID,
+        accessKind: "api_resource",
+        apiResourceFormat: "odata",
+        canonicalUrls: undefined,
+        parquetCacheFolderPath: undefined,
+      },
+      maxPreviewRows: 200,
+      dependencies,
+    });
+
+    expect(dependencies.fetchCsvSample).toHaveBeenCalledWith(LISTING_ID);
+    expect(dependencies.fetchCopyPart).not.toHaveBeenCalled();
+  });
+
   it("reads any other API-backed listing from the first part of its Parquet copy", async () => {
     const partBlob = new Blob(["part"]);
     const dependencies = _createDependencies({

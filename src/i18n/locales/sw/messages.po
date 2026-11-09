@@ -562,7 +562,7 @@ msgstr "Chagua thamani inayokuja kwanza kialfabeti"
 msgid "Latitude and longitude look swapped"
 msgstr "Latitudo na longitudo zinaonekana kubadilishana"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
 msgstr "Haiwezekani kuongeza dataset"
 
@@ -1519,7 +1519,7 @@ msgstr "Hoja ndogo ya JOIN katika nafasi ya {index} haikuweza kusawazishwa "
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Andika swali, nami nitaunda SQL na kuiendesha kwa ajili yako."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "Tafuta seti za data"
 
@@ -1778,6 +1778,10 @@ msgstr "Kundi jipya la jukumu"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Dashboard"
 msgstr "Dashibodi"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add {displayName} to workspace"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2281,7 +2285,7 @@ msgstr "Mipangilio iliyojengwa ndani"
 msgid "Select a data layer to buffer."
 msgstr "Chagua safu ya data ya kuunda bafa."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset yet"
 msgstr "Haiwezi kuongeza mkusanyiko wa data bado"
 
@@ -2294,7 +2298,7 @@ msgid "Select a {conceptName}"
 msgstr "Chagua {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" sasa iko katika eneo lako la kazi."
 
@@ -2382,6 +2386,10 @@ msgstr "Uwazi"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Open Data"
 msgstr "Data za Wazi"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "This dataset has no data yet"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3558,6 +3566,10 @@ msgstr "Tafadhali ingia tena ili uendelee. Ikiwa kuingia hakufanyi kazi, weka "
 msgid "to"
 msgstr "kwa"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Kagua zinazolingana"
@@ -3604,7 +3616,7 @@ msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "URL fupi na rahisi kukumbuka kwa vipeperushi, ripoti na misimbo ya QR."
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
 msgstr "\"{0}\" inatayarishwa. Seti kubwa za data zinaweza kuchukua dakika "
@@ -4250,6 +4262,10 @@ msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
 msgid "Please check your email"
 msgstr "Tafadhali angalia barua yako pepe"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Add them too"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "Chagua safu na ongeza vikwazo vya mistari (enum, anuwai ya nambari, "
@@ -4378,6 +4394,10 @@ msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
 msgstr "Ongeza block ya Kichujio kwenye dashibodi ili kuwezesha uchujaji wa "
 "kimataifa kwa uonyeshaji huu."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Recommended with this dataset"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4743,6 +4763,7 @@ msgstr "Ni wewe pekee unayeweza kufikia {resource} hii. Wengine wote watapoteza 
 "idhini ya kufikia, wakiwemo wasimamizi wa nafasi ya kazi."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Can't be loaded"
 msgstr "Haiwezi kupakiwa"
 
@@ -5383,7 +5404,9 @@ msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "Pitia tena jinsi ya kutengeneza na kushiriki dashboard, kuanzia mwanzo."
 
 #. placeholder {0}: columns.length
+#. placeholder {0}: companions.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "{0}"
 msgstr "{0}"
 
@@ -5453,7 +5476,7 @@ msgstr "Zalisha Swali"
 msgid "No frequency data available."
 msgstr "Hakuna data ya mara kwa mara inapatikana."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't check this dataset's columns. Try adding it again."
 msgstr "Hatukuweza kukagua safu wima za mkusanyiko huu wa data. Jaribu "
 "kuuongeza tena."
@@ -6201,7 +6224,7 @@ msgstr "Kuratibu hiyo iko nje ya masafa yanayokubalika."
 msgid "Open the record"
 msgstr "Fungua rekodi"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "Dataset imeongezwa"
 
@@ -6348,6 +6371,7 @@ msgid "Tool"
 msgstr "Chombo"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Not supported yet"
 msgstr "Bado haitumiki"
 
@@ -6381,6 +6405,10 @@ msgstr "Hakuna maeneo yaliyoongezwa"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
 msgstr "Matokeo yote"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add"
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -7242,11 +7270,15 @@ msgstr "haijumuishi"
 msgid "One filter is active on this layer. It may be excluding everything."
 msgstr "Kichujio kimoja kinatumika kwenye safu hii. Huenda kinazuia kila kitu."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Recommended with it: {companionNames}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "Jina la eneo la kazi limeboreshwa"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "Tafuta data iliyo wazi"
 
@@ -9227,7 +9259,7 @@ msgstr "portali ya malipo."
 msgid "Column 2"
 msgstr "Safu wima ya 2"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "Data haiko tayari"
 
@@ -9376,7 +9408,7 @@ msgstr "Safu za seti za data"
 msgid "Details"
 msgstr "Maelezo"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
 msgstr "Data yako inatayarishwa"
 
@@ -9494,7 +9526,7 @@ msgstr "Ikiwa kuna thamani nyingi za {attributeName} kwa {0} moja, basi..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Usemi wa safu usio na jina katika SELECT; umerukwa."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Futa utafutaji"
@@ -10038,6 +10070,11 @@ msgstr "Inapendekezwa"
 msgid "Teal"
 msgstr "Teal"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
 msgstr "Iliorodheshwa na"
@@ -10412,6 +10449,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 msgstr "Hoja hii inachukulia aina moja ya thamani kama aina nyingine, kama vile "
 "maandishi kuwa nambari au tarehe, kwa hivyo haikuweza kuendeshwa."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "In your workspace"
+msgstr ""
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10710,7 +10751,7 @@ msgstr "Aina ya kesi imefutwa"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING inatumia opereta \"{operator}\" ambaye fomu haitumii."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr "Orodha hii ya katalogi haina metadata ya safu wima. Bado haiwezi "
 "kuletwa."
@@ -10836,6 +10877,10 @@ msgstr "{0} (mpaka)"
 msgid "Loading"
 msgstr "Inapakia"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Names the codes in {columnList}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
@@ -10960,7 +11005,7 @@ msgid "Link"
 msgstr "Kiungo"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
 msgstr "Hatukuweza kutayarisha data ya \"{0}\", kwa hivyo huenda isifunguke."
 

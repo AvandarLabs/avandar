@@ -39,7 +39,7 @@ const DBReadSchema = z.object({
   notes: z.string().nullable(),
   metadata: supabaseJSONSchema.nullable(),
   access_kind: z.enum(["pipeline_parquet", "api_resource"]),
-  api_service: z.enum(["ckan", "socrata"]).nullable(),
+  api_service: z.enum(["ckan", "socrata", "odata"]).nullable(),
   api_base_url: z.string().nullable(),
   api_resource_id: z.string().nullable(),
   api_resource_format: z.string().nullable(),
@@ -77,8 +77,51 @@ const DBReadSchema = z.object({
   parquet_cache_built_at: z.iso.datetime({ offset: true }).nullable(),
   parquet_cache_row_count: z.number().nullable(),
   parquet_cache_byte_size: z.number().nullable(),
+  parquet_cache_checked_at: z.iso.datetime({ offset: true }).nullable(),
+  parquet_cache_checked_source_version: z.string().nullable(),
+  companion_listings: supabaseJSONSchema,
+  api_freshness_probe: supabaseJSONSchema.nullable(),
   search_vector: z.unknown(),
 });
+
+const CompanionKindSchema = z.enum(["lookup"]);
+
+const CompanionJoinOnSchema = z.array(
+  z.object({ column: z.string(), companionColumn: z.string() }),
+);
+
+const CompanionListingsSchema = z.array(
+  z.object({
+    kind: CompanionKindSchema,
+    externalDatasetId: z.string(),
+    apiResourceId: z.string(),
+    joinOn: CompanionJoinOnSchema,
+  }),
+);
+
+const FreshnessProbeSchema = z.object({
+  url: z.string(),
+  token: z.discriminatedUnion("kind", [
+    z.object({
+      kind: z.literal("json-paths"),
+      paths: z.array(z.array(z.union([z.string(), z.number()]))),
+    }),
+    z.object({ kind: z.literal("body-sha256") }),
+  ]),
+});
+
+/**
+ * Validates the JSON documents a listing row carries in its own shape:
+ * `companion_listings`, a companion's `joinOn` and `kind`, and
+ * `api_freshness_probe`. Their keys are camel case as stored, so they are
+ * parsed as they are rather than through the row's case conversion.
+ */
+export const DataCatalogListingJsonSchemas = {
+  companionKind: CompanionKindSchema,
+  companionJoinOn: CompanionJoinOnSchema,
+  companionListings: CompanionListingsSchema,
+  freshnessProbe: FreshnessProbeSchema,
+};
 
 /**
  * Reads a listing row. `metadata` and `additional_source_metadata` are JSON
@@ -90,7 +133,13 @@ const DBReadSchema = z.object({
 function _fromDBReadToModelRead(
   dbRow: DataCatalogListingModel["DBRead"],
 ): DataCatalogListingRead {
-  const { metadata, additional_source_metadata, ...columns } = dbRow;
+  const {
+    metadata,
+    additional_source_metadata,
+    companion_listings,
+    api_freshness_probe,
+    ...columns
+  } = dbRow;
   // The search document exists for catalog search in Postgres. Nothing in
   // the app reads it.
   const fields = nullsToUndefinedDeep(
@@ -102,6 +151,34 @@ function _fromDBReadToModelRead(
     driveId: fields.driveId as DataCatalogDriveId | undefined,
     metadata: metadata ?? undefined,
     additionalSourceMetadata: additional_source_metadata ?? undefined,
+    companionListings: CompanionListingsSchema.parse(companion_listings),
+    apiFreshnessProbe:
+      api_freshness_probe === null
+        ? undefined
+        : FreshnessProbeSchema.parse(api_freshness_probe),
+  };
+}
+
+/**
+ * Writes a listing's columns in snake case, except the JSON documents whose
+ * keys are stored in camel case, which are validated and written as they are.
+ */
+function _toDBWrite<
+  ModelWrite extends Partial<
+    Pick<DataCatalogListingRead, "companionListings" | "apiFreshnessProbe">
+  >,
+>(modelWrite: ModelWrite) {
+  const { companionListings, apiFreshnessProbe, ...columns } = modelWrite;
+  return {
+    ...snakeCaseKeysDeep(columns),
+    ...(companionListings === undefined
+      ? {}
+      : {
+          companion_listings: CompanionListingsSchema.parse(companionListings),
+        }),
+    ...(apiFreshnessProbe === undefined
+      ? {}
+      : { api_freshness_probe: FreshnessProbeSchema.parse(apiFreshnessProbe) }),
   };
 }
 
@@ -110,8 +187,8 @@ export const DataCatalogListingParsers =
     modelName: "DataCatalogListing",
     DBReadSchema,
     fromDBReadToModelRead: _fromDBReadToModelRead,
-    fromModelInsertToDBInsert: snakeCaseKeysDeep,
-    fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
+    fromModelInsertToDBInsert: _toDBWrite,
+    fromModelUpdateToDBUpdate: _toDBWrite,
   });
 
 /**

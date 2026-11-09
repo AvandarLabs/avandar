@@ -8,6 +8,11 @@ type Props = {
   serviceName: string;
   /** The listing's page at its source, when it has one. */
   sourceUrl: string | undefined;
+  /**
+   * True when the source holds no rows for the dataset yet, which is why it
+   * cannot be added, rather than its being a kind Avandar cannot read.
+   */
+  hasNoRows: boolean;
 };
 
 /**
@@ -15,17 +20,29 @@ type Props = {
  * workspace yet, such as a map or a PDF, and links to the original so it
  * is still reachable. The listing stays in the catalog so a search finds
  * it rather than silently leaving it out.
+ *
+ * A dataset whose publisher has not added any rows yet says that instead,
+ * since it is a kind Avandar can add once it has data.
  */
 export function DataCatalogUnsupportedNotice({
   serviceName,
   sourceUrl,
+  hasNoRows,
 }: Props): ReactNode {
   const { t } = useLingui();
   return (
     <Callout.Info
-      title={t`Avandar can't add this kind of dataset yet.`}
+      title={
+        hasNoRows
+          ? t`This dataset has no data yet`
+          : t`Avandar can't add this kind of dataset yet.`
+      }
       titleSize="sm"
-      message={t`You can still open the original, where it is published.`}
+      message={
+        hasNoRows
+          ? t`The publisher has not added any rows to it. You can still open the original, where it is published.`
+          : t`You can still open the original, where it is published.`
+      }
       messageSize="sm"
     >
       {sourceUrl ? (

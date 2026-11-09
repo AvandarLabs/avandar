@@ -557,7 +557,7 @@ msgstr "Choose the value that comes first alphabetically"
 msgid "Latitude and longitude look swapped"
 msgstr "Latitude and longitude look swapped"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
 msgstr "Cannot add dataset"
 
@@ -1502,7 +1502,7 @@ msgstr "JOIN subquery at position {index} could not be re-serialised."
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "Type a question and I will generate the SQL and run it for you."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "Search datasets"
 
@@ -1759,6 +1759,10 @@ msgstr "New role group"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Dashboard"
 msgstr "Dashboard"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add {displayName} to workspace"
+msgstr "Add {displayName} to workspace"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2252,7 +2256,7 @@ msgstr "Built-in presets"
 msgid "Select a data layer to buffer."
 msgstr "Select a data layer to buffer."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset yet"
 msgstr "Cannot add dataset yet"
 
@@ -2265,7 +2269,7 @@ msgid "Select a {conceptName}"
 msgstr "Select a {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" is now in your workspace."
 
@@ -2352,6 +2356,10 @@ msgstr "Opacity"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Open Data"
 msgstr "Open Data"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "This dataset has no data yet"
+msgstr "This dataset has no data yet"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3512,6 +3520,10 @@ msgstr "Please sign in again to continue. If signing in does not work, reset "
 msgid "to"
 msgstr "to"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+msgstr "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Review matches"
@@ -3558,7 +3570,7 @@ msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "A short, memorable URL for flyers, reports, and QR codes."
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
 msgstr "\"{0}\" is being prepared. Large datasets can take a few minutes to "
@@ -4198,6 +4210,10 @@ msgstr "You do not have permission to open this part of the workspace."
 msgid "Please check your email"
 msgstr "Please check your email"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Add them too"
+msgstr "Add them too"
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "Pick columns and add row constraints (enum, number range, date range)."
@@ -4324,6 +4340,10 @@ msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
 msgstr "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Recommended with this dataset"
+msgstr "Recommended with this dataset"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4686,6 +4706,7 @@ msgstr "Only you can access this {resource}. Everyone else loses access, "
 "including workspace admins."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Can't be loaded"
 msgstr "Can't be loaded"
 
@@ -5321,7 +5342,9 @@ msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "Walk through building and sharing a dashboard again, from the top."
 
 #. placeholder {0}: columns.length
+#. placeholder {0}: companions.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "{0}"
 msgstr "{0}"
 
@@ -5389,7 +5412,7 @@ msgstr "Generate Query"
 msgid "No frequency data available."
 msgstr "No frequency data available."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't check this dataset's columns. Try adding it again."
 msgstr "We couldn't check this dataset's columns. Try adding it again."
 
@@ -6128,7 +6151,7 @@ msgstr "That coordinate is out of range."
 msgid "Open the record"
 msgstr "Open the record"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "Dataset added"
 
@@ -6274,6 +6297,7 @@ msgid "Tool"
 msgstr "Tool"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Not supported yet"
 msgstr "Not supported yet"
 
@@ -6307,6 +6331,10 @@ msgstr "No fields have been added"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
 msgstr "All results"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add"
+msgstr "Add"
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -7164,11 +7192,15 @@ msgstr "does not contain"
 msgid "One filter is active on this layer. It may be excluding everything."
 msgstr "One filter is active on this layer. It may be excluding everything."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Recommended with it: {companionNames}"
+msgstr "Recommended with it: {companionNames}"
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "Workspace name updated"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "Search open data"
 
@@ -9128,7 +9160,7 @@ msgstr "billing portal."
 msgid "Column 2"
 msgstr "Column 2"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "Data not ready"
 
@@ -9276,7 +9308,7 @@ msgstr "Dataset columns"
 msgid "Details"
 msgstr "Details"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
 msgstr "Preparing your data"
 
@@ -9393,7 +9425,7 @@ msgstr "If there are multiple {attributeName} values for one {0}, then..."
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "Unnamed column expression in SELECT; skipped."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "Clear search"
@@ -9930,6 +9962,12 @@ msgstr "Recommended"
 msgid "Teal"
 msgstr "Teal"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+msgstr "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
 msgstr "Indexed by"
@@ -10302,6 +10340,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 msgstr "This query treats one kind of value as another, such as text as a "
 "number or a date, so it couldn't run."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "In your workspace"
+msgstr "In your workspace"
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10598,7 +10640,7 @@ msgstr "Case type deleted"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING uses operator \"{operator}\" which the form does not support."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr "This catalog listing has no column metadata. It cannot be imported yet."
 
@@ -10720,6 +10762,10 @@ msgstr "{0} (boundary)"
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Loading"
 msgstr "Loading"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Names the codes in {columnList}"
+msgstr "Names the codes in {columnList}"
 
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
@@ -10844,7 +10890,7 @@ msgid "Link"
 msgstr "Link"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
 msgstr "We couldn't prepare the data for \"{0}\", so it may not open."
 

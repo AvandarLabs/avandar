@@ -556,7 +556,7 @@ msgstr "اختر القيمة التي تأتي أولًا أبجديًا"
 msgid "Latitude and longitude look swapped"
 msgstr "يبدو أن خط العرض وخط الطول متبادلان"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset"
 msgstr "لا يمكن إضافة مجموعة بيانات"
 
@@ -1499,7 +1499,7 @@ msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي لـ 
 msgid "Type a question and I will generate the SQL and run it for you."
 msgstr "اكتب سؤالًا وسأُنشئ SQL وأُشغّله نيابةً عنك."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search datasets"
 msgstr "البحث في مجموعات البيانات"
 
@@ -1757,6 +1757,10 @@ msgstr "مجموعة أدوار جديدة"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 msgid "Dashboard"
 msgstr "لوحة المعلومات"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add {displayName} to workspace"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/DivergenceAlert.tsx
 msgid "The published copy still serves the previous audience. Use the button "
@@ -2252,7 +2256,7 @@ msgstr "الإعدادات المدمجة"
 msgid "Select a data layer to buffer."
 msgstr "حدّد طبقة بيانات لإنشاء نطاق حولها."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Cannot add dataset yet"
 msgstr "لا يمكن إضافة مجموعة البيانات بعد"
 
@@ -2265,7 +2269,7 @@ msgid "Select a {conceptName}"
 msgstr "حدّد {conceptName}"
 
 #. placeholder {0}: dataset.name
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is now in your workspace."
 msgstr "\"{0}\" الآن في مساحة العمل الخاصة بك."
 
@@ -2352,6 +2356,10 @@ msgstr "الشفافية"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Open Data"
 msgstr "البيانات المفتوحة"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "This dataset has no data yet"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Removing…"
@@ -3510,6 +3518,10 @@ msgstr "يرجى تسجيل الدخول مرة أخرى للمتابعة. إذ�
 msgid "to"
 msgstr "إلى"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "مراجعة التطابقات"
@@ -3556,7 +3568,7 @@ msgid "A short, memorable URL for flyers, reports, and QR codes."
 msgstr "عنوان URL قصير وسهل التذكر للمنشورات والتقارير ورموز QR."
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "\"{0}\" is being prepared. Large datasets can take a few minutes to open "
 "the first time."
 msgstr "جارٍ تجهيز \"{0}\". قد تستغرق مجموعات البيانات الكبيرة بضع دقائق لفتحها "
@@ -4195,6 +4207,10 @@ msgstr "ليس لديك إذن لفتح هذا الجزء من مساحة الع
 msgid "Please check your email"
 msgstr "يرجى التحقق من بريدك الإلكتروني"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Add them too"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Pick columns and add row constraints (enum, number range, date range)."
 msgstr "اختر الأعمدة وأضف قيود الصفوف (تعداد، نطاق الأرقام، نطاق التاريخ)."
@@ -4320,6 +4336,10 @@ msgstr "بعض الإحداثيات هي 0، 0."
 msgid "Add a Filter block to the dashboard to enable global filtering for this "
 "visualization."
 msgstr "أضف كتلة فلتر إلى اللوحة لتمكين التصفية العالمية لهذه التصور."
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Recommended with this dataset"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -4682,6 +4702,7 @@ msgstr "يمكنك وحدك الوصول إلى هذا {resource}. سيفقد ا
 "في ذلك مسؤولو مساحة العمل."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Can't be loaded"
 msgstr "يتعذر تحميله"
 
@@ -5320,7 +5341,9 @@ msgid "Walk through building and sharing a dashboard again, from the top."
 msgstr "تعرّف مجددًا على كيفية إنشاء لوحة معلومات ومشاركتها، بدءًا من البداية."
 
 #. placeholder {0}: columns.length
+#. placeholder {0}: companions.length
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "{0}"
 msgstr "{0}"
 
@@ -5388,7 +5411,7 @@ msgstr "توليد استعلام"
 msgid "No frequency data available."
 msgstr "لا توجد بيانات تكرارية متاحة."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't check this dataset's columns. Try adding it again."
 msgstr "تعذر التحقق من أعمدة مجموعة البيانات هذه. حاول إضافتها مرة أخرى."
 
@@ -6124,7 +6147,7 @@ msgstr "هذا الإحداثي خارج النطاق."
 msgid "Open the record"
 msgstr "فتح السجل"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Dataset added"
 msgstr "تمت إضافة مجموعة البيانات"
 
@@ -6268,6 +6291,7 @@ msgid "Tool"
 msgstr "أداة"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Not supported yet"
 msgstr "غير مدعوم حتى الآن"
 
@@ -6301,6 +6325,10 @@ msgstr "لم تتم إضافة أي حقول"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "All results"
 msgstr "جميع النتائج"
+
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Add"
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualSelectionEmptyState/IndividualSelectionEmptyState.tsx
 msgid "Pick one from the list to see its details."
@@ -7157,11 +7185,15 @@ msgstr "لا يحتوي على"
 msgid "One filter is active on this layer. It may be excluding everything."
 msgstr "يوجد عامل تصفية واحد نشط على هذه الطبقة. قد يستبعد جميع البيانات."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
+msgid "Recommended with it: {companionNames}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "تم تحديث اسم مساحة العمل"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
 msgstr "البحث في البيانات المفتوحة"
 
@@ -9117,7 +9149,7 @@ msgstr "بوابة الفوترة."
 msgid "Column 2"
 msgstr "العمود 2"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Data not ready"
 msgstr "البيانات غير جاهزة"
 
@@ -9265,7 +9297,7 @@ msgstr "أعمدة مجموعة البيانات"
 msgid "Details"
 msgstr "التفاصيل"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
 msgstr "جارٍ تجهيز بياناتك"
 
@@ -9383,7 +9415,7 @@ msgstr "إذا كانت هناك قيم متعددة لـ {attributeName} لوا
 msgid "Unnamed column expression in SELECT; skipped."
 msgstr "تعبير عمود غير مُسمّى في SELECT؛ تم تخطيه."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Clear search"
 msgstr "مسح البحث"
@@ -9921,6 +9953,11 @@ msgstr "موصى به"
 msgid "Teal"
 msgstr "أخضر مزرق"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogUnsupportedNotice/DataCatalogUnsupportedNotice.tsx
+msgid "The publisher has not added any rows to it. You can still open the "
+"original, where it is published."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
 msgstr "تمت فهرسته بواسطة"
@@ -10292,6 +10329,10 @@ msgid "This query treats one kind of value as another, such as text as a number 
 msgstr "يتعامل هذا الاستعلام مع نوع من القيم على أنه نوع آخر، مثل التعامل مع "
 "النص كرقم أو كتاريخ، لذا تعذّر تشغيله."
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "In your workspace"
+msgstr ""
+
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/routes/forgot-password.tsx
@@ -10586,7 +10627,7 @@ msgstr "تم حذف نوع الحالة"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه النموذج."
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "This catalog listing has no column metadata. It cannot be imported yet."
 msgstr "لا تحتوي قائمة الكتالوج هذه على بيانات وصفية للأعمدة. لا يمكن استيرادها "
 "بعد."
@@ -10711,6 +10752,10 @@ msgstr "{0} (الحدود)"
 msgid "Loading"
 msgstr "جارٍ التحميل"
 
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
+msgid "Names the codes in {columnList}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfButton.tsx
 msgid "Dashboard is not loaded yet."
@@ -10834,7 +10879,7 @@ msgid "Link"
 msgstr "رابط"
 
 #. placeholder {0}: listing.displayName
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "We couldn't prepare the data for \"{0}\", so it may not open."
 msgstr "تعذّر علينا تجهيز البيانات لـ \"{0}\"، لذا قد لا تُفتح."
 
