@@ -74,4 +74,51 @@ describe("SpatialFilterSelect", () => {
     const update = onLayerChange.mock.calls[0]![0];
     expect(update(schools).spatialFilter).toEqual({ layerId: buffer.id });
   });
+
+  it("shows a filter whose layer is no longer offered so it can be cleared", () => {
+    const sites = _makePointLayer("Sites");
+    const schools = {
+      ..._makePointLayer("Schools"),
+      spatialFilter: { layerId: sites.id },
+    };
+    const onLayerChange = vi.fn<LayerChangeHandler>();
+    render(
+      <SpatialFilterSelect
+        layer={schools}
+        layers={[sites, schools]}
+        onLayerChange={onLayerChange}
+      />,
+    );
+
+    const combobox = screen.getByRole("combobox", {
+      name: "Only show features inside",
+    });
+    expect(combobox).not.toBeDisabled();
+    expect(combobox).toHaveValue("Sites");
+
+    pickMantineSelectOption("Only show features inside", "Sites");
+
+    const update = onLayerChange.mock.calls[0]![0];
+    expect(update(schools).spatialFilter).toBeUndefined();
+  });
+
+  it("labels a filter whose layer was removed as unavailable", () => {
+    const schools = {
+      ..._makePointLayer("Schools"),
+      spatialFilter: { layerId: uuid<MapLayer.Id>() },
+    };
+    render(
+      <SpatialFilterSelect
+        layer={schools}
+        layers={[schools]}
+        onLayerChange={vi.fn()}
+      />,
+    );
+
+    const combobox = screen.getByRole("combobox", {
+      name: "Only show features inside",
+    });
+    expect(combobox).not.toBeDisabled();
+    expect(combobox).toHaveValue("Unavailable layer");
+  });
 });
