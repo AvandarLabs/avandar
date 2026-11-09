@@ -77,6 +77,51 @@ describe("stack order", () => {
 });
 
 describe("layer operations", () => {
+  it("clears the export feature list when its layer is removed", () => {
+    const listed = MapLayer.makeEmpty("Schools");
+    const base = AvaMapConfig.makeEmpty();
+    const config: AvaMapConfig.T = {
+      ...base,
+      layers: [listed],
+      exportLayout: {
+        ...base.exportLayout,
+        featureList: {
+          layerId: listed.id,
+          columnIds: [],
+          sort: undefined,
+          maxRows: 200,
+        },
+      },
+    };
+
+    expect(
+      AvaMapConfig.withLayerRemoved({ config, layerId: listed.id }).exportLayout
+        .featureList,
+    ).toBeUndefined();
+  });
+
+  it("keeps the export feature list when another layer is removed", () => {
+    const listed = MapLayer.makeEmpty("Schools");
+    const other = MapLayer.makeEmpty("Roads");
+    const base = AvaMapConfig.makeEmpty();
+    const featureList: AvaMapConfig.ExportFeatureList = {
+      layerId: listed.id,
+      columnIds: [],
+      sort: undefined,
+      maxRows: 200,
+    };
+    const config: AvaMapConfig.T = {
+      ...base,
+      layers: [listed, other],
+      exportLayout: { ...base.exportLayout, featureList },
+    };
+
+    expect(
+      AvaMapConfig.withLayerRemoved({ config, layerId: other.id }).exportLayout
+        .featureList,
+    ).toBe(featureList);
+  });
+
   it("clears a spatial filter that named the removed layer", () => {
     const area = MapLayer.createArea("Buffer of Sites");
     const schools = {

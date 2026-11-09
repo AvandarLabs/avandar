@@ -5,7 +5,9 @@ import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
  *
  * Every export sheet control funnels through this single helper, which is
  * why `AvaMapConfig.withExportLayout` has exactly one call site outside
- * tests: nothing else in the app may write `exportLayout`.
+ * tests. The only other writer of `exportLayout` is
+ * `AvaMapConfig.withLayerRemoved`, which clears a feature list whose layer
+ * is gone.
  */
 export function updateExportLayout(
   options: Readonly<{

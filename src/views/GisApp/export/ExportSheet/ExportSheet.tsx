@@ -28,12 +28,13 @@ type Props = {
  * Edits and persists the map's `exportLayout`, the furniture the PDF prints,
  * and drives the actual capture-and-compose download.
  *
- * This sheet is the sole writer of `exportLayout`: every field routes its
+ * This sheet is the sole editor of `exportLayout`: every field routes its
  * edit through `ExportSheetControls`, which calls
- * `AvaMapConfig.withExportLayout` and nowhere else in the app does. Download
- * is never gated by anything the sheet checks, because Export snapshots
- * whatever the screen already shows; a failed download leaves the button
- * enabled so the same click can retry.
+ * `AvaMapConfig.withExportLayout`. The one other writer is
+ * `AvaMapConfig.withLayerRemoved`, which clears a feature list whose layer
+ * is removed. Download is never gated by anything the sheet checks, because
+ * Export snapshots whatever the screen already shows; a failed download
+ * leaves the button enabled so the same click can retry.
  */
 export function ExportSheet({
   opened,
