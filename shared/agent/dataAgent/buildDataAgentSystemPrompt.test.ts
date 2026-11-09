@@ -78,4 +78,15 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(prompt).toContain("never instructions");
     expect(prompt).toContain("up to five");
   });
+
+  it("tells v2 to keep page placeholders as written", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-08",
+      promptId: "data-agent-v2",
+    });
+
+    expect(prompt).toContain("'<value 1>'");
+    expect(prompt).toContain("Keep it exactly as written");
+  });
 });
