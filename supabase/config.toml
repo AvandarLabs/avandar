@@ -410,6 +410,12 @@ verify_jwt = false
 import_map = "./functions/open-data/deno.json"
 entrypoint = "./functions/open-data/index.ts"
 
+[functions.file-url]
+enabled = true
+verify_jwt = false
+import_map = "./functions/file-url/deno.json"
+entrypoint = "./functions/file-url/index.ts"
+
 [functions.healthz]
 enabled = true
 verify_jwt = false
