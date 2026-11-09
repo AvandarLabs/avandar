@@ -5,6 +5,7 @@ import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/Virtual
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { AvaMapClient } from "@/clients/maps/AvaMapClient/AvaMapClient";
 import { compileMapSnapshot } from "@/clients/maps/MapSnapshot/compileMapSnapshot/compileMapSnapshot";
+import { MapSnapshotPublishError } from "@/clients/maps/MapSnapshot/MapSnapshotPublishError";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { isSpatialMapLayerBinding } from "@/views/GisApp/layers/useMapLayersData/runMapLayerQuery";
 import { MapSourceHydration } from "@/views/GisApp/useGisApp/MapSourceHydration/MapSourceHydration";
@@ -13,6 +14,7 @@ import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { MapSnapshotQueryContext } from "@/clients/maps/MapSnapshot/compileMapSnapshot/compileMapSnapshot";
 import type { MapSnapshot } from "@/clients/maps/MapSnapshot/MapSnapshot.types";
@@ -33,11 +35,62 @@ async function _getPlacesDatasetIds(
   return new Set(virtualDatasets.map(prop("datasetId")));
 }
 
+type HydrationMetadata = Readonly<{
+  datasetColumns: readonly DatasetColumn.T[];
+  conceptAttributes: readonly ConceptAttribute.T[];
+}>;
+
+/**
+ * The layers whose saved filters lost a rule to hydration because it names
+ * a column their data no longer has. Hidden layers count too: a hidden
+ * layer can still narrow another layer as its spatial filter.
+ */
+function _getLayerNamesWithDroppedFilters(
+  options: Readonly<{ config: AvaMapConfig.T; metadata: HydrationMetadata }>,
+): string[] {
+  return options.config.layers
+    .filter((layer) => {
+      const { issues } = MapSourceHydration.fromMetadata({
+        ...options.metadata,
+        config: { ...options.config, layers: [layer] },
+      });
+      return issues.length > 0;
+    })
+    .map(prop("name"));
+}
+
+/**
+ * Hydrates the saved config the way the GIS app does before it queries.
+ * Hydration only ever drops filter rules, so any issue means the map would
+ * publish less restricted than it is saved, and the publish stops instead.
+ */
+function _hydrateMapConfig(
+  options: Readonly<{ avaMap: AvaMap.T; metadata: HydrationMetadata }>,
+): AvaMapConfig.T {
+  const { avaMap, metadata } = options;
+  const { config, issues } = MapSourceHydration.fromMetadata({
+    ...metadata,
+    config: avaMap.config,
+  });
+  if (issues.length > 0) {
+    throw new MapSnapshotPublishError({
+      reason: "filtersNoLongerApply",
+      mapId: avaMap.id,
+      mapName: avaMap.name,
+      layerNames: _getLayerNamesWithDroppedFilters({
+        config: avaMap.config,
+        metadata,
+      }),
+    });
+  }
+  return config;
+}
+
 /**
  * Reads the workspace metadata a map's queries need and hydrates the saved
- * config from it, the way the GIS app does before it queries. The config is
- * not given places' `place_id` column: that column exists only for editing
- * places in the GIS app and never goes public.
+ * config from it. The config is not given places' `place_id` column: that
+ * column exists only for editing places in the GIS app and never goes
+ * public.
  */
 async function _loadMapQueryInputs(avaMap: AvaMap.T): Promise<MapQueryInputs> {
   const inWorkspace = where("workspace_id", "eq", avaMap.workspaceId);
@@ -48,10 +101,9 @@ async function _loadMapQueryInputs(avaMap: AvaMap.T): Promise<MapQueryInputs> {
       ConceptAttributeClient.getAll(inWorkspace),
       _getPlacesDatasetIds(avaMap.workspaceId),
     ]);
-  const { config } = MapSourceHydration.fromMetadata({
-    config: avaMap.config,
-    datasetColumns,
-    conceptAttributes,
+  const config = _hydrateMapConfig({
+    avaMap,
+    metadata: { datasetColumns, conceptAttributes },
   });
   return { config, datasets, datasetColumns, placesDatasetIds };
 }
@@ -111,6 +163,9 @@ function _createQueryContext(
  * app does, and compiles it at its saved view. Throws when the map is
  * missing, outside the dashboard's workspace, or cannot be queried, so a
  * publish never goes out with a map silently left behind.
+ *
+ * @throws MapSnapshotPublishError when a saved filter no longer matches the
+ * map's data, so the snapshot would show rows the author filtered out.
  */
 export async function createMapSnapshotFromMapId(
   options: Readonly<{ mapId: AvaMap.Id; workspaceId: Workspace.Id }>,
