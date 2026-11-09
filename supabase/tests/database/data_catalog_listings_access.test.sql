@@ -10,7 +10,7 @@
 
 begin;
 
-select plan(26);
+select plan(24);
 
 -- ---------------------------------------------------------------------------
 -- The three pipeline columns become nullable. A Parquet pipeline listing must
@@ -238,8 +238,8 @@ select throws_ok(
 );
 
 -- ---------------------------------------------------------------------------
--- The write-back cache columns. Written atomically: either all three are set,
--- or none are. Only an `api_resource` listing may carry cache state at all.
+-- A listing's Parquet copy. Only an `api_resource` listing may carry one:
+-- a `pipeline_parquet` listing already has a Parquet object of its own.
 -- ---------------------------------------------------------------------------
 
 select lives_ok(
@@ -247,53 +247,29 @@ select lives_ok(
       (id, display_name, organization1_name, access_kind, api_service,
        api_base_url, external_dataset_id, api_resource_id, api_resource_format)
     values
-      ('aaaaaaaa-0000-4000-8000-000000000101', 'pgtap-fixture no cache yet',
+      ('aaaaaaaa-0000-4000-8000-000000000101', 'pgtap-fixture no copy yet',
        'OCHA', 'api_resource', 'ckan', 'https://pgtap-fixture.invalid',
        'pgtap-fixture-dataset-c', 'pgtap-fixture-resource-c', 'CSV')$$,
-  'an api_resource row with no cache columns set inserts'
-);
-
-select lives_ok(
-  $$insert into public.data_catalog_listings
-      (id, display_name, organization1_name, access_kind, api_service,
-       api_base_url, external_dataset_id, api_resource_id, api_resource_format,
-       cached_object_path, cached_source_version, cached_at)
-    values
-      ('aaaaaaaa-0000-4000-8000-000000000102', 'pgtap-fixture cached',
-       'OCHA', 'api_resource', 'ckan', 'https://pgtap-fixture.invalid',
-       'pgtap-fixture-dataset-d', 'pgtap-fixture-resource-d', 'CSV',
-       'aaaaaaaa-0000-4000-8000-000000000102.csv', 'ckan:hash:abc', now())$$,
-  'an api_resource row with every cache column set inserts'
-);
-
-select throws_ok(
-  $$insert into public.data_catalog_listings
-      (id, display_name, organization1_name, access_kind, api_service,
-       api_base_url, external_dataset_id, api_resource_id, api_resource_format,
-       cached_object_path)
-    values
-      ('aaaaaaaa-0000-4000-8000-000000000103', 'pgtap-fixture partial cache',
-       'OCHA', 'api_resource', 'ckan', 'https://pgtap-fixture.invalid',
-       'pgtap-fixture-dataset-e', 'pgtap-fixture-resource-e', 'CSV',
-       'aaaaaaaa-0000-4000-8000-000000000103.csv')$$,
-  '23514',
-  null,
-  'an api_resource row with only cached_object_path set is rejected'
+  'an api_resource row with no Parquet copy inserts'
 );
 
 select throws_ok(
   $$insert into public.data_catalog_listings
       (id, display_name, organization1_name, access_kind,
        parquet_file_name, pipeline_name, pipeline_run_id,
-       cached_object_path, cached_source_version, cached_at)
+       parquet_cache_status, parquet_cache_folder_path,
+       parquet_cache_part_count, parquet_cache_source_version,
+       parquet_cache_built_at, parquet_cache_row_count,
+       parquet_cache_byte_size)
     values
       ('aaaaaaaa-0000-4000-8000-000000000104', 'pgtap-fixture pipeline row',
        'World Bank', 'pipeline_parquet',
        'pgtap-fixture-other2.parquet', 'pgtap-fixture-pipeline', 'run-4',
-       'should-not-be-allowed.csv', 'pgtap-fixture-version', now())$$,
+       'ready', 'catalog-cache/pgtap-fixture', 1, 'pgtap-fixture-version',
+       now(), 10, 1024)$$,
   '23514',
   null,
-  'a pipeline_parquet row with a complete cache set is still rejected'
+  'a pipeline_parquet row with a complete Parquet copy is rejected'
 );
 
 -- ---------------------------------------------------------------------------

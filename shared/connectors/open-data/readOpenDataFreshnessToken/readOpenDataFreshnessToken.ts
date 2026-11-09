@@ -6,8 +6,8 @@ import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
-import type { OpenDataApiAccessFor } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
+import type { OpenDataApiAccessFor } from "$/connectors/open-data/OpenDataApiAccess.types.ts";
 
 /**
  * Reads one cheap, up-to-date freshness token for an `api_resource` entry.
@@ -26,16 +26,6 @@ export async function readOpenDataFreshnessToken(params: {
     });
   }
 
-  // For both CKAN and Socrata this makes its own metadata call, independent of
-  // whatever `acquireLive` does inside `acquireOpenDataResourceWithCache` -
-  // the two are separate closures, each with their own call. On a cache miss
-  // or a stale cached token, this means the metadata is fetched twice (once
-  // here, once again inside the CKAN or Socrata branch of
-  // `acquireOpenDataResource`), not once and reused. This is a known,
-  // accepted inefficiency: de-duplicating it would mean threading the
-  // metadata this function already fetched into `acquireLive`, which would
-  // change `acquireOpenDataResourceWithCache`'s injected-function contracts
-  // and is deliberately deferred rather than done now.
   const token = await match(access)
     .with(
       { apiService: "ckan" },

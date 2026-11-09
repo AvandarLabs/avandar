@@ -1,13 +1,13 @@
+import { buildParquetCachePartName } from "$/connectors/open-data/buildParquetCachePartPath/buildParquetCachePartPath";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
 import { fetchOpenDataColumnTypeSample } from "@/lib/openData/fetchOpenDataColumnTypeSample/fetchOpenDataColumnTypeSample";
+import { downloadOpenDataParquetPart } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type {
   DuckDbColumnSchema,
   UnknownRow,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { FetchedOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
 
 /** The first rows of a catalog listing's data, ready for a data grid. */
 export type CatalogListingPreview = {
@@ -28,9 +28,8 @@ type SniffedPreview = Readonly<{
 
 /** The reads a preview needs. Injected so a test runs without a network. */
 export type CatalogListingPreviewDependencies = {
-  fetchApiResource: (
-    catalogListingId: DataCatalogListing.Id,
-  ) => Promise<Pick<FetchedOpenDataCatalogResource, "bytes" | "contentKind">>;
+  /** Downloads one part of a listing's Parquet copy from Storage. */
+  fetchCopyPart: (partPath: string) => Promise<Blob>;
   /** Reads the start of an API-backed CSV listing's data, as CSV text. */
   fetchCsvSample: (catalogListingId: DataCatalogListing.Id) => Promise<string>;
   fetchParquetUrl: (url: string) => Promise<Blob>;
@@ -54,7 +53,7 @@ async function _fetchParquetUrl(url: string): Promise<Blob> {
 }
 
 const DEFAULT_DEPENDENCIES: CatalogListingPreviewDependencies = {
-  fetchApiResource: fetchOpenDataCatalogResource,
+  fetchCopyPart: downloadOpenDataParquetPart,
   fetchCsvSample: async (catalogListingId) => {
     return (await fetchOpenDataColumnTypeSample(catalogListingId)).csvText;
   },
@@ -103,9 +102,9 @@ function _toPreview(sniffed: SniffedPreview): CatalogListingPreview {
  *
  * An API-backed CSV listing is read from the start of its file, the same
  * sample its column types are verified from, so a source of any size can be
- * previewed. Any other API-backed listing is read whole through the
- * open-data edge function, the proxy that loads it into a workspace, which
- * refuses one too large to relay. A pipeline listing is read from the
+ * previewed. Any other API-backed listing is read from the first part of its
+ * Parquet copy, and has no preview until a workspace adds it and the copy is
+ * built: browsing never starts a build. A pipeline listing is read from the
  * Parquet URL its catalog row names. Either way DuckDB reads only the
  * preview's rows and nothing is kept once they are read.
  *
@@ -118,7 +117,11 @@ export async function fetchCatalogListingPreview(
   options: Readonly<{
     listing: Pick<
       DataCatalogListing.T,
-      "id" | "accessKind" | "apiResourceFormat" | "canonicalUrls"
+      | "id"
+      | "accessKind"
+      | "apiResourceFormat"
+      | "canonicalUrls"
+      | "parquetCacheFolderPath"
     >;
     maxPreviewRows: number;
     dependencies?: CatalogListingPreviewDependencies;
@@ -134,15 +137,16 @@ export async function fetchCatalogListingPreview(
         await _sniffCsvFile(dependencies, csvText, maxPreviewRows),
       );
     }
-    const resource = await dependencies.fetchApiResource(listing.id);
-    if (resource.contentKind === "csv") {
-      return _toPreview(
-        await _sniffCsvFile(dependencies, resource.bytes, maxPreviewRows),
+    if (listing.parquetCacheFolderPath === undefined) {
+      throw new Error(
+        `Catalog listing '${listing.id}' has no Parquet copy to preview yet`,
       );
     }
     return _toPreview(
       await dependencies.previewParquetBlob({
-        parquetBlob: new Blob([resource.bytes]),
+        parquetBlob: await dependencies.fetchCopyPart(
+          `${listing.parquetCacheFolderPath}/${buildParquetCachePartName(0)}`,
+        ),
         maxPreviewRows,
       }),
     );

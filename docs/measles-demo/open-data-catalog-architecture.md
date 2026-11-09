@@ -1,5 +1,10 @@
 # Open Data Catalog architecture
 
+> **Superseded in part.** The resource route, its write-back cache, and the
+> `cached_*` columns this document describes were removed. API-backed
+> listings are now read from Parquet copies the pipeline server builds; see
+> [`odc-parquet-cache-spec.md`](odc-parquet-cache-spec.md).
+
 This is the reference for how the Open Data Catalog works: which connectors
 serve it, how a relation's bytes actually get acquired today, what changes
 once a Socrata connector and a write-back cache exist, and what stays

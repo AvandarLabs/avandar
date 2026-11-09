@@ -22,100 +22,15 @@ import {
   readPipelineServerTarget,
   startParquetCopyBuild,
 } from "@sbfn/open-data/startParquetCopyBuild/startParquetCopyBuild.ts";
-import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { object, string } from "zod";
-import { acquireOpenDataResource } from "$/connectors/open-data/acquireOpenDataResource.ts";
-import { acquireOpenDataResourceWithCache } from "$/connectors/open-data/acquireOpenDataResourceWithCache/acquireOpenDataResourceWithCache.ts";
-import { createAvandarSupabaseStorageClient } from "$/connectors/open-data/AvandarSupabaseStorageClient/AvandarSupabaseStorageClient.ts";
 import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
 import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
 import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
 import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
-import type { OpenDataAcquisition } from "$/connectors/open-data/acquireOpenDataResource.ts";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
 import type { ParquetCacheDependencies } from "@sbfn/open-data/requestParquetCache/requestParquetCache.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-
-/**
- * The largest resource this route will relay. Kept well under the response size
- * a Supabase edge function can return, and deliberately smaller than the
- * largest resources HDX hosts, so an oversized dataset is refused with a clear
- * reason rather than by the runtime killing the invocation.
- */
-const MAX_RESOURCE_BYTES = 25 * 1024 * 1024;
-
-/**
- * Headers the browser is allowed to read off the response. Without this the
- * fetch succeeds and both custom headers are invisible, because a cross-origin
- * response exposes only the CORS-safelisted set.
- */
-const EXPOSED_HEADERS = "X-Ava-Content-Kind, X-Ava-Source-Version";
-
-function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
-  return new Response(JSON.stringify({ error: { code: error.failure.code } }), {
-    status: statusFromOpenDataFailure(error.failure.code),
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-/**
- * Writes a freshly fetched resource's cache location and source version back
- * onto its catalog listing. The sole `updateCache` implementation
- * `acquireOpenDataResourceWithCache` is given, so a cache write only happens
- * through the catalog-entry update it performs.
- */
-async function _persistOpenDataCache(params: {
-  catalogListingId: DataCatalogListing.Id;
-  cachedObjectPath: string;
-  cachedSourceVersion: string;
-}): Promise<void> {
-  const { error: updateError } = await SupabaseAdmin.from(
-    "data_catalog_listings",
-  )
-    .update({
-      cached_object_path: params.cachedObjectPath,
-      cached_source_version: params.cachedSourceVersion,
-      cached_at: new Date().toISOString(),
-    })
-    .eq("id", params.catalogListingId);
-  if (updateError) {
-    throw updateError;
-  }
-}
-
-/**
- * Resolves one catalog listing's resource bytes through the cache-aside path:
- * builds the HTTP and storage clients the acquisition needs, then wires them
- * into `acquireOpenDataResourceWithCache` along with the freshness check,
- * the live fetch, and the cache-persist callback.
- */
-async function _resolveOpenDataAcquisition(
-  entry: Readonly<DataCatalogListing.T>,
-): Promise<OpenDataAcquisition> {
-  const http = HttpClientFactory.create("OpenDataRouteHttpClient", {
-    state: { maxResponseBytes: MAX_RESOURCE_BYTES },
-  });
-  const storage = createAvandarSupabaseStorageClient(
-    SupabaseAdmin.storage.from("open-data-catalog"),
-  );
-
-  return acquireOpenDataResourceWithCache({
-    entry,
-    readFreshnessToken: (freshnessEntry) => {
-      return readOpenDataFreshnessToken({ entry: freshnessEntry, http });
-    },
-    acquireLive: (liveEntry) => {
-      return acquireOpenDataResource({
-        entry: liveEntry,
-        http,
-        maxBytes: MAX_RESOURCE_BYTES,
-      });
-    },
-    storage,
-    updateCache: _persistOpenDataCache,
-  });
-}
 
 /** The largest metadata response the freshness check reads. */
 const MAX_FRESHNESS_RESPONSE_BYTES = 10 * 1024 * 1024;
@@ -237,42 +152,6 @@ async function _readCatalogListing(
  * open relay for arbitrary server-side requests.
  */
 export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
-  "/data-catalog-listings/:catalogListingId/resource": {
-    GET: GET({
-      path: "/data-catalog-listings/:catalogListingId/resource",
-      schema: { catalogListingId: string().uuid() },
-    }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
-      const entry = await _readCatalogListing(
-        supabaseClient,
-        pathParams.catalogListingId,
-      );
-      if (entry instanceof Response) {
-        return entry;
-      }
-
-      try {
-        const acquisition = await _resolveOpenDataAcquisition(entry);
-
-        return new Response(acquisition.bytes as BodyInit, {
-          status: 200,
-          headers: {
-            ...corsHeaders,
-            "Access-Control-Expose-Headers": EXPOSED_HEADERS,
-            "Content-Type": "application/octet-stream",
-            "X-Ava-Content-Kind": acquisition.contentKind,
-            ...(acquisition.sourceVersion === undefined
-              ? {}
-              : { "X-Ava-Source-Version": acquisition.sourceVersion }),
-          },
-        });
-      } catch (caught) {
-        if (OpenDataAcquisitionFailed.is(caught)) {
-          return _responseFromFailure(caught);
-        }
-        throw caught;
-      }
-    }),
-  },
   "/data-catalog-listings/:catalogListingId/column-type-sample": {
     GET: GET({
       path: "/data-catalog-listings/:catalogListingId/column-type-sample",

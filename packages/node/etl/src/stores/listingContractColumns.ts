@@ -4,8 +4,8 @@ import type { ListingRowValues } from "@etl/stores/EtlStores.types";
  * Every listings-table column the engine reads and writes, in one place, so
  * the row builder, the change check, and the Supabase store cannot drift
  * apart. The engine never writes a column outside this list, which is what
- * keeps the app's cache columns (`cached_object_path`,
- * `cached_source_version`, `cached_at`) safe across pipeline runs.
+ * keeps a listing's Parquet copy columns (`parquet_cache_*`) safe across
+ * pipeline runs.
  */
 export const LISTING_CONTRACT_COLUMNS = [
   "access_kind",

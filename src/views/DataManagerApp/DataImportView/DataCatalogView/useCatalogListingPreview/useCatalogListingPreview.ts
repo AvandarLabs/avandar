@@ -38,6 +38,7 @@ export function useCatalogListingPreview(
           accessKind: listing.accessKind,
           apiResourceFormat: listing.apiResourceFormat,
           canonicalUrls: listing.canonicalUrls,
+          parquetCacheFolderPath: listing.parquetCacheFolderPath,
         };
   const query = useQuery({
     queryKey: ["data-catalog-listing-preview", previewSource],
