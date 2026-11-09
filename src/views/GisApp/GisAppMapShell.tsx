@@ -102,7 +102,12 @@ function GisAppAddToDashboardModal({
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   return (
-    <Modal opened={opened} onClose={onClose} title={t`Add to dashboard`}>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      size="lg"
+      title={t`Add to dashboard`}
+    >
       <AddMapToDashboardModal
         mapId={mapId}
         workspaceSlug={workspace.slug}
