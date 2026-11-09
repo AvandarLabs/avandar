@@ -4,7 +4,7 @@ import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { render, screen, waitFor, within } from "@/test-utils";
+import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { createQueryableLayer } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
 import { MapViewer } from "@/views/GisApp/MapViewer/MapViewer";
@@ -256,6 +256,47 @@ describe("MapViewer", () => {
     expect(usePlacesDatasetIdsMock).toHaveBeenCalledWith(WORKSPACE_ID);
   });
 
+  it("closes a live popup on Escape after focusing its close button", () => {
+    const layer = createQueryableLayer();
+    const dataset = layer.source.dataSource as Dataset.T;
+    useGetDatasetsMock.mockReturnValue([[dataset], false]);
+    useGetMapByIdMock.mockReturnValue([_makeMap([layer]), false]);
+
+    _render(LIVE_SOURCE);
+    act(() => {
+      useMapCanvasSpy.mock.lastCall?.[0]?.onFeatureClick(
+        {
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [0, 0] },
+          properties: { name: "Clinic A" },
+        },
+        MapLayerIds.toLayerId(layer.id),
+      );
+    });
+
+    const popup = screen.getByRole("region", { name: "Cases" });
+    const closeButton = within(popup).getByRole("button", { name: "Close" });
+    expect(closeButton).toHaveFocus();
+    fireEvent.keyDown(closeButton, { key: "Escape" });
+    expect(
+      screen.queryByRole("region", { name: "Cases" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("waits for dataset access before drawing a live map", () => {
+    useGetDatasetsMock.mockReturnValue([undefined, true]);
+    useGetMapByIdMock.mockReturnValue([
+      _makeMap([createQueryableLayer()]),
+      false,
+    ]);
+
+    _render(LIVE_SOURCE);
+
+    expect(screen.getByLabelText("Loading the map")).toBeInTheDocument();
+    expect(useMapCanvasSpy).not.toHaveBeenCalled();
+    expect(useMapLayerRenderingMock).not.toHaveBeenCalled();
+  });
+
   it("tells a viewer who cannot read the map that they have no access", () => {
     useGetMapByIdMock.mockReturnValue([undefined, false]);
 
@@ -278,6 +319,31 @@ describe("MapViewer", () => {
     expect(
       screen.getByText("You don't have access to this map"),
     ).toBeInTheDocument();
+    expect(useMapCanvasSpy).not.toHaveBeenCalled();
+    expect(useMapLayerRenderingMock).not.toHaveBeenCalled();
+  });
+
+  it("leaves the disclaimer out when no disputed boundary is drawn", () => {
+    const map = _makeMap([MapLayer.makeEmpty("Districts")]);
+    useGetMapByIdMock.mockReturnValue([
+      {
+        ...map,
+        config: {
+          ...map.config,
+          exportLayout: {
+            ...map.config.exportLayout,
+            disclaimer: "Lines are not borders.",
+          },
+        },
+      },
+      false,
+    ]);
+
+    _render(LIVE_SOURCE);
+
+    expect(
+      screen.queryByText("Lines are not borders."),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the map's disclaimer when a disputed boundary is drawn", () => {

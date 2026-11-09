@@ -21,7 +21,7 @@
 .mapViewerLegend {
   inset-block-end: var(--mantine-spacing-sm);
   inset-inline-end: var(--mantine-spacing-sm);
-  max-height: calc(100% - 2 * var(--mantine-spacing-sm));
+  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm));
   overflow: auto;
   position: absolute;
   z-index: 1;
@@ -30,7 +30,7 @@
 .mapViewerPopup {
   inset-block-start: var(--mantine-spacing-sm);
   inset-inline-start: var(--mantine-spacing-sm);
-  max-width: 280px;
+  max-inline-size: 280px;
   position: absolute;
   z-index: 2;
 }
@@ -50,6 +50,6 @@
 }
 
 .mapViewerStateMessage {
-  max-width: 40ch;
+  max-inline-size: 40ch;
   text-wrap: balance;
 }

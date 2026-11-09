@@ -15,7 +15,7 @@ import type { MapLayerRendering } from "@/views/GisApp/layers/useMapLayerRenderi
 import type { MapViewerCamera } from "@/views/GisApp/MapViewer/MapViewer.types";
 
 /** Whether the viewer can read every dataset the map's layers read. */
-type MapDatasetAccess = "loading" | "granted" | "denied";
+export type MapDatasetAccess = "loading" | "granted" | "denied";
 
 /** Everything a live read-only map needs to draw. */
 export type LiveMapViewerState = {
@@ -23,11 +23,15 @@ export type LiveMapViewerState = {
   rendering: MapLayerRendering;
   initialView: AvaMapConfig.ViewState;
   onViewChange: (view: AvaMapConfig.ViewState) => void;
-  datasetAccess: MapDatasetAccess;
   placesDatasetIds: ReadonlySet<Dataset.Id>;
 };
 
-function useMapDatasetAccess(avaMap: AvaMap.T): MapDatasetAccess {
+/**
+ * Whether the viewer can read every dataset a map's layers read. A map is
+ * drawn only once this is `granted`, so a viewer without access never sees
+ * its layers flash or starts their queries.
+ */
+export function useMapDatasetAccess(avaMap: AvaMap.T): MapDatasetAccess {
   const [datasets, isLoading] = DatasetClient.useGetAll(
     where("workspace_id", "eq", avaMap.workspaceId),
   );
@@ -77,7 +81,6 @@ export function useLiveMapViewerState(
     rendering,
     initialView,
     onViewChange: setCurrentView,
-    datasetAccess: useMapDatasetAccess(avaMap),
     placesDatasetIds: VirtualPlacesStore.usePlacesDatasetIds(
       avaMap.workspaceId,
     ),
