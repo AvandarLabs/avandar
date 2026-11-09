@@ -3,6 +3,7 @@ import { Select } from "@mantine/core";
 import { isAutomaticClassificationMethod } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { GraduatedClassCountControl } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassCountControl";
+import { HighlightValuesBelowInput } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
@@ -14,6 +15,7 @@ type Props = {
   color: GraduatedColor;
   classCount: number;
   manualBreaks: readonly number[];
+  classifiedValueDomain: readonly [number, number] | undefined;
   onLayerChange: LayerChangeHandler;
 };
 
@@ -57,6 +59,7 @@ export function GraduatedMethodControls({
   color,
   classCount,
   manualBreaks,
+  classifiedValueDomain,
   onLayerChange,
 }: Props): ReactNode {
   const { t } = useLingui();
@@ -84,6 +87,10 @@ export function GraduatedMethodControls({
             });
           }
         }}
+      />
+      <HighlightValuesBelowInput
+        classifiedValueDomain={classifiedValueDomain}
+        onLayerChange={onLayerChange}
       />
       <GraduatedClassCountControl
         layer={layer}

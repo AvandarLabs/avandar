@@ -223,7 +223,7 @@ export function createEmptyVersion5Json() {
   const config = AvaMapConfig.makeEmpty();
   return {
     __type: config.__type,
-    version: config.version,
+    version: 5,
     basemap: config.basemap,
     view: config.view,
     bookmarks: config.bookmarks,
@@ -289,5 +289,67 @@ export function createMismatchedBufferJson() {
   return {
     ...createEmptyVersion4Json(),
     layers: [omitExportFields(source), omitExportFields(buffer)],
+  };
+}
+
+/** A version 5 ZIP layer: a 5-color ramp classified by one manual break. */
+export function createVersion5JsonWithGraduatedLayer() {
+  const layer = MapLayer.createArea("ZIP coverage");
+  return {
+    ...createEmptyVersion5Json(),
+    layers: [
+      {
+        ...layer,
+        symbology: {
+          ...MapLayer.createDefaultFillSymbology(),
+          color: {
+            type: "graduated",
+            value: {
+              type: "areaAggregation",
+              outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+            },
+            ramp: ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5", "#08306b"],
+            classification: { method: "manual", breaks: [95] },
+            normalization: undefined,
+            noData: { color: "#ced4da", label: "" },
+          },
+        },
+        legend: {
+          ...layer.legend,
+          breaks: [
+            { lower: undefined, upper: 95 },
+            { lower: 95, upper: undefined },
+          ],
+          entries: [
+            { type: "value", color: "#eff3ff", label: "< 95", count: 3 },
+            { type: "value", color: "#bdd7e7", label: "≥ 95", count: 4 },
+            { type: "noData", color: "#ced4da", label: "", count: 1 },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+/** A version 6 ZIP layer with one custom class label and one unset. */
+export function createGraduatedAreaLayer(): MapLayer.T {
+  const layer = MapLayer.createArea("ZIP coverage");
+  return {
+    ...layer,
+    symbology: {
+      ...MapLayer.createDefaultFillSymbology(),
+      color: {
+        type: "graduated",
+        value: {
+          type: "areaAggregation",
+          outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
+        },
+        ramp: ["#d7301f", "#d9d9d9"],
+        classification: { method: "manual", breaks: [0.95] },
+        normalization: undefined,
+        noData: { color: "#ced4da", label: "" },
+        classLabels: ["Below 95%", undefined],
+      },
+    },
   };
 }

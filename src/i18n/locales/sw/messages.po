@@ -692,6 +692,10 @@ msgstr "Hifadhi na rudia swali"
 msgid "Saved as \"{0}\"."
 msgstr "Imehifadhiwa kama \"{0}\"."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "These values are fractions, so type a percent such as 95."
+msgstr ""
+
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr "Seva hii inahitaji SSL. Weka hali ya SSL iwe \"Require\" kisha ujaribu "
@@ -2173,6 +2177,10 @@ msgstr "Imegundulika:"
 msgid "The record keeps its previous status. Try again in a moment."
 msgstr "Rekodi itabaki na hali yake ya awali. Jaribu tena baada ya muda mfupi."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "%"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "Safu wima ya 3"
@@ -3328,6 +3336,10 @@ msgstr "Imesawazishwa kwenye wingu"
 msgid "No data color"
 msgstr "Hakuna rangi ya data"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Highlight values below"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
@@ -4228,6 +4240,10 @@ msgstr "{plainTextLength} kati ya herufi {RICH_TEXT_MAX_TEXT_LENGTH}"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "Mandhari"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Reverse colors"
+msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -5400,6 +5416,10 @@ msgstr "Aina za chati: {chartTypes}"
 msgid "Generated SQL"
 msgstr "SQL iliyozalishwa"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class colors"
+msgstr ""
+
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
 msgstr "<0>Shift</0> <1>Enter</1> pachika"
@@ -5739,6 +5759,10 @@ msgstr "Kukadiria dhana za SQL"
 msgid "Import failed: {reason}"
 msgstr "Uagizaji umeshindwa: {reason}"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} label"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "Muundo wa alama ya wakati"
@@ -5976,6 +6000,10 @@ msgstr "Imetumwa barua ya kuweka upya nenosiri"
 msgid "Aggregation"
 msgstr "Ujumlishaji"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
 msgstr "Chagua safu ya kupanga"
@@ -6069,6 +6097,10 @@ msgstr "Embed"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Nothing yet."
 msgstr "Bado hakuna chochote."
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class {classNumber}"
+msgstr ""
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6713,6 +6745,10 @@ msgstr "Hakuna seti za data zinazolingana na kichujio chako"
 msgid "Curve"
 msgstr "Mviringo"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold}% or above"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
@@ -7063,6 +7099,10 @@ msgstr "Nukta"
 msgid "kind"
 msgstr "aina"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}%"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
 msgstr "Mabadiliko yote yamehifadhiwa"
@@ -7327,6 +7367,10 @@ msgstr "Barua pepe"
 msgid "Y axis tick color"
 msgstr "Rangi ya alama za mhimili wa Y"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} color"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "Process data again"
@@ -7379,6 +7423,10 @@ msgstr "\"{operator}\" si opereta ambayo fomu hii inaweza kuelewa."
 #: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "Fungua upande wa sidebar"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Red to blue"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
@@ -8201,6 +8249,10 @@ msgstr "Chagua safu unazotaka katika {conceptName}"
 msgid "Visualization Settings"
 msgstr "Mipangilio ya Uonyeshaji"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Threshold"
+msgstr ""
+
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -8545,6 +8597,10 @@ msgstr "Karibu kwenye kidhibiti chako cha chanzo cha data. Chagua faili la CSV "
 msgid "Geometry unavailable"
 msgstr "Jiometri haipatikani"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Custom colors"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
 msgid "Use a link"
 msgstr "Tumia kiungo"
@@ -8832,6 +8888,10 @@ msgstr "Ukubwa wa alama {firstLabel}"
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
 msgstr "Bado huna akaunti?"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold} or above"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -10421,6 +10481,7 @@ msgid "Please try again. Your dashboard is still published."
 msgstr "Tafadhali jaribu tena. Dashibodi yako bado imechapishwa."
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red"
 msgstr "Nyekundu"
 

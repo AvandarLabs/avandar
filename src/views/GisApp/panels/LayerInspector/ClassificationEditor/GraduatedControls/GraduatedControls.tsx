@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { ClassificationBreakHandles } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles/ClassificationBreakHandles";
+import { GraduatedClassList } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList";
 import { GraduatedMethodControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMethodControls";
 import { GraduatedRampSelect } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect";
 import { NormalizationControls } from "@/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationControls";
@@ -13,6 +14,7 @@ type Props = {
   layer: MapLayer.T;
   color: GraduatedColor;
   manualBreaks: readonly number[];
+  classifiedValueDomain: readonly [number, number] | undefined;
   onLayerChange: LayerChangeHandler;
 };
 
@@ -27,6 +29,7 @@ export function GraduatedControls({
   layer,
   color,
   manualBreaks,
+  classifiedValueDomain,
   onLayerChange,
 }: Props): ReactNode {
   const { t } = useLingui();
@@ -40,9 +43,15 @@ export function GraduatedControls({
         color={color}
         classCount={_getClassCount(color)}
         manualBreaks={manualBreaks}
+        classifiedValueDomain={classifiedValueDomain}
         onLayerChange={onLayerChange}
       />
       <GraduatedRampSelect color={color} onLayerChange={onLayerChange} />
+      <GraduatedClassList
+        layer={layer}
+        color={color}
+        onLayerChange={onLayerChange}
+      />
       <NormalizationControls layer={layer} onLayerChange={onLayerChange} />
       <ClassificationBreakHandles
         layer={layer}

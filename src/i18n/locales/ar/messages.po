@@ -684,6 +684,10 @@ msgstr "احفظ وأعد تشغيل الاستعلام"
 msgid "Saved as \"{0}\"."
 msgstr "تم الحفظ كـ \"{0}\"."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "These values are fractions, so type a percent such as 95."
+msgstr ""
+
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "This server requires SSL. Set SSL mode to \"Require\" and try again."
 msgstr "يتطلب هذا الخادم SSL. اضبط وضع SSL على \"Require\" وحاول مرة أخرى."
@@ -2145,6 +2149,10 @@ msgstr "تم الكشف عن:"
 msgid "The record keeps its previous status. Try again in a moment."
 msgstr "يحتفظ السجل بحالته السابقة. حاول مرة أخرى بعد قليل."
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "%"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 3"
 msgstr "العمود 3"
@@ -3280,6 +3288,10 @@ msgstr "تمت المزامنة مع السحابة"
 msgid "No data color"
 msgstr "لا لون للبيانات"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Highlight values below"
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the Y axis. Values are "
 "grouped by the X axis (\"{axisKeyValue}\")."
@@ -4170,6 +4182,10 @@ msgstr "{plainTextLength} من أصل {RICH_TEXT_MAX_TEXT_LENGTH} حرفًا"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Theme"
 msgstr "السمة"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Reverse colors"
+msgstr ""
 
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
@@ -5332,6 +5348,10 @@ msgstr "أنواع المخططات: {chartTypes}"
 msgid "Generated SQL"
 msgstr "SQL المُولد"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class colors"
+msgstr ""
+
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuFooter.tsx
 msgid "<0>Shift</0> <1>Enter</1> embed"
 msgstr "<0>Shift</0> <1>Enter</1> للتضمين"
@@ -5666,6 +5686,10 @@ msgstr "افتراضيات SQL المولدة"
 msgid "Import failed: {reason}"
 msgstr "فشل الاستيراد: {reason}"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} label"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "Timestamp format"
 msgstr "تنسيق الطابع الزمني"
@@ -5901,6 +5925,10 @@ msgstr "تم إرسال بريد إلكتروني لإعادة تعيين كلم
 msgid "Aggregation"
 msgstr "التجميع"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select column to sort by"
 msgstr "اختر العمود للفرز حسبه"
@@ -5992,6 +6020,10 @@ msgstr "تضمين"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "Nothing yet."
 msgstr "لا شيء حتى الآن."
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
+msgid "Class {classNumber}"
+msgstr ""
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6627,6 +6659,10 @@ msgstr "لا توجد مجموعات بيانات تطابق عامل التصف
 msgid "Curve"
 msgstr "منحنى"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold}% or above"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
@@ -6973,6 +7009,10 @@ msgstr "نقطة"
 msgid "kind"
 msgstr "نوع"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "Below {threshold}%"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "All changes saved"
 msgstr "تم حفظ جميع التغييرات"
@@ -7236,6 +7276,10 @@ msgstr "البريد الإلكتروني"
 msgid "Y axis tick color"
 msgstr "لون تدريجات المحور Y"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassRow.tsx
+msgid "Class {classNumber} color"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseOptionsBar/DatasetParseOptionsBar.tsx
 msgid "Process data again"
 msgstr "معالجة البيانات مرة أخرى"
@@ -7288,6 +7332,10 @@ msgstr "\"{operator}\" ليس عاملًا يفهمه هذا النموذج."
 #: src/components/layouts/AppSlate/AppToolbar/NavbarSidebarToggle/NavbarSidebarToggle.tsx
 msgid "Open sidebar"
 msgstr "فتح الشريط الجانبي"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Red to blue"
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
@@ -8095,6 +8143,10 @@ msgstr "اختر الأعمدة التي تريدها في هذا {conceptName}"
 msgid "Visualization Settings"
 msgstr "إعدادات التصويرية"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Threshold"
+msgstr ""
+
 #. placeholder {0}: options.numPreviewRows
 #. placeholder {0}: previewRows.length
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
@@ -8437,6 +8489,10 @@ msgstr "مرحبًا بك في مدير مصدر البيانات لديك. اخ
 msgid "Geometry unavailable"
 msgstr "الأشكال الهندسية غير متاحة"
 
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
+msgid "Custom colors"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar.tsx
 msgid "Use a link"
 msgstr "استخدم رابطًا"
@@ -8718,6 +8774,10 @@ msgstr "حجم الرمز {firstLabel}"
 #: src/routes/signin.tsx
 msgid "Don't have an account yet?"
 msgstr "لا تمتلك حسابًا بعد؟"
+
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
+msgid "{threshold} or above"
+msgstr ""
 
 #: src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx
 msgid "Dataset failed to load"
@@ -10294,6 +10354,7 @@ msgid "Please try again. Your dashboard is still published."
 msgstr "يرجى المحاولة مرة أخرى. لا تزال لوحة المعلومات منشورة."
 
 #: src/components/caseStatuses/useStatusColorLabels.ts
+#: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red"
 msgstr "أحمر"
 

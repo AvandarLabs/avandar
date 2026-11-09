@@ -53,6 +53,7 @@ export function PointAggregationControls({
       <PointInputControls
         layer={layer}
         binding={binding}
+        sourceColumns={sourceColumns}
         updatePoints={updatePoints}
       />
       <PointBoundaryControls

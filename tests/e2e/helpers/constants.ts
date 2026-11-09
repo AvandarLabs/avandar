@@ -206,6 +206,31 @@ export const GIS_DISPUTED_BOUNDARIES_CSV_PATH = path.join(
 /** Parsed row count of {@link GIS_DISPUTED_BOUNDARIES_CSV_PATH}. */
 export const GIS_DISPUTED_BOUNDARIES_ROW_COUNT = 4;
 
+/** Directory of the Parquet copies the threshold-colors spec seeds. */
+const GIS_THRESHOLD_COLORS_DATA_DIR = path.join(
+  process.cwd(),
+  "tests/data/gis-threshold-colors",
+);
+
+/**
+ * 25 Manhattan rows of NYC's Modified ZIP Code Tabulation Areas (MODZCTA):
+ * `modzcta` keys and WKT `the_geom` multipolygons.
+ */
+export const GIS_MODZCTA_MANHATTAN_PARQUET_PATH = path.join(
+  GIS_THRESHOLD_COLORS_DATA_DIR,
+  "modzcta-manhattan.parquet",
+);
+
+/**
+ * The 2024-2025 New York State School Immunization Survey rows inside
+ * {@link GIS_MODZCTA_MANHATTAN_PARQUET_PATH}: WKT `location` points and
+ * `percent_immunized_measles` stored as a fraction (0.95, not 95).
+ */
+export const GIS_SCHOOL_IMMUNIZATION_MANHATTAN_PARQUET_PATH = path.join(
+  GIS_THRESHOLD_COLORS_DATA_DIR,
+  "school-immunization-manhattan.parquet",
+);
+
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
   process.cwd(),
