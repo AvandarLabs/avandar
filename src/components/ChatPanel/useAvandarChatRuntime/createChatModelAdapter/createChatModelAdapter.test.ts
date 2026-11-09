@@ -134,6 +134,34 @@ async function _ask(adapter: ChatModelAdapter): Promise<unknown> {
   return run;
 }
 
+const CASE_INDIVIDUAL_ID = "33333333-3333-4333-8333-333333333333";
+
+/** A view-change line written before case ids were hidden from it. */
+const STORED_CASE_VIEW_LINE =
+  "[View changed: app=other; " +
+  `route=/acme/individual-manager/c1/${CASE_INDIVIDUAL_ID}; ` +
+  "dataset=none; dashboard=none]";
+
+/** Asks with an older case view-change line ahead of the question. */
+async function _askAfterStoredCaseView(
+  adapter: ChatModelAdapter,
+): Promise<unknown> {
+  return adapter.run({
+    messages: [
+      {
+        role: "user",
+        content: [{ type: "text", text: STORED_CASE_VIEW_LINE }],
+        metadata: { custom: { isViewChange: true } },
+      },
+      {
+        role: "user",
+        content: [{ type: "text", text: "How many cases?" }],
+        metadata: {},
+      },
+    ],
+  } as unknown as Parameters<ChatModelAdapter["run"]>[0]);
+}
+
 function _setNavigatorOnLine(isOnLine: boolean): void {
   vi.spyOn(navigator, "onLine", "get").mockReturnValue(isOnLine);
 }
@@ -169,6 +197,14 @@ describe("createChatModelAdapter", () => {
       content: [{ type: "text", text: "cloud reply" }],
     });
     expect(apiPostMock.mock.calls[0]![0].body).not.toHaveProperty("model");
+  });
+
+  it("keeps a stored case id out of today's chat request", async () => {
+    await _askAfterStoredCaseView(_createAdapter("dashboards"));
+
+    const sent = JSON.stringify(apiPostMock.mock.calls[0]![0].body.messages);
+    expect(sent).toContain("/acme/individual-manager/c1/<case>");
+    expect(sent).not.toContain(CASE_INDIVIDUAL_ID);
   });
 
   it("runs the offline data agent in the Data Explorer with offline mode on", async () => {
@@ -253,6 +289,13 @@ describe("createChatModelAdapter with the agent on", () => {
       expect(apiPostMock).not.toHaveBeenCalled();
     },
   );
+
+  it("keeps a stored case id out of the agent's messages", async () => {
+    await _askAfterStoredCaseView(_createAdapter("dashboards"));
+
+    const turn = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(JSON.stringify(turn.apiMessages)).not.toContain(CASE_INDIVIDUAL_ID);
+  });
 
   it("passes the page state to the agent", async () => {
     await _ask(

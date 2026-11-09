@@ -12,6 +12,25 @@ export type ChatViewSnapshot = {
 
 const CONTENT_PREFIX = "[View changed:";
 
+/**
+ * A case page's path up to its case type (`/individual-manager/<conceptId>/`),
+ * then the case's own id, which ends at the next `/`, `;`, `?`, `#`, space,
+ * or the end of the text.
+ */
+const CASE_ID_IN_ROUTE = /(\/individual-manager\/[^/;?#\s]+\/)[^/;?#\s]+/g;
+
+/** What a case's id becomes in a view-change line. */
+const HIDDEN_CASE_ID = "<case>";
+
+/**
+ * Text with every case page path's case id replaced by `<case>`, keeping
+ * the case type. A case's id is never shared with a model, and the case
+ * type is enough to say what kind of page is open.
+ */
+function _hideCaseIds(text: string): string {
+  return text.replace(CASE_ID_IN_ROUTE, `$1${HIDDEN_CASE_ID}`);
+}
+
 function _messageText(message: ThreadMessageLike): string {
   if (typeof message.content === "string") {
     return message.content;
@@ -89,9 +108,30 @@ export const ChatViewEvent = {
     );
   },
 
-  /** Formats a snapshot as a stable hidden view-change line. */
+  /**
+   * Formats a snapshot as a stable hidden view-change line. The line is
+   * sent to models, so a case page's case id is written as `<case>`. Two
+   * cases of one case type therefore format, and compare, the same.
+   */
   format: (snapshot: Readonly<ChatViewSnapshot>): string => {
-    return `[View changed: app=${snapshot.app}; route=${snapshot.route}; dataset=${snapshot.openDatasetId ?? "none"}; dashboard=${snapshot.dashboardId ?? "none"}]`;
+    const route = _hideCaseIds(snapshot.route);
+    const dataset = snapshot.openDatasetId ?? "none";
+    const dashboard = snapshot.dashboardId ?? "none";
+    return (
+      `[View changed: app=${snapshot.app}; route=${route}; ` +
+      `dataset=${dataset}; dashboard=${dashboard}]`
+    );
+  },
+
+  /**
+   * A thread message's text as a model should read it. A view-change line
+   * saved before `format` hid case ids gets its case id hidden here; any
+   * other text, including what the user typed, is returned as is.
+   */
+  toModelContent: (content: string): string => {
+    return ChatViewEvent.isViewChangeContent(content)
+      ? _hideCaseIds(content)
+      : content;
   },
 
   /** Converts a snapshot into an assistant-ui thread message. */

@@ -20,6 +20,21 @@ const DASHBOARD = ChatViewEvent.makeSnapshotFromPageContext({
   route: "/acme/dashboards/edit/11111111-1111-4111-8111-111111111111",
 });
 
+const CONCEPT_ID = "22222222-2222-4222-8222-222222222222";
+const INDIVIDUAL_ID = "33333333-3333-4333-8333-333333333333";
+const OTHER_INDIVIDUAL_ID = "44444444-4444-4444-8444-444444444444";
+
+/** A case page snapshot for one individual of the shared concept. */
+function _caseSnapshot(
+  individualId: string,
+  conceptId = CONCEPT_ID,
+): ReturnType<typeof ChatViewEvent.makeSnapshotFromPageContext> {
+  return ChatViewEvent.makeSnapshotFromPageContext({
+    pageContext: { app: "other" },
+    route: `/acme/individual-manager/${conceptId}/${individualId}`,
+  });
+}
+
 describe("ChatViewEvent", () => {
   it("omits live SQL and errors from the snapshot", () => {
     expect(EXPLORER).toEqual({
@@ -113,5 +128,73 @@ describe("ChatViewEvent", () => {
     });
     expect(next).toHaveLength(3);
     expect(next[2]?.content).toBe(ChatViewEvent.format(DASHBOARD));
+  });
+
+  it("hides the case id in a case route, keeping the case type", () => {
+    const line = ChatViewEvent.format(_caseSnapshot(INDIVIDUAL_ID));
+
+    expect(line).toBe(
+      "[View changed: app=other; " +
+        `route=/acme/individual-manager/${CONCEPT_ID}/<case>; ` +
+        "dataset=none; dashboard=none]",
+    );
+    expect(line).not.toContain(INDIVIDUAL_ID);
+  });
+
+  it("leaves a case type route without a case unchanged", () => {
+    const line = ChatViewEvent.format(
+      ChatViewEvent.makeSnapshotFromPageContext({
+        pageContext: { app: "other" },
+        route: `/acme/individual-manager/${CONCEPT_ID}`,
+      }),
+    );
+
+    expect(line).toContain(`route=/acme/individual-manager/${CONCEPT_ID};`);
+  });
+
+  it("dedupes case pages by case type, since the case id is hidden", () => {
+    const first = ChatViewEvent.applyToMessages({
+      messages: [],
+      snapshot: _caseSnapshot(INDIVIDUAL_ID),
+    });
+
+    expect(
+      ChatViewEvent.applyToMessages({
+        messages: first,
+        snapshot: _caseSnapshot(INDIVIDUAL_ID),
+      }),
+    ).toEqual(first);
+    expect(
+      ChatViewEvent.applyToMessages({
+        messages: first,
+        snapshot: _caseSnapshot(OTHER_INDIVIDUAL_ID),
+      }),
+    ).toEqual(first);
+    const otherType = ChatViewEvent.applyToMessages({
+      messages: first,
+      snapshot: _caseSnapshot(INDIVIDUAL_ID, "other-concept"),
+    });
+    expect(otherType).toHaveLength(1);
+    expect(otherType[0]?.content).toContain("other-concept/<case>");
+  });
+
+  it("hides the case id in a view-change line stored before the fix", () => {
+    const storedLine =
+      "[View changed: app=other; " +
+      `route=/acme/individual-manager/${CONCEPT_ID}/${INDIVIDUAL_ID}; ` +
+      "dataset=none; dashboard=none]";
+
+    expect(ChatViewEvent.toModelContent(storedLine)).toBe(
+      ChatViewEvent.format(_caseSnapshot(INDIVIDUAL_ID)),
+    );
+    expect(ChatViewEvent.toModelContent(ChatViewEvent.format(EXPLORER))).toBe(
+      ChatViewEvent.format(EXPLORER),
+    );
+  });
+
+  it("leaves typed user text alone", () => {
+    const typed = `Open /individual-manager/${CONCEPT_ID}/${INDIVIDUAL_ID}`;
+
+    expect(ChatViewEvent.toModelContent(typed)).toBe(typed);
   });
 });

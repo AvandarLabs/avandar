@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
+import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DataAgentDatasetCache } from "./DataAgentDatasetCache";
 import {
   askConversationDataAgent,
@@ -298,6 +299,29 @@ describe("askConversationDataAgent", () => {
       `${PAGE_BLOCK}\n\nEarlier in this conversation:\n` +
         "User: How many?\nAssistant: 42.\n\nAnd deaths?",
     );
+  });
+
+  it("leaves a case's id out of the recap", async () => {
+    const individualId = "33333333-3333-4333-8333-333333333333";
+    const caseView = ChatViewEvent.format({
+      app: "other",
+      route: `/acme/individual-manager/c1/${individualId}`,
+    });
+    const conversation = _fakeConversation();
+
+    await askConversationDataAgent({
+      conversations: new Map(),
+      turn: _turn([caseView, "42.", "And deaths?"]),
+      buildPageBlock: () => {
+        return PAGE_BLOCK;
+      },
+      createConversation: async () => {
+        return conversation;
+      },
+    });
+
+    expect(conversation.asked[0]).toContain("individual-manager/c1/<case>");
+    expect(conversation.asked[0]).not.toContain(individualId);
   });
 
   it("builds the page block from the conversation it asks", async () => {
