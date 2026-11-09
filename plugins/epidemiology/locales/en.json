@@ -1,0 +1,16 @@
+{
+  "plugin.name": "Epidemiology",
+  "plugin.description": "Statistical modeling tools for public-health data.",
+  "regression.linear.title": "Linear regression",
+  "modal.xColumn": "Predictor (X)",
+  "modal.yColumn": "Outcome (Y)",
+  "modal.fit": "Fit regression",
+  "modal.slope": "Slope",
+  "modal.intercept": "Intercept",
+  "modal.rSquared": "R²",
+  "modal.n": "Rows used",
+  "modal.notAvailable": "Not available",
+  "modal.truncated": "Fitted on the first {count, plural, one {# row} other {# rows}} of the result.",
+  "modal.notEnoughData": "Pick two different numeric columns with at least two rows where X varies.",
+  "modal.failed": "Could not read the result: {message}"
+}

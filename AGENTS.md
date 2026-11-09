@@ -14,6 +14,8 @@
 - How a view inside the slate is laid out (header band, content column,
   properties rail, section rhythm): `docs/design/app-view-layout.md`. Read it
   before building or restyling any app view.
+- How to write a bundled plugin (manifest, `when`, the `avandar` API, import
+  rules): `docs/plugin-authoring.md`.
 - If Context7 MCP is configured, use it to reference the most up-to-date
   documentation of any library when you need it.
 

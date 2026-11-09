@@ -1,12 +1,16 @@
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { lingui } from "@lingui/vite-plugin";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import { loadEnv } from "vite";
+import { loadEnv, runnerImport } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { VitePWA } from "vite-plugin-pwa";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { defaultExclude, defineConfig } from "vitest/config";
+import type * as VitePluginAvaPluginsModule from "./scripts/vite-plugin-ava-plugins/vitePluginAvaPlugins";
+import type { ViteUserConfig } from "vitest/config";
 
 // Read rather than import package.json so this does not depend on
 // `resolveJsonModule` being enabled in the Node-side tsconfig. Exposed to the
@@ -31,8 +35,32 @@ const reactWithLinguiMacro = () => {
   });
 };
 
+// Loads `vitePluginAvaPlugins` through Vite's module runner rather than a
+// static import. Vite bundles this file with esbuild and leaves every bare
+// import external, so a static import would have Node load the
+// `@avandar/plugin-manifest` source directly and fail on its
+// `@plugin-manifest/...` path aliases. The module runner resolves them with
+// `vite-tsconfig-paths`. Only call it outside test mode, where the plugin is
+// not registered. `runnerImport` is marked experimental in Vite 7, so its
+// behavior may change in a minor release. The plugin is loaded once when the
+// config is read, so editing the plugin's own source
+// (`vitePluginAvaPlugins.ts` or `@avandar/plugin-manifest`) while `pnpm dev`
+// runs needs a manual dev server restart.
+const loadVitePluginAvaPlugins = async () => {
+  const { module } = await runnerImport<typeof VitePluginAvaPluginsModule>(
+    join(
+      import.meta.dirname,
+      "scripts/vite-plugin-ava-plugins/vitePluginAvaPlugins.ts",
+    ),
+    { root: import.meta.dirname, plugins: [tsconfigPaths()] },
+  );
+  return module.vitePluginAvaPlugins;
+};
+
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+// The explicit return type keeps literal types such as `worker.format`, which
+// an async function would otherwise widen to `string`.
+export default defineConfig(async ({ mode }): Promise<ViteUserConfig> => {
   const env = loadEnv(mode, process.cwd(), "");
   const supabaseApiUrl = env.VITE_SUPABASE_API_URL ?? "";
 
@@ -83,6 +111,9 @@ export default defineConfig(({ mode }) => {
               semicolons: true,
               routesDirectory: "src/routes",
               generatedRouteTree: "src/routeTree.gen.ts",
+            }),
+            (await loadVitePluginAvaPlugins())({
+              isBundleCheckEnabled: process.env.AVA_PLUGIN_BUNDLE_CHECK === "1",
             }),
             reactWithLinguiMacro(),
             lingui(),
@@ -201,6 +232,8 @@ export default defineConfig(({ mode }) => {
           ? {
               "virtual:pwa-register":
                 "/src/test-utils/virtualPwaRegisterStub.ts",
+              "virtual:ava-plugin-index":
+                "/src/test-utils/virtualAvaPluginIndexStub.ts",
             }
           : {}),
         "@": "/src",
@@ -214,6 +247,9 @@ export default defineConfig(({ mode }) => {
         "@hooks": "/packages/web/hooks/src",
         "@query-hooks": "/packages/web/query-hooks/src",
         "@browser-utils": "/packages/web/browser-utils/src",
+        "@plugin-manifest": "/packages/shared/plugin-manifest/src",
+        "@plugin-sdk": "/packages/web/plugin-sdk/src",
+        "@plugin-ui": "/packages/web/plugin-ui/src",
         "@sbfn": "/supabase/functions",
       },
     },
