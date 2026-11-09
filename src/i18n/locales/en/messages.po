@@ -4468,6 +4468,14 @@ msgstr "Google is rate limiting this request"
 msgid "Plan Features:"
 msgstr "Plan Features:"
 
+#: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
+msgid "Choose Aggregate only when the layer holds protection or health data "
+"that must not be mapped to a household. Displace is unavailable because "
+"it only works for layers that show points."
+msgstr "Choose Aggregate only when the layer holds protection or health data "
+"that must not be mapped to a household. Displace is unavailable because "
+"it only works for layers that show points."
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerVisibilityButton.tsx
 msgid "Hide the layer {layerName}"
 msgstr "Hide the layer {layerName}"
@@ -4544,6 +4552,13 @@ msgstr "Draft case type"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Import one tab of a spreadsheet in your Google Drive"
 msgstr "Import one tab of a spreadsheet in your Google Drive"
+
+#. placeholder {0}: error.layerName ?? ""
+#: src/views/GisApp/panels/MapStatusCard/MapErrorStatus.tsx
+msgid "Layer {0} is set to Displace, which only works for points. Choose "
+"another handling option in its Sensitivity settings."
+msgstr "Layer {0} is set to Displace, which only works for points. Choose "
+"another handling option in its Sensitivity settings."
 
 #. placeholder {0}: error.message
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx

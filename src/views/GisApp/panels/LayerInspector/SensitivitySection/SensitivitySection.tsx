@@ -10,6 +10,17 @@ import type { ReactNode } from "react";
 
 type Props = { layer: MapLayer.T; onLayerChange: LayerChangeHandler };
 
+/**
+ * True unless the layer draws lines or polygons straight from a geometry
+ * column, which cannot be displaced point by point.
+ */
+function _canDisplace(layer: MapLayer.T): boolean {
+  return (
+    layer.geoBinding?.type !== "geometryColumn" ||
+    layer.geoBinding.family === "point"
+  );
+}
+
 /** Renders the layer's spatial sensitivity policy controls. */
 export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
   const { t } = useLingui();
@@ -27,7 +38,11 @@ export function SensitivitySection({ layer, onLayerChange }: Props): ReactNode {
     .exhaustive();
   return (
     <InspectorSection title={t`Sensitivity`} note={note}>
-      <SensitivityModeSelect {...{ sensitivity, onLayerChange }} />
+      <SensitivityModeSelect
+        sensitivity={sensitivity}
+        isDisplaceAvailable={_canDisplace(layer)}
+        onLayerChange={onLayerChange}
+      />
       {sensitivity.mode === "jitter" ? (
         <JitterSensitivityControl {...{ sensitivity, onLayerChange }} />
       ) : null}

@@ -4,6 +4,7 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { renderHook, waitFor } from "@/test-utils";
+import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
   createQueryableLayer,
   createSpatialLayer,
@@ -450,6 +451,114 @@ describe("useMapLayersData", () => {
       workspaceId,
     });
     expect(runStructuredQueryWithMetadataMock).not.toHaveBeenCalled();
+  });
+
+  it("never returns the exact positions of a jitter-mode WKT point layer", async () => {
+    const layer: MapLayer.Standard = {
+      ...createSpatialLayer(),
+      sensitivity: { mode: "jitter", radiusMeters: 500 },
+    };
+    const exactPosition = [15.2663, -4.4419];
+    runSpatialQueryMock.mockResolvedValue({
+      id: uuid<QueryResult.Id>(),
+      columns: [],
+      numRows: 1,
+      data: [
+        {
+          __avandar_feature_collection: {
+            type: "FeatureCollection",
+            features: [
+              {
+                type: "Feature",
+                geometry: { type: "Point", coordinates: exactPosition },
+                properties: {},
+              },
+            ],
+          },
+          __avandar_diagnostics: {
+            sourceCount: 1,
+            parsedCount: 1,
+            invalidCount: 0,
+            observedFamilies: ["point"],
+            hasMixedFamilies: false,
+          },
+        },
+      ],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data?.type).toBe("spatial");
+    });
+    const data = result.current.get(layer.id)?.data;
+    const geometry =
+      data?.type === "spatial"
+        ? data.featureCollection.features[0]?.geometry
+        : undefined;
+    expect(geometry?.type).toBe("Point");
+    expect(geometry?.type === "Point" && geometry.coordinates).not.toEqual(
+      exactPosition,
+    );
+  });
+
+  it("fails a jitter-mode WKT polygon layer with a sensitivity violation", async () => {
+    const spatialLayer = createSpatialLayer();
+    if (spatialLayer.geoBinding?.type !== "geometryColumn") {
+      throw new Error("Expected a geometry-column layer");
+    }
+    const layer: MapLayer.Standard = {
+      ...spatialLayer,
+      geoBinding: { ...spatialLayer.geoBinding, family: "polygon" },
+      sensitivity: { mode: "jitter", radiusMeters: 500 },
+    };
+    runSpatialQueryMock.mockResolvedValue({
+      id: uuid<QueryResult.Id>(),
+      columns: [],
+      numRows: 1,
+      data: [
+        {
+          __avandar_feature_collection: {
+            type: "FeatureCollection",
+            features: [],
+          },
+          __avandar_diagnostics: {
+            sourceCount: 0,
+            parsedCount: 0,
+            invalidCount: 0,
+            observedFamilies: [],
+            hasMixedFamilies: false,
+          },
+        },
+      ],
+    });
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          layers: [layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.error).toBeInstanceOf(
+        SensitivityViolationError,
+      );
+    });
+    expect(result.current.get(layer.id)?.data).toBeUndefined();
   });
 
   it("reports unavailable Spatial for lat/lng when an aoi is applied", () => {
