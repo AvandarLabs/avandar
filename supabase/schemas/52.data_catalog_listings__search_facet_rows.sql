@@ -6,7 +6,10 @@
  *
  * Matching and filtering are `data_catalog_listings__search_matches`'s, so
  * these counts always agree with the pages `rpc_data_catalog_listings__search`
- * returns for the same arguments.
+ * returns for the same arguments. The matches are read once: each facet is a
+ * grouping set of one aggregation, and topics and keywords are grouped by a
+ * listing's whole list before the lists are split, so a blank search over the
+ * whole catalog is one pass rather than one per facet.
  *
  * Facets:
  *
@@ -28,9 +31,11 @@
  * 0. A listing counts once under each of its topics, even when its source
  * repeats one.
  *
- * `tag`: one row per keyword with matches, plus each chosen keyword even at
- * 0. A listing counts once under each of its keywords, even when its source
- * repeats one.
+ * `tag`: one row for each of the 50 keywords with the most matches, plus
+ * each chosen keyword with its count, even at 0. A listing counts once under
+ * each of its keywords, even when its source repeats one. Keywords run to
+ * thousands, so the rest are found by
+ * `rpc_data_catalog_listings__search_tag_options`.
  *
  * `updated_within`: one row per window (`any`, `past_month`, `past_year`,
  * `over_a_year`). The windows are cumulative.
@@ -72,9 +77,117 @@ create or replace function public.data_catalog_listings__search_facet_rows (
   listing_count bigint
 ) as $$
   with
-    match as (
+    facet_group as (
       select
-        *
+        grouping(match.organization1_name) = 0 as is_source_group,
+        grouping(match.file_format) = 0 as is_format_group,
+        grouping(match.organization2_name) = 0 as is_organization2_group,
+        grouping(drive.organization2_label) = 0 as is_organization2_label_group,
+        grouping(match.domains) = 0 as is_domain_group,
+        grouping(match.tags) = 0 as is_tag_group,
+        match.organization1_name,
+        match.file_format,
+        match.organization2_name,
+        drive.organization2_label,
+        match.domains,
+        match.tags,
+        count(*) filter (
+          where
+            match.passes_format and
+            match.passes_updated and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag
+        ) as num_source_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_updated and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag
+        ) as num_format_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_updated and
+            match.passes_loadable and
+            match.passes_domain and
+            match.passes_tag
+        ) as num_organization2_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_updated and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_tag
+        ) as num_domain_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_updated and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain
+        ) as num_tag_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag
+        ) as num_updated_any_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag and
+            public.data_catalog_listings__is_updated_within (match.last_updated_at, 'past_month')
+        ) as num_updated_past_month_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag and
+            public.data_catalog_listings__is_updated_within (match.last_updated_at, 'past_year')
+        ) as num_updated_past_year_matches,
+        count(*) filter (
+          where
+            match.passes_source and
+            match.passes_format and
+            match.passes_loadable and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag and
+            public.data_catalog_listings__is_updated_within (match.last_updated_at, 'over_a_year')
+        ) as num_updated_over_a_year_matches,
+        count(*) filter (
+          where
+            (
+              not match.is_workspace_loadable or
+              match.is_invalid
+            ) and
+            match.passes_source and
+            match.passes_format and
+            match.passes_updated and
+            match.passes_organization2 and
+            match.passes_domain and
+            match.passes_tag
+        ) as num_unloadable_matches
       from
         public.data_catalog_listings__search_matches (
           p_query,
@@ -85,24 +198,73 @@ create or replace function public.data_catalog_listings__search_facet_rows (
           p_organization2_names,
           p_domains,
           p_tags
+        ) as match
+        left join public.data_catalog_drives drive on drive.id = match.drive_id and
+        match.organization2_name is not null
+      group by
+        grouping sets (
+          (match.organization1_name),
+          (match.file_format),
+          (match.organization2_name),
+          (drive.organization2_label),
+          (match.domains),
+          (match.tags),
+          ()
         )
+    ),
+    total_group as (
+      select
+        *
+      from
+        facet_group
+      where
+        not facet_group.is_source_group and
+        not facet_group.is_format_group and
+        not facet_group.is_organization2_group and
+        not facet_group.is_organization2_label_group and
+        not facet_group.is_domain_group and
+        not facet_group.is_tag_group
+    ),
+    domain_count as (
+      select
+        listing_domain.value,
+        sum(facet_group.num_domain_matches)::bigint as listing_count
+      from
+        facet_group
+        cross join lateral (
+          select distinct
+            unnest(facet_group.domains)
+        ) as listing_domain (value)
+      where
+        facet_group.is_domain_group
+      group by
+        listing_domain.value
+    ),
+    tag_count as (
+      select
+        listing_tag.value,
+        sum(facet_group.num_tag_matches)::bigint as listing_count
+      from
+        facet_group
+        cross join lateral (
+          select distinct
+            unnest(facet_group.tags)
+        ) as listing_tag (value)
+      where
+        facet_group.is_tag_group
+      group by
+        listing_tag.value
     ),
     facet_counts as (
       select
         'source' as facet,
-        match.organization1_name as value,
-        count(*) as listing_count
+        facet_group.organization1_name as value,
+        facet_group.num_source_matches as listing_count
       from
-        match
+        facet_group
       where
-        match.passes_format and
-        match.passes_updated and
-        match.passes_loadable and
-        match.passes_organization2 and
-        match.passes_domain and
-        match.passes_tag
-      group by
-        match.organization1_name
+        facet_group.is_source_group and
+        facet_group.num_source_matches > 0
       union all
       select
         'source',
@@ -113,20 +275,14 @@ create or replace function public.data_catalog_listings__search_facet_rows (
       union all
       select
         'format',
-        match.file_format,
-        count(*)
+        facet_group.file_format,
+        facet_group.num_format_matches
       from
-        match
+        facet_group
       where
-        match.file_format is not null and
-        match.passes_source and
-        match.passes_updated and
-        match.passes_loadable and
-        match.passes_organization2 and
-        match.passes_domain and
-        match.passes_tag
-      group by
-        match.file_format
+        facet_group.is_format_group and
+        facet_group.file_format is not null and
+        facet_group.num_format_matches > 0
       union all
       select
         'format',
@@ -137,20 +293,14 @@ create or replace function public.data_catalog_listings__search_facet_rows (
       union all
       select
         'organization2',
-        match.organization2_name,
-        count(*)
+        facet_group.organization2_name,
+        facet_group.num_organization2_matches
       from
-        match
+        facet_group
       where
-        match.organization2_name is not null and
-        match.passes_source and
-        match.passes_format and
-        match.passes_updated and
-        match.passes_loadable and
-        match.passes_domain and
-        match.passes_tag
-      group by
-        match.organization2_name
+        facet_group.is_organization2_group and
+        facet_group.organization2_name is not null and
+        facet_group.num_organization2_matches > 0
       union all
       select
         'organization2',
@@ -161,39 +311,23 @@ create or replace function public.data_catalog_listings__search_facet_rows (
       union all
       select
         'organization2_label',
-        drive.organization2_label,
-        count(*)
+        facet_group.organization2_label,
+        facet_group.num_organization2_matches
       from
-        match
-        join public.data_catalog_drives drive on drive.id = match.drive_id
+        facet_group
       where
-        drive.organization2_label is not null and
-        match.organization2_name is not null and
-        match.passes_source and
-        match.passes_format and
-        match.passes_updated and
-        match.passes_loadable and
-        match.passes_domain and
-        match.passes_tag
-      group by
-        drive.organization2_label
+        facet_group.is_organization2_label_group and
+        facet_group.organization2_label is not null and
+        facet_group.num_organization2_matches > 0
       union all
       select
         'domain',
-        listing_domain.value,
-        count(distinct match.id)
+        domain_count.value,
+        domain_count.listing_count
       from
-        match
-        cross join unnest(match.domains) as listing_domain (value)
+        domain_count
       where
-        match.passes_source and
-        match.passes_format and
-        match.passes_updated and
-        match.passes_loadable and
-        match.passes_organization2 and
-        match.passes_tag
-      group by
-        listing_domain.value
+        domain_count.listing_count > 0
       union all
       select
         'domain',
@@ -202,22 +336,30 @@ create or replace function public.data_catalog_listings__search_facet_rows (
       from
         unnest(coalesce(p_domains, '{}')) as chosen (value)
       union all
+      (
+        select
+          'tag',
+          tag_count.value,
+          tag_count.listing_count
+        from
+          tag_count
+        where
+          tag_count.listing_count > 0
+        order by
+          tag_count.listing_count desc,
+          tag_count.value
+        limit
+          50
+      )
+      union all
       select
         'tag',
-        listing_tag.value,
-        count(distinct match.id)
+        tag_count.value,
+        tag_count.listing_count
       from
-        match
-        cross join unnest(match.tags) as listing_tag (value)
+        tag_count
       where
-        match.passes_source and
-        match.passes_format and
-        match.passes_updated and
-        match.passes_loadable and
-        match.passes_organization2 and
-        match.passes_domain
-      group by
-        listing_tag.value
+        tag_count.value = any (coalesce(p_tags, '{}'))
       union all
       select
         'tag',
@@ -229,36 +371,23 @@ create or replace function public.data_catalog_listings__search_facet_rows (
       select
         'updated_within',
         update_window.name,
-        count(match.id)
+        update_window.listing_count
       from
-        unnest(array['any', 'past_month', 'past_year', 'over_a_year']) as update_window (name)
-        left join match on match.passes_source and
-        match.passes_format and
-        match.passes_loadable and
-        match.passes_organization2 and
-        match.passes_domain and
-        match.passes_tag and
-        public.data_catalog_listings__is_updated_within (match.last_updated_at, update_window.name)
-      group by
-        update_window.name
+        total_group
+        cross join lateral (
+          values
+            ('any', total_group.num_updated_any_matches),
+            ('past_month', total_group.num_updated_past_month_matches),
+            ('past_year', total_group.num_updated_past_year_matches),
+            ('over_a_year', total_group.num_updated_over_a_year_matches)
+        ) as update_window (name, listing_count)
       union all
       select
         'unloadable',
         null,
-        count(*)
+        total_group.num_unloadable_matches
       from
-        match
-      where
-        (
-          not match.is_workspace_loadable or
-          match.is_invalid
-        ) and
-        match.passes_source and
-        match.passes_format and
-        match.passes_updated and
-        match.passes_organization2 and
-        match.passes_domain and
-        match.passes_tag
+        total_group
       union all
       select
         'catalog',

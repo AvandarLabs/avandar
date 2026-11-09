@@ -360,7 +360,7 @@ as the existing facets are:
 | `organization2` | A level-2 organization | Rows passing every filter except `passes_organization2` |
 | `organization2_label` | A level-2 label from `data_catalog_drives`, via `drive_id` | The same rows as `organization2` |
 | `domain` | One element of `domains` | Rows passing every filter except `passes_domain` |
-| `tag` | One element of `tags` | Rows passing every filter except `passes_tag` |
+| `tag` | One element of `tags`: only the 50 with the most rows, plus each chosen keyword | Rows passing every filter except `passes_tag` |
 
 The existing `source` facet is the level-1 facet.
 
@@ -411,9 +411,12 @@ The rail's order becomes: search, **Publisher**, the second-level filter,
   with " or " ("Agency", or "Agency or Department" when the chosen
   publishers' portals disagree). Unchoosing every publisher clears it.
 - **Topic** is a multi-choice facet over `domain`.
-- **Keywords** is a multi-choice facet over `tags`. A user can also add a
-  keyword by clicking it on a listing (section 7.3), which chooses it in this
-  facet.
+- **Keywords** is a multi-choice facet over `tags`. It offers the 50
+  keywords with the most matches until the user types into it, then the 50
+  best matches from `rpc_data_catalog_listings__search_tag_options`, so the
+  thousands of keywords are never sent at once. A user can also add a keyword
+  by clicking it on a listing (section 7.3), which chooses it in this facet.
+  Performance notes: `catalog-search-performance.md`.
 - Publisher, the second level, Topic, Keywords, and Format all reuse
   `DataCatalogFacetSelect`: a searchable combobox, since a facet can grow to
   hundreds of publishers or topics. Typing narrows the options by every

@@ -1443,12 +1443,11 @@ rejects the new listing shape, so the catalog would not load.
   selected, which can empty the list.
 - No automated test runs the mapper loader under Bun. It was verified
   manually.
-- The facet RPC with nothing searched took 5.2s on the demo catalog (196k
-  listings) on 2026-11-08, before the keyword facet, which adds about 1s.
-  `authenticated` has an 8s `statement_timeout`, and a timed-out facet call
-  leaves the rail with no facets. With nothing searched it also returns
-  every keyword (6,443 on demo) on each filter change. Consider caching the
-  blank-search counts or capping the keyword options.
+- An unsearched catalog is still slow on demo: about 3.4s for the facet
+  counts, 2.7s for the first page, and 3.1s per keyword search, against an
+  8s `statement_timeout`. `docs/measles-demo/catalog-search-performance.md`
+  (goes with F9) measures why and lists the optimizations held back, with
+  their trade-offs.
 
 ---
 

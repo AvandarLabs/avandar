@@ -56,6 +56,7 @@ import { requestParquetCopyForAdding } from "@/views/DataManagerApp/DataImportVi
 import { useActiveCatalogFilters } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useActiveCatalogFilters/useActiveCatalogFilters";
 import { useCatalogListingPreview } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useCatalogListingPreview/useCatalogListingPreview";
 import { useDataCatalogFacets } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogFacets";
+import { useDataCatalogKeywordOptions } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogKeywordOptions";
 import { useDataCatalogSearch } from "@/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogSearch/useDataCatalogSearch";
 import {
   useColumnTypeVerificationStatus,
@@ -140,6 +141,12 @@ export function DataCatalogView({
     sortBy,
   });
   const facets = useDataCatalogFacets({ query: debouncedSearch, filters });
+  const { keywordOptions, onKeywordSearchChange } =
+    useDataCatalogKeywordOptions({
+      query: debouncedSearch,
+      filters,
+      topKeywords: facets?.tags ?? EMPTY_CATALOG_FACETS.tags,
+    });
   const isLoadingCatalog = catalogSearch.isLoading;
   const changeFilters = (nextFilters: CatalogListingFilters): void => {
     setFilters(settleCatalogListingFilters(nextFilters));
@@ -381,7 +388,9 @@ export function DataCatalogView({
       onSearchChange={setSearch}
       filters={filters}
       facets={facets ?? EMPTY_CATALOG_FACETS}
+      keywordOptions={keywordOptions}
       onFiltersChange={changeFilters}
+      onKeywordSearchChange={onKeywordSearchChange}
     />
   );
 

@@ -18,6 +18,7 @@ import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatal
 import { DataCatalogOrganization2Facet } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet";
 import { DataCatalogUpdatedWithinSelect } from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect";
 import type {
+  CatalogFacetOption,
   CatalogFacets,
   CatalogListingFilters,
 } from "@/views/DataManagerApp/DataImportView/DataCatalogView/catalogListingFilters/catalogListingFilters";
@@ -28,7 +29,16 @@ type Props = {
   onSearchChange: (search: string) => void;
   filters: Readonly<CatalogListingFilters>;
   facets: Readonly<CatalogFacets>;
+
+  /**
+   * The keywords Keywords offers: the top keywords from `facets` until the
+   * user searches there, then the keywords that search found.
+   */
+  keywordOptions: readonly CatalogFacetOption[];
   onFiltersChange: (filters: CatalogListingFilters) => void;
+
+  /** Called with what the user types into Keywords. */
+  onKeywordSearchChange: (keywordSearch: string) => void;
 };
 
 /**
@@ -42,7 +52,9 @@ export function DataCatalogFilterRail({
   onSearchChange,
   filters,
   facets,
+  keywordOptions,
   onFiltersChange,
+  onKeywordSearchChange,
 }: Props): ReactNode {
   const { t } = useLingui();
 
@@ -103,8 +115,9 @@ export function DataCatalogFilterRail({
         <DataCatalogFacetSelect
           label={t`Keywords`}
           placeholder={t`All keywords`}
-          options={facets.tags}
+          options={keywordOptions}
           chosenValues={filters.tags}
+          onSearchChange={onKeywordSearchChange}
           onChange={(tags) => {
             onFiltersChange({ ...filters, tags });
           }}

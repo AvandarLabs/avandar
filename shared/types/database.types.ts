@@ -2942,6 +2942,23 @@ export type Database = {
         }
         Returns: Json
       }
+      rpc_data_catalog_listings__search_tag_options: {
+        Args: {
+          p_domains?: string[]
+          p_formats?: string[]
+          p_is_loadable_only?: boolean
+          p_organization2_names?: string[]
+          p_query: string
+          p_sources?: string[]
+          p_tag_search: string
+          p_tags?: string[]
+          p_updated_within?: string
+        }
+        Returns: {
+          listing_count: number
+          value: string
+        }[]
+      }
       rpc_data_catalog_listings__upsert_with_relation_columns: {
         Args: { p_listings: Json }
         Returns: string[]
