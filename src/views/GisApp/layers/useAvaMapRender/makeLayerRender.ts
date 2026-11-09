@@ -151,20 +151,23 @@ export function makeLayerRender({
     geometryCache,
     isAggregated,
   });
-  const { geometry, legendUpdate } = classifyLayerGeometry({
+  const { geometry, legendUpdate, valueDomain } = classifyLayerGeometry({
     layer,
     geometry: rawGeometry,
     hasQueryData: queryState?.data !== undefined,
   });
-  const viewState = makeLayerViewState({
-    layer,
-    hasBinding: layer.geoBinding !== undefined,
-    geometry,
-    queryState,
-    audit:
-      queryState?.data?.type === "rows" ? queryState.data.audit : undefined,
-    aggregation,
-  });
+  const viewState: MapLayerViewState = {
+    ...makeLayerViewState({
+      layer,
+      hasBinding: layer.geoBinding !== undefined,
+      geometry,
+      queryState,
+      audit:
+        queryState?.data?.type === "rows" ? queryState.data.audit : undefined,
+      aggregation,
+    }),
+    classifiedValueDomain: valueDomain,
+  };
   const isRendered = layer.isVisible && viewState.status === "ready";
   return {
     layerId: layer.id,

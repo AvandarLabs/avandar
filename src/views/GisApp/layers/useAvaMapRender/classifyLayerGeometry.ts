@@ -13,12 +13,14 @@ import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLege
 type ClassifiedGeometry = {
   geometry: LayerGeometry;
   legendUpdate: LayerLegendUpdate | undefined;
+  valueDomain: readonly [number, number] | undefined;
 };
 
 type LegendClassification = {
   breaks: readonly MapLayer.LegendBreak[];
   classIndexByFeatureId: ReadonlyMap<string, number>;
   entries: readonly MapLayer.LegendEntry[];
+  valueDomain: readonly [number, number] | undefined;
 };
 
 const SIZE_LABEL_FORMATTER = new Intl.NumberFormat(undefined, {
@@ -119,7 +121,12 @@ function _classifyCategories(options: {
   if (noDataCount > 0) {
     entries.push({ type: "noData", ...color.noData, count: noDataCount });
   }
-  return { breaks: [], classIndexByFeatureId: classIndexes, entries };
+  return {
+    breaks: [],
+    classIndexByFeatureId: classIndexes,
+    entries,
+    valueDomain: undefined,
+  };
 }
 
 function _makeClassifiedFeatures(options: {
@@ -175,11 +182,21 @@ function _classifyLegend(options: {
 }): LegendClassification {
   const { layer, features } = options;
   if (layer.symbology.type === "heatmap") {
-    return { breaks: [], classIndexByFeatureId: new Map(), entries: [] };
+    return {
+      breaks: [],
+      classIndexByFeatureId: new Map(),
+      entries: [],
+      valueDomain: undefined,
+    };
   }
   const color = layer.symbology.color;
   if (color.type === "single") {
-    return { breaks: [], classIndexByFeatureId: new Map(), entries: [] };
+    return {
+      breaks: [],
+      classIndexByFeatureId: new Map(),
+      entries: [],
+      valueDomain: undefined,
+    };
   }
   return color.type === "categorical"
     ? _classifyCategories({ layer, features, color })
@@ -237,7 +254,7 @@ export function classifyLayerGeometry(options: {
 }): ClassifiedGeometry {
   const { layer, geometry, hasQueryData } = options;
   if (!hasQueryData) {
-    return { geometry, legendUpdate: undefined };
+    return { geometry, legendUpdate: undefined, valueDomain: undefined };
   }
   const reportableFeatures = _getReportableFeatures(
     geometry.featureCollection.features,
@@ -269,5 +286,6 @@ export function classifyLayerGeometry(options: {
       }),
       sizeStops: _makeSizeStops({ layer, features: reportableFeatures }),
     },
+    valueDomain: classification.valueDomain,
   };
 }
