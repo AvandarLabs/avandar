@@ -93,6 +93,25 @@ describe("placeDraftReducer", () => {
     });
   });
 
+  it("keeps the typed values when the user changes the location", () => {
+    const editing = placeDraftReducer(undefined, {
+      type: "startEdit",
+      datasetId: DATASET_ID,
+      row: ROW,
+    });
+    const typed = {
+      name: "Typed name",
+      address: "",
+      startsAt: "",
+      endsAt: "",
+      notes: "Typed notes",
+    };
+    expect(
+      placeDraftReducer(editing, { type: "clearCoordinate", values: typed })
+        ?.values,
+    ).toEqual(typed);
+  });
+
   it("forgets the location when the user changes it", () => {
     const editing = placeDraftReducer(undefined, {
       type: "startEdit",
@@ -100,7 +119,10 @@ describe("placeDraftReducer", () => {
       row: ROW,
     });
     expect(
-      placeDraftReducer(editing, { type: "clearCoordinate" })?.coordinate,
+      placeDraftReducer(editing, {
+        type: "clearCoordinate",
+        values: editing!.values,
+      })?.coordinate,
     ).toBeUndefined();
   });
 

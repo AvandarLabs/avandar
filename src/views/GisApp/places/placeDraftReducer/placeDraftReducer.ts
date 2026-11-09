@@ -1,7 +1,10 @@
 import { match } from "ts-pattern";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PlaceCoordinate, PlaceRow } from "@/clients/places/places.types";
-import type { PlaceDraft } from "@/views/GisApp/places/PlaceTool.types";
+import type {
+  PlaceDraft,
+  PlaceDraftValues,
+} from "@/views/GisApp/places/PlaceTool.types";
 
 /** Every change the tool, map, Go-to box, or inspector makes to a draft. */
 export type PlaceDraftAction =
@@ -10,7 +13,7 @@ export type PlaceDraftAction =
   | { type: "startMove"; datasetId: Dataset.Id; row: PlaceRow }
   | { type: "pickCoordinate"; coordinate: PlaceCoordinate }
   | { type: "pickSearchResult"; coordinate: PlaceCoordinate; address: string }
-  | { type: "clearCoordinate" }
+  | { type: "clearCoordinate"; values: PlaceDraftValues }
   | { type: "close" };
 
 function _createNewDraft(): PlaceDraft {
@@ -79,8 +82,10 @@ export function placeDraftReducer(
         isAddressFromSearch: true,
       };
     })
-    .with({ type: "clearCoordinate" }, () => {
-      return draft ? { ...draft, coordinate: undefined } : draft;
+    .with({ type: "clearCoordinate" }, (clear) => {
+      return draft
+        ? { ...draft, coordinate: undefined, values: clear.values }
+        : draft;
     })
     .with({ type: "close" }, () => {
       return undefined;

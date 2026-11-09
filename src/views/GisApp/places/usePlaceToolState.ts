@@ -26,8 +26,8 @@ export function usePlaceToolState(): PlaceToolState {
       onSearchResultPicked: (options) => {
         dispatch({ type: "pickSearchResult", ...options });
       },
-      clearCoordinate: () => {
-        dispatch({ type: "clearCoordinate" });
+      clearCoordinate: (values) => {
+        dispatch({ type: "clearCoordinate", values });
       },
       close: () => {
         dispatch({ type: "close" });

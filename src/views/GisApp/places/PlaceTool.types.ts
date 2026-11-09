@@ -40,7 +40,9 @@ export type PlaceToolState = {
     coordinate: PlaceCoordinate;
     address: string;
   }) => void;
-  clearCoordinate: () => void;
+
+  /** Forgets the location but keeps the values typed so far. */
+  clearCoordinate: (values: PlaceDraftValues) => void;
   close: () => void;
 };
 

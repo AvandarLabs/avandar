@@ -22,7 +22,7 @@ type Props = {
   draft: PlaceDraft;
   coordinate: PlaceCoordinate;
   isSaving: boolean;
-  onChangeLocation: () => void;
+  onChangeLocation: (values: PlaceDraftValues) => void;
   onSubmit: (input: PlaceInput) => void;
 };
 
@@ -77,7 +77,9 @@ export function PlaceForm({
             size="compact-xs"
             variant="subtle"
             color="neutral"
-            onClick={onChangeLocation}
+            onClick={() => {
+              onChangeLocation(form.getValues());
+            }}
           >
             {t`Change location`}
           </Button>
