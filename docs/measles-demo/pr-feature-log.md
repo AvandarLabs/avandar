@@ -1490,9 +1490,10 @@ workspace dataset's Metadata tab still shows its preview.
 ## F25: Cached Parquet copies of ODC listings
 
 Status: in progress. The pipeline server builds copies on request through
-`POST /open-data-cache/:catalogListingId/build`; nothing requests or reads
-them yet (the edge route and the app's readers are still to come, see the
-spec's slices).
+`POST /open-data-cache/:catalogListingId/build`, and the `open-data` edge
+function requests them through
+`POST /data-catalog-listings/:id/parquet-cache`. Nothing in the app reads
+them yet (see the spec's slices).
 
 **Purpose:** An API-backed Open Data Catalog (ODC) listing is relayed whole
 through the `open-data` edge function, capped at 25 MB, on every load. The
@@ -1532,6 +1533,7 @@ added to a workspace and load from Storage instead of the source.
 | `513873f61` | fix(pipeline-server): hoist DuckDB in the image, and fail the build if it cannot resolve | All of it. Merged in `7e428d400`. |
 | `3ca228aae` | feat(pipeline-server): build ODC listings' Parquet copies on request | All of it. Merged in `42754c16c`. |
 | `e86a92b21` | feat(pipeline-server): keep a listing's columns when its copy shares none of them | All of it, including the P6.11 roadmap item. Merged in `42754c16c`. |
+| `b1c3a196b` | feat(open-data): request an ODC listing's Parquet copy from the pipeline server | All of it. Merged in `3600d91d9`. |
 
 **Files:** `apps/pipeline-server/src/openDataParquetCache/`,
 `apps/pipeline-server/pipelines/socrata/download/`,
@@ -1546,7 +1548,12 @@ entry, `.dockerignore`, `.env.pipeline-server.prod.example` and its
 `package.json`, the deleted `apps/pipeline-server/fly.production.toml`, the
 Fly section of `apps/pipeline-server/README.md`, the `parquetCache*` fields
 in `DataCatalogListing.types.ts` and `DataCatalogListingParsers.ts` and the
-fixtures that list them, `docs/measles-demo/odc-parquet-cache-spec.md`,
+fixtures that list them, `shared/connectors/open-data/buildParquetCachePartPath/`,
+`supabase/functions/open-data/requestParquetCache/`,
+`supabase/functions/open-data/startParquetCopyBuild/`, the parquet-cache
+route in `OpenDataRoutes.ts` and `OpenDataRoutes.types.ts`, the pipeline
+server section of `.env.example.edge`, the `AVA_PIPELINE_SERVER_URL` lines
+in `.github/workflows/demo.yaml`, `docs/measles-demo/odc-parquet-cache-spec.md`,
 `docs/measles-demo/pipeline-server-fly-runbook.md`, and the P6.9 and P6.10
 bullets in `production-plan-world-humanitarian-day.md`.
 
@@ -1562,6 +1569,7 @@ migrations `20261107220000_STORAGE-opendata-service-role-writes-only.sql`
 ```sh
 pnpm --filter @avandar/pipeline-server test
 pnpm --filter @avandar/etl test
+pnpm exec vitest run supabase/functions/open-data shared/connectors/open-data
 supabase test db supabase/tests/database/rpc_data_catalog_listings__parquet_cache.test.sql
 ```
 Then build the image (`docker build -f apps/pipeline-server/Dockerfile .`),
