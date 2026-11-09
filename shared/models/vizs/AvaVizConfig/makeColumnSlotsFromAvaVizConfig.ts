@@ -1,4 +1,4 @@
-import { objectEntries } from "@avandar/utils";
+import { isPlainObject, objectEntries } from "@avandar/utils";
 import { match } from "ts-pattern";
 
 /**
@@ -91,6 +91,11 @@ export function makeColumnSlotsFromAvaVizConfig<Key extends string>(
       ];
     })
     .with({ vizType: "plugin" }, (chart) => {
+      // A stored plugin config can lack its column settings. It has no slots.
+      const storedColumnSettings: unknown = chart.columnSettings;
+      if (!isPlainObject(storedColumnSettings)) {
+        return [];
+      }
       return objectEntries(chart.columnSettings).map(([settingKey, key]) => {
         return { key, target: `columnSettings.${settingKey}` };
       });

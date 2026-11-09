@@ -1,4 +1,9 @@
-import { identity, objectValuesMap, propEq } from "@avandar/utils";
+import {
+  identity,
+  isPlainObject,
+  objectValuesMap,
+  propEq,
+} from "@avandar/utils";
 import { match } from "ts-pattern";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts";
@@ -139,6 +144,12 @@ export function remapProvisionalColumnIdsInAvaVizConfig({
       },
     )
     .with({ vizType: "plugin" }, (chart) => {
+      // A stored config can lack its column settings. Keep it as it is, so
+      // the renderer's config check rejects it.
+      const storedColumnSettings: unknown = chart.columnSettings;
+      if (!isPlainObject(storedColumnSettings)) {
+        return chart;
+      }
       return {
         ...chart,
         columnSettings: objectValuesMap(chart.columnSettings, (id) => {

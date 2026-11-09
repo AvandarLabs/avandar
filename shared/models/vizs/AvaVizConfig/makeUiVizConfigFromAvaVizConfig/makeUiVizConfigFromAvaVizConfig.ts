@@ -1,6 +1,7 @@
 import {
   identity,
   isDefined,
+  isPlainObject,
   makeIdLookupMap,
   objectValuesMap,
   prop,
@@ -163,6 +164,12 @@ function _mapPluginConfig(
   }>,
 ): UiPluginVizConfig {
   const { config, getSlotQueryResultColumnName } = options;
+  // A stored config can lack its column settings. Keep it as it is, so the
+  // renderer's config check rejects it.
+  const storedColumnSettings: unknown = config.columnSettings;
+  if (!isPlainObject(storedColumnSettings)) {
+    return config;
+  }
   return {
     ...config,
     columnSettings: objectValuesMap(

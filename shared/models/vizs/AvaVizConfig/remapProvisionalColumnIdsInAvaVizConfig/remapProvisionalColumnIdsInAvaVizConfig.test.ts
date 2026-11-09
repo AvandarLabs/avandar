@@ -74,3 +74,23 @@ it("rebinds a plugin chart's provisional column settings", () => {
     }),
   ).toEqual({ ...config, columnSettings: { date: NEW_ID, stack: undefined } });
 });
+
+it.each([undefined, null])(
+  "leaves a stored plugin config whose column settings are %s as it is",
+  (columnSettings) => {
+    const config = {
+      vizType: "plugin",
+      pluginId: "avandar.epidemiology",
+      pluginVizId: "epicurve",
+      columnSettings,
+      settings: {},
+    } as unknown as AvaVizConfig.Plugin;
+    expect(
+      remapProvisionalColumnIdsInAvaVizConfig({
+        config: config,
+        previous: PREVIOUS,
+        current: CURRENT,
+      }),
+    ).toEqual(config);
+  },
+);

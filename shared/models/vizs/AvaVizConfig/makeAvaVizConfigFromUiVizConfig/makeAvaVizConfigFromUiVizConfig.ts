@@ -1,6 +1,7 @@
 import {
   identity,
   isDefined,
+  isPlainObject,
   objectValuesMap,
   prop,
   propEq,
@@ -124,6 +125,13 @@ function _mapPluginConfig(
   }>,
 ): AvaVizConfig.Plugin {
   const { config, getSlotColumnId } = options;
+  // A stored config can lack its column settings. Keep it as it is, so the
+  // renderer's config check rejects it. It then holds no column name, so the
+  // cast changes no value.
+  const storedColumnSettings: unknown = config.columnSettings;
+  if (!isPlainObject(storedColumnSettings)) {
+    return config as AvaVizConfig.Plugin;
+  }
   return {
     ...config,
     columnSettings: objectValuesMap(

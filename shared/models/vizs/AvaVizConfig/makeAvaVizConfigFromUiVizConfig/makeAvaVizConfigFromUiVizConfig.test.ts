@@ -145,6 +145,19 @@ describe("makeAvaVizConfigFromUiVizConfig", () => {
     });
   });
 
+  it.each([undefined, null])(
+    "leaves a plugin config whose column settings are %s as it is",
+    (columnSettings) => {
+      const config = {
+        ...CONFIGS[9]!,
+        columnSettings,
+      } as unknown as UiVizConfig;
+      expect(
+        makeAvaVizConfigFromUiVizConfig({ config, columns: COLUMNS }),
+      ).toEqual({ config, issues: [] });
+    },
+  );
+
   it("leaves an ambiguous plugin column setting unset and reports it", () => {
     const result = makeAvaVizConfigFromUiVizConfig({
       config: {
