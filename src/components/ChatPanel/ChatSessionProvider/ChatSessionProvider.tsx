@@ -1,3 +1,4 @@
+import { useMatch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   addChatSession,
@@ -125,10 +126,38 @@ function _createActions(
 
 /**
  * Owns the workspace-user chat session index used by the panel and case
- * manager, including persistence-backed session mutations.
+ * manager, including persistence-backed session mutations. Outside the
+ * workspace route there is no workspace, so the index stays undefined.
  */
 export function ChatSessionProvider({ children }: Readonly<Props>): ReactNode {
+  const workspaceMatch = useMatch({
+    from: "/_auth/$workspaceSlug",
+    shouldThrow: false,
+  });
+  return workspaceMatch ? (
+    <WorkspaceChatSessionProvider>{children}</WorkspaceChatSessionProvider>
+  ) : (
+    <ChatSessionIndexProvider workspaceId="">
+      {children}
+    </ChatSessionIndexProvider>
+  );
+}
+
+function WorkspaceChatSessionProvider({
+  children,
+}: Readonly<Props>): ReactNode {
   const workspaceId = useCurrentWorkspace().id;
+  return (
+    <ChatSessionIndexProvider workspaceId={workspaceId}>
+      {children}
+    </ChatSessionIndexProvider>
+  );
+}
+
+function ChatSessionIndexProvider({
+  workspaceId,
+  children,
+}: Readonly<Props & { workspaceId: string }>): ReactNode {
   const userId = useCurrentUser()?.id ?? "";
   const identityKey = `${workspaceId}:${userId}`;
   const identity = { workspaceId, userId };

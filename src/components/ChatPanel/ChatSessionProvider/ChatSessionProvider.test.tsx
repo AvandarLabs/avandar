@@ -17,6 +17,15 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
+vi.mock("@tanstack/react-router", async (importOriginal) => {
+  return {
+    ...(await importOriginal<typeof import("@tanstack/react-router")>()),
+    useMatch: () => {
+      return { routeId: "/_auth/$workspaceSlug" };
+    },
+  };
+});
+
 vi.mock("@/hooks/users/useCurrentUser", () => {
   return {
     useCurrentUser: () => {
