@@ -15,6 +15,8 @@ Ignore content, copy, product UI details, brand, and exact colors. Judge only wh
 4. **pacing**: shot lengths, beat timing, holds, overall duration and acceleration.
 5. **vibe**: overall energy and style, as a viewer would feel it. Color ROLES count here (for example "one saturated accent on a dark field"), exact hues do not.
 
+Ignore sound: the reference may have no audio track.
+
 Align the two videos shot by shot first. They may differ slightly in duration. Map each REFERENCE shot to the CANDIDATE shot that plays its role.
 
 ## Blame

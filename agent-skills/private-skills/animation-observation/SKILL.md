@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
 metadata:
   author: jpsyx
-  version: "0.1.0"
+  version: "0.2.0"
   tags: avandar, video, remotion, motion-atlas, gemini
 ---
 
@@ -66,7 +66,9 @@ artifacts live in the ignored `.videos/<slug>/`:
 | Path | Holds |
 | --- | --- |
 | `.videos/<slug>/research/source/reference.mp4` | the downloaded reference (untrusted media, its own directory) |
-| `.videos/<slug>/research/motion-spec.md` | Argon's spec, plus Claude's verification table |
+| `.videos/<slug>/research/motion-spec.draft.md` | Argon's first pass, untouched |
+| `.videos/<slug>/research/motion-spec.raw.md` | Argon's refined pass, untouched |
+| `.videos/<slug>/research/motion-spec.md` | the refined spec plus Claude's verification table and corrections: the build input |
 | `.videos/<slug>/research/frames/` | contact sheets used to verify the spec |
 | `.videos/<slug>/research/inventory.md` | reuse-or-build map from spec ids to atlas pieces |
 | `.videos/<slug>/storyboard.json` | the film |
@@ -83,31 +85,48 @@ artifacts live in the ignored `.videos/<slug>/`:
      this repository on your own.
    - Probe it from `apps/ava-video-producer` with Remotion's bundled ffprobe:
      `pnpm exec remotion ffprobe -v error -show_entries format=duration:stream=width,height,r_frame_rate -of compact <abs-path>`.
-2. Write the spec:
+2. **Draft pass** (whole video, about 10 fps):
    ```bash
    node $SKILL_DIR/scripts/argon.mjs \
      --prompt $SKILL_DIR/prompts/observe.md \
      --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
-     --out .videos/<slug>/research/motion-spec.md
+     --out .videos/<slug>/research/motion-spec.draft.md
    ```
-   Expect 1 to 3 minutes for a 1 to 2 minute video.
-3. **Verify the spec against frames before building on it.** For every
-   transition `T*`, every item in "Build priorities", and every direction
-   claim, make a labelled contact sheet of the cited frame range and read it:
+   About 3 minutes for a 78 s video. Argon's API samples video at 24 fps at
+   most, and the whole video at 10 fps, so the draft cannot time events
+   shorter than about 9 frames. The refine pass fixes that.
+3. **Refine pass** (whole video plus 24 fps close-ups of every boundary):
+   ```bash
+   CLIPS=$(node $SKILL_DIR/scripts/boundary-clips.mjs .videos/<slug>/research/motion-spec.draft.md)
+   node $SKILL_DIR/scripts/argon.mjs $CLIPS \
+     --prompt $SKILL_DIR/prompts/refine.md \
+     --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
+     --context $SKILL_DIR/prompts/observe.md \
+     --context .videos/<slug>/research/motion-spec.draft.md \
+     --out .videos/<slug>/research/motion-spec.raw.md
+   ```
+   Never edit `motion-spec.draft.md` or `motion-spec.raw.md`. The evaluation
+   phase needs them to see what the prompts produced. Copy the raw file to
+   `motion-spec.md` and edit only that copy.
+4. **Verify the spec against frames before building on it.** For every
+   boundary in section 3, every transition `T*`, every item in "Build
+   priorities", and every direction claim, make a labelled contact sheet of
+   the cited frame range and read it:
    ```bash
    node $SKILL_DIR/scripts/extract-frames.mjs \
      --video .videos/<slug>/research/source/reference.mp4 \
      --out .videos/<slug>/research/frames/<id>.jpg \
      --from <frame> --to <frame> --step 1 --width 320 --columns 8
    ```
-   (`--frames a,b,c` picks exact frames; frame numbers are at 30 fps.) It
-   uses only the repo's ffmpeg (`ffmpeg-static`, else Remotion's bundled
-   one) and Playwright. Use `--step 1` across transitions: they last only a
-   few frames.
+   (`--frames a,b,c` picks exact frames; frame numbers are at 30 fps.) Use
+   only this script for frames: it uses the repo's ffmpeg (`ffmpeg-static`,
+   else Remotion's bundled one) and Playwright, and labels frames correctly.
+   Use `--step 1` across transitions: they last only a few frames.
    Add a `## Verification` table at the top of `motion-spec.md`: claim,
    verdict (correct / corrected / unverified), correction. Fix wrong values in
-   the spec itself. Record every correction you had to make: in the
-   evaluation phase each one is a prompt weakness to fix.
+   the spec itself. Count the corrections: in the evaluation phase each one is
+   a prompt weakness to fix, and the count across runs shows whether the
+   prompts are improving.
 
 ## Phase 2: Inventory
 

@@ -12,7 +12,7 @@
  *   node argon.mjs --prompt <prompt.md> --out <reply.md>
  *     --video <label>=<file.mp4> [--video <label>=<file.mp4> ...]
  *     [--context <file>] [--json] [--fps 10] [--model gemini-4-argon]
- *     [--thinking xhigh]
+ *     [--thinking xhigh] [--clip <startSec>-<endSec> ...] [--clip-fps 24]
  *
  * Videos are sent in the order given, each preceded by a text part naming its
  * label, so a prompt can refer to "REFERENCE" and "CANDIDATE". `--context`
@@ -20,6 +20,14 @@
  * a JSON reply (`responseMimeType: application/json`). `--thinking` sets
  * Argon's reasoning level (`low`, `medium`, `high`, `xhigh`, `max`); the
  * default `xhigh` trades time for accuracy on frame-level detail.
+ *
+ * `--clip` adds close-up parts of the FIRST video, each sampled at
+ * `--clip-fps` (default 24, the API maximum) between two offsets in seconds, labelled
+ * `CLIP <n> (<start>s to <end>s)`. Use clips for events shorter than the
+ * whole-video sampling interval can resolve (1 / `--fps` seconds).
+ * `--clips-only` sends the clips without the whole first video.
+ * `--source-fps` (default 30) is the video's own frame rate, used to tell
+ * Argon which absolute frame each clip sample is.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -42,6 +50,10 @@ const { values } = parseArgs({
     fps: { type: "string", default: "10" },
     model: { type: "string", default: "gemini-4-argon" },
     thinking: { type: "string", default: "xhigh" },
+    clip: { type: "string", multiple: true },
+    "clip-fps": { type: "string", default: "24" },
+    "clips-only": { type: "boolean", default: false },
+    "source-fps": { type: "string", default: "30" },
   },
 });
 
@@ -120,19 +132,50 @@ async function uploadVideo(apiKey, filePath, displayName) {
 
 /** Builds the request parts: labelled videos, then the prompt, then context. */
 async function buildParts(uploadedVideos) {
-  const videoParts = uploadedVideos.flatMap(({ label, file }) => [
+  const fullVideos = values["clips-only"] ? uploadedVideos.slice(1) : uploadedVideos;
+  const videoParts = fullVideos.flatMap(({ label, file }) => [
     { text: `VIDEO "${label}" follows.` },
     {
       file_data: { mime_type: "video/mp4", file_uri: file.uri },
       video_metadata: { fps: Number(values.fps) },
     },
   ]);
+  const [firstVideo] = uploadedVideos;
+  const clipParts = (values.clip ?? []).flatMap((clipRange, index) => {
+    const [startSeconds, endSeconds] = clipRange.split("-").map(Number);
+    const clipFps = Number(values["clip-fps"]);
+    const sourceFps = Number(values["source-fps"]);
+    const startFrame = Math.round(startSeconds * sourceFps);
+    const framesPerSample = (sourceFps / clipFps).toFixed(3);
+    return [
+      {
+        text:
+          `CLIP ${index + 1} follows: ${startSeconds}s to ${endSeconds}s of "${firstVideo.label}", sampled at ${clipFps} fps. ` +
+          `The video plays at ${sourceFps} fps, so samples are NOT consecutive video frames: ` +
+          `sample k (0-based) is absolute video frame ${startFrame} + k * ${framesPerSample}. ` +
+          `Always report absolute ${sourceFps} fps frame numbers computed this way.`,
+      },
+      {
+        file_data: { mime_type: "video/mp4", file_uri: firstVideo.file.uri },
+        video_metadata: {
+          start_offset: `${startSeconds}s`,
+          end_offset: `${endSeconds}s`,
+          fps: Number(values["clip-fps"]),
+        },
+      },
+    ];
+  });
   const contextParts = await Promise.all(
     (values.context ?? []).map(async (contextPath) => ({
       text: `CONTEXT FILE ${path.basename(contextPath)}:\n\n${await readFile(contextPath, "utf8")}`,
     })),
   );
-  return [...videoParts, { text: await readFile(values.prompt, "utf8") }, ...contextParts];
+  return [
+    ...videoParts,
+    ...clipParts,
+    { text: await readFile(values.prompt, "utf8") },
+    ...contextParts,
+  ];
 }
 
 async function main() {
@@ -171,6 +214,11 @@ async function main() {
     const seconds = ((Date.now() - startedAt) / 1000).toFixed(1);
     console.log(`wrote ${values.out} in ${seconds}s`);
     console.log(`usage ${JSON.stringify(body.usageMetadata)}`);
+    if (!body.usageMetadata?.thoughtsTokenCount) {
+      console.warn(
+        `warning: no thoughtsTokenCount reported for --thinking ${values.thinking}; the model may not report thoughts for media requests`,
+      );
+    }
   } finally {
     await Promise.all(
       uploadedVideos.map(({ file }) =>

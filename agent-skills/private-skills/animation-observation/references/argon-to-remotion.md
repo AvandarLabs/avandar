@@ -37,8 +37,41 @@ they are still gaps.
   the cursor. For a fast slide, a velocity-scaled directional blur
   (`filter: blur()` on the moving layer, or an SVG `feGaussianBlur` with an
   X-only `stdDeviation`) is the accepted approximation.
+- **No per-shot background.** `plan.theme` is plan-wide and every scene
+  paints `--ground`, so a film that switches between dark, accent, and light
+  fields per shot needs a per-shot `theme` override on the shot base schema,
+  applied by `ShotView`. Check whether it exists before building it.
+- **`docs/shared-scene-library.md` omits the `continuity` scene.** The scene
+  list in this file and `shotSchema.ts` is right.
 - **No low-res fast render.** `render` always draws at canvas size with
   `--concurrency=1`. Use `preview` contact sheets while iterating.
+
+## Placing a boundary by its class
+
+The spec's section 3 classifies every shot boundary. Build each class at the
+level that owns it:
+
+| Class | Build it as |
+| --- | --- |
+| `hard-cut` | `transitionInFrames: 0` |
+| `cut-then-entrance` | a hard cut plus entrance motions in the incoming shot's scene |
+| `exit-then-cut` | an exit option on the outgoing shot's scene (only the layers the spec says move), then a hard cut |
+| `overlap` | a shot transition in `StoryFilm` (both shots on screen at once) |
+
+Do not build an `exit-then-cut` as a `StoryFilm` transition: that moves the
+whole outgoing frame, including layers the spec says stay or fade in place.
+
+## Brand marks with different geometry
+
+A reference's signature beats often animate its own logo's geometry (bars
+that grow, a mark that splits and flies through). Avandar's mark is a single
+raster image (`public/logo.png` in the workspace), so:
+
+- Rebuild such beats as motion of the real mark: N column (or row) masks
+  over the image that animate like the reference's parts, with N a prop.
+- Drop details that exist only in the other brand's mark (notches, its
+  letterforms). Keep the timing, order, easing, and scale of the beat.
+- Never redraw or approximate Avandar's mark as vector shapes.
 
 ## Adding a shot transition
 

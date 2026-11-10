@@ -20,6 +20,12 @@ The implementer cannot see the video. Everything they need to reproduce a beat m
 - A cut followed by an entrance is not a transition between shots. Report exactly what happens in the frames on either side of the boundary: a hard cut, a cut plus an incoming element animation, or one continuous move that carries both shots.
 - Count repeated items (bars, columns, cards, lines). If you cannot count precisely, give a range and say so.
 - If something happens within 1-2 frames you cannot resolve, say so in `confidence` rather than inventing precision.
+- **Know your sampling rate.** You see the whole video sampled at about 10 fps: one sample per 3 video frames. Any event shorter than about 9 frames (most transitions, slides, pops, staggers) cannot be timed from that alone. Give its frames as your best estimate and add `closeup: true` to it. A second pass with 24 fps close-ups of every shot boundary will correct those values, so never invent a mechanism to fill a gap you could not see.
+- **Name only the mechanism you saw.** Distinguish: a *dissolve* (both shots visible at once, blended), a *dip* (one shot fades to a plain field, then the next fades in), *staged element fades* (layers fade one after another, then a cut), a *linear wipe or erase* (a straight edge travels in one direction), a *radial wipe or iris* (a curved edge grows from a point). Check the shape and travel of a mask edge across at least 3 samples before naming it.
+- **Every layer, every boundary.** During a transition, say what EACH on-screen layer of the outgoing and incoming shot does (moves, fades in place, stays, is covered). Do not assume a headline moves with the window next to it.
+- **Hard cuts are transitions too.** If any boundary is a plain cut, the transition catalog must contain a `hard-cut` entry, and every boundary must point at a catalog entry.
+- **One shot numbering.** Catalog `occurrences` cite storyboard shot ids and frame ranges, and must agree with the storyboard script. Check every occurrence against section 8 before you finish.
+- **Backgrounds belong to shots.** Give every shot its background role. If the background changes between shots, that change is part of the boundary.
 
 ## Output format
 
@@ -33,30 +39,47 @@ Return Markdown with exactly these sections, in this order.
 
 Average shot length, shortest and longest shot, cut cadence, how pacing changes across the video (as a list of acts with frame ranges), and any recurring beat interval.
 
-### 3. Composition templates
+### 3. Shot boundaries
+
+A table with one row per boundary between consecutive shots, in order:
+
+| boundary frame | from shot | to shot | class | transition id | outgoing layers | incoming layers |
+
+`class` is exactly one of:
+
+- `hard-cut`: the last frame of one shot is followed by the first frame of the next, nothing animates across it.
+- `cut-then-entrance`: a hard cut, then the incoming shot's elements animate in. The entrance is a motion (`M*`), not a transition.
+- `exit-then-cut`: the outgoing shot's elements animate out (some layers may stay), then a hard cut.
+- `overlap`: both shots are visible at the same time for some frames (dissolve, wipe, push, whip, morph, zoom-through).
+
+`outgoing layers` and `incoming layers` list each layer and what it does across the boundary, for example `window: slides left 110% with blur, f585-f594; headline: fades in place f586-f592; background: unchanged`.
+
+### 4. Composition templates
 
 The recurring layouts. Give each an id `C1`, `C2`, ... and describe it as a layer list from back to front, each layer with its box (`x y w h` in %), alignment, and any constant transform (for example `perspective 1200px, rotateY -12deg, rotateX 4deg`, drop shadow). Include background treatment. Say which shots use each template.
 
-### 4. Transition catalog
+### 5. Transition catalog
 
-Every distinct transition. Give each an id `T1`, `T2`, ... with:
+Every distinct transition, including `hard-cut` if any boundary uses one. Give each an id `T1`, `T2`, ... with:
+
+- `class`: as in section 3.
 
 - `mechanism`: what physically moves (outgoing layer, incoming layer, overlay shapes, mask, camera).
 - `frames`: total duration, and per-layer start/end offsets relative to the shot boundary (negative = before the cut).
 - `properties`: per layer, property start -> end values.
 - `easing` per layer, `motion_blur` yes/no and direction.
 - `geometry`: count, size, and stagger of any shapes (for example "12 vertical columns, each 8.3% wide, stagger 1 frame left-to-right, each rises from translateY 100% to 0%").
-- `occurrences`: list of boundary frames where it is used.
+- `occurrences`: list of `shot id -> shot id @ boundary frame` where it is used.
 
-### 5. Motion catalog
+### 6. Motion catalog
 
 Every distinct element animation. Give each an id `M1`, `M2`, ... with `applies_to` (generic element kind: headline line, word, logo bar, card, chart bar, counter, cursor, connector line, etc.), `property` changes with values, `frames`, `stagger` (frames and order), `easing`, `overshoot`, and `occurrences` (frames). Include in-shot "life" motion such as streaming text, ticking counters, pulses, and typing speed (characters per frame).
 
-### 6. Camera
+### 7. Camera
 
 Every virtual camera move (push-in, pull-back, pan, drift, rotate, zoom-through): frames, start and end scale/translate/rotate, easing, which layers it affects. Say explicitly if the camera is locked for most of the video.
 
-### 7. Storyboard script
+### 8. Storyboard script
 
 A fenced ```yaml block that an implementer follows shot by shot. Every frame of the video must belong to exactly one shot. Use this shape:
 
@@ -69,7 +92,7 @@ shots:
     from: <frame>          # inclusive
     to: <frame>            # exclusive
     composition: C1
-    background: <role, e.g. dark-field | accent-field | light-field>
+    background: <role, e.g. dark-field | accent-field | light-field>   # per shot; may differ every shot
     elements:
       - id: S1.logo
         kind: <generic element kind>
@@ -80,14 +103,15 @@ shots:
             from: <frame>
             to: <frame>
             params: { }    # only values that differ from the catalog entry
+            closeup: <true when shorter than ~9 frames>
     camera: <none | camera move with frames>
-    transition_out: { transition: T1, from: <frame>, to: <frame> }   # omit on the last shot
+    transition_out: { transition: T1, class: overlap, from: <frame>, to: <frame> }   # omit on the last shot
 ```
 
-### 8. Build priorities
+### 9. Build priorities
 
 The 6 to 10 motions, transitions, or compositions that most define this video's feel, ranked. One line each on why.
 
-### 9. Confidence
+### 10. Confidence
 
 What you are unsure of: exact easing, counts, sub-frame staggers, directions. Give the frames where an implementer should look closer.
