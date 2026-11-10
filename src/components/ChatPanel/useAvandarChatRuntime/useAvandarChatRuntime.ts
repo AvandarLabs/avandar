@@ -39,6 +39,7 @@ type SessionStatePersistenceOptions = {
 
 type LoadedSessionState = StoredChatThread & {
   sessionKind: ChatSessionKind;
+  shouldStartKickoff: boolean;
   contextTray: Parameters<typeof ChatContextTrayStore.write>[0]["refs"];
 };
 
@@ -90,27 +91,18 @@ function _persistSessionState(
   });
 }
 
-function _makeSessionSeedMessages(options: {
-  pageContext: Parameters<
-    typeof makeNewChatThreadMessagesFromPageContext
-  >[0]["pageContext"];
-  pathname: string;
-  sessionKind: ChatSessionKind;
-}): ThreadMessageLike[] {
-  const messages = makeNewChatThreadMessagesFromPageContext({
-    pageContext: options.pageContext,
-    pathname: options.pathname,
+/**
+ * Appends the hidden kickoff turn, which starts the run so the assistant
+ * speaks first in a new case-design session. `thread.reset` never starts one.
+ */
+function _appendCaseDesignKickoff(
+  runtime: ReturnType<typeof useLocalRuntime>,
+): void {
+  runtime.thread.append({
+    role: "user",
+    content: [{ type: "text", text: CaseDesignKickoff.CONTENT }],
+    metadata: CaseDesignKickoff.metadata,
   });
-  return options.sessionKind === "case-design"
-    ? [
-        ...messages,
-        {
-          role: "user",
-          content: CaseDesignKickoff.CONTENT,
-          metadata: CaseDesignKickoff.metadata,
-        },
-      ]
-    : messages;
 }
 
 function _loadSessionState(
@@ -123,17 +115,17 @@ function _loadSessionState(
   };
   const record = ChatThreadStore.readRecord(identity);
   const sessionKind = options.index.sessions[options.sessionId]?.kind ?? "data";
+  const isEmpty = record.messages.length === 0;
   return {
     ...record,
-    messages:
-      record.messages.length > 0
-        ? record.messages
-        : _makeSessionSeedMessages({
-            pageContext: options.pageContext,
-            pathname: options.pathname,
-            sessionKind,
-          }),
+    messages: isEmpty
+      ? makeNewChatThreadMessagesFromPageContext({
+          pageContext: options.pageContext,
+          pathname: options.pathname,
+        })
+      : record.messages,
     sessionKind,
+    shouldStartKickoff: isEmpty && sessionKind === "case-design",
     contextTray: ChatContextTrayStore.read(identity),
   };
 }
@@ -245,14 +237,9 @@ export function useAvandarChatRuntime(): {
       userId: user.id,
       sessionId: selectedId,
     });
-    const sessionKind = sessions.index.sessions[selectedId]?.kind ?? "data";
     return record.messages.length > 0
       ? record.messages
-      : _makeSessionSeedMessages({
-          pageContext,
-          pathname,
-          sessionKind,
-        });
+      : makeNewChatThreadMessagesFromPageContext({ pageContext, pathname });
   });
 
   useEffect(
@@ -429,6 +416,9 @@ export function useAvandarChatRuntime(): {
       chatPanelDispatch.setPendingClarification(loaded.pendingClarification);
       chatPanelDispatch.setPendingCaseTypeDraft(loaded.pendingCaseTypeDraft);
       runtime.thread.reset(loaded.messages);
+      if (loaded.shouldStartKickoff) {
+        _appendCaseDesignKickoff(runtime);
+      }
     },
     [
       chatPanelDispatch,

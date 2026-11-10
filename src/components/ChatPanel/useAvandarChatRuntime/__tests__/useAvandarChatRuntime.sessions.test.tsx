@@ -3,7 +3,14 @@
  * `ChatSessionProvider`, preserving each session's thread, pending cards, and
  * context tray while switching.
  */
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import { Model } from "@avandar/models";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
@@ -19,11 +26,15 @@ import {
   WORKSPACE_A,
 } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.fixtures";
 import {
+  getLastAssistantText,
   getThreadTexts,
   renderAppAt,
   resetHarness,
 } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.harness";
-import { harness } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks";
+import {
+  apiPostMock,
+  harness,
+} from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { ThreadMessageLike } from "@assistant-ui/react";
 
@@ -55,8 +66,19 @@ function _message(content: string): ThreadMessageLike {
   };
 }
 
+function _countChatTurnRequests(): number {
+  return apiPostMock.mock.calls.filter(([request]) => {
+    return request?.route === "chat/:workspaceId/messages";
+  }).length;
+}
+
 beforeEach(() => {
   resetHarness();
+  apiPostMock.mockImplementation(async (request: { route: string }) => {
+    return request.route === "chat/:workspaceId/messages"
+      ? Model.make("ChatResponse", { assistantText: "Let's design it." })
+      : { title: "Outbreak design" };
+  });
 });
 
 describe("useAvandarChatRuntime sessions", () => {
@@ -138,6 +160,30 @@ describe("useAvandarChatRuntime sessions", () => {
       );
       expect(getThreadTexts()).toContain(CaseDesignKickoff.CONTENT);
     });
+  });
+
+  it("starts the kickoff run once for a new case-design session", async () => {
+    commitChatSessionIndex(
+      IDENTITY,
+      createChatSessionIndex({ id: "s1", kind: "data" }),
+    );
+    await renderAppAt("/alpha/data-explorer");
+    act(() => {
+      harness.sessions!.startCaseDesignSession();
+    });
+    await waitFor(() => {
+      expect(getLastAssistantText()).toBe("Let's design it.");
+      expect(harness.runtime!.thread.getState().isRunning).toBe(false);
+    });
+    expect(_countChatTurnRequests()).toBe(1);
+    expect(getThreadTexts()).toContain(CaseDesignKickoff.CONTENT);
+
+    cleanup();
+    await renderAppAt("/alpha/data-explorer");
+    await waitFor(() => {
+      expect(getLastAssistantText()).toBe("Let's design it.");
+    });
+    expect(_countChatTurnRequests()).toBe(1);
   });
 
   it("preserves pending cards when New case type clears the panel", async () => {
