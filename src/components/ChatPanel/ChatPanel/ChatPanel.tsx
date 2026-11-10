@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { ChatPanelHeader } from "@/components/ChatPanel/ChatPanelHeader/ChatPanelHeader";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
+import { ChatSessionStrip } from "@/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime";
 import { ChatViewTranscriptSync } from "@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync";
@@ -44,7 +45,9 @@ export function ChatPanel(): React.ReactNode {
           <ChatPanelHeader
             onNewChatClick={onNewChatClick}
             onClose={dispatch.close}
-          />
+          >
+            <ChatSessionStrip />
+          </ChatPanelHeader>
           <AssistantRuntimeProvider runtime={runtime}>
             <ChatViewTranscriptSync />
             <ChatThread />

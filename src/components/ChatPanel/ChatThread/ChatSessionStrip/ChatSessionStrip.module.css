@@ -1,0 +1,67 @@
+.strip {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xxs);
+  min-width: 0;
+  padding: 0 var(--mantine-spacing-xs) var(--mantine-spacing-xxs);
+}
+
+.tabList {
+  display: flex;
+  flex: 1;
+  gap: var(--mantine-spacing-xxxs);
+  min-width: 0;
+}
+
+.tabContainer {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-8);
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  transition: var(--ava-transition-interactive);
+}
+
+.tabContainer:hover {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+.tabContainerSelected {
+  background-color: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-2);
+  color: var(--mantine-color-primary-8);
+}
+
+.tab {
+  color: inherit;
+  flex: 1;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  height: 26px;
+  min-width: 0;
+  overflow: hidden;
+  padding-inline: var(--mantine-spacing-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab:focus-visible {
+  outline: 1px solid var(--ava-border-focus);
+  outline-offset: -1px;
+}
+
+.archivedRow {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xxs);
+  min-width: 240px;
+  padding: var(--mantine-spacing-xxs);
+}
+
+.archivedLabel {
+  flex: 1;
+  min-width: 0;
+  padding-inline-start: var(--mantine-spacing-xxs);
+}
