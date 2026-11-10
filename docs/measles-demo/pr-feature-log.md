@@ -2329,9 +2329,14 @@ compiles each Map block into a privacy-filtered snapshot instead: one GeoJSON
 feature collection per layer plus the map config and legend, written beside the
 published datasets. The compile applies the saved AOI, time range, spatial
 filters, and sensitivity, keeps only popup columns, refuses names on the
-forbidden property list, and displaces points with a salted HMAC jitter keyed by
-`maps.jitter_salt`. It refuses to publish when a map's filters no longer apply,
-and names the map that blocked it. The public page draws the snapshot without
+forbidden property list, and displaces points with an HMAC jitter keyed by the
+map's secret salt and seeded by the layer, the radius, and each point's own
+coordinates, so the same point lands in the same place on every publish. The
+salt lives in `map_jitter_salts`, which only map editors can read, through
+`rpc_maps__get_or_create_jitter_salt`. It refuses to publish when a map's
+filters no longer apply or when the publisher cannot edit the map, and names
+the map that blocked it. A reader who cannot edit a map sees the live map
+displaced with a throwaway salt. The public page draws the snapshot without
 DuckDB or spatial. The share modal warns when shared readers cannot open a
 dashboard's map, and the publish preview lists each map layer a public publish
 exposes with its feature count.
@@ -2393,19 +2398,32 @@ tracked in this log.
 | `8c2d21839` | fix(dashboards): recompile the publish map preview each time it opens | All of it. |
 | `c337161bb` | test(dashboards): cover a map block from export sheet to public page | All of it. |
 | `13a441c57` | chore(i18n): extract map block strings | All of it. |
+| `ee5bfe961` | fix(maps): keep the jitter salt readable only by map editors | All of it. Replaces `35ccfc7da`'s `maps.jitter_salt` column and migration. |
+| `47055e3ea` | fix(maps): seed jitter from each point's own coordinates | All of it. |
+| `5bbf3920a` | fix(maps): fail a map snapshot cleanup that storage did not finish | All of it. |
+| `59590bf43` | refactor(maps): share one lookup for a map layer column's name | All of it. |
+| `bd9b706c7` | fix(maps): key jitter by the displacement radius too | All of it. |
 
 **Files:**
 - Storage paths: `supabase/schemas/16.utils.resource-permissions.sql`,
   `src/clients/storage/` (`SnapshotStorageUtils`,
   `PublicDatasetParquetStorageClient`, `PublicMapSnapshotStorageClient`).
-- Jitter salt: `supabase/schemas/10.maps.sql`, `shared/models/AvaMap/`
-  (`AvaMap.types.ts`, `AvaMapParsers.ts`, row parsing test),
-  `src/views/GisApp/layers/jitterCoordinate/` (`jitterCoordinate`,
-  `buildHmacSha256`) and `displaceSpatialFeatures`.
+- Jitter salt: `supabase/schemas/17.map_jitter_salts.sql` (table, editor-only
+  SELECT policy, insert trigger on `maps`),
+  `supabase/schemas/50.rpc_maps__get_or_create_jitter_salt.sql`,
+  `AvaMapClient.getJitterSalt`, `apps/desktop/sync/syncable-tables.ts`
+  (excludes the table from desktop sync), the map route loader
+  (`src/routes/_auth/$workspaceSlug/map/$mapId.tsx`), `GisApp` and
+  `useGisApp*` (take `jitterSalt`), `LiveMapViewer`,
+  `layers/resolveRenderJitterSalt/` (throwaway salt for non-editors).
+- Jitter seed: `src/views/GisApp/layers/buildJitterSeed/` (layer, radius, and
+  coordinates), `jitterCoordinate/` (`jitterCoordinate`, `buildHmacSha256`),
+  `displaceSpatialFeatures`, and `makeFeatureCollectionFromRows`.
 - Snapshot compile: `src/clients/maps/MapSnapshot/` (`MapSnapshot.types.ts`,
   `MapSnapshotJson/`, `MapSnapshotPublishError.ts`, `compileMapSnapshot/`,
   `applySnapshotSensitivity`, `cutSnapshotFeatureProperties`,
-  `getForbiddenMapPropertyNames`, `createMapSnapshotFromMapId/`,
+  `getForbiddenMapPropertyNames`, `getMapLayerColumnNameById/`,
+  `createMapSnapshotFromMapId/` (reads the salt, refuses a non-editor),
   `createPublicMapConfigFromMapConfig/`, `getMapSnapshotLayerSummaries/`,
   `getDatasetIdsFromMapConfig/`).
 - Publish: `src/clients/dashboards/DashboardClient/` (`publishDashboard.ts`,
@@ -2439,8 +2457,9 @@ tracked in this log.
   session), `MapCanvas/useMapViewSync/` (save the camera after an instant fit).
 - E2E and test fixtures: `tests/e2e/dashboard-map-block.spec.ts`,
   `supabase/tests/database/dashboards/storage_map_snapshot_paths.test.sql`,
-  `supabase/tests/database/permissions/rls_maps.test.sql`, and one-line
-  `jitterSalt` additions to the existing GIS fixtures and tests.
+  `supabase/tests/database/permissions/rls_map_jitter_salts.test.sql`,
+  `exact_data_api_grants.test.sql` (the new table's grants), and the
+  `jitterSalt` arguments the GIS fixtures and tests pass.
 - `src/i18n/locales/*/messages.po`: regenerate with
   `pnpm i18n:extract && pnpm i18n:compile`, never copy.
 
@@ -2448,9 +2467,13 @@ tracked in this log.
 `supabase/migrations/*_dashboard_map_snapshot_paths.sql` teaches
 `util__storage_object_dashboard_id` and its sibling path parser the
 `revisions/<rev>/maps/<uuid>.json` shape, so the existing storage policies
-cover map files. `supabase/migrations/*_add_maps_jitter_salt.sql` adds
-`maps.jitter_salt`. Regenerate `shared/types/database.types.ts` with
-`pnpm db:gen-types`.
+cover map files. `supabase/migrations/*_add_map_jitter_salts.sql`
+(`20261109225409` on the branch) creates `map_jitter_salts`, its editor-only
+policy, the insert trigger on `maps`, and
+`rpc_maps__get_or_create_jitter_salt`. It needs no backfill: the RPC creates a
+salt the first time an editor reads one for an older map. Regenerate
+`shared/types/database.types.ts` with `pnpm db:gen-types` and the desktop
+SQLite migration with `pnpm desktop:sqlite:gen-migrations`.
 
 **Verification:**
 ```sh
