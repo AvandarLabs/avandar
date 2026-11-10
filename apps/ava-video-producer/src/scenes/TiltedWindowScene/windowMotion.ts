@@ -152,10 +152,16 @@ export function getCarouselState(
     : { current, progress: 1 };
 }
 
+/** Share of a carousel slide the outgoing window stays opaque for. */
+const SLIDE_HOLD = 0.6;
+
 /**
  * The incoming and outgoing poses of one carousel slide: the incoming window
  * slides in on top from the right, the outgoing one slides left, recedes
- * and fades underneath it.
+ * and fades underneath it. The outgoing window only starts fading once the
+ * incoming one has covered most of it, so the field never shows through
+ * both half-faded windows (a luminance dip on a field much darker or
+ * lighter than the window content).
  */
 export function getCarouselPoses(progress: number, box: Rect) {
   return {
@@ -169,7 +175,7 @@ export function getCarouselPoses(progress: number, box: Rect) {
       ...RESTING_POSE,
       translateX: mix(progress, 0, -box.width * 0.28),
       translateZ: mix(progress, 0, -120),
-      opacity: 1 - progress,
+      opacity: 1 - Math.max(0, (progress - SLIDE_HOLD) / (1 - SLIDE_HOLD)),
     },
   };
 }

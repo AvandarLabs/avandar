@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getActiveHeadline,
+  getCarouselPoses,
   getCarouselState,
   getFlipSplit,
   getPullBack,
@@ -72,6 +73,15 @@ test("the carousel slides the next window in on top and swaps a cut window at on
   assert.equal(sliding.previous, 0);
   assert.ok(sliding.progress > 0 && sliding.progress < 1);
   assert.deepEqual(getCarouselState(50, windows), { current: 2, progress: 1 });
+});
+
+test("a carousel's outgoing window stays opaque until the incoming one mostly covers it", () => {
+  assert.equal(getCarouselPoses(0.3, box).outgoing.opacity, 1);
+  assert.equal(getCarouselPoses(0.5, box).outgoing.opacity, 1);
+  const late = getCarouselPoses(0.75, box).outgoing.opacity;
+  assert.ok(late > 0 && late < 1);
+  assert.equal(getCarouselPoses(1, box).outgoing.opacity, 0);
+  assert.ok(getCarouselPoses(0.3, box).outgoing.translateX < 0);
 });
 
 test("a pull-back holds the footage full-bleed until it starts, then lands in the box", () => {
