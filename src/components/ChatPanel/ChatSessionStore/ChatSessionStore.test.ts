@@ -63,6 +63,72 @@ describe("loadChatSessions", () => {
     ).toBeNull();
   });
 
+  it("retries migration after the session thread write fails", () => {
+    ChatThreadStore.write({
+      ...IDENTITY,
+      messages: [{ role: "user", content: "kept" }],
+    });
+    ChatContextTrayStore.write({ ...IDENTITY, refs: [DATASET_REF] });
+    const writeRecord = vi
+      .spyOn(ChatThreadStore, "writeRecord")
+      .mockReturnValueOnce(false);
+
+    loadChatSessions(IDENTITY);
+
+    expect(
+      window.localStorage.getItem(
+        `ava.chat.sessions.${IDENTITY.workspaceId}.${IDENTITY.userId}`,
+      ),
+    ).toBeNull();
+    writeRecord.mockRestore();
+    const retried = loadChatSessions(IDENTITY);
+    expect(
+      ChatThreadStore.readRecord({
+        ...IDENTITY,
+        sessionId: retried.selectedId,
+      }).messages,
+    ).toEqual([{ role: "user", content: "kept" }]);
+    expect(
+      ChatContextTrayStore.read({
+        ...IDENTITY,
+        sessionId: retried.selectedId,
+      }),
+    ).toEqual([DATASET_REF]);
+  });
+
+  it("retries migration after the session tray write fails", () => {
+    ChatThreadStore.write({
+      ...IDENTITY,
+      messages: [{ role: "user", content: "kept" }],
+    });
+    ChatContextTrayStore.write({ ...IDENTITY, refs: [DATASET_REF] });
+    const writeTray = vi
+      .spyOn(ChatContextTrayStore, "write")
+      .mockReturnValueOnce(false);
+
+    loadChatSessions(IDENTITY);
+
+    expect(
+      window.localStorage.getItem(
+        `ava.chat.sessions.${IDENTITY.workspaceId}.${IDENTITY.userId}`,
+      ),
+    ).toBeNull();
+    writeTray.mockRestore();
+    const retried = loadChatSessions(IDENTITY);
+    expect(
+      ChatThreadStore.readRecord({
+        ...IDENTITY,
+        sessionId: retried.selectedId,
+      }).messages,
+    ).toEqual([{ role: "user", content: "kept" }]);
+    expect(
+      ChatContextTrayStore.read({
+        ...IDENTITY,
+        sessionId: retried.selectedId,
+      }),
+    ).toEqual([DATASET_REF]);
+  });
+
   it("opens a new data session when the index has only an archive", () => {
     const closed = loadChatSessions(IDENTITY);
     const archived = archiveStoredChatSession(

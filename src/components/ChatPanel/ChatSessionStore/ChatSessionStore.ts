@@ -78,8 +78,11 @@ function _migrateLegacyChat(
       sessionId: index.selectedId,
       refs: legacyRefs,
     });
-  const indexDidWrite = _writeIndex(identity, index);
-  if (threadDidWrite && trayDidWrite && indexDidWrite) {
+  if (!threadDidWrite || !trayDidWrite) {
+    _clearSession(identity, index.selectedId);
+    return index;
+  }
+  if (_writeIndex(identity, index)) {
     ChatThreadStore.clearLegacy(identity);
     ChatContextTrayStore.clearLegacy(identity);
   } else {
