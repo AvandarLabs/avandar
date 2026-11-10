@@ -1,4 +1,4 @@
-import { ActionIcon, Menu, Text } from "@mantine/core";
+import { ActionIcon, Text } from "@mantine/core";
 import { IconRestore, IconTrash } from "@tabler/icons-react";
 import css from "./ChatSessionStrip.module.css";
 
@@ -19,7 +19,7 @@ export function ArchivedChatSessionRow({
   onDelete,
 }: Readonly<Props>): React.ReactNode {
   return (
-    <Menu.Item component="div" className={css.archivedRow}>
+    <div className={css.archivedRow}>
       <Text size="xs" truncate className={css.archivedLabel}>
         {label}
       </Text>
@@ -41,6 +41,6 @@ export function ArchivedChatSessionRow({
       >
         <IconTrash size={15} aria-hidden />
       </ActionIcon>
-    </Menu.Item>
+    </div>
   );
 }

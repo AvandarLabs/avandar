@@ -119,6 +119,9 @@ describe("ChatSessionStrip", () => {
     ]);
     expect(reopenActions).toHaveLength(2);
     expect(deleteActions).toHaveLength(2);
+    [...reopenActions, ...deleteActions].forEach((action) => {
+      expect(action.closest('[role="menuitem"]')).toBeNull();
+    });
 
     fireEvent.click(reopenActions[1]);
     expect(actions.reopenSession).toHaveBeenCalledWith("closed-two");
