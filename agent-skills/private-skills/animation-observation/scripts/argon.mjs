@@ -12,11 +12,14 @@
  *   node argon.mjs --prompt <prompt.md> --out <reply.md>
  *     --video <label>=<file.mp4> [--video <label>=<file.mp4> ...]
  *     [--context <file>] [--json] [--fps 10] [--model gemini-4-argon]
+ *     [--thinking xhigh]
  *
  * Videos are sent in the order given, each preceded by a text part naming its
  * label, so a prompt can refer to "REFERENCE" and "CANDIDATE". `--context`
  * files are appended after the prompt as extra text parts. `--json` asks for
- * a JSON reply (`responseMimeType: application/json`).
+ * a JSON reply (`responseMimeType: application/json`). `--thinking` sets
+ * Argon's reasoning level (`low`, `medium`, `high`, `xhigh`, `max`); the
+ * default `xhigh` trades time for accuracy on frame-level detail.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -38,6 +41,7 @@ const { values } = parseArgs({
     json: { type: "boolean", default: false },
     fps: { type: "string", default: "10" },
     model: { type: "string", default: "gemini-4-argon" },
+    thinking: { type: "string", default: "xhigh" },
   },
 });
 
@@ -151,6 +155,7 @@ async function main() {
           contents: [{ parts: await buildParts(uploadedVideos) }],
           generationConfig: {
             mediaResolution: "MEDIA_RESOLUTION_HIGH",
+            thinkingConfig: { thinkingLevel: values.thinking },
             ...(values.json ? { responseMimeType: "application/json" } : {}),
           },
         }),
