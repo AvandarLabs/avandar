@@ -69,7 +69,11 @@ Avandar tokens, dark to brand blue is about 79, brand blue to light about
 survives a jump of about 100. So:
 
 1. In Phase 2, compute the field change at every boundary and mark which
-   ones the gate will fail.
+   ones the gate will fail. Do the same for in-shot motions whenever
+   Avandar's content is much lighter or darker than the reference's (a
+   bright screenshot pulled back onto a dark field can dim the frame by 45
+   in one frame where the reference's dark footage did not). Fix those
+   generically, for example with a gentler ease of the same length.
 2. **Build the film to match the reference anyway.** Do not soften a hard
    cut or stretch a transition just to pass the gate: that breaks the copy.
 3. When the only gate failures are luma jumps at intentional shot
@@ -77,8 +81,9 @@ survives a jump of about 100. So:
    `.videos/<slug>/out/<plan.id>/render/<plan.id>.mp4` (only `final.mp4` is
    skipped). Use it for evaluation, list the failing frames and their
    boundaries in the report, and say the film is not deliverable until the
-   user decides how the gate should treat intentional cuts. Any failure that
-   is not at a planned boundary is a real defect: fix it.
+   user decides how the gate should treat intentional cuts. Frames of an
+   `exit-then-cut` exit and of an `overlap` transition count as "at the
+   boundary". Any other failure is a real defect: fix it.
 
 ## Placing a boundary by its class
 
@@ -106,6 +111,9 @@ raster image (`public/logo.png` in the workspace), so:
 - Drop details that exist only in the other brand's mark (notches, its
   letterforms). Keep the timing, order, easing, and scale of the beat.
 - Never redraw or approximate Avandar's mark as vector shapes.
+- Trim the image's transparent padding first (an alpha bounding-box crop,
+  not a redraw): `public/logo.png` is 560 x 560 with the mark in about
+  380 x 281, so sizing by image height draws the mark at half size.
 
 ## Adding a shot transition
 
@@ -180,7 +188,17 @@ beat as a scene option instead.
 - **Shot timing.** Copy each spec shot's `to - from` into
   `durationInFrames`. A transition occupies the start of the incoming shot
   and does not change total duration, so a 10-frame transition between S1
-  and S2 means S2's first 10 frames are the transition.
+  and S2 means S2's first 10 frames are the transition. The spec puts an
+  `overlap` boundary at the transition's first frame for this reason; if an
+  older spec puts it at full cover instead, start the incoming shot at the
+  transition's first frame so every event lands on the spec's frame.
+- **Exits end at the cut.** An exit option runs for its duration from
+  `exit.atFrame`, so set `atFrame = last exit frame - duration + 1`, not the
+  spec's first exit frame, and check the outgoing layer is gone by the cut
+  when the spec shows an empty field before it.
+- **Inventory per spec.** Phase 4 builds from the inventory written against
+  the same spec file. If the spec was re-run, redo the inventory rows that
+  changed first.
 - **Avandar content.** Curated product screenshots are in
   `public/avandar/screens/*.png`. A `.videos/<slug>/` plan only sees its own
   `public/`, so copy the ones you need into `.videos/<slug>/public/`. Write
@@ -188,8 +206,19 @@ beat as a scene option instead.
   graphics (`stock`, `graph`, `flowchart`, `metric`) are illustrative and
   must not read as product claims.
 - **Colors.** Use theme tokens (`plan.theme` keys and the app's CSS
-  variables). Map the reference's color roles onto them: its dark field to
-  `ground`/`background`, its accent field to `brand`, and so on.
+  variables). Map the reference's color roles onto them: `dark-field` to the
+  darkest Avandar neutral (`NEUTRAL_SHADES[9]`, a navy), `accent-field` to
+  `brand`, `light-field` to the light background, and `black-field` to
+  `#000000` (Avandar has no black token; `shot-vocabulary.json` does the
+  same).
+- **Fictional data label.** Product footage and screenshots must keep
+  **Fictional demonstration data** visible (producer AGENTS.md), even when
+  the reference's composition has no slot for it. `tilted-window` has a
+  `footnote` for this.
+- **Reading previews.** The preview contact sheet of a long film is too tall
+  to read in one image. Read the individual `still-NNN.jpg` files around
+  each boundary instead, and use `scripts/extract-frames.mjs` on the
+  rendered mp4.
 
 ## Commands
 
@@ -197,8 +226,9 @@ Run from `apps/ava-video-producer`. Every script runs the license guard.
 
 Before changing code, run `npm test` once and save its failure list as a
 baseline: some tests may already fail in a worktree (for example the
-product-bundle pre-step). A regression is a failure that is not in the
-baseline.
+product-bundle pre-step), and some are flaky under load (license and
+showcase-server tests). A regression is a failure that is not in the
+baseline and still fails when its file is run alone.
 
 ```bash
 pnpm video validate ../../.videos/<slug>/storyboard.json

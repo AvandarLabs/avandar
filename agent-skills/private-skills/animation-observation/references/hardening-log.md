@@ -109,3 +109,18 @@ spec, treated as prompt weaknesses before building.
   is 15 frames to stay in the token budget.
 - The raw spec quoted on-screen words and claimed every boundary exact;
   both are now explicit prompt rules.
+
+## Run 1, Phase 4 film (octet-v3 spec, skill 0.4.0)
+
+- Rendered 2357 frames, matching the reference. The gate failed only at
+  planned boundaries (hard cuts, wipes, whip-out exits).
+- **Spec ambiguity: where an `overlap` boundary sits.** The spec put it at
+  full cover, the reference said the transition starts the incoming shot,
+  so following both put wipes 9 frames late. `observe.md` now fixes the
+  boundary at the transition's first frame, and says when an "exit" is
+  really a hard cut into a delayed shot.
+- Reference additions: exits must end at the cut (`atFrame = last frame -
+  duration + 1`), inventory must match the spec it builds, trim the logo's
+  transparent padding, colour-role mapping including pure black, the
+  fictional-data label, reading previews still by still, gate policy for
+  exit frames and in-shot luma, and flaky-test baselines.

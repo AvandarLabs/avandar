@@ -58,6 +58,8 @@ A table with one row per boundary between consecutive shots, in order:
 - `exit-then-cut`: the outgoing shot's elements animate out (some layers may stay), then a hard cut.
 - `overlap`: both shots are visible at the same time for some frames (dissolve, wipe, push, whip, morph, zoom-through).
 
+Where the boundary frame sits: for `overlap`, it is the **first frame of the transition** (the first frame showing anything of the incoming shot), and the transition's frames belong to the incoming shot. For the other classes it is the first frame of the incoming shot. If every layer cuts at once to a new field that then holds before new content enters, that is a `hard-cut` into a shot whose content enters later, not an exit.
+
 `outgoing layers` and `incoming layers` list each layer and what it does across the boundary, for example `window: slides left 110% with blur, f585-f594; headline: fades in place f586-f592; background: unchanged`.
 
 ### 4. Composition templates
@@ -111,7 +113,7 @@ shots:
             params: { }    # only values that differ from the catalog entry
             closeup: <true when shorter than ~9 frames>
     camera: none           # or a list: [{ move: CAM1, from: <frame>, to: <frame> }]
-    transition_out: { transition: T1, class: overlap, from: <frame>, to: <frame> }   # omit on the last shot
+    transition_out: { transition: T1, class: overlap, from: <frame>, to: <frame> }   # omit on the last shot; for overlap, from = the next shot's from
 ```
 
 ### 9. Build priorities
