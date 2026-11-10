@@ -74,10 +74,15 @@ artifacts live in the ignored `.videos/<slug>/`:
 
 ## Phase 1: Observe
 
-1. Fetch the source:
-   `node $SKILL_DIR/scripts/fetch-video.mjs <url> .videos/<slug>/research/source/reference.mp4`
-   (or copy a local file there). Probe it with `ffprobe` for duration, size,
-   and fps.
+1. Get the source into `.videos/<slug>/research/source/reference.mp4`:
+   - A local file: copy it there.
+   - A URL: `node $SKILL_DIR/scripts/fetch-video.mjs <url> .videos/<slug>/research/source/reference.mp4`.
+     It uses the repo's Playwright to find the page's mp4. If it reports no
+     downloadable mp4 (streaming-only sites), ask the user for a local copy
+     of the video and stop until you have one. Do not reach for tools outside
+     this repository on your own.
+   - Probe it from `apps/ava-video-producer` with Remotion's bundled ffprobe:
+     `pnpm exec remotion ffprobe -v error -show_entries format=duration:stream=width,height,r_frame_rate -of compact <abs-path>`.
 2. Write the spec:
    ```bash
    node $SKILL_DIR/scripts/argon.mjs \
@@ -88,10 +93,17 @@ artifacts live in the ignored `.videos/<slug>/`:
    Expect 1 to 3 minutes for a 1 to 2 minute video.
 3. **Verify the spec against frames before building on it.** For every
    transition `T*`, every item in "Build priorities", and every direction
-   claim, extract frames around the cited frame range and read them:
+   claim, make a labelled contact sheet of the cited frame range and read it:
    ```bash
-   ffmpeg -v error -ss <sec> -t <dur> -i reference.mp4 -vf "scale=480:-1,tile=6x3" -frames:v 1 frames/<id>.png
+   node $SKILL_DIR/scripts/extract-frames.mjs \
+     --video .videos/<slug>/research/source/reference.mp4 \
+     --out .videos/<slug>/research/frames/<id>.jpg \
+     --from <frame> --to <frame> --step 1 --width 320 --columns 8
    ```
+   (`--frames a,b,c` picks exact frames; frame numbers are at 30 fps.) It
+   uses only the repo's ffmpeg (`ffmpeg-static`, else Remotion's bundled
+   one) and Playwright. Use `--step 1` across transitions: they last only a
+   few frames.
    Add a `## Verification` table at the top of `motion-spec.md`: claim,
    verdict (correct / corrected / unverified), correction. Fix wrong values in
    the spec itself. Record every correction you had to make: in the
