@@ -3,4 +3,32 @@
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types.ts";
 
 /** Every data-agent tool declared by a bundled plugin. */
-export const PLUGIN_AI_TOOLS: readonly PluginAiToolDeclaration[] = [];
+export const PLUGIN_AI_TOOLS: readonly PluginAiToolDeclaration[] = [
+  {
+    "pluginId": "avandar.epidemiology",
+    "permissions": [
+      "data:context",
+      "query:addColumns"
+    ],
+    "name": "fitRegression",
+    "description": "Fits a straight line of yColumn on xColumn using the numeric result already on screen. Returns slope, intercept, rSquared, n, and isTruncated. n is how many rows had a finite number in both columns. rSquared is null when it has no value. isTruncated is true when the result was longer than the first 50,000 rows. You never receive row values. State the slope, intercept, and fit in one or two plain sentences. This call does not end your turn. If the tool says nothing is on screen, say you need a result showing first. Do not call run_query in the same answer to create that result.\n",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "xColumn",
+        "yColumn"
+      ],
+      "properties": {
+        "xColumn": {
+          "type": "string",
+          "description": "The predictor column, named as it appears on the result."
+        },
+        "yColumn": {
+          "type": "string",
+          "description": "The outcome column, named as it appears on the result."
+        }
+      }
+    }
+  }
+];
