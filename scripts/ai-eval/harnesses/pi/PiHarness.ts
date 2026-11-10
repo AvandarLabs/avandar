@@ -15,10 +15,16 @@ import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDat
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
 import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
+import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
 import { EMPTY_EVAL_USAGE } from "../EvalHarness";
+import {
+  getEvalPluginAiTools,
+  publishFitRegressionResult,
+  runEvalPluginAiTool,
+} from "./fitRegressionTooling";
 import { PI_EVAL_CONFIGS } from "./piEvalConfigs";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
@@ -154,6 +160,7 @@ function _toEvalAnswer(
   reply: DataAgentReply,
   recorder: QuestionRecorder,
   startedAt: number,
+  toolNames: readonly string[],
 ): EvalAnswer {
   const lastQuery = reply.state.lastQuery;
   return {
@@ -174,6 +181,7 @@ function _toEvalAnswer(
     }),
     consentPrompts: recorder.consentPrompts,
     valuesSentToModel: reply.state.valuesSentToModel,
+    toolNames,
     usage: {
       calls: reply.usage.calls,
       promptTokens: reply.usage.inputTokens,
@@ -219,6 +227,7 @@ function _toFailedEvalAnswer(
   error: unknown,
   usage: EvalUsage,
   startedAt: number,
+  toolNames: readonly string[],
 ): EvalAnswer {
   return {
     error: error instanceof Error ? error.message : String(error),
@@ -226,9 +235,27 @@ function _toFailedEvalAnswer(
     clarifications: [],
     consentPrompts: 0,
     valuesSentToModel: [],
+    toolNames,
     usage,
     latencyMs: performance.now() - startedAt,
   };
+}
+
+/** The names of the tools the model called after message `firstIndex`. */
+function _toolNamesSince(
+  dataAgent: DataAgent,
+  firstIndex: number,
+): readonly string[] {
+  return dataAgent.agent.state.messages
+    .slice(firstIndex)
+    .filter((message): message is AssistantMessage => {
+      return message.role === "assistant";
+    })
+    .flatMap((message) => {
+      return message.content.flatMap((block) => {
+        return block.type === "toolCall" ? [block.name] : [];
+      });
+    });
 }
 
 /**
@@ -328,6 +355,9 @@ export function createPiConversation(
       const startedAt = performance.now();
       const firstMessageIndex = dataAgent.agent.state.messages.length;
       const inputs = _buildTurnInputs(question, vault);
+      if (question.fitRegression) {
+        publishFitRegressionResult(question.fitRegression);
+      }
       try {
         const reply = await dataAgent.ask(
           buildAgentTurnText({
@@ -344,10 +374,22 @@ export function createPiConversation(
         );
         lastPageBlock = inputs.blocks.pageBlock ?? lastPageBlock;
         lastAttachedBlock = inputs.blocks.attachedBlock;
-        return _toEvalAnswer(reply, recorder, startedAt);
+        return _toEvalAnswer(
+          reply,
+          recorder,
+          startedAt,
+          _toolNamesSince(dataAgent, firstMessageIndex),
+        );
       } catch (error) {
         const usage = _usageSince(dataAgent, firstMessageIndex);
-        return _toFailedEvalAnswer(error, usage, startedAt);
+        return _toFailedEvalAnswer(
+          error,
+          usage,
+          startedAt,
+          _toolNamesSince(dataAgent, firstMessageIndex),
+        );
+      } finally {
+        ExplorerPluginResultStore.clear();
       }
     },
   };
@@ -408,6 +450,8 @@ export function createPiHarness(
             streamFn,
             today: new Date().toISOString().slice(0, 10),
             sessionId: crypto.randomUUID(),
+            getPluginAiTools: getEvalPluginAiTools,
+            runPluginAiTool: runEvalPluginAiTool,
           });
         },
       });
