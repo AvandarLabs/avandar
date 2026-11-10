@@ -29,6 +29,8 @@ The implementer cannot see the video. Everything they need to reproduce a beat m
 - **Judge mask shape on solid areas.** Read a wipe or erase edge where it crosses a flat background, a bar, or a window, never from how letters disappear: each letter's own outline makes any edge look curved.
 - **Account for every layer.** For each boundary, list every layer visible in the last frame before it and the first frame after it, and say what happens to each, including layers that only drift or stay put underneath a wipe.
 - **Start means first change.** A motion starts on the first frame that differs from the frame before it and ends on the first frame that no longer changes.
+- **Measure, never derive.** Never compute a start, end, or duration from a formula (for example "5 frames per column plus a 1-frame stagger"). Find the first and last changed frame directly; give the stagger separately as what you measured.
+- **No on-screen words.** Never quote text, labels, or names from the video. Say "2-line headline, 4 words" instead.
 - **Use the stated length.** The label of each VIDEO states its exact frame count. `total_frames` must equal it.
 
 ## Output format
@@ -108,7 +110,7 @@ shots:
             to: <frame>
             params: { }    # only values that differ from the catalog entry
             closeup: <true when shorter than ~9 frames>
-    camera: <none | camera move with frames>
+    camera: none           # or a list: [{ move: CAM1, from: <frame>, to: <frame> }]
     transition_out: { transition: T1, class: overlap, from: <frame>, to: <frame> }   # omit on the last shot
 ```
 
@@ -118,4 +120,4 @@ The 6 to 10 motions, transitions, or compositions that most define this video's 
 
 ### 10. Confidence
 
-What you are unsure of: exact easing, counts, sub-frame staggers, directions. Give the frames where an implementer should look closer.
+What you are unsure of: exact easing, counts, sub-frame staggers, directions. Give the frames where an implementer should look closer. List every frame number you estimated rather than counted; never claim all values are exact.

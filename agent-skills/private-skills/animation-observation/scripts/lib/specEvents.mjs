@@ -1,8 +1,8 @@
 /**
  * Reads shot timing from a motion spec's storyboard script or from a
  * producer `storyboard.json`, and lists the frames worth a close look:
- * windows around every shot boundary and transition, and one
- * representative still per shot.
+ * windows around every shot boundary, transition, camera move, and short
+ * in-shot motion, and one representative still per shot.
  */
 import { readFile } from "node:fs/promises";
 import { requireFromProducer } from "./videoTools.mjs";
@@ -52,10 +52,37 @@ export async function readShots(filePath) {
   return (await readStoryboard(filePath)).shots;
 }
 
-/** Collects [startFrame, endFrame] windows around boundaries and transitions. */
+/** Motions at or under this length get a close-up even inside a shot. */
+const SHORT_MOTION_FRAMES = 20;
+
+/** Reads camera moves as `[from, to]`, structured or as "f1212 to f1224" text. */
+function readCameraWindows(camera) {
+  if (!camera || camera === "none") return [];
+  const moves = Array.isArray(camera) ? camera : [camera];
+  return moves.flatMap((move) => {
+    if (typeof move === "object" && Number.isFinite(move.from)) return [[move.from, move.to]];
+    const match = String(move).match(/f?(\d+)\s*(?:to|-|–)\s*f?(\d+)/);
+    return match ? [[Number(match[1]), Number(match[2])]] : [];
+  });
+}
+
+/** Reads short or `closeup`-flagged element motions as `[from, to]`. */
+function readShortMotionWindows(shot) {
+  return (shot.elements ?? []).flatMap((element) =>
+    (element.motions ?? [])
+      .filter((motion) => Number.isFinite(motion.from) && Number.isFinite(motion.to))
+      .filter((motion) => motion.closeup || motion.to - motion.from <= SHORT_MOTION_FRAMES)
+      .map((motion) => [motion.from, motion.to]),
+  );
+}
+
+/**
+ * Collects `[startFrame, endFrame]` windows around boundaries, transitions,
+ * camera moves, and short in-shot motions.
+ */
 function buildEventWindows(shots) {
   return shots.flatMap((shot, index) => {
-    const windows = [];
+    const windows = [...readCameraWindows(shot.camera), ...readShortMotionWindows(shot)];
     if (index > 0) windows.push([shot.from, shot.from]);
     if (shot.transition_out) windows.push([shot.transition_out.from, shot.transition_out.to]);
     return windows;

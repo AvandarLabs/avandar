@@ -86,3 +86,26 @@ spec, treated as prompt weaknesses before building.
 - `npm test` already failed in this worktree (product bundle pre-step); the
   reference now asks for a baseline run, and to restore regenerated
   catalogs before committing.
+
+## Run 3, Phase 1 (octet-v3, skill 0.3.0)
+
+- Spec accuracy: 20 of 78 checked claims corrected (26%, down from 44%).
+  10 of run 2's 21 corrections now right first time, 3 partly.
+- **Refine request timed out** at Node `fetch`'s 300 s headers timeout; it
+  took 562 s. `argon.mjs` now posts through `node:https` with a 30 minute
+  limit.
+- **Late boundaries after long holds** (5-6 frames): Argon miscounted in
+  frame-exact clips. Refine now has to cite `CLIP <label>-<n> sample <k>`
+  for every frame it sets, counting through still stretches.
+- **Totals rebuilt from a formula** ("5 frames per column plus stagger")
+  pushed wipe starts early. New rule: measure first and last changed frames,
+  never derive.
+- **Stills ignored** (line colour roles wrong three runs running, logo
+  height, notch bars): refine must now fill a per-still measurement section
+  first and make the composition section agree with it.
+- **In-shot events never clipped** (a second push-in, a content swap): the
+  clip planner now covers camera moves and every motion of 20 frames or
+  less; camera is now structured in the storyboard script. Default clip pad
+  is 15 frames to stay in the token budget.
+- The raw spec quoted on-screen words and claimed every boundary exact;
+  both are now explicit prompt rules.

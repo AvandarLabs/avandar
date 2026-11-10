@@ -14,7 +14,7 @@
  *     [--context <file> ...] [--json] [--fps 10] [--thinking xhigh]
  *     [--clips-from [<label>=]<spec.md|storyboard.json> ...]
  *     [--clip [<label>:]<startFrame>-<endFrame> ...]
- *     [--clip-pad 30] [--clips-only] [--model gemini-4-argon]
+ *     [--clip-pad 15] [--clips-only] [--dry-run] [--model gemini-4-argon]
  *
  * Each video is sent whole, sampled at `--fps`, preceded by a label part
  * that also states its probed frame rate and frame count, so a prompt can
@@ -26,7 +26,8 @@
  * re-encoded slowed down until every source frame is one 24 fps sample:
  * clip sample k is source frame `startFrame + k`, with no conversion for
  * Argon to get wrong. `--clips-from <label>=<file>` derives clips (every shot
- * boundary and transition window, padded by `--clip-pad` frames) and one
+ * boundary, transition, camera move, and short motion, padded by
+ * `--clip-pad` frames) and one
  * full-resolution still per shot for that video, from a motion spec's
  * storyboard script or a producer `storyboard.json`. Without `<label>=`, it
  * applies to the first video. `--clip` adds clips by hand, with the same
@@ -34,8 +35,9 @@
  * `--dry-run` prints the planned clips and stills and exits without calling
  * the API or reading the key.
  */
-import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import https from "node:https";
 import os from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
@@ -52,6 +54,8 @@ const KEY_NAME = "GEMINI_API_KEY";
 const ENV_FILE_NAME = ".env.video-producer.local";
 const POLL_INTERVAL_MS = 4000;
 const MAX_SAMPLE_FPS = 24;
+/** Large video requests can take over 10 minutes; `fetch` gives up at 5. */
+const GENERATE_TIMEOUT_MS = 30 * 60 * 1000;
 
 const { values } = parseArgs({
   options: {
@@ -65,7 +69,7 @@ const { values } = parseArgs({
     thinking: { type: "string", default: "xhigh" },
     "clips-from": { type: "string", multiple: true },
     clip: { type: "string", multiple: true },
-    "clip-pad": { type: "string", default: "30" },
+    "clip-pad": { type: "string", default: "15" },
     "clips-only": { type: "boolean", default: false },
     "dry-run": { type: "boolean", default: false },
   },
@@ -231,22 +235,50 @@ async function buildParts(apiKey, videos, scratchDir, uploadedFiles) {
   return [...videoParts, ...closeupParts, promptPart, ...contextParts];
 }
 
+/**
+ * POSTs JSON over `node:https` and parses the JSON reply. Used instead of
+ * `fetch` because undici's default headers timeout (300 s) is shorter than a
+ * long video request takes to answer.
+ */
+function postJson(url, headers, payload) {
+  const body = JSON.stringify(payload);
+  return new Promise((resolve, reject) => {
+    const request = https.request(
+      url,
+      { method: "POST", headers: { ...headers, "Content-Length": Buffer.byteLength(body) } },
+      (response) => {
+        const chunks = [];
+        response.on("data", (chunk) => chunks.push(chunk));
+        response.on("end", () => {
+          try {
+            resolve({ status: response.statusCode, json: JSON.parse(Buffer.concat(chunks).toString("utf8")) });
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+    );
+    request.setTimeout(GENERATE_TIMEOUT_MS, () => request.destroy(new Error("generateContent timed out")));
+    request.on("error", reject);
+    request.end(body);
+  });
+}
+
 /** Calls generateContent and returns the reply text and usage. */
 async function generate(apiKey, parts) {
-  const response = await fetch(`${API_BASE}/v1beta/models/${values.model}:generateContent`, {
-    method: "POST",
-    headers: { "x-goog-api-key": apiKey, "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const { status, json: body } = await postJson(
+    `${API_BASE}/v1beta/models/${values.model}:generateContent`,
+    { "x-goog-api-key": apiKey, "Content-Type": "application/json" },
+    {
       contents: [{ parts }],
       generationConfig: {
         mediaResolution: "MEDIA_RESOLUTION_HIGH",
         thinkingConfig: { thinkingLevel: values.thinking },
         ...(values.json ? { responseMimeType: "application/json" } : {}),
       },
-    }),
-  });
-  const body = await response.json();
-  if (!response.ok) throw new Error(`generateContent ${response.status}: ${body.error?.message}`);
+    },
+  );
+  if (status !== 200) throw new Error(`generateContent ${status}: ${body.error?.message}`);
   const replyText = body.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
   return { replyText, usage: body.usageMetadata, finishReason: body.candidates?.[0]?.finishReason };
 }

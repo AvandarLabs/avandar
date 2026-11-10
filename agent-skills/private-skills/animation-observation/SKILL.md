@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
 metadata:
   author: jpsyx
-  version: "0.3.0"
+  version: "0.4.0"
   tags: avandar, video, remotion, motion-atlas, gemini
 ---
 
@@ -108,9 +108,10 @@ artifacts live in the ignored `.videos/<slug>/`:
    ```
    `--clips-from` reads the draft's storyboard script and sends each
    boundary as a slowed clip in which every sample is one source frame, so
-   Argon counts frames instead of converting timestamps. Preview what it will
-   send with `node $SKILL_DIR/scripts/boundary-clips.mjs <draft>`. About 4
-   minutes for a 78 s video.
+   Argon counts frames instead of converting timestamps. It also clips camera
+   moves and every motion of 20 frames or less. Check the plan first with
+   `--dry-run` (no API call). About 10 minutes for a 78 s video; the script
+   waits up to 30.
    Never edit `motion-spec.draft.md` or `motion-spec.raw.md`. The evaluation
    phase needs them to see what the prompts produced. Copy the raw file to
    `motion-spec.md` and edit only that copy.
@@ -193,7 +194,7 @@ Argon cannot run a browser or a Remotion player: it only takes video files.
 Render an mp4 at the reference's resolution and fps, then:
 
 ```bash
-node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 20 \
+node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 10 \
   --prompt $SKILL_DIR/prompts/compare.md \
   --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
   --video CANDIDATE=<rendered.mp4> \
@@ -208,7 +209,7 @@ Both videos get frame-accurate boundary clips and one still per shot, so
 Argon compares transitions frame by frame; the whole videos only carry
 pacing, so 5 fps is enough. Budget: about 270 tokens per sampled frame, and
 the request must stay under about 1M tokens (two 80 s videos at 5 fps plus
-both clip sets is about 650k). Check the plan first with `--dry-run` (no API
+both clip sets at 10-frame padding is about 800k). Check the plan first with `--dry-run` (no API
 call). If it is too large, lower `--clip-pad` before dropping clips.
 
 **Acceptable** = every score (`motion`, `transitions`, `composition`,
