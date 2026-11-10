@@ -155,7 +155,20 @@ async function planCloseups(videos) {
     const [label, range] = splitLabel(value, ":", videos[0].label);
     planFor(label).clips.push(range.split("-").map(Number));
   }
+  for (const plan of plans.values()) plan.clips = mergeClips(plan.clips);
   return plans;
+}
+
+/** Sorts clips and merges any that overlap or touch, across sources. */
+function mergeClips(clips) {
+  return [...clips]
+    .sort((left, right) => left[0] - right[0])
+    .reduce((merged, clip) => {
+      const lastClip = merged.at(-1);
+      if (lastClip && clip[0] <= lastClip[1]) lastClip[1] = Math.max(lastClip[1], clip[1]);
+      else merged.push([...clip]);
+      return merged;
+    }, []);
 }
 
 /** Builds the label part for one whole video. */
@@ -180,7 +193,8 @@ async function buildClipParts(apiKey, video, clips, scratchDir, uploadedFiles) {
           `CLIP ${video.label}-${index + 1} follows: frames ${startFrame} to ${endFrame - 1} of "${video.label}", ` +
           `slowed so that every sample is exactly one consecutive video frame. ` +
           `Sample k (0-based), at clip time k/${MAX_SAMPLE_FPS} s, is video frame ${startFrame} + k. ` +
-          `Report frames of "${video.label}" computed this way.`,
+          `To find a frame, read the clip timestamp t (seconds) of the sample and compute ` +
+          `${startFrame} + round(t * ${MAX_SAMPLE_FPS}); do not count samples by hand through still stretches.`,
       },
       {
         file_data: { mime_type: "video/mp4", file_uri: file.uri },
@@ -264,8 +278,27 @@ function postJson(url, headers, payload) {
   });
 }
 
-/** Calls generateContent and returns the reply text and usage. */
+/** Status codes worth retrying: rate limits and transient server load. */
+const RETRY_STATUSES = new Set([429, 500, 502, 503, 504]);
+const RETRY_DELAYS_MS = [30_000, 90_000, 180_000];
+
+/** Calls generateContent, retrying transient failures with the same uploads. */
 async function generate(apiKey, parts) {
+  for (let attempt = 0; ; attempt += 1) {
+    const result = await generateOnce(apiKey, parts);
+    if (!RETRY_STATUSES.has(result.status) || attempt >= RETRY_DELAYS_MS.length) {
+      if (result.status !== 200) {
+        throw new Error(`generateContent ${result.status}: ${result.body.error?.message}`);
+      }
+      return result.reply;
+    }
+    console.warn(`generateContent ${result.status}; retrying in ${RETRY_DELAYS_MS[attempt] / 1000}s`);
+    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS_MS[attempt]));
+  }
+}
+
+/** One generateContent call; returns the status, body, and parsed reply. */
+async function generateOnce(apiKey, parts) {
   const { status, json: body } = await postJson(
     `${API_BASE}/v1beta/models/${values.model}:generateContent`,
     { "x-goog-api-key": apiKey, "Content-Type": "application/json" },
@@ -278,18 +311,31 @@ async function generate(apiKey, parts) {
       },
     },
   );
-  if (status !== 200) throw new Error(`generateContent ${status}: ${body.error?.message}`);
   const replyText = body.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("") ?? "";
-  return { replyText, usage: body.usageMetadata, finishReason: body.candidates?.[0]?.finishReason };
+  const reply = { replyText, usage: body.usageMetadata, finishReason: body.candidates?.[0]?.finishReason };
+  return { status, body, reply };
 }
 
-/** Prints what a run would send, without calling the API. */
+/** Rough token costs measured on Argon at MEDIA_RESOLUTION_HIGH. */
+const TOKENS_PER_VIDEO_SAMPLE = 273;
+const TOKENS_PER_STILL = 1100;
+const TOKEN_LIMIT = 1_048_576;
+
+/** Prints what a run would send and its estimated size, without calling the API. */
 async function printDryRun(videos) {
+  const wholeVideos = values["clips-only"] ? videos.slice(1) : videos;
+  let numTokens = wholeVideos.reduce(
+    (sum, video) => sum + video.probe.durationSeconds * Number(values.fps) * TOKENS_PER_VIDEO_SAMPLE,
+    0,
+  );
   for (const [label, { clips, stills }] of await planCloseups(videos)) {
     const numClipFrames = clips.reduce((sum, [start, end]) => sum + end - start, 0);
+    numTokens += numClipFrames * TOKENS_PER_VIDEO_SAMPLE + stills.length * TOKENS_PER_STILL;
     console.log(`${label}: ${clips.length} clips (${numClipFrames} frames), ${stills.length} stills`);
     console.log(`  clips: ${clips.map(([start, end]) => `${start}-${end}`).join(" ")}`);
   }
+  const verdict = numTokens < TOKEN_LIMIT * 0.9 ? "ok" : "TOO LARGE: lower --clip-pad or --fps";
+  console.log(`estimated ${Math.round(numTokens / 1000)}k media tokens of ${Math.round(TOKEN_LIMIT / 1000)}k: ${verdict}`);
 }
 
 async function main() {

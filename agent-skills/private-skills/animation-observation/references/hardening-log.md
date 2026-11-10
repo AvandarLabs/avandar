@@ -124,3 +124,30 @@ spec, treated as prompt weaknesses before building.
   transparent padding, colour-role mapping including pure black, the
   fictional-data label, reading previews still by still, gate policy for
   exit frames and in-shot luma, and flaky-test baselines.
+
+## Iteration 1 evaluation (octet-v3 film, skill 0.4.0)
+
+- **Acceptable.** Argon: motion 8.5, transitions 9.0, composition 8.5,
+  pacing 10, vibe 8.5, overall 8.9; no critical differences, one major
+  (window content is a still where the reference's types and scrolls). The
+  reviewer's frame check rated motion and composition about a point lower
+  and found 2 of 6 checked differences partly wrong.
+- Compare fixes: the prompt claimed 10 fps while the command used 5;
+  CANDIDATE got only boundary clips while REFERENCE got in-shot motions too
+  (CANDIDATE now also gets the spec's windows, merged); Argon described one
+  CANDIDATE motion from the storyboard's props instead of its frames (now
+  forbidden); it missed a window running off the frame edge (now asked to
+  check stills for layout defects). `--dry-run` now estimates tokens.
+
+## Run 4, Phase 1 (octet-v4, skill 0.4.0)
+
+- Spec accuracy flat: 23 of 98 claims corrected (23%, run 3 26%). Detail
+  errors dominate: cap heights, line colour roles (wrong four runs
+  running), logo height, mask mechanism names, late end frames.
+- Fixes: retries with backoff on 429/5xx keeping uploads (a 503 had cost a
+  full re-upload); stills avoid camera moves and add one after each move;
+  clip frames are read from timestamps, not counted; mask names need edge
+  positions at three samples; each layer gets its own start and end; a
+  scan for events the draft missed; a motion ends when the element stops,
+  not its contents; a hex colour per text line; SKILL.md states the claim
+  kinds and tolerance (2 frames or 2%) for verification.

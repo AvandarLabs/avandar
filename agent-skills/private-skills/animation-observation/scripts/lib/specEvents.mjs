@@ -108,13 +108,25 @@ export function buildBoundaryClips(shots, padFrames, numFrames) {
   }, []);
 }
 
+/** Frames a still should avoid: camera moves inside the shot. */
+function readBusyWindows(shot) {
+  return readCameraWindows(shot.camera);
+}
+
 /**
- * Picks one still per shot, two thirds of the way in, when entrances have
- * landed and exits have not started.
+ * Picks stills per shot: one two thirds of the way in, moved out of any
+ * camera move, plus one just after each camera move so the composition it
+ * lands on is measured too.
  */
 export function buildShotStills(shots) {
-  return shots.map((shot) => ({
-    shotId: shot.id,
-    frame: Math.round(shot.from + (shot.to - shot.from) * (2 / 3)),
-  }));
+  return shots.flatMap((shot) => {
+    const busyWindows = readBusyWindows(shot);
+    let frame = Math.round(shot.from + (shot.to - shot.from) * (2 / 3));
+    const overlapping = busyWindows.find(([from, to]) => frame >= from - 2 && frame <= to + 2);
+    if (overlapping) frame = overlapping[0] - 3 > shot.from ? overlapping[0] - 3 : overlapping[1] + 3;
+    const afterMoves = busyWindows
+      .map(([, to]) => to + 3)
+      .filter((afterFrame) => afterFrame < shot.to && Math.abs(afterFrame - frame) > 6);
+    return [frame, ...afterMoves].map((stillFrame) => ({ shotId: shot.id, frame: stillFrame }));
+  });
 }

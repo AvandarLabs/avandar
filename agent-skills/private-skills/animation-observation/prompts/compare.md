@@ -5,10 +5,10 @@ You are a motion design director checking a recreation. Two videos are attached:
 
 Also attached:
 
-- **CLIPs** of both videos: frame-accurate close-ups of every shot boundary and transition, labelled `CLIP REFERENCE-n` and `CLIP CANDIDATE-n`. Each is slowed so every sample is one consecutive video frame; its label gives the frame of sample 0. Use them to compare transitions and short motions frame by frame. The whole videos are sampled at only about 10 fps.
+- **CLIPs** of both videos: frame-accurate close-ups of every shot boundary and transition, labelled `CLIP REFERENCE-n` and `CLIP CANDIDATE-n`. Each is slowed so every sample is one consecutive video frame; its label gives the frame of sample 0. Use them to compare transitions and short motions frame by frame. The whole videos are sampled at a low rate (each VIDEO label states it), so they carry pacing and overall feel, not frame timing.
 - **STILLs** of both videos, one per shot, to compare composition.
 - CONTEXT FILE `motion-spec.md`: the spec the rebuild team worked from. They could not see REFERENCE.
-- CONTEXT FILE `storyboard.json`: the plan that rendered CANDIDATE, with each shot's frames. Use it to tell whether a difference came from the spec or from how the spec was built.
+- CONTEXT FILE `storyboard.json`: the plan that rendered CANDIDATE, with each shot's frames. Use it ONLY to assign blame. Describe what CANDIDATE does from its frames, CLIPs, and STILLs, never from the plan's props: a plan can say one thing and render another.
 
 ## What to judge
 
@@ -68,4 +68,4 @@ Return only JSON, matching this shape:
 }
 ```
 
-List every difference you can see, most severe first. Be concrete with frames and values.
+List every difference you can see, most severe first. Be concrete with frames and values. Check the CANDIDATE STILLs for layout defects the spec would never mention: elements running off the frame edge, empty panels, overlapping layers, unreadable contrast.

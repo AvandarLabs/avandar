@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
 metadata:
   author: jpsyx
-  version: "0.4.0"
+  version: "0.5.0"
   tags: avandar, video, remotion, motion-atlas, gemini
 ---
 
@@ -129,6 +129,11 @@ artifacts live in the ignored `.videos/<slug>/`:
    only this script for frames: it uses the repo's ffmpeg (`ffmpeg-static`,
    else Remotion's bundled one) and Playwright, and labels frames correctly.
    Use `--step 1` across transitions: they last only a few frames.
+   Check at least: every boundary frame and class, every transition
+   mechanism, each layer's start and end at each boundary, every short
+   motion's duration and stagger, every count and direction, each shot's
+   composition boxes, cap heights, and line colour roles, and the logo's
+   size. Count a value as correct within 2 frames or 2% of the frame.
    Add a `## Verification` table at the top of `motion-spec.md`: claim,
    verdict (correct / corrected / unverified), correction. Fix every wrong
    value in the body too: the body is what gets built, and it wins over the
@@ -199,18 +204,22 @@ node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 10 \
   --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
   --video CANDIDATE=<rendered.mp4> \
   --clips-from REFERENCE=.videos/<slug>/research/motion-spec.md \
+  --clips-from CANDIDATE=.videos/<slug>/research/motion-spec.md \
   --clips-from CANDIDATE=.videos/<slug>/storyboard.json \
   --context .videos/<slug>/research/motion-spec.md \
   --context .videos/<slug>/storyboard.json \
   --out .videos/<slug>/research/eval/iteration-<n>.json
 ```
 
-Both videos get frame-accurate boundary clips and one still per shot, so
-Argon compares transitions frame by frame; the whole videos only carry
+Both videos get frame-accurate clips and one still per shot, so Argon
+compares transitions frame by frame. CANDIDATE gets the spec's windows too
+(the film follows the spec's frames), so in-shot motions are clipped on both
+sides, merged with its own plan's boundaries; the whole videos only carry
 pacing, so 5 fps is enough. Budget: about 270 tokens per sampled frame, and
 the request must stay under about 1M tokens (two 80 s videos at 5 fps plus
 both clip sets at 10-frame padding is about 800k). Check the plan first with `--dry-run` (no API
-call). If it is too large, lower `--clip-pad` before dropping clips.
+call); it prints an estimated token count. If it is too large, lower
+`--clip-pad` before dropping clips.
 
 **Acceptable** = every score (`motion`, `transitions`, `composition`,
 `pacing`, `vibe`) is 7 or more and there is no `critical` difference. The
