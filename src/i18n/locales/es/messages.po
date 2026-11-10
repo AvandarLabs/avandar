@@ -1788,7 +1788,6 @@ msgid "Answer offline"
 msgstr "Responder sin conexión"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Expandir el panel de capas"
 
@@ -3623,7 +3622,6 @@ msgid "Created"
 msgstr "Creado"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Contraer el panel de capas"
 

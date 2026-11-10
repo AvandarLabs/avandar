@@ -1779,7 +1779,6 @@ msgid "Answer offline"
 msgstr "Jibu bila mtandao"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Panua kidirisha cha tabaka"
 
@@ -3609,7 +3608,6 @@ msgid "Created"
 msgstr "Imeundwa"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Kunja paneli ya tabaka"
 

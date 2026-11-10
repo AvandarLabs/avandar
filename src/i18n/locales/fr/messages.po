@@ -1804,7 +1804,6 @@ msgid "Answer offline"
 msgstr "Répondre hors ligne"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Développer le panneau des calques"
 
@@ -3652,7 +3651,6 @@ msgid "Created"
 msgstr "Créé"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Réduire le panneau des calques"
 

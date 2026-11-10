@@ -1756,7 +1756,6 @@ msgid "Answer offline"
 msgstr "الإجابة دون اتصال"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "توسيع لوحة الطبقات"
 
@@ -3561,7 +3560,6 @@ msgid "Created"
 msgstr "تم الإنشاء"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "طي لوحة الطبقات"
 

@@ -1786,7 +1786,6 @@ msgid "Answer offline"
 msgstr "Responder offline"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Expandir o painel de camadas"
 
@@ -3612,7 +3611,6 @@ msgid "Created"
 msgstr "Criado"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Recolher o painel de camadas"
 

@@ -1710,7 +1710,6 @@ msgid "Answer offline"
 msgstr "离线回答"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "展开图层面板"
 
@@ -3472,7 +3471,6 @@ msgid "Created"
 msgstr "已创建"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
-#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "收起图层面板"
 
