@@ -1,4 +1,5 @@
 import type {
+  AiToolHandler,
   CommandHandler,
   PluginDefinition,
 } from "@plugin-sdk/PluginApi.types";
@@ -17,27 +18,34 @@ export function isPluginDefinition(value: unknown): value is PluginDefinition {
   if (!_isObject(value)) {
     return false;
   }
-  const { kind, commands, vizTypes } = value as {
+  const { kind, commands, vizTypes, aiTools } = value as {
     kind?: unknown;
     commands?: unknown;
     vizTypes?: unknown;
+    aiTools?: unknown;
   };
   return (
-    kind === "avandar-plugin" && _isObject(commands) && _isObject(vizTypes)
+    kind === "avandar-plugin" &&
+    _isObject(commands) &&
+    _isObject(vizTypes) &&
+    (aiTools === undefined || _isObject(aiTools))
   );
 }
 
 /**
- * Declares a plugin's command handlers and chart types, each keyed by the id
- * its `ava.yaml` declares. Either may be left out when the plugin has none.
- * The plugin's entry module must export the result as its default export.
+ * Declares a plugin's command handlers, chart types, and AI tool handlers,
+ * each keyed by the id its `ava.yaml` declares. Any may be left out when the
+ * plugin has none. The plugin's entry module must export the result as its
+ * default export.
  */
 export function definePlugin({
   commands = {},
   vizTypes = {},
+  aiTools = {},
 }: Readonly<{
   commands?: Readonly<Record<string, CommandHandler>>;
   vizTypes?: Readonly<Record<string, PluginVizDefinition>>;
+  aiTools?: Readonly<Record<string, AiToolHandler>>;
 }>): PluginDefinition {
-  return { kind: "avandar-plugin", commands, vizTypes };
+  return { kind: "avandar-plugin", commands, vizTypes, aiTools };
 }
