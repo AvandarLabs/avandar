@@ -8,9 +8,7 @@ import type { ReactNode } from "react";
  * ends in an ellipsis, and hovering it shows the full name. Sort, filter,
  * and resize stay on the grid's own header around this text.
  */
-export function DataGridColumnTitle({
-  displayName,
-}: IHeaderParams): ReactNode {
+export function DataGridColumnTitle({ displayName }: IHeaderParams): ReactNode {
   return (
     <TruncatedText
       className={css.columnTitle}

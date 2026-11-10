@@ -112,7 +112,9 @@ describe("GisAppLayerPanel", () => {
     _renderPanel(app);
 
     expect(screen.getByRole("heading", { name: "Layers" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Schools" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Schools" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Layer settings body")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Add layer" }),

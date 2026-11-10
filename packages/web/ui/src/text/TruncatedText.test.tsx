@@ -1,13 +1,17 @@
 import { MantineProvider } from "@mantine/core";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TruncatedText } from "./TruncatedText";
 
 const LONG_NAME = "School Immunization Survey: From School Records";
 
-function renderText(
-  ui: JSX.Element,
-): ReturnType<typeof render> {
+function renderText(ui: JSX.Element): ReturnType<typeof render> {
   return render(<MantineProvider>{ui}</MantineProvider>);
 }
 
