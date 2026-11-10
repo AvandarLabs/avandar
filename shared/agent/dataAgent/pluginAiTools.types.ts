@@ -25,7 +25,7 @@ export type PluginAiToolDeclaration = {
         {
           type: "string" | "number" | "boolean";
           description?: string;
-          enum?: readonly (string | number | boolean)[];
+          enum?: ReadonlyArray<string | number | boolean>;
         }
       >
     >;
