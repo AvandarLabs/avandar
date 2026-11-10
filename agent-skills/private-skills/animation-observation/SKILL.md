@@ -189,7 +189,7 @@ Argon cannot run a browser or a Remotion player: it only takes video files.
 Render an mp4 at the reference's resolution and fps, then:
 
 ```bash
-node $SKILL_DIR/scripts/argon.mjs --json \
+node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 20 \
   --prompt $SKILL_DIR/prompts/compare.md \
   --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
   --video CANDIDATE=<rendered.mp4> \
@@ -201,9 +201,11 @@ node $SKILL_DIR/scripts/argon.mjs --json \
 ```
 
 Both videos get frame-accurate boundary clips and one still per shot, so
-Argon compares transitions frame by frame. Check the plan first with
-`--dry-run` (no API call). If the request is too large (over about 1M
-tokens), lower `--clip-pad` before dropping clips.
+Argon compares transitions frame by frame; the whole videos only carry
+pacing, so 5 fps is enough. Budget: about 270 tokens per sampled frame, and
+the request must stay under about 1M tokens (two 80 s videos at 5 fps plus
+both clip sets is about 650k). Check the plan first with `--dry-run` (no API
+call). If it is too large, lower `--clip-pad` before dropping clips.
 
 **Acceptable** = every score (`motion`, `transitions`, `composition`,
 `pacing`, `vibe`) is 7 or more and there is no `critical` difference. The
