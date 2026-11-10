@@ -148,12 +148,15 @@ export function archiveChatSession(
     ],
     index.sessions,
   );
+  const wasSelected = index.selectedId === options.sessionId;
   const closed: ChatSessionIndex = {
     ...index,
     openIds,
     archivedIds: evicted.archivedIds,
     sessions: evicted.sessions,
-    selectedId: openIds[0] ?? options.replacementId,
+    selectedId: wasSelected
+      ? (openIds[0] ?? options.replacementId)
+      : index.selectedId,
   };
   const next =
     openIds.length > 0

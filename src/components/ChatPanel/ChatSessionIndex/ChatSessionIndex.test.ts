@@ -80,6 +80,21 @@ describe("ChatSessionIndex", () => {
     expect(archived.evictedSessionId).toBeUndefined();
   });
 
+  it("keeps the selected session when a background session is archived", () => {
+    let index = createChatSessionIndex({ id: "a", kind: "data" });
+    for (const id of ["b", "c"]) {
+      index = addChatSession(index, { id, kind: "data" });
+    }
+    index = selectChatSession(index, "b");
+    expect(index.openIds).toEqual(["c", "b", "a"]);
+    const archived = archiveChatSession(index, {
+      sessionId: "a",
+      replacementId: "unused",
+    });
+    expect(archived.index.selectedId).toBe("b");
+    expect(archived.index.openIds).toEqual(["c", "b"]);
+  });
+
   it("starts a new data session when the last open session is archived", () => {
     const index = createChatSessionIndex({ id: "a", kind: "case-design" });
     const archived = archiveChatSession(index, {
