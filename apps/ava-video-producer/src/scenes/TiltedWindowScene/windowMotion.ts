@@ -1,7 +1,9 @@
 import { DUR, EASE, mix, ramp } from "../../motion";
 import { getCameraPose } from "../../motion-components/cameraTrack";
+import { getSteppedColumnWipeStyle } from "../../storyboard/StoryFilm/steppedColumnWipe";
 import { WINDOW_TILT } from "./windowTilt";
 import type { Rect } from "../layout/layout";
+import type { CSSProperties } from "react";
 
 /** Where a window is relative to its resting box, and how it is turned. */
 export type WindowPose = {
@@ -31,21 +33,76 @@ const RESTING_POSE: WindowPose = {
 
 /**
  * A window whipping in from beyond the right edge: it decelerates into its
- * box while its tilt settles from the steeper entry angle.
+ * box over `durationInFrames` while its tilt settles from the steeper entry
+ * angle.
  */
 export function getWhipEntrance(
   frame: number,
   at: number,
   canvas: { width: number },
   box: Rect,
+  durationInFrames: number = DUR.sheet,
 ): WindowPose {
-  const progress = ramp(frame, at, DUR.sheet, EASE.out);
+  const progress = ramp(frame, at, durationInFrames, EASE.out);
   return {
     ...RESTING_POSE,
     translateX: mix(progress, canvas.width - box.x + box.width * 0.1, 0),
     rotateY: mix(progress, WINDOW_TILT.entryRotateY, WINDOW_TILT.rotateY),
     blurX: mix(progress, WHIP_BLUR, 0),
   };
+}
+
+/**
+ * One window of a pair sliding in from its own outer edge: the left window
+ * (`side` 0) from beyond the left edge, the right one from beyond the right
+ * edge, decelerating into its box with horizontal blur.
+ */
+export function getSideEntrance(
+  frame: number,
+  at: number,
+  side: 0 | 1,
+  canvas: { width: number },
+  box: Rect,
+  durationInFrames: number = DUR.panel,
+): WindowPose {
+  const progress = ramp(frame, at, durationInFrames, EASE.out);
+  const start =
+    side === 0
+      ? -(box.x + box.width * 1.1)
+      : canvas.width - box.x + box.width * 0.1;
+  return {
+    ...RESTING_POSE,
+    translateX: mix(progress, start, 0),
+    blurX: mix(progress, WHIP_BLUR, 0),
+  };
+}
+
+/** A stepped reveal of a window entering: columns of it rising in turn. */
+export type WindowReveal = { columns?: number; durationInFrames: number };
+
+/** Columns a window reveal uses when the plan omits them. */
+const REVEAL_COLUMNS = 4;
+
+/**
+ * The clip on a window while its stepped reveal runs: columns of the window
+ * rise from the bottom, left to right, as a staircase, then the clip is
+ * dropped. The same staircase as the `stepped-column-wipe` shot transition,
+ * drawn in the window's own plane.
+ */
+export function getWindowRevealStyle(
+  frame: number,
+  at: number,
+  reveal: WindowReveal | undefined,
+): CSSProperties {
+  if (!reveal || frame >= at + reveal.durationInFrames) {
+    return {};
+  }
+  const columns = reveal.columns ?? REVEAL_COLUMNS;
+  return getSteppedColumnWipeStyle(
+    Math.max(0, frame - at),
+    reveal.durationInFrames,
+    { columns, staggerFrames: reveal.durationInFrames / (columns + 1) },
+  );
 }
 
 /**

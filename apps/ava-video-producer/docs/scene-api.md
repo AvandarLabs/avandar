@@ -142,7 +142,7 @@ comparisons, significance, percentages, or source provenance.
 | `wordStaggerFrames` | integer ≥ 2, `3` | Frames between words across all lines |
 | `revealMode` | `"word-mask"`, `"line-fade"`, `"wipe"`, `"cut"`; `"word-mask"` | `line-fade` fades each line with a 12 px rise; `wipe` reveals each line left to right behind a clip with a small leftward travel; `cut` shows each line on its frame |
 | `lineStaggerFrames` | integer 1–12, `3` | Frames between lines in the line modes |
-| `icon` | `{src, size?: 40–480}`, none | Public-relative image above the lines (default 160 px tall), fading in without a rise at `revealAtFrame`; lines then start `DUR.panel` later |
+| `icon` | `{src, size?: 40–480, atFrame?}`, none | Public-relative image above the lines (default 160 px tall), fading in without a rise. Without `atFrame` it fades in at `revealAtFrame` and the lines start `DUR.panel` later; with `atFrame` it fades in then and the lines start at `revealAtFrame` |
 | `exit` | `{atFrame, staggerFrames?: 0–12, durationInFrames?: 1–30}`, none | Staged exit: lines fade out in place top to bottom, then the icon, `staggerFrames` (3) apart over `durationInFrames` (`DUR.chip`). Must start inside the shot |
 | `size` | `"display"` or `"caption"`, `"display"` | `caption` sets one small regular-weight size (28 px, fitting down to 18) and rejects `fontSize` |
 
@@ -167,12 +167,13 @@ in the window, never live product UI.
 | `layout` | `"single"` or `"pair"`, `"single"` | `single` needs `windows`; `pair` needs `pair` |
 | `windows` | `WindowSource & {atFrame?, swap?: "slide"\|"cut"}`[1..12] | The first window has no `atFrame`. Each later one replaces the current one at `atFrame`: `slide` (default) comes in on top from the right with blur while the old one slides left, recedes and fades; `cut` swaps at once |
 | `WindowSource` | `{kind: "image"\|"video", src, trimBefore?, fit?: "cover", objectPosition?: {x:.5,y:0}, scrollSteps?: {atFrame, offset}[]}` | Loaded through `MediaPlane`. `scrollSteps` shows a tall still at full width and jumps to each `offset` (fraction of its height) over `DUR.press` |
-| `enter` | `{kind: "whip"\|"flip-split"\|"none", atFrame?: 1}` or `{kind: "pull-back", atFrame, durationInFrames?: 18}`; `whip` (single) / `flip-split` (pair) | `whip` comes in from beyond the right edge. `pull-back` holds the window at full canvas with no tilt or chrome until `atFrame`, then lands in its box. `flip-split` is pair-only |
+| `enter` | `{kind: "whip", atFrame?: 1, durationInFrames?: 13, reveal?: {columns?: 4, durationInFrames}}`, `{kind: "from-sides", atFrame?: 1, durationInFrames?: 9}`, `{kind: "flip-split"\|"none", atFrame?: 1}` or `{kind: "pull-back", atFrame, durationInFrames?: 18}`; `whip` (single) / `flip-split` (pair) | `whip` comes in from beyond the right edge and lands after `durationInFrames`; `reveal` clips the primary window to columns rising from its bottom edge, left to right, for the first `reveal.durationInFrames` of the entrance. `pull-back` holds the window at full canvas with no tilt or chrome until `atFrame`, then lands in its box. `flip-split` and `from-sides` are pair-only: `from-sides` slides the left window in from beyond the left edge and the right one from beyond the right edge, with horizontal blur |
 | `exit` | `{kind: "whip-left", atFrame}`, none | Windows accelerate off the left edge over `DUR.whip` with growing X blur; the headline fades in place from `atFrame + 1`. End the shot with a hard cut |
 | `camera` | `{at, x, y, zoom: 1–3, ease?: "glide"\|"push"\|"whip"}[2..16]`, none | Window-only camera through `getCameraPose()`: the primary window scales by `zoom` about anchor `(x, y)` (0–1 of the window). Keys strictly increase. The headline never moves |
 | `secondary` | `WindowSource & {box: {x,y,width,height} (canvas fractions), atFrame}`, none | A small window in the same plane that whips in at `atFrame` and leaves with the primary |
 | `pair` | two `{label, window, counter: {from?: 0, to, precision?: 1, unit?, startFrame, endFrame}, stat?}` | Side-by-side windows with mirrored ±8° tilt, labels above, a linear counter below that turns `--brand` at `endFrame`, and a small stat. `badge` labels the right column |
 | `chrome` | `"titlebar"` or `"none"`, `"titlebar"` | Window titlebar in `--card` |
+| `footnote` | `string?` (≤ 100) | Small `--muted-foreground` note at the bottom left that fades out with the exit. Use it for **Fictional demonstration data** under product stills |
 
 ## BrandLockupScene (`brand-lockup`)
 

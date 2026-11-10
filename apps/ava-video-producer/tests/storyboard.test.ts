@@ -404,6 +404,63 @@ test("a tilted window pair validates two racing columns with a flip-split entran
   assert.equal(storyboardSchema.safeParse(plan).success, true);
 });
 
+test("a tilted window validates a timed whip with a stepped reveal, side entrances and a footnote", () => {
+  const single = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: {
+      windows: [screen],
+      enter: {
+        kind: "whip",
+        atFrame: 16,
+        durationInFrames: 12,
+        reveal: { columns: 4, durationInFrames: 4 },
+      },
+      footnote: "Fictional demonstration data",
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(single).success, true);
+  const column = {
+    label: "Cases",
+    window: screen,
+    counter: { to: 240, precision: 0, startFrame: 6, endFrame: 88 },
+  };
+  const pair = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: {
+      layout: "pair",
+      pair: [column, { ...column, label: "Visits" }],
+      enter: { kind: "from-sides", atFrame: 0, durationInFrames: 11 },
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(pair).success, true);
+  const sidesOnSingle = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: { windows: [screen], enter: { kind: "from-sides" } },
+  });
+  assert.equal(storyboardSchema.safeParse(sidesOnSingle).success, false);
+});
+
+test("a typography icon may keep its own reveal frame", () => {
+  const plan = withShot({
+    id: "metric",
+    scene: "typography",
+    durationInFrames: 150,
+    props: {
+      lines: ["Then explore it."],
+      revealMode: "line-fade",
+      revealAtFrame: 17,
+      icon: { src: "avandar/logo.png", size: 154, atFrame: 0 },
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
 test("a tilted window rejects layouts and timings it cannot render", () => {
   const props = [
     { windows: [{ ...screen, atFrame: 5 }] },

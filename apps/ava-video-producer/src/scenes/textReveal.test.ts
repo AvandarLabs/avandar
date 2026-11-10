@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getLineRevealStyle,
   getStagedExitStyle,
+  getTypographyRevealFrames,
   getWipeExitStyle,
 } from "./textReveal";
 
@@ -50,4 +51,18 @@ test("a staged exit fades each element out after the one before it", () => {
 
 test("an element with no exit stays fully visible", () => {
   assert.deepEqual(getStagedExitStyle(500, undefined, 0), {});
+});
+
+test("an icon leads the lines by a panel unless it has its own frame", () => {
+  assert.deepEqual(getTypographyRevealFrames(6, undefined), {
+    linesAt: 6,
+  });
+  assert.deepEqual(getTypographyRevealFrames(6, {}), {
+    iconAt: 6,
+    linesAt: 15,
+  });
+  assert.deepEqual(getTypographyRevealFrames(17, { atFrame: 0 }), {
+    iconAt: 0,
+    linesAt: 17,
+  });
 });

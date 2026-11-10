@@ -25,6 +25,8 @@ type Props = {
   rotateX?: number;
   rotateZ?: number;
   perspective?: number;
+  /** A clip in the window's own plane, such as a stepped reveal. */
+  clipPath?: string;
 };
 
 /**
@@ -43,6 +45,7 @@ export function WindowCard({
   rotateX = WINDOW_TILT.rotateX,
   rotateZ = WINDOW_TILT.rotateZ,
   perspective = WINDOW_TILT.perspective,
+  clipPath,
 }: Props) {
   const filterId = `window-blur-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const titlebar =
@@ -70,7 +73,8 @@ export function WindowCard({
           borderRadius: WINDOW_CHROME.radius * tilt,
           overflow: "hidden",
           background: "var(--background)",
-          boxShadow: tilt > 0 ? WINDOW_SHADOW : undefined,
+          boxShadow: tilt > 0 && !clipPath ? WINDOW_SHADOW : undefined,
+          clipPath,
         }}
       >
         {titlebar > 0 ? (

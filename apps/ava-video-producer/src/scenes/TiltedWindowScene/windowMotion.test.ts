@@ -6,7 +6,9 @@ import {
   getFlipSplit,
   getPullBack,
   getScrollOffset,
+  getSideEntrance,
   getWhipEntrance,
+  getWindowRevealStyle,
   getWhipExit,
   getWindowCamera,
 } from "./windowMotion";
@@ -104,4 +106,37 @@ test("scroll steps jump the content to each authored offset in turn", () => {
   assert.equal(getScrollOffset(10, steps), 0);
   assert.equal(getScrollOffset(40, steps), 0.3);
   assert.equal(getScrollOffset(80, steps), 0.6);
+});
+
+test("a whip entrance lands after its authored duration", () => {
+  const moving = getWhipEntrance(18, 1, canvas, box, 20);
+  assert.ok(moving.translateX > 0 && moving.blurX > 0);
+  const landed = getWhipEntrance(21, 1, canvas, box, 20);
+  assert.equal(landed.translateX, 0);
+  assert.equal(landed.blurX, 0);
+});
+
+test("side entrances bring the left window from the left edge and the right one from the right", () => {
+  const left = { x: 67, y: 194, width: 791, height: 664 };
+  const right = { x: 1060, y: 194, width: 791, height: 664 };
+  const leftStart = getSideEntrance(5, 5, 0, canvas, left);
+  const rightStart = getSideEntrance(5, 5, 1, canvas, right);
+  assert.ok(left.x + left.width + leftStart.translateX <= 0);
+  assert.ok(right.x + rightStart.translateX >= canvas.width);
+  assert.ok(leftStart.blurX > 0 && rightStart.blurX > 0);
+  const landed = getSideEntrance(16, 5, 0, canvas, left, 11);
+  assert.equal(landed.translateX, 0);
+  assert.equal(landed.blurX, 0);
+  assert.ok(getSideEntrance(10, 5, 1, canvas, right, 11).translateX > 0);
+});
+
+test("a stepped reveal clips the window to rising columns, then lets go", () => {
+  const reveal = { columns: 4, durationInFrames: 4 };
+  assert.match(
+    String(getWindowRevealStyle(10, 10, reveal).clipPath),
+    /^polygon\(/,
+  );
+  assert.ok(getWindowRevealStyle(12, 10, reveal).clipPath);
+  assert.deepEqual(getWindowRevealStyle(14, 10, reveal), {});
+  assert.deepEqual(getWindowRevealStyle(10, 10, undefined), {});
 });

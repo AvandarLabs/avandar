@@ -1,3 +1,4 @@
+import { DUR, EASE, ramp } from "../../motion";
 import { SceneShell } from "../SceneShell";
 import { RacePair } from "./RacePair";
 import { WindowCard } from "./WindowCard";
@@ -9,8 +10,9 @@ import {
   getWhipEntrance,
   getWhipExit,
   getWindowCamera,
+  getWindowRevealStyle,
 } from "./windowMotion";
-import { WINDOW_BOX, WINDOW_TILT } from "./windowTilt";
+import { HEADLINE_BOX, WINDOW_BOX, WINDOW_TILT } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { TiltedWindowSceneProps } from "../scenes.types";
 import type { WindowPose } from "./windowMotion";
@@ -43,6 +45,9 @@ export function TiltedWindowScene(props: TiltedWindowSceneProps) {
       ) : (
         <_SingleWindow {...props} width={width} height={height} />
       )}
+      {props.footnote ? (
+        <_Footnote frame={frame} text={props.footnote} exit={exit} />
+      ) : null}
     </SceneShell>
   );
 }
@@ -63,6 +68,14 @@ function _SingleWindow(
   const carousel = getCarouselState(frame, windows);
   const slide = getCarouselPoses(carousel.progress, box);
   const lens = camera ? getWindowCamera(frame, camera, box) : undefined;
+  const reveal =
+    props.enter?.kind === "whip"
+      ? getWindowRevealStyle(
+          frame,
+          props.enter.atFrame ?? 1,
+          props.enter.reveal,
+        ).clipPath
+      : undefined;
   const card = (index: number, pose: WindowPose) => (
     <WindowCard
       key={`window-${index}-${windows[index].src}`}
@@ -73,6 +86,7 @@ function _SingleWindow(
       canvasHeight={height}
       tilt={pullBack?.tilt ?? 1}
       chrome={props.chrome}
+      clipPath={reveal}
     />
   );
   return (
@@ -150,6 +164,7 @@ function _getBasePose(
       enter?.atFrame ?? 1,
       { width: props.width },
       box,
+      enter?.durationInFrames,
     );
   }
   return _RESTING;
@@ -180,4 +195,35 @@ function _toPixels(
     width: box.width * canvas.width,
     height: box.height * canvas.height,
   };
+}
+
+/** A small muted note at the bottom left that fades out with the exit. */
+function _Footnote({
+  frame,
+  text,
+  exit,
+}: {
+  frame: number;
+  text: string;
+  exit: TiltedWindowSceneProps["exit"];
+}) {
+  const fade = exit
+    ? 1 - ramp(frame, exit.atFrame + 1, DUR.chip, EASE.inOut)
+    : 1;
+  const arrive = ramp(frame, 1, DUR.panel, EASE.out);
+  return (
+    <p
+      style={{
+        position: "absolute",
+        left: `${HEADLINE_BOX.x * 100}%`,
+        bottom: 40,
+        margin: 0,
+        fontSize: 18,
+        color: "var(--muted-foreground)",
+        opacity: arrive * fade,
+      }}
+    >
+      {text}
+    </p>
+  );
 }

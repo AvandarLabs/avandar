@@ -7,7 +7,11 @@ import {
   sceneBounds,
 } from "./layout/layout";
 import { positioned, SceneShell } from "./SceneShell";
-import { getLineRevealStyle, getStagedExitStyle } from "./textReveal";
+import {
+  getLineRevealStyle,
+  getStagedExitStyle,
+  getTypographyRevealFrames,
+} from "./textReveal";
 import type { TypographySceneProps } from "./scenes.types";
 
 /** Largest font size a `caption` typography shot uses. */
@@ -49,7 +53,10 @@ export function TypographyScene(props: TypographySceneProps) {
     isCaption ? CAPTION_MIN_FONT_SIZE : undefined,
   );
   const isCentered = align === "center";
-  const linesAt = icon ? revealAtFrame + DUR.panel : revealAtFrame;
+  const { iconAt = revealAtFrame, linesAt } = getTypographyRevealFrames(
+    revealAtFrame,
+    icon,
+  );
   const wordStarts = _countWordsBefore(fitted.lines);
   return (
     <SceneShell {...{ frame, width, height, title, kicker }}>
@@ -78,7 +85,7 @@ export function TypographyScene(props: TypographySceneProps) {
                 display: "block",
                 height: iconSize,
                 width: "auto",
-                ...getLineRevealStyle(frame, revealAtFrame, "line-fade", {
+                ...getLineRevealStyle(frame, iconAt, "line-fade", {
                   rise: 0,
                 }),
               }}

@@ -1,7 +1,12 @@
 import { DUR, EASE, enter, mix, mixToken, ramp } from "../../motion";
 import { formatMetric } from "../layout/layout";
 import { WindowCard } from "./WindowCard";
-import { getFlipSplit, getWhipEntrance, getWhipExit } from "./windowMotion";
+import {
+  getFlipSplit,
+  getSideEntrance,
+  getWhipEntrance,
+  getWhipExit,
+} from "./windowMotion";
 import { PAIR_BOXES, PAIR_TILT } from "./windowTilt";
 import type { RaceColumn, TiltedWindowSceneProps } from "../scenes.types";
 
@@ -50,8 +55,23 @@ export function RacePair(props: Props) {
             exit && frame >= exit.atFrame
               ? getWhipExit(frame, exit.atFrame, box)
               : entrance?.kind === "whip"
-                ? getWhipEntrance(frame, at, { width }, box)
-                : {
+                ? getWhipEntrance(
+                    frame,
+                    at,
+                    { width },
+                    box,
+                    entrance.durationInFrames,
+                  )
+                : entrance?.kind === "from-sides"
+                  ? getSideEntrance(
+                      frame,
+                      at,
+                      side === 0 ? 0 : 1,
+                      { width },
+                      box,
+                      entrance.durationInFrames,
+                    )
+                  : {
                     translateX: 0,
                     translateZ: 0,
                     rotateY: 0,

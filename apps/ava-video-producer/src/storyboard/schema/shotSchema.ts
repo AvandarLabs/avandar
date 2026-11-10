@@ -110,6 +110,7 @@ const typography = z.strictObject({
     .strictObject({
       src: assetPathSchema,
       size: z.number().min(40).max(480).optional(),
+      atFrame: frame.optional(),
     })
     .optional(),
   exit: stagedExitSchema.optional(),
@@ -270,7 +271,23 @@ const tiltedWindow = z.strictObject({
   enter: z
     .discriminatedUnion("kind", [
       z.strictObject({
-        kind: z.enum(["whip", "flip-split", "none"]),
+        kind: z.literal("whip"),
+        atFrame: frame.optional(),
+        durationInFrames: positiveFrames.max(60).optional(),
+        reveal: z
+          .strictObject({
+            columns: z.number().int().min(2).max(12).optional(),
+            durationInFrames: positiveFrames.max(30),
+          })
+          .optional(),
+      }),
+      z.strictObject({
+        kind: z.literal("from-sides"),
+        atFrame: frame.optional(),
+        durationInFrames: positiveFrames.max(60).optional(),
+      }),
+      z.strictObject({
+        kind: z.enum(["flip-split", "none"]),
         atFrame: frame.optional(),
       }),
       z.strictObject({
@@ -304,6 +321,7 @@ const tiltedWindow = z.strictObject({
     })
     .optional(),
   chrome: z.enum(["titlebar", "none"]).optional(),
+  footnote: detail.optional(),
 });
 const shotBase = {
   id,

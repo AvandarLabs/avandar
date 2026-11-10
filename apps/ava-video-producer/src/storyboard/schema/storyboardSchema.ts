@@ -325,8 +325,9 @@ function _checkTiltedWindow(
     isPair && !props.pair ? "the pair layout needs pair columns" : "",
     isPair && props.windows ? "the pair layout takes pair, not windows" : "",
     !isPair && !windows.length ? "a single window layout needs windows" : "",
-    !isPair && props.enter?.kind === "flip-split"
-      ? "flip-split enters the pair layout only"
+    !isPair &&
+    (props.enter?.kind === "flip-split" || props.enter?.kind === "from-sides")
+      ? `${props.enter.kind} enters the pair layout only`
       : "",
     windows[0]?.atFrame !== undefined
       ? "the first window is on screen from the start; omit its atFrame"

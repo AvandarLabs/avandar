@@ -11,6 +11,7 @@ import type {
   PullBack,
   ScrollStep,
   WindowCameraKey,
+  WindowReveal,
 } from "./TiltedWindowScene/windowMotion";
 
 /** All times are scene-local frames. Coordinates are normalized unless noted. */
@@ -88,8 +89,10 @@ export type TypographySceneProps = SceneBase & {
   revealMode?: TextRevealMode;
   /** Frames between lines for the line-by-line modes. Default 3. */
   lineStaggerFrames?: number;
-  /** A public-relative image drawn above the lines, `size` px tall. */
-  icon?: { src: string; size?: number };
+  /** A public-relative image drawn above the lines, `size` px tall. It
+   *  fades in at `atFrame`, or at `revealAtFrame` with the lines a panel
+   *  later when `atFrame` is omitted. */
+  icon?: { src: string; size?: number; atFrame?: number };
   /** Lines fade out top to bottom, then the icon. */
   exit?: StagedExit;
   /** `caption` sets small regular-weight text instead of a display size. */
@@ -230,11 +233,31 @@ export type TiltedWindowSceneProps = SceneBase & {
   pair?: [RaceColumn, RaceColumn];
   /** Small badge above the right column of the pair layout. */
   badge?: string;
-  enter?: { kind: "whip" | "flip-split" | "none"; atFrame?: number } | PullBack;
+  enter?:
+    | {
+        kind: "whip";
+        atFrame?: number;
+        /** Frames the window takes to land. Default `DUR.sheet`. */
+        durationInFrames?: number;
+        /** Reveals the window through rising columns as it arrives. */
+        reveal?: WindowReveal;
+      }
+    | {
+        /** Pair only: each window slides in from its own outer edge. */
+        kind: "from-sides";
+        atFrame?: number;
+        /** Frames the windows take to land. Default `DUR.panel`. */
+        durationInFrames?: number;
+      }
+    | { kind: "flip-split" | "none"; atFrame?: number }
+    | PullBack;
   exit?: { kind: "whip-left"; atFrame: number };
   /** A camera on the primary window only; the headline never moves. */
   camera?: WindowCameraKey[];
   /** A small second window in the same plane, such as a desktop app. */
   secondary?: WindowSource & { box: NormalizedRect; atFrame: number };
   chrome?: "titlebar" | "none";
+  /** Small muted note at the bottom left, for example **Fictional
+   *  demonstration data** under product footage. */
+  footnote?: string;
 };

@@ -97,3 +97,21 @@ export function getStagedExitStyle(
   );
   return { opacity: 1 - progress };
 }
+
+/**
+ * When a statement's icon and lines start. An icon without its own
+ * `atFrame` fades in at `revealAtFrame` and the lines follow a panel later;
+ * an icon with one keeps it, and the lines start at `revealAtFrame`.
+ */
+export function getTypographyRevealFrames(
+  revealAtFrame: number,
+  icon: { atFrame?: number } | undefined,
+): { iconAt?: number; linesAt: number } {
+  if (!icon) {
+    return { linesAt: revealAtFrame };
+  }
+  if (icon.atFrame === undefined) {
+    return { iconAt: revealAtFrame, linesAt: revealAtFrame + DUR.panel };
+  }
+  return { iconAt: icon.atFrame, linesAt: revealAtFrame };
+}

@@ -78,8 +78,14 @@
         ],
         "enter": {
           "kind": "whip",
-          "atFrame": 1
+          "atFrame": 1,
+          "durationInFrames": 18,
+          "reveal": {
+            "columns": 4,
+            "durationInFrames": 4
+          }
         },
+        "footnote": "Fictional demonstration data",
         "camera": [
           {
             "at": 0,
