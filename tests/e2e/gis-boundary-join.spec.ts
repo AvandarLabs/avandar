@@ -83,7 +83,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: SUMMARY_DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: SUMMARY_DATASET_NAME,
+        exact: true,
+      });
       await _selectOption(page, inspector, "Geometry", "Join to boundaries");
       await _selectOption(page, inspector, "Data key column", "boundary_key");
       await _selectOption(
@@ -129,6 +132,14 @@ test(
       });
 
       await page.reload();
+      await page
+        .getByRole("region", { name: "Layers" })
+        .getByRole("button", {
+          name: new RegExp(
+            `^${SUMMARY_DATASET_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:\\s|$)`,
+          ),
+        })
+        .click();
       await expect(
         inspector.getByRole("combobox", { name: "Matching" }),
       ).toHaveValue("Normalized name", { timeout: LONG_WAIT });

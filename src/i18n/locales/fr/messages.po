@@ -19,7 +19,7 @@ msgstr "Éditeur"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Filter another layer by this buffer"
-msgstr ""
+msgstr "Filtrer une autre couche à l’aide de cette zone tampon"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
@@ -309,7 +309,7 @@ msgstr "PII détecté :"
 
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Nearest {sourceName}"
-msgstr ""
+msgstr "Plus proche de {sourceName}"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
@@ -588,7 +588,7 @@ msgstr "Créer un compte"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "No layer can be filtered by this buffer."
-msgstr ""
+msgstr "Aucune couche ne peut être filtrée à l’aide de cette zone tampon."
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Views"
@@ -760,7 +760,8 @@ msgstr "Depuis Excel"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownText} of {countText}. Download the full list as CSV from "
 "the map."
-msgstr ""
+msgstr "Affichage de {shownText} sur {countText}. Téléchargez la liste complète "
+"au format CSV depuis la carte."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -860,7 +861,7 @@ msgstr "Classes"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Filter and show list"
-msgstr ""
+msgstr "Filtrer et afficher la liste"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "For more control over your subscription, you can manage your "
@@ -939,7 +940,7 @@ msgstr "Titres en monospace"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Only show features inside"
-msgstr ""
+msgstr "Afficher uniquement les entités à l’intérieur de"
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Quarter"
@@ -1537,7 +1538,9 @@ msgstr "Il n'y a pas de colonnes numériques"
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "This layer shows approximate locations, so its features are not listed "
 "one by one. Listing exact rows would undo that protection."
-msgstr ""
+msgstr "Cette couche affiche des emplacements approximatifs ; ses entités ne "
+"sont donc pas répertoriées une par une. Afficher des lignes précises "
+"annulerait cette protection."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " permission"
@@ -1801,6 +1804,7 @@ msgid "Answer offline"
 msgstr "Répondre hors ligne"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Développer le panneau des calques"
 
@@ -1809,10 +1813,6 @@ msgid "That archive only contains another archive. Paste a link to the file "
 "itself."
 msgstr "Cette archive contient uniquement une autre archive. Collez un lien "
 "vers le fichier lui-même."
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{featureCount} points"
-#~ msgstr "{featureCount} points"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -1905,7 +1905,7 @@ msgstr "Groupes d'utilisateurs"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTable.tsx
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "Assignment not changed"
@@ -2068,7 +2068,7 @@ msgstr "Colonne de nom"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Include a feature list"
-msgstr ""
+msgstr "Inclure une liste d’entités"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign private resources"
@@ -2167,7 +2167,7 @@ msgstr "Aucun dossier ne possède ces statuts"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show"
-msgstr ""
+msgstr "Afficher"
 
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
@@ -2267,7 +2267,7 @@ msgstr "Fin de l’exposition"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Prints the layer's features as a table after the map."
-msgstr ""
+msgstr "Imprime les entités de la couche sous forme de tableau après la carte."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -2276,7 +2276,7 @@ msgstr "Réattribuer"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListDrawer.tsx
 msgid "Feature list: {layerName}"
-msgstr ""
+msgstr "Liste des entités : {layerName}"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
@@ -2401,7 +2401,7 @@ msgstr "Un jeu de données correspond à un onglet."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Label each ring with"
-msgstr ""
+msgstr "Étiqueter chaque anneau avec"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
@@ -2658,7 +2658,7 @@ msgstr "Un problème est survenu lors de l’exécution de cette requête."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Unit"
-msgstr ""
+msgstr "Unité"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -2813,7 +2813,8 @@ msgstr "Vous pouvez commencer à utiliser votre nouveau mot de passe maintenant"
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "The default order lists the nearest first when a buffer filters the "
 "layer."
-msgstr ""
+msgstr "L’ordre par défaut affiche les éléments les plus proches en premier "
+"lorsqu’une zone tampon filtre la couche."
 
 #: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
 msgid "Q{quarter} {year}"
@@ -3056,10 +3057,6 @@ msgstr "Un enregistrement local de chaque fois que vous avez approuvé (ou "
 "annulé) l'envoi de données à un fournisseur d'IA dans cet espace de "
 "travail. Derniers 90 jours, stocké uniquement sur cet appareil."
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "1 point"
-#~ msgstr "1 point"
-
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "{0, plural, one {# record} other {# records}}"
@@ -3070,8 +3067,8 @@ msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Fonction d’agrégation « {funcName} » non prise en charge dans SELECT ; "
 "ignorée."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Annotations"
 msgstr "Annotations"
 
@@ -3125,7 +3122,7 @@ msgstr "L’assistant en ligne est inaccessible. Voulez-vous répondre à ce "
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
 msgid "Up to 1,000. The PDF says when the list is cut short."
-msgstr ""
+msgstr "Jusqu’à 1 000. Le PDF indique si la liste est tronquée."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
@@ -3294,7 +3291,7 @@ msgstr "Visualisation des données"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show {rowLabel} on the map"
-msgstr ""
+msgstr "Afficher {rowLabel} sur la carte"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -3398,7 +3395,7 @@ msgstr "Ancien membre"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Loading features..."
-msgstr ""
+msgstr "Chargement des entités…"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
@@ -3621,7 +3618,7 @@ msgstr "Afficher SQL"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 msgid "Feature list"
-msgstr ""
+msgstr "Liste des entités"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -3633,6 +3630,10 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 "to share it with."
 msgstr "Votre tableau de bord existe, mais personne d’autre ne peut encore "
 "l’ouvrir. Choisissez avec qui le partager."
+
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layer settings"
+msgstr "Retour aux paramètres de la couche"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -3646,6 +3647,7 @@ msgid "Created"
 msgstr "Créé"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Réduire le panneau des calques"
 
@@ -3894,7 +3896,8 @@ msgstr "Aucune colonne dans ce jeu de données."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Only point, line, or polygon layers with exact locations can be listed."
-msgstr ""
+msgstr "Seules les couches de points, de lignes ou de polygones avec des "
+"emplacements exacts peuvent être répertoriées."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
@@ -4216,7 +4219,7 @@ msgstr "Lignes {rowIndexes}."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "No label"
-msgstr ""
+msgstr "Aucune étiquette"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
@@ -4532,7 +4535,7 @@ msgstr "Marge intérieure"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "ft"
-msgstr ""
+msgstr "ft"
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "The layer configuration is saved. Try again once your connection is "
@@ -4843,7 +4846,8 @@ msgstr "{resultCount, plural, =0 {Aucune adresse trouvée} one {# adresse "
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffers are off for layers set to Displace, since rings would reveal "
 "their exact locations."
-msgstr ""
+msgstr "Les zones tampons sont désactivées pour les couches configurées sur "
+"Displace, car les anneaux révéleraient leurs emplacements exacts."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
@@ -4858,11 +4862,6 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "La clause WHERE utilise « {operator} » sur « {columnName} » avec une "
 "liste non littérale."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
-#~ msgid "Distance (meters)"
-#~ msgstr "Distance (mètres)"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Preparing offline models"
@@ -5082,7 +5081,7 @@ msgstr "Toutes les valeurs"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Distance"
-msgstr ""
+msgstr "Distance"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
@@ -5222,7 +5221,7 @@ msgstr "Payer mensuellement"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
@@ -5280,7 +5279,7 @@ msgstr "Limite atteinte"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Unavailable layer"
-msgstr ""
+msgstr "Couche indisponible"
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Month"
@@ -5308,7 +5307,7 @@ msgstr "Choisissez une colonne de date"
 
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Distance to nearest {sourceName}"
-msgstr ""
+msgstr "Distance jusqu’à l’élément le plus proche de {sourceName}"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -5471,7 +5470,7 @@ msgstr "Ajoutez un graphique à barres des comptes de lignes dans {datasetName}"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Anywhere"
-msgstr ""
+msgstr "N’importe où"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
@@ -6417,7 +6416,8 @@ msgstr "Grand"
 
 #: src/views/GisApp/export/loadExportFeatureTable/loadExportFeatureTable.ts
 msgid "The map's data is still loading. Try again in a moment."
-msgstr ""
+msgstr "Les données de la carte sont toujours en cours de chargement. Réessayez "
+"dans un instant."
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Invalid workspace"
@@ -6569,7 +6569,7 @@ msgstr "Premier par ordre alphabétique"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"
-msgstr ""
+msgstr "Télécharger le CSV"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -6874,7 +6874,7 @@ msgstr "WMTS"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to the feature list"
-msgstr ""
+msgstr "Retour à la liste des entités"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -7044,7 +7044,7 @@ msgstr "Un autre statut porte déjà ce nom."
 
 #: src/views/GisApp/panels/FeatureListDrawer/makeCsvRowsFromFeatureList/makeCsvRowsFromFeatureList.ts
 msgid "{columnLabel} ({unitLabel})"
-msgstr ""
+msgstr "{columnLabel} ({unitLabel})"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -7329,10 +7329,6 @@ msgstr "Rayon du groupe"
 msgid "No saved datasets found."
 msgstr "Aucun jeu de données enregistré trouvé."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Expand the inspector"
-msgstr "Développer l’inspecteur"
-
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/index.tsx
@@ -7433,7 +7429,7 @@ msgstr "Ordonnée"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Fewer than {MIN_EXACT_APPROXIMATE_COUNT} features"
-msgstr ""
+msgstr "Moins de {MIN_EXACT_APPROXIMATE_COUNT} entités"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
@@ -7473,7 +7469,7 @@ msgstr "Modèles hors ligne téléchargés"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
 msgid "Maximum rows"
-msgstr ""
+msgstr "Nombre maximal de lignes"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -7508,12 +7504,6 @@ msgid "We detected both potential personal information and language that may "
 msgstr "Nous avons détecté à la fois des informations personnelles potentielles "
 "et un langage qui pourrait biaiser la réponse de l'IA. Veuillez "
 "examiner les deux ci-dessous."
-
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
-#~ "columns."
-#~ msgstr "La mise en zone tampon nécessite une couche avec une géométrie "
-#~ "compilée, et non des colonnes de latitude et de longitude."
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -7806,7 +7796,7 @@ msgstr "Sélectionner un jeu de données"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "mi"
-msgstr ""
+msgstr "mi"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -7905,13 +7895,9 @@ msgstr "Filtrer"
 msgid "This cannot be undone."
 msgstr "Cela ne peut pas être annulé."
 
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{count, plural, one {# entité} other {# entités}}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
@@ -8062,7 +8048,7 @@ msgstr "Partager ce {resourceLabel}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Default order"
-msgstr ""
+msgstr "Ordre par défaut"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
@@ -8093,7 +8079,8 @@ msgstr "L’échelle varie sur cette carte"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName} "
 "within {distanceText} of {sourceLayerName}"
-msgstr ""
+msgstr "{totalCount, plural, one {# entité} other {# entités}} dans {layerName} "
+"à moins de {distanceText} de {sourceLayerName}"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
@@ -8298,7 +8285,7 @@ msgstr "Limite de tableaux de bord partagés atteinte"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# area} other {# areas}}"
-msgstr ""
+msgstr "{featureCount, plural, one {# zone} other {# zones}}"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
@@ -8321,7 +8308,7 @@ msgstr "{formattedPrice}/siège"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Sort direction"
-msgstr ""
+msgstr "Sens du tri"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
@@ -8346,7 +8333,7 @@ msgstr "Votre session a expiré"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "The feature list could not load."
-msgstr ""
+msgstr "La liste des entités n’a pas pu être chargée."
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
@@ -8424,6 +8411,7 @@ msgstr "Espace de travail"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Layer"
 msgstr "Couche"
 
@@ -8472,7 +8460,7 @@ msgstr "Réessayez dans un instant ou contactez l’assistance si le problème "
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# point} other {# points}}"
-msgstr ""
+msgstr "{featureCount, plural, one {# point} other {# points}}"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
@@ -9316,7 +9304,7 @@ msgstr "Accès refusé"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 msgid "Pick a layer"
-msgstr ""
+msgstr "Sélectionner une couche"
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -9478,7 +9466,7 @@ msgstr "Thèmes"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Pick a point layer"
-msgstr ""
+msgstr "Sélectionner une couche de points"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
@@ -9544,7 +9532,7 @@ msgstr "Erreur"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show feature {position} on the map"
-msgstr ""
+msgstr "Afficher l’entité {position} sur la carte"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9562,10 +9550,6 @@ msgstr "{0} et ses calques seront supprimés. Cette action est irréversible."
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... et {remainingCount} de plus"
-
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Collapse the inspector"
-msgstr "Réduire l’inspecteur"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -9847,7 +9831,8 @@ msgstr "Depuis Google Sheets"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownColumnsText} of {totalColumnsText} columns. Download the "
 "full list as CSV from the map."
-msgstr ""
+msgstr "Affichage de {shownColumnsText} colonnes sur {totalColumnsText}. "
+"Téléchargez la liste complète au format CSV depuis la carte."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Subscription updated successfully"
@@ -9926,7 +9911,7 @@ msgstr "Vous avez besoin d'un accès administrateur sur cette ressource pour "
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "At least {minDistance} {unitLabel}"
-msgstr ""
+msgstr "Au moins {minDistance} {unitLabel}"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Displace"
@@ -9990,7 +9975,7 @@ msgstr "Chaque série est un nuage de points (X, Y). Ajoutez-en plus pour "
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{featureCount, plural, one {# entité} other {# entités}}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Polygon"
@@ -10078,10 +10063,6 @@ msgstr "Impossible de supprimer le lieu."
 msgid "Switch Workspace"
 msgstr "Changer d'espace de travail"
 
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName}"
-#~ msgstr ""
-
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "Vous pouvez voir ce tableau de bord car il a été partagé avec vous."
@@ -10092,7 +10073,7 @@ msgstr "Choisir des groupes d'utilisateurs pour ce membre"
 
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName}"
-msgstr ""
+msgstr "{totalCount, plural, one {# entité} other {# entités}} dans {layerName}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -10215,7 +10196,7 @@ msgstr "Le texte contient"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 #: src/views/GisApp/panels/FeatureListDrawer/formatFeatureListCell/formatFeatureListCell.ts
 msgid "{distance} {unit}"
-msgstr ""
+msgstr "{distance} {unit}"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Saving"
@@ -10339,7 +10320,8 @@ msgstr "Configurer comment rejoindre les ensembles de données"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Add an area layer, such as a buffer, to filter by it."
-msgstr ""
+msgstr "Ajoutez une couche de surfaces, comme une zone tampon, pour filtrer "
+"selon celle-ci."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it"
@@ -10375,7 +10357,7 @@ msgstr "Détails"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Buffer added."
-msgstr ""
+msgstr "Zone tampon ajoutée."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
@@ -10795,6 +10777,10 @@ msgstr "Mettre à jour et republier"
 msgid "Center"
 msgstr "Centrer"
 
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layers"
+msgstr "Retour aux couches"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
@@ -10913,7 +10899,7 @@ msgstr "Vérifiez votre connexion, puis cliquez à nouveau sur le bouton pour "
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "This layer's features cannot be listed."
-msgstr ""
+msgstr "Les entités de cette couche ne peuvent pas être listées."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
@@ -11929,7 +11915,7 @@ msgstr ""
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
-msgstr ""
+msgstr "km"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
@@ -12446,7 +12432,7 @@ msgstr "Permuter la latitude et la longitude"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 msgid "Distance ({unitLabel})"
-msgstr ""
+msgstr "Distance ({unitLabel})"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
@@ -12498,7 +12484,9 @@ msgstr "La fenêtre contextuelle de cette couche n’affiche aucun champ. "
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownText} of {countText} rows and {shownColumnsText} of "
 "{totalColumnsText} columns. Download the full list as CSV from the map."
-msgstr ""
+msgstr "Affichage de {shownText} lignes sur {countText} et de "
+"{shownColumnsText} colonnes sur {totalColumnsText}. Téléchargez la "
+"liste complète au format CSV depuis la carte."
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Pick a case type"

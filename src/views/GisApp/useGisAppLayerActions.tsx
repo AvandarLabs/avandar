@@ -100,6 +100,7 @@ function useGisAppLayerSelectionActions(
       return AvaMapConfig.withLayerAdded({ config: current, layer });
     });
     app.setSelectedLayerId(layer.id);
+    app.openLayerSettings();
   };
 
   return { onAddLayerFromSource, updateSelectedLayer };
@@ -191,6 +192,7 @@ export type GisAppLayerDeletionState = Pick<
   | "selectedLayerId"
   | "setSelectedLayerId"
   | "closeInspector"
+  | "closeLayerSettings"
   | "featureListLayerId"
   | "closeFeatureList"
 >;
@@ -214,6 +216,7 @@ export function useGisAppLayerDeletion(
     if (layerId === app.selectedLayerId) {
       app.setSelectedLayerId(nearestSurvivingLayerId);
       app.closeInspector();
+      app.closeLayerSettings();
     }
     if (layerId === app.featureListLayerId) {
       app.closeFeatureList();

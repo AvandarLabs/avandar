@@ -83,6 +83,7 @@ function _createApp(): GisAppState {
     },
     updateConfig: vi.fn(),
     setSelectedLayerId: vi.fn(),
+    openLayerSettings: vi.fn(),
     closeInspector: vi.fn(),
   } as unknown as GisAppState;
 }

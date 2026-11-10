@@ -82,7 +82,7 @@ async function _dragCanvasFraction(
 
 /** Draws a rectangle in the upper canvas so the empty-map card is missed. */
 async function _drawAnnotationArea(page: Page): Promise<void> {
-  await page.getByRole("heading", { name: "Layers", exact: true }).click();
+  await page.getByRole("heading", { name: "Annotations", exact: true }).click();
   await page.keyboard.press("Escape");
   const annotate = page.getByRole("button", {
     name: "Annotate the map",
@@ -178,7 +178,7 @@ test("persists text and area annotations and hides them from the row", async ({
       )
       .toBe(true);
     await expect(
-      page.getByRole("region", { name: "Layers" }).getByText("Annotations"),
+      page.getByRole("region", { name: "Annotations", exact: true }),
     ).toBeVisible({ timeout: MEDIUM_WAIT });
     await expect(
       page.getByRole("status", { name: "All changes saved" }),

@@ -6,12 +6,15 @@ import css from "@/views/GisApp/panels/LayerPanel/LayerPanel.module.css";
 import { LayerSourcePicker } from "@/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePicker";
 import { MapChromePanel } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { MapChromePanelVariant } from "@/views/GisApp/shell/MapChromePanel/MapChromePanel";
 import type { ComponentProps, ReactNode } from "react";
 
 type Props = ComponentProps<typeof LayerList> & {
   isCollapsed: boolean;
   onToggleCollapsed: () => void;
   onAddLayerFromSource: (dataSource: QueryDataSource.T) => void;
+  variant?: MapChromePanelVariant;
+  bodyId?: string;
 };
 
 /** Renders the collapsible layer stack panel and its add-layer control. */
@@ -19,14 +22,17 @@ export function LayerPanel({
   isCollapsed,
   onToggleCollapsed,
   onAddLayerFromSource,
+  variant = "layers",
+  bodyId,
   ...listProps
 }: Props): ReactNode {
   const { t } = useLingui();
 
   return (
     <MapChromePanel
-      variant="layers"
+      variant={variant}
       id="gis-layers-panel"
+      bodyId={bodyId}
       title={t`Layers`}
       itemCount={
         listProps.rows.length + (listProps.annotations?.features.length ? 1 : 0)

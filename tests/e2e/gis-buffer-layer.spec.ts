@@ -229,7 +229,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: POINT_DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: POINT_DATASET_NAME,
+        exact: true,
+      });
       await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
         timeout: LONG_WAIT,
       });
@@ -243,6 +246,7 @@ test(
         .getByRole("button", { name: "Buffer around a layer", exact: true })
         .click();
       await page.getByRole("button", { name: "Confirm" }).click();
+      await page.getByRole("button", { name: "Back to layers" }).click();
       await expect(_layerRow(page, BUFFER_LAYER_NAME)).toBeVisible({
         timeout: MEDIUM_WAIT,
       });

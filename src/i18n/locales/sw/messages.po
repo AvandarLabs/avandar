@@ -19,7 +19,7 @@ msgstr "Mchapishaji"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Filter another layer by this buffer"
-msgstr ""
+msgstr "Chuja safu nyingine kwa kutumia buffer hii"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Changes to your payment method can be made in your"
@@ -305,7 +305,7 @@ msgstr "PII kugunduliwa:"
 
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Nearest {sourceName}"
-msgstr ""
+msgstr "Iliyo karibu zaidi na {sourceName}"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Title field is required"
@@ -584,7 +584,7 @@ msgstr "Unda akaunti"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "No layer can be filtered by this buffer."
-msgstr ""
+msgstr "Hakuna safu inayoweza kuchujwa kwa kutumia buffer hii."
 
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Views"
@@ -752,7 +752,8 @@ msgstr "Kutoka Excel"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownText} of {countText}. Download the full list as CSV from "
 "the map."
-msgstr ""
+msgstr "Inaonyesha {shownText} kati ya {countText}. Pakua orodha kamili kama "
+"CSV kutoka kwenye ramani."
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 #: src/views/DataManagerApp/DatasetParseStatusIndicator.tsx
@@ -851,7 +852,7 @@ msgstr "Madarasa"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Filter and show list"
-msgstr ""
+msgstr "Chuja na uonyeshe orodha"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "For more control over your subscription, you can manage your "
@@ -930,7 +931,7 @@ msgstr "Vichwa vya monospace"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Only show features inside"
-msgstr ""
+msgstr "Onyesha tu vipengele vilivyo ndani ya"
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Quarter"
@@ -1518,7 +1519,9 @@ msgstr "Hakuna safu za nambari"
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "This layer shows approximate locations, so its features are not listed "
 "one by one. Listing exact rows would undo that protection."
-msgstr ""
+msgstr "Safu hii inaonyesha maeneo ya kukadiria, kwa hivyo vipengele vyake "
+"havijaorodheshwa kimoja baada ya kingine. Kuorodhesha safu sahihi "
+"kungeondoa ulinzi huo."
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " permission"
@@ -1776,6 +1779,7 @@ msgid "Answer offline"
 msgstr "Jibu bila mtandao"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Expand the layers panel"
 msgstr "Panua kidirisha cha tabaka"
 
@@ -1784,10 +1788,6 @@ msgid "That archive only contains another archive. Paste a link to the file "
 "itself."
 msgstr "Kumbukumbu hiyo ina kumbukumbu nyingine pekee. Bandika kiungo cha faili "
 "lenyewe."
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{featureCount} points"
-#~ msgstr "{featureCount} pointi"
 
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
@@ -1879,7 +1879,7 @@ msgstr "Makundi ya watumiaji"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTable.tsx
 msgid "Actions"
-msgstr ""
+msgstr "Vitendo"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "Assignment not changed"
@@ -2041,7 +2041,7 @@ msgstr "Safu ya jina"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Include a feature list"
-msgstr ""
+msgstr "Jumuisha orodha ya vipengele"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Reassign private resources"
@@ -2140,7 +2140,7 @@ msgstr "Hakuna rekodi zilizo na hali hizi"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show"
-msgstr ""
+msgstr "Onyesha"
 
 #. placeholder {0}: _columnList(namedColumns)
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
@@ -2239,7 +2239,7 @@ msgstr "Kukabiliwa kunaisha"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Prints the layer's features as a table after the map."
-msgstr ""
+msgstr "Huchapisha vipengele vya safu kama jedwali baada ya ramani."
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourceRow.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
@@ -2248,7 +2248,7 @@ msgstr "Hamishia umiliki"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListDrawer.tsx
 msgid "Feature list: {layerName}"
-msgstr ""
+msgstr "Orodha ya vipengele: {layerName}"
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Welcome back"
@@ -2374,7 +2374,7 @@ msgstr "Kila seti ya data ni kichupo kimoja."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Label each ring with"
-msgstr ""
+msgstr "Weka lebo kwenye kila pete kwa"
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
@@ -2629,7 +2629,7 @@ msgstr "Hitilafu imetokea wakati wa kuendesha hoja hii."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Unit"
-msgstr ""
+msgstr "Kipimo"
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
@@ -2782,7 +2782,8 @@ msgstr "Unaweza kuanza kutumia nenosiri lako jipya sasa"
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "The default order lists the nearest first when a buffer filters the "
 "layer."
-msgstr ""
+msgstr "Mpangilio chaguomsingi huorodhesha vilivyo karibu zaidi kwanza wakati "
+"buffer inachuja safu."
 
 #: src/components/caseFields/useBucketPeriodFormatter/useBucketPeriodFormatter.ts
 msgid "Q{quarter} {year}"
@@ -3024,10 +3025,6 @@ msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa "
 "mtoa huduma wa AI katika eneo hili la kazi. Siku 90 zilizopita, "
 "zimehifadhiwa kwenye kifaa hiki pekee."
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "1 point"
-#~ msgstr "Pointi 1"
-
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "{0, plural, one {# record} other {# records}}"
@@ -3037,8 +3034,8 @@ msgstr "{0, plural, one {rekodi #} other {rekodi #}}"
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
 msgstr "Kazi ya jumlisha isiyotumika \"{funcName}\" katika SELECT; imerukwa."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
 #: src/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Annotations"
 msgstr "Maelezo"
 
@@ -3091,7 +3088,7 @@ msgstr "Msaidizi wa mtandaoni hapatikani. Ungependa kujibu ujumbe huu kwa "
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
 msgid "Up to 1,000. The PDF says when the list is cut short."
-msgstr ""
+msgstr "Hadi 1,000. PDF inaonyesha orodha ilipokatizwa."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields.tsx
 msgid "Type or paste an email below. Your workspace will be billed per member."
@@ -3259,7 +3256,7 @@ msgstr "Uonyeshaji wa Data"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show {rowLabel} on the map"
-msgstr ""
+msgstr "Onyesha {rowLabel} kwenye ramani"
 
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
@@ -3362,7 +3359,7 @@ msgstr "Mwanachama wa zamani"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Loading features..."
-msgstr ""
+msgstr "Inapakia vipengele..."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
@@ -3581,7 +3578,7 @@ msgstr "Onyesha SQL"
 
 #: src/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionItems.tsx
 msgid "Feature list"
-msgstr ""
+msgstr "Orodha ya vipengele"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -3593,6 +3590,10 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 "to share it with."
 msgstr "Dashibodi yako ipo, lakini bado hakuna mtu mwingine anayeweza "
 "kuifungua. Hebu tuchague watu wa kushiriki nao."
+
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layer settings"
+msgstr "Rudi kwenye mipangilio ya safu"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -3606,6 +3607,7 @@ msgid "Created"
 msgstr "Imeundwa"
 
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Collapse the layers panel"
 msgstr "Kunja paneli ya tabaka"
 
@@ -3853,7 +3855,8 @@ msgstr "Hakuna safu kutoka kwenye seti hii ya data."
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Only point, line, or polygon layers with exact locations can be listed."
-msgstr ""
+msgstr "Safu za nukta, mstari au poligoni zilizo na maeneo sahihi pekee ndizo "
+"zinaweza kuorodheshwa."
 
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 msgid "Delete annotation"
@@ -4172,7 +4175,7 @@ msgstr "Safu mlalo {rowIndexes}."
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "No label"
-msgstr ""
+msgstr "Hakuna lebo"
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 msgid "Delete: {openDatasetName}"
@@ -4484,7 +4487,7 @@ msgstr "Pengo la ndani"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "ft"
-msgstr ""
+msgstr "ft"
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "The layer configuration is saved. Try again once your connection is "
@@ -4790,7 +4793,8 @@ msgstr "{resultCount, plural, =0 {Hakuna anwani zilizopatikana} one {Anwani # "
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffers are off for layers set to Displace, since rings would reveal "
 "their exact locations."
-msgstr ""
+msgstr "Buffer zimezimwa kwa safu zilizowekwa kuwa Displace, kwa kuwa pete "
+"zingeonyesha maeneo yake sahihi."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Legend position"
@@ -4805,11 +4809,6 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 msgstr "Kifungu cha WHERE kinatumia \"{operator}\" kwenye \"{columnName}\" "
 "chenye orodha isiyo ya literal."
-
-#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
-#~ msgid "Distance (meters)"
-#~ msgstr "Umbali (mita)"
 
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Preparing offline models"
@@ -5024,7 +5023,7 @@ msgstr "Thamani zote"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Distance"
-msgstr ""
+msgstr "Umbali"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
@@ -5163,7 +5162,7 @@ msgstr "Lipa kila mwezi"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
@@ -5220,7 +5219,7 @@ msgstr "Kikomo kimefikiwa"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Unavailable layer"
-msgstr ""
+msgstr "Safu haipatikani"
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Month"
@@ -5248,7 +5247,7 @@ msgstr "Chagua safu ya tarehe"
 
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Distance to nearest {sourceName}"
-msgstr ""
+msgstr "Umbali hadi iliyo karibu zaidi na {sourceName}"
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is any of"
@@ -5411,7 +5410,7 @@ msgstr "Ongeza chati ya nguzo ya hesabu za safu katika {datasetName}"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Anywhere"
-msgstr ""
+msgstr "Mahali popote"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse.ts
 msgid "No file selected"
@@ -6348,7 +6347,7 @@ msgstr "Kubwa"
 
 #: src/views/GisApp/export/loadExportFeatureTable/loadExportFeatureTable.ts
 msgid "The map's data is still loading. Try again in a moment."
-msgstr ""
+msgstr "Data ya ramani bado inapakia. Jaribu tena baada ya muda mfupi."
 
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Invalid workspace"
@@ -6499,7 +6498,7 @@ msgstr "Wa kwanza kialfabeti"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"
-msgstr ""
+msgstr "Pakua CSV"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -6801,7 +6800,7 @@ msgstr "WMTS"
 
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
 msgid "Back to the feature list"
-msgstr ""
+msgstr "Rudi kwenye orodha ya vipengele"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 msgid "App"
@@ -6967,7 +6966,7 @@ msgstr "Hali nyingine ina jina hili."
 
 #: src/views/GisApp/panels/FeatureListDrawer/makeCsvRowsFromFeatureList/makeCsvRowsFromFeatureList.ts
 msgid "{columnLabel} ({unitLabel})"
-msgstr ""
+msgstr "{columnLabel} ({unitLabel})"
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "No fields have been added"
@@ -7247,10 +7246,6 @@ msgstr "Radiusi ya kundi"
 msgid "No saved datasets found."
 msgstr "Hakuna datasets zilizohifadhiwa zilizopatikana."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Expand the inspector"
-msgstr "Panua kikaguzi"
-
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/index.tsx
@@ -7351,7 +7346,7 @@ msgstr "Yenye mpangilio"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Fewer than {MIN_EXACT_APPROXIMATE_COUNT} features"
-msgstr ""
+msgstr "Vipengele vichache kuliko {MIN_EXACT_APPROXIMATE_COUNT}"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/RowFilterEditor.tsx
 msgid "No row filters. The slice will include every row in the dataset (for the "
@@ -7391,7 +7386,7 @@ msgstr "Modeli za nje ya mtandao zimepakuliwa"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
 msgid "Maximum rows"
-msgstr ""
+msgstr "Safu mlalo za juu zaidi"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -7424,12 +7419,6 @@ msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "Tumegundua taarifa za kibinafsi zinazoweza kuwa na upendeleo wa lugha "
 "katika jibu la AI. Angalia zote hapa chini."
-
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
-#~ "columns."
-#~ msgstr "Bafa inahitaji safu iliyo na jiometri iliyokusanywa, si safu za "
-#~ "latitudo na longitudo."
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -7721,7 +7710,7 @@ msgstr "Chagua mkusanyiko wa data"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "mi"
-msgstr ""
+msgstr "mi"
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Allow syncing"
@@ -7819,13 +7808,9 @@ msgstr "Filter"
 msgid "This cannot be undone."
 msgstr "Hali hii haiwezi kubadilishwa."
 
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
-#~ msgstr ""
-
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{count, plural, one {# kipengele} other {# vipengele}}"
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
@@ -7975,7 +7960,7 @@ msgstr "Shiriki hii {resourceLabel}"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Default order"
-msgstr ""
+msgstr "Mpangilio chaguomsingi"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid "This {resource} is shared with: "
@@ -8006,7 +7991,8 @@ msgstr "Mizani inatofautiana katika ramani hii"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName} "
 "within {distanceText} of {sourceLayerName}"
-msgstr ""
+msgstr "{totalCount, plural, one {# kipengele} other {# vipengele}} katika "
+"{layerName} ndani ya {distanceText} kutoka {sourceLayerName}"
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Let's let others see your dashboard"
@@ -8211,7 +8197,7 @@ msgstr "Kikomo cha dashibodi zilizoshirikiwa kimefikiwa"
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# area} other {# areas}}"
-msgstr ""
+msgstr "{featureCount, plural, one {# eneo} other {# maeneo}}"
 
 #: src/views/GisApp/shell/MapToolCluster/MapToolCluster.tsx
 msgid "Buffer of {sourceName}"
@@ -8234,7 +8220,7 @@ msgstr "{formattedPrice}/kiti"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Sort direction"
-msgstr ""
+msgstr "Mwelekeo wa kupanga"
 
 #: src/views/ProfileView/DisplayNameSection.tsx
 msgid "Display name"
@@ -8259,7 +8245,7 @@ msgstr "Kikao chako kimeisha"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "The feature list could not load."
-msgstr ""
+msgstr "Orodha ya vipengele haikuweza kupakiwa."
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "The query changed after the columns were added."
@@ -8336,6 +8322,7 @@ msgstr "Nafasi ya kazi"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 #: src/views/GisApp/panels/LayerInspector/LayerInspector.tsx
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Layer"
 msgstr "Safu"
 
@@ -8383,7 +8370,7 @@ msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# point} other {# points}}"
-msgstr ""
+msgstr "{featureCount, plural, one {# point} other {# points}}"
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
@@ -9212,7 +9199,7 @@ msgstr "Upatikanaji umekataliwa"
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListOptions.tsx
 msgid "Pick a layer"
-msgstr ""
+msgstr "Chagua tabaka"
 
 #. placeholder {0}: concept.name
 #: src/views/OntologyDesignerApp/ConceptMetaView/RefreshRecordsButton.tsx
@@ -9374,7 +9361,7 @@ msgstr "Mada"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Pick a point layer"
-msgstr ""
+msgstr "Chagua tabaka la pointi"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Show labels"
@@ -9440,7 +9427,7 @@ msgstr "Kosa"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show feature {position} on the map"
-msgstr ""
+msgstr "Onyesha kipengele {position} kwenye ramani"
 
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Send answer"
@@ -9458,10 +9445,6 @@ msgstr "{0} na tabaka zake zitaondolewa. Hili haliwezi kutenduliwa."
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "... and {remainingCount} more"
 msgstr "... na {remainingCount} zaidi"
-
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-msgid "Collapse the inspector"
-msgstr "Kunja kikaguzi"
 
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
@@ -9739,7 +9722,8 @@ msgstr "Kutoka Google Sheets"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownColumnsText} of {totalColumnsText} columns. Download the "
 "full list as CSV from the map."
-msgstr ""
+msgstr "Inaonyesha safu wima {shownColumnsText} kati ya {totalColumnsText}. "
+"Pakua orodha kamili kama CSV kutoka kwenye ramani."
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Subscription updated successfully"
@@ -9816,7 +9800,7 @@ msgstr "Unahitaji ufikiaji wa admin kwenye rasilimali hii ili kusimamia "
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "At least {minDistance} {unitLabel}"
-msgstr ""
+msgstr "Angalau {minDistance} {unitLabel}"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Displace"
@@ -9878,7 +9862,7 @@ msgstr "Kila series ni wingu moja la (X, Y) la alama. Ongeza zaidi ili "
 
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{featureCount, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{featureCount, plural, one {# feature} other {# features}}"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Polygon"
@@ -9966,10 +9950,6 @@ msgstr "Haikuweza kufuta eneo."
 msgid "Switch Workspace"
 msgstr "Badilisha Nafasi ya Kazi"
 
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName}"
-#~ msgstr ""
-
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "Unaweza kuona dashibodi hii kwa sababu ilishirikiwa nawe."
@@ -9980,7 +9960,8 @@ msgstr "Chagua vikundi vya watumiaji kwa mwanachama huyu"
 
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "{totalCount, plural, one {# feature} other {# features}} in {layerName}"
-msgstr ""
+msgstr "{totalCount, plural, one {# feature} other {# features}} katika "
+"{layerName}"
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
@@ -10102,7 +10083,7 @@ msgstr "Maandishi yana"
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 #: src/views/GisApp/panels/FeatureListDrawer/formatFeatureListCell/formatFeatureListCell.ts
 msgid "{distance} {unit}"
-msgstr ""
+msgstr "{distance} {unit}"
 
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Saving"
@@ -10225,7 +10206,7 @@ msgstr "Sanidi jinsi ya kuungana na seti za data"
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Add an area layer, such as a buffer, to filter by it."
-msgstr ""
+msgstr "Ongeza tabaka la eneo, kama vile buffer, ili kuchuja kulingana nalo."
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it"
@@ -10261,7 +10242,7 @@ msgstr "Maelezo"
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Buffer added."
-msgstr ""
+msgstr "Buffer imeongezwa."
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/useAddCatalogListing/useAddCatalogListing.ts
 msgid "Preparing your data"
@@ -10677,6 +10658,10 @@ msgstr "Sasisha & chapisha tena"
 msgid "Center"
 msgstr "Katikati"
 
+#: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
+msgid "Back to layers"
+msgstr "Rudi kwenye tabaka"
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Cancelled"
@@ -10791,7 +10776,7 @@ msgstr "Kagua muunganisho wako na ubofye kitufe tena ili ujaribu upya."
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "This layer's features cannot be listed."
-msgstr ""
+msgstr "Vipengele vya tabaka hili haviwezi kuorodheshwa."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 6"
@@ -11791,7 +11776,7 @@ msgstr ""
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
-msgstr ""
+msgstr "km"
 
 #: src/views/DataManagerApp/copy/postgresConnectorImportErrorCopy/postgresConnectorImportErrorCopy.ts
 msgid "The database did not respond in time. Check the address and try again."
@@ -12301,7 +12286,7 @@ msgstr "Badilisha latitudo na longitudo"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 msgid "Distance ({unitLabel})"
-msgstr ""
+msgstr "Umbali ({unitLabel})"
 
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlQrModal.tsx
 msgid "Download PNG"
@@ -12353,7 +12338,9 @@ msgstr "Dirisha ibukizi la tabaka hili halionyeshi sehemu yoyote. Chagua baadhi 
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownText} of {countText} rows and {shownColumnsText} of "
 "{totalColumnsText} columns. Download the full list as CSV from the map."
-msgstr ""
+msgstr "Inaonyesha safu {shownText} kati ya {countText} na safu wima "
+"{shownColumnsText} kati ya {totalColumnsText}. Pakua orodha kamili kama "
+"CSV kutoka kwenye ramani."
 
 #: src/routes/_auth/$workspaceSlug/individual-manager/index.tsx
 msgid "Pick a case type"

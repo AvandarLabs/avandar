@@ -10,7 +10,6 @@ import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEnt
 import { GisAppFeatureListDrawer } from "@/views/GisApp/GisAppFeatureListDrawer";
 import { GisAppFirstRunCard } from "@/views/GisApp/GisAppFirstRunCard";
 import { GisAppFurnitureBar } from "@/views/GisApp/GisAppFurnitureBar";
-import { GisAppLayerInspector } from "@/views/GisApp/GisAppLayerInspector/GisAppLayerInspector";
 import { GisAppLayerPanel } from "@/views/GisApp/GisAppLayerPanel";
 import { GisAppMapLegend } from "@/views/GisApp/GisAppMapLegend";
 import { GisAppMapToolCluster } from "@/views/GisApp/GisAppMapToolCluster";
@@ -204,12 +203,6 @@ export function GisAppMapShell({ app }: Props): ReactNode {
         />
       }
       layerPanel={<GisAppLayerPanel app={app} actions={layerActions} />}
-      inspector={
-        <GisAppLayerInspector
-          app={app}
-          updateSelectedLayer={layerActions.updateSelectedLayer}
-        />
-      }
       legend={<GisAppMapLegend app={app} />}
       statusCard={isFeatureListOpen ? null : <GisAppStatusCard app={app} />}
       timeSlider={

@@ -8,7 +8,7 @@ type Props = {
   canvas: ReactNode;
   topBar: ReactNode;
   layerPanel: ReactNode;
-  inspector: ReactNode;
+  inspector?: ReactNode;
   legend: ReactNode;
   toolCluster: ReactNode;
   statusCard: ReactNode;
