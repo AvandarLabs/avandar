@@ -16,8 +16,10 @@ measurement rules in `prompts/observe.md`:
 - A **cut plus entrance reported as a whip pan**: the incoming shot was a cut
   followed by cards flipping in on the Y axis. The prompt now makes Argon say
   exactly what happens on each side of a shot boundary.
-- A **wrong repeat count**: a stepped wipe called "8 columns" had about 12.
-  The prompt now asks for counts or a stated range.
+- A **doubted repeat count**: a coarse contact sheet suggested the stepped
+  wipe had about 12 columns, not Argon's 8. A frame-by-frame check later
+  confirmed 8: the coarse sheet was wrong, not Argon. The prompt still asks
+  for counts or a stated range, and verification now uses `--step 1` sheets.
 - Motions **hidden under transitions** were missed: the outgoing card slid
   away with blur under the wipe. The transition catalog now asks for every
   layer's motion.
