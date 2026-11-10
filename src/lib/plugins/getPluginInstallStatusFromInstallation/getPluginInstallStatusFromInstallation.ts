@@ -1,3 +1,4 @@
+import { isPluginContributionActive } from "$/agent/dataAgent/isPluginContributionActive";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
 /** Where a plugin stands in a workspace. */
@@ -29,8 +30,11 @@ export function getPluginInstallStatusFromInstallation(options: {
   if (!installation.isEnabled) {
     return "disabled";
   }
-  const hasUngrantedPermission = manifestPermissions.some((permission) => {
-    return !installation.grantedPermissions.includes(permission);
-  });
-  return hasUngrantedPermission ? "needs_review" : "installed";
+  return isPluginContributionActive({
+    isEnabled: installation.isEnabled,
+    grantedPermissions: installation.grantedPermissions,
+    manifestPermissions,
+  })
+    ? "installed"
+    : "needs_review";
 }
