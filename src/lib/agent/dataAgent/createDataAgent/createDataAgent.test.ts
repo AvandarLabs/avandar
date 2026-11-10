@@ -2,6 +2,7 @@ import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import { describe, expect, it, vi } from "vitest";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { createLocalModel } from "@/lib/agent/localModels/createLocalModelStreamFn/createLocalModelStreamFn";
+import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type { AssistantMessage, StopReason } from "@earendil-works/pi-ai";
@@ -48,6 +49,28 @@ function _createEndingStreamFn(
   };
 }
 
+const OPTIONS = {
+  datasets: [],
+  host: HOST,
+  policy: { primary: { model: MODEL, thinkingLevel: "off" as const } },
+  today: "2026-11-08",
+};
+
+const STOP_STREAM = _createEndingStreamFn("aborted");
+
+const FIT_DECLARATION: PluginAiToolDeclaration = {
+  pluginId: "avandar.epidemiology",
+  permissions: ["data:read"],
+  name: "fitRegression",
+  description: "Fits a line to two numeric columns.",
+  parameters: {
+    type: "object",
+    additionalProperties: false,
+    required: [],
+    properties: {},
+  },
+};
+
 function _createAgent(streamFn: StreamFn) {
   return createDataAgent({
     datasets: [],
@@ -83,5 +106,39 @@ describe("createDataAgent", () => {
     await expect(dataAgent.ask("How many?")).resolves.toMatchObject({
       text: "",
     });
+  });
+
+  it("adds the plugin tool on ask and leaves it off the plan tool list", async () => {
+    const getPluginAiTools = vi.fn(() => {
+      return [FIT_DECLARATION];
+    });
+    const agent = createDataAgent({
+      ...OPTIONS,
+      getPluginAiTools,
+      runPluginAiTool: vi
+        .fn()
+        .mockResolvedValue({ text: '{"slope":2}', isError: false }),
+      streamFn: STOP_STREAM,
+    });
+    await agent.ask("fit it");
+    expect(getPluginAiTools).toHaveBeenCalled();
+    expect(
+      agent.agent.state.tools.map((tool) => {
+        return tool.name;
+      }),
+    ).toContain("fitRegression");
+
+    const planAgent = createDataAgent({
+      ...OPTIONS,
+      queryTools: "plan",
+      getPluginAiTools,
+      streamFn: STOP_STREAM,
+    });
+    await planAgent.ask("fit it");
+    expect(
+      planAgent.agent.state.tools.map((tool) => {
+        return tool.name;
+      }),
+    ).not.toContain("fitRegression");
   });
 });

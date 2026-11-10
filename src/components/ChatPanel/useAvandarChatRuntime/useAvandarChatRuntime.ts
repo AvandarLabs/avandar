@@ -1,7 +1,14 @@
 import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
@@ -13,6 +20,7 @@ import { makeNewChatThreadMessagesFromPageContext } from "@/components/ChatPanel
 import { makeLikeFromThreadMessage } from "@/components/ChatPanel/useChatViewTranscript/threadMessageHelpers";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { ActivePluginsContext } from "@/lib/plugins/PluginHost/ActivePluginsContext";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -64,6 +72,8 @@ export function useAvandarChatRuntime(): {
   const parseSqlRef = useRef(parseSql);
   const userRef = useRef(user);
   const contextTrayRef = useRef(contextTray);
+  const activePlugins = useContext(ActivePluginsContext);
+  const activePluginsRef = useRef(activePlugins);
   // Relies on the workspace layout remounting per workspace
   // (`key={workspace.id}`).
   const hasHydratedTrayRef = useRef(false);
@@ -113,6 +123,7 @@ export function useAvandarChatRuntime(): {
       parseSqlRef.current = parseSql;
       userRef.current = user;
       contextTrayRef.current = contextTray;
+      activePluginsRef.current = activePlugins;
       workspaceIdRef.current = workspace.id;
       workspaceRef.current = workspace;
       copyRef.current = {
@@ -142,6 +153,7 @@ export function useAvandarChatRuntime(): {
       };
     },
     [
+      activePlugins,
       contextTray,
       dashboardEditorState,
       pageContext,
@@ -183,6 +195,7 @@ export function useAvandarChatRuntime(): {
       dashboardEditorDispatch,
       chatPanelDispatch,
       contextTrayRef,
+      activePluginsRef,
     });
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
   }, [dataExplorerDispatch, dashboardEditorDispatch, chatPanelDispatch]);

@@ -199,6 +199,18 @@ afterEach(() => {
 });
 
 describe("runDataAgentTurn", () => {
+  it("passes the turn's plugin tools into the agent", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const getPluginAiTools = () => {
+      return [];
+    };
+    await runDataAgentTurn({
+      ..._turn("workspace-1", "Fit a line."),
+      getPluginAiTools,
+    });
+    expect(_lastAgentOptions().getPluginAiTools).toBe(getPluginAiTools);
+  });
+
   it("names tables in the page block as the agent knows them", async () => {
     getAllDatasetsMock.mockResolvedValue([DATASET_A]);
     await runDataAgentTurn(

@@ -1,4 +1,5 @@
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
@@ -63,6 +64,13 @@ export type DataAgentTurnOptions = {
    * model (offline turns), so labels still read `@Name`.
    */
   questionLabel?: string;
+  /**
+   * The plugin AI tools installed in the workspace, read at the start of
+   * every agent `ask`. The agent offers none when it is not set.
+   */
+  getPluginAiTools?: () => readonly PluginAiToolDeclaration[];
+  /** The workspace's slug, for the API a plugin AI tool receives. */
+  workspaceSlug?: string;
 };
 
 /**
