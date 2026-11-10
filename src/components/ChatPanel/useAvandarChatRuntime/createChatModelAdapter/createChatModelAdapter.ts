@@ -332,6 +332,10 @@ function _isAbortError(error: unknown): boolean {
   );
 }
 
+function _identityTitleMask(text: string): string {
+  return text;
+}
+
 /**
  * Handles a failed agent turn like `_recoverFromChatFailure`, except for its
  * last step: a failure that would be rethrown becomes a reply instead, so
@@ -580,6 +584,9 @@ export function createChatModelAdapter(
       // Every answer an offline turn produces is marked, so a hosted
       // request later reads a fixed line in its place.
       const runOfflineTurn = async (): Promise<ChatModelRunResult> => {
+        if (titleMaskRef && currentPageContext.app !== "data-explorer") {
+          titleMaskRef.current = _identityTitleMask;
+        }
         const result = await runLocalChatTurn({
           dataAgentTurn: {
             ...dataAgentTurn,
@@ -629,6 +636,9 @@ export function createChatModelAdapter(
           : undefined;
 
       try {
+        if (titleMaskRef) {
+          titleMaskRef.current = _identityTitleMask;
+        }
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId },

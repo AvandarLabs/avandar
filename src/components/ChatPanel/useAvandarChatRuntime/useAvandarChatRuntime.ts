@@ -2,23 +2,19 @@ import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { buildChatSessionTitleExcerpt } from "$/agent/chatTitle/buildChatSessionTitleExcerpt";
-import { APIClient } from "@/clients/APIClient";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
-import { requestChatSessionTitle } from "@/components/ChatPanel/ChatSessionTitle/requestChatSessionTitle";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
-import { OfflineAnswerMessage } from "@/components/ChatPanel/OfflineAnswerMessage/OfflineAnswerMessage";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
+import { requestStoredSessionTitle } from "@/components/ChatPanel/useAvandarChatRuntime/requestStoredSessionTitle";
 import { shouldPersistThreadOnRunEnd } from "@/components/ChatPanel/useAvandarChatRuntime/shouldPersistThreadOnRunEnd/shouldPersistThreadOnRunEnd";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { makeNewChatThreadMessagesFromPageContext } from "@/components/ChatPanel/useChatViewTranscript/makeThreadMessagesFromSnapshot";
 import { makeLikeFromThreadMessage } from "@/components/ChatPanel/useChatViewTranscript/threadMessageHelpers";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -63,60 +59,6 @@ type ActiveSessionSnapshot = {
   pendingClarification: StoredChatThread["pendingClarification"];
   pendingCaseTypeDraft: StoredChatThread["pendingCaseTypeDraft"];
 };
-
-type RequestStoredSessionTitleOptions = {
-  messages: readonly ThreadMessageLike[];
-  mask: ((text: string) => string) | undefined;
-  sessionId: string;
-  workspaceId: string;
-  sessions: ReturnType<typeof useChatSessions>;
-  locale: string;
-  placeholders: Readonly<Record<ChatSessionKind, string>>;
-};
-
-function _requestStoredSessionTitle(
-  options: Readonly<RequestStoredSessionTitleOptions>,
-): void {
-  const sessions = options.sessions;
-  if (!sessions) {
-    return;
-  }
-  const session = sessions.index.sessions[options.sessionId];
-  const assistant = [...options.messages].reverse().find((message) => {
-    return message.role === "assistant";
-  });
-  if (!session?.titleIsPlaceholder || !assistant) {
-    return;
-  }
-  const isOffline = OfflineAnswerMessage.isOfflineAnswer(assistant.metadata);
-  if (!isOffline && !options.mask) {
-    return;
-  }
-  const placeholder = options.placeholders[session.kind];
-  const excerpt = buildChatSessionTitleExcerpt({
-    messages: options.messages,
-    mask:
-      options.mask ??
-      ((text) => {
-        return text;
-      }),
-    offlineAnswerText: OfflineAnswerMessage.hostedContent,
-  });
-  void requestChatSessionTitle({
-    sessionId: options.sessionId,
-    kind: session.kind,
-    workspaceId: options.workspaceId,
-    excerpt,
-    locale: options.locale,
-    placeholder,
-    isOffline,
-    post: APIClient.post,
-    completeOffline: OfflineChatEngineStore.complete,
-    setSessionTitle: sessions.setSessionTitle,
-  }).catch(() => {
-    return undefined;
-  });
-}
 
 function _makeSessionSnapshot(
   options: Readonly<ActiveSessionSnapshot>,
@@ -554,7 +496,7 @@ export function useAvandarChatRuntime(): {
               pendingCaseTypeDraft: pendingCaseTypeDraftRef.current,
             });
             if (didWrite) {
-              _requestStoredSessionTitle({
+              requestStoredSessionTitle({
                 messages,
                 mask: titleMaskRef.current,
                 sessionId,

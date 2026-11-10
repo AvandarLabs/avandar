@@ -58,6 +58,11 @@ export async function runOfflineDataAgentTurn(
   return askConversationDataAgent({
     conversations: offlineConversationsByChat,
     turn: { ...options, isOffline: true },
+    onConversationReady: (conversation) => {
+      if (options.titleMaskRef) {
+        options.titleMaskRef.current = conversation.sqlVault.maskText;
+      }
+    },
     createConversation: _createOfflineConversation,
   });
 }

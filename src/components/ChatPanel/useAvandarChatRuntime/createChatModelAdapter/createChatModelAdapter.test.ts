@@ -691,6 +691,16 @@ describe("createChatModelAdapter with mentions", () => {
     expect(body).not.toContain(DATASET_REF.gadgetId);
   });
 
+  it("retains an identity title mask for today's hosted chat", async () => {
+    const titleMaskRef = {
+      current: undefined as ((text: string) => string) | undefined,
+    };
+
+    await _askWithMention("dashboards", [], { titleMaskRef });
+
+    expect(titleMaskRef.current?.("Jane Doe")).toBe("Jane Doe");
+  });
+
   it("names mentions by type in today's chat when loading fails", async () => {
     loadGadgetsMock.mockRejectedValue(new Error("network"));
 

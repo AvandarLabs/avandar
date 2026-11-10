@@ -286,6 +286,8 @@ export type AgentTurnInputs = {
 type AskConversationDataAgentOptions = {
   conversations: Map<string, DataAgentConversation>;
   turn: Readonly<DataAgentTurnOptions>;
+  /** Runs after this turn is attached to its conversation, before the ask. */
+  onConversationReady?: (conversation: DataAgentConversation) => void;
   /**
    * The turn's blocks and mention names, built from the conversation it
    * goes to, whose vault hides personal values in every block's SQL.
@@ -346,6 +348,7 @@ export async function askConversationDataAgent(
   conversation.turnRef.current = turn;
   conversation.results = results;
   turn.chatPanelDispatch.setPendingClarification(undefined);
+  options.onConversationReady?.(conversation);
   const inputs = options.buildTurnInputs?.(conversation);
   const blocks = inputs?.blocks ?? {};
   const reply = await _askAgent(
