@@ -97,7 +97,7 @@ describe("ChatSessionStrip", () => {
       name: "Close chat",
     });
     expect(closeActions).toHaveLength(3);
-    fireEvent.click(closeActions[0]);
+    fireEvent.click(closeActions[0]!);
     expect(actions.archiveSession).toHaveBeenCalledWith("selected");
   });
 
@@ -123,9 +123,9 @@ describe("ChatSessionStrip", () => {
       expect(action.closest('[role="menuitem"]')).toBeNull();
     });
 
-    fireEvent.click(reopenActions[1]);
+    fireEvent.click(reopenActions[1]!);
     expect(actions.reopenSession).toHaveBeenCalledWith("closed-two");
-    fireEvent.click(deleteActions[0]);
+    fireEvent.click(deleteActions[0]!);
     expect(actions.deleteArchivedSession).toHaveBeenCalledWith("closed-one");
     expect(actions.selectSession).not.toHaveBeenCalled();
   });

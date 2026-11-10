@@ -6,7 +6,7 @@ import { GisAppLayerPanel } from "@/views/GisApp/GisAppLayerPanel";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { GisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
-import type { ReactNode } from "react";
+import type { RenderResult } from "@testing-library/react";
 
 vi.mock(
   "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody",
@@ -84,7 +84,7 @@ function _app(
 function _renderPanel(
   app: GisAppState,
   actions: GisAppLayerActions = _actions(),
-): ReactNode {
+): RenderResult {
   return render(<GisAppLayerPanel app={app} actions={actions} />);
 }
 

@@ -36,7 +36,7 @@ const DATASET_REF: Gadget.Ref = {
 const CLARIFICATION = {
   question: "Which year?",
   responseShape: { kind: "free_text" as const },
-  turnNumber: 1,
+  turnNumber: 1 as const,
 };
 const CASE_TYPE_DRAFT = {
   name: "Outbreak",

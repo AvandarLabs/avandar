@@ -57,7 +57,14 @@ function SessionConsumer(): ReactNode {
 function Harness(): ReactNode {
   return (
     <ChatPanelStateManager.Provider
-      initialStateOverrides={{ layout: "composer" }}
+      initialStateOverrides={{
+        isOpen: false,
+        isAvailable: true,
+        layout: "composer",
+        pendingClarification: undefined,
+        pendingCaseTypeDraft: undefined,
+        contextTray: [],
+      }}
     >
       <ChatSessionProvider>
         <SessionConsumer />

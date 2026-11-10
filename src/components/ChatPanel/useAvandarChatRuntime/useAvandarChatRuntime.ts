@@ -197,7 +197,7 @@ export function useAvandarChatRuntime(): {
       "case-design": t`New case type`,
     },
   });
-  const activeSessionIdRef = useRef<string>();
+  const activeSessionIdRef = useRef<string | undefined>(undefined);
   const activeSessionSnapshotRef = useRef<ActiveSessionSnapshot>(
     _makeSessionSnapshot({
       sessionId: undefined,
