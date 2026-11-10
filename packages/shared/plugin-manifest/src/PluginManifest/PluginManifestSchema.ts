@@ -29,6 +29,11 @@ const WHEN_OPERATORS = [
   "lte",
   "in",
 ] as const satisfies readonly WhenOperator[];
+const AI_TOOL_NAME_PATTERN = /^[a-z][A-Za-z0-9]{0,63}$/;
+const AI_TOOL_NAME_MESSAGE =
+  "must start with a lowercase letter and hold only letters and digits, up to 64 characters";
+const AI_TOOL_DESCRIPTION_MAX = 600;
+const AI_TOOL_PARAMETER_DESCRIPTION_MAX = 200;
 const EMPTY_COMBINATOR_MESSAGE = "needs at least one condition";
 const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or "{ <fact>: { <operator>: value } }" with an operator of ${WHEN_OPERATORS.join(", ")}`;
 
@@ -97,6 +102,54 @@ const MenuItemSchema = z.strictObject({
   when: WhenConditionSchema.optional(),
 });
 
+const AiToolParameterDescriptionSchema = z
+  .string()
+  .max(AI_TOOL_PARAMETER_DESCRIPTION_MAX)
+  .optional();
+
+const AiToolPropertySchema = z.discriminatedUnion("type", [
+  z.strictObject({
+    type: z.literal("string"),
+    description: AiToolParameterDescriptionSchema,
+    enum: z.array(z.string()).min(1).optional(),
+  }),
+  z.strictObject({
+    type: z.literal("number"),
+    description: AiToolParameterDescriptionSchema,
+    enum: z.array(z.number()).min(1).optional(),
+  }),
+  z.strictObject({
+    type: z.literal("boolean"),
+    description: AiToolParameterDescriptionSchema,
+    enum: z.array(z.boolean()).min(1).optional(),
+  }),
+]);
+
+const AiToolParametersSchema = z
+  .strictObject({
+    type: z.literal("object"),
+    additionalProperties: z.literal(false),
+    required: z.array(z.string()).default([]),
+    properties: z.record(z.string(), AiToolPropertySchema),
+  })
+  .superRefine((parameters, context) => {
+    parameters.required.forEach((propertyName, index) => {
+      if (!Object.hasOwn(parameters.properties, propertyName)) {
+        context.addIssue({
+          code: "custom",
+          path: ["required", index],
+          message: `required entry "${propertyName}" is not a property`,
+        });
+      }
+    });
+  });
+
+const AiToolSchema = z.strictObject({
+  name: z.string().regex(AI_TOOL_NAME_PATTERN, AI_TOOL_NAME_MESSAGE),
+  description: z.string().min(1).max(AI_TOOL_DESCRIPTION_MAX),
+  parameters: AiToolParametersSchema,
+});
+
 const MenusSchema = z.partialRecord(z.enum(SLOT_IDS), z.array(MenuItemSchema), {
   error: (issue) => {
     return issue.code === "invalid_key"
@@ -131,6 +184,7 @@ const BasePluginManifestSchema = z.strictObject({
     commands: z.array(CommandSchema).default([]),
     menus: MenusSchema.default({}),
     vizTypes: z.array(PluginVizTypeSchema).default([]),
+    aiTools: z.array(AiToolSchema).default([]),
   }),
 });
 
@@ -150,6 +204,23 @@ function _refineCommands(
       });
     }
     seenIds.add(command.id);
+  });
+}
+
+function _refineAiTools(
+  manifest: BasePluginManifest,
+  context: z.RefinementCtx,
+): void {
+  const seenNames = new Set<string>();
+  manifest.contributes.aiTools.forEach((tool, index) => {
+    if (seenNames.has(tool.name)) {
+      context.addIssue({
+        code: "custom",
+        path: ["contributes", "aiTools", index, "name"],
+        message: `duplicate ai tool name "${tool.name}"`,
+      });
+    }
+    seenNames.add(tool.name);
   });
 }
 
@@ -215,6 +286,7 @@ export const PluginManifestSchema = BasePluginManifestSchema.superRefine(
     _refineCommands(manifest, context);
     _refineMenus(manifest, context);
     _refineVizTypes(manifest, context);
+    _refineAiTools(manifest, context);
   },
 );
 
@@ -254,3 +326,10 @@ export type PluginVizSetting = PluginVizType["settings"][number];
  * `kind`, for example to map it onto a settings form control.
  */
 export type PluginVizSettingControl = PluginVizSetting["control"];
+
+/**
+ * A tool a plugin declares under `contributes.aiTools`, for example to list
+ * it among the data agent's tools with its name, description, and JSON
+ * Schema parameters.
+ */
+export type PluginAiTool = PluginManifest["contributes"]["aiTools"][number];

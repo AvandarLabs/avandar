@@ -103,6 +103,67 @@ function _makeManifestWithSetting(
   return _makeManifestWithVizTypes([_makeVizType({ settings: [setting] })]);
 }
 
+function _makeAiTool(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    name: "fitRegression",
+    description: "Fits a line.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["xColumn"],
+      properties: {
+        xColumn: { type: "string", description: "The predictor." },
+      },
+    },
+    ...overrides,
+  };
+}
+
+function _makeManifestWithAiTools(
+  aiTools: unknown[],
+): Record<string, unknown> {
+  const manifest = _makeValidManifest();
+  manifest.contributes = {
+    ...(manifest.contributes as object),
+    aiTools,
+  };
+  return manifest;
+}
+
+function _getIssuesForAiTool(
+  overrides: Record<string, unknown>,
+): Array<{ path: string; message: string }> {
+  return _getIssues(_makeManifestWithAiTools([_makeAiTool(overrides)]));
+}
+
+function _getIssuesForAiToolNames(
+  names: string[],
+): Array<{ path: string; message: string }> {
+  return _getIssues(
+    _makeManifestWithAiTools(
+      names.map((name) => {
+        return _makeAiTool({ name });
+      }),
+    ),
+  );
+}
+
+function _getIssuesForAiToolProperty(
+  property: Record<string, unknown>,
+  required: string[] = [],
+): Array<{ path: string; message: string }> {
+  return _getIssuesForAiTool({
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required,
+      properties: { xColumn: property },
+    },
+  });
+}
+
 describe("PluginManifestSchema", () => {
   it("accepts a valid manifest and defaults omitted lists", () => {
     const manifest = _makeValidManifest();
@@ -565,5 +626,67 @@ describe("PluginManifestSchema contributes.vizTypes", () => {
         message: "must not be greater than max (1)",
       },
     ]);
+  });
+});
+
+describe("PluginManifestSchema contributes.aiTools", () => {
+  it("accepts an ai tool whose parameters are strings", () => {
+    const parsed = PluginManifestSchema.parse(
+      _makeManifestWithAiTools([_makeAiTool()]),
+    );
+    expect(parsed.contributes.aiTools[0]?.name).toBe("fitRegression");
+  });
+
+  it("defaults aiTools to an empty list", () => {
+    const parsed = PluginManifestSchema.parse(_makeValidManifest());
+    expect(parsed.contributes.aiTools).toEqual([]);
+  });
+
+  it.each([
+    ["a dotted name", () => {return _getIssuesForAiTool({ name: "fit.regression" })}],
+    [
+      "a duplicate name",
+      () => {return _getIssuesForAiToolNames(["fitRegression", "fitRegression"])},
+    ],
+    ["an object property", () => {return _getIssuesForAiToolProperty({ type: "object" })}],
+    ["an array property", () => {return _getIssuesForAiToolProperty({ type: "array" })}],
+    [
+      "a 601-character description",
+      () => {return _getIssuesForAiTool({ description: "a".repeat(601) })},
+    ],
+    [
+      "a 201-character parameter description",
+      () =>
+        {return _getIssuesForAiToolProperty({
+          type: "string",
+          description: "a".repeat(201),
+        })},
+    ],
+    [
+      "a required entry that is not a property name",
+      () => {return _getIssuesForAiToolProperty({ type: "string" }, ["yColumn"])},
+    ],
+    [
+      "an enum whose values do not match the property type",
+      () => {return _getIssuesForAiToolProperty({ type: "string", enum: [1, 2] })},
+    ],
+  ])("rejects an ai tool with %s", (_label, getIssuesFromCase) => {
+    // Anchored to the aiTools path so an unrelated issue cannot satisfy it.
+    const paths = getIssuesFromCase().map((issue) => {
+      return issue.path;
+    });
+    expect(
+      paths.some((path) => {
+        return path.startsWith("contributes.aiTools.");
+      }),
+    ).toBe(true);
+  });
+
+  it("accepts an enum whose values match the property type", () => {
+    const issues = _getIssuesForAiToolProperty(
+      { type: "number", enum: [1, 2] },
+      ["xColumn"],
+    );
+    expect(issues).toEqual([]);
   });
 });
