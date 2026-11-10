@@ -157,6 +157,7 @@ function _createAdapter(
     dashboardEditorDispatch: {},
     chatPanelDispatch: { setPendingClarification: vi.fn() },
     contextTrayRef: ref([]),
+    sessionKindRef: ref("data"),
     ...overrides,
   } as unknown as CreateChatModelAdapterOptions);
 }
@@ -406,8 +407,19 @@ describe("createChatModelAdapter with the agent on", () => {
     );
   });
 
-  it("keeps the case designer on today's chat", async () => {
+  it("routes a data session on the case manager to the agent", async () => {
     await _ask(_createAdapter("case-manager"));
+
+    expect(runDataAgentTurnMock).toHaveBeenCalledTimes(1);
+    expect(apiPostMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps a case-design session on today's chat off the case manager", async () => {
+    await _ask(
+      _createAdapter("data-explorer", {
+        sessionKindRef: { current: "case-design" },
+      } as Partial<CreateChatModelAdapterOptions>),
+    );
 
     expect(runDataAgentTurnMock).not.toHaveBeenCalled();
     expect(apiPostMock).toHaveBeenCalledTimes(1);
@@ -507,7 +519,13 @@ describe("createChatModelAdapter with the agent on", () => {
     const failure = new Error("model refused");
     apiPostMock.mockRejectedValue(failure);
 
-    await expect(_ask(_createAdapter("case-manager"))).rejects.toBe(failure);
+    await expect(
+      _ask(
+        _createAdapter("case-manager", {
+          sessionKindRef: { current: "case-design" },
+        } as Partial<CreateChatModelAdapterOptions>),
+      ),
+    ).rejects.toBe(failure);
   });
 
   it("routes to the offline turn, not the agent, with offline mode on", async () => {
@@ -818,7 +836,9 @@ describe("createChatModelAdapter with mentions", () => {
   it("leaves the attached count out in the case designer", async () => {
     isAgentEnabledMock.mockReturnValue(true);
 
-    await _askWithMention("case-manager", [DASHBOARD_REF]);
+    await _askWithMention("case-manager", [DASHBOARD_REF], {
+      sessionKindRef: { current: "case-design" },
+    } as Partial<CreateChatModelAdapterOptions>);
 
     const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
     expect(event.payload).not.toHaveProperty("attachedCount");
@@ -882,7 +902,9 @@ describe("createChatModelAdapter with mentions", () => {
   it("leaves the mention count out in the case designer", async () => {
     isAgentEnabledMock.mockReturnValue(true);
 
-    await _askWithMention("case-manager");
+    await _askWithMention("case-manager", [], {
+      sessionKindRef: { current: "case-design" },
+    } as Partial<CreateChatModelAdapterOptions>);
 
     const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
     expect(event.payload).not.toHaveProperty("mentionCount");
@@ -891,7 +913,9 @@ describe("createChatModelAdapter with mentions", () => {
   it("does not load the tray in the case designer", async () => {
     isAgentEnabledMock.mockReturnValue(true);
 
-    await _askWithMention("case-manager", [DASHBOARD_REF]);
+    await _askWithMention("case-manager", [DASHBOARD_REF], {
+      sessionKindRef: { current: "case-design" },
+    } as Partial<CreateChatModelAdapterOptions>);
 
     expect(loadGadgetsMock).toHaveBeenCalledWith([DATASET_REF]);
   });
@@ -964,6 +988,7 @@ const PERSONAL_TILE_TOKEN = ChatMentionToken.buildToken(PERSONAL_TILE_REF);
 async function _askAfterTileMention(
   app: ChatPageContext.T["app"],
   tile: { title: string; sql: string },
+  overrides: Partial<CreateChatModelAdapterOptions> = {},
 ): Promise<string> {
   loadGadgetsMock.mockResolvedValue(
     new Map([
@@ -978,7 +1003,7 @@ async function _askAfterTileMention(
       ],
     ]),
   );
-  await _createAdapter(app).run({
+  await _createAdapter(app, overrides).run({
     messages: [
       {
         role: "user",
@@ -1031,10 +1056,16 @@ describe("createChatModelAdapter mention privacy leaks", () => {
   it("never sends today's chat a value the mentioned tile's own SQL filters on, in the case designer", async () => {
     isAgentEnabledMock.mockReturnValue(true);
 
-    const sent = await _askAfterTileMention("case-manager", {
-      title: "Visits by Jane Doe",
-      sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
-    });
+    const sent = await _askAfterTileMention(
+      "case-manager",
+      {
+        title: "Visits by Jane Doe",
+        sql: `SELECT count(*) FROM t WHERE "patient_name" = 'Jane Doe'`,
+      },
+      {
+        sessionKindRef: { current: "case-design" },
+      } as Partial<CreateChatModelAdapterOptions>,
+    );
 
     expect(sent).not.toContain("Jane");
   });

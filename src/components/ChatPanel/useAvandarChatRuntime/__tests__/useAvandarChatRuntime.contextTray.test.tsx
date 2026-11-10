@@ -29,6 +29,13 @@ const MAP_REF: Gadget.Ref = {
   subId: null,
 };
 
+function _selectedIdentity() {
+  return {
+    ...IDENTITY,
+    sessionId: harness.sessions!.index.selectedId,
+  };
+}
+
 beforeEach(() => {
   resetHarness();
 });
@@ -46,7 +53,9 @@ describe("useAvandarChatRuntime context tray", () => {
     await waitFor(() => {
       expect(harness.chatPanelState?.contextTray).toEqual([DATASET_REF]);
     });
-    expect(ChatContextTrayStore.read(IDENTITY)).toEqual([DATASET_REF]);
+    expect(ChatContextTrayStore.read(_selectedIdentity())).toEqual([
+      DATASET_REF,
+    ]);
   });
 
   it("never writes or clears an empty tray while mounting a stored one", async () => {
@@ -64,7 +73,11 @@ describe("useAvandarChatRuntime context tray", () => {
         return options.refs.length === 0;
       }),
     ).toEqual([]);
-    expect(clearSpy).not.toHaveBeenCalled();
+    expect(
+      clearSpy.mock.calls.filter(([identity]) => {
+        return identity.sessionId !== undefined;
+      }),
+    ).toEqual([]);
     writeSpy.mockRestore();
     clearSpy.mockRestore();
   });
@@ -77,16 +90,17 @@ describe("useAvandarChatRuntime context tray", () => {
     });
 
     await waitFor(() => {
-      expect(ChatContextTrayStore.read(IDENTITY)).toEqual([MAP_REF]);
+      expect(ChatContextTrayStore.read(_selectedIdentity())).toEqual([MAP_REF]);
     });
   });
 
-  it("empties the tray and the store on a new chat", async () => {
+  it("opens a new chat with an empty tray and preserves the old one", async () => {
     ChatContextTrayStore.write({ ...IDENTITY, refs: [DATASET_REF] });
     await renderAppAt("/alpha/data-explorer");
     await waitFor(() => {
       expect(harness.chatPanelState?.contextTray).toEqual([DATASET_REF]);
     });
+    const previousIdentity = _selectedIdentity();
 
     act(() => {
       harness.startNewChat!();
@@ -95,8 +109,7 @@ describe("useAvandarChatRuntime context tray", () => {
     await waitFor(() => {
       expect(harness.chatPanelState?.contextTray).toEqual([]);
     });
-    expect(
-      window.localStorage.getItem(ChatContextTrayStore.storageKey(IDENTITY)),
-    ).toBeNull();
+    expect(ChatContextTrayStore.read(previousIdentity)).toEqual([DATASET_REF]);
+    expect(ChatContextTrayStore.read(_selectedIdentity())).toEqual([]);
   });
 });

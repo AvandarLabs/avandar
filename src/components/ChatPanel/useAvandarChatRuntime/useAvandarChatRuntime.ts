@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
 import { shouldPersistThreadOnRunEnd } from "@/components/ChatPanel/useAvandarChatRuntime/shouldPersistThreadOnRunEnd/shouldPersistThreadOnRunEnd";
@@ -17,8 +18,111 @@ import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEdito
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
+import type {
+  ChatSessionIndex,
+  ChatSessionKind,
+} from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
+import type { StoredChatThread } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
-import type { ChatModelAdapter } from "@assistant-ui/react";
+import type { ChatModelAdapter, ThreadMessageLike } from "@assistant-ui/react";
+
+type SessionStatePersistenceOptions = {
+  workspaceId: string;
+  userId: string;
+  sessionId: string;
+  messages: readonly ThreadMessageLike[];
+  pendingClarification: StoredChatThread["pendingClarification"];
+  pendingCaseTypeDraft: StoredChatThread["pendingCaseTypeDraft"];
+  contextTray: Parameters<typeof ChatContextTrayStore.write>[0]["refs"];
+};
+
+type LoadedSessionState = StoredChatThread & {
+  sessionKind: ChatSessionKind;
+  contextTray: Parameters<typeof ChatContextTrayStore.write>[0]["refs"];
+};
+
+type LoadSessionStateOptions = {
+  index: ChatSessionIndex;
+  sessionId: string;
+  workspaceId: string;
+  userId: string;
+  pageContext: Parameters<
+    typeof makeNewChatThreadMessagesFromPageContext
+  >[0]["pageContext"];
+  pathname: string;
+};
+
+function _persistSessionState(
+  options: Readonly<SessionStatePersistenceOptions>,
+): void {
+  const identity = {
+    workspaceId: options.workspaceId,
+    userId: options.userId,
+    sessionId: options.sessionId,
+  };
+  ChatThreadStore.writeRecord({
+    ...identity,
+    messages: options.messages,
+    pendingClarification: options.pendingClarification,
+    pendingCaseTypeDraft: options.pendingCaseTypeDraft,
+  });
+  if (options.contextTray.length === 0) {
+    ChatContextTrayStore.clear(identity);
+    return;
+  }
+  ChatContextTrayStore.write({
+    ...identity,
+    refs: options.contextTray,
+  });
+}
+
+function _makeSessionSeedMessages(options: {
+  pageContext: Parameters<
+    typeof makeNewChatThreadMessagesFromPageContext
+  >[0]["pageContext"];
+  pathname: string;
+  sessionKind: ChatSessionKind;
+}): ThreadMessageLike[] {
+  const messages = makeNewChatThreadMessagesFromPageContext({
+    pageContext: options.pageContext,
+    pathname: options.pathname,
+  });
+  return options.sessionKind === "case-design"
+    ? [
+        ...messages,
+        {
+          role: "user",
+          content: CaseDesignKickoff.CONTENT,
+          metadata: CaseDesignKickoff.metadata,
+        },
+      ]
+    : messages;
+}
+
+function _loadSessionState(
+  options: Readonly<LoadSessionStateOptions>,
+): LoadedSessionState {
+  const identity = {
+    workspaceId: options.workspaceId,
+    userId: options.userId,
+    sessionId: options.sessionId,
+  };
+  const record = ChatThreadStore.readRecord(identity);
+  const sessionKind = options.index.sessions[options.sessionId]?.kind ?? "data";
+  return {
+    ...record,
+    messages:
+      record.messages.length > 0
+        ? record.messages
+        : _makeSessionSeedMessages({
+            pageContext: options.pageContext,
+            pathname: options.pathname,
+            sessionKind,
+          }),
+    sessionKind,
+    contextTray: ChatContextTrayStore.read(identity),
+  };
+}
 
 /**
  * The Assistant UI runtime for the Avandar chat panel.
@@ -30,9 +134,8 @@ import type { ChatModelAdapter } from "@assistant-ui/react";
  * `DataExplorerStateManager`, which causes the Explorer to re-run the query
  * automatically through the existing `useDataQuery` pipeline.
  *
- * Returns the local runtime plus `startNewChat`, which aborts in-flight
- * generation, resets the thread with a pending view event for the current
- * page, and clears persisted storage.
+ * Returns the local runtime plus `startNewChat`, which adds and selects an
+ * empty data session.
  */
 export function useAvandarChatRuntime(): {
   runtime: ReturnType<typeof useLocalRuntime>;
@@ -50,7 +153,9 @@ export function useAvandarChatRuntime(): {
   const dashboardEditorDispatch = DashboardEditorStateManager.useDispatch();
   const dashboardEditorState = DashboardEditorStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
-  const { contextTray } = ChatPanelStateManager.useState();
+  const { contextTray, pendingClarification, pendingCaseTypeDraft } =
+    ChatPanelStateManager.useState();
+  const sessions = useChatSessions();
   const { parseSql } = useSqlToStructuredQuery();
   const { t } = useLingui();
   // Refs keep the adapter instance stable while still reading fresh values
@@ -64,11 +169,10 @@ export function useAvandarChatRuntime(): {
   const parseSqlRef = useRef(parseSql);
   const userRef = useRef(user);
   const contextTrayRef = useRef(contextTray);
-  // Relies on the workspace layout remounting per workspace
-  // (`key={workspace.id}`).
-  const hasHydratedTrayRef = useRef(false);
-  // Set by hydration so the persist effect of that same commit, which still
-  // sees the empty tray, does not overwrite what was just loaded.
+  const pendingClarificationRef = useRef(pendingClarification);
+  const pendingCaseTypeDraftRef = useRef(pendingCaseTypeDraft);
+  const sessionKindRef = useRef<ChatSessionKind>("data");
+  const activeSessionIdRef = useRef<string>();
   const skipNextTrayPersistRef = useRef(false);
   const workspaceIdRef = useRef(workspace.id);
   const workspaceRef = useRef(workspace);
@@ -99,11 +203,24 @@ export function useAvandarChatRuntime(): {
     agentUnavailable: t`The assistant could not answer that. Try again in a moment.`,
   });
   const [initialMessages] = useState(() => {
-    return user && workspace.id
-      ? ChatThreadStore.read({ workspaceId: workspace.id, userId: user.id })
-      : [];
+    const selectedId = sessions?.index.selectedId;
+    if (!user || !workspace.id || !selectedId) {
+      return [];
+    }
+    const record = ChatThreadStore.readRecord({
+      workspaceId: workspace.id,
+      userId: user.id,
+      sessionId: selectedId,
+    });
+    const sessionKind = sessions.index.sessions[selectedId]?.kind ?? "data";
+    return record.messages.length > 0
+      ? record.messages
+      : _makeSessionSeedMessages({
+          pageContext,
+          pathname,
+          sessionKind,
+        });
   });
-  const hasHydratedPersistedThreadRef = useRef(initialMessages.length > 0);
 
   useEffect(
     function synchronizeChatRuntimeDependencies() {
@@ -113,6 +230,10 @@ export function useAvandarChatRuntime(): {
       parseSqlRef.current = parseSql;
       userRef.current = user;
       contextTrayRef.current = contextTray;
+      pendingClarificationRef.current = pendingClarification;
+      pendingCaseTypeDraftRef.current = pendingCaseTypeDraft;
+      sessionKindRef.current =
+        sessions?.index.sessions[sessions.index.selectedId]?.kind ?? "data";
       workspaceIdRef.current = workspace.id;
       workspaceRef.current = workspace;
       copyRef.current = {
@@ -146,7 +267,10 @@ export function useAvandarChatRuntime(): {
       dashboardEditorState,
       pageContext,
       pathname,
+      pendingCaseTypeDraft,
+      pendingClarification,
       parseSql,
+      sessions,
       t,
       user,
       workspace,
@@ -183,6 +307,7 @@ export function useAvandarChatRuntime(): {
       dashboardEditorDispatch,
       chatPanelDispatch,
       contextTrayRef,
+      sessionKindRef,
     });
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
   }, [dataExplorerDispatch, dashboardEditorDispatch, chatPanelDispatch]);
@@ -192,50 +317,74 @@ export function useAvandarChatRuntime(): {
   const runtime = useLocalRuntime(adapter, { initialMessages });
 
   useEffect(
-    function hydratePersistedThreadWhenIdentityIsReady() {
-      if (hasHydratedPersistedThreadRef.current || !user || !workspace.id) {
+    function loadSelectedSession() {
+      const selectedId = sessions?.index.selectedId;
+      if (!selectedId || !user || !workspace.id) {
         return;
       }
-      const stored = ChatThreadStore.read({
-        workspaceId: workspace.id,
-        userId: user.id,
-      });
-      hasHydratedPersistedThreadRef.current = true;
-      if (stored.length === 0) {
+      const previousId = activeSessionIdRef.current;
+      if (previousId === selectedId) {
         return;
       }
-      runtime.thread.reset(stored);
-    },
-    [runtime, user, workspace.id],
-  );
-
-  useEffect(
-    function hydrateContextTrayWhenIdentityIsReady() {
-      if (hasHydratedTrayRef.current || !user || !workspace.id) {
-        return;
-      }
-      hasHydratedTrayRef.current = true;
-      skipNextTrayPersistRef.current = true;
-      chatPanelDispatch.setContextTray(
-        ChatContextTrayStore.read({
+      if (previousId) {
+        _persistSessionState({
           workspaceId: workspace.id,
           userId: user.id,
-        }),
-      );
+          sessionId: previousId,
+          messages: runtime.thread
+            .getState()
+            .messages.map(makeLikeFromThreadMessage),
+          pendingClarification,
+          pendingCaseTypeDraft,
+          contextTray,
+        });
+        chatGenerationRef.current += 1;
+        lastTurnRef.current = undefined;
+        runtime.thread.cancelRun();
+      }
+      const loaded = _loadSessionState({
+        index: sessions.index,
+        sessionId: selectedId,
+        workspaceId: workspace.id,
+        userId: user.id,
+        pageContext: pageContextRef.current,
+        pathname: pathnameRef.current,
+      });
+      activeSessionIdRef.current = selectedId;
+      sessionKindRef.current = loaded.sessionKind;
+      skipNextTrayPersistRef.current = true;
+      chatPanelDispatch.setContextTray(loaded.contextTray);
+      chatPanelDispatch.setPendingClarification(loaded.pendingClarification);
+      chatPanelDispatch.setPendingCaseTypeDraft(loaded.pendingCaseTypeDraft);
+      runtime.thread.reset(loaded.messages);
     },
-    [chatPanelDispatch, user, workspace.id],
+    [
+      chatPanelDispatch,
+      contextTray,
+      pendingCaseTypeDraft,
+      pendingClarification,
+      runtime,
+      sessions,
+      user,
+      workspace.id,
+    ],
   );
 
   useEffect(
     function persistContextTray() {
-      if (!hasHydratedTrayRef.current || !user || !workspace.id) {
+      const sessionId = activeSessionIdRef.current;
+      if (!sessionId || !user || !workspace.id) {
         return;
       }
       if (skipNextTrayPersistRef.current) {
         skipNextTrayPersistRef.current = false;
         return;
       }
-      const identity = { workspaceId: workspace.id, userId: user.id };
+      const identity = {
+        workspaceId: workspace.id,
+        userId: user.id,
+        sessionId,
+      };
       if (contextTray.length === 0) {
         ChatContextTrayStore.clear(identity);
         return;
@@ -265,11 +414,15 @@ export function useAvandarChatRuntime(): {
         ) {
           const currentUser = userRef.current;
           const workspaceId = workspaceIdRef.current;
-          if (currentUser && workspaceId) {
-            ChatThreadStore.write({
+          const sessionId = activeSessionIdRef.current;
+          if (currentUser && workspaceId && sessionId) {
+            ChatThreadStore.writeRecord({
               workspaceId,
               userId: currentUser.id,
+              sessionId,
               messages: state.messages.map(makeLikeFromThreadMessage),
+              pendingClarification: pendingClarificationRef.current,
+              pendingCaseTypeDraft: pendingCaseTypeDraftRef.current,
             });
           }
         }
@@ -280,42 +433,11 @@ export function useAvandarChatRuntime(): {
   );
 
   const startNewChat = useCallback(() => {
-    chatGenerationRef.current += 1;
-    // A new chat that asks the previous question again sends the same
-    // messages as that turn, which is how a "Try again" is recognized. The
-    // last turn belongs to the old thread, so forget it.
-    lastTurnRef.current = undefined;
-    runtime.thread.cancelRun();
-    // Same as boot after empty hydrate: empty thread + pending view from the
-    // current page. `useChatViewTranscript` only re-syncs when the snapshot
-    // changes, so New chat on the same route must reseed here.
-    runtime.thread.reset(
-      makeNewChatThreadMessagesFromPageContext({
-        pageContext: pageContextRef.current,
-        pathname: pathnameRef.current,
-      }),
-    );
-    const currentUser = userRef.current;
-    const workspaceId = workspaceIdRef.current;
-    if (currentUser && workspaceId) {
-      ChatThreadStore.clear({
-        workspaceId,
-        userId: currentUser.id,
-      });
+    if (!sessions) {
+      return;
     }
-    if (currentUser && workspaceId) {
-      ChatContextTrayStore.clear({ workspaceId, userId: currentUser.id });
-    }
-    chatPanelDispatch.setContextTray([]);
-    chatPanelDispatch.setPendingClarification(undefined);
-    if (pageContextRef.current.app === "case-manager") {
-      runtime.thread.append({
-        role: "user",
-        content: [{ type: "text", text: CaseDesignKickoff.CONTENT }],
-        metadata: CaseDesignKickoff.metadata,
-      });
-    }
-  }, [runtime, chatPanelDispatch]);
+    sessions.startDataSession();
+  }, [sessions]);
 
   return { runtime, startNewChat };
 }

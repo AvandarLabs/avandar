@@ -40,7 +40,6 @@ export function ChatPanelProvider({
         isOpen: _readInitialChatPanelOpenState(),
         isAvailable: isChatAvailable,
         layout: "docked",
-        caseDesignSessionNonce: 0,
         pendingClarification: undefined,
         pendingCaseTypeDraft: undefined,
         contextTray: [],

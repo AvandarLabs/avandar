@@ -43,6 +43,7 @@ import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConsentAck } from "$/types/chat.types";
+import type { ChatSessionKind } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
@@ -254,6 +255,8 @@ export type CreateChatModelAdapterOptions = {
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
   /** The chat's context tray, read when a turn starts. */
   contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
+  /** The selected session's reply path, read when a turn starts. */
+  sessionKindRef: MutableRefObject<ChatSessionKind>;
 };
 
 /**
@@ -376,6 +379,7 @@ export function createChatModelAdapter(
     dashboardEditorDispatch,
     chatPanelDispatch,
     contextTrayRef,
+    sessionKindRef,
   } = options;
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
@@ -399,8 +403,7 @@ export function createChatModelAdapter(
       const currentDashboardEditorState = dashboardEditorStateRef.current;
       // Only an agent turn reads the tray. Today's chat never sees it.
       const isAgentTurn =
-        currentPageContext.app !== "case-manager" &&
-        DataAgentFeature.isEnabled();
+        sessionKindRef.current === "data" && DataAgentFeature.isEnabled();
       const attachedRefs = isAgentTurn ? contextTrayRef.current : [];
       const turnMessages = await _prepareTurnMessages({
         messages,

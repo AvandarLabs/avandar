@@ -88,3 +88,21 @@ describe("ChatPanelStateManager context tray", () => {
     expect(result.current.state.contextTray).toEqual([_buildDatasetRef(3)]);
   });
 });
+
+describe("ChatPanelStateManager case design", () => {
+  it("opens the composer and clears pending cards without a nonce", () => {
+    const { result } = _renderTrayHook();
+
+    act(() => {
+      result.current.dispatch.beginCaseDesign();
+    });
+
+    expect(result.current.state).toMatchObject({
+      isOpen: true,
+      layout: "composer",
+      pendingClarification: undefined,
+      pendingCaseTypeDraft: undefined,
+    });
+    expect(result.current.state).not.toHaveProperty("caseDesignSessionNonce");
+  });
+});
