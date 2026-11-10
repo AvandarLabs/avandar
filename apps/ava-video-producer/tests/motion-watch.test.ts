@@ -20,6 +20,8 @@ async function _createWatchFixture(root: string) {
     "scripts/yaml",
     "scripts/require-license.mjs",
     "scripts/lib/readLicense.mjs",
+    "scripts/lib/copyRootEnvFile.mjs",
+    "scripts/lib/product-source.mjs",
     "scripts/stock/buildStockMessages",
     "lingui.gallery.config.ts",
     "src/gallery",

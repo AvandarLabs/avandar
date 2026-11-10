@@ -40,7 +40,8 @@ test("the direct video command refuses to start without license keys", async () 
     );
     assert.equal(result.status, 1, result.stderr);
     assert.match(result.stderr, /Remotion license keys are required/);
-    assert.match(result.stderr, /apps\/ava-video-producer\/\.env\.local/);
+    assert.match(result.stderr, /\.env\.video-producer\.local/);
+    assert.match(result.stderr, /\.env\.video-producer\.example/);
     assert.equal(result.stdout, "");
   } finally {
     await rm(directory, { recursive: true, force: true });

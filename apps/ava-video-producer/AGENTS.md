@@ -134,7 +134,7 @@ rules for committing, pushing, merging, or publication.
 
 ## Avandar workspace additions
 
-- Never open, print, commit, or copy `.env.local`. It contains credentials. If a key is needed, extract only that key in a shell command and pass it directly to the consumer without showing it.
+- Never open, print, commit, or copy `.env.local` or the workspace root's `.env.video-producer.local`. They contain credentials. If a key is needed, extract only that key in a shell command and pass it directly to the consumer without showing it. The root file is the source; the license guard (`scripts/lib/copyRootEnvFile.mjs`) copies it to `.env.local`, so never edit the copy by hand. Add new producer keys to the root `.env.video-producer.example`.
 - Keep `Config.setDotEnvLocation("remotion.env")`. Never pass `.env.local` to Remotion: environment-file values are exposed to browser code.
 - Every executable producer entry point must call the shared license guard before doing work. `scripts/lib/readLicense.mjs` reads only the public/private pair without populating `process.env`. Keep raw Remotion CLI configuration guarded too. Never add a skip-license environment variable. Tests use inert keys in temporary files and must never submit render telemetry with them.
 - The starter showcase is intentionally generic. Preserve the original demo and palette when demonstrating upstream behavior; label new studies as additions.

@@ -182,14 +182,24 @@ Motion vocabulary describes how elements move; scenes assemble content, layout, 
 
 ## License keys
 
-Before running any producer command, create the ignored
-`apps/ava-video-producer/.env.local` in this worktree with your own Remotion
-Automators key pair:
+Avandar keeps every env file in the workspace root. Before running any producer
+command, copy the root `.env.video-producer.example` to the ignored
+`.env.video-producer.local` and fill in your own Remotion Automators key pair:
+
+```bash
+cp .env.video-producer.example .env.video-producer.local # from the workspace root
+```
 
 ```dotenv
 REMOTION_PUBLIC_KEY=rm_pub_REPLACE_WITH_YOUR_PUBLIC_KEY
 REMOTION_PRIVATE_KEY=REPLACE_WITH_YOUR_COMPLETE_PRIVATE_KEY
 ```
+
+The license guard at the start of every producer command, including
+`pnpm showcase`, copies that file to the ignored
+`apps/ava-video-producer/.env.local`, which the loader reads. Edit the root
+file, not the copy: the next command overwrites the copy. Without a root file,
+an existing `apps/ava-video-producer/.env.local` is used unchanged.
 
 All package commands, direct runtime scripts, build/review servers, and the
 Remotion CLI config require both keys. Missing or blank keys, the `free-license`

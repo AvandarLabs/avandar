@@ -3,9 +3,11 @@ import path from "node:path";
 import { parseEnv } from "node:util";
 
 const SETUP_MESSAGE =
-  "Remotion license keys are required. Set REMOTION_PUBLIC_KEY and " +
-  "REMOTION_PRIVATE_KEY in apps/ava-video-producer/.env.local " +
-  "(or the process environment). Use your own Remotion Automators keys.";
+  "Remotion license keys are required. Copy .env.video-producer.example " +
+  "to .env.video-producer.local in the workspace root and set " +
+  "REMOTION_PUBLIC_KEY and REMOTION_PRIVATE_KEY (or set them in the process " +
+  "environment). Producer commands copy that file to " +
+  "apps/ava-video-producer/.env.local. Use your own Remotion Automators keys.";
 
 /** Read only the license pair without exposing dotenv values to browser code. */
 export function readLicense(appRoot, environment = process.env) {

@@ -24,6 +24,8 @@ async function _createFailedBuildFixture(root: string): Promise<void> {
     "scripts/yaml/compileYaml.cjs",
     "scripts/require-license.mjs",
     "scripts/lib/readLicense.mjs",
+    "scripts/lib/copyRootEnvFile.mjs",
+    "scripts/lib/product-source.mjs",
   ];
   await Promise.all(
     filenames.map(async (filename) => {
