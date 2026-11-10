@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
@@ -37,7 +38,6 @@ import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
@@ -635,6 +635,12 @@ export function createChatModelAdapter(
           ? buildRetryContext(cachedTurn.response)
           : undefined;
 
+      // A case-design session is today's case-manager chat on every page.
+      const hostedPageContext =
+        sessionKindRef.current === "case-design"
+          ? ChatPageContext.createCaseManagerViewContext()
+          : currentPageContext;
+
       try {
         if (titleMaskRef) {
           titleMaskRef.current = _identityTitleMask;
@@ -644,7 +650,7 @@ export function createChatModelAdapter(
           pathParams: { workspaceId },
           body: {
             messages: [...hostedChatMessages],
-            context: currentPageContext,
+            context: hostedPageContext,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
             ...(retryContext ? { retryContext } : {}),
           },

@@ -240,6 +240,16 @@ describe("createChatModelAdapter", () => {
     expect(apiPostMock.mock.calls[0]![0].body).not.toHaveProperty("model");
   });
 
+  it("sends a case-design turn the case manager context on the Data Explorer", async () => {
+    await _ask(
+      _createAdapter("data-explorer", {
+        sessionKindRef: { current: "case-design" },
+      } as Partial<CreateChatModelAdapterOptions>),
+    );
+
+    expect(apiPostMock.mock.calls[0]![0].body.context.app).toBe("case-manager");
+  });
+
   it("keeps a stored case id out of today's chat request", async () => {
     await _askAfterStoredCaseView(_createAdapter("dashboards"));
 
