@@ -159,6 +159,15 @@ export const storyboardSchema = z
         if (shot.props.fromFrame + shot.durationInFrames > horizon)
           issue(`${shot.id}: Avandar shot extends past its authored timeline`);
       }
+      if (shot.scene === "typography") {
+        if (shot.props.size === "caption" && shot.props.fontSize !== undefined)
+          issue(`${shot.id}: a caption size sets its own font size`);
+        if (
+          shot.props.exit &&
+          shot.props.exit.atFrame >= shot.durationInFrames
+        )
+          issue(`${shot.id}: the exit must start inside the shot`);
+      }
       if (shot.scene === "title" && shot.durationInFrames !== 66)
         issue(`${shot.id}: existing TitleCard requires 66 frames`);
       if (shot.scene === "graph") {

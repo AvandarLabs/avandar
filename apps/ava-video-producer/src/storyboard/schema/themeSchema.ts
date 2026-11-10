@@ -35,12 +35,11 @@ const colorSchema = z.string().max(100).regex(COLOR_PATTERN);
  * literal colours such as the product's adopted palette.
  */
 export const themeSchema = z
-  .object(
+  .strictObject(
     Object.fromEntries(
       THEME_TOKEN_NAMES.map((name) => [name, colorSchema.optional()]),
     ) as Record<ThemeTokenName, z.ZodOptional<typeof colorSchema>>,
-  )
-  .strict();
+  );
 
 const shotTokenSchema = z
   .string()
@@ -57,12 +56,11 @@ const shotTokenSchema = z
  * `ground: "var(--brand)"` to paint the shot on the plan's accent.
  */
 export const shotThemeSchema = z
-  .object(
+  .strictObject(
     Object.fromEntries(
       THEME_TOKEN_NAMES.map((name) => [name, shotTokenSchema.optional()]),
     ) as Record<ThemeTokenName, z.ZodOptional<typeof shotTokenSchema>>,
   )
-  .strict()
   .superRefine((theme, context) => {
     Object.entries(theme).forEach(([name, value]) => {
       if (value === `var(--${name})`) {

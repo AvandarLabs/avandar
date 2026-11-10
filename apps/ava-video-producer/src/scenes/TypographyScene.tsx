@@ -1,36 +1,56 @@
+import { Img, staticFile } from "remotion";
 import { DUR, EASE, mix, ramp } from "../motion";
-import { assertFrame, fitTextLines, sceneBounds } from "./layout/layout";
+import {
+  assertFrame,
+  fitTextLines,
+  safePublicPath,
+  sceneBounds,
+} from "./layout/layout";
 import { positioned, SceneShell } from "./SceneShell";
+import { getLineRevealStyle, getStagedExitStyle } from "./textReveal";
 import type { TypographySceneProps } from "./scenes.types";
 
-/** Headline copy that reveals word by word, with optional emphasized words. */
-export function TypographyScene({
-  frame,
-  width = 1600,
-  height = 1000,
-  title,
-  kicker,
-  lines,
-  emphasis = [],
-  align = "center",
-  fontSize = 92,
-  revealAtFrame = 6,
-  wordStaggerFrames = 3,
-}: TypographySceneProps) {
-  if (!lines.length || lines.length > 6 || lines.some((line) => !line.trim()))
-    throw new Error("TypographyScene needs 1 to 6 nonempty lines");
-  assertFrame(revealAtFrame, "revealAtFrame");
-  assertFrame(wordStaggerFrames, "wordStaggerFrames");
-  if (wordStaggerFrames < 2)
-    throw new Error("wordStaggerFrames must be at least 2");
+/** Largest font size a `caption` typography shot uses. */
+const CAPTION_FONT_SIZE = 28;
+/** Smallest font size a `caption` may shrink to while fitting. */
+const CAPTION_MIN_FONT_SIZE = 18;
+/** Default icon height above the lines, in pixels. */
+const ICON_SIZE = 160;
+
+/**
+ * Headline copy for a statement shot: lines revealed word by word through
+ * masks, or line by line (fade, left-to-right wipe, or cut), optionally
+ * under an icon and leaving in a staged exit. A `caption` size sets one
+ * small line, for example a teaser on an empty field.
+ */
+export function TypographyScene(props: TypographySceneProps) {
+  const {
+    frame,
+    width = 1600,
+    height = 1000,
+    title,
+    kicker,
+    lines,
+    align = "center",
+    revealAtFrame = 6,
+    wordStaggerFrames = 3,
+    icon,
+    size = "display",
+  } = props;
+  _validate(props);
   const bounds = sceneBounds(width, height, Boolean(title || kicker));
+  const iconSize = icon ? (icon.size ?? ICON_SIZE) : 0;
+  const isCaption = size === "caption";
   const fitted = fitTextLines(
     lines,
     bounds.width,
-    bounds.height - 56,
-    fontSize,
+    bounds.height - 56 - (icon ? iconSize + 48 : 0),
+    isCaption ? CAPTION_FONT_SIZE : (props.fontSize ?? 92),
+    isCaption ? CAPTION_MIN_FONT_SIZE : undefined,
   );
-  let wordIndex = 0;
+  const isCentered = align === "center";
+  const linesAt = icon ? revealAtFrame + DUR.panel : revealAtFrame;
+  const wordStarts = _countWordsBefore(fitted.lines);
   return (
     <SceneShell {...{ frame, width, height, title, kicker }}>
       <div
@@ -40,58 +60,173 @@ export function TypographyScene({
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          alignItems: align === "center" ? "center" : "flex-start",
+          alignItems: isCentered ? "center" : "flex-start",
           gap: fitted.fontSize * 0.15,
         }}
       >
+        {icon ? (
+          <div
+            style={{
+              marginBottom: 48,
+              ...getStagedExitStyle(frame, props.exit, fitted.lines.length),
+            }}
+          >
+            <Img
+              src={staticFile(safePublicPath(icon.src))}
+              alt=""
+              style={{
+                display: "block",
+                height: iconSize,
+                width: "auto",
+                ...getLineRevealStyle(frame, revealAtFrame, "line-fade", {
+                  rise: 0,
+                }),
+              }}
+            />
+          </div>
+        ) : null}
         {fitted.lines.map((line, row) => (
           <div
             key={row}
             style={{
-              display: "flex",
-              justifyContent: align === "center" ? "center" : "flex-start",
-              gap: fitted.fontSize * 0.3,
               maxWidth: "100%",
+              ...getStagedExitStyle(frame, props.exit, row),
             }}
           >
-            {line.split(/\s+/).map((word) => {
-              const index = wordIndex++;
-              const progress = ramp(
-                frame,
-                revealAtFrame + index * wordStaggerFrames,
-                DUR.word,
-                EASE.word,
-              );
-              return (
-                <span
-                  key={index}
-                  style={{
-                    display: "inline-block",
-                    overflow: "hidden",
-                    paddingBottom: fitted.fontSize * 0.07,
-                    lineHeight: 1.08,
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "inline-block",
-                      fontSize: fitted.fontSize,
-                      fontWeight: 600,
-                      letterSpacing: -fitted.fontSize * 0.025,
-                      color: emphasis.includes(word)
-                        ? "var(--brand-strong)"
-                        : "var(--foreground)",
-                      transform: `translateY(${mix(progress, 110, 0).toFixed(2)}%)`,
-                    }}
-                  >
-                    {word}
-                  </span>
-                </span>
-              );
-            })}
+            <_TypographyLine
+              {...props}
+              line={line}
+              fontSize={fitted.fontSize}
+              isCaption={isCaption}
+              isCentered={isCentered}
+              revealAt={
+                props.revealMode === undefined ||
+                props.revealMode === "word-mask"
+                  ? linesAt + wordStarts[row] * wordStaggerFrames
+                  : linesAt + row * (props.lineStaggerFrames ?? 3)
+              }
+            />
           </div>
         ))}
       </div>
     </SceneShell>
   );
+}
+
+/** One fitted line, in the scene's reveal mode. */
+function _TypographyLine({
+  frame,
+  line,
+  fontSize,
+  isCaption,
+  isCentered,
+  revealAt,
+  emphasis = [],
+  revealMode = "word-mask",
+  wordStaggerFrames = 3,
+}: TypographySceneProps & {
+  line: string;
+  fontSize: number;
+  isCaption: boolean;
+  isCentered: boolean;
+  revealAt: number;
+}) {
+  const wordStyle = (word: string) => ({
+    display: "inline-block",
+    fontSize,
+    fontWeight: isCaption ? 400 : 600,
+    letterSpacing: isCaption ? 0 : -fontSize * 0.025,
+    color: emphasis.includes(word)
+      ? "var(--brand-strong)"
+      : "var(--foreground)",
+  });
+  const words = line.split(/\s+/);
+  if (revealMode !== "word-mask") {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: isCentered ? "center" : "flex-start",
+          gap: fontSize * 0.3,
+          lineHeight: 1.08,
+          paddingBottom: fontSize * 0.07,
+          ...getLineRevealStyle(frame, revealAt, revealMode),
+        }}
+      >
+        {words.map((word, index) => (
+          <span key={index} style={wordStyle(word)}>
+            {word}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: isCentered ? "center" : "flex-start",
+        gap: fontSize * 0.3,
+        maxWidth: "100%",
+      }}
+    >
+      {words.map((word, index) => {
+        const progress = ramp(
+          frame,
+          revealAt + index * wordStaggerFrames,
+          DUR.word,
+          EASE.word,
+        );
+        return (
+          <span
+            key={index}
+            style={{
+              display: "inline-block",
+              overflow: "hidden",
+              paddingBottom: fontSize * 0.07,
+              lineHeight: 1.08,
+            }}
+          >
+            <span
+              style={{
+                ...wordStyle(word),
+                transform: `translateY(${mix(progress, 110, 0).toFixed(2)}%)`,
+              }}
+            >
+              {word}
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The index of each line's first word across all lines. */
+function _countWordsBefore(lines: string[]): number[] {
+  return lines.map((_, row) =>
+    lines
+      .slice(0, row)
+      .reduce((count, line) => count + line.split(/\s+/).length, 0),
+  );
+}
+
+function _validate({
+  lines,
+  revealAtFrame = 6,
+  wordStaggerFrames = 3,
+  size,
+  fontSize,
+}: TypographySceneProps): void {
+  if (!lines.length || lines.length > 6 || lines.some((line) => !line.trim())) {
+    throw new Error("TypographyScene needs 1 to 6 nonempty lines");
+  }
+  assertFrame(revealAtFrame, "revealAtFrame");
+  assertFrame(wordStaggerFrames, "wordStaggerFrames");
+  if (wordStaggerFrames < 2) {
+    throw new Error("wordStaggerFrames must be at least 2");
+  }
+  if (size === "caption" && fontSize !== undefined) {
+    throw new Error("A caption size sets its own font size");
+  }
 }

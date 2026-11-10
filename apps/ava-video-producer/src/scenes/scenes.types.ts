@@ -1,3 +1,5 @@
+import type { StagedExit, TextRevealMode } from "./textReveal";
+
 /** All times are scene-local frames. Coordinates are normalized unless noted. */
 export type SceneBase = {
   frame: number;
@@ -57,6 +59,16 @@ export type TypographySceneProps = SceneBase & {
   fontSize?: number;
   revealAtFrame?: number;
   wordStaggerFrames?: number;
+  /** How the lines arrive. Default `word-mask`. */
+  revealMode?: TextRevealMode;
+  /** Frames between lines for the line-by-line modes. Default 3. */
+  lineStaggerFrames?: number;
+  /** A public-relative image drawn above the lines, `size` px tall. */
+  icon?: { src: string; size?: number };
+  /** Lines fade out top to bottom, then the icon. */
+  exit?: StagedExit;
+  /** `caption` sets small regular-weight text instead of a display size. */
+  size?: "display" | "caption";
 };
 
 export type NormalizedRect = {

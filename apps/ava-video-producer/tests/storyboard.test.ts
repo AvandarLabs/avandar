@@ -304,3 +304,35 @@ test("a shot transition is rejected on a hard cut, the first shot, or when colum
     assert.equal(storyboardSchema.safeParse(plan).success, false);
   }
 });
+
+test("typography accepts staged reveal modes, an icon, an exit and a caption size", () => {
+  const plan = fixture();
+  plan.shots[1] = {
+    id: "metric",
+    scene: "typography",
+    durationInFrames: 150,
+    props: {
+      lines: ["One statement"],
+      revealMode: "line-fade",
+      lineStaggerFrames: 3,
+      icon: { src: "avandar/logo.png", size: 160 },
+      exit: { atFrame: 120, staggerFrames: 3, durationInFrames: 6 },
+    },
+  };
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+  plan.shots[1].props = { lines: ["A caption"], revealMode: "cut", size: "caption" };
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
+test("typography rejects a caption size with a display font size, or an exit past the shot", () => {
+  const plan = fixture();
+  plan.shots[1] = {
+    id: "metric",
+    scene: "typography",
+    durationInFrames: 150,
+    props: { lines: ["A caption"], size: "caption", fontSize: 60 },
+  };
+  assert.equal(storyboardSchema.safeParse(plan).success, false);
+  plan.shots[1].props = { lines: ["Late"], exit: { atFrame: 150 } };
+  assert.equal(storyboardSchema.safeParse(plan).success, false);
+});

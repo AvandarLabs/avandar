@@ -19,13 +19,12 @@ const outgoingSchema = z.enum(["frozen", "playing"]);
  */
 export const shotTransitionSchema = z.discriminatedUnion("kind", [
   z
-    .object({
+    .strictObject({
       kind: z.literal("dissolve"),
       outgoing: outgoingSchema.optional(),
-    })
-    .strict(),
+    }),
   z
-    .object({
+    .strictObject({
       kind: z.literal("stepped-column-wipe"),
       columns: z.number().int().min(2).max(24).optional(),
       staggerFrames: z.number().min(0).max(6).optional(),
@@ -33,14 +32,12 @@ export const shotTransitionSchema = z.discriminatedUnion("kind", [
       order: z.enum(["left-to-right", "right-to-left"]).optional(),
       outgoing: outgoingSchema.optional(),
       outgoingDrift: z
-        .object({
+        .strictObject({
           x: z.number().min(-0.5).max(0.5),
           blur: z.number().min(0).max(60).optional(),
         })
-        .strict()
         .optional(),
-    })
-    .strict(),
+    }),
 ]);
 
 /** A validated shot transition. */

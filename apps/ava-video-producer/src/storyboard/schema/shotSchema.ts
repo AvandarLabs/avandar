@@ -17,6 +17,12 @@ import {
 import { shotTransitionSchema } from "./shotTransitionSchema";
 import { shotThemeSchema } from "./themeSchema";
 
+/** Elements fading out in place one after another before a cut. */
+const stagedExitSchema = z.strictObject({
+  atFrame: frame,
+  staggerFrames: z.number().int().min(0).max(12).optional(),
+  durationInFrames: positiveFrames.max(30).optional(),
+});
 const heading = {
   title: text.max(100).optional(),
   kicker: text.max(160).optional(),
@@ -79,6 +85,16 @@ const typography = z
     fontSize: z.number().min(40).max(160).optional(),
     revealAtFrame: frame.optional(),
     wordStaggerFrames: z.number().int().min(2).max(12).optional(),
+    revealMode: z.enum(["word-mask", "line-fade", "wipe", "cut"]).optional(),
+    lineStaggerFrames: z.number().int().min(1).max(12).optional(),
+    icon: z
+      .strictObject({
+        src: assetPathSchema,
+        size: z.number().min(40).max(480).optional(),
+      })
+      .optional(),
+    exit: stagedExitSchema.optional(),
+    size: z.enum(["display", "caption"]).optional(),
   })
   .strict();
 const region = {
