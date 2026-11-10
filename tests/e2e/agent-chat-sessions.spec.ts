@@ -149,6 +149,9 @@ test.describe("agent chat sessions", () => {
     await page
       .getByRole("link", { name: "Data Explorer", exact: true })
       .press("Enter");
+    await expect(page).toHaveURL(
+      new RegExp(`/${workspaceSlug}/data-explorer$`),
+    );
     await expect(page.locator('[data-chat-layout="composer"]')).toBeVisible();
   });
 });
