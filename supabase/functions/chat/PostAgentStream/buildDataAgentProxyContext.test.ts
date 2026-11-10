@@ -88,10 +88,18 @@ describe("buildDataAgentProxyContext", () => {
       promptId: "data-agent-v3",
     });
 
+    const v4 = buildDataAgentProxyContext({
+      ...options,
+      promptId: "data-agent-v4",
+    });
+
     expect(v1.systemPrompt).not.toContain("CURRENT PAGE");
     expect(v2.systemPrompt).toContain("CURRENT PAGE");
     expect(v2.systemPrompt).not.toContain("ATTACHED AND MENTIONED");
     expect(v3.systemPrompt).toContain("CURRENT PAGE");
     expect(v3.systemPrompt).toContain("ATTACHED AND MENTIONED");
+    expect(v3.systemPrompt).not.toContain("A plugin tool");
+    expect(v4.systemPrompt).toContain("ATTACHED AND MENTIONED");
+    expect(v4.systemPrompt).toContain("A plugin tool");
   });
 });

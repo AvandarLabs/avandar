@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
+import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools.ts";
 
 /**
  * SHA-256 of prompt v1's instructions (everything before DATASETS), as
@@ -189,5 +190,29 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(v3).toContain("can be appended or stacked");
     expect(v3).toContain("call run_query to list or compare columns");
     expect(v2).not.toContain("call run_query to list or compare columns");
+  });
+});
+
+const PLUGIN_TOOL_SENTENCE =
+  "A plugin tool, when one is listed with the others, runs on the user's device against the result already on screen. Follow that tool's description. You may state the numbers it returns, and the call leaves your turn open so you can explain them.";
+
+describe("buildDataAgentSystemPrompt v4", () => {
+  it("adds the plugin-tool sentence to v4 only, as the last TOOLS bullet", () => {
+    const v3 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v3",
+    });
+    const v4 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v4",
+    });
+
+    expect(v3).not.toContain(PLUGIN_TOOL_SENTENCE);
+    expect(v4.slice(0, v4.indexOf("\n\nSQL\n"))).toBe(
+      `${v3.slice(0, v3.indexOf("\n\nSQL\n"))}\n- ${PLUGIN_TOOL_SENTENCE}`,
+    );
+    expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v4");
   });
 });

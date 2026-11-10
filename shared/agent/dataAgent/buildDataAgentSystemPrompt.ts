@@ -118,10 +118,30 @@ const DATA_AGENT_INSTRUCTIONS_V3 =
   ATTACHED_AND_MENTIONED_RULES +
   SCHEMA_ANSWER_RULES;
 
+/**
+ * The bullet v4 appends to the TOOLS section. It covers any plugin tool the
+ * proxy lists beside the built-in ones.
+ */
+const PLUGIN_TOOL_BULLET =
+  "\n- A plugin tool, when one is listed with the others, runs on the user's device against the result already on screen. Follow that tool's description. You may state the numbers it returns, and the call leaves your turn open so you can explain them.";
+
+/** Where the TOOLS section ends and the SQL section begins. */
+const SQL_SECTION_START = "\n\nSQL\n";
+
+/**
+ * v4: v3's instructions, plus one bullet at the end of the TOOLS section.
+ * The SQL section and everything after it stay as v3 has them.
+ */
+const DATA_AGENT_INSTRUCTIONS_V4 = DATA_AGENT_INSTRUCTIONS_V3.replace(
+  SQL_SECTION_START,
+  PLUGIN_TOOL_BULLET + SQL_SECTION_START,
+);
+
 const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
   "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,
   "data-agent-v2": DATA_AGENT_INSTRUCTIONS_V2,
   "data-agent-v3": DATA_AGENT_INSTRUCTIONS_V3,
+  "data-agent-v4": DATA_AGENT_INSTRUCTIONS_V4,
 };
 
 function _formatDatasetLine(
