@@ -70,17 +70,21 @@ function _makeStoreResultFromQueryResults(
 
 /**
  * Keeps the store on the last settled result: a run in flight leaves it as
- * it is, and unmounting clears it.
+ * it is, and unmounting clears it only while the store still holds what this
+ * hook published, so another explorer's newer result is not erased.
  */
 function usePublishSettledResultToStore(options: Options): void {
   const { queryResults, isLoadingResults } = options;
+  const publishedResultRef = useRef<ExplorerPluginResult | undefined>(
+    undefined,
+  );
 
   useEffect(
     function publishSettledResultToStore() {
       if (!isLoadingResults) {
-        ExplorerPluginResultStore.set(
-          _makeStoreResultFromQueryResults(queryResults),
-        );
+        const result = _makeStoreResultFromQueryResults(queryResults);
+        publishedResultRef.current = result;
+        ExplorerPluginResultStore.set(result);
       }
     },
     [queryResults, isLoadingResults],
@@ -88,7 +92,13 @@ function usePublishSettledResultToStore(options: Options): void {
 
   useEffect(function clearStoreOnUnmount() {
     return () => {
-      ExplorerPluginResultStore.clear();
+      const publishedResult = publishedResultRef.current;
+      if (
+        publishedResult !== undefined &&
+        ExplorerPluginResultStore.get() === publishedResult
+      ) {
+        ExplorerPluginResultStore.clear();
+      }
     };
   }, []);
 }

@@ -199,6 +199,24 @@ describe("useDataExplorerPluginContext", () => {
     expect(ExplorerPluginResultStore.get()).toBeUndefined();
   });
 
+  it("keeps a newer hook's result when an older hook unmounts", () => {
+    const { unmount: unmountOlderHook } = _renderWithSettledResult();
+    const newerResults = {
+      columns: [{ name: "deaths", dataType: "bigint" }],
+      data: [{ deaths: 1 }],
+    } as const;
+    renderHook(() => {
+      return useDataExplorerPluginContext({
+        queryResults: newerResults,
+        isLoadingResults: false,
+      });
+    });
+
+    unmountOlderHook();
+
+    expect(ExplorerPluginResultStore.get()?.rows).toBe(newerResults.data);
+  });
+
   it("keeps the last settled result in the store while a run loads", () => {
     const { rerender } = _renderWithRunStates();
 
