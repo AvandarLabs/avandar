@@ -70,3 +70,19 @@ spec, treated as prompt weaknesses before building.
   `black-field`, use the probed frame count now stated in each VIDEO label).
 - SKILL.md: the refine command used an unquoted `$CLIPS` that zsh does not
   split; `--clips-from <draft>` now plans clips inside `argon.mjs`.
+
+## Run 1, Phase 3 build (octet-copy)
+
+- Built: per-shot `theme`, `stepped-column-wipe`, `tilted-window`,
+  `brand-lockup`, `bar-comparison`, typography reveal modes, graph packets,
+  and four motion tokens. `argon-to-remotion.md` now lists what exists
+  instead of a stale gap list.
+- **Frame gate vs. hard cuts**: the gate fails luma jumps over 25, and the
+  reference hard-cuts between fields 79 to 235 apart. The reference now
+  says to copy the cuts anyway, evaluate the encoded `<plan.id>.mp4`, and
+  leave the gate policy to the user. Never loosen the gate.
+- Demo plans for plain scenes go in the Productions gallery, not continuity
+  studies (their schema only hosts continuity shots).
+- `npm test` already failed in this worktree (product bundle pre-step); the
+  reference now asks for a baseline run, and to restore regenerated
+  catalogs before committing.

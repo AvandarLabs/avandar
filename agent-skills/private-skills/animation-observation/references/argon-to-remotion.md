@@ -11,40 +11,74 @@ file and the code disagree, trust the code and fix this file.
 | --- | --- | --- |
 | Curve, duration, stagger (`EASE`, `DUR`, `STAGGER`) | `src/motion.ts` | No runtime imports in that file. Document new tokens in `docs/motion-vocabulary.md`. |
 | Shot (one `S*` in the storyboard script) | a storyboard shot: `src/storyboard/schema/shotSchema.ts` registry, rendered by `src/storyboard/StoryFilm/ShotView.tsx` | Scene types: `title`, `typography`, `graph`, `flowchart`, `metric`, `media`, `stock`, `avandar`, `continuity`. |
-| Transition between shots (`T*`) | `StoryFilm` (`src/storyboard/StoryFilm/StoryFilm.tsx`) | **Only a dissolve exists** (`transitionInFrames`, `EASE.inOut`, over a frozen last frame of the outgoing shot; `0` = hard cut). Any other shot-boundary transition must be added here as a new, generic, schema-validated transition kind. |
+| Transition between shots (`T*`, class `overlap`) | `StoryFilm` (`src/storyboard/StoryFilm/StoryFilm.tsx`), shot `transition: {kind, ...}` with `transitionInFrames` as its length | Kinds: `dissolve` (default) and `stepped-column-wipe`. `transitionInFrames: 0` is a hard cut. Add other kinds here as generic, schema-validated options. |
 | Transition inside one continuous shot | continuity beats: `src/continuity/continuitySchema.ts` `beats[].transition.kind`, rendered by `SceneTransition.tsx` in `src/motion-components` | Kinds: `cut`, `dissolve`, `wipe`, `aperture`, `spatial` (push with blur), `handoff`, `morph`. Continuity needs a 1600 x 840 stage. |
 | Element motion (`M*`) on a graphic | a Motion Atlas stock preset (`src/stock/presets/<Name>/`) | Self-contained 960 x 600 SVG with a 180-frame loop. Good for logos, charts, diagrams, typing. |
 | Element motion on text | `typography` scene (masked word rise, `wordStaggerFrames`, `revealAtFrame`), `title` scene (fixed 66 frames), stock `word-reveal`, `terminal-type` | No per-letter, line-fade, or wordmark-wipe mode. Add one as a prop on `TypographyScene` rather than a new scene. |
 | Camera move | `DiagramCamera` / camera tracks in `src/motion-components` (SVG, zoom 1 to 3, keys `{at,x,y,zoom,ease}`) | Only inside stock graphics and continuity beats. Nothing moves a camera over a whole storyboard shot. |
 | Composition template (`C*`) | a scene type, or a new scene/layout in `src/scenes/` registered in `shotSchema.ts` + `ShotView.tsx` | Document in `docs/shared-scene-library.md`. |
-| Recurring composition + transition pairing | a continuity study: `storyboards/explainers/study-<x>.json` + `src/continuity/vocabulary/studyCatalog.yaml` entry, then `pnpm continuity:messages` | Studies need at least 3 distinct tags and a real `sourceFilm`. |
+| Demo of a new scene or shot transition | a Productions plan: `storyboards/<name>.json`, listed in `scripts/showcase/ShowcaseFilms` `PLANS` and as a card in `showcase/productions.html` (see `storyboards/shot-vocabulary.json`) | Continuity studies (`studyCatalog.yaml`) only host 1600 x 840 continuity shots with a real `sourceFilm`, so they cannot demo plain scenes. |
+| Recurring continuity composition + transition | a continuity study: `storyboards/explainers/study-<x>.json` + `src/continuity/vocabulary/studyCatalog.yaml` entry, then `pnpm continuity:messages` | At least 3 distinct tags and a real `sourceFilm`. |
 
-## Known platform gaps
+## What exists for copying motion
 
-These were true when this file was written. Check the code before assuming
-they are still gaps.
+Built for earlier runs; read `docs/shared-scene-library.md`,
+`docs/scene-api.md`, and `storyboards/shot-vocabulary.json` for every prop.
 
-- **No 3D.** No `perspective`, `rotateX/Y`, or `preserve-3d` anywhere. Tilted
-  cards, card flips, and 3D extrusions need a new component.
-  - The rule "never put a lasting transform on the container holding the
-    whole UI" is about live product UI, where scaling resamples every glyph.
-    A tilted card showing a **still image** (a product screenshot in `media`)
-    is fine. A tilted card holding the live `avandar` scene is not.
-- **No shot-level wipe, push, whip, or zoom-through.** Add generic transition
-  kinds to `StoryFilm` (see "Adding a shot transition" below).
-- **Motion blur** exists only in `DiagramCamera` (temporal, SVG), the
-  `spatial` transition (CSS `blur()`), `AnchoredOverlay` (velocity blur), and
-  the cursor. For a fast slide, a velocity-scaled directional blur
-  (`filter: blur()` on the moving layer, or an SVG `feGaussianBlur` with an
-  X-only `stdDeviation`) is the accepted approximation.
-- **No per-shot background.** `plan.theme` is plan-wide and every scene
-  paints `--ground`, so a film that switches between dark, accent, and light
-  fields per shot needs a per-shot `theme` override on the shot base schema,
-  applied by `ShotView`. Check whether it exists before building it.
-- **`docs/shared-scene-library.md` omits the `continuity` scene.** The scene
-  list in this file and `shotSchema.ts` is right.
+- Per-shot `theme` override on any shot (for example
+  `{"ground": "var(--brand)"}` for an accent field).
+- `stepped-column-wipe` shot transition (columns, fractional stagger, rise
+  direction, column order, frozen or playing outgoing shot with drift and
+  blur).
+- `tilted-window` scene: perspective-tilted window over stills or footage,
+  with headline lines, whip, flip-split, and pull-back entrances, a
+  `whip-left` exit, a window-only camera, a carousel of windows, a racing
+  pair with counters, and a secondary window.
+- `brand-lockup` scene: the real logo built from N column masks, a
+  wordmark, a call-to-action stack, and a `fly-through` exit.
+- `bar-comparison` scene: one or two hero metrics over bar rows, with an
+  `erase` exit.
+- `typography` `revealMode` (`word-mask`, `line-fade`, `wipe`, `cut`), an
+  icon, a staged exit, and a `caption` size.
+- `graph` node items and tick frames, parallel edges, and travelling
+  packets on edges.
+- Tokens: `EASE.in`, `EASE.surge`, `DUR.whip`, `STAGGER_COLUMN`, plus the
+  window tilt tokens in `windowTilt.ts`; directional blur via
+  `HorizontalBlurFilter`.
+
+Still missing when last checked (check the code first):
+
+- **Motion blur** is a velocity-scaled directional blur approximation, not
+  shutter blur.
+- **No camera over a whole storyboard shot**; cameras exist in stock
+  graphics, continuity beats, and the `tilted-window` window layer.
 - **No low-res fast render.** `render` always draws at canvas size with
   `--concurrency=1`. Use `preview` contact sheets while iterating.
+- `docs/shared-scene-library.md` may omit some scene ids; `shotSchema.ts` is
+  the registry.
+
+## The frame gate and hard cuts
+
+`scripts/check-frames.mjs` fails any frame whose mean luma moves more than
+25 (0-255) from the frame before. It exists to catch flicker. Never loosen
+its thresholds (the producer's AGENTS.md forbids it).
+
+A reference that hard-cuts between distant fields trips it on purpose. With
+Avandar tokens, dark to brand blue is about 79, brand blue to light about
+156, and dark to light about 235. An 8-column wipe at 0.5-frame stagger only
+survives a jump of about 100. So:
+
+1. In Phase 2, compute the field change at every boundary and mark which
+   ones the gate will fail.
+2. **Build the film to match the reference anyway.** Do not soften a hard
+   cut or stretch a transition just to pass the gate: that breaks the copy.
+3. When the only gate failures are luma jumps at intentional shot
+   boundaries, the encoded picture still exists at
+   `.videos/<slug>/out/<plan.id>/render/<plan.id>.mp4` (only `final.mp4` is
+   skipped). Use it for evaluation, list the failing frames and their
+   boundaries in the report, and say the film is not deliverable until the
+   user decides how the gate should treat intentional cuts. Any failure that
+   is not at a planned boundary is a real defect: fix it.
 
 ## Placing a boundary by its class
 
@@ -161,6 +195,11 @@ beat as a scene option instead.
 
 Run from `apps/ava-video-producer`. Every script runs the license guard.
 
+Before changing code, run `npm test` once and save its failure list as a
+baseline: some tests may already fail in a worktree (for example the
+product-bundle pre-step). A regression is a failure that is not in the
+baseline.
+
 ```bash
 pnpm video validate ../../.videos/<slug>/storyboard.json
 pnpm video preview  ../../.videos/<slug>/storyboard.json   # .videos/<slug>/out/<plan.id>/preview/contact-sheet.jpg
@@ -171,8 +210,10 @@ node --import tsx --import ./scripts/yaml/registerYaml.mjs --test tests/storyboa
 ```
 
 - `render` requires a preview of the same plan to exist first.
-- `prevideo`, `premotion`, and `pretest` run `stock:messages`, which can
-  rewrite tracked `*.generated.ts` catalogs. Commit them only when a preset
-  changed.
+- `prevideo`, `premotion`, and `pretest` regenerate tracked catalogs
+  (`src/stock/i18n/*.generated.ts`, `src/continuity/i18n/*.generated.ts`,
+  `locales/en/messages.ts`, `src/gallery/locales/en/messages.ts`) even when
+  nothing changed. Commit them only when their source changed; otherwise
+  restore them with `git checkout -- <paths>` before committing.
 - The frame gate in `scripts/check-frames.mjs` must pass. Never loosen its
   thresholds. A legitimate fast transition that trips it needs a design fix.
