@@ -12,11 +12,11 @@ const LINE_ROWS = [1, 2, 3, 4, 5].map((x) => {
 /**
  * Questions that call the `fitRegression` plugin tool on the Data Explorer's
  * result. They are not in `COVID_QUESTIONS`, so the default 45 stay as they
- * are. Run them with `--questions F`.
+ * are. Run them with `--questions R`.
  */
 export const FIT_REGRESSION_QUESTIONS: readonly EvalQuestion[] = [
   {
-    id: "F01",
+    id: "R01",
     category: "page_context",
     prompt: "Fit y on x for the result on screen.",
     clarification: "not_needed",

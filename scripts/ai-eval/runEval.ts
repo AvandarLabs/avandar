@@ -11,7 +11,7 @@
  * With no `--questions`, the run asks the 45 original questions. `--questions
  * P` runs the page-context questions (what is on screen when the user asks).
  * `--questions M` runs the mention questions (gadgets the user mentions or
- * attaches). `--questions F` runs the fitRegression question, which calls the
+ * attaches). `--questions R` runs the fitRegression question, which calls the
  * epidemiology plugin's tool on a result the Data Explorer shows.
  *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
@@ -24,8 +24,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { COVID_QUESTIONS } from "./covid/covidQuestions";
-import { FIT_REGRESSION_QUESTIONS } from "./covid/fitRegressionQuestions";
 import { createBaselineHarness } from "./harnesses/baseline/BaselineHarness";
 import { createPiHarness } from "./harnesses/pi/PiHarness";
 import { createPiLocalHarness } from "./harnesses/pi/PiLocalHarness";
@@ -37,16 +35,11 @@ import {
   SUMMARY_TABLE_HEADER,
   summarizeEvalRun,
 } from "./runtime/summarizeEvalRun";
+import { selectEvalQuestions } from "./selectEvalQuestions";
 import type { EvalQuestion } from "./EvalQuestion";
 import type { EvalHarness } from "./harnesses/EvalHarness";
 import type { EvalQueryResult } from "./runtime/EvalDatabase";
 import type { GradedAnswer } from "./runtime/gradeEvalAnswer";
-
-/**
- * `--questions F` runs the fitRegression questions. Their ids start with
- * `F` like the follow-up questions, so the bare selector means these only.
- */
-const FIT_REGRESSION_SELECTOR = "F";
 
 const REPO_ROOT = resolve(import.meta.dirname, "../..");
 
@@ -132,40 +125,6 @@ function _parseOptions() {
   return values;
 }
 
-function _selectQuestions(ids: string): readonly EvalQuestion[] {
-  if (!ids) {
-    // The default run stays the audit's 45 questions, so archived runs
-    // compare. Page questions run with `--questions P`, mention questions
-    // with `--questions M`, schema questions with `--questions S`, and the
-    // fitRegression questions with `--questions F`.
-    return COVID_QUESTIONS.filter((question) => {
-      return (
-        question.category !== "page_context" &&
-        question.category !== "mentions" &&
-        question.category !== "schema"
-      );
-    });
-  }
-  const tokens = ids.split(",");
-  const wanted = new Set(
-    tokens.filter((token) => {
-      return token !== FIT_REGRESSION_SELECTOR;
-    }),
-  );
-  const fitQuestions = tokens.includes(FIT_REGRESSION_SELECTOR)
-    ? FIT_REGRESSION_QUESTIONS
-    : [];
-  const covidQuestions = COVID_QUESTIONS.filter((question) => {
-    return (
-      wanted.has(question.id) ||
-      [...wanted].some((id) => {
-        return question.id.startsWith(id) && id.length === 1;
-      })
-    );
-  });
-  return [...covidQuestions, ...fitQuestions];
-}
-
 async function _createHarness(
   options: ReturnType<typeof _parseOptions>,
   database: EvalDatabase,
@@ -231,7 +190,7 @@ async function main(): Promise<void> {
   const label = options.label || harness.label;
   const graded: GradedAnswer[] = [];
   await _runAll(
-    _toConversations(_selectQuestions(options.questions)),
+    _toConversations(selectEvalQuestions(options.questions)),
     Number(options.concurrency),
     async (questions) => {
       await _runConversation({

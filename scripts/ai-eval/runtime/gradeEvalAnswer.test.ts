@@ -139,7 +139,7 @@ describe("gradeEvalAnswer with expectsNoQuery", () => {
 });
 
 const FIT_QUESTION = {
-  id: "F01",
+  id: "R01",
   category: "page_context",
   prompt: "Fit y on x for the result on screen.",
   clarification: "not_needed",
@@ -159,7 +159,7 @@ const FIT_QUESTION = {
 } as unknown as EvalQuestion;
 
 describe("gradeEvalAnswer with fitRegression", () => {
-  it("passes F01 when the tool was called and the reply states the slope", () => {
+  it("passes R01 when the tool was called and the reply states the slope", () => {
     const graded = gradeEvalAnswer(
       FIT_QUESTION,
       _createAnswer({
@@ -172,7 +172,7 @@ describe("gradeEvalAnswer with fitRegression", () => {
     expect(graded.pass).toBe(true);
   });
 
-  it("fails F01 when the tool was not called", () => {
+  it("fails R01 when the tool was not called", () => {
     const graded = gradeEvalAnswer(
       FIT_QUESTION,
       _createAnswer({ assistantText: "The slope is 2.", toolNames: [] }),
@@ -182,7 +182,7 @@ describe("gradeEvalAnswer with fitRegression", () => {
     expect(graded.pass).toBe(false);
   });
 
-  it("fails F01 when the reply does not state the slope", () => {
+  it("fails R01 when the reply does not state the slope", () => {
     const graded = gradeEvalAnswer(
       FIT_QUESTION,
       _createAnswer({

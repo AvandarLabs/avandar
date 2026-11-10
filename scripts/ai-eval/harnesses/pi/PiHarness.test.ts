@@ -397,7 +397,7 @@ describe("createPiConversation mention placeholders", () => {
 });
 
 const FIT_QUESTION = {
-  id: "F01",
+  id: "R01",
   category: "page_context",
   prompt: "Fit y on x for the result on screen.",
   clarification: "not_needed",
@@ -474,5 +474,39 @@ describe("createPiConversation with a fitRegression question", () => {
     const answer = await conversation.ask(QUESTION);
 
     expect(answer.toolNames).toEqual([]);
+  });
+});
+
+describe("createPiConversation store isolation", () => {
+  it("does not clear rows a fit ask set when a non-fit ask finishes", async () => {
+    ExplorerPluginResultStore.set({
+      columns: [{ name: "x", dataType: "double" }],
+      rows: [{ x: 1 }],
+    });
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: _createFailingAgent,
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(ExplorerPluginResultStore.get()?.rows).toEqual([{ x: 1 }]);
+    ExplorerPluginResultStore.clear();
+  });
+
+  it("does not write the store for a non-fit ask", async () => {
+    const seenDuringAsk: Array<
+      ReturnType<typeof ExplorerPluginResultStore.get>
+    > = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createFitAgent(seenDuringAsk);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(seenDuringAsk).toEqual([undefined]);
   });
 });

@@ -389,7 +389,9 @@ export function createPiConversation(
           _toolNamesSince(dataAgent, firstMessageIndex),
         );
       } finally {
-        ExplorerPluginResultStore.clear();
+        if (question.fitRegression) {
+          ExplorerPluginResultStore.clear();
+        }
       }
     },
   };
