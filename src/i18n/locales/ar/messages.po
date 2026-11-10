@@ -405,7 +405,7 @@ msgstr "لا توجد فلاتر حتى الآن. أضف واحدة للسماح
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Not everyone can see every map"
-msgstr ""
+msgstr "لا يمكن للجميع رؤية كل خريطة"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
@@ -1408,7 +1408,7 @@ msgstr "مشاركة “{resourceName}”"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "Checking what each map publishes"
-msgstr ""
+msgstr "جارٍ التحقق مما تنشره كل خريطة"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/signin.tsx
@@ -1775,7 +1775,7 @@ msgstr "فشل الإنشاء"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Ask the map's owner to share the map and its data with you."
-msgstr ""
+msgstr "اطلب من مالك الخريطة مشاركة الخريطة وبياناتها معك."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per month"
@@ -2050,7 +2050,9 @@ msgstr "تعذّر تنزيل النماذج غير المتصلة"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Some people who can open this dashboard cannot open {mapList}. They will "
 "see \"You don't have access to this map\" in its place."
-msgstr ""
+msgstr "يمكن لبعض الأشخاص الذين يمكنهم فتح لوحة المعلومات هذه عدم فتح "
+"{mapList}. سيظهر لهم النص \"ليس لديك صلاحية الوصول إلى هذه الخريطة\" "
+"بدلًا منها."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2322,7 +2324,8 @@ msgstr "اضغط باستمرار على Alt واضغط على السهم لأع
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "This map was added after the dashboard was last published. Publish again "
 "to show it here."
-msgstr ""
+msgstr "أُضيفت هذه الخريطة بعد آخر نشر للوحة المعلومات. انشرها مرة أخرى "
+"لإظهارها هنا."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
@@ -2372,7 +2375,7 @@ msgstr "لم نتمكن من التقاط لوحة المعلومات للتعل
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock.tsx
 msgid "Dashboard filters don't apply to this map yet."
-msgstr ""
+msgstr "لا تنطبق فلاتر لوحة المعلومات على هذه الخريطة حتى الآن."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "It may take a few minutes for your subscription to take effect."
@@ -3480,7 +3483,7 @@ msgstr "{0} و {1} و {2} ثابتة لكل مساحة عمل."
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "You don't have access to this map"
-msgstr ""
+msgstr "ليس لديك صلاحية الوصول إلى هذه الخريطة"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
@@ -4058,7 +4061,8 @@ msgstr "تتحرك كل نقطة بالمقدار نفسه في كل مرة تُ
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
 "editor of the map to publish this dashboard."
-msgstr ""
+msgstr "يمكن فقط لشخص لديه صلاحية تعديل الخريطة \"{mapName}\" نشرها. اطلب من "
+"أحد محرري الخريطة نشر لوحة المعلومات هذه."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
@@ -4189,7 +4193,7 @@ msgstr "اكتب قيمة"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "Opens on"
-msgstr ""
+msgstr "تُفتح في"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
@@ -4841,7 +4845,7 @@ msgstr "تصفية مجموعات البيانات"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "A map could not be prepared for publishing. Open it in Maps to check its "
 "layers."
-msgstr ""
+msgstr "تعذّر تجهيز خريطة للنشر. افتحها في Maps للتحقق من طبقاتها."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
@@ -5508,7 +5512,7 @@ msgstr "يبقى الملف الذي تُسقطه على هذا الجهاز ح�
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
-msgstr ""
+msgstr "إضافة إلى لوحة المعلومات"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -5524,7 +5528,7 @@ msgstr "عريض"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Loading the map"
-msgstr ""
+msgstr "جارٍ تحميل الخريطة"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
@@ -5590,7 +5594,7 @@ msgstr "عنصر غير متاح"
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not add the map: {0}"
-msgstr ""
+msgstr "تعذّرت إضافة الخريطة: {0}"
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -6173,7 +6177,7 @@ msgstr "لكل شهر"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "No maps match"
-msgstr ""
+msgstr "لا توجد خرائط مطابقة"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -6743,7 +6747,7 @@ msgstr "H3"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Pick a map"
-msgstr ""
+msgstr "اختيار خريطة"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/useRegistrationForm.ts
@@ -7058,7 +7062,7 @@ msgstr "{threshold}% أو أكثر"
 #. placeholder {0}: summary.featureCount
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{0, plural, one {# معلم} other {# معالم}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -7184,7 +7188,8 @@ msgstr "جعله داخليًا"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "The map \"{mapName}\" has filters that no longer match its data. Open "
 "the map and fix them before publishing."
-msgstr ""
+msgstr "تحتوي الخريطة \"{mapName}\" على فلاتر لم تعد متوافقة مع بياناتها. افتح "
+"الخريطة وأصلحها قبل النشر."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
@@ -7726,7 +7731,8 @@ msgstr "الصفوف من هذا الجدول"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
 "hidden from you}}"
-msgstr ""
+msgstr "{numUnavailableMaps, plural, one {خريطة مخفية عنك} other {# خرائط مخفية "
+"عنك}}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -8197,7 +8203,7 @@ msgstr "تم إرسال بريد إلكتروني للتأكيد إلى عنوا
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not create the dashboard: {0}"
-msgstr ""
+msgstr "تعذّر إنشاء لوحة المعلومات: {0}"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
@@ -9695,7 +9701,7 @@ msgstr "لم تعد مساحة العمل هذه موجودة أو تم إلغا
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Loading maps"
-msgstr ""
+msgstr "جارٍ تحميل الخرائط"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
@@ -9949,7 +9955,7 @@ msgstr "البيانات غير جاهزة"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "The map's saved view"
-msgstr ""
+msgstr "العرض المحفوظ للخريطة"
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
@@ -11288,7 +11294,7 @@ msgstr "فشلت هذه الاستعلام"
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlockEmptyState.tsx
 msgid "Pick a map in this block's settings."
-msgstr ""
+msgstr "اختر خريطة من إعدادات هذه الكتلة."
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer to plot a dataset, a derived dataset, or a profile. You can "
@@ -11633,7 +11639,7 @@ msgstr "حمّل ملف CSV أو Excel أو PDF، أو صِل Google Sheet، أ�
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Added this map to \"{0}\""
-msgstr ""
+msgstr "تمت إضافة هذه الخريطة إلى \"{0}\""
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
@@ -11894,7 +11900,7 @@ msgstr "الانتقال إلى إعدادات الطبقة"
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Created \"{0}\" with this map"
-msgstr ""
+msgstr "تم إنشاء \"{0}\" باستخدام هذه الخريطة"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -11944,7 +11950,9 @@ msgstr "العمود 10"
 msgid "Maps are published as what they show: each layer's shapes and popup "
 "columns, with displaced and aggregated layers already protected. The "
 "data behind them is not published."
-msgstr ""
+msgstr "تُنشر الخرائط كما تظهر: أشكال كل طبقة وأعمدة النوافذ المنبثقة فيها، مع "
+"حماية الطبقات المُزاحة والمجمّعة مسبقًا. ولا تُنشر البيانات التي تستند "
+"إليها."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
@@ -12108,7 +12116,7 @@ msgstr "الخطوات التالية الموصى بها"
 
 #: src/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal.tsx
 msgid "Pick a dashboard to add this map to, or create one."
-msgstr ""
+msgstr "اختر لوحة معلومات لإضافة هذه الخريطة إليها، أو أنشئ لوحة جديدة."
 
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"

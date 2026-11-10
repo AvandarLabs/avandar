@@ -414,7 +414,7 @@ msgstr "Aucun filtre pour l'instant. Ajoutez-en un pour permettre aux "
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Not everyone can see every map"
-msgstr ""
+msgstr "Tout le monde ne peut pas voir toutes les cartes"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
@@ -1446,7 +1446,7 @@ msgstr "Partager “{resourceName}”"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "Checking what each map publishes"
-msgstr ""
+msgstr "Vérification de ce que chaque carte publie"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/signin.tsx
@@ -1824,7 +1824,8 @@ msgstr "Échec de la création"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Ask the map's owner to share the map and its data with you."
-msgstr ""
+msgstr "Demandez au propriétaire de la carte de la partager, ainsi que ses "
+"données, avec vous."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per month"
@@ -2103,7 +2104,9 @@ msgstr "Les modèles hors ligne n’ont pas été téléchargés"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Some people who can open this dashboard cannot open {mapList}. They will "
 "see \"You don't have access to this map\" in its place."
-msgstr ""
+msgstr "Certaines personnes qui peuvent ouvrir ce tableau de bord ne peuvent "
+"pas ouvrir {mapList}. Elles verront « Vous n’avez pas accès à cette "
+"carte » à sa place."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2380,7 +2383,8 @@ msgstr "Maintenez la touche Alt enfoncée et appuyez sur la flèche vers le haut
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "This map was added after the dashboard was last published. Publish again "
 "to show it here."
-msgstr ""
+msgstr "Cette carte a été ajoutée après la dernière publication du tableau de "
+"bord. Republiez-le pour l’afficher ici."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
@@ -2430,7 +2434,8 @@ msgstr "Impossible de capturer le tableau de bord pour annotation."
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock.tsx
 msgid "Dashboard filters don't apply to this map yet."
-msgstr ""
+msgstr "Les filtres du tableau de bord ne s’appliquent pas encore à cette "
+"carte."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "It may take a few minutes for your subscription to take effect."
@@ -3569,7 +3574,7 @@ msgstr "{0}, {1} et {2} sont fixes pour chaque espace de travail."
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "You don't have access to this map"
-msgstr ""
+msgstr "Vous n’avez pas accès à cette carte"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
@@ -4161,7 +4166,9 @@ msgstr "Chaque point se déplace de la même distance à chaque ouverture de cet
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
 "editor of the map to publish this dashboard."
-msgstr ""
+msgstr "Seule une personne disposant des droits de modification sur la carte « "
+"{mapName} » peut la publier. Demandez à un éditeur de la carte de "
+"publier ce tableau de bord."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
@@ -4294,7 +4301,7 @@ msgstr "Saisissez une valeur"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "Opens on"
-msgstr ""
+msgstr "S’ouvre le"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
@@ -4963,7 +4970,8 @@ msgstr "Filtrer les jeux de données"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "A map could not be prepared for publishing. Open it in Maps to check its "
 "layers."
-msgstr ""
+msgstr "Une carte n’a pas pu être préparée pour la publication. Ouvrez-la dans "
+"Maps pour vérifier ses calques."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
@@ -5641,7 +5649,7 @@ msgstr "Un fichier que vous déposez reste sur cet appareil jusqu’à ce que vo
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
-msgstr ""
+msgstr "Ajouter au tableau de bord"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -5657,7 +5665,7 @@ msgstr "Large"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Loading the map"
-msgstr ""
+msgstr "Chargement de la carte"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
@@ -5724,7 +5732,7 @@ msgstr "Élément indisponible"
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not add the map: {0}"
-msgstr ""
+msgstr "Impossible d’ajouter la carte : {0}"
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -6318,7 +6326,7 @@ msgstr "Par mois"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "No maps match"
-msgstr ""
+msgstr "Aucune carte correspondante"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -6903,7 +6911,7 @@ msgstr "H3"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Pick a map"
-msgstr ""
+msgstr "Sélectionner une carte"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/useRegistrationForm.ts
@@ -7229,7 +7237,7 @@ msgstr "{threshold}% ou plus"
 #. placeholder {0}: summary.featureCount
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{0, plural, one {# entité} other {# entités}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -7356,7 +7364,8 @@ msgstr "Rendre interne"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "The map \"{mapName}\" has filters that no longer match its data. Open "
 "the map and fix them before publishing."
-msgstr ""
+msgstr "La carte « {mapName} » contient des filtres qui ne correspondent plus à "
+"ses données. Ouvrez la carte et corrigez-les avant de la publier."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
@@ -7906,7 +7915,8 @@ msgstr "Lignes de ce tableau"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
 "hidden from you}}"
-msgstr ""
+msgstr "{numUnavailableMaps, plural, one {une carte masquée pour vous} other {# "
+"cartes masquées pour vous}}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -8387,7 +8397,7 @@ msgstr "Un e-mail de confirmation a été envoyé à votre adresse e-mail."
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not create the dashboard: {0}"
-msgstr ""
+msgstr "Impossible de créer le tableau de bord : {0}"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
@@ -9926,7 +9936,7 @@ msgstr "Cet espace de travail n’existe plus ou votre accès a été révoqué.
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Loading maps"
-msgstr ""
+msgstr "Chargement des cartes"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
@@ -10183,7 +10193,7 @@ msgstr "Données non prêtes"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "The map's saved view"
-msgstr ""
+msgstr "La vue enregistrée de la carte"
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
@@ -11554,7 +11564,7 @@ msgstr "Cette requête a échoué"
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlockEmptyState.tsx
 msgid "Pick a map in this block's settings."
-msgstr ""
+msgstr "Sélectionnez une carte dans les paramètres de ce bloc."
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer to plot a dataset, a derived dataset, or a profile. You can "
@@ -11911,7 +11921,7 @@ msgstr "Importez un fichier CSV, Excel ou PDF, connectez une feuille Google "
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Added this map to \"{0}\""
-msgstr ""
+msgstr "Cette carte a été ajoutée à « {0} »"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
@@ -12175,7 +12185,7 @@ msgstr "Accéder aux paramètres de la couche"
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Created \"{0}\" with this map"
-msgstr ""
+msgstr "« {0} » a été créé avec cette carte"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -12225,7 +12235,10 @@ msgstr "Colonne 10"
 msgid "Maps are published as what they show: each layer's shapes and popup "
 "columns, with displaced and aggregated layers already protected. The "
 "data behind them is not published."
-msgstr ""
+msgstr "Les cartes sont publiées telles qu’elles sont affichées : les formes de "
+"chaque calque et les colonnes des fenêtres contextuelles, les calques "
+"déplacés et agrégés étant déjà protégés. Les données sous-jacentes ne "
+"sont pas publiées."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
@@ -12396,7 +12409,8 @@ msgstr "Étapes suivantes recommandées"
 
 #: src/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal.tsx
 msgid "Pick a dashboard to add this map to, or create one."
-msgstr ""
+msgstr "Sélectionnez un tableau de bord auquel ajouter cette carte ou créez-en "
+"un."
 
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"

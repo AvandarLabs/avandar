@@ -412,7 +412,7 @@ msgstr "Aún no hay filtros. Agrega uno para permitir que los espectadores "
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Not everyone can see every map"
-msgstr ""
+msgstr "No todas las personas pueden ver todos los mapas"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
@@ -1434,7 +1434,7 @@ msgstr "Compartir “{resourceName}”"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "Checking what each map publishes"
-msgstr ""
+msgstr "Comprobando qué publica cada mapa"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/signin.tsx
@@ -1808,7 +1808,8 @@ msgstr "Creación fallida"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Ask the map's owner to share the map and its data with you."
-msgstr ""
+msgstr "Pida al propietario del mapa que comparta el mapa y sus datos con "
+"usted."
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per month"
@@ -2087,7 +2088,8 @@ msgstr "Los modelos sin conexión no se descargaron"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Some people who can open this dashboard cannot open {mapList}. They will "
 "see \"You don't have access to this map\" in its place."
-msgstr ""
+msgstr "Algunas personas que pueden abrir este panel no pueden abrir {mapList}. "
+"En su lugar, verán \"No tiene acceso a este mapa\"."
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2365,7 +2367,8 @@ msgstr "Mantenga presionada la tecla Alt y presione la flecha hacia arriba o "
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "This map was added after the dashboard was last published. Publish again "
 "to show it here."
-msgstr ""
+msgstr "Este mapa se agregó después de la última publicación del panel. Vuelva "
+"a publicar para mostrarlo aquí."
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
@@ -2415,7 +2418,7 @@ msgstr "No se pudo capturar el tablero para anotación."
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock.tsx
 msgid "Dashboard filters don't apply to this map yet."
-msgstr ""
+msgstr "Los filtros del panel aún no se aplican a este mapa."
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "It may take a few minutes for your subscription to take effect."
@@ -3542,7 +3545,7 @@ msgstr "{0}, {1} y {2} son fijos para cada espacio de trabajo."
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "You don't have access to this map"
-msgstr ""
+msgstr "No tiene acceso a este mapa"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
@@ -4132,7 +4135,8 @@ msgstr "Cada punto se desplaza la misma cantidad cada vez que se abre este "
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
 "editor of the map to publish this dashboard."
-msgstr ""
+msgstr "Solo alguien que pueda editar el mapa \"{mapName}\" puede publicarlo. "
+"Pida a un editor del mapa que publique este panel."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
@@ -4264,7 +4268,7 @@ msgstr "Ingrese un valor"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "Opens on"
-msgstr ""
+msgstr "Se abre en"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
@@ -4926,7 +4930,8 @@ msgstr "Filtrar conjuntos de datos"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "A map could not be prepared for publishing. Open it in Maps to check its "
 "layers."
-msgstr ""
+msgstr "No se pudo preparar un mapa para su publicación. Ábralo en Maps para "
+"comprobar sus capas."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
@@ -5601,7 +5606,7 @@ msgstr "Un archivo que arrastra permanece en este dispositivo hasta que lo "
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
-msgstr ""
+msgstr "Agregar al panel"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -5617,7 +5622,7 @@ msgstr "Ancho"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Loading the map"
-msgstr ""
+msgstr "Cargando el mapa"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
@@ -5683,7 +5688,7 @@ msgstr "Elemento no disponible"
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not add the map: {0}"
-msgstr ""
+msgstr "No se pudo agregar el mapa: {0}"
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -6275,7 +6280,7 @@ msgstr "Por mes"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "No maps match"
-msgstr ""
+msgstr "Ningún mapa coincide"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -6857,7 +6862,7 @@ msgstr "H3"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Pick a map"
-msgstr ""
+msgstr "Elegir un mapa"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/useRegistrationForm.ts
@@ -7176,7 +7181,7 @@ msgstr "{threshold}% o más"
 #. placeholder {0}: summary.featureCount
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{0, plural, one {# entidad} other {# entidades}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -7303,7 +7308,8 @@ msgstr "Hacer interno"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "The map \"{mapName}\" has filters that no longer match its data. Open "
 "the map and fix them before publishing."
-msgstr ""
+msgstr "El mapa \"{mapName}\" tiene filtros que ya no coinciden con sus datos. "
+"Abra el mapa y corríjalos antes de publicarlo."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
@@ -7850,7 +7856,8 @@ msgstr "Filas de esta tabla"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
 "hidden from you}}"
-msgstr ""
+msgstr "{numUnavailableMaps, plural, one {un mapa oculto para usted} other {# "
+"mapas ocultos para usted}}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -8329,7 +8336,7 @@ msgstr "Se ha enviado un correo electrónico de confirmación a su dirección de
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not create the dashboard: {0}"
-msgstr ""
+msgstr "No se pudo crear el panel: {0}"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
@@ -9859,7 +9866,7 @@ msgstr "Este espacio de trabajo ya no existe o se revocó su acceso. Si cree que
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Loading maps"
-msgstr ""
+msgstr "Cargando mapas"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
@@ -10117,7 +10124,7 @@ msgstr "Datos no disponibles"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "The map's saved view"
-msgstr ""
+msgstr "La vista guardada del mapa"
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
@@ -11480,7 +11487,7 @@ msgstr "Esa consulta falló"
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlockEmptyState.tsx
 msgid "Pick a map in this block's settings."
-msgstr ""
+msgstr "Elija un mapa en la configuración de este bloque."
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer to plot a dataset, a derived dataset, or a profile. You can "
@@ -11832,7 +11839,7 @@ msgstr "Cargue un archivo CSV, Excel o PDF, conecte una hoja de cálculo de "
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Added this map to \"{0}\""
-msgstr ""
+msgstr "Se agregó este mapa a \"{0}\""
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
@@ -12096,7 +12103,7 @@ msgstr "Ir a la configuración de la capa"
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Created \"{0}\" with this map"
-msgstr ""
+msgstr "Se creó \"{0}\" con este mapa"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -12147,7 +12154,9 @@ msgstr "Columna 10"
 msgid "Maps are published as what they show: each layer's shapes and popup "
 "columns, with displaced and aggregated layers already protected. The "
 "data behind them is not published."
-msgstr ""
+msgstr "Los mapas se publican tal como se muestran: las formas de cada capa y "
+"las columnas de las ventanas emergentes, con las capas desplazadas y "
+"agregadas ya protegidas. Los datos subyacentes no se publican."
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
@@ -12317,7 +12326,7 @@ msgstr "Pasos recomendados a seguir"
 
 #: src/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal.tsx
 msgid "Pick a dashboard to add this map to, or create one."
-msgstr ""
+msgstr "Elija un panel al que agregar este mapa o cree uno."
 
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"

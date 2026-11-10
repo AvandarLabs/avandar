@@ -396,7 +396,7 @@ msgstr "尚未添加过滤器。添加一个以便查看者在不影响其他图
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Not everyone can see every map"
-msgstr ""
+msgstr "并非所有人都能看到每张地图"
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
@@ -1373,7 +1373,7 @@ msgstr "分享 “{resourceName}”"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "Checking what each map publishes"
-msgstr ""
+msgstr "正在检查每张地图发布的内容"
 
 #: src/config/AppLinks/AppLinks.tsx
 #: src/routes/signin.tsx
@@ -1729,7 +1729,7 @@ msgstr "创建失败"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Ask the map's owner to share the map and its data with you."
-msgstr ""
+msgstr "请联系地图所有者，与您共享地图及其数据。"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per month"
@@ -1998,7 +1998,7 @@ msgstr "离线模型下载失败"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Some people who can open this dashboard cannot open {mapList}. They will "
 "see \"You don't have access to this map\" in its place."
-msgstr ""
+msgstr "部分可以打开此信息中心的用户无法打开 {mapList}。他们将在原位置看到“您无权访问此地图”。"
 
 #: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
@@ -2263,7 +2263,7 @@ msgstr "按住 Alt 并按向上或向下箭头键可移动此图层。"
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "This map was added after the dashboard was last published. Publish again "
 "to show it here."
-msgstr ""
+msgstr "此地图是在信息中心上次发布后添加的。请再次发布，以便在此处显示。"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Positron"
@@ -2313,7 +2313,7 @@ msgstr "无法捕获仪表板以进行注释。"
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock.tsx
 msgid "Dashboard filters don't apply to this map yet."
-msgstr ""
+msgstr "信息中心筛选条件尚不适用于此地图。"
 
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "It may take a few minutes for your subscription to take effect."
@@ -3397,7 +3397,7 @@ msgstr "{0}、{1} 和 {2} 对每个工作区都是固定的。"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "You don't have access to this map"
-msgstr ""
+msgstr "您无权访问此地图"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Synced to the cloud"
@@ -3959,7 +3959,7 @@ msgstr "每次打开此地图时，每个点都会移动相同的距离，因此
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Only someone who can edit the map \"{mapName}\" can publish it. Ask an "
 "editor of the map to publish this dashboard."
-msgstr ""
+msgstr "只有可以编辑地图“{mapName}”的用户才能发布该地图。请让地图编辑者发布此信息中心。"
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionSwitch.tsx
 msgid "Link to the source record"
@@ -4086,7 +4086,7 @@ msgstr "输入值"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "Opens on"
-msgstr ""
+msgstr "打开于"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 11"
@@ -4721,7 +4721,7 @@ msgstr "筛选数据集"
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "A map could not be prepared for publishing. Open it in Maps to check its "
 "layers."
-msgstr ""
+msgstr "无法准备要发布的地图。请在 Maps 中打开该地图，检查其图层。"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "Draft case type"
@@ -5375,7 +5375,7 @@ msgstr "拖放的文件会一直保留在此设备上，直到你保存。链接
 #: src/views/GisApp/export/ExportSheet/ExportSheet.tsx
 #: src/views/GisApp/GisAppMapShell.tsx
 msgid "Add to dashboard"
-msgstr ""
+msgstr "添加到信息中心"
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Avandar (default)"
@@ -5391,7 +5391,7 @@ msgstr "宽"
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "Loading the map"
-msgstr ""
+msgstr "正在加载地图"
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryColumnFields.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/BoundaryColumnControls.tsx
@@ -5455,7 +5455,7 @@ msgstr "不可用的项目"
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not add the map: {0}"
-msgstr ""
+msgstr "无法添加地图：{0}"
 
 #: src/components/AppShell/Logo.tsx
 msgid "Logo"
@@ -6028,7 +6028,7 @@ msgstr "按月"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "No maps match"
-msgstr ""
+msgstr "没有匹配的地图"
 
 #: src/views/DataExplorerApp/SqlQueryView/SqlSyncWarningNotes.tsx
 msgid "Parts of this SQL could not be represented in the Manual form. The form "
@@ -6590,7 +6590,7 @@ msgstr "H3"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Pick a map"
-msgstr ""
+msgstr "选择地图"
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/useRegistrationForm.ts
@@ -6897,7 +6897,7 @@ msgstr "{threshold}% 或以上"
 #. placeholder {0}: summary.featureCount
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersList.tsx
 msgid "{0, plural, one {# feature} other {# features}}"
-msgstr ""
+msgstr "{0, plural, one {# 个要素} other {# 个要素}}"
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeToggle.tsx
 msgid "You are not connected to the internet, so chat runs on this computer "
@@ -7021,7 +7021,7 @@ msgstr "设为内部"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "The map \"{mapName}\" has filters that no longer match its data. Open "
 "the map and fix them before publishing."
-msgstr ""
+msgstr "地图“{mapName}”的筛选条件已不再与其数据匹配。请打开地图并修复筛选条件，然后再发布。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "This is a Google Sheet. Add it from Connectors so it stays connected."
@@ -7553,7 +7553,7 @@ msgstr "来自此表格的行"
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
 "hidden from you}}"
-msgstr ""
+msgstr "{numUnavailableMaps, plural, one {您看不到的地图} other {您看不到的 # 张地图}}"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Dataset name must be at least 2 characters."
@@ -8019,7 +8019,7 @@ msgstr "确认邮件已发送到您的电子邮件地址。"
 #. placeholder {0}: error.message
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Could not create the dashboard: {0}"
-msgstr ""
+msgstr "无法创建信息中心：{0}"
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Show exact locations?"
@@ -9476,7 +9476,7 @@ msgstr "此工作区已不存在，或您已被撤销访问权限。如果您认
 
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Loading maps"
-msgstr ""
+msgstr "正在加载地图"
 
 #: src/views/GisApp/shell/MapToolCluster/AreaMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
@@ -9726,7 +9726,7 @@ msgstr "数据尚未就绪"
 
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "The map's saved view"
-msgstr ""
+msgstr "地图的已保存视图"
 
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
@@ -11032,7 +11032,7 @@ msgstr "该查询失败"
 
 #: src/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlockEmptyState.tsx
 msgid "Pick a map in this block's settings."
-msgstr ""
+msgstr "请在此区块的设置中选择地图。"
 
 #: src/views/GisApp/panels/MapFirstRunCard/MapFirstRunCard.tsx
 msgid "Add a layer to plot a dataset, a derived dataset, or a profile. You can "
@@ -11368,7 +11368,7 @@ msgstr "上传 CSV、Excel 或 PDF 文件，连接 Google Sheet，或浏览开�
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Added this map to \"{0}\""
-msgstr ""
+msgstr "已将此地图添加到“{0}”"
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "km"
@@ -11624,7 +11624,7 @@ msgstr "跳转到图层设置"
 #. placeholder {0}: dashboard.name
 #: src/views/GisApp/export/AddMapToDashboardModal/useAddMapToDashboard.tsx
 msgid "Created \"{0}\" with this map"
-msgstr ""
+msgstr "已使用此地图创建“{0}”"
 
 #. placeholder {0}: caseType.name
 #. placeholder {0}: concept.name
@@ -11674,7 +11674,7 @@ msgstr "第 10 列"
 msgid "Maps are published as what they show: each layer's shapes and popup "
 "columns, with displaced and aggregated layers already protected. The "
 "data behind them is not published."
-msgstr ""
+msgstr "地图会按其显示的内容发布：每个图层的形状和弹出窗口列，以及已受到保护的位移图层和聚合图层。其背后的数据不会发布。"
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "Click a labelled tick on the y-axis."
@@ -11836,7 +11836,7 @@ msgstr "推荐的下一步"
 
 #: src/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal.tsx
 msgid "Pick a dashboard to add this map to, or create one."
-msgstr ""
+msgstr "选择要将此地图添加到的信息中心，或创建一个信息中心。"
 
 #: src/components/privacy/ConsentModal/ColumnNameHint.tsx
 msgid "From column: <0>{columnName}</0>"
