@@ -1,9 +1,12 @@
 import { useId } from "react";
-import { DUR, STAGGER, enterAt, mixToken, ramp } from "../motion";
+import { DUR, STAGGER, enter, enterAt, mixToken, ramp } from "../motion";
 import {
+  GRAPH_ITEM_GAP,
+  GRAPH_ITEM_PITCH,
   assertFrame,
-  edgeEndpoints,
   edgeHighlight,
+  getPacketPositions,
+  offsetEdgeEndpoints,
   fitTextLines,
   graphNodeRect,
   nodeHighlight,
@@ -12,7 +15,12 @@ import {
   validateGraph,
 } from "./layout/layout";
 import { positioned, SceneShell } from "./SceneShell";
-import type { GraphSceneProps } from "./scenes.types";
+import type { GraphNode, GraphSceneProps } from "./scenes.types";
+
+/** Radius of a packet travelling an edge, in pixels. */
+const PACKET_RADIUS = 6;
+/** Arm length of a `ticks` node's corner ticks, in pixels. */
+const TICK_ARM = 18;
 
 /** An editorial graph, with authored placement and directed traversal. */
 export function GraphScene({
@@ -56,9 +64,10 @@ export function GraphScene({
           </marker>
         </defs>
         {edges.map((edge) => {
-          const { start, end } = edgeEndpoints(
+          const { start, end } = offsetEdgeEndpoints(
             rects.get(edge.from)!,
             rects.get(edge.to)!,
+            edge.offset ?? 0,
           );
           const revealAt =
             revealAtFrame +
@@ -78,7 +87,9 @@ export function GraphScene({
                 pathLength={1}
                 strokeDasharray={1}
                 strokeDashoffset={1 - reveal}
-                markerEnd={`url(#${markerId})`}
+                markerEnd={
+                  edge.arrow === false ? undefined : `url(#${markerId})`
+                }
               />
               <path
                 d={path}
@@ -90,6 +101,17 @@ export function GraphScene({
                 strokeDashoffset={1 - highlight}
                 opacity={highlight > 0 ? 1 : 0}
               />
+              {getPacketPositions(frame, edge.packets ?? [], start, end).map(
+                (point, index) => (
+                  <circle
+                    key={`packet-${index}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={PACKET_RADIUS}
+                    fill="var(--brand)"
+                  />
+                ),
+              )}
               {edge.label ? (
                 <g
                   transform={`translate(${(start.x + end.x) / 2}, ${(start.y + end.y) / 2})`}
@@ -137,11 +159,17 @@ export function GraphScene({
               ...positioned(rect),
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
               padding: 20,
-              border: `2px solid ${mixToken(active, "var(--border)", "var(--brand-strong)")}`,
+              justifyContent: node.items?.length ? "flex-start" : "center",
+              border:
+                node.frame === "ticks"
+                  ? "none"
+                  : `2px solid ${mixToken(active, "var(--border)", "var(--brand-strong)")}`,
               borderRadius: "var(--radius)",
-              background: mixToken(active, "var(--card)", "var(--brand-soft)"),
+              background:
+                node.frame === "ticks"
+                  ? "transparent"
+                  : mixToken(active, "var(--card)", "var(--brand-soft)"),
               ...enterAt(frame, revealAtFrame, index, { y: 10 }),
             }}
           >
@@ -171,9 +199,93 @@ export function GraphScene({
                 ))}
               </div>
             ) : null}
+            <_NodeItems
+              node={node}
+              frame={frame}
+              at={revealAtFrame + index * STAGGER + DUR.panel}
+            />
+            {node.frame === "ticks" ? <_CornerTicks /> : null}
           </article>
         );
       })}
     </SceneShell>
+  );
+}
+
+/** A node's list items, cascading in one stagger apart under its label. */
+function _NodeItems({
+  node,
+  frame,
+  at,
+}: {
+  node: GraphNode;
+  frame: number;
+  at: number;
+}) {
+  if (!node.items?.length) {
+    return null;
+  }
+  return (
+    <ul
+      style={{
+        margin: `${GRAPH_ITEM_GAP}px 0 0`,
+        padding: 0,
+        listStyle: "none",
+      }}
+    >
+      {node.items.map((item, index) => (
+        <li
+          key={`${index}-${item}`}
+          style={{
+            height: GRAPH_ITEM_PITCH,
+            fontSize: 19,
+            lineHeight: `${GRAPH_ITEM_PITCH}px`,
+            color: "var(--muted-foreground)",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            ...enter(frame, at + index * STAGGER * 2, { y: 6 }),
+          }}
+        >
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Four L-shaped corner ticks framing a node without a full border. */
+function _CornerTicks() {
+  const corners = [
+    { top: 0, left: 0, borderTop: true, borderLeft: true },
+    { top: 0, right: 0, borderTop: true, borderRight: true },
+    { bottom: 0, left: 0, borderBottom: true, borderLeft: true },
+    { bottom: 0, right: 0, borderBottom: true, borderRight: true },
+  ];
+  const line = "2px solid var(--border)";
+  return (
+    <>
+      {corners.map(
+        (
+          { borderTop, borderLeft, borderBottom, borderRight, ...position },
+          index,
+        ) => (
+          <span
+            key={index}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              ...position,
+              width: TICK_ARM,
+              height: TICK_ARM,
+              borderTop: borderTop ? line : undefined,
+              borderLeft: borderLeft ? line : undefined,
+              borderBottom: borderBottom ? line : undefined,
+              borderRight: borderRight ? line : undefined,
+            }}
+          />
+        ),
+      )}
+    </>
   );
 }

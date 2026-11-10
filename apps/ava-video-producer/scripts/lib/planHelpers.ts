@@ -47,14 +47,47 @@ export async function publicAsset(
 export function assetReferences(plan: Storyboard): string[] {
   return [
     ...new Set([
-      ...plan.shots.flatMap((shot) =>
-        shot.scene === "media" ? [shot.props.src] : [],
-      ),
+      ...plan.shots.flatMap(_shotAssetReferences),
       ...plan.narration.flatMap((cue) => (cue.audio ? [cue.audio] : [])),
       ...(plan.narrationTrack ? [plan.narrationTrack.src] : []),
       ...plan.soundEffects.map((sound) => sound.src),
     ]),
   ];
+}
+
+/** Every public asset one shot's scene draws, such as stills and logos. */
+function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
+  switch (shot.scene) {
+    case "media":
+      return [shot.props.src];
+    case "typography":
+      return shot.props.icon ? [shot.props.icon.src] : [];
+    case "brand-lockup":
+      return [shot.props.logo.src];
+    case "tilted-window":
+      return [
+        ...(shot.props.windows ?? []).map((window) => window.src),
+        ...(shot.props.pair ?? []).map((column) => column.window.src),
+        ...(shot.props.secondary ? [shot.props.secondary.src] : []),
+      ];
+    default:
+      return [];
+  }
+}
+
+/** Frames inside a shot where its scene's own exit or swap is mid-motion. */
+function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
+  const exitAt =
+    "exit" in shot.props && shot.props.exit && "atFrame" in shot.props.exit
+      ? shot.props.exit.atFrame
+      : undefined;
+  const swaps =
+    shot.scene === "tilted-window"
+      ? (shot.props.windows ?? []).flatMap((window) =>
+          window.atFrame === undefined ? [] : [window.atFrame + 2],
+        )
+      : [];
+  return [...(exitAt === undefined ? [] : [exitAt + 3]), ...swaps];
 }
 
 /** Millisecond conversion uses rounded frame boundaries consistently for SRT and VTT. */
@@ -398,6 +431,7 @@ export function previewFrames(plan: Storyboard): number[] {
         (shot.props.countAtFrame ?? 0) +
           (shot.props.countDurationInFrames ?? 36),
       );
+    _sceneBeatFrames(shot).forEach(local);
     if (shot.scene === "media")
       for (const item of shot.props.callouts ?? []) {
         local(item.startFrame + 1);

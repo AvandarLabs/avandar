@@ -1,4 +1,17 @@
+import type { ThemeTokenName } from "../storyboard/schema/themeSchema";
+import type {
+  LockupCta,
+  MarkBuild,
+  MarkFlyThrough,
+} from "./BrandLockupScene/brandLockupMotion";
+import type { GraphPacket } from "./layout/graphLayout";
 import type { StagedExit, TextRevealMode } from "./textReveal";
+import type {
+  CarouselWindow,
+  PullBack,
+  ScrollStep,
+  WindowCameraKey,
+} from "./TiltedWindowScene/windowMotion";
 
 /** All times are scene-local frames. Coordinates are normalized unless noted. */
 export type SceneBase = {
@@ -15,12 +28,24 @@ export type GraphNode = {
   detail?: string;
   x: number;
   y: number;
+  /** Card width as a fraction of the content width. Default about 20%. */
+  width?: number;
+  /** A short list drawn inside the card, cascading in under its label. */
+  items?: string[];
+  /** `ticks` draws corner ticks instead of a filled bordered card. */
+  frame?: "card" | "ticks";
 };
 export type GraphEdge = {
   id: string;
   from: string;
   to: string;
   label?: string;
+  /** Sideways shift from -1 to 1, for parallel edges between two cards. */
+  offset?: number;
+  /** Draws an arrowhead at `to`. Default true. */
+  arrow?: boolean;
+  /** Dots travelling the edge, each in its own window of frames. */
+  packets?: GraphPacket[];
 };
 export type TraversalBeat = { nodeId: string; atFrame: number };
 export type GraphSceneProps = SceneBase & {
@@ -109,4 +134,107 @@ export type CaptionOverlayProps = {
   height?: number;
   bottom?: number;
   fontSize?: number;
+};
+
+/** One hero number over its ranked rows in a `BarComparisonScene`. */
+export type BarComparisonPanel = {
+  value: number;
+  precision?: number;
+  /** Drawn after the number in the brand colour, such as `s` or `MiB`. */
+  unit?: string;
+  caption?: string;
+  rows: Array<{
+    label: string;
+    /** Nonnegative bar length, relative to the panel's longest bar. */
+    value: number;
+    /** Text shown at the row's end. Defaults to the formatted value. */
+    display?: string;
+    /** Draws this bar in the brand colour. */
+    highlight?: boolean;
+  }>;
+};
+export type BarComparisonSceneProps = SceneBase & {
+  panels: BarComparisonPanel[];
+  revealAtFrame?: number;
+  /** Frames between the first and second panel's staging. Default 3. */
+  panelStaggerFrames?: number;
+  barEdge?: "straight" | "rough";
+  /** Small source or fictional-data note under the panels. */
+  footnote?: string;
+  /** Erases every element left to right, panel by panel. */
+  exit?: {
+    kind: "erase";
+    atFrame: number;
+    /** Fractional frames between elements in a panel. Default 0.1. */
+    staggerFrames?: number;
+    /** Frames each element's erase takes. Default `DUR.press`. */
+    durationInFrames?: number;
+  };
+};
+
+export type BrandLockupSceneProps = SceneBase & {
+  /** Public-relative raster mark. `aspectRatio` is its width over height. */
+  logo: { src: string; aspectRatio?: number; height?: number };
+  wordmark?: string;
+  /** Builds the mark through N column masks rising left to right. */
+  build?: MarkBuild;
+  /** Frame the wordmark wipes in. Defaults to just after the build. */
+  wordmarkAtFrame?: number;
+  /** A CTA stack below the mark; the lockup moves up to make room. */
+  cta?: LockupCta;
+  /** The mark's columns fly through and cover the frame in `color`. */
+  exit?: MarkFlyThrough & { color?: ThemeTokenName };
+};
+
+/** A still or footage shown inside a tilted window. */
+export type WindowSource = {
+  kind: "image" | "video";
+  src: string;
+  trimBefore?: number;
+  fit?: "contain" | "cover";
+  objectPosition?: { x: number; y: number };
+  /** Jumps through a tall still, as fractions of its height. */
+  scrollSteps?: ScrollStep[];
+};
+
+/** A headline beside the window; later ones replace earlier ones. */
+export type WindowHeadline = {
+  atFrame: number;
+  lines: string[];
+  /** A small dimmed monospace note under the headline. */
+  subtitle?: string;
+};
+
+/** One side of the `pair` layout: label, window, live counter and stat. */
+export type RaceColumn = {
+  label: string;
+  window: WindowSource;
+  counter: {
+    from?: number;
+    to: number;
+    precision?: number;
+    unit?: string;
+    startFrame: number;
+    /** The counter stops here and turns the brand colour. */
+    endFrame: number;
+  };
+  stat?: string;
+};
+
+export type TiltedWindowSceneProps = SceneBase & {
+  headlines?: WindowHeadline[];
+  /** `single` shows one window (or a carousel); `pair` shows two. */
+  layout?: "single" | "pair";
+  /** Single layout. Each window after the first swaps in at `atFrame`. */
+  windows?: Array<WindowSource & CarouselWindow>;
+  pair?: [RaceColumn, RaceColumn];
+  /** Small badge above the right column of the pair layout. */
+  badge?: string;
+  enter?: { kind: "whip" | "flip-split" | "none"; atFrame?: number } | PullBack;
+  exit?: { kind: "whip-left"; atFrame: number };
+  /** A camera on the primary window only; the headline never moves. */
+  camera?: WindowCameraKey[];
+  /** A small second window in the same plane, such as a desktop app. */
+  secondary?: WindowSource & { box: NormalizedRect; atFrame: number };
+  chrome?: "titlebar" | "none";
 };

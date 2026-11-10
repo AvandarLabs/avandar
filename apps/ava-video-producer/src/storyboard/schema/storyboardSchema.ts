@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { getContinuityTimeline } from "../../continuity/continuityTimeline";
 import { captionBand } from "../../scenes/layout/layout";
+import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../StoryFilm/steppedColumnWipe";
 import { getCueWindowFromShot } from "./getCueWindowFromShot";
 import { assetPathSchema, frame, id, positiveFrames, text } from "./primitives";
 import { shotSchema } from "./shotSchema";
 import { themeSchema } from "./themeSchema";
-import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../StoryFilm/steppedColumnWipe";
 
 const cueSchema = z
   .object({
@@ -20,7 +20,7 @@ const cueSchema = z
   .strict();
 /** A single source for film order, graphics, narration text, and cue timing. */
 export const storyboardSchema = z
-  .object({
+  .strictObject({
     version: z.literal(1),
     id,
     title: text.max(120),
@@ -61,10 +61,9 @@ export const storyboardSchema = z
       )
       .default([]),
   })
-  .strict()
   .superRefine((plan, ctx) => {
     const issue = (message: string) =>
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+      ctx.addIssue({ code: "custom", message });
     const unique = (ids: string[], name: string) => {
       if (new Set(ids).size !== ids.length) issue(`${name} IDs must be unique`);
     };
@@ -162,12 +161,19 @@ export const storyboardSchema = z
       if (shot.scene === "typography") {
         if (shot.props.size === "caption" && shot.props.fontSize !== undefined)
           issue(`${shot.id}: a caption size sets its own font size`);
-        if (
-          shot.props.exit &&
-          shot.props.exit.atFrame >= shot.durationInFrames
-        )
+        if (shot.props.exit && shot.props.exit.atFrame >= shot.durationInFrames)
           issue(`${shot.id}: the exit must start inside the shot`);
       }
+      if (
+        (shot.scene === "bar-comparison" || shot.scene === "brand-lockup") &&
+        shot.props.exit &&
+        shot.props.exit.atFrame >= shot.durationInFrames
+      )
+        issue(`${shot.id}: the exit must start inside the shot`);
+      if (shot.scene === "tilted-window")
+        _checkTiltedWindow(shot.props, shot.durationInFrames).forEach(
+          (message) => issue(`${shot.id}: ${message}`),
+        );
       if (shot.scene === "title" && shot.durationInFrames !== 66)
         issue(`${shot.id}: existing TitleCard requires 66 frames`);
       if (shot.scene === "graph") {
@@ -299,4 +305,49 @@ function _checkShotTransition(
     }
   }
   return [];
+}
+
+type TiltedWindowProps = Extract<
+  z.infer<typeof shotSchema>,
+  { scene: "tilted-window" }
+>["props"];
+
+/** Explains why a tilted-window shot cannot render as authored. */
+function _checkTiltedWindow(
+  props: TiltedWindowProps,
+  durationInFrames: number,
+): string[] {
+  const isPair = props.layout === "pair";
+  const windows = props.windows ?? [];
+  const isIncreasing = (frames: number[]) =>
+    frames.every((value, index) => index === 0 || value > frames[index - 1]);
+  return [
+    isPair && !props.pair ? "the pair layout needs pair columns" : "",
+    isPair && props.windows ? "the pair layout takes pair, not windows" : "",
+    !isPair && !windows.length ? "a single window layout needs windows" : "",
+    !isPair && props.enter?.kind === "flip-split"
+      ? "flip-split enters the pair layout only"
+      : "",
+    windows[0]?.atFrame !== undefined
+      ? "the first window is on screen from the start; omit its atFrame"
+      : "",
+    windows.slice(1).some((window) => window.atFrame === undefined) ||
+    !isIncreasing(windows.slice(1).map((window) => window.atFrame ?? 0))
+      ? "carousel windows need increasing atFrame values"
+      : "",
+    !isIncreasing((props.headlines ?? []).map((headline) => headline.atFrame))
+      ? "headlines need increasing atFrame values"
+      : "",
+    props.camera && !isIncreasing(props.camera.map((key) => key.at))
+      ? "camera keys need increasing frames"
+      : "",
+    (props.pair ?? []).some(
+      (column) => column.counter.endFrame <= column.counter.startFrame,
+    )
+      ? "a counter must end after it starts"
+      : "",
+    props.exit && props.exit.atFrame >= durationInFrames
+      ? "the exit must start inside the shot"
+      : "",
+  ].filter(Boolean);
 }

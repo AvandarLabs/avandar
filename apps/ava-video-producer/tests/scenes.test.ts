@@ -11,8 +11,10 @@ import {
   fitTextLines,
   flowNodes,
   formatMetric,
+  getPacketPositions,
   graphNodeRect,
   nodeHighlight,
+  offsetEdgeEndpoints,
   safePublicPath,
   sceneBounds,
   textUnits,
@@ -310,4 +312,48 @@ test("the tallest caption reserves its full box, inset and clearance without res
   );
   assert.equal(captionBand([], 1600, 1000), 0);
   assert.equal(captionBand([{ text: "Short cue." }], 1600, 1000), 160);
+});
+
+test("a packet travels its edge only during its window, in its direction", () => {
+  const start = { x: 0, y: 0 };
+  const end = { x: 100, y: 0 };
+  const packets = [
+    { atFrame: 10, durationInFrames: 10 },
+    { atFrame: 30, durationInFrames: 10, direction: "reverse" as const },
+  ];
+  assert.deepEqual(getPacketPositions(5, packets, start, end), []);
+  const forward = getPacketPositions(15, packets, start, end);
+  assert.equal(forward.length, 1);
+  assert.ok(forward[0].x > 0 && forward[0].x < 100);
+  const reverse = getPacketPositions(33, packets, start, end);
+  assert.ok(reverse[0].x > 50, "a reverse packet starts at the far end");
+  assert.deepEqual(getPacketPositions(45, packets, start, end), []);
+});
+
+test("parallel edges with offsets stay apart and still meet both card borders", () => {
+  const a = { x: 0, y: 0, width: 100, height: 120 };
+  const b = { x: 300, y: 0, width: 100, height: 120 };
+  const upper = offsetEdgeEndpoints(a, b, -0.5);
+  const lower = offsetEdgeEndpoints(a, b, 0.5);
+  assert.ok(upper.start.y < 60 && lower.start.y > 60);
+  assert.equal(upper.start.x, 100);
+  assert.equal(lower.end.x, 300);
+});
+
+test("a wide node with list items is taller than its label alone", () => {
+  const bounds = sceneBounds(1920, 1080, true);
+  const plain = graphNodeRect({ id: "n", label: "Core", x: 0, y: 0.5 }, bounds);
+  const listed = graphNodeRect(
+    {
+      id: "n",
+      label: "Core",
+      x: 0,
+      y: 0.5,
+      width: 0.4,
+      items: ["a", "b", "c", "d", "e", "f"],
+    },
+    bounds,
+  );
+  assert.equal(listed.width, bounds.width * 0.4);
+  assert.ok(listed.height > plain.height);
 });

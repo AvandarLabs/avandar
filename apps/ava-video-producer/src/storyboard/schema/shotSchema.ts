@@ -15,7 +15,7 @@ import {
   unit,
 } from "./primitives";
 import { shotTransitionSchema } from "./shotTransitionSchema";
-import { shotThemeSchema } from "./themeSchema";
+import { THEME_TOKEN_NAMES, shotThemeSchema } from "./themeSchema";
 
 /** Elements fading out in place one after another before a cut. */
 const stagedExitSchema = z.strictObject({
@@ -27,17 +27,39 @@ const heading = {
   title: text.max(100).optional(),
   kicker: text.max(160).optional(),
 };
-const edgeSchema = z
-  .object({ id, from: id, to: id, label: label.optional() })
-  .strict();
+const edgeSchema = z.strictObject({
+  id,
+  from: id,
+  to: id,
+  label: label.optional(),
+  offset: z.number().min(-1).max(1).optional(),
+  arrow: z.boolean().optional(),
+  packets: z
+    .array(
+      z.strictObject({
+        atFrame: frame,
+        durationInFrames: positiveFrames.max(120),
+        direction: z.enum(["forward", "reverse"]).optional(),
+      }),
+    )
+    .max(12)
+    .optional(),
+});
 const graph = z
   .object({
     ...heading,
     nodes: z
       .array(
-        z
-          .object({ id, label, detail: detail.optional(), x: unit, y: unit })
-          .strict(),
+        z.strictObject({
+          id,
+          label,
+          detail: detail.optional(),
+          x: unit,
+          y: unit,
+          width: z.number().min(0.1).max(0.6).optional(),
+          items: z.array(label).max(8).optional(),
+          frame: z.enum(["card", "ticks"]).optional(),
+        }),
       )
       .min(1)
       .max(12),
@@ -76,27 +98,25 @@ const metric = z
     countDurationInFrames: positiveFrames.optional(),
   })
   .strict();
-const typography = z
-  .object({
-    ...heading,
-    lines: z.array(text.max(120)).min(1).max(6),
-    emphasis: z.array(text.max(60)).max(12).optional(),
-    align: z.enum(["left", "center"]).optional(),
-    fontSize: z.number().min(40).max(160).optional(),
-    revealAtFrame: frame.optional(),
-    wordStaggerFrames: z.number().int().min(2).max(12).optional(),
-    revealMode: z.enum(["word-mask", "line-fade", "wipe", "cut"]).optional(),
-    lineStaggerFrames: z.number().int().min(1).max(12).optional(),
-    icon: z
-      .strictObject({
-        src: assetPathSchema,
-        size: z.number().min(40).max(480).optional(),
-      })
-      .optional(),
-    exit: stagedExitSchema.optional(),
-    size: z.enum(["display", "caption"]).optional(),
-  })
-  .strict();
+const typography = z.strictObject({
+  ...heading,
+  lines: z.array(text.max(120)).min(1).max(6),
+  emphasis: z.array(text.max(60)).max(12).optional(),
+  align: z.enum(["left", "center"]).optional(),
+  fontSize: z.number().min(40).max(160).optional(),
+  revealAtFrame: frame.optional(),
+  wordStaggerFrames: z.number().int().min(2).max(12).optional(),
+  revealMode: z.enum(["word-mask", "line-fade", "wipe", "cut"]).optional(),
+  lineStaggerFrames: z.number().int().min(1).max(12).optional(),
+  icon: z
+    .strictObject({
+      src: assetPathSchema,
+      size: z.number().min(40).max(480).optional(),
+    })
+    .optional(),
+  exit: stagedExitSchema.optional(),
+  size: z.enum(["display", "caption"]).optional(),
+});
 const region = {
   x: unit,
   y: unit,
@@ -128,6 +148,165 @@ const media = z
       .optional(),
   })
   .strict();
+const barComparison = z.strictObject({
+  ...heading,
+  panels: z
+    .array(
+      z.strictObject({
+        value: z.number().finite(),
+        precision: z.number().int().min(0).max(6).optional(),
+        unit: z.string().max(12).optional(),
+        caption: detail.optional(),
+        rows: z
+          .array(
+            z.strictObject({
+              label,
+              value: z.number().finite().nonnegative(),
+              display: z.string().max(24).optional(),
+              highlight: z.boolean().optional(),
+            }),
+          )
+          .min(1)
+          .max(8),
+      }),
+    )
+    .min(1)
+    .max(2),
+  revealAtFrame: frame.optional(),
+  panelStaggerFrames: z.number().int().min(0).max(30).optional(),
+  barEdge: z.enum(["straight", "rough"]).optional(),
+  footnote: detail.optional(),
+  exit: z
+    .strictObject({
+      kind: z.literal("erase"),
+      atFrame: frame,
+      staggerFrames: z.number().min(0).max(4).optional(),
+      durationInFrames: positiveFrames.max(30).optional(),
+    })
+    .optional(),
+});
+const brandLockup = z.strictObject({
+  logo: z.strictObject({
+    src: assetPathSchema,
+    aspectRatio: z.number().min(0.2).max(5).optional(),
+    height: z.number().min(40).max(600).optional(),
+  }),
+  wordmark: text.max(40).optional(),
+  build: z
+    .strictObject({
+      atFrame: frame.optional(),
+      columns: z.number().int().min(2).max(16).optional(),
+      staggerFrames: z.number().min(0).max(6).optional(),
+      durationInFrames: positiveFrames.max(30).optional(),
+    })
+    .optional(),
+  wordmarkAtFrame: frame.optional(),
+  cta: z
+    .strictObject({
+      atFrame: frame,
+      subtitle: text.max(80).optional(),
+      url: text.max(48).optional(),
+      command: text.max(64).optional(),
+      badge: text.max(40).optional(),
+      commandCharsPerSecond: z.number().min(10).max(60).optional(),
+    })
+    .optional(),
+  exit: z
+    .strictObject({
+      kind: z.literal("fly-through"),
+      atFrame: frame,
+      durationInFrames: positiveFrames.max(45).optional(),
+      color: z.enum(THEME_TOKEN_NAMES).optional(),
+    })
+    .optional(),
+});
+const windowSource = {
+  kind: z.enum(["image", "video"]),
+  src: assetPathSchema,
+  trimBefore: frame.optional(),
+  fit: z.enum(["contain", "cover"]).optional(),
+  objectPosition: z.strictObject({ x: unit, y: unit }).optional(),
+  scrollSteps: z
+    .array(z.strictObject({ atFrame: frame, offset: unit }))
+    .max(12)
+    .optional(),
+};
+const raceColumn = z.strictObject({
+  label,
+  window: z.strictObject(windowSource),
+  counter: z.strictObject({
+    from: z.number().finite().optional(),
+    to: z.number().finite(),
+    precision: z.number().int().min(0).max(3).optional(),
+    unit: z.string().max(6).optional(),
+    startFrame: frame,
+    endFrame: positiveFrames,
+  }),
+  stat: label.optional(),
+});
+const tiltedWindow = z.strictObject({
+  headlines: z
+    .array(
+      z.strictObject({
+        atFrame: frame,
+        lines: z.array(text.max(40)).min(1).max(3),
+        subtitle: text.max(60).optional(),
+      }),
+    )
+    .max(6)
+    .optional(),
+  layout: z.enum(["single", "pair"]).optional(),
+  windows: z
+    .array(
+      z.strictObject({
+        ...windowSource,
+        atFrame: frame.optional(),
+        swap: z.enum(["slide", "cut"]).optional(),
+      }),
+    )
+    .min(1)
+    .max(12)
+    .optional(),
+  pair: z.tuple([raceColumn, raceColumn]).optional(),
+  badge: label.optional(),
+  enter: z
+    .discriminatedUnion("kind", [
+      z.strictObject({
+        kind: z.enum(["whip", "flip-split", "none"]),
+        atFrame: frame.optional(),
+      }),
+      z.strictObject({
+        kind: z.literal("pull-back"),
+        atFrame: frame,
+        durationInFrames: positiveFrames.max(60).optional(),
+      }),
+    ])
+    .optional(),
+  exit: z
+    .strictObject({ kind: z.literal("whip-left"), atFrame: frame })
+    .optional(),
+  camera: z
+    .array(
+      z.strictObject({
+        at: frame,
+        x: unit,
+        y: unit,
+        zoom: z.number().min(1).max(3),
+        ease: z.enum(["glide", "push", "whip"]).optional(),
+      }),
+    )
+    .min(2)
+    .max(16)
+    .optional(),
+  secondary: z
+    .strictObject({
+      ...windowSource,
+      box: z.strictObject(region),
+      atFrame: frame,
+    })
+    .optional(),
+  chrome: z.enum(["titlebar", "none"]).optional(),
+});
 const shotBase = {
   id,
   durationInFrames: positiveFrames.max(2700),
@@ -177,6 +356,21 @@ export const shotSchema = z.discriminatedUnion("scene", [
     .object({ ...shotBase, scene: z.literal("typography"), props: typography })
     .strict(),
   z.object({ ...shotBase, scene: z.literal("media"), props: media }).strict(),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("tilted-window"),
+    props: tiltedWindow,
+  }),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("brand-lockup"),
+    props: brandLockup,
+  }),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("bar-comparison"),
+    props: barComparison,
+  }),
   z
     .object({
       ...shotBase,

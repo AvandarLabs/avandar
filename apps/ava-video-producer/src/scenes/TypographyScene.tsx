@@ -154,7 +154,7 @@ function _TypographyLine({
         }}
       >
         {words.map((word, index) => (
-          <span key={index} style={wordStyle(word)}>
+          <span key={`${index}-${word}`} style={wordStyle(word)}>
             {word}
           </span>
         ))}
@@ -179,7 +179,7 @@ function _TypographyLine({
         );
         return (
           <span
-            key={index}
+            key={`${index}-${word}`}
             style={{
               display: "inline-block",
               overflow: "hidden",

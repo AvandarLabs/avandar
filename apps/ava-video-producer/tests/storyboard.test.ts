@@ -8,6 +8,8 @@ import {
   applySrt,
   timestamp,
   publicAsset,
+  assetReferences,
+  previewFrames,
 } from "../scripts/lib/planHelpers";
 import {
   storyboardSchema,
@@ -320,7 +322,11 @@ test("typography accepts staged reveal modes, an icon, an exit and a caption siz
     },
   };
   assert.equal(storyboardSchema.safeParse(plan).success, true);
-  plan.shots[1].props = { lines: ["A caption"], revealMode: "cut", size: "caption" };
+  plan.shots[1].props = {
+    lines: ["A caption"],
+    revealMode: "cut",
+    size: "caption",
+  };
   assert.equal(storyboardSchema.safeParse(plan).success, true);
 });
 
@@ -335,4 +341,216 @@ test("typography rejects a caption size with a display font size, or an exit pas
   assert.equal(storyboardSchema.safeParse(plan).success, false);
   plan.shots[1].props = { lines: ["Late"], exit: { atFrame: 150 } };
   assert.equal(storyboardSchema.safeParse(plan).success, false);
+});
+
+function withShot(shot: StoryboardInput["shots"][number]): StoryboardInput {
+  const plan = fixture();
+  plan.shots[1] = shot;
+  return plan;
+}
+
+const screen = {
+  kind: "image" as const,
+  src: "avandar/screens/map-map-cases.png",
+};
+
+test("a tilted window shot validates a carousel, camera, secondary window and whip exit", () => {
+  const plan = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: {
+      headlines: [
+        { atFrame: 1, lines: ["Map every case"], subtitle: "Live view" },
+      ],
+      windows: [
+        screen,
+        { ...screen, atFrame: 40, swap: "slide" },
+        { ...screen, atFrame: 70, swap: "cut" },
+      ],
+      enter: { kind: "whip", atFrame: 1 },
+      camera: [
+        { at: 0, x: 0, y: 0.5, zoom: 1 },
+        { at: 30, x: 0, y: 0.5, zoom: 1 },
+        { at: 40, x: 0, y: 0.5, zoom: 1.4, ease: "push" },
+      ],
+      secondary: {
+        ...screen,
+        box: { x: 0.8, y: 0.4, width: 0.15, height: 0.4 },
+        atFrame: 20,
+      },
+      exit: { kind: "whip-left", atFrame: 140 },
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
+test("a tilted window pair validates two racing columns with a flip-split entrance", () => {
+  const column = {
+    label: "Before",
+    window: screen,
+    counter: { to: 13.6, unit: "s", startFrame: 8, endFrame: 88 },
+  };
+  const plan = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: {
+      layout: "pair",
+      pair: [column, { ...column, label: "After" }],
+      enter: { kind: "flip-split" },
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
+test("a tilted window rejects layouts and timings it cannot render", () => {
+  const props = [
+    { windows: [{ ...screen, atFrame: 5 }] },
+    {
+      windows: [screen, { ...screen, atFrame: 50 }, { ...screen, atFrame: 40 }],
+    },
+    { layout: "pair" as const, windows: [screen] },
+    { windows: [screen], enter: { kind: "flip-split" as const } },
+    { windows: [screen], exit: { kind: "whip-left" as const, atFrame: 150 } },
+    { headlines: [{ atFrame: 1, lines: ["A"] }] },
+  ];
+  for (const value of props) {
+    const plan = withShot({
+      id: "metric",
+      scene: "tilted-window",
+      durationInFrames: 150,
+      props: value,
+    });
+    assert.equal(
+      storyboardSchema.safeParse(plan).success,
+      false,
+      JSON.stringify(value),
+    );
+  }
+});
+
+test("a brand lockup validates a column build, a CTA and a fly-through exit", () => {
+  const plan = withShot({
+    id: "metric",
+    scene: "brand-lockup",
+    durationInFrames: 150,
+    props: {
+      logo: { src: "avandar/logo.png", aspectRatio: 1 },
+      wordmark: "avandar",
+      build: { atFrame: 5, columns: 8, staggerFrames: 1.5 },
+      cta: {
+        atFrame: 30,
+        subtitle: "Open source",
+        url: "avandar.example",
+        command: "pnpm add avandar",
+      },
+      exit: { kind: "fly-through", atFrame: 120, color: "brand" },
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
+test("a brand lockup rejects an unknown fly-through colour or an exit past the shot", () => {
+  for (const exit of [
+    { kind: "fly-through", atFrame: 120, color: "accent" },
+    { kind: "fly-through", atFrame: 150 },
+  ]) {
+    const plan = withShot({
+      id: "metric",
+      scene: "brand-lockup",
+      durationInFrames: 150,
+      props: { logo: { src: "avandar/logo.png" }, exit } as never,
+    });
+    assert.equal(
+      storyboardSchema.safeParse(plan).success,
+      false,
+      JSON.stringify(exit),
+    );
+  }
+});
+
+test("a bar comparison validates two panels and rejects negative bars or a third panel", () => {
+  const panel = {
+    value: 13.6,
+    precision: 1,
+    unit: "s",
+    caption: "Time to first chart",
+    rows: [
+      { label: "This build", value: 13.6, highlight: true },
+      { label: "Baseline", value: 21 },
+    ],
+  };
+  const props = {
+    panels: [panel, panel],
+    exit: { kind: "erase" as const, atFrame: 100 },
+  };
+  const shot = {
+    id: "metric",
+    scene: "bar-comparison" as const,
+    durationInFrames: 150,
+    props,
+  };
+  assert.equal(storyboardSchema.safeParse(withShot(shot)).success, true);
+  const negative = { ...panel, rows: [{ label: "Bad", value: -1 }] };
+  for (const panels of [[negative], [panel, panel, panel]]) {
+    assert.equal(
+      storyboardSchema.safeParse(withShot({ ...shot, props: { panels } }))
+        .success,
+      false,
+    );
+  }
+});
+
+test("asset references include window, icon and logo images of the new scenes", () => {
+  const plan = fixture();
+  plan.shots.push(
+    {
+      id: "window",
+      scene: "tilted-window",
+      durationInFrames: 90,
+      props: {
+        windows: [screen, { kind: "image", src: "a/second.png", atFrame: 30 }],
+        secondary: {
+          kind: "image",
+          src: "a/small.png",
+          box: { x: 0.8, y: 0.4, width: 0.1, height: 0.2 },
+          atFrame: 10,
+        },
+      },
+    },
+    {
+      id: "lockup",
+      scene: "brand-lockup",
+      durationInFrames: 90,
+      props: { logo: { src: "a/logo.png" } },
+    },
+    {
+      id: "statement",
+      scene: "typography",
+      durationInFrames: 90,
+      props: { lines: ["Hi"], icon: { src: "a/icon.png" } },
+    },
+  );
+  assert.deepEqual(
+    assetReferences(storyboardSchema.parse(plan)).sort(),
+    [
+      screen.src,
+      "a/icon.png",
+      "a/logo.png",
+      "a/second.png",
+      "a/small.png",
+    ].sort(),
+  );
+});
+
+test("previews sample the middle of a scene exit", () => {
+  const plan = fixture();
+  plan.shots[1] = {
+    id: "metric",
+    scene: "typography",
+    durationInFrames: 150,
+    props: { lines: ["Leaving"], exit: { atFrame: 100 } },
+  };
+  assert.ok(previewFrames(storyboardSchema.parse(plan)).includes(66 + 103));
 });

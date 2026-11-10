@@ -26,3 +26,7 @@ if (typeof document !== "undefined") {
 
 /** Shared composition typography. Product scenes retain their own source font. */
 export const TYPE = `${FACE}, Inter, ui-sans-serif, system-ui, sans-serif`;
+
+/** Monospace stack for commands, code and terminal text drawn by scenes. */
+export const MONO =
+  "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
