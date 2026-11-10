@@ -1,4 +1,4 @@
-import { useMatch } from "@tanstack/react-router";
+import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   addChatSession,
@@ -130,11 +130,8 @@ function _createActions(
  * workspace route there is no workspace, so the index stays undefined.
  */
 export function ChatSessionProvider({ children }: Readonly<Props>): ReactNode {
-  const workspaceMatch = useMatch({
-    from: "/_auth/$workspaceSlug",
-    shouldThrow: false,
-  });
-  return workspaceMatch ? (
+  const { workspaceSlug } = useParams({ strict: false });
+  return workspaceSlug ? (
     <WorkspaceChatSessionProvider>{children}</WorkspaceChatSessionProvider>
   ) : (
     <ChatSessionIndexProvider workspaceId="">
