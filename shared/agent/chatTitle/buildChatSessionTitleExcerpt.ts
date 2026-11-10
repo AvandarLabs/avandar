@@ -68,7 +68,11 @@ export function buildChatSessionTitleExcerpt(options: {
     assistant?.metadata?.custom?.isOfflineAnswer === true;
   const assistantText = assistantIsOffline
     ? options.offlineAnswerText
-    : options.mask(_textParts(assistant?.content));
+    : options.mask(
+        ChatMentionToken.toModelText(_textParts(assistant?.content), (ref) => {
+          return ref.gadgetType;
+        }),
+      );
   const excerpt = `user: ${userText}\nassistant: ${assistantText}`;
   return excerpt.length > EXCERPT_LIMIT
     ? excerpt.slice(0, EXCERPT_LIMIT)

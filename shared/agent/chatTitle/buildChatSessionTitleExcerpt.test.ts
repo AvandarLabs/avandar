@@ -55,4 +55,25 @@ describe("buildChatSessionTitleExcerpt", () => {
     expect(excerpt).not.toContain("secret row");
     expect(excerpt).not.toContain("select name");
   });
+
+  it("names an assistant mention by type and drops the gadget id", () => {
+    const token = ChatMentionToken.buildToken({
+      gadgetType: "dataset",
+      gadgetId: DATASET_ID,
+      subId: null,
+    });
+    const excerpt = buildChatSessionTitleExcerpt({
+      messages: [
+        { role: "user", content: "How many cases?" },
+        { role: "assistant", content: `Counted on ${token}` },
+      ],
+      mask: (text) => {
+        return text;
+      },
+      offlineAnswerText: OFFLINE_ANSWER,
+    });
+    expect(excerpt).toContain('@"dataset"');
+    expect(excerpt).not.toContain("@{");
+    expect(excerpt).not.toContain(DATASET_ID);
+  });
 });
