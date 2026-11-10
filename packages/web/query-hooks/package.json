@@ -1,6 +1,6 @@
 {
   "name": "@avandar/query-hooks",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Avandar conventions layered over TanStack Query: useQuery/useMutation wrappers and a withQueryHooks client augmenter",
   "license": "MIT",
   "repository": {
