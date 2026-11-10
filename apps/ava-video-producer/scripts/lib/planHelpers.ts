@@ -87,7 +87,27 @@ function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
           window.atFrame === undefined ? [] : [window.atFrame + 2],
         )
       : [];
-  return [...(exitAt === undefined ? [] : [exitAt + 3]), ...swaps];
+  return [
+    ...(exitAt === undefined ? [] : [exitAt + 3]),
+    ...swaps,
+    ..._signatureBeatFrames(shot),
+  ];
+}
+
+/** Mid-motion frames of a scene's build, flight or window entrance. */
+function _signatureBeatFrames(shot: Storyboard["shots"][number]): number[] {
+  if (shot.scene === "brand-lockup") {
+    return [
+      ...(shot.props.build ? [(shot.props.build.atFrame ?? 5) + 6] : []),
+      ...(shot.props.exit ? [shot.props.exit.atFrame + 12] : []),
+    ];
+  }
+  if (shot.scene === "tilted-window" && shot.props.enter) {
+    const { enter } = shot.props;
+    const at = enter.atFrame ?? 1;
+    return enter.kind === "pull-back" ? [at + 9] : [at + 4];
+  }
+  return [];
 }
 
 /** Millisecond conversion uses rounded frame boundaries consistently for SRT and VTT. */

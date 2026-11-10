@@ -1,0 +1,462 @@
+{
+  "version": 1,
+  "id": "shot-vocabulary",
+  "title": "Shot vocabulary",
+  "description": "An editorial study of the launch-film shot vocabulary: a brand lockup that builds and flies through the frame, tilted product windows, a staged statement, a bar comparison, a diagram with travelling packets, a racing pair, a pull-back, a caption card and a CTA lockup, joined by stepped column wipes and per-shot field colours.",
+  "sourceNotes": [
+    "Editorial study of reusable scenes and shot transitions; not a claim about Avandar features or performance.",
+    "Window contents are curated fictional Avandar screenshots from public/avandar/screens. Figures and timings are fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "lockup-build",
+      "scene": "brand-lockup",
+      "durationInFrames": 120,
+      "transitionInFrames": 0,
+      "props": {
+        "logo": {
+          "src": "avandar/logo.png",
+          "aspectRatio": 1
+        },
+        "wordmark": "avandar",
+        "build": {
+          "atFrame": 5,
+          "columns": 8,
+          "staggerFrames": 1.5
+        },
+        "exit": {
+          "kind": "fly-through",
+          "atFrame": 92,
+          "color": "brand"
+        }
+      }
+    },
+    {
+      "id": "window-carousel",
+      "scene": "tilted-window",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "var(--brand)",
+        "foreground": "#0b0f17",
+        "muted-foreground": "#1e293b",
+        "background": "#0b0f17",
+        "card": "#1e293b",
+        "border": "#334155"
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 2,
+            "lines": [
+              "Ask anything,",
+              "map it"
+            ],
+            "subtitle": "Editorial study"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/map-map-cases.png"
+          },
+          {
+            "kind": "image",
+            "src": "avandar/screens/explorer-explorer-chart.png",
+            "atFrame": 70,
+            "swap": "slide"
+          }
+        ],
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1
+        },
+        "camera": [
+          {
+            "at": 0,
+            "x": 0,
+            "y": 0.4,
+            "zoom": 1
+          },
+          {
+            "at": 110,
+            "x": 0,
+            "y": 0.4,
+            "zoom": 1
+          },
+          {
+            "at": 122,
+            "x": 0,
+            "y": 0.4,
+            "zoom": 1.3,
+            "ease": "push"
+          }
+        ],
+        "secondary": {
+          "kind": "image",
+          "src": "avandar/screens/cases-cases-record-detail.png",
+          "fit": "cover",
+          "box": {
+            "x": 0.8,
+            "y": 0.44,
+            "width": 0.16,
+            "height": 0.36
+          },
+          "atFrame": 36
+        },
+        "exit": {
+          "kind": "whip-left",
+          "atFrame": 168
+        }
+      }
+    },
+    {
+      "id": "statement",
+      "scene": "typography",
+      "durationInFrames": 100,
+      "transitionInFrames": 12,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 8,
+        "staggerFrames": 1
+      },
+      "props": {
+        "lines": [
+          "One workspace for every source"
+        ],
+        "revealMode": "line-fade",
+        "fontSize": 64,
+        "revealAtFrame": 12,
+        "icon": {
+          "src": "avandar/logo.png",
+          "size": 150
+        },
+        "exit": {
+          "atFrame": 86,
+          "staggerFrames": 3,
+          "durationInFrames": 6
+        }
+      }
+    },
+    {
+      "id": "comparison",
+      "scene": "bar-comparison",
+      "durationInFrames": 130,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "props": {
+        "panels": [
+          {
+            "value": 4.2,
+            "precision": 1,
+            "unit": "s",
+            "caption": "Seconds to a first chart",
+            "rows": [
+              {
+                "label": "Run A",
+                "value": 4.2,
+                "highlight": true
+              },
+              {
+                "label": "Run B",
+                "value": 7.9
+              },
+              {
+                "label": "Run C",
+                "value": 9.4
+              },
+              {
+                "label": "Run D",
+                "value": 12.1
+              }
+            ]
+          },
+          {
+            "value": 38,
+            "unit": "MB",
+            "caption": "Memory at peak",
+            "rows": [
+              {
+                "label": "Run A",
+                "value": 61
+              },
+              {
+                "label": "Run B",
+                "value": 38,
+                "highlight": true
+              },
+              {
+                "label": "Run C",
+                "value": 92
+              },
+              {
+                "label": "Run D",
+                "value": 120
+              }
+            ]
+          }
+        ],
+        "barEdge": "rough",
+        "footnote": "Fictional demonstration data",
+        "exit": {
+          "kind": "erase",
+          "atFrame": 116
+        }
+      }
+    },
+    {
+      "id": "diagram",
+      "scene": "graph",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "props": {
+        "title": "An illustrative architecture",
+        "kicker": "Editorial diagram",
+        "nodes": [
+          {
+            "id": "core",
+            "label": "Workspace",
+            "x": 0,
+            "y": 0.5,
+            "width": 0.34,
+            "frame": "ticks",
+            "items": [
+              "Cases",
+              "Visits",
+              "Facilities",
+              "Districts"
+            ]
+          },
+          {
+            "id": "sources",
+            "label": "Sources",
+            "x": 1,
+            "y": 0.5,
+            "width": 0.3,
+            "frame": "ticks",
+            "items": [
+              "Source A",
+              "Source B",
+              "Source C",
+              "Source D",
+              "Source E",
+              "Source F"
+            ]
+          }
+        ],
+        "edges": [
+          {
+            "id": "e1",
+            "from": "core",
+            "to": "sources",
+            "offset": -0.5,
+            "arrow": false,
+            "packets": [
+              {
+                "atFrame": 60,
+                "durationInFrames": 18
+              }
+            ]
+          },
+          {
+            "id": "e2",
+            "from": "core",
+            "to": "sources",
+            "offset": 0,
+            "arrow": false,
+            "packets": [
+              {
+                "atFrame": 110,
+                "durationInFrames": 18
+              }
+            ]
+          },
+          {
+            "id": "e3",
+            "from": "core",
+            "to": "sources",
+            "offset": 0.5,
+            "arrow": false,
+            "packets": [
+              {
+                "atFrame": 84,
+                "durationInFrames": 21,
+                "direction": "reverse"
+              }
+            ]
+          }
+        ],
+        "revealAtFrame": 8
+      }
+    },
+    {
+      "id": "window-pair",
+      "scene": "tilted-window",
+      "durationInFrames": 150,
+      "transitionInFrames": 12,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 8,
+        "staggerFrames": 1,
+        "order": "right-to-left"
+      },
+      "props": {
+        "layout": "pair",
+        "enter": {
+          "kind": "flip-split",
+          "atFrame": 10
+        },
+        "badge": "2 runs",
+        "pair": [
+          {
+            "label": "First pass",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/import-import-preview.png"
+            },
+            "counter": {
+              "to": 13.6,
+              "unit": "s",
+              "startFrame": 18,
+              "endFrame": 96
+            },
+            "stat": "Illustrative timing"
+          },
+          {
+            "label": "Second pass",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/import-import-saved.png"
+            },
+            "counter": {
+              "to": 17.3,
+              "unit": "s",
+              "startFrame": 18,
+              "endFrame": 118
+            },
+            "stat": "Illustrative timing"
+          }
+        ],
+        "exit": {
+          "kind": "whip-left",
+          "atFrame": 140
+        }
+      }
+    },
+    {
+      "id": "pull-back",
+      "scene": "tilted-window",
+      "durationInFrames": 150,
+      "transitionInFrames": 8,
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 8,
+        "staggerFrames": 0.5
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 66,
+            "lines": [
+              "Then step back"
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/explorer-explorer-records.png"
+          }
+        ],
+        "enter": {
+          "kind": "pull-back",
+          "atFrame": 40
+        }
+      }
+    },
+    {
+      "id": "teaser",
+      "scene": "typography",
+      "durationInFrames": 75,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "#000000"
+      },
+      "props": {
+        "lines": [
+          "One more thing."
+        ],
+        "revealMode": "cut",
+        "size": "caption",
+        "revealAtFrame": 15
+      }
+    },
+    {
+      "id": "lockup-cta",
+      "scene": "brand-lockup",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "props": {
+        "logo": {
+          "src": "avandar/logo.png",
+          "aspectRatio": 1
+        },
+        "wordmark": "avandar",
+        "build": {
+          "atFrame": 2
+        },
+        "cta": {
+          "atFrame": 26,
+          "subtitle": "Editorial study of the shot vocabulary",
+          "url": "avandar.example",
+          "command": "pnpm video preview shot-vocabulary.json",
+          "badge": "Fictional demonstration"
+        }
+      }
+    }
+  ]
+}

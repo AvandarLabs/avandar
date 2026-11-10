@@ -23,6 +23,9 @@ export const PAIR_TILT = {
   /** The left window turns this way; the right one mirrors it. */
   rotateY: 8,
   rotateX: 2,
+  /** A longer lens for the joined card flipping in, so its near edge is
+   *  not magnified past the frame. */
+  flipPerspective: 3200,
 } as const;
 
 /** The single window's box, as fractions of the canvas. */

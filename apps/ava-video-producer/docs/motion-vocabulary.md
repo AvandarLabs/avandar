@@ -18,7 +18,7 @@ For visual reference, browse [Motion Atlas](../showcase/motion.html), served at 
 
 ## Curves
 
-All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts). The upstream comment says four; the implemented object contains five.
+All seven curves are exported through `EASE` in [src/motion.ts](../src/motion.ts).
 
 | Token | Definition | Intended use |
 | --- | --- | --- |
@@ -26,7 +26,9 @@ All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts)
 | `EASE.outBack` | `bezier(0.34, 1.56, 0.64, 1)` | A restrained overshoot when something lands in its slot; use sparingly |
 | `EASE.inOut` | `bezier(0.45, 0, 0.55, 1)` | Something already visible travelling between positions |
 | `EASE.inOutCubic` | `4t³` for the first half; `1 - (-2t + 2)³ / 2` for the second | Pointer travel between targets |
-| `EASE.word` | `bezier(0.22, 1, 0.36, 1)` | Headline words rising out of masks |
+| `EASE.word` | `bezier(0.22, 1, 0.36, 1)` | Masked and staged rises: headline words, line fades, rising wipe columns, growing bars, carousel slides, window camera pushes |
+| `EASE.in` | `bezier(0.55, 0, 1, 0.45)` | Accelerating departures, such as a window whipping off the frame. Never for arrivals |
+| `EASE.surge` | `bezier(0.7, 0, 0.2, 1)` | A fly-through that fills the frame: lingers at rest, surges, settles before the cut |
 
 `bezier(x1, y1, x2, y2)` is also exported. It creates a CSS-style cubic-bezier easing function, returning 0 at inputs at or below 0 and 1 at inputs at or above 1. Curves such as `outBack` can overshoot between those endpoints. The configurable motion components also expose named `ease-in` for accelerating departures, plus bounded custom curves.
 
@@ -42,7 +44,9 @@ All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts)
 | `DUR.sheet` | 13 | 433 ms | Sheet/column motion; default spring and counter duration |
 | `DUR.hero` | 18 | 600 ms | The main visual beat of a phase |
 | `DUR.word` | 15 | 500 ms | One title word's masked rise |
+| `DUR.whip` | 8 | 267 ms | A whip-out or column wipe, deliberately shorter than a panel entrance |
 | `STAGGER` | 2 | 67 ms | Delay between list siblings |
+| `STAGGER_COLUMN` | 0.5 | 17 ms | Sub-frame delay between columns of a stepped wipe; renderers interpolate, never round |
 
 The full `press()` envelope occupies **8 frames**, twice `DUR.press`. The title card has its own **3-frame word stagger**; it does not use the list's `STAGGER` constant. Longer reading holds and scene lengths are composition decisions, not additional exported duration tokens.
 
@@ -131,7 +135,12 @@ from `motion.ts`. Content and timing props are documented in the
 | `TypographyScene` | Each word rises through its own mask using `EASE.word`; authored emphasis selects a token color | Defaults: first word at frame 6, 3-frame stagger, `DUR.word` duration. Lines wrap at a fitted, stable size. No masked-word opacity or per-letter animation |
 | `MediaScene` | Static image/video framing, entrance fade, timed callout fades | Video is sampled from the explicit scene frame through Remotion `Freeze`; trim is additional. Crop is fixed for the shot. Callouts use `DUR.chip` or a shorter interval for short cues. No sustained camera zoom on captured UI |
 | `CaptionOverlay` | Whole-cue text with a short entrance fade and opaque backing | Selects `startFrame <= frame < endFrame`; fade is at most `DUR.chip`. Text fitting stays fixed during the cue; no word-level speech highlighting |
-| `StoryFilm` | Opaque incoming shot dissolves over the preceding shot held at its last frame | Uses `EASE.inOut` and each shot's `transitionInFrames` (schema default 18). First shot has no incoming dissolve. Loop plans additionally fade to ground over the final 18 frames |
+| `StoryFilm` | Opaque incoming shot dissolves over the preceding shot held at its last frame, or reveals through a `stepped-column-wipe`; `outgoing: "playing"` keeps the outgoing shot advancing | Dissolve uses `EASE.inOut` over `transitionInFrames` (schema default 18). The wipe staggers N columns by `staggerFrames` (default `STAGGER_COLUMN`) with `EASE.word`, each column lasting `transitionInFrames - stagger * (N - 1)`; optional outgoing drift uses `EASE.in` with X-only blur. First shot has no transition. Loop plans additionally fade to ground over the final 18 frames |
+| `TypographyScene` line modes | `line-fade` (`enter()` over `DUR.chip`, `EASE.word`, 12 px rise), `wipe` (clip right inset 100% → 0 with −8% → 0 travel over `DUR.panel`), `cut`; staged exit fades each element in place | `lineStaggerFrames` default 3; an icon fades (no rise) and lines follow `DUR.panel` later; exit stagger 3 and `DUR.chip` per element by default |
+| `TiltedWindowScene` | Whip-in: 110%+ → 0 over `DUR.sheet`, `EASE.out`, rotateY −24° → −13°, X blur 40 → 0. Whip-out: `DUR.whip`, `EASE.in`, past the left edge, blur 0 → 40, headline fading in place over `DUR.chip`. Carousel slide: `DUR.chip`, `EASE.word`, incoming on top from +65% with blur 25 → 0, outgoing −28% and −120 px Z while fading. Pull-back: `DUR.hero`, `EASE.word`. Flip-split: `DUR.whip` flip from 80°, split over `DUR.press`. Camera: `getCameraPose()` on normalized window keys with velocity X blur ≤ 12 px | Counters in the pair layout are linear; finishing turns them `--brand` over `DUR.chip` with `mixToken()` |
+| `BrandLockupScene` | Column build: N column masks rise with `EASE.word`, `staggerFrames` 1.5, `DUR.whip` each. Wordmark: `wipe` line mode. Fly-through: wordmark retracts over `DUR.chip`, columns fly `DUR.press` later over `DUR.hero` with `EASE.surge`, a sine-bell rotateY up to 28°, and a token colour covering them by 75% of the flight. CTA: subtitle, URL `DUR.word` later, typed command (`typed()`, 30 cps, block cursor with `caretOn()`), badge `DUR.panel` after typing | The mark is a raster image cut into column masks |
+| `BarComparisonScene` | Hero `enter()` over `DUR.panel` with `EASE.word`; labels `DUR.panel` later, bars `DUR.chip` after labels growing over `DUR.sheet`, values after bars, all rows `STAGGER` apart; a second panel `panelStaggerFrames` (3) later. Erase exit: [getEraseMaskStyle](../src/motion-components/eraseMask.ts) per element over `DUR.press`, elements 0.1 frame apart, panels `STAGGER` apart | Bars are relative to the panel's longest bar |
+| `GraphScene` packets | A dot travels an edge with `EASE.inOut` during each `{atFrame, durationInFrames, direction}` window; list items enter `2 * STAGGER` apart | Packets are drawn only inside their window |
 
 Scene headings follow short `enter()` translations; app and media containers do
 not receive a lasting scale. Graph card heights and fitted text sizes depend on

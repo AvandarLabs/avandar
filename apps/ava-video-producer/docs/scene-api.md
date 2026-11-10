@@ -72,6 +72,12 @@ non-Latin scripts, and dense graphs.
 | `edges` | `GraphEdge[]`, required | Unique `id`, existing `from` and `to` node IDs, optional `label`. Self-edges are rejected |
 | `traversal` | `TraversalBeat[]`, `[]` | `{nodeId, atFrame}` events in strictly increasing frame order |
 | `revealAtFrame` | `number`, `10` | First card entrance; cards stagger in source order using `STAGGER` |
+| `nodes[].width` | `0.1`–`0.6`, about `0.2` | Card width as a fraction of the content width, for a large box such as a system boundary |
+| `nodes[].items` | `string[]`, up to 8 | A list inside the card under its label; each item reserves 34 px and enters `2 * STAGGER` after the last |
+| `nodes[].frame` | `"card"` or `"ticks"`, `"card"` | `ticks` draws four L-shaped corner ticks with no fill or border |
+| `edges[].offset` | `-1`–`1`, `0` | Sideways shift of up to half the shorter card, so several edges between the same two cards run in parallel |
+| `edges[].arrow` | `boolean`, `true` | `false` draws a plain line, for example under packets travelling both ways |
+| `edges[].packets` | `{atFrame, durationInFrames, direction?: "forward"\|"reverse"}[]`, up to 12 | A `--brand` dot travels the edge with `EASE.inOut` during each window |
 
 Coordinates describe centers within an inset content area, so a node at 0 or 1
 is still fully visible. Card height is fitted once from the complete copy,
@@ -134,11 +140,70 @@ comparisons, significance, percentages, or source provenance.
 | `fontSize` | `number`, `92` | Requested maximum, 40–160 px; fitting may choose a smaller fixed size |
 | `revealAtFrame` | `number`, `6` | First word begins rising through its own mask |
 | `wordStaggerFrames` | integer ≥ 2, `3` | Frames between words across all lines |
+| `revealMode` | `"word-mask"`, `"line-fade"`, `"wipe"`, `"cut"`; `"word-mask"` | `line-fade` fades each line with a 12 px rise; `wipe` reveals each line left to right behind a clip with a small leftward travel; `cut` shows each line on its frame |
+| `lineStaggerFrames` | integer 1–12, `3` | Frames between lines in the line modes |
+| `icon` | `{src, size?: 40–480}`, none | Public-relative image above the lines (default 160 px tall), fading in without a rise at `revealAtFrame`; lines then start `DUR.panel` later |
+| `exit` | `{atFrame, staggerFrames?: 0–12, durationInFrames?: 1–30}`, none | Staged exit: lines fade out in place top to bottom, then the icon, `staggerFrames` (3) apart over `durationInFrames` (`DUR.chip`). Must start inside the shot |
+| `size` | `"display"` or `"caption"`, `"display"` | `caption` sets one small regular-weight size (28 px, fitting down to 18) and rejects `fontSize` |
 
 Words use `DUR.word` and `EASE.word`. There is no per-letter animation or
 opacity animation on masked words. Emphasis is authored, not timed to speech;
 the library does not infer narration timing. The caller must allow enough
 shot duration for all words to reveal and then hold.
+
+## TiltedWindowScene (`tilted-window`)
+
+A headline column on the left and stills or footage in a 3D tilted window on
+the right. The plane and boxes are tokens in
+[windowTilt.ts](../src/scenes/TiltedWindowScene/windowTilt.ts): window box
+`x 35.3%, y 17.4%, w 60.3%, h 67%`, `perspective(1400px) rotateY(-13deg)
+rotateX(3deg) rotateZ(-1deg)`, 10 px radius, 3.5% titlebar, and a shadow from
+the `shadow` token (else a mix of `--background`). Only stills and footage go
+in the window, never live product UI.
+
+| Prop | Type / default | Behavior |
+| --- | --- | --- |
+| `headlines` | `{atFrame, lines[1..3] (≤ 40 chars), subtitle?}[]`, none | Lines fade in 3 frames apart at a fitted size (about 6.6% of height). A later entry replaces the earlier one, which fades out over `DUR.press` ending at its `atFrame`. The subtitle is small dimmed monospace |
+| `layout` | `"single"` or `"pair"`, `"single"` | `single` needs `windows`; `pair` needs `pair` |
+| `windows` | `WindowSource & {atFrame?, swap?: "slide"\|"cut"}`[1..12] | The first window has no `atFrame`. Each later one replaces the current one at `atFrame`: `slide` (default) comes in on top from the right with blur while the old one slides left, recedes and fades; `cut` swaps at once |
+| `WindowSource` | `{kind: "image"\|"video", src, trimBefore?, fit?: "cover", objectPosition?: {x:.5,y:0}, scrollSteps?: {atFrame, offset}[]}` | Loaded through `MediaPlane`. `scrollSteps` shows a tall still at full width and jumps to each `offset` (fraction of its height) over `DUR.press` |
+| `enter` | `{kind: "whip"\|"flip-split"\|"none", atFrame?: 1}` or `{kind: "pull-back", atFrame, durationInFrames?: 18}`; `whip` (single) / `flip-split` (pair) | `whip` comes in from beyond the right edge. `pull-back` holds the window at full canvas with no tilt or chrome until `atFrame`, then lands in its box. `flip-split` is pair-only |
+| `exit` | `{kind: "whip-left", atFrame}`, none | Windows accelerate off the left edge over `DUR.whip` with growing X blur; the headline fades in place from `atFrame + 1`. End the shot with a hard cut |
+| `camera` | `{at, x, y, zoom: 1–3, ease?: "glide"\|"push"\|"whip"}[2..16]`, none | Window-only camera through `getCameraPose()`: the primary window scales by `zoom` about anchor `(x, y)` (0–1 of the window). Keys strictly increase. The headline never moves |
+| `secondary` | `WindowSource & {box: {x,y,width,height} (canvas fractions), atFrame}`, none | A small window in the same plane that whips in at `atFrame` and leaves with the primary |
+| `pair` | two `{label, window, counter: {from?: 0, to, precision?: 1, unit?, startFrame, endFrame}, stat?}` | Side-by-side windows with mirrored ±8° tilt, labels above, a linear counter below that turns `--brand` at `endFrame`, and a small stat. `badge` labels the right column |
+| `chrome` | `"titlebar"` or `"none"`, `"titlebar"` | Window titlebar in `--card` |
+
+## BrandLockupScene (`brand-lockup`)
+
+| Prop | Type / default | Behavior |
+| --- | --- | --- |
+| `logo` | `{src, aspectRatio?: 1, height?: 16.7% of height}` | Public-relative raster mark. Centred with the wordmark; raised to about 23% of the height when `cta` is set |
+| `wordmark` | `string?` (≤ 40) | Set beside the mark at 72% of its height; wipes in left to right |
+| `build` | `{atFrame?: 5, columns?: 8, staggerFrames?: 1.5, durationInFrames?: 8}`, none | The mark rises through N column masks left to right. Without `build` the mark is shown complete |
+| `wordmarkAtFrame` | frame, build end + `DUR.sheet` | When the wordmark wipe starts |
+| `cta` | `{atFrame, subtitle?, url?, command?, badge?, commandCharsPerSecond?: 30}` | Subtitle at `atFrame`, URL `DUR.word` later, the `$` prompt and typed command (block cursor in `--brand`) after, badge `DUR.panel` after typing ends |
+| `exit` | `{kind: "fly-through", atFrame, durationInFrames?: 18, color?: theme token, "brand"}` | The wordmark retracts, then the mark's columns fly toward the camera and spread to full-height columns covering the frame in `var(--<color>)`. Cut to the next shot on that colour |
+
+## BarComparisonScene (`bar-comparison`)
+
+| Prop | Type / default | Behavior |
+| --- | --- | --- |
+| `panels` | 1–2 `{value, precision?: 0, unit?, caption?, rows[1..8]: {label, value ≥ 0, display?, highlight?}}` | Hero number with its unit in `--brand`, caption, and ranked rows. Bars are relative to the panel's longest bar; `highlight` draws a bar in `--brand`, others in `--muted`. Row values use the panel precision unless `display` is set |
+| `revealAtFrame` | frame, `1` | Hero entrance; labels, bars and values follow (see motion vocabulary) |
+| `panelStaggerFrames` | integer 0–30, `3` | Delay of the second panel's staging |
+| `barEdge` | `"straight"` or `"rough"`, `"straight"` | `rough` gives each bar a seeded torn right edge |
+| `footnote` | `string?` | Small note under the panels; use it for **Fictional demonstration data** unless the figures are sourced |
+| `exit` | `{kind: "erase", atFrame, staggerFrames?: 0.1, durationInFrames?: 4}` | Each element erases left to right behind a soft edge, in reading order, the left panel first |
+
+## Shot-level theme and transition
+
+Every shot accepts two storyboard-level options next to `transitionInFrames`:
+
+| Field | Type / default | Behavior |
+| --- | --- | --- |
+| `theme` | token map, none | Overrides plan theme tokens (`background`, `foreground`, `card`, `muted`, `muted-foreground`, `border`, `brand`, `brand-soft`, `brand-strong`, `ground`, `shadow`) for this shot. Values are colours or `var(--token)` naming another token, e.g. `{"ground": "var(--brand)"}` for an accent field |
+| `transition` | `{kind: "dissolve", outgoing?}` or `{kind: "stepped-column-wipe", columns?: 8, staggerFrames?: 0.5, from?: "bottom", order?: "left-to-right", outgoing?, outgoingDrift?: {x: -0.5–0.5, blur?: px}}`, none | Duration is `transitionInFrames` (must be above 0; not allowed on the first shot). Omitted means the original dissolve. The wipe reveals the incoming shot through N columns that rise (or drop) one after another; `outgoingDrift` slides the outgoing layer by `x` of the width with X-only blur. `outgoing: "playing"` keeps the outgoing shot advancing instead of freezing its last frame |
 
 ## MediaScene
 

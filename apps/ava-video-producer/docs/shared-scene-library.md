@@ -47,14 +47,31 @@ cycle and uses a separate conceptual palette and system fonts. The
 
 | Component | Source | Content/timing contract | Implemented behavior | Limits |
 | --- | --- | --- | --- | --- |
-| `GraphScene` | [GraphScene.tsx](../src/scenes/GraphScene.tsx) | 1–12 `{id,label,detail?,x,y}` nodes; explicit directed edges; optional `{nodeId,atFrame}` traversal | Normalized authored placement, fitted card height, boundary-clipped connectors, staggered cards, drawn edges, current-node and traversed-edge highlighting | No force layout, collision avoidance, self-loops, parallel-edge separation, or graph camera; preview dense arrangements |
+| `GraphScene` | [GraphScene.tsx](../src/scenes/GraphScene.tsx) | 1–12 `{id,label,detail?,x,y,width?,items?,frame?}` nodes; explicit directed edges with optional `offset`, `arrow`, `packets`; optional `{nodeId,atFrame}` traversal | Normalized authored placement, fitted card height (including list items), boundary-clipped connectors, authored parallel-edge offsets, dots travelling edges on a schedule, corner-tick frames, staggered cards, drawn edges, current-node and traversed-edge highlighting | No force layout, collision avoidance, self-loops, automatic parallel-edge separation, or graph camera; preview dense arrangements |
 | `FlowchartScene` | [FlowchartScene.tsx](../src/scenes/FlowchartScene.tsx) | 1–6 ordered steps, explicit connectors, optional `activeStep` or `stepAtFrames` | Three-column serpentine layout with graph rendering and deterministic traversal | Branches are explicit straight links; no automatic branch routing or crossing avoidance |
 | `MetricScene` | [MetricScene.tsx](../src/scenes/MetricScene.tsx) | `label`, numeric `value`, optional `from`, `unit`, `precision`, `detail`, count timing | Counts between finite values, formats decimals/grouping, fits all content and spacing together at fixed sizes for the shot, reveals detail after completion | One metric; no inferred comparisons, statistical meaning, or source provenance |
-| `TypographyScene` | [TypographyScene.tsx](../src/scenes/TypographyScene.tsx) | 1–6 `lines`, exact-word `emphasis`, alignment, size, reveal and stagger timing | Multiline word wrapping, stable fitted size, individual word masks, token emphasis | Conservative width estimates; no letter animation or speech-driven word highlighting; font size ≥ 40 and stagger ≥ 2 |
+| `TypographyScene` | [TypographyScene.tsx](../src/scenes/TypographyScene.tsx) | 1–6 `lines`, exact-word `emphasis`, alignment, size, reveal mode and stagger timing, optional `icon`, staged `exit`, `size: "caption"` | Multiline word wrapping, stable fitted size, word masks or line fades / left-to-right wipes / cuts, an icon fading in above the lines, a staged fade-out (lines, then icon), token emphasis | Conservative width estimates; no letter animation or speech-driven word highlighting; display font size ≥ 40 (a caption is 18–28) and word stagger ≥ 2 |
+| `TiltedWindowScene` | [TiltedWindowScene.tsx](../src/scenes/TiltedWindowScene/TiltedWindowScene.tsx) | `tilted-window`: headlines; `single` windows (still or footage, carousel `atFrame`/`swap`) or a `pair` of racing columns; `enter`, `exit`, `camera`, `secondary`, `chrome` | Headline line fades, a 3D tilted window (tokens in `windowTilt.ts`) that whips in from the right and out to the left with horizontal blur while the headline fades in place, carousel slides and cuts, a window-only push-in camera, a full-bleed pull-back into the box, a secondary window in the same plane, and a pair that flips in, splits, and runs two linear counters that turn the brand colour | Stills and footage only: never put live product UI under its lasting 3D transform. Window media is not duration-probed by the CLI. No per-letter type |
+| `BrandLockupScene` | [BrandLockupScene.tsx](../src/scenes/BrandLockupScene/BrandLockupScene.tsx) | `brand-lockup`: raster `logo` (`src`, `aspectRatio`, `height`), `wordmark`, column `build`, `wordmarkAtFrame`, `cta`, `exit` | Mark built through N column masks rising left to right, wordmark wipe, CTA cascade (subtitle, URL, typed command with block cursor, badge), and a fly-through that sends the mark's columns through the frame in 3D until they cover it in a theme token colour | Works on a raster mark: it never redraws a logo as vectors or reproduces another brand's mark geometry (notches, bevels) |
+| `BarComparisonScene` | [BarComparisonScene.tsx](../src/scenes/BarComparisonScene/BarComparisonScene.tsx) | `bar-comparison`: 1–2 panels `{value,precision?,unit?,caption?,rows[1..8]}`, `panelStaggerFrames`, `barEdge`, `footnote`, `exit: {kind:"erase"}` | Hero number with a brand-coloured unit, caption, labels cascading in, bars growing from the left, values after, optional rough bar edges, and a per-element left-to-right soft-edge erase, panel by panel | Figures are authored editorial data and need a fictional-data footnote unless sourced. No axes, scales, or negative bars |
 | `MediaScene` | [MediaScene.tsx](../src/scenes/MediaScene.tsx) | Image/video public-relative `src`, trim, fit, position, static crop, timed normalized callouts | Real image/video loading, explicit-frame video playback, fixed media framing, callout boxes/labels | Video is muted; no remote URLs, automatic capture, moving camera, or intrinsic-pixel crop model. Crop selects the fitted plane; callouts use the final viewport |
 | `CaptionOverlay` | [CaptionOverlay.tsx](../src/scenes/CaptionOverlay.tsx) | Explicit frame and ordered `{id,startFrame,endFrame,text}` cues; optional size/bottom inset | Whole-cue captions, stable wrapping, opaque backing, half-open interval selection | No overlapping cues, transcription, forced alignment, or karaoke highlighting |
 | `StockScene` | [StockScene.tsx](../src/scenes/StockScene.tsx) | `StockRequest`: preset, complete optional input, schemaVersion 1, optional six-digit hex accent/background, plus shared frame/size/heading props | Validated authored content, repeating 180-frame cycle, preserved aspect ratio and optional heading space | Only omission invokes a full fictional default. Opaque output; no automatic fact extraction or binding |
 | `StockGraphic` | [StockGraphic.tsx](../src/stock/StockGraphic.tsx) | Preset-discriminated `StockRequest`, explicit frame, optional width/height (960 x 600) | Pure SVG shared by live gallery and Remotion; 170 deterministic bounded content graphics | Direct frame is clamped to 0..179; opaque ground and authored secondary colors; inputs must satisfy preset schema |
+
+Shared pieces behind these scenes: [MediaPlane](../src/scenes/MediaPlane.tsx)
+loads a still or footage at an explicit frame (used by `MediaScene` and the
+tilted window); [textReveal](../src/scenes/textReveal.ts) holds the line
+fade, wipe, cut and staged-exit styles; [eraseMask](../src/motion-components/eraseMask.ts)
+and [HorizontalBlur](../src/motion-components/HorizontalBlur.tsx) provide
+the soft-edge erase and the X-only motion blur. The tilted window's plane,
+boxes, chrome and shadow are design tokens in
+[windowTilt.ts](../src/scenes/TiltedWindowScene/windowTilt.ts); define new
+window geometry there, never inline per shot.
+
+The [shot vocabulary study](../storyboards/shot-vocabulary.json) (1920 × 1080,
+Productions gallery) exercises every new scene and transition with curated
+fictional screenshots.
 
 Graphs, flowcharts, and metrics are editorial explanations of supplied evidence,
 not fabricated product UI. Synthetic inputs must keep their fictional label.
@@ -65,8 +82,8 @@ screen. Text fitting and layout checks do not replace rendered inspection.
 
 | Item | Source | Contract and behavior |
 | --- | --- | --- |
-| `StoryFilm` | [StoryFilm.tsx](../src/storyboard/StoryFilm/StoryFilm.tsx) | Exported React component accepting `{plan: Storyboard}`. Chooses a shot by absolute film frame, passes local time and actual dimensions, and renders captions from the same narration cues |
-| `storyboardSchema` | [schema.ts](../src/storyboard/schema/schema.ts) | Version 1 strict discriminated schema. Scene IDs are `title`, `graph`, `flowchart`, `metric`, `typography`, `media`, `stock`, `avandar`; unknown fields/scenes fail |
+| `StoryFilm` | [StoryFilm.tsx](../src/storyboard/StoryFilm/StoryFilm.tsx) | Exported React component accepting `{plan: Storyboard}`. Chooses a shot by absolute film frame, passes local time and actual dimensions, layers each shot's `theme` over the plan theme, draws the shot transition from [getShotTransitionLayers](../src/storyboard/StoryFilm/getShotTransitionLayers.ts), and renders captions from the same narration cues |
+| `storyboardSchema` | [schema.ts](../src/storyboard/schema/schema.ts) | Version 1 strict discriminated schema. Scene IDs are `title`, `graph`, `flowchart`, `metric`, `typography`, `media`, `stock`, `avandar`, `continuity`, `tilted-window`, `brand-lockup`, `bar-comparison`; unknown fields/scenes fail |
 | `timeline()` / `durationInFrames()` | [schema.ts](../src/storyboard/schema/schema.ts) | Accumulate ordered shot durations. Transitions occur inside a shot's duration; they do not subtract overlapping time from the total |
 | `absoluteCues()` | [schema.ts](../src/storyboard/schema/schema.ts) | Resolves narration's shot-relative bounds into the absolute film coordinates used for captions and audio exports |
 | `ShotView` | [StoryFilm.tsx](../src/storyboard/StoryFilm/StoryFilm.tsx) | Private exhaustive scene switch; not a dynamic plugin registry |
@@ -81,7 +98,11 @@ overrides without rewriting the starter stylesheet. The CLI additionally checks
 asset existence and media duration; schema parsing alone does not do that work.
 
 An incoming shot dissolves over a frozen final frame of the preceding shot,
-with an opaque incoming root. The first shot appears without an incoming
+with an opaque incoming root, unless its `transition` names another kind:
+`stepped-column-wipe` reveals it through staggered columns, and
+`outgoing: "playing"` keeps the outgoing shot advancing under any transition.
+A shot `theme` overrides the plan's colour tokens for that shot only, so a
+film can cut between field colours. The first shot appears without an incoming
 dissolve. Loop plans fade to ground over the final 18 frames; that behavior
 still needs a seam check and does not guarantee an arbitrary story loops well.
 Captioned plans with narration reserve a stable band sized from the tallest
@@ -120,8 +141,8 @@ evidence; update delivery records after those artifacts have been inspected.
 | Filter chips and selection updates | `Demo` | No reusable filter-control scene |
 | Confirmation toast | `Demo` | No exported toast component |
 | Progress bar and status button | `MotionLab` | No reusable progress/action scene |
-| Metric comparison | `MetricScene` exposes a single number | Multiple-metric comparison layouts remain unimplemented |
-| Phase handover | `StoryFilm` dissolves whole shots | No separately exported `PhaseTransition` component or arbitrary nested phase API |
+| Metric comparison | `MetricScene` exposes a single number; `BarComparisonScene` compares one or two hero numbers over ranked bars | No axes, scales, line or column charts |
+| Phase handover | `StoryFilm` dissolves, column-wipes, or hard-cuts whole shots | No separately exported `PhaseTransition` component or arbitrary nested phase API |
 
 ## Supporting modules and verification
 

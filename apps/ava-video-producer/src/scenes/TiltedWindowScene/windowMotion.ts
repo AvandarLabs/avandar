@@ -16,6 +16,8 @@ export type WindowPose = {
 const WHIP_BLUR = 40;
 /** Peak horizontal blur of a carousel slide, in pixels. */
 const SLIDE_BLUR = 25;
+/** The pair card's starting turn, nearly edge-on. */
+const FLIP_START_ROTATE_Y = 80;
 /** Most blur a camera move adds to the window, in pixels. */
 const CAMERA_BLUR = 12;
 
@@ -149,7 +151,9 @@ export function getPullBack(
 export function getFlipSplit(frame: number, at: number, canvasWidth: number) {
   const flip = ramp(frame, at, DUR.whip, EASE.out);
   return {
-    rotateY: mix(flip, 90, 0),
+    // Not quite edge-on: at 90 degrees the near edge would pass the camera.
+    rotateY: mix(flip, FLIP_START_ROTATE_Y, 0),
+    opacity: ramp(frame, at, DUR.press, EASE.out),
     translateX: mix(flip, -canvasWidth * 0.3, 0),
     split: ramp(frame, at + DUR.panel + DUR.press - 1, DUR.press, EASE.out),
   };

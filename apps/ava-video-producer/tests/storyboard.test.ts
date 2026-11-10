@@ -554,3 +554,27 @@ test("previews sample the middle of a scene exit", () => {
   };
   assert.ok(previewFrames(storyboardSchema.parse(plan)).includes(66 + 103));
 });
+
+test("previews sample a lockup mid-build and mid-flight, and a window mid-entrance", () => {
+  const plan = fixture();
+  plan.shots[1] = {
+    id: "metric",
+    scene: "brand-lockup",
+    durationInFrames: 150,
+    props: {
+      logo: { src: "avandar/logo.png" },
+      build: { atFrame: 5 },
+      exit: { kind: "fly-through", atFrame: 100 },
+    },
+  };
+  plan.shots.push({
+    id: "window",
+    scene: "tilted-window",
+    durationInFrames: 90,
+    props: { windows: [screen], enter: { kind: "pull-back", atFrame: 30 } },
+  });
+  const frames = previewFrames(storyboardSchema.parse(plan));
+  assert.ok(frames.includes(66 + 11), "mid-build");
+  assert.ok(frames.includes(66 + 112), "mid-flight");
+  assert.ok(frames.includes(216 + 39), "mid-pull-back");
+});

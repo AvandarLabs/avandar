@@ -35,6 +35,7 @@ export const PLANS: Record<string, string> = {
   ),
   "avandar-home": "home",
   "scene-library": "library",
+  "shot-vocabulary": "shot-vocabulary",
   "avandar-overview": "avandar-overview",
   "avandar-import": "import",
   "avandar-explorer": "explorer",

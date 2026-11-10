@@ -58,9 +58,13 @@ test("a pull-back holds the footage full-bleed until it starts, then lands in th
   assert.equal(landed.tilt, 1);
 });
 
-test("a flip-split card turns in edge-on, then splits into two windows", () => {
+test("a flip-split card is hidden before it starts", () => {
+  assert.equal(getFlipSplit(0, 1, canvas.width).opacity, 0);
+});
+
+test("a flip-split card turns in nearly edge-on, then splits into two windows", () => {
   const start = getFlipSplit(1, 1, canvas.width);
-  assert.equal(start.rotateY, 90);
+  assert.ok(start.rotateY >= 75);
   assert.equal(start.split, 0);
   const joined = getFlipSplit(9, 1, canvas.width);
   assert.equal(joined.rotateY, 0);

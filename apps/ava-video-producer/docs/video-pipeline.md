@@ -60,6 +60,28 @@ Validation does not listen to speech or prove that a provided recording says the
 
 Text-only narration is allowed for planning and silent previews. A final render without audio references remains silent even if captions are present. The CLI reports the distinction.
 
+## Shot transitions and field colours
+
+A shot's `transition` chooses how it replaces the previous one during its
+`transitionInFrames`: the default dissolve, or a `stepped-column-wipe`
+([scene API](scene-api.md#shot-level-theme-and-transition)). A shot's `theme`
+overrides plan tokens for that shot, so a film can cut between a dark field,
+an accent field (`{"ground": "var(--brand)"}`) and a light field. Scene exits
+that belong to one shot (a window whip-out, a staged typography exit, a bar
+erase, a lockup fly-through) are scene options followed by a hard cut, not
+shot transitions.
+
+The frame gate fails any frame whose mean luma moves more than 25 (0–255)
+from the previous frame. A hard cut between fields of different luminance
+fails it: the Avandar dark ground to `#1563fe` is about 79, `#1563fe` to
+`#f8fafc` about 156, dark to light about 235. Measured peak coverage per frame
+for 8 columns: 8 frames at stagger 0.5 covers 25% of the frame per frame
+(safe up to a change of about 100); stagger 1 covers 12.5% (about 200); 16
+frames at stagger 1.5 covers 10% (about 250). Join fields of very different
+luminance with a wipe sized from these figures, or keep both sides of a hard
+cut on fields within 25 of each other. Preview stills sample the middle of
+scene exits, lockup builds and flights, and window entrances.
+
 ## Preview and render proof
 
 Preview uses the installed Remotion bundler/renderer APIs and one headless browser, rendering stills sequentially. Only the plan's referenced public assets are copied into the temporary preview bundle. The complete `StoryFilm` composition is rendered at each sampled absolute frame, so dissolves, captions and underlying footage are visible together. Samples include shot boundaries, transition midpoints/endpoints, settled frames, graph traversal, flowchart steps, metric count completion, callout timing and caption midpoints.

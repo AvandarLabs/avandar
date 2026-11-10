@@ -159,7 +159,7 @@ function _Mark({
           );
           return (
             <div
-              key={index}
+              key={`mark-column-${index}`}
               style={{
                 ...positioned(rect),
                 overflow: "hidden",

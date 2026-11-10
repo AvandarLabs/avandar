@@ -9,6 +9,7 @@ import {
   getBarFractions,
   getEraseStartFrames,
   getRoughEdgeClipPath,
+  getRowValueLabel,
 } from "./barComparisonMotion";
 import type { Rect } from "../layout/layout";
 import type {
@@ -182,6 +183,7 @@ function _Panel(props: PanelProps) {
 /** One row's label, bar and value, each erasable on its own. */
 function _renderRow({
   frame,
+  panel,
   rect,
   row,
   rowIndex,
@@ -276,7 +278,7 @@ function _renderRow({
           ),
         }}
       >
-        {row.display ?? formatMetric(row.value)}
+        {getRowValueLabel(row, panel.precision ?? 0)}
       </div>,
       `value-${rowIndex}`,
     ),

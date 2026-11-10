@@ -48,6 +48,18 @@ Actual product leaves come from this worktree's source and CSS. Fixture controll
 
 Each study exposes guidance, real schema paths, and its source-film link. Inputs are authored as validated storyboards, not changed through a live form editor. The gallery search and family buttons select films or studies; the existing Motion Atlas input editor continues to own individual stock-preset inputs.
 
+### Storyboard scenes outside the continuity catalog
+
+The study catalog hosts continuity studies only. `gallerySelectionReducer`
+tests require each study's first shot to be a `continuity` shot whose beats
+carry every control path, `overlayMotion.test.ts` parses every plan in
+`storyboards/explainers/` with the continuity schema, a study's `sourceFilm`
+must name a continuity film, and continuity needs the 1600 by 840 stage. Plain
+storyboard scenes and shot transitions (`tilted-window`, `brand-lockup`,
+`bar-comparison`, `stepped-column-wipe`) are demonstrated by the
+[shot vocabulary study](../storyboards/shot-vocabulary.json) in the
+Productions gallery instead.
+
 ## Authoring contract
 
 ### Retrieval metadata

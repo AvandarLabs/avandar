@@ -5,6 +5,7 @@ import {
   getBarFractions,
   getEraseStartFrames,
   getRoughEdgeClipPath,
+  getRowValueLabel,
 } from "./barComparisonMotion";
 
 test("a panel stages its hero, then labels, then bars, then values", () => {
@@ -55,4 +56,9 @@ test("a rough bar edge stays within its depth and repeats for the same row", () 
   );
   assert.ok(offsets.length > 2);
   assert.ok(offsets.every((offset) => offset >= 0 && offset <= 8));
+});
+
+test("a row value without display text keeps the panel's decimal places", () => {
+  assert.equal(getRowValueLabel({ value: 4.2 }, 1), "4.2");
+  assert.equal(getRowValueLabel({ value: 4.2, display: "4.2 s" }, 1), "4.2 s");
 });

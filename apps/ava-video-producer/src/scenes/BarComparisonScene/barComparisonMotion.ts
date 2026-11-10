@@ -1,4 +1,5 @@
 import { DUR, STAGGER } from "../../motion";
+import { formatMetric } from "../layout/layout";
 
 /** Frames a bar takes to grow to its length. */
 export const BAR_GROW_FRAMES = DUR.sheet;
@@ -79,4 +80,13 @@ export function getRoughEdgeClipPath(seed: number, depth: number): string {
 function _seededUnit(seed: number): number {
   const value = Math.sin(seed * 12.9898) * 43758.5453;
   return value - Math.floor(value);
+}
+
+/** The text at a row's end: its display text, or its value at the panel's
+ *  precision, so a value is never shown rounded to a different number. */
+export function getRowValueLabel(
+  row: { value: number; display?: string },
+  precision: number,
+): string {
+  return row.display ?? formatMetric(row.value, precision);
 }

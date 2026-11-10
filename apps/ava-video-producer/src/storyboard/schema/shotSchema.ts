@@ -45,31 +45,29 @@ const edgeSchema = z.strictObject({
     .max(12)
     .optional(),
 });
-const graph = z
-  .object({
-    ...heading,
-    nodes: z
-      .array(
-        z.strictObject({
-          id,
-          label,
-          detail: detail.optional(),
-          x: unit,
-          y: unit,
-          width: z.number().min(0.1).max(0.6).optional(),
-          items: z.array(label).max(8).optional(),
-          frame: z.enum(["card", "ticks"]).optional(),
-        }),
-      )
-      .min(1)
-      .max(12),
-    edges: z.array(edgeSchema).max(40),
-    traversal: z
-      .array(z.object({ nodeId: id, atFrame: frame }).strict())
-      .optional(),
-    revealAtFrame: frame.optional(),
-  })
-  .strict();
+const graph = z.strictObject({
+  ...heading,
+  nodes: z
+    .array(
+      z.strictObject({
+        id,
+        label,
+        detail: detail.optional(),
+        x: unit,
+        y: unit,
+        width: z.number().min(0.1).max(0.6).optional(),
+        items: z.array(label).max(8).optional(),
+        frame: z.enum(["card", "ticks"]).optional(),
+      }),
+    )
+    .min(1)
+    .max(12),
+  edges: z.array(edgeSchema).max(40),
+  traversal: z
+    .array(z.object({ nodeId: id, atFrame: frame }).strict())
+    .optional(),
+  revealAtFrame: frame.optional(),
+});
 const flowchart = z
   .object({
     ...heading,

@@ -35,8 +35,9 @@ export function RacePair(props: Props) {
           position: "absolute",
           inset: 0,
           transformOrigin: "50% 50%",
+          opacity: flip?.opacity,
           transform: flip
-            ? `perspective(${PAIR_TILT.perspective}px) translateX(${flip.translateX.toFixed(2)}px) rotateY(${flip.rotateY.toFixed(3)}deg)`
+            ? `perspective(${PAIR_TILT.flipPerspective}px) translateX(${flip.translateX.toFixed(2)}px) rotateY(${flip.rotateY.toFixed(3)}deg)`
             : undefined,
         }}
       >
@@ -59,7 +60,7 @@ export function RacePair(props: Props) {
                   };
           return (
             <WindowCard
-              key={side}
+              key={`${side}-${column.label}`}
               frame={frame}
               rect={{ ...box, x: mix(split, joinedX, box.x) }}
               pose={{ ...base, rotateY: sign * PAIR_TILT.rotateY }}
@@ -76,7 +77,7 @@ export function RacePair(props: Props) {
       </div>
       {pair.map((column, side) => (
         <_RaceStats
-          key={side}
+          key={`${side}-${column.label}`}
           {...props}
           column={column}
           side={side}

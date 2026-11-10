@@ -65,7 +65,7 @@ function _SingleWindow(
   const lens = camera ? getWindowCamera(frame, camera, box) : undefined;
   const card = (index: number, pose: WindowPose) => (
     <WindowCard
-      key={index}
+      key={`window-${index}-${windows[index].src}`}
       frame={frame}
       rect={rect}
       pose={_combinePoses(base, pose, lens?.blurX ?? 0)}
