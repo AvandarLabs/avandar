@@ -25,7 +25,11 @@ The implementer cannot see the video. Everything they need to reproduce a beat m
 - **Every layer, every boundary.** During a transition, say what EACH on-screen layer of the outgoing and incoming shot does (moves, fades in place, stays, is covered). Do not assume a headline moves with the window next to it.
 - **Hard cuts are transitions too.** If any boundary is a plain cut, the transition catalog must contain a `hard-cut` entry, and every boundary must point at a catalog entry.
 - **One shot numbering.** Catalog `occurrences` cite storyboard shot ids and frame ranges, and must agree with the storyboard script. Check every occurrence against section 8 before you finish.
-- **Backgrounds belong to shots.** Give every shot its background role. If the background changes between shots, that change is part of the boundary.
+- **Backgrounds belong to shots.** Give every shot its background role from this list: `black-field` (pure or near-pure black), `dark-field` (dark but not black, or tinted), `accent-field` (a saturated brand color), `light-field` (white or off-white), `image` (footage or a picture fills the frame), `gradient`. If the background changes between shots, that change is part of the boundary.
+- **Judge mask shape on solid areas.** Read a wipe or erase edge where it crosses a flat background, a bar, or a window, never from how letters disappear: each letter's own outline makes any edge look curved.
+- **Account for every layer.** For each boundary, list every layer visible in the last frame before it and the first frame after it, and say what happens to each, including layers that only drift or stay put underneath a wipe.
+- **Start means first change.** A motion starts on the first frame that differs from the frame before it and ends on the first frame that no longer changes.
+- **Use the stated length.** The label of each VIDEO states its exact frame count. `total_frames` must equal it.
 
 ## Output format
 
@@ -92,7 +96,7 @@ shots:
     from: <frame>          # inclusive
     to: <frame>            # exclusive
     composition: C1
-    background: <role, e.g. dark-field | accent-field | light-field>   # per shot; may differ every shot
+    background: <black-field | dark-field | accent-field | light-field | image | gradient>   # per shot
     elements:
       - id: S1.logo
         kind: <generic element kind>

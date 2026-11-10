@@ -50,3 +50,23 @@ spec, treated as prompt weaknesses before building.
   (`motion-spec.draft.md`, `motion-spec.raw.md`).
 - Reference gaps added to `argon-to-remotion.md`: per-shot background,
   placing a boundary by its class, brand marks with different geometry.
+
+## Run 2, Phase 1 (octet-v2, skill 0.2.0)
+
+- Spec accuracy: 22 of 50 checked claims corrected (44%, down from 55%).
+  7 of run 1's 18 corrections now right first time, 9 partly.
+- **Starts 2-3 frames early, and a constant -2 frame drift late in the
+  video**: Argon mis-converted 24 fps samples to 30 fps frames. Clips are
+  now re-encoded slowed (`-itsscale 1.25`) so every sample is one source
+  frame and Argon only counts. A test on an 8-frame wipe landed within 1
+  frame.
+- **Held frames never re-measured**: refine copied the draft's layer boxes,
+  muted-line colours, and tilt angles. Refine now gets one full-resolution
+  STILL per shot and must re-measure composition from it.
+- **Mask shape read from letters** (a linear erase called radial twice), a
+  **dropped drift layer under a wipe**, **pure black filed as dark**, and a
+  **`total_frames` 3 frames off**: new rules in `observe.md` (judge masks on
+  solid areas, account for every layer, a background role list with
+  `black-field`, use the probed frame count now stated in each VIDEO label).
+- SKILL.md: the refine command used an unquoted `$CLIPS` that zsh does not
+  split; `--clips-from <draft>` now plans clips inside `argon.mjs`.

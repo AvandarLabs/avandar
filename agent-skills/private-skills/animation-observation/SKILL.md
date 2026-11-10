@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
 metadata:
   author: jpsyx
-  version: "0.2.0"
+  version: "0.3.0"
   tags: avandar, video, remotion, motion-atlas, gemini
 ---
 
@@ -95,16 +95,22 @@ artifacts live in the ignored `.videos/<slug>/`:
    About 3 minutes for a 78 s video. Argon's API samples video at 24 fps at
    most, and the whole video at 10 fps, so the draft cannot time events
    shorter than about 9 frames. The refine pass fixes that.
-3. **Refine pass** (whole video plus 24 fps close-ups of every boundary):
+3. **Refine pass** (whole video, frame-accurate close-ups of every boundary,
+   and one full-resolution still per shot):
    ```bash
-   CLIPS=$(node $SKILL_DIR/scripts/boundary-clips.mjs .videos/<slug>/research/motion-spec.draft.md)
-   node $SKILL_DIR/scripts/argon.mjs $CLIPS \
+   node $SKILL_DIR/scripts/argon.mjs \
+     --clips-from .videos/<slug>/research/motion-spec.draft.md \
      --prompt $SKILL_DIR/prompts/refine.md \
      --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
      --context $SKILL_DIR/prompts/observe.md \
      --context .videos/<slug>/research/motion-spec.draft.md \
      --out .videos/<slug>/research/motion-spec.raw.md
    ```
+   `--clips-from` reads the draft's storyboard script and sends each
+   boundary as a slowed clip in which every sample is one source frame, so
+   Argon counts frames instead of converting timestamps. Preview what it will
+   send with `node $SKILL_DIR/scripts/boundary-clips.mjs <draft>`. About 4
+   minutes for a 78 s video.
    Never edit `motion-spec.draft.md` or `motion-spec.raw.md`. The evaluation
    phase needs them to see what the prompts produced. Copy the raw file to
    `motion-spec.md` and edit only that copy.
@@ -123,8 +129,9 @@ artifacts live in the ignored `.videos/<slug>/`:
    else Remotion's bundled one) and Playwright, and labels frames correctly.
    Use `--step 1` across transitions: they last only a few frames.
    Add a `## Verification` table at the top of `motion-spec.md`: claim,
-   verdict (correct / corrected / unverified), correction. Fix wrong values in
-   the spec itself. Count the corrections: in the evaluation phase each one is
+   verdict (correct / corrected / unverified), correction. Fix every wrong
+   value in the body too: the body is what gets built, and it wins over the
+   table if they ever disagree. Count the corrections: in the evaluation phase each one is
    a prompt weakness to fix, and the count across runs shows whether the
    prompts are improving.
 
