@@ -109,17 +109,21 @@ describe("createDataAgent", () => {
   });
 
   it("adds the plugin tool on ask and leaves it off the plan tool list", async () => {
+    let installedTools: readonly PluginAiToolDeclaration[] = [];
     const getPluginAiTools = vi.fn(() => {
-      return [FIT_DECLARATION];
+      return installedTools;
     });
+    const runPluginAiTool = vi
+      .fn()
+      .mockResolvedValue({ text: '{"slope":2}', isError: false });
     const agent = createDataAgent({
       ...OPTIONS,
       getPluginAiTools,
-      runPluginAiTool: vi
-        .fn()
-        .mockResolvedValue({ text: '{"slope":2}', isError: false }),
+      runPluginAiTool,
       streamFn: STOP_STREAM,
     });
+    // Installed after the agent exists, so only an ask-time read sees it.
+    installedTools = [FIT_DECLARATION];
     await agent.ask("fit it");
     expect(getPluginAiTools).toHaveBeenCalled();
     expect(
@@ -132,6 +136,7 @@ describe("createDataAgent", () => {
       ...OPTIONS,
       queryTools: "plan",
       getPluginAiTools,
+      runPluginAiTool,
       streamFn: STOP_STREAM,
     });
     await planAgent.ask("fit it");
