@@ -106,16 +106,20 @@ describe("GisAppLayerPanel", () => {
     expect(app.openLayerSettings).toHaveBeenCalledOnce();
   });
 
-  it("shows the layer name and returns to the list without clearing the selection", () => {
+  it("keeps the layer list visible while that layer's controls are open", () => {
     const layer = MapLayer.makeEmpty("Schools");
     const app = _app(layer, "settings");
     _renderPanel(app);
 
-    expect(
-      screen.getByRole("heading", { name: "Schools" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Layers" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Schools" })).toBeInTheDocument();
     expect(screen.getByText("Layer settings body")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Add layer" })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Add layer" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^Schools/ }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Hide the layer Schools" }),
     ).toBeInTheDocument();

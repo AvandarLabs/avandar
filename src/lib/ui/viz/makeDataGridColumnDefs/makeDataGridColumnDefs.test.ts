@@ -31,7 +31,7 @@ function _formatCell(
 describe("makeDataGridColumnDefs", () => {
   const originalTimezone = process.env.TZ;
 
-  it("offers each column title as that column's header tooltip", () => {
+  it("names each column with its field and leaves the tooltip to the title", () => {
     const columnDefs = makeDataGridColumnDefs({
       columnNames: ["county_of_residence", "deaths"],
       data: [],
@@ -40,9 +40,10 @@ describe("makeDataGridColumnDefs", () => {
     });
     expect(
       columnDefs.map((columnDef) => {
-        return columnDef.headerTooltip;
+        return columnDef.headerName;
       }),
     ).toEqual(["county_of_residence", "deaths"]);
+    expect(columnDefs[0]).not.toHaveProperty("headerTooltip");
   });
 
   beforeAll(() => {

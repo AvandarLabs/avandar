@@ -68,11 +68,19 @@ function _layerList(app: GisAppState, actions: GisAppLayerActions): ReactNode {
       onMoveAnnotationsByOffset={(offset) => {
         _moveAnnotationsByOffset(app, offset);
       }}
+      editor={
+        app.layerPanelPage === "settings" ? (
+          <LayerSettingsPanel app={app} actions={actions} />
+        ) : null
+      }
     />
   );
 }
 
-/** Renders the layer stack with actions that update the editable map config. */
+/**
+ * The layer list, with the open layer's controls underneath it. The list
+ * stays on screen while a layer is being edited.
+ */
 export function GisAppLayerPanel({ app, actions }: Props): ReactNode {
   const selectedViewState = app.selectedLayerId
     ? app.layerViewStates.get(app.selectedLayerId)
@@ -84,8 +92,5 @@ export function GisAppLayerPanel({ app, actions }: Props): ReactNode {
       app.onInspectorViewChange({ type: "matchReport" });
     },
   });
-  if (app.layerPanelPage === "settings") {
-    return <LayerSettingsPanel app={app} actions={actions} />;
-  }
   return _layerList(app, actions);
 }

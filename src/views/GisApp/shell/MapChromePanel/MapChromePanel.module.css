@@ -115,8 +115,9 @@
 }
 
 /*
- * The single layer panel. It uses the settings width and fills the column
- * so the list and a layer's editor keep the same frame.
+ * The layer panel hugs its content: the list alone, then the editor under it
+ * when a layer is open. It still stops at the column, so a long editor
+ * scrolls inside the panel instead of covering the map.
  */
 .mapChromePanel--workspace {
   max-height: 100%;
@@ -125,8 +126,16 @@
 }
 
 .mapChromePanel--workspace:not([data-collapsed="true"]) {
+  flex: 0 1 auto;
+  height: auto;
+}
+
+.mapChromePanel--workspace .mapChromePanelBody {
+  display: flex;
   flex: 1 1 auto;
-  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* stylelint-disable-next-line container-name-pattern, value-keyword-case */

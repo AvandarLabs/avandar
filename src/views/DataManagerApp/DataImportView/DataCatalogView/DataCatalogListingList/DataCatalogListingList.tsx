@@ -1,10 +1,10 @@
-import { Tooltip } from "@avandar/ui";
+import { TruncatedText } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Loader, Text } from "@mantine/core";
 import { useId } from "@mantine/hooks";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { buildOrganizationLine } from "@/views/DataManagerApp/DataImportView/DataCatalogView/buildOrganizationLine/buildOrganizationLine";
 import css from "@/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.module.css";
 import { formatCatalogListingDate } from "@/views/DataManagerApp/DataImportView/DataCatalogView/formatCatalogListingDate";
@@ -25,36 +25,15 @@ function DataCatalogListingName({
   name: string;
   isSelected: boolean;
 }): ReactNode {
-  const nameRef = useRef<HTMLParagraphElement>(null);
-  const [isTruncated, setIsTruncated] = useState(false);
-
-  useLayoutEffect(() => {
-    const element = nameRef.current;
-    if (element === null) {
-      return;
-    }
-    const updateIsTruncated = (): void => {
-      setIsTruncated(element.scrollWidth > element.clientWidth + 1);
-    };
-    updateIsTruncated();
-    const observer = new ResizeObserver(updateIsTruncated);
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-    };
-  }, [name]);
-
   return (
-    <Tooltip label={name} disabled={!isTruncated} position="top-start">
-      <Text
-        ref={nameRef}
-        className={css.dataCatalogListingListName}
-        size="sm"
-        fw={isSelected ? 600 : 500}
-      >
-        {name}
-      </Text>
-    </Tooltip>
+    <TruncatedText
+      className={css.dataCatalogListingListName}
+      size="sm"
+      fw={isSelected ? 600 : 500}
+      tooltipProps={{ position: "top-start" }}
+    >
+      {name}
+    </TruncatedText>
   );
 }
 

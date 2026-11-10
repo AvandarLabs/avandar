@@ -5,8 +5,7 @@ import { getHotkeyHandler } from "@mantine/hooks";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useEffect, useRef, useState } from "react";
 import { EditButton } from "../buttons/EditButton";
-import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
-import { Tooltip } from "../Tooltip/Tooltip";
+import { TruncatedText } from "../text/TruncatedText";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {
@@ -158,14 +157,6 @@ export function EditableDisplayText({
     },
   };
 
-  const [displayTextRef, isDisplayTextTruncated] =
-    useCheckTruncatedText<HTMLParagraphElement>([
-      value,
-      hasText,
-      resolvedEmptyDisplayText,
-      passThroughProps.textarea,
-    ]);
-
   const elements = {
     textInput() {
       if (passThroughProps.textarea) {
@@ -303,30 +294,17 @@ export function EditableDisplayText({
     );
   }
 
-  const labelForTooltip = hasText ? value : resolvedEmptyDisplayText;
-
   return (
     <Group gap="xxs" align="center" wrap="nowrap" w="100%" miw={0}>
       <Box miw={0} style={{ flex: 1 }}>
-        <Tooltip
-          label={labelForTooltip}
-          disabled={!isDisplayTextTruncated}
-          position="top"
+        <TruncatedText
+          c={hasText ? undefined : "dimmed"}
+          fs={hasText ? undefined : "italic"}
+          tooltipProps={{ position: "top" }}
+          {...displayTextProps}
         >
-          <Text
-            ref={displayTextRef}
-            display="block"
-            truncate
-            w="100%"
-            maw="100%"
-            miw={0}
-            c={hasText ? undefined : "dimmed"}
-            fs={hasText ? undefined : "italic"}
-            {...displayTextProps}
-          >
-            {hasText ? value : resolvedEmptyDisplayText}
-          </Text>
-        </Tooltip>
+          {hasText ? value : resolvedEmptyDisplayText}
+        </TruncatedText>
       </Box>
       <Box style={{ flexShrink: 0 }}>
         <EditButton onClick={onStartEditing} disabled={disabled} name={name} />

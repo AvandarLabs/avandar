@@ -1,4 +1,36 @@
-.headerAction,
+.editorScroll {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.editorHeader {
+  align-items: center;
+  background: var(--ava-surface-panel-header);
+  border-bottom: 1px solid var(--ava-border-default);
+  border-top: 1px solid var(--ava-border-default);
+  display: flex;
+  flex: none;
+  gap: var(--mantine-spacing-xs);
+  padding-block: var(--mantine-spacing-xxxs);
+  padding-inline: var(--mantine-spacing-xxxs) var(--mantine-spacing-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.editorTitle:global(.mantine-Text-root) {
+  flex: 1 1 auto;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  margin: 0;
+  min-width: 0;
+}
+
 .backAction {
   height: 24px;
   min-height: 24px;
@@ -6,7 +38,6 @@
   width: 24px;
 }
 
-.headerAction:focus-visible,
 .backAction:focus-visible {
   outline-offset: -2px;
 }
@@ -21,7 +52,6 @@
 
 /* stylelint-disable-next-line container-name-pattern, value-keyword-case */
 @container mapShell (max-width: 792px) {
-  .headerAction,
   .backAction {
     height: 44px;
     min-height: 44px;
