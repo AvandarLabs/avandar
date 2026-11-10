@@ -11,6 +11,7 @@ import {
   SLOT_IDS,
   SlotFactRegistry,
 } from "@plugin-manifest/SlotFacts/SlotFactRegistry.ts";
+import { LOCALIZED_KEY_PATTERN } from "@plugin-manifest/strings/getLocalizedTextFromManifestStrings.ts";
 import { z } from "zod";
 import type {
   WhenCondition,
@@ -34,6 +35,11 @@ const AI_TOOL_NAME_MESSAGE =
   "must start with a lowercase letter and hold only letters and digits, up to 64 characters";
 const AI_TOOL_DESCRIPTION_MAX = 600;
 const AI_TOOL_PARAMETER_DESCRIPTION_MAX = 200;
+const PLAIN_TEXT_MESSAGE = "must be plain text, not a %key% reference";
+
+function _isPlainText(value: string): boolean {
+  return !LOCALIZED_KEY_PATTERN.test(value);
+}
 const EMPTY_COMBINATOR_MESSAGE = "needs at least one condition";
 const WHEN_SHAPES_MESSAGE = `must be "all: [...]", "any: [...]", "not: ...", or "{ <fact>: { <operator>: value } }" with an operator of ${WHEN_OPERATORS.join(", ")}`;
 
@@ -105,6 +111,7 @@ const MenuItemSchema = z.strictObject({
 const AiToolParameterDescriptionSchema = z
   .string()
   .max(AI_TOOL_PARAMETER_DESCRIPTION_MAX)
+  .refine(_isPlainText, PLAIN_TEXT_MESSAGE)
   .optional();
 
 const AiToolPropertySchema = z.discriminatedUnion("type", [
@@ -146,7 +153,11 @@ const AiToolParametersSchema = z
 
 const AiToolSchema = z.strictObject({
   name: z.string().regex(AI_TOOL_NAME_PATTERN, AI_TOOL_NAME_MESSAGE),
-  description: z.string().min(1).max(AI_TOOL_DESCRIPTION_MAX),
+  description: z
+    .string()
+    .min(1)
+    .max(AI_TOOL_DESCRIPTION_MAX)
+    .refine(_isPlainText, PLAIN_TEXT_MESSAGE),
   parameters: AiToolParametersSchema,
 });
 

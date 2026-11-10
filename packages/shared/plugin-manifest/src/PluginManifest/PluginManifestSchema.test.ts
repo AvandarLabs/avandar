@@ -682,6 +682,29 @@ describe("PluginManifestSchema contributes.aiTools", () => {
     ).toBe(true);
   });
 
+  it("rejects a tool description that is a localization key", () => {
+    const issues = _getIssuesForAiTool({ description: "%tool.description%" });
+    expect(issues).toEqual([
+      {
+        path: "contributes.aiTools.0.description",
+        message: "must be plain text, not a %key% reference",
+      },
+    ]);
+  });
+
+  it("rejects a parameter description that is a localization key", () => {
+    const issues = _getIssuesForAiToolProperty(
+      { type: "string", description: "%param.description%" },
+      ["xColumn"],
+    );
+    expect(issues).toEqual([
+      {
+        path: "contributes.aiTools.0.parameters.properties.xColumn.description",
+        message: "must be plain text, not a %key% reference",
+      },
+    ]);
+  });
+
   it("accepts an enum whose values match the property type", () => {
     const issues = _getIssuesForAiToolProperty(
       { type: "number", enum: [1, 2] },
