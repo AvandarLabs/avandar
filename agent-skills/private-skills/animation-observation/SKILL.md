@@ -193,9 +193,17 @@ node $SKILL_DIR/scripts/argon.mjs --json \
   --prompt $SKILL_DIR/prompts/compare.md \
   --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
   --video CANDIDATE=<rendered.mp4> \
+  --clips-from REFERENCE=.videos/<slug>/research/motion-spec.md \
+  --clips-from CANDIDATE=.videos/<slug>/storyboard.json \
   --context .videos/<slug>/research/motion-spec.md \
+  --context .videos/<slug>/storyboard.json \
   --out .videos/<slug>/research/eval/iteration-<n>.json
 ```
+
+Both videos get frame-accurate boundary clips and one still per shot, so
+Argon compares transitions frame by frame. Check the plan first with
+`--dry-run` (no API call). If the request is too large (over about 1M
+tokens), lower `--clip-pad` before dropping clips.
 
 **Acceptable** = every score (`motion`, `transitions`, `composition`,
 `pacing`, `vibe`) is 7 or more and there is no `critical` difference. The

@@ -3,7 +3,12 @@ You are a motion design director checking a recreation. Two videos are attached:
 - **REFERENCE**: the original.
 - **CANDIDATE**: a rebuild that intentionally uses different content, words, product UI, and colors (it uses another brand's design tokens).
 
-A CONTEXT FILE named `motion-spec.md` is also attached. It is the spec the rebuild team worked from. They could not see REFERENCE.
+Also attached:
+
+- **CLIPs** of both videos: frame-accurate close-ups of every shot boundary and transition, labelled `CLIP REFERENCE-n` and `CLIP CANDIDATE-n`. Each is slowed so every sample is one consecutive video frame; its label gives the frame of sample 0. Use them to compare transitions and short motions frame by frame. The whole videos are sampled at only about 10 fps.
+- **STILLs** of both videos, one per shot, to compare composition.
+- CONTEXT FILE `motion-spec.md`: the spec the rebuild team worked from. They could not see REFERENCE.
+- CONTEXT FILE `storyboard.json`: the plan that rendered CANDIDATE, with each shot's frames. Use it to tell whether a difference came from the spec or from how the spec was built.
 
 ## What to judge
 
@@ -24,7 +29,7 @@ Align the two videos shot by shot first. They may differ slightly in duration. M
 For every difference, decide who caused it by reading `motion-spec.md`:
 
 - `spec`: the spec is missing the detail, describes it wrongly, or is ambiguous. The fix belongs in how the spec is written.
-- `build`: the spec described it correctly and the candidate did not follow it.
+- `build`: the spec described it correctly and the candidate (or its `storyboard.json`) did not follow it.
 - `platform`: following the spec would need a capability the rebuild clearly lacked (for example true motion blur); the candidate approximated it.
 
 ## Scoring

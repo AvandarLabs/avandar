@@ -12,7 +12,8 @@
  *   node argon.mjs --prompt <prompt.md> --out <reply.md>
  *     --video <label>=<file.mp4> [--video <label>=<file.mp4> ...]
  *     [--context <file> ...] [--json] [--fps 10] [--thinking xhigh]
- *     [--clips-from <spec.md>] [--clip <startFrame>-<endFrame> ...]
+ *     [--clips-from [<label>=]<spec.md|storyboard.json> ...]
+ *     [--clip [<label>:]<startFrame>-<endFrame> ...]
  *     [--clip-pad 30] [--clips-only] [--model gemini-4-argon]
  *
  * Each video is sent whole, sampled at `--fps`, preceded by a label part
@@ -21,20 +22,24 @@
  * as text parts. `--json` asks for a JSON reply. `--thinking` sets Argon's
  * reasoning level (`low`, `medium`, `high`, `xhigh`, `max`).
  *
- * Close-ups apply to the FIRST video. The API samples video at 24 fps at
- * most, so each clip is re-encoded slowed down until every source frame is
- * one 24 fps sample: clip sample k is source frame `startFrame + k`, with no
- * conversion for Argon to get wrong. `--clips-from <spec>` derives clips
- * (every shot boundary and transition window, padded by `--clip-pad` frames)
- * and one full-resolution still per shot from a spec's storyboard script.
- * `--clip` adds clips by hand. `--clips-only` skips the whole first video.
+ * Close-ups: the API samples video at 24 fps at most, so each clip is
+ * re-encoded slowed down until every source frame is one 24 fps sample:
+ * clip sample k is source frame `startFrame + k`, with no conversion for
+ * Argon to get wrong. `--clips-from <label>=<file>` derives clips (every shot
+ * boundary and transition window, padded by `--clip-pad` frames) and one
+ * full-resolution still per shot for that video, from a motion spec's
+ * storyboard script or a producer `storyboard.json`. Without `<label>=`, it
+ * applies to the first video. `--clip` adds clips by hand, with the same
+ * optional label prefix. `--clips-only` skips the whole first video.
+ * `--dry-run` prints the planned clips and stills and exits without calling
+ * the API or reading the key.
  */
 import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { parseArgs } from "node:util";
-import { buildBoundaryClips, buildShotStills, readStoryboard } from "./lib/specEvents.mjs";
+import { buildBoundaryClips, buildShotStills, readShots } from "./lib/specEvents.mjs";
 import {
   extractFrameJpeg,
   probeVideo,
@@ -58,10 +63,11 @@ const { values } = parseArgs({
     fps: { type: "string", default: "10" },
     model: { type: "string", default: "gemini-4-argon" },
     thinking: { type: "string", default: "xhigh" },
-    "clips-from": { type: "string" },
+    "clips-from": { type: "string", multiple: true },
     clip: { type: "string", multiple: true },
     "clip-pad": { type: "string", default: "30" },
     "clips-only": { type: "boolean", default: false },
+    "dry-run": { type: "boolean", default: false },
   },
 });
 
@@ -120,13 +126,32 @@ async function uploadVideo(apiKey, filePath, displayName) {
   return file;
 }
 
-/** Lists the clips and stills to send, from `--clips-from` and `--clip`. */
-async function planCloseups(numFrames) {
-  const manualClips = (values.clip ?? []).map((range) => range.split("-").map(Number));
-  if (!values["clips-from"]) return { clips: manualClips, stills: [] };
-  const { shots } = await readStoryboard(values["clips-from"]);
-  const derivedClips = buildBoundaryClips(shots, Number(values["clip-pad"]), numFrames);
-  return { clips: [...derivedClips, ...manualClips], stills: buildShotStills(shots) };
+/** Splits an optional `<label><separator>` prefix off a CLI value. */
+function splitLabel(value, separator, defaultLabel) {
+  const index = value.indexOf(separator);
+  const hasLabel = index > 0 && !value.slice(0, index).includes("/");
+  return hasLabel ? [value.slice(0, index), value.slice(index + 1)] : [defaultLabel, value];
+}
+
+/** Lists each video's clips and stills, from `--clips-from` and `--clip`. */
+async function planCloseups(videos) {
+  const plans = new Map(videos.map((video) => [video.label, { clips: [], stills: [] }]));
+  const planFor = (label) => {
+    if (!plans.has(label)) throw new Error(`No --video labelled ${label}`);
+    return plans.get(label);
+  };
+  for (const value of values["clips-from"] ?? []) {
+    const [label, filePath] = splitLabel(value, "=", videos[0].label);
+    const video = videos.find((candidate) => candidate.label === label);
+    const shots = await readShots(filePath);
+    planFor(label).clips.push(...buildBoundaryClips(shots, Number(values["clip-pad"]), video.probe.numFrames));
+    planFor(label).stills.push(...buildShotStills(shots));
+  }
+  for (const value of values.clip ?? []) {
+    const [label, range] = splitLabel(value, ":", videos[0].label);
+    planFor(label).clips.push(range.split("-").map(Number));
+  }
+  return plans;
 }
 
 /** Builds the label part for one whole video. */
@@ -141,14 +166,14 @@ function buildVideoLabel(label, probe) {
 async function buildClipParts(apiKey, video, clips, scratchDir, uploadedFiles) {
   const parts = [];
   for (const [index, [startFrame, endFrame]] of clips.entries()) {
-    const clipPath = path.join(scratchDir, `clip-${index + 1}.mp4`);
+    const clipPath = path.join(scratchDir, `${video.label}-clip-${index + 1}.mp4`);
     writeFrameAccurateClip(video.path, startFrame, endFrame, video.probe.fps, MAX_SAMPLE_FPS, clipPath);
     const file = await uploadVideo(apiKey, clipPath, `${video.label}-clip-${index + 1}`);
     uploadedFiles.push(file);
     parts.push(
       {
         text:
-          `CLIP ${index + 1} follows: frames ${startFrame} to ${endFrame - 1} of "${video.label}", ` +
+          `CLIP ${video.label}-${index + 1} follows: frames ${startFrame} to ${endFrame - 1} of "${video.label}", ` +
           `slowed so that every sample is exactly one consecutive video frame. ` +
           `Sample k (0-based), at clip time k/${MAX_SAMPLE_FPS} s, is video frame ${startFrame} + k. ` +
           `Report frames of "${video.label}" computed this way.`,
@@ -159,7 +184,7 @@ async function buildClipParts(apiKey, video, clips, scratchDir, uploadedFiles) {
       },
     );
   }
-  console.log(`uploaded ${clips.length} clips`);
+  if (clips.length) console.log(`uploaded ${clips.length} ${video.label} clips`);
   return parts;
 }
 
@@ -167,7 +192,7 @@ async function buildClipParts(apiKey, video, clips, scratchDir, uploadedFiles) {
 async function buildStillParts(video, stills, scratchDir) {
   const parts = [];
   for (const { shotId, frame } of stills) {
-    const stillPath = path.join(scratchDir, `still-${frame}.jpg`);
+    const stillPath = path.join(scratchDir, `${video.label}-still-${frame}.jpg`);
     extractFrameJpeg(video.path, frame, video.probe.fps, stillPath);
     parts.push(
       { text: `STILL of "${video.label}" frame ${frame} (shot ${shotId}), full resolution:` },
@@ -179,8 +204,7 @@ async function buildStillParts(video, stills, scratchDir) {
 
 /** Uploads everything and assembles the request parts in order. */
 async function buildParts(apiKey, videos, scratchDir, uploadedFiles) {
-  const [firstVideo] = videos;
-  const { clips, stills } = await planCloseups(firstVideo.probe.numFrames);
+  const closeupPlans = await planCloseups(videos);
   const wholeVideos = values["clips-only"] ? videos.slice(1) : videos;
   const videoParts = [];
   for (const video of wholeVideos) {
@@ -192,15 +216,19 @@ async function buildParts(apiKey, videos, scratchDir, uploadedFiles) {
     );
     console.log(`uploaded ${video.label}`);
   }
-  const clipParts = await buildClipParts(apiKey, firstVideo, clips, scratchDir, uploadedFiles);
-  const stillParts = await buildStillParts(firstVideo, stills, scratchDir);
+  const closeupParts = [];
+  for (const video of videos) {
+    const { clips, stills } = closeupPlans.get(video.label);
+    closeupParts.push(...(await buildClipParts(apiKey, video, clips, scratchDir, uploadedFiles)));
+    closeupParts.push(...(await buildStillParts(video, stills, scratchDir)));
+  }
   const contextParts = await Promise.all(
     (values.context ?? []).map(async (contextPath) => ({
       text: `CONTEXT FILE ${path.basename(contextPath)}:\n\n${await readFile(contextPath, "utf8")}`,
     })),
   );
   const promptPart = { text: await readFile(values.prompt, "utf8") };
-  return [...videoParts, ...clipParts, ...stillParts, promptPart, ...contextParts];
+  return [...videoParts, ...closeupParts, promptPart, ...contextParts];
 }
 
 /** Calls generateContent and returns the reply text and usage. */
@@ -223,12 +251,22 @@ async function generate(apiKey, parts) {
   return { replyText, usage: body.usageMetadata, finishReason: body.candidates?.[0]?.finishReason };
 }
 
+/** Prints what a run would send, without calling the API. */
+async function printDryRun(videos) {
+  for (const [label, { clips, stills }] of await planCloseups(videos)) {
+    const numClipFrames = clips.reduce((sum, [start, end]) => sum + end - start, 0);
+    console.log(`${label}: ${clips.length} clips (${numClipFrames} frames), ${stills.length} stills`);
+    console.log(`  clips: ${clips.map(([start, end]) => `${start}-${end}`).join(" ")}`);
+  }
+}
+
 async function main() {
-  const apiKey = await readApiKey();
   const videos = values.video.map((spec) => {
     const [label, filePath] = spec.split(/=(.*)/s);
     return { label, path: path.resolve(filePath), probe: probeVideo(filePath) };
   });
+  if (values["dry-run"]) return printDryRun(videos);
+  const apiKey = await readApiKey();
   const scratchDir = await mkdtemp(path.join(os.tmpdir(), "argon-"));
   const uploadedFiles = [];
   try {

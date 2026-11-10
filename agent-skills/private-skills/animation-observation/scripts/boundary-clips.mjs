@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * Prints the close-up clips and shot stills a refine pass would send for a
- * draft motion spec. `argon.mjs --clips-from <spec>` computes the same list
- * itself; this script is for checking what will be sent.
+ * Prints the close-up clips and shot stills `argon.mjs --clips-from` would
+ * send for a motion spec or a producer `storyboard.json`. `argon.mjs
+ * --dry-run` prints the same plan for a full command line.
  *
- * Usage: node boundary-clips.mjs <motion-spec.md> [--pad 30] [--frames 2357]
+ * Usage: node boundary-clips.mjs <motion-spec.md|storyboard.json> [--pad 30] --frames <n>
  */
 import { parseArgs } from "node:util";
-import { buildBoundaryClips, buildShotStills, readStoryboard } from "./lib/specEvents.mjs";
+import { buildBoundaryClips, buildShotStills, readShots } from "./lib/specEvents.mjs";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -22,12 +22,12 @@ if (!specPath) {
   process.exit(2);
 }
 
-const storyboard = await readStoryboard(specPath);
-const numFrames = Number(values.frames ?? storyboard.total_frames ?? storyboard.shots.at(-1).to);
-const clips = buildBoundaryClips(storyboard.shots, Number(values.pad), numFrames);
+const shots = await readShots(specPath);
+const numFrames = Number(values.frames ?? shots.at(-1).to);
+const clips = buildBoundaryClips(shots, Number(values.pad), numFrames);
 for (const [startFrame, endFrame] of clips) console.log(`clip f${startFrame}-f${endFrame}`);
-for (const { shotId, frame } of buildShotStills(storyboard.shots)) {
+for (const { shotId, frame } of buildShotStills(shots)) {
   console.log(`still ${shotId} f${frame}`);
 }
 const numClipFrames = clips.reduce((sum, [start, end]) => sum + end - start, 0);
-console.error(`${clips.length} clips, ${numClipFrames} frames; ${storyboard.shots.length} stills`);
+console.error(`${clips.length} clips, ${numClipFrames} frames; ${shots.length} stills`);

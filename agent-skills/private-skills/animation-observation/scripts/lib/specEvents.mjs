@@ -1,7 +1,8 @@
 /**
- * Reads a motion spec's storyboard script and lists the frames a refine pass
- * should look at closely: windows around every shot boundary and transition,
- * and one representative still per shot.
+ * Reads shot timing from a motion spec's storyboard script or from a
+ * producer `storyboard.json`, and lists the frames worth a close look:
+ * windows around every shot boundary and transition, and one
+ * representative still per shot.
  */
 import { readFile } from "node:fs/promises";
 import { requireFromProducer } from "./videoTools.mjs";
@@ -23,6 +24,32 @@ export async function readStoryboard(specPath) {
     .find((doc) => doc?.shots);
   if (!storyboard) throw new Error(`No \`\`\`yaml storyboard with \`shots\` in ${specPath}`);
   return storyboard;
+}
+
+/**
+ * Converts a producer storyboard plan to the spec's shot shape. A plan's
+ * transition occupies the first `transitionInFrames` of the incoming shot.
+ */
+function readShotsFromPlan(plan) {
+  let startFrame = 0;
+  return plan.shots.map((shot, index) => {
+    const shotEntry = { id: shot.id, from: startFrame, to: startFrame + shot.durationInFrames };
+    startFrame = shotEntry.to;
+    const nextShot = plan.shots[index + 1];
+    const transitionFrames = nextShot?.transitionInFrames ?? 0;
+    if (nextShot && transitionFrames > 0) {
+      shotEntry.transition_out = { from: shotEntry.to, to: shotEntry.to + transitionFrames };
+    }
+    return shotEntry;
+  });
+}
+
+/** Reads shots from a `.json` producer plan or a Markdown motion spec. */
+export async function readShots(filePath) {
+  if (filePath.endsWith(".json")) {
+    return readShotsFromPlan(JSON.parse(await readFile(filePath, "utf8")));
+  }
+  return (await readStoryboard(filePath)).shots;
 }
 
 /** Collects [startFrame, endFrame] windows around boundaries and transitions. */
