@@ -235,3 +235,72 @@ test("captioned plans reject a canvas that cannot retain 640px of scene content"
   plan.narration![0].text = "A short cue fits.";
   assert.equal(storyboardSchema.safeParse(plan).success, true);
 });
+
+test("a shot theme overrides plan tokens with colours or other token references", () => {
+  const plan = fixture();
+  plan.theme = { ground: "#0d0e11", brand: "#1563fe" };
+  plan.shots[1].theme = { ground: "var(--brand)", foreground: "#0d0e11" };
+  const parsed = storyboardSchema.parse(plan);
+  assert.deepEqual(parsed.shots[1].theme, {
+    ground: "var(--brand)",
+    foreground: "#0d0e11",
+  });
+  assert.equal(parsed.shots[0].theme, undefined);
+});
+
+test("a shot theme rejects unknown tokens, self references and raw CSS", () => {
+  for (const theme of [
+    { accent: "#ffffff" },
+    { ground: "var(--ground)" },
+    { ground: "var(--unknown)" },
+    { ground: "red; background: url(x)" },
+  ]) {
+    const plan = fixture();
+    plan.shots[1].theme = theme as StoryboardInput["shots"][number]["theme"];
+    assert.equal(
+      storyboardSchema.safeParse(plan).success,
+      false,
+      JSON.stringify(theme),
+    );
+  }
+});
+
+test("a stepped column wipe validates on an incoming shot with transition frames", () => {
+  const plan = fixture();
+  plan.shots[1].transitionInFrames = 8;
+  plan.shots[1].transition = {
+    kind: "stepped-column-wipe",
+    columns: 8,
+    staggerFrames: 0.5,
+    from: "bottom",
+    order: "left-to-right",
+    outgoing: "playing",
+    outgoingDrift: { x: -0.06, blur: 12 },
+  };
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
+test("a shot transition is rejected on a hard cut, the first shot, or when columns cannot finish", () => {
+  const changes: Array<(plan: StoryboardInput) => void> = [
+    (plan) => {
+      plan.shots[1].transitionInFrames = 0;
+      plan.shots[1].transition = { kind: "stepped-column-wipe" };
+    },
+    (plan) => {
+      plan.shots[0].transition = { kind: "dissolve" };
+    },
+    (plan) => {
+      plan.shots[1].transitionInFrames = 4;
+      plan.shots[1].transition = {
+        kind: "stepped-column-wipe",
+        columns: 12,
+        staggerFrames: 1,
+      };
+    },
+  ];
+  for (const change of changes) {
+    const plan = fixture();
+    change(plan);
+    assert.equal(storyboardSchema.safeParse(plan).success, false);
+  }
+});

@@ -4,6 +4,8 @@ import { captionBand } from "../../scenes/layout/layout";
 import { getCueWindowFromShot } from "./getCueWindowFromShot";
 import { assetPathSchema, frame, id, positiveFrames, text } from "./primitives";
 import { shotSchema } from "./shotSchema";
+import { themeSchema } from "./themeSchema";
+import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../StoryFilm/steppedColumnWipe";
 
 const cueSchema = z
   .object({
@@ -16,34 +18,6 @@ const cueSchema = z
     audio: assetPathSchema.optional(),
   })
   .strict();
-const theme = z
-  .object(
-    Object.fromEntries(
-      [
-        "background",
-        "foreground",
-        "card",
-        "muted",
-        "muted-foreground",
-        "border",
-        "brand",
-        "brand-soft",
-        "brand-strong",
-        "ground",
-      ].map((name) => [
-        name,
-        z
-          .string()
-          .max(100)
-          .regex(
-            /^(#[0-9a-fA-F]{3,8}|(?:rgb|rgba|hsl|hsla|oklch|oklab)\([\d.,%\s/+-]+\))$/,
-          )
-          .optional(),
-      ]),
-    ),
-  )
-  .strict();
-
 /** A single source for film order, graphics, narration text, and cue timing. */
 export const storyboardSchema = z
   .object({
@@ -62,7 +36,7 @@ export const storyboardSchema = z
         height: z.number().int().min(240).max(2160),
       })
       .strict(),
-    theme: theme.optional(),
+    theme: themeSchema.optional(),
     shots: z.array(shotSchema).min(1).max(100),
     narration: z.array(cueSchema).default([]),
     captions: z.boolean().default(true),
@@ -138,6 +112,7 @@ export const storyboardSchema = z
       offset += shot.durationInFrames;
       if (shot.transitionInFrames >= shot.durationInFrames)
         issue(`${shot.id}: transition must be shorter than the shot`);
+      _checkShotTransition(shot, shot === plan.shots[0]).forEach(issue);
       if (shot.scene === "continuity") {
         const stageHeight =
           plan.height -
@@ -288,3 +263,31 @@ export const storyboardSchema = z
 
 export type Storyboard = z.infer<typeof storyboardSchema>;
 export type Shot = Storyboard["shots"][number];
+
+/** Explains why a shot's transition object cannot render as authored. */
+function _checkShotTransition(
+  shot: z.infer<typeof shotSchema>,
+  isFirstShot: boolean,
+): string[] {
+  const { transition } = shot;
+  if (!transition) {
+    return [];
+  }
+  if (isFirstShot) {
+    return [`${shot.id}: the first shot has nothing to transition from`];
+  }
+  if (shot.transitionInFrames === 0) {
+    return [`${shot.id}: a transition needs transitionInFrames above 0`];
+  }
+  if (transition.kind === "stepped-column-wipe") {
+    const columns = transition.columns ?? STEPPED_COLUMN_WIPE_DEFAULTS.columns;
+    const stagger =
+      transition.staggerFrames ?? STEPPED_COLUMN_WIPE_DEFAULTS.staggerFrames;
+    if (stagger * (columns - 1) >= shot.transitionInFrames) {
+      return [
+        `${shot.id}: the last wipe column starts after the transition ends; lower columns or staggerFrames`,
+      ];
+    }
+  }
+  return [];
+}

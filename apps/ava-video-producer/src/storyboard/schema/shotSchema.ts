@@ -14,6 +14,8 @@ import {
   text,
   unit,
 } from "./primitives";
+import { shotTransitionSchema } from "./shotTransitionSchema";
+import { shotThemeSchema } from "./themeSchema";
 
 const heading = {
   title: text.max(100).optional(),
@@ -114,6 +116,8 @@ const shotBase = {
   id,
   durationInFrames: positiveFrames.max(2700),
   transitionInFrames: frame.max(60).default(18),
+  transition: shotTransitionSchema.optional(),
+  theme: shotThemeSchema.optional(),
   note: text.optional(),
 };
 

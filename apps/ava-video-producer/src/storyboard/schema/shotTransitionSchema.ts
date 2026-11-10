@@ -1,0 +1,47 @@
+import { z } from "zod";
+
+/**
+ * What the outgoing shot does while a transition covers it: `frozen` holds
+ * its last frame, `playing` keeps advancing it past its own end so live
+ * footage or typing does not stop under the transition.
+ */
+const outgoingSchema = z.enum(["frozen", "playing"]);
+
+/**
+ * How one shot replaces the previous one, lasting the shot's
+ * `transitionInFrames`. Omit it for the default dissolve (or a hard cut when
+ * `transitionInFrames` is 0), so plans written before transition kinds
+ * existed render unchanged.
+ *
+ * `stepped-column-wipe` covers the outgoing shot with vertical columns of the
+ * incoming shot that rise (or drop) one after another, for example to echo a
+ * striped brand mark between two acts.
+ */
+export const shotTransitionSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("dissolve"),
+      outgoing: outgoingSchema.optional(),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("stepped-column-wipe"),
+      columns: z.number().int().min(2).max(24).optional(),
+      staggerFrames: z.number().min(0).max(6).optional(),
+      from: z.enum(["bottom", "top"]).optional(),
+      order: z.enum(["left-to-right", "right-to-left"]).optional(),
+      outgoing: outgoingSchema.optional(),
+      outgoingDrift: z
+        .object({
+          x: z.number().min(-0.5).max(0.5),
+          blur: z.number().min(0).max(60).optional(),
+        })
+        .strict()
+        .optional(),
+    })
+    .strict(),
+]);
+
+/** A validated shot transition. */
+export type ShotTransition = z.infer<typeof shotTransitionSchema>;
