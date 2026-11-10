@@ -3,10 +3,22 @@ import { isChatMentionType } from "$/agent/mentions/ChatMentionToken";
 import { isGadgetRef } from "$/models/gadgets/Gadget/Gadget";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 
-type ChatTrayIdentity = { workspaceId: string; userId: string };
+type ChatTrayIdentity = {
+  workspaceId: string;
+  userId: string;
+  sessionId?: string;
+};
 
 function _hasIdentity(options: Readonly<ChatTrayIdentity>): boolean {
   return options.workspaceId.length > 0 && options.userId.length > 0;
+}
+
+function _storageKey(options: Readonly<ChatTrayIdentity>): string {
+  const { workspaceId, userId, sessionId } = options;
+  if (!sessionId) {
+    return `ava.chat.context.${workspaceId}.${userId}`;
+  }
+  return `ava.chat.tray.${workspaceId}.${userId}.${sessionId}`;
 }
 
 function _isTrayRef(value: unknown): value is Gadget.Ref {
@@ -34,15 +46,14 @@ function _refsFromStored(raw: string | null): Gadget.Ref[] {
 }
 
 /**
- * Persists the chat's context tray per workspace and user in localStorage,
- * beside the thread `ChatThreadStore` keeps. Stores refs only, never names.
- * Reading drops anything that is not a chat mention ref and keeps at most
- * five.
+ * Persists the chat's context tray per workspace, user, and optional
+ * session in localStorage, beside the thread `ChatThreadStore` keeps.
+ * Stores refs only, never names. Reading drops anything that is not a
+ * chat mention ref and keeps at most five. A call with no session id
+ * uses the workspace-and-user key.
  */
 export const ChatContextTrayStore = {
-  storageKey: (options: Readonly<ChatTrayIdentity>): string => {
-    return `ava.chat.context.${options.workspaceId}.${options.userId}`;
-  },
+  storageKey: _storageKey,
 
   read: (options: Readonly<ChatTrayIdentity>): Gadget.Ref[] => {
     if (!_hasIdentity(options)) {
@@ -57,19 +68,30 @@ export const ChatContextTrayStore = {
     }
   },
 
+  /**
+   * Reads the workspace-and-user tray, ignoring any session id. Callers
+   * use it to load the slot `read` uses when no session is given.
+   */
+  readLegacy: (options: Readonly<ChatTrayIdentity>): Gadget.Ref[] => {
+    const { workspaceId, userId } = options;
+    return ChatContextTrayStore.read({ workspaceId, userId });
+  },
+
   write: (
     options: Readonly<ChatTrayIdentity & { refs: readonly Gadget.Ref[] }>,
-  ): void => {
+  ): boolean => {
     if (!_hasIdentity(options)) {
-      return;
+      return false;
     }
     try {
       window.localStorage.setItem(
         ChatContextTrayStore.storageKey(options),
         JSON.stringify({ refs: options.refs.map(_toPlainRef) }),
       );
+      return true;
     } catch {
       // Private browsing or quota exceeded: in memory only for this session.
+      return false;
     }
   },
 
@@ -82,5 +104,14 @@ export const ChatContextTrayStore = {
     } catch {
       // Storage unavailable: nothing to clear.
     }
+  },
+
+  /**
+   * Clears the workspace-and-user tray, ignoring any session id. Callers
+   * use it to discard the slot `clear` uses when no session is given.
+   */
+  clearLegacy: (options: Readonly<ChatTrayIdentity>): void => {
+    const { workspaceId, userId } = options;
+    ChatContextTrayStore.clear({ workspaceId, userId });
   },
 };

@@ -14,6 +14,7 @@ function _buildDatasetRef(index: number): Gadget.Ref {
 }
 
 const DATASET_REF = _buildDatasetRef(1);
+const MAP_REF = _buildDatasetRef(2);
 const CASE_REF: Gadget.Ref = {
   gadgetType: "individual",
   gadgetId: "00000000-0000-4000-8000-0000000000aa",
@@ -97,5 +98,37 @@ describe("ChatContextTrayStore", () => {
     expect(ChatContextTrayStore.read({ workspaceId: "", userId: "u" })).toEqual(
       [],
     );
+  });
+
+  it("keeps two sessions' trays apart", () => {
+    ChatContextTrayStore.write({
+      ...IDENTITY,
+      sessionId: "session-a",
+      refs: [DATASET_REF],
+    });
+    ChatContextTrayStore.write({
+      ...IDENTITY,
+      sessionId: "session-b",
+      refs: [MAP_REF],
+    });
+    expect(
+      ChatContextTrayStore.read({ ...IDENTITY, sessionId: "session-a" }),
+    ).toEqual([DATASET_REF]);
+    expect(
+      ChatContextTrayStore.storageKey({
+        ...IDENTITY,
+        sessionId: "session-a",
+      }),
+    ).toBe(
+      `ava.chat.tray.${IDENTITY.workspaceId}.${IDENTITY.userId}.session-a`,
+    );
+  });
+
+  it("reads the tray key this browser used before sessions existed", () => {
+    window.localStorage.setItem(
+      `ava.chat.context.${IDENTITY.workspaceId}.${IDENTITY.userId}`,
+      JSON.stringify({ refs: [DATASET_REF] }),
+    );
+    expect(ChatContextTrayStore.readLegacy(IDENTITY)).toEqual([DATASET_REF]);
   });
 });
