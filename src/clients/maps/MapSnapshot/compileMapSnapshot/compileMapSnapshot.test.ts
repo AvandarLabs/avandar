@@ -450,6 +450,7 @@ function _getSaltedPosition(
       layerId: options.layerId,
       longitude: SCHOOL_POSITION[0],
       latitude: SCHOOL_POSITION[1],
+      radiusMeters: JITTER.radiusMeters,
     }),
   });
   return [displaced.longitude, displaced.latitude];

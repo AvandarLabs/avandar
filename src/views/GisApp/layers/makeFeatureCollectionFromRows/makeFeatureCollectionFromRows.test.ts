@@ -251,6 +251,7 @@ describe("makeFeatureCollectionFromRows", () => {
         layerId: "layer-1",
         longitude: 15.27,
         latitude: -4.44,
+        radiusMeters: 500,
       }),
     });
     const unsalted = jitterCoordinate({
@@ -262,6 +263,7 @@ describe("makeFeatureCollectionFromRows", () => {
         layerId: "layer-1",
         longitude: 15.27,
         latitude: -4.44,
+        radiusMeters: 500,
       }),
     });
 
@@ -276,6 +278,34 @@ describe("makeFeatureCollectionFromRows", () => {
     expect(makeJitteredPosition("another-map-salt")).not.toEqual(
       makeJitteredPosition(MAP_SALT),
     );
+  });
+
+  it("moves the same point in an unrelated direction at another radius", () => {
+    const point = { lat: -4.44, lon: 15.27 };
+    const makeOffset = (radiusMeters: number): [number, number] => {
+      const result = makeFeatureCollectionFromRows({
+        rows: [point],
+        binding,
+        propertyColumnNames: "all",
+        sensitivity: { mode: "jitter", radiusMeters },
+        layerId: "layer-1",
+        jitterSalt: MAP_SALT,
+      });
+      const [longitude = 0, latitude = 0] = (
+        result.featureCollection.features[0]?.geometry as GeoJSON.Point
+      ).coordinates;
+      return [longitude - point.lon, latitude - point.lat];
+    };
+
+    const [smallX, smallY] = makeOffset(500);
+    const [largeX, largeY] = makeOffset(1000);
+
+    // Offsets along one shared bearing would let a reader who saw both
+    // publishes solve for the exact point, so their cross product must not
+    // vanish.
+    const crossProduct = smallX * largeY - smallY * largeX;
+    const scale = Math.hypot(smallX, smallY) * Math.hypot(largeX, largeY);
+    expect(Math.abs(crossProduct) / scale).toBeGreaterThan(1e-3);
   });
 
   it("displaces the same real point identically whatever its row order", () => {

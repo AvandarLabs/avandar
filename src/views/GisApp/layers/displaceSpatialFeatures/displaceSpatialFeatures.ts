@@ -28,7 +28,12 @@ function _jitterPosition(
     latitude,
     radiusMeters: options.radiusMeters,
     salt: options.salt,
-    seed: buildJitterSeed({ layerId: options.layerId, longitude, latitude }),
+    seed: buildJitterSeed({
+      layerId: options.layerId,
+      radiusMeters: options.radiusMeters,
+      longitude,
+      latitude,
+    }),
   });
   return [displaced.longitude, displaced.latitude];
 }
@@ -98,10 +103,10 @@ function _isUndisplaceable(
  * map, its popups, or the map tools that read the same features.
  *
  * Each point moves exactly as a lat/lng row at the same coordinates does: the
- * same `jitterCoordinate` keyed by the map's secret salt, seeded by the layer
- * and the point's own original coordinates (`buildJitterSeed`). Each member
- * of a multipoint is seeded by its own coordinates, so members at different
- * places move independently.
+ * same `jitterCoordinate` keyed by the map's secret salt, seeded by the
+ * layer, the radius, and the point's own original coordinates
+ * (`buildJitterSeed`). Each member of a multipoint is seeded by its own
+ * coordinates, so members at different places move independently.
  *
  * Aggregated bindings (boundary joins, point aggregation, grid bins) are
  * returned unchanged: they draw areas and counts, never individual points.

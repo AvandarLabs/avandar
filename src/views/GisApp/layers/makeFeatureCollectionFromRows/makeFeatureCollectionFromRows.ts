@@ -129,7 +129,12 @@ function _placeCoordinate({
         latitude,
         radiusMeters: policy.radiusMeters,
         salt: jitterSalt,
-        seed: buildJitterSeed({ layerId, longitude, latitude }),
+        seed: buildJitterSeed({
+          layerId,
+          radiusMeters: policy.radiusMeters,
+          longitude,
+          latitude,
+        }),
       });
     })
     .with({ mode: "aggregateOnly" }, () => {

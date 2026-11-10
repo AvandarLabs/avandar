@@ -4,9 +4,9 @@ const METERS_PER_DEGREE_LATITUDE = 111_320;
 
 /**
  * Derives a stable 32-bit value from a point's identity, keyed by the map's
- * secret salt. Keying it means a reader who knows the public seed (layer id
- * and original coordinates) still cannot recompute the offset, so the exact
- * location cannot be recovered by subtracting it.
+ * secret salt. Keying it means a reader who knows the public seed (layer id,
+ * radius, and original coordinates) still cannot recompute the offset, so
+ * the exact location cannot be recovered by subtracting it.
  */
 function _buildKeyedSeedHash(salt: string, seed: string): number {
   const digest = buildHmacSha256({ key: salt, message: seed });
@@ -48,7 +48,7 @@ function _clampLatitude(latitude: number): number {
  * @param params.salt The map's secret jitter salt. It must never be
  * published alongside displaced points.
  * @param params.seed Stable per-point identity from `buildJitterSeed`: the
- * layer id and the point's original coordinates.
+ * layer id, the radius, and the point's original coordinates.
  * @returns The displaced coordinate, unchanged when `radiusMeters` is zero.
  */
 export function jitterCoordinate({

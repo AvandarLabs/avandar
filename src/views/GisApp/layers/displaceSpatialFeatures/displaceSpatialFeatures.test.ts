@@ -118,6 +118,7 @@ describe("displaceSpatialFeatures", () => {
         layerId: jitterLayer.id,
         longitude: goma[0] ?? 0,
         latitude: goma[1] ?? 0,
+        radiusMeters: RADIUS_METERS,
       }),
     });
     expect(_getPointPositions(displaced)[1]).toEqual([
@@ -188,6 +189,7 @@ describe("displaceSpatialFeatures", () => {
           layerId: jitterLayer.id,
           longitude: source[0] ?? 0,
           latitude: source[1] ?? 0,
+          radiusMeters: RADIUS_METERS,
         }),
       });
       expect(positions[index]).not.toEqual([
