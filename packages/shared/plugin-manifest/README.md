@@ -28,7 +28,7 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 | `readPluginDirectory` | Function | node | Reads and validates one plugin folder |
 | `readBundledPlugins` | Function | node | Reads and validates every plugin folder listed in `plugins/bundled.yaml` |
 | `readBundledPluginFolders` | Function | node | Gets the folder names listed in `plugins/bundled.yaml` |
-| `emitPluginAiToolsFile` | Function | node | Makes the text of `pluginAiTools.gen.ts`: the data-agent tools every bundled plugin declares. Run it with `pnpm vite-script packages/shared/plugin-manifest/src/node/emitPluginAiTools.ts` |
+| `emitPluginAiToolsFile` | Function | node | Makes the text of `pluginAiTools.gen.ts`: the data-agent tools every bundled plugin declares. Run it with `pnpm vite-script packages/shared/plugin-manifest/src/node/emitPluginAiTools.main.ts` |
 | `assertUniquePluginAiToolNames` | Function | node | Throws when two plugins declare a data-agent tool with the same name, naming both plugins |
 | `PluginManifest` | Type | main, runtime | A manifest that passed the schema, with omitted lists defaulted to empty |
 | `PluginCommand` | Type | main, runtime | A command declared under `contributes.commands` |
