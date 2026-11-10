@@ -140,3 +140,12 @@ test("a stepped reveal clips the window to rising columns, then lets go", () => 
   assert.deepEqual(getWindowRevealStyle(14, 10, reveal), {});
   assert.deepEqual(getWindowRevealStyle(10, 10, undefined), {});
 });
+
+test("an in-out pull-back starts gently and passes the halfway box at its midpoint", () => {
+  const word = { kind: "pull-back" as const, atFrame: 0, durationInFrames: 10 };
+  const inOut = { ...word, ease: "inOut" as const };
+  const early = getPullBack(1, inOut, canvas, box);
+  assert.ok(early.tilt < getPullBack(1, word, canvas, box).tilt);
+  assert.ok(Math.abs(getPullBack(5, inOut, canvas, box).tilt - 0.5) < 0.01);
+  assert.equal(getPullBack(10, inOut, canvas, box).tilt, 1);
+});

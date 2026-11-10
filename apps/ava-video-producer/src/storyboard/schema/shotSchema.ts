@@ -294,6 +294,7 @@ const tiltedWindow = z.strictObject({
         kind: z.literal("pull-back"),
         atFrame: frame,
         durationInFrames: positiveFrames.max(60).optional(),
+        ease: z.enum(["word", "inOut"]).optional(),
       }),
     ])
     .optional(),

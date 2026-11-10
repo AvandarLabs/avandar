@@ -172,6 +172,12 @@ export type PullBack = {
   kind: "pull-back";
   atFrame: number;
   durationInFrames?: number;
+  /**
+   * `word` (default) lands fast and settles; `inOut` starts gently, which
+   * keeps a bright full-bleed still from dimming the frame in one step when
+   * it shrinks onto a dark field.
+   */
+  ease?: "word" | "inOut";
 };
 
 /**
@@ -188,7 +194,7 @@ export function getPullBack(
     frame,
     enter.atFrame,
     enter.durationInFrames ?? DUR.hero,
-    EASE.word,
+    EASE[enter.ease ?? "word"],
   );
   return {
     rect: {
