@@ -45,6 +45,16 @@ describe("ChatSessionIndex", () => {
     expect(visibleOpenIds(index)).toHaveLength(VISIBLE_OPEN_SESSIONS);
   });
 
+  it("keeps visible order when a non-front session is selected", () => {
+    let index = createChatSessionIndex({ id: "a", kind: "data" });
+    for (const id of ["b", "c", "d"]) {
+      index = addChatSession(index, { id, kind: "data" });
+    }
+    const selected = selectChatSession(index, "c");
+    expect(selected.selectedId).toBe("c");
+    expect(selected.openIds).toEqual(["d", "c", "b", "a"]);
+  });
+
   it("does not select an archived session", () => {
     const started = createChatSessionIndex({ id: "a", kind: "data" });
     const added = addChatSession(started, { id: "b", kind: "data" });

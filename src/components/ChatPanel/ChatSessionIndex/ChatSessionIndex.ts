@@ -77,13 +77,20 @@ export function addChatSession(
   };
 }
 
-/** Moves an open session to the front. An archived id is left alone. */
+/**
+ * Selects an open session. An overflow id is moved to the front. An archived
+ * id is left alone.
+ */
 export function selectChatSession(
   index: ChatSessionIndex,
   sessionId: string,
 ): ChatSessionIndex {
-  if (!index.openIds.includes(sessionId)) {
+  const openPosition = index.openIds.indexOf(sessionId);
+  if (openPosition < 0) {
     return index;
+  }
+  if (openPosition < VISIBLE_OPEN_SESSIONS) {
+    return { ...index, selectedId: sessionId };
   }
   return {
     ...index,
@@ -169,7 +176,7 @@ export function reopenChatSession(
       archivedIds: index.archivedIds.filter((id) => {
         return id !== sessionId;
       }),
-      openIds: [...index.openIds, sessionId],
+      openIds: [sessionId, ...index.openIds],
     },
     sessionId,
   );
