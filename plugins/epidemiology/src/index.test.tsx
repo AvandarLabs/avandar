@@ -3,7 +3,7 @@ import { MantineProvider } from "@mantine/core";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
-import { runFitRegression } from "./fitRegression/runFitRegression";
+import { runFitRegressionTool } from "./fitRegression/runFitRegression";
 import plugin from "./index";
 import { RatePlot } from "./ratePlot/RatePlot/RatePlot";
 import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
@@ -81,6 +81,6 @@ describe("the epidemiology plugin", () => {
   });
 
   it("offers the fitRegression AI tool with its handler", () => {
-    expect(plugin.aiTools.fitRegression).toBe(runFitRegression);
+    expect(plugin.aiTools.fitRegression).toBe(runFitRegressionTool);
   });
 });

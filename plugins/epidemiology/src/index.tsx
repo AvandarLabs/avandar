@@ -1,6 +1,6 @@
 import { definePlugin } from "@avandar/plugin-sdk";
 import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
-import { runFitRegression } from "./fitRegression/runFitRegression";
+import { runFitRegressionTool } from "./fitRegression/runFitRegression";
 import { IncidenceModal } from "./incidence/IncidenceModal/IncidenceModal";
 import { RatePlot } from "./ratePlot/RatePlot/RatePlot";
 import { RegressionModal } from "./RegressionModal/RegressionModal";
@@ -34,5 +34,5 @@ export default definePlugin({
     epicurve: { transform: makeEpicurveFromRows },
     "rate-plot": { Component: RatePlot },
   },
-  aiTools: { fitRegression: runFitRegression },
+  aiTools: { fitRegression: runFitRegressionTool },
 });

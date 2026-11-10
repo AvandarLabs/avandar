@@ -1,6 +1,6 @@
 import { PluginError } from "@avandar/plugin-sdk";
 import { describe, expect, it, vi } from "vitest";
-import { runFitRegression } from "./runFitRegression";
+import { runFitRegression, runFitRegressionTool } from "./runFitRegression";
 import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
 
 type Row = Readonly<Record<string, unknown>>;
@@ -58,9 +58,9 @@ const READY = _makeAvandarWithRows({
   columnNames: ["x", "y"],
 });
 
-async function _getRejection(promise: Promise<unknown>): Promise<unknown> {
+async function _getRejection(outcome: unknown): Promise<unknown> {
   try {
-    await promise;
+    await outcome;
   } catch (error) {
     return error;
   }
@@ -155,5 +155,47 @@ describe("runFitRegression", () => {
     expect((error as PluginError).message).toBe(
       "Not enough numeric rows to fit a line.",
     );
+  });
+
+  it("does not look up a non-string column through String(value)", async () => {
+    const avandar = _makeAvandarWithRows({
+      rows: [
+        { "1": 1, y: 2 },
+        { "1": 2, y: 4 },
+      ],
+      columnNames: ["1", "y"],
+    });
+    const error = await _getRejection(
+      runFitRegressionTool(avandar, { xColumn: 1, yColumn: "y" }),
+    );
+    expect(error).toBeInstanceOf(PluginError);
+    expect((error as PluginError).code).toBe("InvalidToolInput");
+    expect((error as PluginError).message).toBe(
+      'Column "xColumn" is not on the result.',
+    );
+    expect((error as PluginError).message).not.toContain('"1"');
+    expect(avandar.data.fetchRows).not.toHaveBeenCalled();
+  });
+
+  it("rejects a missing column argument without calling the handler", async () => {
+    const avandar = _makeAvandarWithRows({
+      rows: EXACT_LINE_ROWS,
+      columnNames: ["x", "y"],
+    });
+    const error = await _getRejection(
+      runFitRegressionTool(avandar, { xColumn: "x" }),
+    );
+    expect((error as PluginError).message).toBe(
+      'Column "yColumn" is not on the result.',
+    );
+    expect(avandar.data.fetchRows).not.toHaveBeenCalled();
+  });
+
+  it("runs the fit when both arguments are strings", async () => {
+    const result = await runFitRegressionTool(READY, {
+      xColumn: "x",
+      yColumn: "y",
+    });
+    expect(result.n).toBe(5);
   });
 });
