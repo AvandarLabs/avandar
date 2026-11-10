@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { getActivePluginAiToolsFromInstallations } from "$/agent/dataAgent/getActivePluginAiToolsFromInstallations.ts";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types.ts";
 

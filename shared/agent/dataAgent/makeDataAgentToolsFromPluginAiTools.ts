@@ -8,7 +8,6 @@ import {
   type Optional,
   type Schema,
 } from "@earendil-works/pi-schema";
-
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types.ts";
 
 type PluginAiToolProperty =

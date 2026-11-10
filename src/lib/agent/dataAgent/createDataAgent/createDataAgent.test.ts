@@ -1,20 +1,20 @@
 import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
 import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import { createLocalModel } from "@/lib/agent/localModels/createLocalModelStreamFn/createLocalModelStreamFn";
-import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
 import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { runPluginAiTool as runPluginAiToolOnScreen } from "@/lib/plugins/runPluginAiTool/runPluginAiTool";
 import { runFitRegression } from "../../../../../plugins/epidemiology/src/fitRegression/runFitRegression";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
 import type { StreamFn } from "@earendil-works/pi-agent-core";
 import type {
   AssistantMessage,
   JsonObject,
   StopReason,
 } from "@earendil-works/pi-ai";
-import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
 
 const MODEL = createLocalModel({ id: "test", name: "test", contextWindow: 8 });
 
@@ -140,10 +140,7 @@ function _createAssistantMessage(
   };
 }
 
-function toolCallMessage(
-  name: string,
-  args: JsonObject,
-): AssistantMessage {
+function toolCallMessage(name: string, args: JsonObject): AssistantMessage {
   return _createAssistantMessage(
     [{ type: "toolCall", id: "call-1", name, arguments: args }],
     "toolUse",

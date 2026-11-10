@@ -12,10 +12,7 @@ const CONVERSATION_ROLES = new Set(["user", "assistant", "toolResult"]);
 
 type ClientMessage = { role?: unknown; content?: unknown; toolName?: unknown };
 
-function _assertKnownTool(
-  name: unknown,
-  toolNames: ReadonlySet<string>,
-): void {
+function _assertKnownTool(name: unknown, toolNames: ReadonlySet<string>): void {
   if (typeof name !== "string" || !toolNames.has(name)) {
     throw new AvaHTTPError(
       `The data agent has no tool "${String(name)}"`,

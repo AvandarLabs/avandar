@@ -121,9 +121,7 @@ function _makeAiTool(
   };
 }
 
-function _makeManifestWithAiTools(
-  aiTools: unknown[],
-): Record<string, unknown> {
+function _makeManifestWithAiTools(aiTools: unknown[]): Record<string, unknown> {
   const manifest = _makeValidManifest();
   manifest.contributes = {
     ...(manifest.contributes as object),
@@ -643,32 +641,56 @@ describe("PluginManifestSchema contributes.aiTools", () => {
   });
 
   it.each([
-    ["a dotted name", () => {return _getIssuesForAiTool({ name: "fit.regression" })}],
+    [
+      "a dotted name",
+      () => {
+        return _getIssuesForAiTool({ name: "fit.regression" });
+      },
+    ],
     [
       "a duplicate name",
-      () => {return _getIssuesForAiToolNames(["fitRegression", "fitRegression"])},
+      () => {
+        return _getIssuesForAiToolNames(["fitRegression", "fitRegression"]);
+      },
     ],
-    ["an object property", () => {return _getIssuesForAiToolProperty({ type: "object" })}],
-    ["an array property", () => {return _getIssuesForAiToolProperty({ type: "array" })}],
+    [
+      "an object property",
+      () => {
+        return _getIssuesForAiToolProperty({ type: "object" });
+      },
+    ],
+    [
+      "an array property",
+      () => {
+        return _getIssuesForAiToolProperty({ type: "array" });
+      },
+    ],
     [
       "a 601-character description",
-      () => {return _getIssuesForAiTool({ description: "a".repeat(601) })},
+      () => {
+        return _getIssuesForAiTool({ description: "a".repeat(601) });
+      },
     ],
     [
       "a 201-character parameter description",
-      () =>
-        {return _getIssuesForAiToolProperty({
+      () => {
+        return _getIssuesForAiToolProperty({
           type: "string",
           description: "a".repeat(201),
-        })},
+        });
+      },
     ],
     [
       "a required entry that is not a property name",
-      () => {return _getIssuesForAiToolProperty({ type: "string" }, ["yColumn"])},
+      () => {
+        return _getIssuesForAiToolProperty({ type: "string" }, ["yColumn"]);
+      },
     ],
     [
       "an enum whose values do not match the property type",
-      () => {return _getIssuesForAiToolProperty({ type: "string", enum: [1, 2] })},
+      () => {
+        return _getIssuesForAiToolProperty({ type: "string", enum: [1, 2] });
+      },
     ],
   ])("rejects an ai tool with %s", (_label, getIssuesFromCase) => {
     // Anchored to the aiTools path so an unrelated issue cannot satisfy it.

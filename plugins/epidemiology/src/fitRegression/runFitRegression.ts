@@ -37,10 +37,7 @@ function _assertColumnsAreValid(
     }
   }
   if (args.xColumn === args.yColumn) {
-    throw new PluginError(
-      "InvalidToolInput",
-      "X and Y are the same column.",
-    );
+    throw new PluginError("InvalidToolInput", "X and Y are the same column.");
   }
 }
 
