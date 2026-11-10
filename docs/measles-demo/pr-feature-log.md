@@ -83,6 +83,7 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F33 | Filter a map layer by another layer, and the feature list: map config version 7 | not started | F31 | |
 | F34 | Feature list in the export PDF: map config version 8 | not started | F33 | |
 | F35 | Map block on dashboards, with privacy-filtered map snapshots for public publishes | not started | F31, F33, F34 | |
+| F36 | Hide the Get started checklist while a drawer is open | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -123,6 +124,7 @@ API. It's new work, not something this branch built.
 | after F31 | F33 | Map config version 7 migrates from version 6, which F31 introduces. Its e2e spec needs the catalog browser (F19) and Parquet copies (F25). |
 | after F33 | F34 | Map config version 8 migrates from version 7, and the PDF list runs F33's feature list query and cell formatting. Its e2e spec imports a CSV, so it needs no catalog. |
 | after F34 | F35 | Its "Add to dashboard" lives in F34's export sheet footer, and its snapshots bake F31's threshold colors and run F33's spatial filter query. It adds two schema migrations and its e2e spec imports a CSV, so it needs no catalog. |
+| any | F36 | Self-contained fix to the onboarding checklist and the theme, both already on `develop`. The bug (the checklist covering a right-side drawer's footer) is on `develop` too, so it can merge first. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -2487,6 +2489,40 @@ pnpm test:e2e dashboard-map-block.spec.ts
 
 ---
 
+## F36: Hide the Get started checklist while a drawer is open
+
+Status: not started. Built on `fix/measles-followups`, branched from
+`demo/measles`.
+
+**PR title:** `fix(nux): hide the Get started checklist while a drawer is open`
+
+**Depends on:** none.
+
+The Get started checklist sits above modals on purpose, so tour text stays
+readable. That also put it above every Mantine `Drawer`, and in the bottom
+right corner it covered the footer of right-side drawers: the map Export
+sheet's "Download PDF" and "Add to dashboard", the plugin drawer, the
+workspace user permissions drawer, and the data catalog filters drawer. The
+checklist and its collapsed "Get started" button now hide while any drawer is
+open and come back when it closes.
+
+| Commit | Subject | What to take |
+|---|---|---|
+| `64291f509` | fix(nux): hide the Get started checklist while a drawer is open | All of it. |
+
+**Files:**
+- `src/config/Theme/Theme.ts`: gives every Drawer root a marker class at
+  theme level, so drawers that pass their own `classNames` keep theirs.
+- `src/components/Nux/NuxChecklistPanel/*`: a shared `createDialogPresence`
+  factory (the modal detection, lifted unchanged) and a drawer presence store
+  built on it. The checklist panel and dock button hide while a drawer is open.
+- `docs/app-shell-nomenclature.md`: the checklist entries describe the new
+  behavior.
+
+**Verification:** `pnpm vitest run src/components/Nux src/config/Theme`,
+`pnpm test:e2e nux-first-milestone.spec.ts`, and opening the map Export sheet
+with the checklist showing: its footer buttons must be clickable.
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -2657,6 +2693,17 @@ F26's (merged in `d0af42ce6`) under F26, and F29's and F30's (from
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
+
+From `fix/measles-followups`:
+- `423d01075` types F25's `READY_ANSWER` test fixture so `pnpm type-check:deno`
+  passes. It touches only
+  `supabase/functions/open-data/requestParquetCache/requestParquetCache.test.ts`
+  and goes with F25.
+- `665aebff0` updates `tests/e2e/gis-places.spec.ts` and
+  `tests/e2e/gis-map-layers.spec.ts` for `4de947922` (editing a layer from the
+  layers panel), which opens a new layer's settings page and shows Latitude
+  and Longitude as selects. Port it with whichever PR carries `4de947922`.
+- `64291f509` is F36.
 
 Commits that only update this log are branch-only and are not listed.
 

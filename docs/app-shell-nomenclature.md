@@ -50,7 +50,7 @@ Not part of the shell, but frequently confused with it:
 | **Drawer** | Mantine's slide-over panel, anchored to a viewport edge over everything. |
 | **`CanvasDrawer`** | A general-purpose in-flow drawer that splits a vertical region with the sibling above it, which it measures through a ref. It knows nothing about the shell and does not dock under the slate: Data Explorer passes it the chart region, GIS passes it the map surface. Its "canvas" is that view-local surface, not the slate. |
 | **Modal** | A centered dialog over a blurred backdrop. |
-| **NUX checklist** | The "Get started" card docked bottom-right, above modals by design so tour copy stays readable. |
+| **NUX checklist** | The "Get started" card docked bottom-right, above modals by design so tour copy stays readable. It hides while any `Drawer` is open, because drawers dock to the same viewport edge and it would cover their footer actions. |
 
 ### Why "slate" and not "canvas"
 
@@ -101,7 +101,7 @@ Every z-index in the app comes from a named tier in
 | `APP_CHROME_Z_INDEX` | 250 | Floating toolbars, the mobile sidebar, the chat composer overlay (and the composer aside at 251). |
 | `FLOATING_PANEL_Z_INDEX` | 300 | Floating surfaces that must clear app chrome. |
 | `MODAL_ROOT_Z_INDEX` | 400 | Modals, and the onboarding tour overlay at the same level. |
-| `NUX_CHECKLIST_Z_INDEX` | 401 | The "Get started" card, above the tour overlay. |
+| `NUX_CHECKLIST_Z_INDEX` | 401 | The "Get started" card, above the tour overlay. Hidden while a `Drawer` is open, since it outranks drawers. |
 | `MODAL_ABOVE_NUX_TOUR_Z_INDEX` | 403 | Modals that interrupt the tour and must clear its tooltip. |
 | `POPOVER_Z_INDEX` | 500 | Menus, popovers, comboboxes, tooltips. Above modals so a select inside a modal still opens on top. |
 | `NOTIFICATIONS_Z_INDEX` | 10000 | Toasts. |
