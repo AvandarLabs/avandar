@@ -2,7 +2,7 @@
 
 **Author:** Juan Pablo Sarmiento (pablo@avandarlabs.com)
 **Date:** 2026-11-09
-**Status:** Awaiting review
+**Status:** Design approved
 **Parent:** `docs/superpowers/specs/2026-11-06-plugin-ecosystem-design.md`
 (Milestone 1, slice 1c)
 **Builds on:** `docs/superpowers/specs/2026-11-06-plugins-1a-core-commands-design.md`,
