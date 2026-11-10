@@ -390,6 +390,8 @@ msgstr "Reorder {statusName}"
 msgid "This chart needs the {pluginId} plugin, which is not available."
 msgstr "This chart needs the {pluginId} plugin, which is not available."
 
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -1760,10 +1762,6 @@ msgid "That archive only contains another archive. Paste a link to the file "
 msgstr "That archive only contains another archive. Paste a link to the file "
 "itself."
 
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "{featureCount} points"
-#~ msgstr "{featureCount} points"
-
 #: src/components/ChatPanel/ChatAsideToggle/ChatAsideToggle.tsx
 msgid "Close chat (⌘/)"
 msgstr "Close chat (⌘/)"
@@ -2067,6 +2065,10 @@ msgstr "Link address"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Symbol"
 msgstr "Symbol"
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Chats"
+msgstr "Chats"
 
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
@@ -2454,6 +2456,10 @@ msgstr "Colors for {statusName}"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "Everyone in {app} will lose access."
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Closed chats"
+msgstr "Closed chats"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -2959,10 +2965,6 @@ msgid "A local record of every time you approved (or cancelled) sending data to 
 msgstr "A local record of every time you approved (or cancelled) sending data "
 "to an AI provider in this workspace. Last 90 days, stored on this "
 "device only."
-
-#: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
-#~ msgid "1 point"
-#~ msgstr "1 point"
 
 #. placeholder {0}: recordCounts[status.id] ?? 0
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
@@ -4716,11 +4718,6 @@ msgid "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 msgstr "WHERE clause uses \"{operator}\" on \"{columnName}\" with a non-literal "
 "list."
 
-#: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
-#~ msgid "Distance (meters)"
-#~ msgstr "Distance (meters)"
-
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Preparing offline models"
 msgstr "Preparing offline models"
@@ -4890,6 +4887,10 @@ msgstr "Chat is enabled in Data Explorer and Dashboards"
 #: src/routes/signin.tsx
 msgid "Forgot your password?"
 msgstr "Forgot your password?"
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Reopen chat"
+msgstr "Reopen chat"
 
 #. placeholder {0}: pageIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
@@ -5177,6 +5178,10 @@ msgstr "Nested subquery in FROM could not be re-serialised; mapping kept as a "
 msgid "1,000"
 msgstr "1,000"
 
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "More chats"
+msgstr "More chats"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Expected geometry"
 msgstr "Expected geometry"
@@ -5230,6 +5235,8 @@ msgid "Exact locations"
 msgstr "Exact locations"
 
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "New chat"
 msgstr "New chat"
 
@@ -7102,10 +7109,6 @@ msgstr "Cluster radius"
 msgid "No saved datasets found."
 msgstr "No saved datasets found."
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-#~ msgid "Expand the inspector"
-#~ msgstr "Expand the inspector"
-
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/index.tsx
@@ -7272,12 +7275,6 @@ msgid "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
 msgstr "We detected both potential personal information and language that may "
 "bias the AI's answer. Review both below."
-
-#: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
-#~ msgid "Buffer needs a layer with compiled geometry, not latitude and longitude "
-#~ "columns."
-#~ msgstr "Buffer needs a layer with compiled geometry, not latitude and longitude "
-#~ "columns."
 
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Viewing only on this screen size."
@@ -7665,10 +7662,6 @@ msgstr "Filter"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
-
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName} within {distanceText} of {sourceLayerName}"
-#~ msgstr "{countText} {layerName} within {distanceText} of {sourceLayerName}"
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
@@ -8223,6 +8216,10 @@ msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
 msgstr "The database user should ideally have read-only access to the table or "
 "view you plan to import."
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Close chat"
+msgstr "Close chat"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The latitude must be between -90 and 90."
@@ -9278,10 +9275,6 @@ msgstr "{0} and its layers will be removed. This cannot be undone."
 msgid "... and {remainingCount} more"
 msgstr "... and {remainingCount} more"
 
-#: src/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel.tsx
-#~ msgid "Collapse the inspector"
-#~ msgstr "Collapse the inspector"
-
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 msgid "Just what's queried"
 msgstr "Just what's queried"
@@ -9779,10 +9772,6 @@ msgstr "Could not delete the place."
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Switch Workspace"
 msgstr "Switch Workspace"
-
-#: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
-#~ msgid "{countText} {layerName}"
-#~ msgstr "{countText} {layerName}"
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
@@ -11462,6 +11451,10 @@ msgstr "Case type deleted"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING uses operator \"{operator}\" which the form does not support."
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Delete chat"
+msgstr "Delete chat"
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 msgid "Search failed. Try again."
