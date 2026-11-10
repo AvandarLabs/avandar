@@ -221,6 +221,8 @@ vi.mock("@/components/AppShell/AppShell", async () => {
     await import("@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager");
   const { useChatSessions } =
     await import("@/components/ChatPanel/ChatSessionProvider/useChatSessions");
+  const { NewCaseTypeButton } =
+    await import("@/views/OntologyDesignerApp/NewCaseTypeButton");
 
   function ChatPanelStandIn(): React.ReactNode {
     const { runtime, startNewChat } = useAvandarChatRuntime();
@@ -232,6 +234,7 @@ vi.mock("@/components/AppShell/AppShell", async () => {
     return (
       <AssistantRuntimeProvider runtime={runtime}>
         <ChatViewTranscriptSync />
+        <NewCaseTypeButton />
       </AssistantRuntimeProvider>
     );
   }

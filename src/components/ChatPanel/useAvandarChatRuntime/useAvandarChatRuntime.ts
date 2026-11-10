@@ -52,6 +52,19 @@ type LoadSessionStateOptions = {
   pathname: string;
 };
 
+type ActiveSessionSnapshot = {
+  sessionId: string | undefined;
+  contextTray: SessionStatePersistenceOptions["contextTray"];
+  pendingClarification: StoredChatThread["pendingClarification"];
+  pendingCaseTypeDraft: StoredChatThread["pendingCaseTypeDraft"];
+};
+
+function _makeSessionSnapshot(
+  options: Readonly<ActiveSessionSnapshot>,
+): ActiveSessionSnapshot {
+  return { ...options };
+}
+
 function _persistSessionState(
   options: Readonly<SessionStatePersistenceOptions>,
 ): void {
@@ -173,6 +186,14 @@ export function useAvandarChatRuntime(): {
   const pendingCaseTypeDraftRef = useRef(pendingCaseTypeDraft);
   const sessionKindRef = useRef<ChatSessionKind>("data");
   const activeSessionIdRef = useRef<string>();
+  const activeSessionSnapshotRef = useRef<ActiveSessionSnapshot>(
+    _makeSessionSnapshot({
+      sessionId: undefined,
+      contextTray,
+      pendingClarification,
+      pendingCaseTypeDraft,
+    }),
+  );
   const skipNextTrayPersistRef = useRef(false);
   const workspaceIdRef = useRef(workspace.id);
   const workspaceRef = useRef(workspace);
@@ -229,9 +250,18 @@ export function useAvandarChatRuntime(): {
       dashboardEditorStateRef.current = dashboardEditorState;
       parseSqlRef.current = parseSql;
       userRef.current = user;
-      contextTrayRef.current = contextTray;
-      pendingClarificationRef.current = pendingClarification;
-      pendingCaseTypeDraftRef.current = pendingCaseTypeDraft;
+      const activeSessionId = activeSessionIdRef.current;
+      if (activeSessionId === sessions?.index.selectedId) {
+        contextTrayRef.current = contextTray;
+        pendingClarificationRef.current = pendingClarification;
+        pendingCaseTypeDraftRef.current = pendingCaseTypeDraft;
+        activeSessionSnapshotRef.current = _makeSessionSnapshot({
+          sessionId: activeSessionId,
+          contextTray,
+          pendingClarification,
+          pendingCaseTypeDraft,
+        });
+      }
       sessionKindRef.current =
         sessions?.index.sessions[sessions.index.selectedId]?.kind ?? "data";
       workspaceIdRef.current = workspace.id;
@@ -316,6 +346,30 @@ export function useAvandarChatRuntime(): {
   // in the browser and routes each turn through the adapter's `run` function.
   const runtime = useLocalRuntime(adapter, { initialMessages });
 
+  const persistActiveSession = useCallback(
+    (sessionId: string) => {
+      if (!user || !workspace.id) {
+        return;
+      }
+      const snapshot = activeSessionSnapshotRef.current;
+      _persistSessionState({
+        workspaceId: workspace.id,
+        userId: user.id,
+        sessionId,
+        messages: runtime.thread
+          .getState()
+          .messages.map(makeLikeFromThreadMessage),
+        pendingClarification: snapshot.pendingClarification,
+        pendingCaseTypeDraft: snapshot.pendingCaseTypeDraft,
+        contextTray: snapshot.contextTray,
+      });
+      chatGenerationRef.current += 1;
+      lastTurnRef.current = undefined;
+      runtime.thread.cancelRun();
+    },
+    [runtime, user, workspace.id],
+  );
+
   useEffect(
     function loadSelectedSession() {
       const selectedId = sessions?.index.selectedId;
@@ -327,20 +381,7 @@ export function useAvandarChatRuntime(): {
         return;
       }
       if (previousId) {
-        _persistSessionState({
-          workspaceId: workspace.id,
-          userId: user.id,
-          sessionId: previousId,
-          messages: runtime.thread
-            .getState()
-            .messages.map(makeLikeFromThreadMessage),
-          pendingClarification,
-          pendingCaseTypeDraft,
-          contextTray,
-        });
-        chatGenerationRef.current += 1;
-        lastTurnRef.current = undefined;
-        runtime.thread.cancelRun();
+        persistActiveSession(previousId);
       }
       const loaded = _loadSessionState({
         index: sessions.index,
@@ -351,6 +392,15 @@ export function useAvandarChatRuntime(): {
         pathname: pathnameRef.current,
       });
       activeSessionIdRef.current = selectedId;
+      activeSessionSnapshotRef.current = _makeSessionSnapshot({
+        sessionId: selectedId,
+        contextTray: loaded.contextTray,
+        pendingClarification: loaded.pendingClarification,
+        pendingCaseTypeDraft: loaded.pendingCaseTypeDraft,
+      });
+      contextTrayRef.current = loaded.contextTray;
+      pendingClarificationRef.current = loaded.pendingClarification;
+      pendingCaseTypeDraftRef.current = loaded.pendingCaseTypeDraft;
       sessionKindRef.current = loaded.sessionKind;
       skipNextTrayPersistRef.current = true;
       chatPanelDispatch.setContextTray(loaded.contextTray);
@@ -360,9 +410,7 @@ export function useAvandarChatRuntime(): {
     },
     [
       chatPanelDispatch,
-      contextTray,
-      pendingCaseTypeDraft,
-      pendingClarification,
+      persistActiveSession,
       runtime,
       sessions,
       user,
