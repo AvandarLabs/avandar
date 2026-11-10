@@ -2,11 +2,15 @@ import { useLocalRuntime } from "@assistant-ui/react";
 import { useLingui } from "@lingui/react/macro";
 import { useRouterState } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { buildChatSessionTitleExcerpt } from "$/agent/chatTitle/buildChatSessionTitleExcerpt";
+import { APIClient } from "@/clients/APIClient";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatContextTrayStore } from "@/components/ChatPanel/ChatContextTrayStore/ChatContextTrayStore";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
+import { requestChatSessionTitle } from "@/components/ChatPanel/ChatSessionTitle/requestChatSessionTitle";
 import { ChatThreadStore } from "@/components/ChatPanel/ChatThreadStore/ChatThreadStore";
+import { OfflineAnswerMessage } from "@/components/ChatPanel/OfflineAnswerMessage/OfflineAnswerMessage";
 import { createChatModelAdapter } from "@/components/ChatPanel/useAvandarChatRuntime/createChatModelAdapter/createChatModelAdapter";
 import { shouldPersistThreadOnRunEnd } from "@/components/ChatPanel/useAvandarChatRuntime/shouldPersistThreadOnRunEnd/shouldPersistThreadOnRunEnd";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
@@ -14,6 +18,7 @@ import { makeNewChatThreadMessagesFromPageContext } from "@/components/ChatPanel
 import { makeLikeFromThreadMessage } from "@/components/ChatPanel/useChatViewTranscript/threadMessageHelpers";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
@@ -58,6 +63,60 @@ type ActiveSessionSnapshot = {
   pendingClarification: StoredChatThread["pendingClarification"];
   pendingCaseTypeDraft: StoredChatThread["pendingCaseTypeDraft"];
 };
+
+type RequestStoredSessionTitleOptions = {
+  messages: readonly ThreadMessageLike[];
+  mask: ((text: string) => string) | undefined;
+  sessionId: string;
+  workspaceId: string;
+  sessions: ReturnType<typeof useChatSessions>;
+  locale: string;
+  placeholders: Readonly<Record<ChatSessionKind, string>>;
+};
+
+function _requestStoredSessionTitle(
+  options: Readonly<RequestStoredSessionTitleOptions>,
+): void {
+  const sessions = options.sessions;
+  if (!sessions) {
+    return;
+  }
+  const session = sessions.index.sessions[options.sessionId];
+  const assistant = [...options.messages].reverse().find((message) => {
+    return message.role === "assistant";
+  });
+  if (!session?.titleIsPlaceholder || !assistant) {
+    return;
+  }
+  const isOffline = OfflineAnswerMessage.isOfflineAnswer(assistant.metadata);
+  if (!isOffline && !options.mask) {
+    return;
+  }
+  const placeholder = options.placeholders[session.kind];
+  const excerpt = buildChatSessionTitleExcerpt({
+    messages: options.messages,
+    mask:
+      options.mask ??
+      ((text) => {
+        return text;
+      }),
+    offlineAnswerText: OfflineAnswerMessage.hostedContent,
+  });
+  void requestChatSessionTitle({
+    sessionId: options.sessionId,
+    kind: session.kind,
+    workspaceId: options.workspaceId,
+    excerpt,
+    locale: options.locale,
+    placeholder,
+    isOffline,
+    post: APIClient.post,
+    completeOffline: OfflineChatEngineStore.complete,
+    setSessionTitle: sessions.setSessionTitle,
+  }).catch(() => {
+    return undefined;
+  });
+}
 
 function _makeSessionSnapshot(
   options: Readonly<ActiveSessionSnapshot>,
@@ -170,7 +229,7 @@ export function useAvandarChatRuntime(): {
     ChatPanelStateManager.useState();
   const sessions = useChatSessions();
   const { parseSql } = useSqlToStructuredQuery();
-  const { t } = useLingui();
+  const { i18n, t } = useLingui();
   // Refs keep the adapter instance stable while still reading fresh values
   // inside `run()`. Including `pageContext` or `parseSql` in the adapter
   // useMemo deps recreates the adapter whenever SQL or dataset metadata
@@ -184,7 +243,18 @@ export function useAvandarChatRuntime(): {
   const contextTrayRef = useRef(contextTray);
   const pendingClarificationRef = useRef(pendingClarification);
   const pendingCaseTypeDraftRef = useRef(pendingCaseTypeDraft);
+  const sessionsRef = useRef(sessions);
   const sessionKindRef = useRef<ChatSessionKind>("data");
+  const titleMaskRef = useRef<((text: string) => string) | undefined>(
+    undefined,
+  );
+  const titleRequestCopyRef = useRef({
+    locale: i18n.locale,
+    placeholders: {
+      data: t`New chat`,
+      "case-design": t`New case type`,
+    },
+  });
   const activeSessionIdRef = useRef<string>();
   const activeSessionSnapshotRef = useRef<ActiveSessionSnapshot>(
     _makeSessionSnapshot({
@@ -250,6 +320,7 @@ export function useAvandarChatRuntime(): {
       dashboardEditorStateRef.current = dashboardEditorState;
       parseSqlRef.current = parseSql;
       userRef.current = user;
+      sessionsRef.current = sessions;
       const activeSessionId = activeSessionIdRef.current;
       if (activeSessionId === sessions?.index.selectedId) {
         contextTrayRef.current = contextTray;
@@ -266,6 +337,13 @@ export function useAvandarChatRuntime(): {
         sessions?.index.sessions[sessions.index.selectedId]?.kind ?? "data";
       workspaceIdRef.current = workspace.id;
       workspaceRef.current = workspace;
+      titleRequestCopyRef.current = {
+        locale: i18n.locale,
+        placeholders: {
+          data: t`New chat`,
+          "case-design": t`New case type`,
+        },
+      };
       copyRef.current = {
         messageNotSent: t`(Message not sent.)`,
         offlineModelRequired: t`Offline mode needs the offline models. Download them from the Offline button under the message box, or turn offline mode off.`,
@@ -295,6 +373,7 @@ export function useAvandarChatRuntime(): {
     [
       contextTray,
       dashboardEditorState,
+      i18n.locale,
       pageContext,
       pathname,
       pendingCaseTypeDraft,
@@ -338,6 +417,7 @@ export function useAvandarChatRuntime(): {
       chatPanelDispatch,
       contextTrayRef,
       sessionKindRef,
+      titleMaskRef,
     });
     // `createAppStateManager` dispatch fns are stable; refs cover the rest.
   }, [dataExplorerDispatch, dashboardEditorDispatch, chatPanelDispatch]);
@@ -464,14 +544,25 @@ export function useAvandarChatRuntime(): {
           const workspaceId = workspaceIdRef.current;
           const sessionId = activeSessionIdRef.current;
           if (currentUser && workspaceId && sessionId) {
-            ChatThreadStore.writeRecord({
+            const messages = state.messages.map(makeLikeFromThreadMessage);
+            const didWrite = ChatThreadStore.writeRecord({
               workspaceId,
               userId: currentUser.id,
               sessionId,
-              messages: state.messages.map(makeLikeFromThreadMessage),
+              messages,
               pendingClarification: pendingClarificationRef.current,
               pendingCaseTypeDraft: pendingCaseTypeDraftRef.current,
             });
+            if (didWrite) {
+              _requestStoredSessionTitle({
+                messages,
+                mask: titleMaskRef.current,
+                sessionId,
+                workspaceId,
+                sessions: sessionsRef.current,
+                ...titleRequestCopyRef.current,
+              });
+            }
           }
         }
         wasRunning = isRunning;

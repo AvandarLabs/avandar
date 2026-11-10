@@ -362,6 +362,23 @@ describe("createChatModelAdapter with the agent on", () => {
     expect(JSON.stringify(turn.apiMessages)).not.toContain(CASE_INDIVIDUAL_ID);
   });
 
+  it("gives the agent a cleared title mask ref for each turn", async () => {
+    const titleMaskRef: {
+      current: ((text: string) => string) | undefined;
+    } = {
+      current: (text) => {
+        return text;
+      },
+    };
+
+    await _ask(_createAdapter("dashboards", { titleMaskRef }));
+
+    expect(runDataAgentTurnMock.mock.calls[0]![0].titleMaskRef).toBe(
+      titleMaskRef,
+    );
+    expect(titleMaskRef.current).toBeUndefined();
+  });
+
   it("passes the page state to the agent", async () => {
     await _ask(
       _createAdapter("dashboards", {

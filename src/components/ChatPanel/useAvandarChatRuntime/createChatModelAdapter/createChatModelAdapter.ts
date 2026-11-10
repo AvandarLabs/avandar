@@ -257,6 +257,8 @@ export type CreateChatModelAdapterOptions = {
   contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
   /** The selected session's reply path, read when a turn starts. */
   sessionKindRef: MutableRefObject<ChatSessionKind>;
+  /** The hosted agent turn's mask, retained until its reply is persisted. */
+  titleMaskRef?: MutableRefObject<((text: string) => string) | undefined>;
 };
 
 /**
@@ -380,9 +382,13 @@ export function createChatModelAdapter(
     chatPanelDispatch,
     contextTrayRef,
     sessionKindRef,
+    titleMaskRef,
   } = options;
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
+      if (titleMaskRef) {
+        titleMaskRef.current = undefined;
+      }
       const generation = chatGenerationRef.current;
       const isGenerationStale = (): boolean => {
         return chatGenerationRef.current !== generation;
@@ -565,6 +571,7 @@ export function createChatModelAdapter(
         workspaceId,
         currentUser,
         chatGeneration: generation,
+        titleMaskRef,
         parseSqlRef,
         dataExplorerDispatch,
         chatPanelDispatch,
