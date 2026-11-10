@@ -1,5 +1,5 @@
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
-import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
+import { BAD_REQUEST, FORBIDDEN } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import { z } from "zod";
@@ -22,7 +22,7 @@ export const PostChatTitle = POST({
     locale: z.string().min(1).max(35),
     placeholder: z.string().min(1).max(80),
   })
-  .action(async ({ pathParams, body }) => {
+  .action(async ({ pathParams, body, supabaseClient, user }) => {
     if (!isChatTitlePromptId(pathParams.promptId)) {
       throw new AvaHTTPError(
         `Unknown title prompt "${pathParams.promptId}". Reload the page.`,
@@ -31,6 +31,19 @@ export const PostChatTitle = POST({
     }
     if (!openRouterApiKey) {
       throw new Error("OPEN_ROUTER_API_KEY environment variable is not set");
+    }
+    const { data: membership } = await supabaseClient
+      .from("workspace_memberships")
+      .select("workspace_id")
+      .eq("workspace_id", pathParams.workspaceId)
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .throwOnError();
+    if (!membership) {
+      throw new AvaHTTPError(
+        "You are not a member of this workspace",
+        FORBIDDEN,
+      );
     }
     const { text } = await sendOpenRouterRequest({
       requestBody: {
