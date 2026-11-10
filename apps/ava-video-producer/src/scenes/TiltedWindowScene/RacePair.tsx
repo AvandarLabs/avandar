@@ -53,7 +53,7 @@ export function RacePair(props: Props) {
           const sign = side === 0 ? 1 : -1;
           const base =
             exit && frame >= exit.atFrame
-              ? getWhipExit(frame, exit.atFrame, box)
+              ? getWhipExit(frame, exit.atFrame, box, exit.durationInFrames)
               : entrance?.kind === "whip"
                 ? getWhipEntrance(
                     frame,
@@ -72,12 +72,12 @@ export function RacePair(props: Props) {
                       entrance.durationInFrames,
                     )
                   : {
-                    translateX: 0,
-                    translateZ: 0,
-                    rotateY: 0,
-                    opacity: 1,
-                    blurX: 0,
-                  };
+                      translateX: 0,
+                      translateZ: 0,
+                      rotateY: 0,
+                      opacity: 1,
+                      blurX: 0,
+                    };
           return (
             <WindowCard
               key={`${side}-${column.label}`}

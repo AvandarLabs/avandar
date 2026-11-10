@@ -12,7 +12,7 @@ import {
   getWhipExit,
   getWindowCamera,
 } from "./windowMotion";
-import { WINDOW_TILT } from "./windowTilt";
+import { WINDOW_BOXES, WINDOW_TILT } from "./windowTilt";
 
 const canvas = { width: 1920, height: 1080 };
 const box = { x: 678, y: 188, width: 1158, height: 724 };
@@ -34,6 +34,30 @@ test("a whip exit accelerates past the left edge with growing blur", () => {
   assert.ok(late.translateX - early.translateX < early.translateX);
   assert.ok(late.blurX > early.blurX);
   assert.ok(box.x + box.width + getWhipExit(108, 100, box).translateX <= 0);
+});
+
+test("a whip exit with a longer duration is still on screen when the default would be gone", () => {
+  const offscreen = (frame: number, durationInFrames?: number) =>
+    box.x +
+      box.width +
+      getWhipExit(frame, 100, box, durationInFrames).translateX <=
+    0;
+  assert.equal(offscreen(108), true);
+  assert.equal(offscreen(108, 12), false);
+  assert.equal(offscreen(112, 12), true);
+  assert.ok(
+    getWhipExit(105, 100, box, 12).translateX >
+      getWhipExit(105, 100, box).translateX,
+  );
+});
+
+test("the tall window box is taller than the default box and stays on the canvas", () => {
+  assert.ok(WINDOW_BOXES.tall.height > WINDOW_BOXES.default.height);
+  assert.ok(WINDOW_BOXES.tall.y < WINDOW_BOXES.default.y);
+  for (const windowBox of Object.values(WINDOW_BOXES)) {
+    assert.ok(windowBox.x + windowBox.width <= 1);
+    assert.ok(windowBox.y + windowBox.height <= 1);
+  }
 });
 
 test("the carousel slides the next window in on top and swaps a cut window at once", () => {

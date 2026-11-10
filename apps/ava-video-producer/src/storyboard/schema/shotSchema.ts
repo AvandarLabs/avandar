@@ -27,6 +27,18 @@ const heading = {
   title: text.max(100).optional(),
   kicker: text.max(160).optional(),
 };
+/** A heading whose title and kicker can wipe in instead of rising. Only
+ *  scenes that draw their heading through `SceneShell` take it. */
+const headingWithReveal = {
+  ...heading,
+  headingReveal: z
+    .strictObject({
+      mode: z.enum(["rise", "wipe"]),
+      atFrame: frame.optional(),
+      staggerFrames: z.number().int().min(0).max(30).optional(),
+    })
+    .optional(),
+};
 const edgeSchema = z.strictObject({
   id,
   from: id,
@@ -46,7 +58,7 @@ const edgeSchema = z.strictObject({
     .optional(),
 });
 const graph = z.strictObject({
-  ...heading,
+  ...headingWithReveal,
   nodes: z
     .array(
       z.strictObject({
@@ -85,7 +97,7 @@ const flowchart = z
   .strict();
 const metric = z
   .object({
-    ...heading,
+    ...headingWithReveal,
     label,
     value: z.number().finite(),
     from: z.number().finite().optional(),
@@ -97,7 +109,7 @@ const metric = z
   })
   .strict();
 const typography = z.strictObject({
-  ...heading,
+  ...headingWithReveal,
   lines: z.array(text.max(120)).min(1).max(6),
   emphasis: z.array(text.max(60)).max(12).optional(),
   align: z.enum(["left", "center"]).optional(),
@@ -148,7 +160,7 @@ const media = z
   })
   .strict();
 const barComparison = z.strictObject({
-  ...heading,
+  ...headingWithReveal,
   panels: z
     .array(
       z.strictObject({
@@ -298,8 +310,13 @@ const tiltedWindow = z.strictObject({
       }),
     ])
     .optional(),
+  windowBox: z.enum(["default", "tall"]).optional(),
   exit: z
-    .strictObject({ kind: z.literal("whip-left"), atFrame: frame })
+    .strictObject({
+      kind: z.literal("whip-left"),
+      atFrame: frame,
+      durationInFrames: positiveFrames.max(30).optional(),
+    })
     .optional(),
   camera: z
     .array(

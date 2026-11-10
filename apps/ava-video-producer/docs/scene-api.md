@@ -44,6 +44,7 @@ then remains fixed throughout the animation.
 | `width`, `height` | `number` | Canvas pixels. Layouts target 1600 × 1000 and 1920 × 1080; dimensions below 960 × 640 are rejected |
 | `title` | `string?` | Heading above the content, fitted at a fixed 32–48 px size; MediaScene uses a compact 28–36 px title and 18–24 px kicker |
 | `kicker` | `string?` | Supporting heading copy, revealed after the title |
+| `headingReveal` | `{mode: "rise"\|"wipe", atFrame?: 0, staggerFrames?: 9}?` | `graph`, `metric`, `typography` and `bar-comparison` only. `rise` (the default) lifts the title in at `atFrame` and the kicker `staggerFrames` later; `wipe` reveals each left to right behind a clip over `DUR.panel`, clipped to the text's own width |
 
 Keep heading copy short. Font fitting is a conservative character-width estimate,
 not a browser font-measurement service. Text that cannot fit at a readable size
@@ -156,7 +157,7 @@ shot duration for all words to reveal and then hold.
 A headline column on the left and stills or footage in a 3D tilted window on
 the right. The plane and boxes are tokens in
 [windowTilt.ts](../src/scenes/TiltedWindowScene/windowTilt.ts): window box
-`x 35.3%, y 17.4%, w 60.3%, h 67%`, `perspective(1400px) rotateY(-13deg)
+`x 32.1%, y 20.3%, w 60.6%, h 62%` before the tilt (drawn on about `x 35.1%, y 16.7%, w 60.5%, h 68.2%`), `perspective(1400px) rotateY(-13deg)
 rotateX(3deg) rotateZ(-1deg)`, 10 px radius, 3.5% titlebar, and a shadow from
 the `shadow` token (else a mix of `--background`). Only stills and footage go
 in the window, never live product UI.
@@ -168,7 +169,8 @@ in the window, never live product UI.
 | `windows` | `WindowSource & {atFrame?, swap?: "slide"\|"cut"}`[1..12] | The first window has no `atFrame`. Each later one replaces the current one at `atFrame`: `slide` (default) comes in on top from the right with blur while the old one slides left, recedes and fades; `cut` swaps at once |
 | `WindowSource` | `{kind: "image"\|"video", src, trimBefore?, fit?: "cover", objectPosition?: {x:.5,y:0}, scrollSteps?: {atFrame, offset}[]}` | Loaded through `MediaPlane`. `scrollSteps` shows a tall still at full width and jumps to each `offset` (fraction of its height) over `DUR.press` |
 | `enter` | `{kind: "whip", atFrame?: 1, durationInFrames?: 13, reveal?: {columns?: 4, durationInFrames}}`, `{kind: "from-sides", atFrame?: 1, durationInFrames?: 9}`, `{kind: "flip-split"\|"none", atFrame?: 1}` or `{kind: "pull-back", atFrame, durationInFrames?: 18, ease?: "word"\|"inOut"}`; `whip` (single) / `flip-split` (pair) | `whip` comes in from beyond the right edge and lands after `durationInFrames`; `reveal` clips the primary window to columns rising from its bottom edge, left to right, for the first `reveal.durationInFrames` of the entrance. `pull-back` holds the window at full canvas with no tilt or chrome until `atFrame`, then lands in its box (`ease: "inOut"` starts gently, so a bright full-bleed still shrinking onto a dark field does not dim the frame in one step past the frame gate). `flip-split` and `from-sides` are pair-only: `from-sides` slides the left window in from beyond the left edge and the right one from beyond the right edge, with horizontal blur |
-| `exit` | `{kind: "whip-left", atFrame}`, none | Windows accelerate off the left edge over `DUR.whip` with growing X blur; the headline fades in place from `atFrame + 1`. End the shot with a hard cut |
+| `exit` | `{kind: "whip-left", atFrame, durationInFrames?: 8}`, none | Windows accelerate off the left edge over `durationInFrames` (`DUR.whip`) with growing X blur; the headline fades in place from `atFrame + 1`. End the shot with a hard cut, or start it on the shot's last frame under a `stepped-column-wipe` with `outgoing: "playing"` and a longer duration so only the window slides away under the columns while the headline stays |
+| `windowBox` | `"default"` or `"tall"`, `"default"` | Single layout: the box the window rests in, from `WINDOW_BOXES` in `windowTilt.ts`. `tall` (`x 33.1%, y 12.6%, w 58.1%, h 75.7%` before the tilt, drawn on about `x 35.8%, y 8.9%, w 58%, h 82.8%`) reaches near the top and bottom edges, for example the window a full-bleed `pull-back` lands in |
 | `camera` | `{at, x, y, zoom: 1–3, ease?: "glide"\|"push"\|"whip"}[2..16]`, none | Window-only camera through `getCameraPose()`: the primary window scales by `zoom` about anchor `(x, y)` (0–1 of the window). Keys strictly increase. The headline never moves |
 | `secondary` | `WindowSource & {box: {x,y,width,height} (canvas fractions), atFrame}`, none | A small window in the same plane that whips in at `atFrame` and leaves with the primary |
 | `pair` | two `{label, window, counter: {from?: 0, to, precision?: 1, unit?, startFrame, endFrame}, stat?}` | Side-by-side windows with mirrored ±8° tilt, labels above, a linear counter below that turns `--brand` at `endFrame`, and a small stat. `badge` labels the right column |

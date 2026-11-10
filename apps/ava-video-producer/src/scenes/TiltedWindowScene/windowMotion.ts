@@ -106,11 +106,18 @@ export function getWindowRevealStyle(
 }
 
 /**
- * A window whipping off past the left edge: it accelerates away, its tilt
- * flattening slightly, with blur growing as it speeds up.
+ * A window whipping off past the left edge: it accelerates away over
+ * `durationInFrames`, its tilt flattening slightly, with blur growing as it
+ * speeds up. A longer exit keeps the window visible longer, for example
+ * when it slides away under a shot transition that covers it.
  */
-export function getWhipExit(frame: number, at: number, box: Rect): WindowPose {
-  const progress = ramp(frame, at, DUR.whip, EASE.in);
+export function getWhipExit(
+  frame: number,
+  at: number,
+  box: Rect,
+  durationInFrames: number = DUR.whip,
+): WindowPose {
+  const progress = ramp(frame, at, durationInFrames, EASE.in);
   return {
     ...RESTING_POSE,
     translateX: mix(progress, 0, -(box.x + box.width * 1.1)),

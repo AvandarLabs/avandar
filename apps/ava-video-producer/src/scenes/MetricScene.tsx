@@ -16,6 +16,7 @@ export function MetricScene({
   height = 1000,
   title,
   kicker,
+  headingReveal,
   label,
   value,
   from = 0,
@@ -46,7 +47,7 @@ export function MetricScene({
     precision,
   );
   return (
-    <SceneShell {...{ frame, width, height, title, kicker }}>
+    <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
       <section
         aria-label={`${label}: ${formatMetric(value, precision)}${unit ? ` ${unit}` : ""}`}
         style={{

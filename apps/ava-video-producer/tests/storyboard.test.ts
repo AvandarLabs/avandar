@@ -446,6 +446,44 @@ test("a tilted window validates a timed whip with a stepped reveal, side entranc
   assert.equal(storyboardSchema.safeParse(sidesOnSingle).success, false);
 });
 
+test("a tilted window validates a timed whip exit and a tall window box", () => {
+  const plan = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: {
+      windows: [screen],
+      windowBox: "tall",
+      enter: { kind: "pull-back", atFrame: 40 },
+      exit: { kind: "whip-left", atFrame: 140, durationInFrames: 12 },
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+  const unknownBox = withShot({
+    id: "metric",
+    scene: "tilted-window",
+    durationInFrames: 150,
+    props: { windows: [screen], windowBox: "wide" as "tall" },
+  });
+  assert.equal(storyboardSchema.safeParse(unknownBox).success, false);
+});
+
+test("a graph heading may wipe in line by line from its own frame", () => {
+  const plan = withShot({
+    id: "metric",
+    scene: "graph",
+    durationInFrames: 150,
+    props: {
+      title: "How the pieces connect",
+      kicker: "An editorial diagram",
+      headingReveal: { mode: "wipe", atFrame: 7, staggerFrames: 8 },
+      nodes: [{ id: "a", label: "A", x: 0.5, y: 0.5 }],
+      edges: [],
+    },
+  });
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
 test("a typography icon may keep its own reveal frame", () => {
   const plan = withShot({
     id: "metric",

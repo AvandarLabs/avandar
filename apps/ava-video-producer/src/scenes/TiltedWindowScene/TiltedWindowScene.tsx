@@ -12,7 +12,7 @@ import {
   getWindowCamera,
   getWindowRevealStyle,
 } from "./windowMotion";
-import { HEADLINE_BOX, WINDOW_BOX, WINDOW_TILT } from "./windowTilt";
+import { HEADLINE_BOX, WINDOW_BOXES, WINDOW_TILT } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { TiltedWindowSceneProps } from "../scenes.types";
 import type { WindowPose } from "./windowMotion";
@@ -58,7 +58,7 @@ function _SingleWindow(
 ) {
   const { frame, width, height, windows = [], exit, camera, secondary } = props;
   const canvas = { width, height };
-  const box = _toPixels(WINDOW_BOX, canvas);
+  const box = _toPixels(WINDOW_BOXES[props.windowBox ?? "default"], canvas);
   const base = _getBasePose(props, box);
   const pullBack =
     props.enter?.kind === "pull-back"
@@ -124,6 +124,7 @@ function _SingleWindow(
                   frame,
                   exit.atFrame,
                   _toPixels(secondary.box, canvas),
+                  exit.durationInFrames,
                 )
               : getWhipEntrance(
                   frame,
@@ -156,7 +157,7 @@ function _getBasePose(
 ): WindowPose {
   const { frame, exit, enter } = props;
   if (exit && frame >= exit.atFrame) {
-    return getWhipExit(frame, exit.atFrame, box);
+    return getWhipExit(frame, exit.atFrame, box, exit.durationInFrames);
   }
   if (enter === undefined || enter.kind === "whip") {
     return getWhipEntrance(

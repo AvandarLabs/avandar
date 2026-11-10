@@ -253,6 +253,11 @@
       "props": {
         "title": "An illustrative architecture",
         "kicker": "Editorial diagram",
+        "headingReveal": {
+          "mode": "wipe",
+          "atFrame": 2,
+          "staggerFrames": 8
+        },
         "nodes": [
           {
             "id": "core",
@@ -418,6 +423,7 @@
             "src": "avandar/screens/explorer-explorer-records.png"
           }
         ],
+        "windowBox": "tall",
         "enter": {
           "kind": "pull-back",
           "atFrame": 40

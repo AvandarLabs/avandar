@@ -1,6 +1,6 @@
 import { TYPE } from "../fonts";
-import { DUR, enter } from "../motion";
 import { assertFinite, fitTextLines } from "./layout/layout";
+import { getHeadingRevealStyles } from "./textReveal";
 import type { SceneBase } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -11,9 +11,15 @@ export function SceneShell({
   height = 1000,
   title,
   kicker,
+  headingReveal,
   children,
 }: SceneBase & { children: ReactNode }) {
   assertFinite(frame, "scene frame");
+  const reveal = getHeadingRevealStyles(frame, headingReveal);
+  // A wipe clips to the text's own width, not to the header's full width.
+  const lineBox: CSSProperties = {
+    display: headingReveal?.mode === "wipe" ? "inline-block" : "block",
+  };
   const titleSize = title
     ? fitTextLines([title], width * 0.88, 74, 48, 32).fontSize
     : 48;
@@ -42,10 +48,9 @@ export function SceneShell({
                 lineHeight: 1.12,
                 letterSpacing: -1.2,
                 fontWeight: 600,
-                ...enter(frame, 0, { y: 10, dur: DUR.sheet }),
               }}
             >
-              {title}
+              <span style={{ ...lineBox, ...reveal.title }}>{title}</span>
             </h1>
           ) : null}
           {kicker ? (
@@ -56,10 +61,9 @@ export function SceneShell({
                 fontSize: 24,
                 lineHeight: 1.35,
                 color: "var(--muted-foreground)",
-                ...enter(frame, DUR.panel, { y: 8 }),
               }}
             >
-              {kicker}
+              <span style={{ ...lineBox, ...reveal.kicker }}>{kicker}</span>
             </p>
           ) : null}
         </header>

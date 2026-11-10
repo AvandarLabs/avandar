@@ -55,6 +55,42 @@ export function getWipeExitStyle(
   return { clipPath: `inset(0 ${_formatPercent(progress)} 0 0)` };
 }
 
+/**
+ * How a scene's title and kicker arrive: `rise` (the default) lifts each in
+ * with a fade, `wipe` reveals each left to right behind a clip, the kicker
+ * `staggerFrames` after the title.
+ */
+export type HeadingReveal = {
+  mode: "rise" | "wipe";
+  /** Frame the title starts. Default 0. */
+  atFrame?: number;
+  /** Frames between the title and the kicker starting. Default `DUR.panel`. */
+  staggerFrames?: number;
+};
+
+/**
+ * The styles of a scene heading's title and kicker at `frame`. With no
+ * reveal they rise in from frame 0, the kicker a panel later, as every
+ * scene heading always has.
+ */
+export function getHeadingRevealStyles(
+  frame: number,
+  reveal: HeadingReveal | undefined,
+): { title: CSSProperties; kicker: CSSProperties } {
+  const titleAt = reveal?.atFrame ?? 0;
+  const kickerAt = titleAt + (reveal?.staggerFrames ?? DUR.panel);
+  if (reveal?.mode === "wipe") {
+    return {
+      title: getLineRevealStyle(frame, titleAt, "wipe"),
+      kicker: getLineRevealStyle(frame, kickerAt, "wipe"),
+    };
+  }
+  return {
+    title: enter(frame, titleAt, { y: 10, dur: DUR.sheet }),
+    kicker: enter(frame, kickerAt, { y: 8 }),
+  };
+}
+
 function _formatPercent(fraction: number): string {
   return `${Number((fraction * 100).toFixed(2))}%`;
 }

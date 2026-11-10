@@ -33,7 +33,15 @@ const ROUGH_EDGE_DEPTH = 10;
  * fictional unless they are sourced.
  */
 export function BarComparisonScene(props: BarComparisonSceneProps) {
-  const { frame, width = 1600, height = 1000, title, kicker, panels } = props;
+  const {
+    frame,
+    width = 1600,
+    height = 1000,
+    title,
+    kicker,
+    headingReveal,
+    panels,
+  } = props;
   if (!panels.length || panels.length > 2) {
     throw new Error("BarComparisonScene needs one or two panels");
   }
@@ -49,7 +57,7 @@ export function BarComparisonScene(props: BarComparisonSceneProps) {
       })
     : undefined;
   return (
-    <SceneShell {...{ frame, width, height, title, kicker }}>
+    <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
       {panels.map((panel, panelIndex) => (
         <_Panel
           key={panelIndex}

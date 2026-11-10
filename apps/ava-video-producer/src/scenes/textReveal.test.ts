@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getHeadingRevealStyles,
   getLineRevealStyle,
   getStagedExitStyle,
   getTypographyRevealFrames,
@@ -28,10 +29,41 @@ test("a line fade with no rise only changes opacity", () => {
 });
 
 test("a wipe starts fully clipped from the right and ends unclipped at rest", () => {
-  assert.equal(getLineRevealStyle(10, 10, "wipe").clipPath, "inset(0 100% 0 0)");
+  assert.equal(
+    getLineRevealStyle(10, 10, "wipe").clipPath,
+    "inset(0 100% 0 0)",
+  );
   const settled = getLineRevealStyle(40, 10, "wipe");
   assert.equal(settled.clipPath, "inset(0 0% 0 0)");
   assert.equal(settled.transform, "translateX(0.00%)");
+});
+
+test("a scene heading rises in by default, the kicker a panel after the title", () => {
+  const styles = getHeadingRevealStyles(0, undefined);
+  assert.equal(styles.title.opacity, 0);
+  assert.equal(getHeadingRevealStyles(40, undefined).title.opacity, 1);
+  assert.equal(getHeadingRevealStyles(8, undefined).kicker.opacity, 0);
+  assert.equal(styles.title.clipPath, undefined);
+});
+
+test("a wiped scene heading reveals the title, then the kicker, left to right", () => {
+  const reveal = { mode: "wipe" as const, atFrame: 7, staggerFrames: 8 };
+  assert.equal(
+    getHeadingRevealStyles(7, reveal).title.clipPath,
+    "inset(0 100% 0 0)",
+  );
+  assert.equal(
+    getHeadingRevealStyles(30, reveal).title.clipPath,
+    "inset(0 0% 0 0)",
+  );
+  assert.equal(
+    getHeadingRevealStyles(15, reveal).kicker.clipPath,
+    "inset(0 100% 0 0)",
+  );
+  assert.equal(
+    getHeadingRevealStyles(40, reveal).kicker.clipPath,
+    "inset(0 0% 0 0)",
+  );
 });
 
 test("a wipe exit retracts from the right until nothing is left", () => {

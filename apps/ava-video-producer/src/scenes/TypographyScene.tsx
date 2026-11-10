@@ -34,6 +34,7 @@ export function TypographyScene(props: TypographySceneProps) {
     height = 1000,
     title,
     kicker,
+    headingReveal,
     lines,
     align = "center",
     revealAtFrame = 6,
@@ -59,7 +60,7 @@ export function TypographyScene(props: TypographySceneProps) {
   );
   const wordStarts = _countWordsBefore(fitted.lines);
   return (
-    <SceneShell {...{ frame, width, height, title, kicker }}>
+    <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
       <div
         aria-label={lines.join(" ")}
         style={{

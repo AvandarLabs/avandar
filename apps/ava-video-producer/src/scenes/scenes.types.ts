@@ -5,7 +5,7 @@ import type {
   MarkFlyThrough,
 } from "./BrandLockupScene/brandLockupMotion";
 import type { GraphPacket } from "./layout/graphLayout";
-import type { StagedExit, TextRevealMode } from "./textReveal";
+import type { HeadingReveal, StagedExit, TextRevealMode } from "./textReveal";
 import type {
   CarouselWindow,
   PullBack,
@@ -13,6 +13,7 @@ import type {
   WindowCameraKey,
   WindowReveal,
 } from "./TiltedWindowScene/windowMotion";
+import type { WindowBoxName } from "./TiltedWindowScene/windowTilt";
 
 /** All times are scene-local frames. Coordinates are normalized unless noted. */
 export type SceneBase = {
@@ -21,6 +22,9 @@ export type SceneBase = {
   height?: number;
   title?: string;
   kicker?: string;
+  /** How the title and kicker arrive. Default: each rises in, the kicker a
+   *  panel after the title. */
+  headingReveal?: HeadingReveal;
 };
 
 export type GraphNode = {
@@ -251,7 +255,12 @@ export type TiltedWindowSceneProps = SceneBase & {
       }
     | { kind: "flip-split" | "none"; atFrame?: number }
     | PullBack;
-  exit?: { kind: "whip-left"; atFrame: number };
+  /** Windows whip off the left edge from `atFrame` over `durationInFrames`
+   *  (default `DUR.whip`). */
+  exit?: { kind: "whip-left"; atFrame: number; durationInFrames?: number };
+  /** Single layout: which window box from `WINDOW_BOXES` the window rests
+   *  in. Default `default`. */
+  windowBox?: WindowBoxName;
   /** A camera on the primary window only; the headline never moves. */
   camera?: WindowCameraKey[];
   /** A small second window in the same plane, such as a desktop app. */

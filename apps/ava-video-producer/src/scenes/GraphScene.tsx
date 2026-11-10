@@ -29,6 +29,7 @@ export function GraphScene({
   height = 1000,
   title,
   kicker,
+  headingReveal,
   nodes,
   edges,
   traversal = [],
@@ -43,7 +44,7 @@ export function GraphScene({
   const indices = new Map(nodes.map((node, index) => [node.id, index]));
   const markerId = `arrow-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   return (
-    <SceneShell {...{ frame, width, height, title, kicker }}>
+    <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
       <svg
         aria-hidden="true"
         width={width}
