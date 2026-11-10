@@ -100,6 +100,17 @@ describe("ChatContextTrayStore", () => {
     );
   });
 
+  it("returns true when an empty workspace id leaves storage unchanged", () => {
+    const didWrite = ChatContextTrayStore.write({
+      workspaceId: "",
+      userId: "user-1",
+      refs: [DATASET_REF],
+    });
+
+    expect(didWrite).toBe(true);
+    expect(window.localStorage.length).toBe(0);
+  });
+
   it("keeps two sessions' trays apart", () => {
     ChatContextTrayStore.write({
       ...IDENTITY,

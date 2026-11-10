@@ -81,7 +81,7 @@ export const ChatContextTrayStore = {
     options: Readonly<ChatTrayIdentity & { refs: readonly Gadget.Ref[] }>,
   ): boolean => {
     if (!_hasIdentity(options)) {
-      return false;
+      return true;
     }
     try {
       window.localStorage.setItem(
