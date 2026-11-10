@@ -21,14 +21,17 @@
   z-index: 1;
 }
 
-.editorTitle:global(.mantine-Text-root) {
+.editorHeading {
   flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+}
+
+.editorTitle:global(.mantine-Text-root) {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.2;
-  margin: 0;
-  min-width: 0;
 }
 
 .backAction {

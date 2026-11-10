@@ -90,13 +90,14 @@ export function LayerSettingsPanel({ app, actions }: Props): ReactNode {
     <div className={css.editorScroll}>
       <div className={css.editorHeader}>
         {_backButton(app, backLabel)}
-        <TruncatedText
-          className={css.editorTitle}
-          component="h3"
-          tooltipProps={{ position: "bottom" }}
-        >
-          {title}
-        </TruncatedText>
+        <h3 className={css.editorHeading}>
+          <TruncatedText
+            className={css.editorTitle}
+            tooltipProps={{ position: "bottom" }}
+          >
+            {title}
+          </TruncatedText>
+        </h3>
       </div>
       {_settingsBody(app, actions, layer)}
     </div>
