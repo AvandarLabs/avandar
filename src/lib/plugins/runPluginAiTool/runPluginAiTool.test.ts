@@ -123,6 +123,61 @@ describe("runPluginAiTool", () => {
       expect(oversized.text).toBe("The tool result was too large.");
       expect(oversized.text).not.toContain("xxx");
     });
+
+    it("replaces an object whose JSON is an array or a string", async () => {
+      const arrayJson = await runPluginAiTool({
+        ...ROWS_READY,
+        invoke: vi.fn().mockResolvedValue({
+          toJSON: () => {
+            return [{ secret: 1 }];
+          },
+        }),
+      });
+      expect(arrayJson).toEqual({ text: "The tool failed.", isError: true });
+      const stringJson = await runPluginAiTool({
+        ...ROWS_READY,
+        invoke: vi.fn().mockResolvedValue({
+          toJSON: () => {
+            return "secret";
+          },
+        }),
+      });
+      expect(stringJson).toEqual({ text: "The tool failed.", isError: true });
+    });
+
+    it("forwards exactly 2,048 bytes and rejects 2,049", async () => {
+      const exactPayload = { blob: "x".repeat(2048 - '{"blob":""}'.length) };
+      const exact = await runPluginAiTool({
+        ...ROWS_READY,
+        invoke: vi.fn().mockResolvedValue(exactPayload),
+      });
+      expect(new TextEncoder().encode(exact.text).byteLength).toBe(2048);
+      expect(exact).toEqual({
+        text: JSON.stringify(exactPayload),
+        isError: false,
+      });
+      const overByOne = await runPluginAiTool({
+        ...ROWS_READY,
+        invoke: vi.fn().mockResolvedValue({ blob: `${exactPayload.blob}x` }),
+      });
+      expect(overByOne).toEqual({
+        text: "The tool result was too large.",
+        isError: true,
+      });
+    });
+
+    it("replaces a result JSON.stringify throws on", async () => {
+      const result = await runPluginAiTool({
+        ...ROWS_READY,
+        invoke: vi.fn().mockResolvedValue({
+          toJSON: () => {
+            throw new Error("cell secret");
+          },
+        }),
+      });
+      expect(result).toEqual({ text: "The tool failed.", isError: true });
+      expect(result.text).not.toContain("secret");
+    });
   });
 
   it("releases a chat handle and leaves the explorer handle", async () => {

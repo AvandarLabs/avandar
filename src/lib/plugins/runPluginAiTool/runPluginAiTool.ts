@@ -11,7 +11,7 @@ type AiToolArgs = Readonly<Record<string, string | number | boolean>>;
 /** What the data agent's model reads back from a plugin AI tool call. */
 export type PluginAiToolOutcome = { text: string; isError: boolean };
 
-/** The largest tool result, in UTF-8 bytes, the model is shown. */
+/** The largest tool result JSON, in UTF-8 bytes, the model is shown. */
 const MAX_TOOL_RESULT_BYTES = 2048;
 
 const NO_RESULT_TEXT = "No result is on screen.";
@@ -19,15 +19,19 @@ const TOOL_FAILED_TEXT = "The tool failed.";
 const TOOL_RESULT_TOO_LARGE_TEXT = "The tool result was too large.";
 
 function _buildOutcomeFromToolResult(toolResult: unknown): PluginAiToolOutcome {
+  // `toJSON` can turn an object into any JSON value, so the serialized JSON
+  // is judged, not the value the handler returned.
+  const text: string | undefined = JSON.stringify(toolResult);
+  const jsonValue: unknown = text === undefined ? undefined : JSON.parse(text);
   if (
-    typeof toolResult !== "object" ||
-    toolResult === null ||
-    Array.isArray(toolResult)
+    text === undefined ||
+    typeof jsonValue !== "object" ||
+    jsonValue === null ||
+    Array.isArray(jsonValue)
   ) {
     return { text: TOOL_FAILED_TEXT, isError: true };
   }
-  const text = JSON.stringify(toolResult);
-  if (new TextEncoder().encode(text).byteLength >= MAX_TOOL_RESULT_BYTES) {
+  if (new TextEncoder().encode(text).byteLength > MAX_TOOL_RESULT_BYTES) {
     return { text: TOOL_RESULT_TOO_LARGE_TEXT, isError: true };
   }
   return { text, isError: false };
@@ -45,8 +49,8 @@ function _buildOutcomeFromError(error: unknown): PluginAiToolOutcome {
 /**
  * Runs a plugin AI tool against the query result on screen and returns the
  * text the data agent's model reads. Nothing on screen, a thrown error, a
- * result that is not a JSON object, or a result of 2,048 UTF-8 bytes or more
- * each become a fixed host message, except an `InvalidToolInput` error, whose
+ * result whose JSON is not an object, or JSON over 2,048 UTF-8 bytes each
+ * become a fixed host message, except an `InvalidToolInput` error, whose
  * message is forwarded. Never throws.
  *
  * A chat result's query handle is released once the tool finishes. The
