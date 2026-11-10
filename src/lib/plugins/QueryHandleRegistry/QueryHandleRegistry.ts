@@ -5,6 +5,11 @@ type UnknownRow = Readonly<Record<string, unknown>>;
 type QueryHandleRegistryApi = Readonly<{
   getOrCreate: (rows: readonly UnknownRow[]) => QueryHandle;
   getRows: (handle: QueryHandle) => readonly UnknownRow[] | undefined;
+  /**
+   * Forgets one handle and its rows, leaving every other handle readable.
+   * Registering the same rows again issues a new handle.
+   */
+  release: (handle: QueryHandle) => void;
   clear: () => void;
 }>;
 
@@ -29,9 +34,10 @@ function _evictOldestHandles(options: {
  * memory, such as the app-wide `QueryHandleRegistry`. `getOrCreate` is
  * idempotent for the same rows array, so it is safe to call during render.
  * Only the `maxLiveHandles` most recently registered handles stay readable,
- * and `clear` drops them all. Asking again for rows whose handle was evicted
- * or cleared registers that same handle again, so the result a user is
- * looking at never loses its handle.
+ * `release` drops one, and `clear` drops them all. Asking again for rows
+ * whose handle was evicted or cleared registers that same handle again, so
+ * the result a user is looking at never loses its handle. Rows whose handle
+ * was released get a new handle.
  */
 export function makeQueryHandleRegistry(options: {
   maxLiveHandles: number;
@@ -55,6 +61,13 @@ export function makeQueryHandleRegistry(options: {
     },
     getRows: (handle) => {
       return rowsByHandle.get(handle);
+    },
+    release: (handle) => {
+      const rows = rowsByHandle.get(handle);
+      if (rows) {
+        handlesByRows.delete(rows);
+      }
+      rowsByHandle.delete(handle);
     },
     clear: () => {
       rowsByHandle.clear();
