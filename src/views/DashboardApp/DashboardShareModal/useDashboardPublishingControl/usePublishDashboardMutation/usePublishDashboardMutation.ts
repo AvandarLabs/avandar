@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
+import { MapSnapshotPublishError } from "@/clients/maps/MapSnapshot/MapSnapshotPublishError";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { isShareableDashboardLimitError } from "@/utils/isShareableDashboardLimitError/isShareableDashboardLimitError";
@@ -28,6 +29,21 @@ export function usePublishDashboardMutation(
 ): ReturnType<typeof DashboardClient.usePublishDashboard> {
   const { t } = useLingui();
   const { currentDashboard, onPublished, onShareableLimitReached } = options;
+
+  // A map that cannot be published safely stops the whole publish, so the
+  // message names the map the author has to fix. Anything else is transient.
+  const getPublishErrorMessage = (error: Error): string => {
+    if (!(error instanceof MapSnapshotPublishError)) {
+      return t`Please try again. Your dashboard has not been published.`;
+    }
+    const { mapName } = error;
+    switch (error.reason) {
+      case "filtersNoLongerApply":
+        return t`The map "${mapName}" has filters that no longer match its data. Open the map and fix them before publishing.`;
+      case "cannotEditMap":
+        return t`Only someone who can edit the map "${mapName}" can publish it. Ask an editor of the map to publish this dashboard.`;
+    }
+  };
 
   return DashboardClient.usePublishDashboard({
     onSuccess: (updatedDashboard) => {
@@ -73,7 +89,7 @@ export function usePublishDashboardMutation(
       }
       notifyError({
         title: t`Could not publish dashboard`,
-        message: t`Please try again. Your dashboard has not been published.`,
+        message: getPublishErrorMessage(error),
       });
     },
   });

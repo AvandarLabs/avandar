@@ -226,7 +226,7 @@ describe("useGisApp annotation inspector", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { result, rerender } = renderHook(
       () => {
-        return useGisApp(_createAvaMap());
+        return useGisApp(_createAvaMap(), "map-salt");
       },
       { wrapper: TestProviders },
     );
@@ -245,7 +245,7 @@ describe("useGisApp annotation inspector", () => {
     const feature = makeTextAnnotationFeature([10, 10], "Goma");
     const { result } = renderHook(
       () => {
-        return useGisApp(_createAvaMap());
+        return useGisApp(_createAvaMap(), "map-salt");
       },
       { wrapper: TestProviders },
     );
@@ -283,7 +283,7 @@ describe("useGisApp places layers", () => {
     placesState.datasetColumns = fixture.datasetColumns;
     const { result } = renderHook(
       () => {
-        return useGisApp(_createAvaMap(fixture.mapConfig));
+        return useGisApp(_createAvaMap(fixture.mapConfig), "map-salt");
       },
       { wrapper: TestProviders },
     );

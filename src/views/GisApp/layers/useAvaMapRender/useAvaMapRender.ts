@@ -57,12 +57,14 @@ function _makeAvaMapRender(options: {
   layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
   geometryCache: ReturnType<typeof createLayerGeometryCache>;
   hiddenAnnotationFeatureIds: readonly AvaMapConfig.AnnotationFeatureId[];
+  jitterSalt: string;
 }): AvaMapRender {
   const {
     mapConfig,
     layerQueryStates,
     geometryCache,
     hiddenAnnotationFeatureIds,
+    jitterSalt,
   } = options;
   geometryCache.prune(makeSet(mapConfig.layers, { key: "id" }));
   const renderedLayers = mapConfig.layers.map((layer) => {
@@ -70,6 +72,7 @@ function _makeAvaMapRender(options: {
       layer,
       layerQueryStates,
       geometryCache,
+      jitterSalt,
     });
   });
   return {
@@ -110,10 +113,13 @@ export function useAvaMapRender({
   mapConfig,
   layerQueryStates,
   hiddenAnnotationFeatureIds = [],
+  jitterSalt,
 }: Readonly<{
   mapConfig: AvaMapConfig.T;
   layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
   hiddenAnnotationFeatureIds?: readonly AvaMapConfig.AnnotationFeatureId[];
+  /** The map's secret key for jittered points. Never published. */
+  jitterSalt: string;
 }>): AvaMapRender {
   const [geometryCache] = useState(createLayerGeometryCache);
 
@@ -123,6 +129,13 @@ export function useAvaMapRender({
       layerQueryStates,
       geometryCache,
       hiddenAnnotationFeatureIds,
+      jitterSalt,
     });
-  }, [geometryCache, hiddenAnnotationFeatureIds, layerQueryStates, mapConfig]);
+  }, [
+    geometryCache,
+    hiddenAnnotationFeatureIds,
+    jitterSalt,
+    layerQueryStates,
+    mapConfig,
+  ]);
 }

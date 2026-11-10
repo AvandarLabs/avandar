@@ -1,0 +1,14 @@
+.mapPBlockEmptyState {
+  align-items: center;
+  background: var(--ava-surface-body);
+  border: 1px dashed var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  justify-content: center;
+  padding: var(--mantine-spacing-md);
+}
+
+/* Keeps the authoring note off the block's edge. */
+.mapPBlockNote {
+  padding-inline: var(--mantine-spacing-xs);
+}

@@ -42,6 +42,7 @@ with public_tables as (
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
       'datasets__postgres_table',
+      'map_jitter_salts',
       -- Service role only: no `authenticated` grant at all.
       'pipeline_execution_scopes',
       'pipeline_executions',
@@ -97,6 +98,7 @@ with public_tables as (
       'connections__postgres',
       'data_catalog_drives',
       'data_catalog_facet_counts',
+      'map_jitter_salts',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
       'subscriptions',

@@ -1,3 +1,4 @@
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -6,14 +7,19 @@ type DisplaceSpatialFeaturesInput = {
   layer: MapLayer.T;
   sourceLayer: MapLayer.T;
   featureCollection: GeoJSON.FeatureCollection;
+  jitterSalt: string;
 };
 
-/** Displaces one position with the seed lat/lng layers use for a row. */
+/**
+ * Displaces one position with the seed a lat/lng row at the same coordinates
+ * uses, so a point moves the same way whichever binding draws it.
+ */
 function _jitterPosition(
   options: Readonly<{
     position: GeoJSON.Position;
     radiusMeters: number;
-    seed: string;
+    salt: string;
+    layerId: string;
   }>,
 ): GeoJSON.Position {
   const [longitude = 0, latitude = 0] = options.position;
@@ -21,7 +27,13 @@ function _jitterPosition(
     longitude,
     latitude,
     radiusMeters: options.radiusMeters,
-    seed: options.seed,
+    salt: options.salt,
+    seed: buildJitterSeed({
+      layerId: options.layerId,
+      radiusMeters: options.radiusMeters,
+      longitude,
+      latitude,
+    }),
   });
   return [displaced.longitude, displaced.latitude];
 }
@@ -34,30 +46,28 @@ function _jitterGeometry(
   options: Readonly<{
     geometry: GeoJSON.Geometry;
     radiusMeters: number;
-    seed: string;
+    salt: string;
+    layerId: string;
     layerName: string;
   }>,
 ): GeoJSON.Geometry {
-  const { geometry, radiusMeters, seed } = options;
+  const { geometry, radiusMeters, salt, layerId } = options;
   if (geometry.type === "Point") {
     return {
       type: "Point",
       coordinates: _jitterPosition({
         position: geometry.coordinates,
         radiusMeters,
-        seed,
+        salt,
+        layerId,
       }),
     };
   }
   if (geometry.type === "MultiPoint") {
     return {
       type: "MultiPoint",
-      coordinates: geometry.coordinates.map((position, memberIndex) => {
-        return _jitterPosition({
-          position,
-          radiusMeters,
-          seed: `${seed}:${memberIndex}`,
-        });
+      coordinates: geometry.coordinates.map((position) => {
+        return _jitterPosition({ position, radiusMeters, salt, layerId });
       }),
     };
   }
@@ -92,9 +102,11 @@ function _isUndisplaceable(
  * query returned, so a displaced layer never exposes exact positions to the
  * map, its popups, or the map tools that read the same features.
  *
- * Each point moves exactly as a lat/lng row at the same index does: the same
- * `jitterCoordinate` with the seed `${layerId}:${featureIndex}`. Members of a
- * multipoint add their own index to that seed so they do not move together.
+ * Each point moves exactly as a lat/lng row at the same coordinates does: the
+ * same `jitterCoordinate` keyed by the map's secret salt, seeded by the
+ * layer, the radius, and the point's own original coordinates
+ * (`buildJitterSeed`). Each member of a multipoint is seeded by its own
+ * coordinates, so members at different places move independently.
  *
  * Aggregated bindings (boundary joins, point aggregation, grid bins) are
  * returned unchanged: they draw areas and counts, never individual points.
@@ -105,6 +117,7 @@ function _isUndisplaceable(
  * @param params.sourceLayer The layer a buffer is drawn around, or `layer`
  * itself for every other binding.
  * @param params.featureCollection The parsed spatial query features.
+ * @param params.jitterSalt The map's secret jitter salt.
  * @returns The displaced features, or the input itself when nothing moves.
  * @throws SensitivityViolationError when a `jitter` layer draws lines,
  * polygons, or buffers around points, none of which can be displaced.
@@ -113,6 +126,7 @@ export function displaceSpatialFeatures({
   layer,
   sourceLayer,
   featureCollection,
+  jitterSalt,
 }: Readonly<DisplaceSpatialFeaturesInput>): GeoJSON.FeatureCollection {
   const { sensitivity } = layer;
   if (sensitivity.mode !== "jitter") {
@@ -126,13 +140,14 @@ export function displaceSpatialFeatures({
   }
   return {
     ...featureCollection,
-    features: featureCollection.features.map((feature, featureIndex) => {
+    features: featureCollection.features.map((feature) => {
       return {
         ...feature,
         geometry: _jitterGeometry({
           geometry: feature.geometry,
           radiusMeters: sensitivity.radiusMeters,
-          seed: `${layer.id}:${featureIndex}`,
+          salt: jitterSalt,
+          layerId: layer.id,
           layerName: layer.name,
         }),
       };

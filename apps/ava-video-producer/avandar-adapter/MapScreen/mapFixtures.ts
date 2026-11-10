@@ -63,6 +63,8 @@ export const casePoints = makeFeatureCollectionFromRows({
   propertyColumnNames: "all",
   sensitivity: { mode: "exact" },
   layerId: caseLayer.id,
+  // Exact layers never jitter, so no map salt is read.
+  jitterSalt: "",
 });
 export const facilityPoints = makeFeatureCollectionFromRows({
   rows: fixtures.facilities,
@@ -70,6 +72,8 @@ export const facilityPoints = makeFeatureCollectionFromRows({
   propertyColumnNames: "all",
   sensitivity: { mode: "exact" },
   layerId: facilityLayer.id,
+  // Exact layers never jitter, so no map salt is read.
+  jitterSalt: "",
 });
 export const selectedFacility = facilityPoints.featureCollection.features[2]!;
 export const selectedCoordinates = (selectedFacility.geometry as GeoJSON.Point)

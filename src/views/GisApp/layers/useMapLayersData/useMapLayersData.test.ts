@@ -203,6 +203,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -234,6 +235,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -270,6 +272,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -301,6 +304,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [timedLayer],
           workspaceId,
           overlay: {
@@ -330,6 +334,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -357,6 +362,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -381,6 +387,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [firstLayer, secondLayer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -407,6 +414,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -427,6 +435,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -464,6 +473,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -523,6 +533,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -579,6 +590,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -606,6 +618,7 @@ describe("useMapLayersData", () => {
     renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [filterLayer, schools],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -646,6 +659,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [filterLayer, layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -686,6 +700,7 @@ describe("useMapLayersData", () => {
     renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [filterLayer, schools],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -713,6 +728,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: { aoi, timeRange: undefined },
@@ -734,6 +750,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: { aoi, timeRange: undefined },
@@ -755,6 +772,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: { aoi, timeRange: undefined },
@@ -790,6 +808,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -843,6 +862,7 @@ describe("useMapLayersData with query-time widened layers", () => {
     const { result, rerender } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: getQueryLayersFromMapLayers([structuredClone(savedLayer)]),
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,

@@ -8,6 +8,7 @@ import {
   prop,
 } from "@avandar/utils";
 import { match } from "ts-pattern";
+import { buildJitterSeed } from "@/views/GisApp/layers/buildJitterSeed/buildJitterSeed";
 import { jitterCoordinate } from "@/views/GisApp/layers/jitterCoordinate/jitterCoordinate";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -42,7 +43,7 @@ type PlaceCoordinateInput = {
   longitude: number;
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
-  rowIndex: number;
+  jitterSalt: string;
 };
 
 type CreatePointFeatureInput = {
@@ -59,6 +60,7 @@ type PlaceRowInput = {
   binding: MapLayer.GeoBindingColumnNames;
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
+  jitterSalt: string;
   propertyColumnNames: readonly string[] | "all";
 };
 
@@ -68,6 +70,7 @@ type MakeFeatureCollectionInput = {
   propertyColumnNames: readonly string[] | "all";
   sensitivity: MapLayer.Sensitivity;
   layerId: string;
+  jitterSalt: string;
 };
 
 type FeatureCollectionConversion = {
@@ -114,7 +117,7 @@ function _placeCoordinate({
   longitude,
   sensitivity,
   layerId,
-  rowIndex,
+  jitterSalt,
 }: PlaceCoordinateInput): { longitude: number; latitude: number } {
   return match(sensitivity)
     .with({ mode: "exact" }, () => {
@@ -125,7 +128,13 @@ function _placeCoordinate({
         longitude,
         latitude,
         radiusMeters: policy.radiusMeters,
-        seed: `${layerId}:${rowIndex}`,
+        salt: jitterSalt,
+        seed: buildJitterSeed({
+          layerId,
+          radiusMeters: policy.radiusMeters,
+          longitude,
+          latitude,
+        }),
       });
     })
     .with({ mode: "aggregateOnly" }, () => {
@@ -213,6 +222,7 @@ function _placeRow({
   binding,
   sensitivity,
   layerId,
+  jitterSalt,
   propertyColumnNames,
 }: PlaceRowInput): RowPlacement {
   const coordinateRead = _readCoordinate({ row, binding });
@@ -223,7 +233,7 @@ function _placeRow({
     ...coordinateRead.coordinate,
     sensitivity,
     layerId,
-    rowIndex,
+    jitterSalt,
   });
 
   return {
@@ -293,7 +303,9 @@ function _buildConversionResult(
  * from the layer's popup config. `"all"` keeps everything except the bound
  * coordinate columns.
  * @param params.sensitivity Spatial privacy policy applied to each geometry.
- * @param params.layerId Used with the row index to seed jitter.
+ * @param params.layerId Used with each point's coordinates to seed jitter.
+ * @param params.jitterSalt The map's secret key for jitter, so a published
+ * displaced point cannot be reversed from its public seed.
  * @returns The converted features and a report for every row that was dropped.
  * @throws SensitivityViolationError when the policy is `aggregateOnly`, which
  * no geometry binding can satisfy yet.
@@ -304,6 +316,7 @@ export function makeFeatureCollectionFromRows({
   propertyColumnNames,
   sensitivity,
   layerId,
+  jitterSalt,
 }: MakeFeatureCollectionInput): FeatureCollectionConversion {
   if (sensitivity.mode === "aggregateOnly") {
     throw new SensitivityViolationError("aggregateOnly");
@@ -317,6 +330,7 @@ export function makeFeatureCollectionFromRows({
       propertyColumnNames,
       sensitivity,
       layerId,
+      jitterSalt,
     });
   });
   return _buildConversionResult(placements);

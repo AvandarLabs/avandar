@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@/test-utils";
 import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync";
@@ -44,7 +45,11 @@ function _createMapHarness(): {
         moveEndHandler = handler;
       }
     }),
-    off: vi.fn(),
+    off: vi.fn((eventName: string, handler: MoveEndHandler) => {
+      if (eventName === "moveend" && moveEndHandler === handler) {
+        moveEndHandler = undefined;
+      }
+    }),
   };
   const mapInstance = { mapRef: { current: map } };
 
@@ -107,5 +112,39 @@ describe("useMapViewSync", () => {
       zoom: 11,
     });
     expect(onViewChange).not.toHaveBeenCalled();
+  });
+
+  it("publishes an instant camera fit made while the view callback changes", () => {
+    const harness = _createMapHarness();
+    const firstOnViewChange = vi.fn();
+    const secondOnViewChange = vi.fn();
+    const { rerender } = renderHook(
+      ({ onViewChange, shouldFitCamera }) => {
+        // Mirrors the camera fit effect, which runs before the view sync's.
+        useEffect(() => {
+          if (shouldFitCamera) {
+            harness.moveCamera({ center: { lng: 10, lat: 10 }, zoom: 8 });
+          }
+        }, [shouldFitCamera]);
+        return useMapViewSync({
+          mapInstance: harness.mapInstance,
+          view: { center: [-74, 40], zoom: 8 },
+          onViewChange,
+        });
+      },
+      {
+        initialProps: {
+          onViewChange: firstOnViewChange,
+          shouldFitCamera: false,
+        },
+      },
+    );
+
+    rerender({ onViewChange: secondOnViewChange, shouldFitCamera: true });
+
+    expect(secondOnViewChange).toHaveBeenCalledWith({
+      center: [10, 10],
+      zoom: 8,
+    });
   });
 });

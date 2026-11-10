@@ -1722,6 +1722,29 @@ export type Database = {
           },
         ]
       }
+      map_jitter_salts: {
+        Row: {
+          map_id: string
+          salt: string
+        }
+        Insert: {
+          map_id: string
+          salt?: string
+        }
+        Update: {
+          map_id?: string
+          salt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_jitter_salts_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: true
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maps: {
         Row: {
           config: Json
@@ -3536,6 +3559,10 @@ export type Database = {
           sub_label: string
           updated_at: string
         }[]
+      }
+      rpc_maps__get_or_create_jitter_salt: {
+        Args: { p_map_id: string }
+        Returns: string
       }
       rpc_pipeline_executions__finish: {
         Args: { p_execution_id: string; p_outcome: Json }

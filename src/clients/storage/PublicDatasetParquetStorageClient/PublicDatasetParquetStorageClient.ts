@@ -1,6 +1,7 @@
 import { MIMEType, prop } from "@avandar/utils";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
+import { PublicMapSnapshotStorageClient } from "@/clients/storage/PublicMapSnapshotStorageClient/PublicMapSnapshotStorageClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
@@ -311,12 +312,13 @@ async function _listSnapshotRevisions(
   return [SnapshotStorageUtils.LEGACY_SNAPSHOT_REVISION, ...versionedRevisions];
 }
 
-/** Removes one immutable snapshot generation from a bucket. */
+/** Removes one immutable snapshot generation: its datasets and its maps. */
 async function _deleteSnapshotGeneration(
   options: Readonly<DeleteSnapshotGenerationOptions>,
 ): Promise<void> {
   const datasetIds = await _listDatasetIdsForDashboard(options);
   await _deleteDatasets({ ...options, datasetIds });
+  await PublicMapSnapshotStorageClient.deleteMapSnapshotsForGeneration(options);
 }
 
 /** Removes every snapshot object for a dashboard from one bucket. */

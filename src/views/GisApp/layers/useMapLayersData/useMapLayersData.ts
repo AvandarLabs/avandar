@@ -1,37 +1,15 @@
 import { useQueries } from "@tanstack/react-query";
-import { compileSpatialFilteredQuery } from "@/clients/maps/MapLayerSpatialQuery/compileSpatialFilteredQuery/compileSpatialFilteredQuery";
-import {
-  getCompileMetadataFromMapLayer,
-  getLeafSourceLayerFromMapLayer,
-} from "@/clients/maps/MapLayerSpatialQuery/getCompileMetadataFromMapLayer/getCompileMetadataFromMapLayer";
-import { parseMapLayerSpatialResult } from "@/clients/maps/MapLayerSpatialQuery/parseMapLayerSpatialResult/parseMapLayerSpatialResult";
-import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
-import { displaceSpatialFeatures } from "@/views/GisApp/layers/displaceSpatialFeatures/displaceSpatialFeatures";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
-import { runLatLngLayer } from "./runLatLngLayer";
+import { isSpatialMapLayerBinding, runMapLayerQuery } from "./runMapLayerQuery";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
-import type {
-  MapOverlay,
-  SpatialFilterCompileOptions,
-} from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
+import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { UseQueryOptions } from "@tanstack/react-query";
-
-type RunSpatialLayerOptions = {
-  layer: MapLayer.T;
-  workspaceId: Workspace.Id;
-  zoomBand: number;
-  simplificationReferenceLatitude: number;
-  overlay: MapOverlay;
-  stack: readonly MapLayer.T[];
-  resolveMetadata: SpatialFilterCompileOptions["resolveMetadata"];
-  signal?: AbortSignal;
-};
 
 type LayerQueryResult = {
   data: MapLayerDataResult | undefined;
@@ -49,6 +27,9 @@ type UseMapLayersDataOptions = {
   datasets?: readonly Dataset.T[];
   datasetColumns?: readonly DatasetColumn.T[];
   overlay: MapOverlay;
+
+  /** The map's secret key for jittered points. Never published. */
+  jitterSalt: string;
 };
 
 /** One layer's query, as the map render pipeline needs to see it. */
@@ -60,15 +41,9 @@ export type MapLayerQueryState = {
   refetch: () => void;
 };
 
-function _isSpatialBinding(layer: MapLayer.T): boolean {
-  return (
-    layer.geoBinding !== undefined && layer.geoBinding.type !== "latLngColumns"
-  );
-}
-
 /** True when the layer query uses DuckDB Spatial functions. */
 function _layerNeedsSpatial(layer: MapLayer.T, overlay: MapOverlay): boolean {
-  if (_isSpatialBinding(layer) || layer.spatialFilter !== undefined) {
+  if (isSpatialMapLayerBinding(layer) || layer.spatialFilter !== undefined) {
     return true;
   }
   return (
@@ -107,50 +82,8 @@ type LayerQueryContext = {
   datasetColumns: readonly DatasetColumn.T[];
   overlay: MapOverlay;
   spatialAvailability: DuckDbSpatialAvailability;
+  jitterSalt: string;
 };
-
-/**
- * Compiles, executes, and parses one spatial layer, keeping only the
- * features inside its spatial filter layer, then applies its sensitivity
- * policy so no consumer of the query data sees exact points.
- */
-async function _runSpatialLayer(
-  options: RunSpatialLayerOptions,
-): Promise<MapLayerDataResult> {
-  const plan = compileSpatialFilteredQuery(options);
-  const queryResult = await WorkspaceQuerySession.runQuery({
-    rawSql: plan.rawSql,
-    workspaceId: options.workspaceId,
-    signal: options.signal,
-  });
-  const parsed = parseMapLayerSpatialResult({
-    queryResult,
-    family: plan.family,
-  });
-  return {
-    type: "spatial",
-    featureCollection: displaceSpatialFeatures({
-      layer: options.layer,
-      sourceLayer: getLeafSourceLayerFromMapLayer(options.layer, options.stack),
-      featureCollection: parsed.featureCollection,
-    }),
-    diagnostics: parsed.diagnostics,
-  };
-}
-
-/** Resolves any stacked layer's compile metadata from the loaded datasets. */
-function _createMetadataResolver(
-  context: LayerQueryContext,
-): SpatialFilterCompileOptions["resolveMetadata"] {
-  return (layer) => {
-    return getCompileMetadataFromMapLayer({
-      layer,
-      stack: context.layers,
-      datasets: context.datasets,
-      datasetColumns: context.datasetColumns,
-    });
-  };
-}
 
 function _createLayerQuery(
   layer: MapLayer.T,
@@ -196,26 +129,27 @@ function _createLayerQuery(
     // A point layer re-aggregates on every zoom band, so without a placeholder
     // the layer would blank out and refit on each step rather than repaint.
     placeholderData:
-      _isSpatialBinding(layer) || isLatLngPointLayer
+      isSpatialMapLayerBinding(layer) || isLatLngPointLayer
         ? (previous: MapLayerDataResult | undefined) => {
             return previous;
           }
         : undefined,
     queryFn: async ({ signal }): Promise<MapLayerDataResult> => {
-      const runOptions = {
+      return await runMapLayerQuery({
         layer,
-        workspaceId: context.workspaceId,
-        zoomBand: context.zoomBand,
-        simplificationReferenceLatitude:
-          context.simplificationReferenceLatitude,
-        overlay: context.overlay,
-        stack: context.layers,
-        resolveMetadata: _createMetadataResolver(context),
+        context: {
+          stack: context.layers,
+          workspaceId: context.workspaceId,
+          zoomBand: context.zoomBand,
+          simplificationReferenceLatitude:
+            context.simplificationReferenceLatitude,
+          datasets: context.datasets,
+          datasetColumns: context.datasetColumns,
+          overlay: context.overlay,
+          jitterSalt: context.jitterSalt,
+        },
         signal,
-      };
-      return _isSpatialBinding(layer)
-        ? await _runSpatialLayer(runOptions)
-        : await runLatLngLayer(runOptions);
+      });
     },
   };
 }
@@ -265,6 +199,7 @@ export function useMapLayersData({
   datasets = [],
   datasetColumns = [],
   overlay,
+  jitterSalt,
 }: UseMapLayersDataOptions): Map<MapLayer.Id, MapLayerQueryState> {
   const spatialAvailability = useDuckDbSpatialAvailability();
   const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
@@ -279,6 +214,7 @@ export function useMapLayersData({
         datasetColumns,
         overlay,
         spatialAvailability,
+        jitterSalt,
       });
     }),
   });
