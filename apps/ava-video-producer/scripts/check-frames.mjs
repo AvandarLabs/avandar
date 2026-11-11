@@ -7,157 +7,104 @@
 //     of several hundred, at random. So it reads as a flash rather than as
 //     obvious corruption, and it survives every encoder setting you try.
 //     Detected by comparing each frame's left half to its right half and
-//     flagging frames that match far better than their neighbours do.
+//     flagging frames that match far better than their neighbours do. A
+//     frame bordering a near-uniform frame is mostly that flat field, so it
+//     must also match like a copy (COPY_MATCH_DB) to be flagged.
 //
 //  2. Full-frame luminance jumps. A one-frame flip between a light panel
 //     and a dark one is a strobe. The loop seam counts: the last frame
 //     cutting back to frame 0 happens every time the tile repeats, and it
 //     is the one nobody checks.
 //
-// Wire this into every render script and let it fail the build. Do not
-// "fix" a failure by loosening the thresholds below.
+// Declared cuts. A storyboard shot with `transition: {kind: "cut"}` is a
+// hard cut on purpose, and `npm run video -- render` passes its first frame
+// here as `--declared-cuts`. On exactly that frame a jump of any size is
+// accepted, but only if the luminance does not swing back by more than
+// LUMA_JUMP within the next 10 frames: a jump and its reversal is a flash,
+// and WCAG 2.3.1 allows at most three a second. Every other frame, and the
+// frames on either side of a cut, keep the ordinary limit. Measured on a
+// storyboard render, each of six cuts landed entirely on the shot's first
+// frame (the frame before moved by 20 at most), so there is no window to
+// widen. Fixed compositions and stock clips declare nothing. The output
+// lists every declared cut and its verdict.
 //
-// Usage: node scripts/check-frames.mjs out/demo.mp4
+// Wire this into every render script and let it fail the build. Do not
+// "fix" a failure by loosening the thresholds in scripts/lib/frameGate.mjs.
+//
+// Usage: node scripts/check-frames.mjs out/demo.mp4 [--standalone]
+//          [--declared-cuts 602,1022]
 
-import { spawnSync } from "node:child_process";
-import { readFileSync, mkdtempSync, existsSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import {
+  CUT_REVERSAL_FRAMES,
+  LUMA_JUMP,
+  findLumaJumps,
+  findTiledFrames,
+  judgeDeclaredCuts,
+  measureFrames,
+  parseGateArguments,
+} from "./lib/frameGate.mjs";
 import { requireLicense } from "./require-license.mjs";
 
 requireLicense();
 
-const LOCAL = new URL("../node_modules/ffmpeg-static/ffmpeg", import.meta.url)
-  .pathname;
-const FFMPEG = existsSync(LOCAL) ? LOCAL : "ffmpeg";
-
-const args = process.argv.slice(2);
-/* A standalone clip is watched once, so the last frame never cuts back to the
- * first and the seam is not a defect: it is just where the film ended. Only a
- * clip that loops in a page has to close the circle. The skill splits these
- * two cases; without this flag the gate did not, and failed a launch video for
- * ending somewhere brighter than it started. */
-const standalone = args.includes("--standalone");
-const file = args.find((a) => !a.startsWith("--"));
-if (!file) {
-  console.error("usage: node scripts/check-frames.mjs <video> [--standalone]");
+let options;
+try {
+  options = parseGateArguments(process.argv.slice(2));
+} catch (error) {
+  console.error(error.message);
   process.exit(2);
 }
 
-const TILE_SPIKE_DB = 3; // how much better than neighbours counts as tiled
-const LUMA_JUMP = 25; // Y units, on a 0-255 scale
-
-const dir = mkdtempSync(join(tmpdir(), "checkframes-"));
-const tileLog = join(dir, "tile.log");
-
-// ffmpeg reports stream info and filter results on stderr, so both streams
-// have to be read back.
-function run(args) {
-  const r = spawnSync(FFMPEG, args, { encoding: "utf8", maxBuffer: 1 << 28 });
-  if (r.error) throw r.error;
-  return `${r.stdout ?? ""}${r.stderr ?? ""}`;
-}
-
-const size = run(["-hide_banner", "-i", file, "-f", "null", "-"]);
-const dim = /,\s(\d{2,5})x(\d{2,5})[\s,]/.exec(size);
-if (!dim) {
-  console.error("could not read dimensions");
+let measured;
+try {
+  measured = measureFrames(options.file);
+} catch (error) {
+  console.error(error.message);
   process.exit(2);
 }
-const w = Number(dim[1]);
-const h = Number(dim[2]);
-const half = Math.floor(w / 2);
+const { width, height, luma } = measured;
 
-run([
-  "-hide_banner",
-  "-loglevel",
-  "error",
-  "-i",
-  file,
-  "-lavfi",
-  `[0:v]split[x][y];[x]crop=${half}:${h}:0:0[l];[y]crop=${half}:${h}:${w - half}:0[r];` +
-    `[l][r]psnr=stats_file=${tileLog}`,
-  "-f",
-  "null",
-  "-",
-]);
-
-const halves = [];
-for (const line of readFileSync(tileLog, "utf8").split("\n")) {
-  const n = /(?:^|\s)n:(\d+)/.exec(line);
-  const p = /psnr_avg:([0-9.]+|inf)/.exec(line);
-  if (n && p) halves[Number(n[1]) - 1] = p[1] === "inf" ? 99 : Number(p[1]);
-}
-
-const contrast = [];
-const stats = run([
-  "-hide_banner",
-  "-loglevel",
-  "info",
-  "-i",
-  file,
-  "-vf",
-  "signalstats,metadata=print",
-  "-f",
-  "null",
-  "-",
-]);
-const luma = Array.from(
-  stats.matchAll(/lavfi\.signalstats\.YAVG=([0-9.]+)/g),
-  (m) => Number(m[1]),
+const tiled = findTiledFrames(measured);
+const cuts = judgeDeclaredCuts(luma, options.declaredCuts);
+const jumps = findLumaJumps(luma, cuts);
+const rejectedCuts = cuts.filter(
+  (cut) => cut.verdict === "flash" || cut.verdict === "outside-video",
 );
-{
-  const lo = [...stats.matchAll(/lavfi\.signalstats\.YMIN=([0-9.]+)/g)].map(
-    (m) => Number(m[1]),
-  );
-  const hi = [...stats.matchAll(/lavfi\.signalstats\.YMAX=([0-9.]+)/g)].map(
-    (m) => Number(m[1]),
-  );
-  for (let i = 0; i < hi.length; i++) contrast.push(hi[i] - (lo[i] ?? 0));
-}
-
-const median = (xs) => {
-  const s = [...xs].sort((a, b) => a - b);
-  return s[Math.floor(s.length / 2)];
-};
-
-// A frame that is nearly one flat colour has matching halves by definition,
-// so the dissolves in and out of the dark ground would flag forever. Only
-// frames with real detail can be judged this way. Measured: tiled frames sit
-// at 206-219 of contrast, the dimmest dissolve frame worth keeping sits
-// at 71.
-const FLAT = 120;
-
-const tiled = [];
-for (let i = 0; i < halves.length; i++) {
-  if ((contrast[i] ?? 255) < FLAT) continue;
-  const lo = Math.max(0, i - 4);
-  const hi = Math.min(halves.length, i + 5);
-  const around = [];
-  for (let j = lo; j < hi; j++)
-    if (j !== i && halves[j] !== undefined) around.push(halves[j]);
-  if (!around.length) continue;
-  const spike = halves[i] - median(around);
-  if (spike > TILE_SPIKE_DB) tiled.push({ frame: i, spike: spike.toFixed(1) });
-}
-
-const jumps = [];
-for (let i = 1; i < luma.length; i++) {
-  const d = Math.abs(luma[i] - luma[i - 1]);
-  if (d > LUMA_JUMP) jumps.push({ from: i - 1, to: i, jump: d.toFixed(1) });
-}
 const seam = Math.abs(luma[0] - luma[luma.length - 1]);
 
-console.log(`${luma.length} frames, ${w}x${h}`);
+/** One line of the declared-cut report. */
+function describeCut(cut) {
+  const frame = `  frame ${String(cut.frame).padEnd(6)}`;
+  if (cut.verdict === "outside-video")
+    return `${frame}rejected   not in this ${luma.length}-frame video`;
+  const jump = `jump ${cut.jump >= 0 ? "+" : ""}${cut.jump.toFixed(1)}`;
+  const reversal = `swings back ${cut.reversal.toFixed(1)}`;
+  if (cut.verdict === "flash")
+    return `${frame}rejected   ${jump}, ${reversal} by frame ${cut.reversalFrame}: a flash, not a cut`;
+  const status = cut.verdict === "accepted" ? "accepted " : "under limit";
+  return `${frame}${status}  ${jump}, ${reversal} at most within ${CUT_REVERSAL_FRAMES} frames`;
+}
+
+console.log(`${luma.length} frames, ${width}x${height}`);
 console.log(`\ntiled frames: ${tiled.length ? "" : "none"}`);
-for (const t of tiled)
-  console.log(`  frame ${t.frame} — halves match +${t.spike} dB vs neighbours`);
+for (const tile of tiled)
+  console.log(
+    `  frame ${tile.frame} — halves match +${tile.spike.toFixed(1)} dB vs neighbours`,
+  );
+if (cuts.length) {
+  console.log(
+    `\ndeclared cuts (a jump is accepted if it does not swing back over ${LUMA_JUMP} within ${CUT_REVERSAL_FRAMES} frames):`,
+  );
+  for (const cut of cuts) console.log(describeCut(cut));
+}
 console.log(
   `\nluminance jumps over ${LUMA_JUMP}: ${jumps.length ? "" : "none"}`,
 );
-for (const j of jumps)
-  console.log(`  frame ${j.from} -> ${j.to}   jump ${j.jump}`);
-if (standalone) {
+for (const jump of jumps)
+  console.log(
+    `  frame ${jump.from} -> ${jump.to}   jump ${jump.jump.toFixed(1)}`,
+  );
+if (options.isStandalone) {
   console.log(
     `\nloop seam: not checked (--standalone) — last frame Y=${luma[luma.length - 1].toFixed(1)}, first Y=${luma[0].toFixed(1)}`,
   );
@@ -170,5 +117,9 @@ if (standalone) {
   );
 }
 
-const bad = tiled.length || jumps.length || (!standalone && seam > LUMA_JUMP);
-process.exit(bad ? 1 : 0);
+const isFailing =
+  tiled.length ||
+  jumps.length ||
+  rejectedCuts.length ||
+  (!options.isStandalone && seam > LUMA_JUMP);
+process.exit(isFailing ? 1 : 0);

@@ -27,7 +27,8 @@ type Options = {
  * The two layers `StoryFilm` stacks at one frame of a shot boundary: the
  * outgoing shot (absent outside a transition) and the style of the incoming
  * shot above it. A missing transition kind is the original dissolve, so
- * existing plans keep their look.
+ * existing plans keep their look. A declared `cut` never draws the outgoing
+ * shot.
  */
 export function getShotTransitionLayers({
   transition,
@@ -38,6 +39,7 @@ export function getShotTransitionLayers({
 }: Options): { outgoing?: OutgoingShotLayer; incoming: CSSProperties } {
   if (
     previousDurationInFrames === undefined ||
+    transition?.kind === "cut" ||
     transitionInFrames === 0 ||
     localFrame >= transitionInFrames
   ) {

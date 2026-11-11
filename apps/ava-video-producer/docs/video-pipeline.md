@@ -63,8 +63,8 @@ Text-only narration is allowed for planning and silent previews. A final render 
 ## Shot transitions and field colours
 
 A shot's `transition` chooses how it replaces the previous one during its
-`transitionInFrames`: the default dissolve, or a `stepped-column-wipe`
-([scene API](scene-api.md#shot-level-theme-and-transition)). A shot's `theme`
+`transitionInFrames`: the default dissolve, a `stepped-column-wipe`, or a
+declared `cut` ([scene API](scene-api.md#shot-level-theme-and-transition)). A shot's `theme`
 overrides plan tokens for that shot, so a film can cut between a dark field,
 an accent field (`{"ground": "var(--brand)"}`) and a light field. Scene exits
 that belong to one shot (a window whip-out, a staged typography exit, a bar
@@ -72,14 +72,28 @@ erase, a lockup fly-through) are scene options followed by a hard cut, not
 shot transitions.
 
 The frame gate fails any frame whose mean luma moves more than 25 (0–255)
-from the previous frame. A hard cut between fields of different luminance
-fails it: the Avandar dark ground to `#1563fe` is about 79, `#1563fe` to
-`#f8fafc` about 156, dark to light about 235. Measured peak coverage per frame
-for 8 columns: 8 frames at stagger 0.5 covers 25% of the frame per frame
-(safe up to a change of about 100); stagger 1 covers 12.5% (about 200); 16
-frames at stagger 1.5 covers 10% (about 250). Join fields of very different
-luminance with a wipe sized from these figures, or keep both sides of a hard
-cut on fields within 25 of each other. Preview stills sample the middle of
+from the previous frame. An undeclared hard cut between fields of different
+luminance fails it: the Avandar dark ground to `#1563fe` is about 79,
+`#1563fe` to `#f8fafc` about 156, dark to light about 235. Measured peak
+coverage per frame for 8 columns: 8 frames at stagger 0.5 covers 25% of the
+frame per frame (safe up to a change of about 100); stagger 1 covers 12.5%
+(about 200); 16 frames at stagger 1.5 covers 10% (about 250). Join fields of
+very different luminance with a wipe sized from these figures, keep both sides
+of a hard cut on fields within 25 of each other, or declare the cut.
+
+A declared cut is `"transitionInFrames": 0, "transition": {"kind": "cut"}`
+on the incoming shot. It renders exactly like any hard cut. `video render`
+passes the absolute first frame of every declared cut to the gate
+(`--declared-cuts 602,1022` through `render.sh`'s `DECLARED_CUTS`). On that
+frame only, the gate accepts a jump of any size if the luma then holds: it
+must not swing back by more than 25 from the furthest point it reaches within
+the next 10 frames. A jump and its reversal is a flash (WCAG 2.3.1 allows at
+most three a second, one per 10 frames at 30 fps), so a cut to black followed
+by a bright window sweeping in within a third of a second still fails. Give
+the incoming shot its content on the cut frame instead. The frames either side
+of the cut keep the ordinary limit, and the thresholds never change. The gate
+prints each declared cut with its jump, its largest swing back and whether it
+was accepted. Preview stills sample the middle of
 scene exits, lockup builds and flights, and window entrances.
 
 ## Preview and render proof

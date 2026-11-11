@@ -10,6 +10,7 @@ import {
   selectComposition,
 } from "@remotion/renderer";
 import {
+  declaredCutFrames,
   durationInFrames,
   storyboardSchema,
   timeline,
@@ -366,6 +367,8 @@ async function render(plan: Storyboard, filename: string, workspace: string) {
         REMOTION_PROPS_FILE: props,
         DELIVER: `${plan.delivery.width}:${plan.delivery.height}`,
         STANDALONE: plan.purpose === "standalone" ? "1" : "0",
+        // Always set, even empty, so an exported value never leaks in.
+        DECLARED_CUTS: declaredCutFrames(plan).join(","),
         KEEP_RENDER_FRAMES: "1",
       },
     },

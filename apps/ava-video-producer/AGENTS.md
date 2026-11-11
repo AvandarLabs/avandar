@@ -73,8 +73,15 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 - **`src/motion.ts` has no runtime imports.** Its React `CSSProperties` import
   is type-only. Keep the helpers independent of the renderer so they remain portable.
 - **The gate is not optional.** `render.sh` exits non-zero on its failure. Do
-  not loosen the thresholds in `check-frames.mjs` to make a render pass. It
-  keeps the frame sequence on a failure so the flagged JPEG can be opened.
+  not loosen the thresholds in `check-frames.mjs` or `scripts/lib/frameGate.mjs`
+  to make a render pass. It keeps the frame sequence on a failure so the
+  flagged JPEG can be opened. The one sanctioned exception is a storyboard's
+  declared cut (`transition: {kind: "cut"}`): `video render` passes its first
+  frame as `--declared-cuts`, and the gate accepts a jump of any size there
+  only if the luma does not swing back by more than 25 within 10 frames,
+  because a jump and its reversal is a flash. It lists every declared cut and
+  its verdict. Declare a cut only where the film means one; never declare one
+  to silence a strobe.
 - **Nothing on screen may be invented.** Not a row, a card, a label, a count
   or a colour. Lists live in a constants module, not in the page; grep a
   visible string back to its definition and use the whole list in its order.

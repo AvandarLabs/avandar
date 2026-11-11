@@ -333,6 +333,7 @@ export async function fingerprintPlan(
     "scripts/render.sh",
     "scripts/render-sequence.mjs",
     "scripts/check-frames.mjs",
+    "scripts/lib/frameGate.mjs",
     "scripts/video.ts",
     "scripts/lib/plan.ts",
     "scripts/lib/media.ts",

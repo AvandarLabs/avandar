@@ -17,6 +17,7 @@ import {
   absoluteCues,
   durationInFrames,
   assetPathSchema,
+  declaredCutFrames,
 } from "../src/storyboard/schema/schema";
 import type { z } from "zod";
 
@@ -305,6 +306,73 @@ test("a shot transition is rejected on a hard cut, the first shot, or when colum
     change(plan);
     assert.equal(storyboardSchema.safeParse(plan).success, false);
   }
+});
+
+test("a declared cut validates on an incoming shot with no transition frames", () => {
+  const plan = fixture();
+  plan.shots[1].transitionInFrames = 0;
+  plan.shots[1].transition = { kind: "cut" };
+  assert.equal(storyboardSchema.safeParse(plan).success, true);
+});
+
+test("a declared cut is rejected with transition frames, on the first shot, or with options", () => {
+  const cases: Array<[(plan: StoryboardInput) => void, RegExp]> = [
+    [
+      (plan) => {
+        plan.shots[1].transition = { kind: "cut" };
+      },
+      /metric: a cut needs transitionInFrames set to 0/,
+    ],
+    [
+      (plan) => {
+        plan.shots[0].transitionInFrames = 0;
+        plan.shots[0].transition = { kind: "cut" };
+      },
+      /opening: the first shot has nothing to transition from/,
+    ],
+    [
+      (plan) => {
+        plan.shots[1].transitionInFrames = 0;
+        plan.shots[1].transition = {
+          kind: "cut",
+          outgoing: "playing",
+        } as unknown as { kind: "cut" };
+      },
+      /outgoing/,
+    ],
+  ];
+  for (const [change, message] of cases) {
+    const plan = fixture();
+    change(plan);
+    const result = storyboardSchema.safeParse(plan);
+    assert.equal(result.success, false);
+    assert.match(JSON.stringify(result.error?.issues), message);
+  }
+});
+
+test("only shots that declare a cut give the frame gate a cut frame", () => {
+  const plan = fixture();
+  plan.shots.push(
+    {
+      id: "undeclared",
+      scene: "title",
+      durationInFrames: 66,
+      transitionInFrames: 0,
+      props: { name: "Hard cut", kicker: "Not declared" },
+    },
+    {
+      id: "declared",
+      scene: "title",
+      durationInFrames: 66,
+      transitionInFrames: 0,
+      transition: { kind: "cut" },
+      props: { name: "Hard cut", kicker: "Declared" },
+    },
+  );
+  plan.shots[1].transitionInFrames = 0;
+  plan.shots[1].transition = { kind: "cut" };
+  assert.deepEqual(declaredCutFrames(storyboardSchema.parse(plan)), [66, 282]);
+  assert.deepEqual(declaredCutFrames(storyboardSchema.parse(fixture())), []);
 });
 
 test("typography accepts staged reveal modes, an icon, an exit and a caption size", () => {

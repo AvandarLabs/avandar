@@ -30,6 +30,10 @@ DELIVER="${DELIVER:-1536:960}"
 # only means something for a clip that repeats in a page.
 GATE_FLAGS=""
 [ "${STANDALONE:-0}" = "1" ] && GATE_FLAGS="--standalone"
+# DECLARED_CUTS=602,1022 lists the first frames of shots a storyboard declares
+# as hard cuts (`transition: {kind: "cut"}`). `npm run video -- render` sets it
+# from the plan; fixed compositions leave it unset and get the ordinary gate.
+[ -n "${DECLARED_CUTS:-}" ] && GATE_FLAGS="$GATE_FLAGS --declared-cuts $DECLARED_CUTS"
 
 OUT="${RENDER_OUT_DIR:-out}"
 OUTPUT_ID="${RENDER_OUTPUT_ID:-$ID}"

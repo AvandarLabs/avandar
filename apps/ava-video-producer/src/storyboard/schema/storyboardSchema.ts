@@ -291,6 +291,11 @@ function _checkShotTransition(
   if (isFirstShot) {
     return [`${shot.id}: the first shot has nothing to transition from`];
   }
+  if (transition.kind === "cut") {
+    return shot.transitionInFrames === 0
+      ? []
+      : [`${shot.id}: a cut needs transitionInFrames set to 0`];
+  }
   if (shot.transitionInFrames === 0) {
     return [`${shot.id}: a transition needs transitionInFrames above 0`];
   }

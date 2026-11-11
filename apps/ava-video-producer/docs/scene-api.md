@@ -206,7 +206,24 @@ Every shot accepts two storyboard-level options next to `transitionInFrames`:
 | Field | Type / default | Behavior |
 | --- | --- | --- |
 | `theme` | token map, none | Overrides plan theme tokens (`background`, `foreground`, `card`, `muted`, `muted-foreground`, `border`, `brand`, `brand-soft`, `brand-strong`, `ground`, `shadow`) for this shot. Values are colours or `var(--token)` naming another token, e.g. `{"ground": "var(--brand)"}` for an accent field |
-| `transition` | `{kind: "dissolve", outgoing?}` or `{kind: "stepped-column-wipe", columns?: 8, staggerFrames?: 0.5, from?: "bottom", order?: "left-to-right", outgoing?, outgoingDrift?: {x: -0.5–0.5, blur?: px}}`, none | Duration is `transitionInFrames` (must be above 0; not allowed on the first shot). Omitted means the original dissolve. The wipe reveals the incoming shot through N columns that rise (or drop) one after another; `outgoingDrift` slides the outgoing layer by `x` of the width with X-only blur. `outgoing: "playing"` keeps the outgoing shot advancing instead of freezing its last frame |
+| `transition` | `{kind: "dissolve", outgoing?}`, `{kind: "stepped-column-wipe", columns?: 8, staggerFrames?: 0.5, from?: "bottom", order?: "left-to-right", outgoing?, outgoingDrift?: {x: -0.5–0.5, blur?: px}}` or `{kind: "cut"}`, none | Duration is `transitionInFrames` (must be above 0 for a dissolve or wipe; not allowed on the first shot). Omitted means the original dissolve, or an undeclared hard cut when `transitionInFrames` is 0. The wipe reveals the incoming shot through N columns that rise (or drop) one after another; `outgoingDrift` slides the outgoing layer by `x` of the width with X-only blur. `outgoing: "playing"` keeps the outgoing shot advancing instead of freezing its last frame. `cut` declares a deliberate hard cut and takes no options: it requires `transitionInFrames: 0` and tells the frame gate to accept a luminance jump of any size on the shot's first frame, as long as it does not swing back within 10 frames ([video pipeline](video-pipeline.md#shot-transitions-and-field-colours)) |
+
+Transition validation messages:
+
+| Message | Cause |
+| --- | --- |
+| `<shot>: the first shot has nothing to transition from` | Any `transition` on the first shot |
+| `<shot>: a transition needs transitionInFrames above 0` | A dissolve or wipe with `transitionInFrames: 0` |
+| `<shot>: a cut needs transitionInFrames set to 0` | A `cut` without `transitionInFrames: 0` (the default is 18) |
+| `<shot>: the last wipe column starts after the transition ends; lower columns or staggerFrames` | A wipe whose stagger cannot finish |
+
+A declared cut, for example a dark field cutting to a light one:
+
+```json
+{"id": "light-field", "scene": "typography", "durationInFrames": 90,
+ "transitionInFrames": 0, "transition": {"kind": "cut"},
+ "theme": {"ground": "#f8fafc"}, "props": {"...": "..."}}
+```
 
 ## MediaScene
 

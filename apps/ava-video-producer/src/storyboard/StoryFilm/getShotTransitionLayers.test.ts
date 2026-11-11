@@ -51,6 +51,17 @@ test("a hard cut never shows the outgoing shot", () => {
   assert.equal(layers.outgoing, undefined);
 });
 
+test("a declared cut never shows the outgoing shot", () => {
+  const layers = getShotTransitionLayers({
+    ...base,
+    transitionInFrames: 0,
+    localFrame: 0,
+    transition: { kind: "cut" },
+  });
+  assert.equal(layers.outgoing, undefined);
+  assert.deepEqual(layers.incoming, {});
+});
+
 test("a column wipe clips the incoming shot and drifts the outgoing one further over time", () => {
   const at = (localFrame: number) =>
     getShotTransitionLayers({
