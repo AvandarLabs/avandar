@@ -10300,8 +10300,8 @@ on the device.
 starting a case type no longer wipes the chat they were in.
 
 **Design:** `docs/ai-agent/specs/phase-1c.md` and D43 in
-`docs/ai-agent/decisions.md`. The task plan, `docs/ai-agent/plans/phase-1c.md`,
-was never committed (see Open decisions).
+`docs/ai-agent/decisions.md`. The task plan is `docs/ai-agent/plans/phase-1c.md`
+(see Open decisions).
 
 **PR title:** `feat(ai-agent): keep several chats and an archive of closed chats`
 
@@ -10532,9 +10532,9 @@ needs a decision before its feature's PR is built.
 9. **`gadgets.md`.** `1f3bc348d`'s paragraph describes both F90's chat `@`
    menu and F91's tray, so it is F91's. If F90 ships long before F91, port its
    first three sentences with F90.
-10. **F128's plan.** `docs/ai-agent/plans/phase-1c.md` was never committed,
-    though `roadmap.md`'s 1C row links to it. Commit it next to
-    `phase-1a.md` and `phase-1b.md`, or drop the link.
+10. **F128's plan.** `docs/ai-agent/plans/phase-1c.md`, committed after
+    the branch merged, sits behind F128 the way `phase-1a.md` and
+    `phase-1b.md` sit behind their features. Decide it with item 2.
 
 ### Plugins (F96 to F112)
 
