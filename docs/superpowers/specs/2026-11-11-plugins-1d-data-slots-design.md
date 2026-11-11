@@ -296,11 +296,14 @@ handler's `avandar.data` has no `querySlot` in this slice.
 
 ### `avandar.ui.openDataSlotBinding(slotId)`
 
-For a settings admin, opens the Data slots step for that slot on its own
-(see "After install"). For anyone else, shows a notification: "Ask a
-workspace admin to choose which records this plugin reads." Resolves once
-the modal closes or the notification shows. An unknown slot id rejects with
-`InvalidSlot`.
+Opens the Data slots step for that slot on its own, in a modal (see "After
+install"). A settings admin gets the binding panel with Cancel and Save.
+Anyone else reads "Ask a workspace admin to choose which records this plugin
+reads." with a Close button. Resolves once the modal closes. An unknown slot
+id rejects with `InvalidSlot`.
+
+The modal checks the admin permission itself, because the toolbar that runs
+commands does not always have the router context the permission hooks read.
 
 ### Case epicurve
 
@@ -455,7 +458,7 @@ This slice makes the check pass again:
 1. Register the chat's plugin tool runtime as a lazy runtime in the check.
 2. Measure what remains, and move or lazily load any startup host code that
    is cheap to move.
-3. Keep the generated `loadContentUrls` small.
+3. Generate `loadContentUrls` as one import of a per-plugin content module.
 4. Re-baseline `HOST_BUDGET_BYTES` by 1b's rule (the measured bytes rounded up
    to the next 1,000, plus 2,000), with the reason in its comment.
 
@@ -466,9 +469,9 @@ This slice makes the check pass again:
 | Manifest | `dataSlots` rules, the `data:slots` pairing, `content` rules (missing file, file over 1 MB, non-CSV), optional `entry`, reserved tool names, and the `DATA_AGENT_TOOLS` drift test |
 | Binding status | `getDataSlotBindingStatus` for every row of its table |
 | Slot SQL | The SQL builder for a case type and a dataset, unmapped optional attributes, and quoting. An executed DuckDB test runs the built SQL against a small dataset relation |
-| Runtime | `querySlot` errors and truncation, `fetchRows` accepting slot handles from the same invocation only, `openDataSlotBinding` for admins and non-admins |
+| Runtime | `querySlot` errors and truncation, `fetchRows` accepting slot handles from the same invocation only, `openDataSlotBinding` opening the binding modal |
 | Case epicurve | Modal states: unbound, broken, no district, truncated, drawn |
-| Wizard | Which steps a manifest gets, the slot panel's type filtering and required logic, and the import orchestration with mocked clients (success, one failure, already imported) |
+| Wizard | Which steps a manifest gets, the slot panel's type filtering and required logic, the import orchestration with mocked clients (success, one failure, already imported), and the binding modal for admins, non-admins, and while roles load |
 | Chart config | A corrupted config renders the message and Reset instead of crashing |
 | pgTAP | RLS on both tables. A failing binding rolls back the install. An import row survives uninstall and goes when its dataset is deleted. The workspace trigger |
 | E2E, one at a time | `plugins-mozambique-install.spec.ts`: install through the wizard, both datasets appear in Data Manager. `plugins-epidemiology-case-slot.spec.ts`: an E2E-helper case type with an onset date and a district, install with the `cases` slot bound, run Case epicurve, bars render. The existing epidemiology E2Es are updated for the Plugins menu. Each spec deletes the installs and datasets it created |
