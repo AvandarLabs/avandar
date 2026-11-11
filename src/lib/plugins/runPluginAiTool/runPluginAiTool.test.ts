@@ -94,6 +94,26 @@ describe("runPluginAiTool", () => {
       });
     });
 
+    it("replaces an InvalidToolInput message over 2,048 UTF-8 bytes with The tool failed", async () => {
+      // 683 three-byte characters are 2,049 bytes but only 683 code units.
+      const invoke = vi
+        .fn()
+        .mockRejectedValue(
+          new PluginError("InvalidToolInput", "€".repeat(683)),
+        );
+      const result = await runPluginAiTool({ ...ROWS_READY, invoke });
+      expect(result).toEqual({ text: "The tool failed.", isError: true });
+    });
+
+    it("forwards an InvalidToolInput message of exactly 2,048 UTF-8 bytes", async () => {
+      const message = "a".repeat(2048);
+      const invoke = vi
+        .fn()
+        .mockRejectedValue(new PluginError("InvalidToolInput", message));
+      const result = await runPluginAiTool({ ...ROWS_READY, invoke });
+      expect(result).toEqual({ text: message, isError: true });
+    });
+
     it("replaces any other throw with The tool failed", async () => {
       const invoke = vi
         .fn()

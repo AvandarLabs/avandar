@@ -247,7 +247,7 @@ a stack, or a cell value.
 | Situation | Message |
 | --- | --- |
 | Nothing is on screen | `No result is on screen.` |
-| The declaration has no handler, or the handler throws anything other than `InvalidToolInput` | `The tool failed.` |
+| The declaration has no handler, the handler throws anything other than `InvalidToolInput`, or its `InvalidToolInput` message is longer than 2,048 UTF-8 bytes | `The tool failed.` |
 | The return value's UTF-8 JSON is longer than 2,048 bytes | `The tool result was too large.` |
 | The return value is not a JSON object | `The tool failed.` |
 
