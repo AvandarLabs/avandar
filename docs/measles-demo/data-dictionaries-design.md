@@ -1,0 +1,940 @@
+# Data dictionaries and crosswalks - design
+
+- **Status:** Approved in brainstorming and prototype review, awaiting
+  written-spec review
+- **Date:** 2026-11-11
+- **Author:** pablo@avandarlabs.com
+- **Branch:** `feat/data-dictionaries`, from `demo/measles`
+- **Prototype:** `.impeccable/mocks/prototype/data-dictionaries.html` in the
+  `feat/data-dictionaries` worktree (gitignored). Every surface below has a
+  clickable counterpart there. Where this spec and the prototype disagree,
+  this spec wins.
+- **Related:** [qetl-architecture.md](../qetl-architecture.md) (relation
+  loading), [permissions-architecture.md](../permissions-architecture.md),
+  [ai-agent/roadmap.md](../ai-agent/roadmap.md),
+  [app-view-layout.md](../design/app-view-layout.md), and the key-matching
+  crosswalk in
+  [joined-cases-7-key-matching-design.md](../superpowers/specs/2026-11-06-joined-cases-7-key-matching-design.md)
+
+## Contents
+
+1. Summary
+2. Goals and non-goals
+3. Decisions already made
+4. Vocabulary
+5. Data model
+6. How a dictionary reaches the data
+7. Surfaces
+8. Smart guesses
+9. Crosswalk compilation
+10. Ask Avandar context
+11. Permissions and RLS
+12. Offline and desktop
+13. User-facing copy
+14. Edge cases
+15. Testing
+16. Delivery slices
+17. Roadmap
+18. Open decisions
+
+## 1. Summary
+
+Teams in the social sector hold many datasets that share the same codes:
+`1, 2` for sex in twenty county files, `1-4` for socioeconomic status in
+every survey wave. Today, every time they want readable values they type a
+prompt like "convert gender where 1 = Male and 2 = Female" into the Data
+Explorer, once per dataset, then save each result as a new dataset.
+
+This spec adds two things to the Data Sources app:
+
+- **Data dictionaries.** A dictionary is a reusable, workspace-level record of
+  what columns mean. Each **entry** describes one kind of column (its name,
+  the other column names it goes by, a kind, a description) and may carry
+  **code lists**: ordered pairs such as `1 ↔ Male` that work in both
+  directions. A dictionary can be built by hand or learned from one or more
+  datasets, and it is applied to any dataset, partially, alongside other
+  dictionaries.
+- **Data crosswalks.** A crosswalk maps many datasets with different layouts
+  (`zip_code`, `zip`, `postal_code`) onto one reference layout and produces a
+  **combined dataset** that stacks them, with codes reconciled through
+  dictionaries.
+
+Applying a dictionary to a column does one of two things, chosen per column:
+
+- **Attach labels only as reference.** The data is untouched. The labels and
+  descriptions travel with the column: a code-list icon on the dataset page
+  and in the Data Explorer, and the code list in Ask Avandar's context, so
+  "how many female cases" becomes `WHERE "GENDER" = 2`.
+- **Apply conversions.** The values change, either in a new **linked
+  dataset** that stays in step with the dictionary, or in the dataset itself
+  (uploads only), pinned to the dictionary version applied.
+
+## 2. Goals and non-goals
+
+### Goals
+
+- Define codes once and apply them to any number of datasets in a few clicks,
+  without typing prompts or re-exporting files.
+- Mix dictionaries and apply them partially: columns A and B from one
+  dictionary, X and Z from another.
+- Support both attaching labels as documentation and converting values, per
+  column.
+- Learn as much as possible automatically: which columns are coded or
+  ordered, which columns across datasets mean the same thing, and suggested
+  labels, descriptions, and matches.
+- Make code lists bidirectional: one list decodes `1 → Male` and encodes
+  `Male → 1`, with accepted spellings (`M`, `man`) and missing-value codes.
+- Give Ask Avandar every attached code list, online and offline.
+- Combine up to about 100 datasets with different layouts into one dataset
+  through a crosswalk.
+
+### Non-goals
+
+- Writing back to live sources (Google Sheets, Postgres). Applying to a live
+  connection attaches labels or creates a linked dataset. See section 17.
+- Per-dictionary sharing and the restricted flag. Dictionaries and crosswalks
+  are visible to everyone with Data Sources access in v1 (section 11).
+- Side-by-side joins in a crosswalk. A crosswalk stacks rows; key-based joins
+  stay with joined cases (G7).
+- Importing dictionaries from external formats (REDCap data dictionary CSV,
+  CDISC, SPSS `.sav` value labels). Listed in section 17.
+- A display-only "show labels" toggle on converted or raw grids. Listed in
+  section 17.
+
+## 3. Decisions already made
+
+| Topic | Decision |
+|---|---|
+| Crosswalk output | A combined virtual dataset that stacks every mapped dataset, plus a documentation mapping that exports as CSV. |
+| Where codes live | In dictionaries only. A crosswalk reads its code translations from dictionary code lists. |
+| Code list reuse | Code lists are reusable within a dictionary and shared by entries. An entry can also own a one-off list. |
+| Direction | Pairs are bidirectional. Apply detects whether a column holds codes or labels and picks decode or encode; the user can flip it. |
+| Apply modes | Per column: **Attach labels only as reference** (no data change) or **Apply conversions**. Conversions keep the list attached too. |
+| Where conversions go | Uploads: a new linked dataset, or this dataset. Live connections: a linked dataset only. |
+| Edits after applying | Linked datasets follow the dictionary. A dataset converted in place keeps the version it was given and offers **Re-apply**. Reference-only columns always show the current list. |
+| Unmatched values | Shown with row counts. Default keeps the value as is; the user can map it, add it to the list, or empty it. |
+| Smart guesses | Deterministic profiling and matching always run, on the device. An AI pass suggests labels, descriptions, and meaning-based matches as accept-or-reject suggestions, sending only column names and the distinct values of short coded columns. |
+| Placement | Dictionaries and Crosswalks are groups in the Data Sources list, each opening its own view in the slate. |
+| Apply layout | Pairing table (one column per dictionary, up to 3; beyond that, one **Apply** column with a Select), a side pane for the selected column, a horizontal step bar, and a data preview that slides up from the bottom. |
+| Crosswalk layout | Reference layout first, then one dataset (or layout family) at a time, with a stub column stamping every layout Reference, Mapped, Review, To do, or Skipped. |
+| Create layout | Pick datasets, Review columns, Label values, Save. Starting from a dataset's menu skips Pick. |
+| Defaults | Uploaded and offline datasets default to **Apply conversions**; live connections default to **Attach labels only as reference**. |
+
+## 4. Vocabulary
+
+Internal names are for code, schema, and docs. User-facing words are what the
+UI says (see the copy rule in `AGENTS.md`).
+
+| Internal | User-facing | Meaning |
+|---|---|---|
+| `DataDictionary` | dictionary | A named set of entries and code lists. |
+| `DataDictionaryEntry` | entry | One kind of column: name, other column names, kind, unit, valid range, description, codings. |
+| `columnNames` | also matches columns named | The other names an entry recognizes (`GENDER`, `sex_at_birth`). |
+| `DataDictionaryCodeList` | code list | An ordered list of pairs, optionally ordered as a scale. |
+| `CodePair` | value, label | `{ code, label, acceptedSpellings, isMissing }`. |
+| `acceptedSpellings` | also accept as this label | Extra labels that encode to the pair's code (`M`, `man`). |
+| entry coding | code list (on an entry) | The link between an entry and a code list. An entry can have several codings of the same meaning (`1/2/9` and `M/F/U`); one is primary. |
+| `DictionaryBinding` | applied, attached | One dataset column bound to one entry, with a mode. |
+| `mode: "reference"` | attached as reference | Labels and description only. Values unchanged. |
+| `mode: "convert"` | converted | Values change when the dataset loads. |
+| `direction: "decode" \| "encode"` | codes → labels, labels → codes | Which side of the pair the data holds. |
+| `pinnedPairs` | (version shown in the rail) | The pairs a dataset converted in place was given. |
+| linked dataset | linked dataset | A virtual dataset reading from the source with conversions applied, following the dictionary. |
+| `Crosswalk` | crosswalk | A set of datasets mapped onto a reference layout. |
+| `CrosswalkLayout` | layout | Datasets that share the same column names, mapped once together. |
+| `CrosswalkColumn` | column of the combined dataset | One output column, optionally governed by a dictionary entry. |
+| `CrosswalkMapping` | how a column is filled | For one layout and one output column: a source column with a conversion, a fixed value, an expression, or empty. |
+| combined dataset | combined dataset | The crosswalk's output virtual dataset. |
+
+## 5. Data model
+
+All tables follow the conventions in `supabase/schemas` (see the
+`supabase-declarative-schema` skill): `uuid` ids, `workspace_id` with cascade,
+`created_at`/`updated_at` with `util__set_updated_at`, a trigger that stops
+`workspace_id` changing, GRANT only on tables and revoke-then-grant on
+functions, `/** */` docstrings. New enums get their own `00.enum.*.sql` file.
+
+### 5.1 Dictionaries
+
+`10.data_dictionaries.sql`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `uuid` | |
+| `workspace_id` | `uuid` | |
+| `owner_id`, `owner_profile_id` | `uuid` | Same shape as `maps`, so the table can become a shareable resource type later without a migration. |
+| `name` | `text not null` | |
+| `description` | `text` | |
+| `version` | `integer not null default 1` | Bumped by a trigger whenever an entry, code list, or coding in the dictionary changes. |
+| `created_from_dataset_ids` | `uuid[] not null default '{}'` | Provenance for the rail ("Made from"). Not a foreign key: a deleted dataset leaves a stale id, which the rail skips. |
+
+`20.data_dictionaries__code_lists.sql`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `workspace_id`, `dictionary_id` | `uuid` | `dictionary_id` cascades. |
+| `name` | `text not null` | "Sex (1/2/9)". |
+| `is_ordered` | `boolean not null default false` | Ordered lists keep their order in charts (section 6.4). |
+| `pairs` | `jsonb not null` | Array, in display order, of `{ code, label, acceptedSpellings, isMissing }`. Validated by a versioned Zod schema (the `AvaMapConfigSchema` pattern). |
+
+A one-off list is a code list used by one entry. Nothing marks it; the UI
+says "Only this entry uses it".
+
+`20.data_dictionaries__entries.sql`
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `workspace_id`, `dictionary_id` | `uuid` | |
+| `name` | `text not null` | Unique per dictionary. |
+| `column_names` | `text[] not null default '{}'` | The other column names it matches. |
+| `kind` | `data_dictionaries__entry_kind` | `categorical`, `ordered`, `number`, `date`, `text`, `identifier`. |
+| `unit` | `text` | Number entries. |
+| `valid_min`, `valid_max` | `numeric` | Number entries. |
+| `description` | `text` | |
+| `position` | `integer not null` | Display order. |
+
+`30.data_dictionaries__entry_codings.sql`
+
+| Column | Type | Notes |
+|---|---|---|
+| `entry_id` | `uuid` | Cascades. |
+| `code_list_id` | `uuid` | Cascades. |
+| `is_primary` | `boolean not null` | Exactly one primary per entry (partial unique index). The primary list's labels are the entry's canonical labels. |
+
+Several codings let one `sex` entry recognize both `1/2/9` and `M/F/U`. Apply
+and crosswalks pick the coding whose codes fit the data (section 8.2), so the
+"values don't fit" case in the prototype only appears when no coding fits.
+
+### 5.2 Bindings
+
+`30.dataset_columns__dictionary_bindings.sql`: one row per bound column.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id`, `workspace_id`, `dataset_id` | `uuid` | `dataset_id` uses the composite `(id, workspace_id)` foreign key. |
+| `dataset_column_id` | `uuid unique` | Cascades when the column is removed. |
+| `dictionary_id` | `uuid` | `on delete set null`. |
+| `entry_id` | `uuid` | `on delete set null`. |
+| `code_list_id` | `uuid` | The coding chosen for this column. `on delete set null`. |
+| `mode` | `dataset_columns__binding_mode` | `reference` or `convert`. |
+| `direction` | `dataset_columns__binding_direction` | `decode` or `encode`. |
+| `keeps_original` | `boolean not null default false` | Convert only. Adds `<column>_original`. |
+| `value_overrides` | `jsonb not null default '[]'` | Unmatched-value resolutions: `{ value, action: "keep" \| "empty" \| "map", code? }`. |
+| `pinned_pairs` | `jsonb` | Null means "follow the live code list". Set for a dataset converted in place. |
+| `applied_dictionary_version` | `integer not null` | |
+
+A binding with no `entry_id` and no `pinned_pairs` is inert: the UI shows it
+as "This dictionary entry was deleted" and nothing converts.
+
+`dataset_columns` gains `dictionary_binding_id uuid null` (`on delete
+cascade`): set on the `<column>_original` copy that a convert binding adds, so
+removing the binding removes the copy.
+
+### 5.3 Linked datasets
+
+A linked dataset is an ordinary virtual dataset (`datasets__virtual`) whose
+`raw_sql` is `SELECT * FROM "<source dataset id>"` (plus nothing else), with
+convert bindings on its own columns that have `pinned_pairs = null`.
+`datasets__virtual` gains `linked_source_dataset_id uuid null references
+datasets on delete set null`, so the source's rail and the dictionary's Used
+by tab can name it. The source dataset gets reference bindings for the same
+columns, because conversions keep the list attached (section 3).
+
+### 5.4 Crosswalks
+
+`10.crosswalks.sql`: `id`, `workspace_id`, owner columns, `name`,
+`description`, `output_dataset_id uuid null references datasets on delete set
+null`, `codes_output_as` (`labels` or `codes`, default `labels`),
+`adds_source_column boolean not null default true`, `compiled_at
+timestamptz`, `compiled_code_list_versions jsonb` (code list id to the
+`updated_at` it was compiled against, for the stale banner).
+
+`20.crosswalks__layouts.sql`: `id`, `crosswalk_id`, `workspace_id`,
+`signature text` (a hash of the sorted, normalized column names), `column_names
+text[]`, `is_reference boolean`, `status` (`to_do`, `review`, `mapped`,
+`skipped`). Exactly one reference layout per crosswalk.
+
+`20.crosswalks__datasets.sql`: `crosswalk_id`, `dataset_id` (cascades),
+`layout_id`, primary key `(crosswalk_id, dataset_id)`. A dataset joins the
+layout whose signature it matches; a new signature creates a new layout,
+prefilled from the closest existing one (section 8.3).
+
+`20.crosswalks__columns.sql`: `id`, `crosswalk_id`, `name`, `position`,
+`data_type` (`datasets__ava_data_type`), `entry_id uuid null` (the governing
+dictionary entry, `on delete set null`).
+
+`30.crosswalks__mappings.sql`: `id`, `crosswalk_id`, `layout_id`, `column_id`,
+`fill jsonb not null`, `status` (`suggested`, `confirmed`), `confidence
+numeric`, `reason text` ("Same values", "Name and type", "Meaning"). Unique on
+`(layout_id, column_id)`.
+
+`fill` is a versioned Zod schema:
+
+```ts
+type CrosswalkFill =
+  | { kind: "column"; sourceColumn: string; convert?: CrosswalkConvert; codeListId?: string; alreadyLabels?: boolean }
+  | { kind: "constant"; value: string }
+  | { kind: "expression"; sql: string }
+  | { kind: "empty" };
+
+type CrosswalkConvert =
+  | { kind: "parse_date"; format: string }      // e.g. "%m/%d/%Y"
+  | { kind: "pad_text"; length: number }         // ZIP 10451 -> "10451", 501 -> "00501"
+  | { kind: "multiply"; factor: number; label: string } // months -> years: 1/12
+  | { kind: "trim_and_fix_case" };
+```
+
+### 5.5 Models and clients
+
+- `shared/models/dataDictionaries/`: `DataDictionary`, `DataDictionaryEntry`,
+  `DataDictionaryCodeList` (with `CodePairsSchema`), `DictionaryBinding`.
+  `shared/models/crosswalks/`: `Crosswalk`, `CrosswalkLayout`,
+  `CrosswalkColumn`, `CrosswalkMapping` (with `CrosswalkFillSchema`). Each is
+  a `SupabaseCrudModelSpec` with a parser registry, following
+  `shared/models/datasets/Dataset/`.
+- Clients use `createRdbCrudClient` under `src/clients/dataDictionaries/` and
+  `src/clients/crosswalks/` (the `ava-model-creation` skill still names
+  `createSupabaseCRUDClient`, which nothing uses; follow `AvaMapClient`).
+- Saving a dictionary's entries, codings, and code lists in one action goes
+  through one RPC, `rpc_data_dictionaries__save`, so the version bump and the
+  child writes are atomic. Creating a dictionary from datasets uses the same
+  RPC.
+- Applying goes through `rpc_dataset_columns__apply_dictionaries`, which
+  writes every binding for one dataset in one transaction and, for a linked
+  dataset, calls `rpc_datasets__add_virtual_dataset` first.
+
+## 6. How a dictionary reaches the data
+
+### 6.1 Change from the brainstorm
+
+The brainstorm approved "approach A": keep an application record and compile
+it into a virtual dataset's `raw_sql`, recompiling every linked dataset when a
+dictionary changes. Research for this spec found two problems with
+recompiling: a virtual dataset's cached materialization is never invalidated
+when its SQL changes (`VirtualDatasetWrapper.ts`, `freshnessSignal:
+"none"`), and the person editing a dictionary may not be allowed to edit every
+dataset that uses it.
+
+QETL already changes columns at load time instead of in stored data: renames
+and type changes become a `SELECT * EXCLUDE (...) REPLACE` view when a
+relation loads (`getColumnReplacementsFromColumns`,
+`getParquetProjectionClauses`). Conversions use the same hook. The binding
+record is still the source of truth (the spirit of approach A), but it is
+read at load time instead of being compiled into SQL. This means:
+
+- Linked datasets follow dictionary edits with no recompile and no stale
+  cache, because the cached Parquet holds raw values and the view is rebuilt
+  on load.
+- Converting a dataset in place never rewrites the stored file. The original
+  values stay recoverable, which makes an undo possible later.
+- It works the same for synced uploads, offline-only uploads, live
+  connections, virtual datasets, and published dashboard snapshots
+  (`dashboardPublishSnapshots.ts` already uses the hook).
+
+### 6.2 The column projection
+
+`ColumnReplacement` (in `QueryMediator.types.ts`) gains an optional
+`valueMapping`:
+
+```ts
+type ColumnValueMapping = {
+  /** Pairs to translate through, already resolved: live list or pinned pairs. */
+  pairs: readonly CodePair[];
+  direction: "decode" | "encode";
+  overrides: readonly ValueOverride[];
+  /** Emit the untouched column as `<name>_original` beside the converted one. */
+  keepsOriginalAs?: string;
+  outputType: "VARCHAR" | "INTEGER" | { enumLabels: readonly string[] };
+};
+```
+
+`getColumnReplacementsFromColumns` takes the dataset's bindings as a second
+argument and builds a `valueMapping` for every convert binding: live pairs
+from the code list when `pinned_pairs` is null, the pinned pairs otherwise.
+`getParquetProjectionClauses` renders it as a `CASE` over a normalized key:
+
+```sql
+CASE lower(trim(CAST("GENDER" AS VARCHAR)))
+  WHEN '1' THEN 'Male'
+  WHEN '2' THEN 'Female'
+  WHEN '9' THEN 'Unknown'
+  ELSE CAST("GENDER" AS VARCHAR)      -- override "keep" (the default)
+END AS "GENDER"
+```
+
+- Encoding matches the label and every accepted spelling, case- and
+  space-insensitively, and returns the code.
+- Overrides render before the `ELSE`: `empty` as `THEN NULL`, `map` as the
+  mapped pair's output.
+- `outputType` is `INTEGER` when encoding and every code in the list is an
+  integer (regression-ready), `VARCHAR` otherwise, and an `ENUM` of the
+  labels for an ordered list (section 6.4).
+- Literals go through the existing SQL literal quoting helpers. A label is
+  data, never SQL.
+- The bindings are fetched alongside `dataset_columns` with the same
+  `ensureQueryData` pattern, and invalidated when a binding or a code list it
+  uses changes.
+
+### 6.3 Data types
+
+A converted column's `dataset_columns.data_type` is set by the apply RPC to
+the type the projection outputs (`text` for decoded labels, `number` for
+integer codes), so schema views and the agent see the converted type. The
+column's `detected_data_type` is unchanged, so removing the binding restores
+the original type.
+
+### 6.4 Ordered lists
+
+An ordered list's decoded output is cast to a DuckDB `ENUM` of its labels in
+list order, so `ORDER BY` and chart axes follow Low, Lower-middle,
+Upper-middle, High instead of the alphabet. Section 18 has the fallback if
+an anonymous `ENUM` cast proves awkward inside a view.
+
+### 6.5 Reference mode
+
+A reference binding never touches the projection. It feeds the code-list
+popover, the rail, the Used by tab, and Ask Avandar's context.
+
+### 6.6 Converting in place
+
+"Change this dataset" writes convert bindings with `pinned_pairs` set to the
+pairs as they are now and `applied_dictionary_version` recorded. Later edits
+to the dictionary do not reach it. The Used by tab and the dataset's rail
+show "Applied version 2, now version 3" with **Re-apply**, which re-pins.
+
+Allowed for uploads (`csv_file`, `xlsx_file`, `pdf_file`), synced or offline
+only. For a synced dataset, the user must tick "I understand this changes
+<dataset> for the whole workspace" before the button enables.
+
+## 7. Surfaces
+
+Layout rules come from [app-view-layout.md](../design/app-view-layout.md)
+and `DESIGN.md`. Each surface reuses `AppView`, `AppViewHeader`,
+`AppViewBody`, `AppViewSection`, and `AppViewRail`.
+
+### 7.1 Data Sources list
+
+`DataManagerApp.tsx` renders one `AppListPane` titled "All data" with three
+groups: **Datasets** (the current `DatasetNavbar` rows), **Dictionaries**,
+and **Crosswalks**. The "withhold chrome" rules still apply: an empty group
+is hidden, and the filter appears once the combined list passes eight rows.
+The toolbar **Add** menu gains "New dictionary" and "New crosswalk" beside
+"Import data".
+
+Task views (create, apply, and crosswalk mapping) collapse the list pane by
+default to free width for dictionary columns, with a **Show list** / **Hide
+list** toggle in the slate toolbar. The choice resets when the route changes.
+
+New routes under `src/routes/_auth/$workspaceSlug/data-manager/`, each with
+an `AppLinks` entry:
+
+| Route | View |
+|---|---|
+| `dictionaries/$dictionaryId` | Dictionary view |
+| `dictionaries/new` | Create a dictionary (search params `fromDatasetId`, `step`) |
+| `$datasetId/apply-dictionaries` | Apply dictionaries (search param `step`) |
+| `crosswalks/$crosswalkId` | Crosswalk (search params `step`, `layoutId`) |
+| `crosswalks/new` | Crosswalk, step 1 |
+
+### 7.2 Dictionary view
+
+Header: name (editable), facts `Dictionary · 15 entries · 5 code lists · Used
+by 14 datasets · Version 3`, actions **Share** (disabled with a tooltip in
+v1, see section 11) and **Apply to a dataset** (primary). Overflow: Delete
+(danger, behind a confirm that names how many datasets use it).
+
+Tabs:
+
+- **Entries.** A filter that matches entry names and their other column
+  names. Table: Entry, Also matches columns named, Kind and values,
+  Description. Selecting a row opens the entry pane: name, other column
+  names (chips), Kind (Select with a one-line hint per kind), Code list
+  (Select, plus "One-off list for this entry"), a read-only preview of the
+  pairs with an **Edit <list>** link, unit and valid range for numbers, and
+  Description. **Add from datasets** opens the create flow with this
+  dictionary as the target; **Add entry** appends one.
+- **Code lists.** Master-detail. Each list: name, **Unordered / Ordered**,
+  "Used by sex, ..." and a table of pairs: drag handle (ordered only), Code,
+  a two-way arrow, Label, Also accept as this label, Missing value, remove.
+  **Add value** and **Paste a list** (one pair per line, `1 = Male` or `1,
+  Male`). A note explains that pairs work both ways.
+- **Used by.** Dataset, How it was applied (**Reference**: data unchanged,
+  always current; **Linked**: updates when this dictionary changes;
+  **Changed the data**; **Crosswalk**), Entries, Status ("Up to date" or
+  "Applied version 2, now version 3"), and **Re-apply** where pinned.
+
+Rail: Made from (datasets), Owner, Updated, Version, and "How codes work".
+
+### 7.3 Create a dictionary
+
+Task view with a horizontal step bar. Entry points: Add menu → New dictionary,
+the Dictionary view's **Add from datasets**, and a dataset's overflow menu
+(section 7.4), which skips Pick and starts at Review with that dataset.
+
+1. **Pick datasets.** Checkbox table of datasets (name, source, rows,
+   columns). Footer note: "Only column names and the distinct values of short
+   columns are read. Rows never leave this device for suggestions."
+2. **Review columns.** A notice states what happened ("61 columns became 13
+   entries"). Three sections: **Coded columns** (you'll label their values
+   next), **Ordered scales**, **Descriptions only**. Each row: include
+   checkbox, entry name with a **Suggested** tag when matched by meaning, the
+   columns it came from, Kind (Select), values seen, and notes such as "Four
+   columns share the same values. They get one code list." or "Same meaning,
+   different codes." (which becomes a second coding on the same entry, per
+   section 5.1). From a single dataset the notice offers **Learn from more
+   datasets**, which returns to Pick.
+3. **Label values.** Master-detail of code lists to label, each tagged
+   Labeled, Suggested, or To do. Detail: Value in data, Rows, Label (input,
+   AI suggestions prefilled with a marker), Missing value, drag handles for
+   ordered lists. **Suggest labels** asks the AI pass for the selected list.
+   **Accept and next list** moves on.
+4. **Save.** Name, description, a summary (entries, code lists, values
+   labeled, learned from), a warning for unlabeled values ("You can save now
+   and finish them on the dictionary"), and a checkbox to apply next. From a
+   single dataset it reads "Apply it to <dataset> next" and opens Apply with
+   the new dictionary preselected; from several it opens Apply for the first
+   and lists the rest in a toast with links.
+
+A dictionary created from a dataset is not tied to it. The save step says so:
+"Saved to Dictionaries like any other dictionary. <dataset> is only where it
+started."
+
+### 7.4 Dataset page
+
+`DatasetActionsMenu` gains, above Refresh and Delete:
+
+- **Apply a dictionary** ("Turn codes into labels and add column
+  descriptions"). Always shown to users who can edit the dataset.
+- **Create a dictionary from this dataset** ("Saved to Dictionaries, so other
+  datasets can use it too"). Shown only while the dataset has no binding of
+  any mode.
+
+Columns (Metadata tab's column list and each Data Summary column section):
+a column with a code list shows a tag icon after its values. Hover or focus
+opens a popover: list name, every pair (`1  Male`, `9  Unknown (missing
+value)`), and "From <dictionary> › <entry>. Attached as reference. The values
+in the data are unchanged." or "The values were converted to these labels."
+The section meta reads "7 with a code list: hover the tag to read it". A
+column with a bound entry and no description of its own shows the entry's
+description, captioned "From <dictionary>". A column's own description always
+wins.
+
+Rail (`DatasetSourceRail`): a **Dictionaries** group listing each dictionary
+with how it was applied ("Attached as reference · data unchanged", "Linked
+dataset: <name>", "Converted this dataset · version 2"). No actions in the
+rail.
+
+The Data Explorer result grid shows the same tag and popover in a column
+header when the column comes straight from a bound dataset column.
+
+### 7.5 Apply dictionaries
+
+Task view at `$datasetId/apply-dictionaries`. Header: breadcrumb to the
+dataset, title, facts (`6 converted · 1 attached as reference · 3 described ·
+of 22 columns · from 2 of 2 dictionaries`), **Preview data**, **Cancel**.
+Step bar: **Match columns · Unmatched values (n) · Save as**. The last step
+is named **Attach** when no column converts.
+
+**Match columns.**
+
+- A row of dictionary chips ("Using ...", removable, **Add dictionary**). On
+  the right: "For every column" with **Convert all** · **Attach dictionaries
+  only as references**.
+- The pairing table: one row per dataset column that has a match in any
+  chosen dictionary (a link reveals the rest). With three or fewer
+  dictionaries there is one column per dictionary, each cell a radio-style
+  pick showing the entry, its coding, and how many rows its values cover
+  (`100%`), or "No match", or "values don't fit". Clicking the selected
+  pick clears it. With four or more, one **Apply** column holds a Select
+  (`sex · Sex (1/2/9) · from Demographics (CDC)`), and an **Other matches**
+  column counts the alternatives. A narrow **Values** column holds a chip,
+  **Convert** or **Reference only**, that toggles the row.
+- Defaults: each column picks the dictionary whose coding covers the most of
+  its values, then any description-only match. Mode defaults per section 3.
+- The side pane for the selected column: Applying (dictionary › entry, code
+  list), **How to apply the dictionary** with **Apply conversions** ·
+  **Attach labels only as reference** and its explanatory sentence. Only
+  under Apply conversions: the direction switch (**Codes → labels** ·
+  **Labels → codes**, with "Chosen from the data" when automatic), the Value
+  in data · Rows · Becomes table (accepted spellings marked), and "Also keep
+  the original values in a new column, <name>_original". Then "Also matches
+  ..." for other dictionaries. A description-only entry shows the
+  description that will be added.
+- Tooltips on all four mode buttons and on the row chip (copy in section 13).
+
+**Preview data** slides a drawer up from the bottom, behind the footer bar,
+at about 46% of the view's height, open at any step. It shows the first rows
+of the dataset with changed cells as `~~1~~ Male`, unmatched values tinted,
+and reference-only columns unchanged with a tag in their header. "Only
+columns this touches" filters it. Escape closes it.
+
+**Unmatched values.** Two sections:
+
+- **Values being converted:** Column, Value, Rows, and **Keep as is** (default)
+  · **Use an existing label** (Select) · **Add to list** (label input; adds
+  the pair to the dictionary, so it needs edit rights there, otherwise
+  disabled with a tooltip) · **Leave empty**.
+- **Values without a label** (reference-only columns): **Leave unlabeled** ·
+  **Add to list**.
+
+If nothing is unmatched, an empty state says so with a Next button.
+
+**Save as.**
+
+- No conversions: **Attach to <dataset>** with "Nothing in your data changes.
+  ... Edits to the dictionaries show up here right away." and the summary.
+- With conversions: radio cards **Create a new linked dataset** (with a Name
+  field, default `<dataset> (coded)`) and **Change <dataset>**, whose copy
+  depends on storage:
+  - synced upload: "Rewrites the uploaded data in place. It is synced to the
+    workspace, so this changes it for everyone who uses it." plus the
+    confirmation checkbox;
+  - offline upload: "It is offline only, so nobody else is affected.";
+  - live connection: disabled, "<source> data can't be changed from Avandar
+    yet, so a linked dataset is the only option for now."
+  Under both cards: "Either way, the code lists and descriptions are attached
+  to <dataset> for reference." Then a summary table: Column, From, What
+  happens.
+- The primary button reads **Attach to <dataset>**, **Create linked
+  dataset**, or **Change n columns**. Success returns to the dataset page (or
+  the new linked dataset) with a toast.
+
+### 7.6 Crosswalk
+
+Task-style view with header facts `Crosswalk · 100 datasets · 10 columns ·
+Reference: <layout>` and **Export mapping** (CSV: layout, dataset, output
+column, fill kind, source column, conversion, code list, status). Step bar:
+**Choose datasets · Map each dataset · Create combined dataset**.
+
+1. **Choose datasets.** Layouts table (layout, datasets, columns, reference
+   tag) and **Add datasets**. A **Reference layout** Select, defaulting to
+   the layout whose columns best cover the others ("matches 12 of 14 columns
+   in most datasets"). The reference layout's columns seed the combined
+   dataset's columns.
+2. **Map each dataset.** Stub column (about 260px) with a progress bar
+   (`36 of 100 mapped`, counting datasets) and one row per layout: name, "+23
+   with the same layout", and a stamp: Reference, Mapped, Review, To do,
+   Skipped. Skipped stays in the list. The center table: Reference column
+   (name, type, "governed" when bound to an entry), a connector line (solid
+   for a match, dashed for a suggestion, none for empty), Filled from this
+   dataset (source column and its conversion, a fixed value, or Leave empty),
+   and Match (`Name and type · 91%` or a Suggested tag). The side pane edits
+   the selected row: **A column** · **A fixed value** · **Combine** · **Leave
+   empty**; Column Select with an example value; Convert Select (section
+   5.4); Decode codes with (governed columns); a before/after example; and
+   **Accept** / **Reject** for suggestions. **Add a column to the combined
+   dataset** sits under the table. Footer: **Skip this dataset**, **Accept
+   all suggestions**, **Confirm and next**, which stamps the layout and
+   jumps to the next layout that is To do or Review.
+3. **Create combined dataset.** Name, "Add a source_dataset column",
+   coded columns come out as **Labels** · **Codes**, a preview of the
+   stacked rows with a row count and how many datasets are skipped, and
+   **Create combined dataset**. After creation the step is titled **Update
+   combined dataset**.
+
+When a code list the crosswalk decodes with has changed since it was
+compiled, the crosswalk header shows "A dictionary this crosswalk uses has
+changed." with **Update combined dataset**.
+
+## 8. Smart guesses
+
+Profiling and matching run in the browser on DuckDB, so they work offline and
+never send rows anywhere. The modules live in `shared/` where they are pure
+(scoring, normalization) and in `src/lib/dataDictionaries/` where they need
+DuckDB.
+
+### 8.1 Column profiling
+
+`profileDatasetColumns(datasetId)` returns, per column: type, row count,
+null count, approximate distinct count, and the full distinct value list with
+row counts when there are 50 or fewer. It reuses the queries in
+`profileOfflineDatasets.ts` where it can. Classification:
+
+| Kind | Rule (first match wins) |
+|---|---|
+| identifier | distinct / non-null > 0.95, or name tokens `id`, `no`, `num`, `key` with distinct / non-null > 0.8 |
+| date | DuckDB type is a date or timestamp, or 90% of a text sample parses with a known format |
+| ordered | categorical by the next rule, and either the values are consecutive integers `1..k` with `k ≤ 10` and the name has a scale token (`level`, `grade`, `ses`, `score`, `quartile`, `stage`, `cat`), or the text values match a known ordered vocabulary (low/medium/high, none/partial/full, never/sometimes/always, and their siblings) |
+| categorical | distinct ≤ 20, and distinct / non-null ≤ 0.2 or rows < 100 |
+| number | numeric type |
+| text | everything else |
+
+These rules seed the Kind Select; the user corrects them in Review.
+
+### 8.2 Matching
+
+`scoreColumnMatch(a, b)` returns 0..1 from three parts:
+
+- **Name (0.45):** normalize (lowercase, split snake and camel case, strip
+  punctuation, expand a small abbreviation table: `dt` date, `cd` code, `yn`
+  yes no, `num` number, `hosp` hospitalized, `vax` vaccination, `dob` date of
+  birth), then the best Jaro-Winkler or token-overlap score across the
+  column's name and every name in the entry's `column_names`.
+- **Values (0.35):** for coded columns, the share of the column's rows whose
+  value is a code, label, or accepted spelling in the coding (the `100%` shown
+  in Apply). For numbers and dates, range overlap.
+- **Type (0.2):** compatible types score 1, castable 0.5, otherwise 0.
+
+Bands: 0.9 and up is a match, 0.6 to 0.9 is a suggestion, below 0.6 is no
+match. For an entry with several codings, the coding with the best value
+score is the one offered. A coding that matches by name but covers under half
+the rows is shown as "values don't fit".
+
+The same scorer clusters columns across datasets in Create (one entry per
+cluster, every other name kept in `column_names`) and maps layouts onto the
+reference in crosswalks.
+
+### 8.3 Crosswalk layouts
+
+A layout's signature is a hash of its sorted, normalized column names. A
+dataset added to a crosswalk joins a layout with the same signature and is
+mapped already. A new signature becomes a new layout prefilled from the most
+similar existing layout (by column name overlap), with every carried-over
+mapping marked suggested.
+
+### 8.4 AI suggestions
+
+One call per request, through the agent infrastructure's model access (the
+online model, or the in-browser model offline, per the offline-parity rule).
+Inputs: column names, kinds, and the distinct values of columns classified
+categorical or ordered. Never identifiers, free text, dates, or numbers.
+Outputs, as structured JSON validated with Zod: label suggestions per value,
+an entry description, and meaning-based matches the scorer missed (`dob` ↔
+`birth_date`, `vax_status` ↔ `mmr_status`). Every AI result is shown as a
+suggestion with a marker and needs acceptance.
+
+If no model is available, the button explains why ("Suggestions need a
+connection or the offline model. Labeling still works.") and nothing else
+changes.
+
+## 9. Crosswalk compilation
+
+`compileCrosswalkSql(crosswalk, layouts, columns, mappings, codeLists)` in
+`shared/` returns:
+
+```sql
+SELECT 'Kings line list 2026-03' AS "source_dataset",
+       CAST("CaseNo" AS VARCHAR) AS "case_id",
+       strptime("onset_dt", '%m/%d/%Y')::DATE AS "rash_onset_date",
+       CASE lower(trim(CAST("GENDER" AS VARCHAR))) WHEN '1' THEN 'Male' ... END AS "sex",
+       "age_mo" / 12.0 AS "age_years",
+       'Bronx' AS "county",
+       NULL AS "outbreak_associated"
+FROM "<dataset uuid>"
+UNION ALL BY NAME
+SELECT ...
+```
+
+- Skipped layouts are left out. A layout still To do or Review is included
+  with whatever is confirmed or suggested, and step 3 says how many rows come
+  from unconfirmed mappings.
+- Expressions are checked with `assertSingleSqlExpression` from
+  `src/lib/plugins/derivedColumns/` and may reference only the layout's own
+  columns.
+- Decoding embeds the code lists' current pairs, so the combined dataset is
+  a snapshot of the lists at compile time. `compiled_code_list_versions`
+  drives the stale banner (section 7.6). Re-compiling is always the crosswalk
+  editor's own action, so no recompile fans out to datasets they cannot edit.
+- The output is saved as `datasets__virtual.raw_sql` of `output_dataset_id`.
+- `VirtualDatasetWrapper` gets a real freshness signal: the virtual row's
+  `updated_at`. Without it, an updated combined dataset would keep serving
+  its old materialization from `DexieRelationCache`. This also fixes the same
+  limitation for every virtual dataset.
+
+Scale: QETL acquires a virtual dataset's dependencies one at a time
+(`createRegistryForFetch.ts`). With 100 datasets, the first materialization
+of a combined dataset is slow. Step 3 shows progress per dataset, and the
+result is cached like any virtual dataset. Section 18 lists parallel
+acquisition as a follow-up if it is too slow in practice.
+
+## 10. Ask Avandar context
+
+Every path that describes datasets to a model gains code lists for bound
+columns. Reference and convert bindings both count; for a converted column
+the list explains the labels the model sees.
+
+| Path | File | Change |
+|---|---|---|
+| Legacy online `PostChatMessages` and the offline multi-pass pipeline | `shared/models/chat/SqlTableAlias/SqlTableAliasModule.ts` (`_formatAliasLine`) | Bound columns render `GENDER [1=Male, 2=Female, 9=Unknown]`, the same pattern as `_buildStatusFields`. `fetchWorkspaceSchema.ts` and `fetchOfflineChatSchema.ts` load bindings and code lists. |
+| Pi data agent, online and in browser | `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` (`_formatDatasetLine`), `loadDataAgentDatasets.ts` | `GENDER int codes 1=Male, 2=Female, 9=Unknown`. A new prompt version, `data-agent-v4`, since shipped versions are frozen. |
+| Offline data agent | `profileOfflineDatasets.ts`, `buildOfflineDataAgentSystemPrompt.ts`, `findQuestionValues.ts` | A bound integer column lists its code list instead of nothing. `findQuestionValues` also searches labels and accepted spellings, so "female" adds `GENDER = 2` to `VALUES IN THE QUESTION`. |
+| `lookup_values` tool | `lookupValuesTool.ts` | Searches code list labels as well as stored text values, returning the code to filter on. |
+
+Limits: up to 30 pairs per column, then "and 12 more". Up to 120 characters of
+entry description per column, Pi data agent only. `truncateSchemaForOffline`
+keeps a bound column's list whole, as it does for statuses.
+
+Code lists are metadata, not rows, so decision D05 (the model never sees
+rows) holds. Following the agent roadmap's bar, the eval gets cases before
+this ships: questions phrased in labels against coded columns ("how many
+female cases were hospitalized"), for online and offline, with no accuracy
+loss on the existing suite.
+
+## 11. Permissions and RLS
+
+v1 reuses the `data_sources` app and does not add a `resource_type`. Adding
+one touches six SQL files (`15.resource_shares.sql`,
+`16.utils.resource-permissions.sql`, and four RPCs), which is worth doing
+only when per-dictionary sharing is needed. The owner columns are in place
+so that change needs no data migration.
+
+| Table | Select | Insert, update | Delete |
+|---|---|---|---|
+| `data_dictionaries` and its children | `util__auth_user_meets_min_app_role(workspace_id, 'data_sources', 'viewer')` | `... 'editor'` | owner, or `'admin'` |
+| `crosswalks` and its children | same | same | same |
+| `dataset_columns__dictionary_bindings` | `util__auth_user_can_access_resource('dataset', dataset_id, 'viewer')` | `... 'editor'` | `... 'editor'` |
+
+- A linked dataset and a combined dataset are ordinary `datasets` rows owned
+  by their creator, with the usual dataset permissions. Creating one needs
+  the dataset insert permission and the subscription's dataset limit check
+  (`SubscriptionPermissionsClient.useCanAddDataset`), like any import.
+- Applying needs edit rights on the dataset. Adding an unmatched value to a
+  code list also needs edit rights on the dictionary.
+- Dictionary contents are visible to every Data Sources viewer. A reader who
+  cannot see a dataset never sees its bindings, because bindings follow the
+  dataset.
+- Permission keys in `PermissionRegistry.ts`:
+  `data_sources__can_view_dictionaries`,
+  `data_sources__can_edit_dictionaries`,
+  `data_sources__can_edit_crosswalks`.
+- pgTAP: a file per table group under `supabase/tests/database/permissions/`,
+  following `rls_maps.test.sql`, with the negative cases from
+  `docs/rules/sql.md`.
+
+## 12. Offline and desktop
+
+- Dictionaries, code lists, crosswalks, and bindings are read through
+  TanStack Query, whose persisted cache keeps them readable offline. Writes
+  need Supabase, so creating, editing, or applying while disconnected fails
+  with "You're offline. Reconnect to save this." and keeps the user's work in
+  the form.
+- Conversions are applied when data loads, so an offline-only dataset that
+  was converted keeps converting offline.
+- Profiling and matching run on the device. AI suggestions use the offline
+  model when there is no connection.
+- Nothing here depends on browser chrome, so the desktop app gets it for
+  free.
+
+## 13. User-facing copy
+
+All strings go through Lingui. Tooltips are rendered by a positioned
+tooltip, not `title`, and also open on keyboard focus.
+
+| Where | Copy |
+|---|---|
+| Global switch | **Convert all** · **Attach dictionaries only as references** |
+| Convert all tooltip | Changes the values in every column that has codes, using the labels from your dictionaries. Charts, filters, and downloads show the labels from then on. |
+| Attach dictionaries only as references tooltip | Leaves every column exactly as it is. Your dictionaries are attached alongside the data, so anyone can hover a column to see what its values mean, and Ask Avandar can use them to answer questions. |
+| Side pane label | How to apply the dictionary |
+| Side pane switch | **Apply conversions** · **Attach labels only as reference** |
+| Apply conversions tooltip | Changes the values in this column using the dictionary. For example, every 1 becomes Male, and charts, filters, and downloads show Male from then on. |
+| Attach labels only as reference tooltip | Leaves this column exactly as it is. The dictionary is attached alongside it, so anyone can hover the column to see what each value means, and Ask Avandar can use it to answer questions. |
+| Explanation, converting | Your data will change. The labels stay attached too, so the column is still explained. |
+| Explanation, reference | Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the labels. |
+| Row chip | **Convert** · **Reference only** (tooltip: the matching side-pane tooltip plus "Click to attach as reference only instead." or "Click to convert instead.") |
+| Dataset menu | **Apply a dictionary** / Turn codes into labels and add column descriptions. **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
+| Popover footer | From <dictionary> › <entry>. Attached as reference. The values in the data are unchanged. / The values were converted to these labels. |
+| Rail | Attached as reference · data unchanged / Linked dataset: <name> / Converted this dataset · version <n> |
+| Save step, reference only | Nothing in your data changes. <n> columns keep their values, with labels attached as reference. Edits to the dictionaries show up here right away. |
+
+"Reference" was chosen over "documentation" because people already say "for
+reference" to mean "look it up, don't change it".
+
+## 14. Edge cases
+
+| Case | Behavior |
+|---|---|
+| A bound column disappears after a refresh or re-import | The binding cascades away with the `dataset_columns` row. `_reconcileColumns` keeps column ids when names match, so bindings survive ordinary refreshes. |
+| New values appear after a refresh | Converted: unmatched values pass through (override default "keep"). The popover adds "3 values in the data have no label" with a link to the dictionary. |
+| A pair is removed from a live code list | Linked datasets show the raw value for it from the next load. Pinned datasets are unaffected. |
+| A dictionary is deleted | A trigger copies the current pairs into `pinned_pairs` for every live convert binding first, so no linked dataset changes silently. Reference bindings are removed. The delete confirm names the number of datasets affected. |
+| An entry is deleted | Same as above, scoped to the entry. |
+| The source of a linked dataset is deleted | Existing behavior for virtual datasets with a missing dependency. `linked_source_dataset_id` becomes null. |
+| Two bindings for one column | Prevented by the unique `dataset_column_id`. Applying again replaces the binding. |
+| A column renamed after binding | Bindings use `dataset_column_id`, so they follow the rename. |
+| Applying with no edit rights on the dataset | The menu items are hidden; the route redirects to the dataset with a toast. |
+| Code list with codes that differ only in case (`m`, `M`) | Matching is case-insensitive, so the save is refused with "Two values in this list only differ in capitalization: m and M." |
+| 200 datasets in a crosswalk | Allowed; the stub list virtualizes past 100 layouts. |
+
+## 15. Testing
+
+Red/green TDD per `docs/rules/testing.md`.
+
+- **Unit (Vitest):** the projection renderer (decode, encode with accepted
+  spellings, overrides, keep-original, integer output, quoting of hostile
+  labels), the scorer and its bands, profiling classification against real
+  fixtures, layout signatures, `CrosswalkFillSchema` and `CodePairsSchema`
+  parsing and migration.
+- **Executed (`*.executed.test.ts`, real DuckDB):** a converted column
+  returns labels through QETL; an ordered list sorts by list order; a linked
+  dataset follows a code list edit without a cache clear; the crosswalk SQL
+  stacks three layouts with conversions and a source column.
+- **pgTAP:** RLS for every new table (section 11); the version-bump trigger;
+  the pin-on-delete trigger; `rpc_dataset_columns__apply_dictionaries`
+  writing a linked dataset and its bindings atomically.
+- **Agent evals:** the cases in section 10, online and offline.
+- **E2E (one spec per flow, run one at a time):**
+  `dictionary-create-from-dataset.spec.ts`,
+  `dictionary-apply-reference.spec.ts`,
+  `dictionary-apply-linked.spec.ts`,
+  `dictionary-apply-in-place.spec.ts`,
+  `crosswalk-map-and-combine.spec.ts`. Seed datasets with the service-role
+  helpers, drive everything else through the UI, restore state in
+  `afterEach`.
+
+## 16. Delivery slices
+
+Each slice is one PR into `demo/measles`, recorded in
+[pr-feature-log.md](pr-feature-log.md).
+
+1. **Dictionaries.** Schema, models, clients, RLS and pgTAP for dictionaries,
+   entries, code lists, and codings; the list group; the Dictionary view with
+   all three tabs (Used by empty until slice 3); manual create and edit.
+2. **Learn from datasets.** Profiling, scoring, the create flow from the Add
+   menu and from a dataset's menu, AI label and match suggestions online and
+   offline.
+3. **Attach as reference.** Bindings schema and RPC, Apply with reference
+   mode only, the code-list popover (dataset page and Data Explorer header),
+   the rail group, Used by, and Ask Avandar context with evals.
+4. **Conversions.** The `valueMapping` projection, ordered `ENUM` output,
+   linked datasets, converting in place with pinning and Re-apply, unmatched
+   values, the preview drawer, keep-original columns, the virtual dataset
+   freshness signal.
+5. **Crosswalks.** Schema, layouts, the three steps, mapping fills and
+   conversions, compilation, export, the stale banner.
+
+## 17. Roadmap
+
+- **Write-back to live sources.** When a connector supports writing (Google
+  Sheets first, then Postgres), **Change <dataset>** becomes available for
+  live connections, with the same pinned semantics. Until then it stays
+  disabled with the copy in section 7.5.
+- **Undo a conversion in place.** Stored data is never rewritten (section
+  6.1), so removing a convert binding restores the original values. Expose it
+  as "Restore original values" in the rail's overflow and the Used by tab.
+- **Per-dictionary sharing.** Promote dictionaries and crosswalks to a
+  `resource_type` when teams need private or restricted dictionaries.
+- **Import dictionaries** from REDCap data dictionary CSVs, SPSS value
+  labels, and CDISC codelists; publish starter dictionaries (CDC race and
+  ethnicity, NNDSS case report codes).
+- **Show labels on raw grids** as a display toggle, without converting.
+- **Crosswalk joins** (side by side), building on the joined-cases key
+  matching.
+- **Parallel acquisition** for virtual datasets with many dependencies.
+
+## 18. Open decisions
+
+1. **Anonymous `ENUM` casts in a view.** If `CAST(... AS ENUM('Low', ...))`
+   is awkward inside the replacement view, the fallback is `VARCHAR` output
+   plus a sort key column that charts and `ORDER BY` defaults read. Settle in
+   the slice 4 plan with an executed test.
+2. **Bindings in the relation cache key.** The projection is built at load,
+   but the plan must confirm every QETL entry point (Data Explorer, dashboard
+   blocks, maps, published snapshots, agent `run_query`) passes bindings to
+   `getColumnReplacementsFromColumns`, and that a binding change invalidates
+   the loaded view.
+3. **AI suggestion endpoint.** Whether label suggestions reuse the Pi data
+   agent's proxy (`PostAgentStream`) with a dedicated prompt, or get their own
+   small route. Depends on where the agent work stands when slice 2 starts.
+4. **Crosswalk materialization time at 100 datasets.** Measure in slice 5
+   before deciding on parallel acquisition.
