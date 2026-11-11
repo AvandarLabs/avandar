@@ -175,6 +175,8 @@ export const EXCLUDED_TABLES = [
   "resource_shares",
   // Web GIS maps are not mirrored to desktop SQLite yet.
   "maps",
+  // A map's displacement salt: server-only, and readable only by map editors.
+  "map_jitter_salts",
   // Web-only first-run tutorial/onboarding progress; nothing the desktop
   // needs to render offline.
   "user_nux_progress",

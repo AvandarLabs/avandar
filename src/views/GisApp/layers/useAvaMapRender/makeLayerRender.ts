@@ -8,19 +8,24 @@ import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
 import { classifyLayerGeometry } from "@/views/GisApp/layers/useAvaMapRender/classifyLayerGeometry";
 import { getPaintValueColumnName } from "@/views/GisApp/layers/useAvaMapRender/getPaintValueColumnName";
 import { makeLayerViewState } from "@/views/GisApp/layers/useAvaMapRender/makeLayerViewState";
+import type { PointAggregation } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
 import type {
   createLayerGeometryCache,
   LayerGeometry,
 } from "@/views/GisApp/layers/createLayerGeometryCache/createLayerGeometryCache";
 import type { MapBounds } from "@/views/GisApp/layers/getBoundsFromFeatureCollection/getBoundsFromFeatureCollection";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
+import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { LayerLegendUpdate } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
 import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
 
-type LayerRender = {
+/** Everything the map needs to draw, hit-test, and describe one layer. */
+export type LayerRender = {
   layerId: MapLayer.Id;
   layerSpec: MapSpec | undefined;
+  /** The features this layer draws, after sensitivity and classification. */
+  featureCollection: GeoJSON.FeatureCollection;
   interactiveLayerIds: string[];
   viewState: MapLayerViewState;
   bounds: MapBounds | undefined;
@@ -102,17 +107,19 @@ function _getInteractiveLayerIds(options: {
   return [MapLayerIds.toLayerId(layer.id)];
 }
 
-/** Selects direct spatial GeoJSON or cached row conversion. */
+/** Selects direct spatial or snapshot GeoJSON, or cached row conversion. */
 function _getLayerGeometry(options: {
   layer: MapLayer.T;
   binding: MapLayer.GeoBindingColumnNames | undefined;
   queryState: MapLayerQueryState | undefined;
   geometryCache: ReturnType<typeof createLayerGeometryCache>;
   isAggregated: boolean;
+  jitterSalt: string;
 }): LayerGeometry {
-  if (options.queryState?.data?.type === "spatial") {
+  const data = options.queryState?.data;
+  if (data?.type === "spatial" || data?.type === "snapshot") {
     return {
-      featureCollection: options.queryState.data.featureCollection,
+      featureCollection: data.featureCollection,
       drops: [],
       error: undefined,
     };
@@ -122,6 +129,7 @@ function _getLayerGeometry(options: {
     binding: options.binding,
     sensitivity: options.layer.sensitivity,
     propertyColumnNames: _getPropertyColumnNames(options),
+    jitterSalt: options.jitterSalt,
     rows:
       options.queryState?.data?.type === "rows"
         ? options.queryState.data.queryResult.data
@@ -129,20 +137,36 @@ function _getLayerGeometry(options: {
   });
 }
 
-/** Derives all rendering state for one configured map layer. */
+/** How DuckDB aggregated the layer's points, when it did. */
+function _getAggregation(
+  data: MapLayerDataResult | undefined,
+): PointAggregation | undefined {
+  if (data?.type === "rows" || data?.type === "snapshot") {
+    return data.aggregation;
+  }
+  return undefined;
+}
+
+/**
+ * Derives all rendering state for one configured map layer.
+ *
+ * `jitterSalt` is the map's secret key for displacing a jittered lat/lng
+ * layer's points. It must come from the map row, never from published output.
+ */
 export function makeLayerRender({
   layer,
   layerQueryStates,
   geometryCache,
+  jitterSalt,
 }: Readonly<{
   layer: MapLayer.T;
   layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>;
   geometryCache: ReturnType<typeof createLayerGeometryCache>;
+  jitterSalt: string;
 }>): LayerRender {
   const queryState = layerQueryStates.get(layer.id);
   const binding = MapLayer.toGeoBinding(layer);
-  const aggregation =
-    queryState?.data?.type === "rows" ? queryState.data.aggregation : undefined;
+  const aggregation = _getAggregation(queryState?.data);
   const isAggregated = aggregation !== undefined;
   const rawGeometry = _getLayerGeometry({
     layer,
@@ -150,6 +174,7 @@ export function makeLayerRender({
     queryState,
     geometryCache,
     isAggregated,
+    jitterSalt,
   });
   const { geometry, legendUpdate, valueDomain } = classifyLayerGeometry({
     layer,
@@ -177,6 +202,7 @@ export function makeLayerRender({
       isRendered,
       isAggregated,
     }),
+    featureCollection: geometry.featureCollection,
     interactiveLayerIds: _getInteractiveLayerIds({
       layer,
       isRendered,

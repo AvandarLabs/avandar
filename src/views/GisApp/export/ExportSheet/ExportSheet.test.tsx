@@ -121,6 +121,9 @@ function _props(overrides: Overrides): Props {
     view: { center: [0, 0], zoom: 4 },
     legendEntries: [],
     hasDrawnDisputedFeature: false,
+    onAddToDashboard: () => {
+      return;
+    },
     onConfigChange:
       overrides.onConfigChange ??
       (() => {
@@ -526,5 +529,19 @@ describe("ExportSheet", () => {
     expect(
       screen.getByRole("img", { name: "Export preview" }),
     ).toBeInTheDocument();
+  });
+
+  it("offers to add the map to a dashboard from its footer", () => {
+    const onAddToDashboard = vi.fn();
+    render(
+      <ExportSheet
+        {...(_props({}) as Props)}
+        onAddToDashboard={onAddToDashboard}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add to dashboard" }));
+
+    expect(onAddToDashboard).toHaveBeenCalledOnce();
   });
 });

@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+import { LayerEditorFrame } from "@/views/GisApp/panels/LayerPanel/LayerEditorFrame";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
 import css from "@/views/GisApp/panels/LayerPanel/LayerPanel.module.css";
 import { LayerSourcePicker } from "@/views/GisApp/panels/LayerPanel/LayerSourcePicker/LayerSourcePicker";
@@ -13,6 +14,8 @@ type Props = ComponentProps<typeof LayerList> & {
   isCollapsed: boolean;
   onToggleCollapsed: () => void;
   onAddLayerFromSource: (dataSource: QueryDataSource.T) => void;
+  /** Layer controls shown under the list while a layer is open. */
+  editor?: ReactNode;
   variant?: MapChromePanelVariant;
   bodyId?: string;
 };
@@ -22,6 +25,7 @@ export function LayerPanel({
   isCollapsed,
   onToggleCollapsed,
   onAddLayerFromSource,
+  editor = null,
   variant = "layers",
   bodyId,
   ...listProps
@@ -59,7 +63,10 @@ export function LayerPanel({
         </LayerSourcePicker>
       }
     >
-      <LayerList {...listProps} />
+      <div className={css.layerListSection}>
+        <LayerList {...listProps} />
+      </div>
+      <LayerEditorFrame editor={editor} />
     </MapChromePanel>
   );
 }

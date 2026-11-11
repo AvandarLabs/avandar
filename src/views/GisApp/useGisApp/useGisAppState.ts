@@ -178,9 +178,13 @@ function useSelectCreatedAnnotation(
   );
 }
 
-/** Collects the map state, data rendering, and interaction callbacks. */
+/**
+ * Collects the map state, data rendering, and interaction callbacks.
+ * `jitterSalt` displaces the map's jittered points.
+ */
 export function useGisAppState(
   avaMap: AvaMap.T,
+  jitterSalt: string,
 ): ReturnType<typeof useGisAppMapCallbacks> &
   ReturnType<typeof useGisAppCanvas> &
   ReturnType<typeof useGisAppChrome> &
@@ -227,6 +231,7 @@ export function useGisAppState(
   }, [overlayTextFeatureId]);
   const rendering = useGisAppRendering({
     avaMap,
+    jitterSalt,
     chrome,
     editor,
     hiddenAnnotationFeatureIds,

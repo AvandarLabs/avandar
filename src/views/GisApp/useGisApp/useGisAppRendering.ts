@@ -1,86 +1,34 @@
-import { where } from "@avandar/utils";
-import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { FitBoundsRequest } from "@/views/GisApp/layers/FitBoundsRequest/FitBoundsRequest";
-import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
 import { PersistedLayerLegends } from "@/views/GisApp/layers/PersistedLayerLegends/PersistedLayerLegends";
-import { useAvaMapRender } from "@/views/GisApp/layers/useAvaMapRender/useAvaMapRender";
-import { useMapLayersData } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
-import { useMapConfigWithPlaceIds } from "@/views/GisApp/places/useMapConfigWithPlaceIds";
-import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
+import { useMapLayerRendering } from "@/views/GisApp/layers/useMapLayerRendering";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { MapLayerQueryState } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData";
+import type { MapLayerRendering } from "@/views/GisApp/layers/useMapLayerRendering";
+import type { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
 import type { GisAppChrome } from "@/views/GisApp/useGisApp/useGisAppChrome";
 
-/** Collects already-loaded spatial FeatureCollections, keyed by layer. */
-function _getSpatialFeatureCollections(
-  layerQueryStates: ReadonlyMap<MapLayer.Id, MapLayerQueryState>,
-): Map<MapLayer.Id, GeoJSON.FeatureCollection> {
-  const collections = new Map<MapLayer.Id, GeoJSON.FeatureCollection>();
-  layerQueryStates.forEach((state, layerId) => {
-    if (state.data?.type === "spatial") {
-      collections.set(layerId, state.data.featureCollection);
-    }
-  });
-  return collections;
-}
-
 /** Loaded layer data plus the renderable map specification. */
-export type GisAppRendering = ReturnType<typeof useAvaMapRender> & {
-  layerFeatureCollections: Map<MapLayer.Id, GeoJSON.FeatureCollection>;
-};
+export type GisAppRendering = MapLayerRendering;
 
-/** Loads layer data and derives the renderable map state from it. */
+/**
+ * Loads layer data and derives the renderable map state from it, then does
+ * what only the editor does: persists derived legends and fits new layers.
+ */
 export function useGisAppRendering(
   options: Readonly<{
     avaMap: AvaMap.T;
+    /** The salt that displaces the map's jittered points. */
+    jitterSalt: string;
     chrome: GisAppChrome;
     editor: ReturnType<typeof useAvaMapEditor>;
     hiddenAnnotationFeatureIds?: readonly AvaMapConfig.AnnotationFeatureId[];
   }>,
 ): GisAppRendering {
-  const [datasets = []] = DatasetClient.useGetAll(
-    where("workspace_id", "eq", options.avaMap.workspaceId),
-  );
-  const [datasetColumns = []] = DatasetColumnClient.useGetAll(
-    where("workspace_id", "eq", options.avaMap.workspaceId),
-  );
-  const zoomBand = Math.max(
-    0,
-    Math.min(24, Math.floor(options.editor.mapConfig.view.zoom)),
-  );
-  const simplificationReferenceLatitude = useMemo(() => {
-    return options.editor.mapConfig.view.center[1];
-    // Capture latitude only when a new integer zoom band begins.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [zoomBand]);
-  const renderedMapConfig = useMapConfigWithPlaceIds({
+  const rendering = useMapLayerRendering({
     mapConfig: options.editor.mapConfig,
     workspaceId: options.avaMap.workspaceId,
-    datasetColumns,
-  });
-  const renderedLayers = renderedMapConfig.layers;
-  const queryLayers = useMemo(() => {
-    return getQueryLayersFromMapLayers(renderedLayers);
-  }, [renderedLayers]);
-  const layerQueryStates = useMapLayersData({
-    layers: queryLayers,
-    workspaceId: options.avaMap.workspaceId,
-    zoom: options.editor.mapConfig.view.zoom,
-    simplificationReferenceLatitude,
-    datasets,
-    datasetColumns,
-    overlay: {
-      aoi: options.editor.mapConfig.aoi,
-      timeRange: options.editor.mapConfig.timeRange,
-    },
-  });
-  const rendering = useAvaMapRender({
-    layerQueryStates,
-    mapConfig: renderedMapConfig,
+    view: options.editor.mapConfig.view,
+    jitterSalt: options.jitterSalt,
     hiddenAnnotationFeatureIds: options.hiddenAnnotationFeatureIds,
   });
   PersistedLayerLegends.usePersistedLayerLegends({
@@ -92,9 +40,5 @@ export function useGisAppRendering(
     layerBounds: rendering.layerBounds,
     requestFitBounds: options.chrome.requestFitBounds,
   });
-
-  return {
-    ...rendering,
-    layerFeatureCollections: _getSpatialFeatureCollections(layerQueryStates),
-  };
+  return rendering;
 }

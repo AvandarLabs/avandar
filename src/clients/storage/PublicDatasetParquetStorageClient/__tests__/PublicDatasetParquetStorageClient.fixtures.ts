@@ -11,7 +11,19 @@ const { downloadMock, fromMock, listMock, removeMock, uploadMock } = vi.hoisted(
   () => {
     const mockedUpload = vi.fn();
     const mockedDownload = vi.fn();
-    const mockedList = vi.fn();
+    // A folder no scenario mentions lists as empty, so a generation delete
+    // that also looks in the maps folder finds nothing there by default.
+    const mockedList = vi.fn<
+      (
+        folderPath: string,
+        options: { offset: number },
+      ) => Promise<{
+        data: ReadonlyArray<{ name: string }> | null;
+        error: { message: string } | null;
+      }>
+    >(async () => {
+      return { data: [], error: null };
+    });
     const mockedRemove = vi.fn();
     const mockedFrom = vi.fn(() => {
       return {

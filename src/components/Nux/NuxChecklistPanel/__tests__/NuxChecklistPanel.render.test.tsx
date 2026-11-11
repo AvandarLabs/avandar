@@ -1,4 +1,4 @@
-import { Modal } from "@mantine/core";
+import { Drawer, Modal } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
@@ -81,7 +81,7 @@ function _mountChatAside(): HTMLElement {
 function _renderPanel(
   overrides: Partial<NuxAppState>,
   onOpenMilestone: (key: NuxProgress.MilestoneKey) => void = vi.fn(),
-  extras: { withOpenProductModal?: boolean } = {},
+  extras: { withOpenProductModal?: boolean; isDrawerOpen?: boolean } = {},
 ): ReturnType<typeof render> {
   function Wrapper({ children }: { children: ReactNode }): ReactNode {
     return (
@@ -114,6 +114,16 @@ function _renderPanel(
               Publish
             </Modal>
           ) : null}
+          {extras.isDrawerOpen === undefined ? null : (
+            <Drawer
+              opened={extras.isDrawerOpen}
+              onClose={vi.fn()}
+              position="right"
+              title="Export"
+            >
+              Download PDF
+            </Drawer>
+          )}
           {children}
           <NuxChecklistStateProbe />
         </NuxStateManager.Provider>
@@ -196,6 +206,27 @@ describe("NuxChecklistPanel", () => {
     } finally {
       aside.remove();
     }
+  });
+
+  it("steps aside while a drawer is open, since drawers dock to its corner", async () => {
+    _renderPanel({}, vi.fn(), { isDrawerOpen: true });
+    await waitFor(() => {
+      expect(screen.queryByTestId("nux-checklist")).not.toBeInTheDocument();
+    });
+  });
+
+  it("hides its collapsed pill while a drawer is open", async () => {
+    _renderPanel({ isPanelExpanded: false }, vi.fn(), { isDrawerOpen: true });
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("button", { name: /Get started/ }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("stays visible while a drawer is mounted but closed", () => {
+    _renderPanel({}, vi.fn(), { isDrawerOpen: false });
+    expect(screen.getByTestId("nux-checklist")).toBeInTheDocument();
   });
 
   it("renders nothing once every milestone is done", () => {

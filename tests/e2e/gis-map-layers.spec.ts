@@ -136,10 +136,10 @@ test.describe("GIS map layers", () => {
           exact: true,
         });
         await expect(
-          layerInspector.getByRole("button", { name: "Latitude" }),
+          layerInspector.getByRole("combobox", { name: "Latitude" }),
         ).toBeVisible();
         await expect(
-          layerInspector.getByRole("button", { name: "Longitude" }),
+          layerInspector.getByRole("combobox", { name: "Longitude" }),
         ).toBeVisible();
         await layerInspector
           .getByRole("button", { name: "Back to layers" })

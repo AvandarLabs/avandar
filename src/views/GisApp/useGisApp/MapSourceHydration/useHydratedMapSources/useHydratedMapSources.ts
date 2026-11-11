@@ -1,87 +1,13 @@
-import { where } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
+import { useCallback, useEffect, useRef } from "react";
 import { notifyWarning } from "@/utils/notifications/notify";
 import { MapSourceHydration } from "../MapSourceHydration";
+import { useHydratedMapConfig } from "./useHydratedMapConfig";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
-
-function useReadyMapMetadata({
-  config,
-  workspaceId,
-}: {
-  config: AvaMapConfig.T;
-  workspaceId: Workspace.Id;
-}): {
-  readyColumns: DatasetColumn.T[] | undefined;
-  readyAttributes: ConceptAttribute.T[] | undefined;
-} {
-  const [datasetColumns, , datasetQuery] = DatasetColumnClient.useGetAll(
-    where("workspace_id", "eq", workspaceId),
-  );
-  const [conceptAttributes, , conceptQuery] = ConceptAttributeClient.useGetAll({
-    ...where("workspace_id", "eq", workspaceId),
-    useQueryOptions: {
-      enabled: config.layers.some((layer) => {
-        return layer.source.dataSource?.__type === "Concept";
-      }),
-    },
-  });
-  const readyColumns = datasetQuery?.isSuccess ? datasetColumns : undefined;
-  const readyAttributes = conceptQuery?.isSuccess
-    ? conceptAttributes
-    : undefined;
-  return { readyColumns, readyAttributes };
-}
-
-function useMapSourceHydration({
-  config,
-  readyColumns,
-  readyAttributes,
-}: {
-  config: AvaMapConfig.T;
-  readyColumns: readonly DatasetColumn.T[] | undefined;
-  readyAttributes: readonly ConceptAttribute.T[] | undefined;
-}): ReturnType<typeof MapSourceHydration.fromMetadata> {
-  const [previousHydrationState, setPreviousHydrationState] = useState(() => {
-    return {
-      input: config,
-      readyColumns,
-      readyAttributes,
-      result: MapSourceHydration.fromMetadata({
-        config: config,
-        datasetColumns: readyColumns,
-        conceptAttributes: readyAttributes,
-      }),
-    };
-  });
-  let result = previousHydrationState.result;
-  if (
-    previousHydrationState.input !== config ||
-    previousHydrationState.readyColumns !== readyColumns ||
-    previousHydrationState.readyAttributes !== readyAttributes
-  ) {
-    result = MapSourceHydration.fromMetadata({
-      config: config,
-      previousInput: previousHydrationState.input,
-      previousConfig: previousHydrationState.result.config,
-      datasetColumns: readyColumns,
-      conceptAttributes: readyAttributes,
-    });
-    setPreviousHydrationState({
-      input: config,
-      readyColumns,
-      readyAttributes,
-      result,
-    });
-  }
-  return result;
-}
 
 function useMissingFilterNotification(
   issues: ReturnType<typeof MapSourceHydration.fromMetadata>["issues"],
@@ -169,24 +95,19 @@ export function useHydratedMapSources({
   editor: ReturnType<typeof useAvaMapEditor>;
   workspaceId: Workspace.Id;
 }>): ReturnType<typeof useAvaMapEditor> {
-  const { readyColumns, readyAttributes } = useReadyMapMetadata({
+  const hydration = useHydratedMapConfig({
     config: editor.mapConfig,
-    workspaceId: workspaceId,
+    workspaceId,
   });
-  const result = useMapSourceHydration({
-    config: editor.mapConfig,
-    readyColumns: readyColumns,
-    readyAttributes: readyAttributes,
-  });
-  useMissingFilterNotification(result.issues);
+  useMissingFilterNotification(hydration.issues);
   const updateConfig = useHydratedUpdateConfig({
     updateEditorConfig: editor.updateConfig,
     latestHydration: {
       previousInput: editor.mapConfig,
-      previousConfig: result.config,
-      readyColumns,
-      readyAttributes,
+      previousConfig: hydration.config,
+      readyColumns: hydration.readyColumns,
+      readyAttributes: hydration.readyAttributes,
     },
   });
-  return { ...editor, mapConfig: result.config, updateConfig };
+  return { ...editor, mapConfig: hydration.config, updateConfig };
 }
