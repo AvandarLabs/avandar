@@ -181,6 +181,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F125 | Resolve the video adapter's imports when ESLint lints a batch | not started | none | |
 | F126 | Per-branch local Supabase through `.env.development` overrides, with `ava supabase start`, `stop`, `prune`, and `switch remote` | PR open: [#320](https://github.com/AvandarLabs/avandar/pull/320), needs a `develop` merge and one more commit (see its section) | none | |
 | F127 | E2E stability: stable map `updateConfig`, job progress re-render, Featurebase stub, pinned CI runners | PR open: [#321](https://github.com/AvandarLabs/avandar/pull/321) | none | |
+| F128 | Multiple chats, a closed-chat archive, and session titles | not started | F91, F89, F90, F81 to F87, F94, F57 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -315,6 +316,7 @@ API. It's new work, not something this branch built.
 | any | F125 | The unresolved adapter imports in a batch lint are on `develop`, so it can merge first. |
 | any | F126 | PR #320 is open. Merge `develop` into it first: `develop`'s `183a41c50` rewrote the same `AGENTS.md` section. Coordinate with F15 (#319), which edits `apps/ava-cli/src/main.ts` and `apps/ava-cli/README.md` too. |
 | any, before F35 | F127 | PR #321 is open and fixes bugs that are on `develop`. F35's `aad4d700d` later splits `useHydratedMapSources.ts`, so F35 is easier to port once this is in. |
+| after F91, F94, F57 | F128 | Makes F91's tray and the thread per session, adds tabs to F94's panel header, and starts a case-design session from F57's New case type controls. Its title excerpt masks F89 and F90's mention tokens. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -457,8 +459,8 @@ Take only your feature's hunks from these files. The last feature in the
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
-| `supabase/functions/chat/ChatRoutes.ts` | F77, F82 | F77: the `/:workspaceId/extract-measurements` route. F82: the `/:workspaceId/agent/:promptId/api/stream` route (`2fb2a1f91`, path from `a673d31ad`). |
-| `supabase/functions/chat/ChatRoutes.types.ts` | F77, F82, F84 | F77: the extract-measurements body and return type. F82: the agent stream route type. F84: the "Ignored" doc on `model` (`7ea18c278`). |
+| `supabase/functions/chat/ChatRoutes.ts` | F77, F82, F128 | F77: the `/:workspaceId/extract-measurements` route. F82: the `/:workspaceId/agent/:promptId/api/stream` route (`2fb2a1f91`, path from `a673d31ad`). F128: the `/:workspaceId/title/:promptId` route (`0fa1c05f1`). |
+| `supabase/functions/chat/ChatRoutes.types.ts` | F77, F82, F84, F128 | F77: the extract-measurements body and return type. F82: the agent stream route type. F84: the "Ignored" doc on `model` (`7ea18c278`). F128: the title route type. |
 | `supabase/functions/chat/PostChatMessages/PostChatMessages.ts` | F22, F57 to F62, F71 to F75, F81, F84 | F22: BUG-010 and C4 hunks. F57 to F62 (`fb1740d52`): `conceptStatuses`. F71 to F75 (`53bb9e0ba`): `columns`. F81: the turn logic moves into `runChatTurn` (`d5d37b8c8`), carrying the earlier hunks with it. F84: `ChatModelOption.Catalog.defaultId` replaces `enforceChatModelAllowlist` (`7ea18c278`). |
 | `supabase/functions/chat/PostChatMessages/runChatTurn/runChatTurn.ts` | F81, F71 to F75 | F81 creates it. F71 to F75: the `columns: options.schema.columns` argument, resolved into this file in merge `32e728a51`. |
 | `supabase/functions/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.{ts,test.ts}` | F81, F71 to F75 | F81: per-call `OpenRouterUsage` (`d5d37b8c8`, `658b112f4`). F71 to F75 (`53bb9e0ba`, `ae1bf2bd5`): catalog `columns`. |
@@ -506,19 +508,24 @@ Take only your feature's hunks from these files. The last feature in the
 | `docs/ai-agent/**` | F88, F89 to F91 | See F88. |
 | `src/i18n/locales/*/messages.{po,ts}` | F79, F80, F84, F85, F86 | Generated: regenerate in each. |
 
-### AI agent context and the chat panel (F89 to F95)
+### AI agent context and the chat panel (F89 to F95, F128)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
-| `src/components/ChatPanel/ChatThread/Composer/Composer.tsx` | F94, F81 to F85, F86 and F87, F90, F91 | F94: the `composerActions` foot replaces the `Group`, and the send icon's stroke (`f2e44f2e4`). F81 to F85: `OfflineModeControl` in place of `ChatModelPicker` (`5f51ce819`). F86 and F87: the composer is enabled on every page but the case designer with the agent on (`eb4428ac3`). F90: `ChatComposerEditor` with the agent on, and chat gadget chips only (`9cc4cb5e2`, `cf595bb2b`). F91: `ChatContextTray` above the input (`bc8a9f05f`). |
+| `src/components/ChatPanel/ChatThread/Composer/Composer.tsx` | F94, F81 to F85, F86 and F87, F90, F91, F128 | F128: the composer picked from the selected session's kind (`4a57ac447`). F94: the `composerActions` foot replaces the `Group`, and the send icon's stroke (`f2e44f2e4`). F81 to F85: `OfflineModeControl` in place of `ChatModelPicker` (`5f51ce819`). F86 and F87: the composer is enabled on every page but the case designer with the agent on (`eb4428ac3`). F90: `ChatComposerEditor` with the agent on, and chat gadget chips only (`9cc4cb5e2`, `cf595bb2b`). F91: `ChatContextTray` above the input (`bc8a9f05f`). |
 | `src/components/ChatPanel/ChatThread/Composer/Composer.module.css` | F94, F90 | F94: the raised field and the split foot. F90: the editor, chip, and placeholder styles. |
-| `src/components/ChatPanel/ChatThread/Composer/Composer.test.tsx` | F86 and F87, F90, F91 | F86 and F87: `eb4428ac3`. F90: the editor with the agent on. F91: the tray mount. |
+| `src/components/ChatPanel/ChatThread/Composer/Composer.test.tsx` | F86 and F87, F90, F91, F128 | F86 and F87: `eb4428ac3`. F90: the editor with the agent on. F91: the tray mount. F128: the session-kind cases. |
 | `src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx` | F94, F90 | F94: one quiet suggestion list above the composer ("Try asking"). F90: the agent-on copy that invites a question on every page and mentions `@` (`05efea0f2`). |
-| `src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts` | F22, F81 to F85, F86 and F87, F89, F91 | F89: an empty `contextTrayRef` passed to `createChatModelAdapter` (`b3b7dacd4`). F91: the tray read from `ChatPanelStateManager`, hydrated once from `ChatContextTrayStore` and persisted (`15508bb95`, `65523931a`). |
-| `src/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks.tsx` | F22, F91 | F91: the `contextTray` state and store mocks. |
+| `src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts` | F22, F81 to F85, F86 and F87, F89, F91, F128 | F89: an empty `contextTrayRef` passed to `createChatModelAdapter` (`b3b7dacd4`). F91: the tray read from `ChatPanelStateManager`, hydrated once from `ChatContextTrayStore` and persisted (`15508bb95`, `65523931a`). F128: the thread and tray keyed by the selected session, pending cards kept across a switch, the kickoff run, and the title request. |
+| `src/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks.tsx` | F22, F91, F128 | F91: the `contextTray` state and store mocks. F128: the session provider mocks. |
+| `src/components/ChatPanel/{ChatContextTrayStore,ChatPanelStateManager,ChatPanelProvider}/**`, `ChatThread/ChatContextTray/__tests__/ChatContextTrayTestFixtures.tsx`, `__tests__/useAvandarChatRuntime.contextTray.test.tsx`, `src/components/Nux/NuxTour/useNuxOpenChatPanel/useNuxOpenChatPanel.test.tsx` | F91, F128 | F128: the session id in the tray key, `ChatSessionProvider` mounted in the panel provider, and the session fields in the test fixtures. |
+| `src/components/ChatPanel/ChatThreadStore/ChatThreadStore.{ts,test.ts}` | F85, F128 | F128: the session id in the key, `readRecord` and `writeRecord`, and the legacy reads the migration uses. |
+| `src/components/ChatPanel/{ChatPanel/ChatPanel.tsx,ChatPanelHeader/ChatPanelHeader.tsx}` | F94, F128 | F128: the session strip in the header and the panel. |
+| `src/views/OntologyDesignerApp/NewCaseTypeButton.{tsx,test.tsx}`, `src/routes/_auth/$workspaceSlug/ontology-designer/{index.tsx,-index.test.tsx}` | F57, F128 | F128: New case type and the home card start a case-design session. |
+| `tests/e2e/case-list-field.spec.ts` | F74, F75, F128 | F128: the Dock-by-Enter hunk of `b503e1762`. F74 takes its record-link hunk. |
 | `src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts`, `applyChatModelTurnResponse.test.ts` (new in F89) | F22, F89, F95 | F22: BUG-012's `explorerResponse` and BUG-014's labels. F89: `questionLabel` (`de3ff542e`) and the new test file. F95: a schema turn applies no SQL, and its tests. |
 | `src/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/*` | F22, F89 | F22: the file itself (BUG-014). F89: tokens read as `@Name` (`c757b60a7`). |
-| `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. |
+| `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. |
 | `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. |
 | `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F81 to F85, F86 and F87, F89, F95 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. |
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F86 and F87, F110 and F111 (`b3f267300`), F89 | F89: `mentionCount` and `attachedCount` on `ChatMessageSentPayload`. |
@@ -534,7 +541,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/config/Theme/{Theme.ts,Theme.test.ts,index.ts}` | F93, F94, F36 | F93: Paper `borderColor` reads `--ava-paper-border-color` first, and its test. F94: `APP_CHAT_ASIDE_Z_INDEX`, its export, and its test. F36: the Drawer root marker class. |
 | `DESIGN.md` | Postgres branch, F93, F94 | Postgres branch: the copy-rule Do and Don't. F93: the paragraph on `--ava-paper-border-color` in the slate section. F94: the Gutter Rule exception and the fused-aside sentences in the slate shadow paragraph. |
 | `docs/app-shell-nomenclature.md` | F94, F36 | F94: the fused chat aside row, the `APP_CHAT_ASIDE_Z_INDEX` tier, the stacking rule, and the Do line. F36: the checklist entries. |
-| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95 | F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. |
+| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. |
 
 ### Plugins (F96 to F112)
 
@@ -10262,6 +10269,158 @@ Then confirm PR #321's e2e jobs run on `ubuntu-24.04`.
 
 ---
 
+## F128: Multiple chats, a closed-chat archive, and session titles
+
+Status: not started. Built on `feat/agent-sessions`, merged into
+`demo/measles` on 2026-11-11 (`git log --merges --grep agent-sessions
+demo/measles` finds the merge). `develop` has none of it and no PR is open.
+This is Phase 1C of the agent roadmap (decision D43).
+
+**Purpose:** The chat panel keeps several chats per workspace and user.
+Up to three open chats show as tabs, the rest in an overflow list, and a
+closed chat goes to an archive of 50 in this browser, where it can be
+reopened or deleted. One localStorage index
+(`ava.chat.sessions.{workspaceId}.{userId}`) holds the selected id, the
+open ids in display order, the archived ids newest first, and each
+session's kind (`data` or `case-design`) and title. Each session keeps its
+own thread and context tray, under the old keys plus the session id. On
+first load the pre-session thread and tray become the first session, and
+the old keys are cleared only after every new write succeeds. New chat adds
+an empty data session without changing the panel's layout. New case type,
+from the navbar or the Case Manager home card, adds a case-design session,
+selects it, expands the panel, and starts the kickoff run once. The
+composer follows the selected session's kind, and a case-design turn sends
+the case manager page context from any page. After a session's first
+stored assistant reply, while its title is still a placeholder, the app
+asks the new `chat/:workspaceId/title/:promptId` route (`chat-title-v1`,
+Claude Haiku 5.5) for a title from a redacted excerpt. The route requires a
+workspace membership but no Data Explorer role. Offline answers are titled
+on the device.
+**Value:** A person can keep separate threads for separate questions, and
+starting a case type no longer wipes the chat they were in.
+
+**Design:** `docs/ai-agent/specs/phase-1c.md` and D43 in
+`docs/ai-agent/decisions.md`. The task plan, `docs/ai-agent/plans/phase-1c.md`,
+was never committed (see Open decisions).
+
+**PR title:** `feat(ai-agent): keep several chats and an archive of closed chats`
+
+**Depends on:** F91 (`ChatContextTrayStore`, `ChatPanelStateManager`, and
+the tray that becomes per session), F89 and F90 (the redaction and mention
+tokens the title excerpt masks), F81 to F85 and F86 and F87 (the agent
+turn, offline turn, and adapter that request titles), F94 (the panel header
+and the expand and dock layout the tabs sit in), and F57 (`NewCaseTypeButton`
+and the Case Manager home).
+
+**Commits to read** (all of `feat/agent-sessions`; `ab02f9641` and
+`b503e1762` are MIXED, `c40ebd3b3` carries the translations):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `c7b6361c3` | docs(ai-agent): spec multiple chat sessions | All of it. |
+| `5046a6245` | feat(chat): add the session index | All of it. |
+| `e7b1a271f` | fix(chat): keep visible session order on select | All of it. |
+| `a7a3fea55` | feat(chat): store each thread under a session id | All of it. |
+| `77a2d0079` | feat(chat): store each context tray under a session id | All of it. |
+| `e8f40371c` | fix(chat): return true when a tray write has no identity | All of it. |
+| `d097c1428` | feat(chat): migrate today's chat into the first session | All of it. |
+| `ec0ba39fa` | fix(chat): retry failed session migration | All of it. |
+| `f3e9970ac` | feat(chat): keep the open session in the chat provider | All of it. |
+| `12de35a3e` | feat(chat): switch the open thread when the session changes | All of it. |
+| `5dd397580` | fix(chat): preserve pending cards when switching sessions | All of it. |
+| `4a57ac447` | feat(chat): pick the composer from the session kind | All of it. |
+| `1610d30e6` | feat(chat): show open sessions and the archive | All of it. |
+| `62a813f82` | fix(chat): avoid nested archive controls | All of it. |
+| `a660bfa3f` | feat(chat): build a redacted excerpt for session titles | All of it. |
+| `19911de3f` | fix(chat): redact assistant mention tokens in title excerpts | All of it. |
+| `0fa1c05f1` | feat(chat): serve the chat-title-v1 prompt | All of it. |
+| `84ef1e615` | fix(chat): require title workspace membership | All of it. |
+| `2cadf0fad` | feat(chat): name a session after its first reply | All of it. |
+| `775a28b92` | fix(chat): title hosted and offline replies | All of it. |
+| `21778456f` | test(chat): cover session tabs and the archive in the browser | All of it. |
+| `8b9f5970b` | test(chat): assert session navigation reaches data explorer | All of it. |
+| `ab02f9641` | fix(chat): clear session typecheck errors | MIXED: the four `ChatPanel` files go here. The `src/views/GisApp/GisAppLayerPanel.test.tsx` return type is F119's, and `demo/measles` already had the same fix. |
+| `c40ebd3b3` | docs(ai-agent): mark multiple chat sessions built | The roadmap's 1C row. Regenerate the catalogs. |
+| `5d49c7760` | fix(chat): keep the selected chat when a background tab closes | All of it. |
+| `ddd22a0b7` | fix(chat): mount chat sessions on pages outside a workspace | All of it. |
+| `8bc905e0d` | fix(chat): detect the workspace route by its slug param | All of it. |
+| `d70c09fba` | fix(chat): start the case-design kickoff run for a new session | All of it. |
+| `a960b44c3` | fix(chat): start a case-design session from the New case type card | All of it. |
+| `0186ff705` | fix(chat): send case-design turns the case manager context | All of it. |
+| `bdc692ce0` | docs(ai-agent): hand off the unfinished Phase 1C work | Branch-only. `908e2f911` deletes the handoff and its README row. |
+| `62a4e3db1` | test(chat): count only chat turn posts after Try again | All of it. |
+| `125fd3f05` | test(chat): read the selected session's thread key in the harness | All of it. |
+| `b503e1762` | test(cases): dock chat and open the record in the list field spec | MIXED: the Dock-by-Enter hunk goes here, since F94's expanded panel covers the overlay's click point. The record-link hunk goes with F74, because F66's assignee line made `/Alameda$/` miss. Whichever of F74 and F128 lands second takes both. |
+| `83439ad65` | docs(ai-agent): record the fixed Phase 1C test failures | Branch-only. |
+| `7f0c4a2f6` | docs(ai-agent): name demo/measles as the Phase 1C target | Branch-only. |
+| `908e2f911` | docs(ai-agent): remove the Phase 1C handoff | Only the `specs/phase-1c.md` status line. |
+
+**Files:**
+- Session model and storage (new): `src/components/ChatPanel/ChatSessionIndex/ChatSessionIndex.{ts,test.ts}`,
+  `ChatSessionStore/ChatSessionStore.{ts,test.ts}`, and the session-id keys in
+  `ChatThreadStore/ChatThreadStore.{ts,test.ts}` and
+  `ChatContextTrayStore/ChatContextTrayStore.{ts,test.ts}`.
+- Provider (new): `src/components/ChatPanel/ChatSessionProvider/{ChatSessionProvider.tsx,useChatSessions.ts,ChatSessionProvider.test.tsx,ChatSessionProvider.noWorkspace.test.tsx}`,
+  mounted from `ChatPanelProvider/ChatPanelProvider.tsx`, and the session
+  hunks of `ChatPanelStateManager/ChatPanelStateManager.{tsx,test.tsx}`.
+- Tabs and archive (new): `src/components/ChatPanel/ChatThread/ChatSessionStrip/`
+  (`ChatSessionStrip.{tsx,module.css,test.tsx}`, `ChatSessionTabs.tsx`,
+  `ChatSessionTab.tsx`, `ChatSessionOverflowMenu.tsx`,
+  `ArchivedChatSessionsMenu.tsx`, `ArchivedChatSessionRow.tsx`), mounted from
+  `ChatPanel/ChatPanel.tsx` and `ChatPanelHeader/ChatPanelHeader.tsx`.
+- Composer: the session-kind hunks of `ChatThread/Composer/Composer.{tsx,test.tsx}`.
+- Runtime: the session hunks of `useAvandarChatRuntime/useAvandarChatRuntime.ts`,
+  `createChatModelAdapter/createChatModelAdapter.{ts,test.ts}`,
+  `runDataAgentTurn/runDataAgentTurn.{ts,test.ts}`,
+  `runOfflineDataAgentTurn/runOfflineDataAgentTurn.{ts,test.ts}`,
+  `dataAgentTurnHelpers/{dataAgentTurnHelpers.ts,dataAgentConversation.types.ts}`,
+  and `requestStoredSessionTitle.ts` (new).
+- Runtime tests: `__tests__/useAvandarChatRuntime.sessions.test.tsx` and
+  `__tests__/chatSessionTitle.integration.test.ts` (new), and the session
+  hunks of `__tests__/useAvandarChatRuntime.{mocks.tsx,harness.tsx,contextTray.test.tsx,retryContext.test.tsx}`,
+  `ChatThread/ChatContextTray/__tests__/ChatContextTrayTestFixtures.tsx`, and
+  `src/components/Nux/NuxTour/useNuxOpenChatPanel/useNuxOpenChatPanel.test.tsx`.
+- Titles: `shared/agent/chatTitle/{buildChatSessionTitleExcerpt,chatTitlePrompt}.{ts,test.ts}` (new),
+  `src/components/ChatPanel/ChatSessionTitle/requestChatSessionTitle.{ts,test.ts}` (new),
+  `supabase/functions/chat/PostChatTitle/PostChatTitle.{ts,test.ts}` (new), and
+  the title route in `supabase/functions/chat/ChatRoutes.{ts,types.ts}`.
+- New case type: `src/views/OntologyDesignerApp/NewCaseTypeButton.{tsx,test.tsx}` and
+  `src/routes/_auth/$workspaceSlug/ontology-designer/{index.tsx,-index.test.tsx}`.
+- E2E: `tests/e2e/agent-chat-sessions.spec.ts` (new), and the Dock hunk of
+  `tests/e2e/case-list-field.spec.ts`.
+- Docs: `docs/ai-agent/specs/phase-1c.md` (new), D43 in `decisions.md`, the
+  1C rows in `roadmap.md` and `specs/phase-1.md`.
+- `src/i18n/locales/*/messages.{po,ts}`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** none. Sessions, threads, trays, and the archive are in
+localStorage. Chat history in the database is future work F4 in
+`docs/ai-agent/roadmap.md`, not this log's F4.
+
+**Known gaps** (triaged at the branch review and left on purpose): the
+archive dropdown is still `role="menu"` with no menu items, and the tab
+strip's close buttons sit inside `role="tablist"` with no `tabpanel` or
+arrow-key roving. A title is requested after an error reply too. The title
+excerpt uses the latest raw user text, not the hosted turn's
+`_userModelContent`. Switching tabs mid-reply cancels the run and keeps the
+partial answer. Reloading while a kickoff run is in flight can append the
+kickoff again. Duplicate ids in `openIds` are not removed, and a session row
+in neither the open nor the archived ids is never removed. The provider
+value is not memoized. `docs/ontology-architecture.md` still describes
+`caseDesignSessionNonce`.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm vitest run src/components/ChatPanel shared/agent/chatTitle src/views/OntologyDesignerApp 'src/routes/_auth/$workspaceSlug/ontology-designer'
+pnpm type-check:deno
+pnpm tsc -b --force
+pnpm test:e2e agent-chat-sessions.spec.ts
+pnpm test:e2e case-list-field.spec.ts
+```
+
+---
+
 ## Open decisions
 
 Questions the 2026-11-10 mapping could not settle from the code alone. Each
@@ -10326,14 +10485,17 @@ needs a decision before its feature's PR is built.
    keep them on `demo/measles` until the work is built.
 4. **F74's and F75's e2e specs never passed.** `case-list-field.spec.ts` and
    `case-bucketed-fields.spec.ts` did not get past sign-in on an overloaded
-   machine. Expect to debug them.
+   machine. Expect to debug them. `case-list-field.spec.ts` passed on
+   2026-11-11 after `b503e1762` (see F128): Enter docks the expanded chat,
+   and the record link is found by its exact key, since F66 adds the
+   assignee to the link's name.
 5. **Unfixed findings from the branch's notes:** a stronger public read
    boundary than the hand tokenizer, a mapping that can reference another
    workspace's field when it has no date column, and nothing refusing a later
    `bucket_grain` change on a mapped field. Decide whether these become Linear
    issues.
 
-### AI data agent and agent context (F77 to F95)
+### AI data agent and agent context (F77 to F95, F128)
 
 1. **Eval run archive.** `docs/ai-agent/eval-runs/` is 266 generated files,
    about 5 MB. Recommended: keep it and `scripts/ai-eval/archiveEvalRuns.ts`
@@ -10370,6 +10532,9 @@ needs a decision before its feature's PR is built.
 9. **`gadgets.md`.** `1f3bc348d`'s paragraph describes both F90's chat `@`
    menu and F91's tray, so it is F91's. If F90 ships long before F91, port its
    first three sentences with F90.
+10. **F128's plan.** `docs/ai-agent/plans/phase-1c.md` was never committed,
+    though `roadmap.md`'s 1C row links to it. Commit it next to
+    `phase-1a.md` and `phase-1b.md`, or drop the link.
 
 ### Plugins (F96 to F112)
 
@@ -10635,6 +10800,8 @@ Where they came from:
   `feat/agent-default` (`cc3833377`): F77 to F88.
 - `feat/agent-context` (`4eddab717`) and `feat/chat-panel` (`e12cfa634`): F89
   to F95.
+- `feat/agent-sessions` (merged on 2026-11-11): F128. Its commits are listed
+  in full under F128.
 - `feat/plugins-core` (`942bbc4ce`), `feat/plugins-viz` (`c339e8704`), and
   `feat/plugins-columns` (`e2f65917e`): F96 to F112.
 - `fix/gis-displace-wkt-points` (`c9034a5e3`), the public dashboard query
