@@ -42,7 +42,7 @@ describe("runEvalPluginAiTool", () => {
     expect(outcome.isError).toBe(false);
     expect(JSON.parse(outcome.text)).toMatchObject({
       slope: expect.closeTo(2),
-      n: 5,
+      n: 10,
     });
   });
 });

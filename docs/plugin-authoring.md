@@ -740,7 +740,11 @@ A plugin can give the hosted data agent a tool.
 3. In the handler, read rows with `avandar.data.fetchRows` on
    `avandar.context.queryHandle`. The handler does not receive rows as an
    argument.
-4. Return a JSON object.
+4. Return a JSON object of aggregates, never row values.
+
+An aggregate over a few rows can give those rows away. A line fitted over two
+rows passes through both points, for example. Refuse to compute over fewer rows
+than a small-cell minimum, as `fitRegression` does with 10.
 
 Throw `PluginError("InvalidToolInput", message)` for a caller mistake. The
 message must not contain a cell value. Any other throw becomes

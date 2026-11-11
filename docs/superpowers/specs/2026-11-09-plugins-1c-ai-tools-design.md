@@ -207,11 +207,26 @@ Before it fetches, the handler checks the invocation's columns:
 - A name that is not on the result throws `InvalidToolInput` with
   `Column "<name>" is not on the result.` The name is the argument the
   model passed.
-- A fit that comes back undefined throws `InvalidToolInput` with
-  `Not enough numeric rows to fit a line.`
+- A column whose type is not `bigint` or `double` throws `InvalidToolInput`
+  with `Column "<name>" is not a number column.`, before any rows are
+  fetched. Text that reads as a number is not fitted.
+- A fit over fewer than 10 rows with a number in both columns, including one
+  that comes back undefined, throws `InvalidToolInput` with
+  `At least 10 rows need a number in both columns to fit a line.` Over very
+  few rows the line gives exact values away: over two rows it passes through
+  both points, so anyone who knows the two X values can read off both Y
+  values.
+
+The minimum stops the easy reconstruction, not every one. A query the model
+writes can still make the line give away one value: with a 0/1 indicator
+column as X, `slope + intercept` is the mean Y of the rows where X is 1, and
+that is one row's exact value when only one row has X = 1. This is a known
+limit of returning any aggregate over a query the model controls. `run_query`
+already lets the model learn about values one bit per turn through its row
+count.
 
 `InvalidToolInput` is a new `PluginError` code. The host forwards that
-error's `message` to the model. Those three sentences are the only
+error's `message` to the model. Those four sentences are the only
 `InvalidToolInput` messages this plugin uses. They contain no cell values.
 
 ### Errors the host sends
@@ -248,7 +263,7 @@ a stack, or a cell value.
   An empty explorer does not use a chat result.
 - The handler matches the button's fit on a known series, skips non-numeric
   rows, returns `rSquared: null` when the fit has none, sets `isTruncated`
-  from `fetchRows`, and throws the three `InvalidToolInput` messages.
+  from `fetchRows`, and throws the four `InvalidToolInput` messages.
 - An oversized return becomes `The tool result was too large.` and the body
   is absent from the tool result. A non-object return, and any throw other
   than `InvalidToolInput`, becomes `The tool failed.` and the exception

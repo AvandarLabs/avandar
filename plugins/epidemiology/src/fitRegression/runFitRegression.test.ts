@@ -1,13 +1,17 @@
 import { PluginError } from "@avandar/plugin-sdk";
 import { describe, expect, it, vi } from "vitest";
 import { runFitRegression, runFitRegressionTool } from "./runFitRegression";
-import type { AvandarApi, QueryHandle } from "@avandar/plugin-sdk";
+import type {
+  AvandarApi,
+  PluginColumnDataType,
+  QueryHandle,
+} from "@avandar/plugin-sdk";
 
 type Row = Readonly<Record<string, unknown>>;
 
 const QUERY_HANDLE = "query-handle-1" as QueryHandle;
 
-const EXACT_LINE_ROWS: Row[] = [1, 2, 3, 4, 5].map((x) => {
+const EXACT_LINE_ROWS: Row[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => {
   return { x, y: 2 * x + 1 };
 });
 
@@ -15,13 +19,14 @@ function _makeAvandarWithRows(options: {
   rows: Row[];
   columnNames: string[];
   isTruncated?: boolean;
+  dataTypes?: Readonly<Record<string, PluginColumnDataType>>;
 }): AvandarApi {
   return {
     context: {
       slotId: "agent.tool",
       queryHandle: QUERY_HANDLE,
       columns: options.columnNames.map((name) => {
-        return { name, dataType: "double" as const };
+        return { name, dataType: options.dataTypes?.[name] ?? "double" };
       }),
       rowCount: options.rows.length,
     },
@@ -76,7 +81,7 @@ describe("runFitRegression", () => {
     expect(result.slope).toBeCloseTo(2);
     expect(result.intercept).toBeCloseTo(1);
     expect(result.rSquared).toBeCloseTo(1);
-    expect(result.n).toBe(5);
+    expect(result.n).toBe(10);
     expect(result.isTruncated).toBe(false);
     expect(Object.keys(result).sort()).toEqual([
       "intercept",
@@ -106,11 +111,9 @@ describe("runFitRegression", () => {
   it("returns null rSquared when Y never varies", async () => {
     const result = await runFitRegression(
       _makeAvandarWithRows({
-        rows: [
-          { x: 1, y: 5 },
-          { x: 2, y: 5 },
-          { x: 3, y: 5 },
-        ],
+        rows: EXACT_LINE_ROWS.map((row) => {
+          return { ...row, y: 5 };
+        }),
         columnNames: ["x", "y"],
       }),
       { xColumn: "x", yColumn: "y" },
@@ -153,8 +156,67 @@ describe("runFitRegression", () => {
     );
     expect((error as PluginError).code).toBe("InvalidToolInput");
     expect((error as PluginError).message).toBe(
-      "Not enough numeric rows to fit a line.",
+      "At least 10 rows need a number in both columns to fit a line.",
     );
+  });
+
+  it("rejects a fit over 9 rows, which would let the line give rows away", async () => {
+    const error = await _getRejection(
+      runFitRegression(
+        _makeAvandarWithRows({
+          rows: EXACT_LINE_ROWS.slice(0, 9),
+          columnNames: ["x", "y"],
+        }),
+        { xColumn: "x", yColumn: "y" },
+      ),
+    );
+    expect((error as PluginError).code).toBe("InvalidToolInput");
+    expect((error as PluginError).message).toBe(
+      "At least 10 rows need a number in both columns to fit a line.",
+    );
+  });
+
+  it("counts only the rows with a number in both columns", async () => {
+    const error = await _getRejection(
+      runFitRegression(
+        _makeAvandarWithRows({
+          rows: [...EXACT_LINE_ROWS.slice(0, 9), { x: 10, y: null }],
+          columnNames: ["x", "y"],
+        }),
+        { xColumn: "x", yColumn: "y" },
+      ),
+    );
+    expect((error as PluginError).code).toBe("InvalidToolInput");
+  });
+
+  it("rejects a text column even when its values read as numbers, before it fetches rows", async () => {
+    const avandar = _makeAvandarWithRows({
+      rows: EXACT_LINE_ROWS.map((row) => {
+        return { ...row, y: String(row.y) };
+      }),
+      columnNames: ["x", "y"],
+      dataTypes: { y: "varchar" },
+    });
+    const error = await _getRejection(
+      runFitRegression(avandar, { xColumn: "x", yColumn: "y" }),
+    );
+    expect((error as PluginError).code).toBe("InvalidToolInput");
+    expect((error as PluginError).message).toBe(
+      'Column "y" is not a number column.',
+    );
+    expect(avandar.data.fetchRows).not.toHaveBeenCalled();
+  });
+
+  it("fits a bigint column", async () => {
+    const result = await runFitRegression(
+      _makeAvandarWithRows({
+        rows: EXACT_LINE_ROWS,
+        columnNames: ["x", "y"],
+        dataTypes: { x: "bigint" },
+      }),
+      { xColumn: "x", yColumn: "y" },
+    );
+    expect(result.n).toBe(10);
   });
 
   it("does not look up a non-string column through String(value)", async () => {
@@ -196,6 +258,6 @@ describe("runFitRegression", () => {
       xColumn: "x",
       yColumn: "y",
     });
-    expect(result.n).toBe(5);
+    expect(result.n).toBe(10);
   });
 });

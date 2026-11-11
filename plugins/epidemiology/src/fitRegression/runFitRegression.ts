@@ -1,4 +1,5 @@
 import { PluginError } from "@avandar/plugin-sdk";
+import { NUMERIC_DATA_TYPES } from "../derivedColumns/getColumnNamesFromColumns/getColumnNamesFromColumns";
 import { fitLinearRegression } from "../fitLinearRegression/fitLinearRegression";
 import { makeRegressionPointsFromRows } from "../makeRegressionPointsFromRows/makeRegressionPointsFromRows";
 import type { AiToolHandler, AvandarApi } from "@avandar/plugin-sdk";
@@ -19,20 +20,34 @@ export type FitRegressionResult = {
   isTruncated: boolean;
 };
 
+/**
+ * The fewest rows, with a number in both columns, the tool fits a line over.
+ * With few rows the slope and intercept can give exact row values away: over
+ * two rows the line passes through both points.
+ */
+const MIN_FIT_ROW_COUNT = 10;
+
 function _assertColumnsAreValid(
   avandar: AvandarApi,
   args: FitRegressionArgs,
 ): void {
-  const columnNames = new Set(
+  const dataTypesByColumnName = new Map(
     avandar.context.columns.map((column) => {
-      return column.name;
+      return [column.name, column.dataType];
     }),
   );
   for (const columnName of [args.xColumn, args.yColumn]) {
-    if (!columnNames.has(columnName)) {
+    const dataType = dataTypesByColumnName.get(columnName);
+    if (dataType === undefined) {
       throw new PluginError(
         "InvalidToolInput",
         `Column "${columnName}" is not on the result.`,
+      );
+    }
+    if (!NUMERIC_DATA_TYPES.includes(dataType)) {
+      throw new PluginError(
+        "InvalidToolInput",
+        `Column "${columnName}" is not a number column.`,
       );
     }
   }
@@ -46,8 +61,8 @@ function _assertColumnsAreValid(
  * `xColumn` over the result the data agent is working with, the same fit the
  * Linear regression command shows. Column names match case-sensitively. It
  * throws `PluginError` with code `InvalidToolInput`, in words written for the
- * model, when a column is missing, both are the same column, or fewer than
- * two rows have a number in both columns.
+ * model, when a column is missing or not numeric, both are the same column,
+ * or fewer than `MIN_FIT_ROW_COUNT` rows have a number in both columns.
  */
 export async function runFitRegression(
   avandar: AvandarApi,
@@ -62,10 +77,10 @@ export async function runFitRegression(
   const fit = fitLinearRegression(
     makeRegressionPointsFromRows({ rows, xColumn, yColumn }),
   );
-  if (fit === undefined) {
+  if (fit === undefined || fit.n < MIN_FIT_ROW_COUNT) {
     throw new PluginError(
       "InvalidToolInput",
-      "Not enough numeric rows to fit a line.",
+      `At least ${MIN_FIT_ROW_COUNT} rows need a number in both columns to fit a line.`,
     );
   }
   return {

@@ -87,7 +87,7 @@ const LINE_COLUMNS = [
   { name: "y", dataType: "double" },
 ] as const;
 
-const EXACT_LINE_ROWS: Row[] = [1, 2, 3, 4, 5].map((x) => {
+const EXACT_LINE_ROWS: Row[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => {
   return { x, y: 2 * x + 1 };
 });
 
@@ -308,7 +308,7 @@ describe("createDataAgent", () => {
         slope: expect.closeTo(2),
         intercept: expect.closeTo(1),
         rSquared: expect.closeTo(1),
-        n: 5,
+        n: 10,
         isTruncated: false,
       });
     });

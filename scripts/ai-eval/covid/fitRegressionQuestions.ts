@@ -4,8 +4,8 @@ import type { Verdict } from "../grading/ResultMatchers";
 
 const COLUMN_NAMES = ["x", "y"] as const;
 
-/** Five points on the exact line `y = 2x + 1`. */
-const LINE_ROWS = [1, 2, 3, 4, 5].map((x) => {
+/** Ten points on the exact line `y = 2x + 1`. */
+const LINE_ROWS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => {
   return { x, y: 2 * x + 1 };
 });
 
