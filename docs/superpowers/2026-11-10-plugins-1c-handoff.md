@@ -54,7 +54,13 @@ The agent is off unless `VITE_AVA_DATA_AGENT=on` or `localStorage["avandar:data-
 
 Do these before treating the slice as finished. None of them are a new slice.
 
-1. **Whole-branch review was not run.** Per-task reviews passed. The final pass over the branch, the one that found the real gaps in slice 1b, did not happen. Run it before merging. Ask it to try to break the privacy claims: a cell quoted in a DuckDB error, a disabled install, a tool the workspace did not install, and a handler result that is not a JSON object.
+1. **Whole-branch review: done on 2026-11-11.** It ran after the sync with measles and tried to break the four privacy claims. The DuckDB error, disabled install, uninstalled tool, and non-object result claims held. It found eight defects, all fixed on this branch:
+   - A fit over two rows let the model read both Y values off slope and intercept. `fitRegression` now needs at least 10 rows with a number in both columns, and both columns must be `bigint` or `double`. A model-written query with a 0/1 indicator X can still expose one value. The spec records that limit.
+   - Off the Data Explorer, the tool never saw an earlier turn's chat result, because results reset each turn. The conversation now keeps `resultsByTurn`.
+   - Disabling a plugin after a `fitRegression` call broke that chat for good. The proxy now accepts history naming any bundled plugin tool, and offers only the active ones.
+   - The proxy offers plugin tools only to `data-agent-v4`, and falls back to none when the installations read fails.
+   - A forwarded `InvalidToolInput` message is capped at 2,048 UTF-8 bytes.
+   - Wiring tests were added for the plugin tool getter, the Data Explorer flag, and handler loading. `createPiConversation` was split under 45 lines.
 2. **The live eval was not run.** `OPEN_ROUTER_API_KEY` is in `.env.development.edge`. `~/cleaned-test-data` was not on the machine, and `.temp/ai-eval/` had no earlier score. When the data is available:
 
    ```bash
@@ -63,12 +69,10 @@ Do these before treating the slice as finished. None of them are a new slice.
    ```
 
    `R` must pass. The default 45 must not score lower than the last recorded run. If there is still no recorded run, report the score and do not invent a baseline.
-3. **Sync with `origin/demo/measles` before any merge.** This branch was 139 commits behind when the slice finished. A merge without that update will miss a day of measles work.
+3. **Sync with `origin/demo/measles` before any merge.** Synced on 2026-11-11 (merge `576790617`, no conflicts). Check the count again before merging, since measles keeps moving.
 4. **Push and merge only when Pablo asks**, each time. Merge with `--no-ff` in a temporary worktree from `origin/demo/measles`, confirm the merge tree, then `git push origin HEAD:demo/measles`. A push to `demo/**` deploys.
 
-Checks that already passed, at `964bf7489`: the vitest trees named in the plan's task 15 (74 files, 908 tests), eslint on those paths, oxfmt with `--ignore-path .oxfmtignore`, and `node apps/ava-cli/dist/main.cjs plugin validate epidemiology` after `pnpm --filter @avandar/ava-cli build`. The global `ava` link was not rebuilt.
-
-`pnpm type-check:deno` fails in `supabase/functions/open-data/requestParquetCache/requestParquetCache.test.ts` (`status: string` where `"ready"` is required). That file is the open-data Parquet work. This slice does not touch it. Do not fix it as part of plugin work.
+Checks that passed after the review fixes, on 2026-11-11: vitest on the task 15 trees plus `src/views/DataExplorerApp` and `src/components/ChatPanel` (218 files, 1,903 tests), `tsc -b --force`, `pnpm type-check:deno`, eslint and oxfmt on the slice paths, and `node apps/ava-cli/dist/main.cjs plugin validate epidemiology`. The `requestParquetCache` Deno failure noted earlier is gone after the sync. The global `ava` link was not rebuilt.
 
 ## Open follow-ups from 1c
 
