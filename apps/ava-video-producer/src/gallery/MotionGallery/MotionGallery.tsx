@@ -3,6 +3,7 @@ import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
 import { STOCK_CATALOG } from "../../stock/catalog";
+import { HelperGallery } from "../HelperGallery/HelperGallery";
 import { galleryI18n } from "../i18n";
 import { AtlasSections, getAtlasSection } from "./AtlasSections";
 import { GalleryHeader } from "./GalleryHeader";
@@ -209,15 +210,20 @@ function MotionGallery() {
     </>
   );
 }
+/** The gallery for the section the URL names. */
+function AtlasSectionRoot() {
+  const section = getAtlasSection();
+  if (section === "motions") {
+    return <MotionGallery />;
+  }
+  return section === "helpers" ? <HelperGallery /> : <CompositionGallery />;
+}
+
 const root: HTMLElement | null = document.getElementById("motion-root");
 if (root) {
   createRoot(root).render(
     <I18nProvider i18n={galleryI18n}>
-      {getAtlasSection() === "motions" ? (
-        <MotionGallery />
-      ) : (
-        <CompositionGallery />
-      )}
+      <AtlasSectionRoot />
     </I18nProvider>,
   );
 }

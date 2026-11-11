@@ -1,0 +1,36 @@
+.helperGallery {
+  margin: 0 auto;
+  max-width: 1600px;
+  padding: 24px 32px 60px;
+}
+
+.helperGallery h1 {
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.description {
+  color: var(--muted);
+  margin: 0 0 28px;
+}
+
+.workspace {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 300px minmax(0, 1fr);
+}
+
+.content {
+  min-width: 0;
+}
+
+@media (width <= 900px) {
+  .helperGallery {
+    padding: 18px;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+}

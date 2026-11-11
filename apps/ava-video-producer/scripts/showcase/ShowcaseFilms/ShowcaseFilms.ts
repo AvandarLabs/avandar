@@ -8,6 +8,7 @@ import {
   createContinuityPlanFromOptions,
 } from "../../../src/continuity/continuityAppearance";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
+import { getHelperFromFilmId } from "../../../src/gallery/HelperGallery/helperCatalog";
 import {
   storyboardSchema,
   durationInFrames,
@@ -107,11 +108,47 @@ async function _sourceModuleUrl(relative: string) {
   return url.href;
 }
 
+/** A helper preview at the Atlas canvas size. It accepts no options. */
+function _loadHelperFilm(id: string, options: object): Film | undefined {
+  const helper = getHelperFromFilmId(id);
+  if (!helper) {
+    return undefined;
+  }
+  if (Object.keys(options).length > 0) {
+    throw new Error("Helper previews accept no options");
+  }
+  return {
+    id,
+    kind: "helper",
+    helper: helper.id,
+    assets: helper.demo.assets ?? [],
+    source: `apps/ava-video-producer/${helper.source}`,
+    frames: helper.demo.frames,
+    fps: 30,
+    width: 960,
+    height: 600,
+    delivery: { width: 960, height: 600 },
+    loop: true,
+    showCaptions: false,
+  };
+}
+
+/** Helper previews play live in the gallery and are never rendered to MP4. */
+function _assertExportable(film: Readonly<Film>): void {
+  if (film.kind === "helper") {
+    throw new Error("Helper previews play live only");
+  }
+}
+
 /**
  * Read current authored inputs and reject unknown IDs or unsupported options.
  */
 async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   const options = optionsSchema.parse(rawOptions);
+  const helperFilm = _loadHelperFilm(id, options);
+  if (helperFilm) {
+    return helperFilm;
+  }
   const contracts = await buildStockContracts(appRoot);
   const { STOCK_CATALOG, STOCK_FPS, stockRequestSchema } = contracts;
   const stock = STOCK_CATALOG.find((entry) => `stock-${entry.id}` === id);
@@ -210,8 +247,11 @@ export const ShowcaseFilms = {
    * Bind a frozen stock film to the exact sources that validated its content.
    */
   getFingerprintFromFilm: _fingerprintStockFilm,
+  /** Helper previews play live in the gallery and are never rendered to MP4. */
+  assertExportable: _assertExportable,
 } satisfies {
   load: typeof _loadFilm;
   retainContracts: typeof _retainFilmContracts;
   getFingerprintFromFilm: typeof _fingerprintStockFilm;
+  assertExportable: typeof _assertExportable;
 };

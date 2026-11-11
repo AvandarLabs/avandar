@@ -15,6 +15,23 @@ type FilmResult = {
   background?: never;
 };
 
+/**
+ * A Motion Atlas helper preview: one shared helper played in isolation by
+ * the live player. Previews are live only and never exported.
+ */
+type HelperFilmResult = {
+  kind: "helper";
+  /** The helper catalog id the preview plays. */
+  helper: string;
+  /** Public-relative media the preview loads. */
+  assets: readonly string[];
+  preset?: never;
+  input?: never;
+  schemaVersion?: never;
+  accent?: never;
+  background?: never;
+};
+
 /** Validated inputs shared by the live player and downloadable render. */
 export type Film = {
   id: string;
@@ -27,7 +44,11 @@ export type Film = {
   loop: boolean;
   showCaptions: boolean;
   plan?: Storyboard;
-} & (({ kind: "stock" } & ResolvedStockRequest) | FilmResult);
+} & (
+  | ({ kind: "stock" } & ResolvedStockRequest)
+  | FilmResult
+  | HelperFilmResult
+);
 
 /** Viewer choices retained for an export of the displayed composition. */
 export type FilmOptions = {

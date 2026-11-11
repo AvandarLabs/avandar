@@ -33,7 +33,7 @@
     "pretest": "node scripts/require-license.mjs && pnpm stock:messages && node scripts/build-avandar.mjs",
     "pretypecheck": "node scripts/require-license.mjs && node scripts/build-motion-gallery.mjs",
     "stock:messages": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/stock/buildStockMessages/buildStockMessages.ts && pnpm continuity:messages",
-    "gallery:messages": "node scripts/require-license.mjs && lingui extract --config lingui.gallery.config.ts && lingui compile --config lingui.gallery.config.ts",
+    "gallery:messages": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/helperCatalog/buildHelperMessages/buildHelperMessages.ts && lingui extract --config lingui.gallery.config.ts && lingui compile --config lingui.gallery.config.ts",
     "premotion": "node scripts/require-license.mjs && pnpm stock:messages",
     "preshowcase": "node scripts/require-license.mjs && pnpm stock:messages",
     "prevideo": "node scripts/require-license.mjs && pnpm stock:messages",

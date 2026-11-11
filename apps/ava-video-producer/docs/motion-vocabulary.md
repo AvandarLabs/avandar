@@ -4,7 +4,7 @@ This is the complete inventory of the motion vocabulary currently implemented in
 
 The code is the source of truth. The rules for using it live in the [product-demo skill](../.claude/skills/product-demo/SKILL.md) and its [motion](../.claude/skills/product-demo/references/motion.md), [title](../.claude/skills/product-demo/references/titles.md), and [rendering](../.claude/skills/product-demo/references/render.md) references. The original primitives in `src/motion.ts` remain unchanged; three periodic helpers were added for Motion Atlas. Scenes and stock graphics share this module, without a second easing vocabulary.
 
-For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
+For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its **Helpers** section (`motion.html?section=helpers`) previews every helper in this inventory live, one at a time; see [Helpers in the Motion Atlas](#helpers-in-the-motion-atlas). Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
 
 ## Time and coordinates
 
@@ -205,7 +205,7 @@ alignment, and speech-driven word animation are not.
 
 ## Rules for extending the vocabulary
 
-1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change.
+1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
 4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.
@@ -280,3 +280,87 @@ implementations. Five semantic presets combine speed, blur and easing; numeric
 overrides and bounded cubic Beziers are available in JSX and JSON. Camera
 speed preserves reading holds and leaves content clocks unchanged. See the
 [reusable motion API](reusable-motion.md) for timing, precedence and examples.
+
+## Helpers in the Motion Atlas
+
+The Motion Atlas has four sections: Motions (stock presets), Compositions,
+Sample films, and **Helpers**. Helpers is a browsable catalog of the shared
+motion helpers this inventory describes, each previewed live in isolation.
+Open it at `motion.html?section=helpers`; a helper deep links as
+`motion.html?section=helpers&helper=<id>`, and a category filter adds
+`&category=<id>`, for example `?section=helpers&helper=erase-mask&category=masks`.
+
+| Category | Helpers |
+| --- | --- |
+| Curves and durations | Every `EASE` curve plotted with a dot travelling it, `bezier()`, the motion presets, every `DUR` token on one shared timeline, `STAGGER`, `STAGGER_COLUMN` |
+| Interpolation | `ramp()` and `mix()`, `mixToken()`, `countTo()` |
+| Entrances and exits | `enter()`, `enterAt()`, `leave()`, `pop()`, `press()` |
+| Text reveals | Line fade, wipe and cut (`getLineRevealStyle`), `getWipeExitStyle`, `getHeadingRevealStyles`, `getStagedExitStyle`, `typed()` with `caretOn()`, `getActiveHeadline` |
+| Masks and wipes | `getEraseMaskStyle`, `getEraseStartFrames`, the stepped column wipe, the window stepped reveal, `getRoughEdgeClipPath` |
+| Blur | `HorizontalBlurFilter`, `getVelocityBlur` |
+| Camera | `getCameraPose` and the camera track, `DiagramCamera`, `getWindowCamera` |
+| Windows | Whip, side entrance, carousel slide, pull-back, flip and split, scroll offset, the `windowTilt.ts` plane, chrome and box tokens |
+| Media | `MediaPlane` |
+| Transitions | `getShotTransitionLayers` (dissolve, stepped column wipe, declared cut), `SceneTransition` |
+| Continuity | `SharedElement`, `AnchoredOverlay`, `SvgObjectDeparture` |
+| Theme | `createThemeStyleFromTheme` |
+| Pointer | `trackPos` with the shared `Cursor`, `cursorOnTarget`, `downAt` and `cursorScale`, `cursorShutter` |
+| Loops | `loopPhase`, `wave`, `loopEnvelope` |
+| Scene builds | The brand lockup's column build, fly-through and CTA beats; the bar comparison's build beats |
+
+Each entry's detail view shows its API signature, defaults, a copyable usage
+snippet, what it is good for and what to avoid, the files that import it, and
+a link to its source.
+
+### How it is built
+
+- **Catalog.** [helperCatalog.yaml](../src/gallery/HelperGallery/helperCatalog.yaml)
+  holds categories, the source modules the catalog covers, and one entry per
+  helper: `id`, `title`, `category`, `description`, `source`, `exports`
+  (dotted for members, such as `EASE.out`), `signature`, `defaults`, `usage`,
+  `goodFor`, `avoid`, `usedBy` and `demo` (`id`, `frames`, optional public
+  `assets`). [parseHelperCatalog](../src/gallery/HelperGallery/parseHelperCatalog/parseHelperCatalog.ts)
+  validates it strictly with zod.
+- **Drift test.** [helperCatalogDrift.test.ts](../src/gallery/HelperGallery/helperCatalogDrift.test.ts)
+  imports every listed module and fails when a catalogued source or export no
+  longer exists, when a runtime export is neither catalogued nor listed under
+  the module's `excluded` with a reason, when a member of `EASE` or `DUR` has
+  no entry, when a `usedBy` file does not import the helper, when a preview id
+  is unregistered or unused, or when the translation descriptors are stale.
+- **Live previews.** Each preview is a small frame-driven React component in
+  [demos/](../src/gallery/HelperGallery/demos/) that calls the real helper and
+  shows the call, a frame counter and the values the helper returns. The
+  gallery embeds `/live.html?id=helper-<id>`: `ShowcaseFilms.load` returns a
+  `helper` film (960 × 600, looping, frames from the catalog), and the live
+  player plays it through `HelperPlayer` and `HelperComposition` instead of
+  `FilmComposition`. Helper previews are live only; the export route refuses
+  them. Colours come from the Avandar theme in `theme-colors.json`.
+- **Copy.** Catalog prose is display copy. `npm run gallery:messages` first
+  regenerates `helperDescriptors.generated.ts` from the YAML, then extracts and
+  compiles the gallery catalog; `useHelperCopy` resolves it at runtime.
+
+Deliberately excluded: `getTypographyRevealFrames` (TypographyScene's own
+icon-then-lines timing), `getRowValueLabel` (number formatting), and the
+`motionOptionsSchema` / `motionEasingSchema` validators. Scene-internal layout
+code (`src/scenes/layout/`), the stock drawing primitives (inventoried in the
+[shared scene library](shared-scene-library.md#bounded-stock-drawing-primitives))
+and continuity's internal camera and overlay modules are not listed modules.
+
+### Add a helper to the catalog
+
+1. Export the helper from its module and document it in this inventory.
+2. If the module is new to the catalog, add it under `modules` in
+   `helperCatalog.yaml`, listing any exports that are not meant for reuse under
+   `excluded` with a reason.
+3. Add an entry under `helpers` with every field filled in. `usedBy` lists
+   app-relative files that import the helper; leave it empty when nothing does
+   yet.
+4. Add a preview id to [helperDemoIds.ts](../src/gallery/HelperGallery/helperDemoIds.ts),
+   write the preview in the matching `demos/*Demos.tsx` file with
+   `HelperDemoFrame` (call the real helper; never reimplement it), and register
+   it in [helperDemoRegistry.ts](../src/gallery/HelperGallery/demos/helperDemoRegistry.ts).
+   The registry is typed against the id list, so a missing preview fails to
+   compile.
+5. Run `npm run gallery:messages`, `npm run motion:build`, `npm run typecheck`
+   and `npm test`, then open `motion.html?section=helpers&helper=<id>` under
+   `pnpm showcase` and watch the preview loop.

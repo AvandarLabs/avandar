@@ -9,6 +9,7 @@ import {
   continuityAppearanceSchema,
   createContinuityPlanFromOptions,
 } from "../continuity/continuityAppearance";
+import { HelperPlayer } from "../gallery/HelperGallery/HelperPlayer/HelperPlayer";
 import { durationInFrames } from "../storyboard/schema/timeline";
 import { FilmComposition } from "./FilmComposition";
 import type { Film } from "./showcase.types";
@@ -223,7 +224,11 @@ async function start() {
   }
   const film = (await response.json()) as Film;
   createRoot(document.getElementById("root")!).render(
-    <LivePlayer film={film} />,
+    film.kind === "helper" ? (
+      <HelperPlayer film={film} />
+    ) : (
+      <LivePlayer film={film} />
+    ),
   );
 }
 start().catch(() => {

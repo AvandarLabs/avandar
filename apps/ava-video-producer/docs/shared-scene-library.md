@@ -67,7 +67,10 @@ and [HorizontalBlur](../src/motion-components/HorizontalBlur.tsx) provide
 the soft-edge erase and the X-only motion blur. The tilted window's plane,
 boxes, chrome and shadow are design tokens in
 [windowTilt.ts](../src/scenes/TiltedWindowScene/windowTilt.ts); define new
-window geometry there, never inline per shot.
+window geometry there, never inline per shot. Each of these shared pieces,
+and the scenes' exported motion helpers, has a live preview in the Motion
+Atlas **Helpers** section (`motion.html?section=helpers`); see
+[Helpers in the Motion Atlas](motion-vocabulary.md#helpers-in-the-motion-atlas).
 
 The [shot vocabulary study](../storyboards/shot-vocabulary.json) (1920 × 1080)
 exercises every new scene and transition with curated fictional screenshots.

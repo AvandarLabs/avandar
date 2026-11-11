@@ -1,0 +1,47 @@
+import { useLingui } from "@lingui/react/macro";
+import { useEffect, useState } from "react";
+import { Icon } from "../../MotionGallery/Icon";
+import css from "./HelperDetail.module.css";
+
+/** How long the copy button reports success before resetting. */
+const COPIED_MILLISECONDS = 1600;
+
+/** A code sample, with a copy button when the reader is meant to paste it. */
+export function CodeBlock({
+  code,
+  isCopyable = false,
+}: {
+  code: string;
+  isCopyable?: boolean;
+}) {
+  const { t } = useLingui();
+  const [isCopied, setIsCopied] = useState(false);
+  useEffect(() => {
+    if (!isCopied) {
+      return;
+    }
+    const timer = setTimeout(() => setIsCopied(false), COPIED_MILLISECONDS);
+    return () => clearTimeout(timer);
+  }, [isCopied]);
+  const copy = () => {
+    void navigator.clipboard?.writeText(code).then(() => setIsCopied(true));
+  };
+  return (
+    <div className={css.codeBlock}>
+      <pre>
+        <code>{code.trimEnd()}</code>
+      </pre>
+      {isCopyable ? (
+        <button
+          type="button"
+          className={css.copyButton}
+          onClick={copy}
+          aria-label={t`Copy usage snippet`}
+        >
+          <Icon name={isCopied ? "check" : "copy"} size={14} />
+          <span aria-live="polite">{isCopied ? t`Copied` : t`Copy`}</span>
+        </button>
+      ) : null}
+    </div>
+  );
+}

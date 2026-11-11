@@ -86,8 +86,13 @@ function json(res: ServerResponse, status: number, body: unknown) {
 }
 async function filmForPlayer(id: string) {
   const film = await withNarration(await ShowcaseFilms.load(id));
+  const assets = film.plan
+    ? assetReferences(film.plan)
+    : film.kind === "helper"
+      ? film.assets
+      : [];
   await Promise.all(
-    (film.plan ? assetReferences(film.plan) : []).map(async (asset) =>
+    assets.map(async (asset) =>
       media.set(`/${asset}`, await publicAsset(appRoot, asset)),
     ),
   );
@@ -109,6 +114,7 @@ async function exportRequest(req: IncomingMessage, res: ServerResponse) {
   try {
     const request = requestSchema.parse(JSON.parse(body));
     const film = await ShowcaseFilms.load(request.id, request.options);
+    ShowcaseFilms.assertExportable(film);
     const fingerprint =
       film.kind === "stock"
         ? await ShowcaseFilms.getFingerprintFromFilm(film)

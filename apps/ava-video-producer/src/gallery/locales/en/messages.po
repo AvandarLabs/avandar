@@ -13,13 +13,25 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/gallery/HelperGallery/demos/WindowDemos.tsx
+msgid "fits its lines"
+msgstr "fits its lines"
+
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 #~ msgid "Transitions & compositions"
 #~ msgstr "Transitions & compositions"
 
+#: src/gallery/HelperGallery/HelperPreview/HelperPreview.tsx
+msgid "Next helper"
+msgstr "Next helper"
+
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Keywords"
 msgstr "Keywords"
+
+#: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
+msgid "Helper category"
+msgstr "Helper category"
 
 #. placeholder {0}: swatch.name
 #: src/gallery/MotionGallery/PaletteSwatches.tsx
@@ -34,6 +46,10 @@ msgstr "linear time"
 msgid "Avandar Motion Atlas home"
 msgstr "Avandar Motion Atlas home"
 
+#: src/gallery/HelperGallery/demos/CameraDemos.tsx
+msgid "at rest"
+msgstr "at rest"
+
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "then its icon."
 msgstr "then its icon."
@@ -42,6 +58,10 @@ msgstr "then its icon."
 #: src/gallery/MotionGallery/MotionCard.tsx
 msgid "Remove {0} from references"
 msgstr "Remove {0} from references"
+
+#: src/gallery/HelperGallery/HelperDetail/CodeBlock.tsx
+msgid "Copy usage snippet"
+msgstr "Copy usage snippet"
 
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Rendering MP4…"
@@ -55,6 +75,10 @@ msgstr "Rendering MP4…"
 msgid "Preview frame"
 msgstr "Preview frame"
 
+#: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
+msgid "Join"
+msgstr "Join"
+
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "LIVE PREVIEWS"
 msgstr "LIVE PREVIEWS"
@@ -62,6 +86,14 @@ msgstr "LIVE PREVIEWS"
 #: src/gallery/MotionGallery/ReferenceTray.tsx
 msgid "references saved"
 msgstr "references saved"
+
+#: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
+msgid "Choose a helper"
+msgstr "Choose a helper"
+
+#: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
+msgid "Defaults"
+msgstr "Defaults"
 
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "Skip to motion library"
@@ -107,6 +139,10 @@ msgstr "Keep a little inspiration."
 #~ msgstr "Controls camera travel, easing, and blur. Slower presets may lengthen "
 #~ "scenes. Playback speed is separate."
 
+#: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
+msgid "All helpers ({total})"
+msgstr "All helpers ({total})"
+
 #: src/gallery/MotionGallery.tsx
 #~ msgid "PRESETS / VOL. 01"
 #~ msgstr "PRESETS / VOL. 01"
@@ -119,11 +155,19 @@ msgstr "Pause all animations"
 msgid "Export ready"
 msgstr "Export ready"
 
+#: src/gallery/HelperGallery/HelperDetail/CodeBlock.tsx
+msgid "Copied"
+msgstr "Copied"
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Patient and investigative. Gives viewers time to inspect an unfamiliar "
 "system or a dense diagram."
 msgstr "Patient and investigative. Gives viewers time to inspect an unfamiliar "
 "system or a dense diagram."
+
+#: src/gallery/HelperGallery/HelperDetail/HelperDetail.tsx
+msgid "Usage"
+msgstr "Usage"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Confident and purposeful. Moves promptly between familiar landmarks, "
@@ -149,6 +193,10 @@ msgstr "Explore all motions"
 msgid "Copy creative brief"
 msgstr "Copy creative brief"
 
+#: src/gallery/HelperGallery/demos/ThemeDemos.tsx
+msgid "Same scene, shot theme"
+msgstr "Same scene, shot theme"
+
 #: src/gallery/HelperGallery/demos/EntranceDemos.tsx
 msgid "Saved view"
 msgstr "Saved view"
@@ -165,6 +213,10 @@ msgstr "Previous motion"
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
 msgid "FRAME {0}"
 msgstr "FRAME {0}"
+
+#: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
+msgid "No defaults: the value is fixed or every argument is required."
+msgstr "No defaults: the value is fixed or every argument is required."
 
 #: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
 msgid "Annotation roughness"
@@ -213,6 +265,10 @@ msgstr "All collections ({0})"
 msgid "Annotations"
 msgstr "Annotations"
 
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+msgid "Ridge"
+msgstr "Ridge"
+
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "avandar"
 msgstr "avandar"
@@ -228,6 +284,10 @@ msgstr "BROWSE THE COLLECTION"
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "A visual vocabulary for your next explanation."
 msgstr "A visual vocabulary for your next explanation."
+
+#: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
+msgid "Search helpers or exports"
+msgstr "Search helpers or exports"
 
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 #: src/gallery/MotionGallery/AtlasSections.tsx
@@ -269,6 +329,10 @@ msgstr "Motion reference: {0}\n"
 msgid "Share the answer."
 msgstr "Share the answer."
 
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+msgid "Live previews"
+msgstr "Live previews"
+
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
 msgid "Loop"
 msgstr "Loop"
@@ -281,7 +345,21 @@ msgstr "The statement leaves"
 msgid "CONCEPTUAL GRAPHICS"
 msgstr "CONCEPTUAL GRAPHICS"
 
+#: src/gallery/HelperGallery/demos/PointerDemos.tsx
+msgid "Run query"
+msgstr "Run query"
+
+#: src/gallery/HelperGallery/HelperGallery.tsx
+#: src/gallery/MotionGallery/AtlasSections.tsx
+msgid "Helpers"
+msgstr "Helpers"
+
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+msgid "Valley"
+msgstr "Valley"
+
 #: src/gallery/HelperGallery/demos/EntranceDemos.tsx
+#: src/gallery/HelperGallery/demos/PointerDemos.tsx
 msgid "Publish"
 msgstr "Publish"
 
@@ -304,6 +382,10 @@ msgstr "Motion Atlas / Creative reference brief\n"
 #: src/gallery/HelperGallery/demos/EntranceDemos.tsx
 msgid "Draft"
 msgstr "Draft"
+
+#: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
+msgid "No matching helpers. Try another search."
+msgstr "No matching helpers. Try another search."
 
 #. placeholder {0}: preset.name
 #: src/gallery/MotionGallery/MotionCard.tsx
@@ -362,9 +444,17 @@ msgstr "Value type for {0}"
 #~ msgid ")"
 #~ msgstr ")"
 
+#: src/gallery/HelperGallery/demos/BlurDemos.tsx
+msgid "No blur"
+msgstr "No blur"
+
 #: src/gallery/MotionGallery/GalleryIntroduction.tsx
 msgid "MOTION PRESETS"
 msgstr "MOTION PRESETS"
+
+#: src/gallery/HelperGallery/demos/PointerDemos.tsx
+msgid "Inset: shutter samples relative to the pointer, enlarged"
+msgstr "Inset: shutter samples relative to the pointer, enlarged"
 
 #: src/gallery/MotionGallery/GalleryIntroduction.tsx
 msgid "Motion, with <0>meaning.</0>"
@@ -382,6 +472,14 @@ msgstr "{0} FAMILIES"
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 msgid "Complete films built from the motion library."
 msgstr "Complete films built from the motion library."
+
+#: src/gallery/HelperGallery/demos/MaskDemos.tsx
+msgid "row index"
+msgstr "row index"
+
+#: src/gallery/HelperGallery/HelperDetail/CodeBlock.tsx
+msgid "Copy"
+msgstr "Copy"
 
 #. js-lingui-explicit-id
 #: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
@@ -2143,6 +2241,10 @@ msgstr "Play preview"
 msgid "Next motion"
 msgstr "Next motion"
 
+#: src/gallery/HelperGallery/HelperPreview/HelperPreview.tsx
+msgid "Live preview of {title}"
+msgstr "Live preview of {title}"
+
 #: src/gallery/MotionGallery/ContentControls/ContentControls.tsx
 msgid "Reset content"
 msgstr "Reset content"
@@ -2150,6 +2252,10 @@ msgstr "Reset content"
 #: src/gallery/HelperGallery/demos/HelperDemoFrame/HelperDemoFrame.tsx
 msgid "frame"
 msgstr "frame"
+
+#: src/gallery/HelperGallery/HelperDetail/HelperDetail.tsx
+msgid "Avoid"
+msgstr "Avoid"
 
 #: src/gallery/MotionGallery/useMotionGalleryState.ts
 msgid "Text to copy"
@@ -2171,6 +2277,14 @@ msgstr "Export failed. Try again."
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "Use the bookmark on any preset to add it to your references."
 msgstr "Use the bookmark on any preset to add it to your references."
+
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+msgid "Harbor"
+msgstr "Harbor"
+
+#: src/gallery/HelperGallery/demos/CameraDemos.tsx
+msgid "shutter open"
+msgstr "shutter open"
 
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Creative brief copied"
@@ -2218,6 +2332,11 @@ msgstr "Balanced"
 msgid "on its own beat,"
 msgstr "on its own beat,"
 
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+#: src/gallery/HelperGallery/demos/MediaDemos.tsx
+msgid "Fictional demonstration data"
+msgstr "Fictional demonstration data"
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Gentle"
 msgstr "Gentle"
@@ -2235,6 +2354,14 @@ msgstr "eased"
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
 msgid "Speed"
 msgstr "Speed"
+
+#: src/gallery/HelperGallery/demos/ContinuityDemos.tsx
+msgid "Callout drawn from this cell"
+msgstr "Callout drawn from this cell"
+
+#: src/gallery/HelperGallery/demos/BlurDemos.tsx
+msgid "Moving window"
+msgstr "Moving window"
 
 #. placeholder {0}: loopFrames - 1
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
@@ -2274,6 +2401,10 @@ msgstr "Box roughness"
 msgid "Explore {0}"
 msgstr "Explore {0}"
 
+#: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
+msgid "No scene imports it yet."
+msgstr "No scene imports it yet."
+
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "Open the record."
 msgstr "Open the record."
@@ -2300,9 +2431,21 @@ msgstr "Productions"
 msgid "Sketch"
 msgstr "Sketch"
 
+#: src/gallery/HelperGallery/demos/MediaDemos.tsx
+msgid "Fictional Avandar chart screen"
+msgstr "Fictional Avandar chart screen"
+
+#: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
+msgid "Chart"
+msgstr "Chart"
+
 #: src/gallery/MotionGallery/PaletteControls.tsx
 msgid "Live preview colors"
 msgstr "Live preview colors"
+
+#: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
+msgid "Filter"
+msgstr "Filter"
 
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
@@ -2330,10 +2473,22 @@ msgstr "Restart preview"
 #~ msgid "{0} FRAMES"
 #~ msgstr "{0} FRAMES"
 
+#: src/gallery/HelperGallery/demos/BlurDemos.tsx
+msgid "X-only blur"
+msgstr "X-only blur"
+
 #. placeholder {0}: index + 1
 #: src/gallery/MotionGallery/ContentControls/CollectionField.tsx
 #~ msgid "Remove {label} item {0}"
 #~ msgstr "Remove {label} item {0}"
+
+#: src/gallery/HelperGallery/HelperDetail/HelperDetail.tsx
+msgid "API"
+msgstr "API"
+
+#: src/gallery/HelperGallery/HelperPreview/HelperPreview.tsx
+msgid "Previous helper"
+msgstr "Previous helper"
 
 #: src/gallery/MotionGallery/AtlasSections.tsx
 msgid "Atlas sections"
@@ -2359,6 +2514,7 @@ msgstr "Preview controls"
 msgid "reference saved"
 msgstr "reference saved"
 
+#: src/gallery/HelperGallery/HelperDetail/HelperDetail.tsx
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Good for"
 msgstr "Good for"
@@ -2401,10 +2557,17 @@ msgstr "General and technology"
 msgid "Copy configured JSON"
 msgstr "Copy configured JSON"
 
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "Motion Atlas"
 msgstr "Motion Atlas"
+
+#: src/gallery/HelperGallery/HelperGallery.tsx
+msgid "The shared motion helpers scenes are built from, each previewed live "
+"with the real code."
+msgstr "The shared motion helpers scenes are built from, each previewed live "
+"with the real code."
 
 #. placeholder {0}: context.label
 #. placeholder {1}: index + 1
@@ -2420,10 +2583,18 @@ msgstr "Brisk"
 msgid "Current time"
 msgstr "Current time"
 
+#: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
+msgid "Search helpers"
+msgstr "Search helpers"
+
 #. placeholder {0}: STOCK_CATALOG.length
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "CONCEPTUAL STUDIES / {0} PRESETS / VOL. 01"
 msgstr "CONCEPTUAL STUDIES / {0} PRESETS / VOL. 01"
+
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+msgid "North"
+msgstr "North"
 
 #: src/gallery/MotionGallery/PreviewDialog.tsx
 #~ msgid "FRAMES"
@@ -2444,6 +2615,10 @@ msgstr "Pause all"
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Search motions"
 msgstr "Search motions"
+
+#: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
+msgid "Model"
+msgstr "Model"
 
 #: src/gallery/MotionGallery.tsx
 #~ msgid "meaning."
@@ -2477,6 +2652,10 @@ msgstr "Social sector"
 msgid "Remove"
 msgstr "Remove"
 
+#: src/gallery/HelperGallery/demos/BuildDemos.tsx
+msgid "Every helper, previewed live."
+msgstr "Every helper, previewed live."
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Measured and readable. Connects related ideas without drawing attention "
 "away from the explanation."
@@ -2501,6 +2680,10 @@ msgstr "Conceptual graphics. No Avandar product footage."
 #: src/gallery/MotionGallery/ReferenceTray.tsx
 msgid "Reference brief copied"
 msgstr "Reference brief copied"
+
+#: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
+msgid "Exports"
+msgstr "Exports"
 
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Play all"
@@ -2553,9 +2736,18 @@ msgstr "Shape the story."
 #~ msgid "reusable motion presets for the moments a screenshot can’t explain."
 #~ msgstr "reusable motion presets for the moments a screenshot can’t explain."
 
+#: src/gallery/HelperGallery/demos/ContinuityDemos.tsx
+msgid "Response cases"
+msgstr "Response cases"
+
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "Your references, ready for a creative brief."
 msgstr "Your references, ready for a creative brief."
+
+#: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
+#: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
+msgid "Source"
+msgstr "Source"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Camera travel speed: {speed}×. Easing: {easing}. Blur shutter angle: "
@@ -2599,9 +2791,17 @@ msgstr "Subtle"
 msgid "Reference link copied"
 msgstr "Reference link copied"
 
+#: src/gallery/HelperGallery/HelperPlayer/HelperPlayer.tsx
+msgid "Preview unavailable. Check the showcase terminal, then reload."
+msgstr "Preview unavailable. Check the showcase terminal, then reload."
+
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "Check the change."
 msgstr "Check the change."
+
+#: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
+msgid "Used by"
+msgstr "Used by"
 
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 msgid "LOCAL MOTION LIBRARY"
@@ -2659,6 +2859,10 @@ msgstr "Showcase"
 msgid "Copy unavailable. Select the reference text and copy it manually."
 msgstr "Copy unavailable. Select the reference text and copy it manually."
 
+#: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
+msgid "Share"
+msgstr "Share"
+
 #: src/continuity/gallery/CompositionViewer/CameraPresetControl.tsx
 msgid "Camera motion preset"
 msgstr "Camera motion preset"
@@ -2674,3 +2878,9 @@ msgstr "Copy brief"
 #: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
 msgid "Rough"
 msgstr "Rough"
+
+#: src/gallery/HelperGallery/HelperPreview/HelperPreview.tsx
+msgid "Live React preview of the real helper, frame-driven and looping. Pause "
+"or scrub with the player controls."
+msgstr "Live React preview of the real helper, frame-driven and looping. Pause "
+"or scrub with the player controls."
