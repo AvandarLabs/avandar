@@ -17,7 +17,7 @@ file and the code disagree, trust the code and fix this file.
 | Element motion on text | `typography` scene (masked word rise, `wordStaggerFrames`, `revealAtFrame`), `title` scene (fixed 66 frames), stock `word-reveal`, `terminal-type` | No per-letter, line-fade, or wordmark-wipe mode. Add one as a prop on `TypographyScene` rather than a new scene. |
 | Camera move | `DiagramCamera` / camera tracks in `src/motion-components` (SVG, zoom 1 to 3, keys `{at,x,y,zoom,ease}`) | Only inside stock graphics and continuity beats. Nothing moves a camera over a whole storyboard shot. |
 | Composition template (`C*`) | a scene type, or a new scene/layout in `src/scenes/` registered in `shotSchema.ts` + `ShotView.tsx` | Document in `docs/shared-scene-library.md`. |
-| Demo of a new scene or shot transition | a Productions plan: `storyboards/<name>.json`, listed in `scripts/showcase/ShowcaseFilms` `PLANS` and as a card in `showcase/productions.html` (see `storyboards/shot-vocabulary.json`) | Continuity studies (`studyCatalog.yaml`) only host 1600 x 840 continuity shots with a real `sourceFilm`, so they cannot demo plain scenes. |
+| Demo of a new scene, scene option, or shot transition | a scene study in the Atlas Compositions section: a 1920 x 1080 plan in `storyboards/vocabulary/<id>.json` plus a `kind: scene` entry in `src/continuity/vocabulary/studyCatalog.yaml` (category `transitions`, `compositions`, or `scene-motions`, `sourceFilm: shot-vocabulary`), then `pnpm continuity:messages` | `src/continuity/vocabulary/sceneStudies.test.ts` checks the size, that every `controls` path is set on a shot, and that the studies cover every vocabulary piece: add a new piece to its list. Also add the new piece to `storyboards/shot-vocabulary.json` (a Sample film). |
 | Recurring continuity composition + transition | a continuity study: `storyboards/explainers/study-<x>.json` + `src/continuity/vocabulary/studyCatalog.yaml` entry, then `pnpm continuity:messages` | At least 3 distinct tags and a real `sourceFilm`. |
 
 ## What exists for copying motion
@@ -60,37 +60,40 @@ Still missing when last checked (check the code first):
 ## The frame gate and hard cuts
 
 `scripts/check-frames.mjs` fails any frame whose mean luma moves more than
-25 (0-255) from the frame before. It exists to catch flicker. Never loosen
+25 (0-255) from the frame before. It exists to catch strobes. Never loosen
 its thresholds (the producer's AGENTS.md forbids it).
 
-A reference that hard-cuts between distant fields trips it on purpose. With
+A reference that hard-cuts between distant fields would trip it. With
 Avandar tokens, dark to brand blue is about 79, brand blue to light about
 156, and dark to light about 235. An 8-column wipe at 0.5-frame stagger only
 survives a jump of about 100. So:
 
-1. In Phase 2, compute the field change at every boundary and mark which
-   ones the gate will fail. Do the same for in-shot motions whenever
-   Avandar's content is much lighter or darker than the reference's (a
-   bright screenshot pulled back onto a dark field can dim the frame by 45
-   in one frame where the reference's dark footage did not). Fix those
-   generically, for example with a gentler ease of the same length.
-2. **Build the film to match the reference anyway.** Do not soften a hard
-   cut or stretch a transition just to pass the gate: that breaks the copy.
-3. When the only gate failures are luma jumps at intentional shot
-   boundaries, the encoded picture still exists at
-   `.videos/<slug>/out/<plan.id>/render/<plan.id>.mp4` (only `final.mp4` is
-   skipped). Use it for evaluation, list the failing frames and their
-   boundaries in the report, and say the film is not deliverable until the
-   user decides how the gate should treat intentional cuts. Frames of an
-   `exit-then-cut` exit and of an `overlap` transition count as "at the
-   boundary". Any other failure is a real defect: fix it.
-4. A **tiled-frame** flag is never an intentional-cut failure. Open the
-   flagged JPEG (the render keeps frames on a failed gate). If it shows a
-   grid, it is the Chromium defect: re-render. If it shows no grid and sits
-   next to a nearly empty frame (an exit just before an entrance), it is a
-   false positive of the half-against-half check: record it with the JPEG
-   path and leave the decision to the user, like the cuts.
-5. Predict jumps in Phase 2 by measuring luma with
+1. **Declare every intentional hard cut** on the incoming shot:
+   `"transitionInFrames": 0, "transition": {"kind": "cut"}`. `video render`
+   passes those frames to the gate, which accepts a jump of any size there
+   as long as the luma does not swing back by more than 25 within the next
+   10 frames (a jump and its reversal is a flash). Declare a cut only where
+   the spec has a `hard-cut`, `cut-then-entrance`, or `exit-then-cut`
+   boundary; never declare one to silence a failure elsewhere.
+2. In Phase 2, compute the field change at every boundary and for the 10
+   frames after it. A cut into a near-black frame followed by a bright
+   entrance is a flash and fails even when declared: have the incoming
+   content on screen at the cut frame, or join the fields with a wipe. Do
+   the same check for in-shot motions whenever Avandar's content is much
+   lighter or darker than the reference's (a bright screenshot pulled back
+   onto a dark field can dim the frame by 45 in one frame where the
+   reference's dark footage did not). Fix those generically, for example
+   with a gentler ease of the same length.
+3. **Build the film to match the reference.** Do not soften a hard cut or
+   stretch a transition just to pass the gate: declare the cut instead.
+4. Any remaining gate failure is a real defect: fix it. The encoded picture
+   still exists at `.videos/<slug>/out/<plan.id>/render/<plan.id>.mp4` on a
+   failure (only `final.mp4` is skipped), so evaluation can still run, but
+   report the film as not deliverable until the gate passes.
+5. A **tiled-frame** flag means the Chromium defect: open the flagged JPEG
+   (the render keeps frames on a failed gate) and re-render if it shows a
+   grid. If it shows no grid, record it with the JPEG path as a gate bug.
+6. Predict jumps in Phase 2 by measuring luma with
    `scripts/measure-frame.mjs` on a rendered still of each field, not from
    token arithmetic: rendered colours differ from token values.
 

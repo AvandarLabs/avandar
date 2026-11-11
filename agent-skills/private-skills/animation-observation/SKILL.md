@@ -173,8 +173,10 @@ Rules:
   piece, not a copy of it.
 - A piece is missing only when no existing piece can produce the beat with
   props. Do not build a near-duplicate.
-- For every shot boundary, note the field change and whether the frame gate
-  will fail it (see "The frame gate and hard cuts" in the reference), and
+- For every shot boundary, note the field change, whether it is a declared
+  cut, and whether the frame gate will still fail it, for example a cut
+  into a near-black frame before a bright entrance (see "The frame gate and
+  hard cuts" in the reference), and
   carry each element's field colour into any colour-change claim (an accent
   counter is invisible on an accent field).
 - Missing curves or durations become new tokens in `src/motion.ts` (`EASE`,
