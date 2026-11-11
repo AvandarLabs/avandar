@@ -1,6 +1,6 @@
 # Phase 1C: multiple chats and an archive
 
-Status: designed with Pablo on 2026-11-09. Not built. Part of
+Status: designed with Pablo on 2026-11-09. Built on 2026-11-10. Part of
 [Phase 1](phase-1.md). Follows rules R1 to R4 there. Decision D43 in
 [decisions.md](../decisions.md). Builds on [phase-1b.md](phase-1b.md).
 
