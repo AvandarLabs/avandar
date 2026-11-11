@@ -321,6 +321,72 @@ function _buildTurnInputs(
 }
 
 /**
+ * Runs `ask` with the question's fit rows published as the Data Explorer's
+ * result, when it has any, and clears them once it settles.
+ */
+async function _withFitRegressionResult<T>(
+  question: EvalQuestion,
+  ask: () => Promise<T>,
+): Promise<T> {
+  if (!question.fitRegression) {
+    return ask();
+  }
+  publishFitRegressionResult(question.fitRegression);
+  try {
+    return await ask();
+  } finally {
+    ExplorerPluginResultStore.clear();
+  }
+}
+
+/** What one eval conversation keeps between its questions. */
+type PiConversationState = {
+  dataAgent: DataAgent;
+  recorder: QuestionRecorder;
+  vault: SqlPlaceholderVault;
+  lastPageBlock?: string;
+  lastAttachedBlock?: string;
+};
+
+/** Asks one question in the conversation and records how it went. */
+async function _askPiQuestion(
+  state: PiConversationState,
+  question: EvalQuestion,
+): Promise<EvalAnswer> {
+  const { dataAgent, recorder } = state;
+  Object.assign(recorder, {
+    question,
+    result: undefined,
+    error: undefined,
+    vizType: undefined,
+    consentPrompts: 0,
+  });
+  const startedAt = performance.now();
+  const firstMessageIndex = dataAgent.agent.state.messages.length;
+  const inputs = _buildTurnInputs(question, state.vault);
+  try {
+    const reply = await dataAgent.ask(
+      buildAgentTurnText({
+        message: ChatMentionToken.toModelText(question.prompt, inputs.nameOf),
+        pageBlock: inputs.blocks.pageBlock,
+        previousPageBlock: state.lastPageBlock,
+        attachedBlock: inputs.blocks.attachedBlock,
+        previousAttachedBlock: state.lastAttachedBlock,
+        mentionedBlock: inputs.blocks.mentionedBlock,
+      }),
+    );
+    state.lastPageBlock = inputs.blocks.pageBlock ?? state.lastPageBlock;
+    state.lastAttachedBlock = inputs.blocks.attachedBlock;
+    const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
+    return _toEvalAnswer(reply, recorder, startedAt, toolNames);
+  } catch (error) {
+    const usage = _usageSince(dataAgent, firstMessageIndex);
+    const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
+    return _toFailedEvalAnswer(error, usage, startedAt, toolNames);
+  }
+}
+
+/**
  * One eval conversation with a data agent built by `createAgent` over a host
  * backed by DuckDB and the simulated user. Like the browser, it keeps one
  * placeholder vault per conversation and restores placeholders before SQL
@@ -335,64 +401,21 @@ export function createPiConversation(
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
   const vault = createSqlPlaceholderVault();
-  let lastPageBlock: string | undefined;
-  let lastAttachedBlock: string | undefined;
-  const dataAgent = options.createAgent(
-    createPlaceholderRestoringHost(
-      _createEvalHost(options.database, recorder),
-      vault,
+  const state: PiConversationState = {
+    recorder,
+    vault,
+    dataAgent: options.createAgent(
+      createPlaceholderRestoringHost(
+        _createEvalHost(options.database, recorder),
+        vault,
+      ),
     ),
-  );
+  };
   return {
-    ask: async (question) => {
-      Object.assign(recorder, {
-        question,
-        result: undefined,
-        error: undefined,
-        vizType: undefined,
-        consentPrompts: 0,
+    ask: (question) => {
+      return _withFitRegressionResult(question, () => {
+        return _askPiQuestion(state, question);
       });
-      const startedAt = performance.now();
-      const firstMessageIndex = dataAgent.agent.state.messages.length;
-      const inputs = _buildTurnInputs(question, vault);
-      if (question.fitRegression) {
-        publishFitRegressionResult(question.fitRegression);
-      }
-      try {
-        const reply = await dataAgent.ask(
-          buildAgentTurnText({
-            message: ChatMentionToken.toModelText(
-              question.prompt,
-              inputs.nameOf,
-            ),
-            pageBlock: inputs.blocks.pageBlock,
-            previousPageBlock: lastPageBlock,
-            attachedBlock: inputs.blocks.attachedBlock,
-            previousAttachedBlock: lastAttachedBlock,
-            mentionedBlock: inputs.blocks.mentionedBlock,
-          }),
-        );
-        lastPageBlock = inputs.blocks.pageBlock ?? lastPageBlock;
-        lastAttachedBlock = inputs.blocks.attachedBlock;
-        return _toEvalAnswer(
-          reply,
-          recorder,
-          startedAt,
-          _toolNamesSince(dataAgent, firstMessageIndex),
-        );
-      } catch (error) {
-        const usage = _usageSince(dataAgent, firstMessageIndex);
-        return _toFailedEvalAnswer(
-          error,
-          usage,
-          startedAt,
-          _toolNamesSince(dataAgent, firstMessageIndex),
-        );
-      } finally {
-        if (question.fitRegression) {
-          ExplorerPluginResultStore.clear();
-        }
-      }
     },
   };
 }
