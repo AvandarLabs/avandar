@@ -151,3 +151,27 @@ spec, treated as prompt weaknesses before building.
   scan for events the draft missed; a motion ends when the element stops,
   not its contents; a hex colour per text line; SKILL.md states the claim
   kinds and tolerance (2 frames or 2%) for verification.
+
+## One-shot run (octet-oneshot, skill 0.5.0): acceptable
+
+One fresh agent ran Phases 1-5 from the URL with only the skill as guidance.
+
+- Spec: 23 of 90 checked claims corrected (26%) before building.
+- Inventory: 25 spec ids, 22 exact, 3 adapt, 0 missing (earlier runs had
+  added the scenes). Built the 3 adapts generically.
+- Film: 2357 frames, matching. Gate failed only at intentional cuts plus
+  one tiled-frame false positive next to a boundary.
+- Argon: motion 8.0, transitions 8.8, composition 7.6, pacing 9.8, vibe
+  8.2, overall 8.5, acceptable, no critical differences. Spot-checks found
+  2 of Argon's differences false and 1 partly right.
+- It stalled once: its own background helper's completion notice went to
+  the top-level session. SKILL.md now keeps phase subagents to the
+  top-level session.
+- Fixes from its 26 issues: `scripts/measure-frame.mjs` (probe, luma, hex,
+  content boxes; the run's ad-hoc version caught 9 of 23 corrections),
+  type-size tolerance, wider sheets for wipes, a phase-brief checklist,
+  symmetric compare clips with deduped stills, frame evidence and English
+  in compare output, shot alignment measured not copied, gate status
+  reported beside `acceptable`, a tiled-flag policy, and film rules for
+  in-shot cuts, covering exits, pre-tilt window tokens, headline wrapping,
+  and accent-field ink contrast.

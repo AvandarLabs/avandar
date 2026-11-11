@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
 metadata:
   author: jpsyx
-  version: "0.5.0"
+  version: "0.6.0"
   tags: avandar, video, remotion, motion-atlas, gemini
 ---
 
@@ -46,6 +46,11 @@ a fresh subagent that reads this skill and the files the previous group
 wrote: Observe + Inventory, then Build + Film, then Evaluate. Everything a
 later phase needs must be in `.videos/<slug>/research/`, never only in a
 conversation. The orchestrator owns Phase 6.
+
+A phase brief must name: the slug, the evaluation answer, the source path,
+the phase(s) to run and not run, the research files to read and write, and
+the skill-issue file to log problems in. Do not pass your own conclusions
+about the video: the next phase reads the files.
 
 Only the top-level session may split phases into subagents. If you are
 already a subagent, run every phase yourself: a background helper's
@@ -88,8 +93,8 @@ artifacts live in the ignored `.videos/<slug>/`:
      downloadable mp4 (streaming-only sites), ask the user for a local copy
      of the video and stop until you have one. Do not reach for tools outside
      this repository on your own.
-   - Probe it from `apps/ava-video-producer` with Remotion's bundled ffprobe:
-     `pnpm exec remotion ffprobe -v error -show_entries format=duration:stream=width,height,r_frame_rate -of compact <abs-path>`.
+   - Probe it: `node $SKILL_DIR/scripts/measure-frame.mjs --video <file> --probe`
+     (fps, duration, frame count, through the repo's bundled ffprobe).
 2. **Draft pass** (whole video, about 10 fps):
    ```bash
    node $SKILL_DIR/scripts/argon.mjs \
@@ -138,7 +143,12 @@ artifacts live in the ignored `.videos/<slug>/`:
    mechanism, each layer's start and end at each boundary, every short
    motion's duration and stagger, every count and direction, each shot's
    composition boxes, cap heights, and line colour roles, and the logo's
-   size. Count a value as correct within 2 frames or 2% of the frame.
+   size. Measure boxes, cap heights, text colours, and luma with
+   `scripts/measure-frame.mjs` rather than by eye (it caught 9 of 23
+   corrections in one run). Count a value as correct within 2 frames, 2% of
+   the frame for positions and boxes, and 10% of its own value for type
+   sizes and cap heights. Use `--width 480` or more on contact sheets of
+   wipes: 320 px cells are too small to read a mask edge.
    Add a `## Verification` table at the top of `motion-spec.md`: claim,
    verdict (correct / corrected / unverified), correction. Fix every wrong
    value in the body too: the body is what gets built, and it wins over the
@@ -209,6 +219,7 @@ node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 10 \
   --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
   --video CANDIDATE=<rendered.mp4> \
   --clips-from REFERENCE=.videos/<slug>/research/motion-spec.md \
+  --clips-from REFERENCE=.videos/<slug>/storyboard.json \
   --clips-from CANDIDATE=.videos/<slug>/research/motion-spec.md \
   --clips-from CANDIDATE=.videos/<slug>/storyboard.json \
   --context .videos/<slug>/research/motion-spec.md \
@@ -217,9 +228,9 @@ node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 10 \
 ```
 
 Both videos get frame-accurate clips and one still per shot, so Argon
-compares transitions frame by frame. CANDIDATE gets the spec's windows too
-(the film follows the spec's frames), so in-shot motions are clipped on both
-sides, merged with its own plan's boundaries; the whole videos only carry
+compares transitions frame by frame. Both videos get the same windows from
+both the spec and the plan (the film follows the spec's frames), merged and
+with near-duplicate stills dropped, so the two sides are symmetric; the whole videos only carry
 pacing, so 5 fps is enough. Budget: about 270 tokens per sampled frame, and
 the request must stay under about 1M tokens (two 80 s videos at 5 fps plus
 both clip sets at 10-frame padding is about 800k). Check the plan first with `--dry-run` (no API
@@ -228,10 +239,16 @@ call); it prints an estimated token count. If it is too large, lower
 
 **Acceptable** = every score (`motion`, `transitions`, `composition`,
 `pacing`, `vibe`) is 7 or more and there is no `critical` difference. The
-JSON's `acceptable` field applies that rule; check it yourself too.
+JSON's `acceptable` field applies that rule; check it yourself too. It
+judges the copy, not delivery: always report the frame-gate result next to
+it, because an acceptable copy can still be undeliverable.
 
-Spot-check two or three of Argon's claimed differences against frames of both
-videos. Argon can be wrong about the copy as well as the original.
+Spot-check at least four of Argon's differences (including every critical
+and major one) and two of its strengths against frames of both videos, with
+`extract-frames.mjs` and `measure-frame.mjs`. Argon can be wrong about the
+copy as well as the original. Write the verdicts to
+`research/eval/iteration-<n>-review.md`: claim, confirmed / wrong / partly
+right, evidence, and anything Argon missed.
 
 ## Phase 6: Harden and repeat
 

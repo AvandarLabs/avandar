@@ -155,8 +155,21 @@ async function planCloseups(videos) {
     const [label, range] = splitLabel(value, ":", videos[0].label);
     planFor(label).clips.push(range.split("-").map(Number));
   }
-  for (const plan of plans.values()) plan.clips = mergeClips(plan.clips);
+  for (const plan of plans.values()) {
+    plan.clips = mergeClips(plan.clips);
+    plan.stills = dedupeStills(plan.stills);
+  }
   return plans;
+}
+
+/** Stills closer than this many frames show the same composition. */
+const STILL_MIN_GAP_FRAMES = 12;
+
+/** Drops stills that nearly repeat an earlier one, so two sources stay symmetric. */
+function dedupeStills(stills) {
+  return [...stills]
+    .sort((left, right) => left.frame - right.frame)
+    .filter((still, index, sorted) => index === 0 || still.frame - sorted[index - 1].frame >= STILL_MIN_GAP_FRAMES);
 }
 
 /** Sorts clips and merges any that overlap or touch, across sources. */

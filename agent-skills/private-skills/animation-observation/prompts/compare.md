@@ -22,7 +22,9 @@ Ignore content, copy, product UI details, brand, and exact colors. Judge only wh
 
 Ignore sound: the reference may have no audio track.
 
-Align the two videos shot by shot first. They may differ slightly in duration. Map each REFERENCE shot to the CANDIDATE shot that plays its role.
+Write in English only.
+
+Align the two videos shot by shot first, by measuring where each shot starts in each video from its frames. Do not copy frame numbers from the spec or the plan. They may differ slightly in duration. Map each REFERENCE shot to the CANDIDATE shot that plays its role.
 
 ## Blame
 
@@ -61,6 +63,7 @@ Return only JSON, matching this shape:
       "candidate_does": "what happens in CANDIDATE",
       "blame": "spec | build | platform",
       "spec_gap": "for blame=spec: what the spec should have said, and which spec section",
+      "evidence": "where you saw it in both videos: CLIP <label>-<n> t=<seconds> or STILL <label> frame <n>",
       "fix": "the concrete change that would close the gap"
     }
   ],
@@ -68,4 +71,4 @@ Return only JSON, matching this shape:
 }
 ```
 
-List every difference you can see, most severe first. Be concrete with frames and values. Check the CANDIDATE STILLs for layout defects the spec would never mention: elements running off the frame edge, empty panels, overlapping layers, unreadable contrast.
+List every difference you can see, most severe first. Be concrete with frames and values. Check the CANDIDATE STILLs for layout defects the spec would never mention: elements running off the frame edge, content cropped inside its container, empty panels, overlapping layers, unreadable contrast. Compare typography too: relative type sizes, weights, and which lines are muted. Only report a difference you can point to in the frames; cite it in `evidence`.

@@ -58,7 +58,7 @@ A table with one row per boundary between consecutive shots, in order:
 - `exit-then-cut`: the outgoing shot's elements animate out (some layers may stay), then a hard cut.
 - `overlap`: both shots are visible at the same time for some frames (dissolve, wipe, push, whip, morph, zoom-through).
 
-Where the boundary frame sits: for `overlap`, it is the **first frame of the transition** (the first frame showing anything of the incoming shot), and the transition's frames belong to the incoming shot. For the other classes it is the first frame of the incoming shot. If every layer cuts at once to a new field that then holds before new content enters, that is a `hard-cut` into a shot whose content enters later, not an exit.
+Where the boundary frame sits: for `overlap`, it is the **first frame of the transition** (the first frame showing anything of the incoming shot), and the transition's frames belong to the incoming shot. For the other classes it is the first frame of the incoming shot. If every layer cuts at once to a new field that then holds before new content enters, that is a `hard-cut` into a shot whose content enters later, not an exit. For `exit-then-cut`, the boundary is the cut frame (the first frame of the incoming shot), even when the background does not change across it.
 
 `outgoing layers` and `incoming layers` list each layer and what it does across the boundary, for example `window: slides left 110% with blur, f585-f594; headline: fades in place f586-f592; background: unchanged`.
 

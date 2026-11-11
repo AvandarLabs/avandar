@@ -84,6 +84,15 @@ survives a jump of about 100. So:
    user decides how the gate should treat intentional cuts. Frames of an
    `exit-then-cut` exit and of an `overlap` transition count as "at the
    boundary". Any other failure is a real defect: fix it.
+4. A **tiled-frame** flag is never an intentional-cut failure. Open the
+   flagged JPEG (the render keeps frames on a failed gate). If it shows a
+   grid, it is the Chromium defect: re-render. If it shows no grid and sits
+   next to a nearly empty frame (an exit just before an entrance), it is a
+   false positive of the half-against-half check: record it with the JPEG
+   path and leave the decision to the user, like the cuts.
+5. Predict jumps in Phase 2 by measuring luma with
+   `scripts/measure-frame.mjs` on a rendered still of each field, not from
+   token arithmetic: rendered colours differ from token values.
 
 ## Placing a boundary by its class
 
@@ -196,6 +205,21 @@ beat as a scene option instead.
   `exit.atFrame`, so set `atFrame = last exit frame - duration + 1`, not the
   spec's first exit frame, and check the outgoing layer is gone by the cut
   when the spec shows an empty field before it.
+- **A cut inside a spec shot** (content swaps with a hard cut while the
+  composition stays) may become two producer shots. Keep the spec's total
+  frames and the cut frame; the shot count can then exceed the spec's.
+- **Exits that need the whole outgoing shot** (a fly-through that ends
+  covering the frame) stay inside the outgoing shot, with the next shot
+  starting after the exit, even when the spec marks the boundary earlier.
+  Keep every event of the next shot on its spec frame.
+- **Window boxes.** `windowTilt.ts` box tokens position the window before
+  the tilt. Compare the spec's measured box against a rendered still
+  (`measure-frame.mjs`), not against the token values.
+- **Headline length.** Check every headline fits its line count at its size
+  in the preview: an extra wrapped line silently changes the composition.
+- **Accent fields need ink contrast.** If the reference's accent field is
+  light, use a lighter brand shade with dark ink rather than `brand` with
+  white text, and check contrast on the preview.
 - **Inventory per spec.** Phase 4 builds from the inventory written against
   the same spec file. If the spec was re-run, redo the inventory rows that
   changed first.
