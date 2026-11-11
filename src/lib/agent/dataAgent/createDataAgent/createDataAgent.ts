@@ -3,6 +3,7 @@ import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSyst
 import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
+import { createPluginAiTool } from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
 import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
@@ -12,6 +13,8 @@ import {
 } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools";
+import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
+import type { RunPluginAiTool } from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type {
@@ -142,16 +145,22 @@ function _getReplyText(
   return text || state.lastQuery?.summary || "";
 }
 
-function _createTools(
-  options: Readonly<CreateDataAgentOptions>,
-  aliases: readonly SqlTableAlias.T[],
-  state: DataAgentRunState,
-): Array<
+function _getNoPluginAiTools(): readonly PluginAiToolDeclaration[] {
+  return [];
+}
+
+type DataAgentTool =
   | ReturnType<typeof createRunQueryTool>
   | ReturnType<typeof createPlanQueryTool>
   | ReturnType<typeof createLookupValuesTool>
   | ReturnType<typeof createAskUserTool>
-> {
+  | ReturnType<typeof createPluginAiTool>;
+
+function _createBuiltInTools(
+  options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
+  state: DataAgentRunState,
+): DataAgentTool[] {
   const queryContext = {
     host: options.host,
     aliases,
@@ -173,12 +182,33 @@ function _createTools(
   ];
 }
 
+/**
+ * The built-in tools, then one tool per installed plugin AI tool. The
+ * offline agent (`plan`) gets no plugin tools, and neither does an agent
+ * with no way to run them.
+ */
+function _createTools(
+  options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
+  state: DataAgentRunState,
+): DataAgentTool[] {
+  const builtInTools = _createBuiltInTools(options, aliases, state);
+  const { runPluginAiTool, getPluginAiTools = _getNoPluginAiTools } = options;
+  if (options.queryTools === "plan" || runPluginAiTool === undefined) {
+    return builtInTools;
+  }
+  const pluginTools = getPluginAiTools().map((declaration) => {
+    return createPluginAiTool({ declaration, runPluginAiTool });
+  });
+  return [...builtInTools, ...pluginTools];
+}
+
 function _createAgent(
   options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
   state: DataAgentRunState,
   turnCounter: { turns: number },
 ): Agent {
-  const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
   const { primary, escalation } = options.policy;
   return new Agent({
     initialState: {
@@ -234,12 +264,21 @@ export type CreateDataAgentOptions = {
    * on-device models. Default `sql`.
    */
   queryTools?: "sql" | "plan";
+  /**
+   * The plugin AI tools installed in the workspace. Read at the start of
+   * every `ask`, so a plugin installed mid-conversation is offered on the
+   * next message. Default: none.
+   */
+  getPluginAiTools?: () => readonly PluginAiToolDeclaration[];
+  /** Runs a plugin AI tool the model calls. Without it, none is offered. */
+  runPluginAiTool?: RunPluginAiTool;
 };
 
 /**
  * Creates the Pi-based data agent for one conversation: three tools (run a
- * query, look up stored values, ask the user), a cache-friendly system
- * prompt, and a model policy that escalates to a stronger model only when a
+ * query, look up stored values, ask the user) plus the installed plugin AI
+ * tools, rebuilt on every `ask`, a cache-friendly system prompt, and a
+ * model policy that escalates to a stronger model only when a
  * query fails or comes back empty. `ask` rejects when a model call fails,
  * so callers can show the error or offer another way to answer.
  */
@@ -248,12 +287,14 @@ export function createDataAgent(
 ): DataAgent {
   const state = createDataAgentRunState();
   const turnCounter = { turns: 0 };
-  const agent = _createAgent(options, state, turnCounter);
+  const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
+  const agent = _createAgent(options, aliases, state, turnCounter);
   return {
     agent,
     ask: async (message) => {
       Object.assign(state, beginDataAgentRun(state, message));
       turnCounter.turns = 0;
+      agent.state.tools = _createTools(options, aliases, state);
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;
       let usage: DataAgentUsage = EMPTY_USAGE;

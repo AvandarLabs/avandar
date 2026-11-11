@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { MENTION_QUESTIONS } from "../../covid/covidMentionQuestions";
 import { PAGE_QUESTIONS } from "../../covid/covidPageQuestions";
 import { createPiConversation } from "./PiHarness";
@@ -392,5 +393,120 @@ describe("createPiConversation mention placeholders", () => {
       expect.anything(),
       `SELECT 1 FROM t WHERE "Admin2" = 'Kings'`,
     );
+  });
+});
+
+const FIT_QUESTION = {
+  id: "R01",
+  category: "page_context",
+  prompt: "Fit y on x for the result on screen.",
+  clarification: "not_needed",
+  truth: {},
+  fitRegression: {
+    rows: [{ x: 1, y: 3 }],
+    columns: ["x", "y"],
+    xColumn: "x",
+    yColumn: "y",
+    slope: 2,
+  },
+} as unknown as EvalQuestion;
+
+/** An agent that reads the store during `ask` and calls `fitRegression`. */
+function _createFitAgent(
+  seenDuringAsk: Array<ReturnType<typeof ExplorerPluginResultStore.get>>,
+): DataAgent {
+  const messages: unknown[] = [];
+  return {
+    agent: { state: { messages } },
+    ask: async () => {
+      seenDuringAsk.push(ExplorerPluginResultStore.get());
+      messages.push(
+        { role: "user", content: "Fit y on x for the result on screen." },
+        {
+          role: "assistant",
+          content: [
+            { type: "toolCall", id: "1", name: "fitRegression", arguments: {} },
+          ],
+        },
+      );
+      return {
+        text: "The slope is 2.",
+        state: { questions: [], valuesSentToModel: [] },
+        usage: {},
+      };
+    },
+  } as unknown as DataAgent;
+}
+
+describe("createPiConversation with a fitRegression question", () => {
+  it("shows the rows to the tool during ask, then clears them", async () => {
+    const seenDuringAsk: Array<
+      ReturnType<typeof ExplorerPluginResultStore.get>
+    > = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createFitAgent(seenDuringAsk);
+      },
+    });
+
+    const answer = await conversation.ask(FIT_QUESTION);
+
+    expect(seenDuringAsk).toEqual([
+      {
+        columns: [
+          { name: "x", dataType: "double" },
+          { name: "y", dataType: "double" },
+        ],
+        rows: [{ x: 1, y: 3 }],
+      },
+    ]);
+    expect(ExplorerPluginResultStore.get()).toBeUndefined();
+    expect(answer.toolNames).toEqual(["fitRegression"]);
+  });
+
+  it("records no tool names for a question that calls none", async () => {
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: _createFailingAgent,
+    });
+
+    const answer = await conversation.ask(QUESTION);
+
+    expect(answer.toolNames).toEqual([]);
+  });
+});
+
+describe("createPiConversation store isolation", () => {
+  it("does not clear rows a fit ask set when a non-fit ask finishes", async () => {
+    ExplorerPluginResultStore.set({
+      columns: [{ name: "x", dataType: "double" }],
+      rows: [{ x: 1 }],
+    });
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: _createFailingAgent,
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(ExplorerPluginResultStore.get()?.rows).toEqual([{ x: 1 }]);
+    ExplorerPluginResultStore.clear();
+  });
+
+  it("does not write the store for a non-fit ask", async () => {
+    const seenDuringAsk: Array<
+      ReturnType<typeof ExplorerPluginResultStore.get>
+    > = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createFitAgent(seenDuringAsk);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(seenDuringAsk).toEqual([undefined]);
   });
 });

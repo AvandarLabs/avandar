@@ -15,10 +15,16 @@ import { createDataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDat
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
 import { isPersonalColumnName } from "@/lib/agent/dataAgent/pagePrivacy/isPersonalColumnName";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
+import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
 import { EMPTY_EVAL_USAGE } from "../EvalHarness";
+import {
+  getEvalPluginAiTools,
+  publishFitRegressionResult,
+  runEvalPluginAiTool,
+} from "./fitRegressionTooling";
 import { PI_EVAL_CONFIGS } from "./piEvalConfigs";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
@@ -154,6 +160,7 @@ function _toEvalAnswer(
   reply: DataAgentReply,
   recorder: QuestionRecorder,
   startedAt: number,
+  toolNames: readonly string[],
 ): EvalAnswer {
   const lastQuery = reply.state.lastQuery;
   return {
@@ -174,6 +181,7 @@ function _toEvalAnswer(
     }),
     consentPrompts: recorder.consentPrompts,
     valuesSentToModel: reply.state.valuesSentToModel,
+    toolNames,
     usage: {
       calls: reply.usage.calls,
       promptTokens: reply.usage.inputTokens,
@@ -219,6 +227,7 @@ function _toFailedEvalAnswer(
   error: unknown,
   usage: EvalUsage,
   startedAt: number,
+  toolNames: readonly string[],
 ): EvalAnswer {
   return {
     error: error instanceof Error ? error.message : String(error),
@@ -226,9 +235,27 @@ function _toFailedEvalAnswer(
     clarifications: [],
     consentPrompts: 0,
     valuesSentToModel: [],
+    toolNames,
     usage,
     latencyMs: performance.now() - startedAt,
   };
+}
+
+/** The names of the tools the model called after message `firstIndex`. */
+function _toolNamesSince(
+  dataAgent: DataAgent,
+  firstIndex: number,
+): readonly string[] {
+  return dataAgent.agent.state.messages
+    .slice(firstIndex)
+    .filter((message): message is AssistantMessage => {
+      return message.role === "assistant";
+    })
+    .flatMap((message) => {
+      return message.content.flatMap((block) => {
+        return block.type === "toolCall" ? [block.name] : [];
+      });
+    });
 }
 
 /**
@@ -294,6 +321,72 @@ function _buildTurnInputs(
 }
 
 /**
+ * Runs `ask` with the question's fit rows published as the Data Explorer's
+ * result, when it has any, and clears them once it settles.
+ */
+async function _withFitRegressionResult<T>(
+  question: EvalQuestion,
+  ask: () => Promise<T>,
+): Promise<T> {
+  if (!question.fitRegression) {
+    return ask();
+  }
+  publishFitRegressionResult(question.fitRegression);
+  try {
+    return await ask();
+  } finally {
+    ExplorerPluginResultStore.clear();
+  }
+}
+
+/** What one eval conversation keeps between its questions. */
+type PiConversationState = {
+  dataAgent: DataAgent;
+  recorder: QuestionRecorder;
+  vault: SqlPlaceholderVault;
+  lastPageBlock?: string;
+  lastAttachedBlock?: string;
+};
+
+/** Asks one question in the conversation and records how it went. */
+async function _askPiQuestion(
+  state: PiConversationState,
+  question: EvalQuestion,
+): Promise<EvalAnswer> {
+  const { dataAgent, recorder } = state;
+  Object.assign(recorder, {
+    question,
+    result: undefined,
+    error: undefined,
+    vizType: undefined,
+    consentPrompts: 0,
+  });
+  const startedAt = performance.now();
+  const firstMessageIndex = dataAgent.agent.state.messages.length;
+  const inputs = _buildTurnInputs(question, state.vault);
+  try {
+    const reply = await dataAgent.ask(
+      buildAgentTurnText({
+        message: ChatMentionToken.toModelText(question.prompt, inputs.nameOf),
+        pageBlock: inputs.blocks.pageBlock,
+        previousPageBlock: state.lastPageBlock,
+        attachedBlock: inputs.blocks.attachedBlock,
+        previousAttachedBlock: state.lastAttachedBlock,
+        mentionedBlock: inputs.blocks.mentionedBlock,
+      }),
+    );
+    state.lastPageBlock = inputs.blocks.pageBlock ?? state.lastPageBlock;
+    state.lastAttachedBlock = inputs.blocks.attachedBlock;
+    const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
+    return _toEvalAnswer(reply, recorder, startedAt, toolNames);
+  } catch (error) {
+    const usage = _usageSince(dataAgent, firstMessageIndex);
+    const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
+    return _toFailedEvalAnswer(error, usage, startedAt, toolNames);
+  }
+}
+
+/**
  * One eval conversation with a data agent built by `createAgent` over a host
  * backed by DuckDB and the simulated user. Like the browser, it keeps one
  * placeholder vault per conversation and restores placeholders before SQL
@@ -308,47 +401,21 @@ export function createPiConversation(
 ): EvalConversation {
   const recorder: QuestionRecorder = { consentPrompts: 0 };
   const vault = createSqlPlaceholderVault();
-  let lastPageBlock: string | undefined;
-  let lastAttachedBlock: string | undefined;
-  const dataAgent = options.createAgent(
-    createPlaceholderRestoringHost(
-      _createEvalHost(options.database, recorder),
-      vault,
+  const state: PiConversationState = {
+    recorder,
+    vault,
+    dataAgent: options.createAgent(
+      createPlaceholderRestoringHost(
+        _createEvalHost(options.database, recorder),
+        vault,
+      ),
     ),
-  );
+  };
   return {
-    ask: async (question) => {
-      Object.assign(recorder, {
-        question,
-        result: undefined,
-        error: undefined,
-        vizType: undefined,
-        consentPrompts: 0,
+    ask: (question) => {
+      return _withFitRegressionResult(question, () => {
+        return _askPiQuestion(state, question);
       });
-      const startedAt = performance.now();
-      const firstMessageIndex = dataAgent.agent.state.messages.length;
-      const inputs = _buildTurnInputs(question, vault);
-      try {
-        const reply = await dataAgent.ask(
-          buildAgentTurnText({
-            message: ChatMentionToken.toModelText(
-              question.prompt,
-              inputs.nameOf,
-            ),
-            pageBlock: inputs.blocks.pageBlock,
-            previousPageBlock: lastPageBlock,
-            attachedBlock: inputs.blocks.attachedBlock,
-            previousAttachedBlock: lastAttachedBlock,
-            mentionedBlock: inputs.blocks.mentionedBlock,
-          }),
-        );
-        lastPageBlock = inputs.blocks.pageBlock ?? lastPageBlock;
-        lastAttachedBlock = inputs.blocks.attachedBlock;
-        return _toEvalAnswer(reply, recorder, startedAt);
-      } catch (error) {
-        const usage = _usageSince(dataAgent, firstMessageIndex);
-        return _toFailedEvalAnswer(error, usage, startedAt);
-      }
     },
   };
 }
@@ -408,6 +475,8 @@ export function createPiHarness(
             streamFn,
             today: new Date().toISOString().slice(0, 10),
             sessionId: crypto.randomUUID(),
+            getPluginAiTools: getEvalPluginAiTools,
+            runPluginAiTool: runEvalPluginAiTool,
           });
         },
       });

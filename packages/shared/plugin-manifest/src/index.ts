@@ -34,3 +34,4 @@ export {
   PLUGIN_PERMISSIONS,
   PluginManifestSchema,
 } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";
+export type { PluginAiTool } from "@plugin-manifest/PluginManifest/PluginManifestSchema.ts";

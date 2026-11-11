@@ -7,7 +7,7 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 | --- | --- |
 | `@avandar/plugin-manifest` | Everything in `runtime` plus the schema, compiler, error class, and helpers, for build tools and the CLI. Pulls in Zod and YAML, but no Node-only modules |
 | `@avandar/plugin-manifest/runtime` | Browser code: types, `evaluateWhenCondition`, `getLocalizedTextFromManifestStrings`, `SlotFactRegistry`, `SLOT_IDS`. No Zod or YAML at runtime |
-| `@avandar/plugin-manifest/node` | Node only: `readPluginDirectory`, `readBundledPlugins`, `readBundledPluginFolders` |
+| `@avandar/plugin-manifest/node` | Node only: `readPluginDirectory`, `readBundledPlugins`, `readBundledPluginFolders`, `emitPluginAiToolsFile`, `assertUniquePluginAiToolNames` |
 
 ## Exports
 
@@ -28,9 +28,12 @@ The Avandar plugin manifest: its Zod schema, the `ava.yaml` compiler, the
 | `readPluginDirectory` | Function | node | Reads and validates one plugin folder |
 | `readBundledPlugins` | Function | node | Reads and validates every plugin folder listed in `plugins/bundled.yaml` |
 | `readBundledPluginFolders` | Function | node | Gets the folder names listed in `plugins/bundled.yaml` |
+| `emitPluginAiToolsFile` | Function | node | Makes the text of `pluginAiTools.gen.ts`: the data-agent tools every bundled plugin declares. Run it with `pnpm vite-script packages/shared/plugin-manifest/src/node/emitPluginAiTools.main.ts` |
+| `assertUniquePluginAiToolNames` | Function | node | Throws when two plugins declare a data-agent tool with the same name, naming both plugins |
 | `PluginManifest` | Type | main, runtime | A manifest that passed the schema, with omitted lists defaulted to empty |
 | `PluginCommand` | Type | main, runtime | A command declared under `contributes.commands` |
 | `PluginMenuEntry` | Type | main, runtime | One entry in a slot's menu list: a command and an optional `when` |
+| `PluginAiTool` | Type | main | A tool declared under `contributes.aiTools`: a name, description, and JSON Schema parameters |
 | `PluginVizType` | Type | main, runtime | A chart type declared under `contributes.vizTypes` |
 | `PluginVizSetting` | Type | main, runtime | One setting of a chart type, edited in the chart's settings form |
 | `PluginVizSettingControl` | Type | main, runtime | The control a chart setting uses, such as `columnPicker` or `segmented` |

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef } from "react";
+import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { QueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import { makeToolbarFactsFromQueryResult } from "@/views/DataExplorerApp/makeToolbarFactsFromQueryResult/makeToolbarFactsFromQueryResult";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { ExplorerPluginResult } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import type { WhenFacts } from "@avandar/plugin-manifest/runtime";
 import type { DataExplorerToolbarContext } from "@avandar/plugin-sdk";
 
@@ -52,6 +54,55 @@ function _buildContextGetter(
   };
 }
 
+function _makeStoreResultFromQueryResults(
+  queryResults: QueryResults,
+): ExplorerPluginResult | undefined {
+  if (queryResults === undefined) {
+    return undefined;
+  }
+  return {
+    columns: queryResults.columns.map((column) => {
+      return { name: column.name, dataType: column.dataType };
+    }),
+    rows: queryResults.data,
+  };
+}
+
+/**
+ * Keeps the store on the last settled result: a run in flight leaves it as
+ * it is, and unmounting clears it only while the store still holds what this
+ * hook published, so another explorer's newer result is not erased.
+ */
+function usePublishSettledResultToStore(options: Options): void {
+  const { queryResults, isLoadingResults } = options;
+  const publishedResultRef = useRef<ExplorerPluginResult | undefined>(
+    undefined,
+  );
+
+  useEffect(
+    function publishSettledResultToStore() {
+      if (!isLoadingResults) {
+        const result = _makeStoreResultFromQueryResults(queryResults);
+        publishedResultRef.current = result;
+        ExplorerPluginResultStore.set(result);
+      }
+    },
+    [queryResults, isLoadingResults],
+  );
+
+  useEffect(function clearStoreOnUnmount() {
+    return () => {
+      const publishedResult = publishedResultRef.current;
+      if (
+        publishedResult !== undefined &&
+        ExplorerPluginResultStore.get() === publishedResult
+      ) {
+        ExplorerPluginResultStore.clear();
+      }
+    };
+  }, []);
+}
+
 /**
  * Builds what plugin commands in the Data Explorer toolbar need: a getter for
  * the invocation context they run on and the `when` facts that decide which
@@ -78,6 +129,8 @@ export function useDataExplorerPluginContext(options: Options): PluginContext {
     },
     [queryResults, isLoadingResults],
   );
+
+  usePublishSettledResultToStore(options);
 
   const facts = useMemo(() => {
     return _buildFactsFromQueryResults(factsResults);

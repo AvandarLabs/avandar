@@ -730,6 +730,33 @@ the app and fails if plugin code lands in any chunk the app can load without a
 plugin, including lazily loaded routes, or if the plugin host outgrows its size
 budget.
 
+## 12. Add a tool the chat can call
+
+A plugin can give the hosted data agent a tool.
+
+1. Declare it under `contributes.aiTools` in `ava.yaml`. Each tool has a
+   `name`, a plain-text `description` the model sees, and `parameters`.
+2. Export `aiTools.<name>` from the plugin entry. The key matches `name`.
+3. In the handler, read rows with `avandar.data.fetchRows` on
+   `avandar.context.queryHandle`. The handler does not receive rows as an
+   argument.
+4. Return a JSON object of aggregates, never row values.
+
+An aggregate over a few rows can give those rows away. A line fitted over two
+rows passes through both points, for example. Refuse to compute over fewer rows
+than a small-cell minimum, as `fitRegression` does with 10.
+
+Throw `PluginError("InvalidToolInput", message)` for a caller mistake. The
+message must not contain a cell value. Any other throw becomes
+`The tool failed.` for the model.
+
+The tool runs only when the plugin's install status is `installed`, and only on
+the hosted data agent.
+
+For a working example, see the handler in
+`plugins/epidemiology/src/fitRegression/runFitRegression.ts` and the
+`fitRegression` block in `plugins/epidemiology/ava.yaml`.
+
 ## Rules to keep in mind
 
 - **Permissions are declared, not enforced.** A manifest lists the permissions

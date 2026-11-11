@@ -1,19 +1,25 @@
 import { Model } from "@avandar/models";
+import { definePlugin } from "@avandar/plugin-sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { runDataAgentTurn } from "./runDataAgentTurn";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { AgentPageInputs } from "./runDataAgentTurn";
+import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { CreateDataAgentOptions } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { runPluginAiTool } from "@/lib/plugins/runPluginAiTool/runPluginAiTool";
+import type { AgentToolContext } from "@avandar/plugin-sdk";
 
 const {
   askMock,
   createDataAgentMock,
   createAgentPageContextMock,
   getAllDatasetsMock,
+  runPluginAiToolMock,
   showQueryInChatMock,
 } = vi.hoisted(() => {
   return {
@@ -21,8 +27,47 @@ const {
     createDataAgentMock: vi.fn(),
     createAgentPageContextMock: vi.fn(),
     getAllDatasetsMock: vi.fn(),
+    runPluginAiToolMock: vi.fn(),
     showQueryInChatMock: vi.fn(),
   };
+});
+
+/**
+ * The one bundled plugin in these tests. Its id is the epidemiology
+ * plugin's, so the generated `fitRegression` declaration names it, and each
+ * test sets the definition its code chunk holds. The module cache keeps the
+ * first chunk for the session, so the chunk reads the definition live.
+ */
+const bundledPluginMocks = vi.hoisted(() => {
+  return { definition: undefined as unknown };
+});
+
+vi.mock("@/lib/plugins/pluginIndexHelpers", () => {
+  return {
+    getPluginIndexEntry: (pluginId: string) => {
+      if (pluginId !== "avandar.epidemiology") {
+        return undefined;
+      }
+      return {
+        id: pluginId,
+        loadManifest: () => {
+          return Promise.reject(new Error("Not loaded in these tests"));
+        },
+        loadCode: () => {
+          return Promise.resolve({
+            get definition() {
+              return bundledPluginMocks.definition;
+            },
+            messages: {},
+          });
+        },
+      };
+    },
+  };
+});
+
+vi.mock("@/lib/plugins/runPluginAiTool/runPluginAiTool", () => {
+  return { runPluginAiTool: runPluginAiToolMock };
 });
 
 vi.mock("@/lib/agent/dataAgent/createDataAgent/createDataAgent", () => {
@@ -181,6 +226,43 @@ function _lastAgentOptions(): CreateDataAgentOptions {
   return createDataAgentMock.mock.calls.at(-1)![0];
 }
 
+/** A result with only an `x` column, for a plugin tool to run against. */
+const PLUGIN_TOOL_CONTEXT = {
+  slotId: "agent.tool",
+  queryHandle: "query-handle-1",
+  columns: [{ name: "x", dataType: "double" }],
+  rowCount: 0,
+} as unknown as AgentToolContext;
+
+const FIT_REGRESSION_DECLARATION = PLUGIN_AI_TOOLS.find((declaration) => {
+  return declaration.name === "fitRegression";
+})!;
+
+/** Calls the conversation's plugin tool runner, as the agent would. */
+async function _runPluginAiToolFromAgent(): Promise<
+  Parameters<typeof runPluginAiTool>[0]
+> {
+  await _lastAgentOptions().runPluginAiTool!({
+    declaration: FIT_REGRESSION_DECLARATION,
+    args: { xColumn: "x", yColumn: "y" },
+  });
+  return runPluginAiToolMock.mock.calls.at(-1)![0];
+}
+
+/** Makes the agent's next ask show `result` as a chat result card. */
+function _showChatResultOnNextAsk(result: AgentQueryResultData): void {
+  showQueryInChatMock.mockImplementationOnce(
+    (options: { results: AgentQueryResultData[] }) => {
+      options.results.push(result);
+      return Promise.resolve({ kind: "rows", columns: [], rowCount: 1 });
+    },
+  );
+  askMock.mockImplementationOnce(async () => {
+    await _lastAgentOptions().host.showQuery({ sql: "SELECT 1" } as never);
+    return { text: "Here it is." };
+  });
+}
+
 beforeEach(() => {
   askMock.mockResolvedValue({ text: "Done." });
   createDataAgentMock.mockImplementation(() => {
@@ -199,6 +281,111 @@ afterEach(() => {
 });
 
 describe("runDataAgentTurn", () => {
+  it("passes the turn's plugin tools into the agent", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const getPluginAiTools = () => {
+      return [];
+    };
+    await runDataAgentTurn({
+      ..._turn("workspace-1", "Fit a line."),
+      getPluginAiTools,
+    });
+    expect(_lastAgentOptions().getPluginAiTools).toBe(getPluginAiTools);
+  });
+
+  it("lets a plugin tool read the result an earlier turn added to the chat", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const chatResult = { sql: "SELECT x, y FROM t0" } as AgentQueryResultData;
+    _showChatResultOnNextAsk(chatResult);
+    await runDataAgentTurn(_turn("workspace-earlier-result", "Show x and y."));
+    await runDataAgentTurn(
+      _turn("workspace-earlier-result", [
+        "Show x and y.",
+        "Here it is.",
+        "Fit a line.",
+      ]),
+    );
+
+    const request = await _runPluginAiToolFromAgent();
+
+    expect(request.chatResults).toEqual([chatResult]);
+    expect(request.isDataExplorer).toBe(false);
+  });
+
+  it("keeps an older chat result when a later turn shows none", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    const chatResult = { sql: "SELECT x, y FROM t0" } as AgentQueryResultData;
+    _showChatResultOnNextAsk(chatResult);
+    await runDataAgentTurn(_turn("workspace-older-result", "Show x and y."));
+    await runDataAgentTurn(
+      _turn("workspace-older-result", [
+        "Show x and y.",
+        "Here it is.",
+        "Thanks.",
+      ]),
+    );
+
+    const request = await _runPluginAiToolFromAgent();
+
+    expect(request.chatResults.at(-1)).toBe(chatResult);
+  });
+
+  it("tells the plugin runner when the turn is on the Data Explorer", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    createAgentPageContextMock.mockResolvedValueOnce({ app: "data-explorer" });
+    await runDataAgentTurn(
+      _turn("workspace-explorer-tool", "Fit a line."),
+      _page("/acme/data-explorer"),
+    );
+
+    const request = await _runPluginAiToolFromAgent();
+
+    expect(request.isDataExplorer).toBe(true);
+  });
+
+  it("calls the bundled plugin's handler with the plugin API and arguments", async () => {
+    const fitRegression = vi.fn().mockResolvedValue({ slope: 2 });
+    bundledPluginMocks.definition = definePlugin({
+      aiTools: { fitRegression },
+    });
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn(_turn("workspace-bundled-tool", "Fit a line."));
+    const request = await _runPluginAiToolFromAgent();
+
+    await expect(
+      request.invoke(PLUGIN_TOOL_CONTEXT, { xColumn: "x", yColumn: "y" }),
+    ).resolves.toEqual({ slope: 2 });
+    const [pluginApi, args] = fitRegression.mock.calls[0]!;
+    expect(pluginApi.context).toBe(PLUGIN_TOOL_CONTEXT);
+    expect(pluginApi.workspace.id).toBe("workspace-bundled-tool");
+    expect(args).toEqual({ xColumn: "x", yColumn: "y" });
+  });
+
+  it("fails a tool whose bundled plugin has no handler for it", async () => {
+    bundledPluginMocks.definition = definePlugin({});
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn(_turn("workspace-missing-handler", "Fit a line."));
+    const request = await _runPluginAiToolFromAgent();
+
+    await expect(request.invoke(PLUGIN_TOOL_CONTEXT, {})).rejects.toThrow(
+      'Plugin "avandar.epidemiology" has no AI tool "fitRegression"',
+    );
+  });
+
+  it("fails a tool whose plugin is not bundled", async () => {
+    getAllDatasetsMock.mockResolvedValue([DATASET_A]);
+    await runDataAgentTurn(_turn("workspace-unbundled-tool", "Fit a line."));
+    await _lastAgentOptions().runPluginAiTool!({
+      declaration: { ...FIT_REGRESSION_DECLARATION, pluginId: "nobody.none" },
+      args: {},
+    });
+    const request = runPluginAiToolMock.mock.calls.at(-1)![0];
+
+    await expect(request.invoke(PLUGIN_TOOL_CONTEXT, {})).rejects.toThrow(
+      'Plugin "nobody.none" is not bundled',
+    );
+  });
+
   it("names tables in the page block as the agent knows them", async () => {
     getAllDatasetsMock.mockResolvedValue([DATASET_A]);
     await runDataAgentTurn(

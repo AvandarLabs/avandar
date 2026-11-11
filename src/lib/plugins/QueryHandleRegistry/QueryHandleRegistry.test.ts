@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { makeQueryHandleRegistry } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
+import { afterEach, describe, expect, it } from "vitest";
+import {
+  makeQueryHandleRegistry,
+  QueryHandleRegistry,
+} from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
 import type { QueryHandle } from "@avandar/plugin-sdk";
 
 const ROWS = [{ x: 1 }, { x: 2 }];
@@ -121,5 +124,21 @@ describe("makeQueryHandleRegistry", () => {
     const handle = registry.getOrCreate(ROWS);
 
     expect(registry.getRows(handle)).toBe(ROWS);
+  });
+});
+
+describe("QueryHandleRegistry.release", () => {
+  afterEach(() => {
+    QueryHandleRegistry.clear();
+  });
+
+  it("releases one handle and leaves another readable", () => {
+    const explorer = QueryHandleRegistry.getOrCreate([{ x: 1 }]);
+    const chat = QueryHandleRegistry.getOrCreate([{ x: 2 }]);
+
+    QueryHandleRegistry.release(chat);
+
+    expect(QueryHandleRegistry.getRows(explorer)).toEqual([{ x: 1 }]);
+    expect(QueryHandleRegistry.getRows(chat)).toBeUndefined();
   });
 });

@@ -86,4 +86,18 @@ export type EvalQuestion = {
    * schema, so a query shown to the user is a miss. `grade` is not called.
    */
   gradeText?: (assistantText: string) => Verdict;
+  /**
+   * The right answer calls the `fitRegression` plugin tool on a result the
+   * Data Explorer shows, then states the fitted `slope`. The Pi harness
+   * publishes `rows` and `columns` (all `double`) as the explorer's result
+   * before it asks. A reply passes when it called the tool and names the
+   * slope. `grade` is not called.
+   */
+  fitRegression?: {
+    rows: ReadonlyArray<Readonly<Record<string, unknown>>>;
+    columns: readonly string[];
+    xColumn: string;
+    yColumn: string;
+    slope: number;
+  };
 };
