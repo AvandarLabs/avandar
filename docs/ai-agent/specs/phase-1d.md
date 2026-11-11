@@ -55,7 +55,7 @@ Out:
 | The editor saves with a plain update, so its next Save overwrites a row written while it was open. | Confirm on a dashboard that is open in the editor at that moment adds the block to the editor, unsaved, instead of writing the row. |
 | A DataViz block needs column bindings. The editor's Save prepares them with `DashboardColumnBindingPreparation.prepareDocument`. | Confirm runs the same preparation before it saves. |
 | No call checks edit rights for many dashboards at once. | Names are matched first. Edit rights are checked only for the matches, one `UserClient.canAccessResource` call each. |
-| A message part cannot change after its turn, and data parts never reach the model. | The card's proposal is a data part. Its status lives on the session's thread record, and the next turn's text reports it. |
+| A message part cannot change after its turn, data parts never reach the model, and the runtime rewrites the thread record at the end of every run. | The card's proposal is a data part. Its status lives in a per-session store beside the tray, and the next turn's text reports it. |
 | `run_query` asks consent for filter values, counts toward a cap of three queries per answer, and escalates after a failed query. | `add_dashboard_block` does the same with a DataViz block's SQL. |
 | The vault restores placeholders in SQL only. | The vault gains `unmaskText` for names and labels. |
 | Offline routing and value matching read the whole turn text, and the offline model has an 8,192-token window. | Offline routing and value matching read only the user's message. Offline blocks keep SQL for at most three tiles. |
@@ -67,7 +67,7 @@ beside `run_query`, so the proxy and the browser read one definition.
 
 | Argument | Meaning |
 |---|---|
-| `dashboard` | `"current"` for the dashboard open in the editor, or the dashboard's name exactly as the model saw it in the page block, `<mentioned>`, `<attached>`, or the user's message. A placeholder such as `<value 1>` is allowed. |
+| `dashboard` | `"current"` for the dashboard on the current page, or the dashboard's name exactly as the model saw it in the page block, `<mentioned>`, `<attached>`, or the user's message. A placeholder such as `<value 1>` is allowed. |
 | `block` | `kind` and the fields for that kind, as today's `addDashboardBlock` takes them: DataViz (`prompt`, `sql`, `vizType`), HeadingBlock, ParagraphBlock, QuoteBlock, DividerBlock, CalloutBlock, ListBlock, CodeBlock, TableBlock, Card. |
 | `summary` | One sentence for the user. It becomes the reply when the block is added or the card is shown. |
 
@@ -90,7 +90,7 @@ What the model reads back:
 |---|---|---|
 | Added to the open editor | `Added to the open dashboard (unsaved).` | Yes |
 | Card shown | `The card is on the user's screen. Nothing changes until they confirm.` | Yes |
-| No editor open for `"current"` | `No dashboard is open.` | No |
+| `"current"` with no dashboard on the page | `No dashboard is on this page.` | No |
 | No dashboard matches, or the user can edit none of the matches | `No dashboard named "<name>" that the user can edit.` | No |
 | DataViz SQL failed | The error, as `run_query` returns it. | On the third query |
 | Invalid fields | `Invalid block:` and the reason. | No |
@@ -112,7 +112,7 @@ parses the tool call's JSON string. Today's chat behaves as before.
 
 - Add a block only when the user asks to add something to a dashboard.
 - One block per answer.
-- Name the dashboard as written, or `"current"` for the open one.
+- Name the dashboard as written, or `"current"` for the one on the page.
 - A chart that only needs to show in the chat or the explorer uses
   `run_query`.
 - A `<dashboard_card>` line reports what the user did with an earlier card.
@@ -130,8 +130,11 @@ that, a change needs v5.
 `resolveAgentDashboardTarget` is a pure function. The browser host and the
 eval hosts both call it.
 
-- `"current"` is `DashboardEditorStateManager`'s `activeDashboardId`. Only
-  the mounted editor sets it, so a preview page has no current dashboard.
+- `"current"` is the dashboard open in the editor
+  (`DashboardEditorStateManager`'s `activeDashboardId`, which only the
+  mounted editor sets). With no editor open, it is the dashboard the page
+  shows, such as a preview, which then gets a card. With neither, the
+  model is told no dashboard is on this page.
 - A name is first restored with the vault's `unmaskText`, if it holds a
   placeholder. It is compared, ignoring case and surrounding spaces, with
   dashboard names in tiers: the page's dashboard, then the mentioned and
@@ -161,10 +164,12 @@ The proposal is an `agent-dashboard-block` data part in the assistant
 message: a card id, the block, the summary, and the candidate dashboards.
 `AgentDashboardBlockPart` draws it.
 
-The card's status lives on the session's thread record
-(`StoredChatThread.dashboardCards`, by card id), beside the pending
-clarification. It is held in `ChatPanelStateManager`, loaded and saved with
-the session, and written as soon as it changes.
+The card's status lives in `AgentDashboardCardStore`, one localStorage
+record per session beside the thread and the tray
+(`ava.chat.dashboardCards.{workspaceId}.{userId}.{sessionId}`), by card
+id. It is written as soon as it changes, and deleting a session deletes
+it. It is not a field of the thread record, because the runtime rewrites
+that record from its own fields at the end of every run.
 
 | State | Shows |
 |---|---|
@@ -223,7 +228,7 @@ Every string on the card is translated.
 
 | Situation | Behavior |
 |---|---|
-| `"current"` with no editor open | The model is told no dashboard is open. It asks which one, or names one. |
+| `"current"` with no dashboard on the page | The model is told. It asks which one, or names one. |
 | No match, or no edit rights | The model is told, and tells the user. Nothing changes. |
 | Several matches | The card shows a picker. |
 | The DataViz SQL fails | The model gets the error and may retry within the query cap. If the cap runs out, the reply says the chart could not be built. |
@@ -231,7 +236,7 @@ Every string on the card is translated.
 | The dashboard changed before Confirm | Read again and retry once. Still stale: failed, with Retry. |
 | No connection, or the save fails | Failed: "Couldn't save. Check your connection and try again." Retry stays. |
 | The dashboard was deleted or access removed | Failed: "This dashboard is no longer available." No Retry. |
-| A session switch or reload while a card is pending | The card's status is on the session's record and still works. |
+| A session switch or reload while a card is pending | The card's status is in the session's store and still works. |
 | The target is open in the editor at Confirm | The block goes into the editor, unsaved. |
 | Cancel | The card shows cancelled. The next turn's card line says so. |
 | Offline, an unreadable tool call | Goes back to the model as a failed call, as offline already does. |
@@ -294,8 +299,8 @@ Red/green TDD with Vitest, plus one browser spec:
 - v3's instructions keep their hash. v4 holds `DASHBOARD_BLOCK_RULES`.
 - The per-version tool lists: v1 to v3 serve and accept three tools,
   unchanged, and v4 four, in the proxy and the browser.
-- The shared block parser keeps its tests in its new place, and the edge
-  wrapper still parses today's tool calls.
+- The shared block parser gets tests (the edge file had none), and the
+  edge wrapper still parses today's tool calls.
 - The vault's `unmaskText`.
 - `resolveAgentDashboardTarget`: `"current"`, the page, a mention, the
   tray, a workspace name, a placeholder, a trailing "dashboard", edit
@@ -305,7 +310,8 @@ Red/green TDD with Vitest, plus one browser spec:
   summary as the reply.
 - The card: each state, the editor-open Confirm, the save with prepared
   bindings, the stale retry, the offline failure, the status on the
-  session record, and a card line sent once.
+  session's store, the store deleted with its session, and a card line
+  sent once.
 - Offline: routing reads only the message, blocks carry at most three
   tiles of SQL, results go to the chat off the explorer, and the router
   sends an add-to-dashboard request to `data`.

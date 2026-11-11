@@ -825,9 +825,10 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   dashboard open in the editor adds the block there, unsaved, instead of
   writing a row the editor's next Save would overwrite. Confirm prepares
   column bindings as the editor's Save does. Edit rights are checked only
-  for dashboards whose name matches. The card's status lives on the
-  session's thread record, because a message part cannot change after its
-  turn. Offline routing reads only the user's message, and offline blocks
+  for dashboards whose name matches. The card's status lives in a
+  per-session store beside the tray, because a message part cannot change
+  after its turn and the thread record is rewritten at the end of every
+  run. Offline routing reads only the user's message, and offline blocks
   keep SQL for at most three tiles to fit the offline model's window.
 - **Alternatives.** Saving at once with Undo in the chat (breaks D33's
   confirm-first rule). Only the open dashboard (misses "from anywhere").
