@@ -82,17 +82,11 @@ and untracked. With `--exclude ".temp/**"` it passed 269 of 269.
 
 ### 4. Integrate
 
-`git merge-base origin/develop HEAD` is `fb5d2ca5`. This branch and
-current `develop` diverged before Phase 1C. The spec's parent is
-`4de947922` `feat(gis): edit a layer from the layers panel`, and that
-commit is not on `origin/develop`. A merge to `develop` is not this
-feature by itself. Confirm the base with the branch owner before
-merging or opening a PR. Do not merge into `demo/measles`. Do not
-force-push.
-
-The branch is 34 commits ahead of `origin/demo/measles` and 1590 ahead
-of `origin/develop`. Ask whether to merge locally, push a PR, or leave
-the branch.
+The target is `demo/measles`, not `develop` (Pablo, 2026-11-11). This
+is demo work, and a push to `demo/measles` deploys the demo. The branch
+is 34 commits ahead of `origin/demo/measles` and 67 behind it. Do not
+force-push. Ask whether to merge locally or push a PR before doing
+either.
 
 ## Deferred, do not fix unless asked
 
