@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { downloadFilm } from "../../../../../showcase/download.js";
-import type { ContinuityAppearance } from "../../../continuityAppearance";
+import type { CompositionExportOptions } from "../compositionExportOptions";
 
 /** On-demand rendering, with progress scoped to the selected film. */
 export function useCompositionDownload(options: {
   id: string;
-  options: ContinuityAppearance | undefined;
+  options: CompositionExportOptions | undefined;
   captions: boolean | undefined;
 }) {
   const { id, options: appearance } = options;

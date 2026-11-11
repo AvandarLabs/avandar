@@ -225,6 +225,11 @@ A declared cut, for example a dark field cutting to a light one:
  "theme": {"ground": "#f8fafc"}, "props": {"...": "..."}}
 ```
 
+Every scene and option in this section has a short playable study in the
+Motion Atlas Compositions section, with its plan in
+[storyboards/vocabulary/](../storyboards/vocabulary/). See
+[storyboard-scene studies](continuity-compositions.md#storyboard-scene-studies).
+
 ## MediaScene
 
 | Prop | Type / default | Behavior |

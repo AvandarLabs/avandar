@@ -9,32 +9,53 @@ import { CompositionRoughnessControls } from "./CompositionRoughnessControls";
 import type { useCompositionAppearance } from "./useCompositionAppearance";
 
 type Props = { appearance: ReturnType<typeof useCompositionAppearance> };
-/** Shared Atlas palette and transport controls for the active composition. */
-export function CompositionControls({ appearance }: Props) {
+type ControlsProps = Props & {
+  /** A scene study plays plain storyboard scenes with its authored theme. */
+  isScene: boolean;
+};
+
+/**
+ * Shared Atlas palette and transport controls for the active composition.
+ * Scene studies keep only playback: palette, camera, blur, annotation,
+ * roughness and caption settings change nothing in plain storyboard scenes.
+ */
+export function CompositionControls({ appearance, isScene }: ControlsProps) {
   return (
     <MantineProvider
       theme={{ fontFamily: "Inter, Helvetica Neue, Arial, sans-serif" }}
     >
       <div className={css.controls}>
-        <PaletteControls
-          accent={appearance.draft.accent}
-          background={appearance.draft.background}
-          setAccent={(accent) => appearance.update({ accent })}
-          setBackground={(background) => appearance.update({ background })}
-        />
-        <p className={css.help}>
-          <Trans>
-            Colors affect editorial graphics. Product components retain their
-            native theme.
-          </Trans>
-        </p>
-        <TransportControls appearance={appearance} />
+        {isScene ? (
+          <p className={css.help}>
+            <Trans>
+              Storyboard scenes play with their authored theme and per-shot
+              field colors. Palette, camera, motion blur, annotation and
+              roughness settings apply to continuity compositions only.
+            </Trans>
+          </p>
+        ) : (
+          <>
+            <PaletteControls
+              accent={appearance.draft.accent}
+              background={appearance.draft.background}
+              setAccent={(accent) => appearance.update({ accent })}
+              setBackground={(background) => appearance.update({ background })}
+            />
+            <p className={css.help}>
+              <Trans>
+                Colors affect editorial graphics. Product components retain
+                their native theme.
+              </Trans>
+            </p>
+          </>
+        )}
+        <TransportControls appearance={appearance} isScene={isScene} />
       </div>
     </MantineProvider>
   );
 }
 
-function TransportControls({ appearance }: Props) {
+function TransportControls({ appearance, isScene }: ControlsProps) {
   const { t } = useLingui();
   return (
     <div className={css.transport}>
@@ -70,9 +91,13 @@ function TransportControls({ appearance }: Props) {
           appearance.setTransport((current) => ({ ...current, loop }));
         }}
       />
-      <AppearanceToggles appearance={appearance} />
-      <CameraPresetControl appearance={appearance} />
-      <CompositionRoughnessControls appearance={appearance} />
+      {!isScene && (
+        <>
+          <AppearanceToggles appearance={appearance} />
+          <CameraPresetControl appearance={appearance} />
+          <CompositionRoughnessControls appearance={appearance} />
+        </>
+      )}
     </div>
   );
 }

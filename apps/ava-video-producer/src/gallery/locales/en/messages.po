@@ -26,9 +26,17 @@ msgstr "Keywords"
 msgid "{0} brand color"
 msgstr "{0} brand color"
 
+#: src/gallery/HelperGallery/demos/CurveDemos.tsx
+msgid "linear time"
+msgstr "linear time"
+
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "Avandar Motion Atlas home"
 msgstr "Avandar Motion Atlas home"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "then its icon."
+msgstr "then its icon."
 
 #. placeholder {0}: preset.name
 #: src/gallery/MotionGallery/MotionCard.tsx
@@ -107,6 +115,10 @@ msgstr "Keep a little inspiration."
 msgid "Pause all animations"
 msgstr "Pause all animations"
 
+#: src/gallery/HelperGallery/demos/EntranceDemos.tsx
+msgid "Export ready"
+msgstr "Export ready"
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Patient and investigative. Gives viewers time to inspect an unfamiliar "
 "system or a dense diagram."
@@ -137,6 +149,10 @@ msgstr "Explore all motions"
 msgid "Copy creative brief"
 msgstr "Copy creative brief"
 
+#: src/gallery/HelperGallery/demos/EntranceDemos.tsx
+msgid "Saved view"
+msgstr "Saved view"
+
 #: src/gallery/MotionGallery/ContentControls/ContentFeedback/ContentFeedback.tsx
 msgid "Content is valid. Ready to copy or export."
 msgstr "Content is valid. Ready to copy or export."
@@ -153,6 +169,10 @@ msgstr "FRAME {0}"
 #: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
 msgid "Annotation roughness"
 msgstr "Annotation roughness"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "Every line arrives"
+msgstr "Every line arrives"
 
 #: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
 msgid "Smooth"
@@ -196,6 +216,10 @@ msgstr "Annotations"
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "avandar"
 msgstr "avandar"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "one line at a time,"
+msgstr "one line at a time,"
 
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 msgid "BROWSE THE COLLECTION"
@@ -241,13 +265,25 @@ msgstr "Motion reference: {0}\n"
 "This is a conceptual motion graphic, not product footage. Replace illustrative "
 "content with approved story content."
 
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "Share the answer."
+msgstr "Share the answer."
+
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
 msgid "Loop"
 msgstr "Loop"
 
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "The statement leaves"
+msgstr "The statement leaves"
+
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 msgid "CONCEPTUAL GRAPHICS"
 msgstr "CONCEPTUAL GRAPHICS"
+
+#: src/gallery/HelperGallery/demos/EntranceDemos.tsx
+msgid "Publish"
+msgstr "Publish"
 
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Configured JSON copied"
@@ -264,6 +300,10 @@ msgstr "Motion Atlas / Creative reference brief\n"
 "{0} selected motion references\n"
 "\n"
 "{1}"
+
+#: src/gallery/HelperGallery/demos/EntranceDemos.tsx
+msgid "Draft"
+msgstr "Draft"
 
 #. placeholder {0}: preset.name
 #: src/gallery/MotionGallery/MotionCard.tsx
@@ -343,6 +383,1753 @@ msgstr "{0} FAMILIES"
 msgid "Complete films built from the motion library."
 msgstr "Complete films built from the motion library."
 
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.13 frames (433 ms). A sheet or full column; the default spring "
+"and counter length."
+msgstr "13 frames (433 ms). A sheet or full column; the default spring and "
+"counter length."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.15 frames (500 ms). One title word rising out of its mask."
+msgstr "15 frames (500 ms). One title word rising out of its mask."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.18 frames (600 ms). The main visual beat of a phase. Spend it "
+"once."
+msgstr "18 frames (600 ms). The main visual beat of a phase. Spend it once."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.2 frames (67 ms) between siblings in a list, so a group never "
+"arrives on one frame."
+msgstr "2 frames (67 ms) between siblings in a list, so a group never arrives "
+"on one frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.4 frames (133 ms). One half of a press response."
+msgstr "4 frames (133 ms). One half of a press response."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.6 frames (200 ms). Chip and state changes, and the default exit."
+msgstr "6 frames (200 ms). Chip and state changes, and the default exit."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.8 frames (267 ms). A whip-out or column wipe, deliberately "
+"shorter than a panel entrance so the boundary reads as a cut with motion "
+"in it."
+msgstr "8 frames (267 ms). A whip-out or column wipe, deliberately shorter than "
+"a panel entrance so the boundary reads as a cut with motion in it."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.9 frames (300 ms). A row, card or panel arriving; the default "
+"ramp length."
+msgstr "9 frames (300 ms). A row, card or panel arriving; the default ramp "
+"length."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A bounded screen-space blur radius from distance travelled per "
+"frame, scaled by the motion preset's shutter."
+msgstr "A bounded screen-space blur radius from distance travelled per frame, "
+"scaled by the motion preset''s shutter."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A brief scale dip that returns to exactly 1 over an 8-frame "
+"envelope."
+msgstr "A brief scale dip that returns to exactly 1 over an 8-frame envelope."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A button-down state that matches the pointer's press."
+msgstr "A button-down state that matches the pointer''s press."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A camera on the window layer only: the window scales about a "
+"normalized anchor, with X blur while the zoom changes."
+msgstr "A camera on the window layer only: the window scales about a normalized "
+"anchor, with X blur while the zoom changes."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A closing card whose lines must not crowd the typed command."
+msgstr "A closing card whose lines must not crowd the typed command."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A count the viewer is already reading, so it never snaps."
+msgstr "A count the viewer is already reading, so it never snaps."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A damped spring anchored at a frame, 0 to 1, fitted to settle "
+"inside its duration."
+msgstr "A damped spring anchored at a frame, 0 to 1, fitted to settle inside "
+"its duration."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A drawn pointer moving between measured targets."
+msgstr "A drawn pointer moving between measured targets."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A field the flow claims is being filled, a command typed in a "
+"CTA."
+msgstr "A field the flow claims is being filled, a command typed in a CTA."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A fly-through that fills the frame before a cut."
+msgstr "A fly-through that fills the frame before a cut."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A headline column that changes while the window beside it stays."
+msgstr "A headline column that changes while the window beside it stays."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A line fading in with a small rise over DUR.chip on EASE.word."
+msgstr "A line fading in with a small rise over DUR.chip on EASE.word."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A line revealed left to right behind a clip while it travels in "
+"8% from the left, over DUR.panel."
+msgstr "A line revealed left to right behind a clip while it travels in 8% from "
+"the left, over DUR.panel."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A line that appears on its frame with no transition."
+msgstr "A line that appears on its frame with no transition."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A long list erasing inside a short exit."
+msgstr "A long list erasing inside a short exit."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A mark's columns flying from their slices of the mark to "
+"full-height slices of the frame, with a retract, a flight on EASE.surge "
+"and a colour cover."
+msgstr "A mark''s columns flying from their slices of the mark to full-height "
+"slices of the frame, with a retract, a flight on EASE.surge and a "
+"colour cover."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A mask that erases an element left to right behind a soft edge "
+"as progress goes from 0 to 1."
+msgstr "A mask that erases an element left to right behind a soft edge as "
+"progress goes from 0 to 1."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A normalized 0 to under 1 cycle position, with a positive modulo "
+"for negative frames and offsets."
+msgstr "A normalized 0 to under 1 cycle position, with a positive modulo for "
+"negative frames and offsets."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A press answering back, the smallest step of a build."
+msgstr "A press answering back, the smallest step of a build."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A rounded integer counting from zero to a value over a ramp."
+msgstr "A rounded integer counting from zero to a value over a ramp."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A shot transition with motion in it; a stepped reveal of a "
+"window or a mark."
+msgstr "A shot transition with motion in it; a stepped reveal of a window or a "
+"mark."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A single window, which reads better whipping in."
+msgstr "A single window, which reads better whipping in."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A smooth cosine pulse from 0 to 1 and back with no abrupt reset."
+msgstr "A smooth cosine pulse from 0 to 1 and back with no abrupt reset."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A staircase clip whose columns cross the frame one after "
+"another, each at its own sub-frame offset."
+msgstr "A staircase clip whose columns cross the frame one after another, each "
+"at its own sub-frame offset."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A statement leaving before its icon."
+msgstr "A statement leaving before its icon."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A strong in-out: lingers at rest, surges through the middle, "
+"settles before the cut."
+msgstr "A strong in-out: lingers at rest, surges through the middle, settles "
+"before the cut."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A thing crossing the frame under its own power: a cursor between "
+"targets, an object departing."
+msgstr "A thing crossing the frame under its own power: a cursor between "
+"targets, an object departing."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A torn, brush-like right edge for a bar as a clip path, seeded "
+"so every frame draws the same edge."
+msgstr "A torn, brush-like right edge for a bar as a clip path, seeded so every "
+"frame draws the same edge."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A vector-only camera component: it pans and zooms an SVG viewBox "
+"along a track, with temporal motion blur only while it travels."
+msgstr "A vector-only camera component: it pans and zooms an SVG viewBox along "
+"a track, with temporal motion blur only while it travels."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A window entering through a staircase instead of a whip."
+msgstr "A window entering through a staircase instead of a whip."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A window shot that arrives and leaves with energy."
+msgstr "A window shot that arrives and leaves with energy."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A window that opens as full-bleed footage and pulls back into "
+"its box, its tilt growing as it lands."
+msgstr "A window that opens as full-bleed footage and pulls back into its box, "
+"its tilt growing as it lands."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A window whipping in from beyond the right edge and settling its "
+"tilt, then whipping out past the left edge, with X blur on both."
+msgstr "A window whipping in from beyond the right edge and settling its tilt, "
+"then whipping out past the left edge, with X blur on both."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.A wordmark withdrawing before its mark flies through the frame."
+msgstr "A wordmark withdrawing before its mark flies through the frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Accelerating departures: a window whipped off the frame, an "
+"outgoing shot drifting under a wipe."
+msgstr "Accelerating departures: a window whipped off the frame, an outgoing "
+"shot drifting under a wipe."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Accelerating ease-in. Starts slowly and leaves at full speed."
+msgstr "Accelerating ease-in. Starts slowly and leaves at full speed."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Active headline"
+msgstr "Active headline"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Adding a CSS blur on top; the samples already carry the motion."
+msgstr "Adding a CSS blur on top; the samples already carry the motion."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.An element arriving: opacity plus a short translation and "
+"optional scale, ending at rest. Returns transform and opacity only."
+msgstr "An element arriving: opacity plus a short translation and optional "
+"scale, ending at rest. Returns transform and opacity only."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.An I-beam over a field being typed in, a hand over a button."
+msgstr "An I-beam over a field being typed in, a hand over a button."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.An identified object moving into a new layout."
+msgstr "An identified object moving into a new layout."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.An SVG filter that blurs along X only, the motion blur of a "
+"layer moving sideways. Below 0.25 px no filter runs."
+msgstr "An SVG filter that blurs along X only, the motion blur of a layer "
+"moving sideways. Below 0.25 px no filter runs."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Anchored overlay"
+msgstr "Anchored overlay"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Any scene framing captured media: a full-bleed shot or a "
+"screenshot inside a window."
+msgstr "Any scene framing captured media: a full-bleed shot or a screenshot "
+"inside a window."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Any shot boundary in a storyboard film."
+msgstr "Any shot boundary in a storyboard film."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Anything arriving or responding: cards, rows, panels, a whip-in "
+"settling into its box."
+msgstr "Anything arriving or responding: cards, rows, panels, a whip-in "
+"settling into its box."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Arrivals from off screen: the slow start reads as hesitation."
+msgstr "Arrivals from off screen: the slow start reads as hesitation."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Arrivals the viewer has to read."
+msgstr "Arrivals the viewer has to read."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Arrivals. It lands at full speed and reads as a crash."
+msgstr "Arrivals. It lands at full speed and reads as a crash."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Bar build beats"
+msgstr "Bar build beats"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Blends two design tokens through an OKLab color-mix() string, so "
+"a state change ramps instead of snapping."
+msgstr "Blends two design tokens through an OKLab color-mix() string, so a "
+"state change ramps instead of snapping."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Blur"
+msgstr "Blur"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Bright stills on a dark field with the word ease; use inOut to "
+"avoid a luminance step."
+msgstr "Bright stills on a dark field with the word ease; use inOut to avoid a "
+"luminance step."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Building a raster mark through column masks."
+msgstr "Building a raster mark through column masks."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Builds a CSS-style cubic-bezier easing. Returns 0 at or below 0 "
+"and 1 at or above 1; overshooting control points can leave 0 to 1 in "
+"between."
+msgstr "Builds a CSS-style cubic-bezier easing. Returns 0 at or below 0 and 1 "
+"at or above 1; overshooting control points can leave 0 to 1 in between."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Calling it outside StoryFilm; plans set transitions "
+"declaratively."
+msgstr "Calling it outside StoryFilm; plans set transitions declaratively."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Camera"
+msgstr "Camera"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Camera track"
+msgstr "Camera track"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Caption or speech timing; this simulates typing only."
+msgstr "Caption or speech timing; this simulates typing only."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cards, labels and panels settling into place."
+msgstr "Cards, labels and panels settling into place."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Carousel slide"
+msgstr "Carousel slide"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Changes between two nonzero values; use "
+"Math.round(mix(ramp(...), from, to))."
+msgstr "Changes between two nonzero values; use Math.round(mix(ramp(...), from, "
+"to))."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Changing the pace of a camera, overlay or shared element without "
+"retiming its holds."
+msgstr "Changing the pace of a camera, overlay or shared element without "
+"retiming its holds."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Chip duration"
+msgstr "Chip duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Chooses a target's cursor shape only once the pointer reaches "
+"it, and the arrow while travelling."
+msgstr "Chooses a target''s cursor shape only once the pointer reaches it, and "
+"the arrow while travelling."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Choosing a window layout by name in a plan's windowBox."
+msgstr "Choosing a window layout by name in a plan''s windowBox."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Click feedback"
+msgstr "Click feedback"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Clicks before the pointer has held on its target."
+msgstr "Clicks before the pointer has held on its target."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Clip paths and masks that reveal or erase a layer."
+msgstr "Clip paths and masks that reveal or erase a layer."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Colour tokens applied to a whole film or a single shot."
+msgstr "Colour tokens applied to a whole film or a single shot."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Column build"
+msgstr "Column build"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Column fly-through"
+msgstr "Column fly-through"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Column stagger"
+msgstr "Column stagger"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Combining with a wipe reveal on the same element without "
+"separate wrappers; both set clipPath."
+msgstr "Combining with a wipe reveal on the same element without separate "
+"wrappers; both set clipPath."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Continuity"
+msgstr "Continuity"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Continuity diagrams that zoom into a node and back out."
+msgstr "Continuity diagrams that zoom into a node and back out."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Count to"
+msgstr "Count to"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.CTA cascade beats"
+msgstr "CTA cascade beats"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cues too short for travel, fade and a reading hold; they throw."
+msgstr "Cues too short for travel, fade and a reading hold; they throw."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cursor shape on arrival"
+msgstr "Cursor shape on arrival"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cursor shutter"
+msgstr "Cursor shutter"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Curves and durations"
+msgstr "Curves and durations"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Custom cubic Bezier"
+msgstr "Custom cubic Bezier"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cuts a rectangle out of an SVG drawing and sends it away on its "
+"own vector while the rest stays."
+msgstr "Cuts a rectangle out of an SVG drawing and sends it away on its own "
+"vector while the rest stays."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cuts; use adjacent sequences without a Transition element."
+msgstr "Cuts; use adjacent sequences without a Transition element."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Cutting between field colours within one film."
+msgstr "Cutting between field colours within one film."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Damping below 14, which wobbles. Travel, which belongs to "
+"ramp()."
+msgstr "Damping below 14, which wobbles. Travel, which belongs to ramp()."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Dark-on-light pairs with few columns, where each step reads as a "
+"flash."
+msgstr "Dark-on-light pairs with few columns, where each step reads as a flash."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Deeper dips than 0.07; the button reads as squashed."
+msgstr "Deeper dips than 0.07; the button reads as squashed."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Departures; pair it with EASE.in or EASE.inOut on the way out."
+msgstr "Departures; pair it with EASE.in or EASE.inOut on the way out."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Design tokens for the tilted window's resting 3D plane, the "
+"pair's mirrored tilt, its corner radius, titlebar and cast shadow."
+msgstr "Design tokens for the tilted window''s resting 3D plane, the pair''s "
+"mirrored tilt, its corner radius, titlebar and cast shadow."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Diagram camera"
+msgstr "Diagram camera"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Different reveals for headings within one film."
+msgstr "Different reveals for headings within one film."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.downAt() is true for six frames from each click beat; "
+"cursorScale() is the pointer's own press envelope, at most a 7% dip."
+msgstr "downAt() is true for six frames from each click beat; cursorScale() is "
+"the pointer''s own press envelope, at most a 7% dip."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Durations shorter than twice the fade; they throw."
+msgstr "Durations shorter than twice the fade; they throw."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease in"
+msgstr "Ease in"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease in-out"
+msgstr "Ease in-out"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease in-out cubic"
+msgstr "Ease in-out cubic"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease out"
+msgstr "Ease out"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease out back"
+msgstr "Ease out back"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease surge"
+msgstr "Ease surge"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease word"
+msgstr "Ease word"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ease-out with a restrained overshoot past 1 before it settles."
+msgstr "Ease-out with a restrained overshoot past 1 before it settles."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Easing curves, the duration scale and stagger tokens every "
+"helper builds on."
+msgstr "Easing curves, the duration scale and stagger tokens every helper "
+"builds on."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Editorial bar charts that should feel hand-made."
+msgstr "Editorial bar charts that should feel hand-made."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Eight columns crossing the frame inside one whip."
+msgstr "Eight columns crossing the frame inside one whip."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Elements arriving, leaving, landing in place and answering a "
+"press."
+msgstr "Elements arriving, leaving, landing in place and answering a press."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Elements fading out in place one after another, so the field "
+"empties in steps rather than one dissolve."
+msgstr "Elements fading out in place one after another, so the field empties in "
+"steps rather than one dissolve."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ending a lockup by filling the frame with a token colour."
+msgstr "Ending a lockup by filling the frame with a token colour."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Enter"
+msgstr "Enter"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Enter at index"
+msgstr "Enter at index"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Entrances and exits"
+msgstr "Entrances and exits"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Entrances; at 4 frames an element appears to pop in."
+msgstr "Entrances; at 4 frames an element appears to pop in."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Erase mask"
+msgstr "Erase mask"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Erase schedule"
+msgstr "Erase schedule"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Every scene heading through SceneShell's headingReveal."
+msgstr "Every scene heading through SceneShell''s headingReveal."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Every timed style value; the primitive the other helpers build "
+"on."
+msgstr "Every timed style value; the primitive the other helpers build on."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Exit the way it entered: opacity to 0 while translating away on "
+"the same axis."
+msgstr "Exit the way it entered: opacity to 0 while translating away on the "
+"same axis."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Explaining one region of a real screen with a callout."
+msgstr "Explaining one region of a real screen with a callout."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Exponential ease-out. Arrives fast and settles slowly: the "
+"default for entrances, exits and state responses."
+msgstr "Exponential ease-out. Arrives fast and settles slowly: the default for "
+"entrances, exits and state responses."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Fading both windows at once; the field shows through and the "
+"frame dips."
+msgstr "Fading both windows at once; the field shows through and the frame "
+"dips."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Five semantic presets, deliberate to whip, that scale travel "
+"time, shutter angle and easing for the configurable motion components. "
+"Reading holds keep their length."
+msgstr "Five semantic presets, deliberate to whip, that scale travel time, "
+"shutter angle and easing for the configurable motion components. "
+"Reading holds keep their length."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Flip and split"
+msgstr "Flip and split"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Floating artwork that rises from a measured region to a target, "
+"holds while it is read, and returns, without moving the source UI."
+msgstr "Floating artwork that rises from a measured region to a target, holds "
+"while it is read, and returns, without moving the source UI."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Focus, selection and finished states: borders, fills, text "
+"colours."
+msgstr "Focus, selection and finished states: borders, fills, text colours."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Graphics that loop in a page without a seam."
+msgstr "Graphics that loop in a page without a seam."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Half a frame (17 ms) between columns of a stepped wipe. "
+"Fractional on purpose: renderers interpolate each column at its "
+"sub-frame offset."
+msgstr "Half a frame (17 ms) between columns of a stepped wipe. Fractional on "
+"purpose: renderers interpolate each column at its sub-frame offset."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Hand-placed boxes that drift between shots."
+msgstr "Hand-placed boxes that drift between shots."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Hand-timed CTA lines that drift when the command changes length."
+msgstr "Hand-timed CTA lines that drift when the command changes length."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Handing native UI between scenes while keeping one instance of "
+"each."
+msgstr "Handing native UI between scenes while keeping one instance of each."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Heading reveal"
+msgstr "Heading reveal"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Headlines beside a window, statements line by line."
+msgstr "Headlines beside a window, statements line by line."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Headlines closer than DUR.press apart; the fade has no room."
+msgstr "Headlines closer than DUR.press apart; the fade has no room."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Hero duration"
+msgstr "Hero duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Hex values; pass var(--token) references so the film follows the "
+"theme."
+msgstr "Hex values; pass var(--token) references so the film follows the theme."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Horizontal blur"
+msgstr "Horizontal blur"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.How far each column of a mark has risen, left to right, each "
+"staggered and eased on EASE.word."
+msgstr "How far each column of a mark has risen, left to right, each staggered "
+"and eased on EASE.word."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.How far tall window content has scrolled after quick authored "
+"jumps, each over DUR.press."
+msgstr "How far tall window content has scrolled after quick authored jumps, "
+"each over DUR.press."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.How one shot or scene hands over to the next."
+msgstr "How one shot or scene hands over to the next."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Inline angles per shot; add new geometry here."
+msgstr "Inline angles per shot; add new geometry here."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Interpolates pointer keys with EASE.inOutCubic and holds the "
+"last position. Equal keys create a dwell."
+msgstr "Interpolates pointer keys with EASE.inOutCubic and holds the last "
+"position. Equal keys create a dwell."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Interpolation"
+msgstr "Interpolation"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Introducing a before and after pair."
+msgstr "Introducing a before and after pair."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Inventing a new curve per scene; add a named token to EASE "
+"instead."
+msgstr "Inventing a new curve per scene; add a named token to EASE instead."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Keeping every window shot of a film in the same plane."
+msgstr "Keeping every window shot of a film in the same plane."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Keeps one object mounted while its measured rectangle travels "
+"from a source to a target."
+msgstr "Keeps one object mounted while its measured rectangle travels from a "
+"source to a target."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Large layers holding text that must stay legible while moving."
+msgstr "Large layers holding text that must stay legible while moving."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Large surfaces, counters, bars growing."
+msgstr "Large surfaces, counters, bars growing."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Leave"
+msgstr "Leave"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Line cut"
+msgstr "Line cut"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Line fade"
+msgstr "Line fade"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Line fades, which use DUR.chip."
+msgstr "Line fades, which use DUR.chip."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Line wipe"
+msgstr "Line wipe"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Lines timed to a hard beat in the sound or a cut in the picture."
+msgstr "Lines timed to a hard beat in the sound or a cut in the picture."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Lines, headings and typed text arriving and leaving."
+msgstr "Lines, headings and typed text arriving and leaving."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Live product components; it is for vector artwork."
+msgstr "Live product components; it is for vector artwork."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Live product UI inside the lasting 3D transform."
+msgstr "Live product UI inside the lasting 3D transform."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Live product UI under the reveal; it is for stills and footage."
+msgstr "Live product UI under the reveal; it is for stills and footage."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Longer gaps: at 30 fps a six-item list then takes half a second "
+"to arrive."
+msgstr "Longer gaps: at 30 fps a six-item list then takes half a second to "
+"arrive."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Loop envelope"
+msgstr "Loop envelope"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Loop phase"
+msgstr "Loop phase"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Loops"
+msgstr "Loops"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Many cuts in a row, which read as flicker."
+msgstr "Many cuts in a row, which read as flicker."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Masked word rises and the gap between CTA lines."
+msgstr "Masked word rises and the gap between CTA lines."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Masks and wipes"
+msgstr "Masks and wipes"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Matching a curve read from the product's own CSS."
+msgstr "Matching a curve read from the product''s own CSS."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Media"
+msgstr "Media"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Media plane"
+msgstr "Media plane"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Mid-film; it is an exit that covers the frame."
+msgstr "Mid-film; it is an exit that covers the frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Mix token"
+msgstr "Mix token"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Most entrances."
+msgstr "Most entrances."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Motion blur for layers that travel."
+msgstr "Motion blur for layers that travel."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Motion presets"
+msgstr "Motion presets"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Moving elements; the exit fades in place without travel."
+msgstr "Moving elements; the exit fades in place without travel."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Names outside the theme schema; scenes only read the listed "
+"tokens."
+msgstr "Names outside the theme schema; scenes only read the listed tokens."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Negative values; bars are relative to the longest positive bar."
+msgstr "Negative values; bars are relative to the longest positive bar."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Object departure"
+msgstr "Object departure"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One element landing in its slot, once per clip."
+msgstr "One element landing in its slot, once per clip."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One joined card flips in on Y from nearly edge-on while "
+"travelling in from the left, then splits into two windows."
+msgstr "One joined card flips in on Y from nearly edge-on while travelling in "
+"from the left, then splits into two windows."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One key per target: the next leg starts the frame it arrives and "
+"the click misses."
+msgstr "One key per target: the next leg starts the frame it arrives and the "
+"click misses."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One node leaving a diagram to become the subject of the next "
+"shot."
+msgstr "One node leaving a diagram to become the subject of the next shot."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One object kept recognizable while it moves between layouts."
+msgstr "One object kept recognizable while it moves between layouts."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One or two ranked bar panels read left to right."
+msgstr "One or two ranked bar panels read left to right."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One still or one piece of footage sampled at an explicit scene "
+"frame. Video goes through Freeze, so footage follows the scene's clock."
+msgstr "One still or one piece of footage sampled at an explicit scene frame. "
+"Video goes through Freeze, so footage follows the scene''s clock."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.One window of a pair sliding in from its own outer edge, "
+"decelerating into its box with X blur."
+msgstr "One window of a pair sliding in from its own outer edge, decelerating "
+"into its box with X blur."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Opening on the product full screen, then placing it beside a "
+"headline."
+msgstr "Opening on the product full screen, then placing it beside a headline."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Orbits, packets travelling a path, status cycles."
+msgstr "Orbits, packets travelling a path, status cycles."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ordinary travel; the long hold at each end reads as a stall."
+msgstr "Ordinary travel; the long hold at each end reads as a stall."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pan and zoom routes over diagrams and windows."
+msgstr "Pan and zoom routes over diagrams and windows."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Panel duration"
+msgstr "Panel duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Periodic motion that returns exactly to where it started."
+msgstr "Periodic motion that returns exactly to where it started."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pointer"
+msgstr "Pointer"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pointer travel"
+msgstr "Pointer travel"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pop"
+msgstr "Pop"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Precise data comparisons, where the edge blurs small "
+"differences."
+msgstr "Precise data comparisons, where the edge blurs small differences."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Press"
+msgstr "Press"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Press duration"
+msgstr "Press duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pull-back"
+msgstr "Pull-back"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pushing into a region of a vector diagram and holding while it "
+"is read."
+msgstr "Pushing into a region of a vector diagram and holding while it is read."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Pushing into one area of a screenshot inside the tilted window."
+msgstr "Pushing into one area of a screenshot inside the tilted window."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Quiet exits that clear a light field one element at a time."
+msgstr "Quiet exits that clear a light field one element at a time."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Ramp and mix"
+msgstr "Ramp and mix"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.ramp() maps a frame window to eased 0 to 1 progress, clamped at "
+"both ends. mix() turns that progress into any number."
+msgstr "ramp() maps a frame window to eased 0 to 1 progress, clamped at both "
+"ends. mix() turns that progress into any number."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Raster or product content; only the SVG viewBox moves."
+msgstr "Raster or product content; only the SVG viewBox moves."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Redrawing another brand's mark as vectors; cut the raster "
+"instead."
+msgstr "Redrawing another brand''s mark as vectors; cut the raster instead."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Remote URLs and paths outside public/; media errors stay render "
+"failures."
+msgstr "Remote URLs and paths outside public/; media errors stay render "
+"failures."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Repeated use: overshoot everywhere reads as a toy. Values "
+"outside 0 to 1 can push layouts past their bounds."
+msgstr "Repeated use: overshoot everywhere reads as a toy. Values outside 0 to "
+"1 can push layouts past their bounds."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Restrained blur that keeps a fast pointer readable."
+msgstr "Restrained blur that keeps a fast pointer readable."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Retracts a line from its right edge back to its left, the "
+"reverse of a wipe reveal."
+msgstr "Retracts a line from its right edge back to its left, the reverse of a "
+"wipe reveal."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Reusing one id for two layers with different amounts."
+msgstr "Reusing one id for two layers with different amounts."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Reveal and continuity treatments for a TransitionSeries: "
+"dissolve, wipe, aperture, spatial, handoff and morph, with matching "
+"timing."
+msgstr "Reveal and continuity treatments for a TransitionSeries: dissolve, "
+"wipe, aperture, spatial, handoff and morph, with matching timing."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Reveals a graphic and returns it to the ground exactly on both "
+"boundary frames of a loop."
+msgstr "Reveals a graphic and returns it to the ground exactly on both boundary "
+"frames of a loop."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Right-to-left scripts, which read against the wipe."
+msgstr "Right-to-left scripts, which read against the wipe."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Rough bar edge"
+msgstr "Rough bar edge"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Rounding the offsets; the columns then move in lockstep pairs."
+msgstr "Rounding the offsets; the columns then move in lockstep pairs."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Rounding the start frames, which erases rows in clumps."
+msgstr "Rounding the start frames, which erases rows in clumps."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Rows, cards, list items, bar rows."
+msgstr "Rows, cards, list items, bar rows."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Samples a camera centre and zoom from ordered keys. A repeated "
+"pose is a reading hold, kept exact when presets retime the travel."
+msgstr "Samples a camera centre and zoom from ordered keys. A repeated pose is "
+"a reading hold, kept exact when presets retime the travel."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Scale: leave() ignores the scale option."
+msgstr "Scale: leave() ignores the scale option."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Scaling live product UI; the camera is for vector artwork and "
+"stills."
+msgstr "Scaling live product UI; the camera is for vector artwork and stills."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Scene builds"
+msgstr "Scene builds"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Scene choreography built on ramp(); presets only apply to the "
+"configurable motion components."
+msgstr "Scene choreography built on ramp(); presets only apply to the "
+"configurable motion components."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Scene transition"
+msgstr "Scene transition"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Scroll offset"
+msgstr "Scroll offset"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Several hero beats in one phase."
+msgstr "Several hero beats in one phase."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Shared element"
+msgstr "Shared element"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Sheet duration"
+msgstr "Sheet duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Short exits that keep a leaving element from drifting where the "
+"next phase lands."
+msgstr "Short exits that keep a leaving element from drifting where the next "
+"phase lands."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Short UI responses, where the long slow start delays the answer."
+msgstr "Short UI responses, where the long slow start delays the answer."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Shorter lenses than PAIR_TILT.flipPerspective; the near edge "
+"magnifies past the frame."
+msgstr "Shorter lenses than PAIR_TILT.flipPerspective; the near edge magnifies "
+"past the frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Shot transition layers"
+msgstr "Shot transition layers"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Showing more of a tall screenshot without a camera move."
+msgstr "Showing more of a tall screenshot without a camera move."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Sibling rows and cards."
+msgstr "Sibling rows and cards."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Sibling stagger"
+msgstr "Sibling stagger"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Side entrance"
+msgstr "Side entrance"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Single overlays travelling across the frame."
+msgstr "Single overlays travelling across the frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Single-word emphasis; the whole line moves together."
+msgstr "Single-word emphasis; the whole line moves together."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Small chips and labels, which feel sluggish at this length."
+msgstr "Small chips and labels, which feel sluggish at this length."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Smooth continuous scrolling; it is built for jumps."
+msgstr "Smooth continuous scrolling; it is built for jumps."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Something physical landing: a toast, a value snapping into a "
+"slot."
+msgstr "Something physical landing: a toast, a value snapping into a slot."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Staged builds: words, lines, columns, bars and carousel slides."
+msgstr "Staged builds: words, lines, columns, bars and carousel slides."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Staged exit"
+msgstr "Staged exit"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.State flips, line fades, carousel slides."
+msgstr "State flips, line fades, carousel slides."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Stepped column wipe"
+msgstr "Stepped column wipe"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Stepping through several screenshots in one window."
+msgstr "Stepping through several screenshots in one window."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Stills and footage sampled at an explicit frame."
+msgstr "Stills and footage sampled at an explicit frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Strong pulses on text, which read as flashing."
+msgstr "Strong pulses on text, which read as flashing."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Styles for a scene's title and kicker: a rise by default, or a "
+"left-to-right wipe per line, the kicker a panel later."
+msgstr "Styles for a scene''s title and kicker: a rise by default, or a "
+"left-to-right wipe per line, the kicker a panel later."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Subtle halos and proximity emphasis."
+msgstr "Subtle halos and proximity emphasis."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Switching shape while crossing unrelated controls."
+msgstr "Switching shape while crossing unrelated controls."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Symmetric cubic, flatter through the middle than EASE.inOut. The "
+"pointer's travel curve."
+msgstr "Symmetric cubic, flatter through the middle than EASE.inOut. The "
+"pointer''s travel curve."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Symmetric ease for something already on screen travelling "
+"between positions."
+msgstr "Symmetric ease for something already on screen travelling between "
+"positions."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Text reveals"
+msgstr "Text reveals"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The clicked element answering on the same beat as the pointer."
+msgstr "The clicked element answering on the same beat as the pointer."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The clip on a window while its columns rise in turn, the stepped "
+"column wipe drawn in the window's own plane."
+msgstr "The clip on a window while its columns rise in turn, the stepped column "
+"wipe drawn in the window''s own plane."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The drawn cursor: travel, shape, press and shutter."
+msgstr "The drawn cursor: travel, shape, press and shutter."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The frame each element of each panel starts erasing: reading "
+"order within a panel, panel by panel, fractional frames kept."
+msgstr "The frame each element of each panel starts erasing: reading order "
+"within a panel, panel by panel, fractional frames kept."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The one hero beat of a phase; use DUR.hero for that."
+msgstr "The one hero beat of a phase; use DUR.hero for that."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The pull-back, the fly-through, the result landing."
+msgstr "The pull-back, the fly-through, the result landing."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The same entrance, delayed by index times STAGGER, to walk a "
+"list in."
+msgstr "The same entrance, delayed by index times STAGGER, to walk a list in."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The tilted 3D window: its plane, its boxes and its moves."
+msgstr "The tilted 3D window: its plane, its boxes and its moves."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The two layers StoryFilm stacks at a shot boundary: the outgoing "
+"shot, if any, and the incoming shot's style. Dissolve by default, a "
+"stepped column wipe with optional drift, or a declared cut."
+msgstr "The two layers StoryFilm stacks at a shot boundary: the outgoing shot, "
+"if any, and the incoming shot''s style. Dissolve by default, a stepped "
+"column wipe with optional drift, or a declared cut."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.The typographic curve: quick to rise, long to settle. Masked "
+"words, line fades, rising columns and growing bars."
+msgstr "The typographic curve: quick to rise, long to settle. Masked words, "
+"line fades, rising columns and growing bars."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Theme"
+msgstr "Theme"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Theme style"
+msgstr "Theme style"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Three trailing sub-frame samples for the pointer's motion blur, "
+"capped at 4 px, vanishing at rest."
+msgstr "Three trailing sub-frame samples for the pointer''s motion blur, capped "
+"at 4 px, vanishing at rest."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Timing helpers behind the brand lockup and bar comparison "
+"scenes."
+msgstr "Timing helpers behind the brand lockup and bar comparison scenes."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Transitions"
+msgstr "Transitions"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Travel above 16 px or scale below 0.9, which stops looking like "
+"software. A later transform in the same style replaces it."
+msgstr "Travel above 16 px or scale below 0.9, which stops looking like "
+"software. A later transform in the same style replaces it."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Travel across the frame."
+msgstr "Travel across the frame."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Travel between two visible landmarks, which reads better on "
+"EASE.inOut."
+msgstr "Travel between two visible landmarks, which reads better on EASE.inOut."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Travel, dissolves, colour cross-fades and staged exits."
+msgstr "Travel, dissolves, colour cross-fades and staged exits."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Turn a frame into progress, a number, a colour or a count."
+msgstr "Turn a frame into progress, a number, a colour or a count."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Turns storyboard theme tokens into CSS custom properties for a "
+"film layer, so a plan or a single shot can recolour scenes."
+msgstr "Turns storyboard theme tokens into CSS custom properties for a film "
+"layer, so a plan or a single shot can recolour scenes."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Two windows arriving together to be compared."
+msgstr "Two windows arriving together to be compared."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.typed() reveals text one character at a time; caretOn() blinks a "
+"caret on a half-second rhythm."
+msgstr "typed() reveals text one character at a time; caretOn() blinks a caret "
+"on a half-second rhythm."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Typing and caret"
+msgstr "Typing and caret"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Unclamped arithmetic on frame, which keeps moving after its "
+"window closes."
+msgstr "Unclamped arithmetic on frame, which keeps moving after its window "
+"closes."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Unrelated elements; give each its own beat instead."
+msgstr "Unrelated elements; give each its own beat instead."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Unrelated objects; continuity only helps when it is the same "
+"thing."
+msgstr "Unrelated objects; continuity only helps when it is the same thing."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Values that must not jump; the phase resets at the cycle "
+"boundary."
+msgstr "Values that must not jump; the phase resets at the cycle boundary."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Velocity blur"
+msgstr "Velocity blur"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Wave"
+msgstr "Wave"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.When a bar panel's hero number, labels, bars and values start, "
+"and each bar's length relative to the longest."
+msgstr "When a bar panel''s hero number, labels, bars and values start, and "
+"each bar''s length relative to the longest."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.When each line of a call to action arrives: subtitle, URL, the "
+"typed command and when it finishes, then the badge."
+msgstr "When each line of a call to action arrives: subtitle, URL, the typed "
+"command and when it finishes, then the badge."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Where windows and headlines sit on the canvas, as fractions: the "
+"default and tall single boxes, the pair boxes and the headline column."
+msgstr "Where windows and headlines sit on the canvas, as fractions: the "
+"default and tall single boxes, the pair boxes and the headline column."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Which carousel window is current and the poses of a slide: the "
+"incoming window slides in on top, the outgoing one recedes and fades "
+"only once mostly covered."
+msgstr "Which carousel window is current and the poses of a slide: the incoming "
+"window slides in on top, the outgoing one recedes and fades only once "
+"mostly covered."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Which of several timed headlines is on screen, fading each out "
+"over DUR.press as the next one starts."
+msgstr "Which of several timed headlines is on screen, fading each out over "
+"DUR.press as the next one starts."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Whip duration"
+msgstr "Whip duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Whip exits, flip-ins, mark column rises."
+msgstr "Whip exits, flip-ins, mark column rises."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Whips, carousel slides and drifting layers, where CSS blur() "
+"would also smear the top and bottom edges."
+msgstr "Whips, carousel slides and drifting layers, where CSS blur() would also "
+"smear the top and bottom edges."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Whole-frame wipes; it is meant per element."
+msgstr "Whole-frame wipes; it is meant per element."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Window boxes"
+msgstr "Window boxes"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Window camera"
+msgstr "Window camera"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Window plane and chrome"
+msgstr "Window plane and chrome"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Window stepped reveal"
+msgstr "Window stepped reveal"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Window whip"
+msgstr "Window whip"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Windows"
+msgstr "Windows"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Wipe exit"
+msgstr "Wipe exit"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Word duration"
+msgstr "Word duration"
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Wordmarks, labels and headings that should feel drawn rather "
+"than faded."
+msgstr "Wordmarks, labels and headings that should feel drawn rather than "
+"faded."
+
+#. js-lingui-explicit-id
+#: src/gallery/HelperGallery/i18n/helperDescriptors.generated.ts
+msgid "helpers.Zooming the whole frame; only the window layer scales."
+msgstr "Zooming the whole frame; only the window layer scales."
+
 #: src/gallery/MotionGallery/MotionGallery.tsx
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
 msgid "30 FPS"
@@ -359,6 +2146,10 @@ msgstr "Next motion"
 #: src/gallery/MotionGallery/ContentControls/ContentControls.tsx
 msgid "Reset content"
 msgstr "Reset content"
+
+#: src/gallery/HelperGallery/demos/HelperDemoFrame/HelperDemoFrame.tsx
+msgid "frame"
+msgstr "frame"
 
 #: src/gallery/MotionGallery/useMotionGalleryState.ts
 msgid "Text to copy"
@@ -423,6 +2214,10 @@ msgstr "Cell {0}"
 msgid "Balanced"
 msgstr "Balanced"
 
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "on its own beat,"
+msgstr "on its own beat,"
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
 msgid "Gentle"
 msgstr "Gentle"
@@ -432,6 +2227,10 @@ msgid "Fix the marked fields to copy or export. The preview keeps your last "
 "valid content."
 msgstr "Fix the marked fields to copy or export. The preview keeps your last "
 "valid content."
+
+#: src/gallery/HelperGallery/demos/CurveDemos.tsx
+msgid "eased"
+msgstr "eased"
 
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
 msgid "Speed"
@@ -474,6 +2273,10 @@ msgstr "Box roughness"
 #: src/gallery/MotionGallery/MotionCard.tsx
 msgid "Explore {0}"
 msgstr "Explore {0}"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "Open the record."
+msgstr "Open the record."
 
 #: src/gallery/MotionGallery/PreviewDialog.tsx
 #~ msgid "FRAME"
@@ -540,6 +2343,14 @@ msgstr "Atlas sections"
 msgid "Composition default"
 msgstr "Composition default"
 
+#: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+msgid "Storyboard scenes play with their authored theme and per-shot field "
+"colors. Palette, camera, motion blur, annotation and roughness settings "
+"apply to continuity compositions only."
+msgstr "Storyboard scenes play with their authored theme and per-shot field "
+"colors. Palette, camera, motion blur, annotation and roughness settings "
+"apply to continuity compositions only."
+
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
 msgid "Preview controls"
 msgstr "Preview controls"
@@ -551,6 +2362,10 @@ msgstr "reference saved"
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Good for"
 msgstr "Good for"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "The kicker follows a panel later"
+msgstr "The kicker follows a panel later"
 
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 #: src/gallery/MotionGallery/AtlasSections.tsx
@@ -586,6 +2401,7 @@ msgstr "General and technology"
 msgid "Copy configured JSON"
 msgstr "Copy configured JSON"
 
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "Motion Atlas"
 msgstr "Motion Atlas"
@@ -616,6 +2432,10 @@ msgstr "CONCEPTUAL STUDIES / {0} PRESETS / VOL. 01"
 #: src/gallery/MotionGallery/AtlasSections.tsx
 msgid "Motions"
 msgstr "Motions"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "Shared helpers"
+msgstr "Shared helpers"
 
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Pause all"
@@ -779,6 +2599,10 @@ msgstr "Subtle"
 msgid "Reference link copied"
 msgstr "Reference link copied"
 
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "Check the change."
+msgstr "Check the change."
+
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 msgid "LOCAL MOTION LIBRARY"
 msgstr "LOCAL MOTION LIBRARY"
@@ -807,6 +2631,10 @@ msgstr "NOT PRODUCT FOOTAGE"
 msgid "Next preview"
 msgstr "Next preview"
 
+#: src/gallery/HelperGallery/demos/InterpolationDemos.tsx
+msgid "Selected"
+msgstr "Selected"
+
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Saved references"
@@ -818,6 +2646,10 @@ msgstr "Saved references"
 #: src/gallery/MotionGallery/PaletteSwatches.tsx
 msgid "{0}: {1} ({2})"
 msgstr "{0}: {1} ({2})"
+
+#: src/gallery/HelperGallery/demos/TextDemos.tsx
+msgid "then holds."
+msgstr "then holds."
 
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "Showcase"

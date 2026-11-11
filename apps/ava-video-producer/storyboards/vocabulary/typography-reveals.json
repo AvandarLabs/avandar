@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "id": "typography-reveals",
+  "title": "Typography line reveals",
+  "description": "The three line modes in sequence: lines fading up under an icon and leaving in a staged exit, lines wiping in left to right, and a small caption that simply cuts on.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "The icon is public/avandar/logo.png."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "line-fade",
+      "scene": "typography",
+      "durationInFrames": 110,
+      "transitionInFrames": 0,
+      "props": {
+        "lines": ["One workspace", "for every source"],
+        "revealMode": "line-fade",
+        "lineStaggerFrames": 4,
+        "fontSize": 72,
+        "revealAtFrame": 12,
+        "icon": {
+          "src": "avandar/logo.png",
+          "size": 140
+        },
+        "exit": {
+          "atFrame": 94,
+          "staggerFrames": 3,
+          "durationInFrames": 6
+        }
+      }
+    },
+    {
+      "id": "wipe",
+      "scene": "typography",
+      "durationInFrames": 90,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "props": {
+        "lines": ["Model cases, visits", "and facilities together"],
+        "revealMode": "wipe",
+        "lineStaggerFrames": 6,
+        "fontSize": 80,
+        "align": "left",
+        "revealAtFrame": 6
+      }
+    },
+    {
+      "id": "cut",
+      "scene": "typography",
+      "durationInFrames": 75,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#000000"
+      },
+      "props": {
+        "lines": ["Then share what you find."],
+        "revealMode": "cut",
+        "size": "caption",
+        "revealAtFrame": 15
+      }
+    }
+  ]
+}

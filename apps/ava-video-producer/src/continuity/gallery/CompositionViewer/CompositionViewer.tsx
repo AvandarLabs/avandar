@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { isSceneEntry } from "../../continuityCatalog";
 import { useContinuityCopy } from "../../useContinuityCopy";
 import { CompositionActions } from "./CompositionActions/CompositionActions";
 import { CompositionControls } from "./CompositionControls";
@@ -19,7 +20,8 @@ type Props = {
 export function CompositionViewer({ selected, captions, onOptions }: Props) {
   const translate = useContinuityCopy();
   const player = useRef<HTMLIFrameElement>(null);
-  const appearance = useCompositionAppearance(selected.id, player);
+  const isScene = isSceneEntry(selected);
+  const appearance = useCompositionAppearance(selected.id, player, isScene);
   useCompositionPlayer({ id: selected.id, player, onOptions });
   return (
     <section
@@ -41,29 +43,32 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
         <CompositionSummary selected={selected} />
       </div>
       <div className={css.settings}>
-        <CompositionControls appearance={appearance} />
+        <CompositionControls appearance={appearance} isScene={isScene} />
         <CompositionActions
           id={selected.id}
           captions={captions}
           options={appearance.options}
+          isScene={isScene}
         />
       </div>
       <div className={css.guidance}>
         {selected.family === "vocabulary" && (
           <VocabularyGuide entry={selected} />
         )}
-        <CompositionNotice />
+        <CompositionNotice isScene={isScene} />
       </div>
     </section>
   );
 }
 
-function CompositionNotice() {
+function CompositionNotice({ isScene }: { isScene: boolean }) {
   const translate = useContinuityCopy();
   return (
     <p className={css.compositionViewerNotice}>
       {translate(
-        "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection.",
+        isScene
+          ? "Live React storyboard scenes. Fictional demonstration data. Window contents are curated fictional screenshots; figures, timings and diagrams are illustrations. Downloads render the current composition as authored."
+          : "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection.",
       )}
     </p>
   );

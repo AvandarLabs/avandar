@@ -42,3 +42,17 @@
     padding-right: 0;
   }
 }
+
+.compositionSidebarGroup {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 18px 0 4px;
+  padding: 0 12px;
+  text-transform: uppercase;
+}
+
+.compositionSidebarSearch + .compositionSidebarGroup {
+  margin-top: 4px;
+}

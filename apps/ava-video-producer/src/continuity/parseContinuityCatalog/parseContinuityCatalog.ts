@@ -1,6 +1,9 @@
 import { z } from "zod";
 import type { ContinuityCatalogEntry } from "../continuityCatalog";
 
+/** Directory, under `storyboards/`, that holds every scene study's plan. */
+const SCENE_STUDY_DIRECTORY = "vocabulary/";
+
 const BASE_SCHEMA = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
@@ -8,6 +11,9 @@ const BASE_SCHEMA = z.object({
   description: z.string().min(1),
   frames: z.number().int().positive(),
   path: z.string().min(1),
+  // Omitted for continuity entries. `scene` marks a plan of plain
+  // storyboard scenes, which plays without continuity appearance options.
+  kind: z.literal("scene").optional(),
 });
 const FILM_SCHEMA = BASE_SCHEMA.extend({ family: z.literal("films") }).strict();
 const STUDY_SCHEMA = BASE_SCHEMA.extend({
@@ -28,6 +34,16 @@ const STUDY_SCHEMA = BASE_SCHEMA.extend({
   ),
 }).strict();
 
+function _assertUniqueIds(entries: readonly ContinuityCatalogEntry[]) {
+  const ids = new Set<string>();
+  entries.forEach((entry) => {
+    if (ids.has(entry.id)) {
+      throw new Error(`Duplicate continuity catalog id: ${entry.id}`);
+    }
+    ids.add(entry.id);
+  });
+}
+
 /** Parses authored continuity metadata for gallery and render consumers. */
 export function parseContinuityCatalog(
   films: unknown,
@@ -36,18 +52,20 @@ export function parseContinuityCatalog(
   const parsedFilms = z.array(FILM_SCHEMA).parse(films);
   const parsedStudies = z.array(STUDY_SCHEMA).parse(studies);
   const entries = [...parsedFilms, ...parsedStudies];
-  const ids = new Set<string>();
-  entries.forEach((entry) => {
-    if (ids.has(entry.id)) {
-      throw new Error(`Duplicate continuity catalog id: ${entry.id}`);
-    }
-    ids.add(entry.id);
-  });
+  _assertUniqueIds(entries);
   const filmIds = new Set(parsedFilms.map((entry) => entry.id));
   parsedStudies.forEach((entry) => {
     if (!filmIds.has(entry.sourceFilm)) {
       throw new Error(
         `Unknown source film "${entry.sourceFilm}" for "${entry.id}"`,
+      );
+    }
+    if (
+      entry.kind === "scene" &&
+      !entry.path.startsWith(SCENE_STUDY_DIRECTORY)
+    ) {
+      throw new Error(
+        `Scene study "${entry.id}" must live in storyboards/${SCENE_STUDY_DIRECTORY}`,
       );
     }
   });

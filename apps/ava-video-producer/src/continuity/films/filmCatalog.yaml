@@ -72,3 +72,14 @@
   frames: 1989
   path: explainers/film-right-sized-data
   family: films
+- id: shot-vocabulary
+  title: Shot vocabulary
+  category: scene-films
+  kind: scene
+  description:
+    A launch-film sequence of plain storyboard scenes - brand lockup, tilted windows, a
+    statement, bars, a diagram, a racing pair and a call to action - joined by column
+    wipes and field-colour cuts.
+  frames: 1265
+  path: shot-vocabulary
+  family: films

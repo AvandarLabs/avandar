@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "id": "window-entrances",
+  "title": "Window entrances",
+  "description": "Four ways a tilted window arrives: a whip from the right revealed through rising columns, a full-bleed still pulling back into the tall box, a pair sliding in from both sides, and a pair flipping in and splitting.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features or performance.",
+    "Window contents are curated fictional Avandar screenshots from public/avandar/screens. The timings are fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "whip-reveal",
+      "scene": "tilted-window",
+      "durationInFrames": 90,
+      "transitionInFrames": 0,
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 2,
+            "lines": ["Ask the", "question"],
+            "subtitle": "Explorer"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/explorer-explorer-query.png"
+          }
+        ],
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1,
+          "durationInFrames": 18,
+          "reveal": {
+            "columns": 4,
+            "durationInFrames": 6
+          }
+        },
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "pull-back",
+      "scene": "tilted-window",
+      "durationInFrames": 130,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 66,
+            "lines": ["Then step", "back"],
+            "subtitle": "Dashboards"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/dashboards-dashboard-preview.png"
+          }
+        ],
+        "windowBox": "tall",
+        "enter": {
+          "kind": "pull-back",
+          "atFrame": 36,
+          "durationInFrames": 24,
+          "ease": "inOut"
+        },
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "from-sides",
+      "scene": "tilted-window",
+      "durationInFrames": 120,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "props": {
+        "layout": "pair",
+        "enter": {
+          "kind": "from-sides",
+          "atFrame": 4,
+          "durationInFrames": 12
+        },
+        "pair": [
+          {
+            "label": "Case records",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/cases-cases-records.png"
+            },
+            "counter": {
+              "to": 248,
+              "precision": 0,
+              "startFrame": 20,
+              "endFrame": 80
+            },
+            "stat": "Fictional records"
+          },
+          {
+            "label": "Facilities",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/map-map-facilities.png"
+            },
+            "counter": {
+              "to": 37,
+              "precision": 0,
+              "startFrame": 20,
+              "endFrame": 70
+            },
+            "stat": "Fictional sites"
+          }
+        ],
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "flip-split",
+      "scene": "tilted-window",
+      "durationInFrames": 120,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "props": {
+        "layout": "pair",
+        "enter": {
+          "kind": "flip-split",
+          "atFrame": 8
+        },
+        "pair": [
+          {
+            "label": "Dashboard editor",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/dashboards-dashboard-editor.png"
+            },
+            "counter": {
+              "to": 6,
+              "precision": 0,
+              "startFrame": 24,
+              "endFrame": 70
+            },
+            "stat": "Fictional charts"
+          },
+          {
+            "label": "Published view",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/dashboards-dashboard-preview.png"
+            },
+            "counter": {
+              "to": 6,
+              "precision": 0,
+              "startFrame": 24,
+              "endFrame": 84
+            },
+            "stat": "Fictional charts"
+          }
+        ],
+        "footnote": "Fictional demonstration data"
+      }
+    }
+  ]
+}

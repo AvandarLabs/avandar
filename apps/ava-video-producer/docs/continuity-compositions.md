@@ -1,6 +1,6 @@
 # Continuity compositions
 
-The Composition Atlas at `/compositions.html` contains ten long explainers and thirteen reusable studies. It is linked from the Motion Atlas and Productions. Every preview uses the live React composition. The MP4 button renders the selected film with the acknowledged palette, camera, blur, annotation and caption choices through the existing serial export and frame-gate pipeline. The gallery does not use prerecorded preview files. On macOS, the existing showcase supplies local scratch narration for timing review; it is not a finished voice performance.
+The Composition Atlas at `/compositions.html` contains ten long explainers, thirteen reusable continuity studies, and the [shot vocabulary](../storyboards/shot-vocabulary.json) sample film with twelve storyboard-scene studies drawn from it. It is linked from the Motion Atlas and Productions. Every preview uses the live React composition. The MP4 button renders the selected film with the acknowledged palette, camera, blur, annotation and caption choices through the existing serial export and frame-gate pipeline. The gallery does not use prerecorded preview files. On macOS, the existing showcase supplies local scratch narration for timing review; it is not a finished voice performance.
 
 ## Editorial choices
 
@@ -31,6 +31,7 @@ A graphic match cut depends on matching the actual source and destination images
 | `ontology-composite` | Customizability: composite, Field mapping |
 | `plugin-ecosystem` | Future plugins: motion to motion |
 | `right-sized-data` | Small and medium workloads: motion to motion |
+| `shot-vocabulary` | Storyboard scenes: the launch-film shot vocabulary (`kind: scene`, see below) |
 
 The ten films run approximately 51–66 seconds each. They use different stock presets and six distinct product sequences. QETL's composite traces a static dashboard result to its illustrative dependency and reuse path; it does not depict configuring or saving the dashboard. Ontology's composite shows a rule selection and manual-field configuration. The causal-signal study isolates the rule action and its explanatory consequence.
 
@@ -45,20 +46,41 @@ Actual product leaves come from this worktree's source and CSS. Fixture controll
 | Transitions | Shared-object handoff; frame-to-interface morph; aperture into detail; spatial continuation; occlusion wipe; aligned-layout dissolve |
 | Compositing | Action, signal, consequence; bracket a field group; focus without a connector; restrained teaching underline |
 | Composition recipes | Model to workspace; record to relationships; controls and their meaning |
+| Transitions (scenes) | Stepped column wipe; field-colour cut; fly-through into colour; whip exit |
+| Composition recipes (scenes) | Tilted product window; racing pair; brand lockup and call to action; bar comparison |
+| Scene motions | Window entrances; typography line reveals; heading wipe; graph packets |
 
 Each study exposes guidance, real schema paths, and its source-film link. Inputs are authored as validated storyboards, not changed through a live form editor. The gallery search and family buttons select films or studies; the existing Motion Atlas input editor continues to own individual stock-preset inputs.
 
-### Storyboard scenes outside the continuity catalog
+### Storyboard-scene studies
 
-The study catalog hosts continuity studies only. `gallerySelectionReducer`
-tests require each study's first shot to be a `continuity` shot whose beats
-carry every control path, `overlayMotion.test.ts` parses every plan in
-`storyboards/explainers/` with the continuity schema, a study's `sourceFilm`
-must name a continuity film, and continuity needs the 1600 by 840 stage. Plain
-storyboard scenes and shot transitions (`tilted-window`, `brand-lockup`,
-`bar-comparison`, `stepped-column-wipe`) are demonstrated by the
-[shot vocabulary study](../storyboards/shot-vocabulary.json) in the
-Productions gallery instead.
+The catalog also hosts studies of plain storyboard scenes and shot transitions
+(`tilted-window`, `brand-lockup`, `bar-comparison`, typography, graph and metric
+headings, `stepped-column-wipe`, field-colour cuts). An entry with `kind: scene`
+is a scene study; an entry without `kind` is a continuity study, and its
+validation is unchanged.
+
+| | Continuity study | Scene study (`kind: scene`) |
+| --- | --- | --- |
+| Plan | `storyboards/explainers/`, one `continuity` shot at 1600 by 840 | `storyboards/vocabulary/` (the parser enforces it), plain scenes at 1920 by 1080, plan `id` equal to the catalog `id` |
+| Control paths | Continuity beat fields such as `beats[].transition.kind` | Shot fields rooted at `props`, `transition`, `transitionInFrames` or `theme`, such as `props.windows[].swap` or `transition.outgoingDrift` |
+| Path check | `gallerySelectionReducer.test.ts`: every path is a beat schema field present in the study's first shot | `sceneStudies.test.ts`: every path is set on at least one shot of the plan, `frames` equals the plan duration, and the studies together cover every piece of shot vocabulary |
+| `sourceFilm` | A continuity film | The `shot-vocabulary` sample film, itself registered with `kind: scene` |
+| Atlas controls | Palette, camera preset, motion blur, annotations, roughness and captions | Playback only. Plain scenes keep their authored plan and per-shot `theme`, and the live player ignores appearance messages for them, so the viewer hides those controls and says so. Downloads send only the caption choice. Transcript and caption links are hidden because the plans carry no narration |
+
+Scene studies sit in the `transitions` and `compositions` categories next to the
+continuity studies, plus a `scene-motions` category ("Scene motions") for
+entrances and reveals. The sidebar groups entries under a heading per category
+and labels each entry "Continuity" or "Storyboard scenes". Keep one category's
+entries adjacent in `studyCatalog.yaml`; a test checks it.
+
+To add one, write a short focused plan in `storyboards/vocabulary/`, run
+`pnpm video validate` and `pnpm video preview` on it and read the contact sheet,
+then add its catalog entry with real `goodFor`, `creativeDirection`, `avoid`,
+three or more distinct `tags`, and `controls` that name the shot fields a reuser
+would change. Keep **Fictional demonstration data** visible under product stills
+(tilted-window `footnote`) and figures (bar-comparison `footnote`). Scene-plan
+copy is not extracted into the continuity catalog; only the catalog metadata is.
 
 ## Authoring contract
 
@@ -66,7 +88,8 @@ Productions gallery instead.
 
 `src/continuity/vocabulary/studyCatalog.yaml` is the source of reusable composition
 metadata. Each entry includes `title`, `description`, `goodFor`, `tags`,
-`creativeDirection`, and `avoid`. Tags provide keyword phrases. Creative direction
+`creativeDirection`, and `avoid`, plus `kind: scene` for a storyboard-scene
+study. Tags provide keyword phrases. Creative direction
 describes the visual treatment, attention sequence, and intended feel of the
 authored study. The Atlas searches these semantic fields and displays the guidance
 and tags in the reuse guide.

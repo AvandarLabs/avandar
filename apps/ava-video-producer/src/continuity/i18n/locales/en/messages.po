@@ -31,6 +31,19 @@ msgstr "A Case Manager record opens into an explanatory relationship graph."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A Cases window whips in, holds, then accelerates off the left "
+"edge with growing blur while its headline fades in place, and the film "
+"cuts on the empty field. A Maps window whips in the same way, but its "
+"exit starts on its last frame and runs longer, so it keeps sliding away "
+"under eight columns that rise over the still-playing shot."
+msgstr "A Cases window whips in, holds, then accelerates off the left edge with "
+"growing blur while its headline fades in place, and the film cuts on "
+"the empty field. A Maps window whips in the same way, but its exit "
+"starts on its last frame and runs longer, so it keeps sliding away "
+"under eight columns that rise over the still-playing shot."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A chart has dependencies."
 msgstr "A chart has dependencies."
 
@@ -107,6 +120,15 @@ msgstr "A field needs a source and a rule."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A full-bleed pull-back starts on a bright still over a dark "
+"field with a fast ease, which dims the frame in one step, or a pair "
+"entrance is used on a single window."
+msgstr "A full-bleed pull-back starts on a bright still over a dark field with "
+"a fast ease, which dims the frame in one step, or a pair entrance is "
+"used on a single window."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A future plugin ecosystem moves from mission needs to "
 "modules, integration and contributions."
 msgstr "A future plugin ecosystem moves from mission needs to modules, "
@@ -119,8 +141,34 @@ msgstr "A generalizable model begins with a small grammar."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A headline column beside a product still in a 3D tilted "
+"window that scrolls, changes through a carousel, pushes in, and rests in "
+"a tall box with a secondary window."
+msgstr "A headline column beside a product still in a 3D tilted window that "
+"scrolls, changes through a carousel, pushes in, and rests in a tall box "
+"with a secondary window."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A hero number over ranked bars, in one panel or two, with "
+"straight or rough bar edges and an element-by-element erase before the "
+"cut."
+msgstr "A hero number over ranked bars, in one panel or two, with straight or "
+"rough bar edges and an element-by-element erase before the cut."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A later query can add what is missing."
 msgstr "A later query can add what is missing."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A launch-film sequence of plain storyboard scenes - brand "
+"lockup, tilted windows, a statement, bars, a diagram, a racing pair and "
+"a call to action - joined by column wipes and field-colour cuts."
+msgstr "A launch-film sequence of plain storyboard scenes - brand lockup, "
+"tilted windows, a statement, bars, a diagram, a racing pair and a call "
+"to action - joined by column wipes and field-colour cuts."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -177,6 +225,11 @@ msgstr "A plugin ecosystem."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A public image above the lines that fades in first."
+msgstr "A public image above the lines that fades in first."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A query describes the records and columns it needs."
 msgstr "A query describes the records and columns it needs."
 
@@ -189,6 +242,13 @@ msgstr "A query names the data and the operation."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A question becomes a bounded query."
 msgstr "A question becomes a bounded query."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A raster mark built through column masks, a wordmark wipe, "
+"and a call-to-action cascade ending in a typed command and a badge."
+msgstr "A raster mark built through column masks, a wordmark wipe, and a "
+"call-to-action cascade ending in a typed command and a badge."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -232,6 +292,13 @@ msgstr "A rule turns observations into the displayed value."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A scene heading whose title and kicker wipe in left to right "
+"instead of rising, shown on a metric, a statement and a bar comparison."
+msgstr "A scene heading whose title and kicker wipe in left to right instead of "
+"rising, shown on a metric, a statement and a bar comparison."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A separate allocation example keeps the same amount of work."
 msgstr "A separate allocation example keeps the same amount of work."
 
@@ -255,6 +322,24 @@ msgstr "A shared foundation."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.A shared modeling grammar can express those differences."
 msgstr "A shared modeling grammar can express those differences."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A short label above each window."
+msgstr "A short label above each window."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A small note under each counter, such as the figure's "
+"provenance."
+msgstr "A small note under each counter, such as the figure''s provenance."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.A smaller still in the same plane, placed in canvas "
+"fractions, that whips in at its frame."
+msgstr "A smaller still in the same plane, placed in canvas fractions, that "
+"whips in at its frame."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -299,6 +384,16 @@ msgid "continuity.A workload, selected transfer, local execution and resource "
 "allocation explain the small-to-medium data thesis."
 msgstr "A workload, selected transfer, local execution and resource allocation "
 "explain the small-to-medium data thesis."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.accent field"
+msgstr "accent field"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.act break"
+msgstr "act break"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -388,6 +483,13 @@ msgstr "An aperture and a code-frame match bring query intent into the actual "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.An editorial diagram with item lists inside corner-tick "
+"frames and parallel arrowless edges carrying packets both ways."
+msgstr "An editorial diagram with item lists inside corner-tick frames and "
+"parallel arrowless edges carrying packets both ways."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.An entity model resolves into an inspectable product "
 "configuration. Retain the conceptual thread through the reveal."
 msgstr "An entity model resolves into an inspectable product configuration. "
@@ -450,6 +552,16 @@ msgstr "aperture reveal"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Architectural illustration · Fictional demonstration data"
 msgstr "Architectural illustration · Fictional demonstration data"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Arrowhead"
+msgstr "Arrowhead"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.arrowless edges"
+msgstr "arrowless edges"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -546,8 +658,33 @@ msgstr "Avoiding unnecessary transfers can reduce remote work."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Badge"
+msgstr "Badge"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Balance the opening with time to read the detail afterward."
 msgstr "Balance the opening with time to read the detail afterward."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.bar chart"
+msgstr "bar chart"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.bar comparison"
+msgstr "bar comparison"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Bar comparison"
+msgstr "Bar comparison"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Bar edge"
+msgstr "Bar edge"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -635,8 +772,46 @@ msgstr "bracket annotation"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.brand lockup"
+msgstr "brand lockup"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Brand lockup and call to action"
+msgstr "Brand lockup and call to action"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.brand lockup exit"
+msgstr "brand lockup exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Bring in a source."
 msgstr "Bring in a source."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Build columns"
+msgstr "Build columns"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Build stagger"
+msgstr "Build stagger"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Build the mark through eight rising columns and wipe the "
+"wordmark in beside it. Let the wordmark retract, then send the columns "
+"surging through the frame with a slight turn until the accent colour "
+"covers everything. Cut on that colour to a tilted Maps window whipping "
+"in on an accent field, so the handover reads as one continuous move."
+msgstr "Build the mark through eight rising columns and wipe the wordmark in "
+"beside it. Let the wordmark retract, then send the columns surging "
+"through the frame with a slight turn until the accent colour covers "
+"everything. Cut on that colour to a tilted Maps window whipping in on "
+"an accent field, so the handover reads as one continuous move."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -645,13 +820,59 @@ msgstr "Build the vocabulary your mission needs."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.call to action"
+msgstr "call to action"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Call to action"
+msgstr "Call to action"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Camera route"
 msgstr "Camera route"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.caption sets one small regular-weight size and rejects "
+"fontSize."
+msgstr "caption sets one small regular-weight size and rejects fontSize."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.caption size"
+msgstr "caption size"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Caption size"
+msgstr "Caption size"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Captions"
 msgstr "Captions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Card width as a fraction of the content width."
+msgstr "Card width as a fraction of the content width."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.carousel"
+msgstr "carousel"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Carousel change"
+msgstr "Carousel change"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Carousel timing"
+msgstr "Carousel timing"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -684,6 +905,20 @@ msgstr "Change the domain vocabulary."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Change the whole field colour on a hard cut, from a dark "
+"field to the accent and on to a light field, with a theme on each shot "
+"instead of an animated transition."
+msgstr "Change the whole field colour on a hard cut, from a dark field to the "
+"accent and on to a light field, with a theme on each shot instead of an "
+"animated transition."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Characters per second for the typed command."
+msgstr "Characters per second for the typed command."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Choose a composition"
 msgstr "Choose a composition"
 
@@ -703,6 +938,21 @@ msgid "continuity.Choose a seeded mark, measured native rectangle, and "
 "draw/hold/retract interval."
 msgstr "Choose a seeded mark, measured native rectangle, and draw/hold/retract "
 "interval."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose how a product still enters so the motion matches the "
+"beat, from a quick arrival to a reveal of context around a full-screen "
+"still."
+msgstr "Choose how a product still enters so the motion matches the beat, from "
+"a quick arrival to a reveal of context around a full-screen still."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Choose how many columns cover the frame; more columns read as "
+"a finer stripe."
+msgstr "Choose how many columns cover the frame; more columns read as a finer "
+"stripe."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -743,8 +993,55 @@ msgstr "Choose wipe for a moving opaque edge."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Clip a whipping window to columns rising from its bottom edge "
+"for the first frames."
+msgstr "Clip a whipping window to columns rising from its bottom edge for the "
+"first frames."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.closing card"
+msgstr "closing card"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.column build"
+msgstr "column build"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Column count"
+msgstr "Column count"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Column labels"
+msgstr "Column labels"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Column order"
+msgstr "Column order"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.column requests"
 msgstr "column requests"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Column stagger"
+msgstr "Column stagger"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.column wipe"
+msgstr "column wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Columns rise from the bottom or drop from the top."
+msgstr "Columns rise from the bottom or drop from the top."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -760,6 +1057,13 @@ msgstr "Company-built plugins could seed the marketplace."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Company-built tools can seed a wider ecosystem."
 msgstr "Company-built tools can seed a wider ecosystem."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Compare two steps or two runs at a glance, letting the "
+"finishing order of the counters make the comparison."
+msgstr "Compare two steps or two runs at a glance, letting the finishing order "
+"of the counters make the comparison."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -873,6 +1177,11 @@ msgstr "Continue across a shared horizontal space. Direction carries the "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Continuity"
+msgstr "Continuity"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Continuity frame"
 msgstr "Continuity frame"
 
@@ -898,8 +1207,18 @@ msgstr "Controls to adapt"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.corner ticks"
+msgstr "corner ticks"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Correspondence connects existing fields to shared meanings."
 msgstr "Correspondence connects existing fields to shared meanings."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Counters"
+msgstr "Counters"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -907,6 +1226,11 @@ msgid "continuity.Cover a scene boundary with a moving opaque edge, retaining "
 "an opaque background throughout."
 msgstr "Cover a scene boundary with a moving opaque edge, retaining an opaque "
 "background throughout."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Cover colour"
+msgstr "Cover colour"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -925,6 +1249,50 @@ msgstr "Customizability comes from configuration of that structure."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Cut"
+msgstr "Cut"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.cut declares the hard cut after a whip; stepped-column-wipe "
+"covers the longer whip with columns."
+msgstr "cut declares the hard cut after a whip; stepped-column-wipe covers the "
+"longer whip with columns."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Cut from a dark field naming the entities, to a single large "
+"word on the accent field, to a light field where a fictional district "
+"count runs up. Every cut is instant and each shot starts its own reveal "
+"on its first frames, so the colour change carries the beat and nothing "
+"crossfades."
+msgstr "Cut from a dark field naming the entities, to a single large word on "
+"the accent field, to a light field where a fictional district count "
+"runs up. Every cut is instant and each shot starts its own reveal on "
+"its first frames, so the colour change carries the beat and nothing "
+"crossfades."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.cut marks the hard cut as deliberate, so the frame gate "
+"accepts the jump in field brightness on that frame. It needs "
+"transitionInFrames set to 0."
+msgstr "cut marks the hard cut as deliberate, so the frame gate accepts the "
+"jump in field brightness on that frame. It needs transitionInFrames set "
+"to 0."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.cut on"
+msgstr "cut on"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.cut on colour"
+msgstr "cut on colour"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Data begins in sources that need names and context."
 msgstr "Data begins in sources that need names and context."
 
@@ -935,8 +1303,24 @@ msgstr "decision fork"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Declared cut"
+msgstr "Declared cut"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Default leaves room above and below; tall reaches near the "
+"frame edges."
+msgstr "Default leaves room above and below; tall reaches near the frame edges."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Define how fields behave."
 msgstr "Define how fields behave."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Delay of the second panel's staging."
+msgstr "Delay of the second panel''s staging."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -992,6 +1376,11 @@ msgstr "Direct attention to one product region while a separate diagram "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Direction"
+msgstr "Direction"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.directional transition"
 msgstr "directional transition"
 
@@ -1019,6 +1408,20 @@ msgstr "Draw the boundary of the question."
 #: src/continuity/i18n/descriptors.generated.ts
 #~ msgid "continuity.Draw timing"
 #~ msgstr "Draw timing"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Each window sends a dot along the edge, forward or in "
+"reverse."
+msgstr "Each window sends a dot along the edge, forward or in reverse."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Each word needs its own timing, which the default word-mask "
+"mode handles, or the lines are long enough that a wipe outlasts the "
+"read."
+msgstr "Each word needs its own timing, which the default word-mask mode "
+"handles, or the lines are long enough that a wipe outlasts the read."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1083,6 +1486,26 @@ msgstr "entity spine"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Entrance"
+msgstr "Entrance"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Entrance length"
+msgstr "Entrance length"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.erase exit"
+msgstr "erase exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Erase exit"
+msgstr "Erase exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Establish the batch pipeline, visit its details, and let the "
 "query region depart before carrying the single question label into the "
 "source-filtering diagram. The 24-frame handoff relocates that identity "
@@ -1144,6 +1567,11 @@ msgstr "execution placement"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Exit start"
+msgstr "Exit start"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Expand an actual record into an explanation of its fields and "
 "relationships."
 msgstr "Expand an actual record into an explanation of its fields and "
@@ -1162,6 +1590,13 @@ msgid "continuity.Explain a real control or result alongside the dependency "
 "that gives it meaning."
 msgstr "Explain a real control or result alongside the dependency that gives it "
 "meaning."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Explain movement between parts of an illustrated system "
+"without drawing a single arrow for every exchange."
+msgstr "Explain movement between parts of an illustrated system without drawing "
+"a single arrow for every exchange."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1195,8 +1630,38 @@ msgstr "Extend it with domain expertise."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Fade the mark in, then fade two lines up beneath it a few "
+"frames apart, and leave line by line before the icon goes. Cut to a "
+"light field where two left-aligned lines wipe in from the left with a "
+"small leftward travel. End on black with a small regular-weight caption "
+"that cuts on after a beat of silence."
+msgstr "Fade the mark in, then fade two lines up beneath it a few frames apart, "
+"and leave line by line before the icon goes. Cut to a light field where "
+"two left-aligned lines wipe in from the left with a small leftward "
+"travel. End on black with a small regular-weight caption that cuts on "
+"after a beat of silence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.false draws a plain line, for example under packets "
+"travelling both ways."
+msgstr "false draws a plain line, for example under packets travelling both "
+"ways."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Fewer unnecessary transfers can reduce remote work."
 msgstr "Fewer unnecessary transfers can reduce remote work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.field colour"
+msgstr "field colour"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Field colour"
+msgstr "Field colour"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1215,6 +1680,11 @@ msgstr "field lineage"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Field-colour cut"
+msgstr "Field-colour cut"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.First, the familiar batch pipeline."
 msgstr "First, the familiar batch pipeline."
 
@@ -1222,6 +1692,21 @@ msgstr "First, the familiar batch pipeline."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Fit the infrastructure to the work."
 msgstr "Fit the infrastructure to the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Flight length"
+msgstr "Flight length"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.flip-split"
+msgstr "flip-split"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Flip-split or from-sides; both enter the pair layout only."
+msgstr "Flip-split or from-sides; both enter the pair layout only."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1237,6 +1722,16 @@ msgstr "floating diagram"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Floating explanation"
 msgstr "Floating explanation"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.fly-through"
+msgstr "fly-through"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Fly-through into colour"
+msgstr "Fly-through into colour"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1287,6 +1782,20 @@ msgstr "Follow the result back to the data and query it depends on."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Footnote"
+msgstr "Footnote"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Four ways a tilted window arrives - a whip revealed through "
+"rising columns, a full-bleed pull-back into the tall box, a pair from "
+"both sides, and a flip-split pair."
+msgstr "Four ways a tilted window arrives - a whip revealed through rising "
+"columns, a full-bleed pull-back into the tall box, a pair from both "
+"sides, and a flip-split pair."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.frame morph"
 msgstr "frame morph"
 
@@ -1294,6 +1803,29 @@ msgstr "frame morph"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Frame-to-interface morph"
 msgstr "Frame-to-interface morph"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Frames between lines in the line modes."
+msgstr "Frames between lines in the line modes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Frames between neighbouring columns; fractions are allowed."
+msgstr "Frames between neighbouring columns; fractions are allowed."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Frames between neighbouring columns. Fractions are "
+"interpolated, never rounded, and the last column must start inside the "
+"transition."
+msgstr "Frames between neighbouring columns. Fractions are interpolated, never "
+"rounded, and the last column must start inside the transition."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Frames between the title and the kicker."
+msgstr "Frames between the title and the kicker."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1309,6 +1841,23 @@ msgstr "From a visible field to its meaning."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.From question to query"
 msgstr "From question to query"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.from the sides"
+msgstr "from the sides"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Frozen holds the outgoing shot's last frame. Playing keeps "
+"its camera, footage or typing moving under the columns."
+msgstr "Frozen holds the outgoing shot''s last frame. Playing keeps its camera, "
+"footage or typing moving under the columns."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.frozen outgoing frame"
+msgstr "frozen outgoing frame"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1337,6 +1886,13 @@ msgstr "gentle transition"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Give a statement the right weight - a calm fade under the "
+"mark, a brisk wipe, or a quiet caption that simply appears."
+msgstr "Give a statement the right weight - a calm fade under the mark, a brisk "
+"wipe, or a quiet caption that simply appears."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Give the model-to-interface reveal enough overlap to remain "
 "traceable."
 msgstr "Give the model-to-interface reveal enough overlap to remain traceable."
@@ -1358,6 +1914,16 @@ msgstr "Good for"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.graph diagram"
+msgstr "graph diagram"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Graph packets"
+msgstr "Graph packets"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Group bounds"
 msgstr "Group bounds"
 
@@ -1375,6 +1941,14 @@ msgstr "Grouping changes individual cases into district totals."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Hand one shot to the next through vertical columns that rise "
+"or drop one after another, over a frozen frame or a shot that keeps "
+"playing."
+msgstr "Hand one shot to the next through vertical columns that rise or drop "
+"one after another, over a frozen frame or a shot that keeps playing."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Handoff duration"
 msgstr "Handoff duration"
 
@@ -1382,6 +1956,51 @@ msgstr "Handoff duration"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Handoff treatment"
 msgstr "Handoff treatment"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Handover"
+msgstr "Handover"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Handover kind"
+msgstr "Handover kind"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.hard cut"
+msgstr "hard cut"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.heading reveal"
+msgstr "heading reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Heading reveal"
+msgstr "Heading reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Heading start"
+msgstr "Heading start"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Heading wipe"
+msgstr "Heading wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.headline column"
+msgstr "headline column"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Headlines"
+msgstr "Headlines"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1406,6 +2025,11 @@ msgstr "Here, visits supply values for a response case."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.hero number"
+msgstr "hero number"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Hide a scene boundary behind one opaque moving edge."
 msgstr "Hide a scene boundary behind one opaque moving edge."
 
@@ -1423,13 +2047,43 @@ msgstr "Hold the incoming state once the wipe has cleared."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.horizontal blur"
+msgstr "horizontal blur"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.horizontal travel"
 msgstr "horizontal travel"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.How long the columns take to cover the frame."
+msgstr "How long the columns take to cover the frame."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.How long the window takes to land."
+msgstr "How long the window takes to land."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.How many cases are in each district?"
 msgstr "How many cases are in each district?"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.How many column masks the mark rises through."
+msgstr "How many column masks the mark rises through."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.icon"
+msgstr "icon"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Icon"
+msgstr "Icon"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1473,6 +2127,13 @@ msgstr "incremental cache"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.inOut starts gently, which keeps a bright still from dimming "
+"the frame at once."
+msgstr "inOut starts gently, which keeps a bright still from dimming the frame "
+"at once."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Inspect a response case."
 msgstr "Inspect a response case."
 
@@ -1500,6 +2161,14 @@ msgstr "Integration follows the question and the data it requires."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Intent before infrastructure."
 msgstr "Intent before infrastructure."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Introduce a figure or diagram with a heading that reads like "
+"it is being written across the frame, matching wipes elsewhere in the "
+"film."
+msgstr "Introduce a figure or diagram with a heading that reads like it is "
+"being written across the frame, matching wipes elsewhere in the film."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1559,6 +2228,13 @@ msgstr "join semantics"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Jump a still that is taller than its window to each offset, a "
+"fraction of its height."
+msgstr "Jump a still that is taller than its window to each offset, a fraction "
+"of its height."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Keep a meaningful object or relationship in view."
 msgstr "Keep a meaningful object or relationship in view."
 
@@ -1574,6 +2250,19 @@ msgstr "Keep attention within a shared editorial heading and stage layout while 
 msgid "continuity.Keep each diagram cue consistent with the currently displayed "
 "control."
 msgstr "Keep each diagram cue consistent with the currently displayed control."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep Fictional demonstration data visible under product "
+"stills."
+msgstr "Keep Fictional demonstration data visible under product stills."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Keep Fictional demonstration data visible unless the figures "
+"are sourced."
+msgstr "Keep Fictional demonstration data visible unless the figures are "
+"sourced."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1666,6 +2355,44 @@ msgstr "Keywords / tags"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.kicker"
+msgstr "kicker"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Kicker"
+msgstr "Kicker"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Kicker delay"
+msgstr "Kicker delay"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Label, value, optional display text, and highlight for the "
+"accent bar."
+msgstr "Label, value, optional display text, and highlight for the accent bar."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Labels the right-hand column."
+msgstr "Labels the right-hand column."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Land one headline figure and show where it ranks, or set two "
+"related figures side by side."
+msgstr "Land one headline figure and show where it ranks, or set two related "
+"figures side by side."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Landing box"
+msgstr "Landing box"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Layout overlap"
 msgstr "Layout overlap"
 
@@ -1673,6 +2400,21 @@ msgstr "Layout overlap"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Leave a stable hold before the next spatial move."
 msgstr "Leave a stable hold before the next spatial move."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Leave an opening brand lockup and arrive on the first content "
+"shot without a visible seam, because the exit already fills the frame "
+"with the next shot's field."
+msgstr "Leave an opening brand lockup and arrive on the first content shot "
+"without a visible seam, because the exit already fills the frame with "
+"the next shot''s field."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Lengthen the whip so it is still moving under the following "
+"wipe."
+msgstr "Lengthen the whip so it is still moving under the following wipe."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1711,6 +2453,52 @@ msgstr "Let the question define the work."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Let the whip finish a frame or two before a hard cut, or "
+"start it on the shot's last frame when a playing column wipe follows."
+msgstr "Let the whip finish a frame or two before a hard cut, or start it on "
+"the shot''s last frame when a playing column wipe follows."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.light field"
+msgstr "light field"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.line fade"
+msgstr "line fade"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Line stagger"
+msgstr "Line stagger"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.line wipe"
+msgstr "line wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.line-fade, wipe or cut. word-mask is the default rising word "
+"reveal."
+msgstr "line-fade, wipe or cut. word-mask is the default rising word reveal."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Lines fade out top to bottom, then the icon, starting inside "
+"the shot."
+msgstr "Lines fade out top to bottom, then the icon, starting inside the shot."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Lines that fade up, wipe in, or cut on, with an icon above, a "
+"staged exit, and a small caption size."
+msgstr "Lines that fade up, wipe in, or cut on, with an icon above, a staged "
+"exit, and a small caption size."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Live React compositions. Fictional demonstration data. "
 "Product states are scripted; architecture diagrams are illustrations. "
 "Plugin capabilities are future vision. Downloads render the current "
@@ -1719,6 +2507,17 @@ msgstr "Live React compositions. Fictional demonstration data. Product states "
 "are scripted; architecture diagrams are illustrations. Plugin "
 "capabilities are future vision. Downloads render the current "
 "composition and caption selection."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Live React storyboard scenes. Fictional demonstration data. "
+"Window contents are curated fictional screenshots; figures, timings and "
+"diagrams are illustrations. Downloads render the current composition as "
+"authored."
+msgstr "Live React storyboard scenes. Fictional demonstration data. Window "
+"contents are curated fictional screenshots; figures, timings and "
+"diagrams are illustrations. Downloads render the current composition as "
+"authored."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1767,6 +2566,13 @@ msgstr "mapping controls"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Mark a change of act between statements and product stills "
+"with a striped, deliberate handover that echoes a columned brand mark."
+msgstr "Mark a change of act between statements and product stills with a "
+"striped, deliberate handover that echoes a columned brand mark."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Mark the active product region while a separate diagram "
 "explains it. Useful when a line would imply a false data flow."
 msgstr "Mark the active product region while a separate diagram explains it. "
@@ -1803,6 +2609,16 @@ msgstr "Measured field controls anchor floating explanations of mapping and "
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.measured region"
 msgstr "measured region"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.metric"
+msgstr "metric"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.mirrored tilt"
+msgstr "mirrored tilt"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1862,6 +2678,13 @@ msgstr "Move and process what it needs."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Move briskly between product stills, letting the outgoing "
+"window's direction carry the viewer into the next shot."
+msgstr "Move briskly between product stills, letting the outgoing window''s "
+"direction carry the viewer into the next shot."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Move from a broad model into one bounded detail without "
 "losing its context."
 msgstr "Move from a broad model into one bounded detail without losing its "
@@ -1913,8 +2736,33 @@ msgstr "native scale"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Next field"
+msgstr "Next field"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.No matching compositions. Try another search."
 msgstr "No matching compositions. Try another search."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Node frame"
+msgstr "Node frame"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.node items"
+msgstr "node items"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Node items"
+msgstr "Node items"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Node width"
+msgstr "Node width"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1960,6 +2808,47 @@ msgstr "Occlusion wipe"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.On a light field, bring in one hero figure in minutes, then "
+"its labels, bars growing from the left with the highlighted row in the "
+"accent, and values last. Cut to two panels staged a few frames apart "
+"with torn bar edges, hold for reading, then erase every element left to "
+"right in reading order, the left panel first. Keep the fictional-data "
+"footnote under both."
+msgstr "On a light field, bring in one hero figure in minutes, then its labels, "
+"bars growing from the left with the highlighted row in the accent, and "
+"values last. Cut to two panels staged a few frames apart with torn bar "
+"edges, hold for reading, then erase every element left to right in "
+"reading order, the left panel first. Keep the fictional-data footnote "
+"under both."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.On a light field, flip both windows in from edge-on and split "
+"them apart into a mirrored tilt. Start both counters together so the "
+"shorter one finishes first and turns the accent colour, then hold until "
+"the second finishes before both windows whip off to the left. Label the "
+"timings as fictional beside each counter and in the footnote."
+msgstr "On a light field, flip both windows in from edge-on and split them "
+"apart into a mirrored tilt. Start both counters together so the shorter "
+"one finishes first and turns the accent colour, then hold until the "
+"second finishes before both windows whip off to the left. Label the "
+"timings as fictional beside each counter and in the footnote."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.On a light field, wipe the title in from the left and the "
+"kicker eight frames later, then let the scene's own content follow - a "
+"fictional row count running up, a two-line statement fading in, and a "
+"single ranked bar panel. The heading settles before the content moves so "
+"attention passes from the label to the figure."
+msgstr "On a light field, wipe the title in from the left and the kicker eight "
+"frames later, then let the scene''s own content follow - a fictional "
+"row count running up, a two-line statement fading in, and a single "
+"ranked bar panel. The heading settles before the content moves so "
+"attention passes from the label to the figure."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.One entity."
 msgstr "One entity."
 
@@ -1975,6 +2864,11 @@ msgstr "One grammar, many missions"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One or two hero figures, each with up to eight ranked rows."
+msgstr "One or two hero figures, each with up to eight ranked rows."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.One platform cannot predict every mission."
 msgstr "One platform cannot predict every mission."
 
@@ -1982,6 +2876,13 @@ msgstr "One platform cannot predict every mission."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.One source becomes part of a question."
 msgstr "One source becomes part of a question."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.One to three short lines per entry. A later entry replaces "
+"the earlier one at its atFrame."
+msgstr "One to three short lines per entry. A later entry replaces the earlier "
+"one at its atFrame."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2005,6 +2906,30 @@ msgstr "opaque wipe"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Open on a dark statement, then let eight columns rise left to "
+"right half a frame apart onto a light field. Drop six columns from the "
+"top, right to left, onto a tilted Explorer window whose camera starts a "
+"slow push. Close with twelve columns staggered a frame and a half apart "
+"while that push keeps playing underneath, the outgoing shot drifting "
+"left and blurring as the columns cover it. Each handover is short and "
+"crisp, and the last one is the slow, layered exception."
+msgstr "Open on a dark statement, then let eight columns rise left to right "
+"half a frame apart onto a light field. Drop six columns from the top, "
+"right to left, onto a tilted Explorer window whose camera starts a slow "
+"push. Close with twelve columns staggered a frame and a half apart "
+"while that push keeps playing underneath, the outgoing shot drifting "
+"left and blurring as the columns cover it. Each handover is short and "
+"crisp, and the last one is the slow, layered exception."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Open or close a film on the brand, and end on one concrete "
+"next step the viewer can type or visit."
+msgstr "Open or close a film on the brand, and end on one concrete next step "
+"the viewer can type or visit."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Open with the relationship between identity, observations, "
 "and fields, then use a 30-frame wipe into the scripted attribute-mapping "
 "interface. Let the keyed case-and-visit detail appear first, then time "
@@ -2024,6 +2949,11 @@ msgstr "Open with the relationship between identity, observations, and fields, "
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Opening origin"
 msgstr "Opening origin"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.opening sequence"
+msgstr "opening sequence"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2052,13 +2982,58 @@ msgstr "Other source fields are not required for this question."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.outgoing drift"
+msgstr "outgoing drift"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Outgoing drift"
+msgstr "Outgoing drift"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Outgoing shot"
+msgstr "Outgoing shot"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Overlap duration"
 msgstr "Overlap duration"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Packets"
+msgstr "Packets"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Packing it differently leaves some capacity idle."
 msgstr "Packing it differently leaves some capacity idle."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.pair layout"
+msgstr "pair layout"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Panel stagger"
+msgstr "Panel stagger"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Panels"
+msgstr "Panels"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.parallel edges"
+msgstr "parallel edges"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Parallel offset"
+msgstr "Parallel offset"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2090,6 +3065,16 @@ msgstr "Place the opening on the source idea that leads into the next scene."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Placement depends on source support and workload."
 msgstr "Placement depends on source support and workload."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Playing keeps the whip moving under the next shot's columns."
+msgstr "Playing keeps the whip moving under the next shot''s columns."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.playing outgoing shot"
+msgstr "playing outgoing shot"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2138,6 +3123,11 @@ msgstr "Product segment must move forward"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.product stills"
+msgstr "product stills"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.product to diagram"
 msgstr "product to diagram"
 
@@ -2156,6 +3146,25 @@ msgstr "Productions"
 msgid "continuity.Provide complete stock inputs that agree with the displayed "
 "record."
 msgstr "Provide complete stock inputs that agree with the displayed record."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.pull-back"
+msgstr "pull-back"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Pull-back ease"
+msgstr "Pull-back ease"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Punctuate a short run of statements and figures so each new "
+"idea lands on its own colour, the way launch films alternate dark, "
+"accent and light fields."
+msgstr "Punctuate a short run of statements and figures so each new idea lands "
+"on its own colour, the way launch films alternate dark, accent and "
+"light fields."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2211,6 +3220,34 @@ msgstr "query subset"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Query. Then retrieve and compute."
 msgstr "Query. Then retrieve and compute."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.racing counters"
+msgstr "racing counters"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Racing pair"
+msgstr "Racing pair"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Raise the Avandar mark through eight column masks left to "
+"right, then wipe the wordmark in beside it. Once both settle, cascade "
+"the call to action below - the subtitle, a placeholder address, a "
+"terminal prompt typing the command that previews this study with a "
+"blinking block cursor, and a badge after the typing ends."
+msgstr "Raise the Avandar mark through eight column masks left to right, then "
+"wipe the wordmark in beside it. Once both settle, cascade the call to "
+"action below - the subtitle, a placeholder address, a terminal prompt "
+"typing the command that previews this study with a blinking block "
+"cursor, and a badge after the typing ends."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.ranked rows"
+msgstr "ranked rows"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2355,6 +3392,11 @@ msgstr "Reveal duration"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reveal mode"
+msgstr "Reveal mode"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Reveal shape"
 msgstr "Reveal shape"
 
@@ -2364,6 +3406,21 @@ msgid "continuity.Reveal the next explanation through a bounded opening. Useful 
 "when moving from structure to detail."
 msgstr "Reveal the next explanation through a bounded opening. Useful when "
 "moving from structure to detail."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.rhythm"
+msgstr "rhythm"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.rough edges"
+msgstr "rough edges"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Rows"
+msgstr "Rows"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2387,6 +3444,11 @@ msgstr "scene change"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Scene motions"
+msgstr "Scene motions"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.schema correspondence"
 msgstr "schema correspondence"
 
@@ -2397,6 +3459,16 @@ msgstr "schema mapping"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.scroll steps"
+msgstr "scroll steps"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Scroll steps"
+msgstr "Scroll steps"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Search compositions"
 msgstr "Search compositions"
 
@@ -2404,6 +3476,16 @@ msgstr "Search compositions"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Search the collection"
 msgstr "Search the collection"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.secondary window"
+msgstr "secondary window"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Secondary window"
+msgstr "Secondary window"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2428,8 +3510,21 @@ msgstr "Select the ontology fixture interval that proves the bounded point."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Send the mark's columns toward the camera until they cover "
+"the frame in a token colour, then cut to a shot painted on that same "
+"colour."
+msgstr "Send the mark''s columns toward the camera until they cover the frame "
+"in a token colour, then cut to a shot painted on that same colour."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Separate the needed subset from other work."
 msgstr "Separate the needed subset from other work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Set a foreground that stays readable on the shot's field."
+msgstr "Set a foreground that stays readable on the shot''s field."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2443,6 +3538,13 @@ msgstr "Set departure, return, and a settled rectangle clear of the relevant "
 msgid "continuity.Set explicit origin and destination bounds in the 1600 by 840 "
 "stage."
 msgstr "Set explicit origin and destination bounds in the 1600 by 840 stage."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Set the following shot's ground to the same token, for "
+"example var(--brand)."
+msgstr "Set the following shot''s ground to the same token, for example "
+"var(--brand)."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2465,6 +3567,40 @@ msgstr "Shared platform"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Shared-object handoff"
 msgstr "Shared-object handoff"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Shift edges between the same cards sideways so they run in "
+"parallel."
+msgstr "Shift edges between the same cards sideways so they run in parallel."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Short heading copy fitted at a fixed size."
+msgstr "Short heading copy fitted at a fixed size."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.shot theme"
+msgstr "shot theme"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.shot transition"
+msgstr "shot transition"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Shot vocabulary"
+msgstr "Shot vocabulary"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Show a sequence of product stills as a confident launch-film "
+"beat, with one short headline carrying the point while the screens "
+"change."
+msgstr "Show a sequence of product stills as a confident launch-film beat, with "
+"one short headline carrying the point while the screens change."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2493,6 +3629,11 @@ msgstr "Showcase navigation"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.side by side"
+msgstr "side by side"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Signal timing"
 msgstr "Signal timing"
 
@@ -2500,6 +3641,20 @@ msgstr "Signal timing"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.single takeaway"
 msgstr "single takeaway"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Slide brings the next still in on top from the right; cut "
+"swaps at once."
+msgstr "Slide brings the next still in on top from the right; cut swaps at "
+"once."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Slide the outgoing shot by a fraction of the width with "
+"horizontal blur while the columns cover it."
+msgstr "Slide the outgoing shot by a fraction of the width with horizontal blur "
+"while the columns cover it."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2573,10 +3728,25 @@ msgstr "stable typography"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.staged exit"
+msgstr "staged exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Staged exit"
+msgstr "Staged exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Start after the action and leave at least 45 frames for the "
 "consequence."
 msgstr "Start after the action and leave at least 45 frames for the "
 "consequence."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Start the erase inside the shot and cut when it ends."
+msgstr "Start the erase inside the shot and cut when it ends."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2590,8 +3760,43 @@ msgstr "Start with the thing being tracked."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Stat line"
+msgstr "Stat line"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Stepped column wipe"
+msgstr "Stepped column wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.stepped reveal"
+msgstr "stepped reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Stepped reveal"
+msgstr "Stepped reveal"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Storyboard scenes"
+msgstr "Storyboard scenes"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Straight or a seeded rough, torn edge."
+msgstr "Straight or a seeded rough, torn edge."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.structure to detail"
 msgstr "structure to detail"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Subtitle, address, command and badge, cascading from atFrame."
+msgstr "Subtitle, address, command and badge, cascading from atFrame."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2615,13 +3820,28 @@ msgstr "sum rule"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Supporting line under the title."
+msgstr "Supporting line under the title."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Supporting statement"
 msgstr "Supporting statement"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Sweep the columns left to right or right to left."
+msgstr "Sweep the columns left to right or right to left."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Takeaway phrase"
 msgstr "Takeaway phrase"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Tall is the box a full-bleed pull-back lands in."
+msgstr "Tall is the box a full-bleed pull-back lands in."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2641,6 +3861,16 @@ msgid "continuity.Ten stories about how Avandar works, and reusable guidance "
 "for the transitions and visual relationships that make them flow."
 msgstr "Ten stories about how Avandar works, and reusable guidance for the "
 "transitions and visual relationships that make them flow."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Text colour"
+msgstr "Text colour"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Text set beside the mark; it wipes in left to right."
+msgstr "Text set beside the mark; it wipes in left to right."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2733,6 +3963,13 @@ msgstr "The controls are unrelated, or a bracket would cover their labels or "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The cuts would come faster than the viewer can read each "
+"field, or adjacent shots need a spatial relationship a cut would break."
+msgstr "The cuts would come faster than the viewer can read each field, or "
+"adjacent shots need a spatial relationship a cut would break."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The diagram explains structure, not a live synchronization."
 msgstr "The diagram explains structure, not a live synchronization."
 
@@ -2767,6 +4004,21 @@ msgstr "The explanatory diagram is presented as a successful live query, save "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The figures are presented as measured performance without a "
+"source, or the two windows show unrelated screens that invite no "
+"comparison."
+msgstr "The figures are presented as measured performance without a source, or "
+"the two windows show unrelated screens that invite no comparison."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The figures need axes, scales or negative values, or they are "
+"presented as sourced results without a citation."
+msgstr "The figures need axes, scales or negative values, or they are presented "
+"as sourced results without a citation."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The form sequence is scripted; diagrams explain the decision."
 msgstr "The form sequence is scripted; diagrams explain the decision."
 
@@ -2781,6 +4033,13 @@ msgid "continuity.The graph introduces relationships that are not supported by "
 "the record or declared fixtures."
 msgstr "The graph introduces relationships that are not supported by the record "
 "or declared fixtures."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The heading is long enough to wrap, or the content starts "
+"moving before the heading has finished."
+msgstr "The heading is long enough to wrap, or the content starts moving before "
+"the heading has finished."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2808,6 +4067,13 @@ msgstr "The long-term aim is reusable tools for specific missions."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The mapping makes the correspondence explicit."
 msgstr "The mapping makes the correspondence explicit."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The mark would have to be redrawn as vectors, or the command "
+"or address is invented for a product that does not offer it."
+msgstr "The mark would have to be redrawn as vectors, or the command or address "
+"is invented for a product that does not offer it."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2839,6 +4105,20 @@ msgstr "The model specifies sources, relationships and field behavior."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The next shot is not painted on the exit colour, which turns "
+"the covered frame into a flash."
+msgstr "The next shot is not painted on the exit colour, which turns the "
+"covered frame into a flash."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The next shot moves in the opposite direction, or the exit "
+"starts so early that the empty field holds before the cut."
+msgstr "The next shot moves in the opposite direction, or the exit starts so "
+"early that the empty field holds before the cut."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The object changes identity, or the same label would imply an "
 "unsupported equivalence."
 msgstr "The object changes identity, or the same label would imply an "
@@ -2855,6 +4135,13 @@ msgstr "The opening clips important labels, or several details need equal "
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The order changes the work."
 msgstr "The order changes the work."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The packets would read as measured telemetry, or the cards "
+"need automatic layout rather than authored positions."
+msgstr "The packets would read as measured telemetry, or the cards need "
+"automatic layout rather than authored positions."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2943,6 +4230,13 @@ msgstr "The same product surfaces can inspect both models."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The shot's background. Use a colour or var(--token) naming "
+"another token, such as var(--brand) for the accent field."
+msgstr "The shot''s background. Use a colour or var(--token) naming another "
+"token, such as var(--brand) for the accent field."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The source serves the question."
 msgstr "The source serves the question."
 
@@ -2950,6 +4244,13 @@ msgstr "The source serves the question."
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The Sum rule totals the supplied kit counts."
 msgstr "The Sum rule totals the supplied kit counts."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The theme token the columns spread into. Paint the next "
+"shot's field with it."
+msgstr "The theme token the columns spread into. Paint the next shot''s field "
+"with it."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2980,8 +4281,31 @@ msgstr "The vocabulary lets the workspace fit its mission."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The whole handover, including every column's stagger and "
+"rise."
+msgstr "The whole handover, including every column''s stagger and rise."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.The window would hold live product UI, which belongs in an "
+"unscaled avandar shot, or the headline needs more than three short "
+"lines."
+msgstr "The window would hold live product UI, which belongs in an unscaled "
+"avandar shot, or the headline needs more than three short lines."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.The workspace can then fit a particular mission."
 msgstr "The workspace can then fit a particular mission."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.These paths are fields of a storyboard shot: its scene props, "
+"transition and theme. Adjust the plan in storyboards/vocabulary, then "
+"validate and preview it with the video CLI."
+msgstr "These paths are fields of a storyboard shot: its scene props, "
+"transition and theme. Adjust the plan in storyboards/vocabulary, then "
+"validate and preview it with the video CLI."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3038,6 +4362,41 @@ msgstr "Those links make the model useful beyond a single row."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.ticks draws four corner ticks with no fill or border."
+msgstr "ticks draws four corner ticks with no fill or border."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Tilted product window"
+msgstr "Tilted product window"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.tilted window"
+msgstr "tilted window"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.timed comparison"
+msgstr "timed comparison"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Title"
+msgstr "Title"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.title wipe"
+msgstr "title wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.token colour"
+msgstr "token colour"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Tools that fit the mission."
 msgstr "Tools that fit the mission."
 
@@ -3068,6 +4427,51 @@ msgstr "Travel time"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.travelling packets"
+msgstr "travelling packets"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.two panels"
+msgstr "two panels"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Two shots share a layout that a dissolve or cut would carry "
+"better, or the columns would slice through text the viewer is still "
+"reading."
+msgstr "Two shots share a layout that a dissolve or cut would carry better, or "
+"the columns would slice through text the viewer is still reading."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Two tilted windows side by side, each labelled above and "
+"timed by a counter below that turns the accent colour when it finishes."
+msgstr "Two tilted windows side by side, each labelled above and timed by a "
+"counter below that turns the accent colour when it finishes."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.typed command"
+msgstr "typed command"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Typing speed"
+msgstr "Typing speed"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.typography heading"
+msgstr "typography heading"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Typography line reveals"
+msgstr "Typography line reveals"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.unconnected explanation"
 msgstr "unconnected explanation"
 
@@ -3077,6 +4481,11 @@ msgid "continuity.Underline one takeaway with a fixed seed and frame-driven "
 "progress. Keep the rest of the typography still."
 msgstr "Underline one takeaway with a fixed seed and frame-driven progress. "
 "Keep the rest of the typography still."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Up to eight list items inside a card under its label."
+msgstr "Up to eight list items inside a card under its label."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3142,6 +4551,13 @@ msgstr "value selection"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Value, unit, precision and the start and end frames. The "
+"earlier endFrame finishes first."
+msgstr "Value, unit, precision and the start and end frames. The earlier "
+"endFrame finishes first."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Visits and facilities give it relationships and context."
 msgstr "Visits and facilities give it relationships and context."
 
@@ -3167,10 +4583,168 @@ msgstr "What if the question came first?"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.When each later still replaces the current one. The first has "
+"none."
+msgstr "When each later still replaces the current one. The first has none."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.When the title starts."
+msgstr "When the title starts."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.When the wordmark retracts; the columns fly a few frames "
+"later."
+msgstr "When the wordmark retracts; the columns fly a few frames later."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Which districts have cases?"
 msgstr "Which districts have cases?"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Whip a tilted window off the left edge into a hard cut, or "
+"run a longer whip under a column wipe while the outgoing shot keeps "
+"playing."
+msgstr "Whip a tilted window off the left edge into a hard cut, or run a longer "
+"whip under a column wipe while the outgoing shot keeps playing."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Whip an Explorer still in from the right while four columns "
+"rise from its bottom edge to reveal it. Cut to a dashboard filling the "
+"frame with no tilt, hold, then ease it back into the tall box as the "
+"headline appears. On a light field, slide two windows in from opposite "
+"edges with horizontal blur. Finish with two dashboard stills flipping in "
+"from edge-on and splitting apart."
+msgstr "Whip an Explorer still in from the right while four columns rise from "
+"its bottom edge to reveal it. Cut to a dashboard filling the frame with "
+"no tilt, hold, then ease it back into the tall box as the headline "
+"appears. On a light field, slide two windows in from opposite edges "
+"with horizontal blur. Finish with two dashboard stills flipping in from "
+"edge-on and splitting apart."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Whip an Import preview in from the right and jump it down the "
+"page in two quick scroll steps. Slide a Maps still in over it as the "
+"headline changes, cut to a second map, then push the window-only camera "
+"in while the headline stays put. Cut to a light field where a Cases list "
+"rests in the tall box and a record detail whips in beside it in the same "
+"plane. Keep the fictional-data footnote visible under every still."
+msgstr "Whip an Import preview in from the right and jump it down the page in "
+"two quick scroll steps. Slide a Maps still in over it as the headline "
+"changes, cut to a second map, then push the window-only camera in while "
+"the headline stays put. Cut to a light field where a Cases list rests "
+"in the tall box and a record detail whips in beside it in the same "
+"plane. Keep the fictional-data footnote visible under every still."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Whip and pull-back enter a single window; from-sides and "
+"flip-split enter a pair."
+msgstr "Whip and pull-back enter a single window; from-sides and flip-split "
+"enter a pair."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.whip exit"
+msgstr "whip exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Whip exit"
+msgstr "Whip exit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.whip in"
+msgstr "whip in"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Whip length"
+msgstr "Whip length"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Window box"
+msgstr "Window box"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.window camera"
+msgstr "window camera"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Window camera"
+msgstr "Window camera"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.window entrance"
+msgstr "window entrance"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Window entrances"
+msgstr "Window entrances"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Wipe length"
+msgstr "Wipe length"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.wipe reveals left to right behind a clip; rise is the default "
+"lift."
+msgstr "wipe reveals left to right behind a clip; rise is the default lift."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Wipe the heading in, then stage three cards - fictional "
+"sources, the workspace with its entities, and a dashboard card. Draw "
+"three parallel plain lines between the first two, send packets across "
+"them, one travelling back, then send a final packet along the arrowed "
+"edge to the dashboard. Label the whole diagram as illustrative."
+msgstr "Wipe the heading in, then stage three cards - fictional sources, the "
+"workspace with its entities, and a dashboard card. Draw three parallel "
+"plain lines between the first two, send packets across them, one "
+"travelling back, then send a final packet along the arrowed edge to the "
+"dashboard. Label the whole diagram as illustrative."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Wordmark"
+msgstr "Wordmark"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.wordmark wipe"
+msgstr "wordmark wipe"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.workload fit"
 msgstr "workload fit"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Zero for the hard cut; the longer whip needs the wipe's "
+"length."
+msgstr "Zero for the hard cut; the longer whip needs the wipe''s length."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Zero frames makes the hard cut between fields."
+msgstr "Zero frames makes the hard cut between fields."
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Zoom keys anchored inside the window. The headline never "
+"moves."
+msgstr "Zoom keys anchored inside the window. The headline never moves."

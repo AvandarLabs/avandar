@@ -69,9 +69,16 @@ boxes, chrome and shadow are design tokens in
 [windowTilt.ts](../src/scenes/TiltedWindowScene/windowTilt.ts); define new
 window geometry there, never inline per shot.
 
-The [shot vocabulary study](../storyboards/shot-vocabulary.json) (1920 × 1080,
-Productions gallery) exercises every new scene and transition with curated
-fictional screenshots.
+The [shot vocabulary study](../storyboards/shot-vocabulary.json) (1920 × 1080)
+exercises every new scene and transition with curated fictional screenshots.
+It plays in Productions and as a Motion Atlas sample film. The Atlas
+Compositions section breaks it into twelve short studies under
+[storyboards/vocabulary/](../storyboards/vocabulary/), grouped as Transitions
+(stepped column wipe, field-colour cut, fly-through, whip exit), Composition
+recipes (tilted window, racing pair, brand lockup, bar comparison) and Scene
+motions (window entrances, typography line reveals, heading wipe, graph
+packets), each with reuse guidance and the shot fields to change. See
+[storyboard-scene studies](continuity-compositions.md#storyboard-scene-studies).
 
 Graphs, flowcharts, and metrics are editorial explanations of supplied evidence,
 not fabricated product UI. Synthetic inputs must keep their fictional label.

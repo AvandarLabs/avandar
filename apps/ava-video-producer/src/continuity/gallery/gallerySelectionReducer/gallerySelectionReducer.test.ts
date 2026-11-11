@@ -2,32 +2,23 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import test from "node:test";
 import { storyboardSchema } from "../../../storyboard/schema/schema";
-import { CONTINUITY_CATALOG } from "../../continuityCatalog";
+import { CONTINUITY_CATALOG, isSceneEntry } from "../../continuityCatalog";
 import { continuityBeatSchema } from "../../continuitySchema";
+import { hasControlPath } from "../../vocabulary/hasControlPath/hasControlPath";
 import { gallerySelectionReducer } from "./gallerySelectionReducer";
+import type { ContinuityVocabularyEntry } from "../../continuityCatalog";
 
+// Scene studies name shot fields instead; sceneStudies.test.ts checks them.
+const CONTINUITY_STUDIES = CONTINUITY_CATALOG.filter(
+  (entry): entry is ContinuityVocabularyEntry =>
+    entry.family === "vocabulary" && !isSceneEntry(entry),
+);
 const INITIAL_STATE = {
   selectedId: "qetl-motion",
   family: "films" as const,
   query: "query",
   captions: false,
 };
-
-function _hasControlPath(value: unknown, path: readonly string[]): boolean {
-  const [head, ...tail] = path;
-  if (!head) {
-    return true;
-  }
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-  const key = head.endsWith("[]") ? head.slice(0, -2) : head;
-  const child: unknown = Reflect.get(value, key);
-  return head.endsWith("[]")
-    ? Array.isArray(child) &&
-        child.some((item: unknown) => _hasControlPath(item, tail))
-    : key in value && _hasControlPath(child, tail);
-}
 
 test("switching families selects that family's first entry and awaits player options", () => {
   assert.deepEqual(
@@ -107,24 +98,20 @@ test("vocabulary links resolve to full films and controls name actual beat schem
         : [],
     ),
   ]);
-  CONTINUITY_CATALOG.filter((entry) => entry.family === "vocabulary").forEach(
-    (entry) => {
-      assert.equal(
-        CONTINUITY_CATALOG.find((film) => film.id === entry.sourceFilm)?.family,
-        "films",
-      );
-      assert.ok(entry.controls.length > 0, entry.id);
-      entry.controls.forEach((control) =>
-        assert.ok(fields.has(control.path), control.path),
-      );
-    },
-  );
+  CONTINUITY_STUDIES.forEach((entry) => {
+    assert.equal(
+      CONTINUITY_CATALOG.find((film) => film.id === entry.sourceFilm)?.family,
+      "films",
+    );
+    assert.ok(entry.controls.length > 0, entry.id);
+    entry.controls.forEach((control) =>
+      assert.ok(fields.has(control.path), control.path),
+    );
+  });
 });
 
 test("each reusable control applies to its study's actual authored beat content", async () => {
-  const studies = CONTINUITY_CATALOG.filter(
-    (entry) => entry.family === "vocabulary",
-  );
+  const studies = CONTINUITY_STUDIES;
   await Promise.all(
     studies.map(async (entry) => {
       const file = new URL(
@@ -141,7 +128,7 @@ test("each reusable control applies to its study's actual authored beat content"
       }
       entry.controls.forEach((control) =>
         assert.ok(
-          _hasControlPath(shot.props, control.path.split(".")),
+          hasControlPath(shot.props, control.path.split(".")),
           `${entry.id}: ${control.path}`,
         ),
       );

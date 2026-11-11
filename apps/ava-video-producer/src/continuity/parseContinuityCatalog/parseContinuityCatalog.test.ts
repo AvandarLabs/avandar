@@ -61,3 +61,44 @@ test("rejects unknown metadata fields instead of silently dropping authored copy
     parseContinuityCatalog([FILM], [{ ...STUDY, creativeDirections: "Typo" }]),
   );
 });
+
+const SCENE_FILM = {
+  ...FILM,
+  id: "scene-film",
+  path: "shot-vocabulary",
+  kind: "scene",
+};
+const SCENE_STUDY = {
+  ...STUDY,
+  id: "scene-study",
+  path: "vocabulary/scene-study",
+  kind: "scene",
+  sourceFilm: "scene-film",
+  controls: [
+    { path: "transition.columns", label: "Columns", description: "Count." },
+  ],
+};
+
+test("accepts storyboard-scene films and studies and keeps their kind", () => {
+  assert.deepEqual(
+    parseContinuityCatalog([FILM, SCENE_FILM], [STUDY, SCENE_STUDY]),
+    [FILM, SCENE_FILM, STUDY, SCENE_STUDY],
+  );
+});
+
+test("rejects a scene study whose plan is outside storyboards/vocabulary", () => {
+  assert.throws(
+    () =>
+      parseContinuityCatalog(
+        [SCENE_FILM],
+        [{ ...SCENE_STUDY, path: "explainers/scene-study" }],
+      ),
+    /storyboards\/vocabulary/,
+  );
+});
+
+test("rejects unknown study kinds", () => {
+  assert.throws(() =>
+    parseContinuityCatalog([FILM], [{ ...STUDY, kind: "stock" }]),
+  );
+});

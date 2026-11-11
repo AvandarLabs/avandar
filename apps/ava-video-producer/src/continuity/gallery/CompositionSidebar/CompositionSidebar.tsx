@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import { useContinuityCopy } from "../../useContinuityCopy";
 import { CompositionEntry } from "./CompositionEntry/CompositionEntry";
 import css from "./CompositionSidebar.module.css";
+import { useCategoryLabel } from "./useCategoryLabel/useCategoryLabel";
 import type {
   ContinuityCatalogEntry,
   ContinuityFamily,
@@ -23,6 +25,7 @@ export function CompositionSidebar({
   onQueryChange,
 }: Props) {
   const translate = useContinuityCopy();
+  const getCategoryLabel = useCategoryLabel();
   return (
     <aside
       className={css.compositionSidebar}
@@ -35,13 +38,19 @@ export function CompositionSidebar({
         value={selection.query}
         onChange={(event) => onQueryChange(event.target.value)}
       />
-      {entries.map((entry) => (
-        <CompositionEntry
-          key={entry.id}
-          entry={entry}
-          isSelected={entry.id === selection.selectedId}
-          onSelect={onSelect}
-        />
+      {entries.map((entry, index) => (
+        <Fragment key={entry.id}>
+          {entry.category !== entries[index - 1]?.category && (
+            <h2 className={css.compositionSidebarGroup}>
+              {getCategoryLabel(entry.category)}
+            </h2>
+          )}
+          <CompositionEntry
+            entry={entry}
+            isSelected={entry.id === selection.selectedId}
+            onSelect={onSelect}
+          />
+        </Fragment>
       ))}
       {!entries.length && (
         <p>{translate("No matching compositions. Try another search.")}</p>

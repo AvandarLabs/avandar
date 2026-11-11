@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "id": "brand-lockup",
+  "title": "Brand lockup and call to action",
+  "description": "The mark rises through column masks, the wordmark wipes in beside it, and a call to action cascades below: subtitle, address, a typed command with a block cursor, and a badge.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "The mark is public/avandar/logo.png. The address is a placeholder and the command previews this study with the producer CLI."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "lockup",
+      "scene": "brand-lockup",
+      "durationInFrames": 210,
+      "transitionInFrames": 0,
+      "props": {
+        "logo": {
+          "src": "avandar/logo.png",
+          "aspectRatio": 1
+        },
+        "wordmark": "avandar",
+        "build": {
+          "atFrame": 5,
+          "columns": 8,
+          "staggerFrames": 1.5,
+          "durationInFrames": 8
+        },
+        "wordmarkAtFrame": 34,
+        "cta": {
+          "atFrame": 60,
+          "subtitle": "Every source in one workspace",
+          "url": "avandar.example",
+          "command": "pnpm video preview vocabulary/brand-lockup.json",
+          "commandCharsPerSecond": 30,
+          "badge": "Editorial study"
+        }
+      }
+    }
+  ]
+}

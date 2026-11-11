@@ -1,4 +1,4 @@
-import { CONTINUITY_CATALOG } from "../../../continuityCatalog";
+import { CONTINUITY_CATALOG, isSceneEntry } from "../../../continuityCatalog";
 import { useContinuityCopy } from "../../../useContinuityCopy";
 import { VocabularyControl } from "./VocabularyControl";
 import css from "./VocabularyGuide.module.css";
@@ -39,7 +39,9 @@ export function VocabularyGuide({ entry }: Props) {
       <h4>{translate("Controls to adapt")}</h4>
       <p>
         {translate(
-          "These paths refer to the continuity beat schema. Adjust the authored input, then inspect the result at native scale.",
+          isSceneEntry(entry)
+            ? "These paths are fields of a storyboard shot: its scene props, transition and theme. Adjust the plan in storyboards/vocabulary, then validate and preview it with the video CLI."
+            : "These paths refer to the continuity beat schema. Adjust the authored input, then inspect the result at native scale.",
         )}
       </p>
       <ul className={css.vocabularyGuideControls}>

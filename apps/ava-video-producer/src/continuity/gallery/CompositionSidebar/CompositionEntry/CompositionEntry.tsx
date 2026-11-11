@@ -1,3 +1,4 @@
+import { isSceneEntry } from "../../../continuityCatalog";
 import { useContinuityCopy } from "../../../useContinuityCopy";
 import css from "./CompositionEntry.module.css";
 import type { ContinuityCatalogEntry } from "../../../continuityCatalog";
@@ -7,17 +8,11 @@ type Props = {
   isSelected: boolean;
   onSelect: (id: string) => void;
 };
-const CATEGORY_LABELS: Record<string, string> = {
-  "motion-motion": "Motion to motion",
-  "motion-product": "Motion to product",
-  "product-motion": "Product to motion",
-  composite: "Product and motion",
-  transitions: "Transitions",
-  compositing: "Compositing",
-  compositions: "Composition recipes",
-};
 
-/** A selectable collection item with its category and authored duration. */
+/**
+ * A selectable collection item with its kind and authored duration. Its
+ * category is the sidebar group heading above it.
+ */
 export function CompositionEntry({ entry, isSelected, onSelect }: Props) {
   const translate = useContinuityCopy();
   return (
@@ -28,7 +23,7 @@ export function CompositionEntry({ entry, isSelected, onSelect }: Props) {
     >
       <strong>{translate(entry.title)}</strong>
       <small>
-        {translate(CATEGORY_LABELS[entry.category] ?? entry.category)} ·{" "}
+        {translate(isSceneEntry(entry) ? "Storyboard scenes" : "Continuity")} ·{" "}
         {Math.round(entry.frames / 30)} {translate("seconds")}
       </small>
     </button>

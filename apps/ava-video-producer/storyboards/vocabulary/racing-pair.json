@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "racing-pair",
+  "title": "Racing pair",
+  "description": "Two tilted windows flip in and split apart, each with a label above and a counter below that runs to its own end frame and turns the accent colour when it finishes.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features or performance.",
+    "Window contents are curated fictional Avandar screenshots from public/avandar/screens. The timings are fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "pair",
+      "scene": "tilted-window",
+      "durationInFrames": 180,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "background": "#0b0f17",
+        "card": "#1e293b"
+      },
+      "props": {
+        "layout": "pair",
+        "enter": {
+          "kind": "flip-split",
+          "atFrame": 10
+        },
+        "badge": "Saved",
+        "pair": [
+          {
+            "label": "Preview the import",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/import-import-preview.png"
+            },
+            "counter": {
+              "to": 9.4,
+              "unit": "s",
+              "startFrame": 24,
+              "endFrame": 96
+            },
+            "stat": "Fictional timing"
+          },
+          {
+            "label": "Save the dataset",
+            "window": {
+              "kind": "image",
+              "src": "avandar/screens/import-import-saved.png"
+            },
+            "counter": {
+              "to": 12.8,
+              "unit": "s",
+              "startFrame": 24,
+              "endFrame": 126
+            },
+            "stat": "Fictional timing"
+          }
+        ],
+        "footnote": "Fictional demonstration data",
+        "exit": {
+          "kind": "whip-left",
+          "atFrame": 170
+        }
+      }
+    }
+  ]
+}
