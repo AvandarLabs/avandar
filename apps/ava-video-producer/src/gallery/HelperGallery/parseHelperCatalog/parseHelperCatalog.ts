@@ -3,49 +3,43 @@ import type { HelperCatalog } from "../helperCatalog.types";
 
 const TEXT = z.string().min(1);
 
-const CATEGORY_SCHEMA = z
-  .object({ id: TEXT, title: TEXT, description: TEXT })
-  .strict();
+const CATEGORY_SCHEMA = z.strictObject({
+  id: TEXT,
+  title: TEXT,
+  description: TEXT,
+});
 
-const MODULE_SCHEMA = z
-  .object({
-    path: TEXT,
-    exhaustiveMembers: z.array(TEXT).default([]),
-    excluded: z.array(z.object({ name: TEXT, reason: TEXT }).strict()),
-  })
-  .strict();
+const MODULE_SCHEMA = z.strictObject({
+  path: TEXT,
+  exhaustiveMembers: z.array(TEXT).default([]),
+  excluded: z.array(z.strictObject({ name: TEXT, reason: TEXT })),
+});
 
-const HELPER_SCHEMA = z
-  .object({
+const HELPER_SCHEMA = z.strictObject({
+  id: TEXT,
+  title: TEXT,
+  category: TEXT,
+  description: TEXT,
+  source: TEXT,
+  exports: z.array(TEXT).min(1),
+  signature: TEXT,
+  defaults: z.array(z.strictObject({ name: TEXT, value: TEXT })),
+  usage: TEXT,
+  goodFor: TEXT,
+  avoid: TEXT,
+  usedBy: z.array(TEXT),
+  demo: z.strictObject({
     id: TEXT,
-    title: TEXT,
-    category: TEXT,
-    description: TEXT,
-    source: TEXT,
-    exports: z.array(TEXT).min(1),
-    signature: TEXT,
-    defaults: z.array(z.object({ name: TEXT, value: TEXT }).strict()),
-    usage: TEXT,
-    goodFor: TEXT,
-    avoid: TEXT,
-    usedBy: z.array(TEXT),
-    demo: z
-      .object({
-        id: TEXT,
-        frames: z.number().int().positive(),
-        assets: z.array(TEXT).optional(),
-      })
-      .strict(),
-  })
-  .strict();
+    frames: z.number().int().positive(),
+    assets: z.array(TEXT).optional(),
+  }),
+});
 
-const CATALOG_SCHEMA = z
-  .object({
-    categories: z.array(CATEGORY_SCHEMA).min(1),
-    modules: z.array(MODULE_SCHEMA).min(1),
-    helpers: z.array(HELPER_SCHEMA).min(1),
-  })
-  .strict();
+const CATALOG_SCHEMA = z.strictObject({
+  categories: z.array(CATEGORY_SCHEMA).min(1),
+  modules: z.array(MODULE_SCHEMA).min(1),
+  helpers: z.array(HELPER_SCHEMA).min(1),
+});
 
 function _assertUniqueIds(ids: readonly string[]): void {
   const seen = new Set<string>();
