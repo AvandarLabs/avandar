@@ -318,6 +318,31 @@ passed through as `'9'`). E01 to E03 ask about it; D01 to D04 run beside it.
 - The second dataset adds about 180 to 240 input tokens per call online
   (3,957 against 3,721 to 3,781 on the `attach-dictionaries:coded` runs) and
   22 offline (836 against 814). All online runs cost about $0.005.
+### Phase 1D
+
+Runs for dashboard actions from anywhere (D44,
+[phase-1d.md](specs/phase-1d.md)), archived under the `phase-1d` label. The
+dashboard questions D01 to D09 are described under "Questions and ground
+truth". Today's chat set the bar first, on 2026-11-11, before the agent's
+dashboard tool was built.
+
+| Run | Correct | D01 to D05 (open editor) | D06 to D09 (elsewhere) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|---|---|
+| phase-1d:today-dashboards #1 (D05 before its wording fix) | 5/9 | 5/5 | 0/4 | 1 / 0 | $0.00149 | 10,981 | 3.0 s / 9.1 s |
+| phase-1d:today-dashboards #2 | 5/9 | 5/5 | 0/4 | 0 / 0 | $0.00122 | 9,599 | 2.8 s / 4.7 s |
+| phase-1d:today-dashboards #3 | 5/9 | 5/5 | 0/4 | 0 / 0 | $0.00124 | 9,599 | 3.0 s / 4.8 s |
+
+- **The bar for the agent:** D01 to D05 at least 5/5, as today's chat
+  scores on every run, and D06 to D09 on all three agent runs.
+- Today's chat fails D06 to D09 by design. In the Data Explorer (D06) it
+  shows the chart in the explorer and adds nothing to the mentioned
+  dashboard. On a map page (D07 to D09) it offers a block that the app
+  drops, because no editor is open, and it never says a named dashboard
+  does not exist (D08).
+- On run #1, D05 ("What were total deaths in 2022?") asked which dataset
+  to use. With US and global deaths in the workspace, that question was
+  fair, so D05 now says "US deaths" (see "Changes made while running the
+  eval"). Runs #2 and #3 use the fixed wording. The three runs cost $0.035.
 
 ## Offline mode
 
@@ -415,7 +440,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --model Qwen3-
 # The coded-column questions over the measles line list
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --workspace measles
 
-# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S)
+# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S, D)
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions H,N11
 ```
 
@@ -619,6 +644,36 @@ they are graded by their count. They run only with `--workspace measles`, on
 the `pi` and `pi-local` harnesses. Since the converted-columns plan, D01 to
 D04 run with the linked dataset in the prompt beside the coded one, so their
 runs are not comparable with earlier runs.
+`covid/covidDashboardQuestions.ts` adds the dashboard questions D01 to D09.
+Each carries the workspace's `dashboards` (id, name, whether the user can
+edit it, tiles), the dashboard open in the editor when there is one
+(`openEditorDashboardId`), and `expectedWrite`: the one block the answer
+must add (its dashboard, whether it went into the open editor or through a
+confirmed card, its kind, and a check of its fields), or `none`. Every
+answer records the blocks it added (`dashboardWrites`).
+`runtime/gradeDashboardWrites.ts` grades that end state. A DataViz block's
+SQL runs in DuckDB and `grade` checks its result against ground truth. With
+`none`, any block fails the question, and the reply is then graded as
+usual. The baseline harness sends today's chat the page context the app
+sends (`harnesses/baseline/baselinePageContext.ts`): the dashboards app
+with the open editor's id, the Data Explorer's dataset and query, or
+`other`. It records a block as an editor write only when an editor is open,
+as `shouldQueueDashboardBlock` does, and names mentions by their type
+(D42). They run only with `--questions D`. Their ids are separate from the
+measles workspace's coded-column D01 to D04, which run only with
+`--workspace measles`.
+
+| Id | Page | Question shape |
+|---|---|---|
+| D01 | Dashboard editor | A line chart of monthly US deaths in 2022, in the open editor |
+| D02 | Dashboard editor | A heading with given text |
+| D03 | Dashboard editor | A warning callout |
+| D04 | Dashboard editor | A table of the top 5 states |
+| D05 | Dashboard editor | A data question: must add nothing, and answer correctly |
+| D06 | Data Explorer with a query on screen, a dashboard mentioned | "Add this as a bar chart to" the mentioned dashboard, through the card |
+| D07 | Map page | A weekly chart added to a dashboard named in the message, through the card |
+| D08 | Map page | A dashboard that does not exist: must add nothing and say it cannot find it |
+| D09 | Map page, two dashboards with the same name | The simulated user picks one on the card, and only that one gets the block |
 
 ### Metrics
 
@@ -695,6 +750,7 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The coded-column questions offline | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1 --workspace measles` |
 | The converted-column questions (add `--label dictionary-conversions:converted`) | `--harness pi --config haiku-sonnet --workspace measles` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
+| Today's chat on the dashboard questions (add `--label phase-1d:today-dashboards`) | `--harness baseline --model anthropic/claude-haiku-5.5 --questions D --concurrency 6` |
 
 The PDF table assistant has its own runner,
 `pnpm vite-script scripts/ai-eval/pdf/runPdfAssistEval.ts -- ...`:
@@ -730,7 +786,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 131 runs (every
+chat index lists all 134 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
@@ -749,6 +805,7 @@ Each was made after reading the failing answers by hand.
 | `lookup_values` cannot tell which place the user means | Agent prompt | GPT-5.6 Terra used a lookup instead of asking "Georgia: the state or the country?". |
 | A query result ends the turn, so run only the final query | Agent prompt and tool description | Haiku sometimes ran an exploratory query, which became the answer. |
 | Always ask when a name means different things in different datasets | Agent prompt | Haiku answered Georgia as the US state without asking. |
+| D05 says "US deaths" | Question | "What were total deaths in 2022?" could mean the US or the global deaths dataset, and today's chat rightly asked which (Phase 1D baseline run #1). |
 
 After the last two changes, needless and missed questions on the chosen
 setup went from 1 per run to 0.

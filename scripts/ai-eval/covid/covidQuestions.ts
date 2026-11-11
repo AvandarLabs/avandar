@@ -1,5 +1,6 @@
 import { ResultChecks } from "../grading/ResultChecks";
 import { MatcherText } from "../grading/ResultMatchers";
+import { DASHBOARD_QUESTIONS } from "./covidDashboardQuestions";
 import { MENTION_QUESTIONS } from "./covidMentionQuestions";
 import { PAGE_QUESTIONS } from "./covidPageQuestions";
 import { SCHEMA_QUESTIONS } from "./covidSchemaQuestions";
@@ -1008,4 +1009,5 @@ export const COVID_QUESTIONS: readonly EvalQuestion[] = [
   ...PAGE_QUESTIONS,
   ...MENTION_QUESTIONS,
   ...SCHEMA_QUESTIONS,
+  ...DASHBOARD_QUESTIONS,
 ];

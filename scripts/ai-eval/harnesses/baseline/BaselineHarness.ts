@@ -1,3 +1,5 @@
+import { getGadgetTypeName } from "$/agent/mentions/AgentGadgetContext";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
@@ -8,11 +10,17 @@ import { resolveEvalDiscovery } from "../../runtime/resolveEvalDiscovery";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
 import { addEvalUsage, EMPTY_EVAL_USAGE } from "../EvalHarness";
+import {
+  getBaselineBlockOutcome,
+  toBaselinePageContext,
+} from "./baselinePageContext";
 import { DenoChatTurnRunner } from "./DenoChatTurnRunner";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
-import type { EvalDatabase } from "../../runtime/EvalDatabase";
+import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
 import type { SimulatedAnswer } from "../../runtime/SimulatedUser";
 import type { EvalAnswer, EvalConversation, EvalHarness } from "../EvalHarness";
+import type { BaselinePageContext } from "./baselinePageContext";
 import type { DenoChatTurnResponse } from "./DenoChatTurnRunner";
 
 const MAX_MODEL_TURNS_PER_QUESTION = 6;
@@ -27,40 +35,9 @@ const COPY = {
 
 type ThreadMessage = { role: "user" | "assistant"; content: string };
 
-type ExplorerContext = {
-  app: "data-explorer";
-  openDatasetId?: string;
-  lastSql?: string;
-  lastResultColumns?: Array<{ name: string; dataType: string }>;
-  lastError?: string;
-};
-
 type Clarification = NonNullable<
   NonNullable<DenoChatTurnResponse["result"]>["clarification"]
 >;
-
-/**
- * Today's chat page context for a question whose screen is the Data
- * Explorer. Other screens leave the context as the conversation built it:
- * today's chat sees no tiles, maps, or case types.
- */
-function _toExplorerContext(
-  pageContext: NonNullable<EvalQuestion["pageContext"]>,
-): ExplorerContext {
-  const { dataset, explorer } = pageContext;
-  return {
-    app: "data-explorer",
-    ...(dataset ? { openDatasetId: dataset.id } : {}),
-    ...(explorer?.sql ? { lastSql: explorer.sql } : {}),
-    ...(explorer?.resultColumns.length
-      ? {
-          lastResultColumns: explorer.resultColumns.map((column) => {
-            return { ...column };
-          }),
-        }
-      : {}),
-  };
-}
 
 /** The reply text for applied SQL, as `applyChatTurnResponse` builds it. */
 function _buildThreadText(
@@ -77,12 +54,16 @@ function _buildThreadText(
 /** The SQL a response asks the explorer to run, with its chart type. */
 function _getAppliedSql(
   result: NonNullable<DenoChatTurnResponse["result"]>,
+  context: BaselinePageContext,
 ): { sql: string; vizType?: string } | undefined {
   if (result.generatedSql?.sql) {
     return { sql: result.generatedSql.sql };
   }
   const block = result.dashboardBlock;
-  if (block?.kind === "DataViz" && block.sql) {
+  if (
+    block?.kind === "DataViz" &&
+    getBaselineBlockOutcome(context, block).kind === "explorer_chart"
+  ) {
     return { sql: block.sql, vizType: block.vizType };
   }
   return undefined;
@@ -101,7 +82,7 @@ function _needsConsent(values: readonly string[]): boolean {
  */
 class BaselineConversation implements EvalConversation {
   private readonly messages: ThreadMessage[] = [];
-  private context: ExplorerContext = { app: "data-explorer" };
+  private context: BaselinePageContext = { app: "data-explorer" };
 
   constructor(
     private readonly runner: DenoChatTurnRunner,
@@ -119,11 +100,14 @@ class BaselineConversation implements EvalConversation {
       toolNames: [],
       usage: EMPTY_EVAL_USAGE,
       latencyMs: 0,
+      dashboardWrites: [],
     };
-    if (question.pageContext?.app === "data-explorer") {
-      this.context = _toExplorerContext(question.pageContext);
-    }
-    this.messages.push({ role: "user", content: question.prompt });
+    this.context = toBaselinePageContext(question) ?? this.context;
+    // Today's chat hears each mention by its type only (D42).
+    this.messages.push({
+      role: "user",
+      content: ChatMentionToken.toModelText(question.prompt, getGadgetTypeName),
+    });
     for (let turn = 0; turn < MAX_MODEL_TURNS_PER_QUESTION; turn += 1) {
       const isDone = await this.runModelTurn(question, answer);
       if (isDone) {
@@ -160,7 +144,10 @@ class BaselineConversation implements EvalConversation {
       answer.error = `Chat request failed: ${response.error ?? "no response"}`;
       return true;
     }
-    const appliedSql = _getAppliedSql(response.result);
+    if (await this.applyDashboardBlock(response.result, answer)) {
+      return true;
+    }
+    const appliedSql = _getAppliedSql(response.result, this.context);
     const userTexts = this.messages.flatMap((message) => {
       return message.role === "user" ? [message.content] : [];
     });
@@ -195,6 +182,54 @@ class BaselineConversation implements EvalConversation {
     return true;
   }
 
+  /**
+   * Adds a block to the open editor's dashboard, or drops it on a page
+   * without one, as the app does. Returns false when the block is the
+   * Data Explorer's to handle, or there is none.
+   */
+  private async applyDashboardBlock(
+    result: NonNullable<DenoChatTurnResponse["result"]>,
+    answer: EvalAnswer,
+  ): Promise<boolean> {
+    const block = result.dashboardBlock;
+    if (!block) {
+      return false;
+    }
+    const outcome = getBaselineBlockOutcome(this.context, block);
+    if (
+      outcome.kind === "explorer_chart" ||
+      outcome.kind === "dashboard_only"
+    ) {
+      return false;
+    }
+    this.messages.push({ role: "assistant", content: result.assistantText });
+    answer.assistantText = result.assistantText;
+    if (outcome.kind === "dropped") {
+      answer.error = "Offered a dashboard block with no editor open";
+      return true;
+    }
+    answer.dashboardWrites?.push({
+      dashboardId: outcome.dashboardId,
+      via: "editor",
+      block,
+      ...(await this.runBlockSql(block)),
+    });
+    return true;
+  }
+
+  /** A DataViz block's result, the way the editor would run its SQL. */
+  private async runBlockSql(
+    block: ChatGeneratedDashboardBlock,
+  ): Promise<{ result?: EvalQueryResult; error?: string }> {
+    if (block.kind !== "DataViz") {
+      return {};
+    }
+    const outcome = await runEvalSql(this.database, block.sql);
+    return outcome.kind === "failed"
+      ? { error: outcome.error }
+      : { result: outcome.result };
+  }
+
   private async applySql(
     appliedSql: { sql: string; vizType?: string },
     assistantText: string,
@@ -211,8 +246,14 @@ class BaselineConversation implements EvalConversation {
     answer.assistantText = threadText;
     answer.finalSql = appliedSql.sql;
     answer.vizType = appliedSql.vizType;
+    // The page context follows the route: SQL applied on another page does
+    // not turn it into the Data Explorer.
+    const isOnExplorer = this.context.app === "data-explorer";
     if (outcome.kind === "failed") {
       answer.error = outcome.error;
+      if (!isOnExplorer) {
+        return;
+      }
       this.context = {
         app: "data-explorer",
         lastSql: appliedSql.sql,
@@ -221,6 +262,9 @@ class BaselineConversation implements EvalConversation {
       return;
     }
     answer.result = outcome.result;
+    if (!isOnExplorer) {
+      return;
+    }
     this.context = {
       app: "data-explorer",
       lastSql: appliedSql.sql,

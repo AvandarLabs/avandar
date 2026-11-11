@@ -13,6 +13,7 @@
  * `--questions M` runs the mention questions (gadgets the user mentions or
  * attaches). `--questions R` runs the fitRegression question, which calls the
  * epidemiology plugin's tool on a result the Data Explorer shows.
+ * `--questions D` runs the dashboard questions (adding a block).
  *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.

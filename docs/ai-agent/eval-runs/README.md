@@ -144,3 +144,6 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-13T20-44-22](2026-11-13T20-44-22-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00016 | 1.7 s / 2.0 s | none |
 | [2026-11-13T20-44-29](2026-11-13T20-44-29-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00014 | 1.8 s / 2.1 s | none |
 | [2026-11-13T20-46-47](2026-11-13T20-46-47-dictionary-conversions_converted-offline/results.jsonl) | `dictionary-conversions:converted-offline` | 6/7 | 1 | 0 | $0.00000 | 8.6 s / 76.8 s | D04 |
+| [2026-11-11T19-32-45](2026-11-11T19-32-45-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 1 | 0 | $0.00149 | 3.0 s / 9.1 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-07](2026-11-11T19-33-07-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00122 | 2.8 s / 4.7 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-16](2026-11-11T19-33-16-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00124 | 3.0 s / 4.8 s | D06 D07 D08 D09 |

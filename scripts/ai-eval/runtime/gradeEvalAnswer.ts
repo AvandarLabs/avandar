@@ -1,3 +1,4 @@
+import { gradeDashboardWrites } from "./gradeDashboardWrites";
 import type { EvalQuestion } from "../EvalQuestion";
 import type { EvalAnswer } from "../harnesses/EvalHarness";
 import type { EvalQueryResult } from "./EvalDatabase";
@@ -83,6 +84,10 @@ function _gradeResult(
 ): { pass: boolean; detail: string } {
   if (question.fitRegression) {
     return _gradeFitRegression(question.fitRegression.slope, answer);
+  }
+  const writeVerdict = gradeDashboardWrites(question, answer, truth);
+  if (writeVerdict) {
+    return writeVerdict;
   }
   if (question.gradeText) {
     if (answer.finalSql !== undefined || answer.result) {
