@@ -1,8 +1,12 @@
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
-import { DATA_AGENT_TOOLS } from "$/agent/dataAgent/dataAgentTools.ts";
+import {
+  DATA_AGENT_TOOLS,
+  PLUGIN_TOOL_PROMPT_IDS,
+} from "$/agent/dataAgent/dataAgentTools.ts";
 import { makeDataAgentToolsFromPluginAiTools } from "$/agent/dataAgent/makeDataAgentToolsFromPluginAiTools.ts";
+import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen.ts";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
 import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types.ts";
@@ -43,10 +47,11 @@ function _assertKnownTools(
  * The request the agent proxy sends to the model: the server's own system
  * prompt (built from the workspace's datasets) and tool list, and only the
  * conversation from the browser. Any system message the browser sends is
- * dropped, so a caller cannot replace the prompt or add tools, and a tool
- * call or result for a tool the agent does not have is refused. The tools
- * are the built-in `DATA_AGENT_TOOLS` followed by `pluginTools`, the plugin
- * tools active in the workspace.
+ * dropped, so a caller cannot replace the prompt or add tools. A tool call
+ * or result is refused unless it names a tool offered now or one a bundled
+ * plugin declares. The tools are the built-in `DATA_AGENT_TOOLS` followed by
+ * `pluginTools`, the plugin tools active in the workspace, which only a
+ * prompt version in `PLUGIN_TOOL_PROMPT_IDS` is offered.
  */
 export function buildDataAgentProxyContext(
   options: Readonly<{
@@ -57,9 +62,12 @@ export function buildDataAgentProxyContext(
     pluginTools: readonly PluginAiToolDeclaration[];
   }>,
 ): Context {
+  const pluginTools = PLUGIN_TOOL_PROMPT_IDS.includes(options.promptId)
+    ? options.pluginTools
+    : [];
   const tools = [
     ...DATA_AGENT_TOOLS,
-    ...makeDataAgentToolsFromPluginAiTools(options.pluginTools),
+    ...makeDataAgentToolsFromPluginAiTools(pluginTools),
   ].map((tool) => {
     return {
       name: tool.name,
@@ -67,8 +75,10 @@ export function buildDataAgentProxyContext(
       parameters: tool.parameters,
     };
   });
+  // A bundled plugin tool stays allowed in the history after it stops being
+  // offered, as when an admin disables its plugin mid-conversation.
   const toolNames = new Set(
-    tools.map((tool) => {
+    [...tools, ...PLUGIN_AI_TOOLS].map((tool) => {
       return tool.name;
     }),
   );

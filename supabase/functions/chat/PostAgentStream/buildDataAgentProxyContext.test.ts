@@ -123,13 +123,35 @@ describe("buildDataAgentProxyContext", () => {
     expect(v4.systemPrompt).toContain("A plugin tool");
   });
 
-  it("refuses fitRegression when the proxy was not given the tool", () => {
+  it("keeps a past fitRegression call after the tool stops being offered", () => {
+    const context = buildDataAgentProxyContext({
+      clientMessages: [
+        {
+          role: "assistant",
+          content: [{ type: "toolCall", name: "fitRegression" }],
+        },
+        { role: "toolResult", toolName: "fitRegression", content: [] },
+      ],
+      datasets: [],
+      today: "2026-11-10",
+      promptId: "data-agent-v4",
+      pluginTools: [],
+    });
+    expect(context.messages).toHaveLength(2);
+    expect(
+      context.tools?.map((tool) => {
+        return tool.name;
+      }),
+    ).not.toContain("fitRegression");
+  });
+
+  it("refuses a call to a plugin tool no bundled plugin declares", () => {
     expect(() => {
       buildDataAgentProxyContext({
         clientMessages: [
           {
             role: "assistant",
-            content: [{ type: "toolCall", name: "fitRegression" }],
+            content: [{ type: "toolCall", name: "exportRows" }],
           },
         ],
         datasets: [],
@@ -137,8 +159,30 @@ describe("buildDataAgentProxyContext", () => {
         promptId: "data-agent-v4",
         pluginTools: [],
       });
-    }).toThrow('The data agent has no tool "fitRegression"');
+    }).toThrow('The data agent has no tool "exportRows"');
   });
+
+  it.each(["data-agent-v1", "data-agent-v2", "data-agent-v3"] as const)(
+    "offers no plugin tools to %s, whose prompt does not describe them",
+    (promptId) => {
+      const context = buildDataAgentProxyContext({
+        clientMessages: [],
+        datasets: [],
+        today: "2026-11-10",
+        promptId,
+        pluginTools: [EPIDEMIOLOGY_TOOL],
+      });
+      expect(
+        context.tools?.map((tool) => {
+          return tool.name;
+        }),
+      ).toEqual(
+        DATA_AGENT_TOOLS.map((tool) => {
+          return tool.name;
+        }),
+      );
+    },
+  );
 
   it("offers fitRegression when the proxy was given the tool", () => {
     const context = buildDataAgentProxyContext({

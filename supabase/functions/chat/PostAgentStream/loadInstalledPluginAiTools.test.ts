@@ -21,6 +21,25 @@ const EPIDEMIOLOGY_TOOL: PluginAiToolDeclaration = {
   },
 };
 
+function _buildFailingClient(): AvaSupabaseClient {
+  const throwOnError = vi.fn(async () => {
+    throw new Error("permission denied for table plugin_installations");
+  });
+  return {
+    from: () => {
+      return {
+        select: () => {
+          return {
+            eq: () => {
+              return { throwOnError };
+            },
+          };
+        },
+      };
+    },
+  } as unknown as AvaSupabaseClient;
+}
+
 function _buildFakeClient(rows: readonly unknown[]): {
   client: AvaSupabaseClient;
   from: ReturnType<typeof vi.fn>;
@@ -87,5 +106,21 @@ describe("loadInstalledPluginAiTools", () => {
     });
 
     expect(tools).toEqual([]);
+  });
+
+  it("offers no plugin tools when the installations cannot be read", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const tools = await loadInstalledPluginAiTools({
+      supabaseClient: _buildFailingClient(),
+      workspaceId: WORKSPACE_ID,
+      tools: [EPIDEMIOLOGY_TOOL],
+    });
+
+    expect(tools).toEqual([]);
+    expect(console.error).toHaveBeenCalledWith(
+      "Could not read plugin installations for the data agent",
+      expect.any(Error),
+    );
   });
 });

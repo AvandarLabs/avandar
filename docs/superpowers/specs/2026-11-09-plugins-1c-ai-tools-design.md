@@ -61,7 +61,7 @@ The agent is off unless `VITE_AVA_DATA_AGENT=on` or this browser's
 | 5 | What the person sees | The model's reply only |
 | 6 | How a tool is offered | `contributes.aiTools` in the manifest. One shared module, derived from the manifests, is what the proxy and the browser import. The proxy appends a tool only when that plugin's install status is `installed`, the same state that shows its commands |
 | 7 | Tool name | The manifest `name`, with no prefix. `ava plugin validate` fails when two bundled plugins declare the same name |
-| 8 | Prompt | v1, v2, and v3 stay byte for byte. The current prompt becomes `data-agent-v4`, which is v3 plus one sentence. Tools stay shared across prompt versions, as they are today |
+| 8 | Prompt | v1, v2, and v3 stay byte for byte. The current prompt becomes `data-agent-v4`, which is v3 plus one sentence. Built-in tools stay shared across prompt versions. Plugin tools go only to v4 |
 
 ## Manifest
 
@@ -131,8 +131,18 @@ already import.
 converted tools whose plugin id is installed in the workspace. Install
 status uses the same rule as the browser host: `installed` after the
 manifest's permissions are granted. A pending install contributes nothing.
+If the installations cannot be read, the proxy offers no plugin tools and
+still answers, rather than failing every turn.
 
-A tool call or tool result for any other name is refused, as today.
+Only `data-agent-v4` is offered plugin tools. A tab still on v1, v2, or v3
+has no code to run one, so those versions get the built-in tools alone.
+
+A tool call or tool result in the history is accepted when it names a tool
+offered now or any tool a bundled plugin declares. The second case keeps a
+conversation working after its plugin is disabled, its permission revoked,
+or its manifest asks for a new permission: the model is no longer offered
+the tool, but the earlier call stays in the history. Any other name is
+refused, as today.
 
 The system prompt for `data-agent-v4` is the v3 text plus this sentence at
 the end of the TOOLS section:
@@ -252,8 +262,10 @@ a stack, or a cell value.
   rejected.
 - `pluginAiTools.gen.ts` matches a fresh read of the manifests.
 - The proxy includes `fitRegression` when the epidemiology plugin is
-  `installed`, omits it otherwise, and refuses a call to it when it was
-  omitted. An unknown tool is still refused.
+  `installed` and the prompt is v4, and omits it otherwise. A past
+  `fitRegression` call stays accepted after the tool is omitted. A name no
+  bundled plugin declares is still refused. A failed installations read
+  offers no plugin tools.
 - The hosted tool list includes the tool for an installed plugin. The
   offline tool list does not.
 - Result choice: the explorer's current result when the page is the Data
