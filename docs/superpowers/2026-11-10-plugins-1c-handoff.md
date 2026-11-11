@@ -61,14 +61,16 @@ Do these before treating the slice as finished. None of them are a new slice.
    - The proxy offers plugin tools only to `data-agent-v4`, and falls back to none when the installations read fails.
    - A forwarded `InvalidToolInput` message is capped at 2,048 UTF-8 bytes.
    - Wiring tests were added for the plugin tool getter, the Data Explorer flag, and handler loading. `createPiConversation` was split under 45 lines.
-2. **The live eval was not run.** `OPEN_ROUTER_API_KEY` is in `.env.development.edge`. `~/cleaned-test-data` was not on the machine, and `.temp/ai-eval/` had no earlier score. When the data is available:
+2. **The live eval ran on 2026-11-11** with `pi` and `anthropic/claude-haiku-5.5`. `~/cleaned-test-data` is a symlink to Pablo's test-data folder.
 
    ```bash
    pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --model anthropic/claude-haiku-5.5 --questions R
    pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --model anthropic/claude-haiku-5.5
    ```
 
-   `R` must pass. The default 45 must not score lower than the last recorded run. If there is still no recorded run, report the score and do not invent a baseline.
+   - `R01` passed: the model called `fitRegression` and stated the slope.
+   - The default 45 scored 42/45 ($0.00033 per question, 2.4s p50). This is the first recorded run, so it becomes the baseline.
+   - The failures were H06, N02 and N04. None of the 45 was offered `fitRegression`, since the eval offers it only after a result is published. Three reruns of the failed questions passed every time, except N04, which failed once more. On N04 ("which country did best"), the model sometimes leaves out countries with zero deaths, while the expected answer starts with one.
 3. **Sync with `origin/demo/measles` before any merge.** Synced on 2026-11-11 (merge `576790617`, no conflicts). Check the count again before merging, since measles keeps moving.
 4. **Push and merge only when Pablo asks**, each time. Merge with `--no-ff` in a temporary worktree from `origin/demo/measles`, confirm the merge tree, then `git push origin HEAD:demo/measles`. A push to `demo/**` deploys.
 
