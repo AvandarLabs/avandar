@@ -52,7 +52,8 @@
     "Layer visibility, selected layer and feature inspection are controlled by the authored frame. The map camera is applied by the product's useMapViewSync jumpTo path. Circle paint transitions have zero duration so they cannot depend on wall time.",
     "The feature drawer keeps the original FeatureInspector and uses a frame-calculated height wrapper. Native MapLibre NavigationControl is docked beside the measured inspector to avoid covering Export at the film's bounded viewport.",
     "Cursor annotations identify actual rendered controls. The transparent facility marker receives only native map.project coordinates at idle and is explicitly tagged as a canvas projection for hit testing. It does not draw a replacement point.",
-    "Native map idle and shared font/layout readiness delay rendering. The camera, visibility and drawer remain seekable without backend queries or persistence mutations."
+    "Native map idle and shared font/layout readiness delay rendering. The camera, visibility and drawer remain seekable without backend queries or persistence mutations.",
+    "The RichTextComposer's gadget summaries and @-mention search are aliased to film-only shims (shims/cases-map/useGadgetSummaries.ts, searchGadgets.ts). The real ones query Supabase and DuckDB-backed clients, which cannot be bundled for the browser film. The fixtures reference no gadgets and the film never opens the mention menu, so every gadget reads as unavailable and search finds nothing."
   ],
   "fixtureMetrics": {
     "cases": 240,
