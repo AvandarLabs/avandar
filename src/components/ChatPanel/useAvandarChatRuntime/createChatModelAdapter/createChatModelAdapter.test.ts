@@ -378,6 +378,34 @@ describe("createChatModelAdapter with the agent on", () => {
     );
   });
 
+  it("offers the agent the AI tools of the plugins active when it asks", async () => {
+    const activePluginsRef = {
+      current: [{ entry: { id: "avandar.epidemiology" } }],
+    };
+    await _ask(
+      _createAdapter("dashboards", {
+        activePluginsRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+    const { getPluginAiTools } = runDataAgentTurnMock.mock.calls[0]![0];
+    const toToolNames = () => {
+      return getPluginAiTools().map((tool: { name: string }) => {
+        return tool.name;
+      });
+    };
+
+    expect(toToolNames()).toEqual(["fitRegression"]);
+    activePluginsRef.current = [];
+    expect(toToolNames()).toEqual([]);
+  });
+
+  it("offers the agent no plugin AI tools without active plugins", async () => {
+    await _ask(_createAdapter("dashboards"));
+
+    const { getPluginAiTools } = runDataAgentTurnMock.mock.calls[0]![0];
+    expect(getPluginAiTools()).toEqual([]);
+  });
+
   it("keeps the page from when the turn started after a navigation", async () => {
     const pathnameRef = { current: "/acme/dashboards" };
     const dashboardEditorStateRef = { current: { selectedItem: "tile-1" } };

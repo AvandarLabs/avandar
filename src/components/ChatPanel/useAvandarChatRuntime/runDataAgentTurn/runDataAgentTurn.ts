@@ -161,8 +161,8 @@ async function _invokePluginAiTool(
 
 /**
  * Runs a plugin AI tool against what this conversation's turn has on
- * screen: the Data Explorer's result when the user is on it, else the
- * conversation's last chat result.
+ * screen: the Data Explorer's result when the user is on it, else the last
+ * chat result any turn of this conversation showed.
  */
 async function _runConversationPluginAiTool(
   conversation: AgentConversationState,
@@ -174,7 +174,7 @@ async function _runConversationPluginAiTool(
   return runPluginAiTool({
     ...request,
     isDataExplorer: turn.pageContext?.app === "data-explorer",
-    chatResults: conversation.results,
+    chatResults: conversation.resultsByTurn.flat(),
     runQuery: (sql) => {
       return WorkspaceQuerySession.runQuery({
         rawSql: sql,

@@ -75,6 +75,7 @@ export function createAgentConversation(
   const state: AgentConversationState = {
     turnRef: options.turnRef,
     results: [],
+    resultsByTurn: [],
     sqlVault: createSqlPlaceholderVault(),
   };
   const host = createConversationAgentHost(state);

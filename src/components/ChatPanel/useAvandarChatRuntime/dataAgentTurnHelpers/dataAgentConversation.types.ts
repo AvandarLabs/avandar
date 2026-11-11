@@ -83,6 +83,12 @@ export type AgentConversationState = {
   turnRef: { current: DataAgentTurnOptions };
   results: AgentQueryResultData[];
   /**
+   * Each turn's `results` list, oldest first, including this turn's. A
+   * plugin AI tool off the Data Explorer reads the last result in them, so a
+   * result an earlier turn showed stays on screen for the next one.
+   */
+  resultsByTurn: AgentQueryResultData[][];
+  /**
    * Created with the conversation. Page blocks hide values with it, and the
    * host restores them before SQL runs. An offline conversation sends no
    * page block, so its vault stays empty and restoring changes nothing.

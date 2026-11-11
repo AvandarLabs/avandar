@@ -76,6 +76,7 @@ function _state(turn: DataAgentTurnOptions): AgentConversationState {
   return {
     turnRef: { current: turn },
     results: [],
+    resultsByTurn: [],
     sqlVault: createSqlPlaceholderVault(),
   };
 }

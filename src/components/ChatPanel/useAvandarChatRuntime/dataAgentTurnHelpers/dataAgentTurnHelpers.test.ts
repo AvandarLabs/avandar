@@ -208,6 +208,7 @@ describe("askConversationDataAgent", () => {
       asked,
       turnRef: { current: _createTurnOptions() },
       results: [],
+      resultsByTurn: [],
       datasets: [],
       dataAgent: {
         agent: { abort: vi.fn() },

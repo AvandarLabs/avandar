@@ -345,6 +345,7 @@ export async function askConversationDataAgent(
   const results: AgentQueryResultData[] = [];
   conversation.turnRef.current = turn;
   conversation.results = results;
+  conversation.resultsByTurn.push(results);
   turn.chatPanelDispatch.setPendingClarification(undefined);
   const inputs = options.buildTurnInputs?.(conversation);
   const blocks = inputs?.blocks ?? {};
