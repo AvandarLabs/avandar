@@ -1,11 +1,11 @@
 ---
 name: animation-observation
-description: Watches a reference video with Gemini Argon 4, writes a motion, composition, and transition spec with a storyboard script, adds any missing Motion Atlas pieces, and rebuilds the film with Avandar content in apps/ava-video-producer. Optionally evaluates the copy with Argon and hardens this skill until the copy is acceptable. Only run when explicitly requested with a video URL or file path.
+description: Watches a reference video with Gemini Argon 4, writes a motion, composition, and transition spec with a storyboard script, adds any missing Motion Atlas pieces, and rebuilds the film with Avandar content in apps/ava-video-producer. Optionally has Argon compare the copy to the original and fixes the film until the copy is acceptable. Only run when explicitly requested with a video URL or file path.
 disable-model-invocation: true
 argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
 metadata:
   author: jpsyx
-  version: "0.6.0"
+  version: "0.7.0"
   tags: avandar, video, remotion, motion-atlas, gemini
 ---
 
@@ -29,9 +29,10 @@ the speed and vibe match. Stylistic tweaks may remain.
 2. **Ask about evaluation** unless the invocation already said `evaluate` /
    `skip-evaluation` (or plainly asked to evaluate or skip it). There is no
    default. Ask in one question, with this one-sentence reminder:
-   > The evaluation phase renders the copy, has Argon 4 compare it to the
-   > original, and then hardens this skill and re-runs until the copy is
-   > acceptable (costlier: several renders and Argon calls).
+   > The evaluation phase has Argon 4 compare the rendered copy to the
+   > original, score it, and list the differences, then fixes the film and
+   > re-checks until it is acceptable (costlier: extra renders and Argon
+   > calls).
 3. Read, in this order:
    - `apps/ava-video-producer/AGENTS.md`
    - `apps/ava-video-producer/.claude/skills/product-demo/SKILL.md`
@@ -152,9 +153,10 @@ artifacts live in the ignored `.videos/<slug>/`:
    Add a `## Verification` table at the top of `motion-spec.md`: claim,
    verdict (correct / corrected / unverified), correction. Fix every wrong
    value in the body too: the body is what gets built, and it wins over the
-   table if they ever disagree. Count the corrections: in the evaluation phase each one is
-   a prompt weakness to fix, and the count across runs shows whether the
-   prompts are improving.
+   table if they ever disagree. Count the corrections and report the count.
+   About a quarter of a spec's fine detail (cap heights, text colours,
+   exact end frames) typically needs correcting; this step exists to catch
+   it, so do not skip it.
 
 ## Phase 2: Inventory
 
@@ -202,6 +204,12 @@ the Motion Atlas gallery. Then:
    be shown. Never copy the reference's words, logo, or product.
 3. Colors come from Avandar tokens. Keep the reference's color ROLES (dark
    field vs. accent field vs. light field, one accent vs. many).
+   When the spec says a window's or screen's contents move (typing,
+   scrolling, a cursor, live updates), use product footage, not a still:
+   `tilted-window` and `media` take `kind: "video"` sources, and a tall
+   still with `scrollSteps` only covers stepped scrolling. Record footage
+   through the producer's capture pipeline (`docs/capture-pipeline.md`); if
+   no flow covers it, use the closest still and list the gap in the report.
 4. Validate, preview, and read the contact sheet. Fix what the sheet shows.
 5. Render the mp4 (see the reference for the command). Read a few frames of
    the render.
@@ -250,30 +258,33 @@ copy as well as the original. Write the verdicts to
 `research/eval/iteration-<n>-review.md`: claim, confirmed / wrong / partly
 right, evidence, and anything Argon missed.
 
-## Phase 6: Harden and repeat
+## Phase 6: Fix the film and repeat
 
-When the copy is not acceptable, fix the cause, not the symptom, in this
-priority order:
+When the copy is not acceptable, fix the film, not the skill's prompts:
 
-1. `blame: spec` differences and Phase 1 corrections: harden
-   `prompts/observe.md` so any future spec states it. Add a **general** rule
-   (a measurement rule, a required field, a check to perform), never a fact
-   about this one video. Test: would the rule help on a different video?
-2. `blame: platform`: build the missing capability (Phase 3), generically.
-3. `blame: build`: fix the film, and if the mistake came from unclear
-   guidance, add it to `references/argon-to-remotion.md`. This is the lowest
-   priority. The spec should be clear enough for any implementer.
-4. Compare-prompt problems (wrong alignment, a false claim): harden
-   `prompts/compare.md`.
+1. `blame: build`: fix the storyboard or its assets. If the mistake came
+   from unclear guidance, add a general rule to
+   `references/argon-to-remotion.md`.
+2. `blame: platform`: build the missing capability (Phase 3), generically,
+   then rebuild the film.
+3. `blame: spec`: correct `motion-spec.md` from frames (Phase 1 step 4) and
+   rebuild the affected shots. Do **not** edit `prompts/observe.md`,
+   `prompts/refine.md`, or `prompts/compare.md` during a run: tuning them
+   stopped improving spec accuracy after a few runs (see the hardening log),
+   and the frame check catches what they miss. Record the difference in the
+   hardening log instead, so a maintainer can decide whether a prompt change
+   is worth testing across several videos.
 
-Append one entry per iteration to
-[references/hardening-log.md](references/hardening-log.md): scores, top
-differences, and which file changed and why. Bump `metadata.version`.
+Re-run from Phase 4 and re-evaluate. Stop when the copy is acceptable, or
+after three iterations; then report the best iteration, the remaining
+differences, and what blocks acceptance.
 
-Then re-run from Phase 1 when the observe prompt changed (a fresh spec), or
-from Phase 4 otherwise. Stop when the copy is acceptable, or after five
-iterations; then report the best iteration, the remaining differences, and
-what blocks acceptance.
+Append one entry per run to
+[references/hardening-log.md](references/hardening-log.md): scores, spec
+correction count, top differences, and any skill file changed and why. Name
+runs by number and skill version, never by the reference video, and never
+describe the reference's content. Bump `metadata.version` when a skill file
+changes.
 
 ## Report
 

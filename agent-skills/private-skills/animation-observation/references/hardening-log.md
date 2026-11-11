@@ -24,7 +24,7 @@ measurement rules in `prompts/observe.md`:
   away with blur under the wipe. The transition catalog now asks for every
   layer's motion.
 
-## Run 1, Phase 1 (octet-copy, skill 0.1.0)
+## Run 1, Phase 1 (skill 0.1.0)
 
 No film yet. These are the corrections the frame check needed on Argon's
 spec, treated as prompt weaknesses before building.
@@ -51,7 +51,7 @@ spec, treated as prompt weaknesses before building.
 - Reference gaps added to `argon-to-remotion.md`: per-shot background,
   placing a boundary by its class, brand marks with different geometry.
 
-## Run 2, Phase 1 (octet-v2, skill 0.2.0)
+## Run 2, Phase 1 (skill 0.2.0)
 
 - Spec accuracy: 22 of 50 checked claims corrected (44%, down from 55%).
   7 of run 1's 18 corrections now right first time, 9 partly.
@@ -71,7 +71,7 @@ spec, treated as prompt weaknesses before building.
 - SKILL.md: the refine command used an unquoted `$CLIPS` that zsh does not
   split; `--clips-from <draft>` now plans clips inside `argon.mjs`.
 
-## Run 1, Phase 3 build (octet-copy)
+## Run 1, Phase 3 build
 
 - Built: per-shot `theme`, `stepped-column-wipe`, `tilted-window`,
   `brand-lockup`, `bar-comparison`, typography reveal modes, graph packets,
@@ -87,7 +87,7 @@ spec, treated as prompt weaknesses before building.
   reference now asks for a baseline run, and to restore regenerated
   catalogs before committing.
 
-## Run 3, Phase 1 (octet-v3, skill 0.3.0)
+## Run 3, Phase 1 (skill 0.3.0)
 
 - Spec accuracy: 20 of 78 checked claims corrected (26%, down from 44%).
   10 of run 2's 21 corrections now right first time, 3 partly.
@@ -110,9 +110,9 @@ spec, treated as prompt weaknesses before building.
 - The raw spec quoted on-screen words and claimed every boundary exact;
   both are now explicit prompt rules.
 
-## Run 1, Phase 4 film (octet-v3 spec, skill 0.4.0)
+## Run 3, Phase 4 film (skill 0.4.0)
 
-- Rendered 2357 frames, matching the reference. The gate failed only at
+- The film's frame count matched the reference. The gate failed only at
   planned boundaries (hard cuts, wipes, whip-out exits).
 - **Spec ambiguity: where an `overlap` boundary sits.** The spec put it at
   full cover, the reference said the transition starts the incoming shot,
@@ -125,7 +125,7 @@ spec, treated as prompt weaknesses before building.
   fictional-data label, reading previews still by still, gate policy for
   exit frames and in-shot luma, and flaky-test baselines.
 
-## Iteration 1 evaluation (octet-v3 film, skill 0.4.0)
+## Run 3, evaluation iteration 1 (skill 0.4.0)
 
 - **Acceptable.** Argon: motion 8.5, transitions 9.0, composition 8.5,
   pacing 10, vibe 8.5, overall 8.9; no critical differences, one major
@@ -139,7 +139,7 @@ spec, treated as prompt weaknesses before building.
   forbidden); it missed a window running off the frame edge (now asked to
   check stills for layout defects). `--dry-run` now estimates tokens.
 
-## Run 4, Phase 1 (octet-v4, skill 0.4.0)
+## Run 4, Phase 1 (skill 0.4.0)
 
 - Spec accuracy flat: 23 of 98 claims corrected (23%, run 3 26%). Detail
   errors dominate: cap heights, line colour roles (wrong four runs
@@ -152,14 +152,14 @@ spec, treated as prompt weaknesses before building.
   not its contents; a hex colour per text line; SKILL.md states the claim
   kinds and tolerance (2 frames or 2%) for verification.
 
-## One-shot run (octet-oneshot, skill 0.5.0): acceptable
+## Run 5, one-shot (skill 0.5.0): acceptable
 
 One fresh agent ran Phases 1-5 from the URL with only the skill as guidance.
 
 - Spec: 23 of 90 checked claims corrected (26%) before building.
 - Inventory: 25 spec ids, 22 exact, 3 adapt, 0 missing (earlier runs had
   added the scenes). Built the 3 adapts generically.
-- Film: 2357 frames, matching. Gate failed only at intentional cuts plus
+- Film: frame count matching the reference. Gate failed only at intentional cuts plus
   one tiled-frame false positive next to a boundary.
 - Argon: motion 8.0, transitions 8.8, composition 7.6, pacing 9.8, vibe
   8.2, overall 8.5, acceptable, no critical differences. Spot-checks found
@@ -175,3 +175,17 @@ One fresh agent ran Phases 1-5 from the URL with only the skill as guidance.
   reported beside `acceptable`, a tiled-flag policy, and film rules for
   in-shot cuts, covering exits, pre-tilt window tokens, headline wrapping,
   and accent-field ink contrast.
+
+## After run 5: prompt tuning stopped (skill 0.7.0)
+
+Spec accuracy went 55%, 44%, 26%, 23%, 26% of checked claims corrected
+across runs 1-5: prompt changes stopped paying off after run 3, and the
+remaining errors are fine detail the Phase 1 frame check catches. Phase 6
+now fixes the film only and records spec differences here instead of
+editing the prompts during a run. Change a prompt only when a difference
+recurs across several different reference videos.
+
+- SKILL.md: Phase 4 uses product footage when the spec says window or
+  screen contents move (the largest remaining difference in runs 3 and 5
+  was a still where the reference typed and scrolled).
+- The evaluation reminder no longer promises to harden the skill.
