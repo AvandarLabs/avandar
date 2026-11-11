@@ -1106,6 +1106,212 @@ export type Database = {
           },
         ]
       }
+      data_dictionaries: {
+        Row: {
+          created_at: string
+          created_from_dataset_ids: string[]
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          updated_at: string
+          version: number
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_from_dataset_ids?: string[]
+          description?: string | null
+          id?: string
+          name: string
+          owner_id?: string
+          owner_profile_id: string
+          updated_at?: string
+          version?: number
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_from_dataset_ids?: string[]
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          owner_profile_id?: string
+          updated_at?: string
+          version?: number
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_dictionaries_owner_profile_id_fkey"
+            columns: ["owner_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_dictionaries_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_dictionaries__code_lists: {
+        Row: {
+          created_at: string
+          dictionary_id: string
+          id: string
+          is_ordered: boolean
+          name: string
+          pairs: Json
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          dictionary_id: string
+          id?: string
+          is_ordered?: boolean
+          name: string
+          pairs?: Json
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          dictionary_id?: string
+          id?: string
+          is_ordered?: boolean
+          name?: string
+          pairs?: Json
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_dictionaries__code_lists_dictionary_id_workspace_id_fkey"
+            columns: ["dictionary_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
+      data_dictionaries__entries: {
+        Row: {
+          column_names: string[]
+          created_at: string
+          description: string | null
+          dictionary_id: string
+          id: string
+          kind: Database["public"]["Enums"]["data_dictionaries__entry_kind"]
+          name: string
+          position: number
+          unit: string | null
+          updated_at: string
+          valid_max: number | null
+          valid_min: number | null
+          workspace_id: string
+        }
+        Insert: {
+          column_names?: string[]
+          created_at?: string
+          description?: string | null
+          dictionary_id: string
+          id?: string
+          kind: Database["public"]["Enums"]["data_dictionaries__entry_kind"]
+          name: string
+          position: number
+          unit?: string | null
+          updated_at?: string
+          valid_max?: number | null
+          valid_min?: number | null
+          workspace_id: string
+        }
+        Update: {
+          column_names?: string[]
+          created_at?: string
+          description?: string | null
+          dictionary_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["data_dictionaries__entry_kind"]
+          name?: string
+          position?: number
+          unit?: string | null
+          updated_at?: string
+          valid_max?: number | null
+          valid_min?: number | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_dictionaries__entries_dictionary_id_workspace_id_fkey"
+            columns: ["dictionary_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries"
+            referencedColumns: ["id", "workspace_id"]
+          },
+        ]
+      }
+      data_dictionaries__entry_codings: {
+        Row: {
+          code_list_id: string
+          created_at: string
+          dictionary_id: string
+          entry_id: string
+          id: string
+          is_primary: boolean
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          code_list_id: string
+          created_at?: string
+          dictionary_id: string
+          entry_id: string
+          id?: string
+          is_primary?: boolean
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          code_list_id?: string
+          created_at?: string
+          dictionary_id?: string
+          entry_id?: string
+          id?: string
+          is_primary?: boolean
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_dictionaries__entry_coding_code_list_id_dictionary_id_fkey"
+            columns: ["code_list_id", "dictionary_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries__code_lists"
+            referencedColumns: ["id", "dictionary_id"]
+          },
+          {
+            foreignKeyName: "data_dictionaries__entry_coding_dictionary_id_workspace_id_fkey"
+            columns: ["dictionary_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "data_dictionaries__entry_codings_entry_id_dictionary_id_fkey"
+            columns: ["entry_id", "dictionary_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries__entries"
+            referencedColumns: ["id", "dictionary_id"]
+          },
+        ]
+      }
       dataset_columns: {
         Row: {
           column_idx: number
@@ -2889,6 +3095,38 @@ export type Database = {
         Args: { p_updated_within: string }
         Returns: unknown
       }
+      data_dictionaries__check_code_lists: {
+        Args: { p_code_lists: Json; p_dictionary_id: string }
+        Returns: undefined
+      }
+      data_dictionaries__check_codings: {
+        Args: { p_code_lists: Json; p_entries: Json }
+        Returns: undefined
+      }
+      data_dictionaries__check_entries: {
+        Args: { p_code_lists: Json; p_dictionary_id: string; p_entries: Json }
+        Returns: undefined
+      }
+      data_dictionaries__check_pairs: {
+        Args: { p_code_lists: Json }
+        Returns: undefined
+      }
+      data_dictionaries__write_code_lists: {
+        Args: {
+          p_code_lists: Json
+          p_dictionary_id: string
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      data_dictionaries__write_entries: {
+        Args: {
+          p_dictionary_id: string
+          p_entries: Json
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
       datasets__auth_user_may_add_column: {
         Args: { p_dataset_id: string }
         Returns: boolean
@@ -3257,6 +3495,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      rpc_data_dictionaries__save: {
+        Args: { p_code_lists: Json; p_dictionary_id: string; p_entries: Json }
+        Returns: number
       }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
@@ -3876,6 +4118,13 @@ export type Database = {
         | "building"
         | "ready"
         | "failed"
+      data_dictionaries__entry_kind:
+        | "categorical"
+        | "ordered"
+        | "number"
+        | "date"
+        | "text"
+        | "identifier"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -4183,6 +4432,14 @@ export const Constants = {
         "building",
         "ready",
         "failed",
+      ],
+      data_dictionaries__entry_kind: [
+        "categorical",
+        "ordered",
+        "number",
+        "date",
+        "text",
+        "identifier",
       ],
       datasets__ava_data_type: [
         "boolean",
