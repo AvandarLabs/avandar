@@ -796,3 +796,37 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   expanded (tab switches would jump).
 - **Left out.** Database history, plan limits, and moving case management
   onto the agent.
+
+## D44. Dashboard blocks from any page, online and offline (approved)
+
+- **Decision (Pablo, 2026-11-11).** The agent gets `add_dashboard_block`
+  under prompt `data-agent-v4`, with today's ten block kinds. On the
+  dashboard open in the editor the block is added unsaved, as today's chat
+  does. On any other dashboard a card in the chat shows the block and the
+  target, and only Confirm saves it. The tool names the dashboard as the
+  model saw it, or `"current"`, and the browser resolves the name against
+  the page, mentions, the tray, and the workspace's editable dashboards.
+  Several matches put a picker on the card. The offline agent gets the
+  same tool and card and answers on every page. Spec:
+  [phase-1d.md](specs/phase-1d.md).
+- **Why.** Dashboards are the last thing today's chat does that the agent
+  cannot (D33). A saved change to a dashboard the user is not looking at
+  follows D33's rule of a confirm card first, while the open editor's
+  Save already confirms. Resolving names on the device needs no extra
+  tool or model call, and the model never sees the workspace's dashboard
+  list. Offline ships too because nothing in it needs a connection except
+  the save itself (Pablo: offline is left out only when it cannot be built
+  without one).
+- **Tools per version.** v1 to v3 keep their three tools unchanged. v4
+  is the first version whose tool list differs, so the proxy reads
+  `DATA_AGENT_TOOLS_BY_PROMPT_ID`.
+- **Alternatives.** Saving at once with Undo in the chat (breaks D33's
+  confirm-first rule). Only the open dashboard (misses "from anywhere").
+  A separate `find_dashboard` tool (a model call more per request). Listing
+  every dashboard in each turn (tokens on every turn, and names unrelated
+  to the question). Fewer block kinds (a regression from today's chat).
+  Offline left for later (Pablo reversed it).
+- **Left out.** Try again, question-card parity, and
+  `dashboard.block_added_via_chat` (1E, D40). Editing, moving, removing,
+  and creating dashboards (Phase 3.1). Confirmation for other tools
+  (roadmap 2.3).
