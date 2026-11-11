@@ -55,9 +55,10 @@ What the codebase offers today:
   Content, Confirm.
 - The epidemiology plugin's `cases` slot drives a new Case epicurve command.
 - The Mozambique pack imports province and district boundaries.
-- Two hardening items from earlier slices: plugin AI tool names that collide
-  with built-in tool names are rejected, and a corrupted plugin chart config
-  no longer crashes the dashboard editor's settings form.
+- Hardening items from earlier slices: plugin AI tool names that collide with
+  built-in tool names are rejected, a corrupted plugin chart config no longer
+  crashes the dashboard editor's settings form, and `pnpm check:plugin-bundle`
+  passes again.
 
 ## Non-goals
 
@@ -81,7 +82,7 @@ What the codebase offers today:
 | 2 | Bind target | A case type or a dataset. Each slot attribute maps to one case type attribute or one dataset column |
 | 3 | Attribute types | `number`, `date`, `text`, `boolean`, `geo.admin1`, `geo.admin2`. Geo types bind to text only. In this slice they change the wizard's labels, not the checks |
 | 4 | Pack content | Province (admin1) and district (admin2) boundaries for Mozambique |
-| 5 | Data source | geoBoundaries gbOpen MOZ ADM1 and ADM2 (CC BY 4.0), simplified, bundled as CSV with WKT geometry under `plugins/mozambique/content/` |
+| 5 | Data source | geoBoundaries gbHumanitarian MOZ ADM1 and ADM2 (INE and OCHA via HDX, CC BY 3.0 IGO), simplified, bundled as CSV with WKT geometry under `plugins/mozambique/content/`. gbOpen was rejected: its province layer is OpenStreetMap under ODbL (share-alike), it has 10 provinces with no Maputo City, and it leaves Ibo district in no province |
 | 6 | Wizard UI | A Mantine `Stepper` in a large modal, replacing the confirm modal. No new route |
 | 7 | Slot consumer | A "Case epicurve" command that opens a modal with an epicurve of every bound case |
 | 8 | Storage | Two tables, `plugin_data_slot_bindings` and `plugin_content_imports`, plus an install RPC that writes the install and its bindings atomically |
@@ -351,17 +352,22 @@ text, so GIS offers them as boundaries without any change.
 `scripts/plugins/buildMozambiqueBoundaries.ts` rebuilds the two files with
 Node DuckDB and its `spatial` extension:
 
-1. Download geoBoundaries gbOpen `MOZ` `ADM1` and `ADM2` GeoJSON.
+1. Download geoBoundaries gbHumanitarian `MOZ` `ADM1` and `ADM2` GeoJSON,
+   found through the geoBoundaries API, which also names the license.
 2. Simplify with `ST_SimplifyPreserveTopology`, raising the tolerance until
    each file is under 1 MB.
 3. Give each district the province that contains its point on surface.
 4. Write `plugins/mozambique/content/mz-adm1.csv` (`province_code`,
    `province_name`, `geometry`) and `mz-adm2.csv` (`district_code`,
    `district_name`, `province_code`, `province_name`, `geometry`), geometry as
-   WKT in EPSG:4326, sorted by code.
+   WKT in EPSG:4326, sorted by code. gbHumanitarian has no ISO codes, so both
+   codes are geoBoundaries `shapeID`s.
 
 The CSVs and the script are committed. The script prints the feature counts and
-file sizes, and fails if a district has no province.
+file sizes, and fails if a district has no province or a code repeats. The
+first run produced 11 provinces (336 KB, unsimplified) and 159 districts
+(908 KB, tolerance 0.00125°). The datasets' descriptions credit INE and OCHA
+under CC BY 3.0 IGO.
 
 The pack:
 
@@ -436,6 +442,22 @@ control. An invalid config shows "These chart settings can't be read" and a
 "Reset chart settings" button that replaces them with the defaults a new pick
 of that chart type gets. `PluginVizSettingControls` receives only parsed
 values.
+
+### Plugin bundle check
+
+`pnpm check:plugin-bundle` already fails before this slice: it counts 58,991
+host bytes against a 39,600 byte budget. Slice 1c's chat imports
+`makePluginApi` and the plugin tool runner dynamically, but the check does not
+know those imports are lazy runtimes, so their chunks count as host code.
+
+This slice makes the check pass again:
+
+1. Register the chat's plugin tool runtime as a lazy runtime in the check.
+2. Measure what remains, and move or lazily load any startup host code that
+   is cheap to move.
+3. Keep the generated `loadContentUrls` small.
+4. Re-baseline `HOST_BUDGET_BYTES` by 1b's rule (the measured bytes rounded up
+   to the next 1,000, plus 2,000), with the reason in its comment.
 
 ## Testing
 
