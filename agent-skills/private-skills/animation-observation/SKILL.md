@@ -47,6 +47,11 @@ wrote: Observe + Inventory, then Build + Film, then Evaluate. Everything a
 later phase needs must be in `.videos/<slug>/research/`, never only in a
 conversation. The orchestrator owns Phase 6.
 
+Only the top-level session may split phases into subagents. If you are
+already a subagent, run every phase yourself: a background helper's
+completion notice goes to the top-level session, not to you, so you would
+stop and never resume.
+
 ## Secrets
 
 The Gemini key lives in `GEMINI_API_KEY` in the workspace root's
