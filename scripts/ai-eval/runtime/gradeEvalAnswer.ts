@@ -1,3 +1,4 @@
+import { gradeDashboardWrites } from "./gradeDashboardWrites";
 import type { EvalQuestion } from "../EvalQuestion";
 import type { EvalAnswer } from "../harnesses/EvalHarness";
 import type { EvalQueryResult } from "./EvalDatabase";
@@ -54,6 +55,10 @@ function _gradeResult(
   answer: EvalAnswer,
   truth: Readonly<Record<string, EvalQueryResult>>,
 ): { pass: boolean; detail: string } {
+  const writeVerdict = gradeDashboardWrites(question, answer, truth);
+  if (writeVerdict) {
+    return writeVerdict;
+  }
   if (question.gradeText) {
     if (answer.finalSql !== undefined || answer.result) {
       return {

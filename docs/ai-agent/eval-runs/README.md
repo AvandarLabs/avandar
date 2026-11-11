@@ -131,3 +131,6 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T11-40-15](2026-11-09T11-40-15-phase-1b_agent-page/results.jsonl) | `phase-1b:agent-page` | 7/7 | 0 | 0 | $0.00021 | 1.7 s / 2.7 s | none |
 | [2026-11-09T11-40-56](2026-11-09T11-40-56-phase-1b_agent-45/results.jsonl) | `phase-1b:agent-45` | 44/45 | 0 | 0 | $0.00055 | 2.1 s / 3.5 s | N04 |
 | [2026-11-09T11-41-09](2026-11-09T11-41-09-phase-1b_rerun-n04/results.jsonl) | `phase-1b:rerun-n04` | 1/1 | 0 | 0 | $0.00036 | 3.5 s / 3.5 s | none |
+| [2026-11-11T19-32-45](2026-11-11T19-32-45-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 1 | 0 | $0.00149 | 3.0 s / 9.1 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-07](2026-11-11T19-33-07-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00122 | 2.8 s / 4.7 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-16](2026-11-11T19-33-16-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00124 | 3.0 s / 4.8 s | D06 D07 D08 D09 |

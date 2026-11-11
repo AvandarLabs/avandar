@@ -1,0 +1,22 @@
+{
+  "label": "phase-1d:today-dashboards",
+  "questionCount": 9,
+  "passCount": 5,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 9,
+  "promptTokens": 86390,
+  "cachedPromptTokens": 0,
+  "completionTokens": 4671,
+  "totalCost": 0.010974499999999998,
+  "costPerQuestion": 0.0012193888888888888,
+  "latencyMedianMs": 2824.648583,
+  "latencyP90Ms": 4742.690667000001,
+  "failedIds": [
+    "D06",
+    "D07",
+    "D08",
+    "D09"
+  ]
+}

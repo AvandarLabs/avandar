@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalUsage } from "../EvalHarness";
 import type { ChildProcessWithoutNullStreams } from "node:child_process";
 
@@ -49,7 +50,7 @@ export type DenoChatTurnResponse = {
             candidateGroups?: string[][];
           };
     };
-    dashboardBlock?: { kind: string; sql?: string; vizType?: string };
+    dashboardBlock?: ChatGeneratedDashboardBlock;
   };
   usage?: EvalUsage;
   error?: string;

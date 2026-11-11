@@ -1,3 +1,4 @@
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalQuestion } from "../EvalQuestion";
 import type { EvalQueryResult } from "../runtime/EvalDatabase";
 
@@ -20,6 +21,21 @@ export type EvalClarification = {
   isAutomatic: boolean;
 };
 
+/** A block the assistant added to a dashboard, as the harness recorded it. */
+export type EvalDashboardWrite = {
+  dashboardId: string;
+  /**
+   * `editor`: added unsaved to the dashboard open in the editor. `card`:
+   * saved to another dashboard after the user confirmed its card.
+   */
+  via: "editor" | "card";
+  block: ChatGeneratedDashboardBlock;
+  /** A DataViz block's result, from its SQL run in DuckDB. */
+  result?: EvalQueryResult;
+  /** Why a DataViz block's SQL has no result. */
+  error?: string;
+};
+
 /** Everything one question produced, for grading and the report. */
 export type EvalAnswer = {
   /** The last SQL the harness ran for the user, after alias rewriting. */
@@ -37,6 +53,8 @@ export type EvalAnswer = {
   valuesSentToModel: string[];
   usage: EvalUsage;
   latencyMs: number;
+  /** Blocks added to dashboards while answering, in order. */
+  dashboardWrites?: EvalDashboardWrite[];
 };
 
 /** One conversation: follow-up questions see the earlier turns. */

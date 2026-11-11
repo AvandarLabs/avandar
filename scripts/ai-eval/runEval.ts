@@ -11,7 +11,7 @@
  * With no `--questions`, the run asks the 45 original questions. `--questions
  * P` runs the page-context questions (what is on screen when the user asks).
  * `--questions M` runs the mention questions (gadgets the user mentions or
- * attaches).
+ * attaches). `--questions D` runs the dashboard questions (adding a block).
  *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.
@@ -128,12 +128,14 @@ function _selectQuestions(ids: string): readonly EvalQuestion[] {
   if (!ids) {
     // The default run stays the audit's 45 questions, so archived runs
     // compare. Page questions run with `--questions P`, mention questions
-    // with `--questions M`, schema questions with `--questions S`.
+    // with `--questions M`, schema questions with `--questions S`, dashboard
+    // questions with `--questions D`.
     return COVID_QUESTIONS.filter((question) => {
       return (
         question.category !== "page_context" &&
         question.category !== "mentions" &&
-        question.category !== "schema"
+        question.category !== "schema" &&
+        question.category !== "dashboards"
       );
     });
   }
