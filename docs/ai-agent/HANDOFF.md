@@ -5,7 +5,7 @@ read this, then the spec and the plan. Do not re-implement Tasks 1-13.
 
 Worktree: `~/src/worktrees/avandar/feat/agent-sessions`
 Branch: `feat/agent-sessions`
-HEAD: `0186ff705` `fix(chat): send case-design turns the case manager context`
+HEAD: `b503e1762` `test(cases): dock chat and open the record in the list field spec`
 Nothing on this branch has been pushed. There is no upstream.
 
 ## Read first
@@ -70,58 +70,15 @@ run `ava supabase status` and stop if the first line names the shared
 
 ## Still to do
 
-The non-e2e suite was run with
-`./scripts/test-runners/run-all-tests.sh --quick` on 2026-11-10. It
-stopped in `pnpm test:frontend`: 2 failed, 8996 passed, 2 skipped,
-2 todo. The full end-to-end suite was not run. Do not run it as one
-job. The integration menu (merge to `develop`, push a PR, or keep the
-branch) was not offered, because that suite is not green.
+Tasks 1-3 of the earlier list are done (`62a4e3db1`, `125fd3f05`,
+`b503e1762`). On 2026-11-11 every `--quick` step passed: frontend 8998
+passed, 2 skipped, 2 todo, and every package suite plus `test:db`.
+`case-list-field.spec.ts` passes on its own. The full end-to-end suite
+was not run.
 
-### 1. Retry context posts twice
-
-`src/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.retryContext.test.tsx:64`
-
-After Try again, `apiPostMock` is called twice. The test wants one
-call, and that call's body to carry `retryContext.priorGeneratedSql`.
-`apiPostMock` is `APIClient.post`. The title request uses the same
-method (`requestChatSessionTitle`), so the extra call is likely the
-title post rather than a second turn. Confirm by printing both call
-paths. If it is the title, assert the turn call instead of
-`toHaveBeenCalledOnce()`, and keep the retry-context assertion. Do
-not stop the title request to make the count 1.
-
-This file was already failing at `c40ebd3b3`, before the final fix
-wave.
-
-### 2. Workspace switch reads the pre-session thread key
-
-`src/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.workspaceSwitch.test.tsx:93`
-
-`makeThreadStorageKeyFromWorkspace` in
-`useAvandarChatRuntime.harness.tsx` still returns
-`ava.chat.thread.{workspaceId}.{userId}`. Threads now persist at
-`ava.chat.thread.{workspaceId}.{userId}.{sessionId}`. The precondition
-`toContain(WORKSPACE_A_QUESTION)` receives `null`.
-
-Point the harness at the session key (index, then the selected
-session's thread). The product rule under test still holds: workspace
-A's thread must not be stored under workspace B's key. Do not move
-persistence back to the legacy key.
-
-The other three tests in that file passed in the last full frontend
-run. Only this storage assertion failed. The file was already failing
-at `c40ebd3b3`.
-
-### 3. Case list spec cannot click Dock
-
-`tests/e2e/case-list-field.spec.ts:295` times out at 45 seconds on
-`getByRole("button", { name: "Dock chat panel" })`. The expanded chat
-panel covers the overlay's click point. The same click failed with
-the source checked out at `c7b6361c3`, before Phase 1C. The kickoff
-draft now appears, which is the part Phase 1C owns. Do not raise the
-timeout. Fix the click the way `agent-chat-sessions.spec.ts` avoids
-clicking through the expanded panel, or dock through a control the
-panel does not cover. Run only that spec.
+`test:executed` fails under `run-all-tests.sh` only because it collects
+a stale copy at `.temp/branch-cleanup-2026-10-06/`, which is gitignored
+and untracked. With `--exclude ".temp/**"` it passed 269 of 269.
 
 ### 4. Integrate
 
@@ -133,9 +90,9 @@ feature by itself. Confirm the base with the branch owner before
 merging or opening a PR. Do not merge into `demo/measles`. Do not
 force-push.
 
-After the two unit failures are fixed, rerun
-`./scripts/test-runners/run-all-tests.sh --quick`. Then ask whether to
-merge locally, push a PR, or leave the branch.
+The branch is 34 commits ahead of `origin/demo/measles` and 1590 ahead
+of `origin/develop`. Ask whether to merge locally, push a PR, or leave
+the branch.
 
 ## Deferred, do not fix unless asked
 
