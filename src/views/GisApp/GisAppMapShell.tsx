@@ -1,13 +1,15 @@
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
+import { Modal } from "@mantine/core";
 import { useRef, useState } from "react";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { AddMapToDashboardModal } from "@/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
 import { getExportLegendEntries } from "@/views/GisApp/export/getExportLegendEntries/getExportLegendEntries";
+import { GisAppFeatureListDrawer } from "@/views/GisApp/GisAppFeatureListDrawer";
 import { GisAppFirstRunCard } from "@/views/GisApp/GisAppFirstRunCard";
 import { GisAppFurnitureBar } from "@/views/GisApp/GisAppFurnitureBar";
-import { GisAppLayerInspector } from "@/views/GisApp/GisAppLayerInspector/GisAppLayerInspector";
 import { GisAppLayerPanel } from "@/views/GisApp/GisAppLayerPanel";
 import { GisAppMapLegend } from "@/views/GisApp/GisAppMapLegend";
 import { GisAppMapToolCluster } from "@/views/GisApp/GisAppMapToolCluster";
@@ -21,6 +23,7 @@ import { MapShell } from "@/views/GisApp/shell/MapShell/MapShell";
 import { MapTimeSlider } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSlider";
 import { useBasemapAttribution } from "@/views/GisApp/useBasemapAttribution";
 import { useGisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 
@@ -85,6 +88,85 @@ function GisAppAnnotationTextOverlay({ app }: Readonly<Props>): ReactNode {
   );
 }
 
+/** The modal that adds this map to one of the user's dashboards. */
+function GisAppAddToDashboardModal({
+  mapId,
+  opened,
+  onClose,
+}: Readonly<{
+  mapId: AvaMap.Id;
+  opened: boolean;
+  onClose: () => void;
+}>): ReactNode {
+  const { t } = useLingui();
+  const workspace = useCurrentWorkspace();
+  return (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      size="lg"
+      title={t`Add to dashboard`}
+    >
+      <AddMapToDashboardModal
+        mapId={mapId}
+        workspaceSlug={workspace.slug}
+        onClose={onClose}
+      />
+    </Modal>
+  );
+}
+
+/**
+ * The export sheet, and the "Add to dashboard" modal its footer opens in
+ * its place.
+ */
+function GisAppExportSurfaces({
+  app,
+  isExportOpen,
+  setIsExportOpen,
+}: Readonly<
+  Props & { isExportOpen: boolean; setIsExportOpen: (isOpen: boolean) => void }
+>): ReactNode {
+  const { t } = useLingui();
+  const workspace = useCurrentWorkspace();
+  const basemapAttribution = useBasemapAttribution(app.mapConfig.basemap);
+  const [isAddToDashboardOpen, setIsAddToDashboardOpen] = useState(false);
+  return (
+    <>
+      <ExportSheet
+        opened={isExportOpen}
+        onClose={() => {
+          setIsExportOpen(false);
+        }}
+        config={app.mapConfig}
+        mapName={app.name}
+        workspaceName={workspace.name}
+        workspaceId={app.avaMap.workspaceId}
+        basemapAttribution={basemapAttribution}
+        spec={app.spec}
+        view={app.mapConfig.view}
+        legendEntries={getExportLegendEntries({
+          layers: app.rows.filter(prop("isVisible")),
+          labels: { heatmapLowLabel: t`Low`, heatmapHighLabel: t`High` },
+        })}
+        hasDrawnDisputedFeature={app.hasDrawnDisputedFeature}
+        onConfigChange={app.updateConfig}
+        onAddToDashboard={() => {
+          setIsExportOpen(false);
+          setIsAddToDashboardOpen(true);
+        }}
+      />
+      <GisAppAddToDashboardModal
+        mapId={app.avaMap.id}
+        opened={isAddToDashboardOpen}
+        onClose={() => {
+          setIsAddToDashboardOpen(false);
+        }}
+      />
+    </>
+  );
+}
+
 /** Composes the application shell from independently focused GIS surfaces. */
 export function GisAppMapShell({ app }: Props): ReactNode {
   const { t } = useLingui();
@@ -92,8 +174,11 @@ export function GisAppMapShell({ app }: Props): ReactNode {
   const placeTool = usePlaceTool(app);
   const mapSurfaceRef = useRef<HTMLDivElement>(null);
   const [isExportOpen, setIsExportOpen] = useState(false);
-  const workspace = useCurrentWorkspace();
-  const basemapAttribution = useBasemapAttribution(app.mapConfig.basemap);
+  // The open list takes over the bottom-center stack (status and time
+  // slider) so the drawer and the floating chrome never overlap.
+  const isFeatureListOpen = app.mapConfig.layers.some((layer) => {
+    return layer.id === app.featureListLayerId;
+  });
 
   return (
     <MapShell
@@ -118,21 +203,17 @@ export function GisAppMapShell({ app }: Props): ReactNode {
         />
       }
       layerPanel={<GisAppLayerPanel app={app} actions={layerActions} />}
-      inspector={
-        <GisAppLayerInspector
-          app={app}
-          updateSelectedLayer={layerActions.updateSelectedLayer}
-        />
-      }
       legend={<GisAppMapLegend app={app} />}
-      statusCard={<GisAppStatusCard app={app} />}
+      statusCard={isFeatureListOpen ? null : <GisAppStatusCard app={app} />}
       timeSlider={
-        <MapTimeSlider
-          layers={app.mapConfig.layers}
-          timeRange={app.mapConfig.timeRange}
-          updateConfig={app.updateConfig}
-          workspaceId={app.avaMap.workspaceId}
-        />
+        isFeatureListOpen ? undefined : (
+          <MapTimeSlider
+            layers={app.mapConfig.layers}
+            timeRange={app.mapConfig.timeRange}
+            updateConfig={app.updateConfig}
+            workspaceId={app.avaMap.workspaceId}
+          />
+        )
       }
       toolCluster={<GisAppMapToolCluster app={app} placeTool={placeTool} />}
       firstRunCard={
@@ -144,6 +225,11 @@ export function GisAppMapShell({ app }: Props): ReactNode {
       furnitureBar={<GisAppFurnitureBar app={app} />}
       featureDrawer={
         <>
+          {/* A feature opened over a list takes the list's slot rather than
+              stacking under it, and offers the way back. */}
+          {app.isInspectorOpen ? null : (
+            <GisAppFeatureListDrawer app={app} canvasRef={mapSurfaceRef} />
+          )}
           <FeatureInspector
             opened={app.isInspectorOpen}
             onClose={app.closeInspector}
@@ -154,25 +240,13 @@ export function GisAppMapShell({ app }: Props): ReactNode {
             mapRef={app.mapInstance.mapRef}
             onRowClick={app.onRowClick}
             onBackToTable={app.onBackToTable}
+            onBackToList={isFeatureListOpen ? app.closeInspector : undefined}
             placeActions={placeTool.featureActions}
           />
-          <ExportSheet
-            opened={isExportOpen}
-            onClose={() => {
-              setIsExportOpen(false);
-            }}
-            config={app.mapConfig}
-            mapName={app.name}
-            workspaceName={workspace.name}
-            basemapAttribution={basemapAttribution}
-            spec={app.spec}
-            view={app.mapConfig.view}
-            legendEntries={getExportLegendEntries({
-              layers: app.rows.filter(prop("isVisible")),
-              labels: { heatmapLowLabel: t`Low`, heatmapHighLabel: t`High` },
-            })}
-            hasDrawnDisputedFeature={app.hasDrawnDisputedFeature}
-            onConfigChange={app.updateConfig}
+          <GisAppExportSurfaces
+            app={app}
+            isExportOpen={isExportOpen}
+            setIsExportOpen={setIsExportOpen}
           />
         </>
       }

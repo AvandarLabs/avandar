@@ -1,5 +1,9 @@
 import { assertIsDefined } from "@avandar/utils";
 import {
+  prepareMapSnapshots,
+  uploadMapSnapshots,
+} from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardMapSnapshots";
+import {
   preparePublishSnapshot,
   uploadPreparedSnapshots,
 } from "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots";
@@ -22,6 +26,7 @@ import type {
   PublishDashboardParams,
   StagePublishSnapshotOptions,
 } from "@/clients/dashboards/DashboardClient/DashboardClient.types";
+import type { MapSnapshot } from "@/clients/maps/MapSnapshot/MapSnapshot.types";
 import type { SnapshotBucketName } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 import type { PublishSliceConfig } from "@/models/Dashboard/PublishSliceConfig/PublishSliceConfig";
 import type { ILogger } from "@avandar/logger";
@@ -112,6 +117,7 @@ async function _prepareDashboardForPublish(
   dashboard: Dashboard.T;
   prepared: PreparedPublishSnapshot;
   uploadBucket: SnapshotBucketName;
+  mapSnapshots: MapSnapshot[];
 }> {
   const dashboard = await _getDashboardForPublish({
     ...options,
@@ -126,16 +132,25 @@ async function _prepareDashboardForPublish(
     dashboard,
     incomingPublishConfig: options.params.publishConfig,
   });
+  // Compiled before the claim, so a map that cannot be published stops the
+  // whole publish with nothing staged and nothing to abort.
+  const mapSnapshots = await prepareMapSnapshots({
+    dashboard,
+    visibility: options.params.visibility,
+  });
   const { uploadBucket } =
     DashboardSnapshotTransition.makeSnapshotTransitionPlanFromVisibility(
       options.params.visibility,
     );
-  return { dashboard, prepared, uploadBucket };
+  return { dashboard, prepared, uploadBucket, mapSnapshots };
 }
 
 async function _stagePublishSnapshot(
   options: Readonly<
-    StagePublishSnapshotOptions & { context: DashboardMutationContext }
+    StagePublishSnapshotOptions & {
+      context: DashboardMutationContext;
+      mapSnapshots: readonly MapSnapshot[];
+    }
   >,
 ): Promise<{ claimedDashboard: Dashboard.T; snapshotRevision: string }> {
   const claimedDashboard = await createTransitionClaim({
@@ -150,6 +165,12 @@ async function _stagePublishSnapshot(
   const snapshotRevision = claimedDashboard.snapshotTransitionRevision;
   try {
     await uploadPreparedSnapshots({ ...options, snapshotRevision });
+    await uploadMapSnapshots({
+      bucket: options.bucket,
+      dashboardId: options.dashboard.id,
+      snapshotRevision,
+      mapSnapshots: options.mapSnapshots,
+    });
     await PublicDatasetParquetStorageClient.reconcileDatasetsForDashboard({
       bucket: options.bucket,
       dashboardId: options.dashboard.id,
@@ -242,7 +263,7 @@ export async function publishDashboard(
   }>,
 ): Promise<Dashboard.T> {
   const logger = options.context.clientLogger.appendName("publishDashboard");
-  const { dashboard, prepared, uploadBucket } =
+  const { dashboard, prepared, uploadBucket, mapSnapshots } =
     await _prepareDashboardForPublish({
       context: options.context,
       logger,
@@ -253,6 +274,7 @@ export async function publishDashboard(
     context: options.context,
     dashboard,
     logger,
+    mapSnapshots,
     prepared,
     visibility: options.params.visibility,
   });

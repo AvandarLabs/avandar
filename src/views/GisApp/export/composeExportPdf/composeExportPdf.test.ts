@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ExportPdfInput } from "@/views/GisApp/export/composeExportPdf/composeExportPdf";
+import type { ExportFeatureTable } from "@/views/GisApp/export/composeExportPdf/drawExportFeatureTable/drawExportFeatureTable";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 
 const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
@@ -10,6 +11,13 @@ const { fakeDocument, jsPDFMock } = vi.hoisted(() => {
     setDrawColor: vi.fn(),
     setFontSize: vi.fn(),
     setLineDashPattern: vi.fn(),
+    setFont: vi.fn(),
+    splitTextToSize: vi.fn((text: string) => {
+      return [text];
+    }),
+    getTextWidth: vi.fn((text: string) => {
+      return text.length;
+    }),
     rect: vi.fn(),
     line: vi.fn(),
     circle: vi.fn(),
@@ -56,6 +64,21 @@ function _makeLegendEntries(count: number): ExportLegendEntry[] {
   });
 }
 
+/** A two-column feature table of `rowCount` schools. */
+function _makeFeatureTable(rowCount: number): ExportFeatureTable {
+  return {
+    summaryLine: `${rowCount} Schools`,
+    truncationNote: undefined,
+    buildColumnLimitNote: ({ shownCount, totalCount }) => {
+      return `Showing ${shownCount} of ${totalCount} columns.`;
+    },
+    headerLabels: ["School", "Distance"],
+    rows: Array.from({ length: rowCount }, (_, index) => {
+      return [`School ${index}`, `${index} mi`];
+    }),
+  };
+}
+
 /** Builds a complete `ExportPdfInput`, overridden per test scenario. */
 function _options(
   overrides: Readonly<{
@@ -66,6 +89,7 @@ function _options(
     hasAoi?: boolean;
     timeWindow?: string | undefined;
     hasDrawnDisputedFeature?: boolean;
+    featureRowCount?: number;
   }>,
 ): ExportPdfInput {
   const producedAt = overrides.producedAt ?? new Date("2026-08-18T09:00:00Z");
@@ -93,6 +117,7 @@ function _options(
       scaleBar: true,
       sourceLine: "",
       disclaimer: undefined,
+      featureList: undefined,
     },
     text: {
       title: overrides.title ?? "Cholera response",
@@ -113,6 +138,10 @@ function _options(
     pageNumberLabel: ({ page, total }) => {
       return `Page ${page} of ${total}`;
     },
+    featureTable:
+      overrides.featureRowCount === undefined
+        ? undefined
+        : _makeFeatureTable(overrides.featureRowCount),
   };
 }
 
@@ -238,6 +267,55 @@ describe("composeExportPdf", () => {
     await composeExportPdf(_options({}));
 
     expect(fakeDocument.setFillColor).toHaveBeenCalledWith("#ffffff");
+  });
+
+  it("prints the feature list on a page after the map", async () => {
+    await composeExportPdf(_options({ featureRowCount: 3 }));
+
+    expect(fakeDocument.addPage).toHaveBeenCalledTimes(1);
+    expect(_writtenText()).toEqual(
+      expect.arrayContaining(["3 Schools", "School", "Distance", "School 2"]),
+    );
+  });
+
+  it("prints no table page when the layout has no feature list", async () => {
+    await composeExportPdf(_options({}));
+
+    expect(_writtenText()).not.toContain("School");
+  });
+
+  it("numbers the map, legend overflow, and table pages as one sequence", async () => {
+    await composeExportPdf(
+      _options({ legendEntryCount: 60, featureRowCount: 3 }),
+    );
+
+    expect(_writtenText()).toEqual(
+      expect.arrayContaining(["Page 1 of 3", "Page 2 of 3", "Page 3 of 3"]),
+    );
+  });
+
+  it("prints the disclaimer on every page", async () => {
+    await composeExportPdf(
+      _options({ legendEntryCount: 60, featureRowCount: 100 }),
+    );
+    const pageCount = fakeDocument.addPage.mock.calls.length + 1;
+    const disclaimerCount = _writtenText().filter((line) => {
+      return line === "Boundaries are not authoritative.";
+    }).length;
+
+    expect(pageCount).toBeGreaterThan(3);
+    expect(disclaimerCount).toBe(pageCount);
+    expect(_writtenText()).toContain(`Page ${pageCount} of ${pageCount}`);
+  });
+
+  it("draws a small table's text, fonts, and header rule", async () => {
+    await composeExportPdf(_options({ featureRowCount: 2 }));
+
+    expect({
+      text: fakeDocument.text.mock.calls,
+      setFont: fakeDocument.setFont.mock.calls,
+      line: fakeDocument.line.mock.calls,
+    }).toMatchSnapshot();
   });
 
   it("does not save when placing the map image throws", async () => {

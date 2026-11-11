@@ -1,3 +1,7 @@
 .featureInspectorBody {
   padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-sm);
 }
+
+.featureInspectorBackButton {
+  align-self: flex-start;
+}

@@ -3,6 +3,7 @@ import { Box } from "@mantine/core";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
+import { DataGridColumnTitle } from "@/lib/ui/viz/DataGridColumnTitle/DataGridColumnTitle";
 import { makeDataGridColumnDefs } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { DataGridPeriodFormatters } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
@@ -50,7 +51,7 @@ const avandarGridTheme = themeMaterial.withParams({
 
 /**
  * A table of rows. A column title that does not fit ends in an ellipsis,
- * and hovering that title shows the full name.
+ * and hovering that title shows the full name, via `DataGridColumnTitle`.
  *
  * Used wherever a result set is shown as a table, such as a dataset
  * preview or the Explorer.
@@ -105,17 +106,18 @@ export function DataGrid({
     >
       <AgGridReact
         containerStyle={{ flex: 1, minHeight: 0, width: "100%" }}
-        defaultColDef={{ flex: 1, minWidth: 120 }}
+        defaultColDef={{
+          flex: 1,
+          headerComponentParams: {
+            innerHeaderComponent: DataGridColumnTitle,
+          },
+          minWidth: 120,
+        }}
         columnDefs={columnDefs}
         theme={avandarGridTheme}
         rowData={data as Writable<UnknownDataFrame>}
         pagination={pagination}
         paginationPageSize={50}
-        // The grid waits two seconds unless this is set, and never less
-        // than a fifth of a second. A clipped title should show once the
-        // pointer rests on it.
-        tooltipShowDelay={0}
-        tooltipShowMode="whenTruncated"
         onGridReady={onGridReady}
         onGridSizeChanged={onGridSizeChanged}
         onRowDataUpdated={onRowDataUpdated}

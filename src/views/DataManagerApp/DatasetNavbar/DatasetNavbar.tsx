@@ -1,4 +1,4 @@
-import { NavLinkList, Tooltip, useCheckTruncatedText } from "@avandar/ui";
+import { NavLinkList, TruncatedText } from "@avandar/ui";
 import { makeBucketMap, prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -69,27 +69,15 @@ function DatasetNavbarName({
   name,
   tooltipLabel,
 }: DatasetNavbarNameProps): ReactNode {
-  const [textRef, isTruncated] = useCheckTruncatedText<HTMLSpanElement>([name]);
-
-  // `truncate` rather than `lineClamp`: a row is one line. `lineClamp` also
-  // sets `display: -webkit-box`, so the block display on this name would
-  // silently disable it.
   return (
-    <Tooltip
-      label={tooltipLabel ?? name}
-      disabled={tooltipLabel === undefined && !isTruncated}
-      position="right"
+    <TruncatedText
+      className={css.datasetNavbarName}
+      size="sm"
+      tooltipLabel={tooltipLabel}
+      tooltipProps={{ position: "right" }}
     >
-      <Text
-        ref={textRef}
-        className={css.datasetNavbarName}
-        size="sm"
-        component="span"
-        truncate
-      >
-        {name}
-      </Text>
-    </Tooltip>
+      {name}
+    </TruncatedText>
   );
 }
 

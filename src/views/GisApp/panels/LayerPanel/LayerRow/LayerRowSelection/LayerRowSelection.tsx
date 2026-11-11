@@ -1,3 +1,4 @@
+import { TruncatedText } from "@avandar/ui";
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowSelection/LayerRowSelection.module.css";
 import { LayerStatusBadge } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge";
 import { LayerSwatch } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerSwatch/LayerSwatch";
@@ -57,9 +58,19 @@ export function LayerRowSelection({
     >
       <LayerSwatch symbology={layer.symbology} />
       <span className={css.layerRowSelectionText}>
-        <span className={css.layerRowSelectionName}>{layer.name}</span>
+        <TruncatedText
+          className={css.layerRowSelectionName}
+          fz={13}
+          fw={500}
+          tooltipProps={{ position: "right" }}
+        >
+          {layer.name}
+        </TruncatedText>
         <span className={css.layerRowSelectionMeta}>
-          <LayerStatusBadge viewState={viewState} />
+          <LayerStatusBadge
+            viewState={viewState}
+            geoBinding={layer.geoBinding}
+          />
         </span>
       </span>
     </button>

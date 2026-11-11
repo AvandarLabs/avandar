@@ -181,7 +181,7 @@ test.describe("GIS threshold colors", () => {
       await page.getByRole("option", { name: SCHOOL_LISTING_NAME }).click();
 
       const inspector = page.getByRole("region", {
-        name: "Layer",
+        name: SCHOOL_LISTING_NAME,
         exact: true,
       });
       await _bindSchoolsToZipAreas(page, inspector);

@@ -4,6 +4,7 @@ import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
 import { renderHook, waitFor } from "@/test-utils";
+import { getQueryLayersFromMapLayers } from "@/views/GisApp/layers/getQueryLayersFromMapLayers/getQueryLayersFromMapLayers";
 import { SensitivityViolationError } from "@/views/GisApp/layers/SensitivityViolationError";
 import {
   createQueryableLayer,
@@ -145,6 +146,39 @@ function _mockPointLayerQueries(options: {
   };
 }
 
+/** A WKT polygon layer whose geometry column is in its own query. */
+function _createPolygonFilterLayer(): MapLayer.T {
+  const base = createSpatialLayer();
+  const binding = base.geoBinding;
+  if (binding?.type !== "geometryColumn") {
+    throw new Error("The spatial fixture binds a geometry column");
+  }
+  return { ...base, geoBinding: { ...binding, family: "polygon" } };
+}
+
+/** A spatial query's one-row envelope holding `features`. */
+function _createSpatialEnvelopeResult(
+  features: GeoJSON.Feature[],
+): QueryResult.T<UnknownRow> {
+  return {
+    id: uuid<QueryResult.Id>(),
+    columns: [],
+    numRows: 1,
+    data: [
+      {
+        __avandar_feature_collection: { type: "FeatureCollection", features },
+        __avandar_diagnostics: {
+          sourceCount: features.length,
+          parsedCount: features.length,
+          invalidCount: 0,
+          observedFamilies: features.length > 0 ? ["point"] : [],
+          hasMixedFamilies: false,
+        },
+      },
+    ],
+  };
+}
+
 describe("useMapLayersData", () => {
   const workspaceId = uuid<Workspace.Id>();
 
@@ -169,6 +203,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -200,6 +235,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -236,6 +272,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -267,6 +304,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [timedLayer],
           workspaceId,
           overlay: {
@@ -296,6 +334,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -323,6 +362,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -347,6 +387,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [firstLayer, secondLayer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -373,6 +414,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -393,6 +435,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -430,6 +473,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -489,6 +533,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -545,6 +590,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -561,6 +607,119 @@ describe("useMapLayersData", () => {
     expect(result.current.get(layer.id)?.data).toBeUndefined();
   });
 
+  it("draws a geometry layer's features only inside its spatial filter layer", async () => {
+    const filterLayer = _createPolygonFilterLayer();
+    const schools = {
+      ...createSpatialLayer(),
+      spatialFilter: { layerId: filterLayer.id },
+    };
+    runSpatialQueryMock.mockResolvedValue(_createSpatialEnvelopeResult([]));
+
+    renderHook(
+      () => {
+        return useMapLayersData({
+          jitterSalt: "test-map-salt",
+          layers: [filterLayer, schools],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(
+        runSpatialQueryMock.mock.calls.some(([params]) => {
+          return (params as { rawSql: string }).rawSql.includes(
+            "kept_features AS (",
+          );
+        }),
+      ).toBe(true);
+    });
+  });
+
+  it("still displaces a jitter-mode point layer drawn through a spatial filter", async () => {
+    const filterLayer = _createPolygonFilterLayer();
+    const layer: MapLayer.T = {
+      ...createSpatialLayer(),
+      sensitivity: { mode: "jitter", radiusMeters: 500 },
+      spatialFilter: { layerId: filterLayer.id },
+    };
+    const exactPosition = [15.2663, -4.4419];
+    runSpatialQueryMock.mockResolvedValue(
+      _createSpatialEnvelopeResult([
+        {
+          type: "Feature",
+          geometry: { type: "Point", coordinates: exactPosition },
+          properties: {},
+        },
+      ]),
+    );
+
+    const { result } = renderHook(
+      () => {
+        return useMapLayersData({
+          jitterSalt: "test-map-salt",
+          layers: [filterLayer, layer],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data?.type).toBe("spatial");
+    });
+    expect(
+      runSpatialQueryMock.mock.calls.some(([params]) => {
+        return (params as { rawSql: string }).rawSql.includes(
+          "kept_features AS (",
+        );
+      }),
+    ).toBe(true);
+    const data = result.current.get(layer.id)?.data;
+    const geometry =
+      data?.type === "spatial"
+        ? data.featureCollection.features[0]?.geometry
+        : undefined;
+    expect(geometry?.type).toBe("Point");
+    expect(geometry?.type === "Point" && geometry.coordinates).not.toEqual(
+      exactPosition,
+    );
+  });
+
+  it("draws a latitude and longitude layer's points only inside its spatial filter layer", async () => {
+    const filterLayer = _createPolygonFilterLayer();
+    const schools = {
+      ...createQueryableLayer(),
+      spatialFilter: { layerId: filterLayer.id },
+    };
+    const { getDataSql } = _mockPointLayerQueries({ mappableRowCount: 3 });
+
+    renderHook(
+      () => {
+        return useMapLayersData({
+          jitterSalt: "test-map-salt",
+          layers: [filterLayer, schools],
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+
+    await waitFor(() => {
+      expect(
+        getDataSql().some((sql) => {
+          return sql.includes(
+            "AS overlay_source WHERE EXISTS (SELECT 1 FROM filter_geoms",
+          );
+        }),
+      ).toBe(true);
+    });
+  });
+
   it("reports unavailable Spatial for lat/lng when an aoi is applied", () => {
     spatialAvailability.value = "unavailable";
     const layer = createQueryableLayer();
@@ -569,6 +728,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: { aoi, timeRange: undefined },
@@ -590,6 +750,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: { aoi, timeRange: undefined },
@@ -611,6 +772,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: { aoi, timeRange: undefined },
@@ -646,6 +808,7 @@ describe("useMapLayersData", () => {
     const { result } = renderHook(
       () => {
         return useMapLayersData({
+          jitterSalt: "test-map-salt",
           layers: [layer],
           workspaceId,
           overlay: EMPTY_MAP_OVERLAY,
@@ -661,5 +824,63 @@ describe("useMapLayersData", () => {
     expect(makeExecutableQueryFromManualQueryMock).not.toHaveBeenCalled();
     expect(expectedSql).not.toMatch(/limit/i);
     expect(getDataSql()).toEqual([expectedSql]);
+  });
+});
+
+/**
+ * A hydrated WKT point layer whose popup shows all fields, as a map's
+ * schools layer is: only the geometry column is selected, and a name column
+ * waits in its source columns for the query-time widening to add.
+ */
+function _createPopupAllPointLayer(): MapLayer.T {
+  const layer = createSpatialLayer();
+  const nameColumn = QueryColumn.makeFromDatasetColumn({
+    ...layer.source.queryColumns[0]!.baseColumn,
+    id: uuid(),
+    name: "loc_name",
+  } as Parameters<typeof QueryColumn.makeFromDatasetColumn>[0]);
+  return {
+    ...layer,
+    source: {
+      ...layer.source,
+      sourceColumns: [layer.source.queryColumns[0]!, nameColumn],
+    },
+  };
+}
+
+describe("useMapLayersData with query-time widened layers", () => {
+  const workspaceId = uuid<Workspace.Id>();
+
+  beforeEach(() => {
+    runSpatialQueryMock.mockReset();
+    spatialAvailability.value = "available";
+  });
+
+  it("runs a popup-all layer's query once across re-renders with new layer objects", async () => {
+    const savedLayer = _createPopupAllPointLayer();
+    runSpatialQueryMock.mockResolvedValue(_createSpatialEnvelopeResult([]));
+    const { result, rerender } = renderHook(
+      () => {
+        return useMapLayersData({
+          jitterSalt: "test-map-salt",
+          layers: getQueryLayersFromMapLayers([structuredClone(savedLayer)]),
+          workspaceId,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook },
+    );
+    await waitFor(() => {
+      expect(result.current.get(savedLayer.id)?.data?.type).toBe("spatial");
+    });
+    for (let renderCount = 0; renderCount < 5; renderCount += 1) {
+      rerender();
+    }
+
+    await waitFor(() => {
+      expect(result.current.get(savedLayer.id)?.isLoading).toBe(false);
+    });
+    expect(runSpatialQueryMock).toHaveBeenCalledTimes(1);
+    expect(runSpatialQueryMock.mock.calls[0]![0].rawSql).toContain("loc_name");
   });
 });

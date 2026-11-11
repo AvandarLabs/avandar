@@ -88,6 +88,8 @@ describe("MapLayerData.getQueryKeyFromMapLayer", () => {
           type: "bufferOfLayer",
           layerId: source.id,
           distanceMeters: 1000,
+          distanceUnit: "m",
+          labelColumn: undefined,
           dissolve: false,
         },
       },
@@ -104,5 +106,73 @@ describe("MapLayerData.getQueryKeyFromMapLayer", () => {
         buffer,
       ]),
     );
+  });
+});
+
+describe("MapLayerData.getQueryKeyFromMapLayer spatial filters", () => {
+  it("changes when the filter layer's source changes", () => {
+    const filterLayer = MapLayer.createArea("Buffer of Sites");
+    const schools = {
+      ...MapLayer.makeEmpty("Schools"),
+      spatialFilter: { layerId: filterLayer.id },
+    };
+    const editedFilterLayer = {
+      ...filterLayer,
+      source: { ...filterLayer.source, limit: 10 },
+    };
+
+    expect(
+      MapLayerData.getQueryKeyFromMapLayer(schools, undefined, undefined, [
+        filterLayer,
+        schools,
+      ]),
+    ).not.toEqual(
+      MapLayerData.getQueryKeyFromMapLayer(schools, undefined, undefined, [
+        editedFilterLayer,
+        schools,
+      ]),
+    );
+  });
+
+  it("changes when a layer further down the filter chain changes", () => {
+    const zipCodes = MapLayer.createArea("ZIP codes");
+    const sites = {
+      ...MapLayer.createArea("Buffer of Sites"),
+      spatialFilter: { layerId: zipCodes.id },
+    };
+    const schools = {
+      ...MapLayer.makeEmpty("Schools"),
+      spatialFilter: { layerId: sites.id },
+    };
+    const editedZipCodes = {
+      ...zipCodes,
+      source: { ...zipCodes.source, limit: 10 },
+    };
+
+    expect(
+      MapLayerData.getQueryKeyFromMapLayer(schools, undefined, undefined, [
+        zipCodes,
+        sites,
+        schools,
+      ]),
+    ).not.toEqual(
+      MapLayerData.getQueryKeyFromMapLayer(schools, undefined, undefined, [
+        editedZipCodes,
+        sites,
+        schools,
+      ]),
+    );
+  });
+
+  it("leaves an unfiltered layer's key unchanged by other stacked layers", () => {
+    const cases = MapLayer.makeEmpty("Cases");
+    const zipCodes = MapLayer.createArea("ZIP codes");
+
+    expect(
+      MapLayerData.getQueryKeyFromMapLayer(cases, undefined, undefined, [
+        zipCodes,
+        cases,
+      ]),
+    ).toEqual(MapLayerData.getQueryKeyFromMapLayer(cases));
   });
 });

@@ -22,3 +22,13 @@ export type CompileOptions = {
 export type CompileSourceOptions = CompileOptions & {
   sourceSql: string;
 };
+
+/**
+ * Compile inputs for a layer whose spatial filter names another layer. That
+ * layer compiles with its own column metadata, so the caller supplies a
+ * resolver instead of one layer's metadata. For example, the map render and
+ * a feature list both compile through it.
+ */
+export type SpatialFilterCompileOptions = Omit<CompileOptions, "metadata"> & {
+  resolveMetadata: (layer: MapLayer.T) => ResolvedMapLayerMetadata;
+};

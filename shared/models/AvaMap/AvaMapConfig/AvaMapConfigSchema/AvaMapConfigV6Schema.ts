@@ -65,12 +65,20 @@ const V6SymbologySchema = z.discriminatedUnion("type", [
   }),
 ]);
 
+/** Version 6 layer with full point, line, and polygon symbology. */
+export const V6StandardLayerSchema = V5StandardLayerSchema.extend({
+  symbology: V6SymbologySchema,
+}).strict();
+
+/** Version 6 layer restricted to aggregate-only fill paint. */
+export const V6AggregateOnlyLayerSchema = V5AggregateOnlyLayerSchema.extend({
+  symbology: V6FillSymbologySchema,
+}).strict();
+
 /** Version 6 layer: graduated colors carry one optional label per class. */
 export const AvaMapConfigV6LayerSchema = z.union([
-  V5StandardLayerSchema.extend({ symbology: V6SymbologySchema }).strict(),
-  V5AggregateOnlyLayerSchema.extend({
-    symbology: V6FillSymbologySchema,
-  }).strict(),
+  V6StandardLayerSchema,
+  V6AggregateOnlyLayerSchema,
 ]);
 
 /** Version 6 persisted map configuration. */

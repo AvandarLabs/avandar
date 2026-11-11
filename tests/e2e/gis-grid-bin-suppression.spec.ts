@@ -138,7 +138,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: DATASET_NAME,
+        exact: true,
+      });
       await expect(inspector.getByText("5 of 5 rows mapped")).toBeVisible({
         timeout: LONG_WAIT,
       });

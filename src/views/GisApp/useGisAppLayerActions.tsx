@@ -14,6 +14,7 @@ type GisAppLayerAction = (layerId: MapLayer.Id) => void;
 export type GisAppLayerActions = {
   onDeleteLayer: GisAppLayerAction;
   onDuplicateLayer: GisAppLayerAction;
+  onOpenFeatureList: GisAppLayerAction;
   onRenameLayer: GisAppLayerAction;
   onZoomToLayer: GisAppLayerAction;
   onAddLayerFromSource: (dataSource: QueryDataSource.T) => void;
@@ -99,6 +100,7 @@ function useGisAppLayerSelectionActions(
       return AvaMapConfig.withLayerAdded({ config: current, layer });
     });
     app.setSelectedLayerId(layer.id);
+    app.openLayerSettings();
   };
 
   return { onAddLayerFromSource, updateSelectedLayer };
@@ -182,8 +184,27 @@ function useGisAppLayerDuplication(app: GisAppState): GisAppLayerAction {
   };
 }
 
-/** Deletes a layer and selects its nearest surviving neighbor. */
-function useGisAppLayerDeletion(app: GisAppState): GisAppLayerAction {
+/** The parts of the GIS app state a layer deletion reads and updates. */
+export type GisAppLayerDeletionState = Pick<
+  GisAppState,
+  | "mapConfig"
+  | "updateConfig"
+  | "selectedLayerId"
+  | "setSelectedLayerId"
+  | "closeInspector"
+  | "closeLayerSettings"
+  | "featureListLayerId"
+  | "closeFeatureList"
+>;
+
+/**
+ * Deletes a layer, selects its nearest surviving neighbor, and closes the
+ * layer's feature list if it was open. Used by `useGisAppLayerActions` for
+ * the layer menu's delete item.
+ */
+export function useGisAppLayerDeletion(
+  app: GisAppLayerDeletionState,
+): GisAppLayerAction {
   return (layerId: MapLayer.Id): void => {
     const nearestSurvivingLayerId = _getNearestSurvivingLayerId({
       layers: app.mapConfig.layers,
@@ -195,6 +216,10 @@ function useGisAppLayerDeletion(app: GisAppState): GisAppLayerAction {
     if (layerId === app.selectedLayerId) {
       app.setSelectedLayerId(nearestSurvivingLayerId);
       app.closeInspector();
+      app.closeLayerSettings();
+    }
+    if (layerId === app.featureListLayerId) {
+      app.closeFeatureList();
     }
   };
 }
@@ -217,6 +242,7 @@ export function useGisAppLayerActions(app: GisAppState): GisAppLayerActions {
     ...stackActions,
     onDeleteLayer,
     onDuplicateLayer,
+    onOpenFeatureList: app.openFeatureList,
     onRenameLayer,
     onZoomToLayer,
   };

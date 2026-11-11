@@ -38,7 +38,7 @@ const READY: ParquetCacheListingState = {
 };
 
 const READY_ANSWER = {
-  status: "ready",
+  status: "ready" as const,
   partPaths: [`${FOLDER}/part-00000.parquet`, `${FOLDER}/part-00001.parquet`],
   rowCount: 10,
   byteSize: 100,

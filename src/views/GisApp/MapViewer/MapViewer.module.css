@@ -1,0 +1,78 @@
+.mapViewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+}
+
+.mapViewerCanvas {
+  /* MapLibre's three 29px navigation buttons plus their 10px margin. */
+  --map-viewer-nav-controls-block-size: 97px;
+
+  background: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* A fixed picture offers no zoom buttons, since nothing on it moves. */
+/* stylelint-disable-next-line selector-class-pattern -- MapLibre's own class name */
+.mapViewerCanvas--fixed :global(.maplibregl-ctrl-top-right) {
+  display: none;
+}
+
+/*
+ * The legend shares the right edge with MapLibre's zoom in, zoom out, and
+ * compass buttons, so it stops above them.
+ */
+.mapViewerLegend {
+  inset-block-end: var(--mantine-spacing-sm);
+  inset-inline-end: var(--mantine-spacing-sm);
+  max-block-size: calc(
+    100% - 2 * var(--mantine-spacing-sm) -
+      var(--map-viewer-nav-controls-block-size)
+  );
+  overflow: auto;
+  position: absolute;
+  z-index: 1;
+}
+
+/* With no buttons to clear, a fixed picture's legend may use the full height. */
+.mapViewerCanvas--fixed .mapViewerLegend {
+  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm));
+}
+
+.mapViewerPopup {
+  inset-block-start: var(--mantine-spacing-sm);
+  inset-inline-start: var(--mantine-spacing-sm);
+  max-block-size: calc(100% - 2 * var(--mantine-spacing-sm));
+  max-inline-size: 280px;
+  overflow: auto;
+  position: absolute;
+  z-index: 2;
+}
+
+/* Keeps the attribution and disclaimer off the block's edge. */
+.mapViewerFurniture {
+  padding-inline: var(--mantine-spacing-xs);
+}
+
+.mapViewerPopupRow {
+  overflow-wrap: anywhere;
+}
+
+.mapViewerState {
+  align-items: center;
+  background: var(--ava-surface-body);
+  border: 1px dashed var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  justify-content: center;
+  padding: var(--mantine-spacing-md);
+}
+
+.mapViewerStateMessage {
+  max-inline-size: 40ch;
+  text-wrap: balance;
+}

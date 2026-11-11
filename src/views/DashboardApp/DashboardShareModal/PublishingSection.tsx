@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { Accordion, Divider, Stack } from "@mantine/core";
+import { DashboardMapAudienceAlert } from "@/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert";
 import { PublishDashboardStatus } from "@/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus";
+import { PublishMapLayersPreview } from "@/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview";
 import { PublishSliceSection } from "@/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection";
 import { VanitySlugField } from "@/views/DashboardApp/DashboardShareModal/VanitySlugField/VanitySlugField";
 import type { useDashboardPublishingControl } from "@/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useDashboardPublishingControl";
@@ -30,6 +32,10 @@ export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
   return (
     <Stack gap="md">
       <Divider />
+      <DashboardMapAudienceAlert
+        dashboard={publishing.currentDashboard}
+        targetVisibility={publishing.targetVisibility}
+      />
       <PublishDashboardStatus
         visibility={publishing.currentDashboard.visibility}
         targetVisibility={publishing.targetVisibility}
@@ -49,11 +55,18 @@ export function PublishingSection({ publishing }: Readonly<Props>): ReactNode {
             <Trans>Advanced options</Trans>
           </Accordion.Control>
           <Accordion.Panel>
-            <PublishSliceSection
-              dashboard={publishing.currentDashboard}
-              publishConfig={publishing.publishConfig}
-              onChange={publishing.onPublishConfigChange}
-            />
+            <Stack gap="lg">
+              <PublishSliceSection
+                dashboard={publishing.currentDashboard}
+                publishConfig={publishing.publishConfig}
+                onChange={publishing.onPublishConfigChange}
+              />
+              {publishing.targetVisibility === "public" ? (
+                <PublishMapLayersPreview
+                  dashboard={publishing.currentDashboard}
+                />
+              ) : null}
+            </Stack>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>

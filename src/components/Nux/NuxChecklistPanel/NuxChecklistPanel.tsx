@@ -2,6 +2,7 @@ import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import { NuxChecklistDockButton } from "@/components/Nux/NuxChecklistPanel/NuxChecklistDockButton";
 import { NuxChecklistExpandedCard } from "@/components/Nux/NuxChecklistPanel/NuxChecklistExpandedCard";
+import { useIsProductDrawerOpen } from "@/components/Nux/NuxChecklistPanel/useIsProductDrawerOpen";
 import { useNuxChecklistDockRight } from "@/components/Nux/NuxChecklistPanel/useNuxChecklistDockRight";
 import { useNuxMarkDoneFollowUp } from "@/components/Nux/NuxChecklistPanel/useNuxMarkDoneFollowUp";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
@@ -19,7 +20,9 @@ type Props = {
  * The persistent "Get started" checklist.
  *
  * Mounted once in the workspace layout so it survives every route change.
- * Clicking a row routes to that milestone.
+ * Clicking a row routes to that milestone. It hides while a drawer is open:
+ * drawers dock to a viewport edge, the checklist outranks them, and it
+ * would otherwise cover the drawer's footer actions.
  */
 export function NuxChecklistPanel({
   onOpenMilestone,
@@ -32,6 +35,7 @@ export function NuxChecklistPanel({
   const { isHoldingCompletion, markDone, unmarkDone } =
     useNuxMarkDoneFollowUp();
   const dockRightPx = useNuxChecklistDockRight();
+  const isDrawerOpen = useIsProductDrawerOpen();
   // `bottom` is left to CSS, which adds the app-wide sticky-action-bar inset
   // to this gap. Only the gap crosses over, so the constant stays in one
   // place, and the dock does not re-render as the user scrolls a view whose
@@ -46,6 +50,7 @@ export function NuxChecklistPanel({
   );
   if (
     !state.isHydrated ||
+    isDrawerOpen ||
     state.status === "dismissed" ||
     state.status === "not_started" ||
     (isFinished && !isHoldingCompletion)

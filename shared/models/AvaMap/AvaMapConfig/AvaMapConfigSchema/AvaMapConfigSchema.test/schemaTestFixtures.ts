@@ -99,19 +99,33 @@ export function createVersion4ReversedTimeJson() {
 }
 
 /**
+ * Strips the spatial filter, which version 7 added to every layer, so a
+ * current layer can stand in for one persisted under an older version.
+ */
+export function omitSpatialFilterField<
+  T extends Pick<MapLayer.T, "spatialFilter">,
+>(layer: T) {
+  const { spatialFilter: _spatialFilter, ...legacyLayer } = layer;
+  return legacyLayer;
+}
+
+/**
  * Generic for the same reason as `omitOverlayFields` above: it must accept
  * `omitOverlayFields`'s already-narrowed return type, not just a full
- * `MapLayer.T`.
+ * `MapLayer.T`. Strips every field version 5 and later added to a layer.
  */
 export function omitExportFields<
-  T extends Pick<MapLayer.T, "disputedStatusColumn" | "disputedStatusValues">,
+  T extends Pick<
+    MapLayer.T,
+    "disputedStatusColumn" | "disputedStatusValues" | "spatialFilter"
+  >,
 >(layer: T) {
   const {
     disputedStatusColumn: _disputedStatusColumn,
     disputedStatusValues: _disputedStatusValues,
     ...legacyLayer
   } = layer;
-  return legacyLayer;
+  return omitSpatialFilterField(legacyLayer);
 }
 
 export function createVersion4CyclicBufferJson() {
@@ -230,7 +244,7 @@ export function createEmptyVersion5Json() {
     layers: config.layers,
     annotations: config.annotations,
     annotationsZIndex: config.annotationsZIndex,
-    exportLayout: config.exportLayout,
+    exportLayout: omitFeatureListField(config.exportLayout),
   };
 }
 
@@ -248,7 +262,7 @@ export function createVersion5OverlappingDisputedJson() {
     ...createEmptyVersion5Json(),
     layers: [
       {
-        ...layer,
+        ...omitSpatialFilterField(layer),
         disputedStatusColumn: {
           type: "queryColumn",
           column: uuid<QueryColumn.Id>(),
@@ -274,18 +288,19 @@ export function createMismatchedBufferJson() {
       sourceCrs: undefined,
     },
   };
-  const buffer = MapLayer.withSensitivity(
-    {
-      ...MapLayer.createArea("Buffer of Cases"),
-      geoBinding: {
-        type: "bufferOfLayer",
-        layerId: source.id,
-        distanceMeters: 1000,
-        dissolve: false,
-      },
+  const buffer = {
+    ...MapLayer.withSensitivity(MapLayer.createArea("Buffer of Cases"), {
+      mode: "aggregateOnly",
+      minCellCount: 5,
+      minGeoLevel: "district",
+    }),
+    geoBinding: {
+      type: "bufferOfLayer" as const,
+      layerId: source.id,
+      distanceMeters: 1000,
+      dissolve: false,
     },
-    { mode: "aggregateOnly", minCellCount: 5, minGeoLevel: "district" },
-  );
+  };
   return {
     ...createEmptyVersion4Json(),
     layers: [omitExportFields(source), omitExportFields(buffer)],
@@ -299,7 +314,7 @@ export function createVersion5JsonWithGraduatedLayer() {
     ...createEmptyVersion5Json(),
     layers: [
       {
-        ...layer,
+        ...omitSpatialFilterField(layer),
         symbology: {
           ...MapLayer.createDefaultFillSymbology(),
           color: {
@@ -352,4 +367,83 @@ export function createGraduatedAreaLayer(): MapLayer.T {
       },
     },
   };
+}
+
+/** A version 6 polygon source layer and a buffer of it, before unit fields. */
+export function createVersion6BufferJson() {
+  const config = AvaMapConfig.makeEmpty();
+  const source = {
+    ...MapLayer.createArea("Sites"),
+    geoBinding: {
+      type: "geometryColumn" as const,
+      column: uuid<QueryColumn.Id>(),
+      encoding: "wkt" as const,
+      family: "polygon" as const,
+      simplification: undefined,
+      sourceCrs: undefined,
+    },
+  };
+  const buffer = {
+    ...MapLayer.createArea("Buffer of Sites"),
+    geoBinding: {
+      type: "bufferOfLayer" as const,
+      layerId: source.id,
+      distanceMeters: 805,
+      dissolve: false,
+    },
+  };
+  return {
+    __type: config.__type,
+    version: 6,
+    basemap: config.basemap,
+    view: config.view,
+    bookmarks: config.bookmarks,
+    layers: [omitSpatialFilterField(source), omitSpatialFilterField(buffer)],
+    annotations: config.annotations,
+    annotationsZIndex: 0,
+    exportLayout: omitFeatureListField(config.exportLayout),
+  };
+}
+
+/**
+ * Export furniture as versions 5 to 7 persist it: today's layout without the
+ * `featureList` key, which their strict schemas reject.
+ */
+export function omitFeatureListField(exportLayout: AvaMapConfig.ExportLayout) {
+  const { featureList: _featureList, ...olderExportLayout } = exportLayout;
+  return olderExportLayout;
+}
+
+/** A version 7 config: today's empty map with version 7 export furniture. */
+export function createEmptyVersion7Json() {
+  const config = AvaMapConfig.makeEmpty();
+  return {
+    ...config,
+    version: 7,
+    exportLayout: omitFeatureListField(config.exportLayout),
+  } as const;
+}
+
+/** A version 8 config whose export prints a one-layer feature list. */
+export function createVersion8FeatureListJson(
+  options: Readonly<{ maxRows?: number; hasSort?: boolean }> = {},
+) {
+  const layer = MapLayer.makeEmpty("Schools");
+  const columnId = uuid<QueryColumn.Id>();
+  return {
+    ...AvaMapConfig.makeEmpty(),
+    layers: [layer],
+    exportLayout: {
+      ...AvaMapConfig.defaultExportLayout,
+      featureList: {
+        layerId: layer.id,
+        columnIds: [columnId],
+        sort:
+          options.hasSort === false
+            ? undefined
+            : { columnId, direction: "desc" },
+        maxRows: options.maxRows ?? 200,
+      },
+    },
+  } as const;
 }

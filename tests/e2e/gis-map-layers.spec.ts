@@ -131,16 +131,22 @@ test.describe("GIS map layers", () => {
         await page.getByPlaceholder("Search data sources").click();
         await page.getByRole("option", { name: DATASET_NAME }).click();
 
+        const layerInspector = page.getByRole("region", {
+          name: DATASET_NAME,
+          exact: true,
+        });
+        await expect(
+          layerInspector.getByRole("combobox", { name: "Latitude" }),
+        ).toBeVisible();
+        await expect(
+          layerInspector.getByRole("combobox", { name: "Longitude" }),
+        ).toBeVisible();
+        await layerInspector
+          .getByRole("button", { name: "Back to layers" })
+          .click();
+
         const layerRow = _layerRow({ page, layerName: DATASET_NAME });
         await expect(layerRow).toBeVisible({ timeout: MEDIUM_WAIT });
-
-        const layerInspector = page.getByRole("region", { name: "Layer" });
-        await expect(
-          layerInspector.getByRole("button", { name: "Latitude" }),
-        ).toBeVisible();
-        await expect(
-          layerInspector.getByRole("button", { name: "Longitude" }),
-        ).toBeVisible();
 
         await expect(layerRow).toContainText("3 rows unmapped", {
           timeout: LONG_WAIT,

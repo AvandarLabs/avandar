@@ -80,6 +80,10 @@ Branch base: `9cc48c3e4` (merge-base with `develop`). Last updated against
 | F30 | WHO GHO pipeline, recommended listings, and listing freshness probes | not started | F4, F16, F17, F19, F23, F24, F25, F28, F29 | |
 | F31 | Threshold colors: map config version 6 with one color and label per graduated class | not started | none (its e2e spec needs F19, F25) | |
 | F32 | Add places to a map: click, coordinates, or address search, stored as a dataset | not started | none (its e2e spec needs no catalog) | |
+| F33 | Filter a map layer by another layer, and the feature list: map config version 7 | not started | F31 | |
+| F34 | Feature list in the export PDF: map config version 8 | not started | F33 | |
+| F35 | Map block on dashboards, with privacy-filtered map snapshots for public publishes | not started | F31, F33, F34 | |
+| F36 | Hide the Get started checklist while a drawer is open | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -117,6 +121,10 @@ API. It's new work, not something this branch built.
 | 18 | F30 | Extends the listings table, upsert, model and catalog detail that F4, F16, F17, F19, F23 and F24 built, the copy builder and `parquet-cache` route F25 and F28 changed, and reads F29's max age. Merge after all of them. |
 | any | F31 | Self-contained GIS change: the map config version 6 migration, the graduated class editor, and three bug fixes. Its e2e spec adds listings through the catalog, so run that spec after F19 and F25. |
 | any | F32 | Self-contained: one schema migration, one new edge function, and a new map tool. It adds an ordinary `latLngColumns` layer, so it needs no map config version and merges before or after F31. |
+| after F31 | F33 | Map config version 7 migrates from version 6, which F31 introduces. Its e2e spec needs the catalog browser (F19) and Parquet copies (F25). |
+| after F33 | F34 | Map config version 8 migrates from version 7, and the PDF list runs F33's feature list query and cell formatting. Its e2e spec imports a CSV, so it needs no catalog. |
+| after F34 | F35 | Its "Add to dashboard" lives in F34's export sheet footer, and its snapshots bake F31's threshold colors and run F33's spatial filter query. It adds two schema migrations and its e2e spec imports a CSV, so it needs no catalog. |
+| any | F36 | Self-contained fix to the onboarding checklist and the theme, both already on `develop`. The bug (the checklist covering a right-side drawer's footer) is on `develop` too, so it can merge first. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -2109,6 +2117,412 @@ pnpm test:e2e gis-places.spec.ts
 
 ---
 
+## F33: Filter a map layer by another layer, and the feature list (map config version 7)
+
+Status: not started. Built on `feat/gis-filter-by-layer`, branched from
+`demo/measles` at `81f57a979`. The commits below are all of
+`git log --oneline 81f57a979..feat/gis-filter-by-layer --no-merges`. This
+branch carried only F31 in the log, so F33 is the next free number here. If
+`demo/measles` already has an F32 or F33, renumber on merge.
+
+**Purpose:** A layer can keep only the features inside another layer's
+polygons (for example schools within half a mile of exposure sites).
+`MapLayerCommon.spatialFilter` names a polygon-output layer, and map config
+version 7 persists it plus a buffer's distance unit and ring label. Every
+spatial compile is wrapped once in a filter pass, and latitude/longitude layers
+get the same predicate. The buffer tool takes m, km, ft, or mi, can buffer
+latitude/longitude layers, labels its rings, and offers to filter another layer
+by the new buffer. A layer's menu opens a feature list drawer: rows after the
+AOI, time, and spatial filters, sortable, downloadable as CSV, with distance to
+the nearest buffered site and its label. Jitter layers show a count only, and
+aggregate-only layers offer no list.
+**Value:** "Which schools are within half a mile of these sites, and how far
+is each?" is one buffer, one filter, and one table.
+
+**PR title:** `feat(gis): filter a map layer by another layer and list its features`
+
+**Depends on:** F31 (map config version 6 is the base for version 7).
+
+**Commits to read** (from `feat/gis-filter-by-layer`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `8654bc93f` | feat(gis): add spatial filter and buffer unit and label fields to map layers | All of it. |
+| `69af8ce4c` | feat(gis): add buffer unit conversions and geometry kind checks to MapLayer | All of it. |
+| `5b079fe06` | feat(gis): detect spatial filter cycles and list filter candidates | All of it. |
+| `1a119476f` | feat(gis): add AvaMapConfig v7 with spatial filters and buffer units | All of it. |
+| `3ac204a71` | feat(gis): clear dangling spatial filters and insert labelled buffers | All of it. |
+| `bff134fd7` | feat(gis): add feature source and spatial filter SQL helpers | All of it. |
+| `62999adfc` | refactor(gis): resolve compile metadata from a map layer in the client | All of it. |
+| `8f96a6860` | feat(gis): compile map layers with their spatial filter | All of it. |
+| `40a11ae9f` | feat(gis): apply spatial filters to latitude and longitude layers | All of it. |
+| `a48efb85f` | feat(gis): buffer latitude and longitude layers and label rings | All of it. |
+| `e9f13eed4` | fix(gis): never buffer the exact points of a displaced layer | All of it. |
+| `1032b913d` | feat(gis): draw map layers through their spatial filter | All of it. |
+| `e29e4d9f0` | fix(gis): key filtered layers on their whole filter chain | All of it. |
+| `2a5d0bbe4` | feat(gis): define the map layer feature list contract | All of it. |
+| `8f8c3e42d` | feat(gis): compile feature list SQL with nearest-site distance | All of it. |
+| `949b09b45` | perf(gis): project feature list geometries once before measuring | All of it. |
+| `e313d9956` | feat(gis): compile a listable layer as a filtered feature source | All of it. |
+| `e6ed4b39d` | feat(gis): fetch a map layer's feature list and feature count | All of it. |
+| `32868e6b1` | fix(gis): refuse nearest-site distances from a displaced layer | All of it. |
+| `a56919bdd` | feat(gis): let a layer show only features inside another layer | All of it. |
+| `002fef777` | fix(gis): let a stale spatial filter be cleared | All of it. |
+| `e9525ea37` | feat(gis): buffer in friendly units, label rings, and offer to filter by a buffer | All of it. |
+| `d329090ab` | fix(gis): anchor the buffer popover to its tool button | All of it. |
+| `9bb38103f` | fix(gis): keep buffer distances within limits in the chosen unit | All of it. |
+| `6a2b02de2` | fix(gis): show a buffer's distance in its own unit in the inspector | All of it. |
+| `3b38c9149` | fix(gis): keep focus and explain empty targets in the buffer filter step | All of it. |
+| `bae548159` | feat(gis): open a layer's feature list from its menu | All of it. |
+| `6c5c13fdb` | feat(gis): add the feature list drawer | All of it. |
+| `82060dc5b` | fix(gis): close a layer's feature list when the layer is deleted | All of it. |
+| `7bb0c99d4` | fix(gis): refetch a feature list only when its result can change | All of it. |
+| `e5ab6a793` | fix(gis): keep the buffer tool open while picking from its selects | All of it. |
+| `73a136fb9` | feat(gis): show the feature list drawer under the map | All of it. |
+| `8efa8a80d` | fix(gis): give geometry-column layers default popup fields | All of it. |
+| `0b7e2f726` | fix(gis): keep the legend clear of the layer list when the feature list is open | All of it. |
+| `771b78dc7` | test(gis): frame both buffer rings in the feature list screenshot | All of it. |
+| `463a4ad4f` | fix(gis): query every source column when a popup shows all fields | All of it. |
+| `b210d3bcf` | test(gis): frame the rings before showing a listed feature | All of it. |
+| `9856a6b7c` | fix(gis): show a listed feature in place of the list, with a way back | All of it. |
+| `e9aaebffc` | fix(gis): name feature list rows by a name-like column | All of it. |
+| `33f87025a` | fix(gis): count a layer's areas as areas in the layer list | All of it. |
+| `7608b1fa9` | test(gis): show a listed feature in the list's place and come back | All of it. |
+| `e89152e5e` | fix(gis): never widen a displaced layer's popup and never save widened columns | All of it. |
+| `5844fdab3` | chore(i18n): extract the filter by layer strings | All of it. |
+
+**Files:**
+- Model: `shared/models/AvaMap/MapLayer/` (`GeoBinding.types.ts`,
+  `MapLayer.types.ts`, `MapLayer.ts`, `MapLayerModule/`), and
+  `AvaMapConfig/` (`hasSpatialFilterCycle`,
+  `getSpatialFilterCandidatesFromLayers`, `AvaMapConfigSchema/AvaMapConfigV7Schema.ts`,
+  `migrateAvaMapConfig.ts`, `AvaMapConfigModule`, `overlayConfigUpdaters`, and
+  the version 7 suites).
+- Spatial query client: `src/clients/maps/MapLayerSpatialQuery/` (feature
+  source and spatial filter SQL helpers, `compileSpatialFilteredQuery`,
+  `getCompileMetadataFromMapLayer`, lat/lng overlay and layer source
+  compilers, buffer compiler).
+- Feature list client: `src/clients/maps/MapLayerFeatureList/` (contract
+  types, SQL compiler, `fetchMapLayerFeatureList`, count, sort, access).
+- GIS app: `src/views/GisApp/` (layer updates, `useMapLayersData`, filter
+  select in the layer inspector, buffer tool, feature list drawer and state,
+  layer menu item, map shell wiring).
+- E2E and fixtures: `tests/e2e/gis-feature-list.spec.ts`,
+  `tests/data/gis/nyc-exposure-sites.csv`, `tests/data/gis/README.md`,
+  `tests/e2e/helpers/constants.ts`.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** none. Map config version 7 is stored in the existing `config`
+JSON, and the 6 to 7 migration runs on read.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm tsc -b --force
+pnpm vitest run shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm test:executed src/clients/maps
+pnpm test:e2e gis-feature-list.spec.ts
+```
+
+---
+
+## F34: Feature list in the export PDF (map config version 8)
+
+Status: not started. Built on `feat/gis-pdf-feature-list`, branched from
+`demo/measles` at `cd546fdea`. The commits below are all of
+`git log --oneline cd546fdea..feat/gis-pdf-feature-list --no-merges`, except
+the ones that only update this log. If `demo/measles` already has an F34, renumber
+on merge.
+
+**Purpose:** The export sheet gains an "Include a feature list" section: pick
+a listable layer, its columns, a sort, and a row cap (200 by default, 1,000 at
+most). `ExportLayout.featureList` persists the choice in map config version 8,
+and is cleared when its layer is removed. At download the PDF runs F33's
+feature list query with the on-screen filters, formats cells as the drawer
+does, and prints the rows as a table on the pages after the map and any legend
+overflow page. The table repeats its header on every page, wraps long cells,
+drops columns that do not fit, and opens with a line such as "16 features in
+Schools within 0.5 mi of Exposure sites". A note points at the CSV when rows
+or columns are cut. Every page carries "Page n of N" and the footer.
+**Value:** Field teams get the candidate list in the same PDF as the map,
+filtered exactly as on screen, without a separate CSV.
+
+**Design:** `docs/measles-demo/workflow-b-map-features-design.md` §6. Plan:
+`docs/measles-demo/workflow-b-f4-pdf-feature-list-plan.md`.
+
+**PR title:** `feat(gis): print a layer's feature list in the export PDF`
+
+**Depends on:** F33 (map config version 7 is the base for version 8, and the
+PDF list calls `fetchMapLayerFeatureList` and `formatFeatureListCell`).
+
+**Commits to read** (from `feat/gis-pdf-feature-list`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `b1b36a800` | feat(gis): persist an export feature list in map config version 8 | All of it. |
+| `3970e3f64` | feat(gis): cap an export feature list at 1,000 rows | All of it. |
+| `a6d405596` | feat(gis): clear the export feature list when its layer is removed | All of it. |
+| `1e22d6c5b` | feat(gis): word the PDF feature list summary and truncation note | All of it. |
+| `f5ba8b0b2` | feat(gis): lay out the PDF feature table across pages | All of it. |
+| `cf8108950` | feat(gis): print the feature list pages in the export PDF | All of it. |
+| `8222ca084` | fix(gis): keep PDF table columns readable | All of it. |
+| `a090f2594` | feat(gis): fetch the export feature list at download time | All of it. |
+| `fbc225e45` | feat(gis): fetch the feature list rows when downloading the PDF | All of it. |
+| `9ea58f26a` | feat(gis): add feature list defaults and edits for the export sheet | All of it. |
+| `f06e989c9` | feat(gis): add "Include a feature list" to the export sheet | All of it. |
+| `dd79c5c7b` | fix(gis): name what the PDF feature list counts | All of it. |
+| `37aaf0f10` | chore(i18n): extract the PDF feature list strings | All of it. |
+| `74d888249` | test(gis): assert the exported PDF carries the feature list pages | All of it. |
+| `d649a4496` | fix(gis): offer the same columns in the export sheet as the PDF prints | All of it. |
+
+**Files:**
+- Model: `shared/models/AvaMap/AvaMapConfig/` (`ExportLayout.types.ts`,
+  `AvaMapConfigValues.ts`, `AvaMapConfig.ts`, `AvaMapConfig.types.ts`,
+  `AvaMapConfigSchema/AvaMapConfigV8Schema.ts`, `migrateAvaMapConfig.ts`,
+  `AvaMapConfigSchema.ts`, `AvaMapConfigModule/` and `exportLayoutUpdaters/`,
+  and the schema test suites and fixtures).
+- PDF: `src/views/GisApp/export/` (`getExportFeatureTableCopy`,
+  `loadExportFeatureTable`, `composeExportPdf/` with
+  `drawExportFeatureTable` and `createPdfTextMeasurer`,
+  `useExportPdfDownload`).
+- Export sheet: `src/views/GisApp/export/ExportFeatureListConfig/` and
+  `src/views/GisApp/export/ExportSheet/` (`ExportSheetFeatureList*.tsx`,
+  `updateExportFeatureList.ts`, `ExportSheetControls.tsx`,
+  `ExportSheet.tsx`, `updateExportLayout.ts`).
+- GIS app: `src/views/GisApp/GisAppMapShell.tsx` and
+  `src/views/GisApp/layers/getQueryLayersFromMapLayers/`.
+- E2E: `tests/e2e/gis-export-feature-list.spec.ts`.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** none. Map config version 8 is stored in the existing `config`
+JSON, and the 7 to 8 migration runs on read.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm tsc -b --force
+pnpm vitest run shared/models/AvaMap src/views/GisApp src/clients/maps
+pnpm test:e2e gis-export-feature-list.spec.ts
+pnpm test:e2e gis-export-pdf.spec.ts
+```
+
+---
+
+## F35: Map block in dashboards
+
+Status: not started. Built on `feat/dashboard-map-block`, branched from
+`demo/measles` at `fc48eb670`. The commits below are all of
+`git log --oneline fc48eb670..feat/dashboard-map-block --no-merges`, except
+the formatting-only commit and the ones that only update this log. Two merges of
+`demo/measles` into the branch carry no changes of their own. If `demo/measles`
+already has an F35, renumber on merge.
+
+**Purpose:** A dashboard can hold a Map block. The export sheet's footer gains
+"Add to dashboard": pick or create a dashboard and the map is appended as a
+Map block, with a link to open it. On a workspace dashboard the block draws the
+live map through a read-only `MapViewer` (canvas, legend, attribution, no
+panels or tools), and a reader without access to the map or its datasets sees
+"You don't have access to this map". Publishing a dashboard to the public
+compiles each Map block into a privacy-filtered snapshot instead: one GeoJSON
+feature collection per layer plus the map config and legend, written beside the
+published datasets. The compile applies the saved AOI, time range, spatial
+filters, and sensitivity, keeps only popup columns, refuses names on the
+forbidden property list, and displaces points with an HMAC jitter keyed by the
+map's secret salt and seeded by the layer, the radius, and each point's own
+coordinates, so the same point lands in the same place on every publish. The
+salt lives in `map_jitter_salts`, which only map editors can read, through
+`rpc_maps__get_or_create_jitter_salt`. It refuses to publish when a map's
+filters no longer apply or when the publisher cannot edit the map, and names
+the map that blocked it. A reader who cannot edit a map sees the live map
+displaced with a throwaway salt. The public page draws the snapshot without
+DuckDB or spatial. The share modal warns when shared readers cannot open a
+dashboard's map, and the publish preview lists each map layer a public publish
+exposes with its feature count.
+**Value:** A situation map sits on the dashboard the response team already
+reads, live inside the workspace and safe to publish, without a separate
+export.
+
+**Design:** `docs/measles-demo/workflow-b-map-features-design.md` §7. Plan:
+`docs/measles-demo/workflow-b-f5-dashboard-map-block-plan.md`.
+
+**PR title:** `feat(dashboards): add a map block to dashboards`
+
+**Depends on:** F34 (the export sheet footer holds "Add to dashboard"), F33 (the
+snapshot compile reuses the spatial filter query path), and F31 (map config
+version 6 threshold colors are part of the legend a snapshot bakes). The
+dashboard publish pipeline and `AvaPage` blocks this builds on are not
+tracked in this log.
+
+**Commits to read** (from `feat/dashboard-map-block`; none is `MIXED`):
+
+| SHA | Subject | Take |
+|---|---|---|
+| `e3ae5747e` | feat(dashboards): accept map snapshot paths in the snapshot buckets | All of it. |
+| `30a1c1e66` | feat(gis): define the published map snapshot file | All of it. |
+| `330e54c04` | feat(dashboards): store map snapshots beside published datasets | All of it. |
+| `9624ea09f` | feat(dashboards): clear map snapshots with their snapshot generation | All of it. |
+| `fa48af5a7` | refactor(gis): run one layer query outside React | All of it. |
+| `25d85e69c` | feat(gis): draw published map snapshots through the layer renderer | All of it. |
+| `ec0724ef6` | refactor(gis): apply layer legend updates as a pure function | All of it. |
+| `7ccebc416` | feat(gis): compile a map into protected public output | All of it. |
+| `35ccfc7da` | feat(gis): salt map displacement with a per-map secret | All of it. |
+| `2fa28196e` | fix(gis): publish only what a public map draws | All of it. |
+| `d9308a376` | feat(gis): compile a saved map by id for publishing | All of it. |
+| `e124d8f4a` | feat(dashboards): read map block settings from a saved dashboard | All of it. |
+| `bcb8f2776` | fix(gis): refuse to publish a map whose filters no longer apply | All of it. |
+| `a01e65b2d` | feat(dashboards): compile and stage a dashboard's map snapshots | All of it. |
+| `01d482e12` | feat(dashboards): publish map snapshots with a public dashboard | All of it. |
+| `4591b5355` | feat(dashboards): name the map that stops a dashboard from publishing | All of it. |
+| `cec1745e8` | fix(dashboards): wait for every map upload before failing a publish | All of it. |
+| `aad4d700d` | refactor(gis): share map hydration and rendering outside the editor | All of it. |
+| `8b48a13bc` | test(gis): keep the shared map rendering stable across renders | All of it. |
+| `a35f7b898` | feat(gis): add read-only map viewer helpers | All of it. |
+| `177135dd0` | fix(gis): keep internal and location fields out of map viewer popups | All of it. |
+| `550ceef12` | feat(gis): add a read-only map viewer with live and snapshot modes | All of it. |
+| `8a55b9562` | fix(gis): wait for access before drawing a viewer map and close its popup with Escape | All of it. |
+| `c7ee91e36` | feat(dashboards): add a Map block to dashboards | All of it. |
+| `33e89c633` | fix(dashboards): keep the map popup and block notes inside the block | All of it. |
+| `d8b7496fc` | fix(dashboards): keep the map legend clear of the zoom controls | All of it. |
+| `ad9faeec1` | fix(gis): scope the map viewer popup keyboard handling | All of it. |
+| `f112e664b` | refactor(dashboards): split the map viewer and block config into smaller units | All of it. |
+| `13ebfefc7` | feat(gis): add a map to a dashboard from the export sheet | All of it. |
+| `b1da1b229` | fix(gis): size the add to dashboard modal like the explorer's | All of it. |
+| `a02d200d2` | fix(gis): fit the camera only to layers added in this session | All of it. |
+| `a3712257a` | fix(gis): save the camera after an instant fit to a new layer | All of it. |
+| `183124966` | feat(dashboards): warn when shared readers cannot open a dashboard map | All of it. |
+| `1c3f735fc` | fix(dashboards): count unreadable maps once in the audience warning | All of it. |
+| `4557a9d5d` | feat(dashboards): preview each map layer a public publish exposes | All of it. |
+| `8efde477a` | fix(dashboards): avoid repeating 'cannot open' in the map audience warning | All of it. |
+| `8c2d21839` | fix(dashboards): recompile the publish map preview each time it opens | All of it. |
+| `c337161bb` | test(dashboards): cover a map block from export sheet to public page | All of it. |
+| `13a441c57` | chore(i18n): extract map block strings | All of it. |
+| `ee5bfe961` | fix(maps): keep the jitter salt readable only by map editors | All of it. Replaces `35ccfc7da`'s `maps.jitter_salt` column and migration. |
+| `47055e3ea` | fix(maps): seed jitter from each point's own coordinates | All of it. |
+| `5bbf3920a` | fix(maps): fail a map snapshot cleanup that storage did not finish | All of it. |
+| `59590bf43` | refactor(maps): share one lookup for a map layer column's name | All of it. |
+| `bd9b706c7` | fix(maps): key jitter by the displacement radius too | All of it. |
+
+**Files:**
+- Storage paths: `supabase/schemas/16.utils.resource-permissions.sql`,
+  `src/clients/storage/` (`SnapshotStorageUtils`,
+  `PublicDatasetParquetStorageClient`, `PublicMapSnapshotStorageClient`).
+- Jitter salt: `supabase/schemas/17.map_jitter_salts.sql` (table, editor-only
+  SELECT policy, insert trigger on `maps`),
+  `supabase/schemas/50.rpc_maps__get_or_create_jitter_salt.sql`,
+  `AvaMapClient.getJitterSalt`, `apps/desktop/sync/syncable-tables.ts`
+  (excludes the table from desktop sync), the map route loader
+  (`src/routes/_auth/$workspaceSlug/map/$mapId.tsx`), `GisApp` and
+  `useGisApp*` (take `jitterSalt`), `LiveMapViewer`,
+  `layers/resolveRenderJitterSalt/` (throwaway salt for non-editors).
+- Jitter seed: `src/views/GisApp/layers/buildJitterSeed/` (layer, radius, and
+  coordinates), `jitterCoordinate/` (`jitterCoordinate`, `buildHmacSha256`),
+  `displaceSpatialFeatures`, and `makeFeatureCollectionFromRows`.
+- Snapshot compile: `src/clients/maps/MapSnapshot/` (`MapSnapshot.types.ts`,
+  `MapSnapshotJson/`, `MapSnapshotPublishError.ts`, `compileMapSnapshot/`,
+  `applySnapshotSensitivity`, `cutSnapshotFeatureProperties`,
+  `getForbiddenMapPropertyNames`, `getMapLayerColumnNameById/`,
+  `createMapSnapshotFromMapId/` (reads the salt, refuses a non-editor),
+  `createPublicMapConfigFromMapConfig/`, `getMapSnapshotLayerSummaries/`,
+  `getDatasetIdsFromMapConfig/`).
+- Publish: `src/clients/dashboards/DashboardClient/` (`publishDashboard.ts`,
+  `dashboardMapSnapshots/`, the transition fixtures and snapshot tests) and
+  `DashboardMapBlocks/`.
+- Shared rendering: `src/views/GisApp/layers/` (`runMapLayerQuery`,
+  `useMapLayersData`, `useMapLayerRendering`, `useAvaMapRender`,
+  `createMapOverlayFromMapConfig`, `makeFeatureCollectionFromRows`,
+  `PersistedLayerLegends`, `createLayerGeometryCache`,
+  `MapLayerDataResult.types.ts`), `useHydratedMapSources/useHydratedMapConfig.ts`,
+  and `useGisApp/useGisAppRendering.ts`.
+- Viewer: `src/views/GisApp/MapViewer/` (`MapViewer` with its live and
+  snapshot variants, frame, furniture, legend, popup card, state,
+  `getMapViewerPopupFromClick`, `useMapInteractionMode`,
+  `useMapViewerPopupKeyboard`, `createSnapshotLayerQueryStates`,
+  `mapViewerCameraToViewState`).
+- Dashboard block: `src/views/DashboardApp/AvaPage/` (`AvaPage.types.ts`,
+  `pblocks/MapPBlock/`, `pfields/MapPickerPField`, `pfields/MapViewPField`,
+  `useDashboardPuckConfig.tsx`).
+- Share modal: `src/views/DashboardApp/DashboardShareModal/`
+  (`DashboardMapAudienceAlert`, `getLimitedAudienceMapNames`,
+  `useLimitedAudienceMapNames`, `PublishMapLayersPreview`,
+  `PublishMapLayersList`, `PublishingSection.tsx`,
+  `usePublishDashboardMutation`).
+- Add to dashboard: `src/views/GisApp/export/ExportSheet/ExportSheet.tsx`
+  and `src/views/GisApp/export/AddMapToDashboardModal/`
+  (`AddMapToDashboardModal`, `useAddMapToDashboard`,
+  `MapPBlockDashboardConfigs`).
+- GIS fixes: `src/views/GisApp/GisAppMapShell.tsx`,
+  `layers/FitBoundsRequest/` (fit the camera only to layers added this
+  session), `MapCanvas/useMapViewSync/` (save the camera after an instant fit).
+- E2E and test fixtures: `tests/e2e/dashboard-map-block.spec.ts`,
+  `supabase/tests/database/dashboards/storage_map_snapshot_paths.test.sql`,
+  `supabase/tests/database/permissions/rls_map_jitter_salts.test.sql`,
+  `exact_data_api_grants.test.sql` (the new table's grants), and the
+  `jitterSalt` arguments the GIS fixtures and tests pass.
+- `src/i18n/locales/*/messages.po`: regenerate with
+  `pnpm i18n:extract && pnpm i18n:compile`, never copy.
+
+**Schema:** two migrations. Regenerate both, never copy:
+`supabase/migrations/*_dashboard_map_snapshot_paths.sql` teaches
+`util__storage_object_dashboard_id` and its sibling path parser the
+`revisions/<rev>/maps/<uuid>.json` shape, so the existing storage policies
+cover map files. `supabase/migrations/*_add_map_jitter_salts.sql`
+(`20261109225409` on the branch) creates `map_jitter_salts`, its editor-only
+policy, the insert trigger on `maps`, and
+`rpc_maps__get_or_create_jitter_salt`. It needs no backfill: the RPC creates a
+salt the first time an editor reads one for an older map. Regenerate
+`shared/types/database.types.ts` with `pnpm db:gen-types` and the desktop
+SQLite migration with `pnpm desktop:sqlite:gen-migrations`.
+
+**Verification:**
+```sh
+pnpm i18n:extract
+pnpm eslint shared/models/AvaMap src/views/GisApp src/views/DashboardApp src/clients/maps src/clients/storage src/clients/dashboards
+pnpm tsc -b --force
+pnpm vitest run src/clients/maps src/clients/storage src/clients/dashboards src/views/GisApp src/views/DashboardApp
+pnpm test:db
+pnpm test:e2e dashboard-map-block.spec.ts
+```
+
+---
+
+## F36: Hide the Get started checklist while a drawer is open
+
+Status: not started. Built on `fix/measles-followups`, branched from
+`demo/measles`.
+
+**PR title:** `fix(nux): hide the Get started checklist while a drawer is open`
+
+**Depends on:** none.
+
+The Get started checklist sits above modals on purpose, so tour text stays
+readable. That also put it above every Mantine `Drawer`, and in the bottom
+right corner it covered the footer of right-side drawers: the map Export
+sheet's "Download PDF" and "Add to dashboard", the plugin drawer, the
+workspace user permissions drawer, and the data catalog filters drawer. The
+checklist and its collapsed "Get started" button now hide while any drawer is
+open and come back when it closes.
+
+| Commit | Subject | What to take |
+|---|---|---|
+| `64291f509` | fix(nux): hide the Get started checklist while a drawer is open | All of it. |
+
+**Files:**
+- `src/config/Theme/Theme.ts`: gives every Drawer root a marker class at
+  theme level, so drawers that pass their own `classNames` keep theirs.
+- `src/components/Nux/NuxChecklistPanel/*`: a shared `createDialogPresence`
+  factory (the modal detection, lifted unchanged) and a drawer presence store
+  built on it. The checklist panel and dock button hide while a drawer is open.
+- `docs/app-shell-nomenclature.md`: the checklist entries describe the new
+  behavior.
+
+**Verification:** `pnpm vitest run src/components/Nux src/config/Theme`,
+`pnpm test:e2e nux-first-milestone.spec.ts`, and opening the map Export sheet
+with the checklist showing: its footer buttons must be clickable.
+
 ## Branch coverage checklist
 
 Every non-Postgres commit in `9cc48c3e4..HEAD` (89, oldest first) and the
@@ -2273,10 +2687,23 @@ under F18 above rather than numbered here. F21's commits are listed in full
 under F21 in the same way, F25's (merged in `a9d2ec770`) under F25,
 F26's (merged in `d0af42ce6`) under F26, and F29's and F30's (from
 `feat/gho-pipeline`) under F29 and F30, and F31's (from
-`feat/gis-threshold-colors`) under F31.
+`feat/gis-threshold-colors`) under F31, F34's (from
+`feat/gis-pdf-feature-list`) under F34, and F35's (from
+`feat/dashboard-map-block`) under F35.
 
 `051a30ebf`, from `fix/catalog-loadable-filter`, fixes F19's loadable-only
 filter and is listed under F19.
+
+From `fix/measles-followups`:
+- `423d01075` types F25's `READY_ANSWER` test fixture so `pnpm type-check:deno`
+  passes. It touches only
+  `supabase/functions/open-data/requestParquetCache/requestParquetCache.test.ts`
+  and goes with F25.
+- `665aebff0` updates `tests/e2e/gis-places.spec.ts` and
+  `tests/e2e/gis-map-layers.spec.ts` for `4de947922` (editing a layer from the
+  layers panel), which opens a new layer's settings page and shows Latitude
+  and Longitude as selects. Port it with whichever PR carries `4de947922`.
+- `64291f509` is F36.
 
 Commits that only update this log are branch-only and are not listed.
 

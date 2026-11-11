@@ -77,19 +77,30 @@ async function _openSeededMap(
   await expect(_mapRegion(page)).toBeVisible({ timeout: LONG_WAIT });
 }
 
-/** Creates a places dataset through the tool and waits for its layer. */
+/**
+ * Creates a places dataset through the tool and waits for its layer. A new
+ * layer opens its settings in the layers panel, so the test returns to the
+ * layer list (which dismisses the place popover) and then reopens "Add a
+ * place", which now targets the new dataset.
+ */
 async function _createPlacesDataset(
   page: Page,
   datasetName: string,
 ): Promise<void> {
-  await page.getByRole("button", { name: "Add a place" }).click();
+  const addPlaceButton = page.getByRole("button", { name: "Add a place" });
+  await addPlaceButton.click();
   await page
     .getByRole("textbox", { name: "New places dataset name" })
     .fill(datasetName);
   await page.getByRole("button", { name: "Create places dataset" }).click();
+  await page.getByRole("button", { name: "Back to layers" }).click();
   await expect(_layerRow(page, datasetName)).toBeVisible({
     timeout: LONG_WAIT,
   });
+  await addPlaceButton.click();
+  await expect(page.getByRole("button", { name: "Click the map" })).toBeVisible(
+    { timeout: MEDIUM_WAIT },
+  );
 }
 
 async function _clickCanvasFraction(

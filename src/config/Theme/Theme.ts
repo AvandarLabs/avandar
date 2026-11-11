@@ -114,6 +114,16 @@ export const PRODUCT_MODAL_ROOT_CLASSNAME = "ava-product-modal";
 /** Selector for a mounted product modal root. */
 export const PRODUCT_MODAL_ROOT_SELECTOR = `.${PRODUCT_MODAL_ROOT_CLASSNAME}`;
 
+/**
+ * Marks every Mantine `Drawer` root. Drawers dock to a viewport edge, which
+ * is where the onboarding checklist docks too, and the checklist outranks
+ * them, so it hides while one is open rather than cover the drawer's footer.
+ */
+export const PRODUCT_DRAWER_ROOT_CLASSNAME = "ava-product-drawer";
+
+/** Selector for a mounted drawer root. */
+export const PRODUCT_DRAWER_ROOT_SELECTOR = `.${PRODUCT_DRAWER_ROOT_CLASSNAME}`;
+
 /** Default props for `<Modal>` and `@mantine/modals` ModalsProvider. */
 export const DEFAULT_MODAL_PROPS = {
   zIndex: MODAL_ROOT_Z_INDEX,
@@ -319,6 +329,11 @@ export const Theme = createTheme({
     Drawer: Drawer.extend({
       defaultProps: {
         transitionProps: AnimationTheme.mantine.drawer,
+      },
+      // Theme-level classNames merge with a drawer's own `classNames` prop,
+      // where a default prop would be replaced by it.
+      classNames: {
+        root: PRODUCT_DRAWER_ROOT_CLASSNAME,
       },
     }),
 

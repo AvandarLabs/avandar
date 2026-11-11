@@ -17,7 +17,7 @@ import { AvaMapConfigSchema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSch
 describe("AvaMapConfigSchema v4 overlays", () => {
   it("migrates a version 3 config to version 4 without changing wave c layers", () => {
     const parsed = AvaMapConfigSchema.fromJson(createVersion3Json());
-    expect(parsed.version).toBe(6);
+    expect(parsed.version).toBe(8);
     expect(parsed.aoi).toBeUndefined();
     expect(parsed.timeRange).toBeUndefined();
     expect(parsed.annotations.features).toEqual([]);
@@ -59,6 +59,7 @@ describe("AvaMapConfigSchema v4 overlays", () => {
       type: "bufferOfLayer",
       layerId: missingSourceId,
       distanceMeters: 1000,
+      distanceUnit: "m",
       dissolve: false,
     });
   });
@@ -108,6 +109,7 @@ describe("AvaMapConfigSchema v4 overlays", () => {
       type: "bufferOfLayer",
       layerId: sourceId,
       distanceMeters: 1000,
+      distanceUnit: "m",
       dissolve: false,
     });
   });

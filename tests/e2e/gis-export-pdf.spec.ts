@@ -78,6 +78,7 @@ test("downloads a PDF whose filename is the slugified map title", async ({
     await mapRegion.getByRole("button", { name: "Add a layer" }).click();
     await page.getByPlaceholder("Search data sources").click();
     await page.getByRole("option", { name: DATASET_NAME }).click();
+    await page.getByRole("button", { name: "Back to layers" }).click();
 
     const layersPanel = page.getByRole("region", { name: "Layers" });
     const layerRow = layersPanel.getByRole("listitem").filter({
