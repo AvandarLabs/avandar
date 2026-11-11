@@ -773,3 +773,26 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   and hosted models never see an offline answer's text. Offline replies
   stored before the mark existed are sent as written; none could have read
   a mention name.
+
+## D43. Several chat sessions, stored in the browser (approved)
+
+- **Decision (Pablo, 2026-11-09).** The chat panel holds several sessions
+  per workspace and user. Opening the panel returns to the selected
+  session. The strip shows three open sessions, with the rest in an
+  overflow list. Closing a tab archives the session. The archive keeps
+  the 50 newest and is separate from the overflow. Delete exists only
+  there. The wide drawer belongs to the panel. **New case type** adds a
+  case-design session, selects it, expands the panel, and keeps today's
+  plain case-manager composer. Each session has its own thread and tray
+  in localStorage, plus an index. Spec:
+  [phase-1c.md](specs/phase-1c.md).
+- **Why.** One thread cannot keep a data question and a case-type draft
+  at the same time, and closing the panel was the only way to leave a
+  chat. Per-session keys extend the stores the thread and tray already
+  use, so a bad write cannot erase every session at once.
+- **Alternatives.** One localStorage blob for every session (a bad write
+  loses all of them). IndexedDB for threads (a second storage system
+  beside stores that already work). Each session remembering docked or
+  expanded (tab switches would jump).
+- **Left out.** Database history, plan limits, and moving case management
+  onto the agent.

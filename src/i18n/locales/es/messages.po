@@ -397,6 +397,8 @@ msgstr "Reordenar {statusName}"
 msgid "This chart needs the {pluginId} plugin, which is not available."
 msgstr "Este gráfico necesita el plugin {pluginId}, que no está disponible."
 
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/OntologyDesignerApp/CaseTypeHome/NewCaseTypeCard.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
@@ -2118,6 +2120,10 @@ msgstr "Dirección del enlace"
 msgid "Symbol"
 msgstr "Símbolo"
 
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Chats"
+msgstr "Chats"
+
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 msgid "{recordCount, plural, one {Move # record to} other {Move # records to}}"
 msgstr "{recordCount, plural, one {Mover # registro a} other {Mover # registros "
@@ -2524,6 +2530,10 @@ msgstr "Colores para {statusName}"
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Everyone in {app} will lose access."
 msgstr "Todas las personas en {app} perderán el acceso."
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Closed chats"
+msgstr "Chats cerrados"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "Choose a plan that works best for your workspace."
@@ -5009,6 +5019,10 @@ msgstr "El chat está habilitado en el Explorador de Datos y en los Tableros"
 msgid "Forgot your password?"
 msgstr "¿Olvidaste tu contraseña?"
 
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Reopen chat"
+msgstr "Volver a abrir el chat"
+
 #. placeholder {0}: pageIndex + 1
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "PDF page {0}"
@@ -5298,6 +5312,10 @@ msgstr "No se pudo volver a serializar la subconsulta anidada en FROM; el mapeo 
 msgid "1,000"
 msgstr "1,000"
 
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "More chats"
+msgstr "Más chats"
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometryFamilySelect.tsx
 msgid "Expected geometry"
 msgstr "Geometría esperada"
@@ -5353,6 +5371,8 @@ msgid "Exact locations"
 msgstr "Ubicaciones exactas"
 
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+#: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "New chat"
 msgstr "Nuevo chat"
 
@@ -8413,6 +8433,10 @@ msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
 msgstr "Lo ideal es que el usuario de la base de datos tenga acceso de solo "
 "lectura a la tabla o vista que planea importar."
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Close chat"
+msgstr "Cerrar chat"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The latitude must be between -90 and 90."
@@ -11717,6 +11741,10 @@ msgstr "Tipo de caso eliminado"
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "HAVING usa el operador \"{operator}\", que no es compatible con el "
 "formulario."
+
+#: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
+msgid "Delete chat"
+msgstr "Eliminar chat"
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 msgid "Search failed. Try again."

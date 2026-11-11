@@ -35,6 +35,8 @@ export type DataAgentTurnOptions = {
   currentUser: User.T | undefined;
   /** Identifies the conversation; a new chat gets a new agent. */
   chatGeneration: number;
+  /** Receives the completed hosted turn's page-value mask for its title. */
+  titleMaskRef?: MutableRefObject<((text: string) => string) | undefined>;
   parseSqlRef: MutableRefObject<
     ReturnType<typeof useSqlToStructuredQuery>["parseSql"]
   >;

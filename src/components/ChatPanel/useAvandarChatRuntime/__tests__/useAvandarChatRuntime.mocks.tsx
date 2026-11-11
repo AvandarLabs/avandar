@@ -20,6 +20,7 @@
  */
 import { vi } from "vitest";
 import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { ChatSessionActions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useLocalRuntime } from "@assistant-ui/react";
 
@@ -42,6 +43,7 @@ const { hoistedHarness, hoistedApiPostMock, hoistedRunQueryMock } = vi.hoisted(
         queryStatus?: "pending" | "success" | "error";
         chatPanelState?: ChatPanelState;
         chatPanelDispatch?: ChatPanelDispatch;
+        sessions?: ChatSessionActions;
       },
       hoistedApiPostMock: vi.fn(),
       hoistedRunQueryMock: vi.fn(),
@@ -217,6 +219,10 @@ vi.mock("@/components/AppShell/AppShell", async () => {
     await import("@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync");
   const { ChatPanelStateManager } =
     await import("@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager");
+  const { useChatSessions } =
+    await import("@/components/ChatPanel/ChatSessionProvider/useChatSessions");
+  const { NewCaseTypeButton } =
+    await import("@/views/OntologyDesignerApp/NewCaseTypeButton");
 
   function ChatPanelStandIn(): React.ReactNode {
     const { runtime, startNewChat } = useAvandarChatRuntime();
@@ -224,9 +230,11 @@ vi.mock("@/components/AppShell/AppShell", async () => {
     hoistedHarness.startNewChat = startNewChat;
     hoistedHarness.chatPanelState = ChatPanelStateManager.useState();
     hoistedHarness.chatPanelDispatch = ChatPanelStateManager.useDispatch();
+    hoistedHarness.sessions = useChatSessions();
     return (
       <AssistantRuntimeProvider runtime={runtime}>
         <ChatViewTranscriptSync />
+        <NewCaseTypeButton />
       </AssistantRuntimeProvider>
     );
   }

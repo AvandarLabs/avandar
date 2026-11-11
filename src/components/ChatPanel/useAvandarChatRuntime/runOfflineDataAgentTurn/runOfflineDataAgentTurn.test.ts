@@ -120,6 +120,18 @@ describe("runOfflineDataAgentTurn", () => {
     ).toEqual(["cases.csv"]);
   });
 
+  it("retains the offline conversation vault mask for its title", async () => {
+    const titleMaskRef = {
+      current: undefined as ((text: string) => string) | undefined,
+    };
+
+    await runOfflineDataAgentTurn(
+      _createTurnOptions({ chatGeneration: 6, titleMaskRef }),
+    );
+
+    expect(titleMaskRef.current).toBeTypeOf("function");
+  });
+
   it("lets values reach the model without a consent prompt", async () => {
     await runOfflineDataAgentTurn(_createTurnOptions({ chatGeneration: 3 }));
 

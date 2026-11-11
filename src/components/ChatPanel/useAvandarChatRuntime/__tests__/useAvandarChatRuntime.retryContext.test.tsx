@@ -21,6 +21,13 @@ import {
   runQueryMock,
 } from "@/components/ChatPanel/useAvandarChatRuntime/__tests__/useAvandarChatRuntime.mocks";
 
+/** The chat turn posts, without the title post that follows a reply. */
+function _getChatTurnRequests() {
+  return apiPostMock.mock.calls.flatMap(([request]) => {
+    return request?.route === "chat/:workspaceId/messages" ? [request] : [];
+  });
+}
+
 beforeEach(() => {
   resetHarness();
   runQueryMock.mockResolvedValue({
@@ -61,10 +68,10 @@ describe("useAvandarChatRuntime retry context", () => {
       harness.runtime!.thread.getMessageById(messages.at(-1)!.id).reload();
     });
     await waitFor(() => {
-      expect(apiPostMock).toHaveBeenCalledOnce();
+      expect(_getChatTurnRequests()).toHaveLength(1);
     });
 
-    expect(apiPostMock.mock.calls[0]?.[0]?.body?.retryContext).toEqual({
+    expect(_getChatTurnRequests()[0]?.body?.retryContext).toEqual({
       priorGeneratedSql: makeSqlFromDatasetId(DATASET_A_ID),
     });
   });
