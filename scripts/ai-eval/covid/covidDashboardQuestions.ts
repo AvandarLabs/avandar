@@ -125,6 +125,13 @@ function _vizTypeIs(
   };
 }
 
+/** Checks that a DataViz block is a chart, not a table. */
+function _isChart(block: ChatGeneratedDashboardBlock): Verdict {
+  return block.kind === "DataViz" && block.vizType !== "table"
+    ? { pass: true, detail: "a chart" }
+    : { pass: false, detail: "asked for a chart, got a table" };
+}
+
 /** Words a reply uses to say it found no such dashboard. */
 const NOT_FOUND_PATTERN =
   /\b(can(?:no|['’])t find|could(?:n['’]t| not) find|unable to find|no dashboard|not find|doesn['’]t exist|does not exist|don['’]t see|do not see)\b/i;
@@ -266,7 +273,12 @@ const ELSEWHERE_QUESTIONS: readonly EvalQuestion[] = [
     clarification: "not_needed",
     pageContext: MAP_PAGE,
     dashboards: WORKSPACE_DASHBOARDS,
-    expectedWrite: { dashboardId: COVID_2022.id, via: "card", kind: "DataViz" },
+    expectedWrite: {
+      dashboardId: COVID_2022.id,
+      via: "card",
+      kind: "DataViz",
+      checkBlock: _isChart,
+    },
     truth: { total: Sql.total("us_cases", YEAR_2022) },
     grade: (context) => {
       return weeklyTotal(context, 52);
@@ -303,6 +315,7 @@ const ELSEWHERE_QUESTIONS: readonly EvalQuestion[] = [
       dashboardId: COVID_DEATHS_ID,
       via: "card",
       kind: "DataViz",
+      checkBlock: _isChart,
     },
     truth: MONTHLY_DEATHS_2022,
     grade: _monthlyRows,

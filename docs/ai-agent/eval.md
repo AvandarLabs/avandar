@@ -246,6 +246,9 @@ dashboard tool was built.
   to use. With US and global deaths in the workspace, that question was
   fair, so D05 now says "US deaths" (see "Changes made while running the
   eval"). Runs #2 and #3 use the fixed wording. The three runs cost $0.035.
+- After the baseline, a review of the questions made D07 and D09 fail a
+  table, since both ask for a chart. Today's chat added no block on either,
+  so its numbers do not change.
 
 ## Offline mode
 

@@ -818,8 +818,17 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   the save itself (Pablo: offline is left out only when it cannot be built
   without one).
 - **Tools per version.** v1 to v3 keep their three tools unchanged. v4
-  is the first version whose tool list differs, so the proxy reads
-  `DATA_AGENT_TOOLS_BY_PROMPT_ID`.
+  is the first version whose tool list differs, so the proxy and the
+  browser read `DATA_AGENT_TOOLS_BY_PROMPT_ID`.
+- **Revised after a review against the code (2026-11-11).** The editor
+  saves without checking for changes made elsewhere, so Confirm on a
+  dashboard open in the editor adds the block there, unsaved, instead of
+  writing a row the editor's next Save would overwrite. Confirm prepares
+  column bindings as the editor's Save does. Edit rights are checked only
+  for dashboards whose name matches. The card's status lives on the
+  session's thread record, because a message part cannot change after its
+  turn. Offline routing reads only the user's message, and offline blocks
+  keep SQL for at most three tiles to fit the offline model's window.
 - **Alternatives.** Saving at once with Undo in the chat (breaks D33's
   confirm-first rule). Only the open dashboard (misses "from anywhere").
   A separate `find_dashboard` tool (a model call more per request). Listing

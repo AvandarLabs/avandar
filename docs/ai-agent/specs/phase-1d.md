@@ -1,8 +1,9 @@
 # Phase 1D: dashboard actions from anywhere
 
-Status: designed with Pablo on 2026-11-11. Part of
-[Phase 1](phase-1.md). Follows rules R1 to R4 there. Decision D44 in
-[decisions.md](../decisions.md). Builds on [phase-1c.md](phase-1c.md).
+Status: designed with Pablo on 2026-11-11, revised the same day after a
+review against the code. Part of [Phase 1](phase-1.md). Follows rules R1 to
+R4 there. Decision D44 in [decisions.md](../decisions.md). Builds on
+[phase-1c.md](phase-1c.md).
 
 ## Goal
 
@@ -33,7 +34,7 @@ Out:
   in Phase 3.1.
 - A general confirmation system for every tool (roadmap 2.3). The card
   here serves `add_dashboard_block` only.
-- More than one block per turn.
+- More than one block per answer.
 - Case-design sessions. They keep today's case-manager chat, online and
   offline.
 
@@ -47,6 +48,18 @@ Out:
 | Offline | Full parity. The offline agent answers on every page and gets the same tool and card. Only saving needs a connection, and it fails clearly without one. |
 | Analytics and Try again | Not in 1D. 1E adds them. |
 
+## Decisions made while reviewing against the code
+
+| The code showed | Decision |
+|---|---|
+| The editor saves with a plain update, so its next Save overwrites a row written while it was open. | Confirm on a dashboard that is open in the editor at that moment adds the block to the editor, unsaved, instead of writing the row. |
+| A DataViz block needs column bindings. The editor's Save prepares them with `DashboardColumnBindingPreparation.prepareDocument`. | Confirm runs the same preparation before it saves. |
+| No call checks edit rights for many dashboards at once. | Names are matched first. Edit rights are checked only for the matches, one `UserClient.canAccessResource` call each. |
+| A message part cannot change after its turn, and data parts never reach the model. | The card's proposal is a data part. Its status lives on the session's thread record, and the next turn's text reports it. |
+| `run_query` asks consent for filter values, counts toward a cap of three queries per answer, and escalates after a failed query. | `add_dashboard_block` does the same with a DataViz block's SQL. |
+| The vault restores placeholders in SQL only. | The vault gains `unmaskText` for names and labels. |
+| Offline routing and value matching read the whole turn text, and the offline model has an 8,192-token window. | Offline routing and value matching read only the user's message. Offline blocks keep SQL for at most three tiles. |
+
 ## The tool
 
 `add_dashboard_block` is defined in `shared/agent/dataAgent/dataAgentTools.ts`
@@ -56,66 +69,84 @@ beside `run_query`, so the proxy and the browser read one definition.
 |---|---|
 | `dashboard` | `"current"` for the dashboard open in the editor, or the dashboard's name exactly as the model saw it in the page block, `<mentioned>`, `<attached>`, or the user's message. A placeholder such as `<value 1>` is allowed. |
 | `block` | `kind` and the fields for that kind, as today's `addDashboardBlock` takes them: DataViz (`prompt`, `sql`, `vizType`), HeadingBlock, ParagraphBlock, QuoteBlock, DividerBlock, CalloutBlock, ListBlock, CodeBlock, TableBlock, Card. |
-| `summary` | One sentence for the user. |
+| `summary` | One sentence for the user. It becomes the reply when the block is added or the card is shown. |
+
+How it runs:
+
+1. The block is validated with the shared parser. Invalid fields go back
+   to the model.
+2. A second block in the same answer is refused: one block per answer.
+3. A DataViz block's SQL has its aliases resolved, gets the consent check
+   `run_query` uses (`approveValuesForModel` on its literals), and runs
+   on the device with `checkQuery`. It counts toward the three queries an
+   answer may run. A failed query goes back to the model and asks for
+   escalation, as a failed `run_query` does. An empty result is allowed.
+4. The dashboard is resolved (below). The block goes to the open editor,
+   or a card is shown.
 
 What the model reads back:
 
-| Outcome | Tool result |
-|---|---|
-| Added to the open editor | `Added to the open dashboard (unsaved).` |
-| Card shown | `The card is on the user's screen. Nothing changes until they confirm.` The turn ends, as a deferred `ask_user` does. |
-| No editor open for `"current"` | No dashboard is open. |
-| No dashboard matches, or the user cannot edit it | No dashboard named the given name that the user can edit. |
-| DataViz SQL failed | The error, as `run_query` returns it. |
-| Invalid fields | `Invalid block:` and the reason. |
+| Outcome | Tool result | Ends the turn |
+|---|---|---|
+| Added to the open editor | `Added to the open dashboard (unsaved).` | Yes |
+| Card shown | `The card is on the user's screen. Nothing changes until they confirm.` | Yes |
+| No editor open for `"current"` | `No dashboard is open.` | No |
+| No dashboard matches, or the user can edit none of the matches | `No dashboard named "<name>" that the user can edit.` | No |
+| DataViz SQL failed | The error, as `run_query` returns it. | On the third query |
+| Invalid fields | `Invalid block:` and the reason. | No |
+| A second block in one answer | `Only one block per answer. Tell the user what else you would add.` | No |
 
 A DataViz block's result reaches the model as its row count and column
-names, as `run_query`'s does. Never rows.
+names, as `run_query`'s does. Never rows. When the turn ends on the tool,
+the reply is its `summary`.
 
-`parseDashboardBlock`, `dashboardBlockSummary`, and the block types move
-from `supabase/functions/chat/PostChatMessages/parsing/` to
-`shared/agent/dashboardBlocks/`. Today's chat and the agent validate blocks
-with the same code. Today's chat behaves as before.
+The parsing in `parseDashboardBlock`, `dashboardBlockSummary`, and
+`cleanLlmGeneratedSql` moves from `supabase/functions/chat/` to
+`shared/agent/dashboardBlocks/`, so today's chat and the agent validate
+blocks with the same code. The edge function keeps a thin wrapper that
+parses the tool call's JSON string. Today's chat behaves as before.
 
 ## Prompt v4 and the proxy
 
 `data-agent-v4` is v3 plus `DASHBOARD_BLOCK_RULES`:
 
 - Add a block only when the user asks to add something to a dashboard.
-- One block per turn.
+- One block per answer.
 - Name the dashboard as written, or `"current"` for the open one.
 - A chart that only needs to show in the chat or the explorer uses
   `run_query`.
-- A `<dashboard_card>` line reports what the user did with the last card.
+- A `<dashboard_card>` line reports what the user did with an earlier card.
 
-v1 to v3 are served unchanged. Tools become per version:
+v1 to v3 are served unchanged. v3 gets the same instruction-hash test v1
+and v2 have before v4 is written. Tools become per version:
 `DATA_AGENT_TOOLS_BY_PROMPT_ID` gives v1 to v3 their three tools and v4
-four. `buildDataAgentProxyContext` reads it. `DATA_AGENT_PROMPT_ID` becomes
+four. The proxy's tool list and its known-tool check both read it, and so
+does the browser's tool list. `DATA_AGENT_PROMPT_ID` becomes
 `data-agent-v4`. v4 can change until the commit that deploys it. After
 that, a change needs v5.
 
 ## Finding the dashboard
 
-`resolveAgentDashboardTarget` runs on the device.
+`resolveAgentDashboardTarget` is a pure function. The browser host and the
+eval hosts both call it.
 
-- `"current"` is `DashboardEditorStateManager`'s `activeDashboardId`.
-- A name is first restored through the conversation's vault, if it is a
-  placeholder. It is then compared, ignoring case and surrounding spaces,
-  with the page's dashboard, the mentioned dashboards, the attached
-  dashboards, and the workspace's dashboards, in that order. The workspace
-  list is loaded once per turn and holds ids and names only. It is never
-  sent to the model.
-- Only dashboards the user can edit count: the dashboards app role and the
-  dashboard's own access.
-- One match is the target. Several put a picker on the card. None goes
-  back to the model.
-
-## Checking a DataViz block
-
-The host gains `checkQuery`. It runs the block's SQL locally, after the
-vault restores placeholders, and does not show the result. A failed query
-goes back to the model, which may fix it within its usual request cap. An
-empty result is allowed, and the card says the chart has no rows yet.
+- `"current"` is `DashboardEditorStateManager`'s `activeDashboardId`. Only
+  the mounted editor sets it, so a preview page has no current dashboard.
+- A name is first restored with the vault's `unmaskText`, if it holds a
+  placeholder. It is compared, ignoring case and surrounding spaces, with
+  dashboard names in tiers: the page's dashboard, then the mentioned and
+  attached dashboards, then every dashboard in the workspace. The first
+  tier with a match wins. A requested name that ends in the word
+  "dashboard" also matches without that word.
+- The workspace's dashboards are loaded once per turn, only when the tool
+  first needs them, with `DashboardClient.getAll` filtered by the
+  workspace id. The filter matters: without it, the select policy also
+  returns public dashboards from other workspaces. The list is never sent
+  to the model.
+- Each match is checked with `UserClient.canAccessResource` at the editor
+  role. Matches the user cannot edit are dropped.
+- A match that is the dashboard open in the editor goes to the editor.
+  One other match gets a card. Several get a card with a picker.
 
 ## The open editor
 
@@ -126,30 +157,44 @@ canvas unsaved, and the user saves it.
 
 ## The card
 
-`AgentDashboardBlockPart` is a message part stored in the thread, so it
-belongs to its session (1C) and survives a reload.
+The proposal is an `agent-dashboard-block` data part in the assistant
+message: a card id, the block, the summary, and the candidate dashboards.
+`AgentDashboardBlockPart` draws it.
+
+The card's status lives on the session's thread record
+(`StoredChatThread.dashboardCards`, by card id), beside the pending
+clarification. It is held in `ChatPanelStateManager`, loaded and saved with
+the session, and written as soon as it changes.
 
 | State | Shows |
 |---|---|
-| Pending | The target dashboard, or a picker when several match, and a preview of the block. A DataViz preview is drawn from the local result, as `AgentQueryResultPart` draws one. Text blocks show their text. Confirm and Cancel. Confirm is disabled until a dashboard is picked. |
-| Confirmed | That the block was added, with a link to the dashboard. |
+| Pending | The target dashboard, or a picker when several match, and a preview of the block. Each picker option shows the dashboard's name, how many charts it has, and when it was last edited. A DataViz preview is drawn from the local result, as `AgentQueryResultPart` draws one. Text blocks show their text. Confirm and Cancel. Confirm is disabled until a dashboard is picked. |
+| Confirmed | That the block was added, with a link to the dashboard. When it went into the open editor, that it still needs saving. |
 | Cancelled | That nothing was added. |
 | Failed | Why, with Retry when retrying can help. |
 
-Confirm needs no model call. It reads the dashboard row, appends the block
-to the draft content, and saves with `updateDashboardRowIfUnchanged`. If
-the row changed since it was read, it reads again and retries once. The
-published snapshot is not touched.
+Confirm needs no model call:
+
+1. If the chosen dashboard is open in the editor now, the block is queued
+   into the editor, unsaved, as on the editor path.
+2. Otherwise it reads the dashboard row, appends the block to its content,
+   prepares column bindings with
+   `DashboardColumnBindingPreparation.prepareDocument`, and saves the
+   content with `updateDashboardRowIfUnchanged`. If the row changed since
+   it was read, it reads again and retries once. The published snapshot is
+   not touched.
 
 The next agent turn starts with one line for each card resolved since the
-last turn, before the page block:
+agent last heard about it, before the page block:
 
 ```text
 <dashboard_card>Confirmed: added to "COVID 2022".</dashboard_card>
 <dashboard_card>Cancelled.</dashboard_card>
 ```
 
-The dashboard name passes through the vault's mask like any other name.
+A hosted turn masks the name with the vault, like any other name. An
+offline turn uses the real name (D42). Each status records whether the
+agent has heard it, so a line is sent once, even across a reload.
 
 Every string on the card is translated.
 
@@ -159,12 +204,17 @@ Every string on the card is translated.
   which keep today's case-manager chat. The multi-pass offline pipeline
   is no longer used for data sessions.
 - It reads the page block, the mentioned block, and the attached block,
-  with real names, as offline turns may (D42). Its answers stay marked as
-  offline answers.
+  with real names, as offline turns may (D42). Its blocks keep SQL for at
+  most three tiles, so they fit the 8,192-token window with the offline
+  prompt. Its answers stay marked as offline answers.
+- Its results go where the online agent's do: the Data Explorer on that
+  page, the chat everywhere else.
+- Routing and value matching read only the user's message, never the
+  blocks before it.
 - It has the same `add_dashboard_block` tool, host, card, and card line.
-  The offline prompt gains a short dashboard rule.
-- The router treats an add-to-dashboard request as `data`.
-  `add_dashboard_block` counts as the action a data turn must end with.
+  The offline prompt gains a short dashboard rule, and its rule that a data
+  question needs `run_query` also allows `add_dashboard_block`.
+- A turn too long for the window gets today's overflow reply.
 - Saving needs a connection. Without one, Confirm fails and the card
   stays retryable. Adding to the open editor works without one, and saving
   the editor needs a connection, as today.
@@ -176,27 +226,32 @@ Every string on the card is translated.
 | `"current"` with no editor open | The model is told no dashboard is open. It asks which one, or names one. |
 | No match, or no edit rights | The model is told, and tells the user. Nothing changes. |
 | Several matches | The card shows a picker. |
-| The DataViz SQL fails | The model gets the error and may retry within its cap. If the cap runs out, the reply says the chart could not be built. |
-| Invalid block fields | The model gets the reason and may retry once. |
+| The DataViz SQL fails | The model gets the error and may retry within the query cap. If the cap runs out, the reply says the chart could not be built. |
+| Invalid block fields | The model gets the reason and may retry within the turn cap. |
 | The dashboard changed before Confirm | Read again and retry once. Still stale: failed, with Retry. |
 | No connection, or the save fails | Failed: "Couldn't save. Check your connection and try again." Retry stays. |
 | The dashboard was deleted or access removed | Failed: "This dashboard is no longer available." No Retry. |
-| A session switch or reload while a card is pending | The card is stored in the thread and still works. |
-| The target's editor opens while a card is pending | Confirm still saves the stored row. The editor's usual handling of a row changed elsewhere applies. |
+| A session switch or reload while a card is pending | The card's status is on the session's record and still works. |
+| The target is open in the editor at Confirm | The block goes into the editor, unsaved. |
 | Cancel | The card shows cancelled. The next turn's card line says so. |
 | Offline, an unreadable tool call | Goes back to the model as a failed call, as offline already does. |
+
+Known limit: a card saved while the same dashboard is open in an editor in
+another tab is overwritten by that tab's next Save. Saving from the Data
+Explorer's **Save to dashboard** has the same limit today.
 
 ## Eval
 
 New category D, run with `--questions D`, kept out of the default 45.
 
 `EvalQuestion` gains `dashboards` (the workspace's dashboards: id, name,
-editable, tiles), `openEditor` (the dashboard open in the editor, if any),
-and `card` (the simulated user's script: `confirm`, `cancel`, or
-`pick: /name/`). Every answer records
+editable, tiles), `openEditorDashboardId` (the dashboard open in the
+editor, if any), `card` (the simulated user's script: `confirm` or
+`cancel`, and `pickDashboardId` for the picker), and `expectedWrite`.
+Every answer records
 `dashboardWrites: { dashboardId, block, via: "editor" | "card" }[]`.
 
-`gradeDashboardAnswer` checks the end state: the target, `via`, the kind,
+`gradeDashboardWrites` checks the end state: the target, `via`, the kind,
 and the fields. A DataViz block's SQL runs in DuckDB and is graded against
 ground truth with `ResultChecks`.
 
@@ -206,27 +261,28 @@ ground truth with `ResultChecks`.
 | D02 | Dashboard editor | "Add a heading that says Deaths in 2022" | One editor write: HeadingBlock with that text. |
 | D03 | Dashboard editor | "Add a callout warning that 2023 data is partial" | One editor write: CalloutBlock, tone warning. |
 | D04 | Dashboard editor | "Add a table of the 5 states with the most deaths" | One editor write: DataViz table, the top 5 correct. |
-| D05 | Dashboard editor | "What were total deaths in 2022?" | No write. The answer's total is correct. |
+| D05 | Dashboard editor | "What were total US deaths in 2022?" | No write. The answer's total is correct. |
 | D06 | Data Explorer with a query on screen, a dashboard mentioned | "Add this as a bar chart to @COVID 2022" | One card write to the mentioned dashboard, bar, the explorer query's result. |
-| D07 | Map page | "Add a chart of weekly US cases in 2022 to the COVID 2022 dashboard" | One card write to that dashboard, weekly total within 5%. |
-| D08 | Map page | "Add a heading to the Budget dashboard" (none exists) | No write. The reply says it cannot find it. |
-| D09 | Map page, two dashboards named "COVID" | "Add a deaths chart to COVID" | The simulated user picks one on the card, and that dashboard gets one write. |
+| D07 | Map page | "Add a chart of weekly US cases in 2022 to the COVID 2022 dashboard" | One card write to that dashboard, a chart (not a table), weekly total within 5%. |
+| D08 | Map page | "Add a heading that says Spending to the Budget dashboard" (none exists) | No write. The reply says it cannot find it. |
+| D09 | Map page, two dashboards named "COVID" | "Add a chart of monthly US deaths in 2022 to the COVID dashboard" | The simulated user picks one on the card, and that dashboard gets one write: a chart, monthly totals match. |
 
 Harnesses:
 
 - **Baseline:** a page with an editor open sends `ChatPageContext` with
   `app: "dashboards"` and its `dashboardId`. A returned `dashboardBlock` is
   recorded as an editor write, by the rule `shouldQueueDashboardBlock`
-  applies.
-- **Pi and pi-local:** the host resolves dashboards from the fixture, runs
-  `checkQuery` in DuckDB, and the simulated user answers the card.
+  applies. Mentions are named by type, as today's chat hears them (D42).
+- **Pi and pi-local:** the host resolves dashboards with
+  `resolveAgentDashboardTarget` over the fixture, runs `checkQuery` in
+  DuckDB, and the simulated user answers the card.
 
 The baseline's questions, grader, and harness support come first, and its
 runs set the bar before the agent side is built.
 
 | Run | Label | Bar |
 |---|---|---|
-| Today's chat, Claude Haiku 5.5, D01 to D09, two runs | `phase-1d:today-dashboards` | The baseline. D06 to D09 are expected to fail. |
+| Today's chat, Claude Haiku 5.5, D01 to D09 | `phase-1d:today-dashboards` | The baseline: D01 to D05 5/5 and D06 to D09 0/4 on every run (recorded in `eval.md`). |
 | Agent v4, D01 to D09, three runs | `phase-1d:agent-dashboards` | D01 to D05 at least as good as the baseline. D06 to D09 pass on all three. |
 | Agent v4 on P, M, and the 45 | `phase-1d:agent-page`, `phase-1d:agent-mentions`, `phase-1d:agent-45` | Unchanged from v3. A single miss is rerun before calling it a regression. |
 | Offline Qwen3 4B on D and the 45 | `phase-1d:offline-dashboards`, `phase-1d:offline-45` | No write that was not asked for, no write without Confirm, the D score recorded, and the 45 at 26 or better. |
@@ -235,21 +291,28 @@ runs set the bar before the agent side is built.
 
 Red/green TDD with Vitest, plus one browser spec:
 
-- `add_dashboard_block`'s schema, and the per-version tool lists: v1 to v3
-  serve three tools, unchanged, and v4 serves four.
-- `parseDashboardBlock` keeps its tests in its new place.
-- Dashboard resolution: `"current"`, a mention, the tray, a name, a
-  placeholder, edit rights, no match, and several matches.
-- The editor path queues the block unsaved. The card path ends the turn.
-- The card: each state, the save, the stale retry, the offline failure,
-  and the next turn's card line.
-- v4's prompt holds `DASHBOARD_BLOCK_RULES`. v1 to v3 are unchanged.
-- Offline: the router sends an add-to-dashboard request to `data`, and
-  offline turns on other pages carry the page, attached, and mentioned
-  blocks.
+- v3's instructions keep their hash. v4 holds `DASHBOARD_BLOCK_RULES`.
+- The per-version tool lists: v1 to v3 serve and accept three tools,
+  unchanged, and v4 four, in the proxy and the browser.
+- The shared block parser keeps its tests in its new place, and the edge
+  wrapper still parses today's tool calls.
+- The vault's `unmaskText`.
+- `resolveAgentDashboardTarget`: `"current"`, the page, a mention, the
+  tray, a workspace name, a placeholder, a trailing "dashboard", edit
+  rights, no match, several matches, and the open editor among matches.
+- The tool: invalid fields, one block per answer, consent, the query cap,
+  escalation, the editor path, and the card path ending the turn with the
+  summary as the reply.
+- The card: each state, the editor-open Confirm, the save with prepared
+  bindings, the stale retry, the offline failure, the status on the
+  session record, and a card line sent once.
+- Offline: routing reads only the message, blocks carry at most three
+  tiles of SQL, results go to the chat off the explorer, and the router
+  sends an add-to-dashboard request to `data`.
+- The specs that mock `data-agent-v3` move to `data-agent-v4`.
 - `tests/e2e/agent-dashboard-block.spec.ts`: with the agent proxy mocked,
-  set up a test dashboard, ask from the Data Explorer to add a chart to it
-  by name, see the card, confirm, see the link, open the dashboard, and see
+  seed a test dashboard, ask from the Data Explorer to add a chart to it by
+  name, see the card, confirm, see the link, open the dashboard, and see
   the block. `finally` deletes the dashboard.
 
 ## Done when
