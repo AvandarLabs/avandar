@@ -1,7 +1,10 @@
 import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
 import { getCodingsFromProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/getCodingsFromProposal/getCodingsFromProposal.ts";
 import { makeDraftFromProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/makeDraftFromProposal/makeDraftFromProposal.ts";
-import { makeProposalFromColumnProfiles } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/makeProposalFromColumnProfiles/makeProposalFromColumnProfiles.ts";
+import {
+  getStrongerSuggestionReason,
+  makeProposalFromColumnProfiles,
+} from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/makeProposalFromColumnProfiles/makeProposalFromColumnProfiles.ts";
 import {
   acceptCodeList,
   applyLabelSuggestions,
@@ -82,10 +85,10 @@ function getValuesSeen(
   const values = new Map<string, ColumnProfile.Value>();
   getColumns(entry).forEach((column) => {
     (column.values ?? []).forEach((item) => {
-      const key = ColumnProfile.normalizeValue(item.value);
+      const key = ColumnProfile.getComparisonKey(item.value);
       const current = values.get(key);
       values.set(key, {
-        value: current?.value ?? item.value,
+        value: current?.value ?? item.value.trim(),
         rowCount: (current?.rowCount ?? 0) + item.rowCount,
       });
     });
@@ -105,8 +108,16 @@ function getNumberRange(
     return undefined;
   }
   return {
-    min: Math.min(...ranges.map((range) => {return range.min})),
-    max: Math.max(...ranges.map((range) => {return range.max})),
+    min: Math.min(
+      ...ranges.map((range) => {
+        return range.min;
+      }),
+    ),
+    max: Math.max(
+      ...ranges.map((range) => {
+        return range.max;
+      }),
+    ),
   };
 }
 
@@ -269,7 +280,11 @@ function _applyMeaningMatch(
   const merged: DictionaryProposalEntry = {
     ...target,
     suggestedColumns: [...target.suggestedColumns, ...getColumns(source)],
-    suggestionReason: "meaning",
+    suggestionReason: getStrongerSuggestionReason([
+      target.suggestionReason,
+      source.suggestionReason,
+      "meaning",
+    ]),
   };
   return {
     entries: proposal.entries

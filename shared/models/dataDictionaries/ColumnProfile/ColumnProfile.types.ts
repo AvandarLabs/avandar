@@ -49,3 +49,16 @@ export type ColumnMatchScore = {
   typeScore: number;
   band: ColumnMatchBand;
 };
+
+/**
+ * A profile with what scoring needs worked out once: its listed values by
+ * comparison key and their row total. Matching many columns against each
+ * other reads these instead of rebuilding them for every pair.
+ */
+export type ColumnMatchProfile = {
+  profile: ColumnProfileT;
+  /** Row counts of the listed values, by comparison key. */
+  valueRows: ReadonlyMap<string, number> | undefined;
+  /** Rows across every listed value. */
+  totalValueRows: number;
+};

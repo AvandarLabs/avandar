@@ -152,26 +152,125 @@ function _isSameWord(wordA: string, wordB: string): boolean {
 }
 
 /**
+ * How alike two names are from their unique tokens: the share of each
+ * name's tokens the other name also has. `isSame` decides whether two
+ * tokens count as one word, so a caller can pass numbered tokens and a
+ * memoized check.
+ */
+export function getNameScoreFromTokens<Token>(
+  tokensA: readonly Token[],
+  tokensB: readonly Token[],
+  isSame: (tokenA: Token, tokenB: Token) => boolean,
+): number {
+  if (tokensA.length === 0 || tokensB.length === 0) {
+    return 0;
+  }
+  const matchedA = tokensA.filter((tokenA) => {
+    return tokensB.some((tokenB) => {
+      return isSame(tokenA, tokenB);
+    });
+  }).length;
+  const matchedB = tokensB.filter((tokenB) => {
+    return tokensA.some((tokenA) => {
+      return isSame(tokenA, tokenB);
+    });
+  }).length;
+  return (matchedA + matchedB) / (tokensA.length + tokensB.length);
+}
+
+/** The distinct tokens of a column name, in the order they first appear. */
+export function getUniqueTokensFromColumnName(columnName: string): string[] {
+  return [...new Set(getTokensFromColumnName(columnName))];
+}
+
+/**
  * How alike two column names are, from 0 to 1: the share of each name's
  * tokens the other name also has, where two long words a letter or two
  * apart count as one. `zip_code` and `ZIP` score 1; `case_id` and `CaseNo`
  * score 0.5.
  */
 export function getNameScore(nameA: string, nameB: string): number {
-  const tokensA = [...new Set(getTokensFromColumnName(nameA))];
-  const tokensB = [...new Set(getTokensFromColumnName(nameB))];
-  if (tokensA.length === 0 || tokensB.length === 0) {
-    return 0;
-  }
-  const matchedA = tokensA.filter((tokenA) => {
-    return tokensB.some((tokenB) => {
-      return _isSameWord(tokenA, tokenB);
-    });
-  }).length;
-  const matchedB = tokensB.filter((tokenB) => {
-    return tokensA.some((tokenA) => {
-      return _isSameWord(tokenA, tokenB);
-    });
-  }).length;
-  return (matchedA + matchedB) / (tokensA.length + tokensB.length);
+  return getNameScoreFromTokens(
+    getUniqueTokensFromColumnName(nameA),
+    getUniqueTokensFromColumnName(nameB),
+    _isSameWord,
+  );
+}
+
+/** Scores many column names against each other, computing each pair once. */
+export type NameScorer = {
+  /** A small number standing for a column name, the same for equal names. */
+  getNameId: (columnName: string) => number;
+  /** The name score of two names given by `getNameId`. */
+  getScore: (idA: number, idB: number) => number;
+};
+
+/** Gives each distinct word a number, and remembers which words are one. */
+function _createWordIndex(): {
+  getWordId: (word: string) => number;
+  isSameWordId: (idA: number, idB: number) => boolean;
+} {
+  const idsByWord = new Map<string, number>();
+  const words: string[] = [];
+  // 0 not compared yet, 1 the same word, 2 different words.
+  const rows: Uint8Array[] = [];
+  const getWordId = (word: string): number => {
+    const known = idsByWord.get(word);
+    if (known !== undefined) {
+      return known;
+    }
+    idsByWord.set(word, words.length);
+    words.push(word);
+    return words.length - 1;
+  };
+  const isSameWordId = (idA: number, idB: number): boolean => {
+    if (idA === idB) {
+      return true;
+    }
+    const row = (rows[idA] ??= new Uint8Array(words.length));
+    const known = row[idB];
+    if (known) {
+      return known === 1;
+    }
+    const isSame = _isSameWord(words[idA] ?? "", words[idB] ?? "");
+    row[idB] = isSame ? 1 : 2;
+    return isSame;
+  };
+  return { getWordId, isSameWordId };
+}
+
+/**
+ * A `NameScorer` that tokenizes each distinct name once and remembers every
+ * word pair and name pair it has compared. Give every name its id with
+ * `getNameId` before scoring, so each score row is sized once.
+ */
+export function createNameScorer(): NameScorer {
+  const idsByName = new Map<string, number>();
+  const wordIdsByName: number[][] = [];
+  const rows: Float64Array[] = [];
+  const { getWordId, isSameWordId } = _createWordIndex();
+  const getNameId = (columnName: string): number => {
+    const known = idsByName.get(columnName);
+    if (known !== undefined) {
+      return known;
+    }
+    idsByName.set(columnName, wordIdsByName.length);
+    wordIdsByName.push(
+      getUniqueTokensFromColumnName(columnName).map(getWordId),
+    );
+    return wordIdsByName.length - 1;
+  };
+  const getScore = (idA: number, idB: number): number => {
+    const row = (rows[idA] ??= new Float64Array(wordIdsByName.length).fill(-1));
+    const known = row[idB];
+    if (known !== undefined && known >= 0) {
+      return known;
+    }
+    const wordsA = wordIdsByName[idA] ?? [];
+    const wordsB = wordIdsByName[idB] ?? [];
+    const score = getNameScoreFromTokens(wordsA, wordsB, isSameWordId);
+    row[idB] = score;
+    return score;
+  };
+  return { getNameId, getScore };
 }

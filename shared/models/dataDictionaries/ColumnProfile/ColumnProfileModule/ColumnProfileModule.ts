@@ -1,10 +1,12 @@
 import {
+  createNameScorer,
   getEntryNameFromColumnName,
   getNameScore,
   getTokensFromColumnName,
   getWordsFromColumnName,
 } from "$/models/dataDictionaries/ColumnProfile/ColumnProfileModule/columnNameHelpers.ts";
 import type {
+  ColumnMatchProfile,
   ColumnMatchScore,
   ColumnProfileT,
   ColumnProfileValue,
@@ -71,6 +73,19 @@ const TYPE_FAMILIES: Record<AvaDataType.T, string> = {
 
 function normalizeValue(value: string): string {
   return value.trim().toLowerCase();
+}
+
+/** A code made only of digits, with an optional sign or decimals. */
+const NUMERIC_CODE = /^-?\d+(\.\d+)?$/;
+
+/**
+ * The key two values are compared by: trimmed and lowercased, and a numeric
+ * code without its leading zeros, so `01` and `1` are one code. Only
+ * comparisons use it: a code list keeps the spelling it first saw.
+ */
+function getComparisonKey(value: string): string {
+  const key = normalizeValue(value);
+  return NUMERIC_CODE.test(key) ? key.replace(/^(-?)0+(?=\d)/, "$1") : key;
 }
 
 function isMissingValue(value: string): boolean {
@@ -176,19 +191,38 @@ function getEntryKind(
   return "text";
 }
 
+/** Worked out once per profile so scoring many pairs rebuilds nothing. */
+function prepareProfileForMatching(
+  profile: Readonly<ColumnProfileT>,
+): ColumnMatchProfile {
+  if (!profile.values) {
+    return { profile, valueRows: undefined, totalValueRows: 0 };
+  }
+  const valueRows = new Map<string, number>();
+  let totalValueRows = 0;
+  profile.values.forEach((item) => {
+    const key = getComparisonKey(item.value);
+    valueRows.set(key, (valueRows.get(key) ?? 0) + item.rowCount);
+    totalValueRows += item.rowCount;
+  });
+  return { profile, valueRows, totalValueRows };
+}
+
+/** The share of `from`'s rows whose value `other` lists too. */
 function _getListedShare(
-  values: readonly ColumnProfileValue[],
-  otherKeys: ReadonlySet<string>,
+  from: Readonly<ColumnMatchProfile>,
+  other: ReadonlyMap<string, number>,
 ): number {
-  const total = values.reduce((sum, item) => {
-    return sum + item.rowCount;
-  }, 0);
-  const shared = values.reduce((sum, item) => {
-    return otherKeys.has(normalizeValue(item.value))
-      ? sum + item.rowCount
-      : sum;
-  }, 0);
-  return total === 0 ? 0 : shared / total;
+  if (!from.valueRows || from.totalValueRows === 0) {
+    return 0;
+  }
+  let sharedRows = 0;
+  from.valueRows.forEach((rowCount, key) => {
+    if (other.has(key)) {
+      sharedRows += rowCount;
+    }
+  });
+  return sharedRows / from.totalValueRows;
 }
 
 function _getRangeOverlap(
@@ -206,43 +240,47 @@ function _getRangeOverlap(
 }
 
 function _getValueScore(
-  profileA: Readonly<ColumnProfileT>,
-  profileB: Readonly<ColumnProfileT>,
+  matchA: Readonly<ColumnMatchProfile>,
+  matchB: Readonly<ColumnMatchProfile>,
 ): number | undefined {
-  if (profileA.values && profileB.values) {
-    const keysOf = (values: readonly ColumnProfileValue[]): Set<string> => {
-      return new Set(
-        values.map((item) => {
-          return normalizeValue(item.value);
-        }),
-      );
-    };
+  if (matchA.valueRows && matchB.valueRows) {
     return (
-      (_getListedShare(profileA.values, keysOf(profileB.values)) +
-        _getListedShare(profileB.values, keysOf(profileA.values))) /
+      (_getListedShare(matchA, matchB.valueRows) +
+        _getListedShare(matchB, matchA.valueRows)) /
       2
     );
   }
-  if (profileA.numberRange && profileB.numberRange) {
-    return _getRangeOverlap(profileA.numberRange, profileB.numberRange);
-  }
-  return undefined;
+  const rangeA = matchA.profile.numberRange;
+  const rangeB = matchB.profile.numberRange;
+  return rangeA && rangeB ? _getRangeOverlap(rangeA, rangeB) : undefined;
 }
 
-function _getTypeScore(typeA: AvaDataType.T, typeB: AvaDataType.T): number {
+function getTypeScore(typeA: AvaDataType.T, typeB: AvaDataType.T): number {
   if (TYPE_FAMILIES[typeA] === TYPE_FAMILIES[typeB]) {
     return 1;
   }
   return typeA === "varchar" || typeB === "varchar" ? 0.5 : 0;
 }
 
-function getMatchScore(
-  profileA: Readonly<ColumnProfileT>,
-  profileB: Readonly<ColumnProfileT>,
+/**
+ * The highest score two columns could reach once their name and type scores
+ * are known, whatever their values hold. A pair under the suggestion score
+ * here never needs its values compared.
+ */
+function getBestPossibleScore(nameScore: number, typeScore: number): number {
+  return 0.45 * nameScore + 0.2 * typeScore + 0.35;
+}
+
+function getMatchScoreFromPrepared(
+  matchA: Readonly<ColumnMatchProfile>,
+  matchB: Readonly<ColumnMatchProfile>,
+  nameScore: number,
 ): ColumnMatchScore {
-  const nameScore = getNameScore(profileA.columnName, profileB.columnName);
-  const valueScore = _getValueScore(profileA, profileB);
-  const typeScore = _getTypeScore(profileA.dataType, profileB.dataType);
+  const valueScore = _getValueScore(matchA, matchB);
+  const typeScore = getTypeScore(
+    matchA.profile.dataType,
+    matchB.profile.dataType,
+  );
   // When values cannot be compared, name and type carry the whole score.
   const parts = [
     { weight: 0.45, score: nameScore },
@@ -265,6 +303,17 @@ function getMatchScore(
   return { score, nameScore, valueScore, typeScore, band };
 }
 
+function getMatchScore(
+  profileA: Readonly<ColumnProfileT>,
+  profileB: Readonly<ColumnProfileT>,
+): ColumnMatchScore {
+  return getMatchScoreFromPrepared(
+    prepareProfileForMatching(profileA),
+    prepareProfileForMatching(profileB),
+    getNameScore(profileA.columnName, profileB.columnName),
+  );
+}
+
 function _getScaleRank(
   value: string,
   vocabulary: readonly string[] | undefined,
@@ -282,6 +331,14 @@ function _getScaleRank(
     : Number.MAX_SAFE_INTEGER - 1;
 }
 
+/** A locale-free order, so the same values sort the same everywhere. */
+function _compareCodePoints(textA: string, textB: string): number {
+  if (textA === textB) {
+    return 0;
+  }
+  return textA < textB ? -1 : 1;
+}
+
 function sortValuesInScaleOrder(
   values: readonly ColumnProfileValue[],
 ): ColumnProfileValue[] {
@@ -290,7 +347,7 @@ function sortValuesInScaleOrder(
     return (
       _getScaleRank(itemA.value, vocabulary) -
         _getScaleRank(itemB.value, vocabulary) ||
-      itemA.value.localeCompare(itemB.value)
+      _compareCodePoints(itemA.value, itemB.value)
     );
   });
 }
@@ -314,6 +371,12 @@ export const ColumnProfileModule = {
   /** Trims and lowercases a value, the way codes are compared. */
   normalizeValue,
 
+  /**
+   * The key two values are compared by: `normalizeValue`, and a numeric
+   * code without its leading zeros, so `01` and `1` are one code.
+   */
+  getComparisonKey,
+
   /** Whether a value is a word for a missing answer, such as `Unknown`. */
   isMissingValue,
 
@@ -334,6 +397,27 @@ export const ColumnProfileModule = {
    * weights rescaled when values cannot be compared.
    */
   getMatchScore,
+
+  /**
+   * A scorer for the name scores of many columns: it tokenizes each name
+   * once and remembers each pair it has scored.
+   */
+  createNameScorer,
+
+  /** Works out once what `getMatchScoreFromPrepared` reads from a profile. */
+  prepareProfileForMatching,
+
+  /** How alike two columns' data types are: 1, 0.5 for text, or 0. */
+  getTypeScore,
+
+  /** The most two columns could score given their name and type scores. */
+  getBestPossibleScore,
+
+  /**
+   * `getMatchScore` for profiles prepared once, given the name score, so a
+   * caller can score many pairs without rebuilding anything.
+   */
+  getMatchScoreFromPrepared,
 
   /** Values in the order a scale reads, lowest first, missing values last. */
   sortValuesInScaleOrder,

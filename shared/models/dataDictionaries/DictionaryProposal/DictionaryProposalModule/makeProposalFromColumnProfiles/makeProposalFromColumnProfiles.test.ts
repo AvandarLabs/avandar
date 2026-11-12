@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid.ts";
 import { makeProposalFromColumnProfiles } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/makeProposalFromColumnProfiles/makeProposalFromColumnProfiles.ts";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
+import type { DictionaryProposalEntry } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal.types.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 
 type DatasetRef = { datasetId: Dataset.Id; datasetName: string };
@@ -149,5 +150,83 @@ describe("makeProposalFromColumnProfiles", () => {
       _coded(BRONX, "ses_cat", ["1", "2", "3", "4"]),
     ]);
     expect(proposal.entries[0]?.kind).toBe("ordered");
+  });
+
+  it("names the entry after the column read first when two names tie", () => {
+    const names = (profiles: ColumnProfile.T[]): string | undefined => {
+      return makeProposalFromColumnProfiles(profiles).entries[0]?.name;
+    };
+    expect(
+      names([
+        _coded(BRONX, "GENDER", SEX_CODES),
+        _coded(ERIE, "sex", SEX_CODES),
+      ]),
+    ).toBe("gender");
+    expect(
+      names([
+        _coded(ERIE, "sex", SEX_CODES),
+        _coded(BRONX, "GENDER", SEX_CODES),
+      ]),
+    ).toBe("sex");
+  });
+
+  it("lets a certain match take a name a guess would have blocked", () => {
+    const yesNo = ["Y", "N"];
+    const proposal = makeProposalFromColumnProfiles([
+      _coded(BRONX, "symptom_fever", yesNo),
+      _coded(KINGS, "symptom_rash", yesNo),
+      _coded(KINGS, "symptom_fever", yesNo),
+    ]);
+    const describeEntry = (entry: DictionaryProposalEntry): string[] => {
+      return [
+        entry.name,
+        ...entry.columns.map((column) => {
+          return `${column.datasetName}.${column.columnName}`;
+        }),
+      ];
+    };
+    expect(proposal.entries.map(describeEntry)).toEqual([
+      ["symptom_fever", "Bronx.symptom_fever", "Kings.symptom_fever"],
+      ["symptom_rash", "Kings.symptom_rash"],
+    ]);
+  });
+
+  it("keeps the strongest reason when several guesses join one entry", () => {
+    const proposal = makeProposalFromColumnProfiles([
+      _coded(BRONX, "GENDER", SEX_CODES),
+      _coded(ERIE, "sex", ["M", "F", "U"]),
+      _coded(KINGS, "gender_group", SEX_CODES),
+    ]);
+    expect(proposal.entries).toHaveLength(1);
+    expect(proposal.entries[0]?.suggestionReason).toBe("other_codes");
+  });
+
+  it("matches zero-padded codes with the same codes without padding", () => {
+    const proposal = makeProposalFromColumnProfiles([
+      _coded(BRONX, "grade_cat", ["1", "2", "3"]),
+      _coded(ERIE, "grade_cat", ["01", "02", "03"]),
+    ]);
+    expect(proposal.entries[0]?.suggestionReason).toBeUndefined();
+    expect(proposal.entries[0]?.columns).toHaveLength(2);
+  });
+
+  it("clusters thousands of columns in well under two seconds", () => {
+    const words = ["case", "onset", "rash", "fever", "sex", "age", "county"];
+    const datasets = Array.from({ length: 100 }, (_item, index) => {
+      return { datasetId: uuid<Dataset.Id>(), datasetName: `D${index}` };
+    });
+    const profiles = Array.from({ length: 6000 }, (_item, index) => {
+      const datasetNumber = Math.floor(index / 60);
+      const columnNumber = index % 60;
+      const columnName = `${words[(columnNumber * 7 + datasetNumber) % 7]}_${words[columnNumber % 7]}_${columnNumber}`;
+      return _coded(datasets[datasetNumber] ?? BRONX, columnName, [
+        "Y",
+        "N",
+        String(columnNumber % 5),
+      ]);
+    });
+    const startedAt = performance.now();
+    makeProposalFromColumnProfiles(profiles);
+    expect(performance.now() - startedAt).toBeLessThan(1500);
   });
 });

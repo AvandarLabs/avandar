@@ -35,7 +35,7 @@ function _addValues(
   values: Iterable<ColumnProfile.Value>,
 ): void {
   [...values].forEach((item) => {
-    const key = ColumnProfile.normalizeValue(item.value);
+    const key = ColumnProfile.getComparisonKey(item.value);
     const current = target.get(key);
     target.set(key, {
       value: current?.value ?? item.value.trim(),
@@ -57,25 +57,53 @@ function _getTotalRows(coding: Coding): number {
   }, 0);
 }
 
+function _makeColumnCoding(values: readonly ColumnProfile.Value[]): Coding {
+  const coding: Coding = new Map();
+  _addValues(coding, values);
+  return coding;
+}
+
+/**
+ * Merges every pair of codings that overlap, again and again until none
+ * do, so a coding that bridges two others joins all three whatever order
+ * the columns came in.
+ */
+function _mergeOverlappingCodings(codings: readonly Coding[]): Coding[] {
+  const pairIndex = codings.findIndex((codingA, indexA) => {
+    return codings.slice(indexA + 1).some((codingB) => {
+      return _getOverlap(codingA, codingB) >= MIN_CODING_OVERLAP;
+    });
+  });
+  const first = codings[pairIndex];
+  if (!first) {
+    return [...codings];
+  }
+  const secondIndex = codings.findIndex((coding, index) => {
+    return (
+      index > pairIndex && _getOverlap(first, coding) >= MIN_CODING_OVERLAP
+    );
+  });
+  const merged: Coding = new Map(first);
+  _addValues(merged, codings[secondIndex]?.values() ?? []);
+  return _mergeOverlappingCodings([
+    ...codings.slice(0, pairIndex),
+    merged,
+    ...codings.slice(pairIndex + 1).filter((_coding, index) => {
+      return index + pairIndex + 1 !== secondIndex;
+    }),
+  ]);
+}
+
 /** One coding per set of codes the entry's columns hold, most rows first. */
 function _makeCodings(entry: Readonly<DictionaryProposalEntry>): Coding[] {
-  const codings: Coding[] = [];
-  [...entry.columns, ...entry.suggestedColumns].forEach((column) => {
-    if (!column.values || column.values.length === 0) {
-      return;
-    }
-    const columnCoding: Coding = new Map();
-    _addValues(columnCoding, column.values);
-    const target = codings.find((coding) => {
-      return _getOverlap(coding, columnCoding) >= MIN_CODING_OVERLAP;
+  const columnCodings = [...entry.columns, ...entry.suggestedColumns]
+    .filter((column) => {
+      return column.values && column.values.length > 0;
+    })
+    .map((column) => {
+      return _makeColumnCoding(column.values ?? []);
     });
-    if (target) {
-      _addValues(target, columnCoding.values());
-    } else {
-      codings.push(columnCoding);
-    }
-  });
-  return codings.sort((codingA, codingB) => {
+  return _mergeOverlappingCodings(columnCodings).sort((codingA, codingB) => {
     return _getTotalRows(codingB) - _getTotalRows(codingA);
   });
 }

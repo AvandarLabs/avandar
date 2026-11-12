@@ -176,4 +176,30 @@ describe("DictionaryProposal edits", () => {
       ERIE.datasetId,
     ]);
   });
+
+  describe("DictionaryProposal guesses and values", () => {
+    it("keeps the other-codes reason when a meaning match joins later", () => {
+      const withThree = DictionaryProposal.fromColumnProfiles([
+        _coded(BRONX, "GENDER", ["1", "2", "9"]),
+        _coded(ERIE, "sex", ["M", "F", "U"]),
+        _coded(KINGS, "mmr_status", ["0", "1", "2"]),
+      ]);
+      const matched = DictionaryProposal.applyMeaningMatches(withThree, [
+        { name: "mmr_status", sameAs: "gender" },
+      ]);
+      expect(matched.entries).toHaveLength(1);
+      expect(matched.entries[0]?.suggestionReason).toBe("other_codes");
+    });
+
+    it("lists the values seen with trimmed spellings", () => {
+      const entry = _firstEntry(
+        DictionaryProposal.fromColumnProfiles([_coded(BRONX, " M ", [" M "])]),
+      );
+      expect(
+        DictionaryProposal.getValuesSeen(entry).map((item) => {
+          return item.value;
+        }),
+      ).toEqual(["M"]);
+    });
+  });
 });

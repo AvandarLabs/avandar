@@ -196,4 +196,32 @@ describe("getCodingsFromProposal", () => {
     expect(codeLists).toEqual([]);
     expect(codeListKeysByEntryKey).toEqual({});
   });
+
+  it("merges codings into one whatever order the columns come in", () => {
+    const entry = _entry("grade", "categorical", [
+      _column("grade", { "1": 10, "2": 10 }),
+      _column("grade", { "3": 10, "4": 10 }, ERIE_ID),
+      _column("grade", { "1": 5, "2": 5, "3": 5, "4": 5 }, ERIE_ID),
+    ]);
+    const { codeLists, codeListKeysByEntryKey } = getCodingsFromProposal({
+      entries: [entry],
+    });
+    expect(codeLists).toHaveLength(1);
+    expect(codeListKeysByEntryKey["k:grade"]).toHaveLength(1);
+    expect(codeLists[0]?.values).toHaveLength(4);
+  });
+
+  it("reads zero-padded codes as the codes without padding", () => {
+    const entry = _entry("grade", "categorical", [
+      _column("grade", { "1": 10, "2": 10, "3": 10 }),
+      _column("grade", { "01": 5, "02": 5, "03": 5 }, ERIE_ID),
+    ]);
+    const { codeLists } = getCodingsFromProposal({ entries: [entry] });
+    expect(codeLists).toHaveLength(1);
+    expect(codeLists[0]?.values).toEqual([
+      { value: "1", rowCount: 15 },
+      { value: "2", rowCount: 15 },
+      { value: "3", rowCount: 15 },
+    ]);
+  });
 });

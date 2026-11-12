@@ -237,4 +237,17 @@ describe("ColumnProfile.sortValuesInScaleOrder", () => {
       }),
     ).toEqual(["1", "2", "10"]);
   });
+
+  it("breaks ties between plain words by code point, not by locale", () => {
+    const sorted = ColumnProfile.sortValuesInScaleOrder(
+      ["b", "B", "a"].map((value) => {
+        return { value, rowCount: 10 };
+      }),
+    );
+    expect(
+      sorted.map((item) => {
+        return item.value;
+      }),
+    ).toEqual(["B", "a", "b"]);
+  });
 });
