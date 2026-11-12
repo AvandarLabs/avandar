@@ -357,3 +357,124 @@ describe("DataDictionary.toSaveErrorHint", () => {
     expect(DataDictionary.toSaveErrorHint(new Error("boom"))).toBeUndefined();
   });
 });
+
+describe("DataDictionary.setOtherCodeLists", () => {
+  it("dedupes ids, keeps the primary first, and skips the primary's own id", () => {
+    const listA = _listDraft({ name: "A" });
+    const listB = _listDraft({ name: "B" });
+    const listC = _listDraft({ name: "C" });
+    const sex = _entryDraft({
+      codings: [{ codeListId: listA.id, isPrimary: true }],
+    });
+    const draft = DataDictionary.setOtherCodeLists(
+      { codeLists: [listA, listB, listC], entries: [sex] },
+      {
+        entryId: sex.id,
+        codeListIds: [listB.id, listC.id, listB.id, listA.id],
+      },
+    );
+    expect(draft.entries[0]?.codings).toEqual([
+      { codeListId: listA.id, isPrimary: true },
+      { codeListId: listB.id, isPrimary: false },
+      { codeListId: listC.id, isPrimary: false },
+    ]);
+  });
+
+  it("promotes the first coding when the entry has no primary", () => {
+    const listA = _listDraft({ name: "A" });
+    const listB = _listDraft({ name: "B" });
+    const sex = _entryDraft({ codings: [] });
+    const draft = DataDictionary.setOtherCodeLists(
+      { codeLists: [listA, listB], entries: [sex] },
+      { entryId: sex.id, codeListIds: [listA.id, listB.id] },
+    );
+    expect(draft.entries[0]?.codings).toEqual([
+      { codeListId: listA.id, isPrimary: true },
+      { codeListId: listB.id, isPrimary: false },
+    ]);
+  });
+});
+
+describe("DataDictionary.findDraftIssues (primary and list name)", () => {
+  it("flags a coded entry with codings but no single primary", () => {
+    const list = _listDraft();
+    const sex = _entryDraft({
+      codings: [{ codeListId: list.id, isPrimary: false }],
+    });
+    expect(
+      DataDictionary.findDraftIssues({ codeLists: [list], entries: [sex] }),
+    ).toEqual([{ type: "entry_primary_required", entryId: sex.id }]);
+  });
+
+  it("flags a code list with a blank name", () => {
+    const list = _listDraft({ name: "   " });
+    expect(
+      DataDictionary.findDraftIssues({ codeLists: [list], entries: [] }),
+    ).toEqual([{ type: "code_list_name_required", codeListId: list.id }]);
+  });
+});
+
+describe("DataDictionary.toDraft ordering", () => {
+  it("sorts code lists by name and non-primary codings by code list id", () => {
+    const makeList = (name: string): DataDictionaryCodeList.T => {
+      return Model.make("DataDictionaryCodeList", {
+        id: uuid<DataDictionaryCodeList.Id>(),
+        workspaceId: WORKSPACE_ID,
+        dictionaryId: DICTIONARY_ID,
+        name,
+        isOrdered: false,
+        pairs: [],
+        createdAt: NOW,
+        updatedAt: NOW,
+      });
+    };
+    const entryId = uuid<DataDictionaryEntry.Id>();
+    const makeCoding = (
+      codeListId: DataDictionaryCodeList.Id,
+    ): DataDictionaryEntryCoding.T => {
+      return Model.make("DataDictionaryEntryCoding", {
+        id: uuid<DataDictionaryEntryCoding.Id>(),
+        workspaceId: WORKSPACE_ID,
+        dictionaryId: DICTIONARY_ID,
+        entryId,
+        codeListId,
+        isPrimary: false,
+        createdAt: NOW,
+        updatedAt: NOW,
+      });
+    };
+    const zebra = makeList("Zebra");
+    const apple = makeList("apple");
+    const entry = Model.make("DataDictionaryEntry", {
+      id: entryId,
+      workspaceId: WORKSPACE_ID,
+      dictionaryId: DICTIONARY_ID,
+      name: "sex",
+      columnNames: [],
+      kind: "categorical",
+      unit: undefined,
+      validMin: undefined,
+      validMax: undefined,
+      description: undefined,
+      position: 0,
+      createdAt: NOW,
+      updatedAt: NOW,
+    });
+
+    const draft = DataDictionary.toDraft({
+      entries: [entry],
+      codeLists: [zebra, apple],
+      codings: [makeCoding(zebra.id), makeCoding(apple.id)],
+    });
+
+    expect(
+      draft.codeLists.map((list) => {
+        return list.name;
+      }),
+    ).toEqual(["apple", "Zebra"]);
+    const ids = (draft.entries[0]?.codings ?? []).map((coding) => {
+      return coding.codeListId;
+    });
+    expect(ids).toEqual([zebra.id, apple.id].sort());
+  });
+});

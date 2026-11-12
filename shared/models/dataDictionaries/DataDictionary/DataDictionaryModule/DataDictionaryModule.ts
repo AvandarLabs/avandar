@@ -119,7 +119,10 @@ function _toCodingDrafts(
 ): DataDictionaryEntryCodingDraft[] {
   return [...codings]
     .sort((codingA, codingB) => {
-      return Number(codingB.isPrimary) - Number(codingA.isPrimary);
+      return (
+        Number(codingB.isPrimary) - Number(codingA.isPrimary) ||
+        codingA.codeListId.localeCompare(codingB.codeListId)
+      );
     })
     .map((coding) => {
       return { codeListId: coding.codeListId, isPrimary: coding.isPrimary };
@@ -305,7 +308,7 @@ function setOtherCodeLists(
       }
       const primary = entry.codings.filter(prop("isPrimary"));
       const primaryIds = new Set(primary.map(prop("codeListId")));
-      const others = options.codeListIds
+      const others = [...new Set(options.codeListIds)]
         .filter((codeListId) => {
           return !primaryIds.has(codeListId);
         })
