@@ -55,6 +55,27 @@ describe("CodeListEditor", () => {
     expect(_lastDraft(onDraftChange).codeLists[0]?.pairs).toHaveLength(2);
   });
 
+  it("marks a value without a label as needing one, without blocking it", () => {
+    const draft = _draft([
+      { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "9", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+    render(
+      <CodeListEditor
+        draft={draft}
+        codeListId={LIST_ID}
+        issues={[]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/Needs a label/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Label 2")).not.toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
   it("replaces a single empty row with pasted values", async () => {
     const onDraftChange = vi.fn();
     const draft = _draft([

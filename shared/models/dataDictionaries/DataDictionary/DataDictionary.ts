@@ -3,6 +3,7 @@ import type {
   DataDictionaryCodeListDraft,
   DataDictionaryDraft,
   DataDictionaryDraftIssue,
+  DataDictionaryDraftWarning,
   DataDictionaryEntryCodingDraft,
   DataDictionaryEntryDraft,
   DataDictionaryId,
@@ -24,6 +25,7 @@ export namespace DataDictionary {
   export type CodeListDraft = DataDictionaryCodeListDraft;
   export type CodingDraft = DataDictionaryEntryCodingDraft;
   export type DraftIssue = DataDictionaryDraftIssue;
+  export type DraftWarning = DataDictionaryDraftWarning;
   export type SavePayload = DataDictionarySavePayload;
   export type SaveErrorHint = DataDictionarySaveErrorHint;
 }

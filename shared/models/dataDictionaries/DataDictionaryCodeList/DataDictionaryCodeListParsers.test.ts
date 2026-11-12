@@ -39,6 +39,18 @@ describe("DataDictionaryCodeListParsers", () => {
     }).toThrow();
   });
 
+  it("reads a value whose label is still blank", () => {
+    const codeList = DataDictionaryCodeListParsers.fromDBReadToModelRead({
+      ...DB_ROW,
+      pairs: [
+        { code: "9", label: "", accepted_spellings: [], is_missing: false },
+      ],
+    });
+    expect(codeList.pairs).toEqual([
+      { code: "9", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+  });
+
   it("writes pairs back in the stored shape", () => {
     expect(
       codePairsToDBJson([

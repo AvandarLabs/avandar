@@ -133,6 +133,18 @@ export type DataDictionaryDraftIssue =
       pairIndex: number;
     };
 
+/**
+ * Something in a draft worth finishing that does not stop it from saving.
+ * The Dictionary view marks it beside the value, and the create flow counts
+ * them on its Save step.
+ * - `label_missing`: a value with a code and no label yet.
+ */
+export type DataDictionaryDraftWarning = {
+  type: "label_missing";
+  codeListId: DataDictionaryCodeList.Id;
+  pairIndex: number;
+};
+
 /** The arguments of `rpc_data_dictionaries__save`, in model shape. */
 export type DataDictionarySavePayload = {
   dictionaryId: DataDictionaryId;

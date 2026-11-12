@@ -32,6 +32,17 @@ function _matchesFilter(
   );
 }
 
+/** How many values of each code list still need a label. */
+function _countUnlabeledValues(
+  draft: DataDictionary.Draft,
+): Map<DataDictionaryCodeList.Id, number> {
+  const counts = new Map<DataDictionaryCodeList.Id, number>();
+  DataDictionary.findDraftWarnings(draft).forEach((warning) => {
+    counts.set(warning.codeListId, (counts.get(warning.codeListId) ?? 0) + 1);
+  });
+  return counts;
+}
+
 function _makeListNames(
   draft: DataDictionary.Draft,
 ): Map<DataDictionaryCodeList.Id, string> {
@@ -50,6 +61,7 @@ type EntriesTabState = {
   setSelectedId: (entryId: DataDictionaryEntry.Id) => void;
   addEntry: () => void;
   listNames: Map<DataDictionaryCodeList.Id, string>;
+  unlabeledCounts: Map<DataDictionaryCodeList.Id, number>;
 };
 
 /** The filter, the selected entry, and adding an entry for the tab. */
@@ -92,6 +104,7 @@ function useEntriesTabState(
     setSelectedId,
     addEntry,
     listNames: _makeListNames(draft),
+    unlabeledCounts: _countUnlabeledValues(draft),
   };
 }
 
@@ -140,6 +153,7 @@ export function DictionaryEntriesTab(props: Readonly<Props>): ReactNode {
     setSelectedId,
     addEntry,
     listNames,
+    unlabeledCounts,
   } = useEntriesTabState({ draft, onDraftChange });
 
   return (
@@ -155,6 +169,7 @@ export function DictionaryEntriesTab(props: Readonly<Props>): ReactNode {
           rows={rows}
           selectedId={selected?.id}
           listNames={listNames}
+          unlabeledCounts={unlabeledCounts}
           kindShortLabels={copy.kindShortLabels}
           onSelect={setSelectedId}
         />

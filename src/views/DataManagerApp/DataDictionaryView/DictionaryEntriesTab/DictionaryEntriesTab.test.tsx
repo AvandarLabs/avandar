@@ -55,6 +55,19 @@ const DRAFT: DataDictionary.Draft = {
   ],
 };
 
+const UNLABELED_DRAFT: DataDictionary.Draft = {
+  ...DRAFT,
+  codeLists: DRAFT.codeLists.map((list) => {
+    return {
+      ...list,
+      pairs: [
+        ...list.pairs,
+        { code: "9", label: "", acceptedSpellings: [], isMissing: true },
+      ],
+    };
+  }),
+};
+
 function _renderTab(
   overrides: Partial<Parameters<typeof DictionaryEntriesTab>[0]> = {},
 ): void {
@@ -90,6 +103,11 @@ describe("DictionaryEntriesTab", () => {
       target: { value: "gender" },
     });
     expect(screen.getByRole("button", { name: "sex" })).toBeInTheDocument();
+  });
+
+  it("says how many of an entry's values still need a label", () => {
+    _renderTab({ draft: UNLABELED_DRAFT });
+    expect(screen.getByText("1 value needs a label")).toBeInTheDocument();
   });
 
   it("edits the selected entry's description through the pane", () => {

@@ -9,10 +9,12 @@ import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/Da
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { ReactNode, Ref } from "react";
 
-/** A pair's validation problem, with the copy that explains it. */
+/** A pair's validation problem or warning, with the copy that explains it. */
 export type CodePairIssue = {
-  type: DataDictionary.DraftIssue["type"];
+  type: DataDictionary.DraftIssue["type"] | DataDictionary.DraftWarning["type"];
   message: string;
+  /** An error blocks saving. A warning, such as a missing label, does not. */
+  severity: "error" | "warning";
 };
 
 type Props = {
@@ -43,20 +45,18 @@ function _isIssueOnInput(
   options: Readonly<{
     issue: CodePairIssue | undefined;
     input: "code" | "label";
-    pair: DataDictionaryCodeList.Pair;
   }>,
 ): boolean {
-  const { issue, input, pair } = options;
+  const { issue, input } = options;
+  if (issue?.severity !== "error") {
+    return false;
+  }
   if (input === "code") {
     return (
-      issue?.type === "code_not_unique" ||
-      (issue?.type === "code_pair_incomplete" && !pair.code.trim())
+      issue.type === "code_not_unique" || issue.type === "code_pair_incomplete"
     );
   }
-  return (
-    issue?.type === "label_not_unique" ||
-    (issue?.type === "code_pair_incomplete" && !pair.label.trim())
-  );
+  return issue.type === "label_not_unique";
 }
 
 /** The other spellings, missing switch, and remove button of a value. */
@@ -113,7 +113,6 @@ function _buildIssueProps(
   options: Readonly<{
     issue: CodePairIssue | undefined;
     input: "code" | "label";
-    pair: DataDictionaryCodeList.Pair;
   }>,
 ): { error: string | undefined; errorProps: { className?: string } } {
   return {
@@ -131,7 +130,7 @@ function CodePairFields(props: Readonly<FieldsProps>): ReactNode {
     <>
       <TextInput
         aria-label={t`Code ${rowNumber}`}
-        {..._buildIssueProps({ issue, input: "code", pair })}
+        {..._buildIssueProps({ issue, input: "code" })}
         value={pair.code}
         disabled={!canEdit}
         className={css.codeListEditorCode}
@@ -146,7 +145,7 @@ function CodePairFields(props: Readonly<FieldsProps>): ReactNode {
       />
       <TextInput
         aria-label={t`Label ${rowNumber}`}
-        {..._buildIssueProps({ issue, input: "label", pair })}
+        {..._buildIssueProps({ issue, input: "label" })}
         value={pair.label}
         disabled={!canEdit}
         onChange={(event) => {
@@ -197,10 +196,12 @@ function CodePairRowBody(props: Readonly<BodyProps>): ReactNode {
         issue={issue}
       />
       {issue ? (
+        // An error is also its input's accessible description, so its line
+        // is hidden from assistive tech. A warning is only said here.
         <Text
           size="xs"
-          aria-hidden
-          c="danger"
+          aria-hidden={issue.severity === "error"}
+          c={issue.severity === "error" ? "danger" : "dimmed"}
           className={css.codeListEditorRowIssue}
         >
           {issue.message}

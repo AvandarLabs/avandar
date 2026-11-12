@@ -233,6 +233,29 @@ describe("DataDictionary.findDraftIssues", () => {
   });
 });
 
+describe("DataDictionary.findDraftWarnings", () => {
+  it("lets a value with a code and no label save, and marks it as needing one", () => {
+    const list = _listDraft({
+      pairs: [_pair("1", "Male"), _pair("2", " "), _pair("9", "")],
+    });
+    const draft = { codeLists: [list], entries: [] };
+    expect(DataDictionary.findDraftIssues(draft)).toEqual([]);
+    expect(DataDictionary.findDraftWarnings(draft)).toEqual([
+      { type: "label_missing", codeListId: list.id, pairIndex: 1 },
+      { type: "label_missing", codeListId: list.id, pairIndex: 2 },
+    ]);
+  });
+
+  it("still refuses a value with no code, and does not also warn about it", () => {
+    const list = _listDraft({ pairs: [_pair("", "")] });
+    const draft = { codeLists: [list], entries: [] };
+    expect(DataDictionary.findDraftIssues(draft)).toEqual([
+      { type: "code_pair_incomplete", codeListId: list.id, pairIndex: 0 },
+    ]);
+    expect(DataDictionary.findDraftWarnings(draft)).toEqual([]);
+  });
+});
+
 describe("DataDictionary.buildSavePayload", () => {
   it("trims text, numbers positions, and drops codings and number fields that do not apply", () => {
     const list = _listDraft({

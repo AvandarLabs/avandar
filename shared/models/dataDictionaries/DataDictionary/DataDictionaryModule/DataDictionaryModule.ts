@@ -4,6 +4,7 @@ import type {
   DataDictionaryCodeListDraft,
   DataDictionaryDraft,
   DataDictionaryDraftIssue,
+  DataDictionaryDraftWarning,
   DataDictionaryEntryCodingDraft,
   DataDictionaryEntryDraft,
   DataDictionaryId,
@@ -437,7 +438,8 @@ function _findPairIssues(
   return codeList.pairs.flatMap(
     (pair, pairIndex): DataDictionaryDraftIssue[] => {
       const at = { codeListId: codeList.id, pairIndex };
-      if (normalizeKey(pair.code) === "" || normalizeKey(pair.label) === "") {
+      // A blank label is not an issue: `findDraftWarnings` marks it instead.
+      if (normalizeKey(pair.code) === "") {
         return [{ type: "code_pair_incomplete", ...at }];
       }
       if ((codeCounts.get(normalizeKey(pair.code)) ?? 0) > 1) {
@@ -474,6 +476,26 @@ function findDraftIssues(
       ];
     }),
   ];
+}
+
+/**
+ * Every value that has a code but no label yet, in display order. A draft
+ * with these still saves; the editor marks each one as needing a label.
+ */
+function findDraftWarnings(
+  draft: DataDictionaryDraft,
+): DataDictionaryDraftWarning[] {
+  return draft.codeLists.flatMap((codeList) => {
+    return codeList.pairs.flatMap(
+      (pair, pairIndex): DataDictionaryDraftWarning[] => {
+        const isUnlabeled =
+          normalizeKey(pair.code) !== "" && normalizeKey(pair.label) === "";
+        return isUnlabeled
+          ? [{ type: "label_missing", codeListId: codeList.id, pairIndex }]
+          : [];
+      },
+    );
+  });
 }
 
 function _cleanList(
@@ -603,6 +625,7 @@ export const DataDictionaryModule = {
   getEntriesUsingCodeList,
   getPrimaryCodeListId,
   findDraftIssues,
+  findDraftWarnings,
   buildSavePayload,
   parsePastedPairs,
   toSaveErrorHint,

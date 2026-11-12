@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { Badge, Table, Text, UnstyledButton } from "@mantine/core";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import css from "@/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.module.css";
@@ -10,6 +10,8 @@ type Props = {
   rows: readonly DataDictionary.EntryDraft[];
   selectedId: DataDictionaryEntry.Id | undefined;
   listNames: ReadonlyMap<DataDictionaryCodeList.Id, string>;
+  /** Values that still need a label, by code list. */
+  unlabeledCounts: ReadonlyMap<DataDictionaryCodeList.Id, number>;
   kindShortLabels: Record<DataDictionaryEntry.Kind, string>;
   onSelect: (entryId: DataDictionaryEntry.Id) => void;
 };
@@ -18,6 +20,8 @@ type RowProps = {
   entry: DataDictionary.EntryDraft;
   isSelected: boolean;
   listNames: Props["listNames"];
+  /** Values that still need a label, by code list. */
+  unlabeledCounts: Props["unlabeledCounts"];
   kindShortLabels: Props["kindShortLabels"];
   onSelect: Props["onSelect"];
 };
@@ -26,10 +30,14 @@ function DictionaryEntryRow({
   entry,
   isSelected,
   listNames,
+  unlabeledCounts,
   kindShortLabels,
   onSelect,
 }: Readonly<RowProps>): ReactNode {
   const primaryId = DataDictionary.getPrimaryCodeListId(entry);
+  const unlabeledCount = entry.codings.reduce((sum, coding) => {
+    return sum + (unlabeledCounts.get(coding.codeListId) ?? 0);
+  }, 0);
 
   return (
     <Table.Tr
@@ -70,6 +78,15 @@ function DictionaryEntryRow({
         <Text size="xs" c="dimmed">
           {primaryId ? listNames.get(primaryId) : <Trans>Any value</Trans>}
         </Text>
+        {unlabeledCount > 0 ? (
+          <Text size="xs" c="dimmed">
+            <Plural
+              value={unlabeledCount}
+              one="# value needs a label"
+              other="# values need a label"
+            />
+          </Text>
+        ) : null}
       </Table.Td>
       <Table.Td>
         <Text
@@ -89,6 +106,7 @@ export function DictionaryEntriesTable({
   rows,
   selectedId,
   listNames,
+  unlabeledCounts,
   kindShortLabels,
   onSelect,
 }: Readonly<Props>): ReactNode {
@@ -118,6 +136,7 @@ export function DictionaryEntriesTable({
               entry={entry}
               isSelected={entry.id === selectedId}
               listNames={listNames}
+              unlabeledCounts={unlabeledCounts}
               kindShortLabels={kindShortLabels}
               onSelect={onSelect}
             />
