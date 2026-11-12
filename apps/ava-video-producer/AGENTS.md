@@ -16,6 +16,7 @@ Not on Claude Code? The file is plain markdown; read it directly.
 
 ## Read and maintain the inventories
 
+- Use the terms in [the video producer nomenclature](../../docs/video-producer-nomenclature.md): animation, motion, composition, transition, compositing, layout, camera movement, film, helper, and reenactment. "Atlas" and "catalog" mean the same thing. Keep "scene" for storyboard scenes, and call programmatically performed product UI a reenactment, never a recording.
 - Read [docs/motion-vocabulary.md](docs/motion-vocabulary.md) before adding or changing animation behavior. Reuse the shared curves, durations, and helpers; update the inventory when their APIs or behavior change.
 - Read [docs/shared-scene-library.md](docs/shared-scene-library.md) before adding or changing a scene or visual component. Reuse existing components and update the inventory when their interfaces or availability change.
 - Use [docs/stock-motion-library.md](docs/stock-motion-library.md) and `showcase/motion.html` when choosing graphic references. Refer to stable preset IDs in briefs. Keep the gallery and Remotion on the same `StockGraphic` renderer; rebuild the browser bundle after edits. Stock labels, relationships, code, and values are illustrative, not product evidence. Add new presets to the typed catalog, renderer, documentation, and inspected preview/render outputs together.
@@ -51,6 +52,7 @@ npm run video -- render storyboards/library.json
 npm run motion:build                  # build the live Motion Atlas gallery
 npm run motion -- preview all          # inspect each preset's contact sheet
 npm run motion -- render all           # matching previews, serial render and loop gate
+npm run atlas:posters [id...]          # Compositions and Sample films card posters
 ```
 
 `STANDALONE=1` on a clip that plays once skips the loop-seam check, which

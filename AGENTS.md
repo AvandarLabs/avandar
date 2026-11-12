@@ -11,6 +11,8 @@
   `docs/measles-demo/gadgets.md`.
 - App shell, slate, and z-index nomenclature: `docs/app-shell-nomenclature.md`.
 - What the `Ava` and `Ui` type prefixes mean: `docs/type-prefix-nomenclature.md`.
+- Video producer terms (motion, composition, transition, compositing, layout,
+  helper, reenactment): `docs/video-producer-nomenclature.md`.
 - How a view inside the slate is laid out (header band, content column,
   properties rail, section rhythm): `docs/design/app-view-layout.md`. Read it
   before building or restyling any app view.
