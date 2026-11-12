@@ -445,6 +445,88 @@ describe("DictionarySuggestions requests", () => {
   });
 });
 
+function _smallUniqueColumn(columnName: string): ColumnProfile.T {
+  const codes = Array.from({ length: 15 }, (_code, index) => {
+    return `${columnName}-${index}`;
+  });
+  return {
+    ..._column(columnName, codes),
+    rowCount: 15,
+    nonNullCount: 15,
+    distinctCount: 15,
+  };
+}
+
+function _sentValuesOfMatches(
+  request: DictionarySuggestionsRequest | undefined,
+): string[] {
+  return request?.task === "matches"
+    ? request.columns.flatMap((column) => {
+        return column.values;
+      })
+    : ["not a matches request"];
+}
+
+describe("DictionarySuggestions on a column that is unique per row", () => {
+  it("never sends a small line list's unique column, however its kind is set", () => {
+    const seed = DictionaryProposal.fromColumnProfiles([
+      _smallUniqueColumn("specimen"),
+      _column("vax_status", ["Y", "N"], ERIE_ID),
+    ]);
+    const patient = seed.entries.find((entry) => {
+      return entry.name === "specimen";
+    })!;
+    expect(patient.kind).not.toBe("categorical");
+    const asked = DictionarySuggestions.makeMatchesRequestFromProposal({
+      proposal: seed,
+      locale: "en",
+      model: "online",
+    });
+    expect(_sentValuesOfMatches(asked)).toEqual(["Y", "N"]);
+    const edited = {
+      ...seed,
+      entries: seed.entries.map((entry) => {
+        return entry === patient
+          ? { ...entry, kind: "categorical" as const }
+          : entry;
+      }),
+    };
+    const askedAfterEdit = DictionarySuggestions.makeMatchesRequestFromProposal(
+      { proposal: edited, locale: "en", model: "online" },
+    );
+    expect(_sentValuesOfMatches(askedAfterEdit)).toEqual(["Y", "N"]);
+  });
+
+  it("blocks a unique column's labels even after its kind is set to categorical", () => {
+    const seed = DictionaryProposal.fromColumnProfiles([
+      _smallUniqueColumn("specimen"),
+    ]);
+    const proposal = {
+      ...seed,
+      entries: seed.entries.map((entry) => {
+        return { ...entry, kind: "categorical" as const };
+      }),
+    };
+    const codeList = {
+      key: "specimen",
+      name: "specimen",
+      isOrdered: false,
+      entryKeys: proposal.entries.map((entry) => {
+        return entry.key;
+      }),
+      values: [{ value: "specimen-0", rowCount: 1 }],
+    };
+    expect(
+      DictionarySuggestions.getLabelsBlockReason({
+        proposal,
+        codeList,
+        locale: "en",
+        model: "online",
+      }),
+    ).toBe("personal");
+  });
+});
+
 /** A pessimistic estimate: three characters per token, plus the reply. */
 function _estimateOnDeviceTokens(
   request: Readonly<DictionarySuggestionsRequest>,

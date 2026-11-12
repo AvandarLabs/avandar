@@ -17,6 +17,10 @@ import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 const MAX_LISTED_VALUES = 50;
 const MAX_CATEGORICAL_VALUES = 20;
 const MAX_SCALE_LENGTH = 10;
+
+/** Past this many distinct values, almost no repeats means unique per row. */
+const MIN_UNIQUE_PER_ROW_VALUES = 5;
+const UNIQUE_PER_ROW_SHARE = 0.95;
 const MATCH_SCORE = 0.9;
 const SUGGESTION_SCORE = 0.6;
 
@@ -103,6 +107,10 @@ function _isIdentifier(profile: Readonly<ColumnProfileT>): boolean {
   const lastWord = getWordsFromColumnName(profile.columnName).at(-1) ?? "";
   return (
     (share > 0.95 && profile.distinctCount > MAX_CATEGORICAL_VALUES) ||
+    // A small line list can have fewer than 21 rows, so a column with a
+    // different value on every row is an identifier there too.
+    (share >= UNIQUE_PER_ROW_SHARE &&
+      profile.distinctCount > MIN_UNIQUE_PER_ROW_VALUES) ||
     (IDENTIFIER_WORDS.has(lastWord) && share > 0.8 && profile.distinctCount > 2)
   );
 }
@@ -189,6 +197,16 @@ function getEntryKind(
     return "number";
   }
   return "text";
+}
+
+/**
+ * Whether profiling alone calls this column coded: a categorical or ordered
+ * kind. Unlike an entry's kind, which a user can change, this only moves
+ * with the data.
+ */
+function isCodedColumn(profile: Readonly<ColumnProfileT>): boolean {
+  const kind = getEntryKind(profile);
+  return kind === "categorical" || kind === "ordered";
 }
 
 /** Worked out once per profile so scoring many pairs rebuilds nothing. */
@@ -391,6 +409,13 @@ export const ColumnProfileModule = {
    * before identifiers.
    */
   getEntryKind,
+
+  /**
+   * Whether the data alone says a column holds a short list of codes. Use
+   * it to decide whether a column's values may leave the device, since an
+   * entry's kind can be edited by the user and this cannot.
+   */
+  isCodedColumn,
 
   /**
    * How alike two columns are: name 0.45, values 0.35, type 0.2, with the

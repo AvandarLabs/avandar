@@ -160,6 +160,21 @@ describe("dictionarySuggestionsPrompt", () => {
     expect(isIdentifyingColumnName("vax_status")).toBe(false);
   });
 
+  it.each([
+    "zip_code",
+    "ZIPCode",
+    "postal_code",
+    "patient",
+    "PatientID",
+    "contact",
+    "guardian",
+    "parent_phone",
+    "fname",
+    "lname",
+  ])("keeps the values of %s on the device", (columnName) => {
+    expect(isIdentifyingColumnName(columnName)).toBe(true);
+  });
+
   it("does not call an invalid request too large", () => {
     const parsed = DictionarySuggestionsRequestSchema.safeParse({
       task: "labels",

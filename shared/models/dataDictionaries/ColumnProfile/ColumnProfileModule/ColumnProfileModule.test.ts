@@ -89,6 +89,26 @@ describe("ColumnProfile.getEntryKind", () => {
     expect(ColumnProfile.getEntryKind(profile)).toBe("categorical");
   });
 
+  it("calls a unique-per-row column of a small line list an identifier, not coded", () => {
+    const profile = _profile({
+      columnName: "specimen",
+      dataType: "varchar",
+      rowCount: 15,
+      nonNullCount: 15,
+      distinctCount: 15,
+      values: Array.from({ length: 15 }, (_value, index) => {
+        return { value: `p${index}`, rowCount: 1 };
+      }),
+    });
+    expect(ColumnProfile.getEntryKind(profile)).toBe("identifier");
+    expect(ColumnProfile.isCodedColumn(profile)).toBe(false);
+  });
+
+  it("keeps a six-row dataset with three distinct values coded", () => {
+    const profile = _profile({ rowCount: 6, nonNullCount: 6 });
+    expect(ColumnProfile.isCodedColumn(profile)).toBe(true);
+  });
+
   it("calls a text column whose values parse as dates a date", () => {
     const profile = _profile({
       columnName: "onset",

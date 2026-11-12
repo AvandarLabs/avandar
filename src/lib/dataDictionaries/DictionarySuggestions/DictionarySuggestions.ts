@@ -173,13 +173,22 @@ async function requestReply(
  * The route's rule: codes only on a coded column not named after a person.
  * `allNames` is every name the column goes by, before any are cut to fit
  * the request, so an identifying name past the cap still blocks its codes.
+ * The profiled columns must each read as coded from their own data, so
+ * editing an entry's kind cannot make a unique-per-row column send values.
  */
 function _canSendValues(
-  kind: DictionarySuggestionColumn["kind"],
+  entries: ReadonlyArray<Readonly<DictionaryProposal.Entry>>,
   allNames: readonly string[],
 ): boolean {
   return (
-    DataDictionary.isCodedKind(kind) && !allNames.some(isIdentifyingColumnName)
+    entries.every((entry) => {
+      return (
+        DataDictionary.isCodedKind(entry.kind) &&
+        [...entry.columns, ...entry.suggestedColumns].every(
+          ColumnProfile.isCodedColumn,
+        )
+      );
+    }) && !allNames.some(isIdentifyingColumnName)
   );
 }
 
@@ -251,7 +260,7 @@ function _checkLabelsRequestFromCodeList(
     locale: options.locale,
     column,
   };
-  if (!_canSendValues(column.kind, [column.name, ...names])) {
+  if (!_canSendValues(entries, [column.name, ...names])) {
     return { type: "blocked", reason: "personal" };
   }
   if (!_areValuesShortEnough(values)) {
@@ -303,7 +312,7 @@ function makeMatchesRequestFromProposal(
       return {
         ...column,
         values:
-          _canSendValues(column.kind, allNames) && _areValuesShortEnough(values)
+          _canSendValues([entry], allNames) && _areValuesShortEnough(values)
             ? values
             : [],
       };

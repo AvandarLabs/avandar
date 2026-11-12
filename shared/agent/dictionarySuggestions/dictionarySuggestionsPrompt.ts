@@ -72,6 +72,14 @@ export const IDENTIFYING_WORDS: ReadonlySet<string> = new Set([
   "passport",
   "license",
   "mrn",
+  "zip",
+  "postal",
+  "patient",
+  "contact",
+  "guardian",
+  "parent",
+  "fname",
+  "lname",
 ]);
 
 /**
