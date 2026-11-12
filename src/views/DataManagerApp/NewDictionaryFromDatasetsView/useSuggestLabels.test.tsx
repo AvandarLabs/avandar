@@ -125,6 +125,47 @@ describe("useSuggestLabels", () => {
     });
   });
 
+  it("shows no toast when the request finishes after the flow was left", async () => {
+    let finish: (reply: string | undefined) => void = () => {};
+    const { result, unmount } = _render(() => {
+      return new Promise<string | undefined>((resolve) => {
+        finish = resolve;
+      });
+    });
+    result.current.suggestLabels(CODE_LIST);
+    await waitFor(() => {
+      expect(result.current.suggestingCodeListKey).toBe("list-1");
+    });
+    unmount();
+    finish(
+      '{"labels":[{"value":"1","label":"Male","isMissing":false}],"description":""}',
+    );
+    await new Promise((resolve) => {
+      setTimeout(resolve, 50);
+    });
+    expect(notifySuccessMock).not.toHaveBeenCalled();
+    expect(notifyErrorMock).not.toHaveBeenCalled();
+  });
+
+  it("shows no error toast when a failed request finishes after the flow was left", async () => {
+    let fail: (error: Error) => void = () => {};
+    const { result, unmount } = _render(() => {
+      return new Promise<string | undefined>((_resolve, reject) => {
+        fail = reject;
+      });
+    });
+    result.current.suggestLabels(CODE_LIST);
+    await waitFor(() => {
+      expect(result.current.suggestingCodeListKey).toBe("list-1");
+    });
+    unmount();
+    fail(new Error("offline"));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 50);
+    });
+    expect(notifyErrorMock).not.toHaveBeenCalled();
+  });
+
   it("fills nothing in when the user declined to send the request", async () => {
     const { result, dispatch } = _render(() => {
       return Promise.resolve(undefined);

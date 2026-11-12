@@ -2,6 +2,7 @@ import { useMutation } from "@avandar/query-hooks";
 import { useLingui } from "@lingui/react/macro";
 import { parseDictionaryLabelSuggestions } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import { useIsMounted } from "@/lib/hooks/state/useIsMounted";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type {
@@ -108,6 +109,7 @@ function _getLabelsBlockReason(
  */
 export function useSuggestLabels(options: SuggestOptions): SuggestLabels {
   const { t, i18n } = useLingui();
+  const isMountedRef = useIsMounted();
   const [suggest, , result] = useMutation({
     mutationFn: (request: SuggestRequest) => {
       return _requestLabelSuggestions({
@@ -130,12 +132,16 @@ export function useSuggestLabels(options: SuggestOptions): SuggestLabels {
         readId,
         suggestions,
       });
-      notifySuccess(t`Suggested labels filled in. Check them before saving.`);
+      if (isMountedRef.current) {
+        notifySuccess(t`Suggested labels filled in. Check them before saving.`);
+      }
     },
     onError: () => {
-      notifyError(
-        t`Suggestions did not come back. Labeling still works without them.`,
-      );
+      if (isMountedRef.current) {
+        notifyError(
+          t`Suggestions did not come back. Labeling still works without them.`,
+        );
+      }
     },
   });
   return {
