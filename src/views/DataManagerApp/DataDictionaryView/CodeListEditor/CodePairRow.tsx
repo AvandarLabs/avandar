@@ -104,20 +104,41 @@ function CodePairOptions({
   );
 }
 
+/** Whether a pair issue is a warning about the label input. */
+function _isWarningOnLabel(
+  options: Readonly<{
+    issue: CodePairIssue | undefined;
+    input: "code" | "label";
+  }>,
+): boolean {
+  return options.issue?.severity === "warning" && options.input === "label";
+}
+
 /**
  * Mantine owns aria-invalid and aria-describedby on its inputs. Passing the
  * message as `error` sets both, and the element it renders is hidden because
- * the row shows the same message on its own issue line.
+ * the row shows the same message on its own issue line. A warning is not an
+ * error, so it goes in as the input's description instead, hidden the same
+ * way, and the label input still reads it without being marked invalid.
  */
 function _buildIssueProps(
   options: Readonly<{
     issue: CodePairIssue | undefined;
     input: "code" | "label";
   }>,
-): { error: string | undefined; errorProps: { className?: string } } {
+): {
+  error: string | undefined;
+  errorProps: { className?: string };
+  description: string | undefined;
+  descriptionProps: { className?: string };
+} {
   return {
     error: _isIssueOnInput(options) ? options.issue?.message : undefined,
     errorProps: { className: css.codeListEditorIssueDescription },
+    description: _isWarningOnLabel(options)
+      ? options.issue?.message
+      : undefined,
+    descriptionProps: { className: css.codeListEditorIssueDescription },
   };
 }
 
@@ -175,7 +196,8 @@ function CodePairRowBody(props: Readonly<BodyProps>): ReactNode {
   const { pair, index, canEdit, issue, liRef, isDragging } = props;
   const { t } = useLingui();
   const rowNumber = index + 1;
-  const valueName = pair.label.trim() || t`value ${rowNumber}`;
+  const fallbackName = t`value ${rowNumber}`;
+  const valueName = pair.label.trim() || pair.code.trim() || fallbackName;
 
   return (
     <li
@@ -196,11 +218,11 @@ function CodePairRowBody(props: Readonly<BodyProps>): ReactNode {
         issue={issue}
       />
       {issue ? (
-        // An error is also its input's accessible description, so its line
-        // is hidden from assistive tech. A warning is only said here.
+        // The issue is also an input's accessible description, so its line
+        // is hidden from assistive tech.
         <Text
           size="xs"
-          aria-hidden={issue.severity === "error"}
+          aria-hidden
           c={issue.severity === "error" ? "danger" : "dimmed"}
           className={css.codeListEditorRowIssue}
         >

@@ -69,11 +69,68 @@ describe("CodeListEditor", () => {
         onDraftChange={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Needs a label/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Needs a label/)).not.toHaveLength(0);
     expect(screen.getByLabelText("Label 2")).not.toHaveAttribute(
       "aria-invalid",
       "true",
     );
+  });
+
+  it("describes a missing label on its input for assistive tech", () => {
+    const draft = _draft([
+      { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "9", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+    render(
+      <CodeListEditor
+        draft={draft}
+        codeListId={LIST_ID}
+        issues={[]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByLabelText("Label 2")).toHaveAccessibleDescription(
+      /Needs a label/,
+    );
+  });
+
+  it("names a row after its code when it has no label", () => {
+    const draft = _draft([
+      { code: "9", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+    render(
+      <CodeListEditor
+        draft={draft}
+        codeListId={LIST_ID}
+        issues={[]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("listitem", { name: "9" })).toBeInTheDocument();
+  });
+
+  it("shows the error, not the warning, on a duplicate code with no label", () => {
+    const draft = _draft([
+      { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "1", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+    render(
+      <CodeListEditor
+        draft={draft}
+        codeListId={LIST_ID}
+        issues={[
+          { type: "code_not_unique", codeListId: LIST_ID, pairIndex: 1 },
+        ]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getAllByText(/This code is already in the list/),
+    ).not.toHaveLength(0);
+    expect(screen.queryByText(/Needs a label/)).not.toBeInTheDocument();
   });
 
   it("replaces a single empty row with pasted values", async () => {
