@@ -15,11 +15,12 @@ type Member = {
 };
 
 type Cluster = {
-  firstIndex: number;
   columns: [Member, ...Member[]];
   suggested: Member[];
   /** Every dataset a column or a guess in this cluster comes from. */
   datasetIds: Set<string>;
+  /** The columns again, by name id, so a hopeless name is skipped once. */
+  columnsByNameId: Map<number, Member[]>;
   suggestionReason: DictionaryProposalSuggestionReason | undefined;
 };
 
@@ -95,7 +96,7 @@ function _isBetter(
 /**
  * The better of `best` and how `member` relates to one cluster member.
  * Leaves the values uncompared when the name and type alone could not
- * reach a suggestion, or beat a certain match already found.
+ * reach `minimumScore`, or beat a certain match already found.
  */
 function _getMemberPlacement(
   options: Readonly<{
@@ -103,10 +104,11 @@ function _getMemberPlacement(
     clusterMember: Member;
     member: Member;
     best: Placement | undefined;
-    nameScorer: ColumnProfile.NameScorer;
+    search: PlacementSearch;
   }>,
 ): Placement | undefined {
-  const { cluster, clusterMember, member, best, nameScorer } = options;
+  const { cluster, clusterMember, member, best, search } = options;
+  const { nameScorer, minimumScore } = search;
   const nameScore = nameScorer.getScore(member.nameId, clusterMember.nameId);
   const typeScore = ColumnProfile.getTypeScore(
     member.match.profile.dataType,
@@ -115,7 +117,7 @@ function _getMemberPlacement(
   const bestPossible = ColumnProfile.getBestPossibleScore(nameScore, typeScore);
   const isHopeless =
     nameScore < 1 &&
-    (bestPossible < ColumnProfile.SUGGESTION_SCORE ||
+    (bestPossible < minimumScore ||
       (best?.outcome === "same" && bestPossible <= best.score));
   if (isHopeless) {
     return best;
@@ -132,10 +134,20 @@ function _getMemberPlacement(
   return candidate && _isBetter(candidate, best) ? candidate : best;
 }
 
+/**
+ * What a placement search scores with. A score below `minimumScore` can be
+ * skipped unless the names are the same: `MATCH_SCORE` when only a certain
+ * match is wanted, `SUGGESTION_SCORE` when a guess will do.
+ */
+type PlacementSearch = {
+  nameScorer: ColumnProfile.NameScorer;
+  minimumScore: number;
+};
+
 function _findPlacement(
   clusters: readonly Cluster[],
   member: Member,
-  nameScorer: ColumnProfile.NameScorer,
+  search: PlacementSearch,
 ): Placement | undefined {
   const datasetId = member.match.profile.datasetId;
   return clusters.reduce<Placement | undefined>((bestOfAll, cluster) => {
@@ -143,15 +155,26 @@ function _findPlacement(
     if (cluster.datasetIds.has(datasetId)) {
       return bestOfAll;
     }
-    return cluster.columns.reduce<Placement | undefined>(
-      (best, clusterMember) => {
-        return _getMemberPlacement({
-          cluster,
-          clusterMember,
-          member,
-          best,
-          nameScorer,
-        });
+    return [...cluster.columnsByNameId].reduce<Placement | undefined>(
+      (bestOfName, [nameId, clusterMembers]) => {
+        // No type can lift a name this far apart to the minimum score.
+        const nameScore = search.nameScorer.getScore(member.nameId, nameId);
+        const bestPossible = ColumnProfile.getBestPossibleScore(nameScore, 1);
+        if (nameScore < 1 && bestPossible < search.minimumScore) {
+          return bestOfName;
+        }
+        return clusterMembers.reduce<Placement | undefined>(
+          (best, clusterMember) => {
+            return _getMemberPlacement({
+              cluster,
+              clusterMember,
+              member,
+              best,
+              search,
+            });
+          },
+          bestOfName,
+        );
       },
       bestOfAll,
     );
@@ -163,6 +186,10 @@ function _addToCluster(placement: Readonly<Placement>, member: Member): void {
   cluster.datasetIds.add(member.match.profile.datasetId);
   if (outcome === "same") {
     cluster.columns.push(member);
+    cluster.columnsByNameId.set(member.nameId, [
+      ...(cluster.columnsByNameId.get(member.nameId) ?? []),
+      member,
+    ]);
     return;
   }
   cluster.suggested.push(member);
@@ -174,62 +201,91 @@ function _addToCluster(placement: Readonly<Placement>, member: Member): void {
 
 function _createCluster(member: Member): Cluster {
   return {
-    firstIndex: member.index,
     columns: [member],
     suggested: [],
     datasetIds: new Set([member.match.profile.datasetId]),
+    columnsByNameId: new Map([[member.nameId, [member]]]),
     suggestionReason: undefined,
   };
 }
 
-/** A column whose best match is a guess, with the cluster it would join. */
-type DeferredGuess = { member: Member; placement: Placement };
-
 /**
- * Places each member in the cluster it matches best, or starts a new one.
- * A member whose best match is only a guess is returned instead, so every
- * certain match is placed before any guess is.
+ * Orders members by dataset name, dataset id, and column name, so clustering
+ * reads them in the same order however the profiles came in.
  */
-function _placeCertainMembers(
-  members: readonly Member[],
-  clusters: Cluster[],
-  nameScorer: ColumnProfile.NameScorer,
-): DeferredGuess[] {
-  return members.flatMap((member) => {
-    const placement = _findPlacement(clusters, member, nameScorer);
-    if (!placement) {
-      clusters.push(_createCluster(member));
-    } else if (placement.outcome === "same") {
-      _addToCluster(placement, member);
-    } else {
-      return [{ member, placement }];
-    }
-    return [];
+function _compareMembers(memberA: Member, memberB: Member): number {
+  const profileA = memberA.match.profile;
+  const profileB = memberB.match.profile;
+  const keysA = [profileA.datasetName, profileA.datasetId, profileA.columnName];
+  const keysB = [profileB.datasetName, profileB.datasetId, profileB.columnName];
+  const differentAt = keysA.findIndex((key, position) => {
+    return key !== keysB[position];
   });
+  if (differentAt === -1) {
+    return memberA.index - memberB.index;
+  }
+  return (keysA[differentAt] ?? "") < (keysB[differentAt] ?? "") ? -1 : 1;
 }
 
 /**
- * Places the guesses found earlier. A guess keeps its cluster unless that
- * cluster has since taken a column from the same dataset, and then it looks
- * again, as a certain match or a new entry of its own.
+ * Puts each member in the cluster it certainly matches best, or starts a
+ * cluster of its own, so a later column of the same name can still find it.
+ * Guesses are left for `_placeSingleColumns`.
  */
-function _placeGuesses(
-  guesses: readonly DeferredGuess[],
-  clusters: Cluster[],
+function _placeCertainMembers(
+  members: readonly Member[],
   nameScorer: ColumnProfile.NameScorer,
-): void {
-  guesses.forEach(({ member, placement }) => {
-    const isTaken = placement.cluster.datasetIds.has(
-      member.match.profile.datasetId,
-    );
-    const current = isTaken
-      ? _findPlacement(clusters, member, nameScorer)
-      : placement;
-    if (current) {
-      _addToCluster(current, member);
+): Cluster[] {
+  return members.reduce<Cluster[]>((clusters, member) => {
+    const placement = _findPlacement(clusters, member, {
+      nameScorer,
+      minimumScore: ColumnProfile.MATCH_SCORE,
+    });
+    if (placement?.outcome === "same") {
+      _addToCluster(placement, member);
     } else {
       clusters.push(_createCluster(member));
     }
+    return clusters;
+  }, []);
+}
+
+/**
+ * Moves each column that no certain match joined into the entry it matches
+ * best, usually as a guess. It looks at the entries of several columns and
+ * at the single columns ordered before it by `_compareMembers`, so of two
+ * single columns the one in the dataset first by name keeps the entry.
+ * Returns the clusters that are left.
+ */
+function _placeSingleColumns(
+  clusters: readonly Cluster[],
+  nameScorer: ColumnProfile.NameScorer,
+): Cluster[] {
+  const isMultiColumn = clusters.map((cluster) => {
+    return cluster.columns.length > 1;
+  });
+  const movedClusters = new Set<Cluster>();
+  clusters.forEach((cluster, position) => {
+    if (isMultiColumn[position]) {
+      return;
+    }
+    const candidates = clusters.filter((candidate, candidatePosition) => {
+      return (
+        !movedClusters.has(candidate) &&
+        (isMultiColumn[candidatePosition] || candidatePosition < position)
+      );
+    });
+    const placement = _findPlacement(candidates, cluster.columns[0], {
+      nameScorer,
+      minimumScore: ColumnProfile.SUGGESTION_SCORE,
+    });
+    if (placement) {
+      _addToCluster(placement, cluster.columns[0]);
+      movedClusters.add(cluster);
+    }
+  });
+  return clusters.filter((cluster) => {
+    return !movedClusters.has(cluster);
   });
 }
 
@@ -289,19 +345,39 @@ function _getMostCommonKind(
   return mostCommon ?? "text";
 }
 
+function _sortByInputOrder(members: readonly Member[]): Member[] {
+  return [...members].sort((memberA, memberB) => {
+    return memberA.index - memberB.index;
+  });
+}
+
+/** Where the cluster's first column or guess came in the input. */
+function _getFirstIndex(cluster: Readonly<Cluster>): number {
+  return Math.min(
+    ...[...cluster.columns, ...cluster.suggested].map((member) => {
+      return member.index;
+    }),
+  );
+}
+
 function _makeEntryFromCluster(
   cluster: Readonly<Cluster>,
 ): DictionaryProposalEntry {
-  const [first] = cluster.columns;
-  const columns = cluster.columns.map((member) => {
+  // Clustering reads columns in a fixed order, but the entry lists them, and
+  // breaks a name tie, in the order they came in.
+  const orderedColumns = _sortByInputOrder(cluster.columns);
+  const first = orderedColumns[0] ?? cluster.columns[0];
+  const columns = orderedColumns.map((member) => {
     return member.match.profile;
   });
-  const suggestedColumns = cluster.suggested.map((member) => {
-    return member.match.profile;
-  });
+  const suggestedColumns = _sortByInputOrder(cluster.suggested).map(
+    (member) => {
+      return member.match.profile;
+    },
+  );
   return {
     key: `${first.match.profile.datasetId}:${first.match.profile.columnName}`,
-    name: _getMostCommonName(cluster.columns),
+    name: _getMostCommonName(orderedColumns),
     columns,
     suggestedColumns,
     suggestionReason: cluster.suggestionReason,
@@ -329,12 +405,15 @@ function _prepareMembers(
 /**
  * Groups profiled columns from one or more datasets into the entries a new
  * dictionary would have. A column joins the entry it matches best: by the
- * same name, or by a match score of 0.9 or more. A weaker match (0.6 to
- * 0.9) or the same name with other codes joins as a guess the user can
- * undo. Two columns of one dataset never share an entry. Each entry is named
- * after its most common column name in lowercase words (`GENDER` gives
- * `gender`), with `_2` added when another entry, or one of `takenNames`,
- * already has that name.
+ * same name, or by a match score of 0.9 or more. A column nothing certainly
+ * matches can join an entry as a guess the user can undo: by a weaker match
+ * (0.6 to 0.9), or by the same name with other codes. Two columns of one
+ * dataset never share an entry. The grouping does not depend on the order
+ * of `profiles`. That order only sets the order of the entries and, on a
+ * tie, their names: each entry is named after its most common column name
+ * in lowercase words (`GENDER` gives `gender`), the first read on a tie,
+ * with `_2` added when an earlier entry, or one of `takenNames`, already has
+ * that name.
  *
  * Used when a dictionary is created from datasets, and again by Keep apart
  * to regroup the columns a guess had joined.
@@ -344,19 +423,20 @@ export function makeProposalFromColumnProfiles(
   options: Readonly<{ takenNames?: readonly string[] }> = {},
 ): DictionaryProposalT {
   const nameScorer = ColumnProfile.createNameScorer();
-  const members = _prepareMembers(profiles, nameScorer);
-  const clusters: Cluster[] = [];
+  const members = _prepareMembers(profiles, nameScorer).sort(_compareMembers);
   // Certain matches are placed first, so a guess never takes the dataset
   // slot a certain match needed. The guesses are placed second.
-  const guesses = _placeCertainMembers(members, clusters, nameScorer);
-  _placeGuesses(guesses, clusters, nameScorer);
+  const clusters = _placeSingleColumns(
+    _placeCertainMembers(members, nameScorer),
+    nameScorer,
+  );
   const takenNames = new Set(
     (options.takenNames ?? []).map((name) => {
       return name.trim().toLowerCase();
     }),
   );
   const orderedClusters = [...clusters].sort((clusterA, clusterB) => {
-    return clusterA.firstIndex - clusterB.firstIndex;
+    return _getFirstIndex(clusterA) - _getFirstIndex(clusterB);
   });
   return {
     entries: orderedClusters.map((cluster) => {
