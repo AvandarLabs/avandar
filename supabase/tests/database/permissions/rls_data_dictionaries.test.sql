@@ -97,7 +97,7 @@ values (
   true
 );
 
-select plan (19);
+select plan (20);
 
 -- 1. A viewer reads a dictionary in their workspace.
 select lives_ok (
@@ -393,6 +393,20 @@ select is (
   0,
   'deleting a dictionary deletes its code lists, entries, and codings'
 );
+
+-- 20. A signed-in user cannot insert a dictionary with a preset version.
+select throws_ok (
+  $t20$
+  set local role authenticated;
+  select set_config('request.jwt.claims', '{"sub":"dd000003-0000-4000-8000-000000000003","role":"authenticated"}', true);
+  insert into public.data_dictionaries (workspace_id, owner_id, owner_profile_id, name, version)
+  values ('dd100001-0000-4000-8000-000000000001'::uuid, 'dd000003-0000-4000-8000-000000000003'::uuid, 'dd300003-0000-4000-8000-000000000003'::uuid, 'preset version', 99);
+  $t20$,
+  '42501',
+  null,
+  'an editor cannot insert a dictionary with a version other than 1'
+);
+reset role;
 
 select * from finish ();
 

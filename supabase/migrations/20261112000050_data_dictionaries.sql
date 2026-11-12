@@ -176,6 +176,16 @@ begin
   if exists (
     select 1
     from jsonb_to_recordset(p_code_lists) as l (id uuid)
+    group by l.id
+    having count(*) > 1
+  ) then
+    raise exception 'A code list id appears more than once'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_code_lists) as l (id uuid)
     left join public.data_dictionaries__code_lists cl on cl.id = l.id
     where l.id is null or cl.dictionary_id <> p_dictionary_id
   ) then
@@ -212,6 +222,17 @@ begin
   ) then
     raise exception 'Only categorical and ordered entries have code lists'
       using errcode = '23514', hint = 'coding_kind_mismatch';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_array_elements(p_entries) with ordinality as e (entry, entry_index)
+    cross join lateral jsonb_to_recordset(coalesce(e.entry -> 'codings', '[]'::jsonb)) as c (code_list_id uuid)
+    group by e.entry_index, c.code_list_id
+    having count(*) > 1
+  ) then
+    raise exception 'An entry lists the same code list more than once'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
   end if;
 
   if exists (
@@ -260,6 +281,16 @@ begin
     )
   ) then
     raise exception 'Entries must be an array with a known kind each'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_entries) as e (id uuid)
+    group by e.id
+    having count(*) > 1
+  ) then
+    raise exception 'An entry id appears more than once'
       using errcode = '22023', hint = 'dictionary_payload_invalid';
   end if;
 
@@ -362,12 +393,21 @@ CREATE OR REPLACE FUNCTION public.data_dictionaries__guard_managed_columns()
  SET search_path TO ''
 AS $function$
 begin
-  if current_user = 'authenticated' and (
+  if current_user <> 'authenticated' then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    if new.version <> 1 then
+      raise exception 'a new dictionary starts at version 1'
+        using errcode = '42501';
+    end if;
+  elsif
     new.version is distinct from old.version or
     new.owner_id is distinct from old.owner_id or
     new.owner_profile_id is distinct from old.owner_profile_id or
     new.created_from_dataset_ids is distinct from old.created_from_dataset_ids
-  ) then
+  then
     raise exception 'a dictionary''s version, owner, and sources are managed'
       using errcode = '42501';
   end if;
@@ -430,7 +470,8 @@ begin
   set
     name = excluded.name,
     is_ordered = excluded.is_ordered,
-    pairs = excluded.pairs;
+    pairs = excluded.pairs
+  where public.data_dictionaries__code_lists.dictionary_id = excluded.dictionary_id;
 
   delete from public.data_dictionaries__code_lists cl
   where
@@ -476,7 +517,8 @@ begin
     valid_min = excluded.valid_min,
     valid_max = excluded.valid_max,
     description = excluded.description,
-    position = excluded.position;
+    position = excluded.position
+  where public.data_dictionaries__entries.dictionary_id = excluded.dictionary_id;
 
   delete from public.data_dictionaries__entries en
   where
@@ -656,7 +698,7 @@ using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::p
 using (public.util__auth_user_meets_min_app_role(workspace_id, 'data_sources'::public.app_type, 'viewer'::public.role_level));
 
 
-CREATE TRIGGER tr__data_dictionaries__guard_managed_columns BEFORE UPDATE ON public.data_dictionaries FOR EACH ROW EXECUTE FUNCTION public.data_dictionaries__guard_managed_columns();
+CREATE TRIGGER tr__data_dictionaries__guard_managed_columns BEFORE INSERT OR UPDATE ON public.data_dictionaries FOR EACH ROW EXECUTE FUNCTION public.data_dictionaries__guard_managed_columns();
 
 CREATE TRIGGER tr__data_dictionaries__prevent_workspace_id_change BEFORE UPDATE OF workspace_id ON public.data_dictionaries FOR EACH ROW EXECUTE FUNCTION public.data_dictionaries__prevent_workspace_id_change();
 

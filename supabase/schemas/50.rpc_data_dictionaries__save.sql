@@ -91,6 +91,16 @@ begin
   if exists (
     select 1
     from jsonb_to_recordset(p_code_lists) as l (id uuid)
+    group by l.id
+    having count(*) > 1
+  ) then
+    raise exception 'A code list id appears more than once'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_code_lists) as l (id uuid)
     left join public.data_dictionaries__code_lists cl on cl.id = l.id
     where l.id is null or cl.dictionary_id <> p_dictionary_id
   ) then
@@ -189,6 +199,16 @@ begin
   if exists (
     select 1
     from jsonb_to_recordset(p_entries) as e (id uuid)
+    group by e.id
+    having count(*) > 1
+  ) then
+    raise exception 'An entry id appears more than once'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_entries) as e (id uuid)
     left join public.data_dictionaries__entries en on en.id = e.id
     where e.id is null or en.dictionary_id <> p_dictionary_id
   ) then
@@ -250,6 +270,17 @@ begin
 
   if exists (
     select 1
+    from jsonb_array_elements(p_entries) with ordinality as e (entry, entry_index)
+    cross join lateral jsonb_to_recordset(coalesce(e.entry -> 'codings', '[]'::jsonb)) as c (code_list_id uuid)
+    group by e.entry_index, c.code_list_id
+    having count(*) > 1
+  ) then
+    raise exception 'An entry lists the same code list more than once'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
     from jsonb_array_elements(p_entries) as e (entry)
     cross join lateral jsonb_to_recordset(coalesce(e.entry -> 'codings', '[]'::jsonb)) as c (code_list_id uuid)
     where not exists (
@@ -295,7 +326,8 @@ begin
   set
     name = excluded.name,
     is_ordered = excluded.is_ordered,
-    pairs = excluded.pairs;
+    pairs = excluded.pairs
+  where public.data_dictionaries__code_lists.dictionary_id = excluded.dictionary_id;
 
   delete from public.data_dictionaries__code_lists cl
   where
@@ -346,7 +378,8 @@ begin
     valid_min = excluded.valid_min,
     valid_max = excluded.valid_max,
     description = excluded.description,
-    position = excluded.position;
+    position = excluded.position
+  where public.data_dictionaries__entries.dictionary_id = excluded.dictionary_id;
 
   delete from public.data_dictionaries__entries en
   where

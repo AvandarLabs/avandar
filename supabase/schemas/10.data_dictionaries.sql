@@ -132,21 +132,31 @@ from
   service_role;
 
 /**
- * Refuses direct edits by a signed-in user to the columns this schema
- * manages: the version, which only `rpc_data_dictionaries__save` bumps,
- * and ownership and provenance, which no client flow changes. The save RPC
- * runs as the function owner, so its version bump passes.
+ * Refuses direct writes by a signed-in user to the columns this schema
+ * manages: the version, which only `rpc_data_dictionaries__save` bumps and
+ * which always starts at 1, and ownership and provenance, which no client
+ * flow changes after insert. `created_from_dataset_ids` stays insertable.
+ * The save RPC runs as the function owner, so its version bump passes.
  */
 create or replace function public.data_dictionaries__guard_managed_columns () returns trigger language plpgsql
 set
   search_path = '' as $$
 begin
-  if current_user = 'authenticated' and (
+  if current_user <> 'authenticated' then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    if new.version <> 1 then
+      raise exception 'a new dictionary starts at version 1'
+        using errcode = '42501';
+    end if;
+  elsif
     new.version is distinct from old.version or
     new.owner_id is distinct from old.owner_id or
     new.owner_profile_id is distinct from old.owner_profile_id or
     new.created_from_dataset_ids is distinct from old.created_from_dataset_ids
-  ) then
+  then
     raise exception 'a dictionary''s version, owner, and sources are managed'
       using errcode = '42501';
   end if;
@@ -196,7 +206,7 @@ create trigger tr__data_dictionaries__prevent_workspace_id_change before
 update of workspace_id on public.data_dictionaries for each row
 execute function public.data_dictionaries__prevent_workspace_id_change ();
 
-create trigger tr__data_dictionaries__guard_managed_columns before
+create trigger tr__data_dictionaries__guard_managed_columns before insert or
 update on public.data_dictionaries for each row
 execute function public.data_dictionaries__guard_managed_columns ();
 

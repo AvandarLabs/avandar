@@ -89,7 +89,7 @@ on conflict (id) do nothing;
 insert into public.data_dictionaries__code_lists (id, workspace_id, dictionary_id, name, pairs)
 values ('de500009-0000-4000-8000-000000000009'::uuid, 'de100001-0000-4000-8000-000000000001'::uuid, 'de400002-0000-4000-8000-000000000002'::uuid, 'Not yours', '[]'::jsonb);
 
-select plan (17);
+select plan (19);
 
 -- Refusals. None of them changes anything.
 
@@ -236,6 +236,32 @@ select is (
   ),
   'item_not_in_dictionary',
   'a code list from another dictionary cannot be saved into this one'
+);
+reset role;
+
+-- 12b. The same code list id twice in one payload.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500001-0000-4000-8000-000000000001","name":"A","is_ordered":false,"pairs":[]},{"id":"de500001-0000-4000-8000-000000000001","name":"B","is_ordered":false,"pairs":[]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'dictionary_payload_invalid',
+  'a code list id cannot appear twice'
+);
+reset role;
+
+-- 12c. One entry listing the same code list twice.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500001-0000-4000-8000-000000000001","name":"Sex","is_ordered":false,"pairs":[]}]'::jsonb,
+    '[{"id":"de600001-0000-4000-8000-000000000001","name":"sex","column_names":[],"kind":"categorical","unit":null,"valid_min":null,"valid_max":null,"description":null,"position":0,"codings":[{"code_list_id":"de500001-0000-4000-8000-000000000001","is_primary":true},{"code_list_id":"de500001-0000-4000-8000-000000000001","is_primary":false}]}]'::jsonb
+  ),
+  'dictionary_payload_invalid',
+  'an entry cannot list the same code list twice'
 );
 reset role;
 

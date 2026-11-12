@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261111235337_data_dictionaries.sql by
+-- Generated from supabase/migrations/20261112000050_data_dictionaries.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 19
