@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
@@ -115,5 +116,41 @@ describe("DatasetNavbar", () => {
     await expect(
       screen.findByRole("tooltip", undefined, { timeout: 300 }),
     ).rejects.toThrow();
+  });
+});
+
+function _createDictionary(name: string): DataDictionary.T {
+  return {
+    id: "22222222-2222-4222-8222-222222222222",
+    name,
+  } as DataDictionary.T;
+}
+
+describe("DatasetNavbar dictionaries", () => {
+  it("lists dictionaries under their own heading in an All data list", () => {
+    render(
+      <DatasetNavbar
+        datasets={[_createDataset("Bronx line list")]}
+        dictionaries={[_createDictionary("NYS measles case report")]}
+        isLoading={false}
+      />,
+    );
+
+    expect(screen.getByText("All data")).toBeInTheDocument();
+    expect(screen.getByText("Dictionaries")).toBeInTheDocument();
+    expect(screen.getByText("NYS measles case report")).toBeInTheDocument();
+    expect(screen.getByText("Bronx line list")).toBeInTheDocument();
+  });
+
+  it("shows no group headings when only datasets of one kind exist", () => {
+    render(
+      <DatasetNavbar
+        datasets={[_createDataset("Bronx line list")]}
+        isLoading={false}
+      />,
+    );
+
+    expect(screen.queryByText("Dictionaries")).not.toBeInTheDocument();
+    expect(screen.queryByText("CSV")).not.toBeInTheDocument();
   });
 });
