@@ -89,7 +89,7 @@ on conflict (id) do nothing;
 insert into public.data_dictionaries__code_lists (id, workspace_id, dictionary_id, name, pairs)
 values ('de500009-0000-4000-8000-000000000009'::uuid, 'de100001-0000-4000-8000-000000000001'::uuid, 'de400002-0000-4000-8000-000000000002'::uuid, 'Not yours', '[]'::jsonb);
 
-select plan (19);
+select plan (23);
 
 -- Refusals. None of them changes anything.
 
@@ -127,11 +127,11 @@ select is (
   pg_temp.save_as (
     'de000001-0000-4000-8000-000000000001'::uuid,
     'de400001-0000-4000-8000-000000000001'::uuid,
-    '[{"id":"de500001-0000-4000-8000-000000000001","name":"Sex","is_ordered":false,"pairs":[{"code":"1","label":" ","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
+    '[{"id":"de500001-0000-4000-8000-000000000001","name":"Sex","is_ordered":false,"pairs":[{"code":" ","label":"Male","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
     '[]'::jsonb
   ),
   'code_pair_incomplete',
-  'every pair needs a code and a label'
+  'every pair needs a code'
 );
 reset role;
 
@@ -329,6 +329,61 @@ select is (
   'v3 lists=0 codings=0 first=age_years',
   'the second save swapped the names, removed the list and its codings, and made version 3'
 );
+
+-- Blank labels. A value can wait for its label.
+
+-- 18.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500002-0000-4000-8000-000000000002","name":"Hospitalized","is_ordered":false,"pairs":[{"code":"Y","label":"Yes","accepted_spellings":[],"is_missing":false},{"code":"N","label":"","accepted_spellings":[],"is_missing":false},{"code":"U","label":" ","accepted_spellings":[],"is_missing":true}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'no error',
+  'values with blank labels save, two of them in one list'
+);
+reset role;
+
+-- 19.
+select is (
+  (
+    select count(*)::int
+    from public.data_dictionaries__code_lists cl
+    cross join lateral jsonb_array_elements(cl.pairs) as p (pair)
+    where
+      cl.id = 'de500002-0000-4000-8000-000000000002'::uuid and
+      btrim(p.pair ->> 'label') = ''
+  ),
+  2,
+  'the blank labels are stored blank'
+);
+
+-- 20.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500002-0000-4000-8000-000000000002","name":"Hospitalized","is_ordered":false,"pairs":[{"code":"Y","label":"Yes","accepted_spellings":[],"is_missing":false},{"code":"1","label":"yes","accepted_spellings":[],"is_missing":false},{"code":"N","label":"","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'labels_not_unique',
+  'two values still cannot share a label that is not blank'
+);
+reset role;
+
+-- 21.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500002-0000-4000-8000-000000000002","name":"Hospitalized","is_ordered":false,"pairs":[{"code":"Y","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'dictionary_payload_invalid',
+  'a value without a label field at all is refused'
+);
+reset role;
 
 select * from finish ();
 

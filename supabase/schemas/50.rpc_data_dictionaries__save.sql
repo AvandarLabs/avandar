@@ -123,8 +123,10 @@ $$;
 
 /**
  * Raises with a stable hint when any code list's pairs are incomplete or
- * ambiguous: a blank code or label, two codes that differ only in case,
- * or a label or accepted spelling shared by two pairs.
+ * ambiguous: a blank code, a label that is not text, two codes that differ
+ * only in case, or a label or accepted spelling shared by two pairs. A
+ * blank label is allowed: the value is saved and waits for its label, and
+ * blank labels never clash with each other.
  */
 create or replace function public.data_dictionaries__check_pairs (p_code_lists jsonb) returns void language plpgsql
 set
@@ -134,11 +136,19 @@ begin
     select 1
     from jsonb_array_elements(p_code_lists) as l (list)
     cross join lateral jsonb_array_elements(l.list -> 'pairs') as p (pair)
-    where
-      coalesce(btrim(p.pair ->> 'code'), '') = '' or
-      coalesce(btrim(p.pair ->> 'label'), '') = ''
+    where jsonb_typeof(p.pair -> 'label') is distinct from 'string'
   ) then
-    raise exception 'Every value needs a code and a label'
+    raise exception 'Every value needs a label, even an empty one'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_array_elements(p_code_lists) as l (list)
+    cross join lateral jsonb_array_elements(l.list -> 'pairs') as p (pair)
+    where coalesce(btrim(p.pair ->> 'code'), '') = ''
+  ) then
+    raise exception 'Every value needs a code'
       using errcode = '23514', hint = 'code_pair_incomplete';
   end if;
 
