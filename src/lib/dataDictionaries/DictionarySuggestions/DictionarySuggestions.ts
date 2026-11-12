@@ -1,6 +1,7 @@
 import { prop } from "@avandar/utils";
 import {
   buildDictionarySuggestionsMessages,
+  DICTIONARY_SUGGESTIONS_CHARACTERS_PER_TOKEN,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
   DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES,
@@ -32,6 +33,16 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * this device, or nowhere (offline without the offline models).
  */
 export type DictionarySuggestionModel = "online" | "on_device" | "unavailable";
+
+/**
+ * Why a code list's values cannot be sent for label suggestions: its columns
+ * name people, a code is longer than a request may carry, or the list is too
+ * long for the offline model's context window.
+ */
+export type LabelsBlockReason =
+  | "personal"
+  | "code_too_long"
+  | "too_large_for_model";
 
 /** Posts one request to the online suggestions route. */
 export type PostDictionarySuggestions = (options: {
@@ -191,14 +202,20 @@ function _makeColumn(
   };
 }
 
-function makeLabelsRequestFromCodeList(
-  options: Readonly<{
-    proposal: DictionaryProposal.T;
-    codeList: DictionaryProposal.CodeList;
-    locale: string;
-    model: DictionarySuggestionModel;
-  }>,
-): DictionarySuggestionsRequest | undefined {
+type LabelsRequestOptions = Readonly<{
+  proposal: DictionaryProposal.T;
+  codeList: DictionaryProposal.CodeList;
+  locale: string;
+  model: DictionarySuggestionModel;
+}>;
+
+type LabelsRequestCheck =
+  | { type: "ready"; request: DictionarySuggestionsRequest }
+  | { type: "blocked"; reason: LabelsBlockReason };
+
+function _checkLabelsRequestFromCodeList(
+  options: LabelsRequestOptions,
+): LabelsRequestCheck {
   const entries = options.proposal.entries.filter((entry) => {
     return options.codeList.entryKeys.includes(entry.key);
   });
@@ -206,8 +223,10 @@ function makeLabelsRequestFromCodeList(
   const names = [
     ...new Set(entries.flatMap(DictionaryProposal.getColumnNames)),
   ];
+  // A list with no entries has no column to vouch for its values, so they
+  // are kept back like a person's.
   if (!first || names.some(isIdentifyingColumnName)) {
-    return undefined;
+    return { type: "blocked", reason: "personal" };
   }
   const values = options.codeList.values
     .map(prop("value"))
@@ -229,11 +248,29 @@ function makeLabelsRequestFromCodeList(
     locale: options.locale,
     column,
   };
-  return _canSendValues(column.kind, [column.name, ...names]) &&
-    _areValuesShortEnough(values) &&
-    _fitsModel(request, options.model)
-    ? request
-    : undefined;
+  if (!_canSendValues(column.kind, [column.name, ...names])) {
+    return { type: "blocked", reason: "personal" };
+  }
+  if (!_areValuesShortEnough(values)) {
+    return { type: "blocked", reason: "code_too_long" };
+  }
+  return _fitsModel(request, options.model)
+    ? { type: "ready", request }
+    : { type: "blocked", reason: "too_large_for_model" };
+}
+
+function makeLabelsRequestFromCodeList(
+  options: LabelsRequestOptions,
+): DictionarySuggestionsRequest | undefined {
+  const check = _checkLabelsRequestFromCodeList(options);
+  return check.type === "ready" ? check.request : undefined;
+}
+
+function getLabelsBlockReason(
+  options: LabelsRequestOptions,
+): LabelsBlockReason | undefined {
+  const check = _checkLabelsRequestFromCodeList(options);
+  return check.type === "blocked" ? check.reason : undefined;
 }
 
 function makeMatchesRequestFromProposal(
@@ -278,8 +315,8 @@ function makeMatchesRequestFromProposal(
  * Whether one request fits where it will run: the route's cap on the consent
  * text online, or the offline model's context window on device. The window
  * has to hold the prompt, the request, and the reply, so the prompt and the
- * request are sized at a pessimistic three characters per token and the
- * reply at its budget.
+ * request are sized at the shared pessimistic characters-per-token estimate
+ * and the reply at its budget.
  */
 function _fitsModel(
   request: Readonly<DictionarySuggestionsRequest>,
@@ -298,7 +335,8 @@ function _fitsModel(
     0,
   );
   return (
-    Math.ceil(characters / 3) + getDictionarySuggestionsMaxTokens(request) <=
+    Math.ceil(characters / DICTIONARY_SUGGESTIONS_CHARACTERS_PER_TOKEN) +
+      getDictionarySuggestionsMaxTokens(request) <=
     OFFLINE_CHAT_CONTEXT_WINDOW_SIZE
   );
 }
@@ -379,6 +417,12 @@ export const DictionarySuggestions = {
    * a long list asks for nothing.
    */
   makeLabelsRequestFromCodeList,
+
+  /**
+   * Why a code list's labels cannot be asked for, or undefined when they
+   * can. Lets the Label values step say which of the three it is.
+   */
+  getLabelsBlockReason,
 
   /**
    * The request for meaning matches across a proposal's entries. Undefined

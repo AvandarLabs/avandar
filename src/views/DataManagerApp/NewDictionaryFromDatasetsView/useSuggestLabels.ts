@@ -4,7 +4,10 @@ import { parseDictionaryLabelSuggestions } from "$/agent/dictionarySuggestions/d
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type {
+  DictionarySuggestionModel,
+  LabelsBlockReason,
+} from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { Dispatch } from "react";
@@ -48,9 +51,9 @@ async function _requestLabelSuggestions(
  * for the entry using it, and fills them in as suggestions. Used by the
  * Label values step's Suggest labels button. When the user declines to
  * send the request, nothing is filled in and nothing is shown: the Label
- * values pane already says suggestions are off. `canSuggestLabels` lets
- * that step hide or explain the button for a list that cannot be sent,
- * instead of a failed request.
+ * values pane already says suggestions are off. `getLabelsBlockReason`
+ * lets that step explain why the button is off for a list that cannot be
+ * sent, instead of a failed request.
  */
 export function useSuggestLabels(
   options: Readonly<{
@@ -62,11 +65,13 @@ export function useSuggestLabels(
 ): {
   suggestLabels: (codeList: DictionaryProposal.CodeList) => void;
   /**
-   * Whether a request can be made for this list at all. It cannot when a
-   * column of the list looks like it identifies people, when a code is too
-   * long to send, or when the list is too long for the offline model.
+   * Why a request cannot be made for this list, or undefined when it can:
+   * a column of the list looks like it identifies people, a code is too long
+   * to send, or the list is too long for the model that would answer.
    */
-  canSuggestLabels: (codeList: DictionaryProposal.CodeList) => boolean;
+  getLabelsBlockReason: (
+    codeList: DictionaryProposal.CodeList,
+  ) => LabelsBlockReason | undefined;
   suggestingCodeListKey: string | undefined;
 } {
   const { t, i18n } = useLingui();
@@ -101,16 +106,16 @@ export function useSuggestLabels(
   });
   return {
     suggestLabels,
-    canSuggestLabels: (codeList) => {
-      return (
-        options.proposal !== undefined &&
-        DictionarySuggestions.makeLabelsRequestFromCodeList({
-          proposal: options.proposal,
-          codeList,
-          locale: i18n.locale,
-          model: options.model,
-        }) !== undefined
-      );
+    getLabelsBlockReason: (codeList) => {
+      // Without a proposal there is no list to label, so nothing to block.
+      return options.proposal
+        ? DictionarySuggestions.getLabelsBlockReason({
+            proposal: options.proposal,
+            codeList,
+            locale: i18n.locale,
+            model: options.model,
+          })
+        : undefined;
     },
     suggestingCodeListKey: result.isPending ? result.variables?.key : undefined,
   };

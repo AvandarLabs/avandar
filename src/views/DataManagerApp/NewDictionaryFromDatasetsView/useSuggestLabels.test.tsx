@@ -5,21 +5,24 @@ import { useSuggestLabels } from "@/views/DataManagerApp/NewDictionaryFromDatase
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { ReactNode } from "react";
 
-const { makeRequestMock, notifyErrorMock, notifySuccessMock } = vi.hoisted(
-  () => {
+const { makeRequestMock, blockReasonMock, notifyErrorMock, notifySuccessMock } =
+  vi.hoisted(() => {
     return {
       makeRequestMock: vi.fn(),
+      blockReasonMock: vi.fn(),
       notifyErrorMock: vi.fn(),
       notifySuccessMock: vi.fn(),
     };
-  },
-);
+  });
 
 vi.mock(
   "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions",
   () => {
     return {
-      DictionarySuggestions: { makeLabelsRequestFromCodeList: makeRequestMock },
+      DictionarySuggestions: {
+        makeLabelsRequestFromCodeList: makeRequestMock,
+        getLabelsBlockReason: blockReasonMock,
+      },
     };
   },
 );
@@ -129,15 +132,21 @@ describe("useSuggestLabels", () => {
     expect(notifyErrorMock).not.toHaveBeenCalled();
   });
 
-  it("says a code list cannot be sent when no request can be made for it", () => {
+  it("passes on why a code list cannot be sent, or that it can be", () => {
     const { result } = _render(() => {
       return Promise.resolve(undefined);
     });
-    makeRequestMock.mockReturnValueOnce(undefined);
-    expect(result.current.canSuggestLabels(CODE_LIST)).toBe(false);
-    expect(result.current.canSuggestLabels(CODE_LIST)).toBe(true);
-    expect(makeRequestMock).toHaveBeenCalledWith(
-      expect.objectContaining({ proposal: PROPOSAL, codeList: CODE_LIST }),
+    blockReasonMock.mockReturnValueOnce("code_too_long");
+    expect(result.current.getLabelsBlockReason(CODE_LIST)).toBe(
+      "code_too_long",
+    );
+    expect(result.current.getLabelsBlockReason(CODE_LIST)).toBeUndefined();
+    expect(blockReasonMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        proposal: PROPOSAL,
+        codeList: CODE_LIST,
+        model: "online",
+      }),
     );
   });
 });

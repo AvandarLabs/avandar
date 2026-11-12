@@ -71,8 +71,8 @@ vi.mock(
         return {
           suggestLabels: vi.fn(),
           suggestingCodeListKey: undefined,
-          canSuggestLabels: () => {
-            return true;
+          getLabelsBlockReason: () => {
+            return undefined;
           },
         };
       },

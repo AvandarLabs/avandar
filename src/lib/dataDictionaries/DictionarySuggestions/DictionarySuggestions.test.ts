@@ -528,3 +528,86 @@ describe("DictionarySuggestions requests on the offline model", () => {
     ).toBeUndefined();
   });
 });
+
+describe("DictionarySuggestions.getLabelsBlockReason", () => {
+  it("says nothing blocks a list that can be sent", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("GENDER", ["1", "2", "9"]),
+    ]);
+    expect(
+      DictionarySuggestions.getLabelsBlockReason({
+        proposal,
+        codeList: _firstCodeList(proposal),
+        locale: "en",
+        model: "online",
+      }),
+    ).toBeUndefined();
+  });
+
+  it("blames a column that names people", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("first_name", ["Ana", "Luis"]),
+    ]);
+    expect(
+      DictionarySuggestions.getLabelsBlockReason({
+        proposal,
+        codeList: _firstCodeList(proposal),
+        locale: "en",
+        model: "online",
+      }),
+    ).toBe("personal");
+  });
+
+  it("blames a code over the schema's length limit", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("vax_status", [
+        "U",
+        "x".repeat(DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH + 1),
+      ]),
+    ]);
+    expect(
+      DictionarySuggestions.getLabelsBlockReason({
+        proposal,
+        codeList: _firstCodeList(proposal),
+        locale: "en",
+        model: "online",
+      }),
+    ).toBe("code_too_long");
+  });
+
+  it("blames the offline model's window for a list that fits online", () => {
+    const seed = DictionaryProposal.fromColumnProfiles([
+      _column("status_0", ["Y", "N"]),
+    ]);
+    const columns = Array.from({ length: 51 }, (_item, index) => {
+      return _column(
+        `status_${index}_${"n".repeat(180)}`,
+        ["Y", "N"],
+        uuid<Dataset.Id>(),
+      );
+    });
+    const proposal = {
+      ...seed,
+      entries: [{ ...seed.entries[0]!, columns }],
+    };
+    const codeList = {
+      ..._firstCodeList(proposal),
+      values: Array.from({ length: 50 }, (_code, index) => {
+        return { value: `${"c".repeat(150)}_${index}`, rowCount: 1 };
+      }),
+    } as DictionaryProposal.CodeList;
+    const options = { proposal, codeList, locale: "en" };
+    expect(
+      DictionarySuggestions.getLabelsBlockReason({
+        ...options,
+        model: "online",
+      }),
+    ).toBeUndefined();
+    expect(
+      DictionarySuggestions.getLabelsBlockReason({
+        ...options,
+        model: "on_device",
+      }),
+    ).toBe("too_large_for_model");
+  });
+});

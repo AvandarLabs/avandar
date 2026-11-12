@@ -12,6 +12,7 @@ import { useReadDatasets } from "@/views/DataManagerApp/NewDictionaryFromDataset
 import { useSuggestLabels } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserProfile } from "$/models/User/UserProfile";
+import type { LabelsBlockReason } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type {
   NewDictionaryAction,
   NewDictionaryState,
@@ -30,7 +31,9 @@ export type NewDictionaryFlow = {
   isReading: boolean;
   meaningMatchStatus: MeaningMatchStatus;
   suggestLabels: (codeList: DictionaryProposal.CodeList) => void;
-  canSuggestLabels: (codeList: DictionaryProposal.CodeList) => boolean;
+  getLabelsBlockReason: (
+    codeList: DictionaryProposal.CodeList,
+  ) => LabelsBlockReason | undefined;
   suggestingCodeListKey: string | undefined;
   createDictionary: () => void;
   isCreating: boolean;
@@ -244,7 +247,7 @@ export function useNewDictionaryFlow(
     isReading: reading.isReading,
     meaningMatchStatus: reading.meaningMatchStatus,
     suggestLabels: labels.suggestLabels,
-    canSuggestLabels: labels.canSuggestLabels,
+    getLabelsBlockReason: labels.getLabelsBlockReason,
     suggestingCodeListKey: labels.suggestingCodeListKey,
     createDictionary: _makeCreateDictionary({
       state,

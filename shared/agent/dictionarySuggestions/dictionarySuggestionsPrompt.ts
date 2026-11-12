@@ -14,7 +14,13 @@ const MATCHES_MAX_TOKENS = 800;
 const LABELS_BASE_TOKENS = 300;
 const LABELS_TOKENS_PER_VALUE = 25;
 const LABELS_MAX_TOKENS = 3000;
-const CHARACTERS_PER_TOKEN = 3;
+
+/**
+ * A pessimistic count of characters per token, for sizing a prompt against
+ * a model's context window before it is sent. The reply budget and the
+ * browser's check that a request fits the offline model both use it.
+ */
+export const DICTIONARY_SUGGESTIONS_CHARACTERS_PER_TOKEN = 3;
 
 const MAX_LABEL_LENGTH = 80;
 const MAX_DESCRIPTION_LENGTH = 300;
@@ -317,7 +323,7 @@ export function getDictionarySuggestionsMaxTokens(
     return (
       total +
       LABELS_TOKENS_PER_VALUE +
-      Math.ceil(value.length / CHARACTERS_PER_TOKEN)
+      Math.ceil(value.length / DICTIONARY_SUGGESTIONS_CHARACTERS_PER_TOKEN)
     );
   }, 0);
   return Math.min(LABELS_BASE_TOKENS + valueTokens, LABELS_MAX_TOKENS);
