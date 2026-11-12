@@ -57,6 +57,47 @@ describe("proposalLabelHelpers", () => {
     });
   });
 
+  it("carries typed labels to the list a changed code set became, by code", () => {
+    const typed = setValueLabel(
+      setValueLabel(withDefaultLabels({}, [SEX]), {
+        codeListKey: "sex",
+        code: "1",
+        label: "Male",
+      }),
+      { codeListKey: "sex", code: "2", label: "Female" },
+    );
+    const accepted = acceptCodeList(typed, "sex");
+    // The user added code 9 on Review, so the list has a new key.
+    const grown = _list("sex|1|2|9", ["1", "2", "9"]);
+    const again = withDefaultLabels(accepted, [grown]);
+    expect(getValueLabel(again, { codeListKey: grown.key, code: "1" })).toEqual(
+      { label: "Male", isMissing: false, source: "typed" },
+    );
+    expect(
+      getValueLabel(again, { codeListKey: grown.key, code: "2" })?.label,
+    ).toBe("Female");
+    expect(
+      getValueLabel(again, { codeListKey: grown.key, code: "9" })?.label,
+    ).toBe("");
+    expect(again[grown.key]?.isAccepted).toBe(false);
+  });
+
+  it("carries labels from the earlier list that overlaps the new one most", () => {
+    const labels = withDefaultLabels({}, [
+      _list("a", ["1", "2"]),
+      _list("b", ["1", "7", "8"]),
+    ]);
+    const typed = setValueLabel(
+      setValueLabel(labels, { codeListKey: "a", code: "1", label: "From a" }),
+      { codeListKey: "b", code: "1", label: "From b" },
+    );
+    const merged = _list("c", ["1", "7", "8", "9"]);
+    const again = withDefaultLabels(typed, [merged]);
+    expect(getValueLabel(again, { codeListKey: "c", code: "1" })?.label).toBe(
+      "From b",
+    );
+  });
+
   it("fills suggestions in, but never over a typed label or for an unknown value", () => {
     const typed = setValueLabel(withDefaultLabels({}, [SEX]), {
       codeListKey: "sex",

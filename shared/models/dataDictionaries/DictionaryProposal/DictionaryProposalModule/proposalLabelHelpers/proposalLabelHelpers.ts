@@ -29,21 +29,70 @@ function _makeDefaultLabel(value: string): DictionaryProposalValueLabel {
 }
 
 /**
+ * The labels of the earlier list, one no current list uses, that holds the
+ * most of this list's codes. Undefined when none shares a code. A list's key
+ * is built from its codes, so a changed code set is a new key.
+ */
+function _findPreviousListLabels(
+  labels: Readonly<DictionaryProposalLabels>,
+  list: Readonly<DictionaryProposalCodeList>,
+  currentKeys: ReadonlySet<string>,
+): DictionaryProposalLabels[string] | undefined {
+  const codes = list.values.map((item) => {
+    return ColumnProfile.normalizeValue(item.value);
+  });
+  const overlaps = Object.entries(labels)
+    .filter(([key]) => {
+      return !currentKeys.has(key);
+    })
+    .map(([, previous]) => {
+      const sharedCount = codes.filter((code) => {
+        return previous.values[code] !== undefined;
+      }).length;
+      return { previous, sharedCount };
+    });
+  const best = overlaps.reduce<(typeof overlaps)[number] | undefined>(
+    (leader, candidate) => {
+      return candidate.sharedCount > (leader?.sharedCount ?? 0)
+        ? candidate
+        : leader;
+    },
+    undefined,
+  );
+  return best?.previous;
+}
+
+/**
  * The labels with an entry for every value of every code list, keeping
  * whatever was already there. A value that reads as a label (`Recovered`)
  * starts labeled with itself; a word for a missing answer starts marked
- * missing.
+ * missing. A list with no labels yet takes those of the earlier list that
+ * overlaps it most, by code, so changing an entry's code set does not drop
+ * what was typed. Accepting the list does not carry over.
  */
 export function withDefaultLabels(
   labels: Readonly<DictionaryProposalLabels>,
   codeLists: readonly DictionaryProposalCodeList[],
 ): DictionaryProposalLabels {
+  const currentKeys = new Set(
+    codeLists.map((list) => {
+      return list.key;
+    }),
+  );
   const defaults = codeLists.map((list) => {
     const current = labels[list.key];
+    const previous = current
+      ? undefined
+      : _findPreviousListLabels(labels, list, currentKeys);
     const values = Object.fromEntries(
       list.values.map((item) => {
         const key = ColumnProfile.normalizeValue(item.value);
-        return [key, current?.values[key] ?? _makeDefaultLabel(item.value)];
+        return [
+          key,
+          current?.values[key] ??
+            previous?.values[key] ??
+            _makeDefaultLabel(item.value),
+        ];
       }),
     );
     return [list.key, { values, isAccepted: current?.isAccepted ?? false }];
