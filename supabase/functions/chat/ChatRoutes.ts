@@ -3,6 +3,7 @@ import { GetChatSessionSecret } from "@sbfn/chat/GetChatSessionSecret.ts";
 import { PostAgentStream } from "@sbfn/chat/PostAgentStream/PostAgentStream.ts";
 import { PostChatMessages } from "@sbfn/chat/PostChatMessages/PostChatMessages.ts";
 import { PostChatTitle } from "@sbfn/chat/PostChatTitle/PostChatTitle.ts";
+import { PostDictionarySuggestions } from "@sbfn/chat/PostDictionarySuggestions/PostDictionarySuggestions.ts";
 import { PostExtractMeasurements } from "@sbfn/chat/PostExtractMeasurements/PostExtractMeasurements.ts";
 import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types.ts";
 
@@ -13,4 +14,7 @@ export const ChatRoutes = defineRoutes<ChatAPI>("chat", {
   "/:workspaceId/agent/:promptId/api/stream": { POST: PostAgentStream },
   "/:workspaceId/title/:promptId": { POST: PostChatTitle },
   "/:workspaceId/extract-measurements": { POST: PostExtractMeasurements },
+  "/:workspaceId/dictionary-suggestions/:promptId": {
+    POST: PostDictionarySuggestions,
+  },
 });
