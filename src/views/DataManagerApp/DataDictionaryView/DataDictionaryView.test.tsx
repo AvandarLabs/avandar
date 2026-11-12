@@ -14,6 +14,8 @@ const mocks = vi.hoisted(() => {
   return {
     dictionaryQuery: { isError: false, isLoadingError: false },
     dictionary: undefined as unknown,
+    getByIdOptions: [] as unknown[],
+    getAllOptions: [] as unknown[],
   };
 });
 
@@ -22,7 +24,8 @@ vi.mock(
   () => {
     return {
       DataDictionaryClient: {
-        useGetById: () => {
+        useGetById: (options: unknown) => {
+          mocks.getByIdOptions.push(options);
           return [mocks.dictionary, undefined, mocks.dictionaryQuery];
         },
       },
@@ -32,7 +35,8 @@ vi.mock(
 
 function _mockListClient(): { useGetAll: () => unknown[] } {
   return {
-    useGetAll: () => {
+    useGetAll: (options: unknown) => {
+      mocks.getAllOptions.push(options);
       return [[], undefined, { isError: false, isLoadingError: false }];
     },
   };
@@ -64,8 +68,21 @@ function _setDictionaryQuery(state: QueryState): void {
 
 describe("DataDictionaryView", () => {
   beforeEach(() => {
+    mocks.getByIdOptions = [];
+    mocks.getAllOptions = [];
     mocks.dictionary = DICTIONARY;
     _setDictionaryQuery({ isError: false, isLoadingError: false });
+  });
+
+  it("refetches every query on mount so a quick reload never shows a pre-save snapshot", () => {
+    render(<DataDictionaryView dictionaryId={DICTIONARY.id} />);
+    const allOptions = [...mocks.getByIdOptions, ...mocks.getAllOptions];
+    expect(allOptions).toHaveLength(4);
+    for (const options of allOptions) {
+      expect(options).toMatchObject({
+        useQueryOptions: { refetchOnMount: "always" },
+      });
+    }
   });
 
   it("shows the error state when the first load fails", () => {

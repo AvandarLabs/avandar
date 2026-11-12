@@ -9,6 +9,7 @@ import { DataDictionaryCodeListClient } from "@/clients/dataDictionaries/DataDic
 import { DataDictionaryEntryClient } from "@/clients/dataDictionaries/DataDictionaryEntryClient";
 import { DataDictionaryEntryCodingClient } from "@/clients/dataDictionaries/DataDictionaryEntryCodingClient";
 import { AppView } from "@/components/layouts/AppView/AppView";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
 import { DataDictionaryEditor } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditor";
 import type { ReactNode } from "react";
 
@@ -22,22 +23,32 @@ type DictionaryContents = {
   hasLoadFailed: boolean;
 };
 
-/** Loads a dictionary with its entries, code lists, and codings. */
+const REFETCH = { useQueryOptions: ALWAYS_REFETCH_ON_MOUNT };
+
+/**
+ * Loads a dictionary with its entries, code lists, and codings. Every query
+ * refetches on mount: the persisted cache can hold a snapshot from before the
+ * last save, and whole-set saves built on it would undo that save.
+ */
 function useDictionaryContents(
   dictionaryId: DataDictionary.Id,
 ): DictionaryContents {
   const [dictionary, , dictionaryQuery] = DataDictionaryClient.useGetById({
     id: dictionaryId,
+    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
   });
-  const [entries, , entriesQuery] = DataDictionaryEntryClient.useGetAll(
-    where("dictionary_id", "eq", dictionaryId),
-  );
-  const [codeLists, , codeListsQuery] = DataDictionaryCodeListClient.useGetAll(
-    where("dictionary_id", "eq", dictionaryId),
-  );
-  const [codings, , codingsQuery] = DataDictionaryEntryCodingClient.useGetAll(
-    where("dictionary_id", "eq", dictionaryId),
-  );
+  const [entries, , entriesQuery] = DataDictionaryEntryClient.useGetAll({
+    ...where("dictionary_id", "eq", dictionaryId),
+    ...REFETCH,
+  });
+  const [codeLists, , codeListsQuery] = DataDictionaryCodeListClient.useGetAll({
+    ...where("dictionary_id", "eq", dictionaryId),
+    ...REFETCH,
+  });
+  const [codings, , codingsQuery] = DataDictionaryEntryCodingClient.useGetAll({
+    ...where("dictionary_id", "eq", dictionaryId),
+    ...REFETCH,
+  });
   const savedDraft = useMemo(() => {
     return entries && codeLists && codings
       ? DataDictionary.toDraft({ entries, codeLists, codings })

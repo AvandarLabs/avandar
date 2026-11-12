@@ -12,7 +12,6 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 
 const DICTIONARY_NAME = "E2E measles codes";
-const PERSIST_THROTTLE_WAIT = 1_500;
 
 test.describe("data dictionaries", () => {
   test("a saved dictionary keeps its pasted code list and the entry that uses it", async ({
@@ -100,10 +99,12 @@ test.describe("data dictionaries", () => {
         )
         .toEqual(["sex"]);
 
-      await expect(page.getByText(/1 entry/).first()).toBeVisible();
-      // The query cache is written to IndexedDB at most once a second. A
-      // reload sooner than that restores the cache from before the save.
-      await page.waitForTimeout(PERSIST_THROTTLE_WAIT);
+      await expect(
+        page
+          .locator("header")
+          .filter({ hasText: DICTIONARY_NAME })
+          .getByText(/1 entry/),
+      ).toBeVisible();
 
       await page.reload();
       await expect(
@@ -114,6 +115,23 @@ test.describe("data dictionaries", () => {
       await expect(
         page.getByRole("link", { name: DICTIONARY_NAME }),
       ).toBeVisible();
+
+      await page.getByRole("tab", { name: /Code lists/ }).click();
+      const savedCodeListsPanel = page.getByRole("tabpanel", {
+        name: /Code lists/,
+      });
+      await expect(
+        savedCodeListsPanel.getByLabel("Name", { exact: true }),
+      ).toHaveValue("Sex (1/2/9)");
+      for (const [rowNumber, label] of [
+        [1, "Male"],
+        [2, "Female"],
+        [3, "Unknown"],
+      ] as const) {
+        await expect(
+          savedCodeListsPanel.getByLabel(`Label ${rowNumber}`),
+        ).toHaveValue(label);
+      }
     } finally {
       await admin
         .from("data_dictionaries")
