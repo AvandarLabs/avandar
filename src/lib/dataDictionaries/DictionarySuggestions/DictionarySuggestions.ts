@@ -4,6 +4,7 @@ import {
   DICTIONARY_SUGGESTIONS_CHARACTERS_PER_TOKEN,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
+  DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH,
   DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES,
   DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH,
   DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH,
@@ -248,7 +249,12 @@ function _checkLabelsRequestFromCodeList(
     entries.length > 1
       ? {
           ..._makeColumn(first, values),
-          name: options.codeList.name,
+          // The name is only context for the model, so a long one is cut to
+          // what the route's schema takes.
+          name: options.codeList.name.slice(
+            0,
+            DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH,
+          ),
           otherNames: names.slice(0, DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES),
         }
       : _makeColumn(first, values);

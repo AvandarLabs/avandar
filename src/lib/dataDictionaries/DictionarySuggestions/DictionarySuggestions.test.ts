@@ -275,6 +275,31 @@ describe("DictionarySuggestions.approveRequest", () => {
 });
 
 describe("DictionarySuggestions requests", () => {
+  it("cuts a shared list's long name so the route's schema takes the request", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("vax_status", ["Y", "N"]),
+      _column("county", ["Y", "N"]),
+    ]);
+    expect(proposal.entries).toHaveLength(2);
+    const codeList = {
+      ..._firstCodeList(proposal),
+      name: "n".repeat(300),
+      entryKeys: proposal.entries.map((entry) => {
+        return entry.key;
+      }),
+    };
+    const request = DictionarySuggestions.makeLabelsRequestFromCodeList({
+      proposal,
+      codeList,
+      locale: "en",
+      model: "online",
+    });
+    expect(request?.task === "labels" && request.column.name).toHaveLength(200);
+    expect(DictionarySuggestionsRequestSchema.safeParse(request).success).toBe(
+      true,
+    );
+  });
+
   it("asks for one list's labels with the entry's names and codes", () => {
     const proposal = DictionaryProposal.fromColumnProfiles([
       _column("GENDER", ["1", "2", "9"]),

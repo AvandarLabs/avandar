@@ -92,7 +92,13 @@ export function isIdentifyingColumnName(columnName: string): boolean {
   });
 }
 
-const NameSchema = z.string().min(1).max(200);
+/** The longest a column or list name may be in a request. */
+export const DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH = 200;
+
+const NameSchema = z
+  .string()
+  .min(1)
+  .max(DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH);
 const LocaleSchema = z.string().min(1).max(35);
 
 /**
