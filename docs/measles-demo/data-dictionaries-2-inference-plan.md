@@ -4951,6 +4951,8 @@ One module decides which model answers (the hosted model, the offline model, or 
 
 Consent is the chat's own gate, `decideIfDataCanCrossBoundary`: it runs the PII and bias detectors, opens `ConsentModal` when needed, records the decision in the browser-local consent log (`ConsentAuditEntryClient`), and mints an ack token into `PendingAcks`. The chat keeps no "already agreed" flag; it asks per send. `approveRequest` follows the PDF table assistant (`runRegionModelAssist`): the first online send of a create flow sets `explicitConsentRequired`, so the prompt always shows; after the user agrees, later sends in the same flow still pass the detectors (a prompt only when something looks personal) and are still logged. The ack token travels with the request and the route checks it (Task 8). On the offline model nothing leaves the device, so, as in the chat (`runOfflineDataAgentTurn`), nothing is asked. A new consent context, `dictionary_suggestions`, labels these sends in the workspace privacy log.
 
+What may be sent is decided once, in the shared prompt module, and the `chat` route refuses a request that breaks it (Task 7): codes only on a `categorical` or `ordered` column, never on a column whose name or other names hold one of `IDENTIFYING_WORDS` (checked with `isIdentifyingColumnName`), at most `DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES` codes per column in a matches request, and at most `DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH` characters of consent text. This module imports those exports and never keeps a list of its own, so the browser and the route cannot drift apart.
+
 **Files:**
 - Create: `src/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions.ts`
 - Test: `src/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions.test.ts`
@@ -4965,7 +4967,10 @@ Consent is the chat's own gate, `decideIfDataCanCrossBoundary`: it runs the PII 
 
 ```ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { stringifyDictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import {
+  DictionarySuggestionsRequestSchema,
+  stringifyDictionarySuggestionsRequest,
+} from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { uuid } from "$/lib/uuid";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
@@ -5203,6 +5208,21 @@ describe("DictionarySuggestions requests", () => {
       mmr_status: ["0", "1", "2"],
     });
   });
+
+  it("drops columns from a matches request until the route would take it", () => {
+    const profiles = Array.from({ length: 300 }, (_item, index) => {
+      const datasetId = index % 2 === 0 ? BRONX_ID : ERIE_ID;
+      const codes = Array.from({ length: 12 }, (_code, codeIndex) => {
+        return `${"x".repeat(30)}_${index}_${codeIndex}`;
+      });
+      return _column(`coded_column_number_${index}`, codes, datasetId);
+    });
+    const request = DictionarySuggestions.makeMatchesRequestFromProposal({
+      proposal: DictionaryProposal.fromColumnProfiles(profiles),
+      locale: "en",
+    });
+    expect(request && DictionarySuggestionsRequestSchema.safeParse(request).success).toBe(true);
+  });
 });
 ```
 
@@ -5216,9 +5236,12 @@ describe("DictionarySuggestions requests", () => {
 import { prop } from "@avandar/utils";
 import {
   buildDictionarySuggestionsMessages,
+  DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
+  DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH,
   DICTIONARY_SUGGESTIONS_MAX_TOKENS,
   DICTIONARY_SUGGESTIONS_PROMPT_ID,
   getDictionarySuggestionsJsonSchema,
+  isIdentifyingColumnName,
   stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
@@ -5260,30 +5283,10 @@ export type CompleteDictionarySuggestionsOnDevice = (request: {
   jsonSchema: object;
 }) => Promise<{ text: string }>;
 
-/**
- * Words in a column name that mean its values identify a person or how to
- * reach one. Such a column's values are never sent; its name still is.
- */
-const IDENTIFYING_WORDS = new Set([
-  "name",
-  "firstname",
-  "lastname",
-  "fullname",
-  "surname",
-  "nickname",
-  "email",
-  "phone",
-  "mobile",
-  "telephone",
-  "address",
-  "street",
-  "ssn",
-  "passport",
-  "license",
-  "mrn",
-]);
-
-const MAX_MATCH_VALUES = 12;
+// The words that keep a column's values here, the codes per column of a
+// matches request, and the longest request all come from the shared
+// prompt module, because the `chat` route refuses a request that breaks
+// them. Never define a second list here.
 const MAX_OTHER_NAMES = 50;
 const MAX_MATCH_COLUMNS = 300;
 
@@ -5363,10 +5366,12 @@ async function requestReply(
   return response.reply;
 }
 
-function _isIdentifyingName(columnName: string): boolean {
-  return ColumnProfile.getTokensFromColumnName(columnName).some((token) => {
-    return IDENTIFYING_WORDS.has(token);
-  });
+/** The route's rule: codes only on a coded column not named after a person. */
+function _canSendValues(column: Readonly<DictionarySuggestionColumn>): boolean {
+  return (
+    DataDictionary.isCodedKind(column.kind) &&
+    ![column.name, ...column.otherNames].some(isIdentifyingColumnName)
+  );
 }
 
 function _makeColumn(
@@ -5396,7 +5401,7 @@ function makeLabelsRequestFromCodeList(
   });
   const [first] = entries;
   const names = [...new Set(entries.flatMap(DictionaryProposal.getColumnNames))];
-  if (!first || names.some(_isIdentifyingName)) {
+  if (!first || names.some(isIdentifyingColumnName)) {
     return undefined;
   }
   const values = options.codeList.values
@@ -5407,7 +5412,10 @@ function makeLabelsRequestFromCodeList(
     entries.length > 1
       ? { ..._makeColumn(first, values), name: options.codeList.name, otherNames: names.slice(0, MAX_OTHER_NAMES) }
       : _makeColumn(first, values);
-  return { task: "labels", locale: options.locale, column };
+  // An entry renamed after a person keeps its codes here too.
+  return _canSendValues(column)
+    ? { task: "labels", locale: options.locale, column }
+    : undefined;
 }
 
 function makeMatchesRequestFromProposal(
@@ -5421,19 +5429,40 @@ function makeMatchesRequestFromProposal(
     .filter(prop("isIncluded"))
     .slice(0, MAX_MATCH_COLUMNS)
     .map((entry) => {
-      const canSendValues =
-        DataDictionary.isCodedKind(entry.kind) &&
-        !DictionaryProposal.getColumnNames(entry).some(_isIdentifyingName);
-      const values = canSendValues
+      const column = _makeColumn(entry, []);
+      const values = _canSendValues(column)
         ? DictionaryProposal.getValuesSeen(entry)
-            .slice(0, MAX_MATCH_VALUES)
+            .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES)
             .map(prop("value"))
         : [];
-      return _makeColumn(entry, values);
+      return { ...column, values };
     });
-  return columns.length < 2
-    ? undefined
-    : { task: "matches", locale: options.locale, columns };
+  return _fitMatchesRequest({
+    task: "matches",
+    locale: options.locale,
+    columns,
+  });
+}
+
+/**
+ * The request with its last columns dropped until its consent text fits
+ * `DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH`, which the route enforces.
+ * Undefined when fewer than two columns are left.
+ */
+function _fitMatchesRequest(
+  request: Extract<DictionarySuggestionsRequest, { task: "matches" }>,
+): DictionarySuggestionsRequest | undefined {
+  if (request.columns.length < 2) {
+    return undefined;
+  }
+  const length = stringifyDictionarySuggestionsRequest(request).length;
+  if (length <= DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH) {
+    return request;
+  }
+  return _fitMatchesRequest({
+    ...request,
+    columns: request.columns.slice(0, -1),
+  });
 }
 
 /**
