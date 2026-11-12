@@ -1,0 +1,93 @@
+import { useMutation } from "@avandar/query-hooks";
+import { useLingui } from "@lingui/react/macro";
+import { parseDictionaryLabelSuggestions } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
+import type { Dispatch } from "react";
+
+async function _requestLabelSuggestions(
+  options: Readonly<{
+    proposal: DictionaryProposal.T | undefined;
+    codeList: DictionaryProposal.CodeList;
+    locale: string;
+    requestReply: RequestSuggestionReply;
+  }>,
+): Promise<DictionaryProposal.LabelSuggestions | undefined> {
+  const request = options.proposal
+    ? DictionarySuggestions.makeLabelsRequestFromCodeList({
+        proposal: options.proposal,
+        codeList: options.codeList,
+        locale: options.locale,
+      })
+    : undefined;
+  if (request?.task !== "labels") {
+    throw new Error("This code list's values cannot be sent");
+  }
+  const reply = await options.requestReply(request);
+  if (reply === undefined) {
+    return undefined;
+  }
+  const suggestions = parseDictionaryLabelSuggestions(
+    reply,
+    request.column.values,
+  );
+  if (!suggestions) {
+    throw new Error("The suggestion reply could not be read");
+  }
+  return suggestions;
+}
+
+/**
+ * Asks the suggestion model for one code list's labels and a description
+ * for the entry using it, and fills them in as suggestions. Used by the
+ * Label values step's Suggest labels button. When the user declines to
+ * send the request, nothing is filled in and nothing is shown: the Label
+ * values pane already says suggestions are off.
+ */
+export function useSuggestLabels(
+  options: Readonly<{
+    proposal: DictionaryProposal.T | undefined;
+    requestReply: RequestSuggestionReply;
+    dispatch: Dispatch<NewDictionaryAction>;
+  }>,
+): {
+  suggestLabels: (codeList: DictionaryProposal.CodeList) => void;
+  suggestingCodeListKey: string | undefined;
+} {
+  const { t, i18n } = useLingui();
+  const [suggestLabels, , result] = useMutation({
+    mutationFn: (codeList: DictionaryProposal.CodeList) => {
+      return _requestLabelSuggestions({
+        proposal: options.proposal,
+        codeList,
+        locale: i18n.locale,
+        requestReply: options.requestReply,
+      });
+    },
+    onSuccess: (suggestions, codeList) => {
+      if (!suggestions) {
+        return;
+      }
+      const isSingleEntry = codeList.entryKeys.length === 1;
+      options.dispatch({
+        type: "labels_suggested",
+        codeListKey: codeList.key,
+        entryKey: isSingleEntry ? codeList.entryKeys[0] : undefined,
+        suggestions,
+      });
+      notifySuccess(t`Suggested labels filled in. Check them before saving.`);
+    },
+    onError: () => {
+      notifyError(
+        t`Suggestions did not come back. Labeling still works without them.`,
+      );
+    },
+  });
+  return {
+    suggestLabels,
+    suggestingCodeListKey: result.isPending ? result.variables?.key : undefined,
+  };
+}
