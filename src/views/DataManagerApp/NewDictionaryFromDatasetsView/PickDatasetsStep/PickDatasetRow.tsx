@@ -24,7 +24,7 @@ export function PickDatasetRow({
   isPicked,
   onToggle,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const sourceLabels = useDatasetSourceLabels();
   const datasetName = dataset.name;
 
@@ -59,7 +59,7 @@ export function PickDatasetRow({
         </Group>
       </Table.Td>
       <Table.Td ta="right">
-        <Text size="sm">{columnCount}</Text>
+        <Text size="sm">{i18n.number(columnCount)}</Text>
       </Table.Td>
     </Table.Tr>
   );

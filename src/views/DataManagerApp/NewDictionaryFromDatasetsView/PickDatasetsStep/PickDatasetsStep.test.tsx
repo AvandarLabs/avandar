@@ -32,13 +32,16 @@ const COLUMN_COUNTS = new Map([
   [ERIE.id, 9],
 ]);
 
-function _renderStep(pickedDatasetIds: Dataset.Id[] = []) {
+function _renderStep(
+  pickedDatasetIds: Dataset.Id[] = [],
+  columnCounts: ReadonlyMap<Dataset.Id, number> = COLUMN_COUNTS,
+) {
   const dispatch = vi.fn();
   const onRead = vi.fn();
   render(
     <PickDatasetsStep
       datasets={[KINGS, ERIE]}
-      columnCounts={COLUMN_COUNTS}
+      columnCounts={columnCounts}
       pickedDatasetIds={pickedDatasetIds}
       isLoading={false}
       isReading={false}
@@ -82,5 +85,16 @@ describe("PickDatasetsStep", () => {
     expect(screen.getByText("2 picked · 15 columns")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Read 2 datasets" }));
     expect(onRead).toHaveBeenCalledOnce();
+  });
+
+  it("formats column counts with the locale's separators", () => {
+    _renderStep(
+      [KINGS.id],
+      new Map([
+        [KINGS.id, 1234],
+        [ERIE.id, 9],
+      ]),
+    );
+    expect(screen.getByText("1,234")).toBeInTheDocument();
   });
 });

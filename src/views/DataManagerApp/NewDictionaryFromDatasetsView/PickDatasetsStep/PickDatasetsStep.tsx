@@ -1,10 +1,9 @@
 import { plural } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Center, Loader, Text } from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { PickDatasetsFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsFooter";
-import { PickDatasetsTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTable";
+import { PickDatasetsSectionBody } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsSectionBody";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
@@ -42,8 +41,9 @@ export function PickDatasetsStep({
   dispatch,
   onRead,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const pickedCount = pickedDatasetIds.length;
+  const pickedText = i18n.number(pickedCount);
   const columnText = plural(_sumColumns(pickedDatasetIds, columnCounts), {
     one: "# column",
     other: "# columns",
@@ -54,28 +54,15 @@ export function PickDatasetsStep({
       <AppViewBody>
         <AppViewSection
           title={t`Datasets to learn from`}
-          meta={t`${pickedCount} picked · ${columnText}`}
+          meta={t`${pickedText} picked · ${columnText}`}
         >
-          <Text size="sm" c="dimmed" mb="sm">
-            <Trans>
-              Pick datasets that use the same codes. Avandar reads each column,
-              finds the coded ones, and merges columns that mean the same thing.
-            </Trans>
-          </Text>
-          {isLoading ? (
-            <Center py="xl">
-              <Loader size="sm" />
-            </Center>
-          ) : (
-            <PickDatasetsTable
-              datasets={datasets}
-              columnCounts={columnCounts}
-              pickedDatasetIds={pickedDatasetIds}
-              onToggle={(datasetId) => {
-                dispatch({ type: "toggle_dataset", datasetId });
-              }}
-            />
-          )}
+          <PickDatasetsSectionBody
+            datasets={datasets}
+            columnCounts={columnCounts}
+            pickedDatasetIds={pickedDatasetIds}
+            isLoading={isLoading}
+            dispatch={dispatch}
+          />
         </AppViewSection>
       </AppViewBody>
       <PickDatasetsFooter
