@@ -37,9 +37,16 @@ const PROPOSAL = DictionaryProposal.fromColumnProfiles([
 ]);
 
 function _read(state: NewDictionaryState): NewDictionaryState {
-  return newDictionaryReducer(state, {
+  const picked = state.pickedDatasetIds.includes(DATASET_ID)
+    ? state
+    : newDictionaryReducer(state, {
+        type: "toggle_dataset",
+        datasetId: DATASET_ID,
+      });
+  return newDictionaryReducer(picked, {
     type: "datasets_read",
     proposal: PROPOSAL,
+    datasetIds: [DATASET_ID],
     defaultName: "Kings line list codes",
   });
 }
@@ -187,6 +194,67 @@ describe("newDictionaryReducer", () => {
       step: "pick",
       originDatasetId: undefined,
       pickedDatasetIds: [DATASET_ID],
+    });
+  });
+
+  it("ignores a read of datasets that are no longer the ones picked", () => {
+    const otherDatasetId = uuid<Dataset.Id>();
+    const picking = [
+      { type: "toggle_dataset", datasetId: DATASET_ID } as const,
+      { type: "toggle_dataset", datasetId: otherDatasetId } as const,
+    ].reduce(newDictionaryReducer, makeInitialNewDictionaryState(undefined));
+    const state = newDictionaryReducer(picking, {
+      type: "datasets_read",
+      proposal: PROPOSAL,
+      datasetIds: [DATASET_ID],
+      defaultName: "Kings line list codes",
+    });
+    expect(state).toBe(picking);
+    expect(state.step).toBe("pick");
+  });
+
+  it("keeps the proposal of a newer read when an older read finishes late", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const otherDatasetId = uuid<Dataset.Id>();
+    const repicked = newDictionaryReducer(read, {
+      type: "toggle_dataset",
+      datasetId: otherDatasetId,
+    });
+    const late = newDictionaryReducer(repicked, {
+      type: "datasets_read",
+      proposal: DictionaryProposal.fromColumnProfiles([]),
+      datasetIds: [DATASET_ID],
+      defaultName: "Late",
+    });
+    expect(late).toBe(repicked);
+  });
+
+  it("applies meaning matches only to the proposal of the datasets they were found for", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const matches = [{ name: "hosp_yn", sameAs: "GENDER" }];
+    const stale = newDictionaryReducer(read, {
+      type: "meaning_matches_found",
+      matches,
+      datasetIds: [uuid<Dataset.Id>()],
+    });
+    expect(stale).toBe(read);
+    const current = newDictionaryReducer(read, {
+      type: "meaning_matches_found",
+      matches,
+      datasetIds: [DATASET_ID],
+    });
+    expect(current).not.toBe(read);
+  });
+
+  it("falls back to an empty Pick when the dataset that opened the flow is unavailable", () => {
+    const state = newDictionaryReducer(
+      makeInitialNewDictionaryState(DATASET_ID),
+      { type: "origin_dataset_unavailable" },
+    );
+    expect(state).toMatchObject({
+      step: "pick",
+      originDatasetId: undefined,
+      pickedDatasetIds: [],
     });
   });
 });

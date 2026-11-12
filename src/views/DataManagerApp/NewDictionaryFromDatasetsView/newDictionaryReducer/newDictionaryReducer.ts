@@ -35,9 +35,13 @@ export type NewDictionaryAction =
   | {
       type: "datasets_read";
       proposal: DictionaryProposal.T;
+      /** The datasets that were read. The read is ignored unless picked. */
+      datasetIds: readonly Dataset.Id[];
       defaultName: string;
     }
   | { type: "go_to_step"; step: NewDictionaryStep }
+  /** The dataset that opened the flow cannot be read. Start at Pick. */
+  | { type: "origin_dataset_unavailable" }
   | { type: "learn_from_more" }
   | { type: "rename_entry"; entryKey: string; name: string }
   | { type: "set_entry_kind"; entryKey: string; kind: DataDictionaryEntry.Kind }
@@ -47,6 +51,8 @@ export type NewDictionaryAction =
   | {
       type: "meaning_matches_found";
       matches: readonly DictionaryProposal.MeaningMatch[];
+      /** The datasets of the proposal the matches were found for. */
+      datasetIds: readonly Dataset.Id[];
     }
   | { type: "select_code_list"; codeListKey: string }
   | {
@@ -79,6 +85,23 @@ type Handlers = {
     action: Extract<NewDictionaryAction, { type: Type }>,
   ) => NewDictionaryState;
 };
+
+/**
+ * Whether two lists hold the same datasets, in any order. A reply that comes
+ * back for other datasets than the current ones is stale. The create flow
+ * hook also checks it before it asks for meaning matches.
+ */
+export function isSameDatasetSet(
+  datasetIds: readonly Dataset.Id[],
+  otherDatasetIds: readonly Dataset.Id[],
+): boolean {
+  return (
+    datasetIds.length === otherDatasetIds.length &&
+    datasetIds.every((datasetId) => {
+      return otherDatasetIds.includes(datasetId);
+    })
+  );
+}
 
 /** The state with a new proposal, its labels filled in, a list selected. */
 function _withProposal(
@@ -167,11 +190,22 @@ const HANDLERS: Handlers = {
     return { ...state, pickedDatasetIds };
   },
   datasets_read: (state, action) => {
+    if (!isSameDatasetSet(state.pickedDatasetIds, action.datasetIds)) {
+      return state;
+    }
     const name = state.name || action.defaultName;
     return { ..._withProposal(state, action.proposal), step: "review", name };
   },
   go_to_step: (state, action) => {
     return { ...state, step: action.step };
+  },
+  origin_dataset_unavailable: (state) => {
+    return {
+      ...state,
+      step: "pick",
+      originDatasetId: undefined,
+      pickedDatasetIds: [],
+    };
   },
   learn_from_more: (state) => {
     return { ...state, step: "pick", originDatasetId: undefined };
@@ -203,6 +237,15 @@ const HANDLERS: Handlers = {
     });
   },
   meaning_matches_found: (state, action) => {
+    const isCurrent =
+      state.proposal !== undefined &&
+      isSameDatasetSet(
+        DictionaryProposal.getDatasetIds(state.proposal),
+        action.datasetIds,
+      );
+    if (!isCurrent) {
+      return state;
+    }
     return _editProposal(state, (proposal) => {
       return DictionaryProposal.applyMeaningMatches(proposal, action.matches);
     });

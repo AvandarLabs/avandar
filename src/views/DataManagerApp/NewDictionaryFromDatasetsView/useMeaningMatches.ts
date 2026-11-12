@@ -34,14 +34,18 @@ async function _requestMatches(
 
 /**
  * Asks the suggestion model, once, which columns of different datasets
- * record the same thing, and hands back the matches. A failure is shown by
+ * record the same thing, and hands back the matches with the proposal
+ * they were found for. A failure is shown by
  * the Review step's status line, not a toast: the matches by name and
  * values are still there. A request the user declined to send finds none.
  */
 export function useMeaningMatches(
   options: Readonly<{
     requestReply: RequestSuggestionReply;
-    onFound: (matches: DictionaryProposal.MeaningMatch[]) => void;
+    onFound: (
+      matches: DictionaryProposal.MeaningMatch[],
+      proposal: DictionaryProposal.T,
+    ) => void;
   }>,
 ): {
   findMatches: (proposal: DictionaryProposal.T) => void;
@@ -56,9 +60,9 @@ export function useMeaningMatches(
         requestReply: options.requestReply,
       });
     },
-    onSuccess: (matches) => {
+    onSuccess: (matches, proposal) => {
       if (matches.length > 0) {
-        options.onFound(matches);
+        options.onFound(matches, proposal);
       }
     },
     onError: () => {

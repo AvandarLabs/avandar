@@ -2,6 +2,9 @@ import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useIsMounted } from "@/lib/hooks/state/useIsMounted";
+import { notifyError } from "@/utils/notifications/notify";
+import { isSameDatasetSet } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import { useCreateDictionary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary";
 import { useDictionarySuggestions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import { useMeaningMatches } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
@@ -18,7 +21,7 @@ import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/Ne
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import type { NewDictionarySources } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionarySources";
 import type { ReadableDataset } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useReadDatasets";
-import type { Dispatch } from "react";
+import type { Dispatch, RefObject } from "react";
 
 /** What the create flow's steps can do beyond changing its state. */
 export type NewDictionaryFlow = {
@@ -56,13 +59,16 @@ function _makeCreateDictionary(
     state: NewDictionaryState;
     userProfile: UserProfile.T | undefined;
     create: (variables: CreateDictionaryVariables) => void;
+    isCreatingRef: RefObject<boolean>;
   }>,
 ): () => void {
-  const { state, userProfile, create } = options;
+  const { state, userProfile, create, isCreatingRef } = options;
   return () => {
-    if (!userProfile || !state.proposal) {
+    // A second press before the first save re-renders the button is ignored.
+    if (!userProfile || !state.proposal || isCreatingRef.current) {
       return;
     }
+    isCreatingRef.current = true;
     create({
       owner: userProfile,
       name: state.name.trim(),
@@ -79,7 +85,9 @@ function _makeCreateDictionary(
 /**
  * Reads datasets and, once they are read, asks the suggestion model which
  * of their columns mean the same thing. Online, the first such request opens
- * the consent prompt; after a no it is not sent.
+ * the consent prompt; after a no it is not sent. A read that finishes after
+ * the user left the flow, or for datasets that are no longer the picked
+ * ones, starts nothing.
  */
 function useReadWithMatches(
   options: Readonly<
@@ -90,22 +98,38 @@ function useReadWithMatches(
   isReading: boolean;
   meaningMatchStatus: MeaningMatchStatus;
 } {
-  const { state, dispatch, sources, suggestions } = options;
+  const { state, dispatch, suggestions } = options;
   const { t } = useLingui();
+  const isMountedRef = useIsMounted();
+  const latestStateRef = useRef(state);
+  useEffect(() => {
+    latestStateRef.current = state;
+  }, [state]);
   const matches = useMeaningMatches({
     requestReply: suggestions.requestReply,
-    onFound: (found) => {
-      dispatch({ type: "meaning_matches_found", matches: found });
+    onFound: (found, proposal) => {
+      if (!isMountedRef.current) {
+        return;
+      }
+      const datasetIds = DictionaryProposal.getDatasetIds(proposal);
+      dispatch({ type: "meaning_matches_found", matches: found, datasetIds });
     },
   });
   const [read, isReading] = useReadDatasets({
-    onRead: (proposal) => {
-      const firstName =
-        sources.datasets.find((dataset) => {
-          return dataset.id === state.pickedDatasetIds[0];
-        })?.name ?? "";
+    onRead: (proposal, datasets) => {
+      const datasetIds = datasets.map(({ dataset }) => {
+        return dataset.id;
+      });
+      const isCurrent = isSameDatasetSet(
+        latestStateRef.current.pickedDatasetIds,
+        datasetIds,
+      );
+      if (!isMountedRef.current || !isCurrent) {
+        return;
+      }
+      const firstName = datasets[0]?.dataset.name ?? "";
       const defaultName = t`${firstName} codes`;
-      dispatch({ type: "datasets_read", proposal, defaultName });
+      dispatch({ type: "datasets_read", proposal, datasetIds, defaultName });
       const { availability } = suggestions;
       if (availability === "online" || availability === "on_device") {
         matches.findMatches(proposal);
@@ -115,15 +139,21 @@ function useReadWithMatches(
   return { read, isReading, meaningMatchStatus: matches.status };
 }
 
-/** Reads the dataset whose menu opened the flow, once its columns load. */
+/**
+ * Reads the dataset whose menu opened the flow, once its columns load. When
+ * the dataset cannot be found, for example because it was deleted or the user
+ * has no access to it, the flow starts at Pick with a notice instead.
+ */
 function useReadOriginDataset(
   options: Readonly<{
     state: NewDictionaryState;
+    dispatch: Dispatch<NewDictionaryAction>;
     sources: NewDictionarySources;
     read: (datasets: readonly ReadableDataset[]) => void;
   }>,
 ): void {
-  const { state, sources, read } = options;
+  const { state, dispatch, sources, read } = options;
+  const { t } = useLingui();
   const hasStarted = useRef(false);
   const { originDatasetId, proposal } = state;
   useEffect(() => {
@@ -136,8 +166,41 @@ function useReadOriginDataset(
       return;
     }
     hasStarted.current = true;
-    read(_getReadableDatasets(sources, [originDatasetId]));
-  }, [originDatasetId, proposal, sources, read]);
+    const readable = _getReadableDatasets(sources, [originDatasetId]);
+    if (readable.length === 0) {
+      dispatch({ type: "origin_dataset_unavailable" });
+      notifyError(
+        t`This dataset is no longer available. Pick the datasets to learn from.`,
+      );
+      return;
+    }
+    read(readable);
+  }, [originDatasetId, proposal, sources, read, dispatch, t]);
+}
+
+/**
+ * The Read datasets action: reads the picked datasets that can still be
+ * found, or tells the user when none can, rather than reading an empty list.
+ */
+function useReadPicked(
+  options: Readonly<{
+    state: NewDictionaryState;
+    sources: NewDictionarySources;
+    read: (datasets: readonly ReadableDataset[]) => void;
+  }>,
+): () => void {
+  const { state, sources, read } = options;
+  const { t } = useLingui();
+  return () => {
+    const readable = _getReadableDatasets(sources, state.pickedDatasetIds);
+    if (readable.length === 0) {
+      notifyError(
+        t`The picked datasets are no longer available. Pick the datasets to learn from.`,
+      );
+      return;
+    }
+    read(readable);
+  };
 }
 
 /**
@@ -158,23 +221,33 @@ export function useNewDictionaryFlow(
     },
   });
   const reading = useReadWithMatches({ state, dispatch, sources, suggestions });
-  useReadOriginDataset({ state, sources, read: reading.read });
+  useReadOriginDataset({ state, dispatch, sources, read: reading.read });
   const labels = useSuggestLabels({
     proposal: state.proposal,
     requestReply: suggestions.requestReply,
     dispatch,
   });
+  const readPicked = useReadPicked({ state, sources, read: reading.read });
   const [create, isCreating] = useCreateDictionary();
+  const isCreatingRef = useRef(false);
+  useEffect(() => {
+    if (!isCreating) {
+      isCreatingRef.current = false;
+    }
+  }, [isCreating]);
   return {
     suggestionAvailability: suggestions.availability,
-    readPickedDatasets: () => {
-      reading.read(_getReadableDatasets(sources, state.pickedDatasetIds));
-    },
+    readPickedDatasets: readPicked,
     isReading: reading.isReading,
     meaningMatchStatus: reading.meaningMatchStatus,
     suggestLabels: labels.suggestLabels,
     suggestingCodeListKey: labels.suggestingCodeListKey,
-    createDictionary: _makeCreateDictionary({ state, userProfile, create }),
+    createDictionary: _makeCreateDictionary({
+      state,
+      userProfile,
+      create,
+      isCreatingRef,
+    }),
     isCreating,
   };
 }

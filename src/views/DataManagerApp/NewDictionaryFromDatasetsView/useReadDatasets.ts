@@ -31,10 +31,16 @@ function _toProfiledColumns(
  * Reads datasets on this device, one after another, and groups their
  * columns into a proposal. The create flow calls it when the user reads the
  * datasets they picked, and right away when the flow opens from a
- * dataset's menu.
+ * dataset's menu. `onRead` also gets the datasets that were read, so a read
+ * that finished late can be told from the current one.
  */
 export function useReadDatasets(
-  options: Readonly<{ onRead: (proposal: DictionaryProposal.T) => void }>,
+  options: Readonly<{
+    onRead: (
+      proposal: DictionaryProposal.T,
+      datasets: readonly ReadableDataset[],
+    ) => void;
+  }>,
 ): [read: (datasets: readonly ReadableDataset[]) => void, isReading: boolean] {
   const workspace = useCurrentWorkspace();
   const { t } = useLingui();
@@ -55,8 +61,8 @@ export function useReadDatasets(
       );
       return DictionaryProposal.fromColumnProfiles(profiles);
     },
-    onSuccess: (proposal) => {
-      options.onRead(proposal);
+    onSuccess: (proposal, datasets) => {
+      options.onRead(proposal, datasets);
     },
     onError: () => {
       notifyError(

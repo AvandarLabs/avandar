@@ -89,9 +89,10 @@ describe("useMeaningMatches", () => {
     await waitFor(() => {
       expect(result.current.status).toBe("done");
     });
-    expect(onFound).toHaveBeenCalledWith([
-      { name: "birth_date", sameAs: "dob" },
-    ]);
+    expect(onFound).toHaveBeenCalledWith(
+      [{ name: "birth_date", sameAs: "dob" }],
+      PROPOSAL,
+    );
   });
 
   it("finds nothing when the user declined to send the request", async () => {
