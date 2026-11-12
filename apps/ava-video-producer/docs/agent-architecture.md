@@ -197,4 +197,4 @@ See [current scoped verification](motion-atlas/implementation-sampling-correctio
 
 ## Continuity compositions
 
-Continuity is implemented as a strict StoryFilm scene and a linked Composition Atlas. The schema, overlap timing, nested product build/fingerprint detection, beat-relative cue resolution, source-backed adapters, and live catalog entries share the existing preview/export pipeline. Verification distinguishes authored live compositions from generated exports. See [continuity compositions](continuity-compositions.md) for the API, film matrix, editorial guidance and evidence limits.
+Continuity is implemented as a strict StoryFilm scene and the Motion Atlas Compositions and Sample films sections. The schema, overlap timing, nested product build/fingerprint detection, beat-relative cue resolution, source-backed adapters, and live catalog entries share the existing preview/export pipeline. Verification distinguishes authored live compositions from generated exports. See [continuity compositions](continuity-compositions.md) for the API, film matrix, editorial guidance and evidence limits.

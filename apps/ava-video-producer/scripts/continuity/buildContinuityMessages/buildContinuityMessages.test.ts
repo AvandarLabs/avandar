@@ -80,10 +80,10 @@ test("generated catalogs cover reusable guidance and statically selected gallery
     }
   });
   [
-    "Composition Atlas",
     "Loading preview…",
     "Preparing export…",
     "Composition recipes",
+    "Motion to reenactment",
     "Good for",
   ].forEach(_assertMessage);
   assert.deepEqual(

@@ -22,6 +22,11 @@ import type { Film } from "../../src/showcase/showcase.types";
 
 requireLicense();
 
+/** Brand files from `public/` that showcase pages load, by served path. */
+const PUBLIC_FILES: Record<string, string> = {
+  "/fonts/figtree-latin.woff2": "fonts/figtree-latin.woff2",
+  "/brand/avandar-logo.png": "avandar/logo.png",
+};
 const clients = new Set<ServerResponse>();
 const media = new Map<string, string>();
 const session = randomUUID();
@@ -232,8 +237,6 @@ const server = createServer(async (req, res) => {
       return;
     }
     const generated = [
-      "/composition-gallery.js",
-      "/composition-gallery.css",
       "/live-player.js",
       "/live-player.css",
       "/motion-gallery.js",
@@ -241,8 +244,8 @@ const server = createServer(async (req, res) => {
       "/showcase-theme.css",
     ].includes(pathname);
     const file =
-      (pathname === "/fonts/geist-latin.woff2"
-        ? path.join(appRoot, "public/fonts/geist-latin.woff2")
+      (Object.hasOwn(PUBLIC_FILES, pathname)
+        ? path.join(appRoot, "public", PUBLIC_FILES[pathname])
         : media.get(pathname)) ??
       (await servedFile(
         generated ? live.output : path.join(appRoot, "showcase"),

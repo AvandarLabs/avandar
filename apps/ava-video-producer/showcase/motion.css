@@ -2,15 +2,16 @@
   background: var(--paper);
   color: var(--ink);
   color-scheme: light;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--ava-font);
   -webkit-font-smoothing: antialiased;
   font-synthesis: none;
 
-  --paper: #eeede7;
-  --white: #f8f7f1;
+  /* Brand-derived surfaces: a cool paper tinted toward Avandar blue. */
+  --paper: color-mix(in oklab, var(--ava-primary-0) 45%, var(--ava-neutral-0));
+  --white: #fff;
   --ink: var(--ava-neutral-9);
   --muted: var(--ava-neutral-6);
-  --line: #cecec4;
+  --line: color-mix(in oklab, var(--ava-primary-1) 35%, var(--ava-neutral-1));
   --accent-soft: var(--ava-primary-2);
   --accent: var(--ava-primary-7);
   --dark: var(--ava-neutral-9);
@@ -166,36 +167,13 @@ button {
   letter-spacing: -0.2px;
 }
 
+/* The logo PNG carries its own padding, so the box runs a little large. */
 .brand-mark {
-  display: inline-block;
-  height: 28px;
-  position: relative;
-  transform: rotate(-24deg);
-  width: 27px;
-}
-
-.brand-mark i {
-  border: 1.6px solid var(--ink);
-  border-radius: 50%;
-  height: 12px;
-  position: absolute;
-  width: 12px;
-}
-
-.brand-mark i:nth-child(1) {
-  left: 0;
-  top: 0;
-}
-
-.brand-mark i:nth-child(2) {
-  right: 0;
-  top: 8px;
-}
-
-.brand-mark i:nth-child(3) {
-  background: var(--ink);
-  bottom: 0;
-  left: 0;
+  display: block;
+  flex-shrink: 0;
+  height: 40px;
+  margin: -6px -6px -6px -8px;
+  width: 40px;
 }
 
 .site-header nav {

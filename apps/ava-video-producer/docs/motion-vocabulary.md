@@ -269,7 +269,7 @@ Continuity adds typed cut/dissolve/wipe/aperture/spatial/handoff/morph presentat
 Continuity diagram cameras add ordered glide/push/whip routes, reading holds, ten-sample temporal motion blur, and bounded object departures. Native UI remains unscaled. Anchored overlays use the existing easing functions and measured product coordinates; annotation kinds share draw/hold/retract intervals. Camera, blur, notation and editorial palette choices are available in live previews and explicit exports.
 
 
-Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Composition Atlas exposes separate presets and exports the acknowledged values.
+Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Atlas Compositions section exposes separate presets and exports the acknowledged values.
 
 ## Configurable motion components
 
@@ -285,8 +285,11 @@ speed preserves reading holds and leaves content clocks unchanged. See the
 
 The Motion Atlas has four sections: Motions (stock presets), Compositions,
 Sample films, and **Helpers**. Helpers is a browsable catalog of the shared
-motion helpers this inventory describes, each previewed live in isolation.
-Open it at `motion.html?section=helpers`; a helper deep links as
+motion helpers this inventory describes. Like every Atlas section it has a
+category sidebar with counts and a card per helper; each card's thumbnail is
+the helper's real demo rendered live from the gallery clock, and opening it
+shows the looping player, API, usage and guidance in the Atlas preview modal.
+Open it at `motion.html?section=helpers`; an open helper deep links as
 `motion.html?section=helpers&helper=<id>`, and a category filter adds
 `&category=<id>`, for example `?section=helpers&helper=erase-mask&category=masks`.
 

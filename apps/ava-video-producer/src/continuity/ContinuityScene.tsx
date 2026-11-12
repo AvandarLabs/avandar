@@ -1,6 +1,7 @@
 import { TransitionSeries } from "@remotion/transitions";
 import { Fragment } from "react";
 import { Sequence, useCurrentFrame } from "remotion";
+import { TYPE } from "../fonts";
 import { createSceneTransition } from "../motion-components/SceneTransition";
 import {
   ContinuityAppearanceContext,
@@ -35,6 +36,7 @@ export function ContinuityScene({
         className={css.continuityStage}
         style={
           {
+            "--continuity-font": TYPE,
             "--continuity-ground": plan.background,
             "--continuity-ink": getEditorialInk(plan.background),
           } as CSSProperties

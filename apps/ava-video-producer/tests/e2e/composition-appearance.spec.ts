@@ -59,7 +59,10 @@ test("independent roughness levels persist and reach the export request", async 
       });
     });
     await page.goto(`/motion.html?section=${section}`);
-    await page.getByRole("button", { name: "Expand preview" }).click();
+    await page
+      .getByRole("button", { name: /^Explore / })
+      .first()
+      .click();
     const preset = page.getByRole("combobox", {
       name: "Camera motion preset",
       exact: true,
@@ -94,7 +97,10 @@ test("camera preset menus explain settings and feel without changing selection",
   page,
 }) => {
   await page.goto("/motion.html?section=compositions");
-  await page.getByRole("button", { name: "Expand preview" }).click();
+  await page
+    .getByRole("button", { name: /^Explore / })
+    .first()
+    .click();
   const dialog = page.getByRole("dialog");
   const preset = dialog.getByRole("combobox", {
     name: "Camera motion preset",
@@ -175,15 +181,15 @@ test("composition search finds retrieval tags and shows creative direction", asy
   page,
 }) => {
   await page.goto("/motion.html?section=compositions");
+  const search = page.getByRole("searchbox", { name: "Search compositions" });
+  await search.fill("persistent identity");
+  const cards = page.getByRole("button", { name: /^Explore / });
+  await expect(cards).toHaveCount(1);
   await page
-    .getByRole("textbox", { name: "Search compositions" })
-    .fill("persistent identity");
-  const sidebar = page.getByRole("complementary", {
-    name: "Choose a composition",
-  });
-  await expect(sidebar.getByRole("button")).toHaveCount(1);
-  await sidebar.getByRole("button", { name: /Shared-object handoff/ }).click();
-  const guide = page.getByRole("region", { name: "Reuse this study" });
+    .getByRole("button", { name: "Explore Shared-object handoff" })
+    .click();
+  const dialog = page.getByRole("dialog");
+  const guide = dialog.getByRole("region", { name: "Reuse this study" });
   await expect(
     guide.getByText("Creative direction", { exact: true }),
   ).toBeVisible();
@@ -194,11 +200,29 @@ test("composition search finds retrieval tags and shows creative direction", asy
   await expect(guide).toContainText(
     "Keep the movement purposeful and traceable",
   );
-  await page
-    .getByRole("textbox", { name: "Search compositions" })
-    .fill("purposeful and traceable");
-  await expect(sidebar.getByRole("button")).toHaveCount(1);
   await guide.locator("dl").screenshot({
     path: "../../.temp/feat-motion-catalog/composition-reuse-metadata.png",
   });
+  await page.keyboard.press("Escape");
+  await search.fill("purposeful and traceable");
+  await expect(cards).toHaveCount(1);
+});
+
+test("composition categories filter the cards and count their entries", async ({
+  page,
+}) => {
+  await page.goto("/motion.html?section=compositions");
+  const sidebar = page.getByRole("complementary", {
+    name: "Composition categories",
+  });
+  const transitions = sidebar.getByRole("button", { name: /^Transitions/ });
+  const count = Number(
+    await transitions.locator(".category-count").textContent(),
+  );
+  await transitions.click();
+  await expect(transitions).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/category=transitions/);
+  await expect(page.getByRole("button", { name: /^Explore / })).toHaveCount(
+    count,
+  );
 });

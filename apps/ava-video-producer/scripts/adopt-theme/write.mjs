@@ -224,7 +224,7 @@ export function printReport({
     const first = face.split(",")[0].replace(/["']/g, "").trim();
     console.log(`\ntypeface  ${first}`);
     console.log(
-      `  src/fonts.ts loads Geist. If ${first} is in @remotion/google-fonts,`,
+      `  src/fonts.ts loads Figtree. If ${first} is in @remotion/google-fonts,`,
     );
     console.log(
       `  swap the import — a fontFamily string alone loads nothing and every`,

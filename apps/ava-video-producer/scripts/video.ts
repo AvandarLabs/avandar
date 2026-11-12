@@ -201,8 +201,8 @@ async function stageAssets(
   await fs.mkdir(target);
   await fs.mkdir(path.join(target, "fonts"));
   await fs.copyFile(
-    await publicAsset(ROOT, "fonts/geist-latin.woff2"),
-    path.join(target, "fonts/geist-latin.woff2"),
+    await publicAsset(ROOT, "fonts/figtree-latin.woff2"),
+    path.join(target, "fonts/figtree-latin.woff2"),
   );
   for (const asset of assetReferences(plan)) {
     const destination = path.join(target, asset);

@@ -30,6 +30,12 @@ async function _createWatchFixture(root: string) {
     "showcase/watch-films.js",
     "src/stock",
     "src/motion.ts",
+    // Helper card thumbnails render the real helper demos in the gallery.
+    "src/scenes",
+    "src/storyboard",
+    "src/chrome",
+    "src/cursor-motion.ts",
+    "src/fonts.ts",
     "showcase/download.js",
   ];
   await Promise.all(

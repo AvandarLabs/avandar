@@ -8,7 +8,10 @@ import {
   createContinuityPlanFromOptions,
 } from "../../../src/continuity/continuityAppearance";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
-import { getHelperFromFilmId } from "../../../src/gallery/HelperGallery/helperCatalog";
+import {
+  getHelperFromFilmId,
+  HELPER_CANVAS,
+} from "../../../src/gallery/HelperGallery/helperCatalog";
 import {
   storyboardSchema,
   durationInFrames,
@@ -125,9 +128,8 @@ function _loadHelperFilm(id: string, options: object): Film | undefined {
     source: `apps/ava-video-producer/${helper.source}`,
     frames: helper.demo.frames,
     fps: 30,
-    width: 960,
-    height: 600,
-    delivery: { width: 960, height: 600 },
+    ...HELPER_CANVAS,
+    delivery: HELPER_CANVAS,
     loop: true,
     showCaptions: false,
   };

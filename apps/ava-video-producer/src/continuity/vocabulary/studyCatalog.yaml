@@ -926,7 +926,7 @@
       description: Keep Fictional demonstration data visible unless the figures are sourced.
 - id: window-entrances
   title: Window entrances
-  category: scene-motions
+  category: entrances-and-reveals
   kind: scene
   description:
     Four ways a tilted window arrives - a whip revealed through rising columns, a
@@ -972,7 +972,7 @@
       description: Tall is the box a full-bleed pull-back lands in.
 - id: typography-reveals
   title: Typography line reveals
-  category: scene-motions
+  category: entrances-and-reveals
   kind: scene
   description:
     Lines that fade up, wipe in, or cut on, with an icon above, a staged exit, and a small
@@ -1017,7 +1017,7 @@
       description: caption sets one small regular-weight size and rejects fontSize.
 - id: heading-wipe
   title: Heading wipe
-  category: scene-motions
+  category: entrances-and-reveals
   kind: scene
   description:
     A scene heading whose title and kicker wipe in left to right instead of rising,
@@ -1062,7 +1062,7 @@
       description: Supporting line under the title.
 - id: graph-packets
   title: Graph packets
-  category: scene-motions
+  category: entrances-and-reveals
   kind: scene
   description:
     An editorial diagram with item lists inside corner-tick frames and parallel arrowless

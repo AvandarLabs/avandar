@@ -600,7 +600,7 @@ test("a brand lockup validates a column build, a CTA and a fly-through exit", ()
     durationInFrames: 150,
     props: {
       logo: { src: "avandar/logo.png", aspectRatio: 1 },
-      wordmark: "avandar",
+      wordmark: "Avandar",
       build: { atFrame: 5, columns: 8, staggerFrames: 1.5 },
       cta: {
         atFrame: 30,

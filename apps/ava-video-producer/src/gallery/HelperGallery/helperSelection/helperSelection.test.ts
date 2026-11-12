@@ -9,7 +9,7 @@ import {
 
 const identity = (message: string) => message;
 
-test("a deep link selects its helper and category", () => {
+test("a deep link opens its helper and filters to its category", () => {
   assert.deepEqual(
     getHelperSelectionFromSearch(
       "?section=helpers&helper=erase-mask&category=masks",
@@ -19,17 +19,21 @@ test("a deep link selects its helper and category", () => {
   );
 });
 
-test("unknown helpers and categories fall back to the first helper and all", () => {
+test("unknown helpers and categories open nothing and show every category", () => {
   assert.deepEqual(
     getHelperSelectionFromSearch(
       "?section=helpers&helper=missing&category=nope",
       HELPER_CATALOG,
     ),
-    { helperId: HELPER_CATALOG.helpers[0].id, category: "all", query: "" },
+    { helperId: undefined, category: "all", query: "" },
   );
 });
 
-test("the selection URL keeps the section and omits the default category", () => {
+test("the selection URL keeps the section and omits the defaults", () => {
+  assert.equal(
+    buildHelperSearch({ helperId: undefined, category: "all" }),
+    "?section=helpers",
+  );
   assert.equal(
     buildHelperSearch({ helperId: "ramp", category: "all" }),
     "?section=helpers&helper=ramp",

@@ -13,13 +13,15 @@ export function GalleryHeader(): ReactNode {
         className="brand"
         aria-label={t`Avandar Motion Atlas home`}
       >
-        <span className="brand-mark" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
+        <img
+          className="brand-mark"
+          src="/brand/avandar-logo.png"
+          alt=""
+          width={40}
+          height={40}
+        />
         <span>
-          <Trans>avandar</Trans>
+          <Trans>Avandar</Trans>
           <span className="brand-divider">
             <Trans>/</Trans>
           </span>

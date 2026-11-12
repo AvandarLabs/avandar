@@ -13,7 +13,11 @@ import { hasControlPath } from "./hasControlPath/hasControlPath";
 const SCENE_STUDIES = CONTINUITY_CATALOG.filter(
   (entry) => entry.family === "vocabulary" && isSceneEntry(entry),
 );
-const SCENE_CATEGORIES = ["transitions", "compositions", "scene-motions"];
+const SCENE_CATEGORIES = [
+  "transitions",
+  "compositions",
+  "entrances-and-reveals",
+];
 const SHOT_FIELDS = ["props", "transition", "transitionInFrames", "theme"];
 
 function _readPlan(path: string): Storyboard {

@@ -22,7 +22,7 @@ type ControlsProps = Props & {
 export function CompositionControls({ appearance, isScene }: ControlsProps) {
   return (
     <MantineProvider
-      theme={{ fontFamily: "Inter, Helvetica Neue, Arial, sans-serif" }}
+      theme={{ fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif" }}
     >
       <div className={css.controls}>
         {isScene ? (

@@ -27,7 +27,7 @@
           "src": "avandar/logo.png",
           "aspectRatio": 1
         },
-        "wordmark": "avandar",
+        "wordmark": "Avandar",
         "build": {
           "atFrame": 5,
           "columns": 8,

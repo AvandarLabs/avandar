@@ -160,7 +160,7 @@ evidence; update delivery records after those artifacts have been inspected.
 | --- | --- |
 | [motion.ts](../src/motion.ts) | Original curves, durations and frame helpers, plus periodic phase/pulse/loop-envelope helpers; see [motion inventory](motion-vocabulary.md) |
 | [chrome.tsx](../src/chrome/chrome.tsx) | `Box`, `abs`, `BAR = 40`, `HEAD = 68`, `BODY_Y = 108`, pointer tracking and click windows |
-| [fonts.ts](../src/fonts.ts) | Loads Geist normal weights 400–700 with the Latin subset; exports `FACE` and `TYPE` |
+| [fonts.ts](../src/fonts.ts) | Loads the bundled Figtree variable font (Avandar's brand typeface, Latin subset, weights 300–900); exports `FACE`, `TYPE` and `MONO` |
 | [theme.css](../src/theme.css) | Original generic surface, foreground, border, brand, ground and radius tokens |
 | [adopt-theme.mjs](../scripts/adopt-theme.mjs) | Product token/easing adoption for faithful reconstructions; not a scene |
 | [capture runner](../scripts/capture-avandar/capture-avandar.mjs) | Produces real footage and capture evidence; see [capture pipeline](capture-pipeline.md) |

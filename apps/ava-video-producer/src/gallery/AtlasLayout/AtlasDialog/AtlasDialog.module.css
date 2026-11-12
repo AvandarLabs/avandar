@@ -1,0 +1,35 @@
+.header {
+  gap: 12px;
+}
+
+.heading {
+  align-items: baseline;
+  display: flex;
+  flex: 1;
+  gap: 14px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.heading h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heading > span {
+  color: var(--muted);
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.controls {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.controls > button {
+  height: 44px;
+  width: 44px;
+}

@@ -633,8 +633,8 @@ msgstr "Availability and supported operations shape that choice."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.AVANDAR"
-msgstr "AVANDAR"
+#~ msgid "continuity.AVANDAR"
+#~ msgstr "AVANDAR"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -919,8 +919,8 @@ msgstr "Characters per second for the typed command."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Choose a composition"
-msgstr "Choose a composition"
+#~ msgid "continuity.Choose a composition"
+#~ msgstr "Choose a composition"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1072,8 +1072,8 @@ msgstr "Compositing"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Composition Atlas"
-msgstr "Composition Atlas"
+#~ msgid "continuity.Composition Atlas"
+#~ msgstr "Composition Atlas"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1177,8 +1177,8 @@ msgstr "Continue across a shared horizontal space. Direction carries the "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Continuity"
-msgstr "Continuity"
+#~ msgid "continuity.Continuity"
+#~ msgstr "Continuity"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -1493,6 +1493,11 @@ msgstr "Entrance"
 #: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.Entrance length"
 msgstr "Entrance length"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Entrances and reveals"
+msgstr "Entrances and reveals"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2652,8 +2657,13 @@ msgstr "More missions. More useful tools."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Motion Atlas"
-msgstr "Motion Atlas"
+#~ msgid "continuity.Motion Atlas"
+#~ msgstr "Motion Atlas"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Motion over reenactment"
+msgstr "Motion over reenactment"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2662,8 +2672,13 @@ msgstr "Motion to motion"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Motion to product"
-msgstr "Motion to product"
+#~ msgid "continuity.Motion to product"
+#~ msgstr "Motion to product"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Motion to reenactment"
+msgstr "Motion to reenactment"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -2741,8 +2756,8 @@ msgstr "Next field"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.No matching compositions. Try another search."
-msgstr "No matching compositions. Try another search."
+#~ msgid "continuity.No matching compositions. Try another search."
+#~ msgstr "No matching compositions. Try another search."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3108,8 +3123,8 @@ msgstr "Present two short thesis cards about fitting infrastructure to the "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Product and motion"
-msgstr "Product and motion"
+#~ msgid "continuity.Product and motion"
+#~ msgstr "Product and motion"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3133,13 +3148,13 @@ msgstr "product to diagram"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Product to motion"
-msgstr "Product to motion"
+#~ msgid "continuity.Product to motion"
+#~ msgstr "Product to motion"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Productions"
-msgstr "Productions"
+#~ msgid "continuity.Productions"
+#~ msgstr "Productions"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3301,6 +3316,11 @@ msgstr "Record to relationships"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
+msgid "continuity.Reenactment to motion"
+msgstr "Reenactment to motion"
+
+#. js-lingui-explicit-id
+#: src/continuity/i18n/descriptors.generated.ts
 msgid "continuity.related controls"
 msgstr "related controls"
 
@@ -3444,8 +3464,8 @@ msgstr "scene change"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Scene motions"
-msgstr "Scene motions"
+#~ msgid "continuity.Scene motions"
+#~ msgstr "Scene motions"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3469,13 +3489,13 @@ msgstr "Scroll steps"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Search compositions"
-msgstr "Search compositions"
+#~ msgid "continuity.Search compositions"
+#~ msgstr "Search compositions"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Search the collection"
-msgstr "Search the collection"
+#~ msgid "continuity.Search the collection"
+#~ msgstr "Search the collection"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3624,8 +3644,8 @@ msgstr "Show which fictional rows cross the source boundary, then continue "
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Showcase navigation"
-msgstr "Showcase navigation"
+#~ msgid "continuity.Showcase navigation"
+#~ msgstr "Showcase navigation"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
@@ -3857,10 +3877,10 @@ msgstr "teaching underline"
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts
-msgid "continuity.Ten stories about how Avandar works, and reusable guidance "
-"for the transitions and visual relationships that make them flow."
-msgstr "Ten stories about how Avandar works, and reusable guidance for the "
-"transitions and visual relationships that make them flow."
+#~ msgid "continuity.Ten stories about how Avandar works, and reusable guidance "
+#~ "for the transitions and visual relationships that make them flow."
+#~ msgstr "Ten stories about how Avandar works, and reusable guidance for the "
+#~ "transitions and visual relationships that make them flow."
 
 #. js-lingui-explicit-id
 #: src/continuity/i18n/descriptors.generated.ts

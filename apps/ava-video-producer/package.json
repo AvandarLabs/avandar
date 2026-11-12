@@ -24,6 +24,7 @@
     "capture:curate": "node scripts/require-license.mjs && node scripts/curate-capture.mjs",
     "component:build": "node scripts/require-license.mjs && node scripts/build-avandar.mjs",
     "component:review": "node scripts/require-license.mjs && node scripts/review-avandar.mjs",
+    "atlas:posters": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/showcase/atlasPosters/renderAtlasPosters.ts",
     "motion:build": "node scripts/require-license.mjs && node scripts/build-motion-gallery.mjs",
     "motion": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/motion.ts",
     "component:measure": "node scripts/require-license.mjs && node scripts/measure-avandar.mjs",

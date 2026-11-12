@@ -89,7 +89,7 @@ test("composition sections share the atlas and offer a fitted keyboard preview",
     await expect(
       page.getByRole("link", { name: "Avandar Motion Atlas home" }),
     ).toBeVisible();
-    const expand = page.getByRole("button", { name: "Expand preview" });
+    const expand = page.getByRole("button", { name: /^Explore / }).first();
     await expand.click();
     const dialog = page.getByRole("dialog");
     const title = dialog.getByRole("heading", { level: 2 });
@@ -140,17 +140,21 @@ test("legacy links and filtered composition navigation retain their selection", 
 }) => {
   await page.goto("/compositions.html?film=qetl-composite");
   await expect(page).toHaveURL(/motion.html.*film=qetl-composite/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Sample films",
-  );
-  const currentTitle = await page
-    .locator("#composition-preview-title")
-    .textContent();
-  await page
-    .getByRole("textbox", { name: "Search compositions" })
-    .fill(currentTitle!);
-  await page.getByRole("button", { name: "Expand preview" }).click();
+  await expect(
+    page.getByRole("link", { name: "Sample films", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
   const dialog = page.getByRole("dialog");
+  const currentTitle = await dialog
+    .getByRole("heading", { level: 2 })
+    .first()
+    .textContent();
+  await page.keyboard.press("Escape");
+  await expect(page).not.toHaveURL(/film=/);
+  await page
+    .getByRole("searchbox", { name: "Search films" })
+    .fill(currentTitle!);
+  await page.getByRole("button", { name: `Explore ${currentTitle}` }).click();
+  await expect(page).toHaveURL(/film=qetl-composite/);
   await expect(
     dialog.getByRole("button", { name: "Previous preview" }),
   ).toBeDisabled();
@@ -164,11 +168,10 @@ test("legacy links and filtered composition navigation retain their selection", 
   await expect(
     dialog.getByRole("combobox", { name: "Box roughness" }),
   ).toBeInViewport();
+  // The dialog scrolls vertically at phone widths, like the Motions dialog.
   expect(
     await dialog.evaluate(
-      (element) =>
-        element.scrollHeight <= element.clientHeight &&
-        element.scrollWidth <= element.clientWidth,
+      (element) => element.scrollWidth <= element.clientWidth,
     ),
   ).toBe(true);
   await expect(
@@ -207,4 +210,33 @@ test("every atlas section retains the shared paper background and ink text", asy
       atlasTheme.fontFamily,
     );
   }
+});
+
+test("helpers browse by category as live cards and open in the shared preview", async ({
+  page,
+}) => {
+  await page.goto("/motion.html?section=helpers");
+  const sidebar = page.getByRole("complementary", {
+    name: "Helper categories",
+  });
+  const masks = sidebar.getByRole("button", { name: /^Masks and wipes/ });
+  const count = Number(await masks.locator(".category-count").textContent());
+  await masks.click();
+  const cards = page.getByRole("button", { name: /^Explore / });
+  await expect(cards).toHaveCount(count);
+  await page.getByRole("button", { name: "Explore Erase mask" }).click();
+  await expect(page).toHaveURL(/helper=erase-mask/);
+  const dialog = page.getByRole("dialog");
+  await expect(
+    dialog.getByRole("heading", { name: "Erase mask", level: 2 }).first(),
+  ).toBeVisible();
+  await expect(dialog.locator("iframe")).toHaveAttribute(
+    "src",
+    /id=helper-erase-mask/,
+  );
+  await page.keyboard.press("ArrowRight");
+  await expect(page).not.toHaveURL(/helper=erase-mask/);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(page).not.toHaveURL(/helper=/);
 });

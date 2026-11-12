@@ -1,7 +1,7 @@
 .continuityStage {
   background: var(--continuity-ground, #0b1219);
   color: var(--continuity-ink, #edf7f4);
-  font-family: var(--font-sans, Arial, sans-serif);
+  font-family: var(--continuity-font, sans-serif);
   height: 840px;
   left: 0;
   overflow: hidden;

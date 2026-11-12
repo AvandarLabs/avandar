@@ -51,7 +51,6 @@ export async function buildLivePlayers(onBuilt: () => Promise<void>) {
     absWorkingDir: appRoot,
     entryPoints: {
       "live-player": "src/showcase/LivePlayer.tsx",
-      "composition-gallery": "src/continuity/gallery/CompositionGallery.tsx",
     },
     outdir: output,
     bundle: true,

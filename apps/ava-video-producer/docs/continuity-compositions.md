@@ -1,6 +1,6 @@
 # Continuity compositions
 
-The Composition Atlas at `/compositions.html` contains ten long explainers, thirteen reusable continuity studies, and the [shot vocabulary](../storyboards/shot-vocabulary.json) sample film with twelve storyboard-scene studies drawn from it. It is linked from the Motion Atlas and Productions. Every preview uses the live React composition. The MP4 button renders the selected film with the acknowledged palette, camera, blur, annotation and caption choices through the existing serial export and frame-gate pipeline. The gallery does not use prerecorded preview files. On macOS, the existing showcase supplies local scratch narration for timing review; it is not a finished voice performance.
+The Motion Atlas **Compositions** and **Sample films** sections (`/motion.html?section=compositions` and `?section=films`; the legacy `/compositions.html` link redirects there) contain ten long explainers, thirteen reusable continuity studies, and the [shot vocabulary](../storyboards/shot-vocabulary.json) sample film with twelve storyboard-scene studies drawn from it. Terms such as composition, transition, compositing and reenactment follow [the video producer nomenclature](../../../docs/video-producer-nomenclature.md). Each section shows a category sidebar with counts and a card per entry; a card's thumbnail is a tracked poster (`showcase/assets/atlas/<id>.jpg`, rendered by `pnpm atlas:posters`), and opening it plays the live React composition in the Atlas preview modal. The MP4 button renders the selected film with the acknowledged palette, camera, blur, annotation and caption choices through the existing serial export and frame-gate pipeline. The gallery does not use prerecorded preview files. On macOS, the existing showcase supplies local scratch narration for timing review; it is not a finished voice performance.
 
 ## Editorial choices
 
@@ -9,9 +9,9 @@ Professional continuity gives the viewer a reason to follow an object, a directi
 | Relationship | Useful treatment | What to preserve | Avoid |
 | --- | --- | --- | --- |
 | Motion to motion | Cut, short dissolve, spatial continuation, aperture, shared-object handoff | Object identity, direction, reading order, color meaning | Dissolving several layers of text together; unrelated shapes morphing without a reason |
-| Motion to product | Conceptual frame opens onto a measured product region | The question or model being demonstrated; readable native text | Scaling the entire UI, invented controls, beginning an action during the reveal |
-| Product to motion | Hold the result, then reveal its data or relationship model | The result's meaning and source context | Implying that the diagram is actual backend telemetry |
-| Product and motion | Full native product with anchored floating artwork, a source spotlight, and timed notation | The action, its observed consequence, and one focal point | A connector that asserts an unverified data flow; tiny complete diagrams squeezed into a rail |
+| Motion to reenactment | Conceptual frame opens onto a measured product region | The question or model being demonstrated; readable native text | Scaling the entire UI, invented controls, beginning an action during the reveal |
+| Reenactment to motion | Hold the result, then reveal its data or relationship model | The result's meaning and source context | Implying that the diagram is actual backend telemetry |
+| Motion over reenactment | Full native product with anchored floating artwork, a source spotlight, and timed notation | The action, its observed consequence, and one focal point | A connector that asserts an unverified data flow; tiny complete diagrams squeezed into a rail |
 
 The authored transitions generally take 18–30 frames at 30 fps. That is a vocabulary default, not a universal rule. Native product beats stay mounted; diagrams hold their resolved pose before their stock loop reset. Diagram details depart from a measured UI source, settle in free space, and return attention to their origin. Fast diagram camera moves use temporal shutter samples; readable holds remain sharp. Captions retain a separate 160-pixel band.
 
@@ -22,12 +22,12 @@ A graphic match cut depends on matching the actual source and destination images
 | Film | Composition and product sequence |
 | --- | --- |
 | `qetl-motion` | QETL: motion to motion |
-| `qetl-to-product` | QETL: motion to product, Explorer query |
-| `product-to-qetl` | QETL: product to motion, Import |
+| `qetl-to-product` | QETL: motion to reenactment, Explorer query |
+| `product-to-qetl` | QETL: reenactment to motion, Import |
 | `qetl-composite` | QETL: composite, Dashboard result |
 | `ontology-motion` | Customizability: motion to motion |
-| `ontology-to-product` | Customizability: motion to product, Concept metadata |
-| `product-to-ontology` | Customizability: product to motion, Case record |
+| `ontology-to-product` | Customizability: motion to reenactment, Concept metadata |
+| `product-to-ontology` | Customizability: reenactment to motion, Case record |
 | `ontology-composite` | Customizability: composite, Field mapping |
 | `plugin-ecosystem` | Future plugins: motion to motion |
 | `right-sized-data` | Small and medium workloads: motion to motion |
@@ -48,7 +48,7 @@ Actual product leaves come from this worktree's source and CSS. Fixture controll
 | Composition recipes | Model to workspace; record to relationships; controls and their meaning |
 | Transitions (scenes) | Stepped column wipe; field-colour cut; fly-through into colour; whip exit |
 | Composition recipes (scenes) | Tilted product window; racing pair; brand lockup and call to action; bar comparison |
-| Scene motions | Window entrances; typography line reveals; heading wipe; graph packets |
+| Entrances and reveals | Window entrances; typography line reveals; heading wipe; graph packets |
 
 Each study exposes guidance, real schema paths, and its source-film link. Inputs are authored as validated storyboards, not changed through a live form editor. The gallery search and family buttons select films or studies; the existing Motion Atlas input editor continues to own individual stock-preset inputs.
 
@@ -69,9 +69,11 @@ validation is unchanged.
 | Atlas controls | Palette, camera preset, motion blur, annotations, roughness and captions | Playback only. Plain scenes keep their authored plan and per-shot `theme`, and the live player ignores appearance messages for them, so the viewer hides those controls and says so. Downloads send only the caption choice. Transcript and caption links are hidden because the plans carry no narration |
 
 Scene studies sit in the `transitions` and `compositions` categories next to the
-continuity studies, plus a `scene-motions` category ("Scene motions") for
-entrances and reveals. The sidebar groups entries under a heading per category
-and labels each entry "Continuity" or "Storyboard scenes". Keep one category's
+continuity studies, plus an `entrances-and-reveals` category ("Entrances and
+reveals"). The sidebar filters by category and shows each category's count;
+each card labels its entry "Continuity" or "Storyboard scenes" with its
+duration. Add a poster for a new entry with `pnpm atlas:posters <id>`;
+`atlasPosters.test.ts` fails until every catalog entry has one. Keep one category's
 entries adjacent in `studyCatalog.yaml`; a test checks it.
 
 To add one, write a short focused plan in `storyboards/vocabulary/`, run
@@ -154,7 +156,7 @@ Dependencies are pinned to the producer's existing Remotion version, 4.0.516. Do
 
 ## Appearance and camera direction
 
-The Composition Atlas reuses Motion Atlas swatches and color pickers. Camera motion, motion blur, annotations and captions can be toggled independently without seeking the playhead. Speed and loop are synchronized to the active player. Downloads use its acknowledged appearance snapshot. Palette changes affect editorial graphics; actual product components keep their native theme.
+The Compositions section reuses Motion Atlas swatches and color pickers. Camera motion, motion blur, annotations and captions can be toggled independently without seeking the playhead. Speed and loop are synchronized to the active player. Downloads use its acknowledged appearance snapshot. Palette changes affect editorial graphics; actual product components keep their native theme.
 
 Camera paths establish a wide diagram, push into one relevant detail, travel quickly to the next, and reopen the context. Align the travel with the caption or spoken change of subject. Stock objects can depart independently through an authored mask. Use these moves to direct attention, and leave the explanation still long enough to read. The product stage stays at 1600 by 840; a dedicated stacking context keeps native application layers underneath explanatory overlays.
 
@@ -162,7 +164,7 @@ Camera paths establish a wide diagram, push into one relevant detail, travel qui
 ## Independent sketch controls
 
 Annotation roughness and Box roughness each offer Smooth (0), Subtle (0.5),
-Sketch (1.5), and Rough (3) in the Composition Atlas. Storyboard continuity
+Sketch (1.5), and Rough (3) in the Atlas Compositions section. Storyboard continuity
 props and appearance/export options also accept intermediate numeric levels,
 for example `{ "annotationRoughness": 0.5, "boxRoughness": 2 }`. Settings persist
 between films and reloads. Exports receive the active player's acknowledged

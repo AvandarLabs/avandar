@@ -327,7 +327,7 @@ export async function fingerprintPlan(
   }
   for (const extra of [
     "remotion.config.ts",
-    "public/fonts/geist-latin.woff2",
+    "public/fonts/figtree-latin.woff2",
     "../../pnpm-lock.yaml",
     "package.json",
     "scripts/render.sh",

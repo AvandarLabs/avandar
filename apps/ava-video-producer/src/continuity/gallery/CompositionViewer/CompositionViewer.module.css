@@ -16,13 +16,7 @@
   display: grid;
   gap: 24px;
   grid-template-columns: 1fr auto;
-  padding-top: 24px;
-}
-
-.compositionViewerSummary h2 {
-  font-size: 27px;
-  font-weight: 500;
-  margin: 0 0 10px;
+  padding-top: 16px;
 }
 
 .compositionViewerSummary p {
@@ -62,61 +56,91 @@
   min-width: 0;
 }
 
-:global(dialog:modal) .compositionViewer {
+/*
+ * The viewer fills the Atlas preview modal: the player, its summary and
+ * reuse guidance scroll in the left column, and the settings keep the right.
+ */
+.compositionViewer {
+  align-content: start;
+  column-gap: 24px;
   display: grid;
-  gap: 20px;
+  grid-template-areas:
+    "stage settings"
+    "details settings"
+    "guidance settings";
   grid-template-columns: minmax(0, 1fr) 380px;
-  grid-template-rows: minmax(0, 1fr);
+  /* Content height: auto rows would shrink to fit the modal and overlap. */
+  grid-template-rows: repeat(3, max-content);
+  height: 100%;
+  overflow-y: auto;
 }
 
-:global(dialog:modal) .stage {
-  align-items: center;
+.stage {
   background: var(--ava-neutral-9);
   border-radius: 6px;
-  container-type: size;
-  display: flex;
-  justify-content: center;
+  grid-area: stage;
 }
 
-:global(dialog:modal) .compositionViewerPlayer {
-  flex: none;
-  height: min(100cqh, 62.5cqw);
-  width: min(100cqw, 160cqh);
+.compositionViewerPlayer {
+  margin: 0 auto;
+  max-width: calc((100dvh - 150px) * 1.6);
 }
 
-:global(dialog:modal) .details,
-:global(dialog:modal) .guidance {
-  display: none;
+.details {
+  grid-area: details;
+}
+
+.settings {
+  align-self: start;
+  grid-area: settings;
+  position: sticky;
+  top: 0;
+}
+
+.guidance {
+  grid-area: guidance;
 }
 /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-:global(dialog:modal) .settings :global(.palette-controls) {
+.settings :global(.palette-controls) {
   gap: 10px;
   margin: 0 0 12px;
   padding: 10px;
 }
 /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-:global(dialog:modal) .settings :global(.palette-group) {
+.settings :global(.palette-group) {
   flex-basis: 100%;
   gap: 6px;
 }
 /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-:global(dialog:modal) .settings :global(.palette-help) {
+.settings :global(.palette-help) {
   display: none;
 }
 
+/* At phone widths the whole Atlas dialog scrolls, so the viewer does not. */
+@media (width <= 760px) {
+  .compositionViewer {
+    height: auto;
+    overflow-y: visible;
+  }
+}
+
 @media (width <= 800px) {
-  :global(dialog:modal) .compositionViewer {
-    gap: 10px;
+  .compositionViewer {
+    grid-template-areas:
+      "stage"
+      "settings"
+      "details"
+      "guidance";
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(80px, 1fr) auto;
+    grid-template-rows: repeat(4, max-content);
     padding: 10px;
   }
-  /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-  :global(dialog:modal) .settings :global(.palette-group) {
-    flex: 1 1 140px;
-  }
 
-  :global(dialog:modal) .settings :global(.swatches) {
-    display: none;
+  .settings {
+    position: static;
+  }
+  /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
+  .settings :global(.palette-group) {
+    flex: 1 1 140px;
   }
 }

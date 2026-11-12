@@ -1,11 +1,16 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import test from "node:test";
+import { ALL_ATLAS_CATEGORIES } from "../../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { storyboardSchema } from "../../../storyboard/schema/schema";
 import { CONTINUITY_CATALOG, isSceneEntry } from "../../continuityCatalog";
 import { continuityBeatSchema } from "../../continuitySchema";
 import { hasControlPath } from "../../vocabulary/hasControlPath/hasControlPath";
-import { gallerySelectionReducer } from "./gallerySelectionReducer";
+import {
+  countCompositionCategories,
+  filterCompositionEntries,
+  gallerySelectionReducer,
+} from "./gallerySelectionReducer";
 import type { ContinuityVocabularyEntry } from "../../continuityCatalog";
 
 // Scene studies name shot fields instead; sceneStudies.test.ts checks them.
@@ -14,34 +19,21 @@ const CONTINUITY_STUDIES = CONTINUITY_CATALOG.filter(
     entry.family === "vocabulary" && !isSceneEntry(entry),
 );
 const INITIAL_STATE = {
-  selectedId: "qetl-motion",
   family: "films" as const,
-  query: "query",
+  category: ALL_ATLAS_CATEGORIES,
+  query: "",
+  openId: "qetl-motion",
   captions: false,
 };
 
-test("switching families selects that family's first entry and awaits player options", () => {
-  assert.deepEqual(
-    gallerySelectionReducer(INITIAL_STATE, {
-      type: "family",
-      family: "vocabulary",
-    }),
-    {
-      selectedId: "shared-object-handoff",
-      family: "vocabulary",
-      query: "",
-      captions: undefined,
-    },
-  );
-});
-
-test("selecting another entry resets caption state until its own player responds", () => {
-  const selected = gallerySelectionReducer(INITIAL_STATE, {
-    type: "select",
+test("opening another entry resets caption state until its own player responds", () => {
+  const opened = gallerySelectionReducer(INITIAL_STATE, {
+    type: "open",
     id: "qetl-to-product",
   });
-  assert.equal(selected.captions, undefined);
-  const stale = gallerySelectionReducer(selected, {
+  assert.equal(opened.openId, "qetl-to-product");
+  assert.equal(opened.captions, undefined);
+  const stale = gallerySelectionReducer(opened, {
     type: "captions",
     id: "qetl-motion",
     captions: false,
@@ -57,24 +49,59 @@ test("selecting another entry resets caption state until its own player responds
   );
 });
 
-test("reselecting the active entry retains its current live caption choice", () => {
+test("reopening the active entry retains its current live caption choice", () => {
   assert.equal(
-    gallerySelectionReducer(INITIAL_STATE, {
-      type: "select",
-      id: "qetl-motion",
-    }).captions,
+    gallerySelectionReducer(INITIAL_STATE, { type: "open", id: "qetl-motion" })
+      .captions,
     false,
   );
 });
 
-test("unknown entry selection preserves the current screening", () => {
-  assert.deepEqual(
-    gallerySelectionReducer(INITIAL_STATE, {
-      type: "select",
-      id: "missing-film",
-    }),
-    INITIAL_STATE,
+test("unknown or other-section entries leave the open preview unchanged", () => {
+  ["missing-film", "shared-object-handoff"].forEach((id) =>
+    assert.deepEqual(
+      gallerySelectionReducer(INITIAL_STATE, { type: "open", id }),
+      INITIAL_STATE,
+    ),
   );
+});
+
+test("closing the preview forgets its caption state", () => {
+  assert.deepEqual(gallerySelectionReducer(INITIAL_STATE, { type: "close" }), {
+    ...INITIAL_STATE,
+    openId: undefined,
+    captions: undefined,
+  });
+});
+
+test("the visible entries are the section's family, in the chosen category, matching the search", () => {
+  const studies = { ...INITIAL_STATE, family: "vocabulary" as const };
+  const transitions = filterCompositionEntries({
+    ...studies,
+    category: "transitions",
+  });
+  assert.ok(transitions.length > 0);
+  assert.ok(transitions.every((entry) => entry.category === "transitions"));
+  assert.deepEqual(
+    filterCompositionEntries({ ...studies, query: "UNDERLINE" }).map(
+      (entry) => entry.id,
+    ),
+    ["teaching-underline"],
+  );
+  assert.ok(
+    filterCompositionEntries(INITIAL_STATE).every(
+      (entry) => entry.family === "films",
+    ),
+  );
+});
+
+test("each category counts only its own section's entries", () => {
+  const counts = countCompositionCategories("vocabulary");
+  assert.equal(
+    counts.reduce((total, category) => total + category.count, 0),
+    CONTINUITY_CATALOG.filter((entry) => entry.family === "vocabulary").length,
+  );
+  assert.ok(counts.every((category) => category.count > 0));
 });
 
 test("vocabulary links resolve to full films and controls name actual beat schema fields", () => {

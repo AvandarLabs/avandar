@@ -216,7 +216,11 @@ function AtlasSectionRoot() {
   if (section === "motions") {
     return <MotionGallery />;
   }
-  return section === "helpers" ? <HelperGallery /> : <CompositionGallery />;
+  return section === "helpers" ? (
+    <HelperGallery />
+  ) : (
+    <CompositionGallery section={section} />
+  );
 }
 
 const root: HTMLElement | null = document.getElementById("motion-root");

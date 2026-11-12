@@ -246,7 +246,7 @@ The original demo flow, typography, theme, title card, and window chrome are ret
 
 ## Troubleshooting
 
-Use Node 22+ for the combined Avandar workflow. The first render downloads Chrome Headless Shell. The starter Geist font is bundled locally with its SIL Open Font License, so it does not require a font-CDN request. On npm 12, the package manifest allows the pinned `esbuild` and `ffmpeg-static` install scripts.
+Use Node 22+ for the combined Avandar workflow. The first render downloads Chrome Headless Shell. The Avandar brand font, Figtree, is bundled locally with its SIL Open Font License, so it does not require a font-CDN request. On npm 12, the package manifest allows the pinned `esbuild` and `ffmpeg-static` install scripts.
 
 If npm 12 leaves the local FFmpeg binary missing despite `allowScripts`, run `node node_modules/ffmpeg-static/install.js` from this checkout, then retry the command. This installs the project dependency's binary without a global package.
 

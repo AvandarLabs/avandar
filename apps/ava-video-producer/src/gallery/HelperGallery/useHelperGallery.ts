@@ -13,31 +13,34 @@ function _replaceUrl(selection: HelperSelection): void {
   history.replaceState(null, "", buildHelperSearch(selection));
 }
 
-/** Helper selection, filters and neighbours, deep linked through the URL. */
+/** Helper filters, the open preview and its neighbours, deep linked. */
 export function useHelperGallery() {
   const translate = useHelperCopy();
   const [selection, setSelection] = useState(() =>
     getHelperSelectionFromSearch(location.search, HELPER_CATALOG),
   );
-  const selected =
-    HELPER_CATALOG.helpers.find((helper) => helper.id === selection.helperId) ??
-    HELPER_CATALOG.helpers[0];
   const entries = filterHelpers(HELPER_CATALOG.helpers, {
     ...selection,
     translate,
   });
-  const update = (next: HelperSelection) => {
-    setSelection(next);
-    _replaceUrl(next);
+  const open = HELPER_CATALOG.helpers.find(
+    (helper) => helper.id === selection.helperId,
+  );
+  // Browsing a deep-linked helper outside the current filter still works.
+  const browsable = open && !entries.includes(open) ? [open] : entries;
+  const index = open ? browsable.indexOf(open) : -1;
+  const update = (nextSelection: HelperSelection) => {
+    setSelection(nextSelection);
+    _replaceUrl(nextSelection);
   };
-  const index = entries.findIndex((helper) => helper.id === selected.id);
   return {
     selection,
-    selected,
     entries,
-    previous: index > 0 ? entries[index - 1] : undefined,
-    next: index >= 0 ? entries[index + 1] : undefined,
-    select: (helperId: string) => update({ ...selection, helperId }),
+    open,
+    previous: index > 0 ? browsable[index - 1] : undefined,
+    next: index >= 0 ? browsable[index + 1] : undefined,
+    openHelper: (helperId: string) => update({ ...selection, helperId }),
+    close: () => update({ ...selection, helperId: undefined }),
     chooseCategory: (category: string) => update({ ...selection, category }),
     setQuery: (query: string) => setSelection({ ...selection, query }),
   };
