@@ -183,6 +183,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F127 | E2E stability: stable map `updateConfig`, job progress re-render, Featurebase stub, pinned CI runners | PR open: [#321](https://github.com/AvandarLabs/avandar/pull/321) | none | |
 | F128 | Multiple chats, a closed-chat archive, and session titles | not started | F91, F89, F90, F81 to F87, F94, F57 | |
 | F129 | Data dictionaries: entries and reusable two-way code lists under Data Sources | not started | none | |
+| F130 | Learn a data dictionary from datasets: profiling, matching, and suggested labels online and offline | not started | F129 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -319,6 +320,7 @@ API. It's new work, not something this branch built.
 | any, before F35 | F127 | PR #321 is open and fixes bugs that are on `develop`. F35's `aad4d700d` later splits `useHydratedMapSources.ts`, so F35 is easier to port once this is in. |
 | after F91, F94, F57 | F128 | Makes F91's tray and the thread per session, adds tabs to F94's panel header, and starts a case-design session from F57's New case type controls. Its title excerpt masks F89 and F90's mention tokens. |
 | any | F129 | Adds its own tables, models, clients, route, and view, so it can merge first. It edits `DataManagerApp.tsx`, `DatasetNavbar.tsx`, and the generated schema files, so take only its hunks if F20 or F121 landed first. |
+| after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. Changes the save RPC's pair check (migration). Deploy the migration, then the `chat` edge function, then the frontend. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -10531,6 +10533,123 @@ pnpm vitest run src/views/DataManagerApp shared/models/dataDictionaries src/clie
 pnpm tsc -b --force
 pnpm test:db
 pnpm i18n:check
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e csv-import.spec.ts
+```
+
+---
+
+## F130: Learn a data dictionary from datasets
+
+Status: not started. Built on `feat/dictionary-inference`, branched from
+`demo/measles` at `5516a9e6e`. No PR is open.
+
+**Purpose:** A team creates a data dictionary from one or more datasets in four
+steps: Pick datasets, Review columns, Label values, and Save. Coded and ordered
+columns are found on the device, columns that match across datasets are merged
+into one entry, and labels are suggested online or by the offline model. Only
+column names and the values of short coded columns are ever sent. Review shows
+each entry as "Needs labels" or "Description", and Label values has a
+full-height flank headed "Code lists to label" with an "X of Y done" count.
+Focus moves to the step heading when the step changes. Keep apart is
+remembered, so a meaning match that arrives late never rejoins columns the user
+split. A list that cannot get suggestions says why (`getLabelsBlockReason`:
+personal, code too long, or too large for the model). The consent result is
+`approved`, `declined`, `ack_missing`, or `edited`. A save that fails after the
+dictionary row was created deletes it again, and reports
+`DictionaryLeftBehindError` if even that fails. On-device requests fit the
+8,192-token window, and the date sample is the same on every profile.
+
+**Value:** A team no longer types a code list by hand. It reads what its
+datasets already use, labels the values once, and saves a dictionary that other
+datasets can use.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md`. The task plan is
+`docs/measles-demo/data-dictionaries-2-inference-plan.md`.
+
+**PR title:** `feat(data-dictionaries): learn a dictionary from datasets`
+
+**Depends on:** F129.
+
+**Files, by area** (`NewDictionaryFromDatasetsView/` is
+`src/views/DataManagerApp/NewDictionaryFromDatasetsView/`):
+
+- Docs: the plan and the design in `docs/measles-demo/`
+  (`c04ba61f7`, `16500c850`, `e129ff5e5`, `0ca89d343`), and this log.
+- Save RPC schema, migration, desktop twin, and pgTAP (`85ebdc88e`):
+  `supabase/schemas/50.rpc_data_dictionaries__save.sql`,
+  `supabase/migrations/20261112201046_data_dictionaries_blank_labels.sql`,
+  `apps/desktop/migrations/20261112201046_data_dictionaries_blank_labels.gen.sql`,
+  and `supabase/tests/database/data_dictionaries/rpc_data_dictionaries__save.test.sql`.
+- Slice 1 changed for blank labels (`1dd448967`, `c13c23137`):
+  `DataDictionaryModule` (`findDraftWarnings`), the code list parsers,
+  `useDictionaryCopy.ts`, `CodeListEditor/`, and `DictionaryEntriesTab/` mark a
+  value "Needs a label" without blocking Save.
+- Shared models (`eb5a1d0dc`, `301d160d6`, `b6de24b37`, `93ae735a2`,
+  `95d251232`, `6d2929ff0`, `9e27c69f9`, `d6b4dd5b4`, `7dd21b046`, `d28401d6c`):
+  `shared/models/dataDictionaries/ColumnProfile/` and
+  `shared/models/dataDictionaries/DictionaryProposal/` (clustering, shared code
+  lists, the save draft, and the review edits).
+- Suggestions prompt and the `chat` route (`0fefb48c6`, `9988d01ae`,
+  `bcd7ef0d0`, `c0702775f`, `7e28f1fe4`, `e245efbe0`, `0485db5ed`, `e3e018a33`):
+  `shared/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts`,
+  `supabase/functions/chat/PostDictionarySuggestions/`, `ChatRoutes.ts`,
+  `ChatRoutes.types.ts`, and `supabase/functions/chat/deno.json` (the `uuid`
+  entry the prompt's imports need, without which the whole `chat` function
+  fails to boot).
+- Profiling and suggestions libraries (`1df554069`, `620305730`, `19fc3b528`,
+  `151f6e8d4`, `faa20cc5e`, `730e17cb8`, `7683b6501`, `931a5dcb1`, `fc3ac948c`):
+  `src/lib/dataDictionaries/` (`profileDatasetColumns`, `ColumnProfileSql`,
+  `DictionarySuggestions`), `useIsMounted.ts`, and `resolveChatRuntimeMode.ts`.
+- Consent context (`620305730`): `dictionary_suggestions` in
+  `ConsentAuditEntry.constants.ts`, `decideIfDataCanCrossBoundary.tsx`, and
+  `ConsentLogPanel.tsx`.
+- Create flow view (`cd6d25328`, `d33a6491e`, `3e19ea548`, `d2330bc58`,
+  `ae8c0a965`, `583d461f8`, `03c38daaa`, `82dfaebc9`, `d8c2888d6`, `b41950d2a`,
+  `3fcba873e`, `a482b13c9`, `6ed86bd2a`, `d44e43d05`, `c37c915c5`, `b183467f8`,
+  `ec26ed15c`, `4e10c05a4`, `c1fe425ab`, `064e89ba5`, `32cd7c8f2`, `7f37dac18`):
+  `NewDictionaryFromDatasetsView/` (the reducer, the read, suggest, and save
+  hooks, and the four step folders), the
+  `dictionaries/new` route, `AppLinks.tsx`, and the generated `routeTree.gen.ts`.
+- Data Sources entry points (`4ff06c4ca`, `cdcbda201`): `NewDictionaryMenu.tsx`
+  and `ListToggleButton.tsx` in `DataManagerToolbarActions/`,
+  `useListPaneToggle/`, `DataManagerApp.tsx`, and
+  `DatasetActionsMenu/CreateDictionaryMenuItem.tsx`.
+- E2E and fixture (`4ff06c4ca`, `9163c3405`):
+  `tests/e2e/dictionary-create-from-dataset.spec.ts` (new),
+  `tests/e2e/data-dictionary-edit.spec.ts` (through the New dictionary menu),
+  `tests/e2e/helpers/constants.ts`, and
+  `tests/data/measles-line-list-small/measles-line-list-small.csv`.
+- Translations (`4c8886f20`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
+
+**Schema:** yes, one migration (`data_dictionaries_blank_labels`) that replaces
+`data_dictionaries__check_pairs` so a value may be saved with a blank label
+(label uniqueness ignores blanks, and a blank code is still refused), plus its
+desktop SQLite twin. No table, column, or policy changes.
+
+**Deploy:** the migration first (the frontend saves blank labels, which the old
+function refuses), then the `chat` edge function (new route
+`/:workspaceId/dictionary-suggestions/:promptId`, which requires an ack token,
+so the frontend must ship with or after it), then the frontend.
+
+**Known gaps:** applying a dictionary and hiding the dataset menu item once one
+is applied are slice 3. Add from datasets into an existing dictionary is a
+separate small piece after slice 3 and will update "Made from". Slice 4 must
+decide what a blank-label value does in each conversion direction.
+
+**Verification:**
+```sh
+ava supabase status
+pnpm lint
+pnpm exec tsc -b --force --noEmit && pnpm type-check:deno
+pnpm test:frontend
+pnpm vitest run --config vitest.executed.config.ts src/lib/dataDictionaries
+pnpm test:db
+ava supabase migrations validate
+pnpm desktop:sqlite:gen-migrations
+pnpm i18n:check
+pnpm test:e2e dictionary-create-from-dataset.spec.ts
 pnpm test:e2e data-dictionary-edit.spec.ts
 pnpm test:e2e csv-import.spec.ts
 ```
