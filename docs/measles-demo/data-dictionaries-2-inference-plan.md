@@ -6004,6 +6004,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ### Task 12: Reading, suggesting, and saving
 
+**As built (review fixes).** The code in the shipped hooks differs from the blocks below in these ways, and Tasks 13 to 18 follow the shipped code: `datasets_read` and `meaning_matches_found` carry `datasetIds` and the reducer drops a reply for datasets that are no longer current (`isSameDatasetSet`); `origin_dataset_unavailable` returns to an empty Pick; `useReadDatasets` passes `onRead(proposal, datasets)` and `useMeaningMatches` passes `onFound(matches, proposal)`; both hooks and `useSuggestLabels` take a `model`, `useDictionarySuggestions` returns it, and `makeLabelsRequestFromCodeList` and `makeMatchesRequestFromProposal` take it to fit the offline model's context window; `approveRequest` returns `{ type: "approved" | "declined" | "ack_missing" }`; `useSuggestLabels` and the flow expose `canSuggestLabels(codeList)`; `createDictionaryFromDraft` throws `DictionaryLeftBehindError` when it cannot remove an empty dictionary; and the flow ignores work that finishes after it unmounts and a second save press in one frame.
+
 The hooks that connect the reducer to the outside world: the datasets to pick from, reading them on the device, the two kinds of AI suggestions, and saving. `createDictionaryFromDraft` holds the one piece with real failure handling, so it is a plain function with its own test. `useDictionarySuggestions` holds the consent rules, so it gets its own test too:
 
 | Model | `suggestionConsent` | What a send does |
@@ -8233,6 +8235,9 @@ function _renderStep(
       selectedCodeListKey={GENDER_LIST?.key}
       suggestionAvailability={suggestionAvailability}
       suggestingCodeListKey={undefined}
+      canSuggestLabels={() => {
+        return true;
+      }}
       dispatch={dispatch}
       onSuggest={onSuggest}
     />,
@@ -8832,11 +8837,9 @@ export function LabelValuesFooter({ selectedKey, dispatch }: Readonly<Props>): R
 `LabelValuesStep.tsx`:
 
 ```tsx
-import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
-import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import { CodeListLabelsPane } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListLabelsPane";
 import { CodeListsToLabelNav } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListsToLabelNav";
 import { LabelValuesFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter";
@@ -8852,6 +8855,8 @@ type Props = {
   selectedCodeListKey: string | undefined;
   suggestionAvailability: DictionarySuggestionAvailability;
   suggestingCodeListKey: string | undefined;
+  /** Whether a list's values can be sent for suggestions at all. */
+  canSuggestLabels: (codeList: DictionaryProposal.CodeList) => boolean;
   dispatch: Dispatch<NewDictionaryAction>;
   onSuggest: (codeList: DictionaryProposal.CodeList) => void;
 };
@@ -8863,7 +8868,6 @@ type Props = {
  */
 export function LabelValuesStep(props: Readonly<Props>): ReactNode {
   const { proposal, labels, dispatch } = props;
-  const { i18n } = useLingui();
   const { codeLists } = useMemo(() => {
     return DictionaryProposal.getCodings(proposal);
   }, [proposal]);
@@ -8871,13 +8875,7 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
     codeLists.find((codeList) => {
       return codeList.key === props.selectedCodeListKey;
     }) ?? codeLists[0];
-  const canSuggest = selected
-    ? DictionarySuggestions.makeLabelsRequestFromCodeList({
-        proposal,
-        codeList: selected,
-        locale: i18n.locale,
-      }) !== undefined
-    : false;
+  const canSuggest = selected ? props.canSuggestLabels(selected) : false;
 
   return (
     <AppViewBody>
@@ -9403,6 +9401,7 @@ const DATASET_ID = uuid<Dataset.Id>();
 const READ_STATE = newDictionaryReducer(makeInitialNewDictionaryState(undefined), {
   type: "datasets_read",
   proposal: DictionaryProposal.fromColumnProfiles([]),
+  datasetIds: [],
   defaultName: "Codes",
 });
 
@@ -9675,6 +9674,7 @@ export function ProposalStepBody({
         selectedCodeListKey={state.selectedCodeListKey}
         suggestionAvailability={flow.suggestionAvailability}
         suggestingCodeListKey={flow.suggestingCodeListKey}
+        canSuggestLabels={flow.canSuggestLabels}
         dispatch={dispatch}
         onSuggest={flow.suggestLabels}
       />
