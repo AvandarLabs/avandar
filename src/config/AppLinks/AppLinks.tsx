@@ -148,6 +148,19 @@ export const AppLinks = {
       isAvailableOffline: true,
     };
   },
+  dataManagerNewDictionary: (workspaceSlug: string) => {
+    return {
+      key: "data-manager-new-dictionary",
+      to: "/$workspaceSlug/data-manager/dictionaries/new",
+      params: { workspaceSlug },
+      label: (): string => {
+        return t`New dictionary`;
+      },
+      // Reading datasets and labeling work offline. Only saving needs a
+      // connection, and the Save step gates that button itself.
+      isAvailableOffline: true,
+    };
+  },
   dataImport: (workspaceSlug: string) => {
     return {
       key: "dataImport",

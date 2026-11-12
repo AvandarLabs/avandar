@@ -48,6 +48,7 @@ import { Route as AuthWorkspaceSlugDSlugOrIdRouteImport } from "./routes/_auth/$
 import { Route as AuthWorkspaceSlugIndividualManagerConceptIdRouteRouteImport } from "./routes/_auth/$workspaceSlug/individual-manager/$conceptId/route";
 import { Route as AuthWorkspaceSlugIndividualManagerConceptIdIndexRouteImport } from "./routes/_auth/$workspaceSlug/individual-manager/$conceptId/index";
 import { Route as AuthWorkspaceSlugIndividualManagerConceptIdIndividualIdRouteImport } from "./routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId";
+import { Route as AuthWorkspaceSlugDataManagerDictionariesNewRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/dictionaries/new";
 import { Route as AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId";
 import { Route as AuthWorkspaceSlugDashboardsPreviewDashboardIdRouteImport } from "./routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId";
 import { Route as AuthWorkspaceSlugDashboardsEditDashboardIdRouteImport } from "./routes/_auth/$workspaceSlug/dashboards/edit/$dashboardId";
@@ -274,6 +275,12 @@ const AuthWorkspaceSlugIndividualManagerConceptIdIndividualIdRoute =
     path: "/$individualId",
     getParentRoute: () => AuthWorkspaceSlugIndividualManagerConceptIdRouteRoute,
   } as any);
+const AuthWorkspaceSlugDataManagerDictionariesNewRoute =
+  AuthWorkspaceSlugDataManagerDictionariesNewRouteImport.update({
+    id: "/dictionaries/new",
+    path: "/dictionaries/new",
+    getParentRoute: () => AuthWorkspaceSlugDataManagerRouteRoute,
+  } as any);
 const AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute =
   AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRouteImport.update({
     id: "/dictionaries/$dictionaryId",
@@ -332,6 +339,7 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/dashboards/edit/$dashboardId": typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
   "/$workspaceSlug/dashboards/preview/$dashboardId": typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
   "/$workspaceSlug/data-manager/dictionaries/$dictionaryId": typeof AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute;
+  "/$workspaceSlug/data-manager/dictionaries/new": typeof AuthWorkspaceSlugDataManagerDictionariesNewRoute;
   "/$workspaceSlug/individual-manager/$conceptId/$individualId": typeof AuthWorkspaceSlugIndividualManagerConceptIdIndividualIdRoute;
   "/$workspaceSlug/individual-manager/$conceptId/": typeof AuthWorkspaceSlugIndividualManagerConceptIdIndexRoute;
 }
@@ -367,6 +375,7 @@ export interface FileRoutesByTo {
   "/$workspaceSlug/dashboards/edit/$dashboardId": typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
   "/$workspaceSlug/dashboards/preview/$dashboardId": typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
   "/$workspaceSlug/data-manager/dictionaries/$dictionaryId": typeof AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute;
+  "/$workspaceSlug/data-manager/dictionaries/new": typeof AuthWorkspaceSlugDataManagerDictionariesNewRoute;
   "/$workspaceSlug/individual-manager/$conceptId/$individualId": typeof AuthWorkspaceSlugIndividualManagerConceptIdIndividualIdRoute;
   "/$workspaceSlug/individual-manager/$conceptId": typeof AuthWorkspaceSlugIndividualManagerConceptIdIndexRoute;
 }
@@ -412,6 +421,7 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/dashboards/edit/$dashboardId": typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
   "/_auth/$workspaceSlug/dashboards/preview/$dashboardId": typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
   "/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId": typeof AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute;
+  "/_auth/$workspaceSlug/data-manager/dictionaries/new": typeof AuthWorkspaceSlugDataManagerDictionariesNewRoute;
   "/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId": typeof AuthWorkspaceSlugIndividualManagerConceptIdIndividualIdRoute;
   "/_auth/$workspaceSlug/individual-manager/$conceptId/": typeof AuthWorkspaceSlugIndividualManagerConceptIdIndexRoute;
 }
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/dashboards/edit/$dashboardId"
     | "/$workspaceSlug/dashboards/preview/$dashboardId"
     | "/$workspaceSlug/data-manager/dictionaries/$dictionaryId"
+    | "/$workspaceSlug/data-manager/dictionaries/new"
     | "/$workspaceSlug/individual-manager/$conceptId/$individualId"
     | "/$workspaceSlug/individual-manager/$conceptId/";
   fileRoutesByTo: FileRoutesByTo;
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/dashboards/edit/$dashboardId"
     | "/$workspaceSlug/dashboards/preview/$dashboardId"
     | "/$workspaceSlug/data-manager/dictionaries/$dictionaryId"
+    | "/$workspaceSlug/data-manager/dictionaries/new"
     | "/$workspaceSlug/individual-manager/$conceptId/$individualId"
     | "/$workspaceSlug/individual-manager/$conceptId";
   id:
@@ -535,6 +547,7 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/dashboards/edit/$dashboardId"
     | "/_auth/$workspaceSlug/dashboards/preview/$dashboardId"
     | "/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId"
+    | "/_auth/$workspaceSlug/data-manager/dictionaries/new"
     | "/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId"
     | "/_auth/$workspaceSlug/individual-manager/$conceptId/";
   fileRoutesById: FileRoutesById;
@@ -824,6 +837,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthWorkspaceSlugIndividualManagerConceptIdIndividualIdRouteImport;
       parentRoute: typeof AuthWorkspaceSlugIndividualManagerConceptIdRouteRoute;
     };
+    "/_auth/$workspaceSlug/data-manager/dictionaries/new": {
+      id: "/_auth/$workspaceSlug/data-manager/dictionaries/new";
+      path: "/dictionaries/new";
+      fullPath: "/$workspaceSlug/data-manager/dictionaries/new";
+      preLoaderRoute: typeof AuthWorkspaceSlugDataManagerDictionariesNewRouteImport;
+      parentRoute: typeof AuthWorkspaceSlugDataManagerRouteRoute;
+    };
     "/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId": {
       id: "/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId";
       path: "/dictionaries/$dictionaryId";
@@ -874,6 +894,7 @@ interface AuthWorkspaceSlugDataManagerRouteRouteChildren {
   AuthWorkspaceSlugDataManagerDataImportRoute: typeof AuthWorkspaceSlugDataManagerDataImportRoute;
   AuthWorkspaceSlugDataManagerIndexRoute: typeof AuthWorkspaceSlugDataManagerIndexRoute;
   AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute: typeof AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute;
+  AuthWorkspaceSlugDataManagerDictionariesNewRoute: typeof AuthWorkspaceSlugDataManagerDictionariesNewRoute;
 }
 
 const AuthWorkspaceSlugDataManagerRouteRouteChildren: AuthWorkspaceSlugDataManagerRouteRouteChildren =
@@ -886,6 +907,8 @@ const AuthWorkspaceSlugDataManagerRouteRouteChildren: AuthWorkspaceSlugDataManag
       AuthWorkspaceSlugDataManagerIndexRoute,
     AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute:
       AuthWorkspaceSlugDataManagerDictionariesDictionaryIdRoute,
+    AuthWorkspaceSlugDataManagerDictionariesNewRoute:
+      AuthWorkspaceSlugDataManagerDictionariesNewRoute,
   };
 
 const AuthWorkspaceSlugDataManagerRouteRouteWithChildren =

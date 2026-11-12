@@ -21,3 +21,16 @@ describe("AppLinks map destinations", () => {
     expect(mapEditorLink.label()).toBe("Map");
   });
 });
+
+describe("AppLinks learn-a-dictionary destination", () => {
+  it("points at the create route and works offline", () => {
+    const link = AppLinks.dataManagerNewDictionary("workspace-slug");
+
+    expect(link).toMatchObject({
+      to: "/$workspaceSlug/data-manager/dictionaries/new",
+      params: { workspaceSlug: "workspace-slug" },
+      isAvailableOffline: true,
+    });
+    expect(link.label()).toBe("New dictionary");
+  });
+});
