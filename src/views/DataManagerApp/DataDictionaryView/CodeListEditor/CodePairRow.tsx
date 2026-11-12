@@ -7,7 +7,7 @@ import css from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeLi
 import { CodePairDragHandle } from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairDragHandle";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 
 /** A pair's validation problem, with the copy that explains it. */
 export type CodePairIssue = {
@@ -163,39 +163,28 @@ function CodePairFields(props: Readonly<FieldsProps>): ReactNode {
   );
 }
 
-/**
- * One value in a code list: its code, a two-way arrow, its label, the other
- * spellings that also mean it, and whether it stands for a missing answer.
- * Every control is named after its row number, so a screen reader user
- * knows which value they are in.
- */
-export function CodePairRow(props: Readonly<Props>): ReactNode {
-  const { sortableId, pair, index, isOrdered, canEdit, issue } = props;
+type BodyProps = Props & {
+  liRef?: Ref<HTMLLIElement>;
+  isDragging: boolean;
+  hasHandle: boolean;
+  renderHandle: (valueName: string) => ReactNode;
+};
+
+function CodePairRowBody(props: Readonly<BodyProps>): ReactNode {
+  const { pair, index, canEdit, issue, liRef, isDragging } = props;
   const { t } = useLingui();
-  const { ref, handleRef, isDragging } = useSortable({
-    id: sortableId,
-    index,
-    disabled: !isOrdered || !canEdit,
-  });
   const rowNumber = index + 1;
   const valueName = pair.label.trim() || t`value ${rowNumber}`;
 
   return (
     <li
-      ref={ref}
+      ref={liRef}
       className={css.codeListEditorRow}
       data-dragging={isDragging}
+      data-has-handle={props.hasHandle}
       aria-label={valueName}
     >
-      {isOrdered && canEdit ? (
-        <CodePairDragHandle
-          valueName={valueName}
-          handleRef={handleRef}
-          isDragging={isDragging}
-          shouldFocus={props.shouldFocusHandle}
-          onMoveByOffset={props.onMoveByOffset}
-        />
-      ) : null}
+      {props.renderHandle(valueName)}
       <CodePairFields
         pair={pair}
         canEdit={canEdit}
@@ -216,5 +205,59 @@ export function CodePairRow(props: Readonly<Props>): ReactNode {
         </Text>
       ) : null}
     </li>
+  );
+}
+
+/** A row of an ordered list that can be edited, so it can be reordered. */
+function SortableCodePairRow(props: Readonly<Props>): ReactNode {
+  const { ref, handleRef, isDragging } = useSortable({
+    id: props.sortableId,
+    index: props.index,
+  });
+
+  return (
+    <CodePairRowBody
+      {...props}
+      liRef={ref}
+      isDragging={isDragging}
+      hasHandle
+      renderHandle={(valueName) => {
+        return (
+          <CodePairDragHandle
+            valueName={valueName}
+            handleRef={handleRef}
+            isDragging={isDragging}
+            shouldFocus={props.shouldFocusHandle}
+            onMoveByOffset={props.onMoveByOffset}
+          />
+        );
+      }}
+    />
+  );
+}
+
+/**
+ * One value in a code list: its code, a two-way arrow, its label, the other
+ * spellings that also mean it, and whether it stands for a missing answer.
+ * Every control is named after its row number, so a screen reader user
+ * knows which value they are in.
+ *
+ * Only rows that can be reordered register as sortable. A sortable row
+ * without a drag handle would make its whole `li` a focusable button around
+ * the inputs, so the other rows stay plain list items.
+ */
+export function CodePairRow(props: Readonly<Props>): ReactNode {
+  if (props.isOrdered && props.canEdit) {
+    return <SortableCodePairRow {...props} />;
+  }
+  return (
+    <CodePairRowBody
+      {...props}
+      isDragging={false}
+      hasHandle={false}
+      renderHandle={() => {
+        return null;
+      }}
+    />
   );
 }

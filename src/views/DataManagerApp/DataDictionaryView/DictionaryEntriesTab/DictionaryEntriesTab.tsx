@@ -143,7 +143,7 @@ export function DictionaryEntriesTab(props: Readonly<Props>): ReactNode {
   } = useEntriesTabState({ draft, onDraftChange });
 
   return (
-    <div className={css.dictionaryEntriesTab}>
+    <div className={css.dictionaryEntriesTab} data-has-pane={!!selected}>
       <Stack gap="sm" miw={0}>
         <DictionaryEntriesToolbar
           filter={filter}

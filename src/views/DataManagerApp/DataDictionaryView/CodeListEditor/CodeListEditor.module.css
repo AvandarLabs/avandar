@@ -8,13 +8,19 @@
 }
 
 /*
- * One value is a grid so the inputs line up across rows. When the list is
- * unordered there is no handle, so the first track collapses to zero width.
+ * One value is a grid so the inputs line up across rows. Only rows with a
+ * drag handle have the first track, so an unordered row starts at the code.
  */
 .codeListEditorRow {
   align-items: center;
   display: grid;
   gap: var(--mantine-spacing-xs);
+  grid-template-columns:
+    7rem auto minmax(8rem, 1fr) minmax(8rem, 1fr)
+    auto auto;
+}
+
+.codeListEditorRow[data-has-handle="true"] {
   grid-template-columns:
     auto 7rem auto minmax(8rem, 1fr)
     minmax(8rem, 1fr) auto auto;
@@ -25,6 +31,10 @@
 }
 
 .codeListEditorRowIssue {
+  grid-column: 1 / -1;
+}
+
+.codeListEditorRow[data-has-handle="true"] .codeListEditorRowIssue {
   grid-column: 2 / -1;
 }
 

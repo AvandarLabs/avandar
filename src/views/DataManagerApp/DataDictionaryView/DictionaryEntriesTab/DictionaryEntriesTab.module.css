@@ -5,7 +5,11 @@
 .dictionaryEntriesTab {
   display: grid;
   gap: var(--mantine-spacing-lg);
-  grid-template-columns: minmax(0, 1fr) 22rem;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+}
+
+.dictionaryEntriesTab[data-has-pane="false"] {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .dictionaryEntriesTabPane {

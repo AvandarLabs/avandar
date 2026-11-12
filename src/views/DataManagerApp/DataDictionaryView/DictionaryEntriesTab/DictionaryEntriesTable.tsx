@@ -39,6 +39,7 @@ function DictionaryEntryRow({
       <Table.Td>
         <UnstyledButton
           fw={500}
+          fz="sm"
           aria-current={isSelected || undefined}
           onClick={() => {
             onSelect(entry.id);
@@ -95,16 +96,16 @@ export function DictionaryEntriesTable({
     <Table highlightOnHover layout="fixed" verticalSpacing="xs">
       <Table.Thead>
         <Table.Tr>
-          <Table.Th w={160}>
+          <Table.Th w="24%">
             <Trans>Entry</Trans>
           </Table.Th>
-          <Table.Th w={190}>
+          <Table.Th w="26%">
             <Trans>Also matches columns named</Trans>
           </Table.Th>
-          <Table.Th w={170}>
+          <Table.Th w="22%">
             <Trans>Kind and values</Trans>
           </Table.Th>
-          <Table.Th>
+          <Table.Th w="28%">
             <Trans>Description</Trans>
           </Table.Th>
         </Table.Tr>
