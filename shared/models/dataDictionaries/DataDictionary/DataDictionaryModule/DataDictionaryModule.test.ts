@@ -120,6 +120,55 @@ describe("DataDictionary.toDraft", () => {
   });
 });
 
+describe("DataDictionary.toDraft coding tiebreak", () => {
+  it("orders non-primary codings by code list id", () => {
+    const entryId = uuid<DataDictionaryEntry.Id>();
+    const listA =
+      "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" as DataDictionaryCodeList.Id;
+    const listB =
+      "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" as DataDictionaryCodeList.Id;
+    const entry: DataDictionaryEntry.T = Model.make("DataDictionaryEntry", {
+      id: entryId,
+      workspaceId: WORKSPACE_ID,
+      dictionaryId: DICTIONARY_ID,
+      name: "sex",
+      columnNames: ["GENDER"],
+      kind: "categorical",
+      unit: undefined,
+      validMin: undefined,
+      validMax: undefined,
+      description: undefined,
+      position: 0,
+      createdAt: NOW,
+      updatedAt: NOW,
+    });
+    const codings = [listB, listA].map((codeListId) => {
+      return Model.make("DataDictionaryEntryCoding", {
+        id: uuid<DataDictionaryEntryCoding.Id>(),
+        workspaceId: WORKSPACE_ID,
+        dictionaryId: DICTIONARY_ID,
+        entryId,
+        codeListId,
+        isPrimary: false,
+        createdAt: NOW,
+        updatedAt: NOW,
+      });
+    });
+
+    const draft = DataDictionary.toDraft({
+      entries: [entry],
+      codeLists: [],
+      codings,
+    });
+
+    expect(
+      draft.entries[0]?.codings.map((coding) => {
+        return coding.codeListId;
+      }),
+    ).toEqual([listA, listB]);
+  });
+});
+
 describe("DataDictionary.findDraftIssues", () => {
   it("returns nothing for a valid draft", () => {
     const list = _listDraft();

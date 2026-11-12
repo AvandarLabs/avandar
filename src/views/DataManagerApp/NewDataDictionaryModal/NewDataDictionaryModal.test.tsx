@@ -2,8 +2,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { NewDataDictionaryModal } from "@/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal";
 
-const { insertMock, navigateMock } = vi.hoisted(() => {
-  return { insertMock: vi.fn(), navigateMock: vi.fn() };
+const { insertMock, navigateMock, onlineState } = vi.hoisted(() => {
+  return {
+    insertMock: vi.fn(),
+    navigateMock: vi.fn(),
+    onlineState: { isOnline: true },
+  };
+});
+
+vi.mock("@/lib/hooks/browser/useIsOnline/useIsOnline", () => {
+  return {
+    useIsOnline: () => {
+      return onlineState.isOnline;
+    },
+  };
 });
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
@@ -62,6 +74,7 @@ vi.mock(
 describe("NewDataDictionaryModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    onlineState.isOnline = true;
   });
 
   it("creates a dictionary owned by the current profile and opens it", async () => {
@@ -97,5 +110,27 @@ describe("NewDataDictionaryModal", () => {
     expect(
       screen.getByRole("button", { name: "Create dictionary" }),
     ).toBeDisabled();
+  });
+
+  it("clears the fields when the modal is cancelled", () => {
+    const onClose = vi.fn();
+    render(<NewDataDictionaryModal opened onClose={onClose} />);
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: { value: "Draft name" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onClose).toHaveBeenCalled();
+    expect(screen.getByLabelText("Name")).toHaveValue("");
+  });
+
+  it("does not submit while offline", () => {
+    onlineState.isOnline = false;
+    render(<NewDataDictionaryModal opened onClose={vi.fn()} />);
+    const nameInput = screen.getByLabelText("Name");
+    fireEvent.change(nameInput, { target: { value: "NYS codes" } });
+    fireEvent.submit(nameInput.closest("form")!);
+
+    expect(insertMock).not.toHaveBeenCalled();
   });
 });

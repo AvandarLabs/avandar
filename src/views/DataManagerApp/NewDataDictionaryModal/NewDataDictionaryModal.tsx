@@ -15,6 +15,7 @@ import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -36,12 +37,16 @@ export function NewDataDictionaryModal({
   const [userProfile] = useCurrentUserProfile();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const isOnline = useIsOnline();
+  const handleClose = (): void => {
+    setName("");
+    setDescription("");
+    onClose();
+  };
   const [insertDictionary, isInserting] = DataDictionaryClient.useInsert({
     queryToInvalidate: DataDictionaryClient.QueryKeys.getAll(),
     onSuccess: (dictionary) => {
-      onClose();
-      setName("");
-      setDescription("");
+      handleClose();
       const link = AppLinks.dataManagerDictionaryView({
         workspaceSlug: workspace.slug,
         dictionaryId: dictionary.id,
@@ -53,7 +58,7 @@ export function NewDataDictionaryModal({
   const trimmedName = name.trim();
 
   const handleSubmit = (): void => {
-    if (!userProfile || trimmedName === "") {
+    if (!isOnline || !userProfile || trimmedName === "") {
       return;
     }
     insertDictionary({
@@ -68,7 +73,7 @@ export function NewDataDictionaryModal({
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title={t`New dictionary`}>
+    <Modal opened={opened} onClose={handleClose} title={t`New dictionary`}>
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -97,7 +102,7 @@ export function NewDataDictionaryModal({
             rows={3}
           />
           <Group justify="flex-end" gap="sm">
-            <Button variant="default" onClick={onClose}>
+            <Button variant="default" onClick={handleClose}>
               <Trans>Cancel</Trans>
             </Button>
             <OfflineGated>

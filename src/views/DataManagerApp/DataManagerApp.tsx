@@ -28,9 +28,9 @@ export function DataManagerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-  const [allDictionaries] = DataDictionaryClient.useGetAll(
-    where("workspace_id", "eq", workspace.id),
-  );
+  const [allDictionaries, isLoadingDictionaries] =
+    DataDictionaryClient.useGetAll(where("workspace_id", "eq", workspace.id));
+  const isLoading = isLoadingDatasets || isLoadingDictionaries;
   const canEditDictionaries = useHasPermission(
     "data_sources__can_edit_dictionaries",
   );
@@ -41,8 +41,7 @@ export function DataManagerApp(): JSX.Element {
   const isOnHome = Boolean(matchRoute({ to: "/$workspaceSlug/data-manager" }));
   const hasListItems =
     (allDatasets ?? []).length + (allDictionaries ?? []).length > 0;
-  const phonePane =
-    isOnHome && (isLoadingDatasets || hasListItems) ? "list" : "detail";
+  const phonePane = isOnHome && (isLoading || hasListItems) ? "list" : "detail";
 
   return (
     <AppSlate
@@ -88,7 +87,7 @@ export function DataManagerApp(): JSX.Element {
       >
         <DatasetNavbar
           className={css.dataManagerAppList}
-          isLoading={isLoadingDatasets}
+          isLoading={isLoading}
           datasets={allDatasets ?? []}
           dictionaries={allDictionaries ?? []}
         />

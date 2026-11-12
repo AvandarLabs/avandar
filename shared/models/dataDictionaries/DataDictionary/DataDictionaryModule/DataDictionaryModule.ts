@@ -114,6 +114,14 @@ function makeNewCodeList(
   };
 }
 
+/** Orders two ids by code unit, so the order never depends on locale. */
+function _compareIds(idA: string, idB: string): number {
+  if (idA < idB) {
+    return -1;
+  }
+  return idA > idB ? 1 : 0;
+}
+
 function _toCodingDrafts(
   codings: ReadonlyArray<DataDictionaryEntryCodingModel["Read"]>,
 ): DataDictionaryEntryCodingDraft[] {
@@ -121,7 +129,7 @@ function _toCodingDrafts(
     .sort((codingA, codingB) => {
       return (
         Number(codingB.isPrimary) - Number(codingA.isPrimary) ||
-        codingA.codeListId.localeCompare(codingB.codeListId)
+        _compareIds(codingA.codeListId, codingB.codeListId)
       );
     })
     .map((coding) => {

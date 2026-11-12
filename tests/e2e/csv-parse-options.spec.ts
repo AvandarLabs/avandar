@@ -188,7 +188,7 @@ test.describe("CSV parsing options", () => {
     });
 
     await page.goto(`/${workspaceSlug}/data-manager/data-import`);
-    await expect(page.getByText("No datasets yet")).toBeVisible({
+    await expect(page.getByText("No data yet")).toBeVisible({
       timeout: MEDIUM_WAIT,
     });
 
