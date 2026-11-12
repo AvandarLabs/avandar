@@ -24,6 +24,8 @@ type Props = {
   canEdit: boolean;
   /** Focuses the drag handle when the row mounts, after a reorder. */
   shouldFocusHandle: boolean;
+  /** Called once the handle has taken focus, so the request is not reused. */
+  onHandleFocused: () => void;
   issue: CodePairIssue | undefined;
   onChange: (pair: DataDictionaryCodeList.Pair) => void;
   onRemove: () => void;
@@ -228,6 +230,7 @@ function SortableCodePairRow(props: Readonly<Props>): ReactNode {
             handleRef={handleRef}
             isDragging={isDragging}
             shouldFocus={props.shouldFocusHandle}
+            onFocused={props.onHandleFocused}
             onMoveByOffset={props.onMoveByOffset}
           />
         );

@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DictionaryCodeListsTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
+import type { ReactNode } from "react";
 
 /** jsdom has no `document.fonts`, which autosize textareas listen to. */
 beforeAll(() => {
@@ -122,5 +124,58 @@ describe("DictionaryCodeListsTab", () => {
       />,
     );
     expect(screen.getByText(/No code lists yet/)).toBeInTheDocument();
+  });
+
+  it("does not move focus to a handle when another ordered list opens after a reorder", () => {
+    const pairs = ["Low", "High"].map((label, index) => {
+      return {
+        code: String(index + 1),
+        label,
+        acceptedSpellings: [],
+        isMissing: false,
+      };
+    });
+    const orderedDraft: DataDictionary.Draft = {
+      entries: [],
+      codeLists: [
+        { id: SEX_ID, name: "Severity", isOrdered: true, pairs },
+        {
+          id: RACE_ID,
+          name: "Grade",
+          isOrdered: true,
+          pairs: pairs.map((pair) => {
+            return { ...pair, label: `${pair.label} grade` };
+          }),
+        },
+      ],
+    };
+    function Harness(): ReactNode {
+      const [draft, setDraft] = useState(orderedDraft);
+      const [selectedId, setSelectedId] = useState(SEX_ID);
+      return (
+        <DictionaryCodeListsTab
+          draft={draft}
+          issues={[]}
+          canEdit
+          selectedCodeListId={selectedId}
+          onSelectCodeList={setSelectedId}
+          onDraftChange={setDraft}
+        />
+      );
+    }
+    render(<Harness />);
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Reorder Low" }), {
+      key: "ArrowDown",
+      altKey: true,
+    });
+    fireEvent.click(screen.getByText("Grade"));
+
+    expect(
+      screen.getByRole("button", { name: "Reorder High grade" }),
+    ).toBeInTheDocument();
+    expect(document.activeElement).not.toBe(
+      screen.getByRole("button", { name: "Reorder High grade" }),
+    );
   });
 });

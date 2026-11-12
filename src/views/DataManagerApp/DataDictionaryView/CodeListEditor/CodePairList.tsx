@@ -105,6 +105,7 @@ function usePairActions(
 type RowsProps = Pick<Props, "list" | "canEdit" | "pairIssue"> & {
   actions: PairActions;
   focusedIndex: number | undefined;
+  onHandleFocused: () => void;
 };
 
 /** Counts reorders and remembers which index the last reorder moved to. */
@@ -112,6 +113,7 @@ function useReorderTracking(): {
   orderVersion: number;
   focusedIndex: number | undefined;
   onReordered: (movedToIndex: number | undefined) => void;
+  clearFocusedIndex: () => void;
 } {
   const [orderVersion, setOrderVersion] = useState(0);
   const [focusedIndex, setFocusedIndex] = useState<number | undefined>();
@@ -119,6 +121,9 @@ function useReorderTracking(): {
   return {
     orderVersion,
     focusedIndex,
+    clearFocusedIndex: () => {
+      setFocusedIndex(undefined);
+    },
     onReordered: (movedToIndex) => {
       setFocusedIndex(movedToIndex);
       setOrderVersion((version) => {
@@ -134,6 +139,7 @@ function CodePairRows({
   pairIssue,
   actions,
   focusedIndex,
+  onHandleFocused,
 }: Readonly<RowsProps>): ReactNode {
   return list.pairs.map((pair, index) => {
     const sortableId = _buildSortableId({ listId: list.id, index });
@@ -146,6 +152,7 @@ function CodePairRows({
         isOrdered={list.isOrdered}
         canEdit={canEdit}
         shouldFocusHandle={focusedIndex === index}
+        onHandleFocused={onHandleFocused}
         issue={pairIssue(index)}
         onChange={(nextPair) => {
           actions.replacePairAt(index, nextPair);
@@ -177,7 +184,8 @@ export function CodePairList({
   onPairsChange,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
-  const { orderVersion, focusedIndex, onReordered } = useReorderTracking();
+  const { orderVersion, focusedIndex, onReordered, clearFocusedIndex } =
+    useReorderTracking();
   const listName = list.name;
   const actions = usePairActions({ list, onPairsChange, onReordered });
 
@@ -199,6 +207,7 @@ export function CodePairList({
           pairIssue={pairIssue}
           actions={actions}
           focusedIndex={focusedIndex}
+          onHandleFocused={clearFocusedIndex}
         />
       </ul>
     </DragDropProvider>

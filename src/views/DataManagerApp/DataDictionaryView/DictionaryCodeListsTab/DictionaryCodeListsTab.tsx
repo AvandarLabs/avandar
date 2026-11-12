@@ -129,6 +129,7 @@ export function DictionaryCodeListsTab({
       />
       {selected ? (
         <CodeListDetail
+          key={selected.id}
           draft={draft}
           list={selected}
           issues={issues}

@@ -12,6 +12,8 @@ type Props = {
   isDragging: boolean;
   /** Takes focus when the handle mounts. */
   shouldFocus: boolean;
+  /** Called after the handle took focus because `shouldFocus` was set. */
+  onFocused: () => void;
   onMoveByOffset: (offset: -1 | 1) => void;
 };
 
@@ -45,6 +47,7 @@ export function CodePairDragHandle({
   handleRef,
   isDragging,
   shouldFocus,
+  onFocused,
   onMoveByOffset,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
@@ -55,8 +58,9 @@ export function CodePairDragHandle({
   useEffect(() => {
     if (shouldFocus) {
       buttonRef.current?.focus();
+      onFocused();
     }
-  }, [shouldFocus]);
+  }, [shouldFocus, onFocused]);
 
   return (
     <>

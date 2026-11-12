@@ -7,9 +7,7 @@ import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/Da
  * Sources admin. Matches the delete policy on `data_dictionaries`, which
  * silently deletes nothing for any other editor.
  */
-export function useCanDeleteDictionary(
-  dictionary: DataDictionary.T,
-): boolean {
+export function useCanDeleteDictionary(dictionary: DataDictionary.T): boolean {
   const user = useCurrentUser();
   const [roles] = useUserAppRoles();
   const isDataSourcesAdmin = roles?.data_sources === "admin";
