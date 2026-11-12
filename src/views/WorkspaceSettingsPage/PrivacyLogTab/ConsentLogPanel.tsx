@@ -48,6 +48,7 @@ function useContextLabels(): Record<ConsentAuditEntry.T["context"], string> {
     clarification_answer: t`Clarification answer`,
     discovery_clarification: t`Discovery clarification`,
     generated_sql_assumptions: t`Generated SQL assumptions`,
+    dictionary_suggestions: t`Dictionary suggestions`,
   };
 }
 
