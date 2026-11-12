@@ -139,6 +139,7 @@ describe("newDictionaryReducer", () => {
       type: "labels_suggested",
       codeListKey: _codeListKeys()[0] ?? "",
       entryKey,
+      readId: READ_ID,
       suggestions: {
         labels: [{ value: "1", label: "Male", isMissing: false }],
         description: "Sex recorded at intake.",
@@ -268,6 +269,22 @@ describe("newDictionaryReducer", () => {
       readId: READ_ID,
     });
     expect(late).toBe(reread);
+  });
+
+  it("drops labels suggested for an earlier read", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const codeListKey = _codeListKeys()[0] ?? "";
+    const late = newDictionaryReducer(read, {
+      type: "labels_suggested",
+      codeListKey,
+      entryKey: undefined,
+      readId: uuid<ProposalReadId>(),
+      suggestions: {
+        labels: [{ value: "1", label: "Male", isMissing: false }],
+        description: "",
+      },
+    });
+    expect(late).toBe(read);
   });
 
   it("keeps columns apart when matches from the same read arrive after Keep apart", () => {

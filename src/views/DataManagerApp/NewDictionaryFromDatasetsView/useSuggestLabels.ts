@@ -8,7 +8,10 @@ import type {
   DictionarySuggestionModel,
   LabelsBlockReason,
 } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
-import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type {
+  NewDictionaryAction,
+  ProposalReadId,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { Dispatch } from "react";
 
@@ -46,23 +49,17 @@ async function _requestLabelSuggestions(
   return suggestions;
 }
 
-/**
- * Asks the suggestion model for one code list's labels and a description
- * for the entry using it, and fills them in as suggestions. Used by the
- * Label values step's Suggest labels button. When the user declines to
- * send the request, nothing is filled in and nothing is shown: the Label
- * values pane already says suggestions are off. `getLabelsBlockReason`
- * lets that step explain why the button is off for a list that cannot be
- * sent, instead of a failed request.
- */
-export function useSuggestLabels(
-  options: Readonly<{
-    proposal: DictionaryProposal.T | undefined;
-    model: DictionarySuggestionModel;
-    requestReply: RequestSuggestionReply;
-    dispatch: Dispatch<NewDictionaryAction>;
-  }>,
-): {
+type SuggestOptions = Readonly<{
+  proposal: DictionaryProposal.T | undefined;
+  /** The read of the proposal. Labels that come back for another read are dropped. */
+  readId: ProposalReadId | undefined;
+  model: DictionarySuggestionModel;
+  requestReply: RequestSuggestionReply;
+  dispatch: Dispatch<NewDictionaryAction>;
+}>;
+
+/** What the Label values step can do about suggesting labels. */
+export type SuggestLabels = {
   suggestLabels: (codeList: DictionaryProposal.CodeList) => void;
   /**
    * Why a request cannot be made for this list, or undefined when it can:
@@ -73,19 +70,55 @@ export function useSuggestLabels(
     codeList: DictionaryProposal.CodeList,
   ) => LabelsBlockReason | undefined;
   suggestingCodeListKey: string | undefined;
-} {
+};
+
+/** One request: the list to label, and the read it was asked for. */
+type SuggestRequest = {
+  codeList: DictionaryProposal.CodeList;
+  readId: ProposalReadId | undefined;
+};
+
+function _getLabelsBlockReason(
+  options: Readonly<{
+    proposal: DictionaryProposal.T | undefined;
+    codeList: DictionaryProposal.CodeList;
+    locale: string;
+    model: DictionarySuggestionModel;
+  }>,
+): LabelsBlockReason | undefined {
+  // Without a proposal there is no list to label, so nothing to block.
+  return options.proposal
+    ? DictionarySuggestions.getLabelsBlockReason({
+        proposal: options.proposal,
+        codeList: options.codeList,
+        locale: options.locale,
+        model: options.model,
+      })
+    : undefined;
+}
+
+/**
+ * Asks the suggestion model for one code list's labels and a description
+ * for the entry using it, and fills them in as suggestions. Used by the
+ * Label values step's Suggest labels button. When the user declines to
+ * send the request, nothing is filled in and nothing is shown: the Label
+ * values pane already says suggestions are off. `getLabelsBlockReason`
+ * lets that step explain why the button is off for a list that cannot be
+ * sent, instead of a failed request.
+ */
+export function useSuggestLabels(options: SuggestOptions): SuggestLabels {
   const { t, i18n } = useLingui();
-  const [suggestLabels, , result] = useMutation({
-    mutationFn: (codeList: DictionaryProposal.CodeList) => {
+  const [suggest, , result] = useMutation({
+    mutationFn: (request: SuggestRequest) => {
       return _requestLabelSuggestions({
         proposal: options.proposal,
-        codeList,
+        codeList: request.codeList,
         locale: i18n.locale,
         model: options.model,
         requestReply: options.requestReply,
       });
     },
-    onSuccess: (suggestions, codeList) => {
+    onSuccess: (suggestions, { codeList, readId }) => {
       if (!suggestions) {
         return;
       }
@@ -94,6 +127,7 @@ export function useSuggestLabels(
         type: "labels_suggested",
         codeListKey: codeList.key,
         entryKey: isSingleEntry ? codeList.entryKeys[0] : undefined,
+        readId,
         suggestions,
       });
       notifySuccess(t`Suggested labels filled in. Check them before saving.`);
@@ -105,18 +139,19 @@ export function useSuggestLabels(
     },
   });
   return {
-    suggestLabels,
-    getLabelsBlockReason: (codeList) => {
-      // Without a proposal there is no list to label, so nothing to block.
-      return options.proposal
-        ? DictionarySuggestions.getLabelsBlockReason({
-            proposal: options.proposal,
-            codeList,
-            locale: i18n.locale,
-            model: options.model,
-          })
-        : undefined;
+    suggestLabels: (codeList) => {
+      suggest({ codeList, readId: options.readId });
     },
-    suggestingCodeListKey: result.isPending ? result.variables?.key : undefined,
+    getLabelsBlockReason: (codeList) => {
+      return _getLabelsBlockReason({
+        proposal: options.proposal,
+        codeList,
+        locale: i18n.locale,
+        model: options.model,
+      });
+    },
+    suggestingCodeListKey: result.isPending
+      ? result.variables?.codeList.key
+      : undefined,
   };
 }

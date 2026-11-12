@@ -237,6 +237,7 @@ export function useNewDictionaryFlow(
   useReadOriginDataset({ state, dispatch, sources, read: reading.read });
   const labels = useSuggestLabels({
     proposal: state.proposal,
+    readId: state.readId,
     model: suggestions.model,
     requestReply: suggestions.requestReply,
     dispatch,

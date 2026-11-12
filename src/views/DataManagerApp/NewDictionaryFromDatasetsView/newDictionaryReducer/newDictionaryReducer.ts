@@ -90,6 +90,8 @@ export type NewDictionaryAction =
       codeListKey: string;
       /** The one entry using the list, which gets the description. */
       entryKey: string | undefined;
+      /** The read of the proposal the labels were asked for. */
+      readId: ProposalReadId | undefined;
       suggestions: DictionaryProposal.LabelSuggestions;
     }
   | { type: "accept_code_list"; codeListKey: string }
@@ -214,6 +216,10 @@ function _applySuggestedLabels(
   action: Extract<NewDictionaryAction, { type: "labels_suggested" }>,
 ): NewDictionaryState {
   const { codeListKey, entryKey, suggestions } = action;
+  // Labels asked for an earlier read describe a proposal that is gone.
+  if (state.readId !== action.readId) {
+    return state;
+  }
   const withLabels = {
     ...state,
     labels: DictionaryProposal.applyLabelSuggestions(state.labels, {

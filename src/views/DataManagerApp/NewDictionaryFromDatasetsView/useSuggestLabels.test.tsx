@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useSuggestLabels } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { ProposalReadId } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { ReactNode } from "react";
 
 const { makeRequestMock, blockReasonMock, notifyErrorMock, notifySuccessMock } =
@@ -31,6 +33,7 @@ vi.mock("@/utils/notifications/notify", () => {
   return { notifyError: notifyErrorMock, notifySuccess: notifySuccessMock };
 });
 
+const READ_ID = uuid<ProposalReadId>();
 const PROPOSAL = { entries: [] } as unknown as DictionaryProposal.T;
 const CODE_LIST = {
   key: "list-1",
@@ -63,6 +66,7 @@ function _render(requestReply: () => Promise<string | undefined>) {
     () => {
       return useSuggestLabels({
         proposal: PROPOSAL,
+        readId: READ_ID,
         model: "online",
         requestReply,
         dispatch,
@@ -112,6 +116,7 @@ describe("useSuggestLabels", () => {
         type: "labels_suggested",
         codeListKey: "list-1",
         entryKey: "entry-1",
+        readId: READ_ID,
         suggestions: {
           labels: [{ value: "1", label: "Male", isMissing: false }],
           description: "Sex.",
