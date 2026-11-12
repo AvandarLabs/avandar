@@ -11,8 +11,14 @@
  * clicks. The z-index also makes the slate a stacking context, so every
  * overlay is layered against this one value: see APP_SLATE_Z_INDEX in
  * src/config/Theme/Theme.ts.
+ *
+ * The neutral.7 edge reaches the screen through `--ava-paper-border-color`:
+ * the theme paints every Paper's border color inline, which a plain
+ * `border-color` here cannot beat.
  */
 .slate {
+  --ava-paper-border-color: var(--mantine-color-neutral-7);
+
   border: 1px solid var(--mantine-color-neutral-7);
   border-radius: 8px 8px 12px;
   box-shadow:
@@ -27,4 +33,13 @@
   padding: 0;
   position: relative;
   z-index: var(--mantine-z-index-app-slate);
+}
+
+/*
+ * Custom properties inherit, so without this the slate's edge would reach
+ * every Paper inside the view. Resetting it hands nested Papers back the
+ * theme's default edge.
+ */
+.slate :global(.mantine-Paper-root) {
+  --ava-paper-border-color: initial;
 }

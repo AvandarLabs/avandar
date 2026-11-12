@@ -311,6 +311,8 @@ Modals are centered at radius `xl`, with a transparent Mantine overlay replaced 
 
 The raised view that holds the current app. A `Paper` on the Tinted Cool Paper body surface, `8px 8px 12px` corners, a `neutral.7` edge, its own two-layer shadow, and `z-index: 150`. It is the only region that changes on navigation, and every app view lives inside one.
 
+The `neutral.7` edge needs a hook to reach the screen. The theme paints every `Paper` border `--ava-border-default` through its `styles`, which Mantine renders inline, so a `border-color` in a CSS module silently loses. The theme reads `--ava-paper-border-color` first, and the slate sets it. Any other `Paper` that needs a different edge does the same.
+
 The z-index is load-bearing. Mantine paints the navbar and aside above content left in normal flow, so an unraised slate has its shadow chopped into a hard vertical line at the sidebar edge. Raise the slate's paper and never `AppShell.Main`, whose box bleeds over the navbar and would swallow sidebar clicks.
 
 ### Motion

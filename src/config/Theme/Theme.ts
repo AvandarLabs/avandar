@@ -255,7 +255,8 @@ export const Theme = createTheme({
       },
       styles: {
         root: {
-          borderColor: "var(--ava-border-default)",
+          borderColor:
+            "var(--ava-paper-border-color, var(--ava-border-default))",
           transition: interactiveTransition,
         },
       },
