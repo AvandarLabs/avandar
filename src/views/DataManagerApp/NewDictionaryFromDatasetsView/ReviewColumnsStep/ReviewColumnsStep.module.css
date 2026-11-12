@@ -1,0 +1,4 @@
+/* An entry left out reads as set aside, not removed: its checkbox stays bright. */
+.reviewEntryRow[data-included="false"] td:not(:first-child) {
+  opacity: 0.55;
+}
