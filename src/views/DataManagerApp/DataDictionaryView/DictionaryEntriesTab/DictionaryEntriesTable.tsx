@@ -10,7 +10,7 @@ type Props = {
   rows: readonly DataDictionary.EntryDraft[];
   selectedId: DataDictionaryEntry.Id | undefined;
   listNames: ReadonlyMap<DataDictionaryCodeList.Id, string>;
-  kindLabels: Record<DataDictionaryEntry.Kind, string>;
+  kindShortLabels: Record<DataDictionaryEntry.Kind, string>;
   onSelect: (entryId: DataDictionaryEntry.Id) => void;
 };
 
@@ -18,7 +18,7 @@ type RowProps = {
   entry: DataDictionary.EntryDraft;
   isSelected: boolean;
   listNames: Props["listNames"];
-  kindLabels: Props["kindLabels"];
+  kindShortLabels: Props["kindShortLabels"];
   onSelect: Props["onSelect"];
 };
 
@@ -26,7 +26,7 @@ function DictionaryEntryRow({
   entry,
   isSelected,
   listNames,
-  kindLabels,
+  kindShortLabels,
   onSelect,
 }: Readonly<RowProps>): ReactNode {
   const primaryId = DataDictionary.getPrimaryCodeListId(entry);
@@ -66,7 +66,7 @@ function DictionaryEntryRow({
         })}
       </Table.Td>
       <Table.Td>
-        <Text size="sm">{kindLabels[entry.kind].split(":")[0]}</Text>
+        <Text size="sm">{kindShortLabels[entry.kind]}</Text>
         <Text size="xs" c="dimmed">
           {primaryId ? listNames.get(primaryId) : <Trans>Any value</Trans>}
         </Text>
@@ -89,7 +89,7 @@ export function DictionaryEntriesTable({
   rows,
   selectedId,
   listNames,
-  kindLabels,
+  kindShortLabels,
   onSelect,
 }: Readonly<Props>): ReactNode {
   return (
@@ -118,7 +118,7 @@ export function DictionaryEntriesTable({
               entry={entry}
               isSelected={entry.id === selectedId}
               listNames={listNames}
-              kindLabels={kindLabels}
+              kindShortLabels={kindShortLabels}
               onSelect={onSelect}
             />
           );

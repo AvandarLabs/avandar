@@ -6,6 +6,8 @@ import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictiona
 type DictionaryCopy = {
   /** Each entry kind's label and its one-line explanation. */
   kindLabels: Record<DataDictionaryEntry.Kind, string>;
+  /** Each entry kind's name alone, for a table cell. */
+  kindShortLabels: Record<DataDictionaryEntry.Kind, string>;
   /** What one draft issue means, as shown beside the field it is about. */
   describeIssue: (issue: DataDictionary.DraftIssue) => string;
   /** What a save refusal means, or a generic failure for anything else. */
@@ -24,6 +26,14 @@ export function useDictionaryCopy(): DictionaryCopy {
       text: t`Text`,
       identifier: t`Identifier: unique to each row, such as a case number`,
     };
+    const kindShortLabels: Record<DataDictionaryEntry.Kind, string> = {
+      categorical: t`Categorical`,
+      ordered: t`Ordered`,
+      number: t`Number`,
+      date: t`Date`,
+      text: t`Text`,
+      identifier: t`Identifier`,
+    };
     const issueCopy: Record<DataDictionary.DraftIssue["type"], string> = {
       entry_name_required: t`Give this entry a name.`,
       entry_name_not_unique: t`Another entry already has this name.`,
@@ -36,6 +46,7 @@ export function useDictionaryCopy(): DictionaryCopy {
     };
     return {
       kindLabels,
+      kindShortLabels,
       describeIssue: (issue) => {
         return issueCopy[issue.type];
       },

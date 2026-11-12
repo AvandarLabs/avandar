@@ -155,7 +155,7 @@ export function DictionaryEntriesTab(props: Readonly<Props>): ReactNode {
           rows={rows}
           selectedId={selected?.id}
           listNames={listNames}
-          kindLabels={copy.kindLabels}
+          kindShortLabels={copy.kindShortLabels}
           onSelect={setSelectedId}
         />
         {rows.length === 0 ? (
