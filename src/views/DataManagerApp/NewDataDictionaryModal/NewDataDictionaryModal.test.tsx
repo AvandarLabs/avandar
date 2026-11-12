@@ -2,12 +2,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
 import { NewDataDictionaryModal } from "@/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal";
 
-const { insertMock, navigateMock, onlineState } = vi.hoisted(() => {
-  return {
-    insertMock: vi.fn(),
-    navigateMock: vi.fn(),
-    onlineState: { isOnline: true },
-  };
+const { insertMock, navigateMock, notifyErrorMock, onlineState, insertState } =
+  vi.hoisted(() => {
+    return {
+      insertState: { shouldFail: false },
+      notifyErrorMock: vi.fn(),
+      insertMock: vi.fn(),
+      navigateMock: vi.fn(),
+      onlineState: { isOnline: true },
+    };
+  });
+
+vi.mock("@/utils/notifications/notify", () => {
+  return { notifyError: notifyErrorMock };
 });
 
 vi.mock("@/lib/hooks/browser/useIsOnline/useIsOnline", () => {
@@ -57,10 +64,15 @@ vi.mock(
         },
         useInsert: (options: {
           onSuccess: (dictionary: { id: string; name: string }) => void;
+          onError: (error: Error) => void;
         }) => {
           return [
             (variables: unknown) => {
               insertMock(variables);
+              if (insertState.shouldFail) {
+                options.onError(new Error("boom"));
+                return;
+              }
               options.onSuccess({ id: "new-dictionary-id", name: "NYS codes" });
             },
             false,
@@ -75,6 +87,7 @@ describe("NewDataDictionaryModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     onlineState.isOnline = true;
+    insertState.shouldFail = false;
   });
 
   it("creates a dictionary owned by the current profile and opens it", async () => {
@@ -132,5 +145,19 @@ describe("NewDataDictionaryModal", () => {
     fireEvent.submit(nameInput.closest("form")!);
 
     expect(insertMock).not.toHaveBeenCalled();
+  });
+
+  it("tells the user when the dictionary could not be created", () => {
+    insertState.shouldFail = true;
+    render(<NewDataDictionaryModal opened onClose={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText("Name"), {
+      target: { value: "NYS codes" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create dictionary" }));
+
+    expect(notifyErrorMock).toHaveBeenCalledWith(
+      "The dictionary could not be created. Please try again or reach out to support.",
+    );
+    expect(navigateMock).not.toHaveBeenCalled();
   });
 });

@@ -16,6 +16,7 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
+import { notifyError } from "@/utils/notifications/notify";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -53,6 +54,11 @@ export function NewDataDictionaryModal({
         dictionaryName: dictionary.name,
       });
       navigate({ to: link.to, params: link.params });
+    },
+    onError: () => {
+      notifyError(
+        t`The dictionary could not be created. Please try again or reach out to support.`,
+      );
     },
   });
   const trimmedName = name.trim();
