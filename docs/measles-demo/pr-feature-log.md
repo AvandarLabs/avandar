@@ -182,6 +182,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F126 | Per-branch local Supabase through `.env.development` overrides, with `ava supabase start`, `stop`, `prune`, and `switch remote` | PR open: [#320](https://github.com/AvandarLabs/avandar/pull/320), needs a `develop` merge and one more commit (see its section) | none | |
 | F127 | E2E stability: stable map `updateConfig`, job progress re-render, Featurebase stub, pinned CI runners | PR open: [#321](https://github.com/AvandarLabs/avandar/pull/321) | none | |
 | F128 | Multiple chats, a closed-chat archive, and session titles | not started | F91, F89, F90, F81 to F87, F94, F57 | |
+| F129 | Data dictionaries: entries and reusable two-way code lists under Data Sources | not started | none | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -317,6 +318,7 @@ API. It's new work, not something this branch built.
 | any | F126 | PR #320 is open. Merge `develop` into it first: `develop`'s `183a41c50` rewrote the same `AGENTS.md` section. Coordinate with F15 (#319), which edits `apps/ava-cli/src/main.ts` and `apps/ava-cli/README.md` too. |
 | any, before F35 | F127 | PR #321 is open and fixes bugs that are on `develop`. F35's `aad4d700d` later splits `useHydratedMapSources.ts`, so F35 is easier to port once this is in. |
 | after F91, F94, F57 | F128 | Makes F91's tray and the thread per session, adds tabs to F94's panel header, and starts a case-design session from F57's New case type controls. Its title excerpt masks F89 and F90's mention tokens. |
+| any | F129 | Adds its own tables, models, clients, route, and view, so it can merge first. It edits `DataManagerApp.tsx`, `DatasetNavbar.tsx`, and the generated schema files, so take only its hunks if F20 or F121 landed first. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -619,7 +621,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/views/DataManagerApp/DataImportView/DataImportView.tsx` | F14 (merged), F120, F19 | F14: the dataset limit prompt. F120: no `AppViewHeader`, a visually hidden `h1`. F19: `isFillHeight` and the `DataImportTabs/` import path. |
 | `src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.{tsx,module.css}` | Postgres branch, F19, F23 | Postgres branch: the Connectors tab's `Stack` with `PostgresConnectorImportView` and `ConnectorsAdvisory`. F19: the CSS module and the fill-height panel, plus its `4c7c9d760` addendum (the `list` class and the panel padding). F23: its `9987ef9da` addendum (the tab-row `DataCatalogSearchField` in `listRightSection`, and the `search` state passed to `DataCatalogView`). |
 | `src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css` | F19 | F19 and its `4c7c9d760` addendum (`--ava-content-gutter` on `.importPanel` for every tab). |
-| `src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx` | Postgres branch, F20, F121 | Postgres branch: the `postgres_table` source icon. F20: the phone layout lines. F121: `DatasetNavbarName` on `TruncatedText`. |
+| `src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx` | Postgres branch, F20, F121, F129 | Postgres branch: the `postgres_table` source icon. F20: the phone layout lines. F121: `DatasetNavbarName` on `TruncatedText`. F129: a Dictionaries group after the dataset groups, and its filter and rows. |
 | `src/lib/ui/viz/DataGrid.tsx`, `src/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs.{ts,test.ts}` | F22, F71 to F75, F121 | F22 (BUG-003 and its follow-ups): extracts `makeDataGridColumnDefs`. F71 to F75: per-period formatters. F121: `headerComponentParams.innerHeaderComponent: DataGridColumnTitle`, and in `makeDataGridColumnDefs` only a docstring sentence and a renamed test. |
 | `packages/web/ui/src/text/TruncatedText.tsx` | F118, F119, F121 | F118: `tooltipLabel`, the full-width root class, `withFullTextTooltip` defaulting to true. F119 and F121 only call it. |
 | `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx` | F17, F19, F23, F121 | F23: its `9987ef9da` addendum's one-line `DataCatalogListingName`. F121: `52c823754` moves that name onto `TruncatedText`, which goes with whichever of F23 and F121 lands second. |
@@ -10417,6 +10419,109 @@ pnpm type-check:deno
 pnpm tsc -b --force
 pnpm test:e2e agent-chat-sessions.spec.ts
 pnpm test:e2e case-list-field.spec.ts
+```
+
+---
+
+## F129: Data dictionaries: entries and reusable two-way code lists under Data Sources
+
+Status: not started. Built on `feat/data-dictionaries`, branched from
+`demo/measles` at `17695206f`. No PR is open.
+
+**Purpose:** A workspace owner or admin can keep a dictionary of the columns
+a data source uses. Each entry has a name, the other column names it also
+matches, a kind (categorical, ordered, number, date, text, or identifier), a
+description, and for a number a unit and valid range. A categorical or ordered
+entry uses a code list, and can also recognize other code lists that write the
+same values another way. A code list is a set of code and label pairs that
+work both ways: codes turn into labels, and labels turn back into codes, with
+other accepted spellings and a missing flag per value. A code list can be
+ordered, and the order is the scale's order. Data Sources lists dictionaries
+in their own group beside the datasets and has a New dictionary button. The
+dictionary page has Entries, Code lists, and Used by tabs, edits everything as
+one draft, and saves it in one call that bumps a version number, so a refused
+save changes nothing. The Used by tab and its rail are placeholders: applying a
+dictionary to a dataset is a later slice.
+**Value:** A team writes down what its codes mean once, in words a colleague
+can read, and later features can apply that to datasets.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md`. The task plan is
+`docs/measles-demo/data-dictionaries-1-dictionaries-plan.md`.
+
+**PR title:** `feat(data-dictionaries): add dictionaries with entries and two-way code lists`
+
+**Depends on:** none. It reuses the Data Sources shell, the workspace
+permission registry, and the desktop sync manifest, all on `develop`.
+
+**Files, by area** (`DataDictionaryView/` is
+`src/views/DataManagerApp/DataDictionaryView/`):
+
+- Docs: the design and the slice 1 plan in `docs/measles-demo/`
+  (`02fc120d4`, `d9b8db8c1`).
+- Schema (`868246766`, `25ba3a15a`): `supabase/schemas/` files
+  `00.enum.data_dictionaries__entry_kind.sql`, `10.data_dictionaries.sql`,
+  `20.data_dictionaries__code_lists.sql`, `20.data_dictionaries__entries.sql`,
+  `21.data_dictionaries__entry_codings.sql`, and
+  `50.rpc_data_dictionaries__save.sql`, the generated
+  `supabase/migrations/20261112000050_data_dictionaries.sql`, its desktop twin
+  `apps/desktop/migrations/20261112000050_data_dictionaries.gen.sql`, and
+  `apps/desktop/sync/syncable-tables.ts` (the four tables in `ACTIVE_TABLES`).
+  Regenerate the migration with `supabase-declarative-schema`, never copy it.
+  The tests are `supabase/tests/database/data_dictionaries/` and the two
+  files under `supabase/tests/database/permissions/`.
+- Models (`51737369d`, `026a6464b`, `edd6e04f1`, `0ed027e9f`):
+  `shared/models/dataDictionaries/{DataDictionary,DataDictionaryCodeList,DataDictionaryEntry,DataDictionaryEntryCoding}/`.
+  `DataDictionaryModule` holds the draft helpers: `toDraft`, `findDraftIssues`,
+  `buildSavePayload`, and the code list and entry edits.
+- Permission and clients (`83517d8d7`): `data_sources__can_edit_dictionaries`
+  in `PermissionRegistry.ts` and its test, and `src/clients/dataDictionaries/`
+  (the dictionary, code list, entry, and coding clients).
+- Route and links (`2e493e446`): the `dictionaries/$dictionaryId` route,
+  `AppLinks.dataManagerDictionaryView`, and the generated `routeTree.gen.ts`.
+- Data Sources (`6c56716e9`, `040296614`): the Dictionaries group in
+  `DatasetNavbar`, the New dictionary button in `DataManagerApp.tsx`, and
+  `NewDataDictionaryModal/`. The list now counts datasets and dictionaries
+  under an "All data" heading, so `tests/e2e/csv-parse-options.spec.ts` and
+  `apps/ava-video-producer/capture-flows/avandar.mjs` look for that heading.
+- Dictionary view (`b3baec9f6`, `9c809d65f`, `97a45702d`):
+  `DataDictionaryView.tsx`, the header, actions menu, rail, save bar, the
+  draft, save, and copy hooks, and the editor with its tabs. A save bar that
+  holds back edits made while a save is in flight is `97a45702d`.
+- Entries and code lists (`89c67d87f`, `819fd719c`): `DictionaryEntriesTab/`,
+  `DictionaryEntryPane/`, `DictionaryCodeListsTab/`, and `CodeListEditor/`
+  (paste a list, reorder with a drag handle or Alt and an arrow key).
+- Review fixes (`3371677a9`, `9eb35d66c`, `63f5f3ce6`): a failed refetch no
+  longer replaces the editor, the moved value's handle keeps focus after a
+  reorder, pair issues describe their input instead of an alert, counts are
+  pluralized, rows without a handle are plain list items, and the entries
+  table leaves room for its description column.
+- Translations (`d7d0bddec`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
+- E2E: `tests/e2e/data-dictionary-edit.spec.ts` (new).
+- Generated: `shared/types/database.types.ts` (`pnpm db:gen-types`).
+
+**Schema:** yes. Four tables (`data_dictionaries`,
+`data_dictionaries__code_lists`, `data_dictionaries__entries`,
+`data_dictionaries__entry_codings`), one enum
+(`data_dictionaries__entry_kind`), and one RPC, `rpc_data_dictionaries__save`,
+with six helpers (`data_dictionaries__check_code_lists`, `__check_pairs`,
+`__check_entries`, `__check_codings`, `__write_code_lists`, and
+`__write_entries`). The RPC requires an editor on Data Sources, locks the
+dictionary so two saves run one at a time, checks the whole draft before it
+writes, and returns the new version.
+
+**Known gaps:** the Used by tab and rail show no datasets yet. Applying a
+dictionary to a dataset, crosswalks, and creating a dictionary from a dataset
+are later slices of the design.
+
+**Verification:**
+```sh
+pnpm vitest run src/views/DataManagerApp shared/models/dataDictionaries src/clients/dataDictionaries
+pnpm tsc -b --force
+pnpm test:db
+pnpm i18n:check
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e csv-import.spec.ts
 ```
 
 ---
