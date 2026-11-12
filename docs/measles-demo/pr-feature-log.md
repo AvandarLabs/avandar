@@ -10428,8 +10428,9 @@ pnpm test:e2e case-list-field.spec.ts
 Status: not started. Built on `feat/data-dictionaries`, branched from
 `demo/measles` at `17695206f`. No PR is open.
 
-**Purpose:** A workspace owner or admin can keep a dictionary of the columns
-a data source uses. Each entry has a name, the other column names it also
+**Purpose:** Data Sources editors can create and edit a dictionary of the
+columns a data source uses. Only its owner or a Data Sources admin can delete
+it. Each entry has a name, the other column names it also
 matches, a kind (categorical, ordered, number, date, text, or identifier), a
 description, and for a number a unit and valid range. A categorical or ordered
 entry uses a code list, and can also recognize other code lists that write the
@@ -10473,8 +10474,9 @@ permission registry, and the desktop sync manifest, all on `develop`.
   `shared/models/dataDictionaries/{DataDictionary,DataDictionaryCodeList,DataDictionaryEntry,DataDictionaryEntryCoding}/`.
   `DataDictionaryModule` holds the draft helpers: `toDraft`, `findDraftIssues`,
   `buildSavePayload`, and the code list and entry edits.
-- Permission and clients (`83517d8d7`): `data_sources__can_edit_dictionaries`
-  in `PermissionRegistry.ts` and its test, and `src/clients/dataDictionaries/`
+- Permission and clients (`83517d8d7`): `data_sources__can_view_dictionaries`
+  and `data_sources__can_edit_dictionaries` in `PermissionRegistry.ts` and its
+  test, and `src/clients/dataDictionaries/`
   (the dictionary, code list, entry, and coding clients).
 - Route and links (`2e493e446`): the `dictionaries/$dictionaryId` route,
   `AppLinks.dataManagerDictionaryView`, and the generated `routeTree.gen.ts`.
@@ -10495,7 +10497,16 @@ permission registry, and the desktop sync manifest, all on `develop`.
   reorder, pair issues describe their input instead of an alert, counts are
   pluralized, rows without a handle are plain list items, and the entries
   table leaves room for its description column.
-- Translations (`d7d0bddec`): `src/i18n/locales/*/messages.{po,ts}`,
+- Final review fixes (`d99733e9e`, `67d676981`, `7f7b05317`, `ca737d329`,
+  `523c94032`, `ffb06c60e`, `8b4044f69`): the actions menu shows only to the
+  owner or a Data Sources admin (`useCanDeleteDictionary`), matching the delete
+  policy. i18n placeholders are named and the rename and delete failures use
+  fixed copy. The four dictionary queries refetch on mount, so a quick reload
+  after a save never shows the pre-save snapshot. A reorder no longer steals
+  focus in another code list. The entries table uses a short kind label. A
+  failed create shows an error. `DataManagerToolbarActions` is extracted from
+  `DataManagerApp.tsx`.
+- Translations (`d7d0bddec`, `81cfaa4aa`): `src/i18n/locales/*/messages.{po,ts}`,
   regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
 - E2E: `tests/e2e/data-dictionary-edit.spec.ts` (new).
 - Generated: `shared/types/database.types.ts` (`pnpm db:gen-types`).
