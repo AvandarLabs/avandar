@@ -8,9 +8,10 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppSlate } from "@/components/layouts/AppSlate/AppSlate";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import css from "@/views/DataManagerApp/DataManagerApp.module.css";
-import { DataManagerToolbarActions } from "@/views/DataManagerApp/DataManagerToolbarActions";
+import { DataManagerToolbarActions } from "@/views/DataManagerApp/DataManagerToolbarActions/DataManagerToolbarActions";
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar";
 import { NewDataDictionaryModal } from "@/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal";
+import { useListPaneToggle } from "@/views/DataManagerApp/useListPaneToggle/useListPaneToggle";
 
 /**
  * Data Sources: the list of datasets and dictionaries beside whichever one
@@ -19,7 +20,8 @@ import { NewDataDictionaryModal } from "@/views/DataManagerApp/NewDataDictionary
  * On a phone the two do not fit side by side, so only one shows at a time.
  * The list shows on the app's home while there are datasets to pick from;
  * any page under it, such as a dataset or the import flow, takes the whole
- * width instead.
+ * width instead. A task view, such as learning a dictionary, hides the list
+ * until Show list brings it back.
  */
 export function DataManagerApp(): JSX.Element {
   const workspace = useCurrentWorkspace();
@@ -32,6 +34,7 @@ export function DataManagerApp(): JSX.Element {
   const [isNewDictionaryOpen, setIsNewDictionaryOpen] = useState(false);
   const { t } = useLingui();
   const matchRoute = useMatchRoute();
+  const listPane = useListPaneToggle();
   const isOnHome = Boolean(matchRoute({ to: "/$workspaceSlug/data-manager" }));
   const hasListItems =
     (allDatasets ?? []).length + (allDictionaries ?? []).length > 0;
@@ -45,6 +48,14 @@ export function DataManagerApp(): JSX.Element {
           onNewDictionary={() => {
             setIsNewDictionaryOpen(true);
           }}
+          listToggle={
+            listPane.isTaskView
+              ? {
+                  isListShown: listPane.isListShown,
+                  onToggle: listPane.onToggleList,
+                }
+              : undefined
+          }
         />
       }
     >
@@ -60,12 +71,14 @@ export function DataManagerApp(): JSX.Element {
         className={css.dataManagerApp}
         data-phone-pane={phonePane}
       >
-        <DatasetNavbar
-          className={css.dataManagerAppList}
-          isLoading={isLoading}
-          datasets={allDatasets ?? []}
-          dictionaries={allDictionaries ?? []}
-        />
+        {listPane.isListShown ? (
+          <DatasetNavbar
+            className={css.dataManagerAppList}
+            isLoading={isLoading}
+            datasets={allDatasets ?? []}
+            dictionaries={allDictionaries ?? []}
+          />
+        ) : null}
         <Flex
           direction="column"
           flex={1}
