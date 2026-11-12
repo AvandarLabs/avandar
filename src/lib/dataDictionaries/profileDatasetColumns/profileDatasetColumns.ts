@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { ColumnProfileSql } from "@/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
@@ -28,6 +29,9 @@ export async function profileDatasetColumns(
   }
   const summary = await WorkspaceQuerySession.runQuery({
     workspaceId,
+    neededColumnsByDatasetId: {
+      [dataset.id]: columns.map(prop("name")),
+    },
     rawSql: ColumnProfileSql.buildSummarySql({
       datasetId: dataset.id,
       columns,
@@ -48,6 +52,9 @@ export async function profileDatasetColumns(
       : (
           await WorkspaceQuerySession.runQuery<ColumnValueRow>({
             workspaceId,
+            neededColumnsByDatasetId: {
+              [dataset.id]: listedColumns.map(prop("name")),
+            },
             rawSql: ColumnProfileSql.buildValuesSql({
               datasetId: dataset.id,
               columns: listedColumns,

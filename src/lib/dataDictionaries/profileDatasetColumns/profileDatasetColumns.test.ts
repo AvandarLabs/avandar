@@ -47,6 +47,36 @@ describe("profileDatasetColumns", () => {
     });
   });
 
+  it("tells the query layer which columns each query reads", async () => {
+    runQueryMock
+      .mockResolvedValueOnce({
+        data: [
+          {
+            row_count: 3n,
+            non_null_0: 3n,
+            distinct_0: 2n,
+            non_null_1: 900n,
+            distinct_1: 880n,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ data: [] });
+    await profileDatasetColumns({
+      workspaceId: WORKSPACE_ID,
+      dataset: DATASET,
+      columns: [
+        { name: "sex", dataType: "varchar" },
+        { name: "notes", dataType: "varchar" },
+      ],
+    });
+    expect(runQueryMock.mock.calls[0]?.[0].neededColumnsByDatasetId).toEqual({
+      [DATASET.id]: ["sex", "notes"],
+    });
+    expect(runQueryMock.mock.calls[1]?.[0].neededColumnsByDatasetId).toEqual({
+      [DATASET.id]: ["sex"],
+    });
+  });
+
   it("skips the values query when no column is short enough", async () => {
     runQueryMock.mockResolvedValueOnce({
       data: [{ row_count: 900n, non_null_0: 900n, distinct_0: 880n }],
