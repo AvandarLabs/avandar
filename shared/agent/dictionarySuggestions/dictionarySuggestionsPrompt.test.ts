@@ -265,7 +265,7 @@ describe("dictionarySuggestionsPrompt", () => {
       labels: column.values.map((value) => {
         return {
           value,
-          label: "A typical label of forty characters.....",
+          label: "A typical short label.",
           isMissing: false,
         };
       }),
@@ -289,5 +289,23 @@ describe("dictionarySuggestionsPrompt", () => {
         columns: [GENDER, { ...GENDER, name: "sex" }],
       }),
     ).toBe(800);
+  });
+
+  it("budgets a labels reply by each value's length, up to a cap", () => {
+    const budgetFor = (values: string[]): number => {
+      return getDictionarySuggestionsMaxTokens({
+        task: "labels",
+        locale: "en",
+        column: { ...GENDER, values },
+      });
+    };
+    // 300 base, then 25 plus one token per three characters of each value.
+    expect(budgetFor(["1", "2"])).toBe(300 + 2 * (25 + 1));
+    expect(budgetFor(["x".repeat(30)])).toBe(300 + 25 + 10);
+    expect(budgetFor(_makeCodes(50))).toBe(300 + 50 * 26);
+    const longCodes = Array.from({ length: 50 }, () => {
+      return "x".repeat(200);
+    });
+    expect(budgetFor(longCodes)).toBe(3000);
   });
 });

@@ -12,7 +12,9 @@ export const DICTIONARY_SUGGESTIONS_PROMPT_ID = "dictionary-suggestions-v1";
 
 const MATCHES_MAX_TOKENS = 800;
 const LABELS_BASE_TOKENS = 300;
-const LABELS_TOKENS_PER_VALUE = 40;
+const LABELS_TOKENS_PER_VALUE = 25;
+const LABELS_MAX_TOKENS = 3000;
+const CHARACTERS_PER_TOKEN = 3;
 
 const MAX_LABEL_LENGTH = 80;
 const MAX_DESCRIPTION_LENGTH = 300;
@@ -299,16 +301,26 @@ export function stringifyDictionarySuggestionsRequest(
 
 /**
  * The most tokens a model may use to reply to one request, online or
- * offline. A labels reply grows with the codes it labels, so its budget
- * does too. A matches reply is a short list of pairs.
+ * offline. A labels reply grows with the codes it labels and their length,
+ * so its budget does too, up to a cap. A matches reply is a short list of
+ * pairs.
  */
 export function getDictionarySuggestionsMaxTokens(
   request: Readonly<DictionarySuggestionsRequest>,
 ): number {
-  return request.task === "labels"
-    ? LABELS_BASE_TOKENS +
-        LABELS_TOKENS_PER_VALUE * request.column.values.length
-    : MATCHES_MAX_TOKENS;
+  if (request.task !== "labels") {
+    return MATCHES_MAX_TOKENS;
+  }
+  // The reply repeats every value beside its label, so a long code costs
+  // tokens as well as the entry around it.
+  const valueTokens = request.column.values.reduce((total, value) => {
+    return (
+      total +
+      LABELS_TOKENS_PER_VALUE +
+      Math.ceil(value.length / CHARACTERS_PER_TOKEN)
+    );
+  }, 0);
+  return Math.min(LABELS_BASE_TOKENS + valueTokens, LABELS_MAX_TOKENS);
 }
 
 /** Whether the `chat` edge function serves this suggestion prompt version. */
