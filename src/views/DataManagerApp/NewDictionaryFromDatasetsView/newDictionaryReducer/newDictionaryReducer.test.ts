@@ -270,6 +270,42 @@ describe("newDictionaryReducer", () => {
     expect(late).toBe(reread);
   });
 
+  it("keeps columns apart when matches from the same read arrive after Keep apart", () => {
+    const otherDatasetId = uuid<Dataset.Id>();
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("GENDER", ["1", "2", "9"]),
+      { ..._column("sex", ["M", "F", "U"]), datasetId: otherDatasetId },
+    ]);
+    const matches = [{ name: "sex", sameAs: "GENDER" }];
+    const picked = [DATASET_ID, otherDatasetId].reduce((state, datasetId) => {
+      return newDictionaryReducer(state, { type: "toggle_dataset", datasetId });
+    }, makeInitialNewDictionaryState(undefined));
+    const read = newDictionaryReducer(picked, {
+      type: "datasets_read",
+      proposal,
+      datasetIds: [DATASET_ID, otherDatasetId],
+      readId: READ_ID,
+      defaultName: "codes",
+    });
+    const merged = newDictionaryReducer(read, {
+      type: "meaning_matches_found",
+      matches,
+      readId: READ_ID,
+    });
+    expect(merged.proposal?.entries).toHaveLength(1);
+    const apart = newDictionaryReducer(merged, {
+      type: "keep_apart",
+      entryKey: merged.proposal?.entries[0]?.key ?? "",
+    });
+    expect(apart.proposal?.entries).toHaveLength(2);
+    const late = newDictionaryReducer(apart, {
+      type: "meaning_matches_found",
+      matches,
+      readId: READ_ID,
+    });
+    expect(late.proposal?.entries).toHaveLength(2);
+  });
+
   it("falls back to an empty Pick when the dataset that opened the flow is unavailable", () => {
     const state = newDictionaryReducer(
       makeInitialNewDictionaryState(DATASET_ID),

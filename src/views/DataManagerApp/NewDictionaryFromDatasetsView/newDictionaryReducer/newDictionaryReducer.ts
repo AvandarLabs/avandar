@@ -1,3 +1,4 @@
+import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -32,6 +33,11 @@ export type NewDictionaryState = {
   proposal: DictionaryProposal.T | undefined;
   /** The read that made the proposal. Undefined until then. */
   readId: ProposalReadId | undefined;
+  /**
+   * Each Keep apart's entry names, normalized. A meaning match naming two
+   * of one group is dropped. Emptied when the datasets are read again.
+   */
+  keptApartNameGroups: string[][];
   labels: DictionaryProposal.Labels;
   selectedCodeListKey: string | undefined;
   name: string;
@@ -113,6 +119,39 @@ export function isSameDatasetSet(
       return otherDatasetIds.includes(datasetId);
     })
   );
+}
+
+function _toNameKeys(proposal: DictionaryProposal.T): Map<string, string> {
+  return new Map(
+    proposal.entries.map((entry) => {
+      return [entry.key, ColumnProfile.normalizeValue(entry.name)];
+    }),
+  );
+}
+
+/** The normalized names of the entry kept apart and of those split from it. */
+function _buildKeptApartGroup(
+  before: DictionaryProposal.T,
+  after: DictionaryProposal.T,
+  entryKey: string,
+): string[] {
+  const nameKeysBefore = _toNameKeys(before);
+  return [..._toNameKeys(after)].flatMap(([key, nameKey]) => {
+    return key === entryKey || !nameKeysBefore.has(key) ? [nameKey] : [];
+  });
+}
+
+function _dropKeptApartMatches(
+  matches: readonly DictionaryProposal.MeaningMatch[],
+  groups: readonly string[][],
+): DictionaryProposal.MeaningMatch[] {
+  return matches.filter((match) => {
+    const nameKey = ColumnProfile.normalizeValue(match.name);
+    const sameAsKey = ColumnProfile.normalizeValue(match.sameAs);
+    return !groups.some((group) => {
+      return group.includes(nameKey) && group.includes(sameAsKey);
+    });
+  });
 }
 
 /** The state with a new proposal, its labels filled in, a list selected. */
@@ -209,6 +248,7 @@ const HANDLERS: Handlers = {
     return {
       ..._withProposal(state, action.proposal),
       readId: action.readId,
+      keptApartNameGroups: [],
       step: "review",
       name,
     };
@@ -244,9 +284,22 @@ const HANDLERS: Handlers = {
     });
   },
   keep_apart: (state, action) => {
-    return _editProposal(state, (proposal) => {
-      return DictionaryProposal.keepApart(proposal, action.entryKey);
-    });
+    if (!state.proposal) {
+      return state;
+    }
+    const proposal = DictionaryProposal.keepApart(
+      state.proposal,
+      action.entryKey,
+    );
+    const group = _buildKeptApartGroup(
+      state.proposal,
+      proposal,
+      action.entryKey,
+    );
+    return {
+      ..._withProposal(state, proposal),
+      keptApartNameGroups: [...state.keptApartNameGroups, group],
+    };
   },
   set_entry_description: (state, action) => {
     return _editProposal(state, (proposal) => {
@@ -254,13 +307,17 @@ const HANDLERS: Handlers = {
     });
   },
   meaning_matches_found: (state, action) => {
-    // Matches for an older read are dropped, even for the same datasets, so
-    // they cannot undo a Keep apart made on the newer proposal.
+    // Matches for an older read are dropped, even for the same datasets, and
+    // so are matches that would rejoin what Keep apart separated.
     if (state.proposal === undefined || state.readId !== action.readId) {
       return state;
     }
+    const matches = _dropKeptApartMatches(
+      action.matches,
+      state.keptApartNameGroups,
+    );
     return _editProposal(state, (proposal) => {
-      return DictionaryProposal.applyMeaningMatches(proposal, action.matches);
+      return DictionaryProposal.applyMeaningMatches(proposal, matches);
     });
   },
   select_code_list: (state, action) => {
@@ -308,6 +365,7 @@ export function makeInitialNewDictionaryState(
     pickedDatasetIds: originDatasetId ? [originDatasetId] : [],
     proposal: undefined,
     readId: undefined,
+    keptApartNameGroups: [],
     labels: {},
     selectedCodeListKey: undefined,
     name: "",
