@@ -10970,3 +10970,5 @@ The product owner settled every open question from the first draft of this plan:
 | 4 | Renaming entries on Review | Inline, with save-matching validation and a lowercase default name | Tasks 3, 4, 6, 11, 14 |
 | 5 | Drag handles on Label values | Not needed | Task 15 |
 | 6 | Yes/no style lists without a shared prefix | Share one list when the codes are not all numbers | Task 5 |
+
+Matches requests do not pass column names to the detectors after the first approval: once the user agrees to a send in a flow, `approveRequest` only prompts again when the detectors flag the values. Column names are always sent, by design, since they carry no row data and the model needs them to find a match.
