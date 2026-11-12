@@ -5,6 +5,7 @@ import { useSaveDataDictionary } from "@/views/DataManagerApp/DataDictionaryView
 import type { ReactNode } from "react";
 
 type Props = {
+  isDirty: boolean;
   dictionaryId: DataDictionary.Id;
   draft: DataDictionary.Draft;
   issues: readonly DataDictionary.DraftIssue[];
@@ -15,9 +16,11 @@ type Props = {
 /**
  * The save bar wired to the dictionary save. Saves the draft as it is when
  * Save is pressed, so edits made while the save is in flight stay unsaved.
- * Discarding also clears an old save error.
+ * Discarding also clears an old save error. Renders nothing until the
+ * draft has changes.
  */
 export function DataDictionaryEditorSaveBar({
+  isDirty,
   dictionaryId,
   draft,
   issues,
@@ -29,6 +32,9 @@ export function DataDictionaryEditorSaveBar({
     onSaved,
   });
 
+  if (!isDirty) {
+    return null;
+  }
   return (
     <DataDictionarySaveBar
       issueCount={issues.length}

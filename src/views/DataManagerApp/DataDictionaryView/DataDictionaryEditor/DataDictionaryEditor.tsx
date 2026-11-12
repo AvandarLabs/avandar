@@ -1,14 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { DataDictionaryEditorSaveBar } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorSaveBar";
 import { DataDictionaryEditorTabs } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs";
+import { useEditorSelection } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/useEditorSelection";
 import { DataDictionaryHeader } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader";
 import { DataDictionaryRail } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail";
 import { useDataDictionaryDraft } from "@/views/DataManagerApp/DataDictionaryView/useDataDictionaryDraft/useDataDictionaryDraft";
-import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DataDictionaryTabId } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs";
 import type { ReactNode } from "react";
 
@@ -16,6 +16,18 @@ type Props = {
   dictionary: DataDictionary.T;
   savedDraft: DataDictionary.Draft;
 };
+
+/** The Used by rail, shown only while that tab is open. */
+function _buildRail(
+  options: Readonly<{
+    activeTab: DataDictionaryTabId;
+    dictionary: DataDictionary.T;
+  }>,
+): ReactNode {
+  return options.activeTab === "used-by" ? (
+    <DataDictionaryRail dictionary={options.dictionary} />
+  ) : undefined;
+}
 
 /**
  * Edits one dictionary. Entries and code lists are edited as one draft and
@@ -33,10 +45,7 @@ export function DataDictionaryEditor({
   const issues = useMemo(() => {
     return DataDictionary.findDraftIssues(draft);
   }, [draft]);
-  const [activeTab, setActiveTab] = useState<DataDictionaryTabId>("entries");
-  const [selectedCodeListId, setSelectedCodeListId] = useState<
-    DataDictionaryCodeList.Id | undefined
-  >(draft.codeLists[0]?.id);
+  const selection = useEditorSelection(draft);
 
   return (
     <AppView>
@@ -46,35 +55,23 @@ export function DataDictionaryEditor({
         canEdit={canEdit}
       />
       <AppViewBody
-        rail={
-          activeTab === "used-by" ? (
-            <DataDictionaryRail dictionary={dictionary} />
-          ) : undefined
-        }
+        rail={_buildRail({ activeTab: selection.activeTab, dictionary })}
       >
         <DataDictionaryEditorTabs
           draft={draft}
           issues={issues}
           canEdit={canEdit}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          selectedCodeListId={selectedCodeListId}
-          onSelectCodeList={setSelectedCodeListId}
-          onOpenCodeList={(codeListId) => {
-            setSelectedCodeListId(codeListId);
-            setActiveTab("code-lists");
-          }}
+          selection={selection}
           onDraftChange={setDraft}
         />
-        {isDirty ? (
-          <DataDictionaryEditorSaveBar
-            dictionaryId={dictionary.id}
-            draft={draft}
-            issues={issues}
-            onDiscard={discard}
-            onSaved={markSaved}
-          />
-        ) : null}
+        <DataDictionaryEditorSaveBar
+          isDirty={isDirty}
+          dictionaryId={dictionary.id}
+          draft={draft}
+          issues={issues}
+          onDiscard={discard}
+          onSaved={markSaved}
+        />
       </AppViewBody>
     </AppView>
   );

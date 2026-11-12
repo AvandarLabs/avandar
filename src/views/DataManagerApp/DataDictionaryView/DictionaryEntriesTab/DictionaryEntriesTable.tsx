@@ -39,6 +39,7 @@ function DictionaryEntryRow({
       <Table.Td>
         <UnstyledButton
           fw={500}
+          aria-current={isSelected || undefined}
           onClick={() => {
             onSelect(entry.id);
           }}

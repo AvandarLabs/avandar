@@ -5,7 +5,7 @@ import { DictionaryCodeListsTab } from "@/views/DataManagerApp/DataDictionaryVie
 import { DictionaryEntriesTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab";
 import { DictionaryUsedByTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
-import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { EditorSelection } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/useEditorSelection";
 import type { ReactNode } from "react";
 
 const TAB_IDS = ["entries", "code-lists", "used-by"] as const;
@@ -17,17 +17,13 @@ type Props = {
   draft: DataDictionary.Draft;
   issues: readonly DataDictionary.DraftIssue[];
   canEdit: boolean;
-  activeTab: DataDictionaryTabId;
-  onTabChange: (tabId: DataDictionaryTabId) => void;
-  selectedCodeListId: DataDictionaryCodeList.Id | undefined;
-  onSelectCodeList: (codeListId: DataDictionaryCodeList.Id) => void;
-  onOpenCodeList: (codeListId: DataDictionaryCodeList.Id) => void;
+  selection: EditorSelection;
   onDraftChange: (draft: DataDictionary.Draft) => void;
 };
 
 /** The Entries, Code lists, and Used by tabs of one dictionary. */
 export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
-  const { draft, issues, canEdit, activeTab, onTabChange } = props;
+  const { draft, issues, canEdit, selection } = props;
   const { t } = useLingui();
   const entryCount = draft.entries.length;
   const codeListCount = draft.codeLists.length;
@@ -35,8 +31,8 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
   return (
     <Tabs
       tabIds={TAB_IDS}
-      value={activeTab}
-      onTabChange={onTabChange}
+      value={selection.activeTab}
+      onTabChange={selection.setActiveTab}
       classNames={{ list: css.dataDictionaryEditorTabList }}
       renderTabHeader={{
         entries: t`Entries · ${entryCount}`,
@@ -51,7 +47,7 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
               issues={issues}
               canEdit={canEdit}
               onDraftChange={props.onDraftChange}
-              onOpenCodeList={props.onOpenCodeList}
+              onOpenCodeList={selection.openCodeList}
             />
           );
         },
@@ -61,8 +57,8 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
               draft={draft}
               issues={issues}
               canEdit={canEdit}
-              selectedCodeListId={props.selectedCodeListId}
-              onSelectCodeList={props.onSelectCodeList}
+              selectedCodeListId={selection.selectedCodeListId}
+              onSelectCodeList={selection.setSelectedCodeListId}
               onDraftChange={props.onDraftChange}
             />
           );

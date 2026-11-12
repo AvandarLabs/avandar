@@ -1,3 +1,4 @@
+import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button, NavLink, Stack } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
@@ -37,7 +38,13 @@ export function CodeListNav({
             key={list.id}
             active={list.id === selectedCodeListId}
             label={list.name}
-            description={t`${valueCount} values · used by ${entryCount}`}
+            description={t`${plural(valueCount, {
+              one: "# value",
+              other: "# values",
+            })} · ${plural(entryCount, {
+              one: "used by # entry",
+              other: "used by # entries",
+            })}`}
             onClick={() => {
               onSelectCodeList(list.id);
             }}

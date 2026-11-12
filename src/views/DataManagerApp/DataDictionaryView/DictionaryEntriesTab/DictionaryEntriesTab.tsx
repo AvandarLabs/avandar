@@ -32,20 +32,33 @@ function _matchesFilter(
   );
 }
 
-/** The filter, the selected entry, and adding an entry for the tab. */
-function useEntriesTabState(
-  options: Readonly<{
-    draft: DataDictionary.Draft;
-    onDraftChange: (draft: DataDictionary.Draft) => void;
-  }>,
-): {
+function _makeListNames(
+  draft: DataDictionary.Draft,
+): Map<DataDictionaryCodeList.Id, string> {
+  return new Map(
+    draft.codeLists.map((list) => {
+      return [list.id, list.name] as const;
+    }),
+  );
+}
+
+type EntriesTabState = {
   filter: string;
   setFilter: (filter: string) => void;
   rows: DataDictionary.EntryDraft[];
   selected: DataDictionary.EntryDraft | undefined;
   setSelectedId: (entryId: DataDictionaryEntry.Id) => void;
   addEntry: () => void;
-} {
+  listNames: Map<DataDictionaryCodeList.Id, string>;
+};
+
+/** The filter, the selected entry, and adding an entry for the tab. */
+function useEntriesTabState(
+  options: Readonly<{
+    draft: DataDictionary.Draft;
+    onDraftChange: (draft: DataDictionary.Draft) => void;
+  }>,
+): EntriesTabState {
   const { draft, onDraftChange } = options;
   const [filter, setFilter] = useState("");
   const [selectedId, setSelectedId] = useState<
@@ -71,7 +84,45 @@ function useEntriesTabState(
     setSelectedId(entry.id);
   };
 
-  return { filter, setFilter, rows, selected, setSelectedId, addEntry };
+  return {
+    filter,
+    setFilter,
+    rows,
+    selected,
+    setSelectedId,
+    addEntry,
+    listNames: _makeListNames(draft),
+  };
+}
+
+/** The pane that edits the selected entry, labelled for assistive tech. */
+function SelectedEntryAside(
+  props: Readonly<
+    Omit<Props, "draft"> & {
+      draft: DataDictionary.Draft;
+      entry: DataDictionary.EntryDraft;
+    }
+  >,
+): ReactNode {
+  const { t } = useLingui();
+  const entryName = props.entry.name || t`entry`;
+
+  return (
+    <aside
+      className={css.dictionaryEntriesTabPane}
+      aria-label={t`Edit ${entryName}`}
+    >
+      <DictionaryEntryPane
+        key={props.entry.id}
+        draft={props.draft}
+        entry={props.entry}
+        issues={props.issues}
+        canEdit={props.canEdit}
+        onDraftChange={props.onDraftChange}
+        onOpenCodeList={props.onOpenCodeList}
+      />
+    </aside>
+  );
 }
 
 /**
@@ -79,17 +130,17 @@ function useEntriesTabState(
  * matches an entry's own name and every column name it also matches.
  */
 export function DictionaryEntriesTab(props: Readonly<Props>): ReactNode {
-  const { draft, issues, canEdit, onDraftChange, onOpenCodeList } = props;
-  const { t } = useLingui();
+  const { draft, canEdit, onDraftChange } = props;
   const copy = useDictionaryCopy();
-  const { filter, setFilter, rows, selected, setSelectedId, addEntry } =
-    useEntriesTabState({ draft, onDraftChange });
-  const listNames = new Map(
-    draft.codeLists.map((list) => {
-      return [list.id, list.name] as const;
-    }),
-  );
-  const selectedName = selected?.name || t`entry`;
+  const {
+    filter,
+    setFilter,
+    rows,
+    selected,
+    setSelectedId,
+    addEntry,
+    listNames,
+  } = useEntriesTabState({ draft, onDraftChange });
 
   return (
     <div className={css.dictionaryEntriesTab}>
@@ -114,21 +165,7 @@ export function DictionaryEntriesTab(props: Readonly<Props>): ReactNode {
           />
         ) : null}
       </Stack>
-      {selected ? (
-        <aside
-          className={css.dictionaryEntriesTabPane}
-          aria-label={t`Edit ${selectedName}`}
-        >
-          <DictionaryEntryPane
-            draft={draft}
-            entry={selected}
-            issues={issues}
-            canEdit={canEdit}
-            onDraftChange={onDraftChange}
-            onOpenCodeList={onOpenCodeList}
-          />
-        </aside>
-      ) : null}
+      {selected ? <SelectedEntryAside {...props} entry={selected} /> : null}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { CodeListValuesTable } from "@/views/DataManagerApp/DataDictionaryView/D
 import { findEntryIssue } from "@/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/findEntryIssue";
 import { useDictionaryCopy } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryCopy";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { ReactNode } from "react";
 
 /** The Code list select's value for "make a new list for this entry". */
@@ -62,60 +63,81 @@ function OtherCodeListsSelect({
   );
 }
 
-/**
- * The code list a categorical or ordered entry uses, a read-only preview of
- * its values, and the other code lists the entry also recognizes.
- */
-export function EntryCodesFields(props: Readonly<Props>): ReactNode {
-  const { draft, entry, issues, canEdit, onDraftChange, onOpenCodeList } =
-    props;
+type PrimaryProps = Pick<
+  Props,
+  "draft" | "entry" | "issues" | "canEdit" | "onDraftChange"
+>;
+
+/** The draft after the Code list select picks a list, or a new one. */
+function _applyPrimaryChange(
+  options: Readonly<{
+    draft: DataDictionary.Draft;
+    entryId: DataDictionaryEntry.Id;
+    value: string | null;
+  }>,
+): DataDictionary.Draft {
+  const { draft, entryId, value } = options;
+  if (value === NEW_CODE_LIST_VALUE) {
+    return DataDictionary.addCodeListForEntry(draft, entryId).draft;
+  }
+  return DataDictionary.setPrimaryCodeList(draft, {
+    entryId,
+    codeListId: (value ?? undefined) as DataDictionaryCodeList.Id | undefined,
+  });
+}
+
+/** The Code list select, including the option to make a new list. */
+function PrimaryCodeListSelect({
+  draft,
+  entry,
+  issues,
+  canEdit,
+  onDraftChange,
+}: Readonly<PrimaryProps>): ReactNode {
   const { t } = useLingui();
   const copy = useDictionaryCopy();
-  const primaryId = DataDictionary.getPrimaryCodeListId(entry);
-  const primaryList = draft.codeLists.find((list) => {
-    return list.id === primaryId;
-  });
-  const listOptions = draft.codeLists.map((list) => {
-    return { value: list.id, label: list.name };
-  });
   const primaryIssue = findEntryIssue({
     issues,
     entryId: entry.id,
     types: ["entry_primary_required"],
   });
-  const onPrimaryChange = (value: string | null): void => {
-    if (value === NEW_CODE_LIST_VALUE) {
-      onDraftChange(DataDictionary.addCodeListForEntry(draft, entry.id).draft);
-      return;
-    }
-    onDraftChange(
-      DataDictionary.setPrimaryCodeList(draft, {
-        entryId: entry.id,
-        codeListId: (value ?? undefined) as
-          | DataDictionaryCodeList.Id
-          | undefined,
-      }),
-    );
-  };
+
+  return (
+    <Select
+      label={t`Code list`}
+      placeholder={t`No code list`}
+      value={DataDictionary.getPrimaryCodeListId(entry) ?? null}
+      disabled={!canEdit}
+      clearable
+      error={primaryIssue ? copy.describeIssue(primaryIssue) : undefined}
+      data={[
+        ...draft.codeLists.map((list) => {
+          return { value: list.id, label: list.name };
+        }),
+        { value: NEW_CODE_LIST_VALUE, label: t`New code list for this entry` },
+      ]}
+      onChange={(value: string | null) => {
+        onDraftChange(_applyPrimaryChange({ draft, entryId: entry.id, value }));
+      }}
+    />
+  );
+}
+
+/**
+ * The code list a categorical or ordered entry uses, a read-only preview of
+ * its values, and the other code lists the entry also recognizes.
+ */
+export function EntryCodesFields(props: Readonly<Props>): ReactNode {
+  const { draft, entry, canEdit, onDraftChange, onOpenCodeList } = props;
+  const primaryId = DataDictionary.getPrimaryCodeListId(entry);
+  const primaryList = draft.codeLists.find((list) => {
+    return list.id === primaryId;
+  });
+  const listName = primaryList?.name;
 
   return (
     <Stack gap="xs">
-      <Select
-        label={t`Code list`}
-        placeholder={t`No code list`}
-        value={primaryId ?? null}
-        disabled={!canEdit}
-        clearable
-        error={primaryIssue ? copy.describeIssue(primaryIssue) : undefined}
-        data={[
-          ...listOptions,
-          {
-            value: NEW_CODE_LIST_VALUE,
-            label: t`New code list for this entry`,
-          },
-        ]}
-        onChange={onPrimaryChange}
-      />
+      <PrimaryCodeListSelect {...props} />
       {primaryList ? (
         <>
           <CodeListValuesTable codeList={primaryList} />
@@ -127,7 +149,7 @@ export function EntryCodesFields(props: Readonly<Props>): ReactNode {
                 onOpenCodeList(primaryList.id);
               }}
             >
-              <Trans>Edit {primaryList.name}</Trans>
+              <Trans>Edit {listName}</Trans>
             </Button>
           </Group>
           <OtherCodeListsSelect

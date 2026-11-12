@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { CodeListEditor } from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { ReactNode } from "react";
 
 /** jsdom has no `document.fonts`, which autosize textareas listen to. */
 beforeAll(() => {
@@ -99,8 +101,40 @@ describe("CodeListEditor", () => {
     );
     expect(screen.getByText(/Pairs work both ways/)).toBeInTheDocument();
     expect(
-      screen.getByText(/This code is already in the list/),
-    ).toBeInTheDocument();
+      screen.getAllByText(/This code is already in the list/),
+    ).not.toHaveLength(0);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    const codeInput = screen.getByLabelText("Code 2");
+    expect(codeInput).toHaveAttribute("aria-invalid", "true");
+    expect(codeInput).toHaveAccessibleDescription(
+      /This code is already in the list/,
+    );
+    expect(screen.getByLabelText("Label 2")).not.toHaveAttribute(
+      "aria-invalid",
+    );
+  });
+
+  it("marks the label input when the label is the repeated part", () => {
+    const draft = _draft([
+      { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "2", label: "Male", acceptedSpellings: [], isMissing: false },
+    ]);
+    render(
+      <CodeListEditor
+        draft={draft}
+        codeListId={LIST_ID}
+        issues={[
+          { type: "label_not_unique", codeListId: LIST_ID, pairIndex: 1 },
+        ]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByLabelText("Label 2")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    expect(screen.getByLabelText("Code 2")).not.toHaveAttribute("aria-invalid");
   });
 
   it("moves a value one place with Alt and an arrow on an ordered list", () => {
@@ -126,6 +160,41 @@ describe("CodeListEditor", () => {
     expect(
       _lastDraft(onDraftChange).codeLists[0]?.pairs.map((pair) => {
         return pair.label;
+      }),
+    ).toEqual(["High", "Low"]);
+  });
+
+  it("keeps focus on the moved value's handle after a keyboard move", () => {
+    const initialDraft = _draft([
+      { code: "1", label: "Low", acceptedSpellings: [], isMissing: false },
+      { code: "2", label: "High", acceptedSpellings: [], isMissing: false },
+    ]);
+    const [list] = initialDraft.codeLists;
+    function Harness(): ReactNode {
+      const [draft, setDraft] = useState<DataDictionary.Draft>({
+        ...initialDraft,
+        codeLists: [{ ...list!, isOrdered: true }],
+      });
+      return (
+        <CodeListEditor
+          draft={draft}
+          codeListId={LIST_ID}
+          issues={[]}
+          canEdit
+          onDraftChange={setDraft}
+        />
+      );
+    }
+    render(<Harness />);
+    const handle = screen.getByRole("button", { name: "Reorder Low" });
+    handle.focus();
+    fireEvent.keyDown(handle, { key: "ArrowDown", altKey: true });
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Reorder Low" }),
+    );
+    expect(
+      screen.getAllByRole("listitem").map((item) => {
+        return item.getAttribute("aria-label");
       }),
     ).toEqual(["High", "Low"]);
   });

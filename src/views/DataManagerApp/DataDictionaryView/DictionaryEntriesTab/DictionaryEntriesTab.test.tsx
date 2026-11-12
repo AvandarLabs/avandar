@@ -102,6 +102,18 @@ describe("DictionaryEntriesTab", () => {
     expect(nextDraft.entries[0]?.description).toBe("Sex at birth.");
   });
 
+  it("marks only the selected entry's row as current", () => {
+    _renderTab();
+    fireEvent.click(screen.getByRole("button", { name: "age_years" }));
+    expect(screen.getByRole("button", { name: "age_years" })).toHaveAttribute(
+      "aria-current",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "sex" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
   it("adds an entry", () => {
     const onDraftChange = vi.fn();
     _renderTab({ onDraftChange });

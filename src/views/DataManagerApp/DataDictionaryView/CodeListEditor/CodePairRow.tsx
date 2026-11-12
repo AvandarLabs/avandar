@@ -5,8 +5,15 @@ import { Checkbox, TagsInput, Text, TextInput } from "@mantine/core";
 import { IconArrowsLeftRight, IconTrash } from "@tabler/icons-react";
 import css from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.module.css";
 import { CodePairDragHandle } from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairDragHandle";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { ReactNode } from "react";
+
+/** A pair's validation problem, with the copy that explains it. */
+export type CodePairIssue = {
+  type: DataDictionary.DraftIssue["type"];
+  message: string;
+};
 
 type Props = {
   /** A stable key for the sortable, since pairs have no id. */
@@ -15,7 +22,9 @@ type Props = {
   index: number;
   isOrdered: boolean;
   canEdit: boolean;
-  issueMessage: string | undefined;
+  /** Focuses the drag handle when the row mounts, after a reorder. */
+  shouldFocusHandle: boolean;
+  issue: CodePairIssue | undefined;
   onChange: (pair: DataDictionaryCodeList.Pair) => void;
   onRemove: () => void;
   onMoveByOffset: (offset: -1 | 1) => void;
@@ -24,7 +33,29 @@ type Props = {
 type FieldsProps = Pick<Props, "pair" | "canEdit" | "onChange" | "onRemove"> & {
   rowNumber: number;
   valueName: string;
+  issue: CodePairIssue | undefined;
 };
+
+/** Which input a pair issue is about. */
+function _isIssueOnInput(
+  options: Readonly<{
+    issue: CodePairIssue | undefined;
+    input: "code" | "label";
+    pair: DataDictionaryCodeList.Pair;
+  }>,
+): boolean {
+  const { issue, input, pair } = options;
+  if (input === "code") {
+    return (
+      issue?.type === "code_not_unique" ||
+      (issue?.type === "code_pair_incomplete" && !pair.code.trim())
+    );
+  }
+  return (
+    issue?.type === "label_not_unique" ||
+    (issue?.type === "code_pair_incomplete" && !pair.label.trim())
+  );
+}
 
 /** The other spellings, missing switch, and remove button of a value. */
 function CodePairOptions({
@@ -34,7 +65,7 @@ function CodePairOptions({
   onRemove,
   rowNumber,
   valueName,
-}: Readonly<FieldsProps>): ReactNode {
+}: Readonly<Omit<FieldsProps, "issue">>): ReactNode {
   const { t } = useLingui();
 
   return (
@@ -71,20 +102,34 @@ function CodePairOptions({
   );
 }
 
-function CodePairFields({
-  pair,
-  canEdit,
-  onChange,
-  onRemove,
-  rowNumber,
-  valueName,
-}: Readonly<FieldsProps>): ReactNode {
+/**
+ * Mantine owns aria-invalid and aria-describedby on its inputs. Passing the
+ * message as `error` sets both, and the element it renders is hidden because
+ * the row shows the same message on its own issue line.
+ */
+function _buildIssueProps(
+  options: Readonly<{
+    issue: CodePairIssue | undefined;
+    input: "code" | "label";
+    pair: DataDictionaryCodeList.Pair;
+  }>,
+): { error: string | undefined; errorProps: { className?: string } } {
+  return {
+    error: _isIssueOnInput(options) ? options.issue?.message : undefined,
+    errorProps: { className: css.codeListEditorIssueDescription },
+  };
+}
+
+function CodePairFields(props: Readonly<FieldsProps>): ReactNode {
+  const { pair, canEdit, onChange, issue } = props;
   const { t } = useLingui();
+  const rowNumber = props.rowNumber;
 
   return (
     <>
       <TextInput
         aria-label={t`Code ${rowNumber}`}
+        {..._buildIssueProps({ issue, input: "code", pair })}
         value={pair.code}
         disabled={!canEdit}
         className={css.codeListEditorCode}
@@ -99,6 +144,7 @@ function CodePairFields({
       />
       <TextInput
         aria-label={t`Label ${rowNumber}`}
+        {..._buildIssueProps({ issue, input: "label", pair })}
         value={pair.label}
         disabled={!canEdit}
         onChange={(event) => {
@@ -109,9 +155,9 @@ function CodePairFields({
         pair={pair}
         canEdit={canEdit}
         onChange={onChange}
-        onRemove={onRemove}
+        onRemove={props.onRemove}
         rowNumber={rowNumber}
-        valueName={valueName}
+        valueName={props.valueName}
       />
     </>
   );
@@ -124,7 +170,7 @@ function CodePairFields({
  * knows which value they are in.
  */
 export function CodePairRow(props: Readonly<Props>): ReactNode {
-  const { sortableId, pair, index, isOrdered, canEdit, issueMessage } = props;
+  const { sortableId, pair, index, isOrdered, canEdit, issue } = props;
   const { t } = useLingui();
   const { ref, handleRef, isDragging } = useSortable({
     id: sortableId,
@@ -146,6 +192,7 @@ export function CodePairRow(props: Readonly<Props>): ReactNode {
           valueName={valueName}
           handleRef={handleRef}
           isDragging={isDragging}
+          shouldFocus={props.shouldFocusHandle}
           onMoveByOffset={props.onMoveByOffset}
         />
       ) : null}
@@ -156,15 +203,16 @@ export function CodePairRow(props: Readonly<Props>): ReactNode {
         onRemove={props.onRemove}
         rowNumber={rowNumber}
         valueName={valueName}
+        issue={issue}
       />
-      {issueMessage ? (
+      {issue ? (
         <Text
           size="xs"
+          aria-hidden
           c="danger"
-          role="alert"
           className={css.codeListEditorRowIssue}
         >
-          {issueMessage}
+          {issue.message}
         </Text>
       ) : null}
     </li>

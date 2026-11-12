@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@/test-utils";
 import { DictionaryCodeListsTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 
 /** jsdom has no `document.fonts`, which autosize textareas listen to. */
 beforeAll(() => {
@@ -40,6 +41,54 @@ describe("DictionaryCodeListsTab", () => {
     );
     fireEvent.click(screen.getByText("Race"));
     expect(onSelectCodeList).toHaveBeenCalledWith(RACE_ID);
+  });
+
+  it("counts one value and one entry in the singular", () => {
+    const draft: DataDictionary.Draft = {
+      codeLists: [
+        {
+          id: SEX_ID,
+          name: "Sex",
+          isOrdered: false,
+          pairs: [
+            {
+              code: "1",
+              label: "Male",
+              acceptedSpellings: [],
+              isMissing: false,
+            },
+          ],
+        },
+        { id: RACE_ID, name: "Race", isOrdered: false, pairs: [] },
+      ],
+      entries: [
+        {
+          id: "99999999-9999-4999-8999-999999999999" as DataDictionaryEntry.Id,
+          name: "sex",
+          columnNames: [],
+          kind: "categorical",
+          unit: "",
+          validMin: undefined,
+          validMax: undefined,
+          description: "",
+          codings: [{ codeListId: SEX_ID, isPrimary: true }],
+        },
+      ],
+    };
+    render(
+      <DictionaryCodeListsTab
+        draft={draft}
+        issues={[]}
+        canEdit
+        selectedCodeListId={SEX_ID}
+        onSelectCodeList={vi.fn()}
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("1 value · used by 1 entry")).toBeInTheDocument();
+    expect(
+      screen.getByText("0 values · used by 0 entries"),
+    ).toBeInTheDocument();
   });
 
   it("adds a code list and selects it", () => {

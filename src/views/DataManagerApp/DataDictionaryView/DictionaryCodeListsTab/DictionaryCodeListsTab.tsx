@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { Button, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
@@ -39,10 +39,11 @@ function useConfirmRemoveCodeList(
       children: (
         <Text>
           {entryCount > 0 ? (
-            <Trans>
-              {entryCount} entries use this code list. Removing it removes it
-              from them too.
-            </Trans>
+            <Plural
+              value={entryCount}
+              one="# entry uses this code list. Removing it removes it from that entry too."
+              other="# entries use this code list. Removing it removes it from them too."
+            />
           ) : (
             <Trans>No entry uses this code list.</Trans>
           )}

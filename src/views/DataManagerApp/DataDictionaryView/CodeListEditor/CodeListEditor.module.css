@@ -28,6 +28,20 @@
   grid-column: 2 / -1;
 }
 
+/*
+ * The input's own error element is the accessible description of the field.
+ * The row shows the same message on its issue line, so this one is hidden.
+ */
+.codeListEditorIssueDescription {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 .codeListEditorCode {
   font-variant-numeric: tabular-nums;
 }

@@ -1,7 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { VisuallyHidden } from "@mantine/core";
+import { useMergedRef } from "@mantine/hooks";
 import { IconGripVertical } from "@tabler/icons-react";
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import css from "@/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.module.css";
 import type { KeyboardEvent, ReactNode, Ref } from "react";
 
@@ -9,6 +10,8 @@ type Props = {
   valueName: string;
   handleRef: Ref<HTMLButtonElement>;
   isDragging: boolean;
+  /** Takes focus when the handle mounts. */
+  shouldFocus: boolean;
   onMoveByOffset: (offset: -1 | 1) => void;
 };
 
@@ -41,16 +44,25 @@ export function CodePairDragHandle({
   valueName,
   handleRef,
   isDragging,
+  shouldFocus,
   onMoveByOffset,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const instructionsId = useId();
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const mergedRef = useMergedRef(buttonRef, handleRef);
+
+  useEffect(() => {
+    if (shouldFocus) {
+      buttonRef.current?.focus();
+    }
+  }, [shouldFocus]);
 
   return (
     <>
       <button
         type="button"
-        ref={handleRef}
+        ref={mergedRef}
         className={css.codeListEditorHandle}
         aria-label={t`Reorder ${valueName}`}
         aria-describedby={instructionsId}
