@@ -222,9 +222,46 @@ describe("DictionaryProposal edits", () => {
           _coded(KINGS, "grade", ["001"]),
         ]),
       );
+      // The code of a third column that spells it a new way joins the
+      // spelling with the most rows.
+      expect(DictionaryProposal.getValuesSeen(entry)).toEqual([
+        { value: "1", rowCount: 300 },
+        { value: "01", rowCount: 100 },
+      ]);
+    });
+
+    it("joins a new spelling to the one with the most rows", () => {
+      const withRows = (
+        dataset: DatasetRef,
+        values: ColumnProfile.Value[],
+      ): ColumnProfile.T => {
+        return { ..._coded(dataset, "grade", []), values };
+      };
+      const entry = _firstEntry(
+        DictionaryProposal.fromColumnProfiles([
+          withRows(BRONX, [
+            { value: "01", rowCount: 10 },
+            { value: "1", rowCount: 30 },
+          ]),
+          withRows(ERIE, [{ value: "001", rowCount: 5 }]),
+        ]),
+      );
+      expect(DictionaryProposal.getValuesSeen(entry)).toEqual([
+        { value: "1", rowCount: 35 },
+        { value: "01", rowCount: 10 },
+      ]);
+    });
+
+    it("breaks a tie between spellings by their text, not their order", () => {
+      const entry = _firstEntry(
+        DictionaryProposal.fromColumnProfiles([
+          _coded(BRONX, "grade", ["1", "01"]),
+          _coded(ERIE, "grade", ["001"]),
+        ]),
+      );
       expect(DictionaryProposal.getValuesSeen(entry)).toEqual([
         { value: "01", rowCount: 200 },
-        { value: "1", rowCount: 200 },
+        { value: "1", rowCount: 100 },
       ]);
     });
   });

@@ -360,6 +360,11 @@ function _getFirstIndex(cluster: Readonly<Cluster>): number {
   );
 }
 
+/**
+ * The entry for one cluster. Its `key` is built from the first member in
+ * input order, so the same profiles in a different order key their entries
+ * differently, while a proposal's edits only ever use the keys it holds.
+ */
 function _makeEntryFromCluster(
   cluster: Readonly<Cluster>,
 ): DictionaryProposalEntry {

@@ -67,7 +67,7 @@ function _makeColumnCoding(values: readonly ColumnProfile.Value[]): Coding {
  * Groups the columns' codings so two that overlap share a group, through
  * any chain of overlaps, and merges each group's codes once. Only each
  * column's own codes are compared, so the groups do not depend on the order
- * the columns came in, and no code lands in two of one entry's codings.
+ * the columns came in.
  */
 function _mergeOverlappingCodings(codings: readonly Coding[]): Coding[] {
   const parents = codings.map((_coding, index) => {

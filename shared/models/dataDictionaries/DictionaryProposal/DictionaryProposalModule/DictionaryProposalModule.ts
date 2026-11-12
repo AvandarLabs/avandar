@@ -82,6 +82,15 @@ function getDatasetIds(proposal: Readonly<DictionaryProposalT>): Dataset.Id[] {
 /** A listed value merged across columns, with the key it compares by. */
 type ValueSeen = ColumnProfile.Value & { key: string };
 
+function _getBiggestSlot(slots: readonly ValueSeen[]): ValueSeen | undefined {
+  return [...slots].sort((slotA, slotB) => {
+    if (slotA.rowCount !== slotB.rowCount) {
+      return slotB.rowCount - slotA.rowCount;
+    }
+    return slotA.value < slotB.value ? -1 : slotA.value > slotB.value ? 1 : 0;
+  })[0];
+}
+
 /**
  * Adds one column's values to `seen`. A value joins one from another column
  * with the same comparison key, the same spelling first, so `01` and `1`
@@ -101,10 +110,12 @@ function _addColumnValues(
         slot.key === key && (slot.value === value || !takenByColumn.has(slot))
       );
     });
+    // The same spelling first, else the spelling with the most rows so far,
+    // else the first by text, so the choice never rests on listing order.
     const slot =
       candidates.find((candidate) => {
         return candidate.value === value;
-      }) ?? candidates[0];
+      }) ?? _getBiggestSlot(candidates);
     if (slot) {
       slot.rowCount += item.rowCount;
       takenByColumn.add(slot);
