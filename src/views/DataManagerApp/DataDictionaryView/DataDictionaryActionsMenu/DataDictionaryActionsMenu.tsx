@@ -21,17 +21,20 @@ function useDeleteDictionary(dictionary: DataDictionary.T): () => void {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const dictionaryName = dictionary.name;
   const [deleteDictionary] = DataDictionaryClient.useDelete({
     queryToInvalidate: DataDictionaryClient.QueryKeys.getAll(),
     onSuccess: () => {
       navigate(AppLinks.dataManagerHome(workspace.slug));
       notifySuccess({
         title: t`Dictionary deleted`,
-        message: t`${dictionary.name} was deleted.`,
+        message: t`${dictionaryName} was deleted.`,
       });
     },
-    onError: (error) => {
-      notifyError(t`The dictionary could not be deleted: ${error.message}`);
+    onError: () => {
+      notifyError(
+        t`The dictionary could not be deleted. Please try again or reach out to support.`,
+      );
     },
   });
 
@@ -41,7 +44,7 @@ function useDeleteDictionary(dictionary: DataDictionary.T): () => void {
       children: (
         <Text>
           <Trans>
-            Delete {dictionary.name} and all of its entries and code lists?
+            Delete {dictionaryName} and all of its entries and code lists?
           </Trans>
         </Text>
       ),

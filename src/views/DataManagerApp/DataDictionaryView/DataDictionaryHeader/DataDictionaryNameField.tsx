@@ -25,8 +25,10 @@ export function DataDictionaryNameField({
   }, [dictionary.name]);
   const [updateDictionary, isUpdating] = DataDictionaryClient.useUpdate({
     queryToInvalidate: DataDictionaryClient.QueryKeys.getAll(),
-    onError: (error) => {
-      notifyError(t`The name could not be saved: ${error.message}`);
+    onError: () => {
+      notifyError(
+        t`The name could not be saved. Please try again or reach out to support.`,
+      );
     },
   });
 
