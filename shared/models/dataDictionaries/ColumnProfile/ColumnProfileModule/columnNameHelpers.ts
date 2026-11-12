@@ -240,14 +240,59 @@ function _createWordIndex(): {
 }
 
 /**
+ * A map of name pair to score that grows with the pairs compared. A name
+ * keeps its scores in a `Map` until it holds so many that a flat array
+ * indexed by name id is smaller and faster, then switches to that array.
+ * A name compared with only a few others never pays for a row as long as
+ * the number of distinct names.
+ */
+function _createScoreMemo(getNameCount: () => number): {
+  get: (idA: number, idB: number) => number | undefined;
+  set: (idA: number, idB: number, score: number) => void;
+} {
+  const denseRows: Array<Float64Array | undefined> = [];
+  const sparseRows: Array<Map<number, number> | undefined> = [];
+  // A Map entry costs about this many array slots.
+  const SLOTS_PER_MAP_ENTRY = 8;
+  const get = (idA: number, idB: number): number | undefined => {
+    const dense = denseRows[idA];
+    if (dense) {
+      const known = dense[idB];
+      return known !== undefined && known >= 0 ? known : undefined;
+    }
+    return sparseRows[idA]?.get(idB);
+  };
+  const set = (idA: number, idB: number, score: number): void => {
+    const dense = denseRows[idA];
+    if (dense) {
+      dense[idB] = score;
+      return;
+    }
+    const sparse = (sparseRows[idA] ??= new Map<number, number>());
+    sparse.set(idB, score);
+    if (sparse.size * SLOTS_PER_MAP_ENTRY > getNameCount()) {
+      const filled = new Float64Array(getNameCount()).fill(-1);
+      sparse.forEach((known, id) => {
+        filled[id] = known;
+      });
+      denseRows[idA] = filled;
+      sparseRows[idA] = undefined;
+    }
+  };
+  return { get, set };
+}
+
+/**
  * A `NameScorer` that tokenizes each distinct name once and remembers every
  * word pair and name pair it has compared. Give every name its id with
- * `getNameId` before scoring, so each score row is sized once.
+ * `getNameId` before scoring, so a dense row is sized once.
  */
 export function createNameScorer(): NameScorer {
   const idsByName = new Map<string, number>();
   const wordIdsByName: number[][] = [];
-  const rows: Float64Array[] = [];
+  const memo = _createScoreMemo(() => {
+    return wordIdsByName.length;
+  });
   const { getWordId, isSameWordId } = _createWordIndex();
   const getNameId = (columnName: string): number => {
     const known = idsByName.get(columnName);
@@ -261,15 +306,14 @@ export function createNameScorer(): NameScorer {
     return wordIdsByName.length - 1;
   };
   const getScore = (idA: number, idB: number): number => {
-    const row = (rows[idA] ??= new Float64Array(wordIdsByName.length).fill(-1));
-    const known = row[idB];
-    if (known !== undefined && known >= 0) {
+    const known = memo.get(idA, idB);
+    if (known !== undefined) {
       return known;
     }
     const wordsA = wordIdsByName[idA] ?? [];
     const wordsB = wordIdsByName[idB] ?? [];
     const score = getNameScoreFromTokens(wordsA, wordsB, isSameWordId);
-    row[idB] = score;
+    memo.set(idA, idB, score);
     return score;
   };
   return { getNameId, getScore };

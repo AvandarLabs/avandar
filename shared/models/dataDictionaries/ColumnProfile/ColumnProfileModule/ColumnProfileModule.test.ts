@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid.ts";
 import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
+import { getNameScore } from "$/models/dataDictionaries/ColumnProfile/ColumnProfileModule/columnNameHelpers.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 
 const BRONX_ID = uuid<Dataset.Id>();
@@ -269,5 +270,39 @@ describe("ColumnProfile.sortValuesInScaleOrder", () => {
         return item.value;
       }),
     ).toEqual(["B", "a", "b"]);
+  });
+});
+
+describe("ColumnProfile.createNameScorer", () => {
+  const NAME_COUNT = 3000;
+  const names = Array.from({ length: NAME_COUNT }, (_name, index) => {
+    return `field_${index}_value`;
+  });
+
+  it("scores a name against thousands of others the same as getNameScore", () => {
+    const scorer = ColumnProfile.createNameScorer();
+    const ids = names.map(scorer.getNameId);
+    // One name against every other crosses from sparse to dense storage.
+    [0, 1, 1500, 2999].forEach((index) => {
+      names.forEach((name, otherIndex) => {
+        expect(scorer.getScore(ids[index]!, ids[otherIndex]!)).toBe(
+          getNameScore(names[index]!, name),
+        );
+      });
+    });
+  });
+
+  it("scores thousands of distinct names, each against a few others, in a generous bound", () => {
+    const scorer = ColumnProfile.createNameScorer();
+    const ids = names.map(scorer.getNameId);
+    const startedAt = performance.now();
+    ids.forEach((id, index) => {
+      for (let step = 1; step <= 30; step++) {
+        const otherId = ids[(index * 31 + step * 97) % NAME_COUNT]!;
+        scorer.getScore(id, otherId);
+        scorer.getScore(id, otherId);
+      }
+    });
+    expect(performance.now() - startedAt).toBeLessThan(5000);
   });
 });
