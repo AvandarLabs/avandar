@@ -29,6 +29,7 @@ export function ListToggleButton({
       color="neutral"
       size="compact-sm"
       leftSection={<Icon size={18} aria-hidden />}
+      aria-expanded={isListShown}
       onClick={onToggle}
     >
       {isListShown ? t`Hide list` : t`Show list`}

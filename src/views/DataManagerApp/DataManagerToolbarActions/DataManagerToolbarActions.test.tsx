@@ -99,6 +99,25 @@ describe("DataManagerToolbarActions", () => {
     expect(onToggle).toHaveBeenCalledOnce();
   });
 
+  it.each([
+    [true, "Hide list", "true"],
+    [false, "Show list", "false"],
+  ])(
+    "says whether the list is expanded when isListShown is %s",
+    (isListShown, name, expanded) => {
+      render(
+        <DataManagerToolbarActions
+          onNewDictionary={vi.fn()}
+          listToggle={{ isListShown, onToggle: vi.fn() }}
+        />,
+      );
+      expect(screen.getByRole("button", { name })).toHaveAttribute(
+        "aria-expanded",
+        expanded,
+      );
+    },
+  );
+
   it("offers Hide list while the list is shown", () => {
     render(
       <DataManagerToolbarActions
