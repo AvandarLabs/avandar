@@ -41,6 +41,9 @@ with public_tables as (
       'data_catalog_facet_counts',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
+      'data_dictionaries__code_lists',
+      'data_dictionaries__entries',
+      'data_dictionaries__entry_codings',
       'datasets__postgres_table',
       'map_jitter_salts',
       -- Service role only: no `authenticated` grant at all.
@@ -101,6 +104,9 @@ with public_tables as (
       'map_jitter_salts',
       'data_catalog_listings__relation_columns',
       'data_catalog_listings',
+      'data_dictionaries__code_lists',
+      'data_dictionaries__entries',
+      'data_dictionaries__entry_codings',
       'subscriptions',
       'usage_analytics_events'
     )

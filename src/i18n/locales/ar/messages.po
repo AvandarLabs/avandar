@@ -91,6 +91,10 @@ msgstr "الأرقام في النصوص"
 msgid "Sort by"
 msgstr "ترتيب حسب"
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "You need edit access to Data Sources to change this dictionary."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "Remove field"
 msgstr "إزالة الحقل"
@@ -193,6 +197,10 @@ msgstr "تعذّر تحديث مجموعة البيانات هذه"
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is not on"
 msgstr "ليس على"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
+msgid "Values to add"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "0 rows"
@@ -382,6 +390,10 @@ msgstr "الاكتشاف غير متاح في هذا السياق."
 msgid "You need Case Types editor access to change these statuses."
 msgstr "تحتاج إلى صلاحية محرّر أنواع الحالات لتغيير هذه الحالات."
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Identifier: unique to each row, such as a case number"
+msgstr ""
+
 #: src/components/caseStatuses/StatusSetEditor/StatusDragHandle.tsx
 msgid "Reorder {statusName}"
 msgstr "إعادة ترتيب {statusName}"
@@ -398,6 +410,10 @@ msgstr "يحتاج هذا المخطط إلى المكوّن الإضافي {plu
 #: src/views/OntologyDesignerApp/NewCaseTypeButton.tsx
 msgid "New case type"
 msgstr "نوع حالة جديد"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
+msgid "Code lists · {codeListCount}"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "No filters yet. Add one to let viewers refine this chart without "
@@ -485,6 +501,10 @@ msgstr "الانتقال إلى إحداثي أو رمز P"
 msgid "{0, plural, one {# row} other {# rows}}"
 msgstr "{0, plural, one {# صف} other {# صفوف}}"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/DictionaryEntryPane.tsx
+msgid "Applying this entry to a dataset adds this description to the column."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 msgid "Could not load the dataset's SQL query."
 msgstr "لم يتمكن من تحميل استعلام SQL لمجموعة البيانات."
@@ -497,6 +517,10 @@ msgstr "أفاندار"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar can't download from a private or local address."
 msgstr "لا يمكن لـ Avandar التنزيل من عنوان خاص أو محلي."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "{codeListCount, plural, one {# code list} other {# code lists}}"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Needs review"
@@ -535,6 +559,10 @@ msgstr "معالجة"
 msgid "Style"
 msgstr "النمط"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "{dictionaryName} was deleted."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Square"
 msgstr "مربع"
@@ -543,6 +571,10 @@ msgstr "مربع"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Notes"
 msgstr "ملاحظات"
+
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+msgid "NYS measles case report"
+msgstr ""
 
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Detected column types for {changedCount} columns in \"{sourceFileName}\" "
@@ -565,7 +597,6 @@ msgid "Could not open the place."
 msgstr "تعذّر فتح المكان."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
-#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Datasets"
 msgstr "مجموعات البيانات"
 
@@ -653,6 +684,11 @@ msgstr "ملف PDF"
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "These statuses changed somewhere else. Close this window and try again."
 msgstr "تغيّرت هذه الحالات في مكان آخر. أغلق هذه النافذة وحاول مرة أخرى."
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorActions.tsx
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
+msgid "Paste a list"
+msgstr ""
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCardHeader.tsx
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
@@ -842,6 +878,10 @@ msgstr "هل تريد استيراد \"{fileName}\" كبيانات جديدة؟"
 msgid "Classes"
 msgstr "الفئات"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "How codes work"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferFilterStep.tsx
 msgid "Filter and show list"
 msgstr "تصفية القائمة وعرضها"
@@ -986,6 +1026,10 @@ msgid "Only some people can open this dashboard. Teammates on this case without 
 "access will see \"Unavailable\"."
 msgstr "يمكن لبعض الأشخاص فقط فتح لوحة المعلومات هذه. سيرى أعضاء الفريق في هذه "
 "الحالة الذين لا يملكون صلاحية الوصول «غير متاح»."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
+msgid "Entries · {entryCount}"
+msgstr ""
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial?"
@@ -1249,6 +1293,10 @@ msgstr "تم تحديث مجموعة الأدوار"
 msgid "Small"
 msgstr "صغير"
 
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "No data yet"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Go to Privacy log"
 msgstr "الانتقال إلى سجل الخصوصية"
@@ -1295,6 +1343,11 @@ msgstr "لا توجد كلمات مفتاحية"
 msgid "Updated {0}"
 msgstr "تم التحديث {0}"
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairList.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
+msgid "Values in {listName}"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextTray.tsx
 msgid "Attached to this chat"
 msgstr "مرفقة بهذه المحادثة"
@@ -1331,6 +1384,10 @@ msgstr "بعد"
 #: src/views/GisApp/panels/LayerPanel/LayerList/LayerList.tsx
 msgid "No layers yet."
 msgstr "لا توجد طبقات بعد."
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "Label {rowNumber}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
@@ -1383,6 +1440,10 @@ msgstr "تعذر التحميل"
 msgid "The source file is empty."
 msgstr "الملف المصدر فارغ."
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Give this entry a name."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "يمكن للأشخاص والمجموعات المدرجين أدناه فقط الوصول إلى هذا {resource}."
@@ -1392,6 +1453,10 @@ msgid "You cannot add more datasets on your current plan. Upgrade to add this "
 "catalog dataset."
 msgstr "لا يمكنك إضافة المزيد من مجموعات البيانات في خطتك الحالية. قم بالترقية "
 "لإضافة مجموعة بيانات الكتالوج هذه."
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "The lowest valid value is above the highest."
+msgstr ""
 
 #: src/views/RegisterView/RegistrationStatusMessages.tsx
 msgid "Please check your email for a confirmation link. It may take a few "
@@ -1450,6 +1515,10 @@ msgstr "ومع ذلك، لا نسمح بالتسجيلات الجديدة في �
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginStatusBadge.tsx
 msgid "Not installed"
 msgstr "غير مثبّت"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorActions.tsx
+msgid "Add value"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Open and being worked on."
@@ -1587,6 +1656,15 @@ msgstr "تظهر هذه المجموعات في مساحة العمل الخاص
 "بيانات المصدر الخاصة بها في التخزين المحلي لديك. لمتابعة، تحتاج إلى "
 "إعادة تحميل مجموعة البيانات أو حذفها من مساحة العمل الخاصة بك."
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "Delete {dictionaryName} and all of its entries and code lists?"
+msgstr ""
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
+msgid "No code lists yet. A code list holds values such as 1 = Male, and any "
+"entry can use it."
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTableToggle.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
 msgid "Show fewer"
@@ -1605,6 +1683,11 @@ msgstr "إعادة المحاولة"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "تعذّرت إعادة تسلسل الاستعلام الفرعي لـ JOIN في الموضع {index}."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar.tsx
+msgid "{issueCount, plural, one {# thing to fix before saving} other {# things "
+"to fix before saving}}"
+msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Type a question and I will generate the SQL and run it for you."
@@ -1693,6 +1776,10 @@ msgstr "نسخ رابط التعليق"
 msgid "Measure distance and area"
 msgstr "قياس المسافة والمساحة"
 
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Filter data"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add to workspace"
 msgstr "أضف إلى مساحة العمل"
@@ -1717,8 +1804,11 @@ msgstr "الفهرس متاح في <0/> وينمو استنادًا إلى ما 
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
@@ -1979,6 +2069,7 @@ msgstr "الحجم حسب القيمة"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "Label"
 msgstr "التسمية"
@@ -2140,6 +2231,10 @@ msgid "Value axis {0} to {1}, {scaleLabel}, fits {2} ticks (max error "
 msgstr "محور القيم من {0} إلى {1}، {scaleLabel}، يتسع لـ {2} تدريجات (الخطأ "
 "الأقصى {residual} نقطة)"
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "Remove {valueName}"
+msgstr ""
+
 #: src/routes/signin.tsx
 #: src/routes/update-password.tsx
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
@@ -2215,6 +2310,10 @@ msgstr "تاريخ الإنتاج: {0}"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceFormFields.tsx
 msgid "Exposure ends"
 msgstr "انتهاء التعرّض"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
+msgid "Kind and values"
+msgstr ""
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListFields.tsx
 msgid "Prints the layer's features as a table after the map."
@@ -2471,6 +2570,11 @@ msgid "There is no text in this region to send. Kept the rule-based results."
 msgstr "لا يوجد نص في هذه المنطقة لإرساله. تم الاحتفاظ بالنتائج المستندة إلى "
 "القواعد."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesEmptyNote.tsx
+msgid "No entries yet. Add one for each kind of column this dictionary "
+"describes."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Medium"
 msgstr "متوسط"
@@ -2593,7 +2697,7 @@ msgid "Sort & limit"
 msgstr "الفرز والحد"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
-#: src/views/DataManagerApp/DataManagerApp.tsx
+#: src/views/DataManagerApp/DataManagerToolbarActions.tsx
 msgid "Add new dataset"
 msgstr "إضافة مجموعة بيانات جديدة"
 
@@ -2605,6 +2709,7 @@ msgstr "التحويل إلى خطة مجانية"
 msgid "Something went wrong while running this query."
 msgstr "حدث خطأ ما أثناء تشغيل هذا الاستعلام."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Unit"
 msgstr "الوحدة"
@@ -2813,6 +2918,10 @@ msgid "An unexpected error occurred. You can try again, or return home."
 msgstr "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة "
 "الرئيسية."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
+msgid "Remove code list"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "حفظ عنوان URL"
@@ -2879,6 +2988,10 @@ msgstr "تسجيل الخروج"
 msgid "Section"
 msgstr "قسم"
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "value {rowNumber}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Scale"
 msgstr "المقياس"
@@ -2898,6 +3011,11 @@ msgstr "تعكس مجموعة البيانات هذه الآن المحتوى ا
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesModal.tsx
 msgid "Edit statuses"
 msgstr "تحرير الحالات"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
+msgid "Also matches columns named"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
@@ -3151,6 +3269,7 @@ msgid "Place deleted."
 msgstr "تم حذف المكان."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar.tsx
 msgid "Discard"
 msgstr "تجاهل"
 
@@ -3161,6 +3280,14 @@ msgstr "هناك حالتان تحملان الاسم نفسه. امنح كل و
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Its features are removed from this workspace."
 msgstr "تمت إزالة ميزاته من مساحة العمل هذه."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "Made from"
+msgstr ""
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "Updated {updatedDate}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
@@ -3206,6 +3333,10 @@ msgstr "إلغاء تثبيت {pluginName}؟"
 msgid "100% stacked"
 msgstr "تكديس بنسبة 100%"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
+msgid "The name could not be saved. Please try again or reach out to support."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
 "example https://example.org/cases/{case_id}."
@@ -3215,6 +3346,11 @@ msgstr "اكتب اسم حقل بين قوسين معقوفين لملئه من 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not find a known dataset matching \"{tableName}\"."
 msgstr "تعذّر العثور على مجموعة بيانات معروفة تطابق \"{tableName}\"."
+
+#: src/routes/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryView.tsx
+msgid "Dictionary failed to load"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig.tsx
 msgid "Data Visualization"
@@ -3350,6 +3486,10 @@ msgstr "استيراد البيانات"
 msgid "Descending"
 msgstr "تنازلي"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
+msgid "Lowest valid value"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Offline {percent}%"
 msgstr "دون اتصال {percent}%"
@@ -3370,6 +3510,7 @@ msgstr "{keyboardShortcut} للحفظ"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
@@ -3512,6 +3653,10 @@ msgid "Each series is a numeric column plotted on the Y axis. Values are "
 msgstr "كل سلسلة هي عمود رقمي يتم رسمه على المحور Y. يتم تجميع القيم حسب المحور "
 "X (\"{axisKeyValue}\")."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesToolbar.tsx
+msgid "Filter entries"
+msgstr ""
+
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Mention a teammate or link a dashboard, dataset, or case"
 msgstr "أشر إلى أحد أعضاء الفريق أو أضف رابطًا إلى لوحة معلومات أو مجموعة "
@@ -3525,6 +3670,10 @@ msgstr "تعبئة يدويًا"
 #: src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts
 msgid "Some filters were removed"
 msgstr "تمت إزالة بعض عوامل التصفية"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
+msgid "Datasets this dictionary is applied to will be listed here."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Minimum"
@@ -3564,6 +3713,11 @@ msgstr "العودة إلى إعدادات الطبقة"
 msgid "Remove series"
 msgstr "إزالة السلاسل"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
+msgid "(missing value)"
+msgstr ""
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Created"
@@ -3721,9 +3875,13 @@ msgstr "لا يزال يجري تنزيل دعم الأشكال الهندسية
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 #: src/views/GisApp/panels/FeatureInspector/PlaceFeatureActions/PlaceFeatureActions.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
@@ -3787,6 +3945,10 @@ msgstr "هذا العنوان غير مسموح به"
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Your Google connection expired"
 msgstr "انتهت صلاحية اتصالك بـ Google"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "More dictionary actions"
+msgstr ""
 
 #: src/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation.ts
 msgid "This query was stopped before it finished."
@@ -4060,6 +4222,12 @@ msgstr "إجراءات التعليق"
 msgid "Get started {completedCount}/{totalMilestoneCount}"
 msgstr "البدء {completedCount}/{totalMilestoneCount}"
 
+#: src/routes/_auth/$workspaceSlug/data-manager/dictionaries/$dictionaryId.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryView.tsx
+msgid "The dictionary failed to load. Please try again later or reach out to "
+"support."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Each point moves by the same amount every time this map is opened, so a "
 "reader cannot average several views back to the real location."
@@ -4088,6 +4256,10 @@ msgstr "لا شيء"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Link copied"
 msgstr "تم نسخ الرابط"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "Version"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "This dataset is indexed in {serviceName}, but it can't be loaded."
@@ -4160,6 +4332,11 @@ msgstr "يمكنك هنا الاطلاع على ملف إحصائي كامل ل�
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Personal data + biased framing detected"
 msgstr "تم الكشف عن بيانات شخصية + تأطير متحيز"
+
+#: src/views/DataManagerApp/DataManagerToolbarActions.tsx
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+msgid "New dictionary"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/SqlTabPanel.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
@@ -4289,6 +4466,10 @@ msgid "It may have been deleted, or you don't have access. Ask the comment's "
 msgstr "ربما تم حذفها أو لا تملك صلاحية الوصول إليها. اطلب من كاتب التعليق "
 "مشاركتها معك."
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Give this code list a name."
+msgstr ""
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Bring a spreadsheet into Avandar."
 msgstr "أدرِج جدول بيانات في Avandar."
@@ -4311,6 +4492,10 @@ msgstr "تكرار"
 msgid "Outcome"
 msgstr "النتيجة"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
+msgid "No entry uses this code list."
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 msgid "Write an update. Type @ to mention a teammate or link a dashboard, "
 "dataset, or case."
@@ -4319,6 +4504,7 @@ msgstr "اكتب تحديثًا. اكتب @ للإشارة إلى أحد أعض�
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 msgid "Code"
 msgstr "تعليمة برمجية"
 
@@ -4468,6 +4654,11 @@ msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
 msgstr "اطلب مني إضافة مخطط إلى لوحة المعلومات هذه. سأختار نوع التصور، وأكتب "
 "SQL، وأضع كتلة على الصفحة."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesEmptyNote.tsx
+msgid "No entries match “{filter}”. Entries match on their own name and on "
+"every column name they also match."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to find its columns."
 msgstr "جارٍ قراءة عينة من مجموعة البيانات هذه للعثور على أعمدتها."
@@ -4518,6 +4709,10 @@ msgstr "لا توجد قيم"
 #: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
 msgid "Date column for {fieldName}"
 msgstr "عمود التاريخ لـ {fieldName}"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
+msgid "No description"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedRecordGroups.tsx
@@ -4847,8 +5042,8 @@ msgid "You are offline"
 msgstr "أنت غير متصل"
 
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
-msgid "Filter datasets"
-msgstr "تصفية مجموعات البيانات"
+#~ msgid "Filter datasets"
+#~ msgstr "تصفية مجموعات البيانات"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishMapLayersPreview/PublishMapLayersPreview.tsx
 msgid "A map could not be prepared for publishing. Open it in Maps to check its "
@@ -4974,6 +5169,11 @@ msgstr "كل القيم"
 msgid "Distance"
 msgstr "المسافة"
 
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+msgid "The dictionary could not be created. Please try again or reach out to "
+"support."
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "أعجبني جدًا"
@@ -5072,6 +5272,11 @@ msgstr "إعادة تشغيل الاستعلام"
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "Move the pointer over the map to read a coordinate"
 msgstr "حرّك المؤشر فوق الخريطة لقراءة إحداثي"
+
+#. placeholder {0}: error.message
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
+#~ msgid "The name could not be saved: {0}"
+#~ msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -5192,6 +5397,10 @@ msgstr "جدول Google كبير جدًا"
 msgid "Choose a date column"
 msgstr "اختر عمود تاريخ"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/DictionaryEntryPane.tsx
+msgid "Remove entry"
+msgstr ""
+
 #: src/clients/maps/MapLayerFeatureList/fetchMapLayerFeatureList.ts
 msgid "Distance to nearest {sourceName}"
 msgstr "المسافة إلى أقرب {sourceName}"
@@ -5270,6 +5479,10 @@ msgstr "لا توجد مؤسسات"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Hide X axis"
 msgstr "إخفاء المحور X"
+
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "All data"
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition.ts
 msgid "Loading result"
@@ -5355,6 +5568,10 @@ msgstr "نوع التسمية"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "الإزاحة ضمن"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Number"
+msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -5462,6 +5679,10 @@ msgstr "الأصلية"
 msgid "One row per number"
 msgstr "صف واحد لكل رقم"
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Number: a measurement or a count"
+msgstr ""
+
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 msgid "Next"
@@ -5504,6 +5725,13 @@ msgstr "نهاية النطاق الزمني: {endLabel}"
 #: src/config/AppLinks/AppLinks.tsx
 msgid "Home"
 msgstr "الصفحة الرئيسية"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.tsx
+msgid "Pairs work both ways. Applying this list to a column of codes turns them "
+"into labels, and applying it to a column of labels turns them into "
+"codes. Matching ignores capitalization and extra spaces, and also "
+"accepts the other spellings listed beside each label."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Pipe (|)"
@@ -5791,6 +6019,10 @@ msgstr "اسحب للاستيراد"
 msgid "Date range"
 msgstr "نطاق التاريخ"
 
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+msgid "What these codes cover and where they come from"
+msgstr ""
+
 #: src/config/AppLinks/AppLinks.tsx
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
 msgid "Assigned to me"
@@ -5875,6 +6107,10 @@ msgid "[The local discovery lookup failed. Try a different column or lookup "
 msgstr "[فشل البحث في الاكتشاف المحلي. جرّب عمودًا مختلفًا أو استعلام بحث دون "
 "أن تطلب مني الاختيار من الكتالوج الذي تعذّر الوصول إليه.]"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
+msgid "For example, years"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "File"
 msgstr "الملف"
@@ -5913,6 +6149,10 @@ msgstr "حذف مساحة العمل هذه"
 msgid "Edit {name}"
 msgstr "تعديل {name}"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
+msgid "Also recognizes these code lists"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "{usedSeats} of {maxSeats} seats used · {remainingSeats} remaining"
 msgstr "{usedSeats} من {maxSeats} مقاعد مستخدمة · {remainingSeats} متبقية"
@@ -5932,6 +6172,11 @@ msgstr "تعذر التحقق من أعمدة مجموعة البيانات هذ
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "We'll add this visualization to your new dashboard."
 msgstr "سنضيف هذه التصور إلى لوحة التحكم الجديدة الخاصة بك."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "Data holding 1 becomes Male, and data holding Male becomes 1, from the "
+"same pair."
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualNavbar/StatusFilter/StatusFilter.tsx
 msgid "All statuses"
@@ -6340,6 +6585,21 @@ msgstr "عرض السجلات"
 msgid "Create new dashboard"
 msgstr "إنشاء لوحة تحكم جديدة"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
+msgid "No datasets use this dictionary yet"
+msgstr ""
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairDragHandle.tsx
+msgid "Press Space or Enter to pick up this value, move it with the arrow keys, "
+"then press Space or Enter to drop it. Or hold Alt and press the up or "
+"down arrow to move it one place."
+msgstr ""
+
+#. placeholder {0}: error.message
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+#~ msgid "The dictionary could not be deleted: {0}"
+#~ msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the bbox-epsg-3857 placeholder where the server expects the "
 "bounding box."
@@ -6365,6 +6625,11 @@ msgstr "إضافة حقل مُعبّأ يدويًا"
 #: src/views/DashboardApp/DashboardShareModal/PublishingActions/PublishingActions.tsx
 msgid "Upgrade plan"
 msgstr "ترقية الخطة"
+
+#. placeholder {0}: pairs.length
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
+msgid "{0, plural, one {# value found} other {# values found}}"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens.ts
 msgid "Forest"
@@ -6397,6 +6662,10 @@ msgstr "التنسيق"
 msgid "is not"
 msgstr "ليس"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx
+msgid "entry"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Embed"
 msgstr "تضمين"
@@ -6408,6 +6677,10 @@ msgstr "لا شيء حتى الآن."
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedClassList/GraduatedClassList.tsx
 msgid "Class {classNumber}"
 msgstr "الفئة {classNumber}"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
+msgid "No entry uses this code list yet."
+msgstr ""
 
 #. placeholder {0}: readout.timeWindow
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
@@ -6487,6 +6760,10 @@ msgstr "لا يمكن عرض {chartName} لأنه يوجد محاور أو سل�
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Card"
 msgstr "بطاقة"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
+msgid "Kind"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/MapTitleInput/MapTitleEditor.tsx
 msgid "Map name"
@@ -6583,6 +6860,10 @@ msgstr "طبّقت الاستعلام في مستكشف البيانات."
 msgid " Not published yet."
 msgstr " لم يتم النشر بعد."
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "{datasetCount, plural, one {# dataset} other {# datasets}}"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Cancel URL change"
 msgstr "إلغاء تغيير عنوان URL"
@@ -6602,6 +6883,10 @@ msgstr "احصل على مجموع القيم"
 #: src/components/ChatPanel/ClarificationCard/FreeTextBody.tsx
 msgid "Type your answer..."
 msgstr "اكتب إجابتك..."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "Built by hand"
+msgstr ""
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 msgid "Import"
@@ -6695,6 +6980,10 @@ msgstr "خطأ"
 msgid "Bar Chart"
 msgstr "مخطط شريطي"
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Every value needs a code and a label."
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Offline mode answers your questions with models that run on this "
 "computer instead of on Avandar's servers."
@@ -6704,6 +6993,10 @@ msgstr "يجيب وضع عدم الاتصال عن أسئلتك باستخدام
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is none of"
 msgstr "ليس أيًا من"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "Other spellings of value {rowNumber}"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
@@ -6766,6 +7059,10 @@ msgstr "H3"
 #: src/views/DashboardApp/AvaPage/pfields/MapPickerPField/MapPickerPField.tsx
 msgid "Pick a map"
 msgstr "اختيار خريطة"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
+msgid "Any value"
+msgstr ""
 
 #: src/routes/update-password.tsx
 #: src/views/RegisterView/useRegistrationForm.ts
@@ -7066,8 +7363,8 @@ msgid "Title"
 msgstr "العنوان"
 
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
-msgid "No datasets match your filter"
-msgstr "لا توجد مجموعات بيانات تطابق عامل التصفية"
+#~ msgid "No datasets match your filter"
+#~ msgstr "لا توجد مجموعات بيانات تطابق عامل التصفية"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Curve"
@@ -7095,6 +7392,10 @@ msgstr "ماذا يمثّل نوع الحالة هذا؟"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginManifestSummary.tsx
 msgid "{publisher} · version {version}"
 msgstr "{publisher} · الإصدار {version}"
+
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Nothing matches your filter"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 4"
@@ -7242,9 +7543,15 @@ msgid "{0} km"
 msgstr "{0} كم"
 
 #: shared/copy/avaDataTypeLabel.ts
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Date"
 msgstr "التاريخ"
+
+#. placeholder {0}: dictionary.name
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+#~ msgid "Delete {0} and all of its entries and code lists?"
+#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
@@ -7273,6 +7580,8 @@ msgid "SQL"
 msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Ordered"
 msgstr "مرتّب"
 
@@ -7299,6 +7608,7 @@ msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "عنوان URL مخصص محجوز. جرّب إضافة كلمة إليه."
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Unordered"
 msgstr "غير مرتّب"
 
@@ -7415,6 +7725,10 @@ msgstr "فشل المشاركة"
 msgid "Measure readout"
 msgstr "قراءة القياس"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
+msgid "Both ways"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterPairInput.tsx
 msgid "Upper bound"
 msgstr "الحد الأعلى"
@@ -7457,6 +7771,10 @@ msgstr "تم تحديث إعدادات مشاركة لوحة التحكم."
 msgid "Sketch"
 msgstr "رسم تخطيطي"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/DictionaryEntryPane.tsx
+msgid "What this column means, so teammates read it the same way"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 1"
 msgstr "العمود 1"
@@ -7484,6 +7802,12 @@ msgstr "فشل طلب الدردشة"
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copy code"
 msgstr "نسخ الكود"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
+msgid "{entryCount, plural, one {# entry uses this code list. Removing it "
+"removes it from that entry too.} other {# entries use this code list. "
+"Removing it removes it from them too.}}"
+msgstr ""
 
 #. placeholder {0}: Math.round(entry.timeToAnswerMs / 100) / 10
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
@@ -7586,9 +7910,12 @@ msgstr "منخفض"
 
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorFields.tsx
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/DictionaryEntryPane.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/index.tsx
 msgid "Description"
@@ -7650,6 +7977,10 @@ msgstr "السماح بالمزامنة"
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Ascending"
 msgstr "تصاعدي"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Another value in this list already uses this label or spelling."
+msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Ask about your data"
@@ -7784,6 +8115,10 @@ msgstr "فتح الشريط الجانبي"
 msgid "Red to blue"
 msgstr "من الأحمر إلى الأزرق"
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "Also accept"
+msgstr ""
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Upload dataset"
 msgstr "رفع مجموعة البيانات"
@@ -7839,6 +8174,10 @@ msgstr "موصى به معها: {companionNames}"
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Workspace name updated"
 msgstr "تم تحديث اسم مساحة العمل"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "The dictionary was not saved. Please try again."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogSearchField/DataCatalogSearchField.tsx
 msgid "Search open data"
@@ -7910,6 +8249,10 @@ msgstr "مُسنَدة إلى: {label}"
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
 msgid "Remove {datasetName}"
 msgstr "إزالة {datasetName}"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
+msgid "Remove {listName}"
+msgstr ""
 
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
@@ -8100,6 +8443,10 @@ msgstr "مستكشف البيانات"
 msgid "No basemap"
 msgstr "لا توجد خريطة أساس"
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Categorical: named groups, such as sex or outcome"
+msgstr ""
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Sign in again"
 msgstr "تسجيل الدخول مرة أخرى"
@@ -8203,6 +8550,10 @@ msgstr "هذه اللوحة لا تشير إلى أي مجموعات بيانا�
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not match regex"
 msgstr "لا يطابق التعبير النمطي"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Categorical"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -8607,6 +8958,10 @@ msgstr "تتطلب هذه الأداة دعم الأشكال الهندسية، 
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "احفظ تغييراتك أولاً: يعكس PDF لوحة التحكم المحفوظة."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx
+msgid "Edit {entryName}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Units"
 msgstr "الوحدات"
@@ -8690,6 +9045,10 @@ msgid "This dataset is large, so we applied a 100-row limit. You can change it "
 msgstr "هذه مجموعة البيانات كبيرة، لذا قمنا بتطبيق حد 100 صف. يمكنك تغييره في "
 "أي وقت."
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Pick the code list this entry uses."
+msgstr ""
+
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Yellow"
 msgstr "أصفر"
@@ -8723,6 +9082,10 @@ msgstr "تعكس مجموعة البيانات هذه الآن المحتوى ا
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install {pluginName}?"
 msgstr "تثبيت {pluginName}؟"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Another entry already has this name."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this text"
@@ -8820,6 +9183,10 @@ msgstr "جارٍ التحقق من بياناتك…"
 msgid "Result"
 msgstr "النتيجة"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesToolbar.tsx
+msgid "Add entry"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/useGlobalFilterSubscriptionPFieldConfig.tsx
 msgid "Global filters"
 msgstr "الفلاتر العالمية"
@@ -8836,6 +9203,10 @@ msgstr "تحريك نص التعليق التوضيحي"
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Role for {displayName}"
 msgstr "الدور لـ {displayName}"
+
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+msgid "Create dictionary"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is published to your workspace. Only people you have "
@@ -9012,6 +9383,10 @@ msgstr "ألوان مخصصة"
 msgid "Use a link"
 msgstr "استخدم رابطًا"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "Dictionary deleted"
+msgstr ""
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading dashboard"
 msgstr "جارٍ تحميل لوحة المعلومات"
@@ -9072,6 +9447,10 @@ msgstr "لم تتم قراءة أي صفوف بنجاح. اضبط إعدادات
 #: src/routes/signin.tsx
 msgid "Welcome back!"
 msgstr "مرحبًا بعودتك!"
+
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Dictionaries"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "There was an error while trying to authenticate with Google Sheets."
@@ -9226,6 +9605,7 @@ msgstr "هذا الاسم ينطبق فقط في {workspaceName}. تحتفظ م�
 msgid "{0} ambiguous source keys"
 msgstr "{0} من مفاتيح المصدر الملتبسة"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar.tsx
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Unsaved changes"
 msgstr "تغييرات غير محفوظة"
@@ -9316,6 +9696,10 @@ msgstr "حجم الرمز {firstLabel}"
 msgid "Don't have an account yet?"
 msgstr "لا تمتلك حسابًا بعد؟"
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Identifier"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "{threshold} or above"
 msgstr "{threshold} أو أكثر"
@@ -9336,6 +9720,10 @@ msgstr "عشري"
 #: src/utils/notifications/notify.ts
 msgid "Error"
 msgstr "خطأ"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
+msgid "dictionary name"
+msgstr ""
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
 msgid "Show feature {position} on the map"
@@ -9383,6 +9771,10 @@ msgstr "أنواع القضايا"
 msgid "Open case type"
 msgstr "فتح نوع الحالة"
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
+msgid "One per line, with the code first: 1 = Male, 1: Male, or 1, Male."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Percent"
 msgstr "نسبة مئوية"
@@ -9421,6 +9813,11 @@ msgstr "تعذر نشر لوحة التحكم"
 msgid "Fiord"
 msgstr "مضيق بحري"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
+msgid "For data that writes the same values another way, such as M and F "
+"instead of 1 and 2."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportFeedback/DatasetPreview.tsx
 msgid "Choose what to read"
 msgstr "اختر ما يجب قراءته"
@@ -9447,6 +9844,7 @@ msgstr "لم نتمكن من تحديث اشتراكك. يرجى الاتصال 
 msgid "First"
 msgstr "الأول"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove"
 msgstr "إزالة"
@@ -9558,6 +9956,10 @@ msgstr "لن يتم تخزين مجموعة البيانات هذه عبر ال�
 "طالما أنها على جهاز الكمبيوتر الشخصي الخاص بك. لن يتمكن أي شخص في فريقك "
 "من الوصول إلى هذه البيانات. يُوصى بذلك فقط للبيانات الحساسة جدًا."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
+msgid "Highest valid value"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
 msgstr "تحرير الأذونات"
@@ -9584,8 +9986,8 @@ msgid "Collapse the legend"
 msgstr "طيّ وسيلة الإيضاح"
 
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
-msgid "No datasets yet"
-msgstr "لا توجد مجموعات بيانات بعد"
+#~ msgid "No datasets yet"
+#~ msgstr "لا توجد مجموعات بيانات بعد"
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Chat message"
@@ -9677,6 +10079,11 @@ msgstr "القيمة الافتراضية"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
 msgstr "لا تحتوي {0} مناطق على بيانات"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "The dictionary could not be deleted. Please try again or reach out to "
+"support."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Its charts see only the rows of the chart they draw"
@@ -9839,6 +10246,10 @@ msgstr "يستخدم هذا الاستعلام عمودًا باسم \"{columnNa
 msgid "Go to home"
 msgstr "الانتقال إلى الصفحة الرئيسية"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "Delete dictionary"
+msgstr ""
+
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.tsx
 msgid "Visualizations"
 msgstr "التصورات"
@@ -9963,6 +10374,10 @@ msgstr "تم الإدخال يدويًا"
 msgid "Organization"
 msgstr "المؤسسة"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
+msgid "Type a column name and press Enter"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
 msgid "billing portal."
 msgstr "بوابة الفوترة."
@@ -9995,6 +10410,10 @@ msgstr "{distance} {unit}"
 #: src/views/GisApp/shell/MapTopBar/SaveStateIndicator/SaveStateIndicator.tsx
 msgid "Saving"
 msgstr "جارٍ الحفظ"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Ordered: levels with an order, such as low to high"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Role for new share"
@@ -10141,6 +10560,7 @@ msgstr "إكسل"
 msgid "Dataset columns"
 msgstr "أعمدة مجموعة البيانات"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/index.tsx
 msgid "Details"
@@ -10176,6 +10596,10 @@ msgstr "هل تريد جعل \"{resourceName}\" خاصًا؟"
 msgid "The PDF could not be created: {detail}"
 msgstr "تعذّر إنشاء ملف PDF: {detail}"
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
+msgid "Used by {usedByText}."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is already taken"
 msgstr "عنوان URL المخصص هذا مستخدم بالفعل"
@@ -10199,6 +10623,11 @@ msgstr "ستكون مجموعة البيانات هذه متاحة فقط في �
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "Add at least one X / Y / Size series"
 msgstr "أضف على الأقل سلسلة واحدة من X / Y / الحجم"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "This code is already in the list. Codes are matched ignoring "
+"capitalization."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Sidebar"
@@ -10237,6 +10666,10 @@ msgstr "حول"
 msgid "No boundary layer on this map to look up a P-code."
 msgstr "لا توجد طبقة حدود على هذه الخريطة للبحث عن رمز P."
 
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
+msgid "Order"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot contain spaces"
 msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على مسافات"
@@ -10272,6 +10705,10 @@ msgstr "يحتوي على"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the notes under 2,000 characters."
 msgstr "احرص على ألا تتجاوز الملاحظات 2,000 حرف."
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
+msgid "No code list"
+msgstr ""
 
 #. placeholder {0}: state.singularConceptName
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
@@ -10417,6 +10854,10 @@ msgstr "وضع عدم الاتصال مفعّل. تجري الدردشة على 
 msgid "Resize drawer"
 msgstr "تغيير حجم لوحة السحب"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
+msgid "Entry"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Horizontal padding"
 msgstr "الحشو الأفقي"
@@ -10487,6 +10928,10 @@ msgid "Avandar can't connect to a loopback, link-local, or private address. Use 
 msgstr "لا يمكن لـ Avandar الاتصال بعنوان استرجاع أو عنوان محلي للارتباط أو "
 "عنوان خاص. استخدم مضيفًا ومنفذًا يمكن الوصول إليهما بشكل عام."
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "{entryCount, plural, one {# entry} other {# entries}}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "No entries yet. The log fills in as the chat panel asks for consent."
 msgstr "لا توجد إدخالات حتى الآن. يتم ملء السجل مع طلب موافقة لوحة الدردشة."
@@ -10543,9 +10988,17 @@ msgstr "تحرير مجموعة الأدوار"
 msgid "A places dataset holds at most {maxPlaces} places."
 msgstr "تحتوي مجموعة بيانات الأماكن على {maxPlaces} مكانًا كحد أقصى."
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "Dictionary"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Profiles"
 msgstr "الملفات الشخصية"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairDragHandle.tsx
+msgid "Reorder {valueName}"
+msgstr ""
 
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "No records are assigned to this person"
@@ -10558,6 +11011,10 @@ msgstr "تحديث وإعادة نشر"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Center"
 msgstr "توسيط"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "Missing"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Back to layers"
@@ -10598,6 +11055,10 @@ msgstr "اختر من تريد مشاركة هذا معه"
 msgid "Failed to update display name"
 msgstr "فشل في تحديث اسم العرض"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
+msgid "Code list"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Could not parse SQL: {message}"
 msgstr "تعذّر تحليل SQL: {message}"
@@ -10637,6 +11098,11 @@ msgstr "المالك الجديد"
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "{mapLabel}. Use the layer panel to change what is shown."
 msgstr "{mapLabel}. استخدم لوحة الطبقات لتغيير ما يتم عرضه."
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "The dictionary was not saved. Check the highlighted fields and try "
+"again."
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner.tsx
 msgid "Regenerate with the error"
@@ -10707,6 +11173,10 @@ msgstr "يقع بين"
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 msgid "Dashboards"
 msgstr "لوحات المعلومات"
+
+#: src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts
+msgid "Dictionary saved"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Record"
@@ -10894,6 +11364,10 @@ msgstr "شكل"
 msgid "This comment was deleted."
 msgstr "تم حذف هذا التعليق."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesToolbar.tsx
+msgid "Filter entries or column names"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Answers are slower and less accurate than online chat."
 msgstr "الإجابات أبطأ وأقل دقة من الدردشة عبر الإنترنت."
@@ -10950,6 +11424,10 @@ msgstr "الجذر التربيعي"
 msgid "Removed: {0}"
 msgstr "تمت الإزالة: {0}"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
+msgid "New code list for this entry"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
 msgstr "نافذة منبثقة"
@@ -10994,6 +11472,10 @@ msgstr "أضف سلسلة لاختيار العمود الرقمي الذي يق
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryColumnControls/GeometrySourceColumnSelect.tsx
 msgid "Geometry column"
 msgstr "عمود الهندسة"
+
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
+msgid "Code {rowNumber}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Last run"
@@ -11176,6 +11658,7 @@ msgstr "فجوة الأشرطة"
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Text"
 msgstr "نص"
@@ -11363,6 +11846,10 @@ msgid "It's time to create your first workspace. Don't think for too long; you "
 msgstr "حان وقت إنشاء مساحة العمل الأولى. لا تفكر طويلًا؛ يمكنك دائمًا تغيير "
 "هذه الإعدادات لاحقًا!"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
+msgid "Used by"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Sync online?"
 msgstr "مزامنة عبر الإنترنت؟"
@@ -11382,6 +11869,11 @@ msgstr "أفقي"
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Please try again or reach out to support."
 msgstr "يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
+
+#. placeholder {0}: pairs.length
+#: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
+msgid "{0, plural, one {Add # value} other {Add # values}}"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "General access"
@@ -11440,6 +11932,7 @@ msgstr "حذف {0}"
 msgid "Slice colors"
 msgstr "قطع الألوان"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Save changes"
 msgstr "احفظ التغييرات"
@@ -11543,6 +12036,11 @@ msgstr "تم حذف نوع الحالة"
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "HAVING uses operator \"{operator}\" which the form does not support."
 msgstr "يستخدم HAVING العامل \"{operator}\" الذي لا يدعمه النموذج."
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/CodeListNav.tsx
+msgid "{valueCount, plural, one {# value} other {# values}} · {entryCount, "
+"plural, one {used by # entry} other {used by # entries}}"
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
 msgid "Delete chat"
@@ -11757,6 +12255,10 @@ msgstr "اختر عنصرًا من القائمة لمراجعة أعمدته، 
 msgid "Choose the date column for this field"
 msgstr "اختر عمود التاريخ لهذا الحقل"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
+msgid "Untitled dictionary"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "To confirm, type <0>{confirmationTarget}</0> below:"
 msgstr "لتأكيد، اكتب <0>{confirmationTarget}</0> أدناه:"
@@ -11779,6 +12281,11 @@ msgid "This query needs more memory than your browser has available. Try a "
 "narrower question, such as a shorter date range or fewer places."
 msgstr "يحتاج هذا الاستعلام إلى ذاكرة أكبر من المتاحة في متصفحك. جرّب سؤالًا "
 "أضيق نطاقًا، مثل تحديد نطاق زمني أقصر أو عدد أقل من الأماكن."
+
+#. placeholder {0}: dictionary.version
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "Version {0}"
+msgstr ""
 
 #: src/views/ProfileView/EmailSection.tsx
 msgid "Used to sign in to your account."
@@ -12001,6 +12508,10 @@ msgstr "عنوان"
 msgid "Quote"
 msgstr "اقتباس"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/CodeListNav.tsx
+msgid "New code list"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Billing portal cannot be loaded because you do not have a subscription "
 "yet."
@@ -12127,6 +12638,10 @@ msgstr "S"
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "https://example.org"
 msgstr "https://example.org"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
+msgid "Edit {listName}"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationMutations.ts
 msgid "{pluginName} installed"

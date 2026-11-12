@@ -1,0 +1,75 @@
+.codeListEditorList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * One value is a grid so the inputs line up across rows. Only rows with a
+ * drag handle have the first track, so an unordered row starts at the code.
+ */
+.codeListEditorRow {
+  align-items: center;
+  display: grid;
+  gap: var(--mantine-spacing-xs);
+  grid-template-columns:
+    7rem auto minmax(8rem, 1fr) minmax(8rem, 1fr)
+    auto auto;
+}
+
+.codeListEditorRow[data-has-handle="true"] {
+  grid-template-columns:
+    auto 7rem auto minmax(8rem, 1fr)
+    minmax(8rem, 1fr) auto auto;
+}
+
+.codeListEditorRow[data-dragging="true"] {
+  opacity: 0.6;
+}
+
+.codeListEditorRowIssue {
+  grid-column: 1 / -1;
+}
+
+.codeListEditorRow[data-has-handle="true"] .codeListEditorRowIssue {
+  grid-column: 2 / -1;
+}
+
+/*
+ * The input's own error element is the accessible description of the field.
+ * The row shows the same message on its issue line, so this one is hidden.
+ */
+.codeListEditorIssueDescription {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+.codeListEditorCode {
+  font-variant-numeric: tabular-nums;
+}
+
+.codeListEditorArrow {
+  color: var(--mantine-color-neutral-5);
+}
+
+.codeListEditorHandle {
+  background: none;
+  border: 0;
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-neutral-5);
+  cursor: grab;
+  display: inline-flex;
+  padding: var(--mantine-spacing-xxs);
+}
+
+.codeListEditorHandle:hover {
+  color: var(--mantine-color-neutral-8);
+}
