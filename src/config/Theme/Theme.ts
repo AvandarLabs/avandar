@@ -255,9 +255,6 @@ export const Theme = createTheme({
       },
       styles: {
         root: {
-          // Theme styles render inline, so no CSS module class can override
-          // them. A Paper that needs a different edge (the slate, on the dark
-          // shell) sets `--ava-paper-border-color` from its own CSS instead.
           borderColor:
             "var(--ava-paper-border-color, var(--ava-border-default))",
           transition: interactiveTransition,
