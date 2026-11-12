@@ -88,18 +88,55 @@ function _makeCreateDictionary(
   };
 }
 
+type ReadOptions = Readonly<
+  FlowOptions & { suggestions: ReturnType<typeof useDictionarySuggestions> }
+>;
+
+/**
+ * Dispatches a finished read and, when the suggestion model is available,
+ * asks it for meaning matches. A read that finishes after the user left the
+ * flow, or for datasets that are no longer the picked ones, does nothing.
+ */
+function _dispatchReadAndFindMatches(
+  options: Readonly<
+    ReadOptions & {
+      proposal: DictionaryProposal.T;
+      datasets: readonly ReadableDataset[];
+      isCurrent: boolean;
+      defaultName: string;
+      findMatches: (
+        proposal: DictionaryProposal.T,
+        readId: ProposalReadId,
+      ) => void;
+    }
+  >,
+): void {
+  const { dispatch, suggestions, proposal, datasets } = options;
+  if (!options.isCurrent) {
+    return;
+  }
+  const readId = uuid<ProposalReadId>();
+  dispatch({
+    type: "datasets_read",
+    proposal,
+    datasetIds: datasets.map(({ dataset }) => {
+      return dataset.id;
+    }),
+    readId,
+    defaultName: options.defaultName,
+  });
+  const { availability } = suggestions;
+  if (availability === "online" || availability === "on_device") {
+    options.findMatches(proposal, readId);
+  }
+}
+
 /**
  * Reads datasets and, once they are read, asks the suggestion model which
  * of their columns mean the same thing. Online, the first such request opens
- * the consent prompt; after a no it is not sent. A read that finishes after
- * the user left the flow, or for datasets that are no longer the picked
- * ones, starts nothing.
+ * the consent prompt; after a no it is not sent.
  */
-function useReadWithMatches(
-  options: Readonly<
-    FlowOptions & { suggestions: ReturnType<typeof useDictionarySuggestions> }
-  >,
-): {
+function useReadWithMatches(options: ReadOptions): {
   read: (datasets: readonly ReadableDataset[]) => void;
   isReading: boolean;
   meaningMatchStatus: MeaningMatchStatus;
@@ -115,38 +152,29 @@ function useReadWithMatches(
     requestReply: suggestions.requestReply,
     model: suggestions.model,
     onFound: (found, _proposal, readId) => {
-      if (!isMountedRef.current) {
-        return;
+      if (isMountedRef.current) {
+        dispatch({ type: "meaning_matches_found", matches: found, readId });
       }
-      dispatch({ type: "meaning_matches_found", matches: found, readId });
     },
   });
   const [read, isReading] = useReadDatasets({
     onRead: (proposal, datasets) => {
-      const datasetIds = datasets.map(({ dataset }) => {
-        return dataset.id;
-      });
-      const isCurrent = isSameDatasetSet(
-        latestStateRef.current.pickedDatasetIds,
-        datasetIds,
-      );
-      if (!isMountedRef.current || !isCurrent) {
-        return;
-      }
       const firstName = datasets[0]?.dataset.name ?? "";
-      const defaultName = t`${firstName} codes`;
-      const readId = uuid<ProposalReadId>();
-      dispatch({
-        type: "datasets_read",
+      _dispatchReadAndFindMatches({
+        ...options,
         proposal,
-        datasetIds,
-        readId,
-        defaultName,
+        datasets,
+        isCurrent:
+          isMountedRef.current &&
+          isSameDatasetSet(
+            latestStateRef.current.pickedDatasetIds,
+            datasets.map(({ dataset }) => {
+              return dataset.id;
+            }),
+          ),
+        defaultName: t`${firstName} codes`,
+        findMatches: matches.findMatches,
       });
-      const { availability } = suggestions;
-      if (availability === "online" || availability === "on_device") {
-        matches.findMatches(proposal, readId);
-      }
     },
   });
   return { read, isReading, meaningMatchStatus: matches.status };
