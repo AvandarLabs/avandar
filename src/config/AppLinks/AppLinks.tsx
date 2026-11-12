@@ -126,6 +126,28 @@ export const AppLinks = {
       isAvailableOffline: true,
     };
   },
+  dataManagerDictionaryView: ({
+    workspaceSlug,
+    dictionaryId,
+    dictionaryName,
+  }: {
+    workspaceSlug: string;
+    dictionaryId: string;
+    dictionaryName: string;
+  }) => {
+    return {
+      key: "data-manager-dictionary-view",
+      to: "/$workspaceSlug/data-manager/dictionaries/$dictionaryId",
+      params: {
+        workspaceSlug,
+        dictionaryId,
+      },
+      label: () => {
+        return dictionaryName;
+      },
+      isAvailableOffline: true,
+    };
+  },
   dataImport: (workspaceSlug: string) => {
     return {
       key: "dataImport",
