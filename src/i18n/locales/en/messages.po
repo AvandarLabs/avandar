@@ -560,6 +560,10 @@ msgstr "Process"
 msgid "Style"
 msgstr "Style"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "{dictionaryName} was deleted."
+msgstr "{dictionaryName} was deleted."
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridShapeControl.tsx
 msgid "Square"
 msgstr "Square"
@@ -1338,7 +1342,6 @@ msgstr "No keywords"
 #. placeholder {0}: formatDate(dataset.updatedAt, { format: "MMM D, YYYY" })
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
@@ -1657,6 +1660,10 @@ msgid "These datasets are listed in your workspace, but their source data could 
 msgstr "These datasets are listed in your workspace, but their source data "
 "could not be found in your local storage. In order to continue, you "
 "need to either re-upload the dataset or delete it from your workspace."
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "Delete {dictionaryName} and all of its entries and code lists?"
+msgstr "Delete {dictionaryName} and all of its entries and code lists?"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
 msgid "No code lists yet. A code list holds values such as 1 = Male, and any "
@@ -2695,7 +2702,7 @@ msgid "Sort & limit"
 msgstr "Sort & limit"
 
 #: src/routes/_auth/$workspaceSlug/data-manager/index.tsx
-#: src/views/DataManagerApp/DataManagerApp.tsx
+#: src/views/DataManagerApp/DataManagerToolbarActions.tsx
 msgid "Add new dataset"
 msgstr "Add new dataset"
 
@@ -3183,8 +3190,6 @@ msgid "Type or paste an email below. Your workspace will be billed per member."
 msgstr "Type or paste an email below. Your workspace will be billed per member."
 
 #. placeholder {0}: avaMap.name
-#. placeholder {0}: dictionary.name
-#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 #: src/views/GisApp/MapListView/DeleteMapButton.tsx
 msgid "{0} was deleted."
 msgstr "{0} was deleted."
@@ -3286,6 +3291,10 @@ msgstr "Its features are removed from this workspace."
 msgid "Made from"
 msgstr "Made from"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "Updated {updatedDate}"
+msgstr "Updated {updatedDate}"
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Last updated"
 msgstr "Last updated"
@@ -3329,6 +3338,10 @@ msgstr "Uninstall {pluginName}?"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "100% stacked"
 msgstr "100% stacked"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
+msgid "The name could not be saved. Please try again or reach out to support."
+msgstr "The name could not be saved. Please try again or reach out to support."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -4330,7 +4343,7 @@ msgstr "Here you can see a full statistical profile of your data: ranges, "
 msgid "Personal data + biased framing detected"
 msgstr "Personal data + biased framing detected"
 
-#: src/views/DataManagerApp/DataManagerApp.tsx
+#: src/views/DataManagerApp/DataManagerToolbarActions.tsx
 #: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
 msgid "New dictionary"
 msgstr "New dictionary"
@@ -5169,6 +5182,12 @@ msgstr "Every value"
 msgid "Distance"
 msgstr "Distance"
 
+#: src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx
+msgid "The dictionary could not be created. Please try again or reach out to "
+"support."
+msgstr "The dictionary could not be created. Please try again or reach out to "
+"support."
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Love"
 msgstr "Love"
@@ -5270,8 +5289,8 @@ msgstr "Move the pointer over the map to read a coordinate"
 
 #. placeholder {0}: error.message
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
-msgid "The name could not be saved: {0}"
-msgstr "The name could not be saved: {0}"
+#~ msgid "The name could not be saved: {0}"
+#~ msgstr "The name could not be saved: {0}"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
@@ -5562,6 +5581,10 @@ msgstr "Label type"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "Displace within"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Number"
+msgstr "Number"
 
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of row counts in {datasetName}"
@@ -6593,8 +6616,8 @@ msgstr "Press Space or Enter to pick up this value, move it with the arrow "
 
 #. placeholder {0}: error.message
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
-msgid "The dictionary could not be deleted: {0}"
-msgstr "The dictionary could not be deleted: {0}"
+#~ msgid "The dictionary could not be deleted: {0}"
+#~ msgstr "The dictionary could not be deleted: {0}"
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Include the bbox-epsg-3857 placeholder where the server expects the "
@@ -7549,8 +7572,8 @@ msgstr "Date"
 
 #. placeholder {0}: dictionary.name
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
-msgid "Delete {0} and all of its entries and code lists?"
-msgstr "Delete {0} and all of its entries and code lists?"
+#~ msgid "Delete {0} and all of its entries and code lists?"
+#~ msgstr "Delete {0} and all of its entries and code lists?"
 
 #: src/views/DashboardApp/DashboardListView/formatDashboardDate.ts
 msgid "recently"
@@ -7580,6 +7603,7 @@ msgstr "SQL"
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Ordered"
 msgstr "Ordered"
 
@@ -8554,6 +8578,10 @@ msgstr "This dashboard doesn't reference any datasets: nothing to publish."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not match regex"
 msgstr "does not match regex"
+
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Categorical"
+msgstr "Categorical"
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " Published on the web: anyone with the link can view it, and the list "
@@ -9697,6 +9725,10 @@ msgstr "Symbol size {firstLabel}"
 msgid "Don't have an account yet?"
 msgstr "Don't have an account yet?"
 
+#: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
+msgid "Identifier"
+msgstr "Identifier"
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "{threshold} or above"
 msgstr "{threshold} or above"
@@ -10079,6 +10111,12 @@ msgstr "Default value"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas have no data"
 msgstr "{0} areas have no data"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
+msgid "The dictionary could not be deleted. Please try again or reach out to "
+"support."
+msgstr "The dictionary could not be deleted. Please try again or reach out to "
+"support."
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Its charts see only the rows of the chart they draw"
