@@ -2,15 +2,15 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Let a Data Sources editor create a dictionary by learning it from one or more datasets: Avandar profiles every column on the device, guesses which columns are coded or ordered, merges columns that mean the same thing across datasets, and suggests labels online or with the offline model, then saves it all through the existing save RPC.
+**Goal:** Let a Data Sources editor create a dictionary by learning it from one or more datasets: Avandar profiles every column on the device, guesses which columns are coded or ordered, merges columns that mean the same thing across datasets, lets the user rename entries, and suggests labels online (after the chat's consent prompt) or with the offline model. Values can be saved without a label and finished later.
 
-**Architecture:** Pure inference lives in two new non-persisted models under `shared/models/dataDictionaries/`: `ColumnProfile` (name tokens, kind classification, the match scorer) and `DictionaryProposal` (clustering columns into entries, deriving code lists, labels, and the save draft). The browser profiles datasets through the existing QETL query layer (`WorkspaceQuerySession.runQuery`, two queries per dataset) and asks for AI suggestions through one shared prompt module that runs on a new `chat` edge route online and on `OfflineChatEngineStore` offline. A four-step task view (`dictionaries/new`) holds the whole flow in a reducer and saves with `DataDictionaryClient.insert` plus `saveContents`. No schema change.
+**Architecture:** Pure inference lives in two new non-persisted models under `shared/models/dataDictionaries/`: `ColumnProfile` (name tokens, kind classification, the match scorer) and `DictionaryProposal` (clustering columns into entries, deriving code lists, labels, and the save draft). The browser profiles datasets through the existing QETL query layer (`WorkspaceQuerySession.runQuery`, two queries per dataset) and asks for AI suggestions through one shared prompt module that runs on a new `chat` edge route online and on `OfflineChatEngineStore` offline. A four-step task view (`dictionaries/new`) holds the whole flow in a reducer and saves with `DataDictionaryClient.insert` plus `saveContents`. One schema change comes first: the save RPC accepts a blank label, and slice 1's model and editor treat it as a non-blocking "needs a label" warning. Online suggestions go through the chat's consent gate (`decideIfDataCanCrossBoundary`), and the edge route verifies the consent's ack token.
 
-**Tech Stack:** TypeScript, React 19, Mantine 9 (`Stepper`, `Table`, `NavLink`), TanStack Query and Router, zod 4, Lingui, DuckDB-WASM through QETL, `@duckdb/node-api` for executed tests, WebLLM through `OfflineChatEngineStore`, OpenRouter through the `chat` Supabase edge function, Vitest, Playwright.
+**Tech Stack:** Supabase Postgres (declarative schemas, pgTAP), TypeScript, React 19, Mantine 9 (`Stepper`, `Table`, `NavLink`), TanStack Query and Router, zod 4, Lingui, DuckDB-WASM through QETL, `@duckdb/node-api` for executed tests, WebLLM through `OfflineChatEngineStore`, OpenRouter through the `chat` Supabase edge function, Vitest, Playwright.
 
 **Spec:** [data-dictionaries-design.md](data-dictionaries-design.md), slice 2 of section 16. Read sections 3, 7.1, 7.3, 7.4, 8, 12, 13, and 17 first. Refinements made while planning are listed at the end of this file and override the spec where they differ.
 
-**Scope:** Slice 2 only: profiling, scoring, the create flow from the toolbar and from a dataset's menu, and AI label and match suggestions online and offline. Applying dictionaries and Ask Avandar context (slice 3), conversions (slice 4), and crosswalks (slice 5) stay out. So do "Apply a dictionary" on the dataset menu and the "Apply it to <dataset> next" checkbox on the Save step.
+**Scope:** Slice 2 only: blank labels, profiling, scoring, the create flow from the toolbar and from a dataset's menu, and AI label and match suggestions online and offline. Applying dictionaries and Ask Avandar context (slice 3), the small "Add from datasets into an existing dictionary" piece that follows slice 3, conversions (slice 4), and crosswalks (slice 5) stay out. So do "Apply a dictionary" on the dataset menu and the "Apply it to <dataset> next" checkbox on the Save step.
 
 **Builds on:** slice 1 ([data-dictionaries-1-dictionaries-plan.md](data-dictionaries-1-dictionaries-plan.md), feature log F129): the four dictionary tables, `rpc_data_dictionaries__save`, `DataDictionaryModule` (draft helpers), `DataDictionaryClient.saveContents`, the Dictionary view, and `NewDataDictionaryModal`.
 
@@ -23,13 +23,14 @@
 Read once:
 
 - `AGENTS.md` (root; `CLAUDE.md` is a symlink to it): scope, naming, comments, i18n, the Supabase switch stop condition, e2e rules.
-- `docs/rules/typescript.md`, `docs/rules/testing.md`, `docs/rules/e2e-testing.md`, `docs/rules/i18n.md`.
-- `docs/design/app-view-layout.md` and the Named Rules in `DESIGN.md` (before Tasks 11 to 18). Load the `impeccable` skill before Task 11: the create flow is a new surface.
+- `docs/rules/typescript.md`, `docs/rules/sql.md` (Task 1), `docs/rules/testing.md`, `docs/rules/e2e-testing.md`, `docs/rules/i18n.md`.
+- `docs/design/app-view-layout.md` and the Named Rules in `DESIGN.md` (before Tasks 13 to 20). Load the `impeccable` skill before Task 13: the create flow is a new surface.
 - The code this plan reuses:
   - `src/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets.ts` (one summary query per dataset, then the values of short columns) and `src/clients/datasets/DatasetQueryClient.ts` (per-column summaries). Profiling here follows the first one's two-query shape.
   - `shared/agent/chatTitle/chatTitlePrompt.ts`, `supabase/functions/chat/PostChatTitle/PostChatTitle.ts`, and `src/components/ChatPanel/ChatSessionTitle/requestChatSessionTitle.ts`: one shared prompt module, a small edge route, and a browser function that runs the same prompt online or on `OfflineChatEngineStore.complete`. Suggestions copy this shape.
   - `src/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage.ts`: JSON-schema constrained decoding on the offline model.
   - `src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts`: where a model call runs (cloud or local).
+  - `src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx` (opens `ConsentModal`, writes the browser-local consent log through `ConsentAuditEntryClient`, mints an ack token into `PendingAcks`), its use with `explicitConsentRequired` in `src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/runRegionModelAssist/runRegionModelAssist.ts`, and the matching server check in `supabase/functions/chat/PostExtractMeasurements/PostExtractMeasurements.ts`. Suggestions reuse all three. Offline, the chat asks no consent (`runOfflineDataAgentTurn`), and neither do suggestions.
   - `shared/models/dataDictionaries/DataDictionary/DataDictionaryModule/DataDictionaryModule.ts`: `isCodedKind`, `findDraftIssues`, `buildSavePayload`.
   - `src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts`: kind labels and save error copy.
   - `src/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal.tsx`: creating a dictionary row.
@@ -51,23 +52,29 @@ House conventions:
 
 | File | Responsibility |
 | --- | --- |
+| `supabase/schemas/50.rpc_data_dictionaries__save.sql` | Modify: `data_dictionaries__check_pairs` accepts a blank label |
+| `supabase/tests/database/data_dictionaries/rpc_data_dictionaries__save.test.sql` | Modify: blank code refused, blank labels saved, non-blank labels still unique |
+| `supabase/migrations/*_data_dictionaries_blank_labels.sql`, `apps/desktop/migrations/*_data_dictionaries_blank_labels.gen.sql` | Generated migration and its desktop twin |
+| `shared/models/dataDictionaries/DataDictionary/*` | Modify: `DraftWarning`, `findDraftWarnings`; a blank label is no longer an issue |
+| `src/views/DataManagerApp/DataDictionaryView/{useDictionaryCopy.ts,CodeListEditor/*,DictionaryEntriesTab/*}` | Modify: "Needs a label" on rows, "n values need a label" on the entries table |
 | `shared/models/dataDictionaries/ColumnProfile/ColumnProfile.ts` | Namespace for profiles and match scores |
 | `shared/models/dataDictionaries/ColumnProfile/ColumnProfile.types.ts` | `ColumnProfileT`, `ColumnProfileValue`, `ColumnMatchScore` |
-| `shared/models/dataDictionaries/ColumnProfile/ColumnProfileModule/columnNameHelpers.ts` | Words, tokens (abbreviations, synonyms), name score |
+| `shared/models/dataDictionaries/ColumnProfile/ColumnProfileModule/columnNameHelpers.ts` | Words, tokens (abbreviations, synonyms), entry names, name score |
 | `shared/models/dataDictionaries/ColumnProfile/ColumnProfileModule/ColumnProfileModule.ts` (+ test) | Kind classification, the scorer, scale order |
 | `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposal.ts` | Namespace for the proposal, code lists, labels |
-| `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposal.types.ts` | Proposal, entry, code list, labels, suggestion types |
-| `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/DictionaryProposalModule.ts` (+ test) | Edits: kind, include, keep apart, meaning matches, descriptions |
-| `.../DictionaryProposalModule/makeProposalFromColumnProfiles/` (+ test) | Clusters profiled columns into entries |
-| `.../DictionaryProposalModule/getCodingsFromProposal/` (+ test) | Code lists and each entry's codings |
+| `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposal.types.ts` | Proposal, entry, code list, labels, suggestion, name issue types |
+| `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/DictionaryProposalModule.ts` (+ test) | Edits: rename, kind, include, keep apart, meaning matches, descriptions; name issues |
+| `.../DictionaryProposalModule/makeProposalFromColumnProfiles/` (+ test) | Clusters profiled columns into uniquely named entries |
+| `.../DictionaryProposalModule/getCodingsFromProposal/` (+ test) | Code lists (shared by identical word codes, or numeric codes and a first word) and codings |
 | `.../DictionaryProposalModule/proposalLabelHelpers/` (+ test) | Default labels, edits, suggestions, status |
-| `.../DictionaryProposalModule/makeDraftFromProposal/` (+ test) | The `DataDictionary.Draft` the save RPC takes |
-| `shared/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts` (+ test) | Request schema, messages, JSON schemas, reply parsers |
-| `supabase/functions/chat/PostDictionarySuggestions/PostDictionarySuggestions.ts` (+ test) | Online suggestions route |
+| `.../DictionaryProposalModule/makeDraftFromProposal/` (+ test) | The `DataDictionary.Draft` the save RPC takes, blank labels kept blank |
+| `shared/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts` (+ test) | Request schema, the text a consent covers, messages, JSON schemas, reply parsers |
+| `supabase/functions/chat/PostDictionarySuggestions/PostDictionarySuggestions.ts` (+ test) | Online suggestions route; verifies the consent ack |
 | `supabase/functions/chat/ChatRoutes.ts`, `ChatRoutes.types.ts` | Modify: register the route |
 | `src/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql.ts` (+ `__tests__/` unit and executed tests) | Profiling SQL and turning its rows into profiles |
 | `src/lib/dataDictionaries/profileDatasetColumns/profileDatasetColumns.ts` (+ test) | Profiles one dataset through QETL |
-| `src/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions.ts` (+ test) | Which model runs suggestions, the request, the call |
+| `src/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions.ts` (+ test) | Which model runs suggestions, consent, the request, the call |
+| `src/models/privacy/ConsentAuditEntry/ConsentAuditEntry.constants.ts`, `src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx`, `src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx` | Modify: a `dictionary_suggestions` consent context and its privacy log label |
 | `src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts` | Modify: docstring names the new caller |
 | `src/views/DataManagerApp/NewDictionaryFromDatasetsView/` | The create flow: reducer, hooks, steps, view |
 | `src/routes/_auth/$workspaceSlug/data-manager/dictionaries/new.tsx` | Route with `fromDatasetId` |
@@ -78,8 +85,9 @@ House conventions:
 | `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` (+ test) | Modify: Create a dictionary from this dataset |
 | `tests/data/measles-line-list-small/measles-line-list-small.csv` | 24-row coded line list for e2e |
 | `tests/e2e/helpers/constants.ts` | Modify: the fixture's path and row count |
-| `tests/e2e/dictionary-create-from-dataset.spec.ts` | E2E, online and offline suggestions |
+| `tests/e2e/dictionary-create-from-dataset.spec.ts` | E2E: consent, online and offline suggestions, blank labels on the dictionary |
 | `tests/e2e/data-dictionary-edit.spec.ts` | Modify: New dictionary is now a menu |
+| `docs/measles-demo/data-dictionaries-design.md` | Modify: blank labels allowed; the follow-up piece after slice 3 |
 | `docs/measles-demo/pr-feature-log.md` | Modify: F130 |
 
 ---
@@ -90,14 +98,515 @@ House conventions:
 
 - [ ] **Step 1:** `git rev-parse --abbrev-ref HEAD`. Expected: `feat/dictionary-inference`.
 - [ ] **Step 2: Switch to this branch's own local Supabase.** The shared `avandar` stack does not have slice 1's dictionary tables, so this branch needs its own. Run `ava supabase status`. If its first line does not name this branch's own project, run `ava supabase switch` (it seeds the new stack) and run `ava supabase status` again. Do not continue until its first line names `feat-dictionary-inference`. If `ava` is missing, run `pnpm build:ava-cli`. Do not edit `supabase/config.toml` or the switch block in `.env.development`.
-- [ ] **Step 3: Point the edge runtime at the switched stack.** A switch rewrites `.env.development.edge` but not the gitignored `supabase/functions/.env`, so the `chat` edge function would refuse every user token with `unexpected "iss"`. Run `diff .env.development.edge supabase/functions/.env`. If they differ, `cp .env.development.edge supabase/functions/.env`. Then run `ava supabase status` again, and only while its first line still names `feat-dictionary-inference`, run `supabase stop` and `ava supabase switch feat-dictionary-inference` (plain `supabase start` would read the shared stack's ports and fail). Confirm with `ava supabase status`. Keep `OPEN_ROUTER_API_KEY` in `supabase/functions/.env` if it was there.
+- [ ] **Step 3: Point the edge runtime at the switched stack.** A switch rewrites `.env.development.edge` but not the gitignored `supabase/functions/.env`, so the `chat` edge function would refuse every user token with `unexpected "iss"`. Run `diff .env.development.edge supabase/functions/.env`. If they differ, `cp .env.development.edge supabase/functions/.env`, then `supabase stop` and `ava supabase switch feat-dictionary-inference`, and confirm with `ava supabase status`. Keep `OPEN_ROUTER_API_KEY` in `supabase/functions/.env` if it was there.
 - [ ] **Step 4:** `pnpm vitest run src/views/DataManagerApp shared/models/dataDictionaries src/clients/dataDictionaries shared/agent`. Expected: PASS. This is the baseline the later tasks keep green.
 
-This slice changes no schema, migration, seed, bucket, or `config.toml`. Never run `pnpm db:reset`, `pnpm db:new-migration`, or `supabase db diff` in it.
+This slice changes one function in `supabase/schemas/` (Task 1), which is a second reason it needs its own stack. Before any `pnpm db:reset`, `pnpm db:new-migration`, `supabase db diff`, `supabase start`, or `supabase stop`, run `ava supabase status` and confirm its first line names `feat-dictionary-inference`. Never run them while it points at the shared `avandar` stack.
 
 ---
 
-### Task 1: Column profiles: tokens, kinds, and the match scorer
+### Task 1: Blank labels in the save RPC (schema)
+
+A value can now be saved without a label: it waits for one, and the editor marks it (Task 2). Today `data_dictionaries__check_pairs` refuses a blank label with `code_pair_incomplete`. After this task it refuses only a blank code, and a label that is not text at all. Label uniqueness already ignores blank spellings (`where btrim(spellings.spelling) <> ''`), so two blank labels in one list never clash. Nothing else in the schema changes, and the RPC's signature does not change.
+
+Load the `supabase-declarative-schema` and `supabase-postgres-best-practices` skills. Read `docs/rules/sql.md`.
+
+**Files:**
+- Modify: `supabase/schemas/50.rpc_data_dictionaries__save.sql` (`data_dictionaries__check_pairs` only)
+- Modify: `supabase/tests/database/data_dictionaries/rpc_data_dictionaries__save.test.sql`
+- Create (generated): `supabase/migrations/<timestamp>_data_dictionaries_blank_labels.sql`
+- Create (generated): `apps/desktop/migrations/<timestamp>_data_dictionaries_blank_labels.gen.sql`
+- Regenerate, commit only if it changed: `shared/types/database.types.ts`
+
+- [ ] **Step 1: Stop condition.** `ava supabase status`. Its first line must name `feat-dictionary-inference` (Task 0 switched). If it says `This is the develop local Supabase`, stop: do not run any database command below until the switch is in place.
+
+- [ ] **Step 2: Write the failing pgTAP tests.** In `rpc_data_dictionaries__save.test.sql`:
+
+Change `select plan (19);` to `select plan (23);`.
+
+Replace test 4 (a blank label used to be refused) with a blank code:
+
+```sql
+-- 4.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500001-0000-4000-8000-000000000001","name":"Sex","is_ordered":false,"pairs":[{"code":" ","label":"Male","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'code_pair_incomplete',
+  'every pair needs a code'
+);
+reset role;
+```
+
+Add these four tests after test 17, before `select * from finish ();`. They come last because a successful save bumps the version that tests 13 to 17 count.
+
+```sql
+-- Blank labels. A value can wait for its label.
+
+-- 18.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500002-0000-4000-8000-000000000002","name":"Hospitalized","is_ordered":false,"pairs":[{"code":"Y","label":"Yes","accepted_spellings":[],"is_missing":false},{"code":"N","label":"","accepted_spellings":[],"is_missing":false},{"code":"U","label":" ","accepted_spellings":[],"is_missing":true}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'no error',
+  'values with blank labels save, two of them in one list'
+);
+reset role;
+
+-- 19.
+select is (
+  (
+    select count(*)::int
+    from public.data_dictionaries__code_lists cl
+    cross join lateral jsonb_array_elements(cl.pairs) as p (pair)
+    where
+      cl.id = 'de500002-0000-4000-8000-000000000002'::uuid and
+      btrim(p.pair ->> 'label') = ''
+  ),
+  2,
+  'the blank labels are stored blank'
+);
+
+-- 20.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500002-0000-4000-8000-000000000002","name":"Hospitalized","is_ordered":false,"pairs":[{"code":"Y","label":"Yes","accepted_spellings":[],"is_missing":false},{"code":"1","label":"yes","accepted_spellings":[],"is_missing":false},{"code":"N","label":"","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'labels_not_unique',
+  'two values still cannot share a label that is not blank'
+);
+reset role;
+
+-- 21.
+select is (
+  pg_temp.save_as (
+    'de000001-0000-4000-8000-000000000001'::uuid,
+    'de400001-0000-4000-8000-000000000001'::uuid,
+    '[{"id":"de500002-0000-4000-8000-000000000002","name":"Hospitalized","is_ordered":false,"pairs":[{"code":"Y","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
+    '[]'::jsonb
+  ),
+  'dictionary_payload_invalid',
+  'a value without a label field at all is refused'
+);
+reset role;
+```
+
+That is 21 numbered assertions plus 12b and 12c, so 23.
+
+- [ ] **Step 3:** `pnpm test:db`. Expected: FAIL on 18 (`code_pair_incomplete` instead of `no error`) and 21. Everything else passes.
+
+- [ ] **Step 4: Change the check.** In `supabase/schemas/50.rpc_data_dictionaries__save.sql`, replace the docstring and the first `if exists` block of `data_dictionaries__check_pairs` with:
+
+```sql
+/**
+ * Raises with a stable hint when any code list's pairs are incomplete or
+ * ambiguous: a blank code, a label that is not text, two codes that differ
+ * only in case, or a label or accepted spelling shared by two pairs. A
+ * blank label is allowed: the value is saved and waits for its label, and
+ * blank labels never clash with each other.
+ */
+create or replace function public.data_dictionaries__check_pairs (p_code_lists jsonb) returns void language plpgsql
+set
+  search_path = '' as $$
+begin
+  if exists (
+    select 1
+    from jsonb_array_elements(p_code_lists) as l (list)
+    cross join lateral jsonb_array_elements(l.list -> 'pairs') as p (pair)
+    where jsonb_typeof(p.pair -> 'label') is distinct from 'string'
+  ) then
+    raise exception 'Every value needs a label, even an empty one'
+      using errcode = '22023', hint = 'dictionary_payload_invalid';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_array_elements(p_code_lists) as l (list)
+    cross join lateral jsonb_array_elements(l.list -> 'pairs') as p (pair)
+    where coalesce(btrim(p.pair ->> 'code'), '') = ''
+  ) then
+    raise exception 'Every value needs a code'
+      using errcode = '23514', hint = 'code_pair_incomplete';
+  end if;
+```
+
+The rest of the function (the codes and labels uniqueness checks) stays as it is. Run `pnpm exec prettier --write supabase/schemas/50.rpc_data_dictionaries__save.sql`.
+
+- [ ] **Step 5: Generate the migration.** Run `pnpm db:reset`, and immediately after it `pnpm db:new-migration data_dictionaries_blank_labels`. (`db:new-migration` stops, diffs, and resets this branch's own stack; that is why the switch must be confirmed first.)
+
+- [ ] **Step 6: Read the migration before trusting it.** `supabase/migrations/<timestamp>_data_dictionaries_blank_labels.sql` must contain one `CREATE OR REPLACE FUNCTION public.data_dictionaries__check_pairs` with the full new body (an absolute definition, not a delta), plus the `revoke` lines the privileges reconciler appends for it. If it drops, alters, or recreates anything else, the diff ran against a database holding objects this branch does not define: run `pnpm db:reset`, regenerate, and compare. Never commit a migration that drops something this task did not touch.
+
+- [ ] **Step 7: Desktop twin.** `pnpm desktop:sqlite:gen-migrations`. Expected: a new `apps/desktop/migrations/<timestamp>_data_dictionaries_blank_labels.gen.sql` whose header reports `Schema-shape statements emitted: 0` (a function change has no SQLite equivalent).
+
+- [ ] **Step 8: Types.** `pnpm db:gen-types`, then `git diff --stat shared/types/database.types.ts`. Expected: no change, since the RPC's signature is the same. Commit it only if it changed.
+
+- [ ] **Step 9:** `pnpm test:db`. Expected: PASS. Then `ava supabase migrations validate`. Expected: no ordering conflicts.
+
+- [ ] **Step 10: Commit**
+
+```bash
+git add supabase/schemas/50.rpc_data_dictionaries__save.sql supabase/tests/database/data_dictionaries/rpc_data_dictionaries__save.test.sql supabase/migrations/*_data_dictionaries_blank_labels.sql apps/desktop/migrations/*_data_dictionaries_blank_labels.gen.sql
+git commit -m "feat(data-dictionaries): let a dictionary value be saved without a label
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+Never stage `supabase/config.toml`.
+
+---
+
+### Task 2: Blank labels in the dictionary model and editor
+
+The model and the Dictionary view follow the schema: a blank label is a warning, not an issue. `findDraftIssues` no longer reports it, so the save bar still saves. A new `findDraftWarnings` lists every value with a code and no label; the code list editor marks those rows "Needs a label" in a dimmed line, and the entries table says how many of an entry's values still need one. The stored-pairs Zod schema already accepts an empty label (`label: z.string()`), so the parser only gains a test.
+
+**Files:**
+- Modify: `shared/models/dataDictionaries/DataDictionary/DataDictionary.types.ts`
+- Modify: `shared/models/dataDictionaries/DataDictionary/DataDictionary.ts`
+- Modify: `shared/models/dataDictionaries/DataDictionary/DataDictionaryModule/DataDictionaryModule.ts`
+- Test: `shared/models/dataDictionaries/DataDictionary/DataDictionaryModule/DataDictionaryModule.test.ts`
+- Test: `shared/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeListParsers.test.ts`
+- Modify: `src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts`
+- Modify: `src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx`
+- Modify: `src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.tsx`
+- Test: `src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditor.test.tsx`
+- Modify: `src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx`
+- Modify: `src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx`
+- Test: `src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.test.tsx`
+
+- [ ] **Step 1: Write the failing model tests.** Add to `DataDictionaryModule.test.ts`, after the `findDraftIssues` describe block:
+
+```ts
+describe("DataDictionary.findDraftWarnings", () => {
+  it("lets a value with a code and no label save, and marks it as needing one", () => {
+    const list = _listDraft({
+      pairs: [_pair("1", "Male"), _pair("2", " "), _pair("9", "")],
+    });
+    const draft = { codeLists: [list], entries: [] };
+    expect(DataDictionary.findDraftIssues(draft)).toEqual([]);
+    expect(DataDictionary.findDraftWarnings(draft)).toEqual([
+      { type: "label_missing", codeListId: list.id, pairIndex: 1 },
+      { type: "label_missing", codeListId: list.id, pairIndex: 2 },
+    ]);
+  });
+
+  it("still refuses a value with no code, and does not also warn about it", () => {
+    const list = _listDraft({ pairs: [_pair("", "")] });
+    const draft = { codeLists: [list], entries: [] };
+    expect(DataDictionary.findDraftIssues(draft)).toEqual([
+      { type: "code_pair_incomplete", codeListId: list.id, pairIndex: 0 },
+    ]);
+    expect(DataDictionary.findDraftWarnings(draft)).toEqual([]);
+  });
+});
+```
+
+Add to `DataDictionaryCodeListParsers.test.ts`, inside its describe block:
+
+```ts
+  it("reads a value whose label is still blank", () => {
+    const codeList = DataDictionaryCodeListParsers.fromDBReadToModelRead({
+      ...DB_ROW,
+      pairs: [{ code: "9", label: "", accepted_spellings: [], is_missing: false }],
+    });
+    expect(codeList.pairs).toEqual([
+      { code: "9", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+  });
+```
+
+- [ ] **Step 2:** `pnpm vitest run shared/models/dataDictionaries`. Expected: FAIL (`findDraftWarnings` is not a function; the blank label is still an issue). The parser test already passes.
+
+- [ ] **Step 3: Change the model.** In `DataDictionary.types.ts`, after `DataDictionaryDraftIssue`, add:
+
+```ts
+/**
+ * Something in a draft worth finishing that does not stop it from saving.
+ * The Dictionary view marks it beside the value, and the create flow counts
+ * them on its Save step.
+ * - `label_missing`: a value with a code and no label yet.
+ */
+export type DataDictionaryDraftWarning = {
+  type: "label_missing";
+  codeListId: DataDictionaryCodeList.Id;
+  pairIndex: number;
+};
+```
+
+In `DataDictionary.ts`, import `DataDictionaryDraftWarning` with the other types and add `export type DraftWarning = DataDictionaryDraftWarning;` to the namespace, after `DraftIssue`.
+
+In `DataDictionaryModule.ts`, import `DataDictionaryDraftWarning` with the other draft types. In `_findPairIssues`, replace
+
+```ts
+      if (normalizeKey(pair.code) === "" || normalizeKey(pair.label) === "") {
+        return [{ type: "code_pair_incomplete", ...at }];
+      }
+```
+
+with
+
+```ts
+      // A blank label is not an issue: `findDraftWarnings` marks it instead.
+      if (normalizeKey(pair.code) === "") {
+        return [{ type: "code_pair_incomplete", ...at }];
+      }
+```
+
+Add after `findDraftIssues`:
+
+```ts
+/**
+ * Every value that has a code but no label yet, in display order. A draft
+ * with these still saves; the editor marks each one as needing a label.
+ */
+function findDraftWarnings(
+  draft: DataDictionaryDraft,
+): DataDictionaryDraftWarning[] {
+  return draft.codeLists.flatMap((codeList) => {
+    return codeList.pairs.flatMap(
+      (pair, pairIndex): DataDictionaryDraftWarning[] => {
+        const isUnlabeled =
+          normalizeKey(pair.code) !== "" && normalizeKey(pair.label) === "";
+        return isUnlabeled
+          ? [{ type: "label_missing", codeListId: codeList.id, pairIndex }]
+          : [];
+      },
+    );
+  });
+}
+```
+
+and add `findDraftWarnings,` to `DataDictionaryModule` after `findDraftIssues,`.
+
+- [ ] **Step 4:** Run the model tests again. Expected: PASS, including slice 1's existing `findDraftIssues` tests (their incomplete pair has a blank code).
+
+- [ ] **Step 5: Write the failing editor tests.** Add to `CodeListEditor.test.tsx`:
+
+```tsx
+  it("marks a value without a label as needing one, without blocking it", () => {
+    const draft = _draft([
+      { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "9", label: "", acceptedSpellings: [], isMissing: false },
+    ]);
+    render(
+      <CodeListEditor
+        draft={draft}
+        codeListId={LIST_ID}
+        issues={[]}
+        canEdit
+        onDraftChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/Needs a label/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Label 2")).not.toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+```
+
+Add to `DictionaryEntriesTab.test.tsx`, after `DRAFT`:
+
+```tsx
+const UNLABELED_DRAFT: DataDictionary.Draft = {
+  ...DRAFT,
+  codeLists: DRAFT.codeLists.map((list) => {
+    return {
+      ...list,
+      pairs: [
+        ...list.pairs,
+        { code: "9", label: "", acceptedSpellings: [], isMissing: true },
+      ],
+    };
+  }),
+};
+```
+
+and inside the describe block:
+
+```tsx
+  it("says how many of an entry's values still need a label", () => {
+    _renderTab({ draft: UNLABELED_DRAFT });
+    expect(screen.getByText("1 value needs a label")).toBeInTheDocument();
+  });
+```
+
+- [ ] **Step 6:** `pnpm vitest run src/views/DataManagerApp/DataDictionaryView`. Expected: the two new tests FAIL.
+
+- [ ] **Step 7: Change the copy.** In `useDictionaryCopy.ts`, change the `code_pair_incomplete` line to `code_pair_incomplete: t\`Every value needs a code.\`,`, add to `DictionaryCopy`:
+
+```ts
+  /** What one draft warning means, as shown beside the value it is about. */
+  describeWarning: (warning: DataDictionary.DraftWarning) => string;
+```
+
+and to the returned object, after `describeIssue`:
+
+```ts
+      describeWarning: () => {
+        return t`Needs a label. You can save without one and add it later.`;
+      },
+```
+
+- [ ] **Step 8: Show warnings on code list rows.** In `CodePairRow.tsx`, replace the `CodePairIssue` type with:
+
+```ts
+/** A pair's validation problem or warning, with the copy that explains it. */
+export type CodePairIssue = {
+  type: DataDictionary.DraftIssue["type"] | DataDictionary.DraftWarning["type"];
+  message: string;
+  /** An error blocks saving. A warning, such as a missing label, does not. */
+  severity: "error" | "warning";
+};
+```
+
+Remove `pair` from `_isIssueOnInput`'s options type (it no longer reads the pair) and replace its body with:
+
+```ts
+  const { issue, input } = options;
+  if (issue?.severity !== "error") {
+    return false;
+  }
+  if (input === "code") {
+    return issue.type === "code_not_unique" || issue.type === "code_pair_incomplete";
+  }
+  return issue.type === "label_not_unique";
+```
+
+and replace the issue line at the end of `CodePairRowBody` with:
+
+```tsx
+      {issue ? (
+        // An error is also its input's accessible description, so its line
+        // is hidden from assistive tech. A warning is only said here.
+        <Text
+          size="xs"
+          aria-hidden={issue.severity === "error"}
+          c={issue.severity === "error" ? "danger" : "dimmed"}
+          className={css.codeListEditorRowIssue}
+        >
+          {issue.message}
+        </Text>
+      ) : null}
+```
+
+In `CodeListEditor.tsx`, replace `_makePairIssueGetter` with:
+
+```ts
+/** Makes a lookup of the issue, or else the warning, on one pair of a list. */
+function _makePairIssueGetter(
+  options: Readonly<{
+    issues: readonly DataDictionary.DraftIssue[];
+    warnings: readonly DataDictionary.DraftWarning[];
+    listId: DataDictionaryCodeList.Id;
+    describeIssue: (issue: DataDictionary.DraftIssue) => string;
+    describeWarning: (warning: DataDictionary.DraftWarning) => string;
+  }>,
+): (pairIndex: number) => CodePairIssue | undefined {
+  const { issues, warnings, listId } = options;
+  return (pairIndex) => {
+    const issue = issues.find((current) => {
+      return (
+        "pairIndex" in current &&
+        current.codeListId === listId &&
+        current.pairIndex === pairIndex
+      );
+    });
+    if (issue) {
+      return { type: issue.type, message: options.describeIssue(issue), severity: "error" };
+    }
+    const warning = warnings.find((current) => {
+      return current.codeListId === listId && current.pairIndex === pairIndex;
+    });
+    return warning
+      ? { type: warning.type, message: options.describeWarning(warning), severity: "warning" }
+      : undefined;
+  };
+}
+```
+
+and its call in `CodeListEditor` with:
+
+```tsx
+        pairIssue={_makePairIssueGetter({
+          issues,
+          warnings: DataDictionary.findDraftWarnings(draft),
+          listId: list.id,
+          describeIssue: copy.describeIssue,
+          describeWarning: copy.describeWarning,
+        })}
+```
+
+- [ ] **Step 9: Count unlabeled values on the entries table.** In `DictionaryEntriesTab.tsx`, add above `_makeListNames`:
+
+```ts
+/** How many values of each code list still need a label. */
+function _countUnlabeledValues(
+  draft: DataDictionary.Draft,
+): Map<DataDictionaryCodeList.Id, number> {
+  const counts = new Map<DataDictionaryCodeList.Id, number>();
+  DataDictionary.findDraftWarnings(draft).forEach((warning) => {
+    counts.set(warning.codeListId, (counts.get(warning.codeListId) ?? 0) + 1);
+  });
+  return counts;
+}
+```
+
+add `unlabeledCounts: Map<DataDictionaryCodeList.Id, number>;` to `EntriesTabState`, `unlabeledCounts: _countUnlabeledValues(draft),` to what `useEntriesTabState` returns, `unlabeledCounts,` to the destructuring in `DictionaryEntriesTab`, and `unlabeledCounts={unlabeledCounts}` to `<DictionaryEntriesTable>`.
+
+In `DictionaryEntriesTable.tsx`: import `Plural` beside `Trans`; add to both `Props` and `RowProps`:
+
+```ts
+  /** Values that still need a label, by code list. */
+  unlabeledCounts: ReadonlyMap<DataDictionaryCodeList.Id, number>;
+```
+
+destructure `unlabeledCounts` in both `DictionaryEntriesTable` and `DictionaryEntryRow`, pass `unlabeledCounts={unlabeledCounts}` from the table to each `DictionaryEntryRow`; in `DictionaryEntryRow`, after `const primaryId = ...`, add
+
+```ts
+  const unlabeledCount = entry.codings.reduce((sum, coding) => {
+    return sum + (unlabeledCounts.get(coding.codeListId) ?? 0);
+  }, 0);
+```
+
+and in the "Kind and values" cell, after the list name's `<Text>`:
+
+```tsx
+        {unlabeledCount > 0 ? (
+          <Text size="xs" c="dimmed">
+            <Plural
+              value={unlabeledCount}
+              one="# value needs a label"
+              other="# values need a label"
+            />
+          </Text>
+        ) : null}
+```
+
+- [ ] **Step 10:** `pnpm vitest run src/views/DataManagerApp/DataDictionaryView shared/models/dataDictionaries`. Expected: PASS. `pnpm exec tsc -b --force --noEmit`. Expected: no errors.
+
+- [ ] **Step 11: Commit**
+
+```bash
+pnpm exec oxfmt --ignore-path .oxfmtignore shared/models/dataDictionaries/DataDictionary shared/models/dataDictionaries/DataDictionaryCodeList src/views/DataManagerApp/DataDictionaryView
+pnpm exec eslint --fix shared/models/dataDictionaries/DataDictionary shared/models/dataDictionaries/DataDictionaryCodeList src/views/DataManagerApp/DataDictionaryView
+git add shared/models/dataDictionaries/DataDictionary shared/models/dataDictionaries/DataDictionaryCodeList src/views/DataManagerApp/DataDictionaryView
+git commit -m "feat(data-dictionaries): mark values that still need a label instead of refusing them
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+---
+
+### Task 3: Column profiles: tokens, kinds, and the match scorer
 
 Everything here is pure and runs in the browser, the edge function, and Node. It is spec section 8.1 (classification) and 8.2 (scoring), with the refinements listed at the end of this file.
 
@@ -232,6 +741,18 @@ describe("ColumnProfile.getTokensFromColumnName", () => {
     ["dob", ["birth", "date"]],
   ])("reads %s as %j", (columnName, tokens) => {
     expect(ColumnProfile.getTokensFromColumnName(columnName)).toEqual(tokens);
+  });
+});
+
+describe("ColumnProfile.getEntryNameFromColumnName", () => {
+  it.each([
+    ["GENDER", "gender"],
+    ["CaseNo", "case_no"],
+    ["Onset Date", "onset_date"],
+    ["ZIPCode", "zip_code"],
+    ["hosp_yn", "hosp_yn"],
+  ])("names an entry for %s %s", (columnName, entryName) => {
+    expect(ColumnProfile.getEntryNameFromColumnName(columnName)).toBe(entryName);
   });
 });
 
@@ -507,6 +1028,16 @@ export function getTokensFromColumnName(columnName: string): string[] {
   });
 }
 
+/**
+ * A column name as a dictionary entry name: its words in lowercase, joined
+ * by underscores, so `GENDER` gives `gender` and `CaseNo` gives `case_no`.
+ * A name with no letters or digits is only trimmed.
+ */
+export function getEntryNameFromColumnName(columnName: string): string {
+  const words = getWordsFromColumnName(columnName);
+  return words.length > 0 ? words.join("_") : columnName.trim();
+}
+
 /** Jaro-Winkler similarity of two words, from 0 to 1. */
 function _getJaroWinkler(wordA: string, wordB: string): number {
   if (wordA === wordB) {
@@ -604,6 +1135,7 @@ export function getNameScore(nameA: string, nameB: string): number {
 
 ```ts
 import {
+  getEntryNameFromColumnName,
   getNameScore,
   getTokensFromColumnName,
   getWordsFromColumnName,
@@ -924,6 +1456,9 @@ export const ColumnProfileModule = {
   /** The words a column name is compared by. */
   getTokensFromColumnName,
 
+  /** A column name as an entry name: lowercase words joined by `_`. */
+  getEntryNameFromColumnName,
+
   /**
    * The entry kind a profiled column looks like, with dates checked
    * before identifiers.
@@ -945,7 +1480,7 @@ export const ColumnProfileModule = {
 - [ ] **Step 6: Run the tests to make sure they pass**
 
 Run: `pnpm vitest run shared/models/dataDictionaries/ColumnProfile`
-Expected: PASS (25 tests). If `hospitalised`/`hospitalized` fails, print `_getJaroWinkler` for the pair: it must be at least 0.9 (it is about 0.97).
+Expected: PASS (30 tests). If `hospitalised`/`hospitalized` fails, print `_getJaroWinkler` for the pair: it must be at least 0.9 (it is about 0.97).
 
 - [ ] **Step 7: Commit**
 
@@ -960,7 +1495,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 2: Proposal types and clustering columns into entries
+### Task 4: Proposal types and clustering columns into entries
 
 Groups every profiled column, across the picked datasets, into proposed entries (spec section 8.2, "The same scorer clusters columns across datasets in Create").
 
@@ -1066,6 +1601,14 @@ export type DictionaryProposalLabels = Record<
 /** How far along a code list is: shown as Labeled, Suggested, or To do. */
 export type DictionaryProposalCodeListStatus = "labeled" | "suggested" | "to_do";
 
+/**
+ * Why an entry's name cannot be saved, matching what the save RPC refuses:
+ * - `name_required`: blank once trimmed.
+ * - `name_not_unique`: the same as another included entry's name, ignoring
+ *   case and surrounding spaces.
+ */
+export type DictionaryProposalEntryNameIssue = "name_required" | "name_not_unique";
+
 /** One meaning-based match: entry `name` records the same as `sameAs`. */
 export type DictionaryProposalMeaningMatch = {
   name: string;
@@ -1131,7 +1674,7 @@ describe("makeProposalFromColumnProfiles", () => {
         return [entry.key, entry.name];
       }),
     ).toEqual([
-      [`${BRONX.datasetId}:GENDER`, "GENDER"],
+      [`${BRONX.datasetId}:GENDER`, "gender"],
       [`${BRONX.datasetId}:hosp_yn`, "hosp_yn"],
     ]);
   });
@@ -1188,13 +1731,40 @@ describe("makeProposalFromColumnProfiles", () => {
     expect(proposal.entries).toHaveLength(2);
   });
 
-  it("names an entry after its most common column name", () => {
+  it("names an entry after its most common column name, in lowercase words", () => {
     const proposal = makeProposalFromColumnProfiles([
-      _coded(ERIE, "Gender", SEX_CODES),
-      _coded(BRONX, "GENDER", SEX_CODES),
-      _coded(KINGS, "GENDER", SEX_CODES),
+      _coded(ERIE, "GENDER", SEX_CODES),
+      _coded(BRONX, "sex", SEX_CODES),
+      _coded(KINGS, "Sex", SEX_CODES),
     ]);
-    expect(proposal.entries[0]?.name).toBe("GENDER");
+    expect(proposal.entries[0]?.name).toBe("sex");
+  });
+
+  it("splits camelCase into words joined by underscores", () => {
+    const proposal = makeProposalFromColumnProfiles([
+      _coded(BRONX, "CaseNo", [], { values: undefined, distinctCount: 300 }),
+    ]);
+    expect(proposal.entries[0]?.name).toBe("case_no");
+  });
+
+  it("gives two entries that would share a name different names", () => {
+    const proposal = makeProposalFromColumnProfiles([
+      _coded(BRONX, "Gender", SEX_CODES),
+      _coded(BRONX, "gender", ["M", "F"]),
+    ]);
+    expect(
+      proposal.entries.map((entry) => {
+        return entry.name;
+      }),
+    ).toEqual(["gender", "gender_2"]);
+  });
+
+  it("avoids names that are already taken", () => {
+    const proposal = makeProposalFromColumnProfiles(
+      [_coded(ERIE, "sex", ["M", "F", "U"])],
+      { takenNames: ["Sex"] },
+    );
+    expect(proposal.entries[0]?.name).toBe("sex_2");
   });
 
   it("gives an entry the kind its columns look like", () => {
@@ -1315,14 +1885,34 @@ function _findPlacement(
   }, undefined);
 }
 
+/** The entry name most of the columns would get, the first read on a tie. */
 function _getMostCommonName(columns: Readonly<ProfileList>): string {
   const counts = new Map<string, number>();
   columns.forEach((column) => {
-    counts.set(column.columnName, (counts.get(column.columnName) ?? 0) + 1);
+    const name = ColumnProfile.getEntryNameFromColumnName(column.columnName);
+    counts.set(name, (counts.get(name) ?? 0) + 1);
   });
-  return [...counts.entries()].reduce((bestName, [name, count]) => {
-    return count > (counts.get(bestName) ?? 0) ? name : bestName;
-  }, columns[0].columnName);
+  return [...counts.entries()].reduce(
+    (bestName, [name, count]) => {
+      return count > (counts.get(bestName) ?? 0) ? name : bestName;
+    },
+    ColumnProfile.getEntryNameFromColumnName(columns[0].columnName),
+  );
+}
+
+/**
+ * `name`, or `name_2`, `name_3`, and so on: the first one no taken name
+ * uses, ignoring case. Records the one it returns as taken.
+ */
+function _takeUniqueName(name: string, takenNames: Set<string>): string {
+  let candidate = name;
+  let suffix = 2;
+  while (takenNames.has(candidate.toLowerCase())) {
+    candidate = `${name}_${suffix}`;
+    suffix += 1;
+  }
+  takenNames.add(candidate.toLowerCase());
+  return candidate;
 }
 
 function _getMostCommonKind(
@@ -1362,13 +1952,17 @@ function _makeEntryFromCluster(
  * dictionary would have. A column joins the entry it matches best: by the
  * same name, or by a match score of 0.9 or more. A weaker match (0.6 to
  * 0.9) or the same name with other codes joins as a guess the user can
- * undo. Two columns of one dataset never share an entry.
+ * undo. Two columns of one dataset never share an entry. Each entry is named
+ * after its most common column name in lowercase words (`GENDER` gives
+ * `gender`), with `_2` added when another entry, or one of `takenNames`,
+ * already has that name.
  *
  * Used when a dictionary is created from datasets, and again by Keep apart
  * to regroup the columns a guess had joined.
  */
 export function makeProposalFromColumnProfiles(
   profiles: readonly ColumnProfile.T[],
+  options: Readonly<{ takenNames?: readonly string[] }> = {},
 ): DictionaryProposalT {
   const clusters: Cluster[] = [];
   profiles.forEach((profile) => {
@@ -1386,14 +1980,24 @@ export function makeProposalFromColumnProfiles(
       placement.cluster.suggestionReason = placement.outcome;
     }
   });
-  return { entries: clusters.map(_makeEntryFromCluster) };
+  const takenNames = new Set(
+    (options.takenNames ?? []).map((name) => {
+      return name.trim().toLowerCase();
+    }),
+  );
+  return {
+    entries: clusters.map((cluster) => {
+      const entry = _makeEntryFromCluster(cluster);
+      return { ...entry, name: _takeUniqueName(entry.name, takenNames) };
+    }),
+  };
 }
 ```
 
 - [ ] **Step 5: Run the test to make sure it passes**
 
 Run: `pnpm vitest run shared/models/dataDictionaries/DictionaryProposal`
-Expected: PASS (8 tests).
+Expected: PASS (11 tests).
 
 - [ ] **Step 6: Commit**
 
@@ -1408,9 +2012,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 3: Code lists, labels, and the save draft
+### Task 5: Code lists, labels, and the save draft
 
-Derives the code lists a proposal would save (one per distinct set of codes, shared where entries share values and a first word), tracks the labels being typed or suggested, and turns it all into the `DataDictionary.Draft` that `buildSavePayload` already accepts.
+Derives the code lists a proposal would save, tracks the labels being typed or suggested, and turns it all into the `DataDictionary.Draft` that `buildSavePayload` already accepts. Entries share one code list when their codes are identical and are words (`Y/N/U` across `fever`, `rash`, `cough`), or are identical numbers and the columns' names start with the same word (`symptom_fever`, `symptom_rash` with `1/2/9`); identical numbers alone (`GENDER` and `fever`, both `1/2/9`) share nothing. A code list's key never depends on the entry's name, so renaming an entry on Review keeps its labels. A value with no label is saved with a blank label (Task 1 allows it).
 
 **Files:**
 - Create: `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/getCodingsFromProposal/getCodingsFromProposal.ts`
@@ -1538,7 +2142,40 @@ describe("getCodingsFromProposal", () => {
     expect(codeLists[0]?.entryKeys).toEqual(["k:symptom_fever", "k:symptom_rash"]);
   });
 
-  it("keeps entries with the same codes but another first word apart", () => {
+  it("shares one list between entries whose codes are the same words, whatever their names", () => {
+    const yesNoUnknown = { Y: 50, N: 40, U: 5 };
+    const { codeLists } = getCodingsFromProposal({
+      entries: [
+        _entry("fever", "categorical", [_column("fever", yesNoUnknown)]),
+        _entry("rash", "categorical", [_column("rash", yesNoUnknown)]),
+        _entry("cough", "categorical", [_column("cough", yesNoUnknown)]),
+      ],
+    });
+    expect(codeLists).toHaveLength(1);
+    expect(codeLists[0]?.name).toBe("fever, rash, cough (Y/N/U)");
+  });
+
+  it("keeps word codes apart when they are not the same", () => {
+    const { codeLists } = getCodingsFromProposal({
+      entries: [
+        _entry("fever", "categorical", [_column("fever", { Y: 50, N: 40, U: 5 })]),
+        _entry("hosp_yn", "categorical", [_column("hosp_yn", { Y: 50, N: 40 })]),
+      ],
+    });
+    expect(codeLists).toHaveLength(2);
+  });
+
+  it("keeps a list's key when its entry is renamed", () => {
+    const entry = _entry("GENDER", "categorical", [_column("GENDER", SEX_COUNTS)]);
+    const before = getCodingsFromProposal({ entries: [entry] }).codeLists[0];
+    const after = getCodingsFromProposal({
+      entries: [{ ...entry, name: "sex_at_intake" }],
+    }).codeLists[0];
+    expect(after?.key).toBe(before?.key);
+    expect(after?.name).toBe("sex_at_intake (1/2/9)");
+  });
+
+  it("keeps entries with the same numeric codes but another first word apart", () => {
     const { codeLists } = getCodingsFromProposal({
       entries: [
         _entry("GENDER", "categorical", [_column("GENDER", SEX_COUNTS)]),
@@ -1601,11 +2238,18 @@ const MIN_CODING_OVERLAP = 0.5;
 /** How many codes a code list's name shows, as in `GENDER (1/2/9)`. */
 const CODES_IN_NAME = 4;
 
+/** How many entry names a shared list's name shows before `...`. */
+const NAMES_IN_NAME = 3;
+
+/** A code made only of digits, with an optional sign or decimals. */
+const NUMERIC_CODE = /^-?\d+(\.\d+)?$/;
+
 /** Values by normalized code. The first spelling seen is the code kept. */
 type Coding = Map<string, ColumnProfile.Value>;
 
 type ListBuilder = {
-  token: string;
+  /** The shared first word of numeric lists' columns; empty for words. */
+  groupWord: string;
   entryKeys: string[];
   isOrdered: boolean;
   values: Coding;
@@ -1661,6 +2305,44 @@ function _makeCodings(entry: Readonly<DictionaryProposalEntry>): Coding[] {
   });
 }
 
+/**
+ * The word that lets numeric codings share a list: the first word of the
+ * entry's first column name. Word codings need none, so it is empty. It is
+ * read from the column, never the entry's name, so a rename keeps the key.
+ */
+function _getGroupWord(
+  entry: Readonly<DictionaryProposalEntry>,
+  coding: Coding,
+): string {
+  const isNumeric = [...coding.keys()].every((key) => {
+    return NUMERIC_CODE.test(key);
+  });
+  if (!isNumeric) {
+    return "";
+  }
+  const [firstColumn] = [...entry.columns, ...entry.suggestedColumns];
+  const columnName = firstColumn?.columnName ?? entry.name;
+  return ColumnProfile.getTokensFromColumnName(columnName)[0] ?? "";
+}
+
+/** The part of a list's name before its codes. */
+function _getBaseName(
+  builder: Readonly<ListBuilder>,
+  entryNames: ReadonlyMap<string, string>,
+): string {
+  const names = builder.entryKeys.map((entryKey) => {
+    return entryNames.get(entryKey) ?? "";
+  });
+  if (names.length === 1) {
+    return names[0] ?? builder.groupWord;
+  }
+  if (builder.groupWord !== "") {
+    return builder.groupWord;
+  }
+  const shown = names.slice(0, NAMES_IN_NAME).join(", ");
+  return names.length > NAMES_IN_NAME ? `${shown}, ...` : shown;
+}
+
 function _makeCodeList(
   options: Readonly<{
     key: string;
@@ -1675,11 +2357,7 @@ function _makeCodeList(
     : values.sort((itemA, itemB) => {
         return itemB.rowCount - itemA.rowCount;
       });
-  const [firstEntryKey = ""] = builder.entryKeys;
-  const base =
-    builder.entryKeys.length > 1
-      ? builder.token
-      : (entryNames.get(firstEntryKey) ?? builder.token);
+  const base = _getBaseName(builder, entryNames);
   const codes = sortedValues
     .slice(0, CODES_IN_NAME)
     .map((item) => {
@@ -1699,9 +2377,10 @@ function _makeCodeList(
 /**
  * The code lists a proposal would save, and which ones each coded entry
  * uses, primary first. An entry gets one code list per set of codes its
- * columns hold. Entries whose codes are the same and whose names start with
- * the same word (`symptom_fever`, `symptom_rash`) share one list. Excluded
- * and description-only entries get none.
+ * columns hold. Entries share one list when their codes are the same words
+ * (`Y/N/U`), or the same numbers and their columns' names start with the
+ * same word (`symptom_fever`, `symptom_rash`). Excluded and
+ * description-only entries get none.
  *
  * Read by the Label values step to list what needs labels, and by
  * `makeDraftFromProposal` to build the draft that is saved.
@@ -1715,10 +2394,9 @@ export function getCodingsFromProposal(
     return entry.isIncluded && DataDictionary.isCodedKind(entry.kind);
   });
   codedEntries.forEach((entry) => {
-    const token =
-      ColumnProfile.getTokensFromColumnName(entry.name)[0] ?? entry.name;
     codeListKeysByEntryKey[entry.key] = _makeCodings(entry).map((coding) => {
-      const key = `${token}|${[...coding.keys()].sort().join("\u001f")}`;
+      const groupWord = _getGroupWord(entry, coding);
+      const key = `${groupWord}|${[...coding.keys()].sort().join("\u001f")}`;
       const builder = builders.get(key);
       if (builder) {
         builder.entryKeys.push(entry.key);
@@ -1726,7 +2404,7 @@ export function getCodingsFromProposal(
         _addValues(builder.values, coding.values());
       } else {
         const isOrdered = entry.kind === "ordered";
-        builders.set(key, { token, entryKeys: [entry.key], isOrdered, values: coding });
+        builders.set(key, { groupWord, entryKeys: [entry.key], isOrdered, values: coding });
       }
       return key;
     });
@@ -1743,7 +2421,7 @@ export function getCodingsFromProposal(
 }
 ```
 
-- [ ] **Step 4:** Run the codings test again. Expected: PASS (7 tests).
+- [ ] **Step 4:** Run the codings test again. Expected: PASS (10 tests).
 
 - [ ] **Step 5: Write the failing labels test**
 
@@ -2173,7 +2851,7 @@ describe("makeDraftFromProposal", () => {
     ).toEqual([true, false]);
   });
 
-  it("saves each value's label, or its code when it has no label", () => {
+  it("saves each value's label, and a blank label for a value without one", () => {
     const proposal: DictionaryProposalT = {
       entries: [_entry("GENDER", "categorical")],
     };
@@ -2190,9 +2868,10 @@ describe("makeDraftFromProposal", () => {
       }),
     ).toEqual([
       ["1", "Male"],
-      ["2", "2"],
-      ["9", "9"],
+      ["2", ""],
+      ["9", ""],
     ]);
+    expect(DataDictionary.findDraftWarnings(draft)).toHaveLength(2);
   });
 
   it("saves a shared list once, used by both entries", () => {
@@ -2209,7 +2888,7 @@ describe("makeDraftFromProposal", () => {
     );
   });
 
-  it("builds a draft the dictionary accepts as it is", () => {
+  it("builds a draft the dictionary saves as it is, unlabeled values included", () => {
     const proposal: DictionaryProposalT = {
       entries: [
         _entry("GENDER", "categorical"),
@@ -2267,11 +2946,11 @@ function _makeCodeListDraft(
       codeListKey: codeList.key,
       code: item.value,
     });
-    // The save RPC needs a label on every value. An unlabeled value keeps its
-    // code as its label until someone renames it on the dictionary.
+    // A value with no label is saved with a blank one, and the dictionary
+    // marks it as needing a label.
     return {
       code: item.value,
-      label: label?.label.trim() || item.value,
+      label: label?.label.trim() ?? "",
       acceptedSpellings: [],
       isMissing: label?.isMissing ?? false,
     };
@@ -2375,9 +3054,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 4: The proposal module and its edits
+### Task 6: The proposal module and its edits
 
-Puts the proposal behind one namespace, `DictionaryProposal`, and adds the edits the Review step makes: change a kind, include or leave out an entry, keep a guessed merge apart, apply the model's meaning matches, and set a description.
+Puts the proposal behind one namespace, `DictionaryProposal`, and adds the edits the Review step makes: rename an entry, change a kind, include or leave out an entry, keep a guessed merge apart, apply the model's meaning matches, and set a description. `getEntryNameIssues` checks names the way the save RPC does: trimmed, not blank, and unique ignoring case among the entries that will be saved.
 
 **Files:**
 - Create: `shared/models/dataDictionaries/DictionaryProposal/DictionaryProposalModule/DictionaryProposalModule.ts`
@@ -2451,7 +3130,7 @@ describe("DictionaryProposal edits", () => {
       GENDER_AND_SEX,
       _firstEntry(GENDER_AND_SEX).key,
     );
-    expect(_names(apart)).toEqual(["GENDER", "sex"]);
+    expect(_names(apart)).toEqual(["gender", "sex"]);
     expect(apart.entries[0]?.suggestedColumns).toEqual([]);
     expect(apart.entries[0]?.suggestionReason).toBeUndefined();
   });
@@ -2485,6 +3164,47 @@ describe("DictionaryProposal edits", () => {
       { name: "dob", sameAs: "vax_status" },
     ]);
     expect(_names(matched)).toEqual(["vax_status", "mmr_status"]);
+  });
+
+  it("gives the columns kept apart a name no other entry has", () => {
+    const renamed = DictionaryProposal.renameEntry(GENDER_AND_SEX, {
+      entryKey: _firstEntry(GENDER_AND_SEX).key,
+      name: "sex",
+    });
+    const apart = DictionaryProposal.keepApart(renamed, _firstEntry(renamed).key);
+    expect(_names(apart)).toEqual(["sex", "sex_2"]);
+  });
+
+  it("renames an entry as typed", () => {
+    const renamed = DictionaryProposal.renameEntry(VACCINATION, {
+      entryKey: _firstEntry(VACCINATION).key,
+      name: "vaccination_status",
+    });
+    expect(_names(renamed)).toEqual(["vaccination_status", "mmr_status"]);
+  });
+
+  it("flags a blank name and names shared by included entries, ignoring case", () => {
+    const [vax, mmr] = VACCINATION.entries;
+    const blank = DictionaryProposal.renameEntry(VACCINATION, {
+      entryKey: vax?.key ?? "",
+      name: "  ",
+    });
+    expect([...DictionaryProposal.getEntryNameIssues(blank)]).toEqual([
+      [vax?.key, "name_required"],
+    ]);
+    const shared = DictionaryProposal.renameEntry(VACCINATION, {
+      entryKey: mmr?.key ?? "",
+      name: " VAX_status ",
+    });
+    expect([...DictionaryProposal.getEntryNameIssues(shared)]).toEqual([
+      [vax?.key, "name_not_unique"],
+      [mmr?.key, "name_not_unique"],
+    ]);
+    const excluded = DictionaryProposal.setEntryIncluded(shared, {
+      entryKey: mmr?.key ?? "",
+      isIncluded: false,
+    });
+    expect(DictionaryProposal.getEntryNameIssues(excluded).size).toBe(0);
   });
 
   it("never lets a suggested description replace a typed one", () => {
@@ -2544,6 +3264,7 @@ import {
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry.ts";
 import type {
   DictionaryProposalEntry,
+  DictionaryProposalEntryNameIssue,
   DictionaryProposalMeaningMatch,
   DictionaryProposalT,
 } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal.types.ts";
@@ -2634,6 +3355,41 @@ function getNumberRange(
   };
 }
 
+function renameEntry(
+  proposal: Readonly<DictionaryProposalT>,
+  options: Readonly<EntryRef & { name: string }>,
+): DictionaryProposalT {
+  return _changeEntry(proposal, {
+    entryKey: options.entryKey,
+    change: (entry) => {
+      return { ...entry, name: options.name };
+    },
+  });
+}
+
+function getEntryNameIssues(
+  proposal: Readonly<DictionaryProposalT>,
+): Map<string, DictionaryProposalEntryNameIssue> {
+  const included = proposal.entries.filter((entry) => {
+    return entry.isIncluded;
+  });
+  const counts = new Map<string, number>();
+  included.forEach((entry) => {
+    const key = ColumnProfile.normalizeValue(entry.name);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  });
+  const issues = included.flatMap(
+    (entry): Array<[string, DictionaryProposalEntryNameIssue]> => {
+      const key = ColumnProfile.normalizeValue(entry.name);
+      if (key === "") {
+        return [[entry.key, "name_required"]];
+      }
+      return (counts.get(key) ?? 0) > 1 ? [[entry.key, "name_not_unique"]] : [];
+    },
+  );
+  return new Map(issues);
+}
+
 function setEntryKind(
   proposal: Readonly<DictionaryProposalT>,
   options: Readonly<EntryRef & { kind: DataDictionaryEntry.Kind }>,
@@ -2696,7 +3452,12 @@ function keepApart(
   if (!entry || entry.suggestedColumns.length === 0) {
     return { entries: [...proposal.entries] };
   }
-  const split = makeProposalFromColumnProfiles(entry.suggestedColumns).entries;
+  const takenNames = proposal.entries.map((current) => {
+    return current.name;
+  });
+  const split = makeProposalFromColumnProfiles(entry.suggestedColumns, {
+    takenNames,
+  }).entries;
   const kept = { ...entry, suggestedColumns: [], suggestionReason: undefined };
   return {
     entries: proposal.entries.flatMap((current) => {
@@ -2800,6 +3561,15 @@ export const DictionaryProposalModule = {
   /** The lowest and highest value across an entry's number columns. */
   getNumberRange,
 
+  /** The proposal with one entry renamed, exactly as typed. */
+  renameEntry,
+
+  /**
+   * Each included entry whose name the save RPC would refuse: blank, or the
+   * same as another included entry's ignoring case and spaces, by key.
+   */
+  getEntryNameIssues,
+
   /** The proposal with one entry's kind changed. */
   setEntryKind,
 
@@ -2857,6 +3627,7 @@ import type {
   DictionaryProposalCodeListStatus,
   DictionaryProposalCodings,
   DictionaryProposalEntry,
+  DictionaryProposalEntryNameIssue,
   DictionaryProposalLabels,
   DictionaryProposalLabelSuggestions,
   DictionaryProposalMeaningMatch,
@@ -2871,6 +3642,7 @@ export { DictionaryProposalModule as DictionaryProposal } from "$/models/dataDic
 export namespace DictionaryProposal {
   export type T = DictionaryProposalT;
   export type Entry = DictionaryProposalEntry;
+  export type EntryNameIssue = DictionaryProposalEntryNameIssue;
   export type SuggestionReason = DictionaryProposalSuggestionReason;
   export type CodeList = DictionaryProposalCodeList;
   export type Codings = DictionaryProposalCodings;
@@ -2897,9 +3669,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 5: The suggestions prompt, shared by the edge route and the offline model
+### Task 7: The suggestions prompt, shared by the edge route and the offline model
 
-One module holds everything both model paths need, the way `chatTitlePrompt.ts` does for chat titles: the request schema the route validates, the messages, the JSON schemas the offline model decodes against, and the parsers the browser runs on either reply. This settles spec section 18, open decision 3: suggestions get their own small route, not the Pi agent proxy.
+One module holds everything both model paths need, the way `chatTitlePrompt.ts` does for chat titles: the request schema the route validates, the exact text a consent covers (the browser hashes it into the ack token and the route hashes it again), the messages, the JSON schemas the offline model decodes against, and the parsers the browser runs on either reply. This settles spec section 18, open decision 3: suggestions get their own small route, not the Pi agent proxy.
 
 **Files:**
 - Create: `shared/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts`
@@ -2918,8 +3690,12 @@ import {
   isDictionarySuggestionsPromptId,
   parseDictionaryLabelSuggestions,
   parseDictionaryMeaningMatches,
+  stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
-import type { DictionarySuggestionColumn } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
+import type {
+  DictionarySuggestionColumn,
+  DictionarySuggestionsRequest,
+} from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 
 const GENDER: DictionarySuggestionColumn = {
   name: "GENDER",
@@ -2979,6 +3755,17 @@ describe("dictionarySuggestionsPrompt", () => {
     expect(
       parseDictionaryMeaningMatches(reply, ["vax_status", "mmr_status"]),
     ).toEqual([{ name: "mmr_status", sameAs: "vax_status" }]);
+  });
+
+  it("writes the text a consent covers in one key order, whatever order it arrived in", () => {
+    const shuffled: DictionarySuggestionsRequest = {
+      locale: "en",
+      column: { values: ["1"], kind: "categorical", otherNames: [], name: "GENDER" },
+      task: "labels",
+    };
+    expect(stringifyDictionarySuggestionsRequest(shuffled)).toBe(
+      '{"task":"labels","locale":"en","column":{"name":"GENDER","otherNames":[],"kind":"categorical","values":["1"]}}',
+    );
   });
 
   it("refuses a matches request with fewer than two columns", () => {
@@ -3140,6 +3927,38 @@ const MatchesReplySchema = z.object({
     .catch([]),
 });
 
+function _toColumnText(
+  column: Readonly<DictionarySuggestionColumn>,
+): DictionarySuggestionColumn {
+  return {
+    name: column.name,
+    otherNames: [...column.otherNames],
+    kind: column.kind,
+    values: [...column.values],
+  };
+}
+
+/**
+ * The exact text a consent to send one request covers. The browser hashes
+ * it into the consent's ack token and the `chat` route hashes it again to
+ * check that token, so its keys are written in one fixed order.
+ */
+export function stringifyDictionarySuggestionsRequest(
+  request: Readonly<DictionarySuggestionsRequest>,
+): string {
+  return request.task === "labels"
+    ? JSON.stringify({
+        task: "labels",
+        locale: request.locale,
+        column: _toColumnText(request.column),
+      })
+    : JSON.stringify({
+        task: "matches",
+        locale: request.locale,
+        columns: request.columns.map(_toColumnText),
+      });
+}
+
 /** Whether the `chat` edge function serves this suggestion prompt version. */
 export function isDictionarySuggestionsPromptId(value: string): boolean {
   return (DICTIONARY_SUGGESTIONS_PROMPT_IDS as readonly string[]).includes(
@@ -3246,7 +4065,7 @@ export function parseDictionaryMeaningMatches(
 }
 ```
 
-- [ ] **Step 4:** Run the test again. Expected: PASS (7 tests). Then `pnpm type-check:deno`. Expected: no errors.
+- [ ] **Step 4:** Run the test again. Expected: PASS (8 tests). Then `pnpm type-check:deno`. Expected: no errors.
 
 - [ ] **Step 5: Commit**
 
@@ -3261,9 +4080,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 6: The online suggestions route
+### Task 8: The online suggestions route
 
-A small route on the existing `chat` edge function, like `PostChatTitle`. Adding a route to an existing function changes no `config.toml`, so it needs no new `[functions.*]` block.
+A small route on the existing `chat` edge function, like `PostChatTitle`. Adding a route to an existing function changes no `config.toml`, so it needs no new `[functions.*]` block. Like `PostExtractMeasurements`, it refuses a request unless its ack token proves the user consented to send exactly that request (Task 10 asks for the consent).
 
 **Files:**
 - Create: `supabase/functions/chat/PostDictionarySuggestions/PostDictionarySuggestions.ts`
@@ -3277,15 +4096,16 @@ A small route on the existing `chat` edge function, like `PostChatTitle`. Adding
 
 ```ts
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 
-const { sendOpenRouterRequestMock, assertMeetsMinAppRoleMock } = vi.hoisted(
-  () => {
+const { sendOpenRouterRequestMock, assertMeetsMinAppRoleMock, verifyAckTokenMock } =
+  vi.hoisted(() => {
     return {
       sendOpenRouterRequestMock: vi.fn(),
       assertMeetsMinAppRoleMock: vi.fn(),
+      verifyAckTokenMock: vi.fn(),
     };
-  },
-);
+  });
 
 vi.mock("@sbfn/_shared/MiniServer/MiniServer.ts", () => {
   return {
@@ -3314,6 +4134,10 @@ vi.mock("@sbfn/_shared/assertMeetsMinAppRole.ts", () => {
   return { assertMeetsMinAppRole: assertMeetsMinAppRoleMock };
 });
 
+vi.mock("@sbfn/_shared/privacy/verifyAckToken.ts", () => {
+  return { verifyAckToken: verifyAckTokenMock };
+});
+
 vi.stubGlobal("Deno", {
   env: {
     get: () => {
@@ -3325,21 +4149,25 @@ vi.stubGlobal("Deno", {
 const { PostDictionarySuggestions } = await import(
   "@sbfn/chat/PostDictionarySuggestions/PostDictionarySuggestions.ts"
 );
+const { stringifyDictionarySuggestionsRequest } = await import(
+  "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts"
+);
+const { hashTextPayload } = await import("$/utils/privacy/sessionSecretUtils.ts");
+
+const REQUEST: DictionarySuggestionsRequest = {
+  task: "labels",
+  locale: "en",
+  column: {
+    name: "GENDER",
+    otherNames: [],
+    kind: "categorical",
+    values: ["1", "2"],
+  },
+};
 
 async function _callRoute(promptId: string): Promise<unknown> {
   return await PostDictionarySuggestions.state.action({
-    body: {
-      request: {
-        task: "labels",
-        locale: "en",
-        column: {
-          name: "GENDER",
-          otherNames: [],
-          kind: "categorical",
-          values: ["1", "2"],
-        },
-      },
-    },
+    body: { request: REQUEST, ackToken: "ack-token" },
     pathParams: { workspaceId: "workspace-id", promptId },
     supabaseClient: {},
     user: { id: "user-id" },
@@ -3352,6 +4180,8 @@ describe("PostDictionarySuggestions", () => {
     assertMeetsMinAppRoleMock.mockReset();
     sendOpenRouterRequestMock.mockResolvedValue({ text: '{"labels":[]}' });
     assertMeetsMinAppRoleMock.mockResolvedValue(undefined);
+    verifyAckTokenMock.mockReset();
+    verifyAckTokenMock.mockResolvedValue({ valid: true });
   });
 
   it("returns the model's reply to a Data Sources editor", async () => {
@@ -3361,6 +4191,26 @@ describe("PostDictionarySuggestions", () => {
     expect(assertMeetsMinAppRoleMock).toHaveBeenCalledWith(
       expect.objectContaining({ app: "data_sources", minRole: "editor" }),
     );
+  });
+
+  it("checks the consent covers exactly the request it got", async () => {
+    await _callRoute("dictionary-suggestions-v1");
+    expect(verifyAckTokenMock).toHaveBeenCalledWith({
+      token: "ack-token",
+      expectedWorkspaceId: "workspace-id",
+      expectedUserId: "user-id",
+      expectedPayloadHash: await hashTextPayload(
+        stringifyDictionarySuggestionsRequest(REQUEST),
+      ),
+    });
+  });
+
+  it("refuses a request the user did not consent to, before calling the model", async () => {
+    verifyAckTokenMock.mockResolvedValue({ valid: false, reason: "hash_mismatch" });
+    await expect(_callRoute("dictionary-suggestions-v1")).rejects.toMatchObject({
+      httpCode: 400,
+    });
+    expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
   });
 
   it("refuses an unknown prompt version before calling the model", async () => {
@@ -3393,6 +4243,7 @@ import { assertMeetsMinAppRole } from "@sbfn/_shared/assertMeetsMinAppRole.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { verifyAckToken } from "@sbfn/_shared/privacy/verifyAckToken.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import { z } from "zod";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster.ts";
@@ -3401,25 +4252,61 @@ import {
   DICTIONARY_SUGGESTIONS_MAX_TOKENS,
   DictionarySuggestionsRequestSchema,
   isDictionarySuggestionsPromptId,
+  stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
+import { hashTextPayload } from "$/utils/privacy/sessionSecretUtils.ts";
+import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 
 /**
+ * Refuses the request unless the user consented to sending exactly this
+ * request. The browser always asks first, so a missing or mismatched
+ * acknowledgment is never a normal request.
+ */
+async function _assertConsented(
+  options: Readonly<{
+    ackToken: string;
+    request: DictionarySuggestionsRequest;
+    workspaceId: string;
+    userId: string;
+  }>,
+): Promise<void> {
+  const result = await verifyAckToken({
+    token: options.ackToken,
+    expectedWorkspaceId: options.workspaceId,
+    expectedUserId: options.userId,
+    expectedPayloadHash: await hashTextPayload(
+      stringifyDictionarySuggestionsRequest(options.request),
+    ),
+  });
+  if (!result.valid) {
+    throw new AvaHTTPError(
+      `UNAPPROVED_DATA_TRANSFER: consent failed verification: ${result.reason}`,
+      BAD_REQUEST,
+    );
+  }
+}
+
+/**
  * Suggests labels for one coded column, or the columns that record the same
  * thing, for a Data Sources editor learning a dictionary from datasets. The
- * browser sends column names, kinds, and the codes of short coded columns;
- * rows never reach this route. It answers with the data agent's primary
- * model and returns the raw reply, which the browser reads with the same
- * parser it uses for the offline model.
+ * browser sends column names, kinds, and the codes of short coded columns,
+ * with proof the user agreed to send them; rows never reach this route. It
+ * answers with the data agent's primary model and returns the raw reply,
+ * which the browser reads with the same parser it uses for the offline
+ * model.
  */
 export const PostDictionarySuggestions = POST({
   path: "/:workspaceId/dictionary-suggestions/:promptId",
   schema: { workspaceId: z.uuid(), promptId: z.string() },
 })
-  .bodySchema({ request: DictionarySuggestionsRequestSchema })
-  .action(async ({ pathParams, body, supabaseClient }) => {
+  .bodySchema({
+    request: DictionarySuggestionsRequestSchema,
+    ackToken: z.string().min(1),
+  })
+  .action(async ({ pathParams, body, supabaseClient, user }) => {
     if (!isDictionarySuggestionsPromptId(pathParams.promptId)) {
       throw new AvaHTTPError(
         `Unknown dictionary suggestions prompt "${pathParams.promptId}". Reload the page.`,
@@ -3434,6 +4321,12 @@ export const PostDictionarySuggestions = POST({
       workspaceId: pathParams.workspaceId,
       app: "data_sources",
       minRole: "editor",
+    });
+    await _assertConsented({
+      ackToken: body.ackToken,
+      request: body.request,
+      workspaceId: pathParams.workspaceId,
+      userId: user.id,
     });
     const { text } = await sendOpenRouterRequest({
       requestBody: {
@@ -3475,13 +4368,17 @@ import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions
     "/:workspaceId/dictionary-suggestions/:promptId": {
       POST: {
         pathParams: { workspaceId: string; promptId: string };
-        body: { request: DictionarySuggestionsRequest };
+        body: {
+          request: DictionarySuggestionsRequest;
+          /** Proof the user agreed to send exactly `request`. */
+          ackToken: string;
+        };
         returnType: { reply: string };
       };
     };
 ```
 
-- [ ] **Step 5:** `pnpm vitest run supabase/functions/chat`. Expected: PASS, including the 3 new tests. Then `pnpm type-check:deno` and `pnpm exec tsc -b --force --noEmit`. Expected: no errors. (`src/types/http-api.types.ts` picks the new route up from `ChatAPI`; nothing to add there.)
+- [ ] **Step 5:** `pnpm vitest run supabase/functions/chat`. Expected: PASS, including the 5 new tests. Then `pnpm type-check:deno` and `pnpm exec tsc -b --force --noEmit`. Expected: no errors. (`src/types/http-api.types.ts` picks the new route up from `ChatAPI`; nothing to add there.)
 
 - [ ] **Step 6: Commit**
 
@@ -3496,7 +4393,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 7: Profiling datasets through the QETL query layer
+### Task 9: Profiling datasets through the QETL query layer
 
 Profiling runs in the browser on DuckDB-WASM through `WorkspaceQuerySession.runQuery`, the same entry point the Data Summary tab (`DatasetQueryClient`) and the offline agent's lookups use, so it works for uploads, live connections, virtual datasets, and offline-only datasets alike. It follows `profileOfflineDatasets`'s shape: one summary query per dataset, then one query for the values of short columns.
 
@@ -4048,13 +4945,18 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 8: Where suggestions run, and what they send
+### Task 10: Where suggestions run, what they send, and consent
 
-One module decides which model answers (the hosted model, the offline model, or none), builds the two requests from a proposal, and makes the call, the way `requestChatSessionTitle` does for chat titles. It reuses `resolveChatRuntimeMode`, so suggestions run wherever chat would: on the offline model when offline mode is on or the browser is offline with the bundle downloaded, online otherwise.
+One module decides which model answers (the hosted model, the offline model, or none), builds the two requests from a proposal, asks for consent, and makes the call, the way `requestChatSessionTitle` does for chat titles. It reuses `resolveChatRuntimeMode`, so suggestions run wherever chat would: on the offline model when offline mode is on or the browser is offline with the bundle downloaded, online otherwise.
+
+Consent is the chat's own gate, `decideIfDataCanCrossBoundary`: it runs the PII and bias detectors, opens `ConsentModal` when needed, records the decision in the browser-local consent log (`ConsentAuditEntryClient`), and mints an ack token into `PendingAcks`. The chat keeps no "already agreed" flag; it asks per send. `approveRequest` follows the PDF table assistant (`runRegionModelAssist`): the first online send of a create flow sets `explicitConsentRequired`, so the prompt always shows; after the user agrees, later sends in the same flow still pass the detectors (a prompt only when something looks personal) and are still logged. The ack token travels with the request and the route checks it (Task 8). On the offline model nothing leaves the device, so, as in the chat (`runOfflineDataAgentTurn`), nothing is asked. A new consent context, `dictionary_suggestions`, labels these sends in the workspace privacy log.
 
 **Files:**
 - Create: `src/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions.ts`
 - Test: `src/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions.test.ts`
+- Modify: `src/models/privacy/ConsentAuditEntry/ConsentAuditEntry.constants.ts`
+- Modify: `src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx` (one union member)
+- Modify: `src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx` (one label)
 - Modify: `src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts` (docstring only)
 
 - [ ] **Step 1: Write the failing test**
@@ -4062,13 +4964,27 @@ One module decides which model answers (the hosted model, the offline model, or 
 `DictionarySuggestions.test.ts`:
 
 ```ts
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { stringifyDictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { uuid } from "$/lib/uuid";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
+
+const { decideMock, consumeAckMock } = vi.hoisted(() => {
+  return { decideMock: vi.fn(), consumeAckMock: vi.fn() };
+});
+
+vi.mock("@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary", () => {
+  return { decideIfDataCanCrossBoundary: decideMock };
+});
+
+vi.mock("@/components/privacy/privacy-helpers/PendingAcks", () => {
+  return { PendingAcks: { consumeAckForText: consumeAckMock } };
+});
 
 const BRONX_ID = uuid<Dataset.Id>();
 const ERIE_ID = uuid<Dataset.Id>();
@@ -4144,6 +5060,7 @@ describe("DictionarySuggestions.requestReply", () => {
     const post = vi.fn().mockResolvedValue({ reply: '{"matches":[]}' });
     const reply = await DictionarySuggestions.requestReply({
       model: "online",
+      ackToken: "ack-1",
       workspaceId: "workspace-id",
       request: REQUEST,
       post,
@@ -4153,8 +5070,66 @@ describe("DictionarySuggestions.requestReply", () => {
     expect(post).toHaveBeenCalledWith({
       route: "chat/:workspaceId/dictionary-suggestions/:promptId",
       pathParams: { workspaceId: "workspace-id", promptId: "dictionary-suggestions-v1" },
-      body: { request: REQUEST },
+      body: { request: REQUEST, ackToken: "ack-1" },
     });
+  });
+});
+
+describe("DictionarySuggestions.approveRequest", () => {
+  const WORKSPACE_ID = uuid<Workspace.Id>();
+  const TEXT = stringifyDictionarySuggestionsRequest(REQUEST);
+
+  beforeEach(() => {
+    decideMock.mockReset();
+    consumeAckMock.mockReset();
+  });
+
+  it("always asks on the first send and returns the consent's ack token", async () => {
+    decideMock.mockResolvedValue({ approved: true, payload: { text: TEXT } });
+    consumeAckMock.mockResolvedValue("ack-1");
+    const ackToken = await DictionarySuggestions.approveRequest({
+      request: REQUEST,
+      workspaceId: WORKSPACE_ID,
+      userId: "user-id",
+      isConsentConfirmed: false,
+    });
+    expect(ackToken).toBe("ack-1");
+    expect(decideMock).toHaveBeenCalledWith({
+      text: TEXT,
+      values: ["1"],
+      sourceColumn: "GENDER",
+      context: "dictionary_suggestions",
+      workspaceId: WORKSPACE_ID,
+      userId: "user-id",
+      explicitConsentRequired: true,
+    });
+    expect(consumeAckMock).toHaveBeenCalledWith(TEXT);
+  });
+
+  it("only asks again when something looks personal once the user agreed", async () => {
+    decideMock.mockResolvedValue({ approved: true, payload: { text: TEXT } });
+    consumeAckMock.mockResolvedValue("ack-2");
+    await DictionarySuggestions.approveRequest({
+      request: REQUEST,
+      workspaceId: WORKSPACE_ID,
+      userId: "user-id",
+      isConsentConfirmed: true,
+    });
+    expect(decideMock).toHaveBeenCalledWith(
+      expect.objectContaining({ explicitConsentRequired: false }),
+    );
+  });
+
+  it("returns nothing when the user declines", async () => {
+    decideMock.mockResolvedValue({ approved: false, reason: "cancelled" });
+    const ackToken = await DictionarySuggestions.approveRequest({
+      request: REQUEST,
+      workspaceId: WORKSPACE_ID,
+      userId: "user-id",
+      isConsentConfirmed: false,
+    });
+    expect(ackToken).toBeUndefined();
+    expect(consumeAckMock).not.toHaveBeenCalled();
   });
 });
 
@@ -4173,8 +5148,8 @@ describe("DictionarySuggestions requests", () => {
       task: "labels",
       locale: "en",
       column: {
-        name: "GENDER",
-        otherNames: ["sex"],
+        name: "gender",
+        otherNames: ["GENDER", "sex"],
         kind: "categorical",
         values: ["1", "2", "9"],
       },
@@ -4244,17 +5219,21 @@ import {
   DICTIONARY_SUGGESTIONS_MAX_TOKENS,
   DICTIONARY_SUGGESTIONS_PROMPT_ID,
   getDictionarySuggestionsJsonSchema,
+  stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
+import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
+import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
 import type {
   DictionarySuggestionColumn,
   DictionarySuggestionsMessage,
   DictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Where dictionary suggestions run: the hosted model, the offline model on
@@ -4269,7 +5248,7 @@ export type PostDictionarySuggestions = (options: {
     workspaceId: string;
     promptId: typeof DICTIONARY_SUGGESTIONS_PROMPT_ID;
   };
-  body: { request: DictionarySuggestionsRequest };
+  body: { request: DictionarySuggestionsRequest; ackToken: string };
 }) => Promise<{ reply: string }>;
 
 /** Runs one completion on the offline model. */
@@ -4321,14 +5300,47 @@ function getModelFromRuntimeState(
   return options.navigatorOnLine ? "online" : "unavailable";
 }
 
-async function requestReply(
+async function approveRequest(
   options: Readonly<{
-    model: Exclude<DictionarySuggestionModel, "unavailable">;
-    workspaceId: string;
     request: DictionarySuggestionsRequest;
-    post: PostDictionarySuggestions;
-    completeOnDevice: CompleteDictionarySuggestionsOnDevice;
+    workspaceId: Workspace.Id;
+    userId: string;
+    /** True once the user agreed to an earlier send in this flow. */
+    isConsentConfirmed: boolean;
   }>,
+): Promise<string | undefined> {
+  const { request } = options;
+  const text = stringifyDictionarySuggestionsRequest(request);
+  const columns = request.task === "labels" ? [request.column] : request.columns;
+  const consent = await decideIfDataCanCrossBoundary({
+    text,
+    values: columns.flatMap((column) => {
+      return column.values;
+    }),
+    sourceColumn: request.task === "labels" ? request.column.name : undefined,
+    context: "dictionary_suggestions",
+    workspaceId: options.workspaceId,
+    userId: options.userId,
+    // The first send in a flow always asks, even when nothing looks personal.
+    explicitConsentRequired: !options.isConsentConfirmed,
+  });
+  // A rephrasing suggestion would change what was agreed to, so only the
+  // request as written counts as approved.
+  if (!consent.approved || consent.payload.text !== text) {
+    return undefined;
+  }
+  return await PendingAcks.consumeAckForText(text);
+}
+
+async function requestReply(
+  options: Readonly<
+    {
+      workspaceId: string;
+      request: DictionarySuggestionsRequest;
+      post: PostDictionarySuggestions;
+      completeOnDevice: CompleteDictionarySuggestionsOnDevice;
+    } & ({ model: "on_device" } | { model: "online"; ackToken: string })
+  >,
 ): Promise<string> {
   if (options.model === "on_device") {
     const completion = await options.completeOnDevice({
@@ -4346,7 +5358,7 @@ async function requestReply(
       workspaceId: options.workspaceId,
       promptId: DICTIONARY_SUGGESTIONS_PROMPT_ID,
     },
-    body: { request: options.request },
+    body: { request: options.request, ackToken: options.ackToken },
   });
   return response.reply;
 }
@@ -4428,14 +5440,25 @@ function makeMatchesRequestFromProposal(
  * AI suggestions for a dictionary being learned from datasets, online and
  * offline alike. Only column names, kinds, and the codes of short coded
  * columns are sent, never rows, and never the values of a column named
- * after a person or a contact detail. Used by the create flow's Review and
- * Label values steps.
+ * after a person or a contact detail. Online sends go through the chat's
+ * consent gate first. Used by the create flow's Review and Label values
+ * steps.
  */
 export const DictionarySuggestions = {
   /** Which model answers, the same way chat decides where a turn runs. */
   getModelFromRuntimeState,
 
-  /** Runs one request on the given model and returns its raw reply. */
+  /**
+   * Asks the user, through the chat's consent gate, to send one request
+   * online, and returns the ack token the route checks. Undefined when the
+   * user declines.
+   */
+  approveRequest,
+
+  /**
+   * Runs one request on the given model and returns its raw reply. Online
+   * it needs the ack token `approveRequest` returned.
+   */
   requestReply,
 
   /**
@@ -4452,7 +5475,9 @@ export const DictionarySuggestions = {
 };
 ```
 
-- [ ] **Step 4: Name the new caller.** `resolveChatRuntimeMode`'s docstring lists its callers, so add one sentence to it, after "...when the cloud request fails.":
+- [ ] **Step 4: Add the consent context.** In `ConsentAuditEntry.constants.ts`, add `"dictionary_suggestions",` as the last member of `ConsentAuditContexts`. In `decideIfDataCanCrossBoundary.tsx`, add `| "dictionary_suggestions"` to `CrossBoundaryContext`. In `ConsentLogPanel.tsx`'s `useContextLabels`, add `dictionary_suggestions: t\`Dictionary suggestions\`,`. The audit rows live in IndexedDB as plain values, so a new context needs no Dexie version.
+
+- [ ] **Step 5: Name the new caller.** `resolveChatRuntimeMode`'s docstring lists its callers, so add one sentence to it, after "...when the cloud request fails.":
 
 ```ts
  * Data dictionary suggestions also call it, through
@@ -4460,24 +5485,24 @@ export const DictionarySuggestions = {
  * chat turn would.
 ```
 
-- [ ] **Step 5:** `pnpm vitest run src/lib/dataDictionaries src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode`. Expected: PASS. `pnpm exec tsc -b --force --noEmit`. Expected: no errors.
+- [ ] **Step 6:** `pnpm vitest run src/lib/dataDictionaries src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode src/clients/privacy src/views/WorkspaceSettingsPage`. Expected: PASS. `pnpm exec tsc -b --force --noEmit`. Expected: no errors.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-pnpm exec oxfmt --ignore-path .oxfmtignore src/lib/dataDictionaries/DictionarySuggestions src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts
-pnpm exec eslint --fix src/lib/dataDictionaries/DictionarySuggestions src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts
-git add src/lib/dataDictionaries/DictionarySuggestions src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts
-git commit -m "feat(data-dictionaries): run dictionary suggestions online or offline
+pnpm exec oxfmt --ignore-path .oxfmtignore src/lib/dataDictionaries/DictionarySuggestions src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts src/models/privacy/ConsentAuditEntry/ConsentAuditEntry.constants.ts src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
+pnpm exec eslint --fix src/lib/dataDictionaries/DictionarySuggestions src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts src/models/privacy/ConsentAuditEntry/ConsentAuditEntry.constants.ts src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
+git add src/lib/dataDictionaries/DictionarySuggestions src/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode.ts src/models/privacy/ConsentAuditEntry/ConsentAuditEntry.constants.ts src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
+git commit -m "feat(data-dictionaries): run dictionary suggestions online with consent, or offline
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
 ---
 
-### Task 9: The create flow's state
+### Task 11: The create flow's state
 
-The flow keeps everything in one reducer, so each step component only renders state and dispatches actions, and the whole flow's behavior is unit-testable without React. The step is kept in this state rather than in a `step` search param: every step after Pick needs the profile held in memory, so a reloaded or shared step URL would open a step with nothing to show (see Refinements).
+The flow keeps everything in one reducer, so each step component only renders state and dispatches actions, and the whole flow's behavior is unit-testable without React. It also remembers the user's answer to the first online suggestion (`suggestionConsent`), because the chat's consent gate keeps no such flag: once the user agrees, later sends in the flow stop forcing the prompt; once the user declines, the flow sends nothing more online. The step is kept in this state rather than in a `step` search param: every step after Pick needs the profile held in memory, so a reloaded or shared step URL would open a step with nothing to show (see Refinements).
 
 **Files:**
 - Create: `src/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer.ts`
@@ -4616,6 +5641,38 @@ describe("newDictionaryReducer", () => {
     });
   });
 
+  it("renames an entry and keeps the labels typed for its list", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const entryKey = PROPOSAL.entries[0]?.key ?? "";
+    const codeListKey =
+      DictionaryProposal.getCodings(PROPOSAL).codeLists.find((codeList) => {
+        return codeList.entryKeys.includes(entryKey);
+      })?.key ?? "";
+    const renamed = [
+      { type: "set_value_label", codeListKey, code: "1", label: "Male" } as const,
+      { type: "rename_entry", entryKey, name: "sex_at_intake" } as const,
+    ].reduce(newDictionaryReducer, read);
+    expect(renamed.proposal?.entries[0]?.name).toBe("sex_at_intake");
+    expect(
+      DictionaryProposal.getValueLabel(renamed.labels, { codeListKey, code: "1" })?.label,
+    ).toBe("Male");
+  });
+
+  it("remembers the answer to the first online suggestion", () => {
+    const start = makeInitialNewDictionaryState(undefined);
+    expect(start.suggestionConsent).toBe("not_asked");
+    const approved = newDictionaryReducer(start, {
+      type: "suggestion_consent_decided",
+      isApproved: true,
+    });
+    expect(approved.suggestionConsent).toBe("approved");
+    const declined = newDictionaryReducer(start, {
+      type: "suggestion_consent_decided",
+      isApproved: false,
+    });
+    expect(declined.suggestionConsent).toBe("declined");
+  });
+
   it("goes back to Pick and forgets the origin on Learn from more datasets", () => {
     const state = newDictionaryReducer(
       _read(makeInitialNewDictionaryState(DATASET_ID)),
@@ -4645,6 +5702,12 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 export type NewDictionaryStep = "pick" | "review" | "label" | "save";
 
 /**
+ * The user's answer to sending suggestions online, asked on the first
+ * online send of the flow and kept until the flow closes.
+ */
+export type SuggestionConsent = "not_asked" | "approved" | "declined";
+
+/**
  * Everything the create flow holds while someone learns a dictionary from
  * datasets. Nothing is written anywhere until the Save step.
  */
@@ -4659,6 +5722,7 @@ export type NewDictionaryState = {
   selectedCodeListKey: string | undefined;
   name: string;
   description: string;
+  suggestionConsent: SuggestionConsent;
 };
 
 /** Everything the create flow's steps can change. */
@@ -4671,6 +5735,7 @@ export type NewDictionaryAction =
     }
   | { type: "go_to_step"; step: NewDictionaryStep }
   | { type: "learn_from_more" }
+  | { type: "rename_entry"; entryKey: string; name: string }
   | { type: "set_entry_kind"; entryKey: string; kind: DataDictionaryEntry.Kind }
   | { type: "set_entry_included"; entryKey: string; isIncluded: boolean }
   | { type: "keep_apart"; entryKey: string }
@@ -4696,7 +5761,8 @@ export type NewDictionaryAction =
     }
   | { type: "accept_code_list"; codeListKey: string }
   | { type: "set_name"; name: string }
-  | { type: "set_description"; description: string };
+  | { type: "set_description"; description: string }
+  | { type: "suggestion_consent_decided"; isApproved: boolean };
 
 type Handlers = {
   [Type in NewDictionaryAction["type"]]: (
@@ -4796,6 +5862,12 @@ const HANDLERS: Handlers = {
   learn_from_more: (state) => {
     return { ...state, step: "pick", originDatasetId: undefined };
   },
+  rename_entry: (state, action) => {
+    // Code list keys do not depend on entry names, so labels stay put.
+    return _editProposal(state, (proposal) => {
+      return DictionaryProposal.renameEntry(proposal, action);
+    });
+  },
   set_entry_kind: (state, action) => {
     return _editProposal(state, (proposal) => {
       return DictionaryProposal.setEntryKind(proposal, action);
@@ -4840,6 +5912,10 @@ const HANDLERS: Handlers = {
   set_description: (state, action) => {
     return { ...state, description: action.description };
   },
+  suggestion_consent_decided: (state, action) => {
+    const suggestionConsent = action.isApproved ? "approved" : "declined";
+    return { ...state, suggestionConsent };
+  },
 };
 
 /**
@@ -4859,6 +5935,7 @@ export function makeInitialNewDictionaryState(
     selectedCodeListKey: undefined,
     name: "",
     description: "",
+    suggestionConsent: "not_asked",
   };
 }
 
@@ -4881,7 +5958,7 @@ export function newDictionaryReducer(
 }
 ```
 
-- [ ] **Step 4:** Run the test again. Expected: PASS (7 tests). `pnpm exec tsc -b --force --noEmit`. Expected: no errors.
+- [ ] **Step 4:** Run the test again. Expected: PASS (9 tests). `pnpm exec tsc -b --force --noEmit`. Expected: no errors.
 
 - [ ] **Step 5: Commit**
 
@@ -4896,13 +5973,24 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 10: Reading, suggesting, and saving
+### Task 12: Reading, suggesting, and saving
 
-The hooks that connect the reducer to the outside world: the datasets to pick from, reading them on the device, the two kinds of AI suggestions, and saving. `createDictionaryFromDraft` holds the one piece with real failure handling, so it is a plain function with its own test.
+The hooks that connect the reducer to the outside world: the datasets to pick from, reading them on the device, the two kinds of AI suggestions, and saving. `createDictionaryFromDraft` holds the one piece with real failure handling, so it is a plain function with its own test. `useDictionarySuggestions` holds the consent rules, so it gets its own test too:
+
+| Model | `suggestionConsent` | What a send does |
+| --- | --- | --- |
+| `on_device` | any | Runs on the offline model. Nothing is asked, as in the chat. |
+| `online` | `not_asked` | Opens the chat's "Send to AI?" prompt. Agree: sends with the ack token and records `approved`. Decline: sends nothing, records `declined`. |
+| `online` | `approved` | Goes through the chat's detectors without forcing the prompt, so it asks again only when something looks personal. |
+| `online` | `declined` | Sends nothing. The flow shows suggestions as declined and carries on without AI. |
+| `unavailable` | any | Refused. The steps already hide the suggestion buttons. |
+
+Meaning matches run automatically after reading, but only when two or more datasets were read, since `makeMatchesRequestFromProposal` builds no request otherwise. So the prompt appears the moment a second dataset is read, or the first time someone presses Suggest labels, whichever comes first.
 
 **Files** (all under `src/views/DataManagerApp/NewDictionaryFromDatasetsView/`):
 - Create: `useNewDictionarySources.ts`
-- Create: `useDictionarySuggestions.ts`
+- Create: `useDictionarySuggestions/useDictionarySuggestions.ts`
+- Test: `useDictionarySuggestions/useDictionarySuggestions.test.ts`
 - Create: `useReadDatasets.ts`
 - Create: `useMeaningMatches.ts`
 - Create: `useSuggestLabels.ts`
@@ -5044,7 +6132,132 @@ export async function createDictionaryFromDraft(
 
 - [ ] **Step 4:** Run the test again. Expected: PASS (2 tests).
 
-- [ ] **Step 5: Write the hooks**
+- [ ] **Step 5: Write the failing test for suggestions and consent**
+
+`useDictionarySuggestions.test.ts`:
+
+```ts
+import { renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useDictionarySuggestions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
+import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import type { SuggestionConsent } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+
+const mocks = vi.hoisted(() => {
+  return { getModel: vi.fn(), approveRequest: vi.fn(), requestReply: vi.fn() };
+});
+
+vi.mock("@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions", () => {
+  return {
+    DictionarySuggestions: {
+      getModelFromRuntimeState: mocks.getModel,
+      approveRequest: mocks.approveRequest,
+      requestReply: mocks.requestReply,
+    },
+  };
+});
+vi.mock("@/lib/hooks/browser/useIsOnline/useIsOnline", () => {
+  return { useIsOnline: () => true };
+});
+vi.mock("@/hooks/localChatModels/useIsOfflineModeOn", () => {
+  return { useIsOfflineModeOn: () => false };
+});
+vi.mock("@/hooks/localChatModels/useIsOfflineBundleDownloaded", () => {
+  return { useIsOfflineBundleDownloaded: () => false };
+});
+vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
+  return { useCurrentWorkspace: () => ({ id: "workspace-id" }) };
+});
+vi.mock("@/hooks/users/useCurrentUserProfile", () => {
+  return { useCurrentUserProfile: () => [{ userId: "user-id" }] };
+});
+vi.mock("@/clients/APIClient", () => {
+  return { APIClient: { post: vi.fn() } };
+});
+vi.mock("@/stores/OfflineChatEngineStore/OfflineChatEngineStore", () => {
+  return { OfflineChatEngineStore: { complete: vi.fn() } };
+});
+
+const REQUEST: DictionarySuggestionsRequest = {
+  task: "labels",
+  locale: "en",
+  column: { name: "gender", otherNames: [], kind: "categorical", values: ["1", "2"] },
+};
+
+function _render(consent: SuggestionConsent) {
+  const onConsentDecided = vi.fn();
+  const { result } = renderHook(() => {
+    return useDictionarySuggestions({ consent, onConsentDecided });
+  });
+  return { suggestions: result.current, onConsentDecided };
+}
+
+describe("useDictionarySuggestions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getModel.mockReturnValue("online");
+    mocks.requestReply.mockResolvedValue("{}");
+  });
+
+  it("shows declined online once the user said no, but not offline", () => {
+    expect(_render("declined").suggestions.availability).toBe("declined");
+    mocks.getModel.mockReturnValue("on_device");
+    expect(_render("declined").suggestions.availability).toBe("on_device");
+  });
+
+  it("asks nothing on the offline model", async () => {
+    mocks.getModel.mockReturnValue("on_device");
+    const { suggestions } = _render("not_asked");
+    await expect(suggestions.requestReply(REQUEST)).resolves.toBe("{}");
+    expect(mocks.approveRequest).not.toHaveBeenCalled();
+    expect(mocks.requestReply).toHaveBeenCalledWith(
+      expect.objectContaining({ model: "on_device" }),
+    );
+  });
+
+  it("asks on the first online send, then sends with the ack token", async () => {
+    mocks.approveRequest.mockResolvedValue("ack-1");
+    const { suggestions, onConsentDecided } = _render("not_asked");
+    await expect(suggestions.requestReply(REQUEST)).resolves.toBe("{}");
+    expect(mocks.approveRequest).toHaveBeenCalledWith({
+      request: REQUEST,
+      workspaceId: "workspace-id",
+      userId: "user-id",
+      isConsentConfirmed: false,
+    });
+    expect(onConsentDecided).toHaveBeenCalledWith(true);
+    expect(mocks.requestReply).toHaveBeenCalledWith(
+      expect.objectContaining({ model: "online", ackToken: "ack-1" }),
+    );
+  });
+
+  it("sends nothing and records the answer when the user declines", async () => {
+    mocks.approveRequest.mockResolvedValue(undefined);
+    const { suggestions, onConsentDecided } = _render("not_asked");
+    await expect(suggestions.requestReply(REQUEST)).resolves.toBeUndefined();
+    expect(onConsentDecided).toHaveBeenCalledWith(false);
+    expect(mocks.requestReply).not.toHaveBeenCalled();
+  });
+
+  it("stops forcing the prompt once agreed, and sends nothing once declined", async () => {
+    mocks.approveRequest.mockResolvedValue("ack-2");
+    const agreed = _render("approved");
+    await agreed.suggestions.requestReply(REQUEST);
+    expect(mocks.approveRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ isConsentConfirmed: true }),
+    );
+    expect(agreed.onConsentDecided).not.toHaveBeenCalled();
+    mocks.approveRequest.mockClear();
+    const declined = _render("declined");
+    await expect(declined.suggestions.requestReply(REQUEST)).resolves.toBeUndefined();
+    expect(mocks.approveRequest).not.toHaveBeenCalled();
+  });
+});
+```
+
+- [ ] **Step 6:** `pnpm vitest run src/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions`. Expected: FAIL, module not found.
+
+- [ ] **Step 7: Write the hooks**
 
 `useNewDictionarySources.ts`:
 
@@ -5091,29 +6304,89 @@ export function useNewDictionarySources(): NewDictionarySources {
 }
 ```
 
-`useDictionarySuggestions.ts`:
+`useDictionarySuggestions/useDictionarySuggestions.ts`:
 
 ```ts
 import { APIClient } from "@/clients/APIClient";
 import { useIsOfflineBundleDownloaded } from "@/hooks/localChatModels/useIsOfflineBundleDownloaded";
 import { useIsOfflineModeOn } from "@/hooks/localChatModels/useIsOfflineModeOn";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import { OfflineChatEngineStore } from "@/stores/OfflineChatEngineStore/OfflineChatEngineStore";
 import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type { SuggestionConsent } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+
+/**
+ * Who answers dictionary suggestions in this flow: one of the models, or
+ * nobody because the user said no to sending them online.
+ */
+export type DictionarySuggestionAvailability = DictionarySuggestionModel | "declined";
+
+/**
+ * Asks for one suggestion. Resolves to undefined when the user did not let
+ * this request go online.
+ */
+export type RequestSuggestionReply = (
+  request: DictionarySuggestionsRequest,
+) => Promise<string | undefined>;
+
+type ConsentOptions = {
+  consent: SuggestionConsent;
+  onConsentDecided: (isApproved: boolean) => void;
+};
+
+async function _requestOnline(
+  options: Readonly<
+    ConsentOptions & {
+      request: DictionarySuggestionsRequest;
+      workspaceId: Workspace.Id;
+      userId: string;
+    }
+  >,
+): Promise<string | undefined> {
+  const { consent, request, workspaceId } = options;
+  if (consent === "declined") {
+    return undefined;
+  }
+  const ackToken = await DictionarySuggestions.approveRequest({
+    request,
+    workspaceId,
+    userId: options.userId,
+    isConsentConfirmed: consent === "approved",
+  });
+  if (consent === "not_asked") {
+    options.onConsentDecided(ackToken !== undefined);
+  }
+  if (ackToken === undefined) {
+    return undefined;
+  }
+  return await DictionarySuggestions.requestReply({
+    model: "online",
+    ackToken,
+    workspaceId,
+    request,
+    post: APIClient.post,
+    completeOnDevice: OfflineChatEngineStore.complete,
+  });
+}
 
 /**
  * Which model answers dictionary suggestions right now, kept current as the
- * connection or offline mode changes, and a function that asks it. Used by
- * the create flow's Review and Label values steps.
+ * connection or offline mode changes, and a function that asks it. Online
+ * sends go through the chat's consent gate, and the user's first answer is
+ * kept for the flow. Used by the create flow's Review and Label values
+ * steps.
  */
-export function useDictionarySuggestions(): {
-  model: DictionarySuggestionModel;
-  requestReply: (request: DictionarySuggestionsRequest) => Promise<string>;
+export function useDictionarySuggestions(options: Readonly<ConsentOptions>): {
+  availability: DictionarySuggestionAvailability;
+  requestReply: RequestSuggestionReply;
 } {
   const workspace = useCurrentWorkspace();
+  const [userProfile] = useCurrentUserProfile();
   const isOnline = useIsOnline();
   const isOfflineModeOn = useIsOfflineModeOn();
   const isBundleDownloaded = useIsOfflineBundleDownloaded();
@@ -5122,18 +6395,27 @@ export function useDictionarySuggestions(): {
     isOfflineModeOn,
     isBundleDownloaded,
   });
+  const isDeclined = model === "online" && options.consent === "declined";
   return {
-    model,
+    availability: isDeclined ? "declined" : model,
     requestReply: (request) => {
-      if (model === "unavailable") {
+      if (model === "on_device") {
+        return DictionarySuggestions.requestReply({
+          model,
+          workspaceId: workspace.id,
+          request,
+          post: APIClient.post,
+          completeOnDevice: OfflineChatEngineStore.complete,
+        });
+      }
+      if (model === "unavailable" || !userProfile) {
         return Promise.reject(new Error("No model can answer suggestions"));
       }
-      return DictionarySuggestions.requestReply({
-        model,
-        workspaceId: workspace.id,
+      return _requestOnline({
+        ...options,
         request,
-        post: APIClient.post,
-        completeOnDevice: OfflineChatEngineStore.complete,
+        workspaceId: workspace.id,
+        userId: userProfile.userId,
       });
     },
   };
@@ -5220,8 +6502,8 @@ import { useMutation } from "@avandar/query-hooks";
 import { useLingui } from "@lingui/react/macro";
 import { parseDictionaryMeaningMatches } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
-import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 
 /** Where the search for columns that mean the same thing stands. */
 export type MeaningMatchStatus = "idle" | "finding" | "done" | "failed";
@@ -5230,11 +6512,11 @@ export type MeaningMatchStatus = "idle" | "finding" | "done" | "failed";
  * Asks the suggestion model, once, which columns of different datasets
  * record the same thing, and hands back the matches. A failure is shown by
  * the Review step's status line, not a toast: the matches by name and
- * values are still there.
+ * values are still there. A request the user declined to send finds none.
  */
 export function useMeaningMatches(
   options: Readonly<{
-    requestReply: (request: DictionarySuggestionsRequest) => Promise<string>;
+    requestReply: RequestSuggestionReply;
     onFound: (matches: DictionaryProposal.MeaningMatch[]) => void;
   }>,
 ): {
@@ -5255,6 +6537,9 @@ export function useMeaningMatches(
         return column.name;
       });
       const reply = await options.requestReply(request);
+      if (reply === undefined) {
+        return [];
+      }
       return parseDictionaryMeaningMatches(reply, names) ?? [];
     },
     onSuccess: (matches) => {
@@ -5285,20 +6570,22 @@ import { useLingui } from "@lingui/react/macro";
 import { parseDictionaryLabelSuggestions } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { Dispatch } from "react";
 
 /**
  * Asks the suggestion model for one code list's labels and a description
  * for the entry using it, and fills them in as suggestions. Used by the
- * Label values step's Suggest labels button.
+ * Label values step's Suggest labels button. When the user declines to
+ * send the request, nothing is filled in and nothing is shown: the Label
+ * values pane already says suggestions are off.
  */
 export function useSuggestLabels(
   options: Readonly<{
     proposal: DictionaryProposal.T | undefined;
-    requestReply: (request: DictionarySuggestionsRequest) => Promise<string>;
+    requestReply: RequestSuggestionReply;
     dispatch: Dispatch<NewDictionaryAction>;
   }>,
 ): {
@@ -5319,6 +6606,9 @@ export function useSuggestLabels(
         throw new Error("This code list's values cannot be sent");
       }
       const reply = await options.requestReply(request);
+      if (reply === undefined) {
+        return undefined;
+      }
       const suggestions = parseDictionaryLabelSuggestions(reply, request.column.values);
       if (!suggestions) {
         throw new Error("The suggestion reply could not be read");
@@ -5326,6 +6616,9 @@ export function useSuggestLabels(
       return suggestions;
     },
     onSuccess: (suggestions, codeList) => {
+      if (!suggestions) {
+        return;
+      }
       const isSingleEntry = codeList.entryKeys.length === 1;
       options.dispatch({
         type: "labels_suggested",
@@ -5409,18 +6702,18 @@ import { useEffect, useRef } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCreateDictionary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary";
-import { useDictionarySuggestions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions";
+import { useDictionarySuggestions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import { useMeaningMatches } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import { useReadDatasets } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useReadDatasets";
 import { useSuggestLabels } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserProfile } from "$/models/User/UserProfile";
-import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type {
   NewDictionaryAction,
   NewDictionaryState,
 } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { CreateDictionaryVariables } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary";
+import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import type { NewDictionarySources } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionarySources";
 import type { ReadableDataset } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useReadDatasets";
@@ -5428,7 +6721,7 @@ import type { Dispatch } from "react";
 
 /** What the create flow's steps can do beyond changing its state. */
 export type NewDictionaryFlow = {
-  suggestionModel: DictionarySuggestionModel;
+  suggestionAvailability: DictionarySuggestionAvailability;
   readPickedDatasets: () => void;
   isReading: boolean;
   meaningMatchStatus: MeaningMatchStatus;
@@ -5484,7 +6777,8 @@ function _makeCreateDictionary(
 
 /**
  * Reads datasets and, once they are read, asks the suggestion model which
- * of their columns mean the same thing.
+ * of their columns mean the same thing. Online, the first such request opens
+ * the consent prompt; after a no it is not sent.
  */
 function useReadWithMatches(
   options: Readonly<
@@ -5511,7 +6805,8 @@ function useReadWithMatches(
         })?.name ?? "";
       const defaultName = t`${firstName} codes`;
       dispatch({ type: "datasets_read", proposal, defaultName });
-      if (suggestions.model !== "unavailable") {
+      const { availability } = suggestions;
+      if (availability === "online" || availability === "on_device") {
         matches.findMatches(proposal);
       }
     },
@@ -5550,7 +6845,12 @@ export function useNewDictionaryFlow(
 ): NewDictionaryFlow {
   const { state, dispatch, sources } = options;
   const [userProfile] = useCurrentUserProfile();
-  const suggestions = useDictionarySuggestions();
+  const suggestions = useDictionarySuggestions({
+    consent: state.suggestionConsent,
+    onConsentDecided: (isApproved) => {
+      dispatch({ type: "suggestion_consent_decided", isApproved });
+    },
+  });
   const reading = useReadWithMatches({ state, dispatch, sources, suggestions });
   useReadOriginDataset({ state, sources, read: reading.read });
   const labels = useSuggestLabels({
@@ -5560,7 +6860,7 @@ export function useNewDictionaryFlow(
   });
   const [create, isCreating] = useCreateDictionary();
   return {
-    suggestionModel: suggestions.model,
+    suggestionAvailability: suggestions.availability,
     readPickedDatasets: () => {
       reading.read(_getReadableDatasets(sources, state.pickedDatasetIds));
     },
@@ -5574,9 +6874,9 @@ export function useNewDictionaryFlow(
 }
 ```
 
-- [ ] **Step 6:** `pnpm exec tsc -b --force --noEmit`. Expected: no errors. `pnpm vitest run src/views/DataManagerApp/NewDictionaryFromDatasetsView`. Expected: PASS.
+- [ ] **Step 8:** `pnpm vitest run src/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions`. Expected: PASS (5 tests). `pnpm exec tsc -b --force --noEmit`. Expected: no errors. `pnpm vitest run src/views/DataManagerApp/NewDictionaryFromDatasetsView`. Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 pnpm exec oxfmt --ignore-path .oxfmtignore src/views/DataManagerApp/NewDictionaryFromDatasetsView
@@ -5589,7 +6889,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 11: The step footer and Pick datasets
+### Task 13: The step footer and Pick datasets
 
 Load the `impeccable` skill before this task (the create flow is a new surface), and read `docs/design/app-view-layout.md`. Each step renders its own `AppViewBody` and a sticky footer, the way the Dictionary view's save bar works. No `Paper`, `Card`, or info `Callout` between the slate and the content: the prototype's blue "notice" boxes become plain text lines.
 
@@ -5937,9 +7237,11 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 12: Review columns
+### Task 14: Review columns
 
-The step that shows what was learned: three sections (Coded columns, Ordered scales, Descriptions only), one row per entry with an include checkbox, the columns it came from, its kind, the values seen, and, for a guessed merge, a Suggested tag and Keep apart. Empty sections are hidden ("withhold chrome").
+The step that shows what was learned: three sections (Coded columns, Ordered scales, Descriptions only), one row per entry with an include checkbox, its name (editable in place), the columns it came from, its kind, the values seen, and, for a guessed merge, a Suggested tag and Keep apart. Empty sections are hidden ("withhold chrome").
+
+Each entry starts with the name `DictionaryProposal` gave it: its most common column name, in lowercase words joined by `_` (`GENDER` becomes `gender`, `CaseNo` becomes `case_no`), the first dataset read winning a tie, and `_2`, `_3` added when two entries would share a name. The name field is labeled by the entry's first column, which stays put while the name is typed. It flags a blank name and a name another included entry already has, ignoring case and outer spaces, which is exactly what the save RPC refuses (`entry_name_required`, `entry_names_not_unique`); Next stays disabled until every included entry has a usable name. The copy is the Dictionary view's own.
 
 **Files** (under `src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/`):
 - Create: `ReviewColumnsStep.tsx`
@@ -5948,6 +7250,7 @@ The step that shows what was learned: three sections (Coded columns, Ordered sca
 - Create: `ReviewSections.tsx`
 - Create: `ReviewEntriesSection.tsx`
 - Create: `ReviewEntryRow.tsx`
+- Create: `ReviewEntryNameInput.tsx`
 - Create: `ValuesSeenCell.tsx`
 - Create: `SuggestedTag.tsx`
 - Test: `ReviewColumnsStep.test.tsx`
@@ -6055,12 +7358,37 @@ describe("ReviewColumnsStep", () => {
       screen.getByText("Same name, different codes. Kept as separate code lists under one entry."),
     ).toBeInTheDocument();
     fireEvent.click(
-      screen.getByRole("button", { name: "Keep the columns in GENDER apart" }),
+      screen.getByRole("button", { name: "Keep the columns in gender apart" }),
     );
     expect(dispatch).toHaveBeenCalledWith({
       type: "keep_apart",
-      entryKey: _keyOf(TWO_DATASETS, "GENDER"),
+      entryKey: _keyOf(TWO_DATASETS, "gender"),
     });
+  });
+
+  it("names an entry after its most common column and renames it in place", () => {
+    const { dispatch } = _renderStep();
+    const nameInput = screen.getByRole("textbox", {
+      name: "Name of the entry from GENDER",
+    });
+    expect(nameInput).toHaveValue("gender");
+    fireEvent.change(nameInput, { target: { value: "sex_at_intake" } });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "rename_entry",
+      entryKey: _keyOf(TWO_DATASETS, "gender"),
+      name: "sex_at_intake",
+    });
+  });
+
+  it("flags a name another entry has and holds Next until it is fixed", () => {
+    const proposal = DictionaryProposal.renameEntry(TWO_DATASETS, {
+      entryKey: _keyOf(TWO_DATASETS, "hosp_yn"),
+      name: " Gender",
+    });
+    _renderStep({ proposal });
+    expect(screen.getAllByText("Another entry already has this name.")).toHaveLength(2);
+    expect(screen.getByText("Fix the entry names marked above to go on.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Next: label values" })).toBeDisabled();
   });
 
   it("changes an entry's kind", () => {
@@ -6229,17 +7557,64 @@ export function ValuesSeenCell({
 }
 ```
 
-- [ ] **Step 4: Write the row, the section, and the summary**
+- [ ] **Step 4: Write the name field, the row, the section, and the summary**
+
+`ReviewEntryNameInput.tsx`:
+
+```tsx
+import { useLingui } from "@lingui/react/macro";
+import { TextInput } from "@mantine/core";
+import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { Dispatch, ReactNode } from "react";
+
+type Props = {
+  entry: DictionaryProposal.Entry;
+  nameIssue: DictionaryProposal.EntryNameIssue | undefined;
+  dispatch: Dispatch<NewDictionaryAction>;
+};
+
+/**
+ * The name an entry will be saved under, editable in place. It is labeled
+ * by the entry's first column, which stays put while the name is typed, and
+ * it flags the name problems the save RPC refuses.
+ */
+export function ReviewEntryNameInput({
+  entry,
+  nameIssue,
+  dispatch,
+}: Readonly<Props>): ReactNode {
+  const { t } = useLingui();
+  const firstColumnName = DictionaryProposal.getColumns(entry)[0]?.columnName ?? "";
+  const issueMessages: Record<DictionaryProposal.EntryNameIssue, string> = {
+    name_required: t`Give this entry a name.`,
+    name_not_unique: t`Another entry already has this name.`,
+  };
+  return (
+    <TextInput
+      size="xs"
+      aria-label={t`Name of the entry from ${firstColumnName}`}
+      value={entry.name}
+      error={nameIssue ? issueMessages[nameIssue] : undefined}
+      onChange={(event) => {
+        const name = event.currentTarget.value;
+        dispatch({ type: "rename_entry", entryKey: entry.key, name });
+      }}
+    />
+  );
+}
+```
 
 `ReviewEntryRow.tsx`:
 
 ```tsx
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Checkbox, Group, Select, Table, Text } from "@mantine/core";
+import { Box, Button, Checkbox, Group, Select, Table, Text } from "@mantine/core";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { useDictionaryCopy } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryCopy";
 import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsStep.module.css";
+import { ReviewEntryNameInput } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput";
 import { SuggestedTag } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag";
 import { ValuesSeenCell } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
@@ -6248,6 +7623,7 @@ import type { Dispatch, ReactNode } from "react";
 type Props = {
   entry: DictionaryProposal.Entry;
   sharedWithNames: readonly string[];
+  nameIssue: DictionaryProposal.EntryNameIssue | undefined;
   /** One dataset needs no dataset names after each column. */
   isSingleDataset: boolean;
   dispatch: Dispatch<NewDictionaryAction>;
@@ -6267,12 +7643,13 @@ function _formatSources(
 }
 
 /**
- * One proposed entry on the Review step: include it or not, see where it
- * came from, change its kind, and undo a guessed merge.
+ * One proposed entry on the Review step: include it or not, rename it, see
+ * where it came from, change its kind, and undo a guessed merge.
  */
 export function ReviewEntryRow({
   entry,
   sharedWithNames,
+  nameIssue,
   isSingleDataset,
   dispatch,
 }: Readonly<Props>): ReactNode {
@@ -6294,15 +7671,15 @@ export function ReviewEntryRow({
         />
       </Table.Td>
       <Table.Td>
-        <Group gap="xs" wrap="nowrap">
-          <Text size="sm" fw={500} truncate>
-            {entryName}
-          </Text>
+        <Group gap="xs" wrap="nowrap" align="flex-start">
+          <Box flex={1} miw={0}>
+            <ReviewEntryNameInput entry={entry} nameIssue={nameIssue} dispatch={dispatch} />
+          </Box>
           {reason === "meaning" || reason === "similar_name" ? (
             <SuggestedTag reason={reason} />
           ) : null}
         </Group>
-        <Text size="xs" c="dimmed" lineClamp={2}>
+        <Text size="xs" c="dimmed" lineClamp={2} mt={4}>
           {_formatSources(entry, isSingleDataset)}
         </Text>
       </Table.Td>
@@ -6373,6 +7750,7 @@ type Props = {
   meta: string;
   entries: readonly DictionaryProposal.Entry[];
   sharedNamesByEntryKey: ReadonlyMap<string, string[]>;
+  nameIssues: ReadonlyMap<string, DictionaryProposal.EntryNameIssue>;
   isSingleDataset: boolean;
   dispatch: Dispatch<NewDictionaryAction>;
 };
@@ -6386,6 +7764,7 @@ export function ReviewEntriesSection({
   meta,
   entries,
   sharedNamesByEntryKey,
+  nameIssues,
   isSingleDataset,
   dispatch,
 }: Readonly<Props>): ReactNode {
@@ -6403,7 +7782,7 @@ export function ReviewEntriesSection({
               </VisuallyHidden>
             </Table.Th>
             <Table.Th>
-              <Trans>Entry and the columns it came from</Trans>
+              <Trans>Entry name and the columns it came from</Trans>
             </Table.Th>
             <Table.Th w={160}>
               <Trans>Kind</Trans>
@@ -6425,6 +7804,7 @@ export function ReviewEntriesSection({
                 key={entry.key}
                 entry={entry}
                 sharedWithNames={sharedNamesByEntryKey.get(entry.key) ?? NO_SHARED_NAMES}
+                nameIssue={nameIssues.get(entry.key)}
                 isSingleDataset={isSingleDataset}
                 dispatch={dispatch}
               />
@@ -6543,6 +7923,7 @@ import type { Dispatch, ReactNode } from "react";
 
 type Props = {
   proposal: DictionaryProposal.T;
+  nameIssues: ReadonlyMap<string, DictionaryProposal.EntryNameIssue>;
   dispatch: Dispatch<NewDictionaryAction>;
 };
 
@@ -6590,7 +7971,11 @@ function _getSharedNamesByEntryKey(
  * ordered scales, and description-only entries. A group with no entries
  * is not shown.
  */
-export function ReviewSections({ proposal, dispatch }: Readonly<Props>): ReactNode {
+export function ReviewSections({
+  proposal,
+  nameIssues,
+  dispatch,
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const sharedNamesByEntryKey = useMemo(() => {
     return _getSharedNamesByEntryKey(proposal);
@@ -6608,6 +7993,7 @@ export function ReviewSections({ proposal, dispatch }: Readonly<Props>): ReactNo
   const describedCount = described.length;
   const sectionProps = {
     sharedNamesByEntryKey,
+    nameIssues,
     isSingleDataset: DictionaryProposal.getDatasetIds(proposal).length === 1,
     dispatch,
   };
@@ -6641,12 +8027,13 @@ export function ReviewSections({ proposal, dispatch }: Readonly<Props>): ReactNo
 
 ```tsx
 import { Trans } from "@lingui/react/macro";
-import { Button, Stack } from "@mantine/core";
+import { Button, Stack, Text } from "@mantine/core";
+import { useMemo } from "react";
+import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { NewDictionaryFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryFooter/NewDictionaryFooter";
 import { ReviewSections } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections";
 import { ReviewSummary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSummary";
-import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import type { Dispatch, ReactNode } from "react";
@@ -6661,7 +8048,8 @@ type Props = {
 /**
  * The second step of learning a dictionary: what reading the datasets
  * proposed, ready to adjust before labeling. Back to Pick is offered only
- * when the flow started there.
+ * when the flow started there. Next waits until every included entry has a
+ * name the save will accept.
  */
 export function ReviewColumnsStep({
   proposal,
@@ -6672,6 +8060,10 @@ export function ReviewColumnsStep({
   const hasIncludedEntry = proposal.entries.some((entry) => {
     return entry.isIncluded;
   });
+  const nameIssues = useMemo(() => {
+    return DictionaryProposal.getEntryNameIssues(proposal);
+  }, [proposal]);
+  const hasNameIssue = nameIssues.size > 0;
   return (
     <AppViewBody>
       <Stack gap="xl">
@@ -6683,7 +8075,7 @@ export function ReviewColumnsStep({
             dispatch({ type: "learn_from_more" });
           }}
         />
-        <ReviewSections proposal={proposal} dispatch={dispatch} />
+        <ReviewSections proposal={proposal} nameIssues={nameIssues} dispatch={dispatch} />
       </Stack>
       <NewDictionaryFooter
         start={
@@ -6699,8 +8091,13 @@ export function ReviewColumnsStep({
           )
         }
       >
+        {hasNameIssue ? (
+          <Text size="sm" c="dimmed">
+            <Trans>Fix the entry names marked above to go on.</Trans>
+          </Text>
+        ) : null}
         <Button
-          disabled={!hasIncludedEntry}
+          disabled={!hasIncludedEntry || hasNameIssue}
           onClick={() => {
             dispatch({ type: "go_to_step", step: "label" });
           }}
@@ -6713,7 +8110,7 @@ export function ReviewColumnsStep({
 }
 ```
 
-- [ ] **Step 6:** Run the test again. Expected: PASS (6 tests).
+- [ ] **Step 6:** Run the test again. Expected: PASS (8 tests).
 
 - [ ] **Step 7: Commit**
 
@@ -6729,9 +8126,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 13: Label values
+### Task 15: Label values
 
-Master-detail: the code lists to label on the leading side, each tagged Labeled, Suggested, or To do; the selected list's values on the other, with a label input per value (a suggestion carries a marker), a Missing value checkbox, and Suggest labels. A list used by one entry also shows that entry's description, which the label suggestion fills in.
+Master-detail: the code lists to label on the leading side, each tagged Labeled, Suggested, or To do; the selected list's values on the other, with a label input per value (a suggestion carries a marker), a Missing value checkbox, and Suggest labels. A list used by one entry also shows that entry's description, which the label suggestion fills in. A value can be left without a label: it is saved blank and marked "Needs a label" on the dictionary (Task 2). There are no drag handles to reorder values here; an ordered list is reordered on the dictionary after saving. When the user declined to send suggestions online (Task 12), Suggest labels is disabled with a line saying so; offline it still works.
 
 **Files** (under `src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/`):
 - Create: `LabelValuesStep.tsx`
@@ -6758,7 +8155,7 @@ import { fireEvent, render, screen, within } from "@/test-utils";
 import { LabelValuesStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesStep";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 
 /** jsdom has no `document.fonts`, which autosize textareas listen to. */
 beforeAll(() => {
@@ -6795,7 +8192,9 @@ const CODE_LISTS = DictionaryProposal.getCodings(PROPOSAL).codeLists;
 const LABELS = DictionaryProposal.withDefaultLabels({}, CODE_LISTS);
 const GENDER_LIST = CODE_LISTS[0];
 
-function _renderStep(suggestionModel: DictionarySuggestionModel = "online") {
+function _renderStep(
+  suggestionAvailability: DictionarySuggestionAvailability = "online",
+) {
   const dispatch = vi.fn();
   const onSuggest = vi.fn();
   render(
@@ -6803,7 +8202,7 @@ function _renderStep(suggestionModel: DictionarySuggestionModel = "online") {
       proposal={PROPOSAL}
       labels={LABELS}
       selectedCodeListKey={GENDER_LIST?.key}
-      suggestionModel={suggestionModel}
+      suggestionAvailability={suggestionAvailability}
       suggestingCodeListKey={undefined}
       dispatch={dispatch}
       onSuggest={onSuggest}
@@ -6817,7 +8216,7 @@ describe("LabelValuesStep", () => {
     _renderStep();
     const nav = screen.getByRole("navigation", { name: "Code lists to label" });
     expect(
-      within(nav).getByRole("button", { name: /GENDER \(1\/2\/9\).*To do/ }),
+      within(nav).getByRole("button", { name: /gender \(1\/2\/9\).*To do/ }),
     ).toBeInTheDocument();
     expect(
       within(nav).getByRole("button", { name: /county \(Bronx\/Kings\).*Labeled/ }),
@@ -6861,6 +8260,16 @@ describe("LabelValuesStep", () => {
     expect(screen.getByRole("button", { name: "Suggest labels" })).toBeDisabled();
     expect(
       screen.getByText("Suggestions need a connection or the offline model. Labeling still works."),
+    ).toBeInTheDocument();
+  });
+
+  it("explains that suggestions are off when the user declined to send them", () => {
+    _renderStep("declined");
+    expect(screen.getByRole("button", { name: "Suggest labels" })).toBeDisabled();
+    expect(
+      screen.getByText(
+        "You chose not to send values to the AI provider, so suggestions are off for this dictionary. Labeling still works.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -7240,7 +8649,7 @@ import { IconSparkles } from "@tabler/icons-react";
 import { EntryDescriptionField } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField";
 import { LabelValuesTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
 
@@ -7249,7 +8658,7 @@ type Props = {
   /** The entries that use the list. */
   entries: readonly DictionaryProposal.Entry[];
   labels: DictionaryProposal.Labels;
-  suggestionModel: DictionarySuggestionModel;
+  suggestionAvailability: DictionarySuggestionAvailability;
   isSuggesting: boolean;
   /** False when the list's columns look like they name people. */
   canSuggest: boolean;
@@ -7281,7 +8690,7 @@ export function CodeListLabelsPane({
   codeList,
   entries,
   labels,
-  suggestionModel,
+  suggestionAvailability,
   isSuggesting,
   canSuggest,
   dispatch,
@@ -7289,7 +8698,8 @@ export function CodeListLabelsPane({
 }: Readonly<Props>): ReactNode {
   const hint = useCodeListHint(codeList, entries);
   const [onlyEntry] = entries.length === 1 ? entries : [];
-  const isUnavailable = suggestionModel === "unavailable";
+  const isUnavailable = suggestionAvailability === "unavailable";
+  const isDeclined = suggestionAvailability === "declined";
 
   return (
     <Stack gap="md" miw={0}>
@@ -7302,7 +8712,7 @@ export function CodeListLabelsPane({
           size="compact-sm"
           leftSection={<IconSparkles size={14} aria-hidden />}
           loading={isSuggesting}
-          disabled={isUnavailable || !canSuggest}
+          disabled={isUnavailable || isDeclined || !canSuggest}
           onClick={() => {
             onSuggest(codeList);
           }}
@@ -7318,7 +8728,15 @@ export function CodeListLabelsPane({
           <Trans>Suggestions need a connection or the offline model. Labeling still works.</Trans>
         </Text>
       ) : null}
-      {!isUnavailable && !canSuggest ? (
+      {isDeclined ? (
+        <Text size="xs" c="dimmed">
+          <Trans>
+            You chose not to send values to the AI provider, so suggestions are
+            off for this dictionary. Labeling still works.
+          </Trans>
+        </Text>
+      ) : null}
+      {!isUnavailable && !isDeclined && !canSuggest ? (
         <Text size="xs" c="dimmed">
           <Trans>These columns look like they name people, so their values are not sent for suggestions.</Trans>
         </Text>
@@ -7395,7 +8813,7 @@ import { CodeListsToLabelNav } from "@/views/DataManagerApp/NewDictionaryFromDat
 import { LabelValuesFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter";
 import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesStep.module.css";
 import { NothingToLabel } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel";
-import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
 
@@ -7403,7 +8821,7 @@ type Props = {
   proposal: DictionaryProposal.T;
   labels: DictionaryProposal.Labels;
   selectedCodeListKey: string | undefined;
-  suggestionModel: DictionarySuggestionModel;
+  suggestionAvailability: DictionarySuggestionAvailability;
   suggestingCodeListKey: string | undefined;
   dispatch: Dispatch<NewDictionaryAction>;
   onSuggest: (codeList: DictionaryProposal.CodeList) => void;
@@ -7450,7 +8868,7 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
               return selected.entryKeys.includes(entry.key);
             })}
             labels={labels}
-            suggestionModel={props.suggestionModel}
+            suggestionAvailability={props.suggestionAvailability}
             isSuggesting={props.suggestingCodeListKey === selected.key}
             canSuggest={canSuggest}
             dispatch={dispatch}
@@ -7466,7 +8884,7 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
 }
 ```
 
-- [ ] **Step 5:** Run the test again. Expected: PASS (6 tests).
+- [ ] **Step 5:** Run the test again. Expected: PASS (7 tests).
 
 - [ ] **Step 6: Commit**
 
@@ -7482,9 +8900,9 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 14: Save
+### Task 16: Save
 
-Name, description, a summary of what will be saved, a warning for unlabeled values (they are saved with their code as the label), and Create dictionary. From a single dataset it says the dictionary is not tied to it. There is no "Apply it to <dataset> next" checkbox in this slice (see Refinements).
+Name, description, a summary of what will be saved, a warning for unlabeled values (they are saved with a blank label and marked as needing one on the dictionary, which Task 1 and Task 2 allow), and Create dictionary. Unlabeled values never block Create dictionary. From a single dataset it says the dictionary is not tied to it. There is no "Apply it to <dataset> next" checkbox in this slice (see Refinements).
 
 **Files** (under `src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/`):
 - Create: `SaveStep.tsx`
@@ -7574,7 +8992,12 @@ describe("SaveStep", () => {
 
   it("warns about unlabeled values but still creates the dictionary", () => {
     const { onCreate } = _renderStep();
-    expect(screen.getByText(/3 values in GENDER \(1\/2\/9\) have no label yet/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "3 values in gender (1/2/9) have no label yet. They are saved without one and marked as needing a label, so you can finish them on the dictionary.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create dictionary" })).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Create dictionary" }));
     expect(onCreate).toHaveBeenCalledOnce();
   });
@@ -7701,9 +9124,10 @@ function _describeWhere(
 }
 
 /**
- * The Save step's warnings: values with no label yet, which are saved with
- * their code as the label, and anything the dictionary would refuse, which
- * blocks Create dictionary until it is fixed.
+ * The Save step's warnings: values with no label yet, which are saved
+ * without one and marked as needing a label on the dictionary, and anything
+ * the dictionary would refuse, which blocks Create dictionary until it is
+ * fixed.
  */
 export function SaveWarnings({
   draft,
@@ -7737,7 +9161,7 @@ export function SaveWarnings({
           message={t`${plural(unlabeledCount, {
             one: "# value",
             other: "# values",
-          })} in ${listNames} have no label yet. They are saved with their value as the label, so you can finish them on the dictionary.`}
+          })} in ${listNames} have no label yet. They are saved without one and marked as needing a label, so you can finish them on the dictionary.`}
         />
       ) : null}
       {issues.length > 0 ? (
@@ -7909,7 +9333,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 15: The view, its route, and its link
+### Task 17: The view, its route, and its link
 
 Puts the steps together under one task view at `dictionaries/new`, with a header band, a step bar, and the step's body. Only `fromDatasetId` goes in the URL.
 
@@ -8220,7 +9644,7 @@ export function ProposalStepBody({
         proposal={proposal}
         labels={state.labels}
         selectedCodeListKey={state.selectedCodeListKey}
-        suggestionModel={flow.suggestionModel}
+        suggestionAvailability={flow.suggestionAvailability}
         suggestingCodeListKey={flow.suggestingCodeListKey}
         dispatch={dispatch}
         onSuggest={flow.suggestLabels}
@@ -8482,7 +9906,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 16: Ways in: the toolbar, the list, and a dataset's menu
+### Task 18: Ways in: the toolbar, the list, and a dataset's menu
 
 Three entry-point changes in Data Sources, plus the slice 1 spec that clicked the old button:
 
@@ -9112,7 +10536,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 17: End-to-end spec
+### Task 19: End-to-end spec
 
 Load the `playwright-best-practices` skill. Read `docs/rules/e2e-testing.md`. The dataset is imported through the UI as a precondition (a 24-row CSV parses in seconds); everything under test is driven through the UI. The online suggestion route is stubbed with `page.route`, so the spec never reaches a third party. The second test runs the same suggestion on the offline model through the scripted mock runtime that e2e already enables (`VITE_OFFLINE_CHAT_MOCK=true`), and proves no request went online.
 
@@ -9153,7 +10577,7 @@ NY-2026-023,1,N,2,2026-02-19,Queens
 NY-2026-024,2,N,2,2026-02-20,Kings
 ```
 
-What each column profiles as: `case_id` identifier (24 different values), `GENDER` categorical with 11 ones, 10 twos, and 3 nines (so its list is `GENDER (1/2/9)`), `hosp_yn` categorical, `ses_cat` ordered (1 to 4 and a scale word), `onset_dt` date, `county` categorical whose values already read as labels.
+What each column profiles as: `case_id` identifier (24 different values), `GENDER` categorical with 11 ones, 10 twos, and 3 nines (so its entry is named `gender` and its list is `gender (1/2/9)`), `hosp_yn` categorical with `Y`/`N`, which are too short to read as labels, so they stay unlabeled, `ses_cat` ordered (1 to 4 and a scale word), `onset_dt` date, `county` categorical whose values already read as labels.
 
 - [ ] **Step 2: Add the constants** after `SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT` in `tests/e2e/helpers/constants.ts`:
 
@@ -9179,11 +10603,12 @@ export const MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT = 24;
 ```ts
 /*
  * A workspace owner imports a small line list, opens "Create a dictionary
- * from this dataset" from its menu, has the values of GENDER suggested,
- * and saves. The first test answers suggestions from a stubbed online
- * route; the second runs them on the scripted offline model and checks
- * nothing went online. The imported dataset is a precondition; everything
- * the tests create is deleted afterwards.
+ * from this dataset" from its menu, has the values of gender suggested,
+ * and saves with hosp_yn still unlabeled. The first test agrees to the
+ * consent prompt and answers suggestions from a stubbed online route; the
+ * second runs them on the scripted offline model and checks no prompt
+ * opened and nothing went online. The imported dataset is a precondition;
+ * everything the tests create is deleted afterwards.
  */
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
@@ -9203,6 +10628,7 @@ import type { Page, Route } from "@playwright/test";
 const DICTIONARY_NAME = "E2E line list codes";
 const SUGGESTIONS_ROUTE =
   "**/functions/v1/chat/*/dictionary-suggestions/dictionary-suggestions-v1";
+const SESSION_SECRET_ROUTE = "**/functions/v1/chat/*/session-secret";
 const LABELS_REPLY = JSON.stringify({
   labels: [
     { value: "1", label: "Male", isMissing: false },
@@ -9223,6 +10649,33 @@ async function _replyToSuggestions(route: Route): Promise<void> {
   });
 }
 
+/** The consent gate mints its ack token with the chat's session secret. */
+async function _replyWithSessionSecret(route: Route): Promise<void> {
+  if (route.request().method() !== "GET") {
+    await route.fallback();
+    return;
+  }
+  await route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      sessionSecret: Buffer.alloc(32, 0x42).toString("base64"),
+      issuedAt: Date.now(),
+    }),
+  });
+}
+
+/** Agrees to the chat's consent prompt, which a `gender` column opens as a personal data warning. */
+async function _agreeToSend(page: Page): Promise<void> {
+  const dialog = page.getByRole("dialog", { name: "Personal data detected" });
+  await dialog
+    .getByRole("checkbox", {
+      name: "I understand this data will be sent to the AI provider",
+    })
+    .check();
+  await dialog.getByRole("button", { name: "Send" }).click();
+}
+
 async function _openCreateFromDataset(page: Page): Promise<void> {
   await page.getByRole("button", { name: "More dataset actions" }).click();
   await page
@@ -9233,10 +10686,16 @@ async function _openCreateFromDataset(page: Page): Promise<void> {
   });
 }
 
-async function _suggestGenderLabels(page: Page): Promise<void> {
+async function _suggestGenderLabels(
+  page: Page,
+  options: Readonly<{ isOnline: boolean }>,
+): Promise<void> {
   await page.getByRole("button", { name: "Next: label values" }).click();
-  await page.getByRole("button", { name: /GENDER \(1\/2\/9\)/ }).click();
+  await page.getByRole("button", { name: /gender \(1\/2\/9\)/ }).click();
   await page.getByRole("button", { name: "Suggest labels" }).click();
+  if (options.isOnline) {
+    await _agreeToSend(page);
+  }
   await expect(page.getByRole("textbox", { name: "Label for 1" })).toHaveValue(
     "Male",
     { timeout: MEDIUM_WAIT },
@@ -9254,6 +10713,7 @@ test.describe("learning a dictionary from a dataset", () => {
       slug: e2eWorkerDb.workspaceSlug,
     });
     let datasetId: string | undefined;
+    await page.route(SESSION_SECRET_ROUTE, _replyWithSessionSecret);
     await page.route(SUGGESTIONS_ROUTE, _replyToSuggestions);
     try {
       await signInWithEmailPassword(page, {
@@ -9270,16 +10730,23 @@ test.describe("learning a dictionary from a dataset", () => {
 
       await _openCreateFromDataset(page);
       await expect(page.getByRole("row", { name: /ses_cat/ })).toBeVisible();
-      await _suggestGenderLabels(page);
+      await expect(
+        page.getByRole("textbox", { name: "Name of the entry from GENDER" }),
+      ).toHaveValue("gender");
+      await _suggestGenderLabels(page, { isOnline: true });
       await page.getByRole("button", { name: "Accept and next list" }).click();
       await page.getByRole("button", { name: "Next: save" }).click();
+      await expect(page.getByText(/have no label yet/)).toBeVisible();
       await page.getByRole("textbox", { name: "Dictionary name" }).fill(DICTIONARY_NAME);
       await page.getByRole("button", { name: "Create dictionary" }).click();
 
       await expect(page.getByRole("heading", { name: DICTIONARY_NAME })).toBeVisible({
         timeout: LONG_WAIT,
       });
-      await expect(page.getByRole("button", { name: "GENDER" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "gender" })).toBeVisible();
+      await expect(page.getByRole("row", { name: /hosp_yn/ })).toContainText(
+        "2 values need a label",
+      );
       const { data } = await admin
         .from("data_dictionaries")
         .select("created_from_dataset_ids")
@@ -9345,7 +10812,8 @@ test.describe("learning a dictionary from a dataset", () => {
       });
 
       await _openCreateFromDataset(page);
-      await _suggestGenderLabels(page);
+      await _suggestGenderLabels(page, { isOnline: false });
+      await expect(page.getByRole("dialog")).toHaveCount(0);
       expect(onlineRequestCount).toBe(0);
       await page.getByRole("button", { name: "Cancel" }).click();
     } finally {
@@ -9357,7 +10825,7 @@ test.describe("learning a dictionary from a dataset", () => {
 });
 ```
 
-The model id in the init script is `LocalChatModel.OFFLINE_BUNDLE.answer`; the spec runs in the browser context, where the import is not available, so it is written out. If the bundle's model changes, change it here too.
+The consent prompt's kind comes from the chat's detectors: a column named `gender` is a personal data warning ("Personal data detected", with an acknowledgement checkbox). If the detectors change and it opens as the plain "Send to AI?" prompt, drop the checkbox step from `_agreeToSend`; never stub `decideIfDataCanCrossBoundary` here, since the prompt is what the test is for. The model id in the init script is `LocalChatModel.OFFLINE_BUNDLE.answer`; the spec runs in the browser context, where the import is not available, so it is written out. If the bundle's model changes, change it here too.
 
 - [ ] **Step 4:** `pnpm test:e2e dictionary-create-from-dataset.spec.ts`. Expected: 2 passed, each under 45 s. Fix the UI or the locators, never the timeout, and never add a fixed wait. If the Review heading does not appear, the dataset menu item navigated before the dataset's columns loaded: check `useReadOriginDataset` waits for `sources.isLoading` to be false.
 
@@ -9374,26 +10842,27 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 18: Look at it, design detector, translations, feature log
+### Task 20: Look at it, design detector, translations, feature log
 
 **Files:**
 - Modify: `src/i18n/locales/*/messages.po|ts` (generated)
 - Modify: `docs/measles-demo/pr-feature-log.md`
+- Modify (only when a later decision changes them): `docs/measles-demo/data-dictionaries-design.md`
 
 - [ ] **Step 1: Capture the prototype.** With a headless Playwright session (the Playwright MCP, or `pnpm exec playwright` in a scratch script), open `file://<worktree>/.impeccable/mocks/prototype/data-dictionaries.html`, pick "Create a dictionary" in its guide, and capture each step (Pick datasets, Review columns, Label values with the race list selected, Save) into `.temp/feat-dictionary-inference/prototype-<step>.png`. Then open a dataset there, open its ⋯ menu, pick "Create a dictionary from this dataset", and capture the Review step as `prototype-from-dataset-review.png`.
-- [ ] **Step 2: Capture the app.** Run `pnpm dev`. Headless, sign in with the seeded credentials from `seed/SeedData.ts` (`TEST_USER_EMAIL`, `TEST_USER_PASSWORD`, workspace `TEST_WORKSPACE_SLUG`), import `tests/data/measles-line-list-small/measles-line-list-small.csv` twice (rename the second copy so two datasets exist), and capture into `.temp/feat-dictionary-inference/`: the toolbar's New dictionary menu open, a dataset's ⋯ menu, Pick datasets with both picked, Review columns (with Show list toggled once, both states), Label values before and after Suggest labels, Save with the unlabeled warning, and the dictionary view after Create. Suggestions online need `OPEN_ROUTER_API_KEY` in `supabase/functions/.env`; without it, capture the offline path instead by turning offline mode on in Ask Avandar after downloading the bundle, or note that suggestions were not captured.
+- [ ] **Step 2: Capture the app.** Run `pnpm dev`. Headless, sign in with the seeded credentials from `seed/SeedData.ts` (`TEST_USER_EMAIL`, `TEST_USER_PASSWORD`, workspace `TEST_WORKSPACE_SLUG`), import `tests/data/measles-line-list-small/measles-line-list-small.csv` twice (rename the second copy so two datasets exist), and capture into `.temp/feat-dictionary-inference/`: the toolbar's New dictionary menu open, a dataset's ⋯ menu, Pick datasets with both picked, the consent prompt that opens once both are read, Review columns (with Show list toggled once, both states, and an entry renamed to a name another entry has, showing the error and the disabled Next), Label values before and after Suggest labels, Label values after declining the prompt in a fresh flow, Save with the unlabeled warning, and the dictionary view after Create with its "needs a label" counts. Suggestions online need `OPEN_ROUTER_API_KEY` in `supabase/functions/.env`; without it, capture the offline path instead by turning offline mode on in Ask Avandar after downloading the bundle, or note that suggestions were not captured.
 - [ ] **Step 3: Compare.** Put each app capture beside its prototype capture. Fix what differs from the prototype or from `docs/design/app-view-layout.md`, except what this plan's Refinements change on purpose (the menu instead of the Add menu, plain text instead of info notices, no Rows column on Pick, no drag handles on Label values, no Apply checkbox on Save). Check: no `Paper` or `Card` between the slate and the content, no `Callout color="info"`, more space above a heading than below, every sticky footer carries `data-sticky-action-bar`, tables fill the content column, tooltips open on focus.
 - [ ] **Step 4:** `.claude/skills/impeccable/scripts/impeccable detect --json src/views/DataManagerApp/NewDictionaryFromDatasetsView src/views/DataManagerApp/DataManagerToolbarActions src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu`. Fix every mechanical finding; list the rest in the PR description.
 - [ ] **Step 5:** `pnpm i18n:extract && pnpm i18n:compile`. Confirm `src/i18n/locales/en/messages.po` has `#:` references to the new view's files. Commit `src/i18n/locales` as `chore(data-dictionaries): extract learning messages`. (The pre-push hook adds machine translations; that is expected.)
 - [ ] **Step 6: Log the feature.** In `docs/measles-demo/pr-feature-log.md`:
   - add a Features table row after F129: `| F130 | Learn a data dictionary from datasets: profiling, matching, and suggested labels online and offline | not started | F129 | |`
-  - add a Merge order row after F129's: `| after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. No schema change. Deploy the \`chat\` edge function with it. |`
-  - add a `## F130: Learn a data dictionary from datasets` section after F129's, in F129's format: Status (built on `feat/dictionary-inference`, branched from `demo/measles` at `5516a9e6e`), Purpose and Value (a team creates a dictionary from one or more datasets in four steps; coded and ordered columns are found on the device, matching columns across datasets are merged, and labels are suggested online or by the offline model, sending only column names and the values of short coded columns), Design (the spec and this plan), PR title `feat(data-dictionaries): learn a dictionary from datasets`, Depends on F129, Files by area with each area's commit SHAs (list them with `git log --oneline 5516a9e6e..HEAD` and put each short SHA beside the files it touched: shared models; suggestions prompt and the `chat` route; profiling and suggestions libraries; the create flow view; Data Sources entry points; e2e and fixture; translations; this plan), Schema: none, Deploy: the `chat` edge function (new route `/:workspaceId/dictionary-suggestions/:promptId`), Known gaps (applying a dictionary and hiding the dataset menu item once one is applied are slice 3; Add from datasets into an existing dictionary is not built), and Verification (the commands in Task 19).
+  - add a Merge order row after F129's: `| after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. Changes the save RPC's pair check (migration). Deploy the migration, then the \`chat\` edge function, then the frontend. |`
+  - add a `## F130: Learn a data dictionary from datasets` section after F129's, in F129's format: Status (built on `feat/dictionary-inference`, branched from `demo/measles` at `5516a9e6e`), Purpose and Value (a team creates a dictionary from one or more datasets in four steps; coded and ordered columns are found on the device, matching columns across datasets are merged, and labels are suggested online or by the offline model, sending only column names and the values of short coded columns), Design (the spec and this plan), PR title `feat(data-dictionaries): learn a dictionary from datasets`, Depends on F129, Files by area with each area's commit SHAs (list them with `git log --oneline 5516a9e6e..HEAD` and put each short SHA beside the files it touched: the save RPC schema, its migration, the desktop twin, and pgTAP; slice 1's model, copy, and editor files changed for blank labels; shared models; suggestions prompt and the `chat` route; profiling and suggestions libraries; the consent context in `ConsentAuditEntry.constants.ts`, `decideIfDataCanCrossBoundary.tsx`, and `ConsentLogPanel.tsx`; the create flow view; Data Sources entry points; e2e and fixture; translations; this plan), Schema: yes, one migration (`data_dictionaries_blank_labels`) that replaces `data_dictionaries__check_pairs` so a value may be saved with a blank label (label uniqueness ignores blanks; a blank code is still refused), plus its desktop SQLite twin; no table, column, or policy changes, Deploy: the migration first (the frontend saves blank labels, which the old function refuses), then the `chat` edge function (new route `/:workspaceId/dictionary-suggestions/:promptId`, which requires an ack token, so the frontend must ship with or after it), then the frontend, Known gaps (applying a dictionary and hiding the dataset menu item once one is applied are slice 3; Add from datasets into an existing dictionary is a separate small piece after slice 3 and will update "Made from"; slice 4 must decide what a blank-label value does in each conversion direction), and Verification (the commands in Task 21).
 - [ ] **Step 7:** Commit the log: `docs(measles-demo): log learning dictionaries from datasets`.
 
 ---
 
-### Task 19: Final verification
+### Task 21: Final verification
 
 Run each command and read its real exit code (not through `head`).
 
@@ -9402,10 +10871,12 @@ Run each command and read its real exit code (not through `head`).
 - [ ] `pnpm exec tsc -b --force --noEmit && pnpm type-check:deno`
 - [ ] `pnpm test:frontend`
 - [ ] `pnpm vitest run --config vitest.executed.config.ts src/lib/dataDictionaries`
-- [ ] `pnpm test:db` (no schema change in this slice; this proves slice 1's tests still pass on this branch's stack)
+- [ ] `pnpm test:db` (the save RPC's blank-label tests from Task 1, and slice 1's tests unchanged otherwise)
+- [ ] `ava supabase migrations validate`
+- [ ] `pnpm desktop:sqlite:gen-migrations`, then `git status`: no new or changed file (Task 1 committed the twin)
 - [ ] `pnpm i18n:check`
 - [ ] `pnpm test:e2e dictionary-create-from-dataset.spec.ts`
-- [ ] `pnpm test:e2e data-dictionary-edit.spec.ts` (slice 1's spec, through the new menu)
+- [ ] `pnpm test:e2e data-dictionary-edit.spec.ts` (slice 1's spec, through the new menu and with blank labels allowed)
 - [ ] `pnpm test:e2e csv-import.spec.ts` (clicks the toolbar's Add new dataset beside the new menu)
 - [ ] `git status` is clean apart from generated files already committed. Leave the `ava supabase switch` in place (it changes no tracked file).
 
@@ -9417,14 +10888,15 @@ The tasks are ordered so each batch can go to one subagent, with independent bat
 
 | Batch | Tasks | Needs | Runs alongside |
 | --- | --- | --- | --- |
-| A: shared model | 1, 2, 3, 4 (in order) | Task 0 | B |
-| B: prompt and route | 5, then 6 | Task 0 | A |
-| C: browser libraries | 7, 8 (either order) | A, and B's Task 5 | none |
-| D: flow state and hooks | 9, then 10 | A, C | none |
-| E: steps | 11, 12, 13, 14 (in order; they share the footer) | D | none |
-| F: wiring | 15, then 16 | E | none |
-| G: e2e | 17 | F | H's Steps 1 to 4 |
-| H: finish | 18, then 19 | G | none |
+| S: blank labels | 1, then 2 | Task 0, with `ava supabase status` naming `feat-dictionary-inference` | none |
+| A: shared model | 3, 4, 5, 6 (in order) | S (Task 5's draft test uses Task 2's `findDraftWarnings`) | B |
+| B: prompt and route | 7, then 8 | Task 0 | A |
+| C: browser libraries | 9, 10 (either order) | A, and B's Task 7 | none |
+| D: flow state and hooks | 11, then 12 | A, C, and B's Task 8 (the route body type carries `ackToken`) | none |
+| E: steps | 13, 14, 15, 16 (in order; they share the footer) | D | none |
+| F: wiring | 17, then 18 | E | none |
+| G: e2e | 19 | F | H's Steps 1 to 4 |
+| H: finish | 20, then 21 | G | none |
 
 Every batch ends with its own tests green and a commit per task. Review between batches with the `avandar-code-review` skill.
 
@@ -9434,33 +10906,38 @@ Every batch ends with its own tests green and a commit per task. Review between 
 
 These override the spec where they differ.
 
-- **No schema change.** `data_dictionaries.created_from_dataset_ids` is already insertable: slice 1's guard trigger refuses only updates to it. The flow inserts the dictionary with its source dataset ids, then saves the contents through the existing `rpc_data_dictionaries__save`, as spec 5.5 says. Those are two writes, so `createDictionaryFromDraft` deletes the new dictionary again when the save fails (the owner may delete their own dictionary under slice 1's RLS), and the user's work stays in the flow to retry.
-- **Unlabeled values are saved with their code as the label.** The save RPC refuses a blank label (`code_pair_incomplete`), and spec 7.3 lets the user save with values still unlabeled. Saving `9` as `9 → 9` keeps the value in the list to finish on the dictionary, changes nothing if it is ever converted, and the Save step's warning says so. The alternative, allowing blank labels, is a schema and editor change across slices 1, 3, and 4 (open question 1).
+- **One schema change: blank labels (decided by the product owner).** A value may be saved without a label. `data_dictionaries__check_pairs` accepts an empty or blank label (it still needs the `label` key, as a string, and a non-blank code), and label uniqueness ignores blank labels, so two unlabeled values in one list are fine while `Yes` and `yes` still collide. The label is stored as typed (blank), never as the code. The dictionary editor and the entries table mark such a value "Needs a label" as a warning that never blocks Save (Task 2), and the create flow's Save step says unlabeled values are saved without one (Task 16). Slice 4 must decide what a blank-label value does in each conversion direction (codes to labels: keep the code or leave the cell blank; labels to codes: a blank cell cannot map back to a single code).
+- **No other schema change.** `data_dictionaries.created_from_dataset_ids` is already insertable: slice 1's guard trigger refuses only updates to it. The flow inserts the dictionary with its source dataset ids, then saves the contents through the existing `rpc_data_dictionaries__save`, as spec 5.5 says. Those are two writes, so `createDictionaryFromDraft` deletes the new dictionary again when the save fails (the owner may delete their own dictionary under slice 1's RLS), and the user's work stays in the flow to retry.
 - **The AI route is its own small route** (spec 18, open decision 3): `POST chat/:workspaceId/dictionary-suggestions/:promptId`, with a versioned prompt (`dictionary-suggestions-v1`) in `shared/agent/dictionarySuggestions/`, exactly like chat titles. It requires Data Sources editor. Offline, the same prompt runs on `OfflineChatEngineStore.complete` with JSON-schema constrained decoding. Where it runs comes from `resolveChatRuntimeMode`, so suggestions follow the chat's own online and offline rules: offline mode on, or offline with the bundle downloaded, means the offline model.
 - **Two AI requests, with acceptance built in.** Meaning matches are asked once, automatically, right after reading two or more datasets (never for one dataset, where no match could apply). They arrive merged with a Suggested tag and a **Keep apart** button that undoes them. Labels are asked per list with **Suggest labels**, arrive prefilled with a marker, never overwrite a label the user typed, and a list stays "Suggested" until **Accept and next list**. The description comes with the label suggestion and fills the entry's description only when the list belongs to one entry and nothing was typed there.
 - **Same name, different codes is joined but reviewable.** `GENDER` (1/2/9) and `sex` (M/F/U) score below 0.6 by the spec's weights (name 1, values 0), yet the prototype shows them as one entry with two code lists. Clustering joins any pair whose names are the same after normalizing, and marks it `other_codes` with the note "Same name, different codes" and Keep apart.
 - **The scorer's name part, refined.** The spec's abbreviation table gains a small synonym table, so `GENDER` matches `sex` and `zip_code` matches `ZIP` and `postal_code`, which the product owner named. Jaro-Winkler is applied word by word inside the token overlap (two words of four letters or more at 0.9 or above count as one), not to whole names: whole-name Jaro-Winkler scored `symptom_fever` and `symptom_rash` at 0.89 and `sex` against `ses` at 0.82, which merged unrelated columns. When values cannot be compared (no listed values and no number ranges), the name and type weights are rescaled to sum to 1. Two columns of one dataset never merge.
 - **Classification, refined.** Dates are checked before identifiers, since a timestamp is unique per row. The identifier rule's distinct share above 0.95 also needs more than 20 distinct values, so a coded column in a three-row dataset is not an identifier. The id-word rule reads the column's last raw word (`CaseNo`, `case_id`), so `hosp_yn` (expanded to "yes no") is not an identifier. `time` columns are text. Ranges are compared for numbers only, not dates.
-- **Shared code lists need the same codes and the same first word.** `symptom_fever` and `symptom_rash` (both 1/2/9) share one list; `GENDER` and `fever` (both 1/2/9) keep separate lists, since identical codes alone do not mean identical meanings. Code lists are named after their entry, or the shared first word, and their first four codes: `GENDER (1/2/9)`, `symptom (1/2/9)`.
+- **Shared code lists (decided by the product owner).** Entries whose codes are identical and not all numbers share one list: `fever`, `rash`, and `cough` with `Y/N/U` share `fever, rash, cough (Y/N/U)`. Purely numeric codes share only when the columns' names start with the same word: `symptom_fever` and `symptom_rash` (both 1/2/9) share `symptom (1/2/9)`, while `GENDER` and `fever` (both 1/2/9) keep separate lists, since identical numbers alone do not mean identical meanings. A list is named after its one entry, else the shared first word, else up to three entry names, then its first four codes. Its key is built from the codes and the shared word, never from an entry name, so renaming an entry keeps its labels.
 - **Entry points.** The spec's toolbar **Add** menu does not exist; slice 1 kept the "Add new dataset" button, which five e2e helpers click. So slice 1's **New dictionary** button becomes a menu with **From datasets** (this flow) and **Start empty** (slice 1's dialog). This is the "Add from datasets" entry point next to New dictionary in Data Sources. Slice 1's e2e spec is updated for the extra click.
-- **The Dictionary view's "Add from datasets"** (learning into an existing dictionary) stays out. Merging a proposal into saved entries needs matching against a saved dictionary and adding to `created_from_dataset_ids`, which slice 1's guard trigger refuses, so it needs a schema change (open question 2).
+- **"Add from datasets" into an existing dictionary is a separate small piece after slice 3 (decided by the product owner).** It is not in this slice. When built, it will merge a proposal into saved entries and add the datasets to the dictionary's "Made from" (`created_from_dataset_ids`), which slice 1's guard trigger refuses today, so that piece carries its own schema change.
 - **The dataset menu item always shows to dictionary editors in this slice.** The spec shows it "only while the dataset has no binding of any mode", but bindings arrive in slice 3. Slice 3 adds that check and the "Apply a dictionary" item.
 - **No "Apply it to <dataset> next" on Save.** Apply is slice 3. After saving, the new dictionary opens with a "Saved ... to Dictionaries" toast. Slice 3 adds the checkbox and the hand-off to Apply.
 - **The step is not in the URL.** Spec 7.1 lists `fromDatasetId` and `step` search params. Only `fromDatasetId` is kept: every step after Pick needs the in-memory profile, so a reloaded or shared step URL would open a step with nothing to show.
-- **Label values does not reorder ordered lists.** They arrive in scale order (integer codes ascending, known scale words in scale order, missing values last), and the dictionary's Code lists tab already reorders with drag and keyboard. This drops the spec's drag handles from the create flow (open question 5).
+- **No drag handles on Label values (decided by the product owner).** Ordered lists arrive in scale order (integer codes ascending, known scale words in scale order, missing values last), and the dictionary's Code lists tab already reorders with drag and keyboard.
 - **Description-only entries get no AI description here.** Only a single-entry coded list gets one, through Suggest labels. Description-only entries are saved without descriptions and described on the dictionary.
-- **Privacy.** Never sent: rows, identifiers, dates, numbers, free text, and the values of any column whose name names a person or a contact detail (`name`, `email`, `phone`, `address`, `ssn`, `mrn`, and the like). Demographic columns such as sex and race do send their codes, since a code is not a person; `isPersonalColumnName` was not reused because it flags exactly those demographics. Suggestions do not go through the chat consent modal: the user clicks Suggest labels, and Pick states what is read (open question 3).
+- **Privacy.** Never sent: rows, identifiers, dates, numbers, free text, and the values of any column whose name names a person or a contact detail (`name`, `email`, `phone`, `address`, `ssn`, `mrn`, and the like). Demographic columns such as sex and race do send their codes, since a code is not a person; `isPersonalColumnName` was not reused because it flags exactly those demographics.
+- **Online suggestions use the chat's consent prompt (decided by the product owner).** Every online send goes through `decideIfDataCanCrossBoundary`, the chat's gate: its detectors, `ConsentModal`, the browser-local consent log, and an ack token the `chat` route verifies with `verifyAckToken` and `hashTextPayload`, as the PDF table assistant's measurement route does. The chat keeps no stored "agreed" flag (it asks per send), so the create flow keeps the answer in its own state: the first online send of a flow forces the "Send to AI?" prompt (`explicitConsentRequired`, as the PDF assistant does); after a yes, later sends only prompt when the detectors flag something; after a no, nothing is sent online for the rest of the flow and Label values says suggestions are off. Meaning matches still run automatically after reading two or more datasets, so the prompt appears at that moment, or at the first Suggest labels, whichever comes first. Offline nothing leaves the device, so, as in the chat, nothing is asked. Consent log rows use a new context, `dictionary_suggestions`, shown as "Dictionary suggestions".
 - **Offline copy.** The prototype's "Working offline? ... Suggestions need a connection" notice contradicts offline parity. The flow shows spec 8.4's sentence only when no model can answer: "Suggestions need a connection or the offline model. Labeling still works." Saving offline uses the app's standard `OfflineGated` button, not spec 12's custom sentence.
 - **Pick shows Source and Columns, not Rows.** A row count needs each dataset loaded into DuckDB, which is the profiling cost the user has not asked for yet.
 - **The prototype's blue notices become plain text lines,** and the unlabeled-values notice a warning `Callout`, per `app-view-layout.md` ("Callout is for failures and warnings").
 - **The list pane collapses on the create route only,** the one task view so far. `useListPaneToggle` is where slice 3's Apply route and slice 5's crosswalk routes add themselves.
-- **Entry names are not editable on Review.** An entry takes the most common column name among its columns; renaming happens on the dictionary.
+- **Entries are renamed inline on Review (decided by the product owner).** The default name is the entry's most common column name in lowercase words joined by `_` (`GENDER` to `gender`, `CaseNo` to `case_no`, `ZIPCode` to `zip_code`), with the first dataset read winning a tie and `_2`, `_3` added when two entries would share a name. This matches the prototype's lowercase `sex` and slice 1's names, which are compared trimmed and case-insensitively. A blank name or one another included entry has is flagged with the Dictionary view's copy and holds Next, matching the save RPC's `entry_name_required` and `entry_names_not_unique`.
 
-## Open questions for the product owner
+## Resolved decisions
 
-1. Unlabeled values: save them as `code → code` (this plan), or allow blank labels across the dictionary, which is a schema change and changes the editor and later conversions?
-2. When should the Dictionary view's **Add from datasets** (learn into an existing dictionary) be built, and should it update the dictionary's "Made from" datasets (a schema change to the guard trigger or the save RPC)?
-3. Should suggestions go through the chat's consent modal, or is the explicit button plus the Pick step's sentence enough? And is it acceptable that meaning matches are requested automatically after reading two or more datasets (column names and up to 12 codes of coded columns), or should that be a button too?
-4. Should Review let people rename an entry (the prototype names `GENDER`'s entry `sex`), or is renaming on the dictionary enough?
-5. Are drag handles needed on Label values for ordered lists, given they arrive in scale order and can be reordered on the dictionary?
-6. Should the shared-list rule (same codes and same first word) also catch yes/no style lists without a shared prefix (`fever`, `rash`, `cough` all 1/2/9)?
+The product owner settled every open question from the first draft of this plan:
+
+| # | Question | Decision | Where |
+| --- | --- | --- | --- |
+| 1 | Unlabeled values | Saved with a blank label, marked "Needs a label", never blocking Save | Tasks 1, 2, 5, 16 |
+| 2 | Add from datasets into an existing dictionary | A separate small piece after slice 3, updating "Made from" | Out of this slice |
+| 3 | Consent for online suggestions | The chat's consent prompt, first answer kept per flow, matches still automatic | Tasks 8, 10, 11, 12, 15, 19 |
+| 4 | Renaming entries on Review | Inline, with save-matching validation and a lowercase default name | Tasks 3, 4, 6, 11, 14 |
+| 5 | Drag handles on Label values | Not needed | Task 15 |
+| 6 | Yes/no style lists without a shared prefix | Share one list when the codes are not all numbers | Task 5 |
