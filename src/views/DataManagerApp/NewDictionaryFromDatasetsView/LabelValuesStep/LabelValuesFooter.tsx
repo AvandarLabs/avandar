@@ -8,12 +8,15 @@ type Props = {
   /** The list Accept and next list accepts, if there is one. */
   selectedKey: string | undefined;
   dispatch: Dispatch<NewDictionaryAction>;
+  /** Called when the user accepts the selected list. */
+  onAccepted: () => void;
 };
 
 /** Back, Accept and next list, and Next: save, under the Label values step. */
 export function LabelValuesFooter({
   selectedKey,
   dispatch,
+  onAccepted,
 }: Readonly<Props>): ReactNode {
   return (
     <NewDictionaryFooter
@@ -32,6 +35,7 @@ export function LabelValuesFooter({
         <Button
           variant="default"
           onClick={() => {
+            onAccepted();
             dispatch({ type: "accept_code_list", codeListKey: selectedKey });
           }}
         >

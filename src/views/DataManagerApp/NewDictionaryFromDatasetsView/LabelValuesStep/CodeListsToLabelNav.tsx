@@ -1,8 +1,8 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { NavLink, Stack, Text } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import { CodeListStatusBadge } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListStatusBadge";
+import { CodeListNavLink } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListNavLink";
 import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesStep.module.css";
 import type { ReactNode } from "react";
 
@@ -13,7 +13,11 @@ type Props = {
   onSelect: (codeListKey: string) => void;
 };
 
-/** Every code list waiting for labels, with how far along each one is. */
+/**
+ * The flank of the Label values step: every code list waiting for labels,
+ * with how far along each one is and how many are done. It is full height,
+ * on the body surface, and outside the content column's gutter.
+ */
 export function CodeListsToLabelNav({
   codeLists,
   labels,
@@ -25,40 +29,30 @@ export function CodeListsToLabelNav({
     return DictionaryProposal.getCodeListStatus(labels, codeList) === "labeled";
   }).length;
   const listCount = codeLists.length;
+  const progress = plural(listCount, {
+    one: `${doneCount} of # done`,
+    other: `${doneCount} of # done`,
+  });
 
   return (
     <nav aria-label={t`Code lists to label`} className={css.labelValuesStepNav}>
-      <Text size="xs" c="dimmed" fw={600} px="xs" pb="xs">
-        {t`${doneCount} of ${listCount} done`}
-      </Text>
-      <Stack gap={2}>
+      <div className={css.labelValuesStepNavHeader}>
+        <Text component="h3" fz="sm" fw={600}>
+          {t`Code lists to label`}
+        </Text>
+        <Text size="xs" c="dimmed">
+          {progress}
+        </Text>
+      </div>
+      <Stack gap={2} className={css.labelValuesStepNavList}>
         {codeLists.map((codeList) => {
-          const valueCount = codeList.values.length;
-          const isSelected = codeList.key === selectedKey;
           return (
-            <NavLink
+            <CodeListNavLink
               key={codeList.key}
-              component="button"
-              type="button"
-              active={isSelected}
-              aria-current={isSelected ? "true" : undefined}
-              label={codeList.name}
-              description={
-                codeList.isOrdered
-                  ? t`${plural(valueCount, { one: "# value", other: "# values" })} · ordered`
-                  : t`${plural(valueCount, { one: "# value", other: "# values" })}`
-              }
-              rightSection={
-                <CodeListStatusBadge
-                  status={DictionaryProposal.getCodeListStatus(
-                    labels,
-                    codeList,
-                  )}
-                />
-              }
-              onClick={() => {
-                onSelect(codeList.key);
-              }}
+              codeList={codeList}
+              labels={labels}
+              isSelected={codeList.key === selectedKey}
+              onSelect={onSelect}
             />
           );
         })}

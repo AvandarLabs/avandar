@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { Checkbox, Table, Text, TextInput, Tooltip } from "@mantine/core";
-import { IconSparkles } from "@tabler/icons-react";
+import { Checkbox, Table, Text, TextInput } from "@mantine/core";
+import { SuggestedLabelMarker } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestedLabelMarker";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
-import type { Dispatch, ReactNode } from "react";
+import type { ChangeEvent, Dispatch, ReactNode } from "react";
 
 type Props = {
   item: ColumnProfile.Value;
@@ -15,8 +15,8 @@ type Props = {
 
 /**
  * One value to label: the code as found in the data, how many rows hold
- * it, its label (marked when it is an unchecked suggestion), and whether
- * it stands for a missing answer.
+ * it, its label (described as a suggestion until the user changes it), and
+ * whether it stands for a missing answer.
  */
 export function LabelValueRow({
   item,
@@ -26,14 +26,15 @@ export function LabelValueRow({
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
   const code = item.value;
-  const marker =
-    label?.source === "suggested" ? (
-      <Tooltip label={t`Suggested from the column name and values`}>
-        <span tabIndex={0} aria-label={t`Suggested`}>
-          <IconSparkles size={14} aria-hidden />
-        </span>
-      </Tooltip>
-    ) : null;
+  const isSuggested = label?.source === "suggested";
+  const onLabelChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const value = event.currentTarget.value;
+    dispatch({ type: "set_value_label", codeListKey, code, label: value });
+  };
+  const onMissingChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const isMissing = event.currentTarget.checked;
+    dispatch({ type: "set_value_missing", codeListKey, code, isMissing });
+  };
 
   return (
     <Table.Tr>
@@ -50,18 +51,14 @@ export function LabelValueRow({
           size="xs"
           aria-label={t`Label for ${code}`}
           placeholder={t`Label for ${code}`}
+          description={
+            isSuggested
+              ? t`Suggested from the column name and values`
+              : undefined
+          }
           value={label?.label ?? ""}
-          rightSection={marker}
-          rightSectionPointerEvents="all"
-          onChange={(event) => {
-            const value = event.currentTarget.value;
-            dispatch({
-              type: "set_value_label",
-              codeListKey,
-              code,
-              label: value,
-            });
-          }}
+          rightSection={isSuggested ? <SuggestedLabelMarker /> : null}
+          onChange={onLabelChange}
         />
       </Table.Td>
       <Table.Td>
@@ -69,15 +66,7 @@ export function LabelValueRow({
           label={t`Missing`}
           aria-label={t`${code} stands for a missing answer`}
           checked={label?.isMissing ?? false}
-          onChange={(event) => {
-            const isMissing = event.currentTarget.checked;
-            dispatch({
-              type: "set_value_missing",
-              codeListKey,
-              code,
-              isMissing,
-            });
-          }}
+          onChange={onMissingChange}
         />
       </Table.Td>
     </Table.Tr>

@@ -1,12 +1,15 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { Button, Group, Stack, Text, Title } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
 import { EntryDescriptionField } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField";
 import { LabelValuesTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable";
+import { SuggestionsOffNote } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote";
+import { useCodeListHint } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useCodeListHint";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { LabelsBlockReason } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
-import type { Dispatch, ReactNode } from "react";
+import type { Dispatch, ReactNode, Ref } from "react";
 
 type Props = {
   codeList: DictionaryProposal.CodeList;
@@ -15,73 +18,13 @@ type Props = {
   labels: DictionaryProposal.Labels;
   suggestionAvailability: DictionarySuggestionAvailability;
   isSuggesting: boolean;
-  /** False when the list's columns look like they name people. */
-  canSuggest: boolean;
+  /** Why the list's values cannot be sent for suggestions, if they cannot. */
+  blockReason: LabelsBlockReason | undefined;
+  /** The list's title, which the step focuses after accepting a list. */
+  titleRef: Ref<HTMLHeadingElement>;
   dispatch: Dispatch<NewDictionaryAction>;
   onSuggest: (codeList: DictionaryProposal.CodeList) => void;
 };
-
-/** One sentence on how to label this list. */
-function useCodeListHint(
-  codeList: DictionaryProposal.CodeList,
-  entries: readonly DictionaryProposal.Entry[],
-): string {
-  const { t, i18n } = useLingui();
-  if (entries.length > 1) {
-    const names = new Intl.ListFormat(i18n.locale, {
-      type: "conjunction",
-    }).format(
-      entries.map((entry) => {
-        return entry.name;
-      }),
-    );
-    return t`${names} hold the same values, so they share this one list. Label it once.`;
-  }
-  return codeList.isOrdered
-    ? t`This list is ordered, lowest level first. Reorder it on the dictionary after saving if the order is wrong.`
-    : t`Give each value the label people should see. Suggestions are only a starting point.`;
-}
-
-/** Why Suggest labels is off for this list, as one line, or nothing. */
-function SuggestionsOffNote({
-  availability,
-  canSuggest,
-}: Readonly<{
-  availability: DictionarySuggestionAvailability;
-  canSuggest: boolean;
-}>): ReactNode {
-  if (availability === "unavailable") {
-    return (
-      <Text size="xs" c="dimmed">
-        <Trans>
-          Suggestions need a connection or the offline model. Labeling still
-          works.
-        </Trans>
-      </Text>
-    );
-  }
-  if (availability === "declined") {
-    return (
-      <Text size="xs" c="dimmed">
-        <Trans>
-          You chose not to send values to the AI provider, so suggestions are
-          off for this dictionary. Labeling still works.
-        </Trans>
-      </Text>
-    );
-  }
-  if (!canSuggest) {
-    return (
-      <Text size="xs" c="dimmed">
-        <Trans>
-          These columns look like they name people, so their values are not sent
-          for suggestions.
-        </Trans>
-      </Text>
-    );
-  }
-  return null;
-}
 
 /** The selected code list: its values to label and Suggest labels. */
 export function CodeListLabelsPane({
@@ -90,7 +33,8 @@ export function CodeListLabelsPane({
   labels,
   suggestionAvailability,
   isSuggesting,
-  canSuggest,
+  blockReason,
+  titleRef,
   dispatch,
   onSuggest,
 }: Readonly<Props>): ReactNode {
@@ -103,7 +47,7 @@ export function CodeListLabelsPane({
   return (
     <Stack gap="md" miw={0}>
       <Group justify="space-between" wrap="nowrap" gap="md">
-        <Title order={4} fz="lg" fw={650}>
+        <Title order={2} fz="xl" fw={650} tabIndex={-1} ref={titleRef}>
           {codeList.name}
         </Title>
         <Button
@@ -111,7 +55,7 @@ export function CodeListLabelsPane({
           size="compact-sm"
           leftSection={<IconSparkles size={14} aria-hidden />}
           loading={isSuggesting}
-          disabled={isOff || !canSuggest}
+          disabled={isOff || blockReason !== undefined}
           onClick={() => {
             onSuggest(codeList);
           }}
@@ -124,7 +68,7 @@ export function CodeListLabelsPane({
       </Text>
       <SuggestionsOffNote
         availability={suggestionAvailability}
-        canSuggest={canSuggest}
+        blockReason={blockReason}
       />
       <LabelValuesTable
         codeList={codeList}

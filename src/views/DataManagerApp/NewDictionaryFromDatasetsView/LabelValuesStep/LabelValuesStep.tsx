@@ -6,6 +6,8 @@ import { CodeListsToLabelNav } from "@/views/DataManagerApp/NewDictionaryFromDat
 import { LabelValuesFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter";
 import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesStep.module.css";
 import { NothingToLabel } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel";
+import { useFocusTitleAfterAccept } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useFocusTitleAfterAccept";
+import type { LabelsBlockReason } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { Dispatch, ReactNode } from "react";
@@ -16,8 +18,10 @@ type Props = {
   selectedCodeListKey: string | undefined;
   suggestionAvailability: DictionarySuggestionAvailability;
   suggestingCodeListKey: string | undefined;
-  /** Whether a list's values can be sent for suggestions at all. */
-  canSuggestLabels: (codeList: DictionaryProposal.CodeList) => boolean;
+  /** Why a list's values cannot be sent for suggestions, if they cannot. */
+  getLabelsBlockReason: (
+    codeList: DictionaryProposal.CodeList,
+  ) => LabelsBlockReason | undefined;
   dispatch: Dispatch<NewDictionaryAction>;
   onSuggest: (codeList: DictionaryProposal.CodeList) => void;
 };
@@ -25,7 +29,8 @@ type Props = {
 /**
  * The third step of learning a dictionary: label every code list's values,
  * by hand or with suggestions. Labels can be left unfinished and finished
- * on the dictionary later.
+ * on the dictionary later. After Accept and next list, focus moves to the
+ * title of the list that comes next.
  */
 export function LabelValuesStep(props: Readonly<Props>): ReactNode {
   const { proposal, labels, dispatch } = props;
@@ -36,10 +41,13 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
     codeLists.find((codeList) => {
       return codeList.key === props.selectedCodeListKey;
     }) ?? codeLists[0];
-  const canSuggest = selected ? props.canSuggestLabels(selected) : false;
+  const { titleRef, onAccepted } = useFocusTitleAfterAccept(
+    selected?.key,
+    labels,
+  );
 
   return (
-    <AppViewBody>
+    <>
       {selected ? (
         <div className={css.labelValuesStep}>
           <CodeListsToLabelNav
@@ -50,23 +58,32 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
               dispatch({ type: "select_code_list", codeListKey });
             }}
           />
-          <CodeListLabelsPane
-            codeList={selected}
-            entries={proposal.entries.filter((entry) => {
-              return selected.entryKeys.includes(entry.key);
-            })}
-            labels={labels}
-            suggestionAvailability={props.suggestionAvailability}
-            isSuggesting={props.suggestingCodeListKey === selected.key}
-            canSuggest={canSuggest}
-            dispatch={dispatch}
-            onSuggest={props.onSuggest}
-          />
+          <AppViewBody>
+            <CodeListLabelsPane
+              codeList={selected}
+              entries={proposal.entries.filter((entry) => {
+                return selected.entryKeys.includes(entry.key);
+              })}
+              labels={labels}
+              suggestionAvailability={props.suggestionAvailability}
+              isSuggesting={props.suggestingCodeListKey === selected.key}
+              blockReason={props.getLabelsBlockReason(selected)}
+              titleRef={titleRef}
+              dispatch={dispatch}
+              onSuggest={props.onSuggest}
+            />
+          </AppViewBody>
         </div>
       ) : (
-        <NothingToLabel />
+        <AppViewBody>
+          <NothingToLabel />
+        </AppViewBody>
       )}
-      <LabelValuesFooter selectedKey={selected?.key} dispatch={dispatch} />
-    </AppViewBody>
+      <LabelValuesFooter
+        selectedKey={selected?.key}
+        dispatch={dispatch}
+        onAccepted={onAccepted}
+      />
+    </>
   );
 }
