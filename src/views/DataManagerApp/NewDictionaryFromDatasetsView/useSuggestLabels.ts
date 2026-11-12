@@ -4,6 +4,7 @@ import { parseDictionaryLabelSuggestions } from "$/agent/dictionarySuggestions/d
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { Dispatch } from "react";
@@ -13,6 +14,7 @@ async function _requestLabelSuggestions(
     proposal: DictionaryProposal.T | undefined;
     codeList: DictionaryProposal.CodeList;
     locale: string;
+    model: DictionarySuggestionModel;
     requestReply: RequestSuggestionReply;
   }>,
 ): Promise<DictionaryProposal.LabelSuggestions | undefined> {
@@ -21,6 +23,7 @@ async function _requestLabelSuggestions(
         proposal: options.proposal,
         codeList: options.codeList,
         locale: options.locale,
+        model: options.model,
       })
     : undefined;
   if (request?.task !== "labels") {
@@ -50,6 +53,7 @@ async function _requestLabelSuggestions(
 export function useSuggestLabels(
   options: Readonly<{
     proposal: DictionaryProposal.T | undefined;
+    model: DictionarySuggestionModel;
     requestReply: RequestSuggestionReply;
     dispatch: Dispatch<NewDictionaryAction>;
   }>,
@@ -64,6 +68,7 @@ export function useSuggestLabels(
         proposal: options.proposal,
         codeList,
         locale: i18n.locale,
+        model: options.model,
         requestReply: options.requestReply,
       });
     },

@@ -49,7 +49,7 @@ function _render(requestReply: () => Promise<string | undefined>) {
   const onFound = vi.fn();
   const rendered = renderHook(
     () => {
-      return useMeaningMatches({ requestReply, onFound });
+      return useMeaningMatches({ requestReply, model: "online", onFound });
     },
     { wrapper: _makeWrapper() },
   );

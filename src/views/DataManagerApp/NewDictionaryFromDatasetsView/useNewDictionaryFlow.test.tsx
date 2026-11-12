@@ -54,7 +54,11 @@ vi.mock(
   () => {
     return {
       useDictionarySuggestions: () => {
-        return { availability: "online", requestReply: vi.fn() };
+        return {
+          availability: "online",
+          model: "online",
+          requestReply: vi.fn(),
+        };
       },
     };
   },

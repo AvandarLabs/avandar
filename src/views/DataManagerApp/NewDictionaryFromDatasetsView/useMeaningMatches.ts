@@ -3,6 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { parseDictionaryMeaningMatches } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 
 /** Where the search for columns that mean the same thing stands. */
@@ -12,12 +13,14 @@ async function _requestMatches(
   options: Readonly<{
     proposal: DictionaryProposal.T;
     locale: string;
+    model: DictionarySuggestionModel;
     requestReply: RequestSuggestionReply;
   }>,
 ): Promise<DictionaryProposal.MeaningMatch[]> {
   const request = DictionarySuggestions.makeMatchesRequestFromProposal({
     proposal: options.proposal,
     locale: options.locale,
+    model: options.model,
   });
   if (request?.task !== "matches") {
     return [];
@@ -42,6 +45,7 @@ async function _requestMatches(
 export function useMeaningMatches(
   options: Readonly<{
     requestReply: RequestSuggestionReply;
+    model: DictionarySuggestionModel;
     onFound: (
       matches: DictionaryProposal.MeaningMatch[],
       proposal: DictionaryProposal.T,
@@ -57,6 +61,7 @@ export function useMeaningMatches(
       return _requestMatches({
         proposal,
         locale: i18n.locale,
+        model: options.model,
         requestReply: options.requestReply,
       });
     },

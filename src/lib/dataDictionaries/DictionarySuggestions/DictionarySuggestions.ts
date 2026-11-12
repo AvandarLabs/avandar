@@ -19,6 +19,7 @@ import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal
 import { resolveChatRuntimeMode } from "@/components/ChatPanel/useAvandarChatRuntime/resolveChatRuntimeMode/resolveChatRuntimeMode";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
 import { PendingAcks } from "@/components/privacy/privacy-helpers/PendingAcks";
+import { OFFLINE_CHAT_CONTEXT_WINDOW_SIZE } from "@/stores/OfflineChatEngineStore/createLocalModelRuntime/offlineChatContextWindow";
 import type {
   DictionarySuggestionColumn,
   DictionarySuggestionsMessage,
@@ -182,6 +183,7 @@ function makeLabelsRequestFromCodeList(
     proposal: DictionaryProposal.T;
     codeList: DictionaryProposal.CodeList;
     locale: string;
+    model: DictionarySuggestionModel;
   }>,
 ): DictionarySuggestionsRequest | undefined {
   const entries = options.proposal.entries.filter((entry) => {
@@ -209,14 +211,24 @@ function makeLabelsRequestFromCodeList(
   // An entry renamed after a person keeps its codes here too. Codes are
   // never cut, since a cut code could not be matched to its label, so a
   // list with a code over the limit asks for nothing.
+  const request: DictionarySuggestionsRequest = {
+    task: "labels",
+    locale: options.locale,
+    column,
+  };
   return _canSendValues(column.kind, [column.name, ...names]) &&
-    _areValuesShortEnough(values)
-    ? { task: "labels", locale: options.locale, column }
+    _areValuesShortEnough(values) &&
+    _fitsModel(request, options.model)
+    ? request
     : undefined;
 }
 
 function makeMatchesRequestFromProposal(
-  options: Readonly<{ proposal: DictionaryProposal.T; locale: string }>,
+  options: Readonly<{
+    proposal: DictionaryProposal.T;
+    locale: string;
+    model: DictionarySuggestionModel;
+  }>,
 ): DictionarySuggestionsRequest | undefined {
   // A meaning match only ever joins columns of two different datasets.
   if (DictionaryProposal.getDatasetIds(options.proposal).length < 2) {
@@ -243,32 +255,82 @@ function makeMatchesRequestFromProposal(
             : [],
       };
     });
-  return _fitMatchesRequest({
-    task: "matches",
-    locale: options.locale,
-    columns,
-  });
+  return _fitMatchesRequest(
+    { task: "matches", locale: options.locale, columns },
+    options.model,
+  );
 }
 
 /**
- * The request with its last columns dropped until its consent text fits
- * `DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH`, which the route enforces.
- * Undefined when fewer than two columns are left.
+ * Whether one request fits where it will run: the route's cap on the consent
+ * text online, or the offline model's context window on device. The window
+ * has to hold the prompt, the request, and the reply, so the prompt and the
+ * request are sized at a pessimistic three characters per token and the
+ * reply at its budget.
+ */
+function _fitsModel(
+  request: Readonly<DictionarySuggestionsRequest>,
+  model: DictionarySuggestionModel,
+): boolean {
+  if (model !== "on_device") {
+    return (
+      stringifyDictionarySuggestionsRequest(request).length <=
+      DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH
+    );
+  }
+  const characters = buildDictionarySuggestionsMessages(request).reduce(
+    (total, message) => {
+      return total + message.content.length;
+    },
+    0,
+  );
+  return (
+    Math.ceil(characters / 3) + getDictionarySuggestionsMaxTokens(request) <=
+    OFFLINE_CHAT_CONTEXT_WINDOW_SIZE
+  );
+}
+
+/** The matches request with no column carrying more than `limit` codes. */
+function _capMatchValues(
+  request: Extract<DictionarySuggestionsRequest, { task: "matches" }>,
+  limit: number,
+): Extract<DictionarySuggestionsRequest, { task: "matches" }> {
+  return {
+    ...request,
+    columns: request.columns.map((column) => {
+      return { ...column, values: column.values.slice(0, limit) };
+    }),
+  };
+}
+
+/**
+ * The request cut down until it fits its model. On device, codes go first,
+ * one fewer per column at a time, since the columns' names carry the match,
+ * and then columns. Online, only the last columns are dropped. Undefined
+ * when fewer than two columns are left.
  */
 function _fitMatchesRequest(
   request: Extract<DictionarySuggestionsRequest, { task: "matches" }>,
+  model: DictionarySuggestionModel,
 ): DictionarySuggestionsRequest | undefined {
   if (request.columns.length < 2) {
     return undefined;
   }
-  const length = stringifyDictionarySuggestionsRequest(request).length;
-  if (length <= DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH) {
+  if (_fitsModel(request, model)) {
     return request;
   }
-  return _fitMatchesRequest({
-    ...request,
-    columns: request.columns.slice(0, -1),
-  });
+  const mostValues = Math.max(
+    ...request.columns.map((column) => {
+      return column.values.length;
+    }),
+  );
+  if (model === "on_device" && mostValues > 0) {
+    return _fitMatchesRequest(_capMatchValues(request, mostValues - 1), model);
+  }
+  return _fitMatchesRequest(
+    { ...request, columns: request.columns.slice(0, -1) },
+    model,
+  );
 }
 
 /**
@@ -298,13 +360,16 @@ export const DictionarySuggestions = {
 
   /**
    * The request for one code list's labels. Undefined when the list's
-   * columns look like they identify people, so their values stay here.
+   * columns look like they identify people, so their values stay here, or
+   * when it cannot fit where it will run: codes are never cut, so on device
+   * a long list asks for nothing.
    */
   makeLabelsRequestFromCodeList,
 
   /**
    * The request for meaning matches across a proposal's entries. Undefined
    * when it holds fewer than two datasets, where no match could apply.
+   * Cut to fit the model that will answer, codes first on device.
    */
   makeMatchesRequestFromProposal,
 };

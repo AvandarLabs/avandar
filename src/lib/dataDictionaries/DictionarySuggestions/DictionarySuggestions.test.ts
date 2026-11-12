@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  buildDictionarySuggestionsMessages,
   DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH,
   DictionarySuggestionsRequestSchema,
   getDictionarySuggestionsMaxTokens,
@@ -9,6 +10,8 @@ import { uuid } from "$/lib/uuid";
 import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import { OFFLINE_CHAT_CONTEXT_WINDOW_SIZE } from "@/stores/OfflineChatEngineStore/createLocalModelRuntime/offlineChatContextWindow";
+import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -269,6 +272,7 @@ describe("DictionarySuggestions requests", () => {
       proposal,
       codeList: _firstCodeList(proposal),
       locale: "en",
+      model: "online",
     });
     expect(request).toEqual({
       task: "labels",
@@ -291,6 +295,7 @@ describe("DictionarySuggestions requests", () => {
         proposal,
         codeList: _firstCodeList(proposal),
         locale: "en",
+        model: "online",
       }),
     ).toBeUndefined();
   });
@@ -304,6 +309,7 @@ describe("DictionarySuggestions requests", () => {
       DictionarySuggestions.makeMatchesRequestFromProposal({
         proposal: single,
         locale: "en",
+        model: "online",
       }),
     ).toBeUndefined();
   });
@@ -317,6 +323,7 @@ describe("DictionarySuggestions requests", () => {
     const request = DictionarySuggestions.makeMatchesRequestFromProposal({
       proposal,
       locale: "en",
+      model: "online",
     });
     const valuesByName =
       request?.task === "matches"
@@ -344,6 +351,7 @@ describe("DictionarySuggestions requests", () => {
     const request = DictionarySuggestions.makeMatchesRequestFromProposal({
       proposal: DictionaryProposal.fromColumnProfiles(profiles),
       locale: "en",
+      model: "online",
     });
     expect(
       request && DictionarySuggestionsRequestSchema.safeParse(request).success,
@@ -359,6 +367,7 @@ describe("DictionarySuggestions requests", () => {
     const request = DictionarySuggestions.makeMatchesRequestFromProposal({
       proposal,
       locale: "en",
+      model: "online",
     });
     expect(
       request && DictionarySuggestionsRequestSchema.safeParse(request).success,
@@ -389,6 +398,7 @@ describe("DictionarySuggestions requests", () => {
         proposal,
         codeList: _firstCodeList(proposal),
         locale: "en",
+        model: "online",
       }),
     ).toBeUndefined();
   });
@@ -413,11 +423,96 @@ describe("DictionarySuggestions requests", () => {
     const request = DictionarySuggestions.makeMatchesRequestFromProposal({
       proposal,
       locale: "en",
+      model: "online",
     });
     const sentValues =
       request?.task === "matches"
         ? request.columns[0]?.values
         : ["not a matches request"];
     expect(sentValues).toEqual([]);
+  });
+});
+
+/** A pessimistic estimate: three characters per token, plus the reply. */
+function _estimateOnDeviceTokens(
+  request: Readonly<DictionarySuggestionsRequest>,
+): number {
+  const characters = buildDictionarySuggestionsMessages(request).reduce(
+    (total, message) => {
+      return total + message.content.length;
+    },
+    0,
+  );
+  return Math.ceil(characters / 3) + getDictionarySuggestionsMaxTokens(request);
+}
+
+describe("DictionarySuggestions requests on the offline model", () => {
+  it("drops codes before columns so a matches request fits the context window", () => {
+    const profiles = Array.from({ length: 60 }, (_item, index) => {
+      const codes = Array.from({ length: 12 }, (_code, codeIndex) => {
+        return `${"x".repeat(30)}_${index}_${codeIndex}`;
+      });
+      return _column(
+        `coded_column_number_${index}`,
+        codes,
+        index % 2 === 0 ? BRONX_ID : ERIE_ID,
+      );
+    });
+    const proposal = DictionaryProposal.fromColumnProfiles(profiles);
+    const online = DictionarySuggestions.makeMatchesRequestFromProposal({
+      proposal,
+      locale: "en",
+      model: "online",
+    });
+    const onDevice = DictionarySuggestions.makeMatchesRequestFromProposal({
+      proposal,
+      locale: "en",
+      model: "on_device",
+    });
+    expect(online && _estimateOnDeviceTokens(online)).toBeGreaterThan(
+      OFFLINE_CHAT_CONTEXT_WINDOW_SIZE,
+    );
+    expect(onDevice && _estimateOnDeviceTokens(onDevice)).toBeLessThanOrEqual(
+      OFFLINE_CHAT_CONTEXT_WINDOW_SIZE,
+    );
+    expect(onDevice?.task === "matches" && onDevice.columns).toHaveLength(60);
+  });
+
+  it("asks for no labels when the list cannot fit the context window", () => {
+    const seed = DictionaryProposal.fromColumnProfiles([
+      _column("status_0", ["Y", "N"]),
+    ]);
+    // One entry that goes by 50 other names of 190 characters each.
+    const columns = Array.from({ length: 51 }, (_item, index) => {
+      return _column(
+        `status_${index}_${"n".repeat(180)}`,
+        ["Y", "N"],
+        uuid<Dataset.Id>(),
+      );
+    });
+    const proposal = {
+      ...seed,
+      entries: [{ ...seed.entries[0]!, columns }],
+    };
+    // A code list of 50 codes, 150 characters each.
+    const codeList = {
+      ..._firstCodeList(proposal),
+      values: Array.from({ length: 50 }, (_code, index) => {
+        return { value: `${"c".repeat(150)}_${index}`, rowCount: 1 };
+      }),
+    } as DictionaryProposal.CodeList;
+    const options = { proposal, codeList, locale: "en" };
+    expect(
+      DictionarySuggestions.makeLabelsRequestFromCodeList({
+        ...options,
+        model: "online",
+      }),
+    ).toBeDefined();
+    expect(
+      DictionarySuggestions.makeLabelsRequestFromCodeList({
+        ...options,
+        model: "on_device",
+      }),
+    ).toBeUndefined();
   });
 });

@@ -76,6 +76,8 @@ async function _requestOnline(
  */
 export function useDictionarySuggestions(options: Readonly<ConsentOptions>): {
   availability: DictionarySuggestionAvailability;
+  /** The model a request is cut to fit, whatever the user's consent. */
+  model: DictionarySuggestionModel;
   requestReply: RequestSuggestionReply;
 } {
   const workspace = useCurrentWorkspace();
@@ -91,6 +93,7 @@ export function useDictionarySuggestions(options: Readonly<ConsentOptions>): {
   const isDeclined = model === "online" && options.consent === "declined";
   return {
     availability: isDeclined ? "declined" : model,
+    model,
     requestReply: (request) => {
       if (model === "on_device") {
         return DictionarySuggestions.requestReply({

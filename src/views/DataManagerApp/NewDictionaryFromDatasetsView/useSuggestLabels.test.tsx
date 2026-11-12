@@ -58,7 +58,12 @@ function _render(requestReply: () => Promise<string | undefined>) {
   const dispatch = vi.fn();
   const rendered = renderHook(
     () => {
-      return useSuggestLabels({ proposal: PROPOSAL, requestReply, dispatch });
+      return useSuggestLabels({
+        proposal: PROPOSAL,
+        model: "online",
+        requestReply,
+        dispatch,
+      });
     },
     { wrapper: _makeWrapper() },
   );

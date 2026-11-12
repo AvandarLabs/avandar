@@ -107,6 +107,7 @@ function useReadWithMatches(
   }, [state]);
   const matches = useMeaningMatches({
     requestReply: suggestions.requestReply,
+    model: suggestions.model,
     onFound: (found, proposal) => {
       if (!isMountedRef.current) {
         return;
@@ -224,6 +225,7 @@ export function useNewDictionaryFlow(
   useReadOriginDataset({ state, dispatch, sources, read: reading.read });
   const labels = useSuggestLabels({
     proposal: state.proposal,
+    model: suggestions.model,
     requestReply: suggestions.requestReply,
     dispatch,
   });
