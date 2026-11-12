@@ -31,16 +31,24 @@ export function NewDictionaryFlowView({
   );
   const sources = useNewDictionarySources();
   const flow = useNewDictionaryFlow({ state, dispatch, sources });
+  const originDataset = sources.datasets.find((dataset) => {
+    return dataset.id === originDatasetId;
+  });
+  // While datasets load, Cancel still heads for the dataset. Once they have
+  // loaded without it, the dataset is gone, so Cancel goes to Data Sources.
+  const isOriginAvailable = sources.isLoading || originDataset !== undefined;
+  const cancelDatasetId = isOriginAvailable ? originDatasetId : undefined;
+  // Undefined until the dataset is found, never an empty name.
   const originDatasetName = state.originDatasetId
-    ? (sources.datasets.find((dataset) => {
-        return dataset.id === state.originDatasetId;
-      })?.name ?? "")
+    ? originDataset?.name
     : undefined;
 
   return (
     <AppView>
       <NewDictionaryHeader
-        cancelDatasetId={originDatasetId}
+        cancelDatasetId={cancelDatasetId}
+        cancelDatasetName={originDataset?.name}
+        isFromDataset={state.originDatasetId !== undefined}
         originDatasetName={originDatasetName}
       />
       <NewDictionaryStepper state={state} dispatch={dispatch} />
