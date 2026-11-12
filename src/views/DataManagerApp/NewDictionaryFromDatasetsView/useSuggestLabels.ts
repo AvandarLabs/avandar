@@ -48,7 +48,9 @@ async function _requestLabelSuggestions(
  * for the entry using it, and fills them in as suggestions. Used by the
  * Label values step's Suggest labels button. When the user declines to
  * send the request, nothing is filled in and nothing is shown: the Label
- * values pane already says suggestions are off.
+ * values pane already says suggestions are off. `canSuggestLabels` lets
+ * that step hide or explain the button for a list that cannot be sent,
+ * instead of a failed request.
  */
 export function useSuggestLabels(
   options: Readonly<{
@@ -59,6 +61,12 @@ export function useSuggestLabels(
   }>,
 ): {
   suggestLabels: (codeList: DictionaryProposal.CodeList) => void;
+  /**
+   * Whether a request can be made for this list at all. It cannot when a
+   * column of the list looks like it identifies people, when a code is too
+   * long to send, or when the list is too long for the offline model.
+   */
+  canSuggestLabels: (codeList: DictionaryProposal.CodeList) => boolean;
   suggestingCodeListKey: string | undefined;
 } {
   const { t, i18n } = useLingui();
@@ -93,6 +101,17 @@ export function useSuggestLabels(
   });
   return {
     suggestLabels,
+    canSuggestLabels: (codeList) => {
+      return (
+        options.proposal !== undefined &&
+        DictionarySuggestions.makeLabelsRequestFromCodeList({
+          proposal: options.proposal,
+          codeList,
+          locale: i18n.locale,
+          model: options.model,
+        }) !== undefined
+      );
+    },
     suggestingCodeListKey: result.isPending ? result.variables?.key : undefined,
   };
 }

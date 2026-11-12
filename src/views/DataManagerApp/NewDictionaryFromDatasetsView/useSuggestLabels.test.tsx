@@ -128,4 +128,16 @@ describe("useSuggestLabels", () => {
     expect(dispatch).not.toHaveBeenCalled();
     expect(notifyErrorMock).not.toHaveBeenCalled();
   });
+
+  it("says a code list cannot be sent when no request can be made for it", () => {
+    const { result } = _render(() => {
+      return Promise.resolve(undefined);
+    });
+    makeRequestMock.mockReturnValueOnce(undefined);
+    expect(result.current.canSuggestLabels(CODE_LIST)).toBe(false);
+    expect(result.current.canSuggestLabels(CODE_LIST)).toBe(true);
+    expect(makeRequestMock).toHaveBeenCalledWith(
+      expect.objectContaining({ proposal: PROPOSAL, codeList: CODE_LIST }),
+    );
+  });
 });

@@ -30,6 +30,7 @@ export type NewDictionaryFlow = {
   isReading: boolean;
   meaningMatchStatus: MeaningMatchStatus;
   suggestLabels: (codeList: DictionaryProposal.CodeList) => void;
+  canSuggestLabels: (codeList: DictionaryProposal.CodeList) => boolean;
   suggestingCodeListKey: string | undefined;
   createDictionary: () => void;
   isCreating: boolean;
@@ -243,6 +244,7 @@ export function useNewDictionaryFlow(
     isReading: reading.isReading,
     meaningMatchStatus: reading.meaningMatchStatus,
     suggestLabels: labels.suggestLabels,
+    canSuggestLabels: labels.canSuggestLabels,
     suggestingCodeListKey: labels.suggestingCodeListKey,
     createDictionary: _makeCreateDictionary({
       state,
