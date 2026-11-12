@@ -1,0 +1,13 @@
+/*
+ * Sticks to the bottom of the view body while there are unsaved edits. The
+ * opaque background and top hairline keep the table behind it from
+ * reading through.
+ */
+.dataDictionarySaveBar {
+  background-color: var(--ava-surface-raised);
+  border-top: 1px solid var(--ava-border-default);
+  bottom: 0;
+  padding-block: var(--mantine-spacing-sm);
+  position: sticky;
+  z-index: 1;
+}
