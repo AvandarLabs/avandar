@@ -1,0 +1,64 @@
+import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
+import { ColumnProfileSql } from "@/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql";
+import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type {
+  ColumnValueRow,
+  ProfiledColumn,
+} from "@/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql";
+
+/**
+ * Profiles one dataset's columns on this device through the QETL query
+ * layer, so it works for any dataset the workspace can query, offline-only
+ * ones included. Rows stay in DuckDB; only counts, ranges, and the values
+ * of short columns come back. Used when a dictionary is learned from
+ * datasets.
+ */
+export async function profileDatasetColumns(
+  options: Readonly<{
+    workspaceId: Workspace.Id;
+    dataset: Readonly<{ id: Dataset.Id; name: string }>;
+    columns: readonly ProfiledColumn[];
+  }>,
+): Promise<ColumnProfile.T[]> {
+  const { workspaceId, dataset, columns } = options;
+  if (columns.length === 0) {
+    return [];
+  }
+  const summary = await WorkspaceQuerySession.runQuery({
+    workspaceId,
+    rawSql: ColumnProfileSql.buildSummarySql({
+      datasetId: dataset.id,
+      columns,
+    }),
+  });
+  const summaryRow = summary.data[0] ?? {};
+  const listedColumnIndexes = ColumnProfileSql.getListedColumnIndexes({
+    columns,
+    summaryRow,
+  });
+  const listedColumns = [...listedColumnIndexes].flatMap((index) => {
+    const column = columns[index];
+    return column ? [{ index, name: column.name }] : [];
+  });
+  const valueRows =
+    listedColumns.length === 0
+      ? []
+      : (
+          await WorkspaceQuerySession.runQuery<ColumnValueRow>({
+            workspaceId,
+            rawSql: ColumnProfileSql.buildValuesSql({
+              datasetId: dataset.id,
+              columns: listedColumns,
+            }),
+          })
+        ).data;
+  return ColumnProfileSql.makeColumnProfilesFromRows({
+    dataset,
+    columns,
+    summaryRow,
+    valueRows,
+    listedColumnIndexes,
+  });
+}
