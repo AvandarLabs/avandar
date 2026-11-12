@@ -59,6 +59,8 @@ const {
   stringifyDictionarySuggestionsRequest,
 } =
   await import("$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts");
+const { OpenRouterApiError } =
+  await import("@sbfn/chat/PostChatMessages/openRouter/OpenRouterApiError.ts");
 const { hashTextPayload } =
   await import("$/utils/privacy/sessionSecretUtils.ts");
 
@@ -198,5 +200,25 @@ describe("PostDictionarySuggestions", () => {
       message: expect.stringMatching(/^SUGGESTIONS_REQUEST_TOO_LARGE: /),
     });
     expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
+  });
+
+  it("answers a provider failure with its status only, never its error text", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    sendOpenRouterRequestMock.mockRejectedValue(
+      new OpenRouterApiError(429, "bad request echoing the code 1 of GENDER"),
+    );
+    const failure = await _callRoute("dictionary-suggestions-v1").catch(
+      (error: unknown) => {
+        return error;
+      },
+    );
+    expect(failure).toMatchObject({
+      httpCode: 502,
+      message: expect.stringContaining("429"),
+    });
+    expect(String((failure as Error).message)).not.toContain("GENDER");
+    expect(JSON.stringify(errorSpy.mock.calls)).not.toContain("GENDER");
+    expect(JSON.stringify(errorSpy.mock.calls)).toContain("429");
+    errorSpy.mockRestore();
   });
 });

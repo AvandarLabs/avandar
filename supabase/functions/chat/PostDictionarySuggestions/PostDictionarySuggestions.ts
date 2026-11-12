@@ -1,8 +1,13 @@
 import { assertMeetsMinAppRole } from "@sbfn/_shared/assertMeetsMinAppRole.ts";
 import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
-import { BAD_REQUEST, PAYLOAD_TOO_LARGE } from "@sbfn/_shared/httpCodes.ts";
+import {
+  BAD_GATEWAY,
+  BAD_REQUEST,
+  PAYLOAD_TOO_LARGE,
+} from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { verifyAckToken } from "@sbfn/_shared/privacy/verifyAckToken.ts";
+import { OpenRouterApiError } from "@sbfn/chat/PostChatMessages/openRouter/OpenRouterApiError.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import { z } from "zod";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster.ts";
@@ -74,6 +79,52 @@ async function _assertConsented(
 }
 
 /**
+ * Sends the request to the model. A provider failure is logged and answered
+ * with its status alone: the provider's error text can echo the prompt, which
+ * holds the user's column names and codes.
+ */
+async function _askModel(
+  options: Readonly<{
+    request: DictionarySuggestionsRequest;
+    apiKey: string;
+  }>,
+): Promise<string> {
+  const { request } = options;
+  try {
+    const { text } = await sendOpenRouterRequest({
+      requestBody: {
+        model: DATA_AGENT_MODEL_ROSTER.primary.openRouterId,
+        messages: buildDictionarySuggestionsMessages(request),
+        max_tokens: getDictionarySuggestionsMaxTokens(request),
+        temperature: 0,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: `dictionary_${request.task}`,
+            schema: getDictionarySuggestionsJsonSchema(request.task),
+            strict: true,
+          },
+        },
+      },
+      apiKey: options.apiKey,
+      referer: getAppURL(),
+    });
+    return text;
+  } catch (error) {
+    if (error instanceof OpenRouterApiError) {
+      console.error(
+        `Dictionary suggestions: the model provider answered with status ${error.status}`,
+      );
+      throw new AvaHTTPError(
+        `SUGGESTIONS_PROVIDER_FAILED: the model provider answered with status ${error.status}`,
+        BAD_GATEWAY,
+      );
+    }
+    throw error;
+  }
+}
+
+/**
  * Suggests labels for one coded column, or the columns that record the same
  * thing, for a Data Sources editor learning a dictionary from datasets. The
  * browser sends column names, kinds, and the codes of short coded columns,
@@ -115,23 +166,6 @@ export const PostDictionarySuggestions = POST({
       workspaceId: pathParams.workspaceId,
       userId: user.id,
     });
-    const { text } = await sendOpenRouterRequest({
-      requestBody: {
-        model: DATA_AGENT_MODEL_ROSTER.primary.openRouterId,
-        messages: buildDictionarySuggestionsMessages(request),
-        max_tokens: getDictionarySuggestionsMaxTokens(request),
-        temperature: 0,
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: `dictionary_${request.task}`,
-            schema: getDictionarySuggestionsJsonSchema(request.task),
-            strict: true,
-          },
-        },
-      },
-      apiKey: openRouterApiKey,
-      referer: getAppURL(),
-    });
+    const text = await _askModel({ request, apiKey: openRouterApiKey });
     return { reply: text };
   });
