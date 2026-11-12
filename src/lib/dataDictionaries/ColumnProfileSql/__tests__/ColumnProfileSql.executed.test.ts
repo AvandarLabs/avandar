@@ -92,4 +92,28 @@ describe("ColumnProfileSql on a real DuckDB", () => {
       ]);
     });
   });
+
+  it("reads the date share from a sample while counting every row", async () => {
+    await withDuckDb(async (connection) => {
+      await connection.run(`
+        CREATE TABLE "${DATASET.id}" AS
+        SELECT strftime(DATE '2000-01-01' + CAST(i % 5000 AS INTEGER), '%Y-%m-%d') AS onset
+        FROM range(0, 30000) AS t(i)
+      `);
+      const columns: ProfiledColumn[] = [
+        { name: "onset", dataType: "varchar" },
+      ];
+      const summary = await connection.runAndReadAll(
+        ColumnProfileSql.buildSummarySql({ datasetId: DATASET.id, columns }),
+      );
+      const [profile] = ColumnProfileSql.makeColumnProfilesFromRows({
+        dataset: DATASET,
+        columns,
+        summaryRow: summary.getRowObjects()[0] ?? {},
+        valueRows: [],
+        listedColumnIndexes: new Set(),
+      });
+      expect(profile).toMatchObject({ rowCount: 30000, dateShare: 1 });
+    });
+  });
 });

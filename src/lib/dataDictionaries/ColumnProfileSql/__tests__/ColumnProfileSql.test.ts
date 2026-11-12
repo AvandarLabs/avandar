@@ -25,9 +25,35 @@ describe("ColumnProfileSql", () => {
       ],
     });
     expect(sql).toContain('try_strptime("onset"');
+    expect(sql).toContain('count("onset") AS "sampled_0"');
     expect(sql).toContain('CAST(min("age") AS DOUBLE) AS "min_1"');
     expect(sql).not.toContain('"dates_2"');
     expect(sql).not.toContain('"min_2"');
+  });
+
+  it("takes the date share from a sample and keeps the other counts exact", () => {
+    const sql = ColumnProfileSql.buildSummarySql({
+      datasetId: DATASET.id,
+      columns: [
+        { name: "onset", dataType: "varchar" },
+        { name: "age", dataType: "bigint" },
+      ],
+    });
+    expect(sql).toContain("USING SAMPLE 10000 ROWS");
+    const [exactPart = "", samplePart = ""] = sql.split("CROSS JOIN");
+    expect(samplePart).toContain("try_strptime");
+    expect(samplePart).toContain('FROM "sample"');
+    expect(exactPart).not.toContain("try_strptime");
+    expect(exactPart).toContain('count(*) AS "row_count"');
+    expect(exactPart).toContain('CAST(min("age") AS DOUBLE)');
+  });
+
+  it("omits the sample when no column is text", () => {
+    const sql = ColumnProfileSql.buildSummarySql({
+      datasetId: DATASET.id,
+      columns: [{ name: "age", dataType: "bigint" }],
+    });
+    expect(sql).not.toContain("SAMPLE");
   });
 
   it("lists only short columns of a type that can hold codes", () => {
@@ -65,7 +91,8 @@ describe("ColumnProfileSql", () => {
         row_count: 10n,
         non_null_0: 8n,
         distinct_0: 8n,
-        dates_0: 6n,
+        sampled_0: 4n,
+        dates_0: 3n,
       },
       valueRows: [],
       listedColumnIndexes: new Set(),

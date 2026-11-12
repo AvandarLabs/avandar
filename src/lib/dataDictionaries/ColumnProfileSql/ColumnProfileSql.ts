@@ -32,17 +32,19 @@ const APPROXIMATE_COUNT_MARGIN = 10;
 const DATE_FORMATS_SQL =
   "['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d', '%m-%d-%Y', '%d-%m-%Y']";
 
+/**
+ * How many rows the date check reads. Trying six formats on every row of a
+ * large text column is the slowest part of profiling, and a share of dates
+ * does not need every row.
+ */
+const DATE_SAMPLE_ROWS = 10_000;
+
 function _buildSummaryParts(column: ProfiledColumn, index: number): string[] {
   const name = quoteSqlIdentifier(column.name);
   const parts = [
     `count(${name}) AS "non_null_${index}"`,
     `approx_count_distinct(${name}) AS "distinct_${index}"`,
   ];
-  if (column.dataType === "varchar") {
-    parts.push(
-      `count(try_strptime(${name}, ${DATE_FORMATS_SQL})) AS "dates_${index}"`,
-    );
-  }
   if (column.dataType === "bigint" || column.dataType === "double") {
     parts.push(
       `CAST(min(${name}) AS DOUBLE) AS "min_${index}"`,
@@ -52,17 +54,40 @@ function _buildSummaryParts(column: ProfiledColumn, index: number): string[] {
   return parts;
 }
 
+/** The date aggregates of one text column, read from the sample. */
+function _buildSampleParts(column: ProfiledColumn, index: number): string[] {
+  if (column.dataType !== "varchar") {
+    return [];
+  }
+  const name = quoteSqlIdentifier(column.name);
+  return [
+    `count(${name}) AS "sampled_${index}"`,
+    `count(try_strptime(${name}, ${DATE_FORMATS_SQL})) AS "dates_${index}"`,
+  ];
+}
+
 function buildSummarySql(
   options: Readonly<{
     datasetId: Dataset.Id;
     columns: readonly ProfiledColumn[];
   }>,
 ): string {
-  const parts = [
+  const table = quoteSqlIdentifier(options.datasetId);
+  const exactParts = [
     'count(*) AS "row_count"',
     ...options.columns.flatMap(_buildSummaryParts),
   ];
-  return `SELECT ${parts.join(", ")} FROM ${quoteSqlIdentifier(options.datasetId)}`;
+  const exactSql = `SELECT ${exactParts.join(", ")} FROM ${table}`;
+  const sampleParts = options.columns.flatMap(_buildSampleParts);
+  if (sampleParts.length === 0) {
+    return exactSql;
+  }
+  // The counts, distinct counts, and ranges read every row. Only the date
+  // aggregates read the sample, joined onto the one exact row.
+  return [
+    `WITH "sample" AS (SELECT * FROM ${table} USING SAMPLE ${DATE_SAMPLE_ROWS} ROWS)`,
+    `SELECT * FROM (${exactSql}) CROSS JOIN (SELECT ${sampleParts.join(", ")} FROM "sample")`,
+  ].join(" ");
 }
 
 function buildValuesSql(
@@ -137,6 +162,7 @@ function makeColumnProfilesFromRows(
         : undefined;
     const nonNullCount = _toNumber(summaryRow[`non_null_${index}`]);
     const dates = _toOptionalNumber(summaryRow[`dates_${index}`]);
+    const sampledCount = _toNumber(summaryRow[`sampled_${index}`]);
     const min = _toOptionalNumber(summaryRow[`min_${index}`]);
     const max = _toOptionalNumber(summaryRow[`max_${index}`]);
     return {
@@ -151,9 +177,9 @@ function makeColumnProfilesFromRows(
         : _toNumber(summaryRow[`distinct_${index}`]),
       values,
       dateShare:
-        dates === undefined || nonNullCount === 0
+        dates === undefined || sampledCount === 0
           ? undefined
-          : dates / nonNullCount,
+          : dates / sampledCount,
       numberRange:
         min === undefined || max === undefined ? undefined : { min, max },
     };
@@ -163,9 +189,10 @@ function makeColumnProfilesFromRows(
 /**
  * The DuckDB SQL that profiles a dataset's columns, and the step that turns
  * its rows into `ColumnProfile`s. Two queries per dataset: a summary (rows,
- * values, approximate distinct counts, number ranges, and how many text
- * values read as dates), then the values and row counts of every column
- * short enough to be coded. Used by `profileDatasetColumns`.
+ * values, approximate distinct counts, number ranges, and the share of text
+ * values that read as dates, taken from a sample of rows), then the values
+ * and row counts of every column short enough to be coded. Used by
+ * `profileDatasetColumns`.
  */
 export const ColumnProfileSql = {
   /** One query for every column's counts and ranges. */
