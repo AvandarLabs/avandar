@@ -60,6 +60,12 @@ export type NewDictionaryAction =
   | { type: "go_to_step"; step: NewDictionaryStep }
   /** The dataset that opened the flow cannot be read. Start at Pick. */
   | { type: "origin_dataset_unavailable" }
+  /**
+   * Reading these datasets failed. Back to Pick with them still picked, so
+   * the user can try again. Ignored once a read has made the current
+   * proposal, and for datasets that are no longer the picked ones.
+   */
+  | { type: "read_failed"; datasetIds: readonly Dataset.Id[] }
   | { type: "learn_from_more" }
   | { type: "rename_entry"; entryKey: string; name: string }
   | { type: "set_entry_kind"; entryKey: string; kind: DataDictionaryEntry.Kind }
@@ -269,6 +275,15 @@ const HANDLERS: Handlers = {
       originDatasetId: undefined,
       pickedDatasetIds: [],
     };
+  },
+  read_failed: (state, action) => {
+    if (
+      state.readId !== undefined ||
+      !isSameDatasetSet(state.pickedDatasetIds, action.datasetIds)
+    ) {
+      return state;
+    }
+    return { ...state, step: "pick", originDatasetId: undefined };
   },
   learn_from_more: (state) => {
     return { ...state, step: "pick", originDatasetId: undefined };

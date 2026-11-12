@@ -334,4 +334,48 @@ describe("newDictionaryReducer", () => {
       pickedDatasetIds: [],
     });
   });
+
+  describe("read_failed", () => {
+    it("returns to Pick with the picked datasets kept when the first read fails", () => {
+      const state = newDictionaryReducer(
+        makeInitialNewDictionaryState(DATASET_ID),
+        { type: "read_failed", datasetIds: [DATASET_ID] },
+      );
+      expect(state).toMatchObject({
+        step: "pick",
+        originDatasetId: undefined,
+        pickedDatasetIds: [DATASET_ID],
+        proposal: undefined,
+      });
+    });
+
+    it("ignores a failure for datasets that are no longer the picked ones", () => {
+      const initial = makeInitialNewDictionaryState(DATASET_ID);
+      expect(
+        newDictionaryReducer(initial, {
+          type: "read_failed",
+          datasetIds: [uuid<Dataset.Id>()],
+        }),
+      ).toBe(initial);
+    });
+
+    it("ignores a failure once a read has produced the current proposal", () => {
+      const read = newDictionaryReducer(
+        makeInitialNewDictionaryState(DATASET_ID),
+        {
+          type: "datasets_read",
+          proposal: DictionaryProposal.fromColumnProfiles([]),
+          datasetIds: [DATASET_ID],
+          readId: uuid<ProposalReadId>(),
+          defaultName: "codes",
+        },
+      );
+      expect(
+        newDictionaryReducer(read, {
+          type: "read_failed",
+          datasetIds: [DATASET_ID],
+        }),
+      ).toBe(read);
+    });
+  });
 });

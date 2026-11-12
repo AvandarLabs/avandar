@@ -176,6 +176,16 @@ function useReadWithMatches(options: ReadOptions): {
         findMatches: matches.findMatches,
       });
     },
+    onFailed: (datasets) => {
+      if (isMountedRef.current) {
+        dispatch({
+          type: "read_failed",
+          datasetIds: datasets.map(({ dataset }) => {
+            return dataset.id;
+          }),
+        });
+      }
+    },
   });
   return { read, isReading, meaningMatchStatus: matches.status };
 }

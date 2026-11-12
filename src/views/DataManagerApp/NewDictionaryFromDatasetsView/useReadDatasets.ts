@@ -40,6 +40,8 @@ export function useReadDatasets(
       proposal: DictionaryProposal.T,
       datasets: readonly ReadableDataset[],
     ) => void;
+    /** Called with the datasets whose read failed, after the error toast. */
+    onFailed: (datasets: readonly ReadableDataset[]) => void;
   }>,
 ): [read: (datasets: readonly ReadableDataset[]) => void, isReading: boolean] {
   const workspace = useCurrentWorkspace();
@@ -64,10 +66,11 @@ export function useReadDatasets(
     onSuccess: (proposal, datasets) => {
       options.onRead(proposal, datasets);
     },
-    onError: () => {
+    onError: (_error, datasets) => {
       notifyError(
         t`Avandar could not read these datasets. Try again, or pick fewer datasets.`,
       );
+      options.onFailed(datasets);
     },
   });
   return [read, isReading];

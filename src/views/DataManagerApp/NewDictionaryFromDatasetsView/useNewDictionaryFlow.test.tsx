@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 
 type ReadOptions = {
   onRead: (proposal: DictionaryProposal.T, datasets: unknown[]) => void;
+  onFailed: (datasets: unknown[]) => void;
 };
 type MatchOptions = {
   onFound: (
@@ -282,5 +283,23 @@ describe("useNewDictionaryFlow", () => {
     });
     expect(mocks.readMock).not.toHaveBeenCalled();
     expect(mocks.notifyErrorMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends the flow back to Pick when reading the datasets fails", () => {
+    const { dispatch } = _render(_pickedState());
+    act(() => {
+      (mocks.readOptions as ReadOptions).onFailed([{ dataset: DATASET }]);
+    });
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "read_failed",
+      datasetIds: [DATASET_ID],
+    });
+  });
+
+  it("does nothing when a read fails after the flow was left", () => {
+    const { dispatch, unmount } = _render(_pickedState());
+    unmount();
+    (mocks.readOptions as ReadOptions).onFailed([{ dataset: DATASET }]);
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });
