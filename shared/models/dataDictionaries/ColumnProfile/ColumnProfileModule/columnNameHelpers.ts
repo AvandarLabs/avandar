@@ -84,6 +84,17 @@ export function getEntryNameFromColumnName(columnName: string): string {
   return words.length > 0 ? words.join("_") : columnName.trim();
 }
 
+/** How many leading characters, up to four, two words share. */
+function _getCommonPrefixLength(wordA: string, wordB: string): number {
+  const prefixEnd = wordA
+    .slice(0, 4)
+    .split("")
+    .findIndex((char, index) => {
+      return char !== wordB[index];
+    });
+  return prefixEnd < 0 ? Math.min(4, wordA.length, wordB.length) : prefixEnd;
+}
+
 /** Jaro-Winkler similarity of two words, from 0 to 1. */
 function _getJaroWinkler(wordA: string, wordB: string): number {
   if (wordA === wordB) {
@@ -126,14 +137,7 @@ function _getJaroWinkler(wordA: string, wordB: string): number {
       count / wordB.length +
       (count - halfTranspositions / 2) / count) /
     3;
-  const prefixEnd = wordA
-    .slice(0, 4)
-    .split("")
-    .findIndex((char, index) => {
-      return char !== wordB[index];
-    });
-  const prefix =
-    prefixEnd < 0 ? Math.min(4, wordA.length, wordB.length) : prefixEnd;
+  const prefix = _getCommonPrefixLength(wordA, wordB);
   return jaro + prefix * 0.1 * (1 - jaro);
 }
 
