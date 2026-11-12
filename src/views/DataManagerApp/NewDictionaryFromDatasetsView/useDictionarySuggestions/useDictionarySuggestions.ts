@@ -45,21 +45,26 @@ async function _requestOnline(
   if (consent === "declined") {
     return undefined;
   }
-  const ackToken = await DictionarySuggestions.approveRequest({
+  const approval = await DictionarySuggestions.approveRequest({
     request,
     workspaceId,
     userId: options.userId,
     isConsentConfirmed: consent === "approved",
   });
+  // Only a real no turns online suggestions off for the flow. A yes that
+  // left no token is kept as a yes, and the request fails to be retried.
   if (consent === "not_asked") {
-    options.onConsentDecided(ackToken !== undefined);
+    options.onConsentDecided(approval.type !== "declined");
   }
-  if (ackToken === undefined) {
+  if (approval.type === "declined") {
     return undefined;
+  }
+  if (approval.type === "ack_missing") {
+    throw new Error("The consent to send suggestions could not be confirmed");
   }
   return await DictionarySuggestions.requestReply({
     model: "online",
-    ackToken,
+    ackToken: approval.ackToken,
     workspaceId,
     request,
     post: APIClient.post,

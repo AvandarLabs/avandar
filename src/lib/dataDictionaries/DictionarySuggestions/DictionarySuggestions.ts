@@ -52,6 +52,16 @@ export type CompleteDictionarySuggestionsOnDevice = (request: {
   jsonSchema: object;
 }) => Promise<{ text: string }>;
 
+/**
+ * What the user's consent to send one request came to: an ack token the
+ * route checks, a real no, or a yes that left no token to send with (a
+ * technical failure, not a decision).
+ */
+export type DictionarySuggestionsApproval =
+  | { type: "approved"; ackToken: string }
+  | { type: "declined" }
+  | { type: "ack_missing" };
+
 // The words that keep a column's values here, and every cap on a request
 // (codes, code length, other names, columns, total length), come from the
 // shared prompt module, because the `chat` route refuses a request that
@@ -78,7 +88,7 @@ async function approveRequest(
     /** True once the user agreed to an earlier send in this flow. */
     isConsentConfirmed: boolean;
   }>,
-): Promise<string | undefined> {
+): Promise<DictionarySuggestionsApproval> {
   const { request } = options;
   const text = stringifyDictionarySuggestionsRequest(request);
   const columns =
@@ -96,7 +106,7 @@ async function approveRequest(
     explicitConsentRequired: !options.isConsentConfirmed,
   });
   if (!consent.approved) {
-    return undefined;
+    return { type: "declined" };
   }
   // Picking "Use suggestion" on a bias nudge rewrites the text, which would
   // change what was agreed to. Only the request as written counts as
@@ -106,9 +116,12 @@ async function approveRequest(
     if (consent.payload.text !== undefined) {
       await PendingAcks.consumeAckForText(consent.payload.text);
     }
-    return undefined;
+    return { type: "declined" };
   }
-  return await PendingAcks.consumeAckForText(text);
+  const ackToken = await PendingAcks.consumeAckForText(text);
+  return ackToken === undefined
+    ? { type: "ack_missing" }
+    : { type: "approved", ackToken };
 }
 
 async function requestReply(
@@ -347,8 +360,9 @@ export const DictionarySuggestions = {
 
   /**
    * Asks the user, through the chat's consent gate, to send one request
-   * online, and returns the ack token the route checks. Undefined when the
-   * user declines.
+   * online, and returns the ack token the route checks. A decline, or an
+   * edit that changes what was agreed to, is `declined`. A yes that left no
+   * token is `ack_missing`, which is a failure to retry, not a no.
    */
   approveRequest,
 

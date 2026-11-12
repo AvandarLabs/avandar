@@ -199,13 +199,13 @@ describe("DictionarySuggestions.approveRequest", () => {
   it("always asks on the first send and returns the consent's ack token", async () => {
     decideMock.mockResolvedValue({ approved: true, payload: { text: TEXT } });
     consumeAckMock.mockResolvedValue("ack-1");
-    const ackToken = await DictionarySuggestions.approveRequest({
+    const approval = await DictionarySuggestions.approveRequest({
       request: REQUEST,
       workspaceId: WORKSPACE_ID,
       userId: "user-id",
       isConsentConfirmed: false,
     });
-    expect(ackToken).toBe("ack-1");
+    expect(approval).toEqual({ type: "approved", ackToken: "ack-1" });
     expect(decideMock).toHaveBeenCalledWith({
       text: TEXT,
       values: ["1"],
@@ -239,26 +239,38 @@ describe("DictionarySuggestions.approveRequest", () => {
       payload: { text: rewritten },
     });
     consumeAckMock.mockResolvedValue("ack-for-rewrite");
-    const ackToken = await DictionarySuggestions.approveRequest({
+    const approval = await DictionarySuggestions.approveRequest({
       request: REQUEST,
       workspaceId: WORKSPACE_ID,
       userId: "user-id",
       isConsentConfirmed: false,
     });
-    expect(ackToken).toBeUndefined();
+    expect(approval).toEqual({ type: "declined" });
     expect(consumeAckMock).toHaveBeenCalledWith(rewritten);
   });
 
-  it("returns nothing when the user declines", async () => {
+  it("says declined when the user declines", async () => {
     decideMock.mockResolvedValue({ approved: false, reason: "cancelled" });
-    const ackToken = await DictionarySuggestions.approveRequest({
+    const approval = await DictionarySuggestions.approveRequest({
       request: REQUEST,
       workspaceId: WORKSPACE_ID,
       userId: "user-id",
       isConsentConfirmed: false,
     });
-    expect(ackToken).toBeUndefined();
+    expect(approval).toEqual({ type: "declined" });
     expect(consumeAckMock).not.toHaveBeenCalled();
+  });
+
+  it("tells an approval that left no ack token from a decline", async () => {
+    decideMock.mockResolvedValue({ approved: true, payload: { text: TEXT } });
+    consumeAckMock.mockResolvedValue(undefined);
+    const approval = await DictionarySuggestions.approveRequest({
+      request: REQUEST,
+      workspaceId: WORKSPACE_ID,
+      userId: "user-id",
+      isConsentConfirmed: false,
+    });
+    expect(approval).toEqual({ type: "ack_missing" });
   });
 });
 

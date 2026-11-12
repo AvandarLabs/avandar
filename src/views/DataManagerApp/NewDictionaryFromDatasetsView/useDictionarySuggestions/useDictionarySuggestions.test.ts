@@ -105,7 +105,10 @@ describe("useDictionarySuggestions", () => {
   });
 
   it("asks on the first online send, then sends with the ack token", async () => {
-    mocks.approveRequest.mockResolvedValue("ack-1");
+    mocks.approveRequest.mockResolvedValue({
+      type: "approved",
+      ackToken: "ack-1",
+    });
     const { suggestions, onConsentDecided } = _render("not_asked");
     await expect(suggestions.requestReply(REQUEST)).resolves.toBe("{}");
     expect(mocks.approveRequest).toHaveBeenCalledWith({
@@ -121,15 +124,26 @@ describe("useDictionarySuggestions", () => {
   });
 
   it("sends nothing and records the answer when the user declines", async () => {
-    mocks.approveRequest.mockResolvedValue(undefined);
+    mocks.approveRequest.mockResolvedValue({ type: "declined" });
     const { suggestions, onConsentDecided } = _render("not_asked");
     await expect(suggestions.requestReply(REQUEST)).resolves.toBeUndefined();
     expect(onConsentDecided).toHaveBeenCalledWith(false);
     expect(mocks.requestReply).not.toHaveBeenCalled();
   });
 
+  it("keeps the approval and fails the request when the consent left no ack token", async () => {
+    mocks.approveRequest.mockResolvedValue({ type: "ack_missing" });
+    const { suggestions, onConsentDecided } = _render("not_asked");
+    await expect(suggestions.requestReply(REQUEST)).rejects.toThrow();
+    expect(onConsentDecided).toHaveBeenCalledWith(true);
+    expect(mocks.requestReply).not.toHaveBeenCalled();
+  });
+
   it("stops forcing the prompt once agreed, and sends nothing once declined", async () => {
-    mocks.approveRequest.mockResolvedValue("ack-2");
+    mocks.approveRequest.mockResolvedValue({
+      type: "approved",
+      ackToken: "ack-2",
+    });
     const agreed = _render("approved");
     await agreed.suggestions.requestReply(REQUEST);
     expect(mocks.approveRequest).toHaveBeenCalledWith(
