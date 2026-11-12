@@ -1,0 +1,51 @@
+.codeListEditorList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * One value is a grid so the inputs line up across rows. When the list is
+ * unordered there is no handle, so the first track collapses to zero width.
+ */
+.codeListEditorRow {
+  align-items: center;
+  display: grid;
+  gap: var(--mantine-spacing-xs);
+  grid-template-columns:
+    auto 7rem auto minmax(8rem, 1fr)
+    minmax(8rem, 1fr) auto auto;
+}
+
+.codeListEditorRow[data-dragging="true"] {
+  opacity: 0.6;
+}
+
+.codeListEditorRowIssue {
+  grid-column: 2 / -1;
+}
+
+.codeListEditorCode {
+  font-variant-numeric: tabular-nums;
+}
+
+.codeListEditorArrow {
+  color: var(--mantine-color-neutral-5);
+}
+
+.codeListEditorHandle {
+  background: none;
+  border: 0;
+  border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-neutral-5);
+  cursor: grab;
+  display: inline-flex;
+  padding: var(--mantine-spacing-xxs);
+}
+
+.codeListEditorHandle:hover {
+  color: var(--mantine-color-neutral-8);
+}
