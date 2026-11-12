@@ -54,7 +54,10 @@ vi.stubGlobal("Deno", {
 
 const { PostDictionarySuggestions } =
   await import("@sbfn/chat/PostDictionarySuggestions/PostDictionarySuggestions.ts");
-const { stringifyDictionarySuggestionsRequest } =
+const {
+  getDictionarySuggestionsJsonSchema,
+  stringifyDictionarySuggestionsRequest,
+} =
   await import("$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts");
 const { hashTextPayload } =
   await import("$/utils/privacy/sessionSecretUtils.ts");
@@ -70,9 +73,12 @@ const REQUEST: DictionarySuggestionsRequest = {
   },
 };
 
-async function _callRoute(promptId: string): Promise<unknown> {
+async function _callRoute(
+  promptId: string,
+  request: unknown = REQUEST,
+): Promise<unknown> {
   return await PostDictionarySuggestions.state.action({
-    body: { request: REQUEST, ackToken: "ack-token" },
+    body: { request, ackToken: "ack-token" },
     pathParams: { workspaceId: "workspace-id", promptId },
     supabaseClient: {},
     user: { id: "user-id" },
@@ -113,7 +119,7 @@ describe("PostDictionarySuggestions", () => {
   it("refuses a request the user did not consent to, before calling the model", async () => {
     verifyAckTokenMock.mockResolvedValue({
       valid: false,
-      reason: "hash_mismatch",
+      reason: "payload_hash_mismatch",
     });
     await expect(_callRoute("dictionary-suggestions-v1")).rejects.toMatchObject(
       {
@@ -141,6 +147,56 @@ describe("PostDictionarySuggestions", () => {
         httpCode: 403,
       },
     );
+    expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
+  });
+
+  it("asks the model for a reply in the task's JSON schema", async () => {
+    await _callRoute("dictionary-suggestions-v1");
+    expect(sendOpenRouterRequestMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestBody: expect.objectContaining({
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "dictionary_labels",
+              schema: getDictionarySuggestionsJsonSchema("labels"),
+              strict: true,
+            },
+          },
+        }),
+      }),
+    );
+  });
+
+  it("refuses an invalid request with a 400 before calling the model", async () => {
+    const request = { ...REQUEST, column: { ...REQUEST.column, kind: "text" } };
+    await expect(
+      _callRoute("dictionary-suggestions-v1", request),
+    ).rejects.toMatchObject({
+      httpCode: 400,
+      message: expect.stringMatching(/^INVALID_SUGGESTIONS_REQUEST: /),
+    });
+    expect(verifyAckTokenMock).not.toHaveBeenCalled();
+    expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses a request too long to consent to with a 413", async () => {
+    const otherNames = Array.from({ length: 50 }, (_item, index) => {
+      return `a_long_other_column_label_number_${index}`;
+    });
+    const columns = Array.from({ length: 100 }, (_item, index) => {
+      return { ...REQUEST.column, name: `column_${index}`, otherNames };
+    });
+    await expect(
+      _callRoute("dictionary-suggestions-v1", {
+        task: "matches",
+        locale: "en",
+        columns,
+      }),
+    ).rejects.toMatchObject({
+      httpCode: 413,
+      message: expect.stringMatching(/^SUGGESTIONS_REQUEST_TOO_LARGE: /),
+    });
     expect(sendOpenRouterRequestMock).not.toHaveBeenCalled();
   });
 });
