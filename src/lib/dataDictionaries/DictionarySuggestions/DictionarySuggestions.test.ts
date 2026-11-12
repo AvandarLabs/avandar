@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH,
   DictionarySuggestionsRequestSchema,
+  getDictionarySuggestionsMaxTokens,
   stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { uuid } from "$/lib/uuid";
@@ -26,8 +28,9 @@ vi.mock("@/components/privacy/privacy-helpers/PendingAcks", () => {
   return { PendingAcks: { consumeAckForText: consumeAckMock } };
 });
 
-const BRONX_ID = uuid<Dataset.Id>();
-const ERIE_ID = uuid<Dataset.Id>();
+// Fixed, since the order proposals read datasets in can depend on their ids.
+const BRONX_ID = "00000000-0000-4000-8000-000000000001" as Dataset.Id;
+const ERIE_ID = "00000000-0000-4000-8000-000000000002" as Dataset.Id;
 
 function _column(
   columnName: string,
@@ -135,6 +138,30 @@ describe("DictionarySuggestions.requestReply", () => {
     );
   });
 
+  it("gives the offline model a labels budget that grows with the codes", async () => {
+    const completeOnDevice = vi
+      .fn()
+      .mockResolvedValue({ text: '{"labels":[]}' });
+    const codes = Array.from({ length: 50 }, (_item, index) => {
+      return String(index);
+    });
+    await DictionarySuggestions.requestReply({
+      model: "on_device",
+      workspaceId: "workspace-id",
+      request: { ...REQUEST, column: { ...REQUEST.column, values: codes } },
+      post: vi.fn(),
+      completeOnDevice,
+    });
+    expect(completeOnDevice).toHaveBeenCalledWith(
+      expect.objectContaining({
+        maxTokens: getDictionarySuggestionsMaxTokens({
+          ...REQUEST,
+          column: { ...REQUEST.column, values: codes },
+        }),
+      }),
+    );
+  });
+
   it("posts to the suggestions route online", async () => {
     const post = vi.fn().mockResolvedValue({ reply: '{"matches":[]}' });
     const reply = await DictionarySuggestions.requestReply({
@@ -200,6 +227,23 @@ describe("DictionarySuggestions.approveRequest", () => {
     expect(decideMock).toHaveBeenCalledWith(
       expect.objectContaining({ explicitConsentRequired: false }),
     );
+  });
+
+  it("treats a rewritten request as a decline and drops its ack", async () => {
+    const rewritten = `${TEXT} `;
+    decideMock.mockResolvedValue({
+      approved: true,
+      payload: { text: rewritten },
+    });
+    consumeAckMock.mockResolvedValue("ack-for-rewrite");
+    const ackToken = await DictionarySuggestions.approveRequest({
+      request: REQUEST,
+      workspaceId: WORKSPACE_ID,
+      userId: "user-id",
+      isConsentConfirmed: false,
+    });
+    expect(ackToken).toBeUndefined();
+    expect(consumeAckMock).toHaveBeenCalledWith(rewritten);
   });
 
   it("returns nothing when the user declines", async () => {
@@ -304,5 +348,76 @@ describe("DictionarySuggestions requests", () => {
     expect(
       request && DictionarySuggestionsRequestSchema.safeParse(request).success,
     ).toBe(true);
+  });
+
+  it("sends no codes for a column that has one over the schema's limit", () => {
+    const longCode = "x".repeat(DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH + 1);
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("vax_status", ["U", longCode]),
+      _column("mmr_status", ["0", "1"], ERIE_ID),
+    ]);
+    const request = DictionarySuggestions.makeMatchesRequestFromProposal({
+      proposal,
+      locale: "en",
+    });
+    expect(
+      request && DictionarySuggestionsRequestSchema.safeParse(request).success,
+    ).toBe(true);
+    const valuesByName =
+      request?.task === "matches"
+        ? Object.fromEntries(
+            request.columns.map((column) => {
+              return [column.name, column.values];
+            }),
+          )
+        : {};
+    expect(valuesByName).toEqual({
+      vax_status: [],
+      mmr_status: ["0", "1"],
+    });
+  });
+
+  it("asks for no labels when a code is over the schema's limit", () => {
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("vax_status", [
+        "U",
+        "x".repeat(DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH + 1),
+      ]),
+    ]);
+    expect(
+      DictionarySuggestions.makeLabelsRequestFromCodeList({
+        proposal,
+        codeList: _firstCodeList(proposal),
+        locale: "en",
+      }),
+    ).toBeUndefined();
+  });
+
+  it("keeps codes back when the identifying name is past the 50th other name", () => {
+    const seed = DictionaryProposal.fromColumnProfiles([
+      _column("status_0", ["Y", "N"]),
+      _column("case_id", undefined, ERIE_ID),
+    ]);
+    // One entry that goes by 51 other names, the last of them identifying.
+    const columns = Array.from({ length: 52 }, (_item, index) => {
+      return _column(
+        index === 51 ? "status_name" : `status_${index}`,
+        ["Y", "N"],
+        uuid<Dataset.Id>(),
+      );
+    });
+    const proposal = {
+      ...seed,
+      entries: [{ ...seed.entries[0]!, columns }, seed.entries[1]!],
+    };
+    const request = DictionarySuggestions.makeMatchesRequestFromProposal({
+      proposal,
+      locale: "en",
+    });
+    const sentValues =
+      request?.task === "matches"
+        ? request.columns[0]?.values
+        : ["not a matches request"];
+    expect(sentValues).toEqual([]);
   });
 });

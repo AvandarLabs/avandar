@@ -10,11 +10,26 @@ export const DICTIONARY_SUGGESTIONS_PROMPT_IDS = [
 /** The prompt version the browser asks for. */
 export const DICTIONARY_SUGGESTIONS_PROMPT_ID = "dictionary-suggestions-v1";
 
-/** The most tokens one suggestion reply may use, online or offline. */
-export const DICTIONARY_SUGGESTIONS_MAX_TOKENS = 800;
+const MATCHES_MAX_TOKENS = 800;
+const LABELS_BASE_TOKENS = 300;
+const LABELS_TOKENS_PER_VALUE = 40;
 
 const MAX_LABEL_LENGTH = 80;
 const MAX_DESCRIPTION_LENGTH = 300;
+
+/**
+ * The longest one code may be in a request. A longer code is a sign the
+ * column is not really coded, and the browser sends no codes for a column
+ * that has one, since cutting a code short would break mapping its label
+ * back.
+ */
+export const DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH = 200;
+
+/** The most other names one column may carry in a request. */
+export const DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES = 50;
+
+/** The most columns one matches request may carry. */
+export const DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS = 300;
 
 /** The most codes one column may carry in a matches request. */
 export const DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES = 12;
@@ -72,7 +87,9 @@ function _makeColumnSchema(maxValues: number) {
   return z
     .object({
       name: NameSchema,
-      otherNames: z.array(NameSchema).max(50),
+      otherNames: z
+        .array(NameSchema)
+        .max(DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES),
       kind: z.enum([
         "categorical",
         "ordered",
@@ -81,7 +98,9 @@ function _makeColumnSchema(maxValues: number) {
         "text",
         "identifier",
       ]),
-      values: z.array(z.string().max(200)).max(maxValues),
+      values: z
+        .array(z.string().max(DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH))
+        .max(maxValues),
     })
     .superRefine((column, context) => {
       if (column.values.length === 0) {
@@ -127,7 +146,7 @@ export const DictionarySuggestionsRequestSchema = z
       columns: z
         .array(_makeColumnSchema(DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES))
         .min(2)
-        .max(300),
+        .max(DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS),
     }),
   ])
   .superRefine((request, context) => {
@@ -276,6 +295,20 @@ export function stringifyDictionarySuggestionsRequest(
         locale: request.locale,
         columns: request.columns.map(_toColumnText),
       });
+}
+
+/**
+ * The most tokens a model may use to reply to one request, online or
+ * offline. A labels reply grows with the codes it labels, so its budget
+ * does too. A matches reply is a short list of pairs.
+ */
+export function getDictionarySuggestionsMaxTokens(
+  request: Readonly<DictionarySuggestionsRequest>,
+): number {
+  return request.task === "labels"
+    ? LABELS_BASE_TOKENS +
+        LABELS_TOKENS_PER_VALUE * request.column.values.length
+    : MATCHES_MAX_TOKENS;
 }
 
 /** Whether the `chat` edge function serves this suggestion prompt version. */

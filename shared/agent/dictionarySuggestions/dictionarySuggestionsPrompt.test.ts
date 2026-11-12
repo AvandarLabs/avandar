@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDictionarySuggestionsMessages,
+  DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
+  DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES,
   DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH,
+  DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH,
   DICTIONARY_SUGGESTIONS_PROMPT_ID,
   DictionarySuggestionsRequestSchema,
+  getDictionarySuggestionsMaxTokens,
   isDictionarySuggestionsPromptId,
   isDictionarySuggestionsRequestTooLarge,
   isIdentifyingColumnName,
@@ -224,5 +228,66 @@ describe("dictionarySuggestionsPrompt", () => {
     expect(parseDictionaryLabelSuggestions(reply, ["Y", "N"])?.labels).toEqual([
       { value: "Y", label: "Yes", isMissing: false },
     ]);
+  });
+
+  it("refuses a value one character over the schema's length limit", () => {
+    const atLimit = "x".repeat(DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH);
+    expect(_isLabelsRequestValid({ values: [atLimit] })).toBe(true);
+    expect(_isLabelsRequestValid({ values: [`${atLimit}x`] })).toBe(false);
+  });
+
+  it("refuses more other names and more match columns than the caps", () => {
+    const manyNames = Array.from(
+      { length: DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES + 1 },
+      (_item, index) => {
+        return `n${index}`;
+      },
+    );
+    expect(_isLabelsRequestValid({ otherNames: manyNames })).toBe(false);
+    const columns = Array.from(
+      { length: DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS + 1 },
+      (_item, index) => {
+        return { ...GENDER, name: `c${index}`, otherNames: [], values: [] };
+      },
+    );
+    expect(
+      DictionarySuggestionsRequestSchema.safeParse({
+        task: "matches",
+        locale: "en",
+        columns,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("gives a labels reply for 50 values a token budget that fits it", () => {
+    const column = { ...GENDER, values: _makeCodes(50) };
+    const reply = JSON.stringify({
+      labels: column.values.map((value) => {
+        return {
+          value,
+          label: "A typical label of forty characters.....",
+          isMissing: false,
+        };
+      }),
+      description: "d".repeat(300),
+    });
+    // A pessimistic estimate of three characters per token.
+    const estimatedTokens = Math.ceil(reply.length / 3);
+    const budget = getDictionarySuggestionsMaxTokens({
+      task: "labels",
+      locale: "en",
+      column,
+    });
+    expect(budget).toBeGreaterThanOrEqual(estimatedTokens);
+  });
+
+  it("keeps the small budget for a matches reply", () => {
+    expect(
+      getDictionarySuggestionsMaxTokens({
+        task: "matches",
+        locale: "en",
+        columns: [GENDER, { ...GENDER, name: "sex" }],
+      }),
+    ).toBe(800);
   });
 });

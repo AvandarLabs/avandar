@@ -1,11 +1,14 @@
 import { prop } from "@avandar/utils";
 import {
   buildDictionarySuggestionsMessages,
+  DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS,
   DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
+  DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES,
   DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH,
-  DICTIONARY_SUGGESTIONS_MAX_TOKENS,
+  DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH,
   DICTIONARY_SUGGESTIONS_PROMPT_ID,
   getDictionarySuggestionsJsonSchema,
+  getDictionarySuggestionsMaxTokens,
   isIdentifyingColumnName,
   stringifyDictionarySuggestionsRequest,
 } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
@@ -48,12 +51,10 @@ export type CompleteDictionarySuggestionsOnDevice = (request: {
   jsonSchema: object;
 }) => Promise<{ text: string }>;
 
-// The words that keep a column's values here, the codes per column of a
-// matches request, and the longest request all come from the shared
-// prompt module, because the `chat` route refuses a request that breaks
-// them. Never define a second list here.
-const MAX_OTHER_NAMES = 50;
-const MAX_MATCH_COLUMNS = 300;
+// The words that keep a column's values here, and every cap on a request
+// (codes, code length, other names, columns, total length), come from the
+// shared prompt module, because the `chat` route refuses a request that
+// breaks them. Never define a second list here.
 
 function getModelFromRuntimeState(
   options: Readonly<{
@@ -93,9 +94,17 @@ async function approveRequest(
     // The first send in a flow always asks, even when nothing looks personal.
     explicitConsentRequired: !options.isConsentConfirmed,
   });
-  // A rephrasing suggestion would change what was agreed to, so only the
-  // request as written counts as approved.
-  if (!consent.approved || consent.payload.text !== text) {
+  if (!consent.approved) {
+    return undefined;
+  }
+  // Picking "Use suggestion" on a bias nudge rewrites the text, which would
+  // change what was agreed to. Only the request as written counts as
+  // approved, so a rewrite is a decline. Its ack is minted for the rewritten
+  // text, so it is dropped here rather than left in the queue.
+  if (consent.payload.text !== text) {
+    if (consent.payload.text !== undefined) {
+      await PendingAcks.consumeAckForText(consent.payload.text);
+    }
     return undefined;
   }
   return await PendingAcks.consumeAckForText(text);
@@ -115,7 +124,7 @@ async function requestReply(
     const completion = await options.completeOnDevice({
       modelId: LocalChatModel.OFFLINE_BUNDLE.answer,
       messages: buildDictionarySuggestionsMessages(options.request),
-      maxTokens: DICTIONARY_SUGGESTIONS_MAX_TOKENS,
+      maxTokens: getDictionarySuggestionsMaxTokens(options.request),
       temperature: 0,
       jsonSchema: getDictionarySuggestionsJsonSchema(options.request.task),
     });
@@ -132,12 +141,25 @@ async function requestReply(
   return response.reply;
 }
 
-/** The route's rule: codes only on a coded column not named after a person. */
-function _canSendValues(column: Readonly<DictionarySuggestionColumn>): boolean {
+/**
+ * The route's rule: codes only on a coded column not named after a person.
+ * `allNames` is every name the column goes by, before any are cut to fit
+ * the request, so an identifying name past the cap still blocks its codes.
+ */
+function _canSendValues(
+  kind: DictionarySuggestionColumn["kind"],
+  allNames: readonly string[],
+): boolean {
   return (
-    DataDictionary.isCodedKind(column.kind) &&
-    ![column.name, ...column.otherNames].some(isIdentifyingColumnName)
+    DataDictionary.isCodedKind(kind) && !allNames.some(isIdentifyingColumnName)
   );
+}
+
+/** Whether every code fits the schema's length limit, uncut. */
+function _areValuesShortEnough(values: readonly string[]): boolean {
+  return values.every((value) => {
+    return value.length <= DICTIONARY_SUGGESTIONS_MAX_VALUE_LENGTH;
+  });
 }
 
 function _makeColumn(
@@ -149,7 +171,7 @@ function _makeColumn(
   });
   return {
     name: entry.name,
-    otherNames: otherNames.slice(0, MAX_OTHER_NAMES),
+    otherNames: otherNames.slice(0, DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES),
     kind: entry.kind,
     values,
   };
@@ -181,11 +203,14 @@ function makeLabelsRequestFromCodeList(
       ? {
           ..._makeColumn(first, values),
           name: options.codeList.name,
-          otherNames: names.slice(0, MAX_OTHER_NAMES),
+          otherNames: names.slice(0, DICTIONARY_SUGGESTIONS_MAX_OTHER_NAMES),
         }
       : _makeColumn(first, values);
-  // An entry renamed after a person keeps its codes here too.
-  return _canSendValues(column)
+  // An entry renamed after a person keeps its codes here too. Codes are
+  // never cut, since a cut code could not be matched to its label, so a
+  // list with a code over the limit asks for nothing.
+  return _canSendValues(column.kind, [column.name, ...names]) &&
+    _areValuesShortEnough(values)
     ? { task: "labels", locale: options.locale, column }
     : undefined;
 }
@@ -199,15 +224,24 @@ function makeMatchesRequestFromProposal(
   }
   const columns = options.proposal.entries
     .filter(prop("isIncluded"))
-    .slice(0, MAX_MATCH_COLUMNS)
+    .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_COLUMNS)
     .map((entry) => {
       const column = _makeColumn(entry, []);
-      const values = _canSendValues(column)
-        ? DictionaryProposal.getValuesSeen(entry)
-            .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES)
-            .map(prop("value"))
-        : [];
-      return { ...column, values };
+      const allNames = [
+        entry.name,
+        ...DictionaryProposal.getColumnNames(entry),
+      ];
+      const values = DictionaryProposal.getValuesSeen(entry)
+        .slice(0, DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES)
+        .map(prop("value"));
+      // A column with a code over the limit sends none, never a cut one.
+      return {
+        ...column,
+        values:
+          _canSendValues(column.kind, allNames) && _areValuesShortEnough(values)
+            ? values
+            : [],
+      };
     });
   return _fitMatchesRequest({
     task: "matches",

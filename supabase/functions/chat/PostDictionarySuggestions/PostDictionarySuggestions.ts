@@ -8,9 +8,9 @@ import { z } from "zod";
 import { DATA_AGENT_MODEL_ROSTER } from "$/agent/DataAgentModelRoster.ts";
 import {
   buildDictionarySuggestionsMessages,
-  DICTIONARY_SUGGESTIONS_MAX_TOKENS,
   DictionarySuggestionsRequestSchema,
   getDictionarySuggestionsJsonSchema,
+  getDictionarySuggestionsMaxTokens,
   isDictionarySuggestionsPromptId,
   isDictionarySuggestionsRequestTooLarge,
   stringifyDictionarySuggestionsRequest,
@@ -119,7 +119,7 @@ export const PostDictionarySuggestions = POST({
       requestBody: {
         model: DATA_AGENT_MODEL_ROSTER.primary.openRouterId,
         messages: buildDictionarySuggestionsMessages(request),
-        max_tokens: DICTIONARY_SUGGESTIONS_MAX_TOKENS,
+        max_tokens: getDictionarySuggestionsMaxTokens(request),
         temperature: 0,
         response_format: {
           type: "json_schema",
