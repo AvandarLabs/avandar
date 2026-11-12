@@ -67,6 +67,18 @@ async function _profile(
   });
 }
 
+async function _readDateCounts(
+  connection: DuckDBConnection,
+): Promise<unknown[]> {
+  const reader = await connection.runAndReadAll(
+    ColumnProfileSql.buildSummarySql({
+      datasetId: DATASET.id,
+      columns: [{ name: "onset", dataType: "varchar" }],
+    }),
+  );
+  return Object.values(reader.getRowObjects()[0] ?? {});
+}
+
 describe("ColumnProfileSql on a real DuckDB", () => {
   it("profiles a line list into the kinds a dictionary needs", async () => {
     await withDuckDb(async (connection) => {
@@ -114,6 +126,23 @@ describe("ColumnProfileSql on a real DuckDB", () => {
         listedColumnIndexes: new Set(),
       });
       expect(profile).toMatchObject({ rowCount: 30000, dateShare: 1 });
+    });
+  });
+
+  it("reads the same sample every time on a table larger than the sample", async () => {
+    await withDuckDb(async (connection) => {
+      await connection.run(`
+        CREATE TABLE "${DATASET.id}" AS
+        SELECT
+          CASE WHEN (i * 7919) % 3 = 0
+            THEN strftime(DATE '2020-01-01' + CAST(i % 900 AS INTEGER), '%m/%d/%Y')
+            ELSE 'unknown'
+          END AS onset
+        FROM range(1, 40001) AS t(i)
+      `);
+      const firstRun = await _readDateCounts(connection);
+      const secondRun = await _readDateCounts(connection);
+      expect(secondRun).toEqual(firstRun);
     });
   });
 });

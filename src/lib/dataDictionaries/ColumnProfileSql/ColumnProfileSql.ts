@@ -39,6 +39,12 @@ const DATE_FORMATS_SQL =
  */
 const DATE_SAMPLE_ROWS = 10_000;
 
+/**
+ * Fixes which rows the date sample takes, so profiling the same dataset
+ * twice gives the same date share.
+ */
+const DATE_SAMPLE_SEED = 42;
+
 function _buildSummaryParts(column: ProfiledColumn, index: number): string[] {
   const name = quoteSqlIdentifier(column.name);
   const parts = [
@@ -85,7 +91,7 @@ function buildSummarySql(
   // The counts, distinct counts, and ranges read every row. Only the date
   // aggregates read the sample, joined onto the one exact row.
   return [
-    `WITH "sample" AS (SELECT * FROM ${table} USING SAMPLE ${DATE_SAMPLE_ROWS} ROWS)`,
+    `WITH "sample" AS (SELECT * FROM ${table} USING SAMPLE reservoir(${DATE_SAMPLE_ROWS} ROWS) REPEATABLE (${DATE_SAMPLE_SEED}))`,
     `SELECT * FROM (${exactSql}) CROSS JOIN (SELECT ${sampleParts.join(", ")} FROM "sample")`,
   ].join(" ");
 }

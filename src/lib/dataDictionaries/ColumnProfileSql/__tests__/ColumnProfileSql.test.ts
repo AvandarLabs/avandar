@@ -39,7 +39,7 @@ describe("ColumnProfileSql", () => {
         { name: "age", dataType: "bigint" },
       ],
     });
-    expect(sql).toContain("USING SAMPLE 10000 ROWS");
+    expect(sql).toContain("USING SAMPLE reservoir(10000 ROWS) REPEATABLE (42)");
     const [exactPart = "", samplePart = ""] = sql.split("CROSS JOIN");
     expect(samplePart).toContain("try_strptime");
     expect(samplePart).toContain('FROM "sample"');
