@@ -224,4 +224,42 @@ describe("getCodingsFromProposal", () => {
       { value: "3", rowCount: 15 },
     ]);
   });
+
+  it("merges a chain of overlapping codings into one list in every order", () => {
+    const columns = [
+      _column("grade", { "1": 10, "2": 10, "3": 10, "4": 10 }),
+      _column("grade", { "4": 10, "5": 10 }, ERIE_ID),
+      _column("grade", { "5": 10, "6": 10, "7": 10, "8": 10 }, ERIE_ID),
+    ];
+    const orders = [
+      [0, 1, 2],
+      [0, 2, 1],
+      [1, 0, 2],
+      [1, 2, 0],
+      [2, 0, 1],
+      [2, 1, 0],
+    ];
+    const listsByOrder = orders.map((order) => {
+      const ordered = order.flatMap((index) => {
+        return columns[index] ?? [];
+      });
+      const { codeLists } = getCodingsFromProposal({
+        entries: [_entry("grade", "categorical", ordered)],
+      });
+      return codeLists.map((codeList) => {
+        return codeList.values
+          .map((item) => {
+            return item.value;
+          })
+          .sort()
+          .join("/");
+      });
+    });
+    expect(new Set(listsByOrder.flat())).toEqual(new Set(["1/2/3/4/5/6/7/8"]));
+    expect(
+      listsByOrder.map((lists) => {
+        return lists.length;
+      }),
+    ).toEqual([1, 1, 1, 1, 1, 1]);
+  });
 });

@@ -64,34 +64,34 @@ function _makeColumnCoding(values: readonly ColumnProfile.Value[]): Coding {
 }
 
 /**
- * Merges every pair of codings that overlap, again and again until none
- * do, so a coding that bridges two others joins all three whatever order
- * the columns came in.
+ * Groups the columns' codings so two that overlap share a group, through
+ * any chain of overlaps, and merges each group's codes once. Only each
+ * column's own codes are compared, so the groups do not depend on the order
+ * the columns came in, and no code lands in two of one entry's codings.
  */
 function _mergeOverlappingCodings(codings: readonly Coding[]): Coding[] {
-  const pairIndex = codings.findIndex((codingA, indexA) => {
-    return codings.slice(indexA + 1).some((codingB) => {
-      return _getOverlap(codingA, codingB) >= MIN_CODING_OVERLAP;
+  const parents = codings.map((_coding, index) => {
+    return index;
+  });
+  const findRoot = (index: number): number => {
+    const parent = parents[index] ?? index;
+    return parent === index ? index : findRoot(parent);
+  };
+  codings.forEach((codingA, indexA) => {
+    codings.slice(indexA + 1).forEach((codingB, offset) => {
+      if (_getOverlap(codingA, codingB) >= MIN_CODING_OVERLAP) {
+        parents[findRoot(indexA + 1 + offset)] = findRoot(indexA);
+      }
     });
   });
-  const first = codings[pairIndex];
-  if (!first) {
-    return [...codings];
-  }
-  const secondIndex = codings.findIndex((coding, index) => {
-    return (
-      index > pairIndex && _getOverlap(first, coding) >= MIN_CODING_OVERLAP
-    );
+  const groups = new Map<number, Coding>();
+  codings.forEach((coding, index) => {
+    const root = findRoot(index);
+    const merged: Coding = groups.get(root) ?? new Map();
+    _addValues(merged, coding.values());
+    groups.set(root, merged);
   });
-  const merged: Coding = new Map(first);
-  _addValues(merged, codings[secondIndex]?.values() ?? []);
-  return _mergeOverlappingCodings([
-    ...codings.slice(0, pairIndex),
-    merged,
-    ...codings.slice(pairIndex + 1).filter((_coding, index) => {
-      return index + pairIndex + 1 !== secondIndex;
-    }),
-  ]);
+  return [...groups.values()];
 }
 
 /** One coding per set of codes the entry's columns hold, most rows first. */
