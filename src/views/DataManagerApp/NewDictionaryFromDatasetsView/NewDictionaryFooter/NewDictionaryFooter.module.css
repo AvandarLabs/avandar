@@ -1,0 +1,13 @@
+/*
+ * Sticks to the bottom of the view body. The opaque background and top
+ * hairline keep the table behind it from reading through.
+ */
+.newDictionaryFooter {
+  background-color: var(--ava-surface-raised);
+  border-top: 1px solid var(--ava-border-default);
+  bottom: 0;
+  margin-block-start: var(--mantine-spacing-lg);
+  padding-block: var(--mantine-spacing-sm);
+  position: sticky;
+  z-index: 1;
+}
