@@ -26,30 +26,51 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
 vi.mock("@tanstack/react-router", async (importOriginal) => {
   const actual =
     await importOriginal<typeof import("@tanstack/react-router")>();
-  return { ...actual, useNavigate: () => navigateMock };
+  return {
+    ...actual,
+    useNavigate: () => {
+      return navigateMock;
+    },
+  };
 });
 vi.mock(
   "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionarySources",
   () => {
-    return { useNewDictionarySources: () => sourcesState.value };
+    return {
+      useNewDictionarySources: () => {
+        return sourcesState.value;
+      },
+    };
   },
 );
 vi.mock(
   "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow",
   () => {
-    return { useNewDictionaryFlow: () => ({}) };
+    return {
+      useNewDictionaryFlow: () => {
+        return {};
+      },
+    };
   },
 );
 vi.mock(
   "@/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryStepBody",
   () => {
-    return { NewDictionaryStepBody: () => null };
+    return {
+      NewDictionaryStepBody: () => {
+        return null;
+      },
+    };
   },
 );
 vi.mock(
   "@/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryStepper/NewDictionaryStepper",
   () => {
-    return { NewDictionaryStepper: () => null };
+    return {
+      NewDictionaryStepper: () => {
+        return null;
+      },
+    };
   },
 );
 

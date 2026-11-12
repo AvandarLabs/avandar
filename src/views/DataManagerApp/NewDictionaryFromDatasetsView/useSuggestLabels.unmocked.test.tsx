@@ -46,6 +46,7 @@ function _render(proposal: DictionaryProposal.T) {
     () => {
       return useSuggestLabels({
         proposal,
+        readId: undefined,
         model: "online",
         requestReply: () => {
           return Promise.resolve(undefined);

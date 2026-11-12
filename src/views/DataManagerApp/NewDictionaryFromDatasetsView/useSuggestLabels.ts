@@ -51,7 +51,7 @@ async function _requestLabelSuggestions(
 
 type SuggestOptions = Readonly<{
   proposal: DictionaryProposal.T | undefined;
-  /** The read of the proposal. Labels that come back for another read are dropped. */
+  /** The proposal's read. Labels for another read are dropped. */
   readId: ProposalReadId | undefined;
   model: DictionarySuggestionModel;
   requestReply: RequestSuggestionReply;

@@ -8,7 +8,7 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
 type Props = {
-  /** The dataset Cancel returns to, when the flow started from one that exists. */
+  /** The dataset Cancel returns to, when the flow began from one. */
   cancelDatasetId: Dataset.Id | undefined;
   /** The name of the dataset Cancel returns to, once it is found. */
   cancelDatasetName: string | undefined;
