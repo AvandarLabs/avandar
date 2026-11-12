@@ -445,7 +445,7 @@ describe("DataDictionary.toDraft ordering", () => {
     };
     const zebra = makeList("Zebra");
     const apple = makeList("apple");
-    const entry = Model.make("DataDictionaryEntry", {
+    const entry: DataDictionaryEntry.T = Model.make("DataDictionaryEntry", {
       id: entryId,
       workspaceId: WORKSPACE_ID,
       dictionaryId: DICTIONARY_ID,
