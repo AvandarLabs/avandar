@@ -15,6 +15,8 @@ type Props = {
   labels: DictionaryProposal.Labels;
   suggestionAvailability: DictionarySuggestionAvailability;
   isSuggesting: boolean;
+  /** True while any list's suggestion is pending, not only the selected one. */
+  isSuggestionPending: boolean;
   blockReason: LabelsBlockReason | undefined;
   titleRef: Ref<HTMLHeadingElement>;
   dispatch: Dispatch<NewDictionaryAction>;
@@ -46,6 +48,7 @@ export function LabelValuesColumns(props: Readonly<Props>): ReactNode {
           labels={labels}
           suggestionAvailability={props.suggestionAvailability}
           isSuggesting={props.isSuggesting}
+          isSuggestionPending={props.isSuggestionPending}
           blockReason={props.blockReason}
           titleRef={props.titleRef}
           dispatch={dispatch}

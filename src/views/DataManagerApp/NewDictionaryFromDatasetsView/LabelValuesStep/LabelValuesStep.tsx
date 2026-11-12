@@ -54,6 +54,7 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
           labels={labels}
           suggestionAvailability={props.suggestionAvailability}
           isSuggesting={props.suggestingCodeListKey === selected.key}
+          isSuggestionPending={props.suggestingCodeListKey !== undefined}
           blockReason={props.getLabelsBlockReason(selected)}
           titleRef={titleRef}
           dispatch={dispatch}

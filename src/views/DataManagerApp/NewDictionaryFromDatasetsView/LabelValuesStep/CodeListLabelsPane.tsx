@@ -17,6 +17,8 @@ type Props = {
   labels: DictionaryProposal.Labels;
   suggestionAvailability: DictionarySuggestionAvailability;
   isSuggesting: boolean;
+  /** True while any list's suggestion is pending, not only this one. */
+  isSuggestionPending: boolean;
   /** Why the list's values cannot be sent for suggestions, if they cannot. */
   blockReason: LabelsBlockReason | undefined;
   /** The list's title, which the step focuses after accepting a list. */
@@ -32,6 +34,7 @@ export function CodeListLabelsPane({
   labels,
   suggestionAvailability,
   isSuggesting,
+  isSuggestionPending,
   blockReason,
   titleRef,
   dispatch,
@@ -49,7 +52,7 @@ export function CodeListLabelsPane({
         title={codeList.name}
         titleRef={titleRef}
         isSuggesting={isSuggesting}
-        isSuggestOff={isOff || blockReason !== undefined}
+        isSuggestOff={isOff || blockReason !== undefined || isSuggestionPending}
         onSuggest={() => {
           onSuggest(codeList);
         }}
@@ -60,6 +63,7 @@ export function CodeListLabelsPane({
       <SuggestionsOffNote
         availability={suggestionAvailability}
         blockReason={blockReason}
+        valueCount={codeList.values.length}
       />
       <LabelValuesTable
         codeList={codeList}

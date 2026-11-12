@@ -1,5 +1,7 @@
+import { plural } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
+import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { LabelsBlockReason } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { ReactNode } from "react";
@@ -8,6 +10,8 @@ type Props = {
   availability: DictionarySuggestionAvailability;
   /** Why this list's values cannot be sent, when they cannot. */
   blockReason: LabelsBlockReason | undefined;
+  /** How many values the list holds. */
+  valueCount: number;
 };
 
 function _getNote(options: Readonly<Props>): ReactNode {
@@ -52,10 +56,19 @@ function _getNote(options: Readonly<Props>): ReactNode {
       </Trans>
     );
   }
+  if (options.valueCount > ColumnProfile.MAX_LISTED_VALUES) {
+    return plural(ColumnProfile.MAX_LISTED_VALUES, {
+      one: "Suggestions cover the first # value.",
+      other: "Suggestions cover the first # values.",
+    });
+  }
   return null;
 }
 
-/** Why Suggest labels is off for this list, as one line, or nothing. */
+/**
+ * Why Suggest labels is off for this list, or that suggestions cover only
+ * its first values, as one line, or nothing.
+ */
 export function SuggestionsOffNote(props: Readonly<Props>): ReactNode {
   const note = _getNote(props);
   return note ? (

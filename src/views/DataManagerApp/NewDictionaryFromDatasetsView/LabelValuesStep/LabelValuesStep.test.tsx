@@ -81,6 +81,7 @@ function SteppingHarness(): JSX.Element {
 function _renderStep(
   suggestionAvailability: DictionarySuggestionAvailability = "online",
   blockReason: LabelsBlockReason | undefined = undefined,
+  suggestingCodeListKey: string | undefined = undefined,
 ) {
   const dispatch = vi.fn();
   const onSuggest = vi.fn();
@@ -90,7 +91,7 @@ function _renderStep(
       labels={LABELS}
       selectedCodeListKey={GENDER_LIST?.key}
       suggestionAvailability={suggestionAvailability}
-      suggestingCodeListKey={undefined}
+      suggestingCodeListKey={suggestingCodeListKey}
       getLabelsBlockReason={() => {
         return blockReason;
       }}
@@ -193,6 +194,54 @@ describe("LabelValuesStep", () => {
     const { onSuggest } = _renderStep();
     fireEvent.click(screen.getByRole("button", { name: "Suggest labels" }));
     expect(onSuggest).toHaveBeenCalledWith(GENDER_LIST);
+  });
+
+  it("turns Suggest labels off while another list's suggestion is pending", () => {
+    _renderStep("online", undefined, CODE_LISTS[1]?.key);
+    expect(
+      screen.getByRole("button", { name: "Suggest labels" }),
+    ).toBeDisabled();
+  });
+
+  it("says suggestions cover only the first 50 values of a longer list", () => {
+    const wide = DictionaryProposal.fromColumnProfiles([
+      {
+        ..._column(
+          "county_code",
+          Array.from({ length: 51 }, (_code, index) => {
+            return `c${index}`;
+          }),
+        ),
+      },
+    ]);
+    const [entry] = wide.entries;
+    const proposal = DictionaryProposal.setEntryKind(wide, {
+      entryKey: entry?.key ?? "",
+      kind: "categorical",
+    });
+    const [codeList] = DictionaryProposal.getCodings(proposal).codeLists;
+    render(
+      <LabelValuesStep
+        proposal={proposal}
+        labels={DictionaryProposal.withDefaultLabels({}, [codeList!])}
+        selectedCodeListKey={codeList?.key}
+        suggestionAvailability="online"
+        suggestingCodeListKey={undefined}
+        getLabelsBlockReason={() => {
+          return undefined;
+        }}
+        dispatch={vi.fn()}
+        onSuggest={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByText("Suggestions cover the first 50 values."),
+    ).toBeInTheDocument();
+  });
+
+  it("does not mention the cap on a list of 50 values or fewer", () => {
+    _renderStep();
+    expect(screen.queryByText(/Suggestions cover the first/)).toBeNull();
   });
 
   it("explains that suggestions are off when no model is available", () => {
