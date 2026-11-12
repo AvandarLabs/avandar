@@ -1,7 +1,6 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Checkbox, Group, Table, Text, VisuallyHidden } from "@mantine/core";
-import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
-import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
+import { Trans } from "@lingui/react/macro";
+import { Table, Text, VisuallyHidden } from "@mantine/core";
+import { PickDatasetRow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetRow";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
@@ -19,9 +18,6 @@ export function PickDatasetsTable({
   pickedDatasetIds,
   onToggle,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
-  const sourceLabels = useDatasetSourceLabels();
-
   if (datasets.length === 0) {
     return (
       <Text size="sm" c="dimmed">
@@ -53,33 +49,14 @@ export function PickDatasetsTable({
       </Table.Thead>
       <Table.Tbody>
         {datasets.map((dataset) => {
-          const datasetName = dataset.name;
           return (
-            <Table.Tr key={dataset.id}>
-              <Table.Td>
-                <Checkbox
-                  aria-label={t`Pick ${datasetName}`}
-                  checked={pickedDatasetIds.includes(dataset.id)}
-                  onChange={() => {
-                    onToggle(dataset.id);
-                  }}
-                />
-              </Table.Td>
-              <Table.Td>
-                <Text size="sm" fw={500}>
-                  {datasetName}
-                </Text>
-              </Table.Td>
-              <Table.Td>
-                <Group gap="xs" wrap="nowrap">
-                  <DatasetSourceIcon sourceType={dataset.sourceType} />
-                  <Text size="sm">{sourceLabels[dataset.sourceType]}</Text>
-                </Group>
-              </Table.Td>
-              <Table.Td ta="right">
-                <Text size="sm">{columnCounts.get(dataset.id) ?? 0}</Text>
-              </Table.Td>
-            </Table.Tr>
+            <PickDatasetRow
+              key={dataset.id}
+              dataset={dataset}
+              columnCount={columnCounts.get(dataset.id) ?? 0}
+              isPicked={pickedDatasetIds.includes(dataset.id)}
+              onToggle={onToggle}
+            />
           );
         })}
       </Table.Tbody>

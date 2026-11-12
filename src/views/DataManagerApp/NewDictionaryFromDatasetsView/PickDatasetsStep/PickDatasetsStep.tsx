@@ -1,9 +1,9 @@
 import { plural } from "@lingui/core/macro";
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
-import { Button, Center, Loader, Text } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Center, Loader, Text } from "@mantine/core";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
-import { NewDictionaryFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryFooter/NewDictionaryFooter";
+import { PickDatasetsFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsFooter";
 import { PickDatasetsTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTable";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
@@ -18,6 +18,15 @@ type Props = {
   dispatch: Dispatch<NewDictionaryAction>;
   onRead: () => void;
 };
+
+function _sumColumns(
+  datasetIds: readonly Dataset.Id[],
+  columnCounts: ReadonlyMap<Dataset.Id, number>,
+): number {
+  return datasetIds.reduce((sum, datasetId) => {
+    return sum + (columnCounts.get(datasetId) ?? 0);
+  }, 0);
+}
 
 /**
  * The first step of learning a dictionary: pick the datasets to learn
@@ -35,62 +44,45 @@ export function PickDatasetsStep({
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const pickedCount = pickedDatasetIds.length;
-  const columnCount = pickedDatasetIds.reduce((sum, datasetId) => {
-    return sum + (columnCounts.get(datasetId) ?? 0);
-  }, 0);
+  const columnText = plural(_sumColumns(pickedDatasetIds, columnCounts), {
+    one: "# column",
+    other: "# columns",
+  });
 
   return (
-    <AppViewBody>
-      <AppViewSection
-        title={t`Datasets to learn from`}
-        meta={t`${pickedCount} picked · ${plural(columnCount, {
-          one: "# column",
-          other: "# columns",
-        })}`}
-      >
-        <Text size="sm" c="dimmed" mb="sm">
-          <Trans>
-            Pick datasets that use the same codes. Avandar reads each column,
-            finds the coded ones, and merges columns that mean the same thing.
-          </Trans>
-        </Text>
-        {isLoading ? (
-          <Center py="xl">
-            <Loader size="sm" />
-          </Center>
-        ) : (
-          <PickDatasetsTable
-            datasets={datasets}
-            columnCounts={columnCounts}
-            pickedDatasetIds={pickedDatasetIds}
-            onToggle={(datasetId) => {
-              dispatch({ type: "toggle_dataset", datasetId });
-            }}
-          />
-        )}
-      </AppViewSection>
-      <NewDictionaryFooter
-        start={
-          <Text size="sm" c="dimmed">
+    <>
+      <AppViewBody>
+        <AppViewSection
+          title={t`Datasets to learn from`}
+          meta={t`${pickedCount} picked · ${columnText}`}
+        >
+          <Text size="sm" c="dimmed" mb="sm">
             <Trans>
-              Only column names and the distinct values of short columns are
-              read. Rows never leave this device for suggestions.
+              Pick datasets that use the same codes. Avandar reads each column,
+              finds the coded ones, and merges columns that mean the same thing.
             </Trans>
           </Text>
-        }
-      >
-        <Button
-          onClick={onRead}
-          loading={isReading}
-          disabled={pickedCount === 0}
-        >
-          <Plural
-            value={pickedCount}
-            one="Read # dataset"
-            other="Read # datasets"
-          />
-        </Button>
-      </NewDictionaryFooter>
-    </AppViewBody>
+          {isLoading ? (
+            <Center py="xl">
+              <Loader size="sm" />
+            </Center>
+          ) : (
+            <PickDatasetsTable
+              datasets={datasets}
+              columnCounts={columnCounts}
+              pickedDatasetIds={pickedDatasetIds}
+              onToggle={(datasetId) => {
+                dispatch({ type: "toggle_dataset", datasetId });
+              }}
+            />
+          )}
+        </AppViewSection>
+      </AppViewBody>
+      <PickDatasetsFooter
+        pickedCount={pickedCount}
+        isReading={isReading}
+        onRead={onRead}
+      />
+    </>
   );
 }

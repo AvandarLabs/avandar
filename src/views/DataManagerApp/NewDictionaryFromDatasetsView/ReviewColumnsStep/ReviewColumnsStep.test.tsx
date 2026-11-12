@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { ReviewColumnsStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsStep";
+import { SuggestedTag } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag";
+import { ValuesSeenCell } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
@@ -103,9 +105,7 @@ describe("ReviewColumnsStep", () => {
         "Same name, different codes. Kept as separate code lists under one entry.",
       ),
     ).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: "Keep the columns in gender apart" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Keep apart: gender" }));
     expect(dispatch).toHaveBeenCalledWith({
       type: "keep_apart",
       entryKey: _keyOf(TWO_DATASETS, "gender"),
@@ -143,6 +143,30 @@ describe("ReviewColumnsStep", () => {
     ).toBeDisabled();
   });
 
+  it("says in each row whether the entry needs labels or a description", () => {
+    _renderStep();
+    const hospRow = screen.getByRole("row", { name: /hosp_yn/ });
+    expect(within(hospRow).getByText("Needs labels")).toBeInTheDocument();
+    const idRow = screen.getByRole("row", { name: /case_id/ });
+    expect(within(idRow).getByText("Description")).toBeInTheDocument();
+  });
+
+  it("holds Next and says why when every entry is left out", () => {
+    const proposal = TWO_DATASETS.entries.reduce((current, entry) => {
+      return DictionaryProposal.setEntryIncluded(current, {
+        entryKey: entry.key,
+        isIncluded: false,
+      });
+    }, TWO_DATASETS);
+    _renderStep({ proposal });
+    expect(
+      screen.getByText("Include at least one entry to go on."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Next: label values" }),
+    ).toBeDisabled();
+  });
+
   it("changes an entry's kind", () => {
     const { dispatch } = _renderStep();
     pickMantineSelectOption("Kind for hosp_yn", "Ordered");
@@ -173,5 +197,40 @@ describe("ReviewColumnsStep", () => {
       screen.getByRole("button", { name: "Learn from more datasets" }),
     );
     expect(dispatch).toHaveBeenCalledWith({ type: "learn_from_more" });
+  });
+});
+
+describe("SuggestedTag", () => {
+  it("gives its explanation to screen readers, not only to hover", () => {
+    render(<SuggestedTag reason="meaning" />);
+    expect(
+      screen.getByText("Suggested").closest("[tabindex]"),
+    ).toHaveAccessibleDescription(
+      "Matched by meaning, not just by name. Keep apart if these record different things.",
+    );
+  });
+});
+
+describe("ValuesSeenCell", () => {
+  it("says how many more values there are beyond those spelled out", () => {
+    const codes = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const [entry] = DictionaryProposal.fromColumnProfiles([
+      _column("status", codes),
+    ]).entries;
+    render(
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <ValuesSeenCell
+                entry={entry as DictionaryProposal.Entry}
+                sharedWithNames={[]}
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>,
+    );
+    expect(screen.getByText("a, b, c, d, e, f and 2 more")).toBeInTheDocument();
   });
 });

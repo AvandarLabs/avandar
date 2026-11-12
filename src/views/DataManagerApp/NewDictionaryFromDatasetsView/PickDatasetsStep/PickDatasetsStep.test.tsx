@@ -60,6 +60,17 @@ describe("PickDatasetsStep", () => {
   it("picks a dataset with its checkbox", () => {
     const { dispatch } = _renderStep();
     fireEvent.click(screen.getByRole("checkbox", { name: "Pick Erie cases" }));
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "toggle_dataset",
+      datasetId: ERIE.id,
+    });
+  });
+
+  it("picks a dataset when anywhere on its row is clicked, once", () => {
+    const { dispatch } = _renderStep();
+    fireEvent.click(screen.getByText("Erie cases"));
+    expect(dispatch).toHaveBeenCalledTimes(1);
     expect(dispatch).toHaveBeenCalledWith({
       type: "toggle_dataset",
       datasetId: ERIE.id,

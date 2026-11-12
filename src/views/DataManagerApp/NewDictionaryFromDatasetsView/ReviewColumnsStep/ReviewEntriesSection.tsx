@@ -1,6 +1,6 @@
-import { Trans } from "@lingui/react/macro";
-import { Table, VisuallyHidden } from "@mantine/core";
+import { Table } from "@mantine/core";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
+import { ReviewEntriesTableHead } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesTableHead";
 import { ReviewEntryRow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryRow";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
@@ -35,29 +35,7 @@ export function ReviewEntriesSection({
   return (
     <AppViewSection title={title} meta={meta}>
       <Table verticalSpacing="xs" layout="fixed">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th w={44}>
-              <VisuallyHidden>
-                <Trans>Include</Trans>
-              </VisuallyHidden>
-            </Table.Th>
-            <Table.Th>
-              <Trans>Entry name and the columns it came from</Trans>
-            </Table.Th>
-            <Table.Th w={160}>
-              <Trans>Kind</Trans>
-            </Table.Th>
-            <Table.Th>
-              <Trans>Values seen</Trans>
-            </Table.Th>
-            <Table.Th w={120}>
-              <VisuallyHidden>
-                <Trans>Actions</Trans>
-              </VisuallyHidden>
-            </Table.Th>
-          </Table.Tr>
-        </Table.Thead>
+        <ReviewEntriesTableHead />
         <Table.Tbody>
           {entries.map((entry) => {
             return (

@@ -1,8 +1,9 @@
-import { plural } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Group, Loader, Stack, Text } from "@mantine/core";
+import { Trans } from "@lingui/react/macro";
+import { Button, Group, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import { MeaningMatchStatusLine } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/MeaningMatchStatusLine";
+import { useReviewHeadline } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useReviewHeadline";
+import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import type { ReactNode } from "react";
 
@@ -24,26 +25,13 @@ export function ReviewSummary({
   meaningMatchStatus,
   onLearnFromMore,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
-  const columnCount = proposal.entries.reduce((sum, entry) => {
-    return sum + DictionaryProposal.getColumns(entry).length;
-  }, 0);
-  const entryCount = proposal.entries.length;
-  const datasetCount = DictionaryProposal.getDatasetIds(proposal).length;
-  const columns = plural(columnCount, { one: "# column", other: "# columns" });
-  const entries = plural(entryCount, { one: "# entry", other: "# entries" });
-  const datasets = plural(datasetCount, {
-    one: "# dataset",
-    other: "# datasets",
-  });
+  const headline = useReviewHeadline(proposal, originDatasetName);
 
   return (
     <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
       <Stack gap="xxs" maw={720}>
         <Text fw={600} size="sm">
-          {originDatasetName
-            ? t`${columns} in ${originDatasetName} became ${entries}.`
-            : t`${columns} from ${datasets} became ${entries}.`}
+          {headline}
         </Text>
         <Text size="sm" c="dimmed">
           <Trans>
@@ -52,24 +40,7 @@ export function ReviewSummary({
             you don't want, or change its kind.
           </Trans>
         </Text>
-        <div aria-live="polite">
-          {meaningMatchStatus === "finding" ? (
-            <Group gap="xs">
-              <Loader size="xs" />
-              <Text size="sm" c="dimmed">
-                <Trans>Looking for columns that mean the same thing</Trans>
-              </Text>
-            </Group>
-          ) : null}
-          {meaningMatchStatus === "failed" ? (
-            <Text size="sm" c="dimmed">
-              <Trans>
-                Could not look for columns that mean the same thing. The matches
-                here are by name and values.
-              </Trans>
-            </Text>
-          ) : null}
-        </div>
+        <MeaningMatchStatusLine status={meaningMatchStatus} />
       </Stack>
       {originDatasetName ? (
         <Button

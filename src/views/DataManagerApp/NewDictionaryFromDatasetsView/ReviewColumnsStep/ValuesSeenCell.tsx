@@ -2,6 +2,7 @@ import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsStep.module.css";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -32,7 +33,12 @@ function useValuesSeenSummary(entry: DictionaryProposal.Entry): string {
       })
       .join(", ");
     const moreCount = values.length - MAX_SHOWN_VALUES;
-    return moreCount > 0 ? t`${shown} and ${moreCount} more` : shown;
+    return moreCount > 0
+      ? plural(moreCount, {
+          one: `${shown} and # more`,
+          other: `${shown} and # more`,
+        })
+      : shown;
   }
   if (range) {
     const lowest = i18n.number(range.min);
@@ -45,10 +51,10 @@ function useValuesSeenSummary(entry: DictionaryProposal.Entry): string {
       return column.distinctCount;
     }),
   );
-  return t`${plural(distinctCount, {
+  return plural(distinctCount, {
     one: "# different value",
     other: "# different values",
-  })}`;
+  });
 }
 
 /**
@@ -67,7 +73,7 @@ export function ValuesSeenCell({
 
   return (
     <>
-      <Text size="sm" lineClamp={1}>
+      <Text size="sm" lineClamp={1} className={css.reviewEntryText}>
         {summary}
       </Text>
       {entry.suggestionReason === "other_codes" ? (

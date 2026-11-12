@@ -25,6 +25,8 @@ export function SaveNameFields({
     <Stack gap="md">
       <TextInput
         label={t`Dictionary name`}
+        required
+        error={name.trim() === "" ? t`Give this dictionary a name.` : undefined}
         value={name}
         onChange={(event) => {
           dispatch({ type: "set_name", name: event.currentTarget.value });

@@ -1,11 +1,9 @@
-import { Trans } from "@lingui/react/macro";
-import { Button, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { useMemo } from "react";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
-import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
-import { NewDictionaryFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryFooter/NewDictionaryFooter";
+import { SaveFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter";
 import { SaveNameFields } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields";
 import { SaveSummary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary";
 import { SaveWarnings } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveWarnings";
@@ -41,49 +39,35 @@ export function SaveStep(props: Readonly<Props>): ReactNode {
     issues.length === 0 && draft.entries.length > 0 && props.name.trim() !== "";
 
   return (
-    <AppViewBody contentMaxWidth={720}>
-      <Stack gap="xl">
-        <SaveNameFields
-          name={props.name}
-          description={props.description}
-          originDatasetName={props.originDatasetName}
-          dispatch={dispatch}
-        />
-        <SaveSummary
-          draft={draft}
-          proposal={proposal}
-          labels={labels}
-          learnedFromNames={props.learnedFromNames}
-        />
-        <SaveWarnings
-          draft={draft}
-          issues={issues}
-          proposal={proposal}
-          labels={labels}
-        />
-      </Stack>
-      <NewDictionaryFooter
-        start={
-          <Button
-            variant="default"
-            onClick={() => {
-              dispatch({ type: "go_to_step", step: "label" });
-            }}
-          >
-            <Trans>Back</Trans>
-          </Button>
-        }
-      >
-        <OfflineGated>
-          <Button
-            onClick={props.onCreate}
-            loading={props.isCreating}
-            disabled={!canCreate}
-          >
-            <Trans>Create dictionary</Trans>
-          </Button>
-        </OfflineGated>
-      </NewDictionaryFooter>
-    </AppViewBody>
+    <>
+      <AppViewBody contentMaxWidth={720}>
+        <Stack gap="xl">
+          <SaveNameFields
+            name={props.name}
+            description={props.description}
+            originDatasetName={props.originDatasetName}
+            dispatch={dispatch}
+          />
+          <SaveSummary
+            draft={draft}
+            proposal={proposal}
+            labels={labels}
+            learnedFromNames={props.learnedFromNames}
+          />
+          <SaveWarnings
+            draft={draft}
+            issues={issues}
+            proposal={proposal}
+            labels={labels}
+          />
+        </Stack>
+      </AppViewBody>
+      <SaveFooter
+        canCreate={canCreate}
+        isCreating={props.isCreating}
+        dispatch={dispatch}
+        onCreate={props.onCreate}
+      />
+    </>
   );
 }

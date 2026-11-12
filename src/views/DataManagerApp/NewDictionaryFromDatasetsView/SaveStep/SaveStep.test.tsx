@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { SaveStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveStep";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -45,15 +45,31 @@ const LABELS = DictionaryProposal.withDefaultLabels(
   DictionaryProposal.getCodings(PROPOSAL).codeLists,
 );
 
+function _labelValues(codes: readonly string[]): DictionaryProposal.Labels {
+  const codeListKey = DictionaryProposal.getCodings(PROPOSAL).codeLists[0]?.key;
+  return codes.reduce((labels, code) => {
+    return DictionaryProposal.setValueLabel(labels, {
+      codeListKey: codeListKey ?? "",
+      code,
+      label: `Label ${code}`,
+    });
+  }, LABELS);
+}
+
 function _renderStep(
-  options: { name?: string; originDatasetName?: string } = {},
+  options: {
+    name?: string;
+    originDatasetName?: string;
+    labels?: DictionaryProposal.Labels;
+    proposal?: DictionaryProposal.T;
+  } = {},
 ) {
   const dispatch = vi.fn();
   const onCreate = vi.fn();
   render(
     <SaveStep
-      proposal={PROPOSAL}
-      labels={LABELS}
+      proposal={options.proposal ?? PROPOSAL}
+      labels={options.labels ?? LABELS}
       name={options.name ?? "Kings codes"}
       description=""
       originDatasetName={options.originDatasetName}
@@ -93,6 +109,48 @@ describe("SaveStep", () => {
     ).toBeEnabled();
     fireEvent.click(screen.getByRole("button", { name: "Create dictionary" }));
     expect(onCreate).toHaveBeenCalledOnce();
+  });
+
+  it("says one unlabeled value has no label, not that it have none", () => {
+    _renderStep({ labels: _labelValues(["1", "2"]) });
+    expect(
+      screen.getByText(
+        "1 value in gender (1/2/9) has no label yet. It is saved without one and marked as needing a label, so you can finish it on the dictionary.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("lists what blocks the save, one item each", () => {
+    const [first, second] = PROPOSAL.entries;
+    const sameName = DictionaryProposal.renameEntry(
+      DictionaryProposal.renameEntry(PROPOSAL, {
+        entryKey: first?.key ?? "",
+        name: "same",
+      }),
+      { entryKey: second?.key ?? "", name: "same" },
+    );
+    const { onCreate } = _renderStep({ proposal: sameName });
+    const callout = screen
+      .getByText("Fix these before saving")
+      .closest<HTMLElement>('[role="alert"]');
+    expect(callout).not.toBeNull();
+    expect(
+      within(callout as HTMLElement).getAllByRole("listitem"),
+    ).toHaveLength(2);
+    expect(
+      screen.getByRole("button", { name: "Create dictionary" }),
+    ).toBeDisabled();
+    expect(onCreate).not.toHaveBeenCalled();
+  });
+
+  it("marks a blank name as required on the name field", () => {
+    _renderStep({ name: " " });
+    const nameField = screen.getByRole("textbox", { name: /Dictionary name/ });
+    expect(nameField).toBeRequired();
+    expect(nameField).toBeInvalid();
+    expect(
+      screen.getByText("Give this dictionary a name."),
+    ).toBeInTheDocument();
   });
 
   it("cannot create a dictionary without a name", () => {

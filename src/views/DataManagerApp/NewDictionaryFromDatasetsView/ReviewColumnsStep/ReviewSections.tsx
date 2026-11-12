@@ -3,8 +3,12 @@ import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { ReviewEntriesSection } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntriesSection";
-import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
+import {
+  getReviewSectionFromKind,
+  getSharedNamesByEntryKey,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/reviewSectionHelpers";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { ReviewSection } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/reviewSectionHelpers";
 import type { Dispatch, ReactNode } from "react";
 
 type Props = {
@@ -13,43 +17,8 @@ type Props = {
   dispatch: Dispatch<NewDictionaryAction>;
 };
 
-type ReviewSection = "coded" | "ordered" | "description";
-
-function _getSection(kind: DataDictionaryEntry.Kind): ReviewSection {
-  if (kind === "categorical") {
-    return "coded";
-  }
-  return kind === "ordered" ? "ordered" : "description";
-}
-
-/** For each entry on a shared code list, the other entries on it. */
-function _getSharedNamesByEntryKey(
-  proposal: DictionaryProposal.T,
-): Map<string, string[]> {
-  const namesByKey = new Map(
-    proposal.entries.map((entry) => {
-      return [entry.key, entry.name];
-    }),
-  );
-  const shared = new Map<string, string[]>();
-  DictionaryProposal.getCodings(proposal)
-    .codeLists.filter((codeList) => {
-      return codeList.entryKeys.length > 1;
-    })
-    .forEach((codeList) => {
-      codeList.entryKeys.forEach((entryKey) => {
-        const others = codeList.entryKeys.filter((other) => {
-          return other !== entryKey;
-        });
-        shared.set(
-          entryKey,
-          others.flatMap((other) => {
-            return namesByKey.get(other) ?? [];
-          }),
-        );
-      });
-    });
-  return shared;
+function _formatEntryCount(entryCount: number): string {
+  return plural(entryCount, { one: "# entry", other: "# entries" });
 }
 
 /**
@@ -64,19 +33,19 @@ export function ReviewSections({
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const sharedNamesByEntryKey = useMemo(() => {
-    return _getSharedNamesByEntryKey(proposal);
+    return getSharedNamesByEntryKey(proposal);
   }, [proposal]);
   const entriesIn = (section: ReviewSection) => {
     return proposal.entries.filter((entry) => {
-      return _getSection(entry.kind) === section;
+      return getReviewSectionFromKind(entry.kind) === section;
     });
   };
   const coded = entriesIn("coded");
   const ordered = entriesIn("ordered");
   const described = entriesIn("description");
-  const codedCount = coded.length;
-  const orderedCount = ordered.length;
-  const describedCount = described.length;
+  const codedCount = _formatEntryCount(coded.length);
+  const orderedCount = _formatEntryCount(ordered.length);
+  const describedCount = _formatEntryCount(described.length);
   const sectionProps = {
     sharedNamesByEntryKey,
     nameIssues,
@@ -88,19 +57,19 @@ export function ReviewSections({
     <>
       <ReviewEntriesSection
         title={t`Coded columns`}
-        meta={t`${plural(codedCount, { one: "# entry", other: "# entries" })} · you'll label their values next`}
+        meta={t`${codedCount} · you'll label their values next`}
         entries={coded}
         {...sectionProps}
       />
       <ReviewEntriesSection
         title={t`Ordered scales`}
-        meta={t`${plural(orderedCount, { one: "# entry", other: "# entries" })} · order is kept when charted`}
+        meta={t`${orderedCount} · order is kept when charted`}
         entries={ordered}
         {...sectionProps}
       />
       <ReviewEntriesSection
         title={t`Descriptions only`}
-        meta={t`${plural(describedCount, { one: "# entry", other: "# entries" })} · no codes to label`}
+        meta={t`${describedCount} · no codes to label`}
         entries={described}
         {...sectionProps}
       />

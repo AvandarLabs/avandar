@@ -1,13 +1,11 @@
 /*
- * Sticks to the bottom of the view body. The opaque background and top
- * hairline keep the table behind it from reading through.
+ * A band under the step's scrolling body, across the full width of the
+ * view. It sits outside the body's gutter, so it needs no stacking order to
+ * stay clear of the table that scrolls above it.
  */
 .newDictionaryFooter {
   background-color: var(--ava-surface-raised);
   border-top: 1px solid var(--ava-border-default);
-  bottom: 0;
-  margin-block-start: var(--mantine-spacing-lg);
-  padding-block: var(--mantine-spacing-sm);
-  position: sticky;
-  z-index: 1;
+  flex: none;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
 }

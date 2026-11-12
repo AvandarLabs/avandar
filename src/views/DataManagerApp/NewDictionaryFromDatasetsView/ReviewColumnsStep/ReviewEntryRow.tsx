@@ -1,20 +1,12 @@
-import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Group,
-  Select,
-  Table,
-  Text,
-} from "@mantine/core";
+import { useLingui } from "@lingui/react/macro";
+import { Checkbox, Table, Text } from "@mantine/core";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
-import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
-import { useDictionaryCopy } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryCopy";
+import { EntryKindSelect } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/EntryKindSelect";
+import { EntryNameCell } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/EntryNameCell";
+import { KeepApartButton } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/KeepApartButton";
 import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsStep.module.css";
-import { ReviewEntryNameInput } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput";
-import { SuggestedTag } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag";
 import { ValuesSeenCell } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell";
+import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { Dispatch, ReactNode } from "react";
 
@@ -27,22 +19,10 @@ type Props = {
   dispatch: Dispatch<NewDictionaryAction>;
 };
 
-function _formatSources(
-  entry: DictionaryProposal.Entry,
-  isSingleDataset: boolean,
-): string {
-  return DictionaryProposal.getColumnSources(entry)
-    .map(({ columnName, datasetNames }) => {
-      return isSingleDataset
-        ? columnName
-        : `${columnName} (${datasetNames.join(", ")})`;
-    })
-    .join(", ");
-}
-
 /**
  * One proposed entry on the Review step: include it or not, rename it, see
- * where it came from, change its kind, and undo a guessed merge.
+ * where it came from, change its kind, and undo a guessed merge. The last
+ * cell says what comes next for it, labels or only a description.
  */
 export function ReviewEntryRow({
   entry,
@@ -52,9 +32,8 @@ export function ReviewEntryRow({
   dispatch,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
-  const copy = useDictionaryCopy();
   const entryName = entry.name;
-  const reason = entry.suggestionReason;
+  const isCoded = DataDictionary.isCodedKind(entry.kind);
 
   return (
     <Table.Tr className={css.reviewEntryRow} data-included={entry.isIncluded}>
@@ -72,59 +51,23 @@ export function ReviewEntryRow({
           }}
         />
       </Table.Td>
+      <EntryNameCell
+        entry={entry}
+        nameIssue={nameIssue}
+        isSingleDataset={isSingleDataset}
+        dispatch={dispatch}
+      />
       <Table.Td>
-        <Group gap="xs" wrap="nowrap" align="flex-start">
-          <Box flex={1} miw={0}>
-            <ReviewEntryNameInput
-              entry={entry}
-              nameIssue={nameIssue}
-              dispatch={dispatch}
-            />
-          </Box>
-          {reason === "meaning" || reason === "similar_name" ? (
-            <SuggestedTag reason={reason} />
-          ) : null}
-        </Group>
-        <Text size="xs" c="dimmed" lineClamp={2} mt={4}>
-          {_formatSources(entry, isSingleDataset)}
-        </Text>
-      </Table.Td>
-      <Table.Td>
-        <Select
-          size="xs"
-          aria-label={t`Kind for ${entryName}`}
-          allowDeselect={false}
-          value={entry.kind}
-          data={DataDictionary.ENTRY_KINDS.map((kind) => {
-            return { value: kind, label: copy.kindShortLabels[kind] };
-          })}
-          onChange={(value) => {
-            const kind = DataDictionary.ENTRY_KINDS.find((current) => {
-              return current === value;
-            });
-            if (kind) {
-              dispatch({ type: "set_entry_kind", entryKey: entry.key, kind });
-            }
-          }}
-        />
+        <EntryKindSelect entry={entry} dispatch={dispatch} />
       </Table.Td>
       <Table.Td>
         <ValuesSeenCell entry={entry} sharedWithNames={sharedWithNames} />
       </Table.Td>
       <Table.Td>
-        {entry.suggestedColumns.length > 0 ? (
-          <Button
-            variant="subtle"
-            color="neutral"
-            size="compact-xs"
-            aria-label={t`Keep the columns in ${entryName} apart`}
-            onClick={() => {
-              dispatch({ type: "keep_apart", entryKey: entry.key });
-            }}
-          >
-            <Trans>Keep apart</Trans>
-          </Button>
-        ) : null}
+        <Text size="xs" c="dimmed">
+          {isCoded ? t`Needs labels` : t`Description`}
+        </Text>
+        <KeepApartButton entry={entry} dispatch={dispatch} />
       </Table.Td>
     </Table.Tr>
   );
