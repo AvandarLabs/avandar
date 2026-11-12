@@ -29,7 +29,11 @@ export function DataDictionarySaveBar({
     // `data-sticky-action-bar` is what the NUX checklist and toasts clear.
     <div className={css.dataDictionarySaveBar} data-sticky-action-bar>
       <Group justify="space-between" gap="md" wrap="wrap">
-        <Text size="sm" c={issueCount > 0 ? "danger" : "dimmed"}>
+        <Text
+          size="sm"
+          c={issueCount > 0 ? "danger" : "dimmed"}
+          aria-live="polite"
+        >
           {issueCount > 0 ? (
             <Plural
               value={issueCount}

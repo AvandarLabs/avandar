@@ -1,4 +1,6 @@
+import { Callout } from "@avandar/ui";
 import { where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
 import { Center, Loader } from "@mantine/core";
 import { useMemo } from "react";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
@@ -14,21 +16,26 @@ type Props = {
   dictionaryId: DataDictionary.Id;
 };
 
-/**
- * One dictionary: its entries, its code lists, and the datasets that use
- * it. Loads the dictionary and its contents, then hands the editor a draft.
- */
-export function DataDictionaryView({
-  dictionaryId,
-}: Readonly<Props>): ReactNode {
-  const [dictionary] = DataDictionaryClient.useGetById({ id: dictionaryId });
-  const [entries] = DataDictionaryEntryClient.useGetAll(
+type DictionaryContents = {
+  dictionary: DataDictionary.T | undefined;
+  savedDraft: DataDictionary.Draft | undefined;
+  hasLoadFailed: boolean;
+};
+
+/** Loads a dictionary with its entries, code lists, and codings. */
+function useDictionaryContents(
+  dictionaryId: DataDictionary.Id,
+): DictionaryContents {
+  const [dictionary, , dictionaryQuery] = DataDictionaryClient.useGetById({
+    id: dictionaryId,
+  });
+  const [entries, , entriesQuery] = DataDictionaryEntryClient.useGetAll(
     where("dictionary_id", "eq", dictionaryId),
   );
-  const [codeLists] = DataDictionaryCodeListClient.useGetAll(
+  const [codeLists, , codeListsQuery] = DataDictionaryCodeListClient.useGetAll(
     where("dictionary_id", "eq", dictionaryId),
   );
-  const [codings] = DataDictionaryEntryCodingClient.useGetAll(
+  const [codings, , codingsQuery] = DataDictionaryEntryCodingClient.useGetAll(
     where("dictionary_id", "eq", dictionaryId),
   );
   const savedDraft = useMemo(() => {
@@ -37,6 +44,30 @@ export function DataDictionaryView({
       : undefined;
   }, [entries, codeLists, codings]);
 
+  const hasLoadFailed = [
+    dictionaryQuery,
+    entriesQuery,
+    codeListsQuery,
+    codingsQuery,
+  ].some((query) => {
+    return query.isError;
+  });
+  return { dictionary, savedDraft, hasLoadFailed };
+}
+
+/**
+ * One dictionary: its entries, its code lists, and the datasets that use
+ * it. Loads the dictionary and its contents, then hands the editor a draft.
+ */
+export function DataDictionaryView({
+  dictionaryId,
+}: Readonly<Props>): ReactNode {
+  const { dictionary, savedDraft, hasLoadFailed } =
+    useDictionaryContents(dictionaryId);
+
+  if (hasLoadFailed) {
+    return <DataDictionaryLoadFailed />;
+  }
   if (!dictionary || !savedDraft) {
     return (
       <AppView>
@@ -52,5 +83,20 @@ export function DataDictionaryView({
       dictionary={dictionary}
       savedDraft={savedDraft}
     />
+  );
+}
+
+function DataDictionaryLoadFailed(): ReactNode {
+  const { t } = useLingui();
+  return (
+    <AppView>
+      <Center flex={1} p="lg">
+        <Callout
+          maw={520}
+          title={t`Dictionary failed to load`}
+          message={t`The dictionary failed to load. Please try again later or reach out to support.`}
+        />
+      </Center>
+    </AppView>
   );
 }

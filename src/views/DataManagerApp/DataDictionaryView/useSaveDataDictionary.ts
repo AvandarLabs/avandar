@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { DataDictionaryClient } from "@/clients/dataDictionaries/DataDictionaryClient/DataDictionaryClient";
 import { DataDictionaryCodeListClient } from "@/clients/dataDictionaries/DataDictionaryCodeListClient";
 import { DataDictionaryEntryClient } from "@/clients/dataDictionaries/DataDictionaryEntryClient";
@@ -9,10 +10,20 @@ import { notifySuccess } from "@/utils/notifications/notify";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 
 type SaveDataDictionary = {
-  save: (payload: DataDictionary.SavePayload) => void;
+  /**
+   * Saves the payload. `sentDraft` is the draft the payload was built from,
+   * handed back to `onSaved` so edits made while the save is in flight are
+   * not marked as saved.
+   */
+  save: (
+    payload: DataDictionary.SavePayload,
+    sentDraft: DataDictionary.Draft,
+  ) => void;
   isSaving: boolean;
   /** The last save's failure, until the next save. */
   saveError: unknown;
+  /** Forgets the last save's failure. */
+  resetSaveError: () => void;
 };
 
 /**
@@ -23,17 +34,21 @@ type SaveDataDictionary = {
  * copy next to the Save button.
  *
  * @param options.onSaved Called after a save succeeds, before the refresh
- *   lands, so the editor can mark what it sent as saved.
+ *   lands, with the draft that was sent so the editor can mark exactly that
+ *   as saved.
  */
 export function useSaveDataDictionary(
-  options: Readonly<{ onSaved: () => void }>,
+  options: Readonly<{ onSaved: (savedDraft: DataDictionary.Draft) => void }>,
 ): SaveDataDictionary {
   const { t } = useLingui();
   const queryClient = useQueryClient();
+  const sentDraftRef = useRef<DataDictionary.Draft | undefined>(undefined);
   const [saveContents, isSaving, mutation] =
     DataDictionaryClient.useSaveContents({
       onSuccess: async () => {
-        options.onSaved();
+        if (sentDraftRef.current) {
+          options.onSaved(sentDraftRef.current);
+        }
         await Promise.all(
           [
             DataDictionaryClient,
@@ -54,8 +69,12 @@ export function useSaveDataDictionary(
     });
 
   return {
-    save: saveContents,
+    save: (payload, sentDraft) => {
+      sentDraftRef.current = sentDraft;
+      saveContents(payload);
+    },
     isSaving,
     saveError: mutation.error ?? undefined,
+    resetSaveError: mutation.reset,
   };
 }

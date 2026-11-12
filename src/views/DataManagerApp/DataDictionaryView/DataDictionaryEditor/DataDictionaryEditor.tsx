@@ -3,13 +3,11 @@ import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDic
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
+import { DataDictionaryEditorSaveBar } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorSaveBar";
 import { DataDictionaryEditorTabs } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs";
 import { DataDictionaryHeader } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader";
 import { DataDictionaryRail } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail";
-import { DataDictionarySaveBar } from "@/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar";
 import { useDataDictionaryDraft } from "@/views/DataManagerApp/DataDictionaryView/useDataDictionaryDraft/useDataDictionaryDraft";
-import { useDictionaryCopy } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryCopy";
-import { useSaveDataDictionary } from "@/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DataDictionaryTabId } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs";
 import type { ReactNode } from "react";
@@ -29,16 +27,12 @@ export function DataDictionaryEditor({
   dictionary,
   savedDraft,
 }: Readonly<Props>): ReactNode {
-  const copy = useDictionaryCopy();
   const canEdit = useHasPermission("data_sources__can_edit_dictionaries");
   const { draft, setDraft, isDirty, discard, markSaved } =
     useDataDictionaryDraft(savedDraft);
   const issues = useMemo(() => {
     return DataDictionary.findDraftIssues(draft);
   }, [draft]);
-  const { save, isSaving, saveError } = useSaveDataDictionary({
-    onSaved: markSaved,
-  });
   const [activeTab, setActiveTab] = useState<DataDictionaryTabId>("entries");
   const [selectedCodeListId, setSelectedCodeListId] = useState<
     DataDictionaryCodeList.Id | undefined
@@ -73,21 +67,12 @@ export function DataDictionaryEditor({
           onDraftChange={setDraft}
         />
         {isDirty ? (
-          <DataDictionarySaveBar
-            issueCount={issues.length}
-            isSaving={isSaving}
-            saveErrorMessage={
-              saveError ? copy.describeSaveError(saveError) : undefined
-            }
+          <DataDictionaryEditorSaveBar
+            dictionaryId={dictionary.id}
+            draft={draft}
+            issues={issues}
             onDiscard={discard}
-            onSave={() => {
-              save(
-                DataDictionary.buildSavePayload({
-                  dictionaryId: dictionary.id,
-                  draft,
-                }),
-              );
-            }}
+            onSaved={markSaved}
           />
         ) : null}
       </AppViewBody>

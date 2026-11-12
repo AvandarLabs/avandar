@@ -1,5 +1,5 @@
-import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { act, renderHook } from "@/test-utils";
 import { useDataDictionaryDraft } from "@/views/DataManagerApp/DataDictionaryView/useDataDictionaryDraft/useDataDictionaryDraft";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
@@ -64,9 +64,26 @@ describe("useDataDictionaryDraft", () => {
       result.current.setDraft(_draft("gender"));
     });
     act(() => {
-      result.current.markSaved();
+      result.current.markSaved(_draft("gender"));
     });
     expect(result.current.isDirty).toBe(false);
     expect(result.current.draft.entries[0]?.name).toBe("gender");
+  });
+
+  it("keeps edits made while a save was in flight", () => {
+    const { result } = renderHook(() => {
+      return useDataDictionaryDraft(_draft("sex"));
+    });
+    act(() => {
+      result.current.setDraft(_draft("A"));
+    });
+    act(() => {
+      result.current.setDraft(_draft("B"));
+    });
+    act(() => {
+      result.current.markSaved(_draft("A"));
+    });
+    expect(result.current.isDirty).toBe(true);
+    expect(result.current.draft.entries[0]?.name).toBe("B");
   });
 });

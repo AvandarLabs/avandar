@@ -16,10 +16,8 @@ type Props = {
   dictionary: DataDictionary.T;
 };
 
-/** Actions on a whole dictionary that are not what someone came to do. */
-export function DataDictionaryActionsMenu({
-  dictionary,
-}: Readonly<Props>): ReactNode {
+/** Returns an opener for the delete confirmation of a dictionary. */
+function useDeleteDictionary(dictionary: DataDictionary.T): () => void {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
@@ -37,7 +35,7 @@ export function DataDictionaryActionsMenu({
     },
   });
 
-  const onDelete = (): void => {
+  return () => {
     modals.openConfirmModal({
       title: t`Delete dictionary`,
       children: (
@@ -54,6 +52,14 @@ export function DataDictionaryActionsMenu({
       },
     });
   };
+}
+
+/** Actions on a whole dictionary that are not what someone came to do. */
+export function DataDictionaryActionsMenu({
+  dictionary,
+}: Readonly<Props>): ReactNode {
+  const { t } = useLingui();
+  const onDelete = useDeleteDictionary(dictionary);
 
   return (
     <Menu position="bottom-end" width={230} zIndex={POPOVER_Z_INDEX}>

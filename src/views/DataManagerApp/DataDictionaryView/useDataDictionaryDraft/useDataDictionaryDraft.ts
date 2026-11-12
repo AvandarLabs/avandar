@@ -8,8 +8,11 @@ type DataDictionaryDraftState = {
   isDirty: boolean;
   /** Throws the edits away and returns to the last loaded or saved draft. */
   discard: () => void;
-  /** Records the current draft as saved, so it reads as clean. */
-  markSaved: () => void;
+  /**
+   * Records `savedDraft` (what was sent to the server) as saved. Edits made
+   * after it was sent stay dirty.
+   */
+  markSaved: (savedDraft: DataDictionary.Draft) => void;
 };
 
 /**
@@ -45,8 +48,8 @@ export function useDataDictionaryDraft(
     discard: () => {
       setDraft(base);
     },
-    markSaved: () => {
-      setBase(draft);
+    markSaved: (sentDraft) => {
+      setBase(sentDraft);
     },
   };
 }
