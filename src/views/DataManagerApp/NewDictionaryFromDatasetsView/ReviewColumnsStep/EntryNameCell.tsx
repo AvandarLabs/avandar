@@ -11,6 +11,8 @@ type Props = {
   nameIssue: DictionaryProposal.EntryNameIssue | undefined;
   /** One dataset needs no dataset names after each column. */
   isSingleDataset: boolean;
+  /** The id the Suggested tag gives its explanation, when it shows. */
+  explanationId: string;
   dispatch: Dispatch<NewDictionaryAction>;
 };
 
@@ -35,6 +37,7 @@ export function EntryNameCell({
   entry,
   nameIssue,
   isSingleDataset,
+  explanationId,
   dispatch,
 }: Readonly<Props>): ReactNode {
   const { suggestionReason } = entry;
@@ -50,7 +53,10 @@ export function EntryNameCell({
         </Box>
         {suggestionReason === "meaning" ||
         suggestionReason === "similar_name" ? (
-          <SuggestedTag reason={suggestionReason} />
+          <SuggestedTag
+            reason={suggestionReason}
+            explanationId={explanationId}
+          />
         ) : null}
       </Group>
       <Text

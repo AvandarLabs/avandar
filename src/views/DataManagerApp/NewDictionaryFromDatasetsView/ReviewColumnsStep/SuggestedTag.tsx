@@ -1,21 +1,27 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Tooltip, VisuallyHidden } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
-import { useId } from "react";
 import type { ReactNode } from "react";
 
 type Props = {
   reason: "meaning" | "similar_name";
+  /**
+   * The id of the hidden explanation. The row's Keep apart button points at
+   * it too, so both explain the guess to screen readers.
+   */
+  explanationId: string;
 };
 
 /**
  * Marks an entry whose columns were joined by a guess, and says why on
- * hover, on keyboard focus, and to screen readers. Keep apart on the same
+ * hover and to screen readers. Keep apart on the same
  * row undoes the guess.
  */
-export function SuggestedTag({ reason }: Readonly<Props>): ReactNode {
+export function SuggestedTag({
+  reason,
+  explanationId,
+}: Readonly<Props>): ReactNode {
   const { t } = useLingui();
-  const explanationId = useId();
   const explanation =
     reason === "meaning"
       ? t`Matched by meaning, not just by name. Keep apart if these record different things.`
@@ -24,7 +30,6 @@ export function SuggestedTag({ reason }: Readonly<Props>): ReactNode {
     <>
       <Tooltip label={explanation} multiline w={260}>
         <Badge
-          tabIndex={0}
           aria-describedby={explanationId}
           variant="light"
           color="neutral"

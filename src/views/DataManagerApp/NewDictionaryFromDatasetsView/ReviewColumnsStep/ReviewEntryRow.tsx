@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Checkbox, Table, Text } from "@mantine/core";
+import { useId } from "react";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import { EntryKindSelect } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/EntryKindSelect";
 import { EntryNameCell } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/EntryNameCell";
@@ -32,6 +33,7 @@ export function ReviewEntryRow({
   dispatch,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
+  const explanationId = useId();
   const entryName = entry.name;
   const isCoded = DataDictionary.isCodedKind(entry.kind);
 
@@ -55,6 +57,7 @@ export function ReviewEntryRow({
         entry={entry}
         nameIssue={nameIssue}
         isSingleDataset={isSingleDataset}
+        explanationId={explanationId}
         dispatch={dispatch}
       />
       <Table.Td>
@@ -67,7 +70,11 @@ export function ReviewEntryRow({
         <Text size="xs" c="dimmed">
           {isCoded ? t`Needs labels` : t`Description`}
         </Text>
-        <KeepApartButton entry={entry} dispatch={dispatch} />
+        <KeepApartButton
+          entry={entry}
+          explanationId={explanationId}
+          dispatch={dispatch}
+        />
       </Table.Td>
     </Table.Tr>
   );

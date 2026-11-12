@@ -112,6 +112,22 @@ describe("ReviewColumnsStep", () => {
     });
   });
 
+  it("describes why a guessed merge was made on its Keep apart button", () => {
+    const matched = DictionaryProposal.applyMeaningMatches(
+      DictionaryProposal.fromColumnProfiles([
+        _column("hosp_yn", ["Y", "N"]),
+        _column("admitted", ["0", "1"], ERIE_ID),
+      ]),
+      [{ name: "admitted", sameAs: "hosp_yn" }],
+    );
+    _renderStep({ proposal: matched });
+    expect(
+      screen.getByRole("button", { name: "Keep apart: hosp_yn" }),
+    ).toHaveAccessibleDescription(
+      "Matched by meaning, not just by name. Keep apart if these record different things.",
+    );
+  });
+
   it("names an entry after its most common column and renames it in place", () => {
     const { dispatch } = _renderStep();
     const nameInput = screen.getByRole("textbox", {
@@ -202,12 +218,12 @@ describe("ReviewColumnsStep", () => {
 
 describe("SuggestedTag", () => {
   it("gives its explanation to screen readers, not only to hover", () => {
-    render(<SuggestedTag reason="meaning" />);
-    expect(
-      screen.getByText("Suggested").closest("[tabindex]"),
-    ).toHaveAccessibleDescription(
+    render(<SuggestedTag reason="meaning" explanationId="why" />);
+    const badge = screen.getByText("Suggested").closest("[aria-describedby]");
+    expect(badge).toHaveAccessibleDescription(
       "Matched by meaning, not just by name. Keep apart if these record different things.",
     );
+    expect(badge).not.toHaveAttribute("tabindex");
   });
 });
 
