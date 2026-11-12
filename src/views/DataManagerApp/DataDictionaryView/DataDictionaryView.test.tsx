@@ -33,7 +33,7 @@ vi.mock(
   },
 );
 
-function _mockListClient(): { useGetAll: () => unknown[] } {
+function _mockListClient(): { useGetAll: (options: unknown) => unknown[] } {
   return {
     useGetAll: (options: unknown) => {
       mocks.getAllOptions.push(options);
