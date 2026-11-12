@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
-import { Table, Text, VisuallyHidden } from "@mantine/core";
+import { Table, Text } from "@mantine/core";
 import { PickDatasetRow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetRow";
+import { PickDatasetsTableHead } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTableHead";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
@@ -29,24 +30,7 @@ export function PickDatasetsTable({
   }
   return (
     <Table highlightOnHover verticalSpacing="xs">
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th w={44}>
-            <VisuallyHidden>
-              <Trans>Pick</Trans>
-            </VisuallyHidden>
-          </Table.Th>
-          <Table.Th>
-            <Trans>Dataset</Trans>
-          </Table.Th>
-          <Table.Th>
-            <Trans>Source</Trans>
-          </Table.Th>
-          <Table.Th ta="right">
-            <Trans>Columns</Trans>
-          </Table.Th>
-        </Table.Tr>
-      </Table.Thead>
+      <PickDatasetsTableHead />
       <Table.Tbody>
         {datasets.map((dataset) => {
           return (

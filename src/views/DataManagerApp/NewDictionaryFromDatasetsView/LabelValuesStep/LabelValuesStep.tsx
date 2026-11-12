@@ -1,10 +1,8 @@
 import { useMemo } from "react";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
-import { CodeListLabelsPane } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListLabelsPane";
-import { CodeListsToLabelNav } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListsToLabelNav";
+import { LabelValuesColumns } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesColumns";
 import { LabelValuesFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter";
-import css from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesStep.module.css";
 import { NothingToLabel } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/NothingToLabel";
 import { useFocusTitleAfterAccept } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/useFocusTitleAfterAccept";
 import type { LabelsBlockReason } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
@@ -49,31 +47,18 @@ export function LabelValuesStep(props: Readonly<Props>): ReactNode {
   return (
     <>
       {selected ? (
-        <div className={css.labelValuesStep}>
-          <CodeListsToLabelNav
-            codeLists={codeLists}
-            labels={labels}
-            selectedKey={selected.key}
-            onSelect={(codeListKey) => {
-              dispatch({ type: "select_code_list", codeListKey });
-            }}
-          />
-          <AppViewBody>
-            <CodeListLabelsPane
-              codeList={selected}
-              entries={proposal.entries.filter((entry) => {
-                return selected.entryKeys.includes(entry.key);
-              })}
-              labels={labels}
-              suggestionAvailability={props.suggestionAvailability}
-              isSuggesting={props.suggestingCodeListKey === selected.key}
-              blockReason={props.getLabelsBlockReason(selected)}
-              titleRef={titleRef}
-              dispatch={dispatch}
-              onSuggest={props.onSuggest}
-            />
-          </AppViewBody>
-        </div>
+        <LabelValuesColumns
+          proposal={proposal}
+          codeLists={codeLists}
+          selected={selected}
+          labels={labels}
+          suggestionAvailability={props.suggestionAvailability}
+          isSuggesting={props.suggestingCodeListKey === selected.key}
+          blockReason={props.getLabelsBlockReason(selected)}
+          titleRef={titleRef}
+          dispatch={dispatch}
+          onSuggest={props.onSuggest}
+        />
       ) : (
         <AppViewBody>
           <NothingToLabel />

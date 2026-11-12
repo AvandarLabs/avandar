@@ -1,6 +1,5 @@
-import { Trans } from "@lingui/react/macro";
-import { Button, Group, Stack, Text, Title } from "@mantine/core";
-import { IconSparkles } from "@tabler/icons-react";
+import { Stack, Text } from "@mantine/core";
+import { CodeListPaneHeader } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListPaneHeader";
 import { EntryDescriptionField } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/EntryDescriptionField";
 import { LabelValuesTable } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable";
 import { SuggestionsOffNote } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote";
@@ -46,23 +45,15 @@ export function CodeListLabelsPane({
 
   return (
     <Stack gap="md" miw={0}>
-      <Group justify="space-between" wrap="nowrap" gap="md">
-        <Title order={2} fz="xl" fw={650} tabIndex={-1} ref={titleRef}>
-          {codeList.name}
-        </Title>
-        <Button
-          variant="default"
-          size="compact-sm"
-          leftSection={<IconSparkles size={14} aria-hidden />}
-          loading={isSuggesting}
-          disabled={isOff || blockReason !== undefined}
-          onClick={() => {
-            onSuggest(codeList);
-          }}
-        >
-          <Trans>Suggest labels</Trans>
-        </Button>
-      </Group>
+      <CodeListPaneHeader
+        title={codeList.name}
+        titleRef={titleRef}
+        isSuggesting={isSuggesting}
+        isSuggestOff={isOff || blockReason !== undefined}
+        onSuggest={() => {
+          onSuggest(codeList);
+        }}
+      />
       <Text size="sm" c="dimmed">
         {hint}
       </Text>
