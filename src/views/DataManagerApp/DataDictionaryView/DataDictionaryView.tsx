@@ -44,13 +44,15 @@ function useDictionaryContents(
       : undefined;
   }, [entries, codeLists, codings]);
 
+  // Only a failed first load counts. A background refetch that fails after
+  // the data loaded must not unmount the editor and lose the draft.
   const hasLoadFailed = [
     dictionaryQuery,
     entriesQuery,
     codeListsQuery,
     codingsQuery,
   ].some((query) => {
-    return query.isError;
+    return query.isLoadingError;
   });
   return { dictionary, savedDraft, hasLoadFailed };
 }
