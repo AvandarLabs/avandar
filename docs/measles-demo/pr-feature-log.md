@@ -10558,7 +10558,9 @@ personal, code too long, or too large for the model). The consent result is
 `approved`, `declined`, `ack_missing`, or `edited`. A save that fails after the
 dictionary row was created deletes it again, and reports
 `DictionaryLeftBehindError` if even that fails. On-device requests fit the
-8,192-token window, and the date sample is the same on every profile.
+8,192-token window, and the date sample is the same on every profile. A column
+with a different value on every row never sends its values, whatever kind the
+user sets, and a failed read returns to Pick instead of waiting forever.
 
 **Value:** A team no longer types a code list by hand. It reads what its
 datasets already use, labels the values once, and saves a dictionary that other
@@ -10575,7 +10577,7 @@ datasets can use.
 `src/views/DataManagerApp/NewDictionaryFromDatasetsView/`):
 
 - Docs: the plan and the design in `docs/measles-demo/`
-  (`c04ba61f7`, `16500c850`, `e129ff5e5`, `0ca89d343`), and this log.
+  (`c04ba61f7`, `16500c850`, `e129ff5e5`, `0ca89d343`, `89b3f501b`), and this log.
 - Save RPC schema, migration, desktop twin, and pgTAP (`85ebdc88e`):
   `supabase/schemas/50.rpc_data_dictionaries__save.sql`,
   `supabase/migrations/20261112201046_data_dictionaries_blank_labels.sql`,
@@ -10586,19 +10588,23 @@ datasets can use.
   `useDictionaryCopy.ts`, `CodeListEditor/`, and `DictionaryEntriesTab/` mark a
   value "Needs a label" without blocking Save.
 - Shared models (`eb5a1d0dc`, `301d160d6`, `b6de24b37`, `93ae735a2`,
-  `95d251232`, `6d2929ff0`, `9e27c69f9`, `d6b4dd5b4`, `7dd21b046`, `d28401d6c`):
+  `95d251232`, `6d2929ff0`, `9e27c69f9`, `d6b4dd5b4`, `7dd21b046`, `d28401d6c`,
+  `8081e5d87`, `75d8842db`, `01078e74e`):
   `shared/models/dataDictionaries/ColumnProfile/` and
   `shared/models/dataDictionaries/DictionaryProposal/` (clustering, shared code
   lists, the save draft, and the review edits).
 - Suggestions prompt and the `chat` route (`0fefb48c6`, `9988d01ae`,
-  `bcd7ef0d0`, `c0702775f`, `7e28f1fe4`, `e245efbe0`, `0485db5ed`, `e3e018a33`):
+  `bcd7ef0d0`, `c0702775f`, `7e28f1fe4`, `e245efbe0`, `0485db5ed`, `e3e018a33`,
+  `8081e5d87`, `5c6667f23`, `8ff76eade`):
   `shared/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts`,
   `supabase/functions/chat/PostDictionarySuggestions/`, `ChatRoutes.ts`,
   `ChatRoutes.types.ts`, and `supabase/functions/chat/deno.json` (the `uuid`
   entry the prompt's imports need, without which the whole `chat` function
-  fails to boot).
+  fails to boot). `8ff76eade` also adds `OpenRouterApiError.ts` next to
+  `sendOpenRouterRequest.ts`, which now throws it with the same message, so the
+  route can answer a provider failure with its status alone.
 - Profiling and suggestions libraries (`1df554069`, `620305730`, `19fc3b528`,
-  `151f6e8d4`, `faa20cc5e`, `730e17cb8`, `7683b6501`, `931a5dcb1`, `fc3ac948c`):
+  `151f6e8d4`, `faa20cc5e`, `730e17cb8`, `7683b6501`, `931a5dcb1`, `fc3ac948c`, `8081e5d87`, `5c6667f23`):
   `src/lib/dataDictionaries/` (`profileDatasetColumns`, `ColumnProfileSql`,
   `DictionarySuggestions`), `useIsMounted.ts`, and `resolveChatRuntimeMode.ts`.
 - Consent context (`620305730`): `dictionary_suggestions` in
@@ -10607,11 +10613,12 @@ datasets can use.
 - Create flow view (`cd6d25328`, `d33a6491e`, `3e19ea548`, `d2330bc58`,
   `ae8c0a965`, `583d461f8`, `03c38daaa`, `82dfaebc9`, `d8c2888d6`, `b41950d2a`,
   `3fcba873e`, `a482b13c9`, `6ed86bd2a`, `d44e43d05`, `c37c915c5`, `b183467f8`,
-  `ec26ed15c`, `4e10c05a4`, `c1fe425ab`, `064e89ba5`, `32cd7c8f2`, `7f37dac18`):
+  `ec26ed15c`, `4e10c05a4`, `c1fe425ab`, `064e89ba5`, `32cd7c8f2`, `7f37dac18`,
+  `39a5005ee`, `6f36c1d48`, `e5f9e159d`):
   `NewDictionaryFromDatasetsView/` (the reducer, the read, suggest, and save
   hooks, and the four step folders), the
   `dictionaries/new` route, `AppLinks.tsx`, and the generated `routeTree.gen.ts`.
-- Data Sources entry points (`4ff06c4ca`, `cdcbda201`): `NewDictionaryMenu.tsx`
+- Data Sources entry points (`4ff06c4ca`, `cdcbda201`, `14d07dc17`): `NewDictionaryMenu.tsx`
   and `ListToggleButton.tsx` in `DataManagerToolbarActions/`,
   `useListPaneToggle/`, `DataManagerApp.tsx`, and
   `DatasetActionsMenu/CreateDictionaryMenuItem.tsx`.
@@ -10620,7 +10627,7 @@ datasets can use.
   `tests/e2e/data-dictionary-edit.spec.ts` (through the New dictionary menu),
   `tests/e2e/helpers/constants.ts`, and
   `tests/data/measles-line-list-small/measles-line-list-small.csv`.
-- Translations (`4c8886f20`): `src/i18n/locales/*/messages.{po,ts}`,
+- Translations (`4c8886f20`, `8780c13fd`): `src/i18n/locales/*/messages.{po,ts}`,
   regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
 
 **Schema:** yes, one migration (`data_dictionaries_blank_labels`) that replaces
