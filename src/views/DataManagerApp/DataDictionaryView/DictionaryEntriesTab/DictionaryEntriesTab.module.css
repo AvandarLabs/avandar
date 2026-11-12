@@ -1,0 +1,30 @@
+/*
+ * The entries table and the selected entry's pane side by side. Below 62em
+ * the pane drops under the table instead of squeezing it.
+ */
+.dictionaryEntriesTab {
+  display: grid;
+  gap: var(--mantine-spacing-lg);
+  grid-template-columns: minmax(0, 1fr) 22rem;
+}
+
+.dictionaryEntriesTabPane {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-md);
+}
+
+.dictionaryEntriesTabRow[data-selected="true"] td {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.dictionaryEntriesTabAlias {
+  margin-inline-end: var(--mantine-spacing-xxs);
+}
+
+@media (width < 62em) {
+  .dictionaryEntriesTab {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
