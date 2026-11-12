@@ -79,23 +79,57 @@ function getDatasetIds(proposal: Readonly<DictionaryProposalT>): Dataset.Id[] {
   return [...new Set(datasetIds)];
 }
 
+/** A listed value merged across columns, with the key it compares by. */
+type ValueSeen = ColumnProfile.Value & { key: string };
+
+/**
+ * Adds one column's values to `seen`. A value joins one from another column
+ * with the same comparison key, the same spelling first, so `01` and `1`
+ * merge across columns. Two values of one column never merge with each
+ * other unless their trimmed spellings are the same.
+ */
+function _addColumnValues(
+  seen: ValueSeen[],
+  values: readonly ColumnProfile.Value[],
+): void {
+  const takenByColumn = new Set<ValueSeen>();
+  values.forEach((item) => {
+    const value = item.value.trim();
+    const key = ColumnProfile.getComparisonKey(value);
+    const candidates = seen.filter((slot) => {
+      return (
+        slot.key === key && (slot.value === value || !takenByColumn.has(slot))
+      );
+    });
+    const slot =
+      candidates.find((candidate) => {
+        return candidate.value === value;
+      }) ?? candidates[0];
+    if (slot) {
+      slot.rowCount += item.rowCount;
+      takenByColumn.add(slot);
+    } else {
+      const added = { key, value, rowCount: item.rowCount };
+      seen.push(added);
+      takenByColumn.add(added);
+    }
+  });
+}
+
 function getValuesSeen(
   entry: Readonly<DictionaryProposalEntry>,
 ): ColumnProfile.Value[] {
-  const values = new Map<string, ColumnProfile.Value>();
+  const seen: ValueSeen[] = [];
   getColumns(entry).forEach((column) => {
-    (column.values ?? []).forEach((item) => {
-      const key = ColumnProfile.getComparisonKey(item.value);
-      const current = values.get(key);
-      values.set(key, {
-        value: current?.value ?? item.value.trim(),
-        rowCount: (current?.rowCount ?? 0) + item.rowCount,
-      });
+    _addColumnValues(seen, column.values ?? []);
+  });
+  return seen
+    .sort((itemA, itemB) => {
+      return itemB.rowCount - itemA.rowCount;
+    })
+    .map(({ value, rowCount }) => {
+      return { value, rowCount };
     });
-  });
-  return [...values.values()].sort((itemA, itemB) => {
-    return itemB.rowCount - itemA.rowCount;
-  });
 }
 
 function getNumberRange(
@@ -333,7 +367,10 @@ export const DictionaryProposalModule = {
   /** Every dataset a proposal was learned from, each once. */
   getDatasetIds,
 
-  /** An entry's listed values across its columns, most rows first. */
+  /**
+   * An entry's listed values across its columns, most rows first. Codes
+   * such as `01` and `1` merge across columns but stay apart within one.
+   */
   getValuesSeen,
 
   /** The lowest and highest value across an entry's number columns. */

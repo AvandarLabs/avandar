@@ -201,5 +201,31 @@ describe("DictionaryProposal edits", () => {
         }),
       ).toEqual(["M"]);
     });
+
+    it("keeps 01 and 1 apart when one column holds both", () => {
+      const entry = _firstEntry(
+        DictionaryProposal.fromColumnProfiles([
+          _coded(BRONX, "grade", ["01", "1"]),
+        ]),
+      );
+      expect(DictionaryProposal.getValuesSeen(entry)).toEqual([
+        { value: "01", rowCount: 100 },
+        { value: "1", rowCount: 100 },
+      ]);
+    });
+
+    it("merges 01 and 1 when they come from different columns", () => {
+      const entry = _firstEntry(
+        DictionaryProposal.fromColumnProfiles([
+          _coded(BRONX, "grade", ["01", "1"]),
+          _coded(ERIE, "grade", ["1"]),
+          _coded(KINGS, "grade", ["001"]),
+        ]),
+      );
+      expect(DictionaryProposal.getValuesSeen(entry)).toEqual([
+        { value: "01", rowCount: 200 },
+        { value: "1", rowCount: 200 },
+      ]);
+    });
   });
 });
