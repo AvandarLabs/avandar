@@ -4,10 +4,16 @@ import { parseDictionaryMeaningMatches } from "$/agent/dictionarySuggestions/dic
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type { ProposalReadId } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { RequestSuggestionReply } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 
 /** Where the search for columns that mean the same thing stands. */
 export type MeaningMatchStatus = "idle" | "finding" | "done" | "failed";
+
+type MatchesVariables = {
+  proposal: DictionaryProposal.T;
+  readId: ProposalReadId;
+};
 
 async function _requestMatches(
   options: Readonly<{
@@ -38,7 +44,7 @@ async function _requestMatches(
 /**
  * Asks the suggestion model, once, which columns of different datasets
  * record the same thing, and hands back the matches with the proposal
- * they were found for. A failure is shown by
+ * and read they were found for. A failure is shown by
  * the Review step's status line, not a toast: the matches by name and
  * values are still there. A request the user declined to send finds none.
  */
@@ -49,25 +55,26 @@ export function useMeaningMatches(
     onFound: (
       matches: DictionaryProposal.MeaningMatch[],
       proposal: DictionaryProposal.T,
+      readId: ProposalReadId,
     ) => void;
   }>,
 ): {
-  findMatches: (proposal: DictionaryProposal.T) => void;
+  findMatches: (proposal: DictionaryProposal.T, readId: ProposalReadId) => void;
   status: MeaningMatchStatus;
 } {
   const { i18n } = useLingui();
-  const [findMatches, , result] = useMutation({
-    mutationFn: (proposal: DictionaryProposal.T) => {
+  const [findMatchesFor, , result] = useMutation({
+    mutationFn: (variables: MatchesVariables) => {
       return _requestMatches({
-        proposal,
+        proposal: variables.proposal,
         locale: i18n.locale,
         model: options.model,
         requestReply: options.requestReply,
       });
     },
-    onSuccess: (matches, proposal) => {
+    onSuccess: (matches, variables) => {
       if (matches.length > 0) {
-        options.onFound(matches, proposal);
+        options.onFound(matches, variables.proposal, variables.readId);
       }
     },
     onError: () => {
@@ -81,5 +88,10 @@ export function useMeaningMatches(
       : result.isSuccess
         ? "done"
         : "idle";
-  return { findMatches, status };
+  return {
+    findMatches: (proposal, readId) => {
+      findMatchesFor({ proposal, readId });
+    },
+    status,
+  };
 }

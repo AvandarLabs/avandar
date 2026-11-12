@@ -5,7 +5,10 @@ import { act, renderHook, TestProviders } from "@/test-utils";
 import { makeInitialNewDictionaryState } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import { useNewDictionaryFlow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { NewDictionaryState } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type {
+  NewDictionaryState,
+  ProposalReadId,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { NewDictionarySources } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionarySources";
 import type { ReactNode } from "react";
 
@@ -13,7 +16,11 @@ type ReadOptions = {
   onRead: (proposal: DictionaryProposal.T, datasets: unknown[]) => void;
 };
 type MatchOptions = {
-  onFound: (matches: unknown[], proposal: DictionaryProposal.T) => void;
+  onFound: (
+    matches: unknown[],
+    proposal: DictionaryProposal.T,
+    readId: ProposalReadId,
+  ) => void;
 };
 
 const mocks = vi.hoisted(() => {
@@ -176,9 +183,12 @@ describe("useNewDictionaryFlow", () => {
       type: "datasets_read",
       proposal: PROPOSAL,
       datasetIds: [DATASET_ID],
+      readId: expect.any(String),
       defaultName: "Kings line list codes",
     });
-    expect(mocks.findMatchesMock).toHaveBeenCalledWith(PROPOSAL);
+    // The matches are asked for under the id of the read they belong to.
+    const readId = dispatch.mock.calls[0]?.[0].readId;
+    expect(mocks.findMatchesMock).toHaveBeenCalledWith(PROPOSAL, readId);
   });
 
   it("does not ask for matches when the read is for datasets that are no longer picked", () => {
@@ -198,18 +208,20 @@ describe("useNewDictionaryFlow", () => {
     );
   });
 
-  it("tags found matches with the datasets of the proposal they were found for", () => {
+  it("tags found matches with the read they were found for", () => {
     const { dispatch } = _render(_pickedState());
+    const readId = uuid<ProposalReadId>();
     act(() => {
       (mocks.matchOptions as MatchOptions).onFound(
         [{ name: "a", sameAs: "b" }],
         PROPOSAL,
+        readId,
       );
     });
     expect(dispatch).toHaveBeenCalledWith({
       type: "meaning_matches_found",
       matches: [{ name: "a", sameAs: "b" }],
-      datasetIds: [DATASET_ID],
+      readId,
     });
   });
 

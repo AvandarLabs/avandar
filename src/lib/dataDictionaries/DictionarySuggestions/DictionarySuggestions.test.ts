@@ -232,7 +232,7 @@ describe("DictionarySuggestions.approveRequest", () => {
     );
   });
 
-  it("treats a rewritten request as a decline and drops its ack", async () => {
+  it("tells a rewritten request from a decline and drops its ack", async () => {
     const rewritten = `${TEXT} `;
     decideMock.mockResolvedValue({
       approved: true,
@@ -245,7 +245,7 @@ describe("DictionarySuggestions.approveRequest", () => {
       userId: "user-id",
       isConsentConfirmed: false,
     });
-    expect(approval).toEqual({ type: "declined" });
+    expect(approval).toEqual({ type: "edited" });
     expect(consumeAckMock).toHaveBeenCalledWith(rewritten);
   });
 

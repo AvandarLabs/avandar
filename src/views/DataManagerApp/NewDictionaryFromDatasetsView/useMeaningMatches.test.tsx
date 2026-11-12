@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { uuid } from "$/lib/uuid";
 import { renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useMeaningMatches } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import type { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import type { ProposalReadId } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { ReactNode } from "react";
 
 const { makeRequestMock } = vi.hoisted(() => {
@@ -56,6 +58,8 @@ function _render(requestReply: () => Promise<string | undefined>) {
   return { ...rendered, onFound };
 }
 
+const READ_ID = uuid<ProposalReadId>();
+
 describe("useMeaningMatches", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -71,7 +75,7 @@ describe("useMeaningMatches", () => {
       const { result, onFound } = _render(() => {
         return Promise.reject(new Error(message));
       });
-      result.current.findMatches(PROPOSAL);
+      result.current.findMatches(PROPOSAL, READ_ID);
       await waitFor(() => {
         expect(result.current.status).toBe("failed");
       });
@@ -85,13 +89,14 @@ describe("useMeaningMatches", () => {
         '{"matches":[{"name":"birth_date","sameAs":"dob"}]}',
       );
     });
-    result.current.findMatches(PROPOSAL);
+    result.current.findMatches(PROPOSAL, READ_ID);
     await waitFor(() => {
       expect(result.current.status).toBe("done");
     });
     expect(onFound).toHaveBeenCalledWith(
       [{ name: "birth_date", sameAs: "dob" }],
       PROPOSAL,
+      READ_ID,
     );
   });
 
@@ -99,7 +104,7 @@ describe("useMeaningMatches", () => {
     const { result, onFound } = _render(() => {
       return Promise.resolve(undefined);
     });
-    result.current.findMatches(PROPOSAL);
+    result.current.findMatches(PROPOSAL, READ_ID);
     await waitFor(() => {
       expect(result.current.status).toBe("done");
     });

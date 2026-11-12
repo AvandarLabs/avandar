@@ -7,9 +7,13 @@ import {
 } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { NewDictionaryState } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type {
+  NewDictionaryState,
+  ProposalReadId,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 
 const DATASET_ID = uuid<Dataset.Id>();
+const READ_ID = uuid<ProposalReadId>();
 
 function _column(
   columnName: string,
@@ -47,6 +51,7 @@ function _read(state: NewDictionaryState): NewDictionaryState {
     type: "datasets_read",
     proposal: PROPOSAL,
     datasetIds: [DATASET_ID],
+    readId: READ_ID,
     defaultName: "Kings line list codes",
   });
 }
@@ -207,6 +212,7 @@ describe("newDictionaryReducer", () => {
       type: "datasets_read",
       proposal: PROPOSAL,
       datasetIds: [DATASET_ID],
+      readId: READ_ID,
       defaultName: "Kings line list codes",
     });
     expect(state).toBe(picking);
@@ -224,26 +230,44 @@ describe("newDictionaryReducer", () => {
       type: "datasets_read",
       proposal: DictionaryProposal.fromColumnProfiles([]),
       datasetIds: [DATASET_ID],
+      readId: uuid<ProposalReadId>(),
       defaultName: "Late",
     });
     expect(late).toBe(repicked);
   });
 
-  it("applies meaning matches only to the proposal of the datasets they were found for", () => {
+  it("applies meaning matches only to the read they were found for", () => {
     const read = _read(makeInitialNewDictionaryState(undefined));
     const matches = [{ name: "hosp_yn", sameAs: "GENDER" }];
     const stale = newDictionaryReducer(read, {
       type: "meaning_matches_found",
       matches,
-      datasetIds: [uuid<Dataset.Id>()],
+      readId: uuid<ProposalReadId>(),
     });
     expect(stale).toBe(read);
     const current = newDictionaryReducer(read, {
       type: "meaning_matches_found",
       matches,
-      datasetIds: [DATASET_ID],
+      readId: READ_ID,
     });
     expect(current).not.toBe(read);
+  });
+
+  it("drops late matches from an earlier read of the same datasets, so Keep apart stays", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const reread = newDictionaryReducer(read, {
+      type: "datasets_read",
+      proposal: PROPOSAL,
+      datasetIds: [DATASET_ID],
+      readId: uuid<ProposalReadId>(),
+      defaultName: "Kings line list codes",
+    });
+    const late = newDictionaryReducer(reread, {
+      type: "meaning_matches_found",
+      matches: [{ name: "hosp_yn", sameAs: "GENDER" }],
+      readId: READ_ID,
+    });
+    expect(late).toBe(reread);
   });
 
   it("falls back to an empty Pick when the dataset that opened the flow is unavailable", () => {

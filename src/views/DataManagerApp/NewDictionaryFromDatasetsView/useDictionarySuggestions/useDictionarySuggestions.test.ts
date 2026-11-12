@@ -131,6 +131,14 @@ describe("useDictionarySuggestions", () => {
     expect(mocks.requestReply).not.toHaveBeenCalled();
   });
 
+  it("skips a request the user edited without recording a no", async () => {
+    mocks.approveRequest.mockResolvedValue({ type: "edited" });
+    const { suggestions, onConsentDecided } = _render("not_asked");
+    await expect(suggestions.requestReply(REQUEST)).resolves.toBeUndefined();
+    expect(onConsentDecided).not.toHaveBeenCalled();
+    expect(mocks.requestReply).not.toHaveBeenCalled();
+  });
+
   it("keeps the approval and fails the request when the consent left no ack token", async () => {
     mocks.approveRequest.mockResolvedValue({ type: "ack_missing" });
     const { suggestions, onConsentDecided } = _render("not_asked");

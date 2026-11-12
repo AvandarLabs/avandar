@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
+import { uuid } from "$/lib/uuid";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useIsMounted } from "@/lib/hooks/state/useIsMounted";
@@ -16,6 +17,7 @@ import type { LabelsBlockReason } from "@/lib/dataDictionaries/DictionarySuggest
 import type {
   NewDictionaryAction,
   NewDictionaryState,
+  ProposalReadId,
 } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
 import type { CreateDictionaryVariables } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary";
 import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
@@ -112,12 +114,11 @@ function useReadWithMatches(
   const matches = useMeaningMatches({
     requestReply: suggestions.requestReply,
     model: suggestions.model,
-    onFound: (found, proposal) => {
+    onFound: (found, _proposal, readId) => {
       if (!isMountedRef.current) {
         return;
       }
-      const datasetIds = DictionaryProposal.getDatasetIds(proposal);
-      dispatch({ type: "meaning_matches_found", matches: found, datasetIds });
+      dispatch({ type: "meaning_matches_found", matches: found, readId });
     },
   });
   const [read, isReading] = useReadDatasets({
@@ -134,10 +135,17 @@ function useReadWithMatches(
       }
       const firstName = datasets[0]?.dataset.name ?? "";
       const defaultName = t`${firstName} codes`;
-      dispatch({ type: "datasets_read", proposal, datasetIds, defaultName });
+      const readId = uuid<ProposalReadId>();
+      dispatch({
+        type: "datasets_read",
+        proposal,
+        datasetIds,
+        readId,
+        defaultName,
+      });
       const { availability } = suggestions;
       if (availability === "online" || availability === "on_device") {
-        matches.findMatches(proposal);
+        matches.findMatches(proposal, readId);
       }
     },
   });

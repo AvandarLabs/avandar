@@ -65,12 +65,14 @@ export type CompleteDictionarySuggestionsOnDevice = (request: {
 
 /**
  * What the user's consent to send one request came to: an ack token the
- * route checks, a real no, or a yes that left no token to send with (a
- * technical failure, not a decision).
+ * route checks, a real no, an edit that rewrote the text the consent covers
+ * (this request is skipped, and the user has not said no), or a yes that
+ * left no token to send with (a technical failure, not a decision).
  */
 export type DictionarySuggestionsApproval =
   | { type: "approved"; ackToken: string }
   | { type: "declined" }
+  | { type: "edited" }
   | { type: "ack_missing" };
 
 // The words that keep a column's values here, and every cap on a request
@@ -121,13 +123,14 @@ async function approveRequest(
   }
   // Picking "Use suggestion" on a bias nudge rewrites the text, which would
   // change what was agreed to. Only the request as written counts as
-  // approved, so a rewrite is a decline. Its ack is minted for the rewritten
-  // text, so it is dropped here rather than left in the queue.
+  // approved, so a rewrite skips this one request. It is not a no, so it is
+  // reported apart from a decline. Its ack is minted for the rewritten text,
+  // so it is dropped here rather than left in the queue.
   if (consent.payload.text !== text) {
     if (consent.payload.text !== undefined) {
       await PendingAcks.consumeAckForText(consent.payload.text);
     }
-    return { type: "declined" };
+    return { type: "edited" };
   }
   const ackToken = await PendingAcks.consumeAckForText(text);
   return ackToken === undefined
@@ -398,9 +401,10 @@ export const DictionarySuggestions = {
 
   /**
    * Asks the user, through the chat's consent gate, to send one request
-   * online, and returns the ack token the route checks. A decline, or an
-   * edit that changes what was agreed to, is `declined`. A yes that left no
-   * token is `ack_missing`, which is a failure to retry, not a no.
+   * online, and returns the ack token the route checks. A decline is
+   * `declined`. An edit that changes what was agreed to is `edited`: that
+   * request is skipped, without a no on record. A yes that left no token is
+   * `ack_missing`, which is a failure to retry, not a no.
    */
   approveRequest,
 

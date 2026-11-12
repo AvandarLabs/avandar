@@ -1,6 +1,7 @@
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UUID } from "@avandar/utils";
 
 /** The create flow's steps, in order. */
 export type NewDictionaryStep = "pick" | "review" | "label" | "save";
@@ -10,6 +11,13 @@ export type NewDictionaryStep = "pick" | "review" | "label" | "save";
  * online send of the flow and kept until the flow closes.
  */
 export type SuggestionConsent = "not_asked" | "approved" | "declined";
+
+/**
+ * Names one reading of the picked datasets. Meaning matches carry the id of
+ * the read they were asked for, so matches that arrive after the datasets
+ * were read again, or after Keep apart, cannot reapply to a newer proposal.
+ */
+export type ProposalReadId = UUID<"ProposalRead">;
 
 /**
  * Everything the create flow holds while someone learns a dictionary from
@@ -22,6 +30,8 @@ export type NewDictionaryState = {
   pickedDatasetIds: Dataset.Id[];
   /** Undefined until the picked datasets are read. */
   proposal: DictionaryProposal.T | undefined;
+  /** The read that made the proposal. Undefined until then. */
+  readId: ProposalReadId | undefined;
   labels: DictionaryProposal.Labels;
   selectedCodeListKey: string | undefined;
   name: string;
@@ -37,6 +47,8 @@ export type NewDictionaryAction =
       proposal: DictionaryProposal.T;
       /** The datasets that were read. The read is ignored unless picked. */
       datasetIds: readonly Dataset.Id[];
+      /** Names this read, so matches found for it can be told apart. */
+      readId: ProposalReadId;
       defaultName: string;
     }
   | { type: "go_to_step"; step: NewDictionaryStep }
@@ -51,8 +63,8 @@ export type NewDictionaryAction =
   | {
       type: "meaning_matches_found";
       matches: readonly DictionaryProposal.MeaningMatch[];
-      /** The datasets of the proposal the matches were found for. */
-      datasetIds: readonly Dataset.Id[];
+      /** The read of the proposal the matches were found for. */
+      readId: ProposalReadId;
     }
   | { type: "select_code_list"; codeListKey: string }
   | {
@@ -194,7 +206,12 @@ const HANDLERS: Handlers = {
       return state;
     }
     const name = state.name || action.defaultName;
-    return { ..._withProposal(state, action.proposal), step: "review", name };
+    return {
+      ..._withProposal(state, action.proposal),
+      readId: action.readId,
+      step: "review",
+      name,
+    };
   },
   go_to_step: (state, action) => {
     return { ...state, step: action.step };
@@ -237,13 +254,9 @@ const HANDLERS: Handlers = {
     });
   },
   meaning_matches_found: (state, action) => {
-    const isCurrent =
-      state.proposal !== undefined &&
-      isSameDatasetSet(
-        DictionaryProposal.getDatasetIds(state.proposal),
-        action.datasetIds,
-      );
-    if (!isCurrent) {
+    // Matches for an older read are dropped, even for the same datasets, so
+    // they cannot undo a Keep apart made on the newer proposal.
+    if (state.proposal === undefined || state.readId !== action.readId) {
       return state;
     }
     return _editProposal(state, (proposal) => {
@@ -294,6 +307,7 @@ export function makeInitialNewDictionaryState(
     originDatasetId,
     pickedDatasetIds: originDatasetId ? [originDatasetId] : [],
     proposal: undefined,
+    readId: undefined,
     labels: {},
     selectedCodeListKey: undefined,
     name: "",

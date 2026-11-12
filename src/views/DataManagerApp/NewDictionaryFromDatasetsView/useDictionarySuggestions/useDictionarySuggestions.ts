@@ -51,6 +51,11 @@ async function _requestOnline(
     userId: options.userId,
     isConsentConfirmed: consent === "approved",
   });
+  // An edit skips this one request and records nothing: the user neither
+  // agreed to send suggestions nor said no to them.
+  if (approval.type === "edited") {
+    return undefined;
+  }
   // Only a real no turns online suggestions off for the flow. A yes that
   // left no token is kept as a yes, and the request fails to be retried.
   if (consent === "not_asked") {
