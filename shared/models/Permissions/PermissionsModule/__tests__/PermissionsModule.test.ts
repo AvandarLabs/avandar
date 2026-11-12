@@ -88,6 +88,8 @@ describe("Permissions.getPermissionsForAppRole", () => {
     expect(keys.has("data_sources__can_view_dataset")).toBe(true);
     expect(keys.has("data_sources__can_list_sources")).toBe(true);
     expect(keys.has("data_sources__can_edit_dataset")).toBe(false);
+    expect(keys.has("data_sources__can_view_dictionaries")).toBe(true);
+    expect(keys.has("data_sources__can_edit_dictionaries")).toBe(false);
   });
 
   it("includes all tiers for admin", () => {
@@ -97,6 +99,7 @@ describe("Permissions.getPermissionsForAppRole", () => {
     });
 
     expect(keys.has("data_sources__can_manage_sources")).toBe(true);
+    expect(keys.has("data_sources__can_edit_dictionaries")).toBe(true);
     expect(keys.has("data_sources__can_edit_dataset")).toBe(true);
     expect(keys.has("data_sources__can_view_dataset")).toBe(true);
   });
