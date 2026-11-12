@@ -121,6 +121,18 @@ function _toOptionalNumber(value: unknown): number | undefined {
   return value === null || value === undefined ? undefined : _toNumber(value);
 }
 
+/** The share of a text column's sampled values that read as dates. */
+function _getDateShare(
+  summaryRow: ColumnSummaryRow,
+  index: number,
+): number | undefined {
+  const dates = _toOptionalNumber(summaryRow[`dates_${index}`]);
+  const sampledCount = _toNumber(summaryRow[`sampled_${index}`]);
+  return dates === undefined || sampledCount === 0
+    ? undefined
+    : dates / sampledCount;
+}
+
 function getListedColumnIndexes(
   options: Readonly<{
     columns: readonly ProfiledColumn[];
@@ -161,8 +173,6 @@ function makeColumnProfilesFromRows(
         ? listed
         : undefined;
     const nonNullCount = _toNumber(summaryRow[`non_null_${index}`]);
-    const dates = _toOptionalNumber(summaryRow[`dates_${index}`]);
-    const sampledCount = _toNumber(summaryRow[`sampled_${index}`]);
     const min = _toOptionalNumber(summaryRow[`min_${index}`]);
     const max = _toOptionalNumber(summaryRow[`max_${index}`]);
     return {
@@ -176,10 +186,7 @@ function makeColumnProfilesFromRows(
         ? values.length
         : _toNumber(summaryRow[`distinct_${index}`]),
       values,
-      dateShare:
-        dates === undefined || sampledCount === 0
-          ? undefined
-          : dates / sampledCount,
+      dateShare: _getDateShare(summaryRow, index),
       numberRange:
         min === undefined || max === undefined ? undefined : { min, max },
     };

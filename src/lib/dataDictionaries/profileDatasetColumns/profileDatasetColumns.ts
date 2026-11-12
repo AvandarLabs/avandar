@@ -9,6 +9,30 @@ import type {
   ProfiledColumn,
 } from "@/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql";
 
+async function _readValueRows(
+  options: Readonly<{
+    workspaceId: Workspace.Id;
+    dataset: Readonly<{ id: Dataset.Id }>;
+    listedColumns: ReadonlyArray<{ index: number; name: string }>;
+  }>,
+): Promise<ColumnValueRow[]> {
+  const { dataset, listedColumns } = options;
+  if (listedColumns.length === 0) {
+    return [];
+  }
+  const result = await WorkspaceQuerySession.runQuery<ColumnValueRow>({
+    workspaceId: options.workspaceId,
+    neededColumnsByDatasetId: {
+      [dataset.id]: listedColumns.map(prop("name")),
+    },
+    rawSql: ColumnProfileSql.buildValuesSql({
+      datasetId: dataset.id,
+      columns: listedColumns,
+    }),
+  });
+  return result.data;
+}
+
 /**
  * Profiles one dataset's columns on this device through the QETL query
  * layer, so it works for any dataset the workspace can query, offline-only
@@ -46,21 +70,11 @@ export async function profileDatasetColumns(
     const column = columns[index];
     return column ? [{ index, name: column.name }] : [];
   });
-  const valueRows =
-    listedColumns.length === 0
-      ? []
-      : (
-          await WorkspaceQuerySession.runQuery<ColumnValueRow>({
-            workspaceId,
-            neededColumnsByDatasetId: {
-              [dataset.id]: listedColumns.map(prop("name")),
-            },
-            rawSql: ColumnProfileSql.buildValuesSql({
-              datasetId: dataset.id,
-              columns: listedColumns,
-            }),
-          })
-        ).data;
+  const valueRows = await _readValueRows({
+    workspaceId,
+    dataset,
+    listedColumns,
+  });
   return ColumnProfileSql.makeColumnProfilesFromRows({
     dataset,
     columns,
