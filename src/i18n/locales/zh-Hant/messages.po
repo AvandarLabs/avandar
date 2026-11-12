@@ -5556,6 +5556,12 @@ msgstr "數據"
 msgid "You can restart it anytime from Profile."
 msgstr "您隨時可以從個人檔案重新開始。"
 
+#. placeholder {0}: ColumnProfile.MAX_LISTED_VALUES
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
+msgid "{0, plural, one {Suggestions cover the first # value.} other "
+"{Suggestions cover the first # values.}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Kept the rule-based results."
 msgstr "已保留規則式結果。"

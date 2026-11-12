@@ -5823,6 +5823,12 @@ msgstr "Données"
 msgid "You can restart it anytime from Profile."
 msgstr "Vous pouvez la redémarrer à tout moment depuis le profil."
 
+#. placeholder {0}: ColumnProfile.MAX_LISTED_VALUES
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
+msgid "{0, plural, one {Suggestions cover the first # value.} other "
+"{Suggestions cover the first # values.}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Kept the rule-based results."
 msgstr "Les résultats basés sur les règles ont été conservés."

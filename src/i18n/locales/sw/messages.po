@@ -5759,6 +5759,12 @@ msgstr "Data"
 msgid "You can restart it anytime from Profile."
 msgstr "Unaweza kuyaanzisha upya wakati wowote kutoka kwenye Wasifu."
 
+#. placeholder {0}: ColumnProfile.MAX_LISTED_VALUES
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
+msgid "{0, plural, one {Suggestions cover the first # value.} other "
+"{Suggestions cover the first # values.}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Kept the rule-based results."
 msgstr "Tumehifadhi matokeo ya kanuni."

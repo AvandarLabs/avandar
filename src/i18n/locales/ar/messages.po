@@ -5689,6 +5689,12 @@ msgstr "البيانات"
 msgid "You can restart it anytime from Profile."
 msgstr "يمكنك إعادة تشغيلها في أي وقت من الملف الشخصي."
 
+#. placeholder {0}: ColumnProfile.MAX_LISTED_VALUES
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/SuggestionsOffNote.tsx
+msgid "{0, plural, one {Suggestions cover the first # value.} other "
+"{Suggestions cover the first # values.}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "Kept the rule-based results."
 msgstr "تم الإبقاء على النتائج المستندة إلى القواعد."
