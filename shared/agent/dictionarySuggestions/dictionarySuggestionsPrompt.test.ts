@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDictionarySuggestionsMessages,
+  DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES,
+  DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH,
   DICTIONARY_SUGGESTIONS_PROMPT_ID,
   DictionarySuggestionsRequestSchema,
   isDictionarySuggestionsPromptId,
+  isDictionarySuggestionsRequestTooLarge,
+  isIdentifyingColumnName,
   parseDictionaryLabelSuggestions,
   parseDictionaryMeaningMatches,
   stringifyDictionarySuggestionsRequest,
@@ -19,6 +23,22 @@ const GENDER: DictionarySuggestionColumn = {
   kind: "categorical",
   values: ["1", "2", "9"],
 };
+
+function _isLabelsRequestValid(
+  column: Partial<DictionarySuggestionColumn>,
+): boolean {
+  return DictionarySuggestionsRequestSchema.safeParse({
+    task: "labels",
+    locale: "en",
+    column: { ...GENDER, ...column },
+  }).success;
+}
+
+function _makeCodes(count: number): string[] {
+  return Array.from({ length: count }, (_item, index) => {
+    return String(index + 1);
+  });
+}
 
 describe("dictionarySuggestionsPrompt", () => {
   it("serves dictionary-suggestions-v1 and refuses any other id", () => {
@@ -102,5 +122,107 @@ describe("dictionarySuggestionsPrompt", () => {
       columns: [GENDER],
     });
     expect(parsed.success).toBe(false);
+  });
+
+  it.each(["number", "date", "text", "identifier"] as const)(
+    "refuses the values of a %s column",
+    (kind) => {
+      expect(_isLabelsRequestValid({ kind })).toBe(false);
+      expect(_isLabelsRequestValid({ kind, values: [] })).toBe(true);
+    },
+  );
+
+  it("refuses values in a matches request for a column that is not coded", () => {
+    const parsed = DictionarySuggestionsRequestSchema.safeParse({
+      task: "matches",
+      locale: "en",
+      columns: [GENDER, { ...GENDER, name: "notes", kind: "text" }],
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it.each([
+    [{ name: "first_name" }],
+    [{ name: "PatientEmail" }],
+    [{ otherNames: ["sex", "home_phone"] }],
+  ])("refuses the values of a column named like %j", (column) => {
+    expect(_isLabelsRequestValid(column)).toBe(false);
+    expect(_isLabelsRequestValid({ ...column, values: [] })).toBe(true);
+  });
+
+  it("tells identifying column names from coded ones", () => {
+    expect(isIdentifyingColumnName("mother_last_name")).toBe(true);
+    expect(isIdentifyingColumnName("street_address")).toBe(true);
+    expect(isIdentifyingColumnName("vax_status")).toBe(false);
+  });
+
+  it("does not call an invalid request too large", () => {
+    const parsed = DictionarySuggestionsRequestSchema.safeParse({
+      task: "labels",
+      locale: "en",
+      column: { ...GENDER, kind: "text" },
+    });
+    expect(
+      parsed.error && isDictionarySuggestionsRequestTooLarge(parsed.error),
+    ).toBe(false);
+  });
+
+  it("caps the values of each column in a matches request, not in a labels request", () => {
+    const tooMany = _makeCodes(DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES + 1);
+    expect(_isLabelsRequestValid({ values: tooMany })).toBe(true);
+    const parsed = DictionarySuggestionsRequestSchema.safeParse({
+      task: "matches",
+      locale: "en",
+      columns: [GENDER, { ...GENDER, name: "sex", values: tooMany }],
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("refuses a request whose consent text is too long, however valid each column is", () => {
+    const longNames = Array.from({ length: 50 }, (_item, index) => {
+      return `a_long_other_column_label_number_${index}`;
+    });
+    const columns = Array.from({ length: 100 }, (_item, index) => {
+      return { ...GENDER, name: `column_${index}`, otherNames: longNames };
+    });
+    const request = { task: "matches" as const, locale: "en", columns };
+    expect(
+      stringifyDictionarySuggestionsRequest(request).length,
+    ).toBeGreaterThan(DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH);
+    const parsed = DictionarySuggestionsRequestSchema.safeParse(request);
+    expect(parsed.success).toBe(false);
+    expect(
+      parsed.error && isDictionarySuggestionsRequestTooLarge(parsed.error),
+    ).toBe(true);
+  });
+
+  it("returns a label under the stored spelling of a code the reply wrote differently", () => {
+    const reply = JSON.stringify({
+      labels: [
+        { value: "1", label: "Grade one", isMissing: false },
+        { value: "02", label: "Grade two", isMissing: false },
+      ],
+      description: "",
+    });
+    expect(parseDictionaryLabelSuggestions(reply, ["01", "2"])?.labels).toEqual(
+      [
+        { value: "01", label: "Grade one", isMissing: false },
+        { value: "2", label: "Grade two", isMissing: false },
+      ],
+    );
+  });
+
+  it("keeps the first label when a reply labels one code twice", () => {
+    const reply = JSON.stringify({
+      labels: [
+        { value: "Y", label: "Yes", isMissing: false },
+        { value: "y", label: "Yep", isMissing: false },
+        { value: "Y", label: "Yes again", isMissing: false },
+      ],
+      description: "",
+    });
+    expect(parseDictionaryLabelSuggestions(reply, ["Y", "N"])?.labels).toEqual([
+      { value: "Y", label: "Yes", isMissing: false },
+    ]);
   });
 });

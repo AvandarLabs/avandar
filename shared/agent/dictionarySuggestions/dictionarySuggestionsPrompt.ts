@@ -16,40 +16,143 @@ export const DICTIONARY_SUGGESTIONS_MAX_TOKENS = 800;
 const MAX_LABEL_LENGTH = 80;
 const MAX_DESCRIPTION_LENGTH = 300;
 
+/** The most codes one column may carry in a matches request. */
+export const DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES = 12;
+
+/**
+ * The longest a request's consent text may be, as written by
+ * `stringifyDictionarySuggestionsRequest`. The browser drops columns from a
+ * matches request until it fits, and the `chat` route refuses a longer one.
+ */
+export const DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH = 60_000;
+
+/**
+ * Words in a column name that mean its values identify a person or how to
+ * reach one. Such a column's values are never sent; its name still is. The
+ * browser leaves those values out of a request and the `chat` route refuses
+ * a request that has them, both through `isIdentifyingColumnName`.
+ */
+export const IDENTIFYING_WORDS: ReadonlySet<string> = new Set([
+  "name",
+  "firstname",
+  "lastname",
+  "fullname",
+  "surname",
+  "nickname",
+  "email",
+  "phone",
+  "mobile",
+  "telephone",
+  "address",
+  "street",
+  "ssn",
+  "passport",
+  "license",
+  "mrn",
+]);
+
+/**
+ * Whether a column's name holds one of `IDENTIFYING_WORDS`, so its values
+ * must stay on the device. For example `first_name` or `PatientEmail`.
+ */
+export function isIdentifyingColumnName(columnName: string): boolean {
+  return ColumnProfile.getTokensFromColumnName(columnName).some((token) => {
+    return IDENTIFYING_WORDS.has(token);
+  });
+}
+
 const NameSchema = z.string().min(1).max(200);
 const LocaleSchema = z.string().min(1).max(35);
 
-const SuggestionColumnSchema = z.object({
-  name: NameSchema,
-  otherNames: z.array(NameSchema).max(50),
-  kind: z.enum([
-    "categorical",
-    "ordered",
-    "number",
-    "date",
-    "text",
-    "identifier",
-  ]),
-  values: z.array(z.string().max(200)).max(50),
-});
+/**
+ * One column of a request, with at most `maxValues` codes. Codes are only
+ * allowed on a coded column whose names do not identify people.
+ */
+function _makeColumnSchema(maxValues: number) {
+  return z
+    .object({
+      name: NameSchema,
+      otherNames: z.array(NameSchema).max(50),
+      kind: z.enum([
+        "categorical",
+        "ordered",
+        "number",
+        "date",
+        "text",
+        "identifier",
+      ]),
+      values: z.array(z.string().max(200)).max(maxValues),
+    })
+    .superRefine((column, context) => {
+      if (column.values.length === 0) {
+        return;
+      }
+      if (column.kind !== "categorical" && column.kind !== "ordered") {
+        context.addIssue({
+          code: "custom",
+          message: "Only a coded column may send its values.",
+          path: ["values"],
+        });
+      }
+      if ([column.name, ...column.otherNames].some(isIdentifyingColumnName)) {
+        context.addIssue({
+          code: "custom",
+          message: "A column named after a person may not send its values.",
+          path: ["values"],
+        });
+      }
+    });
+}
+
+const SuggestionColumnSchema = _makeColumnSchema(
+  ColumnProfile.MAX_LISTED_VALUES,
+);
 
 /**
  * What the browser asks the suggestion model for: labels for one coded
  * column, or which columns record the same thing. The `chat` edge route
- * validates request bodies with it.
+ * validates request bodies with it, and tells a request too long to consent
+ * to from an invalid one with `isDictionarySuggestionsRequestTooLarge`.
  */
-export const DictionarySuggestionsRequestSchema = z.discriminatedUnion("task", [
-  z.object({
-    task: z.literal("labels"),
-    locale: LocaleSchema,
-    column: SuggestionColumnSchema,
-  }),
-  z.object({
-    task: z.literal("matches"),
-    locale: LocaleSchema,
-    columns: z.array(SuggestionColumnSchema).min(2).max(300),
-  }),
-]);
+export const DictionarySuggestionsRequestSchema = z
+  .discriminatedUnion("task", [
+    z.object({
+      task: z.literal("labels"),
+      locale: LocaleSchema,
+      column: SuggestionColumnSchema,
+    }),
+    z.object({
+      task: z.literal("matches"),
+      locale: LocaleSchema,
+      columns: z
+        .array(_makeColumnSchema(DICTIONARY_SUGGESTIONS_MAX_MATCH_VALUES))
+        .min(2)
+        .max(300),
+    }),
+  ])
+  .superRefine((request, context) => {
+    const { length } = stringifyDictionarySuggestionsRequest(request);
+    if (length > DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH) {
+      context.addIssue({
+        code: "custom",
+        message: `The request is ${length} characters long, over the ${DICTIONARY_SUGGESTIONS_MAX_REQUEST_LENGTH} allowed.`,
+        params: { reason: "too_large" },
+      });
+    }
+  });
+
+/**
+ * Whether a failed `DictionarySuggestionsRequestSchema` parse failed
+ * because the request is too long, which is checked once the rest of it is
+ * valid. A route uses it to answer with its own status, such as a 413.
+ */
+export function isDictionarySuggestionsRequestTooLarge(
+  error: z.ZodError,
+): boolean {
+  return error.issues.some((issue) => {
+    return issue.code === "custom" && issue.params?.reason === "too_large";
+  });
+}
 
 /**
  * One column as the suggestion model sees it: its name, the other names it
@@ -203,8 +306,8 @@ export function buildDictionarySuggestionsMessages(
 }
 
 /**
- * The JSON Schema an offline model's reply is constrained to, so a small
- * model cannot return malformed JSON.
+ * The JSON Schema a model's reply is constrained to, offline and online, so
+ * a model cannot return malformed JSON.
  */
 export function getDictionarySuggestionsJsonSchema(
   task: DictionarySuggestionsRequest["task"],
@@ -226,9 +329,10 @@ function _readJsonObject(reply: string): unknown {
 }
 
 /**
- * The labels in a model's reply, for the values that list holds only, with
- * empty labels dropped and long ones cut. Undefined when the reply holds no
- * readable JSON.
+ * The labels in a model's reply, for the values that list holds only, each
+ * under its spelling in `values` and labeled once, with empty labels
+ * dropped and long ones cut. Undefined when the reply holds no readable
+ * JSON.
  */
 export function parseDictionaryLabelSuggestions(
   reply: string,
@@ -238,16 +342,24 @@ export function parseDictionaryLabelSuggestions(
   if (!parsed.success) {
     return undefined;
   }
-  const knownValues = new Set(values.map(ColumnProfile.normalizeValue));
-  const labels = parsed.data.labels
-    .filter((item) => {
-      const isKnown = knownValues.has(ColumnProfile.normalizeValue(item.value));
-      return isKnown && item.label.trim() !== "";
-    })
-    .map((item) => {
-      const label = item.label.trim().slice(0, MAX_LABEL_LENGTH);
-      return { value: item.value, label, isMissing: item.isMissing };
-    });
+  // Each code by the key it compares by, so a reply's `1` finds a stored
+  // `01`. The label goes back under the stored spelling, once per code.
+  const storedValues = new Map(
+    [...values].reverse().map((value) => {
+      return [ColumnProfile.getComparisonKey(value), value];
+    }),
+  );
+  const labeledKeys = new Set<string>();
+  const labels = parsed.data.labels.flatMap((item) => {
+    const key = ColumnProfile.getComparisonKey(item.value);
+    const value = storedValues.get(key);
+    const label = item.label.trim().slice(0, MAX_LABEL_LENGTH);
+    if (value === undefined || label === "" || labeledKeys.has(key)) {
+      return [];
+    }
+    labeledKeys.add(key);
+    return [{ value, label, isMissing: item.isMissing }];
+  });
   const description = parsed.data.description
     .trim()
     .slice(0, MAX_DESCRIPTION_LENGTH);
