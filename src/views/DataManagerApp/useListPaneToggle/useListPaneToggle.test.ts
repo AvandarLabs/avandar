@@ -5,8 +5,19 @@ import { useListPaneToggle } from "@/views/DataManagerApp/useListPaneToggle/useL
 const { routeState } = vi.hoisted(() => {
   return {
     routeState: {
+      isPhone: false,
       pathname: "/demo/data-manager/dictionaries/new",
       isTaskView: true,
+    },
+  };
+});
+
+vi.mock("@mantine/hooks", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@mantine/hooks")>();
+  return {
+    ...actual,
+    useMediaQuery: () => {
+      return routeState.isPhone;
     },
   };
 });
@@ -33,6 +44,7 @@ describe("useListPaneToggle", () => {
   beforeEach(() => {
     routeState.pathname = "/demo/data-manager/dictionaries/new";
     routeState.isTaskView = true;
+    routeState.isPhone = false;
   });
 
   it("hides the list on a task view until it is shown", () => {
@@ -67,5 +79,31 @@ describe("useListPaneToggle", () => {
       isTaskView: false,
       isListShown: true,
     });
+  });
+
+  it("hides the list again on returning to the route after another view", () => {
+    const { result, rerender } = renderHook(() => {
+      return useListPaneToggle();
+    });
+    act(() => {
+      result.current.onToggleList();
+    });
+    routeState.pathname = "/demo/data-manager/datasets/1";
+    routeState.isTaskView = false;
+    rerender();
+    routeState.pathname = "/demo/data-manager/dictionaries/new";
+    routeState.isTaskView = true;
+    rerender();
+    expect(result.current.isListShown).toBe(false);
+  });
+
+  it("offers the toggle on a task view, but not on a phone", () => {
+    const { result, rerender } = renderHook(() => {
+      return useListPaneToggle();
+    });
+    expect(result.current.isToggleOffered).toBe(true);
+    routeState.isPhone = true;
+    rerender();
+    expect(result.current.isToggleOffered).toBe(false);
   });
 });

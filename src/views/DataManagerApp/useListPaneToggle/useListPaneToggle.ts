@@ -1,14 +1,18 @@
+import { useMediaQuery } from "@mantine/hooks";
 import { useLocation, useMatchRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
 /**
  * Whether the Data Sources list shows beside the current view. A task view
  * (the create flow) hides it by default to free width for its tables, and
- * Show list brings it back until the route changes. Every other view always
- * shows it. Used by `DataManagerApp` and its toolbar.
+ * Show list brings it back until the pathname changes, including on coming
+ * back to the same route later. Every other view always shows it. On a
+ * phone the list and the view never share the row, so the toggle is not
+ * offered. Used by `DataManagerApp` and its toolbar.
  */
 export function useListPaneToggle(): {
   isTaskView: boolean;
+  isToggleOffered: boolean;
   isListShown: boolean;
   onToggleList: () => void;
 } {
@@ -18,17 +22,25 @@ export function useListPaneToggle(): {
       return location.pathname;
     },
   });
-  const [shownOnPathname, setShownOnPathname] = useState<string | undefined>();
+  // `undefined` before the first measure, which counts as not a phone.
+  const isPhone = useMediaQuery("(width < 48em)") === true;
+  const [isShown, setIsShown] = useState(false);
+  const [shownPathname, setShownPathname] = useState(pathname);
+  if (shownPathname !== pathname) {
+    // The choice belongs to one visit of a pathname, so any change resets it.
+    setShownPathname(pathname);
+    setIsShown(false);
+  }
   const isTaskView = Boolean(
     matchRoute({ to: "/$workspaceSlug/data-manager/dictionaries/new" }),
   );
   return {
     isTaskView,
-    // Remembered for one pathname only, so the choice resets on navigation.
-    isListShown: !isTaskView || shownOnPathname === pathname,
+    isToggleOffered: isTaskView && !isPhone,
+    isListShown: !isTaskView || isShown,
     onToggleList: () => {
-      setShownOnPathname((current) => {
-        return current === pathname ? undefined : pathname;
+      setIsShown((current) => {
+        return !current;
       });
     },
   };

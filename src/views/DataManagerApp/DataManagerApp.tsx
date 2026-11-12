@@ -12,6 +12,28 @@ import { DataManagerToolbarActions } from "@/views/DataManagerApp/DataManagerToo
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar";
 import { NewDataDictionaryModal } from "@/views/DataManagerApp/NewDataDictionaryModal/NewDataDictionaryModal";
 import { useListPaneToggle } from "@/views/DataManagerApp/useListPaneToggle/useListPaneToggle";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+/** The workspace's datasets and dictionaries that the list shows. */
+function useDataManagerLists(): {
+  datasets: Dataset.T[];
+  dictionaries: DataDictionary.T[];
+  isLoading: boolean;
+} {
+  const workspace = useCurrentWorkspace();
+  const [datasets, isLoadingDatasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+  const [dictionaries, isLoadingDictionaries] = DataDictionaryClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+  return {
+    datasets: datasets ?? [],
+    dictionaries: dictionaries ?? [],
+    isLoading: isLoadingDatasets || isLoadingDictionaries,
+  };
+}
 
 /**
  * Data Sources: the list of datasets and dictionaries beside whichever one
@@ -24,21 +46,15 @@ import { useListPaneToggle } from "@/views/DataManagerApp/useListPaneToggle/useL
  * until Show list brings it back.
  */
 export function DataManagerApp(): JSX.Element {
-  const workspace = useCurrentWorkspace();
-  const [allDatasets, isLoadingDatasets] = DatasetClient.useGetAll(
-    where("workspace_id", "eq", workspace.id),
-  );
-  const [allDictionaries, isLoadingDictionaries] =
-    DataDictionaryClient.useGetAll(where("workspace_id", "eq", workspace.id));
-  const isLoading = isLoadingDatasets || isLoadingDictionaries;
+  const lists = useDataManagerLists();
   const [isNewDictionaryOpen, setIsNewDictionaryOpen] = useState(false);
   const { t } = useLingui();
   const matchRoute = useMatchRoute();
   const listPane = useListPaneToggle();
   const isOnHome = Boolean(matchRoute({ to: "/$workspaceSlug/data-manager" }));
-  const hasListItems =
-    (allDatasets ?? []).length + (allDictionaries ?? []).length > 0;
-  const phonePane = isOnHome && (isLoading || hasListItems) ? "list" : "detail";
+  const hasListItems = lists.datasets.length + lists.dictionaries.length > 0;
+  const phonePane =
+    isOnHome && (lists.isLoading || hasListItems) ? "list" : "detail";
 
   return (
     <AppSlate
@@ -49,7 +65,7 @@ export function DataManagerApp(): JSX.Element {
             setIsNewDictionaryOpen(true);
           }}
           listToggle={
-            listPane.isTaskView
+            listPane.isToggleOffered
               ? {
                   isListShown: listPane.isListShown,
                   onToggle: listPane.onToggleList,
@@ -74,9 +90,9 @@ export function DataManagerApp(): JSX.Element {
         {listPane.isListShown ? (
           <DatasetNavbar
             className={css.dataManagerAppList}
-            isLoading={isLoading}
-            datasets={allDatasets ?? []}
-            dictionaries={allDictionaries ?? []}
+            isLoading={lists.isLoading}
+            datasets={lists.datasets}
+            dictionaries={lists.dictionaries}
           />
         ) : null}
         <Flex
