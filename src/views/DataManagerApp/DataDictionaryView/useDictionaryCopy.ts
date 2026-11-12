@@ -10,6 +10,8 @@ type DictionaryCopy = {
   kindShortLabels: Record<DataDictionaryEntry.Kind, string>;
   /** What one draft issue means, as shown beside the field it is about. */
   describeIssue: (issue: DataDictionary.DraftIssue) => string;
+  /** What one draft warning means, as shown beside the value it is about. */
+  describeWarning: (warning: DataDictionary.DraftWarning) => string;
   /** What a save refusal means, or a generic failure for anything else. */
   describeSaveError: (error: unknown) => string;
 };
@@ -40,7 +42,7 @@ export function useDictionaryCopy(): DictionaryCopy {
       entry_range_invalid: t`The lowest valid value is above the highest.`,
       entry_primary_required: t`Pick the code list this entry uses.`,
       code_list_name_required: t`Give this code list a name.`,
-      code_pair_incomplete: t`Every value needs a code and a label.`,
+      code_pair_incomplete: t`Every value needs a code.`,
       code_not_unique: t`This code is already in the list. Codes are matched ignoring capitalization.`,
       label_not_unique: t`Another value in this list already uses this label or spelling.`,
     };
@@ -49,6 +51,9 @@ export function useDictionaryCopy(): DictionaryCopy {
       kindShortLabels,
       describeIssue: (issue) => {
         return issueCopy[issue.type];
+      },
+      describeWarning: () => {
+        return t`Needs a label. You can save without one and add it later.`;
       },
       describeSaveError: (error) => {
         const hint = DataDictionary.toSaveErrorHint(error);

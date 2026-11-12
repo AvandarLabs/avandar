@@ -32,6 +32,7 @@ test.describe("data dictionaries", () => {
       await page.getByRole("link", { name: "Data Sources" }).click();
 
       await page.getByRole("button", { name: "New dictionary" }).click();
+      await page.getByRole("menuitem", { name: /Start empty/ }).click();
       const createDialog = page.getByRole("dialog", { name: "New dictionary" });
       await createDialog.getByLabel("Name").fill(DICTIONARY_NAME);
       await createDialog

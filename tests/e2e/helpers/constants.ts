@@ -53,6 +53,19 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
 /**
+ * 24 measles cases with coded columns (GENDER 1/2/9, hosp_yn Y/N, ses_cat
+ * 1 to 4), onset dates, and case ids, for learning a dictionary from a
+ * dataset.
+ */
+export const MEASLES_LINE_LIST_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/measles-line-list-small/measles-line-list-small.csv",
+);
+
+/** Row count DuckDB reports once it parses the measles line list CSV. */
+export const MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT = 24;
+
+/**
  * Seven patient visits with a date and a temperature, for a per-month case
  * type field. See the README beside it.
  */

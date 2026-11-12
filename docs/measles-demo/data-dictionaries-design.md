@@ -175,7 +175,7 @@ functions, `/** */` docstrings. New enums get their own `00.enum.*.sql` file.
 | `id`, `workspace_id`, `dictionary_id` | `uuid` | `dictionary_id` cascades. |
 | `name` | `text not null` | "Sex (1/2/9)". |
 | `is_ordered` | `boolean not null default false` | Ordered lists keep their order in charts (section 6.4). |
-| `pairs` | `jsonb not null` | Array, in display order, of `{ code, label, acceptedSpellings, isMissing }`. Validated by a versioned Zod schema (the `AvaMapConfigSchema` pattern). |
+| `pairs` | `jsonb not null` | Array, in display order, of `{ code, label, acceptedSpellings, isMissing }`. Validated by a versioned Zod schema (the `AvaMapConfigSchema` pattern). A label may be blank: the value is saved and marked as needing a label. Slice 4 decides what a blank label does in each conversion direction. |
 
 A one-off list is a code list used by one entry. Nothing marks it; the UI
 says "Only this entry uses it".
@@ -485,8 +485,10 @@ the Dictionary view's **Add from datasets**, and a dataset's overflow menu
    datasets**, which returns to Pick.
 3. **Label values.** Master-detail of code lists to label, each tagged
    Labeled, Suggested, or To do. Detail: Value in data, Rows, Label (input,
-   AI suggestions prefilled with a marker), Missing value, drag handles for
-   ordered lists. **Suggest labels** asks the AI pass for the selected list.
+   AI suggestions prefilled with a marker), Missing value. Ordered lists
+   arrive in scale order and are reordered on the dictionary, so there are
+   no drag handles here. **Suggest labels** asks the AI pass for the
+   selected list.
    **Accept and next list** moves on.
 4. **Save.** Name, description, a summary (entries, code lists, values
    labeled, learned from), a warning for unlabeled values ("You can save now
@@ -896,6 +898,9 @@ Each slice is one PR into `demo/measles`, recorded in
 3. **Attach as reference.** Bindings schema and RPC, Apply with reference
    mode only, the code-list popover (dataset page and Data Explorer header),
    the rail group, Used by, and Ask Avandar context with evals.
+   - **Add from datasets into an existing dictionary** follows slice 3 as a
+     separate small piece. It learns from more datasets into a saved
+     dictionary and adds them to its "Made from".
 4. **Conversions.** The `valueMapping` projection, ordered `ENUM` output,
    linked datasets, converting in place with pinning and Re-apply, unmatched
    values, the preview drawer, keep-original columns, the virtual dataset

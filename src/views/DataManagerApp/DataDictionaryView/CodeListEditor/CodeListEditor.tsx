@@ -17,15 +17,17 @@ type Props = {
   onDraftChange: (draft: DataDictionary.Draft) => void;
 };
 
-/** Makes a lookup of the issue on one pair of a list, with its copy. */
+/** Makes a lookup of the issue, or else the warning, on one pair of a list. */
 function _makePairIssueGetter(
   options: Readonly<{
     issues: readonly DataDictionary.DraftIssue[];
+    warnings: readonly DataDictionary.DraftWarning[];
     listId: DataDictionaryCodeList.Id;
     describeIssue: (issue: DataDictionary.DraftIssue) => string;
+    describeWarning: (warning: DataDictionary.DraftWarning) => string;
   }>,
 ): (pairIndex: number) => CodePairIssue | undefined {
-  const { issues, listId, describeIssue } = options;
+  const { issues, warnings, listId } = options;
   return (pairIndex) => {
     const issue = issues.find((current) => {
       return (
@@ -34,8 +36,22 @@ function _makePairIssueGetter(
         current.pairIndex === pairIndex
       );
     });
-    return issue
-      ? { type: issue.type, message: describeIssue(issue) }
+    if (issue) {
+      return {
+        type: issue.type,
+        message: options.describeIssue(issue),
+        severity: "error",
+      };
+    }
+    const warning = warnings.find((current) => {
+      return current.codeListId === listId && current.pairIndex === pairIndex;
+    });
+    return warning
+      ? {
+          type: warning.type,
+          message: options.describeWarning(warning),
+          severity: "warning",
+        }
       : undefined;
   };
 }
@@ -129,8 +145,10 @@ export function CodeListEditor({
         canEdit={canEdit}
         pairIssue={_makePairIssueGetter({
           issues,
+          warnings: DataDictionary.findDraftWarnings(draft),
           listId: list.id,
           describeIssue: copy.describeIssue,
+          describeWarning: copy.describeWarning,
         })}
         onPairsChange={setPairs}
       />

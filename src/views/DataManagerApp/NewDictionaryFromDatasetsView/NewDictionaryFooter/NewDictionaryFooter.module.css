@@ -1,0 +1,11 @@
+/*
+ * A band under the step's scrolling body, across the full width of the
+ * view. It sits outside the body's gutter, so it needs no stacking order to
+ * stay clear of the table that scrolls above it.
+ */
+.newDictionaryFooter {
+  background-color: var(--ava-surface-raised);
+  border-top: 1px solid var(--ava-border-default);
+  flex: none;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
+}

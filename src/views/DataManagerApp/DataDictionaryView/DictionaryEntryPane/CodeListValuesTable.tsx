@@ -31,7 +31,13 @@ export function CodeListValuesTable({ codeList }: Readonly<Props>): ReactNode {
             <Table.Tr key={`${pair.code}-${index}`}>
               <Table.Td fw={600}>{pair.code}</Table.Td>
               <Table.Td>
-                {pair.label}
+                {pair.label.trim() === "" ? (
+                  <Text span c="dimmed" fs="italic">
+                    <Trans>No label yet</Trans>
+                  </Text>
+                ) : (
+                  pair.label
+                )}
                 {pair.isMissing ? (
                   <Text span c="dimmed" size="xs">
                     {" "}

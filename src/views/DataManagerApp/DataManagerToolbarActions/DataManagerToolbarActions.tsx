@@ -1,22 +1,28 @@
 import { useLingui } from "@lingui/react/macro";
 import { Button, Group } from "@mantine/core";
-import { IconBook, IconPlus } from "@tabler/icons-react";
+import { IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { ListToggleButton } from "@/views/DataManagerApp/DataManagerToolbarActions/ListToggleButton";
+import { NewDictionaryMenu } from "@/views/DataManagerApp/DataManagerToolbarActions/NewDictionaryMenu";
 import type { ReactNode } from "react";
 
 type Props = {
   onNewDictionary: () => void;
+  /** Set on a task view, where the list is hidden until shown. */
+  listToggle: { isListShown: boolean; onToggle: () => void } | undefined;
 };
 
 /**
- * The Data Sources toolbar buttons: New dictionary for people who can edit
- * dictionaries, and Add new dataset.
+ * The Data Sources toolbar: Show list or Hide list on a task view, the New
+ * dictionary menu for people who can edit dictionaries, and Add new
+ * dataset.
  */
 export function DataManagerToolbarActions({
   onNewDictionary,
+  listToggle,
 }: Readonly<Props>): ReactNode {
   const workspace = useCurrentWorkspace();
   const navigate = useNavigate();
@@ -27,15 +33,9 @@ export function DataManagerToolbarActions({
 
   return (
     <Group gap="xs" wrap="nowrap">
+      {listToggle ? <ListToggleButton {...listToggle} /> : null}
       {canEditDictionaries ? (
-        <Button
-          leftSection={<IconBook size={18} aria-hidden />}
-          onClick={onNewDictionary}
-          size="compact-sm"
-          variant="default"
-        >
-          {t`New dictionary`}
-        </Button>
+        <NewDictionaryMenu onStartEmpty={onNewDictionary} />
       ) : null}
       <Button
         leftSection={<IconPlus size={18} />}

@@ -9,6 +9,7 @@ import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { POPOVER_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { CreateDictionaryMenuItem } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/CreateDictionaryMenuItem";
 import { DatasetRefreshMenuItem } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -19,7 +20,7 @@ type Props = {
 
 /**
  * The actions that apply to a whole dataset but are not what the user came
- * to do: re-syncing it, and deleting it.
+ * to do: learning a dictionary from it, re-syncing it, and deleting it.
  *
  * Delete lives in this menu rather than as a filled red button at the foot of
  * the page: making the most destructive action the largest and lowest thing
@@ -64,7 +65,7 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
   };
 
   return (
-    <Menu position="bottom-end" width={230} zIndex={POPOVER_Z_INDEX}>
+    <Menu position="bottom-end" width={300} zIndex={POPOVER_Z_INDEX}>
       <Menu.Target>
         <ActionIcon
           variant="default"
@@ -76,6 +77,7 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
+        <CreateDictionaryMenuItem datasetId={dataset.id} />
         <DatasetRefreshMenuItem dataset={dataset} />
         <Menu.Item
           color="danger"

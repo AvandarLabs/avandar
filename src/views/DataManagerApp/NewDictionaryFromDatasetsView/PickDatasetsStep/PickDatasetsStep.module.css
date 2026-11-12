@@ -1,0 +1,4 @@
+/* The whole row picks the dataset, so it reads as clickable. */
+.pickDatasetRow {
+  cursor: pointer;
+}

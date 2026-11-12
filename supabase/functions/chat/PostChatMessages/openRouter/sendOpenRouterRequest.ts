@@ -1,3 +1,4 @@
+import { OpenRouterApiError } from "@sbfn/chat/PostChatMessages/openRouter/OpenRouterApiError.ts";
 import { OpenRouterUsage } from "@sbfn/chat/PostChatMessages/openRouter/OpenRouterUsage.ts";
 import type { OpenRouterRawUsage } from "@sbfn/chat/PostChatMessages/openRouter/OpenRouterUsage.ts";
 
@@ -45,7 +46,7 @@ export async function sendOpenRouterRequest(options: {
   );
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenRouter API error: ${errorText}`);
+    throw new OpenRouterApiError(response.status, errorText);
   }
   const data = (await response.json()) as OpenRouterCompletion;
   const message = data.choices?.[0]?.message;

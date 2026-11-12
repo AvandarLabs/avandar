@@ -1,0 +1,8 @@
+/*
+ * An entry left out reads as set aside: only the text about where it came
+ * from and what it holds dims. Its checkbox, name, kind, and buttons stay at
+ * full strength so it can be put back.
+ */
+.reviewEntryRow[data-included="false"] .reviewEntryText {
+  color: var(--mantine-color-dimmed);
+}
