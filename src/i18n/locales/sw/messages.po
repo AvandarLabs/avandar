@@ -3027,6 +3027,11 @@ msgstr "Hitilafu imetokea wakati wa kuendesha hoja hii."
 msgid "Unit"
 msgstr "Kipimo"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/AddedCodeConflictCallout.tsx
+msgid "The code {code} is added twice to {listName}. Change one of them on "
+"Unmatched values."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
@@ -9592,6 +9597,11 @@ msgstr "{featureCount, plural, one {# eneo} other {# maeneo}}"
 msgid "Buffer of {sourceName}"
 msgstr "Bafa ya {sourceName}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "{linkedDatasetName} reads this dataset, so converting it here would "
+"convert twice. Change the linked dataset instead."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
 msgid "Each series is a numeric column plotted on the radial value. Pick the "
 "category axis below."
@@ -9773,7 +9783,6 @@ msgstr "Jaribu tena baada ya muda mfupi, au wasiliana na usaidizi ikiwa tatizo "
 msgid "{featureCount, plural, one {# point} other {# points}}"
 msgstr "{featureCount, plural, one {# point} other {# points}}"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "A linked dataset reads {datasetName}, so it can't be changed in place. "
 "Convert in the linked dataset instead."
@@ -10368,6 +10377,11 @@ msgstr "Wakati umewezeshwa, wanachama wa kundi hili wanapata ufikiaji tu ikiwa "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Divider"
 msgstr "Kitenganishi"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "A linked dataset reads this dataset, so converting it here would convert "
+"twice. Change the linked dataset instead."
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/buildPeriodShowAllLabel.ts
 msgid "{periodCount, plural, one {Show all # week} other {Show all # weeks}}"
@@ -13413,6 +13427,10 @@ msgid "Every workspace member who can open the {app} app gets this role on this 
 msgstr "Kila mwanachama wa nafasi ya kazi anayeweza kufungua programu ya {app} "
 "anapewa jukumu hili kwenye {resource} hii, pamoja na yale "
 "yaliyoorodheshwa hapa chini."
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "The code {conflictCode} is added twice to this list."
+msgstr ""
 
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "{title} couldn't render"
