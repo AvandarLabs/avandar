@@ -29,8 +29,11 @@ function UsageRow({ row }: Readonly<{ row: DictionaryUsageRow }>): ReactNode {
       <Table.Td>
         <Group gap="xs" wrap="nowrap">
           <Badge
+            size="sm"
             variant="light"
             color="neutral"
+            tt="none"
+            flex="none"
             leftSection={<IconTag size={12} aria-hidden />}
           >
             <Trans>Reference</Trans>
@@ -42,7 +45,7 @@ function UsageRow({ row }: Readonly<{ row: DictionaryUsageRow }>): ReactNode {
       </Table.Td>
       <Table.Td ta="end">{i18n.number(row.entryCount)}</Table.Td>
       <Table.Td>
-        <Badge variant="light" color="green">
+        <Badge size="sm" variant="light" color="success" tt="none">
           <Trans>Up to date</Trans>
         </Badge>
       </Table.Td>
