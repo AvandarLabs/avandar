@@ -17,47 +17,35 @@ export const colorValueSchema = z
     /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
     "Expected a hex colour such as #51a7ff",
   );
-export const gradientValueSchema = z
-  .object({ from: colorValueSchema, to: colorValueSchema, deg: z.number().min(0).max(360) })
-  .strict();
+export const gradientValueSchema = z.strictObject({ from: colorValueSchema, to: colorValueSchema, deg: z.number().min(0).max(360) });
 export const easingValueSchema = z.union([
   z.tuple([unitInterval, bezierY, unitInterval, bezierY]),
-  z.object({ powerInOut: z.number().min(1).max(8) }).strict(),
+  z.strictObject({ powerInOut: z.number().min(1).max(8) }),
 ]);
-export const springValueSchema = z
-  .object({
+export const springValueSchema = z.strictObject({
     damping: z.number().min(1).max(100),
     stiffness: z.number().min(1).max(1000),
     mass: z.number().min(0.1).max(10),
-  })
-  .strict();
-const shadowLayerSchema = z
-  .object({
+  });
+const shadowLayerSchema = z.strictObject({
     offsetX: z.number().min(-200).max(200),
     offsetY: z.number().min(-200).max(200),
     blur: z.number().min(0).max(200),
     spread: z.number().min(-100).max(100),
     alpha: unitInterval,
-  })
-  .strict();
-export const shadowValueSchema = z
-  .object({ layers: z.array(shadowLayerSchema).max(4) })
-  .strict();
-export const glowValueSchema = z
-  .object({
+  });
+export const shadowValueSchema = z.strictObject({ layers: z.array(shadowLayerSchema).max(4) });
+export const glowValueSchema = z.strictObject({
     spread: z.number().min(-200).max(200),
     blur: z.number().min(0).max(100),
     opacity: unitInterval,
-  })
-  .strict();
-export const textShadowValueSchema = z
-  .object({
+  });
+export const textShadowValueSchema = z.strictObject({
     offsetX: z.number().min(-50).max(50),
     offsetY: z.number().min(-50).max(50),
     blur: z.number().min(0).max(50),
     alpha: unitInterval,
-  })
-  .strict();
+  });
 
 function _boundedNumber(definition: Pick<TokenDefinition, "min" | "max">) {
   let schema = z.number();
@@ -88,7 +76,7 @@ export function createValueSchemaFromDefinition(
     case "enum":
       return z.enum(definition.options ?? []);
     case "shade":
-      return z.union([shadeIndex, z.object({ light: shadeIndex, dark: shadeIndex }).strict()]);
+      return z.union([shadeIndex, z.strictObject({ light: shadeIndex, dark: shadeIndex })]);
     case "gradient":
       return gradientValueSchema;
     case "fontStack":

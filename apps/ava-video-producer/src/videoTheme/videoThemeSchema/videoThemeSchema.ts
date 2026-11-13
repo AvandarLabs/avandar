@@ -63,7 +63,7 @@ function _compositeSchema(kind: CompositeTokenKind, tier: SchemaTier): z.ZodType
       return [name, required.includes(name) ? schema : schema.optional()];
     }),
   );
-  return _union([z.object(shape).strict(), tokenReferenceSchema]);
+  return _union([z.strictObject(shape), tokenReferenceSchema]);
 }
 
 function _leafSchema(definition: TokenDefinition, tier: SchemaTier): z.ZodType {
@@ -81,7 +81,7 @@ function _leafSchema(definition: TokenDefinition, tier: SchemaTier): z.ZodType {
     definition.kind === "fill" ? _union([colorValueSchema, gradientValueSchema]) : literal;
   const colorPair =
     definition.kind === "color"
-      ? [z.object({ onDark: _fieldSchema(definition, tier), onLight: _fieldSchema(definition, tier) }).strict()]
+      ? [z.strictObject({ onDark: _fieldSchema(definition, tier), onLight: _fieldSchema(definition, tier) })]
       : [];
   return _union([
     tokenReferenceSchema,
@@ -107,7 +107,7 @@ function _nodeSchema(node: CatalogNode, tier: SchemaTier, isComplete: boolean): 
   if (isTokenScale(node)) {
     return z.record(scaleKeySchema, _leafSchema(node.scale, tier).meta(_tokenMeta(node.scale)));
   }
-  return z.object(_shape(node, tier, isComplete)).strict();
+  return z.strictObject(_shape(node, tier, isComplete));
 }
 
 function _shape(group: CatalogGroup, tier: SchemaTier, isComplete: boolean) {
@@ -122,36 +122,31 @@ function _shape(group: CatalogGroup, tier: SchemaTier, isComplete: boolean) {
 function _componentsSchema(isComplete: boolean): z.ZodType {
   const shape = Object.fromEntries(
     Object.entries(VIDEO_TOKEN_CATALOG.components).map(([name, group]) => {
-      const schema = z
-        .object({ defaultProps: _nodeSchema(group, "component", isComplete) })
-        .strict();
+      const schema = z.strictObject({ defaultProps: _nodeSchema(group, "component", isComplete) });
       return [name, isComplete ? schema : schema.optional()];
     }),
   );
-  return z.object(shape).strict();
+  return z.strictObject(shape);
 }
 
 function _themeShape(isComplete: boolean) {
   const optional = (schema: z.ZodType) => (isComplete ? schema : schema.optional());
-  const video = z
-    .object({
+  const video = z.strictObject({
       atomic: optional(_nodeSchema(VIDEO_TOKEN_CATALOG.atomic, "atomic", isComplete)),
       semantic: optional(_nodeSchema(VIDEO_TOKEN_CATALOG.semantic, "semantic", isComplete)),
-    })
-    .strict();
+    });
   return {
     ..._shape(VIDEO_TOKEN_CATALOG.mantine, "mantine", isComplete),
-    other: optional(z.object({ video: optional(video) }).strict()),
+    other: optional(z.strictObject({ video: optional(video) })),
     components: optional(_componentsSchema(isComplete)),
   };
 }
 
 /** A sparse fragment: what a per-item override or an unsaved draft holds. */
-export const videoThemePatchSchema = z.object(_themeShape(false)).strict();
+export const videoThemePatchSchema = z.strictObject(_themeShape(false));
 
 function _documentSchema(isComplete: boolean) {
-  return z
-    .object({
+  return z.strictObject({
       $schema: z.string().optional(),
       schemaVersion: z.literal(1),
       id: slugSchema,
@@ -159,8 +154,7 @@ function _documentSchema(isComplete: boolean) {
       extends: slugSchema.optional(),
       ..._themeShape(isComplete),
       overrides: z.record(slugSchema, videoThemePatchSchema).optional(),
-    })
-    .strict();
+    });
 }
 
 const SPARSE_DOCUMENT_SCHEMA = _documentSchema(false);
