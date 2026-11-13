@@ -304,7 +304,8 @@ passed through as `'9'`). E01 to E03 ask about it; D01 to D04 run beside it.
   met: every online run scored 7/7. The offline run is recorded, not gated.
 - Every E answer, online and offline, filtered the labeled dataset on labels
   (`"GENDER" = 'Female' AND "hosp_yn" = 'Yes'`, `"ses_cat" = 'Lower-middle'`,
-  `"ses_cat" IN ('Upper-middle', 'High')`), never on codes.
+  `"ses_cat" IN ('Upper-middle', 'High')`, or offline the same with `OR`),
+  never on codes.
 - With both datasets in the prompt, the online runs answered D01 over the
   labeled dataset on all three runs (filtering on labels, with the right
   count), and D02 and D03 over the coded one on codes. Offline, D03 went to
