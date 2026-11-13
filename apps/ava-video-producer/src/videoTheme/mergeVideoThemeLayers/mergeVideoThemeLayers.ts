@@ -1,4 +1,3 @@
-import { mergeThemeOverrides, type MantineThemeOverride } from "@mantine/core";
 import { VideoThemeError } from "../VideoThemeError/VideoThemeError";
 import type {
   VideoThemeDocument,
@@ -15,6 +14,34 @@ const DOCUMENT_ONLY_KEYS: readonly string[] = [
   "extends",
   "overrides",
 ];
+
+function _isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function _mergeTwoLayers(
+  base: Record<string, unknown>,
+  patch: Record<string, unknown>,
+): Record<string, unknown> {
+  const result = { ...base };
+  for (const [key, value] of Object.entries(patch)) {
+    const baseValue = result[key];
+    result[key] =
+      _isPlainObject(value) && _isPlainObject(baseValue)
+        ? _mergeTwoLayers(baseValue, value)
+        : value;
+  }
+  return result;
+}
+
+function _mergeThemeLayers(
+  ...layers: readonly VideoThemePatch[]
+): VideoThemePatch {
+  return layers.reduce<Record<string, unknown>>(
+    (merged, layer) => _mergeTwoLayers(merged, layer),
+    {},
+  );
+}
 
 function _toPatch(document: VideoThemeDocument): VideoThemePatch {
   return Object.fromEntries(
@@ -59,9 +86,10 @@ export function getExtendsChainFromThemeId(
 }
 
 /**
- * Merges a theme into one sparse patch over Mantine's defaults, with
- * Mantine's `mergeThemeOverrides`: `classic`, then the `extends` chain from
- * its root, then the theme, then the theme's own override for each id in
+ * Merges a theme into one sparse patch. It follows Mantine's merge, except
+ * that a value never merges into a non-object (a reference): the patch value
+ * replaces it. Layers apply in this order: `classic`, then the `extends`
+ * chain from its root, then the theme, then the theme's own override for each id in
  * `scope.overrideIds` in order, then `scope.patches`. Overrides declared by
  * a theme it extends are skipped: per-item art direction belongs to the
  * theme that declares it.
@@ -90,7 +118,5 @@ export function mergeVideoThemeLayers(
     ...overrides,
     ...(scope.patches ?? []),
   ];
-  return mergeThemeOverrides(
-    ...(layers as MantineThemeOverride[]),
-  ) as VideoThemePatch;
+  return _mergeThemeLayers(...layers);
 }

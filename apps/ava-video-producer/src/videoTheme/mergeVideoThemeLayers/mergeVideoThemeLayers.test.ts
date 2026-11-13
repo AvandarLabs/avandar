@@ -84,3 +84,23 @@ test("an unknown extends target is reported", () => {
     /Unknown theme "missing"/,
   );
 });
+
+test("an object patch replaces a reference instead of merging into it", () => {
+  const box = {
+    roughness: "$atomic.roughness.rough",
+    bowing: "$atomic.bowing.md",
+    seed: "$atomic.seed.md",
+    randomness: "$atomic.randomness.md",
+  };
+  const rough = _theme("rough", "classic", {
+    other: { video: { semantic: { sketch: { box } } } },
+  });
+  const merged = mergeVideoThemeLayers(
+    createVideoThemeLibrary([rough]),
+    "rough",
+  );
+  assert.deepEqual(
+    getValueAtPath(merged, ["other", "video", "semantic", "sketch", "box"]),
+    box,
+  );
+});
