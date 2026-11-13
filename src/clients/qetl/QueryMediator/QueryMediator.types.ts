@@ -1,3 +1,4 @@
+import type { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
@@ -21,14 +22,26 @@ import type {
 } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { UnknownObject } from "@avandar/utils";
 
-/** A column whose stored name or type differs from the source data. */
+/**
+ * A column whose stored name, type, or values differ from the source data.
+ */
 export type ColumnReplacement = {
   /** The original name of the column from the source data. */
   originalName: string;
   /** The new name of the column. */
   alias?: string;
-  /** The new data type of the column. */
+  /**
+   * The new data type of the column. For a converted column, the type its
+   * values are cast to before they are converted.
+   */
   dataType?: DuckDbDataType;
+  /** Set for a converted column: its values are translated as it loads. */
+  valueMapping?: ColumnConversion.T;
+  /**
+   * The cast for a converted column's `<column>_original` copy, when the
+   * copy's stored type differs from the type the column loads as.
+   */
+  originalCopyDataType?: DuckDbDataType;
 };
 
 /** A dataset paired with the source record that says how to fetch it. */

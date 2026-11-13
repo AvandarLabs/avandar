@@ -1,5 +1,7 @@
-import { objectEntries, prop } from "@avandar/utils";
+import { objectEntries } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbLoadParquetOptions } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** Escapes a value for use inside a single-quoted SQL string literal. */
@@ -164,31 +166,88 @@ export function getEntityKeyComparisonSql(
   return `CAST(${outerKey} AS VARCHAR) = CAST(${datasetKey} AS VARCHAR)`;
 }
 
-/** Builds the `EXCLUDE`/replacement clauses for a parquet projection. */
+/** One stored column's replacement, as a loader receives it. */
+type ParquetColumnReplacement = NonNullable<
+  DuckDbLoadParquetOptions["columnReplacements"]
+>[string];
+
+/** Options for {@link getParquetProjectionClauses}. */
+type ParquetProjectionOptions = Readonly<{
+  /** Kept values to append to each ordered column's ENUM, by original name. */
+  keptValuesByColumn?: Readonly<Record<string, readonly string[]>>;
+  /** Leaves conversions out, for the raw-values view. */
+  omitsValueMappings?: boolean;
+}>;
+
+/**
+ * A stored column's value: the column itself, or `TRY_CAST` to `dataType`.
+ * For a converted column, `dataType` is the type it had before converting,
+ * so the conversion and the raw-values view read the value users saw
+ * before; its keep-original copy is cast to its own stored type.
+ */
+function _getStoredValueSql(
+  columnName: string,
+  dataType: DuckDbDataType | undefined,
+): string {
+  const columnSql = quoteSqlIdentifier(columnName);
+  return dataType ? `TRY_CAST(${columnSql} AS ${dataType})` : columnSql;
+}
+
+/** The select-list items that replace one stored column. */
+function _getReplacementItems(
+  columnName: string,
+  replacement: ParquetColumnReplacement,
+  options: ParquetProjectionOptions,
+): string[] {
+  const outputNameSql = quoteSqlIdentifier(replacement.alias ?? columnName);
+  const storedValueSql = _getStoredValueSql(columnName, replacement.dataType);
+  const { valueMapping } = replacement;
+  if (valueMapping === undefined || options.omitsValueMappings) {
+    return [`${storedValueSql} AS ${outputNameSql}`];
+  }
+  const convertedSql = ColumnConversion.toCaseSql({
+    valueSql: storedValueSql,
+    conversion: valueMapping,
+    keptValues: options.keptValuesByColumn?.[columnName],
+  });
+  const convertedItem = `${convertedSql} AS ${outputNameSql}`;
+  if (valueMapping.keepsOriginalAs === undefined) {
+    return [convertedItem];
+  }
+  const copySql = _getStoredValueSql(
+    columnName,
+    replacement.originalCopyDataType,
+  );
+  return [
+    convertedItem,
+    `${copySql} AS ${quoteSqlIdentifier(valueMapping.keepsOriginalAs)}`,
+  ];
+}
+
+/**
+ * Builds the `EXCLUDE`/replacement clauses for a parquet projection. A
+ * renamed or retyped column is excluded and selected again under its name
+ * and type. A converted column is selected as its conversion, followed by
+ * its `<column>_original` copy when it keeps one, cast to
+ * `originalCopyDataType` when that is set. With
+ * `omitsValueMappings`, conversions and copies are left out, for the view
+ * of a dataset's values as stored.
+ */
 export function getParquetProjectionClauses(
   columnReplacements: DuckDbLoadParquetOptions["columnReplacements"],
+  options: ParquetProjectionOptions = {},
 ): { excludeClause: string; replaceClause: string } {
-  const projections = objectEntries(columnReplacements ?? {}).map(
-    ([columnName, { alias, dataType }]) => {
-      const outputName = alias ?? columnName;
-      const valueExpression = dataType
-        ? `TRY_CAST("${columnName}" AS ${dataType})`
-        : `"${columnName}"`;
-      return {
-        exclusion: `"${columnName}"`,
-        replacement: `${valueExpression} AS "${outputName}"`,
-      };
-    },
-  );
+  const entries = objectEntries(columnReplacements ?? {});
+  const exclusions = entries.map(([columnName]) => {
+    return quoteSqlIdentifier(columnName);
+  });
+  const items = entries.flatMap(([columnName, replacement]) => {
+    return _getReplacementItems(columnName, replacement, options);
+  });
   return {
     excludeClause:
-      projections.length > 0
-        ? `EXCLUDE (${projections.map(prop("exclusion")).join(", ")})`
-        : "",
-    replaceClause:
-      projections.length > 0
-        ? `, ${projections.map(prop("replacement")).join(", ")}`
-        : "",
+      exclusions.length > 0 ? `EXCLUDE (${exclusions.join(", ")})` : "",
+    replaceClause: items.length > 0 ? `, ${items.join(", ")}` : "",
   };
 }
 
