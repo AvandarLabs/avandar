@@ -43,6 +43,7 @@ export const DatasetClient = createUsableServiceClient(
       "getSourceDataset",
       "getWithColumns",
       "getAllDatasetsWithColumns",
+      "getEditableIds",
     ],
     mutationFns: [
       "insertCsvFileDataset",

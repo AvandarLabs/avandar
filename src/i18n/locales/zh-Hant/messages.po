@@ -9518,6 +9518,10 @@ msgstr ""
 msgid "Yellow"
 msgstr "黃色"
 
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
+msgid "You can't edit any dataset in this workspace"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "任何取得連結的人"

@@ -12,8 +12,8 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
  * settings and filters can keep pointing at the same column across runs.
  *
  * Descriptors only exist for queries over a single table with no joins or
- * subqueries, where each `SELECT` item is a plain column or one aggregate of
- * a plain column. Other queries produce no descriptors.
+ * subqueries, where each `SELECT` item is a plain column, one aggregate of
+ * a plain column, or `count(*)`. Other queries produce no descriptors.
  */
 export type ProjectionDescriptor = {
   /**

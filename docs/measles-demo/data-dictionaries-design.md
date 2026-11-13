@@ -470,9 +470,10 @@ Tabs:
   **Changed the data**; **Crosswalk**), Entries, Status ("Up to date" or
   "Applied version 2, now version 3"), and **Re-apply** where pinned.
 
-**Apply to a dataset** lists the workspace's datasets, and the apply view
-refuses one the user cannot edit (section 14). Listing only the datasets the
-user can edit waits for a server-side read of them (section 16).
+**Apply to a dataset** lists only the workspace's datasets the user can
+edit, read in one call to `rpc_datasets__get_editable_ids`, and says "You
+can't edit any dataset in this workspace" when there are none. The apply view
+still refuses a dataset the user cannot edit (section 14).
 
 Rail: Made from (datasets), Owner, Updated, Version, and "How codes work".
 
@@ -535,10 +536,8 @@ value)`), and "From <dictionary> › <entry>. Attached as reference. The values
 in the data are unchanged." or "The values were converted to these labels."
 The section meta reads "7 with a code list: hover the tag to read it". A
 column with a bound entry and no description of its own shows the entry's
-description, captioned "From <dictionary>". A column's own description always
-wins. Slice 3 puts it under the column name, because the description list
-does not hand a cell its row yet. Moving it into the Description column is a
-follow-up (section 16).
+description in its Description column, captioned "From <dictionary>". A
+column's own description always wins.
 
 Rail (`DatasetSourceRail`): a **Dictionaries** group listing each dictionary
 with how it was applied ("Attached as reference · data unchanged", "Linked
@@ -546,10 +545,10 @@ dataset: <name>", "Converted this dataset · version 2"). No actions in the
 rail.
 
 The Data Explorer result grid shows the same tag and popover in a column
-header when the column comes straight from a bound dataset column. A grouped
-SQL result (`GROUP BY` with an aggregate) shows no tag yet, because the SQL
-projection reader returns nothing for it; the query builder's grouped columns
-are tagged. Extending the reader is a follow-up (section 16).
+header when the column comes straight from a bound dataset column. That
+includes the grouped column of a grouped result, from the query builder or
+from SQL such as `SELECT "GENDER", count(*) ... GROUP BY 1`. An aggregated or
+computed column gets no tag.
 
 ### 7.5 Apply dictionaries
 
@@ -931,12 +930,13 @@ Each slice is one PR into `demo/measles`, recorded in
    - **Add from datasets into an existing dictionary** follows slice 3 as a
      separate small piece. It learns from more datasets into a saved
      dictionary and adds them to its "Made from".
-   - **Follow-ups from slice 3,** each a small change of its own: the entry
+   - **Follow-ups from slice 3,** built together after it: the entry
      description in the Description column (`ObjectDescriptionList` passing
      the row to `renderValue`, section 7.4); **Apply to a dataset** listing
-     only datasets the user can edit, once a server-side read of them exists
-     (section 7.2); tags on grouped SQL results in the Data Explorer, by
-     extending the SQL projection reader (section 7.4).
+     only datasets the user can edit, through
+     `rpc_datasets__get_editable_ids` (section 7.2); tags on grouped SQL
+     results in the Data Explorer, from the SQL projection reader reading
+     `count(*)` and `GROUP BY` positions (section 7.4).
 4. **Conversions.** The `valueMapping` projection, ordered `ENUM` output,
    linked datasets, converting in place with pinning and Re-apply, unmatched
    values, the preview drawer, keep-original columns, the virtual dataset

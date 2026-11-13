@@ -36,7 +36,35 @@ function useOpenApplyFlow(
   };
 }
 
-/** A searchable list of the workspace's datasets, read while `isOpen`. */
+/**
+ * The workspace's datasets the user can edit, as select options, read while
+ * `isOpen`. The apply flow refuses any other dataset.
+ */
+function useEditableDatasetOptions(isOpen: boolean): {
+  options: Array<{ value: Dataset.Id; label: string }>;
+  isLoading: boolean;
+} {
+  const workspace = useCurrentWorkspace();
+  const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
+    ...where("workspace_id", "eq", workspace.id),
+    useQueryOptions: { enabled: isOpen },
+  });
+  const [editableIds, isLoadingEditableIds] = DatasetClient.useGetEditableIds({
+    workspaceId: workspace.id,
+    useQueryOptions: { enabled: isOpen },
+  });
+  const editableIdSet = new Set(editableIds);
+  const options = (datasets ?? [])
+    .filter((dataset) => {
+      return editableIdSet.has(dataset.id);
+    })
+    .map((dataset) => {
+      return { value: dataset.id, label: dataset.name };
+    });
+  return { options, isLoading: isLoadingDatasets || isLoadingEditableIds };
+}
+
+/** A searchable list of the datasets the user can apply a dictionary to. */
 function DatasetSelect({
   isOpen,
   datasetId,
@@ -47,14 +75,11 @@ function DatasetSelect({
   onChange: (datasetId: Dataset.Id | null) => void;
 }>): ReactNode {
   const { t } = useLingui();
-  const workspace = useCurrentWorkspace();
-  const [datasets, isLoading] = DatasetClient.useGetAll({
-    ...where("workspace_id", "eq", workspace.id),
-    useQueryOptions: { enabled: isOpen },
-  });
-  const options = (datasets ?? []).map((dataset) => {
-    return { value: dataset.id, label: dataset.name };
-  });
+  const { options, isLoading } = useEditableDatasetOptions(isOpen);
+  const emptyMessage =
+    options.length === 0
+      ? t`You can't edit any dataset in this workspace`
+      : t`No dataset has that name`;
   return (
     <Select
       label={t`Dataset`}
@@ -68,7 +93,7 @@ function DatasetSelect({
       disabled={isLoading}
       placeholder={isLoading ? t`Loading datasets…` : undefined}
       rightSection={isLoading ? <Loader size="xs" /> : undefined}
-      nothingFoundMessage={isLoading ? undefined : t`No dataset has that name`}
+      nothingFoundMessage={isLoading ? undefined : emptyMessage}
     />
   );
 }

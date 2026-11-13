@@ -9831,6 +9831,10 @@ msgstr ""
 msgid "Yellow"
 msgstr "Amarelo"
 
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
+msgid "You can't edit any dataset in this workspace"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "Qualquer pessoa com o link"

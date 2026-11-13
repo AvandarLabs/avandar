@@ -16,6 +16,7 @@ import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
 import { NumberValueItem } from "./NumberValueItem";
 import { TextValueItem } from "./TextValueItem";
 import type {
+  DescribableObject,
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
@@ -44,6 +45,12 @@ type Props<
    * passed in.
    */
   rootData?: RootData;
+
+  /**
+   * The object this value is a key of, such as the row a table cell sits
+   * in. It gets passed into `renderValue` and `renderEditableValue`.
+   */
+  parentObject?: DescribableObject;
 } & PrimitiveValueRenderOptions<T, RootData>;
 
 /**
@@ -58,6 +65,7 @@ export function PrimitiveValueItem<
   editMode = false,
   renderAsType = undefined,
   rootData = undefined,
+  parentObject = undefined,
   renderValue = undefined,
   renderEditableValue = undefined,
   renderEmptyString,
@@ -77,7 +85,11 @@ export function PrimitiveValueItem<
   // if we are in display mode and there is a `renderValue` function, then
   // we use that instead
   if (!editMode && renderValue !== undefined) {
-    const customRenderedValue = renderValue(value, rootData as RootData);
+    const customRenderedValue = renderValue(
+      value,
+      rootData as RootData,
+      parentObject,
+    );
 
     // only use the custom display value if it's not `undefined`, which we use
     // to signal a no-op. If a no-op, we continue down this function until we
@@ -93,6 +105,7 @@ export function PrimitiveValueItem<
     const customEditableValue = renderEditableValue(
       value,
       rootData as RootData,
+      parentObject,
     );
 
     // only use the custom editable value if it's not `undefined`, which we use

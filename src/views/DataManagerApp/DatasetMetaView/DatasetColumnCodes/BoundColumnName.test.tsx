@@ -19,36 +19,17 @@ const CODES: ColumnCodes.T = {
 };
 
 describe("BoundColumnName", () => {
-  it("shows the entry's description, from its dictionary, for a column with none", () => {
-    render(
-      <BoundColumnName name="GENDER" codes={CODES} showsEntryDescription />,
-    );
-
-    expect(
-      screen.getByText("Sex recorded on the case report."),
-    ).toBeInTheDocument();
-    expect(screen.getByText("From NYS codes")).toBeInTheDocument();
-  });
-
-  it("lets a column's own description win", () => {
-    render(
-      <BoundColumnName
-        name="GENDER"
-        codes={CODES}
-        showsEntryDescription={false}
-      />,
-    );
-
-    expect(screen.queryByText("Sex recorded on the case report.")).toBeNull();
-  });
-
   it("puts a code-list tag after the name", () => {
-    render(
-      <BoundColumnName name="GENDER" codes={CODES} showsEntryDescription />,
-    );
+    render(<BoundColumnName name="GENDER" codes={CODES} />);
 
     expect(
       screen.getByRole("button", { name: "Code list for GENDER" }),
     ).toBeInTheDocument();
+  });
+
+  it("leaves the entry's description to the Description column", () => {
+    render(<BoundColumnName name="GENDER" codes={CODES} />);
+
+    expect(screen.queryByText("Sex recorded on the case report.")).toBeNull();
   });
 });
