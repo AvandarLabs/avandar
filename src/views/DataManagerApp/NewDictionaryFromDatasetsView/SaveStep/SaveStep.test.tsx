@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from "@/test-utils";
 import { SaveStep } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveStep";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ApplyTarget } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate";
 
 /** jsdom has no `document.fonts`, which autosize textareas listen to. */
 beforeAll(() => {
@@ -62,6 +63,7 @@ function _renderStep(
     originDatasetName?: string;
     labels?: DictionaryProposal.Labels;
     proposal?: DictionaryProposal.T;
+    applyTargets?: readonly ApplyTarget[];
   } = {},
 ) {
   const dispatch = vi.fn();
@@ -74,6 +76,8 @@ function _renderStep(
       description=""
       originDatasetName={options.originDatasetName}
       learnedFromNames={["Kings line list"]}
+      appliesNext
+      applyTargets={options.applyTargets ?? []}
       isCreating={false}
       dispatch={dispatch}
       onCreate={onCreate}
@@ -175,6 +179,45 @@ describe("SaveStep", () => {
     _renderStep({ originDatasetName: "Kings line list" });
     expect(
       screen.getByText(/Kings line list is only where it started/),
+    ).toBeInTheDocument();
+  });
+
+  it("offers to apply the dictionary to the one dataset it was learned from", () => {
+    const { dispatch } = _renderStep({
+      applyTargets: [
+        { datasetId: uuid<Dataset.Id>(), name: "Kings line list" },
+      ],
+    });
+
+    fireEvent.click(
+      screen.getByRole("checkbox", {
+        name: "Apply it to Kings line list next",
+      }),
+    );
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "set_applies_next",
+      appliesNext: false,
+    });
+  });
+
+  it("says which of several datasets opens first", () => {
+    _renderStep({
+      applyTargets: [
+        { datasetId: uuid<Dataset.Id>(), name: "Kings line list" },
+        { datasetId: uuid<Dataset.Id>(), name: "Bronx line list" },
+      ],
+    });
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "Apply it to these 2 datasets after saving",
+      }),
+    ).toBeChecked();
+    expect(
+      screen.getByText(
+        "Kings line list opens first. Apply it to the others from each dataset's menu.",
+      ),
     ).toBeInTheDocument();
   });
 });

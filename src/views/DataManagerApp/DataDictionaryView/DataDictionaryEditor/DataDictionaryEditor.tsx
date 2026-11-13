@@ -9,6 +9,7 @@ import { useEditorSelection } from "@/views/DataManagerApp/DataDictionaryView/Da
 import { DataDictionaryHeader } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader";
 import { DataDictionaryRail } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail";
 import { useDataDictionaryDraft } from "@/views/DataManagerApp/DataDictionaryView/useDataDictionaryDraft/useDataDictionaryDraft";
+import { useDictionaryUsage } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryUsage/useDictionaryUsage";
 import type { DataDictionaryTabId } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs";
 import type { ReactNode } from "react";
 
@@ -46,6 +47,9 @@ export function DataDictionaryEditor({
     return DataDictionary.findDraftIssues(draft);
   }, [draft]);
   const selection = useEditorSelection(draft);
+  const usage = useDictionaryUsage(dictionary.id);
+  const usedByCount =
+    usage.isLoading || usage.hasError ? undefined : usage.rows.length;
 
   return (
     <AppView>
@@ -53,6 +57,7 @@ export function DataDictionaryEditor({
         dictionary={dictionary}
         draft={draft}
         canEdit={canEdit}
+        usedByCount={usedByCount}
       />
       <AppViewBody
         rail={_buildRail({ activeTab: selection.activeTab, dictionary })}
@@ -62,6 +67,7 @@ export function DataDictionaryEditor({
           issues={issues}
           canEdit={canEdit}
           selection={selection}
+          usage={usage}
           onDraftChange={setDraft}
         />
         <DataDictionaryEditorSaveBar

@@ -424,6 +424,12 @@ export const ColumnProfileModule = {
   getMatchScore,
 
   /**
+   * How alike two column names are, from 0 to 1, from the words they
+   * share. `zip_code` and `ZIP` score 1.
+   */
+  getNameScore,
+
+  /**
    * A scorer for the name scores of many columns: it tokenizes each name
    * once and remembers each pair it has scored.
    */

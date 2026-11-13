@@ -9,7 +9,8 @@ export type ResourceTypeForRole = Database["public"]["Enums"]["resource_type"];
  *
  * @param options.resourceType Resource kind for SQL resolution.
  * @param options.resourceId Primary key of the resource.
- * @returns Tuple of role (null when RPC reports no access), loading flag.
+ * @returns Tuple of role (null when RPC reports no access), loading flag,
+ *   and whether the role query failed.
  */
 export function useResourceRole(options: {
   resourceType: ResourceTypeForRole;
@@ -17,16 +18,18 @@ export function useResourceRole(options: {
 }): readonly [
   Database["public"]["Enums"]["role_level"] | null | undefined,
   boolean,
+  boolean,
 ] {
   const user = useCurrentUser();
   const { resourceType, resourceId } = options;
-  const [data, isLoading] = PermissionsClient.useGetResourceEffectiveRole({
-    resourceType,
-    resourceId: resourceId ?? "",
-    useQueryOptions: {
-      enabled: !!resourceId && !!user?.id,
-      staleTime: 30_000,
-    },
-  });
-  return [data, isLoading] as const;
+  const [data, isLoading, query] =
+    PermissionsClient.useGetResourceEffectiveRole({
+      resourceType,
+      resourceId: resourceId ?? "",
+      useQueryOptions: {
+        enabled: !!resourceId && !!user?.id,
+        staleTime: 30_000,
+      },
+    });
+  return [data, isLoading, query.isError] as const;
 }

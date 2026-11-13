@@ -57,6 +57,8 @@ export function ProposalStepBody({
         description={state.description}
         originDatasetName={originDatasetName}
         learnedFromNames={_getLearnedFromNames(proposal)}
+        appliesNext={state.appliesNext}
+        applyTargets={flow.applyTargets}
         isCreating={flow.isCreating}
         dispatch={dispatch}
         onCreate={flow.createDictionary}

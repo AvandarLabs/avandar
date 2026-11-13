@@ -1,60 +1,58 @@
 import { useMutation } from "@avandar/query-hooks";
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { DataDictionaryClient } from "@/clients/dataDictionaries/DataDictionaryClient/DataDictionaryClient";
-import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useIsMounted } from "@/lib/hooks/state/useIsMounted";
-import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { notifyError } from "@/utils/notifications/notify";
 import { useDictionaryCopy } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryCopy";
 import {
   createDictionaryFromDraft,
   DictionaryLeftBehindError,
 } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/createDictionaryFromDraft/createDictionaryFromDraft";
+import { useOpenAfterCreate } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate";
+import type { ApplyTarget } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate";
 
 /** What the Save step hands over to create a dictionary. */
 export type CreateDictionaryVariables = Omit<
   Parameters<typeof createDictionaryFromDraft>[0],
   "workspaceId"
->;
+> & {
+  /**
+   * The datasets to apply the dictionary to once saved. The first opens
+   * next and the rest are named in the toast. Empty opens the dictionary.
+   */
+  applyNext: readonly ApplyTarget[];
+};
 
 /**
- * Creates the dictionary a proposal describes and opens it, unless the user
- * has already left the create flow. A refusal is explained with the same
- * copy as a save on the Dictionary view, and the create flow keeps its state
- * so the user can retry. The dictionaries list is refreshed after a failure
- * too, because a failed save can leave an empty dictionary in it.
+ * Creates the dictionary a proposal describes, then opens Apply for it or
+ * the dictionary itself (`useOpenAfterCreate`). A refusal is explained with
+ * the same copy as a save on the Dictionary view, and the create flow keeps
+ * its state so the user can retry. The dictionaries list is refreshed after
+ * a failure too, because a failed save can leave an empty dictionary in it.
  */
 export function useCreateDictionary(): [
   create: (variables: CreateDictionaryVariables) => void,
   isCreating: boolean,
 ] {
   const workspace = useCurrentWorkspace();
-  const navigate = useNavigate();
   const { t } = useLingui();
   const copy = useDictionaryCopy();
   const queryClient = useQueryClient();
-  const isMountedRef = useIsMounted();
+  const openAfterCreate = useOpenAfterCreate();
   const [create, isCreating] = useMutation({
-    mutationFn: (variables: CreateDictionaryVariables) => {
+    mutationFn: ({
+      applyNext: _applyNext,
+      ...variables
+    }: CreateDictionaryVariables) => {
       return createDictionaryFromDraft({
         ...variables,
         workspaceId: workspace.id,
       });
     },
     queryToInvalidate: DataDictionaryClient.QueryKeys.getAll(),
-    onSuccess: (dictionary) => {
-      const dictionaryName = dictionary.name;
-      notifySuccess(t`Saved ${dictionaryName} to Dictionaries.`);
-      const link = AppLinks.dataManagerDictionaryView({
-        workspaceSlug: workspace.slug,
-        dictionaryId: dictionary.id,
-        dictionaryName,
-      });
-      if (isMountedRef.current) {
-        navigate({ to: link.to, params: link.params });
-      }
+    onSuccess: (dictionary, variables) => {
+      openAfterCreate(dictionary, variables.applyNext);
     },
     onError: (error) => {
       queryClient.invalidateQueries({

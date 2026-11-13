@@ -43,6 +43,8 @@ export type NewDictionaryState = {
   name: string;
   description: string;
   suggestionConsent: SuggestionConsent;
+  /** Whether saving goes on to apply the dictionary to the datasets. */
+  appliesNext: boolean;
 };
 
 /** Everything the create flow's steps can change. */
@@ -103,6 +105,7 @@ export type NewDictionaryAction =
   | { type: "accept_code_list"; codeListKey: string }
   | { type: "set_name"; name: string }
   | { type: "set_description"; description: string }
+  | { type: "set_applies_next"; appliesNext: boolean }
   | { type: "suggestion_consent_decided"; isApproved: boolean };
 
 type Handlers = {
@@ -366,6 +369,9 @@ const HANDLERS: Handlers = {
   set_description: (state, action) => {
     return { ...state, description: action.description };
   },
+  set_applies_next: (state, action) => {
+    return { ...state, appliesNext: action.appliesNext };
+  },
   suggestion_consent_decided: (state, action) => {
     const suggestionConsent = action.isApproved ? "approved" : "declined";
     return { ...state, suggestionConsent };
@@ -392,6 +398,7 @@ export function makeInitialNewDictionaryState(
     name: "",
     description: "",
     suggestionConsent: "not_asked",
+    appliesNext: true,
   };
 }
 

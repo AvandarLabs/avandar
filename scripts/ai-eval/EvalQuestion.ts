@@ -33,7 +33,8 @@ export type EvalQuestion = {
     | "follow_up"
     | "page_context"
     | "mentions"
-    | "schema";
+    | "schema"
+    | "coded";
   prompt: string;
   /** The question this one follows in the same conversation. */
   followsId?: string;
@@ -44,8 +45,8 @@ export type EvalQuestion = {
   clarification: "not_needed" | "allowed" | "expected";
   user?: SimulatedUserScript;
   /**
-   * Ground-truth SQL by name, over the `us_deaths`, `us_cases`, and
-   * `global_deaths` views.
+   * Ground-truth SQL by name, over the workspace's truth views: `us_deaths`,
+   * `us_cases`, and `global_deaths`, or `line_list` for coded questions.
    */
   truth: Readonly<Record<string, string>>;
   grade: (context: GradeContext) => Verdict;

@@ -226,6 +226,13 @@ and crosswalks pick the coding whose codes fit the data (section 8.2), so the
 A binding with no `entry_id` and no `pinned_pairs` is inert: the UI shows it
 as "This dictionary entry was deleted" and nothing converts.
 
+Slice 3 creates the table without `keeps_original`, `value_overrides`, and
+`pinned_pairs`, which only a convert binding uses. Slice 4 adds them with
+conversions: each is nullable or has a default, so adding them needs no
+destructive migration. Bindings are select-only for signed-in users and are
+written whole, per dataset, by `rpc_dataset_columns__apply_dictionaries`
+(section 11).
+
 `dataset_columns` gains `dictionary_binding_id uuid null` (`on delete
 cascade`): set on the `<column>_original` copy that a convert binding adds, so
 removing the binding removes the copy.
@@ -463,6 +470,10 @@ Tabs:
   **Changed the data**; **Crosswalk**), Entries, Status ("Up to date" or
   "Applied version 2, now version 3"), and **Re-apply** where pinned.
 
+**Apply to a dataset** lists the workspace's datasets, and the apply view
+refuses one the user cannot edit (section 14). Listing only the datasets the
+user can edit waits for a server-side read of them (section 16).
+
 Rail: Made from (datasets), Owner, Updated, Version, and "How codes work".
 
 ### 7.3 Create a dictionary
@@ -495,7 +506,8 @@ the Dictionary view's **Add from datasets**, and a dataset's overflow menu
    and finish them on the dictionary"), and a checkbox to apply next. From a
    single dataset it reads "Apply it to <dataset> next" and opens Apply with
    the new dictionary preselected; from several it opens Apply for the first
-   and lists the rest in a toast with links.
+   and names the rest in a toast, as text, to apply from each dataset's menu.
+   A toast closes on its own, so it holds no links.
 
 A dictionary created from a dataset is not tied to it. The save step says so:
 "Saved to Dictionaries like any other dictionary. <dataset> is only where it
@@ -511,6 +523,11 @@ started."
   datasets can use it too"). Shown only while the dataset has no binding of
   any mode.
 
+Until conversions ship (slice 4), **Apply a dictionary**'s sub-line reads
+"Show what codes mean and add column descriptions", since attaching as
+reference cannot turn codes into labels. The copy above returns with
+conversions.
+
 Columns (Metadata tab's column list and each Data Summary column section):
 a column with a code list shows a tag icon after its values. Hover or focus
 opens a popover: list name, every pair (`1  Male`, `9  Unknown (missing
@@ -519,7 +536,9 @@ in the data are unchanged." or "The values were converted to these labels."
 The section meta reads "7 with a code list: hover the tag to read it". A
 column with a bound entry and no description of its own shows the entry's
 description, captioned "From <dictionary>". A column's own description always
-wins.
+wins. Slice 3 puts it under the column name, because the description list
+does not hand a cell its row yet. Moving it into the Description column is a
+follow-up (section 16).
 
 Rail (`DatasetSourceRail`): a **Dictionaries** group listing each dictionary
 with how it was applied ("Attached as reference · data unchanged", "Linked
@@ -527,7 +546,10 @@ dataset: <name>", "Converted this dataset · version 2"). No actions in the
 rail.
 
 The Data Explorer result grid shows the same tag and popover in a column
-header when the column comes straight from a bound dataset column.
+header when the column comes straight from a bound dataset column. A grouped
+SQL result (`GROUP BY` with an aggregate) shows no tag yet, because the SQL
+projection reader returns nothing for it; the query builder's grouped columns
+are tagged. Extending the reader is a follow-up (section 16).
 
 ### 7.5 Apply dictionaries
 
@@ -551,6 +573,11 @@ is named **Attach** when no column converts.
   (`sex · Sex (1/2/9) · from Demographics (CDC)`), and an **Other matches**
   column counts the alternatives. A narrow **Values** column holds a chip,
   **Convert** or **Reference only**, that toggles the row.
+- Dictionaries in use at first: a dataset with bindings opens with them and
+  the dictionaries they use. Otherwise, opened from the dataset menu, every
+  dictionary that matches at least one column, ranked by how many columns it
+  covers; opened from a dictionary (Save, or **Apply to a dataset**), only
+  that dictionary. Each chip is removable with one click.
 - Defaults: each column picks the dictionary whose coding covers the most of
   its values, then any description-only match. Mode defaults per section 3.
 - The side pane for the selected column: Applying (dictionary › entry, code
@@ -758,9 +785,9 @@ the list explains the labels the model sees.
 | Path | File | Change |
 |---|---|---|
 | Legacy online `PostChatMessages` and the offline multi-pass pipeline | `shared/models/chat/SqlTableAlias/SqlTableAliasModule.ts` (`_formatAliasLine`) | Bound columns render `GENDER [1=Male, 2=Female, 9=Unknown]`, the same pattern as `_buildStatusFields`. `fetchWorkspaceSchema.ts` and `fetchOfflineChatSchema.ts` load bindings and code lists. |
-| Pi data agent, online and in browser | `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` (`_formatDatasetLine`), `loadDataAgentDatasets.ts` | `GENDER int codes 1=Male, 2=Female, 9=Unknown`. A new prompt version, `data-agent-v4`, since shipped versions are frozen. |
+| Pi data agent, online and in browser | `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` (`_formatDatasetLine`), `loadDataAgentDatasets.ts` | The dataset's column line is unchanged, and each bound column gets a line of its own under it: `  - GENDER: codes 1=Male, 2=Female, 9=Unknown (missing). Sex recorded on the case report.` A column of labels reads `values Male, Female`, and a code with no label reads `9=(no label)`. A separate line keeps the codes' commas apart from the commas between columns. A new prompt version, `data-agent-v4`, since shipped versions are frozen. |
 | Offline data agent | `profileOfflineDatasets.ts`, `buildOfflineDataAgentSystemPrompt.ts`, `findQuestionValues.ts` | A bound integer column lists its code list instead of nothing. `findQuestionValues` also searches labels and accepted spellings, so "female" adds `GENDER = 2` to `VALUES IN THE QUESTION`. |
-| `lookup_values` tool | `lookupValuesTool.ts` | Searches code list labels as well as stored text values, returning the code to filter on. |
+| `lookup_values` tool | `lookupValuesTool.ts` | Searches code list labels as well as stored text values, returning the code to filter on. A code-list answer runs no query and asks no approval, since a code list is metadata, not rows. A match in the data asks as before. |
 
 Limits: up to 30 pairs per column, then "and 12 more". Up to 120 characters of
 entry description per column, Pi data agent only. `truncateSchemaForOffline`
@@ -784,7 +811,7 @@ so that change needs no data migration.
 |---|---|---|---|
 | `data_dictionaries` and its children | `util__auth_user_meets_min_app_role(workspace_id, 'data_sources', 'viewer')` | `... 'editor'` | owner, or `'admin'` |
 | `crosswalks` and its children | same | same | same |
-| `dataset_columns__dictionary_bindings` | `util__auth_user_can_access_resource('dataset', dataset_id, 'viewer')` | `... 'editor'` | `... 'editor'` |
+| `dataset_columns__dictionary_bindings` | `util__auth_user_can_access_resource('dataset', dataset_id, 'viewer')` | None for signed-in users: `rpc_dataset_columns__apply_dictionaries` writes a dataset's bindings whole after checking `... 'editor'` on the dataset and Data Sources viewer | Same as insert |
 
 - A linked dataset and a combined dataset are ordinary `datasets` rows owned
   by their creator, with the usual dataset permissions. Creating one needs
@@ -834,7 +861,7 @@ tooltip, not `title`, and also open on keyboard focus.
 | Explanation, converting | Your data will change. The labels stay attached too, so the column is still explained. |
 | Explanation, reference | Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the labels. |
 | Row chip | **Convert** · **Reference only** (tooltip: the matching side-pane tooltip plus "Click to attach as reference only instead." or "Click to convert instead.") |
-| Dataset menu | **Apply a dictionary** / Turn codes into labels and add column descriptions. **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
+| Dataset menu | **Apply a dictionary** / Turn codes into labels and add column descriptions (until conversions ship: Show what codes mean and add column descriptions, section 7.4). **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
 | Popover footer | From <dictionary> › <entry>. Attached as reference. The values in the data are unchanged. / The values were converted to these labels. |
 | Rail | Attached as reference · data unchanged / Linked dataset: <name> / Converted this dataset · version <n> |
 | Save step, reference only | Nothing in your data changes. <n> columns keep their values, with labels attached as reference. Edits to the dictionaries show up here right away. |
@@ -851,6 +878,7 @@ reference" to mean "look it up, don't change it".
 | A pair is removed from a live code list | Linked datasets show the raw value for it from the next load. Pinned datasets are unaffected. |
 | A dictionary is deleted | A trigger copies the current pairs into `pinned_pairs` for every live convert binding first, so no linked dataset changes silently. Reference bindings are removed. The delete confirm names the number of datasets affected. |
 | An entry is deleted | Same as above, scoped to the entry. |
+| A code list a binding uses is deleted | The binding keeps its entry, so the column keeps the entry's description, and shows no code list until a dictionary is applied again. A save can delete a list the binding used before the save adds the entry's new one, so the binding cannot follow it. |
 | The source of a linked dataset is deleted | Existing behavior for virtual datasets with a missing dependency. `linked_source_dataset_id` becomes null. |
 | Two bindings for one column | Prevented by the unique `dataset_column_id`. Applying again replaces the binding. |
 | A column renamed after binding | Bindings use `dataset_column_id`, so they follow the rename. |
@@ -874,7 +902,9 @@ Red/green TDD per `docs/rules/testing.md`.
 - **pgTAP:** RLS for every new table (section 11); the version-bump trigger;
   the pin-on-delete trigger; `rpc_dataset_columns__apply_dictionaries`
   writing a linked dataset and its bindings atomically.
-- **Agent evals:** the cases in section 10, online and offline.
+- **Agent evals:** the cases in section 10, online and offline. The online
+  runs gate the release. The offline score is recorded, not a gate, because
+  the offline model's scores move between runs.
 - **E2E (one spec per flow, run one at a time):**
   `dictionary-create-from-dataset.spec.ts`,
   `dictionary-apply-reference.spec.ts`,
@@ -901,10 +931,17 @@ Each slice is one PR into `demo/measles`, recorded in
    - **Add from datasets into an existing dictionary** follows slice 3 as a
      separate small piece. It learns from more datasets into a saved
      dictionary and adds them to its "Made from".
+   - **Follow-ups from slice 3,** each a small change of its own: the entry
+     description in the Description column (`ObjectDescriptionList` passing
+     the row to `renderValue`, section 7.4); **Apply to a dataset** listing
+     only datasets the user can edit, once a server-side read of them exists
+     (section 7.2); tags on grouped SQL results in the Data Explorer, by
+     extending the SQL projection reader (section 7.4).
 4. **Conversions.** The `valueMapping` projection, ordered `ENUM` output,
    linked datasets, converting in place with pinning and Re-apply, unmatched
    values, the preview drawer, keep-original columns, the virtual dataset
-   freshness signal.
+   freshness signal. It also restores the dataset menu's "Turn codes into
+   labels" sub-line (section 7.4) and settles open decision 5.
 5. **Crosswalks.** Schema, layouts, the three steps, mapping fills and
    conversions, compilation, export, the stale banner.
 
@@ -943,3 +980,7 @@ Each slice is one PR into `demo/measles`, recorded in
    small route. Depends on where the agent work stands when slice 2 starts.
 4. **Crosswalk materialization time at 100 datasets.** Measure in slice 5
    before deciding on parallel acquisition.
+5. **A reference binding whose code list is deleted.** It keeps its entry and
+   shows no list until a dictionary is applied again (section 14). Whether a
+   save re-points it to the entry's new list is settled in the slice 4 plan,
+   alongside pinning convert bindings, which must not be re-pointed.

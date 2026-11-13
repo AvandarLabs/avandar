@@ -184,6 +184,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F128 | Multiple chats, a closed-chat archive, and session titles | not started | F91, F89, F90, F81 to F87, F94, F57 | |
 | F129 | Data dictionaries: entries and reusable two-way code lists under Data Sources | not started | none | |
 | F130 | Learn a data dictionary from datasets: profiling, matching, and suggested labels online and offline | not started | F129 | |
+| F131 | Apply a dictionary to a dataset as reference: code lists on the dataset page, in the Data Explorer, and in Ask Avandar online and offline | not started | F129, F130 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -321,6 +322,7 @@ API. It's new work, not something this branch built.
 | after F91, F94, F57 | F128 | Makes F91's tray and the thread per session, adds tabs to F94's panel header, and starts a case-design session from F57's New case type controls. Its title excerpt masks F89 and F90's mention tokens. |
 | any | F129 | Adds its own tables, models, clients, route, and view, so it can merge first. It edits `DataManagerApp.tsx`, `DatasetNavbar.tsx`, and the generated schema files, so take only its hunks if F20 or F121 landed first. |
 | after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. Changes the save RPC's pair check (migration). Deploy the migration, then the `chat` edge function, then the frontend. |
+| after F130 | F131 | Builds on F129's tables and Dictionary view and F130's profiling, create flow, and dataset menu item. Adds the bindings table and the apply RPC (migration) and prompt `data-agent-v4`. Deploy the migration, then the `chat` edge function (it serves v4 and reads bindings, and the new frontend asks for v4), then the frontend. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -380,7 +382,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/schemas/50.rpc_data_catalog_listings__write_verified_column_types.sql` and its pgTAP test | F54, F12, F23 | F54: the function. F12: clears the invalid mark. |
 | `supabase/schemas/20.datasets__open_data.sql` | F4, F54, F16 | F54: the verified-only add trigger. |
 | `supabase/tests/database/rpc_data_catalog_listings__pipeline_scopes.test.sql` | F52, F54, F23 | F54: a fixture update. |
-| `supabase/tests/database/permissions/exact_data_api_grants.test.sql` | F4, F51, F55, F18, F21 | F51: `pipeline_scope_checkpoints`. F55: the two execution tables. |
+| `supabase/tests/database/permissions/exact_data_api_grants.test.sql` | F4, F51, F55, F18, F21, F131 | F51: `pipeline_scope_checkpoints`. F55: the two execution tables. F131: `dataset_columns__dictionary_bindings` as select-only (`cefb14f16`). |
 | `apps/desktop/sync/syncable-tables.ts` | F4, F51, F55, F18, F21, F23 | F51 and F55: their service-role tables in `EXCLUDED_TABLES`. |
 | `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts` | F51, F23 | F51: the `pipeline_scope_keys` SQLite override, keyed by its migration's filename. |
 | `scripts/test-dashboard-publishing-migrations.sh` | F44, F51, F23 | F44 and F51: the replay of their hand-written backfill migrations, keyed by filename. |
@@ -419,10 +421,11 @@ Take only your feature's hunks from these files. The last feature in the
 | `shared/models/chat/SqlTableAlias/*`, `fetchWorkspaceSchema.ts`, `buildSqlSystemPrompt.ts`, the offline chat schema files, `parseProposeCaseType.ts`, `buildCaseManagerSystemPrompt.ts`, `makeChatToolConfigFromOptions.ts`, `shared/types/{chat,offlineChat}.types.ts` | F62, F71 to F75, F81 to F85 | F62: statuses in the schema line and in `proposeCaseType`. The others add field shapes and alias mapping. |
 | `tests/e2e/helpers/CaseTypeSeedHelpers.ts` | F61, F71 to F75 | F61: the helper and its cleanup (`cbf0b48b0`, `16e56ced1`, `b7172aafa`). F71 to F75: per-month fields (`ee2f4a4ad`). |
 | `apps/ava-video-producer/avandar-adapter/CasesScreen/*` | F18, F60, F71 to F75 | F60: `CasesScreen.{tsx,module.css}` stop importing the deleted `IndividualNavbar.module.css` (`e43da0e95`). F18: `RecordDetail.tsx`. |
-| `src/components/layouts/AppView/AppViewBody/AppViewBody.module.css` | F19, F68 | F19: `isFillHeight`. F68: `noPadding` plus fill-height drops the trailing padding. |
+| `src/components/layouts/AppView/AppViewBody/AppViewBody.module.css` | F19, F68, F131 | F19: `isFillHeight`. F68: `noPadding` plus fill-height drops the trailing padding. F131: the rail width reads `--ava-app-view-rail-width`, so the Apply view can widen it (`dd1bc5bec`). |
+| `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
 | `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
-| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67 | Generated: regenerate in each. |
+| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. |
 
 ### Joined cases (F69 to F76)
 
@@ -446,7 +449,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/views/OntologyDesignerApp/ConceptCreatorView/**`, `{createdCaseTypeToFormValues,insertConceptFromFormValues,proposedCaseTypeToCreatedCaseType}/*` | F57 to F62, F73, F74, F75 | F73: allowed rules, locked ID rule, `withFieldDataTypes`, the `DatasetColumnMappingCreator/` folder. F74: value shape switch, `ValueRuleField`, `ValueShapeFields`, `keepKeyAndLabelFieldsSingle`, no rule for lists. F75: `PerPeriodFields`, `formShapeFields`, `createBucketColumnValidator`. |
 | `supabase/functions/chat/PostChatMessages/{parsing/parseProposeCaseType.*,prompt/buildCaseManagerSystemPrompt.*,prompt/makeChatToolConfigFromOptions.*}` | F57 to F62, F73, F74, F75 | F73: allowed rules per column type. F74: list fields. F75: per-period fields. |
 | `supabase/functions/chat/PostChatMessages/{PostChatMessages.ts,parsing/parseOpenRouterResponse.*,runChatAttemptsWithEscalation/*}` | F22, F73 | F73: catalog columns are passed to and required by the proposal parser (`53bb9e0ba`, `ae1bf2bd5`). `7bcaa6da0` also reformats `parseOpenRouterResponse.test.ts` (F22's file). |
-| `shared/models/chat/SqlTableAlias/*`, `shared/types/offlineChat.types.ts`, `fetchOfflineChatSchema/*`, `buildOfflinePrompts/*`, `supabase/functions/chat/PostChatMessages/schema/fetchWorkspaceSchema.*`, `supabase/functions/chat/utils/buildSqlSystemPrompt/*` | F57 to F62, F81 to F85, F74, F75 | F57 to F62: statuses in the SQL context (`fb1740d52`, `accbed4fc`). F81 to F85: offline mode (`5f51ce819`), later `4f17f2f48` and `f98d6a64b`. F74: list markers and view column names. F75: per-period markers and notes. |
+| `shared/models/chat/SqlTableAlias/*`, `shared/types/offlineChat.types.ts`, `fetchOfflineChatSchema/*`, `buildOfflinePrompts/*`, `supabase/functions/chat/PostChatMessages/schema/fetchWorkspaceSchema.*`, `supabase/functions/chat/utils/buildSqlSystemPrompt/*` | F57 to F62, F81 to F85, F74, F75, F131 | F57 to F62: statuses in the SQL context (`fb1740d52`, `accbed4fc`). F81 to F85: offline mode (`5f51ce819`), later `4f17f2f48` and `f98d6a64b`. F74: list markers and view column names. F75: per-period markers and notes. F131: the code list sub-line under a bound column in the legacy schema block, and the browser loading column codes for it (`b878e5416`, `5ba9698b6`); `fetchWorkspaceSchema.ts` reads them in the `chat` function (`90aac2562`). |
 | `shared/types/chat.types.ts` | F22, F57 to F62, F74, F75 | F74: a field that keeps every value. F75: period and date column on proposed and created fields. |
 | `shared/models/ontology/{ConceptAttribute/**,AttributeMapping/DatasetColumnMapping/**}`, `shared/models/queries/{QueryColumn/**,QueryResultColumnBindings/**}` | `refactor/query-column-id` (on `develop`), F57 to F62, F74, F75 | F74: value shape, view column names, `sourceColumnName`/`resultColumnName`, list checks. F75: `bucketGrain`, `bucketColumnId`, period labels on projection descriptors. |
 | `src/lib/ui/viz/{makeDataGridColumnDefs/*,DataGrid.tsx}`, `src/components/VisualizationContainer/**` | F22, F74, F75, F103 to F108, F121 | F74: list cells drop NULL items, saved list columns. F75: period labels. Later: `bd4c8907e` splits `VisualizationContainer.tsx`, so F75's period formatter wiring lives in `UiVizConfigRenderer/UiVizConfigRenderer.tsx` at the tip; `899d290e8` and `52c823754` touch the grid. `7bcaa6da0` reformats `makeDataGridColumnDefs.{ts,test.ts}` (F22). |
@@ -476,12 +479,12 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome.ts` | F22, F82, F85 | F22: BUG-011. F82: `readAppliedSqlResult`. F85: the doc note that a mounted result card matches too (`ad9df5c53`). |
 | `src/components/ChatPanel/ChatThread/Composer/Composer.tsx` | F94, F84, F86, F89 to F91 | F94 (`f2e44f2e4`): the panel polish. F84: `OfflineModeControl` replaces `ChatModelPicker`. F86: input on every page with the switch on (`eb4428ac3`). |
 | `src/components/ChatPanel/ChatModelPicker/**` | F94, F84 | F94 (`f2e44f2e4`) edits `ChatModelPickerView.tsx`. F84 deletes the folder. |
-| `shared/types/offlineChat.types.ts` | F57 to F62, F71 to F75, F84 | F57 to F62 (`accbed4fc`) and F71 to F75: schema fields. F84: the offline bundle types (`5f51ce819`). |
-| `shared/models/chat/SqlTableAlias/{SqlTableAliasModule.ts,SqlTableAlias.test.ts}` | F57 to F62, F71 to F75, F86 | F57 to F62 (`fb1740d52`) and F71 to F75 (`01fd6a86e`, `8297e7a9b`, `8c2a2e369`, `3d0332c7e`): schema context. F86: the alias-to-table and table-to-alias mapping (`4f17f2f48`, `f98d6a64b`). |
-| `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` | F82, F83, F86, `11816d5d0` | F83: `previewRowCount`, `queryTools`, and the `plan_query` tool list. F86: the `promptId` option (`8dc294b2c`, `02a76d122`) and rejecting a failed model call (`25467983a`). `7beccfb8d` (a `demo/measles` formatting commit) reformats two lines. |
+| `shared/types/offlineChat.types.ts` | F57 to F62, F71 to F75, F84, F131 | F57 to F62 (`accbed4fc`) and F71 to F75: schema fields. F84: the offline bundle types (`5f51ce819`). F131: the optional column codes on the offline schema's columns (`b878e5416`). |
+| `shared/models/chat/SqlTableAlias/{SqlTableAliasModule.ts,SqlTableAlias.test.ts}` | F57 to F62, F71 to F75, F86, F131 | F57 to F62 (`fb1740d52`) and F71 to F75 (`01fd6a86e`, `8297e7a9b`, `8c2a2e369`, `3d0332c7e`): schema context. F86: the alias-to-table and table-to-alias mapping (`4f17f2f48`, `f98d6a64b`). F131: the codes line under a bound column, capped and escaped (`b878e5416`, `5ba9698b6`). |
+| `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` | F82, F83, F86, `11816d5d0`, F131 | F83: `previewRowCount`, `queryTools`, and the `plan_query` tool list. F86: the `promptId` option (`8dc294b2c`, `02a76d122`) and rejecting a failed model call (`25467983a`). `7beccfb8d` (a `demo/measles` formatting commit) reformats two lines. F131: passing the column codes to `lookup_values` (`c38cd98ec`). |
 | `src/lib/agent/dataAgent/createDataAgentTools/runQueryTool.ts` | F82, F83, `11816d5d0` | F83: `_describePreview`, `_describeRowsForCheck`, the `previewRowCount` branch, and `previewRowCount` on `QueryToolContext`. |
 | `src/lib/agent/dataAgent/DataAgentHost.ts` | F82, F83, F87 | F83: `previewRowCount` and `previewRows`. F87: placeholder-aware hooks (`8745f3feb`). |
-| `src/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool.ts` | F82, F87 | F87: held placeholders (`8745f3feb`, `8240b7e58`). |
+| `src/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool.ts` | F82, F87, F131 | F87: held placeholders (`8745f3feb`, `8240b7e58`). F131: answering from a code list without a query or approval (`c38cd98ec`). |
 | `src/lib/agent/dataAgent/createDataAgentTools/dataAgentTools.test.ts` | F82, F83, `11816d5d0` | F83: the `plan_query` cases (`50fbf4a34`). |
 | `src/lib/agent/dataAgent/browser/{createBrowserDataAgentHost.ts,DataAgentFeature.ts}` | F82, F86 | F86: `showQuery` routing (`2dcba8303`, `3c49bb065`) and the every-page doc (`5bb545747`). |
 | `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F82, F86, F87, F89 to F91, `11816d5d0` | F82: v1, the shared tools (`a673d31ad`). F86: prompt v2 and its page rules, the alias rule, the v1 pin. F87: the placeholder rules. F89 to F91: v3. |
@@ -531,13 +534,13 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/*` | F22, F89 | F22: the file itself (BUG-014). F89: tokens read as `@Name` (`c757b60a7`). |
 | `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. |
 | `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. |
-| `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F81 to F85, F86 and F87, F89, F95 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. |
+| `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F81 to F85, F86 and F87, F89, F95, F131 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. F131: prompt `data-agent-v4` with a code list sub-line per bound column, served beside v3 (`03ca7f39c`, `5ba9698b6`). |
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F86 and F87, F110 and F111 (`b3f267300`), F89 | F89: `mentionCount` and `attachedCount` on `ChatMessageSentPayload`. |
-| `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. |
-| `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. |
+| `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). |
+| `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). |
 | `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95 | F95: user texts kept across a run, and a schema turn answered without a query. |
 | `supabase/functions/chat/PostChatMessages/prompt/buildSystemPrompts.ts`, `supabase/functions/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts` | F22, F95 | F95: the schema paragraph after ANALYST CHECKS, and the `generateSql` description. |
-| `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). |
+| `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v4` route (`03ca7f39c`). |
 | `src/components/RichText/MentionMenu/{createMentionMenuSuggestion.ts,MentionMenuList/MentionMenuFooter.tsx,MentionMenuList/MentionMenuList.tsx}` | F21, F90 | F90: `variant: "chat"`: no people, an allowed-types filter, links only, one Enter hint, no audience hint. |
 | `docs/measles-demo/gadgets.md` | F21, F91 | F91: the chat `@` menu and tray paragraph, and the Notes line (`1f3bc348d`). |
 | `src/components/AppShell/AppShell.tsx`, `src/components/layouts/AppSlate/AppSlate.tsx` | F20, F94 | F20: `--ava-shell-main-offset-top`. F94: the `chat-fused` mod and the aside's z-index; the slate's `.frame` class. The hunks sit next to each other; apply by hand when F20 is not merged. |
@@ -565,7 +568,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/lib/plugins/{PluginHost/__tests__/pluginHostMenuItems.integration.test.tsx,getMenuItemsFromActivePlugins/getMenuItemsFromActivePlugins.test.ts}` | F99, F105 | F105: `vizTypes: []` in fixtures. |
 | `src/lib/plugins/getContributionCountsFromManifest/*` | F100, F105, F109 | F100 creates it. F105: a `vizTypes` fixture. F109 deletes it for `getContributionsFromManifest`. |
 | `src/views/WorkspaceSettingsPage/WorkspacePluginsTab/**` | F100, F105, F109, F110 | F105: `vizTypes: []` in `PluginDetails.test.tsx` and `WorkspacePluginsTab.test.tsx`. F109: the `PluginDetails/` folder, `PluginManifestSummary.tsx`, `PluginSettingsCard.tsx`, and the tab test. F110: the `query:addColumns` label in `PluginDataAccessSection.tsx` and its test. |
-| `src/views/DataExplorerApp/DataExplorerApp.tsx` | F99, F110, F81 to F85 | F99: the toolbar slot and plugin context. F110: the plugin bridge. F81 to F85 (`7f06c7c6c`, `8301ced8f`): category split charts. |
+| `src/views/DataExplorerApp/DataExplorerApp.tsx` | F99, F110, F81 to F85, F131 | F99: the toolbar slot and plugin context. F110: the plugin bridge. F81 to F85 (`7f06c7c6c`, `8301ced8f`): category split charts. F131: `useExplorerColumnCodes` and the `ColumnCodesContext` provider around the grid (`e82540818`, `26061b590`). |
 | `src/views/DataExplorerApp/DataExplorerStateManager/{DataExplorerStateManager.tsx,dataExplorerStateHelpers.ts,DataExplorerAppState.types.ts}` | F106, F107, F110 | F106: `ee9692bc1`'s plugin guard in type switching and URL restore. F107: plugin chart config memory (`75465118b`, `9f67f0efa`, `7b97f5b5e`). F110: `applyDerivedColumnsSql`, `restoreDerivedColumnsSnapshot`, and the snapshot type. |
 | `src/views/DataExplorerApp/DataExplorerDrawer/{DataExplorerDrawer.tsx,DataExplorerDrawerRail/*}` | F107, F81 to F85, F123 | F107: the rail takes `vizConfig` and `columns` instead of `vizType` (`dea616802`). F81 to F85 `8301ced8f` and the `15410276a` badge fix own the rest. |
 | `src/components/VisualizationContainer/VisualizationContainer.tsx` | F103, F106 | F106: plugin configs go to `PluginVizRenderer`. |
@@ -588,7 +591,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `deno.json` | F2, F96, F81 to F85 | F2: `bottleneck`. F96: the three `@avandar/plugin-manifest` maps, `@plugin-manifest/`, and `yaml`. |
 | `.github/workflows/pr-develop.yaml` | F97, others | F97: the `pnpm check:plugin-bundle` step. `b4622f582` (runner pin) is not F97's. |
 | `eslint.config.js` | F97, others | F97: the `pluginRestrictions` import and spread. `776f94b11` is not F97's. |
-| `apps/desktop/sync/syncable-tables.ts` | F4, F21, F35, F98, others | F98: `plugin_installations` in `EXCLUDED_TABLES`. |
+| `apps/desktop/sync/syncable-tables.ts` | F4, F21, F35, F98, others, F131 | F98: `plugin_installations` in `EXCLUDED_TABLES`. F131: `dataset_columns__dictionary_bindings` in `ACTIVE_TABLES` (`cefb14f16`). |
 | `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts` | F57 to F62, F98 | F98: `settings__can_manage_plugins`. |
 | `apps/ava-cli/{package.json,src/main.ts}` | F15, F102, others | F102: the `@avandar/plugin-manifest` and `yaml` dependencies, the `PluginCli` import, and `.addCommand("plugin", PluginCli)`. |
 | `AGENTS.md` (also loaded as `CLAUDE.md`) | F21, F112, others | F112: the "How to write a bundled plugin" line. |
@@ -643,6 +646,24 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts` | F127, F35 | F127: the stable `updateConfig` (plus `d45e26490`'s `HydrationInputs` names, which only PR #321 has). F35: `aad4d700d` moves the config hydration into `useHydratedMapConfig.ts`. |
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
+
+### Data dictionaries (F129 to F131)
+
+| File (final path) | Owners, in merge order | Each owner's hunks |
+|---|---|---|
+| `src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx` | Postgres branch, F21, F24, F131 | Postgres branch: the `postgres_table` source labels (`a0b8f1646`, `20a52c7cc`). F21: the shared source labels (`af925c7e6`). F24: the catalog preview (`d8a72da58`). F131: `useDatasetColumnCodes` and the codes passed to the column list and rail (`6248dc0f6`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` | Postgres branch, F130, F131 | Postgres branch: the refresh menu items (`20a52c7cc`). F130: `CreateDictionaryMenuItem` (`4ff06c4ca`). F131: `DictionaryMenuItems`, which offers Apply a dictionary and hides Create once one is applied (`32098fc2b`, `e26030a83`). |
+| `src/lib/ui/viz/DataGridColumnTitle/DataGridColumnTitle.tsx` | F23, F121, F131 | F23: the layer list (`52c823754`). F121: the truncated title tooltip. F131: the code list tag read from `ColumnCodesContext` (`e82540818`). |
+| `src/config/AppLinks/AppLinks.tsx` | F66, F129, F130, F131 | F66: Assigned to me. F129: the dictionary view. F130: the create route. F131: `dataManagerApplyDictionaries` (`23d401540`). |
+| `src/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers.ts` | F82, F87, F89, F128, F131 | F131: loading the workspace's column codes into the agent's datasets (`fb01c764b`). |
+| `supabase/functions/chat/PostAgentStream/loadDataAgentDatasets.ts` | F82, F131 | F131: `loadColumnCodes` with the caller's own client (`90aac2562`). |
+| `src/lib/agent/dataAgent/offline/{profileOfflineDatasets,buildOfflineDataAgentSystemPrompt,findQuestionValues}/*.ts` | F82, F83, F131 | F131: code lists in the offline profile, question values matched by label, and the capped code lines (`513e88d44`, `5ba9698b6`). |
+| `scripts/ai-eval/harnesses/pi/PiLocalHarness.ts`, `scripts/ai-eval/runtime/EvalDatabase.ts` | F81, F83, F131 | F131: column codes in the local harness, and the measles workspace's bindings in the eval database (`5ce5ba8a2`, `c567ca769`). |
+| `tests/e2e/agent-chat-sessions.spec.ts`, `tests/e2e/agent-chat-mentions.spec.ts` | F91, F128, F131 | F91 owns mentions and F128 owns sessions. F131: the `data-agent-v4` route (`03ca7f39c`). |
+| `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
+| `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). |
+| `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). |
 
 ---
 
@@ -10659,6 +10680,186 @@ pnpm i18n:check
 pnpm test:e2e dictionary-create-from-dataset.spec.ts
 pnpm test:e2e data-dictionary-edit.spec.ts
 pnpm test:e2e csv-import.spec.ts
+```
+
+---
+
+## F131: Apply a dictionary to a dataset as reference
+
+Status: not started. Built on `feat/attach-dictionaries`, branched from
+`demo/measles` at `71a2a4769`. No PR is open.
+
+**Purpose:** Someone who can edit a dataset applies one or more dictionaries
+to it from its ⋯ menu ("Apply a dictionary"), from a dictionary's "Apply to a
+dataset", or right after creating one ("Apply it to <dataset> next" on Save).
+Columns are matched to dictionary entries on the device, in two steps: Match
+columns and Attach. Attaching stores a reference binding per column and
+changes no value. Bound columns show their code list in a popover on the
+dataset page, the Data Summary, and the Data Explorer grid. The popover opens
+on hover, focus, or click, tracks each separately, closes on Escape pressed on
+the tag, and scrolls a long list inside. The dataset rail and the dictionary's
+Used by tab show where a dictionary is applied, and the menu hides "Create a
+dictionary from this dataset" once one is. Ask Avandar reads the code lists
+online through prompt `data-agent-v4` and offline through its profile,
+question values, and `lookup_values`. Code lines cap each code and label at 60
+characters, spend at most 4,000 characters per prompt, and quote a label
+holding `,`, `=`, `[`, or `]`. The apply view refuses a dataset the user
+cannot edit, and says so when the dataset role cannot be read at all.
+
+**Value:** A coded column explains itself wherever it is read, and "how many
+female cases" becomes `"GENDER" = 2` without anyone remembering the code.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md`. The task plan is
+`docs/measles-demo/data-dictionaries-3-attach-plan.md`.
+
+**PR title:** `feat(data-dictionaries): apply dictionaries to datasets as reference`
+
+**Depends on:** F129 and F130.
+
+**Files, by area** (`ApplyDictionariesView/` is
+`src/views/DataManagerApp/ApplyDictionariesView/`, `DatasetMetaView/` is
+`src/views/DataManagerApp/DatasetMetaView/`, and `SM/` is
+`shared/models/dataDictionaries/`):
+
+- Docs: the plan and the design in `docs/measles-demo/` (`bed2f076d`,
+  `a9ae31115`, `3c52a7a02`), and this log.
+- Schema, migration, desktop twin, sync list, and pgTAP (`cefb14f16`,
+  `977afc66c`): `supabase/schemas/00.enum.dataset_columns__binding_mode.sql`,
+  `00.enum.dataset_columns__binding_direction.sql`,
+  `30.dataset_columns__dictionary_bindings.sql`, and
+  `50.rpc_dataset_columns__apply_dictionaries.sql`; the generated
+  `supabase/migrations/20261113022522_dictionary_bindings.sql` and its twin
+  `apps/desktop/migrations/20261113022522_dictionary_bindings.gen.sql`;
+  `apps/desktop/sync/syncable-tables.ts`; and the tests
+  `supabase/tests/database/dictionary_bindings/rpc_dataset_columns__apply_dictionaries.test.sql`,
+  `supabase/tests/database/permissions/rls_dataset_columns__dictionary_bindings.test.sql`,
+  and `exact_data_api_grants.test.sql`. `977afc66c` renames the workspace
+  guard trigger to `..._keep_workspace_id`, validates each payload with
+  `binding_payload_invalid`, and locks the dataset with `for no key update`.
+  Regenerate the migration with `supabase-declarative-schema`, never copy it.
+- Shared models (`5d7844ff8`, `0d803155b`, `b552bb594`, `6d2ee2909`,
+  `cf77967dc`, `aa1e1a7f7`, `5ba9698b6`): `SM/DictionaryBinding/`,
+  `SM/ColumnCodes/`, `SM/DictionaryMatch/` (`DictionaryMatchFit` includes
+  `not_compared`, ranked below a real fit, and keeps its code list), and
+  `getNameScore` exported from `SM/ColumnProfile/ColumnProfileModule/`.
+- Client, loaders, and hooks (`ab41fb10f`, `1c2efd54e`, `aa1e1a7f7`,
+  `676e8992f`): `src/clients/dataDictionaries/DictionaryBindingClient.ts`,
+  `src/lib/dataDictionaries/loadColumnCodes/`,
+  `src/hooks/datasets/useCanEditDataset/`,
+  `src/hooks/dataDictionaries/useDatasetColumnCodes/`, and
+  `useDatasetHasBindings.ts`. `676e8992f` also makes
+  `src/hooks/permissions/useResourceRole/useResourceRole.ts` return `isError`.
+- The popover (`1f92ec43b`, `e26030a83`, `5a3f40cb2`):
+  `src/components/dataDictionaries/CodeListPopover/`.
+- The dataset page and menu (`6248dc0f6`, `32098fc2b`, `e26030a83`, `b4c794528`):
+  `DatasetMetaView/DatasetColumnCodes/`, `DatasetMetaView.tsx`,
+  `DatasetMetadataList.tsx`, `DatasetSourceRail.tsx`,
+  `DatasetSummaryView/DatasetSummaryView.tsx`,
+  `DatasetSummaryView/ColumnSection/ColumnSection.tsx`, and
+  `DatasetActionsMenu/` (`ApplyDictionaryMenuItem.tsx`,
+  `DictionaryMenuItems.tsx`, `CreateDictionaryMenuItem.tsx`,
+  `DatasetActionsMenu.tsx`).
+- The route, link, and list toggle (`23d401540`):
+  `src/routes/_auth/$workspaceSlug/data-manager/$datasetId_.apply-dictionaries.tsx`,
+  `AppLinks.tsx`, the generated `routeTree.gen.ts`, and
+  `src/views/DataManagerApp/useListPaneToggle/`.
+- The apply flow (`449065183`, `157a44711`, `ecf9e6762`, `30d4772d5`,
+  `571f3fae0`, `9966923a7`, `676e8992f`, `9cd6e8d9d`): `ApplyDictionariesView/`
+  (the reducer, defaults, lookups, the data, profile, flow, access, and
+  attach hooks, the header and step bar, `MatchColumnsStep/`, and
+  `AttachStep/`). The access hook has a `failed` state for a role read that
+  fails. A column two dictionaries tie on goes to the one whose chip comes
+  first (most columns covered). The header leads back to the dataset from a
+  breadcrumb, and the selected column sits in the body's rail, as in the
+  prototype (`dd1bc5bec`, `7af52f65b`).
+- The Save step (`242d427ef`, `ec386f1f6`):
+  `src/views/DataManagerApp/NewDictionaryFromDatasetsView/` (`SaveStep/`,
+  `ProposalStepBody.tsx`, `useCreateDictionary.ts`, `useNewDictionaryFlow.ts`,
+  `useOpenAfterCreate.ts`, and the reducer).
+- The Dictionary view (`b278896db`, `ec386f1f6`, `c6ed4e267`, `ca665cb44`):
+  `src/views/DataManagerApp/DataDictionaryView/` (`ApplyToDatasetButton/`,
+  `DictionaryUsedByTab/` with its loading and error states,
+  `useDictionaryUsage/`, `DataDictionaryHeader/`, and the editor and its
+  tabs). F129's `useSaveDataDictionary.ts` now also refreshes the bindings,
+  so Used by is current after a save removes an entry.
+- The Data Explorer (`e82540818`, `26061b590`):
+  `src/lib/dataDictionaries/getResultColumnCodes/`,
+  `src/lib/ui/viz/DataGridColumnTitle/` (`ColumnCodesContext.ts`,
+  `DataGridColumnTitle.tsx`), `src/views/DataExplorerApp/useExplorerColumnCodes/`,
+  and `DataExplorerApp.tsx`.
+- Prompt v4 and the `chat` function (`03ca7f39c`, `90aac2562`, `5ba9698b6`,
+  `d8c0d6849`): `shared/agent/dataAgent/{buildDataAgentSystemPrompt,dataAgentTools}.ts`,
+  `supabase/functions/chat/utils/loadColumnCodes/`,
+  `PostAgentStream/loadDataAgentDatasets.ts`, and
+  `PostChatMessages/schema/fetchWorkspaceSchema.ts`.
+- The legacy schema block and offline pipeline (`b878e5416`, `5ba9698b6`):
+  `shared/models/chat/SqlTableAlias/SqlTableAliasModule.ts`,
+  `shared/types/offlineChat.types.ts`, and
+  `src/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/`.
+- The browser's agent datasets (`fb01c764b`):
+  `src/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers.ts`.
+- The offline agent (`513e88d44`, `5ba9698b6`):
+  `src/lib/agent/dataAgent/offline/{profileOfflineDatasets,buildOfflineDataAgentSystemPrompt,findQuestionValues}/`.
+- `lookup_values` (`c38cd98ec`, `d8c0d6849`):
+  `src/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool.ts` and
+  `createDataAgent/createDataAgent.ts`.
+- Evals (`5ce5ba8a2`, `c567ca769`, `f5749bc3c`, `78f110d9b`, `92225ff65`):
+  `scripts/ai-eval/measles/`, `EvalQuestion.ts`, `runEval.ts`,
+  `runtime/EvalDatabase.ts`, `harnesses/pi/{PiHarness,PiLocalHarness}.ts`,
+  `docs/ai-agent/eval.md`, and `docs/ai-agent/eval-runs/`. The coded-column
+  graders check only the count. The page and mention questions were rerun on
+  v4 to 7 of 7 after one P04 miss and one M05 grader false positive.
+- E2E (`03ca7f39c`, `d6f624f77`, `8cd68ca59`, `0a70cfcc6`):
+  `tests/e2e/dictionary-apply-reference.spec.ts` (new),
+  `tests/e2e/helpers/seedDataDictionary.ts` (new),
+  `dictionary-create-from-dataset.spec.ts` (saving opens Apply first), and
+  `agent-chat-{result,sessions,mentions}.spec.ts` (the `data-agent-v4` route).
+- Translations (`2cbf5c9a4`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
+- Generated: `shared/types/database.types.ts` (`pnpm db:gen-types`).
+
+**Schema:** yes, one migration (`dictionary_bindings`) with two enums
+(`dataset_columns__binding_mode`, `dataset_columns__binding_direction`), the
+`dataset_columns__dictionary_bindings` table (select-only for signed-in users,
+following the dataset's visibility), its triggers (the workspace guard, and
+removing reference bindings when a dictionary or entry is deleted), and
+`rpc_dataset_columns__apply_dictionaries`, which replaces a dataset's bindings
+whole and accepts `reference` only. Plus its desktop SQLite twin and the table
+in `apps/desktop/sync/syncable-tables.ts`.
+
+**Deploy:** the migration first, then the `chat` edge function, then the
+frontend. Tabs opened before the deploy keep asking for v3, which the
+function still serves.
+
+**Known gaps:** conversions, linked datasets, unmatched values, the preview
+drawer, Re-apply, and the synced-data warning are slice 4. Crosswalks are
+slice 5. "Add from datasets" into an existing dictionary is a separate small
+piece. The slice 3 follow-ups in spec section 16: the entry description in
+the Description column, "Apply to a dataset" listing only editable datasets,
+and tags on grouped SQL results. Re-pointing a binding whose code list is
+deleted, and the menu's conversion sub-line, come with conversions.
+
+**Verification:**
+```sh
+ava supabase status
+pnpm lint
+pnpm exec tsc -b --force --noEmit && pnpm type-check:deno
+deno info --config supabase/functions/chat/deno.json supabase/functions/chat/index.ts 2>&1 | grep -iE "error|not found|unable to"
+pnpm test:frontend
+pnpm vitest run --config vitest.executed.config.ts src/lib/agent/dataAgent/pagePrivacy src/lib/dataDictionaries
+pnpm test:db
+ava supabase migrations validate
+pnpm desktop:sqlite:gen-migrations
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e dictionary-apply-reference.spec.ts
+pnpm test:e2e dictionary-create-from-dataset.spec.ts
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e agent-chat-result.spec.ts
+pnpm test:e2e agent-chat-sessions.spec.ts
+pnpm test:e2e agent-chat-mentions.spec.ts
+pnpm test:e2e data-explorer-grid-layout.spec.ts
+pnpm test:e2e web-offline-mode.spec.ts
 ```
 
 ---

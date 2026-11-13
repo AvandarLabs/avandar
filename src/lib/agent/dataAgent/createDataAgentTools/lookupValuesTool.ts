@@ -1,8 +1,11 @@
+import { isDefined } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { LOOKUP_VALUES_TOOL } from "$/agent/dataAgent/dataAgentTools";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
 import { buildCandidateLookupSqlFromDiscovery } from "@/components/ChatPanel/PendingClarificationBlock/buildCandidateLookupSqlFromDiscovery/buildCandidateLookupSqlFromDiscovery";
 import { DEFERRED_ANSWER_TEXT } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
@@ -15,9 +18,16 @@ type LookupContext = Readonly<{
   state: DataAgentRunState;
   tableName: string;
   column: string;
+  /** The column's code list, when a dictionary is attached to it. */
+  codes: ColumnCodes.Context | undefined;
 }>;
 
-type LookupMatch = { named: string; storedValue: string | undefined };
+type LookupMatch = {
+  named: string;
+  storedValue: string | undefined;
+  /** Set when the code list answered: the label `storedValue` stands for. */
+  codeLabel?: string;
+};
 
 /** Text the model may have meant as a page placeholder, with any spacing. */
 const PLACEHOLDER_LIKE = /^['"`]?\s*<\s*value\s*(\d+)\s*>\s*['"`]?$/i;
@@ -40,6 +50,28 @@ function _readPlaceholder(
 }
 
 /**
+ * The code a named value stands for in the column's code list, when the
+ * value or one of its forms is a label or accepted spelling there.
+ */
+function _findCodeListMatch(
+  context: LookupContext,
+  value: Readonly<{ named: string; forms: readonly string[] }>,
+): LookupMatch | undefined {
+  const { codes } = context;
+  if (codes?.direction !== "decode") {
+    return undefined;
+  }
+  const pair = [value.named, ...value.forms]
+    .map((text) => {
+      return ColumnCodes.findPairByLabel(codes, text);
+    })
+    .find(isDefined);
+  return pair
+    ? { named: value.named, storedValue: pair.code, codeLabel: pair.label }
+    : undefined;
+}
+
+/**
  * How a value is stored. A page placeholder the host holds (`<value 1>`)
  * is already the stored value as far as the model knows, so it matches
  * itself without a query: a lookup would compare its value in lower case,
@@ -52,6 +84,10 @@ async function _findStoredValue(
   const placeholder = _readPlaceholder(value);
   if (placeholder && context.host.isHeldPlaceholder?.(placeholder)) {
     return { named: placeholder, storedValue: placeholder };
+  }
+  const codeListMatch = _findCodeListMatch(context, value);
+  if (codeListMatch) {
+    return codeListMatch;
   }
   const candidateValues = [value.named, ...value.forms];
   const sql = buildCandidateLookupSqlFromDiscovery({
@@ -188,6 +224,50 @@ function _getUnknownPlaceholderResult(
       };
 }
 
+/**
+ * Reports the values found by searching the data, once the host approves
+ * sending them to the model, and records them as an automatic answer.
+ */
+async function _reportDataMatches(
+  context: LookupContext,
+  matched: readonly LookupMatch[],
+  question: string,
+): Promise<string[]> {
+  if (matched.length === 0) {
+    return [];
+  }
+  const matchedValues = matched.map((lookup) => {
+    return lookup.storedValue!;
+  });
+  const isApproved = await context.host.approveValuesForModel({
+    values: matchedValues,
+    reason: "matched_lookup",
+  });
+  if (!isApproved) {
+    return [];
+  }
+  context.state.valuesSentToModel.push(...matchedValues);
+  context.state.questions.push({
+    kind: "values",
+    question,
+    answer: matchedValues.join(", "),
+    isAutomatic: true,
+  });
+  return [
+    `${_describeMatches(matched)} (matched automatically; use only if it means exactly what the user named).`,
+  ];
+}
+
+/**
+ * Reports codes a column's code list gave. A code list is metadata the
+ * model already has, not row data, so nothing here asks for approval.
+ */
+function _describeCodeListMatches(matched: readonly LookupMatch[]): string[] {
+  return matched.map((match) => {
+    return `"${match.named}" is stored as code ${match.storedValue} (${match.codeLabel} in the column's code list).`;
+  });
+}
+
 async function _execute(
   context: LookupContext,
   params: Readonly<{
@@ -204,32 +284,19 @@ async function _execute(
       return _findStoredValue(context, value);
     }),
   );
-  const matched = lookups.filter((lookup) => {
-    return lookup.storedValue !== undefined;
+  const fromCodeList = lookups.filter((lookup) => {
+    return lookup.codeLabel !== undefined;
+  });
+  const fromData = lookups.filter((lookup) => {
+    return lookup.storedValue !== undefined && lookup.codeLabel === undefined;
   });
   const unmatched = lookups.filter((lookup) => {
     return lookup.storedValue === undefined;
   });
-  const matchedValues = matched.map((lookup) => {
-    return lookup.storedValue!;
-  });
-  const isApproved = await context.host.approveValuesForModel({
-    values: matchedValues,
-    reason: "matched_lookup",
-  });
-  const parts: string[] = [];
-  if (matched.length > 0 && isApproved) {
-    context.state.valuesSentToModel.push(...matchedValues);
-    context.state.questions.push({
-      kind: "values",
-      question: params.question,
-      answer: matchedValues.join(", "),
-      isAutomatic: true,
-    });
-    parts.push(
-      `${_describeMatches(matched)} (matched automatically; use only if it means exactly what the user named).`,
-    );
-  }
+  const parts = [
+    ..._describeCodeListMatches(fromCodeList),
+    ...(await _reportDataMatches(context, fromData, params.question)),
+  ];
   if (unmatched.length > 0) {
     parts.push(await _askUserToPick(context, unmatched, params.question));
   }
@@ -242,16 +309,37 @@ async function _execute(
   };
 }
 
+/** The code list of one column of the dataset an alias names, if any. */
+function _findColumnCodes(
+  datasets: readonly DataAgentDataset[],
+  alias: SqlTableAlias.T,
+  columnName: string,
+): ColumnCodes.Context | undefined {
+  if (alias.kind !== "dataset") {
+    return undefined;
+  }
+  return datasets
+    .find((dataset) => {
+      return dataset.id === alias.datasetId;
+    })
+    ?.columns.find((column) => {
+      return column.name === columnName;
+    })?.codes;
+}
+
 /**
  * The tool that finds how values the user named are stored. It runs on the
- * device: an exact match (ignoring case and spaces) answers on its own, and
- * anything else shows the user a card of stored values to pick from. Only
- * matched or picked values reach the model.
+ * device: a label in the column's code list answers with its code, an
+ * exact match (ignoring case and spaces) answers on its own, and anything
+ * else shows the user a card of stored values to pick from. Only matched or
+ * picked values reach the model.
  */
 export function createLookupValuesTool(
   options: Readonly<{
     host: DataAgentHost;
     aliases: readonly SqlTableAlias.T[];
+    /** The datasets under DATASETS, whose columns may carry code lists. */
+    datasets: readonly DataAgentDataset[];
     state: DataAgentRunState;
   }>,
 ): AgentTool<typeof LOOKUP_VALUES_TOOL.parameters> {
@@ -273,6 +361,7 @@ export function createLookupValuesTool(
           state: options.state,
           tableName: alias.tableName,
           column: params.column,
+          codes: _findColumnCodes(options.datasets, alias, params.column),
         },
         params,
       );

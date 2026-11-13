@@ -131,3 +131,12 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T11-40-15](2026-11-09T11-40-15-phase-1b_agent-page/results.jsonl) | `phase-1b:agent-page` | 7/7 | 0 | 0 | $0.00021 | 1.7 s / 2.7 s | none |
 | [2026-11-09T11-40-56](2026-11-09T11-40-56-phase-1b_agent-45/results.jsonl) | `phase-1b:agent-45` | 44/45 | 0 | 0 | $0.00055 | 2.1 s / 3.5 s | N04 |
 | [2026-11-09T11-41-09](2026-11-09T11-41-09-phase-1b_rerun-n04/results.jsonl) | `phase-1b:rerun-n04` | 1/1 | 0 | 0 | $0.00036 | 3.5 s / 3.5 s | none |
+| [2026-11-13T05-21-34](2026-11-13T05-21-34-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00055 | 2.5 s / 2.6 s | none |
+| [2026-11-13T05-21-42](2026-11-13T05-21-42-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00013 | 1.7 s / 1.8 s | none |
+| [2026-11-13T05-21-48](2026-11-13T05-21-48-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00306 | 1.9 s / 3.2 s | none |
+| [2026-11-13T05-22-25](2026-11-13T05-22-25-attach-dictionaries_agent-45/results.jsonl) | `attach-dictionaries:agent-45` | 44/45 | 0 | 0 | $0.00032 | 2.3 s / 3.4 s | N04 |
+| [2026-11-13T05-22-35](2026-11-13T05-22-35-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 6/7 | 0 | 1 | $0.00020 | 1.9 s / 2.2 s | P04 |
+| [2026-11-13T05-22-42](2026-11-13T05-22-42-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 6/7 | 0 | 0 | $0.00021 | 2.1 s / 2.9 s | M05 |
+| [2026-11-13T05-24-43](2026-11-13T05-24-43-attach-dictionaries_coded-offline/results.jsonl) | `attach-dictionaries:coded-offline` | 4/4 | 0 | 0 | $0.00000 | 6.0 s / 72.7 s | none |
+| [2026-11-13T05-27-22](2026-11-13T05-27-22-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 7/7 | 0 | 0 | $0.00020 | 2.2 s / 3.7 s | none |
+| [2026-11-13T05-27-29](2026-11-13T05-27-29-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 7/7 | 0 | 0 | $0.00019 | 2.1 s / 2.7 s | none |

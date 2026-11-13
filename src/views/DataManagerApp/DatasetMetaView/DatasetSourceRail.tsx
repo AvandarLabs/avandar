@@ -2,6 +2,8 @@ import { formatDate, formatFileSize, isNonNullish } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
+import { DatasetDictionariesRailGroup } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -24,7 +26,14 @@ export type DatasetSourceRecord =
 type Props = {
   dataset: Dataset.T;
   source: DatasetSourceRecord | undefined;
+  /**
+   * What attached dictionaries say about each column, by column id. Left
+   * out where no dictionary data is loaded, such as a preview.
+   */
+  columnCodes?: ReadonlyMap<string, ColumnCodes.T>;
 };
+
+const NO_CODES: ReadonlyMap<string, ColumnCodes.T> = new Map();
 
 /**
  * The provenance of a dataset: how it was read, and where the bytes live.
@@ -41,6 +50,7 @@ type Props = {
 export function DatasetSourceRail({
   dataset,
   source,
+  columnCodes = NO_CODES,
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
 
@@ -173,6 +183,7 @@ export function DatasetSourceRail({
           </AppViewRail.Fact>
         ) : null}
       </AppViewRail.Group>
+      <DatasetDictionariesRailGroup columnCodes={columnCodes} />
     </AppViewRail>
   );
 }

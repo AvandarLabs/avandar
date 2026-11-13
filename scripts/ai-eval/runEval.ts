@@ -16,6 +16,10 @@
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.
  *
+ * `--workspace measles` asks the coded-column questions (D) over the
+ * measles line list with its code lists attached, on the `pi` and
+ * `pi-local` harnesses. It needs no `~/cleaned-test-data`.
+ *
  * Needs `~/cleaned-test-data` (the JHU long-format CSVs) and
  * `OPEN_ROUTER_API_KEY` (read from `.env.development.edge` when not set).
  * Writes `results.jsonl` and `summary.md` under `.temp/ai-eval/runs/`.
@@ -27,6 +31,8 @@ import { COVID_QUESTIONS } from "./covid/covidQuestions";
 import { createBaselineHarness } from "./harnesses/baseline/BaselineHarness";
 import { createPiHarness } from "./harnesses/pi/PiHarness";
 import { createPiLocalHarness } from "./harnesses/pi/PiLocalHarness";
+import { MEASLES_QUESTIONS } from "./measles/measlesQuestions";
+import { MEASLES_DATASETS } from "./measles/measlesWorkspace";
 import { EvalDatabase } from "./runtime/EvalDatabase";
 import { gradeEvalAnswer } from "./runtime/gradeEvalAnswer";
 import { readOpenRouterApiKey } from "./runtime/readOpenRouterApiKey";
@@ -119,12 +125,57 @@ function _parseOptions() {
       questions: { type: "string", default: "" },
       concurrency: { type: "string", default: "4" },
       label: { type: "string", default: "" },
+      workspace: { type: "string", default: "covid" },
     },
   });
   return values;
 }
 
-function _selectQuestions(ids: string): readonly EvalQuestion[] {
+/** The questions and data of the workspace a run asks about. */
+type EvalWorkspace = {
+  name: string;
+  /** Set for a workspace other than COVID, whose questions are all its own. */
+  questions: readonly EvalQuestion[] | undefined;
+  /** Set for a workspace other than COVID; the harnesses default to COVID. */
+  datasets: typeof MEASLES_DATASETS | undefined;
+  databasePath: string;
+  dataDir: string | undefined;
+};
+
+/** Looks up a `--workspace` name. Throws on a name it does not know. */
+function _getWorkspace(name: string): EvalWorkspace {
+  if (name === "measles") {
+    return {
+      name,
+      questions: MEASLES_QUESTIONS,
+      datasets: MEASLES_DATASETS,
+      databasePath: join(REPO_ROOT, ".temp/ai-eval/measles.duckdb"),
+      dataDir: join(REPO_ROOT, "tests/data/measles-line-list-small"),
+    };
+  }
+  if (name !== "covid") {
+    throw new Error(`Unknown workspace "${name}": use "covid" or "measles"`);
+  }
+  return {
+    name,
+    questions: undefined,
+    datasets: undefined,
+    databasePath: join(REPO_ROOT, ".temp/ai-eval/covid.duckdb"),
+    dataDir: undefined,
+  };
+}
+
+function _selectQuestions(
+  ids: string,
+  workspaceQuestions: readonly EvalQuestion[] | undefined,
+): readonly EvalQuestion[] {
+  if (workspaceQuestions) {
+    return ids
+      ? workspaceQuestions.filter((question) => {
+          return ids.split(",").includes(question.id);
+        })
+      : workspaceQuestions;
+  }
   if (!ids) {
     // The default run stays the audit's 45 questions, so archived runs
     // compare. Page questions run with `--questions P`, mention questions
@@ -150,14 +201,17 @@ function _selectQuestions(ids: string): readonly EvalQuestion[] {
 
 async function _createHarness(
   options: ReturnType<typeof _parseOptions>,
+  workspace: EvalWorkspace,
   database: EvalDatabase,
 ): Promise<EvalHarness> {
+  const { datasets } = workspace;
   if (options.harness === "pi-local") {
     return createPiLocalHarness({
       repoRoot: REPO_ROOT,
       database,
       configName: options.config || "default",
       model: options.model,
+      datasets,
     });
   }
   const openRouterApiKey = readOpenRouterApiKey(REPO_ROOT);
@@ -167,7 +221,13 @@ async function _createHarness(
       database,
       configName: options.config || "default",
       model: options.model,
+      datasets,
     });
+  }
+  if (datasets) {
+    throw new Error(
+      `The ${workspace.name} workspace runs on the pi and pi-local harnesses only`,
+    );
   }
   return createBaselineHarness({
     repoRoot: REPO_ROOT,
@@ -206,14 +266,17 @@ function _writeRun(
 
 async function main(): Promise<void> {
   const options = _parseOptions();
+  const workspace = _getWorkspace(options.workspace);
   const database = await EvalDatabase.open({
-    databasePath: join(REPO_ROOT, ".temp/ai-eval/covid.duckdb"),
+    databasePath: workspace.databasePath,
+    dataDir: workspace.dataDir,
+    datasets: workspace.datasets,
   });
-  const harness = await _createHarness(options, database);
+  const harness = await _createHarness(options, workspace, database);
   const label = options.label || harness.label;
   const graded: GradedAnswer[] = [];
   await _runAll(
-    _toConversations(_selectQuestions(options.questions)),
+    _toConversations(_selectQuestions(options.questions, workspace.questions)),
     Number(options.concurrency),
     async (questions) => {
       await _runConversation({

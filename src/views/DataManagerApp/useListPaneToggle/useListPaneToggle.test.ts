@@ -8,6 +8,7 @@ const { routeState } = vi.hoisted(() => {
       isPhone: false,
       pathname: "/demo/data-manager/dictionaries/new",
       isTaskView: true,
+      taskRoute: "/$workspaceSlug/data-manager/dictionaries/new",
     },
   };
 });
@@ -28,8 +29,10 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   return {
     ...actual,
     useMatchRoute: () => {
-      return () => {
-        return routeState.isTaskView ? {} : false;
+      return (options: { to: string }) => {
+        return routeState.isTaskView && options.to === routeState.taskRoute
+          ? {}
+          : false;
       };
     },
     useLocation: (options: {
@@ -45,6 +48,20 @@ describe("useListPaneToggle", () => {
     routeState.pathname = "/demo/data-manager/dictionaries/new";
     routeState.isTaskView = true;
     routeState.isPhone = false;
+    routeState.taskRoute = "/$workspaceSlug/data-manager/dictionaries/new";
+  });
+
+  it("hides the list while dictionaries are applied to a dataset", () => {
+    routeState.pathname = "/demo/data-manager/1/apply-dictionaries";
+    routeState.taskRoute =
+      "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries";
+    const { result } = renderHook(() => {
+      return useListPaneToggle();
+    });
+    expect(result.current).toMatchObject({
+      isTaskView: true,
+      isListShown: false,
+    });
   });
 
   it("hides the list on a task view until it is shown", () => {

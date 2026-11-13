@@ -19,7 +19,8 @@
  *   - ACTIVE: dataset definitions and their per-format detail rows,
  *     catalog listings and their drives, dashboards, concepts + their
  *     statuses, attributes, and attribute mappings, data dictionaries and
- *     their contents, individuals, user
+ *     their contents, the dictionary bindings of dataset columns,
+ *     individuals, user
  *     profile, plus `workspaces` and `workspace_memberships` so the
  *     workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
@@ -53,6 +54,7 @@ const ACTIVE_TABLES = [
   "data_dictionaries__code_lists",
   "data_dictionaries__entries",
   "data_dictionaries__entry_codings",
+  "dataset_columns__dictionary_bindings",
   "concept_attributes",
   "attribute_mappings__dataset_column",
   "attribute_mappings__manual_entry",

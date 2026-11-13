@@ -126,6 +126,25 @@ export const AppLinks = {
       isAvailableOffline: true,
     };
   },
+  dataManagerApplyDictionaries: ({
+    workspaceSlug,
+    datasetId,
+  }: {
+    workspaceSlug: string;
+    datasetId: string;
+  }) => {
+    return {
+      key: "data-manager-apply-dictionaries",
+      to: "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries",
+      params: { workspaceSlug, datasetId },
+      label: (): string => {
+        return t`Apply dictionaries`;
+      },
+      // Matching runs on the device. Only attaching needs a connection, and
+      // the Attach step gates that button itself.
+      isAvailableOffline: true,
+    };
+  },
   dataManagerDictionaryView: ({
     workspaceSlug,
     dictionaryId,

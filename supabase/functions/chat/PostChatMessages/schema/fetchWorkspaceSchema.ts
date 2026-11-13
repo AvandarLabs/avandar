@@ -1,3 +1,5 @@
+import { loadColumnCodes } from "@sbfn/chat/utils/loadColumnCodes/loadColumnCodes.ts";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 export type Dataset = { id: string; name: string; description?: string | null };
@@ -6,6 +8,8 @@ export type DatasetColumn = {
   dataset_id: string;
   name: string;
   data_type: string;
+  /** The column's code list, when a dictionary is attached to it. */
+  codes?: ColumnCodes.Context;
 };
 export type Concept = {
   id: string;
@@ -52,19 +56,30 @@ async function _fetchDatasets(options: {
     return { datasets: [], columns: [] };
   }
 
-  const { data: columns } = await options.supabaseClient
-    .from("dataset_columns")
-    .select("id, dataset_id, name, data_type")
-    .eq("workspace_id", options.workspaceId)
-    .in(
-      "dataset_id",
-      datasets.map((dataset: Dataset) => {
-        return dataset.id;
-      }),
-    )
-    .throwOnError();
+  const [{ data: columns }, codesByColumnId] = await Promise.all([
+    options.supabaseClient
+      .from("dataset_columns")
+      .select("id, dataset_id, name, data_type")
+      .eq("workspace_id", options.workspaceId)
+      .in(
+        "dataset_id",
+        datasets.map((dataset: Dataset) => {
+          return dataset.id;
+        }),
+      )
+      .throwOnError(),
+    loadColumnCodes(options),
+  ]);
 
-  return { datasets: datasets ?? [], columns: columns ?? [] };
+  return {
+    datasets: datasets ?? [],
+    columns: (columns ?? []).map((column: DatasetColumn) => {
+      const codes = column.id ? codesByColumnId.get(column.id) : undefined;
+      return codes
+        ? { ...column, codes: ColumnCodes.toContext(codes) }
+        : column;
+    }),
+  };
 }
 
 async function _fetchConcepts(options: {
