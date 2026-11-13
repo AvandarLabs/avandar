@@ -18,6 +18,8 @@ import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
 import { appRoot, ShowcaseFilms, PLANS } from "./ShowcaseFilms/ShowcaseFilms";
 import { servedFile, streamFile } from "./staticFileHelpers/staticFileHelpers";
+import { handleThemeRequest } from "./themeRoutes/themeRoutes";
+import { createThemeStore } from "./themeStore/themeStore";
 import type { Film } from "../../src/showcase/showcase.types";
 
 requireLicense();
@@ -57,6 +59,18 @@ const plansWatcher = watch(
     }, 200);
   },
 );
+const themeStore = createThemeStore({ directory: path.join(appRoot, "themes") });
+let themeTimer: ReturnType<typeof setTimeout> | undefined;
+// A theme saved here or edited on disk republishes, so open galleries reload it.
+const themesWatcher = watch(path.join(appRoot, "themes"), (_event, filename) => {
+  if (!filename?.endsWith(".theme.json") || filename.startsWith(".")) {
+    return;
+  }
+  clearTimeout(themeTimer);
+  themeTimer = setTimeout(() => {
+    publish().catch((error) => console.error("Theme reload failed:", error));
+  }, 200);
+});
 const jobs: ReturnType<
   typeof createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>
 > = createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>(
@@ -145,6 +159,9 @@ async function api(
   res: ServerResponse,
   pathname: string,
 ) {
+  if (await handleThemeRequest({ req, res, pathname, store: themeStore })) {
+    return;
+  }
   if (pathname === "/api/exports" && req.method === "POST") {
     await exportRequest(req, res);
     return;
@@ -281,8 +298,10 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 });
 async function close() {
   clearTimeout(planTimer);
+  clearTimeout(themeTimer);
   clients.forEach((client) => client.end());
   plansWatcher.close();
+  themesWatcher.close();
   server.close();
   await live.dispose();
   await atlas?.dispose();
