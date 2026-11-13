@@ -1,0 +1,17 @@
+{
+  "label": "attach-dictionaries:coded-offline",
+  "questionCount": 4,
+  "passCount": 4,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 8,
+  "promptTokens": 6511,
+  "cachedPromptTokens": 0,
+  "completionTokens": 401,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 6002.641916000008,
+  "latencyP90Ms": 72712.802959,
+  "failedIds": []
+}

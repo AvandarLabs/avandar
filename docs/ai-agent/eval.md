@@ -221,6 +221,46 @@ described under "Questions and ground truth".
   variance and caching, not more work per question. All Phase 1B runs cost
   about $0.03.
 
+### Coded columns
+
+Runs on 2026-11-13 for dictionaries attached as reference, archived under the
+`attach-dictionaries` label. Prompt v4 lists each bound column's codes and
+description on its own line under its dataset, the offline agent reads the
+code lists in its profile and question values, and `lookup_values` answers
+from a code list without running a query. The coded-column questions D01 to
+D04 run over the measles line list (`--workspace measles`) and are described
+under "Questions and ground truth".
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| attach-dictionaries:coded #1-#3 (D01-D04) | 4/4, 4/4, 4/4 | 0 / 0 | $0.00013 to $0.00306 | 3,721 to 3,781 | 1.7 to 2.5 s / 1.8 to 3.2 s |
+| attach-dictionaries:coded-offline (Qwen3 4B, D01-D04) | 4/4 | 0 / 0 | $0 | 814 | 6.0 s / 72.7 s |
+| attach-dictionaries:agent-page (P01-P07) | 6/7 | 0 / 1 | $0.00020 | 3,950 | 1.9 s / 2.2 s |
+| attach-dictionaries:agent-mentions (M01-M06, M03b) | 6/7 | 0 / 0 | $0.00021 | 3,985 | 2.1 s / 2.9 s |
+| attach-dictionaries:agent-45 | 44/45 | 0 / 0 | $0.00032 | 3,904 | 2.3 s / 3.4 s |
+
+- The coded-column bar is met: D01 to D04 pass on all three online runs, and
+  the 45 questions score 44/45. The miss, N04, left out zero-death countries,
+  as it does on some runs (see Phase 1B).
+- The page and mention bar is not met on this run, and neither miss involves
+  a code list. P04 ("make this a pie chart" with two charts on screen)
+  answered without asking which chart; it has varied between runs before
+  (1 of 3 in Phase 1A's second review). M05 behaved as intended: it ran no
+  query and said it cannot see the dashboard, but its reply described the
+  datasets as "COVID-19" data, and the grader fails any digit in that reply.
+  Neither was rerun or tuned.
+- D04 ("What does a GENDER value of 9 mean?"): every online run said the
+  code has no label, quoted `(no label)`, named the labelled codes (1 Male,
+  2 Female), and said it cannot tell what 9 stands for. The offline run said
+  9 "represents 'No label' as per the dataset's coding" and invented no
+  meaning. No run ran a query for it.
+- The offline run took 72.7 s on its first answer, which loads the model and
+  profiles the data, and about 6 s per answer after that.
+- Prompt v4 adds about 400 to 430 input tokens per call over Phase 1B's v3
+  runs (3,904 against 3,478 on the 45 questions, +12%), all from the coded
+  columns instructions, since the COVID datasets have no code lists. All
+  online runs cost about $0.03.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -313,6 +353,9 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config single --mo
 
 # The offline agent on one in-browser model (WebLLM id); needs no API key
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --model Qwen3-4B-q4f16_1-MLC
+
+# The coded-column questions over the measles line list
+pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --workspace measles
 
 # A subset: question ids, or a category letter (B, I, H, N, F, P, M, S)
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions H,N11
@@ -507,6 +550,14 @@ be stacked as stored, and it names a real difference (a near-match such as
 S02 is "Try again" in the same conversation. Any query shown to the user
 fails the question. They run only with `--questions S`.
 
+`measles/measlesQuestions.ts` holds the coded-column questions D01 to D04,
+over the 24-row measles line list in `tests/data/measles-line-list-small/`,
+with the code lists in `measles/measlesWorkspace.ts` attached as reference.
+D01 to D03 ask in labels and are graded by their count; D04 asks what an
+unlabeled code means and passes only when the reply says it has no label.
+They run only with `--workspace measles`, on the `pi` and `pi-local`
+harnesses.
+
 ### Metrics
 
 | Metric | Definition |
@@ -578,6 +629,8 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | One question or category | `--questions N11` or `--questions H` |
 | The page-context questions (add `--label phase-1a-redaction:agent-page`) | `--harness pi --config haiku-sonnet --questions P` |
 | The mention questions (add `--label phase-1b:agent-mentions`) | `--harness pi --config haiku-sonnet --questions M` |
+| The coded-column questions (add `--label attach-dictionaries:coded`) | `--harness pi --config haiku-sonnet --workspace measles` |
+| The coded-column questions offline | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1 --workspace measles` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 
 The PDF table assistant has its own runner,

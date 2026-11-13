@@ -1,0 +1,17 @@
+{
+  "label": "attach-dictionaries:coded",
+  "questionCount": 4,
+  "passCount": 4,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 4,
+  "promptTokens": 14882,
+  "cachedPromptTokens": 0,
+  "completionTokens": 671,
+  "totalCost": 0.00219535,
+  "costPerQuestion": 0.0005488375,
+  "latencyMedianMs": 2534.463125,
+  "latencyP90Ms": 2622.7975840000004,
+  "failedIds": []
+}
