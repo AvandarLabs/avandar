@@ -5,10 +5,12 @@ import {
   GENDER,
   makeApplyFlow,
   makeApplyLookups,
+  SEX_LIST,
   SEX_PICK,
 } from "@/views/DataManagerApp/ApplyDictionariesView/__tests__/applyFlow.fixtures";
 import { UnmatchedValuesStep } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
 import type { ApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 
 const mocks = vi.hoisted(() => {
@@ -38,7 +40,10 @@ function _flow(overrides: Partial<ApplyFlow> = {}): ApplyFlow {
   });
 }
 
-function _render(flow: ApplyFlow): void {
+function _render(
+  flow: ApplyFlow,
+  lookups: ApplyLookups = makeApplyLookups(),
+): void {
   const state = {
     ...flow.state,
     picks: {
@@ -51,7 +56,7 @@ function _render(flow: ApplyFlow): void {
       dataset={DATASET}
       columns={[GENDER, COUNTY]}
       flow={{ ...flow, state }}
-      lookups={makeApplyLookups()}
+      lookups={lookups}
       preview={null}
     />,
   );
@@ -185,6 +190,42 @@ describe("UnmatchedValuesStep", () => {
     expect(
       await screen.findByText(
         "This column becomes whole numbers, so this value can't stay as text.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("disables Add to list for a code already in the list without a label", async () => {
+    const blankList = {
+      ...SEX_LIST,
+      pairs: [
+        ...SEX_LIST.pairs,
+        { code: "8", label: " ", acceptedSpellings: [], isMissing: false },
+      ],
+    };
+    _render(
+      _flow({
+        unmatched: {
+          status: "ready",
+          result: new Map([
+            [GENDER.id, [{ value: "8", valueKey: "8", rowCount: 4 }]],
+          ]),
+        },
+      }),
+      {
+        ...makeApplyLookups(),
+        codeLists: new Map([[SEX_LIST.id, blankList]]),
+      },
+    );
+
+    const group = screen.getByRole("radiogroup", {
+      name: "What to do with 8 in GENDER",
+    });
+    const add = within(group).getByRole("radio", { name: "Add to list" });
+    expect(add).toBeDisabled();
+    fireEvent.mouseEnter(add.closest("span") ?? add);
+    expect(
+      await screen.findByText(
+        "8 is already in the list, without a label. Label it on the dictionary.",
       ),
     ).toBeInTheDocument();
   });
