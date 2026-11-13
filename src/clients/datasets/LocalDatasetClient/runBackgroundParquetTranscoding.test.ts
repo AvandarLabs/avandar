@@ -1,12 +1,20 @@
 import "fake-indexeddb/auto";
+import { Model } from "@avandar/models";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
-import { makeTranscodeCompletionUpdateFromParquet } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
+import {
+  getReconcilableColumnsByOriginalName,
+  makeTranscodeCompletionUpdateFromParquet,
+} from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "@/db/dexie/dexieVersions/dexieVersions";
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 const db = AvaDexieVersionManager.getVersion(CURRENT_AVA_DEXIE_VERSION);
@@ -97,5 +105,41 @@ describe("makeTranscodeCompletionUpdateFromParquet", () => {
     expect(row).toHaveProperty("sourceBytes");
     expect(row?.sourceBytes).toBeDefined();
     expect(row?.sourceFileSize).toBe(64);
+  });
+});
+
+describe("getReconcilableColumnsByOriginalName", () => {
+  function _makeColumn(
+    name: string,
+    dictionaryBindingId: DictionaryBinding.Id | undefined,
+  ): DatasetColumn.T {
+    return Model.make("DatasetColumn", {
+      id: `${name}-id` as DatasetColumn.Id,
+      datasetId: "33333333-3333-4333-8333-333333333333" as Dataset.Id,
+      workspaceId: "44444444-4444-4444-8444-444444444444" as Workspace.Id,
+      createdAt: "2026-11-13T00:00:00.000Z",
+      updatedAt: "2026-11-13T00:00:00.000Z",
+      name,
+      originalName: "GENDER",
+      originalDataType: "BIGINT",
+      detectedDataType: "BIGINT",
+      dataType: "varchar",
+      description: undefined,
+      columnIdx: 0,
+      dictionaryBindingId,
+    });
+  }
+
+  it("keeps the converted column, not its keep-original copy", () => {
+    const gender = _makeColumn("GENDER", undefined);
+    const copy = _makeColumn(
+      "GENDER_original",
+      "55555555-5555-4555-8555-555555555555" as DictionaryBinding.Id,
+    );
+
+    const byName = getReconcilableColumnsByOriginalName([gender, copy]);
+
+    expect(byName.get("GENDER")).toBe(gender);
+    expect(byName.size).toBe(1);
   });
 });
