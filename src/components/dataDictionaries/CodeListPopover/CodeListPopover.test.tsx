@@ -242,4 +242,67 @@ describe("CodeListPopover", () => {
     ).toBeInTheDocument();
     mocks.unlabeledCount = undefined;
   });
+
+  it("lets the keyboard reach the dropdown's link and Escape back to the tag", async () => {
+    mocks.unlabeledCount = 3;
+    try {
+      render(
+        <CodeListPopover
+          columnName="GENDER"
+          datasetId={"dataset-1" as Dataset.Id}
+          codes={makeCodes({ mode: "convert", direction: "encode" })}
+        />,
+      );
+      const tag = screen.getByRole("button", { name: "Code list for GENDER" });
+      act(() => {
+        tag.focus();
+      });
+      const dialog = await screen.findByRole("dialog");
+      const link = within(dialog).getByRole("link", {
+        name: "Label them in NYS codes",
+        hidden: true,
+      });
+
+      fireEvent.keyDown(tag, { key: "Tab" });
+      expect(link).toHaveFocus();
+
+      // Focus inside the dropdown keeps it open past the close delay.
+      await new Promise((resolve) => {
+        setTimeout(resolve, 300);
+      });
+      expect(screen.getByRole("dialog", { hidden: true })).toBeInTheDocument();
+
+      fireEvent.keyDown(link, { key: "Escape" });
+      await waitFor(() => {
+        expect(screen.queryByRole("dialog", { hidden: true })).toBeNull();
+      });
+      expect(tag).toHaveFocus();
+    } finally {
+      mocks.unlabeledCount = undefined;
+    }
+  });
+
+  it("names the list when its entry was deleted", async () => {
+    render(
+      <CodeListPopover
+        columnName="GENDER"
+        codes={makeCodes({
+          dictionaryId: "",
+          dictionaryName: "",
+          entryName: "",
+          codeListName: undefined,
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          isSourceDeleted: true,
+          currentDictionaryVersion: undefined,
+        })}
+      />,
+    );
+    fireEvent.focus(
+      screen.getByRole("button", { name: "Code list for GENDER" }),
+    );
+
+    expect(await screen.findByRole("dialog")).toHaveTextContent(/^Code list/);
+  });
 });

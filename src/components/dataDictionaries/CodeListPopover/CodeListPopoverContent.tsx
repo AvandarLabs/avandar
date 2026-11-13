@@ -50,7 +50,7 @@ export function CodeListPopoverContent({
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {codes.codeListName ?? entryName}
+        {codes.codeListName || entryName || <Trans>Code list</Trans>}
       </Text>
       <Table className={css.codeListPopoverTable} verticalSpacing={2}>
         <Table.Tbody>
