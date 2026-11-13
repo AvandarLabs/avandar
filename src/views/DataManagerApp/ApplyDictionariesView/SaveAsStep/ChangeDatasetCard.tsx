@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Radio, Stack, Text } from "@mantine/core";
 import { useId } from "react";
 import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
@@ -43,7 +43,6 @@ export function ChangeDatasetCard({
   dataset,
   inPlace,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
   const titleId = useId();
   const descriptionId = useId();
   const description = useDescription(dataset, inPlace);
@@ -60,7 +59,7 @@ export function ChangeDatasetCard({
         <Radio.Indicator disabled={!inPlace.isAvailable} />
         <Stack gap={2}>
           <Text id={titleId} fw={600} size="sm">
-            {t`Change ${datasetName}`}
+            <Trans>Change {datasetName}</Trans>
           </Text>
           <Text id={descriptionId} size="xs" c="dimmed">
             {description}

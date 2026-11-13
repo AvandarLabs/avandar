@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Checkbox, Radio, Stack, Text, TextInput } from "@mantine/core";
+import { useId } from "react";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { ChangeDatasetCard } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard";
 import { LinkedDatasetCard } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard";
@@ -32,10 +33,20 @@ export function SaveTargetCards(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const { dataset, targets, state, dispatch } = props;
   const datasetName = dataset.name;
+  const titleId = useId();
   return (
-    <AppViewSection title={<Trans>Save the conversions as</Trans>}>
+    <AppViewSection
+      title={
+        <span id={titleId}>
+          <Trans>Save the conversions as</Trans>
+        </span>
+      }
+    >
       <Stack gap="md" maw="72ch">
         <Radio.Group
+          // Mantine labels the group by its label id, so the section
+          // title takes that id and names the group.
+          labelProps={{ id: titleId }}
           value={state.saveTarget ?? ""}
           onChange={(value) => {
             dispatch({

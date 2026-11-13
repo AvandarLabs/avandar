@@ -123,7 +123,7 @@ describe("Change <dataset>", () => {
     ).toBeEnabled();
   });
 
-  it("cannot change a live connection or a dataset a linked dataset reads", () => {
+  it("cannot change a live connection", () => {
     _render({
       dataset: { ...UPLOAD, sourceType: "google_sheets" },
       inPlace: {
@@ -141,6 +141,55 @@ describe("Change <dataset>", () => {
       screen.getByText(
         "Google Sheets data can't be changed from Avandar yet, so a linked dataset is the only option for now.",
       ),
+    ).toBeInTheDocument();
+  });
+
+  it("cannot change an upload a linked dataset reads", () => {
+    _render({
+      inPlace: {
+        isAvailable: false,
+        reason: "has_linked_datasets",
+        storage: "synced",
+      },
+      state: { saveTarget: "linked" },
+    });
+
+    expect(
+      screen.getByRole("radio", { name: /Change Bronx line list/ }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(
+        "A linked dataset reads Bronx line list, so it can't be changed in place. Convert in the linked dataset instead.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("cannot change a virtual dataset built from other data", () => {
+    _render({
+      dataset: { ...UPLOAD, sourceType: "virtual" },
+      inPlace: {
+        isAvailable: false,
+        reason: "not_an_upload",
+        storage: undefined,
+      },
+      state: { saveTarget: "linked" },
+    });
+
+    expect(
+      screen.getByRole("radio", { name: /Change Bronx line list/ }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(
+        "Bronx line list is built from other data, so a linked dataset is the only option.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("names the save targets by their section title", () => {
+    _render({ inPlace: { isAvailable: true, storage: "offline" } });
+
+    expect(
+      screen.getByRole("radiogroup", { name: "Save the conversions as" }),
     ).toBeInTheDocument();
   });
 });
