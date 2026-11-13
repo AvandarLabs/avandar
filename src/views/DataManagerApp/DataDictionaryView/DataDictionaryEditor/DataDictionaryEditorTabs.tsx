@@ -6,6 +6,7 @@ import { DictionaryEntriesTab } from "@/views/DataManagerApp/DataDictionaryView/
 import { DictionaryUsedByTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { EditorSelection } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/useEditorSelection";
+import type { DictionaryUsage } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryUsage/useDictionaryUsage";
 import type { ReactNode } from "react";
 
 const TAB_IDS = ["entries", "code-lists", "used-by"] as const;
@@ -18,6 +19,8 @@ type Props = {
   issues: readonly DataDictionary.DraftIssue[];
   canEdit: boolean;
   selection: EditorSelection;
+  /** The datasets the dictionary is applied to. */
+  usage: DictionaryUsage;
   onDraftChange: (draft: DataDictionary.Draft) => void;
 };
 
@@ -27,6 +30,7 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const entryCount = draft.entries.length;
   const codeListCount = draft.codeLists.length;
+  const usedByCount = props.usage.rows.length;
 
   return (
     <Tabs
@@ -37,7 +41,7 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
       renderTabHeader={{
         entries: t`Entries · ${entryCount}`,
         "code-lists": t`Code lists · ${codeListCount}`,
-        "used-by": t`Used by`,
+        "used-by": t`Used by · ${usedByCount}`,
       }}
       renderTabPanel={{
         entries: () => {
@@ -64,7 +68,7 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
           );
         },
         "used-by": () => {
-          return <DictionaryUsedByTab />;
+          return <DictionaryUsedByTab usage={props.usage} />;
         },
       }}
     />

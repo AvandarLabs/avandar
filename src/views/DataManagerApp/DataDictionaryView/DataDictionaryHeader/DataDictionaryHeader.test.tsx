@@ -39,6 +39,17 @@ vi.mock(
 );
 
 vi.mock(
+  "@/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetButton",
+  () => {
+    return {
+      ApplyToDatasetButton: () => {
+        return <button type="button">Apply to a dataset</button>;
+      },
+    };
+  },
+);
+
+vi.mock(
   "@/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField",
   () => {
     return {
@@ -63,6 +74,7 @@ function _renderHeader(): void {
       dictionary={DICTIONARY}
       draft={{ entries: [], codeLists: [] }}
       canEdit={false}
+      usedByCount={2}
     />,
   );
 }
@@ -73,6 +85,7 @@ function _renderEditableHeader(): void {
       dictionary={DICTIONARY}
       draft={{ entries: [], codeLists: [] }}
       canEdit
+      usedByCount={2}
     />,
   );
 }
@@ -112,5 +125,32 @@ describe("DataDictionaryHeader delete access", () => {
     expect(
       screen.queryByRole("button", { name: "Dictionary actions" }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("DataDictionaryHeader use", () => {
+  beforeEach(() => {
+    mocks.currentUserId = OWNER_ID;
+    mocks.dataSourcesRole = "editor";
+  });
+
+  it("says how many datasets use the dictionary", () => {
+    _renderHeader();
+    expect(screen.getByText(/Used by 2 datasets/)).toBeInTheDocument();
+  });
+
+  it("offers Apply to a dataset to someone who can edit datasets", () => {
+    _renderHeader();
+    expect(
+      screen.getByRole("button", { name: "Apply to a dataset" }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not offer it to a Data Sources viewer", () => {
+    mocks.dataSourcesRole = "viewer";
+    _renderHeader();
+    expect(
+      screen.queryByRole("button", { name: "Apply to a dataset" }),
+    ).toBeNull();
   });
 });
