@@ -9,6 +9,8 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { BoundColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/BoundColumnName";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -42,6 +44,8 @@ type DatasetWithColumnsAndSource = SetOptional<
 
 type Props = {
   dataset: DatasetWithColumnsAndSource;
+  /** What attached dictionaries say about each column, by column name. */
+  columnCodesByName: ReadonlyMap<string, ColumnCodes.T>;
 };
 
 /**
@@ -54,7 +58,10 @@ type Props = {
  * record: that gives a column's name the same visual weight as the CSV escape
  * character.
  */
-export function DatasetMetadataList({ dataset }: Props): JSX.Element {
+export function DatasetMetadataList({
+  dataset,
+  columnCodesByName,
+}: Props): JSX.Element {
   const { t } = useLingui();
 
   // Only the three shown columns get a header. Anything else falls back to
@@ -108,6 +115,24 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         itemRenderOptions={{
           includeKeys: ["name", "dataType", "description"],
           keyRenderOptions: {
+            name: {
+              // The table hands a cell only its own value, so a bound
+              // column's entry description shows under its name.
+              renderValue: (name) => {
+                const columnName = String(name);
+                const codes = columnCodesByName.get(columnName);
+                const ownDescription = dataset.columns?.find((column) => {
+                  return column.name === columnName;
+                })?.description;
+                return codes ? (
+                  <BoundColumnName
+                    name={columnName}
+                    codes={codes}
+                    showsEntryDescription={!ownDescription}
+                  />
+                ) : undefined;
+              },
+            },
             description: {
               renderAsType: "text",
             },
