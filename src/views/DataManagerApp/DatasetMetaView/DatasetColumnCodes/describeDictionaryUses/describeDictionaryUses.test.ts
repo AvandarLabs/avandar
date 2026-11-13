@@ -3,7 +3,7 @@ import { describeDictionaryUses } from "@/views/DataManagerApp/DatasetMetaView/D
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
-/** A column's codes, as Task 13's `ColumnCodes.fromRows` returns them. */
+/** A column's codes, as `ColumnCodes.fromRows` returns them. */
 function makeCodes(overrides: Partial<ColumnCodes.T> = {}): ColumnCodes.T {
   return {
     datasetColumnId: "col-gender",

@@ -36,7 +36,7 @@ vi.mock("@avandar/ui", async (importOriginal) => {
   };
 });
 
-/** A column's codes, as Task 13's `ColumnCodes.fromRows` returns them. */
+/** A column's codes, as `ColumnCodes.fromRows` returns them. */
 function makeCodes(overrides: Partial<ColumnCodes.T> = {}): ColumnCodes.T {
   return {
     datasetColumnId: "col-gender",
