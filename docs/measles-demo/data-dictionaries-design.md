@@ -1058,8 +1058,8 @@ Each slice is one PR into `demo/measles`, recorded in
    small route. Depends on where the agent work stands when slice 2 starts.
 4. **Crosswalk materialization time at 100 datasets.** Measure in slice 5
    before deciding on parallel acquisition.
-5. **A reference binding whose code list is deleted.** Recommended in the
-   slice 4 plan, pending the owner: the save that deletes the list re-points
+5. **A reference binding whose code list is deleted.** Settled with the
+   slice 4 plan (owner decision 4): the save that deletes the list re-points
    the binding when its entry is left exactly one code list; otherwise it
    keeps its entry and shows no list until the next apply. A convert binding
    is pinned instead and never re-pointed (section 14).

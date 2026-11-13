@@ -8,11 +8,11 @@
 
 **Tech Stack:** Supabase Postgres (declarative schemas, pgTAP), TypeScript, React 19, Mantine 9 (`Stepper`, `Table`, `SegmentedControl`, `Radio.Card`, `Drawer`-like sheet, `Tooltip`), TanStack Query and Router, zod 4, Lingui, DuckDB-WASM 1.33.1-dev20.0 (DuckDB v1.4.4) through QETL, `@duckdb/node-api` for executed tests, the Pi data agent online through the `chat` edge function and offline on WebLLM, ag-grid, Vitest, Playwright, the `scripts/ai-eval` harness.
 
-**Spec:** [data-dictionaries-design.md](data-dictionaries-design.md), slice 4 of section 16. Read sections 3, 4, 5.2, 5.3, all of 6, 7.4, 7.5, 11, 12, 13, 14, 15, 16, and 18 first. The Refinements at the end of this file override the spec where they differ; the spec edits this plan made, and the questions for the owner, are listed there too.
+**Spec:** [data-dictionaries-design.md](data-dictionaries-design.md), slice 4 of section 16. Read sections 3, 4, 5.2, 5.3, all of 6, 7.4, 7.5, 11, 12, 13, 14, 15, 16, and 18 first. The Refinements at the end of this file override the spec where they differ; the spec edits this plan made, and the owner's decisions on its open questions, are listed there too.
 
 **Scope:** Slice 4: the `valueMapping` projection, ordered `ENUM` output, linked datasets, converting in place with pinned pairs and **Re-apply**, the Unmatched values step and `value_overrides`, the preview drawer, keep-original columns and `dataset_columns.dictionary_binding_id`, the virtual dataset freshness signal, the synced-data warning on **Change <dataset>**, the dataset menu's "Turn codes into labels and add column descriptions" sub-line, and open decision 5. Out: crosswalks (slice 5), "Add from datasets into an existing dictionary" (its own small piece), and everything in spec section 17, including "Restore original values" as its own action and write-back to live sources.
 
-**Delivery:** two parts, each a mergeable PR (owner question 1). **Part A** (Tasks 0 to 27, feature F133) ships the whole engine and schema, the apply flow with linked datasets, and every surface. **Part B** (Tasks 28 to 33, feature F134) is frontend only: the **Change <dataset>** card with its synced-data warning, and **Re-apply**. Part A's migration already carries what Part B needs, so Part B adds no migration.
+**Delivery:** two parts, each a mergeable PR (owner decision 1). **Part A** (Tasks 0 to 27, feature F133) ships the whole engine and schema, the apply flow with linked datasets, and every surface. **Part B** (Tasks 28 to 33, feature F134) is frontend only: the **Change <dataset>** card with its synced-data warning, and **Re-apply**. Part A's migration already carries what Part B needs, so Part B adds no migration.
 
 **Builds on:** slice 1 ([plan](data-dictionaries-1-dictionaries-plan.md), F129) for the dictionary tables, `rpc_data_dictionaries__save`, and the Dictionary view; slice 2 ([plan](data-dictionaries-2-inference-plan.md), F130) for `profileDatasetColumns` and `useListPaneToggle`; slice 3 ([plan](data-dictionaries-3-attach-plan.md), F131) for the bindings table, `rpc_dataset_columns__apply_dictionaries`, `DictionaryBinding`, `ColumnCodes`, `DictionaryMatch`, the apply flow (Match columns, Attach), the code-list popover, the rail group, Used by, and the agent context; and F132 for `rpc_datasets__get_editable_ids`, the entry description in the Description column, and tags on grouped SQL results.
 
@@ -64,7 +64,7 @@ House conventions (unchanged from slice 3):
 | 45-line functions, named Lingui placeholders, plurals in variables | Every block in Tasks 15 to 23 and 29 to 30 |
 | Accessibility | The global switch is a `SegmentedControl` radio group named "For every column"; the pane's mode buttons use `aria-pressed`; the row chip's name is its visible text ("Convert" or "Reference only") with the column and the click hint as its description, so a pressed state never contradicts a changing label (WCAG 2.5.3); tooltips on buttons open on focus; the preview drawer is a labelled region that takes focus, closes on Escape, and returns focus to **Preview data**; each unmatched value's resolutions are a radio group named "What to do with <value> in <column>" (Tasks 17 to 21) |
 | e2e: UI-driven, under 45 s, no sleeps, cleanup in `finally` | Tasks 25 and 31 |
-| Agent changes need evals | Task 24 adds converted-column questions for the online and offline agents; no prompt version changes (owner question 5) |
+| Agent changes need evals | Task 24 adds converted-column questions for the online and offline agents; no prompt version changes (owner decision 5) |
 | The `demo-measles` stack lacks the dictionary migrations; schema work needs a switch | Task 0 switches this branch to its own stack before any schema file changes |
 | Desktop twins churn by a comment count | Task 5 restores `20261109134745_*` and `20261109155144_*` after `pnpm desktop:sqlite:gen-migrations` instead of committing their drift |
 
@@ -141,7 +141,7 @@ The output type rule, shared by SQL and TypeScript: a decode conversion outputs 
 Triggers replace slice 3's two remove-reference triggers:
 
 - Deleting a dictionary or an entry removes its reference bindings and pins its live convert bindings (copies the list's pairs and `is_ordered`) first.
-- Deleting a code list pins the live convert bindings that use it. A reference binding keeps `on delete set null` and is re-pointed by the save (open decision 5, owner question 4): when a save deletes the list a reference binding used and leaves its entry exactly one code list, the binding is re-pointed to that list in the same transaction.
+- Deleting a code list pins the live convert bindings that use it. A reference binding keeps `on delete set null` and is re-pointed by the save (open decision 5, owner decision 4): when a save deletes the list a reference binding used and leaves its entry exactly one code list, the binding is re-pointed to that list in the same transaction.
 
 RPCs (all SECURITY DEFINER, `search_path = ''`, `authenticated` only):
 
@@ -162,7 +162,7 @@ rpc_dataset_columns__apply_dictionaries_as_linked_dataset (p_source_dataset_id u
 rpc_dataset_columns__reapply_dictionary (p_dataset_id uuid, p_dictionary_id uuid) returns integer
 ```
 
-Apply rules: a `convert` binding needs a `code_list_id` (`convert_needs_code_list`); `keeps_original`, `value_overrides`, and `is_pinned` are only for `convert` (`binding_payload_invalid`); in place, `convert` needs `is_pinned = true` and an upload source type (`csv_file`, `xlsx_file`, `pdf_file`), or `is_pinned = false` on a linked dataset, and is refused otherwise (`binding_mode_unsupported`); converting in place a dataset that a linked dataset reads is refused (`dataset_has_linked_datasets`, owner question 3); added pairs need Data Sources editor (`dictionary_editor_required`) and pass `data_dictionaries__check_pairs` on the merged list (`code_pair_incomplete`, `codes_not_unique`, `labels_not_unique`), and bump each touched dictionary's version once; a new dataset needs `util__can_manage_workspace_settings` (`dataset_creator_required`); re-applying with nothing pinned to re-pin raises `nothing_to_reapply`.
+Apply rules: a `convert` binding needs a `code_list_id` (`convert_needs_code_list`); `keeps_original`, `value_overrides`, and `is_pinned` are only for `convert` (`binding_payload_invalid`); in place, `convert` needs `is_pinned = true` and an upload source type (`csv_file`, `xlsx_file`, `pdf_file`), or `is_pinned = false` on a linked dataset, and is refused otherwise (`binding_mode_unsupported`); converting in place a dataset that a linked dataset reads is refused (`dataset_has_linked_datasets`, owner decision 3); added pairs need Data Sources editor (`dictionary_editor_required`) and pass `data_dictionaries__check_pairs` on the merged list (`code_pair_incomplete`, `codes_not_unique`, `labels_not_unique`), and bump each touched dictionary's version once; a new dataset needs `util__can_manage_workspace_settings` (`dataset_creator_required`); re-applying with nothing pinned to re-pin raises `nothing_to_reapply`.
 
 ### Shared models (Tasks 6, 7, 13)
 
@@ -12295,7 +12295,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 The reducer gains everything conversions need: each pick's mode, direction, and keep-original choice; how each unmatched value is resolved; where the conversions are saved; the linked dataset's name; the workspace-change confirmation; and whether the preview drawer is open. Three pure modules decide the rest: `applyTargets` (where this dataset's conversions can go, and so which mode a coded column starts in), `applyDefaults` (the opening picks, now with modes and the existing overrides), and `applyInputs` (turning state into the RPC's bindings and added pairs, and into the draft conversions the preview and the unmatched-value queries run).
 
-Where conversions can go, per spec sections 3 and 7.5 and the owner questions:
+Where conversions can go, per spec sections 3 and 7.5 and the owner decisions:
 
 | Dataset | Linked dataset | Change in place | Mode a coded column starts in |
 | --- | --- | --- | --- |
@@ -19561,7 +19561,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ### Task 22: The dataset page: menu sub-line, rail, popover, read-only type, linked source, and delete confirm
 
-Everything a dataset page says about conversions. The ⋯ menu's **Apply a dictionary** gets back the spec's "Turn codes into labels and add column descriptions" (slice 3 owner decision 6). The rail's Dictionaries group says, per dictionary, every way it reaches this dataset: attached as reference, converted as it loads (a linked dataset's own conversions), converted in place with the version it was given, and each linked dataset that reads this one. A linked dataset's Source group names the dataset it reads. The code-list popover says the values were converted, and with which version, and, read only when it opens, how many values in the data have no label (spec 14). The Type cell of a converted column is read-only and says which dictionary set it. Deleting a dataset that linked datasets read names them first (owner question 7).
+Everything a dataset page says about conversions. The ⋯ menu's **Apply a dictionary** gets back the spec's "Turn codes into labels and add column descriptions" (slice 3 owner decision 6). The rail's Dictionaries group says, per dictionary, every way it reaches this dataset: attached as reference, converted as it loads (a linked dataset's own conversions), converted in place with the version it was given, and each linked dataset that reads this one. A linked dataset's Source group names the dataset it reads. The code-list popover says the values were converted, and with which version, and, read only when it opens, how many values in the data have no label (spec 14). The Type cell of a converted column is read-only and says which dictionary set it. Deleting a dataset that linked datasets read names them first (owner decision 7).
 
 Linked datasets are found through the cached `VirtualDatasetClient` (`where("linked_source_dataset_id", "eq", datasetId)`), with `VirtualDataset.T["linkedSourceDatasetId"]` from Task 6. `ColumnCodes.T` comes from Task 13: for a `convert` binding, `direction` is the side the column holds once converted (`encode` means it now holds labels), and `isPinned`, `appliedDictionaryVersion`, `currentDictionaryVersion`, `isSourceDeleted`, and `keepsOriginal` say the rest.
 
@@ -20083,7 +20083,12 @@ describe("describeDictionaryUses", () => {
     );
 
     expect(uses[0]?.notes).toEqual([
-      { kind: "converted_pinned", appliedVersion: 2, currentVersion: 4 },
+      {
+        kind: "converted_pinned",
+        appliedVersion: 2,
+        currentVersion: 4,
+        canReapply: true,
+      },
     ]);
   });
 
@@ -20166,6 +20171,11 @@ export type DictionaryUseNote =
       appliedVersion: number;
       /** Undefined once the dictionary is deleted. */
       currentVersion: number | undefined;
+      /**
+       * Whether a pinned column still has its code list, so Re-apply has
+       * something to re-pin.
+       */
+      canReapply: boolean;
     }
   | { kind: "linked"; datasetId: string; datasetName: string };
 
@@ -20207,6 +20217,9 @@ function _getPinnedNote(
     kind: "converted_pinned",
     appliedVersion,
     currentVersion: first.currentDictionaryVersion,
+    canReapply: pinned.some((codes) => {
+      return codes.codeListName !== undefined;
+    }),
   };
 }
 
@@ -22136,7 +22149,7 @@ import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaV
 
 ### Task 24: Eval: converted columns
 
-No prompt changes (owner question 5): a converted column's code line is written for the side it holds (Task 13), `  - GENDER: values Male, Female`, which `data-agent-v5` already reads as stored labels. The eval proves the agents then filter on labels. The measles workspace gains a second dataset, the line list's linked dataset `measles-line-list-small (labeled)`, built by the same `ColumnConversion.toCaseSql` the app's view uses, so `GENDER`, `hosp_yn`, and `ses_cat` hold labels (`ses_cat` as the ordered `ENUM`, and `GENDER`'s unlabeled `9` passed through as `'9'`). Its columns carry the codes as Task 13's loaders hand them to the agents: `direction: "encode"`, the side a decoded column holds. Three questions name it:
+No prompt changes (owner decision 5): a converted column's code line is written for the side it holds (Task 13), `  - GENDER: values Male, Female`, which `data-agent-v5` already reads as stored labels. The eval proves the agents then filter on labels. The measles workspace gains a second dataset, the line list's linked dataset `measles-line-list-small (labeled)`, built by the same `ColumnConversion.toCaseSql` the app's view uses, so `GENDER`, `hosp_yn`, and `ses_cat` hold labels (`ses_cat` as the ordered `ENUM`, and `GENDER`'s unlabeled `9` passed through as `'9'`). Its columns carry the codes as Task 13's loaders hand them to the agents: `direction: "encode"`, the side a decoded column holds. Three questions name it:
 
 | Id | Question | Truth |
 | --- | --- | --- |
@@ -22475,7 +22488,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --config singl
 - [ ] **Step 9:** `pnpm vite-script scripts/ai-eval/archiveEvalRuns.ts`.
 - [ ] **Step 10: Write it up in `docs/ai-agent/eval.md`.**
   - After the `### Coded columns` section, before `## Offline mode`, add a `### Converted columns` section: one paragraph saying when the runs were made, that a converted column's code line is written for the labels it holds (`values Male, Female`) with no new prompt version, and that the measles workspace now also holds the line list's linked dataset, converted by the app's own `ColumnConversion` SQL; then a table with the `### Coded columns` section's columns (Run, Correct, Needless / missed, Cost per question, Input tokens per call, Latency p50 / p90) and one row each for `dictionary-conversions:converted #1-#3` and `dictionary-conversions:converted-offline`, filled from each run's `summary.md`; then bullets on whether the bar is met, which SQL the E answers ran (labels or codes), and how many input tokens the second dataset adds per call against the `attach-dictionaries:coded` runs.
-  - Under `### Questions and ground truth`, replace the paragraph that starts "`measles/measlesQuestions.ts` holds the coded-column questions D01 to D04" with: "`measles/measlesQuestions.ts` holds the coded-column questions. D01 to D04 run over the 24-row measles line list in `tests/data/measles-line-list-small/`, with the code lists in `measles/measlesWorkspace.ts` attached as reference: D01 to D03 ask in labels and are graded by their count; D04 asks what an unlabeled code means and passes only when the reply says it has no label. E01 to E03 ask in labels over the line list's linked dataset, whose GENDER, hosp_yn, and ses_cat hold labels, built with the app's own conversion SQL; they are graded by their count. They run only with `--workspace measles`, on the `pi` and `pi-local` harnesses."
+  - Under `### Questions and ground truth`, replace the paragraph that starts "`measles/measlesQuestions.ts` holds the coded-column questions D01 to D04" with: "`measles/measlesQuestions.ts` holds the coded-column questions. D01 to D04 run over the 24-row measles line list in `tests/data/measles-line-list-small/`, with the code lists in `measles/measlesWorkspace.ts` attached as reference: D01 to D03 ask in labels and are graded by their count; D04 asks what an unlabeled code means and passes only when the reply says it has no label. E01 to E03 ask in labels over the line list's linked dataset, whose GENDER, hosp_yn, and ses_cat hold labels, built with the app's own conversion SQL; they are graded by their count. They run only with `--workspace measles`, on the `pi` and `pi-local` harnesses. Since the converted-columns plan, D01 to D04 run with the linked dataset in the prompt beside the coded one, so their runs are not comparable with earlier runs."
   - In the `## Reproducing every result` table, add after the coded-column offline row: `| The converted-column questions (add \`--label dictionary-conversions:converted\`) | \`--harness pi --config haiku-sonnet --workspace measles\` |`.
 - [ ] **Step 11: Commit** `docs/ai-agent/eval.md` and the new run folders under `docs/ai-agent/eval-runs/` (with its `README.md` index) as `docs(ai-agent): record the converted-column eval`.
 
@@ -22485,7 +22498,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --config singl
 
 One test, driven through the UI with only the dictionary seeded before the first page load. A workspace owner imports the line list, opens **Apply a dictionary** from its ⋯ menu (which now promises to turn codes into labels), converts every column, gives the unmatched `9` a label with **Add to list**, opens the preview and closes it with Escape, and creates the linked dataset. The linked dataset's preview shows labels, its rail names the dataset it reads, and the code-list popover says the values were converted. The source's rail names the linked dataset. Then the owner relabels `2` on the dictionary, and the linked dataset shows the new label without a reload: the dictionary save refreshes the rows (Task 23) and the projection key rebuilds the view (Task 10). The only database reads are the final oracle and the cleanup. The agent is not asked anything: Task 24's eval covers how it reads converted columns.
 
-The dictionary is seeded with `1 Male` and `2 Female` only, so the 3 rows with `9` are unmatched. The workspace owner is a workspace admin, so the linked-dataset card is enabled (owner question 8).
+The dictionary is seeded with `1 Male` and `2 Female` only, so the 3 rows with `9` are unmatched. The workspace owner is a workspace admin, so the linked-dataset card is enabled (owner decision 8).
 
 The selectors follow the copy of spec sections 7.5 and 13 that Tasks 17 to 21 render: the global switch's **Convert all** (a `SegmentedControl`, so a radio), the footer's **Next: unmatched values** and **Next: save as** (slice 3's `Next: <step>` pattern), the unmatched value's row in **Values being converted** with its **Add to list** option and label input, **Preview data** opening a region of that name, the **Create a new linked dataset** card (a radio), its **Name** field, and **Create linked dataset**. If Tasks 17 to 21 name one differently, use their name here rather than changing their copy.
 
@@ -22840,7 +22853,7 @@ There is no prototype to compare against. The surfaces are checked against spec 
     - **Files, by area** with each area's commit SHAs (list them with `git log --oneline 6518c3aa5..HEAD` and put each short SHA beside the files it touched): docs (the plan, the spec edits); templating (`duckDbSqlText.ts`); schema, migration, desktop twin, and pgTAP; shared models (`DictionaryBinding/`, `DataDictionaryCodeList/`, `DatasetColumn/`, `VirtualDataset/`, `ColumnConversion/`); rendering and loading (`QueryMediator.types.ts`, `getColumnReplacementsFromColumns/`, `RelationLoading.ts`, `queryRunner.ts`, `getRelationSources.ts`, `QueryableRelationColumns/`, `duckDbParquetLoad.ts`, `duckDbSqlSources.ts`, `loadColumnReplacements/`, `runBackgroundParquetTranscoding.ts`); virtual dataset freshness (`VirtualDatasetWrapper/`, `createRegistryForFetch.ts`, `clearCachedDatasetRows.ts`); results and snapshots (`arrowFieldToQueryResultField.ts`, `dashboardPublishSnapshots.ts`); column codes (`ColumnCodes/`, both `loadColumnCodes/`); the binding client; the apply flow (`ApplyDictionariesView/`, `profileDatasetColumns/`); the dataset page (`DatasetActionsMenu/`, `DatasetColumnCodes/`, `LinkedSourceFact.tsx`, `DatasetSourceRail.tsx`, `DatasetMetaView.tsx`, `DatasetMetadataList.tsx`, `ColumnSection.tsx`, `useLinkedDatasets/`); the popover; the Dictionary view (`useDictionaryUsage/`, `DictionaryUsedByTab/`, `DataDictionaryEditor.tsx`, `useSaveDataDictionary.ts`); evals; e2e; translations.
     - **Schema:** yes, one migration (`dictionary_conversions`): the binding's `keeps_original`, `value_overrides`, `pinned_pairs`, `pinned_is_ordered`, and `replaced_data_type` with the reference-only check; `dataset_columns.dictionary_binding_id` and `datasets__virtual.linked_source_dataset_id`, both managed; the pin-on-delete triggers that replace the remove-reference ones; the re-pointing of reference bindings and the re-derived types in `rpc_data_dictionaries__save`; and `rpc_dataset_columns__apply_dictionaries` (now with conversions and added pairs), `rpc_dataset_columns__apply_dictionaries_as_linked_dataset`, and `rpc_dataset_columns__reapply_dictionary` (used from F134). Plus its desktop SQLite twin. Regenerate the migration with `supabase-declarative-schema`, never copy it.
     - **Deploy:** the migration first, then the `chat` edge function, then the frontend. Tabs opened before the deploy send the old two-argument apply call, which the new RPC's defaulted third argument still accepts.
-    - **Known gaps:** converting in place, its synced-data warning, and Re-apply are F134 (the RPCs are here). Pipelines (`packages/node/etl`, `apps/pipeline-server`) read stored files and see raw values, as they do for renames. Another user's open tab follows a code-list edit when its cached list goes stale (6 minutes online) or on reload. "Restore original values" as its own action, write-back to live sources, crosswalks (slice 5), and "Add from datasets" into an existing dictionary stay out. A linked dataset's cached rows do not follow a rename or cast on its source's columns, as for any virtual dataset.
+    - **Known gaps:** converting in place, its synced-data warning, and Re-apply are F134 (the RPCs are here). Pipelines (`packages/node/etl`, `apps/pipeline-server`) read stored files and see raw values, as they do for renames. Another user's open tab follows a code-list edit when its cached list goes stale (6 minutes online) or on reload. "Restore original values" as its own action, write-back to live sources, crosswalks (slice 5), and "Add from datasets" into an existing dictionary stay out. A linked dataset's cached rows do not follow a rename or cast on its source's columns, as for any virtual dataset. A published snapshot stores an ordered column as text, so a public chart sorts its labels alphabetically unless the chart sorts explicitly. Every workspace query reads its datasets' bindings and code lists, mostly from the query cache; a refetch past the 6-minute stale time happens while the query holds its DuckDB lease.
     - **Verification:** the commands in Task 27.
   - for each file below that already has a row under **Files shared by several features** (`grep -n "<path>" docs/measles-demo/pr-feature-log.md`), add F133 to the row with one sentence on its hunks; add a row for any that another feature also changed: `duckDbSqlText.ts`, `duckDbParquetLoad.ts`, `QueryMediator.types.ts`, `RelationLoading.ts`, `queryRunner.ts`, `getRelationSources.ts`, `VirtualDatasetWrapper.ts`, `createRegistryForFetch.ts`, `arrowFieldToQueryResultField.ts`, `dashboardPublishSnapshots.ts`, `duckDbSqlSources.ts`, `runBackgroundParquetTranscoding.ts`, `clearCachedDatasetRows.ts`, `DatasetActionsMenu.tsx`, `DatasetSourceRail.tsx`, `DatasetMetaView.tsx`, `DatasetMetadataList.tsx`, `ColumnSection.tsx`, `useSaveDataDictionary.ts`, `DataDictionaryEditor.tsx`, `EvalDatabase.ts`, `exact_data_api_grants.test.sql`, and `50.rpc_data_dictionaries__save.sql`.
 - [ ] **Step 6:** Commit the log as `docs(measles-demo): log converting coded columns into linked datasets`.
@@ -23173,7 +23186,7 @@ export function useReapplyDictionary(
 
 Part B's frontend for converting in place (spec sections 6.6 and 7.5). Task 4's RPC already accepts pinned convert bindings, and Task 20 already builds the pinned request, blocks an unconfirmed synced change, and labels the button **Change n columns**. This task adds the card beside **Create a new linked dataset**, its confirmation, and widens where conversions can go:
 
-- **Change <dataset>**, with copy by storage: a synced upload "Rewrites the uploaded data in place. It is synced to the workspace, so this changes it for everyone who uses it.", then, once chosen, the checkbox "I understand this changes <dataset> for the whole workspace", without which the button stays disabled; an offline upload "It is offline only, so nobody else is affected."; a live connection disabled with "<source> data can't be changed from Avandar yet, so a linked dataset is the only option for now." (a non-linked virtual dataset says it is built from other data instead); and an upload a linked dataset reads disabled with why (owner question 3).
+- **Change <dataset>**, with copy by storage: a synced upload "Rewrites the uploaded data in place. It is synced to the workspace, so this changes it for everyone who uses it.", then, once chosen, the checkbox "I understand this changes <dataset> for the whole workspace", without which the button stays disabled; an offline upload "It is offline only, so nobody else is affected."; a live connection disabled with "<source> data can't be changed from Avandar yet, so a linked dataset is the only option for now." (a non-linked virtual dataset says it is built from other data instead); and an upload a linked dataset reads disabled with why (owner decision 3).
 - `canConvert` now counts changing in place, so an upload converts by default for anyone who can edit it, admin or not.
 - The Save step opens on **Change <dataset>** for a dataset already converted in place; otherwise on the linked card when it is available, else on Change.
 
@@ -23483,7 +23496,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ### Task 30: Re-apply in Used by and the rail
 
-**Re-apply** appears where a dataset converted in place is behind its dictionary: in the dictionary's Used by tab, beside "Applied version 2, now version 3", and in the dataset's rail, as the rail's one action (owner question 2). Both show only to someone who can edit the dataset: Used by reads the workspace's editable dataset ids once (F132's `rpc_datasets__get_editable_ids`), and the rail reads the viewer's role on its own dataset. A synced upload asks first, since re-applying changes it for everyone ("This changes <dataset> for everyone in the workspace who uses it."); an offline-only upload re-applies at once. The button's visible text, "Re-apply", starts its accessible name, which also names the dictionary and the dataset.
+**Re-apply** appears where a dataset converted in place is behind its dictionary: in the dictionary's Used by tab, beside "Applied version 2, now version 3", and in the dataset's rail, as the rail's one action (owner decision 2). Both show only to someone who can edit the dataset: Used by reads the workspace's editable dataset ids once (F132's `rpc_datasets__get_editable_ids`), and the rail reads the viewer's role on its own dataset. A synced upload asks first, since re-applying changes it for everyone ("This changes <dataset> for everyone in the workspace who uses it."); an offline-only upload re-applies at once. The button's visible text, "Re-apply", starts its accessible name, which also names the dictionary and the dataset.
 
 **Files:**
 - Create: `src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx` (+ `.test.tsx`)
@@ -23972,8 +23985,9 @@ vi.mock("@/components/dataDictionaries/ReapplyButton/ReapplyButton", () => {
 - [ ] **Step 11:** `pnpm vitest run src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes`. Expected: FAIL (no `dataset` prop, no Re-apply).
 - [ ] **Step 12: Put Re-apply in the rail.** In `DictionaryUseNote.tsx`:
   - add `/** Shown under a pinned version that is behind, such as Re-apply. */ action?: ReactNode;` to `Props` and to `PinnedNote`'s props;
-  - in `PinnedNote`, after the `{isBehind ? (<Text ...>...</Text>) : null}` block, add `{isBehind ? action : null}`;
-  - and in `DictionaryUseNote`, destructure `action` and pass `action={action}` to `<PinnedNote ... />`.
+  - add `canReapply: boolean;` to `PinnedNote`'s props, and in `PinnedNote`, after the `{isBehind ? (<Text ...>...</Text>) : null}` block, add `{isBehind && canReapply ? action : null}`: a pinned conversion whose code list was deleted has nothing to re-pin, so it gets no Re-apply (`rpc_dataset_columns__reapply_dictionary` would refuse it with `nothing_to_reapply`);
+  - and in `DictionaryUseNote`, destructure `action` and pass `action={action}` and `canReapply={note.canReapply}` to `<PinnedNote ... />`.
+  - In `DatasetDictionariesRailGroup.test.tsx`, add a case: a pinned convert binding whose `codeListName` is `undefined` and whose version is behind shows "Applied version 2, now version 3" and no Re-apply button.
 
   In `DatasetDictionariesRailGroup.tsx`:
   - add the imports
@@ -24250,7 +24264,7 @@ test.describe("converting a dataset in place", () => {
 - Modify: `src/i18n/locales/*/messages.po|ts` (generated)
 - Modify: `docs/measles-demo/pr-feature-log.md`
 
-- [ ] **Step 1: Capture the app.** With `pnpm dev`, signed in as in Task 26, capture into `.temp/feat-dictionary-conversions/` as `app-in-place-*.png`: Save as for a synced upload with **Change <dataset>** selected (its copy "Rewrites the uploaded data in place. It is synced to the workspace, so this changes it for everyone who uses it.", the unticked confirmation, and the disabled **Change n columns**), for an offline-only upload ("It is offline only, so nobody else is affected."), for a Google Sheet (the card disabled with "<source> data can't be changed from Avandar yet, so a linked dataset is the only option for now."), and for a dataset a linked dataset reads (the card disabled with owner question 3's copy); the dataset page after converting in place (labels, the rail's "Converted this dataset · version n", the read-only Type cell); after relabelling on the dictionary (the rail's "Applied version n, now version n+1" with **Re-apply**, and Used by's "Changed the data" row with **Re-apply**); the Re-apply confirmation; and the toast after it.
+- [ ] **Step 1: Capture the app.** With `pnpm dev`, signed in as in Task 26, capture into `.temp/feat-dictionary-conversions/` as `app-in-place-*.png`: Save as for a synced upload with **Change <dataset>** selected (its copy "Rewrites the uploaded data in place. It is synced to the workspace, so this changes it for everyone who uses it.", the unticked confirmation, and the disabled **Change n columns**), for an offline-only upload ("It is offline only, so nobody else is affected."), for a Google Sheet (the card disabled with "<source> data can't be changed from Avandar yet, so a linked dataset is the only option for now."), and for a dataset a linked dataset reads (the card disabled with owner decision 3's copy); the dataset page after converting in place (labels, the rail's "Converted this dataset · version n", the read-only Type cell); after relabelling on the dictionary (the rail's "Applied version n, now version n+1" with **Re-apply**, and Used by's "Changed the data" row with **Re-apply**); the Re-apply confirmation; and the toast after it.
 - [ ] **Step 2: Compare** each capture against spec 7.5's Save as copy and 6.6, and against Task 26's checks. Fix what differs.
 - [ ] **Step 3:** `.claude/skills/impeccable/scripts/impeccable detect --json src/views/DataManagerApp/ApplyDictionariesView src/components/dataDictionaries/ReapplyButton src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab`. Fix every mechanical finding; list the rest in the PR description.
 - [ ] **Step 4:** `pnpm i18n:extract && pnpm i18n:compile`. Confirm `src/i18n/locales/en/messages.po` has `#:` references to `ReapplyButton/` and `useReapplyDictionary/`. Commit `src/i18n/locales` as `chore(data-dictionaries): extract converting-in-place messages`.
@@ -24317,16 +24331,16 @@ These override the spec where they differ.
 - **The binding stores two more columns.** `pinned_is_ordered` keeps a pinned list's order with its pairs, and `replaced_data_type` remembers the column's type before converting, so removing the binding or switching the column to Reference only restores it exactly (spec 6.3 restored `detected_data_type`, which forgets a type the user chose).
 - **A keep-original copy is a `dataset_columns` row that shares the converted column's `original_name`.** Its Parquet header is the converted column's, so column-subset loading maps a query naming `GENDER_original` to the `GENDER` header with no extra rule. Its name is `<name>_original`, then `_2`, `_3` when taken, and renaming it is allowed (the projection reads its current name).
 - **Converted types are read-only on the dataset page.** The Type cell of a converted column says "Set by <dictionary>": the type follows the conversion.
-- **Code-list deletion pins live convert bindings.** Spec 14 pinned a linked dataset's conversions when its dictionary or entry was deleted; a deleted code list now does the same, so no linked dataset stops converting silently. A reference binding is re-pointed in the same save when its entry is left exactly one code list (open decision 5, owner question 4).
+- **Code-list deletion pins live convert bindings.** Spec 14 pinned a linked dataset's conversions when its dictionary or entry was deleted; a deleted code list now does the same, so no linked dataset stops converting silently. A reference binding is re-pointed in the same save when its entry is left exactly one code list (open decision 5, owner decision 4).
 - **The dictionary save re-derives converted types.** A live convert binding's output type follows its list (a new non-integer code turns `bigint` into `varchar`), so `rpc_data_dictionaries__save` updates those columns' `data_type` in the same transaction.
 - **A linked dataset is created by its own RPC.** Spec 5.5 had `rpc_dataset_columns__apply_dictionaries` call `rpc_datasets__add_virtual_dataset` first. A separate `rpc_dataset_columns__apply_dictionaries_as_linked_dataset` keeps one transaction (a refusal leaves no dataset behind) and builds the new dataset's columns from the source's on the server, so the client cannot describe them wrongly.
-- **Only workspace admins create linked datasets.** Every dataset insert goes through `rpc_datasets__add_dataset`, which requires `util__can_manage_workspace_settings`. Anyone else sees the linked card disabled with "Only workspace admins can add datasets." (owner question 8).
+- **Only workspace admins create linked datasets.** Every dataset insert goes through `rpc_datasets__add_dataset`, which requires `util__can_manage_workspace_settings`. Anyone else sees the linked card disabled with "Only workspace admins can add datasets." (owner decision 8).
 - **Applying to a linked dataset saves in place, live.** Its Save step has no cards: the button reads **Update <dataset>** and its conversions keep following the dictionaries. A non-linked virtual dataset and a live connection can only convert into a new linked dataset.
 - **A raw-values view.** A converted dataset's view holds labels, but profiling, matching, unmatched values, and the preview need the stored values, so every loaded relation also gets `ava_raw_<datasetId>` (renames and casts, no conversions), resolved by the SQL analyzer as a read of the dataset like `ava_rows_`.
 - **A loaded view reloads when its projection changes.** Spec 6.2 said bindings are read with the `ensureQueryData` pattern and invalidated on change. `ensureQueryData` returns cached data even after an invalidation, and the queryable tier never rebuilt a loaded view. Each loaded relation records a projection key; bindings and code lists are read with `fetchQuery` (with a fallback to cached data when offline), and a different key rebuilds the view from the storage tier on the next query (open decision 2).
 - **Published snapshots read converted datasets through the query.** A dataset with a convert binding counts as having column replacements, so its slices are not copied from the stored file.
 - **Virtual dataset freshness is the SQL plus the dependencies.** Spec 9 proposed the virtual row's `updated_at` as the freshness signal. The storage key's definition token is the defining SQL itself (an exact match on what produced the bytes), a virtual dataset's rows go stale when a dependency's do (a linked dataset over a Google Sheet follows the sheet's 5-minute age), and a source's Refresh also clears the linked datasets that read it.
-- **No new prompt version.** A converted column's code line is written for the side it holds after conversion (`values Male, Female`), which prompt `data-agent-v5` already reads as stored labels. The `chat` function must be redeployed with the frontend because the shared formatter and the bindings it reads changed (owner question 5).
+- **No new prompt version.** A converted column's code line is written for the side it holds after conversion (`values Male, Female`), which prompt `data-agent-v5` already reads as stored labels. The `chat` function must be redeployed with the frontend because the shared formatter and the bindings it reads changed (owner decision 5).
 - **Template parameters are substituted once and literally.** `getQueryStringFromParams` used `String.replace` with a string replacement, one parameter after another, so a label containing `` $` `` could close its quotes in the trusted view statement. It now substitutes in one pass with a replacer function (Task 1).
 - **Every workspace query reads the catalog.** The projection key needs each dependency's columns, bindings, and code lists, so a `catalog` session reads them on every query that names a dataset, mostly from the query cache, even when every relation is already loaded. A `stored` session never reads them. When the cached bindings are older than the online stale time, the refetch happens while the query holds its DuckDB lease. When bindings cannot be read and nothing is cached, the dataset loads unconverted, the failure is logged, and the first successful read rebuilds the view.
 - **Virtual datasets are acquired once more after this ships.** Cached virtual entries carry no definition token, so each is re-acquired once.
@@ -24334,8 +24348,8 @@ These override the spec where they differ.
 - **Conversion edge rules.** A `map` override to a code no longer in the list is dropped. A blank "Add to list" keeps the value as is. A code already in the list with a blank label cannot be added again; it is labeled on the dictionary. The projection renderer now quotes every identifier with `quoteSqlIdentifier`, which changes no text unless a name holds `"`.
 - **A pinned binding whose dictionary or entry is gone, or cannot be read, still converts.** It is listed with `isSourceDeleted`, the Type cell reads "Set by a conversion", and the popover says the dictionary was deleted or is unavailable.
 - **The popover and rail copy the spec did not have.** An encoding conversion's popover footer reads "The values were converted to these codes." A linked dataset's own rail line reads "Converted as it loads · follows the dictionary". The unlabeled count stops at 1,000 values.
-- **Part A converts only for admins.** Linked datasets are Part A's only conversion target, so a dataset editor who is not a workspace admin sees the convert controls locked with an explanation until Part B lets them convert an upload in place (owner question 24).
-- **Re-apply has its own RPC.** `rpc_dataset_columns__reapply_dictionary` re-pins one dictionary's pinned bindings on one dataset without resending the whole set, and asks for a confirmation on a synced dataset (owner question 2).
+- **Part A converts only for admins.** Linked datasets are Part A's only conversion target, so a dataset editor who is not a workspace admin sees the convert controls locked with an explanation until Part B lets them convert an upload in place (owner decision 24).
+- **Re-apply has its own RPC.** `rpc_dataset_columns__reapply_dictionary` re-pins one dictionary's pinned bindings on one dataset without resending the whole set, and asks for a confirmation on a synced dataset (owner decision 2).
 - **Switching a converted column back to Reference only restores its values.** Stored data is never rewritten, so the Save step's summary says "Back to the original values" for such a column. A separate "Restore original values" action stays on the roadmap (spec 17).
 
 ### Spec edits made with this plan
@@ -24356,22 +24370,22 @@ These override the spec where they differ.
 12. Section 14: rows for a deleted code list under a convert binding, the source of a linked dataset deleted, and pipelines.
 13. Section 13, the dataset menu row: the conversion sub-line is back.
 14. Section 16: slice 4 delivered in two parts.
-15. Section 18: open decisions 1 and 2 marked settled, and 5 recommended pending the owner.
+15. Section 18: open decisions 1, 2, and 5 marked settled.
 
 ## Owner decisions kept
 
-- Every open question in one table, each with a recommendation.
+- Every open question in one table, each with a recommendation, approved as a set.
 - Offline parity: a converted dataset converts offline and on the desktop app from cached bindings and lists, an offline-only upload can be converted in place, and only writes need a connection.
 - The dataset menu's "Apply a dictionary" sub-line returns to "Turn codes into labels and add column descriptions" (slice 3 owner decision 6).
 - The synced-data warning on **Change <dataset>**: the confirmation checkbox must be ticked before the button enables.
 - "Add from datasets into an existing dictionary" stays out.
 - Crosswalks stay in slice 5.
 
-## Questions for the owner
+## Owner decisions on the open questions
 
-Each has a recommendation, and the tasks already build it.
+Juan Pablo approved every recommendation on 2026-11-13. The tasks build these decisions, and the spec records them.
 
-| # | Question | Recommendation | Where it lands |
+| # | Question | Decision | Where it lands |
 | --- | --- | --- | --- |
 | 1 | One PR or two? | Two. Part A (F133, Tasks 0 to 27) is the engine, the schema, linked datasets, and every surface; Part B (F134, Tasks 28 to 33) is converting in place, its warning, and Re-apply, frontend only. Part B changes what everyone in a workspace sees, so it is reviewed on its own, and Part A's migration already carries its schema. | Delivery; feature log |
 | 2 | Spec 6.6 puts Re-apply in the rail, 7.4 says the rail has no actions. Where does Re-apply go? | In the Used by tab and as the one action in the rail row ("Applied version 2, now version 3 · Re-apply"), for dataset editors only, with a confirmation on a synced dataset. The rail is the only place on the dataset page that says the conversion is behind. | Tasks 23, 30; spec 6.6, 7.4 |
@@ -24385,15 +24399,15 @@ Each has a recommendation, and the tasks already build it.
 | 10 | What does a blank label do in a conversion? | Decoding passes the code through and lists it in Unmatched values; encoding still matches the pair's accepted spellings. | Tasks 7, 18; spec 5.1 |
 | 11 | Should a converted column's popover count values with no label after a refresh (spec 14)? | Yes, read when the popover opens, with a link to the dictionary. | Task 22 |
 | 12 | Offline and desktop? | Applying, re-applying, and adding values need a connection ("You're offline. Reconnect to save this."). A converted dataset keeps converting offline from the cached bindings and lists. An offline-only upload can be converted in place, since nobody else is affected. The desktop app gets the new columns through the generated SQLite twin; the sync list already has every table involved. | Tasks 5, 10, 20 |
-| 13 | Open decision 1, the ordered `ENUM`. | Settled by the executed probe: an `ENUM` of the labels and the kept values, built at load. | Tasks 8, 9, 12 |
-| 14 | Open decision 2, bindings at every entry point. | Settled: every browser path goes through relation loading; a projection key rebuilds a loaded view on change; published snapshots read converted datasets through the query. Pipelines still read stored files, as they do for renames. | Tasks 10, 12 |
+| 13 | Open decision 1, the ordered `ENUM`. | Settled by the executed probe and accepted: an `ENUM` of the labels and the kept values, built at load. | Tasks 8, 9, 12 |
+| 14 | Open decision 2, bindings at every entry point. | Settled and accepted: every browser path goes through relation loading; a projection key rebuilds a loaded view on change; published snapshots read converted datasets through the query. Pipelines still read stored files, as they do for renames. | Tasks 10, 12 |
 | 15 | In the encode direction, what does Add to list ask for? | The code: the value in the data is the label, so the new pair is `<typed code> ↔ <value>`. | Task 18 |
 | 16 | Someone who can view a linked dataset but has no Data Sources role cannot read code lists, so its live conversions would load as raw codes. Open the list to them? | Yes, narrowly: a code list is also readable when a live convert binding uses it on a dataset the reader can view. Pinned conversions carry their pairs and need nothing. Dictionaries and entries stay Data Sources only, so the popover names no dictionary for such a reader. | Task 2 |
 | 17 | The eval's measles workspace gains a labeled linked dataset beside the coded one, so slice 3's coded questions (D01 to D04) now run with two candidate datasets. Keep them comparable with a workspace without it? | No. A linked dataset sits beside its source in real workspaces, so all questions run against both and D01 to D04 are rerun; the eval doc records that those runs are not comparable with slice 3's. | Task 24 |
 | 18 | Should the Data Explorer header's popover also count values with no label? | No. A result column may come from a query over several datasets, and the dataset page and Data Summary already show the count. | Task 22 |
 | 19 | A published snapshot stores an ordered column as text, so a public chart sorts its labels alphabetically unless the chart sorts explicitly. Fix now? | No: record it as a known gap. Publishing ordered columns needs the snapshot format to carry an order, which is its own change. | Known gaps (Task 26) |
 | 20 | Does a linked dataset get the source's reference-only bindings too? | Yes: every reference-bound source column gets the same reference binding on the linked dataset, so descriptions and code-list tags follow it. | Task 4 |
-| 21 | Can a linked dataset be the source of another? | No. The RPC refuses it (`binding_mode_unsupported`), and the linked card says "<dataset> is already a linked dataset. Change its conversions here instead." | Tasks 4, 20 |
+| 21 | Can a linked dataset be the source of another? | No. Applying to a linked dataset updates its own conversions in place (**Update <dataset>**, no cards), so the UI never offers it, and the RPC refuses it (`binding_mode_unsupported`). | Tasks 4, 20 |
 | 22 | In a column that encodes to whole numbers, what does "Keep as is" do for a text value? | It cannot: the column becomes whole numbers, so such a value defaults to "Leave empty" and "Keep as is" is disabled with a tooltip saying why. A kept integer stays as is. | Tasks 7, 18 |
 | 23 | Should Re-apply re-point a binding whose code list was deleted? | No. Re-apply re-pins only bindings whose list still exists, and is hidden otherwise; applying the dictionary again picks a list. | Tasks 4, 30 |
 | 24 | Until Part B ships, a dataset editor who is not a workspace admin has nowhere to put a conversion. Hide the convert controls from them, or lock them? | Lock them with the reason in their tooltips ("Converting <dataset> creates a linked dataset, and only workspace admins can add datasets. You can still attach labels as reference."), so the option is discoverable, and Part B unlocks them for uploads without a copy change. | Tasks 15, 17 |
