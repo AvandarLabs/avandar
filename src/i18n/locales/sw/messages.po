@@ -13,6 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesView.tsx
+msgid "The dataset or its dictionaries failed to load. Please try again later "
+"or reach out to support."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Publisher"
 msgstr "Mchapishaji"
@@ -160,6 +165,10 @@ msgstr "Hifadhi mwonekano wa sasa"
 msgid "Review new permissions"
 msgstr "Kagua ruhusa mpya"
 
+#: src/config/AppLinks/AppLinks.tsx
+msgid "Apply dictionaries"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/GridBinControls/GridBinControls.tsx
 msgid "Cell size (meters)"
 msgstr "Ukubwa wa seli (mita)"
@@ -240,14 +249,31 @@ msgstr "Kipindi sawa"
 msgid "Invite member"
 msgstr "Karibisha mwanachama"
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopover.tsx
+msgid "Code list for {columnName}"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN entry at position {index} is not a plain table reference."
 msgstr "Ingizo la JOIN katika nafasi ya {index} si rejeleo la jedwali "
 "tambarare."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyStepBody.tsx
+msgid "The columns could not be read"
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "This computer only"
 msgstr "Kompyuta hii pekee"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
+msgid "No entry in the dictionaries you are using matches this column."
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText.tsx
+msgid "{removedCount, plural, one {# column no longer uses a dictionary.} other "
+"{# columns no longer use a dictionary.}}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Right span"
@@ -340,6 +366,10 @@ msgstr "Kosa lilitokea wakati wa kupakia faili"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
 msgstr "Aina"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "How to apply the dictionary"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
@@ -677,6 +707,12 @@ msgstr "Ongeza hali"
 msgid "Search dashboards, datasets, maps..."
 msgstr "Tafuta dashibodi, seti za data, ramani..."
 
+#. placeholder {0}: applyTargets.length
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveApplyNextField.tsx
+msgid "{0, plural, one {Apply it to this dataset after saving} other {Apply it "
+"to these # datasets after saving}}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Delete failed"
@@ -725,6 +761,10 @@ msgstr "Maeneo mahususi yatachorwa kwenye ramani, na maeneo yaliyofichwa "
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/ManualQueryFormView/ManualQueryFormLayout.tsx
 msgid "Aggregations"
 msgstr "Mkusanyiko"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+msgid "What happens"
+msgstr ""
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -974,6 +1014,10 @@ msgstr "{fieldName} kwa robo mwaka"
 msgid "Unable to sync dataset online"
 msgstr "Imeshindikana kusawazisha mkusanyiko wa data mtandaoni"
 
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
+msgid "Apply {dictionaryName} to a dataset"
+msgstr ""
+
 #: src/views/GisApp/export/useExportPdfDownload/useExportPdfDownload.ts
 #: src/views/GisApp/panels/LegendPanel/MapLegend/DisputedLegendRow/DisputedLegendRow.tsx
 msgid "Disputed or undetermined boundary"
@@ -1098,9 +1142,18 @@ msgstr "Avandar haikuweza kuthibitisha kuwa hoja hii inasoma tu seti zako za "
 msgid "Removing offline models"
 msgstr "Inaondoa modeli za nje ya mtandao"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "{otherCount, plural, one {# other match} other {# other matches}}"
+msgstr ""
+
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Year"
 msgstr "Mwaka"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "{dictionaryName} › {entryName}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "Show datasets in {topic}"
@@ -1378,6 +1431,10 @@ msgstr "SQL ya sasa ina sehemu ambazo fomu haikuweza kuwakilisha. Ukiendelea, "
 "SQL hiyo itafutwa na kubadilishwa na SQL inayozalishwa kutoka kwenye "
 "fomu."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
+msgid "Datasets failed to load"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "No keywords"
 msgstr "Hakuna maneno muhimu"
@@ -1431,6 +1488,10 @@ msgstr "Inasasisha nenosiri kwa {0}"
 msgid "is after"
 msgstr "iko baada ya"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "Removed the dictionaries from {datasetName}. The data is unchanged."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerList/LayerList.tsx
 msgid "No layers yet."
 msgstr "Bado hakuna safu."
@@ -1442,6 +1503,11 @@ msgstr ""
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Narrow"
 msgstr "Nyembamba"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
+msgid "Nothing is applied to this column. Pick a match in the table to apply "
+"it."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Choose how much of each dataset to publish. The default: \"Only what's "
@@ -1979,6 +2045,10 @@ msgstr "Data ya {0} imekatwa"
 msgid "Share it with your workspace"
 msgstr "Shiriki kwenye workspace yako"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels.ts
+msgid "Match columns"
+msgstr ""
+
 #: src/routes/forgot-password.tsx
 msgid "Enter your email to get a reset link"
 msgstr "Ingiza barua yako ya pepe kupata kiungo cha kurekebisha"
@@ -2117,6 +2187,10 @@ msgstr "Huenda plugin imepitwa na wakati. Mwombe msimamizi aangalie Mipangilio "
 msgid "Start of time range: {startLabel}"
 msgstr "Mwanzo wa kipindi cha muda: {startLabel}"
 
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
+msgid "No dataset has that name"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/useAnnotatedPdfExport.ts
 msgid "Couldn't export PDF"
@@ -2168,6 +2242,10 @@ msgstr "Kiwango kimoja cha kawaida karibu na wastani"
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Liberty"
 msgstr "Liberty"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
+msgid "Nothing picked yet"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SQL is empty."
@@ -2277,6 +2355,10 @@ msgstr "Hebu tuhifadhi matokeo yako sasa"
 msgid "Custom"
 msgstr "Kawaida"
 
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
+msgid "Used by · {usedByCount}"
+msgstr ""
+
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Timestamp"
@@ -2298,6 +2380,10 @@ msgstr "Onyesha"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "{0}, and {remainingCount} more naming the page and the document"
 msgstr "{0}, na {remainingCount} zaidi zinazotaja ukurasa na hati"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "Not in the list"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionPicker/PdfRegionPicker.tsx
 msgid "The assistant read nothing we could use. Kept the rule-based results."
@@ -2514,6 +2600,10 @@ msgstr "{code} - ukanda wa kusini wa UTM {0}"
 msgid "Hold Alt and press the up or down arrow to move this layer."
 msgstr "Shikilia Alt na ubonyeze kishale cha juu au chini ili kusogeza tabaka "
 "hili."
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "Entry to apply to {columnName}"
+msgstr ""
 
 #: src/views/GisApp/MapViewer/MapViewerState.tsx
 msgid "This map was added after the dashboard was last published. Publish again "
@@ -2856,6 +2946,10 @@ msgstr "Futa aina ya kesi"
 msgid "Offline mode"
 msgstr "Hali ya nje ya mtandao"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Description added to the column"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "Avandar couldn't download that link. Check it and try again."
 msgstr "Avandar haikuweza kupakua kiungo hicho. Kikague kisha ujaribu tena."
@@ -2937,6 +3031,10 @@ msgstr "avg"
 msgid "Generating…"
 msgstr "Inaundwa…"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+msgid "Apply dictionaries to {datasetName}"
+msgstr ""
+
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
@@ -2986,6 +3084,10 @@ msgstr "Aina ya faili isiyoungwa mkono"
 msgid "{droppedRowCount} of {totalRowCount} rows could not be mapped"
 msgstr "Safu {droppedRowCount} kati ya {totalRowCount} hazikuweza kuwekwa "
 "kwenye ramani"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
+msgid "Apply a dictionary"
+msgstr ""
 
 #: src/components/caseFields/PeriodControls/DateColumnSelect.tsx
 msgid "Date column"
@@ -3278,6 +3380,10 @@ msgstr "Ichapishe"
 msgid "Prod reporting replica"
 msgstr "Nakili ya ripoti ya uzalishaji"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
+msgid "No dictionary matches these columns yet"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Ask me to add a chart to this dashboard..."
 msgstr "Nijulishe kuongeza chati kwenye dashibodi hii..."
@@ -3330,6 +3436,11 @@ msgstr "Rekebisha URL maalum kabla ya kuchapisha."
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "\"{sourceFileName}\" finished processing and is ready to use."
 msgstr "\"{sourceFileName}\" imekamilisha usindikaji na iko tayari kutumika."
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
+msgid "{attachedCount, plural, one {# attached as reference} other {# attached "
+"as reference}}"
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
 #: src/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail.tsx
@@ -3482,6 +3593,11 @@ msgstr "Uonyeshaji wa Data"
 msgid "Show {rowLabel} on the map"
 msgstr "Onyesha {rowLabel} kwenye ramani"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyStepBody.tsx
+msgid "Avandar could not read this dataset's columns to match them. Please try "
+"again later or reach out to support."
+msgstr ""
+
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "PDF"
@@ -3622,6 +3738,10 @@ msgstr ""
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeBusyButton.tsx
 msgid "Offline {percent}%"
 msgstr "Nje ya mtandao {percent}%"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
+msgid "Attached as reference · data unchanged"
+msgstr ""
 
 #: shared/copy/vizSettingGroupLabel.ts
 msgid "Category axis"
@@ -3810,8 +3930,8 @@ msgid "Matched by meaning, not just by name. Keep apart if these record "
 msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
-msgid "Datasets this dictionary is applied to will be listed here."
-msgstr ""
+#~ msgid "Datasets this dictionary is applied to will be listed here."
+#~ msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Minimum"
@@ -3841,6 +3961,11 @@ msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who 
 msgstr "Dashibodi yako ipo, lakini bado hakuna mtu mwingine anayeweza "
 "kuifungua. Hebu tuchague watu wa kushiriki nao."
 
+#. placeholder {0}: options.columnCount
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
+msgid "{0, plural, one {of # column} other {of # columns}}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerSettingsPanel.tsx
 msgid "Back to layer settings"
 msgstr "Rudi kwenye mipangilio ya safu"
@@ -3851,6 +3976,7 @@ msgstr "Rudi kwenye mipangilio ya safu"
 msgid "Remove series"
 msgstr "Ondoa mfululizo"
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 msgid "(missing value)"
 msgstr ""
@@ -3944,6 +4070,10 @@ msgstr "Hali"
 msgid "{pluginName} uninstalled"
 msgstr "{pluginName} imeondolewa"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "Apply"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "Ingiza jina la dataset hii"
@@ -4015,6 +4145,8 @@ msgstr "Usaidizi wa jiometri bado unapakuliwa. Hii inaweza kuchukua muda kwa "
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryCodeListsTab/DictionaryCodeListsTab.tsx
@@ -4136,6 +4268,11 @@ msgstr "Futa maelezo"
 #: src/views/DataExplorerApp/DataExplorerDrawer/VizTabPanel/VizTabPanel.tsx
 msgid "Pick a chart type above to configure one."
 msgstr "Chagua aina ya chati hapo juu ili kuisanidi."
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep.tsx
+msgid "Attach to {datasetName}"
+msgstr ""
 
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
@@ -4287,6 +4424,10 @@ msgstr "Bado haijachapishwa. Hakuna mtu anayeweza kufungua dashibodi hii "
 msgid "Some latitudes or longitudes are not numbers."
 msgstr "Baadhi ya latitudo au longitudo si nambari."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep.tsx
+msgid "Summary"
+msgstr ""
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Run a query first"
 msgstr "Tekeleza swali kwanza"
@@ -4358,6 +4499,11 @@ msgstr ""
 msgid "Reassign private resources first"
 msgstr "Hamishia umiliki wa rasilimali za faragha kwanza"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/UnmatchedColumnsToggle.tsx
+msgid "{count, plural, one {Show # column with no match} other {Show # columns "
+"with no match}}"
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListsToLabelNav.tsx
 msgid "{listCount, plural, one {{doneCount} of # done} other {{doneCount} of # "
 "done}}"
@@ -4401,6 +4547,7 @@ msgstr "Hali ya nje ya mtandao inahitaji modeli za nje ya mtandao. Zipakue "
 msgid "Comment actions"
 msgstr "Vitendo vya maoni"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
 msgid "Value in data"
 msgstr ""
@@ -4445,6 +4592,10 @@ msgstr "Hakuna"
 msgid "Link copied"
 msgstr "Kiungo kimenakiliwa"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/AddDictionaryMenu.tsx
+msgid "Add dictionary"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Version"
 msgstr ""
@@ -4482,6 +4633,7 @@ msgstr "Imeshindikana kuhifadhi dashibodi: {0}"
 msgid "Publish"
 msgstr "Chapisha"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
 msgid "Entries"
 msgstr ""
@@ -4541,6 +4693,10 @@ msgstr ""
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 msgid "Manual form shows an approximation"
 msgstr "Fomu ya Manual inaonyesha makadirio"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+msgid "From"
+msgstr ""
 
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "N"
@@ -4612,6 +4768,10 @@ msgstr "Imeachwa ikiwa imewashwa kwa ramani itakayochapishwa: msomaji hawezi "
 msgid "Bind geometry on the selected layer to buffer it."
 msgstr "Unganisha jiometri kwenye safu iliyochaguliwa ili kuunda bafa yake."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+msgid "Attached as reference, values unchanged"
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Show dots"
 msgstr "Onyesha nukta"
@@ -4678,6 +4838,7 @@ msgstr ""
 msgid "Bring a spreadsheet into Avandar."
 msgstr "Leta lahajedwali kwenye Avandar."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "description"
 msgstr "maelezo"
@@ -4740,6 +4901,11 @@ msgstr "{pluginName} itapatikana kwa kila mwanachama wa workspace hii."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "ends with"
 msgstr "huishia na"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
+msgid "The datasets that use this dictionary failed to load. Please try again "
+"later or reach out to support."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectorImportView.tsx
 msgid "Table or view to import"
@@ -4857,6 +5023,10 @@ msgstr "Geuza rangi"
 msgid "Register"
 msgstr "Jisajili"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
+msgid "Saved {dictionaryName} to Dictionaries. Now choose how to apply it."
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
 msgid "Ask me to add a chart to this dashboard. I will pick a viz type, write "
 "the SQL, and drop a block onto the page."
@@ -4944,6 +5114,11 @@ msgstr "Rekebisha sehemu zilizo hapo juu, kisha uhifadhi."
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Uninstall"
 msgstr "Ondoa"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveApplyNextField.tsx
+msgid "{firstName} opens first. Apply it to the others from each dataset's "
+"menu."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner.tsx
 msgid "Back to editor"
@@ -5247,6 +5422,10 @@ msgstr "Bofya tiki ya pili iliyo na lebo kwenye mhimili wa Y."
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfReviewGrid/PdfReviewGrid.tsx
 msgid "column {0}"
 msgstr "safu wima {0}"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchPickButton.tsx
+msgid "{entryName} · description"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal.tsx
 msgid "Invite sent"
@@ -5600,9 +5779,22 @@ msgstr "Tumia kila kichujio cha kimataifa kwenye dashibodi."
 msgid "Collapse"
 msgstr "Punguza"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "code {code}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Cap reached"
 msgstr "Kikomo kimefikiwa"
+
+#. placeholder {0}: counts.attachedCount
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText.tsx
+msgid "{0, plural, one {Nothing in your data changes. # column keeps its "
+"values, with labels attached as reference. Edits to the dictionaries "
+"show up here right away.} other {Nothing in your data changes. # columns "
+"keep their values, with labels attached as reference. Edits to the "
+"dictionaries show up here right away.}}"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect.tsx
 msgid "Unavailable layer"
@@ -5775,6 +5967,7 @@ msgstr "Tumehifadhi matokeo ya kanuni."
 msgid "Unavailable offline"
 msgstr "Haipatikani bila mtandao"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
 msgid "Rows"
 msgstr ""
@@ -5865,7 +6058,7 @@ msgstr "Kichupo cha kuleta"
 msgid "Couldn't search. Keep typing to retry."
 msgstr "Imeshindwa kutafuta. Endelea kuandika ili ujaribu tena."
 
-#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary.ts
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
 msgid "Saved {dictionaryName} to Dictionaries."
 msgstr ""
 
@@ -6002,6 +6195,10 @@ msgid "Are you sure you want to delete this dataset? This action cannot be "
 msgstr "Je, una uhakika unataka kufuta seti hii ya data? Kitendo hiki hakiwezi "
 "kubadilishwa."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyStepBody.tsx
+msgid "Reading the columns of {datasetName} on this device"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/MapEmptyStatus.tsx
 msgid "{filterCount} filters are active on this layer. They may be excluding "
 "everything."
@@ -6117,6 +6314,10 @@ msgstr "Uamuzi"
 msgid "Update failed"
 msgstr "Sasisho limefeli"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels.ts
+msgid "Attach"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/StyleSection/ProportionalSymbolControls/ProportionalScaleSelect.tsx
 msgid "Linear"
 msgstr "Ya mstari"
@@ -6124,6 +6325,7 @@ msgstr "Ya mstari"
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter.tsx
@@ -6133,6 +6335,10 @@ msgstr "Ya mstari"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Back"
 msgstr "Rudi"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsFooter.tsx
+msgid "Next: attach"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/ShareableLimitReachedModal/LimitMessage.tsx
 msgid "Your current plan only lets you share or publish {maxAllowed, plural, "
@@ -6326,6 +6532,10 @@ msgstr "Nenda nyumbani"
 msgid "Count how many rows there are in {datasetName}"
 msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Attached as reference"
+msgstr ""
+
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View details for {0}"
@@ -6398,6 +6608,10 @@ msgstr "Aina hiyo ya faili haitumiki"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "Lebele, mfano. Mkoa"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+msgid "Up to date"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
 msgid "Records can only move to a status in this list."
@@ -6754,6 +6968,10 @@ msgstr "Kuna karatasi moja tu katika karatasi hii ya excel."
 msgid "Make dataset offline-only?"
 msgstr "Fanya dataset iwe ya mtandaoni pekee?"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "Don't apply"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Change custom URL?"
 msgstr "Ungependa kubadilisha URL maalum?"
@@ -6999,6 +7217,11 @@ msgstr "Pakua PDF"
 msgid "Enter a name."
 msgstr "Weka jina."
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
+msgid "From {dictionaryName} › {entryName}. Attached as reference. The values "
+"in the data are unchanged."
+msgstr ""
+
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bold"
 msgstr "Nene"
@@ -7107,6 +7330,10 @@ msgstr "Ofisi imeundwa kwa mafanikio!"
 msgid "Retry lookup"
 msgstr "Jaribu tena utafutaji"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "No description yet"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivacyLogTab.tsx
 msgid "Clarifications"
@@ -7208,6 +7435,10 @@ msgstr ""
 msgid "Import"
 msgstr "Ingiza"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Code list: {codeListName}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedColumnSelect.tsx
 msgid "Clear Disputed status column"
 msgstr "Futa safu ya hali ya Zinazobishaniwa"
@@ -7255,6 +7486,10 @@ msgstr "Sera ya Faragha"
 #: src/components/AppShell/Navbar/Navbar.tsx
 msgid "Sign out failed"
 msgstr "Kutoka nje kumeshindikana"
+
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveApplyNextField.tsx
+msgid "Apply it to {firstName} next"
+msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Fix the entry names marked above to go on."
@@ -7449,6 +7684,10 @@ msgstr "Postgres"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Owner"
 msgstr "Mmiliki"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "Attached to {datasetName}. The data is unchanged."
+msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude must be between -90 and 90, and longitude must be between -180 "
@@ -7664,6 +7903,10 @@ msgstr "Mwelekeo"
 msgid "Dashboard deleted successfully!"
 msgstr "Dashibodi imefutwa kwa mafanikio!"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Chosen from the data: these values are codes."
+msgstr ""
+
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin's chart code didn't load."
 msgstr "Msimbo wa chati wa plugin ya {pluginId} haukupakia."
@@ -7722,6 +7965,11 @@ msgid "You are not connected to the internet, so chat runs on this computer "
 msgstr "Hujaunganishwa kwenye intaneti, kwa hiyo mazungumzo yanaendeshwa kwenye "
 "kompyuta hii kwa kutumia modeli za nje ya mtandao."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Your data stays the same, which is what you want for models and exports "
+"that need the original values. Hover the column to see the labels."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "What does this case type represent?"
 msgstr "Aina hii ya kesi inawakilisha nini?"
@@ -7761,6 +8009,11 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Time to answer"
 msgstr "Wakati wa kujibu"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingTable.tsx
+msgid "No match"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Maximum"
@@ -7967,6 +8220,10 @@ msgstr "Lebo ya mhimili wa X"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useSlugValidation/makeSlugErrorMessageFromValidationFailure.ts
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+msgid "Reference"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
@@ -8443,6 +8700,10 @@ msgstr "Export as PDF"
 msgid "Edit case type"
 msgstr "Hariri aina ya kesi"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesView.tsx
+msgid "Dictionaries failed to load"
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 msgid "Coded columns"
 msgstr ""
@@ -8463,6 +8724,11 @@ msgstr "Hali hii haiwezi kubadilishwa."
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "{count, plural, one {# feature} other {# features}}"
 msgstr "{count, plural, one {# kipengele} other {# vipengele}}"
+
+#: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+msgid "{usedByCount, plural, one {Used by # dataset} other {Used by # "
+"datasets}}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
@@ -8509,6 +8775,10 @@ msgstr "Fungua upande wa sidebar"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Red to blue"
 msgstr "Kutoka nyekundu hadi bluu"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchPickButton.tsx
+msgid "{entryName} · {codeListName}"
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Also accept"
@@ -8635,6 +8905,11 @@ msgstr "Hii {resource} inashirikiwa na: "
 msgid "Private dashboards"
 msgstr "Dashibodi za faragha"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingTable.tsx
+msgid "Column in this dataset"
+msgstr ""
+
 #: src/components/providers/AvandarAppProvider.tsx
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
@@ -8680,6 +8955,10 @@ msgstr "Zilifutwa kutoka kwenye kompyuta hii. Unaweza kuzipakua tena wakati "
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeRail.tsx
 msgid "Records added by hand"
 msgstr "Rekodi zilizoongezwa kwa mkono"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DictionaryChips.tsx
+msgid "Using"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unrecognised SELECT item; skipped."
@@ -8822,6 +9101,11 @@ msgstr "Inapakua modeli za nje ya mtandao: {percent}%"
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "The comment is removed from the case for everyone."
 msgstr "Maoni haya yameondolewa kwenye kesi kwa kila mtu."
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText.tsx
+msgid "Nothing in your data changes. Edits to the dictionaries show up here "
+"right away."
+msgstr ""
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetMandatoryFurniture.tsx
 msgid "Source attribution (Always included)"
@@ -9105,6 +9389,10 @@ msgstr "Hesabu safu katika {datasetName} kwa {secondGroupByColumn}"
 msgid "This Dropbox link is a folder. Paste a link to one file."
 msgstr "Kiungo hiki cha Dropbox ni cha folda. Bandika kiungo cha faili moja."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "{entryName} · {codeListText}"
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Your checkout was successful!"
 msgstr "Malipo yako yalifanikiwa!"
@@ -9150,6 +9438,11 @@ msgstr "Tuma <0>{0}</0> thamani{1} kwa AI?"
 msgid "Custom URL path"
 msgstr "Njia ya URL ya Kawaida"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "A dictionary changed while you were applying it. Reload the page and try "
+"again."
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses operator \"{operator}\" which the form does not "
 "support."
@@ -9184,6 +9477,8 @@ msgstr "Bonyeza Space au Enter ili kuchukua hali hii, isogeze kwa vitufe vya "
 "mishale, kisha bonyeza Space au Enter ili kuiweka. Au shikilia Alt na "
 "ubonyeze mshale wa juu au chini ili kuisogeza nafasi moja."
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 msgid "No label yet"
 msgstr ""
@@ -9361,6 +9656,14 @@ msgid "The picked datasets are no longer available. Pick the datasets to learn "
 "from."
 msgstr ""
 
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetButton.tsx
+msgid "Apply to a dataset"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "Means"
+msgstr ""
+
 #: src/views/GisApp/shell/MapFurnitureBar/MapFurnitureBar.tsx
 msgid "W"
 msgstr "W"
@@ -9418,6 +9721,10 @@ msgstr "Kijivu"
 msgid "There was an error on update: {0}"
 msgstr "Kulikuwa na hitilafu kwenye sasisho: {0}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Applying"
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Aggregate function \"{funcName}\" uses a complex argument; skipped."
 msgstr "Jukumu la jumlisha \"{funcName}\" linatumia hoja changamano; lumerukwa."
@@ -9438,6 +9745,10 @@ msgstr "Chagua safu unazotaka katika {conceptName}"
 #: src/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig.tsx
 msgid "Visualization Settings"
 msgstr "Mipangilio ya Uonyeshaji"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
+msgid "{typeLabel} · {distinctText} different values"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 msgid "Threshold"
@@ -9674,6 +9985,11 @@ msgstr "Hariri maoni"
 msgid "CSV file"
 msgstr "Faili ya CSV"
 
+#: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate.ts
+msgid "Saved {dictionaryName} to Dictionaries. Apply it to {otherNames} too, "
+"from each dataset's menu."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Updating dataset"
 msgstr "Inasasisha seti ya data"
@@ -9876,6 +10192,11 @@ msgstr "Sikuweza kutengeneza SQL bila mtandao. Jaribu kuandika upya au "
 msgid "Enter a link that starts with http:// or https://."
 msgstr "Weka kiungo kinachoanza na http:// au https://."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/UnmatchedColumnsToggle.tsx
+msgid "{count, plural, one {Hide # column with no match} other {Hide # columns "
+"with no match}}"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
 "question, or turn offline mode off to use online chat."
@@ -9906,6 +10227,7 @@ msgstr ""
 msgid "Welcome back!"
 msgstr "Karibu tena!"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 #: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
 msgid "Dictionaries"
 msgstr ""
@@ -9925,6 +10247,7 @@ msgstr "Mmiliki daima ana ufikiaji wa admin. Ili kubadilisha mmiliki, tumia "
 "mipangilio ya {resource}."
 
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField.tsx
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 msgid "Loading datasets…"
 msgstr "Inapakia seti za data…"
 
@@ -10021,6 +10344,12 @@ msgstr "Maeneo yaliyosomwa"
 msgid "Bar layout"
 msgstr "Mpangilio wa pau"
 
+#. placeholder {0}: options.dictionaryCount
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
+msgid "{0, plural, one {from {usedText} of # dictionary} other {from {usedText} "
+"of # dictionaries}}"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "Limit to app access"
 msgstr "Punguza ufikiaji wa programu"
@@ -10090,6 +10419,8 @@ msgstr "Workspace hii haina usajili halali."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTableHead.tsx
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "Dataset"
@@ -10168,6 +10499,11 @@ msgstr "Bado huna akaunti?"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Identifier"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "You need edit access to {datasetName} to apply a dictionary."
 msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
@@ -10278,6 +10614,10 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "User group saved"
 msgstr "Kikundi cha mtumiaji kimehifadhiwa"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "Only match"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
@@ -10440,6 +10780,10 @@ msgstr "Seti hii ya data haitahifadhiwa mtandaoni tena na inaweza kufikiwa tu "
 "ikiwa iko kwenye kompyuta yako binafsi. Hakuna mtu kwenye timu yako "
 "ataweza kufikia data hii. Hii inapendekezwa tu kwa data nyeti sana."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "{entryName} · {codeListText} · from {dictionaryName}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
 msgid "Highest valid value"
 msgstr ""
@@ -10580,6 +10924,10 @@ msgstr ""
 msgid "Its charts see only the rows of the chart they draw"
 msgstr "Chati zake huona tu safu za chati inayochora"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsStep.tsx
+msgid "Selected column"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/OpenStreetMapAttribution.tsx
 msgid "© OpenStreetMap contributors"
 msgstr "© Wachangiaji wa OpenStreetMap"
@@ -10599,6 +10947,10 @@ msgstr "Hujachagua safu ya jina"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Grouped"
 msgstr "Zilizowekwa katika makundi"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
+msgid "Also matches {names}."
+msgstr ""
 
 #: src/components/permissions/useShareButtonState.ts
 msgid "You need admin access on this resource to manage sharing."
@@ -10772,6 +11124,10 @@ msgstr "Haikuweza kufuta eneo."
 msgid "Switch Workspace"
 msgstr "Badilisha Nafasi ya Kazi"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
+msgid "Show what codes mean and add column descriptions"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
 msgstr "Unaweza kuona dashibodi hii kwa sababu ilishirikiwa nawe."
@@ -10851,6 +11207,10 @@ msgstr "Eneo lako la kazi liko kwenye mpango wa Bure, ambao unasaidia hadi seti 
 msgid "Avandar turns your question into a query to show you the answers."
 msgstr "Avandar hubadilisha swali lako kuwa query ili kukuonyesha majibu."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+msgid "Status"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Tone"
 msgstr "Toni"
@@ -10913,6 +11273,10 @@ msgstr "Mwonekano uliohifadhiwa wa ramani"
 #: src/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer.tsx
 msgid "You haven't chosen a value column"
 msgstr "Hujachagua safu ya thamani"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "The dictionaries were not attached. Please try again."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Text contains"
@@ -11486,6 +11850,10 @@ msgid "No disputed-status column. Outlines render as settled."
 msgstr "Hakuna safu ya hali ya Zinazobishaniwa. Mipaka inaonyeshwa kuwa "
 "imethibitishwa."
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
+msgid "{describedCount, plural, one {# described} other {# described}}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakList.tsx
 msgid "Breaks must be finite and strictly increasing."
 msgstr "Vikomo lazima viwe na thamani halisi na viongezeke kwa mpangilio mkali."
@@ -11535,6 +11903,7 @@ msgid "A places dataset holds at most {maxPlaces} places."
 msgstr "Seti ya data ya maeneo inaweza kuwa na maeneo yasiyozidi {maxPlaces}."
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "Dictionary"
 msgstr ""
 
@@ -11760,6 +12129,11 @@ msgstr "nambari kamili"
 msgid "Custom clarification answer"
 msgstr "Jibu la ufafanuzi maalum"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab.tsx
+msgid "Apply it to a dataset to explain its codes and describe its columns. The "
+"datasets it is applied to are listed here."
+msgstr ""
+
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/CreateDictionaryMenuItem.tsx
 msgid "Saved to Dictionaries, so other datasets can use it too"
 msgstr ""
@@ -11835,6 +12209,10 @@ msgstr "Avandar bado iko kwenye beta. Vipengele vingine vinaweza kutofanya kazi 
 msgid "Exposure starts"
 msgstr "Mfiduo unaanza"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "This entry has no codes, so only its description is attached."
+msgstr ""
+
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "Thank you for your interest!"
 msgstr "Asante kwa nia yako!"
@@ -11895,6 +12273,10 @@ msgid "The publisher has not added any rows to it. You can still open the "
 msgstr "Mchapishaji hajaongeza safu zozote kwenye seti hii. Bado unaweza "
 "kufungua ya asili, ambako imechapishwa."
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+msgid "data unchanged, always current"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Indexed by"
 msgstr "Iliorodheshwa na"
@@ -11908,9 +12290,21 @@ msgstr "Chagua yote"
 msgid "Write the entries and code lists yourself"
 msgstr ""
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchPickButton.tsx
+msgid "values don't fit"
+msgstr ""
+
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "Invalid chart settings"
 msgstr "Mipangilio batili ya chati"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/EntryDescription.tsx
+msgid "From {dictionaryName}"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter.tsx
+msgid "Remove dictionaries from {datasetName}"
+msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryReading.tsx
 msgid "Reading {datasetName} on this device"
@@ -11977,6 +12371,10 @@ msgstr "Wajumbe"
 #: src/components/ChatPanel/ChatComposerOverlay/ChatComposerOverlay.tsx
 msgid "Dock chat panel"
 msgstr "Bandika kidirisha cha mazungumzo"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+msgid "Other matches"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointGeometryTypeSelect.tsx
 msgid "Point geometry"
@@ -12092,6 +12490,7 @@ msgstr "Neno muhimu: {keyword}"
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 msgid "Column"
 msgstr "Safu"
 
@@ -12161,6 +12560,10 @@ msgstr "Thamani isiyo sahihi ya safu imechaguliwa"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Safu {rowNum} / Safu wima {colNum}"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DictionaryChips.tsx
+msgid "Stop using {name}"
+msgstr ""
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList.tsx
 msgid "You can't go to this step until you create a new dashboard."
@@ -12304,6 +12707,7 @@ msgid "X axis tick color"
 msgstr "Rangi ya alama za mhimili wa X"
 
 #: src/components/Nux/NuxCompletionModal/NuxCompletionModal.tsx
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 msgid "Continue"
 msgstr "Endelea"
@@ -12352,6 +12756,12 @@ msgstr "Isiyoonekana sana"
 msgid "Activity"
 msgstr "Shughuli"
 
+#. placeholder {0}: counts.describedCount
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText.tsx
+msgid "{0, plural, one {# column gets a description from a dictionary.} other "
+"{# columns get descriptions from dictionaries.}}"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "(Message not sent.)"
 msgstr "(Ujumbe haukutumwa.)"
@@ -12363,6 +12773,10 @@ msgstr ""
 #: src/routes/_auth/(no-workspace)/invalid-workspace.tsx
 msgid "No workspace was found"
 msgstr "Hakuna eneo la kazi lililopatikana"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/useColumnsSectionMeta.ts
+msgid "{columnCountText} · {codedText}"
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save\" to open the menu."
@@ -12473,6 +12887,10 @@ msgid "It's time to create your first workspace. Don't think for too long; you "
 msgstr "Ni wakati wa kuunda nafasi yako ya kwanza ya kazi. Usifikirie kwa muda "
 "mrefu sana; unaweza kubadilisha haya baadaye wakati wowote!"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Chosen from the data: these values are labels."
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
 msgid "Used by"
 msgstr ""
@@ -12550,6 +12968,10 @@ msgstr "Nakili kiungo"
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/NormalizationControls/NormalizationMultiplierSelect.tsx
 msgid "100,000"
 msgstr "100,000"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+msgid "How it was applied"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityComposer/CaseActivityComposer.tsx
 msgid "Post"
@@ -12635,6 +13057,11 @@ msgstr "Hakuna wachapishaji"
 msgid "Beta"
 msgstr "Beta"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/useColumnsSectionMeta.ts
+msgid "{codedCount, plural, one {# with a code list: open the tag to read it} "
+"other {# with a code list: open the tag to read it}}"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Search by name or user group"
 msgstr "Tafuta kwa jina au kikundi cha mtumiaji"
@@ -12709,6 +13136,10 @@ msgstr "Imehamishwa"
 #: src/hooks/ui/useGooglePicker.ts
 msgid "My Drive"
 msgstr "Hifadhi Yangu"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+msgid "Description added"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "Please confirm that you would like to proceed with this plan change. "
@@ -13127,6 +13558,10 @@ msgstr "Chini kushoto"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Page title"
 msgstr "Kichwa cha ukurasa"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse.tsx
+msgid "Add a dictionary above to pick its entries for these columns by hand."
+msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "Some"
