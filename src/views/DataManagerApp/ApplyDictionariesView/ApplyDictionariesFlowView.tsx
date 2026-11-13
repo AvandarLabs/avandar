@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { ApplyDictionariesHeader } from "@/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader";
 import { ApplyDictionariesStepHeading } from "@/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesStepHeading";
@@ -8,8 +8,8 @@ import { makeApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/a
 import { ApplyStepBody } from "@/views/DataManagerApp/ApplyDictionariesView/ApplyStepBody";
 import { ApplyPreviewDrawer } from "@/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer";
 import {
-  useApplyFacts,
   countPicks,
+  useApplyFacts,
 } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFacts";
 import { useApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 import { useApplyStepLabels } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels";
@@ -39,26 +39,44 @@ function _countUnmatched(flow: ApplyFlow): number | undefined {
   }, 0);
 }
 
-/** The drawer while it is open; closing it returns focus to Preview data. */
+/**
+ * The drawer while it is open. It takes focus only when Preview data has
+ * just opened it, and closing it returns focus to Preview data.
+ */
 function usePreview(
   props: Readonly<Props & { flow: ApplyFlow; lookups: ApplyLookups }>,
-): { preview: ReactNode; buttonRef: RefObject<HTMLButtonElement | null> } {
+): {
+  preview: ReactNode;
+  buttonRef: RefObject<HTMLButtonElement | null>;
+  toggle: () => void;
+} {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [isOpening, setIsOpening] = useState(false);
   const { flow } = props;
+  const isOpen = flow.state.isPreviewOpen;
+  const toggle = (): void => {
+    setIsOpening(!isOpen);
+    flow.dispatch({ type: "set_preview_open", isOpen: !isOpen });
+  };
   const close = (): void => {
     flow.dispatch({ type: "set_preview_open", isOpen: false });
     buttonRef.current?.focus();
   };
-  const preview = flow.state.isPreviewOpen ? (
+  const clearOpening = useCallback(() => {
+    setIsOpening(false);
+  }, []);
+  const preview = isOpen ? (
     <ApplyPreviewDrawer
       dataset={props.dataset}
       columns={props.data.columns ?? []}
       flow={flow}
       lookups={props.lookups}
       onClose={close}
+      takesFocusOnOpen={isOpening}
+      onFocused={clearOpening}
     />
   ) : null;
-  return { preview, buttonRef };
+  return { preview, buttonRef, toggle };
 }
 
 /** The labels, facts, and lookups the frame shows. */
@@ -103,7 +121,11 @@ export function ApplyDictionariesFlowView(props: Readonly<Props>): ReactNode {
     targets,
   });
   const { counts, facts, labels, lookups } = useFrame({ ...props, flow });
-  const { preview, buttonRef } = usePreview({ ...props, flow, lookups });
+  const { preview, buttonRef, toggle } = usePreview({
+    ...props,
+    flow,
+    lookups,
+  });
   return (
     <AppView>
       <ApplyDictionariesHeader
@@ -111,12 +133,7 @@ export function ApplyDictionariesFlowView(props: Readonly<Props>): ReactNode {
         facts={facts}
         isPreviewOpen={flow.state.isPreviewOpen}
         isPreviewAvailable={!flow.isMatching}
-        onTogglePreview={() => {
-          flow.dispatch({
-            type: "set_preview_open",
-            isOpen: !flow.state.isPreviewOpen,
-          });
-        }}
+        onTogglePreview={toggle}
         previewButtonRef={buttonRef}
       />
       <ApplyDictionariesStepper

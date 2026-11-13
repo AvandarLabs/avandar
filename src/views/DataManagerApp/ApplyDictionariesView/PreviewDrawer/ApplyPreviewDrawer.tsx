@@ -35,6 +35,14 @@ type Props = {
   flow: ApplyFlow;
   lookups: ApplyLookups;
   onClose: () => void;
+  /**
+   * Whether the drawer takes focus as it mounts: true only when Preview
+   * data has just opened it, so a remount on a step change leaves focus on
+   * the step's heading.
+   */
+  takesFocusOnOpen: boolean;
+  /** Called once the drawer has taken focus. */
+  onFocused: () => void;
 };
 
 /** Every column's plan, from the picks, resolutions, and unmatched values. */
@@ -123,8 +131,8 @@ function DrawerBody(
 
 /**
  * The preview drawer: the dataset's first rows as they would look if saved
- * now, open at any step. It takes focus when it opens and closes on
- * Escape; the flow returns focus to Preview data.
+ * now, open at any step. It takes focus when Preview data opens it and
+ * closes on Escape; the flow returns focus to Preview data.
  */
 export function ApplyPreviewDrawer(props: Readonly<Props>): ReactNode {
   const headingId = useId();
@@ -136,9 +144,13 @@ export function ApplyPreviewDrawer(props: Readonly<Props>): ReactNode {
     columns: plans,
     isEnabled: true,
   });
+  const { takesFocusOnOpen, onFocused } = props;
   useEffect(() => {
-    regionRef.current?.focus();
-  }, []);
+    if (takesFocusOnOpen) {
+      regionRef.current?.focus();
+      onFocused();
+    }
+  }, [takesFocusOnOpen, onFocused]);
   const shown = plans.flatMap((plan, index) => {
     return !isOnlyTouched || plan.isTouched ? [{ index, plan }] : [];
   });

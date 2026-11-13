@@ -55,6 +55,8 @@ function _render() {
       })}
       lookups={makeApplyLookups()}
       onClose={onClose}
+      takesFocusOnOpen
+      onFocused={vi.fn()}
     />,
   );
   return onClose;
