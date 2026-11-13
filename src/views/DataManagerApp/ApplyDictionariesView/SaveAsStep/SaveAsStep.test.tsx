@@ -101,6 +101,17 @@ describe("SaveAsStep", () => {
     ).toBeInTheDocument();
   });
 
+  it("waits for the targets instead of offering an update", () => {
+    const flow = makeApplyFlow({ targets: undefined });
+    _render({ ...flow, state: { ...flow.state, saveTarget: undefined } });
+
+    expect(screen.queryByRole("radio")).toBeNull();
+    expect(screen.queryByText("Update Bronx line list")).toBeNull();
+    expect(
+      screen.getByRole("status", { name: "Loading save options" }),
+    ).toBeInTheDocument();
+  });
+
   it("updates a linked dataset's own conversions without cards", () => {
     const flow = makeApplyFlow({
       targets: { ...LINKED_ONLY_TARGETS, isLinkedDataset: true },

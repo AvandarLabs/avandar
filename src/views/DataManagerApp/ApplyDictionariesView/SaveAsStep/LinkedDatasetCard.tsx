@@ -24,7 +24,7 @@ function useDescription(
     case "dataset_limit":
       return t`Your plan's dataset limit is reached, so a linked dataset can't be added.`;
     case "already_linked":
-      return t`${datasetName} is already a linked dataset, so its conversions are updated in place.`;
+      return t`${datasetName} is already a linked dataset, so its conversions stay live.`;
   }
 }
 

@@ -1,6 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
+import { Center, Loader, Stack, Text } from "@mantine/core";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { isConvertingPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
@@ -76,27 +76,45 @@ function UpdateLinkedSection({
   );
 }
 
+/** A loader until the targets are known, then the cards or the update. */
+function SaveTargetSection(
+  props: Readonly<Props & { linkedDatasetName: string }>,
+): ReactNode {
+  const { t } = useLingui();
+  const { dataset, flow } = props;
+  const { targets } = flow;
+  if (!targets) {
+    return (
+      <Center role="status" aria-label={t`Loading save options`} py="lg">
+        <Loader size="sm" />
+      </Center>
+    );
+  }
+  if (targets.isLinkedDataset) {
+    return <UpdateLinkedSection datasetName={dataset.name} />;
+  }
+  return (
+    <SaveTargetCards
+      dataset={dataset}
+      targets={targets}
+      state={flow.state}
+      linkedDatasetName={props.linkedDatasetName}
+      dispatch={flow.dispatch}
+    />
+  );
+}
+
 function SaveAsBody(
   props: Readonly<
     Props & { linkedDatasetName: string; isLinkedTarget: boolean }
   >,
 ): ReactNode {
   const { dataset, flow } = props;
-  const { state, targets } = flow;
+  const { state } = flow;
   return (
     <AppViewBody>
       <Stack gap="xl">
-        {targets && !targets.isLinkedDataset ? (
-          <SaveTargetCards
-            dataset={dataset}
-            targets={targets}
-            state={state}
-            linkedDatasetName={props.linkedDatasetName}
-            dispatch={flow.dispatch}
-          />
-        ) : (
-          <UpdateLinkedSection datasetName={dataset.name} />
-        )}
+        <SaveTargetSection {...props} />
         <AppViewSection title={<Trans>Summary</Trans>} meta={props.summary}>
           <SaveSummaryTable
             datasetName={dataset.name}
