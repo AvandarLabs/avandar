@@ -10,10 +10,11 @@ import { notifyError } from "@/utils/notifications/notify";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /** Whether the user may apply dictionaries to the dataset yet. */
-export type ApplyAccess = "checking" | "allowed" | "denied";
+export type ApplyAccess = "checking" | "allowed" | "denied" | "failed";
 
 /**
- * Whether the user may apply dictionaries, or `checking` while their app
+ * Whether the user may apply dictionaries, `failed` when their role on the
+ * dataset could not be read, or `checking` while their app
  * roles or their role on the dataset are not known yet. A role query that
  * has not started yet reports no loading but no role either, so an
  * undefined role counts as unknown, while `null` means no access.
@@ -23,10 +24,13 @@ function useApplyPermission(dataset: Dataset.T | undefined): ApplyAccess {
   const canViewDictionaries = useHasPermission(
     "data_sources__can_view_dictionaries",
   );
-  const [role, isRoleLoading] = useResourceRole({
+  const [role, isRoleLoading, hasRoleFailed] = useResourceRole({
     resourceType: "dataset",
     resourceId: dataset?.id,
   });
+  if (hasRoleFailed) {
+    return "failed";
+  }
   if (
     !dataset ||
     areAppRolesLoading ||

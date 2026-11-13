@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => {
       canViewDictionaries: true,
       areAppRolesLoading: false,
       isRoleResolved: true,
+      hasRoleFailed: false,
     },
   };
 });
@@ -25,7 +26,11 @@ vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
         : mocks.access.canEdit
           ? "editor"
           : "viewer";
-      return [role, mocks.access.isLoading] as const;
+      return [
+        role,
+        mocks.access.isLoading,
+        mocks.access.hasRoleFailed,
+      ] as const;
     },
   };
 });
@@ -76,6 +81,7 @@ describe("useApplyAccess", () => {
       canViewDictionaries: true,
       areAppRolesLoading: false,
       isRoleResolved: true,
+      hasRoleFailed: false,
     };
   });
 
@@ -143,5 +149,19 @@ describe("useApplyAccess", () => {
 
     expect(result.current).toBe("checking");
     expect(mocks.notifyErrorMock).not.toHaveBeenCalled();
+  });
+
+  it("reports a failure when the dataset role cannot be read", () => {
+    mocks.access.isRoleResolved = false;
+    mocks.access.hasRoleFailed = true;
+    const { result } = renderHook(
+      () => {
+        return useApplyAccess(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    expect(result.current).toBe("failed");
+    expect(mocks.navigateMock).not.toHaveBeenCalled();
   });
 });

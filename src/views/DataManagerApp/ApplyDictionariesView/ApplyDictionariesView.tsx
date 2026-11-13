@@ -37,7 +37,7 @@ export function ApplyDictionariesView({
   const { t } = useLingui();
   const data = useApplyDictionariesData(datasetId);
   const access = useApplyAccess(data.dataset);
-  if (data.hasLoadFailed) {
+  if (data.hasLoadFailed || access === "failed") {
     return (
       <AppView>
         <Center flex={1} p="lg">
