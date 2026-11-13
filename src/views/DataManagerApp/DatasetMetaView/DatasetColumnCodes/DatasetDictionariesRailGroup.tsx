@@ -1,9 +1,11 @@
 import { Link } from "@avandar/ui";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { Text } from "@mantine/core";
+import { IconBook } from "@tabler/icons-react";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import css from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.module.css";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { ReactNode } from "react";
 
@@ -29,13 +31,13 @@ function _listDictionaries(
 }
 
 /**
- * The rail group naming each dictionary attached to a dataset and how it
- * was applied. Nothing renders while no dictionary is attached.
+ * The rail group naming each dictionary attached to a dataset, one row
+ * each, with how it was applied underneath. Nothing renders while no
+ * dictionary is attached.
  */
 export function DatasetDictionariesRailGroup({
   columnCodes,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const dictionaries = _listDictionaries(columnCodes);
   if (dictionaries.length === 0) {
@@ -50,14 +52,22 @@ export function DatasetDictionariesRailGroup({
           dictionaryName: dictionary.name,
         });
         return (
-          <AppViewRail.Fact key={dictionary.id} label={t`Dictionary`}>
-            <Link to={link.to} params={link.params} size="sm">
-              {dictionary.name}
-            </Link>
-            <Text component="span" display="block" size="xs" c="dimmed">
+          <div key={dictionary.id} className={css.dictionaryRow}>
+            <dt className={css.dictionaryName}>
+              <IconBook size={16} stroke={1.5} aria-hidden />
+              <Link to={link.to} params={link.params} size="sm">
+                {dictionary.name}
+              </Link>
+            </dt>
+            <Text
+              component="dd"
+              size="xs"
+              c="dimmed"
+              className={css.dictionaryNote}
+            >
               <Trans>Attached as reference · data unchanged</Trans>
             </Text>
-          </AppViewRail.Fact>
+          </div>
         );
       })}
     </AppViewRail.Group>

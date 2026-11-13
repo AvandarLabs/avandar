@@ -71,6 +71,20 @@ describe("DatasetDictionariesRailGroup", () => {
     );
   });
 
+  it("lists each dictionary as one row without a repeated label", () => {
+    const columnCodes = new Map([
+      ["col-gender", createCodes("col-gender", "sex")],
+    ]);
+
+    render(<DatasetDictionariesRailGroup columnCodes={columnCodes} />);
+
+    expect(screen.getByRole("term")).toHaveTextContent("NYS codes");
+    expect(screen.getByRole("definition")).toHaveTextContent(
+      "Attached as reference · data unchanged",
+    );
+    expect(screen.queryByText("Dictionary")).toBeNull();
+  });
+
   it("renders nothing while no dictionary is attached", () => {
     render(<DatasetDictionariesRailGroup columnCodes={new Map()} />);
 
