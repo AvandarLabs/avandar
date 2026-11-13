@@ -36,7 +36,7 @@
 }
 
 .previewCell[data-status="unmatched"] {
-  background-color: var(--mantine-color-warning-0);
+  background-color: var(--mantine-color-warning-light);
   text-decoration: underline dotted var(--mantine-color-warning-7);
   text-underline-offset: 3px;
 }

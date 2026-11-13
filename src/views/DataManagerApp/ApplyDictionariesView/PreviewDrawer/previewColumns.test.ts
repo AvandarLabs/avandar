@@ -35,11 +35,11 @@ describe("previewColumns", () => {
       unmatchedByColumnId: UNMATCHED,
     });
 
-    expect(plans.map((plan) => {return plan.column.name})).toEqual([
-      "GENDER",
-      "hosp_yn",
-      "county",
-    ]);
+    expect(
+      plans.map((plan) => {
+        return plan.column.name;
+      }),
+    ).toEqual(["GENDER", "hosp_yn", "county"]);
     expect(plans[0]?.conversion?.overrides).toEqual([
       { value: "8", action: "empty" },
     ]);
