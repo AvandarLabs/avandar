@@ -123,3 +123,11 @@ test("a camera curve that overshoots its framings is rejected", () => {
   ]);
   assert.match(_issuesOf(() => resolveVideoTheme(library, "bouncy-camera")), /^camera\.easing\.push: /m);
 });
+
+test("an elevation resolves to its shadow layers and colour", () => {
+  const floating = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").semantic.elevation.floating;
+  assert.deepEqual(floating, {
+    layers: [{ offsetX: 0, offsetY: 16, blur: 22, spread: 0, alpha: 1 }],
+    color: "#06101455",
+  });
+});

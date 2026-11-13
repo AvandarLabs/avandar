@@ -24,16 +24,6 @@ function _kebab(segment: string): string {
   return segment.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
 
-/** An elevation as the resolver stores it: its shadow field holds the layers. */
-type ResolvedElevationValue = Readonly<{
-  shadow: Pick<ResolvedElevation, "layers">;
-  color: string;
-}>;
-
-function _flattenElevation(value: ResolvedElevationValue): ResolvedElevation {
-  return { layers: value.shadow.layers, color: value.color };
-}
-
 function _typeStyleVariables(name: string, style: ResolvedTypeStyle): Record<string, string> {
   return {
     [`${name}-font-family`]: style.fontFamily,
@@ -69,13 +59,11 @@ function _variablesFromValue(kind: TokenKind, name: string, value: unknown): Rec
       const paint = value as ResolvedPaint;
       return { [name]: buildColorWithAlpha(paint.color, paint.alpha) };
     }
-    case "elevation": {
-      const elevation = _flattenElevation(value as ResolvedElevationValue);
+    case "elevation":
       return {
-        [`${name}-box-shadow`]: elevationToBoxShadow(elevation),
-        [`${name}-drop-shadow`]: elevationToDropShadowFilter(elevation),
+        [`${name}-box-shadow`]: elevationToBoxShadow(value as ResolvedElevation),
+        [`${name}-drop-shadow`]: elevationToDropShadowFilter(value as ResolvedElevation),
       };
-    }
     case "box":
       return Object.fromEntries(
         Object.entries(value as ResolvedBox).map(([side, pixels]) => [`${name}-${side}`, `${String(pixels)}px`]),

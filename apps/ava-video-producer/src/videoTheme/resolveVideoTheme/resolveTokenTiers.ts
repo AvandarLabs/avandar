@@ -147,6 +147,14 @@ function _finishTypeStyle(fields: UnknownRecord): unknown {
   };
 }
 
+function _finishElevation(fields: UnknownRecord): unknown {
+  const shadow = fields.shadow;
+  if (!_isRecord(shadow) || fields.color === undefined) {
+    return undefined;
+  }
+  return { layers: shadow.layers, color: fields.color };
+}
+
 function _resolveComposite(
   context: ResolutionContext,
   kind: CompositeTokenKind,
@@ -171,7 +179,10 @@ function _resolveComposite(
     }
     resolved[name] = _resolveValue(context, raw[name], field, `${path}.${name}`, stack);
   }
-  return kind === "typeStyle" ? _finishTypeStyle(resolved) : resolved;
+  if (kind === "typeStyle") {
+    return _finishTypeStyle(resolved);
+  }
+  return kind === "elevation" ? _finishElevation(resolved) : resolved;
 }
 
 function _resolveNode(
