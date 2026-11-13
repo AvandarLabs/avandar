@@ -224,7 +224,10 @@ described under "Questions and ground truth".
 ### Coded columns
 
 Runs on 2026-11-13 for dictionaries attached as reference, archived under the
-`attach-dictionaries` label. Prompt v4 lists each bound column's codes and
+`attach-dictionaries` label. These runs used the coded-column prompt before
+it was merged with the plugin AI tools: v3 plus CODED COLUMNS, then named v4.
+It ships as `data-agent-v5`, which also carries the plugin tools' v4 TOOLS
+bullet, and has not been rerun since. The prompt lists each bound column's codes and
 description on its own line under its dataset, the offline agent reads the
 code lists in its profile and question values, and `lookup_values` answers
 from a code list without running a query. The coded-column questions D01 to
@@ -275,7 +278,7 @@ under "Questions and ground truth".
   meaning. No run ran a query for it.
 - The offline run took 72.7 s on its first answer, which loads the model and
   profiles the data, and about 6 s per answer after that.
-- Prompt v4 adds about 400 to 430 input tokens per call over Phase 1B's v3
+- The coded-column prompt adds about 400 to 430 input tokens per call over Phase 1B's v3
   runs (3,904 against 3,478 on the 45 questions, +12%), all from the coded
   columns instructions, since the COVID datasets have no code lists. All
   online runs cost about $0.035.

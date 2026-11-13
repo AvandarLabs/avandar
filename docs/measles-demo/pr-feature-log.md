@@ -322,7 +322,7 @@ API. It's new work, not something this branch built.
 | after F91, F94, F57 | F128 | Makes F91's tray and the thread per session, adds tabs to F94's panel header, and starts a case-design session from F57's New case type controls. Its title excerpt masks F89 and F90's mention tokens. |
 | any | F129 | Adds its own tables, models, clients, route, and view, so it can merge first. It edits `DataManagerApp.tsx`, `DatasetNavbar.tsx`, and the generated schema files, so take only its hunks if F20 or F121 landed first. |
 | after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. Changes the save RPC's pair check (migration). Deploy the migration, then the `chat` edge function, then the frontend. |
-| after F130 | F131 | Builds on F129's tables and Dictionary view and F130's profiling, create flow, and dataset menu item. Adds the bindings table and the apply RPC (migration) and prompt `data-agent-v4`. Deploy the migration, then the `chat` edge function (it serves v4 and reads bindings, and the new frontend asks for v4), then the frontend. |
+| after F130 | F131 | Builds on F129's tables and Dictionary view and F130's profiling, create flow, and dataset menu item. Adds the bindings table and the apply RPC (migration) and prompt `data-agent-v5`, which is the plugin AI tools' `data-agent-v4` plus the coded-column rules. Deploy the migration, then the `chat` edge function (it serves v5 and reads bindings, and the new frontend asks for v5), then the frontend. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -534,13 +534,13 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/*` | F22, F89 | F22: the file itself (BUG-014). F89: tokens read as `@Name` (`c757b60a7`). |
 | `src/components/ChatPanel/useAvandarChatRuntime/{createChatModelAdapter,runDataAgentTurn,runOfflineDataAgentTurn,dataAgentTurnHelpers,agentPageContext,ChatAnalyticsPayloads}/**` | F81 to F85, F86 and F87, F89, F128 | F89: everything its commits add: the per-turn gadget load, mention naming off the agent path, offline answer marking, the mention and attached counts. F128: the title request after a reply, and case-manager context for case-design turns. |
 | `shared/agent/pageContext/{buildAgentPageContextBlock,buildAgentTurnText}.ts`, `buildAgentTurnText.test.ts` | F86 and F87, F89 | F89: the text helpers move to `agentBlockText.ts`, every block shares one redaction pass, and the turn text adds `<attached>` and `<mentioned>`. |
-| `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F81 to F85, F86 and F87, F89, F95, F131 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. F131: prompt `data-agent-v4` with a code list sub-line per bound column, served beside v3 (`03ca7f39c`, `5ba9698b6`). |
+| `shared/agent/dataAgent/{buildDataAgentSystemPrompt.ts,buildDataAgentSystemPrompt.test.ts,dataAgentTools.ts}` | F81 to F85, F86 and F87, F89, F95, F131 | F89: `ATTACHED_AND_MENTIONED_RULES`, `data-agent-v3` served and used. F95: `SCHEMA_ANSWER_RULES` appended to v3 and the `run_query` description. F131: prompt `data-agent-v5`, the plugin AI tools' v4 plus CODED COLUMNS, with a code list sub-line per bound column, served beside v1 to v4. v4 is SHA-pinned as shipped (`03ca7f39c`, `5ba9698b6`, `b60b9206d`). |
 | `shared/analytics/AnalyticsEvents/AnalyticsEvents.types.ts` | F86 and F87, F110 and F111 (`b3f267300`), F89 | F89: `mentionCount` and `attachedCount` on `ChatMessageSentPayload`. |
 | `scripts/ai-eval/{EvalQuestion.ts,runEval.ts,covid/covidQuestions.ts,runtime/gradeEvalAnswer.ts}`, `runtime/gradeEvalAnswer.test.ts` (new in F89) | F81 to F85, F86 and F87, F89, F95, F131 | F89: the `mentions` category, M01 to M06, and their grading. F95: the `schema` category, `gradeText`, S01 and S02. F131: the `coded` category and the coded-column runner options in `EvalQuestion.ts` and `runEval.ts` (`5ce5ba8a2`, `c567ca769`). |
 | `scripts/ai-eval/harnesses/pi/PiHarness.{ts,test.ts}`, `scripts/ai-eval/covid/covidPageQuestions.ts` | F81 to F85, F86 and F87, F89, F131 | F89: mention and tray context in the Pi harness; page question helpers move to `covidQuestionHelpers.ts`. F131: the column codes in the Pi harness's datasets (`5ce5ba8a2`). |
 | `scripts/ai-eval/harnesses/baseline/BaselineHarness.ts`, `src/lib/agent/dataAgent/{DataAgentRunState.ts,createDataAgent/createDataAgent.ts,createDataAgentTools/runQueryTool.ts}` | F81 to F85, F95 | F95: user texts kept across a run, and a schema turn answered without a query. |
 | `supabase/functions/chat/PostChatMessages/prompt/buildSystemPrompts.ts`, `supabase/functions/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts` | F22, F95 | F95: the schema paragraph after ANALYST CHECKS, and the `generateSql` description. |
-| `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v4` route (`03ca7f39c`). |
+| `tests/e2e/agent-chat-result.spec.ts` | F86 and F87, F89, F90, F91, F131 | F89: the `data-agent-v3` route (`29e2bd92a`). F90: the message box found by its "Message" label (`5f10894c5`). F91: the `openAgentChat` helper (`15369dc2b`). F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). |
 | `src/components/RichText/MentionMenu/{createMentionMenuSuggestion.ts,MentionMenuList/MentionMenuFooter.tsx,MentionMenuList/MentionMenuList.tsx}` | F21, F90 | F90: `variant: "chat"`: no people, an allowed-types filter, links only, one Enter hint, no audience hint. |
 | `docs/measles-demo/gadgets.md` | F21, F91 | F91: the chat `@` menu and tray paragraph, and the Notes line (`1f3bc348d`). |
 | `src/components/AppShell/AppShell.tsx`, `src/components/layouts/AppSlate/AppSlate.tsx` | F20, F94 | F20: `--ava-shell-main-offset-top`. F94: the `chat-fused` mod and the aside's z-index; the slate's `.frame` class. The hunks sit next to each other; apply by hand when F20 is not merged. |
@@ -660,7 +660,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/functions/chat/PostAgentStream/loadDataAgentDatasets.ts` | F82, F131 | F131: `loadColumnCodes` with the caller's own client (`90aac2562`). |
 | `src/lib/agent/dataAgent/offline/{profileOfflineDatasets,buildOfflineDataAgentSystemPrompt,findQuestionValues}/*.ts` | F82, F83, F131 | F131: code lists in the offline profile, question values matched by label, and the capped code lines (`513e88d44`, `5ba9698b6`). |
 | `scripts/ai-eval/harnesses/pi/PiLocalHarness.ts`, `scripts/ai-eval/runtime/EvalDatabase.ts` | F81, F83, F131 | F131: column codes in the local harness, and the measles workspace's bindings in the eval database (`5ce5ba8a2`, `c567ca769`). |
-| `tests/e2e/agent-chat-sessions.spec.ts`, `tests/e2e/agent-chat-mentions.spec.ts` | F91, F128, F131 | F91 owns mentions and F128 owns sessions. F131: the `data-agent-v4` route (`03ca7f39c`). |
+| `tests/e2e/agent-chat-sessions.spec.ts`, `tests/e2e/agent-chat-mentions.spec.ts` | F91, F128, F131 | F91 owns mentions and F128 owns sessions. F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). |
 | `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
 | `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). |
 | `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). |
@@ -10700,7 +10700,7 @@ on hover, focus, or click, tracks each separately, closes on Escape pressed on
 the tag, and scrolls a long list inside. The dataset rail and the dictionary's
 Used by tab show where a dictionary is applied, and the menu hides "Create a
 dictionary from this dataset" once one is. Ask Avandar reads the code lists
-online through prompt `data-agent-v4` and offline through its profile,
+online through prompt `data-agent-v5` and offline through its profile,
 question values, and `lookup_values`. Code lines cap each code and label at 60
 characters, spend at most 4,000 characters per prompt, and quote a label
 holding `,`, `=`, `[`, or `]`. The apply view refuses a dataset the user
@@ -10787,8 +10787,8 @@ female cases" becomes `"GENDER" = 2` without anyone remembering the code.
   `src/lib/ui/viz/DataGridColumnTitle/` (`ColumnCodesContext.ts`,
   `DataGridColumnTitle.tsx`), `src/views/DataExplorerApp/useExplorerColumnCodes/`,
   and `DataExplorerApp.tsx`.
-- Prompt v4 and the `chat` function (`03ca7f39c`, `90aac2562`, `5ba9698b6`,
-  `d8c0d6849`): `shared/agent/dataAgent/{buildDataAgentSystemPrompt,dataAgentTools}.ts`,
+- Prompt v5 and the `chat` function (`03ca7f39c`, `90aac2562`, `5ba9698b6`,
+  `d8c0d6849`, `b60b9206d`): `shared/agent/dataAgent/{buildDataAgentSystemPrompt,dataAgentTools}.ts`,
   `supabase/functions/chat/utils/loadColumnCodes/`,
   `PostAgentStream/loadDataAgentDatasets.ts`, and
   `PostChatMessages/schema/fetchWorkspaceSchema.ts`.
@@ -10807,13 +10807,16 @@ female cases" becomes `"GENDER" = 2` without anyone remembering the code.
   `scripts/ai-eval/measles/`, `EvalQuestion.ts`, `runEval.ts`,
   `runtime/EvalDatabase.ts`, `harnesses/pi/{PiHarness,PiLocalHarness}.ts`,
   `docs/ai-agent/eval.md`, and `docs/ai-agent/eval-runs/`. The coded-column
-  graders check only the count. The page and mention questions were rerun on
-  v4 to 7 of 7 after one P04 miss and one M05 grader false positive.
+  graders check only the count. The page and mention questions were rerun to
+  7 of 7 after one P04 miss and one M05 grader false positive. These runs
+  used the coded-column prompt before the merge with the plugin AI tools,
+  when it was v3 plus CODED COLUMNS and named v4. It ships as v5, which also
+  carries v4's plugin-tool bullet, and has not been rerun.
 - E2E (`03ca7f39c`, `d6f624f77`, `8cd68ca59`, `0a70cfcc6`):
   `tests/e2e/dictionary-apply-reference.spec.ts` (new),
   `tests/e2e/helpers/seedDataDictionary.ts` (new),
   `dictionary-create-from-dataset.spec.ts` (saving opens Apply first), and
-  `agent-chat-{result,sessions,mentions}.spec.ts` (the `data-agent-v4` route).
+  `agent-chat-{result,sessions,mentions}.spec.ts` (the `data-agent-v5` route).
 - Translations (`2cbf5c9a4`): `src/i18n/locales/*/messages.{po,ts}`,
   regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
 - Generated: `shared/types/database.types.ts` (`pnpm db:gen-types`).
@@ -10828,8 +10831,9 @@ whole and accepts `reference` only. Plus its desktop SQLite twin and the table
 in `apps/desktop/sync/syncable-tables.ts`.
 
 **Deploy:** the migration first, then the `chat` edge function, then the
-frontend. Tabs opened before the deploy keep asking for v3, which the
-function still serves.
+frontend. The plugin AI tools' prompt `data-agent-v4` must be deployed first
+or in the same deploy, since v5 builds on it. Tabs opened before the deploy
+keep asking for v3 or v4, which the function still serves.
 
 **Known gaps:** conversions, linked datasets, unmatched values, the preview
 drawer, Re-apply, and the synced-data warning are slice 4. Crosswalks are
