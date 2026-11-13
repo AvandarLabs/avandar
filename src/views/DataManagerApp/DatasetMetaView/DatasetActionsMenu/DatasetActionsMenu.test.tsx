@@ -12,6 +12,7 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       canViewDictionaries: true,
       canEditDataset: true,
       hasBindings: false,
+      hasBindingsError: false,
     },
   };
 });
@@ -37,7 +38,11 @@ vi.mock("@/hooks/datasets/useCanEditDataset/useCanEditDataset", () => {
 vi.mock("@/hooks/dataDictionaries/useDatasetHasBindings", () => {
   return {
     useDatasetHasBindings: () => {
-      return { hasBindings: permissionState.hasBindings, isLoading: false };
+      return {
+        hasBindings: permissionState.hasBindings,
+        isLoading: false,
+        isError: permissionState.hasBindingsError,
+      };
     },
   };
 });
@@ -110,6 +115,7 @@ describe("DatasetActionsMenu", () => {
     permissionState.canViewDictionaries = true;
     permissionState.canEditDataset = true;
     permissionState.hasBindings = false;
+    permissionState.hasBindingsError = false;
   });
 
   it("opens learning a dictionary from this dataset", async () => {
@@ -177,6 +183,22 @@ describe("DatasetActionsMenu", () => {
 
   it("stops offering to learn a dictionary once one is attached", async () => {
     permissionState.hasBindings = true;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+    expect(
+      await screen.findByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", {
+        name: /Create a dictionary from this dataset/,
+      }),
+    ).toBeNull();
+  });
+
+  it("does not offer to learn a dictionary when the bindings cannot be read", async () => {
+    permissionState.hasBindingsError = true;
     render(<DatasetActionsMenu dataset={DATASET} />);
     fireEvent.click(
       screen.getByRole("button", { name: "More dataset actions" }),

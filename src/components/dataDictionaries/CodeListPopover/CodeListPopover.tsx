@@ -2,6 +2,7 @@ import { ActionIcon } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Popover } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
+import css from "@/components/dataDictionaries/CodeListPopover/CodeListPopover.module.css";
 import { CodeListPopoverContent } from "@/components/dataDictionaries/CodeListPopover/CodeListPopoverContent";
 import { useHoverOrFocusOpen } from "@/components/dataDictionaries/CodeListPopover/useHoverOrFocusOpen";
 import { POPOVER_Z_INDEX } from "@/config/Theme/Theme";
@@ -31,7 +32,7 @@ export function CodeListPopover({
     <Popover
       opened={popover.isOpen}
       onChange={(isOpen) => {
-        return isOpen ? popover.open() : popover.close();
+        return isOpen ? popover.onClick() : popover.close();
       }}
       position="bottom-start"
       width={300}
@@ -46,14 +47,22 @@ export function CodeListPopover({
           color="neutral"
           size="sm"
           aria-label={label}
-          onMouseEnter={popover.open}
-          onMouseLeave={popover.closeSoon}
-          onFocus={popover.open}
-          onBlur={popover.closeSoon}
+          onMouseEnter={popover.onPointerEnter}
+          onMouseLeave={popover.onPointerLeave}
+          onFocus={popover.onFocus}
+          onBlur={popover.onBlur}
           onClick={(event) => {
             // In a grid header, a click that bubbles up would sort the column.
             event.stopPropagation();
-            popover.open();
+            popover.onClick();
+          }}
+          onKeyDown={(event) => {
+            // The dropdown only hears Escape when it has focus, and a
+            // popover opened from the keyboard leaves focus on the tag.
+            if (event.key === "Escape" && popover.isOpen) {
+              event.stopPropagation();
+              popover.close();
+            }
           }}
         >
           <IconTag size={14} aria-hidden />
@@ -61,8 +70,9 @@ export function CodeListPopover({
       </Popover.Target>
       <Popover.Dropdown
         aria-label={label}
-        onMouseEnter={popover.open}
-        onMouseLeave={popover.closeSoon}
+        className={css.codeListPopoverDropdown}
+        onMouseEnter={popover.onPointerEnter}
+        onMouseLeave={popover.onPointerLeave}
       >
         <CodeListPopoverContent codes={codes} />
       </Popover.Dropdown>

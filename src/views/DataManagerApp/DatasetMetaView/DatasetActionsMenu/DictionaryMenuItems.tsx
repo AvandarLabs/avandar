@@ -14,8 +14,9 @@ type Props = {
 /**
  * The dataset menu's dictionary actions, and a divider after them when any
  * shows. Apply shows to someone who can edit the dataset and read
- * dictionaries. Create shows to a dictionary editor while no dictionary is
- * attached to the dataset, and not while that is still loading.
+ * dictionaries. Create shows to a dictionary editor once the bindings are
+ * read and no dictionary is attached: not while they load, and not when
+ * they cannot be read. Neither shows while its check is still loading.
  */
 export function DictionaryMenuItems({ datasetId }: Readonly<Props>): ReactNode {
   const canViewDictionaries = useHasPermission(
@@ -24,10 +25,15 @@ export function DictionaryMenuItems({ datasetId }: Readonly<Props>): ReactNode {
   const canEditDictionaries = useHasPermission(
     "data_sources__can_edit_dictionaries",
   );
-  const { canEdit } = useCanEditDataset(datasetId);
-  const { hasBindings, isLoading } = useDatasetHasBindings(datasetId);
-  const canApply = canEdit && canViewDictionaries;
-  const canCreate = canEditDictionaries && !isLoading && !hasBindings;
+  const editRights = useCanEditDataset(datasetId);
+  const bindings = useDatasetHasBindings(datasetId);
+  const canApply =
+    !editRights.isLoading && editRights.canEdit && canViewDictionaries;
+  const canCreate =
+    canEditDictionaries &&
+    !bindings.isLoading &&
+    !bindings.isError &&
+    !bindings.hasBindings;
   if (!canApply && !canCreate) {
     return null;
   }

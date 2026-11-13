@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 
 /**
- * The Columns section's count: `22`, or `22 · 7 with a code list: hover
+ * The Columns section's count: `22`, or `22 · 7 with a code list: open
  * the tag to read it` once dictionaries are attached. Undefined until the
  * columns load.
  */
@@ -25,8 +25,8 @@ export function useColumnsSectionMeta(
     return columnCountText;
   }
   const codedText = plural(codedCount, {
-    one: "# with a code list: hover the tag to read it",
-    other: "# with a code list: hover the tag to read it",
+    one: "# with a code list: open the tag to read it",
+    other: "# with a code list: open the tag to read it",
   });
   return t`${columnCountText} · ${codedText}`;
 }

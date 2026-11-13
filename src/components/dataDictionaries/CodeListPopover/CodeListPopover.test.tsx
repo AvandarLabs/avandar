@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CodeListPopover } from "@/components/dataDictionaries/CodeListPopover/CodeListPopover";
-import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import { act, fireEvent, render, screen, waitFor } from "@/test-utils";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 
 const CODES: ColumnCodes.T = {
@@ -47,16 +47,38 @@ describe("CodeListPopover", () => {
     expect(await screen.findByText("No label yet")).toBeInTheDocument();
   });
 
-  it("closes on Escape", async () => {
+  it("closes on Escape while the tag has focus", async () => {
     render(<CodeListPopover columnName="GENDER" codes={CODES} />);
     const tag = screen.getByRole("button", { name: "Code list for GENDER" });
-    fireEvent.click(tag);
-    const dialog = await screen.findByRole("dialog");
+    fireEvent.focus(tag);
+    await screen.findByRole("dialog");
 
-    fireEvent.keyDown(dialog, { key: "Escape" });
+    fireEvent.keyDown(tag, { key: "Escape" });
 
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).toBeNull();
     });
+  });
+
+  it("stays open while the tag has focus and the pointer leaves", async () => {
+    vi.useFakeTimers();
+    try {
+      render(<CodeListPopover columnName="GENDER" codes={CODES} />);
+      const tag = screen.getByRole("button", {
+        name: "Code list for GENDER",
+      });
+      fireEvent.focus(tag);
+      fireEvent.mouseEnter(tag);
+      fireEvent.mouseLeave(tag);
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(
+        screen.getByRole("dialog", { name: "Code list for GENDER" }),
+      ).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
