@@ -149,7 +149,10 @@ test.describe("learning a dictionary from a dataset", () => {
         page.getByRole("button", { name: `Stop using ${DICTIONARY_NAME}` }),
       ).toBeVisible({ timeout: LONG_WAIT });
       const applyHeader = page.locator("header").filter({
-        has: page.getByRole("heading", { name: /^Apply dictionaries to / }),
+        has: page.getByRole("heading", {
+          name: "Apply dictionaries",
+          exact: true,
+        }),
       });
       await applyHeader.getByRole("button", { name: "Cancel" }).click();
       await page

@@ -1,3 +1,4 @@
+import { Link } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
@@ -13,9 +14,9 @@ type Props = {
 };
 
 /**
- * The apply flow's header band: which dataset the dictionaries are for, how
- * many columns each kind of pick covers, and Cancel, which goes back to the
- * dataset.
+ * The apply flow's header band: a breadcrumb back to the dataset the
+ * dictionaries are for, how many columns each kind of pick covers, and
+ * Cancel, which goes back to the dataset.
  */
 export function ApplyDictionariesHeader({
   dataset,
@@ -25,21 +26,28 @@ export function ApplyDictionariesHeader({
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const datasetName = dataset.name;
+  const datasetLink = AppLinks.dataManagerDatasetView({
+    workspaceSlug: workspace.slug,
+    datasetId: dataset.id,
+    datasetName,
+  });
   return (
     <AppViewHeader
-      title={t`Apply dictionaries to ${datasetName}`}
+      breadcrumb={
+        <nav aria-label={t`Breadcrumb`}>
+          <Link to={datasetLink.to} params={datasetLink.params} size="xs">
+            {datasetName}
+          </Link>
+          <span aria-hidden> ›</span>
+        </nav>
+      }
+      title={t`Apply dictionaries`}
       facts={facts}
       actions={
         <Button
           variant="default"
           onClick={() => {
-            navigate(
-              AppLinks.dataManagerDatasetView({
-                workspaceSlug: workspace.slug,
-                datasetId: dataset.id,
-                datasetName,
-              }),
-            );
+            navigate(datasetLink);
           }}
         >
           <Trans>Cancel</Trans>
