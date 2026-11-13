@@ -57,6 +57,14 @@ describe("getVirtualRelationDefinitions", () => {
     });
   });
 
+  it("finds no definitions when the virtual records cannot be read, so an uploaded dataset is still served", async () => {
+    virtualGetAllMock.mockRejectedValue(new Error("Failed to fetch"));
+
+    await expect(getVirtualRelationDefinitions([UPLOAD_ID])).resolves.toEqual(
+      {},
+    );
+  });
+
   it("makes the same definition from the same SQL", () => {
     expect(makeVirtualRelationDefinition("SELECT 1")).toEqual({
       kind: "virtual_sql",

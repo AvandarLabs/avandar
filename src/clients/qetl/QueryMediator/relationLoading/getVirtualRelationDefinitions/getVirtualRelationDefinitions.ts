@@ -1,6 +1,7 @@
 import { where } from "@avandar/utils";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { LogicalDefinition } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 
@@ -23,6 +24,10 @@ export function makeVirtualRelationDefinition(
  * stored under it come from the same SQL. Other datasets are left out: they
  * have no defining text. Used by the query runner before it probes the
  * storage tier.
+ *
+ * A failed read is logged and finds no definitions, so the query still runs:
+ * every other dataset is served as before, and a virtual dataset probes with
+ * no definition, misses, and is acquired from its source.
  */
 export async function getVirtualRelationDefinitions(
   datasetIds: readonly Dataset.Id[],
@@ -30,12 +35,20 @@ export async function getVirtualRelationDefinitions(
   if (datasetIds.length === 0) {
     return {};
   }
-  const sources = await VirtualDatasetClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(where("dataset_id", "in", datasetIds));
-  return Object.fromEntries(
-    sources.map((source) => {
-      return [source.datasetId, makeVirtualRelationDefinition(source.rawSql)];
-    }),
-  );
+  try {
+    const sources = await VirtualDatasetClient.withCache(AvaQueryClient)
+      .withEnsureQueryData()
+      .getAll(where("dataset_id", "in", datasetIds));
+    return Object.fromEntries(
+      sources.map((source) => {
+        return [source.datasetId, makeVirtualRelationDefinition(source.rawSql)];
+      }),
+    );
+  } catch (error) {
+    Logger.error(
+      "Could not read virtual dataset definitions; the query runs without them",
+      { error },
+    );
+    return {};
+  }
 }
