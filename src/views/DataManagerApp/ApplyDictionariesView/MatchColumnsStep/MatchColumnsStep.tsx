@@ -10,8 +10,12 @@ import { PairingSelectTable } from "@/views/DataManagerApp/ApplyDictionariesView
 import { PairingTable } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingTable";
 import { UnmatchedColumnsToggle } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/UnmatchedColumnsToggle";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
-import type { ApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
+import type {
+  ApplyColumnRow,
+  ApplyFlow,
+} from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 import type { ReactNode } from "react";
 
 /** Past this many dictionaries in use, one Select replaces a column each. */
@@ -35,12 +39,64 @@ function _getDictionariesInUse(props: Readonly<Props>): DataDictionary.T[] {
   });
 }
 
+/** The pairing table, or the empty state, and the unmatched toggle. */
+function PairingColumn(
+  props: Readonly<{
+    flow: ApplyFlow;
+    inUse: readonly DataDictionary.T[];
+    rows: readonly ApplyColumnRow[];
+  }>,
+): ReactNode {
+  const { state, dispatch } = props.flow;
+  const Pairing =
+    props.inUse.length > MAX_DICTIONARY_COLUMNS
+      ? PairingSelectTable
+      : PairingTable;
+  return (
+    <Stack gap="sm" id={PAIRING_TABLE_ID}>
+      {props.inUse.length === 0 && props.rows.length === 0 ? (
+        <NoDictionaryInUse />
+      ) : (
+        <Pairing
+          rows={props.rows}
+          dictionaries={props.inUse}
+          state={state}
+          dispatch={dispatch}
+        />
+      )}
+      <UnmatchedColumnsToggle
+        count={props.flow.unmatchedRows.length}
+        isShowing={state.isShowingUnmatched}
+        tableId={PAIRING_TABLE_ID}
+        onToggle={() => {
+          dispatch({ type: "toggle_unmatched" });
+        }}
+      />
+    </Stack>
+  );
+}
+
+/** The selected column's pane, beside the pairing table. */
+function SelectedColumnPane(
+  props: Readonly<{
+    row: ApplyColumnRow;
+    pick: ColumnPick | undefined;
+    lookups: ApplyLookups;
+  }>,
+): ReactNode {
+  const { t } = useLingui();
+  return (
+    <aside className={css.matchColumnsPane} aria-label={t`Selected column`}>
+      <ColumnPane row={props.row} pick={props.pick} lookups={props.lookups} />
+    </aside>
+  );
+}
+
 /**
  * The Match columns step: the dictionaries in use, one row per matched
  * column with its picks, and the selected column's pane.
  */
 export function MatchColumnsStep(props: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
   const { state, dispatch } = props.flow;
   const inUse = _getDictionariesInUse(props);
   const rows = state.isShowingUnmatched
@@ -49,8 +105,6 @@ export function MatchColumnsStep(props: Readonly<Props>): ReactNode {
   const selected = rows.find((row) => {
     return row.column.id === state.selectedColumnId;
   });
-  const Pairing =
-    inUse.length > MAX_DICTIONARY_COLUMNS ? PairingSelectTable : PairingTable;
   return (
     <>
       <DictionaryChips
@@ -66,37 +120,13 @@ export function MatchColumnsStep(props: Readonly<Props>): ReactNode {
           className={css.matchColumns}
           data-has-pane={selected !== undefined}
         >
-          <Stack gap="sm" id={PAIRING_TABLE_ID}>
-            {inUse.length === 0 && rows.length === 0 ? (
-              <NoDictionaryInUse />
-            ) : (
-              <Pairing
-                rows={rows}
-                dictionaries={inUse}
-                state={state}
-                dispatch={dispatch}
-              />
-            )}
-            <UnmatchedColumnsToggle
-              count={props.flow.unmatchedRows.length}
-              isShowing={state.isShowingUnmatched}
-              tableId={PAIRING_TABLE_ID}
-              onToggle={() => {
-                dispatch({ type: "toggle_unmatched" });
-              }}
-            />
-          </Stack>
+          <PairingColumn flow={props.flow} inUse={inUse} rows={rows} />
           {selected ? (
-            <aside
-              className={css.matchColumnsPane}
-              aria-label={t`Selected column`}
-            >
-              <ColumnPane
-                row={selected}
-                pick={state.picks[selected.column.id]}
-                lookups={props.lookups}
-              />
-            </aside>
+            <SelectedColumnPane
+              row={selected}
+              pick={state.picks[selected.column.id]}
+              lookups={props.lookups}
+            />
           ) : null}
         </div>
       </AppViewBody>

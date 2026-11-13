@@ -22,15 +22,16 @@ export type ApplyDictionariesData = WorkspaceDictionaryContents & {
   matchEntries: readonly DictionaryMatch.Entry[];
 };
 
-/**
- * Loads one dataset, its columns, its current bindings, and every
- * dictionary in the workspace, for the apply flow. Bindings refetch on
- * mount, since this flow is what changes them.
- */
-export function useApplyDictionariesData(
-  datasetId: Dataset.Id,
-): ApplyDictionariesData {
-  const workspace = useCurrentWorkspace();
+const NO_BINDINGS: readonly DictionaryBinding.T[] = [];
+
+/** One dataset, its columns in order, and its bindings. */
+function useDatasetWithBindings(datasetId: Dataset.Id): {
+  dataset: Dataset.T | undefined;
+  columns: readonly DatasetColumn.T[] | undefined;
+  existingBindings: readonly DictionaryBinding.T[];
+  isLoading: boolean;
+  hasLoadFailed: boolean;
+} {
   const ofDataset = {
     ...where("dataset_id", "eq", datasetId),
     useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
@@ -39,7 +40,6 @@ export function useApplyDictionariesData(
   const [columns, , columnsQuery] = DatasetColumnClient.useGetAll(ofDataset);
   const [bindings, , bindingsQuery] =
     DictionaryBindingClient.useGetAll(ofDataset);
-  const contents = useWorkspaceDictionaryContents(workspace.id);
   const sortedColumns = useMemo(() => {
     return columns
       ? [...columns].sort((columnA, columnB) => {
@@ -47,8 +47,23 @@ export function useApplyDictionariesData(
         })
       : undefined;
   }, [columns]);
+  return {
+    dataset,
+    columns: sortedColumns,
+    existingBindings: bindings ?? NO_BINDINGS,
+    isLoading: !dataset || !columns || !bindings,
+    hasLoadFailed: [datasetQuery, columnsQuery, bindingsQuery].some((query) => {
+      return query.isLoadingError;
+    }),
+  };
+}
+
+/** Every entry of every dictionary, ready to match, built once per change. */
+function useMatchEntries(
+  contents: Readonly<WorkspaceDictionaryContents>,
+): readonly DictionaryMatch.Entry[] {
   const { dictionaries, entries, codeLists, codings } = contents;
-  const matchEntries = useMemo(() => {
+  return useMemo(() => {
     return DictionaryMatch.toMatchEntries({
       dictionaries,
       entries,
@@ -56,18 +71,49 @@ export function useApplyDictionariesData(
       codings,
     });
   }, [dictionaries, entries, codeLists, codings]);
-  const ownQueries = [datasetQuery, columnsQuery, bindingsQuery];
-  return {
-    ...contents,
-    dataset,
-    columns: sortedColumns,
-    existingBindings: bindings ?? [],
+}
+
+/**
+ * Loads one dataset, its columns, its current bindings, and every
+ * dictionary in the workspace, for the apply flow. Bindings refetch on
+ * mount, since this flow is what changes them. The result is one object
+ * per change of what it holds, so the flow's memos and its first-selection
+ * effect do not rerun on every render.
+ */
+export function useApplyDictionariesData(
+  datasetId: Dataset.Id,
+): ApplyDictionariesData {
+  const workspace = useCurrentWorkspace();
+  const own = useDatasetWithBindings(datasetId);
+  const contents = useWorkspaceDictionaryContents(workspace.id);
+  const { dictionaries, entries, codeLists, codings } = contents;
+  const matchEntries = useMatchEntries(contents);
+  const { dataset, columns, existingBindings } = own;
+  const isLoading = contents.isLoading || own.isLoading;
+  const hasLoadFailed = contents.hasLoadFailed || own.hasLoadFailed;
+  return useMemo(() => {
+    return {
+      dictionaries,
+      entries,
+      codeLists,
+      codings,
+      matchEntries,
+      dataset,
+      columns,
+      existingBindings,
+      isLoading,
+      hasLoadFailed,
+    };
+  }, [
+    dictionaries,
+    entries,
+    codeLists,
+    codings,
     matchEntries,
-    isLoading: contents.isLoading || !dataset || !columns || !bindings,
-    hasLoadFailed:
-      contents.hasLoadFailed ||
-      ownQueries.some((query) => {
-        return query.isLoadingError;
-      }),
-  };
+    dataset,
+    columns,
+    existingBindings,
+    isLoading,
+    hasLoadFailed,
+  ]);
 }

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { makeInitialApplyState } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import { AttachStep } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep";
@@ -67,6 +67,10 @@ function _render(
 }
 
 describe("AttachStep", () => {
+  beforeEach(() => {
+    attachMock.mockClear();
+  });
+
   it("attaches each pick as reference", () => {
     _render({ [GENDER.id]: PICK });
 
@@ -87,10 +91,12 @@ describe("AttachStep", () => {
   it("offers to remove the dictionaries when every pick was cleared", () => {
     _render({}, [{ datasetColumnId: GENDER.id } as DictionaryBinding.T]);
 
-    expect(
-      screen.getByRole("button", {
-        name: "Remove dictionaries from Kings line list",
-      }),
-    ).toBeEnabled();
+    const removeButton = screen.getByRole("button", {
+      name: "Remove dictionaries from Kings line list",
+    });
+    expect(removeButton).toBeEnabled();
+    fireEvent.click(removeButton);
+
+    expect(attachMock).toHaveBeenCalledWith([]);
   });
 });

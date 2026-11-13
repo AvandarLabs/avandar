@@ -7,17 +7,34 @@ const mocks = vi.hoisted(() => {
   return {
     navigateMock: vi.fn(),
     notifyErrorMock: vi.fn(),
-    access: { canEdit: true, isLoading: false, canViewDictionaries: true },
+    access: {
+      canEdit: true,
+      isLoading: false,
+      canViewDictionaries: true,
+      areAppRolesLoading: false,
+      isRoleResolved: true,
+    },
   };
 });
 
-vi.mock("@/hooks/datasets/useCanEditDataset/useCanEditDataset", () => {
+vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {
-    useCanEditDataset: () => {
-      return {
-        canEdit: mocks.access.canEdit,
-        isLoading: mocks.access.isLoading,
-      };
+    useResourceRole: () => {
+      const role = !mocks.access.isRoleResolved
+        ? undefined
+        : mocks.access.canEdit
+          ? "editor"
+          : "viewer";
+      return [role, mocks.access.isLoading] as const;
+    },
+  };
+});
+vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
+  return {
+    useUserAppRoles: () => {
+      return mocks.access.areAppRolesLoading
+        ? ([undefined, true] as const)
+        : ([{}, false] as const);
     },
   };
 });
@@ -57,6 +74,8 @@ describe("useApplyAccess", () => {
       canEdit: true,
       isLoading: false,
       canViewDictionaries: true,
+      areAppRolesLoading: false,
+      isRoleResolved: true,
     };
   });
 
@@ -97,5 +116,32 @@ describe("useApplyAccess", () => {
     );
 
     expect(result.current).toBe("checking");
+  });
+
+  it("waits while app roles load", () => {
+    mocks.access.areAppRolesLoading = true;
+    mocks.access.canViewDictionaries = false;
+    const { result } = renderHook(
+      () => {
+        return useApplyAccess(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    expect(result.current).toBe("checking");
+    expect(mocks.navigateMock).not.toHaveBeenCalled();
+  });
+
+  it("waits until the dataset role has been read", () => {
+    mocks.access.isRoleResolved = false;
+    const { result } = renderHook(
+      () => {
+        return useApplyAccess(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    expect(result.current).toBe("checking");
+    expect(mocks.notifyErrorMock).not.toHaveBeenCalled();
   });
 });

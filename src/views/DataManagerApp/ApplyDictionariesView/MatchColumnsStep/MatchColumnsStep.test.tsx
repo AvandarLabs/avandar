@@ -88,6 +88,46 @@ describe("MatchColumnsStep", () => {
     });
   });
 
+  it("shows the picked entry when it is not the dictionary's top match", () => {
+    const genderMatch: DictionaryMatch.T = {
+      ...SEX_MATCH,
+      entryId: "entry-gender" as DataDictionaryEntry.Id,
+      entryName: "gender",
+      codeListName: "Gender (M/F)",
+      score: 0.6,
+    };
+    const flow = _flow(1);
+    const withPick: ApplyFlow = {
+      ...flow,
+      state: {
+        ...flow.state,
+        picks: {
+          [GENDER.id]: {
+            dictionaryId: NYS,
+            entryId: genderMatch.entryId,
+            codeListId: genderMatch.codeListId,
+            direction: "decode",
+          },
+        },
+      },
+      rows: [
+        {
+          column: GENDER,
+          profile: undefined,
+          matches: [SEX_MATCH, genderMatch],
+        },
+      ],
+    };
+    _render(withPick);
+
+    expect(
+      screen.getByRole("button", { name: /gender · Gender \(M\/F\)/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.queryByRole("button", { name: /sex · Sex \(1\/2\/9\)/ }),
+    ).not.toBeInTheDocument();
+  });
+
   it("uses one Select per column past three dictionaries", () => {
     _render(_flow(4));
 

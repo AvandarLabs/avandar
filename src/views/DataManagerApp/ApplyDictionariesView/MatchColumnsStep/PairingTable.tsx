@@ -6,9 +6,11 @@ import { ColumnNameCell } from "@/views/DataManagerApp/ApplyDictionariesView/Mat
 import css from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsStep.module.css";
 import { MatchPickButton } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchPickButton";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
 import type {
   ApplyDictionariesAction,
   ApplyDictionariesState,
+  ColumnPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ApplyColumnRow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 import type { Dispatch, ReactNode } from "react";
@@ -20,6 +22,58 @@ type Props = {
   state: ApplyDictionariesState;
   dispatch: Dispatch<ApplyDictionariesAction>;
 };
+
+type CellProps = {
+  row: ApplyColumnRow;
+  dictionaryId: DataDictionary.Id;
+  nameId: string;
+  pick: ColumnPick | undefined;
+  dispatch: Dispatch<ApplyDictionariesAction>;
+};
+
+/**
+ * The match a dictionary's cell shows: the column's pick when it comes from
+ * this dictionary, so a picked entry is never hidden behind a better-ranked
+ * one, else the dictionary's best match.
+ */
+function _findCellMatch(
+  props: Readonly<CellProps>,
+): DictionaryMatch.T | undefined {
+  const matches = props.row.matches.filter((match) => {
+    return match.dictionaryId === props.dictionaryId;
+  });
+  return (
+    matches.find((match) => {
+      return isSamePick(props.pick, toColumnPick(match));
+    }) ?? matches[0]
+  );
+}
+
+function PairingCell(props: Readonly<CellProps>): ReactNode {
+  const match = _findCellMatch(props);
+  if (!match) {
+    return (
+      <Text size="sm" c="dimmed">
+        <Trans>No match</Trans>
+      </Text>
+    );
+  }
+  const columnId = props.row.column.id;
+  return (
+    <MatchPickButton
+      match={match}
+      isPicked={isSamePick(props.pick, toColumnPick(match))}
+      describedById={props.nameId}
+      onPick={() => {
+        props.dispatch({
+          type: "toggle_pick",
+          columnId,
+          pick: toColumnPick(match),
+        });
+      }}
+    />
+  );
+}
 
 function PairingRow(
   props: Readonly<Omit<Props, "rows"> & { row: ApplyColumnRow }>,
@@ -43,32 +97,15 @@ function PairingRow(
         />
       </Table.Td>
       {props.dictionaries.map((dictionary) => {
-        const match = row.matches.find((candidate) => {
-          return candidate.dictionaryId === dictionary.id;
-        });
         return (
           <Table.Td key={dictionary.id}>
-            {match ? (
-              <MatchPickButton
-                match={match}
-                isPicked={isSamePick(
-                  state.picks[columnId],
-                  toColumnPick(match),
-                )}
-                describedById={nameId}
-                onPick={() => {
-                  dispatch({
-                    type: "toggle_pick",
-                    columnId,
-                    pick: toColumnPick(match),
-                  });
-                }}
-              />
-            ) : (
-              <Text size="sm" c="dimmed">
-                <Trans>No match</Trans>
-              </Text>
-            )}
+            <PairingCell
+              row={row}
+              dictionaryId={dictionary.id}
+              nameId={nameId}
+              pick={state.picks[columnId]}
+              dispatch={dispatch}
+            />
           </Table.Td>
         );
       })}

@@ -15,6 +15,33 @@ export type DatasetProfiles =
 /** A read and the dataset and columns it is for. */
 type TaggedRead = { key: string | undefined; profiles: DatasetProfiles };
 
+/** The tag of a read: the dataset and each column's id and name. */
+function _buildReadKey(
+  dataset: Dataset.T | undefined,
+  columns: readonly DatasetColumn.T[] | undefined,
+): string | undefined {
+  if (!dataset || !columns) {
+    return undefined;
+  }
+  const columnKeys = columns.map((column) => {
+    return `${column.id}=${column.name}`;
+  });
+  return `${dataset.id}:${columnKeys.join(",")}`;
+}
+
+/** The columns to profile, in the dataset's order. */
+function _toProfileColumns(
+  columns: readonly DatasetColumn.T[],
+): Array<{ name: string; dataType: DatasetColumn.T["dataType"] }> {
+  return [...columns]
+    .sort((columnA, columnB) => {
+      return columnA.columnIdx - columnB.columnIdx;
+    })
+    .map((column) => {
+      return { name: column.name, dataType: column.dataType };
+    });
+}
+
 /**
  * Reads one dataset's columns on this device: their values and row counts,
  * for matching them to dictionary entries. A read that finishes after the
@@ -28,14 +55,7 @@ export function useDatasetProfiles(
 ): DatasetProfiles {
   const workspace = useCurrentWorkspace();
   const { dataset, columns } = options;
-  const key =
-    dataset && columns
-      ? `${dataset.id}:${columns
-          .map((column) => {
-            return `${column.id}=${column.name}`;
-          })
-          .join(",")}`
-      : undefined;
+  const key = _buildReadKey(dataset, columns);
   const [read, setRead] = useState<TaggedRead>({
     key: undefined,
     profiles: { status: "reading" },
@@ -49,13 +69,7 @@ export function useDatasetProfiles(
     profileDatasetColumns({
       workspaceId: workspace.id,
       dataset,
-      columns: [...columns]
-        .sort((columnA, columnB) => {
-          return columnA.columnIdx - columnB.columnIdx;
-        })
-        .map((column) => {
-          return { name: column.name, dataType: column.dataType };
-        }),
+      columns: _toProfileColumns(columns),
     })
       .then((profiles) => {
         if (isCurrent) {

@@ -13,6 +13,31 @@ type Props = {
   onRemove: (dictionaryId: DataDictionary.Id) => void;
 };
 
+/** One dictionary in use, with a button to stop using it. */
+function DictionaryChip(
+  props: Readonly<{ name: string; onRemove: () => void }>,
+): ReactNode {
+  const { t } = useLingui();
+  const { name } = props;
+  return (
+    <Pill
+      size="md"
+      withRemoveButton
+      onRemove={props.onRemove}
+      // Pill hides its remove button from assistive tech and the tab order,
+      // since inside an input Backspace removes a pill. Here the button is
+      // the only way to stop using a dictionary.
+      removeButtonProps={{
+        "aria-label": t`Stop using ${name}`,
+        "aria-hidden": false,
+        tabIndex: 0,
+      }}
+    >
+      {name}
+    </Pill>
+  );
+}
+
 /**
  * The dictionaries the columns are matched against, each removable, and a
  * menu to add another.
@@ -23,7 +48,6 @@ export function DictionaryChips({
   onAdd,
   onRemove,
 }: Readonly<Props>): ReactNode {
-  const { t } = useLingui();
   const available = dictionaries.filter((dictionary) => {
     return !dictionaryIds.includes(dictionary.id);
   });
@@ -38,24 +62,13 @@ export function DictionaryChips({
             return dictionary.id === dictionaryId;
           })?.name ?? "";
         return (
-          <Pill
+          <DictionaryChip
             key={dictionaryId}
-            size="md"
-            withRemoveButton
+            name={name}
             onRemove={() => {
               onRemove(dictionaryId);
             }}
-            // Pill hides its remove button from assistive tech and the tab
-            // order, since inside an input Backspace removes a pill. Here the
-            // button is the only way to stop using a dictionary.
-            removeButtonProps={{
-              "aria-label": t`Stop using ${name}`,
-              "aria-hidden": false,
-              tabIndex: 0,
-            }}
-          >
-            {name}
-          </Pill>
+          />
         );
       })}
       {available.length > 0 ? (

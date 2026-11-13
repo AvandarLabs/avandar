@@ -107,6 +107,24 @@ describe("useAttachDictionaries", () => {
     );
   });
 
+  it("says the dictionaries were removed after a remove-only apply", () => {
+    const { result } = renderHook(
+      () => {
+        return useAttachDictionaries(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    act(() => {
+      result.current[0]([]);
+      mocks.options?.onSuccess();
+    });
+
+    expect(mocks.notifySuccessMock).toHaveBeenCalledWith(
+      "Removed the dictionaries from Kings line list. The data is unchanged.",
+    );
+  });
+
   it("does not navigate once the user has left the view", () => {
     const { unmount } = renderHook(
       () => {

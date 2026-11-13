@@ -18,6 +18,7 @@ import type {
   ApplyDictionariesState,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ApplyDictionariesData } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyDictionariesData";
+import type { DatasetProfiles } from "@/views/DataManagerApp/ApplyDictionariesView/useDatasetProfiles";
 import type { Dispatch } from "react";
 
 const NO_PROFILES: readonly ColumnProfile.T[] = [];
@@ -52,12 +53,15 @@ function _buildRows(
   }>,
 ): { rows: ApplyColumnRow[]; unmatchedRows: ApplyColumnRow[] } {
   const dictionaryIds = options.state.dictionaryIds ?? [];
+  const profilesByName = new Map(
+    options.profiles.map((profile) => {
+      return [profile.columnName, profile] as const;
+    }),
+  );
   const all = (data.columns ?? []).map((column) => {
     return {
       column,
-      profile: options.profiles.find((profile) => {
-        return profile.columnName === column.name;
-      }),
+      profile: profilesByName.get(column.name),
       matches: (options.matchesByColumnName.get(column.name) ?? []).filter(
         (match) => {
           return dictionaryIds.includes(match.dictionaryId);
@@ -78,6 +82,23 @@ function _buildRows(
   };
 }
 
+/** Reads the dataset's columns on the device and matches every dictionary. */
+function useColumnMatches(data: Readonly<ApplyDictionariesData>): {
+  read: DatasetProfiles;
+  profiles: readonly ColumnProfile.T[];
+  matchesByColumnName: MatchesByColumnName;
+} {
+  const read = useDatasetProfiles({
+    dataset: data.dataset,
+    columns: data.columns,
+  });
+  const profiles = read.status === "ready" ? read.profiles : NO_PROFILES;
+  const matchesByColumnName = useMemo(() => {
+    return DictionaryMatch.findColumnMatches(profiles, data.matchEntries);
+  }, [profiles, data.matchEntries]);
+  return { read, profiles, matchesByColumnName };
+}
+
 /**
  * The apply flow: reads the dataset's columns on the device, matches them
  * against every dictionary, opens with the default picks, and keeps the
@@ -95,14 +116,7 @@ export function useApplyFlow(
     undefined,
     makeInitialApplyState,
   );
-  const read = useDatasetProfiles({
-    dataset: data.dataset,
-    columns: data.columns,
-  });
-  const profiles = read.status === "ready" ? read.profiles : NO_PROFILES;
-  const matchesByColumnName = useMemo(() => {
-    return DictionaryMatch.findColumnMatches(profiles, data.matchEntries);
-  }, [profiles, data.matchEntries]);
+  const { read, profiles, matchesByColumnName } = useColumnMatches(data);
   const isReady = read.status === "ready" && !data.isLoading;
   useOpenWithDefaults({
     data,
@@ -114,19 +128,20 @@ export function useApplyFlow(
   const { rows, unmatchedRows } = useMemo(() => {
     return _buildRows(data, { state, profiles, matchesByColumnName });
   }, [data, state, profiles, matchesByColumnName]);
+  const addDictionary = (dictionaryId: DataDictionary.Id): void => {
+    const picks = pickDefaultsForColumns({
+      columns: data.columns ?? [],
+      matchesByColumnName,
+      dictionaryIds: [dictionaryId],
+    });
+    dispatch({ type: "add_dictionary", dictionaryId, picks });
+  };
   return {
     state,
     dispatch,
     rows,
     unmatchedRows,
-    addDictionary: (dictionaryId) => {
-      const picks = pickDefaultsForColumns({
-        columns: data.columns ?? [],
-        matchesByColumnName,
-        dictionaryIds: [dictionaryId],
-      });
-      dispatch({ type: "add_dictionary", dictionaryId, picks });
-    },
+    addDictionary,
     isMatching: !isReady,
     hasReadFailed: read.status === "failed",
   };

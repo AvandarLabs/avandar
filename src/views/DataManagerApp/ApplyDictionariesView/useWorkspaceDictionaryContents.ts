@@ -22,6 +22,11 @@ export type WorkspaceDictionaryContents = {
   hasLoadFailed: boolean;
 };
 
+// Stable empties, so a consumer's memo does not rerun while a query loads.
+const NO_ENTRIES: readonly DataDictionaryEntry.T[] = [];
+const NO_CODE_LISTS: readonly DataDictionaryCodeList.T[] = [];
+const NO_CODINGS: readonly DataDictionaryEntryCoding.T[] = [];
+
 function _compareDictionaries(
   dictionaryA: DataDictionary.T,
   dictionaryB: DataDictionary.T,
@@ -65,9 +70,9 @@ export function useWorkspaceDictionaryContents(
   ];
   return {
     dictionaries: sorted,
-    entries: entries ?? [],
-    codeLists: codeLists ?? [],
-    codings: codings ?? [],
+    entries: entries ?? NO_ENTRIES,
+    codeLists: codeLists ?? NO_CODE_LISTS,
+    codings: codings ?? NO_CODINGS,
     isLoading: !dictionaries || !entries || !codeLists || !codings,
     hasLoadFailed: queries.some((query) => {
       return query.isLoadingError;

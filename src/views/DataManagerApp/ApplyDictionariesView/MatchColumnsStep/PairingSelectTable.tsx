@@ -9,6 +9,7 @@ import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/
 import type {
   ApplyDictionariesAction,
   ApplyDictionariesState,
+  ColumnPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ApplyColumnRow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 import type { Dispatch, ReactNode } from "react";
@@ -36,13 +37,16 @@ function useMatchOptions(
     { value: "", label: t`Don't apply` },
     ...row.matches.map((match) => {
       const { entryName } = match;
-      const what = match.codeListName ?? t`description`;
-      const from = dictionaries.find((dictionary) => {
+      const codeListText = match.codeListName ?? t`description`;
+      const dictionaryName = dictionaries.find((dictionary) => {
         return dictionary.id === match.dictionaryId;
       })?.name;
       return {
         value: _toKey(match),
-        label: t`${entryName} · ${what} · from ${from}`,
+        label:
+          dictionaryName === undefined
+            ? t`${entryName} · ${codeListText}`
+            : t`${entryName} · ${codeListText} · from ${dictionaryName}`,
       };
     }),
   ];
@@ -62,13 +66,44 @@ function OtherMatchesText({
   );
 }
 
+/** The Select that picks a column's entry from every match. */
+function MatchSelect(
+  props: Readonly<{
+    row: ApplyColumnRow;
+    options: Array<{ value: string; label: string }>;
+    pick: ColumnPick | undefined;
+    dispatch: Dispatch<ApplyDictionariesAction>;
+  }>,
+): ReactNode {
+  const { t } = useLingui();
+  const { row, dispatch } = props;
+  const columnId = row.column.id;
+  const columnName = row.column.name;
+  return (
+    <Select
+      aria-label={t`Entry to apply to ${columnName}`}
+      data={props.options}
+      value={props.pick ? _toKey(props.pick) : ""}
+      allowDeselect={false}
+      onChange={(value) => {
+        const match = row.matches.find((candidate) => {
+          return _toKey(candidate) === value;
+        });
+        dispatch({
+          type: "set_pick",
+          columnId,
+          pick: match ? toColumnPick(match) : undefined,
+        });
+      }}
+    />
+  );
+}
+
 function SelectRow(
   props: Readonly<Omit<Props, "rows"> & { row: ApplyColumnRow }>,
 ): ReactNode {
-  const { t } = useLingui();
   const { row, state, dispatch } = props;
   const columnId = row.column.id;
-  const columnName = row.column.name;
   const options = useMatchOptions(row, props.dictionaries);
   const pick = state.picks[columnId];
   return (
@@ -87,21 +122,11 @@ function SelectRow(
         />
       </Table.Td>
       <Table.Td>
-        <Select
-          aria-label={t`Entry to apply to ${columnName}`}
-          data={options}
-          value={pick ? _toKey(pick) : ""}
-          allowDeselect={false}
-          onChange={(value) => {
-            const match = row.matches.find((candidate) => {
-              return _toKey(candidate) === value;
-            });
-            dispatch({
-              type: "set_pick",
-              columnId,
-              pick: match ? toColumnPick(match) : undefined,
-            });
-          }}
+        <MatchSelect
+          row={row}
+          options={options}
+          pick={pick}
+          dispatch={dispatch}
         />
       </Table.Td>
       <Table.Td>
