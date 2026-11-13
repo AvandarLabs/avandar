@@ -46,6 +46,8 @@ function _toProfileColumns(
  * Reads one dataset's columns on this device: their values and row counts,
  * for matching them to dictionary entries. A read that finishes after the
  * dataset or its columns changed, or after the view closed, is dropped.
+ * It reads the values as stored, so a converted dataset is matched on its
+ * codes, not on the labels its conversions show.
  */
 export function useDatasetProfiles(
   options: Readonly<{
@@ -70,6 +72,7 @@ export function useDatasetProfiles(
       workspaceId: workspace.id,
       dataset,
       columns: _toProfileColumns(columns),
+      readsRawValues: true,
     })
       .then((profiles) => {
         if (isCurrent) {

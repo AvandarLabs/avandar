@@ -14,6 +14,7 @@ import {
   getDefaultSaveTarget,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyTargets/applyTargets";
 import { useDatasetProfiles } from "@/views/DataManagerApp/ApplyDictionariesView/useDatasetProfiles";
+import { useUnmatchedValues } from "@/views/DataManagerApp/ApplyDictionariesView/useUnmatchedValues";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -25,6 +26,7 @@ import type {
 import type { ApplyTargets } from "@/views/DataManagerApp/ApplyDictionariesView/applyTargets/applyTargets";
 import type { ApplyDictionariesData } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyDictionariesData";
 import type { DatasetProfiles } from "@/views/DataManagerApp/ApplyDictionariesView/useDatasetProfiles";
+import type { UnmatchedValues } from "@/views/DataManagerApp/ApplyDictionariesView/useUnmatchedValues";
 import type { Dispatch } from "react";
 
 const NO_PROFILES: readonly ColumnProfile.T[] = [];
@@ -50,6 +52,8 @@ export type ApplyFlow = {
   hasReadFailed: boolean;
   /** Where this dataset's conversions can go. Set once the flow is ready. */
   targets: ApplyTargets | undefined;
+  /** Each coded column's values no pair matches, read on the device. */
+  unmatched: UnmatchedValues;
 };
 
 function _buildRows(
@@ -140,14 +144,20 @@ export function useApplyFlow(
   const { rows, unmatchedRows } = useMemo(() => {
     return _buildRows(data, { state, profiles, matchesByColumnName });
   }, [data, state, profiles, matchesByColumnName]);
-  const addDictionary = (dictionaryId: DataDictionary.Id): void => {
-    const picks = pickDefaultsForColumns({
-      columns: data.columns ?? [],
-      matchesByColumnName,
-      dictionaryIds: [dictionaryId],
-    });
-    dispatch({ type: "add_dictionary", dictionaryId, picks });
-  };
+  const codeListsById = useMemo(() => {
+    return new Map(
+      data.codeLists.map((codeList) => {
+        return [codeList.id, codeList] as const;
+      }),
+    );
+  }, [data.codeLists]);
+  const unmatched = useUnmatchedValues({
+    dataset: isReady ? data.dataset : undefined,
+    columns: data.columns,
+    picks: state.picks,
+    codeLists: codeListsById,
+  });
+  const addDictionary = useAddDictionary(data, matchesByColumnName, dispatch);
   return {
     state,
     dispatch,
@@ -157,6 +167,23 @@ export function useApplyFlow(
     isMatching: !isReady,
     hasReadFailed: read.status === "failed",
     targets: options.targets,
+    unmatched,
+  };
+}
+
+/** Adds a dictionary with the picks it brings to columns with none. */
+function useAddDictionary(
+  data: Readonly<ApplyDictionariesData>,
+  matchesByColumnName: MatchesByColumnName,
+  dispatch: Dispatch<ApplyDictionariesAction>,
+): (dictionaryId: DataDictionary.Id) => void {
+  return (dictionaryId) => {
+    const picks = pickDefaultsForColumns({
+      columns: data.columns ?? [],
+      matchesByColumnName,
+      dictionaryIds: [dictionaryId],
+    });
+    dispatch({ type: "add_dictionary", dictionaryId, picks });
   };
 }
 
