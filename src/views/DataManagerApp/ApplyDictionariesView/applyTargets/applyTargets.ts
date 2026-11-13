@@ -106,7 +106,11 @@ export function getApplyTargets(
 
 /** Whether any column of the dataset can be converted at all. */
 export function canConvert(targets: Readonly<ApplyTargets>): boolean {
-  return targets.isLinkedDataset || targets.linked.isAvailable;
+  return (
+    targets.isLinkedDataset ||
+    targets.linked.isAvailable ||
+    targets.inPlace.isAvailable
+  );
 }
 
 /**
@@ -123,8 +127,9 @@ export function getDefaultMode(
 }
 
 /**
- * The card the Save step opens with: a new linked dataset when one can be
- * created. A linked dataset has no cards, so it has no target.
+ * The card the Save step opens with: Change for a dataset already
+ * converted in place, else a new linked dataset when one can be created,
+ * else Change. A linked dataset has no cards, so it has no target.
  */
 export function getDefaultSaveTarget(
   targets: Readonly<ApplyTargets>,
@@ -132,5 +137,11 @@ export function getDefaultSaveTarget(
   if (targets.isLinkedDataset) {
     return undefined;
   }
-  return targets.linked.isAvailable ? "linked" : undefined;
+  if (targets.isAlreadyConvertedInPlace && targets.inPlace.isAvailable) {
+    return "in_place";
+  }
+  if (targets.linked.isAvailable) {
+    return "linked";
+  }
+  return targets.inPlace.isAvailable ? "in_place" : undefined;
 }

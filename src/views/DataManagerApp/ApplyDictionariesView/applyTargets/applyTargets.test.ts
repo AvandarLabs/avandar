@@ -55,12 +55,36 @@ describe("applyTargets", () => {
     });
   });
 
-  it("converts nothing when no target is available", () => {
+  it("converts an upload in place for an editor who cannot add datasets", () => {
     const targets = getApplyTargets({ ...BASE, canCreateDatasets: false });
 
+    expect(canConvert(targets)).toBe(true);
+    expect(getDefaultMode(targets, "csv_file")).toBe("convert");
+    expect(getDefaultSaveTarget(targets)).toBe("in_place");
+  });
+
+  it("converts nothing when no target is available", () => {
+    const targets = getApplyTargets({
+      ...BASE,
+      sourceType: "google_sheets",
+      canCreateDatasets: false,
+    });
+
     expect(canConvert(targets)).toBe(false);
-    expect(getDefaultMode(targets, "csv_file")).toBe("reference");
     expect(getDefaultSaveTarget(targets)).toBeUndefined();
+  });
+
+  it("opens on Change for a dataset already converted in place", () => {
+    const pinned = {
+      mode: "convert",
+      pinnedPairs: [],
+    } as unknown as DictionaryBinding.T;
+
+    expect(
+      getDefaultSaveTarget(
+        getApplyTargets({ ...BASE, existingBindings: [pinned] }),
+      ),
+    ).toBe("in_place");
   });
 
   it("updates a linked dataset's own conversions, with no target to choose", () => {
