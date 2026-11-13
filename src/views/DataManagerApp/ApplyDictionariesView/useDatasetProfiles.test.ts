@@ -104,4 +104,31 @@ describe("useDatasetProfiles", () => {
       { name: "GENDER", dataType: "bigint" },
     ]);
   });
+
+  it("profiles a converted column with no replaced type as its detected type", async () => {
+    profileMock.mockReset().mockResolvedValue([]);
+    const gender = { ..._column("GENDER"), detectedDataType: "BIGINT" };
+    const bindings = [
+      {
+        datasetColumnId: gender.id,
+        mode: "convert",
+        replacedDataType: undefined,
+      },
+    ] as DictionaryBinding.T[];
+
+    renderHook(() => {
+      return useDatasetProfiles({
+        dataset: DATASET,
+        columns: [gender] as DatasetColumn.T[],
+        bindings,
+      });
+    });
+
+    await waitFor(() => {
+      expect(profileMock).toHaveBeenCalledTimes(1);
+    });
+    expect(profileMock.mock.calls[0]?.[0].columns).toEqual([
+      { name: "GENDER", dataType: "bigint" },
+    ]);
+  });
 });
