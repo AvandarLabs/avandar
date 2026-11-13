@@ -3,11 +3,13 @@ import { useMemo } from "react";
 import { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { SaveApplyNextField } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveApplyNextField";
 import { SaveFooter } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter";
 import { SaveNameFields } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields";
 import { SaveSummary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary";
 import { SaveWarnings } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveWarnings";
 import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { ApplyTarget } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate";
 import type { Dispatch, ReactNode } from "react";
 
 type Props = {
@@ -17,6 +19,8 @@ type Props = {
   description: string;
   originDatasetName: string | undefined;
   learnedFromNames: readonly string[];
+  appliesNext: boolean;
+  applyTargets: readonly ApplyTarget[];
   isCreating: boolean;
   dispatch: Dispatch<NewDictionaryAction>;
   onCreate: () => void;
@@ -59,6 +63,11 @@ export function SaveStep(props: Readonly<Props>): ReactNode {
             issues={issues}
             proposal={proposal}
             labels={labels}
+          />
+          <SaveApplyNextField
+            appliesNext={props.appliesNext}
+            applyTargets={props.applyTargets}
+            dispatch={dispatch}
           />
         </Stack>
       </AppViewBody>

@@ -50,6 +50,7 @@ vi.mock("@/utils/notifications/notify", () => {
 
 const VARIABLES = {
   name: "Kings codes",
+  applyNext: [],
 } as unknown as CreateDictionaryVariables;
 
 function _render() {
@@ -131,5 +132,51 @@ describe("useCreateDictionary", () => {
       expect(mocks.notifySuccessMock).toHaveBeenCalledTimes(1);
     });
     expect(mocks.navigateMock).not.toHaveBeenCalled();
+  });
+
+  it("opens Apply for the dataset it was learned from when asked to apply it next", async () => {
+    mocks.createMock.mockResolvedValue({
+      id: "dictionary-1",
+      name: "Kings codes",
+    });
+    const { result } = _render();
+    act(() => {
+      result.current[0]({
+        ...VARIABLES,
+        applyNext: [{ datasetId: "dataset-1", name: "Kings line list" }],
+      } as unknown as CreateDictionaryVariables);
+    });
+    await waitFor(() => {
+      expect(mocks.navigateMock).toHaveBeenCalledWith({
+        key: "data-manager-apply-dictionaries",
+        to: "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries",
+        params: { workspaceSlug: "demo", datasetId: "dataset-1" },
+        label: expect.any(Function),
+        isAvailableOffline: true,
+        search: { dictionaryId: "dictionary-1" },
+      });
+    });
+  });
+
+  it("names the other datasets to apply it to in the toast", async () => {
+    mocks.createMock.mockResolvedValue({
+      id: "dictionary-1",
+      name: "Kings codes",
+    });
+    const { result } = _render();
+    act(() => {
+      result.current[0]({
+        ...VARIABLES,
+        applyNext: [
+          { datasetId: "dataset-1", name: "Kings line list" },
+          { datasetId: "dataset-2", name: "Bronx line list" },
+        ],
+      } as unknown as CreateDictionaryVariables);
+    });
+    await waitFor(() => {
+      expect(mocks.notifySuccessMock).toHaveBeenCalledWith(
+        "Saved Kings codes to Dictionaries. Apply it to Bronx line list too, from each dataset's menu.",
+      );
+    });
   });
 });

@@ -23,6 +23,7 @@ import type { CreateDictionaryVariables } from "@/views/DataManagerApp/NewDictio
 import type { DictionarySuggestionAvailability } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 import type { NewDictionarySources } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionarySources";
+import type { ApplyTarget } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useOpenAfterCreate";
 import type { ReadableDataset } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useReadDatasets";
 import type { Dispatch, RefObject } from "react";
 
@@ -39,6 +40,11 @@ export type NewDictionaryFlow = {
   suggestingCodeListKey: string | undefined;
   createDictionary: () => void;
   isCreating: boolean;
+  /**
+   * The datasets the dictionary is learned from, the one that opened the
+   * flow or else the first picked first. Saving can go on to apply it.
+   */
+  applyTargets: readonly ApplyTarget[];
 };
 
 type FlowOptions = {
@@ -60,10 +66,33 @@ function _getReadableDatasets(
   });
 }
 
+/** The read datasets: the one that opened the flow, or the picked ones. */
+function _getApplyTargets(
+  state: NewDictionaryState,
+  sources: Readonly<NewDictionarySources>,
+): ApplyTarget[] {
+  if (!state.proposal) {
+    return [];
+  }
+  const readIds = DictionaryProposal.getDatasetIds(state.proposal);
+  const orderedIds = state.originDatasetId
+    ? [state.originDatasetId]
+    : state.pickedDatasetIds;
+  return orderedIds.flatMap((datasetId) => {
+    const dataset = sources.datasets.find((current) => {
+      return current.id === datasetId;
+    });
+    return dataset && readIds.includes(datasetId)
+      ? [{ datasetId, name: dataset.name }]
+      : [];
+  });
+}
+
 function _makeCreateDictionary(
   options: Readonly<{
     state: NewDictionaryState;
     userProfile: UserProfile.T | undefined;
+    applyTargets: readonly ApplyTarget[];
     create: (variables: CreateDictionaryVariables) => void;
     isCreatingRef: RefObject<boolean>;
   }>,
@@ -84,6 +113,7 @@ function _makeCreateDictionary(
         proposal: state.proposal,
         labels: state.labels,
       }),
+      applyNext: state.appliesNext ? options.applyTargets : [],
     });
   };
 }
@@ -282,6 +312,7 @@ export function useNewDictionaryFlow(
   });
   const readPicked = useReadPicked({ state, sources, read: reading.read });
   const [create, isCreating] = useCreateDictionary();
+  const applyTargets = _getApplyTargets(state, sources);
   const isCreatingRef = useRef(false);
   useEffect(() => {
     if (!isCreating) {
@@ -299,9 +330,11 @@ export function useNewDictionaryFlow(
     createDictionary: _makeCreateDictionary({
       state,
       userProfile,
+      applyTargets,
       create,
       isCreatingRef,
     }),
     isCreating,
+    applyTargets,
   };
 }
