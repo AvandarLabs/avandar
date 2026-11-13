@@ -1,0 +1,96 @@
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@/test-utils";
+import { makeInitialApplyState } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import { AttachStep } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep";
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { ApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
+
+const { attachMock } = vi.hoisted(() => {
+  return { attachMock: vi.fn() };
+});
+
+vi.mock(
+  "@/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries",
+  () => {
+    return {
+      useAttachDictionaries: () => {
+        return [attachMock, false];
+      },
+    };
+  },
+);
+
+const DATASET = { id: "dataset-1", name: "Kings line list" } as Dataset.T;
+const GENDER = { id: "col-gender", name: "GENDER" } as DatasetColumn.T;
+const PICK = {
+  dictionaryId: "dict-1",
+  entryId: "entry-sex",
+  codeListId: "list-sex",
+  direction: "decode",
+} as unknown as ColumnPick;
+
+function _render(
+  picks: Record<string, ColumnPick>,
+  existingBindings: readonly DictionaryBinding.T[] = [],
+) {
+  const flow = {
+    state: {
+      ...makeInitialApplyState(),
+      dictionaryIds: [],
+      step: "attach",
+      picks,
+    },
+    dispatch: vi.fn(),
+  } as unknown as ApplyFlow;
+  render(
+    <AttachStep
+      dataset={DATASET}
+      columns={[GENDER]}
+      existingBindings={existingBindings}
+      flow={flow}
+      counts={{
+        attachedCount: Object.keys(picks).length,
+        describedCount: 0,
+        usedDictionaryCount: 1,
+      }}
+      lookups={{
+        dictionaryNames: new Map(),
+        entries: new Map(),
+        codeLists: new Map(),
+      }}
+      summary=""
+    />,
+  );
+}
+
+describe("AttachStep", () => {
+  it("attaches each pick as reference", () => {
+    _render({ [GENDER.id]: PICK });
+
+    expect(
+      screen.getByText(
+        /Nothing in your data changes. 1 column keeps its values/,
+      ),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Attach to Kings line list" }),
+    );
+
+    expect(attachMock).toHaveBeenCalledWith([
+      { datasetColumnId: GENDER.id, ...PICK, mode: "reference" },
+    ]);
+  });
+
+  it("offers to remove the dictionaries when every pick was cleared", () => {
+    _render({}, [{ datasetColumnId: GENDER.id } as DictionaryBinding.T]);
+
+    expect(
+      screen.getByRole("button", {
+        name: "Remove dictionaries from Kings line list",
+      }),
+    ).toBeEnabled();
+  });
+});
