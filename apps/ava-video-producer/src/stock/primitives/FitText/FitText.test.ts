@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { FitText } from "./FitText";
 import { wrapTextToLines } from "./wrapTextToLines";
 
@@ -396,4 +397,26 @@ test("nine-line capacity and content beyond eight lines still fail explicitly", 
       }),
     /line count/,
   );
+});
+
+test("fitted text takes its colour and line spacing from the data role", () => {
+  const patch = {
+    lineHeights: { md: "1.5" },
+    other: { video: { atomic: { swatch: { text: "#ffeedd" } } } },
+  };
+  const markup = renderToStaticMarkup(
+    createElement(VideoThemeScope, {
+      patches: [patch],
+      children: createElement(FitText, {
+        text: "one two three four",
+        x: 0,
+        y: 0,
+        width: 50,
+        fontSize: 12,
+        maxLines: 4,
+      }),
+    }),
+  );
+  assert.match(markup, /fill="#ffeedd"/);
+  assert.match(markup, /dy="18"/);
 });
