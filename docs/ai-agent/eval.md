@@ -227,7 +227,8 @@ Runs on 2026-11-13 for dictionaries attached as reference, archived under the
 `attach-dictionaries` label. These runs used the coded-column prompt before
 it was merged with the plugin AI tools: v3 plus CODED COLUMNS, then named v4.
 It ships as `data-agent-v5`, which also carries the plugin tools' v4 TOOLS
-bullet, and has not been rerun since. The prompt lists each bound column's codes and
+bullet. The measles questions were rerun with v5 on 2026-11-13, under
+the `dictionary-conversions` label (see "Converted columns"). The prompt lists each bound column's codes and
 description on its own line under its dataset, the offline agent reads the
 code lists in its profile and question values, and `lookup_values` answers
 from a code list without running a query. The coded-column questions D01 to
@@ -728,7 +729,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 112 runs (every
+chat index lists all 131 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
