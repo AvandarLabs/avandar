@@ -34,3 +34,10 @@ test("an unknown theme is refused", async () => {
     ShowcaseFilms.load("occlusion-wipe", { theme: { id: "missing" } }),
   );
 });
+
+test("a continuity film keeps its theme out of the appearance options", async () => {
+  const film = await ShowcaseFilms.load("qetl-motion", {
+    theme: { id: "avandar" },
+  });
+  assert.equal(film.theme?.themeId, "avandar");
+});

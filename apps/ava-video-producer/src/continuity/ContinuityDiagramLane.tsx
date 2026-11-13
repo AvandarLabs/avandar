@@ -1,6 +1,8 @@
 import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
 import { StockGraphic } from "../stock/StockGraphic";
+import { createThemePatchFromLegacyAppearance } from "../videoTheme/themePatches/themePatches";
+import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
 import {
   useContinuityAppearance,
   getEditorialInk,
@@ -64,15 +66,22 @@ function FloatingDiagram({ content, diagram, frame, accent }: DiagramProps) {
           </defs>
         )}
         <g clipPath={detail ? `url(#${clipId})` : undefined}>
-          <StockGraphic
-            {...diagram.request}
-            frame={sampleStockFrame((frame - cue.at) * 3 + 36)}
-            width={960}
-            height={600}
-            accent={accent}
-            boxRoughness={appearance.boxRoughness}
-            transparent
-          />
+          <VideoThemeScope
+            patches={[
+              createThemePatchFromLegacyAppearance({
+                boxRoughness: appearance.boxRoughness,
+              }),
+            ]}
+          >
+            <StockGraphic
+              {...diagram.request}
+              frame={sampleStockFrame((frame - cue.at) * 3 + 36)}
+              width={960}
+              height={600}
+              accent={accent}
+              transparent
+            />
+          </VideoThemeScope>
         </g>
       </svg>
     </AnchoredOverlay>

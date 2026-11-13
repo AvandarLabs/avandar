@@ -6,10 +6,11 @@ import {
   stockEntry,
   type StockEntry,
 } from "../../src/stock/catalog";
-import { STOCK } from "../../src/stock/stockPalette";
 import { safeInputFile } from "../lib/planHelpers";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
+import { loadVideoThemeSnapshot } from "../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { ResolvedStockRequest } from "../../src/stock/contracts/stockRequestSchema/stockRequestSchema";
+import type { VideoThemeSnapshot } from "../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 
 const ROOT: string = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -20,30 +21,52 @@ export type MotionRequest = {
   entry: StockEntry;
   request: ResolvedStockRequest;
   sourceHash: string;
+  theme: VideoThemeSnapshot;
 };
 
-/** Resolve stable CLI selections and the optional complete-input file. */
+const MOTION_USAGE =
+  "Usage: pnpm motion -- list | preview [all|preset-id] [--input file.json] [--theme id] | render [all|preset-id] [--input file.json] [--theme id]";
+
+function _parseFlags(
+  extra: readonly string[],
+): Readonly<Record<string, string>> {
+  const flags: Record<string, string> = {};
+  for (let index = 0; index < extra.length; index += 2) {
+    const [flag, value] = [extra[index], extra[index + 1]];
+    if (!["--input", "--theme"].includes(flag) || !value || flag in flags) {
+      throw new Error(MOTION_USAGE);
+    }
+    flags[flag] = value;
+  }
+  return flags;
+}
+
+/** Resolve stable CLI selections, the optional complete-input file, and the theme. */
 function _parseMotionArgs(args: readonly string[]): {
   command: string;
   entries: StockEntry[];
   inputFile: string | undefined;
+  themeId: string;
 } {
   const [command, selection = "all", ...extra] =
     args[0] === "--" ? args.slice(1) : args;
-  const hasInput =
-    extra.length === 2 && extra[0] === "--input" && Boolean(extra[1]);
+  const flags = _parseFlags(extra);
+  const hasInput = "--input" in flags;
   if (
     !["list", "preview", "render"].includes(command) ||
-    (extra.length > 0 && !hasInput) ||
-    (hasInput && (selection === "all" || command === "list"))
+    (command === "list" && extra.length > 0) ||
+    (hasInput && selection === "all")
   ) {
-    throw new Error(
-      "Usage: pnpm motion -- list | preview [all|preset-id] [--input file.json] | render [all|preset-id] [--input file.json]",
-    );
+    throw new Error(MOTION_USAGE);
   }
   const entries =
     selection === "all" ? [...STOCK_CATALOG] : [stockEntry(selection)];
-  return { command, entries, inputFile: hasInput ? extra[1] : undefined };
+  return {
+    command,
+    entries,
+    inputFile: flags["--input"],
+    themeId: flags["--theme"] ?? "classic",
+  };
 }
 
 function _freezeSnapshot<Value>(value: Value): Value {
@@ -63,6 +86,7 @@ async function _makeMotionRequestsFromArgs(
 ): Promise<MotionRequest[]> {
   const { args, root = ROOT } = options;
   const contracts = await buildStockContracts(root);
+  const theme = await loadVideoThemeSnapshot({ id: args.themeId });
   const supplied: unknown = args.inputFile
     ? JSON.parse(
         await fs.readFile(
@@ -73,9 +97,7 @@ async function _makeMotionRequestsFromArgs(
     : undefined;
   return args.entries.map((entry) => {
     const request = contracts.stockRequestSchema.parse(
-      args.inputFile
-        ? supplied
-        : { preset: entry.id, accent: STOCK.mint, background: STOCK.ground },
+      args.inputFile ? supplied : { preset: entry.id },
     );
     if (request.preset !== entry.id) {
       throw new Error("Input preset must equal the selected CLI preset");
@@ -84,12 +106,13 @@ async function _makeMotionRequestsFromArgs(
       entry,
       request: _freezeSnapshot(request),
       sourceHash: contracts.sourceHash,
+      theme,
     };
   });
 }
 /** Related MotionRequests operations. */
 export const MotionRequests = {
-  /** Resolve stable CLI selections and the optional complete-input file. */
+  /** Resolve stable CLI selections, the optional complete-input file, and the theme. */
   parseArgs: _parseMotionArgs,
   /**
    * Validate complete authored requests before starting any renderer bundle.

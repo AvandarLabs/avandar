@@ -25,7 +25,8 @@ import {
 import { readRgbaFromPng, writePngFromRgba } from "./rgbaPng/rgbaPng";
 import type { Film } from "../../../src/showcase/showcase.types";
 
-const PARITY_DIRECTORY = path.join(appRoot, "out/theme-parity");
+const PARITY_ROOT = path.join(appRoot, "out/theme-parity");
+let PARITY_DIRECTORY = PARITY_ROOT;
 
 type ParityStage = "reference" | "current" | "diff";
 type LoadedTarget = Readonly<{
@@ -50,10 +51,16 @@ function _frameFile(stage: ParityStage, id: string, frame: number) {
   );
 }
 
-async function _loadTargets(ids: readonly string[]): Promise<LoadedTarget[]> {
+async function _loadTargets(
+  ids: readonly string[],
+  themeId: string,
+): Promise<LoadedTarget[]> {
   return Promise.all(
     listParityTargets(ids).map(async (target) => {
-      const film = await ShowcaseFilms.load(target.filmId, target.options);
+      const film = await ShowcaseFilms.load(target.filmId, {
+        ...target.options,
+        theme: { id: themeId },
+      });
       return { target, film, frames: getParityFramesFromFilm(film) };
     }),
   );
@@ -182,8 +189,9 @@ async function _writeManifest(targets: readonly LoadedTarget[]) {
 async function runThemeParity(
   mode: "capture" | "compare",
   ids: readonly string[],
+  themeId: string,
 ): Promise<void> {
-  const targets = await _loadTargets(ids);
+  const targets = await _loadTargets(ids, themeId);
   const stages: readonly ParityStage[] =
     mode === "capture" ? ["reference"] : ["current", "diff"];
   await Promise.all(
@@ -218,10 +226,22 @@ async function runThemeParity(
   }
 }
 
-const [mode, ...ids] = process.argv.slice(2);
-if (mode === "capture" || mode === "compare") {
-  await runThemeParity(mode, ids);
+const argv = process.argv.slice(2);
+const themeIndex = argv.indexOf("--theme");
+const themeId = themeIndex < 0 ? "classic" : argv[themeIndex + 1];
+const [mode, ...ids] =
+  themeIndex < 0
+    ? argv
+    : argv.filter(
+        (_, index) => index !== themeIndex && index !== themeIndex + 1,
+      );
+PARITY_DIRECTORY =
+  themeId === "classic" ? PARITY_ROOT : path.join(PARITY_ROOT, themeId);
+if ((mode === "capture" || mode === "compare") && themeId) {
+  await runThemeParity(mode, ids, themeId);
 } else {
-  console.error("Usage: pnpm theme:parity <capture|compare> [target ids...]");
+  console.error(
+    "Usage: pnpm theme:parity <capture|compare> [target ids...] [--theme id]",
+  );
   process.exitCode = 2;
 }

@@ -3,6 +3,18 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StockGraphic } from "../../stock/StockGraphic";
+import { createThemePatchFromLegacyAppearance } from "../../videoTheme/themePatches/themePatches";
+import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
+
+function _withBoxRoughness(
+  boxRoughness: number,
+  element: ReturnType<typeof createElement>,
+) {
+  return createElement(VideoThemeScope, {
+    patches: [createThemePatchFromLegacyAppearance({ boxRoughness })],
+    children: element,
+  });
+}
 
 test("overlay graphics omit only their stage ground and retain diagram objects", () => {
   const request = { preset: "data-pipeline" as const, frame: 120 };
@@ -23,7 +35,7 @@ test("rough boxes change diagram outlines without changing text or the stage gro
   const request = { preset: "data-pipeline" as const, frame: 120 };
   const smooth = renderToStaticMarkup(createElement(StockGraphic, request));
   const rough = renderToStaticMarkup(
-    createElement(StockGraphic, { ...request, boxRoughness: 2 }),
+    _withBoxRoughness(2, createElement(StockGraphic, request)),
   );
   assert.notEqual(rough, smooth);
   assert.match(rough, /data-rough-box/);
@@ -35,24 +47,23 @@ test("rough boxes change diagram outlines without changing text or the stage gro
   assert.equal(
     rough,
     renderToStaticMarkup(
-      createElement(StockGraphic, { ...request, boxRoughness: 2 }),
+      _withBoxRoughness(2, createElement(StockGraphic, request)),
     ),
   );
   assert.equal(
     smooth,
     renderToStaticMarkup(
-      createElement(StockGraphic, { ...request, boxRoughness: 0 }),
+      _withBoxRoughness(0, createElement(StockGraphic, request)),
     ),
   );
 });
 
 test("sketch mode also roughens animated emphasis outlines on diagram boxes", () => {
   const markup = renderToStaticMarkup(
-    createElement(StockGraphic, {
-      preset: "data-pipeline",
-      frame: 120,
-      boxRoughness: 1.5,
-    }),
+    _withBoxRoughness(
+      1.5,
+      createElement(StockGraphic, { preset: "data-pipeline", frame: 120 }),
+    ),
   );
   assert.doesNotMatch(markup, /<rect[^>]*stroke=/);
 });

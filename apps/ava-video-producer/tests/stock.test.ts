@@ -324,8 +324,9 @@ test("composition metadata validates complete replacements after top-level prop 
   const defaults = decision.props.defaultProps;
   assert.equal(defaults.schemaVersion, 1);
   assert.ok(defaults.input);
-  assert.equal(defaults.accent, "#9fefca");
-  assert.equal(defaults.background, "#0b1219");
+  // No default colours: the composition's theme decides them.
+  assert.equal(defaults.accent, undefined);
+  assert.equal(defaults.background, undefined);
   const input = structuredClone(DECISION_FORK_DENSE_INPUT);
   input.branches[1].outcome = "Composition chosen";
   const { props } = decision.props.calculateMetadata({

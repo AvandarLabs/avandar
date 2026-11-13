@@ -231,8 +231,9 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   const plan = storyboardSchema.parse(
     JSON.parse(await fs.readFile(path.join(appRoot, source), "utf8")),
   );
+  const { theme: _theme, ...appearance } = options;
   const configuredPlan = continuity
-    ? createContinuityPlanFromOptions(plan, options)
+    ? createContinuityPlanFromOptions(plan, appearance)
     : plan;
   return {
     ...base,

@@ -140,3 +140,29 @@ test("pnpm's forwarded separator preserves the documented motion commands", () =
   );
   assert.equal(MotionRequests.parseArgs(["--", "list"]).command, "list");
 });
+
+test("motion CLI accepts one theme for any selection", () => {
+  assert.equal(
+    MotionRequests.parseArgs(["render", "all", "--theme", "avandar"]).themeId,
+    "avandar",
+  );
+  assert.equal(
+    MotionRequests.parseArgs(["preview", "network-graph"]).themeId,
+    "classic",
+  );
+});
+
+test("motion CLI refuses a theme when listing", () => {
+  assert.throws(
+    () => MotionRequests.parseArgs(["list", "all", "--theme", "avandar"]),
+    /Usage/,
+  );
+});
+
+test("default motion requests carry no colours so the theme decides", async () => {
+  const [request] = await MotionRequests.fromArgs({
+    args: MotionRequests.parseArgs(["preview", "network-graph"]),
+  });
+  assert.equal(request.request.accent, undefined);
+  assert.equal(request.theme.themeId, "classic");
+});

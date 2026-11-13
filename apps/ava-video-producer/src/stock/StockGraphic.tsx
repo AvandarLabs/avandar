@@ -1,11 +1,13 @@
 import { useId } from "react";
 import { loopEnvelope } from "../motion";
+import { fillToCss } from "../videoTheme/cssValues/cssValues";
+import { createThemePatchFromStockColors } from "../videoTheme/themePatches/themePatches";
+import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
 import { stockRequestEnvelopeSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
-import { STOCK } from "./graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "./i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { STOCK_GRAPHIC_COPY } from "./i18n/stockGraphicCopy";
-import { StockBoxRoughnessContext } from "./primitives/StockRect/StockRect";
 import { stockRenderers } from "./registry/stockRenderers/stockRenderers";
+import { GraphicIdContext, useGraphicTokens } from "./theme/useGraphicTheme";
 import type { StockRequest } from "./contracts/StockContract.types";
 
 /** Preset-discriminated content with explicit local frame and display size. */
@@ -16,35 +18,44 @@ export type Props = StockRequest & {
   height?: number;
   /** Omit the stage ground when compositing the diagram above another surface. */
   transparent?: boolean;
-  /** Seeded hand-drawn box outlines, from smooth (0) to expressive (3). */
-  boxRoughness?: number;
 };
 
-/**
- * Shared browser/video renderer. Pure SVG, explicit frame time, no Remotion
- * dependency. Presets are conceptual illustrations with fictional example data.
- * A fixed viewBox preserves the layout at every display size. Ground remains
- * opaque while the authored 180-frame envelope returns both ends to that ground.
- */
-export function StockGraphic({
+type CanvasProps = Omit<Props, "accent" | "background" | "schemaVersion"> & {
+  id: string;
+};
+
+function GroundFill({ id }: { id: string }) {
+  const { color } = useGraphicTokens();
+  const fill = color.groundFill;
+  if (fill.type === "solid") {
+    return <rect width={960} height={600} fill={fill.color} />;
+  }
+  return (
+    <>
+      <defs>
+        <linearGradient
+          id={`${id}-ground`}
+          gradientTransform={`rotate(${fill.deg - 90} 0.5 0.5)`}
+        >
+          <stop offset="0" stopColor={fill.from} />
+          <stop offset="1" stopColor={fill.to} />
+        </linearGradient>
+      </defs>
+      <rect width={960} height={600} fill={`url(#${id}-ground)`} />
+    </>
+  );
+}
+
+function StockCanvas({
   preset,
   frame,
   width = 960,
   height = 600,
-  accent = STOCK.mint,
-  background = STOCK.ground,
   input,
-  schemaVersion,
   transparent = false,
-  boxRoughness = 0,
-}: Props) {
-  const id = `stock-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
-  stockRequestEnvelopeSchema.parse({
-    preset,
-    schemaVersion,
-    accent,
-    background,
-  });
+  id,
+}: CanvasProps) {
+  const tokens = useGraphicTokens();
   const localFrame = Math.max(
     0,
     Math.min(179, Number.isFinite(frame) ? frame : 0),
@@ -58,25 +69,63 @@ export function StockGraphic({
       role="img"
       aria-label={getStockDisplayCopyFromDescriptor({
         descriptor: STOCK_GRAPHIC_COPY,
-        values: {
-          preset: preset.replaceAll("-", " "),
-        },
+        values: { preset: preset.replaceAll("-", " ") },
       })}
       style={{
         display: "block",
-        background: transparent ? "transparent" : background,
-        fontFamily: "Arial, sans-serif",
+        background: transparent
+          ? "transparent"
+          : fillToCss(tokens.color.groundFill),
+        fontFamily: tokens.text.graphic.body.fontFamily,
       }}
     >
-      {!transparent && <rect width={960} height={600} fill={background} />}
-      <StockBoxRoughnessContext.Provider value={boxRoughness}>
+      {!transparent && <GroundFill id={id} />}
+      <GraphicIdContext.Provider value={id}>
         <g opacity={loopEnvelope(localFrame, 180)}>
           {stockRenderers[preset](
-            { frame: localFrame, accent, background, id },
+            {
+              frame: localFrame,
+              accent: tokens.color.accent,
+              background: tokens.color.ground,
+              id,
+            },
             input,
           )}
         </g>
-      </StockBoxRoughnessContext.Provider>
+      </GraphicIdContext.Provider>
     </svg>
+  );
+}
+
+/**
+ * Shared browser/video renderer. Pure SVG, explicit frame time, no Remotion
+ * dependency. Presets are conceptual illustrations with fictional example
+ * data. The graphic draws inside the surrounding video theme (classic when
+ * there is none) plus its preset's override; explicit `accent` and
+ * `background` props are content and win over both. A fixed viewBox
+ * preserves the layout at every display size, and the authored 180-frame
+ * envelope returns both loop ends to the ground.
+ */
+export function StockGraphic({
+  accent,
+  background,
+  schemaVersion,
+  ...canvas
+}: Props) {
+  const id = `stock-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  stockRequestEnvelopeSchema.parse({
+    preset: canvas.preset,
+    schemaVersion,
+    accent,
+    background,
+  });
+  const patches =
+    accent || background
+      ? [createThemePatchFromStockColors({ accent, background })]
+      : [];
+  return (
+    <VideoThemeScope overrideIds={[canvas.preset]} patches={patches}>
+      <StockCanvas {...canvas} id={id} />
+    </VideoThemeScope>
   );
 }

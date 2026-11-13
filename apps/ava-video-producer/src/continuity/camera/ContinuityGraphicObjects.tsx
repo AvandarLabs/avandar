@@ -1,5 +1,7 @@
 import { SvgObjectDeparture } from "../../motion-components/SvgObjectDeparture";
 import { StockGraphic } from "../../stock/StockGraphic";
+import { createThemePatchFromLegacyAppearance } from "../../videoTheme/themePatches/themePatches";
+import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { sampleStockFrame } from "../continuityTimeline";
 import type { ContinuityBeat } from "../continuitySchema";
@@ -19,14 +21,22 @@ export function ContinuityGraphicObjects({ content, frame }: Props) {
     frame: sampleStockFrame(frame, content.settleFrame),
     accent,
     background,
-    boxRoughness,
     width: 960,
     height: 600,
   };
-  if (!flight || frame < flight.at) return <StockGraphic {...props} />;
+  const patches = [createThemePatchFromLegacyAppearance({ boxRoughness })];
+  if (!flight || frame < flight.at) {
+    return (
+      <VideoThemeScope patches={patches}>
+        <StockGraphic {...props} />
+      </VideoThemeScope>
+    );
+  }
   return (
     <SvgObjectDeparture frame={frame} flight={flight}>
-      <StockGraphic {...props} />
+      <VideoThemeScope patches={patches}>
+        <StockGraphic {...props} />
+      </VideoThemeScope>
     </SvgObjectDeparture>
   );
 }

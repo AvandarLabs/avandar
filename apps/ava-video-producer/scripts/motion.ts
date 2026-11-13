@@ -11,6 +11,7 @@ import {
   selectComposition,
 } from "@remotion/renderer";
 import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../src/stock/catalog";
+import { resolveVideoThemeFromSnapshot } from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { run, ffmpeg, probe } from "./lib/mediaHelpers";
 import { ensureDirectory, fileHash } from "./lib/planHelpers";
 import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
@@ -67,10 +68,10 @@ async function _preview(requests: MotionRequest[]) {
   });
   const browser = await openBrowser("chrome", { logLevel: "error" });
   try {
-    for (const { entry, request, sourceHash } of requests) {
+    for (const { entry, request, sourceHash, theme } of requests) {
       const fingerprint = await StockFingerprintModule.fromRequest({
         root: ROOT,
-        request,
+        request: { ...request, theme },
         expectedSourceHash: sourceHash,
       });
       await StockFingerprintModule.verifySources({
@@ -83,7 +84,7 @@ async function _preview(requests: MotionRequest[]) {
       const composition = await selectComposition({
         serveUrl,
         id: `stock-${entry.id}`,
-        inputProps: request,
+        inputProps: { ...request, theme },
         puppeteerInstance: browser,
         envVariables: {},
         logLevel: "error",
@@ -91,7 +92,7 @@ async function _preview(requests: MotionRequest[]) {
       for (const [index, frame] of SAMPLES.entries()) {
         await renderStill({
           composition,
-          inputProps: request,
+          inputProps: { ...request, theme },
           serveUrl,
           frame,
           output: path.join(
@@ -169,13 +170,13 @@ async function _render(requests: MotionRequest[]) {
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   // Check the whole selection before spending time on a partial batch.
   await Promise.all(
-    requests.map(async ({ entry, request, sourceHash }) => {
+    requests.map(async ({ entry, request, sourceHash, theme }) => {
       await StockFingerprintModule.requirePreview({
         root: ROOT,
         preset: entry.id,
         fingerprint: await StockFingerprintModule.fromRequest({
           root: ROOT,
-          request,
+          request: { ...request, theme },
           expectedSourceHash: sourceHash,
         }),
       });
@@ -183,7 +184,7 @@ async function _render(requests: MotionRequest[]) {
   );
   const destination = await ensureDirectory(ROOT, "out/motion/deliveries");
   const publicDir = await ensureDirectory(ROOT, "out/motion/empty-public");
-  for (const { entry, request, sourceHash } of requests) {
+  for (const { entry, request, sourceHash, theme } of requests) {
     await StockFingerprintModule.verifySources({
       root: ROOT,
       sourceHash: digest,
@@ -197,7 +198,7 @@ async function _render(requests: MotionRequest[]) {
       `render/${entry.id}/${fingerprint.configurationHash}`,
     );
     const propsFile = path.join(directory, "inputs.json");
-    await fs.writeFile(propsFile, JSON.stringify(request));
+    await fs.writeFile(propsFile, JSON.stringify({ ...request, theme }));
     const output = await run(
       "sh",
       [path.join(ROOT, "scripts/render.sh"), `stock-${entry.id}`, "90"],
@@ -256,6 +257,8 @@ async function _render(requests: MotionRequest[]) {
       preset: entry.id,
       fingerprint,
       request,
+      themeId: theme.themeId,
+      themeHash: resolveVideoThemeFromSnapshot(theme, [entry.id]).hash,
       frames: STOCK_LOOP_FRAMES,
       fps: STOCK_FPS,
       width: 1280,

@@ -1,13 +1,14 @@
-import { createContext, useContext } from "react";
 import rough from "roughjs";
+import { useGraphicTokens } from "../../theme/useGraphicTheme";
 import type { SVGProps } from "react";
 
-/** Optional sketch treatment for editorial boxes. Product UI does not use it. */
-export const StockBoxRoughnessContext = createContext(0);
-
-/** Seeded box outlines retain crisp text and the original SVG at roughness zero. */
+/**
+ * A box drawn with the theme's box sketch profile (`sketch.box`): the plain
+ * SVG rect while the profile is smooth, seeded roughjs outlines otherwise.
+ * Text is never sketched. Used by panels, pills, and preset boxes.
+ */
 export function StockRect(props: SVGProps<SVGRectElement>) {
-  const roughness = useContext(StockBoxRoughnessContext);
+  const profile = useGraphicTokens().sketch.box;
   const {
     x = 0,
     y = 0,
@@ -22,7 +23,7 @@ export function StockRect(props: SVGProps<SVGRectElement>) {
     ...attributes
   } = props;
   if (
-    !roughness ||
+    !profile.roughness ||
     !stroke ||
     stroke === "none" ||
     typeof x !== "number" ||
@@ -35,17 +36,18 @@ export function StockRect(props: SVGProps<SVGRectElement>) {
   const generator = rough.generator();
   const paths = generator.toPaths(
     generator.rectangle(x, y, width, height, {
-      roughness,
-      seed: 17,
+      roughness: profile.roughness,
+      bowing: profile.bowing,
+      seed: profile.seed,
       stroke,
       fill,
       fillStyle: "solid",
       strokeWidth: Number(strokeWidth),
-      maxRandomnessOffset: 3,
+      maxRandomnessOffset: profile.randomness,
     }),
   );
   return (
-    <g {...attributes} data-rough-box={roughness}>
+    <g {...attributes} data-rough-box={profile.roughness}>
       {paths.map((path, index) => (
         <path key={index} {...path} />
       ))}
