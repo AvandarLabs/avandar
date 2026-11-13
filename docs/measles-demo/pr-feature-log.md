@@ -421,7 +421,8 @@ Take only your feature's hunks from these files. The last feature in the
 | `shared/models/chat/SqlTableAlias/*`, `fetchWorkspaceSchema.ts`, `buildSqlSystemPrompt.ts`, the offline chat schema files, `parseProposeCaseType.ts`, `buildCaseManagerSystemPrompt.ts`, `makeChatToolConfigFromOptions.ts`, `shared/types/{chat,offlineChat}.types.ts` | F62, F71 to F75, F81 to F85 | F62: statuses in the schema line and in `proposeCaseType`. The others add field shapes and alias mapping. |
 | `tests/e2e/helpers/CaseTypeSeedHelpers.ts` | F61, F71 to F75 | F61: the helper and its cleanup (`cbf0b48b0`, `16e56ced1`, `b7172aafa`). F71 to F75: per-month fields (`ee2f4a4ad`). |
 | `apps/ava-video-producer/avandar-adapter/CasesScreen/*` | F18, F60, F71 to F75 | F60: `CasesScreen.{tsx,module.css}` stop importing the deleted `IndividualNavbar.module.css` (`e43da0e95`). F18: `RecordDetail.tsx`. |
-| `src/components/layouts/AppView/AppViewBody/AppViewBody.module.css` | F19, F68 | F19: `isFillHeight`. F68: `noPadding` plus fill-height drops the trailing padding. |
+| `src/components/layouts/AppView/AppViewBody/AppViewBody.module.css` | F19, F68, F131 | F19: `isFillHeight`. F68: `noPadding` plus fill-height drops the trailing padding. F131: the rail width reads `--ava-app-view-rail-width`, so the Apply view can widen it (`dd1bc5bec`). |
+| `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
 | `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
 | `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. |
@@ -10750,7 +10751,7 @@ female cases" becomes `"GENDER" = 2` without anyone remembering the code.
   `src/hooks/permissions/useResourceRole/useResourceRole.ts` return `isError`.
 - The popover (`1f92ec43b`, `e26030a83`, `5a3f40cb2`):
   `src/components/dataDictionaries/CodeListPopover/`.
-- The dataset page and menu (`6248dc0f6`, `32098fc2b`, `e26030a83`):
+- The dataset page and menu (`6248dc0f6`, `32098fc2b`, `e26030a83`, `b4c794528`):
   `DatasetMetaView/DatasetColumnCodes/`, `DatasetMetaView.tsx`,
   `DatasetMetadataList.tsx`, `DatasetSourceRail.tsx`,
   `DatasetSummaryView/DatasetSummaryView.tsx`,
@@ -10768,7 +10769,9 @@ female cases" becomes `"GENDER" = 2` without anyone remembering the code.
   attach hooks, the header and step bar, `MatchColumnsStep/`, and
   `AttachStep/`). The access hook has a `failed` state for a role read that
   fails. A column two dictionaries tie on goes to the one whose chip comes
-  first (most columns covered).
+  first (most columns covered). The header leads back to the dataset from a
+  breadcrumb, and the selected column sits in the body's rail, as in the
+  prototype (`dd1bc5bec`, `7af52f65b`).
 - The Save step (`242d427ef`, `ec386f1f6`):
   `src/views/DataManagerApp/NewDictionaryFromDatasetsView/` (`SaveStep/`,
   `ProposalStepBody.tsx`, `useCreateDictionary.ts`, `useNewDictionaryFlow.ts`,
