@@ -178,7 +178,7 @@ function _formatColumnCodesLine(
 function _formatDatasetLine(
   alias: string,
   dataset: Readonly<DataAgentDataset>,
-  listsColumnCodes: boolean,
+  codeLines: readonly string[],
 ): string {
   const columns = dataset.columns
     .map((column) => {
@@ -188,19 +188,42 @@ function _formatDatasetLine(
       return `${column.name} ${shortType}`;
     })
     .join(", ");
-  const codeLines = listsColumnCodes
-    ? dataset.columns.flatMap((column) => {
-        return _formatColumnCodesLine(column) ?? [];
-      })
-    : [];
   return [`${alias} = "${dataset.name}": ${columns}`, ...codeLines].join("\n");
+}
+
+/**
+ * Each dataset's code lines, in the order given, cut to the prompt's
+ * code-list budget, and the note that says how many columns it left out.
+ */
+function _fitCodeLines(
+  datasets: ReadonlyArray<Readonly<DataAgentDataset> | undefined>,
+): { codeLinesByDataset: string[][]; hiddenNote: string | undefined } {
+  const allLines = datasets.map((dataset) => {
+    return (dataset?.columns ?? []).flatMap((column) => {
+      return _formatColumnCodesLine(column) ?? [];
+    });
+  });
+  const { isKept, hiddenCount } = ColumnCodes.fitToPromptBudget(
+    allLines.flat(),
+  );
+  let offset = 0;
+  const codeLinesByDataset = allLines.map((lines) => {
+    const keptLines = lines.filter((_line, index) => {
+      return isKept[offset + index] ?? false;
+    });
+    offset += lines.length;
+    return keptLines;
+  });
+  const note = ColumnCodes.formatHiddenCodesNote(hiddenCount);
+  return { codeLinesByDataset, hiddenNote: note ? `(${note})` : undefined };
 }
 
 /**
  * Builds the system prompt for one prompt version: that version's fixed
  * instructions, then the datasets (aliases in the app's `SqlTableAlias`
  * order), then today's date. Everything before the date stays the same
- * between turns, so providers can cache it.
+ * between turns, so providers can cache it. From v4, each dataset lists
+ * its columns' code lists, within the prompt's code-list budget.
  */
 export function buildDataAgentSystemPrompt(
   options: Readonly<{
@@ -210,22 +233,30 @@ export function buildDataAgentSystemPrompt(
   }>,
 ): string {
   const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
-  const datasetLines = aliases.map((entry) => {
-    const dataset = options.datasets.find((candidate) => {
+  const datasets = aliases.map((entry) => {
+    return options.datasets.find((candidate) => {
       return entry.kind === "dataset" && candidate.id === entry.datasetId;
     });
+  });
+  const { codeLinesByDataset, hiddenNote } = LISTS_COLUMN_CODES[
+    options.promptId
+  ]
+    ? _fitCodeLines(datasets)
+    : { codeLinesByDataset: [], hiddenNote: undefined };
+  const datasetLines = aliases.map((entry, index) => {
+    const dataset = datasets[index];
     return dataset
       ? _formatDatasetLine(
           entry.alias,
           dataset,
-          LISTS_COLUMN_CODES[options.promptId],
+          codeLinesByDataset[index] ?? [],
         )
       : "";
   });
   return `${INSTRUCTIONS_BY_PROMPT_ID[options.promptId]}
 
 DATASETS
-${datasetLines.join("\n")}
+${[...datasetLines, ...(hiddenNote ? [hiddenNote] : [])].join("\n")}
 
 Today is ${options.today}.`;
 }

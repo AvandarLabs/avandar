@@ -280,6 +280,38 @@ describe("buildDataAgentSystemPrompt", () => {
     );
   });
 
+  it("names columns past v4's code-list budget instead of listing them", () => {
+    const pairs = Array.from({ length: 30 }, (_, index) => {
+      return {
+        code: String(index),
+        label: `Label number ${index}`,
+        acceptedSpellings: [],
+        isMissing: false,
+      };
+    });
+    const columns = Array.from({ length: 20 }, (_, index) => {
+      return {
+        name: `coded_${index}`,
+        dataType: "bigint",
+        codes: { direction: "decode" as const, pairs },
+      };
+    });
+
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: [{ ...CODED_DATASETS[0]!, columns }],
+      today: "2026-11-12",
+      promptId: "data-agent-v4",
+    });
+    const datasetsBlock = prompt.slice(prompt.indexOf("\n\nDATASETS\n"));
+
+    expect(datasetsBlock).toContain("  - coded_0: codes 0=Label number 0");
+    expect(datasetsBlock).not.toContain("  - coded_19:");
+    expect(datasetsBlock).toMatch(
+      /\n\(and \d+ more columns with code lists\)\n\nToday/,
+    );
+    expect(datasetsBlock.length).toBeLessThan(5000);
+  });
+
   it("tells v4 to filter on the code and never guess a missing label", () => {
     const v4 = buildDataAgentSystemPrompt({
       datasets: DATASETS,

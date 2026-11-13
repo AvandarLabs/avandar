@@ -118,19 +118,40 @@ function _formatAliasLine(
 }
 
 /**
- * A dataset column as the schema block names it: `GENDER [1=Male,
- * 2=Female]` for a column holding codes, `sex [values Male, Female]` for
- * one holding labels, and the bare name otherwise. The list stays whole
- * however the block is cut, because it is part of the column's name.
+ * The code list the schema block writes after a column's name: ` [1=Male,
+ * 2=Female]` for a column holding codes, ` [values Male, Female]` for one
+ * holding labels, and nothing otherwise.
  */
-function _formatColumnName(column: Readonly<SchemaColumn>): string {
+function _formatColumnCodes(column: Readonly<SchemaColumn>): string {
   const pairsText = column.codes ? ColumnCodes.formatPairs(column.codes) : "";
   if (pairsText === "") {
-    return column.name;
+    return "";
   }
   return column.codes?.direction === "encode"
-    ? `${column.name} [values ${pairsText}]`
-    : `${column.name} [${pairsText}]`;
+    ? ` [values ${pairsText}]`
+    : ` [${pairsText}]`;
+}
+
+/**
+ * Each dataset column as the schema block names it, such as `GENDER [1=Male,
+ * 2=Female]`, with the note that says how many columns' lists the block's
+ * code-list budget left out. A list stays whole however the block is cut,
+ * because it is part of the column's name.
+ */
+function _formatColumnNames(columns: readonly SchemaColumn[]): {
+  names: Array<{ dataset_id: string; label: string }>;
+  hiddenNote: string | undefined;
+} {
+  const codeTexts = columns.map(_formatColumnCodes);
+  const { isKept, hiddenCount } = ColumnCodes.fitToPromptBudget(codeTexts);
+  const names = columns.map((column, index) => {
+    return {
+      dataset_id: column.dataset_id,
+      label: isKept[index] ? `${column.name}${codeTexts[index]}` : column.name,
+    };
+  });
+  const note = ColumnCodes.formatHiddenCodesNote(hiddenCount);
+  return { names, hiddenNote: note ? `(${note})` : undefined };
 }
 
 /**
@@ -251,15 +272,11 @@ function _formatSchemaBlock(
     conceptStatuses?: readonly SqlTableAliasConceptStatus[];
   }>,
 ): string {
-  const namesByDatasetId = makeBucketMap(
-    args.columns.map((column) => {
-      return {
-        dataset_id: column.dataset_id,
-        label: _formatColumnName(column),
-      };
-    }),
-    { key: "dataset_id", valueKey: "label" },
-  );
+  const columnNames = _formatColumnNames(args.columns);
+  const namesByDatasetId = makeBucketMap(columnNames.names, {
+    key: "dataset_id",
+    valueKey: "label",
+  });
   const namesByConceptId = _formatConceptAttributeNames(
     args.conceptAttributes ?? [],
   );
@@ -279,6 +296,7 @@ function _formatSchemaBlock(
             ];
       return _formatAliasLine(entry, names);
     })
+    .concat(columnNames.hiddenNote ? [columnNames.hiddenNote] : [])
     .join("\n");
 }
 

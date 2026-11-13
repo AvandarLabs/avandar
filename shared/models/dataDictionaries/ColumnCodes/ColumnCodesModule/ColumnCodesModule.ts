@@ -11,9 +11,40 @@ const MAX_PROMPT_PAIRS = 30;
 /** The longest description one column carries into a prompt. */
 const MAX_PROMPT_DESCRIPTION_CHARS = 120;
 
+/** The longest code or label one pair carries into a prompt. */
+const MAX_PROMPT_VALUE_CHARS = 60;
+
+/**
+ * The most characters of code lists one prompt carries, across all its
+ * columns. Columns past it are named without their codes.
+ */
+const MAX_PROMPT_CODES_CHARS = 4000;
+
 /** Trims and collapses each run of whitespace, newlines too, to one space. */
 function _toOneLine(text: string): string {
   return text.trim().replace(/\s+/g, " ");
+}
+
+/** Cuts text to `maxChars`, ending in "...", when it is longer. */
+function _truncate(text: string, maxChars: number): string {
+  return text.length > maxChars
+    ? `${text.slice(0, maxChars - 3).trimEnd()}...`
+    : text;
+}
+
+/** A code or label on one line, cut to 60 characters. */
+function _toPromptValue(text: string): string {
+  return _truncate(_toOneLine(text), MAX_PROMPT_VALUE_CHARS);
+}
+
+/**
+ * A code or label as text to put inside double quotes in a prompt: on one
+ * line, cut to 60 characters, with backslashes and quotes escaped. Used
+ * wherever a prompt quotes a code or label, for example the offline data
+ * agent's code lists.
+ */
+function toPromptText(text: string): string {
+  return _toPromptValue(text).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 /** Trims, lowercases, and collapses inner spaces, for comparing labels. */
@@ -151,20 +182,22 @@ function fromStoredPairs(value: unknown): ColumnCodePair[] {
 }
 
 /**
- * A label as prompt text: quoted, with inner quotes escaped, only when a
- * comma or `=` would otherwise blur where the pair ends.
+ * A code or label as prompt text, cut to 60 characters: quoted, with inner
+ * quotes escaped, only when a comma, `=`, or bracket would otherwise blur
+ * where the pair or the list ends.
  */
-function _formatLabel(label: string): string {
-  return /[,=]/.test(label) ? `"${label.replace(/"/g, '\\"')}"` : label;
+function _formatValue(text: string): string {
+  const value = _toPromptValue(text);
+  return /[,=[\]]/.test(value) ? `"${toPromptText(value)}"` : value;
 }
 
 function _formatPair(
   pair: Readonly<ColumnCodePair>,
   direction: ColumnCodesContext["direction"],
 ): string {
-  const oneLineLabel = _toOneLine(pair.label);
-  const label = oneLineLabel === "" ? "(no label)" : _formatLabel(oneLineLabel);
-  const code = _toOneLine(pair.code);
+  const label =
+    _toOneLine(pair.label) === "" ? "(no label)" : _formatValue(pair.label);
+  const code = _formatValue(pair.code);
   const missing = pair.isMissing ? " (missing)" : "";
   return direction === "decode"
     ? `${code}=${label}${missing}`
@@ -200,9 +233,45 @@ function formatDescription(
   if (text === "") {
     return undefined;
   }
-  return text.length > MAX_PROMPT_DESCRIPTION_CHARS
-    ? `${text.slice(0, MAX_PROMPT_DESCRIPTION_CHARS - 3).trimEnd()}...`
-    : text;
+  return _truncate(text, MAX_PROMPT_DESCRIPTION_CHARS);
+}
+
+/**
+ * Which of one prompt's code-list texts fit in its budget of 4,000
+ * characters, in prompt order. Texts are kept until one would pass the
+ * budget, and every text after it is left out too, so a prompt never lists
+ * a later column's codes but not an earlier one's. An empty text, for a
+ * column without codes, costs nothing and is never counted as hidden.
+ */
+function fitToPromptBudget(texts: readonly string[]): {
+  isKept: boolean[];
+  hiddenCount: number;
+} {
+  const isKept: boolean[] = [];
+  let usedChars = 0;
+  let hiddenCount = 0;
+  for (const text of texts) {
+    usedChars += text.length;
+    const fits =
+      text === "" || (hiddenCount === 0 && usedChars <= MAX_PROMPT_CODES_CHARS);
+    isKept.push(fits);
+    hiddenCount += fits ? 0 : 1;
+  }
+  return { isKept, hiddenCount };
+}
+
+/**
+ * The note a prompt ends its datasets with when its code-list budget left
+ * columns out, such as `and 3 more columns with code lists`, or undefined
+ * when nothing was left out.
+ */
+function formatHiddenCodesNote(hiddenCount: number): string | undefined {
+  if (hiddenCount <= 0) {
+    return undefined;
+  }
+  return hiddenCount === 1
+    ? "and 1 more column with a code list"
+    : `and ${hiddenCount} more columns with code lists`;
 }
 
 /**
@@ -233,11 +302,16 @@ function findPairByLabel(
 export const ColumnCodesModule = {
   MAX_PROMPT_PAIRS,
   MAX_PROMPT_DESCRIPTION_CHARS,
+  MAX_PROMPT_VALUE_CHARS,
+  MAX_PROMPT_CODES_CHARS,
   fromRows,
   getRowIdsFromBindings,
   toContext,
   fromStoredPairs,
   formatPairs,
   formatDescription,
+  toPromptText,
+  fitToPromptBudget,
+  formatHiddenCodesNote,
   findPairByLabel,
 };

@@ -169,6 +169,85 @@ describe("ColumnCodes.formatPairs", () => {
   });
 });
 
+describe("ColumnCodes.formatPairs caps and brackets", () => {
+  it("cuts a long label and a long code to 60 characters", () => {
+    const text = ColumnCodes.formatPairs({
+      direction: "decode",
+      pairs: [
+        { ...SEX_PAIRS[0]!, code: "c".repeat(80), label: "l".repeat(80) },
+      ],
+    });
+
+    expect(text).toBe(`${"c".repeat(57)}...=${"l".repeat(57)}...`);
+  });
+
+  it("quotes a label or code that holds a bracket", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, code: "[1]", label: "Male]" }],
+      }),
+    ).toBe('"[1]"="Male]"');
+  });
+
+  it("quotes a code that holds a comma", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, code: "1,2" }],
+      }),
+    ).toBe('"1,2"=Male');
+  });
+});
+
+describe("ColumnCodes.toPromptText", () => {
+  it("escapes a quote", () => {
+    expect(ColumnCodes.toPromptText('Said "no"')).toBe('Said \\"no\\"');
+  });
+
+  it("writes a newline as a space", () => {
+    expect(ColumnCodes.toPromptText(" Male\n  adult ")).toBe("Male adult");
+  });
+
+  it("cuts long text to 60 characters", () => {
+    expect(ColumnCodes.toPromptText("x".repeat(80))).toBe(
+      `${"x".repeat(57)}...`,
+    );
+  });
+});
+
+describe("ColumnCodes.fitToPromptBudget", () => {
+  it("keeps every text that fits", () => {
+    expect(ColumnCodes.fitToPromptBudget(["a", "", "b"])).toEqual({
+      isKept: [true, true, true],
+      hiddenCount: 0,
+    });
+  });
+
+  it("leaves out texts from the first one past the budget", () => {
+    const half = "x".repeat(ColumnCodes.MAX_PROMPT_CODES_CHARS / 2);
+
+    expect(
+      ColumnCodes.fitToPromptBudget([half, "", half, "y", "", "z"]),
+    ).toEqual({
+      isKept: [true, true, true, false, true, false],
+      hiddenCount: 2,
+    });
+  });
+});
+
+describe("ColumnCodes.formatHiddenCodesNote", () => {
+  it("says how many columns' code lists were left out", () => {
+    expect(ColumnCodes.formatHiddenCodesNote(0)).toBeUndefined();
+    expect(ColumnCodes.formatHiddenCodesNote(1)).toBe(
+      "and 1 more column with a code list",
+    );
+    expect(ColumnCodes.formatHiddenCodesNote(3)).toBe(
+      "and 3 more columns with code lists",
+    );
+  });
+});
+
 describe("ColumnCodes.formatDescription", () => {
   it("cuts a long description to 120 characters", () => {
     const text = ColumnCodes.formatDescription("word ".repeat(40));
