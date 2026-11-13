@@ -11031,13 +11031,36 @@ linked dataset keeps up with the dictionary.
   (`rls_data_dictionaries__code_lists__linked`,
   `rls_dataset_columns__dictionary_bindings`). Regenerate the migration
   with `supabase-declarative-schema`, never copy it.
-- Shared models (`12f5ee41a`, `029a31457`, `54af33e5f`):
+- Schema fixes from the final review (`cfbd887a4`): the generated
+  `supabase/migrations/20261113232435_dictionary_conversion_fixes.sql` and
+  its twin
+  `apps/desktop/migrations/20261113232435_dictionary_conversion_fixes.gen.sql`,
+  `shared/types/database.types.ts`, the matching edits to
+  `supabase/schemas/{30.dataset_columns__dictionary_bindings,50.rpc_data_dictionaries__save,51.rpc_dataset_columns__apply_dictionaries,52.rpc_dataset_columns__apply_dictionaries_as_linked_dataset}.sql`,
+  and the tests `dictionary_changes` and
+  `..._apply_dictionaries__convert`. `sync_live_types` types a column from
+  `coalesce(pinned_pairs, live pairs)`, so a save that edits a list and
+  deletes its entry leaves the right `data_type` (the save pinned the
+  entry's convert bindings to the list's new pairs, and re-typing then
+  skipped them). Both apply RPCs check the Data Sources editor right after
+  they authorize the dataset, before any binding is read, when the call adds
+  values.
+- Shared models (`12f5ee41a`, `029a31457`, `54af33e5f`, `cb3521097`,
+  `55ab3f63e`):
   `SM/DictionaryBinding/`, `SM/DataDictionaryCodeList/`,
   `shared/models/datasets/DatasetColumn/`,
   `shared/models/datasets/VirtualDataset/`, and the new
   `SM/ColumnConversion/` (the `WHEN` clauses, output type, and `ENUM`
   labels, with codes trimmed the way SQL trims them). `12f5ee41a` also
   touches `ApplyDictionariesView/AttachStep/` for the new binding fields.
+  `cb3521097` applies a map override whose code differs from a pair only in
+  case or surrounding spaces, as the apply RPC already accepts it, where the
+  lookup was exact and the override did nothing. `55ab3f63e` reads an
+  ordered column as text when a kept value holds a NUL character or the
+  column keeps more than 1,000 values, since either broke the `ENUM`
+  literal and the dataset's view failed to build. The kept values read, in
+  `src/clients/DuckDbClient/duckDbSqlText.ts` with its tests, now stops one
+  past the cap.
 - Rendering and loading (`b603b61b8`, `b195ad2e8`, `3bdccd425`,
   `59c506f64`, `f25b4dcf3`, `9d5fe22f3`, `b66609496`):
   `src/clients/DuckDbClient/{duckDbSqlText,duckDbParquetLoad,duckDbClientOperations}.ts`
@@ -11073,7 +11096,8 @@ linked dataset keeps up with the dictionary.
 - The apply flow (`83781324c`, `4863ee56b`, `b67aea4cd`, `e1e0e0442`,
   `8c7fa2781`, `d36ba57fd`, `7bc391c64`, `63a08980e`, `ae54962d0`,
   `4ce941af3`, `3f668c259`, `161f24881`, `7f073e8d6`, `1c320c62d`,
-  `dbc4f876c`): `ApplyDictionariesView/` (the reducer, defaults, inputs,
+  `dbc4f876c`, `39bbce3dd`, `2b5a84053`, `73c7c4ade`, `2a9bc0850`,
+  `8c5e74acf`, `a95df8b8e`, `a7daa8a7d`): `ApplyDictionariesView/` (the reducer, defaults, inputs,
   targets, the profile, unmatched-value, and preview reads,
   `MatchColumnsStep/`, `UnmatchedValuesStep/`, `PreviewDrawer/`,
   `SaveAsStep/`, the header, stepper, step heading, facts, and step
@@ -11082,7 +11106,21 @@ linked dataset keeps up with the dictionary.
   `src/hooks/datasets/useIsUnderDatasetLimit/useIsUnderDatasetLimit.ts`.
   `1c320c62d` profiles a converted column as its stored type, so Apply on a
   linked dataset can read its columns. `dbc4f876c` keeps the preview's
-  hidden text inside the drawer.
+  hidden text inside the drawer. The final review fixed these:
+  `39bbce3dd` drops a saved map override to a code its list no longer
+  holds when the flow opens, and never sends it, since the RPC refused every
+  save with `binding_payload_invalid`. `2b5a84053` forgets a removed
+  dictionary's value resolutions along with its picks, so a later pick of
+  the same column does not inherit them. `73c7c4ade` keeps Save and Attach
+  disabled until the unmatched values read lands, because until then
+  overrides and added pairs held lowercased keys, not the stored text.
+  `2a9bc0850` counts a pending Add to list code that is not a whole number
+  when offering Keep as is, since it makes a whole-number column text.
+  `8c5e74acf` blocks saving when two values add one code to a list with
+  different labels (new `AddedCodeConflictCallout.tsx`, the conflicted
+  inputs name the code, and two columns adding the very same pair still
+  save). `a95df8b8e` formats these fixes, and `a7daa8a7d` extracts their
+  messages into the translation catalogs.
 - The dataset page (`402335d0b`, `76d145c3e`, `7663ab9e0`, `6705c3e3c`,
   `dbc4f876c`): `DatasetMetaView/DatasetActionsMenu/`
   (`ApplyDictionaryMenuItem.tsx`, `DatasetActionsMenu.tsx`,
@@ -11104,7 +11142,14 @@ linked dataset keeps up with the dictionary.
   `DictionaryUsedByTab/` with `HowAppliedCell.tsx` and
   `UsageStatusCell.tsx`, `DataDictionaryEditor/DataDictionaryEditor.tsx`,
   and `useSaveDataDictionary.ts`, which now also refreshes the dataset
-  columns and the cached rows).
+  columns and the cached rows). `a62e71b49` adds
+  `DataDictionaryActionsMenu/invalidateAfterDictionaryDelete.ts`:
+  deleting a dictionary removes its reference bindings and pins its convert
+  bindings on the server, so the dataset bindings, columns, and rows are
+  refreshed too, where only the dictionary list was.
+- Test docstrings (`e6aebba2b`): the tests for `CodeListPopover`,
+  `DatasetDictionariesRailGroup`, `describeDictionaryUses`,
+  `DatasetMetadataList`, and `LinkedSourceFact` no longer name plan tasks.
 - Evals (`da036466e`, `8f6abcc07`, `f05473c46`, `682fbf212`):
   `scripts/ai-eval/measles/`, `scripts/ai-eval/runtime/EvalDatabase.ts`
   (a column's `sourceSql`), `docs/ai-agent/eval.md`, and
@@ -11112,10 +11157,10 @@ linked dataset keeps up with the dictionary.
 - E2E (`161f24881`, `766c39961`, `029c51b19`):
   `tests/e2e/dictionary-apply-linked.spec.ts` (new) and
   `dictionary-apply-reference.spec.ts` (the three-step flow).
-- Translations (`c9e47cd9f`): `src/i18n/locales/*/messages.{po,ts}`,
+- Translations (`c9e47cd9f`, `a7daa8a7d`): `src/i18n/locales/*/messages.{po,ts}`,
   regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
 
-**Schema:** yes, one migration (`dictionary_conversions`): the binding's
+**Schema:** yes, two migrations. `dictionary_conversions` holds the binding's
 `keeps_original`, `value_overrides`, `pinned_pairs`, `pinned_is_ordered`, and
 `replaced_data_type` with the reference-only check;
 `dataset_columns.dictionary_binding_id` and
@@ -11125,12 +11170,14 @@ re-pointing of reference bindings and the re-derived types in
 `rpc_data_dictionaries__save`; and `rpc_dataset_columns__apply_dictionaries`
 (now with conversions and added pairs),
 `rpc_dataset_columns__apply_dictionaries_as_linked_dataset`, and
-`rpc_dataset_columns__reapply_dictionary` (used from F134). Plus its desktop
-SQLite twin. Regenerate the migration with `supabase-declarative-schema`,
-never copy it.
+`rpc_dataset_columns__reapply_dictionary` (used from F134).
+`dictionary_conversion_fixes` retypes columns from `coalesce(pinned_pairs,
+live pairs)` and adds the Data Sources editor check to both apply RPCs. Each
+has its desktop SQLite twin. Regenerate each migration with
+`supabase-declarative-schema`, never copy it.
 
-**Deploy:** the migration first, then the `chat` edge function, then the
-frontend. Tabs opened before the deploy send the old two-argument apply
+**Deploy:** both migrations together first, then the `chat` edge function,
+then the frontend. Tabs opened before the deploy send the old two-argument apply
 call, which the new RPC's defaulted third argument still accepts.
 
 **Known gaps:** converting in place, its synced-data warning, and Re-apply
@@ -11161,7 +11208,13 @@ them; `column_idx` keeps the source's order. The Data Summary
 shows only a column's most common values, so an ordered list's order shows
 in a grouped query, not there. A workspace member who is not an admin never
 reaches the disabled Save as card on an upload: Convert all and the row
-chips are already disabled at Match columns, with the same reason.
+chips are already disabled at Match columns, with the same reason. After a
+reload, queries on an offline-only upload fail, because the query path never
+reads `LocalDataset`'s Parquet and such an upload has nothing in cloud
+storage. This predates this feature (the relation-cache design stopped the
+query path reading `LocalDataset.parquetData`). Fixing it is its own change.
+Shift+Tab is the only way back from the code-list popover's link to its tag.
+Tab from the link continues to the next control.
 
 **Verification:**
 ```sh
@@ -11203,8 +11256,9 @@ needs "I understand this changes <dataset> for the whole workspace" ticked
 before **Change n columns** enables. A live connection and a dataset a
 linked dataset reads cannot be changed in place, and the disabled card says
 why ("<source> data can't be changed from Avandar yet, so a linked dataset
-is the only option for now.", or "A linked dataset reads <dataset>, so it
-can't be changed in place. Convert in the linked dataset instead."). The
+is the only option for now.", or "<linked dataset> reads this dataset, so
+converting it here would convert twice. Change the linked dataset instead.",
+with "A linked dataset" until the name loads). The
 conversion is pinned to the dictionary version applied, so later edits do
 not reach it. The dataset rail and Used by say "Applied version n, now
 version m" and offer **Re-apply** to someone who can edit the dataset, with
@@ -11241,10 +11295,13 @@ and 7.5) and `docs/measles-demo/data-dictionaries-4-conversions-plan.md`
   `src/clients/dataDictionaries/DictionaryBindingClient.ts`
   (`reapplyDictionary`) and
   `src/hooks/dataDictionaries/useReapplyDictionary/`.
-- The Save as card (`08af7bcc8`, `79d071a55`):
+- The Save as card (`08af7bcc8`, `79d071a55`, `27deb6c7e`):
   `ApplyDictionariesView/SaveAsStep/{ChangeDatasetCard,SaveTargetCards}.tsx`
   with `ChangeDatasetCard.test.tsx`, and
-  `ApplyDictionariesView/applyTargets/`.
+  `ApplyDictionariesView/applyTargets/` with `useApplyTargets.ts`.
+  `27deb6c7e` makes the Change card name the linked dataset that reads this
+  one and say that converting here would convert twice, falling back to "A
+  linked dataset" while the name has not loaded.
 - Re-apply (`6f5fd62a8`, `1f2459c4a`, `83af03334`):
   `src/components/dataDictionaries/ReapplyButton/`,
   `DataDictionaryView/DictionaryUsedByTab/` (`DictionaryUsedByTab.tsx`,
