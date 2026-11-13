@@ -260,6 +260,14 @@ under "Questions and ground truth".
   its reply described the datasets as "COVID-19" data, and
   `runtime/gradeEvalAnswer.ts:47` fails any digit in that reply. On run #2
   it passed. The grader is unchanged.
+- After review, the coded-column graders were tightened: D01 to D03 now pass
+  only a one-row result holding exactly one number, equal to the count, so a
+  code shown beside a wrong count (D01's 1 is also the Male code, D03's 3 the
+  Upper-middle code) fails. D04 no longer accepts "not recorded", which an
+  invented meaning can say. The four coded runs were re-graded from their
+  saved answers and complete result previews, with no new model calls: every
+  run still scores 4/4, and each D01 to D03 answer was a single `count(*)`
+  or `SUM(CASE ...)` column.
 - D04 ("What does a GENDER value of 9 mean?"): every online run said the
   code has no label, quoted `(no label)`, named the labelled codes (1 Male,
   2 Female), and said it cannot tell what 9 stands for. The offline run said
