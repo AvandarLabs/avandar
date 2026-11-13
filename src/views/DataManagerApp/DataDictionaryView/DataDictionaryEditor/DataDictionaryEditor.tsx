@@ -47,7 +47,10 @@ export function DataDictionaryEditor({
     return DataDictionary.findDraftIssues(draft);
   }, [draft]);
   const selection = useEditorSelection(draft);
-  const usage = useDictionaryUsage(dictionary.id);
+  const usage = useDictionaryUsage({
+    dictionaryId: dictionary.id,
+    currentVersion: dictionary.version,
+  });
   const usedByCount =
     usage.isLoading || usage.hasError ? undefined : usage.rows.length;
 

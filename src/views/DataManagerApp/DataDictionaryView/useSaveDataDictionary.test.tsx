@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { act, renderHook, TestProviders } from "@/test-utils";
 import { useSaveDataDictionary } from "@/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary";
 import type { ReactNode } from "react";
@@ -55,6 +57,14 @@ describe("useSaveDataDictionary", () => {
 
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["DictionaryBindingClient"],
+    });
+    // A conversion follows its live list, so the converted columns' types
+    // and every shown row can change with a save.
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: [DatasetColumnClient.getClientName()],
+    });
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: [DatasetQueryClient.getClientName()],
     });
   });
 });
