@@ -189,7 +189,7 @@ describe("getKeptEnumValuesQueries", () => {
     expect(queries).toEqual([
       {
         columnName: "SES",
-        sql: `SELECT DISTINCT kept_value FROM (SELECT CASE lower(trim(CAST(TRY_CAST("SES" AS BIGINT) AS VARCHAR))) WHEN lower(trim('1')) THEN 'Male' ELSE CAST(TRY_CAST("SES" AS BIGINT) AS VARCHAR) END AS kept_value FROM read_parquet("t1")) WHERE kept_value IS NOT NULL AND kept_value NOT IN ('Male') ORDER BY kept_value`,
+        sql: `SELECT DISTINCT kept_value FROM (SELECT CASE lower(trim(CAST(TRY_CAST("SES" AS BIGINT) AS VARCHAR))) WHEN lower(trim('1')) THEN 'Male' ELSE CAST(TRY_CAST("SES" AS BIGINT) AS VARCHAR) END AS kept_value FROM read_parquet("t1")) WHERE kept_value IS NOT NULL AND kept_value NOT IN ('Male') ORDER BY kept_value LIMIT 1001`,
       },
     ]);
   });

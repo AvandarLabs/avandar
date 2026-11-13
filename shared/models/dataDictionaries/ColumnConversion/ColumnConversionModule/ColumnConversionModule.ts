@@ -9,6 +9,15 @@ import type {
 /** A whole-number code of at most 18 digits, so it fits a BIGINT. */
 const INTEGER_CODE_REGEX = /^-?[0-9]{1,18}$/;
 
+/**
+ * The most kept values an ordered list's `ENUM` takes. Past it the column
+ * stays text, so a column of mostly free text never builds a huge type.
+ */
+const MAX_ENUM_KEPT_VALUES = 1000;
+
+/** The NUL character, which DuckDB's parser cannot read in a literal. */
+const NUL_CHARACTER = String.fromCharCode(0);
+
 type Binding = ColumnConversionRows["bindings"][number];
 
 type Lookups = {
@@ -189,6 +198,16 @@ function _toEnumTypeSql(labels: readonly string[]): string {
   return `ENUM(${_unique(labels).map(quoteSqlLiteral).join(", ")})`;
 }
 
+/** Whether `keptValues` can complete an `ENUM`: few enough, none with NUL. */
+function _canCompleteEnum(keptValues: readonly string[]): boolean {
+  return (
+    keptValues.length <= MAX_ENUM_KEPT_VALUES &&
+    !keptValues.some((value) => {
+      return value.includes(NUL_CHARACTER);
+    })
+  );
+}
+
 /**
  * The converted value of `valueSql` as one SQL expression. A value no case
  * matches is kept as text. Integer codes are cast to `BIGINT`, so a kept
@@ -196,7 +215,8 @@ function _toEnumTypeSql(labels: readonly string[]): string {
  * become an `ENUM` only when `keptValues` lists every other value the
  * conversion keeps, since only the load-time read knows them and casting a
  * value outside the `ENUM` fails the whole query; without it the labels
- * stay text.
+ * stay text. They also stay text when there are more than 1,000 kept
+ * values, or when one holds a NUL character, which no `ENUM` literal can.
  */
 function toCaseSql(
   options: Readonly<{
@@ -213,7 +233,11 @@ function toCaseSql(
   if (outputType.kind === "bigint") {
     return `TRY_CAST(${expressionSql} AS BIGINT)`;
   }
-  if (outputType.kind === "enum" && options.keptValues !== undefined) {
+  if (
+    outputType.kind === "enum" &&
+    options.keptValues !== undefined &&
+    _canCompleteEnum(options.keptValues)
+  ) {
     const labels = [...outputType.labels, ...options.keptValues];
     return `CAST(${expressionSql} AS ${_toEnumTypeSql(labels)})`;
   }
@@ -223,7 +247,9 @@ function toCaseSql(
 /**
  * A query for every value an ordered list's conversion keeps that is not
  * one of its labels, sorted, as one `kept_value` column. Its rows are the
- * `keptValues` that complete the column's `ENUM`.
+ * `keptValues` that complete the column's `ENUM`. It reads at most one
+ * past the 1,000 the `ENUM` takes, enough for `toCaseSql` to see the cap
+ * is passed and keep the column as text.
  */
 function toKeptValuesSql(
   options: Readonly<{
@@ -241,7 +267,7 @@ function toKeptValuesSql(
     labels.length === 0
       ? ""
       : ` AND kept_value NOT IN (${labels.map(quoteSqlLiteral).join(", ")})`;
-  return `SELECT DISTINCT kept_value FROM (SELECT ${expressionSql} AS kept_value FROM ${options.relationSql}) WHERE kept_value IS NOT NULL${notListedSql} ORDER BY kept_value`;
+  return `SELECT DISTINCT kept_value FROM (SELECT ${expressionSql} AS kept_value FROM ${options.relationSql}) WHERE kept_value IS NOT NULL${notListedSql} ORDER BY kept_value LIMIT ${MAX_ENUM_KEPT_VALUES + 1}`;
 }
 
 /**

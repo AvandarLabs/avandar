@@ -268,3 +268,71 @@ describe("getParquetProjectionClauses, executed", () => {
     ).toEqual([...HOSTILE_LABELS, "7"]);
   });
 });
+
+/**
+ * Builds a view converting `levels_sql`'s `level` column with an ordered
+ * list, reading its kept values first as a load does, then reads `sql`.
+ */
+async function _readOrderedLevels(
+  levelsSql: string,
+  sql: string,
+): Promise<Array<Record<string, unknown>>> {
+  return await withDuckDb(async (connection) => {
+    await _readAll(connection, `CREATE TABLE levels AS ${levelsSql}`);
+    const keptRows = await _readAll(
+      connection,
+      ColumnConversion.toKeptValuesSql({
+        relationSql: '"levels"',
+        valueSql: '"level"',
+        conversion: SES_CONVERSION,
+      }),
+    );
+    const clauses = getParquetProjectionClauses(
+      { level: { valueMapping: SES_CONVERSION } },
+      {
+        keptValuesByColumn: {
+          level: keptRows.map((row) => {
+            return String(row.kept_value);
+          }),
+        },
+      },
+    );
+    await _readAll(
+      connection,
+      `CREATE VIEW converted AS SELECT * ${clauses.excludeClause} ${clauses.replaceClause} FROM levels`,
+    );
+    return await _readAll(connection, sql);
+  });
+}
+
+describe("ordered conversions an ENUM cannot hold, executed", () => {
+  it("reads a kept value holding a NUL character as text", async () => {
+    const rows = await _readOrderedLevels(
+      `SELECT * FROM (VALUES ('1'), ('a' || chr(0) || 'b')) AS t(level)`,
+      `SELECT level, typeof(level) AS level_type FROM converted ORDER BY level`,
+    );
+
+    expect(rows).toEqual([
+      { level: "Low", level_type: "VARCHAR" },
+      { level: `a${String.fromCharCode(0)}b`, level_type: "VARCHAR" },
+    ]);
+  });
+
+  it("reads a column with more than 1,000 kept values as text", async () => {
+    const rows = await _readOrderedLevels(
+      `SELECT CAST(range + 100 AS VARCHAR) AS level FROM range(1001)`,
+      `SELECT count(DISTINCT level)::INTEGER AS levels, any_value(typeof(level)) AS level_type FROM converted`,
+    );
+
+    expect(rows).toEqual([{ levels: 1001, level_type: "VARCHAR" }]);
+  });
+
+  it("keeps an ENUM for exactly 1,000 kept values", async () => {
+    const rows = await _readOrderedLevels(
+      `SELECT CAST(range + 100 AS VARCHAR) AS level FROM range(1000)`,
+      `SELECT any_value(typeof(level)) AS level_type FROM converted`,
+    );
+
+    expect(String(rows[0]?.level_type)).toMatch(/^ENUM\(/);
+  });
+});

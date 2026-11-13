@@ -262,6 +262,31 @@ describe("ColumnConversion.toCaseSql", () => {
     expect(sql).not.toContain("ENUM");
   });
 
+  it("leaves an ordered list as text when a kept value holds a NUL character", () => {
+    const sql = ColumnConversion.toCaseSql({
+      valueSql: '"SES"',
+      conversion: _makeConversion({ pairs: SES_PAIRS, isOrdered: true }),
+      keptValues: ["7", `a${String.fromCharCode(0)}b`],
+    });
+
+    expect(sql).not.toContain("ENUM");
+  });
+
+  it("leaves an ordered list as text past 1,000 kept values", () => {
+    const toSql = (count: number): string => {
+      return ColumnConversion.toCaseSql({
+        valueSql: '"SES"',
+        conversion: _makeConversion({ pairs: SES_PAIRS, isOrdered: true }),
+        keptValues: Array.from({ length: count }, (_, index) => {
+          return `v${index}`;
+        }),
+      });
+    };
+
+    expect(toSql(1000)).toContain("ENUM");
+    expect(toSql(1001)).not.toContain("ENUM");
+  });
+
   it("keeps every value as text when nothing can match", () => {
     expect(
       ColumnConversion.toCaseSql({
@@ -292,7 +317,7 @@ describe("ColumnConversion.toCaseSql", () => {
 });
 
 describe("ColumnConversion.toKeptValuesSql", () => {
-  it("selects the values kept beside an ordered list's labels, sorted", () => {
+  it("selects the values kept beside an ordered list's labels, sorted, one past the ENUM cap", () => {
     const sql = ColumnConversion.toKeptValuesSql({
       relationSql: '"raw"',
       valueSql: '"SES"',
@@ -303,7 +328,7 @@ describe("ColumnConversion.toKeptValuesSql", () => {
     });
 
     expect(sql).toBe(
-      `SELECT DISTINCT kept_value FROM (SELECT CASE lower(trim(CAST("SES" AS VARCHAR))) WHEN lower(trim('1')) THEN 'Low' WHEN lower(trim('2')) THEN 'High' ELSE CAST("SES" AS VARCHAR) END AS kept_value FROM "raw") WHERE kept_value IS NOT NULL AND kept_value NOT IN ('Low', 'High') ORDER BY kept_value`,
+      `SELECT DISTINCT kept_value FROM (SELECT CASE lower(trim(CAST("SES" AS VARCHAR))) WHEN lower(trim('1')) THEN 'Low' WHEN lower(trim('2')) THEN 'High' ELSE CAST("SES" AS VARCHAR) END AS kept_value FROM "raw") WHERE kept_value IS NOT NULL AND kept_value NOT IN ('Low', 'High') ORDER BY kept_value LIMIT 1001`,
     );
   });
 });
