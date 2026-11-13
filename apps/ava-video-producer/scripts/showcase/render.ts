@@ -18,6 +18,7 @@ import {
 import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "../require-license.mjs";
 import { StockFingerprintModule } from "../stock/StockFingerprintModule/StockFingerprintModule";
+import { getDeliveryThemeFromFilm } from "./deliveryTheme/deliveryTheme";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
 
@@ -196,6 +197,7 @@ export async function renderFilm(
     JSON.stringify(
       {
         film: film.id,
+        ...getDeliveryThemeFromFilm(film),
         ...(stockFingerprint ? { fingerprint: stockFingerprint } : {}),
         gate: "passed",
         metadata,

@@ -12,10 +12,12 @@ import { StockGraphic } from "../stock/StockGraphic";
 import { absoluteCues } from "../storyboard/schema/schema";
 import { StoryFilm } from "../storyboard/StoryFilm/StoryFilm";
 import { TitleCard, TITLE_LEN } from "../title-card";
+import { VideoThemeProvider } from "../videoTheme/VideoThemeProvider/VideoThemeProvider";
+import { createVideoThemeSourceFromSnapshot } from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import type { Film } from "./showcase.types";
 
-/** Shared picture for browser playback and serial frame rendering. */
-export function FilmComposition({
+/** The film's picture, drawn inside its theme by `FilmComposition`. */
+function FilmPicture({
   film,
   withAudio = true,
 }: {
@@ -91,5 +93,26 @@ export function FilmComposition({
           ))
         : null}
     </>
+  );
+}
+
+/**
+ * Shared picture for browser playback and serial frame rendering, themed
+ * by the film's snapshot with the film id as its override scope. A stock
+ * graphic or continuity beat inside adds its own nested scope.
+ */
+export function FilmComposition({
+  film,
+  withAudio = true,
+}: {
+  film: Film;
+  withAudio?: boolean;
+}) {
+  return (
+    <VideoThemeProvider
+      source={createVideoThemeSourceFromSnapshot(film.theme, [film.id])}
+    >
+      <FilmPicture film={film} withAudio={withAudio} />
+    </VideoThemeProvider>
   );
 }

@@ -17,6 +17,10 @@ import {
   durationInFrames,
 } from "../../../src/storyboard/schema/schema";
 import {
+  VIDEO_THEME_SLUG_PATTERN,
+  videoThemePatchSchema,
+} from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+import {
   buildStockContracts,
   type StockContractGeneration,
 } from "../../stock/buildStockContracts/buildStockContracts";
@@ -24,6 +28,7 @@ import {
   type StockFingerprint,
   StockFingerprintModule,
 } from "../../stock/StockFingerprintModule/StockFingerprintModule";
+import { loadVideoThemeSnapshot } from "../../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 /**
@@ -90,6 +95,12 @@ const optionsSchema = z
     input: z.unknown().optional(),
     accent: color.optional(),
     background: color.optional(),
+    theme: z
+      .strictObject({
+        id: z.string().regex(VIDEO_THEME_SLUG_PATTERN),
+        patch: videoThemePatchSchema.optional(),
+      })
+      .optional(),
   })
   .strict() satisfies z.ZodType;
 
@@ -158,7 +169,7 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   if (
     !stock &&
     !continuity &&
-    Object.keys(options).some((key) => key !== "captions")
+    Object.keys(options).some((key) => key !== "captions" && key !== "theme")
   ) {
     throw new Error("Stock options require an Atlas preset");
   }
@@ -168,6 +179,7 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   )
     throw new Error("Stock input requires an Atlas preset");
   const base = {
+    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
     id,
     fps: 30,
     width: 1600,
@@ -184,7 +196,8 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
         preset: stock.id,
         ...Object.fromEntries(
           Object.entries(options).filter(
-            ([key, value]) => key !== "captions" && value !== undefined,
+            ([key, value]) =>
+              key !== "captions" && key !== "theme" && value !== undefined,
           ),
         ),
       }),

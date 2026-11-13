@@ -5,6 +5,8 @@ import type {
 } from "../stock/contracts/StockContract.types";
 import type { ResolvedStockRequest } from "../stock/contracts/stockRequestSchema/stockRequestSchema";
 import type { Storyboard } from "../storyboard/schema/schema";
+import type { VideoThemePatch } from "../videoTheme/videoTheme.types";
+import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 /** Data for Film. */
 type FilmResult = {
   kind: "storyboard" | "title-study" | "motion-lab";
@@ -44,6 +46,8 @@ export type Film = {
   loop: boolean;
   showCaptions: boolean;
   plan?: Storyboard;
+  /** The theme every frame resolves. Undefined renders `classic`. */
+  theme?: VideoThemeSnapshot;
 } & (
   | ({ kind: "stock" } & ResolvedStockRequest)
   | FilmResult
@@ -63,4 +67,6 @@ export type FilmOptions = {
   boxRoughness?: number;
   accent?: string;
   background?: string;
+  /** A theme from `themes/` and the unsaved draft to apply on top of it. */
+  theme?: Readonly<{ id: string; patch?: VideoThemePatch }>;
 };
