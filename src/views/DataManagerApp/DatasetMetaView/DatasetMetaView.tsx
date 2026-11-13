@@ -30,6 +30,7 @@ import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/Datase
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
+import { toColumnsInTableOrder } from "@/views/DataManagerApp/DatasetMetaView/toColumnsInTableOrder/toColumnsInTableOrder";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -78,8 +79,11 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
       numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
       workspaceId: workspace.id,
     });
-  const [datasetColumns, isLoadingDatasetColumns] =
+  const [unorderedDatasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
+  const datasetColumns = useMemo(() => {
+    return toColumnsInTableOrder(unorderedDatasetColumns);
+  }, [unorderedDatasetColumns]);
   const columnCodes = useDatasetColumnCodes({
     datasetId: dataset.id,
     columns: datasetColumns,
