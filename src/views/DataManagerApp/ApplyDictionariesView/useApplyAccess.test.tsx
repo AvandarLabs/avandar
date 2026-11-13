@@ -107,8 +107,11 @@ describe("useApplyAccess", () => {
     );
     rerender();
 
-    expect(result.current).toBe("denied");
+    expect(result.current).toBe("denied_edit");
     expect(mocks.notifyErrorMock).toHaveBeenCalledTimes(1);
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "You need edit access to Kings line list to apply a dictionary.",
+    );
     expect(mocks.navigateMock).toHaveBeenCalledTimes(1);
   });
 
@@ -163,5 +166,21 @@ describe("useApplyAccess", () => {
 
     expect(result.current).toBe("failed");
     expect(mocks.navigateMock).not.toHaveBeenCalled();
+  });
+
+  it("tells an editor who cannot read dictionaries why they were sent back", () => {
+    mocks.access.canViewDictionaries = false;
+    const { result } = renderHook(
+      () => {
+        return useApplyAccess(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    expect(result.current).toBe("denied_dictionaries");
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "You need access to dictionaries in Data Sources to apply one to Kings line list.",
+    );
+    expect(mocks.navigateMock).toHaveBeenCalledTimes(1);
   });
 });

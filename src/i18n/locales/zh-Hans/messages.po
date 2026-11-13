@@ -60,6 +60,11 @@ msgstr "该数据集上的至少一个查询使用了 <0>SELECT *</0> 或无法�
 msgid "No records yet"
 msgstr "暂无记录"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "You can no longer read one of these dictionaries, so it was not "
+"attached. Ask an admin for access to dictionaries."
+msgstr ""
+
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "返回在线以查看或使页面可离线使用。"
@@ -6999,6 +7004,11 @@ msgstr "粗体"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically first"
 msgstr "按字母顺序最前"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
+msgid "You need access to dictionaries in Data Sources to apply one to "
+"{datasetName}."
+msgstr ""
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"

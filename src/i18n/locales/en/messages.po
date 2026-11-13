@@ -62,6 +62,12 @@ msgstr "At least one query on this dataset uses <0>SELECT *</0> or couldn't be "
 msgid "No records yet"
 msgstr "No records yet"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "You can no longer read one of these dictionaries, so it was not "
+"attached. Ask an admin for access to dictionaries."
+msgstr "You can no longer read one of these dictionaries, so it was not "
+"attached. Ask an admin for access to dictionaries."
+
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "Return online to view or make the page available offline."
@@ -7193,6 +7199,12 @@ msgstr "Bold"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically first"
 msgstr "Alphabetically first"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
+msgid "You need access to dictionaries in Data Sources to apply one to "
+"{datasetName}."
+msgstr "You need access to dictionaries in Data Sources to apply one to "
+"{datasetName}."
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"

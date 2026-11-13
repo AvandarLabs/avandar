@@ -155,4 +155,38 @@ describe("useAttachDictionaries", () => {
       "You need edit access to Kings line list to apply a dictionary.",
     );
   });
+
+  it("asks for a reload when a column left the dataset", () => {
+    renderHook(
+      () => {
+        return useAttachDictionaries(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    act(() => {
+      mocks.options?.onError({ hint: "column_not_in_dataset" });
+    });
+
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "A dictionary changed while you were applying it. Reload the page and try again.",
+    );
+  });
+
+  it("explains a refusal for someone who can no longer read a dictionary", () => {
+    renderHook(
+      () => {
+        return useAttachDictionaries(DATASET);
+      },
+      { wrapper: TestProviders },
+    );
+
+    act(() => {
+      mocks.options?.onError({ hint: "dictionary_viewer_required" });
+    });
+
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "You can no longer read one of these dictionaries, so it was not attached. Ask an admin for access to dictionaries.",
+    );
+  });
 });

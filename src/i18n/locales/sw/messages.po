@@ -61,6 +61,11 @@ msgstr "Angalau swali moja kwenye dataset hii linatumia <0>SELECT *</0> au "
 msgid "No records yet"
 msgstr "Bado hakuna rekodi"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+msgid "You can no longer read one of these dictionaries, so it was not "
+"attached. Ask an admin for access to dictionaries."
+msgstr ""
+
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
 msgstr "Rudi mtandaoni ili kuona au kufanya ukurasa upatikane bila mtandao."
@@ -7229,6 +7234,11 @@ msgstr "Nene"
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically first"
 msgstr "Wa kwanza kialfabeti"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
+msgid "You need access to dictionaries in Data Sources to apply one to "
+"{datasetName}."
+msgstr ""
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"

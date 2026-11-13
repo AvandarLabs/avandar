@@ -15,13 +15,18 @@ function useApplyErrorMessage(datasetName: string): (error: unknown) => string {
   const { t } = useLingui();
   return (error) => {
     const hint = DictionaryBinding.toApplyErrorHint(error);
-    if (hint === "dataset_editor_required") {
-      return t`You need edit access to ${datasetName} to apply a dictionary.`;
+    switch (hint) {
+      case "dataset_editor_required":
+        return t`You need edit access to ${datasetName} to apply a dictionary.`;
+      case "dictionary_viewer_required":
+        return t`You can no longer read one of these dictionaries, so it was not attached. Ask an admin for access to dictionaries.`;
+      case "column_not_in_dataset":
+      case "entry_not_in_dictionary":
+      case "code_list_not_in_entry":
+        return t`A dictionary changed while you were applying it. Reload the page and try again.`;
+      default:
+        return t`The dictionaries were not attached. Please try again.`;
     }
-    return hint === "entry_not_in_dictionary" ||
-      hint === "code_list_not_in_entry"
-      ? t`A dictionary changed while you were applying it. Reload the page and try again.`
-      : t`The dictionaries were not attached. Please try again.`;
   };
 }
 

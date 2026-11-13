@@ -10,7 +10,14 @@ import { notifyError } from "@/utils/notifications/notify";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /** Whether the user may apply dictionaries to the dataset yet. */
-export type ApplyAccess = "checking" | "allowed" | "denied" | "failed";
+export type ApplyAccess =
+  | "checking"
+  | "allowed"
+  /** The user cannot edit the dataset. */
+  | "denied_edit"
+  /** The user can edit the dataset but cannot read dictionaries. */
+  | "denied_dictionaries"
+  | "failed";
 
 /**
  * Whether the user may apply dictionaries, `failed` when their role on the
@@ -40,8 +47,10 @@ function useApplyPermission(dataset: Dataset.T | undefined): ApplyAccess {
   ) {
     return "checking";
   }
-  const canEdit = role === "editor" || role === "admin";
-  return canEdit && canViewDictionaries ? "allowed" : "denied";
+  if (role !== "editor" && role !== "admin") {
+    return "denied_edit";
+  }
+  return canViewDictionaries ? "allowed" : "denied_dictionaries";
 }
 
 /**
@@ -56,13 +65,17 @@ export function useApplyAccess(dataset: Dataset.T | undefined): ApplyAccess {
   const access = useApplyPermission(dataset);
   const hasRedirectedRef = useRef(false);
   useEffect(() => {
-    if (access !== "denied" || !dataset || hasRedirectedRef.current) {
+    const isDenied =
+      access === "denied_edit" || access === "denied_dictionaries";
+    if (!isDenied || !dataset || hasRedirectedRef.current) {
       return;
     }
     hasRedirectedRef.current = true;
     const datasetName = dataset.name;
     notifyError(
-      t`You need edit access to ${datasetName} to apply a dictionary.`,
+      access === "denied_edit"
+        ? t`You need edit access to ${datasetName} to apply a dictionary.`
+        : t`You need access to dictionaries in Data Sources to apply one to ${datasetName}.`,
     );
     navigate(
       AppLinks.dataManagerDatasetView({
