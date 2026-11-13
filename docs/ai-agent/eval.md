@@ -235,20 +235,31 @@ under "Questions and ground truth".
 |---|---|---|---|---|---|
 | attach-dictionaries:coded #1-#3 (D01-D04) | 4/4, 4/4, 4/4 | 0 / 0 | $0.00013 to $0.00306 | 3,721 to 3,781 | 1.7 to 2.5 s / 1.8 to 3.2 s |
 | attach-dictionaries:coded-offline (Qwen3 4B, D01-D04) | 4/4 | 0 / 0 | $0 | 814 | 6.0 s / 72.7 s |
-| attach-dictionaries:agent-page (P01-P07) | 6/7 | 0 / 1 | $0.00020 | 3,950 | 1.9 s / 2.2 s |
-| attach-dictionaries:agent-mentions (M01-M06, M03b) | 6/7 | 0 / 0 | $0.00021 | 3,985 | 2.1 s / 2.9 s |
+| attach-dictionaries:agent-page #1 (P01-P07) | 6/7 | 0 / 1 | $0.00020 | 3,950 | 1.9 s / 2.2 s |
+| attach-dictionaries:agent-page #2 (P01-P07, rerun) | 7/7 | 0 / 0 | $0.00020 | 3,980 | 2.2 s / 3.7 s |
+| attach-dictionaries:agent-mentions #1 (M01-M06, M03b) | 6/7 | 0 / 0 | $0.00021 | 3,985 | 2.1 s / 2.9 s |
+| attach-dictionaries:agent-mentions #2 (M01-M06, M03b, rerun) | 7/7 | 0 / 0 | $0.00019 | 3,989 | 2.1 s / 2.7 s |
 | attach-dictionaries:agent-45 | 44/45 | 0 / 0 | $0.00032 | 3,904 | 2.3 s / 3.4 s |
 
-- The coded-column bar is met: D01 to D04 pass on all three online runs, and
-  the 45 questions score 44/45. The miss, N04, left out zero-death countries,
-  as it does on some runs (see Phase 1B).
-- The page and mention bar is not met on this run, and neither miss involves
-  a code list. P04 ("make this a pie chart" with two charts on screen)
-  answered without asking which chart; it has varied between runs before
-  (1 of 3 in Phase 1A's second review). M05 behaved as intended: it ran no
-  query and said it cannot see the dashboard, but its reply described the
-  datasets as "COVID-19" data, and the grader fails any digit in that reply.
-  Neither was rerun or tuned.
+- The plan's bar: "D01 to D04 pass on all three online runs; the 45
+  questions score 43/45 or better (v3's last run scored 44/45, and one
+  borderline question moves between runs); P01 to P07 and every mention
+  question pass." Counting both page and mention runs, it is met on the
+  rerun and not on the first run: D01 to D04 passed on all three online
+  runs, the 45 questions scored 44/45, and the page and mention questions
+  scored 6/7 and 6/7 on the first runs, then 7/7 and 7/7 on the rerun. No
+  prompt was changed between the runs.
+- N04, the miss on the 45, left out zero-death countries, as it does on
+  some runs (see Phase 1B).
+- P04 ("make this a pie chart" with two charts on screen) missed on run #1:
+  it answered without asking which chart. On run #2 it asked one question
+  and found all 12 truth rows. It has varied between runs before (1 of 3 in
+  Phase 1A's second review), and it involves no code list.
+- M05 (an unavailable dashboard) failed on run #1 only because of the
+  grader: the agent ran no query and said it cannot see the dashboard, but
+  its reply described the datasets as "COVID-19" data, and
+  `runtime/gradeEvalAnswer.ts:47` fails any digit in that reply. On run #2
+  it passed. The grader is unchanged.
 - D04 ("What does a GENDER value of 9 mean?"): every online run said the
   code has no label, quoted `(no label)`, named the labelled codes (1 Male,
   2 Female), and said it cannot tell what 9 stands for. The offline run said
@@ -259,7 +270,7 @@ under "Questions and ground truth".
 - Prompt v4 adds about 400 to 430 input tokens per call over Phase 1B's v3
   runs (3,904 against 3,478 on the 45 questions, +12%), all from the coded
   columns instructions, since the COVID datasets have no code lists. All
-  online runs cost about $0.03.
+  online runs cost about $0.035.
 
 ## Offline mode
 

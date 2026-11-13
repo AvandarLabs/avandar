@@ -138,3 +138,5 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-13T05-22-35](2026-11-13T05-22-35-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 6/7 | 0 | 1 | $0.00020 | 1.9 s / 2.2 s | P04 |
 | [2026-11-13T05-22-42](2026-11-13T05-22-42-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 6/7 | 0 | 0 | $0.00021 | 2.1 s / 2.9 s | M05 |
 | [2026-11-13T05-24-43](2026-11-13T05-24-43-attach-dictionaries_coded-offline/results.jsonl) | `attach-dictionaries:coded-offline` | 4/4 | 0 | 0 | $0.00000 | 6.0 s / 72.7 s | none |
+| [2026-11-13T05-27-22](2026-11-13T05-27-22-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 7/7 | 0 | 0 | $0.00020 | 2.2 s / 3.7 s | none |
+| [2026-11-13T05-27-29](2026-11-13T05-27-29-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 7/7 | 0 | 0 | $0.00019 | 2.1 s / 2.7 s | none |
