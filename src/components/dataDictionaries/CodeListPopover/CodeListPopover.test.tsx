@@ -37,6 +37,17 @@ describe("CodeListPopover", () => {
     );
   });
 
+  it("draws the arrow on a dropdown that does not clip it", async () => {
+    render(<CodeListPopover columnName="GENDER" codes={CODES} />);
+    fireEvent.focus(
+      screen.getByRole("button", { name: "Code list for GENDER" }),
+    );
+    const dialog = await screen.findByRole("dialog");
+
+    expect(dialog.querySelector(".mantine-Popover-arrow")).not.toBeNull();
+    expect(getComputedStyle(dialog).overflowY).not.toBe("auto");
+  });
+
   it("says a code has no label yet", async () => {
     render(<CodeListPopover columnName="GENDER" codes={CODES} />);
 

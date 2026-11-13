@@ -1,13 +1,15 @@
 import { ActionIcon } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { Popover } from "@mantine/core";
+import { Popover, ScrollArea } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
-import css from "@/components/dataDictionaries/CodeListPopover/CodeListPopover.module.css";
 import { CodeListPopoverContent } from "@/components/dataDictionaries/CodeListPopover/CodeListPopoverContent";
 import { useHoverOrFocusOpen } from "@/components/dataDictionaries/CodeListPopover/useHoverOrFocusOpen";
 import { POPOVER_Z_INDEX } from "@/config/Theme/Theme";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { ReactNode } from "react";
+
+/** How tall the code list grows before it scrolls. */
+const CODE_LIST_MAX_HEIGHT = "calc(var(--mantine-spacing-xl) * 12)";
 
 type Props = {
   /** The column the code list explains, named in the button's label. */
@@ -70,11 +72,14 @@ export function CodeListPopover({
       </Popover.Target>
       <Popover.Dropdown
         aria-label={label}
-        className={css.codeListPopoverDropdown}
         onMouseEnter={popover.onPointerEnter}
         onMouseLeave={popover.onPointerLeave}
       >
-        <CodeListPopoverContent codes={codes} />
+        {/* The list scrolls, not the dropdown: an overflowing dropdown
+            would clip the arrow drawn just outside its box. */}
+        <ScrollArea.Autosize mah={CODE_LIST_MAX_HEIGHT} type="auto">
+          <CodeListPopoverContent codes={codes} />
+        </ScrollArea.Autosize>
       </Popover.Dropdown>
     </Popover>
   );
