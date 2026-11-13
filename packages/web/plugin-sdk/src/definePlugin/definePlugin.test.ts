@@ -56,6 +56,34 @@ describe("definePlugin", () => {
     ).toBe(false);
   });
 
+  it("accepts a definition that omits aiTools", () => {
+    expect(
+      isPluginDefinition(definePlugin({ commands: {}, vizTypes: {} })),
+    ).toBe(true);
+  });
+
+  it("keeps the AI tool handler it was given", () => {
+    const definition = definePlugin({
+      aiTools: {
+        fitRegression: async () => {
+          return { slope: 1 };
+        },
+      },
+    });
+    expect(typeof definition.aiTools.fitRegression).toBe("function");
+  });
+
+  it("rejects a definition whose aiTools is not an object", () => {
+    expect(
+      isPluginDefinition({
+        kind: "avandar-plugin",
+        commands: {},
+        vizTypes: {},
+        aiTools: null,
+      }),
+    ).toBe(false);
+  });
+
   it("rejects a definition whose chart types are missing", () => {
     expect(isPluginDefinition({ kind: "avandar-plugin", commands: {} })).toBe(
       false,

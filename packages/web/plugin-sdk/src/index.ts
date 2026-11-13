@@ -13,6 +13,8 @@ export { PluginVizProvider } from "@plugin-sdk/PluginVizContext/PluginVizContext
 export type { PluginErrorCode } from "@plugin-sdk/PluginError/PluginError";
 export type {
   AddColumnsResult,
+  AgentToolContext,
+  AiToolHandler,
   AvandarApi,
   CommandHandler,
   DataExplorerToolbarContext,

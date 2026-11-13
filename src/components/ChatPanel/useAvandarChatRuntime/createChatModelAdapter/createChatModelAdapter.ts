@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
+import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
@@ -37,6 +38,7 @@ import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModel
 import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
@@ -47,6 +49,7 @@ import type { ChatSessionKind } from "@/components/ChatPanel/ChatSessionIndex/Ch
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import type { ActivePlugin } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
@@ -259,7 +262,32 @@ export type CreateChatModelAdapterOptions = {
   sessionKindRef: MutableRefObject<ChatSessionKind>;
   /** The hosted agent turn's mask, retained until its reply is persisted. */
   titleMaskRef?: MutableRefObject<((text: string) => string) | undefined>;
+  /**
+   * The plugins active in the workspace, from `ActivePluginsContext`. Read
+   * each time the agent starts answering, so its plugin AI tools follow
+   * installs during a conversation. Omitted: the agent gets no plugin tools.
+   */
+  activePluginsRef?: MutableRefObject<readonly ActivePlugin[]>;
 };
+
+/**
+ * Makes the getter that lists the generated plugin AI tools whose plugin
+ * is active right now.
+ */
+function _buildPluginAiToolsGetter(
+  activePluginsRef: MutableRefObject<readonly ActivePlugin[]> | undefined,
+): () => readonly PluginAiToolDeclaration[] {
+  return () => {
+    const activePluginIds = new Set(
+      (activePluginsRef?.current ?? []).map((plugin) => {
+        return plugin.entry.id;
+      }),
+    );
+    return PLUGIN_AI_TOOLS.filter((tool) => {
+      return activePluginIds.has(tool.pluginId);
+    });
+  };
+}
 
 /**
  * Runs a turn with the data agent on any page. The agent, and the code
@@ -388,6 +416,7 @@ export function createChatModelAdapter(
     sessionKindRef,
     titleMaskRef,
   } = options;
+  const getPluginAiTools = _buildPluginAiToolsGetter(options.activePluginsRef);
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
       if (titleMaskRef) {
@@ -579,6 +608,8 @@ export function createChatModelAdapter(
         parseSqlRef,
         dataExplorerDispatch,
         chatPanelDispatch,
+        getPluginAiTools,
+        workspaceSlug: workspaceRef.current.slug,
       };
 
       // Every answer an offline turn produces is marked, so a hosted

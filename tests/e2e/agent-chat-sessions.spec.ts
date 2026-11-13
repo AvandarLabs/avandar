@@ -25,7 +25,11 @@ function _replyStream(): string {
     { type: "text_end", contentIndex: 0, contentSignature: "" },
     { type: "done", reason: "stop", usage },
   ];
-  return events.map((event) => {return `data: ${JSON.stringify(event)}\n\n`}).join("");
+  return events
+    .map((event) => {
+      return `data: ${JSON.stringify(event)}\n\n`;
+    })
+    .join("");
 }
 
 /** The chat tabs inside the panel, excluding similarly named archive rows. */
@@ -55,7 +59,7 @@ test.describe("agent chat sessions", () => {
       window.localStorage.setItem("avandar:data-agent", "on");
     });
     await page.route(
-      "**/functions/v1/chat/*/agent/data-agent-v4/api/stream",
+      "**/functions/v1/chat/*/agent/data-agent-v5/api/stream",
       async (route) => {
         await route.fulfill({
           contentType: "text/event-stream",

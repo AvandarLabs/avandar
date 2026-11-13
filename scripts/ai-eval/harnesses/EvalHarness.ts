@@ -35,6 +35,8 @@ export type EvalAnswer = {
   consentPrompts: number;
   /** Stored data values sent to the model (matched or picked lookups). */
   valuesSentToModel: string[];
+  /** Names of the tools the model called, in order. */
+  toolNames: readonly string[];
   usage: EvalUsage;
   latencyMs: number;
 };

@@ -27,7 +27,7 @@ import { DataExplorerApp } from "@/views/DataExplorerApp/DataExplorerApp";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { DataExplorerBridge } from "@/lib/plugins/DataExplorerBridge.types";
-import type { PluginInvocationContext } from "@avandar/plugin-sdk";
+import type { DataExplorerToolbarContext } from "@avandar/plugin-sdk";
 import type { ReactNode } from "react";
 
 type DataQueryOptions = {
@@ -37,7 +37,7 @@ type DataQueryOptions = {
 type SaveMenuProps = { savableSql: string | undefined };
 
 type FakeSlotProps = {
-  getContext: (() => PluginInvocationContext) | undefined;
+  getContext: (() => DataExplorerToolbarContext) | undefined;
   getDataExplorerBridge?: (() => DataExplorerBridge) | undefined;
 };
 

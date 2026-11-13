@@ -12,13 +12,17 @@
  *   cannot add: a bad name, a placeholder with no input, an input naming a
  *   column the result does not have, an expression that is not exactly one
  *   SQL scalar or window expression, or an empty list.
+ * - `InvalidToolInput`: an AI tool handler rejected the arguments the model
+ *   passed it. The host may show this error's message to the model so it can
+ *   correct the call, so write it for the model and keep it free of secrets.
  */
 export type PluginErrorCode =
   | "PermissionDenied"
   | "InvalidHandle"
   | "LoadFailed"
   | "CommandFailed"
-  | "InvalidExpression";
+  | "InvalidExpression"
+  | "InvalidToolInput";
 
 /**
  * A typed error from the plugin API. A plugin command can branch on `code`

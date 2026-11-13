@@ -35,10 +35,24 @@ export type DataExplorerToolbarContext = Readonly<{
 }>;
 
 /**
- * What a command was invoked on. One variant per slot, discriminated by
- * `slotId`.
+ * What an AI tool was invoked on: the query result the data agent was
+ * working with when the model called the tool. It has the same data as
+ * `DataExplorerToolbarContext`, under the `agent.tool` slot.
  */
-export type PluginInvocationContext = DataExplorerToolbarContext;
+export type AgentToolContext = Readonly<{
+  slotId: "agent.tool";
+  queryHandle: QueryHandle;
+  columns: DataExplorerToolbarContext["columns"];
+  rowCount: number;
+}>;
+
+/**
+ * What a command or AI tool was invoked on. One variant per slot,
+ * discriminated by `slotId`.
+ */
+export type PluginInvocationContext =
+  | DataExplorerToolbarContext
+  | AgentToolContext;
 
 /** Options for `avandar.data.fetchRows`. */
 export type FetchRowsOptions = Readonly<{
@@ -160,6 +174,19 @@ export type AvandarApi = Readonly<{
 /** Runs when a user invokes a plugin command. */
 export type CommandHandler = (avandar: AvandarApi) => Promise<void> | void;
 
+/**
+ * Runs when the data agent's model calls a plugin AI tool. `args` holds the
+ * values the model passed, keyed by the parameter names the tool declares in
+ * `ava.yaml`. It returns the result the model reads, and may throw a
+ * `PluginError` with code `InvalidToolInput` for arguments it cannot use.
+ */
+export type AiToolHandler = (
+  avandar: AvandarApi,
+  args: Readonly<Record<string, string | number | boolean>>,
+) =>
+  | Promise<Readonly<Record<string, unknown>>>
+  | Readonly<Record<string, unknown>>;
+
 /** What a plugin's entry module exports as its default. */
 export type PluginDefinition = Readonly<{
   /** The marker the host checks before it runs anything in the module. */
@@ -174,4 +201,9 @@ export type PluginDefinition = Readonly<{
    * declares under `contributes.vizTypes` in its `ava.yaml`.
    */
   vizTypes: Readonly<Record<string, PluginVizDefinition>>;
+  /**
+   * The AI tool handlers, keyed by the tool ids the plugin declares under
+   * `contributes.aiTools` in its `ava.yaml`.
+   */
+  aiTools: Readonly<Record<string, AiToolHandler>>;
 }>;

@@ -116,6 +116,7 @@ class BaselineConversation implements EvalConversation {
       clarifications: [],
       consentPrompts: 0,
       valuesSentToModel: [],
+      toolNames: [],
       usage: EMPTY_EVAL_USAGE,
       latencyMs: 0,
     };

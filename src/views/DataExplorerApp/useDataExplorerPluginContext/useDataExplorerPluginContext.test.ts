@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import {
   MAX_LIVE_QUERY_HANDLES,
   QueryHandleRegistry,
@@ -77,6 +78,7 @@ function _renderWithRunStates(): RenderHookResult<
 describe("useDataExplorerPluginContext", () => {
   beforeEach(() => {
     QueryHandleRegistry.clear();
+    ExplorerPluginResultStore.clear();
   });
 
   it("has no context getter and empty facts while there is no result", () => {
@@ -175,6 +177,61 @@ describe("useDataExplorerPluginContext", () => {
     expect(_countReadableHandles(otherHandles)).toBe(
       MAX_LIVE_QUERY_HANDLES - 1,
     );
+  });
+
+  it("publishes the settled result's columns and rows to the store", () => {
+    _renderWithSettledResult();
+
+    expect(ExplorerPluginResultStore.get()).toEqual({
+      columns: [
+        { name: "cases", dataType: "bigint" },
+        { name: "onset", dataType: "date" },
+      ],
+      rows: QUERY_RESULTS.data,
+    });
+  });
+
+  it("clears the store when the hook unmounts", () => {
+    const { unmount } = _renderWithSettledResult();
+
+    unmount();
+
+    expect(ExplorerPluginResultStore.get()).toBeUndefined();
+  });
+
+  it("keeps a newer hook's result when an older hook unmounts", () => {
+    const { unmount: unmountOlderHook } = _renderWithSettledResult();
+    const newerResults = {
+      columns: [{ name: "deaths", dataType: "bigint" }],
+      data: [{ deaths: 1 }],
+    } as const;
+    renderHook(() => {
+      return useDataExplorerPluginContext({
+        queryResults: newerResults,
+        isLoadingResults: false,
+      });
+    });
+
+    unmountOlderHook();
+
+    expect(ExplorerPluginResultStore.get()?.rows).toBe(newerResults.data);
+  });
+
+  it("keeps the last settled result in the store while a run loads", () => {
+    const { rerender } = _renderWithRunStates();
+
+    rerender({ isLoadingResults: true, hasResults: false });
+
+    expect(ExplorerPluginResultStore.get()?.rows).toBe(QUERY_RESULTS.data);
+  });
+
+  it("clears the store when a run settles with no result", () => {
+    const { rerender } = _renderWithRunStates();
+
+    rerender({ isLoadingResults: true, hasResults: false });
+    rerender({ isLoadingResults: false, hasResults: false });
+
+    expect(ExplorerPluginResultStore.get()).toBeUndefined();
   });
 
   it("keeps the same getter and facts across rerenders of one result", () => {

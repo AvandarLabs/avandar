@@ -30,7 +30,7 @@ const MANIFEST: PluginManifest = {
   entry: "src/index.tsx",
   icon: "virus",
   permissions: [],
-  contributes: { commands: [], menus: {}, vizTypes: [EPICURVE] },
+  contributes: { commands: [], menus: {}, vizTypes: [EPICURVE], aiTools: [] },
 };
 
 describe("getPluginVizTypeFromManifest", () => {

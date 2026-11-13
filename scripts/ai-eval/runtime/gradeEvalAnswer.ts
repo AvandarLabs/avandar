@@ -49,11 +49,28 @@ function _gradeNoQuery(answer: EvalAnswer): {
     : { pass: true, detail: "ran no query and said it cannot see it" };
 }
 
+/** A fitRegression question: the tool ran and the reply has the slope. */
+function _gradeFitRegression(
+  slope: number,
+  answer: EvalAnswer,
+): { pass: boolean; detail: string } {
+  if (!answer.toolNames.includes("fitRegression")) {
+    return { pass: false, detail: "did not call fitRegression" };
+  }
+  const slopePattern = new RegExp(`\\b${String(slope).replace(".", "\\.")}\\b`);
+  return slopePattern.test(answer.assistantText)
+    ? { pass: true, detail: "called fitRegression and stated the slope" }
+    : { pass: false, detail: `reply does not state the slope ${slope}` };
+}
+
 function _gradeResult(
   question: EvalQuestion,
   answer: EvalAnswer,
   truth: Readonly<Record<string, EvalQueryResult>>,
 ): { pass: boolean; detail: string } {
+  if (question.fitRegression) {
+    return _gradeFitRegression(question.fitRegression.slope, answer);
+  }
   if (question.gradeText) {
     if (answer.finalSql !== undefined || answer.result) {
       return {

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
+import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools.ts";
 
 /**
  * SHA-256 of prompt v1's instructions (everything before DATASETS), as
@@ -23,6 +24,14 @@ const V2_INSTRUCTIONS_SHA256 =
  */
 const V3_INSTRUCTIONS_SHA256 =
   "251d390134571b4ab6200d01a9641fae13cd9eda35909f6def1ceee9e6ec824b";
+
+/**
+ * SHA-256 of prompt v4's instructions (everything before DATASETS), as
+ * shipped with the plugin tools on 2026-11-11. Tabs opened before a deploy
+ * still request v4.
+ */
+const V4_INSTRUCTIONS_SHA256 =
+  "0c7547581f90d48f9073bf4cc9e2d56799a19c2e579408a99e917244864d3fe2";
 
 /** A line list whose GENDER and hosp_yn columns have code lists attached. */
 const CODED_DATASETS = [
@@ -255,11 +264,11 @@ describe("buildDataAgentSystemPrompt", () => {
     );
   });
 
-  it("lists a coded column's codes and description under its dataset in v4", () => {
+  it("lists a coded column's codes and description under its dataset in v5", () => {
     const prompt = buildDataAgentSystemPrompt({
       datasets: CODED_DATASETS,
       today: "2026-11-12",
-      promptId: "data-agent-v4",
+      promptId: "data-agent-v5",
     });
 
     expect(prompt).toContain(
@@ -267,20 +276,23 @@ describe("buildDataAgentSystemPrompt", () => {
     );
   });
 
-  it("leaves code lists out of v3's datasets", () => {
-    const prompt = buildDataAgentSystemPrompt({
-      datasets: CODED_DATASETS,
-      today: "2026-11-12",
-      promptId: "data-agent-v3",
-    });
+  it.each(["data-agent-v3", "data-agent-v4"] as const)(
+    "leaves code lists out of %s's datasets",
+    (promptId) => {
+      const prompt = buildDataAgentSystemPrompt({
+        datasets: CODED_DATASETS,
+        today: "2026-11-12",
+        promptId,
+      });
 
-    expect(prompt).not.toContain("1=Male");
-    expect(prompt).toContain(
-      't0 = "Bronx line list": CaseNo text, GENDER int, onset_dt date\n\nToday',
-    );
-  });
+      expect(prompt).not.toContain("1=Male");
+      expect(prompt).toContain(
+        't0 = "Bronx line list": CaseNo text, GENDER int, onset_dt date\n\nToday',
+      );
+    },
+  );
 
-  it("names columns past v4's code-list budget instead of listing them", () => {
+  it("names columns past v5's code-list budget instead of listing them", () => {
     const pairs = Array.from({ length: 30 }, (_, index) => {
       return {
         code: String(index),
@@ -300,7 +312,7 @@ describe("buildDataAgentSystemPrompt", () => {
     const prompt = buildDataAgentSystemPrompt({
       datasets: [{ ...CODED_DATASETS[0]!, columns }],
       today: "2026-11-12",
-      promptId: "data-agent-v4",
+      promptId: "data-agent-v5",
     });
     const datasetsBlock = prompt.slice(prompt.indexOf("\n\nDATASETS\n"));
 
@@ -312,15 +324,73 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(datasetsBlock.length).toBeLessThan(5000);
   });
 
-  it("tells v4 to filter on the code and never guess a missing label", () => {
+  it("tells v5 to filter on the code and never guess a missing label", () => {
+    const v5 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-12",
+      promptId: "data-agent-v5",
+    });
+
+    expect(v5).toContain("CODED COLUMNS");
+    expect(v5).toContain('Filter and group on the code ("GENDER" = 2');
+    expect(v5).toContain("Never guess it.");
+  });
+
+  it("builds v5 from all of v4, then the coded-column rules", () => {
     const v4 = buildDataAgentSystemPrompt({
       datasets: DATASETS,
       today: "2026-11-12",
       promptId: "data-agent-v4",
     });
+    const v5 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-12",
+      promptId: "data-agent-v5",
+    });
+    const v4Instructions = v4.slice(0, v4.indexOf("\n\nDATASETS\n"));
+    const v5Instructions = v5.slice(0, v5.indexOf("\n\nDATASETS\n"));
 
-    expect(v4).toContain("CODED COLUMNS");
-    expect(v4).toContain('Filter and group on the code ("GENDER" = 2');
-    expect(v4).toContain("Never guess it.");
+    expect(v4Instructions).not.toContain("CODED COLUMNS");
+    expect(
+      v5Instructions.startsWith(`${v4Instructions}\n\nCODED COLUMNS\n`),
+    ).toBe(true);
+    expect(DATA_AGENT_PROMPT_ID).toBe("data-agent-v5");
+  });
+});
+
+const PLUGIN_TOOL_SENTENCE =
+  "A plugin tool, when one is listed with the others, runs on the user's device against the result already on screen. Follow that tool's description. You may state the numbers it returns, and the call leaves your turn open so you can explain them.";
+
+describe("buildDataAgentSystemPrompt v4", () => {
+  it("adds the plugin-tool sentence to v4 only, as the last TOOLS bullet", () => {
+    const v3 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v3",
+    });
+    const v4 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-09",
+      promptId: "data-agent-v4",
+    });
+
+    expect(v3).not.toContain(PLUGIN_TOOL_SENTENCE);
+    expect(v4.slice(0, v4.indexOf("\n\nSQL\n"))).toBe(
+      `${v3.slice(0, v3.indexOf("\n\nSQL\n"))}\n- ${PLUGIN_TOOL_SENTENCE}`,
+    );
+  });
+
+  it("keeps every character of v4's instructions", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-13",
+      promptId: "data-agent-v4",
+    });
+    const instructions = prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+
+    expect(instructions.length).toBe(7075);
+    expect(createHash("sha256").update(instructions).digest("hex")).toBe(
+      V4_INSTRUCTIONS_SHA256,
+    );
   });
 });

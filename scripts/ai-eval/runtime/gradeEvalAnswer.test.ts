@@ -22,6 +22,7 @@ function _createAnswer(overrides: Partial<EvalAnswer>): EvalAnswer {
     clarifications: [],
     consentPrompts: 0,
     valuesSentToModel: [],
+    toolNames: [],
     usage: {
       calls: 1,
       promptTokens: 0,
@@ -129,6 +130,64 @@ describe("gradeEvalAnswer with expectsNoQuery", () => {
         error: undefined,
         assistantText: "I cannot see it, but here is a table.",
         result: { columns: [{ name: "x", type: "int" }], rows: [[1]] },
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+});
+
+const FIT_QUESTION = {
+  id: "R01",
+  category: "page_context",
+  prompt: "Fit y on x for the result on screen.",
+  clarification: "not_needed",
+  truth: {},
+  fitRegression: {
+    rows: [1, 2, 3].map((x) => {
+      return { x, y: 2 * x + 1 };
+    }),
+    columns: ["x", "y"],
+    xColumn: "x",
+    yColumn: "y",
+    slope: 2,
+  },
+  grade: () => {
+    return { pass: false, detail: "graded by the tool call" };
+  },
+} as unknown as EvalQuestion;
+
+describe("gradeEvalAnswer with fitRegression", () => {
+  it("passes R01 when the tool was called and the reply states the slope", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({
+        assistantText: "The slope is 2.",
+        toolNames: ["fitRegression"],
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
+
+  it("fails R01 when the tool was not called", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({ assistantText: "The slope is 2.", toolNames: [] }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+
+  it("fails R01 when the reply does not state the slope", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({
+        assistantText: "I fitted a line.",
+        toolNames: ["fitRegression"],
       }),
       {},
     );

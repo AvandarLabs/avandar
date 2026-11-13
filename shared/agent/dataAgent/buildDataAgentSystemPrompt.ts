@@ -127,6 +127,25 @@ const DATA_AGENT_INSTRUCTIONS_V3 =
   ATTACHED_AND_MENTIONED_RULES +
   SCHEMA_ANSWER_RULES;
 
+/**
+ * The bullet v4 appends to the TOOLS section. It covers any plugin tool the
+ * proxy lists beside the built-in ones.
+ */
+const PLUGIN_TOOL_BULLET =
+  "\n- A plugin tool, when one is listed with the others, runs on the user's device against the result already on screen. Follow that tool's description. You may state the numbers it returns, and the call leaves your turn open so you can explain them.";
+
+/** Where the TOOLS section ends and the SQL section begins. */
+const SQL_SECTION_START = "\n\nSQL\n";
+
+/**
+ * v4: v3's instructions, plus one bullet at the end of the TOOLS section.
+ * The SQL section and everything after it stay as v3 has them.
+ */
+const DATA_AGENT_INSTRUCTIONS_V4 = DATA_AGENT_INSTRUCTIONS_V3.replace(
+  SQL_SECTION_START,
+  PLUGIN_TOOL_BULLET + SQL_SECTION_START,
+);
+
 const CODED_COLUMN_RULES = `
 
 CODED COLUMNS
@@ -135,26 +154,28 @@ CODED COLUMNS
 - A line such as "  - sex: values Male, Female" means the column stores those labels as written.
 - Text after the codes, or alone after the column name, says what the column means.`;
 
-/** v4: v3's rules, plus how to read the code lists listed under DATASETS. */
-const DATA_AGENT_INSTRUCTIONS_V4 =
-  DATA_AGENT_INSTRUCTIONS_V3 + CODED_COLUMN_RULES;
+/** v5: v4's instructions, plus how to read the code lists under DATASETS. */
+const DATA_AGENT_INSTRUCTIONS_V5 =
+  DATA_AGENT_INSTRUCTIONS_V4 + CODED_COLUMN_RULES;
 
 const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
   "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,
   "data-agent-v2": DATA_AGENT_INSTRUCTIONS_V2,
   "data-agent-v3": DATA_AGENT_INSTRUCTIONS_V3,
   "data-agent-v4": DATA_AGENT_INSTRUCTIONS_V4,
+  "data-agent-v5": DATA_AGENT_INSTRUCTIONS_V5,
 };
 
 /**
  * Whether a version lists columns' code lists under DATASETS. Versions
- * before v4 never do, so their prompts stay as they shipped.
+ * before v5 never do, so their prompts stay as they shipped.
  */
 const LISTS_COLUMN_CODES: Record<DataAgentPromptId, boolean> = {
   "data-agent-v1": false,
   "data-agent-v2": false,
   "data-agent-v3": false,
-  "data-agent-v4": true,
+  "data-agent-v4": false,
+  "data-agent-v5": true,
 };
 
 /** `  - GENDER: codes 1=Male, 2=Female. Sex at intake.`, or undefined. */
@@ -222,7 +243,7 @@ function _fitCodeLines(
  * Builds the system prompt for one prompt version: that version's fixed
  * instructions, then the datasets (aliases in the app's `SqlTableAlias`
  * order), then today's date. Everything before the date stays the same
- * between turns, so providers can cache it. From v4, each dataset lists
+ * between turns, so providers can cache it. From v5, each dataset lists
  * its columns' code lists, within the prompt's code-list budget.
  */
 export function buildDataAgentSystemPrompt(
