@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import { createServer, type Server } from "node:http";
+import { createServer, request, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import os from "node:os";
 import path from "node:path";
@@ -83,4 +83,31 @@ test("a cross-origin write is refused", () =>
 test("paths outside /api/themes are left to other routes", () =>
   _withServer(async (origin) => {
     assert.equal((await fetch(`${origin}/api/exports`)).status, 404);
+  }));
+
+/** Sends a JSON body in two TCP writes cut inside the first multibyte character. */
+function _postSplitMidCharacter(origin: string, body: unknown) {
+  const bytes = Buffer.from(JSON.stringify(body), "utf8");
+  const cut = bytes.indexOf(0xc3) + 1;
+  return new Promise<number>((resolve, reject) => {
+    const req = request(
+      `${origin}/api/themes`,
+      { method: "POST", headers: { "Content-Type": "application/json", Origin: origin, "Content-Length": bytes.length } },
+      (res) => {
+        res.resume();
+        resolve(res.statusCode ?? 0);
+      },
+    );
+    req.on("error", reject);
+    req.write(bytes.subarray(0, cut));
+    setTimeout(() => req.end(bytes.subarray(cut)), 50);
+  });
+}
+
+test("a label with multibyte characters survives a body split across chunks", () =>
+  _withServer(async (origin) => {
+    const label = "Café ✓";
+    assert.equal(await _postSplitMidCharacter(origin, { ...WARM, label }), 201);
+    const read = (await (await fetch(`${origin}/api/themes/warm`)).json()) as { document: { label: string } };
+    assert.equal(read.document.label, label);
   }));

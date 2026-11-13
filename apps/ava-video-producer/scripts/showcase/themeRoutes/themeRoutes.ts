@@ -19,6 +19,7 @@ function _send(res: ServerResponse, status: number, body: unknown): void {
 
 async function _readJsonBody(req: IncomingMessage): Promise<unknown> {
   let body = "";
+  req.setEncoding("utf8");
   for await (const chunk of req) {
     body += chunk;
     if (Buffer.byteLength(body) > THEME_FILE_MAX_BYTES) {
