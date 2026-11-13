@@ -1,4 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { useGraphicMotion } from "../../theme/useGraphicTheme";
 import { CachedRelation } from "./CachedRelation";
 import { CacheRequests } from "./CacheRequests";
 import { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
@@ -16,7 +17,8 @@ export function QueryColumnCacheGrowth({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getCacheSceneFromFrame({ frame, input });
+  const motion = useGraphicMotion();
+  const scene = getCacheSceneFromFrame({ frame, input, motion });
   return (
     <g>
       <CacheRequests

@@ -618,6 +618,49 @@ const SCHEMA_MAPPING_TOKENS = {
   ),
 } as const;
 
+const QUERY_CACHE_TOKENS = {
+  tableRadius: _length(
+    "Cache table radius",
+    "Corner radius of the cached relation.",
+  ),
+  tableStrokeWidth: _stroke(
+    "Cache table outline width",
+    "Width of the cached relation's outline.",
+  ),
+  gridStrokeWidth: _stroke(
+    "Cache grid width",
+    "Width of the row and column lines inside the cached relation.",
+  ),
+  missingDash: _dash(
+    "Missing column dash",
+    "Dash pattern of a column the cache does not hold yet.",
+  ),
+  missingStrokeWidth: _stroke(
+    "Missing column outline width",
+    "Width of a missing column's dashed outline.",
+  ),
+  cardRadius: _length(
+    "Request card radius",
+    "Corner radius of a query request card.",
+  ),
+  cardStrokeWidth: _stroke(
+    "Request card outline width",
+    "Width of a request card's outline.",
+  ),
+  checkWidth: _stroke(
+    "Covered check width",
+    "Width of the check on a request the cache covers.",
+  ),
+  routeStrokeWidth: _stroke(
+    "Request route width",
+    "Width of the routes from a request to its columns.",
+  ),
+  portRadius: _length(
+    "Column port radius",
+    "Radius of the ring where a request route meets a column.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -635,6 +678,7 @@ export const COMPONENT_TOKENS = {
   CodeWindow: CODE_WINDOW_TOKENS,
   CodeFocus: CODE_FOCUS_TOKENS,
   SchemaMapping: SCHEMA_MAPPING_TOKENS,
+  QueryColumnCacheGrowth: QUERY_CACHE_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

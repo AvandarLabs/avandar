@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { useGraphicProps, useGraphicTokens } from "../../theme/useGraphicTheme";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 
@@ -13,6 +13,8 @@ export function MissingCacheColumns({
   input,
   missingIds,
 }: Readonly<Props>): ReactNode {
+  const style = useGraphicProps("QueryColumnCacheGrowth", {});
+  const { color } = useGraphicTokens();
   return (
     <g>
       {missingIds.map((id, index) => {
@@ -25,15 +27,17 @@ export function MissingCacheColumns({
               width={158}
               height={60}
               fill="none"
-              stroke={STOCK.orange}
-              strokeDasharray="5 3"
+              stroke={color.highlight}
+              strokeDasharray={style.missingDash.join(" ")}
+              strokeWidth={style.missingStrokeWidth}
             />
             <LabelSlots
               labels={[[column.label, 70 + index * 168, 210, 138, 14, 3]]}
             />
             <path
               d={`M${198 + index * 168} 238 h10 m-5 -5 v10`}
-              stroke={STOCK.orange}
+              stroke={color.highlight}
+              strokeWidth={style.missingStrokeWidth}
             />
           </g>
         );

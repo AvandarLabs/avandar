@@ -67,3 +67,14 @@ test("schema-mapping draws its match rings at the themed radius", () => {
     /r="11"/,
   );
 });
+
+test("query-column-cache-growth dashes missing columns with the themed pattern", () => {
+  assert.match(
+    renderPresetWithComponentPatch(
+      { preset: "query-column-cache-growth" },
+      "QueryColumnCacheGrowth",
+      { missingDash: [6, 2] },
+    ),
+    /stroke-dasharray="6 2"/,
+  );
+});

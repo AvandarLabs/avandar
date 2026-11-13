@@ -254,6 +254,7 @@
     "CodeWindow": { "defaultProps": { "radius": 19, "dividerWidth": "$stroke.hairline", "dotRadius": 4.5, "dotAlpha": 0.45 } },
     "CodeFocus": { "defaultProps": { "highlightRadius": 7, "highlightAlpha": 0.065, "markerWidth": 3, "dividerWidth": "$stroke.hairline", "footerDotRadius": 3.5 } },
     "SchemaMapping": { "defaultProps": { "fieldRadius": 8, "dividerWidth": "$stroke.hairline", "dotRadius": 5, "edgeAlpha": "$atomic.opacity.70", "ringRadius": 13, "ringAlpha": 0.6, "ringStrokeWidth": "$stroke.hairline", "checkSize": 10 } },
+    "QueryColumnCacheGrowth": { "defaultProps": { "tableRadius": 5, "tableStrokeWidth": "$stroke.default", "gridStrokeWidth": "$stroke.hairline", "missingDash": [5, 3], "missingStrokeWidth": "$stroke.hairline", "cardRadius": 10, "cardStrokeWidth": "$stroke.hairline", "checkWidth": "$atomic.strokeWidth.lg", "routeStrokeWidth": "$stroke.hairline", "portRadius": 5 } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,
