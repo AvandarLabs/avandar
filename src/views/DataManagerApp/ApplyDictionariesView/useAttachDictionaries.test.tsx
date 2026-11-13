@@ -81,6 +81,7 @@ describe("useAttachDictionaries", () => {
     expect(mocks.applyMock).toHaveBeenCalledWith({
       datasetId: DATASET.id,
       bindings: BINDINGS,
+      addedPairs: [],
     });
   });
 

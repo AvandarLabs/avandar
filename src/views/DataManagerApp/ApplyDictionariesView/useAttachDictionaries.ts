@@ -91,7 +91,7 @@ export function useAttachDictionaries(
     }
     isAttachingRef.current = true;
     isRemovingRef.current = bindings.length === 0;
-    applyToDataset({ datasetId: dataset.id, bindings });
+    applyToDataset({ datasetId: dataset.id, bindings, addedPairs: [] });
   };
   return [attach, isAttaching];
 }
