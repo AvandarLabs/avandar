@@ -1,6 +1,10 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicMotion,
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme";
 import { PushdownLedger } from "./PushdownLedger";
 import { PushdownPredicate } from "./PushdownPredicate";
 import { PushdownRows } from "./PushdownRows";
@@ -9,14 +13,20 @@ import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
+const INTRO_FRAMES = 12;
+
 /** Source gates filter row copies before they cross a transfer boundary. */
 export function PredicatePushdownBoundary({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const style = useGraphicProps("PredicatePushdownBoundary", {});
+  const { color } = useGraphicTokens();
+  const motion = useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={ramp(frame, 0, motion.scale(INTRO_FRAMES))}>
       <LabelSlots
         labels={[
           [input.copy.context, 48, 28, 864, 14, 1],
@@ -30,9 +40,9 @@ export function PredicatePushdownBoundary({
       <path
         data-boundary="true"
         d="M500 192 V572"
-        stroke={STOCK.line}
-        strokeWidth={2}
-        strokeDasharray="5 7"
+        stroke={color.line}
+        strokeWidth={style.boundaryWidth}
+        strokeDasharray={style.boundaryDash.join(" ")}
       />
       <PushdownRows {...{ frame, input, accent }} />
       <PushdownLedger {...{ input, frame }} />

@@ -36,3 +36,14 @@ test("data-pipeline draws its stage icons at the themed radius", () => {
     /r="23"/,
   );
 });
+
+test("predicate-pushdown-boundary dashes its boundary with the themed pattern", () => {
+  assert.match(
+    renderPresetWithComponentPatch(
+      { preset: "predicate-pushdown-boundary" },
+      "PredicatePushdownBoundary",
+      { boundaryDash: [4, 4] },
+    ),
+    /stroke-dasharray="4 4"/,
+  );
+});

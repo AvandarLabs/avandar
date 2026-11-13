@@ -519,6 +519,34 @@ const DATA_PIPELINE_TOKENS = {
   ),
 } as const;
 
+const PREDICATE_PUSHDOWN_TOKENS = {
+  boundaryWidth: _stroke(
+    "Boundary width",
+    "Width of the dashed transfer boundary.",
+  ),
+  boundaryDash: _dash(
+    "Boundary dash",
+    "Dash pattern of the transfer boundary, in pixels.",
+  ),
+  predicateRadius: _length(
+    "Predicate card radius",
+    "Corner radius of the predicate card.",
+  ),
+  predicateStrokeWidth: _stroke(
+    "Predicate card outline width",
+    "Width of the predicate card's accent outline.",
+  ),
+  rowRadius: _length("Row radius", "Corner radius of a data row."),
+  rowStrokeWidth: _stroke(
+    "Row outline width",
+    "Width of a data row's outline.",
+  ),
+  gateWidth: _stroke(
+    "Gate width",
+    "Width of the gate that stops a row at the source.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -532,6 +560,7 @@ export const COMPONENT_TOKENS = {
   PlexusField: PLEXUS_FIELD_TOKENS,
   OrbitalSystem: ORBITAL_SYSTEM_TOKENS,
   DataPipeline: DATA_PIPELINE_TOKENS,
+  PredicatePushdownBoundary: PREDICATE_PUSHDOWN_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",
