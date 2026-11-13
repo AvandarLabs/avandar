@@ -45,6 +45,7 @@ const EXPECTED_ORIGIN_BY_SOURCE_TYPE: Record<
 const DATASET_ID = DATASET_IDS[0];
 
 const {
+  bindingGetAllMock,
   datasetColumnGetAllMock,
   datasetGetAllMock,
   downloadDatasetMock,
@@ -53,6 +54,7 @@ const {
   uploadDatasetMock,
 } = vi.hoisted(() => {
   return {
+    bindingGetAllMock: vi.fn(),
     datasetColumnGetAllMock: vi.fn(),
     datasetGetAllMock: vi.fn(),
     downloadDatasetMock: vi.fn(),
@@ -108,6 +110,10 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
 
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return { DatasetColumnClient: { getAll: datasetColumnGetAllMock } };
+});
+
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", () => {
+  return { DictionaryBindingClient: { getAll: bindingGetAllMock } };
 });
 
 vi.mock("@/utils/notifications/notify", () => {
@@ -184,6 +190,7 @@ function _getUploadedOrigin(): SnapshotRowsOrigin | undefined {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  bindingGetAllMock.mockResolvedValue([]);
   runQueryMock.mockResolvedValue(BLOB_BY_ORIGIN["workspace-query"]);
   downloadDatasetMock.mockResolvedValue(
     BLOB_BY_ORIGIN["stored-dataset-parquet"],
@@ -281,5 +288,22 @@ describe("preparePublishSnapshot", () => {
     const datasetIds = await _prepareWithColumn(_makeColumn("population"));
 
     expect([...datasetIds]).toEqual([]);
+  });
+
+  it("marks a dataset with a converted column even when its stored type is unchanged", async () => {
+    // Text codes decoded to text labels keep `varchar`, so only the binding
+    // says the stored Parquet holds values the dashboard never shows.
+    bindingGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
+
+    const datasetIds = await _prepareWithColumn(_makeColumn("population"));
+
+    expect([...datasetIds]).toEqual([DATASET_ID]);
+    expect(bindingGetAllMock).toHaveBeenCalledWith({
+      where: {
+        dataset_id: { in: [DATASET_ID] },
+        mode: { eq: "convert" },
+        workspace_id: { eq: WORKSPACE_ID },
+      },
+    });
   });
 });
