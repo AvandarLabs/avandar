@@ -1,11 +1,12 @@
 /*
  * A workspace owner imports a small line list, opens "Create a dictionary
  * from this dataset" from its menu, has the values of gender suggested, and
- * saves with hosp_yn still unlabeled. The first test agrees to the consent
- * prompt and answers suggestions from a stubbed online route. The second
- * runs them on the scripted offline model and checks that no prompt opened
- * and nothing went online. The imported dataset is a precondition. Everything
- * the tests create is deleted afterwards.
+ * saves with hosp_yn still unlabeled, which opens Apply for the dataset. The
+ * first test agrees to the consent prompt and answers suggestions from a
+ * stubbed online route. The second runs them on the scripted offline model
+ * and checks that no prompt opened and nothing went online. The imported
+ * dataset is a precondition. Everything the tests create is deleted
+ * afterwards.
  */
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
@@ -137,8 +138,20 @@ test.describe("learning a dictionary from a dataset", () => {
       await page
         .getByRole("textbox", { name: "Dictionary name" })
         .fill(DICTIONARY_NAME);
+      await expect(
+        page.getByRole("checkbox", { name: /^Apply it to .+ next$/ }),
+      ).toBeChecked();
       await page.getByRole("button", { name: "Create dictionary" }).click();
 
+      // Saving opens Apply with the new dictionary in use. Leave it and
+      // open the dictionary from the list.
+      await expect(
+        page.getByRole("button", { name: `Stop using ${DICTIONARY_NAME}` }),
+      ).toBeVisible({ timeout: LONG_WAIT });
+      await page.getByRole("button", { name: "Cancel" }).click();
+      await page
+        .getByRole("link", { name: DICTIONARY_NAME, exact: true })
+        .click();
       await expect(
         page.getByRole("heading", { name: DICTIONARY_NAME }),
       ).toBeVisible({ timeout: LONG_WAIT });
