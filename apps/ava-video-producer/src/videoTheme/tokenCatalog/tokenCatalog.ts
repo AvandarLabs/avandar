@@ -66,7 +66,10 @@ function _getSectionFromPath(
   if (root === "components") {
     return [COMPONENT_TOKENS, rest];
   }
-  return [isMantineTokenRoot(root) ? MANTINE_TOKENS : SEMANTIC_TOKENS, segments];
+  return [
+    isMantineTokenRoot(root) ? MANTINE_TOKENS : SEMANTIC_TOKENS,
+    segments,
+  ];
 }
 
 /**

@@ -20,19 +20,29 @@ type Props = Readonly<{
  * chrome and video theme never style each other. Use it at the root of a
  * film or a gallery preview.
  */
-export function VideoThemeProvider({ source, children, element = "div" }: Props) {
+export function VideoThemeProvider({
+  source,
+  children,
+  element = "div",
+}: Props) {
   const theme = useMemo(
     () => resolveVideoTheme(source.library, source.themeId, source.scope),
     [source],
   );
   const value = useMemo(() => ({ theme, source }), [theme, source]);
   const style = useMemo(
-    () => ({ display: "contents", ...buildVideoCssVariables(theme) }) as CSSProperties,
+    () =>
+      ({
+        display: "contents",
+        ...buildVideoCssVariables(theme),
+      }) as CSSProperties,
     [theme],
   );
   const content = (
     <MantineThemeProvider theme={theme.mantine} inherit={false}>
-      <VideoThemeContext.Provider value={value}>{children}</VideoThemeContext.Provider>
+      <VideoThemeContext.Provider value={value}>
+        {children}
+      </VideoThemeContext.Provider>
     </MantineThemeProvider>
   );
   return element === "none" ? content : <div style={style}>{content}</div>;

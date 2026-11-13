@@ -58,9 +58,9 @@ export function getVideoFontIdFromStack(
  * Bundled faces with their ids, for loading them before a render and for
  * writing `@font-face` rules.
  */
-export function listBundledVideoFonts(): readonly (BundledVideoFont & {
+export function listBundledVideoFonts(): ReadonlyArray<BundledVideoFont & {
   id: VideoFontId;
-})[] {
+}> {
   return VIDEO_FONT_IDS.flatMap((id) => {
     const font = VIDEO_FONT_REGISTRY[id];
     return font.source === "bundled" ? [{ ...font, id }] : [];

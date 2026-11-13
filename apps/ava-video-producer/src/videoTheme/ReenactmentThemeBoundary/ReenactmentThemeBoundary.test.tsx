@@ -8,24 +8,37 @@ import { ReenactmentThemeBoundary } from "./ReenactmentThemeBoundary";
 
 function ProductProbe() {
   const theme = useMantineTheme();
-  return <span>{`${String(theme.other.video === undefined)}|${theme.fontSizes.md}`}</span>;
+  return (
+    <span>{`${String(theme.other.video === undefined)}|${theme.fontSizes.md}`}</span>
+  );
 }
 
 function _render(withBoundary: boolean): string {
   const product = (
-    <MantineProvider theme={{ primaryColor: "blue" }} withCssVariables={false} withGlobalClasses={false}>
+    <MantineProvider
+      theme={{ primaryColor: "blue" }}
+      withCssVariables={false}
+      withGlobalClasses={false}
+    >
       <ProductProbe />
     </MantineProvider>
   );
   return renderToStaticMarkup(
     <VideoThemeProvider source={DEFAULT_VIDEO_THEME_SOURCE} element="none">
-      {withBoundary ? <ReenactmentThemeBoundary>{product}</ReenactmentThemeBoundary> : product}
+      {withBoundary ? (
+        <ReenactmentThemeBoundary>{product}</ReenactmentThemeBoundary>
+      ) : (
+        product
+      )}
     </VideoThemeProvider>,
   );
 }
 
 test("product UI inside the boundary sees only its own theme", () => {
-  assert.equal(_render(true), `<span>true|${DEFAULT_THEME.fontSizes.md}</span>`);
+  assert.equal(
+    _render(true),
+    `<span>true|${DEFAULT_THEME.fontSizes.md}</span>`,
+  );
 });
 
 test("without the boundary a product MantineProvider inherits the video theme", () => {

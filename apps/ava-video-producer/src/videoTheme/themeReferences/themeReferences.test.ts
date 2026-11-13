@@ -27,11 +27,20 @@ test("any other reference targets the semantic tier", () => {
 });
 
 test("$primary targets Mantine's primary colour", () => {
-  assert.deepEqual(getTargetFromTokenReference("$primary"), { tier: "primary" });
+  assert.deepEqual(getTargetFromTokenReference("$primary"), {
+    tier: "primary",
+  });
 });
 
 test("colours and malformed paths are not references", () => {
-  for (const value of ["#51a7ff", "$", "$.accent", "$color..accent", "color.accent", 4]) {
+  for (const value of [
+    "#51a7ff",
+    "$",
+    "$.accent",
+    "$color..accent",
+    "color.accent",
+    4,
+  ]) {
     assert.equal(isTokenReference(value), false, String(value));
   }
 });

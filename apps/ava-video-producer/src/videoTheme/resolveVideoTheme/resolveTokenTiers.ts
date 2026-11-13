@@ -14,7 +14,10 @@ import {
   type FieldSpec,
 } from "../tokenCatalog/defineTokens";
 import { VIDEO_TOKEN_CATALOG } from "../tokenCatalog/tokenCatalog";
-import { VIDEO_FONT_REGISTRY, type VideoFontId } from "../videoFontRegistry/videoFontRegistry";
+import {
+  VIDEO_FONT_REGISTRY,
+  type VideoFontId,
+} from "../videoFontRegistry/videoFontRegistry";
 import type {
   CatalogNode,
   GlowValue,
@@ -50,18 +53,27 @@ function _isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function _isColorPair(value: unknown): value is Readonly<{ onDark: unknown; onLight: unknown }> {
+function _isColorPair(
+  value: unknown,
+): value is Readonly<{ onDark: unknown; onLight: unknown }> {
   return _isRecord(value) && "onDark" in value && "onLight" in value;
 }
 
 function _primaryColor(context: ResolutionContext): unknown {
   const shade = context.mantine.primaryShade;
   const index =
-    typeof shade === "number" ? shade : context.isDarkGround ? shade.dark : shade.light;
+    typeof shade === "number"
+      ? shade
+      : context.isDarkGround
+        ? shade.dark
+        : shade.light;
   return context.mantine.colors[context.mantine.primaryColor]?.[index];
 }
 
-function _lookup(context: ResolutionContext, reference: TokenReference): unknown {
+function _lookup(
+  context: ResolutionContext,
+  reference: TokenReference,
+): unknown {
   const target = getTargetFromTokenReference(reference);
   if (target.tier === "primary") {
     return _primaryColor(context);
@@ -83,12 +95,18 @@ function _resolveReference(
   stack: readonly string[],
 ): unknown {
   if (stack.includes(reference)) {
-    context.issues.push({ path, message: `Reference cycle: ${[...stack, reference].join(" → ")}` });
+    context.issues.push({
+      path,
+      message: `Reference cycle: ${[...stack, reference].join(" → ")}`,
+    });
     return undefined;
   }
   const target = _lookup(context, reference);
   if (target === undefined) {
-    context.issues.push({ path, message: `${reference} does not point at a token` });
+    context.issues.push({
+      path,
+      message: `${reference} does not point at a token`,
+    });
     return undefined;
   }
   return _resolveValue(context, target, field, path, [...stack, reference]);
@@ -106,10 +124,19 @@ function _resolveValue(
   }
   if (field.kind === "color" && _isColorPair(raw)) {
     if (context.forbidColorPairs) {
-      context.issues.push({ path, message: "The ground colour cannot depend on the ground" });
+      context.issues.push({
+        path,
+        message: "The ground colour cannot depend on the ground",
+      });
       return undefined;
     }
-    return _resolveValue(context, context.isDarkGround ? raw.onDark : raw.onLight, field, path, stack);
+    return _resolveValue(
+      context,
+      context.isDarkGround ? raw.onDark : raw.onLight,
+      field,
+      path,
+      stack,
+    );
   }
   if (isCompositeTokenKind(field.kind)) {
     return _resolveComposite(context, field.kind, raw, path, stack);
@@ -135,10 +162,18 @@ function _finishTypeStyle(fields: UnknownRecord): unknown {
     fontFamily: VIDEO_FONT_REGISTRY[fontId].stack,
     fontSize: fields.size,
     fontWeight: fields.weight,
-    ...(fields.lineHeight === undefined ? {} : { lineHeight: fields.lineHeight }),
-    ...(fields.letterSpacing === undefined ? {} : { letterSpacing: fields.letterSpacing }),
-    ...(fields.transform === undefined ? {} : { textTransform: fields.transform }),
-    ...(fields.numeric === undefined ? {} : { fontVariantNumeric: fields.numeric }),
+    ...(fields.lineHeight === undefined
+      ? {}
+      : { lineHeight: fields.lineHeight }),
+    ...(fields.letterSpacing === undefined
+      ? {}
+      : { letterSpacing: fields.letterSpacing }),
+    ...(fields.transform === undefined
+      ? {}
+      : { textTransform: fields.transform }),
+    ...(fields.numeric === undefined
+      ? {}
+      : { fontVariantNumeric: fields.numeric }),
     color,
     alpha: fields.alpha ?? 1,
     ...(textShadow ? { textShadow: { ...textShadow, color } } : {}),
@@ -177,7 +212,13 @@ function _resolveComposite(
       }
       continue;
     }
-    resolved[name] = _resolveValue(context, raw[name], field, `${path}.${name}`, stack);
+    resolved[name] = _resolveValue(
+      context,
+      raw[name],
+      field,
+      `${path}.${name}`,
+      stack,
+    );
   }
   if (kind === "typeStyle") {
     return _finishTypeStyle(resolved);
@@ -201,13 +242,21 @@ function _resolveNode(
   if (isTokenScale(node)) {
     const entries = _isRecord(raw) ? Object.entries(raw) : [];
     return Object.fromEntries(
-      entries.map(([key, value]) => [key, _resolveValue(context, value, node.scale, `${path}.${key}`, [])]),
+      entries.map(([key, value]) => [
+        key,
+        _resolveValue(context, value, node.scale, `${path}.${key}`, []),
+      ]),
     );
   }
   return Object.fromEntries(
     Object.entries(node).map(([key, child]) => [
       key,
-      _resolveNode(context, child, _isRecord(raw) ? raw[key] : undefined, path ? `${path}.${key}` : key),
+      _resolveNode(
+        context,
+        child,
+        _isRecord(raw) ? raw[key] : undefined,
+        path ? `${path}.${key}` : key,
+      ),
     ]),
   );
 }
@@ -254,11 +303,27 @@ export function resolveTokenTiers(
     [],
   );
   const isDarkGround =
-    typeof ground === "string" ? luminance(ground) < options.mantine.luminanceThreshold : true;
-  const context: ResolutionContext = { ...groundContext, isDarkGround, forbidColorPairs: false };
+    typeof ground === "string"
+      ? luminance(ground) < options.mantine.luminanceThreshold
+      : true;
+  const context: ResolutionContext = {
+    ...groundContext,
+    isDarkGround,
+    forbidColorPairs: false,
+  };
   return {
-    atomic: _resolveNode(context, VIDEO_TOKEN_CATALOG.atomic, context.atomic, "atomic"),
-    semantic: _resolveNode(context, VIDEO_TOKEN_CATALOG.semantic, context.semantic, ""),
+    atomic: _resolveNode(
+      context,
+      VIDEO_TOKEN_CATALOG.atomic,
+      context.atomic,
+      "atomic",
+    ),
+    semantic: _resolveNode(
+      context,
+      VIDEO_TOKEN_CATALOG.semantic,
+      context.semantic,
+      "",
+    ),
     components: _resolveComponents(context),
     isDarkGround,
     issues,

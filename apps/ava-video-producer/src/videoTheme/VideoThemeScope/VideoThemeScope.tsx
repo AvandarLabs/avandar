@@ -2,7 +2,11 @@ import { useMemo, type ReactNode } from "react";
 import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
 import { useVideoThemeContext } from "../useVideoTheme/useVideoTheme";
 import { VideoThemeProvider } from "../VideoThemeProvider/VideoThemeProvider";
-import type { VideoThemePatch, VideoThemeScope as Scope, VideoThemeSource } from "../videoTheme.types";
+import type {
+  VideoThemePatch,
+  VideoThemeScope as Scope,
+  VideoThemeSource,
+} from "../videoTheme.types";
 
 /**
  * The source for an item nested inside another. The inner item's overrides
@@ -18,7 +22,10 @@ export function createScopedVideoThemeSource(
     library: outer.library,
     themeId: outer.themeId,
     scope: {
-      overrideIds: [...(inner.overrideIds ?? []), ...(outer.scope?.overrideIds ?? [])],
+      overrideIds: [
+        ...(inner.overrideIds ?? []),
+        ...(outer.scope?.overrideIds ?? []),
+      ],
       patches: [...(outer.scope?.patches ?? []), ...(inner.patches ?? [])],
     },
   };
@@ -37,7 +44,12 @@ type Props = Readonly<{
  * a stock graphic rendered on its own still draws with tokens. Use it
  * around a nested preset or a gallery card.
  */
-export function VideoThemeScope({ overrideIds, patches, children, element = "none" }: Props) {
+export function VideoThemeScope({
+  overrideIds,
+  patches,
+  children,
+  element = "none",
+}: Props) {
   const outer = useVideoThemeContext()?.source ?? DEFAULT_VIDEO_THEME_SOURCE;
   // Callers rebuild these arrays on every frame; the key keeps the source stable.
   const scopeKey = JSON.stringify({ overrideIds, patches });

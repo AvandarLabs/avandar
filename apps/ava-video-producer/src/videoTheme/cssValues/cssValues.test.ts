@@ -18,7 +18,10 @@ test("an opaque colour keeps its value", () => {
 });
 
 test("a translucent colour mixes toward transparent", () => {
-  assert.equal(buildColorWithAlpha("#51a7ff", 0.25), "color-mix(in srgb, #51a7ff 25%, transparent)");
+  assert.equal(
+    buildColorWithAlpha("#51a7ff", 0.25),
+    "color-mix(in srgb, #51a7ff 25%, transparent)",
+  );
 });
 
 test("an elevation becomes a box shadow with every layer", () => {
@@ -26,17 +29,29 @@ test("an elevation becomes a box shadow with every layer", () => {
 });
 
 test("an elevation becomes a drop-shadow filter", () => {
-  assert.equal(elevationToDropShadowFilter(FLOATING), "drop-shadow(0px 16px 22px #06101455)");
+  assert.equal(
+    elevationToDropShadowFilter(FLOATING),
+    "drop-shadow(0px 16px 22px #06101455)",
+  );
 });
 
 test("an elevation with no layers casts no shadow", () => {
   assert.equal(elevationToBoxShadow({ layers: [], color: "#000000" }), "none");
-  assert.equal(elevationToDropShadowFilter({ layers: [], color: "#000000" }), "none");
+  assert.equal(
+    elevationToDropShadowFilter({ layers: [], color: "#000000" }),
+    "none",
+  );
 });
 
 test("a text shadow applies its alpha to its colour", () => {
   assert.equal(
-    textShadowToCss({ offsetX: 0, offsetY: 2, blur: 4, alpha: 0.5, color: "#000000" }),
+    textShadowToCss({
+      offsetX: 0,
+      offsetY: 2,
+      blur: 4,
+      alpha: 0.5,
+      color: "#000000",
+    }),
     "0px 2px 4px color-mix(in srgb, #000000 50%, transparent)",
   );
 });

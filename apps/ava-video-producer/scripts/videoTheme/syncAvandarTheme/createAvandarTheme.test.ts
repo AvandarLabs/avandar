@@ -4,10 +4,16 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { createVideoThemeLibrary } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
-import { createAvandarTheme, getShadowFromCss, getHexFromCssColor } from "./createAvandarTheme";
+import {
+  createAvandarTheme,
+  getShadowFromCss,
+  getHexFromCssColor,
+} from "./createAvandarTheme";
 import { readAvandarThemeSource } from "./readAvandarThemeSource";
 
-const THEME_FILE = fileURLToPath(new URL("../../../themes/avandar.theme.json", import.meta.url));
+const THEME_FILE = fileURLToPath(
+  new URL("../../../themes/avandar.theme.json", import.meta.url),
+);
 
 test("the tracked avandar theme matches a fresh sync from the Avandar theme", async () => {
   assert.deepEqual(
@@ -26,7 +32,9 @@ test("a space-separated rgb colour with a percent alpha becomes an 8-digit hex",
 
 test("a stacked shadow becomes layers that share one colour", () => {
   assert.deepEqual(
-    getShadowFromCss("0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06)"),
+    getShadowFromCss(
+      "0 1px 2px rgba(16, 42, 67, 0.1), 0 2px 5px rgba(16, 42, 67, 0.06)",
+    ),
     {
       color: "#102a43",
       shadow: {
@@ -40,7 +48,9 @@ test("a stacked shadow becomes layers that share one colour", () => {
 });
 
 test("the avandar theme resolves on Avandar's dark body surface", () => {
-  const library = createVideoThemeLibrary([createAvandarTheme(readAvandarThemeSource())]);
+  const library = createVideoThemeLibrary([
+    createAvandarTheme(readAvandarThemeSource()),
+  ]);
   const theme = resolveVideoTheme(library, "avandar");
   assert.equal(theme.semantic.color.ground, "#102a43");
   assert.equal(theme.semantic.corner.panel, 12);

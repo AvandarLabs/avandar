@@ -6,7 +6,10 @@ import type { ResolvedVideoTheme } from "../videoTheme.types";
  * undefined. Array indexes are keys too, so `["colors", "primary", "4"]`
  * reads a palette shade.
  */
-export function getValueAtPath(source: unknown, path: readonly string[]): unknown {
+export function getValueAtPath(
+  source: unknown,
+  path: readonly string[],
+): unknown {
   let value: unknown = source;
   for (const key of path) {
     if (typeof value !== "object" || value === null) {

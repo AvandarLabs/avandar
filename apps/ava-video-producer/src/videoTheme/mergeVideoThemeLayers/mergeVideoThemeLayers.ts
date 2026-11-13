@@ -18,7 +18,9 @@ const DOCUMENT_ONLY_KEYS: readonly string[] = [
 
 function _toPatch(document: VideoThemeDocument): VideoThemePatch {
   return Object.fromEntries(
-    Object.entries(document).filter(([key]) => !DOCUMENT_ONLY_KEYS.includes(key)),
+    Object.entries(document).filter(
+      ([key]) => !DOCUMENT_ONLY_KEYS.includes(key),
+    ),
   );
 }
 
@@ -37,13 +39,18 @@ export function getExtendsChainFromThemeId(
   while (currentId !== undefined) {
     if (seen.has(currentId)) {
       throw new VideoThemeError([
-        { path: "extends", message: `Theme "${themeId}" extends itself through "${currentId}"` },
+        {
+          path: "extends",
+          message: `Theme "${themeId}" extends itself through "${currentId}"`,
+        },
       ]);
     }
     seen.add(currentId);
     const document = library.get(currentId);
     if (!document) {
-      throw new VideoThemeError([{ path: "extends", message: `Unknown theme "${currentId}"` }]);
+      throw new VideoThemeError([
+        { path: "extends", message: `Unknown theme "${currentId}"` },
+      ]);
     }
     chain.unshift(document);
     currentId = document.extends;
@@ -66,7 +73,9 @@ export function mergeVideoThemeLayers(
 ): VideoThemePatch {
   const classic = library.get("classic");
   if (!classic) {
-    throw new VideoThemeError([{ path: "id", message: "The classic theme is missing" }]);
+    throw new VideoThemeError([
+      { path: "id", message: "The classic theme is missing" },
+    ]);
   }
   const chain = getExtendsChainFromThemeId(library, themeId);
   const theme = chain[chain.length - 1];
@@ -75,9 +84,13 @@ export function mergeVideoThemeLayers(
     return override ? [override] : [];
   });
   const layers: readonly VideoThemePatch[] = [
-    ...[classic, ...chain.filter((document) => document !== classic)].map(_toPatch),
+    ...[classic, ...chain.filter((document) => document !== classic)].map(
+      _toPatch,
+    ),
     ...overrides,
     ...(scope.patches ?? []),
   ];
-  return mergeThemeOverrides(...(layers as MantineThemeOverride[])) as VideoThemePatch;
+  return mergeThemeOverrides(
+    ...(layers as MantineThemeOverride[]),
+  ) as VideoThemePatch;
 }

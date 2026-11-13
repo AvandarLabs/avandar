@@ -7,7 +7,10 @@ import {
 
 test("canonical JSON sorts object keys at every depth and drops undefined", () => {
   assert.equal(
-    buildCanonicalJsonFromValue({ b: 1, a: { d: [2, { f: 3, e: undefined }], c: true } }),
+    buildCanonicalJsonFromValue({
+      b: 1,
+      a: { d: [2, { f: 3, e: undefined }], c: true },
+    }),
     '{"a":{"c":true,"d":[2,{"f":3}]},"b":1}',
   );
 });

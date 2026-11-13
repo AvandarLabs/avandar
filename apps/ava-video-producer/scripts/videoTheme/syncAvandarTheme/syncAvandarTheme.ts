@@ -5,7 +5,9 @@ import { createAvandarTheme } from "./createAvandarTheme";
 import { readAvandarThemeSource } from "./readAvandarThemeSource";
 
 requireLicense();
-const output = fileURLToPath(new URL("../../../themes/avandar.theme.json", import.meta.url));
+const output = fileURLToPath(
+  new URL("../../../themes/avandar.theme.json", import.meta.url),
+);
 await fs.writeFile(
   output,
   `${JSON.stringify(createAvandarTheme(readAvandarThemeSource()), null, 2)}\n`,

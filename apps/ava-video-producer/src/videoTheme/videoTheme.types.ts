@@ -1,12 +1,12 @@
+import type { ATOMIC_TOKENS } from "./tokenCatalog/atomicTokens";
+import type { COMPONENT_TOKENS } from "./tokenCatalog/componentTokens";
+import type { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens";
+import type { VideoFontId } from "./videoFontRegistry/videoFontRegistry";
 /*
  * Types shared by the video theme model: authored values, token metadata,
  * theme documents, and the resolved values renderers read.
  */
 import type { MantineTheme } from "@mantine/core";
-import type { ATOMIC_TOKENS } from "./tokenCatalog/atomicTokens";
-import type { COMPONENT_TOKENS } from "./tokenCatalog/componentTokens";
-import type { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens";
-import type { VideoFontId } from "./videoFontRegistry/videoFontRegistry";
 
 /** A `$path` reference from one token to another, such as `$atomic.strokeWidth.sm`. */
 export type TokenReference = `$${string}`;
@@ -80,7 +80,9 @@ export type ResolvedSketchProfile = Readonly<{
   randomness: number;
 }>;
 export type ResolvedBox = Readonly<
-  Partial<Record<"top" | "right" | "bottom" | "left" | "x" | "y" | "gap", number>>
+  Partial<
+    Record<"top" | "right" | "bottom" | "left" | "x" | "y" | "gap", number>
+  >
 >;
 export type ResolvedMotionStep = Readonly<{
   duration?: number;
@@ -157,7 +159,7 @@ export type CatalogNode = TokenDefinition | TokenScale | CatalogGroup;
 export type ResolvedTokenNode<Node> = Node extends {
   readonly kind: infer Kind extends TokenKind;
 }
-  ? Node extends { readonly options: readonly (infer Option)[] }
+  ? Node extends { readonly options: ReadonlyArray<infer Option> }
     ? Option
     : TokenKindValues[Kind]
   : Node extends { readonly scale: infer Definition }
@@ -166,7 +168,9 @@ export type ResolvedTokenNode<Node> = Node extends {
 
 export type ResolvedVideoAtomic = ResolvedTokenNode<typeof ATOMIC_TOKENS>;
 export type ResolvedVideoSemantic = ResolvedTokenNode<typeof SEMANTIC_TOKENS>;
-export type ResolvedVideoComponents = ResolvedTokenNode<typeof COMPONENT_TOKENS>;
+export type ResolvedVideoComponents = ResolvedTokenNode<
+  typeof COMPONENT_TOKENS
+>;
 export type VideoComponentName = keyof ResolvedVideoComponents;
 
 /** A sparse theme fragment: Mantine keys, `other.video`, and `components`. */

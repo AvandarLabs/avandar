@@ -28,24 +28,41 @@ const MANTINE_SHADOW_KEYS = ["xs", "sm", "md", "lg", "xl"] as const;
 
 function _createMantineTheme(merged: VideoThemePatch) {
   const mantineKeys = Object.fromEntries(
-    Object.entries(merged).filter(([key]) => key !== "other" && key !== "components"),
+    Object.entries(merged).filter(
+      ([key]) => key !== "other" && key !== "components",
+    ),
   );
   try {
-    return mergeMantineTheme(DEFAULT_THEME, mantineKeys as MantineThemeOverride);
+    return mergeMantineTheme(
+      DEFAULT_THEME,
+      mantineKeys as MantineThemeOverride,
+    );
   } catch (error) {
     throw new VideoThemeError([
-      { path: "primaryColor", message: error instanceof Error ? error.message : String(error) },
+      {
+        path: "primaryColor",
+        message: error instanceof Error ? error.message : String(error),
+      },
     ]);
   }
 }
 
 function _findUnmeasuredGraphicText(
-  tiers: Readonly<{ atomic: ResolvedVideoAtomic; semantic: ResolvedVideoSemantic; components: ResolvedVideoComponents }>,
+  tiers: Readonly<{
+    atomic: ResolvedVideoAtomic;
+    semantic: ResolvedVideoSemantic;
+    components: ResolvedVideoComponents;
+  }>,
 ): VideoThemeIssue[] {
   return listTokenDefinitions()
-    .filter(({ definition }) => definition.kind === "typeStyle" && definition.surface === "graphic")
+    .filter(
+      ({ definition }) =>
+        definition.kind === "typeStyle" && definition.surface === "graphic",
+    )
     .flatMap(({ path }) => {
-      const style = getResolvedTokenValue(tiers, path) as ResolvedTypeStyle | undefined;
+      const style = getResolvedTokenValue(tiers, path) as
+        | ResolvedTypeStyle
+        | undefined;
       if (!style || VIDEO_FONT_REGISTRY[style.fontId].measured) {
         return [];
       }
@@ -58,11 +75,16 @@ function _findUnmeasuredGraphicText(
     });
 }
 
-function _findUnsafeCameraCurves(semantic: ResolvedVideoSemantic): VideoThemeIssue[] {
+function _findUnsafeCameraCurves(
+  semantic: ResolvedVideoSemantic,
+): VideoThemeIssue[] {
   const curves = [
-    ...Object.entries(semantic.camera.easing).map(([name, easing]) => [`camera.easing.${name}`, easing] as const),
+    ...Object.entries(semantic.camera.easing).map(
+      ([name, easing]) => [`camera.easing.${name}`, easing] as const,
+    ),
     ...Object.entries(semantic.camera.presets).map(
-      ([name, preset]) => [`camera.presets.${name}.easing`, preset.easing] as const,
+      ([name, preset]) =>
+        [`camera.presets.${name}.easing`, preset.easing] as const,
     ),
   ];
   return curves
@@ -78,7 +100,9 @@ function _deriveMantineShadows(atomic: ResolvedVideoAtomic, color: string) {
   return Object.fromEntries(
     MANTINE_SHADOW_KEYS.flatMap((key) => {
       const shadow = atomic.shadow[key];
-      return shadow ? [[key, elevationToBoxShadow({ layers: shadow.layers, color })]] : [];
+      return shadow
+        ? [[key, elevationToBoxShadow({ layers: shadow.layers, color })]]
+        : [];
     }),
   );
 }
@@ -99,7 +123,9 @@ export function resolveVideoTheme(
 ): ResolvedVideoTheme {
   const document = library.get(themeId);
   if (!document) {
-    throw new VideoThemeError([{ path: "id", message: `Unknown theme "${themeId}"` }]);
+    throw new VideoThemeError([
+      { path: "id", message: `Unknown theme "${themeId}"` },
+    ]);
   }
   const merged = mergeVideoThemeLayers(library, themeId, scope);
   const mantine = _createMantineTheme(merged);
@@ -126,9 +152,15 @@ export function resolveVideoTheme(
     hash: buildVideoThemeHashFromContent(content),
     ...content,
     mantine: mergeMantineTheme(mantine, {
-      shadows: _deriveMantineShadows(content.atomic, content.semantic.color.shadowColor),
+      shadows: _deriveMantineShadows(
+        content.atomic,
+        content.semantic.color.shadowColor,
+      ),
       components: Object.fromEntries(
-        Object.entries(content.components).map(([name, defaultProps]) => [name, { defaultProps }]),
+        Object.entries(content.components).map(([name, defaultProps]) => [
+          name,
+          { defaultProps },
+        ]),
       ),
       other: { video: { atomic: content.atomic, semantic: content.semantic } },
     }),

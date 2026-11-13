@@ -22,11 +22,27 @@ function _stageType(label: string, description: string) {
 }
 
 function _stroke(label: string, description: string) {
-  return token({ kind: "length", unit: "px", min: 0, max: 12, step: 0.1, label, description });
+  return token({
+    kind: "length",
+    unit: "px",
+    min: 0,
+    max: 12,
+    step: 0.1,
+    label,
+    description,
+  });
 }
 
 function _corner(label: string, description: string) {
-  return token({ kind: "length", unit: "px", min: 0, max: 9999, step: 1, label, description });
+  return token({
+    kind: "length",
+    unit: "px",
+    min: 0,
+    max: 9999,
+    step: 1,
+    label,
+    description,
+  });
 }
 
 function _sketch(label: string, description: string) {
@@ -34,7 +50,15 @@ function _sketch(label: string, description: string) {
 }
 
 function _duration(label: string, description: string) {
-  return token({ kind: "duration", unit: "frames", min: 0, max: 120, step: 1, label, description });
+  return token({
+    kind: "duration",
+    unit: "frames",
+    min: 0,
+    max: 120,
+    step: 1,
+    label,
+    description,
+  });
 }
 
 function _motionStep(label: string, description: string) {
@@ -42,7 +66,15 @@ function _motionStep(label: string, description: string) {
 }
 
 function _stagger(label: string, description: string) {
-  return token({ kind: "number", unit: "frames", min: 0, max: 30, step: 0.5, label, description });
+  return token({
+    kind: "number",
+    unit: "frames",
+    min: 0,
+    max: 30,
+    step: 0.5,
+    label,
+    description,
+  });
 }
 
 function _cameraPreset(name: string) {
@@ -72,18 +104,28 @@ export const SEMANTIC_TOKENS = {
     groundFill: token({
       kind: "fill",
       label: "Ground fill",
-      description: "How the ground is painted: the ground colour, or the theme's ground gradient.",
+      description:
+        "How the ground is painted: the ground colour, or the theme's ground gradient.",
     }),
-    surface: _color("Surface", "Fill of panels, nodes, and cards that sit on the ground."),
+    surface: _color(
+      "Surface",
+      "Fill of panels, nodes, and cards that sit on the ground.",
+    ),
     elevated: _color(
       "Elevated surface",
       "Fill of a surface stacked on another surface, such as a card inside a panel.",
     ),
     line: _color("Line", "Edges, outlines, guides, and dividers."),
     text: _color("Text", "Primary text and labels."),
-    textMuted: _color("Muted text", "Secondary text: eyebrows, captions, and details."),
+    textMuted: _color(
+      "Muted text",
+      "Secondary text: eyebrows, captions, and details.",
+    ),
     accent: _color("Accent", "The path, packet, or object a motion is about."),
-    accentAlt: _color("Second accent", "A companion colour that alternates with the accent."),
+    accentAlt: _color(
+      "Second accent",
+      "A companion colour that alternates with the accent.",
+    ),
     highlight: _color("Highlight", "A warm colour for one point of attention."),
     scrim: _color("Scrim", "The dimming layer around a spotlight."),
     productBackdrop: _color(
@@ -94,41 +136,89 @@ export const SEMANTIC_TOKENS = {
   },
   text: {
     graphic: {
-      eyebrow: _graphicType("Eyebrow", "The small tracked label in the top-left corner of a graphic."),
-      heading: _graphicType("Graphic heading", "A heading drawn inside a graphic."),
-      body: _graphicType("Graphic body", "Default text drawn inside a graphic."),
+      eyebrow: _graphicType(
+        "Eyebrow",
+        "The small tracked label in the top-left corner of a graphic.",
+      ),
+      heading: _graphicType(
+        "Graphic heading",
+        "A heading drawn inside a graphic.",
+      ),
+      body: _graphicType(
+        "Graphic body",
+        "Default text drawn inside a graphic.",
+      ),
       label: _graphicType("Label", "Names under nodes and other shapes."),
-      detail: _graphicType("Detail", "Small monospace values and annotations under a label."),
-      caption: _graphicType("Caption", "The one-line caption along the bottom of a graphic."),
+      detail: _graphicType(
+        "Detail",
+        "Small monospace values and annotations under a label.",
+      ),
+      caption: _graphicType(
+        "Caption",
+        "The one-line caption along the bottom of a graphic.",
+      ),
       pill: _graphicType("Pill text", "Text inside a pill-shaped tag."),
     },
     stage: {
-      heading: _stageType("Stage heading", "The heading of a composition beat."),
+      heading: _stageType(
+        "Stage heading",
+        "The heading of a composition beat.",
+      ),
       subtitle: _stageType("Stage subtitle", "The line under a beat heading."),
-      evidence: _stageType("Evidence", "Short evidence chips along the bottom of the stage."),
+      evidence: _stageType(
+        "Evidence",
+        "Short evidence chips along the bottom of the stage.",
+      ),
       sharedObject: _stageType(
         "Shared object text",
         "The text on an object that travels from one motion to the next.",
       ),
-      thesis: _stageType("Thesis", "Large statement lines that carry the argument of a composition."),
-      thesisEmphasis: _stageType("Thesis emphasis", "The supporting line under a thesis."),
-      floatingLabel: _stageType("Floating label", "A label anchored to a point on the stage."),
+      thesis: _stageType(
+        "Thesis",
+        "Large statement lines that carry the argument of a composition.",
+      ),
+      thesisEmphasis: _stageType(
+        "Thesis emphasis",
+        "The supporting line under a thesis.",
+      ),
+      floatingLabel: _stageType(
+        "Floating label",
+        "A label anchored to a point on the stage.",
+      ),
     },
   },
   stroke: {
-    guide: _stroke("Guide stroke", "Orbits, guides, and other construction lines."),
+    guide: _stroke(
+      "Guide stroke",
+      "Orbits, guides, and other construction lines.",
+    ),
     outline: _stroke("Outline stroke", "Outlines of panels, nodes, and cards."),
     default: _stroke("Default stroke", "Edges, connectors, and drawn paths."),
-    annotation: _stroke("Annotation stroke", "Hand-drawn underlines and annotations."),
+    annotation: _stroke(
+      "Annotation stroke",
+      "Hand-drawn underlines and annotations.",
+    ),
     route: _stroke("Route stroke", "A highlighted route through a diagram."),
   },
   corner: {
     panel: _corner("Panel corner", "Corner radius of panels inside a graphic."),
     pill: _corner("Pill corner", "Corner radius of pill-shaped tags."),
-    card: _corner("Card corner", "Corner radius of summary cards inside a graphic."),
-    chip: _corner("Chip corner", "Corner radius of evidence chips on the stage."),
-    sharedObject: _corner("Shared object corner", "Corner radius of an object that travels between motions."),
-    spotlight: _corner("Spotlight corner", "Corner radius of a spotlight cut-out."),
+    card: _corner(
+      "Card corner",
+      "Corner radius of summary cards inside a graphic.",
+    ),
+    chip: _corner(
+      "Chip corner",
+      "Corner radius of evidence chips on the stage.",
+    ),
+    sharedObject: _corner(
+      "Shared object corner",
+      "Corner radius of an object that travels between motions.",
+    ),
+    spotlight: _corner(
+      "Spotlight corner",
+      "Corner radius of a spotlight cut-out.",
+    ),
     label: _corner("Label corner", "Corner radius of a floating label."),
   },
   elevation: {
@@ -140,7 +230,8 @@ export const SEMANTIC_TOKENS = {
     floating: token({
       kind: "elevation",
       label: "Floating",
-      description: "Surfaces that hover over the stage, such as floating labels and lifted diagrams.",
+      description:
+        "Surfaces that hover over the stage, such as floating labels and lifted diagrams.",
     }),
   },
   effect: {
@@ -157,9 +248,18 @@ export const SEMANTIC_TOKENS = {
       sketch: _sketch("Sketch", "Lines that read as drawn by hand."),
       rough: _sketch("Rough", "Loose, expressive hand-drawn lines."),
     },
-    box: _sketch("Box sketch", "The sketch profile boxes, panels, and pills use."),
-    annotation: _sketch("Annotation sketch", "The sketch profile underlines, brackets, and annotations use."),
-    shape: _sketch("Shape sketch", "The sketch profile nodes, edges, and guides use."),
+    box: _sketch(
+      "Box sketch",
+      "The sketch profile boxes, panels, and pills use.",
+    ),
+    annotation: _sketch(
+      "Annotation sketch",
+      "The sketch profile underlines, brackets, and annotations use.",
+    ),
+    shape: _sketch(
+      "Shape sketch",
+      "The sketch profile nodes, edges, and guides use.",
+    ),
   },
   layout: {
     graphic: {
@@ -177,7 +277,8 @@ export const SEMANTIC_TOKENS = {
         kind: "box",
         surface: "graphic",
         label: "Eyebrow position",
-        description: "Where the eyebrow baseline starts: x from the left edge and y from the top.",
+        description:
+          "Where the eyebrow baseline starts: x from the left edge and y from the top.",
       }),
       captionBaseline: token({
         kind: "length",
@@ -187,7 +288,8 @@ export const SEMANTIC_TOKENS = {
         max: 300,
         step: 1,
         label: "Caption baseline",
-        description: "Distance from the bottom of a graphic to the baseline of its caption.",
+        description:
+          "Distance from the bottom of a graphic to the baseline of its caption.",
       }),
     },
     stage: {
@@ -195,13 +297,15 @@ export const SEMANTIC_TOKENS = {
         kind: "box",
         surface: "stage",
         label: "Heading inset",
-        description: "Where the heading block of a beat sits: x from both sides and top from the top edge.",
+        description:
+          "Where the heading block of a beat sits: x from both sides and top from the top edge.",
       }),
       graphicInset: token({
         kind: "box",
         surface: "stage",
         label: "Graphic inset",
-        description: "Where the graphic of a beat sits: x from both sides, plus top and bottom.",
+        description:
+          "Where the graphic of a beat sits: x from both sides, plus top and bottom.",
       }),
       evidenceRow: token({
         kind: "box",
@@ -225,24 +329,45 @@ export const SEMANTIC_TOKENS = {
     }),
     press: _duration("Press", "A press answering back."),
     chip: _duration("Chip", "A chip changing state."),
-    whip: _duration("Whip", "A whip-out or wipe, shorter than a panel so the boundary reads as a cut."),
+    whip: _duration(
+      "Whip",
+      "A whip-out or wipe, shorter than a panel so the boundary reads as a cut.",
+    ),
     panel: _duration("Panel", "A row, card, or panel arriving."),
     sheet: _duration("Sheet", "A sheet or full column arriving."),
     word: _duration("Word", "One word rising out of its mask."),
     hero: _duration("Hero", "The hero beat of a phase. Spend it once."),
-    entrance: _motionStep("Entrance", "How elements arrive: duration, curve, and rise distance."),
-    exit: _motionStep("Exit", "How elements leave: duration, curve, and travel distance."),
-    emphasis: _motionStep("Emphasis", "A spring landing for a value or card snapping into place."),
+    entrance: _motionStep(
+      "Entrance",
+      "How elements arrive: duration, curve, and rise distance.",
+    ),
+    exit: _motionStep(
+      "Exit",
+      "How elements leave: duration, curve, and travel distance.",
+    ),
+    emphasis: _motionStep(
+      "Emphasis",
+      "A spring landing for a value or card snapping into place.",
+    ),
     drawOn: _motionStep("Draw on", "How edges and paths draw themselves in."),
-    travel: _motionStep("Travel", "The curve of something already on screen moving between landmarks."),
+    travel: _motionStep(
+      "Travel",
+      "The curve of something already on screen moving between landmarks.",
+    ),
     pulse: _motionStep("Pulse", "The cycle of a breathing node or halo."),
     drift: _motionStep("Drift", "How far particles wander in a looping field."),
-    packetFlow: _motionStep("Packet flow", "The cycle of packets travelling along edges."),
+    packetFlow: _motionStep(
+      "Packet flow",
+      "The cycle of packets travelling along edges.",
+    ),
     typing: _motionStep("Typing", "How fast typed text appears."),
     stagger: {
       list: _stagger("List stagger", "Frames between siblings in a list."),
       edge: _stagger("Edge stagger", "Frames between edges drawing in."),
-      column: _stagger("Column stagger", "Frames between neighbouring columns of a stepped wipe."),
+      column: _stagger(
+        "Column stagger",
+        "Frames between neighbouring columns of a stepped wipe.",
+      ),
     },
   },
   camera: {
@@ -262,7 +387,10 @@ export const SEMANTIC_TOKENS = {
     easing: {
       push: _easing("Push curve", "The curve of a camera pushing in."),
       whip: _easing("Whip curve", "The curve of a fast camera whip."),
-      glide: _easing("Glide curve", "The curve of a camera gliding between framings."),
+      glide: _easing(
+        "Glide curve",
+        "The curve of a camera gliding between framings.",
+      ),
     },
     zoom: token({
       kind: "range",
@@ -278,7 +406,8 @@ export const SEMANTIC_TOKENS = {
       max: 360,
       step: 5,
       label: "Shutter angle",
-      description: "Shutter angle for camera motion blur when the camera follows its authored timing.",
+      description:
+        "Shutter angle for camera motion blur when the camera follows its authored timing.",
     }),
     samples: token({
       kind: "number",
@@ -294,7 +423,8 @@ export const SEMANTIC_TOKENS = {
       max: 1,
       step: 0.01,
       label: "Velocity blur factor",
-      description: "Blur pixels for each pixel of travel per frame in a single-object move.",
+      description:
+        "Blur pixels for each pixel of travel per frame in a single-object move.",
     }),
     velocityMax: token({
       kind: "length",
@@ -312,7 +442,8 @@ export const SEMANTIC_TOKENS = {
       max: 48,
       step: 0.5,
       label: "Transition blur",
-      description: "Peak blur of a spatial transition at full strength and a 180 degree shutter.",
+      description:
+        "Peak blur of a spatial transition at full strength and a 180 degree shutter.",
     }),
   },
 } as const;

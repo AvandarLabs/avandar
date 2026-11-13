@@ -6,7 +6,10 @@ import {
   textShadowToCss,
 } from "../cssValues/cssValues";
 import { getResolvedTokenValue } from "../getResolvedTokenValue/getResolvedTokenValue";
-import { isMantineTokenRoot, listTokenDefinitions } from "../tokenCatalog/tokenCatalog";
+import {
+  isMantineTokenRoot,
+  listTokenDefinitions,
+} from "../tokenCatalog/tokenCatalog";
 import type {
   GlowValue,
   ResolvedBox,
@@ -24,21 +27,38 @@ function _kebab(segment: string): string {
   return segment.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
 
-function _typeStyleVariables(name: string, style: ResolvedTypeStyle): Record<string, string> {
+function _typeStyleVariables(
+  name: string,
+  style: ResolvedTypeStyle,
+): Record<string, string> {
   return {
     [`${name}-font-family`]: style.fontFamily,
     [`${name}-font-size`]: `${style.fontSize}px`,
     [`${name}-font-weight`]: String(style.fontWeight),
     [`${name}-color`]: buildColorWithAlpha(style.color, style.alpha),
-    ...(style.lineHeight === undefined ? {} : { [`${name}-line-height`]: String(style.lineHeight) }),
-    ...(style.letterSpacing === undefined ? {} : { [`${name}-letter-spacing`]: `${style.letterSpacing}em` }),
-    ...(style.textTransform ? { [`${name}-text-transform`]: style.textTransform } : {}),
-    ...(style.fontVariantNumeric ? { [`${name}-font-variant-numeric`]: style.fontVariantNumeric } : {}),
-    ...(style.textShadow ? { [`${name}-text-shadow`]: textShadowToCss(style.textShadow) } : {}),
+    ...(style.lineHeight === undefined
+      ? {}
+      : { [`${name}-line-height`]: String(style.lineHeight) }),
+    ...(style.letterSpacing === undefined
+      ? {}
+      : { [`${name}-letter-spacing`]: `${style.letterSpacing}em` }),
+    ...(style.textTransform
+      ? { [`${name}-text-transform`]: style.textTransform }
+      : {}),
+    ...(style.fontVariantNumeric
+      ? { [`${name}-font-variant-numeric`]: style.fontVariantNumeric }
+      : {}),
+    ...(style.textShadow
+      ? { [`${name}-text-shadow`]: textShadowToCss(style.textShadow) }
+      : {}),
   };
 }
 
-function _variablesFromValue(kind: TokenKind, name: string, value: unknown): Record<string, string> {
+function _variablesFromValue(
+  kind: TokenKind,
+  name: string,
+  value: unknown,
+): Record<string, string> {
   switch (kind) {
     case "color":
       return { [name]: String(value) };
@@ -61,12 +81,19 @@ function _variablesFromValue(kind: TokenKind, name: string, value: unknown): Rec
     }
     case "elevation":
       return {
-        [`${name}-box-shadow`]: elevationToBoxShadow(value as ResolvedElevation),
-        [`${name}-drop-shadow`]: elevationToDropShadowFilter(value as ResolvedElevation),
+        [`${name}-box-shadow`]: elevationToBoxShadow(
+          value as ResolvedElevation,
+        ),
+        [`${name}-drop-shadow`]: elevationToDropShadowFilter(
+          value as ResolvedElevation,
+        ),
       };
     case "box":
       return Object.fromEntries(
-        Object.entries(value as ResolvedBox).map(([side, pixels]) => [`${name}-${side}`, `${String(pixels)}px`]),
+        Object.entries(value as ResolvedBox).map(([side, pixels]) => [
+          `${name}-${side}`,
+          `${String(pixels)}px`,
+        ]),
       );
     case "glow": {
       const glow = value as GlowValue;
@@ -107,7 +134,14 @@ export function buildVideoCssVariables(
       UNSTYLED_GROUPS.has(segments[0]);
     const value = isSkipped ? undefined : getResolvedTokenValue(theme, path);
     if (value !== undefined) {
-      Object.assign(variables, _variablesFromValue(definition.kind, _variableNameFromPath(segments), value));
+      Object.assign(
+        variables,
+        _variablesFromValue(
+          definition.kind,
+          _variableNameFromPath(segments),
+          value,
+        ),
+      );
     }
   }
   return variables;

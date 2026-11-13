@@ -1,7 +1,10 @@
 import { useProps } from "@mantine/core";
 import { createContext, useContext, useMemo } from "react";
 import { SEMANTIC_TOKENS } from "../tokenCatalog/semanticTokens";
-import { createTokenUsageProxy, VideoTokenUsageContext } from "../tokenUsage/tokenUsage";
+import {
+  createTokenUsageProxy,
+  VideoTokenUsageContext,
+} from "../tokenUsage/tokenUsage";
 import type {
   ResolvedVideoComponents,
   ResolvedVideoSemantic,
@@ -20,7 +23,9 @@ export type VideoThemeContextValue = Readonly<{
  * The video theme of the subtree. Set by `VideoThemeProvider`. The source is
  * kept so a nested `VideoThemeScope` can re-resolve with extra overrides.
  */
-export const VideoThemeContext = createContext<VideoThemeContextValue | undefined>(undefined);
+export const VideoThemeContext = createContext<
+  VideoThemeContextValue | undefined
+>(undefined);
 
 /** The theme context, or undefined outside any provider. */
 export function useVideoThemeContext(): VideoThemeContextValue | undefined {
@@ -34,7 +39,9 @@ export function useVideoThemeContext(): VideoThemeContextValue | undefined {
 export function useVideoTheme(): ResolvedVideoTheme {
   const value = useContext(VideoThemeContext);
   if (!value) {
-    throw new Error("Video tokens need a VideoThemeProvider or VideoThemeScope above this component");
+    throw new Error(
+      "Video tokens need a VideoThemeProvider or VideoThemeScope above this component",
+    );
   }
   return value.theme;
 }
@@ -50,7 +57,12 @@ export function useVideoTokens(): ResolvedVideoSemantic {
   return useMemo(
     () =>
       report
-        ? createTokenUsageProxy({ value: theme.semantic, catalog: SEMANTIC_TOKENS, basePath: [], report })
+        ? createTokenUsageProxy({
+            value: theme.semantic,
+            catalog: SEMANTIC_TOKENS,
+            basePath: [],
+            report,
+          })
         : theme.semantic,
     [theme, report],
   );

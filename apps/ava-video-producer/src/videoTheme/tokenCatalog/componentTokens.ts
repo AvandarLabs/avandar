@@ -16,7 +16,8 @@ export const COMPONENT_TOKENS = {
       max: 16,
       step: 1,
       label: "Progress bar height",
-      description: "Thickness of the beat progress bar along the bottom of the stage.",
+      description:
+        "Thickness of the beat progress bar along the bottom of the stage.",
     }),
     paint: token({
       kind: "paint",

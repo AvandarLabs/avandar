@@ -19,7 +19,11 @@ const SAMPLES = Array.from({ length: 21 }, (_, index) => index / 20);
 
 test("classic's swatches equal the stock palette", () => {
   for (const [name, color] of Object.entries(STOCK)) {
-    assert.equal(atomic.swatch[name as keyof typeof atomic.swatch], color, name);
+    assert.equal(
+      atomic.swatch[name as keyof typeof atomic.swatch],
+      color,
+      name,
+    );
   }
 });
 
@@ -56,7 +60,10 @@ test("classic's staggers equal STAGGER and STAGGER_COLUMN", () => {
 
 test("classic's spring lands exactly like pop's default spring", () => {
   for (let frame = 0; frame <= DUR.sheet; frame += 1) {
-    assert.equal(pop(frame, 0, atomic.spring.pop, atomic.duration.lg), pop(frame, 0));
+    assert.equal(
+      pop(frame, 0, atomic.spring.pop, atomic.duration.lg),
+      pop(frame, 0),
+    );
   }
 });
 
@@ -67,7 +74,9 @@ test("classic's camera presets equal MOTION_PRESETS", () => {
     assert.equal(atomic.shutter[key], preset.shutterAngle, name);
     assert.equal(
       semantic.camera.presets[key].easing,
-      preset.easing === "ease-in-out" ? "$atomic.easing.inOut" : "$atomic.easing.inOutCubic",
+      preset.easing === "ease-in-out"
+        ? "$atomic.easing.inOut"
+        : "$atomic.easing.inOutCubic",
       name,
     );
   }
@@ -82,7 +91,10 @@ test("classic's velocity blur equals getVelocityBlur", () => {
     assert.ok(
       Math.abs(
         getVelocityBlur(distance) -
-          Math.min(atomic.velocityBlur.max, distance * atomic.velocityBlur.factor),
+          Math.min(
+            atomic.velocityBlur.max,
+            distance * atomic.velocityBlur.factor,
+          ),
       ) < 1e-12,
       String(distance),
     );
@@ -90,7 +102,10 @@ test("classic's velocity blur equals getVelocityBlur", () => {
 });
 
 test("classic's accent and ground are the Atlas gallery defaults", () => {
-  assert.equal(classicJson.colors.primary[classicJson.primaryShade.dark], DEFAULT_ACCENT);
+  assert.equal(
+    classicJson.colors.primary[classicJson.primaryShade.dark],
+    DEFAULT_ACCENT,
+  );
   assert.equal(atomic.swatch.ground, DEFAULT_BACKGROUND);
 });
 

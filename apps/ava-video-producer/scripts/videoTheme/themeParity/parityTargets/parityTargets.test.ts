@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  getAllowedRegionsFromFilm,
-  listParityTargets,
-} from "./parityTargets";
+import { getAllowedRegionsFromFilm, listParityTargets } from "./parityTargets";
 
 test("every in-scope preset and composition is a parity target", () => {
   assert.deepEqual(

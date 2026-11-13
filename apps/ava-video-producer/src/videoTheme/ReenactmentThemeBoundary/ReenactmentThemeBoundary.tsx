@@ -10,5 +10,7 @@ type Props = Readonly<{ children: ReactNode }>;
  * sizes, spacing, and component defaults. Wrap every reenactment root in it.
  */
 export function ReenactmentThemeBoundary({ children }: Props) {
-  return <MantineThemeProvider inherit={false}>{children}</MantineThemeProvider>;
+  return (
+    <MantineThemeProvider inherit={false}>{children}</MantineThemeProvider>
+  );
 }

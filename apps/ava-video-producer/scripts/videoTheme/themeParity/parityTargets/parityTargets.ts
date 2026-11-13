@@ -1,8 +1,11 @@
-import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../../../../src/gallery/palette";
+import {
+  DEFAULT_ACCENT,
+  DEFAULT_BACKGROUND,
+} from "../../../../src/gallery/palette";
 import { previewFrames } from "../../../lib/planHelpers";
 import { StockFingerprintModule } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
-import type { ParityRegion } from "../compareRgbaFrames/compareRgbaFrames";
 import type { Film } from "../../../../src/showcase/showcase.types";
+import type { ParityRegion } from "../compareRgbaFrames/compareRgbaFrames";
 
 /** The stock presets the design tokens cover, in Atlas order. */
 export const PARITY_STOCK_PRESET_IDS = [

@@ -1,6 +1,10 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
 import { createVideoThemeJsonSchema } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
-import { THEME_FILE_MAX_BYTES, ThemeStoreError, type ThemeStore } from "../themeStore/themeStore";
+import {
+  THEME_FILE_MAX_BYTES,
+  ThemeStoreError,
+  type ThemeStore,
+} from "../themeStore/themeStore";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 const THEME_ROUTE = /^\/api\/themes(?:\/([^/]+))?$/;
 
@@ -13,7 +17,10 @@ type ThemeRequest = Readonly<{
 
 function _send(res: ServerResponse, status: number, body: unknown): void {
   res
-    .writeHead(status, { "Content-Type": "application/json", "Cache-Control": "no-store" })
+    .writeHead(status, {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    })
     .end(JSON.stringify(body));
 }
 
@@ -39,7 +46,10 @@ function _assertSameOrigin(req: IncomingMessage): void {
   }
 }
 
-async function _route({ req, res, store }: ThemeRequest, id: string | undefined): Promise<void> {
+async function _route(
+  { req, res, store }: ThemeRequest,
+  id: string | undefined,
+): Promise<void> {
   const method = req.method ?? "GET";
   if (id === undefined && method === "GET") {
     return _send(res, 200, await store.list());
@@ -72,7 +82,9 @@ async function _route({ req, res, store }: ThemeRequest, id: string | undefined)
  * (PUT with `If-Match`). Writes require a same-origin request. Returns false
  * for any other path so the showcase server can try its other routes.
  */
-export async function handleThemeRequest(request: ThemeRequest): Promise<boolean> {
+export async function handleThemeRequest(
+  request: ThemeRequest,
+): Promise<boolean> {
   const match = THEME_ROUTE.exec(request.pathname);
   if (!match) {
     return false;
@@ -81,10 +93,15 @@ export async function handleThemeRequest(request: ThemeRequest): Promise<boolean
     await _route(request, match[1]);
   } catch (error) {
     if (error instanceof ThemeStoreError) {
-      _send(request.res, error.status, { message: error.message, issues: error.issues });
+      _send(request.res, error.status, {
+        message: error.message,
+        issues: error.issues,
+      });
     } else {
       console.error("Theme request failed:", error);
-      _send(request.res, 500, { message: "The theme request failed. Check the showcase terminal." });
+      _send(request.res, 500, {
+        message: "The theme request failed. Check the showcase terminal.",
+      });
     }
   }
   return true;

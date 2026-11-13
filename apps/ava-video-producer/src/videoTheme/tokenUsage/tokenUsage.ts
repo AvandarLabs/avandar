@@ -10,7 +10,9 @@ export type TokenUsageReporter = (tokenPath: string) => void;
  * renders pay nothing. The token editor sets it to show the tokens an item
  * actually uses.
  */
-export const VideoTokenUsageContext = createContext<TokenUsageReporter | undefined>(undefined);
+export const VideoTokenUsageContext = createContext<
+  TokenUsageReporter | undefined
+>(undefined);
 
 /** A set of token paths reported by renders, read back sorted. */
 export type TokenUsageCollector = Readonly<{
@@ -68,7 +70,12 @@ export function createTokenUsageProxy<Value extends object>(
         return child;
       }
       return typeof child === "object" && child !== null
-        ? createTokenUsageProxy({ value: child, catalog: node, basePath: path, report })
+        ? createTokenUsageProxy({
+            value: child,
+            catalog: node,
+            basePath: path,
+            report,
+          })
         : child;
     },
   });

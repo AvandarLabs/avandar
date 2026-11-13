@@ -8,7 +8,9 @@ import {
   listBundledVideoFonts,
 } from "./videoFontRegistry";
 
-const PUBLIC_DIRECTORY = fileURLToPath(new URL("../../../public", import.meta.url));
+const PUBLIC_DIRECTORY = fileURLToPath(
+  new URL("../../../public", import.meta.url),
+);
 
 test("every bundled font file exists in public/fonts", async () => {
   await Promise.all(

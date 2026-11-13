@@ -1,9 +1,17 @@
 import { parseCssPixels } from "../../../src/videoTheme/normalizeTokenValue/normalizeTokenValue";
-import { VIDEO_FONT_IDS, VIDEO_FONT_REGISTRY } from "../../../src/videoTheme/videoFontRegistry/videoFontRegistry";
-import type { ShadowValue, VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
+import {
+  VIDEO_FONT_IDS,
+  VIDEO_FONT_REGISTRY,
+} from "../../../src/videoTheme/videoFontRegistry/videoFontRegistry";
+import type {
+  ShadowValue,
+  VideoThemeDocument,
+} from "../../../src/videoTheme/videoTheme.types";
 
 type Shades = readonly string[];
-type Surfaces = Readonly<Record<"body" | "raised" | "overlay" | "sunken" | "panelHeader", string>>;
+type Surfaces = Readonly<
+  Record<"body" | "raised" | "overlay" | "sunken" | "panelHeader", string>
+>;
 type SizeScale = Readonly<Record<"xs" | "sm" | "md" | "lg" | "xl", string>>;
 
 /** The Avandar theme values `read-theme.mjs --for-video` prints. */
@@ -18,7 +26,12 @@ export type AvandarThemeSource = Readonly<{
   brand: string;
   surfaces: Readonly<{ light: Surfaces; dark: Surfaces }>;
   radius: SizeScale;
-  borders: Readonly<Record<"light" | "dark", Readonly<Record<"default" | "strong" | "focus", string>>>>;
+  borders: Readonly<
+    Record<
+      "light" | "dark",
+      Readonly<Record<"default" | "strong" | "focus", string>>
+    >
+  >;
   shadows: SizeScale;
   easing: Readonly<Record<string, string>>;
   overlay: Readonly<{ backgroundColor: string }>;
@@ -32,15 +45,19 @@ export type AvandarThemeSource = Readonly<{
  */
 const AVANDAR_DARK_ACCENT_SHADE = 4;
 const SIZE_KEYS = ["xs", "sm", "md", "lg", "xl"] as const;
-const CSS_COLOR_PATTERN = /^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)\s*(?:[,/]\s*([\d.]+%?))?\s*\)$/;
-const SHADOW_LAYER_PATTERN = /^(-?[\d.]+)(?:px)? (-?[\d.]+)(?:px)? ([\d.]+)(?:px)?(?: (-?[\d.]+)(?:px)?)? (rgba?\(.+\))$/;
+const CSS_COLOR_PATTERN =
+  /^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)\s*(?:[,/]\s*([\d.]+%?))?\s*\)$/;
+const SHADOW_LAYER_PATTERN =
+  /^(-?[\d.]+)(?:px)? (-?[\d.]+)(?:px)? ([\d.]+)(?:px)?(?: (-?[\d.]+)(?:px)?)? (rgba?\(.+\))$/;
 
 function _byte(value: number): string {
   return Math.round(value).toString(16).padStart(2, "0");
 }
 
 /** The opaque hex and the alpha of a CSS rgb() or rgba() colour. */
-function _parseCssColor(color: string): Readonly<{ hex: string; alpha: number }> {
+function _parseCssColor(
+  color: string,
+): Readonly<{ hex: string; alpha: number }> {
   const match = CSS_COLOR_PATTERN.exec(color);
   if (!match) {
     throw new Error(`Unsupported colour ${color}`);
@@ -67,7 +84,9 @@ export function getHexFromCssColor(color: string): string {
 }
 
 /** Layers and their shared colour from a CSS box-shadow such as Avandar's stacked shadows. */
-export function getShadowFromCss(css: string): Readonly<{ shadow: ShadowValue; color: string }> {
+export function getShadowFromCss(
+  css: string,
+): Readonly<{ shadow: ShadowValue; color: string }> {
   const layers = css.split(/,(?![^(]*\))/).map((layer) => {
     const match = SHADOW_LAYER_PATTERN.exec(layer.trim());
     if (!match) {
@@ -89,7 +108,10 @@ export function getShadowFromCss(css: string): Readonly<{ shadow: ShadowValue; c
   if (colors.size !== 1) {
     throw new Error(`Shadow layers use more than one colour: ${css}`);
   }
-  return { color: layers[0].color, shadow: { layers: layers.map(({ layer }) => layer) } };
+  return {
+    color: layers[0].color,
+    shadow: { layers: layers.map(({ layer }) => layer) },
+  };
 }
 
 function _cubicBezier(css: string): readonly number[] {
@@ -102,9 +124,13 @@ function _cubicBezier(css: string): readonly number[] {
 
 function _fontStack(fontFamily: string): string {
   const face = fontFamily.split(",")[0].trim().replace(/['"]/g, "");
-  const id = VIDEO_FONT_IDS.find((fontId) => VIDEO_FONT_REGISTRY[fontId].label === face);
+  const id = VIDEO_FONT_IDS.find(
+    (fontId) => VIDEO_FONT_REGISTRY[fontId].label === face,
+  );
   if (!id) {
-    throw new Error(`The Avandar font ${face} is not in the video font registry`);
+    throw new Error(
+      `The Avandar font ${face} is not in the video font registry`,
+    );
   }
   return VIDEO_FONT_REGISTRY[id].stack;
 }
@@ -133,8 +159,12 @@ function _swatches(source: AvandarThemeSource, shadowColor: string) {
  * ground is Avandar's dark body, the line is its dark hairline border, and
  * mint, cyan, and orange become its success, info, and secondary colours.
  */
-export function createAvandarTheme(source: AvandarThemeSource): VideoThemeDocument {
-  const shadows = SIZE_KEYS.map((key) => [key, getShadowFromCss(source.shadows[key])] as const);
+export function createAvandarTheme(
+  source: AvandarThemeSource,
+): VideoThemeDocument {
+  const shadows = SIZE_KEYS.map(
+    (key) => [key, getShadowFromCss(source.shadows[key])] as const,
+  );
   const stack = _fontStack(source.fontFamily);
   return {
     schemaVersion: 1,
@@ -150,15 +180,22 @@ export function createAvandarTheme(source: AvandarThemeSource): VideoThemeDocume
       danger: source.danger,
       info: source.info,
     },
-    primaryShade: { light: source.primary.indexOf(source.brand), dark: AVANDAR_DARK_ACCENT_SHADE },
+    primaryShade: {
+      light: source.primary.indexOf(source.brand),
+      dark: AVANDAR_DARK_ACCENT_SHADE,
+    },
     fontFamily: stack,
     headings: { fontFamily: stack },
-    radius: Object.fromEntries(SIZE_KEYS.map((key) => [key, `${parseCssPixels(source.radius[key])}px`])),
+    radius: Object.fromEntries(
+      SIZE_KEYS.map((key) => [key, `${parseCssPixels(source.radius[key])}px`]),
+    ),
     other: {
       video: {
         atomic: {
           swatch: _swatches(source, shadows[0][1].color),
-          shadow: Object.fromEntries(shadows.map(([key, { shadow }]) => [key, shadow])),
+          shadow: Object.fromEntries(
+            shadows.map(([key, { shadow }]) => [key, shadow]),
+          ),
           easing: {
             out: _cubicBezier(source.easing.out),
             inOut: _cubicBezier(source.easing.inOut),

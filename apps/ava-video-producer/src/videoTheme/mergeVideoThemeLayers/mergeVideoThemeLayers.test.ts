@@ -18,7 +18,13 @@ function _swatch(name: string, color: string) {
 }
 
 function _ground(patch: object): unknown {
-  return getValueAtPath(patch, ["other", "video", "atomic", "swatch", "ground"]);
+  return getValueAtPath(patch, [
+    "other",
+    "video",
+    "atomic",
+    "swatch",
+    "ground",
+  ]);
 }
 
 const STUDIO = _theme("studio", "classic", {
@@ -30,7 +36,10 @@ const STUDIO = _theme("studio", "classic", {
 });
 
 test("a theme's values win over the theme it extends", () => {
-  const merged = mergeVideoThemeLayers(createVideoThemeLibrary([STUDIO]), "studio");
+  const merged = mergeVideoThemeLayers(
+    createVideoThemeLibrary([STUDIO]),
+    "studio",
+  );
   assert.equal(_ground(merged), "#201510");
   assert.equal(
     getValueAtPath(merged, ["other", "video", "atomic", "swatch", "mint"]),
@@ -70,5 +79,8 @@ test("an extends cycle is reported", () => {
 
 test("an unknown extends target is reported", () => {
   const library = createVideoThemeLibrary([_theme("orphan", "missing")]);
-  assert.throws(() => mergeVideoThemeLayers(library, "orphan"), /Unknown theme "missing"/);
+  assert.throws(
+    () => mergeVideoThemeLayers(library, "orphan"),
+    /Unknown theme "missing"/,
+  );
 });

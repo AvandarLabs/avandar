@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isTokenDefinition, isTokenScale, TOKEN_CONTROLS } from "./defineTokens";
+import {
+  isTokenDefinition,
+  isTokenScale,
+  TOKEN_CONTROLS,
+} from "./defineTokens";
 import { MANTINE_TOKENS } from "./mantineTokens";
 import { SEMANTIC_TOKENS } from "./semanticTokens";
 import {
@@ -53,9 +57,18 @@ test("enum tokens list at least two options", () => {
 test("a token path finds its definition in every tier", () => {
   assert.equal(getTokenDefinitionFromPath("color.accent")?.kind, "color");
   assert.equal(getTokenDefinitionFromPath("atomic.swatch.mint")?.kind, "color");
-  assert.equal(getTokenDefinitionFromPath("colors.primary")?.kind, "colorTuple");
-  assert.equal(getTokenDefinitionFromPath("headings.sizes.h2.fontSize")?.kind, "cssLength");
-  assert.equal(getTokenDefinitionFromPath("components.ProgressBar.height")?.kind, "length");
+  assert.equal(
+    getTokenDefinitionFromPath("colors.primary")?.kind,
+    "colorTuple",
+  );
+  assert.equal(
+    getTokenDefinitionFromPath("headings.sizes.h2.fontSize")?.kind,
+    "cssLength",
+  );
+  assert.equal(
+    getTokenDefinitionFromPath("components.ProgressBar.height")?.kind,
+    "length",
+  );
 });
 
 test("an unknown token path has no definition", () => {

@@ -59,11 +59,23 @@ export const MANTINE_TOKENS = {
       "Neutral palette",
       "Ten shades of the cool grey that carries muted text on light grounds.",
     ),
-    secondary: _palette("Secondary palette", "Ten shades of the warm companion colour."),
-    success: _palette("Success palette", "Ten shades of green for positive outcomes."),
+    secondary: _palette(
+      "Secondary palette",
+      "Ten shades of the warm companion colour.",
+    ),
+    success: _palette(
+      "Success palette",
+      "Ten shades of green for positive outcomes.",
+    ),
     warning: _palette("Warning palette", "Ten shades of yellow for caution."),
-    danger: _palette("Danger palette", "Ten shades of red for errors and losses."),
-    info: _palette("Info palette", "Ten shades of cyan for neutral information."),
+    danger: _palette(
+      "Danger palette",
+      "Ten shades of red for errors and losses.",
+    ),
+    info: _palette(
+      "Info palette",
+      "Ten shades of cyan for neutral information.",
+    ),
   },
   white: token({
     kind: "color",
@@ -79,7 +91,8 @@ export const MANTINE_TOKENS = {
     kind: "paletteName",
     options: PALETTE_NAMES,
     label: "Primary palette name",
-    description: "Which palette is primary. The accent comes from this palette.",
+    description:
+      "Which palette is primary. The accent comes from this palette.",
   }),
   primaryShade: token({
     kind: "shade",
@@ -93,23 +106,27 @@ export const MANTINE_TOKENS = {
   defaultGradient: token({
     kind: "gradient",
     label: "Ground gradient",
-    description: "The gradient a ground fill uses when it is not a solid colour.",
+    description:
+      "The gradient a ground fill uses when it is not a solid colour.",
   }),
   fontFamily: token({
     kind: "fontStack",
     label: "Body font stack",
-    description: "Mantine's body font. It must be the stack of a registered font.",
+    description:
+      "Mantine's body font. It must be the stack of a registered font.",
   }),
   fontFamilyMonospace: token({
     kind: "fontStack",
     label: "Monospace font stack",
-    description: "Mantine's monospace font. It must be the stack of a registered font.",
+    description:
+      "Mantine's monospace font. It must be the stack of a registered font.",
   }),
   headings: {
     fontFamily: token({
       kind: "fontStack",
       label: "Heading font stack",
-      description: "Mantine's heading font. It must be the stack of a registered font.",
+      description:
+        "Mantine's heading font. It must be the stack of a registered font.",
     }),
     fontWeight: token({
       kind: "cssNumber",
@@ -128,7 +145,8 @@ export const MANTINE_TOKENS = {
     max: 160,
     step: 1,
     label: "Font size",
-    description: "A step of the type scale, in pixels of the surface that draws the text.",
+    description:
+      "A step of the type scale, in pixels of the surface that draws the text.",
   }),
   lineHeights: scale({
     kind: "cssNumber",
@@ -145,7 +163,8 @@ export const MANTINE_TOKENS = {
     max: 9999,
     step: 1,
     label: "Radius",
-    description: "A corner radius step, in pixels. The full step rounds a shape into a pill.",
+    description:
+      "A corner radius step, in pixels. The full step rounds a shape into a pill.",
   }),
   spacing: scale({
     kind: "cssLength",
@@ -154,12 +173,14 @@ export const MANTINE_TOKENS = {
     max: 600,
     step: 1,
     label: "Spacing",
-    description: "A spacing step used by layout insets and gaps, in pixels of the surface.",
+    description:
+      "A spacing step used by layout insets and gaps, in pixels of the surface.",
   }),
   autoContrast: token({
     kind: "boolean",
     label: "Mantine auto contrast",
-    description: "Whether Mantine picks readable text on its own filled components.",
+    description:
+      "Whether Mantine picks readable text on its own filled components.",
   }),
   luminanceThreshold: token({
     kind: "number",

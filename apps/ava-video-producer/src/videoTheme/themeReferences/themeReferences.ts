@@ -2,12 +2,16 @@ import { isMantineTokenRoot } from "../tokenCatalog/tokenCatalog";
 import type { TokenReference } from "../videoTheme.types";
 
 /** `$` then dot-separated segments; the first segment starts with a letter. */
-export const TOKEN_REFERENCE_PATTERN = /^\$[A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)*$/;
+export const TOKEN_REFERENCE_PATTERN =
+  /^\$[A-Za-z][A-Za-z0-9]*(?:\.[A-Za-z0-9]+)*$/;
 
 /** The tier a reference reads from, and the path inside it. */
 export type TokenReferenceTarget =
   | Readonly<{ tier: "primary" }>
-  | Readonly<{ tier: "mantine" | "atomic" | "semantic"; path: readonly string[] }>;
+  | Readonly<{
+      tier: "mantine" | "atomic" | "semantic";
+      path: readonly string[];
+    }>;
 
 /** Whether a value is a `$` reference to another token. */
 export function isTokenReference(value: unknown): value is TokenReference {

@@ -23,7 +23,9 @@ test("the classic theme defines every token and passes", () => {
 
 test("a theme that extends another may be sparse", () => {
   assert.equal(
-    parseVideoThemeDocument(_sparse({ atomic: { swatch: { ground: "#201510" } } })).id,
+    parseVideoThemeDocument(
+      _sparse({ atomic: { swatch: { ground: "#201510" } } }),
+    ).id,
     "warm",
   );
 });
@@ -40,14 +42,20 @@ test("a theme without extends must define every token", () => {
 
 test("a semantic token rejects a literal value", () => {
   assert.throws(
-    () => parseVideoThemeDocument(_sparse({ semantic: { color: { accent: "#ff0000" } } })),
+    () =>
+      parseVideoThemeDocument(
+        _sparse({ semantic: { color: { accent: "#ff0000" } } }),
+      ),
     /accent/,
   );
 });
 
 test("an atomic token rejects a reference", () => {
   assert.throws(
-    () => parseVideoThemeDocument(_sparse({ atomic: { swatch: { ground: "$color.text" } } })),
+    () =>
+      parseVideoThemeDocument(
+        _sparse({ atomic: { swatch: { ground: "$color.text" } } }),
+      ),
     /ground/,
   );
 });
@@ -65,7 +73,10 @@ test("a component token accepts a literal one-off", () => {
 
 test("an unknown token is rejected", () => {
   assert.throws(
-    () => parseVideoThemeDocument(_sparse({ semantic: { color: { sparkle: "$color.accent" } } })),
+    () =>
+      parseVideoThemeDocument(
+        _sparse({ semantic: { color: { sparkle: "$color.accent" } } }),
+      ),
     /sparkle/,
   );
 });

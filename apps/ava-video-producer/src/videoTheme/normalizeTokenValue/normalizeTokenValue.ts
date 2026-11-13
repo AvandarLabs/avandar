@@ -24,7 +24,8 @@ const NUMERIC_KINDS = new Set([
 ]);
 const PIXELS_PATTERN = /^(-?\d*\.?\d+)px$/;
 const REM_PATTERN = /^(-?\d*\.?\d+)rem$/;
-const MANTINE_REM_PATTERN = /^calc\((-?\d*\.?\d+)rem \* var\(--mantine-scale\)\)$/;
+const MANTINE_REM_PATTERN =
+  /^calc\((-?\d*\.?\d+)rem \* var\(--mantine-scale\)\)$/;
 const NUMBER_PATTERN = /^-?\d*\.?\d+$/;
 
 /**
@@ -59,15 +60,22 @@ function _fail(field: FieldSpec, value: unknown): NormalizedTokenValue {
   };
 }
 
-function _normalizeFont(field: FieldSpec, value: unknown): NormalizedTokenValue {
+function _normalizeFont(
+  field: FieldSpec,
+  value: unknown,
+): NormalizedTokenValue {
   if (typeof value === "string" && Object.hasOwn(VIDEO_FONT_REGISTRY, value)) {
     return { ok: true, value };
   }
-  const id = typeof value === "string" ? getVideoFontIdFromStack(value) : undefined;
+  const id =
+    typeof value === "string" ? getVideoFontIdFromStack(value) : undefined;
   return id ? { ok: true, value: id } : _fail(field, value);
 }
 
-function _normalizeFill(field: FieldSpec, value: unknown): NormalizedTokenValue {
+function _normalizeFill(
+  field: FieldSpec,
+  value: unknown,
+): NormalizedTokenValue {
   if (colorValueSchema.safeParse(value).success) {
     return { ok: true, value: { type: "solid", color: value } };
   }
@@ -88,7 +96,9 @@ export function normalizeTokenValue(
 ): NormalizedTokenValue {
   if (NUMERIC_KINDS.has(field.kind)) {
     const number = parseCssPixels(value);
-    return number === undefined ? _fail(field, value) : { ok: true, value: number };
+    return number === undefined
+      ? _fail(field, value)
+      : { ok: true, value: number };
   }
   if (field.kind === "fontFamily") {
     return _normalizeFont(field, value);
@@ -97,5 +107,7 @@ export function normalizeTokenValue(
     return _normalizeFill(field, value);
   }
   const parsed = createValueSchemaFromDefinition(field)?.safeParse(value);
-  return parsed?.success ? { ok: true, value: parsed.data } : _fail(field, value);
+  return parsed?.success
+    ? { ok: true, value: parsed.data }
+    : _fail(field, value);
 }

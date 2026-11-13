@@ -15,7 +15,8 @@ export const ATOMIC_TOKENS = {
   fontFamily: scale({
     kind: "fontFamily",
     label: "Font face",
-    description: "A registered font face. Graphic text accepts only faces with measured glyph widths.",
+    description:
+      "A registered font face. Graphic text accepts only faces with measured glyph widths.",
   }),
   fontWeight: scale({
     kind: "fontWeight",
@@ -65,17 +66,20 @@ export const ATOMIC_TOKENS = {
   shadow: scale({
     kind: "shadow",
     label: "Shadow",
-    description: "Shadow geometry as stacked layers. Its colour comes from the elevation that uses it.",
+    description:
+      "Shadow geometry as stacked layers. Its colour comes from the elevation that uses it.",
   }),
   glow: scale({
     kind: "glow",
     label: "Glow",
-    description: "A soft halo: how far it spreads past its shape, how blurred it is, and how opaque.",
+    description:
+      "A soft halo: how far it spreads past its shape, how blurred it is, and how opaque.",
   }),
   textShadow: scale({
     kind: "textShadow",
     label: "Text shadow",
-    description: "Text shadow geometry. Its colour comes from the text style that uses it.",
+    description:
+      "Text shadow geometry. Its colour comes from the text style that uses it.",
   }),
   blur: scale({
     kind: "length",
@@ -92,7 +96,8 @@ export const ATOMIC_TOKENS = {
     max: 3,
     step: 0.1,
     label: "Roughness",
-    description: "How far a hand-drawn line wanders from its true path. Zero draws a clean line.",
+    description:
+      "How far a hand-drawn line wanders from its true path. Zero draws a clean line.",
   }),
   bowing: scale({
     kind: "number",
@@ -108,7 +113,8 @@ export const ATOMIC_TOKENS = {
     max: 9999,
     step: 1,
     label: "Sketch seed",
-    description: "Fixes the random wobble of hand-drawn lines so every frame draws the same shape.",
+    description:
+      "Fixes the random wobble of hand-drawn lines so every frame draws the same shape.",
   }),
   randomness: scale({
     kind: "length",
@@ -117,12 +123,14 @@ export const ATOMIC_TOKENS = {
     max: 10,
     step: 0.1,
     label: "Sketch offset",
-    description: "The largest random offset the points of a hand-drawn line may take.",
+    description:
+      "The largest random offset the points of a hand-drawn line may take.",
   }),
   dash: scale({
     kind: "dash",
     label: "Dash pattern",
-    description: "Alternating dash and gap lengths. An empty pattern draws a solid line.",
+    description:
+      "Alternating dash and gap lengths. An empty pattern draws a solid line.",
   }),
   curveTension: scale({
     kind: "number",
@@ -130,7 +138,8 @@ export const ATOMIC_TOKENS = {
     max: 1,
     step: 0.01,
     label: "Curve tension",
-    description: "Where a curved connector places its control points along the line between its ends.",
+    description:
+      "Where a curved connector places its control points along the line between its ends.",
   }),
   duration: scale({
     kind: "duration",
@@ -144,12 +153,14 @@ export const ATOMIC_TOKENS = {
   easing: scale({
     kind: "easing",
     label: "Easing curve",
-    description: "How an animation accelerates: cubic Bezier control points, or a symmetric power curve.",
+    description:
+      "How an animation accelerates: cubic Bezier control points, or a symmetric power curve.",
   }),
   spring: scale({
     kind: "spring",
     label: "Spring",
-    description: "Physical spring settings for a landing that should feel weighty.",
+    description:
+      "Physical spring settings for a landing that should feel weighty.",
   }),
   stagger: scale({
     kind: "number",
@@ -176,7 +187,8 @@ export const ATOMIC_TOKENS = {
     max: 200,
     step: 1,
     label: "Distance",
-    description: "How far an element travels during an entrance, an exit, or a drift.",
+    description:
+      "How far an element travels during an entrance, an exit, or a drift.",
   }),
   typingRate: scale({
     kind: "number",
@@ -194,7 +206,8 @@ export const ATOMIC_TOKENS = {
     max: 1.5,
     step: 0.05,
     label: "Tempo",
-    description: "A tempo step. Tempo divides animation durations inside a beat.",
+    description:
+      "A tempo step. Tempo divides animation durations inside a beat.",
   }),
   cameraSpeed: scale({
     kind: "number",
@@ -203,7 +216,8 @@ export const ATOMIC_TOKENS = {
     max: 4,
     step: 0.05,
     label: "Camera speed",
-    description: "How fast a camera preset travels relative to its authored timing.",
+    description:
+      "How fast a camera preset travels relative to its authored timing.",
   }),
   shutter: scale({
     kind: "number",

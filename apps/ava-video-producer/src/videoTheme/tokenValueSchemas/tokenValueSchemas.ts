@@ -17,35 +17,41 @@ export const colorValueSchema = z
     /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
     "Expected a hex colour such as #51a7ff",
   );
-export const gradientValueSchema = z.strictObject({ from: colorValueSchema, to: colorValueSchema, deg: z.number().min(0).max(360) });
+export const gradientValueSchema = z.strictObject({
+  from: colorValueSchema,
+  to: colorValueSchema,
+  deg: z.number().min(0).max(360),
+});
 export const easingValueSchema = z.union([
   z.tuple([unitInterval, bezierY, unitInterval, bezierY]),
   z.strictObject({ powerInOut: z.number().min(1).max(8) }),
 ]);
 export const springValueSchema = z.strictObject({
-    damping: z.number().min(1).max(100),
-    stiffness: z.number().min(1).max(1000),
-    mass: z.number().min(0.1).max(10),
-  });
+  damping: z.number().min(1).max(100),
+  stiffness: z.number().min(1).max(1000),
+  mass: z.number().min(0.1).max(10),
+});
 const shadowLayerSchema = z.strictObject({
-    offsetX: z.number().min(-200).max(200),
-    offsetY: z.number().min(-200).max(200),
-    blur: z.number().min(0).max(200),
-    spread: z.number().min(-100).max(100),
-    alpha: unitInterval,
-  });
-export const shadowValueSchema = z.strictObject({ layers: z.array(shadowLayerSchema).max(4) });
+  offsetX: z.number().min(-200).max(200),
+  offsetY: z.number().min(-200).max(200),
+  blur: z.number().min(0).max(200),
+  spread: z.number().min(-100).max(100),
+  alpha: unitInterval,
+});
+export const shadowValueSchema = z.strictObject({
+  layers: z.array(shadowLayerSchema).max(4),
+});
 export const glowValueSchema = z.strictObject({
-    spread: z.number().min(-200).max(200),
-    blur: z.number().min(0).max(100),
-    opacity: unitInterval,
-  });
+  spread: z.number().min(-200).max(200),
+  blur: z.number().min(0).max(100),
+  opacity: unitInterval,
+});
 export const textShadowValueSchema = z.strictObject({
-    offsetX: z.number().min(-50).max(50),
-    offsetY: z.number().min(-50).max(50),
-    blur: z.number().min(0).max(50),
-    alpha: unitInterval,
-  });
+  offsetX: z.number().min(-50).max(50),
+  offsetY: z.number().min(-50).max(50),
+  blur: z.number().min(0).max(50),
+  alpha: unitInterval,
+});
 
 function _boundedNumber(definition: Pick<TokenDefinition, "min" | "max">) {
   let schema = z.number();
@@ -76,15 +82,22 @@ export function createValueSchemaFromDefinition(
     case "enum":
       return z.enum(definition.options ?? []);
     case "shade":
-      return z.union([shadeIndex, z.strictObject({ light: shadeIndex, dark: shadeIndex })]);
+      return z.union([
+        shadeIndex,
+        z.strictObject({ light: shadeIndex, dark: shadeIndex }),
+      ]);
     case "gradient":
       return gradientValueSchema;
     case "fontStack":
       return z.enum(VIDEO_FONT_STACKS);
     case "cssLength":
-      return z.string().regex(/^-?\d+(?:\.\d+)?px$/, "Expected pixels such as 18px");
+      return z
+        .string()
+        .regex(/^-?\d+(?:\.\d+)?px$/, "Expected pixels such as 18px");
     case "cssNumber":
-      return z.string().regex(/^-?\d+(?:\.\d+)?$/, "Expected a number such as 1.3");
+      return z
+        .string()
+        .regex(/^-?\d+(?:\.\d+)?$/, "Expected a number such as 1.3");
     case "length":
     case "number":
     case "opacity":

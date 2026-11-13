@@ -29,10 +29,16 @@ type SchemaTier = "mantine" | "atomic" | "semantic" | "component";
 
 const tokenReferenceSchema = z
   .string()
-  .regex(TOKEN_REFERENCE_PATTERN, "Expected a token reference such as $atomic.strokeWidth.sm");
+  .regex(
+    TOKEN_REFERENCE_PATTERN,
+    "Expected a token reference such as $atomic.strokeWidth.sm",
+  );
 const slugSchema = z
   .string()
-  .regex(VIDEO_THEME_SLUG_PATTERN, "Theme ids are 1 to 48 lowercase letters, digits, or hyphens");
+  .regex(
+    VIDEO_THEME_SLUG_PATTERN,
+    "Theme ids are 1 to 48 lowercase letters, digits, or hyphens",
+  );
 const scaleKeySchema = z
   .string()
   .regex(/^[A-Za-z0-9]{1,32}$/, "Scale keys are letters and digits");
@@ -53,7 +59,10 @@ function _fieldSchema(field: FieldSpec, tier: SchemaTier): z.ZodType {
     : tokenReferenceSchema;
 }
 
-function _compositeSchema(kind: CompositeTokenKind, tier: SchemaTier): z.ZodType {
+function _compositeSchema(
+  kind: CompositeTokenKind,
+  tier: SchemaTier,
+): z.ZodType {
   const spec = COMPOSITE_TOKEN_FIELDS[kind];
   const required: readonly string[] = spec.required;
   const fields: Readonly<Record<string, FieldSpec>> = spec.fields;
@@ -71,17 +80,27 @@ function _leafSchema(definition: TokenDefinition, tier: SchemaTier): z.ZodType {
   if (tier === "mantine" || tier === "atomic") {
     return literal ?? z.never();
   }
-  if ((definition.kind === "enum" || definition.kind === "boolean") && literal) {
+  if (
+    (definition.kind === "enum" || definition.kind === "boolean") &&
+    literal
+  ) {
     return literal;
   }
   if (isCompositeTokenKind(definition.kind)) {
     return _compositeSchema(definition.kind, tier);
   }
   const componentLiteral =
-    definition.kind === "fill" ? _union([colorValueSchema, gradientValueSchema]) : literal;
+    definition.kind === "fill"
+      ? _union([colorValueSchema, gradientValueSchema])
+      : literal;
   const colorPair =
     definition.kind === "color"
-      ? [z.strictObject({ onDark: _fieldSchema(definition, tier), onLight: _fieldSchema(definition, tier) })]
+      ? [
+          z.strictObject({
+            onDark: _fieldSchema(definition, tier),
+            onLight: _fieldSchema(definition, tier),
+          }),
+        ]
       : [];
   return _union([
     tokenReferenceSchema,
@@ -100,12 +119,19 @@ function _tokenMeta(definition: TokenDefinition) {
   };
 }
 
-function _nodeSchema(node: CatalogNode, tier: SchemaTier, isComplete: boolean): z.ZodType {
+function _nodeSchema(
+  node: CatalogNode,
+  tier: SchemaTier,
+  isComplete: boolean,
+): z.ZodType {
   if (isTokenDefinition(node)) {
     return _leafSchema(node, tier).meta(_tokenMeta(node));
   }
   if (isTokenScale(node)) {
-    return z.record(scaleKeySchema, _leafSchema(node.scale, tier).meta(_tokenMeta(node.scale)));
+    return z.record(
+      scaleKeySchema,
+      _leafSchema(node.scale, tier).meta(_tokenMeta(node.scale)),
+    );
   }
   return z.strictObject(_shape(node, tier, isComplete));
 }
@@ -122,7 +148,9 @@ function _shape(group: CatalogGroup, tier: SchemaTier, isComplete: boolean) {
 function _componentsSchema(isComplete: boolean): z.ZodType {
   const shape = Object.fromEntries(
     Object.entries(VIDEO_TOKEN_CATALOG.components).map(([name, group]) => {
-      const schema = z.strictObject({ defaultProps: _nodeSchema(group, "component", isComplete) });
+      const schema = z.strictObject({
+        defaultProps: _nodeSchema(group, "component", isComplete),
+      });
       return [name, isComplete ? schema : schema.optional()];
     }),
   );
@@ -130,11 +158,16 @@ function _componentsSchema(isComplete: boolean): z.ZodType {
 }
 
 function _themeShape(isComplete: boolean) {
-  const optional = (schema: z.ZodType) => (isComplete ? schema : schema.optional());
+  const optional = (schema: z.ZodType) =>
+    isComplete ? schema : schema.optional();
   const video = z.strictObject({
-      atomic: optional(_nodeSchema(VIDEO_TOKEN_CATALOG.atomic, "atomic", isComplete)),
-      semantic: optional(_nodeSchema(VIDEO_TOKEN_CATALOG.semantic, "semantic", isComplete)),
-    });
+    atomic: optional(
+      _nodeSchema(VIDEO_TOKEN_CATALOG.atomic, "atomic", isComplete),
+    ),
+    semantic: optional(
+      _nodeSchema(VIDEO_TOKEN_CATALOG.semantic, "semantic", isComplete),
+    ),
+  });
   return {
     ..._shape(VIDEO_TOKEN_CATALOG.mantine, "mantine", isComplete),
     other: optional(z.strictObject({ video: optional(video) })),
@@ -147,14 +180,14 @@ export const videoThemePatchSchema = z.strictObject(_themeShape(false));
 
 function _documentSchema(isComplete: boolean) {
   return z.strictObject({
-      $schema: z.string().optional(),
-      schemaVersion: z.literal(1),
-      id: slugSchema,
-      label: z.string().trim().min(1).max(80),
-      extends: slugSchema.optional(),
-      ..._themeShape(isComplete),
-      overrides: z.record(slugSchema, videoThemePatchSchema).optional(),
-    });
+    $schema: z.string().optional(),
+    schemaVersion: z.literal(1),
+    id: slugSchema,
+    label: z.string().trim().min(1).max(80),
+    extends: slugSchema.optional(),
+    ..._themeShape(isComplete),
+    overrides: z.record(slugSchema, videoThemePatchSchema).optional(),
+  });
 }
 
 const SPARSE_DOCUMENT_SCHEMA = _documentSchema(false);

@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
-import { createTokenUsageCollector, VideoTokenUsageContext } from "../tokenUsage/tokenUsage";
+import {
+  createTokenUsageCollector,
+  VideoTokenUsageContext,
+} from "../tokenUsage/tokenUsage";
 import { useVideoProps, useVideoTokens } from "../useVideoTheme/useVideoTheme";
 import { VideoThemeProvider } from "./VideoThemeProvider";
 
@@ -21,7 +24,10 @@ function BarProbe({ height }: { height?: number }) {
 }
 
 test("reading tokens outside a provider fails loudly", () => {
-  assert.throws(() => renderToStaticMarkup(<TokenProbe />), /VideoThemeProvider/);
+  assert.throws(
+    () => renderToStaticMarkup(<TokenProbe />),
+    /VideoThemeProvider/,
+  );
 });
 
 test("the provider sets video CSS variables on its wrapper", () => {

@@ -11,7 +11,10 @@ import {
   bundleShowcaseFilms,
   SHOWCASE_STILL_BROWSER_OPTIONS,
 } from "../../showcase/bundleShowcaseFilms/bundleShowcaseFilms";
-import { appRoot, ShowcaseFilms } from "../../showcase/ShowcaseFilms/ShowcaseFilms";
+import {
+  appRoot,
+  ShowcaseFilms,
+} from "../../showcase/ShowcaseFilms/ShowcaseFilms";
 import { compareRgbaFrames } from "./compareRgbaFrames/compareRgbaFrames";
 import {
   getAllowedRegionsFromFilm,
@@ -203,7 +206,11 @@ async function runThemeParity(
     results.push(await _compareTarget(target));
   }
   console.table(results);
-  if (results.some((result) => result.unexplainedPixels > 0 || result.missingFrames > 0)) {
+  if (
+    results.some(
+      (result) => result.unexplainedPixels > 0 || result.missingFrames > 0,
+    )
+  ) {
     console.error(
       `Parity failed. Diff images: ${path.relative(appRoot, path.join(PARITY_DIRECTORY, "diff"))}`,
     );

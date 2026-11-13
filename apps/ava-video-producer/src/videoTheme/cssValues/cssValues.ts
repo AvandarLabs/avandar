@@ -34,7 +34,9 @@ export function elevationToBoxShadow(elevation: ResolvedElevation): string {
  * shapes whose outline is not a box. `drop-shadow` has no spread, so spread
  * is ignored.
  */
-export function elevationToDropShadowFilter(elevation: ResolvedElevation): string {
+export function elevationToDropShadowFilter(
+  elevation: ResolvedElevation,
+): string {
   if (elevation.layers.length === 0) {
     return "none";
   }
