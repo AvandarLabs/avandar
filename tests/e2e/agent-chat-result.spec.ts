@@ -76,7 +76,7 @@ test.describe("agent results in the chat", () => {
       window.localStorage.setItem("avandar:data-agent", "on");
     });
     await page.route(
-      "**/functions/v1/chat/*/agent/data-agent-v3/api/stream",
+      "**/functions/v1/chat/*/agent/data-agent-v4/api/stream",
       async (route) => {
         proxyBodies.push(route.request().postData() ?? "");
         await route.fulfill({

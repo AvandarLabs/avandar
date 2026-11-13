@@ -1,11 +1,20 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 
-/** A dataset as the data agent sees it: names and column types, no rows. */
+/**
+ * A dataset as the data agent sees it: names, column types, and what an
+ * attached dictionary says about a column. Never rows.
+ */
 export type DataAgentDataset = {
   id: string;
   name: string;
-  columns: ReadonlyArray<{ name: string; dataType: string }>;
+  columns: ReadonlyArray<{
+    name: string;
+    dataType: string;
+    /** The column's code list and description, from an attached dictionary. */
+    codes?: ColumnCodes.Context;
+  }>;
 };
 
 const SHORT_TYPE_BY_DATA_TYPE: Record<string, string> = {
@@ -118,15 +127,58 @@ const DATA_AGENT_INSTRUCTIONS_V3 =
   ATTACHED_AND_MENTIONED_RULES +
   SCHEMA_ANSWER_RULES;
 
+const CODED_COLUMN_RULES = `
+
+CODED COLUMNS
+- A line such as "  - GENDER: codes 1=Male, 2=Female" under a dataset means the column stores codes. Filter and group on the code ("GENDER" = 2, or 'Y' for a text code) and name the label in your summary. Do not call lookup_values for a label listed there.
+- "(no label)" means nobody has recorded what that code means. Never guess it. If the question needs it, say that code has no label yet.
+- A line such as "  - sex: values Male, Female" means the column stores those labels as written.
+- Text after the codes, or alone after the column name, says what the column means.`;
+
+/** v4: v3's rules, plus how to read the code lists listed under DATASETS. */
+const DATA_AGENT_INSTRUCTIONS_V4 =
+  DATA_AGENT_INSTRUCTIONS_V3 + CODED_COLUMN_RULES;
+
 const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
   "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,
   "data-agent-v2": DATA_AGENT_INSTRUCTIONS_V2,
   "data-agent-v3": DATA_AGENT_INSTRUCTIONS_V3,
+  "data-agent-v4": DATA_AGENT_INSTRUCTIONS_V4,
 };
+
+/**
+ * Whether a version lists columns' code lists under DATASETS. Versions
+ * before v4 never do, so their prompts stay as they shipped.
+ */
+const LISTS_COLUMN_CODES: Record<DataAgentPromptId, boolean> = {
+  "data-agent-v1": false,
+  "data-agent-v2": false,
+  "data-agent-v3": false,
+  "data-agent-v4": true,
+};
+
+/** `  - GENDER: codes 1=Male, 2=Female. Sex at intake.`, or undefined. */
+function _formatColumnCodesLine(
+  column: DataAgentDataset["columns"][number],
+): string | undefined {
+  const { codes } = column;
+  const pairsText = codes ? ColumnCodes.formatPairs(codes) : "";
+  const description = ColumnCodes.formatDescription(codes?.description);
+  const parts = [
+    ...(pairsText === ""
+      ? []
+      : [`${codes?.direction === "encode" ? "values" : "codes"} ${pairsText}`]),
+    ...(description ? [description] : []),
+  ];
+  return parts.length === 0
+    ? undefined
+    : `  - ${column.name}: ${parts.join(". ")}`;
+}
 
 function _formatDatasetLine(
   alias: string,
   dataset: Readonly<DataAgentDataset>,
+  listsColumnCodes: boolean,
 ): string {
   const columns = dataset.columns
     .map((column) => {
@@ -136,7 +188,12 @@ function _formatDatasetLine(
       return `${column.name} ${shortType}`;
     })
     .join(", ");
-  return `${alias} = "${dataset.name}": ${columns}`;
+  const codeLines = listsColumnCodes
+    ? dataset.columns.flatMap((column) => {
+        return _formatColumnCodesLine(column) ?? [];
+      })
+    : [];
+  return [`${alias} = "${dataset.name}": ${columns}`, ...codeLines].join("\n");
 }
 
 /**
@@ -157,7 +214,13 @@ export function buildDataAgentSystemPrompt(
     const dataset = options.datasets.find((candidate) => {
       return entry.kind === "dataset" && candidate.id === entry.datasetId;
     });
-    return dataset ? _formatDatasetLine(entry.alias, dataset) : "";
+    return dataset
+      ? _formatDatasetLine(
+          entry.alias,
+          dataset,
+          LISTS_COLUMN_CODES[options.promptId],
+        )
+      : "";
   });
   return `${INSTRUCTIONS_BY_PROMPT_ID[options.promptId]}
 

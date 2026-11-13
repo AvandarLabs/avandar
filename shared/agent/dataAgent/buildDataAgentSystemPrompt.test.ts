@@ -17,6 +17,56 @@ const V1_INSTRUCTIONS_SHA256 =
 const V2_INSTRUCTIONS_SHA256 =
   "99ccfa97cf7b7516cf31eb90cd72ec64ce4dbb8b401c2f342054438f1cdb25a4";
 
+/**
+ * SHA-256 of prompt v3's instructions (everything before DATASETS), as
+ * shipped on 2026-11-09. Tabs opened before a deploy still request v3.
+ */
+const V3_INSTRUCTIONS_SHA256 =
+  "251d390134571b4ab6200d01a9641fae13cd9eda35909f6def1ceee9e6ec824b";
+
+/** A line list whose GENDER and hosp_yn columns have code lists attached. */
+const CODED_DATASETS = [
+  {
+    id: "cccccccc-3333-4333-8333-cccccccccccc",
+    name: "Bronx line list",
+    columns: [
+      {
+        name: "CaseNo",
+        dataType: "varchar",
+        codes: {
+          direction: "decode" as const,
+          pairs: [],
+          description: "Case number from the county.",
+        },
+      },
+      {
+        name: "GENDER",
+        dataType: "bigint",
+        codes: {
+          direction: "decode" as const,
+          pairs: [
+            {
+              code: "1",
+              label: "Male",
+              acceptedSpellings: [],
+              isMissing: false,
+            },
+            {
+              code: "2",
+              label: "Female",
+              acceptedSpellings: [],
+              isMissing: false,
+            },
+            { code: "9", label: "", acceptedSpellings: [], isMissing: true },
+          ],
+          description: "Sex recorded on the case report.",
+        },
+      },
+      { name: "onset_dt", dataType: "date" },
+    ],
+  },
+];
+
 const DATASETS = [
   {
     id: "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb",
@@ -189,5 +239,56 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(v3).toContain("can be appended or stacked");
     expect(v3).toContain("call run_query to list or compare columns");
     expect(v2).not.toContain("call run_query to list or compare columns");
+  });
+
+  it("keeps every character of v3's instructions", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-12",
+      promptId: "data-agent-v3",
+    });
+    const instructions = prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+
+    expect(instructions.length).toBe(6828);
+    expect(createHash("sha256").update(instructions).digest("hex")).toBe(
+      V3_INSTRUCTIONS_SHA256,
+    );
+  });
+
+  it("lists a coded column's codes and description under its dataset in v4", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: CODED_DATASETS,
+      today: "2026-11-12",
+      promptId: "data-agent-v4",
+    });
+
+    expect(prompt).toContain(
+      't0 = "Bronx line list": CaseNo text, GENDER int, onset_dt date\n  - CaseNo: Case number from the county.\n  - GENDER: codes 1=Male, 2=Female, 9=(no label) (missing). Sex recorded on the case report.',
+    );
+  });
+
+  it("leaves code lists out of v3's datasets", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: CODED_DATASETS,
+      today: "2026-11-12",
+      promptId: "data-agent-v3",
+    });
+
+    expect(prompt).not.toContain("1=Male");
+    expect(prompt).toContain(
+      't0 = "Bronx line list": CaseNo text, GENDER int, onset_dt date\n\nToday',
+    );
+  });
+
+  it("tells v4 to filter on the code and never guess a missing label", () => {
+    const v4 = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-12",
+      promptId: "data-agent-v4",
+    });
+
+    expect(v4).toContain("CODED COLUMNS");
+    expect(v4).toContain('Filter and group on the code ("GENDER" = 2');
+    expect(v4).toContain("Never guess it.");
   });
 });
