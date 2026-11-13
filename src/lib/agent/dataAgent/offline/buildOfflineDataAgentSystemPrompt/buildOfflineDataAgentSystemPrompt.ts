@@ -1,5 +1,10 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { OFFLINE_PLAN_INSTRUCTIONS } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/offlinePlanInstructions";
+import {
+  hasListedCodes,
+  isTextColumn,
+} from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { QuestionValueMatch } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import type {
@@ -56,8 +61,30 @@ function _quoteValues(values: readonly string[]): string {
     .join(", ");
 }
 
+/**
+ * A coded column's list for a small model, written out in full: `1 =
+ * "Male", 2 = "Female", 9 = "Unknown" (missing value)`. Text codes are
+ * quoted, so the model copies the quotes into its filter.
+ */
+function _formatCodes(column: Readonly<OfflineColumnProfile>): string {
+  const pairs = column.codes?.pairs ?? [];
+  const shown = pairs.slice(0, ColumnCodes.MAX_PROMPT_PAIRS).map((pair) => {
+    const code = isTextColumn(column) ? `"${pair.code}"` : pair.code;
+    const label = pair.label.trim();
+    const meaning = label === "" ? "(no label)" : `"${label}"`;
+    return `${code} = ${meaning}${pair.isMissing ? " (missing value)" : ""}`;
+  });
+  const hiddenCount = pairs.length - shown.length;
+  return hiddenCount > 0
+    ? `${shown.join(", ")}, and ${hiddenCount} more`
+    : shown.join(", ");
+}
+
 function _formatColumn(column: Readonly<OfflineColumnProfile>): string {
   const type = column.dataType.toLowerCase();
+  if (hasListedCodes(column)) {
+    return `${column.name} ${type}, codes: ${_formatCodes(column)}`;
+  }
   if (column.range) {
     return `${column.name} ${type}, ${column.range.min} to ${column.range.max}`;
   }
@@ -126,7 +153,48 @@ function _isAmbiguousAcrossDatasets(
   });
 }
 
-/** Lists matched values and flags names that mean different things. */
+/** One line per stored value the question names, with any ambiguity. */
+function _formatStoredValueLines(
+  matches: readonly QuestionValueMatch[],
+  aliasOf: (datasetId: string) => string,
+): string[] {
+  const values = [
+    ...new Set(
+      matches.map((match) => {
+        return match.storedValue;
+      }),
+    ),
+  ];
+  return values.map((value) => {
+    const places = matches.filter((match) => {
+      return match.storedValue === value;
+    });
+    const where = places
+      .map((match) => {
+        return `${aliasOf(match.datasetId)}."${match.column}"`;
+      })
+      .join(", ");
+    const note = _isAmbiguousAcrossDatasets(places)
+      ? " This name means different things in different datasets: ask the user which one they mean."
+      : "";
+    return `- "${value}" is stored in ${where}.${note}`;
+  });
+}
+
+/** One line per label the question names that a code list turns into a code. */
+function _formatCodeLines(
+  matches: readonly QuestionValueMatch[],
+  aliasOf: (datasetId: string) => string,
+): string[] {
+  return matches.map((match) => {
+    return `- "${match.term}" is code ${match.storedValue} in ${aliasOf(match.datasetId)}."${match.column}" (${match.storedValue} = ${match.codeLabel}).`;
+  });
+}
+
+/**
+ * Lists matched values and flags names that mean different things. A label
+ * found in a column's code list is listed with the code to filter on.
+ */
 export function formatQuestionValues(
   matches: readonly QuestionValueMatch[],
   datasets: readonly DataAgentDataset[],
@@ -139,29 +207,16 @@ export function formatQuestionValues(
       })?.alias ?? datasetId
     );
   };
-  const values = [
-    ...new Set(
-      matches.map((match) => {
-        return match.storedValue;
-      }),
-    ),
-  ];
-  return values
-    .map((value) => {
-      const places = matches.filter((match) => {
-        return match.storedValue === value;
-      });
-      const where = places
-        .map((match) => {
-          return `${aliasOf(match.datasetId)}."${match.column}"`;
-        })
-        .join(", ");
-      const note = _isAmbiguousAcrossDatasets(places)
-        ? " This name means different things in different datasets: ask the user which one they mean."
-        : "";
-      return `- "${value}" is stored in ${where}.${note}`;
-    })
-    .join("\n");
+  const stored = matches.filter((match) => {
+    return match.codeLabel === undefined;
+  });
+  const coded = matches.filter((match) => {
+    return match.codeLabel !== undefined;
+  });
+  return [
+    ..._formatStoredValueLines(stored, aliasOf),
+    ..._formatCodeLines(coded, aliasOf),
+  ].join("\n");
 }
 
 /**

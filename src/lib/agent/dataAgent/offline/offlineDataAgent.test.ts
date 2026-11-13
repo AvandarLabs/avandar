@@ -31,6 +31,32 @@ const WORLD = {
   columns: [{ name: "country", dataType: "varchar" }],
 };
 
+/** A line list whose GENDER column has a code list attached. */
+const LINE_LIST = {
+  id: "cccccccc-3333-4333-8333-cccccccccccc",
+  name: "line list",
+  columns: [
+    {
+      name: "GENDER",
+      dataType: "bigint",
+      codes: {
+        direction: "decode" as const,
+        pairs: [
+          { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+          {
+            code: "2",
+            label: "Female",
+            acceptedSpellings: ["F"],
+            isMissing: false,
+          },
+          { code: "9", label: "", acceptedSpellings: [], isMissing: true },
+        ],
+      },
+    },
+    { name: "hosp_yn", dataType: "varchar" },
+  ],
+};
+
 /** Answers the profile and lookup queries the offline agent sends. */
 function _createHost(overrides: Partial<DataAgentHost> = {}): DataAgentHost {
   return {
@@ -126,6 +152,72 @@ describe("findQuestionValues", () => {
         return match.storedValue;
       }),
     ).toEqual(["New York"]);
+  });
+});
+
+describe("findQuestionValues with code lists", () => {
+  it("finds a label in a code list and gives the code to filter on", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        return sql.includes("concat_ws") ? ["24|2"] : [];
+      }),
+    });
+    const profiles = await profileOfflineDatasets(host, [LINE_LIST]);
+
+    const matches = await findQuestionValues(host, {
+      datasets: [LINE_LIST],
+      profiles,
+      question: "How many female cases were hospitalized?",
+    });
+
+    expect(matches).toContainEqual({
+      term: "female",
+      datasetId: LINE_LIST.id,
+      column: "GENDER",
+      storedValue: "2",
+      codeLabel: "Female",
+    });
+  });
+});
+
+describe("offline prompt with code lists", () => {
+  it("lists a coded column's codes and marks a code with no label", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        return sql.includes("concat_ws") ? ["24|2"] : ["Y", "N"];
+      }),
+    });
+    const profiles = await profileOfflineDatasets(host, [LINE_LIST]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [LINE_LIST],
+      profiles,
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(
+      '- GENDER bigint, codes: 1 = "Male", 2 = "Female", 9 = (no label) (missing value)',
+    );
+  });
+
+  it("tells the model the code a label in the question stands for", () => {
+    const message = buildOfflineQuestionMessage({
+      question: "How many female cases?",
+      matches: [
+        {
+          term: "female",
+          datasetId: LINE_LIST.id,
+          column: "GENDER",
+          storedValue: "2",
+          codeLabel: "Female",
+        },
+      ],
+      datasets: [LINE_LIST],
+    });
+
+    expect(message).toContain(
+      '- "female" is code 2 in t0."GENDER" (2 = Female).',
+    );
   });
 });
 

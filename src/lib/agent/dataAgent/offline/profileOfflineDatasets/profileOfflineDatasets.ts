@@ -1,5 +1,6 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /** A text column holding this many values or fewer is listed in full. */
@@ -18,6 +19,8 @@ export type OfflineColumnProfile = {
   values?: string[];
   /** First and last value, for date columns. */
   range?: { min: string; max: string };
+  /** The code list of a column a dictionary is attached to. */
+  codes?: ColumnCodes.Context;
 };
 
 /** What an offline model is told about one dataset. */
@@ -34,6 +37,16 @@ export function isTextColumn(column: Readonly<{ dataType: string }>): boolean {
 
 function _isDateColumn(column: Readonly<{ dataType: string }>): boolean {
   return DATE_TYPES.has(column.dataType.toLowerCase());
+}
+
+/**
+ * True for a column holding codes its code list explains. Its list is shown
+ * instead of its stored values.
+ */
+export function hasListedCodes(
+  column: Readonly<{ codes?: ColumnCodes.Context }>,
+): boolean {
+  return column.codes?.direction === "decode" && column.codes.pairs.length > 0;
 }
 
 /**
@@ -76,6 +89,7 @@ function _parseSummary(
     const profile: OfflineColumnProfile = {
       name: column.name,
       dataType: column.dataType,
+      ...(column.codes ? { codes: column.codes } : {}),
     };
     if (isTextColumn(column)) {
       profile.distinctCount = Number(fields[index++] ?? 0);
@@ -104,7 +118,8 @@ async function _profileDataset(
     // copy them into filters. The question's own values are looked up.
     if (
       column.distinctCount === undefined ||
-      column.distinctCount > MAX_FULLY_LISTED_VALUES
+      column.distinctCount > MAX_FULLY_LISTED_VALUES ||
+      hasListedCodes(column)
     ) {
       continue;
     }
