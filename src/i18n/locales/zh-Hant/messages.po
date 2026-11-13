@@ -43,6 +43,10 @@ msgstr "{0} 列"
 msgid "We couldn't load a preview of this dataset."
 msgstr "我們無法載入此資料集的預覽。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
+msgid "What to do"
+msgstr ""
+
 #: src/components/ChatPanel/ChatPanelHeader/ChatPanelHeader.tsx
 msgid "Close chat panel"
 msgstr "關閉聊天面板"
@@ -61,9 +65,9 @@ msgid "No records yet"
 msgstr "尚無記錄"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
-msgid "You can no longer read one of these dictionaries, so it was not "
-"attached. Ask an admin for access to dictionaries."
-msgstr ""
+#~ msgid "You can no longer read one of these dictionaries, so it was not "
+#~ "attached. Ask an admin for access to dictionaries."
+#~ msgstr ""
 
 #: src/components/offline/OfflineUnavailableTooltipLabel.tsx
 msgid "Return online to view or make the page available offline."
@@ -159,6 +163,11 @@ msgstr "關鍵字"
 msgid "This query isn't written correctly, so it couldn't be read."
 msgstr "此查詢的寫法不正確，因此無法讀取。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
+msgid "Its conversions follow the dictionaries, so later edits to them show up "
+"here right away."
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/ViewsMenu/ViewsMenu.tsx
 msgid "Save the current view"
 msgstr "儲存目前檢視"
@@ -180,6 +189,10 @@ msgstr "儲存格大小（公尺）"
 #: src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.tsx
 msgid "Open dataset"
 msgstr "打開資料集"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "(accepted spelling)"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Delete comment?"
@@ -363,7 +376,11 @@ msgstr "載入檔案時發生錯誤"
 msgid "Type"
 msgstr "類型"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "Nothing was saved. Please try again."
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
 msgid "How to apply the dictionary"
 msgstr ""
 
@@ -746,7 +763,12 @@ msgstr "個別位置將繪製在地圖上，隱藏區域將顯示其實際數量
 msgid "Aggregations"
 msgstr "聚合"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Label for {value}"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "What happens"
 msgstr ""
 
@@ -822,6 +844,10 @@ msgstr "無法儲存。您上次的變更仍顯示在畫面上。"
 msgid "From Excel"
 msgstr "從 Excel"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "updates when this dictionary changes"
+msgstr ""
+
 #: src/views/GisApp/export/getExportFeatureTableCopy/getExportFeatureTableCopy.ts
 msgid "Showing {shownText} of {countText}. Download the full list as CSV from "
 "the map."
@@ -893,6 +919,11 @@ msgstr "來源 CRS"
 msgid "For example, County or Household"
 msgstr "例如：郡或家戶"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "You can no longer read one of these dictionaries, so nothing was saved. "
+"Ask an admin for access to dictionaries."
+msgstr ""
+
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "{statusName} color: {colorName}"
 msgstr "{statusName} 顏色：{colorName}"
@@ -949,6 +980,10 @@ msgstr "記錄"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Click \"Save to dashboard\"."
 msgstr "點選「儲存至儀表板」。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Label to use for {value}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardListView/DashboardListEmptyState.tsx
 msgid "Nothing has been created or shared with you yet. Create a dashboard to "
@@ -1125,6 +1160,7 @@ msgstr "年"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "{dictionaryName} › {entryName}"
 msgstr ""
 
@@ -1135,6 +1171,10 @@ msgstr "顯示 {topic} 中的資料集"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Best match"
 msgstr "最佳相符"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeChip.tsx
+msgid "Click to attach as reference only instead."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView.tsx
 msgid "Pick a sheet"
@@ -1329,6 +1369,12 @@ msgstr "涵蓋"
 msgid "{shareClause} will lose access."
 msgstr "{shareClause} 將失去存取權限。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Changes the values in this column using the dictionary. For example, "
+"every 1 becomes Male, and charts, filters, and downloads show Male from "
+"then on."
+msgstr ""
+
 #: src/components/caseStatuses/useStatusColorLabels.ts
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedRampSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/HeatmapControls/HeatmapRampSelect.tsx
@@ -1447,7 +1493,7 @@ msgstr "正在更新 {0} 的密碼"
 msgid "is after"
 msgstr "晚於"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+#: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "Removed the dictionaries from {datasetName}. The data is unchanged."
 msgstr ""
 
@@ -1579,6 +1625,11 @@ msgstr "已發布至工作區"
 msgid "Single select"
 msgstr "單選"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+#: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+msgid "You're offline. Reconnect to save this."
+msgstr ""
+
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
 msgid "However, we are not allowing new registrations at the moment."
 msgstr "不過，我們目前不允許新的註冊。"
@@ -1602,6 +1653,10 @@ msgstr "衍生資料集"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice.tsx
 msgid "This link has more than one data file."
 msgstr "此連結包含多個資料檔案。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "Finding values that are not in the code lists"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "This field cannot be empty"
@@ -1865,6 +1920,7 @@ msgstr "目錄以 <0/> 建置，並根據人們的需求持續擴充。找不到
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
@@ -1881,6 +1937,11 @@ msgstr "名稱"
 msgid "Datasets to learn from"
 msgstr ""
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "From {dictionaryName} › {entryName}. The values were converted to these "
+"codes."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "您的問題包含可能會影響 AI 回答的語言。"
@@ -1893,6 +1954,11 @@ msgstr "垂直內距"
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
 msgid "Filters ({0})"
 msgstr "篩選條件（{0}）"
+
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "Converted with version {appliedVersion} of the dictionary. The "
+"dictionary is now at version {currentVersion}."
+msgstr ""
 
 #. placeholder {0}: aggregateLayer.name
 #: src/views/GisApp/export/ExportSheet/ExportSheetNotices.tsx
@@ -2137,6 +2203,7 @@ msgstr "依值調整大小"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
@@ -2198,6 +2265,10 @@ msgid "A coordinate cannot be mapped when either latitude or longitude is "
 "empty."
 msgstr "當緯度或經度為空時，無法繪製座標。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/PreviewTable.tsx
+msgid ", not in the list"
+msgstr ""
+
 #: src/components/AppErrorBoundary/SessionRecoveringScreen.tsx
 msgid "Your session has expired. Redirecting you to sign in."
 msgstr "您的工作階段已過期。正在將您重新導向至登入頁面。"
@@ -2213,6 +2284,10 @@ msgstr "第 12 欄"
 #: src/views/GisApp/export/ExportSheet/ExportSheetToggleFields.tsx
 msgid "North arrow"
 msgstr "指北針"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote.tsx
+msgid "Converted as it loads · follows the dictionary"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "The offline models did not download"
@@ -2441,6 +2516,11 @@ msgid "Add a member or a user group to grant access. Use General access above "
 "to share more broadly."
 msgstr "新增成員或使用者群組以授予存取權限。使用上方的「一般存取權限」即可更廣泛地分享。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "Avandar could not read which values are missing from the code lists. You "
+"can go on: every value no pair matches is kept as it is."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Keep the table's columns"
 msgstr "保留表格的欄位"
@@ -2454,6 +2534,10 @@ msgstr "熱點半徑"
 #: src/components/privacy/ConsentModal/PiiWarningPanel.tsx
 msgid "Detected:"
 msgstr "檢測到："
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Leave unlabeled"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange.ts
 msgid "The record keeps its previous status. Try again in a moment."
@@ -2554,6 +2638,10 @@ msgstr "為每個環圈加上標籤"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
 msgstr "它可以讀取的資料"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "Changed the data"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
 msgid "Permissions saved"
@@ -3132,6 +3220,12 @@ msgstr ""
 msgid "Also matches columns named"
 msgstr ""
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DeleteDatasetConfirmBody.tsx
+msgid "{linkedCount, plural, one {This linked dataset reads it and stops "
+"working once it is deleted:} other {These # linked datasets read it and "
+"stop working once it is deleted:}}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivityModeSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/SensitivitySection.tsx
 msgid "Aggregate only"
@@ -3341,6 +3435,23 @@ msgstr "手動"
 msgid "Understanding your question…"
 msgstr "正在了解您的問題…"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
+msgid "Your plan's dataset limit is reached, so a linked dataset can't be "
+"added."
+msgstr ""
+
+#: src/views/DataManagerApp/DatasetMetaView/LinkedSourceFact.tsx
+msgid "Reads"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/PreviewTable.tsx
+msgid "attached as reference"
+msgstr ""
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/ConvertedTypeNote.tsx
+msgid "Set by a conversion"
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID cannot be empty"
 msgstr "工作區 ID 不得為空"
@@ -3547,6 +3658,10 @@ msgstr "將此儀表板匯出為 PDF，或先進行草圖標註。標註支持�
 msgid "Audience"
 msgstr "受眾"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+msgid "Updated {datasetName}."
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Latitude is outside the valid range but would be a valid longitude, and "
 "the reverse."
@@ -3567,6 +3682,10 @@ msgstr "我已執行查詢，但查詢失敗。"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
 msgstr "步階"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+msgid "Avandar could not read this dataset's first rows. Saving still works."
+msgstr ""
 
 #: src/components/RichText/RichTextView/RichTextView.tsx
 #: src/components/RichText/UserMention/UserMentionChip.tsx
@@ -3614,7 +3733,7 @@ msgstr ""
 msgid "Offline {percent}%"
 msgstr "離線 {percent}%"
 
-#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote.tsx
 msgid "Attached as reference · data unchanged"
 msgstr ""
 
@@ -3692,6 +3811,11 @@ msgstr "工作區 ID"
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginAdditionsSection.tsx
 msgid "What it adds"
 msgstr "它新增的內容"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+msgid "{convertedCount, plural, one {Changed # column of {datasetName}.} other "
+"{Changed # columns of {datasetName}.}}"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The longitude must be between -180 and 180."
@@ -3877,10 +4001,18 @@ msgstr "主要"
 msgid "Unable to publish dashboard"
 msgstr "無法發佈儀表板"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
+msgid "{convertedCount, plural, one {# converted} other {# converted}}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationMeasureSelect.tsx
 msgid "Measure"
 msgstr "測量"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Labels become codes"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogPublishedByGroup.tsx
 msgid "Published by"
@@ -4165,6 +4297,10 @@ msgstr ""
 msgid "Dataset {datasetName}"
 msgstr "資料集 {datasetName}"
 
+#: src/views/DataManagerApp/DatasetMetaView/LinkedSourceFact.tsx
+msgid "The dataset it reads was deleted."
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Choose a dataset"
 msgstr "選擇資料集"
@@ -4278,6 +4414,7 @@ msgid "Some latitudes or longitudes are not numbers."
 msgstr "部分緯度或經度不是數字。"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
 msgid "Summary"
 msgstr ""
 
@@ -4293,6 +4430,10 @@ msgstr "HAVING 子句包含表單無法表示的「{nodeType}」節點。"
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "You are about to change your subscription plan to:"
 msgstr "您即將將訂閱計劃更改為："
+
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+msgid "First {rowCountText} rows"
+msgstr ""
 
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerOpenDatasetMenuItems.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
@@ -4362,6 +4503,10 @@ msgstr ""
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "The offline models are on this computer."
 msgstr "離線模型已在這台電腦上。"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
+msgid "A deleted dictionary"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogOrganization2Facet.tsx
 msgid "All organizations"
@@ -4441,8 +4586,17 @@ msgstr "連結已複製"
 msgid "Add dictionary"
 msgstr ""
 
+#: src/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote.tsx
+msgid "{count, plural, one {# value in the data has no label.} other {# values "
+"in the data have no label.}}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Version"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+msgid "Only columns this touches"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
@@ -4535,6 +4689,7 @@ msgid "Manual form shows an approximation"
 msgstr "手動表單顯示近似值"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "From"
 msgstr ""
 
@@ -4566,6 +4721,11 @@ msgstr "需要額外的座位"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Unavailable case"
 msgstr "無法使用的案件"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "Only workspace admins can add datasets, so the linked dataset was not "
+"created."
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedValuesInput/PillsFieldTarget.tsx
 msgid "Type a value"
@@ -4606,6 +4766,7 @@ msgid "Bind geometry on the selected layer to buffer it."
 msgstr "繫結所選圖層中的幾何資料，以建立緩衝區。"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Attached as reference, values unchanged"
 msgstr ""
 
@@ -4615,6 +4776,10 @@ msgstr "顯示資料點"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveSummary.tsx
 msgid "Code lists"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ConvertAllControls.tsx
+msgid "Convert all"
 msgstr ""
 
 #: src/components/ChatPanel/ChatEmptyState/ChatEmptyState.tsx
@@ -4634,6 +4799,10 @@ msgstr "編輯"
 msgid "SQL was not applied. Approve the assumed filter values to run this "
 "query."
 msgstr "尚未套用 SQL。請核准假設的篩選值，以執行此查詢。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Removed"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
 msgid "Could not create those case types"
@@ -4708,6 +4877,7 @@ msgstr ""
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
 msgid "Code"
 msgstr "程式碼"
@@ -4852,6 +5022,10 @@ msgstr "主題"
 msgid "Reverse colors"
 msgstr "反轉顏色"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Keep as is"
+msgstr ""
+
 #: src/views/RegisterView/RegistrationActions.tsx
 msgid "Register"
 msgstr "註冊"
@@ -4870,6 +5044,10 @@ msgid "No entries match “{filter}”. Entries match on their own name and on "
 "every column name they also match."
 msgstr ""
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Code for {value}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 msgid "Reading a sample of this dataset to find its columns."
 msgstr "正在讀取此資料集的範例，以找出其欄位。"
@@ -4886,10 +5064,18 @@ msgstr "第 {pageNumber} 頁，共 {total} 頁"
 msgid "Method"
 msgstr "方法"
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "Converted with version {appliedVersion} of the dictionary."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CoordinateColumnSelects.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointCoordinateSelect.tsx
 msgid "Longitude"
 msgstr "經度"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+msgid "Close preview"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/SliceModeEditor/SliceModeEditor.tsx
 msgid "Publish only the columns your dashboard reads. Narrowest, most private."
@@ -4922,6 +5108,14 @@ msgstr "{fieldName} 的日期欄"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTable.tsx
 msgid "No description"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Back to the original values"
+msgstr ""
+
+#: src/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote.tsx
+msgid "Label them in {dictionaryName}"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
@@ -5069,6 +5263,10 @@ msgstr "選擇依字母順序排在最後的值"
 msgid "+ Add row filter"
 msgstr "+ 添加行過濾器"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
+msgid "Chosen from the data"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 #: src/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary.tsx
 msgid "Consider rephrasing"
@@ -5087,6 +5285,8 @@ msgid "Size column"
 msgstr "大小列"
 
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingTable.tsx
 msgid "Values"
 msgstr "值"
 
@@ -5135,6 +5335,10 @@ msgstr "在儀表板中添加過濾器區塊以啟用此視覺化的全局過濾
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogRecommendedListings/DataCatalogRecommendedListings.tsx
 msgid "Recommended with this dataset"
 msgstr "推薦搭配此資料集"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Labels become codes in the linked dataset"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Full"
@@ -5316,10 +5520,14 @@ msgstr "新增值"
 msgid "Rose"
 msgstr "玫瑰"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/ConvertedTypeNote.tsx
+msgid "Set by {dictionaryName}"
+msgstr ""
+
 #. placeholder {0}: dataset.name
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
-msgid "Are you sure you want to delete {0}?"
-msgstr "您確定要刪除 {0} 嗎？"
+#~ msgid "Are you sure you want to delete {0}?"
+#~ msgstr "您確定要刪除 {0} 嗎？"
 
 #: src/views/GisApp/panels/MapStatusCard/MapLoadingStatus.tsx
 msgid "Running the layer's query."
@@ -5461,6 +5669,10 @@ msgstr "目錄中目前還沒有任何內容"
 msgid "Geometry must be rebound"
 msgstr "必須重新繫結幾何圖形"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "This column becomes whole numbers, so this value can't stay as text."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceTagsTab/WorkspaceTagsTab.tsx
 msgid "Create groups for your workspace members. Datasets and dashboards can be "
 "configured to only share with (or restrict) certain user groups."
@@ -5538,6 +5750,10 @@ msgstr "每月付款"
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "m"
 msgstr "m"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Keeps the original values in {originalName}"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "does not start with"
@@ -5691,6 +5907,10 @@ msgstr "進階幾何設定"
 msgid "Upload CSV"
 msgstr "上傳 CSV"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Back to the original values in {datasetName}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The source file isn't in a format Avandar can read as a table."
 msgstr "來源檔案的格式不是 Avandar 可讀取為資料表的格式。"
@@ -5723,6 +5943,10 @@ msgstr ""
 msgid "Loading result"
 msgstr "正在載入結果"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
+msgid "Save the conversions as"
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 msgid "Accept and next list"
 msgstr ""
@@ -5744,6 +5968,10 @@ msgstr "無法使用的結果"
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Create places dataset"
 msgstr "建立地點資料集"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Add to list"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
@@ -5771,6 +5999,7 @@ msgid "Unavailable offline"
 msgstr "離線不可用"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesTable.tsx
 msgid "Rows"
 msgstr ""
@@ -5902,6 +6131,10 @@ msgstr "發送邀請"
 msgid "record"
 msgstr "筆記錄"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeChip.tsx
+msgid "Convert"
+msgstr ""
+
 #. placeholder {0}: caseType.name
 #. placeholder {0}: selectedDataset.name
 #. placeholder {0}: summary.name
@@ -6021,6 +6254,10 @@ msgstr "Avandar（預設）"
 msgid "Add your first dataset"
 msgstr "新增您的第一個資料集"
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
+msgid "Turn codes into labels and add column descriptions"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Wide"
 msgstr "寬"
@@ -6063,6 +6300,11 @@ msgstr "GROUP BY 使用非欄位運算式。"
 msgid "Checking this dataset's columns first. It will be added to your "
 "workspace as soon as that finishes."
 msgstr "正在先檢查此資料集的欄位。檢查完成後，就會將其新增至您的工作區。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "{value} is already in the list, without a label. Label it on the "
+"dictionary."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Make private"
@@ -6121,6 +6363,8 @@ msgstr "線性"
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveFooter.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter.tsx
@@ -6131,7 +6375,7 @@ msgstr "線性"
 msgid "Back"
 msgstr "返回"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsFooter.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
 msgid "Next: attach"
 msgstr ""
 
@@ -6166,6 +6410,10 @@ msgstr "自訂 URL 不得包含空格"
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "You can attach up to {MAX_ATTACHED_GADGETS} items."
 msgstr "最多可附加 {MAX_ATTACHED_GADGETS} 項。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
+msgid "{convertedCount, plural, one {Change # column} other {Change # columns}}"
+msgstr ""
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bullet list"
@@ -6251,6 +6499,15 @@ msgstr "在 {app} 中的任何人"
 msgid "Failed to delete dataset"
 msgstr "刪除資料集失敗"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "Adding values to a code list needs edit access to dictionaries, so "
+"nothing was saved. Choose another way to handle those values."
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
+msgid "{datasetName} is already a linked dataset, so its conversions stay live."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogAboutGroup.tsx
 msgid "License"
 msgstr "許可證"
@@ -6330,8 +6587,8 @@ msgid "Count how many rows there are in {datasetName}"
 msgstr "計算 {datasetName} 中有多少行"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
-msgid "Attached as reference"
-msgstr ""
+#~ msgid "Attached as reference"
+#~ msgstr ""
 
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
@@ -6397,11 +6654,15 @@ msgstr "點幾何圖形欄"
 msgid "That file type is not supported"
 msgstr "不支援此檔案類型"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels.ts
+msgid "Unmatched values ({countText})"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Label, e.g. Region"
 msgstr "標籤，例如：區域"
 
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell.tsx
 msgid "Up to date"
 msgstr ""
 
@@ -6428,6 +6689,11 @@ msgstr "編輯 {name}"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
 msgid "Also recognizes these code lists"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "A column set to convert has no code list. Attach it as reference only, "
+"or pick an entry with a code list."
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
@@ -6475,6 +6741,10 @@ msgstr "水平網格線"
 msgid "Number range"
 msgstr "數字範圍"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
+msgid "Which way to convert"
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/openVanitySlugChangeConfirmModal.tsx
 msgid "Replace URL"
 msgstr "取代 URL"
@@ -6506,6 +6776,14 @@ msgstr "標準"
 msgid "Code lists to label"
 msgstr ""
 
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote.tsx
+msgid "Converted this dataset · version {appliedText}"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ConvertAllControls.tsx
+msgid "For every column"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link can view this {resource}. People and groups below "
 "still control who can edit it."
@@ -6523,6 +6801,10 @@ msgstr "新增此工作表的人員需要重新連結其 Google 帳戶。請對�
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
 msgstr "無法呈現此頁面。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
+msgid "Create a new linked dataset"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "Here is a query based on your workspace metadata."
@@ -6544,6 +6826,10 @@ msgstr "WKB"
 msgid "The plugin behind this chart is not available, so its settings cannot be "
 "shown."
 msgstr "此圖表所使用的外掛無法使用，因此無法顯示其設定。"
+
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "The original values are kept beside it, in a column ending in _original."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a valid regular expression."
@@ -6617,6 +6903,10 @@ msgstr "此查詢無法執行"
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
 msgid "View"
 msgstr "查看"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
+msgid "Codes → labels"
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "This condition does not apply to {typeName} columns."
@@ -6696,6 +6986,11 @@ msgstr "H1"
 msgid "Reorder layer {layerName}"
 msgstr "重新排序圖層 {layerName}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "{datasetName} can't be changed in place, so nothing was saved. Create a "
+"linked dataset instead."
+msgstr ""
+
 #: src/components/badges/SourceBadge.tsx
 msgid "From dataset"
 msgstr "來自數據集"
@@ -6744,6 +7039,10 @@ msgstr "導出 PDF"
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 msgid "There is only one sheet in this excel sheet."
 msgstr "此 Excel 工作表中只有一個工作表。"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "Linked"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make dataset offline-only?"
@@ -6996,7 +7295,7 @@ msgstr "下載 PDF"
 msgid "Enter a name."
 msgstr "輸入名稱。"
 
-#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
 msgid "From {dictionaryName} › {entryName}. Attached as reference. The values "
 "in the data are unchanged."
 msgstr ""
@@ -7048,6 +7347,10 @@ msgstr "這將永久刪除 <0>{0}</0> 及其所有資料。此動作無法復原
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal.ts
 msgid "Unable to open the billing portal. Please try again later."
 msgstr "無法開啟帳單入口網站。請稍後再試。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
+msgid "Attach labels only as reference"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect.tsx
 msgid "Time column"
@@ -7426,6 +7729,11 @@ msgstr "資料集成功加載"
 msgid "Every status needs a name."
 msgstr "每個狀態都需要名稱。"
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "From {dictionaryName} › {entryName}. The values were converted to these "
+"labels."
+msgstr ""
+
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "I have legal authority to share this data with the AI provider"
 msgstr "我有法律權限與 AI 提供者分享此數據"
@@ -7453,7 +7761,7 @@ msgstr "Postgres"
 msgid "Owner"
 msgstr "擁有者"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+#: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "Attached to {datasetName}. The data is unchanged."
 msgstr ""
 
@@ -7667,6 +7975,10 @@ msgstr "儀表板已成功刪除！"
 msgid "Chosen from the data: these values are codes."
 msgstr ""
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "A value you added to a code list is missing its label or code."
+msgstr ""
+
 #: src/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder.tsx
 msgid "The {pluginId} plugin's chart code didn't load."
 msgstr "{pluginId} 外掛的圖表程式碼未載入。"
@@ -7724,7 +8036,7 @@ msgid "You are not connected to the internet, so chat runs on this computer "
 "with the offline models."
 msgstr "您目前未連線至網際網路，因此聊天會在這台電腦上使用離線模型執行。"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
 msgid "Your data stays the same, which is what you want for models and exports "
 "that need the original values. Hover the column to see the labels."
 msgstr ""
@@ -7769,6 +8081,10 @@ msgstr ""
 msgid "Time to answer"
 msgstr "回答時間"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
+msgid "Create linked dataset"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingTable.tsx
 msgid "No match"
@@ -7797,6 +8113,10 @@ msgstr ""
 #: src/lib/plugins/PluginMenuSlot/usePluginCommandRunner/usePluginCommandRunner.ts
 msgid "{pluginName}: the command failed"
 msgstr "{pluginName}：指令失敗"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Leave empty"
+msgstr ""
 
 #: src/views/RegisterView/RegisterView.tsx
 msgid "Create a new account"
@@ -7909,6 +8229,11 @@ msgstr "{0} 公里"
 msgid "Date"
 msgstr "日期"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
+msgid "Either way, the code lists and descriptions are attached to "
+"{datasetName} for reference."
+msgstr ""
+
 #. placeholder {0}: dictionary.name
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 #~ msgid "Delete {0} and all of its entries and code lists?"
@@ -7974,7 +8299,7 @@ msgstr "X 軸標籤"
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "此自訂 URL 已被保留。請嘗試在其中加入一個字詞。"
 
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "Reference"
 msgstr ""
 
@@ -7992,6 +8317,10 @@ msgstr "空的"
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
 msgid "All"
 msgstr "全部"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Codes become labels"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
 msgid "Offline models downloaded"
@@ -8154,6 +8483,10 @@ msgstr "第 1 欄"
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{mapped} of {total} rows mapped"
 msgstr "已對應 {mapped} / {total} 筆資料列"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote.tsx
+msgid "Applied version {appliedText}, now version {nowText}"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup.tsx
 msgid "Missing from source since"
@@ -8354,6 +8687,11 @@ msgstr "允許同步"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ValuesSeenCell.tsx
 msgid "Unique per row"
+msgstr ""
+
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "The values were converted to these codes. The dictionary entry they came "
+"from was deleted."
 msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/useOrderDirectionOptions.ts
@@ -8637,6 +8975,10 @@ msgstr "預設順序"
 msgid "This {resource} is shared with: "
 msgstr "此 {resource} 與以下人員共享："
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "What to do with {value} in {columnName}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/PrivateResourcesTable.tsx
 msgid "Private dashboards"
 msgstr "私人儀表板"
@@ -8650,6 +8992,10 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.tsx
 msgid "Upload"
 msgstr "上傳"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels.ts
+msgid "Unmatched values"
+msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 msgid "{count} · order is kept when charted"
@@ -8797,6 +9143,11 @@ msgstr "{0} 欄 · {1} 行"
 msgid "Request a dataset"
 msgstr "申請資料集"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+msgid "Preview data"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "User removed"
 msgstr "用戶已移除"
@@ -8863,6 +9214,11 @@ msgstr "編輯查詢"
 #: src/views/DataExplorerApp/DataExplorerApp.tsx
 msgid "Data Explorer"
 msgstr "數據探索器"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Converting {datasetName} creates a linked dataset, and only workspace "
+"admins can add datasets. You can still attach labels as reference."
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BasemapMenuDropdown.tsx
 msgid "No basemap"
@@ -8985,6 +9341,10 @@ msgid " Published on the web: anyone with the link can view it, and the list "
 "above controls editing only."
 msgstr " 已發布至網路：任何取得連結的人都能檢視，上方清單僅控制編輯權限。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels.ts
+msgid "Save as"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Row {rowIndexes}."
 msgstr "第 {rowIndexes} 列。"
@@ -9073,6 +9433,15 @@ msgstr "請稍後再試；如果問題持續發生，請聯絡支援人員。"
 msgid "{featureCount, plural, one {# point} other {# points}}"
 msgstr "{featureCount, plural, one {# 個點} other {# 個點}}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "A linked dataset reads {datasetName}, so it can't be changed in place. "
+"Convert in the linked dataset instead."
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "{datasetName} is already up to date."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/PostgresConnectorImportView/PostgresConnectionForm.tsx
 msgid "The database user should ideally have read-only access to the table or "
 "view you plan to import."
@@ -9139,6 +9508,11 @@ msgstr "無法載入此工作區的外掛。請重新載入後再試一次。"
 msgid "Records"
 msgstr "記錄"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+msgid "Created {linkedName}. The code lists are attached to {datasetName} for "
+"reference."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerStatusBadge.tsx
 msgid "Rebind required"
 msgstr "需要重新繫結"
@@ -9162,7 +9536,7 @@ msgstr "將 <0>{0}</0> 值{1} 發送到 AI 嗎？"
 msgid "Custom URL path"
 msgstr "自訂 URL 路徑"
 
-#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "A dictionary changed while you were applying it. Reload the page and try "
 "again."
 msgstr ""
@@ -9289,6 +9663,10 @@ msgstr "資料集已刪除"
 msgid "Discovery clarification"
 msgstr "發現澄清"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
+msgid "Next: save as"
+msgstr ""
+
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
 msgstr "開始導覽"
@@ -9333,6 +9711,11 @@ msgstr "只有我"
 msgid "An error occurred while saving the dataset"
 msgstr "儲存資料集時發生錯誤"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
+msgid "A new dataset that reads {datasetName} and converts its values as it "
+"loads. Later edits to the dictionaries show up in it right away."
+msgstr ""
+
 #: shared/copy/appLabel.ts
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
 #: src/config/AppLinks/AppLinks.tsx
@@ -9369,6 +9752,10 @@ msgstr "無法載入 {pluginName}"
 msgid "Pick which global filters apply to this visualization."
 msgstr "選擇適用於此視覺化的全域篩選。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
+msgid "Also keep the original values in a new column, {originalName}"
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow.ts
 msgid "The picked datasets are no longer available. Pick the datasets to learn "
 "from."
@@ -9395,9 +9782,17 @@ msgstr "每個系列是一個氣泡雲。大小欄決定氣泡半徑。"
 msgid "does not end with"
 msgstr "不以…結尾"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/PreviewTable.tsx
+msgid "empty"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "新增圖層"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DeleteDatasetConfirmBody.tsx
+msgid "Are you sure you want to delete {datasetName}?"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Column description updated successfully!"
@@ -9481,6 +9876,10 @@ msgstr "前 {0} 列"
 msgid "Choose a status"
 msgstr "選擇狀態"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "Values being converted"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportCopy.ts
 msgid "Data processing failed"
 msgstr "資料處理失敗"
@@ -9520,6 +9919,10 @@ msgstr "黃色"
 
 #: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 msgid "You can't edit any dataset in this workspace"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "A label you added is already used in its code list."
 msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
@@ -9589,6 +9992,11 @@ msgstr "您的方案不允許分享更多儀表板。"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Warning"
 msgstr "警告"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Adding a value changes the dictionary, so it needs edit access to "
+"dictionaries."
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
 msgid "When on, members of this group only get access if they already have "
@@ -9671,6 +10079,10 @@ msgstr "{displayName} 的角色"
 msgid "Create dictionary"
 msgstr ""
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeChip.tsx
+msgid "Click to convert instead."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/VisibilityAlert.tsx
 msgid "This dashboard is published to your workspace. Only people you have "
 "given access can open the link below."
@@ -9743,6 +10155,10 @@ msgstr "{fieldName} 保留多少個值"
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "{0} areas are suppressed"
 msgstr "已隱藏 {0} 個區域"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
+msgid "Apply conversions"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Aggregate points to boundaries"
@@ -9883,6 +10299,16 @@ msgstr "WHERE 子句包含表單不支援的「{nodeType}」節點。"
 msgid "Dashboard published!"
 msgstr "儀表板已發佈！"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "Not in the list, kept as is"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Changes the values in every column that has codes, using the labels from "
+"your dictionaries. Charts, filters, and downloads show the labels from "
+"then on."
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I could not produce SQL offline. Try rephrasing or reconnect to use "
 "cloud chat."
@@ -9905,6 +10331,10 @@ msgstr "這個問題對離線模型而言太長。請嘗試縮短問題，或關
 #: src/components/permissions/ShareResourceModal/copy/makePrivateConfirmCopy/makePrivateConfirmCopy.ts
 msgid "Only you will be able to open it. You can share it again at any time."
 msgstr "只有您能開啟此項目。您可以隨時再次分享。"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell.tsx
+msgid "Applied version {appliedVersion}, now version {nowVersion}"
+msgstr ""
 
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.tsx
 msgid "Added to \"{dashboardName}\""
@@ -10188,7 +10618,7 @@ msgid "Identifier"
 msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyAccess.ts
-#: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "You need edit access to {datasetName} to apply a dictionary."
 msgstr ""
 
@@ -10250,6 +10680,10 @@ msgstr "套用校準"
 msgid "Could not generate QR code"
 msgstr "無法生成 QR 碼"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+msgid "Use an existing label"
+msgstr ""
+
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterRemoveAction/FilterRemoveAction.tsx
 msgid "Remove condition"
 msgstr "移除條件"
@@ -10308,6 +10742,10 @@ msgstr ""
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/usePublishDashboardMutation/usePublishDashboardMutation.ts
 msgid "Could not publish dashboard"
 msgstr "無法發布儀表板"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "Nothing is unmatched"
+msgstr ""
 
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/BuiltInBasemapItems.tsx
 msgid "Fiord"
@@ -10450,6 +10888,12 @@ msgid "None of the selected regions produced any rows yet, so there are no "
 "printed columns to keep."
 msgstr "目前選取的區域尚未產生任何列，因此沒有可保留的列印欄位。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Leaves every column exactly as it is. Your dictionaries are attached "
+"alongside the data, so anyone can hover a column to see what its values "
+"mean, and Ask Avandar can use them to answer questions."
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftAttributeRow/AttributeNameFields.tsx
 msgid "Name for {columnLabel}"
 msgstr "{columnLabel} 的名稱"
@@ -10486,6 +10930,10 @@ msgstr "查詢的"
 msgid "They referenced columns this data source does not have."
 msgstr "他們引用了此資料來源沒有的欄。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "Values without a label"
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "{conceptName} fields"
 msgstr "{conceptName} 欄位"
@@ -10512,6 +10960,8 @@ msgstr "保存數據集時出錯"
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu.tsx
 #: src/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryStepLabels.ts
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentCardBody.tsx
 #: src/views/ProfileView/DisplayNameSection.tsx
@@ -10527,6 +10977,10 @@ msgstr "PDF 檔案"
 #: src/components/permissions/useShareButtonState.ts
 msgid "Share or publish this {resourceLabel}"
 msgstr "分享或發布此{resourceLabel}"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsFooter.tsx
+msgid "Next: unmatched values"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/BufferOfLayerFields/BufferOfLayerFields.tsx
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
@@ -10549,6 +11003,12 @@ msgstr "顯示 {shownColumnsText} 欄，共 {totalColumnsText} 欄。請從地�
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal.tsx
 msgid "Subscription updated successfully"
 msgstr "訂閱成功更新"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Leaves this column exactly as it is. The dictionary is attached "
+"alongside it, so anyone can hover the column to see what each value "
+"means, and Ask Avandar can use it to answer questions."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Last indexed"
@@ -10672,6 +11132,10 @@ msgstr "插件圖表"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Stack group"
 msgstr "堆疊群組"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Removed, back to the original values"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Select rule (e.g. most frequent)"
@@ -10798,8 +11262,8 @@ msgid "Switch Workspace"
 msgstr "切換工作區"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/ApplyDictionaryMenuItem.tsx
-msgid "Show what codes mean and add column descriptions"
-msgstr ""
+#~ msgid "Show what codes mean and add column descriptions"
+#~ msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ShareOnlyAccessAlert.tsx
 msgid "You can view this dashboard because it was shared with you."
@@ -10935,6 +11399,11 @@ msgstr "第 2 欄"
 msgid "Data not ready"
 msgstr "資料尚未準備就緒"
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter.tsx
+msgid "The values were converted to these labels. The dictionary entry they "
+"came from was deleted."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/MapViewPField/MapViewPField.tsx
 msgid "The map's saved view"
 msgstr "地圖的已儲存檢視"
@@ -10944,8 +11413,8 @@ msgid "You haven't chosen a value column"
 msgstr "您尚未選擇值欄位"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useAttachDictionaries.ts
-msgid "The dictionaries were not attached. Please try again."
-msgstr ""
+#~ msgid "The dictionaries were not attached. Please try again."
+#~ msgstr ""
 
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Text contains"
@@ -11086,6 +11555,10 @@ msgstr "請新增面圖層（例如緩衝區），以便依此篩選。"
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Save it"
 msgstr "儲存"
+
+#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote.tsx
+msgid "Linked dataset: {datasetLink}"
+msgstr ""
 
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 msgid "Hide the tutorial"
@@ -11301,6 +11774,10 @@ msgid "This is the last step. Publish, and anyone in your workspace can open "
 "this dashboard."
 msgstr "這是最後一步。發布後，您工作區中的任何人都可以開啟此儀表板。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
+msgid "Loading save options"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField.tsx
 msgid "Add filter"
 msgstr "新增篩選器"
@@ -11427,11 +11904,18 @@ msgstr "數據集已準備好"
 msgid "H2"
 msgstr "H2"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Your data will change. The labels stay attached too, so the column is "
+"still explained."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Add a pull quote..."
 msgstr "新增引文…"
 
 #. placeholder {0}: codeList.values.length
+#. placeholder {0}: props.rows.length
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListNavLink.tsx
 msgid "{0, plural, one {# value} other {# values}}"
 msgstr ""
@@ -11549,6 +12033,10 @@ msgstr "編輯角色群組"
 msgid "A places dataset holds at most {maxPlaces} places."
 msgstr "地點資料集最多可容納 {maxPlaces} 個地點。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ConvertAllControls.tsx
+msgid "Attach dictionaries only as references"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 msgid "Dictionary"
 msgstr ""
@@ -11620,6 +12108,7 @@ msgstr "選擇您要分享的對象"
 msgid "Failed to update display name"
 msgstr "更新顯示名稱失敗"
 
+#: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
 msgid "Code list"
 msgstr ""
@@ -11652,6 +12141,10 @@ msgid "{valueCount, plural, one {# value in {listNames} has no label yet. It is 
 "the dictionary.} other {# values in {listNames} have no label yet. They "
 "are saved without one and marked as needing a label, so you can finish "
 "them on the dictionary.}}"
+msgstr ""
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "The values could not be read"
 msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/useOfflineModelActions.ts
@@ -11781,6 +12274,10 @@ msgstr ""
 msgid "Saved to Dictionaries, so other datasets can use it too"
 msgstr ""
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
+msgid "Update {datasetName}"
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds.ts
 msgid "Like"
 msgstr "讚"
@@ -11801,6 +12298,10 @@ msgstr "每位成員都會恢復使用其功能。"
 #: src/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig.tsx
 msgid "Prompt"
 msgstr "提示"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
+msgid "{datasetName} (converted)"
+msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I ran the query, but no data matched it."
@@ -11910,7 +12411,7 @@ msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
 msgstr "發布者尚未在其中新增任何資料列。您仍可開啟發布原始資料的位置。"
 
-#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "data unchanged, always current"
 msgstr ""
 
@@ -12022,6 +12523,7 @@ msgstr "讓我們將這些結果移至儀表板"
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "值"
@@ -12125,6 +12627,8 @@ msgstr "關鍵字：{keyword}"
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterFieldSelector/FilterFieldSelector.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
 msgid "Column"
 msgstr "欄位"
 
@@ -12201,6 +12705,11 @@ msgstr ""
 msgid "You can't go to this step until you create a new dashboard."
 msgstr "您必須先建立新的儀表板，才能前往此步驟。"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
+msgid "Converting {datasetName} creates a linked dataset, and your plan's "
+"dataset limit is reached. You can still attach labels as reference."
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index.tsx
 msgid "No columns have been added yet."
 msgstr "尚未添加任何欄位。"
@@ -12254,6 +12763,10 @@ msgstr "此查詢以無法計算的方式混合了總計與個別資料列。"
 msgid "Choose a workspace preset or customize per app. User groups control "
 "dataset and dashboard access intersections."
 msgstr "選擇工作區預設或按應用程式自訂。用戶群組控制數據集和儀表板的訪問交集。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeChip.tsx
+msgid "Reference only"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
 msgid "Bin into a grid"
@@ -12327,6 +12840,11 @@ msgstr "儲存資料集"
 msgid "Sidebar position"
 msgstr "側邊欄位置"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
+msgid "Only workspace admins can add datasets, so you can't create a linked "
+"dataset."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis tick color"
 msgstr "X 軸刻度顏色"
@@ -12353,6 +12871,10 @@ msgstr "在您的工作區中"
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "On this page"
 msgstr "此頁面上"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
+msgid "{datasetName} (coded)"
+msgstr ""
 
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 #: src/components/providers/AvandarAppProvider.tsx
@@ -12390,6 +12912,7 @@ msgstr ""
 msgid "(Message not sent.)"
 msgstr "（訊息未傳送。）"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 msgid "Next: save"
 msgstr ""
@@ -12422,6 +12945,10 @@ msgstr "這就是您的答案"
 #: src/views/GisApp/panels/LegendPanel/MapLegend/MapLegend.tsx
 msgid "Expand the legend"
 msgstr "展開圖例"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
+msgid "Codes become labels in the linked dataset"
+msgstr ""
 
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Every workspace member who can open the {app} app gets this role on this "
@@ -12519,6 +13046,10 @@ msgstr "同步到線上？"
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Neutral failure"
 msgstr "中立失敗"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "No label yet, kept as is"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "No fields yet"
@@ -12622,6 +13153,10 @@ msgstr "Google 表單載入失敗"
 #: src/components/privacy/ConsentModal/ConsentModal.tsx
 msgid "Type the confirmation phrase"
 msgstr "輸入確認短語"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+msgid "Every value in the columns you picked is in its code list."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/GoogleSheetsImportView/getGoogleSheetImportErrorCopy.ts
 msgid "Google can export at most 10 MB of a spreadsheet at a time. Split the "
@@ -12736,6 +13271,11 @@ msgstr ""
 msgid "Delete chat"
 msgstr "刪除聊天"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+msgid "A value you added is already in its code list, perhaps with different "
+"capitalization."
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 msgid "Search failed. Try again."
 msgstr "搜尋失敗。請再試一次。"
@@ -12753,6 +13293,7 @@ msgid "My Drive"
 msgstr "我的雲端硬碟"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Description added"
 msgstr ""
 
@@ -12828,6 +13369,10 @@ msgstr "此資料集沒有日期欄"
 msgid "The values you selected may contain personal information. The AI "
 "provider will receive them and may log the request."
 msgstr "您選擇的值可能包含個人信息。AI 提供者將接收這些信息並可能記錄請求。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch.tsx
+msgid "Labels → codes"
+msgstr ""
 
 #: src/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge.ts
 msgid "Nothing to undo"
@@ -13087,6 +13632,10 @@ msgstr "未回報"
 msgid "Anyone"
 msgstr "任何人"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+msgid "The preview could not be read"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve"
 msgstr "核准"
@@ -13199,6 +13748,10 @@ msgstr "值，以逗號分隔"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Heading"
 msgstr "標題"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName.ts
+msgid "{datasetName} (labeled)"
+msgstr ""
 
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -13342,6 +13895,10 @@ msgstr ""
 msgid "{pluginName} installed"
 msgstr "已安裝 {pluginName}"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "keeps the version it was given"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "The assistant could not answer that. Try again in a moment."
 msgstr "助手無法回答這個問題。請稍後再試。"
@@ -13417,6 +13974,10 @@ msgstr "地點名稱"
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "The record keeps its previous assignee. Try again in a moment."
 msgstr "記錄仍保留先前的受指派人。請稍後再試。"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
+msgid "Becomes"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the minimum value"
