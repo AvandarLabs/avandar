@@ -25,10 +25,15 @@
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-lg);
 }
 
+/*
+ * Positioned so the table's visually hidden text, which is absolutely
+ * positioned, is clipped here instead of overflowing the slate.
+ */
 .applyPreviewBody {
   flex: 1;
   min-height: 0;
   overflow: auto;
+  position: relative;
 }
 
 .previewCell {
