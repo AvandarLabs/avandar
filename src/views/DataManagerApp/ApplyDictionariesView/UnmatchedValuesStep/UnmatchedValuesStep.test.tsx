@@ -194,6 +194,43 @@ describe("UnmatchedValuesStep", () => {
     ).toBeInTheDocument();
   });
 
+  it("names a code two values add to one list, under each of their inputs", () => {
+    const flow = makeApplyFlow({
+      unmatched: {
+        status: "ready",
+        result: new Map([
+          [
+            GENDER.id,
+            [
+              { value: "X", valueKey: "x", rowCount: 2 },
+              { value: "Y", valueKey: "y", rowCount: 1 },
+            ],
+          ],
+        ]),
+      },
+    });
+    _render({
+      ...flow,
+      state: {
+        ...flow.state,
+        picks: { [GENDER.id]: { ...SEX_PICK, direction: "encode" } },
+        resolutions: {
+          [GENDER.id]: {
+            x: { action: "add", text: "8" },
+            y: { action: "add", text: "8" },
+          },
+        },
+      },
+    });
+
+    expect(screen.getByRole("textbox", { name: "Code for X" })).toHaveAccessibleDescription(
+      "The code 8 is added twice to this list.",
+    );
+    expect(screen.getByRole("textbox", { name: "Code for Y" })).toHaveAccessibleDescription(
+      "The code 8 is added twice to this list.",
+    );
+  });
+
   it("disables Add to list for a code already in the list without a label", async () => {
     const blankList = {
       ...SEX_LIST,

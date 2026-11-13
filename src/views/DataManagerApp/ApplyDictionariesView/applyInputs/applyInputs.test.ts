@@ -10,6 +10,7 @@ import {
   buildBindingInputs,
   buildDraftConversion,
   buildMatchConversion,
+  findAddedCodeConflicts,
   isConvertingPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { UnmatchedValue } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
@@ -122,6 +123,41 @@ describe("applyInputs", () => {
         unmatchedByColumnId: UNMATCHED,
       }),
     ).toEqual([{ codeListId: SEX_LIST.id, code: "Undisclosed", label: "U" }]);
+  });
+
+  it("finds two values adding one code to a list with different labels", () => {
+    expect(
+      findAddedCodeConflicts({
+        picks: { [GENDER.id]: { ...SEX_PICK, direction: "encode" } },
+        resolutions: {
+          [GENDER.id]: {
+            x: { action: "add", text: "8" },
+            u: { action: "add", text: " 8 " },
+            "7": { action: "add", text: "6" },
+          },
+        },
+        unmatchedByColumnId: UNMATCHED,
+      }),
+    ).toEqual([
+      { columnId: GENDER.id, valueKey: "x", codeListId: SEX_LIST.id, code: "8" },
+      { columnId: GENDER.id, valueKey: "u", codeListId: SEX_LIST.id, code: "8" },
+    ]);
+  });
+
+  it("finds no conflict when two columns add the same pair", () => {
+    expect(
+      findAddedCodeConflicts({
+        picks: { [GENDER.id]: SEX_PICK, [COUNTY.id]: SEX_PICK },
+        resolutions: {
+          [GENDER.id]: { u: { action: "add", text: "Undisclosed" } },
+          [COUNTY.id]: { u: { action: "add", text: "Undisclosed" } },
+        },
+        unmatchedByColumnId: new Map([
+          ...UNMATCHED,
+          [COUNTY.id, [{ value: "U", valueKey: "u", rowCount: 1 }]],
+        ]),
+      }),
+    ).toEqual([]);
   });
 
   it("trims only spaces from an added pair, as value keys do", () => {

@@ -5,6 +5,7 @@ import type {
   ApplyDictionariesAction,
   ValueResolution,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { UnmatchedRow } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/buildUnmatchedRows";
 import type { Dispatch, ReactNode } from "react";
 
@@ -14,6 +15,8 @@ type Props = {
   row: UnmatchedRow;
   resolution: ValueResolution | undefined;
   canEditDictionaries: boolean;
+  /** Set when another value adds this value's code with another label. */
+  conflict: AddedCodeConflict | undefined;
   dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
@@ -103,11 +106,12 @@ function ResolutionDetail(
   props: Readonly<{
     row: UnmatchedRow;
     resolution: ValueResolution | undefined;
+    conflict: AddedCodeConflict | undefined;
     onResolve: (resolution: ValueResolution) => void;
   }>,
 ): ReactNode {
   const { t } = useLingui();
-  const { row, resolution } = props;
+  const { row, resolution, conflict } = props;
   const { value } = row.item;
   if (resolution?.action === "map") {
     const options = row.codeList.pairs
@@ -133,8 +137,14 @@ function ResolutionDetail(
   }
   if (resolution?.action === "add") {
     const isLabel = row.pick.direction === "decode";
+    const conflictCode = conflict?.code;
     return (
       <TextInput
+        error={
+          conflictCode === undefined
+            ? undefined
+            : t`The code ${conflictCode} is added twice to this list.`
+        }
         size="xs"
         maw={280}
         aria-label={isLabel ? t`Label for ${value}` : t`Code for ${value}`}
@@ -203,6 +213,7 @@ export function ResolutionControl(props: Readonly<Props>): ReactNode {
       <ResolutionDetail
         row={row}
         resolution={props.resolution}
+        conflict={props.conflict}
         onResolve={resolve}
       />
     </Stack>

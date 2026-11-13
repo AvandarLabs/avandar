@@ -1,5 +1,8 @@
 import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
-import { trimSpaces } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import {
+  toValueKey,
+  trimSpaces,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -147,18 +150,19 @@ function _toAddedPair(
       };
 }
 
-/**
- * The pairs Add to list puts in code lists, once each per list and code,
- * ignoring an entry left blank.
- */
-export function buildAddedPairs(
-  options: Readonly<{
-    picks: Readonly<Record<string, ColumnPick>>;
-    resolutions: ResolutionsByColumnId;
-    unmatchedByColumnId: UnmatchedByColumnId;
-  }>,
-): DictionaryBinding.AddedPair[] {
-  const added = Object.entries(options.picks).flatMap(([columnId, pick]) => {
+type AddOptions = Readonly<{
+  picks: Readonly<Record<string, ColumnPick>>;
+  resolutions: ResolutionsByColumnId;
+  unmatchedByColumnId: UnmatchedByColumnId;
+}>;
+
+/** Every Add to list resolution with its column, value key, and pair. */
+function _collectAdds(options: AddOptions): Array<{
+  columnId: string;
+  valueKey: string;
+  pair: DictionaryBinding.AddedPair;
+}> {
+  return Object.entries(options.picks).flatMap(([columnId, pick]) => {
     if (!pick.codeListId) {
       return [];
     }
@@ -169,16 +173,72 @@ export function buildAddedPairs(
     );
     return resolved.flatMap(({ value, resolution }) => {
       return resolution.action === "add" && resolution.text.trim() !== ""
-        ? [_toAddedPair(withList, value, resolution.text)]
+        ? [
+            {
+              columnId,
+              valueKey: toValueKey(value),
+              pair: _toAddedPair(withList, value, resolution.text),
+            },
+          ]
         : [];
     });
   });
+}
+
+function _toAddedCodeKey(pair: DictionaryBinding.AddedPair): string {
+  return `${pair.codeListId}:${pair.code.toLowerCase()}`;
+}
+
+/**
+ * The pairs Add to list puts in code lists, once each per list and code,
+ * ignoring an entry left blank.
+ */
+export function buildAddedPairs(
+  options: AddOptions,
+): DictionaryBinding.AddedPair[] {
   const seen = new Set<string>();
-  return added.filter((pair) => {
-    const key = `${pair.codeListId}:${pair.code.toLowerCase()}`;
-    const isNew = !seen.has(key);
-    seen.add(key);
-    return isNew;
+  return _collectAdds(options)
+    .map((add) => {
+      return add.pair;
+    })
+    .filter((pair) => {
+      const key = _toAddedCodeKey(pair);
+      const isNew = !seen.has(key);
+      seen.add(key);
+      return isNew;
+    });
+}
+
+/**
+ * One Add to list resolution whose code another adds to the same list with
+ * a different label, which a list cannot hold.
+ */
+export type AddedCodeConflict = {
+  columnId: string;
+  valueKey: string;
+  codeListId: DataDictionaryCodeList.Id;
+  /** The code as this resolution adds it. */
+  code: string;
+};
+
+/**
+ * Every Add to list resolution that adds a code to a list another one adds
+ * with a different label, in column then value order. Saving is blocked
+ * until none are left; two adding the very same pair are not a conflict.
+ */
+export function findAddedCodeConflicts(
+  options: AddOptions,
+): AddedCodeConflict[] {
+  const adds = _collectAdds(options);
+  const labelsByCode = new Map<string, Set<string>>();
+  adds.forEach(({ pair }) => {
+    const key = _toAddedCodeKey(pair);
+    labelsByCode.set(key, (labelsByCode.get(key) ?? new Set()).add(pair.label));
+  });
+  return adds.flatMap(({ columnId, valueKey, pair }) => {
+    return (labelsByCode.get(_toAddedCodeKey(pair))?.size ?? 0) > 1
+      ? [{ columnId, valueKey, codeListId: pair.codeListId, code: pair.code }]
+      : [];
   });
 }
 

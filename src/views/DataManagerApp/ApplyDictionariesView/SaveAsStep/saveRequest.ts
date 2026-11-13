@@ -4,6 +4,7 @@ import {
   isConvertingPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
@@ -18,6 +19,7 @@ import type { UnmatchedValues } from "@/views/DataManagerApp/ApplyDictionariesVi
 export type SaveBlocker =
   | "no_target"
   | "reading_values"
+  | "added_code_conflict"
   | "no_name"
   | "needs_confirmation";
 
@@ -74,8 +76,9 @@ export function buildSaveRequest(
 /**
  * Why the request cannot be saved yet: no target chosen, the unmatched
  * values still being read (until then overrides only know each value's
- * lowercased key, not its stored text), a linked dataset with no name, or
- * a synced upload changed in place without the confirmation ticked.
+ * lowercased key, not its stored text), two values adding one code to a
+ * list, a linked dataset with no name, or a synced upload changed in place
+ * without the confirmation ticked.
  */
 export function getSaveBlocker(
   options: Readonly<{
@@ -83,6 +86,7 @@ export function getSaveBlocker(
     targets: ApplyTargets | undefined;
     hasConfirmedWorkspaceChange: boolean;
     unmatched: UnmatchedValues;
+    addedCodeConflicts: readonly AddedCodeConflict[];
   }>,
 ): SaveBlocker | undefined {
   const { request } = options;
@@ -91,6 +95,9 @@ export function getSaveBlocker(
   }
   if (options.unmatched.status === "reading") {
     return "reading_values";
+  }
+  if (options.addedCodeConflicts.length > 0) {
+    return "added_code_conflict";
   }
   if (request.kind === "linked" && request.linkedDatasetName.trim() === "") {
     return "no_name";

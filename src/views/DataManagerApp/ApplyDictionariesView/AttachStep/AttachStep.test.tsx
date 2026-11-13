@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import {
+  COUNTY,
   GENDER,
   makeApplyFlow,
   makeApplyLookups,
@@ -10,7 +11,10 @@ import {
 import { AttachStep } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type {
+  ApplyDictionariesState,
+  ColumnPick,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { UnmatchedValues } from "@/views/DataManagerApp/ApplyDictionariesView/useUnmatchedValues";
 
 const { saveMock } = vi.hoisted(() => {
@@ -37,12 +41,15 @@ function _render(
   picks: Record<string, ColumnPick>,
   existingBindings: readonly DictionaryBinding.T[] = [],
   unmatched: UnmatchedValues = READY_UNMATCHED,
+  resolutions: ApplyDictionariesState["resolutions"] = {
+    [GENDER.id]: { "8": { action: "add", text: "Other" } },
+  },
 ) {
   const flow = makeApplyFlow({ unmatched });
   render(
     <AttachStep
       dataset={DATASET}
-      columns={[GENDER]}
+      columns={[GENDER, COUNTY]}
       existingBindings={existingBindings}
       flow={{
         ...flow,
@@ -50,9 +57,7 @@ function _render(
           ...flow.state,
           step: "save",
           picks,
-          resolutions: {
-            [GENDER.id]: { "8": { action: "add", text: "Other" } },
-          },
+          resolutions,
         },
       }}
       counts={{
@@ -107,6 +112,26 @@ describe("AttachStep", () => {
   it("cannot attach while the unmatched values are still being read", () => {
     _render({ [GENDER.id]: REFERENCE_PICK }, [], { status: "reading" });
 
+    expect(
+      screen.getByRole("button", { name: "Attach to Kings line list" }),
+    ).toBeDisabled();
+  });
+
+  it("cannot attach while two values add one code to a list, naming the code", () => {
+    _render({ [GENDER.id]: REFERENCE_PICK, [COUNTY.id]: REFERENCE_PICK }, [], {
+      status: "ready",
+      result: new Map([
+        [GENDER.id, [{ value: "8", valueKey: "8", rowCount: 2 }]],
+        [COUNTY.id, [{ value: "8", valueKey: "8", rowCount: 1 }]],
+      ]),
+    }, {
+      [GENDER.id]: { "8": { action: "add", text: "Other" } },
+      [COUNTY.id]: { "8": { action: "add", text: "Refused" } },
+    });
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "The code 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",
+    );
     expect(
       screen.getByRole("button", { name: "Attach to Kings line list" }),
     ).toBeDisabled();

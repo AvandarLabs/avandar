@@ -2,14 +2,17 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
+import { AddedCodeConflictCallout } from "@/views/DataManagerApp/ApplyDictionariesView/AddedCodeConflictCallout";
 import {
   buildAddedPairs,
   buildBindingInputs,
+  findAddedCodeConflicts,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import { AttachFooter } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter";
 import { AttachSummaryTable } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable";
 import { AttachSummaryText } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText";
 import { useSaveApply } from "@/views/DataManagerApp/ApplyDictionariesView/useSaveApply";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -33,13 +36,14 @@ type Props = {
 };
 
 /**
- * The picked columns, how many bound columns lose their dictionary, and the
- * save.
+ * The picked columns, how many bound columns lose their dictionary, the
+ * save, and the first code two values add to one list.
  */
 function useAttachRequest(props: Readonly<Props>): {
   picked: Array<{ column: DatasetColumn.T; pick: ColumnPick }>;
   removedCount: number;
   request: ApplySaveRequest;
+  conflict: AddedCodeConflict | undefined;
 } {
   const { state, unmatched } = props.flow;
   const picked = props.columns.flatMap((column) => {
@@ -66,7 +70,8 @@ function useAttachRequest(props: Readonly<Props>): {
     }),
     addedPairs: buildAddedPairs(shared),
   };
-  return { picked, removedCount, request };
+  const [conflict] = findAddedCodeConflicts(shared);
+  return { picked, removedCount, request, conflict };
 }
 
 /**
@@ -77,12 +82,16 @@ function useAttachRequest(props: Readonly<Props>): {
 export function AttachStep(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const datasetName = props.dataset.name;
-  const { picked, removedCount, request } = useAttachRequest(props);
+  const { picked, removedCount, request, conflict } = useAttachRequest(props);
   const [save, isAttaching] = useSaveApply(props.dataset);
   return (
     <>
       <AppViewBody>
         <Stack gap="xl">
+          <AddedCodeConflictCallout
+            conflict={conflict}
+            codeLists={props.lookups.codeLists}
+          />
           <AppViewSection title={t`Attach to ${datasetName}`}>
             <AttachSummaryText
               counts={props.counts}
@@ -102,7 +111,9 @@ export function AttachStep(props: Readonly<Props>): ReactNode {
         pickedCount={picked.length}
         removedCount={removedCount}
         isAttaching={isAttaching}
-        isReadingValues={props.flow.unmatched.status === "reading"}
+        isBlocked={
+          props.flow.unmatched.status === "reading" || conflict !== undefined
+        }
         onBack={() => {
           props.flow.dispatch({ type: "go_to_step", step: "unmatched" });
         }}

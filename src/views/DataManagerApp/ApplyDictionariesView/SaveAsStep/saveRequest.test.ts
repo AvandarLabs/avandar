@@ -71,6 +71,7 @@ describe("saveRequest", () => {
       targets: LINKED_ONLY_TARGETS,
       hasConfirmedWorkspaceChange: false,
       unmatched: UNMATCHED,
+      addedCodeConflicts: [],
     };
     const linked = buildSaveRequest({
       state: STATE,
@@ -91,6 +92,7 @@ describe("saveRequest", () => {
         },
         hasConfirmedWorkspaceChange: false,
         unmatched: UNMATCHED,
+        addedCodeConflicts: [],
         request: { kind: "in_place", bindings: [], addedPairs: [] },
       }),
     ).toBe("needs_confirmation");
@@ -102,6 +104,7 @@ describe("saveRequest", () => {
         targets: LINKED_ONLY_TARGETS,
         hasConfirmedWorkspaceChange: false,
         unmatched: { status: "reading" },
+        addedCodeConflicts: [],
         request: {
           kind: "linked",
           linkedDatasetName: "Bronx (labeled)",
@@ -110,6 +113,30 @@ describe("saveRequest", () => {
         },
       }),
     ).toBe("reading_values");
+  });
+
+  it("blocks saving while two values add one code to a list", () => {
+    expect(
+      getSaveBlocker({
+        targets: LINKED_ONLY_TARGETS,
+        hasConfirmedWorkspaceChange: false,
+        unmatched: UNMATCHED,
+        addedCodeConflicts: [
+          {
+            columnId: GENDER.id,
+            valueKey: "x",
+            codeListId: SEX_LIST.id,
+            code: "8",
+          },
+        ],
+        request: {
+          kind: "linked",
+          linkedDatasetName: "Bronx (labeled)",
+          bindings: [],
+          addedPairs: [],
+        },
+      }),
+    ).toBe("added_code_conflict");
   });
 
   it("says what happens to each column, including one going back to its values", () => {

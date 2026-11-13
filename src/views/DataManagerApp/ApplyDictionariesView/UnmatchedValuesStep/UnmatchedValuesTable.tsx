@@ -5,6 +5,7 @@ import type {
   ApplyDictionariesAction,
   ApplyDictionariesState,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { UnmatchedRow } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/buildUnmatchedRows";
 import type { Dispatch, ReactNode } from "react";
 
@@ -12,6 +13,8 @@ type Props = {
   rows: readonly UnmatchedRow[];
   resolutions: ApplyDictionariesState["resolutions"];
   canEditDictionaries: boolean;
+  /** Add to list resolutions whose code another adds with another label. */
+  addedCodeConflicts: readonly AddedCodeConflict[];
   dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
@@ -52,6 +55,12 @@ export function UnmatchedValuesTable(props: Readonly<Props>): ReactNode {
                   row={row}
                   resolution={props.resolutions[column.id]?.[item.valueKey]}
                   canEditDictionaries={props.canEditDictionaries}
+                  conflict={props.addedCodeConflicts.find((conflict) => {
+                    return (
+                      conflict.columnId === column.id &&
+                      conflict.valueKey === item.valueKey
+                    );
+                  })}
                   dispatch={props.dispatch}
                 />
               </Table.Td>

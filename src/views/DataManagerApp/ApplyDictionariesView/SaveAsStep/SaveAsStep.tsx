@@ -3,7 +3,11 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Center, Loader, Stack, Text } from "@mantine/core";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
-import { isConvertingPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
+import { AddedCodeConflictCallout } from "@/views/DataManagerApp/ApplyDictionariesView/AddedCodeConflictCallout";
+import {
+  findAddedCodeConflicts,
+  isConvertingPick,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import { AttachStep } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep";
 import { SaveFooter } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveFooter";
 import {
@@ -14,12 +18,14 @@ import { SaveSummaryTable } from "@/views/DataManagerApp/ApplyDictionariesView/S
 import { SaveTargetCards } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards";
 import { useDefaultLinkedName } from "@/views/DataManagerApp/ApplyDictionariesView/useDefaultLinkedName";
 import { useSaveApply } from "@/views/DataManagerApp/ApplyDictionariesView/useSaveApply";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
 import type { ApplyCounts } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFacts";
 import type { ApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
+import type { SaveBlocker } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/saveRequest";
 import type { ApplySaveRequest } from "@/views/DataManagerApp/ApplyDictionariesView/useSaveApply";
 import type { ReactNode } from "react";
 
@@ -106,7 +112,11 @@ function SaveTargetSection(
 
 function SaveAsBody(
   props: Readonly<
-    Props & { linkedDatasetName: string; isLinkedTarget: boolean }
+    Props & {
+      linkedDatasetName: string;
+      isLinkedTarget: boolean;
+      conflict: AddedCodeConflict | undefined;
+    }
   >,
 ): ReactNode {
   const { dataset, flow } = props;
@@ -114,6 +124,10 @@ function SaveAsBody(
   return (
     <AppViewBody>
       <Stack gap="xl">
+        <AddedCodeConflictCallout
+          conflict={props.conflict}
+          codeLists={props.lookups.codeLists}
+        />
         <SaveTargetSection {...props} />
         <AppViewSection title={<Trans>Summary</Trans>} meta={props.summary}>
           <SaveSummaryTable
@@ -130,7 +144,16 @@ function SaveAsBody(
   );
 }
 
-function ConvertingSave(props: Readonly<Props>): ReactNode {
+/**
+ * The save the step stands for, why it cannot be sent yet, the linked
+ * dataset's name, and the first code two values add to one list.
+ */
+function useConvertingSave(props: Readonly<Props>): {
+  request: ApplySaveRequest | undefined;
+  blocker: SaveBlocker | undefined;
+  linkedDatasetName: string;
+  conflict: AddedCodeConflict | undefined;
+} {
   const { dataset, flow } = props;
   const { state, targets } = flow;
   const defaultName = useDefaultLinkedName(dataset.name, state.picks);
@@ -143,12 +166,31 @@ function ConvertingSave(props: Readonly<Props>): ReactNode {
     isLinkedDataset: targets?.isLinkedDataset ?? false,
     linkedDatasetName,
   });
+  const addedCodeConflicts = findAddedCodeConflicts({
+    picks: state.picks,
+    resolutions: state.resolutions,
+    unmatchedByColumnId:
+      flow.unmatched.status === "ready" ? flow.unmatched.result : new Map(),
+  });
   const blocker = getSaveBlocker({
     request,
     targets,
     hasConfirmedWorkspaceChange: state.hasConfirmedWorkspaceChange,
     unmatched: flow.unmatched,
+    addedCodeConflicts,
   });
+  return {
+    request,
+    blocker,
+    linkedDatasetName,
+    conflict: addedCodeConflicts[0],
+  };
+}
+
+function ConvertingSave(props: Readonly<Props>): ReactNode {
+  const { dataset, flow } = props;
+  const { request, blocker, linkedDatasetName, conflict } =
+    useConvertingSave(props);
   const label = useSaveLabel(dataset.name, request);
   const [save, isSaving] = useSaveApply(dataset);
   return (
@@ -157,6 +199,7 @@ function ConvertingSave(props: Readonly<Props>): ReactNode {
         {...props}
         linkedDatasetName={linkedDatasetName}
         isLinkedTarget={request?.kind === "linked"}
+        conflict={conflict}
       />
       {props.preview}
       <SaveFooter

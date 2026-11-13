@@ -8,12 +8,16 @@ import { AppSlateEmptyState } from "@/components/AppSlateEmptyState/AppSlateEmpt
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
-import { isConvertingPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
+import {
+  findAddedCodeConflicts,
+  isConvertingPick,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import { buildUnmatchedRows } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/buildUnmatchedRows";
 import { UnmatchedValuesFooter } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter";
 import { UnmatchedValuesTable } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
 import type { UnmatchedRow } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/buildUnmatchedRows";
 import type { ApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
@@ -40,6 +44,7 @@ function ValuesSection(
     rows: readonly UnmatchedRow[];
     flow: ApplyFlow;
     canEditDictionaries: boolean;
+    addedCodeConflicts: readonly AddedCodeConflict[];
   }>,
 ): ReactNode {
   const headingId = useId();
@@ -60,6 +65,7 @@ function ValuesSection(
           rows={props.rows}
           resolutions={props.flow.state.resolutions}
           canEditDictionaries={props.canEditDictionaries}
+          addedCodeConflicts={props.addedCodeConflicts}
           dispatch={props.flow.dispatch}
         />
       </AppViewSection>
@@ -67,17 +73,37 @@ function ValuesSection(
   );
 }
 
+/**
+ * The step's rows, and every Add to list resolution whose code another adds
+ * to the same list with another label.
+ */
+function _buildRowsAndConflicts(props: Readonly<BodyProps>): {
+  rows: ReturnType<typeof buildUnmatchedRows>;
+  addedCodeConflicts: AddedCodeConflict[];
+} {
+  const { unmatched } = props.flow;
+  const { picks, resolutions } = props.flow.state;
+  const unmatchedByColumnId =
+    unmatched.status === "ready" ? unmatched.result : new Map();
+  return {
+    rows: buildUnmatchedRows({
+      columns: props.columns,
+      picks,
+      resolutions,
+      codeLists: props.lookups.codeLists,
+      unmatchedByColumnId,
+    }),
+    addedCodeConflicts: findAddedCodeConflicts({
+      picks,
+      resolutions,
+      unmatchedByColumnId,
+    }),
+  };
+}
+
 function ReadyBody(props: Readonly<BodyProps>): ReactNode {
   const { t } = useLingui();
-  const { unmatched } = props.flow;
-  const rows = buildUnmatchedRows({
-    columns: props.columns,
-    picks: props.flow.state.picks,
-    resolutions: props.flow.state.resolutions,
-    codeLists: props.lookups.codeLists,
-    unmatchedByColumnId:
-      unmatched.status === "ready" ? unmatched.result : new Map(),
-  });
+  const { rows, addedCodeConflicts } = _buildRowsAndConflicts(props);
   if (rows.converted.length === 0 && rows.reference.length === 0) {
     return (
       <AppSlateEmptyState
@@ -94,6 +120,7 @@ function ReadyBody(props: Readonly<BodyProps>): ReactNode {
   const shared = {
     flow: props.flow,
     canEditDictionaries: props.canEditDictionaries,
+    addedCodeConflicts,
   };
   return (
     <Stack gap="xl">

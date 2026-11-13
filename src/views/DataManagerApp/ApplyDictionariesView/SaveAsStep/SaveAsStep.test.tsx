@@ -5,6 +5,7 @@ import {
   LINKED_ONLY_TARGETS,
   makeApplyFlow,
   makeApplyLookups,
+  SEX_PICK,
 } from "@/views/DataManagerApp/ApplyDictionariesView/__tests__/applyFlow.fixtures";
 import { SaveAsStep } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -76,6 +77,43 @@ describe("SaveAsStep", () => {
         linkedDatasetName: "Bronx line list (labeled)",
       }),
     );
+  });
+
+  it("cannot save while two values add one code to a list, naming the code", () => {
+    const flow = makeApplyFlow({
+      unmatched: {
+        status: "ready",
+        result: new Map([
+          [
+            GENDER.id,
+            [
+              { value: "X", valueKey: "x", rowCount: 2 },
+              { value: "Y", valueKey: "y", rowCount: 1 },
+            ],
+          ],
+        ]),
+      },
+    });
+    _render({
+      ...flow,
+      state: {
+        ...flow.state,
+        picks: { [GENDER.id]: { ...SEX_PICK, direction: "encode" } },
+        resolutions: {
+          [GENDER.id]: {
+            x: { action: "add", text: "8" },
+            y: { action: "add", text: "8" },
+          },
+        },
+      },
+    });
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "The code 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",
+    );
+    expect(
+      screen.getByRole("button", { name: "Create linked dataset" }),
+    ).toBeDisabled();
   });
 
   it("cannot create a linked dataset with no name", () => {
