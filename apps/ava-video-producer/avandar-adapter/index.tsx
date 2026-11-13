@@ -9,14 +9,7 @@ import { i18n } from "@lingui/core";
 import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { I18nProvider } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import {
-  MantineProvider,
-  Group,
-  Text,
-  ActionIcon,
-  Title,
-  Box,
-} from "@mantine/core";
+import { Group, Text, ActionIcon, Title, Box } from "@mantine/core";
 import logo from "@product-assets/logoWhite.png";
 import {
   IconLayoutSidebarLeftCollapse,
@@ -50,6 +43,7 @@ import {
   OntologyScreen,
   ONTOLOGY_BEATS,
 } from "./OntologyScreen/OntologyScreen";
+import { ProductThemeRoot } from "./ProductThemeRoot";
 import { VideoRouteContext } from "./shims/router";
 import "./stage.css";
 
@@ -138,7 +132,7 @@ export function AvandarStage({
   );
   return (
     <I18nProvider i18n={i18n}>
-      <MantineProvider
+      <ProductThemeRoot
         theme={{
           ...Theme,
           fontFamily: "Figtree Variable, Figtree, sans-serif",
@@ -251,7 +245,7 @@ export function AvandarStage({
             </div>
           </div>
         </VideoRouteContext.Provider>
-      </MantineProvider>
+      </ProductThemeRoot>
     </I18nProvider>
   );
 }
