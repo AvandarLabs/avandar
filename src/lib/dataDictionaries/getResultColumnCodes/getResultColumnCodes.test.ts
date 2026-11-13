@@ -146,6 +146,24 @@ describe("getResultColumnCodes", () => {
     expect(_codesOf(projections, ["top"]).size).toBe(0);
   });
 
+  it.each([
+    [
+      `SELECT "GENDER", count(*) FROM "${DATASET_ID}" GROUP BY "GENDER"`,
+      "count_star()",
+    ],
+    [
+      `SELECT "GENDER", count(*) AS cases FROM "${DATASET_ID}" GROUP BY 1`,
+      "cases",
+    ],
+  ])("tags the grouped column of a grouped SQL count: %s", (sql, countName) => {
+    const projections = _projections(sql, ["GENDER", countName]);
+
+    expect(getSourceDatasetIdFromProjections(projections)).toBe(DATASET_ID);
+    expect([..._codesOf(projections, ["GENDER", countName])]).toEqual([
+      ["GENDER", GENDER_CODES],
+    ]);
+  });
+
   it("tags a column the query builder groups by", () => {
     const dataset = _makeDataset();
     const gender = _makeQueryColumn(dataset, "GENDER");
