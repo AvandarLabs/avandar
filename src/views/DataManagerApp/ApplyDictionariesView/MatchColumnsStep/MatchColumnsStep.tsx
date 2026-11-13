@@ -76,7 +76,7 @@ function PairingColumn(
   );
 }
 
-/** The selected column's pane, beside the pairing table. */
+/** The selected column's pane, in the view's side panel. */
 function SelectedColumnPane(
   props: Readonly<{
     row: ApplyColumnRow;
@@ -86,9 +86,9 @@ function SelectedColumnPane(
 ): ReactNode {
   const { t } = useLingui();
   return (
-    <aside className={css.matchColumnsPane} aria-label={t`Selected column`}>
+    <section aria-label={t`Selected column`}>
       <ColumnPane row={props.row} pick={props.pick} lookups={props.lookups} />
-    </aside>
+    </section>
   );
 }
 
@@ -115,20 +115,19 @@ export function MatchColumnsStep(props: Readonly<Props>): ReactNode {
           dispatch({ type: "remove_dictionary", dictionaryId });
         }}
       />
-      <AppViewBody>
-        <div
-          className={css.matchColumns}
-          data-has-pane={selected !== undefined}
-        >
-          <PairingColumn flow={props.flow} inUse={inUse} rows={rows} />
-          {selected ? (
+      <AppViewBody
+        className={css.matchColumnsBody}
+        rail={
+          selected ? (
             <SelectedColumnPane
               row={selected}
               pick={state.picks[selected.column.id]}
               lookups={props.lookups}
             />
-          ) : null}
-        </div>
+          ) : undefined
+        }
+      >
+        <PairingColumn flow={props.flow} inUse={inUse} rows={rows} />
       </AppViewBody>
       <MatchColumnsFooter summary={props.summary} dispatch={dispatch} />
     </>

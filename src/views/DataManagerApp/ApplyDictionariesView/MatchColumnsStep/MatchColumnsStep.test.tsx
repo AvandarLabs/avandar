@@ -128,6 +128,17 @@ describe("MatchColumnsStep", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("shows the selected column in the view's side panel", () => {
+    const flow = _flow(1);
+    _render({
+      ...flow,
+      state: { ...flow.state, selectedColumnId: GENDER.id },
+    });
+
+    const pane = screen.getByRole("region", { name: "Selected column" });
+    expect(pane.closest("#apply-dictionaries-pairing-table")).toBeNull();
+  });
+
   it("uses one Select per column past three dictionaries", () => {
     _render(_flow(4));
 

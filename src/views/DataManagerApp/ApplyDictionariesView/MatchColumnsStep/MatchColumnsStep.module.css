@@ -1,23 +1,9 @@
 /*
- * The pairing table and the selected column's pane side by side. Below 62em
- * the pane drops under the table instead of squeezing it.
+ * The selected column's pane sits in the body's rail, widened so its values
+ * table fits.
  */
-.matchColumns {
-  display: grid;
-  gap: var(--mantine-spacing-lg);
-  grid-template-columns: minmax(0, 1fr) 20rem;
-}
-
-.matchColumns[data-has-pane="false"] {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.matchColumnsPane {
-  align-self: start;
-  background-color: var(--ava-surface-body);
-  border: 1px solid var(--ava-border-default);
-  border-radius: var(--mantine-radius-sm);
-  padding: var(--mantine-spacing-md);
+.matchColumnsBody {
+  --ava-app-view-rail-width: 22rem;
 }
 
 .matchColumnsChips {
@@ -62,10 +48,4 @@
 .matchPickText {
   flex: 1;
   min-width: 0;
-}
-
-@media (width < 62em) {
-  .matchColumns {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
