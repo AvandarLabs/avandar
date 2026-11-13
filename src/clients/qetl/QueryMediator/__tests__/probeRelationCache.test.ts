@@ -95,4 +95,46 @@ describe("probeRelationCache", () => {
 
     expect(result).toEqual([LOADED_ID]);
   });
+
+  it("treats a loaded table as a miss when its view was built with another projection", async () => {
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+    QueryableRelationColumns.remember({
+      datasetId: LOADED_ID,
+      columns: "all",
+      staleAt: undefined,
+      projectionKey: "before-the-code-list-changed",
+    });
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache(
+      [LOADED_ID],
+      {},
+      { [LOADED_ID]: "after-the-code-list-changed" },
+    );
+
+    expect(result).toEqual([LOADED_ID]);
+  });
+
+  it("serves a loaded table whose projection key matches", async () => {
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+    QueryableRelationColumns.remember({
+      datasetId: LOADED_ID,
+      columns: "all",
+      staleAt: undefined,
+      projectionKey: "same",
+    });
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache(
+      [LOADED_ID],
+      {},
+      {
+        [LOADED_ID]: "same",
+      },
+    );
+
+    expect(result).toEqual([]);
+  });
 });

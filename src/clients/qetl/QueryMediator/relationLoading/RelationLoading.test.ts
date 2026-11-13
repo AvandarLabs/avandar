@@ -1,10 +1,11 @@
 /**
  * Tests how the storage relation cache hands cached payloads to the loader,
- * and when the loader reads the dataset column catalog.
+ * and how the loader applies each relation's precomputed replacements.
  */
 
 import { MIMEType } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -13,26 +14,12 @@ import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoo
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
 
-const { datasetColumnGetAllMock } = vi.hoisted(() => {
-  return { datasetColumnGetAllMock: vi.fn() };
+const { loadParquetMock } = vi.hoisted(() => {
+  return { loadParquetMock: vi.fn() };
 });
 
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
-  return { DuckDbClient: {} };
-});
-
-vi.mock("@/clients/datasets/DatasetColumnClient", () => {
-  return {
-    DatasetColumnClient: {
-      withCache: () => {
-        return {
-          withEnsureQueryData: () => {
-            return { getAll: datasetColumnGetAllMock };
-          },
-        };
-      },
-    },
-  };
+  return { DuckDbClient: { loadParquet: loadParquetMock } };
 });
 
 vi.mock(
@@ -78,23 +65,69 @@ describe("RelationLoading.probeStorageRelationCache", () => {
 describe("RelationLoading.loadRelationBytes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    datasetColumnGetAllMock.mockResolvedValue([]);
+    QueryableRelationColumns.clear();
+    loadParquetMock.mockResolvedValue({});
   });
 
-  it("reads no dataset columns when the query loads no relation", async () => {
-    // A query that names no dataset (a literal `VALUES` query, or one whose
-    // datasets are all already in DuckDB) loads nothing. The column catalog
-    // is gated by RLS, so reading it anyway fails for a visitor who may not
-    // read any dataset's columns.
+  it("loads a relation with only the replacements its columns hold, and records its key", async () => {
     await RelationLoading.loadRelationBytes({
-      datasetColumnSource: "catalog",
+      columnReplacements: {
+        replacementsByDatasetId: {
+          [DATASET_ID]: [
+            { originalName: "zip_code", alias: "zip" },
+            { originalName: "not_loaded", dataType: "VARCHAR" },
+          ],
+        },
+        projectionKeyByDatasetId: { [DATASET_ID]: "key-1" },
+      },
       datasetDuckDbLease: {} as DatasetDuckDbLease,
       principalKey: PRINCIPAL_KEY,
       relationCache: createInMemoryRelationCache(),
-      relations: [],
+      relations: [
+        {
+          datasetId: DATASET_ID,
+          parquetBlob: new Blob(["parquet"]),
+          columns: ["zip_code"],
+          staleAt: undefined,
+        },
+      ],
       relationsToStore: [],
     });
 
-    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        columnReplacements: {
+          zip_code: { originalName: "zip_code", alias: "zip" },
+        },
+      }),
+    );
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-2",
+      }),
+    ).toBe(false);
+  });
+
+  it("loads a stored session's relation with no replacements and no key", async () => {
+    await RelationLoading.loadRelationBytes({
+      columnReplacements: undefined,
+      datasetDuckDbLease: {} as DatasetDuckDbLease,
+      principalKey: PRINCIPAL_KEY,
+      relationCache: createInMemoryRelationCache(),
+      relations: [
+        {
+          datasetId: DATASET_ID,
+          parquetBlob: new Blob(["parquet"]),
+          columns: "all",
+          staleAt: undefined,
+        },
+      ],
+      relationsToStore: [],
+    });
+
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columnReplacements: {} }),
+    );
   });
 });

@@ -1,23 +1,17 @@
 import {
   isDefined,
-  makeBucketRecord,
   MIMEType,
   makeIdLookupRecord,
   promiseMap,
   prop,
-  where,
 } from "@avandar/utils";
 import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCacheKey";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
-import { getColumnReplacementsFromColumns } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   PrincipalKey,
   RelationCacheKey,
@@ -30,7 +24,8 @@ import type {
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   AcquiredRelationBytes,
-  DatasetColumnSource,
+  ColumnReplacement,
+  LoadedColumnReplacements,
   NeededColumnsByDatasetId,
   QetlRunQuery,
   RelationSource,
@@ -66,8 +61,12 @@ type FetchRelationBytesOptions = {
 
 /** Input to {@link RelationLoading.loadRelationBytes}. */
 type LoadRelationBytesOptions = {
-  /** `stored` loads each relation as its Parquet holds it, unrenamed. */
-  datasetColumnSource: DatasetColumnSource;
+  /**
+   * The catalog's replacements and projection keys for the query's datasets,
+   * or undefined for a `stored` session, whose relations load as their
+   * Parquet holds them.
+   */
+  columnReplacements: LoadedColumnReplacements | undefined;
   relations: readonly AcquiredRelationBytes[];
   relationsToStore: readonly AcquiredRelationBytes[];
   datasetDuckDbLease: DatasetDuckDbLease;
@@ -88,14 +87,15 @@ const _relationLogger: ILogger = Logger.appendName("QetlRelations");
  * now that a query can load a subset, the replacements have to be narrowed to
  * that subset too.
  */
-function _isColumnInLoadedRelation(
+function _isReplacementInLoadedRelation(
   loadedColumns: readonly string[] | "all",
-  column: Readonly<DatasetColumn.T>,
+  replacement: Readonly<ColumnReplacement>,
 ): boolean {
   return (
     loadedColumns === "all" ||
-    loadedColumns.includes(column.originalName) ||
-    loadedColumns.includes(column.name)
+    loadedColumns.includes(replacement.originalName) ||
+    (replacement.alias !== undefined &&
+      loadedColumns.includes(replacement.alias))
   );
 }
 
@@ -380,7 +380,8 @@ async function _writeStoredRelationBytes(
 
 /**
  * Writes newly acquired relations to the storage tier and loads every relation
- * into the queryable tier.
+ * into the queryable tier, each with its own replacements, narrowed to the
+ * columns it holds, and records the projection key its view was built with.
  *
  * `relationsToStore` is passed separately rather than derived, because the
  * caller already knows which relations came out of the cache and which were
@@ -390,40 +391,28 @@ async function _writeStoredRelationBytes(
  * queryable tier is about to receive them, so a full disk costs the next
  * query a re-fetch rather than costing this one its result.
  *
- * With no relations to load, the dataset column catalog is not read at all.
- * A query that names no dataset, or whose datasets are all already in the
- * queryable tier, needs no column replacements, and the catalog is gated by
- * RLS, so reading it would fail for a caller who may read no dataset's
- * columns, such as an anonymous visitor to a public dashboard. A `stored`
- * session never reads it either: its relations load with no replacements.
+ * Nothing here reads the dataset catalog. The runner reads it once per query,
+ * and never in a `stored` session, whose visitor may hold no grant on
+ * `dataset_columns`.
  */
 async function _loadRelationBytes(
   options: Readonly<LoadRelationBytesOptions>,
 ): Promise<void> {
   await _writeStoredRelationBytes(options);
-  if (options.relations.length === 0) {
-    return;
-  }
-  const columns =
-    options.datasetColumnSource === "stored"
-      ? []
-      : await DatasetColumnClient.withCache(AvaQueryClient)
-          .withEnsureQueryData()
-          .getAll(
-            where("dataset_id", "in", options.relations.map(prop("datasetId"))),
-          );
-  const columnsByDatasetId = makeBucketRecord(columns, { key: "datasetId" });
   await promiseMap(options.relations, async (relation) => {
+    const replacements =
+      options.columnReplacements?.replacementsByDatasetId[relation.datasetId] ??
+      [];
     await DuckDbClient.loadParquet({
       tableName: relation.datasetId,
       blob: relation.parquetBlob,
       datasetDuckDbLease: options.datasetDuckDbLease,
+      // Narrowed here, after the replacements were built from every column
+      // of the dataset, so a conversion still knows its keep-original copy.
       columnReplacements: makeIdLookupRecord(
-        getColumnReplacementsFromColumns(
-          (columnsByDatasetId[relation.datasetId] ?? []).filter((column) => {
-            return _isColumnInLoadedRelation(relation.columns, column);
-          }),
-        ),
+        replacements.filter((replacement) => {
+          return _isReplacementInLoadedRelation(relation.columns, replacement);
+        }),
         { key: "originalName" },
       ),
     });
@@ -431,6 +420,10 @@ async function _loadRelationBytes(
       datasetId: relation.datasetId,
       columns: relation.columns,
       staleAt: relation.staleAt,
+      projectionKey:
+        options.columnReplacements?.projectionKeyByDatasetId[
+          relation.datasetId
+        ],
     });
   });
 }

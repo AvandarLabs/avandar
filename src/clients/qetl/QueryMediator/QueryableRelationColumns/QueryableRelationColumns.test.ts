@@ -58,4 +58,48 @@ describe("QueryableRelationColumns", () => {
       }),
     ).toBe(false);
   });
+
+  it("reports the projection a view was built with as current only for that key", () => {
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+      projectionKey: "key-1",
+    });
+
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-1",
+      }),
+    ).toBe(true);
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-2",
+      }),
+    ).toBe(false);
+  });
+
+  it("never judges a view recorded without a key, or not recorded, out of date", () => {
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+    });
+
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-1",
+      }),
+    ).toBe(true);
+    QueryableRelationColumns.clear();
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-1",
+      }),
+    ).toBe(true);
+  });
 });

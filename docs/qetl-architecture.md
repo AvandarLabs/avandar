@@ -254,7 +254,13 @@ reaches a wrapper._
 
 **Queryable tier.** Presence in `information_schema.tables` plus the sidecar.
 It has no principal; it is protected by authorization (step 1), the lease check
-(step 13), and ownership (section 7). A tab reload empties it.
+(step 13), and ownership (section 7). A tab reload empties it. The sidecar also
+records the projection key each view was built with (`getProjectionKey` over
+the dataset's renames, casts, and dictionary conversions, read by
+`loadColumnReplacements`). A workspace query whose key differs treats the
+table as a miss, so the storage tier serves the same bytes and the view is
+rebuilt: a relabeled code list reaches the next query without a cache clear.
+A `stored` session passes no keys and never reads the catalog.
 
 **Max age for live sources.** A wrapper whose rows can change without a
 re-import (Google Sheets, Postgres tables) returns `maxAgeMs` from `acquire`

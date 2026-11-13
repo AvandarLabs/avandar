@@ -127,6 +127,11 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
     },
   };
 });
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", async () => {
+  return (
+    await import("@/lib/dataDictionaries/loadColumnReplacements/__tests__/noDictionaryBindingsClient")
+  ).NO_DICTIONARY_BINDINGS_CLIENT_MODULE;
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
