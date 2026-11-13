@@ -10,7 +10,7 @@ type Props = {
   dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
-/** What the matches add up to, and Next to the Attach step. */
+/** What the matches add up to, and Next to the Unmatched values step. */
 export function MatchColumnsFooter({
   summary,
   dispatch,
@@ -25,10 +25,10 @@ export function MatchColumnsFooter({
     >
       <Button
         onClick={() => {
-          dispatch({ type: "go_to_step", step: "attach" });
+          dispatch({ type: "go_to_step", step: "unmatched" });
         }}
       >
-        <Trans>Next: attach</Trans>
+        <Trans>Next: unmatched values</Trans>
       </Button>
     </NewDictionaryFooter>
   );

@@ -2,15 +2,21 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
 import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import { PickedEntryDetails } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails";
-import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type {
+  ApplyDictionariesAction,
+  ColumnPick,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
+import type { ConversionCopy } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy";
 import type { ApplyColumnRow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode } from "react";
 
 type Props = {
   row: ApplyColumnRow;
   pick: ColumnPick | undefined;
   lookups: ApplyLookups;
+  copy: ConversionCopy;
+  dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
 function OtherMatchesNote(props: Readonly<Props>): ReactNode {
@@ -65,6 +71,8 @@ export function ColumnPane(props: Readonly<Props>): ReactNode {
           row={props.row}
           pick={props.pick}
           lookups={props.lookups}
+          copy={props.copy}
+          dispatch={props.dispatch}
         />
       ) : (
         <Text size="sm" c="dimmed">

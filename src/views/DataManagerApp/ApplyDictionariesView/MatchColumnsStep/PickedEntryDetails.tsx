@@ -1,16 +1,24 @@
-import { Trans } from "@lingui/react/macro";
-import { Stack, Text } from "@mantine/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { Checkbox, Stack, Text } from "@mantine/core";
 import { ColumnValuesTable } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable";
+import { DirectionSwitch } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DirectionSwitch";
+import { ModeSwitch } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
-import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type {
+  ApplyDictionariesAction,
+  ColumnPick,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
+import type { ConversionCopy } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy";
 import type { ApplyColumnRow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode } from "react";
 
 type Props = {
   row: ApplyColumnRow;
   pick: ColumnPick;
   lookups: ApplyLookups;
+  copy: ConversionCopy;
+  dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
 function AppliedFrom(
@@ -40,32 +48,17 @@ function AppliedFrom(
   );
 }
 
-function ReferenceExplanation({
+function DirectionNote({
   direction,
 }: Readonly<Pick<ColumnPick, "direction">>): ReactNode {
   return (
-    <Stack gap={4}>
-      <Text size="xs" fw={600} c="dimmed">
-        <Trans>How to apply the dictionary</Trans>
-      </Text>
-      <Text size="sm" fw={500}>
-        <Trans>Attached as reference</Trans>
-      </Text>
-      <Text size="xs" c="dimmed">
-        <Trans>
-          Your data stays the same, which is what you want for models and
-          exports that need the original values. Hover the column to see the
-          labels.
-        </Trans>
-      </Text>
-      <Text size="xs" c="dimmed">
-        {direction === "decode" ? (
-          <Trans>Chosen from the data: these values are codes.</Trans>
-        ) : (
-          <Trans>Chosen from the data: these values are labels.</Trans>
-        )}
-      </Text>
-    </Stack>
+    <Text size="xs" c="dimmed">
+      {direction === "decode" ? (
+        <Trans>Chosen from the data: these values are codes.</Trans>
+      ) : (
+        <Trans>Chosen from the data: these values are labels.</Trans>
+      )}
+    </Text>
   );
 }
 
@@ -87,22 +80,71 @@ function DescriptionOnly({
   );
 }
 
-function CodedDetails(
+function KeepOriginalCheckbox(
   props: Readonly<{
-    row: ApplyColumnRow;
-    pick: ColumnPick;
-    codeList: DataDictionaryCodeList.T;
+    columnName: string;
+    isChecked: boolean;
+    onChange: (isChecked: boolean) => void;
   }>,
 ): ReactNode {
-  const values = props.row.profile?.values;
+  const { t } = useLingui();
+  const originalName = `${props.columnName}_original`;
+  return (
+    <Checkbox
+      size="xs"
+      label={t`Also keep the original values in a new column, ${originalName}`}
+      checked={props.isChecked}
+      onChange={(event) => {
+        props.onChange(event.currentTarget.checked);
+      }}
+    />
+  );
+}
+
+function CodedDetails(
+  props: Readonly<
+    Omit<Props, "lookups"> & { codeList: DataDictionaryCodeList.T }
+  >,
+): ReactNode {
+  const { row, pick, dispatch } = props;
+  const columnId = row.column.id;
+  const isConverting = pick.mode === "convert";
+  const values = row.profile?.values;
   return (
     <>
-      <ReferenceExplanation direction={props.pick.direction} />
+      <ModeSwitch
+        mode={pick.mode}
+        copy={props.copy}
+        onChange={(mode) => {
+          dispatch({ type: "set_mode", columnId, mode });
+        }}
+      />
+      {isConverting ? (
+        <DirectionSwitch
+          direction={pick.direction}
+          isFromData={pick.isDirectionFromData}
+          onChange={(direction) => {
+            dispatch({ type: "set_direction", columnId, direction });
+          }}
+        />
+      ) : (
+        <DirectionNote direction={pick.direction} />
+      )}
       {values ? (
         <ColumnValuesTable
           values={values}
           pairs={props.codeList.pairs}
-          direction={props.pick.direction}
+          direction={pick.direction}
+          mode={pick.mode}
+        />
+      ) : null}
+      {isConverting ? (
+        <KeepOriginalCheckbox
+          columnName={row.column.name}
+          isChecked={pick.keepsOriginal}
+          onChange={(keepsOriginal) => {
+            dispatch({ type: "set_keeps_original", columnId, keepsOriginal });
+          }}
         />
       ) : null}
     </>
@@ -111,13 +153,11 @@ function CodedDetails(
 
 /**
  * What applying the picked entry does to a column: where it comes from,
- * that the data stays the same, and what each value in the column means.
+ * whether its values convert or stay as they are, and what each value in
+ * the column means or becomes.
  */
-export function PickedEntryDetails({
-  row,
-  pick,
-  lookups,
-}: Readonly<Props>): ReactNode {
+export function PickedEntryDetails(props: Readonly<Props>): ReactNode {
+  const { pick, lookups } = props;
   const entry = lookups.entries.get(pick.entryId);
   const codeList = pick.codeListId
     ? lookups.codeLists.get(pick.codeListId)
@@ -130,7 +170,7 @@ export function PickedEntryDetails({
         codeListName={codeList?.name}
       />
       {codeList ? (
-        <CodedDetails row={row} pick={pick} codeList={codeList} />
+        <CodedDetails {...props} codeList={codeList} />
       ) : (
         <DescriptionOnly description={entry?.description} />
       )}

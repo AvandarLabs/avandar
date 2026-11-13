@@ -5,13 +5,16 @@ import { isSamePick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDi
 import { ColumnNameCell } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnNameCell";
 import css from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsStep.module.css";
 import { MatchPickButton } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchPickButton";
+import { ModeChip } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeChip";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
   ApplyDictionariesAction,
   ApplyDictionariesState,
   ColumnPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { ConversionCopy } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy";
 import type { ApplyColumnRow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 import type { Dispatch, ReactNode } from "react";
 
@@ -20,6 +23,7 @@ type Props = {
   /** The dictionaries in use, one table column each. */
   dictionaries: ReadonlyArray<Pick<DataDictionary.T, "id" | "name">>;
   state: ApplyDictionariesState;
+  copy: ConversionCopy;
   dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
@@ -75,6 +79,36 @@ function PairingCell(props: Readonly<CellProps>): ReactNode {
   );
 }
 
+/** A row's Values cell: the mode chip, for a pick with a code list. */
+export function ValuesCell(
+  props: Readonly<{
+    columnId: DatasetColumn.Id;
+    nameId: string;
+    pick: ColumnPick | undefined;
+    copy: ConversionCopy;
+    dispatch: Dispatch<ApplyDictionariesAction>;
+  }>,
+): ReactNode {
+  const { columnId, pick } = props;
+  if (!pick?.codeListId) {
+    return null;
+  }
+  return (
+    <ModeChip
+      mode={pick.mode}
+      nameId={props.nameId}
+      copy={props.copy}
+      onToggle={() => {
+        props.dispatch({
+          type: "set_mode",
+          columnId,
+          mode: pick.mode === "convert" ? "reference" : "convert",
+        });
+      }}
+    />
+  );
+}
+
 function PairingRow(
   props: Readonly<Omit<Props, "rows"> & { row: ApplyColumnRow }>,
 ): ReactNode {
@@ -109,6 +143,15 @@ function PairingRow(
           </Table.Td>
         );
       })}
+      <Table.Td>
+        <ValuesCell
+          columnId={columnId}
+          nameId={nameId}
+          pick={state.picks[columnId]}
+          copy={props.copy}
+          dispatch={dispatch}
+        />
+      </Table.Td>
     </Table.Tr>
   );
 }
@@ -129,6 +172,9 @@ export function PairingTable(props: Readonly<Props>): ReactNode {
           {props.dictionaries.map((dictionary) => {
             return <Table.Th key={dictionary.id}>{dictionary.name}</Table.Th>;
           })}
+          <Table.Th w="8.5rem">
+            <Trans>Values</Trans>
+          </Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
