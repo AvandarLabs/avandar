@@ -1,9 +1,24 @@
 import { MantineThemeProvider } from "@mantine/core";
 import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { buildVideoCssVariables } from "../buildVideoCssVariables/buildVideoCssVariables";
-import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
+import { resolveVideoThemeFromSource } from "../resolveVideoThemeFromSource/resolveVideoThemeFromSource";
 import { VideoThemeContext } from "../useVideoTheme/useVideoTheme";
-import type { VideoThemeSource } from "../videoTheme.types";
+import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
+
+const CSS_STYLES = new WeakMap<ResolvedVideoTheme, CSSProperties>();
+
+function _styleFromTheme(theme: ResolvedVideoTheme): CSSProperties {
+  const cached = CSS_STYLES.get(theme);
+  if (cached) {
+    return cached;
+  }
+  const style = {
+    display: "contents",
+    ...buildVideoCssVariables(theme),
+  } as CSSProperties;
+  CSS_STYLES.set(theme, style);
+  return style;
+}
 
 type Props = Readonly<{
   source: VideoThemeSource;
@@ -25,19 +40,9 @@ export function VideoThemeProvider({
   children,
   element = "div",
 }: Props) {
-  const theme = useMemo(
-    () => resolveVideoTheme(source.library, source.themeId, source.scope),
-    [source],
-  );
+  const theme = useMemo(() => resolveVideoThemeFromSource(source), [source]);
   const value = useMemo(() => ({ theme, source }), [theme, source]);
-  const style = useMemo(
-    () =>
-      ({
-        display: "contents",
-        ...buildVideoCssVariables(theme),
-      }) as CSSProperties,
-    [theme],
-  );
+  const style = _styleFromTheme(theme);
   const content = (
     <MantineThemeProvider theme={theme.mantine} inherit={false}>
       <VideoThemeContext.Provider value={value}>
