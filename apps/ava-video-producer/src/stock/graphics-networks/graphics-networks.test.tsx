@@ -54,3 +54,13 @@ test("radial-network draws its hub glow at the themed opacity", () => {
     /fill-opacity="0.21"/,
   );
 });
+
+test("plexus-field draws links at the themed width", () => {
+  assert.match(
+    renderPresetWithPatch(
+      { preset: "plexus-field" },
+      _componentPatch("PlexusField", { linkWidth: 2.25 }),
+    ),
+    /stroke-width="2.25"/,
+  );
+});

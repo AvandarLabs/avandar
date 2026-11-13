@@ -48,6 +48,12 @@ const APPROVED_MARKUP_MOVES: Partial<
   "node-traversal": [
     { from: '<text x="480" y="545"', to: '<text x="480" y="551"' },
   ],
+  "plexus-field": [
+    {
+      from: '<line x1="64" y1="529" x2="896" y2="529" stroke="#2a404e">',
+      to: '<line x1="64" y1="529" x2="896" y2="529" stroke="#2a404e" stroke-width="1">',
+    },
+  ],
   "radial-network": [
     {
       from: '<ellipse cx="480" cy="295" rx="278" ry="181" fill="none" stroke="#2a404e" stroke-dasharray',

@@ -374,6 +374,18 @@ const NETWORK_GRAPH_TOKENS = {
   ),
 } as const;
 
+const PLEXUS_FIELD_TOKENS = {
+  linkDistance: _length(
+    "Link distance",
+    "Particles closer than this are joined by a line.",
+  ),
+  linkAlpha: _alpha(
+    "Link opacity",
+    "Opacity of a link between touching particles; it fades out with distance.",
+  ),
+  linkWidth: _stroke("Link width", "Width of a link between particles."),
+} as const;
+
 const RADIAL_NETWORK_TOKENS = {
   spokeAlpha: _alpha(
     "Spoke opacity",
@@ -421,6 +433,7 @@ export const COMPONENT_TOKENS = {
   ...SHARED_GRAPHIC_TOKENS,
   NetworkGraph: NETWORK_GRAPH_TOKENS,
   RadialNetwork: RADIAL_NETWORK_TOKENS,
+  PlexusField: PLEXUS_FIELD_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",
