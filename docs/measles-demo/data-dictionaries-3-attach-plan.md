@@ -1061,7 +1061,7 @@ set
 declare
   v_workspace_id uuid;
   v_bindings jsonb := coalesce(p_bindings, '[]'::jsonb);
-  v_count integer;
+  v_num_bindings integer;
 begin
   -- Read without a lock: the caller has not been authorized yet.
   select ds.workspace_id
@@ -1092,15 +1092,15 @@ begin
   -- Two applies to one dataset run one at a time.
   perform 1 from public.datasets where id = p_dataset_id for update;
 
-  perform public.dataset_columns__check_bindings (p_dataset_id, v_workspace_id, v_bindings);
-  perform public.dataset_columns__write_bindings (p_dataset_id, v_workspace_id, v_bindings);
+  perform public.dataset_columns__dictionary_bindings__check (p_dataset_id, v_workspace_id, v_bindings);
+  perform public.dataset_columns__dictionary_bindings__write (p_dataset_id, v_workspace_id, v_bindings);
 
   select count(*)::integer
-  into v_count
+  into v_num_bindings
   from public.dataset_columns__dictionary_bindings b
   where b.dataset_id = p_dataset_id;
 
-  return v_count;
+  return v_num_bindings;
 end;
 $$;
 
@@ -1111,7 +1111,7 @@ $$;
  * dictionary or the dataset's workspace, or a code list the entry does not
  * use. Called only by `rpc_dataset_columns__apply_dictionaries`.
  */
-create or replace function public.dataset_columns__check_bindings (
+create or replace function public.dataset_columns__dictionary_bindings__check (
   p_dataset_id uuid,
   p_workspace_id uuid,
   p_bindings jsonb
@@ -1166,16 +1166,16 @@ begin
       using errcode = '23514', hint = 'column_not_in_dataset';
   end if;
 
-  perform public.dataset_columns__check_binding_entries (p_workspace_id, p_bindings);
+  perform public.dataset_columns__dictionary_bindings__check_entries (p_workspace_id, p_bindings);
 end;
 $$;
 
 /**
  * Raises with a stable hint when a binding's entry is not in its dictionary
  * and the dataset's workspace, or its code list is not one the entry uses.
- * Called only by `dataset_columns__check_bindings`.
+ * Called only by `dataset_columns__dictionary_bindings__check`.
  */
-create or replace function public.dataset_columns__check_binding_entries (
+create or replace function public.dataset_columns__dictionary_bindings__check_entries (
   p_workspace_id uuid,
   p_bindings jsonb
 ) returns void language plpgsql
@@ -1217,7 +1217,7 @@ $$;
  * rest, recording each dictionary's current version. Called only by
  * `rpc_dataset_columns__apply_dictionaries` after its checks pass.
  */
-create or replace function public.dataset_columns__write_bindings (
+create or replace function public.dataset_columns__dictionary_bindings__write (
   p_dataset_id uuid,
   p_workspace_id uuid,
   p_bindings jsonb
@@ -1273,7 +1273,7 @@ execute on function public.rpc_dataset_columns__apply_dictionaries (uuid, jsonb)
 -- The helpers run inside the SECURITY DEFINER apply and are never called
 -- directly, so no Data API role gets EXECUTE.
 revoke
-execute on function public.dataset_columns__check_bindings (uuid, uuid, jsonb)
+execute on function public.dataset_columns__dictionary_bindings__check (uuid, uuid, jsonb)
 from
   public,
   anon,
@@ -1281,7 +1281,7 @@ from
   service_role;
 
 revoke
-execute on function public.dataset_columns__check_binding_entries (uuid, jsonb)
+execute on function public.dataset_columns__dictionary_bindings__check_entries (uuid, jsonb)
 from
   public,
   anon,
@@ -1289,7 +1289,7 @@ from
   service_role;
 
 revoke
-execute on function public.dataset_columns__write_bindings (uuid, uuid, jsonb)
+execute on function public.dataset_columns__dictionary_bindings__write (uuid, uuid, jsonb)
 from
   public,
   anon,

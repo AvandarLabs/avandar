@@ -114,7 +114,7 @@ begin
 end;
 $$;
 
-select plan (14);
+select plan (16);
 
 -- 1.
 select is (
@@ -201,6 +201,14 @@ select throws_ok (
   'a binding cannot move to another workspace'
 );
 
+-- A convert binding, which no apply can write yet, on a fourth column. A
+-- deleted entry or dictionary must leave it in place.
+insert into public.dataset_columns (id, dataset_id, workspace_id, original_name, name, original_data_type, detected_data_type, data_type, column_idx)
+values ('db460004-0000-4000-8000-000000000004'::uuid, 'db450001-0000-4000-8000-000000000001'::uuid, 'db100001-0000-4000-8000-000000000001'::uuid, 'hosp_code', 'hosp_code', 'VARCHAR', 'VARCHAR', 'varchar', 2);
+
+insert into public.dataset_columns__dictionary_bindings (id, workspace_id, dataset_id, dataset_column_id, dictionary_id, entry_id, code_list_id, mode, applied_dictionary_version)
+values ('db470004-0000-4000-8000-000000000004'::uuid, 'db100001-0000-4000-8000-000000000001'::uuid, 'db450001-0000-4000-8000-000000000001'::uuid, 'db460004-0000-4000-8000-000000000004'::uuid, 'db400001-0000-4000-8000-000000000001'::uuid, 'db600002-0000-4000-8000-000000000002'::uuid, null, 'convert', 1);
+
 -- 9. A save that gives hospitalized a new code list deletes Yes/No.
 select lives_ok (
   $t9$
@@ -244,27 +252,53 @@ reset role;
 
 -- 12.
 select results_eq (
-  'select id from public.dataset_columns__dictionary_bindings order by id',
+  'select id from public.dataset_columns__dictionary_bindings where mode = ''reference'' and workspace_id = ''db100001-0000-4000-8000-000000000001''::uuid order by id',
   $$ values ('db470001-0000-4000-8000-000000000001'::uuid), ('db470002-0000-4000-8000-000000000002'::uuid) $$,
   'a deleted entry takes its reference bindings with it'
 );
 
--- 13. The owner may delete the dictionary without editing either dataset.
+-- 13.
+select results_eq (
+  $q$
+    select dictionary_id, entry_id
+    from public.dataset_columns__dictionary_bindings
+    where id = 'db470004-0000-4000-8000-000000000004'::uuid
+  $q$,
+  $q$ values ('db400001-0000-4000-8000-000000000001'::uuid, null::uuid) $q$,
+  'a deleted entry leaves a convert binding in place'
+);
+
+-- 14. The owner may delete the dictionary without editing either dataset.
 select lives_ok (
-  $t13$
+  $t14$
   set local role authenticated;
   select set_config('request.jwt.claims', '{"sub":"db000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
   delete from public.data_dictionaries where id = 'db400001-0000-4000-8000-000000000001'::uuid;
-  $t13$,
+  $t14$,
   'the owner deletes the dictionary'
 );
 reset role;
 
--- 14.
+-- 15.
 select is (
-  (select count(*)::int from public.dataset_columns__dictionary_bindings),
+  (
+    select count(*)::int
+    from public.dataset_columns__dictionary_bindings
+    where mode = 'reference' and workspace_id = 'db100001-0000-4000-8000-000000000001'::uuid
+  ),
   0,
   'a deleted dictionary takes its reference bindings with it'
+);
+
+-- 16.
+select results_eq (
+  $q$
+    select dictionary_id, entry_id
+    from public.dataset_columns__dictionary_bindings
+    where id = 'db470004-0000-4000-8000-000000000004'::uuid
+  $q$,
+  $q$ values (null::uuid, null::uuid) $q$,
+  'a deleted dictionary leaves a convert binding in place'
 );
 
 select * from finish ();

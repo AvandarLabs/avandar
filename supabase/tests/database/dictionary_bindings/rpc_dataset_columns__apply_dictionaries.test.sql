@@ -150,7 +150,8 @@ values (
   true
 );
 
-select plan (20);
+
+select plan (25);
 
 -- Refusals. None of them changes anything.
 
@@ -275,14 +276,50 @@ reset role;
 
 -- 12.
 select is (
-  (select count(*)::int from public.dataset_columns__dictionary_bindings),
+  pg_temp.apply_as (
+    'dc000001-0000-4000-8000-000000000001'::uuid,
+    'dc450001-0000-4000-8000-000000000001'::uuid,
+    '{}'::jsonb
+  ),
+  'binding_payload_invalid',
+  'an object instead of an array is refused'
+);
+reset role;
+
+-- 13.
+select is (
+  pg_temp.apply_as (
+    'dc000001-0000-4000-8000-000000000001'::uuid,
+    'dc450001-0000-4000-8000-000000000001'::uuid,
+    '[1]'::jsonb
+  ),
+  'binding_payload_invalid',
+  'an element that is not an object is refused'
+);
+reset role;
+
+-- 14.
+select is (
+  pg_temp.apply_as (
+    'dc000001-0000-4000-8000-000000000001'::uuid,
+    'dc450001-0000-4000-8000-000000000001'::uuid,
+    jsonb_build_array(pg_temp.sex_binding ('dc460001-0000-4000-8000-000000000001'::uuid) || '{"entry_id":"not-a-uuid"}'::jsonb)
+  ),
+  'binding_payload_invalid',
+  'a malformed id is refused'
+);
+reset role;
+
+-- 15.
+select is (
+  (select count(*)::int from public.dataset_columns__dictionary_bindings where workspace_id = 'dc100001-0000-4000-8000-000000000001'::uuid),
   0,
   'no refusal wrote a binding'
 );
 
 -- Applies.
 
--- 13.
+-- 16.
 select is (
   pg_temp.apply_as (
     'dc000001-0000-4000-8000-000000000001'::uuid,
@@ -297,11 +334,12 @@ select is (
 );
 reset role;
 
--- 14.
+-- 17.
 select results_eq (
   $q$
     select dataset_column_id, mode::text, applied_dictionary_version
     from public.dataset_columns__dictionary_bindings
+    where workspace_id = 'dc100001-0000-4000-8000-000000000001'::uuid
     order by dataset_column_id
   $q$,
   $q$
@@ -312,7 +350,7 @@ select results_eq (
   'both bindings are stored as reference with the dictionary''s version'
 );
 
--- 15.
+-- 18.
 select is (
   pg_temp.apply_as (
     'dc000001-0000-4000-8000-000000000001'::uuid,
@@ -327,15 +365,15 @@ select is (
 );
 reset role;
 
--- 16. A statement sees the data as it was when it began, so each check
+-- 19. A statement sees the data as it was when it began, so each check
 -- below reads the bindings in a statement of its own.
 select is (
-  (select count(*)::int from public.dataset_columns__dictionary_bindings),
+  (select count(*)::int from public.dataset_columns__dictionary_bindings where workspace_id = 'dc100001-0000-4000-8000-000000000001'::uuid),
   2,
   'a refused apply leaves the earlier bindings as they were'
 );
 
--- 17.
+-- 20.
 select is (
   pg_temp.apply_as (
     'dc000001-0000-4000-8000-000000000001'::uuid,
@@ -347,14 +385,46 @@ select is (
 );
 reset role;
 
--- 18.
+-- 21.
 select results_eq (
-  'select dataset_column_id from public.dataset_columns__dictionary_bindings',
+  'select dataset_column_id from public.dataset_columns__dictionary_bindings where workspace_id = ''dc100001-0000-4000-8000-000000000001''::uuid',
   $$values ('dc460001-0000-4000-8000-000000000001'::uuid)$$,
   'the smaller set replaces the dataset''s bindings'
 );
 
--- 19.
+-- Remembers the GENDER binding's row, to check that a re-apply updates it.
+create temp table gender_binding as
+select id
+from public.dataset_columns__dictionary_bindings
+where dataset_column_id = 'dc460001-0000-4000-8000-000000000001'::uuid;
+
+-- 22.
+select is (
+  pg_temp.apply_as (
+    'dc000001-0000-4000-8000-000000000001'::uuid,
+    'dc450001-0000-4000-8000-000000000001'::uuid,
+    jsonb_build_array(pg_temp.sex_binding ('dc460001-0000-4000-8000-000000000001'::uuid) || '{"entry_id":"dc600002-0000-4000-8000-000000000002","code_list_id":null}'::jsonb)
+  ),
+  'no error',
+  'an editor binds the column to a different entry'
+);
+reset role;
+
+-- 23.
+select results_eq (
+  $q$
+    select id, entry_id
+    from public.dataset_columns__dictionary_bindings
+    where dataset_column_id = 'dc460001-0000-4000-8000-000000000001'::uuid
+  $q$,
+  $q$
+    select id, 'dc600002-0000-4000-8000-000000000002'::uuid
+    from pg_temp.gender_binding
+  $q$,
+  'a re-apply updates the column''s binding in place with the new entry'
+);
+
+-- 24.
 select is (
   pg_temp.apply_as (
     'dc000001-0000-4000-8000-000000000001'::uuid,
@@ -366,9 +436,9 @@ select is (
 );
 reset role;
 
--- 20.
+-- 25.
 select is (
-  (select count(*)::int from public.dataset_columns__dictionary_bindings),
+  (select count(*)::int from public.dataset_columns__dictionary_bindings where workspace_id = 'dc100001-0000-4000-8000-000000000001'::uuid),
   0,
   'an empty set removes every binding'
 );

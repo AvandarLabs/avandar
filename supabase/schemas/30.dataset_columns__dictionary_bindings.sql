@@ -112,7 +112,8 @@ from
 /**
  * Removes the reference bindings of an entry that is being deleted, for
  * example by a dictionary save that leaves it out. SECURITY DEFINER for the
- * same reason as `..._remove_for_dictionary`.
+ * same reason as
+ * `dataset_columns__dictionary_bindings__remove_for_dictionary`.
  */
 create or replace function public.dataset_columns__dictionary_bindings__remove_for_entry () returns trigger language plpgsql security definer
 set

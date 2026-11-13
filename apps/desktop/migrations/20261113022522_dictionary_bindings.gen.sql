@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261113021422_dictionary_bindings.sql by
+-- Generated from supabase/migrations/20261113022522_dictionary_bindings.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 7

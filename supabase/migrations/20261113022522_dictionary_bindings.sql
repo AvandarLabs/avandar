@@ -58,64 +58,49 @@ alter table "public"."dataset_columns__dictionary_bindings" validate constraint 
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.dataset_columns__check_binding_entries(p_workspace_id uuid, p_bindings jsonb)
+CREATE OR REPLACE FUNCTION public.dataset_columns__dictionary_bindings__check(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb)
  RETURNS void
  LANGUAGE plpgsql
  SET search_path TO ''
 AS $function$
+declare
+  v_uuid_pattern constant text :=
+    '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
 begin
-  if exists (
-    select 1
-    from jsonb_to_recordset(p_bindings) as b (dictionary_id uuid, entry_id uuid)
-    left join public.data_dictionaries__entries en on
-      en.id = b.entry_id and
-      en.dictionary_id = b.dictionary_id and
-      en.workspace_id = p_workspace_id
-    where en.id is null
-  ) then
-    raise exception 'Every entry must belong to its dictionary in this workspace'
-      using errcode = '23514', hint = 'entry_not_in_dictionary';
+  -- Each shape check runs on its own, before anything casts the payload, so
+  -- a malformed payload raises this hint rather than a cast error.
+  if jsonb_typeof(p_bindings) is distinct from 'array' then
+    raise exception 'Bindings must be an array'
+      using errcode = '22023', hint = 'binding_payload_invalid';
   end if;
 
   if exists (
     select 1
-    from jsonb_to_recordset(p_bindings) as b (entry_id uuid, code_list_id uuid)
+    from jsonb_array_elements(p_bindings) as e (binding)
+    where jsonb_typeof(e.binding) <> 'object'
+  ) then
+    raise exception 'Every binding must be an object'
+      using errcode = '22023', hint = 'binding_payload_invalid';
+  end if;
+
+  -- Reads every field as text, so a missing id, a malformed id, or an
+  -- unknown mode or direction is caught without a cast.
+  if exists (
+    select 1
+    from jsonb_array_elements(p_bindings) as e (binding)
     where
-      b.code_list_id is not null and
-      not exists (
-        select 1
-        from public.data_dictionaries__entry_codings ec
-        where ec.entry_id = b.entry_id and ec.code_list_id = b.code_list_id
+      coalesce(e.binding ->> 'dataset_column_id', '') !~* v_uuid_pattern or
+      coalesce(e.binding ->> 'dictionary_id', '') !~* v_uuid_pattern or
+      coalesce(e.binding ->> 'entry_id', '') !~* v_uuid_pattern or
+      (e.binding ->> 'code_list_id') !~* v_uuid_pattern or
+      coalesce(e.binding ->> 'mode', '') <> all (
+        enum_range(null::public.dataset_columns__binding_mode)::text[]
+      ) or
+      coalesce(e.binding ->> 'direction', '') <> all (
+        enum_range(null::public.dataset_columns__binding_direction)::text[]
       )
   ) then
-    raise exception 'A binding''s code list must be one its entry uses'
-      using errcode = '23514', hint = 'code_list_not_in_entry';
-  end if;
-end;
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.dataset_columns__check_bindings(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb)
- RETURNS void
- LANGUAGE plpgsql
- SET search_path TO ''
-AS $function$
-begin
-  if jsonb_typeof(p_bindings) is distinct from 'array' or exists (
-    select 1
-    from jsonb_to_recordset(p_bindings) as b (
-      dataset_column_id uuid, dictionary_id uuid, entry_id uuid, mode text, direction text
-    )
-    where
-      b.dataset_column_id is null or
-      b.dictionary_id is null or
-      b.entry_id is null or
-      b.mode is null or
-      b.mode not in (select unnest(enum_range(null::public.dataset_columns__binding_mode))::text) or
-      b.direction is null or
-      b.direction not in (select unnest(enum_range(null::public.dataset_columns__binding_direction))::text)
-  ) then
-    raise exception 'Bindings must be an array of complete bindings'
+    raise exception 'Every binding must name a column, dictionary, entry, mode, and direction'
       using errcode = '22023', hint = 'binding_payload_invalid';
   end if;
 
@@ -148,7 +133,44 @@ begin
       using errcode = '23514', hint = 'column_not_in_dataset';
   end if;
 
-  perform public.dataset_columns__check_binding_entries (p_workspace_id, p_bindings);
+  perform public.dataset_columns__dictionary_bindings__check_entries (p_workspace_id, p_bindings);
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.dataset_columns__dictionary_bindings__check_entries(p_workspace_id uuid, p_bindings jsonb)
+ RETURNS void
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+begin
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_bindings) as b (dictionary_id uuid, entry_id uuid)
+    left join public.data_dictionaries__entries en on
+      en.id = b.entry_id and
+      en.dictionary_id = b.dictionary_id and
+      en.workspace_id = p_workspace_id
+    where en.id is null
+  ) then
+    raise exception 'Every entry must belong to its dictionary in this workspace'
+      using errcode = '23514', hint = 'entry_not_in_dictionary';
+  end if;
+
+  if exists (
+    select 1
+    from jsonb_to_recordset(p_bindings) as b (entry_id uuid, code_list_id uuid)
+    where
+      b.code_list_id is not null and
+      not exists (
+        select 1
+        from public.data_dictionaries__entry_codings ec
+        where ec.entry_id = b.entry_id and ec.code_list_id = b.code_list_id
+      )
+  ) then
+    raise exception 'A binding''s code list must be one its entry uses'
+      using errcode = '23514', hint = 'code_list_not_in_entry';
+  end if;
 end;
 $function$
 ;
@@ -199,7 +221,7 @@ end;
 $function$
 ;
 
-CREATE OR REPLACE FUNCTION public.dataset_columns__write_bindings(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb)
+CREATE OR REPLACE FUNCTION public.dataset_columns__dictionary_bindings__write(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb)
  RETURNS void
  LANGUAGE plpgsql
  SET search_path TO ''
@@ -248,7 +270,7 @@ AS $function$
 declare
   v_workspace_id uuid;
   v_bindings jsonb := coalesce(p_bindings, '[]'::jsonb);
-  v_count integer;
+  v_num_bindings integer;
 begin
   -- Read without a lock: the caller has not been authorized yet.
   select ds.workspace_id
@@ -276,18 +298,25 @@ begin
       using errcode = '42501', hint = 'dictionary_viewer_required';
   end if;
 
-  -- Two applies to one dataset run one at a time.
-  perform 1 from public.datasets where id = p_dataset_id for update;
+  -- Two applies to one dataset run one at a time. The lock does not block
+  -- inserts that reference the dataset. A dataset deleted since the read
+  -- above raises the same error as a missing one.
+  perform 1 from public.datasets where id = p_dataset_id for no key update;
 
-  perform public.dataset_columns__check_bindings (p_dataset_id, v_workspace_id, v_bindings);
-  perform public.dataset_columns__write_bindings (p_dataset_id, v_workspace_id, v_bindings);
+  if not found then
+    raise exception 'Only an editor of this dataset can apply dictionaries to it'
+      using errcode = '42501', hint = 'dataset_editor_required';
+  end if;
+
+  perform public.dataset_columns__dictionary_bindings__check (p_dataset_id, v_workspace_id, v_bindings);
+  perform public.dataset_columns__dictionary_bindings__write (p_dataset_id, v_workspace_id, v_bindings);
 
   select count(*)::integer
-  into v_count
+  into v_num_bindings
   from public.dataset_columns__dictionary_bindings b
   where b.dataset_id = p_dataset_id;
 
-  return v_count;
+  return v_num_bindings;
 end;
 $function$
 ;
@@ -324,11 +353,11 @@ CREATE TRIGGER tr__dataset_columns__dictionary_bindings__set_updated_at BEFORE U
 -- Privileges that `supabase db diff` cannot see: default, schema, column,
 -- and view grants. Appended by `pnpm db:new-migration` from what
 -- `supabase/schemas/` declares. Do not hand-edit; re-run the command.
-revoke all privileges on function public.dataset_columns__check_binding_entries(p_workspace_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
-revoke all privileges on function public.dataset_columns__check_bindings(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.dataset_columns__dictionary_bindings__check_entries(p_workspace_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.dataset_columns__dictionary_bindings__check(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.dataset_columns__dictionary_bindings__keep_workspace_id() from public, anon, authenticated, service_role;
 revoke all privileges on function public.dataset_columns__dictionary_bindings__remove_for_dictionary() from public, anon, authenticated, service_role;
 revoke all privileges on function public.dataset_columns__dictionary_bindings__remove_for_entry() from public, anon, authenticated, service_role;
-revoke all privileges on function public.dataset_columns__write_bindings(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.dataset_columns__dictionary_bindings__write(p_dataset_id uuid, p_workspace_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.rpc_dataset_columns__apply_dictionaries(p_dataset_id uuid, p_bindings jsonb) from public, anon, authenticated, service_role;
 grant EXECUTE on function public.rpc_dataset_columns__apply_dictionaries(p_dataset_id uuid, p_bindings jsonb) to "authenticated";

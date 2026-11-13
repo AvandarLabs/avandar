@@ -3208,15 +3208,15 @@ export type Database = {
         }
         Returns: undefined
       }
-      dataset_columns__check_binding_entries: {
-        Args: { p_bindings: Json; p_workspace_id: string }
-        Returns: undefined
-      }
-      dataset_columns__check_bindings: {
+      dataset_columns__dictionary_bindings__check: {
         Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
         Returns: undefined
       }
-      dataset_columns__write_bindings: {
+      dataset_columns__dictionary_bindings__check_entries: {
+        Args: { p_bindings: Json; p_workspace_id: string }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__write: {
         Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
         Returns: undefined
       }

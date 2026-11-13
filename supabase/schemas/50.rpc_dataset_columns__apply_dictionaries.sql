@@ -22,7 +22,7 @@ set
 declare
   v_workspace_id uuid;
   v_bindings jsonb := coalesce(p_bindings, '[]'::jsonb);
-  v_count integer;
+  v_num_bindings integer;
 begin
   -- Read without a lock: the caller has not been authorized yet.
   select ds.workspace_id
@@ -50,18 +50,25 @@ begin
       using errcode = '42501', hint = 'dictionary_viewer_required';
   end if;
 
-  -- Two applies to one dataset run one at a time.
-  perform 1 from public.datasets where id = p_dataset_id for update;
+  -- Two applies to one dataset run one at a time. The lock does not block
+  -- inserts that reference the dataset. A dataset deleted since the read
+  -- above raises the same error as a missing one.
+  perform 1 from public.datasets where id = p_dataset_id for no key update;
 
-  perform public.dataset_columns__check_bindings (p_dataset_id, v_workspace_id, v_bindings);
-  perform public.dataset_columns__write_bindings (p_dataset_id, v_workspace_id, v_bindings);
+  if not found then
+    raise exception 'Only an editor of this dataset can apply dictionaries to it'
+      using errcode = '42501', hint = 'dataset_editor_required';
+  end if;
+
+  perform public.dataset_columns__dictionary_bindings__check (p_dataset_id, v_workspace_id, v_bindings);
+  perform public.dataset_columns__dictionary_bindings__write (p_dataset_id, v_workspace_id, v_bindings);
 
   select count(*)::integer
-  into v_count
+  into v_num_bindings
   from public.dataset_columns__dictionary_bindings b
   where b.dataset_id = p_dataset_id;
 
-  return v_count;
+  return v_num_bindings;
 end;
 $$;
 
@@ -72,29 +79,51 @@ $$;
  * dictionary or the dataset's workspace, or a code list the entry does not
  * use. Called only by `rpc_dataset_columns__apply_dictionaries`.
  */
-create or replace function public.dataset_columns__check_bindings (
+create or replace function public.dataset_columns__dictionary_bindings__check (
   p_dataset_id uuid,
   p_workspace_id uuid,
   p_bindings jsonb
 ) returns void language plpgsql
 set
   search_path = '' as $$
+declare
+  v_uuid_pattern constant text :=
+    '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
 begin
-  if jsonb_typeof(p_bindings) is distinct from 'array' or exists (
+  -- Each shape check runs on its own, before anything casts the payload, so
+  -- a malformed payload raises this hint rather than a cast error.
+  if jsonb_typeof(p_bindings) is distinct from 'array' then
+    raise exception 'Bindings must be an array'
+      using errcode = '22023', hint = 'binding_payload_invalid';
+  end if;
+
+  if exists (
     select 1
-    from jsonb_to_recordset(p_bindings) as b (
-      dataset_column_id uuid, dictionary_id uuid, entry_id uuid, mode text, direction text
-    )
-    where
-      b.dataset_column_id is null or
-      b.dictionary_id is null or
-      b.entry_id is null or
-      b.mode is null or
-      b.mode not in (select unnest(enum_range(null::public.dataset_columns__binding_mode))::text) or
-      b.direction is null or
-      b.direction not in (select unnest(enum_range(null::public.dataset_columns__binding_direction))::text)
+    from jsonb_array_elements(p_bindings) as e (binding)
+    where jsonb_typeof(e.binding) <> 'object'
   ) then
-    raise exception 'Bindings must be an array of complete bindings'
+    raise exception 'Every binding must be an object'
+      using errcode = '22023', hint = 'binding_payload_invalid';
+  end if;
+
+  -- Reads every field as text, so a missing id, a malformed id, or an
+  -- unknown mode or direction is caught without a cast.
+  if exists (
+    select 1
+    from jsonb_array_elements(p_bindings) as e (binding)
+    where
+      coalesce(e.binding ->> 'dataset_column_id', '') !~* v_uuid_pattern or
+      coalesce(e.binding ->> 'dictionary_id', '') !~* v_uuid_pattern or
+      coalesce(e.binding ->> 'entry_id', '') !~* v_uuid_pattern or
+      (e.binding ->> 'code_list_id') !~* v_uuid_pattern or
+      coalesce(e.binding ->> 'mode', '') <> all (
+        enum_range(null::public.dataset_columns__binding_mode)::text[]
+      ) or
+      coalesce(e.binding ->> 'direction', '') <> all (
+        enum_range(null::public.dataset_columns__binding_direction)::text[]
+      )
+  ) then
+    raise exception 'Every binding must name a column, dictionary, entry, mode, and direction'
       using errcode = '22023', hint = 'binding_payload_invalid';
   end if;
 
@@ -127,16 +156,16 @@ begin
       using errcode = '23514', hint = 'column_not_in_dataset';
   end if;
 
-  perform public.dataset_columns__check_binding_entries (p_workspace_id, p_bindings);
+  perform public.dataset_columns__dictionary_bindings__check_entries (p_workspace_id, p_bindings);
 end;
 $$;
 
 /**
  * Raises with a stable hint when a binding's entry is not in its dictionary
  * and the dataset's workspace, or its code list is not one the entry uses.
- * Called only by `dataset_columns__check_bindings`.
+ * Called only by `dataset_columns__dictionary_bindings__check`.
  */
-create or replace function public.dataset_columns__check_binding_entries (p_workspace_id uuid, p_bindings jsonb) returns void language plpgsql
+create or replace function public.dataset_columns__dictionary_bindings__check_entries (p_workspace_id uuid, p_bindings jsonb) returns void language plpgsql
 set
   search_path = '' as $$
 begin
@@ -175,7 +204,7 @@ $$;
  * rest, recording each dictionary's current version. Called only by
  * `rpc_dataset_columns__apply_dictionaries` after its checks pass.
  */
-create or replace function public.dataset_columns__write_bindings (
+create or replace function public.dataset_columns__dictionary_bindings__write (
   p_dataset_id uuid,
   p_workspace_id uuid,
   p_bindings jsonb
@@ -231,7 +260,7 @@ execute on function public.rpc_dataset_columns__apply_dictionaries (uuid, jsonb)
 -- The helpers run inside the SECURITY DEFINER apply and are never called
 -- directly, so no Data API role gets EXECUTE.
 revoke
-execute on function public.dataset_columns__check_bindings (uuid, uuid, jsonb)
+execute on function public.dataset_columns__dictionary_bindings__check (uuid, uuid, jsonb)
 from
   public,
   anon,
@@ -239,7 +268,7 @@ from
   service_role;
 
 revoke
-execute on function public.dataset_columns__check_binding_entries (uuid, jsonb)
+execute on function public.dataset_columns__dictionary_bindings__check_entries (uuid, jsonb)
 from
   public,
   anon,
@@ -247,7 +276,7 @@ from
   service_role;
 
 revoke
-execute on function public.dataset_columns__write_bindings (uuid, uuid, jsonb)
+execute on function public.dataset_columns__dictionary_bindings__write (uuid, uuid, jsonb)
 from
   public,
   anon,
