@@ -135,34 +135,45 @@ function _getScore(
 
 /**
  * How well one entry matches one profiled column, or undefined below the
- * suggestion score.
+ * suggestion score. An entry with codes whose values could not be compared
+ * with the column's, because the column has too many values to list or none
+ * at all, matches as a description and ranks below every compared match.
  */
 function getEntryMatch(
   profile: Readonly<ColumnProfile.T>,
   entry: Readonly<DictionaryMatchEntry>,
 ): DictionaryMatchT | undefined {
   const best = _getBestCoverage(profile, entry);
+  const compared = best?.coverage === undefined ? undefined : best;
   const score = _getScore(
     _getEntryNameScore(profile.columnName, entry),
     _getKindTypeScore(entry.kind, profile.dataType),
-    best?.coverage,
+    compared?.coverage,
   );
   if (score < ColumnProfile.SUGGESTION_SCORE) {
     return undefined;
   }
-  const isFitting = (best?.coverage ?? 0) >= FITS_SHARE;
+  const coverage = compared?.coverage;
+  const isUncompared = best !== undefined && compared === undefined;
   return {
     dictionaryId: entry.dictionaryId,
     dictionaryRank: entry.dictionaryRank,
     entryId: entry.entryId,
     entryName: entry.entryName,
     position: entry.position,
-    codeListId: best?.codeListId,
-    codeListName: best?.codeListName,
-    coverage: best?.coverage,
-    direction: best?.direction ?? "decode",
-    fit: !best ? "description" : isFitting ? "fits" : "values_dont_fit",
-    score,
+    codeListId: compared?.codeListId,
+    codeListName: compared?.codeListName,
+    coverage,
+    direction: compared?.direction ?? "decode",
+    fit:
+      coverage === undefined
+        ? "description"
+        : coverage >= FITS_SHARE
+          ? "fits"
+          : "values_dont_fit",
+    // Every compared match scores at least the suggestion score, so scaling
+    // below it keeps an uncompared list from outranking a real comparison.
+    score: isUncompared ? score * ColumnProfile.SUGGESTION_SCORE : score,
   };
 }
 
@@ -205,12 +216,14 @@ function findColumnMatches(
 /**
  * The match a column starts with: the code list covering the most of its
  * rows, else the best description-only entry. A list whose values do not
- * fit is never picked for the user.
+ * fit is never picked for the user. The result never depends on the order
+ * of `matches`.
  */
 function pickDefaultMatch(
   matches: readonly DictionaryMatchT[],
 ): DictionaryMatchT | undefined {
-  const fitting = matches
+  const sorted = [...matches].sort(compareMatches);
+  const fitting = sorted
     .filter((match) => {
       return match.fit === "fits";
     })
@@ -222,7 +235,7 @@ function pickDefaultMatch(
     });
   return (
     fitting[0] ??
-    matches.find((match) => {
+    sorted.find((match) => {
       return match.fit === "description";
     })
   );

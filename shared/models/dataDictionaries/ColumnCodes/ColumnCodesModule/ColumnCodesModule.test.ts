@@ -108,6 +108,45 @@ describe("ColumnCodes.formatPairs", () => {
     ).toBe("1=(no label)");
   });
 
+  it("writes a label or code with a newline on one line", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, code: " 1\n", label: "Male\n  adult" }],
+      }),
+    ).toBe("1=Male adult");
+  });
+
+  it("quotes a label that holds a comma or an equals sign", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [
+          { ...SEX_PAIRS[0]!, label: "Yes, confirmed" },
+          { ...SEX_PAIRS[1]!, label: "a=b" },
+        ],
+      }),
+    ).toBe('1="Yes, confirmed", 2="a=b"');
+  });
+
+  it("escapes a quote inside a quoted label", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "encode",
+        pairs: [{ ...SEX_PAIRS[0]!, label: 'Said "no", twice' }],
+      }),
+    ).toBe('"Said \\"no\\", twice"');
+  });
+
+  it("leaves a quote alone in a label that needs no quoting", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, label: 'The "other" one' }],
+      }),
+    ).toBe('1=The "other" one');
+  });
+
   it("lists only the labels for a column that holds labels", () => {
     expect(
       ColumnCodes.formatPairs({ direction: "encode", pairs: SEX_PAIRS }),
@@ -162,14 +201,23 @@ describe("ColumnCodes.findPairByLabel", () => {
     ).toBe("1");
   });
 
-  it("never matches a blank label", () => {
+  it("does not match a pair whose label is blank", () => {
     expect(
       ColumnCodes.findPairByLabel(
         {
           direction: "decode",
-          pairs: [{ ...SEX_PAIRS[0]!, label: "", acceptedSpellings: [] }],
+          pairs: [{ ...SEX_PAIRS[0]!, label: "  ", acceptedSpellings: [] }],
         },
-        "",
+        "male",
+      ),
+    ).toBeUndefined();
+  });
+
+  it("finds nothing for a blank query", () => {
+    expect(
+      ColumnCodes.findPairByLabel(
+        { direction: "decode", pairs: SEX_PAIRS },
+        "  ",
       ),
     ).toBeUndefined();
   });

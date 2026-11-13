@@ -11,9 +11,14 @@ const MAX_PROMPT_PAIRS = 30;
 /** The longest description one column carries into a prompt. */
 const MAX_PROMPT_DESCRIPTION_CHARS = 120;
 
+/** Trims and collapses each run of whitespace, newlines too, to one space. */
+function _toOneLine(text: string): string {
+  return text.trim().replace(/\s+/g, " ");
+}
+
 /** Trims, lowercases, and collapses inner spaces, for comparing labels. */
 function _toComparable(text: string): string {
-  return text.trim().toLowerCase().replace(/\s+/g, " ");
+  return _toOneLine(text).toLowerCase();
 }
 
 function _byId<Row extends { id: string }>(
@@ -101,14 +106,24 @@ function fromStoredPairs(value: unknown): ColumnCodePair[] {
   });
 }
 
+/**
+ * A label as prompt text: quoted, with inner quotes escaped, only when a
+ * comma or `=` would otherwise blur where the pair ends.
+ */
+function _formatLabel(label: string): string {
+  return /[,=]/.test(label) ? `"${label.replace(/"/g, '\\"')}"` : label;
+}
+
 function _formatPair(
   pair: Readonly<ColumnCodePair>,
   direction: ColumnCodesContext["direction"],
 ): string {
-  const label = pair.label.trim() === "" ? "(no label)" : pair.label.trim();
+  const oneLineLabel = _toOneLine(pair.label);
+  const label = oneLineLabel === "" ? "(no label)" : _formatLabel(oneLineLabel);
+  const code = _toOneLine(pair.code);
   const missing = pair.isMissing ? " (missing)" : "";
   return direction === "decode"
-    ? `${pair.code}=${label}${missing}`
+    ? `${code}=${label}${missing}`
     : `${label}${missing}`;
 }
 
@@ -137,7 +152,7 @@ function formatPairs(codes: Readonly<ColumnCodesContext>): string {
 function formatDescription(
   description: string | undefined,
 ): string | undefined {
-  const text = description?.trim().replace(/\s+/g, " ") ?? "";
+  const text = description === undefined ? "" : _toOneLine(description);
   if (text === "") {
     return undefined;
   }
@@ -160,7 +175,7 @@ function findPairByLabel(
   }
   return codes.pairs.find((pair) => {
     return [pair.label, ...pair.acceptedSpellings].some((spelling) => {
-      return spelling.trim() !== "" && _toComparable(spelling) === wanted;
+      return _toComparable(spelling) === wanted;
     });
   });
 }

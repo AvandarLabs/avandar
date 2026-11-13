@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
 import { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch.ts";
-import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.ts";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary.ts";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList.ts";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry.ts";
+import type { DataDictionaryEntryCoding } from "$/models/dataDictionaries/DataDictionaryEntryCoding/DataDictionaryEntryCoding.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 
 const NYS = "dict-nys" as DataDictionary.Id;
@@ -151,6 +152,49 @@ describe("DictionaryMatch.getEntryMatch", () => {
     expect(match?.fit).toBe("description");
   });
 
+  it("matches a leading-zero code to the code it stands for", () => {
+    const match = DictionaryMatch.getEntryMatch(
+      _profile("GENDER", [
+        ["01", 5],
+        ["02", 4],
+      ]),
+      _entry({
+        entryId: "entry-sex" as DataDictionaryEntry.Id,
+        entryName: "sex",
+        columnNames: ["GENDER"],
+        codeLists: [SEX_129],
+      }),
+    );
+
+    expect(match?.coverage).toBe(1);
+    expect(match?.fit).toBe("fits");
+  });
+
+  it.each([
+    ["has too many values to list", undefined],
+    ["holds only nulls", []],
+  ] as const)(
+    "matches a column that %s as a description ranked below any comparison",
+    (_label, values) => {
+      const match = DictionaryMatch.getEntryMatch(
+        _profile("GENDER", values),
+        _entry({
+          entryId: "entry-sex" as DataDictionaryEntry.Id,
+          entryName: "sex",
+          columnNames: ["GENDER"],
+          codeLists: [SEX_129],
+        }),
+      );
+
+      expect(match).toMatchObject({
+        fit: "description",
+        codeListId: undefined,
+        coverage: undefined,
+      });
+      expect(match?.score).toBeLessThanOrEqual(ColumnProfile.SUGGESTION_SCORE);
+    },
+  );
+
   it("ignores an entry whose name and values share nothing with the column", () => {
     expect(
       DictionaryMatch.getEntryMatch(
@@ -207,6 +251,30 @@ describe("DictionaryMatch.findColumnMatches", () => {
     expect(backward).toEqual(forward);
   });
 
+  it("orders tied matches the same whatever order they arrive in", () => {
+    const tied = [
+      { ...cdcSex, entryId: "entry-c" as DataDictionaryEntry.Id },
+      { ...nysSex, position: 1, entryId: "entry-b" as DataDictionaryEntry.Id },
+      { ...nysSex, entryId: "entry-z" as DataDictionaryEntry.Id },
+      { ...nysSex, entryId: "entry-a" as DataDictionaryEntry.Id },
+    ].map((entry) => {
+      return { ...entry, codeLists: [SEX_129] };
+    });
+
+    const forward = DictionaryMatch.findColumnMatches([GENDER], tied);
+    const backward = DictionaryMatch.findColumnMatches(
+      [GENDER],
+      [...tied].reverse(),
+    );
+
+    expect(backward).toEqual(forward);
+    expect(
+      forward.get("GENDER")?.map((match) => {
+        return match.entryId;
+      }),
+    ).toEqual(["entry-a", "entry-z", "entry-b", "entry-c"]);
+  });
+
   it("breaks a tie by the dictionary's place in the list", () => {
     const sameInCdc = { ...cdcSex, codeLists: [SEX_129] };
     const sameInNys = { ...nysSex, codeLists: [SEX_129] };
@@ -251,5 +319,112 @@ describe("DictionaryMatch.pickDefaultMatch", () => {
     expect(
       DictionaryMatch.pickDefaultMatch(description ? [description] : [])?.fit,
     ).toBe("description");
+  });
+  it("prefers the list covering more rows over a higher score", () => {
+    const base: DictionaryMatch.T = {
+      dictionaryId: NYS,
+      dictionaryRank: 0,
+      entryId: "entry-a" as DataDictionaryEntry.Id,
+      entryName: "sex",
+      position: 0,
+      codeListId: SEX_129.id,
+      codeListName: SEX_129.name,
+      coverage: 0.6,
+      direction: "decode",
+      fit: "fits",
+      score: 0.95,
+    };
+    const wider = {
+      ...base,
+      entryId: "entry-b" as DataDictionaryEntry.Id,
+      coverage: 1,
+      score: 0.8,
+    };
+
+    expect(DictionaryMatch.pickDefaultMatch([base, wider])?.entryId).toBe(
+      "entry-b",
+    );
+  });
+
+  it("picks the best description whatever order the matches arrive in", () => {
+    const weaker: DictionaryMatch.T = {
+      dictionaryId: NYS,
+      dictionaryRank: 0,
+      entryId: "entry-weak" as DataDictionaryEntry.Id,
+      entryName: "case",
+      position: 0,
+      codeListId: undefined,
+      codeListName: undefined,
+      coverage: undefined,
+      direction: "decode",
+      fit: "description",
+      score: 0.7,
+    };
+    const stronger = {
+      ...weaker,
+      entryId: "entry-strong" as DataDictionaryEntry.Id,
+      score: 0.9,
+    };
+
+    expect(DictionaryMatch.pickDefaultMatch([weaker, stronger])?.entryId).toBe(
+      "entry-strong",
+    );
+  });
+});
+
+describe("DictionaryMatch.toMatchEntries", () => {
+  const ENTRY = {
+    id: "entry-sex" as DataDictionaryEntry.Id,
+    dictionaryId: CDC,
+    name: "sex",
+    columnNames: ["GENDER"],
+    kind: "categorical",
+    position: 2,
+  } as DataDictionaryEntry.T;
+  const LISTS = [SEX_MFU, SEX_129].map((list) => {
+    return { ...list, isOrdered: false } as DataDictionaryCodeList.T;
+  });
+
+  function _coding(
+    codeListId: string,
+    isPrimary: boolean,
+  ): DataDictionaryEntryCoding.T {
+    return {
+      entryId: ENTRY.id,
+      codeListId,
+      isPrimary,
+    } as DataDictionaryEntryCoding.T;
+  }
+
+  it("ranks by the dictionary list, puts the primary list first, and skips missing lists", () => {
+    const [entry, ...rest] = DictionaryMatch.toMatchEntries({
+      dictionaries: [{ id: NYS }, { id: CDC }],
+      entries: [ENTRY],
+      codeLists: LISTS,
+      codings: [
+        _coding(SEX_MFU.id, false),
+        _coding("list-gone", false),
+        _coding(SEX_129.id, true),
+      ],
+    });
+
+    expect(rest).toEqual([]);
+    expect(entry).toMatchObject({ dictionaryRank: 1, position: 2 });
+    expect(
+      entry?.codeLists.map((list) => {
+        return list.id;
+      }),
+    ).toEqual([SEX_129.id, SEX_MFU.id]);
+  });
+
+  it("drops entries of dictionaries that are not in the list", () => {
+    expect(
+      DictionaryMatch.toMatchEntries({
+        dictionaries: [{ id: NYS }],
+        entries: [ENTRY],
+        codeLists: LISTS,
+        codings: [],
+      }),
+    ).toEqual([]);
   });
 });

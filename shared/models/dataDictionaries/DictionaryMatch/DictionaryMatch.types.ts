@@ -7,8 +7,9 @@ import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBind
  * How an entry's values relate to a column's. `fits`: half or more of the
  * column's rows hold a code or label from the entry's code list.
  * `values_dont_fit`: the entry has codes but the column's values are not
- * them. `description`: the entry has no codes, so only its description
- * applies.
+ * them. `description`: only the entry's description applies, because the
+ * entry has no codes or the column's values could not be compared with them
+ * (too many to list, or none at all).
  */
 export type DictionaryMatchFit = "fits" | "values_dont_fit" | "description";
 
@@ -39,18 +40,24 @@ export type DictionaryMatchT = {
   entryId: DataDictionaryEntry.Id;
   entryName: string;
   position: number;
-  /** The entry's code list that fits the column best, if it has any. */
+  /**
+   * The entry's code list that fits the column best. Undefined for a
+   * description.
+   */
   codeListId: DataDictionaryCodeList.Id | undefined;
   codeListName: string | undefined;
   /**
    * The share of the column's rows the code list covers, from 0 to 1.
-   * Undefined for a description, or when the column has too many values
-   * to list.
+   * Undefined for a description.
    */
   coverage: number | undefined;
   /** Whether the column holds the list's codes or its labels. */
   direction: DictionaryBinding.Direction;
   fit: DictionaryMatchFit;
-  /** Name 0.45, values 0.35, type 0.2, rescaled when values are unknown. */
+  /**
+   * Name 0.45, values 0.35, type 0.2, rescaled when values are unknown. An
+   * entry with codes that could not be compared scores below every match
+   * that was.
+   */
   score: number;
 };
