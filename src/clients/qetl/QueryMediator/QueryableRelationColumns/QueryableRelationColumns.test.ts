@@ -102,4 +102,34 @@ describe("QueryableRelationColumns", () => {
       }),
     ).toBe(true);
   });
+
+  it("names the earliest stale-at time among the datasets it is asked about", () => {
+    const otherId = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: 5_000,
+    });
+    QueryableRelationColumns.remember({
+      datasetId: otherId,
+      columns: "all",
+      staleAt: 2_000,
+    });
+
+    expect(
+      QueryableRelationColumns.getEarliestStaleAt([DATASET_ID, otherId]),
+    ).toBe(2_000);
+  });
+
+  it("names no stale-at time when none of the datasets goes stale", () => {
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+    });
+
+    expect(
+      QueryableRelationColumns.getEarliestStaleAt([DATASET_ID]),
+    ).toBeUndefined();
+  });
 });

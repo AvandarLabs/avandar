@@ -10,16 +10,24 @@ import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/Re
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type {
+  QetlRunQuery,
+  RelationSource,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
 
-const { loadParquetMock } = vi.hoisted(() => {
-  return { loadParquetMock: vi.fn() };
+const { getWrapperForRefMock, loadParquetMock } = vi.hoisted(() => {
+  return { getWrapperForRefMock: vi.fn(), loadParquetMock: vi.fn() };
 });
 
 vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
   return { DuckDbClient: { loadParquet: loadParquetMock } };
+});
+
+vi.mock("@/clients/qetl/RelationRegistry/RelationRegistry", () => {
+  return { getWrapperForRef: getWrapperForRefMock };
 });
 
 vi.mock(
@@ -129,5 +137,76 @@ describe("RelationLoading.loadRelationBytes", () => {
     expect(loadParquetMock).toHaveBeenCalledWith(
       expect.objectContaining({ columnReplacements: {} }),
     );
+  });
+});
+
+describe("virtual dataset definitions", () => {
+  const VIRTUAL_SQL = 'SELECT * FROM "aaaaaaaa-2222-4222-8222-aaaaaaaaaaaa"';
+
+  it("probes a dataset under the definition it was given", async () => {
+    const relationCache = createInMemoryRelationCache();
+    const probeSpy = vi.spyOn(relationCache, "probe");
+
+    await RelationLoading.probeStorageRelationCache({
+      datasetIds: [DATASET_ID],
+      neededByDatasetId: {},
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
+      definitionByDatasetId: {
+        [DATASET_ID]: { kind: "virtual_sql", text: VIRTUAL_SQL },
+      },
+    });
+
+    expect(probeSpy.mock.calls[0]?.[0][0]?.definition).toEqual({
+      kind: "virtual_sql",
+      text: VIRTUAL_SQL,
+    });
+  });
+
+  it("stores acquired virtual rows under the SQL they were acquired with", async () => {
+    getWrapperForRefMock.mockReturnValue({
+      acquire: async () => {
+        return {
+          ref: { kind: "dataset", id: DATASET_ID },
+          parquetBlob: new Blob(["rows"]),
+          sourceVersion: undefined,
+          maxAgeMs: 60_000,
+        };
+      },
+    });
+    const relationSource = {
+      sourceType: "virtual",
+      dataset: { id: DATASET_ID, workspaceId: "workspace-1", name: "linked" },
+      sourceDataset: { datasetId: DATASET_ID, rawSql: VIRTUAL_SQL },
+    } as unknown as RelationSource;
+
+    const [fetched] = await RelationLoading.fetchRelationBytes({
+      datasetDuckDbLease: {} as DatasetDuckDbLease,
+      growFromColumnsByDatasetId: {},
+      neededByDatasetId: {},
+      relationSources: [relationSource],
+      runQuery: vi.fn() as unknown as QetlRunQuery,
+    });
+    const relationCache = createInMemoryRelationCache();
+    const writeSpy = vi.spyOn(relationCache, "write");
+    loadParquetMock.mockResolvedValue({});
+    await RelationLoading.loadRelationBytes({
+      columnReplacements: undefined,
+      datasetDuckDbLease: {} as DatasetDuckDbLease,
+      principalKey: PRINCIPAL_KEY,
+      relationCache,
+      relations: [fetched!],
+      relationsToStore: [fetched!],
+    });
+
+    expect(fetched?.definition).toEqual({
+      kind: "virtual_sql",
+      text: VIRTUAL_SQL,
+    });
+    expect(fetched?.staleAt).toBeGreaterThan(Date.now());
+    expect(writeSpy.mock.calls[0]?.[0].identity.definition).toEqual({
+      kind: "virtual_sql",
+      text: VIRTUAL_SQL,
+    });
   });
 });

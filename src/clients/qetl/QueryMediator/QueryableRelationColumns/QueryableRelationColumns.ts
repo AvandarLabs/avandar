@@ -54,6 +54,16 @@ function _isProjectionCurrent(
   return recordedKey === undefined || recordedKey === options.projectionKey;
 }
 
+function _getEarliestStaleAt(
+  datasetIds: readonly string[],
+): number | undefined {
+  const staleAts = datasetIds.flatMap((datasetId) => {
+    const staleAt = loadedRelationsByDatasetId.get(datasetId)?.staleAt;
+    return staleAt === undefined ? [] : [staleAt];
+  });
+  return staleAts.length === 0 ? undefined : Math.min(...staleAts);
+}
+
 function _clear(): void {
   loadedRelationsByDatasetId.clear();
 }
@@ -93,6 +103,13 @@ export const QueryableRelationColumns = {
    * table loaded outside this recorder still hits.
    */
   isProjectionCurrent: _isProjectionCurrent,
+
+  /**
+   * The earliest epoch ms at which any of these datasets' loaded rows go
+   * stale, or `undefined` when none does. A virtual dataset's rows go stale
+   * with the rows it was built from.
+   */
+  getEarliestStaleAt: _getEarliestStaleAt,
 
   /** Forgets every recorded queryable column set. */
   clear: _clear,

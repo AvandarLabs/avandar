@@ -11,11 +11,13 @@ import {
   getRelationSources,
   probeRelationCache,
 } from "@/clients/qetl/QueryMediator/getRelationSources";
+import { getVirtualRelationDefinitions } from "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions";
 import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { loadColumnReplacements } from "@/lib/dataDictionaries/loadColumnReplacements/loadColumnReplacements";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { LogicalDefinition } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type {
@@ -105,15 +107,18 @@ async function _getNeededParquetColumnsForQuery(
 type QueryCatalog = {
   /** Undefined for a `stored` session and for a query that names no dataset. */
   columnReplacements: LoadedColumnReplacements | undefined;
+  /** Each virtual dataset's definition, its storage entries' key. */
+  definitionByDatasetId: Readonly<Record<string, LogicalDefinition>>;
 };
 
 /**
  * Reads each dataset's renames, casts, and conversions, with the projection
- * key its loaded view is checked against. A `stored` session reads nothing:
- * its Parquet already holds the query-facing columns, and its visitor may
- * hold no grant on the catalog. A query that names no dataset reads nothing
- * either. Every other query reads it, mostly from the query cache, because a
- * view already in DuckDB is only current if its projection still is.
+ * key its loaded view is checked against, and each virtual dataset's
+ * definition. A `stored` session reads nothing: its Parquet already holds
+ * the query-facing columns, and its visitor may hold no grant on the
+ * catalog. A query that names no dataset reads nothing either. Every other
+ * query reads it, mostly from the query cache, because a view already in
+ * DuckDB is only current if its projection still is.
  */
 async function _readQueryCatalog(
   options: Readonly<{
@@ -125,11 +130,13 @@ async function _readQueryCatalog(
     options.datasetColumnSource === "stored" ||
     options.queryDependencies.length === 0
   ) {
-    return { columnReplacements: undefined };
+    return { columnReplacements: undefined, definitionByDatasetId: {} };
   }
-  return {
-    columnReplacements: await loadColumnReplacements(options.queryDependencies),
-  };
+  const [columnReplacements, definitionByDatasetId] = await Promise.all([
+    loadColumnReplacements(options.queryDependencies),
+    getVirtualRelationDefinitions(options.queryDependencies),
+  ]);
+  return { columnReplacements, definitionByDatasetId };
 }
 
 /**
@@ -140,6 +147,7 @@ async function _readQueryCatalog(
 async function _acquireRelations(
   options: Readonly<{
     datasetIds: readonly Dataset.Id[];
+    definitionByDatasetId: Readonly<Record<string, LogicalDefinition>>;
     neededByDatasetId: NeededColumnsByDatasetId;
     queryOptions: RunLeasedQueryOptions;
     runQuery: QetlRunQuery;
@@ -152,6 +160,7 @@ async function _acquireRelations(
   const { cachedRelations, growFromColumnsByDatasetId, uncachedDatasetIds } =
     await RelationLoading.probeStorageRelationCache({
       datasetIds: options.datasetIds,
+      definitionByDatasetId: options.definitionByDatasetId,
       neededByDatasetId: options.neededByDatasetId,
       principalKey: options.runnerOptions.principalKey,
       relationCache: options.runnerOptions.relationCache,
@@ -202,6 +211,7 @@ async function _loadQueryRelations(
   const { cachedRelations, fetchedRelationBytes } = await _acquireRelations({
     ...options,
     datasetIds: notInQueryableTier,
+    definitionByDatasetId: catalog.definitionByDatasetId,
     neededByDatasetId,
   });
   await RelationLoading.loadRelationBytes({

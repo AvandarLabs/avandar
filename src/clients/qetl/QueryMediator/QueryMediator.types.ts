@@ -9,7 +9,10 @@ import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDatase
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { PrincipalKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type {
+  LogicalDefinition,
+  PrincipalKey,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 import type {
   DatasetDuckDbLease,
@@ -106,6 +109,11 @@ export type AcquiredRelationBytes = {
    * again; `undefined` for rows that never go stale.
    */
   staleAt: number | undefined;
+  /**
+   * The definition these rows were produced from, stored with them: a
+   * virtual dataset's SQL, or undefined for a dataset with no defining text.
+   */
+  definition?: LogicalDefinition;
 };
 
 /** Per-dataset column sets a query needs, or `"all"` when unknown. */

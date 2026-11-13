@@ -140,6 +140,22 @@ vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", async () => {
   ).NO_DICTIONARY_BINDINGS_CLIENT_MODULE;
 });
 
+vi.mock(
+  "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions",
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions")
+      >();
+    return {
+      ...original,
+      getVirtualRelationDefinitions: async () => {
+        return {};
+      },
+    };
+  },
+);
+
 /** The shape `getRelationSources` filters datasets with. */
 type DatasetIdFilter = { where?: { id?: { in?: readonly Dataset.Id[] } } };
 

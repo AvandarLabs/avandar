@@ -10,10 +10,12 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
 import { UNREAD_PROJECTION_KEY } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
+import { makeVirtualRelationDefinition } from "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
+  LogicalDefinition,
   PrincipalKey,
   RelationCacheKey,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
@@ -49,6 +51,11 @@ type ProbeStorageRelationCacheOptions = {
   neededByDatasetId: NeededColumnsByDatasetId;
   relationCache: RelationCachePort;
   principalKey: PrincipalKey;
+  /**
+   * Each virtual dataset's definition, by dataset id. Others probe with
+   * none.
+   */
+  definitionByDatasetId?: Readonly<Record<string, LogicalDefinition>>;
 };
 
 /** Input to {@link RelationLoading.fetchRelationBytes}. */
@@ -103,20 +110,22 @@ function _isReplacementInLoadedRelation(
 /**
  * The cache key for one dataset relation under one principal and column set.
  *
- * `definition` and `sourceVersion` are undefined because a plain dataset has
- * no defining text and no freshness token yet.
+ * `definition` is a virtual dataset's SQL, so an edited definition is a
+ * miss, and undefined for every other dataset. `sourceVersion` is undefined:
+ * a plain dataset has no freshness token yet.
  */
 function _toDatasetCacheKey(
   options: Readonly<{
     columns: readonly string[] | "all";
     datasetId: Dataset.Id;
+    definition: LogicalDefinition | undefined;
     principalKey: PrincipalKey;
   }>,
 ): RelationCacheKey {
   return {
     principal: options.principalKey,
     relation: { kind: "dataset", id: options.datasetId },
-    definition: undefined,
+    definition: options.definition,
     sourceVersion: undefined,
     columns: options.columns,
   };
@@ -151,6 +160,7 @@ async function _readStorageCacheHit(
   return {
     columns: options.hit.entry.columns,
     datasetId: options.hit.key.relation.id,
+    definition: options.hit.key.definition,
     parquetBlob: _asParquetBlob(payload),
     staleAt: options.hit.entry.staleAt,
   };
@@ -173,12 +183,14 @@ function _toStorageProbeKeys(
     datasetIds: readonly Dataset.Id[];
     neededByDatasetId: NeededColumnsByDatasetId;
     principalKey: PrincipalKey;
+    definitionByDatasetId?: Readonly<Record<string, LogicalDefinition>>;
   }>,
 ): RelationCacheKey[] {
   return options.datasetIds.map((datasetId) => {
     return _toDatasetCacheKey({
       columns: options.neededByDatasetId[datasetId] ?? "all",
       datasetId,
+      definition: options.definitionByDatasetId?.[datasetId],
       principalKey: options.principalKey,
     });
   });
@@ -269,6 +281,15 @@ async function _projectAcquiredBlob(
   });
 }
 
+/** The definition a relation source's rows are produced from, if it has one. */
+function _getRelationDefinition(
+  relationSource: Readonly<RelationSource>,
+): LogicalDefinition | undefined {
+  return relationSource.sourceType === "virtual"
+    ? makeVirtualRelationDefinition(relationSource.sourceDataset.rawSql)
+    : undefined;
+}
+
 /**
  * Fetches one relation's bytes, through the wrapper the registry resolves.
  *
@@ -307,6 +328,7 @@ async function _fetchRelationSource(
   return {
     columns: acquireSet,
     datasetId: dataset.id,
+    definition: _getRelationDefinition(options.relationSource),
     parquetBlob: await _projectAcquiredBlob({
       columns: acquireSet,
       datasetDuckDbLease: options.datasetDuckDbLease,
@@ -363,7 +385,7 @@ async function _writeStoredRelationBytes(
         identity: {
           principal: options.principalKey,
           relation: { kind: "dataset", id: relation.datasetId },
-          definition: undefined,
+          definition: relation.definition,
           sourceVersion: undefined,
         },
         columns: relation.columns,

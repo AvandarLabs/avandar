@@ -172,7 +172,9 @@ run before any lock; steps 4 to 14 run inside one coordinated operation.
    datasets with no replacements and no key, so the query still runs and a
    loaded view keeps being served; a view loaded then is recorded with the
    `UNREAD_PROJECTION_KEY` sentinel, so the first successful read rebuilds it.
-   A `stored` session, and a query that names no dataset, read nothing.
+   It also reads each virtual dataset's definition
+   (`getVirtualRelationDefinitions`), which step 9 probes the storage tier
+   under. A `stored` session, and a query that names no dataset, read nothing.
 8. **`probeRelationCache`**. Datasets DuckDB cannot serve: absent, present
    with a sidecar set that does not cover the need, stale, or built with
    another projection key than step 7 read
@@ -280,6 +282,10 @@ turns it into a `staleAt` time that both tiers record, and from that time on
 neither serves the rows, so the next query acquires them again. While the
 browser is offline nothing is judged stale (`getRelationFreshnessNow`): stale
 rows beat no rows. Each source's "Refresh" action evicts both tiers at once.
+A virtual dataset (a linked dataset, for example) has no max age of its own:
+it returns the earliest stale-at time among the datasets its SQL read, so a
+linked dataset over a Google Sheet is materialized again when the Sheet's
+rows are. A source's Refresh also evicts the linked datasets that read it.
 
 **Storage key** ([RelationCacheKey.ts](../shared/models/relations/RelationCacheKey/RelationCacheKey.ts)):
 
@@ -290,6 +296,11 @@ rows beat no rows. Each source's "Refresh" action evicts both tiers at once.
 | version token | `v0`, or `v1.` plus a truncated SHA-256 of `sourceVersion` | no, recorded only |
 | definition token | `d0`, or `d1.` plus a truncated SHA-256 of kind and text | exact |
 | columns | sorted, de-duplicated names, or `"all"` | coverage (`coversColumns`) |
+
+A virtual dataset is probed and stored under the definition `virtual_sql`
+with its defining SQL, read from the same cached virtual record acquisition
+reads, so an edited definition is a miss. Every other dataset has no
+definition.
 
 The identity key is `principal|tableName|versionToken|definitionToken`. The
 reuse predicate is `serves`. Column names compare case-sensitively.
@@ -679,7 +690,7 @@ means traced through the source but not run.
 
 | Gap | Status | Where |
 | --- | --- | --- |
-| No version-based freshness: `sourceVersion` and `definition` are always `undefined` in the storage key, the acquired `sourceVersion` is dropped, and `readFreshness` has no caller. Live sources (Sheets, Postgres) are re-acquired once their max age passes, but virtual dataset edits and CKAN republishes are never seen | by reading | `relationLoading/RelationLoading.ts` |
+| No version token: `sourceVersion` is always `undefined` in the storage key, the acquired `sourceVersion` is dropped, and `readFreshness` has no caller. Live sources (Sheets, Postgres) are re-acquired once their max age passes, and a virtual dataset is keyed by its SQL and goes stale with its dependencies, but a CKAN republish is never seen, and a virtual dataset's SQL is read from the persisted query cache, so another session's edit is seen once that cache entry is refetched | by reading | `relationLoading/RelationLoading.ts`, `getVirtualRelationDefinitions.ts` |
 | No pushdown and no capability-driven planning | by reading | `QueryMediator.ts` TODO |
 | Eviction only on `QuotaExceededError`; no byte budget | by reading | both cache adapters |
 | Every workspace query locks every workspace dataset, so top-level queries in one workspace serialize across tabs | by reading | `WorkspaceQuerySession.ts`, `queryRunner.ts` |

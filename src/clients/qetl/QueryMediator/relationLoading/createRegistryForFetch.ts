@@ -1,7 +1,9 @@
 import { makeIdLookupRecord, makeObject, prop } from "@avandar/utils";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { readRelationCsv } from "@/clients/qetl/QueryMediator/relationLoading/readRelationCsv/readRelationCsv";
 import { createDefaultRegistry } from "@/clients/qetl/wrappers/createDefaultRegistry";
+import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
 import type { RelationCsvReader } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
@@ -64,6 +66,21 @@ function _getOrThrow<T>(value: T | undefined, message: string): T {
   return value;
 }
 
+/**
+ * When the rows a nested query read go stale: the earliest stale-at time of
+ * the datasets its SQL names, as the queryable tier recorded them while the
+ * query loaded them. SQL the analyzer cannot read names none.
+ */
+function _getDependencyStaleAt(rawSql: string): number | undefined {
+  try {
+    return QueryableRelationColumns.getEarliestStaleAt(
+      DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
+    );
+  } catch {
+    return undefined;
+  }
+}
+
 export function createRegistryForFetch(
   options: Readonly<{
     relationSources: readonly RelationSource[];
@@ -86,15 +103,16 @@ export function createRegistryForFetch(
         `Dataset '${id}' is not among the relations to fetch`,
       );
     },
-    runParquetQuery: ({ rawSql }) => {
+    runParquetQuery: async ({ rawSql }) => {
       // The caller's spine restrictions apply only to the outer statement's
       // concepts and must not reach this nested query: its bytes are cached in
       // the relation cache under a key that ignores them.
-      return options.runQuery({
+      const parquetBlob = await options.runQuery({
         rawSql,
         returnType: "parquet",
         datasetDuckDbLease: options.datasetDuckDbLease,
       });
+      return { parquetBlob, staleAt: _getDependencyStaleAt(rawSql) };
     },
   });
 }

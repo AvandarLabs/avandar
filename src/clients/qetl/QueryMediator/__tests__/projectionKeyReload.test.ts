@@ -86,6 +86,22 @@ vi.mock(
   },
 );
 
+vi.mock(
+  "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions",
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions")
+      >();
+    return {
+      ...original,
+      getVirtualRelationDefinitions: async () => {
+        return {};
+      },
+    };
+  },
+);
+
 let QueryMediatorFactory: typeof QueryMediatorFactoryType;
 
 beforeAll(async () => {
