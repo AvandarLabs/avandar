@@ -48,6 +48,10 @@ describe("gradeNoLabelAnswer", () => {
 });
 
 describe("the coded-column count graders", () => {
+  it("pass a converted-column count", () => {
+    expect(_gradeCount("E02", 10, _createResult(["cases"], [[10]]))).toBe(true);
+  });
+
   it("pass a single count", () => {
     expect(_gradeCount("D01", 1, _createResult(["cases"], [[1]]))).toBe(true);
   });

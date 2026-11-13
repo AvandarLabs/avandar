@@ -26,17 +26,26 @@ const DUCKDB_TYPE_BY_APP_TYPE: Record<string, string> = {
   date: "DATE",
 };
 
-/** A dataset the eval database loads, from a CSV under its data directory. */
-type EvalDataset = Pick<
-  CovidDataset,
-  "id" | "fileName" | "truthViewName" | "columns"
->;
+/**
+ * A dataset the eval database loads, from a CSV under its data directory.
+ * A column with `sourceSql` is filled by that SQL over the CSV's columns,
+ * as a converted column is; any other is the CSV's value cast to its type.
+ */
+type EvalDataset = Pick<CovidDataset, "id" | "fileName" | "truthViewName"> & {
+  columns: ReadonlyArray<{
+    name: string;
+    dataType: string;
+    sourceSql?: string;
+  }>;
+};
 
 function _buildCreateTableSql(dataset: EvalDataset, dataDir: string): string {
   const castColumns = dataset.columns
     .map((column) => {
       const duckDbType = DUCKDB_TYPE_BY_APP_TYPE[column.dataType] ?? "VARCHAR";
-      return `CAST("${column.name}" AS ${duckDbType}) AS "${column.name}"`;
+      const valueSql =
+        column.sourceSql ?? `CAST("${column.name}" AS ${duckDbType})`;
+      return `${valueSql} AS "${column.name}"`;
     })
     .join(", ");
   const csvPath = join(dataDir, dataset.fileName).replaceAll("'", "''");
