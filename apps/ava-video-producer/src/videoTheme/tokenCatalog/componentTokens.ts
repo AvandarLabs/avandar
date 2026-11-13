@@ -374,6 +374,43 @@ const NETWORK_GRAPH_TOKENS = {
   ),
 } as const;
 
+const RADIAL_NETWORK_TOKENS = {
+  spokeAlpha: _alpha(
+    "Spoke opacity",
+    "Opacity of the spokes from the hub to each node.",
+  ),
+  spokePulsePeriod: _duration(
+    "Spoke node pulse period",
+    "Frames for one breath of a spoke node.",
+  ),
+  spokePulseSwing: _alpha(
+    "Spoke node pulse swing",
+    "How high a spoke node's activity rises at the top of a breath.",
+  ),
+  hubRadius: _length(
+    "Hub radius",
+    "Radius of the hub disc at the centre of a radial network.",
+  ),
+  hubStrokeAlpha: _alpha("Hub rim opacity", "Opacity of the hub's accent rim."),
+  hubStrokeWidth: _stroke("Hub rim width", "Width of the hub's accent rim."),
+  hubGlowRadius: _length(
+    "Hub glow radius",
+    "Radius of the soft glow inside the hub.",
+  ),
+  hubGlowAlpha: _alpha(
+    "Hub glow opacity",
+    "Opacity of the soft glow inside the hub.",
+  ),
+  hubLabelOffset: _offset(
+    "Hub label offset",
+    "Vertical distance from the hub centre to its label baseline.",
+  ),
+  hubDetailOffset: _offset(
+    "Hub detail offset",
+    "Vertical distance from the hub centre to its detail baseline.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -383,6 +420,7 @@ const NETWORK_GRAPH_TOKENS = {
 export const COMPONENT_TOKENS = {
   ...SHARED_GRAPHIC_TOKENS,
   NetworkGraph: NETWORK_GRAPH_TOKENS,
+  RadialNetwork: RADIAL_NETWORK_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

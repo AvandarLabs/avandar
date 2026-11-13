@@ -247,6 +247,10 @@ export const SEMANTIC_TOKENS = {
       "Guide stroke",
       "Orbits, guides, and other construction lines.",
     ),
+    hairline: _stroke(
+      "Hairline stroke",
+      "The thinnest outline, for hub rims, rows, and fine dividers.",
+    ),
     outline: _stroke("Outline stroke", "Outlines of panels, nodes, and cards."),
     default: _stroke("Default stroke", "Edges, connectors, and drawn paths."),
     annotation: _stroke(

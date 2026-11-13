@@ -44,3 +44,13 @@ test("node-traversal draws off-route nodes in the inactive colour", () => {
     /stroke="#a1b2c3"/,
   );
 });
+
+test("radial-network draws its hub glow at the themed opacity", () => {
+  assert.match(
+    renderPresetWithPatch(
+      { preset: "radial-network" },
+      _componentPatch("RadialNetwork", { hubGlowAlpha: 0.21 }),
+    ),
+    /fill-opacity="0.21"/,
+  );
+});

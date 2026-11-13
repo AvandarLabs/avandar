@@ -32,29 +32,53 @@ const BASELINE: {
 };
 
 /**
- * Presets whose caption moved to the shared caption style (17 px at baseline
- * 551). The legacy capture is kept as recorded, so only this one caption
- * attribute is rewritten before comparing.
+ * Approved markup changes in the legacy capture, kept as recorded. Each move
+ * is one exact string rewritten once before comparing:
+ * - captions moved to the shared caption style (17 px at baseline 551);
+ * - halo glows consolidated to the shared 0.03 opacity;
+ * - 1 px hairlines that now pass an explicit `stroke-width="1"`, which draws
+ *   the same pixels as the SVG default.
  */
-const SHARED_CAPTION_MOVES: Partial<
-  Record<(typeof LEGACY_IDS)[number], Readonly<{ from: string; to: string }>>
+const APPROVED_MARKUP_MOVES: Partial<
+  Record<
+    (typeof LEGACY_IDS)[number],
+    ReadonlyArray<Readonly<{ from: string; to: string }>>
+  >
 > = {
-  "node-traversal": {
-    from: '<text x="480" y="545"',
-    to: '<text x="480" y="551"',
-  },
+  "node-traversal": [
+    { from: '<text x="480" y="545"', to: '<text x="480" y="551"' },
+  ],
+  "radial-network": [
+    {
+      from: '<ellipse cx="480" cy="295" rx="278" ry="181" fill="none" stroke="#2a404e" stroke-dasharray',
+      to: '<ellipse cx="480" cy="295" rx="278" ry="181" fill="none" stroke="#2a404e" stroke-width="1" stroke-dasharray',
+    },
+    {
+      from: 'r="70" fill="#101e28" stroke="#9fefca" stroke-opacity="0.4">',
+      to: 'r="70" fill="#101e28" stroke="#9fefca" stroke-opacity="0.4" stroke-width="1">',
+    },
+    {
+      from: 'r="59" fill="#9fefca" fill-opacity="0.035"',
+      to: 'r="59" fill="#9fefca" fill-opacity="0.03"',
+    },
+    {
+      from: '<text x="480" y="560" fill="#728794" font-size="15"',
+      to: '<text x="480" y="551" fill="#728794" font-size="17"',
+    },
+  ],
 };
 
 const _normalizeSvgIds = (markup: string): string =>
   markup.replace(/stock-[a-zA-Z0-9_]+(?=-)/g, "stock-ID");
 
-const _moveSharedCaption = (
+const _applyApprovedMoves = (
   preset: (typeof LEGACY_IDS)[number],
   markup: string,
-): string => {
-  const move = SHARED_CAPTION_MOVES[preset];
-  return move ? markup.replaceAll(move.from, move.to) : markup;
-};
+): string =>
+  (APPROVED_MARKUP_MOVES[preset] ?? []).reduce(
+    (moved, { from, to }) => moved.replace(from, to),
+    markup,
+  );
 
 const _render = ({
   preset,
@@ -85,7 +109,7 @@ test("original twenty samples preserve every SVG label and geometry at all sixty
     );
     assert.equal(
       _normalizeSvgIds(actual),
-      _normalizeSvgIds(_moveSharedCaption(preset, svg)),
+      _normalizeSvgIds(_applyApprovedMoves(preset, svg)),
       `${preset} frame ${frame}`,
     );
   });
