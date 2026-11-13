@@ -21,6 +21,11 @@ function _isBlank(text: string): boolean {
   return text.trim() === "";
 }
 
+/** Trims spaces only, as the SQL `btrim` does, never tabs or newlines. */
+function _trimSpaces(text: string): string {
+  return text.replace(/^ +| +$/g, "");
+}
+
 function _unique(values: readonly string[]): string[] {
   return [...new Set(values)];
 }
@@ -54,7 +59,7 @@ function getOutputDataType(
     return "varchar";
   }
   const areWholeNumbers = options.pairs.every((pair) => {
-    return INTEGER_CODE_REGEX.test(pair.code.trim());
+    return INTEGER_CODE_REGEX.test(_trimSpaces(pair.code));
   });
   return areWholeNumbers ? "bigint" : "varchar";
 }

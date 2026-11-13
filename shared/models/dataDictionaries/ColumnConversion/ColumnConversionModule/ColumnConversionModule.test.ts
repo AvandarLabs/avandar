@@ -132,7 +132,9 @@ describe("ColumnConversion.getOutputDataType", () => {
     [["01", " 2 ", "-3"], "bigint"],
     [["1", "1.5"], "varchar"],
     [["1", "M"], "varchar"],
+    [["123456789012345678"], "bigint"],
     [["1234567890123456789"], "varchar"],
+    [["\t1"], "varchar"],
     [[], "varchar"],
   ])("encodes codes %j as %s", (codes, expected) => {
     const pairs = codes.map((code) => {
@@ -322,13 +324,13 @@ describe("ColumnConversion.toUnmatchedValuesSql", () => {
     expect(sql).not.toContain("NOT IN");
   });
 
-  it("refuses a limit that is not a positive whole number", () => {
+  it.each([0, -1, 0.5])("refuses a limit of %s", (limit) => {
     expect(() => {
       return ColumnConversion.toUnmatchedValuesSql({
         relationSql: '"raw"',
         valueSql: '"GENDER"',
         conversion: _makeConversion(),
-        limit: 0.5,
+        limit,
       });
     }).toThrow("positive integer");
   });
