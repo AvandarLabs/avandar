@@ -5,6 +5,7 @@ import { DataDictionaryClient } from "@/clients/dataDictionaries/DataDictionaryC
 import { DataDictionaryCodeListClient } from "@/clients/dataDictionaries/DataDictionaryCodeListClient";
 import { DataDictionaryEntryClient } from "@/clients/dataDictionaries/DataDictionaryEntryClient";
 import { DataDictionaryEntryCodingClient } from "@/clients/dataDictionaries/DataDictionaryEntryCodingClient";
+import { DictionaryBindingClient } from "@/clients/dataDictionaries/DictionaryBindingClient";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
@@ -27,8 +28,9 @@ type SaveDataDictionary = {
 };
 
 /**
- * Saves a dictionary's contents in one call, then refreshes the dictionary
- * and its entries, code lists, and codings.
+ * Saves a dictionary's contents in one call, then refreshes the dictionary,
+ * its entries, code lists, and codings, and the dataset bindings, which
+ * removing an entry or code list changes.
  *
  * A failure is logged, not toasted: the save bar shows it as translated
  * copy next to the Save button.
@@ -55,6 +57,7 @@ export function useSaveDataDictionary(
             DataDictionaryEntryClient,
             DataDictionaryCodeListClient,
             DataDictionaryEntryCodingClient,
+            DictionaryBindingClient,
           ].map((client) => {
             return queryClient.invalidateQueries({
               queryKey: [client.getClientName()],
