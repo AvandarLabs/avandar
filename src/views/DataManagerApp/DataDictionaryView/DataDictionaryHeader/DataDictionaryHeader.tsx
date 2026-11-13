@@ -14,8 +14,11 @@ type Props = {
   dictionary: DataDictionary.T;
   draft: DataDictionary.Draft;
   canEdit: boolean;
-  /** How many datasets the user can see that use this dictionary. */
-  usedByCount: number;
+  /**
+   * How many datasets the user can see that use this dictionary, or
+   * undefined while that is loading or could not be read.
+   */
+  usedByCount: number | undefined;
 };
 
 /** The dictionary's name, the facts that identify it, and its actions. */
@@ -48,10 +51,12 @@ export function DataDictionaryHeader({
         t`Dictionary`,
         plural(entryCount, { one: "# entry", other: "# entries" }),
         plural(codeListCount, { one: "# code list", other: "# code lists" }),
-        plural(usedByCount, {
-          one: "Used by # dataset",
-          other: "Used by # datasets",
-        }),
+        usedByCount === undefined
+          ? undefined
+          : plural(usedByCount, {
+              one: "Used by # dataset",
+              other: "Used by # datasets",
+            }),
         t`Version ${dictionary.version}`,
         t`Updated ${updatedDate}`,
       ]}

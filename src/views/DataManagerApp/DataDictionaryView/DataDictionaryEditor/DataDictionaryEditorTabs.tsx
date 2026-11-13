@@ -27,10 +27,16 @@ type Props = {
 /** The Entries, Code lists, and Used by tabs of one dictionary. */
 export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
   const { draft, issues, canEdit, selection } = props;
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const entryCount = draft.entries.length;
   const codeListCount = draft.codeLists.length;
-  const usedByCount = props.usage.rows.length;
+  const { usage } = props;
+  const usedByCount = i18n.number(usage.rows.length);
+  // No count until the datasets are read, so it never says 0 by mistake.
+  const usedByHeader =
+    usage.isLoading || usage.hasError
+      ? t`Used by`
+      : t`Used by · ${usedByCount}`;
 
   return (
     <Tabs
@@ -41,7 +47,7 @@ export function DataDictionaryEditorTabs(props: Readonly<Props>): ReactNode {
       renderTabHeader={{
         entries: t`Entries · ${entryCount}`,
         "code-lists": t`Code lists · ${codeListCount}`,
-        "used-by": t`Used by · ${usedByCount}`,
+        "used-by": usedByHeader,
       }}
       renderTabPanel={{
         entries: () => {

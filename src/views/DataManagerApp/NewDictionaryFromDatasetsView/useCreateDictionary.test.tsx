@@ -148,14 +148,40 @@ describe("useCreateDictionary", () => {
     });
     await waitFor(() => {
       expect(mocks.navigateMock).toHaveBeenCalledWith({
-        key: "data-manager-apply-dictionaries",
         to: "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries",
         params: { workspaceSlug: "demo", datasetId: "dataset-1" },
-        label: expect.any(Function),
-        isAvailableOffline: true,
         search: { dictionaryId: "dictionary-1" },
       });
     });
+    expect(mocks.notifySuccessMock).toHaveBeenCalledWith(
+      "Saved Kings codes to Dictionaries. Now choose how to apply it.",
+    );
+  });
+
+  it("neither opens Apply nor mentions it once the user has left the flow", async () => {
+    let finish: (value: unknown) => void = () => {
+      return undefined;
+    };
+    mocks.createMock.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+    );
+    const { result, unmount } = _render();
+    act(() => {
+      result.current[0]({
+        ...VARIABLES,
+        applyNext: [{ datasetId: "dataset-1", name: "Kings line list" }],
+      } as unknown as CreateDictionaryVariables);
+    });
+    unmount();
+    finish({ id: "dictionary-1", name: "Kings codes" });
+    await waitFor(() => {
+      expect(mocks.notifySuccessMock).toHaveBeenCalledWith(
+        "Saved Kings codes to Dictionaries.",
+      );
+    });
+    expect(mocks.navigateMock).not.toHaveBeenCalled();
   });
 
   it("names the other datasets to apply it to in the toast", async () => {
@@ -170,12 +196,13 @@ describe("useCreateDictionary", () => {
         applyNext: [
           { datasetId: "dataset-1", name: "Kings line list" },
           { datasetId: "dataset-2", name: "Bronx line list" },
+          { datasetId: "dataset-3", name: "Queens line list" },
         ],
       } as unknown as CreateDictionaryVariables);
     });
     await waitFor(() => {
       expect(mocks.notifySuccessMock).toHaveBeenCalledWith(
-        "Saved Kings codes to Dictionaries. Apply it to Bronx line list too, from each dataset's menu.",
+        "Saved Kings codes to Dictionaries. Apply it to Bronx line list and Queens line list too, from each dataset's menu.",
       );
     });
   });

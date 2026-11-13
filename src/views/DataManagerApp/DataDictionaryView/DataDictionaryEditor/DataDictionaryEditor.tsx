@@ -48,6 +48,8 @@ export function DataDictionaryEditor({
   }, [draft]);
   const selection = useEditorSelection(draft);
   const usage = useDictionaryUsage(dictionary.id);
+  const usedByCount =
+    usage.isLoading || usage.hasError ? undefined : usage.rows.length;
 
   return (
     <AppView>
@@ -55,7 +57,7 @@ export function DataDictionaryEditor({
         dictionary={dictionary}
         draft={draft}
         canEdit={canEdit}
-        usedByCount={usage.rows.length}
+        usedByCount={usedByCount}
       />
       <AppViewBody
         rail={_buildRail({ activeTab: selection.activeTab, dictionary })}

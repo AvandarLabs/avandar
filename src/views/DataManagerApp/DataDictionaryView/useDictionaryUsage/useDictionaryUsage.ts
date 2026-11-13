@@ -19,6 +19,8 @@ export type DictionaryUsageRow = {
 export type DictionaryUsage = {
   rows: readonly DictionaryUsageRow[];
   isLoading: boolean;
+  /** True when the bindings or their datasets could not be read. */
+  hasError: boolean;
 };
 
 function _toRows(
@@ -52,14 +54,15 @@ function _toRows(
 export function useDictionaryUsage(
   dictionaryId: DataDictionary.Id,
 ): DictionaryUsage {
-  const [bindings, isLoadingBindings] = DictionaryBindingClient.useGetAll({
-    ...where("dictionary_id", "eq", dictionaryId),
-    useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
-  });
+  const [bindings, isLoadingBindings, bindingsQuery] =
+    DictionaryBindingClient.useGetAll({
+      ...where("dictionary_id", "eq", dictionaryId),
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
   const datasetIds = useMemo(() => {
     return [...new Set((bindings ?? []).map(prop("datasetId")))];
   }, [bindings]);
-  const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
+  const [datasets, isLoadingDatasets, datasetsQuery] = DatasetClient.useGetAll({
     ...where("id", "in", datasetIds),
     useQueryOptions: { enabled: datasetIds.length > 0 },
   });
@@ -69,5 +72,9 @@ export function useDictionaryUsage(
       datasetIds.length > 0 ? (datasets ?? []) : [],
     );
   }, [bindings, datasets, datasetIds]);
-  return { rows, isLoading: isLoadingBindings || isLoadingDatasets };
+  return {
+    rows,
+    isLoading: isLoadingBindings || isLoadingDatasets,
+    hasError: bindingsQuery.isError || datasetsQuery.isError,
+  };
 }

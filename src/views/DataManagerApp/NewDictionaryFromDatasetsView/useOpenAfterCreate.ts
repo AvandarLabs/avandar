@@ -11,49 +11,72 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 /** A dataset a new dictionary can be applied to once it is saved. */
 export type ApplyTarget = { datasetId: Dataset.Id; name: string };
 
+type SavedDictionary = Readonly<{ id: DataDictionary.Id; name: string }>;
+
+/**
+ * The toast shown once a learned dictionary is saved. It only mentions
+ * applying the dictionary when Apply is about to open.
+ */
+function useSavedMessage(): (
+  dictionaryName: string,
+  applyTargets: readonly ApplyTarget[],
+) => string {
+  const { t, i18n } = useLingui();
+  return (dictionaryName, applyTargets) => {
+    const [firstTarget, ...otherTargets] = applyTargets;
+    if (!firstTarget) {
+      return t`Saved ${dictionaryName} to Dictionaries.`;
+    }
+    if (otherTargets.length === 0) {
+      return t`Saved ${dictionaryName} to Dictionaries. Now choose how to apply it.`;
+    }
+    const otherNames = new Intl.ListFormat(i18n.locale, {
+      type: "conjunction",
+    }).format(otherTargets.map(prop("name")));
+    return t`Saved ${dictionaryName} to Dictionaries. Apply it to ${otherNames} too, from each dataset's menu.`;
+  };
+}
+
 /**
  * What happens once a learned dictionary is saved: a toast, then Apply for
  * the first dataset with the dictionary picked, or the dictionary itself
  * when the user did not ask to apply it. Other datasets to apply it to are
- * named in the toast. Nothing navigates once the user has left the flow.
+ * named in the toast. Once the user has left the flow, nothing navigates
+ * and the toast only says the dictionary was saved.
  * Used by `useCreateDictionary`.
  */
 export function useOpenAfterCreate(): (
-  dictionary: Readonly<{ id: DataDictionary.Id; name: string }>,
+  dictionary: SavedDictionary,
   applyNext: readonly ApplyTarget[],
 ) => void {
-  const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const isMountedRef = useIsMounted();
+  const getSavedMessage = useSavedMessage();
   return (dictionary, applyNext) => {
-    const dictionaryName = dictionary.name;
-    const [first, ...rest] = applyNext;
-    const restNames = rest.map(prop("name")).join(", ");
-    notifySuccess(
-      !first
-        ? t`Saved ${dictionaryName} to Dictionaries.`
-        : rest.length === 0
-          ? t`Saved ${dictionaryName} to Dictionaries. Now choose how to apply it.`
-          : t`Saved ${dictionaryName} to Dictionaries. Apply it to ${restNames} too, from each dataset's menu.`,
-    );
     if (!isMountedRef.current) {
+      notifySuccess(getSavedMessage(dictionary.name, []));
       return;
     }
-    navigate(
-      first
-        ? {
-            ...AppLinks.dataManagerApplyDictionaries({
-              workspaceSlug: workspace.slug,
-              datasetId: first.datasetId,
-            }),
-            search: { dictionaryId: dictionary.id },
-          }
-        : AppLinks.dataManagerDictionaryView({
-            workspaceSlug: workspace.slug,
-            dictionaryId: dictionary.id,
-            dictionaryName,
-          }),
-    );
+    notifySuccess(getSavedMessage(dictionary.name, applyNext));
+    const [firstTarget] = applyNext;
+    if (!firstTarget) {
+      const link = AppLinks.dataManagerDictionaryView({
+        workspaceSlug: workspace.slug,
+        dictionaryId: dictionary.id,
+        dictionaryName: dictionary.name,
+      });
+      navigate({ to: link.to, params: link.params });
+      return;
+    }
+    const link = AppLinks.dataManagerApplyDictionaries({
+      workspaceSlug: workspace.slug,
+      datasetId: firstTarget.datasetId,
+    });
+    navigate({
+      to: link.to,
+      params: link.params,
+      search: { dictionaryId: dictionary.id },
+    });
   };
 }

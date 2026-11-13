@@ -1,5 +1,5 @@
 import { Link } from "@avandar/ui";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge, Group, Table, Text } from "@mantine/core";
 import { IconTag } from "@tabler/icons-react";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
@@ -12,6 +12,7 @@ type Props = {
 };
 
 function UsageRow({ row }: Readonly<{ row: DictionaryUsageRow }>): ReactNode {
+  const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const link = AppLinks.dataManagerDatasetView({
     workspaceSlug: workspace.slug,
@@ -39,7 +40,7 @@ function UsageRow({ row }: Readonly<{ row: DictionaryUsageRow }>): ReactNode {
           </Text>
         </Group>
       </Table.Td>
-      <Table.Td ta="end">{row.entryCount}</Table.Td>
+      <Table.Td ta="end">{i18n.number(row.entryCount)}</Table.Td>
       <Table.Td>
         <Badge variant="light" color="green">
           <Trans>Up to date</Trans>
