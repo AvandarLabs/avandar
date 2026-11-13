@@ -44,6 +44,7 @@ with public_tables as (
       'data_dictionaries__code_lists',
       'data_dictionaries__entries',
       'data_dictionaries__entry_codings',
+      'dataset_columns__dictionary_bindings',
       'datasets__postgres_table',
       'map_jitter_salts',
       -- Service role only: no `authenticated` grant at all.
@@ -107,6 +108,7 @@ with public_tables as (
       'data_dictionaries__code_lists',
       'data_dictionaries__entries',
       'data_dictionaries__entry_codings',
+      'dataset_columns__dictionary_bindings',
       'subscriptions',
       'usage_analytics_events'
     )

@@ -1372,6 +1372,87 @@ export type Database = {
           },
         ]
       }
+      dataset_columns__dictionary_bindings: {
+        Row: {
+          applied_dictionary_version: number
+          code_list_id: string | null
+          created_at: string
+          dataset_column_id: string
+          dataset_id: string
+          dictionary_id: string | null
+          direction: Database["public"]["Enums"]["dataset_columns__binding_direction"]
+          entry_id: string | null
+          id: string
+          mode: Database["public"]["Enums"]["dataset_columns__binding_mode"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          applied_dictionary_version: number
+          code_list_id?: string | null
+          created_at?: string
+          dataset_column_id: string
+          dataset_id: string
+          dictionary_id?: string | null
+          direction?: Database["public"]["Enums"]["dataset_columns__binding_direction"]
+          entry_id?: string | null
+          id?: string
+          mode?: Database["public"]["Enums"]["dataset_columns__binding_mode"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          applied_dictionary_version?: number
+          code_list_id?: string | null
+          created_at?: string
+          dataset_column_id?: string
+          dataset_id?: string
+          dictionary_id?: string | null
+          direction?: Database["public"]["Enums"]["dataset_columns__binding_direction"]
+          entry_id?: string | null
+          id?: string
+          mode?: Database["public"]["Enums"]["dataset_columns__binding_mode"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dataset_columns__dictionary_bindin_dataset_id_workspace_id_fkey"
+            columns: ["dataset_id", "workspace_id"]
+            isOneToOne: false
+            referencedRelation: "datasets"
+            referencedColumns: ["id", "workspace_id"]
+          },
+          {
+            foreignKeyName: "dataset_columns__dictionary_bindings_code_list_id_fkey"
+            columns: ["code_list_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries__code_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dataset_columns__dictionary_bindings_dataset_column_id_fkey"
+            columns: ["dataset_column_id"]
+            isOneToOne: true
+            referencedRelation: "dataset_columns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dataset_columns__dictionary_bindings_dictionary_id_fkey"
+            columns: ["dictionary_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dataset_columns__dictionary_bindings_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "data_dictionaries__entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets: {
         Row: {
           created_at: string
@@ -3127,6 +3208,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      dataset_columns__check_binding_entries: {
+        Args: { p_bindings: Json; p_workspace_id: string }
+        Returns: undefined
+      }
+      dataset_columns__check_bindings: {
+        Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
+        Returns: undefined
+      }
+      dataset_columns__write_bindings: {
+        Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
+        Returns: undefined
+      }
       datasets__auth_user_may_add_column: {
         Args: { p_dataset_id: string }
         Returns: boolean
@@ -3498,6 +3591,10 @@ export type Database = {
       }
       rpc_data_dictionaries__save: {
         Args: { p_code_lists: Json; p_dictionary_id: string; p_entries: Json }
+        Returns: number
+      }
+      rpc_dataset_columns__apply_dictionaries: {
+        Args: { p_bindings: Json; p_dataset_id: string }
         Returns: number
       }
       rpc_datasets__add_csv_file_dataset: {
@@ -4125,6 +4222,8 @@ export type Database = {
         | "date"
         | "text"
         | "identifier"
+      dataset_columns__binding_direction: "decode" | "encode"
+      dataset_columns__binding_mode: "reference" | "convert"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -4441,6 +4540,8 @@ export const Constants = {
         "text",
         "identifier",
       ],
+      dataset_columns__binding_direction: ["decode", "encode"],
+      dataset_columns__binding_mode: ["reference", "convert"],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
