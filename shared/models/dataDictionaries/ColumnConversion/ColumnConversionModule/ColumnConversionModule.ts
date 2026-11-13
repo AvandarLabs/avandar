@@ -26,6 +26,16 @@ function _trimSpaces(text: string): string {
   return text.replace(/^ +| +$/g, "");
 }
 
+/**
+ * Whether two codes name the same pair: equal once spaces are trimmed and
+ * case is ignored, as the apply RPC compares a `map` override's code with
+ * its list. Use it wherever a code someone chose is looked up in a list,
+ * for example a saved override or a code typed to add.
+ */
+function isSameCode(codeA: string, codeB: string): boolean {
+  return _trimSpaces(codeA).toLowerCase() === _trimSpaces(codeB).toLowerCase();
+}
+
 function _unique(values: readonly string[]): string[] {
   return [...new Set(values)];
 }
@@ -83,13 +93,16 @@ function _getPairCases(
   });
 }
 
-/** What a value mapped to the pair with `code` becomes, if anything. */
+/**
+ * What a value mapped to the pair with `code` becomes, if anything. Codes
+ * compare by `isSameCode`, so every override the RPC accepts applies.
+ */
 function _getMappedOutput(
   conversion: Readonly<ColumnConversionT>,
   code: string,
 ): string | undefined {
   const pair = conversion.pairs.find((candidate) => {
-    return candidate.code === code;
+    return isSameCode(candidate.code, code);
   });
   const output = conversion.direction === "decode" ? pair?.label : pair?.code;
   return output === undefined || _isBlank(output) ? undefined : output;
@@ -354,6 +367,7 @@ export const ColumnConversionModule = {
   getCases,
   getOutputType,
   getOutputDataType,
+  isSameCode,
   toValueKeySql,
   toCaseSql,
   toKeptValuesSql,

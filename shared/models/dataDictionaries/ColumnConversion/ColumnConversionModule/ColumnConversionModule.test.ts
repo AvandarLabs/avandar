@@ -116,6 +116,28 @@ describe("ColumnConversion.getCases", () => {
     expect(cases.at(-1)).toEqual({ match: "Mle", output: "1" });
   });
 
+  it("maps to a pair whose code differs only in case and surrounding spaces, as the apply RPC accepts", () => {
+    const cases = ColumnConversion.getCases(
+      _makeConversion({
+        pairs: [_pair("A1", "Alpha")],
+        overrides: [{ value: "q", action: "map", code: " a1 " }],
+      }),
+    );
+
+    expect(cases.at(-1)).toEqual({ match: "q", output: "Alpha" });
+  });
+
+  it("does not map to a code that differs by a tab, which the RPC's trim keeps", () => {
+    const cases = ColumnConversion.getCases(
+      _makeConversion({
+        pairs: [_pair("A1", "Alpha")],
+        overrides: [{ value: "q", action: "map", code: "\tA1" }],
+      }),
+    );
+
+    expect(cases).toEqual([{ match: "A1", output: "Alpha" }]);
+  });
+
   it("keeps a pair's case ahead of an override for the same value", () => {
     const cases = ColumnConversion.getCases(
       _makeConversion({ overrides: [{ value: "1", action: "empty" }] }),
