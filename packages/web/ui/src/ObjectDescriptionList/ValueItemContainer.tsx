@@ -28,6 +28,13 @@ type Props<RootData extends GenericRootData> = {
    */
   rootData: RootData;
 
+  /**
+   * The object this value is a key of, such as the row a table cell sits
+   * in. A primitive value passes it to its `renderValue` and
+   * `renderEditableValue`.
+   */
+  parentObject?: DescribableObject;
+
   /** Whether to render the value in edit mode. */
   editMode?: boolean;
 
@@ -66,12 +73,20 @@ export function ValueItemContainer<RootData extends GenericRootData>(
   return match(props)
     .with(
       { type: "primitive" },
-      ({ type, value, rootData, onChange, ...primitiveValueRenderOptions }) => {
+      ({
+        type,
+        value,
+        rootData,
+        parentObject,
+        onChange,
+        ...primitiveValueRenderOptions
+      }) => {
         return (
           <PrimitiveValueItem
             value={value}
             onChange={onChange}
             rootData={rootData}
+            parentObject={parentObject}
             {...primitiveValueRenderOptions}
           />
         );
@@ -79,7 +94,14 @@ export function ValueItemContainer<RootData extends GenericRootData>(
     )
     .with(
       { type: "array" },
-      ({ type, value, rootData, onSubmitChange, ...arrayRenderOptions }) => {
+      ({
+        type,
+        value,
+        rootData,
+        parentObject,
+        onSubmitChange,
+        ...arrayRenderOptions
+      }) => {
         return (
           <DescribableValueArrayBlock
             data={value}
@@ -92,7 +114,14 @@ export function ValueItemContainer<RootData extends GenericRootData>(
     )
     .with(
       { type: "object" },
-      ({ type, value, rootData, onSubmitChange, ...objectRenderOptions }) => {
+      ({
+        type,
+        value,
+        rootData,
+        parentObject,
+        onSubmitChange,
+        ...objectRenderOptions
+      }) => {
         return (
           <ObjectDescriptionListBlock
             data={value}
@@ -109,6 +138,7 @@ export function ValueItemContainer<RootData extends GenericRootData>(
         type,
         value,
         rootData,
+        parentObject,
         editMode,
         onChange,
         onSubmitChange,
@@ -123,6 +153,7 @@ export function ValueItemContainer<RootData extends GenericRootData>(
               value={value}
               onChange={onChange}
               rootData={rootData}
+              parentObject={parentObject}
               {...renderOptions}
             />
           );

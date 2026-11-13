@@ -112,6 +112,7 @@ export function ObjectTableRow<
               type="unknown"
               value={fieldVal}
               rootData={rootData}
+              parentObject={editedObjectValue}
               {...childRenderOptions}
             />
           </Table.Td>

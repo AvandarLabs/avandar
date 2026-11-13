@@ -10,6 +10,7 @@ import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { BoundColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/BoundColumnName";
+import { EntryDescription } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/EntryDescription";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
@@ -116,25 +117,24 @@ export function DatasetMetadataList({
           includeKeys: ["name", "dataType", "description"],
           keyRenderOptions: {
             name: {
-              // The table hands a cell only its own value, so a bound
-              // column's entry description shows under its name.
               renderValue: (name) => {
                 const columnName = String(name);
                 const codes = columnCodesByName.get(columnName);
-                const ownDescription = dataset.columns?.find((column) => {
-                  return column.name === columnName;
-                })?.description;
                 return codes ? (
-                  <BoundColumnName
-                    name={columnName}
-                    codes={codes}
-                    showsEntryDescription={!ownDescription}
-                  />
+                  <BoundColumnName name={columnName} codes={codes} />
                 ) : undefined;
               },
             },
             description: {
               renderAsType: "text",
+              // A column's own description wins. Without one, a bound
+              // column shows its dictionary entry's description.
+              renderValue: (description, _rootData, column) => {
+                const codes = columnCodesByName.get(column.name);
+                return !description && codes?.description ? (
+                  <EntryDescription codes={codes} />
+                ) : undefined;
+              },
             },
             dataType: {
               renderAsType: {
