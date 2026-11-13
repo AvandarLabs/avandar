@@ -1,4 +1,4 @@
-import { objectEntries, objectKeys, prop } from "@avandar/utils";
+import { objectEntries, prop } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import type { DuckDbLoadParquetOptions } from "@/clients/DuckDbClient/duckDbClientOperations";
 
@@ -192,23 +192,32 @@ export function getParquetProjectionClauses(
   };
 }
 
-/** Substitutes `$name$` placeholders in a query with their parameters. */
+/** A `$name$` placeholder: a name of letters, digits, and underscores. */
+const QUERY_PARAM_PLACEHOLDER_REGEX = /\$([A-Za-z_][A-Za-z0-9_]*)\$/g;
+
+/**
+ * Substitutes `$name$` placeholders in a query with their parameters, in
+ * one pass. A parameter's value is inserted as written: `$&`, `` $` ``,
+ * `$'`, and `$$` in it stay literal, and a placeholder inside it is never
+ * substituted in turn, so a code-list label in a view's projection can
+ * never rewrite the statement around it. A placeholder with no parameter,
+ * or an undefined one, is left as it is.
+ */
 export function getQueryStringFromParams(
   options: Readonly<{
     params: Record<string, string | number | bigint | undefined>;
     queryString: string;
   }>,
 ): string {
-  return objectKeys(options.params).reduce((currentQuery, parameterName) => {
-    const argumentValue = options.params[parameterName];
-    if (argumentValue === undefined) {
-      return currentQuery;
-    }
-    return currentQuery.replace(
-      new RegExp(`\\$${parameterName}\\$`, "g"),
-      String(argumentValue),
-    );
-  }, options.queryString);
+  return options.queryString.replace(
+    QUERY_PARAM_PLACEHOLDER_REGEX,
+    (placeholder: string, parameterName: string) => {
+      const argumentValue = Object.hasOwn(options.params, parameterName)
+        ? options.params[parameterName]
+        : undefined;
+      return argumentValue === undefined ? placeholder : String(argumentValue);
+    },
+  );
 }
 
 /** Flattens dataset ID groups into one list without duplicates. */
