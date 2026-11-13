@@ -586,6 +586,38 @@ const CODE_FOCUS_TOKENS = {
   ),
 } as const;
 
+const SCHEMA_MAPPING_TOKENS = {
+  fieldRadius: _length("Field row radius", "Corner radius of a field row."),
+  dividerWidth: _stroke(
+    "Panel divider width",
+    "Width of the line under a panel title.",
+  ),
+  dotRadius: _length(
+    "Field port radius",
+    "Radius of the dot where a mapping leaves or enters a field.",
+  ),
+  edgeAlpha: _alpha(
+    "Mapping opacity",
+    "Opacity of a mapping line between two fields.",
+  ),
+  ringRadius: _length(
+    "Match ring radius",
+    "Radius of the ring that confirms a mapping.",
+  ),
+  ringAlpha: _alpha(
+    "Match ring opacity",
+    "Opacity of the confirming ring's outline.",
+  ),
+  ringStrokeWidth: _stroke(
+    "Match ring width",
+    "Width of the confirming ring's outline.",
+  ),
+  checkSize: _length(
+    "Match check size",
+    "Size of the check inside the confirming ring.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -602,6 +634,7 @@ export const COMPONENT_TOKENS = {
   PredicatePushdownBoundary: PREDICATE_PUSHDOWN_TOKENS,
   CodeWindow: CODE_WINDOW_TOKENS,
   CodeFocus: CODE_FOCUS_TOKENS,
+  SchemaMapping: SCHEMA_MAPPING_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

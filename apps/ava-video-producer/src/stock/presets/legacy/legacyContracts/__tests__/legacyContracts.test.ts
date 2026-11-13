@@ -115,6 +115,18 @@ const APPROVED_MARKUP_MOVES: Partial<
       to: '<text x="480" y="551" fill="#728794" font-size="17"',
     },
   ],
+  "schema-mapping": [
+    // Each panel's title divider gains the explicit hairline.
+    ...["64", "598"].map((x1) => ({
+      from: `<line x1="${x1}" y1="202" x2="${Number(x1) + 298}" y2="202" stroke="#2a404e"></line>`,
+      to: `<line x1="${x1}" y1="202" x2="${Number(x1) + 298}" y2="202" stroke="#2a404e" stroke-width="1"></line>`,
+    })),
+    // Each match ring gains the explicit hairline once, in drawing order.
+    ...[0, 1, 2, 3].map(() => ({
+      from: 'stroke-opacity="0.6"></circle>',
+      to: 'stroke-opacity="0.6" stroke-width="1"></circle>',
+    })),
+  ],
   "terminal-type": [
     // The shared code window's title-bar divider gains the explicit hairline.
     {

@@ -56,3 +56,14 @@ test("code-focus draws its window at the themed radius", () => {
     /rx="21"/,
   );
 });
+
+test("schema-mapping draws its match rings at the themed radius", () => {
+  assert.match(
+    renderPresetWithComponentPatch(
+      { preset: "schema-mapping" },
+      "SchemaMapping",
+      { ringRadius: 11 },
+    ),
+    /r="11"/,
+  );
+});

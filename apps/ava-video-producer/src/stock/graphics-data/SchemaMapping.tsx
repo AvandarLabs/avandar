@@ -1,131 +1,246 @@
 import { prop } from "@avandar/utils";
-import { DUR, ramp } from "../../motion";
+import { ramp } from "../../motion";
 import {
   Arrive,
   Check,
-  Curve,
   DrawPath,
   Eyebrow,
+  GRAPHIC_WIDTH,
   Panel,
-  STOCK,
   Text,
   type GraphicProps,
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
+import {
+  useGraphicMotion,
+  useGraphicProps,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme";
 import type { SchemaMappingInput } from "../presets/SchemaMapping/SchemaMapping.schema";
 
 type Props = GraphicProps & { input: SchemaMappingInput };
 
-/** Draws the bounded authored schema-mapping study at an explicit frame. */
-export function SchemaMapping({
-  input,
+const PANEL_TOP = 133;
+const PANEL_WIDTH = 298;
+const PANEL_HEIGHT = 373;
+const TITLE_INSET = 26;
+const TITLE_Y = 177;
+const DIVIDER_Y = 202;
+const FIRST_ROW_Y = 242;
+const ROW_STEP = 68;
+const ROW_INSET = 18;
+const ROW_WIDTH = 262;
+const ROW_HEIGHT = 46;
+const ROW_HALF_HEIGHT = 22;
+const FIELD_INSET = 14;
+const FIELD_BASELINE = 6;
+const TYPE_INSET = 16;
+const TYPE_BASELINE = 5;
+const SOURCE_ROW_CUE = 18;
+const TARGET_ROW_CUE = 22;
+const LINK_CUE = 26;
+const LINK_STEP = 13;
+const CAPTION_Y = 553;
+
+function SchemaPanel({
+  x,
+  title,
   frame,
-  accent,
-  background = STOCK.ground,
-}: Readonly<Props>) {
-  const sources = input.mappings.map(prop("source"));
-  const targets = input.mappings.map(prop("target"));
-  const types = input.mappings.map(prop("type"));
+  index,
+}: {
+  x: number;
+  title: string;
+  frame: number;
+  index: number;
+}) {
+  const style = useGraphicProps("SchemaMapping", {});
+  const { color } = useGraphicTokens();
+  return (
+    <Arrive frame={frame} index={index}>
+      <Panel x={x} y={PANEL_TOP} width={PANEL_WIDTH} height={PANEL_HEIGHT}>
+        <Text role="panelTitle" x={x + TITLE_INSET} y={TITLE_Y}>
+          {title}
+        </Text>
+        <line
+          x1={x}
+          y1={DIVIDER_Y}
+          x2={x + PANEL_WIDTH}
+          y2={DIVIDER_Y}
+          stroke={color.line}
+          strokeWidth={style.dividerWidth}
+        />
+      </Panel>
+    </Arrive>
+  );
+}
+
+type FieldProps = {
+  x: number;
+  y: number;
+  portX: number;
+  color: string;
+  label: string;
+  isPortFirst: boolean;
+};
+
+/**
+ * A field row's card, port dot, and name. A target row draws its port before
+ * its name and a source row after it, so each keeps its legacy paint order.
+ */
+function FieldRow({ x, y, portX, color, label, isPortFirst }: FieldProps) {
+  const style = useGraphicProps("SchemaMapping", {});
+  const tokens = useGraphicTokens();
+  const port = <circle cx={portX} cy={y} r={style.dotRadius} fill={color} />;
+  return (
+    <>
+      <StockRect
+        x={x + ROW_INSET}
+        y={y - ROW_HALF_HEIGHT}
+        width={ROW_WIDTH}
+        height={ROW_HEIGHT}
+        rx={style.fieldRadius}
+        fill={tokens.color.elevated}
+      />
+      {isPortFirst ? port : null}
+      <Text role="field" x={x + ROW_INSET + FIELD_INSET} y={y + FIELD_BASELINE}>
+        {label}
+      </Text>
+      {isPortFirst ? null : port}
+    </>
+  );
+}
+
+function MatchRing({
+  y,
+  color,
+  opacity,
+  showCheck,
+}: {
+  y: number;
+  color: string;
+  opacity: number;
+  showCheck: boolean;
+}) {
+  const style = useGraphicProps("SchemaMapping", {});
+  const tokens = useGraphicTokens();
+  const x = GRAPHIC_WIDTH / 2;
+  return (
+    <g opacity={opacity}>
+      <circle
+        cx={x}
+        cy={y}
+        r={style.ringRadius}
+        fill={tokens.color.ground}
+        stroke={color}
+        strokeOpacity={style.ringAlpha}
+        strokeWidth={style.ringStrokeWidth}
+      />
+      {showCheck ? (
+        <Check x={x} y={y} color={color} size={style.checkSize} />
+      ) : null}
+    </g>
+  );
+}
+
+type RowProps = {
+  label: string;
+  target: string;
+  type: string;
+  index: number;
+  frame: number;
+  accent: string;
+  left: number;
+  right: number;
+  showChecks: boolean;
+};
+
+function MappingRow({ index, frame, accent, left, right, ...row }: RowProps) {
+  const style = useGraphicProps("SchemaMapping", {});
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const y = FIRST_ROW_Y + index * ROW_STEP;
+  const color = index % 2 ? tokens.color.accentAlt : accent;
+  const sourceX = left + PANEL_WIDTH;
+  const cue = LINK_CUE + index * LINK_STEP;
+  const t = ramp(frame, cue, motion.hero, motion.entrance.easing);
+  const field = { y, color };
+  return (
+    <g>
+      <Arrive frame={frame} at={SOURCE_ROW_CUE} index={index}>
+        <FieldRow
+          {...field}
+          x={left}
+          portX={sourceX}
+          label={row.label}
+          isPortFirst={false}
+        />
+      </Arrive>
+      <DrawPath
+        curve={{ from: { x: sourceX, y }, to: { x: right, y } }}
+        frame={frame}
+        at={cue}
+        color={color}
+        opacity={style.edgeAlpha}
+      />
+      <MatchRing y={y} color={color} opacity={t} showCheck={row.showChecks} />
+      <Arrive frame={frame} at={TARGET_ROW_CUE} index={index}>
+        <FieldRow
+          {...field}
+          x={right}
+          portX={right}
+          label={row.target}
+          isPortFirst
+        />
+        <Text
+          role="detail"
+          x={right + ROW_INSET + ROW_WIDTH - TYPE_INSET}
+          y={y + TYPE_BASELINE}
+          anchor="end"
+        >
+          {row.type}
+        </Text>
+      </Arrive>
+    </g>
+  );
+}
+
+/** Draws the bounded authored schema-mapping study at an explicit frame. */
+export function SchemaMapping({ input, frame, accent }: Readonly<Props>) {
+  const { layout } = useGraphicTokens();
+  const left = layout.graphic.margin;
+  const right = GRAPHIC_WIDTH - layout.graphic.margin - PANEL_WIDTH;
+  const copy = LEGACY_DISPLAY_COPY["schema-mapping"];
   return (
     <g>
       <Eyebrow>
-        {getStockDisplayCopyFromDescriptor({
-          descriptor: LEGACY_DISPLAY_COPY["schema-mapping"].schemaMapping,
-        })}
+        {getStockDisplayCopyFromDescriptor({ descriptor: copy.schemaMapping })}
       </Eyebrow>
-      <Arrive frame={frame}>
-        <Panel x={64} y={133} width={298} height={373}>
-          <Text x={90} y={177} size={23} weight={600}>
-            {input.sourceLabel}
-          </Text>
-          <line x1={64} y1={202} x2={362} y2={202} stroke={STOCK.line} />
-        </Panel>
-      </Arrive>
-      <Arrive frame={frame} index={1}>
-        <Panel x={598} y={133} width={298} height={373}>
-          <Text x={624} y={177} size={23} weight={600}>
-            {input.targetLabel}
-          </Text>
-          <line x1={598} y1={202} x2={896} y2={202} stroke={STOCK.line} />
-        </Panel>
-      </Arrive>
-      {sources.map((label, i) => {
-        const y = 242 + i * 68;
-        const color = i % 2 ? STOCK.cyan : accent;
-        const from = { x: 362, y };
-        const to = { x: 598, y };
-        const t = ramp(frame, 26 + i * 13, DUR.hero);
-        return (
-          <g key={label}>
-            <Arrive frame={frame} at={18} index={i}>
-              <StockRect
-                x={82}
-                y={y - 22}
-                width={262}
-                height={46}
-                rx={8}
-                fill={STOCK.elevated}
-              />
-              <Text x={96} y={y + 6} size={17} mono>
-                {label}
-              </Text>
-              <circle cx={362} cy={y} r={5} fill={color} />
-            </Arrive>
-            <DrawPath
-              d={Curve({ from, to })}
-              frame={frame}
-              at={26 + i * 13}
-              duration={DUR.hero}
-              color={color}
-              opacity={0.7}
-            />
-            <g opacity={t}>
-              <circle
-                cx={480}
-                cy={y}
-                r={13}
-                fill={background}
-                stroke={color}
-                strokeOpacity={0.6}
-              />
-              {input.showChecks ? (
-                <Check x={480} y={y} color={color} size={10} />
-              ) : null}
-            </g>
-            <Arrive frame={frame} at={22} index={i}>
-              <StockRect
-                x={616}
-                y={y - 22}
-                width={262}
-                height={46}
-                rx={8}
-                fill={STOCK.elevated}
-              />
-              <circle cx={598} cy={y} r={5} fill={color} />
-              <Text x={630} y={y + 6} size={17} mono>
-                {targets[i]}
-              </Text>
-              <Text
-                x={862}
-                y={y + 5}
-                size={12}
-                fill={STOCK.muted}
-                anchor="end"
-                mono
-              >
-                {types[i]}
-              </Text>
-            </Arrive>
-          </g>
-        );
-      })}
-      <Text x={480} y={553} size={15} anchor="middle" fill={STOCK.muted}>
+      <SchemaPanel x={left} title={input.sourceLabel} frame={frame} index={0} />
+      <SchemaPanel
+        x={right}
+        title={input.targetLabel}
+        frame={frame}
+        index={1}
+      />
+      {input.mappings.map((mapping, i) => (
+        <MappingRow
+          key={mapping.source}
+          label={mapping.source}
+          target={mapping.target}
+          type={mapping.type}
+          index={i}
+          frame={frame}
+          accent={accent}
+          left={left}
+          right={right}
+          showChecks={input.showChecks}
+        />
+      ))}
+      <Text role="note" x={GRAPHIC_WIDTH / 2} y={CAPTION_Y} anchor="middle">
         {getStockDisplayCopyFromDescriptor({
-          descriptor:
-            LEGACY_DISPLAY_COPY["schema-mapping"]
-              .differentNamesExplicitConnections,
+          descriptor: copy.differentNamesExplicitConnections,
         })}
       </Text>
     </g>
