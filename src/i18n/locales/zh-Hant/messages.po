@@ -150,6 +150,10 @@ msgstr "在相同分頁中開啟連結"
 msgid "Run a query to see results."
 msgstr "執行查詢以查看結果。"
 
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "This changes {datasetName} for everyone in the workspace who uses it."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "開始日期（例如：2024-01-01）"
@@ -299,6 +303,11 @@ msgstr "搜尋資料集..."
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "Latitude and longitude"
 msgstr "緯度和經度"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "Rewrites the uploaded data in place. It is synced to the workspace, so "
+"this changes it for everyone who uses it."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
@@ -1563,6 +1572,10 @@ msgstr "來源檔案是空的。"
 msgid "Give this entry a name."
 msgstr ""
 
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "{datasetName} already has the current version of {dictionaryName}."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "只有下方列出的人員和群組可以存取此 {resource}。"
@@ -1625,6 +1638,7 @@ msgstr "已發布至工作區"
 msgid "Single select"
 msgstr "單選"
 
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "You're offline. Reconnect to save this."
@@ -1872,6 +1886,11 @@ msgstr "目前縮放程度下要移除的細節像素數。設為零即可停用
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Any time"
 msgstr "不限時間"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "{datasetName} is built from other data, so a linked dataset is the only "
+"option."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Regular expression"
@@ -2635,6 +2654,10 @@ msgstr "一個資料集就是一個分頁。"
 msgid "Label each ring with"
 msgstr "為每個環圈加上標籤"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
+msgid "I understand this changes {datasetName} for the whole workspace"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
 msgstr "它可以讀取的資料"
@@ -3200,6 +3223,10 @@ msgstr "比例尺"
 msgid "You shared your first dashboard with your workspace. Anyone there can "
 "open it whenever they need it."
 msgstr "您已與工作區分享第一個儀表板。工作區中的任何人都可以在需要時開啟它。"
+
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "You can no longer read {dictionaryName}, so it was not re-applied."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "This dataset now reflects the current contents of the table."
@@ -4010,6 +4037,11 @@ msgstr ""
 msgid "Measure"
 msgstr "測量"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "{sourceName} data can't be changed from Avandar yet, so a linked dataset "
+"is the only option for now."
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Labels become codes"
 msgstr ""
@@ -4123,6 +4155,7 @@ msgstr "幾何功能正在下載。在網路較慢時可能需要稍等。"
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
@@ -5730,6 +5763,10 @@ msgstr "晚於或等於"
 msgid "Try a different lookup"
 msgstr "嘗試其他查詢"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "It is offline only, so nobody else is affected."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
@@ -5788,6 +5825,10 @@ msgstr "檢測到個人數據"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Coordinate validation report"
 msgstr "座標驗證報告"
+
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "Re-apply {dictionaryName}?"
+msgstr ""
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Day"
@@ -5890,6 +5931,10 @@ msgstr "預期的幾何圖形"
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "Untitled map"
 msgstr "未命名地圖"
+
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "Re-applied {dictionaryName} to {datasetName}."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve new permissions for {pluginName}?"
@@ -6946,6 +6991,10 @@ msgstr "富有洞察力"
 msgid "Statuses saved"
 msgstr "狀態已儲存"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "Change {datasetName}"
+msgstr ""
+
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "資料集"
@@ -7316,6 +7365,10 @@ msgstr ""
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"
 msgstr "下載 CSV"
+
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "You need edit access to {datasetName} to re-apply a dictionary."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -9433,6 +9486,7 @@ msgstr "請稍後再試；如果問題持續發生，請聯絡支援人員。"
 msgid "{featureCount, plural, one {# point} other {# points}}"
 msgstr "{featureCount, plural, one {# 個點} other {# 個點}}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "A linked dataset reads {datasetName}, so it can't be changed in place. "
 "Convert in the linked dataset instead."
@@ -10188,6 +10242,10 @@ msgstr "由 Geoapify 提供"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "設為僅限離線"
+
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "Re-apply {dictionaryName} to {datasetName}"
+msgstr ""
 
 #: src/views/GisApp/places/usePlacesErrorMessage.ts
 msgid "This dataset isn't a places dataset, so places can't be added to it."
@@ -12653,6 +12711,10 @@ msgstr "最大半徑"
 msgid "Top"
 msgstr "頂端"
 
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "{dictionaryName} was not re-applied to {datasetName}. Please try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "來自您的提示："
@@ -13030,6 +13092,10 @@ msgstr "收合圖層面板"
 msgid "It's time to create your first workspace. Don't think for too long; you "
 "can always change these later!"
 msgstr "是時候建立您的第一個工作區了。不用想太久；之後隨時都可以變更這些設定！"
+
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "Re-apply"
+msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "Chosen from the data: these values are labels."

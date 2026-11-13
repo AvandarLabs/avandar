@@ -157,6 +157,10 @@ msgstr "Ouvrir le lien dans le même onglet"
 msgid "Run a query to see results."
 msgstr "Exécutez une requête pour voir les résultats."
 
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "This changes {datasetName} for everyone in the workspace who uses it."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Start (e.g. 2024-01-01)"
 msgstr "Début (par ex. 2024-01-01)"
@@ -310,6 +314,11 @@ msgstr "Rechercher des ensembles de données..."
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceLocationStep.tsx
 msgid "Latitude and longitude"
 msgstr "Latitude et longitude"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "Rewrites the uploaded data in place. It is synced to the workspace, so "
+"this changes it for everyone who uses it."
+msgstr ""
 
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
@@ -1632,6 +1641,10 @@ msgstr "Le fichier source est vide."
 msgid "Give this entry a name."
 msgstr ""
 
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "{datasetName} already has the current version of {dictionaryName}."
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Only the people and groups listed below can access this {resource}."
 msgstr "Seules les personnes et les groupes indiqués ci-dessous peuvent accéder "
@@ -1698,6 +1711,7 @@ msgstr "Publié dans l’espace de travail"
 msgid "Single select"
 msgstr "Sélection unique"
 
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
 msgid "You're offline. Reconnect to save this."
@@ -1961,6 +1975,11 @@ msgstr "Pixels de détail à supprimer au niveau de zoom actuel. Définissez cet
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Any time"
 msgstr "À tout moment"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "{datasetName} is built from other data, so a linked dataset is the only "
+"option."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 msgid "Regular expression"
@@ -2756,6 +2775,10 @@ msgstr "Un jeu de données correspond à un onglet."
 msgid "Label each ring with"
 msgstr "Étiqueter chaque anneau avec"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
+msgid "I understand this changes {datasetName} for the whole workspace"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Data it can read"
 msgstr "Données qu’il peut lire"
@@ -3344,6 +3367,10 @@ msgid "You shared your first dashboard with your workspace. Anyone there can "
 msgstr "Vous avez partagé votre premier tableau de bord avec votre espace de "
 "travail. Toute personne qui en fait partie peut l'ouvrir dès qu'elle en "
 "a besoin."
+
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "You can no longer read {dictionaryName}, so it was not re-applied."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "This dataset now reflects the current contents of the table."
@@ -4190,6 +4217,11 @@ msgstr ""
 msgid "Measure"
 msgstr "Mesurer"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "{sourceName} data can't be changed from Avandar yet, so a linked dataset "
+"is the only option for now."
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Labels become codes"
 msgstr ""
@@ -4310,6 +4342,7 @@ msgstr "La prise en charge de la géométrie est en cours de téléchargement. C
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
 #: src/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader.tsx
 #: src/components/permissions/ShareResourceModal/openMakePrivateConfirmModal.tsx
 #: src/components/privacy/ConsentModal/ConsentActions.tsx
@@ -5990,6 +6023,10 @@ msgstr "est postérieur ou égal à"
 msgid "Try a different lookup"
 msgstr "Essayez une autre recherche"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "It is offline only, so nobody else is affected."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector.tsx
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline width"
@@ -6052,6 +6089,10 @@ msgstr "Données personnelles détectées"
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReport.tsx
 msgid "Coordinate validation report"
 msgstr "Rapport de validation des coordonnées"
+
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "Re-apply {dictionaryName}?"
+msgstr ""
 
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Day"
@@ -6155,6 +6196,10 @@ msgstr "Géométrie attendue"
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "Untitled map"
 msgstr "Carte sans titre"
+
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "Re-applied {dictionaryName} to {datasetName}."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Approve new permissions for {pluginName}?"
@@ -7244,6 +7289,10 @@ msgstr "Instructif"
 msgid "Statuses saved"
 msgstr "Statuts enregistrés"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
+msgid "Change {datasetName}"
+msgstr ""
+
 #: shared/copy/resourceTypeLabel.ts
 msgid "dataset"
 msgstr "jeu de données"
@@ -7622,6 +7671,10 @@ msgstr ""
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListBody.tsx
 msgid "Download CSV"
 msgstr "Télécharger le CSV"
+
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "You need edit access to {datasetName} to re-apply a dictionary."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents.tsx
 msgid "Purchase {seatsToAdd} seat"
@@ -9814,6 +9867,7 @@ msgstr "Réessayez dans un instant ou contactez l’assistance si le problème "
 msgid "{featureCount, plural, one {# point} other {# points}}"
 msgstr "{featureCount, plural, one {# point} other {# points}}"
 
+#: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/ChangeDatasetCard.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "A linked dataset reads {datasetName}, so it can't be changed in place. "
 "Convert in the linked dataset instead."
@@ -10607,6 +10661,10 @@ msgstr "Fourni par Geoapify"
 #: src/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton.tsx
 msgid "Make offline-only"
 msgstr "Rendre uniquement hors ligne"
+
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "Re-apply {dictionaryName} to {datasetName}"
+msgstr ""
 
 #: src/views/GisApp/places/usePlacesErrorMessage.ts
 msgid "This dataset isn't a places dataset, so places can't be added to it."
@@ -13171,6 +13229,10 @@ msgstr "Rayon maximal"
 msgid "Top"
 msgstr "Haut"
 
+#: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
+msgid "{dictionaryName} was not re-applied to {datasetName}. Please try again."
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 msgid "From your prompt:"
 msgstr "De votre invite :"
@@ -13568,6 +13630,10 @@ msgid "It's time to create your first workspace. Don't think for too long; you "
 msgstr "Il est temps de créer votre premier espace de travail. Ne réfléchissez "
 "pas trop longtemps : vous pourrez toujours modifier ces paramètres plus "
 "tard !"
+
+#: src/components/dataDictionaries/ReapplyButton/ReapplyButton.tsx
+msgid "Re-apply"
+msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "Chosen from the data: these values are labels."
