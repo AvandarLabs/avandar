@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  getKeptEnumValuesQueries,
   getParquetProjectionClauses,
   getQueryStringFromParams,
+  getRawValuesViewName,
+  getTableNameFromRawValuesViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
 import type { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 
@@ -145,5 +148,49 @@ describe("getParquetProjectionClauses", () => {
       excludeClause: "",
       replaceClause: "",
     });
+  });
+});
+
+describe("raw-values view names", () => {
+  const DATASET_ID = "22222222-2222-4222-8222-222222222222";
+
+  it("prefixes a dataset's table name and reads it back", () => {
+    const viewName = getRawValuesViewName(DATASET_ID);
+
+    expect(viewName).toBe(`ava_raw_${DATASET_ID}`);
+    expect(getTableNameFromRawValuesViewName(viewName)).toBe(DATASET_ID);
+  });
+
+  it("reads no table from any other name", () => {
+    expect(
+      getTableNameFromRawValuesViewName(`ava_rows_${DATASET_ID}`),
+    ).toBeUndefined();
+  });
+});
+
+describe("getKeptEnumValuesQueries", () => {
+  it("asks only an ordered decoded column for its kept values, over its stored value", () => {
+    const queries = getKeptEnumValuesQueries({
+      columnReplacements: {
+        SES: {
+          dataType: "BIGINT",
+          valueMapping: {
+            ...GENDER_CONVERSION,
+            isOrdered: true,
+            keepsOriginalAs: undefined,
+          },
+        },
+        GENDER: { valueMapping: GENDER_CONVERSION },
+        zip: { alias: "zip_code" },
+      },
+      relationSql: 'read_parquet("t1")',
+    });
+
+    expect(queries).toEqual([
+      {
+        columnName: "SES",
+        sql: `SELECT DISTINCT kept_value FROM (SELECT CASE lower(trim(CAST(TRY_CAST("SES" AS BIGINT) AS VARCHAR))) WHEN lower(trim('1')) THEN 'Male' ELSE CAST(TRY_CAST("SES" AS BIGINT) AS VARCHAR) END AS kept_value FROM read_parquet("t1")) WHERE kept_value IS NOT NULL AND kept_value NOT IN ('Male') ORDER BY kept_value`,
+      },
+    ]);
   });
 });

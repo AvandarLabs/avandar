@@ -32,6 +32,36 @@ export function getRowNumberedViewName(tableName: string): string {
 }
 
 /**
+ * Prefix of the auxiliary view that exposes a dataset's values as stored:
+ * its renames and casts, none of its conversions, and no keep-original
+ * copies. Deliberately not a `RelationRef` prefix, for the same reason as
+ * `ava_rows_`.
+ */
+const RAW_VALUES_VIEW_PREFIX = "ava_raw_";
+
+/**
+ * Names the auxiliary view of a dataset's values before any conversion.
+ * Profiling, matching, and the apply flow's preview and unmatched values
+ * read it, because a converted dataset's public view holds labels.
+ */
+export function getRawValuesViewName(tableName: string): string {
+  return `${RAW_VALUES_VIEW_PREFIX}${tableName}`;
+}
+
+/**
+ * The dataset table an `ava_raw_` view reads, or undefined for any other
+ * name. The inverse of `getRawValuesViewName`, which the SQL analyzer uses
+ * to treat the view as a read of that dataset.
+ */
+export function getTableNameFromRawValuesViewName(
+  viewName: string,
+): string | undefined {
+  return viewName.startsWith(RAW_VALUES_VIEW_PREFIX)
+    ? viewName.slice(RAW_VALUES_VIEW_PREFIX.length)
+    : undefined;
+}
+
+/**
  * Prefix of the table that stages one concept's generated individuals.
  *
  * Deliberately not a `RelationRef` prefix, for the same reason as
@@ -249,6 +279,38 @@ export function getParquetProjectionClauses(
       exclusions.length > 0 ? `EXCLUDE (${exclusions.join(", ")})` : "",
     replaceClause: items.length > 0 ? `, ${items.join(", ")}` : "",
   };
+}
+
+/**
+ * One query per column whose conversion outputs an `ENUM`, reading the
+ * values it keeps beside its labels from `relationSql`. A loader runs them
+ * before it builds the view and passes their rows to
+ * `getParquetProjectionClauses` as `keptValuesByColumn`, so the cast to the
+ * `ENUM` never meets a value it lacks.
+ */
+export function getKeptEnumValuesQueries(
+  options: Readonly<{
+    columnReplacements: DuckDbLoadParquetOptions["columnReplacements"];
+    relationSql: string;
+  }>,
+): Array<{ columnName: string; sql: string }> {
+  return objectEntries(options.columnReplacements ?? {}).flatMap(
+    ([columnName, replacement]) => {
+      const conversion = replacement.valueMapping;
+      if (
+        conversion === undefined ||
+        ColumnConversion.getOutputType(conversion).kind !== "enum"
+      ) {
+        return [];
+      }
+      const sql = ColumnConversion.toKeptValuesSql({
+        relationSql: options.relationSql,
+        valueSql: _getStoredValueSql(columnName, replacement.dataType),
+        conversion,
+      });
+      return [{ columnName, sql }];
+    },
+  );
 }
 
 /** A `$name$` placeholder: a name of letters, digits, and underscores. */

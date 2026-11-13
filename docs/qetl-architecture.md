@@ -62,6 +62,7 @@ loading entirely; they only see tables already resident in the tab.
 | poisoning | Marking a table invalid before a mutating statement runs |
 | spine | `concept_<id>__individuals`: a one-column `VARCHAR` table of a concept's `external_id` values |
 | `ava_rows_<id>` | A second view over a dataset's Parquet file that adds `file_row_number` |
+| `ava_raw_<id>` | A third view over a dataset's Parquet file with its renames and casts but none of its conversions: the values as stored, which profiling and the apply flow read |
 | trusted internal SQL | SQL the DuckDB client or QETL builds itself (loaders, CSV sniffing, projection, concept views), marked with the `TRUSTED_INTERNAL_SQL` symbol so `runRawQuery` accepts it when the analyzer's only objection is a source it cannot inspect (`uninspectable-source`) |
 
 ### 2.1 Client, wrapper, and adapter: three words, two separate layers
@@ -390,7 +391,7 @@ PublicOwned with the exact expected owner, and Invalid is readable by nobody._
 
 - **Loading.** `loadParquetIntoDuckDb` drops the table, registers the blob as a
   `BROWSER_FILEREADER` file handle (byte-range reads, no copy into the WASM
-  heap), and creates the dataset view plus its `ava_rows_<id>` view.
+  heap), reads each ordered conversion's kept values from the file, and creates the dataset view plus its `ava_rows_<id>` and `ava_raw_<id>` views.
   `registerParquetFile` rejects a blob whose type is not
   `application/vnd.apache.parquet`.
 
@@ -413,7 +414,7 @@ Do not break these without changing the reason they exist.
 | Datasets load before concept views, spines before views | DuckDB binds a view's sources at `CREATE VIEW` time | `_runLeasedQuery`, `loadConceptRelations` |
 | Column renames apply only to columns the loaded file holds | `SELECT * EXCLUDE (...)` fails on a projected-away column | `_isColumnInLoadedRelation` in `relationLoading.ts` |
 | A dataset's table name is its bare UUID; every other kind has a prefix, tried longest first | Stored dashboard SQL, virtual dataset SQL, and `?sql=` URLs must keep resolving | `RelationRefModule.ts` |
-| `RelationRef.fromTableName` must not resolve internal names (`concept_<id>__individuals`, `ava_rows_`, `ava_proj_`, `ava_staging_individuals_`) | A resolved name would be authorized and loaded as a relation; the analyzer instead maps `ava_rows_<id>` to a read of dataset `<id>` on purpose and treats staging tables as reading nothing | `RelationRefModule.ts`, `duckDbSqlText.ts`, `duckDbSqlSources.ts`, `loadConceptSpine.ts` |
+| `RelationRef.fromTableName` must not resolve internal names (`concept_<id>__individuals`, `ava_rows_`, `ava_raw_`, `ava_proj_`, `ava_staging_individuals_`) | A resolved name would be authorized and loaded as a relation; the analyzer instead maps `ava_rows_<id>` and `ava_raw_<id>` to a read of dataset `<id>` on purpose and treats staging tables as reading nothing | `RelationRefModule.ts`, `duckDbSqlText.ts`, `duckDbSqlSources.ts`, `loadConceptSpine.ts` |
 | One wrapper per relation kind; declared pushdown or acquirability must have a method | Resolution must not depend on registration order; wiring errors surface when the registry is built, which is once per `fetchRelationBytes` call rather than at startup | `createRelationRegistry` |
 | A spine's key column is `VARCHAR`, loaded through CSV, and empty ids are refused | Keys compare as text; user text must not enter SQL | `loadConceptSpine.ts` |
 
@@ -676,7 +677,7 @@ means traced through the source but not run.
 | Snapshot publishing of an `all_columns` slice fails over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists). Google Sheets and Postgres tables keep no parquet in Storage, so every slice of theirs is read through the workspace query instead. An uploaded file's `all_columns` slice copies the stored parquet, which keeps the original column names and detected types, so a column renamed or retyped after import does not match the widget SQL a published viewer runs | by reading | `dashboardPublishSnapshots.ts`, `LocalPublicDatasetRawDataClient.ts` |
 | `extractReferencedRelations`, `buildCsvFromDatastoreRecords`, `RelationRegistry.resolveAll` and `wrappers` have no production caller | by reading | as named |
 | Concept attributes mapped from two datasets read only the first mapping | by reading | `makeConceptAttributeColumnsFromMetadata.ts` |
-| An `ava_rows_` view outlives its dataset when the dataset is dropped and not reloaded | documented in code | `duckDbParquetLoad.ts` |
+| The `ava_rows_` and `ava_raw_` views outlive their dataset when the dataset is dropped and not reloaded | documented in code | `duckDbParquetLoad.ts` |
 | Planned and absent: the 14-day offline authorization window, sorted materialization by entity key, publish-time concept materialization | by reading | design specs below |
 
 ## 14. Related documents
