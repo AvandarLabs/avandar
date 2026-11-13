@@ -34,3 +34,13 @@ test("network-graph draws its highlighted edges at the themed opacity", () => {
     /opacity="0.37"/,
   );
 });
+
+test("node-traversal draws off-route nodes in the inactive colour", () => {
+  assert.match(
+    renderPresetWithPatch(
+      { preset: "node-traversal" },
+      { other: { video: { atomic: { swatch: { muted: "#a1b2c3" } } } } },
+    ),
+    /stroke="#a1b2c3"/,
+  );
+});

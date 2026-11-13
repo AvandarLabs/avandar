@@ -1,19 +1,30 @@
-import { DUR, EASE, mix, ramp } from "../../motion";
+import { ramp } from "../../motion";
 import {
+  Caption,
   CircleNode,
   DrawPath,
   Eyebrow,
-  STOCK,
-  Text,
+  Route,
   type GraphicProps,
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary";
+import { useGraphicMotion, useGraphicTokens } from "../theme/useGraphicTheme";
 import type { NodeTraversalInput } from "../presets/NodeTraversal/NodeTraversal.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: NodeTraversalInput };
+
+const ROUTE_CUE = 24;
+const ROUTE_DRAW_FRAMES = 106;
+const EDGE_CUE = 14;
+const ROUTE_LINE_CUE = 25;
+const CAPTION_CUE = 80;
+
+function _clampUnit(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
 
 /** Draws the bounded authored node-traversal study at an explicit frame. */
 export function NodeTraversal({
@@ -21,10 +32,17 @@ export function NodeTraversal({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const nodes = input.nodes;
-  const edges = input.edges;
-  const route = input.route;
-  const progress = ramp(frame, 24, 106, EASE.inOut) * (route.length - 1);
+  const { color } = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const { nodes, edges, route } = input;
+  const progress =
+    ramp(
+      frame,
+      ROUTE_CUE,
+      motion.scale(ROUTE_DRAW_FRAMES),
+      motion.travel.easing,
+    ) *
+    (route.length - 1);
   return (
     <g>
       <Eyebrow>
@@ -43,53 +61,42 @@ export function NodeTraversal({
           key={i}
           d={`M${nodes[a].x} ${nodes[a].y} L${nodes[b].x} ${nodes[b].y}`}
           frame={frame}
-          at={14 + i * 2}
-          width={2}
+          at={EDGE_CUE + i * motion.stagger.edge}
         />
       ))}
-      {route.slice(0, -1).map((a, i) => {
-        const b = route[i + 1];
-        const t = Math.min(1, Math.max(0, progress - i));
-        return (
-          <line
-            key={i}
-            x1={nodes[a].x}
-            y1={nodes[a].y}
-            x2={mix(t, nodes[a].x, nodes[b].x)}
-            y2={mix(t, nodes[a].y, nodes[b].y)}
-            stroke={accent}
-            strokeWidth={3.5}
-            strokeLinecap="round"
-            opacity={ramp(frame, 25, DUR.chip)}
-          />
-        );
-      })}
+      {route.slice(0, -1).map((a, i) => (
+        <Route
+          key={i}
+          from={nodes[a]}
+          to={nodes[route[i + 1]]}
+          progress={_clampUnit(progress - i)}
+          frame={frame}
+          at={ROUTE_LINE_CUE}
+          color={accent}
+        />
+      ))}
       {nodes.map((node, i) => {
         const routeIndex = route.indexOf(i);
-        const active =
-          routeIndex < 0
-            ? 0
-            : Math.min(1, Math.max(0, progress - routeIndex + 1));
         return (
           <CircleNode
             key={node.label}
             {...node}
             frame={frame}
             index={i}
-            accent={routeIndex < 0 ? STOCK.muted : accent}
-            active={active}
-            radius={29}
+            accent={routeIndex < 0 ? color.inactive : accent}
+            active={routeIndex < 0 ? 0 : _clampUnit(progress - routeIndex + 1)}
+            size="lg"
           />
         );
       })}
-      <g opacity={ramp(frame, 80, DUR.sheet)}>
-        <Text x={480} y={545} size={17} anchor="middle" fill={STOCK.muted}>
+      <g opacity={ramp(frame, CAPTION_CUE, motion.sheet)}>
+        <Caption>
           {getStockDisplayCopyFromDescriptor({
             descriptor:
               LEGACY_DISPLAY_COPY["node-traversal"]
                 .aSelectedPathThroughAConnectedSystem,
           })}
-        </Text>
+        </Caption>
       </g>
     </g>
   );

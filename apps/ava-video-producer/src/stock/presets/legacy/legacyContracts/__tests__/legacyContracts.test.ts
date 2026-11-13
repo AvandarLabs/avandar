@@ -31,8 +31,30 @@ const BASELINE: {
   }>;
 };
 
+/**
+ * Presets whose caption moved to the shared caption style (17 px at baseline
+ * 551). The legacy capture is kept as recorded, so only this one caption
+ * attribute is rewritten before comparing.
+ */
+const SHARED_CAPTION_MOVES: Partial<
+  Record<(typeof LEGACY_IDS)[number], Readonly<{ from: string; to: string }>>
+> = {
+  "node-traversal": {
+    from: '<text x="480" y="545"',
+    to: '<text x="480" y="551"',
+  },
+};
+
 const _normalizeSvgIds = (markup: string): string =>
   markup.replace(/stock-[a-zA-Z0-9_]+(?=-)/g, "stock-ID");
+
+const _moveSharedCaption = (
+  preset: (typeof LEGACY_IDS)[number],
+  markup: string,
+): string => {
+  const move = SHARED_CAPTION_MOVES[preset];
+  return move ? markup.replaceAll(move.from, move.to) : markup;
+};
 
 const _render = ({
   preset,
@@ -63,7 +85,7 @@ test("original twenty samples preserve every SVG label and geometry at all sixty
     );
     assert.equal(
       _normalizeSvgIds(actual),
-      _normalizeSvgIds(svg),
+      _normalizeSvgIds(_moveSharedCaption(preset, svg)),
       `${preset} frame ${frame}`,
     );
   });
