@@ -1,0 +1,29 @@
+{
+  "figtree": {
+    "label": "Figtree",
+    "source": "bundled",
+    "file": "fonts/figtree-latin.woff2",
+    "face": "Figtree",
+    "weight": "300 900",
+    "stack": "Figtree, ui-sans-serif, system-ui, sans-serif",
+    "measured": false
+  },
+  "arial": {
+    "label": "Arial",
+    "source": "system",
+    "stack": "Arial, sans-serif",
+    "measured": true
+  },
+  "courier": {
+    "label": "Courier New",
+    "source": "system",
+    "stack": "'Courier New', monospace",
+    "measured": true
+  },
+  "systemMono": {
+    "label": "System monospace",
+    "source": "system",
+    "stack": "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace",
+    "measured": false
+  }
+}

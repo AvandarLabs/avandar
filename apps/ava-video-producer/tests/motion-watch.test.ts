@@ -36,6 +36,7 @@ async function _createWatchFixture(root: string) {
     "src/chrome",
     "src/cursor-motion.ts",
     "src/fonts.ts",
+    "src/videoTheme",
     "showcase/download.js",
   ];
   await Promise.all(

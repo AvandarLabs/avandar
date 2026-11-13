@@ -1,18 +1,32 @@
 import { execFileSync } from "node:child_process";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+const FONT_REGISTRY_FILE = new URL(
+  "../../src/videoTheme/videoFontRegistry/videoFontRegistry.json",
+  import.meta.url,
+);
+
 /**
- * Avandar's brand typeface, served by the showcase from `public/fonts`, so
- * every page that loads the theme also gets the brand font.
+ * `@font-face` rules for every bundled video font, served by the showcase
+ * from `public/fonts`, so every page that loads the theme CSS also gets the
+ * fonts a video theme may name.
  */
-const BRAND_FONT_FACE = `@font-face {
+export async function buildBundledFontFaceCss() {
+  const registry = JSON.parse(await readFile(FONT_REGISTRY_FILE, "utf8"));
+  return Object.values(registry)
+    .filter((font) => font.source === "bundled")
+    .map(
+      (font) => `@font-face {
   font-display: swap;
-  font-family: Figtree;
+  font-family: ${font.face};
   font-style: normal;
-  font-weight: 300 900;
-  src: url("/fonts/figtree-latin.woff2") format("woff2");
+  font-weight: ${font.weight};
+  src: url("/${font.file}") format("woff2");
 }
-`;
+`,
+    )
+    .join("\n");
+}
 
 /** Refreshes browser theme CSS and palette data from the workspace theme. */
 export async function refreshPalette({ root, outputDirectory, paletteFile }) {
@@ -34,7 +48,7 @@ export async function refreshPalette({ root, outputDirectory, paletteFile }) {
   );
   await writeFile(
     path.join(outputDirectory, "showcase-theme.css"),
-    `${BRAND_FONT_FACE}\n:root {\n${tokens.join("\n")}\n  --ava-font: Figtree, ui-sans-serif, system-ui, sans-serif;\n}\n`,
+    `${await buildBundledFontFaceCss()}\n:root {\n${tokens.join("\n")}\n  --ava-font: Figtree, ui-sans-serif, system-ui, sans-serif;\n}\n`,
   );
   if ((await readFile(paletteFile, "utf8").catch(() => "")) !== text) {
     await writeFile(paletteFile, text);
