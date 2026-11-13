@@ -64,6 +64,50 @@ function fromRows(rows: Readonly<ColumnCodesRows>): Map<string, ColumnCodesT> {
   return result;
 }
 
+type ColumnCodesBinding = ColumnCodesRows["bindings"][number];
+
+function _uniqueDefined<Value>(
+  values: ReadonlyArray<Value | undefined>,
+): Value[] {
+  return [
+    ...new Set(
+      values.filter((value): value is Value => {
+        return value !== undefined;
+      }),
+    ),
+  ];
+}
+
+/**
+ * The ids of the dictionaries, entries, and code lists a set of bindings
+ * names, each listed once. Use it to read the rows `fromRows` joins.
+ */
+function getRowIdsFromBindings<Binding extends ColumnCodesBinding>(
+  bindings: readonly Binding[],
+): {
+  dictionaryIds: Array<NonNullable<Binding["dictionaryId"]>>;
+  entryIds: Array<NonNullable<Binding["entryId"]>>;
+  codeListIds: Array<NonNullable<Binding["codeListId"]>>;
+} {
+  return {
+    dictionaryIds: _uniqueDefined(
+      bindings.map((binding) => {
+        return binding.dictionaryId;
+      }),
+    ),
+    entryIds: _uniqueDefined(
+      bindings.map((binding) => {
+        return binding.entryId;
+      }),
+    ),
+    codeListIds: _uniqueDefined(
+      bindings.map((binding) => {
+        return binding.codeListId;
+      }),
+    ),
+  };
+}
+
 /** The part of a column's codes a model reads. */
 function toContext(codes: Readonly<ColumnCodesContext>): ColumnCodesContext {
   return {
@@ -190,6 +234,7 @@ export const ColumnCodesModule = {
   MAX_PROMPT_PAIRS,
   MAX_PROMPT_DESCRIPTION_CHARS,
   fromRows,
+  getRowIdsFromBindings,
   toContext,
   fromStoredPairs,
   formatPairs,

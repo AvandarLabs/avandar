@@ -6,7 +6,8 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 /**
  * Whether any dictionary is attached to a dataset's columns. Use it to
  * offer an action only to a dataset with no dictionary yet, such as
- * learning a dictionary from it. `hasBindings` is false while loading.
+ * learning a dictionary from it. `hasBindings` is false while loading and
+ * when the bindings cannot be read.
  */
 export function useDatasetHasBindings(datasetId: Dataset.Id): {
   hasBindings: boolean;
@@ -18,6 +19,6 @@ export function useDatasetHasBindings(datasetId: Dataset.Id): {
   });
   return {
     hasBindings: (bindings?.length ?? 0) > 0,
-    isLoading: isLoading || bindings === undefined,
+    isLoading,
   };
 }

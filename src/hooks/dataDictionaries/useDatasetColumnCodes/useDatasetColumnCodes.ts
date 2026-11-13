@@ -1,4 +1,4 @@
-import { isDefined, prop, where } from "@avandar/utils";
+import { where } from "@avandar/utils";
 import { useMemo } from "react";
 import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { DataDictionaryClient } from "@/clients/dataDictionaries/DataDictionaryClient/DataDictionaryClient";
@@ -21,12 +21,6 @@ export type DatasetColumnCodes = {
   isLoading: boolean;
 };
 
-function _uniqueIds<Id extends string>(
-  ids: ReadonlyArray<Id | undefined>,
-): Id[] {
-  return [...new Set(ids.filter(isDefined))];
-}
-
 type BoundDictionaryRows = Omit<ColumnCodes.Rows, "bindings"> & {
   isLoading: boolean;
 };
@@ -36,24 +30,29 @@ function useBoundDictionaryRows(
   bindings: readonly DictionaryBinding.T[],
 ): BoundDictionaryRows {
   const ids = useMemo(() => {
-    return {
-      dictionaryIds: _uniqueIds(bindings.map(prop("dictionaryId"))),
-      entryIds: _uniqueIds(bindings.map(prop("entryId"))),
-      codeListIds: _uniqueIds(bindings.map(prop("codeListId"))),
-    };
+    return ColumnCodes.getRowIdsFromBindings(bindings);
   }, [bindings]);
   const [dictionaries, isLoadingDictionaries] = DataDictionaryClient.useGetAll({
     ...where("id", "in", ids.dictionaryIds),
-    useQueryOptions: { enabled: ids.dictionaryIds.length > 0 },
+    useQueryOptions: {
+      enabled: ids.dictionaryIds.length > 0,
+      usePreviousDataAsPlaceholder: true,
+    },
   });
   const [entries, isLoadingEntries] = DataDictionaryEntryClient.useGetAll({
     ...where("id", "in", ids.entryIds),
-    useQueryOptions: { enabled: ids.entryIds.length > 0 },
+    useQueryOptions: {
+      enabled: ids.entryIds.length > 0,
+      usePreviousDataAsPlaceholder: true,
+    },
   });
   const [codeLists, isLoadingCodeLists] =
     DataDictionaryCodeListClient.useGetAll({
       ...where("id", "in", ids.codeListIds),
-      useQueryOptions: { enabled: ids.codeListIds.length > 0 },
+      useQueryOptions: {
+        enabled: ids.codeListIds.length > 0,
+        usePreviousDataAsPlaceholder: true,
+      },
     });
   const isLoading =
     isLoadingDictionaries || isLoadingEntries || isLoadingCodeLists;

@@ -222,3 +222,26 @@ describe("ColumnCodes.findPairByLabel", () => {
     ).toBeUndefined();
   });
 });
+
+describe("ColumnCodes.getRowIdsFromBindings", () => {
+  it("lists each named id once and skips the ones a binding lacks", () => {
+    const binding = ROWS.bindings[0]!;
+    const ids = ColumnCodes.getRowIdsFromBindings([
+      binding,
+      { ...binding, datasetColumnId: "col-other" },
+      {
+        ...binding,
+        datasetColumnId: "col-orphan",
+        dictionaryId: "dict-2",
+        entryId: undefined,
+        codeListId: undefined,
+      },
+    ]);
+
+    expect(ids).toEqual({
+      dictionaryIds: ["dict-1", "dict-2"],
+      entryIds: ["entry-sex"],
+      codeListIds: ["list-sex"],
+    });
+  });
+});

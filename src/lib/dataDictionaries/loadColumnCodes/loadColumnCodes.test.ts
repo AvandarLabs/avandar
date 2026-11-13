@@ -73,9 +73,38 @@ describe("loadColumnCodes", () => {
     const codes = await loadColumnCodes(WORKSPACE_ID);
 
     expect(codes.get("col-gender")?.codeListName).toBe("Sex (1/2/9)");
-    expect(codeListsMock).toHaveBeenCalledWith({
-      where: { id: { in: ["list-sex"] } },
+  });
+
+  it("reads only the workspace's bindings", async () => {
+    bindingsMock.mockResolvedValue([]);
+
+    await loadColumnCodes(WORKSPACE_ID);
+
+    expect(bindingsMock).toHaveBeenCalledWith({
+      where: { workspace_id: { eq: WORKSPACE_ID } },
     });
+  });
+
+  it("reads entries and code lists by their dictionaries", async () => {
+    bindingsMock.mockResolvedValue([
+      {
+        datasetColumnId: "col-gender",
+        dictionaryId: "dict-1",
+        entryId: "entry-sex",
+        codeListId: "list-sex",
+        mode: "reference",
+        direction: "decode",
+      },
+    ]);
+    dictionariesMock.mockResolvedValue([]);
+    entriesMock.mockResolvedValue([]);
+    codeListsMock.mockResolvedValue([]);
+
+    await loadColumnCodes(WORKSPACE_ID);
+
+    const byDictionary = { where: { dictionary_id: { in: ["dict-1"] } } };
+    expect(entriesMock).toHaveBeenCalledWith(byDictionary);
+    expect(codeListsMock).toHaveBeenCalledWith(byDictionary);
   });
 
   it("gives no codes when the bindings cannot be read", async () => {
