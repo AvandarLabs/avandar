@@ -539,7 +539,7 @@ select
   );
 
 /** Prevents a binding from being moved to another workspace. */
-create or replace function public.dataset_columns__dictionary_bindings__prevent_workspace_id_change () returns trigger language plpgsql
+create or replace function public.dataset_columns__dictionary_bindings__keep_workspace_id () returns trigger language plpgsql
 set
   search_path = '' as $$
 begin
@@ -553,7 +553,7 @@ end;
 $$;
 
 revoke
-execute on function public.dataset_columns__dictionary_bindings__prevent_workspace_id_change ()
+execute on function public.dataset_columns__dictionary_bindings__keep_workspace_id ()
 from
   public,
   anon,
@@ -609,9 +609,9 @@ from
   authenticated,
   service_role;
 
-create trigger tr__dataset_columns__dictionary_bindings__prevent_workspace_id_change before
+create trigger tr__dataset_columns__dictionary_bindings__keep_workspace_id before
 update of workspace_id on public.dataset_columns__dictionary_bindings for each row
-execute function public.dataset_columns__dictionary_bindings__prevent_workspace_id_change ();
+execute function public.dataset_columns__dictionary_bindings__keep_workspace_id ();
 
 create trigger tr__dataset_columns__dictionary_bindings__set_updated_at before
 update on public.dataset_columns__dictionary_bindings for each row
