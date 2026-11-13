@@ -231,6 +231,19 @@
     }
   },
   "components": {
+    "Node": { "defaultProps": { "radiusXs": 22, "radiusSm": 25, "radiusMd": 26, "radiusLg": 29, "radiusXl": 37, "fill": "$color.surface", "stroke": "$color.line", "strokeWidth": "$stroke.outline", "ringSpread": 9, "ringAlpha": "$atomic.opacity.25", "tintAlpha": "$atomic.opacity.9", "outlineAlpha": "$atomic.opacity.28", "coreRadius": 5, "coreGrowth": 2, "labelOffset": 30, "detailOffset": 51 } },
+    "Edge": { "defaultProps": { "color": "$color.line", "strokeWidth": "$stroke.default", "cap": "round", "dash": "$atomic.dash.fine", "drawDuration": "$motion.drawOn.duration", "drawEasing": "$motion.drawOn.easing", "curveTension": "$atomic.curveTension.md" } },
+    "Route": { "defaultProps": { "strokeWidth": "$stroke.route", "cap": "round", "fadeIn": "$motion.chip" } },
+    "Packet": { "defaultProps": { "color": "$atomic.swatch.mint", "radius": 4, "radiusSm": 2.5, "period": "$motion.packetFlow.period", "curveTension": "$atomic.curveTension.md", "fadeIn": "$motion.sheet" } },
+    "Halo": { "defaultProps": { "glow": "$effect.halo" } },
+    "Particle": { "defaultProps": { "radius": 2.7, "radiusLg": 4.5, "haloRadius": 14, "haloAlpha": "$atomic.opacity.6", "twinklePeriod": "$motion.pulse.period", "twinkleFloor": 0.45 } },
+    "Guide": { "defaultProps": { "color": "$color.line", "alpha": "$atomic.opacity.65", "strokeWidth": "$atomic.strokeWidth.3xs", "dash": "$atomic.dash.orbit" } },
+    "Panel": { "defaultProps": { "fill": "$color.surface", "stroke": "$color.line", "radius": "$corner.panel", "strokeWidth": "$stroke.outline" } },
+    "Card": { "defaultProps": { "radius": "$corner.card", "fillAlpha": "$atomic.opacity.8", "strokeAlpha": "$atomic.opacity.32", "padding": 16, "textBaseline": 21, "baseHeight": 24 } },
+    "Pill": { "defaultProps": { "color": "$color.textMuted", "width": 114, "height": 30, "radius": "$corner.pill", "fillAlpha": "$atomic.opacity.8", "strokeAlpha": "$atomic.opacity.32", "textBaseline": 20 } },
+    "Check": { "defaultProps": { "color": "$atomic.swatch.mint", "size": 12, "strokeWidth": "$atomic.strokeWidth.md", "cap": "round", "join": "round" } },
+    "Rule": { "defaultProps": { "color": "$color.line", "strokeWidth": "$atomic.strokeWidth.3xs" } },
+    "Glyph": { "defaultProps": { "strokeWidth": "$stroke.default" } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,
