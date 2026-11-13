@@ -186,6 +186,33 @@ describe("QueryMediator projection key", () => {
     expect(datasetGetAllMock).not.toHaveBeenCalled();
   });
 
+  it("rebuilds a view loaded while the columns could not be read once they can", async () => {
+    // The catalog read failed: no replacements and no keys.
+    loadColumnReplacementsMock.mockResolvedValue({
+      replacementsByDatasetId: {},
+      projectionKeyByDatasetId: {},
+    });
+    await _runQuery("catalog");
+    getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
+    // Still unreadable: the loaded view keeps being served.
+    await _runQuery("catalog");
+    expect(loadParquetMock).toHaveBeenCalledTimes(1);
+
+    loadColumnReplacementsMock.mockResolvedValue(_catalogLabelling("Male"));
+    await _runQuery("catalog");
+
+    expect(loadParquetMock).toHaveBeenCalledTimes(2);
+    expect(loadParquetMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        columnReplacements: {
+          GENDER: expect.objectContaining({
+            valueMapping: _conversionLabelling("Male"),
+          }),
+        },
+      }),
+    );
+  });
+
   it("never reads the catalog in a stored session", async () => {
     await _runQuery("stored");
 

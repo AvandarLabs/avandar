@@ -168,9 +168,11 @@ run before any lock; steps 4 to 14 run inside one coordinated operation.
 7. **`_readQueryCatalog`** (`queryRunner.ts`). In a `catalog` session that
    names a dataset, reads each dataset's replacements and projection key with
    `loadColumnReplacements`: every column, the convert bindings, and the live
-   code lists they use. A failed read is logged and leaves those datasets with
-   no replacements and no key, so the query still runs. A `stored` session,
-   and a query that names no dataset, read nothing.
+   code lists they use. A failed columns read is logged and leaves those
+   datasets with no replacements and no key, so the query still runs and a
+   loaded view keeps being served; a view loaded then is recorded with the
+   `UNREAD_PROJECTION_KEY` sentinel, so the first successful read rebuilds it.
+   A `stored` session, and a query that names no dataset, read nothing.
 8. **`probeRelationCache`**. Datasets DuckDB cannot serve: absent, present
    with a sidecar set that does not cover the need, stale, or built with
    another projection key than step 7 read
@@ -686,7 +688,6 @@ means traced through the source but not run.
 | Column inference attributes a table alias written without `AS` and a typed literal's keyword (`TIMESTAMP`, `DATE`, `INTERVAL`) as columns. When the dataset has a column the query does not name and no `"all"` copy is cached, the projection fails with a binder error, unless the keyword happens to equal a column name (`DATE` over a `date` column succeeds with a duplicate `date_1`) | verified | `getNeededColumnsFromQuery.ts`, `getParquetColumnNamesFromNeeded.ts` |
 | In a multi-dataset statement that qualifies some names, unqualified names are not attributed, so the projection can drop a needed column | verified | `getNeededColumnsFromQuery.ts` |
 | The analyzer refuses `EXTRACT(part FROM column)` as `uninspectable-source` | verified | `duckDbSqlSources.ts` |
-| When a workspace query cannot read the dataset columns (offline with nothing cached), its datasets load with no renames, casts, or conversions and no projection key. A view recorded without a key counts as current, so that unconverted view keeps being served after the catalog is readable again, until the tab reloads or the view is dropped for another reason. A failed bindings read is not affected: it records the "no conversions" key, so the next successful read rebuilds the view | by reading | `loadColumnReplacements.ts`, `QueryableRelationColumns.ts` |
 | A CKAN resource in Parquet format is wrapped in an untyped Blob and fails `registerParquetFile` when the query needs all columns; the bad entry is cached first. Latent: in-repo registrations are CSV and XLSX | by reading | `DatasetParquetWrapper.ts` |
 | The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `QueryableRelationColumns.ts` |
 | Snapshot publishing of an `all_columns` slice fails over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists). Google Sheets and Postgres tables keep no parquet in Storage, so every slice of theirs is read through the workspace query instead. An uploaded file's `all_columns` slice copies the stored parquet, which keeps the original column names and detected types, so a column renamed or retyped after import does not match the widget SQL a published viewer runs | by reading | `dashboardPublishSnapshots.ts`, `LocalPublicDatasetRawDataClient.ts` |

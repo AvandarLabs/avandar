@@ -9,6 +9,7 @@ import { unionColumnSets } from "$/models/relations/RelationCacheKey/RelationCac
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
+import { UNREAD_PROJECTION_KEY } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import { getWrapperForRef } from "@/clients/qetl/RelationRegistry/RelationRegistry";
 import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -379,6 +380,25 @@ async function _writeStoredRelationBytes(
 }
 
 /**
+ * The projection key to record with a loaded view: none for a `stored`
+ * session, which has no projection, the catalog's key when it was read, and
+ * {@link UNREAD_PROJECTION_KEY} when the catalog could not be read, so the
+ * next query that reads it rebuilds the view.
+ */
+function _getRecordedProjectionKey(
+  columnReplacements: LoadedColumnReplacements | undefined,
+  datasetId: Dataset.Id,
+): string | undefined {
+  if (columnReplacements === undefined) {
+    return undefined;
+  }
+  return (
+    columnReplacements.projectionKeyByDatasetId[datasetId] ??
+    UNREAD_PROJECTION_KEY
+  );
+}
+
+/**
  * Writes newly acquired relations to the storage tier and loads every relation
  * into the queryable tier, each with its own replacements, narrowed to the
  * columns it holds, and records the projection key its view was built with.
@@ -420,10 +440,10 @@ async function _loadRelationBytes(
       datasetId: relation.datasetId,
       columns: relation.columns,
       staleAt: relation.staleAt,
-      projectionKey:
-        options.columnReplacements?.projectionKeyByDatasetId[
-          relation.datasetId
-        ],
+      projectionKey: _getRecordedProjectionKey(
+        options.columnReplacements,
+        relation.datasetId,
+      ),
     });
   });
 }

@@ -141,6 +141,14 @@ function _toStableValue(value: unknown): unknown {
 }
 
 /**
+ * The projection key recorded for a view loaded while its dataset's columns
+ * could not be read, so it holds no renames, casts, or conversions. Never
+ * equal to a key from {@link getProjectionKey}, which is always a JSON array,
+ * so the first query whose catalog read succeeds rebuilds the view.
+ */
+export const UNREAD_PROJECTION_KEY = "unread";
+
+/**
  * A key that names a dataset's projection: equal for equal replacements in
  * any order, and different as soon as a rename, cast, pair, override, or
  * output type changes. The queryable tier records it with each loaded view,
