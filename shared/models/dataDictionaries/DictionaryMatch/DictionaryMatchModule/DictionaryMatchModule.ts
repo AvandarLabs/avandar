@@ -133,44 +133,50 @@ function _getScore(
   return coverage === undefined ? weighted / 0.65 : weighted + 0.35 * coverage;
 }
 
+/** How a match's values relate, from its best list and whether it has any. */
+function _getFit(best: ListCoverage | undefined): DictionaryMatchT["fit"] {
+  if (!best) {
+    return "description";
+  }
+  if (best.coverage === undefined) {
+    return "not_compared";
+  }
+  return best.coverage >= FITS_SHARE ? "fits" : "values_dont_fit";
+}
+
 /**
  * How well one entry matches one profiled column, or undefined below the
  * suggestion score. An entry with codes whose values could not be compared
  * with the column's, because the column has too many values to list or none
- * at all, matches as a description and ranks below every compared match.
+ * at all, keeps its primary code list and ranks below every compared match.
  */
 function getEntryMatch(
   profile: Readonly<ColumnProfile.T>,
   entry: Readonly<DictionaryMatchEntry>,
 ): DictionaryMatchT | undefined {
   const best = _getBestCoverage(profile, entry);
-  const compared = best?.coverage === undefined ? undefined : best;
   const score = _getScore(
     _getEntryNameScore(profile.columnName, entry),
     _getKindTypeScore(entry.kind, profile.dataType),
-    compared?.coverage,
+    best?.coverage,
   );
   if (score < ColumnProfile.SUGGESTION_SCORE) {
     return undefined;
   }
-  const coverage = compared?.coverage;
-  const isUncompared = best !== undefined && compared === undefined;
+  const fit = _getFit(best);
+  const primaryList = entry.codeLists[0];
+  const isUncompared = fit === "not_compared";
   return {
     dictionaryId: entry.dictionaryId,
     dictionaryRank: entry.dictionaryRank,
     entryId: entry.entryId,
     entryName: entry.entryName,
     position: entry.position,
-    codeListId: compared?.codeListId,
-    codeListName: compared?.codeListName,
-    coverage,
-    direction: compared?.direction ?? "decode",
-    fit:
-      coverage === undefined
-        ? "description"
-        : coverage >= FITS_SHARE
-          ? "fits"
-          : "values_dont_fit",
+    codeListId: isUncompared ? primaryList?.id : best?.codeListId,
+    codeListName: isUncompared ? primaryList?.name : best?.codeListName,
+    coverage: best?.coverage,
+    direction: isUncompared ? "decode" : (best?.direction ?? "decode"),
+    fit,
     // Every compared match scores at least the suggestion score, so scaling
     // below it keeps an uncompared list from outranking a real comparison.
     score: isUncompared ? score * ColumnProfile.SUGGESTION_SCORE : score,

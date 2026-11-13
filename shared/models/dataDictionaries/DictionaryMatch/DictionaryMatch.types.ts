@@ -7,11 +7,15 @@ import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBind
  * How an entry's values relate to a column's. `fits`: half or more of the
  * column's rows hold a code or label from the entry's code list.
  * `values_dont_fit`: the entry has codes but the column's values are not
- * them. `description`: only the entry's description applies, because the
- * entry has no codes or the column's values could not be compared with them
- * (too many to list, or none at all).
+ * them. `not_compared`: the entry has codes, but the column's values could
+ * not be compared with them (too many to list, or all null).
+ * `description`: the entry has no codes, so only its description applies.
  */
-export type DictionaryMatchFit = "fits" | "values_dont_fit" | "description";
+export type DictionaryMatchFit =
+  | "fits"
+  | "values_dont_fit"
+  | "not_compared"
+  | "description";
 
 /**
  * A dictionary entry ready to be matched against columns: its names, kind,
@@ -41,14 +45,14 @@ export type DictionaryMatchT = {
   entryName: string;
   position: number;
   /**
-   * The entry's code list that fits the column best. Undefined for a
-   * description.
+   * The entry's code list that fits the column best, or its primary list
+   * when the values were not compared. Undefined for a description.
    */
   codeListId: DataDictionaryCodeList.Id | undefined;
   codeListName: string | undefined;
   /**
    * The share of the column's rows the code list covers, from 0 to 1.
-   * Undefined for a description.
+   * Undefined for a description, or when the values were not compared.
    */
   coverage: number | undefined;
   /** Whether the column holds the list's codes or its labels. */

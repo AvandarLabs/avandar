@@ -174,7 +174,7 @@ describe("DictionaryMatch.getEntryMatch", () => {
     ["has too many values to list", undefined],
     ["holds only nulls", []],
   ] as const)(
-    "matches a column that %s as a description ranked below any comparison",
+    "keeps the primary list for a column that %s, ranked below any comparison",
     (_label, values) => {
       const match = DictionaryMatch.getEntryMatch(
         _profile("GENDER", values),
@@ -182,14 +182,16 @@ describe("DictionaryMatch.getEntryMatch", () => {
           entryId: "entry-sex" as DataDictionaryEntry.Id,
           entryName: "sex",
           columnNames: ["GENDER"],
-          codeLists: [SEX_129],
+          codeLists: [SEX_MFU, SEX_129],
         }),
       );
 
       expect(match).toMatchObject({
-        fit: "description",
-        codeListId: undefined,
+        fit: "not_compared",
+        codeListId: SEX_MFU.id,
+        codeListName: SEX_MFU.name,
         coverage: undefined,
+        direction: "decode",
       });
       expect(match?.score).toBeLessThanOrEqual(ColumnProfile.SUGGESTION_SCORE);
     },
