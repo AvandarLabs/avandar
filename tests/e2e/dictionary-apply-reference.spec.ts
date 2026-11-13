@@ -229,10 +229,14 @@ test.describe("applying a dictionary as reference", () => {
         }),
       ).toEqual(["reference", "reference", "reference"]);
     } finally {
-      await admin.from("data_dictionaries").delete().eq("id", dictionaryId);
       if (datasetId) {
         await deleteDatasetFixture({ admin, datasetId, workspaceId });
       }
+      await admin
+        .from("data_dictionaries")
+        .delete()
+        .eq("id", dictionaryId)
+        .throwOnError();
     }
   });
 
@@ -308,10 +312,14 @@ test.describe("applying a dictionary as reference", () => {
       ).toBeVisible();
       expect(onlineAgentRequestCount).toBe(0);
     } finally {
-      await admin.from("data_dictionaries").delete().eq("id", dictionaryId);
       if (datasetId) {
         await deleteDatasetFixture({ admin, datasetId, workspaceId });
       }
+      await admin
+        .from("data_dictionaries")
+        .delete()
+        .eq("id", dictionaryId)
+        .throwOnError();
     }
   });
 });
