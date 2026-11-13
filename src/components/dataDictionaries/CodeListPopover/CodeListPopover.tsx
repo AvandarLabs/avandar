@@ -136,7 +136,6 @@ export function CodeListPopover({
       width={300}
       shadow="md"
       withArrow
-      returnFocus
       zIndex={POPOVER_Z_INDEX}
     >
       <Popover.Target>
