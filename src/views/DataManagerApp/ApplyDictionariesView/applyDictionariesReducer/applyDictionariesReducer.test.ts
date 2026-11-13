@@ -23,6 +23,8 @@ const DESCRIPTION_PICK: ColumnPick = {
   codeListId: undefined,
   mode: "reference",
 };
+const CDC_COLUMN = "col-cdc" as DatasetColumn.Id;
+const CDC_PICK: ColumnPick = { ...SEX_PICK, dictionaryId: CDC };
 const READY = applyDictionariesReducer(makeInitialApplyState(), {
   type: "matches_ready",
   dictionaryIds: [NYS],
@@ -256,6 +258,32 @@ describe("applyDictionariesReducer", () => {
 
     expect(state.dictionaryIds).toEqual([]);
     expect(state.picks).toEqual({});
+  });
+
+  it("forgets the resolutions of every column whose pick a removed dictionary drops", () => {
+    const resolved = applyDictionariesReducer(
+      { ...READY, picks: { ...READY.picks, [CDC_COLUMN]: CDC_PICK } },
+      {
+        type: "resolve_value",
+        columnId: GENDER.id,
+        valueKey: "7",
+        resolution: { action: "empty" },
+      },
+    );
+    const withCdcResolved = applyDictionariesReducer(resolved, {
+      type: "resolve_value",
+      columnId: CDC_COLUMN,
+      valueKey: "x",
+      resolution: { action: "keep" },
+    });
+    const state = applyDictionariesReducer(withCdcResolved, {
+      type: "remove_dictionary",
+      dictionaryId: NYS,
+    });
+
+    expect(state.resolutions).toEqual({
+      [CDC_COLUMN]: { x: { action: "keep" } },
+    });
   });
 
   it("keeps the user's picks when a dictionary is added", () => {

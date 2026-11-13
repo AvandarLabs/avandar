@@ -287,19 +287,30 @@ function _withResolution(
   };
 }
 
+/**
+ * Stops using a dictionary: drops its picks and the resolutions of every
+ * column it was picked for, which were chosen for its code lists.
+ */
 function _withoutDictionary(
   state: ApplyDictionariesState,
   dictionaryId: DataDictionary.Id,
 ): ApplyDictionariesState {
-  const picks = Object.fromEntries(
-    Object.entries(state.picks).filter(([, pick]) => {
-      return pick.dictionaryId !== dictionaryId;
+  const droppedColumnIds = new Set(
+    Object.keys(state.picks).filter((columnId) => {
+      return state.picks[columnId]?.dictionaryId === dictionaryId;
     }),
+  );
+  const isKept = ([columnId]: readonly [string, unknown]): boolean => {
+    return !droppedColumnIds.has(columnId);
+  };
+  const picks = Object.fromEntries(Object.entries(state.picks).filter(isKept));
+  const resolutions = Object.fromEntries(
+    Object.entries(state.resolutions).filter(isKept),
   );
   const dictionaryIds = (state.dictionaryIds ?? []).filter((id) => {
     return id !== dictionaryId;
   });
-  return { ...state, dictionaryIds, picks };
+  return { ...state, dictionaryIds, picks, resolutions };
 }
 
 function _withDictionary(
