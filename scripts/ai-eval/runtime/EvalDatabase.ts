@@ -19,7 +19,13 @@ const DUCKDB_TYPE_BY_APP_TYPE: Record<string, string> = {
   date: "DATE",
 };
 
-function _buildCreateTableSql(dataset: CovidDataset, dataDir: string): string {
+/** A dataset the eval database loads, from a CSV under its data directory. */
+type EvalDataset = Pick<
+  CovidDataset,
+  "id" | "fileName" | "truthViewName" | "columns"
+>;
+
+function _buildCreateTableSql(dataset: EvalDataset, dataDir: string): string {
   const castColumns = dataset.columns
     .map((column) => {
       const duckDbType = DUCKDB_TYPE_BY_APP_TYPE[column.dataType] ?? "VARCHAR";
@@ -44,27 +50,35 @@ function _toPlainValue(value: unknown): unknown {
 async function _createTables(
   connection: DuckDBConnection,
   dataDir: string,
+  datasets: readonly EvalDataset[],
 ): Promise<void> {
-  for (const dataset of COVID_DATASETS) {
+  for (const dataset of datasets) {
     await connection.run(_buildCreateTableSql(dataset, dataDir));
   }
 }
 
-async function _createTruthViews(connection: DuckDBConnection): Promise<void> {
-  for (const dataset of COVID_DATASETS) {
+async function _createTruthViews(
+  connection: DuckDBConnection,
+  datasets: readonly EvalDataset[],
+): Promise<void> {
+  for (const dataset of datasets) {
     await connection.run(
       `CREATE OR REPLACE VIEW ${dataset.truthViewName} AS SELECT * FROM "${dataset.id}"`,
     );
   }
 }
 
-async function _build(databasePath: string, dataDir: string): Promise<void> {
+async function _build(
+  databasePath: string,
+  dataDir: string,
+  datasets: readonly EvalDataset[],
+): Promise<void> {
   mkdirSync(dirname(databasePath), { recursive: true });
   const instance = await DuckDBInstance.create(databasePath);
   const connection = await instance.connect();
   try {
-    await _createTables(connection, dataDir);
-    await _createTruthViews(connection);
+    await _createTables(connection, dataDir, datasets);
+    await _createTruthViews(connection, datasets);
   } finally {
     connection.closeSync();
     instance.closeSync();
@@ -72,18 +86,24 @@ async function _build(databasePath: string, dataDir: string): Promise<void> {
 }
 
 /**
- * Opens the eval's DuckDB copy of the COVID workspace, building it from the
- * CSV files on first use. Tables are named by dataset id, as in the app, and
- * the `us_deaths`, `us_cases`, and `global_deaths` views serve the
- * ground-truth SQL. Opens read-only, so several eval runs can share the file.
+ * Opens the eval's DuckDB copy of a workspace, building it from the CSV
+ * files on first use: the COVID workspace by default, or `datasets` from
+ * `dataDir`. Tables are named by dataset id, as in the app, and each
+ * dataset's truth view serves the ground-truth SQL. Opens read-only, so
+ * several eval runs can share the file.
  */
 async function _open(
-  options: Readonly<{ databasePath: string; dataDir?: string }>,
+  options: Readonly<{
+    databasePath: string;
+    dataDir?: string;
+    datasets?: readonly EvalDataset[];
+  }>,
 ): Promise<EvalDatabase> {
   if (!existsSync(options.databasePath)) {
     await _build(
       options.databasePath,
       options.dataDir ?? join(homedir(), "cleaned-test-data"),
+      options.datasets ?? COVID_DATASETS,
     );
   }
   const instance = await DuckDBInstance.create(options.databasePath, {
