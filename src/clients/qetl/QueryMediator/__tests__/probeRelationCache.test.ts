@@ -7,6 +7,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
+import { getProjectionKey } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const MISSING_ID = "66666666-6666-4666-8666-666666666666" as Dataset.Id;
@@ -133,6 +134,35 @@ describe("probeRelationCache", () => {
       {
         [LOADED_ID]: "same",
       },
+    );
+
+    expect(result).toEqual([]);
+  });
+
+  it("treats a table loaded outside the recorder as a miss once its dataset needs a projection", async () => {
+    // An upload's transcode loads the table as stored and records nothing.
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache(
+      [LOADED_ID],
+      {},
+      { [LOADED_ID]: "a-conversion" },
+    );
+
+    expect(result).toEqual([LOADED_ID]);
+  });
+
+  it("serves a table loaded outside the recorder while its dataset needs no projection", async () => {
+    getTableOrViewNamesMock.mockResolvedValue([LOADED_ID]);
+
+    const { probeRelationCache } =
+      await import("@/clients/qetl/QueryMediator/getRelationSources");
+    const result = await probeRelationCache(
+      [LOADED_ID],
+      {},
+      { [LOADED_ID]: getProjectionKey([]) },
     );
 
     expect(result).toEqual([]);

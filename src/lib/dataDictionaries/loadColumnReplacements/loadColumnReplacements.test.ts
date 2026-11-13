@@ -268,6 +268,24 @@ describe("loadColumnReplacements", () => {
     ).toBe("varchar");
   });
 
+  it("builds replacements from the cached columns when a fresh read fails", async () => {
+    AvaQueryClient.setQueryData(COLUMNS_QUERY_KEY, [GENDER]);
+    // Out of date, so the read is attempted rather than served from cache.
+    await AvaQueryClient.invalidateQueries({ queryKey: COLUMNS_QUERY_KEY });
+    columnsGetAllMock.mockRejectedValue(new Error("Failed to fetch"));
+    bindingsGetAllMock.mockResolvedValue([
+      _makeBinding({ pinnedPairs: SEX_PAIRS, pinnedIsOrdered: false }),
+    ]);
+
+    const loaded = await loadColumnReplacements([DATASET_ID]);
+
+    expect(columnsGetAllMock).toHaveBeenCalled();
+    expect(
+      loaded.replacementsByDatasetId[DATASET_ID]?.[0]?.valueMapping
+        ?.outputDataType,
+    ).toBe("varchar");
+  });
+
   it("converts with the cached bindings when a fresh read fails", async () => {
     AvaQueryClient.setQueryData(BINDINGS_QUERY_KEY, [
       _makeBinding({ pinnedPairs: SEX_PAIRS, pinnedIsOrdered: false }),

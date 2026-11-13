@@ -250,7 +250,8 @@ flowchart TD
   H["Acquire through<br/>the registry"]
   A -->|"no"| D
   A -->|"yes"| B
-  B -->|"no entry: counts as all"| HIT1
+  B -->|"no entry, dataset needs<br/>no replacements: counts as all"| HIT1
+  B -->|"no entry, dataset<br/>needs replacements"| D
   B -->|"entry"| C
   C -->|"yes"| HIT1
   C -->|"no"| D

@@ -53,9 +53,11 @@ function _isProjectionCurrent(
  * but built with another projection than `projectionKeyByDatasetId` names,
  * so a changed rename, cast, or conversion rebuilds the view.
  *
- * A present table with no sidecar entry is treated as `"all"`, which is how
- * tables loaded outside this recorder still hit. A caller that passes no
- * projection keys, such as a `stored` session, never compares them.
+ * A present table with no sidecar entry, such as one an upload's transcode
+ * loaded outside this recorder, is treated as `"all"` built with no
+ * projection: it is served only while its dataset needs no renames, casts,
+ * or conversions. A caller that passes no projection keys, such as a
+ * `stored` session, never compares them.
  */
 export async function probeRelationCache(
   queryDependencies: readonly Dataset.Id[],
