@@ -4,8 +4,10 @@
  * `rpc_dataset_columns__apply_dictionaries` replaces one dataset's
  * dictionary bindings in one transaction. Only an editor of the dataset who
  * can read dictionaries may call it, every column, entry, and code list must
- * belong where the binding says, and only reference bindings are accepted.
- * Refusals raise a stable `hint` and change nothing.
+ * belong where the binding says, and a call that leaves out the conversion
+ * fields and the added values still works. Conversions are covered in
+ * `rpc_dataset_columns__apply_dictionaries__convert.test.sql`. Refusals
+ * raise a stable `hint` and change nothing.
  */
 begin;
 
@@ -243,7 +245,7 @@ select is (
     jsonb_build_array(pg_temp.sex_binding ('dc460001-0000-4000-8000-000000000001'::uuid) || '{"mode":"convert"}'::jsonb)
   ),
   'binding_mode_unsupported',
-  'a convert binding is refused'
+  'a live convert binding on an upload is refused'
 );
 reset role;
 

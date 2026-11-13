@@ -9,6 +9,12 @@
  * anything else. Every refusal raises with a stable `hint` that the client
  * maps to copy.
  *
+ * Deleting a list, entry, or the dictionary's rows pins the live convert
+ * bindings that used them (their triggers do that). After writing, a
+ * reference binding whose list this save deleted is pointed at its entry's
+ * only remaining list, and every live converted column's `data_type`
+ * follows its list.
+ *
  * @param p_dictionary_id The dictionary whose contents are replaced.
  * @param p_code_lists The full set, as `{ id, name, is_ordered, pairs }`,
  *   where `pairs` is `[{ code, label, accepted_spellings, is_missing }]`.
@@ -28,6 +34,7 @@ declare
   v_workspace_id uuid;
   v_code_lists jsonb := coalesce(p_code_lists, '[]'::jsonb);
   v_entries jsonb := coalesce(p_entries, '[]'::jsonb);
+  v_bindings_to_repoint uuid[];
   v_version integer;
 begin
   -- Read without a lock: the caller has not been authorized yet.
@@ -53,11 +60,21 @@ begin
   perform public.data_dictionaries__check_code_lists (p_dictionary_id, v_code_lists);
   perform public.data_dictionaries__check_entries (p_dictionary_id, v_entries, v_code_lists);
 
+  v_bindings_to_repoint := public.dataset_columns__dictionary_bindings__find_repointable (p_dictionary_id, v_code_lists);
+
   delete from public.data_dictionaries__entry_codings ec
   where ec.dictionary_id = p_dictionary_id;
 
   perform public.data_dictionaries__write_code_lists (p_dictionary_id, v_workspace_id, v_code_lists);
   perform public.data_dictionaries__write_entries (p_dictionary_id, v_workspace_id, v_entries);
+  perform public.dataset_columns__dictionary_bindings__repoint_reference (v_bindings_to_repoint);
+  perform public.dataset_columns__dictionary_bindings__sync_live_types (
+    array(
+      select cl.id
+      from public.data_dictionaries__code_lists cl
+      where cl.dictionary_id = p_dictionary_id
+    )
+  );
 
   update public.data_dictionaries
   set version = version + 1
