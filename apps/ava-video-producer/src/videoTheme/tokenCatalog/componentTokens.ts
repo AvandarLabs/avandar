@@ -386,6 +386,55 @@ const PLEXUS_FIELD_TOKENS = {
   linkWidth: _stroke("Link width", "Width of a link between particles."),
 } as const;
 
+const ORBITAL_SYSTEM_TOKENS = {
+  orbitAlpha: _alpha("Orbit opacity", "Opacity of an orbit's path."),
+  orbitWidth: _stroke("Orbit width", "Width of an orbit's path."),
+  bodyRadius: _length("Body radius", "Radius of an orbiting body's shell."),
+  bodyCoreRadius: _length(
+    "Body core radius",
+    "Radius of the dot inside an orbiting body.",
+  ),
+  bodyAlpha: _alpha("Body rim opacity", "Opacity of an orbiting body's rim."),
+  bodyStrokeWidth: _stroke(
+    "Body rim width",
+    "Width of an orbiting body's rim.",
+  ),
+  bodyLabelOffset: _length(
+    "Body label offset",
+    "Distance from a body's centre up to its label baseline.",
+  ),
+  coreRadius: _length("Core radius", "Radius of the central core."),
+  coreStrokeAlpha: _alpha(
+    "Core rim opacity",
+    "Opacity of the central core's accent rim.",
+  ),
+  coreStrokeWidth: _stroke(
+    "Core rim width",
+    "Width of the central core's accent rim.",
+  ),
+  pulsePeriod: _duration(
+    "Core pulse period",
+    "Frames for one breath of the glow around the core.",
+  ),
+  pulseRadius: _length(
+    "Core pulse radius",
+    "Radius of the glow around the core at rest.",
+  ),
+  pulseSwing: _length(
+    "Core pulse swing",
+    "How far the glow around the core grows at the top of a breath.",
+  ),
+  pulseAlpha: _alpha(
+    "Core pulse opacity",
+    "Opacity of the glow around the core.",
+  ),
+  pulseStrokeAlpha: _alpha(
+    "Core pulse rim opacity",
+    "Opacity of the glow's rim.",
+  ),
+  pulseStrokeWidth: _stroke("Core pulse rim width", "Width of the glow's rim."),
+} as const;
+
 const RADIAL_NETWORK_TOKENS = {
   spokeAlpha: _alpha(
     "Spoke opacity",
@@ -434,6 +483,7 @@ export const COMPONENT_TOKENS = {
   NetworkGraph: NETWORK_GRAPH_TOKENS,
   RadialNetwork: RADIAL_NETWORK_TOKENS,
   PlexusField: PLEXUS_FIELD_TOKENS,
+  OrbitalSystem: ORBITAL_SYSTEM_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

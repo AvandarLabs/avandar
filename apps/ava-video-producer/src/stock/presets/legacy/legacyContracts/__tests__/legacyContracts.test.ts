@@ -48,6 +48,29 @@ const APPROVED_MARKUP_MOVES: Partial<
   "node-traversal": [
     { from: '<text x="480" y="545"', to: '<text x="480" y="551"' },
   ],
+  "orbital-system": [
+    ...["#9fefca", "#82c8f2", "#f0ba83"].map((color) => ({
+      from: `text-anchor="middle" fill="${color}" font-size="12" font-family`,
+      to: `fill="${color}" font-size="12" font-weight="400" text-anchor="middle" font-family`,
+    })),
+    // Each body shell gains the explicit hairline once, in drawing order.
+    ...[0, 1, 2].map(() => ({
+      from: 'stroke-opacity="0.24">',
+      to: 'stroke-opacity="0.24" stroke-width="1">',
+    })),
+    {
+      from: 'fill-opacity="0.025" stroke="#9fefca" stroke-opacity="0.1">',
+      to: 'fill-opacity="0.03" stroke="#9fefca" stroke-opacity="0.1" stroke-width="1">',
+    },
+    {
+      from: 'r="49" fill="#101e28" stroke="#9fefca" stroke-opacity="0.7">',
+      to: 'r="49" fill="#101e28" stroke="#9fefca" stroke-opacity="0.7" stroke-width="1">',
+    },
+    {
+      from: '<text x="480" y="551" fill="#728794" font-size="18"',
+      to: '<text x="480" y="551" fill="#728794" font-size="17"',
+    },
+  ],
   "plexus-field": [
     {
       from: '<line x1="64" y1="529" x2="896" y2="529" stroke="#2a404e">',

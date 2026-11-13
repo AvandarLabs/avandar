@@ -248,6 +248,7 @@
     "NetworkGraph": { "defaultProps": { "highlightEdgeAlpha": "$atomic.opacity.34", "edgeAlpha": "$atomic.opacity.65", "hubPulsePeriod": "$motion.pulse.period", "hubPulseFloor": 0.65, "hubPulseSwing": 0.3, "nodePulsePeriod": "$atomic.period.lg", "nodePulseSwing": 0.5 } },
     "RadialNetwork": { "defaultProps": { "spokeAlpha": "$atomic.opacity.30", "spokePulsePeriod": "$motion.pulse.period", "spokePulseSwing": 0.6, "hubRadius": 70, "hubStrokeAlpha": "$atomic.opacity.40", "hubStrokeWidth": "$stroke.hairline", "hubGlowRadius": 59, "hubGlowAlpha": "$atomic.opacity.3", "hubLabelOffset": -2, "hubDetailOffset": 22 } },
     "PlexusField": { "defaultProps": { "linkDistance": 148, "linkAlpha": 0.62, "linkWidth": "$atomic.strokeWidth.2xs" } },
+    "OrbitalSystem": { "defaultProps": { "orbitAlpha": "$atomic.opacity.24", "orbitWidth": "$stroke.guide", "bodyRadius": 17, "bodyCoreRadius": 7, "bodyAlpha": "$atomic.opacity.24", "bodyStrokeWidth": "$stroke.hairline", "bodyLabelOffset": 27, "coreRadius": 49, "coreStrokeAlpha": "$atomic.opacity.70", "coreStrokeWidth": "$stroke.hairline", "pulsePeriod": "$motion.pulse.period", "pulseRadius": 71, "pulseSwing": 5, "pulseAlpha": "$atomic.opacity.3", "pulseStrokeAlpha": "$atomic.opacity.10", "pulseStrokeWidth": "$stroke.hairline" } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,

@@ -1,19 +1,85 @@
 import { loopPhase, wave } from "../../motion";
-import { Eyebrow, STOCK, Text, type GraphicProps } from "../graphics-common";
+import {
+  Caption,
+  Eyebrow,
+  Glyph,
+  Text,
+  type GraphicProps,
+} from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
+import { resolveContentColor } from "../theme/resolveContentColor/resolveContentColor";
+import { useGraphicProps, useGraphicTokens } from "../theme/useGraphicTheme";
 import type { OrbitalSystemInput } from "../presets/OrbitalSystem/OrbitalSystem.schema";
 
 type Props = GraphicProps & { input: OrbitalSystemInput };
 
-/** Draws the bounded authored orbital-system study at an explicit frame. */
-export function OrbitalSystem({
-  input,
+const CENTER = { x: 480, y: 298 };
+const LOOP_FRAMES = 180;
+const CUBE_GLYPH =
+  "M480 272 L503 285 L503 311 L480 324 L457 311 L457 285 Z M480 272 V298 L503 311 M480 298 L457 311";
+
+function OrbitingBody({
+  orbit,
   frame,
-  accent,
-  background = STOCK.ground,
-}: Readonly<Props>) {
-  const bodies = input.bodies;
+  color,
+  showOrbit,
+}: {
+  orbit: OrbitalSystemInput["bodies"][number];
+  frame: number;
+  color: string;
+  showOrbit: boolean;
+}) {
+  const style = useGraphicProps("OrbitalSystem", {});
+  const tokens = useGraphicTokens();
+  const angle = loopPhase(frame, LOOP_FRAMES, orbit.phase) * Math.PI * 2;
+  const rotation = (orbit.angle * Math.PI) / 180;
+  const x = orbit.rx * Math.cos(angle);
+  const y = orbit.ry * Math.sin(angle);
+  const px = CENTER.x + x * Math.cos(rotation) - y * Math.sin(rotation);
+  const py = CENTER.y + x * Math.sin(rotation) + y * Math.cos(rotation);
+  return (
+    <g>
+      {showOrbit ? (
+        <ellipse
+          cx={CENTER.x}
+          cy={CENTER.y}
+          rx={orbit.rx}
+          ry={orbit.ry}
+          fill="none"
+          stroke={color}
+          strokeOpacity={style.orbitAlpha}
+          strokeWidth={style.orbitWidth}
+          transform={`rotate(${orbit.angle} ${CENTER.x} ${CENTER.y})`}
+        />
+      ) : null}
+      <circle
+        cx={px}
+        cy={py}
+        r={style.bodyRadius}
+        fill={tokens.color.ground}
+        stroke={color}
+        strokeOpacity={style.bodyAlpha}
+        strokeWidth={style.bodyStrokeWidth}
+      />
+      <circle cx={px} cy={py} r={style.bodyCoreRadius} fill={color} />
+      <Text
+        role="data"
+        x={px}
+        y={py - style.bodyLabelOffset}
+        fill={color}
+        anchor="middle"
+      >
+        {orbit.label}
+      </Text>
+    </g>
+  );
+}
+
+/** Draws the bounded authored orbital-system study at an explicit frame. */
+export function OrbitalSystem({ input, frame, accent }: Readonly<Props>) {
+  const style = useGraphicProps("OrbitalSystem", {});
+  const tokens = useGraphicTokens();
   return (
     <g>
       <Eyebrow>
@@ -21,81 +87,44 @@ export function OrbitalSystem({
           descriptor: LEGACY_DISPLAY_COPY["orbital-system"].orbitalSystem,
         })}
       </Eyebrow>
-      {bodies.map((orbit, i) => {
-        const color = orbit.color === "accent" ? accent : orbit.color;
-        const angle = loopPhase(frame, 180, orbit.phase) * Math.PI * 2;
-        const rotation = (orbit.angle * Math.PI) / 180;
-        const x = orbit.rx * Math.cos(angle);
-        const y = orbit.ry * Math.sin(angle);
-        const px = 480 + x * Math.cos(rotation) - y * Math.sin(rotation);
-        const py = 298 + x * Math.sin(rotation) + y * Math.cos(rotation);
-        return (
-          <g key={i}>
-            {input.showOrbits ? (
-              <ellipse
-                cx={480}
-                cy={298}
-                rx={orbit.rx}
-                ry={orbit.ry}
-                fill="none"
-                stroke={color}
-                strokeOpacity={0.24}
-                strokeWidth={1.5}
-                transform={`rotate(${orbit.angle} 480 298)`}
-              />
-            ) : null}
-            <circle
-              cx={px}
-              cy={py}
-              r={17}
-              fill={background}
-              stroke={color}
-              strokeOpacity={0.24}
-            />
-            <circle cx={px} cy={py} r={7} fill={color} />
-            <text
-              x={px}
-              y={py - 27}
-              textAnchor="middle"
-              fill={color}
-              fontSize={12}
-              fontFamily="Arial, sans-serif"
-            >
-              {orbit.label}
-            </text>
-          </g>
-        );
-      })}
+      {input.bodies.map((orbit, i) => (
+        <OrbitingBody
+          key={i}
+          orbit={orbit}
+          frame={frame}
+          color={resolveContentColor(orbit.color, { tokens, accent })}
+          showOrbit={input.showOrbits}
+        />
+      ))}
       <circle
-        cx={480}
-        cy={298}
-        r={71 + wave(frame, 90) * 5}
+        cx={CENTER.x}
+        cy={CENTER.y}
+        r={
+          style.pulseRadius + wave(frame, style.pulsePeriod) * style.pulseSwing
+        }
         fill={accent}
-        fillOpacity={0.025}
+        fillOpacity={style.pulseAlpha}
         stroke={accent}
-        strokeOpacity={0.1}
+        strokeOpacity={style.pulseStrokeAlpha}
+        strokeWidth={style.pulseStrokeWidth}
       />
       <circle
-        cx={480}
-        cy={298}
-        r={49}
-        fill={STOCK.surface}
+        cx={CENTER.x}
+        cy={CENTER.y}
+        r={style.coreRadius}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeOpacity={0.7}
+        strokeOpacity={style.coreStrokeAlpha}
+        strokeWidth={style.coreStrokeWidth}
       />
-      <path
-        d="M480 272 L503 285 L503 311 L480 324 L457 311 L457 285 Z M480 272 V298 L503 311 M480 298 L457 311"
-        fill="none"
-        stroke={accent}
-        strokeWidth={2}
-      />
-      <Text x={480} y={551} size={18} anchor="middle" fill={STOCK.muted}>
+      <Glyph d={CUBE_GLYPH} color={accent} />
+      <Caption>
         {getStockDisplayCopyFromDescriptor({
           descriptor:
             LEGACY_DISPLAY_COPY["orbital-system"]
               .independentMotionSharedGravity,
         })}
-      </Text>
+      </Caption>
     </g>
   );
 }

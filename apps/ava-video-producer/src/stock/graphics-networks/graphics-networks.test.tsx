@@ -64,3 +64,30 @@ test("plexus-field draws links at the themed width", () => {
     /stroke-width="2.25"/,
   );
 });
+
+test("orbital-system draws its core at the themed radius", () => {
+  assert.match(
+    renderPresetWithPatch(
+      { preset: "orbital-system" },
+      _componentPatch("OrbitalSystem", { coreRadius: 44 }),
+    ),
+    /r="44"/,
+  );
+});
+
+test("an orbit colour can follow the theme through a colour role", async () => {
+  const { orbitalSystemInputSchema } =
+    await import("../presets/OrbitalSystem/OrbitalSystem.schema");
+  const body = {
+    rx: 120,
+    ry: 80,
+    angle: 0,
+    color: "$color.highlight",
+    phase: 0,
+    label: "Body",
+  };
+  assert.equal(
+    orbitalSystemInputSchema.shape.bodies.element.safeParse(body).success,
+    true,
+  );
+});
