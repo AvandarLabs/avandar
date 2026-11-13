@@ -1,5 +1,9 @@
-import { STOCK, Text } from "../../../graphics-common";
+import { Text } from "../../../graphics-common";
 import { getConservativeWidthFromText } from "../../../text/getConservativeWidthFromText";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../../theme/useGraphicTheme";
 import type { ReactNode } from "react";
 
 const GRAPHEME_SEGMENTER: Intl.Segmenter = new Intl.Segmenter(undefined, {
@@ -10,6 +14,8 @@ type Props = {
   text: string;
   x: number;
   y: number;
+  /** The decision type role; `size` overrides its size, for example in width tests. */
+  role?: "choice" | "question";
   size?: number;
   width?: number;
   fill?: string;
@@ -26,17 +32,9 @@ function _append({ lines, text, width, size }: AppendOptions): string[] {
     : [...lines, text];
 }
 
-/** Stable, bounded SVG lines preserve every authored character. */
-export function ForkLabel({
-  text,
-  x,
-  y,
-  size = 17,
-  width = 168,
-  fill = STOCK.text,
-}: Readonly<Props>): ReactNode {
+function _wrap(text: string, width: number, size: number): string[] {
   const tokens = text.match(/\S+\s*|\s+/g) ?? [""];
-  const lines = tokens.reduce<string[]>((result, token) => {
+  return tokens.reduce<string[]>((result, token) => {
     return getConservativeWidthFromText({
       text: token.trimEnd(),
       fontSize: size,
@@ -48,14 +46,31 @@ export function ForkLabel({
         )
       : _append({ lines: result, text: token, width, size });
   }, []);
+}
+
+/** Stable, bounded SVG lines preserve every authored character. */
+export function ForkLabel({
+  text,
+  x,
+  y,
+  role = "choice",
+  size,
+  width = 168,
+  fill,
+}: Readonly<Props>): ReactNode {
+  const roleStyle = useGraphicTokens().text.graphic[role];
+  const fontSize = size ?? roleStyle.fontSize;
+  const { lineGap } = useGraphicProps("DecisionFork", {});
+  const lines = _wrap(text, width, fontSize);
   return (
     <g aria-label={text}>
       {lines.map((line, index) => (
         <Text
           key={index}
+          role={role}
           x={x}
-          y={y + index * (size + 4)}
-          size={size}
+          y={y + index * (fontSize + lineGap)}
+          size={fontSize}
           anchor="middle"
           fill={fill}
         >

@@ -256,6 +256,7 @@
     "SchemaMapping": { "defaultProps": { "fieldRadius": 8, "dividerWidth": "$stroke.hairline", "dotRadius": 5, "edgeAlpha": "$atomic.opacity.70", "ringRadius": 13, "ringAlpha": 0.6, "ringStrokeWidth": "$stroke.hairline", "checkSize": 10 } },
     "QueryColumnCacheGrowth": { "defaultProps": { "tableRadius": 5, "tableStrokeWidth": "$stroke.default", "gridStrokeWidth": "$stroke.hairline", "missingDash": [5, 3], "missingStrokeWidth": "$stroke.hairline", "cardRadius": 10, "cardStrokeWidth": "$stroke.hairline", "checkWidth": "$atomic.strokeWidth.lg", "routeStrokeWidth": "$stroke.hairline", "portRadius": 5 } },
     "SourceMerge": { "defaultProps": { "edgeAlpha": 0.42, "chipRadius": 10, "chipFillAlpha": 0.07, "chipStrokeAlpha": "$atomic.opacity.30", "chipStrokeWidth": "$stroke.hairline", "outEdgeAlpha": 0.5, "outEdgeWidth": "$atomic.strokeWidth.lg", "outPacketPeriod": 60, "mergeRadius": 39, "mergeStrokeAlpha": "$atomic.opacity.65", "mergeStrokeWidth": "$stroke.hairline", "glyphWidth": "$atomic.strokeWidth.md", "barHeight": 6, "barAlpha": 0.8, "slotRadius": 5, "slotFillAlpha": 0.12, "slotStrokeAlpha": 0.6, "slotStrokeWidth": "$stroke.default" } },
+    "DecisionFork": { "defaultProps": { "selectedWidth": "$atomic.strokeWidth.lg", "conditionRadius": 10, "conditionStrokeWidth": "$stroke.hairline", "outcomeRadius": 14, "outcomeStrokeWidth": "$stroke.hairline", "gateWidth": "$stroke.default", "gateSpread": 9, "markerRadius": 13, "markerAlpha": 0.12, "markerCoreRadius": 5, "lineGap": 4 } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,

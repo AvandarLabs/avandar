@@ -727,6 +727,50 @@ const SOURCE_MERGE_TOKENS = {
   ),
 } as const;
 
+const DECISION_FORK_TOKENS = {
+  selectedWidth: _stroke(
+    "Chosen path width",
+    "Width of the accent path along the chosen branch.",
+  ),
+  conditionRadius: _length(
+    "Condition box radius",
+    "Corner radius of a branch's condition box.",
+  ),
+  conditionStrokeWidth: _stroke(
+    "Condition outline width",
+    "Width of the accent outline on the chosen condition.",
+  ),
+  outcomeRadius: _length(
+    "Outcome box radius",
+    "Corner radius of a branch's outcome box.",
+  ),
+  outcomeStrokeWidth: _stroke(
+    "Outcome outline width",
+    "Width of an outcome box's outline.",
+  ),
+  gateWidth: _stroke(
+    "Gate width",
+    "Width of the cross that closes an untaken branch.",
+  ),
+  gateSpread: _length(
+    "Gate spread",
+    "Half the width of the cross that closes an untaken branch.",
+  ),
+  markerRadius: _length(
+    "Marker halo radius",
+    "Radius of the halo around the scenario marker.",
+  ),
+  markerAlpha: _alpha(
+    "Marker halo opacity",
+    "Opacity of the halo around the scenario marker.",
+  ),
+  markerCoreRadius: _length("Marker radius", "Radius of the scenario marker."),
+  lineGap: _length(
+    "Label line gap",
+    "Space added between wrapped lines of a decision label.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -746,6 +790,7 @@ export const COMPONENT_TOKENS = {
   SchemaMapping: SCHEMA_MAPPING_TOKENS,
   QueryColumnCacheGrowth: QUERY_CACHE_TOKENS,
   SourceMerge: SOURCE_MERGE_TOKENS,
+  DecisionFork: DECISION_FORK_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

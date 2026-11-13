@@ -1,9 +1,15 @@
-import { DUR, mix, ramp } from "../../../motion";
-import { STOCK } from "../../graphics-common";
+import { mix, ramp } from "../../../motion";
+import {
+  useGraphicMotion,
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
 
 type Props = Pick<BranchProps, "branch" | "x" | "frame" | "isSelected">;
+
+const CLOSE_CUE = 60;
 
 /** Untaken alternatives close gently before the marker leaves the junction. */
 export function DecisionGate({
@@ -12,16 +18,20 @@ export function DecisionGate({
   frame,
   isSelected,
 }: Readonly<Props>): ReactNode {
-  const closed = isSelected ? 0 : ramp(frame, 60, DUR.sheet);
+  const style = useGraphicProps("DecisionFork", {});
+  const { color } = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const closed = isSelected ? 0 : ramp(frame, CLOSE_CUE, motion.sheet);
+  const spread = mix(closed, 0, style.gateSpread);
   return (
     <g
       opacity={closed}
-      stroke={STOCK.muted}
-      strokeWidth={2}
+      stroke={color.inactive}
+      strokeWidth={style.gateWidth}
       data-closed-gate={branch.id}
     >
       <path
-        d={`M${x - mix(closed, 0, 9)} 382 L${x + mix(closed, 0, 9)} 400 M${x + mix(closed, 0, 9)} 382 L${x - mix(closed, 0, 9)} 400`}
+        d={`M${x - spread} 382 L${x + spread} 400 M${x + spread} 382 L${x - spread} 400`}
       />
     </g>
   );

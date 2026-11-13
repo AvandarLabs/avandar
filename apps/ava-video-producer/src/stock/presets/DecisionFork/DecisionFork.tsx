@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { DUR, ramp } from "../../../motion";
-import { DrawPath, STOCK, Text } from "../../graphics-common";
+import { ramp } from "../../../motion";
+import { DrawPath, Text } from "../../graphics-common";
+import { useGraphicMotion } from "../../theme/useGraphicTheme";
 import { DecisionBranch } from "./DecisionBranch";
 import { DecisionHeading } from "./DecisionHeading";
 import { DecisionMarker } from "./DecisionMarker";
@@ -15,6 +16,7 @@ export type Props = GraphicProps & { input: DecisionForkInput };
  * A bounded authored decision shows conditions, closed gates and one outcome.
  */
 export function DecisionFork({ frame, accent, input }: Props): ReactNode {
+  const motion = useGraphicMotion();
   const branchSpacing = 880 / input.branches.length;
   const selectedIndex = input.branches.findIndex(
     propEq("id", input.selectedBranchId),
@@ -42,8 +44,8 @@ export function DecisionFork({ frame, accent, input }: Props): ReactNode {
         accent={accent}
         branchId={input.selectedBranchId}
       />
-      <g opacity={ramp(frame, 120, DUR.chip)}>
-        <Text x={480} y={557} size={16} anchor="middle" fill={STOCK.muted}>
+      <g opacity={ramp(frame, 120, motion.chip)}>
+        <Text role="secondary" x={480} y={557} anchor="middle">
           {input.selectionLabel}
         </Text>
       </g>

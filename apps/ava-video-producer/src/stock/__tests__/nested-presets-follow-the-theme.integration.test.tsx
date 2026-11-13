@@ -87,3 +87,14 @@ test("source-merge draws its merge node at the themed radius", () => {
     /r="41"/,
   );
 });
+
+test("decision-fork draws its marker at the themed radius", () => {
+  assert.match(
+    renderPresetWithComponentPatch(
+      { preset: "decision-fork" },
+      "DecisionFork",
+      { markerRadius: 15 },
+    ),
+    /r="15"/,
+  );
+});
