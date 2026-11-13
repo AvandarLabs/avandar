@@ -661,6 +661,72 @@ const QUERY_CACHE_TOKENS = {
   ),
 } as const;
 
+const SOURCE_MERGE_TOKENS = {
+  edgeAlpha: _alpha(
+    "Source edge opacity",
+    "Opacity of an edge from a source to the merge.",
+  ),
+  chipRadius: _length(
+    "Source chip radius",
+    "Corner radius of a source's kind chip.",
+  ),
+  chipFillAlpha: _alpha("Source chip fill", "Opacity of a source chip's tint."),
+  chipStrokeAlpha: _alpha(
+    "Source chip outline",
+    "Opacity of a source chip's outline.",
+  ),
+  chipStrokeWidth: _stroke(
+    "Source chip outline width",
+    "Width of a source chip's outline.",
+  ),
+  outEdgeAlpha: _alpha(
+    "Output edge opacity",
+    "Opacity of the edge from the merge to the destination.",
+  ),
+  outEdgeWidth: _stroke(
+    "Output edge width",
+    "Width of the edge from the merge to the destination.",
+  ),
+  outPacketPeriod: _duration(
+    "Output packet period",
+    "Frames for a packet to cross from the merge to the destination.",
+  ),
+  mergeRadius: _length("Merge node radius", "Radius of the merge node."),
+  mergeStrokeAlpha: _alpha(
+    "Merge node rim opacity",
+    "Opacity of the merge node's accent rim.",
+  ),
+  mergeStrokeWidth: _stroke(
+    "Merge node rim width",
+    "Width of the merge node's accent rim.",
+  ),
+  glyphWidth: _stroke("Merge glyph width", "Stroke width of the merge glyph."),
+  barHeight: _length(
+    "Destination bar height",
+    "Thickness of the accent bar on the destination panel.",
+  ),
+  barAlpha: _alpha(
+    "Destination bar opacity",
+    "Opacity of the accent bar on the destination panel.",
+  ),
+  slotRadius: _length(
+    "Destination slot radius",
+    "Corner radius of a slot on the destination panel.",
+  ),
+  slotFillAlpha: _alpha(
+    "Destination slot fill",
+    "Opacity of a destination slot's tint.",
+  ),
+  slotStrokeAlpha: _alpha(
+    "Destination slot line opacity",
+    "Opacity of the line inside a destination slot.",
+  ),
+  slotStrokeWidth: _stroke(
+    "Destination slot line width",
+    "Width of the line inside a destination slot.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -679,6 +745,7 @@ export const COMPONENT_TOKENS = {
   CodeFocus: CODE_FOCUS_TOKENS,
   SchemaMapping: SCHEMA_MAPPING_TOKENS,
   QueryColumnCacheGrowth: QUERY_CACHE_TOKENS,
+  SourceMerge: SOURCE_MERGE_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

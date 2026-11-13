@@ -127,6 +127,19 @@ const APPROVED_MARKUP_MOVES: Partial<
       to: 'stroke-opacity="0.6" stroke-width="1"></circle>',
     })),
   ],
+  "source-merge": [
+    // Each source chip's outline gains the explicit hairline once, in drawing
+    // order.
+    ...[0, 1, 2].map(() => ({
+      from: 'stroke-opacity="0.3"></rect>',
+      to: 'stroke-opacity="0.3" stroke-width="1"></rect>',
+    })),
+    // The merge node's rim gains the explicit hairline.
+    {
+      from: 'stroke-opacity="0.65"></circle>',
+      to: 'stroke-opacity="0.65" stroke-width="1"></circle>',
+    },
+  ],
   "terminal-type": [
     // The shared code window's title-bar divider gains the explicit hairline.
     {

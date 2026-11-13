@@ -78,3 +78,12 @@ test("query-column-cache-growth dashes missing columns with the themed pattern",
     /stroke-dasharray="6 2"/,
   );
 });
+
+test("source-merge draws its merge node at the themed radius", () => {
+  assert.match(
+    renderPresetWithComponentPatch({ preset: "source-merge" }, "SourceMerge", {
+      mergeRadius: 41,
+    }),
+    /r="41"/,
+  );
+});
