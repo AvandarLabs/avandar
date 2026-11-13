@@ -138,7 +138,15 @@ export function makeInitialApplyState(): ApplyDictionariesState {
  * every comparison against data happens in SQL.
  */
 export function toValueKey(value: string): string {
-  return value.replace(/^ +| +$/g, "").toLowerCase();
+  return trimSpaces(value).toLowerCase();
+}
+
+/**
+ * `text` without leading and trailing spaces. Only spaces, as DuckDB's
+ * `trim` does, so text the apply flow sends agrees with the conversion's SQL.
+ */
+export function trimSpaces(text: string): string {
+  return text.replace(/^ +| +$/g, "");
 }
 
 /** Whether two picks name the same entry of the same dictionary. */
@@ -220,16 +228,38 @@ function _inMode(pick: ColumnPick, mode: DictionaryBinding.Mode): ColumnPick {
   };
 }
 
+/**
+ * Puts each of `columnIds` that has a pick in `mode`. A column whose mode
+ * changes forgets its resolutions, which were chosen for the other mode.
+ */
+function _withModes(
+  state: ApplyDictionariesState,
+  columnIds: readonly string[],
+  mode: DictionaryBinding.Mode,
+): ApplyDictionariesState {
+  return columnIds.reduce((current, columnId) => {
+    const pick = current.picks[columnId];
+    if (!pick) {
+      return current;
+    }
+    const updated = _inMode(pick, mode);
+    return {
+      ...current,
+      picks: { ...current.picks, [columnId]: updated },
+      resolutions:
+        updated.mode === pick.mode
+          ? current.resolutions
+          : _withoutKey(current.resolutions, columnId),
+    };
+  }, state);
+}
+
 function _withAllModes(
   state: ApplyDictionariesState,
   mode: DictionaryBinding.Mode,
 ): ApplyDictionariesState {
-  const picks = Object.fromEntries(
-    Object.entries(state.picks).map(([columnId, pick]) => {
-      return [columnId, _inMode(pick, mode)] as const;
-    }),
-  );
-  return { ...state, picks, defaultMode: mode };
+  const updated = _withModes(state, Object.keys(state.picks), mode);
+  return { ...updated, defaultMode: mode };
 }
 
 function _withDirection(
@@ -338,9 +368,7 @@ const HANDLERS: Handlers = {
     return { ...state, step: action.step };
   },
   set_mode: (state, action) => {
-    return _updatePick(state, action.columnId, (pick) => {
-      return _inMode(pick, action.mode);
-    });
+    return _withModes(state, [action.columnId], action.mode);
   },
   set_all_modes: (state, action) => {
     return _withAllModes(state, action.mode);

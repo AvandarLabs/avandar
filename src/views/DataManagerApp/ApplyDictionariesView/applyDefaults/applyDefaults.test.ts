@@ -170,6 +170,7 @@ describe("makeInitialSelection", () => {
     expect(selection.dictionaryIds).toEqual([CDC, NYS]);
     expect(selection.picks[OUTCOME.id]?.dictionaryId).toBe(CDC);
   });
+
   it("starts new coded picks in the default mode and keeps a binding's own", () => {
     const SES = { id: "col-ses" as DatasetColumn.Id, name: "SES" };
     const converted = {

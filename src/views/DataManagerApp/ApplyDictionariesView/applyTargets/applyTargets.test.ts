@@ -72,6 +72,10 @@ describe("applyTargets", () => {
     });
 
     expect(targets.isLinkedDataset).toBe(true);
+    expect(targets.linked).toEqual({
+      isAvailable: false,
+      reason: "already_linked",
+    });
     expect(canConvert(targets)).toBe(true);
     expect(getDefaultMode(targets, "virtual")).toBe("convert");
     expect(getDefaultSaveTarget(targets)).toBeUndefined();

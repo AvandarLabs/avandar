@@ -9,6 +9,7 @@ import {
   makeInitialApplyState,
   toValueKey,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import { buildAddedPairs } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -144,6 +145,77 @@ describe("applyDictionariesReducer", () => {
       isDirectionFromData: false,
     });
     expect(state.resolutions[GENDER.id]).toBeUndefined();
+  });
+
+  it("stops adding a value to the list when its column changes mode", () => {
+    const added = applyDictionariesReducer(READY, {
+      type: "resolve_value",
+      columnId: GENDER.id,
+      valueKey: "u",
+      resolution: { action: "add", text: "Undisclosed" },
+    });
+    const asReference = applyDictionariesReducer(added, {
+      type: "set_mode",
+      columnId: GENDER.id,
+      mode: "reference",
+    });
+    const allReference = applyDictionariesReducer(added, {
+      type: "set_all_modes",
+      mode: "reference",
+    });
+
+    [asReference, allReference].forEach((state) => {
+      expect(
+        buildAddedPairs({
+          picks: state.picks,
+          resolutions: state.resolutions,
+          unmatchedByColumnId: new Map(),
+        }),
+      ).toEqual([]);
+    });
+  });
+
+  it("keeps a column's resolutions when its mode does not change", () => {
+    const added = applyDictionariesReducer(READY, {
+      type: "resolve_value",
+      columnId: GENDER.id,
+      valueKey: "u",
+      resolution: { action: "add", text: "Undisclosed" },
+    });
+    const state = applyDictionariesReducer(added, {
+      type: "set_mode",
+      columnId: GENDER.id,
+      mode: "convert",
+    });
+
+    expect(state.resolutions[GENDER.id]?.u).toEqual({
+      action: "add",
+      text: "Undisclosed",
+    });
+  });
+
+  it("adds a value to the list from a reference column", () => {
+    const asReference = applyDictionariesReducer(READY, {
+      type: "set_mode",
+      columnId: GENDER.id,
+      mode: "reference",
+    });
+    const state = applyDictionariesReducer(asReference, {
+      type: "resolve_value",
+      columnId: GENDER.id,
+      valueKey: "u",
+      resolution: { action: "add", text: "Undisclosed" },
+    });
+
+    expect(
+      buildAddedPairs({
+        picks: state.picks,
+        resolutions: state.resolutions,
+        unmatchedByColumnId: new Map(),
+      }),
+    ).toEqual([
+      { codeListId: SEX_PICK.codeListId, code: "u", label: "Undisclosed" },
+    ]);
   });
 
   it("records how a value is resolved, by its key", () => {

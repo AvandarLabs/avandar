@@ -1,4 +1,5 @@
 import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
+import { trimSpaces } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -117,8 +118,16 @@ function _toAddedPair(
 ): DictionaryBinding.AddedPair {
   // Data holding codes gains a label; data holding labels gains a code.
   return pick.direction === "decode"
-    ? { codeListId: pick.codeListId, code: value.trim(), label: text.trim() }
-    : { codeListId: pick.codeListId, code: text.trim(), label: value.trim() };
+    ? {
+        codeListId: pick.codeListId,
+        code: trimSpaces(value),
+        label: trimSpaces(text),
+      }
+    : {
+        codeListId: pick.codeListId,
+        code: trimSpaces(text),
+        label: trimSpaces(value),
+      };
 }
 
 /**

@@ -101,6 +101,20 @@ describe("applyInputs", () => {
     ).toEqual([{ codeListId: SEX_LIST.id, code: "Undisclosed", label: "U" }]);
   });
 
+  it("trims only spaces from an added pair, as value keys do", () => {
+    expect(
+      buildAddedPairs({
+        picks: { [GENDER.id]: SEX_PICK },
+        resolutions: {
+          [GENDER.id]: { "\tu": { action: "add", text: " Tab " } },
+        },
+        unmatchedByColumnId: new Map([
+          [GENDER.id, [{ value: "\tU ", valueKey: "\tu", rowCount: 1 }]],
+        ]),
+      }),
+    ).toEqual([{ codeListId: SEX_LIST.id, code: "\tU", label: "Tab" }]);
+  });
+
   it("previews with the added pair and the overrides, matches with the list alone", () => {
     const draft = buildDraftConversion({
       column: GENDER,

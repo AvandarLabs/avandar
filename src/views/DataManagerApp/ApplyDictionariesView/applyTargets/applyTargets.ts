@@ -3,8 +3,14 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { SaveTarget } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 
-/** Why a linked dataset cannot be created from a dataset. */
-export type LinkedUnavailableReason = "not_admin" | "dataset_limit";
+/**
+ * Why a linked dataset cannot be created from a dataset. `already_linked`:
+ * the dataset is itself a linked dataset, whose conversions update live.
+ */
+export type LinkedUnavailableReason =
+  | "not_admin"
+  | "dataset_limit"
+  | "already_linked";
 
 /** Why a dataset cannot be changed in place. */
 export type InPlaceUnavailableReason = "not_an_upload" | "has_linked_datasets";
@@ -87,7 +93,7 @@ export function getApplyTargets(
   return {
     isLinkedDataset,
     linked: isLinkedDataset
-      ? { isAvailable: false, reason: "not_admin" }
+      ? { isAvailable: false, reason: "already_linked" }
       : _getLinked(options),
     inPlace: _getInPlace(options),
     isAlreadyConvertedInPlace:
