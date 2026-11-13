@@ -81,6 +81,14 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   };
 });
 
+vi.mock("@/hooks/datasets/useLinkedDatasets/useLinkedDatasets", () => {
+  return {
+    useLinkedDatasets: () => {
+      return { linkedDatasets: [], isLoading: false };
+    },
+  };
+});
+
 vi.mock(
   "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem",
   () => {
@@ -165,6 +173,16 @@ describe("DatasetActionsMenu", () => {
         params: { workspaceSlug: "demo", datasetId: DATASET.id },
       }),
     );
+  });
+
+  it("says Apply turns codes into labels", async () => {
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+    expect(
+      await screen.findByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toHaveTextContent("Turn codes into labels and add column descriptions");
   });
 
   it("does not offer Apply to someone who cannot edit the dataset", async () => {
