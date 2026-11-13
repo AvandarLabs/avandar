@@ -31,7 +31,12 @@ function _render(flow: ApplyFlow): void {
       columns={[GENDER]}
       existingBindings={[]}
       flow={flow}
-      counts={{ attachedCount: 0, describedCount: 0, usedDictionaryCount: 1 }}
+      counts={{
+        convertedCount: 0,
+        attachedCount: 0,
+        describedCount: 0,
+        usedDictionaryCount: 1,
+      }}
       lookups={makeApplyLookups()}
       summary="1 converted"
       preview={null}

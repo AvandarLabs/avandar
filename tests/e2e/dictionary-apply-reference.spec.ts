@@ -86,6 +86,13 @@ async function _attachDictionary(page: Page): Promise<void> {
     SEX_CODE_LIST_NAME,
     { timeout: LONG_WAIT },
   );
+  // An upload starts converting; this spec attaches as reference only.
+  // SegmentedControl keeps its radios visually hidden, so click the label.
+  await page
+    .getByRole("radiogroup", { name: "For every column" })
+    .getByText("Attach dictionaries only as references", { exact: true })
+    .click();
+  await page.getByRole("button", { name: "Next: unmatched values" }).click();
   await page.getByRole("button", { name: "Next: attach" }).click();
   await page.getByRole("button", { name: /^Attach to / }).click();
   await expect(page.getByText(/The data is unchanged\./)).toBeVisible({

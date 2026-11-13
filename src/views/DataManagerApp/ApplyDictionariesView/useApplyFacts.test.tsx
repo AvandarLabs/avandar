@@ -16,17 +16,32 @@ const PICKS: Record<string, ColumnPick> = {
     entryId: "sex" as DataDictionaryEntry.Id,
     codeListId: "list" as DataDictionaryCodeList.Id,
     direction: "decode",
+    mode: "convert",
+    isDirectionFromData: true,
+    keepsOriginal: false,
   },
   "col-case": {
     dictionaryId: NYS,
     entryId: "case" as DataDictionaryEntry.Id,
     codeListId: undefined,
     direction: "decode",
+    mode: "reference",
+    isDirectionFromData: true,
+    keepsOriginal: false,
+  },
+  "col-ses": {
+    dictionaryId: NYS,
+    entryId: "ses" as DataDictionaryEntry.Id,
+    codeListId: "list-ses" as DataDictionaryCodeList.Id,
+    direction: "decode",
+    mode: "reference",
+    isDirectionFromData: true,
+    keepsOriginal: false,
   },
 };
 
 describe("useApplyFacts", () => {
-  it("counts code lists, descriptions, columns, and dictionaries", () => {
+  it("counts conversions, code lists, descriptions, columns, and dictionaries", () => {
     const { result } = renderHook(
       () => {
         return useApplyFacts({
@@ -39,6 +54,7 @@ describe("useApplyFacts", () => {
     );
 
     expect(result.current).toEqual([
+      "1 converted",
       "1 attached as reference",
       "1 described",
       "of 22 columns",

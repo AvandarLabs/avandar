@@ -1,8 +1,9 @@
 import { Callout } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Center, Loader, Stack, Text } from "@mantine/core";
-import { AttachStep } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep";
 import { MatchColumnsStep } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsStep";
+import { SaveAsStep } from "@/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep";
+import { UnmatchedValuesStep } from "@/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
 import type { ApplyDictionariesData } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyDictionariesData";
@@ -17,6 +18,8 @@ type Props = {
   counts: ApplyCounts;
   lookups: ApplyLookups;
   summary: string;
+  /** The preview drawer, or null while it is closed. */
+  preview: ReactNode;
 };
 
 function ReadingColumns({
@@ -32,6 +35,47 @@ function ReadingColumns({
       </Stack>
     </Center>
   );
+}
+
+function CurrentStep(props: Readonly<Props>): ReactNode {
+  const { dataset, data, flow, lookups, preview } = props;
+  const columns = data.columns ?? [];
+  switch (flow.state.step) {
+    case "match":
+      return (
+        <MatchColumnsStep
+          flow={flow}
+          dataset={dataset}
+          dictionaries={data.dictionaries}
+          lookups={lookups}
+          summary={props.summary}
+          preview={preview}
+        />
+      );
+    case "unmatched":
+      return (
+        <UnmatchedValuesStep
+          dataset={dataset}
+          columns={columns}
+          flow={flow}
+          lookups={lookups}
+          preview={preview}
+        />
+      );
+    case "save":
+      return (
+        <SaveAsStep
+          dataset={dataset}
+          columns={columns}
+          existingBindings={data.existingBindings}
+          flow={flow}
+          counts={props.counts}
+          lookups={lookups}
+          summary={props.summary}
+          preview={preview}
+        />
+      );
+  }
 }
 
 /** The current step, or why it cannot show yet. */
@@ -52,25 +96,5 @@ export function ApplyStepBody(props: Readonly<Props>): ReactNode {
   if (flow.isMatching || flow.state.dictionaryIds === undefined) {
     return <ReadingColumns datasetName={props.dataset.name} />;
   }
-  if (flow.state.step === "attach") {
-    return (
-      <AttachStep
-        dataset={props.dataset}
-        columns={props.data.columns ?? []}
-        existingBindings={props.data.existingBindings}
-        flow={flow}
-        counts={props.counts}
-        lookups={props.lookups}
-        summary={props.summary}
-      />
-    );
-  }
-  return (
-    <MatchColumnsStep
-      flow={flow}
-      dictionaries={props.data.dictionaries}
-      lookups={props.lookups}
-      summary={props.summary}
-    />
-  );
+  return <CurrentStep {...props} />;
 }

@@ -56,6 +56,7 @@ function _render(
         },
       }}
       counts={{
+        convertedCount: 0,
         attachedCount: Object.keys(picks).length,
         describedCount: 0,
         usedDictionaryCount: 1,

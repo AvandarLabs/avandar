@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@/test-utils";
+import { fireEvent, render, screen } from "@/test-utils";
 import { ApplyDictionariesHeader } from "@/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -48,7 +48,16 @@ const DATASET = { id: "dataset-1", name: "Bronx line list" } as Dataset.T;
 
 describe("ApplyDictionariesHeader", () => {
   it("leads back to the dataset from a breadcrumb above the title", () => {
-    render(<ApplyDictionariesHeader dataset={DATASET} facts={[]} />);
+    render(
+      <ApplyDictionariesHeader
+        dataset={DATASET}
+        facts={[]}
+        isPreviewOpen={false}
+        isPreviewAvailable
+        onTogglePreview={vi.fn()}
+        previewButtonRef={{ current: null }}
+      />,
+    );
 
     expect(
       screen.getByRole("heading", { name: "Apply dictionaries" }),
@@ -57,5 +66,24 @@ describe("ApplyDictionariesHeader", () => {
     expect(
       breadcrumb.querySelector("a[href='/demo/data-manager/dataset-1']"),
     ).toHaveTextContent("Bronx line list");
+  });
+
+  it("opens the preview from Preview data", () => {
+    const onTogglePreview = vi.fn();
+    render(
+      <ApplyDictionariesHeader
+        dataset={DATASET}
+        facts={[]}
+        isPreviewOpen={false}
+        isPreviewAvailable
+        onTogglePreview={onTogglePreview}
+        previewButtonRef={{ current: null }}
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: "Preview data" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(button);
+    expect(onTogglePreview).toHaveBeenCalledTimes(1);
   });
 });
