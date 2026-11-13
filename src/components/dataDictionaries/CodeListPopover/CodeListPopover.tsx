@@ -8,7 +8,7 @@ import { useHoverOrFocusOpen } from "@/components/dataDictionaries/CodeListPopov
 import { POPOVER_Z_INDEX } from "@/config/Theme/Theme";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { KeyboardEvent, ReactNode, RefObject } from "react";
+import type { FocusEvent, KeyboardEvent, ReactNode, RefObject } from "react";
 
 /** How tall the code list grows before it scrolls. */
 const CODE_LIST_MAX_HEIGHT = "calc(var(--mantine-spacing-xl) * 12)";
@@ -29,17 +29,42 @@ type Props = {
 };
 
 /**
+ * Tab at either end of the dropdown goes back to the tag. Forward Tab is
+ * not prevented: the browser's own Tab then carries on from the tag to
+ * whatever follows it, and the popover closes as focus leaves.
+ */
+function _onDropdownTab(
+  event: KeyboardEvent<HTMLDivElement>,
+  dropdown: HTMLDivElement | null,
+  tag: HTMLButtonElement | null,
+): void {
+  const stops = [
+    ...(dropdown?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []),
+  ];
+  const stop = event.shiftKey ? stops[0] : stops[stops.length - 1];
+  if (!tag || event.target !== stop) {
+    return;
+  }
+  if (event.shiftKey) {
+    event.preventDefault();
+  }
+  tag.focus();
+}
+
+/**
  * Keyboard handling for the tag and its dropdown. The dropdown is portaled
  * away from the tag, so Tab from an open tag moves into it by hand rather
- * than skipping its links, and Escape inside it hands focus back.
+ * than skipping its links. Escape, Shift+Tab from its first stop, and Tab
+ * from its last stop hand focus back to the tag, so the dropdown reads as
+ * if it sat right after the tag.
  */
 function useCodeListKeyboard(popover: ReturnType<typeof useHoverOrFocusOpen>): {
   dropdownRef: RefObject<HTMLDivElement | null>;
+  onTagFocus: (event: FocusEvent<HTMLButtonElement>) => void;
   onTagKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
   onDropdownKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
 } {
-  // Set when Tab moves focus from the tag into the dropdown, the only way
-  // the keyboard gets there. `ActionIcon` takes no ref.
+  // Set whenever the tag gets focus. `ActionIcon` takes no ref.
   const tagRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -58,21 +83,31 @@ function useCodeListKeyboard(popover: ReturnType<typeof useHoverOrFocusOpen>): {
       dropdownRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
     if (event.key === "Tab" && !event.shiftKey && firstFocusable) {
       event.preventDefault();
-      tagRef.current = event.currentTarget;
       firstFocusable.focus();
     }
   };
 
-  // Escape inside the dropdown hands focus back to the tag. Focusing the
-  // tag first lets `close` clear the focus that reopens it.
   const onDropdownKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+    // Focusing the tag first lets `close` clear the focus that reopens it.
     if (event.key === "Escape") {
       event.stopPropagation();
       tagRef.current?.focus();
       popover.close();
+      return;
+    }
+    if (event.key === "Tab") {
+      _onDropdownTab(event, dropdownRef.current, tagRef.current);
     }
   };
-  return { dropdownRef, onTagKeyDown, onDropdownKeyDown };
+  return {
+    dropdownRef,
+    onTagFocus: (event) => {
+      tagRef.current = event.currentTarget;
+      popover.onFocus();
+    },
+    onTagKeyDown,
+    onDropdownKeyDown,
+  };
 }
 
 /**
@@ -112,7 +147,7 @@ export function CodeListPopover({
           aria-label={label}
           onMouseEnter={popover.onPointerEnter}
           onMouseLeave={popover.onPointerLeave}
-          onFocus={popover.onFocus}
+          onFocus={keyboard.onTagFocus}
           onBlur={popover.onBlur}
           onClick={(event) => {
             // In a grid header, a click that bubbles up would sort the column.

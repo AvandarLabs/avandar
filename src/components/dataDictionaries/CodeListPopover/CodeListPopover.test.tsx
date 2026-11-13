@@ -71,6 +71,32 @@ const CODES = makeCodes({
   ],
 });
 
+/** Opens a converted column's popover and Tabs into its only link. */
+async function _focusDropdownLink(): Promise<{
+  tag: HTMLElement;
+  link: HTMLElement;
+}> {
+  render(
+    <CodeListPopover
+      columnName="GENDER"
+      datasetId={"dataset-1" as Dataset.Id}
+      codes={makeCodes({ mode: "convert", direction: "encode" })}
+    />,
+  );
+  const tag = screen.getByRole("button", { name: "Code list for GENDER" });
+  act(() => {
+    tag.focus();
+  });
+  const dialog = await screen.findByRole("dialog");
+  const link = within(dialog).getByRole("link", {
+    name: "Label them in NYS codes",
+    hidden: true,
+  });
+  fireEvent.keyDown(tag, { key: "Tab" });
+  expect(link).toHaveFocus();
+  return { tag, link };
+}
+
 describe("CodeListPopover", () => {
   it("shows the code list when the tag gets keyboard focus", async () => {
     render(<CodeListPopover columnName="GENDER" codes={CODES} />);
@@ -304,5 +330,32 @@ describe("CodeListPopover", () => {
     );
 
     expect(await screen.findByRole("dialog")).toHaveTextContent(/^Code list/);
+  });
+
+  it("hands forward Tab from the dropdown's last link back to the tag", async () => {
+    mocks.unlabeledCount = 3;
+    try {
+      const { tag, link } = await _focusDropdownLink();
+
+      // Not prevented: the browser's own Tab then continues past the tag.
+      expect(fireEvent.keyDown(link, { key: "Tab" })).toBe(true);
+      expect(tag).toHaveFocus();
+    } finally {
+      mocks.unlabeledCount = undefined;
+    }
+  });
+
+  it("moves Shift+Tab from the dropdown's first link to the tag", async () => {
+    mocks.unlabeledCount = 3;
+    try {
+      const { tag, link } = await _focusDropdownLink();
+
+      expect(fireEvent.keyDown(link, { key: "Tab", shiftKey: true })).toBe(
+        false,
+      );
+      expect(tag).toHaveFocus();
+    } finally {
+      mocks.unlabeledCount = undefined;
+    }
   });
 });
