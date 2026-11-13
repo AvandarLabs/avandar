@@ -132,16 +132,32 @@ function _parseOptions() {
 }
 
 /** The questions and data of the workspace a run asks about. */
-function _getWorkspace(name: string) {
+type EvalWorkspace = {
+  name: string;
+  /** Set for a workspace other than COVID, whose questions are all its own. */
+  questions: readonly EvalQuestion[] | undefined;
+  /** Set for a workspace other than COVID; the harnesses default to COVID. */
+  datasets: typeof MEASLES_DATASETS | undefined;
+  databasePath: string;
+  dataDir: string | undefined;
+};
+
+/** Looks up a `--workspace` name. Throws on a name it does not know. */
+function _getWorkspace(name: string): EvalWorkspace {
   if (name === "measles") {
     return {
+      name,
       questions: MEASLES_QUESTIONS,
       datasets: MEASLES_DATASETS,
       databasePath: join(REPO_ROOT, ".temp/ai-eval/measles.duckdb"),
       dataDir: join(REPO_ROOT, "tests/data/measles-line-list-small"),
     };
   }
+  if (name !== "covid") {
+    throw new Error(`Unknown workspace "${name}": use "covid" or "measles"`);
+  }
   return {
+    name,
     questions: undefined,
     datasets: undefined,
     databasePath: join(REPO_ROOT, ".temp/ai-eval/covid.duckdb"),
@@ -185,9 +201,10 @@ function _selectQuestions(
 
 async function _createHarness(
   options: ReturnType<typeof _parseOptions>,
+  workspace: EvalWorkspace,
   database: EvalDatabase,
 ): Promise<EvalHarness> {
-  const { datasets } = _getWorkspace(options.workspace);
+  const { datasets } = workspace;
   if (options.harness === "pi-local") {
     return createPiLocalHarness({
       repoRoot: REPO_ROOT,
@@ -209,7 +226,7 @@ async function _createHarness(
   }
   if (datasets) {
     throw new Error(
-      `The ${options.workspace} workspace runs on the pi and pi-local harnesses only`,
+      `The ${workspace.name} workspace runs on the pi and pi-local harnesses only`,
     );
   }
   return createBaselineHarness({
@@ -255,7 +272,7 @@ async function main(): Promise<void> {
     dataDir: workspace.dataDir,
     datasets: workspace.datasets,
   });
-  const harness = await _createHarness(options, database);
+  const harness = await _createHarness(options, workspace, database);
   const label = options.label || harness.label;
   const graded: GradedAnswer[] = [];
   await _runAll(

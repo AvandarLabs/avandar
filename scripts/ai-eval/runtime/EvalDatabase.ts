@@ -1,4 +1,11 @@
-import { existsSync, mkdirSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { DuckDBInstance } from "@duckdb/node-api";
@@ -68,6 +75,44 @@ async function _createTruthViews(
   }
 }
 
+/** Where the datasets a database was built from are recorded. */
+function _buildDatasetsKeyPath(databasePath: string): string {
+  return `${databasePath}.datasets.json`;
+}
+
+function _buildDatasetsKey(datasets: readonly EvalDataset[]): string {
+  return JSON.stringify(datasets);
+}
+
+/**
+ * Whether a built database is out of date: a CSV is newer than it, or the
+ * datasets it was built from (ids, files, columns, codes) have changed.
+ */
+function _isStale(
+  databasePath: string,
+  dataDir: string,
+  datasets: readonly EvalDataset[],
+): boolean {
+  const keyPath = _buildDatasetsKeyPath(databasePath);
+  if (
+    !existsSync(keyPath) ||
+    readFileSync(keyPath, "utf8") !== _buildDatasetsKey(datasets)
+  ) {
+    return true;
+  }
+  const builtAt = statSync(databasePath).mtimeMs;
+  return datasets.some((dataset) => {
+    const csvPath = join(dataDir, dataset.fileName);
+    return existsSync(csvPath) && statSync(csvPath).mtimeMs > builtAt;
+  });
+}
+
+function _remove(databasePath: string): void {
+  for (const path of [databasePath, `${databasePath}.wal`]) {
+    rmSync(path, { force: true });
+  }
+}
+
 async function _build(
   databasePath: string,
   dataDir: string,
@@ -83,12 +128,17 @@ async function _build(
     connection.closeSync();
     instance.closeSync();
   }
+  writeFileSync(
+    _buildDatasetsKeyPath(databasePath),
+    _buildDatasetsKey(datasets),
+  );
 }
 
 /**
  * Opens the eval's DuckDB copy of a workspace, building it from the CSV
  * files on first use: the COVID workspace by default, or `datasets` from
- * `dataDir`. Tables are named by dataset id, as in the app, and each
+ * `dataDir`. It builds again when a CSV is newer than the file or the
+ * datasets changed. Tables are named by dataset id, as in the app, and each
  * dataset's truth view serves the ground-truth SQL. Opens read-only, so
  * several eval runs can share the file.
  */
@@ -99,12 +149,14 @@ async function _open(
     datasets?: readonly EvalDataset[];
   }>,
 ): Promise<EvalDatabase> {
-  if (!existsSync(options.databasePath)) {
-    await _build(
-      options.databasePath,
-      options.dataDir ?? join(homedir(), "cleaned-test-data"),
-      options.datasets ?? COVID_DATASETS,
-    );
+  const dataDir = options.dataDir ?? join(homedir(), "cleaned-test-data");
+  const datasets = options.datasets ?? COVID_DATASETS;
+  if (
+    !existsSync(options.databasePath) ||
+    _isStale(options.databasePath, dataDir, datasets)
+  ) {
+    _remove(options.databasePath);
+    await _build(options.databasePath, dataDir, datasets);
   }
   const instance = await DuckDBInstance.create(options.databasePath, {
     access_mode: "READ_ONLY",

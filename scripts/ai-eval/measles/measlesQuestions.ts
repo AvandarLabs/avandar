@@ -1,14 +1,36 @@
-import { ResultChecks } from "../grading/ResultChecks";
+import { MatcherText } from "../grading/ResultMatchers";
 import type { EvalQuestion, GradeContext } from "../EvalQuestion";
 import type { Verdict } from "../grading/ResultMatchers";
 
 /** The one count a truth query returns. */
-function _count(context: GradeContext): number {
+function _getTruthCount(context: GradeContext): number {
   return Number(context.truth.count?.rows[0]?.[0] ?? Number.NaN);
 }
 
+/**
+ * Passes a result that is one row with exactly one number in it, equal to
+ * the truth count. A code shown beside the count, or a grouped result, fails
+ * even when one of its codes equals the count.
+ */
 function _hasCount(context: GradeContext): Verdict {
-  return ResultChecks.hasValue(context.result, _count(context), { maxRows: 1 });
+  const truthCount = _getTruthCount(context);
+  const { rows } = context.result;
+  if (rows.length !== 1) {
+    return { pass: false, detail: `expected 1 row, got ${rows.length}` };
+  }
+  const numbers = rows[0]!.flatMap((cell) => {
+    const cellNumber = MatcherText.toNumber(cell);
+    return cellNumber === undefined ? [] : [cellNumber];
+  });
+  if (numbers.length !== 1) {
+    return {
+      pass: false,
+      detail: `expected 1 number in the row, got ${numbers.length}`,
+    };
+  }
+  return numbers[0] === truthCount
+    ? { pass: true, detail: `found ${truthCount}` }
+    : { pass: false, detail: `got ${numbers[0]}, expected ${truthCount}` };
 }
 
 /**
@@ -17,7 +39,7 @@ function _hasCount(context: GradeContext): Verdict {
  */
 export function gradeNoLabelAnswer(text: string): Verdict {
   const saysNoLabel =
-    /no label|not labell?ed|unlabell?ed|doesn't have a label|does not have a label|hasn't been labell?ed|has not been labell?ed|not recorded/i.test(
+    /no label|not labell?ed|unlabell?ed|doesn't have a label|does not have a label|hasn't been labell?ed|has not been labell?ed/i.test(
       text,
     );
   return saysNoLabel

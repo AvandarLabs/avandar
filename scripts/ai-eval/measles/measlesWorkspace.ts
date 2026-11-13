@@ -10,7 +10,8 @@ export type MeaslesDataset = Omit<CovidDataset, "columns"> & {
   }>;
 };
 
-function _pair(
+/** One code and its label, with no other spellings. */
+function _createCodePair(
   code: string,
   label: string,
   isMissing = false,
@@ -44,7 +45,11 @@ export const MEASLES_DATASETS: readonly MeaslesDataset[] = [
         dataType: "bigint",
         codes: {
           direction: "decode",
-          pairs: [_pair("1", "Male"), _pair("2", "Female"), _pair("9", "")],
+          pairs: [
+            _createCodePair("1", "Male"),
+            _createCodePair("2", "Female"),
+            _createCodePair("9", ""),
+          ],
           description: "Sex recorded on the case report.",
         },
       },
@@ -53,7 +58,7 @@ export const MEASLES_DATASETS: readonly MeaslesDataset[] = [
         dataType: "varchar",
         codes: {
           direction: "decode",
-          pairs: [_pair("Y", "Yes"), _pair("N", "No")],
+          pairs: [_createCodePair("Y", "Yes"), _createCodePair("N", "No")],
           description: "Admitted to a hospital for at least one night.",
         },
       },
@@ -63,10 +68,10 @@ export const MEASLES_DATASETS: readonly MeaslesDataset[] = [
         codes: {
           direction: "decode",
           pairs: [
-            _pair("1", "Low"),
-            _pair("2", "Lower-middle"),
-            _pair("3", "Upper-middle"),
-            _pair("4", "High"),
+            _createCodePair("1", "Low"),
+            _createCodePair("2", "Lower-middle"),
+            _createCodePair("3", "Upper-middle"),
+            _createCodePair("4", "High"),
           ],
         },
       },
