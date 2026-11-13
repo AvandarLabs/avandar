@@ -26,6 +26,7 @@
     "component:review": "node scripts/require-license.mjs && node scripts/review-avandar.mjs",
     "atlas:posters": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/showcase/atlasPosters/renderAtlasPosters.ts",
     "theme:parity": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/videoTheme/themeParity/themeParity.ts",
+    "theme:sync-avandar": "node scripts/require-license.mjs && node --import tsx scripts/videoTheme/syncAvandarTheme/syncAvandarTheme.ts",
     "motion:build": "node scripts/require-license.mjs && node scripts/build-motion-gallery.mjs",
     "motion": "node scripts/require-license.mjs && node --import tsx --import ./scripts/yaml/registerYaml.mjs scripts/motion.ts",
     "component:measure": "node scripts/require-license.mjs && node scripts/measure-avandar.mjs",

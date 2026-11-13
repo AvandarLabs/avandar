@@ -1,3 +1,4 @@
+import avandarTheme from "../../../themes/avandar.theme.json";
 import classicTheme from "../../../themes/classic.theme.json";
 import { parseVideoThemeDocument } from "../videoThemeSchema/videoThemeSchema";
 import type {
@@ -7,7 +8,7 @@ import type {
 } from "../videoTheme.types";
 
 /** Ids of the themes bundled with the producer. They are read-only. */
-export const BUILT_IN_VIDEO_THEME_IDS = ["classic"] as const;
+export const BUILT_IN_VIDEO_THEME_IDS = ["classic", "avandar"] as const;
 
 /**
  * Bundled built-in themes by id, validated at load. Every render can resolve
@@ -15,7 +16,7 @@ export const BUILT_IN_VIDEO_THEME_IDS = ["classic"] as const;
  * card rendered outside any theme provider.
  */
 export const BUILT_IN_VIDEO_THEMES: VideoThemeLibrary = new Map(
-  [classicTheme].map((value) => {
+  [classicTheme, avandarTheme].map((value) => {
     const document = parseVideoThemeDocument(value);
     return [document.id, document] as const;
   }),
