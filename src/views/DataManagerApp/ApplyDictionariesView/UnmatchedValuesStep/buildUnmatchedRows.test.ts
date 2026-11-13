@@ -23,6 +23,7 @@ describe("buildUnmatchedRows", () => {
         [GENDER.id]: SEX_PICK,
         [COUNTY.id]: { ...SEX_PICK, mode: "reference" },
       },
+      resolutions: {},
       codeLists: new Map([[SEX_LIST.id, BLANK_LIST]]),
       unmatchedByColumnId: new Map([
         [GENDER.id, [{ value: "7", valueKey: "7", rowCount: 3 }]],
@@ -48,6 +49,7 @@ describe("buildUnmatchedRows", () => {
     const rows = buildUnmatchedRows({
       columns: [GENDER],
       picks: { [GENDER.id]: SEX_PICK },
+      resolutions: {},
       codeLists: new Map([[SEX_LIST.id, SEX_LIST]]),
       unmatchedByColumnId: new Map([
         [
@@ -75,6 +77,7 @@ describe("buildUnmatchedRows", () => {
     const rows = buildUnmatchedRows({
       columns: [GENDER],
       picks: { [GENDER.id]: { ...SEX_PICK, direction: "encode" } },
+      resolutions: {},
       codeLists: new Map([[SEX_LIST.id, SEX_LIST]]),
       unmatchedByColumnId: new Map([
         [
@@ -94,10 +97,39 @@ describe("buildUnmatchedRows", () => {
     ).toEqual([true, false]);
   });
 
+  it("lets a value stay as text once a pending added code makes the column text", () => {
+    const toCannotStay = (addedCode: string): boolean[] => {
+      const rows = buildUnmatchedRows({
+        columns: [GENDER],
+        picks: { [GENDER.id]: { ...SEX_PICK, direction: "encode" } },
+        resolutions: {
+          [GENDER.id]: { y: { action: "add", text: addedCode } },
+        },
+        codeLists: new Map([[SEX_LIST.id, SEX_LIST]]),
+        unmatchedByColumnId: new Map([
+          [
+            GENDER.id,
+            [
+              { value: "X", valueKey: "x", rowCount: 2 },
+              { value: "Y", valueKey: "y", rowCount: 1 },
+            ],
+          ],
+        ]),
+      });
+      return rows.converted.map((row) => {
+        return row.cannotStayAsText;
+      });
+    };
+
+    expect(toCannotStay("N/A")).toEqual([false, false]);
+    expect(toCannotStay("8")).toEqual([true, true]);
+  });
+
   it("leaves out a column whose pick has no code list or whose list is gone", () => {
     const rows = buildUnmatchedRows({
       columns: [GENDER],
       picks: { [GENDER.id]: { ...SEX_PICK, codeListId: undefined } },
+      resolutions: {},
       codeLists: new Map(),
       unmatchedByColumnId: new Map([
         [GENDER.id, [{ value: "7", valueKey: "7", rowCount: 3 }]],

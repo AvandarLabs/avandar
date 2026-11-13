@@ -1,8 +1,12 @@
 import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import { toValueKey } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import { buildAddedPairs } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type {
+  ApplyDictionariesState,
+  ColumnPick,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { UnmatchedValue } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 
 /** One value to resolve, with its column and how that column is applied. */
@@ -26,11 +30,11 @@ const WHOLE_NUMBER = /^ *-?[0-9]{1,18} *$/;
 function _cannotStayAsText(
   item: UnmatchedValue,
   pick: ColumnPick,
-  codeList: DataDictionaryCodeList.T,
+  pairs: readonly DataDictionaryCodeList.Pair[],
 ): boolean {
   const outputDataType = ColumnConversion.getOutputDataType({
     direction: pick.direction,
-    pairs: codeList.pairs,
+    pairs: [...pairs],
   });
   return (
     pick.mode === "convert" &&
@@ -85,18 +89,45 @@ export function mergeByValueKey(
 }
 
 /**
+ * Each code list's pairs once saving adds what Add to list adds, by code
+ * list id, so a pending added code counts toward the column's output type.
+ */
+function _getPairsWithAdded(
+  options: Parameters<typeof buildAddedPairs>[0] &
+    Readonly<{ codeLists: ReadonlyMap<string, DataDictionaryCodeList.T> }>,
+): Map<string, DataDictionaryCodeList.Pair[]> {
+  const pairsByListId = new Map<string, DataDictionaryCodeList.Pair[]>(
+    [...options.codeLists.values()].map((codeList) => {
+      return [codeList.id, [...codeList.pairs]];
+    }),
+  );
+  buildAddedPairs(options).forEach((added) => {
+    pairsByListId.get(added.codeListId)?.push({
+      code: added.code,
+      label: added.label,
+      acceptedSpellings: [],
+      isMissing: false,
+    });
+  });
+  return pairsByListId;
+}
+
+/**
  * The Unmatched values step's rows, in the dataset's column order: values
  * of converted columns, and values of reference columns, which have no
- * label to show.
+ * label to show. Whether a value can stay as text counts the codes pending
+ * Add to list resolutions would add.
  */
 export function buildUnmatchedRows(
   options: Readonly<{
     columns: readonly DatasetColumn.T[];
     picks: Readonly<Record<string, ColumnPick>>;
+    resolutions: ApplyDictionariesState["resolutions"];
     codeLists: ReadonlyMap<string, DataDictionaryCodeList.T>;
     unmatchedByColumnId: ReadonlyMap<string, readonly UnmatchedValue[]>;
   }>,
 ): { converted: UnmatchedRow[]; reference: UnmatchedRow[] } {
+  const pairsByListId = _getPairsWithAdded(options);
   const rows = options.columns.flatMap((column) => {
     const pick = options.picks[column.id];
     const codeList = pick?.codeListId
@@ -115,7 +146,11 @@ export function buildUnmatchedRows(
         codeList,
         item,
         isInListWithoutLabel: _isInListWithoutLabel(item, pick, codeList),
-        cannotStayAsText: _cannotStayAsText(item, pick, codeList),
+        cannotStayAsText: _cannotStayAsText(
+          item,
+          pick,
+          pairsByListId.get(codeList.id) ?? codeList.pairs,
+        ),
       };
     });
   });

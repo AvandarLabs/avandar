@@ -73,6 +73,7 @@ function ReadyBody(props: Readonly<BodyProps>): ReactNode {
   const rows = buildUnmatchedRows({
     columns: props.columns,
     picks: props.flow.state.picks,
+    resolutions: props.flow.state.resolutions,
     codeLists: props.lookups.codeLists,
     unmatchedByColumnId:
       unmatched.status === "ready" ? unmatched.result : new Map(),
