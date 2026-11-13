@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { bundle } from "@remotion/bundler";
 import {
   openBrowser,
   renderStill,
@@ -10,13 +9,13 @@ import {
   CONTINUITY_CATALOG,
   isSceneEntry,
 } from "../../../src/continuity/continuityCatalog";
-import { buildProduct } from "../../build-avandar.mjs";
-import { assetReferences, publicAsset } from "../../lib/planHelpers";
-import { withWorkspaceAliases } from "../../lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "../../require-license.mjs";
+import {
+  bundleShowcaseFilms,
+  SHOWCASE_STILL_BROWSER_OPTIONS,
+} from "../bundleShowcaseFilms/bundleShowcaseFilms";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 import { getPosterFrameFromPlan } from "./getPosterFrameFromPlan/getPosterFrameFromPlan";
-import type { Film } from "../../../src/showcase/showcase.types";
 
 /** Tracked card posters for the Atlas Compositions and Sample films sections. */
 const ATLAS_POSTER_DIRECTORY: string = path.join(
@@ -26,33 +25,6 @@ const ATLAS_POSTER_DIRECTORY: string = path.join(
 
 /** Posters render at half the canvas: sharp on a card, small in Git. */
 const POSTER_SCALE = 0.5;
-
-/** One Remotion bundle whose public directory holds every film's assets. */
-async function _bundleFilms(films: readonly Film[], directory: string) {
-  const publicDir = path.join(directory, "public");
-  await fs.mkdir(publicDir, { recursive: true });
-  await fs.cp(
-    path.join(appRoot, "public/fonts"),
-    path.join(publicDir, "fonts"),
-    { recursive: true },
-  );
-  const assets = new Set(
-    films.flatMap((film) => (film.plan ? assetReferences(film.plan) : [])),
-  );
-  for (const asset of assets) {
-    const target = path.join(publicDir, asset);
-    await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.copyFile(await publicAsset(appRoot, asset), target);
-  }
-  await buildProduct();
-  return bundle({
-    webpackOverride: withWorkspaceAliases,
-    entryPoint: path.join(appRoot, "src/showcase/render-entry.tsx"),
-    rootDir: appRoot,
-    outDir: path.join(directory, "bundle"),
-    publicDir,
-  });
-}
 
 /**
  * Render a still for each named composition or sample film, or for the whole
@@ -78,13 +50,9 @@ async function renderAtlasPosters(ids: readonly string[]) {
   );
   const directory = path.join(appRoot, "out/showcase/atlas-posters");
   await fs.rm(directory, { recursive: true, force: true });
-  const serveUrl = await _bundleFilms(films, directory);
+  const serveUrl = await bundleShowcaseFilms(films, directory);
   await fs.mkdir(ATLAS_POSTER_DIRECTORY, { recursive: true });
-  const options = {
-    chromeMode: "headless-shell" as const,
-    chromiumOptions: { headless: true, gl: "angle" as const },
-    logLevel: "error" as const,
-  };
+  const options = SHOWCASE_STILL_BROWSER_OPTIONS;
   const browser = await openBrowser("chrome", options);
   try {
     for (const film of films) {
