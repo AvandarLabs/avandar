@@ -662,6 +662,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `tests/e2e/agent-chat-sessions.spec.ts`, `tests/e2e/agent-chat-mentions.spec.ts` | F91, F128, F131 | F91 owns mentions and F128 owns sessions. F131: the `data-agent-v4` route (`03ca7f39c`). |
 | `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
 | `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). |
+| `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). |
 
 ---
 
@@ -10762,19 +10763,22 @@ female cases" becomes `"GENDER" = 2` without anyone remembering the code.
   `AppLinks.tsx`, the generated `routeTree.gen.ts`, and
   `src/views/DataManagerApp/useListPaneToggle/`.
 - The apply flow (`449065183`, `157a44711`, `ecf9e6762`, `30d4772d5`,
-  `571f3fae0`, `9966923a7`, `676e8992f`): `ApplyDictionariesView/` (the
-  reducer, defaults, lookups, the data, profile, flow, access, and attach
-  hooks, the header and step bar, `MatchColumnsStep/`, and `AttachStep/`).
-  The access hook has a `failed` state for a role read that fails.
+  `571f3fae0`, `9966923a7`, `676e8992f`, `9cd6e8d9d`): `ApplyDictionariesView/`
+  (the reducer, defaults, lookups, the data, profile, flow, access, and
+  attach hooks, the header and step bar, `MatchColumnsStep/`, and
+  `AttachStep/`). The access hook has a `failed` state for a role read that
+  fails. A column two dictionaries tie on goes to the one whose chip comes
+  first (most columns covered).
 - The Save step (`242d427ef`, `ec386f1f6`):
   `src/views/DataManagerApp/NewDictionaryFromDatasetsView/` (`SaveStep/`,
   `ProposalStepBody.tsx`, `useCreateDictionary.ts`, `useNewDictionaryFlow.ts`,
   `useOpenAfterCreate.ts`, and the reducer).
-- The Dictionary view (`b278896db`, `ec386f1f6`, `c6ed4e267`):
+- The Dictionary view (`b278896db`, `ec386f1f6`, `c6ed4e267`, `ca665cb44`):
   `src/views/DataManagerApp/DataDictionaryView/` (`ApplyToDatasetButton/`,
   `DictionaryUsedByTab/` with its loading and error states,
   `useDictionaryUsage/`, `DataDictionaryHeader/`, and the editor and its
-  tabs).
+  tabs). F129's `useSaveDataDictionary.ts` now also refreshes the bindings,
+  so Used by is current after a save removes an entry.
 - The Data Explorer (`e82540818`, `26061b590`):
   `src/lib/dataDictionaries/getResultColumnCodes/`,
   `src/lib/ui/viz/DataGridColumnTitle/` (`ColumnCodesContext.ts`,
