@@ -103,6 +103,7 @@ function useColumnMatches(data: Readonly<ApplyDictionariesData>): {
   const read = useDatasetProfiles({
     dataset: data.dataset,
     columns: data.columns,
+    bindings: data.existingBindings,
   });
   const profiles = read.status === "ready" ? read.profiles : NO_PROFILES;
   const matchesByColumnName = useMemo(() => {

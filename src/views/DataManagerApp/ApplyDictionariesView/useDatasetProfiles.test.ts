@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { act, renderHook, waitFor } from "@/test-utils";
 import { useDatasetProfiles } from "@/views/DataManagerApp/ApplyDictionariesView/useDatasetProfiles";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
@@ -48,7 +49,11 @@ describe("useDatasetProfiles", () => {
       .mockResolvedValueOnce([{ columnName: "renamed" }]);
     const { result, rerender } = renderHook(
       (props: { columns: DatasetColumn.T[] }) => {
-        return useDatasetProfiles({ dataset: DATASET, columns: props.columns });
+        return useDatasetProfiles({
+          dataset: DATASET,
+          columns: props.columns,
+          bindings: [],
+        });
       },
       { initialProps: { columns: [_column("GENDER")] } },
     );
@@ -64,5 +69,39 @@ describe("useDatasetProfiles", () => {
         profiles: [{ columnName: "renamed" }],
       });
     });
+  });
+
+  it("profiles a converted column as the type it is stored as", async () => {
+    profileMock.mockReset().mockResolvedValue([]);
+    const gender = { ..._column("GENDER"), columnIdx: 1 };
+    const caseId = _column("case_id");
+    const bindings = [
+      {
+        datasetColumnId: gender.id,
+        mode: "convert",
+        replacedDataType: "bigint",
+      },
+      {
+        datasetColumnId: caseId.id,
+        mode: "reference",
+        replacedDataType: undefined,
+      },
+    ] as DictionaryBinding.T[];
+
+    renderHook(() => {
+      return useDatasetProfiles({
+        dataset: DATASET,
+        columns: [gender, caseId],
+        bindings,
+      });
+    });
+
+    await waitFor(() => {
+      expect(profileMock).toHaveBeenCalledTimes(1);
+    });
+    expect(profileMock.mock.calls[0]?.[0].columns).toEqual([
+      { name: "case_id", dataType: "varchar" },
+      { name: "GENDER", dataType: "bigint" },
+    ]);
   });
 });
