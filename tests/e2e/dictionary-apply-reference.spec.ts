@@ -102,9 +102,11 @@ async function _expectCodesOnDatasetPage(page: Page): Promise<void> {
     "Attached as reference. The values in the data are unchanged.",
   );
   await page.keyboard.press("Escape");
+  // In case_id's own row of the column table, since it has no description
+  // of its own. The data preview grid has a header row named case_id too.
   await expect(
-    page.getByText("Case number assigned by the county."),
-  ).toBeVisible();
+    page.getByRole("table").getByRole("row", { name: /^case_id/ }),
+  ).toContainText("Case number assigned by the county.");
   // The rail's caption, since the list pane links to the dictionary too.
   await expect(
     page.getByText("Attached as reference · data unchanged"),
@@ -121,7 +123,10 @@ async function _expectCodesOnDatasetPage(page: Page): Promise<void> {
   await page.keyboard.press("Escape");
 }
 
-/** A Data Explorer query of the bound column shows its tag in the header. */
+/**
+ * A grouped Data Explorer count of the bound column shows its tag in the
+ * grouped column's header.
+ */
 async function _expectCodesInExplorer(
   page: Page,
   options: Readonly<{ admin: AvaSupabaseDBClient; datasetId: string }>,
@@ -136,7 +141,7 @@ async function _expectCodesInExplorer(
     page,
     datasetName: dataset.name,
     columnName: "GENDER",
-    sql: `SELECT "GENDER", "hosp_yn" FROM "${options.datasetId}"`,
+    sql: `SELECT "GENDER", count(*) FROM "${options.datasetId}" GROUP BY 1`,
   });
   await expect(
     page.getByRole("button", { name: "Code list for GENDER" }),
