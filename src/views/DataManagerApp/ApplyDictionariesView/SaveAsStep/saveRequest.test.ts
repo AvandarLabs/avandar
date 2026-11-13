@@ -3,6 +3,7 @@ import {
   GENDER,
   LINKED_ONLY_TARGETS,
   makeApplyFlow,
+  SEX_LIST,
   SEX_PICK,
 } from "@/views/DataManagerApp/ApplyDictionariesView/__tests__/applyFlow.fixtures";
 import {
@@ -14,6 +15,7 @@ import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBind
 
 const STATE = makeApplyFlow().state;
 const UNMATCHED = { status: "ready", result: new Map() } as const;
+const CODE_LISTS = new Map([[SEX_LIST.id, SEX_LIST]]);
 
 describe("saveRequest", () => {
   it("creates a linked dataset with live conversions", () => {
@@ -21,6 +23,7 @@ describe("saveRequest", () => {
       state: STATE,
       columns: [GENDER],
       unmatched: UNMATCHED,
+      codeLists: CODE_LISTS,
       isLinkedDataset: false,
       linkedDatasetName: "Bronx (labeled)",
     });
@@ -40,6 +43,7 @@ describe("saveRequest", () => {
       state: { ...STATE, saveTarget: "in_place" },
       columns: [GENDER],
       unmatched: UNMATCHED,
+      codeLists: CODE_LISTS,
       isLinkedDataset: false,
       linkedDatasetName: "",
     });
@@ -53,6 +57,7 @@ describe("saveRequest", () => {
       state: { ...STATE, saveTarget: undefined },
       columns: [GENDER],
       unmatched: UNMATCHED,
+      codeLists: CODE_LISTS,
       isLinkedDataset: true,
       linkedDatasetName: "",
     });
@@ -70,6 +75,7 @@ describe("saveRequest", () => {
       state: STATE,
       columns: [GENDER],
       unmatched: UNMATCHED,
+      codeLists: CODE_LISTS,
       isLinkedDataset: false,
       linkedDatasetName: " ",
     });

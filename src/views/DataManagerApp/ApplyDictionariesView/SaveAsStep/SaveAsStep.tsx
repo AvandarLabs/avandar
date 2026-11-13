@@ -139,6 +139,7 @@ function ConvertingSave(props: Readonly<Props>): ReactNode {
     state,
     columns: props.columns,
     unmatched: flow.unmatched,
+    codeLists: props.lookups.codeLists,
     isLinkedDataset: targets?.isLinkedDataset ?? false,
     linkedDatasetName,
   });

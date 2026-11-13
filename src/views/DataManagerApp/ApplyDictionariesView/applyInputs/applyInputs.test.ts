@@ -24,6 +24,7 @@ const UNMATCHED = new Map<string, readonly UnmatchedValue[]>([
     ],
   ],
 ]);
+const CODE_LISTS = new Map([[SEX_LIST.id, SEX_LIST]]);
 const RESOLUTIONS = {
   [GENDER.id]: {
     "7": { action: "empty" },
@@ -48,6 +49,7 @@ describe("applyInputs", () => {
       picks: { [GENDER.id]: { ...SEX_PICK, keepsOriginal: true } },
       resolutions: RESOLUTIONS,
       unmatchedByColumnId: UNMATCHED,
+      codeLists: CODE_LISTS,
       isPinned: true,
     });
 
@@ -67,12 +69,33 @@ describe("applyInputs", () => {
     });
   });
 
+  it("never sends a map to a code its list does not have", () => {
+    const [binding] = buildBindingInputs({
+      columns: [GENDER],
+      picks: { [GENDER.id]: SEX_PICK },
+      resolutions: {
+        [GENDER.id]: {
+          x: { action: "map", code: "4" },
+          u: { action: "map", code: " 9 " },
+        },
+      },
+      unmatchedByColumnId: UNMATCHED,
+      codeLists: CODE_LISTS,
+      isPinned: false,
+    });
+
+    expect(binding?.valueOverrides).toEqual([
+      { value: "U", action: "map", code: " 9 " },
+    ]);
+  });
+
   it("writes a reference column plain", () => {
     const [binding] = buildBindingInputs({
       columns: [GENDER],
       picks: { [GENDER.id]: { ...SEX_PICK, mode: "reference" } },
       resolutions: RESOLUTIONS,
       unmatchedByColumnId: UNMATCHED,
+      codeLists: CODE_LISTS,
       isPinned: true,
     });
 

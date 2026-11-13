@@ -222,7 +222,14 @@ function useOpenWithDefaults(
       ...selection,
       selectedColumnId: firstColumn?.id,
       defaultMode,
-      resolutions: resolutionsFromBindings(data.existingBindings),
+      resolutions: resolutionsFromBindings(
+        data.existingBindings,
+        new Map(
+          data.codeLists.map((codeList) => {
+            return [codeList.id, codeList] as const;
+          }),
+        ),
+      ),
       saveTarget: getDefaultSaveTarget(targets),
     });
   }, [

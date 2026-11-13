@@ -61,6 +61,7 @@ function useAttachRequest(props: Readonly<Props>): {
     bindings: buildBindingInputs({
       ...shared,
       columns: props.columns,
+      codeLists: props.lookups.codeLists,
       isPinned: false,
     }),
     addedPairs: buildAddedPairs(shared),

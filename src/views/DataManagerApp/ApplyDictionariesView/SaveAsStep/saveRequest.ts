@@ -3,6 +3,7 @@ import {
   buildBindingInputs,
   isConvertingPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
+import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
@@ -32,6 +33,7 @@ export function buildSaveRequest(
     state: ApplyDictionariesState;
     columns: readonly DatasetColumn.T[];
     unmatched: UnmatchedValues;
+    codeLists: ReadonlyMap<string, DataDictionaryCodeList.T>;
     isLinkedDataset: boolean;
     linkedDatasetName: string;
   }>,
@@ -51,6 +53,7 @@ export function buildSaveRequest(
   const bindings = buildBindingInputs({
     ...shared,
     columns: options.columns,
+    codeLists: options.codeLists,
     isPinned: target === "in_place",
   });
   const addedPairs = buildAddedPairs(shared);

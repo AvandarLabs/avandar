@@ -1,6 +1,8 @@
+import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
 import { toValueKey } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type {
@@ -145,12 +147,28 @@ function _toResolution(
     : { action: override.action };
 }
 
+/** Whether a saved override can still be sent: a map needs its code listed. */
+function _isStillValid(
+  override: DictionaryBinding.ValueOverride,
+  codeList: DataDictionaryCodeList.T | undefined,
+): boolean {
+  if (override.action !== "map") {
+    return true;
+  }
+  return (codeList?.pairs ?? []).some((pair) => {
+    return ColumnConversion.isSameCode(pair.code, override.code);
+  });
+}
+
 /**
  * How each converted column's unmatched values were resolved the last
- * time, by column id and value key, so reopening Apply keeps them.
+ * time, by column id and value key, so reopening Apply keeps them. A map to
+ * a code its list no longer has, or whose list is not in `codeLists`, is
+ * dropped so the value is kept as is: the apply RPC would refuse it.
  */
 export function resolutionsFromBindings(
   bindings: readonly DictionaryBinding.T[],
+  codeLists: ReadonlyMap<string, DataDictionaryCodeList.T>,
 ): Record<string, Record<string, ValueResolution>> {
   return Object.fromEntries(
     bindings
@@ -158,13 +176,20 @@ export function resolutionsFromBindings(
         return binding.mode === "convert" && binding.valueOverrides.length > 0;
       })
       .map((binding) => {
+        const codeList = binding.codeListId
+          ? codeLists.get(binding.codeListId)
+          : undefined;
         const byKey = Object.fromEntries(
-          binding.valueOverrides.map((override) => {
-            return [
-              toValueKey(override.value),
-              _toResolution(override),
-            ] as const;
-          }),
+          binding.valueOverrides
+            .filter((override) => {
+              return _isStillValid(override, codeList);
+            })
+            .map((override) => {
+              return [
+                toValueKey(override.value),
+                _toResolution(override),
+              ] as const;
+            }),
         );
         return [binding.datasetColumnId, byKey] as const;
       }),

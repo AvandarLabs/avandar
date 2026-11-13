@@ -47,17 +47,31 @@ function _resolvedValues(
   });
 }
 
-/** Every resolution but Add to list, which adds a pair instead. */
+/** Whether `codeList` has a pair with `code`, as the apply RPC checks. */
+function _hasCode(
+  codeList: DataDictionaryCodeList.T | undefined,
+  code: string,
+): boolean {
+  return (codeList?.pairs ?? []).some((pair) => {
+    return ColumnConversion.isSameCode(pair.code, code);
+  });
+}
+
+/**
+ * Every resolution but Add to list, which adds a pair instead. A map to a
+ * code `codeList` does not have keeps the value as is.
+ */
 function _toOverrides(
   resolutions: Resolutions,
   unmatched: readonly UnmatchedValue[] | undefined,
+  codeList: DataDictionaryCodeList.T | undefined,
 ): DictionaryBinding.ValueOverride[] {
   return _resolvedValues(resolutions, unmatched).flatMap(
     ({ value, resolution }): DictionaryBinding.ValueOverride[] => {
       switch (resolution.action) {
         case "map":
           // A map with no label chosen yet keeps the value as is.
-          return resolution.code === ""
+          return resolution.code === "" || !_hasCode(codeList, resolution.code)
             ? []
             : [{ value, action: "map", code: resolution.code }];
         case "keep":
@@ -73,7 +87,8 @@ function _toOverrides(
 /**
  * The bindings the apply RPC takes, in the dataset's column order. A
  * converted column carries its overrides and keep-original choice and is
- * pinned when `isPinned`; everything else is attached plain.
+ * pinned when `isPinned`; everything else is attached plain. A map to a
+ * code its list in `codeLists` does not have is left out.
  */
 export function buildBindingInputs(
   options: Readonly<{
@@ -81,6 +96,7 @@ export function buildBindingInputs(
     picks: Readonly<Record<string, ColumnPick>>;
     resolutions: ResolutionsByColumnId;
     unmatchedByColumnId: UnmatchedByColumnId;
+    codeLists: ReadonlyMap<string, DataDictionaryCodeList.T>;
     isPinned: boolean;
   }>,
 ): DictionaryBinding.Input[] {
@@ -103,6 +119,7 @@ export function buildBindingInputs(
           ? _toOverrides(
               options.resolutions[column.id],
               options.unmatchedByColumnId.get(column.id),
+              options.codeLists.get(pick.codeListId),
             )
           : [],
         isPinned: isConverting && options.isPinned,
@@ -223,7 +240,11 @@ export function buildDraftConversion(
   return {
     ...buildMatchConversion(options),
     pairs,
-    overrides: _toOverrides(options.resolutions, options.unmatched),
+    overrides: _toOverrides(
+      options.resolutions,
+      options.unmatched,
+      options.codeList,
+    ),
     outputDataType: ColumnConversion.getOutputDataType({
       direction: options.pick.direction,
       pairs,

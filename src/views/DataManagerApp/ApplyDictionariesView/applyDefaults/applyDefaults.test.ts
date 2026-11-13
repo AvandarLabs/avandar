@@ -71,6 +71,26 @@ const REFERENCE_BINDING = {
   replacedDataType: undefined,
 } as unknown as DictionaryBinding.T;
 
+const SEX_LIST_ID = "list-129" as DataDictionaryCodeList.Id;
+const CODE_LISTS = new Map([
+  [
+    SEX_LIST_ID,
+    {
+      id: SEX_LIST_ID,
+      pairs: [
+        { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+        { code: "2", label: "Female", acceptedSpellings: [], isMissing: false },
+      ],
+    } as unknown as DataDictionaryCodeList.T,
+  ],
+]);
+const CONVERTED_BINDING = {
+  ...REFERENCE_BINDING,
+  codeListId: SEX_LIST_ID,
+  mode: "convert",
+  valueOverrides: [{ value: "M", action: "map", code: "1" }],
+} as DictionaryBinding.T;
+
 describe("makeInitialSelection", () => {
   it("uses every dictionary that matches a column, and only those", () => {
     const selection = makeInitialSelection({
@@ -212,19 +232,38 @@ describe("makeInitialSelection", () => {
 
   it("reopens a converted column's overrides as resolutions", () => {
     const converted = {
-      ...REFERENCE_BINDING,
-      mode: "convert",
+      ...CONVERTED_BINDING,
       valueOverrides: [
         { value: " M ", action: "map", code: "1" },
         { value: "7", action: "empty" },
       ],
     } as DictionaryBinding.T;
 
-    expect(resolutionsFromBindings([converted])).toEqual({
+    expect(resolutionsFromBindings([converted], CODE_LISTS)).toEqual({
       [converted.datasetColumnId]: {
         m: { action: "map", code: "1" },
         "7": { action: "empty" },
       },
     });
+  });
+
+  it("drops a saved map to a code its list no longer has, so the value is kept as is", () => {
+    const converted = {
+      ...CONVERTED_BINDING,
+      valueOverrides: [
+        { value: "M", action: "map", code: "4" },
+        { value: "F", action: "map", code: " 2 " },
+      ],
+    } as DictionaryBinding.T;
+
+    expect(resolutionsFromBindings([converted], CODE_LISTS)).toEqual({
+      [converted.datasetColumnId]: { f: { action: "map", code: " 2 " } },
+    });
+  });
+
+  it("drops every saved map when the column's list is not loaded", () => {
+    expect(
+      resolutionsFromBindings([CONVERTED_BINDING], new Map()),
+    ).toEqual({ [CONVERTED_BINDING.datasetColumnId]: {} });
   });
 });
