@@ -114,6 +114,42 @@ describe("SqlTableAlias.formatSchemaBlock", () => {
     expect(block).not.toContain(DATASET_B.id);
   });
 
+  it("lists a coded column's codes beside its name", () => {
+    const aliases = SqlTableAlias.fromDatasets([DATASET_B]);
+    const block = SqlTableAlias.formatSchemaBlock({
+      aliases,
+      columns: [
+        {
+          dataset_id: DATASET_B.id,
+          name: "GENDER",
+          data_type: "bigint",
+          codes: {
+            direction: "decode",
+            pairs: [
+              {
+                code: "1",
+                label: "Male",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+              {
+                code: "2",
+                label: "Female",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+            ],
+          },
+        },
+        { dataset_id: DATASET_B.id, name: "county", data_type: "varchar" },
+      ],
+    });
+
+    expect(block).toContain(
+      "- t0: Cholera cases (GENDER [1=Male, 2=Female], county)",
+    );
+  });
+
   it("lists concept attribute names without concept UUIDs", () => {
     const aliases = SqlTableAlias.fromConcepts([CONCEPT_B]);
     const block = SqlTableAlias.formatSchemaBlock({

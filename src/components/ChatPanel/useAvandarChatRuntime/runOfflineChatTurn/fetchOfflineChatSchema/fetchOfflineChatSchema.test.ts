@@ -15,12 +15,14 @@ const {
   conceptGetAllMock,
   conceptAttributeGetAllMock,
   conceptStatusGetAllMock,
+  loadColumnCodesMock,
 } = vi.hoisted(() => {
   return {
     datasetsWithColumnsMock: vi.fn(),
     conceptGetAllMock: vi.fn(),
     conceptAttributeGetAllMock: vi.fn(),
     conceptStatusGetAllMock: vi.fn(),
+    loadColumnCodesMock: vi.fn(),
   };
 });
 
@@ -28,6 +30,9 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: { getAllDatasetsWithColumns: datasetsWithColumnsMock },
   };
+});
+vi.mock("@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes", () => {
+  return { loadColumnCodes: loadColumnCodesMock };
 });
 vi.mock("@/clients/ontology/ConceptClient", () => {
   return { ConceptClient: { getAll: conceptGetAllMock } };
@@ -43,6 +48,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   window.sessionStorage.clear();
   datasetsWithColumnsMock.mockResolvedValue([]);
+  loadColumnCodesMock.mockResolvedValue(new Map());
   conceptGetAllMock.mockResolvedValue([{ id: CONCEPT_ID, name: "Case" }]);
   conceptAttributeGetAllMock.mockResolvedValue([]);
   conceptStatusGetAllMock.mockResolvedValue([
@@ -52,6 +58,30 @@ beforeEach(() => {
 });
 
 describe("fetchOfflineChatSchema", () => {
+  it("carries a bound column's code list into the offline schema", async () => {
+    datasetsWithColumnsMock.mockResolvedValue([
+      {
+        id: "dataset-1",
+        name: "line list",
+        columns: [{ id: "col-gender", name: "GENDER", dataType: "bigint" }],
+      },
+    ]);
+    const codes = {
+      direction: "decode",
+      pairs: [
+        { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      ],
+    };
+    loadColumnCodesMock.mockResolvedValue(new Map([["col-gender", codes]]));
+
+    const schema = await fetchOfflineChatSchema({
+      workspace: { id: WORKSPACE_ID } as Workspace.T,
+      navigatorOnLine: true,
+    });
+
+    expect(schema.columns[0]?.codes).toEqual(codes);
+  });
+
   it("carries each case type's statuses into the offline schema", async () => {
     const schema = await fetchOfflineChatSchema({
       workspace: { id: WORKSPACE_ID } as Workspace.T,

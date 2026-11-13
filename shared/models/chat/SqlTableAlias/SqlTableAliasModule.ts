@@ -1,4 +1,5 @@
 import { makeBucketMap } from "@avandar/utils";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef.ts";
@@ -25,6 +26,8 @@ type SchemaColumn = {
   dataset_id: string;
   name: string;
   data_type: string;
+  /** The column's code list, when a dictionary is attached to it. */
+  codes?: ColumnCodes.Context;
 };
 
 function _sortNamedRelations<T extends { id: string }>(
@@ -112,6 +115,22 @@ function _formatAliasLine(
     return `- ${entry.alias}: ${entry.name}`;
   }
   return `- ${entry.alias}: ${entry.name} (${names.join(", ")})`;
+}
+
+/**
+ * A dataset column as the schema block names it: `GENDER [1=Male,
+ * 2=Female]` for a column holding codes, `sex [values Male, Female]` for
+ * one holding labels, and the bare name otherwise. The list stays whole
+ * however the block is cut, because it is part of the column's name.
+ */
+function _formatColumnName(column: Readonly<SchemaColumn>): string {
+  const pairsText = column.codes ? ColumnCodes.formatPairs(column.codes) : "";
+  if (pairsText === "") {
+    return column.name;
+  }
+  return column.codes?.direction === "encode"
+    ? `${column.name} [values ${pairsText}]`
+    : `${column.name} [${pairsText}]`;
 }
 
 /**
@@ -232,10 +251,15 @@ function _formatSchemaBlock(
     conceptStatuses?: readonly SqlTableAliasConceptStatus[];
   }>,
 ): string {
-  const namesByDatasetId = makeBucketMap(args.columns, {
-    key: "dataset_id",
-    valueKey: "name",
-  });
+  const namesByDatasetId = makeBucketMap(
+    args.columns.map((column) => {
+      return {
+        dataset_id: column.dataset_id,
+        label: _formatColumnName(column),
+      };
+    }),
+    { key: "dataset_id", valueKey: "label" },
+  );
   const namesByConceptId = _formatConceptAttributeNames(
     args.conceptAttributes ?? [],
   );
