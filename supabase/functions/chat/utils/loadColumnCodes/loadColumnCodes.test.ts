@@ -25,6 +25,7 @@ function _createClient(
       return { data: answer.rows };
     },
   };
+  // Fakes only the query chain, too unlike the client for a single `as`.
   return {
     from: (name: string) => {
       table = name;

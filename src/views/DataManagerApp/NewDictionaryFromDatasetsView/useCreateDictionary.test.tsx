@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { DictionaryLeftBehindError } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/createDictionaryFromDraft/createDictionaryFromDraft";
 import { useCreateDictionary } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type { CreateDictionaryVariables } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useCreateDictionary";
 import type { ReactNode } from "react";
 
@@ -48,10 +50,19 @@ vi.mock("@/utils/notifications/notify", () => {
   };
 });
 
-const VARIABLES = {
+const VARIABLES: CreateDictionaryVariables = {
+  owner: {
+    userId: "user-1" as UserProfile.T["userId"],
+    profileId: "profile-1" as UserProfile.T["profileId"],
+  },
   name: "Kings codes",
+  description: "",
+  datasetIds: [],
+  draft: { entries: [], codeLists: [] },
   applyNext: [],
-} as unknown as CreateDictionaryVariables;
+};
+
+const KINGS = { datasetId: "dataset-1" as Dataset.Id, name: "Kings line list" };
 
 function _render() {
   const queryClient = new QueryClient({
@@ -143,8 +154,8 @@ describe("useCreateDictionary", () => {
     act(() => {
       result.current[0]({
         ...VARIABLES,
-        applyNext: [{ datasetId: "dataset-1", name: "Kings line list" }],
-      } as unknown as CreateDictionaryVariables);
+        applyNext: [KINGS],
+      });
     });
     await waitFor(() => {
       expect(mocks.navigateMock).toHaveBeenCalledWith({
@@ -171,8 +182,8 @@ describe("useCreateDictionary", () => {
     act(() => {
       result.current[0]({
         ...VARIABLES,
-        applyNext: [{ datasetId: "dataset-1", name: "Kings line list" }],
-      } as unknown as CreateDictionaryVariables);
+        applyNext: [KINGS],
+      });
     });
     unmount();
     finish({ id: "dictionary-1", name: "Kings codes" });
@@ -194,11 +205,11 @@ describe("useCreateDictionary", () => {
       result.current[0]({
         ...VARIABLES,
         applyNext: [
-          { datasetId: "dataset-1", name: "Kings line list" },
-          { datasetId: "dataset-2", name: "Bronx line list" },
-          { datasetId: "dataset-3", name: "Queens line list" },
+          KINGS,
+          { datasetId: "dataset-2" as Dataset.Id, name: "Bronx line list" },
+          { datasetId: "dataset-3" as Dataset.Id, name: "Queens line list" },
         ],
-      } as unknown as CreateDictionaryVariables);
+      });
     });
     await waitFor(() => {
       expect(mocks.notifySuccessMock).toHaveBeenCalledWith(

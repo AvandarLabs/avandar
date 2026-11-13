@@ -14,6 +14,7 @@ vi.mock("@sbfn/chat/utils/loadColumnCodes/loadColumnCodes.ts", () => {
 function _createClient(
   rowsByTable: Record<string, unknown[]>,
 ): AvaSupabaseClient {
+  // Fakes only the query chain, too unlike the client for a single `as`.
   return {
     from: (table: string) => {
       const chain = {

@@ -2,6 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import { makeInitialApplyState } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import { AttachStep } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachStep";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -25,18 +28,18 @@ vi.mock(
 
 const DATASET = { id: "dataset-1", name: "Kings line list" } as Dataset.T;
 const GENDER = { id: "col-gender", name: "GENDER" } as DatasetColumn.T;
-const PICK = {
-  dictionaryId: "dict-1",
-  entryId: "entry-sex",
-  codeListId: "list-sex",
+const PICK: ColumnPick = {
+  dictionaryId: "dict-1" as DataDictionary.Id,
+  entryId: "entry-sex" as DataDictionaryEntry.Id,
+  codeListId: "list-sex" as DataDictionaryCodeList.Id,
   direction: "decode",
-} as unknown as ColumnPick;
+};
 
 function _render(
   picks: Record<string, ColumnPick>,
   existingBindings: readonly DictionaryBinding.T[] = [],
 ) {
-  const flow = {
+  const flow: ApplyFlow = {
     state: {
       ...makeInitialApplyState(),
       dictionaryIds: [],
@@ -44,7 +47,12 @@ function _render(
       picks,
     },
     dispatch: vi.fn(),
-  } as unknown as ApplyFlow;
+    rows: [],
+    unmatchedRows: [],
+    addDictionary: vi.fn(),
+    isMatching: false,
+    hasReadFailed: false,
+  };
   render(
     <AttachStep
       dataset={DATASET}

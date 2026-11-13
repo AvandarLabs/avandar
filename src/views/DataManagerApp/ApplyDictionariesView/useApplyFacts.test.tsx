@@ -4,22 +4,26 @@ import {
   countPicks,
   useApplyFacts,
 } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFacts";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 
-const PICKS = {
+const NYS = "nys" as DataDictionary.Id;
+const PICKS: Record<string, ColumnPick> = {
   "col-gender": {
-    dictionaryId: "nys",
-    entryId: "sex",
-    codeListId: "list",
+    dictionaryId: NYS,
+    entryId: "sex" as DataDictionaryEntry.Id,
+    codeListId: "list" as DataDictionaryCodeList.Id,
     direction: "decode",
   },
   "col-case": {
-    dictionaryId: "nys",
-    entryId: "case",
+    dictionaryId: NYS,
+    entryId: "case" as DataDictionaryEntry.Id,
     codeListId: undefined,
     direction: "decode",
   },
-} as unknown as Record<string, ColumnPick>;
+};
 
 describe("useApplyFacts", () => {
   it("counts code lists, descriptions, columns, and dictionaries", () => {
