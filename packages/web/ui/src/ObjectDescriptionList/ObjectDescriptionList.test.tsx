@@ -41,6 +41,36 @@ describe("ObjectDescriptionList", () => {
     expect(screen.getByText("Age in years")).toBeInTheDocument();
   });
 
+  it("shows an editable table row's new values when its data changes", () => {
+    const { rerender } = renderList(
+      <ObjectDescriptionList
+        data={COLUMNS}
+        renderAsTable
+        editable
+        itemRenderOptions={{ includeKeys: ["name", "description"] }}
+      />,
+    );
+    const updatedColumns = COLUMNS.map((column) => {
+      return column.id === "2"
+        ? { ...column, description: "Age at onset" }
+        : column;
+    });
+
+    rerender(
+      <MantineProvider>
+        <ObjectDescriptionList
+          data={updatedColumns}
+          renderAsTable
+          editable
+          itemRenderOptions={{ includeKeys: ["name", "description"] }}
+        />
+      </MantineProvider>,
+    );
+
+    expect(screen.getByText("Age at onset")).toBeInTheDocument();
+    expect(screen.queryByText("Age in years")).not.toBeInTheDocument();
+  });
+
   it("hands a key's renderValue the object it belongs to", () => {
     renderList(
       <ObjectDescriptionList
