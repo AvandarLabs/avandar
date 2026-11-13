@@ -125,4 +125,33 @@ describe("makeInitialSelection", () => {
 
     expect(backward.dictionaryIds).toEqual(forward.dictionaryIds);
   });
+
+  it("gives a tied column to the dictionary that covers the most columns", () => {
+    const AGE = { id: "col-age" as DatasetColumn.Id, name: "AGE" };
+    const OUTCOME = { id: "col-outcome" as DatasetColumn.Id, name: "OUTCOME" };
+    const fitting = (dictionaryId: DataDictionary.Id, rank: number) => {
+      return _match({
+        dictionaryId,
+        dictionaryRank: rank,
+        entryId: `entry-${dictionaryId}` as DataDictionaryEntry.Id,
+        codeListId: `list-${dictionaryId}` as DataDictionaryCodeList.Id,
+        coverage: 1,
+        fit: "fits",
+      });
+    };
+    const selection = makeInitialSelection({
+      columns: [GENDER, AGE, OUTCOME],
+      matchesByColumnName: new Map([
+        ["GENDER", [fitting(CDC, 1)]],
+        ["AGE", [fitting(CDC, 1)]],
+        ["OUTCOME", [fitting(NYS, 0), fitting(CDC, 1)]],
+      ]),
+      existingBindings: [],
+      preselectedDictionaryId: undefined,
+      dictionaries: DICTIONARIES,
+    });
+
+    expect(selection.dictionaryIds).toEqual([CDC, NYS]);
+    expect(selection.picks[OUTCOME.id]?.dictionaryId).toBe(CDC);
+  });
 });

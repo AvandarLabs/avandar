@@ -24,7 +24,8 @@ export function toColumnPick(match: Readonly<DictionaryMatch.T>): ColumnPick {
 
 /**
  * The pick each column starts with from `dictionaryIds` alone: the code
- * list covering the most of its rows, else a description.
+ * list covering the most of its rows, else a description. A tie goes to
+ * the dictionary earliest in `dictionaryIds`.
  */
 export function pickDefaultsForColumns(
   options: Readonly<{
@@ -35,11 +36,12 @@ export function pickDefaultsForColumns(
 ): Record<string, ColumnPick> {
   const picks: Record<string, ColumnPick> = {};
   options.columns.forEach((column) => {
-    const matches = (options.matchesByColumnName.get(column.name) ?? []).filter(
-      (match) => {
-        return options.dictionaryIds.includes(match.dictionaryId);
-      },
-    );
+    const matches = (
+      options.matchesByColumnName.get(column.name) ?? []
+    ).flatMap((match) => {
+      const rank = options.dictionaryIds.indexOf(match.dictionaryId);
+      return rank === -1 ? [] : [{ ...match, dictionaryRank: rank }];
+    });
     const match = DictionaryMatch.pickDefaultMatch(matches);
     if (match) {
       picks[column.id] = toColumnPick(match);
@@ -80,6 +82,15 @@ function _rankDictionariesByPicks(
     });
 }
 
+/** Where `id` sits in `rankedIds`, with unranked ids last. */
+function _rankOf(
+  rankedIds: readonly DataDictionary.Id[],
+  id: DataDictionary.Id,
+): number {
+  const rank = rankedIds.indexOf(id);
+  return rank === -1 ? rankedIds.length : rank;
+}
+
 function _picksFromBindings(
   bindings: readonly DictionaryBinding.T[],
 ): Record<string, ColumnPick> {
@@ -101,7 +112,8 @@ function _picksFromBindings(
  * The dictionaries and picks the apply flow opens with. A dataset that
  * already has bindings opens with them. A dictionary named when the flow
  * opened is the only one used for new picks. Otherwise every dictionary
- * that matches a column is used, ranked by how many columns it covers.
+ * that matches a column is used, ranked by how many columns it covers,
+ * and a column two of them tie on goes to the higher ranked one.
  */
 export function makeInitialSelection(
   options: Readonly<{
@@ -121,12 +133,24 @@ export function makeInitialSelection(
       : options.dictionaries.map((dictionary) => {
           return dictionary.id;
         });
-  const defaults = pickDefaultsForColumns({
+  const firstDefaults = pickDefaultsForColumns({
     ...options,
     dictionaryIds: newIds,
   });
+  const rankedIds = _rankDictionariesByPicks(
+    { ...firstDefaults, ...existing },
+    options.dictionaries,
+  );
+  // Pick again in ranked order, so a tie goes to the dictionary shown first.
+  // Re-picking only moves picks toward earlier dictionaries, so the ranking
+  // still holds.
+  const defaults = pickDefaultsForColumns({
+    ...options,
+    dictionaryIds: [...newIds].sort((idA, idB) => {
+      return _rankOf(rankedIds, idA) - _rankOf(rankedIds, idB);
+    }),
+  });
   const picks = { ...defaults, ...existing };
-  const rankedIds = _rankDictionariesByPicks(picks, options.dictionaries);
   // A dictionary the user named stays in use even when nothing matched.
   const named = options.preselectedDictionaryId;
   const dictionaryIds =
