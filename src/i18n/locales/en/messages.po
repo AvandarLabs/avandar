@@ -173,6 +173,7 @@ msgid "Review new permissions"
 msgstr "Review new permissions"
 
 #: src/config/AppLinks/AppLinks.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
 msgid "Apply dictionaries"
 msgstr "Apply dictionaries"
 
@@ -3016,8 +3017,8 @@ msgid "Generating…"
 msgstr "Generating…"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
-msgid "Apply dictionaries to {datasetName}"
-msgstr "Apply dictionaries to {datasetName}"
+#~ msgid "Apply dictionaries to {datasetName}"
+#~ msgstr "Apply dictionaries to {datasetName}"
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
@@ -6468,6 +6469,10 @@ msgstr "What these codes cover and where they come from"
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
 msgid "Assigned to me"
 msgstr "Assigned to me"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+msgid "Breadcrumb"
+msgstr "Breadcrumb"
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
@@ -11863,7 +11868,6 @@ msgid "A places dataset holds at most {maxPlaces} places."
 msgstr "A places dataset holds at most {maxPlaces} places."
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "Dictionary"
 msgstr "Dictionary"
 

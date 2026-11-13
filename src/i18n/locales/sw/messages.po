@@ -171,6 +171,7 @@ msgid "Review new permissions"
 msgstr "Kagua ruhusa mpya"
 
 #: src/config/AppLinks/AppLinks.tsx
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
 msgid "Apply dictionaries"
 msgstr ""
 
@@ -3037,8 +3038,8 @@ msgid "Generating…"
 msgstr "Inaundwa…"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
-msgid "Apply dictionaries to {datasetName}"
-msgstr ""
+#~ msgid "Apply dictionaries to {datasetName}"
+#~ msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "Are you sure you want to proceed with this action? This cannot be "
@@ -6500,6 +6501,10 @@ msgstr ""
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeView.tsx
 msgid "Assigned to me"
 msgstr "Nilizokabidhiwa"
+
+#: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+msgid "Breadcrumb"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogListingDetail.tsx
 msgid "Add dataset to workspace"
@@ -11913,7 +11918,6 @@ msgid "A places dataset holds at most {maxPlaces} places."
 msgstr "Seti ya data ya maeneo inaweza kuwa na maeneo yasiyozidi {maxPlaces}."
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
-#: src/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.tsx
 msgid "Dictionary"
 msgstr ""
 
