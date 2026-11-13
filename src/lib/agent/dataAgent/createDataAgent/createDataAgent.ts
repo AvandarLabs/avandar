@@ -168,7 +168,12 @@ function _createTools(
   }
   return [
     createRunQueryTool(queryContext),
-    createLookupValuesTool({ host: options.host, aliases, state }),
+    createLookupValuesTool({
+      host: options.host,
+      aliases,
+      datasets: options.datasets,
+      state,
+    }),
     askUser,
   ];
 }

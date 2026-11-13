@@ -113,7 +113,12 @@ describe("lookup_values", () => {
     const host = _createHost({
       readColumnValues: vi.fn().mockResolvedValue(["United Kingdom"]),
     });
-    const tool = createLookupValuesTool({ host, aliases: ALIASES, state });
+    const tool = createLookupValuesTool({
+      host,
+      aliases: ALIASES,
+      datasets: [],
+      state,
+    });
 
     const result = await tool.execute("call-1", {
       table: "t0",
@@ -136,7 +141,12 @@ describe("lookup_values", () => {
         .mockResolvedValue(["Youth Mentoring", "Youth Sports"]),
       askUser: vi.fn().mockResolvedValue({ kind: "deferred" }),
     });
-    const tool = createLookupValuesTool({ host, aliases: ALIASES, state });
+    const tool = createLookupValuesTool({
+      host,
+      aliases: ALIASES,
+      datasets: [],
+      state,
+    });
 
     const result = await tool.execute("call-1", {
       table: "t0",
@@ -155,10 +165,57 @@ describe("lookup_values", () => {
     expect(state.valuesSentToModel).toEqual([]);
   });
 
+  it("answers a label from the column's code list with its code, without a query", async () => {
+    const state = createDataAgentRunState();
+    const host = _createHost();
+    const tool = createLookupValuesTool({
+      host,
+      aliases: ALIASES,
+      datasets: [
+        {
+          id: DATASET_ID,
+          name: "deaths.csv",
+          columns: [
+            {
+              name: "GENDER",
+              dataType: "bigint",
+              codes: {
+                direction: "decode",
+                pairs: [
+                  {
+                    code: "2",
+                    label: "Female",
+                    acceptedSpellings: [],
+                    isMissing: false,
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+      state,
+    });
+
+    const result = await tool.execute("call-1", {
+      table: "t0",
+      column: "GENDER",
+      values: [{ named: "female", forms: ["women"] }],
+      question: "Which of these is female?",
+    });
+
+    expect(_textOf(result)).toBe(
+      '"female" is stored as code 2 (Female in the column\'s code list).',
+    );
+    expect(host.readColumnValues).not.toHaveBeenCalled();
+    expect(host.approveValuesForModel).not.toHaveBeenCalled();
+  });
+
   it("refuses an alias that is not in the schema", async () => {
     const tool = createLookupValuesTool({
       host: _createHost(),
       aliases: ALIASES,
+      datasets: [],
       state: createDataAgentRunState(),
     });
 
