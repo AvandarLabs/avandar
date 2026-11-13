@@ -14,8 +14,9 @@ type Props = {
 };
 
 /**
- * Back, and the button that attaches the picks. With nothing picked but
- * bindings to drop, the button says it removes them instead.
+ * Back to Unmatched values, and the button that attaches the picks. With
+ * nothing picked but bindings to drop, the button says it removes them
+ * instead.
  */
 export function AttachFooter(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();
