@@ -46,6 +46,7 @@ declare
   v_num_bindings integer;
 begin
   v_workspace_id := public.dataset_columns__dictionary_bindings__authorize (p_dataset_id);
+  perform public.dataset_columns__dictionary_bindings__authorize_adding_pairs (v_workspace_id, p_added_pairs);
 
   perform public.dataset_columns__dictionary_bindings__check (p_dataset_id, v_workspace_id, v_bindings, false);
   perform public.dataset_columns__dictionary_bindings__add_pairs (v_workspace_id, v_bindings, coalesce(p_added_pairs, '[]'::jsonb));
@@ -426,12 +427,43 @@ set
 $$;
 
 /**
+ * Raises `dictionary_editor_required` when `p_added_pairs` adds any value
+ * and the caller is not a Data Sources editor in `p_workspace_id`. Called
+ * by the apply RPCs right after they authorize the dataset, before they
+ * read any binding, so a non-editor who adds values is refused first.
+ * Anything other than a non-empty array is left to
+ * `dataset_columns__dictionary_bindings__add_pairs` to judge.
+ */
+create or replace function public.dataset_columns__dictionary_bindings__authorize_adding_pairs (
+  p_workspace_id uuid,
+  p_added_pairs jsonb
+) returns void language plpgsql
+set
+  search_path = '' as $$
+begin
+  if
+    jsonb_typeof(p_added_pairs) = 'array' and
+    jsonb_array_length(p_added_pairs) > 0 and
+    not public.util__auth_user_meets_min_app_role (
+      p_workspace_id,
+      'data_sources'::public.app_type,
+      'editor'::public.role_level
+    )
+  then
+    raise exception 'Only Data Sources editors can add values to a code list'
+      using errcode = '42501', hint = 'dictionary_editor_required';
+  end if;
+end;
+$$;
+
+/**
  * Appends the values the user added while applying to their code lists,
  * checked as a dictionary save checks them, bumps each touched
- * dictionary's version once, and re-types every live converted column of
- * those lists. Each value must go to a code list the set uses, and adding
- * needs Data Sources editor in the workspace. An empty `p_added_pairs`
- * changes nothing.
+ * dictionary's version once, and re-types every converted column of those
+ * lists. Each value must go to a code list the set uses. The caller has
+ * already checked Data Sources editor with
+ * `dataset_columns__dictionary_bindings__authorize_adding_pairs`. An empty
+ * `p_added_pairs` changes nothing.
  */
 create or replace function public.dataset_columns__dictionary_bindings__add_pairs (
   p_workspace_id uuid,
@@ -483,15 +515,6 @@ begin
   ) then
     raise exception 'A value can only be added to a code list this apply uses'
       using errcode = '23514', hint = 'code_list_not_in_entry';
-  end if;
-
-  if not public.util__auth_user_meets_min_app_role (
-    p_workspace_id,
-    'data_sources'::public.app_type,
-    'editor'::public.role_level
-  ) then
-    raise exception 'Only Data Sources editors can add values to a code list'
-      using errcode = '42501', hint = 'dictionary_editor_required';
   end if;
 
   perform 1
@@ -739,6 +762,14 @@ from
 
 revoke
 execute on function public.dataset_columns__dictionary_bindings__write_pairs (jsonb)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+revoke
+execute on function public.dataset_columns__dictionary_bindings__authorize_adding_pairs (uuid, jsonb)
 from
   public,
   anon,

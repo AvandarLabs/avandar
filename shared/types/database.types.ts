@@ -3261,6 +3261,10 @@ export type Database = {
         Args: { p_dataset_id: string }
         Returns: string
       }
+      dataset_columns__dictionary_bindings__authorize_adding_pairs: {
+        Args: { p_added_pairs: Json; p_workspace_id: string }
+        Returns: undefined
+      }
       dataset_columns__dictionary_bindings__check: {
         Args: {
           p_bindings: Json

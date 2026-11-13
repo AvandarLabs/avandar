@@ -144,7 +144,7 @@ values
   ('d3100001-0000-4000-8000-000000000001'::uuid, 'd3400001-0000-4000-8000-000000000001'::uuid, 'd3600002-0000-4000-8000-000000000002'::uuid, 'd3500002-0000-4000-8000-000000000002'::uuid, true),
   ('d3100001-0000-4000-8000-000000000001'::uuid, 'd3400001-0000-4000-8000-000000000001'::uuid, 'd3600009-0000-4000-8000-000000000009'::uuid, 'd3500009-0000-4000-8000-000000000009'::uuid, true);
 
-select plan (40);
+select plan (41);
 
 -- 1.
 select has_function ('public', 'rpc_dataset_columns__apply_dictionaries', array['uuid', 'jsonb', 'jsonb']::name[], 'the apply takes the bindings and the values to add');
@@ -589,6 +589,20 @@ select is (
   2,
   'an apply that adds no value leaves the version alone'
 );
+
+-- 41. A non-editor who adds values is refused before any binding is read,
+-- so a malformed binding does not decide the hint.
+select is (
+  pg_temp.apply_as (
+    'd3000002-0000-4000-8000-000000000002'::uuid,
+    'd3450001-0000-4000-8000-000000000001'::uuid,
+    jsonb_build_array(pg_temp.binding ('d3460001-0000-4000-8000-000000000001'::uuid, 'd3600001-0000-4000-8000-000000000001'::uuid, 'd3500001-0000-4000-8000-000000000001'::uuid, '{"mode":"bogus"}')),
+    '[{"code_list_id":"d3500001-0000-4000-8000-000000000001","code":"8","label":"Other"}]'::jsonb
+  ),
+  'dictionary_editor_required',
+  'adding values checks Data Sources editor before checking the bindings'
+);
+reset role;
 
 select * from finish ();
 

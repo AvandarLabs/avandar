@@ -109,7 +109,7 @@ values
   ('d2470006-0000-4000-8000-000000000006'::uuid, 'd2100001-0000-4000-8000-000000000001'::uuid, 'd2450001-0000-4000-8000-000000000001'::uuid, 'd2460006-0000-4000-8000-000000000006'::uuid, 'd2400001-0000-4000-8000-000000000001'::uuid, 'd2600002-0000-4000-8000-000000000002'::uuid, 'd2500002-0000-4000-8000-000000000002'::uuid, 1),
   ('d2470007-0000-4000-8000-000000000007'::uuid, 'd2100001-0000-4000-8000-000000000001'::uuid, 'd2450001-0000-4000-8000-000000000001'::uuid, 'd2460007-0000-4000-8000-000000000007'::uuid, 'd2400001-0000-4000-8000-000000000001'::uuid, 'd2600001-0000-4000-8000-000000000001'::uuid, 'd2500004-0000-4000-8000-000000000004'::uuid, 1);
 
-select plan (28);
+select plan (31);
 
 -- 1.
 select hasnt_function ('public', 'dataset_columns__dictionary_bindings__remove_for_dictionary', 'the remove-only dictionary trigger is gone');
@@ -309,9 +309,60 @@ select results_eq (
   'a deleted entry leaves its pinned convert binding converting'
 );
 
--- Deleting the dictionary.
+-- A save that edits an encoded list's codes from whole numbers to text and
+-- deletes the entry using it. The entry's delete pins the live binding to
+-- the list's new pairs, so its column's type follows those pairs.
+
+insert into public.dataset_columns (id, dataset_id, workspace_id, original_name, name, original_data_type, detected_data_type, data_type, column_idx)
+values ('d2460009-0000-4000-8000-000000000009'::uuid, 'd2450002-0000-4000-8000-000000000002'::uuid, 'd2100001-0000-4000-8000-000000000001'::uuid, 'status', 'status', 'VARCHAR', 'VARCHAR', 'bigint', 4);
+
+insert into public.data_dictionaries__code_lists (id, workspace_id, dictionary_id, name, pairs)
+values ('d2500007-0000-4000-8000-000000000007'::uuid, 'd2100001-0000-4000-8000-000000000001'::uuid, 'd2400001-0000-4000-8000-000000000001'::uuid, 'Status (1/2)', '[{"code":"1","label":"Active","accepted_spellings":[],"is_missing":false},{"code":"2","label":"Inactive","accepted_spellings":[],"is_missing":false}]'::jsonb);
+
+insert into public.data_dictionaries__entries (id, workspace_id, dictionary_id, name, kind, position)
+values ('d2600004-0000-4000-8000-000000000004'::uuid, 'd2100001-0000-4000-8000-000000000001'::uuid, 'd2400001-0000-4000-8000-000000000001'::uuid, 'status', 'categorical', 1);
+
+insert into public.data_dictionaries__entry_codings (workspace_id, dictionary_id, entry_id, code_list_id, is_primary)
+values ('d2100001-0000-4000-8000-000000000001'::uuid, 'd2400001-0000-4000-8000-000000000001'::uuid, 'd2600004-0000-4000-8000-000000000004'::uuid, 'd2500007-0000-4000-8000-000000000007'::uuid, true);
+
+insert into public.dataset_columns__dictionary_bindings (id, workspace_id, dataset_id, dataset_column_id, dictionary_id, entry_id, code_list_id, mode, direction, applied_dictionary_version, replaced_data_type)
+values ('d2470009-0000-4000-8000-000000000009'::uuid, 'd2100001-0000-4000-8000-000000000001'::uuid, 'd2450002-0000-4000-8000-000000000002'::uuid, 'd2460009-0000-4000-8000-000000000009'::uuid, 'd2400001-0000-4000-8000-000000000001'::uuid, 'd2600004-0000-4000-8000-000000000004'::uuid, 'd2500007-0000-4000-8000-000000000007'::uuid, 'convert', 'encode', 1, 'varchar');
 
 -- 23.
+select lives_ok (
+  $t23$
+  select pg_temp.save_as_owner (
+    '[
+      {"id":"d2500001-0000-4000-8000-000000000001","name":"Sex (1/2/9)","is_ordered":false,"pairs":[{"code":"1","label":"Male","accepted_spellings":[],"is_missing":false},{"code":"2","label":"Female","accepted_spellings":[],"is_missing":false},{"code":"9","label":"Unknown","accepted_spellings":[],"is_missing":true},{"code":"U","label":"Not stated","accepted_spellings":[],"is_missing":true}]},
+      {"id":"d2500003-0000-4000-8000-000000000003","name":"Y/N/U","is_ordered":false,"pairs":[{"code":"Y","label":"Yes","accepted_spellings":[],"is_missing":false},{"code":"N","label":"No","accepted_spellings":[],"is_missing":false},{"code":"U","label":"Unknown","accepted_spellings":[],"is_missing":true}]},
+      {"id":"d2500005-0000-4000-8000-000000000005","name":"Sex (m/f/x)","is_ordered":false,"pairs":[{"code":"m","label":"Male","accepted_spellings":[],"is_missing":false},{"code":"f","label":"Female","accepted_spellings":[],"is_missing":false},{"code":"x","label":"Other","accepted_spellings":[],"is_missing":false}]},
+      {"id":"d2500007-0000-4000-8000-000000000007","name":"Status (A/I)","is_ordered":false,"pairs":[{"code":"A","label":"Active","accepted_spellings":[],"is_missing":false},{"code":"I","label":"Inactive","accepted_spellings":[],"is_missing":false}]}
+    ]'::jsonb,
+    jsonb_build_array(
+      pg_temp.entry ('d2600001-0000-4000-8000-000000000001'::uuid, 'sex', 0, '[{"code_list_id":"d2500001-0000-4000-8000-000000000001","is_primary":true},{"code_list_id":"d2500005-0000-4000-8000-000000000005","is_primary":false}]'::jsonb)
+    )
+  );
+  $t23$,
+  'the owner recodes the status list to text and deletes its entry in one save'
+);
+
+-- 24.
+select is (
+  (select pinned_pairs -> 0 ->> 'code' from public.dataset_columns__dictionary_bindings where id = 'd2470009-0000-4000-8000-000000000009'::uuid),
+  'A',
+  'the entry''s live binding is pinned to the list''s new pairs'
+);
+
+-- 25.
+select is (
+  (select data_type from public.dataset_columns where id = 'd2460009-0000-4000-8000-000000000009'::uuid),
+  'varchar'::public.datasets__ava_data_type,
+  'a binding pinned by the same save takes its type from the pairs it was pinned to'
+);
+
+-- Deleting the dictionary.
+
+-- 26.
 select lives_ok (
   $t22$
   set local role authenticated;
@@ -322,7 +373,7 @@ select lives_ok (
 );
 reset role;
 
--- 24.
+-- 27.
 select is (
   (
     select count(*)::int
@@ -333,7 +384,7 @@ select is (
   'a deleted dictionary takes its reference bindings with it'
 );
 
--- 25. The dictionary's trigger runs before the cascade clears code_list_id,
+-- 28. The dictionary's trigger runs before the cascade clears code_list_id,
 -- so the binding is pinned to Sex (1/2/9) as it stood, U included.
 select results_eq (
   $q$
@@ -345,21 +396,21 @@ select results_eq (
   'a live binding of a deleted dictionary is pinned before its links are cleared'
 );
 
--- 26.
+-- 29.
 select is (
   (select jsonb_array_length(pinned_pairs) from public.dataset_columns__dictionary_bindings where id = 'd2470002-0000-4000-8000-000000000002'::uuid),
   4,
   'every live binding of the dictionary is pinned'
 );
 
--- 27.
+-- 30.
 select is (
   (select jsonb_array_length(pinned_pairs) from public.dataset_columns__dictionary_bindings where id = 'd2470004-0000-4000-8000-000000000004'::uuid),
   3,
   'a binding pinned in place is not re-pinned when its dictionary goes'
 );
 
--- 28.
+-- 31.
 select is (
   (select data_type from public.dataset_columns where id = 'd2460001-0000-4000-8000-000000000001'::uuid),
   'varchar'::public.datasets__ava_data_type,

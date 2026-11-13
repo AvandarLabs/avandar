@@ -12,8 +12,9 @@
  * Deleting a list, entry, or the dictionary's rows pins the live convert
  * bindings that used them (their triggers do that). After writing, a
  * reference binding whose list this save deleted is pointed at its entry's
- * only remaining list, and every live converted column's `data_type`
- * follows its list.
+ * only remaining list, and every converted column on the dictionary's lists
+ * takes the `data_type` its pairs give: the pinned ones, including those
+ * this save pinned, or the live list's.
  *
  * @param p_dictionary_id The dictionary whose contents are replaced.
  * @param p_code_lists The full set, as `{ id, name, is_ordered, pairs }`,

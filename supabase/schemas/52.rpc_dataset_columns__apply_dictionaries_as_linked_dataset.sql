@@ -11,9 +11,10 @@
  *
  * SECURITY DEFINER because bindings are select-only for signed-in users.
  * Before it reads anything else it checks dataset editor on the source,
- * Data Sources viewer, and the right to add a dataset to the workspace,
- * which any import needs. A refusal at any point, including while the new
- * dataset is being created, rolls the whole apply back.
+ * Data Sources viewer, Data Sources editor when it adds values, and the
+ * right to add a dataset to the workspace, which any import needs. A
+ * refusal at any point, including while the new dataset is being created,
+ * rolls the whole apply back.
  *
  * @param p_source_dataset_id The dataset the linked dataset reads. It may
  *   not itself be a linked dataset.
@@ -38,6 +39,7 @@ declare
   v_bindings jsonb := coalesce(p_bindings, '[]'::jsonb);
 begin
   v_workspace_id := public.dataset_columns__dictionary_bindings__authorize (p_source_dataset_id);
+  perform public.dataset_columns__dictionary_bindings__authorize_adding_pairs (v_workspace_id, p_added_pairs);
 
   if not public.util__can_manage_workspace_settings (v_workspace_id) then
     raise exception 'Only a workspace admin can add a dataset'

@@ -289,10 +289,14 @@ from
   service_role;
 
 /**
- * Re-derives the `data_type` of every column with a live convert binding
- * on one of `p_code_list_ids`, after those lists changed. Called by the
- * dictionary save and by an apply that adds values to a list. A pinned
- * binding's column keeps its type until Re-apply.
+ * Re-derives the `data_type` of every column with a convert binding on one
+ * of `p_code_list_ids`, after those lists changed. Called by the dictionary
+ * save and by an apply that adds values to a list. Each type comes from
+ * the binding's pinned pairs, or from the live list when it has none, as
+ * `dataset_columns__dictionary_bindings__set_types` reads them. So a
+ * binding the same save pinned, when it deleted the binding's entry after
+ * editing its list, takes the type of the pairs it was pinned to, and a
+ * binding pinned earlier keeps the type its own pairs give.
  */
 create or replace function public.dataset_columns__dictionary_bindings__sync_live_types (p_code_list_ids uuid[]) returns void language sql
 set
@@ -302,13 +306,15 @@ set
   from (
     select
       b.dataset_column_id,
-      public.dataset_columns__dictionary_bindings__get_output_data_type (b.direction, cl.pairs) as data_type
+      public.dataset_columns__dictionary_bindings__get_output_data_type (
+        b.direction,
+        coalesce(b.pinned_pairs, cl.pairs)
+      ) as data_type
     from public.dataset_columns__dictionary_bindings b
     join public.data_dictionaries__code_lists cl on cl.id = b.code_list_id
     where
       b.code_list_id = any (p_code_list_ids) and
-      b.mode = 'convert' and
-      b.pinned_pairs is null
+      b.mode = 'convert'
   ) as t
   where dc.id = t.dataset_column_id and dc.data_type is distinct from t.data_type;
 $$;
