@@ -547,6 +547,45 @@ const PREDICATE_PUSHDOWN_TOKENS = {
   ),
 } as const;
 
+const CODE_WINDOW_TOKENS = {
+  radius: _length("Code window radius", "Corner radius of the editor window."),
+  dividerWidth: _stroke(
+    "Code window divider width",
+    "Width of the line under the window's title bar.",
+  ),
+  dotRadius: _length(
+    "Window dot radius",
+    "Radius of the three dots in the title bar.",
+  ),
+  dotAlpha: _alpha(
+    "Window dot opacity",
+    "Opacity of the three dots in the title bar.",
+  ),
+} as const;
+
+const CODE_FOCUS_TOKENS = {
+  highlightRadius: _length(
+    "Line highlight radius",
+    "Corner radius of the highlight behind the focused line.",
+  ),
+  highlightAlpha: _alpha(
+    "Line highlight opacity",
+    "Opacity of the highlight behind the focused line.",
+  ),
+  markerWidth: _length(
+    "Line marker width",
+    "Width of the accent bar beside the focused line.",
+  ),
+  dividerWidth: _stroke(
+    "Footer divider width",
+    "Width of the line above the window's footer.",
+  ),
+  footerDotRadius: _length(
+    "Footer dot radius",
+    "Radius of the accent dot in the footer.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -561,6 +600,8 @@ export const COMPONENT_TOKENS = {
   OrbitalSystem: ORBITAL_SYSTEM_TOKENS,
   DataPipeline: DATA_PIPELINE_TOKENS,
   PredicatePushdownBoundary: PREDICATE_PUSHDOWN_TOKENS,
+  CodeWindow: CODE_WINDOW_TOKENS,
+  CodeFocus: CODE_FOCUS_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

@@ -251,6 +251,8 @@
     "OrbitalSystem": { "defaultProps": { "orbitAlpha": "$atomic.opacity.24", "orbitWidth": "$stroke.guide", "bodyRadius": 17, "bodyCoreRadius": 7, "bodyAlpha": "$atomic.opacity.24", "bodyStrokeWidth": "$stroke.hairline", "bodyLabelOffset": 27, "coreRadius": 49, "coreStrokeAlpha": "$atomic.opacity.70", "coreStrokeWidth": "$stroke.hairline", "pulsePeriod": "$motion.pulse.period", "pulseRadius": 71, "pulseSwing": 5, "pulseAlpha": "$atomic.opacity.3", "pulseStrokeAlpha": "$atomic.opacity.10", "pulseStrokeWidth": "$stroke.hairline" } },
     "DataPipeline": { "defaultProps": { "activeTintAlpha": 0.04, "activeStrokeAlpha": 0.6, "activeStrokeWidth": "$stroke.hairline", "iconRadius": 25, "iconFillAlpha": "$atomic.opacity.8", "iconStrokeAlpha": 0.35, "iconStrokeWidth": "$stroke.hairline", "checkSize": 19, "dotRadius": 5, "trackHeight": 3, "packetPeriod": 64 } },
     "PredicatePushdownBoundary": { "defaultProps": { "boundaryWidth": "$stroke.default", "boundaryDash": [5, 7], "predicateRadius": 10, "predicateStrokeWidth": "$stroke.hairline", "rowRadius": 5, "rowStrokeWidth": "$stroke.hairline", "gateWidth": "$atomic.strokeWidth.lg" } },
+    "CodeWindow": { "defaultProps": { "radius": 19, "dividerWidth": "$stroke.hairline", "dotRadius": 4.5, "dotAlpha": 0.45 } },
+    "CodeFocus": { "defaultProps": { "highlightRadius": 7, "highlightAlpha": 0.065, "markerWidth": 3, "dividerWidth": "$stroke.hairline", "footerDotRadius": 3.5 } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,

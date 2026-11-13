@@ -47,3 +47,12 @@ test("predicate-pushdown-boundary dashes its boundary with the themed pattern", 
     /stroke-dasharray="4 4"/,
   );
 });
+
+test("code-focus draws its window at the themed radius", () => {
+  assert.match(
+    renderPresetWithComponentPatch({ preset: "code-focus" }, "CodeWindow", {
+      radius: 21,
+    }),
+    /rx="21"/,
+  );
+});

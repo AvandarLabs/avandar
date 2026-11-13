@@ -1,19 +1,148 @@
-import { EASE, ramp } from "../../motion";
+import { ramp } from "../../motion";
 import {
   Eyebrow,
+  GRAPHIC_WIDTH,
   Pill,
-  STOCK,
   Text,
   type GraphicProps,
 } from "../graphics-common";
 import { getStockDisplayCopyFromDescriptor } from "../i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { StockRect } from "../primitives/StockRect/StockRect";
+import { STOCK } from "../stockPalette";
+import { resolveContentColor } from "../theme/resolveContentColor/resolveContentColor";
+import {
+  useGraphicMotion,
+  useGraphicProps,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme";
 import { CodeWindow } from "./CodeWindow";
 import type { CodeFocusInput } from "../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: CodeFocusInput };
+
+const BADGE_TOP = 44;
+const BADGE_WIDTH = 156;
+const HIGHLIGHT_CUE = 43;
+const HIGHLIGHT_STEP = 38;
+const HIGHLIGHT_FRAMES = 13;
+const FIRST_LINE_Y = 189;
+const LINE_STEP = 46;
+
+type CodeLine = CodeFocusInput["lines"][number];
+
+/** The fractional line the highlight sits on at `frame`, easing between authored lines. */
+function useHighlightLine(highlight: readonly number[], frame: number): number {
+  const motion = useGraphicMotion();
+  return highlight
+    .slice(1)
+    .reduce(
+      (offset, lineIndex, index) =>
+        offset +
+        ramp(
+          frame,
+          HIGHLIGHT_CUE + index * HIGHLIGHT_STEP,
+          motion.scale(HIGHLIGHT_FRAMES),
+          motion.travel.easing,
+        ) *
+          (lineIndex - highlight[index]),
+      highlight[0],
+    );
+}
+
+/** The tinted band and accent marker behind the focused line. */
+function CodeHighlight({
+  line,
+  accent,
+}: Readonly<{ line: number; accent: string }>): ReactNode {
+  const style = useGraphicProps("CodeFocus", {});
+  const y = FIRST_LINE_Y + line * LINE_STEP;
+  return (
+    <>
+      <StockRect
+        x={84}
+        y={y - 23}
+        width={792}
+        height={40}
+        rx={style.highlightRadius}
+        fill={accent}
+        fillOpacity={style.highlightAlpha}
+      />
+      <StockRect
+        x={84}
+        y={y - 23}
+        width={style.markerWidth}
+        height={40}
+        rx={style.markerWidth / 2}
+        fill={accent}
+      />
+    </>
+  );
+}
+
+/** One numbered code line. A mint token keeps meaning the graphic's accent. */
+function CodeLineRow({
+  codeTokens,
+  index,
+  accent,
+}: Readonly<{
+  codeTokens: CodeLine;
+  index: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const code = tokens.text.graphic.code;
+  const y = FIRST_LINE_Y + index * LINE_STEP;
+  return (
+    <g>
+      <Text role="lineNumber" x={111} y={y} anchor="end">
+        {index + 1}
+      </Text>
+      <text
+        x={144}
+        y={y}
+        fontSize={code.fontSize}
+        fontFamily={code.fontFamily}
+        xmlSpace="preserve"
+      >
+        {codeTokens.map((token, j) => (
+          <tspan
+            key={j}
+            fill={resolveContentColor(
+              token.color === STOCK.mint ? "accent" : token.color,
+              { tokens, accent },
+            )}
+          >
+            {token.text}
+          </tspan>
+        ))}
+      </text>
+    </g>
+  );
+}
+
+/** The divider, accent dot, and footer note at the bottom of the window. */
+function CodeFooter({
+  footer,
+  accent,
+}: Readonly<{ footer: string; accent: string }>): ReactNode {
+  const style = useGraphicProps("CodeFocus", {});
+  const { color } = useGraphicTokens();
+  return (
+    <>
+      <path
+        d="M84 478 H876"
+        stroke={color.line}
+        strokeWidth={style.dividerWidth}
+      />
+      <circle cx={107} cy={500} r={style.footerDotRadius} fill={accent} />
+      <Text role="pill" x={122} y={505}>
+        {footer}
+      </Text>
+    </>
+  );
+}
 
 /** Draws the bounded authored code-focus study at an explicit frame. */
 export function CodeFocus({
@@ -21,17 +150,8 @@ export function CodeFocus({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const lines = input.lines;
-  const line = input.highlight
-    .slice(1)
-    .reduce(
-      (offset, lineIndex, index) =>
-        offset +
-        ramp(frame, 43 + index * 38, 13, EASE.inOut) *
-          (lineIndex - input.highlight[index]),
-      input.highlight[0],
-    );
-  const y = 189 + line * 46;
+  const tokens = useGraphicTokens();
+  const line = useHighlightLine(input.highlight, frame);
   return (
     <g>
       <Eyebrow>
@@ -40,9 +160,9 @@ export function CodeFocus({
         })}
       </Eyebrow>
       <Pill
-        x={740}
-        y={44}
-        width={156}
+        x={GRAPHIC_WIDTH - tokens.layout.graphic.margin - BADGE_WIDTH}
+        y={BADGE_TOP}
+        width={BADGE_WIDTH}
         text={getStockDisplayCopyFromDescriptor({
           descriptor: LEGACY_DISPLAY_COPY["code-focus"].exampleCode,
         })}
@@ -50,61 +170,17 @@ export function CodeFocus({
       />
       <CodeWindow title={input.title}>
         {input.showHighlight ? (
-          <>
-            <StockRect
-              x={84}
-              y={y - 23}
-              width={792}
-              height={40}
-              rx={7}
-              fill={accent}
-              fillOpacity={0.065}
-            />
-            <StockRect
-              x={84}
-              y={y - 23}
-              width={3}
-              height={40}
-              rx={1.5}
-              fill={accent}
-            />
-          </>
+          <CodeHighlight line={line} accent={accent} />
         ) : null}
-        {lines.map((tokens, i) => (
-          <g key={i}>
-            <Text
-              x={111}
-              y={189 + i * 46}
-              size={17}
-              fill={STOCK.muted}
-              mono
-              anchor="end"
-            >
-              {i + 1}
-            </Text>
-            <text
-              x={144}
-              y={189 + i * 46}
-              fontSize={21}
-              fontFamily="'Courier New', monospace"
-              xmlSpace="preserve"
-            >
-              {tokens.map((token, j) => (
-                <tspan
-                  key={j}
-                  fill={token.color === STOCK.mint ? accent : token.color}
-                >
-                  {token.text}
-                </tspan>
-              ))}
-            </text>
-          </g>
+        {input.lines.map((codeTokens, i) => (
+          <CodeLineRow
+            key={i}
+            codeTokens={codeTokens}
+            index={i}
+            accent={accent}
+          />
         ))}
-        <path d="M84 478 H876" stroke={STOCK.line} />
-        <circle cx={107} cy={500} r={3.5} fill={accent} />
-        <Text x={122} y={505} size={13} mono fill={STOCK.muted}>
-          {input.footer}
-        </Text>
+        <CodeFooter footer={input.footer} accent={accent} />
       </CodeWindow>
     </g>
   );

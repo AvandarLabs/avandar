@@ -45,6 +45,13 @@ const APPROVED_MARKUP_MOVES: Partial<
     ReadonlyArray<Readonly<{ from: string; to: string }>>
   >
 > = {
+  "code-focus": [
+    // The title-bar and footer dividers gain the explicit hairline.
+    ...["M70 164 H890", "M84 478 H876"].map((path) => ({
+      from: `<path d="${path}" stroke="#2a404e"></path>`,
+      to: `<path d="${path}" stroke="#2a404e" stroke-width="1"></path>`,
+    })),
+  ],
   "data-pipeline": [
     // Each stage's accent outline gains the explicit hairline, matched by the
     // stage number that follows it because its opacity moves with progress.
@@ -106,6 +113,13 @@ const APPROVED_MARKUP_MOVES: Partial<
     {
       from: '<text x="480" y="560" fill="#728794" font-size="15"',
       to: '<text x="480" y="551" fill="#728794" font-size="17"',
+    },
+  ],
+  "terminal-type": [
+    // The shared code window's title-bar divider gains the explicit hairline.
+    {
+      from: '<path d="M70 164 H890" stroke="#2a404e"></path>',
+      to: '<path d="M70 164 H890" stroke="#2a404e" stroke-width="1"></path>',
     },
   ],
 };
