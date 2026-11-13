@@ -6,6 +6,7 @@ import { CodeListPopoverContent } from "@/components/dataDictionaries/CodeListPo
 import { useHoverOrFocusOpen } from "@/components/dataDictionaries/CodeListPopover/useHoverOrFocusOpen";
 import { POPOVER_Z_INDEX } from "@/config/Theme/Theme";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
 /** How tall the code list grows before it scrolls. */
@@ -15,6 +16,11 @@ type Props = {
   /** The column the code list explains, named in the button's label. */
   columnName: string;
   codes: ColumnCodes.T;
+  /**
+   * The column's dataset. Set where a converted column should also count
+   * its values with no label, such as the dataset page.
+   */
+  datasetId?: Dataset.Id;
 };
 
 /**
@@ -26,6 +32,7 @@ type Props = {
 export function CodeListPopover({
   columnName,
   codes,
+  datasetId,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const popover = useHoverOrFocusOpen();
@@ -78,7 +85,11 @@ export function CodeListPopover({
         {/* The list scrolls, not the dropdown: an overflowing dropdown
             would clip the arrow drawn just outside its box. */}
         <ScrollArea.Autosize mah={CODE_LIST_MAX_HEIGHT} type="auto">
-          <CodeListPopoverContent codes={codes} />
+          <CodeListPopoverContent
+            codes={codes}
+            columnName={columnName}
+            datasetId={datasetId}
+          />
         </ScrollArea.Autosize>
       </Popover.Dropdown>
     </Popover>
