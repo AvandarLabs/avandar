@@ -10,7 +10,8 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 /**
  * Reads the workspace's bindings, then their dictionaries' entries and code
  * lists by dictionary id, so the request stays short however many columns
- * are bound.
+ * are bound. Bindings whose dictionaries are all gone still count: a pinned
+ * one keeps converting.
  */
 async function _readColumnCodes(
   workspaceId: Workspace.Id,
@@ -18,16 +19,19 @@ async function _readColumnCodes(
   const bindings = await DictionaryBindingClient.getAll(
     where("workspace_id", "eq", workspaceId),
   );
-  const { dictionaryIds } = ColumnCodes.getRowIdsFromBindings(bindings);
-  if (dictionaryIds.length === 0) {
+  if (bindings.length === 0) {
     return new Map();
   }
+  const { dictionaryIds } = ColumnCodes.getRowIdsFromBindings(bindings);
   const byDictionary = where("dictionary_id", "in", dictionaryIds);
-  const [dictionaries, entries, codeLists] = await Promise.all([
-    DataDictionaryClient.getAll(where("id", "in", dictionaryIds)),
-    DataDictionaryEntryClient.getAll(byDictionary),
-    DataDictionaryCodeListClient.getAll(byDictionary),
-  ]);
+  const [dictionaries, entries, codeLists] =
+    dictionaryIds.length === 0
+      ? [[], [], []]
+      : await Promise.all([
+          DataDictionaryClient.getAll(where("id", "in", dictionaryIds)),
+          DataDictionaryEntryClient.getAll(byDictionary),
+          DataDictionaryCodeListClient.getAll(byDictionary),
+        ]);
   return ColumnCodes.fromRows({ bindings, dictionaries, entries, codeLists });
 }
 

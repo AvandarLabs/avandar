@@ -49,6 +49,11 @@ function createCodes(
     codeListName: undefined,
     isOrdered: false,
     mode: "reference",
+    keepsOriginal: false,
+    isPinned: false,
+    appliedDictionaryVersion: 1,
+    currentDictionaryVersion: 1,
+    isSourceDeleted: false,
     direction: "decode",
     pairs: [],
   };

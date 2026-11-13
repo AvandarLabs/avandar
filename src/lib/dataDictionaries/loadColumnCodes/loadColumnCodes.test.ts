@@ -107,6 +107,34 @@ describe("loadColumnCodes", () => {
     expect(codeListsMock).toHaveBeenCalledWith(byDictionary);
   });
 
+  it("keeps a pinned binding whose dictionary was deleted, reading no dictionary", async () => {
+    bindingsMock.mockResolvedValue([
+      {
+        id: "binding-gender",
+        datasetColumnId: "col-gender",
+        dictionaryId: undefined,
+        entryId: undefined,
+        codeListId: undefined,
+        mode: "convert",
+        direction: "decode",
+        keepsOriginal: false,
+        pinnedPairs: [
+          { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+        ],
+        pinnedIsOrdered: false,
+        appliedDictionaryVersion: 2,
+      },
+    ]);
+
+    const codes = await loadColumnCodes(WORKSPACE_ID);
+
+    expect(codes.get("col-gender")).toMatchObject({
+      isSourceDeleted: true,
+      direction: "encode",
+    });
+    expect(dictionariesMock).not.toHaveBeenCalled();
+  });
+
   it("gives no codes when the bindings cannot be read", async () => {
     bindingsMock.mockRejectedValue(new Error("Failed to fetch"));
 

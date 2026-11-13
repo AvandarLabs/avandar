@@ -23,16 +23,33 @@ export type ColumnCodesContext = {
 
 /**
  * Everything Avandar shows about one bound column: the context a model
- * gets, plus where it came from for the code-list popover and the rail.
+ * gets, plus where it came from for the code-list popover and the rail. For
+ * a converted column, `direction` is the side it holds once converted.
  */
 export type ColumnCodesT = ColumnCodesContext & {
   datasetColumnId: string;
+  /** Blank when the dictionary is deleted or the reader cannot open it. */
   dictionaryId: string;
+  /** Blank when the dictionary is deleted or the reader cannot open it. */
   dictionaryName: string;
+  /** Blank when the entry is deleted or the reader cannot open it. */
   entryName: string;
   codeListName: string | undefined;
   isOrdered: boolean;
   mode: DictionaryBinding.Mode;
+  /** Whether a `<column>_original` copy is kept beside the converted column. */
+  keepsOriginal: boolean;
+  /** Whether the pairs are pinned rather than the live list's. */
+  isPinned: boolean;
+  /** The dictionary's version when the binding was written. */
+  appliedDictionaryVersion: number;
+  /** The dictionary's version now, or undefined when it is unavailable. */
+  currentDictionaryVersion: number | undefined;
+  /**
+   * Whether the dictionary or entry is deleted or unreadable. Only a pinned
+   * binding is kept then: it still converts with its pinned pairs.
+   */
+  isSourceDeleted: boolean;
 };
 
 /**
@@ -41,14 +58,20 @@ export type ColumnCodesT = ColumnCodesContext & {
  */
 export type ColumnCodesRows = {
   bindings: ReadonlyArray<{
+    id: string;
     datasetColumnId: string;
     dictionaryId: string | undefined;
     entryId: string | undefined;
     codeListId: string | undefined;
     mode: DictionaryBinding.Mode;
     direction: DictionaryBinding.Direction;
+    keepsOriginal: boolean;
+    /** Set for a pinned binding: the pairs it converts with. */
+    pinnedPairs: readonly ColumnCodePair[] | undefined;
+    pinnedIsOrdered: boolean | undefined;
+    appliedDictionaryVersion: number;
   }>;
-  dictionaries: ReadonlyArray<{ id: string; name: string }>;
+  dictionaries: ReadonlyArray<{ id: string; name: string; version: number }>;
   entries: ReadonlyArray<{
     id: string;
     name: string;

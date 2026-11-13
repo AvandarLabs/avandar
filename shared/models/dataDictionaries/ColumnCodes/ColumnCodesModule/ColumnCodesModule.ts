@@ -62,10 +62,60 @@ function _byId<Row extends { id: string }>(
   );
 }
 
+type ColumnCodesBindingRow = ColumnCodesRows["bindings"][number];
+
+/**
+ * The side of the pairs a column holds as Avandar reads it. A converted
+ * column holds the other side: decoding turns codes into labels.
+ */
+function _toHeldSide(
+  binding: Readonly<ColumnCodesBindingRow>,
+): ColumnCodesT["direction"] {
+  if (binding.mode !== "convert") {
+    return binding.direction;
+  }
+  return binding.direction === "decode" ? "encode" : "decode";
+}
+
+function _toColumnCodes(
+  binding: Readonly<ColumnCodesBindingRow>,
+  found: Readonly<{
+    dictionary: ColumnCodesRows["dictionaries"][number] | undefined;
+    entry: ColumnCodesRows["entries"][number] | undefined;
+    codeList: ColumnCodesRows["codeLists"][number] | undefined;
+  }>,
+): ColumnCodesT | undefined {
+  const isPinned = binding.pinnedPairs !== undefined;
+  const isSourceDeleted = !found.dictionary || !found.entry;
+  if (isSourceDeleted && !isPinned) {
+    return undefined;
+  }
+  return {
+    datasetColumnId: binding.datasetColumnId,
+    dictionaryId: found.dictionary?.id ?? "",
+    dictionaryName: found.dictionary?.name ?? "",
+    entryName: found.entry?.name ?? "",
+    description: found.entry?.description,
+    codeListName: found.codeList?.name,
+    isOrdered: binding.pinnedIsOrdered ?? found.codeList?.isOrdered ?? false,
+    pairs: binding.pinnedPairs ?? found.codeList?.pairs ?? [],
+    mode: binding.mode,
+    direction: _toHeldSide(binding),
+    keepsOriginal: binding.keepsOriginal,
+    isPinned,
+    appliedDictionaryVersion: binding.appliedDictionaryVersion,
+    currentDictionaryVersion: found.dictionary?.version,
+    isSourceDeleted,
+  };
+}
+
 /**
  * Joins bindings to the dictionary rows they name, one result per bound
- * column. A binding whose dictionary or entry is gone, or not visible to
- * the reader, is left out.
+ * column. A pinned binding's own pairs win over its live list's. A converted
+ * column's `direction` is the side it holds once converted. A binding whose
+ * dictionary or entry is gone, or not visible to the reader, is left out,
+ * unless it is pinned: a pinned binding still converts, so it is kept with
+ * blank names and `isSourceDeleted`.
  */
 function fromRows(rows: Readonly<ColumnCodesRows>): Map<string, ColumnCodesT> {
   const dictionaries = _byId(rows.dictionaries);
@@ -73,29 +123,17 @@ function fromRows(rows: Readonly<ColumnCodesRows>): Map<string, ColumnCodesT> {
   const codeLists = _byId(rows.codeLists);
   const result = new Map<string, ColumnCodesT>();
   rows.bindings.forEach((binding) => {
-    const dictionary = dictionaries.get(binding.dictionaryId ?? "");
-    const entry = entries.get(binding.entryId ?? "");
-    if (!dictionary || !entry) {
-      return;
-    }
-    const codeList = codeLists.get(binding.codeListId ?? "");
-    result.set(binding.datasetColumnId, {
-      datasetColumnId: binding.datasetColumnId,
-      dictionaryId: dictionary.id,
-      dictionaryName: dictionary.name,
-      entryName: entry.name,
-      description: entry.description,
-      codeListName: codeList?.name,
-      isOrdered: codeList?.isOrdered ?? false,
-      pairs: codeList?.pairs ?? [],
-      mode: binding.mode,
-      direction: binding.direction,
+    const codes = _toColumnCodes(binding, {
+      dictionary: dictionaries.get(binding.dictionaryId ?? ""),
+      entry: entries.get(binding.entryId ?? ""),
+      codeList: codeLists.get(binding.codeListId ?? ""),
     });
+    if (codes) {
+      result.set(binding.datasetColumnId, codes);
+    }
   });
   return result;
 }
-
-type ColumnCodesBinding = ColumnCodesRows["bindings"][number];
 
 function _uniqueDefined<Value>(
   values: ReadonlyArray<Value | undefined>,
@@ -113,7 +151,7 @@ function _uniqueDefined<Value>(
  * The ids of the dictionaries, entries, and code lists a set of bindings
  * names, each listed once. Use it to read the rows `fromRows` joins.
  */
-function getRowIdsFromBindings<Binding extends ColumnCodesBinding>(
+function getRowIdsFromBindings<Binding extends ColumnCodesBindingRow>(
   bindings: readonly Binding[],
 ): {
   dictionaryIds: Array<NonNullable<Binding["dictionaryId"]>>;

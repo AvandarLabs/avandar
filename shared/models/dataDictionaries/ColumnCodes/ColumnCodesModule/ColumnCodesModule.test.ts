@@ -7,34 +7,51 @@ const SEX_PAIRS: ColumnCodes.Pair[] = [
   { code: "9", label: "Unknown", acceptedSpellings: [], isMissing: true },
 ];
 
+/**
+ * A binding's fields that only conversions set, as a reference binding has
+ * them.
+ */
+const REFERENCE_FIELDS = {
+  keepsOriginal: false,
+  pinnedPairs: undefined,
+  pinnedIsOrdered: undefined,
+  appliedDictionaryVersion: 2,
+};
+
 const ROWS: ColumnCodes.Rows = {
   bindings: [
     {
+      id: "binding-gender",
       datasetColumnId: "col-gender",
       dictionaryId: "dict-1",
       entryId: "entry-sex",
       codeListId: "list-sex",
       mode: "reference",
       direction: "decode",
+      ...REFERENCE_FIELDS,
     },
     {
+      id: "binding-case",
       datasetColumnId: "col-case",
       dictionaryId: "dict-1",
       entryId: "entry-case",
       codeListId: undefined,
       mode: "reference",
       direction: "decode",
+      ...REFERENCE_FIELDS,
     },
     {
+      id: "binding-orphan",
       datasetColumnId: "col-orphan",
       dictionaryId: undefined,
       entryId: undefined,
       codeListId: undefined,
       mode: "reference",
       direction: "decode",
+      ...REFERENCE_FIELDS,
     },
   ],
-  dictionaries: [{ id: "dict-1", name: "NYS measles case report" }],
+  dictionaries: [{ id: "dict-1", name: "NYS measles case report", version: 3 }],
   entries: [
     { id: "entry-sex", name: "sex", description: "Sex on the report." },
     { id: "entry-case", name: "case_id", description: undefined },
@@ -66,6 +83,88 @@ describe("ColumnCodes.fromRows", () => {
 
   it("leaves out a binding whose entry is gone", () => {
     expect(ColumnCodes.fromRows(ROWS).has("col-orphan")).toBe(false);
+  });
+
+  it("gives a reference binding its versions and no pin", () => {
+    expect(ColumnCodes.fromRows(ROWS).get("col-gender")).toMatchObject({
+      isPinned: false,
+      isSourceDeleted: false,
+      keepsOriginal: false,
+      appliedDictionaryVersion: 2,
+      currentDictionaryVersion: 3,
+      direction: "decode",
+    });
+  });
+
+  it("describes a decoded column by the labels it now holds", () => {
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        { ...ROWS.bindings[0]!, mode: "convert", direction: "decode" },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-gender")?.direction).toBe(
+      "encode",
+    );
+  });
+
+  it("describes an encoded column by the codes it now holds", () => {
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        { ...ROWS.bindings[0]!, mode: "convert", direction: "encode" },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-gender")?.direction).toBe(
+      "decode",
+    );
+  });
+
+  it("shows a pinned binding's pairs and order, not the live list's", () => {
+    const pinnedPairs = [SEX_PAIRS[0]!];
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        {
+          ...ROWS.bindings[0]!,
+          mode: "convert",
+          pinnedPairs,
+          pinnedIsOrdered: true,
+        },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-gender")).toMatchObject({
+      pairs: pinnedPairs,
+      isOrdered: true,
+      isPinned: true,
+    });
+  });
+
+  it("keeps a pinned binding whose dictionary was deleted, with blank names", () => {
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        {
+          ...ROWS.bindings[2]!,
+          mode: "convert",
+          pinnedPairs: SEX_PAIRS,
+          pinnedIsOrdered: false,
+        },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-orphan")).toMatchObject({
+      dictionaryId: "",
+      dictionaryName: "",
+      entryName: "",
+      pairs: SEX_PAIRS,
+      isSourceDeleted: true,
+      currentDictionaryVersion: undefined,
+      direction: "encode",
+    });
   });
 });
 

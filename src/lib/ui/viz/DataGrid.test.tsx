@@ -49,6 +49,11 @@ describe("DataGrid", () => {
       codeListName: "Sex (1/2/9)",
       isOrdered: false,
       mode: "reference",
+      keepsOriginal: false,
+      isPinned: false,
+      appliedDictionaryVersion: 1,
+      currentDictionaryVersion: 1,
+      isSourceDeleted: false,
     };
     render(
       <ColumnCodesContext.Provider value={new Map([["GENDER", codes]])}>

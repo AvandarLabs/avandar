@@ -11,6 +11,11 @@ const CODES: ColumnCodes.T = {
   codeListName: "Sex (1/2/9)",
   isOrdered: false,
   mode: "reference",
+  keepsOriginal: false,
+  isPinned: false,
+  appliedDictionaryVersion: 1,
+  currentDictionaryVersion: 1,
+  isSourceDeleted: false,
   direction: "decode",
   pairs: [
     { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },

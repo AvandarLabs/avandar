@@ -35,10 +35,15 @@ function _createClient(
 }
 
 const BOUND_ROW = {
+  id: "binding-gender",
   dataset_column_id: "col-gender",
   mode: "reference",
   direction: "decode",
-  dictionary: { id: "dict-1", name: "NYS codes" },
+  keeps_original: false,
+  pinned_pairs: null,
+  pinned_is_ordered: null,
+  applied_dictionary_version: 2,
+  dictionary: { id: "dict-1", name: "NYS codes", version: 3 },
   entry: { id: "entry-sex", name: "sex", description: null },
   code_list: {
     id: "list-sex",
@@ -63,7 +68,7 @@ describe("loadColumnCodes", () => {
       {
         table: "dataset_columns__dictionary_bindings",
         select:
-          "dataset_column_id, mode, direction, dictionary:data_dictionaries(id, name), entry:data_dictionaries__entries(id, name, description), code_list:data_dictionaries__code_lists(id, name, is_ordered, pairs)",
+          "id, dataset_column_id, mode, direction, keeps_original, pinned_pairs, pinned_is_ordered, applied_dictionary_version, dictionary:data_dictionaries(id, name, version), entry:data_dictionaries__entries(id, name, description), code_list:data_dictionaries__code_lists(id, name, is_ordered, pairs)",
       },
     ]);
   });
@@ -90,6 +95,54 @@ describe("loadColumnCodes", () => {
     });
 
     expect(codes.size).toBe(0);
+  });
+
+  it("describes a converted column by the labels it holds, with its versions", async () => {
+    const codes = await loadColumnCodes({
+      supabaseClient: _createClient({
+        rows: [{ ...BOUND_ROW, mode: "convert" }],
+      }),
+      workspaceId: "workspace-1",
+    });
+
+    expect(codes.get("col-gender")).toMatchObject({
+      direction: "encode",
+      appliedDictionaryVersion: 2,
+      currentDictionaryVersion: 3,
+    });
+  });
+
+  it("keeps a pinned binding whose dictionary the reader cannot see, with its pinned pairs", async () => {
+    const codes = await loadColumnCodes({
+      supabaseClient: _createClient({
+        rows: [
+          {
+            ...BOUND_ROW,
+            mode: "convert",
+            pinned_pairs: [
+              {
+                code: "1",
+                label: "Male",
+                accepted_spellings: [],
+                is_missing: false,
+              },
+            ],
+            pinned_is_ordered: false,
+            dictionary: null,
+            entry: null,
+            code_list: null,
+          },
+        ],
+      }),
+      workspaceId: "workspace-1",
+    });
+
+    expect(codes.get("col-gender")).toMatchObject({
+      isSourceDeleted: true,
+      pairs: [
+        { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      ],
+    });
   });
 
   it("gives no codes when the bindings cannot be read", async () => {
