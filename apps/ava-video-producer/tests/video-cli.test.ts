@@ -21,3 +21,21 @@ test("CLI rejects unknown or unsafe numeric options and requires manual-alignmen
     "A voice name",
   );
 });
+
+test("preview and render accept one theme", () => {
+  assert.equal(
+    parseArgs(["preview", "plan.json", "--theme", "avandar"]).theme,
+    "avandar",
+  );
+  assert.equal(
+    parseArgs(["render", "plan.json", "--theme", "classic"]).theme,
+    "classic",
+  );
+});
+
+test("commands that draw no picture refuse a theme", () => {
+  assert.throws(
+    () => parseArgs(["validate", "plan.json", "--theme", "avandar"]),
+    /Invalid/,
+  );
+});

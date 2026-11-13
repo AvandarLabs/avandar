@@ -16,6 +16,10 @@ import {
   timeline,
   type Storyboard,
 } from "../src/storyboard/schema/schema";
+import {
+  resolveVideoThemeFromSnapshot,
+  type VideoThemeSnapshot,
+} from "../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { buildProduct } from "./build-avandar.mjs";
 import {
   ffmpeg,
@@ -42,6 +46,7 @@ import { productRequirements } from "./lib/productRequirements/productRequiremen
 import { videoWorkspace } from "./lib/video-workspace.mjs";
 import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "./require-license.mjs";
+import { loadVideoThemeSnapshot } from "./videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const AUDIO_EXTENSIONS = [
@@ -72,13 +77,14 @@ type Options = {
   srt?: string;
   voice?: string;
   rate?: number;
+  theme?: string;
 };
 
 const HELP = `Usage: pnpm video <command> <plan.json> [options]
   validate                     Check schema, assets and media timing
   plan                         Write shot list, transcript, SRT and VTT
-  preview                      Render composed-film stills and contact sheet
-  render                       Require matching preview, render/gate, mix audio
+  preview [--theme ID]         Render composed-film stills and contact sheet
+  render [--theme ID]          Require matching preview, render/gate, mix audio
   tts [--voice NAME] [--rate N]  Generate macOS scratch speech and a derived plan
   align --audio FILE --srt FILE Import a recording with manually aligned SRT
 
@@ -96,7 +102,9 @@ export function parseArgs(argv: string[]): Options {
       ? ["--voice", "--rate"]
       : command === "align"
         ? ["--audio", "--srt"]
-        : [];
+        : command === "preview" || command === "render"
+          ? ["--theme"]
+          : [];
   const seen = new Set<string>();
   for (let index = 0; index < rest.length; index += 2) {
     const flag = rest[index];
@@ -108,6 +116,7 @@ export function parseArgs(argv: string[]): Options {
     else if (flag === "--voice") options.voice = value;
     else if (flag === "--audio") options.audio = value;
     else if (flag === "--srt") options.srt = value;
+    else if (flag === "--theme") options.theme = value;
   }
   if (
     options.rate !== undefined &&
@@ -216,9 +225,32 @@ async function stageAssets(
   return target;
 }
 
+/** The plan fingerprint plus the resolved theme hash, so a preview only unlocks a render of the same theme. */
+async function _fingerprintThemedPlan(
+  plan: Storyboard,
+  filename: string,
+  workspace: string,
+  theme: VideoThemeSnapshot,
+) {
+  return {
+    ...(await fingerprintPlan(ROOT, filename, plan, workspace)),
+    themeHash: resolveVideoThemeFromSnapshot(theme, [plan.id]).hash,
+  };
+}
+
 /** Render actual composition frames with one reusable headless browser. */
-async function preview(plan: Storyboard, filename: string, workspace: string) {
-  const fingerprint = await fingerprintPlan(ROOT, filename, plan, workspace);
+async function preview(
+  plan: Storyboard,
+  filename: string,
+  workspace: string,
+  theme: VideoThemeSnapshot,
+) {
+  const fingerprint = await _fingerprintThemedPlan(
+    plan,
+    filename,
+    workspace,
+    theme,
+  );
   const directory = await freshStage(plan, "preview", workspace);
   const publicDir = await stageAssets(plan, directory, workspace);
   const serveUrl = await bundle({
@@ -256,7 +288,7 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
     const composition = await selectComposition({
       serveUrl,
       id: "story-film",
-      inputProps: { plan },
+      inputProps: { plan, theme },
       puppeteerInstance: browser,
       ...browserOptions,
       chromiumOptions,
@@ -268,7 +300,7 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
       await renderStill({
         composition,
         serveUrl,
-        inputProps: { plan },
+        inputProps: { plan, theme },
         frame,
         output: path.join(directory, file),
         imageFormat: "jpeg",
@@ -316,7 +348,7 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
     contactHtml(plan, samples),
     { flag: "wx" },
   );
-  const after = await fingerprintPlan(ROOT, filename, plan, workspace);
+  const after = await _fingerprintThemedPlan(plan, filename, workspace, theme);
   if (JSON.stringify(after) !== JSON.stringify(fingerprint))
     throw new Error(
       "Plan, media or renderer changed during preview; run it again",
@@ -336,8 +368,18 @@ async function preview(plan: Storyboard, filename: string, workspace: string) {
 }
 
 /** Delegate picture creation to the original JPEG, encode and mandatory gate path. */
-async function render(plan: Storyboard, filename: string, workspace: string) {
-  const fingerprint = await fingerprintPlan(ROOT, filename, plan, workspace);
+async function render(
+  plan: Storyboard,
+  filename: string,
+  workspace: string,
+  theme: VideoThemeSnapshot,
+) {
+  const fingerprint = await _fingerprintThemedPlan(
+    plan,
+    filename,
+    workspace,
+    theme,
+  );
   const previewDirectory = path.join(workspace, "out", plan.id, "preview");
   await requireMatchingPreview(
     path.join(previewDirectory, "manifest.json"),
@@ -346,7 +388,7 @@ async function render(plan: Storyboard, filename: string, workspace: string) {
   await fs.access(path.join(previewDirectory, "contact-sheet.jpg"));
   const directory = await freshStage(plan, "render", workspace);
   const props = path.join(directory, "props.json");
-  await writeJson(props, { plan });
+  await writeJson(props, { plan, theme });
   const publicDir = await stageAssets(plan, directory, workspace);
   const last = timeline(plan).at(-1)!;
   const poster = last.startFrame + Math.floor(last.durationInFrames * 0.65);
@@ -376,7 +418,7 @@ async function render(plan: Storyboard, filename: string, workspace: string) {
   const picture = path.join(directory, `${plan.id}.mp4`);
   const final = path.join(directory, "final.mp4");
   const hasAudio = await mixAudio(plan, workspace, picture, final);
-  const after = await fingerprintPlan(ROOT, filename, plan, workspace);
+  const after = await _fingerprintThemedPlan(plan, filename, workspace, theme);
   if (JSON.stringify(after) !== JSON.stringify(fingerprint))
     throw new Error(
       "Plan, media or renderer changed during render; outputs remain for inspection",
@@ -618,16 +660,22 @@ export async function main(argv = process.argv.slice(2)) {
     );
   } else if (options.command === "plan")
     console.log("Plan artifacts:", await exportPlan(plan, workspace));
-  else if (options.command === "preview")
-    console.log(
-      "Inspect preview:",
-      await preview(plan, options.filename, workspace),
-    );
-  else
-    console.log(
-      "Finished video:",
-      await render(plan, options.filename, workspace),
-    );
+  else {
+    // Only the two commands that draw a picture load a theme.
+    const theme = await loadVideoThemeSnapshot({
+      id: options.theme ?? "classic",
+    });
+    if (options.command === "preview")
+      console.log(
+        "Inspect preview:",
+        await preview(plan, options.filename, workspace, theme),
+      );
+    else
+      console.log(
+        "Finished video:",
+        await render(plan, options.filename, workspace, theme),
+      );
+  }
 }
 
 if (

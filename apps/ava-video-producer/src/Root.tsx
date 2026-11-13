@@ -6,7 +6,7 @@ import { MotionLab, MOTION_LAB_LEN } from "./compositions/MotionLab";
 import { TitleStudy, TITLE_STUDY_LEN } from "./compositions/TitleStudy";
 import { StockCompositions } from "./stock/StockCompositions";
 import { storyboardSchema, durationInFrames } from "./storyboard/schema/schema";
-import { StoryFilm } from "./storyboard/StoryFilm/StoryFilm";
+import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm/ThemedStoryFilm";
 import { TITLE_LEN, TitleCard } from "./title-card";
 
 export const FPS = 30;
@@ -63,12 +63,12 @@ export function RemotionRoot() {
       <StockCompositions />
       <Composition
         id="story-film"
-        component={StoryFilm}
+        component={ThemedStoryFilm}
         defaultProps={{ plan: storyboardSchema.parse(libraryPlan) }}
         calculateMetadata={({ props }) => {
           const plan = storyboardSchema.parse(props.plan);
           return {
-            props: { plan },
+            props: { plan, theme: props.theme },
             durationInFrames: durationInFrames(plan),
             fps: plan.fps,
             width: plan.width,

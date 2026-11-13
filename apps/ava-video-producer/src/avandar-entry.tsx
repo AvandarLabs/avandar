@@ -7,11 +7,20 @@ import {
   durationInFrames,
   type Storyboard,
 } from "./storyboard/schema/schema";
-import { StoryFilm } from "./storyboard/StoryFilm/StoryFilm";
+import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm/ThemedStoryFilm";
+import type { VideoThemeSnapshot } from "./videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 
 const defaults = storyboardSchema.parse(importPlan);
-function ProductFilm({ plan }: { plan: Storyboard }) {
-  return <StoryFilm plan={plan} productScene={AvandarScene} />;
+function ProductFilm({
+  plan,
+  theme,
+}: {
+  plan: Storyboard;
+  theme?: VideoThemeSnapshot;
+}) {
+  return (
+    <ThemedStoryFilm plan={plan} theme={theme} productScene={AvandarScene} />
+  );
 }
 function Root() {
   return (
@@ -22,7 +31,7 @@ function Root() {
       calculateMetadata={({ props }) => {
         const plan = storyboardSchema.parse(props.plan);
         return {
-          props: { plan },
+          props: { plan, theme: props.theme },
           durationInFrames: durationInFrames(plan),
           fps: plan.fps,
           width: plan.width,
