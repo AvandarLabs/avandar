@@ -3886,6 +3886,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__get_editable_ids: {
+        Args: { p_workspace_id: string }
+        Returns: string[]
+      }
       rpc_gadgets__search: {
         Args: { p_limit?: number; p_query: string; p_workspace_id: string }
         Returns: {
