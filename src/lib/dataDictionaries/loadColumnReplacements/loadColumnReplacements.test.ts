@@ -9,28 +9,54 @@ import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBind
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { QueryClient } from "@tanstack/react-query";
 
 const {
   BINDINGS_QUERY_KEY,
+  COLUMNS_QUERY_KEY,
   bindingsGetAllMock,
   codeListsGetAllMock,
   columnsGetAllMock,
 } = vi.hoisted(() => {
   return {
     BINDINGS_QUERY_KEY: ["DictionaryBindingClient", "getAll", "test"],
+    COLUMNS_QUERY_KEY: ["DatasetColumnClient", "getAll", "test"],
     bindingsGetAllMock: vi.fn(),
     codeListsGetAllMock: vi.fn(),
     columnsGetAllMock: vi.fn(),
   };
 });
 
+// Reads go through the real query cache, so a test can tell a read that
+// serves invalidated rows from one that reads them again.
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  type QueryCache = Pick<QueryClient, "ensureQueryData" | "fetchQuery">;
+  const toGetAll = (read: QueryCache["fetchQuery"]) => {
+    return {
+      getAll: (params: unknown) => {
+        return read({
+          queryKey: COLUMNS_QUERY_KEY,
+          queryFn: () => {
+            return columnsGetAllMock(params);
+          },
+        });
+      },
+    };
+  };
   return {
     DatasetColumnClient: {
-      withCache: () => {
+      QueryKeys: {
+        getAll: () => {
+          return COLUMNS_QUERY_KEY;
+        },
+      },
+      withCache: (queryClient: QueryCache) => {
         return {
           withEnsureQueryData: () => {
-            return { getAll: columnsGetAllMock };
+            return toGetAll(queryClient.ensureQueryData.bind(queryClient));
+          },
+          withFetchQuery: () => {
+            return toGetAll(queryClient.fetchQuery.bind(queryClient));
           },
         };
       },
@@ -221,6 +247,25 @@ describe("loadColumnReplacements", () => {
     expect(after.projectionKeyByDatasetId[DATASET_ID]).not.toBe(
       before.projectionKeyByDatasetId[DATASET_ID],
     );
+  });
+
+  it("reads the columns again once they are invalidated, so a column converted since converts to labels", async () => {
+    // Read before converting: GENDER holds its codes as numbers.
+    columnsGetAllMock.mockResolvedValue([{ ...GENDER, dataType: "bigint" }]);
+    await loadColumnReplacements([DATASET_ID]);
+    // Converting retypes GENDER to text and invalidates the columns.
+    columnsGetAllMock.mockResolvedValue([GENDER]);
+    bindingsGetAllMock.mockResolvedValue([
+      _makeBinding({ pinnedPairs: SEX_PAIRS, pinnedIsOrdered: false }),
+    ]);
+    await AvaQueryClient.invalidateQueries({ queryKey: COLUMNS_QUERY_KEY });
+
+    const loaded = await loadColumnReplacements([DATASET_ID]);
+
+    expect(
+      loaded.replacementsByDatasetId[DATASET_ID]?.[0]?.valueMapping
+        ?.outputDataType,
+    ).toBe("varchar");
   });
 
   it("converts with the cached bindings when a fresh read fails", async () => {

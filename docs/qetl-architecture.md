@@ -273,6 +273,9 @@ the dataset's renames, casts, and dictionary conversions, read by
 `loadColumnReplacements`). A workspace query whose key differs treats the
 table as a miss, so the storage tier serves the same bytes and the view is
 rebuilt: a relabeled code list reaches the next query without a cache clear.
+A table the sidecar never recorded, such as one an upload's transcode loaded,
+holds the dataset as stored, so it is current only while the key asks for no
+renames, casts, or conversions.
 A `stored` session passes no keys and never reads the catalog.
 
 **Max age for live sources.** A wrapper whose rows can change without a

@@ -129,16 +129,23 @@ async function _readConversions(
 
 /**
  * Every column of the datasets, or undefined when they cannot be read, for
- * example offline with nothing cached. The failure is logged and the query
- * still runs.
+ * example offline with nothing cached. Read again once invalidated, like the
+ * bindings, so a column converted since then is read with the type it
+ * converts to. The failure is logged and the query still runs.
  */
 async function _readColumns(
   datasetIds: readonly Dataset.Id[],
 ): Promise<DatasetColumn.T[] | undefined> {
+  const params = where("dataset_id", "in", datasetIds);
   try {
-    return await DatasetColumnClient.withCache(AvaQueryClient)
-      .withEnsureQueryData()
-      .getAll(where("dataset_id", "in", datasetIds));
+    return await _fetchOrCached({
+      queryKey: DatasetColumnClient.QueryKeys.getAll(params),
+      fetch: () => {
+        return DatasetColumnClient.withCache(AvaQueryClient)
+          .withFetchQuery()
+          .getAll(params);
+      },
+    });
   } catch (error) {
     Logger.error(
       "Could not read dataset columns; the datasets load with no replacements",

@@ -92,9 +92,17 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetColumnClient", "getAll"];
+        },
+      },
       withCache: () => {
         return {
           withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+          withFetchQuery: () => {
             return { getAll: datasetColumnGetAllMock };
           },
         };

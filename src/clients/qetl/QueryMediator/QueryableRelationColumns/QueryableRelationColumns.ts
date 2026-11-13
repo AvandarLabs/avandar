@@ -2,7 +2,11 @@ import {
   isFreshAt,
   normalizeColumns,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { getProjectionKey } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+/** The key of a dataset loaded with no renames, casts, or conversions. */
+const EMPTY_PROJECTION_KEY = getProjectionKey([]);
 
 const loadedRelationsByDatasetId = new Map<
   string,
@@ -48,10 +52,16 @@ function _isStale(
 function _isProjectionCurrent(
   options: Readonly<{ datasetId: Dataset.Id; projectionKey: string }>,
 ): boolean {
-  const recordedKey = loadedRelationsByDatasetId.get(
-    options.datasetId,
-  )?.projectionKey;
-  return recordedKey === undefined || recordedKey === options.projectionKey;
+  const loaded = loadedRelationsByDatasetId.get(options.datasetId);
+  if (loaded === undefined) {
+    // Loaded outside this recorder, such as by an upload's transcode, which
+    // loads the table as stored.
+    return options.projectionKey === EMPTY_PROJECTION_KEY;
+  }
+  return (
+    loaded.projectionKey === undefined ||
+    loaded.projectionKey === options.projectionKey
+  );
 }
 
 function _getEarliestStaleAt(
@@ -98,9 +108,12 @@ export const QueryableRelationColumns = {
   isStale: _isStale,
 
   /**
-   * Whether this dataset's view was built with `projectionKey`. A view this
-   * process did not record, or recorded without a key, is current, so a
-   * table loaded outside this recorder still hits.
+   * Whether this dataset's view was built with `projectionKey`. A view
+   * recorded without a key is current. A view this process did not record,
+   * such as a table an upload's transcode loaded, holds the dataset as
+   * stored, so it is current only while `projectionKey` asks for no renames,
+   * casts, or conversions. Otherwise it is rebuilt, so a dataset converted
+   * in the session that uploaded it shows the conversion.
    */
   isProjectionCurrent: _isProjectionCurrent,
 
