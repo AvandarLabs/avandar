@@ -26,7 +26,7 @@
       "h2": { "fontSize": "48px", "fontWeight": "600", "lineHeight": "1.12" }
     }
   },
-  "fontSizes": { "2xs": "12px", "xs": "13px", "sm": "14px", "md": "17px", "lg": "18px", "xl": "20px", "2xl": "22px", "3xl": "23px", "4xl": "25px", "5xl": "30px" },
+  "fontSizes": { "3xs": "12px", "2xs": "13px", "xs": "14px", "sm": "15px", "md": "16px", "lg": "17px", "xl": "18px", "2xl": "20px", "3xl": "21px", "4xl": "22px", "5xl": "23px", "6xl": "24px", "7xl": "25px", "8xl": "30px", "9xl": "32px" },
   "lineHeights": { "xs": "1.12", "sm": "1.25", "md": "1.3", "lg": "1.35" },
   "radius": { "xs": "4px", "sm": "8px", "md": "10px", "lg": "12px", "xl": "18px", "full": "9999px" },
   "spacing": { "2xs": "16px", "xs": "20px", "sm": "32px", "md": "49px", "lg": "60px", "xl": "64px", "2xl": "70px", "3xl": "96px", "4xl": "192px" },
@@ -55,7 +55,7 @@
         "fontWeight": { "regular": 400, "medium": 500, "semibold": 600, "bold": 700 },
         "letterSpacing": { "tight": -0.025, "none": 0, "wide": 0.17142857142857143 },
         "size": {},
-        "strokeWidth": { "2xs": 1.1, "xs": 1.5, "sm": 2, "md": 2.5, "lg": 3, "xl": 3.5 },
+        "strokeWidth": { "3xs": 1, "2xs": 1.1, "xs": 1.5, "sm": 2, "md": 2.5, "lg": 3, "xl": 3.5 },
         "opacity": { "3": 0.03, "6": 0.06, "8": 0.08, "9": 0.09, "10": 0.1, "24": 0.24, "25": 0.25, "28": 0.28, "30": 0.3, "32": 0.32, "34": 0.34, "40": 0.4, "65": 0.65, "70": 0.7, "100": 1 },
         "shadow": {
           "none": { "layers": [] },
@@ -101,6 +101,7 @@
           "line": "$atomic.swatch.line",
           "text": { "onDark": "$atomic.swatch.text", "onLight": "$atomic.swatch.textDark" },
           "textMuted": { "onDark": "$atomic.swatch.muted", "onLight": "$colors.neutral.6" },
+          "inactive": "$atomic.swatch.muted",
           "accent": "$primary",
           "accentAlt": "$atomic.swatch.cyan",
           "highlight": "$atomic.swatch.orange",
@@ -110,22 +111,37 @@
         },
         "text": {
           "graphic": {
-            "eyebrow": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.sm", "weight": "$atomic.fontWeight.regular", "letterSpacing": "$atomic.letterSpacing.wide", "color": "$color.textMuted" },
-            "heading": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.2xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
-            "body": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
-            "label": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.lg", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
-            "detail": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.2xs", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
-            "caption": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.md", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
-            "pill": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.xs", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" }
+            "eyebrow": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.xs", "weight": "$atomic.fontWeight.regular", "letterSpacing": "$atomic.letterSpacing.wide", "color": "$color.textMuted" },
+            "heading": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.4xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "body": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.2xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "label": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "detail": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.3xs", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "caption": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.lg", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "pill": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.2xs", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "display": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.9xl", "weight": "$atomic.fontWeight.semibold", "color": "$color.text" },
+            "title": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.7xl", "weight": "$atomic.fontWeight.semibold", "color": "$color.text" },
+            "panelTitle": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.5xl", "weight": "$atomic.fontWeight.semibold", "color": "$color.text" },
+            "cardTitle": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.4xl", "weight": "$atomic.fontWeight.semibold", "color": "$color.text" },
+            "itemLabel": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.3xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "choice": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.lg", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "question": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.6xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "secondary": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.md", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "note": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.sm", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "meta": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.sm", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "footnote": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.xs", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "field": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.lg", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "lineNumber": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.lg", "weight": "$atomic.fontWeight.regular", "color": "$color.textMuted" },
+            "code": { "family": "$atomic.fontFamily.courier", "size": "$fontSizes.3xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "data": { "family": "$atomic.fontFamily.arial", "size": "$fontSizes.3xs", "weight": "$atomic.fontWeight.regular", "lineHeight": "$lineHeights.md", "color": "$color.text" }
           },
           "stage": {
             "heading": { "family": "$atomic.fontFamily.figtree", "size": "$headings.sizes.h2.fontSize", "weight": "$headings.sizes.h2.fontWeight", "lineHeight": "$headings.sizes.h2.lineHeight", "letterSpacing": "$atomic.letterSpacing.tight", "color": "$color.text" },
-            "subtitle": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.4xl", "weight": "$atomic.fontWeight.regular", "lineHeight": "$lineHeights.lg", "color": "$color.text" },
-            "evidence": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.md", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
-            "sharedObject": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.4xl", "weight": "$atomic.fontWeight.semibold", "color": "$color.accent" },
+            "subtitle": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.7xl", "weight": "$atomic.fontWeight.regular", "lineHeight": "$lineHeights.lg", "color": "$color.text" },
+            "evidence": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.lg", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "sharedObject": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.7xl", "weight": "$atomic.fontWeight.semibold", "color": "$color.accent" },
             "thesis": { "family": "$atomic.fontFamily.figtree", "size": "$headings.sizes.h1.fontSize", "weight": "$headings.sizes.h1.fontWeight", "lineHeight": "$headings.sizes.h1.lineHeight", "letterSpacing": "$atomic.letterSpacing.tight", "color": "$color.text" },
-            "thesisEmphasis": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.5xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
-            "floatingLabel": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.3xl", "weight": "$atomic.fontWeight.regular", "lineHeight": "$lineHeights.sm", "color": "$color.text" }
+            "thesisEmphasis": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.8xl", "weight": "$atomic.fontWeight.regular", "color": "$color.text" },
+            "floatingLabel": { "family": "$atomic.fontFamily.figtree", "size": "$fontSizes.5xl", "weight": "$atomic.fontWeight.regular", "lineHeight": "$lineHeights.sm", "color": "$color.text" }
           }
         },
         "stroke": {

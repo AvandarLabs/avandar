@@ -42,5 +42,5 @@ test("product UI inside the boundary sees only its own theme", () => {
 });
 
 test("without the boundary a product MantineProvider inherits the video theme", () => {
-  assert.equal(_render(false), "<span>false|17px</span>");
+  assert.equal(_render(false), "<span>false|16px</span>");
 });
