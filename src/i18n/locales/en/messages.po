@@ -9777,6 +9777,10 @@ msgstr "Pick the code list this entry uses."
 msgid "Yellow"
 msgstr "Yellow"
 
+#: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
+msgid "You can't edit any dataset in this workspace"
+msgstr "You can't edit any dataset in this workspace"
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone with the link"
 msgstr "Anyone with the link"
