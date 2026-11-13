@@ -2,13 +2,20 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useLocation, useMatchRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+/** The task views that hide the list by default. */
+const TASK_ROUTES = [
+  "/$workspaceSlug/data-manager/dictionaries/new",
+  "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries",
+] as const;
+
 /**
  * Whether the Data Sources list shows beside the current view. A task view
- * (the create flow) hides it by default to free width for its tables, and
- * Show list brings it back until the pathname changes, including on coming
- * back to the same route later. Every other view always shows it. On a
- * phone the list and the view never share the row, so the toggle is not
- * offered. Used by `DataManagerApp` and its toolbar.
+ * (creating a dictionary, applying dictionaries) hides it by default to
+ * free width for its tables, and Show list brings it back until the
+ * pathname changes, including on coming back to the same route later.
+ * Every other view always shows it. On a phone the list and the view never
+ * share the row, so the toggle is not offered. Used by `DataManagerApp` and
+ * its toolbar.
  */
 export function useListPaneToggle(): {
   isTaskView: boolean;
@@ -31,9 +38,9 @@ export function useListPaneToggle(): {
     setShownPathname(pathname);
     setIsShown(false);
   }
-  const isTaskView = Boolean(
-    matchRoute({ to: "/$workspaceSlug/data-manager/dictionaries/new" }),
-  );
+  const isTaskView = TASK_ROUTES.some((to) => {
+    return Boolean(matchRoute({ to }));
+  });
   return {
     isTaskView,
     isToggleOffered: isTaskView && !isPhone,
