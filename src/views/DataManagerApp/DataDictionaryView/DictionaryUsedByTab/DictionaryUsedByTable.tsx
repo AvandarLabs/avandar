@@ -17,15 +17,36 @@ type Props = {
   usage: DictionaryUsage;
 };
 
-function UsageRow({
-  row,
-  usage,
-  canEdit,
-}: Readonly<{
+type RowProps = {
   row: DictionaryUsageRow;
   usage: DictionaryUsage;
   canEdit: boolean;
-}>): ReactNode {
+};
+
+/** A row's status, with Re-apply when it is behind and the user can edit. */
+function RowStatusCell({ row, usage, canEdit }: Readonly<RowProps>): ReactNode {
+  return (
+    <UsageStatusCell
+      row={row}
+      currentVersion={usage.currentVersion}
+      action={
+        canEdit && row.isBehind ? (
+          <ReapplyButton
+            dataset={{
+              id: row.datasetId,
+              name: row.datasetName,
+              sourceType: row.sourceType,
+            }}
+            dictionaryId={usage.dictionaryId}
+            dictionaryName={usage.dictionaryName}
+          />
+        ) : undefined
+      }
+    />
+  );
+}
+
+function UsageRow({ row, usage, canEdit }: Readonly<RowProps>): ReactNode {
   const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const link = AppLinks.dataManagerDatasetView({
@@ -45,23 +66,7 @@ function UsageRow({
       </Table.Td>
       <Table.Td ta="end">{i18n.number(row.entryCount)}</Table.Td>
       <Table.Td>
-        <UsageStatusCell
-          row={row}
-          currentVersion={usage.currentVersion}
-          action={
-            canEdit && row.isBehind ? (
-              <ReapplyButton
-                dataset={{
-                  id: row.datasetId,
-                  name: row.datasetName,
-                  sourceType: row.sourceType,
-                }}
-                dictionaryId={usage.dictionaryId}
-                dictionaryName={usage.dictionaryName}
-              />
-            ) : undefined
-          }
-        />
+        <RowStatusCell row={row} usage={usage} canEdit={canEdit} />
       </Table.Td>
     </Table.Tr>
   );
