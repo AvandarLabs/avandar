@@ -12,11 +12,11 @@ import { AttachFooter } from "@/views/DataManagerApp/ApplyDictionariesView/Attac
 import { AttachSummaryTable } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable";
 import { AttachSummaryText } from "@/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryText";
 import { useSaveApply } from "@/views/DataManagerApp/ApplyDictionariesView/useSaveApply";
-import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { AddedCodeConflict } from "@/views/DataManagerApp/ApplyDictionariesView/applyInputs/applyInputs";
 import type { ApplyLookups } from "@/views/DataManagerApp/ApplyDictionariesView/applyLookups";
 import type { ApplyCounts } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFacts";
 import type { ApplyFlow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";

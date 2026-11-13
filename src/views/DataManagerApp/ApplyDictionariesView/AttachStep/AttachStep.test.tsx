@@ -118,16 +118,21 @@ describe("AttachStep", () => {
   });
 
   it("cannot attach while two values add one code to a list, naming the code", () => {
-    _render({ [GENDER.id]: REFERENCE_PICK, [COUNTY.id]: REFERENCE_PICK }, [], {
-      status: "ready",
-      result: new Map([
-        [GENDER.id, [{ value: "8", valueKey: "8", rowCount: 2 }]],
-        [COUNTY.id, [{ value: "8", valueKey: "8", rowCount: 1 }]],
-      ]),
-    }, {
-      [GENDER.id]: { "8": { action: "add", text: "Other" } },
-      [COUNTY.id]: { "8": { action: "add", text: "Refused" } },
-    });
+    _render(
+      { [GENDER.id]: REFERENCE_PICK, [COUNTY.id]: REFERENCE_PICK },
+      [],
+      {
+        status: "ready",
+        result: new Map([
+          [GENDER.id, [{ value: "8", valueKey: "8", rowCount: 2 }]],
+          [COUNTY.id, [{ value: "8", valueKey: "8", rowCount: 1 }]],
+        ]),
+      },
+      {
+        [GENDER.id]: { "8": { action: "add", text: "Other" } },
+        [COUNTY.id]: { "8": { action: "add", text: "Refused" } },
+      },
+    );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "The code 8 is added twice to Sex (1/2/9). Change one of them on Unmatched values.",

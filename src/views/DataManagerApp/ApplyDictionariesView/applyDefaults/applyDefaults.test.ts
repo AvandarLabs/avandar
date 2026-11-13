@@ -262,8 +262,8 @@ describe("makeInitialSelection", () => {
   });
 
   it("drops every saved map when the column's list is not loaded", () => {
-    expect(
-      resolutionsFromBindings([CONVERTED_BINDING], new Map()),
-    ).toEqual({ [CONVERTED_BINDING.datasetColumnId]: {} });
+    expect(resolutionsFromBindings([CONVERTED_BINDING], new Map())).toEqual({
+      [CONVERTED_BINDING.datasetColumnId]: {},
+    });
   });
 });

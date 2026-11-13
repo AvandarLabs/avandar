@@ -223,12 +223,12 @@ describe("UnmatchedValuesStep", () => {
       },
     });
 
-    expect(screen.getByRole("textbox", { name: "Code for X" })).toHaveAccessibleDescription(
-      "The code 8 is added twice to this list.",
-    );
-    expect(screen.getByRole("textbox", { name: "Code for Y" })).toHaveAccessibleDescription(
-      "The code 8 is added twice to this list.",
-    );
+    expect(
+      screen.getByRole("textbox", { name: "Code for X" }),
+    ).toHaveAccessibleDescription("The code 8 is added twice to this list.");
+    expect(
+      screen.getByRole("textbox", { name: "Code for Y" }),
+    ).toHaveAccessibleDescription("The code 8 is added twice to this list.");
   });
 
   it("disables Add to list for a code already in the list without a label", async () => {

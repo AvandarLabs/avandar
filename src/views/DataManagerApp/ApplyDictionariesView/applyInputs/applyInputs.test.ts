@@ -139,8 +139,18 @@ describe("applyInputs", () => {
         unmatchedByColumnId: UNMATCHED,
       }),
     ).toEqual([
-      { columnId: GENDER.id, valueKey: "x", codeListId: SEX_LIST.id, code: "8" },
-      { columnId: GENDER.id, valueKey: "u", codeListId: SEX_LIST.id, code: "8" },
+      {
+        columnId: GENDER.id,
+        valueKey: "x",
+        codeListId: SEX_LIST.id,
+        code: "8",
+      },
+      {
+        columnId: GENDER.id,
+        valueKey: "u",
+        codeListId: SEX_LIST.id,
+        code: "8",
+      },
     ]);
   });
 
