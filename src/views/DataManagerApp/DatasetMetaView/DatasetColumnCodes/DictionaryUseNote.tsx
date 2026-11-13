@@ -56,7 +56,7 @@ function PinnedNote({
     <>
       <Trans>Converted this dataset · version {appliedText}</Trans>
       {isBehind ? (
-        <Text span display="block" size="xs" c="warning">
+        <Text span display="block" size="xs" fw={500}>
           <Trans>
             Applied version {appliedText}, now version {nowText}
           </Trans>

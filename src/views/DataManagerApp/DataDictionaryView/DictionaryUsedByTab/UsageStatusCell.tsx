@@ -32,7 +32,7 @@ export function UsageStatusCell({
   const nowVersion = i18n.number(currentVersion);
   return (
     <Stack gap={4} align="flex-start">
-      <Text size="xs" c="warning">
+      <Text size="xs" fw={500}>
         <Trans>
           Applied version {appliedVersion}, now version {nowVersion}
         </Trans>
