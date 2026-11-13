@@ -134,12 +134,12 @@ down is shared code._
 Related diagrams in this file: the probe order (section 6), table ownership
 states (section 7), and connector touch points (section 10).
 
-## 4. The thirteen steps of the per-query pipeline
+## 4. The fourteen steps of the per-query pipeline
 
 All steps are called from
 [`queryRunner.ts`](../src/clients/qetl/QueryMediator/queryRunner.ts); the links
 point at the file that implements a step when it lives elsewhere. Steps 1 to 3
-run before any lock; steps 4 to 13 run inside one coordinated operation.
+run before any lock; steps 4 to 14 run inside one coordinated operation.
 
 1. **`getQueryDependencies`** (session policy). Workspace:
    `assertWorkspaceRelations` refuses any dataset outside the workspace. Public:
@@ -165,30 +165,39 @@ run before any lock; steps 4 to 13 run inside one coordinated operation.
    (`getNeededColumnsFromQuery`), applies caller overrides
    (`neededColumnsByDatasetId`), and maps names to Parquet headers
    (`getParquetColumnNamesFromNeeded`).
-7. **`probeRelationCache`**. Datasets DuckDB cannot serve: absent, or present
-   with a sidecar set that does not cover the need
+7. **`_readQueryCatalog`** (`queryRunner.ts`). In a `catalog` session that
+   names a dataset, reads each dataset's replacements and projection key with
+   `loadColumnReplacements`: every column, the convert bindings, and the live
+   code lists they use. A failed read is logged and leaves those datasets with
+   no replacements and no key, so the query still runs. A `stored` session,
+   and a query that names no dataset, read nothing.
+8. **`probeRelationCache`**. Datasets DuckDB cannot serve: absent, present
+   with a sidecar set that does not cover the need, stale, or built with
+   another projection key than step 7 read
    ([getRelationSources.ts](../src/clients/qetl/QueryMediator/getRelationSources.ts)).
-8. **`probeStorageRelationCache`**. Probes the session's port for the rest,
+9. **`probeStorageRelationCache`**. Probes the session's port for the rest,
    reads hit payloads, and returns `growFrom` for misses
    ([relationLoading.ts](../src/clients/qetl/QueryMediator/relationLoading.ts)).
-9. **`getRelationSources`**. Reads `datasets` rows and per-type source rows for
-   uncached ids. Skipped when nothing is uncached.
-10. **`fetchRelationBytes`** (`relationLoading.ts`). Builds a registry, then for
+10. **`getRelationSources`**. Reads `datasets` rows and per-type source rows
+    for uncached ids. Skipped when nothing is uncached.
+11. **`fetchRelationBytes`** (`relationLoading.ts`). Builds a registry, then for
     each source in order calls `acquire` with the needed set plus `growFrom`,
     and, when that set is a finite column list, projects the result with
     `projectParquetBlob`. Sequential on purpose.
-11. **`loadRelationBytes`** (`relationLoading.ts`). Writes new bytes to the
+12. **`loadRelationBytes`** (`relationLoading.ts`). Writes new bytes to the
     storage tier (failures are logged and ignored), then `loadParquet` for every
-    relation with renames limited to loaded columns, and records the sidecar.
-12. **`loadConceptRelations`**. Builds each concept's spine, then its view.
-13. **`DuckDbClient.runRawQuery`**. Re-analyzes the caller's SQL, proves the
+    relation with the replacements step 7 read (renames, casts, and dictionary
+    conversions), narrowed to the loaded columns, and records the sidecar with
+    the projection key. It reads no catalog itself.
+13. **`loadConceptRelations`**. Builds each concept's spine, then its view.
+14. **`DuckDbClient.runRawQuery`**. Re-analyzes the caller's SQL, proves the
     lease covers it, asserts workspace validity or snapshot ownership, poisons
     mutated tables, and executes; `returnType: "parquet"` exports through a
     temporary view and `COPY`.
 
-A virtual dataset is acquired at step 10 by running its defining SQL through the
+A virtual dataset is acquired at step 11 by running its defining SQL through the
 same `runQuery` with the outer lease (`runParquetQuery` in
-`_createRegistryForFetch`). The nested query repeats steps 1 to 13 without
+`_createRegistryForFetch`). The nested query repeats steps 1 to 14 without
 taking locks, and without the outer statement's `conceptSpineRestrictions`,
 because its parquet bytes are cached without them.
 
@@ -231,7 +240,7 @@ flowchart TD
   HIT1["Served by DuckDB"]
   D["probeStorageRelationCache:<br/>does an entry serve it?<br/>same principal, table,<br/>definition token;<br/>not past staleAt; columns<br/>cover the need"]
   E["Is the payload<br/>row readable?"]
-  HIT2["Served by IndexedDB,<br/>loaded at step 11"]
+  HIT2["Served by IndexedDB,<br/>loaded at step 12"]
   F["Miss, with growFrom if<br/>a narrower live entry exists"]
   G["Treated as uncached,<br/>no growFrom"]
   H["Acquire through<br/>the registry"]
@@ -254,7 +263,7 @@ reaches a wrapper._
 
 **Queryable tier.** Presence in `information_schema.tables` plus the sidecar.
 It has no principal; it is protected by authorization (step 1), the lease check
-(step 13), and ownership (section 7). A tab reload empties it. The sidecar also
+(step 14), and ownership (section 7). A tab reload empties it. The sidecar also
 records the projection key each view was built with (`getProjectionKey` over
 the dataset's renames, casts, and dictionary conversions, read by
 `loadColumnReplacements`). A workspace query whose key differs treats the
@@ -434,10 +443,10 @@ Do not break these without changing the reason they exist.
 | Runtime strategy selection | `_createDatasetWrapper` in `createDefaultRegistry.ts` | Documented as a "composite"; it dispatches on `sourceType`, it does not form a tree |
 | Strategy (policy injection) | `QetlRunnerOptions` from each session | CRUD reads inside the pipeline are not injectable |
 | Ports and adapters | `RelationCachePort` with Dexie, public, and in-memory test adapters | The port carries Dexie-shaped fields (`identityKey`, `touch`) |
-| Cache-aside | steps 7, 8, 11 | No invalidation on source change |
+| Cache-aside | steps 8, 9, 12 | No invalidation on source change |
 | Facade | `DuckDbClient` over `duckDb*` units | The operation bundle is rebuilt per call so test doubles apply |
 | Capability token | `DatasetDuckDbLease` | Called a lease, but has no expiry |
-| Fail-safe defaults (Saltzer and Schroeder) | analyzer, `assertWorkspaceRelations` | The public session drops out-of-snapshot references at step 1 and relies on the step 13 lease check |
+| Fail-safe defaults (Saltzer and Schroeder) | analyzer, `assertWorkspaceRelations` | The public session drops out-of-snapshot references at step 1 and relies on the step 14 lease check |
 
 `SourceWrapper.describe`, `readFreshness`, `pushDown`, and the capability record
 have no production caller beyond the registry's registration checks; treat them
@@ -672,12 +681,12 @@ means traced through the source but not run.
 | No pushdown and no capability-driven planning | by reading | `QueryMediator.ts` TODO |
 | Eviction only on `QuotaExceededError`; no byte budget | by reading | both cache adapters |
 | Every workspace query locks every workspace dataset, so top-level queries in one workspace serialize across tabs | by reading | `WorkspaceQuerySession.ts`, `queryRunner.ts` |
-| Public sessions cannot plan or build concepts, so `concept_<uuid>` fails as a missing table unless a workspace query in the same tab left that view behind (step 13's public checks cover dataset relations only); they depend on the out-of-band preload in `useEnsurePublishedDashboardDatasets` and cannot acquire | by reading | `PublicQuerySession.ts`, `duckDbRawQuery.ts` |
+| Public sessions cannot plan or build concepts, so `concept_<uuid>` fails as a missing table unless a workspace query in the same tab left that view behind (step 14's public checks cover dataset relations only); they depend on the out-of-band preload in `useEnsurePublishedDashboardDatasets` and cannot acquire | by reading | `PublicQuerySession.ts`, `duckDbRawQuery.ts` |
 | A nested virtual-dataset query that names a concept its outer query did not plan is refused for an insufficient lease | documented in code | `_getLeaseNames` in `queryRunner.ts` |
 | Column inference attributes a table alias written without `AS` and a typed literal's keyword (`TIMESTAMP`, `DATE`, `INTERVAL`) as columns. When the dataset has a column the query does not name and no `"all"` copy is cached, the projection fails with a binder error, unless the keyword happens to equal a column name (`DATE` over a `date` column succeeds with a duplicate `date_1`) | verified | `getNeededColumnsFromQuery.ts`, `getParquetColumnNamesFromNeeded.ts` |
 | In a multi-dataset statement that qualifies some names, unqualified names are not attributed, so the projection can drop a needed column | verified | `getNeededColumnsFromQuery.ts` |
 | The analyzer refuses `EXTRACT(part FROM column)` as `uninspectable-source` | verified | `duckDbSqlSources.ts` |
-| Anonymous public dashboards: `loadRelationBytes` always reads `dataset_columns`, which `anon` cannot read (HTTP 401 on the local stack) | 401 verified; dashboard failure by reading | `relationLoading.ts` |
+| When a workspace query cannot read the dataset columns (offline with nothing cached), its datasets load with no renames, casts, or conversions and no projection key. A view recorded without a key counts as current, so that unconverted view keeps being served after the catalog is readable again, until the tab reloads or the view is dropped for another reason. A failed bindings read is not affected: it records the "no conversions" key, so the next successful read rebuilds the view | by reading | `loadColumnReplacements.ts`, `QueryableRelationColumns.ts` |
 | A CKAN resource in Parquet format is wrapped in an untyped Blob and fails `registerParquetFile` when the query needs all columns; the bad entry is cached first. Latent: in-repo registrations are CSV and XLSX | by reading | `DatasetParquetWrapper.ts` |
 | The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `QueryableRelationColumns.ts` |
 | Snapshot publishing of an `all_columns` slice fails over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists). Google Sheets and Postgres tables keep no parquet in Storage, so every slice of theirs is read through the workspace query instead. An uploaded file's `all_columns` slice copies the stored parquet, which keeps the original column names and detected types, so a column renamed or retyped after import does not match the widget SQL a published viewer runs | by reading | `dashboardPublishSnapshots.ts`, `LocalPublicDatasetRawDataClient.ts` |
