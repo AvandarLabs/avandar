@@ -65,6 +65,7 @@ Created:
 | `themes/classic.theme.json` | The complete built-in theme (today's look) |
 | `src/videoTheme/builtInVideoThemes/builtInVideoThemes.ts` | Bundled built-in themes, libraries, default source |
 | `src/videoTheme/createEasingFromToken/createEasingFromToken.ts` | Easing token to easing function |
+| `src/videoTheme/cameraEasing/cameraEasing.ts` | Which curves can drive a camera |
 | `src/videoTheme/normalizeTokenValue/normalizeTokenValue.ts` | Converts a resolved literal to its kind's value (Mantine CSS strings to numbers, stacks to font ids) |
 | `src/videoTheme/cssValues/cssValues.ts` | CSS strings for shadows, fills, text shadows, alpha colours |
 | `src/videoTheme/VideoThemeError/VideoThemeError.ts` | Error carrying token-path issues |
@@ -4540,9 +4541,60 @@ git commit -m "feat(video-producer): merge video theme layers and per-item overr
 ### Task 14: The resolver
 
 **Files:**
+- Create: `src/videoTheme/cameraEasing/cameraEasing.ts`
+- Test: `src/videoTheme/cameraEasing/cameraEasing.test.ts`
 - Create: `src/videoTheme/resolveVideoTheme/resolveTokenTiers.ts`
 - Create: `src/videoTheme/resolveVideoTheme/resolveVideoTheme.ts`
 - Test: `src/videoTheme/resolveVideoTheme/resolveVideoTheme.test.ts`
+
+- [ ] **Step 0: Define camera-safe curves**
+
+A camera must stay between its authored framings, so its curves cannot overshoot, and the camera code only knows the cubic power curve by name. The resolver rejects any other camera curve, so an editor draft or a generated theme fails as a token error instead of crashing a render.
+
+`src/videoTheme/cameraEasing/cameraEasing.test.ts`:
+
+```ts
+import assert from "node:assert/strict";
+import test from "node:test";
+import { isCameraSafeEasing } from "./cameraEasing";
+
+test("a bezier inside 0..1 is camera-safe", () => {
+  assert.equal(isCameraSafeEasing([0.45, 0, 0.55, 1]), true);
+});
+
+test("an overshooting bezier is not camera-safe", () => {
+  assert.equal(isCameraSafeEasing([0.34, 1.56, 0.64, 1]), false);
+});
+
+test("the cubic power curve is the only camera-safe power curve", () => {
+  assert.equal(isCameraSafeEasing({ powerInOut: 3 }), true);
+  assert.equal(isCameraSafeEasing({ powerInOut: 4 }), false);
+});
+```
+
+Run: `node --import tsx --import ./scripts/yaml/registerYaml.mjs --test src/videoTheme/cameraEasing/cameraEasing.test.ts`
+Expected: FAIL, module not found.
+
+`src/videoTheme/cameraEasing/cameraEasing.ts`:
+
+```ts
+import type { EasingValue } from "../videoTheme.types";
+
+/**
+ * Whether a curve can drive a camera: a bezier whose control points all lie
+ * in 0..1, so the camera never overshoots its framings, or the cubic power
+ * curve, the one power curve camera motion supports. The resolver enforces
+ * it for camera tokens, and the token editor offers only these curves there.
+ */
+export function isCameraSafeEasing(easing: EasingValue): boolean {
+  if ("powerInOut" in easing) {
+    return easing.powerInOut === 3;
+  }
+  return easing.every((point) => point >= 0 && point <= 1);
+}
+```
+
+Run the test command again. Expected: 3 passing.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -4664,6 +4716,13 @@ test("the hash changes when a resolved value changes", () => {
     resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic").hash,
     resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", { patches: [LIGHT_GROUND] }).hash,
   );
+});
+
+test("a camera curve that overshoots its framings is rejected", () => {
+  const library = createVideoThemeLibrary([
+    _extending("bouncy-camera", _semantic({ camera: { easing: { push: "$atomic.easing.outBack" } } })),
+  ]);
+  assert.match(_issuesOf(() => resolveVideoTheme(library, "bouncy-camera")), /^camera\.easing\.push: /m);
 });
 ```
 
@@ -4944,6 +5003,7 @@ import {
   mergeMantineTheme,
   type MantineThemeOverride,
 } from "@mantine/core";
+import { isCameraSafeEasing } from "../cameraEasing/cameraEasing";
 import { elevationToBoxShadow } from "../cssValues/cssValues";
 import { getResolvedTokenValue } from "../getResolvedTokenValue/getResolvedTokenValue";
 import { buildVideoThemeHashFromContent } from "../hashVideoTheme/hashVideoTheme";
@@ -4998,6 +5058,22 @@ function _findUnmeasuredGraphicText(
     });
 }
 
+function _findUnsafeCameraCurves(semantic: ResolvedVideoSemantic): VideoThemeIssue[] {
+  const curves = [
+    ...Object.entries(semantic.camera.easing).map(([name, easing]) => [`camera.easing.${name}`, easing] as const),
+    ...Object.entries(semantic.camera.presets).map(
+      ([name, preset]) => [`camera.presets.${name}.easing`, preset.easing] as const,
+    ),
+  ];
+  return curves
+    .filter(([, easing]) => !isCameraSafeEasing(easing))
+    .map(([path]) => ({
+      path,
+      message:
+        "A camera curve must keep its control points between 0 and 1, or be the cubic in-out, so the camera stays between its framings.",
+    }));
+}
+
 function _deriveMantineShadows(atomic: ResolvedVideoAtomic, color: string) {
   return Object.fromEntries(
     MANTINE_SHADOW_KEYS.flatMap((key) => {
@@ -5037,9 +5113,12 @@ export function resolveVideoTheme(
     components: tiers.components as ResolvedVideoComponents,
     isDarkGround: tiers.isDarkGround,
   };
-  const fontIssues = _findUnmeasuredGraphicText(content);
-  if (fontIssues.length > 0) {
-    throw new VideoThemeError(fontIssues);
+  const ruleIssues = [
+    ..._findUnmeasuredGraphicText(content),
+    ..._findUnsafeCameraCurves(content.semantic),
+  ];
+  if (ruleIssues.length > 0) {
+    throw new VideoThemeError(ruleIssues);
   }
   return {
     id: themeId,
@@ -5059,7 +5138,7 @@ export function resolveVideoTheme(
 
 - [ ] **Step 5: Run the tests to verify they pass**
 
-Run the Step 2 command. Expected: 11 passing.
+Run the Step 2 command. Expected: 12 passing.
 
 - [ ] **Step 6: Typecheck and commit**
 
@@ -6957,6 +7036,7 @@ Plans 2 and 3 build on these exact names. Plan 1 builds everything in the first 
 | `buildVideoCssVariables` | `src/videoTheme/buildVideoCssVariables/buildVideoCssVariables.ts` | `--video-<semantic path>`, `--video-component-<name>-<prop>`. |
 | `buildColorWithAlpha`, `elevationToBoxShadow`, `elevationToDropShadowFilter`, `textShadowToCss`, `fillToCss` | `src/videoTheme/cssValues/cssValues.ts` | |
 | `createEasingFromToken` | `src/videoTheme/createEasingFromToken/createEasingFromToken.ts` | |
+| `isCameraSafeEasing` | `src/videoTheme/cameraEasing/cameraEasing.ts` | The resolver reports unsafe curves at `camera.easing.<name>` and `camera.presets.<name>.easing`. |
 | `getResolvedTokenValue`, `getValueAtPath` | `src/videoTheme/getResolvedTokenValue/getResolvedTokenValue.ts` | |
 | `listTextContrastFromTheme`, `getContrastRatioFromColors`, `getWcagLevelFromContrast` | `src/videoTheme/textContrast/textContrast.ts` | |
 | `buildVideoThemeHashFromContent` | `src/videoTheme/hashVideoTheme/hashVideoTheme.ts` | |
