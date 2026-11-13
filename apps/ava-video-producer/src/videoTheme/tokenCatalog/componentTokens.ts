@@ -343,6 +343,37 @@ const SHARED_GRAPHIC_TOKENS = {
   },
 } as const;
 
+const NETWORK_GRAPH_TOKENS = {
+  highlightEdgeAlpha: _alpha(
+    "Highlighted edge opacity",
+    "Opacity of the first edges of a network graph, drawn in the accent.",
+  ),
+  edgeAlpha: _alpha(
+    "Network edge opacity",
+    "Opacity of the remaining edges of a network graph.",
+  ),
+  hubPulsePeriod: _duration(
+    "Hub pulse period",
+    "Frames for one breath of the hub node.",
+  ),
+  hubPulseFloor: _alpha(
+    "Hub pulse floor",
+    "The hub's lowest activity while it breathes.",
+  ),
+  hubPulseSwing: _alpha(
+    "Hub pulse swing",
+    "How far the hub's activity rises above its floor.",
+  ),
+  nodePulsePeriod: _duration(
+    "Outer node pulse period",
+    "Frames for one breath of an outer node.",
+  ),
+  nodePulseSwing: _alpha(
+    "Outer node pulse swing",
+    "How high an outer node's activity rises at the top of a breath.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -351,6 +382,7 @@ const SHARED_GRAPHIC_TOKENS = {
  */
 export const COMPONENT_TOKENS = {
   ...SHARED_GRAPHIC_TOKENS,
+  NetworkGraph: NETWORK_GRAPH_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",

@@ -244,6 +244,7 @@
     "Check": { "defaultProps": { "color": "$atomic.swatch.mint", "size": 12, "strokeWidth": "$atomic.strokeWidth.md", "cap": "round", "join": "round" } },
     "Rule": { "defaultProps": { "color": "$color.line", "strokeWidth": "$atomic.strokeWidth.3xs" } },
     "Glyph": { "defaultProps": { "strokeWidth": "$stroke.default" } },
+    "NetworkGraph": { "defaultProps": { "highlightEdgeAlpha": "$atomic.opacity.34", "edgeAlpha": "$atomic.opacity.65", "hubPulsePeriod": "$motion.pulse.period", "hubPulseFloor": 0.65, "hubPulseSwing": 0.3, "nodePulsePeriod": "$atomic.period.lg", "nodePulseSwing": 0.5 } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,
