@@ -9,6 +9,8 @@ import type { ReactNode } from "react";
 
 type Props = {
   note: DictionaryUseNoteT;
+  /** Shown under a pinned version that is behind, such as Re-apply. */
+  action?: ReactNode;
 };
 
 /** A linked dataset that reads this one, linked by name. */
@@ -30,13 +32,20 @@ function LinkedDatasetNote({
   return <Trans>Linked dataset: {datasetLink}</Trans>;
 }
 
-/** The pinned version, and how far behind the dictionary it is. */
+/**
+ * The pinned version, how far behind the dictionary it is, and `action`
+ * when it is behind and a pinned column still has a code list to re-pin.
+ */
 function PinnedNote({
   appliedVersion,
   currentVersion,
+  canReapply,
+  action,
 }: Readonly<{
   appliedVersion: number;
   currentVersion: number | undefined;
+  canReapply: boolean;
+  action?: ReactNode;
 }>): ReactNode {
   const { i18n } = useLingui();
   const isBehind =
@@ -53,6 +62,7 @@ function PinnedNote({
           </Trans>
         </Text>
       ) : null}
+      {isBehind && canReapply ? action : null}
     </>
   );
 }
@@ -61,7 +71,10 @@ function PinnedNote({
  * One line under a dictionary in a dataset's rail, saying one way the
  * dictionary reaches the dataset.
  */
-export function DictionaryUseNote({ note }: Readonly<Props>): ReactNode {
+export function DictionaryUseNote({
+  note,
+  action,
+}: Readonly<Props>): ReactNode {
   return (
     <Text component="dd" size="xs" c="dimmed" className={css.dictionaryNote}>
       {note.kind === "reference" ? (
@@ -74,6 +87,8 @@ export function DictionaryUseNote({ note }: Readonly<Props>): ReactNode {
         <PinnedNote
           appliedVersion={note.appliedVersion}
           currentVersion={note.currentVersion}
+          canReapply={note.canReapply}
+          action={action}
         />
       ) : null}
       {note.kind === "linked" ? (

@@ -49,6 +49,7 @@ export function DataDictionaryEditor({
   const selection = useEditorSelection(draft);
   const usage = useDictionaryUsage({
     dictionaryId: dictionary.id,
+    dictionaryName: dictionary.name,
     currentVersion: dictionary.version,
   });
   const usedByCount =

@@ -50,10 +50,5 @@ export function DictionaryUsedByTab({ usage }: Readonly<Props>): ReactNode {
       />
     );
   }
-  return (
-    <DictionaryUsedByTable
-      rows={usage.rows}
-      currentVersion={usage.currentVersion}
-    />
-  );
+  return <DictionaryUsedByTable usage={usage} />;
 }

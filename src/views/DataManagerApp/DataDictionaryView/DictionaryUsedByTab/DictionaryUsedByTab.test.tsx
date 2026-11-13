@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@/test-utils";
 import { DictionaryUsedByTab } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTab";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
@@ -20,11 +21,41 @@ vi.mock("@avandar/ui", async (importOriginal) => {
   };
 });
 
+const mocks = vi.hoisted(() => {
+  return { editableIds: [] as string[] };
+});
+
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
+  return {
+    DatasetClient: {
+      useGetEditableIds: () => {
+        return [mocks.editableIds, false];
+      },
+    },
+  };
+});
+vi.mock("@/components/dataDictionaries/ReapplyButton/ReapplyButton", () => {
+  return {
+    ReapplyButton: (props: {
+      dataset: { name: string };
+      dictionaryName: string;
+    }) => {
+      return (
+        <button type="button">
+          {`Re-apply ${props.dictionaryName} to ${props.dataset.name}`}
+        </button>
+      );
+    },
+  };
+});
+
 describe("DictionaryUsedByTab", () => {
   it("lists each dataset with how the dictionary was applied", () => {
     render(
       <DictionaryUsedByTab
         usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
           isLoading: false,
           hasError: false,
           currentVersion: 3,
@@ -54,6 +85,8 @@ describe("DictionaryUsedByTab", () => {
     render(
       <DictionaryUsedByTab
         usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
           isLoading: false,
           hasError: false,
           rows: [],
@@ -71,6 +104,8 @@ describe("DictionaryUsedByTab", () => {
     render(
       <DictionaryUsedByTab
         usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
           isLoading: true,
           hasError: false,
           rows: [],
@@ -88,6 +123,8 @@ describe("DictionaryUsedByTab", () => {
     render(
       <DictionaryUsedByTab
         usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
           isLoading: false,
           hasError: true,
           rows: [],
@@ -106,6 +143,8 @@ describe("DictionaryUsedByTab", () => {
     render(
       <DictionaryUsedByTab
         usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
           isLoading: false,
           hasError: false,
           currentVersion: 3,
@@ -136,6 +175,8 @@ describe("DictionaryUsedByTab", () => {
     render(
       <DictionaryUsedByTab
         usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
           isLoading: false,
           hasError: false,
           currentVersion: 3,
@@ -159,5 +200,68 @@ describe("DictionaryUsedByTab", () => {
     expect(row).toHaveTextContent("keeps the version it was given");
     expect(row).toHaveTextContent("Applied version 2, now version 3");
     expect(row).not.toHaveTextContent("Up to date");
+  });
+
+  it("offers Re-apply on a dataset behind the dictionary that the user can edit", () => {
+    mocks.editableIds = ["dataset-3"];
+    render(
+      <DictionaryUsedByTab
+        usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
+          isLoading: false,
+          hasError: false,
+          currentVersion: 3,
+          rows: [
+            {
+              datasetId: "dataset-3" as Dataset.Id,
+              datasetName: "Bronx line list",
+              sourceType: "csv_file",
+              entryCount: 2,
+              howApplied: "changed",
+              appliedVersion: 2,
+              isBehind: true,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Re-apply NYS codes to Bronx line list",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("does not offer Re-apply to someone who cannot edit the dataset", () => {
+    mocks.editableIds = [];
+    render(
+      <DictionaryUsedByTab
+        usage={{
+          dictionaryId: "dict-1" as DataDictionary.Id,
+          dictionaryName: "NYS codes",
+          isLoading: false,
+          hasError: false,
+          currentVersion: 3,
+          rows: [
+            {
+              datasetId: "dataset-3" as Dataset.Id,
+              datasetName: "Bronx line list",
+              sourceType: "csv_file",
+              entryCount: 2,
+              howApplied: "changed",
+              appliedVersion: 2,
+              isBehind: true,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole("row", { name: /Bronx line list/ }),
+    ).toHaveTextContent("Applied version 2, now version 3");
+    expect(screen.queryByRole("button", { name: /Re-apply/ })).toBeNull();
   });
 });

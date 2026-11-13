@@ -1,22 +1,31 @@
 import { Link } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Table } from "@mantine/core";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { ReapplyButton } from "@/components/dataDictionaries/ReapplyButton/ReapplyButton";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { HowAppliedCell } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell";
 import { UsageStatusCell } from "@/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell";
-import type { DictionaryUsageRow } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryUsage/useDictionaryUsage";
+import type {
+  DictionaryUsage,
+  DictionaryUsageRow,
+} from "@/views/DataManagerApp/DataDictionaryView/useDictionaryUsage/useDictionaryUsage";
 import type { ReactNode } from "react";
 
 type Props = {
-  rows: readonly DictionaryUsageRow[];
-  currentVersion: number;
+  usage: DictionaryUsage;
 };
 
 function UsageRow({
   row,
-  currentVersion,
-}: Readonly<{ row: DictionaryUsageRow; currentVersion: number }>): ReactNode {
+  usage,
+  canEdit,
+}: Readonly<{
+  row: DictionaryUsageRow;
+  usage: DictionaryUsage;
+  canEdit: boolean;
+}>): ReactNode {
   const { i18n } = useLingui();
   const workspace = useCurrentWorkspace();
   const link = AppLinks.dataManagerDatasetView({
@@ -36,17 +45,38 @@ function UsageRow({
       </Table.Td>
       <Table.Td ta="end">{i18n.number(row.entryCount)}</Table.Td>
       <Table.Td>
-        <UsageStatusCell row={row} currentVersion={currentVersion} />
+        <UsageStatusCell
+          row={row}
+          currentVersion={usage.currentVersion}
+          action={
+            canEdit && row.isBehind ? (
+              <ReapplyButton
+                dataset={{
+                  id: row.datasetId,
+                  name: row.datasetName,
+                  sourceType: row.sourceType,
+                }}
+                dictionaryId={usage.dictionaryId}
+                dictionaryName={usage.dictionaryName}
+              />
+            ) : undefined
+          }
+        />
       </Table.Td>
     </Table.Tr>
   );
 }
 
-/** One row per dataset the dictionary is applied to, and how. */
-export function DictionaryUsedByTable({
-  rows,
-  currentVersion,
-}: Readonly<Props>): ReactNode {
+/**
+ * One row per dataset the dictionary is applied to, and how, with
+ * Re-apply on a dataset that is behind and that the user can edit.
+ */
+export function DictionaryUsedByTable({ usage }: Readonly<Props>): ReactNode {
+  const workspace = useCurrentWorkspace();
+  const [editableIds] = DatasetClient.useGetEditableIds({
+    workspaceId: workspace.id,
+  });
+  const editableIdSet = new Set<string>(editableIds ?? []);
   return (
     <Table layout="fixed" verticalSpacing="xs">
       <Table.Thead>
@@ -66,12 +96,13 @@ export function DictionaryUsedByTable({
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {rows.map((row) => {
+        {usage.rows.map((row) => {
           return (
             <UsageRow
               key={row.datasetId}
               row={row}
-              currentVersion={currentVersion}
+              usage={usage}
+              canEdit={editableIdSet.has(row.datasetId)}
             />
           );
         })}

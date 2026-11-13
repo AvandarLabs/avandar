@@ -33,6 +33,8 @@ export type DictionaryUsageRow = {
 
 /** The datasets a dictionary is applied to, sorted by name. */
 export type DictionaryUsage = {
+  dictionaryId: DataDictionary.Id;
+  dictionaryName: string;
   rows: readonly DictionaryUsageRow[];
   /** The dictionary's version now. */
   currentVersion: number;
@@ -101,10 +103,11 @@ function _toRow(
 export function useDictionaryUsage(
   options: Readonly<{
     dictionaryId: DataDictionary.Id;
+    dictionaryName: string;
     currentVersion: number;
   }>,
 ): DictionaryUsage {
-  const { dictionaryId, currentVersion } = options;
+  const { dictionaryId, dictionaryName, currentVersion } = options;
   const [bindings, isLoadingBindings, bindingsQuery] =
     DictionaryBindingClient.useGetAll({
       ...where("dictionary_id", "eq", dictionaryId),
@@ -128,6 +131,8 @@ export function useDictionaryUsage(
       });
   }, [bindings, datasets, datasetIds, currentVersion]);
   return {
+    dictionaryId,
+    dictionaryName,
     rows,
     currentVersion,
     isLoading: isLoadingBindings || isLoadingDatasets,

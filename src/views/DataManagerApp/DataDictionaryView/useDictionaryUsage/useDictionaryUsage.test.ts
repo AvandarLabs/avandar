@@ -89,6 +89,7 @@ describe("useDictionaryUsage", () => {
     const { result } = renderHook(() => {
       return useDictionaryUsage({
         dictionaryId: DICTIONARY_ID,
+        dictionaryName: "NYS codes",
         currentVersion: 3,
       });
     });
@@ -145,6 +146,7 @@ describe("useDictionaryUsage", () => {
     const { result } = renderHook(() => {
       return useDictionaryUsage({
         dictionaryId: DICTIONARY_ID,
+        dictionaryName: "NYS codes",
         currentVersion: 3,
       });
     });
@@ -161,6 +163,7 @@ describe("useDictionaryUsage", () => {
     const { result } = renderHook(() => {
       return useDictionaryUsage({
         dictionaryId: DICTIONARY_ID,
+        dictionaryName: "NYS codes",
         currentVersion: 3,
       });
     });

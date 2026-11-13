@@ -37,6 +37,33 @@ vi.mock("@avandar/ui", async (importOriginal) => {
   };
 });
 
+const DATASET = {
+  id: "dataset-1" as Dataset.Id,
+  name: "Kings line list",
+  sourceType: "csv_file" as const,
+};
+
+const railMocks = vi.hoisted(() => {
+  return { canEdit: true };
+});
+
+vi.mock("@/hooks/datasets/useCanEditDataset/useCanEditDataset", () => {
+  return {
+    useCanEditDataset: () => {
+      return { canEdit: railMocks.canEdit, isLoading: false };
+    },
+  };
+});
+vi.mock("@/components/dataDictionaries/ReapplyButton/ReapplyButton", () => {
+  return {
+    ReapplyButton: (props: { dictionaryName: string }) => {
+      return (
+        <button type="button">{`Re-apply ${props.dictionaryName}`}</button>
+      );
+    },
+  };
+});
+
 /** A column's codes, as Task 13's `ColumnCodes.fromRows` returns them. */
 function makeCodes(overrides: Partial<ColumnCodes.T> = {}): ColumnCodes.T {
   return {
@@ -76,6 +103,7 @@ describe("DatasetDictionariesRailGroup", () => {
 
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={columnCodes}
         linkedDatasets={[]}
       />,
@@ -99,6 +127,7 @@ describe("DatasetDictionariesRailGroup", () => {
 
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={columnCodes}
         linkedDatasets={[]}
       />,
@@ -114,6 +143,7 @@ describe("DatasetDictionariesRailGroup", () => {
   it("renders nothing while no dictionary is attached", () => {
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={new Map()}
         linkedDatasets={[]}
       />,
@@ -139,6 +169,7 @@ describe("DatasetDictionariesRailGroup", () => {
 
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={columnCodes}
         linkedDatasets={[]}
       />,
@@ -157,6 +188,7 @@ describe("DatasetDictionariesRailGroup", () => {
 
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={columnCodes}
         linkedDatasets={[
           {
@@ -186,6 +218,7 @@ describe("DatasetDictionariesRailGroup", () => {
 
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={columnCodes}
         linkedDatasets={[]}
       />,
@@ -215,6 +248,7 @@ describe("DatasetDictionariesRailGroup", () => {
 
     render(
       <DatasetDictionariesRailGroup
+        dataset={DATASET}
         columnCodes={columnCodes}
         linkedDatasets={[]}
       />,
@@ -225,5 +259,116 @@ describe("DatasetDictionariesRailGroup", () => {
     expect(
       screen.getByText("Converted this dataset · version 1"),
     ).toBeInTheDocument();
+  });
+
+  it("offers Re-apply on a version that is behind, to an editor", () => {
+    railMocks.canEdit = true;
+    const columnCodes = new Map([
+      [
+        "col-gender",
+        makeCodes({
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          appliedDictionaryVersion: 2,
+          currentDictionaryVersion: 3,
+        }),
+      ],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        dataset={DATASET}
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Re-apply NYS codes" }),
+    ).toBeInTheDocument();
+  });
+
+  it("offers no Re-apply when the version is current or the user cannot edit", () => {
+    railMocks.canEdit = false;
+    const columnCodes = new Map([
+      [
+        "col-gender",
+        makeCodes({
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          appliedDictionaryVersion: 2,
+          currentDictionaryVersion: 3,
+        }),
+      ],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        dataset={DATASET}
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: /Re-apply/ })).toBeNull();
+    railMocks.canEdit = true;
+  });
+
+  it("offers no Re-apply on a pinned column whose code list was deleted", () => {
+    railMocks.canEdit = true;
+    const columnCodes = new Map([
+      [
+        "col-gender",
+        makeCodes({
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          codeListName: undefined,
+          appliedDictionaryVersion: 2,
+          currentDictionaryVersion: 3,
+        }),
+      ],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        dataset={DATASET}
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(
+      screen.getByText("Applied version 2, now version 3"),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Re-apply/ })).toBeNull();
+  });
+
+  it("offers no Re-apply when the version is current", () => {
+    railMocks.canEdit = true;
+    const columnCodes = new Map([
+      [
+        "col-gender",
+        makeCodes({
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          appliedDictionaryVersion: 3,
+          currentDictionaryVersion: 3,
+        }),
+      ],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        dataset={DATASET}
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: /Re-apply/ })).toBeNull();
   });
 });

@@ -201,6 +201,7 @@ export function DatasetSourceRail({
         ) : null}
       </AppViewRail.Group>
       <DatasetDictionariesRailGroup
+        dataset={dataset}
         columnCodes={columnCodes}
         linkedDatasets={linkedDatasets}
       />
