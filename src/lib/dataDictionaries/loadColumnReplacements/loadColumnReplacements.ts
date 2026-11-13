@@ -19,6 +19,15 @@ import type { QueryKey } from "@tanstack/react-query";
 const NO_CONVERSIONS: ReadonlyMap<string, ColumnConversion.T> = new Map();
 
 /**
+ * No replacements and no projection keys: each dataset loads as its Parquet
+ * holds it, and a view already loaded is served as current.
+ */
+const NO_REPLACEMENTS: LoadedColumnReplacements = {
+  replacementsByDatasetId: {},
+  projectionKeyByDatasetId: {},
+};
+
+/**
  * Reads fresh rows when the cached ones are invalidated or stale, and falls
  * back to the cached rows when that read fails, so a converted dataset keeps
  * converting through a dropped request.
@@ -119,20 +128,43 @@ async function _readConversions(
 }
 
 /**
+ * Every column of the datasets, or undefined when they cannot be read, for
+ * example offline with nothing cached. The failure is logged and the query
+ * still runs.
+ */
+async function _readColumns(
+  datasetIds: readonly Dataset.Id[],
+): Promise<DatasetColumn.T[] | undefined> {
+  try {
+    return await DatasetColumnClient.withCache(AvaQueryClient)
+      .withEnsureQueryData()
+      .getAll(where("dataset_id", "in", datasetIds));
+  } catch (error) {
+    Logger.error(
+      "Could not read dataset columns; the datasets load with no replacements",
+      { error },
+    );
+    return undefined;
+  }
+}
+
+/**
  * Each dataset's renames, casts, and conversions, and the projection key the
  * queryable tier checks its loaded view against, read from the dataset
  * catalog with the user's own permissions. Used by the query runner before
- * every workspace query that names a dataset.
+ * every workspace query that names a dataset. When the columns cannot be
+ * read, it returns no replacements and no keys rather than failing the query.
  */
 export async function loadColumnReplacements(
   datasetIds: readonly Dataset.Id[],
 ): Promise<LoadedColumnReplacements> {
   if (datasetIds.length === 0) {
-    return { replacementsByDatasetId: {}, projectionKeyByDatasetId: {} };
+    return NO_REPLACEMENTS;
   }
-  const columns = await DatasetColumnClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(where("dataset_id", "in", datasetIds));
+  const columns = await _readColumns(datasetIds);
+  if (columns === undefined) {
+    return NO_REPLACEMENTS;
+  }
   // Read whole, never narrowed to the columns a query needs, so each
   // conversion sees its keep-original copy.
   const conversions = await _readConversions({ datasetIds, columns });

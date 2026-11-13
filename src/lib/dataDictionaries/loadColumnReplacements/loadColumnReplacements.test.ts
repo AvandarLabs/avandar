@@ -246,4 +246,18 @@ describe("loadColumnReplacements", () => {
       { originalName: "GENDER", alias: undefined, dataType: "VARCHAR" },
     ]);
   });
+
+  it("loads with no replacements and no keys, and never fails the query, when the columns cannot be read", async () => {
+    // Offline with nothing cached: no key means a loaded view stays current,
+    // and an unloaded one loads as its Parquet holds it.
+    columnsGetAllMock.mockRejectedValue(new Error("Failed to fetch"));
+
+    const loaded = await loadColumnReplacements([DATASET_ID]);
+
+    expect(loaded).toEqual({
+      replacementsByDatasetId: {},
+      projectionKeyByDatasetId: {},
+    });
+    expect(bindingsGetAllMock).not.toHaveBeenCalled();
+  });
 });
