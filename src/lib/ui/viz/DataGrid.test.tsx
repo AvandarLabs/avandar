@@ -36,14 +36,20 @@ describe("DataGrid", () => {
   });
 
   it("puts a code-list tag on a column title that has one", async () => {
-    const codes = {
-      dictionaryName: "NYS codes",
-      entryName: "sex",
-      codeListName: "Sex (1/2/9)",
+    const codes: ColumnCodes.T = {
+      direction: "decode",
       pairs: [
         { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
       ],
-    } as unknown as ColumnCodes.T;
+      description: undefined,
+      datasetColumnId: "gender-column",
+      dictionaryId: "dictionary-1",
+      dictionaryName: "NYS codes",
+      entryName: "sex",
+      codeListName: "Sex (1/2/9)",
+      isOrdered: false,
+      mode: "reference",
+    };
     render(
       <ColumnCodesContext.Provider value={new Map([["GENDER", codes]])}>
         <DataGrid

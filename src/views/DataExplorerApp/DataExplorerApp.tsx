@@ -172,7 +172,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     savableSql,
     queryResults?.columns,
   ]);
-  const columnCodes = useExplorerColumnCodes(projections);
+  const columnCodes = useExplorerColumnCodes(
+    projections,
+    queryResults?.columns,
+  );
   const schema = useQueryResultColumnBindings({
     scopeKey: `${workspace.id}:${columnBindingScope.current}`,
     sqlKey: savableSql ?? "",
