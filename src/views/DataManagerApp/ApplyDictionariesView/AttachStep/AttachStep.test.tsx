@@ -92,7 +92,14 @@ describe("AttachStep", () => {
     );
 
     expect(attachMock).toHaveBeenCalledWith([
-      { datasetColumnId: GENDER.id, ...PICK, mode: "reference" },
+      {
+        datasetColumnId: GENDER.id,
+        ...PICK,
+        mode: "reference",
+        keepsOriginal: false,
+        valueOverrides: [],
+        isPinned: false,
+      },
     ]);
   });
 

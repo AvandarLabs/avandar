@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  codePairsFromDBJson,
   codePairsToDBJson,
   DataDictionaryCodeListParsers,
 } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList.ts";
@@ -68,6 +69,15 @@ describe("DataDictionaryCodeListParsers", () => {
         accepted_spellings: ["F"],
         is_missing: false,
       },
+    ]);
+  });
+});
+
+describe("codePairsFromDBJson", () => {
+  it("reads stored pairs, the shape a binding pins too", () => {
+    expect(codePairsFromDBJson(DB_ROW.pairs)).toEqual([
+      { code: "1", label: "Male", acceptedSpellings: ["M"], isMissing: false },
+      { code: "9", label: "Unknown", acceptedSpellings: [], isMissing: true },
     ]);
   });
 });

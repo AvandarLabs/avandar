@@ -1,3 +1,4 @@
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
@@ -48,6 +49,14 @@ export type DatasetColumnRead = Model.Base<
 
     /** Description of the column. */
     description: string | undefined;
+
+    /**
+     * Set only on a `<column>_original` copy: the convert binding that keeps
+     * it. The copy reads the converted column's stored values, so its
+     * `originalName` is that column's, and removing the binding removes it.
+     * Optional so a column built in code may leave it out.
+     */
+    dictionaryBindingId?: DictionaryBinding.Id;
 
     /** Unique identifier of the dataset column */
     id: DatasetColumnId;

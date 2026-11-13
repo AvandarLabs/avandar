@@ -44,8 +44,12 @@ type StoredCodePair = z.infer<typeof StoredCodePairsSchema>[number];
 type ReadWithoutPairs = Omit<DataDictionaryCodeListModel["Read"], "pairs">;
 type DBReadWithoutPairs = Omit<DataDictionaryCodeListModel["DBRead"], "pairs">;
 
-/** Parses stored pairs, throwing when one is missing a field. */
-function _pairsFromJson(pairs: Json): CodePair[] {
+/**
+ * Parses pairs in the stored JSON shape, throwing when one is missing a
+ * field. Reads `data_dictionaries__code_lists.pairs` and a binding's
+ * `pinned_pairs`.
+ */
+export function codePairsFromDBJson(pairs: Json): CodePair[] {
   return StoredCodePairsSchema.parse(pairs).map((pair) => {
     return {
       code: pair.code,
@@ -95,7 +99,7 @@ export const DataDictionaryCodeListParsers =
         id: modelRow.id as DataDictionaryCodeListId,
         dictionaryId: modelRow.dictionaryId as DataDictionaryId,
         workspaceId: modelRow.workspaceId as Workspace.Id,
-        pairs: _pairsFromJson(pairs),
+        pairs: codePairsFromDBJson(pairs),
       });
     },
     fromModelInsertToDBInsert: (model) => {

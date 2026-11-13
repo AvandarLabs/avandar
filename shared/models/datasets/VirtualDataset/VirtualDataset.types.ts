@@ -34,6 +34,13 @@ export type VirtualDatasetRead = Model.Base<
      * datasets it may edit; every other reader treats it as a plain query.
      */
     isPlaces: boolean;
+
+    /**
+     * For a linked dataset, the dataset its `rawSql` reads and whose
+     * columns it converts. Undefined for any other virtual dataset, and
+     * once the source dataset is deleted.
+     */
+    linkedSourceDatasetId: DatasetId | undefined;
   }
 >;
 
@@ -49,7 +56,7 @@ export type VirtualDatasetModel = SupabaseCrudModelSpec<
       Read: VirtualDatasetRead;
       Insert: SetOptional<
         VirtualDatasetRead,
-        "id" | "createdAt" | "updatedAt" | "isPlaces"
+        "id" | "createdAt" | "updatedAt" | "isPlaces" | "linkedSourceDatasetId"
       >;
 
       Update: Partial<VirtualDatasetRead>;

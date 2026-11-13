@@ -47,7 +47,14 @@ export function AttachStep(props: Readonly<Props>): ReactNode {
     return props.flow.state.picks[binding.datasetColumnId] === undefined;
   }).length;
   const bindings = picked.map(({ column, pick }) => {
-    return { datasetColumnId: column.id, ...pick, mode: "reference" as const };
+    return {
+      datasetColumnId: column.id,
+      ...pick,
+      mode: "reference" as const,
+      keepsOriginal: false,
+      valueOverrides: [],
+      isPinned: false,
+    };
   });
   return (
     <>

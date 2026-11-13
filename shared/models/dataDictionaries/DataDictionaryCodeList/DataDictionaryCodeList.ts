@@ -6,6 +6,7 @@ import type {
 } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList.types.ts";
 
 export {
+  codePairsFromDBJson,
   codePairsToDBJson,
   DataDictionaryCodeListParsers,
 } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeListParsers.ts";
