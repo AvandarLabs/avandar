@@ -26,6 +26,7 @@ import { useCategorySplitChartInput } from "@/components/VisualizationContainer/
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { PluginMenuSlot } from "@/lib/plugins/PluginMenuSlot/PluginMenuSlot";
+import { ColumnCodesContext } from "@/lib/ui/viz/DataGridColumnTitle/ColumnCodesContext";
 import css from "@/views/DataExplorerApp/DataExplorerApp.module.css";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerSaveMenu } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu";
@@ -42,6 +43,7 @@ import { useDataExplorerPluginBridge } from "@/views/DataExplorerApp/useDataExpl
 import { useDataExplorerPluginContext } from "@/views/DataExplorerApp/useDataExplorerPluginContext/useDataExplorerPluginContext";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import { useExplorerColumnCodes } from "@/views/DataExplorerApp/useExplorerColumnCodes/useExplorerColumnCodes";
 import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -170,6 +172,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     savableSql,
     queryResults?.columns,
   ]);
+  const columnCodes = useExplorerColumnCodes(projections);
   const schema = useQueryResultColumnBindings({
     scopeKey: `${workspace.id}:${columnBindingScope.current}`,
     sqlKey: savableSql ?? "",
@@ -329,13 +332,15 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
             aria-hidden
           />
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
-          <VisualizationContainer
-            rawColumns={queryResults?.columns}
-            columns={chartInput.columns}
-            data={chartInput.data}
-            dateColumns={chartInput.dateColumns}
-            vizConfig={chartInput.vizConfig}
-          />
+          <ColumnCodesContext.Provider value={columnCodes}>
+            <VisualizationContainer
+              rawColumns={queryResults?.columns}
+              columns={chartInput.columns}
+              data={chartInput.data}
+              dateColumns={chartInput.dateColumns}
+              vizConfig={chartInput.vizConfig}
+            />
+          </ColumnCodesContext.Provider>
         </Box>
         <DataExplorerDrawer
           columns={queryResultColumns}
