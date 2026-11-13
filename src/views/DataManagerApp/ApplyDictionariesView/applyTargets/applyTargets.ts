@@ -27,10 +27,13 @@ export type ApplyTargets = {
     | { isAvailable: false; reason: LinkedUnavailableReason };
   inPlace:
     | { isAvailable: true; storage: UploadStorage }
+    | { isAvailable: false; reason: "not_an_upload"; storage: undefined }
     | {
         isAvailable: false;
-        reason: InPlaceUnavailableReason;
-        storage: UploadStorage | undefined;
+        reason: "has_linked_datasets";
+        storage: UploadStorage;
+        /** The first linked dataset reading this one, once its name loads. */
+        linkedDatasetName: string | undefined;
       };
   /** The dataset already holds conversions pinned in place. */
   isAlreadyConvertedInPlace: boolean;
@@ -61,6 +64,7 @@ function _getInPlace(
     sourceType: DatasetSource.SourceType;
     isInCloudStorage: boolean | undefined;
     hasLinkedDatasets: boolean;
+    linkedDatasetName: string | undefined;
   }>,
 ): ApplyTargets["inPlace"] {
   if (!UPLOAD_SOURCE_TYPES.has(options.sourceType)) {
@@ -68,15 +72,20 @@ function _getInPlace(
   }
   const storage = options.isInCloudStorage === false ? "offline" : "synced";
   return options.hasLinkedDatasets
-    ? { isAvailable: false, reason: "has_linked_datasets", storage }
+    ? {
+        isAvailable: false,
+        reason: "has_linked_datasets",
+        storage,
+        linkedDatasetName: options.linkedDatasetName,
+      }
     : { isAvailable: true, storage };
 }
 
 /**
  * Where a dataset's conversions can go: a new linked dataset (workspace
  * admins under the dataset limit), the dataset itself (uploads that no
- * linked dataset reads), or, for a linked dataset, its own live
- * conversions.
+ * linked dataset reads, naming `linkedDatasetName` when one does), or, for
+ * a linked dataset, its own live conversions.
  */
 export function getApplyTargets(
   options: Readonly<{
@@ -86,6 +95,7 @@ export function getApplyTargets(
     canCreateDatasets: boolean;
     isUnderDatasetLimit: boolean;
     hasLinkedDatasets: boolean;
+    linkedDatasetName: string | undefined;
     existingBindings: readonly DictionaryBinding.T[];
   }>,
 ): ApplyTargets {

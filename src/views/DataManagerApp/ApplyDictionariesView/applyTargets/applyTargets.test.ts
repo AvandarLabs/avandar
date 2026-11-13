@@ -15,6 +15,7 @@ const BASE = {
   canCreateDatasets: true,
   isUnderDatasetLimit: true,
   hasLinkedDatasets: false,
+  linkedDatasetName: undefined,
   existingBindings: [] as DictionaryBinding.T[],
 } as const;
 
@@ -113,11 +114,16 @@ describe("applyTargets", () => {
       storage: "offline",
     });
     expect(
-      getApplyTargets({ ...BASE, hasLinkedDatasets: true }).inPlace,
+      getApplyTargets({
+        ...BASE,
+        hasLinkedDatasets: true,
+        linkedDatasetName: "Bronx (labeled)",
+      }).inPlace,
     ).toEqual({
       isAvailable: false,
       reason: "has_linked_datasets",
       storage: "synced",
+      linkedDatasetName: "Bronx (labeled)",
     });
   });
 

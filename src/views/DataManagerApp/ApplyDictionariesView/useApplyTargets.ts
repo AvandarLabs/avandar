@@ -35,8 +35,9 @@ function useSourceFacts(dataset: Dataset.T): {
 
 /**
  * Where this dataset's conversions can be saved, or undefined while what
- * decides it loads: its source record, the linked datasets that read it,
- * who may add datasets, and the plan's dataset limit.
+ * decides it loads: its source record, the linked datasets that read it
+ * and the first one's name, who may add datasets, and the plan's dataset
+ * limit.
  */
 export function useApplyTargets(
   options: Readonly<{
@@ -52,8 +53,17 @@ export function useApplyTargets(
     ...where("linked_source_dataset_id", "eq", dataset.id),
     useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
   });
-  const isReady = !source.isLoading && linkedDatasets !== undefined;
+  const firstLinkedDatasetId = linkedDatasets?.[0]?.datasetId;
+  const [firstLinkedDataset, isLoadingLinkedName] = DatasetClient.useGetById({
+    id: firstLinkedDatasetId,
+    useQueryOptions: { enabled: firstLinkedDatasetId !== undefined },
+  });
+  const isReady =
+    !source.isLoading &&
+    linkedDatasets !== undefined &&
+    (firstLinkedDatasetId === undefined || !isLoadingLinkedName);
   const hasLinkedDatasets = (linkedDatasets?.length ?? 0) > 0;
+  const linkedDatasetName = firstLinkedDataset?.name;
   const { linkedSourceDatasetId, isInCloudStorage } = source;
   return useMemo(() => {
     return isReady
@@ -64,6 +74,7 @@ export function useApplyTargets(
           canCreateDatasets,
           isUnderDatasetLimit,
           hasLinkedDatasets,
+          linkedDatasetName,
           existingBindings,
         })
       : undefined;
@@ -75,6 +86,7 @@ export function useApplyTargets(
     canCreateDatasets,
     isUnderDatasetLimit,
     hasLinkedDatasets,
+    linkedDatasetName,
     existingBindings,
   ]);
 }

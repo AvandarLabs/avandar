@@ -27,7 +27,10 @@ function useDescription(
       : t`It is offline only, so nobody else is affected.`;
   }
   if (inPlace.reason === "has_linked_datasets") {
-    return t`A linked dataset reads ${datasetName}, so it can't be changed in place. Convert in the linked dataset instead.`;
+    const { linkedDatasetName } = inPlace;
+    return linkedDatasetName === undefined
+      ? t`A linked dataset reads this dataset, so converting it here would convert twice. Change the linked dataset instead.`
+      : t`${linkedDatasetName} reads this dataset, so converting it here would convert twice. Change the linked dataset instead.`;
   }
   return dataset.sourceType === "virtual"
     ? t`${datasetName} is built from other data, so a linked dataset is the only option.`

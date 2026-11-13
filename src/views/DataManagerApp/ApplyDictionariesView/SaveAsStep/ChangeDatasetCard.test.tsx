@@ -144,12 +144,13 @@ describe("Change <dataset>", () => {
     ).toBeInTheDocument();
   });
 
-  it("cannot change an upload a linked dataset reads", () => {
+  it("cannot change an upload a linked dataset reads, naming that dataset", () => {
     _render({
       inPlace: {
         isAvailable: false,
         reason: "has_linked_datasets",
         storage: "synced",
+        linkedDatasetName: "Bronx (labeled)",
       },
       state: { saveTarget: "linked" },
     });
@@ -159,7 +160,25 @@ describe("Change <dataset>", () => {
     ).toBeDisabled();
     expect(
       screen.getByText(
-        "A linked dataset reads Bronx line list, so it can't be changed in place. Convert in the linked dataset instead.",
+        "Bronx (labeled) reads this dataset, so converting it here would convert twice. Change the linked dataset instead.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says a linked dataset reads the upload when its name is unknown", () => {
+    _render({
+      inPlace: {
+        isAvailable: false,
+        reason: "has_linked_datasets",
+        storage: "synced",
+        linkedDatasetName: undefined,
+      },
+      state: { saveTarget: "linked" },
+    });
+
+    expect(
+      screen.getByText(
+        "A linked dataset reads this dataset, so converting it here would convert twice. Change the linked dataset instead.",
       ),
     ).toBeInTheDocument();
   });
