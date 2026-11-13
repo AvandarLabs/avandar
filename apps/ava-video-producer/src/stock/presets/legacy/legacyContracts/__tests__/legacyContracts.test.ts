@@ -45,6 +45,19 @@ const APPROVED_MARKUP_MOVES: Partial<
     ReadonlyArray<Readonly<{ from: string; to: string }>>
   >
 > = {
+  "data-pipeline": [
+    // Each stage's accent outline gains the explicit hairline, matched by the
+    // stage number that follows it because its opacity moves with progress.
+    ...[86, 306, 526, 746].map((x) => ({
+      from: `"></rect><text x="${x}" y="239"`,
+      to: `" stroke-width="1"></rect><text x="${x}" y="239"`,
+    })),
+    // Each stage icon's rim gains the explicit hairline once, in drawing order.
+    ...[0, 1, 2, 3].map(() => ({
+      from: 'stroke-opacity="0.35"></circle>',
+      to: 'stroke-opacity="0.35" stroke-width="1"></circle>',
+    })),
+  ],
   "node-traversal": [
     { from: '<text x="480" y="545"', to: '<text x="480" y="551"' },
   ],

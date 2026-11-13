@@ -249,6 +249,7 @@
     "RadialNetwork": { "defaultProps": { "spokeAlpha": "$atomic.opacity.30", "spokePulsePeriod": "$motion.pulse.period", "spokePulseSwing": 0.6, "hubRadius": 70, "hubStrokeAlpha": "$atomic.opacity.40", "hubStrokeWidth": "$stroke.hairline", "hubGlowRadius": 59, "hubGlowAlpha": "$atomic.opacity.3", "hubLabelOffset": -2, "hubDetailOffset": 22 } },
     "PlexusField": { "defaultProps": { "linkDistance": 148, "linkAlpha": 0.62, "linkWidth": "$atomic.strokeWidth.2xs" } },
     "OrbitalSystem": { "defaultProps": { "orbitAlpha": "$atomic.opacity.24", "orbitWidth": "$stroke.guide", "bodyRadius": 17, "bodyCoreRadius": 7, "bodyAlpha": "$atomic.opacity.24", "bodyStrokeWidth": "$stroke.hairline", "bodyLabelOffset": 27, "coreRadius": 49, "coreStrokeAlpha": "$atomic.opacity.70", "coreStrokeWidth": "$stroke.hairline", "pulsePeriod": "$motion.pulse.period", "pulseRadius": 71, "pulseSwing": 5, "pulseAlpha": "$atomic.opacity.3", "pulseStrokeAlpha": "$atomic.opacity.10", "pulseStrokeWidth": "$stroke.hairline" } },
+    "DataPipeline": { "defaultProps": { "activeTintAlpha": 0.04, "activeStrokeAlpha": 0.6, "activeStrokeWidth": "$stroke.hairline", "iconRadius": 25, "iconFillAlpha": "$atomic.opacity.8", "iconStrokeAlpha": 0.35, "iconStrokeWidth": "$stroke.hairline", "checkSize": 19, "dotRadius": 5, "trackHeight": 3, "packetPeriod": 64 } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,

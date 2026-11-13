@@ -472,6 +472,53 @@ const RADIAL_NETWORK_TOKENS = {
   ),
 } as const;
 
+const DATA_PIPELINE_TOKENS = {
+  activeTintAlpha: _alpha(
+    "Active stage tint",
+    "Opacity of the accent tint on a completed stage.",
+  ),
+  activeStrokeAlpha: _alpha(
+    "Active stage outline",
+    "Opacity of the accent outline on a completed stage.",
+  ),
+  activeStrokeWidth: _stroke(
+    "Active stage outline width",
+    "Width of the accent outline on a completed stage.",
+  ),
+  iconRadius: _length(
+    "Stage icon radius",
+    "Radius of the disc behind a stage's check.",
+  ),
+  iconFillAlpha: _alpha(
+    "Stage icon fill",
+    "Opacity of the disc behind a stage's check.",
+  ),
+  iconStrokeAlpha: _alpha(
+    "Stage icon rim",
+    "Opacity of the rim of the disc behind a stage's check.",
+  ),
+  iconStrokeWidth: _stroke(
+    "Stage icon rim width",
+    "Width of the rim of the disc behind a stage's check.",
+  ),
+  checkSize: _length(
+    "Stage check size",
+    "Size of the check on a completed stage.",
+  ),
+  dotRadius: _length(
+    "Stage dot radius",
+    "Radius of the dot on a stage that has not finished.",
+  ),
+  trackHeight: _length(
+    "Progress track height",
+    "Thickness of the pipeline's progress track.",
+  ),
+  packetPeriod: _duration(
+    "Pipeline packet period",
+    "Frames for a packet to cross between two stages.",
+  ),
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -484,6 +531,7 @@ export const COMPONENT_TOKENS = {
   RadialNetwork: RADIAL_NETWORK_TOKENS,
   PlexusField: PLEXUS_FIELD_TOKENS,
   OrbitalSystem: ORBITAL_SYSTEM_TOKENS,
+  DataPipeline: DATA_PIPELINE_TOKENS,
   ProgressBar: {
     height: token({
       kind: "length",
