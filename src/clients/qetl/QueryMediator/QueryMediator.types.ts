@@ -44,6 +44,16 @@ export type ColumnReplacement = {
   originalCopyDataType?: DuckDbDataType;
 };
 
+/**
+ * Each of a query's datasets' renames, casts, and conversions, and the key
+ * that names that projection, read from the dataset catalog before the
+ * query loads its relations.
+ */
+export type LoadedColumnReplacements = {
+  replacementsByDatasetId: Record<string, ColumnReplacement[]>;
+  projectionKeyByDatasetId: Record<string, string>;
+};
+
 /** A dataset paired with the source record that says how to fetch it. */
 export type RelationSource =
   | {
