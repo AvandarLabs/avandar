@@ -171,6 +171,8 @@ async function _relabelFemaleThenOpenLinked(
   await page.getByRole("tab", { name: /Code lists/ }).click();
   const codeLists = page.getByRole("tabpanel", { name: /Code lists/ });
   await codeLists.getByText("Sex (1/2)", { exact: true }).click();
+  // The editor names each label input by its row, and row 2 of the seeded
+  // list is code 2, Female.
   await codeLists.getByLabel("Label 2").fill("Woman");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByText("Dictionary saved")).toBeVisible({
@@ -186,6 +188,52 @@ async function _relabelFemaleThenOpenLinked(
     .filter({ has: linkedLink });
   await expect(linkedRow).toContainText("Linked");
   await linkedRow.getByRole("link", { name: linkedName, exact: true }).click();
+}
+
+/**
+ * Deletes every linked dataset that reads `datasetId`, then `datasetId`
+ * itself. Each deletion runs even when an earlier one fails.
+ */
+async function _deleteLinkedThenSource(
+  admin: AvaSupabaseDBClient,
+  options: Readonly<{ datasetId: string; workspaceId: string }>,
+): Promise<void> {
+  const { datasetId, workspaceId } = options;
+  try {
+    const { data: linked } = await admin
+      .from("datasets__virtual")
+      .select("dataset_id")
+      .eq("linked_source_dataset_id", datasetId)
+      .throwOnError();
+    await _deleteEach(admin, {
+      datasetIds: linked.map((row) => {
+        return row.dataset_id;
+      }),
+      workspaceId,
+    });
+  } finally {
+    await deleteDatasetFixture({ admin, datasetId, workspaceId });
+  }
+}
+
+/** Deletes each dataset, trying the rest when one fails, then rethrows. */
+async function _deleteEach(
+  admin: AvaSupabaseDBClient,
+  options: Readonly<{ datasetIds: readonly string[]; workspaceId: string }>,
+): Promise<void> {
+  const [firstId, ...restIds] = options.datasetIds;
+  if (firstId === undefined) {
+    return;
+  }
+  try {
+    await deleteDatasetFixture({
+      admin,
+      datasetId: firstId,
+      workspaceId: options.workspaceId,
+    });
+  } finally {
+    await _deleteEach(admin, { ...options, datasetIds: restIds });
+  }
 }
 
 /** The seeded dictionary, and the line list a test imports through the UI. */
@@ -231,26 +279,17 @@ const test = base.extend<{ lineList: LineListFixture }>({
     try {
       await use({ admin, signInAndImport });
     } finally {
-      if (datasetId) {
-        const { data: linked } = await admin
-          .from("datasets__virtual")
-          .select("dataset_id")
-          .eq("linked_source_dataset_id", datasetId)
-          .throwOnError();
-        for (const row of linked) {
-          await deleteDatasetFixture({
-            admin,
-            datasetId: row.dataset_id,
-            workspaceId,
-          });
+      try {
+        if (datasetId) {
+          await _deleteLinkedThenSource(admin, { datasetId, workspaceId });
         }
-        await deleteDatasetFixture({ admin, datasetId, workspaceId });
+      } finally {
+        await admin
+          .from("data_dictionaries")
+          .delete()
+          .eq("id", dictionaryId)
+          .throwOnError();
       }
-      await admin
-        .from("data_dictionaries")
-        .delete()
-        .eq("id", dictionaryId)
-        .throwOnError();
     }
   },
 });
