@@ -3,11 +3,16 @@ import { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/Dicti
 import {
   makeInitialSelection,
   pickDefaultsForColumns,
+  resolutionsFromBindings,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDefaults/applyDefaults";
 import {
   applyDictionariesReducer,
   makeInitialApplyState,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import {
+  getDefaultMode,
+  getDefaultSaveTarget,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyTargets/applyTargets";
 import { useDatasetProfiles } from "@/views/DataManagerApp/ApplyDictionariesView/useDatasetProfiles";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
@@ -17,6 +22,7 @@ import type {
   ApplyDictionariesAction,
   ApplyDictionariesState,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { ApplyTargets } from "@/views/DataManagerApp/ApplyDictionariesView/applyTargets/applyTargets";
 import type { ApplyDictionariesData } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyDictionariesData";
 import type { DatasetProfiles } from "@/views/DataManagerApp/ApplyDictionariesView/useDatasetProfiles";
 import type { Dispatch } from "react";
@@ -42,6 +48,8 @@ export type ApplyFlow = {
   addDictionary: (dictionaryId: DataDictionary.Id) => void;
   isMatching: boolean;
   hasReadFailed: boolean;
+  /** Where this dataset's conversions can go. Set once the flow is ready. */
+  targets: ApplyTargets | undefined;
 };
 
 function _buildRows(
@@ -101,13 +109,15 @@ function useColumnMatches(data: Readonly<ApplyDictionariesData>): {
 
 /**
  * The apply flow: reads the dataset's columns on the device, matches them
- * against every dictionary, opens with the default picks, and keeps the
- * user's choices. Used by the apply view.
+ * against every dictionary, opens with the default picks in the mode this
+ * dataset's targets allow, and keeps the user's choices. Used by the apply
+ * view.
  */
 export function useApplyFlow(
   options: Readonly<{
     data: ApplyDictionariesData;
     preselectedDictionaryId: DataDictionary.Id | undefined;
+    targets: ApplyTargets | undefined;
   }>,
 ): ApplyFlow {
   const { data } = options;
@@ -117,13 +127,15 @@ export function useApplyFlow(
     makeInitialApplyState,
   );
   const { read, profiles, matchesByColumnName } = useColumnMatches(data);
-  const isReady = read.status === "ready" && !data.isLoading;
+  const isReady =
+    read.status === "ready" && !data.isLoading && options.targets !== undefined;
   useOpenWithDefaults({
     data,
     matchesByColumnName,
     isReady,
     dispatch,
     preselectedDictionaryId: options.preselectedDictionaryId,
+    targets: options.targets,
   });
   const { rows, unmatchedRows } = useMemo(() => {
     return _buildRows(data, { state, profiles, matchesByColumnName });
@@ -144,6 +156,7 @@ export function useApplyFlow(
     addDictionary,
     isMatching: !isReady,
     hasReadFailed: read.status === "failed",
+    targets: options.targets,
   };
 }
 
@@ -155,19 +168,22 @@ function useOpenWithDefaults(
     isReady: boolean;
     preselectedDictionaryId: DataDictionary.Id | undefined;
     dispatch: Dispatch<ApplyDictionariesAction>;
+    targets: ApplyTargets | undefined;
   }>,
 ): void {
-  const { data, matchesByColumnName, isReady, dispatch } = options;
+  const { data, matchesByColumnName, isReady, dispatch, targets } = options;
   useEffect(() => {
-    if (!isReady) {
+    if (!isReady || !targets || !data.dataset) {
       return;
     }
+    const defaultMode = getDefaultMode(targets, data.dataset.sourceType);
     const selection = makeInitialSelection({
       columns: data.columns ?? [],
       matchesByColumnName,
       existingBindings: data.existingBindings,
       preselectedDictionaryId: options.preselectedDictionaryId,
       dictionaries: data.dictionaries,
+      defaultMode,
     });
     const firstColumn = (data.columns ?? []).find((column) => {
       return selection.picks[column.id] !== undefined;
@@ -177,12 +193,16 @@ function useOpenWithDefaults(
       type: "matches_ready",
       ...selection,
       selectedColumnId: firstColumn?.id,
+      defaultMode,
+      resolutions: resolutionsFromBindings(data.existingBindings),
+      saveTarget: getDefaultSaveTarget(targets),
     });
   }, [
     isReady,
     data,
     matchesByColumnName,
     options.preselectedDictionaryId,
+    targets,
     dispatch,
   ]);
 }
