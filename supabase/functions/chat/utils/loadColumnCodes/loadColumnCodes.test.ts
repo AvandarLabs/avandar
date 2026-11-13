@@ -2,12 +2,17 @@ import { loadColumnCodes } from "@sbfn/chat/utils/loadColumnCodes/loadColumnCode
 import { describe, expect, it } from "vitest";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
+/** Each `from` table and `select` string the fake client was asked for. */
+const queries: Array<{ table: string; select: string }> = [];
+
 /** A client whose bindings query answers `rows`, or fails. */
 function _createClient(
   answer: { rows: unknown[] } | { error: Error },
 ): AvaSupabaseClient {
+  let table = "";
   const chain = {
-    select: () => {
+    select: (columns: string) => {
+      queries.push({ table, select: columns });
       return chain;
     },
     eq: () => {
@@ -21,7 +26,8 @@ function _createClient(
     },
   };
   return {
-    from: () => {
+    from: (name: string) => {
+      table = name;
       return chain;
     },
   } as unknown as AvaSupabaseClient;
@@ -44,6 +50,23 @@ const BOUND_ROW = {
 };
 
 describe("loadColumnCodes", () => {
+  it("embeds the dictionary, entry, and code list through the binding's foreign keys", async () => {
+    queries.length = 0;
+
+    await loadColumnCodes({
+      supabaseClient: _createClient({ rows: [] }),
+      workspaceId: "workspace-1",
+    });
+
+    expect(queries).toEqual([
+      {
+        table: "dataset_columns__dictionary_bindings",
+        select:
+          "dataset_column_id, mode, direction, dictionary:data_dictionaries(id, name), entry:data_dictionaries__entries(id, name, description), code_list:data_dictionaries__code_lists(id, name, is_ordered, pairs)",
+      },
+    ]);
+  });
+
   it("reads each bound column's stored pairs", async () => {
     const codes = await loadColumnCodes({
       supabaseClient: _createClient({ rows: [BOUND_ROW] }),

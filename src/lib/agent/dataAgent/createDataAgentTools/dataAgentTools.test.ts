@@ -15,6 +15,33 @@ const ALIASES = SqlTableAlias.fromSchema({
   datasets: [{ id: DATASET_ID, name: "deaths.csv" }],
 });
 
+/** The deaths dataset with a GENDER column whose code list says 2=Female. */
+function _createCodedDatasets(direction: "decode" | "encode") {
+  return [
+    {
+      id: DATASET_ID,
+      name: "deaths.csv",
+      columns: [
+        {
+          name: "GENDER",
+          dataType: direction === "decode" ? "bigint" : "varchar",
+          codes: {
+            direction,
+            pairs: [
+              {
+                code: "2",
+                label: "Female",
+                acceptedSpellings: [],
+                isMissing: false,
+              },
+            ],
+          },
+        },
+      ],
+    },
+  ];
+}
+
 function _createHost(overrides: Partial<DataAgentHost> = {}): DataAgentHost {
   return {
     showQuery: vi.fn(),
@@ -209,6 +236,86 @@ describe("lookup_values", () => {
     );
     expect(host.readColumnValues).not.toHaveBeenCalled();
     expect(host.approveValuesForModel).not.toHaveBeenCalled();
+  });
+
+  it("sends only the value found in the data for approval when a code-list match comes back with it", async () => {
+    const state = createDataAgentRunState();
+    const host = _createHost({
+      readColumnValues: vi.fn().mockResolvedValue(["Male"]),
+    });
+    const tool = createLookupValuesTool({
+      host,
+      aliases: ALIASES,
+      datasets: _createCodedDatasets("decode"),
+      state,
+    });
+
+    const result = await tool.execute("call-1", {
+      table: "t0",
+      column: "GENDER",
+      values: [
+        { named: "female", forms: [] },
+        { named: "male", forms: ["Male"] },
+      ],
+      question: "Which of these are female and male?",
+    });
+
+    expect(host.approveValuesForModel).toHaveBeenCalledTimes(1);
+    expect(host.approveValuesForModel).toHaveBeenCalledWith({
+      values: ["Male"],
+      reason: "matched_lookup",
+    });
+    expect(state.valuesSentToModel).toEqual(["Male"]);
+    expect(_textOf(result)).toContain(
+      '"female" is stored as code 2 (Female in the column\'s code list).',
+    );
+    expect(_textOf(result)).toContain('"male" is stored as "Male"');
+  });
+
+  it("searches the data for a column that holds labels", async () => {
+    const state = createDataAgentRunState();
+    const host = _createHost({
+      readColumnValues: vi.fn().mockResolvedValue(["Female"]),
+    });
+    const tool = createLookupValuesTool({
+      host,
+      aliases: ALIASES,
+      datasets: _createCodedDatasets("encode"),
+      state,
+    });
+
+    const result = await tool.execute("call-1", {
+      table: "t0",
+      column: "GENDER",
+      values: [{ named: "female", forms: [] }],
+      question: "Which of these is female?",
+    });
+
+    expect(host.readColumnValues).toHaveBeenCalled();
+    expect(_textOf(result)).toContain('"female" is stored as "Female"');
+    expect(_textOf(result)).not.toContain("code list");
+  });
+
+  it("finds a padded, upper-case label in the code list", async () => {
+    const host = _createHost();
+    const tool = createLookupValuesTool({
+      host,
+      aliases: ALIASES,
+      datasets: _createCodedDatasets("decode"),
+      state: createDataAgentRunState(),
+    });
+
+    const result = await tool.execute("call-1", {
+      table: "t0",
+      column: "GENDER",
+      values: [{ named: "  FEMALE ", forms: [] }],
+      question: "Which of these is female?",
+    });
+
+    expect(_textOf(result)).toBe(
+      '"  FEMALE " is stored as code 2 (Female in the column\'s code list).',
+    );
+    expect(host.readColumnValues).not.toHaveBeenCalled();
   });
 
   it("refuses an alias that is not in the schema", async () => {
