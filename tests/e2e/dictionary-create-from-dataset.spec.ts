@@ -148,7 +148,10 @@ test.describe("learning a dictionary from a dataset", () => {
       await expect(
         page.getByRole("button", { name: `Stop using ${DICTIONARY_NAME}` }),
       ).toBeVisible({ timeout: LONG_WAIT });
-      await page.getByRole("button", { name: "Cancel" }).click();
+      const applyHeader = page.locator("header").filter({
+        has: page.getByRole("heading", { name: /^Apply dictionaries to / }),
+      });
+      await applyHeader.getByRole("button", { name: "Cancel" }).click();
       await page
         .getByRole("link", { name: DICTIONARY_NAME, exact: true })
         .click();

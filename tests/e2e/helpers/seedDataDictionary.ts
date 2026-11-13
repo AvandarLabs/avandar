@@ -1,20 +1,16 @@
+import { codePairsToDBJson } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
+import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-
-/** One code pair as `data_dictionaries__code_lists.pairs` stores it. */
-type StoredPair = {
-  code: string;
-  label: string;
-  accepted_spellings: string[];
-  is_missing: boolean;
-};
 
 /** One entry to seed, with the code list it uses, if any. */
 export type SeedEntry = {
   name: string;
   columnNames: readonly string[];
-  kind: "categorical" | "identifier";
+  kind: DataDictionaryEntry.Kind;
   description?: string;
-  codeList?: { name: string; pairs: readonly StoredPair[] };
+  codeList?: { name: string; pairs: readonly DataDictionaryCodeList.Pair[] };
 };
 
 async function _getOwnerProfile(
@@ -47,7 +43,7 @@ async function _seedEntry(
   }>,
 ): Promise<void> {
   const { admin, workspaceId, dictionaryId, entry } = options;
-  const { data: row } = await admin
+  const { data: entryRow } = await admin
     .from("data_dictionaries__entries")
     .insert({
       workspace_id: workspaceId,
@@ -64,13 +60,13 @@ async function _seedEntry(
   if (!entry.codeList) {
     return;
   }
-  const { data: list } = await admin
+  const { data: codeList } = await admin
     .from("data_dictionaries__code_lists")
     .insert({
       workspace_id: workspaceId,
       dictionary_id: dictionaryId,
       name: entry.codeList.name,
-      pairs: [...entry.codeList.pairs],
+      pairs: codePairsToDBJson(entry.codeList.pairs),
     })
     .select("id")
     .single()
@@ -80,8 +76,8 @@ async function _seedEntry(
     .insert({
       workspace_id: workspaceId,
       dictionary_id: dictionaryId,
-      entry_id: row.id,
-      code_list_id: list.id,
+      entry_id: entryRow.id,
+      code_list_id: codeList.id,
       is_primary: true,
     })
     .throwOnError();
@@ -100,7 +96,7 @@ export async function seedDataDictionary(
     name: string;
     entries: readonly SeedEntry[];
   }>,
-): Promise<string> {
+): Promise<DataDictionary.Id> {
   const { admin, workspaceId } = options;
   const owner = await _getOwnerProfile(admin, workspaceId);
   const { data: dictionary } = await admin
@@ -123,5 +119,5 @@ export async function seedDataDictionary(
       position,
     });
   }
-  return dictionary.id;
+  return dictionary.id as DataDictionary.Id;
 }

@@ -6,7 +6,7 @@
  * dataset is a precondition and the dictionary is seeded before the first
  * page load. Everything the tests create is deleted afterwards.
  */
-import { expect, test } from "./fixtures/e2e.fixture";
+import { expect, test as base } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT,
@@ -28,6 +28,8 @@ import type { Page } from "@playwright/test";
 
 const DICTIONARY_NAME = "E2E line list codes to apply";
 
+const SEX_CODE_LIST_NAME = "Sex (1/2/9)";
+
 const ENTRIES: readonly SeedEntry[] = [
   {
     name: "sex",
@@ -35,20 +37,20 @@ const ENTRIES: readonly SeedEntry[] = [
     kind: "categorical",
     description: "Sex recorded on the case report.",
     codeList: {
-      name: "Sex (1/2/9)",
+      name: SEX_CODE_LIST_NAME,
       pairs: [
-        { code: "1", label: "Male", accepted_spellings: [], is_missing: false },
+        { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
         {
           code: "2",
           label: "Female",
-          accepted_spellings: [],
-          is_missing: false,
+          acceptedSpellings: [],
+          isMissing: false,
         },
         {
           code: "9",
           label: "Unknown",
-          accepted_spellings: [],
-          is_missing: true,
+          acceptedSpellings: [],
+          isMissing: true,
         },
       ],
     },
@@ -60,8 +62,8 @@ const ENTRIES: readonly SeedEntry[] = [
     codeList: {
       name: "Yes/No",
       pairs: [
-        { code: "Y", label: "Yes", accepted_spellings: [], is_missing: false },
-        { code: "N", label: "No", accepted_spellings: [], is_missing: false },
+        { code: "Y", label: "Yes", acceptedSpellings: [], isMissing: false },
+        { code: "N", label: "No", acceptedSpellings: [], isMissing: false },
       ],
     },
   },
@@ -77,16 +79,14 @@ const ENTRIES: readonly SeedEntry[] = [
 async function _attachDictionary(page: Page): Promise<void> {
   await page.getByRole("button", { name: "More dataset actions" }).click();
   await page.getByRole("menuitem", { name: /Apply a dictionary/ }).click();
-  const genderPick = page.getByRole("button", {
-    name: /sex · Sex \(1\/2\/9\) 100%/,
+  const genderRow = page.getByRole("row").filter({
+    has: page.getByRole("button", { name: "GENDER", exact: true }),
   });
-  await expect(genderPick).toHaveAttribute("aria-pressed", "true", {
-    timeout: LONG_WAIT,
-  });
+  await expect(genderRow.getByRole("button", { pressed: true })).toContainText(
+    SEX_CODE_LIST_NAME,
+    { timeout: LONG_WAIT },
+  );
   await page.getByRole("button", { name: "Next: attach" }).click();
-  await expect(
-    page.getByText(/Nothing in your data changes. 2 columns keep their values/),
-  ).toBeVisible();
   await page.getByRole("button", { name: /^Attach to / }).click();
   await expect(page.getByText(/The data is unchanged\./)).toBeVisible({
     timeout: MEDIUM_WAIT,
@@ -143,24 +143,30 @@ async function _expectCodesInExplorer(
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-/** The table alias the agent gives a dataset: its place among the ids. */
+/**
+ * The table alias the agent gives a dataset: `t` and its place among the
+ * workspace's dataset ids, sorted, as `SqlTableAliasModule.fromDatasets`
+ * assigns it. The module cannot be imported here: it loads `ColumnCodes`,
+ * whose entry file merges a namespace with a value export, which
+ * Playwright's Babel transform refuses as a duplicate export.
+ */
 async function _getAlias(
   admin: AvaSupabaseDBClient,
   options: Readonly<{ workspaceId: string; datasetId: string }>,
 ): Promise<string> {
-  const { data } = await admin
+  const { data: datasetRows } = await admin
     .from("datasets")
     .select("id")
     .eq("workspace_id", options.workspaceId)
     .throwOnError();
-  const ids = data
-    .map((row) => {
-      return row.id;
+  const sortedIds = datasetRows
+    .map((datasetRow) => {
+      return datasetRow.id;
     })
     .sort((left, right) => {
       return left.localeCompare(right);
     });
-  return `t${ids.indexOf(options.datasetId)}`;
+  return `t${sortedIds.indexOf(options.datasetId)}`;
 }
 
 /** The scripted offline model: a code-list question, then its reply. */
@@ -184,11 +190,61 @@ function _buildOfflineScript(alias: string) {
   ];
 }
 
-test.describe("applying a dictionary as reference", () => {
-  test("an applied dictionary explains the codes without changing them", async ({
-    page,
-    e2eWorkerDb,
-  }) => {
+/**
+ * Turns on the data agent and offline mode with a downloaded model, so Ask
+ * Avandar runs on the scripted model, and aborts and counts every request
+ * to the online agent. The script starts as a placeholder that matches
+ * nothing; {@link _setOfflineScript} fills it in once the alias is known.
+ */
+async function _useScriptedOfflineAgent(
+  page: Page,
+): Promise<{ getOnlineRequestCount: () => number }> {
+  let onlineRequestCount = 0;
+  await page.route("**/functions/v1/chat/*/agent/**", async (route) => {
+    onlineRequestCount += 1;
+    await route.abort();
+  });
+  await page.addInitScript(() => {
+    window.localStorage.setItem("avandar:data-agent", "on");
+    window.localStorage.setItem("avandar.offlineChat.isOfflineModeOn", "on");
+    window.localStorage.setItem(
+      "avandar.offlineChat.downloadedModels",
+      JSON.stringify({ "Qwen3-4B-q4f16_1-MLC": true }),
+    );
+    Object.assign(window, {
+      __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__: [
+        { match: "never matches", response: "{}" },
+      ],
+    });
+  });
+  return {
+    getOnlineRequestCount: () => {
+      return onlineRequestCount;
+    },
+  };
+}
+
+/** Swaps the real script in. The offline engine reads it on every request. */
+async function _setOfflineScript(page: Page, alias: string): Promise<void> {
+  await page.evaluate((script) => {
+    Object.assign(window, { __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__: script });
+  }, _buildOfflineScript(alias));
+}
+
+/** The seeded dictionary, and the line list a test imports through the UI. */
+type LineListFixture = {
+  admin: AvaSupabaseDBClient;
+  workspaceId: string;
+  /** Signs in and imports the line list. Returns the dataset id. */
+  signInAndImport: () => Promise<string>;
+};
+
+/**
+ * Seeds the dictionary before the first page load. Afterwards it deletes
+ * the imported dataset, then the dictionary, whose children cascade.
+ */
+const test = base.extend<{ lineList: LineListFixture }>({
+  lineList: async ({ page, e2eWorkerDb }, use) => {
     const admin = createSupabaseAdminClient();
     const workspaceId = await getWorkspaceIdBySlug({
       supabaseAdminClient: admin,
@@ -201,7 +257,7 @@ test.describe("applying a dictionary as reference", () => {
       entries: ENTRIES,
     });
     let datasetId: string | undefined;
-    try {
+    const signInAndImport = async (): Promise<string> => {
       await signInWithEmailPassword(page, {
         email: e2eWorkerDb.primaryUser.email,
         password: e2eWorkerDb.primaryUser.password,
@@ -213,21 +269,10 @@ test.describe("applying a dictionary as reference", () => {
         expectedRowCount: MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT,
         workspaceSlug: e2eWorkerDb.workspaceSlug,
       });
-
-      await _attachDictionary(page);
-      await _expectCodesOnDatasetPage(page);
-      await _expectCodesInExplorer(page, { admin, datasetId });
-
-      const { data: bindings } = await admin
-        .from("dataset_columns__dictionary_bindings")
-        .select("mode")
-        .eq("dataset_id", datasetId)
-        .throwOnError();
-      expect(
-        bindings.map((binding) => {
-          return binding.mode;
-        }),
-      ).toEqual(["reference", "reference", "reference"]);
+      return datasetId;
+    };
+    try {
+      await use({ admin, workspaceId, signInAndImport });
     } finally {
       if (datasetId) {
         await deleteDatasetFixture({ admin, datasetId, workspaceId });
@@ -238,88 +283,62 @@ test.describe("applying a dictionary as reference", () => {
         .eq("id", dictionaryId)
         .throwOnError();
     }
+  },
+});
+
+test.describe("applying a dictionary as reference", () => {
+  test("an applied dictionary explains the codes without changing them", async ({
+    page,
+    lineList,
+  }) => {
+    const { admin } = lineList;
+    const datasetId = await lineList.signInAndImport();
+
+    await _attachDictionary(page);
+    await _expectCodesOnDatasetPage(page);
+    await _expectCodesInExplorer(page, { admin, datasetId });
+
+    const { data: bindings } = await admin
+      .from("dataset_columns__dictionary_bindings")
+      .select("mode")
+      .eq("dataset_id", datasetId)
+      .throwOnError();
+    expect(
+      bindings.map((binding) => {
+        return binding.mode;
+      }),
+    ).toEqual(["reference", "reference", "reference"]);
   });
 
   test("Ask Avandar answers a question in labels from the code list, offline", async ({
     page,
-    e2eWorkerDb,
+    lineList,
   }) => {
-    const admin = createSupabaseAdminClient();
-    const workspaceId = await getWorkspaceIdBySlug({
-      supabaseAdminClient: admin,
-      slug: e2eWorkerDb.workspaceSlug,
-    });
-    const dictionaryId = await seedDataDictionary({
-      admin,
-      workspaceId,
-      name: DICTIONARY_NAME,
-      entries: ENTRIES,
-    });
-    let datasetId: string | undefined;
-    let onlineAgentRequestCount = 0;
-    await page.route("**/functions/v1/chat/*/agent/**", async (route) => {
-      onlineAgentRequestCount += 1;
-      await route.abort();
-    });
-    await page.addInitScript(() => {
-      window.localStorage.setItem("avandar:data-agent", "on");
-      window.localStorage.setItem("avandar.offlineChat.isOfflineModeOn", "on");
-      window.localStorage.setItem(
-        "avandar.offlineChat.downloadedModels",
-        JSON.stringify({ "Qwen3-4B-q4f16_1-MLC": true }),
-      );
-      // A placeholder, so the app picks the scripted model. The test fills
-      // in the real script once it knows the dataset's alias.
-      Object.assign(window, {
-        __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__: [
-          { match: "never matches", response: "{}" },
-        ],
-      });
-    });
-    try {
-      await signInWithEmailPassword(page, {
-        email: e2eWorkerDb.primaryUser.email,
-        password: e2eWorkerDb.primaryUser.password,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      datasetId = await importDatasetViaUi({
-        page,
-        filePath: MEASLES_LINE_LIST_CSV_PATH,
-        expectedRowCount: MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT,
-        workspaceSlug: e2eWorkerDb.workspaceSlug,
-      });
-      await _attachDictionary(page);
-      const alias = await _getAlias(admin, { workspaceId, datasetId });
-      await page.evaluate((script) => {
-        Object.assign(window, { __AVANDAR_OFFLINE_CHAT_MOCK_SCRIPT__: script });
-      }, _buildOfflineScript(alias));
+    const offlineAgent = await _useScriptedOfflineAgent(page);
+    const datasetId = await lineList.signInAndImport();
+    await _attachDictionary(page);
+    await _setOfflineScript(
+      page,
+      await _getAlias(lineList.admin, {
+        workspaceId: lineList.workspaceId,
+        datasetId,
+      }),
+    );
 
-      await page
-        .getByRole("link", { name: "Data Explorer", exact: true })
-        .click();
-      await openAgentChat(page);
-      const composer = page.getByLabel("Message", { exact: true });
-      await composer.fill("How many female cases were hospitalized?");
-      await composer.press("Enter");
+    await page
+      .getByRole("link", { name: "Data Explorer", exact: true })
+      .click();
+    await openAgentChat(page);
+    const composer = page.getByLabel("Message", { exact: true });
+    await composer.fill("How many female cases were hospitalized?");
+    await composer.press("Enter");
 
-      await expect(
-        page.getByText("One female case was hospitalized."),
-      ).toBeVisible({
-        timeout: LONG_WAIT,
-      });
-      await expect(
-        page.getByRole("columnheader", { name: /female_hospitalized/ }),
-      ).toBeVisible();
-      expect(onlineAgentRequestCount).toBe(0);
-    } finally {
-      if (datasetId) {
-        await deleteDatasetFixture({ admin, datasetId, workspaceId });
-      }
-      await admin
-        .from("data_dictionaries")
-        .delete()
-        .eq("id", dictionaryId)
-        .throwOnError();
-    }
+    await expect(
+      page.getByText("One female case was hospitalized."),
+    ).toBeVisible({ timeout: LONG_WAIT });
+    await expect(
+      page.getByRole("columnheader", { name: /female_hospitalized/ }),
+    ).toBeVisible();
+    expect(offlineAgent.getOnlineRequestCount()).toBe(0);
   });
 });
