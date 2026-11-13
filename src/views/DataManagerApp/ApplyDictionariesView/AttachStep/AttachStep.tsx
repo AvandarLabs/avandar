@@ -102,6 +102,7 @@ export function AttachStep(props: Readonly<Props>): ReactNode {
         pickedCount={picked.length}
         removedCount={removedCount}
         isAttaching={isAttaching}
+        isReadingValues={props.flow.unmatched.status === "reading"}
         onBack={() => {
           props.flow.dispatch({ type: "go_to_step", step: "unmatched" });
         }}

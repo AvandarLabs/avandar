@@ -15,7 +15,11 @@ import type { ApplySaveRequest } from "@/views/DataManagerApp/ApplyDictionariesV
 import type { UnmatchedValues } from "@/views/DataManagerApp/ApplyDictionariesView/useUnmatchedValues";
 
 /** Why the primary button is disabled. */
-export type SaveBlocker = "no_target" | "no_name" | "needs_confirmation";
+export type SaveBlocker =
+  | "no_target"
+  | "reading_values"
+  | "no_name"
+  | "needs_confirmation";
 
 /** What saving does to one column, for the summary table. */
 export type WhatHappens =
@@ -68,20 +72,25 @@ export function buildSaveRequest(
 }
 
 /**
- * Why the request cannot be saved yet: no target chosen, a linked dataset
- * with no name, or a synced upload changed in place without the
- * confirmation ticked.
+ * Why the request cannot be saved yet: no target chosen, the unmatched
+ * values still being read (until then overrides only know each value's
+ * lowercased key, not its stored text), a linked dataset with no name, or
+ * a synced upload changed in place without the confirmation ticked.
  */
 export function getSaveBlocker(
   options: Readonly<{
     request: ApplySaveRequest | undefined;
     targets: ApplyTargets | undefined;
     hasConfirmedWorkspaceChange: boolean;
+    unmatched: UnmatchedValues;
   }>,
 ): SaveBlocker | undefined {
   const { request } = options;
   if (!request) {
     return "no_target";
+  }
+  if (options.unmatched.status === "reading") {
+    return "reading_values";
   }
   if (request.kind === "linked" && request.linkedDatasetName.trim() === "") {
     return "no_name";

@@ -147,6 +147,7 @@ function ConvertingSave(props: Readonly<Props>): ReactNode {
     request,
     targets,
     hasConfirmedWorkspaceChange: state.hasConfirmedWorkspaceChange,
+    unmatched: flow.unmatched,
   });
   const label = useSaveLabel(dataset.name, request);
   const [save, isSaving] = useSaveApply(dataset);

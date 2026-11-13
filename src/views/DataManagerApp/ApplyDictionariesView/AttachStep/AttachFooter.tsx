@@ -9,6 +9,8 @@ type Props = {
   pickedCount: number;
   removedCount: number;
   isAttaching: boolean;
+  /** The unmatched values are still being read, so nothing can be sent. */
+  isReadingValues: boolean;
   onBack: () => void;
   onAttach: () => void;
 };
@@ -33,7 +35,10 @@ export function AttachFooter(props: Readonly<Props>): ReactNode {
       <OfflineGated>
         <Button
           loading={props.isAttaching}
-          disabled={props.pickedCount === 0 && props.removedCount === 0}
+          disabled={
+            props.isReadingValues ||
+            (props.pickedCount === 0 && props.removedCount === 0)
+          }
           onClick={props.onAttach}
         >
           {isRemovingOnly

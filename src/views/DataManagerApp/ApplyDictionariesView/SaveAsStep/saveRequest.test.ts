@@ -70,6 +70,7 @@ describe("saveRequest", () => {
     const base = {
       targets: LINKED_ONLY_TARGETS,
       hasConfirmedWorkspaceChange: false,
+      unmatched: UNMATCHED,
     };
     const linked = buildSaveRequest({
       state: STATE,
@@ -89,9 +90,26 @@ describe("saveRequest", () => {
           inPlace: { isAvailable: true, storage: "synced" },
         },
         hasConfirmedWorkspaceChange: false,
+        unmatched: UNMATCHED,
         request: { kind: "in_place", bindings: [], addedPairs: [] },
       }),
     ).toBe("needs_confirmation");
+  });
+
+  it("blocks saving while the unmatched values are still being read", () => {
+    expect(
+      getSaveBlocker({
+        targets: LINKED_ONLY_TARGETS,
+        hasConfirmedWorkspaceChange: false,
+        unmatched: { status: "reading" },
+        request: {
+          kind: "linked",
+          linkedDatasetName: "Bronx (labeled)",
+          bindings: [],
+          addedPairs: [],
+        },
+      }),
+    ).toBe("reading_values");
   });
 
   it("says what happens to each column, including one going back to its values", () => {
