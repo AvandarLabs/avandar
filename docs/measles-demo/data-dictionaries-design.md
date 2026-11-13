@@ -226,6 +226,13 @@ and crosswalks pick the coding whose codes fit the data (section 8.2), so the
 A binding with no `entry_id` and no `pinned_pairs` is inert: the UI shows it
 as "This dictionary entry was deleted" and nothing converts.
 
+Slice 3 creates the table without `keeps_original`, `value_overrides`, and
+`pinned_pairs`, which only a convert binding uses. Slice 4 adds them with
+conversions: each is nullable or has a default, so adding them needs no
+destructive migration. Bindings are select-only for signed-in users and are
+written whole, per dataset, by `rpc_dataset_columns__apply_dictionaries`
+(section 11).
+
 `dataset_columns` gains `dictionary_binding_id uuid null` (`on delete
 cascade`): set on the `<column>_original` copy that a convert binding adds, so
 removing the binding removes the copy.
@@ -758,7 +765,7 @@ the list explains the labels the model sees.
 | Path | File | Change |
 |---|---|---|
 | Legacy online `PostChatMessages` and the offline multi-pass pipeline | `shared/models/chat/SqlTableAlias/SqlTableAliasModule.ts` (`_formatAliasLine`) | Bound columns render `GENDER [1=Male, 2=Female, 9=Unknown]`, the same pattern as `_buildStatusFields`. `fetchWorkspaceSchema.ts` and `fetchOfflineChatSchema.ts` load bindings and code lists. |
-| Pi data agent, online and in browser | `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` (`_formatDatasetLine`), `loadDataAgentDatasets.ts` | `GENDER int codes 1=Male, 2=Female, 9=Unknown`. A new prompt version, `data-agent-v4`, since shipped versions are frozen. |
+| Pi data agent, online and in browser | `shared/agent/dataAgent/buildDataAgentSystemPrompt.ts` (`_formatDatasetLine`), `loadDataAgentDatasets.ts` | The dataset's column line is unchanged, and each bound column gets a line of its own under it: `  - GENDER: codes 1=Male, 2=Female, 9=Unknown (missing). Sex recorded on the case report.` A column of labels reads `values Male, Female`, and a code with no label reads `9=(no label)`. A separate line keeps the codes' commas apart from the commas between columns. A new prompt version, `data-agent-v4`, since shipped versions are frozen. |
 | Offline data agent | `profileOfflineDatasets.ts`, `buildOfflineDataAgentSystemPrompt.ts`, `findQuestionValues.ts` | A bound integer column lists its code list instead of nothing. `findQuestionValues` also searches labels and accepted spellings, so "female" adds `GENDER = 2` to `VALUES IN THE QUESTION`. |
 | `lookup_values` tool | `lookupValuesTool.ts` | Searches code list labels as well as stored text values, returning the code to filter on. |
 
@@ -784,7 +791,7 @@ so that change needs no data migration.
 |---|---|---|---|
 | `data_dictionaries` and its children | `util__auth_user_meets_min_app_role(workspace_id, 'data_sources', 'viewer')` | `... 'editor'` | owner, or `'admin'` |
 | `crosswalks` and its children | same | same | same |
-| `dataset_columns__dictionary_bindings` | `util__auth_user_can_access_resource('dataset', dataset_id, 'viewer')` | `... 'editor'` | `... 'editor'` |
+| `dataset_columns__dictionary_bindings` | `util__auth_user_can_access_resource('dataset', dataset_id, 'viewer')` | None for signed-in users: `rpc_dataset_columns__apply_dictionaries` writes a dataset's bindings whole after checking `... 'editor'` on the dataset and Data Sources viewer | Same as insert |
 
 - A linked dataset and a combined dataset are ordinary `datasets` rows owned
   by their creator, with the usual dataset permissions. Creating one needs
@@ -851,6 +858,7 @@ reference" to mean "look it up, don't change it".
 | A pair is removed from a live code list | Linked datasets show the raw value for it from the next load. Pinned datasets are unaffected. |
 | A dictionary is deleted | A trigger copies the current pairs into `pinned_pairs` for every live convert binding first, so no linked dataset changes silently. Reference bindings are removed. The delete confirm names the number of datasets affected. |
 | An entry is deleted | Same as above, scoped to the entry. |
+| A code list a binding uses is deleted | The binding keeps its entry, so the column keeps the entry's description, and shows no code list until a dictionary is applied again. A save can delete a list the binding used before the save adds the entry's new one, so the binding cannot follow it. |
 | The source of a linked dataset is deleted | Existing behavior for virtual datasets with a missing dependency. `linked_source_dataset_id` becomes null. |
 | Two bindings for one column | Prevented by the unique `dataset_column_id`. Applying again replaces the binding. |
 | A column renamed after binding | Bindings use `dataset_column_id`, so they follow the rename. |
