@@ -64,7 +64,7 @@ export function ModeSwitch({
           label={t`Apply conversions`}
           tooltip={copy.convertUnavailable ?? copy.convertTooltip}
           isSelected={mode === "convert"}
-          isLocked={copy.convertUnavailable !== undefined}
+          isLocked={copy.convertUnavailable !== undefined && mode !== "convert"}
           onSelect={() => {
             onChange("convert");
           }}

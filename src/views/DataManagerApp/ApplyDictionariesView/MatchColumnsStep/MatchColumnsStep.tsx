@@ -2,8 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Stack } from "@mantine/core";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { ColumnPane } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane";
-import { ConvertAllControls } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ConvertAllControls";
-import { DictionaryChips } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/DictionaryChips";
+import { MatchColumnsChips } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsChips";
 import { MatchColumnsFooter } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsFooter";
 import css from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsStep.module.css";
 import { NoDictionaryInUse } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/NoDictionaryInUse";
@@ -47,6 +46,13 @@ function _getDictionariesInUse(props: Readonly<Props>): DataDictionary.T[] {
     });
     return dictionary ? [dictionary] : [];
   });
+}
+
+/** The rows the table shows: matched ones, then unmatched when shown. */
+function _getShownRows(flow: ApplyFlow): readonly ApplyColumnRow[] {
+  return flow.state.isShowingUnmatched
+    ? [...flow.rows, ...flow.unmatchedRows]
+    : flow.rows;
 }
 
 /** The pairing table, or the empty state, and the unmatched toggle. */
@@ -120,9 +126,7 @@ function SelectedColumnPane(
 export function MatchColumnsStep(props: Readonly<Props>): ReactNode {
   const { state, dispatch } = props.flow;
   const inUse = _getDictionariesInUse(props);
-  const rows = state.isShowingUnmatched
-    ? [...props.flow.rows, ...props.flow.unmatchedRows]
-    : props.flow.rows;
+  const rows = _getShownRows(props.flow);
   const selected = rows.find((row) => {
     return row.column.id === state.selectedColumnId;
   });
@@ -132,20 +136,10 @@ export function MatchColumnsStep(props: Readonly<Props>): ReactNode {
   });
   return (
     <>
-      <DictionaryChips
-        dictionaryIds={state.dictionaryIds ?? []}
+      <MatchColumnsChips
+        flow={props.flow}
         dictionaries={props.dictionaries}
-        onAdd={props.flow.addDictionary}
-        onRemove={(dictionaryId) => {
-          dispatch({ type: "remove_dictionary", dictionaryId });
-        }}
-        end={
-          <ConvertAllControls
-            picks={state.picks}
-            copy={copy}
-            dispatch={dispatch}
-          />
-        }
+        copy={copy}
       />
       <AppViewBody
         className={css.matchColumnsBody}
