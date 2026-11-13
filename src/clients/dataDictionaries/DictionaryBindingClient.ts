@@ -1,6 +1,7 @@
 import { DictionaryBindingParsers } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -46,6 +47,8 @@ function _toRpcArgs(request: ApplyRequest) {
  * dataset's bindings whole in one call: `applyToDataset` in place, and
  * `applyAsLinkedDataset` through a new linked dataset. Bindings are never
  * written row by row, so a dataset never holds half of an apply.
+ * `reapplyDictionary` re-pins a dataset converted in place to a
+ * dictionary's current version.
  */
 export const DictionaryBindingClient = createUsableServiceClient(
   createRdbCrudClient({
@@ -107,10 +110,36 @@ export const DictionaryBindingClient = createUsableServiceClient(
             .throwOnError();
           return data as Dataset.Id;
         },
+
+        /**
+         * Re-pins one dictionary's pinned bindings on one dataset to the
+         * current pairs and version, and returns how many it re-pinned. A
+         * refusal rejects with the RPC's `hint`.
+         */
+        reapplyDictionary: async (
+          options: Readonly<{
+            datasetId: Dataset.Id;
+            dictionaryId: DataDictionary.Id;
+          }>,
+        ): Promise<number> => {
+          const logger = clientLogger.appendName("reapplyDictionary");
+          logger.log("Re-applying a dictionary", options);
+          const { data } = await dbClient
+            .rpc("rpc_dataset_columns__reapply_dictionary", {
+              p_dataset_id: options.datasetId,
+              p_dictionary_id: options.dictionaryId,
+            })
+            .throwOnError();
+          return data;
+        },
       };
     },
   }),
   {
-    mutationFns: ["applyToDataset", "applyAsLinkedDataset"],
+    mutationFns: [
+      "applyToDataset",
+      "applyAsLinkedDataset",
+      "reapplyDictionary",
+    ],
   },
 );
