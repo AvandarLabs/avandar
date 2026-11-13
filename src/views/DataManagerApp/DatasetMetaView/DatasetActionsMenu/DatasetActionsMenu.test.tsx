@@ -13,6 +13,7 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       canEditDataset: true,
       hasBindings: false,
       hasBindingsError: false,
+      isLoadingLinkedDatasets: false,
     },
   };
 });
@@ -84,7 +85,10 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
 vi.mock("@/hooks/datasets/useLinkedDatasets/useLinkedDatasets", () => {
   return {
     useLinkedDatasets: () => {
-      return { linkedDatasets: [], isLoading: false };
+      return {
+        linkedDatasets: [],
+        isLoading: permissionState.isLoadingLinkedDatasets,
+      };
     },
   };
 });
@@ -124,6 +128,7 @@ describe("DatasetActionsMenu", () => {
     permissionState.canEditDataset = true;
     permissionState.hasBindings = false;
     permissionState.hasBindingsError = false;
+    permissionState.isLoadingLinkedDatasets = false;
   });
 
   it("opens learning a dictionary from this dataset", async () => {
@@ -229,5 +234,17 @@ describe("DatasetActionsMenu", () => {
         name: /Create a dictionary from this dataset/,
       }),
     ).toBeNull();
+  });
+
+  it("keeps Delete disabled until the linked datasets are known", async () => {
+    permissionState.isLoadingLinkedDatasets = true;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
+    ).toBeDisabled();
   });
 });

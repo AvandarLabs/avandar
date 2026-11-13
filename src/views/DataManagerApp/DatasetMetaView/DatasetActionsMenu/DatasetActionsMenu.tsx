@@ -33,7 +33,8 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const { linkedDatasets } = useLinkedDatasets(dataset.id);
+  const { linkedDatasets, isLoading: isLoadingLinkedDatasets } =
+    useLinkedDatasets(dataset.id);
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
@@ -87,6 +88,8 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
         <Menu.Item
           color="danger"
           leftSection={<IconTrash size={16} />}
+          // The confirmation names the linked datasets, so it waits for them.
+          disabled={isLoadingLinkedDatasets}
           onClick={onDelete}
         >
           <Trans>Delete Dataset</Trans>
