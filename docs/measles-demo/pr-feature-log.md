@@ -185,6 +185,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F129 | Data dictionaries: entries and reusable two-way code lists under Data Sources | not started | none | |
 | F130 | Learn a data dictionary from datasets: profiling, matching, and suggested labels online and offline | not started | F129 | |
 | F131 | Apply a dictionary to a dataset as reference: code lists on the dataset page, in the Data Explorer, and in Ask Avandar online and offline | not started | F129, F130 | |
+| F132 | Data dictionary follow-ups: entry descriptions in the Description column, only editable datasets in Apply to a dataset, and tags on grouped SQL results | not started | F131 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -323,6 +324,7 @@ API. It's new work, not something this branch built.
 | any | F129 | Adds its own tables, models, clients, route, and view, so it can merge first. It edits `DataManagerApp.tsx`, `DatasetNavbar.tsx`, and the generated schema files, so take only its hunks if F20 or F121 landed first. |
 | after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. Changes the save RPC's pair check (migration). Deploy the migration, then the `chat` edge function, then the frontend. |
 | after F130 | F131 | Builds on F129's tables and Dictionary view and F130's profiling, create flow, and dataset menu item. Adds the bindings table and the apply RPC (migration) and prompt `data-agent-v5`, which is the plugin AI tools' `data-agent-v4` plus the coded-column rules. Deploy the migration, then the `chat` edge function (it serves v5 and reads bindings, and the new frontend asks for v5), then the frontend. |
+| after F131 | F132 | Builds on F131's bound-column name, Apply to a dataset dialog, and Data Explorer tags. Adds `rpc_datasets__get_editable_ids` (migration). Deploy the migration, then the frontend: the new dialog calls the RPC. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -425,7 +427,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
 | `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
-| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. |
+| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. |
 
 ### Joined cases (F69 to F76)
 
@@ -647,12 +649,12 @@ Take only your feature's hunks from these files. The last feature in the
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
 
-### Data dictionaries (F129 to F131)
+### Data dictionaries (F129 to F132)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
 | `src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx` | Postgres branch, F21, F24, F131 | Postgres branch: the `postgres_table` source labels (`a0b8f1646`, `20a52c7cc`). F21: the shared source labels (`af925c7e6`). F24: the catalog preview (`d8a72da58`). F131: `useDatasetColumnCodes` and the codes passed to the column list and rail (`6248dc0f6`). |
-| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131, F132 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). F132: `DatasetMetadataList.tsx` only, the Description column's `renderValue` that shows the entry's description, and `BoundColumnName` without it (`22804b213`). |
 | `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` | Postgres branch, F130, F131 | Postgres branch: the refresh menu items (`20a52c7cc`). F130: `CreateDictionaryMenuItem` (`4ff06c4ca`). F131: `DictionaryMenuItems`, which offers Apply a dictionary and hides Create once one is applied (`32098fc2b`, `e26030a83`). |
 | `src/lib/ui/viz/DataGridColumnTitle/DataGridColumnTitle.tsx` | F23, F121, F131 | F23: the layer list (`52c823754`). F121: the truncated title tooltip. F131: the code list tag read from `ColumnCodesContext` (`e82540818`). |
 | `src/config/AppLinks/AppLinks.tsx` | F66, F129, F130, F131 | F66: Assigned to me. F129: the dictionary view. F130: the create route. F131: `dataManagerApplyDictionaries` (`23d401540`). |
@@ -664,6 +666,8 @@ Take only your feature's hunks from these files. The last feature in the
 | `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
 | `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). |
 | `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). |
+| `src/clients/datasets/DatasetClient/{DatasetClient.ts,createDatasetQueries.ts}` | Postgres branch, F132 | Postgres branch: the Postgres table source (`581fa414b`). F132: the `getEditableIds` query (`051931742`). |
+| `shared/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts` | F75, F132 | F75: `bucketGrain` (`00a93b53d`). F132: the `ProjectionDescriptor` docstring names `count(*)` (`b78b7b893`). |
 
 ---
 
@@ -10840,7 +10844,7 @@ drawer, Re-apply, and the synced-data warning are slice 4. Crosswalks are
 slice 5. "Add from datasets" into an existing dictionary is a separate small
 piece. The slice 3 follow-ups in spec section 16: the entry description in
 the Description column, "Apply to a dataset" listing only editable datasets,
-and tags on grouped SQL results. Re-pointing a binding whose code list is
+and tags on grouped SQL results, all three built in F132. Re-pointing a binding whose code list is
 deleted, and the menu's conversion sub-line, come with conversions.
 
 **Verification:**
@@ -10867,6 +10871,71 @@ pnpm test:e2e web-offline-mode.spec.ts
 ```
 
 ---
+
+## F132: Data dictionary follow-ups
+
+Status: not started. Built on `feat/dictionary-followups`, branched from
+`demo/measles` at `72f90d8fe`. No PR is open.
+
+**Purpose:** The three small follow-ups F131 left for its slice. A bound
+column with no description of its own shows its dictionary entry's
+description in the dataset's Description column, captioned "From
+<dictionary>", instead of under the column name. The Dictionary view's
+"Apply to a dataset" dialog offers only the datasets the user can edit, read
+in one call, and says "You can't edit any dataset in this workspace" when
+there are none. A grouped SQL result in the Data Explorer, such as
+`SELECT "GENDER", count(*) FROM ... GROUP BY 1`, tags its grouped column with
+its code list.
+
+**Value:** A coded column reads the same in every place, the dialog no longer
+offers datasets the apply view then refuses, and the most common question
+about a coded column (how many of each) shows what the codes mean.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md`, sections 7.2,
+7.4, and 16.
+
+**PR title:** `feat(data-dictionaries): finish the attach-as-reference follow-ups`
+
+**Depends on:** F131.
+
+**Files, by area:**
+
+- Entry descriptions (`22804b213`): `packages/web/ui/src/ObjectDescriptionList/`
+  (`ObjectDescriptionList.types.ts`, `ValueItemContainer.tsx`,
+  `ObjectDescriptionListBlock.tsx`, `PrimitiveValueItem/PrimitiveValueItem.tsx`,
+  `DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx`, and the new
+  `ObjectDescriptionList.test.tsx`): `renderValue` and `renderEditableValue`
+  get a third argument, the object the value is a key of. Then
+  `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx` and its
+  new test, and `DatasetColumnCodes/BoundColumnName.{tsx,test.tsx}`.
+- Editable datasets, schema (`091fd74ed`):
+  `supabase/schemas/50.rpc_datasets__get_editable_ids.sql`, the generated
+  `supabase/migrations/20261113154906_datasets_get_editable_ids.sql` and its
+  twin `apps/desktop/migrations/20261113154906_datasets_get_editable_ids.gen.sql`,
+  `shared/types/database.types.ts`, and
+  `supabase/tests/database/datasets/rpc_datasets__get_editable_ids.test.sql`.
+  The RPC runs as the caller and keeps the datasets that
+  `util__auth_user_can_update_resource` allows.
+- Editable datasets, client and dialog (`051931742`):
+  `src/clients/datasets/DatasetClient/{DatasetClient.ts,createDatasetQueries.ts}`
+  (`getEditableIds`) and
+  `src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.{tsx,test.tsx}`.
+- Grouped SQL tags (`b78b7b893`):
+  `shared/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/`
+  reads `count(*)` (keyed as a count of `*`, named by its alias or DuckDB's
+  `count_star()`) and a `GROUP BY` position, plus the docstring in
+  `QueryResultColumnBindings.types.ts` and new cases in
+  `src/lib/dataDictionaries/getResultColumnCodes/getResultColumnCodes.test.ts`.
+  Raw SQL with `count(*)` now also keeps stable column IDs across runs.
+
+**Schema:** yes, one migration (`datasets_get_editable_ids`) with one RPC,
+`authenticated` only. Regenerate it with `supabase-declarative-schema`.
+
+**Deploy:** the migration, then the frontend.
+
+**Known gaps:** none of the three is partial. `count(*)` with `FILTER`,
+`DISTINCT`, or a window still yields no projections, as does grouping by an
+expression.
 
 ## Open decisions
 
