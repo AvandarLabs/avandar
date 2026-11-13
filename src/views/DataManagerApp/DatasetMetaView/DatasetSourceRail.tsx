@@ -3,6 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
 import { DatasetDictionariesRailGroup } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup";
+import { LinkedSourceFact } from "@/views/DataManagerApp/DatasetMetaView/LinkedSourceFact";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -12,6 +13,7 @@ import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDat
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
+import type { LinkedDataset } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
 import type { ReactNode } from "react";
 
 export type DatasetSourceRecord =
@@ -31,9 +33,15 @@ type Props = {
    * out where no dictionary data is loaded, such as a preview.
    */
   columnCodes?: ReadonlyMap<string, ColumnCodes.T>;
+  /**
+   * The linked datasets that read this dataset. Left out where they are
+   * not loaded, such as a preview.
+   */
+  linkedDatasets?: readonly LinkedDataset[];
 };
 
 const NO_CODES: ReadonlyMap<string, ColumnCodes.T> = new Map();
+const NO_LINKED_DATASETS: readonly LinkedDataset[] = [];
 
 /**
  * The provenance of a dataset: how it was read, and where the bytes live.
@@ -51,6 +59,7 @@ export function DatasetSourceRail({
   dataset,
   source,
   columnCodes = NO_CODES,
+  linkedDatasets = NO_LINKED_DATASETS,
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
 
@@ -147,8 +156,16 @@ export function DatasetSourceRail({
     .with(undefined, () => {
       return null;
     })
-    .with({ __type: "OpenDataDataset" }, { __type: "VirtualDataset" }, () => {
+    .with({ __type: "OpenDataDataset" }, () => {
       return null;
+    })
+    .with({ __type: "VirtualDataset" }, (virtualDataset) => {
+      return (
+        <LinkedSourceFact
+          linkedSourceDatasetId={virtualDataset.linkedSourceDatasetId}
+          columnCodes={columnCodes}
+        />
+      );
     })
     .exhaustive();
 
@@ -183,7 +200,10 @@ export function DatasetSourceRail({
           </AppViewRail.Fact>
         ) : null}
       </AppViewRail.Group>
-      <DatasetDictionariesRailGroup columnCodes={columnCodes} />
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={linkedDatasets}
+      />
     </AppViewRail>
   );
 }

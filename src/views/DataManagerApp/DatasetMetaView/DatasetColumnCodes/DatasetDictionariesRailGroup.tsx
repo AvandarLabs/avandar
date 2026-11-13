@@ -6,67 +6,68 @@ import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRai
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup.module.css";
+import { describeDictionaryUses } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/describeDictionaryUses/describeDictionaryUses";
+import { DictionaryUseNote } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DictionaryUseNote";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
+import type { LinkedDataset } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
+import type { DictionaryUse } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/describeDictionaryUses/describeDictionaryUses";
 import type { ReactNode } from "react";
 
 type Props = {
   columnCodes: ReadonlyMap<string, ColumnCodes.T>;
+  /** The linked datasets that read this dataset. */
+  linkedDatasets: readonly LinkedDataset[];
 };
 
-/** Each attached dictionary once, sorted by name. */
-function _listDictionaries(
-  columnCodes: ReadonlyMap<string, ColumnCodes.T>,
-): Array<{ id: string; name: string }> {
-  const byId = new Map<string, string>();
-  columnCodes.forEach((codes) => {
-    byId.set(codes.dictionaryId, codes.dictionaryName);
+/** A dictionary's name, linked, or "A deleted dictionary". */
+function DictionaryName({ use }: Readonly<{ use: DictionaryUse }>): ReactNode {
+  const workspace = useCurrentWorkspace();
+  if (use.dictionaryId === "") {
+    return (
+      <Text span size="sm">
+        <Trans>A deleted dictionary</Trans>
+      </Text>
+    );
+  }
+  const link = AppLinks.dataManagerDictionaryView({
+    workspaceSlug: workspace.slug,
+    dictionaryId: use.dictionaryId,
+    dictionaryName: use.dictionaryName,
   });
-  return [...byId]
-    .map(([id, name]) => {
-      return { id, name };
-    })
-    .sort((dictionaryA, dictionaryB) => {
-      return dictionaryA.name < dictionaryB.name ? -1 : 1;
-    });
+  return (
+    <Link to={link.to} params={link.params} size="sm">
+      {use.dictionaryName}
+    </Link>
+  );
 }
 
 /**
- * The rail group naming each dictionary attached to a dataset, one row
- * each, with how it was applied underneath. Nothing renders while no
- * dictionary is attached.
+ * The rail group naming each dictionary that reaches a dataset, one row
+ * each, with every way it is applied underneath: attached as reference,
+ * converted in place or as it loads, and each linked dataset that reads
+ * this one. Nothing renders while no dictionary is attached.
  */
 export function DatasetDictionariesRailGroup({
   columnCodes,
+  linkedDatasets,
 }: Readonly<Props>): ReactNode {
-  const workspace = useCurrentWorkspace();
-  const dictionaries = _listDictionaries(columnCodes);
-  if (dictionaries.length === 0) {
+  const uses = describeDictionaryUses(columnCodes, linkedDatasets);
+  if (uses.length === 0) {
     return null;
   }
   return (
     <AppViewRail.Group title={<Trans>Dictionaries</Trans>}>
-      {dictionaries.map((dictionary) => {
-        const link = AppLinks.dataManagerDictionaryView({
-          workspaceSlug: workspace.slug,
-          dictionaryId: dictionary.id,
-          dictionaryName: dictionary.name,
-        });
+      {uses.map((use) => {
         return (
-          <div key={dictionary.id} className={css.dictionaryRow}>
+          <div key={use.dictionaryId} className={css.dictionaryRow}>
             <dt className={css.dictionaryName}>
               <IconBook size={16} stroke={1.5} aria-hidden />
-              <Link to={link.to} params={link.params} size="sm">
-                {dictionary.name}
-              </Link>
+              <DictionaryName use={use} />
             </dt>
-            <Text
-              component="dd"
-              size="xs"
-              c="dimmed"
-              className={css.dictionaryNote}
-            >
-              <Trans>Attached as reference · data unchanged</Trans>
-            </Text>
+            {use.notes.map((note) => {
+              const key = note.kind === "linked" ? note.datasetId : note.kind;
+              return <DictionaryUseNote key={key} note={note} />;
+            })}
           </div>
         );
       })}

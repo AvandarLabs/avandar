@@ -18,6 +18,7 @@ import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { useDatasetColumnCodes } from "@/hooks/dataDictionaries/useDatasetColumnCodes/useDatasetColumnCodes";
 import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
+import { useLinkedDatasets } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -83,6 +84,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
     datasetId: dataset.id,
     columns: datasetColumns,
   });
+  const { linkedDatasets } = useLinkedDatasets(dataset.id);
   const [datasetMeta, isLoadingDatasetMeta] =
     DatasetQueryClient.useGetDatasetMeta({
       datasetId: dataset.id,
@@ -189,6 +191,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
         dataset={dataset}
         source={datasetWithColumnsAndSource.source}
         columnCodes={columnCodes.byColumnId}
+        linkedDatasets={linkedDatasets}
       />
     );
 

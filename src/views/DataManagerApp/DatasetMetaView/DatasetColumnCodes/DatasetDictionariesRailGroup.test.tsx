@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@/test-utils";
 import { DatasetDictionariesRailGroup } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
@@ -36,37 +37,49 @@ vi.mock("@avandar/ui", async (importOriginal) => {
   };
 });
 
-/** A column bound to the NYS dictionary. */
-function createCodes(
-  datasetColumnId: string,
-  entryName: string,
-): ColumnCodes.T {
+/** A column's codes, as Task 13's `ColumnCodes.fromRows` returns them. */
+function makeCodes(overrides: Partial<ColumnCodes.T> = {}): ColumnCodes.T {
   return {
-    datasetColumnId,
+    datasetColumnId: "col-gender",
     dictionaryId: "dict-nys",
     dictionaryName: "NYS codes",
-    entryName,
-    codeListName: undefined,
+    entryName: "sex",
+    codeListName: "Sex (1/2/9)",
     isOrdered: false,
     mode: "reference",
-    keepsOriginal: false,
+    direction: "decode",
+    pairs: [
+      { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "2", label: "Female", acceptedSpellings: [], isMissing: false },
+    ],
     isPinned: false,
     appliedDictionaryVersion: 1,
     currentDictionaryVersion: 1,
     isSourceDeleted: false,
-    direction: "decode",
-    pairs: [],
+    keepsOriginal: false,
+    ...overrides,
   };
 }
 
 describe("DatasetDictionariesRailGroup", () => {
   it("names a dictionary once however many columns use it", () => {
     const columnCodes = new Map([
-      ["col-gender", createCodes("col-gender", "sex")],
-      ["col-race", createCodes("col-race", "race")],
+      [
+        "col-gender",
+        makeCodes({ datasetColumnId: "col-gender", entryName: "sex" }),
+      ],
+      [
+        "col-race",
+        makeCodes({ datasetColumnId: "col-race", entryName: "race" }),
+      ],
     ]);
 
-    render(<DatasetDictionariesRailGroup columnCodes={columnCodes} />);
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
 
     const links = screen.getAllByRole("link", { name: "NYS codes" });
     expect(links).toHaveLength(1);
@@ -78,10 +91,18 @@ describe("DatasetDictionariesRailGroup", () => {
 
   it("lists each dictionary as one row without a repeated label", () => {
     const columnCodes = new Map([
-      ["col-gender", createCodes("col-gender", "sex")],
+      [
+        "col-gender",
+        makeCodes({ datasetColumnId: "col-gender", entryName: "sex" }),
+      ],
     ]);
 
-    render(<DatasetDictionariesRailGroup columnCodes={columnCodes} />);
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
 
     expect(screen.getByRole("term")).toHaveTextContent("NYS codes");
     expect(screen.getByRole("definition")).toHaveTextContent(
@@ -91,9 +112,118 @@ describe("DatasetDictionariesRailGroup", () => {
   });
 
   it("renders nothing while no dictionary is attached", () => {
-    render(<DatasetDictionariesRailGroup columnCodes={new Map()} />);
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={new Map()}
+        linkedDatasets={[]}
+      />,
+    );
 
     expect(screen.queryByText("Dictionaries")).toBeNull();
     expect(screen.queryByRole("link")).toBeNull();
+  });
+
+  it("says a dataset converted in place, and when its version is behind", () => {
+    const columnCodes = new Map([
+      [
+        "col-gender",
+        makeCodes({
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          appliedDictionaryVersion: 2,
+          currentDictionaryVersion: 3,
+        }),
+      ],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(
+      screen.getByText("Converted this dataset · version 2"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Applied version 2, now version 3"),
+    ).toBeInTheDocument();
+  });
+
+  it("links each linked dataset that reads this one", () => {
+    const columnCodes = new Map([["col-gender", makeCodes()]]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={[
+          {
+            id: "dataset-labeled" as Dataset.Id,
+            name: "Kings (labeled)",
+            dictionaryIds: new Set(["dict-nys"]),
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByText("Attached as reference · data unchanged"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Kings (labeled)" }),
+    ).toHaveAttribute("href", "/demo/data-manager/dataset-labeled");
+    expect(screen.getAllByRole("definition")[1]).toHaveTextContent(
+      "Linked dataset: Kings (labeled)",
+    );
+  });
+
+  it("says a linked dataset's own conversions follow the dictionary", () => {
+    const columnCodes = new Map([
+      ["col-gender", makeCodes({ mode: "convert", direction: "encode" })],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(
+      screen.getByText("Converted as it loads · follows the dictionary"),
+    ).toBeInTheDocument();
+  });
+
+  it("names a deleted dictionary without a link", () => {
+    const columnCodes = new Map([
+      [
+        "col-gender",
+        makeCodes({
+          dictionaryId: "",
+          dictionaryName: "",
+          entryName: "",
+          mode: "convert",
+          direction: "encode",
+          isPinned: true,
+          isSourceDeleted: true,
+          currentDictionaryVersion: undefined,
+        }),
+      ],
+    ]);
+
+    render(
+      <DatasetDictionariesRailGroup
+        columnCodes={columnCodes}
+        linkedDatasets={[]}
+      />,
+    );
+
+    expect(screen.getByRole("term")).toHaveTextContent("A deleted dictionary");
+    expect(screen.queryByRole("link")).toBeNull();
+    expect(
+      screen.getByText("Converted this dataset · version 1"),
+    ).toBeInTheDocument();
   });
 });
