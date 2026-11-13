@@ -27,7 +27,8 @@ export function makeVirtualRelationDefinition(
  *
  * A failed read is logged and finds no definitions, so the query still runs:
  * every other dataset is served as before, and a virtual dataset probes with
- * no definition, misses, and is acquired from its source.
+ * no definition, so it is served only from rows cached before its definition
+ * was keyed, and otherwise acquired again.
  */
 export async function getVirtualRelationDefinitions(
   datasetIds: readonly Dataset.Id[],
