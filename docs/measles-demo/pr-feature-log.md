@@ -10927,6 +10927,10 @@ about a coded column (how many of each) shows what the codes mean.
   `QueryResultColumnBindings.types.ts` and new cases in
   `src/lib/dataDictionaries/getResultColumnCodes/getResultColumnCodes.test.ts`.
   Raw SQL with `count(*)` now also keeps stable column IDs across runs.
+- E2E (`055064f62`): `tests/e2e/dictionary-apply-reference.spec.ts` runs a
+  grouped count in the Data Explorer and finds the entry's description in
+  `case_id`'s own row.
+- Translations (`670dc704f`) and this log.
 
 **Schema:** yes, one migration (`datasets_get_editable_ids`) with one RPC,
 `authenticated` only. Regenerate it with `supabase-declarative-schema`.
@@ -10936,6 +10940,13 @@ about a coded column (how many of each) shows what the codes mean.
 **Known gaps:** none of the three is partial. `count(*)` with `FILTER`,
 `DISTINCT`, or a window still yields no projections, as does grouping by an
 expression.
+
+**Verification:** `pnpm lint`, `pnpm exec tsc -b --force --noEmit`,
+`pnpm type-check:deno`, `pnpm i18n:check`, `pnpm test:frontend` (only the
+known maplibre `-$dashboardId.test.tsx` failure), `pnpm vitest run` in
+`packages/web/ui`, `pnpm test:db` on the branch's switched stack, and one at a
+time `dictionary-apply-reference`, `data-dictionary-edit`,
+`dictionary-create-from-dataset`, and `data-explorer-grid-layout` e2e specs.
 
 ## Open decisions
 
