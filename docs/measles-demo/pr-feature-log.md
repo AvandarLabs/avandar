@@ -188,6 +188,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F132 | Data dictionary follow-ups: entry descriptions in the Description column, only editable datasets in Apply to a dataset, and tags on grouped SQL results | not started | F131 | |
 | F133 | Convert coded columns with a dictionary into a linked dataset that follows it: the load-time conversion, ordered lists, unmatched values, the preview, and the dataset and dictionary surfaces | not started | F131, F132 | |
 | F134 | Convert a dataset in place with a dictionary, pinned to the version applied, with the synced-data warning and Re-apply | not started | F133 | |
+| F136 | Crosswalks: map datasets with different column layouts onto one reference layout and save a combined dataset, with Export mapping, the stale banner, and Used by | not started | F129, F130, F131, F132, F133, F134 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -329,6 +330,7 @@ API. It's new work, not something this branch built.
 | after F131 | F132 | Builds on F131's bound-column name, Apply to a dataset dialog, and Data Explorer tags. Adds `rpc_datasets__get_editable_ids` (migration). Deploy the migration, then the frontend: the new dialog calls the RPC. |
 | after F132 | F133 | Builds on F131's bindings, apply RPC, apply flow, popover, rail, and Used by, and F132's editable-ids RPC. Adds the conversion columns, the keep-original link, `linked_source_dataset_id`, pin-on-delete triggers, and three RPCs (migration). Deploy the migration, then the `chat` edge function (it reads the new binding columns and describes a converted column by its labels), then the frontend. |
 | after F133 | F134 | Frontend only: F133's migration already carries the pinned columns and `rpc_dataset_columns__reapply_dictionary`. Deploy the frontend. |
+| after F134 | F136 | Builds on F130's scorer and pick table, F131's bindings, popover, and Used by, F133's `ColumnConversion`, linked-dataset creation, virtual dataset freshness, and `clearCachedDatasetRows`, and F134's Re-apply in Used by. Adds five crosswalk tables and two RPCs (migration) and the desktop sync entries. Deploy the migration, then the frontend; the desktop app syncs the new tables from its next build. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -388,7 +390,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `supabase/schemas/50.rpc_data_catalog_listings__write_verified_column_types.sql` and its pgTAP test | F54, F12, F23 | F54: the function. F12: clears the invalid mark. |
 | `supabase/schemas/20.datasets__open_data.sql` | F4, F54, F16 | F54: the verified-only add trigger. |
 | `supabase/tests/database/rpc_data_catalog_listings__pipeline_scopes.test.sql` | F52, F54, F23 | F54: a fixture update. |
-| `supabase/tests/database/permissions/exact_data_api_grants.test.sql` | F4, F51, F55, F18, F21, F131 | F51: `pipeline_scope_checkpoints`. F55: the two execution tables. F131: `dataset_columns__dictionary_bindings` as select-only (`cefb14f16`). |
+| `supabase/tests/database/permissions/exact_data_api_grants.test.sql` | F4, F51, F55, F18, F21, F131, F136 | F51: `pipeline_scope_checkpoints`. F55: the two execution tables. F131: `dataset_columns__dictionary_bindings` as select-only (`cefb14f16`). F136: `crosswalks` and its four child tables, the children as select-only (`0342d9410`). |
 | `apps/desktop/sync/syncable-tables.ts` | F4, F51, F55, F18, F21, F23 | F51 and F55: their service-role tables in `EXCLUDED_TABLES`. |
 | `apps/desktop/scripts/gen-sqlite-migrations/getManualMigrationBodyFromSourceFile.ts` | F51, F23 | F51: the `pipeline_scope_keys` SQLite override, keyed by its migration's filename. |
 | `scripts/test-dashboard-publishing-migrations.sh` | F44, F51, F23 | F44 and F51: the replay of their hand-written backfill migrations, keyed by filename. |
@@ -431,7 +433,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
 | `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
-| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. |
+| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134, F136 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. F136: regenerate for its migration, route, and messages. |
 
 ### Joined cases (F69 to F76)
 
@@ -597,7 +599,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `deno.json` | F2, F96, F81 to F85 | F2: `bottleneck`. F96: the three `@avandar/plugin-manifest` maps, `@plugin-manifest/`, and `yaml`. |
 | `.github/workflows/pr-develop.yaml` | F97, others | F97: the `pnpm check:plugin-bundle` step. `b4622f582` (runner pin) is not F97's. |
 | `eslint.config.js` | F97, others | F97: the `pluginRestrictions` import and spread. `776f94b11` is not F97's. |
-| `apps/desktop/sync/syncable-tables.ts` | F4, F21, F35, F98, others, F131 | F98: `plugin_installations` in `EXCLUDED_TABLES`. F131: `dataset_columns__dictionary_bindings` in `ACTIVE_TABLES` (`cefb14f16`). |
+| `apps/desktop/sync/syncable-tables.ts` | F4, F21, F35, F98, others, F131, F136 | F98: `plugin_installations` in `EXCLUDED_TABLES`. F131: `dataset_columns__dictionary_bindings` in `ACTIVE_TABLES` (`cefb14f16`). F136: the five crosswalk tables in `ACTIVE_TABLES` and the comment line that names them (`0342d9410`). |
 | `shared/models/Permissions/PermissionsModule/PermissionRegistry.ts` | F57 to F62, F98 | F98: `settings__can_manage_plugins`. |
 | `apps/ava-cli/{package.json,src/main.ts}` | F15, F102, others | F102: the `@avandar/plugin-manifest` and `yaml` dependencies, the `PluginCli` import, and `.addCommand("plugin", PluginCli)`. |
 | `AGENTS.md` (also loaded as `CLAUDE.md`) | F21, F112, others | F112: the "How to write a bundled plugin" line. |
@@ -632,7 +634,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/views/DataManagerApp/DataImportView/DataImportView.tsx` | F14 (merged), F120, F19 | F14: the dataset limit prompt. F120: no `AppViewHeader`, a visually hidden `h1`. F19: `isFillHeight` and the `DataImportTabs/` import path. |
 | `src/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs.{tsx,module.css}` | Postgres branch, F19, F23 | Postgres branch: the Connectors tab's `Stack` with `PostgresConnectorImportView` and `ConnectorsAdvisory`. F19: the CSS module and the fill-height panel, plus its `4c7c9d760` addendum (the `list` class and the panel padding). F23: its `9987ef9da` addendum (the tab-row `DataCatalogSearchField` in `listRightSection`, and the `search` state passed to `DataCatalogView`). |
 | `src/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal.module.css` | F19 | F19 and its `4c7c9d760` addendum (`--ava-content-gutter` on `.importPanel` for every tab). |
-| `src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx` | Postgres branch, F20, F121, F129 | Postgres branch: the `postgres_table` source icon. F20: the phone layout lines. F121: `DatasetNavbarName` on `TruncatedText`. F129: a Dictionaries group after the dataset groups, and its filter and rows. |
+| `src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx` | Postgres branch, F20, F121, F129, F136 | Postgres branch: the `postgres_table` source icon. F20: the phone layout lines. F121: `DatasetNavbarName` on `TruncatedText`. F129: a Dictionaries group after the dataset groups, and its filter and rows. F136: a Crosswalks group after Dictionaries, shown to Data Sources editors (`a2c127a26`). |
 | `src/lib/ui/viz/DataGrid.tsx`, `src/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs.{ts,test.ts}` | F22, F71 to F75, F121 | F22 (BUG-003 and its follow-ups): extracts `makeDataGridColumnDefs`. F71 to F75: per-period formatters. F121: `headerComponentParams.innerHeaderComponent: DataGridColumnTitle`, and in `makeDataGridColumnDefs` only a docstring sentence and a renamed test. |
 | `packages/web/ui/src/text/TruncatedText.tsx` | F118, F119, F121 | F118: `tooltipLabel`, the full-width root class, `withFullTextTooltip` defaulting to true. F119 and F121 only call it. |
 | `src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingList/DataCatalogListingList.tsx` | F17, F19, F23, F121 | F23: its `9987ef9da` addendum's one-line `DataCatalogListingName`. F121: `52c823754` moves that name onto `TruncatedText`, which goes with whichever of F23 and F121 lands second. |
@@ -653,22 +655,22 @@ Take only your feature's hunks from these files. The last feature in the
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
 
-### Data dictionaries (F129 to F134)
+### Data dictionaries (F129 to F136)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
 | `src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx` | Postgres branch, F21, F24, F131, F133, F134 | Postgres branch: the `postgres_table` source labels (`a0b8f1646`, `20a52c7cc`). F21: the shared source labels (`af925c7e6`). F24: the catalog preview (`d8a72da58`). F131: `useDatasetColumnCodes` and the codes passed to the column list and rail (`6248dc0f6`). F133: `useLinkedDatasets` and the linked datasets passed to the rail (`76d145c3e`). F134: the columns ordered by `column_idx` with `toColumnsInTableOrder` (`25da4ee87`). |
-| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131, F132, F133, F134 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). F132: `DatasetMetadataList.tsx` only, the Description column's `renderValue` that shows the entry's description, and `BoundColumnName` without it (`22804b213`). F133: `DatasetMetadataList.tsx` passes `datasetId` to `BoundColumnName` and shows a converted column's read-only type with `ConvertedTypeNote` (`7663ab9e0`); `DatasetSourceRail.tsx` adds the `VirtualDataset` arm with `LinkedSourceFact` and the linked datasets (`76d145c3e`). F134: `DatasetSourceRail.tsx` only, the dataset passed to the Dictionaries group, which offers Re-apply (`6f5fd62a8`). |
-| `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` | Postgres branch, F130, F131, F133 | Postgres branch: the refresh menu items (`20a52c7cc`). F130: `CreateDictionaryMenuItem` (`4ff06c4ca`). F131: `DictionaryMenuItems`, which offers Apply a dictionary and hides Create once one is applied (`32098fc2b`, `e26030a83`). F133: `DeleteDatasetConfirmBody` names the linked datasets, and Delete waits for them (`402335d0b`, `6705c3e3c`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131, F132, F133, F134, F136 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). F132: `DatasetMetadataList.tsx` only, the Description column's `renderValue` that shows the entry's description, and `BoundColumnName` without it (`22804b213`). F133: `DatasetMetadataList.tsx` passes `datasetId` to `BoundColumnName` and shows a converted column's read-only type with `ConvertedTypeNote` (`7663ab9e0`); `DatasetSourceRail.tsx` adds the `VirtualDataset` arm with `LinkedSourceFact` and the linked datasets (`76d145c3e`). F134: `DatasetSourceRail.tsx` only, the dataset passed to the Dictionaries group, which offers Re-apply (`6f5fd62a8`). F136: `DatasetSourceRail.tsx` only, `CombinedByFact` in the rail of a combined dataset (`539d28a69`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` | Postgres branch, F130, F131, F133, F136 | Postgres branch: the refresh menu items (`20a52c7cc`). F130: `CreateDictionaryMenuItem` (`4ff06c4ca`). F131: `DictionaryMenuItems`, which offers Apply a dictionary and hides Create once one is applied (`32098fc2b`, `e26030a83`). F133: `DeleteDatasetConfirmBody` names the linked datasets, and Delete waits for them (`402335d0b`, `6705c3e3c`). F136: `DatasetActionsMenu.tsx` and `DictionaryMenuItems.tsx` hide Apply a dictionary on a combined dataset through `useCombiningCrosswalk` (`539d28a69`, `2b5ebde5e`), with `DatasetActionsMenu.test.tsx`. |
 | `src/lib/ui/viz/DataGridColumnTitle/DataGridColumnTitle.tsx` | F23, F121, F131 | F23: the layer list (`52c823754`). F121: the truncated title tooltip. F131: the code list tag read from `ColumnCodesContext` (`e82540818`). |
-| `src/config/AppLinks/AppLinks.tsx` | F66, F129, F130, F131 | F66: Assigned to me. F129: the dictionary view. F130: the create route. F131: `dataManagerApplyDictionaries` (`23d401540`). |
+| `src/config/AppLinks/AppLinks.tsx` | F66, F129, F130, F131, F136 | F66: Assigned to me. F129: the dictionary view. F130: the create route. F131: `dataManagerApplyDictionaries` (`23d401540`). F136: `dataManagerCrosswalkView` and `dataManagerNewCrosswalk` (`a2c127a26`), with `AppLinks.test.ts`. |
 | `src/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers.ts` | F82, F87, F89, F128, F131 | F131: loading the workspace's column codes into the agent's datasets (`fb01c764b`). |
 | `supabase/functions/chat/PostAgentStream/loadDataAgentDatasets.ts` | F82, F131 | F131: `loadColumnCodes` with the caller's own client (`90aac2562`). |
 | `src/lib/agent/dataAgent/offline/{profileOfflineDatasets,buildOfflineDataAgentSystemPrompt,findQuestionValues}/*.ts` | F82, F83, F131 | F131: code lists in the offline profile, question values matched by label, and the capped code lines (`513e88d44`, `5ba9698b6`). |
 | `scripts/ai-eval/harnesses/pi/PiLocalHarness.ts`, `scripts/ai-eval/runtime/EvalDatabase.ts` | F81, F83, F131, F133 | F131: column codes in the local harness, and the measles workspace's bindings in the eval database (`5ce5ba8a2`, `c567ca769`). F133: `EvalDatabase.ts` only, a column's `sourceSql` for the converted copy of the line list (`da036466e`). |
 | `tests/e2e/agent-chat-sessions.spec.ts`, `tests/e2e/agent-chat-mentions.spec.ts` | F91, F128, F131 | F91 owns mentions and F128 owns sessions. F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). |
 | `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
-| `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131, F133, F134 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). F133: `DataDictionaryEditor.tsx` passes the dictionary's version to `useDictionaryUsage`, and Used by says Reference or Linked and whether a dataset is behind, in `HowAppliedCell.tsx` and `UsageStatusCell.tsx` (`238ee4188`). F134: `DataDictionaryEditor.tsx` passes the dictionary's name to `useDictionaryUsage`, and Used by offers Re-apply under a behind status, set in ink (`6f5fd62a8`, `1f2459c4a`, `83af03334`). |
+| `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131, F133, F134, F136 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). F133: `DataDictionaryEditor.tsx` passes the dictionary's version to `useDictionaryUsage`, and Used by says Reference or Linked and whether a dataset is behind, in `HowAppliedCell.tsx` and `UsageStatusCell.tsx` (`238ee4188`). F134: `DataDictionaryEditor.tsx` passes the dictionary's name to `useDictionaryUsage`, and Used by offers Re-apply under a behind status, set in ink (`6f5fd62a8`, `1f2459c4a`, `83af03334`). F136: `useDictionaryUsage/` reads crosswalks, and Used by lists a combined dataset as Crosswalk with its status and Open crosswalk, in `HowAppliedCell.tsx`, `UsageStatusCell.tsx`, `DictionaryUsedByTable.tsx`, and the new `OpenCrosswalkLink.tsx` (`539d28a69`, `2b5ebde5e`). |
 | `src/clients/dataDictionaries/DictionaryBindingClient.ts` | F131, F133, F134 | F131: reading and applying bindings (`ab41fb10f`). F133: conversions and added values in the apply call, and the linked-dataset apply (`5a2d003f1`). F134: `reapplyDictionary`, which calls `rpc_dataset_columns__reapply_dictionary` (`c055c0854`). |
 | `src/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns.ts`, `src/clients/qetl/QueryMediator/getRelationSources.ts`, `src/lib/dataDictionaries/loadColumnReplacements/loadColumnReplacements.ts`, `docs/qetl-architecture.md` | F133, F134 | F133: see its rendering and loading area. F134: a table loaded outside the recorder counts as current only when the dataset needs no replacements, and the columns are read with `fetchQuery` once invalidated (`35db27b15`, `1ca97e30f`). |
 | `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131, F133 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). F133: a save also refreshes the dataset columns and the cached rows, so converted datasets show the new labels (`238ee4188`). |
@@ -679,6 +681,14 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/clients/DuckDbClient/duckDbParquetLoad.ts` | F63, F133 | F63: see its section. F133: the kept `ENUM` values read before the view is built, and the `ava_raw_` view of the values as stored (`b195ad2e8`). |
 | `src/clients/DuckDbClient/arrowFieldToQueryResultField.ts` | F70, F133 | F70: list, struct, decimal, date, and time fields. F133: a dictionary-encoded text field (an `ENUM`) is `varchar` (`cac36bd9c`). |
 | `src/lib/sql/DuckDbSqlAnalyzer/duckDbSqlSources.ts` | F22's BUG-001, F69, F133 | F22's BUG-001 and F69: see F69's section. F133: an `ava_raw_<datasetId>` view is reported as a read of its dataset, like `ava_rows_` (`b195ad2e8`). |
+| `src/lib/dataDictionaries/ColumnProfileSql/{ColumnProfileSql.ts,__tests__/ColumnProfileSql.test.ts}` | F130, F133, F136 | F136: `DATE_FORMATS` is exported and `buildDateSampleSql` reads a column's date samples for date-format detection (`6ab82052e`, `66caa70bc`). |
+| `src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/{PickDatasetsTable.tsx,PickDatasetRow.tsx,PickDatasetsStep.module.css}` | F130, F136 | F136: the `isLocked`, `lockedReason`, and `unavailableReason` row props, so the crosswalk's Add datasets modal can show a dataset that is already added or cannot be picked (`70e95bce5`, `66caa70bc`). |
+| `src/views/DataManagerApp/DatasetMetaView/clearCachedDatasetRows.ts` (with `.test.ts`, `useRefreshGoogleSheetDataset.test.ts`, `useRefreshPostgresTableDataset.test.ts`) | F133, F136 | F133: a refresh also clears the linked datasets that read the dataset. F136: it also clears the combined datasets that read it (`539d28a69`, `2b5ebde5e`). |
+| `shared/models/dataDictionaries/DictionaryMatch/DictionaryMatchModule/{DictionaryMatchModule.ts,DictionaryMatchModule.test.ts}` | F131, F136 | F136: `getBestCodeList`, which picks the code list a set of values fits best (`464e93afc`). |
+| `shared/models/datasets/AvaDataType/{AvaDataTypeModule.ts,AvaDataTypeModule.test.ts}` | F136 | F136 adds `toDuckDbTypeSql` (`ccbfd332d`). Listed because the test file is new. |
+| `shared/models/Permissions/PermissionsModule/{PermissionRegistry.ts,__tests__/PermissionsModule.test.ts}` | F129, F136 | F129: the dictionary keys. F136: `data_sources__can_edit_crosswalks` for Data Sources editors and admins (`a2c127a26`). |
+| `src/views/DataManagerApp/DataManagerToolbarActions/{DataManagerToolbarActions.tsx,DataManagerToolbarActions.test.tsx}`, `src/views/DataManagerApp/DataManagerApp.tsx`, `src/views/DataManagerApp/useListPaneToggle/{useListPaneToggle.ts,useListPaneToggle.test.ts}` | F129, F130, F136 | F136: `NewCrosswalkButton.tsx` after New dictionary, the Crosswalks list through the new `useDataManagerLists/`, and the list pane collapsing on the crosswalk routes (`a2c127a26`). |
+| `tests/e2e/helpers/{constants.ts,seedDataDictionary.ts}` | F130, F131, F133, F136 | F136: the crosswalk line list paths in `constants.ts`, and a second coding per seeded entry in `seedDataDictionary.ts` (`7acb100b3`). |
 
 ---
 
@@ -11429,6 +11439,183 @@ offline-only-upload-reload.spec.ts`, which fails on the old wrapper (no column
 summary after the reload) and passes on this one. The e2e ran against
 `feat/dictionary-conversions`' switched stack, because the shared `avandar`
 stack predates `demo/measles`' migrations.
+
+## F136: Crosswalks and the combined dataset
+
+Status: built on `feat/crosswalks`, branched from `demo/measles` at
+`ea3481332`. No PR is open.
+
+**Purpose:** A Data Sources editor opens **New crosswalk**, adds datasets
+whose columns are named differently (`zip_code`, `zip`, `postal_code`), and
+maps them onto one reference layout, one layout family at a time: datasets
+with the same column names are mapped once, together. Step 1 groups the
+datasets into layouts and suggests the reference that covers the most columns
+of the others. Step 2 prefills every layout by name and type, then by values
+once the layout is read, and carries fills over from the most similar layout
+already mapped. Each column is filled from a source column (with a date
+format, zero padding, a factor, or trimming, or translated through a
+dictionary code list), a fixed value, a Combine expression, or nothing, with a
+before/after example from the SQL the combined dataset runs. Step 3 previews
+the stacked rows and saves a combined dataset: a virtual dataset that stacks
+every mapped dataset with `UNION ALL BY NAME`, with codes reconciled to the
+governing entry's primary list as labels or codes, a `source_dataset` column,
+and reference bindings on its coded columns, so the code-list tag, Ask
+Avandar, and Used by work with no new agent code. **Export mapping**
+downloads the mapping as CSV. A fingerprint of each embedded code list drives
+a banner when a list changed, and Used by lists the combined dataset as
+Crosswalk with that status. The combined dataset's rail names its crosswalk,
+Apply a dictionary is hidden on it, and refreshing a source clears its cached
+rows.
+
+**Value:** A hundred line lists exported by different systems become one
+dataset to chart, filter, and ask about, with "1", "M", and "Male" all
+reading Male, and a mapping a colleague can review.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md` and
+`docs/measles-demo/data-dictionaries-5-crosswalks-plan.md` (Part A).
+
+**PR title:** `feat(crosswalks): combine datasets with different layouts through a crosswalk`
+
+**Depends on:** F129 to F134.
+
+**Files, by area** (`SC/` is `shared/models/crosswalks/`, `LC/` is
+`src/lib/crosswalks/`, `CV/` is `src/views/DataManagerApp/CrosswalkView/`,
+`DatasetMetaView/` is `src/views/DataManagerApp/DatasetMetaView/`, and
+`DataDictionaryView/` is `src/views/DataManagerApp/DataDictionaryView/`):
+
+- Docs (`b2e9fa801`, `d37ab2627`, `28f1c1a28`, and the commit that adds
+  this entry): the plan in
+  `docs/measles-demo/data-dictionaries-5-crosswalks-plan.md`, the spec edits in
+  `data-dictionaries-design.md`, and this log.
+- Schema, migration, desktop twin, and pgTAP (`0342d9410`, `3ac14c859`): the
+  four `supabase/schemas/00.enum.crosswalks__*.sql` files, `11.crosswalks.sql`,
+  `20.crosswalks__layouts.sql`, `21.crosswalks__columns.sql`,
+  `21.crosswalks__datasets.sql`, `22.crosswalks__mappings.sql`,
+  `50.rpc_crosswalks__save.sql`, and
+  `71.rpc_crosswalks__save_combined_dataset.sql`; the generated
+  `supabase/migrations/20261114171619_crosswalks.sql` and its twin
+  `apps/desktop/migrations/20261114171619_crosswalks.gen.sql`;
+  `apps/desktop/sync/syncable-tables.ts`; `shared/types/database.types.ts`;
+  `supabase/tests/database/permissions/{rls_crosswalks,rls_crosswalks__children,exact_data_api_grants}.test.sql`;
+  and
+  `supabase/tests/database/crosswalks/{rpc_crosswalks__save,rpc_crosswalks__save_combined_dataset}.test.sql`.
+  `3ac14c859` is the review fix: the hints `crosswalk_has_unreadable_datasets`
+  and `output_dataset_in_crosswalk`, a membership keeping its id when its
+  layout drops, null payload sets refused, and `id` guarded. Regenerate the
+  migration with `supabase-declarative-schema`, never copy it.
+- Shared models (`ccbfd332d`, `26df590ec`, `8c0e55864`, `464e93afc`,
+  `57f9c5d94`, `fc0b4d11d`): `shared/utils/fnv1a64Hex/`,
+  `shared/models/datasets/AvaDataType/AvaDataTypeModule.ts`
+  (`toDuckDbTypeSql`), `SC/{Crosswalk,CrosswalkLayout,CrosswalkDataset,CrosswalkColumn,CrosswalkMapping,CrosswalkMatch,CrosswalkSql}/`,
+  and `shared/models/dataDictionaries/DictionaryMatch/DictionaryMatchModule/DictionaryMatchModule.ts`
+  (`getBestCodeList`). `fc0b4d11d` matches DuckDB's names and types when
+  grouping and stacking datasets, and `CrosswalkSql` reports
+  `column_types_differ` for a dataset whose column type cannot stack.
+- The browser engine (`4c6ba16e5`, `286f5b38a`, `6ab82052e`, `ea5e6e4aa`,
+  `b1aa292dc`, `1fea566ce`, `1cc63fd7e`, `539d28a69`, `2b5ebde5e`):
+  `LC/{CrosswalkDraft,validateCombineExpression,compileCrosswalk,detectDateFormats,toDateFormatLabel,buildCodeListLookups,clearCombinedDatasetCaches,buildMappingCsvRows,isCrosswalkStale}/`,
+  with the executed tests `LC/__tests__/CrosswalkSql.executed.test.ts` and
+  `LC/detectDateFormats/DateFormatSql/DateFormatSql.executed.test.ts`;
+  `src/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql.ts`
+  (`DATE_FORMATS`, `buildDateSampleSql`). Layout keys and fills never trim
+  names. `2b5ebde5e` closes the CSV formula escape gap in
+  `buildMappingCsvRows` and tightens the combined dataset checks.
+- Clients (`f9388a8da`): `src/clients/crosswalks/`.
+- Permission, routes, and the list (`a2c127a26`): `PermissionRegistry.ts`,
+  `AppLinks.tsx`, `src/routes/_auth/$workspaceSlug/data-manager/crosswalks/{new,$crosswalkId}.tsx`,
+  `useListPaneToggle/`, `DatasetNavbar/`, `DataManagerToolbarActions/`
+  (`NewCrosswalkButton.tsx`), `DataManagerApp.tsx`,
+  `src/views/DataManagerApp/useDataManagerLists/`, and the committed
+  `src/routeTree.gen.ts`.
+- The crosswalk view (`4ce1905f4`, `b25b27a8c`, `70e95bce5`, `1ea150498`,
+  `8a6d1f1c1`, `34c6bec75`, `66caa70bc`, `b1aa292dc`, `bf6902357`,
+  `1fea566ce`, `c27deb99f`, `1cc63fd7e`, `539d28a69`, `07770e7a1`,
+  `2b5ebde5e`): `CV/` (the reducer, the loading hooks, the shell and header
+  with `ExportMapping/` and `CrosswalkStaleBanner/`, `layoutLabel/`, the
+  three steps, and the fixtures in `CV/__tests__/` and
+  `CV/MapLayoutsStep/__tests__/`), and step 1's locked rows in
+  `NewDictionaryFromDatasetsView/PickDatasetsStep/{PickDatasetsTable,PickDatasetRow}.tsx`.
+  `34c6bec75` serializes saves and saves before a step change. `07770e7a1`
+  makes the reducer re-choose a guessed code list from the values once a
+  column is governed, and mark a re-governed column's cleared fills with
+  reason `name_and_type`. `flow.selectLayout` opens the layout even when its
+  save fails.
+- The combined dataset elsewhere (`539d28a69`, `2b5ebde5e`):
+  `src/hooks/crosswalks/`, `DataDictionaryView/useDictionaryUsage/`,
+  `DataDictionaryView/DictionaryUsedByTab/` (`HowAppliedCell.tsx`,
+  `UsageStatusCell.tsx`, `DictionaryUsedByTable.tsx`, `OpenCrosswalkLink.tsx`),
+  `DatasetMetaView/CombinedByFact/`, `DatasetMetaView/DatasetSourceRail.tsx`,
+  `DatasetMetaView/DatasetActionsMenu/{DatasetActionsMenu,DictionaryMenuItems}.tsx`,
+  and `DatasetMetaView/clearCachedDatasetRows.ts`.
+- E2E (`7acb100b3`): `tests/e2e/crosswalk-map-and-combine.spec.ts`,
+  `tests/data/crosswalk-line-lists/`, `tests/e2e/helpers/constants.ts`, and
+  `tests/e2e/helpers/seedDataDictionary.ts` (a second coding per entry).
+- Translations (`5fd4700d7`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
+  The extraction left each locale's new messages untranslated, since
+  machine translations are added by the pre-push hook.
+
+**Schema:** yes, one migration (`crosswalks`): four enums; `crosswalks` with
+its managed `output_dataset_id`, `compiled_at`, and `compiled_code_lists`; the
+four select-only child tables; `rpc_crosswalks__save` and
+`rpc_crosswalks__save_combined_dataset`; and its desktop SQLite twin.
+Regenerate it with `supabase-declarative-schema`, never copy it.
+
+**Deploy:** the migration, then the frontend. No edge function changes: Ask
+Avandar reads the combined dataset's reference bindings as it reads any
+dataset's. The desktop app syncs the five tables from its next build.
+
+**Known gaps:** AI meaning suggestions for mappings, the virtualized layout
+list past 100 layouts, per-dataset progress while combining, and the
+100-dataset measurement are F137. The first combine of many datasets reads
+them one at a time and can take minutes. A combined dataset's rail and popover
+say its codes are "Attached as reference · data unchanged", though the
+crosswalk translated them; the values shown are right. A code list the viewer
+cannot read counts as changed in the stale banner and Used by. Refreshing a
+source clears the combined dataset's cached rows in this tab; another tab
+follows through the virtual dataset's dependency staleness. A dataset whose
+columns changed since it was mapped is left out until it is removed and added
+again. Export mapping exports the draft as shown, unsaved edits included.
+Layouts and mappings are visible to Data Sources viewers even when every
+member dataset is restricted, which leaks column names (the membership rows
+are hidden, the layouts are not). The lock order between combining and a
+dataset delete is not settled. On the desktop, the unique-index ordering
+exposure and `updated_at` churn come from the park-names step of the column
+reconcile. Combine matches columns by name, so a column the user renamed in
+the combined dataset loses its description on the next combine. In Codes mode
+a value that matches no pair of its list passes through as text. Two editors
+saving one crosswalk at once: the last save wins. `ava supabase migrations
+validate` check 5 fails on storage migrations that predate this work.
+Side-by-side joins, write-back to live sources, and "Add from datasets" into
+an existing dictionary stay out.
+
+**Not done:** the headless screenshots of the crosswalk steps and the look-at-it
+comparison against spec section 7.6 (Task 27, Steps 1 and 2) were never taken,
+because the Playwright MCP was unavailable. That includes the keyboard-only
+pass, the narrow stub at 900 px, the offline Map step, the non-admin Create
+button, and the opened Export mapping CSV. The Playwright spec exercises the
+map and combine flow, and `impeccable detect` reports nothing on the touched
+folders.
+
+**Verification:**
+```sh
+ava supabase status
+pnpm lint
+pnpm exec tsc -b --force --noEmit && pnpm type-check:deno
+pnpm test:frontend
+pnpm vitest run --config vitest.executed.config.ts src/lib/crosswalks src/lib/dataDictionaries src/clients/qetl src/components/dataDictionaries
+pnpm test:db
+ava supabase migrations validate
+pnpm desktop:sqlite:gen-migrations
+pnpm desktop:sqlite:check-migrations
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e crosswalk-map-and-combine.spec.ts
+pnpm test:e2e dictionary-apply-linked.spec.ts
+pnpm test:e2e dictionary-apply-reference.spec.ts
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e web-offline-mode.spec.ts
+```
 
 ## Open decisions
 
