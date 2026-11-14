@@ -5,7 +5,11 @@ import {
   Highlight,
   Underline,
 } from "@remotion/rough-notation";
-import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
+import {
+  useVideoProps,
+  useVideoTokens,
+} from "../videoTheme/useVideoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityOverlays.module.css";
 import { getAnnotationProgress } from "./overlayMotion";
@@ -32,9 +36,15 @@ export function ContinuityAnnotation({
 }: Props) {
   const appearance = useContinuityAppearance();
   const { sketch } = useVideoTokens();
+  const annotation = useVideoProps("Annotation", {});
+  const motion = useVideoMotion();
   if (!appearance.annotations) return null;
   return annotations.map((cue, index) => {
-    const progress = getAnnotationProgress(frame, cue);
+    const progress = getAnnotationProgress(
+      frame,
+      cue,
+      motion.scale(annotation.drawIn),
+    );
     if (progress <= 0) return null;
     const Annotation = notation[cue.kind];
     return (
@@ -44,7 +54,7 @@ export function ContinuityAnnotation({
         style={{
           left: cue.target.x,
           top: cue.target.y,
-          opacity: cue.kind === "highlight" ? 0.4 : 1,
+          opacity: cue.kind === "highlight" ? annotation.highlightAlpha : 1,
         }}
       >
         <Annotation
@@ -52,7 +62,7 @@ export function ContinuityAnnotation({
           color={accent}
           roughness={sketch.annotation.roughness}
           seed={cue.seed}
-          strokeWidth={3}
+          strokeWidth={annotation.strokeWidth}
         >
           <div style={{ width: cue.target.width, height: cue.target.height }} />
         </Annotation>

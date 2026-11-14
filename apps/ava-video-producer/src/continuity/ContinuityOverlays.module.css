@@ -1,26 +1,30 @@
 .floating {
-  filter: drop-shadow(0 16px 22px #06101455);
+  color: var(--video-color-text);
   pointer-events: none;
   position: absolute;
   z-index: 20;
 }
 
 .label {
-  border: 1px solid currentcolor;
-  border-radius: 10px;
-  bottom: calc(100% + 12px);
+  background: var(--video-color-ground);
+  border: var(--video-component-floating-label-border-width) solid currentcolor;
+  border-radius: var(--video-corner-label);
+  bottom: calc(100% + var(--video-component-floating-label-offset));
   display: inline-block;
-  font-size: 23px;
-  line-height: 1.25;
+  font-family: var(--video-text-stage-floating-label-font-family);
+  font-size: var(--video-text-stage-floating-label-font-size);
+  line-height: var(--video-text-stage-floating-label-line-height);
   margin: 0;
   max-width: 90%;
-  padding: 12px 18px;
+  padding: var(--video-component-floating-label-padding-y)
+    var(--video-component-floating-label-padding-x);
   position: absolute;
 }
 
 .spotlight {
-  border-radius: 12px;
-  box-shadow: 0 0 0 1800px #061019a8;
+  border-radius: var(--video-corner-spotlight);
+  box-shadow: 0 0 0 var(--video-component-spotlight-scrim-spread)
+    var(--video-color-scrim);
   pointer-events: none;
   position: absolute;
   z-index: 10;

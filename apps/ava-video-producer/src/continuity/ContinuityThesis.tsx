@@ -1,6 +1,10 @@
 import { Underline } from "@remotion/rough-notation";
 import { enter, ramp } from "../motion";
-import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
+import {
+  useVideoProps,
+  useVideoTokens,
+} from "../videoTheme/useVideoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityScene.module.css";
 import { useContinuityCopy } from "./useContinuityCopy";
@@ -12,18 +16,27 @@ type Props = {
   accent: string;
 };
 
+const UNDERLINE_CUE = 95;
+
 /** Staggered statement with a single deterministic teaching underline. */
 export function ContinuityThesis({ content, frame, accent }: Props) {
   const translate = useContinuityCopy();
   const { annotations } = useContinuityAppearance();
   const { sketch } = useVideoTokens();
+  const thesis = useVideoProps("Thesis", {});
+  const underline = useVideoProps("Underline", {});
+  const motion = useVideoMotion();
   return (
     <div className={css.continuityThesis}>
       {content.lines.map((line, index) => (
         <div
           className={css.continuityThesisLine}
           key={line}
-          style={enter(frame, index * 24, { y: 16, dur: 24 })}
+          style={enter(frame, index * motion.scale(thesis.lineStagger), {
+            y: thesis.lineDistance,
+            dur: motion.scale(thesis.lineDuration),
+            easing: motion.curve(thesis.lineEasing),
+          })}
         >
           {translate(line)}
         </div>
@@ -31,11 +44,11 @@ export function ContinuityThesis({ content, frame, accent }: Props) {
       <div className={css.continuityEmphasis}>
         <Underline
           disabled={!annotations}
-          progress={ramp(frame, 95, 28)}
+          progress={ramp(frame, UNDERLINE_CUE, motion.scale(underline.drawIn))}
           color={accent}
           roughness={sketch.annotation.roughness}
-          seed={4}
-          strokeWidth={3}
+          seed={underline.seed}
+          strokeWidth={underline.strokeWidth}
         >
           {translate(content.emphasis)}
         </Underline>
