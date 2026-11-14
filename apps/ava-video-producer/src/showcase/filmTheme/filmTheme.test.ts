@@ -158,6 +158,18 @@ test("an oversized snapshot is refused before it is parsed", () => {
   assert.deepEqual(_refusal(huge), ["payload-too-large"]);
 });
 
+test("the size limit counts bytes, not characters", () => {
+  // 100,000 characters stay under the limit as text, but each euro sign is
+  // three bytes, so the payload is about 300 KB.
+  const padding = "€".repeat(100_000);
+  assert.ok(padding.length < 256 * 1024);
+  const huge = {
+    ...VALID_SNAPSHOT,
+    documents: [{ ...CUSTOM_THEME, label: padding }],
+  };
+  assert.deepEqual(_refusal(huge), ["payload-too-large"]);
+});
+
 test("an unexpected failure is reported with a fixed code", () => {
   const cyclic: Record<string, unknown> = { ...VALID_SNAPSHOT };
   cyclic.self = cyclic;
