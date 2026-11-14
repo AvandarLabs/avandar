@@ -1,0 +1,34 @@
+import { useEffect, useMemo, useState } from "react";
+import { EMPTY_THEME_DRAFT, type ThemeDraft } from "../themeDraft/themeDraft";
+import { isThemeDraftValid } from "./resolveDraftTheme";
+import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
+
+/**
+ * The draft previews and exports may use: the current draft when every part
+ * resolves, otherwise the last one of this theme that did. A preview must
+ * never receive a draft that throws.
+ */
+export function useValidThemeDraft(
+  options: Readonly<{
+    library: VideoThemeLibrary;
+    themeId: string;
+    draft: ThemeDraft;
+  }>,
+): ThemeDraft {
+  const { library, themeId, draft } = options;
+  const isValid = useMemo(
+    () => isThemeDraftValid({ library, themeId, draft }),
+    [library, themeId, draft],
+  );
+  const [lastValid, setLastValid] =
+    useState<Readonly<{ themeId: string; draft: ThemeDraft }>>();
+  useEffect(() => {
+    if (isValid) {
+      setLastValid({ themeId, draft });
+    }
+  }, [isValid, themeId, draft]);
+  if (isValid) {
+    return draft;
+  }
+  return lastValid?.themeId === themeId ? lastValid.draft : EMPTY_THEME_DRAFT;
+}
