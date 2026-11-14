@@ -1,9 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
+import clsx from "clsx";
+import { useId } from "react";
 import { useContinuityCopy } from "../../../useContinuityCopy";
 import css from "./CompositionActions.module.css";
+import { ThemeExportNotice } from "./ThemeExportNotice";
 import { useCompositionDownload } from "./useCompositionDownload";
 import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
 import type { CompositionExportOptions } from "../compositionExportOptions";
+import type { ThemeExportState } from "../themeExportState/themeExportState";
 
 type Props = Readonly<{
   id: string;
@@ -13,58 +17,103 @@ type Props = Readonly<{
   isScene: boolean;
   /** The theme the export renders with, unsaved edits included. */
   theme: ExportTheme;
-  /** The live player shows this theme, so the MP4 will match the preview. */
-  isThemeReady: boolean;
+  /** Whether the live player shows this theme, so the MP4 will match the preview. */
+  themeState: ThemeExportState;
+  /** Sends the theme to the player again after it timed out. */
+  onRetryTheme: () => void;
   /** The camera preset in effect, which changes caption timing. */
   cameraPreset: string;
 }>;
 
-/** Explicit exports use only the options and theme the live player acknowledged. */
-export function CompositionActions({
-  id,
-  captions,
-  options,
-  isScene,
-  theme,
-  isThemeReady,
-  cameraPreset,
-}: Props) {
+/** The download label. A blocked download keeps its label and explains itself in the notice. */
+function useDownloadLabel(
+  isBusy: boolean,
+  options: CompositionExportOptions | undefined,
+  themeState: ThemeExportState,
+): string {
   const { t } = useLingui();
   const translate = useContinuityCopy();
+  if (isBusy) {
+    return translate("Preparing export…");
+  }
+  if (options === undefined) {
+    return translate("Loading preview…");
+  }
+  return themeState.kind === "pending"
+    ? t`Applying design tokens…`
+    : translate("Download MP4");
+}
+
+type DownloadButtonProps = Readonly<{
+  download: ReturnType<typeof useCompositionDownload>;
+  options: CompositionExportOptions | undefined;
+  themeState: ThemeExportState;
+  /** The notice that explains a blocked download. */
+  noticeId: string;
+}>;
+
+/** Download MP4, enabled once the player shows the options and theme the export will use. */
+function DownloadButton({
+  download,
+  options,
+  themeState,
+  noticeId,
+}: DownloadButtonProps) {
+  const label = useDownloadLabel(download.busy, options, themeState);
+  const isBlocked =
+    themeState.kind === "refused" || themeState.kind === "timed-out";
+  return (
+    <button
+      className={clsx(
+        css.compositionActionsDownload,
+        isBlocked && css.isBlocked,
+      )}
+      disabled={
+        download.busy || options === undefined || themeState.kind !== "ready"
+      }
+      aria-busy={download.busy}
+      aria-describedby={isBlocked ? noticeId : undefined}
+      onClick={() => void download.start()}
+    >
+      {label}
+    </button>
+  );
+}
+
+/** Explicit exports use only the options and theme the live player acknowledged. */
+export function CompositionActions(props: Props) {
+  const { id, options, isScene, theme, themeState } = props;
+  const translate = useContinuityCopy();
+  const noticeId = useId();
   const download = useCompositionDownload({
     id,
-    captions,
+    captions: props.captions,
     options,
     theme: isScene ? undefined : theme,
   });
-  const isReady = options !== undefined && isThemeReady;
-  const label = download.busy
-    ? translate("Preparing export…")
-    : options === undefined
-      ? translate("Loading preview…")
-      : isThemeReady
-        ? translate("Download MP4")
-        : t`Applying design tokens…`;
   return (
     <div className={css.compositionActions}>
       <div className={css.compositionActionsLinks}>
-        <button
-          className={css.compositionActionsDownload}
-          disabled={download.busy || !isReady}
-          aria-busy={download.busy}
-          onClick={() => void download.start()}
-        >
-          {label}
-        </button>
+        <DownloadButton
+          download={download}
+          options={options}
+          themeState={themeState}
+          noticeId={noticeId}
+        />
         {!isScene && (
           <NarrationLinks
             id={id}
             options={options}
             themeId={theme.id}
-            cameraPreset={cameraPreset}
+            cameraPreset={props.cameraPreset}
           />
         )}
       </div>
+      <ThemeExportNotice
+        id={noticeId}
+        state={themeState}
+        onRetry={props.onRetryTheme}
+      />
       <p className={css.compositionActionsStatus} role="status">
         {translate(download.status)}
       </p>

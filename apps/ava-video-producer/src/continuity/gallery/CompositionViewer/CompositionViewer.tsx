@@ -38,15 +38,11 @@ type SettingsProps = Readonly<{
   onTabChange: (tab: AtlasPanelTab) => void;
 }>;
 
-function CompositionSettings({
-  selected,
-  captions,
-  player,
-  appearance,
-  tab,
-  onTabChange,
-}: SettingsProps) {
-  const { t } = useLingui();
+/** The draft's theme for one composition: what its player shows and what its export sends. */
+function useCompositionDraftTheme(
+  selected: ContinuityCatalogEntry,
+  player: RefObject<HTMLIFrameElement | null>,
+) {
   const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
   const isScene = isSceneEntry(selected);
   const snapshot = useMemo(
@@ -71,35 +67,82 @@ function CompositionSettings({
       }),
     [library, themeId, validDraft, selected.id],
   );
-  const theme = useCompositionTheme({ id: selected.id, player, snapshot });
+  const theme = useCompositionTheme({
+    id: selected.id,
+    player,
+    snapshot,
+    isScene,
+    hasDraftIssues: hasIssues,
+  });
+  return { isScene, exportTheme, theme };
+}
+
+function CompositionSettings({
+  selected,
+  captions,
+  player,
+  appearance,
+  tab,
+  onTabChange,
+}: SettingsProps) {
+  const { t } = useLingui();
+  const { isScene, exportTheme, theme } = useCompositionDraftTheme(
+    selected,
+    player,
+  );
+  const details = (
+    <>
+      <CompositionControls appearance={appearance} isScene={isScene} />
+      <CompositionActions
+        id={selected.id}
+        captions={captions}
+        options={appearance.options}
+        isScene={isScene}
+        theme={exportTheme}
+        themeState={theme.exportState}
+        onRetryTheme={theme.retry}
+        cameraPreset={theme.cameraPreset}
+      />
+    </>
+  );
+  const tokens = isScene ? undefined : (
+    <VideoThemePanel
+      key={selected.id}
+      item={{ id: selected.id, scopeLabel: t`This composition only` }}
+      usedTokens={theme.usedTokens}
+    />
+  );
   return (
     <AtlasPanelTabs
       tab={tab}
       onTabChange={onTabChange}
-      details={
-        <>
-          <CompositionControls appearance={appearance} isScene={isScene} />
-          <CompositionActions
-            id={selected.id}
-            captions={captions}
-            options={appearance.options}
-            isScene={isScene}
-            theme={exportTheme}
-            isThemeReady={isScene || (theme.isAcknowledged && !hasIssues)}
-            cameraPreset={theme.cameraPreset}
-          />
-        </>
-      }
-      tokens={
-        isScene ? undefined : (
-          <VideoThemePanel
-            key={selected.id}
-            item={{ id: selected.id, scopeLabel: t`This composition only` }}
-            usedTokens={theme.usedTokens}
-          />
-        )
-      }
+      details={details}
+      tokens={tokens}
     />
+  );
+}
+
+type StageProps = Readonly<{
+  selected: ContinuityCatalogEntry;
+  player: RefObject<HTMLIFrameElement | null>;
+  onLoad: () => void;
+}>;
+
+/** The live player, remounted for each composition. */
+function CompositionStage({ selected, player, onLoad }: StageProps) {
+  const translate = useContinuityCopy();
+  return (
+    <div className={css.stage}>
+      <iframe
+        key={selected.id}
+        className={css.compositionViewerPlayer}
+        ref={player}
+        src={`/live.html?id=${encodeURIComponent(selected.id)}`}
+        title={translate(selected.title)}
+        onLoad={onLoad}
+        allowFullScreen
+      />
+    </div>
   );
 }
 
@@ -119,17 +162,11 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
       )}
       aria-label={translate("Composition screening")}
     >
-      <div className={css.stage}>
-        <iframe
-          key={selected.id}
-          className={css.compositionViewerPlayer}
-          ref={player}
-          src={`/live.html?id=${encodeURIComponent(selected.id)}`}
-          title={translate(selected.title)}
-          onLoad={appearance.loaded}
-          allowFullScreen
-        />
-      </div>
+      <CompositionStage
+        selected={selected}
+        player={player}
+        onLoad={appearance.loaded}
+      />
       <div className={css.details}>
         <CompositionSummary selected={selected} />
       </div>

@@ -13,16 +13,26 @@ import {
   resolveVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
-import type { VideoThemeIssue } from "../../../videoTheme/videoTheme.types";
+import {
+  getCurrentAcknowledgement,
+  getThemeExportState,
+  type ReceivedThemeAcknowledgement,
+  type ThemeAcknowledgement,
+} from "./themeExportState/themeExportState";
 
 /** About 100 ms, so dragging a slider does not flood the player. */
 const THEME_SEND_DELAY_MS = 100;
 
-type Acknowledgement = Readonly<{
+/** How long the player has to acknowledge a theme before the gallery offers a retry. */
+const ACKNOWLEDGEMENT_TIMEOUT_MS = 8000;
+
+type PlayerReplies = Readonly<{
   id: string;
-  hash?: string;
-  issues: readonly VideoThemeIssue[];
+  acknowledgement?: ReceivedThemeAcknowledgement;
+  paths: readonly string[];
 }>;
+
+type Player = RefObject<HTMLIFrameElement | null>;
 
 function _expectedTheme(snapshotKey: string, id: string) {
   if (!snapshotKey) {
@@ -49,30 +59,87 @@ function _isOptionsFrom(data: unknown, id: string): boolean {
   );
 }
 
+function _acknowledgementFrom(
+  data: unknown,
+  id: string,
+): ThemeAcknowledgement | undefined {
+  if (!isFilmThemeAcknowledgement(data, id)) {
+    return undefined;
+  }
+  return data.type === "film-theme"
+    ? { hash: data.hash, issues: [] }
+    : { issues: data.issues };
+}
+
 /**
- * Keeps the live player on the draft's theme: sends the item's snapshot
- * (debounced while editing, and again whenever the player reports its
- * options after loading), tracks the hash it acknowledges, and collects the
- * tokens it reports reading. Downloads wait until the player acknowledges
- * the theme the gallery expects.
+ * The live player's theme acknowledgement, tagged with the theme request
+ * that was current when it arrived, and its token usage for film `id`.
+ * Both reset whenever the id changes, so a reply from an earlier visit to
+ * the same film never stands in for its new player's answer.
  */
-export function useCompositionTheme(
-  options: Readonly<{
-    id: string;
-    player: RefObject<HTMLIFrameElement | null>;
-    snapshot: VideoThemeSnapshot | undefined;
-  }>,
-) {
-  const { id, player, snapshot } = options;
-  const snapshotKey = snapshot ? JSON.stringify(snapshot) : "";
-  const expected = useMemo(
-    () => _expectedTheme(snapshotKey, id),
-    [snapshotKey, id],
-  );
-  const [acknowledgement, setAcknowledgement] = useState<Acknowledgement>();
-  const [usage, setUsage] = useState<
-    Readonly<{ id: string; paths: readonly string[] }>
-  >({ id, paths: [] });
+function usePlayerReplies(
+  request: Readonly<{ id: string; key: string | undefined }>,
+  player: Player,
+  onOptions: () => void,
+): PlayerReplies {
+  const { id, key: requestKey } = request;
+  const [replies, setReplies] = useState<PlayerReplies>({ id, paths: [] });
+  if (replies.id !== id) {
+    setReplies({ id, paths: [] });
+  }
+  useEffect(() => {
+    const receive = (event: MessageEvent<unknown>) => {
+      if (
+        event.origin !== location.origin ||
+        event.source !== player.current?.contentWindow
+      ) {
+        return;
+      }
+      const { data } = event;
+      if (_isOptionsFrom(data, id)) {
+        onOptions();
+      }
+      const acknowledgement = _acknowledgementFrom(data, id);
+      if (acknowledgement) {
+        setReplies((current) =>
+          current.id === id
+            ? {
+                ...current,
+                acknowledgement: { ...acknowledgement, requestKey },
+              }
+            : current,
+        );
+      }
+      if (isFilmTokensUsedMessage(data, id)) {
+        setReplies((current) =>
+          current.id === id ? { ...current, paths: data.paths } : current,
+        );
+      }
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [id, requestKey, player, onOptions]);
+  return replies.id === id ? replies : { id, paths: [] };
+}
+
+/** Whether the request named by `requestKey` has gone unanswered for too long. */
+function useRequestTimeout(requestKey: string | undefined): boolean {
+  const [timedOutKey, setTimedOutKey] = useState<string>();
+  useEffect(() => {
+    if (requestKey === undefined) {
+      return;
+    }
+    const timer = setTimeout(
+      () => setTimedOutKey(requestKey),
+      ACKNOWLEDGEMENT_TIMEOUT_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [requestKey]);
+  return requestKey !== undefined && timedOutKey === requestKey;
+}
+
+/** Posts the snapshot to the player, debounced while it keeps changing. */
+function useThemeSender(id: string, player: Player, snapshotKey: string) {
   const send = useCallback(() => {
     if (snapshotKey) {
       player.current?.contentWindow?.postMessage(
@@ -90,39 +157,55 @@ export function useCompositionTheme(
     const timer = setTimeout(send, THEME_SEND_DELAY_MS);
     return () => clearTimeout(timer);
   }, [send]);
-  useEffect(() => {
-    const receive = (event: MessageEvent<unknown>) => {
-      if (
-        event.origin !== location.origin ||
-        event.source !== player.current?.contentWindow
-      ) {
-        return;
-      }
-      const { data } = event;
-      if (_isOptionsFrom(data, id)) {
-        send();
-      }
-      if (isFilmThemeAcknowledgement(data, id)) {
-        setAcknowledgement(
-          data.type === "film-theme"
-            ? { id, hash: data.hash, issues: [] }
-            : { id, issues: data.issues },
-        );
-      }
-      if (isFilmTokensUsedMessage(data, id)) {
-        setUsage({ id, paths: data.paths });
-      }
-    };
-    window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
-  }, [id, player, send]);
+  return send;
+}
+
+/**
+ * Keeps the live player on the draft's theme: sends the item's snapshot
+ * (debounced while editing, and again whenever the player reports its
+ * options after loading), tracks what it acknowledges, and collects the
+ * tokens it reports reading. Downloads use `exportState`, which never stays
+ * pending: a refusal names its reason and a silent player times out with a
+ * retry.
+ */
+export function useCompositionTheme(
+  options: Readonly<{
+    id: string;
+    player: Player;
+    snapshot: VideoThemeSnapshot | undefined;
+    isScene: boolean;
+    hasDraftIssues: boolean;
+  }>,
+) {
+  const { id, player, snapshot, isScene, hasDraftIssues } = options;
+  const snapshotKey = snapshot ? JSON.stringify(snapshot) : "";
+  const expected = useMemo(
+    () => _expectedTheme(snapshotKey, id),
+    [snapshotKey, id],
+  );
+  const [attempt, setAttempt] = useState(0);
+  const send = useThemeSender(id, player, snapshotKey);
+  const requestKey = snapshotKey
+    ? `${id}:${expected?.hash}:${attempt}`
+    : undefined;
+  const replies = usePlayerReplies({ id, key: requestKey }, player, send);
+  const isTimedOut = useRequestTimeout(requestKey);
   return {
-    isAcknowledged:
-      expected !== undefined &&
-      acknowledgement?.id === id &&
-      acknowledgement.hash === expected.hash,
-    playerIssues: acknowledgement?.id === id ? acknowledgement.issues : [],
-    usedTokens: usage.id === id ? usage.paths : [],
+    exportState: getThemeExportState({
+      isScene,
+      hasDraftIssues,
+      expectedHash: expected?.hash,
+      acknowledgement: getCurrentAcknowledgement(
+        replies.acknowledgement,
+        requestKey,
+      ),
+      isTimedOut,
+    }),
+    usedTokens: replies.paths,
     cameraPreset: expected?.semantic.camera.preset ?? "authored",
+    retry: () => {
+      setAttempt((current) => current + 1);
+      send();
+    },
   };
 }
