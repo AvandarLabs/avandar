@@ -60,11 +60,17 @@ test("an atomic token rejects a reference", () => {
   );
 });
 
-test("a theme slower than tempo 0.8 is rejected", () => {
+test("a tempo below the slowest allowed is rejected", () => {
   assert.throws(
     () => parseVideoThemeDocument(_sparse({ atomic: { tempo: { md: 0.75 } } })),
-    /tempo/,
+    (error: { issues?: readonly { path: readonly PropertyKey[] }[] }) =>
+      error.issues?.some(
+        (issue) => issue.path.join(".") === "other.video.atomic.tempo.md",
+      ) ?? false,
   );
+});
+
+test("the slowest allowed tempo is accepted", () => {
   assert.equal(
     parseVideoThemeDocument(_sparse({ atomic: { tempo: { md: 0.8 } } })).id,
     "warm",
