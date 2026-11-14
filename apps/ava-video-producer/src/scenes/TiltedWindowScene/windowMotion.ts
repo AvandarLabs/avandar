@@ -135,7 +135,7 @@ export type CarouselWindow = { atFrame?: number; swap?: "slide" | "cut" };
  */
 export function getCarouselState(
   frame: number,
-  windows: ReadonlyArray<CarouselWindow>,
+  windows: readonly CarouselWindow[],
 ): { current: number; previous?: number; progress: number } {
   const current = windows.reduce(
     (latest, window, index) =>
@@ -250,7 +250,7 @@ export type WindowCameraKey = {
  */
 export function getWindowCamera(
   frame: number,
-  keys: ReadonlyArray<WindowCameraKey>,
+  keys: readonly WindowCameraKey[],
   box: Rect,
 ): { scale: number; originX: number; originY: number; blurX: number } {
   const viewport = { width: 1, height: 1 };
@@ -291,7 +291,7 @@ export type ScrollStep = { atFrame: number; offset: number };
 /** How far tall window content has scrolled, after quick authored jumps. */
 export function getScrollOffset(
   frame: number,
-  steps: ReadonlyArray<ScrollStep>,
+  steps: readonly ScrollStep[],
 ): number {
   return steps.reduce(
     (offset, step) =>

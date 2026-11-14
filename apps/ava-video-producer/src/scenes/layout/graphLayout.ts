@@ -144,7 +144,7 @@ export type GraphPacket = {
  */
 export function getPacketPositions(
   frame: number,
-  packets: ReadonlyArray<GraphPacket>,
+  packets: readonly GraphPacket[],
   start: Point,
   end: Point,
 ): Point[] {

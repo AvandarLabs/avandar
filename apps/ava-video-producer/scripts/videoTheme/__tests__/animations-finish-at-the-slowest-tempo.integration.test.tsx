@@ -58,7 +58,7 @@ function _picture(
 
 function _readContinuityShots(
   id: string,
-): readonly (readonly ContinuityBeat[])[] {
+): ReadonlyArray<readonly ContinuityBeat[]> {
   const entry = CONTINUITY_CATALOG.find((candidate) => candidate.id === id);
   assert.ok(entry, id);
   const plan = storyboardSchema.parse(

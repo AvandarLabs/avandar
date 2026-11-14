@@ -1,9 +1,9 @@
 import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { EASE, ramp } from "../../motion";
 import {
   HorizontalBlurFilter,
   getHorizontalBlurFilter,
 } from "../../motion-components/HorizontalBlur";
-import { EASE, ramp } from "../../motion";
 import { CaptionOverlay } from "../../scenes/CaptionOverlay";
 import { captionBand } from "../../scenes/layout/layout";
 import {

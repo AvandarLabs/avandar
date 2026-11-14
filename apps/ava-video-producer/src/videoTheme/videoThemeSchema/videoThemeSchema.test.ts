@@ -63,7 +63,7 @@ test("an atomic token rejects a reference", () => {
 test("a tempo below the slowest allowed is rejected", () => {
   assert.throws(
     () => parseVideoThemeDocument(_sparse({ atomic: { tempo: { md: 0.75 } } })),
-    (error: { issues?: readonly { path: readonly PropertyKey[] }[] }) =>
+    (error: { issues?: ReadonlyArray<{ path: readonly PropertyKey[] }> }) =>
       error.issues?.some(
         (issue) => issue.path.join(".") === "other.video.atomic.tempo.md",
       ) ?? false,

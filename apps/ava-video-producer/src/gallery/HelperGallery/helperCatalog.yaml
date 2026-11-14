@@ -258,7 +258,14 @@ helpers:
     category: curves
     description: "Five semantic presets, deliberate to whip, that scale travel time, shutter angle and easing for the configurable motion components. Reading holds keep their length."
     source: src/motion-components/motionSettings.ts
-    exports: [MOTION_PRESETS, resolveMotionSettings, getMotionDuration, getMotionProgress, getMotionEasing]
+    exports:
+      [
+        MOTION_PRESETS,
+        resolveMotionSettings,
+        getMotionDuration,
+        getMotionProgress,
+        getMotionEasing,
+      ]
     signature: "getMotionProgress(frame: number, at: number, duration: number, options?: MotionOptions, fallback?: Easing): number"
     defaults:
       - name: preset
@@ -614,7 +621,7 @@ helpers:
     description: "A line fading in with a small rise over DUR.chip on EASE.word."
     source: src/scenes/textReveal.ts
     exports: [getLineRevealStyle]
-    signature: "getLineRevealStyle(frame: number, at: number, mode: \"line-fade\", options?: { rise?: number }): CSSProperties"
+    signature: 'getLineRevealStyle(frame: number, at: number, mode: "line-fade", options?: { rise?: number }): CSSProperties'
     defaults:
       - name: rise
         value: "12 px (0 for a pure fade)"
@@ -635,7 +642,7 @@ helpers:
     description: "A line revealed left to right behind a clip while it travels in 8% from the left, over DUR.panel."
     source: src/scenes/textReveal.ts
     exports: [getLineRevealStyle]
-    signature: "getLineRevealStyle(frame: number, at: number, mode: \"wipe\"): CSSProperties"
+    signature: 'getLineRevealStyle(frame: number, at: number, mode: "wipe"): CSSProperties'
     defaults:
       - name: travel
         value: "-8% to 0"
@@ -656,7 +663,7 @@ helpers:
     description: "A line that appears on its frame with no transition."
     source: src/scenes/textReveal.ts
     exports: [getLineRevealStyle]
-    signature: "getLineRevealStyle(frame: number, at: number, mode: \"cut\"): CSSProperties"
+    signature: 'getLineRevealStyle(frame: number, at: number, mode: "cut"): CSSProperties'
     defaults: []
     usage: |
       <p style={getLineRevealStyle(frame, beat, "cut")}>{line}</p>
@@ -690,7 +697,7 @@ helpers:
     description: "Styles for a scene's title and kicker: a rise by default, or a left-to-right wipe per line, the kicker a panel later."
     source: src/scenes/textReveal.ts
     exports: [getHeadingRevealStyles]
-    signature: "getHeadingRevealStyles(frame: number, reveal: { mode: \"rise\" | \"wipe\", atFrame?, staggerFrames? } | undefined): { title, kicker }"
+    signature: 'getHeadingRevealStyles(frame: number, reveal: { mode: "rise" | "wipe", atFrame?, staggerFrames? } | undefined): { title, kicker }'
     defaults:
       - name: mode
         value: "rise"
@@ -803,7 +810,12 @@ helpers:
     category: masks
     description: "A staircase clip whose columns cross the frame one after another, each at its own sub-frame offset."
     source: src/storyboard/StoryFilm/steppedColumnWipe.ts
-    exports: [getSteppedColumnWipeStyle, getColumnWipeProgress, STEPPED_COLUMN_WIPE_DEFAULTS]
+    exports:
+      [
+        getSteppedColumnWipeStyle,
+        getColumnWipeProgress,
+        STEPPED_COLUMN_WIPE_DEFAULTS,
+      ]
     signature: "getSteppedColumnWipeStyle(frame: number, durationInFrames: number, options: { columns?, staggerFrames?, from?, order? }): CSSProperties"
     defaults:
       - name: columns
@@ -906,7 +918,14 @@ helpers:
     category: camera
     description: "Samples a camera centre and zoom from ordered keys. A repeated pose is a reading hold, kept exact when presets retime the travel."
     source: src/motion-components/cameraTrack.ts
-    exports: [getCameraPose, retimeCameraTrack, isCameraMoving, createCameraTrackSchema, cameraTrackSchema]
+    exports:
+      [
+        getCameraPose,
+        retimeCameraTrack,
+        isCameraMoving,
+        createCameraTrackSchema,
+        cameraTrackSchema,
+      ]
     signature: "getCameraPose(keys, frame: number, enabled?: boolean, options?: MotionOptions, viewport?: { width, height }): { x, y, zoom }"
     defaults:
       - name: viewport
@@ -1036,7 +1055,7 @@ helpers:
     description: "A window that opens as full-bleed footage and pulls back into its box, its tilt growing as it lands."
     source: src/scenes/TiltedWindowScene/windowMotion.ts
     exports: [getPullBack]
-    signature: "getPullBack(frame, enter: { kind: \"pull-back\", atFrame, durationInFrames?, ease? }, canvas, box): { rect, tilt }"
+    signature: 'getPullBack(frame, enter: { kind: "pull-back", atFrame, durationInFrames?, ease? }, canvas, box): { rect, tilt }'
     defaults:
       - name: durationInFrames
         value: "DUR.hero (18)"
@@ -1114,7 +1133,8 @@ helpers:
     category: windows
     description: "Where windows and headlines sit on the canvas, as fractions: the default and tall single boxes, the pair boxes and the headline column."
     source: src/scenes/TiltedWindowScene/windowTilt.ts
-    exports: [WINDOW_BOX, WINDOW_BOX_TALL, WINDOW_BOXES, PAIR_BOXES, HEADLINE_BOX]
+    exports:
+      [WINDOW_BOX, WINDOW_BOX_TALL, WINDOW_BOXES, PAIR_BOXES, HEADLINE_BOX]
     signature: "WINDOW_BOXES = { default: WINDOW_BOX, tall: WINDOW_BOX_TALL }"
     defaults:
       - name: WINDOW_BOX
@@ -1139,7 +1159,7 @@ helpers:
     description: "One still or one piece of footage sampled at an explicit scene frame. Video goes through Freeze, so footage follows the scene's clock."
     source: src/scenes/MediaPlane.tsx
     exports: [MediaPlane]
-    signature: "<MediaPlane frame={frame} kind=\"image\" | \"video\" src=\"public/relative.png\" trimBefore? alt style />"
+    signature: '<MediaPlane frame={frame} kind="image" | "video" src="public/relative.png" trimBefore? alt style />'
     defaults:
       - name: trimBefore
         value: "0"
@@ -1442,7 +1462,7 @@ helpers:
     description: "A mark's columns flying from their slices of the mark to full-height slices of the frame, with a retract, a flight on EASE.surge and a colour cover."
     source: src/scenes/BrandLockupScene/brandLockupMotion.ts
     exports: [getFlightProgress, getFlightColumnRect]
-    signature: "getFlightProgress(frame, exit: { kind: \"fly-through\", atFrame, durationInFrames? } | undefined): { retract, flight, cover } · getFlightColumnRect(index, columns, mark, canvas, progress): Rect"
+    signature: 'getFlightProgress(frame, exit: { kind: "fly-through", atFrame, durationInFrames? } | undefined): { retract, flight, cover } · getFlightColumnRect(index, columns, mark, canvas, progress): Rect'
     defaults:
       - name: durationInFrames
         value: "DUR.hero (18)"

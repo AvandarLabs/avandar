@@ -34,12 +34,11 @@ const colorSchema = z.string().max(100).regex(COLOR_PATTERN);
  * Plan-wide colour tokens, applied once around the whole film. Values are
  * literal colours such as the product's adopted palette.
  */
-export const themeSchema = z
-  .strictObject(
-    Object.fromEntries(
-      THEME_TOKEN_NAMES.map((name) => [name, colorSchema.optional()]),
-    ) as Record<ThemeTokenName, z.ZodOptional<typeof colorSchema>>,
-  );
+export const themeSchema = z.strictObject(
+  Object.fromEntries(
+    THEME_TOKEN_NAMES.map((name) => [name, colorSchema.optional()]),
+  ) as Record<ThemeTokenName, z.ZodOptional<typeof colorSchema>>,
+);
 
 const shotTokenSchema = z
   .string()

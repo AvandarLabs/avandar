@@ -1,8 +1,8 @@
+import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type {
   GadgetSummary,
   GadgetSummaryOptions,
 } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
-import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 
 /** Film-only gadget summaries. The case fixtures reference no gadgets, and
  * the real summaries query Supabase and DuckDB-backed clients, so every gadget

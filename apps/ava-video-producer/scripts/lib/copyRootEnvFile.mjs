@@ -19,7 +19,10 @@ export const ROOT_ENV_FILENAME = ".env.video-producer.local";
  * reads a partial file.
  */
 export function copyRootEnvFile(appRoot, environment = process.env) {
-  if (environment.REMOTION_KEYS_FILE || environment.AVANDAR_REMOTION_KEYS_FILE) {
+  if (
+    environment.REMOTION_KEYS_FILE ||
+    environment.AVANDAR_REMOTION_KEYS_FILE
+  ) {
     return;
   }
   const contents = _readOptionalFile(

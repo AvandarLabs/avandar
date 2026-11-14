@@ -18,7 +18,10 @@ export type { MotionRect, OverlayCue } from "./AnchoredOverlay";
 export { SvgObjectDeparture, getObjectFlight } from "./SvgObjectDeparture";
 export type { ObjectFlight } from "./SvgObjectDeparture";
 export { SharedElement } from "./SharedElement";
-export { HorizontalBlurFilter, getHorizontalBlurFilter } from "./HorizontalBlur";
+export {
+  HorizontalBlurFilter,
+  getHorizontalBlurFilter,
+} from "./HorizontalBlur";
 export type { SharedElementProps } from "./SharedElement";
 export {
   SceneTransition,

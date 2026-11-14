@@ -69,6 +69,7 @@
     "details settings"
     "guidance settings";
   grid-template-columns: minmax(0, 1fr) 380px;
+
   /* Content height: auto rows would shrink to fit the modal and overlap. */
   grid-template-rows: repeat(3, max-content);
   height: 100%;

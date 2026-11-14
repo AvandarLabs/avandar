@@ -24,7 +24,7 @@
 }
 
 .cardBarShort {
-  composes: cardBar;
+  composes: cardbar;
   width: 60%;
 }
 

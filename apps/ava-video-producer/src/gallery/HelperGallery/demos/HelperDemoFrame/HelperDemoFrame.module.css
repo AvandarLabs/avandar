@@ -42,11 +42,8 @@
 
 /* The bottom 64px stay clear for the live player's control bar. */
 .stage {
-  bottom: 64px;
-  left: 28px;
+  inset: 112px 28px 64px;
   position: absolute;
-  right: 28px;
-  top: 112px;
 }
 
 .readouts {
@@ -64,18 +61,18 @@
 
 .readout {
   align-items: baseline;
-  flex: none;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   background: var(--demo-panel);
   border-radius: 6px;
   display: flex;
+  flex: none;
   font-family: var(--demo-mono);
   font-size: 14px;
   gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
   padding: 6px 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .readoutName {
