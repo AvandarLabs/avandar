@@ -1014,6 +1014,29 @@ const OVERLAY_TOKENS = {
   },
 } as const;
 
+const TRANSITION_TOKENS = {
+  Morph: {
+    startRadius: _length(
+      "Morph start radius",
+      "Corner radius a morph transition starts from before it opens to the full frame.",
+      "stage",
+    ),
+  },
+  Aperture: {
+    overscan: token({
+      kind: "number",
+      surface: "stage",
+      unit: "×",
+      min: 1,
+      max: 1.5,
+      step: 0.01,
+      label: "Aperture overscan",
+      description:
+        "How far past the frame's diagonal an aperture transition opens, so its edge clears the corners.",
+    }),
+  },
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -1024,6 +1047,7 @@ export const COMPONENT_TOKENS = {
   ...SHARED_GRAPHIC_TOKENS,
   ...STAGE_TOKENS,
   ...OVERLAY_TOKENS,
+  ...TRANSITION_TOKENS,
   NetworkGraph: NETWORK_GRAPH_TOKENS,
   RadialNetwork: RADIAL_NETWORK_TOKENS,
   PlexusField: PLEXUS_FIELD_TOKENS,

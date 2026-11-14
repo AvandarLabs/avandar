@@ -30,6 +30,9 @@ export const motionOptionsSchema = z
     shutterAngle: z.number().min(0).max(360).optional(),
     samples: z.number().int().min(2).max(16).optional(),
     blurStrength: z.number().min(0).max(2).optional(),
+    velocityBlurFactor: z.number().min(0).max(1).optional(),
+    velocityBlurLimit: z.number().min(0).max(20).optional(),
+    transitionBlur: z.number().min(0).max(48).optional(),
   })
   .strict();
 /** Numeric overrides take precedence over the selected semantic preset. */
@@ -45,6 +48,9 @@ export function resolveMotionSettings(options: MotionOptions = {}) {
     shutterAngle: parsed.shutterAngle ?? preset.shutterAngle,
     samples: parsed.samples ?? 10,
     blurStrength: parsed.blurStrength ?? 1,
+    velocityBlurFactor: parsed.velocityBlurFactor ?? 0.09,
+    velocityBlurLimit: parsed.velocityBlurLimit ?? 3,
+    transitionBlur: parsed.transitionBlur ?? 12,
   };
 }
 
@@ -96,15 +102,22 @@ export function getMotionProgress(
   );
 }
 
-/** Bounded screen-space blur for single-instance overlays and scene movement. */
+/**
+ * Bounded screen-space blur for single-instance overlays and scene movement:
+ * the travel per frame times the blur factor, capped at the limit (the
+ * motion options' `velocityBlurLimit` unless `maximum` is given).
+ */
 export function getVelocityBlur(
   distancePerFrame: number,
   options?: MotionOptions,
-  maximum = 3,
+  maximum?: number,
 ): number {
   const settings = resolveMotionSettings(options);
   return (
-    (Math.min(maximum, Math.abs(distancePerFrame) * 0.09) *
+    (Math.min(
+      maximum ?? settings.velocityBlurLimit,
+      Math.abs(distancePerFrame) * settings.velocityBlurFactor,
+    ) *
       settings.blurStrength *
       settings.shutterAngle) /
     180

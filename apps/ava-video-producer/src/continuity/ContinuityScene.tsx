@@ -30,6 +30,8 @@ export function ContinuityScene({
   const translate = useContinuityCopy();
   const { color } = useVideoTokens();
   const bar = useVideoProps("ProgressBar", {});
+  const morph = useVideoProps("Morph", {});
+  const aperture = useVideoProps("Aperture", {});
   const timing = getContinuityTimeline(plan.beats);
   const duration = timing[timing.length - 1].end;
   return (
@@ -49,6 +51,8 @@ export function ContinuityScene({
                       anchor: plan.beats[index - 1]?.token?.anchor,
                       cameraMotion: plan.cameraMotion,
                       motionBlur: plan.motionBlur,
+                      morphRadius: morph.startRadius,
+                      apertureOverscan: aperture.overscan,
                     })}
                   />
                 )}

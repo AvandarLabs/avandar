@@ -269,6 +269,8 @@
     "Connector": { "defaultProps": { "strokeWidth": "$stroke.default", "dash": "$atomic.dash.connector", "bend": 30, "drop": 60, "drawIn": 30, "easing": "$atomic.easing.inOut" } },
     "FloatingLabel": { "defaultProps": { "padding": { "x": 18, "y": 12 }, "offset": 12, "borderWidth": "$stroke.hairline" } },
     "FloatingDiagram": { "defaultProps": { "elevation": "$elevation.floating" } },
+    "Morph": { "defaultProps": { "startRadius": 12 } },
+    "Aperture": { "defaultProps": { "overscan": 1.05 } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,

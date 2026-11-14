@@ -60,6 +60,9 @@ test("numeric overrides win over presets without modifying their shared definiti
     shutterAngle: 30,
     samples: 6,
     blurStrength: 0,
+    velocityBlurFactor: 0.09,
+    velocityBlurLimit: 3,
+    transitionBlur: 12,
     easing: "ease-out",
   });
   assert.equal(resolveMotionSettings({ preset: "whip" }).speed, 1.5);
@@ -254,5 +257,37 @@ test("native UI scene movement has bounded blur, exact rests and an opaque outgo
     getSceneTransitionStyle(0.5, true, { ...props, cameraMotion: false })
       .transform,
     undefined,
+  );
+});
+
+test("velocity blur reads its factor and limit from the motion options", () => {
+  assert.equal(getVelocityBlur(10, { velocityBlurFactor: 0.05 }), 0.5);
+  assert.equal(
+    getVelocityBlur(100, { velocityBlurFactor: 0.05, velocityBlurLimit: 2 }),
+    2,
+  );
+});
+
+test("a spatial transition's peak blur comes from the motion options", () => {
+  const style = getSceneTransitionStyle(0.5, true, {
+    kind: "spatial",
+    motion: { transitionBlur: 24 },
+  });
+  assert.equal(style.filter, "blur(24px)");
+});
+
+test("a morph starts from its themed radius and an aperture opens to its themed overscan", () => {
+  const morph = getSceneTransitionStyle(0.5, true, {
+    kind: "morph",
+    morphRadius: 24,
+  });
+  assert.match(String(morph.clipPath), /round 12px\)$/);
+  const aperture = getSceneTransitionStyle(1, true, {
+    kind: "aperture",
+    apertureOverscan: 1,
+  });
+  assert.equal(
+    aperture.clipPath,
+    `circle(${Math.hypot(1600, 840)}px at 800px 420px)`,
   );
 });
