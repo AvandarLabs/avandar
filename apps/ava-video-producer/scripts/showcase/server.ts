@@ -14,7 +14,7 @@ import { requireLicense } from "../require-license.mjs";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { type StockFingerprint } from "../stock/StockFingerprintModule/StockFingerprintModule";
 import { buildLivePlayers } from "./build";
-import { getCaptionFileOptionsFromSearch } from "./captionFileOptions/captionFileOptions";
+import { loadCaptionFilm } from "./captionFileOptions/captionFileOptions";
 import { createExportJobs } from "./createExportJobs/createExportJobs";
 import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
@@ -191,11 +191,20 @@ async function api(
       return;
     }
     const parameters = new URL(req.url ?? "/", "http://localhost").searchParams;
-    const film = await ShowcaseFilms.load(
-      filmMatch[1],
-      getCaptionFileOptionsFromSearch(parameters),
-    );
-    if (!film.plan) {
+    const result = await loadCaptionFilm({
+      id: filmMatch[1],
+      parameters,
+      load: ShowcaseFilms.load,
+    });
+    if (result.status === 400) {
+      json(res, 400, {
+        message:
+          "Invalid theme or camera options for this film. Check the showcase terminal.",
+      });
+      return;
+    }
+    const film = result.status === 200 ? result.film : undefined;
+    if (!film?.plan) {
       res.writeHead(404).end();
       return;
     }

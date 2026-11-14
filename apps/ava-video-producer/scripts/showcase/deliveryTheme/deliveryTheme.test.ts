@@ -65,3 +65,13 @@ test("a saved theme records no draft", () => {
     false,
   );
 });
+
+test("a custom theme sent with an empty patch is marked as a draft", () => {
+  const theme = createSnapshotFromThemeRequest({
+    library: createVideoThemeLibrary([WARM]),
+    id: "warm",
+    patch: {},
+  });
+  const delivery = getDeliveryThemeFromFilm({ id: "occlusion-wipe", theme });
+  assert.deepEqual([delivery.themeId, delivery.themeDraft], ["warm", true]);
+});

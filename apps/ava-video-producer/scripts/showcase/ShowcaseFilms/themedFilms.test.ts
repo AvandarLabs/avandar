@@ -46,3 +46,10 @@ test("a continuity film keeps its theme out of the appearance options", async ()
   });
   assert.equal(film.theme?.themeId, "avandar");
 });
+
+test("an empty draft patch on a built-in theme still renders as the unsaved theme", async () => {
+  const film = await ShowcaseFilms.load("stock-network-graph", {
+    theme: { id: "avandar", patch: {} },
+  });
+  assert.equal(film.theme?.themeId, DRAFT_THEME_ID);
+});

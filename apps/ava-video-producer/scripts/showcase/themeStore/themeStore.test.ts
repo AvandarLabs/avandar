@@ -169,3 +169,16 @@ test("the reserved draft theme id cannot be saved", () =>
       400,
     );
   }));
+
+test("a hand-placed reserved draft theme file is neither listed nor read", () =>
+  _withStore(async (store, directory) => {
+    await fs.writeFile(
+      path.join(directory, "unsaved-draft.theme.json"),
+      JSON.stringify({ ...WARM, id: "unsaved-draft" }),
+    );
+    assert.deepEqual(
+      (await store.list()).map((summary) => summary.id),
+      ["classic"],
+    );
+    assert.equal(await _statusOf(store.read("unsaved-draft")), 404);
+  }));

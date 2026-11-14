@@ -93,3 +93,12 @@ test("an unknown theme is rejected", () =>
       /Unknown video theme "missing"/,
     );
   }));
+
+test("an empty draft patch on a custom theme is kept as a draft", () =>
+  _withThemes(async (directory) => {
+    const snapshot = await loadVideoThemeSnapshot(
+      { id: "warm", patch: {} },
+      { directory },
+    );
+    assert.deepEqual([snapshot.themeId, snapshot.patches], ["warm", [{}]]);
+  }));

@@ -162,6 +162,11 @@ function _fileFromId(directory: string, id: string): string {
 }
 
 async function _readTheme(directory: string, id: string): Promise<StoredTheme> {
+  // A hand-placed file under the reserved id would collide with every
+  // built-in theme's draft, so the store treats it as absent.
+  if (id === DRAFT_THEME_ID) {
+    throw new ThemeStoreError(404, `No theme named "${id}"`);
+  }
   const text = await fs
     .readFile(_fileFromId(directory, id), "utf8")
     .catch((error: NodeJS.ErrnoException) => {
@@ -185,7 +190,10 @@ async function _readAllThemes(
   directory: string,
 ): Promise<VideoThemeDocument[]> {
   const names = (await fs.readdir(directory)).filter(
-    (name) => name.endsWith(THEME_FILE_SUFFIX) && !name.startsWith("."),
+    (name) =>
+      name.endsWith(THEME_FILE_SUFFIX) &&
+      !name.startsWith(".") &&
+      name !== `${DRAFT_THEME_ID}${THEME_FILE_SUFFIX}`,
   );
   const results = await Promise.all(
     names.map((name) =>

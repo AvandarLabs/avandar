@@ -33,3 +33,41 @@ export function getCaptionFileOptionsFromSearch(
       : { cameraMotion: cameraMotion !== "false" }),
   };
 }
+
+/** A caption download's film, or the status to answer with instead. */
+export type CaptionFilmResult<FilmValue> =
+  | Readonly<{ status: 200; film: FilmValue }>
+  | Readonly<{ status: 400 | 404 }>;
+
+/**
+ * Loads the film a transcript or caption download asks for. A film that
+ * loads without the query's options but not with them is a bad query (400);
+ * one that never loads is unknown (404). The load error stays on the server.
+ */
+export async function loadCaptionFilm<FilmValue>(
+  options: Readonly<{
+    id: string;
+    parameters: URLSearchParams;
+    load: (
+      id: string,
+      options: Readonly<Record<string, unknown>>,
+    ) => Promise<FilmValue>;
+  }>,
+): Promise<CaptionFilmResult<FilmValue>> {
+  const { id, parameters, load } = options;
+  try {
+    return {
+      status: 200,
+      film: await load(id, getCaptionFileOptionsFromSearch(parameters)),
+    };
+  } catch (error) {
+    const isKnownFilm = await load(id, {}).then(
+      () => true,
+      () => false,
+    );
+    if (isKnownFilm) {
+      console.error("Invalid caption download options:", error);
+    }
+    return { status: isKnownFilm ? 400 : 404 };
+  }
+}
