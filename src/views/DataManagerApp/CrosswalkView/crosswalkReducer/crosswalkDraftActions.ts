@@ -247,6 +247,7 @@ export function chooseReference(
 
 function _identityMapping(
   column: CrosswalkDraft.Column,
+  sourceColumnName: string,
   binding: ReferenceColumnBinding | undefined,
 ): CrosswalkDraft.Mapping {
   const isGoverned = column.entryId !== undefined;
@@ -255,7 +256,7 @@ function _identityMapping(
     id: uuid<CrosswalkMapping.Id>(),
     fill: {
       kind: "column",
-      sourceColumn: column.name,
+      sourceColumn: sourceColumnName,
       convert: undefined,
       codeListId: isGoverned ? binding?.codeListId : undefined,
       holdsLabels: isGoverned ? (binding?.holdsLabels ?? false) : false,
@@ -271,7 +272,9 @@ function _identityMapping(
 
 /**
  * Makes the combined dataset's columns from the reference dataset's, in its
- * column order, governed where the reference binds a known entry. The
+ * column order, governed where the reference binds a known entry. A column
+ * is named without its header's edge spaces, as it is saved, while its fill
+ * reads the source column exactly as the dataset spells it. The
  * reference layout fills each from itself, confirmed; every other layout is
  * prefilled by name and type. Does nothing once columns exist.
  */
@@ -299,13 +302,18 @@ export function seedColumns(
       context,
     });
     const id = uuid<CrosswalkColumn.Id>();
-    return { id, name: sourceColumn.name, position, dataType, entryId };
+    return { id, name: sourceColumn.name.trim(), position, dataType, entryId };
   });
   const referenceMappings = Object.fromEntries(
-    columns.map((column) => {
+    columns.map((column, position) => {
+      const sourceName = dataset.columns[position]?.name ?? column.name;
       return [
         column.id,
-        _identityMapping(column, bindingsByColumnName.get(column.name)),
+        _identityMapping(
+          column,
+          sourceName,
+          bindingsByColumnName.get(sourceName),
+        ),
       ];
     }),
   );

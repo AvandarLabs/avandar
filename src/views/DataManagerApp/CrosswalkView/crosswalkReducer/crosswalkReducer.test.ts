@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import { CrosswalkSql } from "$/models/crosswalks/CrosswalkSql/CrosswalkSql";
+import { compileCrosswalk } from "@/lib/crosswalks/compileCrosswalk/compileCrosswalk";
 import { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import {
   BRONX,
   CONTEXT,
+  CROSSWALK_ID,
   getColumn,
   getLayoutOf,
   KINGS_APRIL,
@@ -25,6 +27,7 @@ import {
   canChangeReference,
   crosswalkReducer,
   isCrosswalkDirty,
+  makeInitialCrosswalkState,
 } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer";
 import { withLayoutMappings } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/prefillCrosswalkLayout";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
@@ -264,6 +267,58 @@ describe("crosswalkReducer: columns_seeded", () => {
     });
     expect(_fillOf(state, kings.id, "county")?.status).toBe("confirmed");
     expect(kings.status).toBe(_expectedStatus(state, kings.id));
+  });
+
+  it("names the output column without the edge spaces of a padded header", () => {
+    const padded: CrosswalkLayout.Dataset = {
+      id: "dddddddd-0000-4000-8000-0000000000a1" as typeof BRONX.id,
+      name: "Padded header",
+      columns: [
+        { name: "CaseNo ", dataType: "varchar" },
+        { name: " county", dataType: "varchar" },
+      ],
+    };
+    const context = makeContext([padded]);
+    const added = crosswalkReducer(
+      makeInitialCrosswalkState(
+        CrosswalkDraft.makeEmpty({ crosswalkId: CROSSWALK_ID, name: "Padded" }),
+        { isSaved: false },
+      ),
+      { type: "datasets_added", datasetIds: [padded.id], context },
+    );
+    const state = crosswalkReducer(added, {
+      type: "columns_seeded",
+      bindingsByColumnName: new Map(),
+      context,
+    });
+    const referenceId = getLayoutOf(state, padded.id).id;
+    const result = compileCrosswalk({
+      draft: state.draft,
+      datasetsById: context.datasetsById,
+      entriesById: context.entriesById,
+    });
+    const savedNames = CrosswalkDraft.toSavePayload(state.draft).columns.map(
+      (column) => {
+        return column.name;
+      },
+    );
+
+    expect(savedNames).toEqual(["CaseNo", "county"]);
+    expect(_fillOf(state, referenceId, "CaseNo")?.fill).toMatchObject({
+      sourceColumn: "CaseNo ",
+    });
+    expect(result.status).toBe("ready");
+    expect(
+      result.status === "ready"
+        ? result.columns.map((column) => {
+            return column.name;
+          })
+        : [],
+    ).toEqual(["source_dataset", ...savedNames]);
+    expect(result.status === "ready" ? result.sql : "").toContain(
+      'AS "CaseNo"',
+    );
+    expect(result.status === "ready" ? result.sql : "").toContain('"CaseNo "');
   });
 
   it("seeds only once", () => {
