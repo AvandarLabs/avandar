@@ -4,6 +4,11 @@ import { useId, useState } from "react";
 import { useContinuityCopy } from "../../../useContinuityCopy";
 import css from "./CompositionActions.module.css";
 import {
+  CAPTION_DOWNLOAD_IDLE,
+  finishCaptionDownload,
+  startCaptionDownload,
+} from "./downloadCaptionFile/captionDownloadState";
+import {
   type CaptionDownloadOptions,
   downloadCaptionFile,
 } from "./downloadCaptionFile/downloadCaptionFile";
@@ -120,13 +125,21 @@ export function CompositionActions(props: Props) {
 function useCaptionDownload(
   id: string,
   options: CaptionDownloadOptions,
-): Readonly<{ hasFailed: boolean; start: () => void }> {
-  const [failedId, setFailedId] = useState<string | undefined>(undefined);
+): Readonly<{ isBusy: boolean; hasFailed: boolean; start: () => void }> {
+  const [state, setState] = useState(CAPTION_DOWNLOAD_IDLE);
   return {
-    hasFailed: failedId === id,
+    isBusy: state.busyId !== undefined,
+    hasFailed: state.failedId === id,
     start: () => {
-      setFailedId(undefined);
-      downloadCaptionFile({ id, options }).catch(() => setFailedId(id));
+      const started = startCaptionDownload(state, id);
+      if (!started) {
+        return;
+      }
+      setState(started);
+      downloadCaptionFile({ id, options }).then(
+        () => setState((current) => finishCaptionDownload(current, id, false)),
+        () => setState((current) => finishCaptionDownload(current, id, true)),
+      );
     },
   };
 }
@@ -157,6 +170,8 @@ function NarrationLinks({
       <button
         type="button"
         className={css.compositionActionsLink}
+        disabled={captions.isBusy}
+        aria-busy={captions.isBusy}
         onClick={captions.start}
       >
         {translate("Captions")}

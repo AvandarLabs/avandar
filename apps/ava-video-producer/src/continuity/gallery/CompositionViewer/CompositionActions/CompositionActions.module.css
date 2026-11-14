@@ -31,6 +31,11 @@
   text-decoration: underline;
 }
 
+.compositionActionsLink:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .compositionActionsStatus {
   margin-top: 12px;
   min-height: 24px;
