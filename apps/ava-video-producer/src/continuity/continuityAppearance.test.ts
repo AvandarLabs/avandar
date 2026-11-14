@@ -104,38 +104,11 @@ test("roughness accepts independent finite levels from zero to three", () => {
   }
 });
 
-test("camera presets extend travel without truncating holds or mutating authored plans", () => {
-  const plan = storyboardSchema.parse(
-    JSON.parse(
-      fs.readFileSync(
-        new URL(
-          "../../storyboards/explainers/study-shared-object-handoff.json",
-          import.meta.url,
-        ),
-        "utf8",
-      ),
-    ),
-  );
-  const before = structuredClone(plan);
-  const changed = createContinuityPlanFromOptions(plan, {
-    cameraPreset: "deliberate",
-  });
-  assert.deepEqual(plan, before);
-  assert.ok(changed.shots[0].durationInFrames > plan.shots[0].durationInFrames);
-  assert.equal(storyboardSchema.safeParse(changed).success, true);
-  assert.deepEqual(changed.narration, plan.narration);
-  const shot = changed.shots[0];
-  assert.equal(shot.scene, "continuity");
-  if (shot.scene === "continuity") {
-    const content = shot.props.beats[0].content;
-    assert.equal(content.kind, "stock");
-    if (content.kind === "stock") {
-      assert.deepEqual(content.cameraOptions, { preset: "deliberate" });
-    }
-  }
+test("the camera preset option leaves timing to the video theme", () => {
+  const plan = _readFirstPlan();
   assert.deepEqual(
-    createContinuityPlanFromOptions(plan, { cameraPreset: "authored" }),
-    plan,
+    createContinuityPlanFromOptions(plan, { cameraPreset: "deliberate" }),
+    createContinuityPlanFromOptions(plan, {}),
   );
 });
 
@@ -153,35 +126,4 @@ test("camera preset validation accepts the five profiles and the authored defaul
     continuityAppearanceSchema.safeParse({ cameraPreset: "fast" }).success,
     false,
   );
-});
-
-test("every catalog film remains valid with every camera preset", () => {
-  CONTINUITY_CATALOG.forEach((entry) => {
-    const plan = storyboardSchema.parse(
-      JSON.parse(
-        fs.readFileSync(
-          new URL(`../../storyboards/${entry.path}.json`, import.meta.url),
-          "utf8",
-        ),
-      ),
-    );
-    ["deliberate", "gentle", "balanced", "brisk", "whip"].forEach(
-      (cameraPreset) => {
-        const changed = createContinuityPlanFromOptions(plan, { cameraPreset });
-        const result = storyboardSchema.safeParse(changed);
-        assert.equal(
-          result.success,
-          true,
-          `${entry.id}: ${cameraPreset}: ${result.error?.message}`,
-        );
-        assert.deepEqual(
-          createContinuityPlanFromOptions(plan, {
-            cameraPreset,
-            cameraMotion: false,
-          }),
-          createContinuityPlanFromOptions(plan, { cameraMotion: false }),
-        );
-      },
-    );
-  });
 });

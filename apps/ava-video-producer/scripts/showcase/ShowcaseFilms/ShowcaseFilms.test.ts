@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { DECISION_FORK_DENSE_INPUT } from "../../../src/stock/presets/DecisionFork/DecisionFork.fixtures";
 import { resolveVideoThemeFromSnapshot } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
@@ -332,19 +333,21 @@ test("camera preset exports include the complete extended timeline", async () =>
     cameraPreset: "deliberate",
   });
   assert.ok(adjusted.frames > original.frames);
+  const drawn = createContinuityPlanFromVideoThemeSnapshot(
+    adjusted.plan!,
+    adjusted.theme,
+    [adjusted.id],
+  );
   assert.equal(
     adjusted.frames,
-    adjusted.plan!.shots.reduce(
-      (total, shot) => total + shot.durationInFrames,
-      0,
-    ),
+    drawn.shots.reduce((total, shot) => total + shot.durationInFrames, 0),
   );
-  const shot = adjusted.plan!.shots[0];
+  const shot = drawn.shots[0];
   assert.equal(
     shot.scene === "continuity" &&
       shot.props.beats[0].content.kind === "stock" &&
-      shot.props.beats[0].content.cameraOptions?.preset,
-    "deliberate",
+      shot.props.beats[0].content.cameraOptions?.speed,
+    0.25,
   );
   await assert.rejects(
     ShowcaseFilms.load("shared-object-handoff", { cameraPreset: "fast" }),

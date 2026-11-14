@@ -4,6 +4,7 @@ import libraryPlan from "../storyboards/library.json";
 import { Demo, DEMO_LEN } from "./compositions/Demo/Demo";
 import { MotionLab, MOTION_LAB_LEN } from "./compositions/MotionLab";
 import { TitleStudy, TITLE_STUDY_LEN } from "./compositions/TitleStudy";
+import { createContinuityPlanFromVideoThemeSnapshot } from "./continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { StockCompositions } from "./stock/StockCompositions";
 import { storyboardSchema, durationInFrames } from "./storyboard/schema/schema";
 import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm/ThemedStoryFilm";
@@ -69,7 +70,11 @@ export function RemotionRoot() {
           const plan = storyboardSchema.parse(props.plan);
           return {
             props: { plan, theme: props.theme },
-            durationInFrames: durationInFrames(plan),
+            durationInFrames: durationInFrames(
+              createContinuityPlanFromVideoThemeSnapshot(plan, props.theme, [
+                plan.id,
+              ]),
+            ),
             fps: plan.fps,
             width: plan.width,
             height: plan.height,

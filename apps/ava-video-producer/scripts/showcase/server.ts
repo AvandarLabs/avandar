@@ -7,6 +7,7 @@ import {
 } from "node:http";
 import path from "node:path";
 import { z } from "zod";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { buildAtlas } from "../buildAtlas/buildAtlas.mjs";
 import { assetReferences, publicAsset, captionFiles } from "../lib/planHelpers";
 import { requireLicense } from "../require-license.mjs";
@@ -59,18 +60,23 @@ const plansWatcher = watch(
     }, 200);
   },
 );
-const themeStore = createThemeStore({ directory: path.join(appRoot, "themes") });
+const themeStore = createThemeStore({
+  directory: path.join(appRoot, "themes"),
+});
 let themeTimer: ReturnType<typeof setTimeout> | undefined;
 // A theme saved here or edited on disk republishes, so open galleries reload it.
-const themesWatcher = watch(path.join(appRoot, "themes"), (_event, filename) => {
-  if (!filename?.endsWith(".theme.json") || filename.startsWith(".")) {
-    return;
-  }
-  clearTimeout(themeTimer);
-  themeTimer = setTimeout(() => {
-    publish().catch((error) => console.error("Theme reload failed:", error));
-  }, 200);
-});
+const themesWatcher = watch(
+  path.join(appRoot, "themes"),
+  (_event, filename) => {
+    if (!filename?.endsWith(".theme.json") || filename.startsWith(".")) {
+      return;
+    }
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(() => {
+      publish().catch((error) => console.error("Theme reload failed:", error));
+    }, 200);
+  },
+);
 const jobs: ReturnType<
   typeof createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>
 > = createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>(
@@ -192,7 +198,12 @@ async function api(
       res.writeHead(404).end();
       return;
     }
-    const files = captionFiles(film.plan);
+    // Caption timing follows the theme's camera preset.
+    const files = captionFiles(
+      createContinuityPlanFromVideoThemeSnapshot(film.plan, film.theme, [
+        film.id,
+      ]),
+    );
     res
       .writeHead(200, {
         "Content-Type": "text/plain; charset=utf-8",

@@ -9,6 +9,7 @@ import {
   renderStill,
   selectComposition,
 } from "@remotion/renderer";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import {
   declaredCutFrames,
   durationInFrames,
@@ -661,19 +662,25 @@ export async function main(argv = process.argv.slice(2)) {
   } else if (options.command === "plan")
     console.log("Plan artifacts:", await exportPlan(plan, workspace));
   else {
-    // Only the two commands that draw a picture load a theme.
+    // Only the two commands that draw a picture load a theme. Its camera
+    // preset can lengthen beats, so the stills, the audio mix, and the gates
+    // use the themed plan. The composition themes it again, which changes
+    // nothing.
     const theme = await loadVideoThemeSnapshot({
       id: options.theme ?? "classic",
     });
+    const themedPlan = createContinuityPlanFromVideoThemeSnapshot(plan, theme, [
+      plan.id,
+    ]);
     if (options.command === "preview")
       console.log(
         "Inspect preview:",
-        await preview(plan, options.filename, workspace, theme),
+        await preview(themedPlan, options.filename, workspace, theme),
       );
     else
       console.log(
         "Finished video:",
-        await render(plan, options.filename, workspace, theme),
+        await render(themedPlan, options.filename, workspace, theme),
       );
   }
 }

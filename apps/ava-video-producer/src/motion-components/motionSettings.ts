@@ -19,7 +19,12 @@ export const MOTION_PRESETS = {
   whip: { speed: 1.5, shutterAngle: 240, easing: "ease-in-out-cubic" },
 } as const;
 
-/** Serializable overrides shared by JSX components and storyboard motion cues. */
+/**
+ * Serializable overrides shared by JSX components and storyboard motion
+ * cues. In a continuity shot, `createContinuityPlanFromVideoTheme` expands a
+ * preset and fills the shutter, samples, and blur fields from the video
+ * theme; a value the storyboard authors overrides the theme for that cue.
+ */
 export const motionOptionsSchema = z
   .object({
     preset: z

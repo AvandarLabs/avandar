@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   AbsoluteFill,
   Audio,
@@ -8,6 +9,7 @@ import {
 import { AvandarScene } from "../avandar/AvandarScene";
 import { MotionLab } from "../compositions/MotionLab";
 import { TitleStudy } from "../compositions/TitleStudy";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { StockGraphic } from "../stock/StockGraphic";
 import { absoluteCues } from "../storyboard/schema/schema";
 import { StoryFilm } from "../storyboard/StoryFilm/StoryFilm";
@@ -108,11 +110,27 @@ export function FilmComposition({
   film: Film;
   withAudio?: boolean;
 }) {
+  // The picture and its audio cues follow the themed plan, the same plan the
+  // film's frame count came from.
+  const themedFilm = useMemo(
+    () =>
+      film.plan
+        ? {
+            ...film,
+            plan: createContinuityPlanFromVideoThemeSnapshot(
+              film.plan,
+              film.theme,
+              [film.id],
+            ),
+          }
+        : film,
+    [film],
+  );
   return (
     <VideoThemeProvider
       source={createVideoThemeSourceFromSnapshot(film.theme, [film.id])}
     >
-      <FilmPicture film={film} withAudio={withAudio} />
+      <FilmPicture film={themedFilm} withAudio={withAudio} />
     </VideoThemeProvider>
   );
 }

@@ -8,6 +8,7 @@ import {
   createContinuityPlanFromOptions,
 } from "../../../src/continuity/continuityAppearance";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import {
   getHelperFromFilmId,
   HELPER_CANVAS,
@@ -156,12 +157,24 @@ function _assertExportable(film: Readonly<Film>): void {
   }
 }
 
-/** The gallery's palette and roughness controls for a continuity film, as theme patches. */
+/** The gallery's palette, roughness, and camera preset controls for a continuity film, as theme patches. */
 function _legacyThemePatches(
   options: z.infer<typeof optionsSchema>,
 ): VideoThemePatch[] {
-  const { accent, background, annotationRoughness, boxRoughness } = options;
-  const legacy = { accent, background, annotationRoughness, boxRoughness };
+  const {
+    accent,
+    background,
+    annotationRoughness,
+    boxRoughness,
+    cameraPreset,
+  } = options;
+  const legacy = {
+    accent,
+    background,
+    annotationRoughness,
+    boxRoughness,
+    cameraPreset,
+  };
   return Object.values(legacy).some((value) => value !== undefined)
     ? [createThemePatchFromLegacyAppearance(legacy)]
     : [];
@@ -256,7 +269,13 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
     ...base,
     kind: "storyboard",
     plan: configuredPlan,
-    frames: durationInFrames(configuredPlan),
+    // The film keeps the authored plan; FilmComposition applies the theme,
+    // whose camera preset can lengthen beats.
+    frames: durationInFrames(
+      createContinuityPlanFromVideoThemeSnapshot(configuredPlan, base.theme, [
+        id,
+      ]),
+    ),
     fps: plan.fps,
     width: plan.width,
     height: plan.height,

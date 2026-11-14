@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
 import { createVideoThemeSourceFromSnapshot } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { StoryFilm } from "../StoryFilm/StoryFilm";
@@ -17,11 +19,15 @@ type Props = Readonly<{
  * `story-film` composition the `video` CLI renders.
  */
 export function ThemedStoryFilm({ plan, theme, productScene }: Props) {
+  const themedPlan = useMemo(
+    () => createContinuityPlanFromVideoThemeSnapshot(plan, theme, [plan.id]),
+    [plan, theme],
+  );
   return (
     <VideoThemeProvider
       source={createVideoThemeSourceFromSnapshot(theme, [plan.id])}
     >
-      <StoryFilm plan={plan} productScene={productScene} />
+      <StoryFilm plan={themedPlan} productScene={productScene} />
     </VideoThemeProvider>
   );
 }

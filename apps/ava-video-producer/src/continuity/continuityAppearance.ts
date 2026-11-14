@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_ACCENT } from "../gallery/palette";
 import { motionOptionsSchema } from "../motion-components/motionSettings";
-import { createContinuityShotFromCameraPreset } from "./createContinuityShotFromCameraPreset";
 import type { Storyboard } from "../storyboard/schema/schema";
 
 /** Validated editorial controls shared by previews and exports. */
@@ -30,7 +29,7 @@ export const continuityAppearanceSchema = z
 /** Complete appearance acknowledged by the active player. */
 export type ContinuityAppearance = z.infer<typeof continuityAppearanceSchema>;
 
-/** Apply editorial options and camera timing without mutating authored inputs. */
+/** Apply the render switches without mutating authored inputs. Values the video theme owns are ignored here. */
 export function createContinuityPlanFromOptions(
   plan: Storyboard,
   raw: unknown,
@@ -50,11 +49,11 @@ export function createContinuityPlanFromOptions(
     })
     .strict()
     .parse(raw);
-  // Palette and roughness reach the renderer through the theme (see
-  // createThemePatchFromLegacyAppearance), never through shot props.
+  // Palette, roughness, and the camera preset reach the renderer through the
+  // theme (see createThemePatchFromLegacyAppearance), never through shot props.
   const {
     captions: _captions,
-    cameraPreset,
+    cameraPreset: _cameraPreset,
     accent: _accent,
     background: _background,
     annotationRoughness: _annotationRoughness,
@@ -67,12 +66,7 @@ export function createContinuityPlanFromOptions(
       if (shot.scene !== "continuity") {
         return shot;
       }
-      const styled = { ...shot, props: { ...shot.props, ...appearance } };
-      return cameraPreset &&
-        cameraPreset !== "authored" &&
-        styled.props.cameraMotion
-        ? createContinuityShotFromCameraPreset(styled, cameraPreset)
-        : styled;
+      return { ...shot, props: { ...shot.props, ...appearance } };
     }),
   };
 }

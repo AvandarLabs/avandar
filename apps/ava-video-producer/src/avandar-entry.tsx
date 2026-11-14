@@ -2,6 +2,7 @@ import { Composition, registerRoot } from "remotion";
 import "./theme.css";
 import importPlan from "../storyboards/import.json";
 import { AvandarScene } from "./avandar/AvandarScene";
+import { createContinuityPlanFromVideoThemeSnapshot } from "./continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import {
   storyboardSchema,
   durationInFrames,
@@ -32,7 +33,11 @@ function Root() {
         const plan = storyboardSchema.parse(props.plan);
         return {
           props: { plan, theme: props.theme },
-          durationInFrames: durationInFrames(plan),
+          durationInFrames: durationInFrames(
+            createContinuityPlanFromVideoThemeSnapshot(plan, props.theme, [
+              plan.id,
+            ]),
+          ),
           fps: plan.fps,
           width: plan.width,
           height: plan.height,

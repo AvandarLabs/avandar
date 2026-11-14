@@ -45,6 +45,11 @@ export type Film = {
   delivery: { width: number; height: number };
   loop: boolean;
   showCaptions: boolean;
+  /**
+   * The authored plan with the viewer's render switches applied. Draw it and
+   * count its frames through `createContinuityPlanFromVideoThemeSnapshot(plan,
+   * theme, [id])`, because the theme's camera preset can lengthen beats.
+   */
   plan?: Storyboard;
   /** The theme every frame resolves. Undefined renders `classic`. */
   theme?: VideoThemeSnapshot;

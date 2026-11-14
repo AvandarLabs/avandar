@@ -9,6 +9,7 @@ import {
   continuityAppearanceSchema,
   createContinuityPlanFromOptions,
 } from "../continuity/continuityAppearance";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { HelperPlayer } from "../gallery/HelperGallery/HelperPlayer/HelperPlayer";
 import { durationInFrames } from "../storyboard/schema/timeline";
 import { createThemePatchFromLegacyAppearance } from "../videoTheme/themePatches/themePatches";
@@ -76,14 +77,8 @@ function LivePlayer({ film }: { film: Film }) {
         : {},
     ),
   );
-  const previewPlan =
-    film.plan && continuity
-      ? createContinuityPlanFromOptions(film.plan, appearance)
-      : film.plan;
-  const previewFrames = previewPlan
-    ? durationInFrames(previewPlan)
-    : film.frames;
-  // The gallery's palette and roughness controls apply as the last theme patch.
+  // The gallery's palette, roughness, and camera preset controls apply as
+  // the last theme patch.
   const theme = useMemo(
     () =>
       addPatchesToVideoThemeSnapshot(
@@ -91,6 +86,25 @@ function LivePlayer({ film }: { film: Film }) {
         continuity ? [createThemePatchFromLegacyAppearance(appearance)] : [],
       ),
     [film.theme, continuity, appearance],
+  );
+  const previewPlan = useMemo(
+    () =>
+      film.plan && continuity
+        ? createContinuityPlanFromOptions(film.plan, appearance)
+        : film.plan,
+    [film.plan, continuity, appearance],
+  );
+  // Count frames with the theme applied: its camera preset can lengthen beats.
+  const previewFrames = useMemo(
+    () =>
+      previewPlan
+        ? durationInFrames(
+            createContinuityPlanFromVideoThemeSnapshot(previewPlan, theme, [
+              film.id,
+            ]),
+          )
+        : film.frames,
+    [previewPlan, theme, film.id, film.frames],
   );
   const [captions, setCaptions] = useState(saved?.captions ?? true);
   const [speed, setSpeed] = useState(saved?.speed ?? 1);
