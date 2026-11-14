@@ -12,37 +12,15 @@ type Props = Readonly<{
 }>;
 
 /**
- * The Design tokens tab of an Atlas modal: the theme bar, the
- * changed-on-disk banner, and the editor for the open item. Key it by the
- * item so its scope resets when the item changes.
+ * The Design tokens tab of an Atlas modal: the editor for the open item,
+ * with the theme bar and the changed-on-disk banner pinned above its toolbar.
+ * Key it by the item so its scope resets when the item changes.
  */
 export function VideoThemePanel({ item, usedTokens }: Props) {
   const gallery = useGalleryVideoTheme();
   const [scope, setScope] = useState<ThemeEditScope>({ kind: "theme" });
   return (
     <div className={css.panel}>
-      <ThemeBar
-        themes={gallery.themes}
-        themeId={gallery.themeId}
-        isBuiltIn={gallery.isBuiltIn}
-        isDirty={gallery.isDirty}
-        hasIssues={gallery.hasIssues}
-        isChangedOnDisk={gallery.isChangedOnDisk}
-        status={gallery.status}
-        onSelectTheme={gallery.selectTheme}
-        onSave={() => void gallery.save()}
-        onSaveAsNew={gallery.saveAsNew}
-        onDiscard={gallery.discard}
-        onReloadTheme={() => void gallery.reloadTheme()}
-        onCopyJson={() => void gallery.copyThemeJson()}
-      />
-      {gallery.isChangedOnDisk ? (
-        <ChangedOnDiskBanner
-          onKeep={gallery.keepDraft}
-          onDiscard={gallery.discard}
-          onReload={() => void gallery.reloadTheme()}
-        />
-      ) : null}
       <VideoThemeEditor
         library={gallery.library}
         themeId={gallery.themeId}
@@ -50,6 +28,32 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
         scope={scope}
         item={item}
         usedTokens={usedTokens}
+        header={
+          <>
+            <ThemeBar
+              themes={gallery.themes}
+              themeId={gallery.themeId}
+              isBuiltIn={gallery.isBuiltIn}
+              isDirty={gallery.isDirty}
+              hasIssues={gallery.hasIssues}
+              isChangedOnDisk={gallery.isChangedOnDisk}
+              status={gallery.status}
+              onSelectTheme={gallery.selectTheme}
+              onSave={() => void gallery.save()}
+              onSaveAsNew={gallery.saveAsNew}
+              onDiscard={gallery.discard}
+              onReloadTheme={() => void gallery.reloadTheme()}
+              onCopyJson={() => void gallery.copyThemeJson()}
+            />
+            {gallery.isChangedOnDisk ? (
+              <ChangedOnDiskBanner
+                onKeep={gallery.keepDraft}
+                onDiscard={gallery.discard}
+                onReload={() => void gallery.reloadTheme()}
+              />
+            ) : null}
+          </>
+        }
         onDraftChange={gallery.setDraft}
         onScopeChange={setScope}
       />

@@ -4,15 +4,32 @@
   min-width: 0;
 }
 
-/* Sticks under an Atlas panel's tab list, or at the top without one. */
-.toolbar {
+/*
+ * The theme bar, the changed-on-disk banner, and the toolbar stay pinned
+ * together under an Atlas panel's tab list (or at the top without one) while
+ * the rows scroll. A 1px rule closes the block so rows never clip against it
+ * with no edge. The block scrolls inside itself past a share of the viewport,
+ * so the rows always keep room. The 4px of padding, offset by matching
+ * negative inline margins, keeps a focus ring from clipping at the edge.
+ */
+.pinned {
   background: var(--paper);
+  border-bottom: 1px solid var(--line);
   display: grid;
   gap: 8px;
   inset-block-start: var(--atlas-panel-tabs-height, 0);
-  padding-block-end: 8px;
+  margin-inline: -4px;
+  max-block-size: 45dvh;
+  overflow-y: auto;
+  padding-block: 4px 8px;
+  padding-inline: 4px;
   position: sticky;
   z-index: 2;
+}
+
+.toolbar {
+  display: grid;
+  gap: 8px;
 }
 
 .scope {

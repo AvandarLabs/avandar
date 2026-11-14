@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { SegmentedControl } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useDraftTheme } from "../resolveDraftTheme/useDraftTheme";
 import {
   countItemOverrides,
@@ -37,6 +37,8 @@ type Props = Readonly<{
   item?: EditorItem;
   /** Token paths the previewed item read; enables the usage filter. */
   usedTokens?: readonly string[];
+  /** Pinned above the toolbar, so it stays visible while the rows scroll. */
+  header?: ReactNode;
   onDraftChange: (draft: ThemeDraft) => void;
   onScopeChange: (scope: ThemeEditScope) => void;
 }>;
@@ -164,15 +166,18 @@ export function VideoThemeEditor(props: Props) {
   return (
     <TokenEditorContext.Provider value={context}>
       <section className={css.editor} aria-label={t`Design tokens`}>
-        <EditorToolbar
-          filters={filters}
-          onFiltersChange={setFilters}
-          scope={props.scope}
-          item={props.item}
-          overrideCount={overrideCount}
-          hasUsage={props.usedTokens !== undefined}
-          onScopeChange={props.onScopeChange}
-        />
+        <div className={css.pinned}>
+          {props.header}
+          <EditorToolbar
+            filters={filters}
+            onFiltersChange={setFilters}
+            scope={props.scope}
+            item={props.item}
+            overrideCount={overrideCount}
+            hasUsage={props.usedTokens !== undefined}
+            onScopeChange={props.onScopeChange}
+          />
+        </div>
         {filters.query ? null : <EssentialsGroup rows={rows} />}
         <TierSwitch
           filters={filters}
