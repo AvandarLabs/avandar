@@ -64,6 +64,27 @@ describe("useListPaneToggle", () => {
     });
   });
 
+  it.each([
+    [
+      "/demo/data-manager/crosswalks/new",
+      "/$workspaceSlug/data-manager/crosswalks/new",
+    ],
+    [
+      "/demo/data-manager/crosswalks/1",
+      "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
+    ],
+  ])("hides the list on the crosswalk view at %s", (pathname, taskRoute) => {
+    routeState.pathname = pathname;
+    routeState.taskRoute = taskRoute;
+    const { result } = renderHook(() => {
+      return useListPaneToggle();
+    });
+    expect(result.current).toMatchObject({
+      isTaskView: true,
+      isListShown: false,
+    });
+  });
+
   it("hides the list on a task view until it is shown", () => {
     const { result } = renderHook(() => {
       return useListPaneToggle();

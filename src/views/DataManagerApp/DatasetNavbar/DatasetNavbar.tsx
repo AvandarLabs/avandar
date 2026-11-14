@@ -11,7 +11,12 @@ import {
   TextInput,
   Tooltip as MantineTooltip,
 } from "@mantine/core";
-import { IconBook, IconDatabaseOff, IconSearch } from "@tabler/icons-react";
+import {
+  IconArrowMerge,
+  IconBook,
+  IconDatabaseOff,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useDeferredValue, useMemo, useState } from "react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -24,6 +29,7 @@ import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import css from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar.module.css";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
+import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { NavLinkProps } from "@avandar/ui";
@@ -39,11 +45,14 @@ type Props = {
   datasets: Dataset.T[];
   /** Dictionaries listed in their own group below the datasets. */
   dictionaries?: readonly DataDictionary.T[];
+  /** Crosswalks listed in their own group below the dictionaries. */
+  crosswalks?: readonly Crosswalk.T[];
   isLoading: boolean;
   className?: string;
 };
 
 const NO_DICTIONARIES: readonly DataDictionary.T[] = [];
+const NO_CROSSWALKS: readonly Crosswalk.T[] = [];
 
 type DatasetGroup = {
   sourceType: DatasetSource.SourceType;
@@ -162,9 +171,53 @@ function makeDictionaryLink(options: {
   } as NavLinkProps & { key: string };
 }
 
+function makeCrosswalkLink(options: {
+  workspaceSlug: string;
+  crosswalk: Crosswalk.T;
+}): NavLinkProps & { key: string } {
+  const { workspaceSlug, crosswalk } = options;
+  // Destination only, for the same reasons as `makeDatasetLink`.
+  const { to, params } = AppLinks.dataManagerCrosswalkView({
+    workspaceSlug,
+    crosswalkId: crosswalk.id,
+    crosswalkName: crosswalk.name,
+  });
+  return {
+    key: crosswalk.id,
+    to,
+    params,
+    className: css.datasetNavbarLink,
+    leftSection: <IconArrowMerge size={16} stroke={1.6} aria-hidden />,
+    label: <DatasetNavbarName name={crosswalk.name} />,
+  } as NavLinkProps & { key: string };
+}
+
+/** The crosswalks whose names contain the filter, as list rows. */
+function useCrosswalkLinks(
+  options: Readonly<{
+    crosswalks: readonly Crosswalk.T[];
+    filter: string;
+    workspaceSlug: string;
+  }>,
+): ReadonlyArray<NavLinkProps & { key: string }> {
+  const { crosswalks, filter, workspaceSlug } = options;
+  return useMemo(() => {
+    const query = filter.trim().toLocaleLowerCase();
+    return crosswalks
+      .filter((crosswalk) => {
+        return (
+          query === "" || crosswalk.name.toLocaleLowerCase().includes(query)
+        );
+      })
+      .map((crosswalk) => {
+        return makeCrosswalkLink({ workspaceSlug, crosswalk });
+      });
+  }, [crosswalks, filter, workspaceSlug]);
+}
+
 /**
- * The master pane of Data Sources: every dataset and dictionary in the
- * workspace, datasets grouped by where they came from.
+ * The master pane of Data Sources: every dataset, dictionary, and crosswalk in
+ * the workspace, datasets grouped by where they came from.
  *
  * The grouping is withheld while the workspace has only one kind of source,
  * because a single heading over every row labels nothing. The filter is
@@ -173,6 +226,7 @@ function makeDictionaryLink(options: {
 export function DatasetNavbar({
   datasets,
   dictionaries = NO_DICTIONARIES,
+  crosswalks = NO_CROSSWALKS,
   isLoading,
   className,
 }: Readonly<Props>): ReactNode {
@@ -268,9 +322,18 @@ export function DatasetNavbar({
     });
   }, [matchingDictionaries, workspaceSlug]);
 
-  const totalCount = datasets.length + dictionaries.length;
+  const crosswalkLinks = useCrosswalkLinks({
+    crosswalks,
+    filter: deferredFilter,
+    workspaceSlug,
+  });
+
+  const totalCount = datasets.length + dictionaries.length + crosswalks.length;
   const isGrouped =
-    datasetGroups.length + (dictionaryLinks.length > 0 ? 1 : 0) > 1;
+    datasetGroups.length +
+      (dictionaryLinks.length > 0 ? 1 : 0) +
+      (crosswalkLinks.length > 0 ? 1 : 0) >
+    1;
 
   const elements = {
     loading() {
@@ -336,6 +399,20 @@ export function DatasetNavbar({
               />
             </div>
           ) : null}
+          {crosswalkLinks.length > 0 ? (
+            <div className={css.datasetNavbarGroup}>
+              {isGrouped ? (
+                <Text component="h4" className={css.datasetNavbarGroupTitle}>
+                  <Trans>Crosswalks</Trans>
+                </Text>
+              ) : null}
+              <NavLinkList
+                links={crosswalkLinks}
+                gap={6}
+                inactiveHoverColor="neutral.1"
+              />
+            </div>
+          ) : null}
         </>
       );
     },
@@ -364,7 +441,9 @@ export function DatasetNavbar({
     >
       {isLoading && totalCount === 0
         ? elements.loading()
-        : datasetGroups.length === 0 && dictionaryLinks.length === 0
+        : datasetGroups.length === 0 &&
+            dictionaryLinks.length === 0 &&
+            crosswalkLinks.length === 0
           ? elements.empty()
           : elements.groups()}
     </AppListPane>

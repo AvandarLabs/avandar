@@ -6,13 +6,16 @@ import { useState } from "react";
 const TASK_ROUTES = [
   "/$workspaceSlug/data-manager/dictionaries/new",
   "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries",
+  "/$workspaceSlug/data-manager/crosswalks/new",
+  "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
 ] as const;
 
 /**
  * Whether the Data Sources list shows beside the current view. A task view
- * (creating a dictionary, applying dictionaries) hides it by default to
- * free width for its tables, and Show list brings it back until the
- * pathname changes, including on coming back to the same route later.
+ * (creating a dictionary, applying dictionaries, mapping a crosswalk) hides
+ * it by default to free width for its tables, and Show list brings it back
+ * until the pathname changes, including on coming back to the same route
+ * later.
  * Every other view always shows it. On a phone the list and the view never
  * share the row, so the toggle is not offered. Used by `DataManagerApp` and
  * its toolbar.

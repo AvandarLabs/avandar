@@ -180,6 +180,45 @@ export const AppLinks = {
       isAvailableOffline: true,
     };
   },
+  dataManagerNewCrosswalk: (workspaceSlug: string) => {
+    return {
+      key: "data-manager-new-crosswalk",
+      to: "/$workspaceSlug/data-manager/crosswalks/new",
+      params: { workspaceSlug },
+      label: (): string => {
+        return t`New crosswalk`;
+      },
+      // Choosing datasets and grouping layouts run on the device. Only
+      // saving needs a connection, and saving says so when offline.
+      isAvailableOffline: true,
+    };
+  },
+  dataManagerCrosswalkView: ({
+    workspaceSlug,
+    crosswalkId,
+    crosswalkName,
+    step,
+    layoutId,
+  }: {
+    workspaceSlug: string;
+    crosswalkId: string;
+    crosswalkName: string;
+    step?: "datasets" | "map" | "combine";
+    layoutId?: string;
+  }) => {
+    return {
+      key: "data-manager-crosswalk-view",
+      to: "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
+      params: { workspaceSlug, crosswalkId },
+      search: { step, layoutId },
+      label: () => {
+        return crosswalkName;
+      },
+      // A crosswalk read from the persisted cache can be mapped offline.
+      // Saving says so when there is no connection.
+      isAvailableOffline: true,
+    };
+  },
   dataImport: (workspaceSlug: string) => {
     return {
       key: "dataImport",
