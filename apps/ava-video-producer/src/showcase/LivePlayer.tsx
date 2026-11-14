@@ -3,21 +3,21 @@ import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { I18nProvider } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { Player, type PlayerRef } from "@remotion/player";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createRoot } from "react-dom/client";
 import {
   continuityAppearanceSchema,
   createContinuityPlanFromOptions,
+  type ContinuityAppearance,
 } from "../continuity/continuityAppearance";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { HelperPlayer } from "../gallery/HelperGallery/HelperPlayer/HelperPlayer";
 import { durationInFrames } from "../storyboard/schema/timeline";
-import { createThemePatchFromLegacyAppearance } from "../videoTheme/themePatches/themePatches";
-import {
-  addPatchesToVideoThemeSnapshot,
-  CLASSIC_VIDEO_THEME_SNAPSHOT,
-} from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { VideoTokenUsageContext } from "../videoTheme/tokenUsage/tokenUsage";
+import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
 import { FilmComposition } from "./FilmComposition";
+import { useFilmControl } from "./useFilmControl/useFilmControl";
+import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import type { Film } from "./showcase.types";
 import "../theme.css";
 import "./player.css";
@@ -25,20 +25,31 @@ import "./player.css";
 i18n.setMessagesCompiler(compileMessage);
 i18n.loadAndActivate({ locale: "en", messages: {} });
 const id = new URLSearchParams(location.search).get("id") ?? "avandar-home";
-function readSaved() {
+
+type SavedPlayback = Readonly<{
+  frame: number;
+  playing: boolean;
+  captions: boolean;
+  speed?: number;
+  loop?: boolean;
+}>;
+type ContinuityShot = Extract<
+  NonNullable<Film["plan"]>["shots"][number],
+  { scene: "continuity" }
+>;
+
+function _readSaved(): SavedPlayback | undefined {
   try {
-    return JSON.parse(sessionStorage.getItem(`film:${id}`) ?? "null") as {
-      frame: number;
-      playing: boolean;
-      captions: boolean;
-      speed?: number;
-      loop?: boolean;
-    } | null;
+    return (
+      (JSON.parse(
+        sessionStorage.getItem(`film:${id}`) ?? "null",
+      ) as SavedPlayback | null) ?? undefined
+    );
   } catch {
-    return null;
+    return undefined;
   }
 }
-const saved = readSaved();
+const saved = _readSaved();
 let savePlayback = () => {};
 window.addEventListener("message", (event) => {
   if (
@@ -54,45 +65,167 @@ window.addEventListener("message", (event) => {
   } catch {
     /* Storage can be unavailable in a restricted browser. */
   }
-  send({ type: "film-reloading", requestId: event.data.requestId });
+  _send({ type: "film-reloading", requestId: event.data.requestId });
   location.reload();
 });
-function send(message: object) {
+function _send(message: object) {
   window.parent.postMessage(message, location.origin);
 }
 
+function _findContinuityShot(film: Film): ContinuityShot | undefined {
+  const shot = film.plan?.shots.find(
+    (candidate) => candidate.scene === "continuity",
+  );
+  return shot?.scene === "continuity" ? shot : undefined;
+}
+
+function _getInitialAppearance(
+  shot: ContinuityShot | undefined,
+): ContinuityAppearance {
+  return continuityAppearanceSchema.parse(
+    shot
+      ? {
+          cameraMotion: shot.props.cameraMotion,
+          motionBlur: shot.props.motionBlur,
+          annotations: shot.props.annotations,
+        }
+      : {},
+  );
+}
+
+// The film keeps its unthemed plan: FilmComposition applies the theme.
+function _createPreviewPlan(
+  film: Film,
+  appearance: ContinuityAppearance,
+  isContinuity: boolean,
+) {
+  return film.plan && isContinuity
+    ? createContinuityPlanFromOptions(film.plan, appearance)
+    : film.plan;
+}
+
+function _getInitialFrame(previewFrames: number): number {
+  const fallbackFrame =
+    id === "avandar-home" ? 490 : Math.min(100, previewFrames - 1);
+  return Math.min(previewFrames - 1, saved?.frame ?? fallbackFrame);
+}
+
+function useSavedPlayback(
+  player: RefObject<PlayerRef | null>,
+  state: Readonly<{ captions: boolean; speed: number; loop: boolean }>,
+) {
+  const { captions, speed, loop } = state;
+  useEffect(
+    function rememberPlaybackForReload() {
+      savePlayback = () =>
+        sessionStorage.setItem(
+          `film:${id}`,
+          JSON.stringify({
+            frame: player.current?.getCurrentFrame() ?? 0,
+            playing: player.current?.isPlaying() ?? false,
+            captions,
+            speed,
+            loop,
+          }),
+        );
+    },
+    [player, captions, speed, loop],
+  );
+  useEffect(
+    function registerPlayEventListener() {
+      const current = player.current;
+      const play = () => _send({ type: "film-playing", id });
+      current?.addEventListener("play", play);
+      return () => {
+        current?.removeEventListener("play", play);
+      };
+    },
+    [player],
+  );
+}
+
+type LiveFilmProps = Readonly<{
+  film: Film;
+  player: RefObject<PlayerRef | null>;
+  previewFrames: number;
+  captions: boolean;
+  speed: number;
+  loop: boolean;
+}>;
+
+function LiveFilm(props: LiveFilmProps) {
+  const { film, player, previewFrames, captions, speed, loop } = props;
+  return (
+    <Player
+      ref={player}
+      component={FilmComposition}
+      inputProps={{
+        film: { ...film, frames: previewFrames, showCaptions: captions },
+      }}
+      compositionWidth={film.width}
+      compositionHeight={film.height}
+      durationInFrames={previewFrames}
+      fps={film.fps}
+      controls
+      loop={loop}
+      playbackRate={speed}
+      autoPlay={saved?.playing ?? false}
+      initialFrame={_getInitialFrame(previewFrames)}
+      style={{ width: "100%" }}
+      clickToPlay={false}
+      spaceKeyToPlayOrPause
+      errorFallback={() => (
+        <p className="liveError">
+          <Trans>
+            Preview unavailable. Check the showcase terminal, then reload.
+          </Trans>
+        </p>
+      )}
+    />
+  );
+}
+
+/**
+ * The live film's appearance, theme, and transport, seeded from the film and
+ * the playback saved before a source reload.
+ */
+function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
+  const [appearance, setAppearance] = useState(() =>
+    _getInitialAppearance(continuity),
+  );
+  const [theme, setTheme] = useState<VideoThemeSnapshot | undefined>(
+    film.theme,
+  );
+  const [captions, setCaptions] = useState(saved?.captions ?? true);
+  const [speed, setSpeed] = useState(saved?.speed ?? 1);
+  const [loop, setLoop] = useState(saved?.loop ?? false);
+  return {
+    appearance,
+    setAppearance,
+    theme,
+    setTheme,
+    captions,
+    setCaptions,
+    speed,
+    setSpeed,
+    loop,
+    setLoop,
+  };
+}
+
+/**
+ * The embedded live preview: plays a film, follows the gallery's transport,
+ * appearance, and theme messages, and reports the tokens its film reads.
+ */
 function LivePlayer({ film }: { film: Film }) {
   const player = useRef<PlayerRef>(null);
-  const continuity = film.plan?.shots.find(
-    (shot) => shot.scene === "continuity",
-  );
-  const [appearance, setAppearance] = useState(() =>
-    continuityAppearanceSchema.parse(
-      continuity?.scene === "continuity"
-        ? {
-            cameraMotion: continuity.props.cameraMotion,
-            motionBlur: continuity.props.motionBlur,
-            annotations: continuity.props.annotations,
-          }
-        : {},
-    ),
-  );
-  // The gallery's palette, roughness, and camera preset controls apply as
-  // the last theme patch.
-  const theme = useMemo(
-    () =>
-      addPatchesToVideoThemeSnapshot(
-        film.theme ?? CLASSIC_VIDEO_THEME_SNAPSHOT,
-        continuity ? [createThemePatchFromLegacyAppearance(appearance)] : [],
-      ),
-    [film.theme, continuity, appearance],
-  );
+  const continuity = _findContinuityShot(film);
+  const state = useLiveFilmState(film, continuity);
+  const { appearance, theme, captions, speed, loop } = state;
+  const usage = useObservedTokenUsage();
   const previewPlan = useMemo(
-    () =>
-      film.plan && continuity
-        ? createContinuityPlanFromOptions(film.plan, appearance)
-        : film.plan,
-    [film.plan, continuity, appearance],
+    () => _createPreviewPlan(film, appearance, Boolean(continuity)),
+    [film, appearance, continuity],
   );
   // Count frames with the theme applied: its camera preset can lengthen beats.
   const previewFrames = useMemo(
@@ -106,133 +239,45 @@ function LivePlayer({ film }: { film: Film }) {
         : film.frames,
     [previewPlan, theme, film.id, film.frames],
   );
-  const [captions, setCaptions] = useState(saved?.captions ?? true);
-  const [speed, setSpeed] = useState(saved?.speed ?? 1);
-  const [loop, setLoop] = useState(saved?.loop ?? false);
-  useEffect(
-    function restoreSavedPlaybackState() {
-      savePlayback = () =>
-        sessionStorage.setItem(
-          `film:${id}`,
-          JSON.stringify({
-            frame: player.current?.getCurrentFrame() ?? 0,
-            playing: player.current?.isPlaying() ?? false,
-            captions,
-            speed,
-            loop,
-          }),
-        );
-      send({
-        type: "film-options",
-        id,
-        options: continuity ? { ...appearance, captions } : { captions },
-        transport: { speed, loop },
-      });
-      const receive = (event: MessageEvent) => {
-        if (
-          event.origin !== location.origin ||
-          event.source !== window.parent ||
-          event.data?.type !== "film-control"
-        ) {
-          return;
-        }
-        if (event.data.id && event.data.id !== id) return;
-        const { action, value } = event.data;
-        if (action === "appearance" && continuity) {
-          const result = continuityAppearanceSchema.safeParse(value);
-          if (result.success) {
-            setAppearance(result.data);
-            setCaptions(result.data.captions);
-          }
-        }
-        if (action === "options")
-          send({
-            type: "film-options",
-            id,
-            options: continuity ? { ...appearance, captions } : { captions },
-            transport: { speed, loop },
-          });
-        if (action === "play") {
-          player.current?.play();
-        }
-        if (action === "pause") {
-          player.current?.pause();
-        }
-        if (action === "replay") {
-          player.current?.seekTo(0);
-          player.current?.play();
-        }
-        if (action === "seek" && Number.isFinite(value)) {
-          player.current?.seekTo(
-            Math.max(0, Math.min(previewFrames - 1, value)),
-          );
-          player.current?.play();
-        }
-        if (action === "speed" && [0.5, 1, 1.5, 2].includes(value)) {
-          setSpeed(value);
-        }
-        if (action === "loop") {
-          setLoop(Boolean(value));
-        }
-      };
-      window.addEventListener("message", receive);
-      return () => window.removeEventListener("message", receive);
+  useSavedPlayback(player, { captions, speed, loop });
+  useFilmControl({
+    id,
+    player,
+    isContinuity: Boolean(continuity),
+    appearance,
+    captions,
+    speed,
+    loop,
+    previewFrames,
+    usedTokens: usage.paths,
+    send: _send,
+    onAppearance: (nextAppearance) => {
+      state.setAppearance(nextAppearance);
+      state.setCaptions(nextAppearance.captions);
     },
-    [previewFrames, captions, appearance, speed, loop, continuity],
-  );
-  useEffect(function registerPlayEventListener() {
-    const current = player.current;
-    const play = () => send({ type: "film-playing", id });
-    current?.addEventListener("play", play);
-    return () => {
-      current?.removeEventListener("play", play);
-    };
-  }, []);
+    onTheme: state.setTheme,
+    onSpeed: state.setSpeed,
+    onLoop: state.setLoop,
+  });
   return (
     <I18nProvider i18n={i18n}>
       <div className="liveFilm">
-        <Player
-          ref={player}
-          component={FilmComposition}
-          inputProps={{
-            film: {
-              ...film,
-              plan: previewPlan,
-              frames: previewFrames,
-              showCaptions: captions,
-              theme,
-            },
-          }}
-          compositionWidth={film.width}
-          compositionHeight={film.height}
-          durationInFrames={previewFrames}
-          fps={film.fps}
-          controls
-          loop={loop}
-          playbackRate={speed}
-          autoPlay={saved?.playing ?? false}
-          initialFrame={Math.min(
-            previewFrames - 1,
-            saved?.frame ??
-              (id === "avandar-home" ? 490 : Math.min(100, previewFrames - 1)),
-          )}
-          style={{ width: "100%" }}
-          clickToPlay={false}
-          spaceKeyToPlayOrPause
-          errorFallback={() => (
-            <p className="liveError">
-              <Trans>
-                Preview unavailable. Check the showcase terminal, then reload.
-              </Trans>
-            </p>
-          )}
-        />
+        <VideoTokenUsageContext.Provider value={usage.report}>
+          <LiveFilm
+            film={{ ...film, theme, plan: previewPlan }}
+            player={player}
+            previewFrames={previewFrames}
+            captions={captions}
+            speed={speed}
+            loop={loop}
+          />
+        </VideoTokenUsageContext.Provider>
         {film.plan?.captions && !continuity ? (
           <label className="captionToggle">
             <input
               type="checkbox"
               checked={captions}
-              onChange={(event) => setCaptions(event.target.checked)}
+              onChange={(event) => state.setCaptions(event.target.checked)}
             />
             <Trans>Captions</Trans>
           </label>

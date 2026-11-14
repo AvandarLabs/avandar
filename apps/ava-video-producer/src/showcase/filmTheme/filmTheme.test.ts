@@ -16,6 +16,7 @@ import {
   createFilmTokensUsedMessage,
   isFilmThemeAcknowledgement,
   isFilmTokensUsedMessage,
+  parseFilmControlMessage,
   type FilmThemeAcknowledgement,
 } from "./filmTheme";
 import type {
@@ -223,5 +224,62 @@ test("malformed usage messages are rejected", () => {
   ];
   for (const message of rejected) {
     assert.equal(isFilmTokensUsedMessage(message, ITEM_ID), false);
+  }
+});
+
+test("a control message for this film yields its action and value", () => {
+  assert.deepEqual(
+    parseFilmControlMessage(
+      { type: "film-control", id: ITEM_ID, action: "seek", value: 12 },
+      ITEM_ID,
+    ),
+    { action: "seek", value: 12 },
+  );
+});
+
+test("a transport control without a film id applies to the current film", () => {
+  assert.deepEqual(
+    parseFilmControlMessage({ type: "film-control", action: "play" }, ITEM_ID),
+    { action: "play", value: undefined },
+  );
+});
+
+test("a control message for another film is ignored", () => {
+  assert.equal(
+    parseFilmControlMessage(
+      { type: "film-control", id: OTHER_ITEM_ID, action: "play" },
+      ITEM_ID,
+    ),
+    undefined,
+  );
+});
+
+test("a theme or appearance control must name its film", () => {
+  for (const action of ["theme", "appearance"]) {
+    assert.equal(
+      parseFilmControlMessage(
+        { type: "film-control", action, value: VALID_SNAPSHOT },
+        ITEM_ID,
+      ),
+      undefined,
+    );
+  }
+});
+
+test("malformed control messages are ignored", () => {
+  const base = { type: "film-control", id: ITEM_ID };
+  const rejected: readonly unknown[] = [
+    null,
+    "film-control",
+    [{ ...base, action: "play" }],
+    { ...base, type: "film-options", action: "play" },
+    { ...base, action: "launch" },
+    { ...base, action: "reload", requestId: "1" },
+    { ...base, action: 7 },
+    { ...base, id: 7, action: "play" },
+    { ...base, action: "play", extra: true },
+  ];
+  for (const message of rejected) {
+    assert.equal(parseFilmControlMessage(message, ITEM_ID), undefined);
   }
 });

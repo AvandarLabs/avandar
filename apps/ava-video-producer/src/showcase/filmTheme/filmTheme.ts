@@ -17,6 +17,13 @@ const MAX_ISSUE_PATH_LENGTH = 512;
 const MAX_ISSUE_MESSAGE_LENGTH = 1000;
 const MAX_TOKEN_PATHS = 4096;
 const MAX_TOKEN_PATH_LENGTH = 256;
+const MAX_FILM_ID_LENGTH = 256;
+
+/** Controls that change a film's look, so they must name the film they target. */
+const FILM_SCOPED_ACTIONS: ReadonlySet<string> = new Set([
+  "appearance",
+  "theme",
+]);
 
 /** Issue messages for failures that carry no theme issue of their own. */
 const PAYLOAD_TOO_LARGE = "payload-too-large";
@@ -52,6 +59,29 @@ const tokensUsedSchema = z.strictObject({
   id: z.string(),
   paths: z.array(z.string().max(MAX_TOKEN_PATH_LENGTH)).max(MAX_TOKEN_PATHS),
 });
+
+const filmControlSchema = z.strictObject({
+  type: z.literal("film-control"),
+  id: z.string().max(MAX_FILM_ID_LENGTH).optional(),
+  action: z.enum([
+    "play",
+    "pause",
+    "replay",
+    "seek",
+    "speed",
+    "loop",
+    "appearance",
+    "theme",
+    "options",
+  ]),
+  value: z.unknown().optional(),
+});
+
+/** A control the gallery posts to the live player, without its envelope. */
+export type FilmControl = Readonly<{
+  action: z.infer<typeof filmControlSchema>["action"];
+  value: unknown;
+}>;
 
 /** The live player's answer to a theme: the resolved hash, or why it refused. */
 export type FilmThemeAcknowledgement = Readonly<
@@ -173,4 +203,28 @@ export function isFilmTokensUsedMessage(
 ): data is FilmTokensUsedMessage {
   const result = tokensUsedSchema.safeParse(data);
   return result.success && result.data.id === id;
+}
+
+/**
+ * Reads a control message posted to the live player for film `id`. Returns
+ * undefined for anything malformed or meant for another film. Transport
+ * controls may omit the film id; appearance and theme controls must name it.
+ * The value is left unparsed for the handler of its action.
+ */
+export function parseFilmControlMessage(
+  data: unknown,
+  id: string,
+): FilmControl | undefined {
+  const result = filmControlSchema.safeParse(data);
+  if (!result.success) {
+    return undefined;
+  }
+  const message = result.data;
+  const isForThisFilm =
+    message.id === undefined
+      ? !FILM_SCOPED_ACTIONS.has(message.action)
+      : message.id === id;
+  return isForThisFilm
+    ? { action: message.action, value: message.value }
+    : undefined;
 }
