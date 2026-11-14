@@ -122,7 +122,11 @@ function usePlayerReplies(
   return replies.id === id ? replies : { id, paths: [] };
 }
 
-/** Whether the request named by `requestKey` has gone unanswered for too long. */
+/**
+ * Whether the request named by `requestKey` has gone unanswered for too
+ * long. The timeout clears whenever the key changes, so returning to a key
+ * that timed out earlier starts a fresh wait.
+ */
 function useRequestTimeout(requestKey: string | undefined): boolean {
   const [timedOutKey, setTimedOutKey] = useState<string>();
   useEffect(() => {
@@ -133,7 +137,10 @@ function useRequestTimeout(requestKey: string | undefined): boolean {
       () => setTimedOutKey(requestKey),
       ACKNOWLEDGEMENT_TIMEOUT_MS,
     );
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setTimedOutKey(undefined);
+    };
   }, [requestKey]);
   return requestKey !== undefined && timedOutKey === requestKey;
 }
