@@ -23,6 +23,30 @@ function _output(kind: string, value: number): unknown {
   return kind === "cssNumber" ? String(value) : value;
 }
 
+type NumberSliderProps = Readonly<{
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  onChange: (value: number) => void;
+}>;
+
+/** The slider beside a number field, marked invalid in a row with an issue. */
+function NumberSlider({ label, ...props }: NumberSliderProps) {
+  const sliderRef = useSliderIssueRef();
+  return (
+    <Slider
+      {...props}
+      ref={sliderRef}
+      className={css.slider}
+      size="sm"
+      thumbLabel={label}
+      label={null}
+    />
+  );
+}
+
 /**
  * A number token: a slider when the range is short, and an exact input with
  * its unit. Opacity reads as a percentage; Mantine strings round-trip.
@@ -33,7 +57,6 @@ export function NumberValueControl({
   value,
   onChange,
 }: ValueControlProps) {
-  const sliderRef = useSliderIssueRef();
   const scale = definition.unit === "%" ? 100 : 1;
   const min = (definition.min ?? 0) * scale;
   const max = (definition.max ?? 100) * scale;
@@ -46,16 +69,12 @@ export function NumberValueControl({
   return (
     <Group className={css.numberRow} gap="xs" wrap="nowrap">
       {(max - min) / step <= SLIDER_STEP_LIMIT ? (
-        <Slider
-          ref={sliderRef}
-          className={css.slider}
-          size="sm"
+        <NumberSlider
+          label={label}
           min={min}
           max={max}
           step={step}
           value={shown}
-          thumbLabel={label}
-          label={null}
           onChange={emit}
         />
       ) : null}
