@@ -86,3 +86,11 @@
   color: var(--muted);
   font-size: 12px;
 }
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .hint,
+  .count {
+    font-size: 12px;
+  }
+}

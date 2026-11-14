@@ -86,3 +86,18 @@
   font: 10px var(--mono);
   overflow-wrap: anywhere;
 }
+
+/* On a phone, descriptions and values are 12px and token paths 11px. */
+@media (width <= 760px) {
+  .inheritedTag,
+  .value,
+  .meta,
+  .issue {
+    font-size: 12px;
+  }
+
+  .path,
+  .issueMessage {
+    font-size: 11px;
+  }
+}

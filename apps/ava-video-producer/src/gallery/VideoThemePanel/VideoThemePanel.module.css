@@ -33,8 +33,42 @@
   }
 }
 
+/*
+ * On a phone every control gets at least a 32px hit area, past the 24px
+ * WCAG 2.2 minimum. A Mantine control sets its own height, so these floors
+ * go on the library's stable class names.
+ */
 @media (width <= 760px) {
   .panel {
     padding: 12px;
+
+    :global(.mantine-Button-root),
+    :global(.mantine-Input-input) {
+      min-height: 32px;
+    }
+
+    :global(.mantine-ActionIcon-root) {
+      min-height: 32px;
+      min-width: 32px;
+    }
+
+    :global(.mantine-Switch-body) {
+      align-items: center;
+      min-height: 32px;
+    }
+
+    :global(.mantine-SegmentedControl-label) {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+      min-height: 32px;
+    }
+
+    :global(.mantine-ColorInput-swatch) {
+      flex: 0 0 32px;
+      height: 0;
+      padding-bottom: 32px;
+      width: 32px;
+    }
   }
 }
