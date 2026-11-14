@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BUILT_IN_VIDEO_THEME_IDS } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getBrowserStorage } from "./browserStorage";
 import { useActiveThemeId } from "./useActiveThemeId";
 import { useStoredDraft, type StoredDraftState } from "./useStoredDraft";
@@ -35,9 +35,7 @@ export function useVideoThemeDraft(): VideoThemeDraftState {
     baseHash: storedTheme?.hash ?? "",
     storage,
   });
-  const isBuiltIn = (BUILT_IN_VIDEO_THEME_IDS as readonly string[]).includes(
-    themeId,
-  );
+  const isBuiltIn = BUILT_IN_VIDEO_THEMES.has(themeId);
   const saving = useThemeSaving({
     library,
     themeId,

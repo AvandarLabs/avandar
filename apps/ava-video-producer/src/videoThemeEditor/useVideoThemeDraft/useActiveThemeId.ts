@@ -43,7 +43,11 @@ export function useActiveThemeId(
       rememberActiveThemeId(storage, id);
       const url = new URL(location.href);
       url.searchParams.set("theme", id);
-      history.replaceState(history.state, "", url);
+      try {
+        history.replaceState(history.state, "", url);
+      } catch {
+        // A sandboxed frame can refuse URL changes. The choice still applies.
+      }
     },
     [storage],
   );

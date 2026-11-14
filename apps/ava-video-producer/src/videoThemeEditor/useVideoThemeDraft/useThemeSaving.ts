@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type RefObject } from "react";
 import {
   ThemeApi,
   ThemeApiError,
@@ -35,7 +35,7 @@ export type ThemeSavingState = Readonly<{
   saveAsNew: (label: string) => Promise<void>;
 }>;
 
-type Options = Readonly<{
+type SaveOptions = Readonly<{
   library: VideoThemeLibrary;
   themeId: string;
   isBuiltIn: boolean;
@@ -46,10 +46,38 @@ type Options = Readonly<{
   discard: () => void;
 }>;
 
-function _failure(error: unknown): ThemeSaveStatus {
+function _buildFailureStatusFromError(error: unknown): ThemeSaveStatus {
   return error instanceof ThemeApiError
     ? { kind: "failed", status: error.status, issues: error.issues }
     : { kind: "failed", status: 0, issues: [] };
+}
+
+/**
+ * Runs one theme request with its status updates. A request started while
+ * another is in flight is ignored, so a double click cannot send the same
+ * stale hash twice.
+ */
+async function _runThemeRequest(
+  options: Readonly<{
+    inFlight: RefObject<boolean>;
+    setStatus: (status: ThemeSaveStatus) => void;
+    request: () => Promise<void>;
+  }>,
+): Promise<void> {
+  const { inFlight, setStatus, request } = options;
+  if (inFlight.current) {
+    return;
+  }
+  inFlight.current = true;
+  setStatus({ kind: "saving" });
+  try {
+    await request();
+    setStatus({ kind: "saved" });
+  } catch (error) {
+    setStatus(_buildFailureStatusFromError(error));
+  } finally {
+    inFlight.current = false;
+  }
 }
 
 /**
@@ -57,8 +85,11 @@ function _failure(error: unknown): ThemeSaveStatus {
  * hash) or into a new theme, then clears the draft. A new theme becomes the
  * active one.
  */
-export function useThemeSaving(options: Options): ThemeSavingState {
+export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   const [status, setStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
+  const inFlight = useRef(false);
+  const run = (request: () => Promise<void>) =>
+    _runThemeRequest({ inFlight, setStatus, request });
   const save = async () => {
     const { storedTheme } = options;
     if (options.isBuiltIn || !storedTheme) {
@@ -68,15 +99,11 @@ export function useThemeSaving(options: Options): ThemeSavingState {
       storedTheme.document,
       options.draft,
     );
-    setStatus({ kind: "saving" });
-    try {
+    await run(async () => {
       const { hash } = await ThemeApi.save(document, storedTheme.hash);
       options.storeTheme({ document, hash });
       options.discard();
-      setStatus({ kind: "saved" });
-    } catch (error) {
-      setStatus(_failure(error));
-    }
+    });
   };
   const saveAsNew = async (label: string) => {
     const base = options.library.get(options.themeId);
@@ -90,16 +117,12 @@ export function useThemeSaving(options: Options): ThemeSavingState {
       id,
       label,
     });
-    setStatus({ kind: "saving" });
-    try {
+    await run(async () => {
       const { hash } = await ThemeApi.create(document);
       options.storeTheme({ document, hash });
       options.discard();
       options.selectTheme(id);
-      setStatus({ kind: "saved" });
-    } catch (error) {
-      setStatus(_failure(error));
-    }
+    });
   };
   return { status, setStatus, save, saveAsNew };
 }
