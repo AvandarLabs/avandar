@@ -130,6 +130,9 @@ function _dash(label: string, description: string) {
 function _glow(label: string, description: string) {
   return token({ kind: "glow", surface: "graphic", label, description });
 }
+function _elevation(label: string, description: string) {
+  return token({ kind: "elevation", surface: "graphic", label, description });
+}
 
 const NODE_TOKENS = {
   radiusXs: _length(
@@ -279,6 +282,10 @@ const SHARED_GRAPHIC_TOKENS = {
     stroke: _color("Panel outline colour", "Outline colour of a panel."),
     radius: _length("Panel radius", "Corner radius of a panel."),
     strokeWidth: _stroke("Panel outline width", "Outline width of a panel."),
+    elevation: _elevation(
+      "Panel elevation",
+      "The shadow under a panel. Flat panels cast none.",
+    ),
   },
   Card: {
     radius: _length("Card radius", "Corner radius of a tinted summary card."),

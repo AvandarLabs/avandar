@@ -1,6 +1,7 @@
 import { loopPhase, mix, ramp, wave } from "../motion";
 import { StockRect } from "./primitives/StockRect/StockRect";
 import {
+  useGraphicFilter,
   useGraphicMotion,
   useGraphicProps,
   useGraphicTokens,
@@ -91,12 +92,14 @@ export function Text({
   spacing?: number;
 }) {
   const text = useGraphicTokens().text.graphic;
+  const filter = useGraphicFilter(`text.graphic.${role}`);
   const style = text[role];
   const fontSize = size ?? style.fontSize;
   return (
     <text
       x={x}
       y={y}
+      filter={filter}
       fill={fill ?? style.color}
       fillOpacity={style.alpha < 1 ? style.alpha : undefined}
       fontSize={fontSize}
@@ -178,8 +181,9 @@ export function Panel({
   radius?: number;
 }) {
   const panel = useGraphicProps("Panel", { stroke, fill, radius });
+  const filter = useGraphicFilter("components.Panel.elevation");
   return (
-    <g>
+    <g filter={filter}>
       <StockRect
         x={x}
         y={y}
@@ -399,8 +403,10 @@ export function Halo({
   color: string;
 }) {
   const { glow } = useGraphicProps("Halo", {});
+  const filter = useGraphicFilter("components.Halo.glow");
   return (
     <circle
+      filter={filter}
       cx={cx}
       cy={cy}
       r={r + glow.spread}

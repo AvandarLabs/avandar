@@ -2,12 +2,18 @@ import { useId } from "react";
 import { loopEnvelope } from "../motion";
 import { fillToCss } from "../videoTheme/cssValues/cssValues";
 import { createThemePatchFromStockColors } from "../videoTheme/themePatches/themePatches";
+import { VideoEffectDefs } from "../videoTheme/VideoEffectDefs/VideoEffectDefs";
+import { listVideoEffectFilters } from "../videoTheme/videoEffectFilters/videoEffectFilters";
 import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
 import { stockRequestEnvelopeSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
 import { getStockDisplayCopyFromDescriptor } from "./i18n/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { STOCK_GRAPHIC_COPY } from "./i18n/stockGraphicCopy";
 import { stockRenderers } from "./registry/stockRenderers/stockRenderers";
-import { GraphicIdContext, useGraphicTokens } from "./theme/useGraphicTheme";
+import {
+  GraphicIdContext,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "./theme/useGraphicTheme";
 import type { StockRequest } from "./contracts/StockContract.types";
 
 /** Preset-discriminated content with explicit local frame and display size. */
@@ -56,6 +62,7 @@ function StockCanvas({
   id,
 }: CanvasProps) {
   const tokens = useGraphicTokens();
+  const theme = useGraphicTheme();
   const localFrame = Math.max(
     0,
     Math.min(179, Number.isFinite(frame) ? frame : 0),
@@ -79,6 +86,7 @@ function StockCanvas({
         fontFamily: tokens.text.graphic.body.fontFamily,
       }}
     >
+      <VideoEffectDefs graphicId={id} filters={listVideoEffectFilters(theme)} />
       {!transparent && <GroundFill id={id} />}
       <GraphicIdContext.Provider value={id}>
         <g opacity={loopEnvelope(localFrame, 180)}>

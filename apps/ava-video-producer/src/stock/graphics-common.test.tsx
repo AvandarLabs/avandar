@@ -11,6 +11,7 @@ import {
   Pill,
   Text,
 } from "./graphics-common";
+import { StockGraphic } from "./StockGraphic";
 import type { VideoThemePatch } from "../videoTheme/videoTheme.types";
 import type { ReactElement } from "react";
 
@@ -88,5 +89,29 @@ test("a guide draws its dash pattern at the guide opacity", () => {
   assert.match(
     _svg(<Guide cx={0} cy={0} rx={10} ry={5} />),
     /stroke-dasharray="3 9"[^>]*opacity="0.65"/,
+  );
+});
+
+test("a raised panel references the theme's elevation filter", () => {
+  const markup = renderToStaticMarkup(
+    <VideoThemeScope
+      patches={[
+        {
+          components: {
+            Panel: { defaultProps: { elevation: "$elevation.floating" } },
+          },
+        },
+      ]}
+    >
+      <StockGraphic preset="data-pipeline" frame={120} />
+    </VideoThemeScope>,
+  );
+  assert.match(
+    markup,
+    /<filter id="stock-[^"]*-fx-components-Panel-elevation"/,
+  );
+  assert.match(
+    markup,
+    /filter="url\(#stock-[^"]*-fx-components-Panel-elevation\)"/,
   );
 });
