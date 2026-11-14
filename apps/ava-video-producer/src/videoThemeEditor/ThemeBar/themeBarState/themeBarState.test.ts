@@ -13,7 +13,8 @@ const QUIET = {
   isDirty: true,
   hasIssues: false,
   isChangedOnDisk: false,
-};
+  copyStatus: "idle",
+} as const;
 
 function _failed(status: number) {
   return { kind: "failed", status, issues: [] } as const;
@@ -28,9 +29,33 @@ test("each finished theme action has its own status message", () => {
     getThemeBarMessage({ ...QUIET, status: { kind: "saved" } }),
     "saved",
   );
+});
+
+test("a finished copy has its own message", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: { kind: "copied" } }),
+    getThemeBarMessage({ ...QUIET, status: IDLE, copyStatus: "copied" }),
     "copied",
+  );
+});
+
+test("a copy that failed says the copy failed, not that the save did", () => {
+  assert.equal(
+    getThemeBarMessage({ ...QUIET, status: IDLE, copyStatus: "failed" }),
+    "copyFailed",
+  );
+});
+
+test("a copy finishing during a save does not hide the save or unlock its actions", () => {
+  const input = {
+    ...QUIET,
+    status: { kind: "saving" },
+    copyStatus: "copied",
+  } as const;
+  assert.equal(getThemeBarMessage(input), "saving");
+  const actions = getThemeBarActions(input);
+  assert.deepEqual(
+    [actions.canSave, actions.canSaveAsNew, actions.canDiscard],
+    [false, false, false],
   );
 });
 
@@ -257,5 +282,16 @@ test("a new theme refused for another reason is explained like a refused save", 
   assert.equal(
     getThemeBarMessage({ ...QUIET, status: _createFailed(0) }),
     "saveFailed",
+  );
+});
+
+test("a copy after a refused save keeps Reload from file in the bar", () => {
+  assert.equal(
+    getThemeBarActions({
+      ...QUIET,
+      status: _failed(409),
+      copyStatus: "copied",
+    }).showsReload,
+    true,
   );
 });

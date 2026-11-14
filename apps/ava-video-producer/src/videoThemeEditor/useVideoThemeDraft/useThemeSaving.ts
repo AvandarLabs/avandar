@@ -28,7 +28,6 @@ export type ThemeSaveStatus =
   | Readonly<{ kind: "idle" }>
   | Readonly<{ kind: "saving" }>
   | Readonly<{ kind: "saved" }>
-  | Readonly<{ kind: "copied" }>
   | Readonly<{
       kind: "failed";
       status: number;
@@ -43,10 +42,17 @@ export type ThemeSaveStatus =
 
 type FailureKind = "failed" | "createFailed";
 
+/**
+ * What the last Copy JSON did. It is kept apart from the save status so a
+ * copy never changes whether a save is running.
+ */
+export type ThemeCopyStatus = "idle" | "copied" | "failed";
+
 /** Saving actions and their status. */
 export type ThemeSavingState = Readonly<{
   status: ThemeSaveStatus;
-  setStatus: (status: ThemeSaveStatus) => void;
+  copyStatus: ThemeCopyStatus;
+  setCopyStatus: (status: ThemeCopyStatus) => void;
   save: () => Promise<void>;
   /** Resolves true when the new theme was created, false when it was not. */
   saveAsNew: (label: string) => Promise<boolean>;
@@ -246,12 +252,17 @@ function useSaveAsNew(
  * option they use changes.
  */
 export function useThemeSaving(options: SaveOptions): ThemeSavingState {
-  const [status, setStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
+  const [status, setSaveStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
+  const [copyStatus, setCopyStatus] = useState<ThemeCopyStatus>("idle");
+  const setStatus = useCallback((nextStatus: ThemeSaveStatus) => {
+    setSaveStatus(nextStatus);
+    setCopyStatus("idle");
+  }, []);
   const inFlight = useRef(false);
   const run = useCallback<RunThemeRequest>(
     (request, failureKind) =>
       runThemeRequest({ inFlight, setStatus, request, failureKind }),
-    [],
+    [setStatus],
   );
   const latestDraft = useRef(options.draft);
   useEffect(() => {
@@ -270,10 +281,17 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
         rebaseDraft,
         setStatus,
       }),
-    [themeId, storeTheme, rebaseDraft],
+    [themeId, storeTheme, rebaseDraft, setStatus],
   );
   return useMemo(
-    () => ({ status, setStatus, save, saveAsNew, reloadTheme }),
-    [status, save, saveAsNew, reloadTheme],
+    () => ({
+      status,
+      copyStatus,
+      setCopyStatus,
+      save,
+      saveAsNew,
+      reloadTheme,
+    }),
+    [status, copyStatus, save, saveAsNew, reloadTheme],
   );
 }

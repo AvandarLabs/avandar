@@ -11,7 +11,10 @@ import {
   type ThemeBarMessage,
 } from "./themeBarState/themeBarState";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
-import type { ThemeSaveStatus } from "../useVideoThemeDraft/useThemeSaving";
+import type {
+  ThemeCopyStatus,
+  ThemeSaveStatus,
+} from "../useVideoThemeDraft/useThemeSaving";
 
 type Props = Readonly<{
   themes: readonly ThemeSummary[];
@@ -21,6 +24,7 @@ type Props = Readonly<{
   hasIssues: boolean;
   isChangedOnDisk: boolean;
   status: ThemeSaveStatus;
+  copyStatus: ThemeCopyStatus;
   onSelectTheme: (themeId: string) => void;
   onSave: () => void;
   /** Resolves true when the theme was created. */
@@ -37,6 +41,7 @@ function useStatusText(): (message: ThemeBarMessage) => string {
     saving: t`Saving…`,
     saved: t`Theme saved.`,
     copied: t`Theme JSON copied.`,
+    copyFailed: t`The theme JSON could not be copied.`,
     fixIssuesFirst: t`Fix the marked settings before saving.`,
     invalidTheme: t`The theme has problems. Fix the marked settings and save again.`,
     readOnlyTheme: t`Built-in themes are read-only. Save a copy as a new theme.`,

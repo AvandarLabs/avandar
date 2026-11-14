@@ -51,7 +51,7 @@ export function useGalleryVideoTheme(): GalleryVideoThemeValue {
 /** Copies the active theme, as saving the draft would write it, as JSON. */
 function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
   const { t } = useLingui();
-  const { library, themeId, draft, setStatus } = state;
+  const { library, themeId, draft, setCopyStatus } = state;
   return useCallback(async () => {
     const document = library.get(themeId);
     if (!document) {
@@ -64,11 +64,11 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
         2,
       );
       await copyTextToClipboard(json, t`Theme JSON`);
-      setStatus({ kind: "copied" });
+      setCopyStatus("copied");
     } catch {
-      setStatus({ kind: "failed", status: 0, issues: [] });
+      setCopyStatus("failed");
     }
-  }, [library, themeId, draft, setStatus, t]);
+  }, [library, themeId, draft, setCopyStatus, t]);
 }
 
 /**

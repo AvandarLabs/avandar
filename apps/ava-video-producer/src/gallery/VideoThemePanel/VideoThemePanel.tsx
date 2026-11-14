@@ -39,6 +39,7 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
               hasIssues={gallery.hasIssues}
               isChangedOnDisk={gallery.isChangedOnDisk}
               status={gallery.status}
+              copyStatus={gallery.copyStatus}
               onSelectTheme={gallery.selectTheme}
               onSave={() => void gallery.save()}
               onSaveAsNew={gallery.saveAsNew}

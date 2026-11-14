@@ -1,4 +1,7 @@
-import type { ThemeSaveStatus } from "../../useVideoThemeDraft/useThemeSaving";
+import type {
+  ThemeCopyStatus,
+  ThemeSaveStatus,
+} from "../../useVideoThemeDraft/useThemeSaving";
 
 /** What the theme bar knows about the active theme and its last action. */
 export type ThemeBarInput = Readonly<{
@@ -8,6 +11,7 @@ export type ThemeBarInput = Readonly<{
   /** The changed-on-disk banner is showing, with its keep and discard actions. */
   isChangedOnDisk: boolean;
   status: ThemeSaveStatus;
+  copyStatus: ThemeCopyStatus;
 }>;
 
 /**
@@ -20,6 +24,7 @@ export type ThemeBarMessage =
   | "saving"
   | "saved"
   | "copied"
+  | "copyFailed"
   | "fixIssuesFirst"
   | "invalidTheme"
   | "readOnlyTheme"
@@ -56,17 +61,22 @@ function _getFailureMessage(
 }
 
 /**
- * The status line's message: the last action's outcome, or, while idle, why
- * saving is unavailable, so a disabled save explains itself. A conflict
+ * The status line's message: a running save, then the last copy's outcome,
+ * then the last save's outcome, or, while idle, why saving is unavailable,
+ * so a disabled save explains itself. A conflict
  * while the changed-on-disk banner shows points at the banner's actions
  * rather than a page reload, so the two never disagree.
  */
 export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
   const { status } = input;
+  if (status.kind === "saving") {
+    return "saving";
+  }
+  if (input.copyStatus !== "idle") {
+    return input.copyStatus === "copied" ? "copied" : "copyFailed";
+  }
   switch (status.kind) {
-    case "saving":
     case "saved":
-    case "copied":
       return status.kind;
     case "createFailed":
       return status.status === 409
@@ -104,7 +114,8 @@ export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
       isIdle,
     canSaveAsNew: !input.hasIssues && isIdle,
     canDiscard: input.isDirty && isIdle,
-    showsReload: getThemeBarMessage(input) === "changedOnDisk",
+    showsReload:
+      getThemeBarMessage({ ...input, copyStatus: "idle" }) === "changedOnDisk",
   };
 }
 
