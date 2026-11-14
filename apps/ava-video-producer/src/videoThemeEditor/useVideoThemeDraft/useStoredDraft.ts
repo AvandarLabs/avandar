@@ -27,8 +27,11 @@ export type StoredDraftState = Readonly<{
   setDraft: (draft: ThemeDraft) => void;
   /** Keeps the edits on top of the current file and clears the banner. */
   keepDraft: () => void;
-  /** Keeps the edits and records them as made against the file with this hash. */
-  rebaseDraft: (baseHash: string) => void;
+  /**
+   * Records the edits, or the given ones in their place, as made against the
+   * file with this hash.
+   */
+  rebaseDraft: (baseHash: string, nextDraft?: ThemeDraft) => void;
   discard: () => void;
 }>;
 
@@ -95,8 +98,13 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     [store, baseHash, draft],
   );
   const rebaseDraft = useCallback(
-    (nextBaseHash: string) =>
-      store(createRebasedRecord({ baseHash: nextBaseHash, draft })),
+    (nextBaseHash: string, nextDraft?: ThemeDraft) =>
+      store(
+        createRebasedRecord({
+          baseHash: nextBaseHash,
+          draft: nextDraft ?? draft,
+        }),
+      ),
     [store, draft],
   );
   const discard = useCallback(

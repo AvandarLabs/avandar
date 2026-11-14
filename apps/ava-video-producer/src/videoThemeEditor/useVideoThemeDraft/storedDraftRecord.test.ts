@@ -1,18 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  createSavedDocumentFromDraft,
   EMPTY_THEME_DRAFT,
   isThemeDraftEmpty,
   setTokenInDraft,
+  type ThemeDraft,
 } from "../themeDraft/themeDraft";
 import {
+  createDraftAfterSave,
   createEditedRecord,
   createKeptRecord,
   createRebasedRecord,
   createDiscardedRecord,
+  isDraftUnchanged,
   isRecordChangedOnDisk,
   type DraftRecord,
 } from "./storedDraftRecord";
+import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
 const THEME = { kind: "theme" } as const;
 const ACCENT_DRAFT = setTokenInDraft(
@@ -123,6 +128,115 @@ test("changed on disk needs edits and two differing hashes", () => {
   assert.equal(isRecordChangedOnDisk({ record: empty, fileHash: "H2" }), false);
   assert.equal(
     isRecordChangedOnDisk({ record: undefined, fileHash: "H2" }),
+    false,
+  );
+});
+
+const SAVED_BASE: VideoThemeDocument = {
+  schemaVersion: 1,
+  id: "studio",
+  label: "Studio",
+  extends: "classic",
+};
+const ITEM = { kind: "item", itemId: "network-graph" } as const;
+
+function _settle(savedDraft: ThemeDraft, currentDraft: ThemeDraft) {
+  return createDraftAfterSave({
+    savedDraft,
+    currentDraft,
+    savedDocument: createSavedDocumentFromDraft(SAVED_BASE, savedDraft),
+  });
+}
+
+test("a draft unchanged since the save started is cleared", () => {
+  assert.deepEqual(_settle(ACCENT_DRAFT, ACCENT_DRAFT), EMPTY_THEME_DRAFT);
+});
+
+test("an equal copy of the saved draft is cleared too", () => {
+  const copy: ThemeDraft = JSON.parse(JSON.stringify(ACCENT_DRAFT));
+  assert.deepEqual(_settle(ACCENT_DRAFT, copy), EMPTY_THEME_DRAFT);
+});
+
+test("an edit made during the save is kept, and the saved values are folded in", () => {
+  assert.deepEqual(
+    _settle(ACCENT_DRAFT, MORE_DRAFT),
+    setTokenInDraft(
+      EMPTY_THEME_DRAFT,
+      THEME,
+      "color.text",
+      "$atomic.swatch.mint",
+    ),
+  );
+});
+
+test("a saved token edited again during the save keeps its newer value", () => {
+  const newer = setTokenInDraft(
+    ACCENT_DRAFT,
+    THEME,
+    "color.accent",
+    "$atomic.swatch.orange",
+  );
+  assert.deepEqual(
+    _settle(ACCENT_DRAFT, newer),
+    setTokenInDraft(
+      EMPTY_THEME_DRAFT,
+      THEME,
+      "color.accent",
+      "$atomic.swatch.orange",
+    ),
+  );
+});
+
+test("item edits are folded in against the saved item overrides", () => {
+  const saved = setTokenInDraft(
+    ACCENT_DRAFT,
+    ITEM,
+    "color.accent",
+    "$atomic.swatch.mint",
+  );
+  const newer = setTokenInDraft(
+    saved,
+    ITEM,
+    "color.text",
+    "$atomic.swatch.cyan",
+  );
+  assert.deepEqual(
+    _settle(saved, newer),
+    setTokenInDraft(
+      EMPTY_THEME_DRAFT,
+      ITEM,
+      "color.text",
+      "$atomic.swatch.cyan",
+    ),
+  );
+});
+
+test("a newer draft that lacks a saved token keeps only its own edits", () => {
+  const unrelated = setTokenInDraft(
+    EMPTY_THEME_DRAFT,
+    THEME,
+    "color.text",
+    "$atomic.swatch.mint",
+  );
+  const result = _settle(ACCENT_DRAFT, unrelated);
+  assert.deepEqual(result, unrelated);
+});
+
+test("drafts are unchanged only when every edit matches", () => {
+  const copy: ThemeDraft = JSON.parse(JSON.stringify(ACCENT_DRAFT));
+  assert.equal(
+    isDraftUnchanged({ savedDraft: ACCENT_DRAFT, currentDraft: copy }),
+    true,
+  );
+  assert.equal(
+    isDraftUnchanged({ savedDraft: ACCENT_DRAFT, currentDraft: MORE_DRAFT }),
+    false,
+  );
+  assert.equal(
+    isDraftUnchanged({
+      savedDraft: EMPTY_THEME_DRAFT,
+      currentDraft: ACCENT_DRAFT,
+    }),
     false,
   );
 });

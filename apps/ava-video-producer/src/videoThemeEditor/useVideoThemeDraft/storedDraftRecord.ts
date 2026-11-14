@@ -74,3 +74,92 @@ export function isRecordChangedOnDisk(
     record.baseHash !== fileHash
   );
 }
+
+function _isDeepEqual(left: unknown, right: unknown): boolean {
+  if (left === right) {
+    return true;
+  }
+  if (
+    typeof left !== "object" ||
+    typeof right !== "object" ||
+    left === null ||
+    right === null
+  ) {
+    return false;
+  }
+  const leftEntries = Object.entries(left);
+  return (
+    leftEntries.length === Object.keys(right).length &&
+    leftEntries.every(
+      ([key, value]) =>
+        Object.hasOwn(right, key) &&
+        _isDeepEqual(value, (right as Record<string, unknown>)[key]),
+    )
+  );
+}
+
+/** The patch without the tokens whose value the saved patch already holds. */
+function _omitSavedTokens(
+  patch: VideoThemePatch,
+  saved: VideoThemePatch,
+): VideoThemePatch {
+  return listTokenPathsFromPatch(patch).reduce<VideoThemePatch>(
+    (result, tokenPath) => {
+      const documentPath = getDocumentPathFromTokenPath(tokenPath);
+      return _isDeepEqual(
+        getValueAtPath(patch, documentPath),
+        getValueAtPath(saved, documentPath),
+      )
+        ? (removeValueAtPath(result, documentPath) as VideoThemePatch)
+        : result;
+    },
+    patch,
+  );
+}
+
+function _omitSavedOverrides(
+  overrides: ThemeDraft["overrides"],
+  savedDocument: VideoThemeDocument,
+): ThemeDraft["overrides"] {
+  return Object.fromEntries(
+    Object.entries(overrides)
+      .map(
+        ([itemId, patch]) =>
+          [
+            itemId,
+            _omitSavedTokens(patch, savedDocument.overrides?.[itemId] ?? {}),
+          ] as const,
+      )
+      .filter(([, patch]) => Object.keys(patch).length > 0),
+  );
+}
+
+/** Whether two drafts hold exactly the same edits. */
+export function isDraftUnchanged(
+  options: Readonly<{ savedDraft: ThemeDraft; currentDraft: ThemeDraft }>,
+): boolean {
+  return _isDeepEqual(options.savedDraft, options.currentDraft);
+}
+
+/**
+ * The draft to keep once a save succeeded. When nothing changed since the
+ * save started it is empty. Otherwise the edits made during the save stay,
+ * minus any value the saved file already holds, so they sit on top of the
+ * saved theme.
+ */
+export function createDraftAfterSave(
+  options: Readonly<{
+    savedDraft: ThemeDraft;
+    currentDraft: ThemeDraft;
+    savedDocument: VideoThemeDocument;
+  }>,
+): ThemeDraft {
+  const { savedDraft, currentDraft, savedDocument } = options;
+  if (isDraftUnchanged({ savedDraft, currentDraft })) {
+    return EMPTY_THEME_DRAFT;
+  }
+  return {
+    patch: _omitSavedTokens(currentDraft.patch, savedDocument),
+    overrides: _omitSavedOverrides(currentDraft.overrides, savedDocument),
+  };
+}

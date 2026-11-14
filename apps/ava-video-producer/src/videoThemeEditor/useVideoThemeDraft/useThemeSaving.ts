@@ -1,4 +1,11 @@
-import { useCallback, useMemo, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import {
   ThemeApi,
   ThemeApiError,
@@ -10,6 +17,7 @@ import {
   createSavedDocumentFromDraft,
   type ThemeDraft,
 } from "../themeDraft/themeDraft";
+import { createDraftAfterSave, isDraftUnchanged } from "./storedDraftRecord";
 import type {
   VideoThemeIssue,
   VideoThemeLibrary,
@@ -47,8 +55,11 @@ type SaveOptions = Readonly<{
   storeTheme: (stored: StoredTheme) => void;
   selectTheme: (themeId: string) => void;
   discard: () => void;
-  rebaseDraft: (baseHash: string) => void;
+  rebaseDraft: (baseHash: string, nextDraft?: ThemeDraft) => void;
 }>;
+
+/** The draft as it is now, read when a request finishes. */
+type LatestDraft = RefObject<ThemeDraft>;
 
 function _buildFailureStatusFromError(error: unknown): ThemeSaveStatus {
   return error instanceof ThemeApiError
@@ -127,9 +138,16 @@ export async function reloadStoredTheme(
 
 type RunThemeRequest = (request: () => Promise<void>) => Promise<boolean>;
 
-/** Saves the draft into its custom theme file, guarded by the file's hash. */
-function useSaveInPlace(options: SaveOptions, run: RunThemeRequest) {
-  const { isBuiltIn, storedTheme, draft, storeTheme, discard } = options;
+/**
+ * Saves the draft into its custom theme file, guarded by the file's hash.
+ * Edits made while the save runs stay, on top of the saved theme.
+ */
+function useSaveInPlace(
+  options: SaveOptions,
+  run: RunThemeRequest,
+  latestDraft: LatestDraft,
+) {
+  const { isBuiltIn, storedTheme, draft, storeTheme, rebaseDraft } = options;
   return useCallback(async () => {
     if (isBuiltIn || !storedTheme) {
       return;
@@ -138,16 +156,37 @@ function useSaveInPlace(options: SaveOptions, run: RunThemeRequest) {
     await run(async () => {
       const { hash } = await ThemeApi.save(document, storedTheme.hash);
       storeTheme({ document, hash });
-      discard();
+      rebaseDraft(
+        hash,
+        createDraftAfterSave({
+          savedDraft: draft,
+          currentDraft: latestDraft.current,
+          savedDocument: document,
+        }),
+      );
     });
-  }, [isBuiltIn, storedTheme, draft, storeTheme, discard, run]);
+  }, [
+    isBuiltIn,
+    storedTheme,
+    draft,
+    storeTheme,
+    rebaseDraft,
+    run,
+    latestDraft,
+  ]);
 }
 
 /**
  * Saves the draft as a new theme and makes it the active one. A missing base
- * theme fails like any other refused save, so the status line says so.
+ * theme fails like any other refused save, so the status line says so. The
+ * base theme's draft is cleared only when it did not change during the save,
+ * so edits made meanwhile are not lost.
  */
-function useSaveAsNew(options: SaveOptions, run: RunThemeRequest) {
+function useSaveAsNew(
+  options: SaveOptions,
+  run: RunThemeRequest,
+  latestDraft: LatestDraft,
+) {
   const { library, themeId, draft, storeTheme, discard, selectTheme } = options;
   return useCallback(
     (label: string) =>
@@ -160,10 +199,26 @@ function useSaveAsNew(options: SaveOptions, run: RunThemeRequest) {
         const document = createNewThemeDocument({ base, draft, id, label });
         const { hash } = await ThemeApi.create(document);
         storeTheme({ document, hash });
-        discard();
+        if (
+          isDraftUnchanged({
+            savedDraft: draft,
+            currentDraft: latestDraft.current,
+          })
+        ) {
+          discard();
+        }
         selectTheme(id);
       }),
-    [library, themeId, draft, storeTheme, discard, selectTheme, run],
+    [
+      library,
+      themeId,
+      draft,
+      storeTheme,
+      discard,
+      selectTheme,
+      run,
+      latestDraft,
+    ],
   );
 }
 
@@ -180,8 +235,12 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
     (request) => runThemeRequest({ inFlight, setStatus, request }),
     [],
   );
-  const save = useSaveInPlace(options, run);
-  const saveAsNew = useSaveAsNew(options, run);
+  const latestDraft = useRef(options.draft);
+  useEffect(() => {
+    latestDraft.current = options.draft;
+  }, [options.draft]);
+  const save = useSaveInPlace(options, run, latestDraft);
+  const saveAsNew = useSaveAsNew(options, run, latestDraft);
   const { themeId, storeTheme, rebaseDraft } = options;
   const reloadTheme = useCallback(
     () =>
