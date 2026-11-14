@@ -281,9 +281,18 @@ export function findTokenRowIssue(
   );
 }
 
-/** The key for a value added to a scale: the first free `custom<n>`. */
-export function buildNextCustomScaleKey(rows: readonly TokenRow[]): string {
-  const taken = new Set(rows.map((row) => row.scaleKey));
+/**
+ * The key for a value added to a scale group: the first `custom<n>` no entry
+ * of that scale uses. Pass every row, not a filtered view, so a value hidden
+ * by search is never overwritten.
+ */
+export function buildNextCustomScaleKey(
+  rows: readonly TokenRow[],
+  group: string,
+): string {
+  const taken = new Set(
+    rows.filter((row) => row.group === group).map((row) => row.scaleKey),
+  );
   let index = 1;
   while (taken.has(`custom${index}`)) {
     index += 1;

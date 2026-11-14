@@ -24,6 +24,7 @@ export function TypeSpecimen({
     <div className={css.specimenRow}>
       <p
         className={css.specimen}
+        data-inherit-dim
         style={{
           background: fillToCss(theme.semantic.color.groundFill),
           color: buildColorWithAlpha(style.color, style.alpha),

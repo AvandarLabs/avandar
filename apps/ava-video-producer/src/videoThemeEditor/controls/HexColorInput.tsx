@@ -1,10 +1,16 @@
 import { ColorInput, type ColorInputProps } from "@mantine/core";
+import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { parseHexDraft } from "./controlValues/controlValues";
 import { useDraftValue } from "./useDraftValue";
 
 type HexColorInputProps = Omit<
   ColorInputProps,
-  "value" | "onChange" | "format" | "popoverProps" | "withEyeDropper"
+  | "value"
+  | "onChange"
+  | "format"
+  | "popoverProps"
+  | "withEyeDropper"
+  | "attributes"
 > &
   Readonly<{
     value: string;
@@ -14,6 +20,8 @@ type HexColorInputProps = Omit<
   }>;
 
 const POPOVER = { withinPortal: false } as const;
+// The colour chip is a non-text part, so an inherited token row dims it.
+const ATTRIBUTES = { colorPreview: { "data-inherit-dim": true } } as const;
 
 /**
  * A Mantine colour field that keeps hand-typed hex text while it is
@@ -26,8 +34,10 @@ export function HexColorInput({
   allowAlpha,
   onChange,
   onBlur,
+  error,
   ...props
 }: HexColorInputProps) {
+  const hasIssue = useRowHasIssue();
   const field = useDraftValue<string, string>({
     value,
     toKey: (color) => color,
@@ -38,10 +48,12 @@ export function HexColorInput({
   return (
     <ColorInput
       {...props}
+      error={error ?? hasIssue}
       value={field.draft}
       format={allowAlpha && value.length === 9 ? "hexa" : "hex"}
       withEyeDropper={false}
       popoverProps={POPOVER}
+      attributes={ATTRIBUTES}
       onChange={field.change}
       onBlur={(event) => {
         if (!field.isValid) {

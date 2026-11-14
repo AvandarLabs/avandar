@@ -220,14 +220,25 @@ test("a row's issue is one at its path or inside it, never a sibling's", () => {
   );
 });
 
-test("a new scale value takes the first free custom key", () => {
-  const swatches = _rows({ kind: "theme" }).filter(
-    (row) => row.group === "atomic:swatch",
+test("a new scale value takes the first free custom key in its whole scale", () => {
+  const draft = setTokenInDraft(
+    setTokenInDraft(
+      EMPTY_THEME_DRAFT,
+      { kind: "theme" },
+      "atomic.swatch.custom1",
+      "#123456",
+    ),
+    { kind: "theme" },
+    "atomic.swatch.custom3",
+    "#654321",
   );
-  assert.equal(buildNextCustomScaleKey(swatches), "custom1");
-  const taken = [
-    { ...swatches[0], scaleKey: "custom1" },
-    { ...swatches[0], scaleKey: "custom3" },
-  ];
-  assert.equal(buildNextCustomScaleKey(taken), "custom2");
+  const rows = _rows({ kind: "theme" }, draft);
+  const visible = filterTokenRows(rows, {
+    tiers: ["atomic"],
+    query: "mint",
+    getText: () => "",
+  });
+  assert.ok(!visible.some((row) => row.scaleKey === "custom1"));
+  assert.equal(buildNextCustomScaleKey(rows, "atomic:swatch"), "custom2");
+  assert.equal(buildNextCustomScaleKey(rows, "atomic:textShadow"), "custom1");
 });

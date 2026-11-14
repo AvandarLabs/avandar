@@ -12,6 +12,7 @@ import {
   orderReferenceOptions,
   type ReferenceOption,
 } from "../referenceOptions/referenceOptions";
+import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { useTokenCopy } from "../tokenCopy/useTokenCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import css from "./controls.module.css";
@@ -193,6 +194,7 @@ function _OptionRow({
           className={css.chip}
           style={{ background: chip }}
           aria-hidden="true"
+          data-inherit-dim
         />
       ) : null}
       <span>{label}</span>
@@ -213,10 +215,12 @@ export function ReferenceControl(props: ReferenceControlProps) {
   const toLabel = useOptionLabel();
   const options = useReferenceOptions(props);
   const chips = useOptionChips(options);
+  const hasIssue = useRowHasIssue();
   return (
     <div className={css.reference}>
       <AtlasSelect
         aria-label={props.label}
+        error={hasIssue}
         searchable
         data={options.map((option) => ({
           value: option.reference,

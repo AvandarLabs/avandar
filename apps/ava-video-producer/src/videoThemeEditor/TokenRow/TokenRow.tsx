@@ -2,8 +2,9 @@ import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconAlertCircle, IconArrowBackUp } from "@tabler/icons-react";
 import clsx from "clsx";
-import { useCallback, useId } from "react";
+import { useCallback } from "react";
 import { formatTokenValue } from "../formatTokenValue/formatTokenValue";
+import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
 import { TokenControl } from "../TokenControl/TokenControl";
 import { useTokenCopy } from "../tokenCopy/useTokenCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
@@ -80,13 +81,10 @@ function TokenRowHeader({ row, label, isInherited }: HeaderProps) {
   );
 }
 
-function TokenRowIssue({
-  id,
-  issue,
-}: Readonly<{ id: string; issue: VideoThemeIssue }>) {
+function TokenRowIssue({ issue }: Readonly<{ issue: VideoThemeIssue }>) {
   const { t } = useLingui();
   return (
-    <p id={id} className={css.issue} role="alert">
+    <p className={css.issue} role="alert">
       <IconAlertCircle className={css.issueIcon} size={14} aria-hidden="true" />
       <span>
         {t`This value does not resolve.`}{" "}
@@ -99,40 +97,30 @@ function TokenRowIssue({
 /**
  * One token: its name and state, its control, its path and description, and
  * any problem. An inherited item-scope value shows muted text and an
- * "Inherited" tag. A problem puts the control in its error state and adds an
- * alert line the control is described by.
+ * "Inherited" tag, and its chips and previews dim. A problem puts the
+ * control's inputs in Mantine's error state and adds an alert line.
  */
 export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
   const copy = useTokenCopy();
   const editor = useTokenEditor();
-  const issueId = useId();
   const label = useTokenRowLabel()(row);
   const issue = findTokenRowIssue(editor.issues, row.path);
   const isInherited =
     editor.scope.kind === "item" && row.overrideState === "none";
   return (
     <div
-      className={clsx(
-        css.row,
-        isInherited && css.inherited,
-        issue && css.hasIssue,
-      )}
+      className={clsx(css.row, isInherited && css.inherited)}
       data-token-path={row.path}
     >
       <TokenRowHeader row={row} label={label} isInherited={isInherited} />
-      <div
-        className={css.control}
-        role="group"
-        aria-label={label}
-        aria-describedby={issue ? issueId : undefined}
-      >
+      <RowIssueContext.Provider value={issue !== undefined}>
         <TokenControl row={row} label={label} />
-      </div>
+      </RowIssueContext.Provider>
       <p className={css.meta}>
         <code className={css.path}>{row.path}</code>{" "}
         {copy(row.definition.description)}
       </p>
-      {issue ? <TokenRowIssue id={issueId} issue={issue} /> : null}
+      {issue ? <TokenRowIssue issue={issue} /> : null}
     </div>
   );
 }

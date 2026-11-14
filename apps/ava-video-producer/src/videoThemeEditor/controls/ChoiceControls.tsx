@@ -5,6 +5,7 @@ import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
 } from "../../videoTheme/videoFontRegistry/videoFontRegistry";
+import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { useOptionCopy, type OptionCopy } from "../tokenCopy/useEditorCopy";
 import css from "./controls.module.css";
 import type { ValueControlProps } from "./valueControl.types";
@@ -17,6 +18,7 @@ export function FontValueControl({
   onChange,
 }: ValueControlProps) {
   const { t } = useLingui();
+  const hasIssue = useRowHasIssue();
   const data = VIDEO_FONT_IDS.map((id) => {
     const font = VIDEO_FONT_REGISTRY[id];
     const name = font.label;
@@ -28,6 +30,7 @@ export function FontValueControl({
   return (
     <AtlasSelect
       aria-label={label}
+      error={hasIssue}
       data={data}
       value={String(value)}
       onChange={(next) => next && onChange(next)}
@@ -42,11 +45,13 @@ function _EnumMenu({
   label,
   value,
   options,
+  hasIssue,
   onChange,
 }: Readonly<{
   label: string;
   value: string;
   options: readonly EnumOption[];
+  hasIssue: boolean;
   onChange: (option: string) => void;
 }>) {
   const descriptions = new Map(
@@ -55,6 +60,7 @@ function _EnumMenu({
   return (
     <AtlasSelect
       aria-label={label}
+      error={hasIssue}
       value={value}
       data={options.map((entry) => ({
         value: entry.option,
@@ -85,6 +91,7 @@ export function EnumValueControl({
   optionKey = "",
 }: ValueControlProps) {
   const copy = useOptionCopy();
+  const hasIssue = useRowHasIssue();
   const options = (definition.options ?? []).map((option) => ({
     option,
     ...copy(optionKey, option),
@@ -95,6 +102,7 @@ export function EnumValueControl({
         label={label}
         value={String(value)}
         options={options}
+        hasIssue={hasIssue}
         onChange={onChange}
       />
     );
@@ -104,6 +112,7 @@ export function EnumValueControl({
       size="xs"
       fullWidth
       aria-label={label}
+      aria-invalid={hasIssue || undefined}
       value={String(value)}
       data={options.map((entry) => ({
         value: entry.option,
@@ -120,10 +129,12 @@ export function BooleanValueControl({
   value,
   onChange,
 }: ValueControlProps) {
+  const hasIssue = useRowHasIssue();
   return (
     <Switch
       size="xs"
       aria-label={label}
+      error={hasIssue}
       checked={value === true}
       onChange={(event) => onChange(event.currentTarget.checked)}
     />

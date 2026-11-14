@@ -1,4 +1,5 @@
 import { NumberInput, type NumberInputProps } from "@mantine/core";
+import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { toNumberInRange } from "./controlValues/controlValues";
 import { useDraftValue } from "./useDraftValue";
 
@@ -24,8 +25,10 @@ export function RangeNumberInput({
   max,
   onChange,
   onBlur,
+  error,
   ...props
 }: RangeNumberInputProps) {
+  const hasIssue = useRowHasIssue();
   const field = useDraftValue<number, number | string>({
     value,
     toKey: String,
@@ -36,6 +39,7 @@ export function RangeNumberInput({
   return (
     <NumberInput
       {...props}
+      error={error ?? hasIssue}
       min={min}
       max={max}
       value={field.draft}

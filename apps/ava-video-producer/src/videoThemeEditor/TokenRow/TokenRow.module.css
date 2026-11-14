@@ -30,15 +30,8 @@
   font-size: 11px;
 }
 
-/* Only non-text parts dim when inherited: colour chips, effect previews, and sketches. */
-.inherited
-  .control
-  :is(
-    :global(.mantine-ColorInput-colorPreview),
-    :global(.mantine-ColorSwatch-root),
-    svg[aria-hidden="true"]:not([class*="tabler-icon"]),
-    [aria-hidden="true"][style]
-  ) {
+/* Only non-text parts dim when inherited: chips, swatches, specimens, and previews. */
+.inherited [data-inherit-dim] {
   opacity: 0.6;
 }
 
@@ -60,18 +53,6 @@
   font-size: 11px;
   margin-inline-start: auto;
   white-space: nowrap;
-}
-
-.control {
-  min-width: 0;
-}
-
-/* Mantine's input error state, applied to every input in the row's control. */
-.hasIssue
-  .control
-  :global(.mantine-Input-wrapper:not([data-variant="unstyled"])) {
-  --input-bd: var(--mantine-color-red-6);
-  --input-bd-focus: var(--mantine-color-red-6);
 }
 
 .meta {

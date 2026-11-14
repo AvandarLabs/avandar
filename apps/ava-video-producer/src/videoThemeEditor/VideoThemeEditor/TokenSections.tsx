@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Accordion, Button } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
 import { getDefaultLiteralFromKind } from "../controls/defaultLiterals";
 import { useGroupCopy } from "../tokenCopy/useEditorCopy";
@@ -28,7 +28,13 @@ function useGroupName(): (group: string) => string {
   };
 }
 
-function AddScaleValue({ group, rows }: TokenRowGroup) {
+type SectionProps = TokenRowGroup &
+  Readonly<{
+    /** Every row in the editor, unfiltered, so new keys never collide. */
+    allRows: readonly TokenRowModel[];
+  }>;
+
+function AddScaleValue({ group, allRows }: SectionProps) {
   const { t } = useLingui();
   const editor = useTokenEditor();
   const scalePath = `atomic.${group.split(":")[1]}`;
@@ -42,7 +48,7 @@ function AddScaleValue({ group, rows }: TokenRowGroup) {
       variant="subtle"
       onClick={() =>
         editor.setToken(
-          `${scalePath}.${buildNextCustomScaleKey(rows)}`,
+          `${scalePath}.${buildNextCustomScaleKey(allRows, group)}`,
           getDefaultLiteralFromKind(kind),
         )
       }
@@ -52,16 +58,30 @@ function AddScaleValue({ group, rows }: TokenRowGroup) {
   );
 }
 
-function SectionRows({ group, rows }: TokenRowGroup) {
+function SectionRows({ group, rows, allRows }: SectionProps) {
   return (
     <>
       {rows.map((row) => (
         <TokenRow key={row.path} row={row} />
       ))}
       {group.startsWith("atomic:") ? (
-        <AddScaleValue group={group} rows={rows} />
+        <AddScaleValue group={group} rows={rows} allRows={allRows} />
       ) : null}
     </>
+  );
+}
+
+/** Sections for the visible rows, then the empty scales after them. */
+function useSectionGroups(
+  rows: readonly TokenRowModel[],
+  emptyGroups: readonly string[],
+): readonly TokenRowGroup[] {
+  return useMemo(
+    () => [
+      ...groupTokenRows(rows),
+      ...emptyGroups.map((group) => ({ group, rows: [] })),
+    ],
+    [rows, emptyGroups],
   );
 }
 
@@ -71,18 +91,19 @@ function SectionRows({ group, rows }: TokenRowGroup) {
  */
 export function TokenSections({
   rows,
+  allRows,
   emptyGroups,
 }: Readonly<{
+  /** The rows to show, after search and filters. */
   rows: readonly TokenRowModel[];
+  /** Every row, for choosing a free key when a value is added. */
+  allRows: readonly TokenRowModel[];
   emptyGroups: readonly string[];
 }>) {
   const { t } = useLingui();
   const groupName = useGroupName();
   const [openGroups, setOpenGroups] = useState<string[]>([]);
-  const groups: readonly TokenRowGroup[] = [
-    ...groupTokenRows(rows),
-    ...emptyGroups.map((group) => ({ group, rows: [] })),
-  ];
+  const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
     return <p className={css.empty}>{t`No tokens match.`}</p>;
   }
@@ -105,7 +126,7 @@ export function TokenSections({
           </Accordion.Control>
           <Accordion.Panel>
             {openGroups.includes(group) ? (
-              <SectionRows group={group} rows={grouped} />
+              <SectionRows group={group} rows={grouped} allRows={allRows} />
             ) : null}
           </Accordion.Panel>
         </Accordion.Item>

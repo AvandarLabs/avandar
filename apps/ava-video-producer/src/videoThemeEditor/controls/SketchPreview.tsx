@@ -24,7 +24,12 @@ export function SketchPreview({
     );
   }, [profile]);
   return (
-    <svg className={css.sketchPreview} viewBox="0 0 96 44" aria-hidden="true">
+    <svg
+      className={css.sketchPreview}
+      viewBox="0 0 96 44"
+      aria-hidden="true"
+      data-inherit-dim
+    >
       {paths.map((path) => (
         <path
           key={path.d}

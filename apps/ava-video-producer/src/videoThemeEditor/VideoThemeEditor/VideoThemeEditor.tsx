@@ -61,6 +61,29 @@ function useVisibleRows(
   );
 }
 
+/**
+ * The search, tier, and usage filters, the rows they leave visible, and the
+ * empty atomic scales to offer while the unfiltered atomic tier is open.
+ */
+function useEditorFilters(
+  rows: readonly TokenRow[],
+  usedTokens: readonly string[] | undefined,
+) {
+  const [filters, setFilters] = useState<EditorFilters>({
+    tier: "semantic",
+    query: "",
+    isUsedOnly: false,
+  });
+  const visibleRows = useVisibleRows(rows, filters, usedTokens);
+  const showsEmptyScales =
+    filters.tier === "atomic" && !filters.query && !filters.isUsedOnly;
+  const emptyGroups = useMemo(
+    () => (showsEmptyScales ? listEmptyAtomicScaleGroups(rows) : []),
+    [showsEmptyScales, rows],
+  );
+  return { filters, setFilters, visibleRows, emptyGroups };
+}
+
 /** The draft's rows and the context its controls read. */
 function useEditorRows(props: Props) {
   const { library, themeId, draft, scope, onDraftChange } = props;
@@ -126,14 +149,10 @@ function TierSwitch({ filters, onFiltersChange, hasItem }: TierSwitchProps) {
 export function VideoThemeEditor(props: Props) {
   const { t } = useLingui();
   const { rows, context } = useEditorRows(props);
-  const [filters, setFilters] = useState<EditorFilters>({
-    tier: "semantic",
-    query: "",
-    isUsedOnly: false,
-  });
-  const visibleRows = useVisibleRows(rows, filters, props.usedTokens);
-  const showsEmptyScales =
-    filters.tier === "atomic" && !filters.query && !filters.isUsedOnly;
+  const { filters, setFilters, visibleRows, emptyGroups } = useEditorFilters(
+    rows,
+    props.usedTokens,
+  );
   const overrideCount = props.item
     ? countItemOverrides({
         library: props.library,
@@ -162,7 +181,8 @@ export function VideoThemeEditor(props: Props) {
         />
         <TokenSections
           rows={visibleRows}
-          emptyGroups={showsEmptyScales ? listEmptyAtomicScaleGroups(rows) : []}
+          allRows={rows}
+          emptyGroups={emptyGroups}
         />
       </section>
     </TokenEditorContext.Provider>

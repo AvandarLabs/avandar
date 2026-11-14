@@ -7,6 +7,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { elevationToBoxShadow } from "../../videoTheme/cssValues/cssValues";
+import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import css from "./controls.module.css";
 import {
@@ -199,6 +200,7 @@ export function ShadowValueControl({
           className={css.shadowPreview}
           style={{ boxShadow }}
           aria-hidden="true"
+          data-inherit-dim
         />
       </Group>
     </div>
@@ -270,6 +272,26 @@ function DashPresets({
   );
 }
 
+/** A line drawn with a dash pattern. */
+function _DashPreview({ pattern }: Readonly<{ pattern: readonly number[] }>) {
+  return (
+    <svg
+      className={css.dashPreview}
+      viewBox="0 0 160 8"
+      aria-hidden="true"
+      data-inherit-dim
+    >
+      <line
+        x1={0}
+        y1={4}
+        x2={160}
+        y2={4}
+        strokeDasharray={formatDashPattern(pattern)}
+      />
+    </svg>
+  );
+}
+
 /** A dash pattern: presets plus exact dash and gap lengths, previewed as a line. */
 export function DashValueControl({
   label,
@@ -277,6 +299,7 @@ export function DashValueControl({
   onChange,
 }: ValueControlProps) {
   const { t } = useLingui();
+  const hasIssue = useRowHasIssue();
   const pattern = Array.isArray(value) ? (value as readonly number[]) : [];
   const field = useDraftValue<readonly number[], string>({
     value: pattern,
@@ -294,20 +317,12 @@ export function DashValueControl({
         value={field.draft}
         error={
           field.isValid
-            ? undefined
+            ? hasIssue
             : t`Use up to eight numbers separated by spaces.`
         }
         onChange={(event) => field.change(event.currentTarget.value)}
       />
-      <svg className={css.dashPreview} viewBox="0 0 160 8" aria-hidden="true">
-        <line
-          x1={0}
-          y1={4}
-          x2={160}
-          y2={4}
-          strokeDasharray={formatDashPattern(pattern)}
-        />
-      </svg>
+      <_DashPreview pattern={pattern} />
     </div>
   );
 }
