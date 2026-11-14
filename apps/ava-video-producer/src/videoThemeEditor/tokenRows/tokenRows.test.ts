@@ -12,8 +12,11 @@ import {
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
 import {
+  buildNextCustomScaleKey,
   filterTokenRows,
+  findTokenRowIssue,
   getEssentialRows,
+  listEmptyAtomicScaleGroups,
   listTokenRows,
   type TokenRow,
 } from "./tokenRows";
@@ -192,4 +195,39 @@ test("Essentials come out in their fixed order", () => {
       "sketch.box",
     ],
   );
+});
+
+test("atomic scales with no entries still get a section", () => {
+  assert.deepEqual(listEmptyAtomicScaleGroups(_rows({ kind: "theme" })), [
+    "atomic:size",
+    "atomic:textShadow",
+  ]);
+});
+
+test("a row's issue is one at its path or inside it, never a sibling's", () => {
+  const issues = [
+    { path: "color.accentSoft", message: "sibling" },
+    { path: "text.stage.title.color", message: "inside" },
+  ];
+  assert.equal(findTokenRowIssue(issues, "color.accent"), undefined);
+  assert.equal(
+    findTokenRowIssue(issues, "text.stage.title")?.message,
+    "inside",
+  );
+  assert.equal(
+    findTokenRowIssue(issues, "color.accentSoft")?.message,
+    "sibling",
+  );
+});
+
+test("a new scale value takes the first free custom key", () => {
+  const swatches = _rows({ kind: "theme" }).filter(
+    (row) => row.group === "atomic:swatch",
+  );
+  assert.equal(buildNextCustomScaleKey(swatches), "custom1");
+  const taken = [
+    { ...swatches[0], scaleKey: "custom1" },
+    { ...swatches[0], scaleKey: "custom3" },
+  ];
+  assert.equal(buildNextCustomScaleKey(taken), "custom2");
 });

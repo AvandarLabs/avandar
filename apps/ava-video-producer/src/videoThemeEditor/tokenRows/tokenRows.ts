@@ -16,6 +16,7 @@ import {
 import type {
   ResolvedVideoTheme,
   TokenDefinition,
+  VideoThemeIssue,
   VideoThemeLibrary,
   VideoThemePatch,
 } from "../../videoTheme/videoTheme.types";
@@ -57,7 +58,10 @@ export type TokenRowFilter = Readonly<{
   getText: (row: TokenRow) => string;
 }>;
 
-/** The handful of tokens that change a look the most, always shown first (spec §3.2). */
+/**
+ * The handful of tokens that change a look the most. The editor shows them
+ * first, above the tiers, in this order.
+ */
 export const ESSENTIAL_TOKEN_PATHS = [
   "color.accent",
   "color.ground",
@@ -247,4 +251,42 @@ export function getEssentialRows(
   return ESSENTIAL_TOKEN_PATHS.flatMap((path) =>
     rows.filter((row) => row.path === path),
   );
+}
+
+/**
+ * Sections for atomic scales that have no entries yet, such as an empty
+ * `textShadow` scale, so the editor can offer to add the first value.
+ */
+export function listEmptyAtomicScaleGroups(
+  rows: readonly TokenRow[],
+): readonly string[] {
+  const filled = new Set(rows.map((row) => row.group));
+  return listTokenDefinitions()
+    .filter(({ path, isScale }) => isScale && path.startsWith("atomic."))
+    .map(({ path }) => `atomic:${path.split(".")[1]}`)
+    .filter((group) => !filled.has(group));
+}
+
+/**
+ * The resolver problem a row shows: one reported at the token itself or at
+ * one of its fields, such as `text.stage.title.color` for `text.stage.title`.
+ */
+export function findTokenRowIssue(
+  issues: readonly VideoThemeIssue[],
+  tokenPath: string,
+): VideoThemeIssue | undefined {
+  return issues.find(
+    (issue) =>
+      issue.path === tokenPath || issue.path.startsWith(`${tokenPath}.`),
+  );
+}
+
+/** The key for a value added to a scale: the first free `custom<n>`. */
+export function buildNextCustomScaleKey(rows: readonly TokenRow[]): string {
+  const taken = new Set(rows.map((row) => row.scaleKey));
+  let index = 1;
+  while (taken.has(`custom${index}`)) {
+    index += 1;
+  }
+  return `custom${index}`;
 }

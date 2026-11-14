@@ -1,0 +1,70 @@
+.editor {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.toolbar {
+  background: var(--paper);
+  display: grid;
+  gap: 8px;
+  inset-block-start: 0;
+  padding-block-end: 8px;
+  position: sticky;
+  z-index: 2;
+}
+
+.scope {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.usage {
+  display: grid;
+  gap: 4px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.essentials {
+  border-bottom: 1px solid var(--line);
+}
+
+.sectionTitle {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.section {
+  border-bottom: 1px solid var(--line);
+}
+
+.sectionControl {
+  font-size: 12px;
+  padding-inline: 0;
+}
+
+.sectionPanel {
+  padding-inline: 0;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  margin-inline-start: 6px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 12px;
+}

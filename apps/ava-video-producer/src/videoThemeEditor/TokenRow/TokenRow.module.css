@@ -1,0 +1,107 @@
+.row {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  padding-block: 12px;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.inherited .label {
+  color: var(--muted);
+}
+
+.inheritedTag {
+  color: var(--muted);
+  flex: 0 0 auto;
+  font-size: 11px;
+}
+
+/* Only non-text parts dim when inherited: colour chips, effect previews, and sketches. */
+.inherited
+  .control
+  :is(
+    :global(.mantine-ColorInput-colorPreview),
+    :global(.mantine-ColorSwatch-root),
+    svg[aria-hidden="true"]:not([class*="tabler-icon"]),
+    [aria-hidden="true"][style]
+  ) {
+  opacity: 0.6;
+}
+
+.dot {
+  background: var(--ava-primary-6);
+  border: 2px solid var(--ava-primary-6);
+  border-radius: 50%;
+  flex: 0 0 auto;
+  height: 8px;
+  width: 8px;
+}
+
+.dotSaved {
+  background: transparent;
+}
+
+.value {
+  color: var(--muted);
+  font-size: 11px;
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+
+.control {
+  min-width: 0;
+}
+
+/* Mantine's input error state, applied to every input in the row's control. */
+.hasIssue
+  .control
+  :global(.mantine-Input-wrapper:not([data-variant="unstyled"])) {
+  --input-bd: var(--mantine-color-red-6);
+  --input-bd-focus: var(--mantine-color-red-6);
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.path {
+  font: 10px var(--mono);
+}
+
+.issue {
+  align-items: flex-start;
+  color: var(--mantine-color-red-9);
+  display: flex;
+  font-size: 11px;
+  gap: 6px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.issueIcon {
+  color: var(--mantine-color-red-6);
+  flex: 0 0 auto;
+  margin-block-start: 1px;
+}
+
+.issueMessage {
+  font: 10px var(--mono);
+  overflow-wrap: anywhere;
+}
