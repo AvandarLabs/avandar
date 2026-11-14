@@ -34,6 +34,8 @@ export type ThemeBarActions = Readonly<{
   canSave: boolean;
   canSaveAsNew: boolean;
   canDiscard: boolean;
+  /** A save was refused because the file changed, and no banner offers a reload. */
+  showsReload: boolean;
 }>;
 
 const FAILURE_MESSAGES: Readonly<Record<number, ThemeBarMessage>> = {
@@ -78,7 +80,8 @@ export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
 /**
  * Save shows for custom themes only and needs unsaved changes without issues.
  * Save as new needs no issues, Discard needs unsaved changes, and nothing
- * starts while a save is in flight.
+ * starts while a save is in flight. Reload theme shows after a conflict the
+ * changed-on-disk banner is not already answering.
  */
 export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
   const isIdle = input.status.kind !== "saving";
@@ -87,6 +90,7 @@ export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
     canSave: !input.isBuiltIn && input.isDirty && !input.hasIssues && isIdle,
     canSaveAsNew: !input.hasIssues && isIdle,
     canDiscard: input.isDirty && isIdle,
+    showsReload: getThemeBarMessage(input) === "changedOnDisk",
   };
 }
 

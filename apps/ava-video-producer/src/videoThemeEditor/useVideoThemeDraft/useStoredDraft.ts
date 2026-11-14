@@ -20,6 +20,8 @@ export type StoredDraftState = Readonly<{
   setDraft: (draft: ThemeDraft) => void;
   /** Keeps the edits on top of the current file and clears the banner. */
   keepDraft: () => void;
+  /** Keeps the edits and records them as made against the file with this hash. */
+  rebaseDraft: (baseHash: string) => void;
   discard: () => void;
 }>;
 
@@ -77,6 +79,10 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     () => store({ baseHash, draft }),
     [store, baseHash, draft],
   );
+  const rebaseDraft = useCallback(
+    (nextBaseHash: string) => store({ baseHash: nextBaseHash, draft }),
+    [store, draft],
+  );
   const discard = useCallback(
     () => store({ baseHash, draft: EMPTY_THEME_DRAFT }),
     [store, baseHash],
@@ -88,7 +94,23 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     Boolean(baseHash) &&
     recordHash !== baseHash;
   return useMemo(
-    () => ({ draft, isDirty, isChangedOnDisk, setDraft, keepDraft, discard }),
-    [draft, isDirty, isChangedOnDisk, setDraft, keepDraft, discard],
+    () => ({
+      draft,
+      isDirty,
+      isChangedOnDisk,
+      setDraft,
+      keepDraft,
+      rebaseDraft,
+      discard,
+    }),
+    [
+      draft,
+      isDirty,
+      isChangedOnDisk,
+      setDraft,
+      keepDraft,
+      rebaseDraft,
+      discard,
+    ],
   );
 }

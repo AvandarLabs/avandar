@@ -129,3 +129,32 @@ test("a new theme name is trimmed, and a blank name is no name", () => {
   assert.equal(getThemeLabelFromInput("  Night shift "), "Night shift");
   assert.equal(getThemeLabelFromInput("   "), undefined);
 });
+
+test("a save refused because the file changed offers Reload theme in the bar", () => {
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: _failed(409) }).showsReload,
+    true,
+  );
+});
+
+test("the bar leaves Reload theme to the banner while the banner shows", () => {
+  assert.equal(
+    getThemeBarActions({
+      ...QUIET,
+      isChangedOnDisk: true,
+      status: _failed(409),
+    }).showsReload,
+    false,
+  );
+});
+
+test("other outcomes do not offer Reload theme in the bar", () => {
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: _failed(500) }).showsReload,
+    false,
+  );
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: IDLE }).showsReload,
+    false,
+  );
+});

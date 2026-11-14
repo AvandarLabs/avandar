@@ -46,6 +46,7 @@ export function useVideoThemeDraft(): VideoThemeDraftState {
     storeTheme,
     selectTheme,
     discard: draftState.discard,
+    rebaseDraft: draftState.rebaseDraft,
   });
   return useMemo(
     () => ({

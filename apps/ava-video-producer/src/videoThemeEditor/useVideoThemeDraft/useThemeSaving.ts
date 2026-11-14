@@ -47,6 +47,7 @@ type SaveOptions = Readonly<{
   storeTheme: (stored: StoredTheme) => void;
   selectTheme: (themeId: string) => void;
   discard: () => void;
+  rebaseDraft: (baseHash: string) => void;
 }>;
 
 function _buildFailureStatusFromError(error: unknown): ThemeSaveStatus {
@@ -86,26 +87,41 @@ export async function runThemeRequest(
 }
 
 /**
- * Re-reads one theme's file and stores it, resolving true when it worked. A
- * successful reload clears the status line, since a stale-hash failure no
- * longer applies. A failed one reports why.
+ * Re-reads one theme's file, stores it, and records the draft as made against
+ * it, resolving true when it worked. The draft's edits stay, so nothing on
+ * disk or in the draft is overwritten. It shares the in-flight guard with
+ * saving: while a save runs it does nothing, so a late read cannot replace
+ * the document and hash a save just stored. A successful reload clears the
+ * status line, since a stale-hash failure no longer applies. A failed one
+ * reports why.
  */
 export async function reloadStoredTheme(
   options: Readonly<{
     themeId: string;
+    inFlight: RefObject<boolean>;
     read: (themeId: string) => Promise<StoredTheme>;
     storeTheme: (stored: StoredTheme) => void;
+    rebaseDraft: (baseHash: string) => void;
     setStatus: (status: ThemeSaveStatus) => void;
   }>,
 ): Promise<boolean> {
-  const { themeId, read, storeTheme, setStatus } = options;
+  const { themeId, inFlight, read, storeTheme, rebaseDraft, setStatus } =
+    options;
+  if (inFlight.current) {
+    return false;
+  }
+  inFlight.current = true;
   try {
-    storeTheme(await read(themeId));
+    const stored = await read(themeId);
+    storeTheme(stored);
+    rebaseDraft(stored.hash);
     setStatus({ kind: "idle" });
     return true;
   } catch (error) {
     setStatus(_buildFailureStatusFromError(error));
     return false;
+  } finally {
+    inFlight.current = false;
   }
 }
 
@@ -164,16 +180,18 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   );
   const save = useSaveInPlace(options, run);
   const saveAsNew = useSaveAsNew(options, run);
-  const { themeId, storeTheme } = options;
+  const { themeId, storeTheme, rebaseDraft } = options;
   const reloadTheme = useCallback(
     () =>
       reloadStoredTheme({
         themeId,
+        inFlight,
         read: ThemeApi.read,
         storeTheme,
+        rebaseDraft,
         setStatus,
       }),
-    [themeId, storeTheme],
+    [themeId, storeTheme, rebaseDraft],
   );
   return useMemo(
     () => ({ status, setStatus, save, saveAsNew, reloadTheme }),

@@ -20,7 +20,7 @@ export function ChangedOnDiskBanner({
   return (
     <Alert variant="light" color="yellow" title={t`This theme changed on disk`}>
       <p className={css.bannerText}>
-        {t`Your unsaved edits were made against an older version. Keep them on top of the new version, or discard them.`}
+        {t`Your unsaved edits were made against an older version. Keep them on top of the new version, discard them, or reload the theme to read the file again and keep your edits.`}
       </p>
       <Group gap="xs">
         <Button size="compact-xs" onClick={onKeep}>{t`Keep my edits`}</Button>
