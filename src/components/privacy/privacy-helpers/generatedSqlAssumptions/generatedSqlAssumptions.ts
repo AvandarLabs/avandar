@@ -1,7 +1,10 @@
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-
-/** Matches user messages that answer an inline clarification card. */
-export const CLARIFICATION_ANSWER_MARKER_RE = /^\[Clarification answer:/m;
+import {
+  CLARIFICATION_NONE_OF_ABOVE_BODY,
+  containsClarificationAnswerLine,
+  parseClarificationAnswerBody,
+  parseCustomAnswerText,
+} from "$/utils/chat/clarificationAnswerFormat";
 
 export const MAX_CLARIFICATIONS_PER_QUESTION = 3;
 
@@ -25,9 +28,7 @@ export function countClarificationAnswersInThread(
   messages: readonly ThreadMessage[],
 ): number {
   return messages.filter((msg) => {
-    return (
-      msg.role === "user" && CLARIFICATION_ANSWER_MARKER_RE.test(msg.content)
-    );
+    return msg.role === "user" && containsClarificationAnswerLine(msg.content);
   }).length;
 }
 
@@ -43,20 +44,19 @@ export function collectApprovedClarificationValues(
     if (message.role !== "user") {
       continue;
     }
-    const match = message.content.match(/^\[Clarification answer: (.+)\]$/s);
-    if (!match) {
+    const body = parseClarificationAnswerBody(message.content);
+    if (body === undefined) {
       continue;
     }
-    const body = match[1]!.trim();
     if (
-      body === "(none of the listed options)" ||
+      body === CLARIFICATION_NONE_OF_ABOVE_BODY ||
       body === "(user let AI decide)"
     ) {
       continue;
     }
-    const customMatch = body.match(/^\(custom answer: (.+)\)$/s);
-    if (customMatch) {
-      approved.add(normalizeAssumptionValue(customMatch[1]!));
+    const customText = parseCustomAnswerText(body);
+    if (customText !== undefined) {
+      approved.add(normalizeAssumptionValue(customText));
       continue;
     }
     for (const part of body.split(",")) {
