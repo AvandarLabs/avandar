@@ -66,7 +66,7 @@ export async function runGoogleTokenGet(
   options: Readonly<{ email: string; raw: boolean }>,
 ): Promise<void> {
   const { email, raw } = options;
-  const target = AvaEnv.getLoadedEnvTarget();
+  const envName = AvaEnv.getLoadedEnvName();
 
   // Only the lookup is wrapped. A missing row is an ordinary outcome with its
   // own guidance, not a failure to report twice, so it is handled after this.
@@ -74,7 +74,7 @@ export async function runGoogleTokenGet(
   try {
     // Deliberately only `VITE_SUPABASE_API_URL`, with no fallback to
     // `SUPABASE_URL`. Both name the same thing, and accepting either would mean
-    // a target whose file defines neither could still resolve one from the
+    // an env whose file defines neither could still resolve one from the
     // ambient shell. `AvaEnv.requireVar` names the file to add it to instead.
     const apiUrl = AvaEnv.requireVar("VITE_SUPABASE_API_URL").replace(
       /\/+$/,
@@ -83,7 +83,7 @@ export async function runGoogleTokenGet(
     const secretKey = AvaEnv.requireVar("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!raw) {
-      printInfo(`Reading tokens__google from ${target} (${apiUrl})...`);
+      printInfo(`Reading tokens__google from ${envName} (${apiUrl})...`);
     }
     rows = await _fetchTokenRows({ apiUrl, secretKey, email });
   } catch (error: unknown) {
@@ -96,14 +96,14 @@ export async function runGoogleTokenGet(
 
   const [newest] = rows;
   if (!newest) {
-    printError(`No Google account connected for ${email} on ${target}.`);
+    printError(`No Google account connected for ${email} on ${envName}.`);
     printError(
       "Connect it in the app first: Data Manager > Data Import > " +
         "Connectors > Connect to Google Sheets.",
     );
     // Thrown so the exit code is non-zero, which is what makes a `--raw`
     // capture in a shell script fail instead of assigning an empty string.
-    throw new Error(`No tokens__google row for ${email} on ${target}.`);
+    throw new Error(`No tokens__google row for ${email} on ${envName}.`);
   }
 
   // Raw mode is for `$(...)` capture, so the token is the only thing on

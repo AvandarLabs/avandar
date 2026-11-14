@@ -40,7 +40,8 @@ Acclimate.run(
     .addOption({
       name: "--dbLocationType",
       description:
-        "The Supabase location type. One of: local, staging, production",
+        "The Supabase location type: local, or the --env name of a " +
+        "deployed database, such as staging",
       type: "string",
       required: true,
     })
