@@ -4,6 +4,9 @@ The running list of features built on `demo/measles` that must each land
 in `develop` as their own PR. When every feature below reads `merged`,
 everything this branch built is in `develop`.
 
+Bug fixes ready to port to `develop`, and the PR and Linear status of
+each, are tracked in [bug-log.md](bug-log.md).
+
 Out of scope: the Postgres connector. It came in through
 `1d8678750 Merge branch 'feat/postgres-connector'`, again through
 `5ccb9b54e`, and into `feat/statuses` through `b903cbd9f`. Its 90 commits
