@@ -3,6 +3,8 @@ import { match } from "ts-pattern";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
@@ -131,16 +133,30 @@ async function _getDataset(datasetId: Dataset.Id): Promise<Dataset.T> {
   return dataset;
 }
 
+type StoredFileSourceType = "csv_file" | "xlsx_file" | "pdf_file";
+
 /**
- * Downloads an uploaded-file dataset's stored Parquet, resolving its source
- * record first. The source record's fields are not needed to build the storage
- * path; resolving it anyway keeps the requests, and the cache entries they
- * populate, identical to the relation extractor path this replaces.
+ * The Parquet this device made from an uploaded file, if it has finished
+ * making it. After a reload the transcode that makes it may still be running,
+ * so a running transcode is awaited first.
  */
-async function _downloadStoredParquet(
-  dataset: Readonly<Dataset.T>,
-  sourceType: "csv_file" | "xlsx_file" | "pdf_file",
-): Promise<Blob> {
+async function _findLocalParquet(
+  datasetId: Dataset.Id,
+): Promise<Blob | undefined> {
+  if (ImportJobsManager.getJob(datasetId)?.status === "running") {
+    await ImportJobsManager.waitForCompletion(datasetId);
+  }
+  const localDataset = await LocalDatasetClient.getById({ id: datasetId });
+  return localDataset?.parseStatus === "ready"
+    ? localDataset.parquetData
+    : undefined;
+}
+
+/** Whether an uploaded file's source record says it was never stored. */
+async function _isKeptOffline(
+  datasetId: Dataset.Id,
+  sourceType: StoredFileSourceType,
+): Promise<boolean> {
   const sourceClient = match(sourceType)
     .with("csv_file", () => {
       return CsvFileDatasetClient;
@@ -152,10 +168,48 @@ async function _downloadStoredParquet(
       return PdfFileDatasetClient;
     })
     .exhaustive();
-  await sourceClient
+  const sourceDatasets = await sourceClient
     .withCache(AvaQueryClient)
     .withEnsureQueryData()
-    .getAll(where("dataset_id", "in", [dataset.id]));
+    .getAll(where("dataset_id", "in", [datasetId]));
+  return sourceDatasets[0]?.isInCloudStorage === false;
+}
+
+/**
+ * Reads an uploaded-file dataset's Parquet. A file kept offline has no stored
+ * copy, so this device's copy is the only one. Any other file is downloaded,
+ * and this device's copy answers when the download fails: offline, or when a
+ * cached source record has not yet seen the file made offline-only.
+ */
+async function _readStoredFileParquet(
+  dataset: Readonly<Dataset.T>,
+  sourceType: StoredFileSourceType,
+): Promise<Blob> {
+  if (await _isKeptOffline(dataset.id, sourceType)) {
+    const localParquet = await _findLocalParquet(dataset.id);
+    if (!localParquet) {
+      throw new Error(
+        `The ${sourceType} dataset '${dataset.id}' (${dataset.name}) is kept offline, and this device has no copy of its rows`,
+      );
+    }
+    return localParquet;
+  }
+  try {
+    return await _downloadStoredParquet(dataset, sourceType);
+  } catch (downloadError) {
+    const localParquet = await _findLocalParquet(dataset.id);
+    if (!localParquet) {
+      throw downloadError;
+    }
+    return localParquet;
+  }
+}
+
+/** Downloads an uploaded-file dataset's stored Parquet. */
+async function _downloadStoredParquet(
+  dataset: Readonly<Dataset.T>,
+  sourceType: StoredFileSourceType,
+): Promise<Blob> {
   const parquetBlob = await DatasetParquetStorageClient.downloadDataset({
     datasetId: dataset.id,
     workspaceId: dataset.workspaceId,
@@ -275,7 +329,7 @@ async function _fetchParquetFromSource(
   return match(dataset.sourceType)
     .with("csv_file", "xlsx_file", "pdf_file", async (sourceType) => {
       return {
-        parquetBlob: await _downloadStoredParquet(dataset, sourceType),
+        parquetBlob: await _readStoredFileParquet(dataset, sourceType),
         sourceVersion: undefined,
       };
     })
