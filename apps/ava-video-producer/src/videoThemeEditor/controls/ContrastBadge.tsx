@@ -1,6 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
 import { Badge } from "@mantine/core";
+import clsx from "clsx";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
+import css from "./controls.module.css";
 import { getContrastSummaryFromColors } from "./roleValues/roleValues";
 import type { ResolvedTypeStyle } from "../../videoTheme/videoTheme.types";
 
@@ -19,8 +21,16 @@ export function ContrastBadge({
     theme.semantic.color.ground,
     style,
   );
+  const isFailing = level === "fail";
   return (
-    <Badge size="xs" variant="light" color={level === "fail" ? "red" : "green"}>
+    <Badge
+      size="xs"
+      variant="light"
+      color={isFailing ? "red" : "green"}
+      classNames={{
+        root: clsx(css.contrastBadge, isFailing && css.contrastBadgeFail),
+      }}
+    >
       {level === "fail" ? t`Low contrast ${ratio}:1` : t`${level} ${ratio}:1`}
     </Badge>
   );

@@ -60,7 +60,11 @@ function ScopeSwitch({
         }
       />
       {overrideCount > 0 ? (
-        <Badge size="xs" variant="light">
+        <Badge
+          size="xs"
+          variant="light"
+          classNames={{ root: css.overridesBadge }}
+        >
           {t`Overrides: ${overrideCount}`}
         </Badge>
       ) : null}
