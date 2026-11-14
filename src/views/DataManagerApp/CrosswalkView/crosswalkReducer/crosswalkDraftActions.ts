@@ -511,10 +511,15 @@ export function removeColumn(
   return refreshStatuses({ ...draft, columns, mappings });
 }
 
-/** Every `column` fill of one column, without a code list. */
+/**
+ * Every `column` fill of one column, without a code list. When the column is
+ * governed by an entry, each such fill is marked as matched, not chosen, so
+ * reading its values picks the list that fits them.
+ */
 function _clearCodeLists(
   mappings: CrosswalkDraft.T["mappings"],
   columnId: string,
+  isGoverned: boolean,
 ): CrosswalkDraft.T["mappings"] {
   return Object.fromEntries(
     Object.entries(mappings).map(([layoutId, layoutMappings]) => {
@@ -527,9 +532,10 @@ function _clearCodeLists(
         codeListId: undefined,
         holdsLabels: false,
       };
+      const reason = isGoverned ? "name_and_type" : mapping.reason;
       return [
         layoutId,
-        { ...layoutMappings, [columnId]: { ...mapping, fill } },
+        { ...layoutMappings, [columnId]: { ...mapping, fill, reason } },
       ];
     }),
   );
@@ -575,7 +581,7 @@ export function changeColumn(
     mappings:
       entryId === column.entryId
         ? draft.mappings
-        : _clearCodeLists(draft.mappings, column.id),
+        : _clearCodeLists(draft.mappings, column.id, entryId !== undefined),
   };
 }
 

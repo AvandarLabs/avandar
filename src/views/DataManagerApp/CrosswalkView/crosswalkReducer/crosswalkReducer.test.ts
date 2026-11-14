@@ -713,6 +713,50 @@ describe("crosswalkReducer: columns", () => {
     expect(next.readLayoutIds).toEqual([]);
   });
 
+  it("chooses a code list from the values for a fill the user set before the column was governed", () => {
+    const state = makeSeededState();
+    const countyId = getColumn(state, "county").id;
+    const bronxId = getLayoutOf(state, BRONX.id).id;
+    const withUserFill = crosswalkReducer(state, {
+      type: "fill_set",
+      layoutId: bronxId,
+      columnId: countyId,
+      fill: {
+        kind: "column",
+        sourceColumn: "county",
+        convert: undefined,
+        codeListId: undefined,
+        holdsLabels: false,
+      },
+    });
+    const governed = crosswalkReducer(withUserFill, {
+      type: "column_changed",
+      columnId: countyId,
+      changes: { entryId: SEX_ENTRY_ID },
+      context: CONTEXT,
+    });
+    const next = crosswalkReducer(governed, {
+      type: "values_read",
+      layoutId: bronxId,
+      sources: [
+        makeProfile({
+          dataset: BRONX,
+          columnName: "county",
+          dataType: "varchar",
+          values: ["M", "F"],
+        }),
+      ],
+      targets: [],
+      dateFormatsBySourceColumn: new Map(),
+      context: CONTEXT,
+    });
+
+    expect(_fillOf(next, bronxId, "county")?.fill).toMatchObject({
+      codeListId: SEX_LETTERS_ID,
+      holdsLabels: false,
+    });
+  });
+
   it("removes an entry and every fill's code list", () => {
     const state = makeSeededState();
     const next = crosswalkReducer(state, {
