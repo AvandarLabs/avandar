@@ -8,7 +8,12 @@ import { getPosterFrameFromFilm } from "./getPosterFrameFromFilm";
 test("a poster frame comes from the plan the film draws under its camera preset", async () => {
   const film = await ShowcaseFilms.load("shared-object-handoff", {
     captions: false,
-    cameraPreset: "deliberate",
+    theme: {
+      id: "classic",
+      patch: {
+        other: { video: { semantic: { camera: { preset: "deliberate" } } } },
+      },
+    },
   });
   const drawn = createContinuityPlanFromVideoThemeSnapshot(
     film.plan!,

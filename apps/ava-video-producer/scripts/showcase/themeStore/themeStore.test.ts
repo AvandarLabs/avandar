@@ -151,3 +151,21 @@ test("theme ids must be slugs", () =>
       400,
     );
   }));
+
+test("the reserved draft theme id cannot be created", () =>
+  _withStore(async (store) => {
+    assert.equal(
+      await _statusOf(store.create({ ...WARM, id: "unsaved-draft" })),
+      400,
+    );
+  }));
+
+test("the reserved draft theme id cannot be saved", () =>
+  _withStore(async (store) => {
+    assert.equal(
+      await _statusOf(
+        store.save("unsaved-draft", { ...WARM, id: "unsaved-draft" }, "any"),
+      ),
+      400,
+    );
+  }));

@@ -14,12 +14,10 @@ import {
   storyboardSchema,
   durationInFrames,
 } from "../../../src/storyboard/schema/schema";
-import { createThemePatchFromLegacyAppearance } from "../../../src/videoTheme/themePatches/themePatches";
 import {
   VIDEO_THEME_SLUG_PATTERN,
   videoThemePatchSchema,
 } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
-import { addPatchesToVideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import {
   buildStockContracts,
   type StockContractGeneration,
@@ -30,7 +28,6 @@ import {
 } from "../../stock/StockFingerprintModule/StockFingerprintModule";
 import { loadVideoThemeSnapshot } from "../../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { Film } from "../../../src/showcase/showcase.types";
-import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
 
 /**
  * App location derived from this module, independent of the shell directory.
@@ -81,29 +78,22 @@ async function _fingerprintStockFilm(
 }
 
 const color = z.string().regex(/^#[0-9a-fA-F]{6}$/) satisfies z.ZodType;
-const optionsSchema = z
-  .object({
-    captions: z.boolean().optional(),
-    cameraMotion: z.boolean().optional(),
-    cameraPreset: z
-      .enum(["authored", "deliberate", "gentle", "balanced", "brisk", "whip"])
-      .optional(),
-    motionBlur: z.boolean().optional(),
-    annotations: z.boolean().optional(),
-    annotationRoughness: z.number().min(0).max(3).optional(),
-    boxRoughness: z.number().min(0).max(3).optional(),
-    schemaVersion: z.literal(1).optional(),
-    input: z.unknown().optional(),
-    accent: color.optional(),
-    background: color.optional(),
-    theme: z
-      .strictObject({
-        id: z.string().regex(VIDEO_THEME_SLUG_PATTERN),
-        patch: videoThemePatchSchema.optional(),
-      })
-      .optional(),
-  })
-  .strict() satisfies z.ZodType;
+const optionsSchema = z.strictObject({
+  captions: z.boolean().optional(),
+  cameraMotion: z.boolean().optional(),
+  motionBlur: z.boolean().optional(),
+  annotations: z.boolean().optional(),
+  schemaVersion: z.literal(1).optional(),
+  input: z.unknown().optional(),
+  accent: color.optional(),
+  background: color.optional(),
+  theme: z
+    .strictObject({
+      id: z.string().regex(VIDEO_THEME_SLUG_PATTERN),
+      patch: videoThemePatchSchema.optional(),
+    })
+    .optional(),
+}) satisfies z.ZodType;
 
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
@@ -154,32 +144,9 @@ function _assertExportable(film: Readonly<Film>): void {
   }
 }
 
-/** The gallery's palette, roughness, and camera preset controls for a continuity film, as theme patches. */
-function _legacyThemePatches(
-  options: z.infer<typeof optionsSchema>,
-): VideoThemePatch[] {
-  const {
-    accent,
-    background,
-    annotationRoughness,
-    boxRoughness,
-    cameraPreset,
-  } = options;
-  const legacy = {
-    accent,
-    background,
-    annotationRoughness,
-    boxRoughness,
-    cameraPreset,
-  };
-  return Object.values(legacy).some((value) => value !== undefined)
-    ? [createThemePatchFromLegacyAppearance(legacy)]
-    : [];
-}
-
 /**
- * The options a continuity film's shots take. Palette, roughness, and camera
- * preset options reach the film as theme patches (see `_legacyThemePatches`).
+ * The options a continuity film's shots take. Colours, sketch roughness, and
+ * the camera preset are theme tokens, so they reach the film through `theme`.
  */
 function _renderOptions(
   options: z.infer<typeof optionsSchema>,
@@ -214,14 +181,16 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   }
   if (
     continuity &&
-    (options.input !== undefined || options.schemaVersion !== undefined)
+    (options.input !== undefined ||
+      options.schemaVersion !== undefined ||
+      options.accent !== undefined ||
+      options.background !== undefined)
   )
-    throw new Error("Stock input requires an Atlas preset");
+    throw new Error(
+      "Continuity input and colours come from the storyboard and theme",
+    );
   const base = {
-    theme: addPatchesToVideoThemeSnapshot(
-      await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
-      continuity ? _legacyThemePatches(options) : [],
-    ),
+    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
     id,
     fps: 30,
     width: 1600,

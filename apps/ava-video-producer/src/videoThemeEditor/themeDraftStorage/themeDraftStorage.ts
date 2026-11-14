@@ -5,17 +5,13 @@ import { isThemeDraftEmpty, type ThemeDraft } from "../themeDraft/themeDraft";
 const DRAFT_KEY_PREFIX = "video-theme-draft:v1:";
 const ACTIVE_THEME_KEY = "video-theme-active:v1";
 
-const storedDraftSchema = z
-  .object({
-    baseHash: z.string(),
-    draft: z
-      .object({
-        patch: videoThemePatchSchema,
-        overrides: z.record(z.string(), videoThemePatchSchema),
-      })
-      .strict(),
-  })
-  .strict();
+const storedDraftSchema = z.strictObject({
+  baseHash: z.string(),
+  draft: z.strictObject({
+    patch: videoThemePatchSchema,
+    overrides: z.record(z.string(), videoThemePatchSchema),
+  }),
+});
 
 /** A persisted draft and the hash of the theme file it was made against. */
 export type StoredThemeDraft = Readonly<{

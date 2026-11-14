@@ -4,15 +4,12 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import {
-  createDraftThemeTarget,
-  DRAFT_THEME_ID,
-} from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
+import { DRAFT_THEME_ID } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
+import { createSnapshotFromThemeRequest } from "../../videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
 import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
 import { resolveVideoThemeFromSource } from "../../videoTheme/resolveVideoThemeFromSource/resolveVideoThemeFromSource";
 import {
   CLASSIC_VIDEO_THEME_SNAPSHOT,
-  createVideoThemeSnapshot,
   resolveVideoThemeFromSnapshot,
 } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import {
@@ -30,8 +27,12 @@ import {
   listTokenPathsFromPatch,
   resetTokenInDraft,
   setTokenInDraft,
+  type ThemeDraft,
 } from "./themeDraft";
-import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
+import type {
+  VideoThemeDocument,
+  VideoThemeLibrary,
+} from "../../videoTheme/videoTheme.types";
 
 const THEME = { kind: "theme" } as const;
 const ITEM = { kind: "item", itemId: "network-graph" } as const;
@@ -412,22 +413,63 @@ test("an export from a built-in draft carries a patch even when only another ite
   const exportTheme = createExportThemeFromDraft(target);
   assert.notEqual(exportTheme.patch, undefined);
   // The server reads a present patch, even an empty one, as a draft.
-  const serverTarget = createDraftThemeTarget({
+  const serverSnapshot = createSnapshotFromThemeRequest({
     library: CLASSIC_WITH_OVERRIDE,
-    themeId: exportTheme.id,
-    hasDraft: exportTheme.patch !== undefined,
+    id: exportTheme.id,
+    patch: exportTheme.patch,
   });
-  const serverPatches =
-    exportTheme.patch && Object.keys(exportTheme.patch).length > 0
-      ? [exportTheme.patch]
-      : [];
-  const serverSnapshot = createVideoThemeSnapshot(
-    serverTarget.library,
-    serverTarget.themeId,
-    serverPatches,
-  );
   assert.equal(
     resolveVideoThemeFromSnapshot(serverSnapshot, ["network-graph"]).hash,
     resolveVideoThemeFromSource(createVideoThemeSourceFromDraft(target)).hash,
   );
+});
+
+function _exportAndPreviewHashes(
+  library: VideoThemeLibrary,
+  themeId: string,
+  draft: ThemeDraft,
+) {
+  const target = { library, themeId, draft, itemId: "network-graph" };
+  const exported = createExportThemeFromDraft(target);
+  const exportSnapshot = createSnapshotFromThemeRequest({
+    library,
+    id: exported.id,
+    patch: exported.patch,
+  });
+  return [
+    resolveVideoThemeFromSnapshot(exportSnapshot, ["network-graph"]).hash,
+    resolveVideoThemeFromSnapshot(createSnapshotFromDraft(target), [
+      "network-graph",
+    ]).hash,
+  ];
+}
+
+const EXPORT_DRAFT = setTokenInDraft(
+  setTokenInDraft(
+    EMPTY_THEME_DRAFT,
+    THEME,
+    "color.accent",
+    "$atomic.swatch.cyan",
+  ),
+  ITEM,
+  "stroke.default",
+  "$atomic.strokeWidth.lg",
+);
+
+test("an export of a built-in theme's draft resolves to the same hash as its preview", () => {
+  const [exported, preview] = _exportAndPreviewHashes(
+    CLASSIC_WITH_OVERRIDE,
+    "classic",
+    EXPORT_DRAFT,
+  );
+  assert.equal(exported, preview);
+});
+
+test("an export of a custom theme's draft resolves to the same hash as its preview", () => {
+  const [exported, preview] = _exportAndPreviewHashes(
+    LIBRARY,
+    "studio",
+    EXPORT_DRAFT,
+  );
+  assert.equal(exported, preview);
 });

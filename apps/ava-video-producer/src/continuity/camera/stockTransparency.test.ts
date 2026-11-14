@@ -3,15 +3,30 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StockGraphic } from "../../stock/StockGraphic";
-import { createThemePatchFromLegacyAppearance } from "../../videoTheme/themePatches/themePatches";
 import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
 
+/** Sketches boxes at a test roughness, through an atomic step the box profile points at. */
 function _withBoxRoughness(
   boxRoughness: number,
   element: ReturnType<typeof createElement>,
 ) {
+  const box = {
+    roughness: "$atomic.roughness.testBox",
+    bowing: "$atomic.bowing.md",
+    seed: "$atomic.seed.md",
+    randomness: "$atomic.randomness.md",
+  };
   return createElement(VideoThemeScope, {
-    patches: [createThemePatchFromLegacyAppearance({ boxRoughness })],
+    patches: [
+      {
+        other: {
+          video: {
+            atomic: { roughness: { testBox: boxRoughness } },
+            semantic: { sketch: { box } },
+          },
+        },
+      },
+    ],
     children: element,
   });
 }

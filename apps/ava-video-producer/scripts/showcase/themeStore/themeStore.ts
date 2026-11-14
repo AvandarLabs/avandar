@@ -6,6 +6,7 @@ import {
   BUILT_IN_VIDEO_THEME_IDS,
   createVideoThemeLibrary,
 } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
 import { VideoThemeError } from "../../../src/videoTheme/VideoThemeError/VideoThemeError";
 import {
@@ -71,6 +72,17 @@ function _hashText(text: string): string {
 
 function _isBuiltIn(id: string): boolean {
   return (BUILT_IN_VIDEO_THEME_IDS as readonly string[]).includes(id);
+}
+
+// The draft rule renders a built-in theme's unsaved edits under this id, so a
+// file with it would collide with every such draft.
+function _assertNotReserved(id: string): void {
+  if (id === DRAFT_THEME_ID) {
+    throw new ThemeStoreError(
+      400,
+      "That theme id is reserved for unsaved edits. Choose another name.",
+    );
+  }
 }
 
 function _parse(value: unknown): VideoThemeDocument {
@@ -228,6 +240,7 @@ export function createThemeStore(
     read: (id) => _readTheme(directory, id),
     create: async (value) => {
       const document = _parse(value);
+      _assertNotReserved(document.id);
       const text = _serializeWithinCap(document);
       const isTaken = await fs.access(_fileFromId(directory, document.id)).then(
         () => true,
@@ -243,6 +256,7 @@ export function createThemeStore(
       return _writeTheme(directory, document, text);
     },
     save: async (id, value, ifMatch) => {
+      _assertNotReserved(id);
       if (_isBuiltIn(id)) {
         throw new ThemeStoreError(
           403,

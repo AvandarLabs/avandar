@@ -1,4 +1,3 @@
-import type { MotionOptions } from "../motion-components/motionSettings";
 import type {
   StockInputByPreset,
   StockPresetId,
@@ -65,11 +64,8 @@ export type FilmOptions = {
   input?: StockInputByPreset[StockPresetId];
   captions?: boolean;
   cameraMotion?: boolean;
-  cameraPreset?: NonNullable<MotionOptions["preset"]> | "authored";
   motionBlur?: boolean;
   annotations?: boolean;
-  annotationRoughness?: number;
-  boxRoughness?: number;
   accent?: string;
   background?: string;
   /** A theme from `themes/` and the unsaved draft to apply on top of it. */

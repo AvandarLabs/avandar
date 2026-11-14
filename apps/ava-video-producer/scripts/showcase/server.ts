@@ -14,13 +14,17 @@ import { requireLicense } from "../require-license.mjs";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { type StockFingerprint } from "../stock/StockFingerprintModule/StockFingerprintModule";
 import { buildLivePlayers } from "./build";
+import { getCaptionFileOptionsFromSearch } from "./captionFileOptions/captionFileOptions";
 import { createExportJobs } from "./createExportJobs/createExportJobs";
 import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
 import { appRoot, ShowcaseFilms, PLANS } from "./ShowcaseFilms/ShowcaseFilms";
 import { servedFile, streamFile } from "./staticFileHelpers/staticFileHelpers";
 import { handleThemeRequest } from "./themeRoutes/themeRoutes";
-import { createThemeStore } from "./themeStore/themeStore";
+import {
+  createThemeStore,
+  THEME_FILE_MAX_BYTES,
+} from "./themeStore/themeStore";
 import type { Film } from "../../src/showcase/showcase.types";
 
 requireLicense();
@@ -94,12 +98,12 @@ const jobs: ReturnType<
     }
   },
 );
-const requestSchema = z
-  .object({
-    id: z.string().max(80),
-    options: z.record(z.string(), z.unknown()).optional(),
-  })
-  .strict();
+const requestSchema = z.strictObject({
+  id: z.string().max(80),
+  options: z.record(z.string(), z.unknown()).optional(),
+});
+/** An export body: the film id, its options, and a theme patch of up to 256 KB. */
+const EXPORT_BODY_MAX_BYTES = 8192 + THEME_FILE_MAX_BYTES;
 
 function json(res: ServerResponse, status: number, body: unknown) {
   res
@@ -129,9 +133,10 @@ async function exportRequest(req: IncomingMessage, res: ServerResponse) {
     return;
   }
   let body = "";
+  req.setEncoding("utf8");
   for await (const chunk of req) {
     body += chunk;
-    if (body.length > 8192) {
+    if (Buffer.byteLength(body) > EXPORT_BODY_MAX_BYTES) {
       json(res, 413, { message: "Request too large" });
       return;
     }
@@ -186,14 +191,10 @@ async function api(
       return;
     }
     const parameters = new URL(req.url ?? "/", "http://localhost").searchParams;
-    const film = await ShowcaseFilms.load(filmMatch[1], {
-      ...(parameters.has("cameraPreset")
-        ? { cameraPreset: parameters.get("cameraPreset") }
-        : {}),
-      ...(parameters.has("cameraMotion")
-        ? { cameraMotion: parameters.get("cameraMotion") !== "false" }
-        : {}),
-    });
+    const film = await ShowcaseFilms.load(
+      filmMatch[1],
+      getCaptionFileOptionsFromSearch(parameters),
+    );
     if (!film.plan) {
       res.writeHead(404).end();
       return;

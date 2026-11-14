@@ -1,8 +1,8 @@
 import { fileURLToPath } from "node:url";
 import { createVideoThemeLibrary } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest/createSnapshotFromThemeRequest";
 import { videoThemePatchSchema } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
 import {
-  createVideoThemeSnapshot,
   resolveVideoThemeFromSnapshot,
   type VideoThemeSnapshot,
 } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
@@ -14,7 +14,8 @@ const THEMES_DIRECTORY = fileURLToPath(
 );
 
 /**
- * A snapshot of a theme in `themes/`, with an optional draft patch, checked
+ * A snapshot of a theme in `themes/`, with an optional draft patch under the
+ * gallery's draft rule (see `createSnapshotFromThemeRequest`), checked
  * by resolving it once so an invalid theme or patch fails here rather than
  * mid-render. Used wherever a render starts on the server: showcase films,
  * exports, posters, the parity gate, and the `video` and `motion` CLIs.
@@ -36,10 +37,17 @@ export async function loadVideoThemeSnapshot(
       `Unknown video theme "${request.id}". Themes live in themes/<id>.theme.json.`,
     );
   }
-  const patches = request.patch
-    ? [videoThemePatchSchema.parse(request.patch) as VideoThemePatch]
-    : [];
-  const snapshot = createVideoThemeSnapshot(library, request.id, patches);
+  // A present patch, even an empty one, marks a draft (see
+  // `createSnapshotFromThemeRequest`), so it is kept rather than dropped.
+  const patch =
+    request.patch === undefined
+      ? undefined
+      : (videoThemePatchSchema.parse(request.patch) as VideoThemePatch);
+  const snapshot = createSnapshotFromThemeRequest({
+    library,
+    id: request.id,
+    patch,
+  });
   resolveVideoThemeFromSnapshot(snapshot, []);
   return snapshot;
 }

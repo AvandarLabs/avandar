@@ -19,7 +19,6 @@ import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getValueAtPath } from "../../../src/videoTheme/getResolvedTokenValue/getResolvedTokenValue";
 import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/resolveVideoTheme";
-import { createThemePatchFromLegacyAppearance } from "../../../src/videoTheme/themePatches/themePatches";
 import {
   getTargetFromTokenReference,
   isTokenReference,
@@ -90,7 +89,9 @@ function _planBuilderReads(): readonly string[] {
     );
   });
   for (const cameraPreset of CAMERA_PRESETS) {
-    const patch = createThemePatchFromLegacyAppearance({ cameraPreset });
+    const patch = {
+      other: { video: { semantic: { camera: { preset: cameraPreset } } } },
+    };
     const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
       patches: [patch],
     });

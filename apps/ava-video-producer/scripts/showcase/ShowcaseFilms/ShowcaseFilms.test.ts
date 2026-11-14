@@ -302,13 +302,15 @@ test("explainer caption selection preserves the overlap-aware film duration", as
 test("continuity appearance options preserve the timeline", async () => {
   const original = await ShowcaseFilms.load("qetl-motion");
   const film = await ShowcaseFilms.load("qetl-motion", {
-    accent: "#ff0000",
-    background: "#ffffff",
+    theme: {
+      id: "classic",
+      patch: {
+        other: { video: { atomic: { swatch: { ground: "#ffffff" } } } },
+      },
+    },
     cameraMotion: false,
     motionBlur: false,
     annotations: false,
-    annotationRoughness: 0,
-    boxRoughness: 2.5,
   });
   assert.equal(film.frames, original.frames);
   assert.deepEqual(film.plan?.narration, original.plan?.narration);
@@ -318,10 +320,7 @@ test("continuity appearance options preserve the timeline", async () => {
   assert.equal(shot?.scene === "continuity" && "accent" in shot.props, false);
   assert.equal(shot?.scene === "continuity" && shot.props.cameraMotion, false);
   const theme = resolveVideoThemeFromSnapshot(film.theme, [film.id]);
-  assert.equal(theme.semantic.color.accent, "#ff0000");
   assert.equal(theme.semantic.color.ground, "#ffffff");
-  assert.equal(theme.semantic.sketch.annotation.roughness, 0);
-  assert.equal(theme.semantic.sketch.box.roughness, 2.5);
   await assert.rejects(
     ShowcaseFilms.load("avandar-home", { cameraMotion: false }),
   );
@@ -330,7 +329,12 @@ test("continuity appearance options preserve the timeline", async () => {
 test("camera preset exports include the complete extended timeline", async () => {
   const original = await ShowcaseFilms.load("shared-object-handoff");
   const adjusted = await ShowcaseFilms.load("shared-object-handoff", {
-    cameraPreset: "deliberate",
+    theme: {
+      id: "classic",
+      patch: {
+        other: { video: { semantic: { camera: { preset: "deliberate" } } } },
+      },
+    },
   });
   assert.ok(adjusted.frames > original.frames);
   const drawn = createContinuityPlanFromVideoThemeSnapshot(
@@ -350,6 +354,20 @@ test("camera preset exports include the complete extended timeline", async () =>
     0.25,
   );
   await assert.rejects(
-    ShowcaseFilms.load("shared-object-handoff", { cameraPreset: "fast" }),
+    ShowcaseFilms.load("shared-object-handoff", {
+      theme: {
+        id: "classic",
+        patch: {
+          other: { video: { semantic: { camera: { preset: "fast" } } } },
+        },
+      },
+    }),
+  );
+});
+
+test("continuity films refuse colour options; colours come from the theme", async () => {
+  await assert.rejects(
+    ShowcaseFilms.load("shared-object-handoff", { accent: "#ff0000" }),
+    /theme/,
   );
 });

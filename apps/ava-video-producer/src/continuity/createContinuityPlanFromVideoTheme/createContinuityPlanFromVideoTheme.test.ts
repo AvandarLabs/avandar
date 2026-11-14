@@ -10,7 +10,6 @@ import { storyboardSchema } from "../../storyboard/schema/schema";
 import { durationInFrames } from "../../storyboard/schema/timeline";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVideoTheme";
-import { createThemePatchFromLegacyAppearance } from "../../videoTheme/themePatches/themePatches";
 import { createContinuityPlanFromOptions } from "../continuityAppearance";
 import { CONTINUITY_CATALOG } from "../continuityCatalog";
 import {
@@ -19,7 +18,6 @@ import {
 } from "./createContinuityPlanFromVideoTheme";
 import type { MotionOptions } from "../../motion-components/motionSettings";
 import type { Storyboard } from "../../storyboard/schema/schema";
-import type { CameraPresetName } from "../../videoTheme/themePatches/themePatches";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 
 const PRESETS = ["deliberate", "gentle", "balanced", "brisk", "whip"] as const;
@@ -37,8 +35,12 @@ function _classicWith(patch: VideoThemePatch) {
   });
 }
 
-function _classicWithCamera(cameraPreset: CameraPresetName) {
-  return _classicWith(createThemePatchFromLegacyAppearance({ cameraPreset }));
+function _classicWithCamera(
+  cameraPreset: "authored" | (typeof PRESETS)[number],
+) {
+  return _classicWith({
+    other: { video: { semantic: { camera: { preset: cameraPreset } } } },
+  });
 }
 
 function _readPlan(path: string): Storyboard {
