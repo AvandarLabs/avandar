@@ -1,10 +1,10 @@
-import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import {
   CLARIFICATION_NONE_OF_ABOVE_BODY,
   containsClarificationAnswerLine,
   parseClarificationAnswerBody,
   parseCustomAnswerText,
 } from "$/utils/chat/clarificationAnswerFormat";
+import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 export const MAX_CLARIFICATIONS_PER_QUESTION = 3;
 

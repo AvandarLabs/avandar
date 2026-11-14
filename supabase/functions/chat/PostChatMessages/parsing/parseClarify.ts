@@ -29,7 +29,8 @@ export function countClarificationsInHistory(
 ): number {
   return messages.filter((message) => {
     return (
-      message.role === "user" && containsClarificationAnswerLine(message.content)
+      message.role === "user" &&
+      containsClarificationAnswerLine(message.content)
     );
   }).length;
 }

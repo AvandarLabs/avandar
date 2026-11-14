@@ -1,6 +1,6 @@
+import { isClarificationAnswerLine } from "$/utils/chat/clarificationAnswerFormat";
 import { CaseDesignKickoff } from "@/components/ChatPanel/CaseDesignKickoff/CaseDesignKickoff";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
-import { isClarificationAnswerLine } from "$/utils/chat/clarificationAnswerFormat";
 
 /**
  * Returns whether a user-message line should skip bias detection and
