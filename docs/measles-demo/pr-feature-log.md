@@ -11031,6 +11031,20 @@ linked dataset keeps up with the dictionary.
   (`rls_data_dictionaries__code_lists__linked`,
   `rls_dataset_columns__dictionary_bindings`). Regenerate the migration
   with `supabase-declarative-schema`, never copy it.
+- Desktop SQLite generator (`660875fdd`):
+  `apps/desktop/scripts/gen-sqlite-migrations/transpile.ts` turns sqlglot's
+  `DEFAULT CAST('<literal>' AS <type>)` into `DEFAULT '<literal>'` (an empty
+  array into `'[]'`) instead of dropping it, with the new `transpile.test.ts`
+  and a `runGenerator.test.ts` case that adds the column to a table holding a
+  row. Without it the `value_overrides` ADD COLUMN was `NOT NULL` with no
+  default, which SQLite refuses on a desktop database that already holds
+  bindings. Regenerating also restores the defaults in six older `.gen.sql`
+  files (`20250929162612`, `20260819055319`, `20261109082310`,
+  `20261112000050`, `20261113022522`, and `20261113181028`). The desktop
+  tracks applied migrations by name, so the older files change only fresh
+  installs. `pnpm desktop:sqlite:check-migrations` still reports
+  `20261109134745` and `20261109155144`, whose header counts drifted before
+  this branch.
 - Schema fixes from the final review (`cfbd887a4`): the generated
   `supabase/migrations/20261113232435_dictionary_conversion_fixes.sql` and
   its twin
@@ -11192,13 +11206,7 @@ any virtual dataset. A published snapshot stores an ordered column as text,
 so a public chart sorts its labels alphabetically unless the chart sorts
 explicitly. Every workspace query reads its datasets' bindings and code
 lists, mostly from the query cache; a refetch past the 6-minute stale time
-happens while the query holds its DuckDB lease. The desktop SQLite
-generator drops the `value_overrides` default in
-`apps/desktop/migrations/20261113181028_dictionary_conversions.gen.sql`, so
-that desktop migration fails on a desktop database that already holds
-bindings (the same generator bug as `companion_listings` in
-`20261109082310`; the fix belongs in
-`apps/desktop/scripts/gen-sqlite-migrations/transpile.ts`). The offline
+happens while the query holds its DuckDB lease. The offline
 agent missed D04 in the converted-columns eval (recorded, not gated).
 Several deleted dictionaries in one dataset's rail collapse into one "A
 deleted dictionary" row. A linked dataset's page and preview list a
@@ -11209,10 +11217,8 @@ shows only a column's most common values, so an ordered list's order shows
 in a grouped query, not there. A workspace member who is not an admin never
 reaches the disabled Save as card on an upload: Convert all and the row
 chips are already disabled at Match columns, with the same reason. After a
-reload, queries on an offline-only upload fail, because the query path never
-reads `LocalDataset`'s Parquet and such an upload has nothing in cloud
-storage. This predates this feature (the relation-cache design stopped the
-query path reading `LocalDataset.parquetData`). Fixing it is its own change.
+reload, queries on an offline-only upload fail. This predates this feature,
+and F135 (`fix/offline-upload-reload`) fixes it.
 Shift+Tab is the only way back from the code-list popover's link to its tag.
 Tab from the link continues to the next control.
 
