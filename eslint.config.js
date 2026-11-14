@@ -165,6 +165,11 @@ export default [
               "tsconfig.node.json",
               "tsconfig.base.json",
               "shared/tsconfig.json",
+              // Closer on disk than apps/ava-video-producer/tsconfig*.json.
+              // Those configs do not map `@/*`. The resolver reuses the
+              // nearest cached project, so without this entry a producer
+              // test linted in the same run leaves adapter imports unresolved.
+              "apps/ava-video-producer/avandar-adapter/tsconfig.json",
               "apps/*/tsconfig.json",
               "apps/*/tsconfig.*.json",
               "packages/*/*/tsconfig.json",
