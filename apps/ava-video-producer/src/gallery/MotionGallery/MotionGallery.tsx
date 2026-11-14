@@ -3,6 +3,7 @@ import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
 import { STOCK_CATALOG } from "../../stock/catalog";
+import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
 import {
   GalleryVideoTheme,
   useGalleryVideoTheme,
@@ -25,14 +26,30 @@ const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
 );
 
 /**
+ * The accent and ground one motion's preview shows: the theme draft, the
+ * motion's saved overrides, and its own draft. With no motion it is the
+ * theme scope, as the reference tray quotes for several motions at once.
+ */
+function useItemThemeColors(itemId: string | undefined) {
+  const { library, themeId, draft } = useGalleryVideoTheme();
+  const { theme } = useDraftTheme({
+    library,
+    themeId,
+    draft,
+    scope: itemId ? { kind: "item", itemId } : { kind: "theme" },
+  });
+  return {
+    accent: theme.semantic.color.accent,
+    background: theme.semantic.color.ground,
+  };
+}
+
+/**
  * Root of the Motion Atlas showcase: browses, previews, and exports stock
  * motion presets.
  */
 function MotionGallery() {
   const { t } = useGalleryLingui();
-  const { galleryTheme } = useGalleryVideoTheme();
-  const accent = galleryTheme.semantic.color.accent;
-  const background = galleryTheme.semantic.color.ground;
   const {
     category,
     selectCategory,
@@ -58,6 +75,10 @@ function MotionGallery() {
     updateContent,
     onClose,
   } = useMotionGalleryState();
+  const { galleryTheme } = useGalleryVideoTheme();
+  const accent = galleryTheme.semantic.color.accent;
+  const background = galleryTheme.semantic.color.ground;
+  const selectedColors = useItemThemeColors(selected?.id);
 
   return (
     <>
@@ -184,8 +205,8 @@ function MotionGallery() {
       </div>
       {selected ? (
         <PreviewDialog
-          accent={accent}
-          background={background}
+          accent={selectedColors.accent}
+          background={selectedColors.background}
           preset={selected}
           onPrevious={previousPreset ? () => onOpen(previousPreset) : undefined}
           onNext={nextPreset ? () => onOpen(nextPreset) : undefined}

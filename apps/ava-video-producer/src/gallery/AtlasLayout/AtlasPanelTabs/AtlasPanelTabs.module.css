@@ -1,11 +1,25 @@
 /*
  * The tab list's fixed height, shared with sticky content inside a panel
- * (such as the token editor toolbar) so it sticks just under the tabs.
+ * (such as the token editor toolbar) so it sticks just under the tabs. The
+ * root is the modal grid's right column, so it scrolls on its own and keeps
+ * the grid row as tall as the modal. The sticky tab list and token toolbar
+ * stick inside this scroll container.
  */
 .root {
   --atlas-panel-tabs-height: 40px;
 
+  background: var(--white);
+  min-block-size: 0;
   min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* A stacked modal scrolls as a whole, like the old details column. */
+@media (width <= 760px) {
+  .root {
+    overflow: visible;
+  }
 }
 
 .list {

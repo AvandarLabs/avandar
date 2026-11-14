@@ -2693,7 +2693,12 @@ button {
   }
 }
 
-/* The Design tokens tab widens the modal's right column. */
-.dialog-layout.is-token-panel {
-  grid-template-columns: minmax(0, 1fr) 420px;
+/*
+ * The Design tokens tab widens the modal's right column, without squeezing
+ * the player on narrower screens.
+ */
+@media (width > 800px) {
+  .dialog-layout.is-token-panel {
+    grid-template-columns: minmax(0, 1fr) min(420px, 45vw);
+  }
 }
