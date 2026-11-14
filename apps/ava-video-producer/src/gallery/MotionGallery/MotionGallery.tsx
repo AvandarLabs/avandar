@@ -1,9 +1,10 @@
 import { I18nProvider } from "@lingui/react";
 import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
+import { useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
 import { STOCK_CATALOG } from "../../stock/catalog";
-import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
+import { resolveDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
 import {
   GalleryVideoTheme,
   useGalleryVideoTheme,
@@ -27,21 +28,31 @@ const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
 
 /**
  * The accent and ground one motion's preview shows: the theme draft, the
- * motion's saved overrides, and its own draft. With no motion it is the
- * theme scope, as the reference tray quotes for several motions at once.
+ * motion's saved overrides, and its own draft. With no motion open it
+ * resolves nothing. It returns undefined then, or while the draft does not
+ * resolve, and the caller falls back to the theme-scope colors.
  */
-function useItemThemeColors(itemId: string | undefined) {
+function useItemThemeColors(
+  itemId: string | undefined,
+): Readonly<{ accent: string; background: string }> | undefined {
   const { library, themeId, draft } = useGalleryVideoTheme();
-  const { theme } = useDraftTheme({
-    library,
-    themeId,
-    draft,
-    scope: itemId ? { kind: "item", itemId } : { kind: "theme" },
-  });
-  return {
-    accent: theme.semantic.color.accent,
-    background: theme.semantic.color.ground,
-  };
+  return useMemo(() => {
+    if (!itemId) {
+      return undefined;
+    }
+    const result = resolveDraftTheme({
+      library,
+      themeId,
+      draft,
+      scope: { kind: "item", itemId },
+    });
+    return result.ok
+      ? {
+          accent: result.theme.semantic.color.accent,
+          background: result.theme.semantic.color.ground,
+        }
+      : undefined;
+  }, [library, themeId, draft, itemId]);
 }
 
 /**
@@ -205,8 +216,8 @@ function MotionGallery() {
       </div>
       {selected ? (
         <PreviewDialog
-          accent={selectedColors.accent}
-          background={selectedColors.background}
+          accent={selectedColors?.accent ?? accent}
+          background={selectedColors?.background ?? background}
           preset={selected}
           onPrevious={previousPreset ? () => onOpen(previousPreset) : undefined}
           onNext={nextPreset ? () => onOpen(nextPreset) : undefined}

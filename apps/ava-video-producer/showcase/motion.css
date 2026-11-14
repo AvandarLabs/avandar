@@ -68,17 +68,17 @@ body {
     color: inherit;
     text-decoration: none;
   }
-}
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--ava-primary-7);
-  outline-offset: 4px;
-}
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 4px;
+  }
 
-button:disabled {
-  cursor: default;
+  button:disabled {
+    cursor: default;
+  }
 }
 
 svg {
@@ -2543,7 +2543,8 @@ p {
   min-height: 0;
 }
 
-.preview-dialog button:disabled {
+/* Mantine buttons keep their own disabled styling. */
+.preview-dialog button:disabled:not(.mantine-UnstyledButton-root) {
   cursor: wait;
   opacity: 0.6;
 }
