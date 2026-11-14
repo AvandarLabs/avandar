@@ -101,21 +101,6 @@
 .guidance {
   grid-area: guidance;
 }
-/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-.settings :global(.palette-controls) {
-  gap: 10px;
-  margin: 0 0 12px;
-  padding: 10px;
-}
-/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-.settings :global(.palette-group) {
-  flex-basis: 100%;
-  gap: 6px;
-}
-/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-.settings :global(.palette-help) {
-  display: none;
-}
 
 /* At phone widths the whole Atlas dialog scrolls, so the viewer does not. */
 @media (width <= 760px) {
@@ -140,8 +125,25 @@
   .settings {
     position: static;
   }
-  /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-  .settings :global(.palette-group) {
-    flex: 1 1 140px;
+}
+
+/*
+ * The Design tokens tab widens the settings column, which then scrolls with
+ * the viewer. The guidance row takes up the tall panel's extra height, so the
+ * stage keeps the player's own height.
+ */
+.compositionViewer.isTokenPanel {
+  grid-template-columns: minmax(0, 1fr) 420px;
+  grid-template-rows: max-content max-content 1fr;
+}
+
+.isTokenPanel .settings {
+  position: static;
+}
+
+@media (width <= 800px) {
+  .compositionViewer.isTokenPanel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(4, max-content);
   }
 }

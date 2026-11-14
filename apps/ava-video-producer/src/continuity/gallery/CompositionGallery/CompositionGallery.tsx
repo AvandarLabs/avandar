@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { AtlasCategoryNav } from "../../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../../../gallery/AtlasLayout/AtlasCollection/AtlasCollection";
 import { AtlasDialog } from "../../../gallery/AtlasLayout/AtlasDialog/AtlasDialog";
+import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
 import { AtlasSections } from "../../../gallery/MotionGallery/AtlasSections";
 import { GalleryHeader } from "../../../gallery/MotionGallery/GalleryHeader";
 import { useContinuityCopy } from "../../useContinuityCopy";
@@ -56,6 +57,7 @@ export function CompositionGallery({ section }: Props) {
   const translate = useContinuityCopy();
   const getCategoryLabel = useCategoryLabel();
   const copy = useSectionCopy(section);
+  const { themeId } = useGalleryVideoTheme();
   const gallery = useCompositionGallery(
     section === "films" ? "films" : "vocabulary",
   );
@@ -105,6 +107,7 @@ export function CompositionGallery({ section }: Props) {
               key={entry.id}
               entry={entry}
               category={getCategoryLabel(entry.category)}
+              themeId={themeId}
               onOpen={gallery.openEntry}
             />
           ))}

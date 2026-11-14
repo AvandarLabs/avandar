@@ -3,7 +3,7 @@ import test from "node:test";
 import { continuityAppearanceSchema } from "../../continuityAppearance";
 import { getExportOptionsFromAcknowledgement } from "./compositionExportOptions";
 
-const DRAFT = continuityAppearanceSchema.parse({ accent: "#123456" });
+const DRAFT = continuityAppearanceSchema.parse({ cameraMotion: false });
 
 test("a continuity study exports only the appearance its player acknowledged", () => {
   assert.equal(
@@ -11,7 +11,7 @@ test("a continuity study exports only the appearance its player acknowledged", (
       id: "study",
       isScene: false,
       draft: DRAFT,
-      acknowledged: { id: "study", options: { ...DRAFT, accent: "#abcdef" } },
+      acknowledged: { id: "study", options: { ...DRAFT, motionBlur: false } },
     }),
     undefined,
   );

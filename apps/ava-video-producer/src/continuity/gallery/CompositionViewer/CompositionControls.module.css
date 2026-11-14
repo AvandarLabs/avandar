@@ -61,15 +61,6 @@
   }
 }
 
-.roughness {
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-basis: 100%;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  padding-top: 12px;
-}
-
 :global(dialog:modal) .transport {
   gap: 10px 14px;
   padding: 10px;
@@ -84,11 +75,6 @@
   margin: 0 0 10px;
 }
 
-:global(dialog:modal) .roughness {
-  gap: 8px;
-  padding-top: 8px;
-}
-
 @media (width <= 800px) {
   :global(dialog:modal) .transport {
     gap: 6px 10px;
@@ -101,10 +87,6 @@
   :global(dialog:modal) .help {
     display: none;
   }
-}
-
-.roughness > div {
-  flex-basis: 100%;
 }
 
 .transport :global(.mantine-Checkbox-label) {

@@ -1,11 +1,8 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import "@mantine/core/styles.layer.css";
-import { MantineProvider, Checkbox } from "@mantine/core";
+import { Checkbox } from "@mantine/core";
+import { AtlasChromeProvider } from "../../../gallery/AtlasLayout/AtlasChromeProvider/AtlasChromeProvider";
 import { AtlasSelect } from "../../../gallery/AtlasSelect/AtlasSelect";
-import { PaletteControls } from "../../../gallery/MotionGallery/PaletteControls";
-import { CameraPresetControl } from "./CameraPresetControl";
 import css from "./CompositionControls.module.css";
-import { CompositionRoughnessControls } from "./CompositionRoughnessControls";
 import type { useCompositionAppearance } from "./useCompositionAppearance";
 
 type Props = { appearance: ReturnType<typeof useCompositionAppearance> };
@@ -15,43 +12,26 @@ type ControlsProps = Props & {
 };
 
 /**
- * Shared Atlas palette and transport controls for the active composition.
- * Scene studies keep only playback: palette, camera, blur, annotation,
- * roughness and caption settings change nothing in plain storyboard scenes.
+ * Transport and render toggles for the active composition. Colours, sketch
+ * levels, and camera presets are design tokens, edited in the Design tokens
+ * tab. Scene studies keep only playback.
  */
 export function CompositionControls({ appearance, isScene }: ControlsProps) {
   return (
-    <MantineProvider
-      theme={{ fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif" }}
-    >
+    <AtlasChromeProvider>
       <div className={css.controls}>
         {isScene ? (
           <p className={css.help}>
             <Trans>
               Storyboard scenes play with their authored theme and per-shot
-              field colors. Palette, camera, motion blur, annotation and
-              roughness settings apply to continuity compositions only.
+              field colors. Design tokens, camera motion, motion blur, and
+              annotation settings apply to continuity compositions only.
             </Trans>
           </p>
-        ) : (
-          <>
-            <PaletteControls
-              accent={appearance.draft.accent}
-              background={appearance.draft.background}
-              setAccent={(accent) => appearance.update({ accent })}
-              setBackground={(background) => appearance.update({ background })}
-            />
-            <p className={css.help}>
-              <Trans>
-                Colors affect editorial graphics. Product components retain
-                their native theme.
-              </Trans>
-            </p>
-          </>
-        )}
+        ) : null}
         <TransportControls appearance={appearance} isScene={isScene} />
       </div>
-    </MantineProvider>
+    </AtlasChromeProvider>
   );
 }
 
@@ -91,13 +71,7 @@ function TransportControls({ appearance, isScene }: ControlsProps) {
           appearance.setTransport((current) => ({ ...current, loop }));
         }}
       />
-      {!isScene && (
-        <>
-          <AppearanceToggles appearance={appearance} />
-          <CameraPresetControl appearance={appearance} />
-          <CompositionRoughnessControls appearance={appearance} />
-        </>
-      )}
+      {isScene ? null : <AppearanceToggles appearance={appearance} />}
     </div>
   );
 }

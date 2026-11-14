@@ -32,7 +32,7 @@ export function useCompositionAppearance(
   const [draft, setDraft] = useState<ContinuityAppearance>(() => {
     try {
       return continuityAppearanceSchema.parse(
-        JSON.parse(localStorage.getItem("composition-appearance") ?? "{}"),
+        JSON.parse(localStorage.getItem("composition-appearance:v2") ?? "{}"),
       );
     } catch {
       return continuityAppearanceSchema.parse({});
@@ -77,7 +77,7 @@ export function useCompositionAppearance(
   useEffect(() => {
     if (!isScene) send("appearance", draft);
     try {
-      localStorage.setItem("composition-appearance", JSON.stringify(draft));
+      localStorage.setItem("composition-appearance:v2", JSON.stringify(draft));
     } catch {
       /* Preferences remain usable when storage is unavailable. */
     }

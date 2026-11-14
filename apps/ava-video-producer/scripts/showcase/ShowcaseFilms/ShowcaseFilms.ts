@@ -3,10 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { z } from "zod";
-import {
-  continuityAppearanceSchema,
-  createContinuityPlanFromOptions,
-} from "../../../src/continuity/continuityAppearance";
+import { createContinuityPlanFromOptions } from "../../../src/continuity/continuityAppearance";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import {
@@ -88,8 +85,8 @@ const optionsSchema = z
   .object({
     captions: z.boolean().optional(),
     cameraMotion: z.boolean().optional(),
-    cameraPreset: continuityAppearanceSchema.shape.cameraPreset
-      .unwrap()
+    cameraPreset: z
+      .enum(["authored", "deliberate", "gentle", "balanced", "brisk", "whip"])
       .optional(),
     motionBlur: z.boolean().optional(),
     annotations: z.boolean().optional(),
@@ -181,6 +178,21 @@ function _legacyThemePatches(
 }
 
 /**
+ * The options a continuity film's shots take. Palette, roughness, and camera
+ * preset options reach the film as theme patches (see `_legacyThemePatches`).
+ */
+function _renderOptions(
+  options: z.infer<typeof optionsSchema>,
+): Record<string, boolean> {
+  const { captions, cameraMotion, motionBlur, annotations } = options;
+  return Object.fromEntries(
+    Object.entries({ captions, cameraMotion, motionBlur, annotations }).filter(
+      (entry): entry is [string, boolean] => entry[1] !== undefined,
+    ),
+  );
+}
+
+/**
  * Read current authored inputs and reject unknown IDs or unsupported options.
  */
 async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
@@ -261,9 +273,8 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   const plan = storyboardSchema.parse(
     JSON.parse(await fs.readFile(path.join(appRoot, source), "utf8")),
   );
-  const { theme: _theme, ...appearance } = options;
   const configuredPlan = continuity
-    ? createContinuityPlanFromOptions(plan, appearance)
+    ? createContinuityPlanFromOptions(plan, _renderOptions(options))
     : plan;
   return {
     ...base,

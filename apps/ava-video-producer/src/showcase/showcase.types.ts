@@ -1,4 +1,4 @@
-import type { ContinuityAppearance } from "../continuity/continuityAppearance";
+import type { MotionOptions } from "../motion-components/motionSettings";
 import type {
   StockInputByPreset,
   StockPresetId,
@@ -65,7 +65,7 @@ export type FilmOptions = {
   input?: StockInputByPreset[StockPresetId];
   captions?: boolean;
   cameraMotion?: boolean;
-  cameraPreset?: ContinuityAppearance["cameraPreset"];
+  cameraPreset?: NonNullable<MotionOptions["preset"]> | "authored";
   motionBlur?: boolean;
   annotations?: boolean;
   annotationRoughness?: number;
