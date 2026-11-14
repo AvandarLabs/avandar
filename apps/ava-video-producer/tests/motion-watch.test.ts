@@ -38,6 +38,8 @@ async function _createWatchFixture(root: string) {
     "src/fonts.ts",
     "src/videoTheme",
     "src/videoThemeEditor",
+    // The composition viewer reads the film theme helpers from the showcase.
+    "src/showcase/filmTheme",
     "scripts/videoTheme",
     "themes",
     "showcase/download.js",
