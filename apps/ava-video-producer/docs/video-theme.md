@@ -69,7 +69,7 @@ Below **Look and feel**, three tabs choose which settings the list shows. Search
 | --- | --- | --- |
 | **Parts** | The defaults of one themed shape, such as a progress bar's height | Component |
 | **Styles** | Settings named by what they are for, such as the accent colour or the caption style. This tab opens first | Semantic |
-| **Base values** | The raw palettes and scales the styles point at: swatches, stroke widths, opacities, durations, and the Mantine palettes, type, radius, and spacing values. Each scale has **Add value** for a new entry | Atomic and Mantine |
+| **Base values** | The raw palettes and scales the styles point at: swatches, stroke widths, opacities, durations, and the Mantine palettes, type, radius, and spacing values. The atomic scales (not the Mantine values) have **Add value** for a new entry | Atomic and Mantine |
 
 **Only settings used by this preview** lists the parts and styles the preview has read so far, so play the preview once to find the rest. It does not filter **Base values**, which always show.
 
@@ -83,7 +83,7 @@ The showcase reloads its pages when a theme file changes, for example when you o
 
 A save the server refuses because the file changed (a 409) says so in the status line. While the notice is showing, the status line points at it. Otherwise the theme bar offers **Reload from file** itself. Saving as a new theme with a name that is taken is a different refusal: it says the name exists, keeps the typed name, and offers no reload.
 
-An edit made while a save runs is kept on top of the saved theme. A successful save followed by a new edit never shows the notice for your own save.
+An edit made while a save runs is kept on top of the saved theme. A successful save followed by a new edit never shows the notice for your own save. A draft can only set a value, never remove one the file holds, so resetting a token that the running save just wrote is dropped and the saved value stays. Set it to the value you want once the save finishes.
 
 ## Making a theme with `/impeccable`
 
