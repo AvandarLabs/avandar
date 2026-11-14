@@ -35,6 +35,41 @@ const DATE_FORMATS: readonly string[] = ColumnProfileSql.DATE_FORMATS;
 
 const LETTER_CASES = ["keep", "lower", "upper"] as const;
 
+/**
+ * A format typed by hand. It is a pattern with no meaning until it is
+ * finished, so it is sent when the field is left or Enter is pressed, never
+ * per keystroke.
+ */
+function OwnFormatInput(
+  props: Readonly<{ format: string; onChange: OnConvert }>,
+): ReactNode {
+  const { t } = useLingui();
+  const [text, setText] = useState(props.format);
+  const exampleFormat = "%d.%m.%Y";
+  const commit = (): void => {
+    if (text.trim() !== "" && text !== props.format) {
+      props.onChange({ kind: "parse_date", format: text });
+    }
+  };
+  return (
+    <TextInput
+      size="xs"
+      label={t`Format`}
+      description={t`Use %Y for the year, %m for the month, and %d for the day, such as ${exampleFormat}.`}
+      value={text}
+      onChange={(event) => {
+        setText(event.currentTarget.value);
+      }}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          commit();
+        }
+      }}
+    />
+  );
+}
+
 function DateFormatControl(
   props: Readonly<{ format: string; onChange: OnConvert }>,
 ): ReactNode {
@@ -42,7 +77,6 @@ function DateFormatControl(
   const [isOwnFormat, setIsOwnFormat] = useState(
     !DATE_FORMATS.includes(props.format),
   );
-  const exampleFormat = "%d.%m.%Y";
   return (
     <>
       <Select
@@ -64,18 +98,7 @@ function DateFormatControl(
         }}
       />
       {isOwnFormat ? (
-        <TextInput
-          size="xs"
-          label={t`Format`}
-          description={t`Use %Y for the year, %m for the month, and %d for the day, such as ${exampleFormat}.`}
-          defaultValue={props.format}
-          onChange={(event) => {
-            const format = event.currentTarget.value;
-            if (format.trim() !== "") {
-              props.onChange({ kind: "parse_date", format });
-            }
-          }}
-        />
+        <OwnFormatInput format={props.format} onChange={props.onChange} />
       ) : null}
     </>
   );

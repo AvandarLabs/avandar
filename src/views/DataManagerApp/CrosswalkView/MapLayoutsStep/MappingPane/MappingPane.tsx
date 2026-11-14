@@ -154,7 +154,6 @@ function FillDetails(
     case "expression":
       return (
         <CombineInput
-          key={`${props.layout.id}:${props.column.id}`}
           sql={fill.sql}
           columnNames={props.layout.columnNames}
           onChange={(sql) => {
@@ -280,7 +279,9 @@ function FillSection(props: Readonly<FillProps>): ReactNode {
  * Step 2's side pane: the selected column of the combined dataset, its own
  * settings, and how the selected layout fills it, with an example of what
  * that gives and Accept or Reject while the fill is a suggestion. Every
- * change is stored as a confirmed fill.
+ * change is stored as a confirmed fill. Its controls keep their own state
+ * (typed text, own-format and own-factor choices), so mount it with a key
+ * per layout and column.
  */
 export function MappingPane(props: Readonly<Props>): ReactNode {
   const headingId = useId();
@@ -301,7 +302,6 @@ export function MappingPane(props: Readonly<Props>): ReactNode {
       <Stack gap="md">
         <PaneHeading id={headingId} column={column} />
         <ColumnSettings
-          key={column.id}
           draft={props.draft}
           column={column}
           context={context}

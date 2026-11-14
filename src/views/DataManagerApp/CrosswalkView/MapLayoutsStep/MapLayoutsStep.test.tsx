@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
 import {
   BRONX_LAYOUT_ID,
+  GENDER_FILL,
   makeCatalog,
   makeDraft,
   makeFlow,
@@ -10,6 +11,8 @@ import {
   QUEENS_LAYOUT_ID,
   QUEENS_PROFILES,
   REFERENCE_LAYOUT_ID,
+  SEX_COLUMN,
+  withFill,
 } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/__tests__/mapStep.fixtures";
 import { MapLayoutsStep } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
@@ -157,6 +160,50 @@ describe("MapLayoutsStep", () => {
     expect(
       screen.getByText(`pane for ${ONSET_COLUMN.name}`),
     ).toBeInTheDocument();
+  });
+
+  it("keeps the fallback column once the chosen one is removed", () => {
+    const draft = makeDraft();
+    const { rerender } = render(
+      <MapLayoutsStep
+        flow={makeFlow(draft)}
+        catalog={makeCatalog()}
+        crosswalk={undefined}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "table" }));
+    expect(
+      screen.getByText(`pane for ${ONSET_COLUMN.name}`),
+    ).toBeInTheDocument();
+    const rerenderWith = (next: CrosswalkDraft.T): void => {
+      rerender(
+        <MapLayoutsStep
+          flow={makeFlow(next)}
+          catalog={makeCatalog()}
+          crosswalk={undefined}
+        />,
+      );
+    };
+
+    const withoutOnset = {
+      ...draft,
+      columns: draft.columns.filter((column) => {
+        return column.id !== ONSET_COLUMN.id;
+      }),
+    };
+    rerenderWith(withoutOnset);
+    expect(screen.getByText("pane for sex")).toBeInTheDocument();
+
+    // Confirming sex leaves nothing to attend to. A selection that was not
+    // written back would now jump to the first column.
+    rerenderWith(
+      withFill(withoutOnset, {
+        layoutId: QUEENS_LAYOUT_ID,
+        columnId: SEX_COLUMN.id,
+        fill: GENDER_FILL,
+      }),
+    );
+    expect(screen.getByText("pane for sex")).toBeInTheDocument();
   });
 
   it("selects the layout picked in the stub through the flow, which saves first", () => {

@@ -105,8 +105,8 @@ function CodesOutputControl({
 /**
  * The combined dataset's own settings: its name, whether it gets a
  * source_dataset column, and, when a column is governed, whether coded
- * columns come out as labels or codes. The two settings change the draft;
- * the name is saved with the dataset.
+ * columns come out as labels or codes. The two settings change the draft.
+ * The name is saved with the dataset.
  */
 export function CombineSettings(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();

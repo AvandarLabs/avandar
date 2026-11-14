@@ -1,6 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { List } from "@mantine/core";
+import { List, VisuallyHidden } from "@mantine/core";
 import {
   IconAlertCircle,
   IconAlertTriangle,
@@ -164,6 +164,24 @@ function useProblemSentence(
 }
 
 /**
+ * The word a screen reader hears before a problem, since its icon is
+ * decorative.
+ */
+function useWeightLabel(): (weight: ProblemWeight) => string {
+  const { t } = useLingui();
+  return (weight) => {
+    switch (weight) {
+      case "blocks":
+        return t`Blocks:`;
+      case "changes":
+        return t`Changes:`;
+      case "informs":
+        return t`Note:`;
+    }
+  };
+}
+
+/**
  * Before you combine: everything the compile found, worst first. What
  * stops the save, what changes the data (a dataset left out, values passed
  * through), and what is only worth knowing (skipped and unconfirmed
@@ -172,6 +190,7 @@ function useProblemSentence(
  */
 export function CombineProblems(props: Readonly<Props>): ReactNode {
   const toSentence = useProblemSentence(props);
+  const toWeightLabel = useWeightLabel();
   const headingId = useId();
   if (props.problems.length === 0) {
     return null;
@@ -198,6 +217,9 @@ export function CombineProblems(props: Readonly<Props>): ReactNode {
                 key={_toProblemKey(problem)}
                 icon={<ProblemIcon weight={_getWeight(problem)} />}
               >
+                <VisuallyHidden>
+                  {toWeightLabel(_getWeight(problem))}{" "}
+                </VisuallyHidden>
                 {toSentence(problem)}
               </List.Item>
             );

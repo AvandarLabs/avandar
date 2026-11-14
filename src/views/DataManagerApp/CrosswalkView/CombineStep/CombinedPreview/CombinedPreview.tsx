@@ -52,7 +52,13 @@ function PreviewTable(
   }>,
 ): ReactNode {
   return (
-    <div className={css.combinedPreviewScroller}>
+    <div
+      className={css.combinedPreviewScroller}
+      role="region"
+      aria-labelledby={props.labelId}
+      // The scroller must be reachable by keyboard to scroll sideways.
+      tabIndex={0}
+    >
       <Table
         fz="xs"
         verticalSpacing={4}
@@ -68,7 +74,7 @@ function PreviewTable(
         </Table.Thead>
         <Table.Tbody>
           {props.rows.map((row, rowIndex) => {
-            // The rows have no identity of their own; their order is fixed.
+            // The rows have no identity of their own. Their order is fixed.
             return (
               <PreviewRow
                 key={rowIndex}

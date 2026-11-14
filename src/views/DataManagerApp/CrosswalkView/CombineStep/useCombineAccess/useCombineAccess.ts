@@ -45,7 +45,7 @@ function useUpdateAccess(
 
 /**
  * Whether the user may save the combined dataset: creating it needs the
- * people who may add datasets, under the plan's dataset limit; updating it
+ * people who may add datasets, under the plan's dataset limit. Updating it
  * needs edit access to it. The server checks both again.
  */
 export function useCombineAccess(

@@ -8,13 +8,17 @@ import {
   makeDraft,
   makeFlow,
   QUEENS_APRIL_ID,
+  QUEENS_LAYOUT_ID,
   QUEENS_MARCH_ID,
+  SEX_COLUMN,
 } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/__tests__/mapStep.fixtures";
 import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { CompileCrosswalkResult } from "@/lib/crosswalks/compileCrosswalk/compileCrosswalk";
 import type { CombineAccess } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombineAccess/useCombineAccess";
 import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkFlow/useCrosswalkFlow";
+
+const COMBINED_ID = "55555555-5555-4555-8555-555555555555" as Dataset.Id;
 
 const READY: CompileCrosswalkResult = {
   status: "ready",
@@ -41,6 +45,7 @@ const mocks = vi.hoisted(() => {
     result: undefined as unknown,
     access: { status: "allowed" } as unknown,
     existingName: undefined as string | undefined,
+    isExistingLoading: false,
     saveCrosswalkMock: vi.fn(),
     saveCombinedMock: vi.fn(),
     order: [] as string[],
@@ -96,7 +101,7 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
       useGetById: () => {
         return [
           mocks.existingName ? { name: mocks.existingName } : undefined,
-          false,
+          mocks.isExistingLoading,
         ];
       },
     },
@@ -119,6 +124,7 @@ describe("CombineStep", () => {
     mocks.result = READY;
     mocks.access = { status: "allowed" } satisfies CombineAccess;
     mocks.existingName = undefined;
+    mocks.isExistingLoading = false;
     mocks.order = [];
     mocks.saveCrosswalkMock.mockImplementation(() => {
       mocks.order.push("crosswalk");
@@ -130,19 +136,25 @@ describe("CombineStep", () => {
     });
   });
 
-  it("changes how coded columns come out and whether the source column is added", () => {
+  it("changes how coded columns come out", () => {
     const flow = _render();
 
     fireEvent.click(screen.getByRole("radio", { name: "Codes" }));
-    fireEvent.click(
-      screen.getByRole("checkbox", { name: "Add a source_dataset column" }),
-    );
 
     expect(flow.dispatch).toHaveBeenCalledWith({
       type: "settings_changed",
       changes: { codesOutputAs: "codes" },
       context: CONTEXT,
     });
+  });
+
+  it("changes whether the source column is added", () => {
+    const flow = _render();
+
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: "Add a source_dataset column" }),
+    );
+
     expect(flow.dispatch).toHaveBeenCalledWith({
       type: "settings_changed",
       changes: { addsSourceColumn: false },
@@ -319,6 +331,120 @@ describe("CombineStep", () => {
     expect(
       screen.getByRole("button", { name: "Update combined dataset" }),
     ).toBeEnabled();
+  });
+
+  it("does not save the combined dataset when saving the crosswalk first did not go through", async () => {
+    mocks.saveCrosswalkMock.mockResolvedValue(false);
+    const flow = makeFlow(makeDraft(), { save: mocks.saveCrosswalkMock });
+    _render({
+      ...flow,
+      state: {
+        ...flow.state,
+        draft: { ...flow.state.draft, codesOutputAs: "codes" as const },
+      },
+    });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create combined dataset" }),
+    );
+
+    await waitFor(() => {
+      expect(mocks.saveCrosswalkMock).toHaveBeenCalledTimes(1);
+    });
+    expect(mocks.saveCombinedMock).not.toHaveBeenCalled();
+  });
+
+  it("names the existing combined dataset, not the typed name, when updating is refused", () => {
+    mocks.existingName = "Measles combined";
+    mocks.access = {
+      status: "denied",
+      reason: "not_dataset_editor",
+    } satisfies CombineAccess;
+    _render(makeFlow(makeDraft({ outputDatasetId: COMBINED_ID })));
+    fireEvent.change(screen.getByRole("textbox", { name: "Name" }), {
+      target: { value: "Something else" },
+    });
+
+    expect(
+      screen.getByRole("button", { name: "Update combined dataset" }),
+    ).toHaveAccessibleDescription(
+      "You need edit access to Measles combined to update it.",
+    );
+  });
+
+  it("names the existing combined dataset when its access could not be checked", () => {
+    mocks.existingName = "Measles combined";
+    mocks.access = {
+      status: "denied",
+      reason: "failed",
+    } satisfies CombineAccess;
+    _render(makeFlow(makeDraft({ outputDatasetId: COMBINED_ID })));
+
+    expect(
+      screen.getByRole("button", { name: "Update combined dataset" }),
+    ).toHaveAccessibleDescription(
+      "Avandar couldn't check your access to Measles combined. Reload the page and try again.",
+    );
+  });
+
+  it("holds the update until the existing combined dataset has been read", () => {
+    mocks.isExistingLoading = true;
+    _render(makeFlow(makeDraft({ outputDatasetId: COMBINED_ID })));
+
+    expect(
+      screen.getByRole("button", { name: "Update combined dataset" }),
+    ).toBeDisabled();
+  });
+
+  it("won't update a combined dataset that can't be read", () => {
+    _render(makeFlow(makeDraft({ outputDatasetId: COMBINED_ID })));
+
+    const button = screen.getByRole("button", {
+      name: "Update combined dataset",
+    });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription(
+      "Avandar couldn't check your access to the combined dataset. Reload the page and try again.",
+    );
+  });
+
+  it("lets the preview's scroll area be reached by keyboard", () => {
+    _render();
+
+    const region = screen.getByRole("region", { name: "Preview" });
+    expect(region).toHaveAttribute("tabindex", "0");
+    expect(
+      within(region).getByRole("table", { name: "Preview" }),
+    ).toBeInTheDocument();
+  });
+
+  it("says in words how much each problem matters", () => {
+    mocks.result = {
+      ...READY,
+      problems: [
+        { kind: "skipped", datasetCount: 1 },
+        {
+          kind: "columns_changed",
+          datasetId: QUEENS_APRIL_ID,
+          datasetName: "Queens 2026-04",
+        },
+        {
+          kind: "invalid_expression",
+          layoutId: QUEENS_LAYOUT_ID,
+          columnId: SEX_COLUMN.id,
+        },
+      ],
+    } satisfies CompileCrosswalkResult;
+    _render();
+
+    const items = within(
+      screen.getByRole("region", { name: "Before you combine" }),
+    ).getAllByRole("listitem");
+    expect(
+      items.map((item) => {
+        return item.textContent?.split(":")[0];
+      }),
+    ).toEqual(["Blocks", "Changes", "Note"]);
   });
 
   it("goes back to Map each dataset", () => {

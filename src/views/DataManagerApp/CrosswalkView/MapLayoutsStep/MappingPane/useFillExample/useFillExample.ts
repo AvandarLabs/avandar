@@ -25,7 +25,7 @@ export type FillExampleOptions = CrosswalkSql.CodeLists & {
   /** The layout's first dataset. */
   datasetId: Dataset.Id;
   fill: CrosswalkMapping.Fill | undefined;
-  /** The combined dataset's column being filled; a draft column fits. */
+  /** The combined dataset's column being filled. A draft column fits. */
   column: CrosswalkSql.Column;
   codesOutputAs: Crosswalk.CodesOutput;
   /** The layout's columns, which a Combine formula may name. */

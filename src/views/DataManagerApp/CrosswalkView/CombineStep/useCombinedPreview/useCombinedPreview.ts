@@ -53,7 +53,7 @@ function _toPreviewRow(
  * Reads the combined dataset's preview on this device: the first rows,
  * then the row count. The first read loads every source dataset, so it can
  * take minutes. Keyed by the SQL and its columns, so a settings change
- * reads again and a late reply is dropped; nothing is read without SQL.
+ * reads again and a late reply is dropped. Nothing is read without SQL.
  */
 export function useCombinedPreview(
   options: Readonly<{

@@ -71,14 +71,19 @@ function ColumnNameInput({
 
 /**
  * The entry Select's options: "No code list", then every entry with a code
- * list, grouped by dictionary in the user's dictionary order.
+ * list, grouped by dictionary in the user's dictionary order. The entry
+ * that governs the column now is always listed, so the Select never shows
+ * blank: even when it has no code list, or is no longer in the catalog.
  */
-function useEntryOptions(context: CrosswalkContext): ComboboxData {
+function useEntryOptions(
+  context: CrosswalkContext,
+  currentEntryId: DataDictionaryEntry.Id | undefined,
+): ComboboxData {
   const { t } = useLingui();
   const dictionaryNames = useDictionaryNames();
   const entries = [...context.entriesById.values()]
     .filter((entry) => {
-      return entry.codeLists.length > 0;
+      return entry.codeLists.length > 0 || entry.entryId === currentEntryId;
     })
     .sort((entryA, entryB) => {
       return (
@@ -105,7 +110,15 @@ function useEntryOptions(context: CrosswalkContext): ComboboxData {
         }),
     };
   });
-  return [{ value: NO_ENTRY, label: t`No code list` }, ...groups];
+  const isCurrentMissing =
+    currentEntryId !== undefined && !context.entriesById.has(currentEntryId);
+  return [
+    { value: NO_ENTRY, label: t`No code list` },
+    ...groups,
+    ...(isCurrentMissing
+      ? [{ value: currentEntryId, label: t`Entry no longer available` }]
+      : []),
+  ];
 }
 
 function EntrySelect({
@@ -114,7 +127,7 @@ function EntrySelect({
   dispatch,
 }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
-  const options = useEntryOptions(context);
+  const options = useEntryOptions(context, column.entryId);
   return (
     <Select
       size="xs"

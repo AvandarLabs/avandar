@@ -8,10 +8,10 @@ import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppV
 import { getLayoutLabel } from "@/views/DataManagerApp/CrosswalkView/layoutLabel/getLayoutLabel";
 import { useLayoutNamer } from "@/views/DataManagerApp/CrosswalkView/layoutLabel/useLayoutNamer";
 import { AddColumnButton } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton";
+import { LayoutPane } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutPane/LayoutPane";
 import { LayoutStub } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStub";
 import { MapLayoutsFooter } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter";
 import css from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.module.css";
-import { MappingPane } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane";
 import { MappingTable } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable";
 import {
   chooseSelectedColumnId,
@@ -21,7 +21,6 @@ import {
 import { useLayoutValues } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useLayoutValues/useLayoutValues";
 import { useMapStepActions } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useMapStepActions/useMapStepActions";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
-import type { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import type { CrosswalkContext } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
 import type { CrosswalkStepProps } from "@/views/DataManagerApp/CrosswalkView/CrosswalkStepBody";
@@ -36,23 +35,6 @@ type LayoutProps = {
 };
 
 type ValuesStatus = LayoutValues["status"];
-
-/** The layout's first dataset's columns, the sources a fill can read. */
-function _getSourceColumns(
-  layout: CrosswalkDraft.Layout,
-  context: CrosswalkContext,
-): CrosswalkLayout.Dataset["columns"] {
-  const firstDatasetId = layout.datasetIds[0];
-  const columns = firstDatasetId
-    ? context.datasetsById.get(firstDatasetId)?.columns
-    : undefined;
-  return (
-    columns ??
-    layout.columnNames.map((name) => {
-      return { name, dataType: "varchar" as const };
-    })
-  );
-}
 
 /**
  * The section meta under the layout's name: Reference, or "+n with the
@@ -157,32 +139,22 @@ function LayoutFooter({ flow, layout }: Readonly<LayoutProps>): ReactNode {
   );
 }
 
-/** The side pane for the selected column, or nothing when there is none. */
-function LayoutPane(
-  props: Readonly<
-    LayoutProps & {
-      values: LayoutValues;
-      selectedColumnId: CrosswalkColumn.Id | undefined;
-    }
-  >,
+/** The side pane for the selected column, or no rail when none is. */
+function _buildRail(
+  props: Readonly<LayoutProps & { values: LayoutValues }>,
+  selectedColumnId: CrosswalkColumn.Id | undefined,
 ): ReactNode {
-  const { flow, context, layout, values } = props;
-  const column = flow.state.draft.columns.find((candidate) => {
-    return candidate.id === props.selectedColumnId;
-  });
-  if (!column) {
-    return null;
+  if (selectedColumnId === undefined) {
+    return undefined;
   }
   return (
-    <MappingPane
-      draft={flow.state.draft}
-      layout={layout}
-      column={column}
-      sourceColumns={_getSourceColumns(layout, context)}
-      profilesBySourceColumn={values.profilesBySourceColumn}
-      dateFormatsBySourceColumn={values.dateFormatsBySourceColumn}
-      context={context}
-      dispatch={flow.dispatch}
+    <LayoutPane
+      draft={props.flow.state.draft}
+      context={props.context}
+      layout={props.layout}
+      values={props.values}
+      selectedColumnId={selectedColumnId}
+      dispatch={props.flow.dispatch}
     />
   );
 }
@@ -210,9 +182,7 @@ function LayoutRegions(
       />
       <AppViewBody
         className={css.mapLayoutsMain}
-        rail={
-          selectedColumnId === undefined ? undefined : <LayoutPane {...props} />
-        }
+        rail={_buildRail(props, selectedColumnId)}
       >
         <LayoutTableSection
           flow={flow}
@@ -244,6 +214,16 @@ function LayoutMapping({
   const [chosenColumnId, setChosenColumnId] = useState(() => {
     return chooseSelectedColumnId(draft, layout.id, undefined);
   });
+  const selectedColumnId = chooseSelectedColumnId(
+    draft,
+    layout.id,
+    chosenColumnId,
+  );
+  // A chosen column that is gone falls back once and stays there, so later
+  // edits to the fills never move the selection by themselves.
+  if (selectedColumnId !== chosenColumnId) {
+    setChosenColumnId(selectedColumnId);
+  }
   return (
     <>
       <LayoutRegions
@@ -251,11 +231,7 @@ function LayoutMapping({
         context={context}
         layout={layout}
         values={values}
-        selectedColumnId={chooseSelectedColumnId(
-          draft,
-          layout.id,
-          chosenColumnId,
-        )}
+        selectedColumnId={selectedColumnId}
         onSelectColumn={setChosenColumnId}
       />
       <LayoutFooter flow={flow} context={context} layout={layout} />
@@ -283,7 +259,7 @@ function NoLayouts({ onBack }: Readonly<{ onBack: () => void }>): ReactNode {
  * table with Add a column under it, the selected column's side pane, and
  * the footer that skips, accepts suggestions, or confirms and moves on.
  * The shown layout's subtree is keyed by its id, so the selected column
- * starts over on every layout. Pane edits only dispatch; they are saved
+ * starts over on every layout. Pane edits only dispatch. They are saved
  * by the next footer action or layout change.
  */
 export function MapLayoutsStep({

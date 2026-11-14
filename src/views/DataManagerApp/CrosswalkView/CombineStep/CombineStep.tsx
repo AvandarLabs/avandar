@@ -22,43 +22,82 @@ import type { ReactNode } from "react";
 
 const NO_COLUMN_NAMES: readonly string[] = [];
 
-/** The existing combined dataset's name, else the crosswalk's. */
-function useDefaultDatasetName(
+/** The crosswalk's existing combined dataset, as far as it has been read. */
+type ExistingDataset = {
+  /** Undefined when there is none, while it loads, or when it can't be read. */
+  name: string | undefined;
+  isLoading: boolean;
+  /** Whether a combined dataset exists but could not be read. */
+  isUnreadable: boolean;
+};
+
+function useExistingDataset(
   outputDatasetId: Dataset.Id | undefined,
-  crosswalkName: string,
-): string {
-  const [existing] = DatasetClient.useGetById({
+): ExistingDataset {
+  const [existing, isLoading] = DatasetClient.useGetById({
     id: outputDatasetId,
     useQueryOptions: { enabled: outputDatasetId !== undefined },
   });
-  return existing?.name ?? crosswalkName;
+  const isDefined = outputDatasetId !== undefined;
+  return {
+    name: existing?.name,
+    isLoading: isDefined && isLoading,
+    isUnreadable: isDefined && !isLoading && existing === undefined,
+  };
+}
+
+/**
+ * The access check, held at `checking` until the existing combined dataset
+ * has been read: until then the name field holds the crosswalk's name, and
+ * updating would rename the dataset to it. A combined dataset that can't be
+ * read can't be updated either.
+ */
+function useGuardedAccess(
+  outputDatasetId: Dataset.Id | undefined,
+  existing: ExistingDataset,
+): CombineAccess {
+  const access = useCombineAccess(outputDatasetId);
+  if (access.status !== "allowed") {
+    return access;
+  }
+  if (existing.isLoading) {
+    return { status: "checking" };
+  }
+  return existing.isUnreadable
+    ? { status: "denied", reason: "failed" }
+    : access;
 }
 
 /** Why the primary button cannot be used yet, or undefined. */
 function useDisabledReason(
   result: CompileCrosswalkResult,
   access: CombineAccess,
-  datasetName: string,
+  options: Readonly<{ datasetName: string; existingName: string | undefined }>,
 ): string | undefined {
   const { t } = useLingui();
   if (result.status === "blocked") {
     return t`Fix the problems above to combine.`;
   }
-  if (datasetName.trim() === "") {
+  if (options.datasetName.trim() === "") {
     return t`Enter a name for the combined dataset.`;
   }
   if (access.status !== "denied") {
     return undefined;
   }
+  const { existingName } = options;
   switch (access.reason) {
     case "not_admin":
       return t`Only workspace admins can add datasets.`;
     case "dataset_limit":
       return t`Your plan's dataset limit is reached, so a new dataset can't be added.`;
     case "not_dataset_editor":
-      return t`You need edit access to ${datasetName} to update it.`;
+      return existingName === undefined
+        ? t`You need edit access to the combined dataset to update it.`
+        : t`You need edit access to ${existingName} to update it.`;
     case "failed":
-      return t`Avandar couldn't check your access to ${datasetName}. Reload the page and try again.`;
+      return existingName === undefined
+        ? t`Avandar couldn't check your access to the combined dataset. Reload the page and try again.`
+        : t`Avandar couldn't check your access to ${existingName}. Reload the page and try again.`;
   }
 }
 
@@ -66,7 +105,7 @@ function useDisabledReason(
  * Saving from step 3: the crosswalk first through `flow.save` when its
  * draft changed, so the crosswalk row always matches the SQL it produced,
  * then the combined dataset. A crosswalk save that did not go through
- * (offline, refused, or a second press) stops here; the flow has said why.
+ * (offline, refused, or a second press) stops here. The flow has said why.
  */
 function useCombineSave(
   flow: CrosswalkFlow,
@@ -156,7 +195,7 @@ function useCombineState(props: Readonly<CrosswalkStepProps>): {
   const { flow, catalog, crosswalk } = props;
   const { context } = catalog;
   const { draft } = flow.state;
-  // The crosswalk row knows a combined dataset created in this session; the
+  // The crosswalk row knows a combined dataset created in this session. The
   // draft only knows the one it was loaded with.
   const outputDatasetId = crosswalk?.outputDatasetId ?? draft.outputDatasetId;
   const result = useMemo(() => {
@@ -166,11 +205,14 @@ function useCombineState(props: Readonly<CrosswalkStepProps>): {
       entriesById: context.entriesById,
     });
   }, [draft, context.datasetsById, context.entriesById]);
-  const defaultName = useDefaultDatasetName(outputDatasetId, draft.name);
+  const existing = useExistingDataset(outputDatasetId);
   const [typedName, setDatasetName] = useState<string | undefined>(undefined);
-  const datasetName = typedName ?? defaultName;
-  const access = useCombineAccess(outputDatasetId);
-  const disabledReason = useDisabledReason(result, access, datasetName);
+  const datasetName = typedName ?? existing.name ?? draft.name;
+  const access = useGuardedAccess(outputDatasetId, existing);
+  const disabledReason = useDisabledReason(result, access, {
+    datasetName,
+    existingName: existing.name,
+  });
   return {
     result,
     outputDatasetId,

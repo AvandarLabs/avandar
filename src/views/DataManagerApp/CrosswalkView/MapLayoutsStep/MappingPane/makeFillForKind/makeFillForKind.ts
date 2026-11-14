@@ -37,7 +37,7 @@ function _pickSourceColumn(options: Options): string {
 /**
  * The fill a column starts with when the user switches it to another kind.
  * A column fill reads the current fill's source, else the layout column
- * named like the target (ignoring case), else the layout's first column; a
+ * named like the target (ignoring case), else the layout's first column. A
  * governed column translates with its entry's primary list. Combine starts
  * as that column's placeholder, so it is never blank. Choosing the kind the
  * fill already has keeps it.

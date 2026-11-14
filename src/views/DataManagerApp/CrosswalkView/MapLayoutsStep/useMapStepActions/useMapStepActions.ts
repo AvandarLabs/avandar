@@ -31,8 +31,8 @@ export type MapStepActions = {
  * none is left. That next layout is read from the draft before the action:
  * both actions change only this layout's status, which the choice skips
  * anyway, and `flow.state` here is the state this render saw, not the one
- * the action produced. A failed save keeps the change and stays put;
- * nothing moves once the user has left the view.
+ * the action produced. A failed save keeps the change and stays put.
+ * Nothing moves once the user has left the view.
  */
 export function useMapStepActions(flow: CrosswalkFlow): MapStepActions {
   const isMountedRef = useIsMounted();

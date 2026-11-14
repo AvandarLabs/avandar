@@ -13,7 +13,7 @@ type Props = {
 
 /**
  * How this column is filled: a column, a fixed value, a Combine formula, or
- * left empty. A radio group named by its visible label; none is chosen
+ * left empty. A radio group named by its visible label. None is chosen
  * while the column has no fill.
  */
 export function FillKindControl({

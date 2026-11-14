@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, renderHook, TestProviders } from "@/test-utils";
+import { act, renderHook, TestProviders, waitFor } from "@/test-utils";
 import { useSaveCombinedDataset } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset";
 import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -17,6 +17,9 @@ const mocks = vi.hoisted(() => {
     notifyErrorMock: vi.fn(),
     notifySuccessMock: vi.fn(),
     isOnline: true,
+    user: { id: "user-1", email: "pablo@avandarlabs.com" } as
+      | { id: string; email: string }
+      | undefined,
     mutationOptions: undefined as MutationOptions | undefined,
   };
 });
@@ -93,7 +96,7 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
 vi.mock("@/hooks/users/useCurrentUser", () => {
   return {
     useCurrentUser: () => {
-      return { id: "user-1", email: "pablo@avandarlabs.com" };
+      return mocks.user;
     },
   };
 });
@@ -117,6 +120,13 @@ const RESULT: Extract<CompileCrosswalkResult, { status: "ready" }> = {
   problems: [],
 };
 
+const OPTIONS = {
+  crosswalkId: CROSSWALK_ID,
+  outputDatasetId: undefined,
+  result: RESULT,
+  datasetName: "A",
+};
+
 function _renderSave() {
   return renderHook(
     () => {
@@ -130,6 +140,13 @@ describe("useSaveCombinedDataset", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.isOnline = true;
+    mocks.user = { id: "user-1", email: "pablo@avandarlabs.com" };
+    mocks.clearCachesMock.mockImplementation(() => {
+      return Promise.resolve();
+    });
+    mocks.navigateMock.mockImplementation(() => {
+      return Promise.resolve();
+    });
     mocks.mutateAsyncMock.mockImplementation(
       (payload: { datasetId: string }) => {
         return Promise.resolve(payload.datasetId);
@@ -257,5 +274,89 @@ describe("useSaveCombinedDataset", () => {
     );
     expect(mocks.clearCachesMock).not.toHaveBeenCalled();
     expect(mocks.navigateMock).not.toHaveBeenCalled();
+  });
+  it("stays saving until the caches are cleared and the dataset is open", async () => {
+    let finishClearing: () => void = () => {};
+    let finishOpening: () => void = () => {};
+    mocks.clearCachesMock.mockImplementation(() => {
+      return new Promise<void>((resolve) => {
+        finishClearing = resolve;
+      });
+    });
+    mocks.navigateMock.mockImplementation(() => {
+      return new Promise<void>((resolve) => {
+        finishOpening = resolve;
+      });
+    });
+    const { result } = _renderSave();
+
+    let saving: Promise<unknown> = Promise.resolve();
+    act(() => {
+      saving = result.current[0](OPTIONS);
+    });
+    await waitFor(() => {
+      expect(mocks.clearCachesMock).toHaveBeenCalled();
+    });
+    expect(result.current[1]).toBe(true);
+
+    await act(async () => {
+      finishClearing();
+    });
+    await waitFor(() => {
+      expect(mocks.navigateMock).toHaveBeenCalled();
+    });
+    expect(result.current[1]).toBe(true);
+
+    await act(async () => {
+      finishOpening();
+      await saving;
+    });
+    expect(result.current[1]).toBe(false);
+  });
+
+  it("says so when there is no signed-in user to clear caches for, and still opens the dataset", async () => {
+    mocks.user = undefined;
+    const { result } = _renderSave();
+
+    await act(async () => {
+      await result.current[0](OPTIONS);
+    });
+
+    expect(mocks.clearCachesMock).not.toHaveBeenCalled();
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "A was saved, but this device may still show its old rows. Reload the page to refresh them.",
+    );
+    expect(mocks.navigateMock).toHaveBeenCalled();
+  });
+
+  it("says so when the caches could not be cleared, and still opens the dataset", async () => {
+    mocks.clearCachesMock.mockRejectedValue(new Error("cache"));
+    const { result } = _renderSave();
+
+    await act(async () => {
+      await result.current[0](OPTIONS);
+    });
+
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "A was saved, but this device may still show its old rows. Reload the page to refresh them.",
+    );
+    expect(mocks.notifySuccessMock).toHaveBeenCalledWith("Created A.");
+    expect(mocks.navigateMock).toHaveBeenCalled();
+  });
+
+  it("reports a failure to open the saved dataset, and still resolves its id", async () => {
+    mocks.navigateMock.mockRejectedValue(new Error("navigation"));
+    const { result } = _renderSave();
+
+    let savedId: string | undefined;
+    await act(async () => {
+      savedId = await result.current[0](OPTIONS);
+    });
+
+    expect(savedId).toBe(NEW_ID);
+    expect(mocks.notifyErrorMock).toHaveBeenCalledWith(
+      "A was saved, but it could not be opened. Open it from the dataset list.",
+    );
+    expect(result.current[1]).toBe(false);
   });
 });
