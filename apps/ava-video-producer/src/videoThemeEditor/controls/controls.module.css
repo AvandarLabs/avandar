@@ -164,3 +164,9 @@
   white-space: nowrap;
   width: 1px;
 }
+
+.sketchPreview {
+  color: var(--ink);
+  height: 44px;
+  width: 96px;
+}
