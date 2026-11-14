@@ -204,6 +204,9 @@ export const continuityBeatSchema = z
       .optional(),
   })
   .strict();
+/** Why a continuity plan can no longer set its own palette or sketch. */
+const THEMED_FIELD_MESSAGE =
+  "Colours and sketch roughness come from the video theme. Set them in the theme's overrides for this composition (themes/<theme>.theme.json, overrides.<composition id>).";
 /** Strict film-use grammar shared by long explainers and isolated atlas studies. */
 export const continuitySchema = z
   .object({
@@ -215,16 +218,13 @@ export const continuitySchema = z
       "composite",
     ]),
     evidence: copy,
-    accent: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-    background: z
-      .string()
-      .regex(/^#[0-9a-fA-F]{6}$/)
-      .default("#0b1219"),
+    accent: z.never({ error: THEMED_FIELD_MESSAGE }).optional(),
+    background: z.never({ error: THEMED_FIELD_MESSAGE }).optional(),
     cameraMotion: z.boolean().default(true),
     motionBlur: z.boolean().default(true),
     annotations: z.boolean().default(true),
-    annotationRoughness: z.number().min(0).max(3).default(1.5),
-    boxRoughness: z.number().min(0).max(3).default(0),
+    annotationRoughness: z.never({ error: THEMED_FIELD_MESSAGE }).optional(),
+    boxRoughness: z.never({ error: THEMED_FIELD_MESSAGE }).optional(),
     beats: z.array(continuityBeatSchema).min(2).max(12),
   })
   .strict()

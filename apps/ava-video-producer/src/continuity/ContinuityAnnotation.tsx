@@ -5,6 +5,7 @@ import {
   Highlight,
   Underline,
 } from "@remotion/rough-notation";
+import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityOverlays.module.css";
 import { getAnnotationProgress } from "./overlayMotion";
@@ -30,6 +31,7 @@ export function ContinuityAnnotation({
   accent,
 }: Props) {
   const appearance = useContinuityAppearance();
+  const { sketch } = useVideoTokens();
   if (!appearance.annotations) return null;
   return annotations.map((cue, index) => {
     const progress = getAnnotationProgress(frame, cue);
@@ -48,7 +50,7 @@ export function ContinuityAnnotation({
         <Annotation
           progress={progress}
           color={accent}
-          roughness={appearance.annotationRoughness}
+          roughness={sketch.annotation.roughness}
           seed={cue.seed}
           strokeWidth={3}
         >

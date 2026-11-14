@@ -1,7 +1,7 @@
 .continuityStage {
-  background: var(--continuity-ground, #0b1219);
-  color: var(--continuity-ink, #edf7f4);
-  font-family: var(--continuity-font, sans-serif);
+  background: var(--video-color-ground-fill);
+  color: var(--video-color-text);
+  font-family: var(--video-text-stage-heading-font-family);
   height: 840px;
   left: 0;
   overflow: hidden;
@@ -11,7 +11,7 @@
 }
 
 .continuityBeat {
-  background: var(--continuity-ground, #0b1219);
+  background: var(--video-color-ground-fill);
   inset: 0;
   position: absolute;
 }
@@ -32,7 +32,7 @@
 }
 
 .continuityHeading p {
-  color: var(--continuity-ink, #b3c5cf);
+  color: var(--video-text-stage-subtitle-color);
   font-size: 25px;
   line-height: 1.35;
   margin: 18px 0 0;
@@ -45,7 +45,7 @@
 
 .continuityEvidence {
   bottom: 16px;
-  color: var(--continuity-ink, #b3c5cf);
+  color: var(--video-text-stage-evidence-color);
   display: flex;
   font-size: 17px;
   gap: 20px;
@@ -58,7 +58,7 @@
 }
 
 .continuityEvidence span {
-  background: var(--continuity-ground, #0b1219);
+  background: var(--video-color-ground);
   border-radius: 4px;
   padding: 7px 12px;
 }
@@ -94,7 +94,7 @@
 }
 
 .continuityEmphasis {
-  color: var(--continuity-ink, #b3c5cf);
+  color: var(--video-text-stage-thesis-emphasis-color);
   font-size: 30px;
   margin-top: 20px;
 }
@@ -110,7 +110,6 @@
 
 .continuityProgress {
   bottom: 0;
-  height: 3px;
   left: 0;
   position: absolute;
   z-index: 40;

@@ -1,6 +1,7 @@
 import { ramp } from "../motion";
 import { getMotionProgress } from "../motion-components/motionSettings";
 import { SharedElement } from "../motion-components/SharedElement";
+import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
@@ -16,6 +17,8 @@ export function ContinuityToken({
   frame: number;
 }) {
   const translate = useContinuityCopy();
+  const tokens = useVideoTokens();
+  const isSketched = tokens.sketch.box.roughness > 0;
   const timing = getContinuityTimeline(plan.beats);
   const index = Math.max(
     0,
@@ -46,9 +49,9 @@ export function ContinuityToken({
       motion={beat.transition.motion}
       className={css.continuityToken}
       style={{
-        color: plan.accent,
-        borderColor: plan.boxRoughness > 0 ? "transparent" : undefined,
-        borderRadius: plan.boxRoughness > 0 ? 0 : undefined,
+        color: tokens.text.stage.sharedObject.color,
+        borderColor: isSketched ? "transparent" : undefined,
+        borderRadius: isSketched ? 0 : undefined,
         background:
           beat.token.appearance === "outline" ? "transparent" : undefined,
         opacity:

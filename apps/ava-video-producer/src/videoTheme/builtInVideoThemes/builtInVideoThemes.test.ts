@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import classicJson from "../../../themes/classic.theme.json";
+import {
+  CONTINUITY_CATALOG,
+  isSceneEntry,
+} from "../../continuity/continuityCatalog";
 import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../../gallery/palette";
 import { DUR, EASE, pop, STAGGER, STAGGER_COLUMN } from "../../motion";
 import {
@@ -10,6 +14,7 @@ import {
 } from "../../motion-components/motionSettings";
 import { STOCK } from "../../stock/stockPalette";
 import { createEasingFromToken } from "../createEasingFromToken/createEasingFromToken";
+import { resolveVideoTheme } from "../resolveVideoTheme/resolveVideoTheme";
 import { BUILT_IN_VIDEO_THEMES } from "./builtInVideoThemes";
 import type { EasingValue } from "../videoTheme.types";
 
@@ -111,4 +116,49 @@ test("classic's accent and ground are the Atlas gallery defaults", () => {
 
 test("the built-in library holds classic", () => {
   assert.equal(BUILT_IN_VIDEO_THEMES.get("classic")?.label, "Classic");
+});
+
+/** Each continuity plan's accent before it moved into classic's overrides. */
+const AUTHORED_ACCENTS = {
+  "qetl-motion": "mint",
+  "qetl-to-product": "cyan",
+  "product-to-qetl": "orange",
+  "qetl-composite": "mint",
+  "ontology-motion": "cyan",
+  "ontology-to-product": "orange",
+  "product-to-ontology": "mint",
+  "ontology-composite": "cyan",
+  "plugin-ecosystem": "orange",
+  "right-sized-data": "mint",
+  "shared-object-handoff": "mint",
+  "frame-to-interface": "cyan",
+  "aperture-detail": "cyan",
+  "spatial-continuation": "mint",
+  "occlusion-wipe": "orange",
+  "graphic-match": "cyan",
+  "causal-signal": "cyan",
+  "field-grouping": "cyan",
+  "focus-handoff": "cyan",
+  "teaching-underline": "mint",
+  "model-to-workspace": "orange",
+  "record-to-relationships": "mint",
+  "controls-and-meaning": "cyan",
+} as const;
+
+test("every continuity composition keeps its authored accent through classic's overrides", () => {
+  for (const [id, swatch] of Object.entries(AUTHORED_ACCENTS)) {
+    const theme = resolveVideoTheme(BUILT_IN_VIDEO_THEMES, "classic", {
+      overrideIds: [id],
+    });
+    assert.equal(theme.semantic.color.accent, STOCK[swatch], id);
+  }
+});
+
+test("every continuity entry in the Atlas has a classic override", () => {
+  assert.deepEqual(
+    CONTINUITY_CATALOG.filter((entry) => !isSceneEntry(entry))
+      .map((entry) => entry.id)
+      .sort(),
+    Object.keys(AUTHORED_ACCENTS).sort(),
+  );
 });

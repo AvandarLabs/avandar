@@ -1,5 +1,6 @@
 import { Underline } from "@remotion/rough-notation";
 import { enter, ramp } from "../motion";
+import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityScene.module.css";
 import { useContinuityCopy } from "./useContinuityCopy";
@@ -14,7 +15,8 @@ type Props = {
 /** Staggered statement with a single deterministic teaching underline. */
 export function ContinuityThesis({ content, frame, accent }: Props) {
   const translate = useContinuityCopy();
-  const { annotations, annotationRoughness } = useContinuityAppearance();
+  const { annotations } = useContinuityAppearance();
+  const { sketch } = useVideoTokens();
   return (
     <div className={css.continuityThesis}>
       {content.lines.map((line, index) => (
@@ -31,7 +33,7 @@ export function ContinuityThesis({ content, frame, accent }: Props) {
           disabled={!annotations}
           progress={ramp(frame, 95, 28)}
           color={accent}
-          roughness={annotationRoughness}
+          roughness={sketch.annotation.roughness}
           seed={4}
           strokeWidth={3}
         >

@@ -264,5 +264,29 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {
+    "qetl-motion": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "qetl-to-product": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "product-to-qetl": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.orange" } } } } },
+    "qetl-composite": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "ontology-motion": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "ontology-to-product": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.orange" } } } } },
+    "product-to-ontology": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "ontology-composite": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "plugin-ecosystem": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.orange" } } } } },
+    "right-sized-data": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "shared-object-handoff": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "frame-to-interface": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "aperture-detail": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "spatial-continuation": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "occlusion-wipe": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.orange" } } } } },
+    "graphic-match": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "causal-signal": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "field-grouping": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "focus-handoff": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } },
+    "teaching-underline": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "model-to-workspace": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.orange" } } } } },
+    "record-to-relationships": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.mint" } } } } },
+    "controls-and-meaning": { "other": { "video": { "semantic": { "color": { "accent": "$atomic.swatch.cyan" } } } } }
+  }
 }

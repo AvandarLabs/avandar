@@ -3,7 +3,7 @@ import { compileMessage } from "@lingui/message-utils/compileMessage";
 import { I18nProvider } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { Player, type PlayerRef } from "@remotion/player";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   continuityAppearanceSchema,
@@ -11,6 +11,11 @@ import {
 } from "../continuity/continuityAppearance";
 import { HelperPlayer } from "../gallery/HelperGallery/HelperPlayer/HelperPlayer";
 import { durationInFrames } from "../storyboard/schema/timeline";
+import { createThemePatchFromLegacyAppearance } from "../videoTheme/themePatches/themePatches";
+import {
+  addPatchesToVideoThemeSnapshot,
+  CLASSIC_VIDEO_THEME_SNAPSHOT,
+} from "../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { FilmComposition } from "./FilmComposition";
 import type { Film } from "./showcase.types";
 import "../theme.css";
@@ -64,13 +69,9 @@ function LivePlayer({ film }: { film: Film }) {
     continuityAppearanceSchema.parse(
       continuity?.scene === "continuity"
         ? {
-            accent: continuity.props.accent,
-            background: continuity.props.background,
             cameraMotion: continuity.props.cameraMotion,
             motionBlur: continuity.props.motionBlur,
             annotations: continuity.props.annotations,
-            annotationRoughness: continuity.props.annotationRoughness,
-            boxRoughness: continuity.props.boxRoughness,
           }
         : {},
     ),
@@ -82,6 +83,15 @@ function LivePlayer({ film }: { film: Film }) {
   const previewFrames = previewPlan
     ? durationInFrames(previewPlan)
     : film.frames;
+  // The gallery's palette and roughness controls apply as the last theme patch.
+  const theme = useMemo(
+    () =>
+      addPatchesToVideoThemeSnapshot(
+        film.theme ?? CLASSIC_VIDEO_THEME_SNAPSHOT,
+        continuity ? [createThemePatchFromLegacyAppearance(appearance)] : [],
+      ),
+    [film.theme, continuity, appearance],
+  );
   const [captions, setCaptions] = useState(saved?.captions ?? true);
   const [speed, setSpeed] = useState(saved?.speed ?? 1);
   const [loop, setLoop] = useState(saved?.loop ?? false);
@@ -176,6 +186,7 @@ function LivePlayer({ film }: { film: Film }) {
               plan: previewPlan,
               frames: previewFrames,
               showCaptions: captions,
+              theme,
             },
           }}
           compositionWidth={film.width}

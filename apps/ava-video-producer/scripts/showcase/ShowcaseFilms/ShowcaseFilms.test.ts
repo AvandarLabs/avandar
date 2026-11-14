@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { DECISION_FORK_DENSE_INPUT } from "../../../src/stock/presets/DecisionFork/DecisionFork.fixtures";
+import { resolveVideoThemeFromSnapshot } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 
 test("unknown IDs and unsafe render options cannot become render inputs", async () => {
@@ -313,13 +314,13 @@ test("continuity appearance options preserve the timeline", async () => {
   const shot = film.plan?.shots.find(
     (candidate) => candidate.scene === "continuity",
   );
-  assert.equal(shot?.scene === "continuity" && shot.props.accent, "#ff0000");
+  assert.equal(shot?.scene === "continuity" && "accent" in shot.props, false);
   assert.equal(shot?.scene === "continuity" && shot.props.cameraMotion, false);
-  assert.equal(
-    shot?.scene === "continuity" && shot.props.annotationRoughness,
-    0,
-  );
-  assert.equal(shot?.scene === "continuity" && shot.props.boxRoughness, 2.5);
+  const theme = resolveVideoThemeFromSnapshot(film.theme, [film.id]);
+  assert.equal(theme.semantic.color.accent, "#ff0000");
+  assert.equal(theme.semantic.color.ground, "#ffffff");
+  assert.equal(theme.semantic.sketch.annotation.roughness, 0);
+  assert.equal(theme.semantic.sketch.box.roughness, 2.5);
   await assert.rejects(
     ShowcaseFilms.load("avandar-home", { cameraMotion: false }),
   );

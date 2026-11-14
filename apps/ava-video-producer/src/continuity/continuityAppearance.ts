@@ -50,7 +50,17 @@ export function createContinuityPlanFromOptions(
     })
     .strict()
     .parse(raw);
-  const { captions: _captions, cameraPreset, ...appearance } = options;
+  // Palette and roughness reach the renderer through the theme (see
+  // createThemePatchFromLegacyAppearance), never through shot props.
+  const {
+    captions: _captions,
+    cameraPreset,
+    accent: _accent,
+    background: _background,
+    annotationRoughness: _annotationRoughness,
+    boxRoughness: _boxRoughness,
+    ...appearance
+  } = options;
   return {
     ...plan,
     shots: plan.shots.map((shot) => {

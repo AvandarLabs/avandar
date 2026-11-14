@@ -1,12 +1,8 @@
 import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
 import { StockGraphic } from "../stock/StockGraphic";
-import { createThemePatchFromLegacyAppearance } from "../videoTheme/themePatches/themePatches";
-import { VideoThemeScope } from "../videoTheme/VideoThemeScope/VideoThemeScope";
-import {
-  useContinuityAppearance,
-  getEditorialInk,
-} from "./ContinuityAppearanceContext";
+import { useVideoTokens } from "../videoTheme/useVideoTheme/useVideoTheme";
+import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityOverlays.module.css";
 import { sampleStockFrame } from "./continuityTimeline";
@@ -16,13 +12,17 @@ import type { ContinuityBeat } from "./continuitySchema";
 
 type Content = Extract<ContinuityBeat["content"], { kind: "composite" }>;
 type Props = { content: Content; frame: number; accent: string };
-type DiagramProps = Props & { diagram: Content["diagrams"][number] };
+type DiagramProps = Omit<Props, "accent"> & {
+  diagram: Content["diagrams"][number];
+};
 
 /** Extracted explanatory artwork travels from the UI without cloning the UI itself. */
-function FloatingDiagram({ content, diagram, frame, accent }: DiagramProps) {
+function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
   const clipId = `overlay-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const translate = useContinuityCopy();
   const appearance = useContinuityAppearance();
+  const tokens = useVideoTokens();
+  const isSketched = tokens.sketch.box.roughness > 0;
   const cue = diagram.overlay;
   if (frame < cue.at || frame >= cue.until) return null;
   const detail = diagram.detail;
@@ -34,16 +34,16 @@ function FloatingDiagram({ content, diagram, frame, accent }: DiagramProps) {
       motionBlur={appearance.motionBlur}
       className={css.floating}
       style={{
-        color: getEditorialInk(appearance.background),
+        color: tokens.color.text,
         filter: "drop-shadow(0 16px 22px #06101455)",
       }}
     >
       <div
         className={css.label}
         style={{
-          background: appearance.background,
-          borderColor: appearance.boxRoughness > 0 ? "transparent" : undefined,
-          borderRadius: appearance.boxRoughness > 0 ? 0 : undefined,
+          background: tokens.color.ground,
+          borderColor: isSketched ? "transparent" : undefined,
+          borderRadius: isSketched ? 0 : undefined,
         }}
       >
         <ContinuityBoxOutline />
@@ -66,22 +66,13 @@ function FloatingDiagram({ content, diagram, frame, accent }: DiagramProps) {
           </defs>
         )}
         <g clipPath={detail ? `url(#${clipId})` : undefined}>
-          <VideoThemeScope
-            patches={[
-              createThemePatchFromLegacyAppearance({
-                boxRoughness: appearance.boxRoughness,
-              }),
-            ]}
-          >
-            <StockGraphic
-              {...diagram.request}
-              frame={sampleStockFrame((frame - cue.at) * 3 + 36)}
-              width={960}
-              height={600}
-              accent={accent}
-              transparent
-            />
-          </VideoThemeScope>
+          <StockGraphic
+            {...diagram.request}
+            frame={sampleStockFrame((frame - cue.at) * 3 + 36)}
+            width={960}
+            height={600}
+            transparent
+          />
         </g>
       </svg>
     </AnchoredOverlay>
@@ -90,7 +81,6 @@ function FloatingDiagram({ content, diagram, frame, accent }: DiagramProps) {
 
 /** Timed spotlight and anchored artwork share the full native product stage. */
 export function ContinuityDiagramLane({ content, frame, accent }: Props) {
-  const appearance = useContinuityAppearance();
   const active = content.diagrams.find(
     (diagram) => frame >= diagram.overlay.at && frame < diagram.overlay.until,
   );
@@ -132,7 +122,6 @@ export function ContinuityDiagramLane({ content, frame, accent }: Props) {
           content={content}
           diagram={diagram}
           frame={frame}
-          accent={appearance.accent}
         />
       ))}
     </>

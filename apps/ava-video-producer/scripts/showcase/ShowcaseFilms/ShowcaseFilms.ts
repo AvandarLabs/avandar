@@ -16,10 +16,12 @@ import {
   storyboardSchema,
   durationInFrames,
 } from "../../../src/storyboard/schema/schema";
+import { createThemePatchFromLegacyAppearance } from "../../../src/videoTheme/themePatches/themePatches";
 import {
   VIDEO_THEME_SLUG_PATTERN,
   videoThemePatchSchema,
 } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
+import { addPatchesToVideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import {
   buildStockContracts,
   type StockContractGeneration,
@@ -30,6 +32,7 @@ import {
 } from "../../stock/StockFingerprintModule/StockFingerprintModule";
 import { loadVideoThemeSnapshot } from "../../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { Film } from "../../../src/showcase/showcase.types";
+import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
 
 /**
  * App location derived from this module, independent of the shell directory.
@@ -153,6 +156,17 @@ function _assertExportable(film: Readonly<Film>): void {
   }
 }
 
+/** The gallery's palette and roughness controls for a continuity film, as theme patches. */
+function _legacyThemePatches(
+  options: z.infer<typeof optionsSchema>,
+): VideoThemePatch[] {
+  const { accent, background, annotationRoughness, boxRoughness } = options;
+  const legacy = { accent, background, annotationRoughness, boxRoughness };
+  return Object.values(legacy).some((value) => value !== undefined)
+    ? [createThemePatchFromLegacyAppearance(legacy)]
+    : [];
+}
+
 /**
  * Read current authored inputs and reject unknown IDs or unsupported options.
  */
@@ -179,7 +193,10 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   )
     throw new Error("Stock input requires an Atlas preset");
   const base = {
-    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
+    theme: addPatchesToVideoThemeSnapshot(
+      await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
+      continuity ? _legacyThemePatches(options) : [],
+    ),
     id,
     fps: 30,
     width: 1600,

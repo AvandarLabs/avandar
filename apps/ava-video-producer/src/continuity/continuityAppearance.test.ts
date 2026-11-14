@@ -8,8 +8,8 @@ import {
 } from "./continuityAppearance";
 import { CONTINUITY_CATALOG } from "./continuityCatalog";
 
-test("appearance copies editorial props without mutating product beats or timing", () => {
-  const plan = storyboardSchema.parse(
+function _readFirstPlan() {
+  return storyboardSchema.parse(
     JSON.parse(
       fs.readFileSync(
         new URL(
@@ -20,22 +20,35 @@ test("appearance copies editorial props without mutating product beats or timing
       ),
     ),
   );
+}
+
+test("appearance copies render options without mutating product beats or timing", () => {
+  const plan = _readFirstPlan();
   const before = structuredClone(plan);
-  const options = { accent: "#123456", cameraMotion: false };
+  const options = { cameraMotion: false };
   const copy = createContinuityPlanFromOptions(plan, options);
   assert.deepEqual(plan, before);
   assert.deepEqual(copy.narration, plan.narration);
   copy.shots.forEach((shot, index) => {
     const original = plan.shots[index];
     if (shot.scene !== "continuity") return assert.equal(shot, original);
-    assert.equal(shot.props.accent, "#123456");
     assert.equal(shot.props.cameraMotion, false);
     if (original.scene === "continuity")
       assert.equal(shot.props.beats, original.props.beats);
   });
-  options.accent = "#abcdef";
+});
+
+test("palette and roughness never reach shot props", () => {
+  const copy = createContinuityPlanFromOptions(_readFirstPlan(), {
+    accent: "#123456",
+    boxRoughness: 3,
+  });
   const shot = copy.shots.find((candidate) => candidate.scene === "continuity");
-  assert.equal(shot?.scene === "continuity" && shot.props.accent, "#123456");
+  assert.equal(shot?.scene === "continuity" && "accent" in shot.props, false);
+  assert.equal(
+    shot?.scene === "continuity" && "boxRoughness" in shot.props,
+    false,
+  );
 });
 test("appearance protocol validates colors and boolean defaults", () => {
   assert.equal(continuityAppearanceSchema.parse({}).cameraMotion, true);
@@ -53,44 +66,17 @@ test("appearance protocol validates colors and boolean defaults", () => {
   );
 });
 
-test("omitted appearance values preserve authored flags and colors", () => {
-  const plan = storyboardSchema.parse(
-    JSON.parse(
-      fs.readFileSync(
-        new URL(
-          `../../storyboards/${CONTINUITY_CATALOG[0].path}.json`,
-          import.meta.url,
-        ),
-        "utf8",
-      ),
-    ),
-  );
-  const authored = createContinuityPlanFromOptions(plan, {
-    accent: "#123456",
-    background: "#abcdef",
+test("omitted appearance values preserve authored flags", () => {
+  const authored = createContinuityPlanFromOptions(_readFirstPlan(), {
     cameraMotion: false,
     motionBlur: false,
     annotations: false,
-    annotationRoughness: 0.5,
-    boxRoughness: 3,
   });
   assert.deepEqual(createContinuityPlanFromOptions(authored, {}), authored);
-  const recolored = createContinuityPlanFromOptions(authored, {
-    accent: "#654321",
-  });
-  const shot = recolored.shots.find(
+  const shot = authored.shots.find(
     (candidate) => candidate.scene === "continuity",
   );
-  assert.equal(
-    shot?.scene === "continuity" && shot.props.background,
-    "#abcdef",
-  );
   assert.equal(shot?.scene === "continuity" && shot.props.annotations, false);
-  assert.equal(
-    shot?.scene === "continuity" && shot.props.annotationRoughness,
-    0.5,
-  );
-  assert.equal(shot?.scene === "continuity" && shot.props.boxRoughness, 3);
   assert.equal(shot?.scene === "continuity" && shot.props.motionBlur, false);
   assert.equal(shot?.scene === "continuity" && shot.props.cameraMotion, false);
 });
