@@ -1735,6 +1735,12 @@ msgstr "Could not load"
 msgid "The source file is empty."
 msgstr "The source file is empty."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "There are too many columns to look for matches at once. Mapping still "
+"works."
+msgstr "There are too many columns to look for matches at once. Mapping still "
+"works."
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
 msgid "Give this entry a name."
@@ -2039,6 +2045,12 @@ msgstr "Search datasets"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Enter email"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombiningProgress/CombiningProgress.tsx
+msgid "{totalCount, plural, one {Read {readLabel} of # dataset} other {Read "
+"{readLabel} of # datasets}}"
+msgstr "{totalCount, plural, one {Read {readLabel} of # dataset} other {Read "
+"{readLabel} of # datasets}}"
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per week"
@@ -4239,7 +4251,7 @@ msgstr "How it is filled"
 msgid "That file is no longer in the download. Choose another one."
 msgstr "That file is no longer in the download. Choose another one."
 
-#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStub.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStubList/LayoutStubList.tsx
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
 msgid "Map each dataset"
 msgstr "Map each dataset"
@@ -5249,6 +5261,10 @@ msgstr "New dictionary"
 msgid "Manual form shows an approximation"
 msgstr "Manual form shows an approximation"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggest matches"
+msgstr "Suggest matches"
+
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "From"
@@ -5555,6 +5571,10 @@ msgstr "Split (+/-)"
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Active"
 msgstr "Active"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "No other matches found."
+msgstr "No other matches found."
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
 msgid "Combining datasets needs edit access to Data Sources. Ask a workspace "
@@ -7720,6 +7740,12 @@ msgstr "CTEs (WITH clauses) are not supported in the form."
 msgid "{areaValue} km²"
 msgstr "{areaValue} km²"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "{foundCount, plural, one {Found # more match. It's marked Suggested.} "
+"other {Found # more matches. They're marked Suggested.}}"
+msgstr "{foundCount, plural, one {Found # more match. It's marked Suggested.} "
+"other {Found # more matches. They're marked Suggested.}}"
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
 msgstr "Start with a spreadsheet"
@@ -8426,6 +8452,12 @@ msgstr "Delete {crosswalkName}? Its mappings are deleted."
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Fix the entry names marked above to go on."
 msgstr "Fix the entry names marked above to go on."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "You chose not to send column names to the AI provider, so suggestions "
+"are off for this crosswalk. Mapping still works."
+msgstr "You chose not to send column names to the AI provider, so suggestions "
+"are off for this crosswalk. Mapping still works."
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
 msgid "Geometry support is unavailable"
@@ -10207,6 +10239,11 @@ msgstr "No basemap"
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Translate codes with"
 msgstr "Translate codes with"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggestions need a connection or the offline model. Mapping still works."
+msgstr "Suggestions need a connection or the offline model. Mapping still "
+"works."
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Categorical: named groups, such as sex or outcome"
@@ -12021,6 +12058,10 @@ msgstr "Loading more datasets"
 msgid "Could not make private"
 msgstr "Could not make private"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing is left to match in this dataset."
+msgstr "Nothing is left to match in this dataset."
+
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
 msgstr "Tutorial"
@@ -12089,6 +12130,10 @@ msgstr "This dataset will no longer be stored online and can only be accessed "
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 msgid "{entryName} · {codeListText} · from {dictionaryName}"
 msgstr "{entryName} · {codeListText} · from {dictionaryName}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing was sent. No matches were suggested."
+msgstr "Nothing was sent. No matches were suggested."
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
 msgid "Highest valid value"
@@ -12845,6 +12890,10 @@ msgstr "Delete the view {0}"
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "This record's fields failed to load"
 msgstr "This record's fields failed to load"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{percentLabel}% of the datasets read"
+msgstr "{percentLabel}% of the datasets read"
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx

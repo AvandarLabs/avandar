@@ -1679,6 +1679,11 @@ msgstr "無法載入"
 msgid "The source file is empty."
 msgstr "來源檔案是空的。"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "There are too many columns to look for matches at once. Mapping still "
+"works."
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
 msgid "Give this entry a name."
@@ -1974,6 +1979,11 @@ msgstr "搜尋資料集"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "輸入電子郵件"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombiningProgress/CombiningProgress.tsx
+msgid "{totalCount, plural, one {Read {readLabel} of # dataset} other {Read "
+"{readLabel} of # datasets}}"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per week"
@@ -4111,7 +4121,7 @@ msgstr ""
 msgid "That file is no longer in the download. Choose another one."
 msgstr "該檔案已不在下載內容中。請選擇其他檔案。"
 
-#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStub.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStubList/LayoutStubList.tsx
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
 msgid "Map each dataset"
 msgstr ""
@@ -5085,6 +5095,10 @@ msgstr ""
 msgid "Manual form shows an approximation"
 msgstr "手動表單顯示近似值"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggest matches"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "From"
@@ -5383,6 +5397,10 @@ msgstr "分割（+/-）"
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Active"
 msgstr "使用中"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "No other matches found."
+msgstr ""
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
 msgid "Combining datasets needs edit access to Data Sources. Ask a workspace "
@@ -7484,6 +7502,11 @@ msgstr "表單不支援 CTE（WITH 子句）。"
 msgid "{areaValue} km²"
 msgstr "{areaValue} km²"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "{foundCount, plural, one {Found # more match. It's marked Suggested.} "
+"other {Found # more matches. They're marked Suggested.}}"
+msgstr ""
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
 msgstr "從試算表開始"
@@ -8170,6 +8193,11 @@ msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Fix the entry names marked above to go on."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "You chose not to send column names to the AI provider, so suggestions "
+"are off for this crosswalk. Mapping still works."
 msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
@@ -9907,6 +9935,10 @@ msgstr "無底圖"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Translate codes with"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggestions need a connection or the offline model. Mapping still works."
 msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
@@ -11664,6 +11696,10 @@ msgstr "正在載入更多資料集"
 msgid "Could not make private"
 msgstr "無法設為私人"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing is left to match in this dataset."
+msgstr ""
+
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
 msgstr "教學"
@@ -11725,6 +11761,10 @@ msgstr "此數據集將不再在線存儲，僅能在您的個人電腦上訪問
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 msgid "{entryName} · {codeListText} · from {dictionaryName}"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing was sent. No matches were suggested."
 msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
@@ -12462,6 +12502,10 @@ msgstr "刪除檢視 {0}"
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "This record's fields failed to load"
 msgstr "此記錄的欄位載入失敗"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{percentLabel}% of the datasets read"
+msgstr ""
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx

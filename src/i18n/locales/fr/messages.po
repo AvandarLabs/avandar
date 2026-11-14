@@ -1748,6 +1748,11 @@ msgstr "Impossible de charger"
 msgid "The source file is empty."
 msgstr "Le fichier source est vide."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "There are too many columns to look for matches at once. Mapping still "
+"works."
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewEntryNameInput.tsx
 msgid "Give this entry a name."
@@ -2060,6 +2065,11 @@ msgstr "Rechercher des jeux de données"
 #: src/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema.ts
 msgid "Enter email"
 msgstr "Entrez l'email"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombiningProgress/CombiningProgress.tsx
+msgid "{totalCount, plural, one {Read {readLabel} of # dataset} other {Read "
+"{readLabel} of # datasets}}"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per week"
@@ -4286,7 +4296,7 @@ msgid "That file is no longer in the download. Choose another one."
 msgstr "Ce fichier ne se trouve plus dans le téléchargement. Choisissez-en un "
 "autre."
 
-#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStub.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStubList/LayoutStubList.tsx
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
 msgid "Map each dataset"
 msgstr ""
@@ -5299,6 +5309,10 @@ msgstr ""
 msgid "Manual form shows an approximation"
 msgstr "Le formulaire manuel montre une approximation"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggest matches"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "From"
@@ -5607,6 +5621,10 @@ msgstr "Séparation (+/-)"
 #: src/views/OntologyDesignerApp/makeDefaultStatusDrafts/makeDefaultStatusDrafts.ts
 msgid "Active"
 msgstr "Actif"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "No other matches found."
+msgstr ""
 
 #: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
 msgid "Combining datasets needs edit access to Data Sources. Ask a workspace "
@@ -7781,6 +7799,11 @@ msgstr "Les CTE (clauses WITH) ne sont pas pris en charge dans le formulaire."
 msgid "{areaValue} km²"
 msgstr "{areaValue} km²"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "{foundCount, plural, one {Found # more match. It's marked Suggested.} "
+"other {Found # more matches. They're marked Suggested.}}"
+msgstr ""
+
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Start with a spreadsheet"
 msgstr "Commencer avec une feuille de calcul"
@@ -8491,6 +8514,11 @@ msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 msgid "Fix the entry names marked above to go on."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "You chose not to send column names to the AI provider, so suggestions "
+"are off for this crosswalk. Mapping still works."
 msgstr ""
 
 #: src/views/GisApp/panels/MapStatusCard/MapStatusContent.tsx
@@ -10281,6 +10309,10 @@ msgstr "Aucun fond de carte"
 
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
 msgid "Translate codes with"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Suggestions need a connection or the offline model. Mapping still works."
 msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
@@ -12109,6 +12141,10 @@ msgstr "Chargement d’autres jeux de données"
 msgid "Could not make private"
 msgstr "Impossible de rendre privé"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing is left to match in this dataset."
+msgstr ""
+
 #: src/views/ProfileView/TutorialSection/TutorialSection.tsx
 msgid "Tutorial"
 msgstr "Tutoriel"
@@ -12175,6 +12211,10 @@ msgstr "Cet ensemble de données ne sera plus stocké en ligne et ne pourra êtr
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingSelectTable.tsx
 msgid "{entryName} · {codeListText} · from {dictionaryName}"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx
+msgid "Nothing was sent. No matches were suggested."
 msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryNumberFields.tsx
@@ -12936,6 +12976,10 @@ msgstr "Supprimer la vue {0}"
 #: src/views/IndividualManagerApp/SingleIndividualView/DetailsStatus/DetailsStatus.tsx
 msgid "This record's fields failed to load"
 msgstr "Les champs de cet enregistrement n'ont pas pu être chargés"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{percentLabel}% of the datasets read"
+msgstr ""
 
 #. placeholder {0}: cluster.pointCount
 #: src/views/GisApp/panels/FeatureInspector/FeatureInspector.tsx
