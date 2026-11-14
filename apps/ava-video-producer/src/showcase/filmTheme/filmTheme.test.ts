@@ -14,6 +14,7 @@ import {
 import {
   createFilmThemeAcknowledgement,
   createFilmTokensUsedMessage,
+  createUnsupportedFilmThemeError,
   isFilmThemeAcknowledgement,
   isFilmTokensUsedMessage,
   parseFilmControlMessage,
@@ -282,4 +283,24 @@ test("malformed control messages are ignored", () => {
   for (const message of rejected) {
     assert.equal(parseFilmControlMessage(message, ITEM_ID), undefined);
   }
+});
+
+test("a film that cannot take a theme refuses it with a fixed code", () => {
+  const message = createUnsupportedFilmThemeError(ITEM_ID);
+  assert.deepEqual(message, {
+    type: "film-theme-error",
+    id: ITEM_ID,
+    issues: [{ path: "", message: "film-unsupported" }],
+  });
+  assert.equal(isFilmThemeAcknowledgement(message, ITEM_ID), true);
+});
+
+test("a usage message drops overlong paths and keeps within the path cap", () => {
+  const longPath = "x".repeat(257);
+  const paths = [longPath, ...Array.from({ length: 5000 }, (_, i) => `p${i}`)];
+  const message = createFilmTokensUsedMessage(ITEM_ID, paths);
+  assert.equal(message.paths.length, 4096);
+  assert.equal(message.paths.includes(longPath), false);
+  assert.equal(message.paths[0], "p0");
+  assert.equal(isFilmTokensUsedMessage(message, ITEM_ID), true);
 });

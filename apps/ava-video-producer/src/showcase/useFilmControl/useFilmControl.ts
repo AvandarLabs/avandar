@@ -6,6 +6,7 @@ import {
 import {
   createFilmThemeAcknowledgement,
   createFilmTokensUsedMessage,
+  createUnsupportedFilmThemeError,
   parseFilmControlMessage,
   type FilmControl,
 } from "../filmTheme/filmTheme";
@@ -84,6 +85,57 @@ function _handlePlayback(
   }
 }
 
+function _applyTheme(value: unknown, options: FilmControlOptions): void {
+  if (!options.isContinuity) {
+    options.send(createUnsupportedFilmThemeError(options.id));
+    return;
+  }
+  const { snapshot, message } = createFilmThemeAcknowledgement(
+    options.id,
+    value,
+  );
+  if (snapshot) {
+    options.onTheme(snapshot);
+  }
+  options.send(message);
+}
+
+function _haveSamePaths(
+  left: readonly string[],
+  right: readonly string[],
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every((path, index) => path === right[index])
+  );
+}
+
+/**
+ * Posts the film's token usage within the gallery's limits, only when the
+ * bounded list differs from the last one sent.
+ */
+function useUsedTokensReport(
+  id: string,
+  usedTokens: readonly string[],
+  send: (message: object) => void,
+): void {
+  const lastSentPaths = useRef<readonly string[]>([]);
+  useEffect(
+    function reportUsedTokens() {
+      const message = createFilmTokensUsedMessage(id, usedTokens);
+      if (
+        message.paths.length === 0 ||
+        _haveSamePaths(message.paths, lastSentPaths.current)
+      ) {
+        return;
+      }
+      lastSentPaths.current = message.paths;
+      send(message);
+    },
+    [usedTokens, id, send],
+  );
+}
+
 function _handleSettings(
   { action, value }: FilmControl,
   options: FilmControlOptions,
@@ -94,15 +146,8 @@ function _handleSettings(
       options.onAppearance(result.data);
     }
   }
-  if (action === "theme" && options.isContinuity) {
-    const { snapshot, message } = createFilmThemeAcknowledgement(
-      options.id,
-      value,
-    );
-    if (snapshot) {
-      options.onTheme(snapshot);
-    }
-    options.send(message);
+  if (action === "theme") {
+    _applyTheme(value, options);
   }
   if (action === "options") {
     _sendOptions(options);
@@ -141,12 +186,5 @@ export function useFilmControl(options: FilmControlOptions): void {
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
   }, []);
-  useEffect(
-    function reportUsedTokens() {
-      if (usedTokens.length > 0) {
-        send(createFilmTokensUsedMessage(id, usedTokens));
-      }
-    },
-    [usedTokens, id, send],
-  );
+  useUsedTokensReport(id, usedTokens, send);
 }

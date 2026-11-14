@@ -214,20 +214,20 @@ function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
 }
 
 /**
- * The embedded live preview: plays a film, follows the gallery's transport,
- * appearance, and theme messages, and reports the tokens its film reads.
+ * The plan the live film plays and its length. The plan stays unthemed, but
+ * its frames are counted with the theme applied, because the theme's camera
+ * preset can lengthen beats.
  */
-function LivePlayer({ film }: { film: Film }) {
-  const player = useRef<PlayerRef>(null);
-  const continuity = _findContinuityShot(film);
-  const state = useLiveFilmState(film, continuity);
-  const { appearance, theme, captions, speed, loop } = state;
-  const usage = useObservedTokenUsage();
+function usePreviewTiming(
+  film: Film,
+  appearance: ContinuityAppearance,
+  theme: VideoThemeSnapshot | undefined,
+  isContinuity: boolean,
+) {
   const previewPlan = useMemo(
-    () => _createPreviewPlan(film, appearance, Boolean(continuity)),
-    [film, appearance, continuity],
+    () => _createPreviewPlan(film, appearance, isContinuity),
+    [film, appearance, isContinuity],
   );
-  // Count frames with the theme applied: its camera preset can lengthen beats.
   const previewFrames = useMemo(
     () =>
       previewPlan
@@ -239,17 +239,48 @@ function LivePlayer({ film }: { film: Film }) {
         : film.frames,
     [previewPlan, theme, film.id, film.frames],
   );
-  useSavedPlayback(player, { captions, speed, loop });
+  return { previewPlan, previewFrames };
+}
+
+type CaptionToggleProps = Readonly<{
+  captions: boolean;
+  onChange: (captions: boolean) => void;
+}>;
+
+function CaptionToggle({ captions, onChange }: CaptionToggleProps) {
+  return (
+    <label className="captionToggle">
+      <input
+        type="checkbox"
+        checked={captions}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <Trans>Captions</Trans>
+    </label>
+  );
+}
+
+type LiveFilmControlOptions = Readonly<{
+  player: RefObject<PlayerRef | null>;
+  isContinuity: boolean;
+  state: ReturnType<typeof useLiveFilmState>;
+  previewFrames: number;
+  usedTokens: readonly string[];
+}>;
+
+/** Lets the embedding gallery drive this film's state through messages. */
+function useLiveFilmControl(options: LiveFilmControlOptions) {
+  const { state } = options;
   useFilmControl({
     id,
-    player,
-    isContinuity: Boolean(continuity),
-    appearance,
-    captions,
-    speed,
-    loop,
-    previewFrames,
-    usedTokens: usage.paths,
+    player: options.player,
+    isContinuity: options.isContinuity,
+    appearance: state.appearance,
+    captions: state.captions,
+    speed: state.speed,
+    loop: state.loop,
+    previewFrames: options.previewFrames,
+    usedTokens: options.usedTokens,
     send: _send,
     onAppearance: (nextAppearance) => {
       state.setAppearance(nextAppearance);
@@ -258,6 +289,32 @@ function LivePlayer({ film }: { film: Film }) {
     onTheme: state.setTheme,
     onSpeed: state.setSpeed,
     onLoop: state.setLoop,
+  });
+}
+
+/**
+ * The embedded live preview: plays a film, follows the gallery's transport,
+ * appearance, and theme messages, and reports the tokens its film reads.
+ */
+function LivePlayer({ film }: { film: Film }) {
+  const player = useRef<PlayerRef>(null);
+  const continuity = _findContinuityShot(film);
+  const state = useLiveFilmState(film, continuity);
+  const { appearance, theme, captions, speed, loop } = state;
+  const usage = useObservedTokenUsage();
+  const { previewPlan, previewFrames } = usePreviewTiming(
+    film,
+    appearance,
+    theme,
+    Boolean(continuity),
+  );
+  useSavedPlayback(player, { captions, speed, loop });
+  useLiveFilmControl({
+    player,
+    isContinuity: Boolean(continuity),
+    state,
+    previewFrames,
+    usedTokens: usage.paths,
   });
   return (
     <I18nProvider i18n={i18n}>
@@ -273,14 +330,7 @@ function LivePlayer({ film }: { film: Film }) {
           />
         </VideoTokenUsageContext.Provider>
         {film.plan?.captions && !continuity ? (
-          <label className="captionToggle">
-            <input
-              type="checkbox"
-              checked={captions}
-              onChange={(event) => state.setCaptions(event.target.checked)}
-            />
-            <Trans>Captions</Trans>
-          </label>
+          <CaptionToggle captions={captions} onChange={state.setCaptions} />
         ) : null}
       </div>
     </I18nProvider>

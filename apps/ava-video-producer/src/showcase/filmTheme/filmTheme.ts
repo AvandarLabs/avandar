@@ -29,6 +29,7 @@ const FILM_SCOPED_ACTIONS: ReadonlySet<string> = new Set([
 const PAYLOAD_TOO_LARGE = "payload-too-large";
 const PAYLOAD_UNREADABLE = "payload-unreadable";
 const THEME_UNRESOLVABLE = "theme-unresolvable";
+const FILM_UNSUPPORTED = "film-unsupported";
 
 const snapshotSchema = z.strictObject({
   themeId: z.string().regex(VIDEO_THEME_SLUG_PATTERN),
@@ -179,12 +180,33 @@ export function createFilmThemeAcknowledgement(
   }
 }
 
-/** The usage message the live player posts as its film reads tokens. */
+/**
+ * The refusal the live player posts when its film has no themed composition
+ * to apply a theme to, so the gallery stops waiting for a hash.
+ */
+export function createUnsupportedFilmThemeError(
+  id: string,
+): FilmThemeAcknowledgement {
+  return {
+    type: "film-theme-error",
+    id,
+    issues: [{ path: "", message: FILM_UNSUPPORTED }],
+  };
+}
+
+/**
+ * The usage message the live player posts as its film reads tokens. It
+ * keeps within the limits the gallery checks: overlong paths are dropped and
+ * the list stops at the path cap, so one bad path never voids the report.
+ */
 export function createFilmTokensUsedMessage(
   id: string,
   paths: readonly string[],
 ): FilmTokensUsedMessage {
-  return { type: "film-tokens-used", id, paths: [...paths] };
+  const boundedPaths = paths
+    .filter((path) => path.length <= MAX_TOKEN_PATH_LENGTH)
+    .slice(0, MAX_TOKEN_PATHS);
+  return { type: "film-tokens-used", id, paths: boundedPaths };
 }
 
 /** Whether a posted message is a theme acknowledgement for this film. */
