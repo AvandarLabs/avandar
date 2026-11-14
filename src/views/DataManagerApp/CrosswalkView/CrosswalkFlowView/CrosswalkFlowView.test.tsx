@@ -74,6 +74,16 @@ vi.mock(
     };
   },
 );
+vi.mock(
+  "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep",
+  () => {
+    return {
+      MapLayoutsStep: () => {
+        return <div data-crosswalk-step="map" />;
+      },
+    };
+  },
+);
 
 describe("CrosswalkFlowView", () => {
   beforeEach(() => {

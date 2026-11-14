@@ -1,4 +1,5 @@
 import { ChooseDatasetsStep } from "@/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep";
+import { MapLayoutsStep } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep";
 import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { CrosswalkCatalog } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkCatalog/useCrosswalkCatalog";
 import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkFlow/useCrosswalkFlow";
@@ -20,7 +21,7 @@ export function CrosswalkStepBody(
     case "datasets":
       return <ChooseDatasetsStep {...props} />;
     case "map":
-      return <div data-crosswalk-step="map" />;
+      return <MapLayoutsStep {...props} />;
     case "combine":
       return <div data-crosswalk-step="combine" />;
   }
