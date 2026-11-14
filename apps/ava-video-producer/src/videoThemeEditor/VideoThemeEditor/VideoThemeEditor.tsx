@@ -116,24 +116,23 @@ function useEditorRows(props: Props) {
 type TierSwitchProps = Readonly<{
   filters: EditorFilters;
   onFiltersChange: (filters: EditorFilters) => void;
-  hasItem: boolean;
 }>;
 
-function TierSwitch({ filters, onFiltersChange, hasItem }: TierSwitchProps) {
+function TierSwitch({ filters, onFiltersChange }: TierSwitchProps) {
   const { t } = useLingui();
   return (
     <SegmentedControl
       size="xs"
       fullWidth
-      aria-label={t`Token layer`}
+      aria-label={t`Kind of setting`}
       value={filters.tier}
       data={[
         {
           value: "component",
-          label: hasItem ? t`Components for this item` : t`Components`,
+          label: t`Parts`,
         },
-        { value: "semantic", label: t`Semantic` },
-        { value: "atomic", label: t`Atomic` },
+        { value: "semantic", label: t`Styles` },
+        { value: "atomic", label: t`Base values` },
       ]}
       onChange={(tier) =>
         onFiltersChange({ ...filters, tier: tier as EditorTier })
@@ -179,11 +178,7 @@ export function VideoThemeEditor(props: Props) {
           />
         </div>
         {filters.query ? null : <EssentialsGroup rows={rows} />}
-        <TierSwitch
-          filters={filters}
-          onFiltersChange={setFilters}
-          hasItem={props.item !== undefined}
-        />
+        <TierSwitch filters={filters} onFiltersChange={setFilters} />
         <TokenSections
           rows={visibleRows}
           allRows={rows}

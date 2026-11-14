@@ -4,9 +4,11 @@ import { useCallback, useMemo, useState } from "react";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import { isTokenReference } from "../../videoTheme/themeReferences/themeReferences";
 import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
+import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
 import { getCustomScaleFromReference } from "../customTokenValue/customTokenValue";
 import { formatTokenValue } from "../formatTokenValue/formatTokenValue";
 import {
+  getReferenceOptionRole,
   isCameraCurveToken,
   listReferenceOptions,
   orderReferenceOptions,
@@ -51,13 +53,20 @@ function useOptionLabel(): (option: ReferenceOption) => string {
   return useCallback(
     (option: ReferenceOption) => {
       const value = formatTokenValue(option.kind, option.value);
-      if (option.path === "primary") {
-        return t`Primary color, ${value}`;
+      const role = getReferenceOptionRole(option);
+      if (role === "primary") {
+        return t`Primary colour, ${value}`;
+      }
+      if (role === "custom") {
+        return option.kind === "color"
+          ? t`Custom colour · ${value}`
+          : t`Custom value · ${value}`;
       }
       const name = option.definition
         ? copy(option.definition.label)
         : option.path;
-      const key = option.key;
+      const key =
+        option.key === undefined ? undefined : humanizeScaleKey(option.key);
       return key === undefined
         ? t`${name} · ${value}`
         : t`${name} ${key} · ${value}`;
@@ -228,7 +237,7 @@ export function ReferenceControl(props: ReferenceControlProps) {
         }))}
         value={isTokenReference(props.value) ? props.value : null}
         placeholder={props.value === undefined ? t`Not set` : t`Custom value`}
-        nothingFoundMessage={t`No matching tokens`}
+        nothingFoundMessage={t`No matching settings`}
         onChange={(next) => next && props.onChange(next)}
         renderOption={({ option }) => (
           <_OptionRow label={option.label} chip={chips.get(option.value)} />

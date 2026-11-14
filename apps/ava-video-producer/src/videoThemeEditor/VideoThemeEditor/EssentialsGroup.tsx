@@ -16,7 +16,7 @@ export function EssentialsGroup({
   return (
     <section className={css.essentials} aria-labelledby={titleId}>
       <h3 id={titleId} className={css.sectionTitle}>
-        {t`Essentials`}
+        {t`Look and feel`}
       </h3>
       {getEssentialRows(rows).map((row) => (
         <TokenRow key={row.path} row={row} />

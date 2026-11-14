@@ -1,5 +1,6 @@
 import { isCameraSafeEasing } from "../../videoTheme/cameraEasing/cameraEasing";
 import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalog";
+import { isCustomScaleKey } from "../customScaleKey/customScaleKey";
 import type {
   EasingValue,
   ResolvedVideoTheme,
@@ -20,6 +21,19 @@ export type ReferenceOption = Readonly<{
   key?: string;
   value: unknown;
 }>;
+
+/**
+ * What an option is, for naming it: Mantine's primary colour, a value the
+ * producer typed in (a generated custom scale entry), or a named entry.
+ */
+export function getReferenceOptionRole(
+  option: ReferenceOption,
+): "primary" | "custom" | "named" {
+  if (option.path === "primary") {
+    return "primary";
+  }
+  return isCustomScaleKey(option.key) ? "custom" : "named";
+}
 
 function _effectiveKind(path: string, kind: TokenKind): TokenKind {
   if (kind === "cssLength") {

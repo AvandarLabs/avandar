@@ -37,8 +37,8 @@ function useStatusText(): (message: ThemeBarMessage) => string {
     saving: t`Saving…`,
     saved: t`Theme saved.`,
     copied: t`Theme JSON copied.`,
-    fixIssuesFirst: t`Fix the marked tokens before saving.`,
-    invalidTheme: t`The theme has problems. Fix the marked tokens and save again.`,
+    fixIssuesFirst: t`Fix the marked settings before saving.`,
+    invalidTheme: t`The theme has problems. Fix the marked settings and save again.`,
     readOnlyTheme: t`Built-in themes are read-only. Save a copy as a new theme.`,
     changedOnDisk: t`This theme changed on disk. Reload the theme, then save again.`,
     changedOnDiskUseBanner: t`This theme changed on disk. Keep, discard, or reload in the notice below, then save again.`,
@@ -193,7 +193,7 @@ export function ThemeBar(props: Props) {
       <ThemePicker {...props} />
       {props.isBuiltIn ? (
         <p className={css.notice}>
-          {t`Changes to a built-in theme are saved as a new theme. New themes use theme colors in every composition.`}
+          {t`Changes to a built-in theme are saved as a new theme. The new theme leaves out this theme's settings for single compositions, so each composition uses the theme's own colours.`}
         </p>
       ) : null}
       <ThemeActions

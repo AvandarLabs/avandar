@@ -105,7 +105,7 @@ export function TokenSections({
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
-    return <p className={css.empty}>{t`No tokens match.`}</p>;
+    return <p className={css.empty}>{t`No settings match.`}</p>;
   }
   return (
     <Accordion

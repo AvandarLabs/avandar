@@ -12,6 +12,7 @@ import {
   CLASSIC_VIDEO_THEME_SNAPSHOT,
   resolveVideoThemeFromSnapshot,
 } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { setCustomValueInDraft } from "../customTokenValue/customTokenValue";
 import {
   buildThemeIdFromLabel,
   countItemOverrides,
@@ -380,6 +381,26 @@ test("a built-in theme's draft counts no saved item overrides", () => {
       itemId: "network-graph",
     }),
     0,
+  );
+});
+
+test("one custom value counts as one override, not a token plus its generated swatch", () => {
+  const draft = setCustomValueInDraft(EMPTY_THEME_DRAFT, ITEM, {
+    tokenPath: "color.accent",
+    fieldPath: [],
+    currentValue: "$primary",
+    currentReference: "$primary",
+    kind: "color",
+    literal: "#00ff00",
+  });
+  assert.equal(
+    countItemOverrides({
+      library: LIBRARY,
+      themeId: "studio",
+      draft,
+      itemId: "network-graph",
+    }),
+    1,
   );
 });
 

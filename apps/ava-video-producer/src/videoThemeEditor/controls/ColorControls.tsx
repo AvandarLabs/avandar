@@ -91,8 +91,8 @@ export function ShadeValueControl({
   );
   return (
     <Group gap="xs" role="group" aria-label={label}>
-      {field("dark", t`On dark grounds`)}
-      {field("light", t`On light grounds`)}
+      {field("dark", t`On dark backgrounds`)}
+      {field("light", t`On light backgrounds`)}
     </Group>
   );
 }

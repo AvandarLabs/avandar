@@ -35,7 +35,7 @@ async function _setEssentialAccent(
   color: string,
 ): Promise<void> {
   const accent = dialog
-    .getByRole("region", { name: "Essentials" })
+    .getByRole("region", { name: "Look and feel" })
     .locator('[data-token-path="color.accent"]');
   await accent.getByRole("button", { name: "Custom value for Accent" }).click();
   const input = accent.getByRole("textbox", { name: "Custom Accent" });
@@ -47,7 +47,7 @@ function _strokesIn(scope: Locator, color: string): Locator {
   return scope.locator(`svg [stroke="${color}"]`);
 }
 
-test("changing the accent in Essentials updates a motion thumbnail and the modal player", async ({
+test("changing the accent in Look and feel updates a motion thumbnail and the modal player", async ({
   page,
 }) => {
   const dialog = await _openFirstMotionTokens(page);

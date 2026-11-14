@@ -14,6 +14,7 @@ import {
   createVideoThemeSnapshot,
   type VideoThemeSnapshot,
 } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { isCustomScaleEntryPath } from "../customScaleKey/customScaleKey";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,
@@ -249,7 +250,9 @@ function _draftTarget(target: DraftTarget): DraftThemeTarget {
 }
 
 /**
- * How many tokens an item overrides, saved or drafted. On a built-in theme
+ * How many tokens an item overrides, saved or drafted, one per token the
+ * producer changed. A custom value's generated scale entry is not counted
+ * apart from the token that points at it. On a built-in theme
  * with a draft the saved overrides do not count: the new theme saving would
  * create does not inherit them.
  */
@@ -261,10 +264,12 @@ export function countItemOverrides(
     _getDocument(themeTarget.library, themeTarget.themeId).overrides?.[
       target.itemId
     ] ?? {};
-  return new Set([
-    ...listTokenPathsFromPatch(saved),
-    ...listTokenPathsFromPatch(target.draft.overrides[target.itemId] ?? {}),
-  ]).size;
+  return new Set(
+    [
+      ...listTokenPathsFromPatch(saved),
+      ...listTokenPathsFromPatch(target.draft.overrides[target.itemId] ?? {}),
+    ].filter((tokenPath) => !isCustomScaleEntryPath(tokenPath)),
+  ).size;
 }
 
 function _applyPatch(

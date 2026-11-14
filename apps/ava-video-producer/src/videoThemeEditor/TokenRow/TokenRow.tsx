@@ -3,6 +3,7 @@ import { ActionIcon } from "@mantine/core";
 import { IconAlertCircle, IconArrowBackUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { useCallback } from "react";
+import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
 import { formatTokenValue } from "../formatTokenValue/formatTokenValue";
 import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
 import { TokenControl } from "../TokenControl/TokenControl";
@@ -22,7 +23,7 @@ export function useTokenRowLabel(): (row: TokenRowModel) => string {
     (row: TokenRowModel) =>
       row.scaleKey === undefined
         ? copy(row.definition.label)
-        : `${copy(row.definition.label)} · ${row.scaleKey}`,
+        : `${copy(row.definition.label)} · ${humanizeScaleKey(row.scaleKey)}`,
     [copy],
   );
 }
@@ -39,9 +40,7 @@ function OverrideDot({
       className={clsx(css.dot, state === "saved" && css.dotSaved)}
       role="img"
       aria-label={
-        state === "draft"
-          ? t`Edited, not saved`
-          : t`Saved override for this item`
+        state === "draft" ? t`Edited, not saved` : t`Saved for this item only`
       }
     />
   );
@@ -61,7 +60,7 @@ function TokenRowHeader({ row, label, isInherited }: HeaderProps) {
       <span className={css.label}>{label}</span>
       <OverrideDot state={row.overrideState} />
       {isInherited ? (
-        <span className={css.inheritedTag}>{t`Inherited`}</span>
+        <span className={css.inheritedTag}>{t`Same as the theme`}</span>
       ) : null}
       <span className={css.value}>
         {formatTokenValue(row.definition.kind, row.resolved)}
@@ -97,7 +96,7 @@ function TokenRowIssue({ issue }: Readonly<{ issue: VideoThemeIssue }>) {
 /**
  * One token: its name and state, its control, its path and description, and
  * any problem. An inherited item-scope value shows muted text and an
- * "Inherited" tag, and its chips and previews dim. A problem puts the
+ * "Same as the theme" tag, and its chips and previews dim. A problem puts the
  * control's inputs in Mantine's error state and adds an alert line.
  */
 export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {

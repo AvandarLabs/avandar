@@ -66,12 +66,12 @@ export function ColorRoleControl({ row, label }: RoleProps) {
     <div className={css.stack}>
       <Switch
         size="xs"
-        label={t`Different on light grounds`}
+        label={t`Use another colour on light backgrounds`}
         error={hasIssue}
         {...issueAriaProps}
         checked={pair !== undefined}
         disabled={!canPair}
-        description={canPair ? undefined : t`Pick a color first.`}
+        description={canPair ? undefined : t`Pick a colour first.`}
         onChange={(event) =>
           editor.setToken(
             row.path,

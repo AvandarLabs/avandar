@@ -51,7 +51,7 @@ A colour may be `{ "onDark": "$...", "onLight": "$..." }`. The ground is dark wh
 Start the showcase with `pnpm showcase` and open `http://localhost:4173/motion.html`.
 
 1. Open a motion or composition, then the **Design tokens** tab.
-2. Edit **Essentials** first. Its rows, in order, are **Accent**, **Ground**, **Text**, **Font face · figtree** (the face the stage text uses), **Default stroke**, **Panel corner**, **Tempo**, and **Box sketch**. The player updates as you edit, and so do motion thumbnails.
+2. Edit **Look and feel** first. Its rows, in order, are **Accent**, **Ground**, **Text**, **Font face · figtree** (the face the stage text uses), **Default stroke**, **Panel corner**, **Tempo**, and **Box sketch**. The player updates as you edit, and so do motion thumbnails.
 3. Switch the scope from **All items (theme)** to **This motion only** or **This composition only** for art direction that belongs to one item. A dot marks an edited token: it is filled differently for a saved item override. An unsaved edit also gets a reset arrow on its row.
 4. Drafts are kept in your browser (local storage) across reloads. **Save as new theme** asks for a name and writes `themes/<id>.theme.json`, with the id made from the name. **Save** updates a custom theme in place and is not offered for built-in themes, which are read-only. **Discard** drops the draft.
 

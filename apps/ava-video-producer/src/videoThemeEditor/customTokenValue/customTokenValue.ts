@@ -2,6 +2,7 @@ import {
   getTargetFromTokenReference,
   isTokenReference,
 } from "../../videoTheme/themeReferences/themeReferences";
+import { CUSTOM_SCALE_KEY_PREFIX } from "../customScaleKey/customScaleKey";
 import {
   setTokenInDraft,
   setValueAtPath,
@@ -78,7 +79,7 @@ export function buildCustomScaleKeyFromPath(path: readonly string[]): string {
   const words = path
     .flatMap((segment) => segment.split(/[^A-Za-z0-9]+/))
     .filter(Boolean);
-  return `custom${words.map((word) => word[0].toUpperCase() + word.slice(1)).join("")}`.slice(
+  return `${CUSTOM_SCALE_KEY_PREFIX}${words.map((word) => word[0].toUpperCase() + word.slice(1)).join("")}`.slice(
     0,
     32,
   );

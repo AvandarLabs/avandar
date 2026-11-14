@@ -22,8 +22,12 @@ is built-in, a one-line muted notice under the theme picker says that its
 changes are saved as a new theme.
 
 Top to bottom: theme bar (picker and save actions), the built-in notice or the
-changed-on-disk banner, a toolbar (scope switch, search, filters), Essentials,
-tier tabs, then category accordions holding one row per token.
+changed-on-disk banner, a toolbar (scope switch, search, filters), Look and
+feel (the first group of rows), the layer tabs (Parts, Styles, Base values),
+then category accordions holding one row per token. The layer tabs are the
+component, semantic, and atomic tiers: copy never uses those three words, nor
+"token", "override", or "item", where a producer's own noun fits. The editor
+spells colour the British way throughout, matching the token catalog.
 
 ## Density and rhythm
 
@@ -44,8 +48,8 @@ Video theme colours appear only inside chips, swatches, and specimens.
 
 ## States
 
-Inherited values in item scope render their text in `--muted` at full opacity
-with an "Inherited" label until edited. Only non-text parts (chips, swatches,
+Same-as-theme values in item scope render their text in `--muted` at full opacity
+with a "Same as the theme" label until edited. Only non-text parts (chips, swatches,
 specimens) drop to 60% opacity. Opacity on text is not used: `--muted` at 60%
 falls to about 2.5:1 on `--paper` and `--ink` to about 4:1, both under the
 4.5:1 floor in `PRODUCT.md`.
@@ -63,6 +67,6 @@ line.
 Every control has a label naming its token, shows its value as text, and is
 keyboard operable. Status changes are announced through a polite live region.
 Focus rings use `--ava-primary-7` at 2 px, matching the gallery's existing
-focus style. Edited, overridden, inherited, and issue states each carry text or
+focus style. Edited, overridden, same-as-theme, and issue states each carry text or
 an icon as well as colour, so colour is never the only signal. Layouts use
 logical properties so they survive right-to-left mirroring.

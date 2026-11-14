@@ -5,6 +5,7 @@ import { resolveDraftTheme } from "../resolveDraftTheme/resolveDraftTheme";
 import { EMPTY_THEME_DRAFT } from "../themeDraft/themeDraft";
 import { listTokenRows } from "../tokenRows/tokenRows";
 import {
+  getReferenceOptionRole,
   isCameraCurveToken,
   listReferenceOptions,
   orderReferenceOptions,
@@ -95,4 +96,34 @@ test("camera curves are the named camera curves and each camera preset's curve",
   assert.equal(isCameraCurveToken("camera.presets.whip", ["easing"]), true);
   assert.equal(isCameraCurveToken("camera.presets.whip", ["speed"]), false);
   assert.equal(isCameraCurveToken("atomic.easing.outBack"), false);
+});
+
+test("an option's role says whether it is the primary colour, a custom value, or a named entry", () => {
+  const base = { kind: "color", value: "#00ff00" } as const;
+  assert.equal(
+    getReferenceOptionRole({
+      ...base,
+      reference: "$primary",
+      path: "primary",
+    }),
+    "primary",
+  );
+  assert.equal(
+    getReferenceOptionRole({
+      ...base,
+      reference: "$atomic.swatch.customColorAccent",
+      path: "atomic.swatch.customColorAccent",
+      key: "customColorAccent",
+    }),
+    "custom",
+  );
+  assert.equal(
+    getReferenceOptionRole({
+      ...base,
+      reference: "$atomic.swatch.mint",
+      path: "atomic.swatch.mint",
+      key: "mint",
+    }),
+    "named",
+  );
 });

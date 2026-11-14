@@ -16,7 +16,7 @@ export function useGroupCopy(): (group: string) => string | undefined {
   const { t } = useLingui();
   return useMemo(() => {
     const names: Readonly<Record<string, string>> = {
-      "semantic:color": t`Color`,
+      "semantic:color": t`Colour`,
       "semantic:text": t`Type`,
       "semantic:stroke": t`Strokes`,
       "semantic:corner": t`Corners`,
@@ -51,7 +51,7 @@ function useTypeFieldCopy(): Readonly<Record<string, string>> {
       letterSpacing: t`Letter spacing`,
       transform: t`Letter case`,
       numeric: t`Numerals`,
-      color: t`Color`,
+      color: t`Colour`,
       alpha: t`Opacity`,
       textShadow: t`Text shadow`,
       glow: t`Glow`,
@@ -90,8 +90,8 @@ export function useFieldCopy(): (field: string) => string {
       shutter: t`Shutter angle`,
       min: t`Minimum`,
       max: t`Maximum`,
-      onDark: t`On dark grounds`,
-      onLight: t`On light grounds`,
+      onDark: t`On dark backgrounds`,
+      onLight: t`On light backgrounds`,
     };
     return (field: string) => names[field] ?? field;
   }, [t, typeFields]);
