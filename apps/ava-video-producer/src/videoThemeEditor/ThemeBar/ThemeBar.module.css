@@ -7,8 +7,11 @@
   position: relative;
 }
 
-/* Focus lands here only from code, after a button leaves, so it needs no ring. */
-.bar:focus {
+/*
+ * Focus lands here from code, after a button leaves. A keyboard user gets the
+ * panel's focus ring (see VideoThemePanel.module.css). A mouse click does not.
+ */
+.bar:focus:not(:focus-visible) {
   outline: none;
 }
 
