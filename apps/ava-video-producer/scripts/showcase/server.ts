@@ -7,14 +7,16 @@ import {
 } from "node:http";
 import path from "node:path";
 import { z } from "zod";
-import { createContinuityPlanFromVideoThemeSnapshot } from "../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { buildAtlas } from "../buildAtlas/buildAtlas.mjs";
-import { assetReferences, publicAsset, captionFiles } from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers";
 import { requireLicense } from "../require-license.mjs";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { type StockFingerprint } from "../stock/StockFingerprintModule/StockFingerprintModule";
 import { buildLivePlayers } from "./build";
-import { loadCaptionFilm } from "./captionFileOptions/captionFileOptions";
+import {
+  type CaptionFilesResult,
+  createCaptionFilesFromRequest,
+} from "./captionFileOptions/captionFileOptions";
 import { createExportJobs } from "./createExportJobs/createExportJobs";
 import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
@@ -127,10 +129,18 @@ async function filmForPlayer(id: string) {
   );
   return film;
 }
-async function exportRequest(req: IncomingMessage, res: ServerResponse) {
+/**
+ * The film id and options of an export or caption request, read under the
+ * same origin check, byte cap, and strict schema. Answers the request itself
+ * and returns undefined when the body is refused.
+ */
+async function readFilmRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<z.infer<typeof requestSchema> | undefined> {
   if (req.headers.origin !== `http://${req.headers.host}`) {
     json(res, 403, { message: "Use the local showcase to request a render." });
-    return;
+    return undefined;
   }
   let body = "";
   req.setEncoding("utf8");
@@ -138,11 +148,63 @@ async function exportRequest(req: IncomingMessage, res: ServerResponse) {
     body += chunk;
     if (Buffer.byteLength(body) > EXPORT_BODY_MAX_BYTES) {
       json(res, 413, { message: "Request too large" });
-      return;
+      return undefined;
     }
   }
   try {
-    const request = requestSchema.parse(JSON.parse(body));
+    return requestSchema.parse(JSON.parse(body));
+  } catch (error) {
+    console.error("Invalid showcase film request:", error);
+    json(res, 400, {
+      message: "Invalid film or export options. Check the showcase terminal.",
+    });
+    return undefined;
+  }
+}
+/** Sends a transcript or caption file, or the status its request earned. */
+function sendCaptionFile(
+  res: ServerResponse,
+  result: CaptionFilesResult<Film>,
+  fileName: "transcript.txt" | "captions.srt",
+) {
+  if (result.status === 404) {
+    res.writeHead(404).end();
+    return;
+  }
+  if (result.status === 400) {
+    json(res, 400, {
+      message:
+        "Invalid theme or camera options for this film. Check the showcase terminal.",
+    });
+    return;
+  }
+  res
+    .writeHead(200, {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${result.film.id}-${fileName}"`,
+    })
+    .end(
+      fileName === "captions.srt" ? result.files.srt : result.files.transcript,
+    );
+}
+/** Captions timed by the same options and theme an export sends. */
+async function captionRequest(req: IncomingMessage, res: ServerResponse) {
+  const request = await readFilmRequest(req, res);
+  if (request) {
+    const result = await createCaptionFilesFromRequest({
+      id: request.id,
+      options: request.options,
+      load: ShowcaseFilms.load,
+    });
+    sendCaptionFile(res, result, "captions.srt");
+  }
+}
+async function exportRequest(req: IncomingMessage, res: ServerResponse) {
+  const request = await readFilmRequest(req, res);
+  if (!request) {
+    return;
+  }
+  try {
     const film = await ShowcaseFilms.load(request.id, request.options);
     ShowcaseFilms.assertExportable(film);
     const fingerprint =
@@ -177,6 +239,10 @@ async function api(
     await exportRequest(req, res);
     return;
   }
+  if (pathname === "/api/captions" && req.method === "POST") {
+    await captionRequest(req, res);
+    return;
+  }
   if (!["GET", "HEAD"].includes(req.method ?? "")) {
     res.writeHead(405).end();
     return;
@@ -190,36 +256,18 @@ async function api(
       json(res, 200, await filmForPlayer(filmMatch[1]));
       return;
     }
-    const parameters = new URL(req.url ?? "/", "http://localhost").searchParams;
-    const result = await loadCaptionFilm({
+    // A plain link downloads the saved film; a draft's captions come from
+    // `POST /api/captions` with the export's options.
+    const result = await createCaptionFilesFromRequest({
       id: filmMatch[1],
-      parameters,
+      options: undefined,
       load: ShowcaseFilms.load,
     });
-    if (result.status === 400) {
-      json(res, 400, {
-        message:
-          "Invalid theme or camera options for this film. Check the showcase terminal.",
-      });
-      return;
-    }
-    const film = result.status === 200 ? result.film : undefined;
-    if (!film?.plan) {
-      res.writeHead(404).end();
-      return;
-    }
-    // Caption timing follows the theme's camera preset.
-    const files = captionFiles(
-      createContinuityPlanFromVideoThemeSnapshot(film.plan, film.theme, [
-        film.id,
-      ]),
+    sendCaptionFile(
+      res,
+      result,
+      filmMatch[2] === "captions.srt" ? "captions.srt" : "transcript.txt",
     );
-    res
-      .writeHead(200, {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${film.id}-${filmMatch[2]}"`,
-      })
-      .end(filmMatch[2] === "captions.srt" ? files.srt : files.transcript);
     return;
   }
   const exportMatch = /^\/api\/exports\/([a-f0-9-]+)(\/download)?$/.exec(

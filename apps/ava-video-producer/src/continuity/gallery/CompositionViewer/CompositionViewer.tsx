@@ -101,7 +101,6 @@ function CompositionSettings({
         theme={exportTheme}
         themeState={theme.exportState}
         onRetryTheme={theme.retry}
-        cameraPreset={theme.cameraPreset}
       />
     </>
   );

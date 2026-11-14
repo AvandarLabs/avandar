@@ -183,7 +183,16 @@ async function _readTheme(directory: string, id: string): Promise<StoredTheme> {
       `themes/${id}${THEME_FILE_SUFFIX} is not valid JSON`,
     );
   }
-  return { document: _parse(value), hash: _hashText(text) };
+  const document = _parse(value);
+  // Every lookup is by file name, so a document under another id would be
+  // listed but never found, breaking each render that loads the library.
+  if (document.id !== id) {
+    throw new ThemeStoreError(
+      400,
+      `themes/${id}${THEME_FILE_SUFFIX} must have the id "${id}"`,
+    );
+  }
+  return { document, hash: _hashText(text) };
 }
 
 async function _readAllThemes(

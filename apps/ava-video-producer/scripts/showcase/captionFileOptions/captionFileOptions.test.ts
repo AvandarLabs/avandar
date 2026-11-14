@@ -1,72 +1,91 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  getCaptionFileOptionsFromSearch,
-  loadCaptionFilm,
-} from "./captionFileOptions";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
+import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
+import { captionFiles } from "../../lib/planHelpers";
+import { ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
+import { createCaptionFilesFromRequest } from "./captionFileOptions";
 
-test("a theme and camera preset become a theme option for caption timing", () => {
-  assert.deepEqual(
-    getCaptionFileOptionsFromSearch(
-      new URLSearchParams("theme=classic&cameraPreset=whip&cameraMotion=true"),
-    ),
-    {
-      theme: {
-        id: "classic",
-        patch: {
-          other: { video: { semantic: { camera: { preset: "whip" } } } },
+const FILM_ID = "shared-object-handoff";
+
+function _deliberateTheme(speed?: number) {
+  return {
+    id: "classic",
+    patch: {
+      other: {
+        video: {
+          ...(speed === undefined
+            ? {}
+            : { atomic: { cameraSpeed: { deliberate: speed } } }),
+          semantic: { camera: { preset: "deliberate" } },
         },
       },
-      cameraMotion: true,
     },
-  );
-});
-
-test("without a theme the film keeps its own and only camera motion applies", () => {
-  assert.deepEqual(
-    getCaptionFileOptionsFromSearch(new URLSearchParams("cameraMotion=false")),
-    { cameraMotion: false },
-  );
-});
-
-const FILM = { id: "shared-object-handoff" };
-
-async function _loadOnlyWithoutOptions(id: string, options: object) {
-  if (id !== FILM.id || Object.keys(options).length > 0) {
-    throw new Error("internal detail");
-  }
-  return FILM;
+  };
 }
 
-test("a bad caption query for a known film is a request error", async () => {
-  assert.deepEqual(
-    await loadCaptionFilm({
-      id: FILM.id,
-      parameters: new URLSearchParams("theme=missing"),
-      load: _loadOnlyWithoutOptions,
-    }),
-    { status: 400 },
+async function _captions(options: Readonly<Record<string, unknown>>) {
+  const result = await createCaptionFilesFromRequest({
+    id: FILM_ID,
+    options,
+    load: ShowcaseFilms.load,
+  });
+  if (result.status !== 200) {
+    throw new Error(`Expected captions, got ${result.status}`);
+  }
+  return result;
+}
+
+test("a draft that changes a camera preset's speed reaches the captions and matches the export", async () => {
+  const options = { theme: _deliberateTheme(0.1) };
+  const captions = await _captions(options);
+  const exported = await ShowcaseFilms.load(FILM_ID, options);
+  const exportFiles = captionFiles(
+    createContinuityPlanFromVideoThemeSnapshot(exported.plan!, exported.theme, [
+      FILM_ID,
+    ]),
   );
+  assert.equal(captions.files.srt, exportFiles.srt);
+  assert.notEqual(
+    captions.files.srt,
+    (await _captions({ theme: _deliberateTheme() })).files.srt,
+  );
+});
+
+test("a request with no draft resolves the saved built-in theme, overrides included", async () => {
+  const captions = await _captions({ theme: { id: "classic" } });
+  assert.equal(captions.film.theme?.themeId, "classic");
+  assert.equal(captions.files.srt, (await _captions({})).files.srt);
+});
+
+test("an empty patch is a draft", async () => {
+  const captions = await _captions({ theme: { id: "classic", patch: {} } });
+  assert.equal(captions.film.theme?.themeId, DRAFT_THEME_ID);
+});
+
+test("bad options for a known film are a request error", async () => {
+  const result = await createCaptionFilesFromRequest({
+    id: FILM_ID,
+    options: { theme: { id: "missing" } },
+    load: ShowcaseFilms.load,
+  });
+  assert.deepEqual(result, { status: 400 });
 });
 
 test("an unknown film is not found", async () => {
-  assert.deepEqual(
-    await loadCaptionFilm({
-      id: "missing-film",
-      parameters: new URLSearchParams(),
-      load: _loadOnlyWithoutOptions,
-    }),
-    { status: 404 },
-  );
+  const result = await createCaptionFilesFromRequest({
+    id: "missing-film",
+    options: {},
+    load: ShowcaseFilms.load,
+  });
+  assert.deepEqual(result, { status: 404 });
 });
 
-test("a valid caption query loads the film", async () => {
-  assert.deepEqual(
-    await loadCaptionFilm({
-      id: FILM.id,
-      parameters: new URLSearchParams(),
-      load: _loadOnlyWithoutOptions,
-    }),
-    { status: 200, film: FILM },
-  );
+test("a film without a plan has no captions", async () => {
+  const result = await createCaptionFilesFromRequest({
+    id: "stock-network-graph",
+    options: {},
+    load: ShowcaseFilms.load,
+  });
+  assert.deepEqual(result, { status: 404 });
 });

@@ -1,73 +1,70 @@
-function _themeOption(themeId: string, cameraPreset: string | null) {
-  return {
-    id: themeId,
-    ...(cameraPreset
-      ? {
-          patch: {
-            other: {
-              video: { semantic: { camera: { preset: cameraPreset } } },
-            },
-          },
-        }
-      : {}),
-  };
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
+import { captionFiles } from "../../lib/planHelpers";
+import type { Film } from "../../../src/showcase/showcase.types";
+
+type CaptionFilm = Pick<Film, "id" | "plan" | "theme">;
+
+/** A caption download's film and files, or the status to answer with instead. */
+export type CaptionFilesResult<FilmValue extends CaptionFilm> =
+  | Readonly<{
+      status: 200;
+      film: FilmValue;
+      files: ReturnType<typeof captionFiles>;
+    }>
+  | Readonly<{ status: 400 }>
+  | Readonly<{ status: 404 }>;
+
+async function _statusOfFailedLoad(
+  id: string,
+  error: unknown,
+  load: (id: string) => Promise<unknown>,
+): Promise<400 | 404> {
+  const isKnownFilm = await load(id).then(
+    () => true,
+    () => false,
+  );
+  console.error(
+    isKnownFilm
+      ? "Invalid caption download options:"
+      : "Unknown caption download film:",
+    error,
+  );
+  return isKnownFilm ? 400 : 404;
 }
 
 /**
- * Film options for a transcript or caption download from its query string.
- * Caption timing depends on the camera preset, which is a theme token, so
- * `theme` and `cameraPreset` become a theme option. `ShowcaseFilms.load`
- * validates both.
+ * The transcript and caption files for a film loaded with the same options
+ * an export sends, `theme: { id, patch }` included, so caption timing
+ * follows the camera tokens the MP4 renders with. A film that loads without
+ * the options but not with them is a bad request (400); one that never
+ * loads, or has no plan, is not found (404). Load errors stay on the server.
  */
-export function getCaptionFileOptionsFromSearch(
-  parameters: URLSearchParams,
-): Readonly<Record<string, unknown>> {
-  const themeId = parameters.get("theme");
-  const cameraMotion = parameters.get("cameraMotion");
-  return {
-    ...(themeId
-      ? { theme: _themeOption(themeId, parameters.get("cameraPreset")) }
-      : {}),
-    ...(cameraMotion === null
-      ? {}
-      : { cameraMotion: cameraMotion !== "false" }),
-  };
-}
-
-/** A caption download's film, or the status to answer with instead. */
-export type CaptionFilmResult<FilmValue> =
-  | Readonly<{ status: 200; film: FilmValue }>
-  | Readonly<{ status: 400 | 404 }>;
-
-/**
- * Loads the film a transcript or caption download asks for. A film that
- * loads without the query's options but not with them is a bad query (400);
- * one that never loads is unknown (404). The load error stays on the server.
- */
-export async function loadCaptionFilm<FilmValue>(
-  options: Readonly<{
+export async function createCaptionFilesFromRequest<
+  FilmValue extends CaptionFilm,
+>(
+  request: Readonly<{
     id: string;
-    parameters: URLSearchParams;
+    options: Readonly<Record<string, unknown>> | undefined;
     load: (
       id: string,
-      options: Readonly<Record<string, unknown>>,
+      options?: Readonly<Record<string, unknown>>,
     ) => Promise<FilmValue>;
   }>,
-): Promise<CaptionFilmResult<FilmValue>> {
-  const { id, parameters, load } = options;
+): Promise<CaptionFilesResult<FilmValue>> {
+  const { id, options, load } = request;
+  let film: FilmValue;
   try {
-    return {
-      status: 200,
-      film: await load(id, getCaptionFileOptionsFromSearch(parameters)),
-    };
+    film = await load(id, options ?? {});
   } catch (error) {
-    const isKnownFilm = await load(id, {}).then(
-      () => true,
-      () => false,
-    );
-    if (isKnownFilm) {
-      console.error("Invalid caption download options:", error);
-    }
-    return { status: isKnownFilm ? 400 : 404 };
+    return { status: await _statusOfFailedLoad(id, error, load) };
   }
+  if (!film.plan) {
+    return { status: 404 };
+  }
+  const plan = createContinuityPlanFromVideoThemeSnapshot(
+    film.plan,
+    film.theme,
+    [film.id],
+  );
+  return { status: 200, film, files: captionFiles(plan) };
 }

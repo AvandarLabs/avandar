@@ -182,3 +182,38 @@ test("a hand-placed reserved draft theme file is neither listed nor read", () =>
     );
     assert.equal(await _statusOf(store.read("unsaved-draft")), 404);
   }));
+
+test("a theme whose id differs from its file name is rejected", () =>
+  _withStore(async (store, directory) => {
+    await fs.writeFile(
+      path.join(directory, "foo.theme.json"),
+      JSON.stringify({ ...WARM, id: "warm" }),
+    );
+    assert.equal(await _statusOf(store.read("foo")), 400);
+  }));
+
+test("the reserved draft id inside another file name is rejected", () =>
+  _withStore(async (store, directory) => {
+    await fs.writeFile(
+      path.join(directory, "foo.theme.json"),
+      JSON.stringify({ ...WARM, id: "unsaved-draft" }),
+    );
+    assert.equal(await _statusOf(store.read("foo")), 400);
+  }));
+
+test("listing skips rejected files and keeps every valid theme", () =>
+  _withStore(async (store, directory) => {
+    await store.create(WARM);
+    await fs.writeFile(
+      path.join(directory, "foo.theme.json"),
+      JSON.stringify({ ...WARM, id: "unsaved-draft" }),
+    );
+    await fs.writeFile(
+      path.join(directory, "bar.theme.json"),
+      JSON.stringify({ ...WARM, id: "warm" }),
+    );
+    assert.deepEqual(
+      (await store.list()).map((summary) => summary.id),
+      ["classic", "warm"],
+    );
+  }));

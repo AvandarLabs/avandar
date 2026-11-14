@@ -20,6 +20,17 @@
   opacity: 0.55;
 }
 
+/* The caption download posts the export's theme, so it is a button styled as its sibling links. */
+.compositionActionsLink {
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+
 .compositionActionsStatus {
   margin-top: 12px;
   min-height: 24px;

@@ -209,7 +209,6 @@ export function useCompositionTheme(
       isTimedOut,
     }),
     usedTokens: replies.paths,
-    cameraPreset: expected?.semantic.camera.preset ?? "authored",
     retry: () => {
       setAttempt((current) => current + 1);
       send();

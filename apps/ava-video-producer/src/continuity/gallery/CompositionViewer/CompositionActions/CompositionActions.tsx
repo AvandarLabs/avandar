@@ -1,8 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
-import { useId } from "react";
+import { useId, useState } from "react";
 import { useContinuityCopy } from "../../../useContinuityCopy";
 import css from "./CompositionActions.module.css";
+import {
+  type CaptionDownloadOptions,
+  downloadCaptionFile,
+} from "./downloadCaptionFile/downloadCaptionFile";
 import { ThemeExportNotice } from "./ThemeExportNotice";
 import { useCompositionDownload } from "./useCompositionDownload";
 import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
@@ -21,8 +25,6 @@ type Props = Readonly<{
   themeState: ThemeExportState;
   /** Sends the theme to the player again after it timed out. */
   onRetryTheme: () => void;
-  /** The camera preset in effect, which changes caption timing. */
-  cameraPreset: string;
 }>;
 
 /** The download label. A blocked download keeps its label and explains itself in the notice. */
@@ -100,14 +102,7 @@ export function CompositionActions(props: Props) {
           themeState={themeState}
           noticeId={noticeId}
         />
-        {!isScene && (
-          <NarrationLinks
-            id={id}
-            options={options}
-            themeId={theme.id}
-            cameraPreset={props.cameraPreset}
-          />
-        )}
+        {!isScene && <NarrationLinks id={id} options={options} theme={theme} />}
       </div>
       <ThemeExportNotice
         id={noticeId}
@@ -121,37 +116,56 @@ export function CompositionActions(props: Props) {
   );
 }
 
-/** Transcript and caption downloads, timed by the theme's camera preset. */
+/** Starts a caption download and reports a refused one. */
+function useCaptionDownload(
+  id: string,
+  options: CaptionDownloadOptions,
+): Readonly<{ hasFailed: boolean; start: () => void }> {
+  const [failedId, setFailedId] = useState<string | undefined>(undefined);
+  return {
+    hasFailed: failedId === id,
+    start: () => {
+      setFailedId(undefined);
+      downloadCaptionFile({ id, options }).catch(() => setFailedId(id));
+    },
+  };
+}
+
+/**
+ * Transcript and caption downloads. Captions are timed by the camera tokens,
+ * so they take the same options and theme as the MP4 export, draft included.
+ */
 function NarrationLinks({
   id,
   options,
-  themeId,
-  cameraPreset,
+  theme,
 }: Readonly<{
   id: string;
   options: CompositionExportOptions | undefined;
-  themeId: string;
-  cameraPreset: string;
+  theme: ExportTheme;
 }>) {
+  const { t } = useLingui();
   const translate = useContinuityCopy();
   const cameraMotion =
     options && "cameraMotion" in options ? options.cameraMotion : true;
-  const captionQuery = new URLSearchParams({
-    theme: themeId,
-    cameraPreset,
-    cameraMotion: String(cameraMotion),
-  });
+  const captions = useCaptionDownload(id, { cameraMotion, theme });
   return (
     <>
       <a href={`/api/films/${encodeURIComponent(id)}/transcript.txt`} download>
         {translate("Transcript")}
       </a>
-      <a
-        href={`/api/films/${encodeURIComponent(id)}/captions.srt?${captionQuery}`}
-        download
+      <button
+        type="button"
+        className={css.compositionActionsLink}
+        onClick={captions.start}
       >
         {translate("Captions")}
-      </a>
+      </button>
+      {captions.hasFailed && (
+        <span role="alert">
+          {t`Captions could not be made with these settings. Check the showcase terminal.`}
+        </span>
+      )}
     </>
   );
 }
