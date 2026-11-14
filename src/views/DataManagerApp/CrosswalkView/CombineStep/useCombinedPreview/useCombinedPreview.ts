@@ -1,6 +1,7 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { startCombinedPreviewTiming } from "@/lib/crosswalks/combinedPreviewTiming/combinedPreviewTiming";
 import { useTaggedRead } from "@/views/DataManagerApp/ApplyDictionariesView/useTaggedRead";
 import { useCombiningProgress } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombiningProgress/useCombiningProgress";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -60,17 +61,26 @@ function _toPreviewRow(
 
 /**
  * Runs the preview's two queries, the first rows and then the row count,
- * reporting each dataset as relation loading has it in hand.
+ * reporting each dataset as relation loading has it in hand, and records
+ * the run as a `crosswalks:combined-preview` performance measure. A failed
+ * run records nothing: it throws before the measure.
  */
 async function _readCombinedPreview(
   options: Readonly<{
     workspaceId: Workspace.Id;
     sql: string;
     columnNames: readonly string[];
+    /** The stacked datasets, which the timing counts as read. */
+    datasetIds: readonly Dataset.Id[];
     onRelationFetched: (datasetId: Dataset.Id) => void;
   }>,
 ): Promise<CombinedPreviewResult> {
-  const { workspaceId, columnNames, onRelationFetched } = options;
+  const { workspaceId, columnNames } = options;
+  const timing = startCombinedPreviewTiming();
+  const onRelationFetched = (datasetId: Dataset.Id): void => {
+    options.onRelationFetched(datasetId);
+    timing.onRelationFetched(datasetId);
+  };
   const { rowsSql, countSql } = buildCombinedPreviewSql(options);
   const rows = await WorkspaceQuerySession.runQuery<Record<string, unknown>>({
     workspaceId,
@@ -82,6 +92,7 @@ async function _readCombinedPreview(
     rawSql: countSql,
     onRelationFetched,
   });
+  timing.finish({ datasetIds: options.datasetIds });
   return {
     rows: rows.data.map((row) => {
       return _toPreviewRow(row, columnNames);
@@ -118,6 +129,7 @@ export function useCombinedPreview(
         workspaceId: workspace.id,
         sql: sql ?? "",
         columnNames,
+        datasetIds: options.datasetIds,
         onRelationFetched: progress.onRelationFetched,
       });
     },

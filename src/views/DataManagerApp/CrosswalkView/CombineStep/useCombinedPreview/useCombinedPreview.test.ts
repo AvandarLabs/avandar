@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@/test-utils";
 import {
   buildCombinedPreviewSql,
@@ -42,6 +42,10 @@ describe("buildCombinedPreviewSql", () => {
 describe("useCombinedPreview", () => {
   beforeEach(() => {
     runQueryMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("reads the rows, then the row count", async () => {
@@ -111,5 +115,46 @@ describe("useCombinedPreview", () => {
     expect(runQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({ onRelationFetched: expect.any(Function) }),
     );
+  });
+
+  it("records a measure of the run once both queries are done", async () => {
+    const measureSpy = vi.fn();
+    vi.stubGlobal("performance", {
+      now: () => {
+        return Date.now();
+      },
+      mark: vi.fn(),
+      measure: measureSpy,
+      clearMarks: vi.fn(),
+    });
+    runQueryMock.mockImplementation(
+      (params: {
+        onRelationFetched?: (datasetId: Dataset.Id) => void;
+        rawSql: string;
+      }) => {
+        params.onRelationFetched?.(KINGS);
+        params.onRelationFetched?.(QUEENS);
+        return Promise.resolve({
+          data: params.rawSql.includes("count(*)") ? [{ rows: 2 }] : [],
+        });
+      },
+    );
+
+    renderHook(() => {
+      return useCombinedPreview({
+        sql: "SELECT 1",
+        columnNames: ["case_id"],
+        datasetIds: [KINGS, QUEENS],
+      });
+    });
+
+    await waitFor(() => {
+      expect(measureSpy).toHaveBeenCalledWith(
+        "crosswalks:combined-preview",
+        expect.objectContaining({
+          detail: expect.objectContaining({ datasetCount: 2, readCount: 2 }),
+        }),
+      );
+    });
   });
 });
