@@ -1159,8 +1159,9 @@ Each slice is one PR into `demo/measles`, recorded in
    - **Part A (F136), built on `feat/crosswalks`.** The schema, the engine,
      every crosswalk surface, **Export mapping**, the stale banner, and Used
      by.
-   - **Part B (F137), not built.** Meaning suggestions, long layout lists,
-     combining progress, and the 100-dataset measurement, frontend only.
+   - **Part B (F137), built on `feat/crosswalks`.** Meaning suggestions, long
+     layout lists, combining progress, and the 100-dataset measurement,
+     frontend only.
 
 ## 17. Roadmap
 

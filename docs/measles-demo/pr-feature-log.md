@@ -189,6 +189,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F133 | Convert coded columns with a dictionary into a linked dataset that follows it: the load-time conversion, ordered lists, unmatched values, the preview, and the dataset and dictionary surfaces | not started | F131, F132 | |
 | F134 | Convert a dataset in place with a dictionary, pinned to the version applied, with the synced-data warning and Re-apply | not started | F133 | |
 | F136 | Crosswalks: map datasets with different column layouts onto one reference layout and save a combined dataset, with Export mapping, the stale banner, and Used by | not started | F129, F130, F131, F132, F133, F134 | |
+| F137 | Crosswalks at scale: meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the 100-dataset materialization measurement | not started | F136 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -331,6 +332,7 @@ API. It's new work, not something this branch built.
 | after F132 | F133 | Builds on F131's bindings, apply RPC, apply flow, popover, rail, and Used by, and F132's editable-ids RPC. Adds the conversion columns, the keep-original link, `linked_source_dataset_id`, pin-on-delete triggers, and three RPCs (migration). Deploy the migration, then the `chat` edge function (it reads the new binding columns and describes a converted column by its labels), then the frontend. |
 | after F133 | F134 | Frontend only: F133's migration already carries the pinned columns and `rpc_dataset_columns__reapply_dictionary`. Deploy the frontend. |
 | after F134 | F136 | Builds on F130's scorer and pick table, F131's bindings, popover, and Used by, F133's `ColumnConversion`, linked-dataset creation, virtual dataset freshness, and `clearCachedDatasetRows`, and F134's Re-apply in Used by. Adds five crosswalk tables and two RPCs (migration) and the desktop sync entries. Deploy the migration, then the frontend; the desktop app syncs the new tables from its next build. |
+| after F136 | F137 | Frontend only: F136's migration carries everything it reads. Deploy the frontend; the `chat` function is unchanged (same prompt, same route). |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -433,7 +435,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
 | `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
-| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134, F136 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. F136: regenerate for its migration, route, and messages. |
+| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134, F136, F137 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. F136: regenerate for its migration, route, and messages. F137: messages only (`abdafb519`). |
 
 ### Joined cases (F69 to F76)
 
@@ -448,7 +450,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.{ts,executed.test.ts}` | F57 to F62, F71, F73, F74, F75 | F57 to F62: the status column. F71: `attributeId` on columns, case-insensitive reserved names, values from `buildAttributeValueSql`, exported `EXTERNAL_ID_COLUMN`. F73: rule types and tests (incl. `f1bd3ada5`'s test tidy). F74: value shape, view column names from `ConceptAttribute.getViewColumnNames`. F75: per-period columns. |
 | `src/clients/qetl/QueryMediator/conceptRelation/{makeConceptAttributeColumnsFromMetadata.ts,__tests__/conceptAttributeColumns.integration.executed.test.ts}` | F57 to F62, F71, F72, F73, F74, F75 | F71: `attributeId`, case-insensitive suffixing. F72: comment and test-comment wording after `AttributeAssertionClient` is deleted. F73: refuse a disallowed rule (`3e6d417c8`, `5213b4e02`), column Ava type. F74: value shape, shared view column names. F75: per-period columns and the date column. |
 | `src/clients/qetl/QueryMediator/conceptRelation/{getConceptRelationPlansFromSql/*,loadConceptSpine/loadConceptSpine.ts,conceptRelation.types.ts,getConceptAttributeColumnsFromConceptId.ts}` | F57 to F62, F71, F72, F74, F75 | F57 to F62: status name in the spine. F71: `ConceptSpineRestriction`, restricted spines, the collision message. F72: `a9730f086`'s hunk, comment updates (`c6b410ad3`). F74: `61bf863d9` in `loadConceptSpine.ts`. F75: fetch the date column (`b27358007`, `394d9090c`). |
-| `src/clients/qetl/QueryMediator/{QueryMediator.ts,QueryMediator.types.ts,queryRunner.ts}`, `src/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch.ts`, `src/clients/qetl/wrappers/createDefaultRegistry.ts` | F1, Postgres branch, F71, F133 | F1: named create calls (`9377eb6c8`). Postgres branch: the registry and relation-loading refactor (`createRegistryForFetch.ts` exists only there; later `86f234dc1` and `ba9724f2a` also touch these files). F71: `conceptSpineRestrictions` plumbing, refusing a restriction without a planner, the nested-query comment, removing `ConceptWrapper` from the registry. F133: `valueMapping` and `originalCopyDataType` on a column replacement, the catalog read with projection keys in `queryRunner.ts`, and a nested query's dependency stale-at in `createRegistryForFetch.ts` and `createDefaultRegistry.ts` (`b603b61b8`, `3bdccd425`, `59c506f64`, `62bedf4ee`). |
+| `src/clients/qetl/QueryMediator/{QueryMediator.ts,QueryMediator.types.ts,queryRunner.ts}`, `src/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch.ts`, `src/clients/qetl/wrappers/createDefaultRegistry.ts` | F1, Postgres branch, F71, F133, F137 | F1: named create calls (`9377eb6c8`). Postgres branch: the registry and relation-loading refactor (`createRegistryForFetch.ts` exists only there; later `86f234dc1` and `ba9724f2a` also touch these files). F71: `conceptSpineRestrictions` plumbing, refusing a restriction without a planner, the nested-query comment, removing `ConceptWrapper` from the registry. F133: `valueMapping` and `originalCopyDataType` on a column replacement, the catalog read with projection keys in `queryRunner.ts`, and a nested query's dependency stale-at in `createRegistryForFetch.ts` and `createDefaultRegistry.ts` (`b603b61b8`, `3bdccd425`, `59c506f64`, `62bedf4ee`). F137: `onRelationFetched` in `QueryMediator.types.ts`, `QueryMediator.ts`, `queryRunner.ts`, and `createRegistryForFetch.ts`, so a nested virtual query reports its datasets too (`d4c1773ff`, `90f964bd4`). `createDefaultRegistry.ts` is not touched. |
 | `src/clients/queries/runStructuredQuery/{runStructuredQueryWithMetadata.ts,runStructuredQuery.types.ts,runStructuredQuery.test.ts}` | F57 to F62, F71, F74, F75 | F71: out-of-sync case types run as SQL over the view, `executedSql` returned (`2c00baf97`), the dropped sort. F74: suffixed and duplicate field tests. F75: one fixture field. |
 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.{ts,test.ts}` | F57 to F62, F71, F73, F74, F75 | F71: Sync names from `buildAttributeValueSql`. F73: column Ava type for text `max`/`min`. F74: value shape. F75: fixture fields. |
 | `src/views/IndividualManagerApp/SingleIndividualView/{index.tsx,CaseDetailsRail.tsx,CaseDetailsRail.test.tsx,CaseDetailsRail.module.css}` | F57 to F62, F18, F72, F74, F75, F68, F66 | F72: `useRecordFields`, "No value", every source, the load-failure callout and retry. F74: `DetailsStatus`, source list named "Sources of <field>", heading order, `RecordFieldValue`. F75: per-period rows. Later: `cb76ac57a` (pin case details above the activity feed) and `3284a4b46` (assign a record from its header), F68 and F66. |
@@ -608,8 +610,8 @@ Take only your feature's hunks from these files. The last feature in the
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
-| `src/clients/qetl/QueryMediator/QueryMediator.ts`, `QueryMediator.types.ts`, `queryRunner.ts` | F1, F113, F71 to F75, Postgres branch, F133 | F1: the named `create("QueryMediator", { state })` call (`QueryMediator.ts`). F113: the `datasetColumnSource` option, its `DatasetColumnSource` type, and the `stored` skip in `_getParquetNeededByDatasetId`. F71 to F75: spine restrictions (`1ee2e4b2a`). Postgres branch: the `RelationLoading` module call sites (`b72a4d9fb`). F133: `QueryMediator.types.ts` and `queryRunner.ts` only, the same hunks as in the row above (`b603b61b8`, `3bdccd425`, `59c506f64`, `62bedf4ee`). |
-| `src/clients/qetl/QueryMediator/relationLoading.ts` on `develop` (`relationLoading/RelationLoading.ts` on `demo/measles`) | F113, Postgres branch, F133 | F113: return early from `loadRelationBytes` when there are no relations, and skip the catalog read when `datasetColumnSource` is `stored`. Postgres branch: the move into the `RelationLoading` module and `getColumnReplacementsFromColumns`. F133: the projection key recorded per loaded view and the rebuild when it changes, conversions in a load, and virtual definitions as storage keys (`59c506f64`, `b66609496`, `62bedf4ee`). |
+| `src/clients/qetl/QueryMediator/QueryMediator.ts`, `QueryMediator.types.ts`, `queryRunner.ts` | F1, F113, F71 to F75, Postgres branch, F133, F137 | F1: the named `create("QueryMediator", { state })` call (`QueryMediator.ts`). F113: the `datasetColumnSource` option, its `DatasetColumnSource` type, and the `stored` skip in `_getParquetNeededByDatasetId`. F71 to F75: spine restrictions (`1ee2e4b2a`). Postgres branch: the `RelationLoading` module call sites (`b72a4d9fb`). F133: `QueryMediator.types.ts` and `queryRunner.ts` only, the same hunks as in the row above (`b603b61b8`, `3bdccd425`, `59c506f64`, `62bedf4ee`). F137: the same hunks as in the row above, minus `createDefaultRegistry.ts`: the `onRelationFetched` callback type, its pass-through, and its call from `queryRunner.ts`, with `notifyRelationFetched` so a failing listener cannot affect a query (`d4c1773ff`, `90f964bd4`). |
+| `src/clients/qetl/QueryMediator/relationLoading.ts` on `develop` (`relationLoading/RelationLoading.ts` on `demo/measles`) | F113, Postgres branch, F133, F137 | F113: return early from `loadRelationBytes` when there are no relations, and skip the catalog read when `datasetColumnSource` is `stored`. Postgres branch: the move into the `RelationLoading` module and `getColumnReplacementsFromColumns`. F133: the projection key recorded per loaded view and the rebuild when it changes, conversions in a load, and virtual definitions as storage keys (`59c506f64`, `b66609496`, `62bedf4ee`). F137: a dataset is reported to `onRelationFetched` as its bytes arrive, before they are loaded into DuckDB (`d4c1773ff`, `90f964bd4`). |
 | `src/clients/qetl/PublicQuerySession/PublicQuerySession.ts`, `__tests__/PublicQuerySession.test.ts` | F1, F113 | F1: the named create call. F113: `datasetColumnSource: "stored"` and the test that runs a public query through the real mediator without reading `dataset_columns`. |
 | `src/clients/qetl/QueryMediator/__tests__/relationCacheProjection.test.ts` | F1, F113 | F1: the named create call. F113: the no-dataset query test and the "dataset column source" `describe` block. |
 | `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts`, `DashboardClient.types.ts` | Postgres branch, F113, F133 | Postgres branch: the `match` on `sourceType` and the Google Sheets and Postgres whole-dataset slices (`90952bf3c`). F113: `hasColumnReplacements`, `datasetIdsWithColumnReplacements`, and `_getDatasetIdsWithColumnReplacements`. F133: `dashboardPublishSnapshots.ts` only, a dataset with a convert binding is sliced through the workspace query (`cac36bd9c`). |
@@ -655,7 +657,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
 
-### Data dictionaries (F129 to F136)
+### Data dictionaries (F129 to F137)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
@@ -672,7 +674,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
 | `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131, F133, F134, F136 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). F133: `DataDictionaryEditor.tsx` passes the dictionary's version to `useDictionaryUsage`, and Used by says Reference or Linked and whether a dataset is behind, in `HowAppliedCell.tsx` and `UsageStatusCell.tsx` (`238ee4188`). F134: `DataDictionaryEditor.tsx` passes the dictionary's name to `useDictionaryUsage`, and Used by offers Re-apply under a behind status, set in ink (`6f5fd62a8`, `1f2459c4a`, `83af03334`). F136: `useDictionaryUsage/` reads crosswalks, and Used by lists a combined dataset as Crosswalk with its status and Open crosswalk, in `HowAppliedCell.tsx`, `UsageStatusCell.tsx`, `DictionaryUsedByTable.tsx`, and the new `OpenCrosswalkLink.tsx` (`539d28a69`, `2b5ebde5e`). |
 | `src/clients/dataDictionaries/DictionaryBindingClient.ts` | F131, F133, F134 | F131: reading and applying bindings (`ab41fb10f`). F133: conversions and added values in the apply call, and the linked-dataset apply (`5a2d003f1`). F134: `reapplyDictionary`, which calls `rpc_dataset_columns__reapply_dictionary` (`c055c0854`). |
-| `src/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns.ts`, `src/clients/qetl/QueryMediator/getRelationSources.ts`, `src/lib/dataDictionaries/loadColumnReplacements/loadColumnReplacements.ts`, `docs/qetl-architecture.md` | F133, F134 | F133: see its rendering and loading area. F134: a table loaded outside the recorder counts as current only when the dataset needs no replacements, and the columns are read with `fetchQuery` once invalidated (`35db27b15`, `1ca97e30f`). |
+| `src/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns.ts`, `src/clients/qetl/QueryMediator/getRelationSources.ts`, `src/lib/dataDictionaries/loadColumnReplacements/loadColumnReplacements.ts`, `docs/qetl-architecture.md` | F133, F134, F137 | F133: see its rendering and loading area. F134: a table loaded outside the recorder counts as current only when the dataset needs no replacements, and the columns are read with `fetchQuery` once invalidated (`35db27b15`, `1ca97e30f`). F137: `docs/qetl-architecture.md` only, a Progress paragraph on the `onRelationFetched` callback (`d4c1773ff`, `90f964bd4`). |
 | `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131, F133 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). F133: a save also refreshes the dataset columns and the cached rows, so converted datasets show the new labels (`238ee4188`). |
 | `src/clients/datasets/DatasetClient/{DatasetClient.ts,createDatasetQueries.ts}` | Postgres branch, F132 | Postgres branch: the Postgres table source (`581fa414b`). F132: the `getEditableIds` query (`051931742`). |
 | `shared/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts` | F75, F132 | F75: `bucketGrain` (`00a93b53d`). F132: the `ProjectionDescriptor` docstring names `count(*)` (`b78b7b893`). |
@@ -689,6 +691,8 @@ Take only your feature's hunks from these files. The last feature in the
 | `shared/models/Permissions/PermissionsModule/{PermissionRegistry.ts,__tests__/PermissionsModule.test.ts}` | F129, F136 | F129: the dictionary keys. F136: `data_sources__can_edit_crosswalks` for Data Sources editors and admins (`a2c127a26`). |
 | `src/views/DataManagerApp/DataManagerToolbarActions/{DataManagerToolbarActions.tsx,DataManagerToolbarActions.test.tsx}`, `src/views/DataManagerApp/DataManagerApp.tsx`, `src/views/DataManagerApp/useListPaneToggle/{useListPaneToggle.ts,useListPaneToggle.test.ts}` | F129, F130, F136 | F136: `NewCrosswalkButton.tsx` after New dictionary, the Crosswalks list through the new `useDataManagerLists/`, and the list pane collapsing on the crosswalk routes (`a2c127a26`). |
 | `tests/e2e/helpers/{constants.ts,seedDataDictionary.ts}` | F130, F131, F133, F136 | F136: the crosswalk line list paths in `constants.ts`, and a second coding per seeded entry in `seedDataDictionary.ts` (`7acb100b3`). |
+| `src/lib/dataDictionaries/DictionarySuggestions/{DictionarySuggestions.ts,DictionarySuggestions.test.ts}` | F130, F137 | F130: the create flow's suggestions run online with consent, or offline, and the later fixes to its request limits and consent (`620305730`, `7e28f1fe4`, `730e17cb8`, `931a5dcb1`, `0485db5ed`, `fc3ac948c`, `8081e5d87`, `5c6667f23`). F137: `makeMatchesRequestFromColumns`, which builds a meaning request from two sets of columns for the crosswalk (`a66ba38e8`). |
+| `src/clients/qetl/WorkspaceQuerySession/{WorkspaceQuerySession.ts,WorkspaceQuerySession.membership.test.ts}` | F1, F71 to F75, F137 | F1: the named create call (`9377eb6c8`). F71 to F75: spine restrictions pass through `runQuery` (`1ee2e4b2a`). F137: `runQuery` accepts `onRelationFetched` and passes it to the mediator (`d4c1773ff`). |
 
 ---
 
@@ -11616,6 +11620,180 @@ pnpm test:e2e dictionary-apply-reference.spec.ts
 pnpm test:e2e data-dictionary-edit.spec.ts
 pnpm test:e2e web-offline-mode.spec.ts
 ```
+
+## F137: Crosswalks at scale
+
+Status: built on `feat/crosswalks` after F136's commits. Split into its own PR
+from the commits after F136's log entry (`253e60d0b`). No PR is open.
+
+**Purpose:** **Suggest matches** in step 2 asks the suggestion model which of
+a layout's unused columns mean the combined dataset's unfilled columns (`dob`
+and `birth_date`), through the create flow's `dictionary-suggestions-v1`
+prompt and consent gate, online or on the offline model. Each pair becomes a
+suggested fill marked "Meaning" that the user accepts or rejects, and a
+governed column gets the code list that fits the source's values. Only names,
+kinds, and the codes of short coded columns not named after a person are sent.
+With no model, or after a decline, the button is off and says why. Past 100
+layouts the stub renders only the rows in view, keeping the listbox's keyboard
+and `aria-setsize`. Step 3 says "Read {count} of {total} datasets" with a bar
+while the preview reads, from a new `onRelationFetched` callback threaded from
+`WorkspaceQuerySession.runQuery` through relation loading, including nested
+virtual queries. The 100-dataset measurement and its decision are in
+`docs/measles-demo/crosswalks-materialization.md`.
+
+**Value:** A state combining a hundred county line lists maps columns with
+unrelated names without hunting for them, keeps a usable stub at any size, and
+sees the first combine progress instead of a spinner. The measurement settles
+open decision 4 with numbers.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md` (sections 8.4, 9,
+14, and 18) and `docs/measles-demo/data-dictionaries-5-crosswalks-plan.md`
+(Part B).
+
+**PR title:** `feat(crosswalks): suggest matches, scale the layout list, and measure combining at 100 datasets`
+
+**Depends on:** F136.
+
+**Files, by area** (`CV/` is `src/views/DataManagerApp/CrosswalkView/`,
+`LC/` is `src/lib/crosswalks/`, and `QM/` is `src/clients/qetl/QueryMediator/`):
+
+- Meaning suggestions (`a66ba38e8`): `DictionarySuggestions.ts` gains
+  `makeMatchesRequestFromColumns` (in `src/lib/dataDictionaries/DictionarySuggestions/`,
+  with its test); `LC/makeCrosswalkMatchesRequest/` and
+  `LC/__tests__/meaningMatchFixtures.ts`; the `meaning_matches_found` action in
+  `CV/crosswalkReducer/crosswalkReducer.types.ts`, its `HANDLERS` entry in
+  `crosswalkReducer.ts`, and `applyMeaningMatches` in
+  `CV/crosswalkReducer/prefillCrosswalkLayout.ts`;
+  `CV/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches.ts`
+  with `useCrosswalkSuggestionConsent`,
+  `CV/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton.tsx`, the
+  `MapLayoutsFooter.tsx` slot, and `MapLayoutsStep.tsx`.
+- The long stub (`ff2cb68a9`):
+  `CV/MapLayoutsStep/LayoutStub/LayoutStubList/LayoutStubList.tsx`,
+  `LayoutStub.tsx`, `LayoutStubRow.tsx` (the row's `positionInList`),
+  `useLayoutListKeyboard.ts` (`scrollToLayout`), and `LayoutStub.module.css`.
+- Review fix for the two above (`a648f3e87`): a cut meaning request keeps both
+  sides of a pair and the button says why it is off
+  (`LC/makeCrosswalkMatchesRequest/`, `SuggestMatchesButton.tsx`,
+  `useCrosswalkMeaningMatches.ts`), and `LayoutStubList.tsx` clears
+  `aria-activedescendant` when its row is outside the window.
+- Combining progress (`d4c1773ff`, `90f964bd4`): `QM/QueryMediator.types.ts`
+  (`onRelationFetched`), `QM/QueryMediator.ts`, `QM/queryRunner.ts`,
+  `QM/relationLoading/RelationLoading.ts`,
+  `QM/relationLoading/createRegistryForFetch.ts`,
+  `src/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession.ts`,
+  `QM/notifyRelationFetched/notifyRelationFetched.ts` (`90f964bd4`: a failing
+  listener cannot affect a combine, and a stale read is ignored),
+  `docs/qetl-architecture.md`,
+  `CV/CombineStep/useCombiningProgress/useCombiningProgress.ts`,
+  `CV/CombineStep/CombiningProgress/CombiningProgress.tsx`,
+  `CV/CombineStep/useCombinedPreview/useCombinedPreview.ts`,
+  `CV/CombineStep/CombinedPreview/CombinedPreview.tsx`, and
+  `CV/CombineStep/CombineStep.tsx`, with the tests beside each and
+  `QM/__tests__/relationFetchedProgress.test.ts`.
+- The measurement (`f02460f56`, `2cccdd0bf`):
+  `LC/combinedPreviewTiming/combinedPreviewTiming.ts` (the
+  `crosswalks:combined-preview` performance measure, used in
+  `useCombinedPreview.ts`), `scripts/crosswalks/{seedCrosswalkMeasurement,cleanupCrosswalkMeasurement,measurementOutput}.ts`,
+  `scripts/crosswalks/crosswalkMeasurementPlan/`,
+  `scripts/crosswalks/requireLocalSupabase/`,
+  `docs/measles-demo/crosswalks-materialization.md`, and the spec's section 18
+  and roadmap in `docs/measles-demo/data-dictionaries-design.md`.
+- Translations (`abdafb519`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied. The
+  extraction left each locale's new messages untranslated, since machine
+  translations are added by the pre-push hook.
+- Docs (the commit that adds this entry): this log, and the Part B status line
+  in `data-dictionaries-design.md`.
+
+**Schema:** none. F136's migration carries everything Part B reads, and Part B
+adds no table, column, RPC, or desktop twin.
+
+**Deploy:** the frontend only. The `chat` function is unchanged (same prompt,
+same route).
+
+**Known gaps:**
+
+- **Measurement decision for the owner.** The 100-dataset measurement ran cold
+  and throttled at 67.7 s, 100% "reading", and the rule as written (build
+  parallel acquisition above 60 s with at least 70% reading) says to build it.
+  But the timer's `readingMs` starts at the preview's start, so it counts the
+  DuckDB engine and Parquet extension download (about 36 s, before the first
+  dataset) as reading. Read strictly as dataset downloads, about 32 s for 100
+  datasets read one at a time, which is under the 60 s line, and a session
+  whose DuckDB is already running does not pay the other 36 s. The doc records
+  the rule as met. Whether to schedule parallel acquisition is the owner's
+  call, and nothing in this PR builds it.
+- The measurement used the branch's local Supabase and DevTools throttling
+  (Fast 4G) as a stand-in for production, on one machine.
+- **Suggest matches** `foundCount` ("Found 3 more matches") counts the pairs
+  the model returned, not the fills that were applied, so it can exceed what
+  the user sees when a pair is dropped.
+- `aria-activedescendant` on the long layout list can name an off-screen
+  virtual row. It is cleared when the row is outside the rendered window, so
+  a screen reader announces nothing for it until the row scrolls back.
+- The progress line says "Read N of M" when a dataset's bytes arrive, before
+  they are loaded into DuckDB.
+- A nested query can report a dataset more than once. The hook de-duplicates
+  by dataset.
+- A meaning reply that arrives after the user leaves the layout is applied to
+  that layout, but on return the button shows idle rather than "Found".
+- A meaning match suggests the source column and, for a governed column, a
+  code list, but never a conversion (a date format or padding). The user sets
+  those in the pane. Suggestions run once per press, for the selected layout
+  only, not across every layout.
+
+**Not done:** the headless screenshots of the new controls and the look-at-it
+comparison against spec sections 7.6 and 8.4 (Task 33, Steps 1 and 2) were
+never taken, because the Playwright MCP was unavailable. That includes the
+ready, consent, found, offline, and nothing-left states of **Suggest matches**,
+the long stub, and the combining progress line at 1280 px. `impeccable detect`
+reports nothing on `CV/MapLayoutsStep` and `CV/CombineStep`.
+
+**Verification:**
+```sh
+ava supabase status
+pnpm lint
+pnpm exec tsc -b --force --noEmit && pnpm type-check:deno
+pnpm test:frontend
+pnpm vitest run --config vitest.executed.config.ts src/lib/crosswalks src/lib/dataDictionaries src/clients/qetl src/components/dataDictionaries
+pnpm test:db
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e crosswalk-map-and-combine.spec.ts
+pnpm test:e2e dictionary-apply-linked.spec.ts
+pnpm test:e2e dictionary-apply-reference.spec.ts
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e web-offline-mode.spec.ts
+```
+
+Results at the commit that adds this entry:
+
+- `ava supabase status` names `feat-crosswalks` as the branch's switched
+  project. `pnpm lint` exits 0 (react-doctor's advisory report only).
+  `tsc -b --force --noEmit` and `pnpm type-check:deno` exit 0.
+- `pnpm test:frontend`: 1402 files and 10728 tests pass. The one failing file
+  is the known maplibre suite,
+  `src/routes/_auth/$workspaceSlug/dashboards/edit/-$dashboardId.test.tsx`
+  (`window.URL.createObjectURL is not a function`).
+- The executed tests (`vitest.executed.config.ts`): 14 files, 139 tests pass.
+  `pnpm vitest run scripts/ai-eval`: 9 files, 74 tests pass.
+- `pnpm test:db`: 119 files, 1739 tests, PASS. `pnpm test:desktop`: 13 files,
+  95 tests pass. `pnpm i18n:check` exits 0.
+- `pnpm desktop:sqlite:check-migrations` reports drift in two twins that Part B
+  does not touch (`20261109134745_gadgets_search_stored_prompt.gen.sql` and
+  `20261109155144_catalog_loadable_search.gen.sql`). Part B changes nothing
+  under `supabase/` or `apps/desktop/`, so the drift is not from this work.
+  Part B ran no `gen-migrations` or `migrations validate`, since it has no
+  schema change.
+- E2E, one at a time and headless: `crosswalk-map-and-combine.spec.ts` passes
+  (37.7 s), `dictionary-apply-linked.spec.ts` passes (11.9 s),
+  `dictionary-apply-reference.spec.ts` passes (2 tests, 15.1 s and 5.5 s),
+  `data-dictionary-edit.spec.ts` passes (10.5 s), and
+  `web-offline-mode.spec.ts` passes (7.5 s).
+- Timings from the measurement (medians of three, in
+  `docs/measles-demo/crosswalks-materialization.md`): cold throttled 67.7 s,
+  cold unthrottled 2.1 s, warm storage tier 1.3 s, hot 0.2 s.
 
 ## Open decisions
 
