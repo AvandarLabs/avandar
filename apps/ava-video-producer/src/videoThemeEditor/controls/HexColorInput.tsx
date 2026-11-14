@@ -2,7 +2,6 @@ import { ColorInput, type ColorInputProps } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import {
-  doesEscapeBelongToColorPopover,
   isColorPopoverOpenAfter,
   type ColorPopoverEvent,
 } from "./colorPopover/colorPopover";
@@ -88,7 +87,7 @@ export function HexColorInput({
           reactTo("enter");
         }
         if (event.key === "Escape") {
-          if (doesEscapeBelongToColorPopover(isOpen)) {
+          if (isOpen) {
             // The preview dialog closes on an Escape nobody handled, and it
             // checks `defaultPrevented`, so this press only closes the picker.
             event.preventDefault();

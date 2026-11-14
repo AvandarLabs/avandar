@@ -15,12 +15,3 @@ export type ColorPopoverEvent =
 export function isColorPopoverOpenAfter(event: ColorPopoverEvent): boolean {
   return event === "focus" || event === "click" || event === "type";
 }
-
-/**
- * Whether Escape is for the picker rather than the dialog around it. While the
- * picker is open Escape only closes the picker. With it closed Escape reaches
- * the dialog.
- */
-export function doesEscapeBelongToColorPopover(isOpen: boolean): boolean {
-  return isOpen;
-}
