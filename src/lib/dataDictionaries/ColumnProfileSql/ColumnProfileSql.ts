@@ -1,5 +1,5 @@
 import { makeBucketMap } from "@avandar/utils";
-import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { quoteSqlIdentifier, quoteSqlLiteral } from "@avandar/utils/sql";
 import { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -28,9 +28,22 @@ const LISTABLE_TYPES: ReadonlySet<AvaDataType.T> = new Set([
 /** Approximate distinct counts can be a few off, so list a little past 50. */
 const APPROXIMATE_COUNT_MARGIN = 10;
 
-/** The date formats a text column's values are tried against. */
-const DATE_FORMATS_SQL =
-  "['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d', '%m-%d-%Y', '%d-%m-%Y']";
+/**
+ * The date formats a text column's values are tried against. ISO comes
+ * first, then US before day-first, so a column whose every value reads
+ * both ways (`01/02/2026`) reads as US.
+ */
+const DATE_FORMATS = [
+  "%Y-%m-%d",
+  "%m/%d/%Y",
+  "%d/%m/%Y",
+  "%Y/%m/%d",
+  "%m-%d-%Y",
+  "%d-%m-%Y",
+] as const;
+
+/** `DATE_FORMATS` as a DuckDB list, for `try_strptime` with any format. */
+const DATE_FORMATS_SQL = `[${DATE_FORMATS.map(quoteSqlLiteral).join(", ")}]`;
 
 /**
  * How many rows the date check reads. Trying six formats on every row of a
@@ -44,6 +57,14 @@ const DATE_SAMPLE_ROWS = 10_000;
  * twice gives the same date share.
  */
 const DATE_SAMPLE_SEED = 42;
+
+/**
+ * A repeatable sample of a relation's rows, the ones date checks read. The
+ * relation is given as SQL, already quoted.
+ */
+function buildDateSampleSql(relationSql: string): string {
+  return `SELECT * FROM ${relationSql} USING SAMPLE reservoir(${DATE_SAMPLE_ROWS} ROWS) REPEATABLE (${DATE_SAMPLE_SEED})`;
+}
 
 function _buildSummaryParts(column: ProfiledColumn, index: number): string[] {
   const name = quoteSqlIdentifier(column.name);
@@ -93,7 +114,7 @@ function buildSummarySql(
   // The counts, distinct counts, and ranges read every row. Only the date
   // aggregates read the sample, joined onto the one exact row.
   return [
-    `WITH "sample" AS (SELECT * FROM ${table} USING SAMPLE reservoir(${DATE_SAMPLE_ROWS} ROWS) REPEATABLE (${DATE_SAMPLE_SEED}))`,
+    `WITH "sample" AS (${buildDateSampleSql(table)})`,
     `SELECT * FROM (${exactSql}) CROSS JOIN (SELECT ${sampleParts.join(", ")} FROM "sample")`,
   ].join(" ");
 }
@@ -212,6 +233,12 @@ function makeColumnProfilesFromRows(
  * `profileDatasetColumns`.
  */
 export const ColumnProfileSql = {
+  /** The date formats text columns are tried against, most likely first. */
+  DATE_FORMATS,
+
+  /** A repeatable sample of a relation's rows, for date checks. */
+  buildDateSampleSql,
+
   /** One query for every column's counts and ranges. */
   buildSummarySql,
 

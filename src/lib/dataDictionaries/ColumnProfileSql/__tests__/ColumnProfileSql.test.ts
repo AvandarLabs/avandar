@@ -125,4 +125,25 @@ describe("ColumnProfileSql", () => {
       values: undefined,
     });
   });
+
+  it("shares its date formats and its sample", () => {
+    expect(ColumnProfileSql.DATE_FORMATS).toEqual([
+      "%Y-%m-%d",
+      "%m/%d/%Y",
+      "%d/%m/%Y",
+      "%Y/%m/%d",
+      "%m-%d-%Y",
+      "%d-%m-%Y",
+    ]);
+    expect(ColumnProfileSql.buildDateSampleSql('"t"')).toBe(
+      'SELECT * FROM "t" USING SAMPLE reservoir(10000 ROWS) REPEATABLE (42)',
+    );
+    const sql = ColumnProfileSql.buildSummarySql({
+      datasetId: DATASET.id,
+      columns: [{ name: "onset", dataType: "varchar" }],
+    });
+    expect(sql).toContain(
+      "try_strptime(\"onset\", ['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d', '%m-%d-%Y', '%d-%m-%Y'])",
+    );
+  });
 });
