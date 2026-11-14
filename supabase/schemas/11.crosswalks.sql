@@ -153,13 +153,22 @@ from
  * which a new crosswalk leaves empty, and the id and ownership, which no
  * client flow changes after insert. A whole-row update that sends the same values
  * passes. The RPCs run as the function owner, and the foreign key's
- * `on delete set null` runs as the table's owner, so both pass.
+ * `on delete set null` runs as the table's owner, so both pass. When that
+ * foreign key clears `output_dataset_id`, this trigger clears `compiled_at`
+ * and `compiled_code_lists` with it.
  */
 create or replace function public.crosswalks__guard_managed_columns () returns trigger language plpgsql
 set
   search_path = '' as $$
 begin
   if current_user <> 'authenticated' then
+    -- The foreign key's set null, run when the combined dataset is
+    -- deleted, also forgets what that dataset was compiled from.
+    if tg_op = 'UPDATE' and old.output_dataset_id is not null and new.output_dataset_id is null then
+      new.compiled_at := null;
+      new.compiled_code_lists := null;
+    end if;
+
     return new;
   end if;
 
@@ -226,19 +235,17 @@ from
   service_role;
 
 /**
- * Checks that the caller is a Data Sources editor in the crosswalk's
- * workspace, then locks the crosswalk so two writes to it run one at a
- * time, and returns its workspace. A missing crosswalk and a forbidden
- * one raise the same error, so neither crosswalk RPC can be used to probe
- * for crosswalk ids. Called first by both crosswalk RPCs.
+ * Checks, without locking anything, that the caller is a Data Sources
+ * editor in the crosswalk's workspace, and returns that workspace. A
+ * missing crosswalk and a forbidden one raise the same error, so no
+ * crosswalk RPC can be used to probe for crosswalk ids.
  */
-create or replace function public.crosswalks__authorize (p_crosswalk_id uuid) returns uuid language plpgsql
+create or replace function public.crosswalks__require_editor (p_crosswalk_id uuid) returns uuid language plpgsql
 set
   search_path = '' as $$
 declare
   v_workspace_id uuid;
 begin
-  -- Read without a lock: the caller has not been authorized yet.
   select c.workspace_id
   into v_workspace_id
   from public.crosswalks c
@@ -252,6 +259,36 @@ begin
     raise exception 'Only Data Sources editors can change a crosswalk'
       using errcode = '42501', hint = 'crosswalk_editor_required';
   end if;
+
+  return v_workspace_id;
+end;
+$$;
+
+-- Runs inside the SECURITY DEFINER crosswalk RPCs and is never called
+-- directly, so no Data API role gets EXECUTE.
+revoke
+execute on function public.crosswalks__require_editor (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+/**
+ * Checks that the caller is a Data Sources editor in the crosswalk's
+ * workspace, then locks the crosswalk so two writes to it run one at a
+ * time, and returns its workspace. A missing crosswalk and a forbidden
+ * one raise the same error. Called first by both crosswalk RPCs that
+ * write.
+ */
+create or replace function public.crosswalks__authorize (p_crosswalk_id uuid) returns uuid language plpgsql
+set
+  search_path = '' as $$
+declare
+  v_workspace_id uuid;
+begin
+  -- Read without a lock: the caller has not been authorized yet.
+  v_workspace_id := public.crosswalks__require_editor (p_crosswalk_id);
 
   perform 1 from public.crosswalks where id = p_crosswalk_id for update;
 

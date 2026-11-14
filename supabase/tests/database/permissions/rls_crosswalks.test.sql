@@ -10,7 +10,8 @@
  * A signed-in user cannot move a crosswalk to another workspace, set or
  * change its combined dataset, when it was compiled, or the code lists it
  * embedded, or change its owner or id. Deleting the combined dataset clears
- * `output_dataset_id` and keeps the crosswalk.
+ * `output_dataset_id`, `compiled_at`, and `compiled_code_lists` and keeps
+ * the crosswalk.
  */
 begin;
 
@@ -459,10 +460,11 @@ select results_eq (
     select
       (select count(*)::int from public.datasets where id = 'c1450001-0000-4000-8000-000000000001'::uuid),
       (select output_dataset_id is null from public.crosswalks where id = 'c1400001-0000-4000-8000-000000000001'::uuid),
-      (select compiled_at is not null from public.crosswalks where id = 'c1400001-0000-4000-8000-000000000001'::uuid)
+      (select compiled_at is null from public.crosswalks where id = 'c1400001-0000-4000-8000-000000000001'::uuid),
+      (select compiled_code_lists is null from public.crosswalks where id = 'c1400001-0000-4000-8000-000000000001'::uuid)
   $q$,
-  $q$ values (0, true, true) $q$,
-  'deleting the combined dataset clears output_dataset_id and keeps the crosswalk'
+  $q$ values (0, true, true, true) $q$,
+  'deleting the combined dataset clears output_dataset_id, compiled_at, and compiled_code_lists and keeps the crosswalk'
 );
 
 -- Shape.

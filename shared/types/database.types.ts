@@ -3475,6 +3475,10 @@ export type Database = {
         Args: { p_crosswalk_id: string; p_layouts: Json }
         Returns: undefined
       }
+      crosswalks__has_unreadable_members: {
+        Args: { p_crosswalk_id: string }
+        Returns: boolean
+      }
       crosswalks__is_fill_valid: { Args: { p_fill: Json }; Returns: boolean }
       crosswalks__read_combined_columns: {
         Args: { p_columns: Json }
@@ -3487,6 +3491,10 @@ export type Database = {
       crosswalks__reconcile_combined_columns: {
         Args: { p_columns: Json; p_dataset_id: string; p_workspace_id: string }
         Returns: undefined
+      }
+      crosswalks__require_editor: {
+        Args: { p_crosswalk_id: string }
+        Returns: string
       }
       crosswalks__update_combined_dataset: {
         Args: {
@@ -3899,6 +3907,10 @@ export type Database = {
           p_workspace_id: string
         }
         Returns: undefined
+      }
+      rpc_crosswalks__has_unreadable_datasets: {
+        Args: { p_crosswalk_id: string }
+        Returns: boolean
       }
       rpc_crosswalks__save: {
         Args: {

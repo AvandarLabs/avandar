@@ -153,7 +153,8 @@ values
   ('c4450003-0000-4000-8000-000000000003'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Queens line list', 'csv_file'::public.datasets__source_type, false),
   ('c4450004-0000-4000-8000-000000000004'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Bronx line list', 'csv_file'::public.datasets__source_type, true),
   ('c4450005-0000-4000-8000-000000000005'::uuid, 'c4100002-0000-4000-8000-000000000002'::uuid, 'c4000004-0000-4000-8000-000000000004'::uuid, 'c4300004-0000-4000-8000-000000000004'::uuid, 'Other workspace list', 'csv_file'::public.datasets__source_type, false),
-  ('c4450006-0000-4000-8000-000000000006'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Kings and Queens (combined)', 'virtual'::public.datasets__source_type, false)
+  ('c4450006-0000-4000-8000-000000000006'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Kings and Queens (combined)', 'virtual'::public.datasets__source_type, false),
+  ('c4450007-0000-4000-8000-000000000007'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Another combined dataset', 'virtual'::public.datasets__source_type, false)
 on conflict (id) do nothing;
 
 insert into public.data_dictionaries (id, workspace_id, owner_id, owner_profile_id, name)
@@ -177,7 +178,7 @@ values
 insert into public.crosswalks (id, workspace_id, owner_id, owner_profile_id, name, created_at, updated_at, output_dataset_id)
 values
   ('c4700001-0000-4000-8000-000000000001'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000002-0000-4000-8000-000000000002'::uuid, 'c4300002-0000-4000-8000-000000000002'::uuid, 'Untitled crosswalk', '2020-01-01T00:00:00Z', '2020-01-01T00:00:00Z', 'c4450006-0000-4000-8000-000000000006'::uuid),
-  ('c4700002-0000-4000-8000-000000000002'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Another crosswalk', now(), now(), null),
+  ('c4700002-0000-4000-8000-000000000002'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000001-0000-4000-8000-000000000001'::uuid, 'c4300001-0000-4000-8000-000000000001'::uuid, 'Another crosswalk', now(), now(), 'c4450007-0000-4000-8000-000000000007'::uuid),
   ('c4700003-0000-4000-8000-000000000003'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4000002-0000-4000-8000-000000000002'::uuid, 'c4300002-0000-4000-8000-000000000002'::uuid, 'Untitled crosswalk', now(), now(), null);
 
 insert into public.crosswalks__layouts (id, workspace_id, crosswalk_id, signature, column_names, is_reference, status)
@@ -189,7 +190,7 @@ values ('c4720009-0000-4000-8000-000000000009'::uuid, 'c4100001-0000-4000-8000-0
 insert into public.crosswalks__mappings (id, workspace_id, crosswalk_id, layout_id, column_id, fill, status)
 values ('c4730009-0000-4000-8000-000000000009'::uuid, 'c4100001-0000-4000-8000-000000000001'::uuid, 'c4700002-0000-4000-8000-000000000002'::uuid, 'c4710009-0000-4000-8000-000000000009'::uuid, 'c4720009-0000-4000-8000-000000000009'::uuid, '{"version":1,"kind":"column","source_column":"id","convert":null,"code_list_id":null,"holds_labels":false}'::jsonb, 'confirmed');
 
-select plan (59);
+select plan (66);
 
 -- 1.
 select has_function (
@@ -499,13 +500,61 @@ reset role;
 select is (
   pg_temp.save (p_datasets => jsonb_set(pg_temp.base_datasets (), '{2,dataset_id}', '"c4450006-0000-4000-8000-000000000006"')),
   'output_dataset_in_crosswalk',
-  'the combined dataset cannot be one of the datasets it combines'
+  'the crosswalk''s own combined dataset cannot be one of the datasets it combines'
+);
+reset role;
+
+-- 38.
+select is (
+  pg_temp.save (p_datasets => jsonb_set(pg_temp.base_datasets (), '{2,dataset_id}', '"c4450007-0000-4000-8000-000000000007"')),
+  'output_dataset_in_crosswalk',
+  'another crosswalk''s combined dataset cannot be combined either'
+);
+reset role;
+
+-- 39.
+select is (
+  pg_temp.save (p_columns => jsonb_set(pg_temp.base_columns (), '{2,position}', '10001')),
+  'crosswalk_payload_invalid',
+  'a column position is at most 10000'
+);
+reset role;
+
+-- 40.
+select is (
+  pg_temp.save (p_columns => jsonb_set(pg_temp.base_columns (), '{2,position}', '-1')),
+  'crosswalk_payload_invalid',
+  'a column position is not negative'
+);
+reset role;
+
+-- 41.
+select is (
+  pg_temp.save (p_mappings => jsonb_set(pg_temp.base_mappings (), '{4,fill,convert}', '{"kind":"pad_text","length":0}')),
+  'fill_invalid',
+  'zero pads nothing'
+);
+reset role;
+
+-- 42.
+select is (
+  pg_temp.save (p_mappings => jsonb_set(pg_temp.base_mappings (), '{4,fill,convert}', '{"kind":"pad_text","length":65}')),
+  'fill_invalid',
+  'a pad length is at most 64'
+);
+reset role;
+
+-- 43.
+select is (
+  pg_temp.save (p_mappings => jsonb_set(pg_temp.base_mappings (), '{4,fill,convert}', '{"kind":"pad_text","length":"5"}')),
+  'fill_invalid',
+  'a pad length is a number'
 );
 reset role;
 
 -- Saves that succeed.
 
--- 38. A first save before any dataset is added.
+-- 44. A first save before any dataset is added.
 select is (
   pg_temp.save (
     p_settings => pg_temp.base_settings () || '{"name":"Empty for now","description":null}'::jsonb,
@@ -520,7 +569,7 @@ select is (
 );
 reset role;
 
--- 39. Read in its own statement: the outer query of a statement does not
+-- 45. Read in its own statement: the outer query of a statement does not
 -- see writes made by a function it calls.
 select is (
   format(
@@ -533,7 +582,7 @@ select is (
   'the empty save wrote its settings'
 );
 
--- 40.
+-- 46.
 select is (
   pg_temp.save (p_settings => pg_temp.base_settings () || '{"codes_output_as":"codes"}'::jsonb),
   'no error',
@@ -541,7 +590,7 @@ select is (
 );
 reset role;
 
--- 41.
+-- 47.
 select is (
   format(
     'name=%s description=%s codes=%s source=%s columns=%s layouts=%s memberships=%s mappings=%s reference=%s entry=%s',
@@ -560,7 +609,7 @@ select is (
   'the save wrote the settings and every set'
 );
 
--- 42.
+-- 48.
 select results_eq (
   $q$
     select fill, status::text, confidence, reason::text, layout_id, column_id
@@ -580,7 +629,7 @@ select results_eq (
   'a mapping keeps its fill, status, confidence, and reason as sent'
 );
 
--- 43.
+-- 49.
 select ok (
   (select updated_at > '2020-01-02T00:00:00Z'::timestamptz from public.crosswalks where id = 'c4700001-0000-4000-8000-000000000001'::uuid),
   'a save moves the crosswalk''s updated_at'
@@ -596,7 +645,7 @@ select id, dataset_id
 from public.crosswalks__datasets
 where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid;
 
--- 44. A second save renames case_id, drops the third layout (its mapping
+-- 50. A second save renames case_id, drops the third layout (its mapping
 -- goes with it), moves Kings 2026-04 to the reference layout, and turns
 -- one fill into a fixed value. It leaves out the Bronx membership, which
 -- the editor cannot see.
@@ -616,7 +665,7 @@ select is (
 );
 reset role;
 
--- 45.
+-- 51.
 select is (
   format(
     'column=%s layouts=%s status=%s m4=%s m2=%s/%s',
@@ -631,7 +680,7 @@ select is (
   'the column and the mapping kept their ids, and the dropped layout took its mapping'
 );
 
--- 46.
+-- 52.
 select results_eq (
   $q$
     select d.dataset_id, d.layout_id, b.id is not null
@@ -650,7 +699,7 @@ select results_eq (
   'memberships keep their ids, the moved one changed layout, and the hidden one survived'
 );
 
--- 47. Dropping the layout that holds the hidden membership would delete
+-- 53. Dropping the layout that holds the hidden membership would delete
 -- it, so the save is refused.
 select is (
   pg_temp.save (
@@ -663,7 +712,7 @@ select is (
 );
 reset role;
 
--- 48.
+-- 54.
 select is (
   format(
     'layouts=%s bronx=%s',
@@ -679,7 +728,7 @@ select is (
 -- Layout three comes back holding Kings 2026-03, and the next save drops it
 -- again, moving that dataset to the reference layout.
 
--- 49.
+-- 55.
 select is (
   pg_temp.save (
     p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710003-0000-4000-8000-000000000003"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450003-0000-4000-8000-000000000003","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb
@@ -696,7 +745,7 @@ where
   crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid and
   dataset_id = 'c4450001-0000-4000-8000-000000000001'::uuid;
 
--- 50.
+-- 56.
 select is (
   pg_temp.save (
     p_layouts => pg_temp.base_layouts () - 2,
@@ -708,7 +757,7 @@ select is (
 );
 reset role;
 
--- 51.
+-- 57.
 select is (
   format(
     'same_membership=%s layout=%s dropped_layout=%s',
@@ -720,7 +769,7 @@ select is (
   'the moved dataset kept its membership when its old layout was dropped in the same save'
 );
 
--- 52. Queens is left out of the memberships, and the editor can view it, so
+-- 58. Queens is left out of the memberships, and the editor can view it, so
 -- its membership is deleted. The Bronx one, which the editor cannot view,
 -- stays.
 select is (
@@ -734,14 +783,14 @@ select is (
 );
 reset role;
 
--- 53.
+-- 59.
 select is (
   (select string_agg(dataset_id::text, ',' order by dataset_id) from public.crosswalks__datasets where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid),
   'c4450001-0000-4000-8000-000000000001,c4450002-0000-4000-8000-000000000002,c4450004-0000-4000-8000-000000000004',
   'the viewable membership left out was deleted and the hidden one stayed'
 );
 
--- 54. Onset is left out of the columns, and so is its mapping.
+-- 60. Onset is left out of the columns, and so is its mapping.
 select is (
   pg_temp.save (
     p_columns => pg_temp.base_columns () - 2,
@@ -754,7 +803,7 @@ select is (
 );
 reset role;
 
--- 55.
+-- 61.
 select is (
   format(
     'columns=%s onset=%s onset_mapping=%s',
@@ -766,7 +815,7 @@ select is (
   'the column left out was deleted with its mapping'
 );
 
--- 56. Two columns swap names in one save.
+-- 62. Two columns swap names in one save.
 select is (
   pg_temp.save (
     p_columns => jsonb_set(jsonb_set(pg_temp.base_columns () - 2, '{0,name}', '"sex"'), '{1,name}', '"case_id"'),
@@ -779,7 +828,7 @@ select is (
 );
 reset role;
 
--- 57.
+-- 63.
 select is (
   format(
     'first=%s second=%s',
@@ -790,7 +839,7 @@ select is (
   'each column kept its id and took the other''s name'
 );
 
--- 58. The reference moves from layout one to layout two.
+-- 64. The reference moves from layout one to layout two.
 select is (
   pg_temp.save (
     p_columns => pg_temp.base_columns () - 2,
@@ -811,12 +860,33 @@ select is (
 );
 reset role;
 
--- 59.
+-- 65.
 select is (
   (select string_agg(id::text || ':' || is_reference::text || ':' || status::text, ',' order by id) from public.crosswalks__layouts where crosswalk_id = 'c4700001-0000-4000-8000-000000000001'::uuid),
   'c4710001-0000-4000-8000-000000000001:false:to_do,c4710002-0000-4000-8000-000000000002:true:mapped',
   'layout two is the only reference, and layout one is no longer mapped'
 );
+
+-- 66. A column at the highest position, and a pad of the longest length.
+select is (
+  pg_temp.save (
+    p_columns => jsonb_set(pg_temp.base_columns () - 2, '{1,position}', '10000'),
+    p_layouts => jsonb_set(
+      jsonb_set(
+        jsonb_set(jsonb_set(pg_temp.base_layouts () - 2, '{0,is_reference}', 'false'), '{0,status}', '"to_do"'),
+        '{1,is_reference}',
+        'true'
+      ),
+      '{1,status}',
+      '"mapped"'
+    ),
+    p_datasets => '[{"dataset_id":"c4450001-0000-4000-8000-000000000001","layout_id":"c4710001-0000-4000-8000-000000000001"},{"dataset_id":"c4450002-0000-4000-8000-000000000002","layout_id":"c4710001-0000-4000-8000-000000000001"}]'::jsonb,
+    p_mappings => jsonb_set(pg_temp.base_mappings () - 3 - 3, '{2,fill,convert}', '{"kind":"pad_text","length":64}')
+  ),
+  'no error',
+  'a column at position 10000 and a pad of 64 are accepted'
+);
+reset role;
 
 select * from finish ();
 

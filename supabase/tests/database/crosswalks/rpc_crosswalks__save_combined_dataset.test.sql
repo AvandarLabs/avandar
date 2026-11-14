@@ -204,7 +204,7 @@ values
   ('c5100001-0000-4000-8000-000000000001'::uuid, 'c5700002-0000-4000-8000-000000000002'::uuid, 'c5450003-0000-4000-8000-000000000003'::uuid, 'c5710001-0000-4000-8000-000000000001'::uuid),
   ('c5100001-0000-4000-8000-000000000001'::uuid, 'c5700002-0000-4000-8000-000000000002'::uuid, 'c5450004-0000-4000-8000-000000000004'::uuid, 'c5710002-0000-4000-8000-000000000002'::uuid);
 
-select plan (38);
+select plan (41);
 
 -- 1.
 select has_function (
@@ -250,13 +250,37 @@ reset role;
 
 -- 6.
 select is (
+  pg_temp.combine (p_dataset_id => null),
+  'combined_columns_invalid',
+  'the combined dataset needs an id'
+);
+reset role;
+
+-- 7.
+select is (
+  pg_temp.combine (p_raw_sql => null),
+  'combined_columns_invalid',
+  'the combined dataset needs SQL'
+);
+reset role;
+
+-- 8.
+select is (
+  pg_temp.combine (p_raw_sql => '   '),
+  'combined_columns_invalid',
+  'blank SQL is refused like none'
+);
+reset role;
+
+-- 9.
+select is (
   pg_temp.combine (p_columns => '[]'::jsonb),
   'combined_columns_invalid',
   'the combined dataset needs at least one column'
 );
 reset role;
 
--- 7.
+-- 10.
 select is (
   pg_temp.combine (p_columns => jsonb_set(pg_temp.base_columns (), '{3,name}', '"CASE_ID"')),
   'combined_columns_invalid',
@@ -264,7 +288,7 @@ select is (
 );
 reset role;
 
--- 8.
+-- 11.
 select is (
   pg_temp.combine (p_columns => jsonb_set(pg_temp.base_columns (), '{1,data_type}', '"integer"')),
   'combined_columns_invalid',
@@ -272,7 +296,7 @@ select is (
 );
 reset role;
 
--- 9.
+-- 12.
 select is (
   pg_temp.combine (p_bindings => jsonb_set(pg_temp.base_bindings (), '{0,direction}', '"both"')),
   'combined_columns_invalid',
@@ -280,7 +304,7 @@ select is (
 );
 reset role;
 
--- 10.
+-- 13.
 select is (
   pg_temp.combine (p_bindings => jsonb_set(pg_temp.base_bindings (), '{0,column_name}', '"gender"')),
   'binding_column_missing',
@@ -288,7 +312,7 @@ select is (
 );
 reset role;
 
--- 11.
+-- 14.
 select is (
   pg_temp.combine (
     p_bindings => jsonb_set(
@@ -306,7 +330,7 @@ select is (
 );
 reset role;
 
--- 12.
+-- 15.
 select is (
   pg_temp.combine (p_bindings => jsonb_set(pg_temp.base_bindings (), '{0,dictionary_id}', '"c5400003-0000-4000-8000-000000000003"')),
   'binding_not_in_workspace',
@@ -314,7 +338,7 @@ select is (
 );
 reset role;
 
--- 13.
+-- 16.
 select is (
   pg_temp.combine (p_bindings => jsonb_set(pg_temp.base_bindings (), '{0,code_list_id}', '"c5500002-0000-4000-8000-000000000002"')),
   'binding_not_in_workspace',
@@ -322,7 +346,7 @@ select is (
 );
 reset role;
 
--- 14.
+-- 17.
 select is (
   pg_temp.combine (p_user_id => 'c5000002-0000-4000-8000-000000000002'::uuid),
   'dataset_creator_required',
@@ -330,7 +354,7 @@ select is (
 );
 reset role;
 
--- 15.
+-- 18.
 select is (
   format(
     'datasets=%s output=%s compiled=%s',
@@ -344,14 +368,14 @@ select is (
 
 -- Creating.
 
--- 16.
+-- 19.
 select is (
   pg_temp.create_as_owner (),
   'c5450001-0000-4000-8000-000000000001'::uuid,
   'the workspace owner creates the combined dataset, and the RPC returns its id'
 );
 
--- 17.
+-- 20.
 select results_eq (
   $q$
     select name, source_type::text, owner_id, workspace_id
@@ -362,7 +386,7 @@ select results_eq (
   'the combined dataset is a virtual dataset the caller owns'
 );
 
--- 18.
+-- 21.
 select results_eq (
   $q$
     select raw_sql, linked_source_dataset_id is null
@@ -373,7 +397,7 @@ select results_eq (
   'it runs the compiled SQL and is not a linked dataset'
 );
 
--- 19.
+-- 22.
 select results_eq (
   $q$
     select original_name, name, original_data_type, detected_data_type::text, data_type::text, column_idx
@@ -391,7 +415,7 @@ select results_eq (
   'its columns are the payload''s, in order, with their types'
 );
 
--- 20.
+-- 23.
 select results_eq (
   $q$
     select dc.name, b.mode::text, b.direction::text, b.dictionary_id, b.entry_id, b.code_list_id, b.applied_dictionary_version
@@ -408,7 +432,7 @@ select results_eq (
   'its governed columns get reference bindings at the dictionary''s version'
 );
 
--- 21.
+-- 24.
 select results_eq (
   $q$
     select output_dataset_id, compiled_at is not null, compiled_code_lists
@@ -427,7 +451,7 @@ select results_eq (
 
 -- Updating.
 
--- 22.
+-- 25.
 select is (
   pg_temp.combine (p_dataset_id => 'c5450002-0000-4000-8000-000000000002'::uuid),
   'combined_dataset_mismatch',
@@ -440,7 +464,7 @@ select id, name
 from public.dataset_columns
 where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid;
 
--- 23. case_id comes back as CASE_ID, sex turns into codes, outcome goes,
+-- 26. case_id comes back as CASE_ID, sex turns into codes, outcome goes,
 -- county is new, and sex is now bound to decode.
 select is (
   pg_temp.combine (
@@ -455,7 +479,7 @@ select is (
 );
 reset role;
 
--- 24.
+-- 27.
 select results_eq (
   $q$
     select d.name, v.raw_sql
@@ -467,7 +491,7 @@ select results_eq (
   'the update renames the dataset and replaces its SQL'
 );
 
--- 25.
+-- 28.
 select results_eq (
   $q$
     select
@@ -491,7 +515,7 @@ select results_eq (
   'columns matching by name ignoring case keep their ids, new ones are added, and removed ones are gone'
 );
 
--- 26.
+-- 29.
 select results_eq (
   $q$
     select
@@ -509,7 +533,7 @@ select results_eq (
   'the bindings are replaced whole, on the kept column, and the removed column''s binding is gone'
 );
 
--- 27.
+-- 30.
 select results_eq (
   $q$
     select output_dataset_id, compiled_code_lists
@@ -539,7 +563,7 @@ from public.dataset_columns__dictionary_bindings b
 join public.dataset_columns dc on dc.id = b.dataset_column_id
 where b.dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid;
 
--- 28.
+-- 31.
 select is (
   pg_temp.combine (
     p_dataset_name => 'Kings and Queens (v2)',
@@ -551,7 +575,7 @@ select is (
 );
 reset role;
 
--- 29.
+-- 32.
 select is (
   format(
     'columns=%s binding_modes=%s',
@@ -567,7 +591,7 @@ select id, name
 from public.dataset_columns
 where dataset_id = 'c5450001-0000-4000-8000-000000000001'::uuid;
 
--- 30. Names are compared and stored without surrounding spaces, as the save
+-- 33. Names are compared and stored without surrounding spaces, as the save
 -- compares them.
 select is (
   pg_temp.combine (
@@ -579,7 +603,7 @@ select is (
 );
 reset role;
 
--- 31.
+-- 34.
 select is (
   pg_temp.combine (
     p_dataset_name => 'Kings and Queens (v2)',
@@ -591,7 +615,7 @@ select is (
 );
 reset role;
 
--- 32.
+-- 35.
 select is (
   format(
     'columns=%s kept_ids=%s bound=%s',
@@ -605,7 +629,7 @@ select is (
 
 -- A combine on a crosswalk that stacks a dataset the caller cannot view.
 
--- 33.
+-- 36.
 select is (
   pg_temp.combine (
     p_user_id => 'c5000002-0000-4000-8000-000000000002'::uuid,
@@ -621,7 +645,7 @@ update public.crosswalks__layouts
 set status = 'skipped'
 where id = 'c5710002-0000-4000-8000-000000000002'::uuid;
 
--- 34. The restricted dataset is on a skipped layout now, so the SQL never
+-- 37. The restricted dataset is on a skipped layout now, so the SQL never
 -- stacks it. The editor gets past the check and meets the next refusal.
 select is (
   pg_temp.combine (
@@ -638,7 +662,7 @@ update public.crosswalks__layouts
 set status = 'to_do'
 where id = 'c5710002-0000-4000-8000-000000000002'::uuid;
 
--- 35. The owner can view every dataset, so the same crosswalk combines.
+-- 38. The owner can view every dataset, so the same crosswalk combines.
 select is (
   pg_temp.combine (
     p_crosswalk_id => 'c5700002-0000-4000-8000-000000000002'::uuid,
@@ -649,7 +673,7 @@ select is (
 );
 reset role;
 
--- 36.
+-- 39.
 select is (
   (select output_dataset_id from public.crosswalks where id = 'c5700002-0000-4000-8000-000000000002'::uuid),
   'c5450010-0000-4000-8000-000000000010'::uuid,
@@ -662,7 +686,7 @@ update public.datasets
 set is_restricted = true
 where id = 'c5450001-0000-4000-8000-000000000001'::uuid;
 
--- 37.
+-- 40.
 select is (
   pg_temp.combine (
     p_user_id => 'c5000002-0000-4000-8000-000000000002'::uuid,
@@ -673,7 +697,7 @@ select is (
 );
 reset role;
 
--- 38.
+-- 41.
 select is (
   (select name from public.datasets where id = 'c5450001-0000-4000-8000-000000000001'::uuid),
   'Kings and Queens (v2)',

@@ -247,19 +247,7 @@ declare
   v_workspace_id uuid;
 begin
   -- Read without a lock: the caller has not been authorized yet.
-  select c.workspace_id
-  into v_workspace_id
-  from public.crosswalks c
-  where c.id = p_crosswalk_id;
-
-  if v_workspace_id is null or not public.util__auth_user_meets_min_app_role (
-    v_workspace_id,
-    'data_sources'::public.app_type,
-    'editor'::public.role_level
-  ) then
-    raise exception 'Only Data Sources editors can change a crosswalk'
-      using errcode = '42501', hint = 'crosswalk_editor_required';
-  end if;
+  v_workspace_id := public.crosswalks__require_editor (p_crosswalk_id);
 
   perform 1 from public.crosswalks where id = p_crosswalk_id for update;
 
@@ -289,7 +277,7 @@ begin
       coalesce(e.col ->> 'id', '') !~* v_uuid_pattern or
       jsonb_typeof(e.col -> 'name') is distinct from 'string' or
       jsonb_typeof(e.col -> 'position') is distinct from 'number' or
-      coalesce(e.col ->> 'position', '') !~ '^[0-9]+$' or
+      coalesce(e.col ->> 'position', '') !~ '^([0-9]{1,4}|10000)$' or
       coalesce(e.col ->> 'data_type', '') <> all (
         enum_range(null::public.datasets__ava_data_type)::text[]
       ) or
@@ -539,13 +527,14 @@ begin
       using errcode = '42501', hint = 'dataset_not_readable';
   end if;
 
-  -- The combined dataset reads every member, so it cannot be one.
+  -- A combined dataset reads every member, so no crosswalk's combined
+  -- dataset can be one: two crosswalks could otherwise feed each other.
   if exists (
     select 1
     from jsonb_to_recordset(p_datasets) as d (dataset_id uuid)
-    join public.crosswalks c on c.id = p_crosswalk_id and c.output_dataset_id = d.dataset_id
+    join public.crosswalks c on c.output_dataset_id = d.dataset_id
   ) then
-    raise exception 'The combined dataset cannot be one of the datasets it combines'
+    raise exception 'A combined dataset cannot be one of the datasets a crosswalk combines'
       using errcode = '23514', hint = 'output_dataset_in_crosswalk';
   end if;
 
@@ -731,19 +720,7 @@ CREATE OR REPLACE FUNCTION public.crosswalks__check_members_viewable(p_crosswalk
  SET search_path TO ''
 AS $function$
 begin
-  if exists (
-    select 1
-    from public.crosswalks__datasets cd
-    join public.crosswalks__layouts l on l.id = cd.layout_id and l.crosswalk_id = cd.crosswalk_id
-    where
-      cd.crosswalk_id = p_crosswalk_id and
-      l.status <> 'skipped' and
-      not public.util__auth_user_can_access_resource (
-        'dataset'::public.resource_type,
-        cd.dataset_id,
-        'viewer'::public.role_level
-      )
-  ) then
+  if public.crosswalks__has_unreadable_members (p_crosswalk_id) then
     raise exception 'This crosswalk combines a dataset you cannot open, so you cannot update the combined dataset'
       using errcode = '42501', hint = 'crosswalk_has_unreadable_datasets';
   end if;
@@ -923,6 +900,13 @@ CREATE OR REPLACE FUNCTION public.crosswalks__guard_managed_columns()
 AS $function$
 begin
   if current_user <> 'authenticated' then
+    -- The foreign key's set null, run when the combined dataset is
+    -- deleted, also forgets what that dataset was compiled from.
+    if tg_op = 'UPDATE' and old.output_dataset_id is not null and new.output_dataset_id is null then
+      new.compiled_at := null;
+      new.compiled_code_lists := null;
+    end if;
+
     return new;
   end if;
 
@@ -952,6 +936,28 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.crosswalks__has_unreadable_members(p_crosswalk_id uuid)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE
+ SET search_path TO ''
+AS $function$
+  select exists (
+    select 1
+    from public.crosswalks__datasets cd
+    join public.crosswalks__layouts l on l.id = cd.layout_id and l.crosswalk_id = cd.crosswalk_id
+    where
+      cd.crosswalk_id = p_crosswalk_id and
+      l.status <> 'skipped' and
+      not public.util__auth_user_can_access_resource (
+        'dataset'::public.resource_type,
+        cd.dataset_id,
+        'viewer'::public.role_level
+      )
+  );
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.crosswalks__is_fill_valid(p_fill jsonb)
  RETURNS boolean
  LANGUAGE sql
@@ -964,7 +970,14 @@ AS $function$
     case p_fill ->> 'kind'
       when 'column' then
         jsonb_typeof(p_fill -> 'source_column') = 'string' and
-        btrim(p_fill ->> 'source_column') <> ''
+        btrim(p_fill ->> 'source_column') <> '' and
+        (
+          coalesce(p_fill -> 'convert' ->> 'kind', '') <> 'pad_text' or
+          (
+            jsonb_typeof(p_fill -> 'convert' -> 'length') = 'number' and
+            (p_fill -> 'convert' ->> 'length') ~ '^([1-9]|[1-5][0-9]|6[0-4])$'
+          )
+        )
       when 'constant' then jsonb_typeof(p_fill -> 'value') = 'string'
       when 'expression' then
         jsonb_typeof(p_fill -> 'sql') = 'string' and
@@ -1057,6 +1070,33 @@ begin
     from public.dataset_columns dc
     where dc.dataset_id = p_dataset_id and lower(dc.name) = lower(w.name)
   );
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.crosswalks__require_editor(p_crosswalk_id uuid)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SET search_path TO ''
+AS $function$
+declare
+  v_workspace_id uuid;
+begin
+  select c.workspace_id
+  into v_workspace_id
+  from public.crosswalks c
+  where c.id = p_crosswalk_id;
+
+  if v_workspace_id is null or not public.util__auth_user_meets_min_app_role (
+    v_workspace_id,
+    'data_sources'::public.app_type,
+    'editor'::public.role_level
+  ) then
+    raise exception 'Only Data Sources editors can change a crosswalk'
+      using errcode = '42501', hint = 'crosswalk_editor_required';
+  end if;
+
+  return v_workspace_id;
 end;
 $function$
 ;
@@ -1281,6 +1321,20 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.rpc_crosswalks__has_unreadable_datasets(p_crosswalk_id uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+begin
+  perform public.crosswalks__require_editor (p_crosswalk_id);
+
+  return public.crosswalks__has_unreadable_members (p_crosswalk_id);
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.rpc_crosswalks__save(p_crosswalk_id uuid, p_settings jsonb, p_columns jsonb, p_layouts jsonb, p_datasets jsonb, p_mappings jsonb)
  RETURNS void
  LANGUAGE plpgsql
@@ -1335,6 +1389,11 @@ begin
   if coalesce(btrim(p_dataset_name), '') = '' then
     raise exception 'The combined dataset needs a name'
       using errcode = '23514', hint = 'combined_dataset_name_required';
+  end if;
+
+  if p_dataset_id is null or coalesce(btrim(p_raw_sql), '') = '' then
+    raise exception 'The combined dataset needs an id and the SQL that builds it'
+      using errcode = '22023', hint = 'combined_columns_invalid';
   end if;
 
   perform public.crosswalks__check_combined_payload (p_columns, p_bindings, p_compiled_code_lists);
@@ -1531,10 +1590,12 @@ revoke all privileges on function public.crosswalks__check_payload(p_settings js
 revoke all privileges on function public.crosswalks__create_combined_dataset(p_workspace_id uuid, p_dataset_id uuid, p_name text, p_raw_sql text, p_columns jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__delete_left_out_layouts(p_crosswalk_id uuid, p_layouts jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__guard_managed_columns() from public, anon, authenticated, service_role;
+revoke all privileges on function public.crosswalks__has_unreadable_members(p_crosswalk_id uuid) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__is_fill_valid(p_fill jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__prevent_workspace_id_change() from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__read_combined_columns(p_columns jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__reconcile_combined_columns(p_workspace_id uuid, p_dataset_id uuid, p_columns jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.crosswalks__require_editor(p_crosswalk_id uuid) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__update_combined_dataset(p_workspace_id uuid, p_output_dataset_id uuid, p_dataset_id uuid, p_name text, p_raw_sql text, p_columns jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__validate_owner_profile() from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__write_columns(p_crosswalk_id uuid, p_workspace_id uuid, p_columns jsonb) from public, anon, authenticated, service_role;
@@ -1542,6 +1603,8 @@ revoke all privileges on function public.crosswalks__write_combined_bindings(p_w
 revoke all privileges on function public.crosswalks__write_datasets(p_crosswalk_id uuid, p_workspace_id uuid, p_datasets jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__write_layouts(p_crosswalk_id uuid, p_workspace_id uuid, p_layouts jsonb) from public, anon, authenticated, service_role;
 revoke all privileges on function public.crosswalks__write_mappings(p_crosswalk_id uuid, p_workspace_id uuid, p_mappings jsonb) from public, anon, authenticated, service_role;
+revoke all privileges on function public.rpc_crosswalks__has_unreadable_datasets(p_crosswalk_id uuid) from public, anon, authenticated, service_role;
+grant EXECUTE on function public.rpc_crosswalks__has_unreadable_datasets(p_crosswalk_id uuid) to "authenticated";
 revoke all privileges on function public.rpc_crosswalks__save_combined_dataset(p_crosswalk_id uuid, p_dataset_id uuid, p_dataset_name text, p_raw_sql text, p_columns jsonb, p_bindings jsonb, p_compiled_code_lists jsonb) from public, anon, authenticated, service_role;
 grant EXECUTE on function public.rpc_crosswalks__save_combined_dataset(p_crosswalk_id uuid, p_dataset_id uuid, p_dataset_name text, p_raw_sql text, p_columns jsonb, p_bindings jsonb, p_compiled_code_lists jsonb) to "authenticated";
 revoke all privileges on function public.rpc_crosswalks__save(p_crosswalk_id uuid, p_settings jsonb, p_columns jsonb, p_layouts jsonb, p_datasets jsonb, p_mappings jsonb) from public, anon, authenticated, service_role;

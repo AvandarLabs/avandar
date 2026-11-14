@@ -130,7 +130,7 @@ $$;
 
 /**
  * Raises `crosswalk_payload_invalid` unless every column has a uuid id, a
- * text name, a whole-number position, a known type, and a uuid or null
+ * text name, a whole-number position from 0 to 10000, a known type, and a uuid or null
  * entry, with no id twice. Runs before anything casts the columns.
  */
 create or replace function public.crosswalks__check_column_fields (p_columns jsonb) returns void language plpgsql
@@ -147,7 +147,7 @@ begin
       coalesce(e.col ->> 'id', '') !~* v_uuid_pattern or
       jsonb_typeof(e.col -> 'name') is distinct from 'string' or
       jsonb_typeof(e.col -> 'position') is distinct from 'number' or
-      coalesce(e.col ->> 'position', '') !~ '^[0-9]+$' or
+      coalesce(e.col ->> 'position', '') !~ '^([0-9]{1,4}|10000)$' or
       coalesce(e.col ->> 'data_type', '') <> all (
         enum_range(null::public.datasets__ava_data_type)::text[]
       ) or
@@ -408,8 +408,8 @@ $$;
 /**
  * Raises with a stable hint when a set of memberships cannot be saved: one
  * names a layout that is not in the set, or a dataset that is missing, in
- * another workspace, or one the caller cannot view, or names the crosswalk's
- * own combined dataset. Also refuses a set of
+ * another workspace, or one the caller cannot view, or is any crosswalk's
+ * combined dataset. Also refuses a set of
  * layouts that leaves out a layout still holding a membership the caller
  * cannot view, because deleting the layout would delete that membership.
  */
@@ -451,13 +451,14 @@ begin
       using errcode = '42501', hint = 'dataset_not_readable';
   end if;
 
-  -- The combined dataset reads every member, so it cannot be one.
+  -- A combined dataset reads every member, so no crosswalk's combined
+  -- dataset can be one: two crosswalks could otherwise feed each other.
   if exists (
     select 1
     from jsonb_to_recordset(p_datasets) as d (dataset_id uuid)
-    join public.crosswalks c on c.id = p_crosswalk_id and c.output_dataset_id = d.dataset_id
+    join public.crosswalks c on c.output_dataset_id = d.dataset_id
   ) then
-    raise exception 'The combined dataset cannot be one of the datasets it combines'
+    raise exception 'A combined dataset cannot be one of the datasets a crosswalk combines'
       using errcode = '23514', hint = 'output_dataset_in_crosswalk';
   end if;
 
@@ -547,7 +548,8 @@ $$;
  * Whether a stored fill is a valid version 1 fill: an object with
  * `version` 1 and a known `kind`, where a `column` fill names a non-blank
  * `source_column`, a `constant` has a text `value`, and an `expression`
- * has non-blank `sql`. The browser's versioned parser checks the rest.
+ * has non-blank `sql`. A `pad_text` conversion pads to a length from 1 to
+ * 64. The browser's versioned parser checks the rest.
  */
 create or replace function public.crosswalks__is_fill_valid (p_fill jsonb) returns boolean language sql immutable
 set
@@ -558,7 +560,14 @@ set
     case p_fill ->> 'kind'
       when 'column' then
         jsonb_typeof(p_fill -> 'source_column') = 'string' and
-        btrim(p_fill ->> 'source_column') <> ''
+        btrim(p_fill ->> 'source_column') <> '' and
+        (
+          coalesce(p_fill -> 'convert' ->> 'kind', '') <> 'pad_text' or
+          (
+            jsonb_typeof(p_fill -> 'convert' -> 'length') = 'number' and
+            (p_fill -> 'convert' ->> 'length') ~ '^([1-9]|[1-5][0-9]|6[0-4])$'
+          )
+        )
       when 'constant' then jsonb_typeof(p_fill -> 'value') = 'string'
       when 'expression' then
         jsonb_typeof(p_fill -> 'sql') = 'string' and

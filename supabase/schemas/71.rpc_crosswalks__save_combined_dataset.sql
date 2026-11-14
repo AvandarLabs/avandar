@@ -50,6 +50,11 @@ begin
       using errcode = '23514', hint = 'combined_dataset_name_required';
   end if;
 
+  if p_dataset_id is null or coalesce(btrim(p_raw_sql), '') = '' then
+    raise exception 'The combined dataset needs an id and the SQL that builds it'
+      using errcode = '22023', hint = 'combined_columns_invalid';
+  end if;
+
   perform public.crosswalks__check_combined_payload (p_columns, p_bindings, p_compiled_code_lists);
   perform public.crosswalks__check_combined_bindings (v_workspace_id, p_columns, p_bindings);
 
@@ -80,16 +85,16 @@ end;
 $$;
 
 /**
- * Raises `crosswalk_has_unreadable_datasets` when a layout that is not
- * skipped holds a dataset the caller cannot view. Such a dataset is not in
- * the SQL the caller compiled, so saving it would overwrite the combined
- * dataset without that member.
+ * Whether a layout that is not skipped holds a dataset the caller cannot
+ * view. Such a dataset is not in the SQL the caller compiled. Shared by
+ * `crosswalks__check_members_viewable` and
+ * `rpc_crosswalks__has_unreadable_datasets`, so the browser and the save
+ * agree on it.
  */
-create or replace function public.crosswalks__check_members_viewable (p_crosswalk_id uuid) returns void language plpgsql
+create or replace function public.crosswalks__has_unreadable_members (p_crosswalk_id uuid) returns boolean language sql stable
 set
   search_path = '' as $$
-begin
-  if exists (
+  select exists (
     select 1
     from public.crosswalks__datasets cd
     join public.crosswalks__layouts l on l.id = cd.layout_id and l.crosswalk_id = cd.crosswalk_id
@@ -101,7 +106,19 @@ begin
         cd.dataset_id,
         'viewer'::public.role_level
       )
-  ) then
+  );
+$$;
+
+/**
+ * Raises `crosswalk_has_unreadable_datasets` when a layout that is not
+ * skipped holds a dataset the caller cannot view, because saving would
+ * overwrite the combined dataset without that member.
+ */
+create or replace function public.crosswalks__check_members_viewable (p_crosswalk_id uuid) returns void language plpgsql
+set
+  search_path = '' as $$
+begin
+  if public.crosswalks__has_unreadable_members (p_crosswalk_id) then
     raise exception 'This crosswalk combines a dataset you cannot open, so you cannot update the combined dataset'
       using errcode = '42501', hint = 'crosswalk_has_unreadable_datasets';
   end if;
@@ -493,6 +510,14 @@ execute on function public.rpc_crosswalks__save_combined_dataset (
 
 -- The helpers run inside the SECURITY DEFINER RPC and are never called
 -- directly, so no Data API role gets EXECUTE.
+revoke
+execute on function public.crosswalks__has_unreadable_members (uuid)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
 revoke
 execute on function public.crosswalks__check_members_viewable (uuid)
 from
