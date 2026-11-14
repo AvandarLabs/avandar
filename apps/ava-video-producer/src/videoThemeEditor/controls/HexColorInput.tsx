@@ -33,8 +33,7 @@ const ATTRIBUTES = { colorPreview: { "data-inherit-dim": true } } as const;
  * incomplete, emits a lowercased colour once it is valid, and puts back the
  * last valid colour on blur. Its picker stays inside the preview dialog, and
  * closes on Enter, Escape, and blur so it does not cover the rows below. While
- * it is open the field carries Mantine's `data-mantine-stop-propagation`, so
- * the dialog's own Escape handler leaves the dialog open for that one press. For
+ * it is open, Escape is handled here and does not reach the dialog. For
  * example, the colour, palette, and gradient token controls use it.
  */
 export function HexColorInput({
@@ -84,12 +83,17 @@ export function HexColorInput({
         reactTo("click");
         onClick?.(event);
       }}
-      data-mantine-stop-propagation={doesEscapeBelongToColorPopover(isOpen)}
       onKeyDown={(event) => {
         if (event.key === "Enter") {
           reactTo("enter");
         }
         if (event.key === "Escape") {
+          if (doesEscapeBelongToColorPopover(isOpen)) {
+            // The preview dialog closes on an Escape nobody handled, and it
+            // checks `defaultPrevented`, so this press only closes the picker.
+            event.preventDefault();
+            event.stopPropagation();
+          }
           reactTo("escape");
         }
         onKeyDown?.(event);
