@@ -75,6 +75,23 @@ vi.mock(
   },
 );
 vi.mock(
+  "@/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkStaleBanner/CrosswalkStaleBanner",
+  () => {
+    return {
+      CrosswalkStaleBanner: (props: {
+        isOnCombineStep: boolean;
+        onUpdate: () => void;
+      }) => {
+        return props.isOnCombineStep ? null : (
+          <button type="button" onClick={props.onUpdate}>
+            Update from banner
+          </button>
+        );
+      },
+    };
+  },
+);
+vi.mock(
   "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep",
   () => {
     return {
@@ -142,5 +159,23 @@ describe("CrosswalkFlowView", () => {
     expect(
       screen.getByRole("button", { name: /Update combined dataset/ }),
     ).toBeInTheDocument();
+  });
+
+  it("goes to the combine step from the stale banner", () => {
+    render(
+      <CrosswalkFlowView
+        crosswalk={undefined}
+        initialDraft={makeSeededState().draft}
+        isSaved
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Update from banner" }));
+    expect(mocks.navigate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: { workspaceSlug: "demo", crosswalkId: CROSSWALK_ID },
+        search: { step: "combine", layoutId: undefined },
+      }),
+    );
   });
 });

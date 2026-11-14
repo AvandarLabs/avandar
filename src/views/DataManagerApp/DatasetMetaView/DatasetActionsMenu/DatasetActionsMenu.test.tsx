@@ -14,6 +14,7 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       hasBindings: false,
       hasBindingsError: false,
       isLoadingLinkedDatasets: false,
+      combiningCrosswalk: undefined as unknown,
     },
   };
 });
@@ -27,6 +28,20 @@ vi.mock("@/hooks/permissions/useHasPermission/useHasPermission", () => {
     },
   };
 });
+
+vi.mock(
+  "@/hooks/crosswalks/useCombiningCrosswalk/useCombiningCrosswalk",
+  () => {
+    return {
+      useCombiningCrosswalk: () => {
+        return {
+          crosswalk: permissionState.combiningCrosswalk,
+          isLoading: false,
+        };
+      },
+    };
+  },
+);
 
 vi.mock("@/hooks/datasets/useCanEditDataset/useCanEditDataset", () => {
   return {
@@ -129,6 +144,7 @@ describe("DatasetActionsMenu", () => {
     permissionState.hasBindings = false;
     permissionState.hasBindingsError = false;
     permissionState.isLoadingLinkedDatasets = false;
+    permissionState.combiningCrosswalk = undefined;
   });
 
   it("opens learning a dictionary from this dataset", async () => {
@@ -246,5 +262,23 @@ describe("DatasetActionsMenu", () => {
     expect(
       await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
     ).toBeDisabled();
+  });
+
+  it("does not offer Apply on a dataset a crosswalk combined", async () => {
+    permissionState.combiningCrosswalk = {
+      id: "crosswalk-1",
+      name: "Borough line lists",
+    };
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toBeNull();
   });
 });

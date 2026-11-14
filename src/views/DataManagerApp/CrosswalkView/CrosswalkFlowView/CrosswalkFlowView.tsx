@@ -1,6 +1,7 @@
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import { CrosswalkHeader } from "@/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkHeader";
+import { CrosswalkStaleBanner } from "@/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkStaleBanner/CrosswalkStaleBanner";
 import { CrosswalkStepBody } from "@/views/DataManagerApp/CrosswalkView/CrosswalkStepBody";
 import { CrosswalkStepHeading } from "@/views/DataManagerApp/CrosswalkView/CrosswalkStepHeading/CrosswalkStepHeading";
 import { CrosswalkStepper } from "@/views/DataManagerApp/CrosswalkView/CrosswalkStepper/CrosswalkStepper";
@@ -20,8 +21,9 @@ type Props = {
 
 /**
  * The crosswalk once everything it reads has loaded: the header with its
- * facts and actions, the step bar, and the current step. Opening Map each
- * dataset from the step bar keeps the layout in the URL.
+ * facts and actions, the stale banner when a code list its combined
+ * dataset embedded has changed, the step bar, and the current step.
+ * Opening Map each dataset from the step bar keeps the layout in the URL.
  */
 export function CrosswalkFlowView({
   crosswalk,
@@ -45,6 +47,13 @@ export function CrosswalkFlowView({
         crosswalk={crosswalk}
         flow={flow}
         context={catalog.context}
+      />
+      <CrosswalkStaleBanner
+        crosswalk={crosswalk}
+        isOnCombineStep={flow.step === "combine"}
+        onUpdate={() => {
+          flow.goToStepSaving("combine");
+        }}
       />
       <CrosswalkStepper
         step={flow.step}

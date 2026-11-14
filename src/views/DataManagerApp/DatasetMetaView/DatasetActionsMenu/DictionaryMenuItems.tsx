@@ -1,4 +1,5 @@
 import { Menu } from "@mantine/core";
+import { useCombiningCrosswalk } from "@/hooks/crosswalks/useCombiningCrosswalk/useCombiningCrosswalk";
 import { useDatasetHasBindings } from "@/hooks/dataDictionaries/useDatasetHasBindings";
 import { useCanEditDataset } from "@/hooks/datasets/useCanEditDataset/useCanEditDataset";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
@@ -14,7 +15,9 @@ type Props = {
 /**
  * The dataset menu's dictionary actions, and a divider after them when any
  * shows. Apply shows to someone who can edit the dataset and read
- * dictionaries. Create shows to a dictionary editor once the bindings are
+ * dictionaries. It is hidden on a crosswalk's combined dataset, whose code
+ * lists come from the crosswalk, which replaces its bindings on every
+ * update. Create shows to a dictionary editor once the bindings are
  * read and no dictionary is attached: not while they load, and not when
  * they cannot be read. Neither shows while its check is still loading.
  */
@@ -27,8 +30,13 @@ export function DictionaryMenuItems({ datasetId }: Readonly<Props>): ReactNode {
   );
   const editRights = useCanEditDataset(datasetId);
   const bindings = useDatasetHasBindings(datasetId);
+  const combining = useCombiningCrosswalk(datasetId);
   const canApply =
-    !editRights.isLoading && editRights.canEdit && canViewDictionaries;
+    !editRights.isLoading &&
+    editRights.canEdit &&
+    canViewDictionaries &&
+    !combining.isLoading &&
+    combining.crosswalk === undefined;
   const canCreate =
     canEditDictionaries &&
     !bindings.isLoading &&

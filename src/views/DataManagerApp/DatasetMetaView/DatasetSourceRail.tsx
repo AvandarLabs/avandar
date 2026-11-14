@@ -2,6 +2,7 @@ import { formatDate, formatFileSize, isNonNullish } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
+import { CombinedByFact } from "@/views/DataManagerApp/DatasetMetaView/CombinedByFact/CombinedByFact";
 import { DatasetDictionariesRailGroup } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup";
 import { LinkedSourceFact } from "@/views/DataManagerApp/DatasetMetaView/LinkedSourceFact";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
@@ -160,11 +161,15 @@ export function DatasetSourceRail({
       return null;
     })
     .with({ __type: "VirtualDataset" }, (virtualDataset) => {
+      // Only a virtual dataset can be a crosswalk's combined dataset.
       return (
-        <LinkedSourceFact
-          linkedSourceDatasetId={virtualDataset.linkedSourceDatasetId}
-          columnCodes={columnCodes}
-        />
+        <>
+          <LinkedSourceFact
+            linkedSourceDatasetId={virtualDataset.linkedSourceDatasetId}
+            columnCodes={columnCodes}
+          />
+          <CombinedByFact datasetId={dataset.id} />
+        </>
       );
     })
     .exhaustive();

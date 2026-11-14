@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { CrosswalkSql } from "$/models/crosswalks/CrosswalkSql/CrosswalkSql";
 import { renderHook } from "@/test-utils";
 import { useDictionaryUsage } from "@/views/DataManagerApp/DataDictionaryView/useDictionaryUsage/useDictionaryUsage";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
@@ -8,6 +9,8 @@ const mocks = vi.hoisted(() => {
     bindings: [] as unknown[],
     datasets: [] as unknown[],
     isBindingsError: false,
+    crosswalks: [] as unknown[],
+    codeLists: [] as unknown[],
   };
 });
 
@@ -26,6 +29,24 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
       // Row-level security returns only the datasets the user can read.
       useGetAll: () => {
         return [mocks.datasets, false, { isError: false }];
+      },
+    },
+  };
+});
+vi.mock("@/clients/crosswalks/CrosswalkClient", () => {
+  return {
+    CrosswalkClient: {
+      useGetAll: () => {
+        return [mocks.crosswalks, false, { isError: false }];
+      },
+    },
+  };
+});
+vi.mock("@/clients/dataDictionaries/DataDictionaryCodeListClient", () => {
+  return {
+    DataDictionaryCodeListClient: {
+      useGetAll: () => {
+        return [mocks.codeLists, false, { isError: false }];
       },
     },
   };
@@ -56,9 +77,42 @@ const PINNED = {
   ],
 };
 
+const SEX_PAIRS = [
+  { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+  { code: "2", label: "Female", acceptedSpellings: [], isMissing: false },
+];
+
+/** A crosswalk that combined `dataset-combined`, embedding the sex list. */
+function _useCombinedDataset(currentPairs: typeof SEX_PAIRS): void {
+  mocks.bindings = [_binding("dataset-combined", "entry-gender")];
+  mocks.datasets = [
+    {
+      id: "dataset-combined",
+      name: "Measles, all boroughs",
+      sourceType: "virtual",
+    },
+  ];
+  mocks.crosswalks = [
+    {
+      id: "crosswalk-1",
+      name: "Borough line lists",
+      outputDatasetId: "dataset-combined",
+      compiledCodeLists: [
+        {
+          codeListId: "list-sex",
+          fingerprint: CrosswalkSql.getCodeListFingerprint(SEX_PAIRS),
+        },
+      ],
+    },
+  ];
+  mocks.codeLists = [{ id: "list-sex", pairs: currentPairs }];
+}
+
 describe("useDictionaryUsage", () => {
   beforeEach(() => {
     mocks.isBindingsError = false;
+    mocks.crosswalks = [];
+    mocks.codeLists = [];
     mocks.bindings = [
       _binding("dataset-kings", "entry-gender"),
       _binding("dataset-kings", "entry-gender"),
@@ -168,5 +222,47 @@ describe("useDictionaryUsage", () => {
       });
     });
     expect(result.current.hasError).toBe(true);
+  });
+
+  it("lists a crosswalk's combined dataset as Crosswalk, up to date while its lists are unchanged", () => {
+    _useCombinedDataset(SEX_PAIRS);
+
+    const { result } = renderHook(() => {
+      return useDictionaryUsage({
+        dictionaryId: DICTIONARY_ID,
+        dictionaryName: "NYS codes",
+        currentVersion: 3,
+      });
+    });
+
+    expect(result.current.rows).toEqual([
+      {
+        datasetId: "dataset-combined",
+        datasetName: "Measles, all boroughs",
+        sourceType: "virtual",
+        entryCount: 1,
+        howApplied: "crosswalk",
+        appliedVersion: undefined,
+        isBehind: false,
+        crosswalk: { id: "crosswalk-1", name: "Borough line lists" },
+      },
+    ]);
+  });
+
+  it("says a crosswalk's combined dataset is behind once a list it embedded changed", () => {
+    _useCombinedDataset([SEX_PAIRS[0]!, { ...SEX_PAIRS[1]!, label: "Woman" }]);
+
+    const { result } = renderHook(() => {
+      return useDictionaryUsage({
+        dictionaryId: DICTIONARY_ID,
+        dictionaryName: "NYS codes",
+        currentVersion: 3,
+      });
+    });
+
+    expect(result.current.rows[0]).toMatchObject({
+      howApplied: "crosswalk",
+      isBehind: true,
+    });
   });
 });
