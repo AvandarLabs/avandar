@@ -10,6 +10,7 @@ import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
+import type { CrosswalkMeaningMatch } from "@/lib/crosswalks/makeCrosswalkMatchesRequest/makeCrosswalkMatchesRequest";
 
 /** The crosswalk view's steps, in order. */
 export type CrosswalkStep = "datasets" | "map" | "combine";
@@ -115,4 +116,16 @@ export type CrosswalkAction =
       };
       context: CrosswalkContext;
     }
-  | { type: "saved"; draft: CrosswalkDraft.T };
+  | { type: "saved"; draft: CrosswalkDraft.T }
+  /**
+   * Layout columns the suggestion model says mean combined-dataset columns,
+   * with the layout's profiles and the catalog, so a governed column gets a
+   * code list as it would from a values match.
+   */
+  | {
+      type: "meaning_matches_found";
+      layoutId: CrosswalkLayout.Id;
+      matches: readonly CrosswalkMeaningMatch[];
+      sources: readonly ColumnProfile.T[];
+      context: CrosswalkContext;
+    };

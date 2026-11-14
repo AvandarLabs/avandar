@@ -26,6 +26,7 @@ import {
   crosswalkReducer,
   isCrosswalkDirty,
 } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer";
+import { withLayoutMappings } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/prefillCrosswalkLayout";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
 import type { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import type { CrosswalkState } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
@@ -842,5 +843,158 @@ describe("crosswalkReducer: settings and saving", () => {
 
   it("counts a draft never saved as dirty", () => {
     expect(isCrosswalkDirty(makeSeededState())).toBe(true);
+  });
+});
+
+describe("crosswalkReducer: meaning_matches_found", () => {
+  /** `state` with a column's fill removed from a layout, status refreshed. */
+  function _withoutFill(
+    state: CrosswalkState,
+    layoutId: CrosswalkLayout.Id,
+    columnName: string,
+  ): CrosswalkState {
+    const columnId = getColumn(state, columnName).id;
+    const kept = Object.fromEntries(
+      Object.entries(state.draft.mappings[layoutId] ?? {}).filter(
+        ([candidate]) => {
+          return candidate !== columnId;
+        },
+      ),
+    );
+    return { ...state, draft: withLayoutMappings(state.draft, layoutId, kept) };
+  }
+
+  /** The seeded state with Kings' `sex` fill removed. */
+  function _kingsWithoutSex(): CrosswalkState {
+    const seeded = makeSeededState();
+    return _withoutFill(seeded, getLayoutOf(seeded, KINGS_MARCH.id).id, "sex");
+  }
+
+  /** Dispatches meaning matches for a layout, Kings unless another is given. */
+  function _meaningFound(
+    state: CrosswalkState,
+    matches: ReadonlyArray<{ columnName: string; sourceColumn: string }>,
+    layoutId: CrosswalkLayout.Id = getLayoutOf(state, KINGS_MARCH.id).id,
+  ): CrosswalkState {
+    return crosswalkReducer(state, {
+      type: "meaning_matches_found",
+      layoutId,
+      matches: matches.map((match) => {
+        return {
+          columnId: getColumn(state, match.columnName).id,
+          sourceColumn: match.sourceColumn,
+        };
+      }),
+      sources: [
+        makeProfile({
+          dataset: KINGS_MARCH,
+          columnName: "GENDER",
+          dataType: "bigint",
+          values: ["1", "2", "9"],
+        }),
+      ],
+      context: CONTEXT,
+    });
+  }
+
+  it("adds a suggested Meaning fill, with the code list its values fit", () => {
+    const state = _kingsWithoutSex();
+    const next = _meaningFound(state, [
+      { columnName: "sex", sourceColumn: "GENDER" },
+    ]);
+
+    expect(_fillOf(next, getLayoutOf(next, KINGS_MARCH.id).id, "sex")).toEqual({
+      id: expect.any(String),
+      fill: {
+        kind: "column",
+        sourceColumn: "GENDER",
+        convert: undefined,
+        codeListId: SEX_CODES_ID,
+        holdsLabels: false,
+      },
+      status: "suggested",
+      confidence: undefined,
+      reason: "meaning",
+    });
+  });
+
+  it("moves a To do layout to Review once every column has a fill", () => {
+    const state = _kingsWithoutSex();
+    const next = _meaningFound(state, [
+      { columnName: "sex", sourceColumn: "GENDER" },
+    ]);
+
+    expect(getLayoutOf(state, KINGS_MARCH.id).status).toBe("to_do");
+    expect(getLayoutOf(next, KINGS_MARCH.id).status).toBe("review");
+  });
+
+  it("spells the source as the layout does", () => {
+    const next = _meaningFound(_kingsWithoutSex(), [
+      { columnName: "sex", sourceColumn: "gender" },
+    ]);
+
+    expect(
+      _fillOf(next, getLayoutOf(next, KINGS_MARCH.id).id, "sex")?.fill,
+    ).toMatchObject({
+      sourceColumn: "GENDER",
+    });
+  });
+
+  it("never replaces a fill that exists", () => {
+    const state = makeSeededState();
+
+    expect(
+      _meaningFound(state, [
+        { columnName: "case_id", sourceColumn: "onset_dt" },
+      ]),
+    ).toBe(state);
+  });
+
+  it("drops a source another fill reads, and one the layout does not have", () => {
+    const state = _kingsWithoutSex();
+
+    expect(
+      _meaningFound(state, [
+        { columnName: "sex", sourceColumn: "CASE_ID" },
+        { columnName: "sex", sourceColumn: "gender_cd" },
+      ]),
+    ).toBe(state);
+  });
+
+  it("uses each source for one column only, first match first", () => {
+    const seeded = _kingsWithoutSex();
+    const kingsId = getLayoutOf(seeded, KINGS_MARCH.id).id;
+    const state = _withoutFill(seeded, kingsId, "county");
+    const next = _meaningFound(state, [
+      { columnName: "sex", sourceColumn: "onset_dt" },
+      { columnName: "county", sourceColumn: "ONSET_DT" },
+    ]);
+
+    expect(_fillOf(next, kingsId, "sex")?.fill).toMatchObject({
+      sourceColumn: "onset_dt",
+    });
+    expect(_fillOf(next, kingsId, "county")).toBeUndefined();
+  });
+
+  it("leaves the reference layout and a skipped layout alone", () => {
+    const seeded = makeSeededState();
+    const referenceId = getLayoutOf(seeded, BRONX.id).id;
+    const withoutReferenceSex = _withoutFill(seeded, referenceId, "sex");
+    const kingsWithoutSex = _kingsWithoutSex();
+    const skipped = crosswalkReducer(kingsWithoutSex, {
+      type: "layout_skipped",
+      layoutId: getLayoutOf(kingsWithoutSex, KINGS_MARCH.id).id,
+    });
+
+    expect(
+      _meaningFound(
+        withoutReferenceSex,
+        [{ columnName: "sex", sourceColumn: "sex" }],
+        referenceId,
+      ),
+    ).toBe(withoutReferenceSex);
+    expect(
+      _meaningFound(skipped, [{ columnName: "sex", sourceColumn: "GENDER" }]),
+    ).toBe(skipped);
   });
 });

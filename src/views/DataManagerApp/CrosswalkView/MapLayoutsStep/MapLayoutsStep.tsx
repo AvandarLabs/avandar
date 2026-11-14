@@ -18,12 +18,18 @@ import {
   chooseShownLayout,
   hasSuggestions,
 } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/mapStepSelection/mapStepSelection";
+import { SuggestMatchesButton } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/SuggestMatchesButton/SuggestMatchesButton";
+import {
+  useCrosswalkMeaningMatches,
+  useCrosswalkSuggestionConsent,
+} from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches";
 import { useLayoutValues } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useLayoutValues/useLayoutValues";
 import { useMapStepActions } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useMapStepActions/useMapStepActions";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import type { CrosswalkContext } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
 import type { CrosswalkStepProps } from "@/views/DataManagerApp/CrosswalkView/CrosswalkStepBody";
+import type { CrosswalkSuggestionConsent } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches";
 import type { LayoutValues } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useLayoutValues/useLayoutValues";
 import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkFlow/useCrosswalkFlow";
 import type { ReactNode } from "react";
@@ -116,13 +122,31 @@ function LayoutTableSection(
   );
 }
 
-function LayoutFooter({ flow, layout }: Readonly<LayoutProps>): ReactNode {
+function LayoutFooter(
+  props: Readonly<
+    LayoutProps & {
+      values: LayoutValues;
+      suggestionConsent: CrosswalkSuggestionConsent;
+    }
+  >,
+): ReactNode {
+  const { flow, layout } = props;
   const actions = useMapStepActions(flow);
+  const meaningMatches = useCrosswalkMeaningMatches({
+    draft: flow.state.draft,
+    layoutId: layout.id,
+    context: props.context,
+    targets: props.values.targets,
+    profilesBySourceColumn: props.values.profilesBySourceColumn,
+    suggestionConsent: props.suggestionConsent,
+    dispatch: flow.dispatch,
+  });
   return (
     <MapLayoutsFooter
       layout={layout}
       hasSuggestions={hasSuggestions(flow.state.draft, layout.id)}
       isSaving={flow.isSaving}
+      suggestMatches={<SuggestMatchesButton meaningMatches={meaningMatches} />}
       onSkip={() => {
         void actions.skip(layout.id);
       }}
@@ -202,7 +226,10 @@ function LayoutMapping({
   flow,
   context,
   layout,
-}: Readonly<LayoutProps>): ReactNode {
+  suggestionConsent,
+}: Readonly<
+  LayoutProps & { suggestionConsent: CrosswalkSuggestionConsent }
+>): ReactNode {
   const { draft, readLayoutIds } = flow.state;
   const values = useLayoutValues({
     draft,
@@ -234,7 +261,13 @@ function LayoutMapping({
         selectedColumnId={selectedColumnId}
         onSelectColumn={setChosenColumnId}
       />
-      <LayoutFooter flow={flow} context={context} layout={layout} />
+      <LayoutFooter
+        flow={flow}
+        context={context}
+        layout={layout}
+        values={values}
+        suggestionConsent={suggestionConsent}
+      />
     </>
   );
 }
@@ -259,13 +292,16 @@ function NoLayouts({ onBack }: Readonly<{ onBack: () => void }>): ReactNode {
  * table with Add a column under it, the selected column's side pane, and
  * the footer that skips, accepts suggestions, or confirms and moves on.
  * The shown layout's subtree is keyed by its id, so the selected column
- * starts over on every layout. Pane edits only dispatch. They are saved
- * by the next footer action or layout change.
+ * starts over on every layout, while the answer to sending column names
+ * for Suggest matches is kept above it. Pane edits only dispatch. They are
+ * saved by the next footer action or layout change.
  */
 export function MapLayoutsStep({
   flow,
   catalog,
 }: Readonly<CrosswalkStepProps>): ReactNode {
+  // Above the per-layout subtree, so one answer covers every layout.
+  const suggestionConsent = useCrosswalkSuggestionConsent();
   const layout = chooseShownLayout(flow.state.draft, flow.layoutId);
   if (!layout) {
     return (
@@ -282,6 +318,7 @@ export function MapLayoutsStep({
       flow={flow}
       context={catalog.context}
       layout={layout}
+      suggestionConsent={suggestionConsent}
     />
   );
 }

@@ -18,6 +18,10 @@ import type {
 export type LayoutMappings = Readonly<Record<string, CrosswalkDraft.Mapping>>;
 
 type ValuesRead = Extract<CrosswalkAction, { type: "values_read" }>;
+type MeaningMatchesFound = Extract<
+  CrosswalkAction,
+  { type: "meaning_matches_found" }
+>;
 type CarriedFill = {
   columnId: CrosswalkColumn.Id;
   fill: CrosswalkMapping.Fill;
@@ -340,4 +344,109 @@ export function applyLayoutValues(
     ..._chooseCodeListsFromValues(draft, confirmed, action),
     ..._toMappings(prefills, current),
   });
+}
+
+/**
+ * The column fill a meaning match suggests: the source column with no
+ * conversion, and for a governed column the code list the source's values
+ * fit, as a values match would choose it.
+ */
+function _toMeaningFill(
+  options: Readonly<{
+    column: CrosswalkDraft.Column;
+    sourceColumn: string;
+    action: MeaningMatchesFound;
+  }>,
+): CrosswalkMapping.Fill {
+  const { column, sourceColumn, action } = options;
+  const entry = column.entryId
+    ? action.context.entriesById.get(column.entryId)
+    : undefined;
+  const profile = action.sources.find((candidate) => {
+    return candidate.columnName.toLowerCase() === sourceColumn.toLowerCase();
+  });
+  const choice =
+    entry && profile
+      ? CrosswalkMatch.chooseCodeList({ profile, entry })
+      : undefined;
+  return {
+    kind: "column",
+    sourceColumn,
+    convert: undefined,
+    codeListId: choice?.codeListId,
+    holdsLabels: choice?.holdsLabels ?? false,
+  };
+}
+
+/**
+ * The suggested mappings meaning matches add to one layout: one per column
+ * with no fill, from a layout column (spelled as the layout spells it) that
+ * no fill reads yet. Each column and each source is used once, first match
+ * first.
+ */
+function _makeMeaningMappings(
+  draft: CrosswalkDraft.T,
+  layout: CrosswalkDraft.Layout,
+  action: MeaningMatchesFound,
+): Record<string, CrosswalkDraft.Mapping> {
+  const current = draft.mappings[layout.id] ?? {};
+  const usedSources = _usedSourceColumns(current);
+  const added: Record<string, CrosswalkDraft.Mapping> = {};
+  action.matches.forEach((match) => {
+    const column = draft.columns.find((candidate) => {
+      return candidate.id === match.columnId;
+    });
+    const sourceColumn = layout.columnNames.find((name) => {
+      return name.toLowerCase() === match.sourceColumn.toLowerCase();
+    });
+    if (
+      !column ||
+      !sourceColumn ||
+      current[column.id] ||
+      added[column.id] ||
+      usedSources.has(sourceColumn.toLowerCase())
+    ) {
+      return;
+    }
+    usedSources.add(sourceColumn.toLowerCase());
+    added[column.id] = {
+      id: uuid<CrosswalkMapping.Id>(),
+      fill: _toMeaningFill({ column, sourceColumn, action }),
+      status: "suggested",
+      confidence: undefined,
+      reason: "meaning",
+    };
+  });
+  return added;
+}
+
+/**
+ * Stores meaning matches as suggested fills of one layout, marked
+ * `meaning`. A fill that exists is never replaced, the reference layout and
+ * a mapped or skipped layout are left alone, and the layout's status is
+ * refreshed, so a To do layout becomes Review once every column has a fill.
+ * Returns the same draft when nothing is added.
+ */
+export function applyMeaningMatches(
+  draft: CrosswalkDraft.T,
+  action: MeaningMatchesFound,
+): CrosswalkDraft.T {
+  const layout = draft.layouts.find((candidate) => {
+    return candidate.id === action.layoutId;
+  });
+  if (
+    !layout ||
+    layout.isReference ||
+    layout.status === "mapped" ||
+    layout.status === "skipped"
+  ) {
+    return draft;
+  }
+  const added = _makeMeaningMappings(draft, layout, action);
+  return Object.keys(added).length === 0
+    ? draft
+    : withLayoutMappings(draft, layout.id, {
+        ...draft.mappings[layout.id],
+        ...added,
+      });
 }

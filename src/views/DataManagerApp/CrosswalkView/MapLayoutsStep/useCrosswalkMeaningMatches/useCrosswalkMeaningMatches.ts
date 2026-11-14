@@ -1,0 +1,196 @@
+import { useMutation } from "@avandar/query-hooks";
+import { useLingui } from "@lingui/react/macro";
+import { useState } from "react";
+import { parseDictionaryMeaningMatches } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
+import {
+  makeCrosswalkMatchesRequest,
+  toCrosswalkMeaningMatches,
+} from "@/lib/crosswalks/makeCrosswalkMatchesRequest/makeCrosswalkMatchesRequest";
+import { useDictionarySuggestions } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
+import type { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
+import type { CrosswalkMatch } from "$/models/crosswalks/CrosswalkMatch/CrosswalkMatch";
+import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
+import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
+import type {
+  CrosswalkMatchesRequest,
+  CrosswalkMeaningMatch,
+} from "@/lib/crosswalks/makeCrosswalkMatchesRequest/makeCrosswalkMatchesRequest";
+import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
+import type {
+  CrosswalkAction,
+  CrosswalkContext,
+} from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
+import type { SuggestionConsent } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type {
+  DictionarySuggestionAvailability,
+  RequestSuggestionReply,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
+import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
+
+/** What step 2's Suggest matches shows and does for the selected layout. */
+export type CrosswalkMeaningMatches = {
+  availability: DictionarySuggestionAvailability;
+  /** True when a model can answer and the layout has something to ask about. */
+  canSuggest: boolean;
+  /** The search for this layout; another layout's search reads as idle. */
+  status: MeaningMatchStatus;
+  /** How many pairs the last search for this layout found, once it is done. */
+  foundCount: number | undefined;
+  suggestMatches: () => void;
+};
+
+/** The user's answer to sending column names online, and how it is given. */
+export type CrosswalkSuggestionConsent = {
+  consent: SuggestionConsent;
+  onConsentDecided: (isApproved: boolean) => void;
+};
+
+/** What the hook reads: the draft, layout, values, consent, and dispatch. */
+type MeaningMatchesOptions = Readonly<{
+  draft: CrosswalkDraft.T;
+  layoutId: CrosswalkLayout.Id;
+  context: CrosswalkContext;
+  targets: readonly CrosswalkMatch.Target[];
+  profilesBySourceColumn: ReadonlyMap<string, ColumnProfile.T>;
+  suggestionConsent: CrosswalkSuggestionConsent;
+  dispatch: (action: CrosswalkAction) => void;
+}>;
+
+type MatchesVariables = {
+  request: CrosswalkMatchesRequest;
+  layoutId: CrosswalkLayout.Id;
+  /** The layout's profiles when it was asked about, for the dispatch. */
+  sources: readonly ColumnProfile.T[];
+};
+
+/**
+ * Keeps the user's answer to sending suggestions online. Step 2 holds it
+ * above the shown layout, so one answer covers every layout of the
+ * crosswalk while the step is open.
+ */
+export function useCrosswalkSuggestionConsent(): CrosswalkSuggestionConsent {
+  const [consent, setConsent] = useState<SuggestionConsent>("not_asked");
+  return {
+    consent,
+    onConsentDecided: (isApproved) => {
+      setConsent(isApproved ? "approved" : "declined");
+    },
+  };
+}
+
+async function _requestMatches(
+  request: CrosswalkMatchesRequest,
+  requestReply: RequestSuggestionReply,
+): Promise<CrosswalkMeaningMatch[]> {
+  const reply = await requestReply(request.request);
+  if (reply === undefined) {
+    return [];
+  }
+  const names = request.request.columns.map((column) => {
+    return column.name;
+  });
+  const matches = parseDictionaryMeaningMatches(reply, names) ?? [];
+  return toCrosswalkMeaningMatches({ request, matches });
+}
+
+function _toStatus(result: {
+  isPending: boolean;
+  isError: boolean;
+  isSuccess: boolean;
+}): MeaningMatchStatus {
+  if (result.isPending) {
+    return "finding";
+  }
+  if (result.isError) {
+    return "failed";
+  }
+  return result.isSuccess ? "done" : "idle";
+}
+
+/** The layout's request, cut to fit the model that will answer, if any. */
+function _makeRequest(
+  options: MeaningMatchesOptions,
+  locale: string,
+  model: DictionarySuggestionModel,
+): CrosswalkMatchesRequest | undefined {
+  return makeCrosswalkMatchesRequest({
+    draft: options.draft,
+    layoutId: options.layoutId,
+    datasetsById: options.context.datasetsById,
+    targets: options.targets,
+    profilesBySourceColumn: options.profilesBySourceColumn,
+    locale,
+    model,
+  });
+}
+
+/** The search: asks, then dispatches what it found for the layout asked. */
+function useFindMatches(
+  options: Readonly<{
+    requestReply: RequestSuggestionReply;
+    context: CrosswalkContext;
+    dispatch: (action: CrosswalkAction) => void;
+  }>,
+) {
+  return useMutation({
+    mutationFn: (variables: MatchesVariables) => {
+      return _requestMatches(variables.request, options.requestReply);
+    },
+    onSuccess: (matches, variables) => {
+      if (matches.length > 0) {
+        options.dispatch({
+          type: "meaning_matches_found",
+          layoutId: variables.layoutId,
+          matches,
+          sources: variables.sources,
+          context: options.context,
+        });
+      }
+    },
+    onError: () => {
+      // The footer's note says the search did not finish.
+    },
+  });
+}
+
+/**
+ * Asks the suggestion model which of a layout's unused columns mean the
+ * combined dataset's unfilled columns, and dispatches the pairs as
+ * `meaning_matches_found` for the layout that was asked about. Online
+ * sends go through the chat's consent gate, with the answer the step keeps;
+ * on device nothing is asked; with no model nothing is sent. A failure is
+ * shown by the footer's note, not a toast: the matches by name and values
+ * are still there.
+ */
+export function useCrosswalkMeaningMatches(
+  options: MeaningMatchesOptions,
+): CrosswalkMeaningMatches {
+  const { i18n } = useLingui();
+  const suggestions = useDictionarySuggestions(options.suggestionConsent);
+  const request = _makeRequest(options, i18n.locale, suggestions.model);
+  const [findMatches, , result] = useFindMatches({
+    requestReply: suggestions.requestReply,
+    context: options.context,
+    dispatch: options.dispatch,
+  });
+  const isThisLayout = result.variables?.layoutId === options.layoutId;
+  const isModelReady =
+    suggestions.availability === "online" ||
+    suggestions.availability === "on_device";
+  return {
+    availability: suggestions.availability,
+    canSuggest: isModelReady && request !== undefined,
+    status: isThisLayout ? _toStatus(result) : "idle",
+    foundCount:
+      isThisLayout && result.isSuccess ? result.data.length : undefined,
+    suggestMatches: () => {
+      if (request && isModelReady && !result.isPending) {
+        findMatches({
+          request,
+          layoutId: options.layoutId,
+          sources: [...options.profilesBySourceColumn.values()],
+        });
+      }
+    },
+  };
+}

@@ -20,9 +20,30 @@ import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCros
 
 const mocks = vi.hoisted(() => {
   return {
+    suggestMatchesMock: vi.fn(),
     valuesStatus: "ready" as "reading" | "ready" | "failed",
   };
 });
+
+vi.mock(
+  "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches",
+  () => {
+    return {
+      useCrosswalkSuggestionConsent: () => {
+        return { consent: "not_asked", onConsentDecided: vi.fn() };
+      },
+      useCrosswalkMeaningMatches: () => {
+        return {
+          availability: "online",
+          canSuggest: true,
+          status: "idle",
+          foundCount: undefined,
+          suggestMatches: mocks.suggestMatchesMock,
+        };
+      },
+    };
+  },
+);
 
 vi.mock(
   "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useLayoutValues/useLayoutValues",
@@ -123,6 +144,7 @@ function _withStatus(
 describe("MapLayoutsStep", () => {
   beforeEach(() => {
     mocks.valuesStatus = "ready";
+    mocks.suggestMatchesMock.mockReset();
   });
 
   it("shows the first layout to map, named by its first dataset, with the column needing attention", () => {
@@ -305,5 +327,25 @@ describe("MapLayoutsStep", () => {
       name: "county",
       dataType: "varchar",
     });
+  });
+
+  it("asks for matches by meaning from the footer", () => {
+    _render();
+
+    fireEvent.click(screen.getByRole("button", { name: "Suggest matches" }));
+
+    expect(mocks.suggestMatchesMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers no Suggest matches for a skipped layout", () => {
+    _render(
+      makeFlow(_withStatus(BRONX_LAYOUT_ID, "skipped"), {
+        layoutId: BRONX_LAYOUT_ID,
+      }),
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Suggest matches" }),
+    ).toBeNull();
   });
 });

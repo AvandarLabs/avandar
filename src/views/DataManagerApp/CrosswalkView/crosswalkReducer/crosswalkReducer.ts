@@ -14,7 +14,10 @@ import {
   skipLayout,
   updateMappings,
 } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkDraftActions";
-import { applyLayoutValues } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/prefillCrosswalkLayout";
+import {
+  applyLayoutValues,
+  applyMeaningMatches,
+} from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/prefillCrosswalkLayout";
 import type {
   CrosswalkAction,
   CrosswalkState,
@@ -195,6 +198,9 @@ const HANDLERS: Handlers = {
       ? action.draft
       : { ...state.draft, isSaved: true };
     return { ...state, draft, savedDraft: action.draft };
+  },
+  meaning_matches_found: (state, action) => {
+    return _withDraft(state, applyMeaningMatches(state.draft, action));
   },
 };
 

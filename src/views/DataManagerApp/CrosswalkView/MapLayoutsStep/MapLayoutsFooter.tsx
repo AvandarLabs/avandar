@@ -13,6 +13,8 @@ type Props = {
   onReopen: () => void;
   onAcceptAll: () => void;
   onConfirm: () => void;
+  /** Suggest matches, rendered before Accept all suggestions. */
+  suggestMatches?: ReactNode;
 };
 
 function SkipButton(props: Readonly<Props>): ReactNode {
@@ -35,8 +37,9 @@ function SkipButton(props: Readonly<Props>): ReactNode {
 
 /**
  * Step 2's action bar for the shown layout: Skip this dataset (never for
- * the reference layout), Accept all suggestions while any are left, and
- * Confirm and next. A skipped layout offers only Map this dataset.
+ * the reference layout), Suggest matches when the step passes it, Accept
+ * all suggestions while any are left, and Confirm and next. A skipped
+ * layout offers only Map this dataset.
  */
 export function MapLayoutsFooter(props: Readonly<Props>): ReactNode {
   if (props.layout.status === "skipped") {
@@ -52,6 +55,7 @@ export function MapLayoutsFooter(props: Readonly<Props>): ReactNode {
   }
   return (
     <NewDictionaryFooter start={<SkipButton {...props} />}>
+      {props.suggestMatches}
       <OfflineGated>
         <Button
           variant="default"
