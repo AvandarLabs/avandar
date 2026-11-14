@@ -96,7 +96,11 @@ export function PreviewDialogContent(props: Props): ReactNode {
         details={<PreviewDetails {...props} />}
         tokens={
           <VideoThemePanel
-            item={{ id: preset.id, scopeLabel: t`This motion only` }}
+            item={{
+              id: preset.id,
+              scopeLabel: t`This motion only`,
+              name: t`This motion`,
+            }}
             usedTokens={usage.paths}
           />
         }

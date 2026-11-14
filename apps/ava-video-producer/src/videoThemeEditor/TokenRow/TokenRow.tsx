@@ -60,7 +60,16 @@ type HeaderProps = Readonly<{
 function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
   const { t } = useLingui();
   const editor = useTokenEditor();
-  const value = formatTokenValue(row.definition.kind, row.resolved);
+  const kind = row.definition.kind;
+  const value = formatTokenValue(kind, row.resolved);
+  const itemValue =
+    row.itemOverride && formatTokenValue(kind, row.itemOverride.resolved);
+  const toValueText = (): string => {
+    if (hasIssue) {
+      return t`Last working value: ${value}`;
+    }
+    return itemValue ? t`Used here: ${itemValue}` : value;
+  };
   return (
     <div className={css.header}>
       <span className={css.label}>{label}</span>
@@ -68,9 +77,7 @@ function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
       {isInherited ? (
         <span className={css.inheritedTag}>{t`Same as the theme`}</span>
       ) : null}
-      <span className={css.value}>
-        {hasIssue ? t`Last working value: ${value}` : value}
-      </span>
+      <span className={css.value}>{toValueText()}</span>
       {row.overrideState === "draft" ? (
         <ActionIcon
           size="sm"
@@ -83,6 +90,26 @@ function TokenRowHeader({ row, label, isInherited, hasIssue }: HeaderProps) {
         </ActionIcon>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * In theme scope, says the previewed item has its own value, so the control
+ * below edits the theme's value and not the one the preview shows.
+ */
+function ItemOverrideNote({ label }: Readonly<{ label: string }>) {
+  const { t } = useLingui();
+  const { item } = useTokenEditor();
+  if (!item) {
+    return null;
+  }
+  const itemName = item.name;
+  const scopeLabel = item.scopeLabel;
+  const settingName = label.toLowerCase();
+  return (
+    <p className={css.itemNote}>
+      {t`${itemName} has its own ${settingName}. Choose "${scopeLabel}" to change it.`}
+    </p>
   );
 }
 
@@ -145,6 +172,7 @@ export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
         isInherited={isInherited}
         hasIssue={issue !== undefined}
       />
+      {row.itemOverride ? <ItemOverrideNote label={label} /> : null}
       <RowIssueContext.Provider value={issue !== undefined}>
         <TokenControl row={row} label={label} />
       </RowIssueContext.Provider>

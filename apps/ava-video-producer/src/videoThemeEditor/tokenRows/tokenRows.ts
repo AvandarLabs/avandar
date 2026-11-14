@@ -40,6 +40,12 @@ export type TokenRow = Readonly<{
   value: unknown;
   resolved: unknown;
   overrideState: TokenOverrideState;
+  /**
+   * In theme scope, the value the previewed item uses when it has its own
+   * for this token, saved or unsaved. Item scope states this in
+   * `overrideState`, so it never sets this.
+   */
+  itemOverride?: Readonly<{ resolved: unknown }>;
 }>;
 
 /** A run of rows that share a section. */
@@ -97,6 +103,11 @@ type RowContext = Readonly<{
   theme: ResolvedVideoTheme;
   scopePatch: VideoThemePatch;
   savedOverride: VideoThemePatch;
+  /** In theme scope, the previewed item's own settings and the theme it resolves to. */
+  itemOwn?: Readonly<{
+    patches: readonly VideoThemePatch[];
+    theme: ResolvedVideoTheme;
+  }>;
 }>;
 
 function _tierFromRoot(root: string): TokenTier {
@@ -154,6 +165,9 @@ function _createRow(
       : getValueAtPath(context.savedOverride, documentPath) !== undefined
         ? "saved"
         : "none";
+  const isItemOwn = context.itemOwn?.patches.some(
+    (patch) => getValueAtPath(patch, documentPath) !== undefined,
+  );
   return {
     path,
     definition,
@@ -163,6 +177,13 @@ function _createRow(
     value: getValueAtPath(context.merged, documentPath),
     resolved: getResolvedTokenValue(context.theme, path),
     overrideState,
+    ...(isItemOwn && context.itemOwn
+      ? {
+          itemOverride: {
+            resolved: getResolvedTokenValue(context.itemOwn.theme, path),
+          },
+        }
+      : {}),
   };
 }
 
@@ -179,9 +200,11 @@ export function listTokenRows(
     scope: ThemeEditScope;
     merged: VideoThemePatch;
     theme: ResolvedVideoTheme;
+    /** The previewed item and the theme it resolves to, so theme scope can show its own values. */
+    item?: Readonly<{ id: string; theme: ResolvedVideoTheme }>;
   }>,
 ): readonly TokenRow[] {
-  const { scope, draft } = options;
+  const { scope, draft, item } = options;
   const context: RowContext = {
     merged: options.merged,
     theme: options.theme,
@@ -191,6 +214,17 @@ export function listTokenRows(
         : (draft.overrides[scope.itemId] ?? {}),
     savedOverride:
       scope.kind === "item" ? _savedOverride(options, scope.itemId) : {},
+    ...(scope.kind === "theme" && item
+      ? {
+          itemOwn: {
+            patches: [
+              _savedOverride(options, item.id),
+              draft.overrides[item.id] ?? {},
+            ],
+            theme: item.theme,
+          },
+        }
+      : {}),
   };
   return listTokenDefinitions().flatMap(({ path, definition, isScale }) => {
     if (!isScale) {

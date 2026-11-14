@@ -6,6 +6,7 @@ import type {
 import type { CustomValueRequest } from "../customTokenValue/customTokenValue";
 import type { ThemeEditScope } from "../themeDraft/themeDraft";
 import type { TokenRow } from "../tokenRows/tokenRows";
+import type { EditorItem } from "../VideoThemeEditor/EditorToolbar";
 
 /** What every token control reads and the edits it can make. */
 export type TokenEditorContextValue = Readonly<{
@@ -15,6 +16,8 @@ export type TokenEditorContextValue = Readonly<{
   issues: readonly VideoThemeIssue[];
   /** Six-digit theme colours offered by colour pickers. */
   swatches: readonly string[];
+  /** The previewed item, when the host has one. */
+  item?: EditorItem;
   setToken: (tokenPath: string, value: unknown) => void;
   setCustomValue: (request: CustomValueRequest) => void;
   resetToken: (tokenPath: string) => void;

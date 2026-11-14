@@ -4,6 +4,7 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { getResolvedTokenValue } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
 import { resolveDraftTheme } from "../resolveDraftTheme/resolveDraftTheme";
 import {
   EMPTY_THEME_DRAFT,
@@ -268,5 +269,52 @@ test("any other resolver message is a general problem", () => {
   assert.deepEqual(
     describeRowIssue({ path: "stroke.default", message: "Expected a length" }),
     { kind: "other" },
+  );
+});
+
+function _themeRowsWithItem(draft: ThemeDraft) {
+  const input = { library: LIBRARY, themeId: "studio", draft };
+  const themeResult = resolveDraftTheme({ ...input, scope: { kind: "theme" } });
+  const itemResult = resolveDraftTheme({ ...input, scope: ITEM });
+  if (!themeResult.ok || !itemResult.ok) {
+    throw new Error("The test theme must resolve");
+  }
+  const rows = listTokenRows({
+    ...input,
+    scope: { kind: "theme" },
+    merged: themeResult.merged,
+    theme: themeResult.theme,
+    item: { id: "network-graph", theme: itemResult.theme },
+  });
+  return { rows, itemTheme: itemResult.theme };
+}
+
+test("in theme scope, a row the previewed item overrides carries the item's own value", () => {
+  const { rows, itemTheme } = _themeRowsWithItem(EMPTY_THEME_DRAFT);
+  const accent = _row(rows, "color.accent");
+  assert.ok(accent?.itemOverride);
+  assert.notEqual(accent.itemOverride.resolved, accent.resolved);
+  assert.equal(
+    accent.itemOverride.resolved,
+    getResolvedTokenValue(itemTheme, "color.accent"),
+  );
+  assert.equal(_row(rows, "color.line")?.itemOverride, undefined);
+});
+
+test("in theme scope, an unsaved item edit also counts as the item's own value", () => {
+  const draft = setTokenInDraft(
+    EMPTY_THEME_DRAFT,
+    ITEM,
+    "stroke.default",
+    "$atomic.strokeWidth.lg",
+  );
+  const { rows } = _themeRowsWithItem(draft);
+  assert.ok(_row(rows, "stroke.default")?.itemOverride);
+});
+
+test("item-scope rows never carry an item override, since their state says it", () => {
+  assert.equal(
+    _rows(ITEM).filter((row) => row.itemOverride !== undefined).length,
+    0,
   );
 });

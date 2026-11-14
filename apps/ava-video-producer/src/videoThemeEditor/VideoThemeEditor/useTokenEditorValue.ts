@@ -12,6 +12,7 @@ import type {
 } from "../../videoTheme/videoTheme.types";
 import type { TokenEditorContextValue } from "../TokenEditorContext/TokenEditorContext";
 import type { TokenRow } from "../tokenRows/tokenRows";
+import type { EditorItem } from "./EditorToolbar";
 
 const OPAQUE_HEX_COLOR = /^#[0-9a-f]{6}$/i;
 
@@ -23,10 +24,11 @@ export function useTokenEditorValue(
     rows: readonly TokenRow[];
     theme: ResolvedVideoTheme;
     issues: readonly VideoThemeIssue[];
+    item?: EditorItem;
     onDraftChange: (draft: ThemeDraft) => void;
   }>,
 ): TokenEditorContextValue {
-  const { draft, scope, rows, theme, issues, onDraftChange } = options;
+  const { draft, scope, rows, theme, issues, item, onDraftChange } = options;
   const swatches = useMemo(
     () =>
       [
@@ -44,6 +46,7 @@ export function useTokenEditorValue(
       theme,
       issues,
       swatches,
+      item,
       setToken: (tokenPath, value) =>
         onDraftChange(setTokenInDraft(draft, scope, tokenPath, value)),
       setCustomValue: (request) =>
@@ -51,6 +54,6 @@ export function useTokenEditorValue(
       resetToken: (tokenPath) =>
         onDraftChange(resetTokenInDraft(draft, scope, tokenPath)),
     }),
-    [draft, scope, rows, theme, issues, swatches, onDraftChange],
+    [draft, scope, rows, theme, issues, swatches, item, onDraftChange],
   );
 }

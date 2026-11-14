@@ -88,8 +88,19 @@ function useEditorFilters(
 
 /** The draft's rows and the context its controls read. */
 function useEditorRows(props: Props) {
-  const { library, themeId, draft, scope, onDraftChange } = props;
+  const { library, themeId, draft, scope, item, onDraftChange } = props;
   const draftTheme = useDraftTheme({ library, themeId, draft, scope });
+  // Theme scope shows the previewed item's own values, so it resolves the item too.
+  const itemScope = useMemo<ThemeEditScope>(
+    () => (item ? { kind: "item", itemId: item.id } : { kind: "theme" }),
+    [item],
+  );
+  const itemTheme = useDraftTheme({
+    library,
+    themeId,
+    draft,
+    scope: itemScope,
+  }).theme;
   const rows = useMemo(
     () =>
       listTokenRows({
@@ -99,8 +110,18 @@ function useEditorRows(props: Props) {
         scope,
         merged: draftTheme.merged,
         theme: draftTheme.theme,
+        ...(item ? { item: { id: item.id, theme: itemTheme } } : {}),
       }),
-    [library, themeId, draft, scope, draftTheme.merged, draftTheme.theme],
+    [
+      library,
+      themeId,
+      draft,
+      scope,
+      draftTheme.merged,
+      draftTheme.theme,
+      item,
+      itemTheme,
+    ],
   );
   const context = useTokenEditorValue({
     draft,
@@ -108,6 +129,7 @@ function useEditorRows(props: Props) {
     rows,
     theme: draftTheme.theme,
     issues: draftTheme.issues,
+    item,
     onDraftChange,
   });
   return { rows, context };

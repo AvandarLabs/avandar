@@ -75,3 +75,12 @@ Focus rings use `--ava-primary-7` at 2 px, matching the gallery's existing
 focus style. Edited, overridden, same-as-theme, and issue states each carry text or
 an icon as well as colour, so colour is never the only signal. Layouts use
 logical properties so they survive right-to-left mirroring.
+
+## Items with their own values
+
+An item can ship its own value for a token, or the producer can edit one in the
+item scope. In theme scope, a row such as Accent then says so above its
+control: "This composition has its own accent. Choose "This composition only"
+to change it." Its value reads "Used here" followed by the value the preview
+draws with, while the control still edits the theme's own value. The editor
+resolves the previewed item as well as the theme to know that value.

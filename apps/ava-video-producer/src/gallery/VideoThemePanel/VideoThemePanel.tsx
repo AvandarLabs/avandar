@@ -5,9 +5,10 @@ import { VideoThemeEditor } from "../../videoThemeEditor/VideoThemeEditor/VideoT
 import { useGalleryVideoTheme } from "../GalleryVideoTheme/GalleryVideoTheme";
 import css from "./VideoThemePanel.module.css";
 import type { ThemeEditScope } from "../../videoThemeEditor/themeDraft/themeDraft";
+import type { EditorItem } from "../../videoThemeEditor/VideoThemeEditor/EditorToolbar";
 
 type Props = Readonly<{
-  item: Readonly<{ id: string; scopeLabel: string }>;
+  item: EditorItem;
   usedTokens: readonly string[];
 }>;
 

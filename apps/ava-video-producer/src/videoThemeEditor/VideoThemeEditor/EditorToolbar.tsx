@@ -14,7 +14,13 @@ export type EditorFilters = Readonly<{
 }>;
 
 /** The item the host is previewing, for item-scope edits. */
-export type EditorItem = Readonly<{ id: string; scopeLabel: string }>;
+export type EditorItem = Readonly<{
+  id: string;
+  /** What the item-scope switch says, such as "This composition only". */
+  scopeLabel: string;
+  /** The item as a sentence subject, such as "This composition". */
+  name: string;
+}>;
 
 type Props = Readonly<{
   filters: EditorFilters;

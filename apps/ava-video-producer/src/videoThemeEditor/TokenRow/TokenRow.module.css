@@ -55,6 +55,13 @@
   white-space: nowrap;
 }
 
+.itemNote {
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
 .meta {
   color: var(--muted);
   font-size: 11px;
@@ -99,6 +106,7 @@
   .inheritedTag,
   .value,
   .meta,
+  .itemNote,
   .issue {
     font-size: 12px;
   }

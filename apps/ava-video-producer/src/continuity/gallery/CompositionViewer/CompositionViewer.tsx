@@ -107,7 +107,11 @@ function CompositionSettings({
   const tokens = isScene ? undefined : (
     <VideoThemePanel
       key={selected.id}
-      item={{ id: selected.id, scopeLabel: t`This composition only` }}
+      item={{
+        id: selected.id,
+        scopeLabel: t`This composition only`,
+        name: t`This composition`,
+      }}
       usedTokens={theme.usedTokens}
     />
   );
