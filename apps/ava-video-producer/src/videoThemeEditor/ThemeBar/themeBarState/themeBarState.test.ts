@@ -131,14 +131,14 @@ test("a new theme name is trimmed, and a blank name is no name", () => {
   assert.equal(getThemeLabelFromInput("   "), undefined);
 });
 
-test("a save refused because the file changed offers Reload theme in the bar", () => {
+test("a save refused because the file changed offers Reload from file in the bar", () => {
   assert.equal(
     getThemeBarActions({ ...QUIET, status: _failed(409) }).showsReload,
     true,
   );
 });
 
-test("the bar leaves Reload theme to the banner while the banner shows", () => {
+test("the bar leaves Reload from file to the banner while the banner shows", () => {
   assert.equal(
     getThemeBarActions({
       ...QUIET,
@@ -149,7 +149,7 @@ test("the bar leaves Reload theme to the banner while the banner shows", () => {
   );
 });
 
-test("other outcomes do not offer Reload theme in the bar", () => {
+test("other outcomes do not offer Reload from file in the bar", () => {
   assert.equal(
     getThemeBarActions({ ...QUIET, status: _failed(500) }).showsReload,
     false,
@@ -181,4 +181,40 @@ test("the name form stays open, keeping the typed name, when the save fails", as
     close: () => closeCount++,
   });
   assert.equal(closeCount, 0);
+});
+
+test("Save waits while the changed-on-disk banner asks for a decision", () => {
+  const waiting = getThemeBarActions({
+    ...QUIET,
+    status: IDLE,
+    isChangedOnDisk: true,
+  });
+  assert.equal(waiting.showsSave, true);
+  assert.equal(waiting.canSave, false);
+  assert.equal(waiting.canSaveAsNew, true);
+  assert.equal(waiting.canDiscard, true);
+});
+
+test("Save is available again once the banner is answered", () => {
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: IDLE, isChangedOnDisk: false })
+      .canSave,
+    true,
+  );
+});
+
+test("while the banner waits, the status line points at it before any token problem", () => {
+  assert.equal(
+    getThemeBarMessage({ ...QUIET, status: IDLE, isChangedOnDisk: true }),
+    "changedOnDiskUseBanner",
+  );
+  assert.equal(
+    getThemeBarMessage({
+      ...QUIET,
+      status: IDLE,
+      isChangedOnDisk: true,
+      hasIssues: true,
+    }),
+    "changedOnDiskUseBanner",
+  );
 });

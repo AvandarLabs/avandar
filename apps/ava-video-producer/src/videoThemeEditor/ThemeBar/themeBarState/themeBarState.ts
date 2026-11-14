@@ -73,21 +73,30 @@ export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
       }
       return _getFailureMessage(status.status, status.issues.length > 0);
     case "idle":
+      if (input.isChangedOnDisk) {
+        return "changedOnDiskUseBanner";
+      }
       return input.hasIssues ? "fixIssuesFirst" : "none";
   }
 }
 
 /**
- * Save shows for custom themes only and needs unsaved changes without issues.
+ * Save shows for custom themes only. It needs unsaved changes without issues
+ * and waits while the changed-on-disk banner asks what to do with them.
  * Save as new needs no issues, Discard needs unsaved changes, and nothing
- * starts while a save is in flight. Reload theme shows after a conflict the
+ * starts while a save is in flight. Reload from file shows after a conflict the
  * changed-on-disk banner is not already answering.
  */
 export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
   const isIdle = input.status.kind !== "saving";
   return {
     showsSave: !input.isBuiltIn,
-    canSave: !input.isBuiltIn && input.isDirty && !input.hasIssues && isIdle,
+    canSave:
+      !input.isBuiltIn &&
+      input.isDirty &&
+      !input.hasIssues &&
+      !input.isChangedOnDisk &&
+      isIdle,
     canSaveAsNew: !input.hasIssues && isIdle,
     canDiscard: input.isDirty && isIdle,
     showsReload: getThemeBarMessage(input) === "changedOnDisk",

@@ -67,6 +67,12 @@ list rows.
 Disabled actions keep their label and explain themselves through the status
 line.
 
+The changed-on-disk banner sets its heading and text in `--ink` on its pale
+yellow ground (about 13:1), because Mantine's own light yellow heading is an
+orange under 4.5:1. It offers three choices, each with a one-line description:
+Keep my edits, Discard my edits, and Reload from file. Save stays disabled
+until one is chosen.
+
 ## Accessibility
 
 Every control has a label naming its token, shows its value as text, and is

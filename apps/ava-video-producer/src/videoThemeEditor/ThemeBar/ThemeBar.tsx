@@ -40,7 +40,7 @@ function useStatusText(): (message: ThemeBarMessage) => string {
     fixIssuesFirst: t`Fix the marked settings before saving.`,
     invalidTheme: t`The theme has problems. Fix the marked settings and save again.`,
     readOnlyTheme: t`Built-in themes are read-only. Save a copy as a new theme.`,
-    changedOnDisk: t`This theme changed on disk. Reload the theme, then save again.`,
+    changedOnDisk: t`This theme changed on disk. Reload it from file, then save again.`,
     changedOnDiskUseBanner: t`This theme changed on disk. Keep, discard, or reload in the notice below, then save again.`,
     themeTooLarge: t`This theme is too large to save.`,
     saveFailed: t`The theme could not be saved. Check the showcase terminal.`,
@@ -161,7 +161,7 @@ function ThemeActions(
           variant="default"
           onClick={props.onReloadTheme}
         >
-          {t`Reload theme`}
+          {t`Reload from file`}
         </Button>
       ) : null}
       <Button size="compact-xs" variant="subtle" onClick={props.onCopyJson}>
@@ -173,7 +173,7 @@ function ThemeActions(
 
 /**
  * The theme picker and theme actions above the editor: Save (custom themes
- * only), Save as new theme, Discard, and Copy theme JSON (plus Reload theme after a save conflict), with an unsaved
+ * only), Save as new theme, Discard, and Copy theme JSON (plus Reload from file after a save conflict), with an unsaved
  * indicator, a polite status line that also says why saving is unavailable,
  * and, for a built-in theme, a notice that its changes are saved as a new
  * theme. The new theme's name form stays open, with the typed name, until
