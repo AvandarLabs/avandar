@@ -17,7 +17,11 @@ import {
   createSavedDocumentFromDraft,
   type ThemeDraft,
 } from "../themeDraft/themeDraft";
-import { createDraftAfterSave, isDraftUnchanged } from "./storedDraftRecord";
+import {
+  createDraftAfterSave,
+  getLatestDraftOfTheme,
+  isDraftUnchanged,
+} from "./storedDraftRecord";
 import type {
   VideoThemeIssue,
   VideoThemeLibrary,
@@ -72,8 +76,11 @@ type SaveOptions = Readonly<{
   rebaseDraft: (baseHash: string, nextDraft?: ThemeDraft) => void;
 }>;
 
-/** The draft as it is now, read when a request finishes. */
-type LatestDraft = RefObject<ThemeDraft>;
+/**
+ * Each theme's last draft, read when a request finishes. It is keyed by
+ * theme id because the active theme can change while a request runs.
+ */
+type LatestDrafts = RefObject<Map<string, ThemeDraft>>;
 
 function _buildFailureStatusFromError(
   error: unknown,
@@ -168,9 +175,10 @@ type RunThemeRequest = (
 function useSaveInPlace(
   options: SaveOptions,
   run: RunThemeRequest,
-  latestDraft: LatestDraft,
+  latestDrafts: LatestDrafts,
 ) {
-  const { isBuiltIn, storedTheme, draft, storeTheme, rebaseDraft } = options;
+  const { themeId, isBuiltIn, storedTheme, draft, storeTheme, rebaseDraft } =
+    options;
   return useCallback(async () => {
     if (isBuiltIn || !storedTheme) {
       return;
@@ -182,20 +190,22 @@ function useSaveInPlace(
       rebaseDraft(
         hash,
         createDraftAfterSave({
+          themeId,
           savedDraft: draft,
-          currentDraft: latestDraft.current,
           savedDocument: document,
+          latestDrafts: latestDrafts.current,
         }),
       );
     });
   }, [
+    themeId,
     isBuiltIn,
     storedTheme,
     draft,
     storeTheme,
     rebaseDraft,
     run,
-    latestDraft,
+    latestDrafts,
   ]);
 }
 
@@ -208,7 +218,7 @@ function useSaveInPlace(
 function useSaveAsNew(
   options: SaveOptions,
   run: RunThemeRequest,
-  latestDraft: LatestDraft,
+  latestDrafts: LatestDrafts,
 ) {
   const { library, themeId, draft, storeTheme, discard, selectTheme } = options;
   return useCallback(
@@ -225,7 +235,11 @@ function useSaveAsNew(
         if (
           isDraftUnchanged({
             savedDraft: draft,
-            currentDraft: latestDraft.current,
+            currentDraft: getLatestDraftOfTheme({
+              latestDrafts: latestDrafts.current,
+              themeId,
+              fallback: draft,
+            }),
           })
         ) {
           discard();
@@ -240,16 +254,17 @@ function useSaveAsNew(
       discard,
       selectTheme,
       run,
-      latestDraft,
+      latestDrafts,
     ],
   );
 }
 
 /**
  * Saves the draft into its theme (custom themes only, guarded by the file's
- * hash) or into a new theme, then clears the draft. A new theme becomes the
- * active one. The state and its functions keep their identity until an
- * option they use changes.
+ * hash) or into a new theme. A finished save clears the saved draft unless
+ * the theme gained edits while it ran, which stay on top of the saved theme.
+ * A new theme becomes the active one. The state and its functions keep their
+ * identity until an option they use changes.
  */
 export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   const [status, setSaveStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
@@ -264,12 +279,12 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
       runThemeRequest({ inFlight, setStatus, request, failureKind }),
     [setStatus],
   );
-  const latestDraft = useRef(options.draft);
+  const latestDrafts = useRef(new Map<string, ThemeDraft>());
   useEffect(() => {
-    latestDraft.current = options.draft;
-  }, [options.draft]);
-  const save = useSaveInPlace(options, run, latestDraft);
-  const saveAsNew = useSaveAsNew(options, run, latestDraft);
+    latestDrafts.current.set(options.themeId, options.draft);
+  }, [options.themeId, options.draft]);
+  const save = useSaveInPlace(options, run, latestDrafts);
+  const saveAsNew = useSaveAsNew(options, run, latestDrafts);
   const { themeId, storeTheme, rebaseDraft } = options;
   const reloadTheme = useCallback(
     () =>

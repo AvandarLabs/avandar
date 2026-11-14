@@ -40,6 +40,8 @@ export type ThemeBarActions = Readonly<{
   canSave: boolean;
   canSaveAsNew: boolean;
   canDiscard: boolean;
+  /** The theme picker is open for a change. It locks while a save runs. */
+  canSwitchTheme: boolean;
   /** A save was refused because the file changed, and no banner offers a reload. */
   showsReload: boolean;
 }>;
@@ -99,7 +101,7 @@ export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
  * Save shows for custom themes only. It needs unsaved changes without issues
  * and waits while the changed-on-disk banner asks what to do with them.
  * Save as new needs no issues, Discard needs unsaved changes, and nothing
- * starts while a save is in flight. Reload from file shows after a conflict the
+ * starts, including a switch to another theme, while a save is in flight. Reload from file shows after a conflict the
  * changed-on-disk banner is not already answering.
  */
 export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
@@ -114,6 +116,7 @@ export function getThemeBarActions(input: ThemeBarInput): ThemeBarActions {
       isIdle,
     canSaveAsNew: !input.hasIssues && isIdle,
     canDiscard: input.isDirty && isIdle,
+    canSwitchTheme: isIdle,
     showsReload:
       getThemeBarMessage({ ...input, copyStatus: "idle" }) === "changedOnDisk",
   };

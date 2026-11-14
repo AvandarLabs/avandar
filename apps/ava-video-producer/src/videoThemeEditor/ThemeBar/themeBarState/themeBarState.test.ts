@@ -314,3 +314,14 @@ test("focus stays where it is when the reload failed, so the button stays usable
   });
   assert.deepEqual(calls, []);
 });
+
+test("the theme picker is locked while a save is in flight, so a switch cannot cross the save", () => {
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: { kind: "saving" } }).canSwitchTheme,
+    false,
+  );
+  assert.equal(
+    getThemeBarActions({ ...QUIET, status: IDLE }).canSwitchTheme,
+    true,
+  );
+});

@@ -105,7 +105,8 @@ function SaveAsNewForm({
 }
 
 function ThemePicker(
-  props: Pick<Props, "themes" | "themeId" | "isDirty" | "onSelectTheme">,
+  props: Pick<Props, "themes" | "themeId" | "isDirty" | "onSelectTheme"> &
+    Readonly<{ isDisabled: boolean }>,
 ) {
   const { t } = useLingui();
   return (
@@ -117,6 +118,7 @@ function ThemePicker(
           label: builtIn ? t`${label} (built-in)` : label,
         }))}
         value={props.themeId}
+        disabled={props.isDisabled}
         onChange={(id) => id && props.onSelectTheme(id)}
       />
       {props.isDirty ? (
@@ -212,7 +214,10 @@ export function ThemeBar(props: Props) {
       aria-label={t`Theme controls`}
       tabIndex={-1}
     >
-      <ThemePicker {...props} />
+      <ThemePicker
+        {...props}
+        isDisabled={!getThemeBarActions(props).canSwitchTheme}
+      />
       {props.isBuiltIn ? (
         <p className={css.notice}>
           {t`Changes to a built-in theme are saved as a new theme. The new theme leaves out this theme's settings for single compositions, so each composition uses the theme's own colours.`}

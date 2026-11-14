@@ -13,6 +13,7 @@ import {
   createKeptRecord,
   createRebasedRecord,
   createDiscardedRecord,
+  getLatestDraftOfTheme,
   isDraftUnchanged,
   isRecordChangedOnDisk,
   type DraftRecord,
@@ -140,10 +141,15 @@ const SAVED_BASE: VideoThemeDocument = {
 };
 const ITEM = { kind: "item", itemId: "network-graph" } as const;
 
-function _settle(savedDraft: ThemeDraft, currentDraft: ThemeDraft) {
+function _settle(
+  savedDraft: ThemeDraft,
+  currentDraft: ThemeDraft,
+  otherDrafts: ReadonlyMap<string, ThemeDraft> = new Map(),
+) {
   return createDraftAfterSave({
+    themeId: "studio",
     savedDraft,
-    currentDraft,
+    latestDrafts: new Map([...otherDrafts, ["studio", currentDraft]]),
     savedDocument: createSavedDocumentFromDraft(SAVED_BASE, savedDraft),
   });
 }
@@ -239,4 +245,77 @@ test("drafts are unchanged only when every edit matches", () => {
     }),
     false,
   );
+});
+
+test("switching to another theme during a save does not copy its draft into the saved theme", () => {
+  const otherThemeDraft = setTokenInDraft(
+    EMPTY_THEME_DRAFT,
+    THEME,
+    "color.text",
+    "$atomic.swatch.orange",
+  );
+  const result = createDraftAfterSave({
+    themeId: "studio",
+    savedDraft: ACCENT_DRAFT,
+    latestDrafts: new Map([
+      ["studio", ACCENT_DRAFT],
+      ["other", otherThemeDraft],
+    ]),
+    savedDocument: createSavedDocumentFromDraft(SAVED_BASE, ACCENT_DRAFT),
+  });
+  assert.deepEqual(result, EMPTY_THEME_DRAFT);
+});
+
+test("edits made to the saved theme before switching away during a save are kept", () => {
+  const otherThemeDraft = setTokenInDraft(
+    EMPTY_THEME_DRAFT,
+    THEME,
+    "color.text",
+    "$atomic.swatch.orange",
+  );
+  assert.deepEqual(
+    _settle(ACCENT_DRAFT, MORE_DRAFT, new Map([["other", otherThemeDraft]])),
+    setTokenInDraft(
+      EMPTY_THEME_DRAFT,
+      THEME,
+      "color.text",
+      "$atomic.swatch.mint",
+    ),
+  );
+});
+
+test("a theme with no latest draft on record is treated as unchanged since the save", () => {
+  const result = createDraftAfterSave({
+    themeId: "studio",
+    savedDraft: ACCENT_DRAFT,
+    latestDrafts: new Map(),
+    savedDocument: createSavedDocumentFromDraft(SAVED_BASE, ACCENT_DRAFT),
+  });
+  assert.deepEqual(result, EMPTY_THEME_DRAFT);
+});
+
+test("the latest draft of a theme is read by its id, falling back to the given draft", () => {
+  const latestDrafts = new Map([["studio", MORE_DRAFT]]);
+  assert.equal(
+    getLatestDraftOfTheme({
+      latestDrafts,
+      themeId: "studio",
+      fallback: ACCENT_DRAFT,
+    }),
+    MORE_DRAFT,
+  );
+  assert.equal(
+    getLatestDraftOfTheme({
+      latestDrafts,
+      themeId: "other",
+      fallback: ACCENT_DRAFT,
+    }),
+    ACCENT_DRAFT,
+  );
+});
+
+test("a token reset during the save is dropped, because a draft cannot remove a saved token", () => {
+  const savedBoth = MORE_DRAFT;
+  const resetText = ACCENT_DRAFT;
+  assert.deepEqual(_settle(savedBoth, resetText), EMPTY_THEME_DRAFT);
 });

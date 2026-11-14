@@ -142,19 +142,46 @@ export function isDraftUnchanged(
 }
 
 /**
- * The draft to keep once a save succeeded. When nothing changed since the
- * save started it is empty. Otherwise the edits made during the save stay,
- * minus any value the saved file already holds, so they sit on top of the
- * saved theme.
+ * The latest draft of one theme from a record of each theme's last draft, or
+ * the fallback when none is recorded. Reading by theme id keeps a theme
+ * switch during a request from handing one theme another theme's draft.
+ */
+export function getLatestDraftOfTheme(
+  options: Readonly<{
+    latestDrafts: ReadonlyMap<string, ThemeDraft>;
+    themeId: string;
+    fallback: ThemeDraft;
+  }>,
+): ThemeDraft {
+  return options.latestDrafts.get(options.themeId) ?? options.fallback;
+}
+
+/**
+ * The draft to keep once a save succeeded. When the saved theme's draft did
+ * not change since the save started it is empty. Otherwise the edits made to
+ * that theme during the save stay, minus any value the saved file already
+ * holds, so they sit on top of the saved theme. Only the saved theme's own
+ * latest draft is read, so switching to another theme during the save never
+ * copies that theme's draft over.
+ *
+ * A draft can only set a value, never remove one the file holds. A token
+ * reset during the save was already saved, so the reset is dropped and the
+ * saved value stays.
  */
 export function createDraftAfterSave(
   options: Readonly<{
+    themeId: string;
     savedDraft: ThemeDraft;
-    currentDraft: ThemeDraft;
     savedDocument: VideoThemeDocument;
+    latestDrafts: ReadonlyMap<string, ThemeDraft>;
   }>,
 ): ThemeDraft {
-  const { savedDraft, currentDraft, savedDocument } = options;
+  const { themeId, savedDraft, savedDocument, latestDrafts } = options;
+  const currentDraft = getLatestDraftOfTheme({
+    latestDrafts,
+    themeId,
+    fallback: savedDraft,
+  });
   if (isDraftUnchanged({ savedDraft, currentDraft })) {
     return EMPTY_THEME_DRAFT;
   }
