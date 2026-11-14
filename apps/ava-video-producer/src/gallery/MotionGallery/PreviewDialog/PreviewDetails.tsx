@@ -4,7 +4,6 @@ import { ContentControls } from "../ContentControls/ContentControls";
 import { getReferenceUrlFromPreset } from "../getReferenceUrlFromPreset";
 import { Icon } from "../Icon";
 import { makeStockRequestFromConfiguration } from "../makeStockRequestFromConfiguration";
-import { PaletteControls } from "../PaletteControls";
 import { useReferenceBrief } from "../useReferenceBrief";
 import { usePreviewDownload } from "./usePreviewDownload";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
@@ -25,28 +24,18 @@ export function PreviewDetails({
   notice,
   accent,
   background,
-  setAccent,
-  setBackground,
 }: Readonly<Props>): ReactNode {
   const { t } = useGalleryLingui();
   const referenceBrief = useReferenceBrief();
-  const { exporting, exportStatus, download } = usePreviewDownload({
+  const { exporting, exportStatus, canExport, download } = usePreviewDownload({
     preset,
     contentState,
-    accent,
-    background,
   });
   return (
     <div className="dialog-details">
       <p className="dialog-description" id="dialog-description">
         {preset.description}
       </p>
-      <PaletteControls
-        accent={accent}
-        background={background}
-        setAccent={setAccent}
-        setBackground={setBackground}
-      />
       <ContentControls
         preset={preset.id}
         state={contentState}
@@ -127,7 +116,7 @@ export function PreviewDetails({
         </button>
         <button
           onClick={download}
-          disabled={exporting || !contentState.isValid}
+          disabled={exporting || !contentState.isValid || !canExport}
         >
           <Icon name="download" size={14} />
           {exporting ? t`Rendering MP4…` : t`Download MP4`}

@@ -1,17 +1,27 @@
+import { useLingui as useGalleryLingui } from "@lingui/react/macro";
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { StockGraphic } from "../../../stock/StockGraphic";
+import { VideoTokenUsageContext } from "../../../videoTheme/tokenUsage/tokenUsage";
+import { useObservedTokenUsage } from "../../../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
+import {
+  AtlasPanelTabs,
+  type AtlasPanelTab,
+} from "../../AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
+import { GalleryItemTheme } from "../../GalleryVideoTheme/GalleryItemTheme";
+import { VideoThemePanel } from "../../VideoThemePanel/VideoThemePanel";
 import { isReducedMotionPreferred } from "../isReducedMotionPreferred";
-import { type Props as PaletteProps } from "../PaletteControls";
 import { useFrames } from "../useGalleryClock";
 import { PreviewDetails } from "./PreviewDetails";
 import { PreviewPlaybackControls } from "./PreviewPlaybackControls";
 import type { StockPresetId } from "../../../stock/catalog";
+import type { StockRequest } from "../../../stock/contracts/StockContract.types";
 import type { ContentDraft } from "../ContentControls/ContentDraftModule/ContentDraftModule";
 import type { Preset } from "../Preset.types";
 import type { ReactNode } from "react";
 
-/** Data for Props. */
-type PropsResult = {
+/** Per-motion player, content editor, theme editor, and export controls. */
+export type Props = Readonly<{
   preset: Preset;
   contentState: ContentDraft;
   onContentChange: (state: ContentDraft) => void;
@@ -20,30 +30,15 @@ type PropsResult = {
   onSave: (id: StockPresetId) => void;
   onCopy: (text: string, label: string) => void;
   notice: string;
-};
+  /** The theme's resolved accent and ground, quoted in briefs and configured JSON. */
+  accent: string;
+  background: string;
+}>;
 
-/** Per-motion player, content editor, and export controls. */
-export type Props = PaletteProps & PropsResult;
-
-/** Remounts for each motion to isolate playback and pending export status. */
-export function PreviewDialogContent({
-  preset,
-  contentState,
-  onContentChange,
-  saved,
-  initialPlaying,
-  onSave,
-  onCopy,
-  notice,
-  accent,
-  background,
-  setAccent,
-  setBackground,
-}: Props): ReactNode {
+function usePlayingUnlessReducedMotion(initialPlaying: boolean) {
   const [playing, setPlaying] = useState(
     initialPlaying && !isReducedMotionPreferred(),
   );
-  const [frame, setFrame] = useFrames(playing, preset.loopFrames);
   useEffect(function pauseOnReducedMotionPreference() {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const pauseForPreference = () => {
@@ -54,20 +49,37 @@ export function PreviewDialogContent({
     preference.addEventListener("change", pauseForPreference);
     return () => preference.removeEventListener("change", pauseForPreference);
   }, []);
+  return [playing, setPlaying] as const;
+}
+
+/** Remounts for each motion to isolate playback, pending exports, and the editor's scope. */
+export function PreviewDialogContent(props: Props): ReactNode {
+  const { t } = useGalleryLingui();
+  const { preset, contentState } = props;
+  const [playing, setPlaying] = usePlayingUnlessReducedMotion(
+    props.initialPlaying,
+  );
+  const [frame, setFrame] = useFrames(playing, preset.loopFrames);
+  const [tab, setTab] = useState<AtlasPanelTab>("details");
+  const usage = useObservedTokenUsage();
   return (
-    <div className="dialog-layout">
+    <div
+      className={clsx("dialog-layout", tab === "tokens" && "is-token-panel")}
+    >
       <div className="dialog-player">
         <div className="dialog-stage">
           <div className="dialog-canvas">
-            <StockGraphic
-              {...({
-                preset: preset.id,
-                input: contentState.resolvedInput,
-              } as import("../../../stock/contracts/StockContract.types").StockRequest)}
-              frame={frame}
-              accent={accent}
-              background={background}
-            />
+            <GalleryItemTheme itemId={preset.id}>
+              <VideoTokenUsageContext.Provider value={usage.report}>
+                <StockGraphic
+                  {...({
+                    preset: preset.id,
+                    input: contentState.resolvedInput,
+                  } as StockRequest)}
+                  frame={frame}
+                />
+              </VideoTokenUsageContext.Provider>
+            </GalleryItemTheme>
           </div>
         </div>
         <PreviewPlaybackControls
@@ -78,18 +90,16 @@ export function PreviewDialogContent({
           loopFrames={preset.loopFrames}
         />
       </div>
-      <PreviewDetails
-        preset={preset}
-        contentState={contentState}
-        onContentChange={onContentChange}
-        saved={saved}
-        onSave={onSave}
-        onCopy={onCopy}
-        notice={notice}
-        accent={accent}
-        background={background}
-        setAccent={setAccent}
-        setBackground={setBackground}
+      <AtlasPanelTabs
+        tab={tab}
+        onTabChange={setTab}
+        details={<PreviewDetails {...props} />}
+        tokens={
+          <VideoThemePanel
+            item={{ id: preset.id, scopeLabel: t`This motion only` }}
+            usedTokens={usage.paths}
+          />
+        }
       />
     </div>
   );

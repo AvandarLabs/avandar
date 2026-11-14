@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { afterDownloads } from "../../../showcase/download.js";
 import { STOCK_CATALOG, type StockPresetId } from "../../stock/catalog";
 import { copyTextToClipboard } from "../copyText/copyText";
-import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../palette";
 import {
   type ContentDraft,
   ContentDraftModule,
@@ -22,27 +21,8 @@ const _findPreset = (id: string): Preset | undefined =>
 const _getPresetFromHash = (): Preset | undefined =>
   _findPreset(window.location.hash.slice(1));
 
-function _readPaletteOverride({
-  key,
-  fallback,
-}: {
-  key: string;
-  fallback: string;
-}): string {
-  try {
-    const value = sessionStorage.getItem(key);
-    return value && /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 /** Catalog selection, saved references, editable content, and playback controls. */
 export type MotionGalleryState = {
-  accent: string;
-  background: string;
-  setAccent: Dispatch<SetStateAction<string>>;
-  setBackground: Dispatch<SetStateAction<string>>;
   category: string;
   selectCategory: (value: string) => void;
   saved: StockPresetId[];
@@ -91,37 +71,6 @@ export function useMotionGalleryState(): MotionGalleryState {
       cancelRefresh?.();
     };
   }, []);
-
-  const [accent, setAccent] = useState(() =>
-    _readPaletteOverride({ key: "atlas:accent", fallback: DEFAULT_ACCENT }),
-  );
-
-  const [background, setBackground] = useState(() =>
-    _readPaletteOverride({
-      key: "atlas:background",
-      fallback: DEFAULT_BACKGROUND,
-    }),
-  );
-
-  useEffect(
-    function persistPaletteOverrides() {
-      try {
-        if (accent === DEFAULT_ACCENT) {
-          sessionStorage.removeItem("atlas:accent");
-        } else {
-          sessionStorage.setItem("atlas:accent", accent);
-        }
-        if (background === DEFAULT_BACKGROUND) {
-          sessionStorage.removeItem("atlas:background");
-        } else {
-          sessionStorage.setItem("atlas:background", background);
-        }
-      } catch {
-        /* Current palette remains usable when storage is unavailable. */
-      }
-    },
-    [accent, background],
-  );
 
   const [category, setCategory] = useState("All motions");
 
@@ -296,10 +245,6 @@ export function useMotionGalleryState(): MotionGalleryState {
     setQuery("");
   };
   return {
-    accent,
-    background,
-    setAccent,
-    setBackground,
     category,
     selectCategory,
     saved,

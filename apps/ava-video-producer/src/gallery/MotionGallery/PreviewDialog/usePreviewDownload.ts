@@ -1,25 +1,28 @@
 import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { downloadFilm } from "../../../../showcase/download.js";
+import { createExportThemeFromDraft } from "../../../videoThemeEditor/themeDraft/themeDraft";
+import { useGalleryVideoTheme } from "../../GalleryVideoTheme/GalleryVideoTheme";
 import type { Props as PreviewProps } from "./PreviewDialogContent";
 
-type Options = Pick<
-  PreviewProps,
-  "preset" | "contentState" | "accent" | "background"
->;
-/** Tracks an MP4 download and surfaces its progress and failures. */
+type Options = Pick<PreviewProps, "preset" | "contentState">;
+
+/**
+ * Tracks an MP4 download of the previewed motion with the theme the preview
+ * shows, unsaved edits included, and surfaces progress and failures. An
+ * invalid draft cannot be exported.
+ */
 export function usePreviewDownload({
   preset,
   contentState,
-  accent,
-  background,
 }: Readonly<Options>): {
   exporting: boolean;
   exportStatus: string;
+  canExport: boolean;
   download: () => Promise<void>;
 } {
   const { t } = useGalleryLingui();
-
+  const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState("");
   const download = async () => {
@@ -28,10 +31,14 @@ export function usePreviewDownload({
       await downloadFilm({
         id: `stock-${preset.id}`,
         options: {
-          accent,
-          background,
           schemaVersion: 1,
           input: contentState.resolvedInput,
+          theme: createExportThemeFromDraft({
+            library,
+            themeId,
+            draft: validDraft,
+            itemId: preset.id,
+          }),
         },
         onStatus: (status) => setExportStatus(status.message),
       });
@@ -43,5 +50,5 @@ export function usePreviewDownload({
       setExporting(false);
     }
   };
-  return { exporting, exportStatus, download };
+  return { exporting, exportStatus, canExport: !hasIssues, download };
 }

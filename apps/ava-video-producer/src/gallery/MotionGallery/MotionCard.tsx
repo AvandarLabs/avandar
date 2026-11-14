@@ -1,6 +1,7 @@
 import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { memo } from "react";
 import { StockGraphic } from "../../stock/StockGraphic";
+import { GalleryItemTheme } from "../GalleryVideoTheme/GalleryItemTheme";
 import { Icon } from "./Icon";
 import { useFrames, useVisible } from "./useGalleryClock";
 import type { StockPresetId } from "../../stock/catalog";
@@ -14,12 +15,8 @@ export const MotionCard = memo(function MotionCard({
   saved,
   onOpen,
   onSave,
-  accent,
-  background,
   contentState,
 }: {
-  accent: string;
-  background: string;
   contentState?: ContentDraft;
   preset: Preset;
   index: number;
@@ -44,15 +41,15 @@ export const MotionCard = memo(function MotionCard({
         aria-label={t`Explore ${preset.name}`}
       >
         {visible ? (
-          <StockGraphic
-            {...({
-              preset: preset.id,
-              input: contentState?.resolvedInput,
-            } as import("../../stock/contracts/StockContract.types").StockRequest)}
-            frame={frame}
-            accent={accent}
-            background={background}
-          />
+          <GalleryItemTheme itemId={preset.id}>
+            <StockGraphic
+              {...({
+                preset: preset.id,
+                input: contentState?.resolvedInput,
+              } as import("../../stock/contracts/StockContract.types").StockRequest)}
+              frame={frame}
+            />
+          </GalleryItemTheme>
         ) : (
           <span className="card-still" aria-hidden="true">
             <Icon name="pause" size={24} />

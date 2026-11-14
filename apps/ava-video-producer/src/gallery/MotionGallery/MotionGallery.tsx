@@ -3,6 +3,10 @@ import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
 import { STOCK_CATALOG } from "../../stock/catalog";
+import {
+  GalleryVideoTheme,
+  useGalleryVideoTheme,
+} from "../GalleryVideoTheme/GalleryVideoTheme";
 import { HelperGallery } from "../HelperGallery/HelperGallery";
 import { galleryI18n } from "../i18n";
 import { AtlasSections, getAtlasSection } from "./AtlasSections";
@@ -12,7 +16,6 @@ import { GalleryNavigation } from "./GalleryNavigation";
 import { GalleryToolbar } from "./GalleryToolbar";
 import { Icon } from "./Icon";
 import { MotionCard } from "./MotionCard";
-import { PaletteControls } from "./PaletteControls";
 import { PreviewDialog } from "./PreviewDialog/PreviewDialog";
 import { ReferenceTray } from "./ReferenceTray";
 import { useMotionGalleryState } from "./useMotionGalleryState";
@@ -27,11 +30,10 @@ const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
  */
 function MotionGallery() {
   const { t } = useGalleryLingui();
+  const { galleryTheme } = useGalleryVideoTheme();
+  const accent = galleryTheme.semantic.color.accent;
+  const background = galleryTheme.semantic.color.ground;
   const {
-    accent,
-    background,
-    setAccent,
-    setBackground,
     category,
     selectCategory,
     saved,
@@ -101,18 +103,10 @@ function MotionGallery() {
                 <Trans>LIVE PREVIEWS</Trans>
               </span>
             </div>
-            <PaletteControls
-              accent={accent}
-              background={background}
-              setAccent={setAccent}
-              setBackground={setBackground}
-            />
             {results.length ? (
               <div className="motion-grid">
                 {results.map((preset) => (
                   <MotionCard
-                    accent={accent}
-                    background={background}
                     key={preset.id}
                     preset={preset}
                     index={PRESET_INDEX.get(preset.id) ?? 0}
@@ -192,8 +186,6 @@ function MotionGallery() {
         <PreviewDialog
           accent={accent}
           background={background}
-          setAccent={setAccent}
-          setBackground={setBackground}
           preset={selected}
           onPrevious={previousPreset ? () => onOpen(previousPreset) : undefined}
           onNext={nextPreset ? () => onOpen(nextPreset) : undefined}
@@ -210,16 +202,20 @@ function MotionGallery() {
     </>
   );
 }
-/** The gallery for the section the URL names. */
+/** The gallery for the section the URL names; themed sections share one draft. */
 function AtlasSectionRoot() {
   const section = getAtlasSection();
-  if (section === "motions") {
-    return <MotionGallery />;
+  if (section === "helpers") {
+    return <HelperGallery />;
   }
-  return section === "helpers" ? (
-    <HelperGallery />
-  ) : (
-    <CompositionGallery section={section} />
+  return (
+    <GalleryVideoTheme>
+      {section === "motions" ? (
+        <MotionGallery />
+      ) : (
+        <CompositionGallery section={section} />
+      )}
+    </GalleryVideoTheme>
   );
 }
 

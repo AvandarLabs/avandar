@@ -2692,3 +2692,8 @@ button {
     max-width: none;
   }
 }
+
+/* The Design tokens tab widens the modal's right column. */
+.dialog-layout.is-token-panel {
+  grid-template-columns: minmax(0, 1fr) 420px;
+}
