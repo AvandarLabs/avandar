@@ -138,14 +138,26 @@ function _serializeWithinCap(document: VideoThemeDocument): string {
   return text;
 }
 
-async function _writeAtomically(file: string, text: string): Promise<void> {
+/**
+ * Writes the file whole or not at all. A replacing write renames over the
+ * file. An exclusive write links the finished temporary file into place, so
+ * it fails with EEXIST when the file already exists and never shows a
+ * half-written file.
+ */
+async function _writeAtomically(
+  file: string,
+  text: string,
+  mode: "replace" | "create",
+): Promise<void> {
   const temporary = path.join(
     path.dirname(file),
     `.${path.basename(file)}.${randomUUID()}.tmp`,
   );
   try {
     await fs.writeFile(temporary, text);
-    await fs.rename(temporary, file);
+    await (mode === "create"
+      ? fs.link(temporary, file)
+      : fs.rename(temporary, file));
   } finally {
     await fs.rm(temporary, { force: true });
   }
@@ -221,9 +233,46 @@ async function _writeTheme(
   directory: string,
   document: VideoThemeDocument,
   text: string,
+  mode: "replace" | "create",
 ): Promise<StoredTheme> {
-  await _writeAtomically(_fileFromId(directory, document.id), text);
+  try {
+    await _writeAtomically(_fileFromId(directory, document.id), text, mode);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+      throw new ThemeStoreError(
+        409,
+        `A theme named "${document.id}" already exists`,
+      );
+    }
+    throw error;
+  }
   return { document, hash: _hashText(text) };
+}
+
+/**
+ * Runs writes to one theme id one after another, so a check made at the
+ * start of a write still holds when the file is written. A failed write does
+ * not stop the ones queued behind it. Writes to other ids run alongside.
+ */
+function _createWriteQueue() {
+  const tails = new Map<string, Promise<unknown>>();
+  return function runExclusively<Result>(
+    id: string,
+    task: () => Promise<Result>,
+  ): Promise<Result> {
+    const result = (tails.get(id) ?? Promise.resolve()).then(task);
+    const tail = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    tails.set(id, tail);
+    void tail.then(() => {
+      if (tails.get(id) === tail) {
+        tails.delete(id);
+      }
+    });
+    return result;
+  };
 }
 
 function _documentToSummary(document: VideoThemeDocument): ThemeSummary {
@@ -233,6 +282,38 @@ function _documentToSummary(document: VideoThemeDocument): ThemeSummary {
     builtIn: _isBuiltIn(document.id),
     ...(document.extends ? { extends: document.extends } : {}),
   };
+}
+
+/** Saves a custom theme in place when `ifMatch` is the file's current hash. */
+async function _saveTheme(
+  directory: string,
+  id: string,
+  value: unknown,
+  ifMatch: string,
+): Promise<StoredTheme> {
+  _assertNotReserved(id);
+  if (_isBuiltIn(id)) {
+    throw new ThemeStoreError(
+      403,
+      "Built-in themes are read-only. Save a copy as a new theme.",
+    );
+  }
+  const document = _parse(value);
+  if (document.id !== id) {
+    throw new ThemeStoreError(
+      400,
+      "A theme's id cannot change when it is saved",
+    );
+  }
+  const text = _serializeWithinCap(document);
+  if ((await _readTheme(directory, id)).hash !== ifMatch) {
+    throw new ThemeStoreError(
+      409,
+      "The theme changed on disk. Reload it before saving.",
+    );
+  }
+  _assertResolves(document, await _readAllThemes(directory));
+  return _writeTheme(directory, document, text, "replace");
 }
 
 /**
@@ -245,6 +326,7 @@ export function createThemeStore(
   options: Readonly<{ directory: string }>,
 ): ThemeStore {
   const { directory } = options;
+  const runExclusively = _createWriteQueue();
   return {
     list: async () =>
       (await _readAllThemes(directory))
@@ -259,43 +341,24 @@ export function createThemeStore(
       const document = _parse(value);
       _assertNotReserved(document.id);
       const text = _serializeWithinCap(document);
-      const isTaken = await fs.access(_fileFromId(directory, document.id)).then(
-        () => true,
-        () => false,
-      );
-      if (isTaken) {
-        throw new ThemeStoreError(
-          409,
-          `A theme named "${document.id}" already exists`,
-        );
-      }
-      _assertResolves(document, await _readAllThemes(directory));
-      return _writeTheme(directory, document, text);
+      return runExclusively(document.id, async () => {
+        const isTaken = await fs
+          .access(_fileFromId(directory, document.id))
+          .then(
+            () => true,
+            () => false,
+          );
+        if (isTaken) {
+          throw new ThemeStoreError(
+            409,
+            `A theme named "${document.id}" already exists`,
+          );
+        }
+        _assertResolves(document, await _readAllThemes(directory));
+        return _writeTheme(directory, document, text, "create");
+      });
     },
-    save: async (id, value, ifMatch) => {
-      _assertNotReserved(id);
-      if (_isBuiltIn(id)) {
-        throw new ThemeStoreError(
-          403,
-          "Built-in themes are read-only. Save a copy as a new theme.",
-        );
-      }
-      const document = _parse(value);
-      if (document.id !== id) {
-        throw new ThemeStoreError(
-          400,
-          "A theme's id cannot change when it is saved",
-        );
-      }
-      const text = _serializeWithinCap(document);
-      if ((await _readTheme(directory, id)).hash !== ifMatch) {
-        throw new ThemeStoreError(
-          409,
-          "The theme changed on disk. Reload it before saving.",
-        );
-      }
-      _assertResolves(document, await _readAllThemes(directory));
-      return _writeTheme(directory, document, text);
-    },
+    save: (id, value, ifMatch) =>
+      runExclusively(id, () => _saveTheme(directory, id, value, ifMatch)),
   };
 }

@@ -217,3 +217,65 @@ test("listing skips rejected files and keeps every valid theme", () =>
       ["classic", "warm"],
     );
   }));
+
+async function _settledStatuses(
+  promises: ReadonlyArray<Promise<unknown>>,
+): Promise<number[]> {
+  return (await Promise.all(promises.map(_statusOf))).sort();
+}
+
+test("two creates of the same id at once leave one winner and one conflict", () =>
+  _withStore(async (store, directory) => {
+    const statuses = await _settledStatuses([
+      store.create(WARM),
+      store.create({ ...WARM, label: "Warm again" }),
+    ]);
+    assert.deepEqual(statuses, [200, 409]);
+    assert.deepEqual((await fs.readdir(directory)).sort(), [
+      "classic.theme.json",
+      "warm.theme.json",
+    ]);
+  }));
+
+test("two saves with the same hash at once leave one winner and one conflict", () =>
+  _withStore(async (store) => {
+    const created = await store.create(WARM);
+    const statuses = await _settledStatuses([
+      store.save("warm", { ...WARM, label: "First" }, created.hash),
+      store.save("warm", { ...WARM, label: "Second" }, created.hash),
+    ]);
+    assert.deepEqual(statuses, [200, 409]);
+  }));
+
+test("a refused create leaves the existing file as it was", () =>
+  _withStore(async (store, directory) => {
+    await store.create(WARM);
+    const before = await fs.readFile(
+      path.join(directory, "warm.theme.json"),
+      "utf8",
+    );
+    assert.equal(
+      await _statusOf(store.create({ ...WARM, label: "Overwritten" })),
+      409,
+    );
+    assert.equal(
+      await fs.readFile(path.join(directory, "warm.theme.json"), "utf8"),
+      before,
+    );
+  }));
+
+test("a failed write does not block the next write to the same theme", () =>
+  _withStore(async (store) => {
+    const created = await store.create(WARM);
+    assert.equal(await _statusOf(store.save("warm", WARM, "stale")), 409);
+    assert.equal(await _statusOf(store.save("warm", WARM, created.hash)), 200);
+  }));
+
+test("writes to different themes do not wait for each other", () =>
+  _withStore(async (store) => {
+    const statuses = await _settledStatuses([
+      store.create(WARM),
+      store.create({ ...WARM, id: "cool", label: "Cool" }),
+    ]);
+    assert.deepEqual(statuses, [200, 200]);
+  }));
