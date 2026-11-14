@@ -299,11 +299,38 @@ function _usedSourceColumns(mappings: LayoutMappings): Set<string> {
 }
 
 /**
+ * The suggested fills that meaning matches made, kept while their source
+ * column is still one of the layout's. They carry no values, so reading the
+ * values neither confirms nor rebuilds them.
+ */
+function _keptMeaningSuggestions(
+  mappings: LayoutMappings,
+  layout: CrosswalkDraft.Layout,
+): LayoutMappings {
+  const layoutColumns = new Set(
+    layout.columnNames.map((name) => {
+      return name.toLowerCase();
+    }),
+  );
+  return Object.fromEntries(
+    Object.entries(mappings).filter(([, mapping]) => {
+      return (
+        mapping.status === "suggested" &&
+        mapping.reason === "meaning" &&
+        mapping.fill.kind === "column" &&
+        layoutColumns.has(mapping.fill.sourceColumn.toLowerCase())
+      );
+    }),
+  );
+}
+
+/**
  * Refills a layout from its real values. Confirmed fills are kept (a
- * governed one gets the list its values fit, unless the user chose one).
- * Every other column is matched again, carried over first, against the source
- * columns no confirmed fill uses. A suggestion the values no longer support
- * is dropped.
+ * governed one gets the list its values fit, unless the user chose one), and
+ * so are Meaning suggestions whose source column is still in the layout.
+ * Every other column is matched again, carried over first, against the
+ * source columns no kept fill uses. A suggestion the values no longer
+ * support is dropped.
  */
 export function applyLayoutValues(
   draft: CrosswalkDraft.T,
@@ -317,13 +344,14 @@ export function applyLayoutValues(
   }
   const current = draft.mappings[layout.id] ?? {};
   const confirmed = _confirmedOnly(current);
-  const usedSources = _usedSourceColumns(confirmed);
-  const openColumns = draft.columns.filter((column) => {
-    return confirmed[column.id] === undefined;
-  });
+  const meaning = _keptMeaningSuggestions(current, layout);
+  const usedSources = _usedSourceColumns({ ...confirmed, ...meaning });
   const isOpen = (columnId: string): boolean => {
-    return confirmed[columnId] === undefined;
+    return confirmed[columnId] === undefined && meaning[columnId] === undefined;
   };
+  const openColumns = draft.columns.filter((column) => {
+    return isOpen(column.id);
+  });
   const prefills = CrosswalkMatch.prefillLayout({
     columns: openColumns,
     targets: action.targets.filter((target) => {
@@ -342,6 +370,7 @@ export function applyLayoutValues(
   });
   return withLayoutMappings(draft, layout.id, {
     ..._chooseCodeListsFromValues(draft, confirmed, action),
+    ...meaning,
     ..._toMappings(prefills, current),
   });
 }

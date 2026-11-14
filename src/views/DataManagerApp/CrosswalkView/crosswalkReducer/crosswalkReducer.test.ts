@@ -992,6 +992,68 @@ describe("crosswalkReducer: meaning_matches_found", () => {
     });
   });
 
+  /** Reads Kings' values, with `GENDER` among the source columns. */
+  function _kingsValuesRead(state: CrosswalkState): CrosswalkState {
+    return crosswalkReducer(state, {
+      type: "values_read",
+      layoutId: getLayoutOf(state, KINGS_MARCH.id).id,
+      sources: [
+        makeProfile({
+          dataset: KINGS_MARCH,
+          columnName: "GENDER",
+          dataType: "bigint",
+          values: ["1", "2", "9"],
+        }),
+      ],
+      targets: [],
+      dateFormatsBySourceColumn: new Map(),
+      context: CONTEXT,
+    });
+  }
+
+  it("keeps a Meaning suggestion when the layout's values are read", () => {
+    const found = _meaningFound(_kingsWithoutSex(), [
+      { columnName: "sex", sourceColumn: "GENDER" },
+    ]);
+    const kingsId = getLayoutOf(found, KINGS_MARCH.id).id;
+    const read = _kingsValuesRead(found);
+
+    expect(_fillOf(read, kingsId, "sex")).toEqual(
+      _fillOf(found, kingsId, "sex"),
+    );
+    expect(_fillOf(read, kingsId, "sex")).toMatchObject({
+      status: "suggested",
+      reason: "meaning",
+    });
+  });
+
+  it("drops a Meaning suggestion whose source column is gone from the layout", () => {
+    const found = _meaningFound(_kingsWithoutSex(), [
+      { columnName: "sex", sourceColumn: "GENDER" },
+    ]);
+    const kingsId = getLayoutOf(found, KINGS_MARCH.id).id;
+    const withoutSource: CrosswalkState = {
+      ...found,
+      draft: {
+        ...found.draft,
+        layouts: found.draft.layouts.map((layout) => {
+          return layout.id === kingsId
+            ? {
+                ...layout,
+                columnNames: layout.columnNames.filter((name) => {
+                  return name !== "GENDER";
+                }),
+              }
+            : layout;
+        }),
+      },
+    };
+
+    expect(
+      _fillOf(_kingsValuesRead(withoutSource), kingsId, "sex"),
+    ).toBeUndefined();
+  });
+
   it("moves a To do layout to Review once every column has a fill", () => {
     const state = _kingsWithoutSex();
     const next = _meaningFound(state, [
