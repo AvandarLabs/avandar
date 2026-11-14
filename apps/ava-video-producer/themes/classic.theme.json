@@ -185,7 +185,7 @@
           },
           "stage": {
             "headingInset": { "x": "$spacing.3xl", "top": "$spacing.xl" },
-            "graphicInset": { "x": "$spacing.4xl", "top": "$spacing.lg", "bottom": "$spacing.2xl" },
+            "graphicInset": { "x": "$spacing.lg", "top": "$spacing.4xl", "bottom": "$spacing.2xl" },
             "evidenceRow": { "x": "$spacing.sm", "bottom": "$spacing.2xs", "gap": "$spacing.xs" }
           }
         },
@@ -257,6 +257,11 @@
     "QueryColumnCacheGrowth": { "defaultProps": { "tableRadius": 5, "tableStrokeWidth": "$stroke.default", "gridStrokeWidth": "$stroke.hairline", "missingDash": [5, 3], "missingStrokeWidth": "$stroke.hairline", "cardRadius": 10, "cardStrokeWidth": "$stroke.hairline", "checkWidth": "$atomic.strokeWidth.lg", "routeStrokeWidth": "$stroke.hairline", "portRadius": 5 } },
     "SourceMerge": { "defaultProps": { "edgeAlpha": 0.42, "chipRadius": 10, "chipFillAlpha": 0.07, "chipStrokeAlpha": "$atomic.opacity.30", "chipStrokeWidth": "$stroke.hairline", "outEdgeAlpha": 0.5, "outEdgeWidth": "$atomic.strokeWidth.lg", "outPacketPeriod": 60, "mergeRadius": 39, "mergeStrokeAlpha": "$atomic.opacity.65", "mergeStrokeWidth": "$stroke.hairline", "glyphWidth": "$atomic.strokeWidth.md", "barHeight": 6, "barAlpha": 0.8, "slotRadius": 5, "slotFillAlpha": 0.12, "slotStrokeAlpha": 0.6, "slotStrokeWidth": "$stroke.default" } },
     "DecisionFork": { "defaultProps": { "selectedWidth": "$atomic.strokeWidth.lg", "conditionRadius": 10, "conditionStrokeWidth": "$stroke.hairline", "outcomeRadius": 14, "outcomeStrokeWidth": "$stroke.hairline", "gateWidth": "$stroke.default", "gateSpread": 9, "markerRadius": 13, "markerAlpha": 0.12, "markerCoreRadius": 5, "lineGap": 4 } },
+    "Heading": { "defaultProps": { "entranceDuration": "$motion.hero", "entranceEasing": "$atomic.easing.out", "entranceDistance": "$atomic.distance.sm" } },
+    "Subtitle": { "defaultProps": { "gap": 18 } },
+    "SharedObject": { "defaultProps": { "borderWidth": "$stroke.default", "fill": "$color.surface", "fadeIn": "$motion.hero", "outlineFade": 20 } },
+    "EvidenceChip": { "defaultProps": { "padding": { "x": 12, "y": 7 } } },
+    "ProductFrame": { "defaultProps": { "backdrop": "$color.productBackdrop" } },
     "ProgressBar": {
       "defaultProps": {
         "height": 3,

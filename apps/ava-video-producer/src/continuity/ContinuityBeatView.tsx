@@ -1,5 +1,7 @@
 import { useCurrentFrame } from "remotion";
 import { enter } from "../motion";
+import { useVideoMotion } from "../videoTheme/useVideoMotion/useVideoMotion";
+import { useVideoProps } from "../videoTheme/useVideoTheme/useVideoTheme";
 import { ContinuityContent } from "./ContinuityContent";
 import css from "./ContinuityScene.module.css";
 import { useContinuityCopy } from "./useContinuityCopy";
@@ -16,12 +18,18 @@ type Props = {
 export function ContinuityBeatView({ beat, accent, productScene }: Props) {
   const frame = useCurrentFrame();
   const translate = useContinuityCopy();
+  const heading = useVideoProps("Heading", {});
+  const motion = useVideoMotion();
   return (
     <div className={css.continuityBeat} data-continuity-beat={beat.id}>
       {beat.content.kind !== "product" && beat.content.kind !== "composite" && (
         <header
           className={css.continuityHeading}
-          style={enter(frame, 0, { y: 8, dur: 18 })}
+          style={enter(frame, 0, {
+            y: heading.entranceDistance,
+            dur: motion.scale(heading.entranceDuration),
+            easing: motion.curve(heading.entranceEasing),
+          })}
         >
           <h1>{translate(beat.title)}</h1>
           <p>{translate(beat.subtitle)}</p>

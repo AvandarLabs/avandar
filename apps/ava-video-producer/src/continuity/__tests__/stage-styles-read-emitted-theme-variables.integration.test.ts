@@ -1,0 +1,39 @@
+/*
+ * The continuity CSS modules read only `--video-*` variables the theme
+ * actually emits, so a typo or a renamed token cannot silently fall back to
+ * the browser default.
+ */
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import test from "node:test";
+import { buildVideoCssVariables } from "../../videoTheme/buildVideoCssVariables/buildVideoCssVariables";
+import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVideoTheme";
+
+const STYLE_FILES = [
+  "../ContinuityScene.module.css",
+  "../ContinuityOverlays.module.css",
+];
+
+test("every required theme variable in the stage styles is emitted by every built-in theme", async () => {
+  const css = (
+    await Promise.all(
+      STYLE_FILES.map((file) =>
+        fs.readFile(new URL(file, import.meta.url), "utf8"),
+      ),
+    )
+  ).join("\n");
+  const required = new Set(
+    [...css.matchAll(/var\((--video-[a-z0-9-]+)\)/g)].map((match) => match[1]),
+  );
+  for (const themeId of BUILT_IN_VIDEO_THEMES.keys()) {
+    const emitted = buildVideoCssVariables(
+      resolveVideoTheme(BUILT_IN_VIDEO_THEMES, themeId),
+    );
+    assert.deepEqual(
+      [...required].filter((name) => !(name in emitted)),
+      [],
+      themeId,
+    );
+  }
+});

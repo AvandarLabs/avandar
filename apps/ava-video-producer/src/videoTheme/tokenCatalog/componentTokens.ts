@@ -771,6 +771,71 @@ const DECISION_FORK_TOKENS = {
   ),
 } as const;
 
+const STAGE_TOKENS = {
+  Heading: {
+    entranceDuration: _duration(
+      "Heading entrance duration",
+      "How long a beat heading takes to arrive.",
+      "stage",
+    ),
+    entranceEasing: _easing(
+      "Heading entrance curve",
+      "The curve of a beat heading arriving.",
+      "stage",
+    ),
+    entranceDistance: _length(
+      "Heading rise",
+      "How far a beat heading rises as it arrives.",
+      "stage",
+    ),
+  },
+  Subtitle: {
+    gap: _length(
+      "Subtitle gap",
+      "Space between a beat heading and its subtitle.",
+      "stage",
+    ),
+  },
+  SharedObject: {
+    borderWidth: _stroke(
+      "Shared object border",
+      "Border width of an object that travels between motions.",
+      "stage",
+    ),
+    fill: _color(
+      "Shared object fill",
+      "Fill of an object that travels between motions.",
+      "stage",
+    ),
+    fadeIn: _duration(
+      "Shared object fade-in",
+      "How long a shared object takes to appear.",
+      "stage",
+    ),
+    outlineFade: _duration(
+      "Outline fade",
+      "How long an outline-only shared object takes to fade after it lands.",
+      "stage",
+    ),
+  },
+  EvidenceChip: {
+    padding: token({
+      kind: "box",
+      surface: "stage",
+      label: "Evidence chip padding",
+      description:
+        "Space inside an evidence chip: x on the sides and y above and below.",
+    }),
+  },
+  ProductFrame: {
+    backdrop: _color(
+      "Reenactment backdrop",
+      "The backdrop drawn around a reenactment on the stage.",
+      "stage",
+    ),
+  },
+} as const;
+
 /**
  * Component tokens: `components.<Name>.defaultProps` in a theme, read by
  * themed shapes through Mantine `useProps` (via `useVideoProps`). A value is
@@ -779,6 +844,7 @@ const DECISION_FORK_TOKENS = {
  */
 export const COMPONENT_TOKENS = {
   ...SHARED_GRAPHIC_TOKENS,
+  ...STAGE_TOKENS,
   NetworkGraph: NETWORK_GRAPH_TOKENS,
   RadialNetwork: RADIAL_NETWORK_TOKENS,
   PlexusField: PLEXUS_FIELD_TOKENS,

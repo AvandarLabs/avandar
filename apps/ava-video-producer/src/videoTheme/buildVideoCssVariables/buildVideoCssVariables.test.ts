@@ -37,7 +37,8 @@ test("elevations become a box shadow and a drop-shadow filter", () => {
 });
 
 test("layout boxes become one variable per side", () => {
-  assert.equal(variables["--video-layout-stage-graphic-inset-x"], "192px");
+  assert.equal(variables["--video-layout-stage-graphic-inset-x"], "60px");
+  assert.equal(variables["--video-layout-stage-graphic-inset-top"], "192px");
   assert.equal(variables["--video-layout-stage-graphic-inset-bottom"], "70px");
 });
 
