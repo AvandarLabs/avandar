@@ -1,3 +1,6 @@
+/* Mantine's layer comes after the showcase resets, so it wins over them. */
+@layer showcase-reset, mantine;
+
 :root {
   background: var(--paper);
   color: var(--ink);
@@ -30,35 +33,41 @@ body {
   margin: 0;
 }
 
-button,
-input,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
+/*
+ * Element resets sit in a layer below Mantine's, so a Mantine Button or
+ * input inside the Atlas modals keeps its own styles. Unlayered rules always
+ * beat layered ones, so unlayered resets would strip every Mantine control.
+ * Gallery class rules stay unlayered and still override these.
+ */
+@layer showcase-reset {
+  button,
+  input,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-button,
-input {
-  font: inherit;
-}
+  button,
+  input {
+    font: inherit;
+  }
 
-button,
-a {
-  touch-action: manipulation;
-}
+  button,
+  a {
+    touch-action: manipulation;
+  }
 
-button {
-  color: inherit;
-  cursor: pointer;
-}
+  button {
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
 
-button {
-  background: none;
-  border: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 button:focus-visible,
@@ -81,10 +90,6 @@ h2,
 h3,
 p {
   margin: 0;
-}
-
-button {
-  padding: 0;
 }
 
 ::selection {
