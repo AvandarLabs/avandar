@@ -143,24 +143,26 @@ function useSaveInPlace(options: SaveOptions, run: RunThemeRequest) {
   }, [isBuiltIn, storedTheme, draft, storeTheme, discard, run]);
 }
 
-/** Saves the draft as a new theme and makes it the active one. */
+/**
+ * Saves the draft as a new theme and makes it the active one. A missing base
+ * theme fails like any other refused save, so the status line says so.
+ */
 function useSaveAsNew(options: SaveOptions, run: RunThemeRequest) {
   const { library, themeId, draft, storeTheme, discard, selectTheme } = options;
   return useCallback(
-    async (label: string) => {
-      const base = library.get(themeId);
-      if (!base) {
-        return false;
-      }
-      const id = buildThemeIdFromLabel(label, [...library.keys()]);
-      const document = createNewThemeDocument({ base, draft, id, label });
-      return run(async () => {
+    (label: string) =>
+      run(async () => {
+        const base = library.get(themeId);
+        if (!base) {
+          throw new Error(`The base theme "${themeId}" is not loaded.`);
+        }
+        const id = buildThemeIdFromLabel(label, [...library.keys()]);
+        const document = createNewThemeDocument({ base, draft, id, label });
         const { hash } = await ThemeApi.create(document);
         storeTheme({ document, hash });
         discard();
         selectTheme(id);
-      });
-    },
+      }),
     [library, themeId, draft, storeTheme, discard, selectTheme, run],
   );
 }
