@@ -3,19 +3,25 @@ import {
   Button,
   Fieldset,
   Group,
-  NumberInput,
   SegmentedControl,
   TextInput,
 } from "@mantine/core";
-import { useState, type ReactNode } from "react";
 import { elevationToBoxShadow } from "../../videoTheme/cssValues/cssValues";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import css from "./controls.module.css";
+import {
+  formatDashPattern,
+  parseDashDraft,
+} from "./controlValues/controlValues";
+import { getDefaultLiteralFromKind } from "./defaultLiterals";
+import { RangeNumberInput } from "./RangeNumberInput";
+import { useDraftValue } from "./useDraftValue";
 import type {
   ShadowLayer,
   ShadowValue,
 } from "../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
 type NumberField = Readonly<{
   key: string;
@@ -31,7 +37,11 @@ const DASH_PRESETS: Readonly<Record<string, readonly number[]>> = {
   dotted: [1, 4],
   dashed: [6, 6],
 };
+const MAX_SHADOW_LAYERS = 4;
+const DEFAULT_SHADOW = getDefaultLiteralFromKind("shadow") as ShadowValue;
+const DEFAULT_SHADOW_LAYER = DEFAULT_SHADOW.layers[0] as ShadowLayer;
 
+/** Field names and ranges for each effect kind, translated. */
 function useEffectFields(): Readonly<
   Record<"shadow" | "glow" | "textShadow", readonly NumberField[]>
 > {
@@ -74,24 +84,28 @@ function useEffectFields(): Readonly<
   };
 }
 
-function NumberFields({
+/** One set of effect numbers under a legend. A missing value shows its default. */
+function _NumberFields({
   legend,
   fields,
   values,
+  fallback,
   onChange,
   action,
 }: Readonly<{
   legend: string;
   fields: readonly NumberField[];
   values: NumberValues;
+  fallback: NumberValues;
   onChange: (values: NumberValues) => void;
   action?: ReactNode;
 }>) {
+  const current = { ...fallback, ...values };
   return (
     <Fieldset className={css.layer} legend={legend} variant="unstyled">
       <div className={css.fields}>
         {fields.map((field) => (
-          <NumberInput
+          <RangeNumberInput
             key={field.key}
             size="xs"
             label={field.name}
@@ -99,17 +113,59 @@ function NumberFields({
             max={field.max}
             step={field.step}
             decimalScale={2}
-            value={values[field.key]}
-            onChange={(next) =>
-              typeof next === "number" &&
-              onChange({ ...values, [field.key]: next })
-            }
+            value={current[field.key] ?? 0}
+            onChange={(next) => onChange({ ...current, [field.key]: next })}
           />
         ))}
       </div>
       {action}
     </Fieldset>
   );
+}
+
+/** The editable layers of a shadow, each with its own remove action. */
+function ShadowLayers({
+  layers,
+  onChange,
+}: Readonly<{
+  layers: readonly ShadowLayer[];
+  onChange: (layers: readonly ShadowLayer[]) => void;
+}>) {
+  const { t } = useLingui();
+  const fields = useEffectFields().shadow;
+  return layers.map((layer, index) => {
+    const layerNumber = index + 1;
+    return (
+      <_NumberFields
+        // A layer has no identity apart from its position in the stack.
+        key={`layer-${String(layerNumber)}`}
+        legend={t`Layer ${layerNumber}`}
+        fields={fields}
+        values={layer}
+        fallback={DEFAULT_SHADOW_LAYER}
+        onChange={(next) =>
+          onChange(
+            layers.map((current, position) =>
+              position === index
+                ? { ...DEFAULT_SHADOW_LAYER, ...next }
+                : current,
+            ),
+          )
+        }
+        action={
+          <Button
+            size="compact-xs"
+            variant="subtle"
+            onClick={() =>
+              onChange(layers.filter((_, position) => position !== index))
+            }
+          >
+            {t`Remove layer ${layerNumber}`}
+          </Button>
+        }
+      />
+    );
+  });
 }
 
 /** A shadow token: up to four layers, previewed in the theme's shadow colour. */
@@ -120,64 +176,28 @@ export function ShadowValueControl({
 }: ValueControlProps) {
   const { t } = useLingui();
   const { theme } = useTokenEditor();
-  const fields = useEffectFields().shadow;
-  const shadow = value as ShadowValue;
-  const setLayers = (layers: readonly ShadowLayer[]) => onChange({ layers });
+  const layers = (value as ShadowValue | undefined)?.layers ?? [];
+  const setLayers = (nextLayers: readonly ShadowLayer[]) =>
+    onChange({ layers: nextLayers });
+  const boxShadow = elevationToBoxShadow({
+    layers,
+    color: theme.semantic.color.shadowColor,
+  });
   return (
     <div className={css.layers} role="group" aria-label={label}>
-      {shadow.layers.map((layer, index) => {
-        const layerNumber = index + 1;
-        return (
-          <NumberFields
-            key={`layer-${String(layerNumber)}`}
-            legend={t`Layer ${layerNumber}`}
-            fields={fields}
-            values={layer}
-            onChange={(next) =>
-              setLayers(
-                shadow.layers.map((current, position) =>
-                  position === index ? (next as ShadowLayer) : current,
-                ),
-              )
-            }
-            action={
-              <Button
-                size="compact-xs"
-                variant="subtle"
-                onClick={() =>
-                  setLayers(
-                    shadow.layers.filter((_, position) => position !== index),
-                  )
-                }
-              >
-                {t`Remove layer ${layerNumber}`}
-              </Button>
-            }
-          />
-        );
-      })}
+      <ShadowLayers layers={layers} onChange={setLayers} />
       <Group gap="xs">
         <Button
           size="compact-xs"
           variant="default"
-          disabled={shadow.layers.length >= 4}
-          onClick={() =>
-            setLayers([
-              ...shadow.layers,
-              { offsetX: 0, offsetY: 4, blur: 8, spread: 0, alpha: 0.2 },
-            ])
-          }
+          disabled={layers.length >= MAX_SHADOW_LAYERS}
+          onClick={() => setLayers([...layers, DEFAULT_SHADOW_LAYER])}
         >
           {t`Add layer`}
         </Button>
         <span
           className={css.shadowPreview}
-          style={{
-            boxShadow: elevationToBoxShadow({
-              layers: shadow.layers,
-              color: theme.semantic.color.shadowColor,
-            }),
-          }}
+          style={{ boxShadow }}
           aria-hidden="true"
         />
       </Group>
@@ -193,10 +213,11 @@ export function GlowValueControl({
 }: ValueControlProps) {
   const fields = useEffectFields().glow;
   return (
-    <NumberFields
+    <_NumberFields
       legend={label}
       fields={fields}
-      values={value as NumberValues}
+      values={(value ?? {}) as NumberValues}
+      fallback={getDefaultLiteralFromKind("glow") as NumberValues}
       onChange={onChange}
     />
   );
@@ -210,26 +231,43 @@ export function TextShadowValueControl({
 }: ValueControlProps) {
   const fields = useEffectFields().textShadow;
   return (
-    <NumberFields
+    <_NumberFields
       legend={label}
       fields={fields}
-      values={value as NumberValues}
+      values={(value ?? {}) as NumberValues}
+      fallback={getDefaultLiteralFromKind("textShadow") as NumberValues}
       onChange={onChange}
     />
   );
 }
 
-function _parseDash(text: string): readonly number[] | undefined {
-  const parts = text.trim()
-    ? text
-        .trim()
-        .split(/[\s,]+/)
-        .map(Number)
-    : [];
-  return parts.length <= 8 &&
-    parts.every((part) => Number.isFinite(part) && part >= 0)
-    ? parts
-    : undefined;
+/** Solid, dotted, and dashed presets. Shows no selection for a custom pattern. */
+function DashPresets({
+  pattern,
+  onChange,
+}: Readonly<{
+  pattern: readonly number[];
+  onChange: (pattern: readonly number[]) => void;
+}>) {
+  const { t } = useLingui();
+  const patternText = formatDashPattern(pattern);
+  const preset =
+    Object.entries(DASH_PRESETS).find(
+      ([, dashes]) => formatDashPattern(dashes) === patternText,
+    )?.[0] ?? "";
+  return (
+    <SegmentedControl
+      size="xs"
+      aria-label={t`Dash preset`}
+      value={preset}
+      data={[
+        { value: "solid", label: t`Solid` },
+        { value: "dotted", label: t`Dotted` },
+        { value: "dashed", label: t`Dashed` },
+      ]}
+      onChange={(next) => onChange(DASH_PRESETS[next] ?? [])}
+    />
+  );
 }
 
 /** A dash pattern: presets plus exact dash and gap lengths, previewed as a line. */
@@ -240,45 +278,26 @@ export function DashValueControl({
 }: ValueControlProps) {
   const { t } = useLingui();
   const pattern = Array.isArray(value) ? (value as readonly number[]) : [];
-  const [text, setText] = useState(pattern.join(" "));
-  const preset =
-    Object.entries(DASH_PRESETS).find(
-      ([, dashes]) => dashes.join(" ") === pattern.join(" "),
-    )?.[0] ?? "";
-  const apply = (dashes: readonly number[]) => {
-    setText(dashes.join(" "));
-    onChange(dashes);
-  };
+  const field = useDraftValue<readonly number[], string>({
+    value: pattern,
+    toKey: formatDashPattern,
+    toDraft: formatDashPattern,
+    parse: parseDashDraft,
+    onChange,
+  });
   return (
     <div className={css.stack} role="group" aria-label={label}>
-      <SegmentedControl
-        size="xs"
-        aria-label={t`Dash preset`}
-        value={preset}
-        data={[
-          { value: "solid", label: t`Solid` },
-          { value: "dotted", label: t`Dotted` },
-          { value: "dashed", label: t`Dashed` },
-        ]}
-        onChange={(next) => apply(DASH_PRESETS[next] ?? [])}
-      />
+      <DashPresets pattern={pattern} onChange={onChange} />
       <TextInput
         size="xs"
         label={t`Dash and gap lengths`}
-        value={text}
+        value={field.draft}
         error={
-          _parseDash(text)
+          field.isValid
             ? undefined
             : t`Use up to eight numbers separated by spaces.`
         }
-        onChange={(event) => {
-          const next = event.currentTarget.value;
-          setText(next);
-          const dashes = _parseDash(next);
-          if (dashes) {
-            onChange(dashes);
-          }
-        }}
+        onChange={(event) => field.change(event.currentTarget.value)}
       />
       <svg className={css.dashPreview} viewBox="0 0 160 8" aria-hidden="true">
         <line
@@ -286,7 +305,7 @@ export function DashValueControl({
           y1={4}
           x2={160}
           y2={4}
-          strokeDasharray={pattern.join(" ")}
+          strokeDasharray={formatDashPattern(pattern)}
         />
       </svg>
     </div>

@@ -1,13 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
-import { ColorInput, Group, NumberInput } from "@mantine/core";
+import { Group } from "@mantine/core";
 import css from "./controls.module.css";
+import { HexColorInput } from "./HexColorInput";
+import { RangeNumberInput } from "./RangeNumberInput";
 import type { GradientValue } from "../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "./valueControl.types";
 import type { ReactNode } from "react";
 
-const HEX_COLOR = /^#[0-9a-f]{6}(?:[0-9a-f]{2})?$/i;
-const OPAQUE_HEX_COLOR = /^#[0-9a-f]{6}$/i;
-const POPOVER = { withinPortal: false } as const;
+type Shade = Readonly<{ light: number; dark: number }>;
 
 /** A colour token: a hex field with a picker and the theme's swatches. */
 export function ColorValueControl({
@@ -18,24 +18,17 @@ export function ColorValueControl({
   badge,
 }: ValueControlProps &
   Readonly<{ swatches?: readonly string[]; badge?: ReactNode }>) {
-  const color = typeof value === "string" ? value : "#000000";
   return (
     <Group gap="xs" wrap="nowrap" align="center">
-      <ColorInput
+      <HexColorInput
         className={css.color}
         size="xs"
         aria-label={label}
-        value={color}
-        format={color.length === 9 ? "hexa" : "hex"}
+        value={typeof value === "string" ? value : "#000000"}
+        allowAlpha
         swatches={[...swatches]}
         swatchesPerRow={8}
-        withEyeDropper={false}
-        popoverProps={POPOVER}
-        onChange={(next) => {
-          if (HEX_COLOR.test(next)) {
-            onChange(next.toLowerCase());
-          }
-        }}
+        onChange={onChange}
       />
       {badge}
     </Group>
@@ -53,23 +46,20 @@ export function PaletteValueControl({
   return (
     <div className={css.palette} role="group" aria-label={label}>
       {shades.map((shade, index) => (
-        <ColorInput
+        <HexColorInput
+          // A shade's position is its identity: the palette always has ten.
           key={`shade-${String(index)}`}
           size="xs"
           aria-label={t`${label}, shade ${index}`}
           value={shade}
-          format="hex"
-          withEyeDropper={false}
-          popoverProps={POPOVER}
-          onChange={(next) => {
-            if (OPAQUE_HEX_COLOR.test(next)) {
-              onChange(
-                shades.map((current, position) =>
-                  position === index ? next.toLowerCase() : current,
-                ),
-              );
-            }
-          }}
+          allowAlpha={false}
+          onChange={(color) =>
+            onChange(
+              shades.map((current, position) =>
+                position === index ? color : current,
+              ),
+            )
+          }
         />
       ))}
     </div>
@@ -83,12 +73,12 @@ export function ShadeValueControl({
   onChange,
 }: ValueControlProps) {
   const { t } = useLingui();
-  const shade =
+  const shade: Shade =
     typeof value === "number"
       ? { light: value, dark: value }
-      : (value as Readonly<{ light: number; dark: number }>);
-  const field = (side: "dark" | "light", name: string) => (
-    <NumberInput
+      : (value as Shade);
+  const field = (side: keyof Shade, name: string) => (
+    <RangeNumberInput
       size="xs"
       label={name}
       min={0}
@@ -96,9 +86,7 @@ export function ShadeValueControl({
       step={1}
       allowDecimal={false}
       value={shade[side]}
-      onChange={(next) =>
-        typeof next === "number" && onChange({ ...shade, [side]: next })
-      }
+      onChange={(next) => onChange({ ...shade, [side]: next })}
     />
   );
   return (
@@ -118,34 +106,26 @@ export function GradientValueControl({
   const { t } = useLingui();
   const gradient = value as GradientValue;
   const colorField = (side: "from" | "to", name: string) => (
-    <ColorInput
+    <HexColorInput
       size="xs"
       label={name}
       value={gradient[side]}
-      format="hex"
-      withEyeDropper={false}
-      popoverProps={POPOVER}
-      onChange={(next) => {
-        if (HEX_COLOR.test(next)) {
-          onChange({ ...gradient, [side]: next.toLowerCase() });
-        }
-      }}
+      allowAlpha
+      onChange={(color) => onChange({ ...gradient, [side]: color })}
     />
   );
   return (
     <Group gap="xs" role="group" aria-label={label} wrap="nowrap">
       {colorField("from", t`From`)}
       {colorField("to", t`To`)}
-      <NumberInput
+      <RangeNumberInput
         size="xs"
         label={t`Angle`}
         suffix="°"
         min={0}
         max={360}
         value={gradient.deg}
-        onChange={(deg) =>
-          typeof deg === "number" && onChange({ ...gradient, deg })
-        }
+        onChange={(deg) => onChange({ ...gradient, deg })}
       />
     </Group>
   );

@@ -1,7 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
-import { Group, NumberInput, Slider } from "@mantine/core";
+import { Group, Slider } from "@mantine/core";
 import { parseCssPixels } from "../../videoTheme/normalizeTokenValue/normalizeTokenValue";
 import css from "./controls.module.css";
+import { RangeNumberInput } from "./RangeNumberInput";
 import type { ValueControlProps } from "./valueControl.types";
 
 const SLIDER_STEP_LIMIT = 1000;
@@ -55,7 +56,7 @@ export function NumberValueControl({
           onChange={emit}
         />
       ) : null}
-      <NumberInput
+      <RangeNumberInput
         className={css.numberInput}
         size="xs"
         aria-label={label}
@@ -65,7 +66,7 @@ export function NumberValueControl({
         decimalScale={4}
         suffix={definition.unit ? UNIT_SUFFIXES[definition.unit] : undefined}
         value={shown}
-        onChange={(next) => typeof next === "number" && emit(next)}
+        onChange={emit}
       />
     </Group>
   );
@@ -83,7 +84,7 @@ export function DurationValueControl({
   const milliseconds = Math.round((frames / 30) * 1000);
   return (
     <Group className={css.numberRow} gap="xs" wrap="nowrap">
-      <NumberInput
+      <RangeNumberInput
         className={css.numberInput}
         size="xs"
         aria-label={label}
@@ -93,7 +94,7 @@ export function DurationValueControl({
         allowDecimal={false}
         suffix={t` frames`}
         value={frames}
-        onChange={(next) => typeof next === "number" && onChange(next)}
+        onChange={onChange}
       />
       <span className={css.readout}>{t`${milliseconds} ms`}</span>
     </Group>

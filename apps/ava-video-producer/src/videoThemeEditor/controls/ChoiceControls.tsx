@@ -5,7 +5,7 @@ import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
 } from "../../videoTheme/videoFontRegistry/videoFontRegistry";
-import { useOptionCopy } from "../tokenCopy/useEditorCopy";
+import { useOptionCopy, type OptionCopy } from "../tokenCopy/useEditorCopy";
 import css from "./controls.module.css";
 import type { ValueControlProps } from "./valueControl.types";
 
@@ -35,6 +35,47 @@ export function FontValueControl({
   );
 }
 
+type EnumOption = OptionCopy & Readonly<{ option: string }>;
+
+/** An enum menu whose options show their explanations under their names. */
+function _EnumMenu({
+  label,
+  value,
+  options,
+  onChange,
+}: Readonly<{
+  label: string;
+  value: string;
+  options: readonly EnumOption[];
+  onChange: (option: string) => void;
+}>) {
+  const descriptions = new Map(
+    options.map((entry) => [entry.option, entry.description]),
+  );
+  return (
+    <AtlasSelect
+      aria-label={label}
+      value={value}
+      data={options.map((entry) => ({
+        value: entry.option,
+        label: entry.label,
+      }))}
+      onChange={(next) => next && onChange(next)}
+      renderOption={({ option }) => {
+        const description = descriptions.get(option.value);
+        return (
+          <span className={css.option}>
+            <span>{option.label}</span>
+            {description ? (
+              <span className={css.optionDescription}>{description}</span>
+            ) : null}
+          </span>
+        );
+      }}
+    />
+  );
+}
+
 /** An enum token: segments for up to three options, otherwise a menu with explanations. */
 export function EnumValueControl({
   label,
@@ -48,41 +89,27 @@ export function EnumValueControl({
     option,
     ...copy(optionKey, option),
   }));
-  const data = options.map((entry) => ({
-    value: entry.option,
-    label: entry.label,
-  }));
-  if (options.length <= 3) {
+  if (options.length > 3) {
     return (
-      <SegmentedControl
-        size="xs"
-        fullWidth
-        aria-label={label}
+      <_EnumMenu
+        label={label}
         value={String(value)}
-        data={data}
+        options={options}
         onChange={onChange}
       />
     );
   }
   return (
-    <AtlasSelect
+    <SegmentedControl
+      size="xs"
+      fullWidth
       aria-label={label}
       value={String(value)}
-      data={data}
-      onChange={(next) => next && onChange(next)}
-      renderOption={({ option }) => {
-        const description = options.find(
-          (entry) => entry.option === option.value,
-        )?.description;
-        return (
-          <span className={css.option}>
-            <span>{option.label}</span>
-            {description ? (
-              <span className={css.optionDescription}>{description}</span>
-            ) : null}
-          </span>
-        );
-      }}
+      data={options.map((entry) => ({
+        value: entry.option,
+        label: entry.label,
+      }))}
+      onChange={onChange}
     />
   );
 }

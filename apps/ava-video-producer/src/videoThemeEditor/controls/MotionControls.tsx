@@ -1,8 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { NumberInput, SegmentedControl, Text } from "@mantine/core";
+import { SegmentedControl, Text } from "@mantine/core";
 import { CurvePlot } from "../../gallery/HelperGallery/demos/parts/CurvePlot";
 import { createEasingFromToken } from "../../videoTheme/createEasingFromToken/createEasingFromToken";
 import css from "./controls.module.css";
+import { getDefaultLiteralFromKind } from "./defaultLiterals";
+import { RangeNumberInput } from "./RangeNumberInput";
 import type {
   EasingValue,
   SpringValue,
@@ -11,7 +13,9 @@ import type { ValueControlProps } from "./valueControl.types";
 
 type Bezier = readonly [number, number, number, number];
 
-const DEFAULT_BEZIER: Bezier = [0.45, 0, 0.55, 1];
+const DEFAULT_BEZIER = getDefaultLiteralFromKind("easing") as Bezier;
+const DEFAULT_POWER: EasingValue = { powerInOut: 3 };
+const DEFAULT_SPRING = getDefaultLiteralFromKind("spring") as SpringValue;
 
 function _withPoint(points: Bezier, index: number, value: number): Bezier {
   const [x1, y1, x2, y2] = points;
@@ -23,6 +27,7 @@ function _withPoint(points: Bezier, index: number, value: number): Bezier {
   ];
 }
 
+/** The four Bezier control values. A camera curve keeps every point in 0..1. */
 function BezierFields({
   points,
   isCameraCurve,
@@ -37,7 +42,7 @@ function BezierFields({
   return (
     <div className={css.fields}>
       {points.map((point, index) => (
-        <NumberInput
+        <RangeNumberInput
           key={names[index]}
           size="xs"
           label={names[index]}
@@ -46,13 +51,42 @@ function BezierFields({
           step={0.01}
           decimalScale={3}
           value={point}
-          onChange={(next) =>
-            typeof next === "number" &&
-            onChange(_withPoint(points, index, next))
-          }
+          onChange={(next) => onChange(_withPoint(points, index, next))}
         />
       ))}
     </div>
+  );
+}
+
+/** The power curve exponent. A camera supports only the cubic in-out curve. */
+function PowerFields({
+  power,
+  isCameraCurve,
+  onChange,
+}: Readonly<{
+  power: number;
+  isCameraCurve: boolean;
+  onChange: (easing: EasingValue) => void;
+}>) {
+  const { t } = useLingui();
+  if (isCameraCurve) {
+    return (
+      <Text size="xs" c="dimmed">
+        {t`Cubic in-out. Cameras support no other power curve.`}
+      </Text>
+    );
+  }
+  return (
+    <RangeNumberInput
+      size="xs"
+      label={t`Exponent`}
+      min={1}
+      max={8}
+      step={0.5}
+      decimalScale={2}
+      value={power}
+      onChange={(next) => onChange({ powerInOut: next })}
+    />
   );
 }
 
@@ -68,28 +102,9 @@ export function EasingValueControl({
   isCameraCurve = false,
 }: ValueControlProps) {
   const { t } = useLingui();
-  const easing = value as EasingValue;
-  const power = "powerInOut" in easing ? easing.powerInOut : undefined;
-  const points: Bezier | undefined =
-    "powerInOut" in easing ? undefined : easing;
-  const powerControl = isCameraCurve ? (
-    <Text size="xs" c="dimmed">
-      {t`Cubic in-out. Cameras support no other power curve.`}
-    </Text>
-  ) : (
-    <NumberInput
-      size="xs"
-      label={t`Exponent`}
-      min={1}
-      max={8}
-      step={0.5}
-      decimalScale={2}
-      value={power}
-      onChange={(next) =>
-        typeof next === "number" && onChange({ powerInOut: next })
-      }
-    />
-  );
+  const easing = (value ?? DEFAULT_BEZIER) as EasingValue;
+  const points = "powerInOut" in easing ? undefined : easing;
+  const power = "powerInOut" in easing ? easing.powerInOut : 3;
   return (
     <div className={css.easing} role="group" aria-label={label}>
       <SegmentedControl
@@ -101,7 +116,7 @@ export function EasingValueControl({
           { value: "power", label: t`Power` },
         ]}
         onChange={(kind) =>
-          onChange(kind === "power" ? { powerInOut: 3 } : DEFAULT_BEZIER)
+          onChange(kind === "power" ? DEFAULT_POWER : DEFAULT_BEZIER)
         }
       />
       <div className={css.easingBody}>
@@ -112,27 +127,26 @@ export function EasingValueControl({
           handles={points}
         />
         {points ? (
-          <BezierFields
-            points={points}
-            isCameraCurve={isCameraCurve}
-            onChange={onChange}
-          />
+          <BezierFields {...{ points, isCameraCurve, onChange }} />
         ) : (
-          powerControl
+          <PowerFields {...{ power, isCameraCurve, onChange }} />
         )}
       </div>
     </div>
   );
 }
 
-/** A spring token: damping, stiffness, and mass. */
+/** A spring token: damping, stiffness, and mass. A missing field shows its default. */
 export function SpringValueControl({
   label,
   value,
   onChange,
 }: ValueControlProps) {
   const { t } = useLingui();
-  const spring = value as SpringValue;
+  const spring: SpringValue = {
+    ...DEFAULT_SPRING,
+    ...(value as Partial<SpringValue> | undefined),
+  };
   const fields = [
     { key: "damping", name: t`Damping`, min: 1, max: 100, step: 1 },
     { key: "stiffness", name: t`Stiffness`, min: 1, max: 1000, step: 1 },
@@ -141,7 +155,7 @@ export function SpringValueControl({
   return (
     <div className={css.fields} role="group" aria-label={label}>
       {fields.map((field) => (
-        <NumberInput
+        <RangeNumberInput
           key={field.key}
           size="xs"
           label={field.name}
@@ -150,10 +164,7 @@ export function SpringValueControl({
           step={field.step}
           decimalScale={2}
           value={spring[field.key]}
-          onChange={(next) =>
-            typeof next === "number" &&
-            onChange({ ...spring, [field.key]: next })
-          }
+          onChange={(next) => onChange({ ...spring, [field.key]: next })}
         />
       ))}
     </div>
