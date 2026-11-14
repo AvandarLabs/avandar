@@ -1025,6 +1025,11 @@ so that change needs no data migration.
   `crosswalks__datasets` row is readable only by someone who can view its
   dataset, so a reader never learns about a dataset they cannot open, and a
   save never removes a membership its caller cannot see.
+- Accepted trade-off: Data Sources viewers can read a crosswalk's layouts and
+  mappings, so the column names, source columns, and fills of a restricted
+  dataset that is alone in its layout are readable. The membership rows
+  themselves stay hidden. Hiding the layouts would hide them from the save
+  payload, and the save would then delete them, so they stay readable.
 - pgTAP: a file per table group under `supabase/tests/database/permissions/`,
   following `rls_maps.test.sql`, with the negative cases from
   `docs/rules/sql.md`.

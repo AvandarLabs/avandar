@@ -11581,14 +11581,23 @@ follows through the virtual dataset's dependency staleness. A dataset whose
 columns changed since it was mapped is left out until it is removed and added
 again. Export mapping exports the draft as shown, unsaved edits included.
 Layouts and mappings are visible to Data Sources viewers even when every
-member dataset is restricted, which leaks column names (the membership rows
-are hidden, the layouts are not). The lock order between combining and a
+member dataset is restricted: the column names, source columns, and fills of
+a restricted dataset that is alone in its layout are readable, while the
+membership rows stay hidden. This is accepted, since hiding layouts from
+viewers would hide them from the save payload, and the save would then delete
+them. The lock order between combining and a
 dataset delete is not settled. On the desktop, the unique-index ordering
 exposure and `updated_at` churn come from the park-names step of the column
 reconcile. Combine matches columns by name, so a column the user renamed in
 the combined dataset loses its description on the next combine. In Codes mode
 a value that matches no pair of its list passes through as text. Two editors
-saving one crosswalk at once: the last save wins. `ava supabase migrations
+saving one crosswalk at once: the last save wins. Removing a column drops its
+mappings without asking. `rpc_dataset_columns__apply_dictionaries` does not
+refuse a combined dataset, so only the interface hides Apply a dictionary on
+one. Refreshing a source does not reach a combined dataset through a linked
+dataset. `validateCombineExpression` accepts aggregates and bare identifiers
+that fail when the combine runs. Going Back, or leaving the page, with unsaved
+edits has no unload guard. `ava supabase migrations
 validate` check 5 fails on storage migrations that predate this work.
 Side-by-side joins, write-back to live sources, and "Add from datasets" into
 an existing dictionary stay out.
