@@ -4,9 +4,17 @@ import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
 } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { DRAFT_THEME_ID } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
+import {
+  createDraftThemeTarget,
+  DRAFT_THEME_ID,
+} from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { getValueAtPath } from "../../videoTheme/getResolvedTokenValue/getResolvedTokenValue";
-import { CLASSIC_VIDEO_THEME_SNAPSHOT } from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
+import { resolveVideoThemeFromSource } from "../../videoTheme/resolveVideoThemeFromSource/resolveVideoThemeFromSource";
+import {
+  CLASSIC_VIDEO_THEME_SNAPSHOT,
+  createVideoThemeSnapshot,
+  resolveVideoThemeFromSnapshot,
+} from "../../videoTheme/videoThemeSnapshot/videoThemeSnapshot";
 import {
   buildThemeIdFromLabel,
   countItemOverrides,
@@ -15,6 +23,7 @@ import {
   createNewThemeDocument,
   createSavedDocumentFromDraft,
   createSnapshotFromDraft,
+  createVideoThemeSourceFromDraft,
   EMPTY_THEME_DRAFT,
   getDocumentPathFromTokenPath,
   getTokenPathFromDocumentPath,
@@ -384,5 +393,41 @@ test("an export lets an item's composite replace a theme-level reference", () =>
         },
       },
     },
+  );
+});
+
+test("an export from a built-in draft carries a patch even when only another item changed", () => {
+  const draft = setTokenInDraft(
+    EMPTY_THEME_DRAFT,
+    { kind: "item", itemId: "bar-chart" },
+    "stroke.default",
+    "$atomic.strokeWidth.lg",
+  );
+  const target = {
+    library: CLASSIC_WITH_OVERRIDE,
+    themeId: "classic",
+    draft,
+    itemId: "network-graph",
+  };
+  const exportTheme = createExportThemeFromDraft(target);
+  assert.notEqual(exportTheme.patch, undefined);
+  // The server reads a present patch, even an empty one, as a draft.
+  const serverTarget = createDraftThemeTarget({
+    library: CLASSIC_WITH_OVERRIDE,
+    themeId: exportTheme.id,
+    hasDraft: exportTheme.patch !== undefined,
+  });
+  const serverPatches =
+    exportTheme.patch && Object.keys(exportTheme.patch).length > 0
+      ? [exportTheme.patch]
+      : [];
+  const serverSnapshot = createVideoThemeSnapshot(
+    serverTarget.library,
+    serverTarget.themeId,
+    serverPatches,
+  );
+  assert.equal(
+    resolveVideoThemeFromSnapshot(serverSnapshot, ["network-graph"]).hash,
+    resolveVideoThemeFromSource(createVideoThemeSourceFromDraft(target)).hash,
   );
 });

@@ -405,17 +405,20 @@ export function createSnapshotFromDraft(
 
 /**
  * The `theme` an export request sends for one item: the saved id and one
- * merged patch. The server applies the same draft target to it (see
- * `createSnapshotFromThemeRequest`), so the MP4 matches the preview.
+ * merged patch. A present `patch`, even an empty one, tells the server a
+ * draft exists, so it applies the same draft target (see
+ * `createSnapshotFromThemeRequest`) and the MP4 matches the preview. A
+ * built-in theme with edits only on other items still resolves as the
+ * unsaved theme, so its export carries `patch: {}`. Only a theme with no
+ * draft at all sends the id alone.
  */
 export function createExportThemeFromDraft(target: DraftTarget): ExportTheme {
-  const patches = createDraftPatchesForItem(target);
-  if (patches.length === 0) {
+  if (isThemeDraftEmpty(target.draft)) {
     return { id: target.themeId };
   }
   return {
     id: target.themeId,
-    patch: mergeVideoThemePatches(...patches),
+    patch: mergeVideoThemePatches(...createDraftPatchesForItem(target)),
   };
 }
 
