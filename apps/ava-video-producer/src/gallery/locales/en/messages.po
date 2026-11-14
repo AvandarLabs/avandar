@@ -60,6 +60,10 @@ msgstr "Avandar Motion Atlas home"
 msgid "at rest"
 msgstr "at rest"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Type"
+msgstr "Type"
+
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "then its icon."
 msgstr "then its icon."
@@ -77,9 +81,17 @@ msgstr "Copy usage snippet"
 msgid "Rendering MP4…"
 msgstr "Rendering MP4…"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Shadow"
+msgstr "Shadow"
+
 #: src/gallery/MotionGallery.tsx
 #~ msgid "All collections ("
 #~ msgstr "All collections ("
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "As written"
+msgstr "As written"
 
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
 msgid "Preview frame"
@@ -139,6 +151,10 @@ msgstr "✳"
 msgid "6 SEC LOOPS"
 msgstr "6 SEC LOOPS"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Font"
+msgstr "Font"
+
 #: src/gallery/MotionGallery.tsx
 #~ msgid "CONCEPTUAL STUDIES /"
 #~ msgstr "CONCEPTUAL STUDIES /"
@@ -156,6 +172,10 @@ msgstr "Keep a little inspiration."
 #~ "scenes. Playback speed is separate."
 #~ msgstr "Controls camera travel, easing, and blur. Slower presets may lengthen "
 #~ "scenes. Playback speed is separate."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Proportional"
+msgstr "Proportional"
 
 #: src/gallery/HelperGallery/HelperSidebar/HelperSidebar.tsx
 #~ msgid "All helpers ({total})"
@@ -178,7 +198,12 @@ msgstr "Export ready"
 msgid "Copied"
 msgstr "Copied"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Text shadow"
+msgstr "Text shadow"
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Patient and investigative. Gives viewers time to inspect an unfamiliar "
 "system or a dense diagram."
 msgstr "Patient and investigative. Gives viewers time to inspect an unfamiliar "
@@ -189,6 +214,7 @@ msgid "Usage"
 msgstr "Usage"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Confident and purposeful. Moves promptly between familiar landmarks, "
 "with a more emphatic start and stop."
 msgstr "Confident and purposeful. Moves promptly between familiar landmarks, "
@@ -237,6 +263,10 @@ msgstr "Content is valid. Ready to copy or export."
 msgid "Search titles, ideas, tags…"
 msgstr "Search titles, ideas, tags…"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Palettes"
+msgstr "Palettes"
+
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
 msgid "Previous motion"
 msgstr "Previous motion"
@@ -254,9 +284,17 @@ msgstr "No defaults: the value is fixed or every argument is required."
 msgid "Annotation roughness"
 msgstr "Annotation roughness"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Gap"
+msgstr "Gap"
+
 #: src/gallery/HelperGallery/HelperGallery.tsx
 msgid "BROWSE THE LIBRARY"
 msgstr "BROWSE THE LIBRARY"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Opacity"
+msgstr "Opacity"
 
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "Every line arrives"
@@ -280,6 +318,7 @@ msgid "{0} background"
 msgstr "{0} background"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Deliberate"
 msgstr "Deliberate"
 
@@ -295,6 +334,10 @@ msgstr "Deliberate"
 #: src/gallery/MotionGallery/ContentControls/NullableField/NullableField.tsx
 msgid "Empty value for {0}"
 msgstr "Empty value for {0}"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Radii and spacing"
+msgstr "Radii and spacing"
 
 #. placeholder {0}: STOCK_CATALOG.length
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
@@ -317,6 +360,10 @@ msgstr "Explore {title}"
 msgid "Ridge"
 msgstr "Ridge"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Uppercase"
+msgstr "Uppercase"
+
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 #~ msgid "avandar"
 #~ msgstr "avandar"
@@ -324,6 +371,10 @@ msgstr "Ridge"
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "one line at a time,"
 msgstr "one line at a time,"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Info"
+msgstr "Info"
 
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
@@ -333,6 +384,10 @@ msgstr "BROWSE THE COLLECTION"
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "A visual vocabulary for your next explanation."
 msgstr "A visual vocabulary for your next explanation."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Size"
+msgstr "Size"
 
 #: src/continuity/gallery/CompositionCard/CompositionCard.tsx
 msgid "CONTINUITY"
@@ -346,9 +401,17 @@ msgstr "CONTINUITY"
 msgid "THE COMPOSITION COLLECTION"
 msgstr "THE COMPOSITION COLLECTION"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Minimum"
+msgstr "Minimum"
+
 #: src/gallery/MotionGallery/AtlasSections.tsx
 msgid "Compositions"
 msgstr "Compositions"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Outline"
+msgstr "Outline"
 
 #. placeholder {0}: preset.name
 #. placeholder {1}: preset.id
@@ -455,10 +518,18 @@ msgstr "View {0} details"
 msgid "Close preview"
 msgstr "Close preview"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Elevation"
+msgstr "Elevation"
+
 #: src/gallery/HelperGallery/HelperCard/HelperCard.tsx
 #: src/gallery/MotionGallery/MotionCard.tsx
 msgid "LIVE"
 msgstr "LIVE"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Rate"
+msgstr "Rate"
 
 #: src/gallery/MotionGallery/ContentControls/ContentControls.tsx
 msgid "Edit this preset for the current visit. Preview, copied JSON, and "
@@ -475,12 +546,17 @@ msgstr "Check this value and its related fields."
 #~ msgstr "FAMILIES"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Whip"
 msgstr "Whip"
 
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Creative direction"
 msgstr "Creative direction"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Tabular"
+msgstr "Tabular"
 
 #: src/gallery/HelperGallery/HelperGallery.tsx
 msgid "All helpers"
@@ -489,6 +565,10 @@ msgstr "All helpers"
 #: src/gallery/MotionGallery/PaletteSwatches.tsx
 msgid "Brand swatches"
 msgstr "Brand swatches"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "On dark grounds"
+msgstr "On dark grounds"
 
 #: src/gallery/MotionGallery/GalleryNavigation.tsx
 msgid "01"
@@ -515,6 +595,14 @@ msgstr "No blur"
 msgid "MOTION PRESETS"
 msgstr "MOTION PRESETS"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Distance"
+msgstr "Distance"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Seed"
+msgstr "Seed"
+
 #: src/gallery/HelperGallery/demos/PointerDemos.tsx
 msgid "Inset: shutter samples relative to the pointer, enlarged"
 msgstr "Inset: shutter samples relative to the pointer, enlarged"
@@ -536,9 +624,17 @@ msgstr "{0} FAMILIES"
 #~ msgid "Complete films built from the motion library."
 #~ msgstr "Complete films built from the motion library."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Roughness"
+msgstr "Roughness"
+
 #: src/gallery/HelperGallery/demos/MaskDemos.tsx
 msgid "row index"
 msgstr "row index"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Numerals"
+msgstr "Numerals"
 
 #: src/gallery/HelperGallery/HelperDetail/CodeBlock.tsx
 msgid "Copy"
@@ -2300,6 +2396,10 @@ msgstr "30 FPS"
 msgid "Play preview"
 msgstr "Play preview"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Rendering"
+msgstr "Rendering"
+
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDialog.tsx
 msgid "Next motion"
 msgstr "Next motion"
@@ -2353,6 +2453,14 @@ msgstr "Use the bookmark on any preset to add it to your references."
 msgid "Harbor"
 msgstr "Harbor"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Corners"
+msgstr "Corners"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Motion"
+msgstr "Motion"
+
 #: src/gallery/HelperGallery/demos/CameraDemos.tsx
 msgid "shutter open"
 msgstr "shutter open"
@@ -2365,6 +2473,10 @@ msgstr "Creative brief copied"
 msgid "Library navigation"
 msgstr "Library navigation"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Type scale"
+msgstr "Type scale"
+
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 msgid "Composition categories"
 msgstr "Composition categories"
@@ -2375,14 +2487,26 @@ msgid "The shared helpers every motion and composition is built from, each "
 msgstr "The shared helpers every motion and composition is built from, each "
 "previewed live with the real code."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Shutter angle"
+msgstr "Shutter angle"
+
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "Explore a preset. Scrub the motion. Make it yours."
 msgstr "Explore a preset. Scrub the motion. Make it yours."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Color"
+msgstr "Color"
 
 #. placeholder {0}: preset.name
 #: src/gallery/MotionGallery/MotionCard.tsx
 msgid "Save {0} to references"
 msgstr "Save {0} to references"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Letter case"
+msgstr "Letter case"
 
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
 msgid "DRAG TO EXPLORE"
@@ -2406,6 +2530,7 @@ msgid "Cell {0}"
 msgstr "Cell {0}"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Balanced"
 msgstr "Balanced"
 
@@ -2423,6 +2548,7 @@ msgid "NO POSTER YET"
 msgstr "NO POSTER YET"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Gentle"
 msgstr "Gentle"
 
@@ -2437,8 +2563,13 @@ msgid "eased"
 msgstr "eased"
 
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Speed"
 msgstr "Speed"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Capitalized"
+msgstr "Capitalized"
 
 #: src/gallery/HelperGallery/demos/ContinuityDemos.tsx
 msgid "Callout drawn from this cell"
@@ -2448,9 +2579,17 @@ msgstr "Callout drawn from this cell"
 msgid "Moving window"
 msgstr "Moving window"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Duration"
+msgstr "Duration"
+
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 msgid "No matching films."
 msgstr "No matching films."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Secondary"
+msgstr "Secondary"
 
 #. placeholder {0}: loopFrames - 1
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
@@ -2486,6 +2625,10 @@ msgstr "Download MP4"
 msgid "Box roughness"
 msgstr "Box roughness"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Curve"
+msgstr "Curve"
+
 #. placeholder {0}: preset.name
 #: src/gallery/MotionGallery/MotionCard.tsx
 msgid "Explore {0}"
@@ -2494,6 +2637,10 @@ msgstr "Explore {0}"
 #: src/gallery/HelperGallery/HelperDetail/HelperReference.tsx
 msgid "No scene imports it yet."
 msgstr "No scene imports it yet."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Maximum"
+msgstr "Maximum"
 
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "Open the record."
@@ -2507,7 +2654,12 @@ msgstr "Open the record."
 msgid "Reset colors"
 msgstr "Reset colors"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Vertical"
+msgstr "Vertical"
+
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Calm and instructional. A gradual change of focus for tutorials and "
 "teaching."
 msgstr "Calm and instructional. A gradual change of focus for tutorials and "
@@ -2522,12 +2674,17 @@ msgid "Search films"
 msgstr "Search films"
 
 #: src/continuity/gallery/CompositionViewer/CompositionRoughnessControls.tsx
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Sketch"
 msgstr "Sketch"
 
 #: src/gallery/HelperGallery/demos/MediaDemos.tsx
 msgid "Fictional Avandar chart screen"
 msgstr "Fictional Avandar chart screen"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Right"
+msgstr "Right"
 
 #: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
 msgid "Chart"
@@ -2536,6 +2693,10 @@ msgstr "Chart"
 #: src/gallery/MotionGallery/PaletteControls.tsx
 msgid "Live preview colors"
 msgstr "Live preview colors"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Bowing"
+msgstr "Bowing"
 
 #: src/gallery/HelperGallery/demos/parts/DemoDiagram.tsx
 msgid "Filter"
@@ -2549,6 +2710,10 @@ msgstr "All motions"
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Save reference"
 msgstr "Save reference"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Spring"
+msgstr "Spring"
 
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
 msgid "Camera motion"
@@ -2595,6 +2760,7 @@ msgid "Atlas sections"
 msgstr "Atlas sections"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Composition default"
 msgstr "Composition default"
 
@@ -2623,6 +2789,10 @@ msgstr "Good for"
 msgid "The kicker follows a panel later"
 msgstr "The kicker follows a panel later"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Neutral"
+msgstr "Neutral"
+
 #: src/gallery/MotionGallery/AtlasSections.tsx
 msgid "Sample films"
 msgstr "Sample films"
@@ -2639,6 +2809,10 @@ msgstr "About {0}"
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
 msgid "Captions"
 msgstr "Captions"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Horizontal"
+msgstr "Horizontal"
 
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Collection"
@@ -2668,6 +2842,10 @@ msgstr "Motion Atlas"
 #~ msgstr "The shared motion helpers scenes are built from, each previewed live "
 #~ "with the real code."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Cycle"
+msgstr "Cycle"
+
 #. placeholder {0}: context.label
 #. placeholder {1}: index + 1
 #: src/gallery/MotionGallery/ContentControls/CollectionItem/CollectionItem.tsx
@@ -2675,6 +2853,7 @@ msgid "Remove {0} item {1}"
 msgstr "Remove {0} item {1}"
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Brisk"
 msgstr "Brisk"
 
@@ -2703,9 +2882,23 @@ msgstr "North"
 #~ msgid "FRAMES"
 #~ msgstr "FRAMES"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Fast and energetic. Adds a brief burst of momentum at a major subject "
+"change. Use it sparingly."
+msgstr "Fast and energetic. Adds a brief burst of momentum at a major subject "
+"change. Use it sparingly."
+
 #: src/gallery/MotionGallery/AtlasSections.tsx
 msgid "Motions"
 msgstr "Motions"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Warning"
+msgstr "Warning"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Layout"
+msgstr "Layout"
 
 #: src/continuity/gallery/CompositionCard/CompositionCard.tsx
 msgid "Preview in classic theme"
@@ -2720,9 +2913,21 @@ msgstr "Shared helpers"
 msgid "Pause all"
 msgstr "Pause all"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Keeps the speed, easing, and blur defined in each scene."
+msgstr "Keeps the speed, easing, and blur defined in each scene."
+
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Search motions"
 msgstr "Search motions"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Camera"
+msgstr "Camera"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Strokes"
+msgstr "Strokes"
 
 #: src/gallery/HelperGallery/HelperGallery.tsx
 msgid "THE HELPER LIBRARY"
@@ -2764,6 +2969,10 @@ msgstr "Colors affect editorial graphics. Product components retain their "
 msgid "Social sector"
 msgstr "Social sector"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Primary"
+msgstr "Primary"
+
 #: src/gallery/MotionGallery/ContentControls/CollectionItem/CollectionItem.tsx
 msgid "Remove"
 msgstr "Remove"
@@ -2773,6 +2982,7 @@ msgid "Every helper, previewed live."
 msgstr "Every helper, previewed live."
 
 #: src/continuity/gallery/CompositionViewer/useCameraPresetOptions.ts
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Measured and readable. Connects related ideas without drawing attention "
 "away from the explanation."
 msgstr "Measured and readable. Connects related ideas without drawing attention "
@@ -2789,6 +2999,10 @@ msgid "Only camera travel changes. Reading holds stay intact; slower moves may "
 msgstr "Only camera travel changes. Reading holds stay intact; slower moves may "
 "extend the scene. The Motion blur toggle can turn blur off."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Lowercase"
+msgstr "Lowercase"
+
 #: src/gallery/MotionGallery/PreviewDialog/PreviewDetails.tsx
 msgid "Conceptual graphics. No Avandar product footage."
 msgstr "Conceptual graphics. No Avandar product footage."
@@ -2796,6 +3010,3896 @@ msgstr "Conceptual graphics. No Avandar product footage."
 #: src/gallery/HelperGallery/HelperGallery.tsx
 msgid "The code <0>behind the motion.</0>"
 msgstr "The code <0>behind the motion.</0>"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Danger"
+msgstr "Danger"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A blur radius step."
+msgstr "A blur radius step."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A camera zoom limit."
+msgstr "A camera zoom limit."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A card's height before its text lines are added."
+msgstr "A card''s height before its text lines are added."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A chip changing state."
+msgstr "A chip changing state."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A companion colour that alternates with the accent."
+msgstr "A companion colour that alternates with the accent."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A corner radius step, in pixels. The full step rounds a shape "
+"into a pill."
+msgstr "A corner radius step, in pixels. The full step rounds a shape into a "
+"pill."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A count of sub-frames blended for camera motion blur."
+msgstr "A count of sub-frames blended for camera motion blur."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A dimension of a drawn shape such as a dot, node, or glyph, in "
+"pixels of the surface that draws it."
+msgstr "A dimension of a drawn shape such as a dot, node, or glyph, in pixels "
+"of the surface that draws it."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A font weight step."
+msgstr "A font weight step."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A heading drawn inside a graphic."
+msgstr "A heading drawn inside a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A highlighted route through a diagram."
+msgstr "A highlighted route through a diagram."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A label anchored to a point on the stage."
+msgstr "A label anchored to a point on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A line height step, as a multiple of the font size."
+msgstr "A line height step, as a multiple of the font size."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A line thickness step."
+msgstr "A line thickness step."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A motion blur shutter angle. 180 degrees matches film."
+msgstr "A motion blur shutter angle. 180 degrees matches film."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A named colour. Semantic colours point at swatches, and a colour "
+"picked in the editor becomes a new swatch."
+msgstr "A named colour. Semantic colours point at swatches, and a colour picked "
+"in the editor becomes a new swatch."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A press answering back."
+msgstr "A press answering back."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A registered font face. Graphic text accepts only faces with "
+"measured glyph widths."
+msgstr "A registered font face. Graphic text accepts only faces with measured "
+"glyph widths."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A row, card, or panel arriving."
+msgstr "A row, card, or panel arriving."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A sheet or full column arriving."
+msgstr "A sheet or full column arriving."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A soft halo: how far it spreads past its shape, how blurred it "
+"is, and how opaque."
+msgstr "A soft halo: how far it spreads past its shape, how blurred it is, and "
+"how opaque."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A spacing step used by layout insets and gaps, in pixels of the "
+"surface."
+msgstr "A spacing step used by layout insets and gaps, in pixels of the "
+"surface."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A spring landing for a value or card snapping into place."
+msgstr "A spring landing for a value or card snapping into place."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A step of the type scale, in pixels of the surface that draws the "
+"text."
+msgstr "A step of the type scale, in pixels of the surface that draws the text."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A tempo step. Tempo divides animation durations inside a beat."
+msgstr "A tempo step. Tempo divides animation durations inside a beat."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A warm colour for one point of attention."
+msgstr "A warm colour for one point of attention."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.A whip-out or wipe, shorter than a panel so the boundary reads as "
+"a cut."
+msgstr "A whip-out or wipe, shorter than a panel so the boundary reads as a "
+"cut."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Accent"
+msgstr "Accent"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Active stage outline"
+msgstr "Active stage outline"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Active stage outline width"
+msgstr "Active stage outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Active stage tint"
+msgstr "Active stage tint"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Alternating dash and gap lengths. An empty pattern draws a solid "
+"line."
+msgstr "Alternating dash and gap lengths. An empty pattern draws a solid line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.An animation length in frames at 30 fps."
+msgstr "An animation length in frames at 30 fps."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.An opacity step, keyed by its percentage."
+msgstr "An opacity step, keyed by its percentage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Annotation draw-in"
+msgstr "Annotation draw-in"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Annotation sketch"
+msgstr "Annotation sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Annotation stroke"
+msgstr "Annotation stroke"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Annotation width"
+msgstr "Annotation width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Aperture overscan"
+msgstr "Aperture overscan"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Authored camera timing, or one of the motion presets."
+msgstr "Authored camera timing, or one of the motion presets."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Balanced camera"
+msgstr "Balanced camera"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Black"
+msgstr "Black"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Blur"
+msgstr "Blur"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Blur pixels for each pixel of travel per frame in a single-object "
+"move."
+msgstr "Blur pixels for each pixel of travel per frame in a single-object move."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Blur samples"
+msgstr "Blur samples"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Body core radius"
+msgstr "Body core radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Body font stack"
+msgstr "Body font stack"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Body label offset"
+msgstr "Body label offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Body radius"
+msgstr "Body radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Body rim opacity"
+msgstr "Body rim opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Body rim width"
+msgstr "Body rim width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Border width of a floating label."
+msgstr "Border width of a floating label."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Border width of an object that travels between motions."
+msgstr "Border width of an object that travels between motions."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Boundary dash"
+msgstr "Boundary dash"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Boundary width"
+msgstr "Boundary width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Bowing"
+msgstr "Bowing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Box sketch"
+msgstr "Box sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Brisk camera"
+msgstr "Brisk camera"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Cache grid width"
+msgstr "Cache grid width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Cache table outline width"
+msgstr "Cache table outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Cache table radius"
+msgstr "Cache table radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Camera preset"
+msgstr "Camera preset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Camera speed"
+msgstr "Camera speed"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Caption"
+msgstr "Caption"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Caption baseline"
+msgstr "Caption baseline"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card base height"
+msgstr "Card base height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card corner"
+msgstr "Card corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card fill opacity"
+msgstr "Card fill opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card outline opacity"
+msgstr "Card outline opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card padding"
+msgstr "Card padding"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card radius"
+msgstr "Card radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card text baseline"
+msgstr "Card text baseline"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Card title"
+msgstr "Card title"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Characters typed per second."
+msgstr "Characters typed per second."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Check cap"
+msgstr "Check cap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Check join"
+msgstr "Check join"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Check width"
+msgstr "Check width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Chip"
+msgstr "Chip"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Chip corner"
+msgstr "Chip corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Choice"
+msgstr "Choice"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Chosen path width"
+msgstr "Chosen path width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Clean geometric lines."
+msgstr "Clean geometric lines."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Code"
+msgstr "Code"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Code and other monospace text. Also the face of any text drawn as "
+"monospace."
+msgstr "Code and other monospace text. Also the face of any text drawn as "
+"monospace."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Code window divider width"
+msgstr "Code window divider width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Code window radius"
+msgstr "Code window radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Colour and opacity of the beat progress bar."
+msgstr "Colour and opacity of the beat progress bar."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Colour of a divider rule."
+msgstr "Colour of a divider rule."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Colour of a node's resting outline."
+msgstr "Colour of a node''s resting outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Colour of an edge that names no colour of its own."
+msgstr "Colour of an edge that names no colour of its own."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Colour of orbit guides and construction lines."
+msgstr "Colour of orbit guides and construction lines."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Column port radius"
+msgstr "Column port radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Column stagger"
+msgstr "Column stagger"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Condition box radius"
+msgstr "Condition box radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Condition outline width"
+msgstr "Condition outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Connector bend"
+msgstr "Connector bend"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Connector curve"
+msgstr "Connector curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Connector dash"
+msgstr "Connector dash"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Connector draw-in"
+msgstr "Connector draw-in"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Connector drop"
+msgstr "Connector drop"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Connector width"
+msgstr "Connector width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core pulse opacity"
+msgstr "Core pulse opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core pulse period"
+msgstr "Core pulse period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core pulse radius"
+msgstr "Core pulse radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core pulse rim opacity"
+msgstr "Core pulse rim opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core pulse rim width"
+msgstr "Core pulse rim width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core pulse swing"
+msgstr "Core pulse swing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core radius"
+msgstr "Core radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core rim opacity"
+msgstr "Core rim opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Core rim width"
+msgstr "Core rim width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius a morph transition starts from before it opens to "
+"the full frame."
+msgstr "Corner radius a morph transition starts from before it opens to the "
+"full frame."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a branch's condition box."
+msgstr "Corner radius of a branch''s condition box."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a branch's outcome box."
+msgstr "Corner radius of a branch''s outcome box."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a data row."
+msgstr "Corner radius of a data row."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a field row."
+msgstr "Corner radius of a field row."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a floating label."
+msgstr "Corner radius of a floating label."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a panel."
+msgstr "Corner radius of a panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a pill, limited to half its height."
+msgstr "Corner radius of a pill, limited to half its height."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a query request card."
+msgstr "Corner radius of a query request card."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a slot on the destination panel."
+msgstr "Corner radius of a slot on the destination panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a source's kind chip."
+msgstr "Corner radius of a source''s kind chip."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a spotlight cut-out."
+msgstr "Corner radius of a spotlight cut-out."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of a tinted summary card."
+msgstr "Corner radius of a tinted summary card."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of an object that travels between motions."
+msgstr "Corner radius of an object that travels between motions."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of evidence chips on the stage."
+msgstr "Corner radius of evidence chips on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of panels inside a graphic."
+msgstr "Corner radius of panels inside a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of pill-shaped tags."
+msgstr "Corner radius of pill-shaped tags."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of summary cards inside a graphic."
+msgstr "Corner radius of summary cards inside a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of the cached relation."
+msgstr "Corner radius of the cached relation."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of the editor window."
+msgstr "Corner radius of the editor window."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of the highlight behind the focused line."
+msgstr "Corner radius of the highlight behind the focused line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Corner radius of the predicate card."
+msgstr "Corner radius of the predicate card."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Covered check width"
+msgstr "Covered check width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Curve tension"
+msgstr "Curve tension"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Danger palette"
+msgstr "Danger palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dark ground threshold"
+msgstr "Dark ground threshold"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dash pattern"
+msgstr "Dash pattern"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dash pattern of a column the cache does not hold yet."
+msgstr "Dash pattern of a column the cache does not hold yet."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dash pattern of a connector, in pixels."
+msgstr "Dash pattern of a connector, in pixels."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dash pattern of dashed edges, in fractions of the path length."
+msgstr "Dash pattern of dashed edges, in fractions of the path length."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dash pattern of guides, in pixels."
+msgstr "Dash pattern of guides, in pixels."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Dash pattern of the transfer boundary, in pixels."
+msgstr "Dash pattern of the transfer boundary, in pixels."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Data"
+msgstr "Data"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Default stroke"
+msgstr "Default stroke"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Default text drawn inside a graphic."
+msgstr "Default text drawn inside a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Default weight of Mantine heading levels."
+msgstr "Default weight of Mantine heading levels."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Deliberate camera"
+msgstr "Deliberate camera"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Destination bar height"
+msgstr "Destination bar height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Destination bar opacity"
+msgstr "Destination bar opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Destination slot fill"
+msgstr "Destination slot fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Destination slot line opacity"
+msgstr "Destination slot line opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Destination slot line width"
+msgstr "Destination slot line width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Destination slot radius"
+msgstr "Destination slot radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Detail"
+msgstr "Detail"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Display"
+msgstr "Display"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance"
+msgstr "Distance"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from a body's centre up to its label baseline."
+msgstr "Distance from a body''s centre up to its label baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from a card's top to its first text baseline."
+msgstr "Distance from a card''s top to its first text baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from a node's edge to its detail baseline."
+msgstr "Distance from a node''s edge to its detail baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from a node's edge to its label baseline."
+msgstr "Distance from a node''s edge to its label baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from a pill's top to its text baseline."
+msgstr "Distance from a pill''s top to its text baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from the bottom of a graphic to the baseline of its "
+"caption."
+msgstr "Distance from the bottom of a graphic to the baseline of its caption."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Distance from the edges of a graphic to its content."
+msgstr "Distance from the edges of a graphic to its content."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Divides every animation duration inside a beat. 1.5 is faster and "
+"0.8 slower; timeline lengths never change."
+msgstr "Divides every animation duration inside a beat. 1.5 is faster and 0.8 "
+"slower; timeline lengths never change."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Draw on"
+msgstr "Draw on"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Drift"
+msgstr "Drift"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Duration"
+msgstr "Duration"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Easing curve"
+msgstr "Easing curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge cap"
+msgstr "Edge cap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge colour"
+msgstr "Edge colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge curve tension"
+msgstr "Edge curve tension"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge dash"
+msgstr "Edge dash"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge draw curve"
+msgstr "Edge draw curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge draw duration"
+msgstr "Edge draw duration"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge sketch"
+msgstr "Edge sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge stagger"
+msgstr "Edge stagger"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edge width"
+msgstr "Edge width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edges, connectors, and drawn paths."
+msgstr "Edges, connectors, and drawn paths."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Edges, outlines, guides, and dividers."
+msgstr "Edges, outlines, guides, and dividers."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Elevated surface"
+msgstr "Elevated surface"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Emphasis"
+msgstr "Emphasis"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Entrance"
+msgstr "Entrance"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Evidence"
+msgstr "Evidence"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Evidence chip padding"
+msgstr "Evidence chip padding"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Evidence row"
+msgstr "Evidence row"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Exact data values and text fitted into fixed slots. Fitted text "
+"keeps its own size."
+msgstr "Exact data values and text fitted into fixed slots. Fitted text keeps "
+"its own size."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Exit"
+msgstr "Exit"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Extra-small node radius"
+msgstr "Extra-small node radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Eyebrow"
+msgstr "Eyebrow"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Eyebrow position"
+msgstr "Eyebrow position"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Field"
+msgstr "Field"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Field port radius"
+msgstr "Field port radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Field row radius"
+msgstr "Field row radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fill behind a node's tint."
+msgstr "Fill behind a node''s tint."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fill of a panel."
+msgstr "Fill of a panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fill of a surface stacked on another surface, such as a card "
+"inside a panel."
+msgstr "Fill of a surface stacked on another surface, such as a card inside a "
+"panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fill of an object that travels between motions."
+msgstr "Fill of an object that travels between motions."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fill of panels, nodes, and cards that sit on the ground."
+msgstr "Fill of panels, nodes, and cards that sit on the ground."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fixes the random wobble of hand-drawn lines so every frame draws "
+"the same shape."
+msgstr "Fixes the random wobble of hand-drawn lines so every frame draws the "
+"same shape."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Fixes the wobble of the teaching underline so every frame draws "
+"the same line."
+msgstr "Fixes the wobble of the teaching underline so every frame draws the "
+"same line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Flat"
+msgstr "Flat"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Floating"
+msgstr "Floating"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Floating diagram elevation"
+msgstr "Floating diagram elevation"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Floating label"
+msgstr "Floating label"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Floating label border"
+msgstr "Floating label border"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Floating label offset"
+msgstr "Floating label offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Floating label padding"
+msgstr "Floating label padding"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Font face"
+msgstr "Font face"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Font size"
+msgstr "Font size"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Font size of the heading heading level on the stage."
+msgstr "Font size of the heading heading level on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Font size of the thesis heading level on the stage."
+msgstr "Font size of the thesis heading level on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Font smoothing"
+msgstr "Font smoothing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Font weight"
+msgstr "Font weight"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Footer divider width"
+msgstr "Footer divider width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Footer dot radius"
+msgstr "Footer dot radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Footnote"
+msgstr "Footnote"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames between edges drawing in."
+msgstr "Frames between edges drawing in."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames between neighbouring columns of a stepped wipe."
+msgstr "Frames between neighbouring columns of a stepped wipe."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames between siblings in a list."
+msgstr "Frames between siblings in a list."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames between siblings that start one after another."
+msgstr "Frames between siblings that start one after another."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames between thesis lines starting to arrive."
+msgstr "Frames between thesis lines starting to arrive."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for a packet to cross between two stages."
+msgstr "Frames for a packet to cross between two stages."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for a packet to cross from the merge to the destination."
+msgstr "Frames for a packet to cross from the merge to the destination."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for a packet to travel its edge once."
+msgstr "Frames for a packet to travel its edge once."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for one breath of a spoke node."
+msgstr "Frames for one breath of a spoke node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for one breath of an outer node."
+msgstr "Frames for one breath of an outer node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for one breath of the glow around the core."
+msgstr "Frames for one breath of the glow around the core."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for one breath of the hub node."
+msgstr "Frames for one breath of the hub node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for one cycle of a repeating motion."
+msgstr "Frames for one cycle of a repeating motion."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Frames for one particle twinkle cycle."
+msgstr "Frames for one particle twinkle cycle."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Gate spread"
+msgstr "Gate spread"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Gate width"
+msgstr "Gate width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Gentle camera"
+msgstr "Gentle camera"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Glide curve"
+msgstr "Glide curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Glow"
+msgstr "Glow"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Glyph width"
+msgstr "Glyph width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Graphic body"
+msgstr "Graphic body"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Graphic heading"
+msgstr "Graphic heading"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Graphic inset"
+msgstr "Graphic inset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Graphic margin"
+msgstr "Graphic margin"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ground"
+msgstr "Ground"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ground fill"
+msgstr "Ground fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ground gradient"
+msgstr "Ground gradient"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Grounds whose luminance is below this count as dark, so colour "
+"pairs use their on-dark value."
+msgstr "Grounds whose luminance is below this count as dark, so colour pairs "
+"use their on-dark value."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Guide colour"
+msgstr "Guide colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Guide dash"
+msgstr "Guide dash"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Guide opacity"
+msgstr "Guide opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Guide sketch"
+msgstr "Guide sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Guide stroke"
+msgstr "Guide stroke"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Guide width"
+msgstr "Guide width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hairline stroke"
+msgstr "Hairline stroke"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Half the width of the cross that closes an untaken branch."
+msgstr "Half the width of the cross that closes an untaken branch."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Halo"
+msgstr "Halo"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Halo glow"
+msgstr "Halo glow"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hand-drawn underlines and annotations."
+msgstr "Hand-drawn underlines and annotations."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading entrance curve"
+msgstr "Heading entrance curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading entrance duration"
+msgstr "Heading entrance duration"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading font stack"
+msgstr "Heading font stack"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading inset"
+msgstr "Heading inset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading line height"
+msgstr "Heading line height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading rise"
+msgstr "Heading rise"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading size"
+msgstr "Heading size"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Heading weight"
+msgstr "Heading weight"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Height of a pill."
+msgstr "Height of a pill."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hero"
+msgstr "Hero"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Highlight"
+msgstr "Highlight"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Highlight opacity"
+msgstr "Highlight opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Highlighted edge opacity"
+msgstr "Highlighted edge opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How a check mark's corner is drawn."
+msgstr "How a check mark''s corner is drawn."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How a check mark's ends are drawn."
+msgstr "How a check mark''s ends are drawn."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How an animation accelerates: cubic Bezier control points, or a "
+"symmetric power curve."
+msgstr "How an animation accelerates: cubic Bezier control points, or a "
+"symmetric power curve."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How edge ends are drawn."
+msgstr "How edge ends are drawn."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How edges and paths draw themselves in."
+msgstr "How edges and paths draw themselves in."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How elements arrive: duration, curve, and rise distance."
+msgstr "How elements arrive: duration, curve, and rise distance."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How elements leave: duration, curve, and travel distance."
+msgstr "How elements leave: duration, curve, and travel distance."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far a beat heading rises as it arrives."
+msgstr "How far a beat heading rises as it arrives."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far a hand-drawn line wanders from its true path. Zero draws "
+"a clean line."
+msgstr "How far a hand-drawn line wanders from its true path. Zero draws a "
+"clean line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far a thesis line rises as it arrives."
+msgstr "How far a thesis line rises as it arrives."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far an element travels during an entrance, an exit, or a "
+"drift."
+msgstr "How far an element travels during an entrance, an exit, or a drift."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far below its target a connector ends."
+msgstr "How far below its target a connector ends."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far particles wander in a looping field."
+msgstr "How far particles wander in a looping field."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far past its target a connector's end swings sideways."
+msgstr "How far past its target a connector''s end swings sideways."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far past the frame's diagonal an aperture transition opens, "
+"so its edge clears the corners."
+msgstr "How far past the frame''s diagonal an aperture transition opens, so its "
+"edge clears the corners."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far the active ring sits outside a node."
+msgstr "How far the active ring sits outside a node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far the glow around the core grows at the top of a breath."
+msgstr "How far the glow around the core grows at the top of a breath."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far the hub's activity rises above its floor."
+msgstr "How far the hub''s activity rises above its floor."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How far the scrim around a spotlight extends. It must reach past "
+"every stage edge."
+msgstr "How far the scrim around a spotlight extends. It must reach past every "
+"stage edge."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How fast a camera preset travels relative to its authored timing."
+msgstr "How fast a camera preset travels relative to its authored timing."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How fast typed text appears."
+msgstr "How fast typed text appears."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How high a spoke node's activity rises at the top of a breath."
+msgstr "How high a spoke node''s activity rises at the top of a breath."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How high an outer node's activity rises at the top of a breath."
+msgstr "How high an outer node''s activity rises at the top of a breath."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long a beat heading takes to arrive."
+msgstr "How long a beat heading takes to arrive."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long a connector takes to draw."
+msgstr "How long a connector takes to draw."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long a hand-drawn mark takes to draw and to retract."
+msgstr "How long a hand-drawn mark takes to draw and to retract."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long a route takes to appear."
+msgstr "How long a route takes to appear."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long a shared object takes to appear."
+msgstr "How long a shared object takes to appear."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long a thesis line takes to arrive."
+msgstr "How long a thesis line takes to arrive."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long an edge takes to draw itself in."
+msgstr "How long an edge takes to draw itself in."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long an outline-only shared object takes to fade after it "
+"lands."
+msgstr "How long an outline-only shared object takes to fade after it lands."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long packets take to appear."
+msgstr "How long packets take to appear."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How long the teaching underline takes to draw."
+msgstr "How long the teaching underline takes to draw."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How much a hand-drawn line bends between its ends."
+msgstr "How much a hand-drawn line bends between its ends."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How much the centre dot grows at full activity."
+msgstr "How much the centre dot grows at full activity."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How route ends are drawn."
+msgstr "How route ends are drawn."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.How the ground is painted: the ground colour, or the theme's "
+"ground gradient."
+msgstr "How the ground is painted: the ground colour, or the theme''s ground "
+"gradient."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub detail offset"
+msgstr "Hub detail offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub glow opacity"
+msgstr "Hub glow opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub glow radius"
+msgstr "Hub glow radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub label offset"
+msgstr "Hub label offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub node radius"
+msgstr "Hub node radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub pulse floor"
+msgstr "Hub pulse floor"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub pulse period"
+msgstr "Hub pulse period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub pulse swing"
+msgstr "Hub pulse swing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub radius"
+msgstr "Hub radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub rim opacity"
+msgstr "Hub rim opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Hub rim width"
+msgstr "Hub rim width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Inactive"
+msgstr "Inactive"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Info palette"
+msgstr "Info palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Item label"
+msgstr "Item label"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Label"
+msgstr "Label"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Label corner"
+msgstr "Label corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Label line gap"
+msgstr "Label line gap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Large node radius"
+msgstr "Large node radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Large particle radius"
+msgstr "Large particle radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Large statement lines that carry the argument of a composition."
+msgstr "Large statement lines that carry the argument of a composition."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Letter spacing"
+msgstr "Letter spacing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line"
+msgstr "Line"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line height"
+msgstr "Line height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line height of the heading heading level on the stage."
+msgstr "Line height of the heading heading level on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line height of the thesis heading level on the stage."
+msgstr "Line height of the thesis heading level on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line highlight opacity"
+msgstr "Line highlight opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line highlight radius"
+msgstr "Line highlight radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line marker width"
+msgstr "Line marker width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line number"
+msgstr "Line number"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Line numbers beside code."
+msgstr "Line numbers beside code."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Lines that read as drawn by hand."
+msgstr "Lines that read as drawn by hand."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Lines with a slight hand-drawn wobble."
+msgstr "Lines with a slight hand-drawn wobble."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Link distance"
+msgstr "Link distance"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Link opacity"
+msgstr "Link opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Link width"
+msgstr "Link width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.List stagger"
+msgstr "List stagger"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Loose, expressive hand-drawn lines."
+msgstr "Loose, expressive hand-drawn lines."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Mantine auto contrast"
+msgstr "Mantine auto contrast"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Mantine's body font. It must be the stack of a registered font."
+msgstr "Mantine''s body font. It must be the stack of a registered font."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Mantine's heading font. It must be the stack of a registered "
+"font."
+msgstr "Mantine''s heading font. It must be the stack of a registered font."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Mantine's monospace font. It must be the stack of a registered "
+"font."
+msgstr "Mantine''s monospace font. It must be the stack of a registered font."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Mapping opacity"
+msgstr "Mapping opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Marker halo opacity"
+msgstr "Marker halo opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Marker halo radius"
+msgstr "Marker halo radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Marker radius"
+msgstr "Marker radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Match check size"
+msgstr "Match check size"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Match ring opacity"
+msgstr "Match ring opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Match ring radius"
+msgstr "Match ring radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Match ring width"
+msgstr "Match ring width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Merge glyph width"
+msgstr "Merge glyph width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Merge node radius"
+msgstr "Merge node radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Merge node rim opacity"
+msgstr "Merge node rim opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Merge node rim width"
+msgstr "Merge node rim width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Meta"
+msgstr "Meta"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Missing column dash"
+msgstr "Missing column dash"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Missing column outline width"
+msgstr "Missing column outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Monospace counts and notes along the edge of a graphic or window."
+msgstr "Monospace counts and notes along the edge of a graphic or window."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Monospace field and column names."
+msgstr "Monospace field and column names."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Monospace font stack"
+msgstr "Monospace font stack"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Morph start radius"
+msgstr "Morph start radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Muted text"
+msgstr "Muted text"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Names under nodes and other shapes."
+msgstr "Names under nodes and other shapes."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Network edge opacity"
+msgstr "Network edge opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Neutral palette"
+msgstr "Neutral palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node accent outline opacity"
+msgstr "Node accent outline opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node core growth"
+msgstr "Node core growth"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node core radius"
+msgstr "Node core radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node detail offset"
+msgstr "Node detail offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node fill"
+msgstr "Node fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node label offset"
+msgstr "Node label offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node outline colour"
+msgstr "Node outline colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node outline width"
+msgstr "Node outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node radius"
+msgstr "Node radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node ring opacity"
+msgstr "Node ring opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node ring spread"
+msgstr "Node ring spread"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node sketch"
+msgstr "Node sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Node tint opacity"
+msgstr "Node tint opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Note"
+msgstr "Note"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.One word rising out of its mask."
+msgstr "One word rising out of its mask."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity"
+msgstr "Opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a card's outline."
+msgstr "Opacity of a card''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a card's tint."
+msgstr "Opacity of a card''s tint."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a destination slot's tint."
+msgstr "Opacity of a destination slot''s tint."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a hand-drawn highlight on the product stage."
+msgstr "Opacity of a hand-drawn highlight on the product stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a link between touching particles; it fades out with "
+"distance."
+msgstr "Opacity of a link between touching particles; it fades out with "
+"distance."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a mapping line between two fields."
+msgstr "Opacity of a mapping line between two fields."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a pill's outline."
+msgstr "Opacity of a pill''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a pill's tint."
+msgstr "Opacity of a pill''s tint."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a source chip's outline."
+msgstr "Opacity of a source chip''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of a source chip's tint."
+msgstr "Opacity of a source chip''s tint."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of an edge from a source to the merge."
+msgstr "Opacity of an edge from a source to the merge."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of an orbit's path."
+msgstr "Opacity of an orbit''s path."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of an orbiting body's rim."
+msgstr "Opacity of an orbiting body''s rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of guides."
+msgstr "Opacity of guides."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the accent bar on the destination panel."
+msgstr "Opacity of the accent bar on the destination panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the accent outline at rest; it rises to full as the "
+"node activates."
+msgstr "Opacity of the accent outline at rest; it rises to full as the node "
+"activates."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the accent outline on a completed stage."
+msgstr "Opacity of the accent outline on a completed stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the accent tint inside a node at full activity."
+msgstr "Opacity of the accent tint inside a node at full activity."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the accent tint on a completed stage."
+msgstr "Opacity of the accent tint on a completed stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the active ring at full activity."
+msgstr "Opacity of the active ring at full activity."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the central core's accent rim."
+msgstr "Opacity of the central core''s accent rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the confirming ring's outline."
+msgstr "Opacity of the confirming ring''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the disc behind a stage's check."
+msgstr "Opacity of the disc behind a stage''s check."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the edge from the merge to the destination."
+msgstr "Opacity of the edge from the merge to the destination."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the first edges of a network graph, drawn in the "
+"accent."
+msgstr "Opacity of the first edges of a network graph, drawn in the accent."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the glow around the core."
+msgstr "Opacity of the glow around the core."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the glow's rim."
+msgstr "Opacity of the glow''s rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the halo around an emphasised particle."
+msgstr "Opacity of the halo around an emphasised particle."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the halo around the scenario marker."
+msgstr "Opacity of the halo around the scenario marker."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the highlight behind the focused line."
+msgstr "Opacity of the highlight behind the focused line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the hub's accent rim."
+msgstr "Opacity of the hub''s accent rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the line inside a destination slot."
+msgstr "Opacity of the line inside a destination slot."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the merge node's accent rim."
+msgstr "Opacity of the merge node''s accent rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the remaining edges of a network graph."
+msgstr "Opacity of the remaining edges of a network graph."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the rim of the disc behind a stage's check."
+msgstr "Opacity of the rim of the disc behind a stage''s check."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the soft glow inside the hub."
+msgstr "Opacity of the soft glow inside the hub."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the spokes from the hub to each node."
+msgstr "Opacity of the spokes from the hub to each node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Opacity of the three dots in the title bar."
+msgstr "Opacity of the three dots in the title bar."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Orbit opacity"
+msgstr "Orbit opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Orbit width"
+msgstr "Orbit width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Orbits, guides, and other construction lines."
+msgstr "Orbits, guides, and other construction lines."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outcome box radius"
+msgstr "Outcome box radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outcome outline width"
+msgstr "Outcome outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outer node pulse period"
+msgstr "Outer node pulse period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outer node pulse swing"
+msgstr "Outer node pulse swing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outline colour of a panel."
+msgstr "Outline colour of a panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outline fade"
+msgstr "Outline fade"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outline stroke"
+msgstr "Outline stroke"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outline width of a panel."
+msgstr "Outline width of a panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Outlines of panels, nodes, and cards."
+msgstr "Outlines of panels, nodes, and cards."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Output edge opacity"
+msgstr "Output edge opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Output edge width"
+msgstr "Output edge width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Output packet period"
+msgstr "Output packet period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Packet curve tension"
+msgstr "Packet curve tension"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Packet fade-in"
+msgstr "Packet fade-in"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Packet flow"
+msgstr "Packet flow"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Packet period"
+msgstr "Packet period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Packet radius"
+msgstr "Packet radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel"
+msgstr "Panel"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel corner"
+msgstr "Panel corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel divider width"
+msgstr "Panel divider width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel elevation"
+msgstr "Panel elevation"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel fill"
+msgstr "Panel fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel outline colour"
+msgstr "Panel outline colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel outline width"
+msgstr "Panel outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel radius"
+msgstr "Panel radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Panel title"
+msgstr "Panel title"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Particle halo opacity"
+msgstr "Particle halo opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Particle halo radius"
+msgstr "Particle halo radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Particle radius"
+msgstr "Particle radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Particle twinkle floor"
+msgstr "Particle twinkle floor"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Particle twinkle period"
+msgstr "Particle twinkle period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Particles closer than this are joined by a line."
+msgstr "Particles closer than this are joined by a line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Peak blur of a spatial transition at full strength and a 180 "
+"degree shutter."
+msgstr "Peak blur of a spatial transition at full strength and a 180 degree "
+"shutter."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Period"
+msgstr "Period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Physical spring settings for a landing that should feel weighty."
+msgstr "Physical spring settings for a landing that should feel weighty."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill corner"
+msgstr "Pill corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill fill opacity"
+msgstr "Pill fill opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill height"
+msgstr "Pill height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill outline opacity"
+msgstr "Pill outline opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill radius"
+msgstr "Pill radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill text"
+msgstr "Pill text"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pill text baseline"
+msgstr "Pill text baseline"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pipeline packet period"
+msgstr "Pipeline packet period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Predicate card outline width"
+msgstr "Predicate card outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Predicate card radius"
+msgstr "Predicate card radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Press"
+msgstr "Press"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Primary palette"
+msgstr "Primary palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Primary palette name"
+msgstr "Primary palette name"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Primary shade"
+msgstr "Primary shade"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Primary text and labels."
+msgstr "Primary text and labels."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Product backdrop"
+msgstr "Product backdrop"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Progress bar colour"
+msgstr "Progress bar colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Progress bar height"
+msgstr "Progress bar height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Progress track height"
+msgstr "Progress track height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Pulse"
+msgstr "Pulse"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Push curve"
+msgstr "Push curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Question"
+msgstr "Question"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius"
+msgstr "Radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of a hub node at the centre of a network."
+msgstr "Radius of a hub node at the centre of a network."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of a packet on a secondary edge."
+msgstr "Radius of a packet on a secondary edge."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of a packet."
+msgstr "Radius of a packet."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of a standard node."
+msgstr "Radius of a standard node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of an ambient particle."
+msgstr "Radius of an ambient particle."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of an emphasised particle."
+msgstr "Radius of an emphasised particle."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of an orbiting body's shell."
+msgstr "Radius of an orbiting body''s shell."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of large nodes, such as the stops of a traversal."
+msgstr "Radius of large nodes, such as the stops of a traversal."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of small nodes, such as the outer nodes of a network "
+"graph."
+msgstr "Radius of small nodes, such as the outer nodes of a network graph."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the accent dot in the footer."
+msgstr "Radius of the accent dot in the footer."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the central core."
+msgstr "Radius of the central core."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the disc behind a stage's check."
+msgstr "Radius of the disc behind a stage''s check."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the dot at a node's centre at rest."
+msgstr "Radius of the dot at a node''s centre at rest."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the dot inside an orbiting body."
+msgstr "Radius of the dot inside an orbiting body."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the dot on a stage that has not finished."
+msgstr "Radius of the dot on a stage that has not finished."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the dot where a mapping leaves or enters a field."
+msgstr "Radius of the dot where a mapping leaves or enters a field."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the glow around the core at rest."
+msgstr "Radius of the glow around the core at rest."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the halo around an emphasised particle."
+msgstr "Radius of the halo around an emphasised particle."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the halo around the scenario marker."
+msgstr "Radius of the halo around the scenario marker."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the hub disc at the centre of a radial network."
+msgstr "Radius of the hub disc at the centre of a radial network."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the merge node."
+msgstr "Radius of the merge node."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the ring that confirms a mapping."
+msgstr "Radius of the ring that confirms a mapping."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the ring where a request route meets a column."
+msgstr "Radius of the ring where a request route meets a column."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the scenario marker."
+msgstr "Radius of the scenario marker."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the smallest nodes, such as the spokes of a radial "
+"network."
+msgstr "Radius of the smallest nodes, such as the spokes of a radial network."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the soft glow inside the hub."
+msgstr "Radius of the soft glow inside the hub."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Radius of the three dots in the title bar."
+msgstr "Radius of the three dots in the title bar."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Reenactment backdrop"
+msgstr "Reenactment backdrop"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Request card outline width"
+msgstr "Request card outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Request card radius"
+msgstr "Request card radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Request route width"
+msgstr "Request route width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Rough"
+msgstr "Rough"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Roughness"
+msgstr "Roughness"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Route cap"
+msgstr "Route cap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Route fade-in"
+msgstr "Route fade-in"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Route stroke"
+msgstr "Route stroke"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Route width"
+msgstr "Route width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Row outline width"
+msgstr "Row outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Row radius"
+msgstr "Row radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Rule colour"
+msgstr "Rule colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Rule width"
+msgstr "Rule width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Screen-space blur settings for fast single-object moves."
+msgstr "Screen-space blur settings for fast single-object moves."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Scrim"
+msgstr "Scrim"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Scrim spread"
+msgstr "Scrim spread"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Second accent"
+msgstr "Second accent"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Secondary palette"
+msgstr "Secondary palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Secondary text"
+msgstr "Secondary text"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Secondary text: eyebrows, captions, and details."
+msgstr "Secondary text: eyebrows, captions, and details."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shadow"
+msgstr "Shadow"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shadow colour"
+msgstr "Shadow colour"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shadow geometry as stacked layers. Its colour comes from the "
+"elevation that uses it."
+msgstr "Shadow geometry as stacked layers. Its colour comes from the elevation "
+"that uses it."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shape size"
+msgstr "Shape size"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shape sketch"
+msgstr "Shape sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shapes that are present but not part of the current point, such "
+"as off-route nodes and closed gates."
+msgstr "Shapes that are present but not part of the current point, such as "
+"off-route nodes and closed gates."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shared object border"
+msgstr "Shared object border"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shared object corner"
+msgstr "Shared object corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shared object fade-in"
+msgstr "Shared object fade-in"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shared object fill"
+msgstr "Shared object fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shared object text"
+msgstr "Shared object text"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Sheet"
+msgstr "Sheet"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Short evidence chips along the bottom of the stage."
+msgstr "Short evidence chips along the bottom of the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shutter angle"
+msgstr "Shutter angle"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Shutter angle for camera motion blur when the camera follows its "
+"authored timing."
+msgstr "Shutter angle for camera motion blur when the camera follows its "
+"authored timing."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Size of the check inside the confirming ring."
+msgstr "Size of the check inside the confirming ring."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Size of the check on a completed stage."
+msgstr "Size of the check on a completed stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Sketch"
+msgstr "Sketch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Sketch offset"
+msgstr "Sketch offset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Sketch seed"
+msgstr "Sketch seed"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Small monospace labels for inputs, outputs, and similar metadata."
+msgstr "Small monospace labels for inputs, outputs, and similar metadata."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Small monospace values and annotations under a label."
+msgstr "Small monospace values and annotations under a label."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Small node radius"
+msgstr "Small node radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Small packet radius"
+msgstr "Small packet radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Small supporting text such as a stage detail or a short caption."
+msgstr "Small supporting text such as a stage detail or a short caption."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Smooth"
+msgstr "Smooth"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Source chip fill"
+msgstr "Source chip fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Source chip outline"
+msgstr "Source chip outline"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Source chip outline width"
+msgstr "Source chip outline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Source chip radius"
+msgstr "Source chip radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Source edge opacity"
+msgstr "Source edge opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space above the thesis's supporting line."
+msgstr "Space above the thesis''s supporting line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space added between wrapped lines of a decision label."
+msgstr "Space added between wrapped lines of a decision label."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space between a beat heading and its subtitle."
+msgstr "Space between a beat heading and its subtitle."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space between a card's edge and its text."
+msgstr "Space between a card''s edge and its text."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space between a floating label and the artwork it names."
+msgstr "Space between a floating label and the artwork it names."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space between a spotlit region and the edge of its cut-out."
+msgstr "Space between a spotlit region and the edge of its cut-out."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space between thesis lines."
+msgstr "Space between thesis lines."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space inside a floating label: x on the sides and y above and "
+"below."
+msgstr "Space inside a floating label: x on the sides and y above and below."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Space inside an evidence chip: x on the sides and y above and "
+"below."
+msgstr "Space inside an evidence chip: x on the sides and y above and below."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spacing"
+msgstr "Spacing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Speed, shutter, and curve of the balanced camera preset."
+msgstr "Speed, shutter, and curve of the balanced camera preset."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Speed, shutter, and curve of the brisk camera preset."
+msgstr "Speed, shutter, and curve of the brisk camera preset."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Speed, shutter, and curve of the deliberate camera preset."
+msgstr "Speed, shutter, and curve of the deliberate camera preset."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Speed, shutter, and curve of the gentle camera preset."
+msgstr "Speed, shutter, and curve of the gentle camera preset."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Speed, shutter, and curve of the whip camera preset."
+msgstr "Speed, shutter, and curve of the whip camera preset."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spoke node pulse period"
+msgstr "Spoke node pulse period"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spoke node pulse swing"
+msgstr "Spoke node pulse swing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spoke opacity"
+msgstr "Spoke opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spotlight corner"
+msgstr "Spotlight corner"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spotlight padding"
+msgstr "Spotlight padding"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Spring"
+msgstr "Spring"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage check size"
+msgstr "Stage check size"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage dot radius"
+msgstr "Stage dot radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage heading"
+msgstr "Stage heading"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage icon fill"
+msgstr "Stage icon fill"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage icon radius"
+msgstr "Stage icon radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage icon rim"
+msgstr "Stage icon rim"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage icon rim width"
+msgstr "Stage icon rim width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stage subtitle"
+msgstr "Stage subtitle"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stagger"
+msgstr "Stagger"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stroke width"
+msgstr "Stroke width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stroke width of a check mark."
+msgstr "Stroke width of a check mark."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stroke width of icon glyphs drawn inside shapes."
+msgstr "Stroke width of icon glyphs drawn inside shapes."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Stroke width of the merge glyph."
+msgstr "Stroke width of the merge glyph."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Sub-frames blended for camera motion blur."
+msgstr "Sub-frames blended for camera motion blur."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Subtitle gap"
+msgstr "Subtitle gap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Subtle"
+msgstr "Subtle"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Success palette"
+msgstr "Success palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Supporting lines under a title, scenario, or selection."
+msgstr "Supporting lines under a title, scenario, or selection."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Surface"
+msgstr "Surface"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Surfaces that hover over the stage, such as floating labels and "
+"lifted diagrams."
+msgstr "Surfaces that hover over the stage, such as floating labels and lifted "
+"diagrams."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Surfaces that sit on the ground with no shadow."
+msgstr "Surfaces that sit on the ground with no shadow."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Swatch"
+msgstr "Swatch"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Tempo"
+msgstr "Tempo"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of cyan for neutral information."
+msgstr "Ten shades of cyan for neutral information."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of green for positive outcomes."
+msgstr "Ten shades of green for positive outcomes."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of red for errors and losses."
+msgstr "Ten shades of red for errors and losses."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of the brand colour, lightest first. The accent reads "
+"one of them through the primary shade."
+msgstr "Ten shades of the brand colour, lightest first. The accent reads one of "
+"them through the primary shade."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of the cool grey that carries muted text on light "
+"grounds."
+msgstr "Ten shades of the cool grey that carries muted text on light grounds."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of the warm companion colour."
+msgstr "Ten shades of the warm companion colour."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Ten shades of yellow for caution."
+msgstr "Ten shades of yellow for caution."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Text"
+msgstr "Text"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Text inside a pill-shaped tag."
+msgstr "Text inside a pill-shaped tag."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Text shadow"
+msgstr "Text shadow"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Text shadow geometry. Its colour comes from the text style that "
+"uses it."
+msgstr "Text shadow geometry. Its colour comes from the text style that uses "
+"it."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The backdrop around a reenactment. The product UI itself keeps "
+"the product theme."
+msgstr "The backdrop around a reenactment. The product UI itself keeps the "
+"product theme."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The backdrop drawn around a reenactment on the stage."
+msgstr "The backdrop drawn around a reenactment on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The black Mantine mixes into derived colours."
+msgstr "The black Mantine mixes into derived colours."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The colour of drop shadows."
+msgstr "The colour of drop shadows."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of a beat heading arriving."
+msgstr "The curve of a beat heading arriving."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of a camera gliding between framings."
+msgstr "The curve of a camera gliding between framings."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of a camera pushing in."
+msgstr "The curve of a camera pushing in."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of a connector drawing in."
+msgstr "The curve of a connector drawing in."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of a fast camera whip."
+msgstr "The curve of a fast camera whip."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of a thesis line arriving."
+msgstr "The curve of a thesis line arriving."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of an edge drawing itself in."
+msgstr "The curve of an edge drawing itself in."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The curve of something already on screen moving between "
+"landmarks."
+msgstr "The curve of something already on screen moving between landmarks."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The cycle of a breathing node or halo."
+msgstr "The cycle of a breathing node or halo."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The cycle of packets travelling along edges."
+msgstr "The cycle of packets travelling along edges."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The dimming layer around a spotlight."
+msgstr "The dimming layer around a spotlight."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The gradient a ground fill uses when it is not a solid colour."
+msgstr "The gradient a ground fill uses when it is not a solid colour."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The heading at the top of a panel."
+msgstr "The heading at the top of a panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The heading of a composition beat."
+msgstr "The heading of a composition beat."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The hero beat of a phase. Spend it once."
+msgstr "The hero beat of a phase. Spend it once."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The hub's lowest activity while it breathes."
+msgstr "The hub''s lowest activity while it breathes."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The large heading of a graphic that states its subject."
+msgstr "The large heading of a graphic that states its subject."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The largest random offset the points of a hand-drawn line may "
+"take."
+msgstr "The largest random offset the points of a hand-drawn line may take."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The line under a beat heading."
+msgstr "The line under a beat heading."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The lowest opacity a twinkling particle reaches."
+msgstr "The lowest opacity a twinkling particle reaches."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The most blur a single-object move can get."
+msgstr "The most blur a single-object move can get."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The name of a source or item in a list."
+msgstr "The name of a source or item in a list."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The name on a hub or destination at the centre of a graphic."
+msgstr "The name on a hub or destination at the centre of a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The name on a stage card in a pipeline or sequence."
+msgstr "The name on a stage card in a pipeline or sequence."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The one-line caption along the bottom of a graphic."
+msgstr "The one-line caption along the bottom of a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The path, packet, or object a motion is about."
+msgstr "The path, packet, or object a motion is about."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The primary palette shade used as the accent: one shade on dark "
+"grounds and one on light grounds."
+msgstr "The primary palette shade used as the accent: one shade on dark grounds "
+"and one on light grounds."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The question a decision answers."
+msgstr "The question a decision answers."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The shadow under a panel. Flat panels cast none."
+msgstr "The shadow under a panel. Flat panels cast none."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The shadow under artwork lifted off the product stage."
+msgstr "The shadow under artwork lifted off the product stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The sketch profile boxes, panels, and pills use."
+msgstr "The sketch profile boxes, panels, and pills use."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The sketch profile edges use."
+msgstr "The sketch profile edges use."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The sketch profile guides use."
+msgstr "The sketch profile guides use."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The sketch profile node outlines use."
+msgstr "The sketch profile node outlines use."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The sketch profile nodes, edges, and guides use."
+msgstr "The sketch profile nodes, edges, and guides use."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The sketch profile underlines, brackets, and annotations use."
+msgstr "The sketch profile underlines, brackets, and annotations use."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The small tracked label in the top-left corner of a graphic."
+msgstr "The small tracked label in the top-left corner of a graphic."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The smallest and largest camera zoom."
+msgstr "The smallest and largest camera zoom."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The soft disc around a packet."
+msgstr "The soft disc around a packet."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The soft glow around packets and highlighted points."
+msgstr "The soft glow around packets and highlighted points."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The stage colour behind everything. Its luminance decides whether "
+"colour pairs use their on-dark or on-light value."
+msgstr "The stage colour behind everything. Its luminance decides whether "
+"colour pairs use their on-dark or on-light value."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The supporting line under a thesis."
+msgstr "The supporting line under a thesis."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The text on an object that travels from one motion to the next."
+msgstr "The text on an object that travels from one motion to the next."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The thinnest outline, for hub rims, rows, and fine dividers."
+msgstr "The thinnest outline, for hub rims, rows, and fine dividers."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The white Mantine mixes into derived colours."
+msgstr "The white Mantine mixes into derived colours."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.The wording of an option or outcome in a decision."
+msgstr "The wording of an option or outcome in a decision."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis"
+msgstr "Thesis"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis emphasis"
+msgstr "Thesis emphasis"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis emphasis gap"
+msgstr "Thesis emphasis gap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis inset"
+msgstr "Thesis inset"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis line curve"
+msgstr "Thesis line curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis line duration"
+msgstr "Thesis line duration"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis line gap"
+msgstr "Thesis line gap"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis line height"
+msgstr "Thesis line height"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis line rise"
+msgstr "Thesis line rise"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis line stagger"
+msgstr "Thesis line stagger"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis size"
+msgstr "Thesis size"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thesis weight"
+msgstr "Thesis weight"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thickness of the accent bar on the destination panel."
+msgstr "Thickness of the accent bar on the destination panel."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thickness of the beat progress bar along the bottom of the stage."
+msgstr "Thickness of the beat progress bar along the bottom of the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Thickness of the pipeline's progress track."
+msgstr "Thickness of the pipeline''s progress track."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Title"
+msgstr "Title"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Tracking as a fraction of the font size."
+msgstr "Tracking as a fraction of the font size."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Transition blur"
+msgstr "Transition blur"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Travel"
+msgstr "Travel"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Typing"
+msgstr "Typing"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Typing rate"
+msgstr "Typing rate"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Underline draw-in"
+msgstr "Underline draw-in"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Underline seed"
+msgstr "Underline seed"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Underline width"
+msgstr "Underline width"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Velocity blur"
+msgstr "Velocity blur"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Velocity blur factor"
+msgstr "Velocity blur factor"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Velocity blur limit"
+msgstr "Velocity blur limit"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Vertical distance from the hub centre to its detail baseline."
+msgstr "Vertical distance from the hub centre to its detail baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Vertical distance from the hub centre to its label baseline."
+msgstr "Vertical distance from the hub centre to its label baseline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Warning palette"
+msgstr "Warning palette"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Weight of the heading heading level on the stage."
+msgstr "Weight of the heading heading level on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Weight of the thesis heading level on the stage."
+msgstr "Weight of the thesis heading level on the stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where a curved connector places its control points along the line "
+"between its ends."
+msgstr "Where a curved connector places its control points along the line "
+"between its ends."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where a curved edge places its control points."
+msgstr "Where a curved edge places its control points."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where a packet's curved path places its control points."
+msgstr "Where a packet''s curved path places its control points."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where the evidence row sits: x from both sides, bottom from the "
+"bottom edge, and the gap between chips."
+msgstr "Where the evidence row sits: x from both sides, bottom from the bottom "
+"edge, and the gap between chips."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where the eyebrow baseline starts: x from the left edge and y "
+"from the top."
+msgstr "Where the eyebrow baseline starts: x from the left edge and y from the "
+"top."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where the graphic of a beat sits: x from both sides, plus top and "
+"bottom."
+msgstr "Where the graphic of a beat sits: x from both sides, plus top and "
+"bottom."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where the heading block of a beat sits: x from both sides and top "
+"from the top edge."
+msgstr "Where the heading block of a beat sits: x from both sides and top from "
+"the top edge."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Where the thesis block sits: top, x from both sides, and bottom."
+msgstr "Where the thesis block sits: top, x from both sides, and bottom."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Whether Mantine applies antialiased font smoothing."
+msgstr "Whether Mantine applies antialiased font smoothing."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Whether Mantine picks readable text on its own filled components."
+msgstr "Whether Mantine picks readable text on its own filled components."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Which palette is primary. The accent comes from this palette."
+msgstr "Which palette is primary. The accent comes from this palette."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Whip"
+msgstr "Whip"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Whip camera"
+msgstr "Whip camera"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Whip curve"
+msgstr "Whip curve"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.White"
+msgstr "White"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a data row's outline."
+msgstr "Width of a data row''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a divider rule."
+msgstr "Width of a divider rule."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a highlighted route."
+msgstr "Width of a highlighted route."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a link between particles."
+msgstr "Width of a link between particles."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a missing column's dashed outline."
+msgstr "Width of a missing column''s dashed outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a node's outlines."
+msgstr "Width of a node''s outlines."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a request card's outline."
+msgstr "Width of a request card''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of a source chip's outline."
+msgstr "Width of a source chip''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of an orbit's path."
+msgstr "Width of an orbit''s path."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of an orbiting body's rim."
+msgstr "Width of an orbiting body''s rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of an outcome box's outline."
+msgstr "Width of an outcome box''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of dashed guides."
+msgstr "Width of dashed guides."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of edges and drawn paths."
+msgstr "Width of edges and drawn paths."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of hand-drawn boxes, brackets, and circles on the product "
+"stage."
+msgstr "Width of hand-drawn boxes, brackets, and circles on the product stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the accent bar beside the focused line."
+msgstr "Width of the accent bar beside the focused line."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the accent outline on a completed stage."
+msgstr "Width of the accent outline on a completed stage."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the accent outline on the chosen condition."
+msgstr "Width of the accent outline on the chosen condition."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the accent path along the chosen branch."
+msgstr "Width of the accent path along the chosen branch."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the cached relation's outline."
+msgstr "Width of the cached relation''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the central core's accent rim."
+msgstr "Width of the central core''s accent rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the check on a request the cache covers."
+msgstr "Width of the check on a request the cache covers."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the confirming ring's outline."
+msgstr "Width of the confirming ring''s outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the cross that closes an untaken branch."
+msgstr "Width of the cross that closes an untaken branch."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the dashed connector from a source to its explanation."
+msgstr "Width of the dashed connector from a source to its explanation."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the dashed transfer boundary."
+msgstr "Width of the dashed transfer boundary."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the edge from the merge to the destination."
+msgstr "Width of the edge from the merge to the destination."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the gate that stops a row at the source."
+msgstr "Width of the gate that stops a row at the source."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the glow's rim."
+msgstr "Width of the glow''s rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the hand-drawn teaching underline."
+msgstr "Width of the hand-drawn teaching underline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the hub's accent rim."
+msgstr "Width of the hub''s accent rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the line above the window's footer."
+msgstr "Width of the line above the window''s footer."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the line inside a destination slot."
+msgstr "Width of the line inside a destination slot."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the line under a panel title."
+msgstr "Width of the line under a panel title."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the line under the window's title bar."
+msgstr "Width of the line under the window''s title bar."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the merge node's accent rim."
+msgstr "Width of the merge node''s accent rim."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the predicate card's accent outline."
+msgstr "Width of the predicate card''s accent outline."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the rim of the disc behind a stage's check."
+msgstr "Width of the rim of the disc behind a stage''s check."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the routes from a request to its columns."
+msgstr "Width of the routes from a request to its columns."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Width of the row and column lines inside the cached relation."
+msgstr "Width of the row and column lines inside the cached relation."
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Window dot opacity"
+msgstr "Window dot opacity"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Window dot radius"
+msgstr "Window dot radius"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Word"
+msgstr "Word"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Zoom"
+msgstr "Zoom"
+
+#. js-lingui-explicit-id
+#: src/videoThemeEditor/tokenCopy/tokenDescriptors.generated.ts
+msgid "tokens.Zoom limits"
+msgstr "Zoom limits"
 
 #: src/gallery/MotionGallery/ReferenceTray.tsx
 msgid "Reference brief copied"
@@ -2825,6 +6929,14 @@ msgstr "/"
 msgid "Brand color"
 msgstr "Brand color"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Left"
+msgstr "Left"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "On light grounds"
+msgstr "On light grounds"
+
 #: src/gallery/AtlasLayout/AtlasCollection/AtlasCollection.tsx
 #: src/gallery/MotionGallery/GalleryToolbar.tsx
 msgid "Clear search"
@@ -2838,11 +6950,16 @@ msgstr "Pause preview"
 msgid "Saved to references"
 msgstr "Saved to references"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Letter spacing"
+msgstr "Letter spacing"
+
 #: src/gallery/MotionGallery/PreviewDialog/PreviewPlaybackControls.tsx
 msgid "{loopFrames} FRAMES"
 msgstr "{loopFrames} FRAMES"
 
 #: src/continuity/gallery/CompositionViewer/CompositionControls.tsx
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
 msgid "Motion blur"
 msgstr "Motion blur"
 
@@ -2881,13 +6998,25 @@ msgid "Camera travel speed: {speed}×. Easing: {easing}. Blur shutter angle: "
 msgstr "Camera travel speed: {speed}×. Easing: {easing}. Blur shutter angle: "
 "{shutterAngle}°. Blur strength: 1; temporal samples: 10."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Weight"
+msgstr "Weight"
+
 #: src/continuity/gallery/CompositionGallery/CompositionGallery.tsx
 #~ msgid "Reusable units that combine two or more motions."
 #~ msgstr "Reusable units that combine two or more motions."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Line height"
+msgstr "Line height"
+
 #: src/continuity/gallery/CompositionCard/CompositionCard.tsx
 msgid "{seconds} SEC"
 msgstr "{seconds} SEC"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Top"
+msgstr "Top"
 
 #: src/gallery/MotionGallery/GalleryHeader.tsx
 msgid "Starter showcase"
@@ -2949,6 +7078,10 @@ msgid "Small movements. Clear ideas. {0} reusable motion presets for the "
 msgstr "Small movements. Clear ideas. {0} reusable motion presets for the "
 "moments a screenshot can’t explain."
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Effects"
+msgstr "Effects"
+
 #. placeholder {0}: index + 1
 #: src/gallery/MotionGallery/ContentControls/CollectionItem/CollectionItem.tsx
 msgid "Item {0}"
@@ -3006,6 +7139,10 @@ msgstr "Copy unavailable. Select the reference text and copy it manually."
 msgid "Share"
 msgstr "Share"
 
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Offset"
+msgstr "Offset"
+
 #: src/continuity/gallery/CompositionViewer/CameraPresetControl.tsx
 msgid "Camera motion preset"
 msgstr "Camera motion preset"
@@ -3018,6 +7155,14 @@ msgstr "Skip to the collection"
 #: src/gallery/MotionGallery/MotionGallery.tsx
 msgid "Try a different keyword, or explore the full collection."
 msgstr "Try a different keyword, or explore the full collection."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Glow"
+msgstr "Glow"
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Bottom"
+msgstr "Bottom"
 
 #: src/gallery/MotionGallery/ReferenceTray.tsx
 msgid "Copy brief"
@@ -3032,3 +7177,7 @@ msgid "Live React preview of the real helper, frame-driven and looping. Pause "
 "or scrub with the player controls."
 msgstr "Live React preview of the real helper, frame-driven and looping. Pause "
 "or scrub with the player controls."
+
+#: src/videoThemeEditor/tokenCopy/useEditorCopy.ts
+msgid "Success"
+msgstr "Success"

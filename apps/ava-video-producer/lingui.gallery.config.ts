@@ -11,7 +11,11 @@ const config: LinguiConfig = {
   catalogs: [
     {
       path: "<rootDir>/src/gallery/locales/{locale}/messages",
-      include: ["src/gallery", "src/continuity/gallery"],
+      include: [
+        "src/gallery",
+        "src/continuity/gallery",
+        "src/videoThemeEditor",
+      ],
       exclude: ["**/*.test.*"],
     },
   ],

@@ -24,7 +24,11 @@ export function createGalleryPlugin({
         },
         async ({ path: filename }) => {
           if (
-            !["src/gallery/", "src/continuity/gallery/"].some((directory) =>
+            ![
+              "src/gallery/",
+              "src/continuity/gallery/",
+              "src/videoThemeEditor/",
+            ].some((directory) =>
               filename.startsWith(path.join(root, directory)),
             )
           ) {

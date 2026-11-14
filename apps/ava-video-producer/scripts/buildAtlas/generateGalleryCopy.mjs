@@ -8,9 +8,14 @@ const { buildStockMessages } = await tsImport(
   "../stock/buildStockMessages/buildStockMessages.ts",
   import.meta.url,
 );
+const { buildTokenMessages } = await tsImport(
+  "../videoTheme/buildTokenMessages/buildTokenMessages.ts",
+  import.meta.url,
+);
 /** Generates and compiles the active gallery translation catalogs. */
 export async function generateGalleryCopy(root) {
   await buildStockMessages(root);
+  await buildTokenMessages(root);
   execFileSync(
     process.execPath,
     [LINGUI_CLI, "extract", "--config", "lingui.gallery.config.ts"],
