@@ -1180,6 +1180,9 @@ Each slice is one PR into `demo/measles`, recorded in
 - **Crosswalk joins** (side by side), building on the joined-cases key
   matching.
 - **Parallel acquisition** for virtual datasets with many dependencies.
+  Measured in slice 5: a cold combine over 100 datasets on a throttled network
+  spends about 32 s reading them one at a time
+  ([crosswalks-materialization.md](crosswalks-materialization.md)).
 
 ## 18. Open decisions
 
@@ -1198,14 +1201,17 @@ Each slice is one PR into `demo/measles`, recorded in
 3. **AI suggestion endpoint.** Whether label suggestions reuse the Pi data
    agent's proxy (`PostAgentStream`) with a dedicated prompt, or get their own
    small route. Depends on where the agent work stands when slice 2 starts.
-4. **Crosswalk materialization time at 100 datasets.** Measured in slice 5's
-   Part B (the plan's Task 32), not Part A, before deciding on parallel
-   acquisition. The rule is set before measuring: build parallel acquisition
-   when the median cold first preview of 100 datasets, on a throttled
-   network, exceeds 60 seconds and at least 70% of it is spent reading
-   datasets. Over 60 seconds with less reading means the time is in DuckDB
-   stacking the rows, which parallel downloads would not shorten. At or under
-   60 seconds, acquisition stays sequential.
+4. **Crosswalk materialization time at 100 datasets.** Settled by
+   measurement in slice 5 ([crosswalks-materialization.md](crosswalks-materialization.md)).
+   The rule was set before measuring: build parallel acquisition when the
+   median cold first preview of 100 datasets, on a throttled network, exceeds
+   60 seconds and at least 70% of it is spent reading datasets. Cold,
+   throttled took 67.7 s with 100% reading: parallel acquisition is worth
+   building, as a follow-up feature on the roadmap. About 36 s of that is the
+   browser fetching the DuckDB engine and its Parquet extension before the
+   first dataset arrives, and about 32 s is the datasets themselves, so the
+   follow-up shortens only the second part. Unthrottled, the same preview
+   takes 2.1 s cold, 1.3 s warm, and 0.2 s hot.
 5. **A reference binding whose code list is deleted.** Settled with the
    slice 4 plan (owner decision 4): the save that deletes the list re-points
    the binding when its entry is left exactly one code list; otherwise it
