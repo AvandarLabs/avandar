@@ -16,7 +16,7 @@ precision in alignment, rhythm, and state.
 ## Placement
 
 The right column of the Atlas preview modal, under a Details / Design tokens
-tab pair. The tokens tab widens the column to 420 px. Under 800 px wide the
+tab pair. The tokens tab widens the column to 420 px. Under 760 px wide the
 column stacks below the player and takes the full width. When the active theme
 is built-in, a one-line muted notice under the theme picker says that its
 changes are saved as a new theme.
