@@ -33,7 +33,7 @@ export type ThemeBarActions = Readonly<{
   canDiscard: boolean;
 }>;
 
-const _FAILURE_MESSAGES: Readonly<Record<number, ThemeBarMessage>> = {
+const FAILURE_MESSAGES: Readonly<Record<number, ThemeBarMessage>> = {
   400: "invalidTheme",
   403: "readOnlyTheme",
   409: "changedOnDisk",
@@ -45,8 +45,7 @@ function _getFailureMessage(
   hasTokenIssues: boolean,
 ): ThemeBarMessage {
   return (
-    _FAILURE_MESSAGES[status] ??
-    (hasTokenIssues ? "invalidTheme" : "saveFailed")
+    FAILURE_MESSAGES[status] ?? (hasTokenIssues ? "invalidTheme" : "saveFailed")
   );
 }
 

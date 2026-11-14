@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Badge, Button, Group, TextInput } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import css from "./ThemeBar.module.css";
 import {
@@ -68,6 +68,13 @@ function SaveAsNewForm({
         label={t`New theme name`}
         value={input}
         onChange={(event) => setInput(event.currentTarget.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            event.stopPropagation();
+            onCancel();
+          }
+        }}
       />
       <Group gap="xs">
         <Button size="compact-xs" type="submit" disabled={!label}>
@@ -103,7 +110,13 @@ function ThemePicker(
   );
 }
 
-function ThemeActions(props: Props & Readonly<{ onStartNaming: () => void }>) {
+function ThemeActions(
+  props: Props &
+    Readonly<{
+      onStartNaming: () => void;
+      saveAsNewRef: RefObject<HTMLButtonElement | null>;
+    }>,
+) {
   const { t } = useLingui();
   const actions = getThemeBarActions(props);
   return (
@@ -118,6 +131,7 @@ function ThemeActions(props: Props & Readonly<{ onStartNaming: () => void }>) {
         </Button>
       ) : null}
       <Button
+        ref={props.saveAsNewRef}
         size="compact-xs"
         variant="default"
         disabled={!actions.canSaveAsNew}
@@ -151,6 +165,11 @@ export function ThemeBar(props: Props) {
   const { t } = useLingui();
   const statusText = useStatusText();
   const [isNaming, setIsNaming] = useState(false);
+  const saveAsNewRef = useRef<HTMLButtonElement>(null);
+  const closeNaming = () => {
+    setIsNaming(false);
+    saveAsNewRef.current?.focus();
+  };
   return (
     <div className={css.bar}>
       <ThemePicker {...props} />
@@ -159,12 +178,16 @@ export function ThemeBar(props: Props) {
           {t`Changes to a built-in theme are saved as a new theme. New themes use theme colors in every composition.`}
         </p>
       ) : null}
-      <ThemeActions {...props} onStartNaming={() => setIsNaming(true)} />
+      <ThemeActions
+        {...props}
+        saveAsNewRef={saveAsNewRef}
+        onStartNaming={() => setIsNaming(true)}
+      />
       {isNaming ? (
         <SaveAsNewForm
-          onCancel={() => setIsNaming(false)}
+          onCancel={closeNaming}
           onSubmit={(label) => {
-            setIsNaming(false);
+            closeNaming();
             props.onSaveAsNew(label);
           }}
         />
