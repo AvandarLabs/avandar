@@ -61,6 +61,7 @@ export function ColorRoleControl({ row, label }: RoleProps) {
   const hasIssue = useRowHasIssue();
   const issueAriaProps = useRowIssueAriaProps();
   const pair = isColorPair(row.value) ? row.value : undefined;
+  const canPair = canPairColorRole(row.value);
   return (
     <div className={css.stack}>
       <Switch
@@ -69,7 +70,8 @@ export function ColorRoleControl({ row, label }: RoleProps) {
         error={hasIssue}
         {...issueAriaProps}
         checked={pair !== undefined}
-        disabled={!canPairColorRole(row.value)}
+        disabled={!canPair}
+        description={canPair ? undefined : t`Pick a color first.`}
         onChange={(event) =>
           editor.setToken(
             row.path,
