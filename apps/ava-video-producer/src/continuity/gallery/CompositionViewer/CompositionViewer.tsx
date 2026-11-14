@@ -1,10 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import clsx from "clsx";
-import { useMemo, useRef, useState, type RefObject } from "react";
+import { useMemo, useRef, type RefObject } from "react";
 import {
   AtlasPanelTabs,
   type AtlasPanelTab,
 } from "../../../gallery/AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
+import { useRememberedPanelTab } from "../../../gallery/AtlasLayout/AtlasPanelTabs/useRememberedPanelTab";
 import { useGalleryVideoTheme } from "../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
 import { VideoThemePanel } from "../../../gallery/VideoThemePanel/VideoThemePanel";
 import {
@@ -155,7 +156,7 @@ export function CompositionViewer({ selected, captions, onOptions }: Props) {
   const player = useRef<HTMLIFrameElement>(null);
   const isScene = isSceneEntry(selected);
   const appearance = useCompositionAppearance(selected.id, player, isScene);
-  const [tab, setTab] = useState<AtlasPanelTab>("details");
+  const [tab, setTab] = useRememberedPanelTab(selected.id);
   useCompositionPlayer({ id: selected.id, player, onOptions });
   return (
     <section

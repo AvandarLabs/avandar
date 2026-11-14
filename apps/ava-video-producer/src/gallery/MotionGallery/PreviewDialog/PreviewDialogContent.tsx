@@ -4,10 +4,8 @@ import { useEffect, useState } from "react";
 import { StockGraphic } from "../../../stock/StockGraphic";
 import { VideoTokenUsageContext } from "../../../videoTheme/tokenUsage/tokenUsage";
 import { useObservedTokenUsage } from "../../../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
-import {
-  AtlasPanelTabs,
-  type AtlasPanelTab,
-} from "../../AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
+import { AtlasPanelTabs } from "../../AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
+import { useRememberedPanelTab } from "../../AtlasLayout/AtlasPanelTabs/useRememberedPanelTab";
 import { GalleryItemTheme } from "../../GalleryVideoTheme/GalleryItemTheme";
 import { VideoThemePanel } from "../../VideoThemePanel/VideoThemePanel";
 import { isReducedMotionPreferred } from "../isReducedMotionPreferred";
@@ -60,7 +58,7 @@ export function PreviewDialogContent(props: Props): ReactNode {
     props.initialPlaying,
   );
   const [frame, setFrame] = useFrames(playing, preset.loopFrames);
-  const [tab, setTab] = useState<AtlasPanelTab>("details");
+  const [tab, setTab] = useRememberedPanelTab(preset.id);
   const usage = useObservedTokenUsage();
   return (
     <div
