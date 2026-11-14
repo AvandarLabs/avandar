@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { SegmentedControl, Text } from "@mantine/core";
 import { CurvePlot } from "../../gallery/HelperGallery/demos/parts/CurvePlot";
 import { createEasingFromToken } from "../../videoTheme/createEasingFromToken/createEasingFromToken";
+import { useRowIssueAriaProps } from "../RowIssueContext/RowIssueContext";
 import css from "./controls.module.css";
 import { getDefaultLiteralFromKind } from "./defaultLiterals";
 import { RangeNumberInput } from "./RangeNumberInput";
@@ -102,6 +103,7 @@ export function EasingValueControl({
   isCameraCurve = false,
 }: ValueControlProps) {
   const { t } = useLingui();
+  const issueAriaProps = useRowIssueAriaProps();
   const easing = (value ?? DEFAULT_BEZIER) as EasingValue;
   const points = "powerInOut" in easing ? undefined : easing;
   const power = "powerInOut" in easing ? easing.powerInOut : 3;
@@ -110,6 +112,7 @@ export function EasingValueControl({
       <SegmentedControl
         size="xs"
         aria-label={t`Curve type`}
+        {...issueAriaProps}
         value={points ? "bezier" : "power"}
         data={[
           { value: "bezier", label: t`Bezier` },

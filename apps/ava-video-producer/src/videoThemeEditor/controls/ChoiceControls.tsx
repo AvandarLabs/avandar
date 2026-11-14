@@ -5,7 +5,10 @@ import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
 } from "../../videoTheme/videoFontRegistry/videoFontRegistry";
-import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
+import {
+  useRowHasIssue,
+  useRowIssueAriaProps,
+} from "../RowIssueContext/RowIssueContext";
 import { useOptionCopy, type OptionCopy } from "../tokenCopy/useEditorCopy";
 import css from "./controls.module.css";
 import type { ValueControlProps } from "./valueControl.types";
@@ -130,11 +133,13 @@ export function BooleanValueControl({
   onChange,
 }: ValueControlProps) {
   const hasIssue = useRowHasIssue();
+  const issueAriaProps = useRowIssueAriaProps();
   return (
     <Switch
       size="xs"
       aria-label={label}
       error={hasIssue}
+      {...issueAriaProps}
       checked={value === true}
       onChange={(event) => onChange(event.currentTarget.checked)}
     />

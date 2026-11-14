@@ -7,7 +7,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { elevationToBoxShadow } from "../../videoTheme/cssValues/cssValues";
-import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
+import {
+  useRowHasIssue,
+  useRowIssueAriaProps,
+} from "../RowIssueContext/RowIssueContext";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import css from "./controls.module.css";
 import {
@@ -252,6 +255,7 @@ function DashPresets({
   onChange: (pattern: readonly number[]) => void;
 }>) {
   const { t } = useLingui();
+  const issueAriaProps = useRowIssueAriaProps();
   const patternText = formatDashPattern(pattern);
   const preset =
     Object.entries(DASH_PRESETS).find(
@@ -261,6 +265,7 @@ function DashPresets({
     <SegmentedControl
       size="xs"
       aria-label={t`Dash preset`}
+      {...issueAriaProps}
       value={preset}
       data={[
         { value: "solid", label: t`Solid` },

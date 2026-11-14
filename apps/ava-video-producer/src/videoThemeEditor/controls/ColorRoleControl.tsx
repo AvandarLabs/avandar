@@ -1,5 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { Switch } from "@mantine/core";
+import {
+  useRowHasIssue,
+  useRowIssueAriaProps,
+} from "../RowIssueContext/RowIssueContext";
 import { useFieldCopy } from "../tokenCopy/useEditorCopy";
 import { useTokenEditor } from "../TokenEditorContext/TokenEditorContext";
 import { ContrastBadge } from "./ContrastBadge";
@@ -53,12 +57,16 @@ function ColorPairFields({
 export function ColorRoleControl({ row, label }: RoleProps) {
   const { t } = useLingui();
   const editor = useTokenEditor();
+  const hasIssue = useRowHasIssue();
+  const issueAriaProps = useRowIssueAriaProps();
   const pair = isColorPair(row.value) ? row.value : undefined;
   return (
     <div className={css.stack}>
       <Switch
         size="xs"
         label={t`Different on light grounds`}
+        error={hasIssue}
+        {...issueAriaProps}
         checked={pair !== undefined}
         onChange={(event) =>
           editor.setToken(

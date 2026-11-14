@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Group, Slider } from "@mantine/core";
 import { parseCssPixels } from "../../videoTheme/normalizeTokenValue/normalizeTokenValue";
+import { useSliderIssueRef } from "../RowIssueContext/RowIssueContext";
 import css from "./controls.module.css";
 import { RangeNumberInput } from "./RangeNumberInput";
 import type { ValueControlProps } from "./valueControl.types";
@@ -32,6 +33,7 @@ export function NumberValueControl({
   value,
   onChange,
 }: ValueControlProps) {
+  const sliderRef = useSliderIssueRef();
   const scale = definition.unit === "%" ? 100 : 1;
   const min = (definition.min ?? 0) * scale;
   const max = (definition.max ?? 100) * scale;
@@ -45,6 +47,7 @@ export function NumberValueControl({
     <Group className={css.numberRow} gap="xs" wrap="nowrap">
       {(max - min) / step <= SLIDER_STEP_LIMIT ? (
         <Slider
+          ref={sliderRef}
           className={css.slider}
           size="sm"
           min={min}
