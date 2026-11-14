@@ -430,3 +430,50 @@ describe("DictionaryMatch.toMatchEntries", () => {
     ).toEqual([]);
   });
 });
+
+describe("DictionaryMatch.getBestCodeList", () => {
+  const ENTRY_SEX = _entry({
+    entryId: "entry-sex" as DataDictionaryEntry.Id,
+    entryName: "sex",
+    codeLists: [SEX_129, SEX_MFU],
+  });
+
+  it("picks the list covering the most rows, whatever the column is named", () => {
+    const profile = _profile(
+      "q7",
+      [
+        ["M", 10],
+        ["F", 8],
+      ],
+      "varchar",
+    );
+
+    expect(DictionaryMatch.getBestCodeList(profile, ENTRY_SEX)).toEqual({
+      codeListId: SEX_MFU.id,
+      direction: "decode",
+      coverage: 1,
+    });
+  });
+
+  it("falls back to the primary list holding codes when values were not compared", () => {
+    expect(
+      DictionaryMatch.getBestCodeList(_profile("sex", undefined), ENTRY_SEX),
+    ).toEqual({
+      codeListId: SEX_129.id,
+      direction: "decode",
+      coverage: undefined,
+    });
+  });
+
+  it("is undefined for an entry with no code list", () => {
+    expect(
+      DictionaryMatch.getBestCodeList(
+        GENDER,
+        _entry({
+          entryId: "entry-age" as DataDictionaryEntry.Id,
+          entryName: "age",
+        }),
+      ),
+    ).toBeUndefined();
+  });
+});

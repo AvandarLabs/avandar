@@ -123,6 +123,33 @@ function _getBestCoverage(
     }, undefined);
 }
 
+/**
+ * The entry's code list and direction covering the most of a profiled
+ * column's rows, judged on values alone, or its primary list holding codes
+ * when the values could not be compared. Undefined when the entry has no
+ * code list. Use it when the entry is already chosen and only its list is
+ * in question, for example a crosswalk column a dictionary entry governs.
+ */
+function getBestCodeList(
+  profile: Readonly<ColumnProfile.T>,
+  entry: Readonly<DictionaryMatchEntry>,
+):
+  | {
+      codeListId: DataDictionaryCodeList.Id;
+      direction: DictionaryMatchT["direction"];
+      coverage: number | undefined;
+    }
+  | undefined {
+  const best = _getBestCoverage(profile, entry);
+  return best === undefined
+    ? undefined
+    : {
+        codeListId: best.codeListId,
+        direction: best.direction,
+        coverage: best.coverage,
+      };
+}
+
 /** Name 0.45, type 0.2, values 0.35, rescaled when values are unknown. */
 function _getScore(
   nameScore: number,
@@ -322,6 +349,7 @@ export const DictionaryMatchModule = {
   FITS_SHARE,
   toMatchEntries,
   getEntryMatch,
+  getBestCodeList,
   findColumnMatches,
   compareMatches,
   pickDefaultMatch,
