@@ -12,6 +12,14 @@ import type { CrosswalkContext } from "@/views/DataManagerApp/CrosswalkView/cros
 /** A byte order mark, so spreadsheet apps read the file as UTF-8. */
 const UTF8_BOM = "\uFEFF";
 
+/**
+ * Values a spreadsheet would run as a formula: those starting with `=`, `+`,
+ * `-`, `@`, a tab, or a carriage return. Papaparse's own `true` setting
+ * also requires the rest of the line to match, so it skips a value with a
+ * line break after the leading character.
+ */
+const FORMULA_START = /^[=+\-@\t\r]/;
+
 /** Runs of characters a file name cannot hold on common systems. */
 const UNSAFE_FILE_NAME_CHARACTERS = /[\\/:*?"<>|\p{Cc}]+/gu;
 
@@ -68,7 +76,7 @@ export function useExportMapping(
   const exportMapping = (): void => {
     const csv = Papa.unparse(
       { fields: copy.headers, data: rows.map(copy.toCells) },
-      { escapeFormulae: true },
+      { escapeFormulae: FORMULA_START },
     );
     const crosswalkName = draft.name;
     downloadTextFile({

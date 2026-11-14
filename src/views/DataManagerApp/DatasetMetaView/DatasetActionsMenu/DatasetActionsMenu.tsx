@@ -83,7 +83,10 @@ export function DatasetActionsMenu({ dataset }: Readonly<Props>): ReactNode {
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        <DictionaryMenuItems datasetId={dataset.id} />
+        <DictionaryMenuItems
+          datasetId={dataset.id}
+          sourceType={dataset.sourceType}
+        />
         <DatasetRefreshMenuItem dataset={dataset} />
         <Menu.Item
           color="danger"

@@ -93,7 +93,7 @@ export function useMappingCsvCopy(): MappingCsvCopy {
       row.filledFrom ?? "",
       describeChange(row),
       row.translation
-        ? (row.translation.codeListName ?? t`A code list that no longer exists`)
+        ? (row.translation.codeListName ?? t`A code list that is not available`)
         : "",
       statuses[row.status],
     ];

@@ -223,27 +223,20 @@ function _toSortedRows(
 }
 
 /**
- * The datasets one dictionary is applied to, that the user can see, with
- * how each uses it and whether it is behind: a pinned conversion older
- * than the dictionary's current version, or a crosswalk's combined dataset
- * whose embedded code lists changed. A dataset the user cannot read is
- * never counted, because its bindings are hidden with it. Bindings and
- * crosswalks refetch on mount, so an apply or a combine made a moment ago
- * is listed. Used by the Dictionary view's header and Used by tab.
+ * The datasets the dictionary's bindings sit on that the user can read, as
+ * Used by rows, with whether each read is loading or failed.
  */
-export function useDictionaryUsage(
+function useUsageRows(
   options: Readonly<{
-    dictionaryId: DataDictionary.Id;
-    dictionaryName: string;
+    bindings: readonly DictionaryBinding.T[] | undefined;
     currentVersion: number;
   }>,
-): DictionaryUsage {
-  const { dictionaryId, dictionaryName, currentVersion } = options;
-  const [bindings, isLoadingBindings, bindingsQuery] =
-    DictionaryBindingClient.useGetAll({
-      ...where("dictionary_id", "eq", dictionaryId),
-      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
-    });
+): {
+  rows: readonly DictionaryUsageRow[];
+  isLoading: boolean;
+  isError: boolean;
+} {
+  const { bindings, currentVersion } = options;
   const datasetIds = useMemo(() => {
     return [...new Set((bindings ?? []).map(prop("datasetId")))];
   }, [bindings]);
@@ -267,15 +260,41 @@ export function useDictionaryUsage(
     crosswalkOutputs.byDatasetId,
   ]);
   return {
+    rows,
+    isLoading: isLoadingDatasets || crosswalkOutputs.isLoading,
+    isError: datasetsQuery.isError || crosswalkOutputs.isError,
+  };
+}
+
+/**
+ * The datasets one dictionary is applied to, that the user can see, with
+ * how each uses it and whether it is behind: a pinned conversion older
+ * than the dictionary's current version, or a crosswalk's combined dataset
+ * whose embedded code lists changed. A dataset the user cannot read is
+ * never counted, because its bindings are hidden with it. Bindings and
+ * crosswalks refetch on mount, so an apply or a combine made a moment ago
+ * is listed. Used by the Dictionary view's header and Used by tab.
+ */
+export function useDictionaryUsage(
+  options: Readonly<{
+    dictionaryId: DataDictionary.Id;
+    dictionaryName: string;
+    currentVersion: number;
+  }>,
+): DictionaryUsage {
+  const { dictionaryId, dictionaryName, currentVersion } = options;
+  const [bindings, isLoadingBindings, bindingsQuery] =
+    DictionaryBindingClient.useGetAll({
+      ...where("dictionary_id", "eq", dictionaryId),
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
+    });
+  const usageRows = useUsageRows({ bindings, currentVersion });
+  return {
     dictionaryId,
     dictionaryName,
-    rows,
+    rows: usageRows.rows,
     currentVersion,
-    isLoading:
-      isLoadingBindings || isLoadingDatasets || crosswalkOutputs.isLoading,
-    hasError:
-      bindingsQuery.isError ||
-      datasetsQuery.isError ||
-      crosswalkOutputs.isError,
+    isLoading: isLoadingBindings || usageRows.isLoading,
+    hasError: bindingsQuery.isError || usageRows.isError,
   };
 }

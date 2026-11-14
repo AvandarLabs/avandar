@@ -47,10 +47,10 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
   return { VirtualDatasetClient: _cachedClient(virtualGetAllMock) };
 });
 vi.mock("@/clients/crosswalks/CrosswalkDatasetClient", () => {
-  return { CrosswalkDatasetClient: _cachedClient(membershipGetAllMock) };
+  return { CrosswalkDatasetClient: { getAll: membershipGetAllMock } };
 });
 vi.mock("@/clients/crosswalks/CrosswalkClient", () => {
-  return { CrosswalkClient: _cachedClient(crosswalkGetAllMock) };
+  return { CrosswalkClient: { getAll: crosswalkGetAllMock } };
 });
 
 const SHEET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
@@ -120,6 +120,29 @@ describe("clearCachedDatasetRows", () => {
     expect(dropLocalDatasetMock).toHaveBeenCalledWith({
       datasetId: COMBINED_ID,
     });
+  });
+
+  it("finds a crosswalk a dataset joined since the last refresh", async () => {
+    await clearCachedDatasetRows(OPTIONS);
+    expect(evictMock).toHaveBeenLastCalledWith(
+      [{ kind: "dataset", id: SHEET_ID }],
+      PRINCIPAL,
+    );
+
+    membershipGetAllMock.mockResolvedValue([{ crosswalkId: "crosswalk-1" }]);
+    crosswalkGetAllMock.mockResolvedValue([
+      { id: "crosswalk-1", outputDatasetId: COMBINED_ID },
+    ]);
+    await clearCachedDatasetRows(OPTIONS);
+
+    expect(membershipGetAllMock).toHaveBeenCalledTimes(2);
+    expect(evictMock).toHaveBeenLastCalledWith(
+      [
+        { kind: "dataset", id: SHEET_ID },
+        { kind: "dataset", id: COMBINED_ID },
+      ],
+      PRINCIPAL,
+    );
   });
 
   it("reads no crosswalk for a dataset no crosswalk stacks", async () => {

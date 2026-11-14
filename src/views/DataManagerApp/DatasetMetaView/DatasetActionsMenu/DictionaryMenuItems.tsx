@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 
 type Props = {
   datasetId: Dataset.Id;
+  sourceType: Dataset.T["sourceType"];
 };
 
 /**
@@ -17,11 +18,15 @@ type Props = {
  * shows. Apply shows to someone who can edit the dataset and read
  * dictionaries. It is hidden on a crosswalk's combined dataset, whose code
  * lists come from the crosswalk, which replaces its bindings on every
- * update. Create shows to a dictionary editor once the bindings are
+ * update, and while that is being looked up. A failed lookup does not hide
+ * it. Create shows to a dictionary editor once the bindings are
  * read and no dictionary is attached: not while they load, and not when
  * they cannot be read. Neither shows while its check is still loading.
  */
-export function DictionaryMenuItems({ datasetId }: Readonly<Props>): ReactNode {
+export function DictionaryMenuItems({
+  datasetId,
+  sourceType,
+}: Readonly<Props>): ReactNode {
   const canViewDictionaries = useHasPermission(
     "data_sources__can_view_dictionaries",
   );
@@ -30,7 +35,10 @@ export function DictionaryMenuItems({ datasetId }: Readonly<Props>): ReactNode {
   );
   const editRights = useCanEditDataset(datasetId);
   const bindings = useDatasetHasBindings(datasetId);
-  const combining = useCombiningCrosswalk(datasetId);
+  // Only a virtual dataset can be a crosswalk's combined dataset.
+  const combining = useCombiningCrosswalk(datasetId, {
+    isEnabled: sourceType === "virtual",
+  });
   const canApply =
     !editRights.isLoading &&
     editRights.canEdit &&

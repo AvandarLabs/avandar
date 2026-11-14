@@ -34,23 +34,24 @@ async function _getLinkedDatasetIds(
 
 /**
  * The combined datasets of every crosswalk that stacks `datasetId`, whose
- * cached rows hold copies of its rows. A failed read finds none, so the
- * dataset itself is still cleared.
+ * cached rows hold copies of its rows. Read from the server, never from the
+ * query cache: a dataset added to a crosswalk a moment ago must be found. A
+ * failed read finds none, so the dataset itself is still cleared.
  */
 async function _getCombinedDatasetIds(
   datasetId: Dataset.Id,
 ): Promise<Dataset.Id[]> {
   try {
-    const memberships = await CrosswalkDatasetClient.withCache(AvaQueryClient)
-      .withEnsureQueryData()
-      .getAll(where("dataset_id", "eq", datasetId));
+    const memberships = await CrosswalkDatasetClient.getAll(
+      where("dataset_id", "eq", datasetId),
+    );
     const crosswalkIds = [...new Set(memberships.map(prop("crosswalkId")))];
     if (crosswalkIds.length === 0) {
       return [];
     }
-    const crosswalks = await CrosswalkClient.withCache(AvaQueryClient)
-      .withEnsureQueryData()
-      .getAll(where("id", "in", crosswalkIds));
+    const crosswalks = await CrosswalkClient.getAll(
+      where("id", "in", crosswalkIds),
+    );
     return crosswalks.flatMap((crosswalk) => {
       return crosswalk.outputDatasetId === undefined
         ? []

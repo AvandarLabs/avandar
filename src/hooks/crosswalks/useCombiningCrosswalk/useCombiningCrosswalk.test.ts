@@ -4,7 +4,11 @@ import { renderHook } from "@/test-utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const mocks = vi.hoisted(() => {
-  return { crosswalks: [] as unknown[], options: undefined as unknown };
+  return {
+    crosswalks: [] as unknown[],
+    options: undefined as unknown,
+    isError: false,
+  };
 });
 
 vi.mock("@/clients/crosswalks/CrosswalkClient", () => {
@@ -12,7 +16,7 @@ vi.mock("@/clients/crosswalks/CrosswalkClient", () => {
     CrosswalkClient: {
       useGetAll: (options: unknown) => {
         mocks.options = options;
-        return [mocks.crosswalks, false];
+        return [mocks.crosswalks, false, { isError: mocks.isError }];
       },
     },
   };
@@ -23,6 +27,7 @@ const DATASET_ID = "dataset-combined" as Dataset.Id;
 describe("useCombiningCrosswalk", () => {
   beforeEach(() => {
     mocks.crosswalks = [];
+    mocks.isError = false;
   });
 
   it("finds the crosswalk whose combined dataset this is", () => {
@@ -49,6 +54,40 @@ describe("useCombiningCrosswalk", () => {
       return useCombiningCrosswalk(DATASET_ID);
     });
 
-    expect(result.current).toEqual({ crosswalk: undefined, isLoading: false });
+    expect(result.current).toEqual({
+      crosswalk: undefined,
+      isLoading: false,
+      isError: false,
+    });
+  });
+
+  it("reports a failed lookup instead of saying no crosswalk combined it", () => {
+    mocks.isError = true;
+
+    const { result } = renderHook(() => {
+      return useCombiningCrosswalk(DATASET_ID);
+    });
+
+    expect(result.current).toMatchObject({
+      crosswalk: undefined,
+      isError: true,
+    });
+  });
+
+  it("reads nothing for a dataset that cannot be combined", () => {
+    mocks.crosswalks = [{ id: "crosswalk-1", outputDatasetId: DATASET_ID }];
+
+    const { result } = renderHook(() => {
+      return useCombiningCrosswalk(DATASET_ID, { isEnabled: false });
+    });
+
+    expect(result.current).toEqual({
+      crosswalk: undefined,
+      isLoading: false,
+      isError: false,
+    });
+    expect(mocks.options).toMatchObject({
+      useQueryOptions: { enabled: false },
+    });
   });
 });

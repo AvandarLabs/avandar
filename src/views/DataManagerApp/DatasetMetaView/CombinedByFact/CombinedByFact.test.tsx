@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => {
   return {
     crosswalk: undefined as unknown,
     canEditCrosswalks: true,
+    linkProps: [] as unknown[],
   };
 });
 
@@ -40,8 +41,9 @@ vi.mock("@avandar/ui", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@avandar/ui")>();
   return {
     ...actual,
-    Link: ({ children }: { children: ReactNode }) => {
-      return createElement("a", { href: "#crosswalk" }, children);
+    Link: (props: { children: ReactNode }) => {
+      mocks.linkProps.push(props);
+      return createElement("a", { href: "#crosswalk" }, props.children);
     },
   };
 });
@@ -52,6 +54,7 @@ describe("CombinedByFact", () => {
   beforeEach(() => {
     mocks.crosswalk = { id: "crosswalk-1", name: "Borough line lists" };
     mocks.canEditCrosswalks = true;
+    mocks.linkProps = [];
   });
 
   it("links a crosswalk editor to the crosswalk that combined the dataset", () => {
@@ -61,6 +64,13 @@ describe("CombinedByFact", () => {
     expect(
       screen.getByRole("link", { name: "Borough line lists" }),
     ).toBeInTheDocument();
+    expect(mocks.linkProps).toEqual([
+      expect.objectContaining({
+        to: "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
+        params: { workspaceSlug: "demo", crosswalkId: "crosswalk-1" },
+        search: { step: undefined, layoutId: undefined },
+      }),
+    ]);
   });
 
   it("names the crosswalk without a link for someone who cannot edit crosswalks", () => {

@@ -217,6 +217,31 @@ describe("ExportMappingButton", () => {
     expect(_exportedText()).toContain(`,"'=SUM(A1:A9)",case_id,`);
   });
 
+  it("keeps a multi-line value that starts like a formula as text", () => {
+    const base = _makeDraft();
+    const draft = _makeDraft({
+      mappings: {
+        ...base.mappings,
+        [KINGS]: {
+          ...base.mappings[KINGS],
+          [CASE_ID]: _mapping(
+            { kind: "constant", value: "=1+1\nx" },
+            "confirmed",
+          ),
+        },
+      },
+    });
+    render(
+      <ExportMappingButton draft={draft} context={_makeContext("=1+1\nx")} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Export mapping" }));
+
+    const text = _exportedText();
+    expect(text).toContain(`"'=1+1\nx",case_id,A fixed value,"'=1+1\nx"`);
+    expect(text).not.toMatch(/,"=1\+1\nx"/);
+  });
+
   it("is disabled while the crosswalk has no dataset", () => {
     render(
       <ExportMappingButton
