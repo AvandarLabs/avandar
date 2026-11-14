@@ -580,6 +580,82 @@ describe("crosswalkReducer: values_read", () => {
   });
 });
 
+describe("crosswalkReducer: values_read on a mapped or skipped layout", () => {
+  /** Kings with a confirmed governed fill whose list was only matched. */
+  function _kingsWithMatchedList(
+    status: CrosswalkLayout.Status,
+  ): CrosswalkState {
+    const seeded = makeSeededState();
+    const kingsId = getLayoutOf(seeded, KINGS_MARCH.id).id;
+    const sexId = getColumn(seeded, "sex").id;
+    const matched: CrosswalkDraft.Mapping = {
+      id: "44444444-0000-4000-8000-000000000002" as CrosswalkMapping.Id,
+      fill: {
+        kind: "column",
+        sourceColumn: "GENDER",
+        convert: undefined,
+        codeListId: SEX_LETTERS_ID,
+        holdsLabels: false,
+      },
+      status: "confirmed",
+      confidence: undefined,
+      reason: "name_and_type",
+    };
+    return {
+      ...seeded,
+      draft: {
+        ...seeded.draft,
+        layouts: seeded.draft.layouts.map((layout) => {
+          return layout.id === kingsId ? { ...layout, status } : layout;
+        }),
+        mappings: {
+          ...seeded.draft.mappings,
+          [kingsId]: { ...seeded.draft.mappings[kingsId], [sexId]: matched },
+        },
+      },
+    };
+  }
+
+  function _read(state: CrosswalkState): CrosswalkState {
+    return crosswalkReducer(state, {
+      type: "values_read",
+      layoutId: getLayoutOf(state, KINGS_MARCH.id).id,
+      sources: [
+        makeProfile({
+          dataset: KINGS_MARCH,
+          columnName: "GENDER",
+          dataType: "bigint",
+          values: ["1", "2", "9"],
+        }),
+      ],
+      targets: [],
+      dateFormatsBySourceColumn: new Map(),
+      context: CONTEXT,
+    });
+  }
+
+  it.each(["mapped", "skipped"] as const)(
+    "leaves the fills of a %s layout as they are",
+    (status) => {
+      const state = _kingsWithMatchedList(status);
+      const next = _read(state);
+
+      expect(next.draft).toBe(state.draft);
+      expect(next.readLayoutIds).toContain(
+        getLayoutOf(state, KINGS_MARCH.id).id,
+      );
+    },
+  );
+
+  it("still chooses the list for a layout that is not mapped", () => {
+    const next = _read(_kingsWithMatchedList("review"));
+
+    expect(
+      _fillOf(next, getLayoutOf(next, KINGS_MARCH.id).id, "sex")?.fill,
+    ).toMatchObject({ codeListId: SEX_CODES_ID });
+  });
+});
+
 describe("crosswalkReducer: fills and suggestions", () => {
   it("stores a set fill as confirmed and marks a filled layout for review", () => {
     let state = makeSeededState();

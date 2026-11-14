@@ -330,7 +330,8 @@ function _keptMeaningSuggestions(
  * so are Meaning suggestions whose source column is still in the layout.
  * Every other column is matched again, carried over first, against the
  * source columns no kept fill uses. A suggestion the values no longer
- * support is dropped.
+ * support is dropped. A mapped or skipped layout is left as the user left
+ * it, apart from the reference, whose lists are still chosen from values.
  */
 export function applyLayoutValues(
   draft: CrosswalkDraft.T,
@@ -340,6 +341,10 @@ export function applyLayoutValues(
     return candidate.id === action.layoutId;
   });
   if (!layout) {
+    return draft;
+  }
+  const isSettled = layout.status === "mapped" || layout.status === "skipped";
+  if (isSettled && !layout.isReference) {
     return draft;
   }
   const current = draft.mappings[layout.id] ?? {};
