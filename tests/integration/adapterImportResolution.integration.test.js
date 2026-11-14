@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 const PRODUCER_TEST = "apps/ava-video-producer/tests/avandar-scenes.test.ts";
 const ADAPTER_SCREEN =
@@ -35,7 +35,7 @@ async function getAdapterImportRuleIds() {
 }
 
 describe("video producer adapter import resolution", () => {
-  it("resolves adapter @/ imports when a producer test is linted first", async () => {
+  it("reports no unresolved or extension errors for adapter imports when a producer test is linted first", async () => {
     expect(await getAdapterImportRuleIds()).toEqual([]);
   }, 30_000);
 });
