@@ -23,6 +23,15 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
     },
   };
 });
+vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
+  return {
+    DatasetClient: {
+      useGetAll: () => {
+        return [[], false, {}];
+      },
+    },
+  };
+});
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
@@ -73,7 +82,7 @@ describe("CrosswalkFlowView", () => {
   });
 
   it("opens a new crosswalk on Choose datasets", () => {
-    const { container } = render(
+    render(
       <CrosswalkFlowView
         crosswalk={undefined}
         initialDraft={makeAddedState().draft}
@@ -84,9 +93,7 @@ describe("CrosswalkFlowView", () => {
     expect(
       screen.getByRole("heading", { level: 2, name: "Choose datasets" }),
     ).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-crosswalk-step="datasets"]'),
-    ).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
   });
 
   it("opens the step in the URL and moves between reachable steps", () => {

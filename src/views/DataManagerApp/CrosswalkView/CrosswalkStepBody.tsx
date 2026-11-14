@@ -1,3 +1,4 @@
+import { ChooseDatasetsStep } from "@/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep";
 import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { CrosswalkCatalog } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkCatalog/useCrosswalkCatalog";
 import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkFlow/useCrosswalkFlow";
@@ -17,7 +18,7 @@ export function CrosswalkStepBody(
 ): ReactNode {
   switch (props.flow.step) {
     case "datasets":
-      return <div data-crosswalk-step="datasets" />;
+      return <ChooseDatasetsStep {...props} />;
     case "map":
       return <div data-crosswalk-step="map" />;
     case "combine":

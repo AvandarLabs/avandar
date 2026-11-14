@@ -9,6 +9,14 @@ type Props = {
   datasets: readonly Dataset.T[];
   columnCounts: ReadonlyMap<Dataset.Id, number>;
   pickedDatasetIds: readonly Dataset.Id[];
+  /** Datasets shown picked that cannot be unpicked. */
+  lockedDatasetIds?: readonly Dataset.Id[];
+  /** Datasets shown unpicked that cannot be picked. */
+  unavailableDatasetIds?: readonly Dataset.Id[];
+  /** Why the unavailable datasets cannot be picked. */
+  unavailableReason?: ReactNode;
+  /** What to say when there is no dataset. Defaults to the create copy. */
+  emptyMessage?: ReactNode;
   onToggle: (datasetId: Dataset.Id) => void;
 };
 
@@ -17,14 +25,20 @@ export function PickDatasetsTable({
   datasets,
   columnCounts,
   pickedDatasetIds,
+  lockedDatasetIds,
+  unavailableDatasetIds,
+  unavailableReason,
+  emptyMessage,
   onToggle,
 }: Readonly<Props>): ReactNode {
   if (datasets.length === 0) {
     return (
       <Text size="sm" c="dimmed">
-        <Trans>
-          There are no datasets yet. Add one, then learn a dictionary from it.
-        </Trans>
+        {emptyMessage ?? (
+          <Trans>
+            There are no datasets yet. Add one, then learn a dictionary from it.
+          </Trans>
+        )}
       </Text>
     );
   }
@@ -33,12 +47,16 @@ export function PickDatasetsTable({
       <PickDatasetsTableHead />
       <Table.Tbody>
         {datasets.map((dataset) => {
+          const isUnavailable =
+            unavailableDatasetIds?.includes(dataset.id) ?? false;
           return (
             <PickDatasetRow
               key={dataset.id}
               dataset={dataset}
               columnCount={columnCounts.get(dataset.id) ?? 0}
               isPicked={pickedDatasetIds.includes(dataset.id)}
+              isLocked={lockedDatasetIds?.includes(dataset.id) ?? false}
+              unavailableReason={isUnavailable ? unavailableReason : undefined}
               onToggle={onToggle}
             />
           );
