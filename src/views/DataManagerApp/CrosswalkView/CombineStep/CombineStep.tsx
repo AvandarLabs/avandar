@@ -215,9 +215,12 @@ function useCombineState(props: Readonly<CrosswalkStepProps>): {
   const { flow, catalog, crosswalk } = props;
   const { context } = catalog;
   const { draft } = flow.state;
-  // The crosswalk row knows a combined dataset created in this session. The
-  // draft only knows the one it was loaded with.
-  const outputDatasetId = crosswalk?.outputDatasetId ?? draft.outputDatasetId;
+  // The crosswalk row knows a combined dataset created in this session, and
+  // that it was deleted since. The draft only knows the one it was loaded
+  // with, so it is the answer only while the row has not been read.
+  const outputDatasetId = crosswalk
+    ? crosswalk.outputDatasetId
+    : draft.outputDatasetId;
   const result = useMemo(() => {
     return compileCrosswalk({
       draft,

@@ -15,14 +15,15 @@ const NO_COMPILED_CODE_LISTS: readonly Crosswalk.CompiledCodeList[] = [];
 /**
  * Reads the code lists a crosswalk's combined dataset embedded and says
  * whether any is gone or changed since it was combined. Nothing is stale
- * without a crosswalk, before it was combined, or while the lists are
- * loading or failed to load.
+ * without a crosswalk, without a combined dataset (never made, or deleted
+ * since), or while the lists are loading or failed to load.
  */
 export function useCrosswalkStaleness(
   crosswalk: Crosswalk.T | undefined,
 ): CrosswalkStaleness {
   const compiledCodeLists =
-    crosswalk?.compiledCodeLists ?? NO_COMPILED_CODE_LISTS;
+    (crosswalk?.outputDatasetId ? crosswalk.compiledCodeLists : undefined) ??
+    NO_COMPILED_CODE_LISTS;
   const codeListIds = useMemo(() => {
     return compiledCodeLists.map(prop("codeListId"));
   }, [compiledCodeLists]);

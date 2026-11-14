@@ -31,6 +31,7 @@ const PAIRS: DataDictionaryCodeList.Pair[] = [
 const CROSSWALK = {
   id: "crosswalk-1",
   name: "Borough line lists",
+  outputDatasetId: "dataset-combined",
   compiledCodeLists: [
     {
       codeListId: LIST_ID,
@@ -71,6 +72,21 @@ describe("useCrosswalkStaleness", () => {
     mocks.codeLists = undefined;
 
     expect(_render(CROSSWALK).isStale).toBe(false);
+  });
+
+  it("calls nothing stale once the combined dataset is gone", () => {
+    mocks.codeLists = [
+      { id: LIST_ID, pairs: [{ ...PAIRS[0]!, label: "Man" }] },
+    ];
+    const withoutDataset = {
+      ...CROSSWALK,
+      outputDatasetId: undefined,
+    } as unknown as Crosswalk.T;
+
+    expect(_render(withoutDataset).isStale).toBe(false);
+    expect(mocks.options).toMatchObject({
+      useQueryOptions: { enabled: false },
+    });
   });
 
   it("reads nothing without a crosswalk", () => {

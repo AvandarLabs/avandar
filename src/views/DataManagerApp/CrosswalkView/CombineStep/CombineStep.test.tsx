@@ -254,6 +254,16 @@ describe("CombineStep", () => {
     ).toBeInTheDocument();
   });
 
+  it("creates again when the crosswalk row says its combined dataset was deleted", () => {
+    _render(makeFlow(makeDraft({ outputDatasetId: COMBINED_ID })), {
+      outputDatasetId: undefined,
+    } as Crosswalk.T);
+
+    expect(
+      screen.getByRole("button", { name: "Create combined dataset" }),
+    ).toBeInTheDocument();
+  });
+
   it("previews the stacked rows in a labelled table with the row count", () => {
     _render();
 
