@@ -101,6 +101,26 @@ export const CrosswalkClient = createUsableServiceClient(
     tableName: "crosswalks",
     dbTablePrimaryKey: "id",
     parsers: CrosswalkParsers,
+    queries: ({ dbClient }) => {
+      return {
+        /**
+         * Whether a dataset in a layout that is not skipped is one the caller
+         * cannot open. Only a crosswalk editor can ask. Such a crosswalk
+         * cannot be combined by this caller, since the combined dataset
+         * would leave that dataset out.
+         */
+        hasUnreadableDatasets: async (params: {
+          crosswalkId: Crosswalk.Id;
+        }): Promise<boolean> => {
+          const { data } = await dbClient
+            .rpc("rpc_crosswalks__has_unreadable_datasets", {
+              p_crosswalk_id: params.crosswalkId,
+            })
+            .throwOnError();
+          return data === true;
+        },
+      };
+    },
     mutations: ({ clientLogger, dbClient }) => {
       return {
         /**
@@ -146,6 +166,7 @@ export const CrosswalkClient = createUsableServiceClient(
     },
   }),
   {
+    queryFns: ["hasUnreadableDatasets"],
     mutationFns: ["saveContents", "saveCombinedDataset"],
   },
 );

@@ -239,3 +239,33 @@ describe("CrosswalkClient.saveCombinedDataset", () => {
     );
   });
 });
+
+describe("CrosswalkClient.hasUnreadableDatasets", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("asks the RPC about the crosswalk and returns its answer", async () => {
+    _resolveWith(true);
+
+    const hasUnreadable = await CrosswalkClient.hasUnreadableDatasets({
+      crosswalkId: CROSSWALK_ID,
+    });
+
+    expect(hasUnreadable).toBe(true);
+    expect(rpcMock).toHaveBeenCalledWith(
+      "rpc_crosswalks__has_unreadable_datasets",
+      { p_crosswalk_id: CROSSWALK_ID },
+    );
+  });
+
+  it("treats an empty answer as no unreadable datasets", async () => {
+    _resolveWith(null);
+
+    expect(
+      await CrosswalkClient.hasUnreadableDatasets({
+        crosswalkId: CROSSWALK_ID,
+      }),
+    ).toBe(false);
+  });
+});

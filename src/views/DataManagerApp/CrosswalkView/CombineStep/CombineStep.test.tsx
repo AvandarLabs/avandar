@@ -46,6 +46,7 @@ const mocks = vi.hoisted(() => {
     access: { status: "allowed" } as unknown,
     existingName: undefined as string | undefined,
     isExistingLoading: false,
+    hasUnreadable: false as boolean | undefined,
     saveCrosswalkMock: vi.fn(),
     saveCombinedMock: vi.fn(),
     order: [] as string[],
@@ -95,6 +96,16 @@ vi.mock(
     };
   },
 );
+vi.mock(
+  "@/hooks/crosswalks/useHasUnreadableDatasets/useHasUnreadableDatasets",
+  () => {
+    return {
+      useHasUnreadableDatasets: () => {
+        return mocks.hasUnreadable;
+      },
+    };
+  },
+);
 vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   return {
     DatasetClient: {
@@ -125,6 +136,7 @@ describe("CombineStep", () => {
     mocks.access = { status: "allowed" } satisfies CombineAccess;
     mocks.existingName = undefined;
     mocks.isExistingLoading = false;
+    mocks.hasUnreadable = false;
     mocks.order = [];
     mocks.saveCrosswalkMock.mockImplementation(() => {
       mocks.order.push("crosswalk");
@@ -226,7 +238,7 @@ describe("CombineStep", () => {
     ).toBeInTheDocument();
     expect(
       within(problems).getByText(
-        "A dataset in this crosswalk couldn't be read, so it was left out. Check that it still exists and that you can open it.",
+        "A dataset in this crosswalk couldn't be read, so it can't be part of the combined dataset. Check that it still exists and that you can open it.",
       ),
     ).toBeInTheDocument();
     expect(problems).not.toHaveTextContent(unreadableId);
@@ -406,6 +418,46 @@ describe("CombineStep", () => {
     expect(button).toHaveAccessibleDescription(
       "Avandar couldn't check your access to the combined dataset. Reload the page and try again.",
     );
+  });
+
+  it("won't create or update while the crosswalk holds a dataset the user can't open", () => {
+    mocks.hasUnreadable = true;
+    const { unmount } = render(
+      <CombineStep
+        flow={makeFlow()}
+        catalog={makeCatalog()}
+        crosswalk={undefined}
+      />,
+    );
+
+    const createButton = screen.getByRole("button", {
+      name: "Create combined dataset",
+    });
+    expect(createButton).toBeDisabled();
+    expect(createButton).toHaveAccessibleDescription(
+      "This crosswalk includes a dataset you can't open, so only someone who can open every dataset can create the combined dataset.",
+    );
+    unmount();
+
+    mocks.existingName = "Measles combined";
+    _render(makeFlow(makeDraft({ outputDatasetId: COMBINED_ID })));
+
+    const updateButton = screen.getByRole("button", {
+      name: "Update combined dataset",
+    });
+    expect(updateButton).toBeDisabled();
+    expect(updateButton).toHaveAccessibleDescription(
+      "This crosswalk includes a dataset you can't open, so only someone who can open every dataset can update the combined dataset.",
+    );
+  });
+
+  it("holds the button while the unreadable-dataset lookup has no answer", () => {
+    mocks.hasUnreadable = undefined;
+    _render();
+
+    expect(
+      screen.getByRole("button", { name: "Create combined dataset" }),
+    ).toBeDisabled();
   });
 
   it("lets the preview's scroll area be reached by keyboard", () => {

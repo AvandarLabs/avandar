@@ -12,7 +12,13 @@ export type CombineDeniedReason =
   /** Updating needs edit access to the combined dataset. */
   | "not_dataset_editor"
   /** The user's role on the combined dataset could not be read. */
-  | "failed";
+  | "failed"
+  /**
+   * The crosswalk holds a dataset the user cannot open, so a combine by them
+   * would leave it out. Set by the combine step from its own lookup, not by
+   * `useCombineAccess`.
+   */
+  | "unreadable_datasets";
 
 /** Whether the user may create or update the combined dataset yet. */
 export type CombineAccess =

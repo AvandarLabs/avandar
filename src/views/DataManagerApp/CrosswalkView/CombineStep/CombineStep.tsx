@@ -3,6 +3,7 @@ import { Stack } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { useHasUnreadableDatasets } from "@/hooks/crosswalks/useHasUnreadableDatasets/useHasUnreadableDatasets";
 import { compileCrosswalk } from "@/lib/crosswalks/compileCrosswalk/compileCrosswalk";
 import { CombinedPreview } from "@/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview";
 import { CombineFooter } from "@/views/DataManagerApp/CrosswalkView/CombineStep/CombineFooter";
@@ -51,18 +52,24 @@ function useExistingDataset(
  * The access check, held at `checking` until the existing combined dataset
  * has been read: until then the name field holds the crosswalk's name, and
  * updating would rename the dataset to it. A combined dataset that can't be
- * read can't be updated either.
+ * read can't be updated either. A crosswalk with a dataset the user can't
+ * open is denied too, and an unanswered lookup holds `checking`, since the
+ * combine would otherwise leave that dataset out without a word.
  */
 function useGuardedAccess(
   outputDatasetId: Dataset.Id | undefined,
   existing: ExistingDataset,
+  hasUnreadableDatasets: boolean | undefined,
 ): CombineAccess {
   const access = useCombineAccess(outputDatasetId);
   if (access.status !== "allowed") {
     return access;
   }
-  if (existing.isLoading) {
+  if (existing.isLoading || hasUnreadableDatasets === undefined) {
     return { status: "checking" };
+  }
+  if (hasUnreadableDatasets) {
+    return { status: "denied", reason: "unreadable_datasets" };
   }
   return existing.isUnreadable
     ? { status: "denied", reason: "failed" }
@@ -73,7 +80,11 @@ function useGuardedAccess(
 function useDisabledReason(
   result: CompileCrosswalkResult,
   access: CombineAccess,
-  options: Readonly<{ datasetName: string; existingName: string | undefined }>,
+  options: Readonly<{
+    datasetName: string;
+    existingName: string | undefined;
+    hasOutputDataset: boolean;
+  }>,
 ): string | undefined {
   const { t } = useLingui();
   if (result.status === "blocked") {
@@ -95,6 +106,10 @@ function useDisabledReason(
       return existingName === undefined
         ? t`You need edit access to the combined dataset to update it.`
         : t`You need edit access to ${existingName} to update it.`;
+    case "unreadable_datasets":
+      return options.hasOutputDataset
+        ? t`This crosswalk includes a dataset you can't open, so only someone who can open every dataset can update the combined dataset.`
+        : t`This crosswalk includes a dataset you can't open, so only someone who can open every dataset can create the combined dataset.`;
     case "failed":
       return existingName === undefined
         ? t`Avandar couldn't check your access to the combined dataset. Reload the page and try again.`
@@ -213,10 +228,18 @@ function useCombineState(props: Readonly<CrosswalkStepProps>): {
   const existing = useExistingDataset(outputDatasetId);
   const [typedName, setDatasetName] = useState<string | undefined>(undefined);
   const datasetName = typedName ?? existing.name ?? draft.name;
-  const access = useGuardedAccess(outputDatasetId, existing);
+  const hasUnreadableDatasets = useHasUnreadableDatasets(
+    draft.isSaved ? draft.crosswalkId : undefined,
+  );
+  const access = useGuardedAccess(
+    outputDatasetId,
+    existing,
+    hasUnreadableDatasets,
+  );
   const disabledReason = useDisabledReason(result, access, {
     datasetName,
     existingName: existing.name,
+    hasOutputDataset: outputDatasetId !== undefined,
   });
   return {
     result,

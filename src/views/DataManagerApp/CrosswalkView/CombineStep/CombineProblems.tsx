@@ -111,7 +111,8 @@ type DatasetProblem = Extract<
 /**
  * The sentence for a dataset the compile left out. A dataset the catalog no
  * longer holds can't be read, and its name is only its id, so it is not
- * named.
+ * named. The sentence for it does not promise the combine goes ahead without
+ * it: the combine step refuses someone who can't open every dataset.
  */
 function useDatasetProblemSentence(
   datasetsById: Props["datasetsById"],
@@ -120,7 +121,7 @@ function useDatasetProblemSentence(
   return (problem) => {
     const { datasetName } = problem;
     if (!datasetsById.has(problem.datasetId)) {
-      return t`A dataset in this crosswalk couldn't be read, so it was left out. Check that it still exists and that you can open it.`;
+      return t`A dataset in this crosswalk couldn't be read, so it can't be part of the combined dataset. Check that it still exists and that you can open it.`;
     }
     if (problem.kind === "column_types_differ") {
       return t`${datasetName} was left out: a column it fills from holds a different kind of values than the same column of the first dataset with its layout. Remove it, or fix that column's type at its source.`;
