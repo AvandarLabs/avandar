@@ -34,7 +34,7 @@ test("a faster tempo shortens durations and staggers", () => {
 
 test("tempo never changes the period of a repeating motion", () => {
   assert.equal(
-    _motionAtTempo(0.75).pulse.period,
+    _motionAtTempo(0.8).pulse.period,
     _motionAtTempo(1).pulse.period,
   );
 });

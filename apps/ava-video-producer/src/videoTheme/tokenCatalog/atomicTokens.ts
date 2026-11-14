@@ -202,7 +202,7 @@ export const ATOMIC_TOKENS = {
   tempo: scale({
     kind: "number",
     unit: "×",
-    min: 0.75,
+    min: 0.8,
     max: 1.5,
     step: 0.05,
     label: "Tempo",

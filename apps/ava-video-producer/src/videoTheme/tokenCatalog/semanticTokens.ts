@@ -379,12 +379,12 @@ export const SEMANTIC_TOKENS = {
     tempo: token({
       kind: "number",
       unit: "×",
-      min: 0.75,
+      min: 0.8,
       max: 1.5,
       step: 0.05,
       label: "Tempo",
       description:
-        "Divides every animation duration inside a beat. 1.5 is faster and 0.75 slower; timeline lengths never change.",
+        "Divides every animation duration inside a beat. 1.5 is faster and 0.8 slower; timeline lengths never change.",
     }),
     press: _duration("Press", "A press answering back."),
     chip: _duration("Chip", "A chip changing state."),

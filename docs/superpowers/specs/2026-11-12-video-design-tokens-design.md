@@ -260,7 +260,7 @@ both from the theme, so a theme-scope edit recolours every composition.
   `getEditorialInk` is replaced by `{ onDark, onLight }` resolution.
 - **Motion.** `src/motion.ts` keeps no runtime imports. Callers pass token
   values to its helpers. A test keeps `DUR` and `EASE` equal to `classic`.
-  `motion.tempo` (clamped 0.75–1.5) divides animation durations inside a
+  `motion.tempo` (clamped 0.8–1.5) divides animation durations inside a
   beat, so 1.5 is faster and 0.75 is slower. It never changes timeline
   lengths. Camera preset, shutter, and samples come from tokens.
 - **Appearance options split.**
@@ -434,7 +434,7 @@ stays unchanged here. A later sub-project maps its names to semantic colours:
 | Migration | Every continuity catalog entry's former authored `accent` / `background` appears in `classic.overrides`; the schema rejects the removed fields |
 | Server | Slug, size cap, built-in protection, `If-Match` 409, atomic write, export snapshot and `delivery.json` hash |
 | Usage | Collector records component and semantic reads; iframe posts the union |
-| Tempo | At tempo 0.75, every in-scope animation finishes before its beat or loop ends |
+| Tempo | At tempo 0.8, every in-scope animation finishes before its beat or loop ends |
 
 ### 5.3 End-to-end (Playwright, one spec at a time, state restored in `finally`)
 
@@ -469,7 +469,7 @@ Three plans, each complete and green before the next:
 | --- | --- |
 | Sub-pixel drift when literals become computed tokens | Exact numeric parity in `classic`, enforced by the parity gate |
 | Rough rendering of many edges is slow per frame | Memoize on geometry and sketch parameters; smooth shapes skip roughjs |
-| A slower tempo overruns a reading hold | Clamp 0.75–1.5 and the tempo test (§5.2) |
+| A slower tempo overruns a reading hold | Clamp 0.8–1.5 and the tempo test (§5.2) |
 | Theme edits leave posters stale | Per-theme posters, fallback badge, `atlas:posters --theme` |
 | The schema is too large to browse | Essentials, "used by this item" filter, search |
 | A theme picks a font the renderer cannot load | Registry-only families; validation rejects unknown ones |

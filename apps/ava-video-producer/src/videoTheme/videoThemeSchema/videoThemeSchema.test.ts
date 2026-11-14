@@ -60,6 +60,17 @@ test("an atomic token rejects a reference", () => {
   );
 });
 
+test("a theme slower than tempo 0.8 is rejected", () => {
+  assert.throws(
+    () => parseVideoThemeDocument(_sparse({ atomic: { tempo: { md: 0.75 } } })),
+    /tempo/,
+  );
+  assert.equal(
+    parseVideoThemeDocument(_sparse({ atomic: { tempo: { md: 0.8 } } })).id,
+    "warm",
+  );
+});
+
 test("a component token accepts a literal one-off", () => {
   const document = {
     schemaVersion: 1,
