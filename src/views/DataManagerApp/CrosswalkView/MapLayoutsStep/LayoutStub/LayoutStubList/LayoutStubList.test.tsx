@@ -11,13 +11,17 @@ import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDr
 /** How many rows the mocked virtualizer says are in view. */
 const WINDOW_SIZE = 12;
 
-const { scrollToIndexMock } = vi.hoisted(() => {
-  return { scrollToIndexMock: vi.fn() };
+const { scrollToIndexMock, windowState } = vi.hoisted(() => {
+  return {
+    scrollToIndexMock: vi.fn(),
+    /** The first row the mocked virtualizer says is in view. */
+    windowState: { firstIndex: 0 },
+  };
 });
 
 // jsdom lays nothing out, so a real virtualizer would render no rows. The
-// mock renders the first rows as in view and records scrolling, as
-// DataCatalogListingList's test does.
+// mock renders a window of rows as in view (the first rows unless a test
+// moves it) and records scrolling, as DataCatalogListingList's test does.
 vi.mock("@tanstack/react-virtual", () => {
   return {
     useVirtualizer: (options: { count: number }) => {
@@ -28,7 +32,8 @@ vi.mock("@tanstack/react-virtual", () => {
         getVirtualItems: () => {
           return Array.from(
             { length: Math.min(options.count, WINDOW_SIZE) },
-            (_item, index) => {
+            (_item, offset) => {
+              const index = windowState.firstIndex + offset;
               return {
                 index,
                 key: index,
@@ -116,6 +121,7 @@ function _option(index: number): HTMLElement {
 describe("LayoutStubList", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    windowState.firstIndex = 0;
   });
 
   it("renders every row up to the threshold, as before", () => {
@@ -149,23 +155,46 @@ describe("LayoutStubList", () => {
     expect(scrollToIndexMock).toHaveBeenLastCalledWith(149, { align: "auto" });
   });
 
-  it("selects the active row with Enter, and a row by clicking it", () => {
+  it("selects the active row with Enter", () => {
     const { layouts, onSelectLayout } = _render({ count: 150 });
 
     fireEvent.keyDown(_listbox(), { key: "ArrowDown" });
     fireEvent.keyDown(_listbox(), { key: "Enter" });
+
     expect(onSelectLayout).toHaveBeenLastCalledWith(layouts[1]?.id);
+  });
+
+  it("selects a row by clicking it", () => {
+    const { layouts, onSelectLayout } = _render({ count: 150 });
 
     fireEvent.click(screen.getByText("Dataset 5"));
+
     expect(onSelectLayout).toHaveBeenLastCalledWith(layouts[5]?.id);
   });
 
-  it("scrolls a layout selected from outside into view and makes it active", () => {
-    const { layouts, rerenderWithSelection } = _render({ count: 150 });
+  it("scrolls a layout selected from outside into view", () => {
+    const { rerenderWithSelection } = _render({ count: 150 });
 
     rerenderWithSelection(120);
 
     expect(scrollToIndexMock).toHaveBeenLastCalledWith(120, { align: "auto" });
+  });
+
+  it("points at no row while the active row is outside the rendered window", () => {
+    const { rerenderWithSelection } = _render({ count: 150 });
+
+    rerenderWithSelection(120);
+
+    expect(_listbox()).not.toHaveAttribute("aria-activedescendant");
+  });
+
+  it("points at the active row once the window reaches it", () => {
+    const { layouts, rerenderWithSelection } = _render({ count: 150 });
+    rerenderWithSelection(120);
+
+    windowState.firstIndex = 115;
+    rerenderWithSelection(120);
+
     expect(_listbox().getAttribute("aria-activedescendant")).toContain(
       layouts[120]?.id,
     );

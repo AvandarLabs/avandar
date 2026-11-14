@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DOB,
   makeColumnFill,
@@ -14,10 +14,36 @@ import {
   makeCrosswalkMatchesRequest,
   toCrosswalkMeaningMatches,
 } from "@/lib/crosswalks/makeCrosswalkMatchesRequest/makeCrosswalkMatchesRequest";
+import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
 import type { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 
-function _request(draft: CrosswalkDraft.T = makeMeaningDraft()) {
+const modelState = vi.hoisted(() => {
+  return { windowSize: 8192 };
+});
+
+// The offline model's context window, which a test can shrink to make a
+// request too large for it.
+vi.mock(
+  "@/stores/OfflineChatEngineStore/createLocalModelRuntime/offlineChatContextWindow",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/stores/OfflineChatEngineStore/createLocalModelRuntime/offlineChatContextWindow")
+      >();
+    return {
+      ...actual,
+      get OFFLINE_CHAT_CONTEXT_WINDOW_SIZE() {
+        return modelState.windowSize;
+      },
+    };
+  },
+);
+
+function _result(
+  draft: CrosswalkDraft.T = makeMeaningDraft(),
+  model: "online" | "on_device" = "online",
+) {
   return makeCrosswalkMatchesRequest({
     draft,
     layoutId: QUEENS_LAYOUT,
@@ -25,8 +51,28 @@ function _request(draft: CrosswalkDraft.T = makeMeaningDraft()) {
     targets: MEANING_TARGETS,
     profilesBySourceColumn: MEANING_SOURCES_BY_NAME,
     locale: "en",
-    model: "online",
+    model,
   });
+}
+
+function _request(draft?: CrosswalkDraft.T) {
+  const result = _result(draft);
+  return result.status === "ready" ? result.request : undefined;
+}
+
+/** The meaning draft with more combined-dataset columns no fill reaches. */
+function _withExtraColumns(count: number): CrosswalkDraft.T {
+  const draft = makeMeaningDraft();
+  const extraColumns = Array.from({ length: count }, (_item, index) => {
+    return {
+      id: `c1000000-0000-4000-8000-${String(index).padStart(12, "0")}` as CrosswalkColumn.Id,
+      name: `extra_${index}`,
+      position: draft.columns.length + index,
+      dataType: "varchar" as const,
+      entryId: undefined,
+    };
+  });
+  return { ...draft, columns: [...draft.columns, ...extraColumns] };
 }
 
 function _names(draft?: CrosswalkDraft.T): string[] | undefined {
@@ -70,13 +116,13 @@ describe("makeCrosswalkMatchesRequest", () => {
         kind: "categorical",
         values: ["Male", "Female"],
       },
-      { name: "dob", otherNames: [], kind: "date", values: [] },
       {
         name: "GENDER",
         otherNames: [],
         kind: "categorical",
         values: ["1", "2"],
       },
+      { name: "dob", otherNames: [], kind: "date", values: [] },
       expect.objectContaining({ name: "birth_date", values: [] }),
       // Named after a person, so its values stay here.
       expect.objectContaining({ name: "patient_name", values: [] }),
@@ -103,7 +149,7 @@ describe("makeCrosswalkMatchesRequest", () => {
       }),
     };
 
-    expect(_names(renamed)).toEqual(["sex", "dob", "birth_date"]);
+    expect(_names(renamed)).toEqual(["sex", "birth_date", "dob"]);
   });
 
   it("counts a Combine expression's columns as used", () => {
@@ -142,7 +188,7 @@ describe("makeCrosswalkMatchesRequest", () => {
       },
     };
 
-    expect(_request(draft)).toBeUndefined();
+    expect(_result(draft)).toEqual({ status: "nothing_to_match" });
   });
 
   it("asks nothing for the reference layout", () => {
@@ -156,7 +202,7 @@ describe("makeCrosswalkMatchesRequest", () => {
         locale: "en",
         model: "online",
       }),
-    ).toBeUndefined();
+    ).toEqual({ status: "nothing_to_match" });
   });
 
   it("names a column it has no profile for by the dataset's type", () => {
@@ -171,16 +217,55 @@ describe("makeCrosswalkMatchesRequest", () => {
     });
 
     expect(
-      result?.request.columns.map((column) => {
-        return [column.name, column.kind];
-      }),
+      result.status === "ready"
+        ? result.request.request.columns.map((column) => {
+            return [column.name, column.kind];
+          })
+        : undefined,
     ).toEqual([
       ["sex", "text"],
-      ["dob", "date"],
       ["GENDER", "number"],
+      ["dob", "date"],
       ["birth_date", "text"],
       ["patient_name", "text"],
     ]);
+  });
+});
+
+describe("makeCrosswalkMatchesRequest on a wide crosswalk", () => {
+  beforeEach(() => {
+    modelState.windowSize = 8192;
+  });
+
+  it("keeps the layout's columns in a request cut to the column limit", () => {
+    const request = _request(_withExtraColumns(350));
+
+    expect(request?.request.columns).toHaveLength(300);
+    expect(request?.sourceNames).toEqual(
+      new Set(["GENDER", "birth_date", "patient_name"]),
+    );
+  });
+
+  it("alternates the combined dataset's columns with the layout's", () => {
+    const names = _request(_withExtraColumns(4))?.request.columns.map(
+      (column) => {
+        return column.name;
+      },
+    );
+
+    expect(names?.slice(0, 4)).toEqual(["sex", "GENDER", "dob", "birth_date"]);
+  });
+
+  it("says a request is too large when the model cannot take even one pair", () => {
+    modelState.windowSize = 10;
+
+    expect(_result(makeMeaningDraft(), "on_device")).toEqual({
+      status: "too_large_for_model",
+    });
+  });
+
+  it("takes the same request on a model with room", () => {
+    expect(_result(makeMeaningDraft(), "on_device").status).toBe("ready");
   });
 });
 
@@ -202,15 +287,25 @@ describe("toCrosswalkMeaningMatches", () => {
     ]);
   });
 
-  it("drops a pair within one side, and keeps each column in one pair", () => {
+  it("drops a pair within one side", () => {
+    expect(
+      toCrosswalkMeaningMatches({
+        request: _request()!,
+        matches: [
+          { name: "sex", sameAs: "dob" },
+          { name: "GENDER", sameAs: "birth_date" },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it("keeps each column in one pair, first pair first", () => {
     const result = _request()!;
 
     expect(
       toCrosswalkMeaningMatches({
         request: result,
         matches: [
-          { name: "sex", sameAs: "dob" },
-          { name: "GENDER", sameAs: "birth_date" },
           { name: "dob", sameAs: "birth_date" },
           { name: "dob", sameAs: "patient_name" },
           { name: "sex", sameAs: "birth_date" },

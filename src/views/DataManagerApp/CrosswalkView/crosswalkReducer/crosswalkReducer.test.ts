@@ -950,14 +950,19 @@ describe("crosswalkReducer: meaning_matches_found", () => {
     ).toBe(state);
   });
 
-  it("drops a source another fill reads, and one the layout does not have", () => {
+  it("drops a source another fill reads", () => {
     const state = _kingsWithoutSex();
 
     expect(
-      _meaningFound(state, [
-        { columnName: "sex", sourceColumn: "CASE_ID" },
-        { columnName: "sex", sourceColumn: "gender_cd" },
-      ]),
+      _meaningFound(state, [{ columnName: "sex", sourceColumn: "CASE_ID" }]),
+    ).toBe(state);
+  });
+
+  it("drops a source the layout does not have", () => {
+    const state = _kingsWithoutSex();
+
+    expect(
+      _meaningFound(state, [{ columnName: "sex", sourceColumn: "gender_cd" }]),
     ).toBe(state);
   });
 
@@ -976,15 +981,10 @@ describe("crosswalkReducer: meaning_matches_found", () => {
     expect(_fillOf(next, kingsId, "county")).toBeUndefined();
   });
 
-  it("leaves the reference layout and a skipped layout alone", () => {
+  it("leaves the reference layout alone", () => {
     const seeded = makeSeededState();
     const referenceId = getLayoutOf(seeded, BRONX.id).id;
     const withoutReferenceSex = _withoutFill(seeded, referenceId, "sex");
-    const kingsWithoutSex = _kingsWithoutSex();
-    const skipped = crosswalkReducer(kingsWithoutSex, {
-      type: "layout_skipped",
-      layoutId: getLayoutOf(kingsWithoutSex, KINGS_MARCH.id).id,
-    });
 
     expect(
       _meaningFound(
@@ -993,8 +993,37 @@ describe("crosswalkReducer: meaning_matches_found", () => {
         referenceId,
       ),
     ).toBe(withoutReferenceSex);
+  });
+
+  it("leaves a skipped layout alone", () => {
+    const kingsWithoutSex = _kingsWithoutSex();
+    const skipped = crosswalkReducer(kingsWithoutSex, {
+      type: "layout_skipped",
+      layoutId: getLayoutOf(kingsWithoutSex, KINGS_MARCH.id).id,
+    });
+
     expect(
       _meaningFound(skipped, [{ columnName: "sex", sourceColumn: "GENDER" }]),
     ).toBe(skipped);
+  });
+
+  it("leaves a mapped layout alone, even with a column unfilled", () => {
+    const state = _kingsWithoutSex();
+    const kingsId = getLayoutOf(state, KINGS_MARCH.id).id;
+    const mapped: CrosswalkState = {
+      ...state,
+      draft: {
+        ...state.draft,
+        layouts: state.draft.layouts.map((layout) => {
+          return layout.id === kingsId
+            ? { ...layout, status: "mapped" }
+            : layout;
+        }),
+      },
+    };
+
+    expect(
+      _meaningFound(mapped, [{ columnName: "sex", sourceColumn: "GENDER" }]),
+    ).toBe(mapped);
   });
 });

@@ -1,3 +1,4 @@
+import { DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
 import { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import { DictionarySuggestions } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
 import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt";
@@ -29,6 +30,16 @@ export type CrosswalkMatchesRequest = {
   /** The layout columns in the request, as the layout spells them. */
   sourceNames: ReadonlySet<string>;
 };
+
+/**
+ * What asking about one layout comes to: a request, nothing to ask about
+ * (a reference or mapped layout, or no column left on one side), or too
+ * many columns for the model to take, even cut down to one pair.
+ */
+export type CrosswalkMatchesResult =
+  | { status: "ready"; request: CrosswalkMatchesRequest }
+  | { status: "nothing_to_match" }
+  | { status: "too_large_for_model" };
 
 function _toKey(name: string): string {
   return name.trim().toLowerCase();
@@ -113,11 +124,39 @@ function _getSourceColumns(
     });
 }
 
+/** Whether the route's schema takes the column's name uncut. */
+function _hasSendableName(column: Readonly<{ name: string }>): boolean {
+  return (
+    column.name.length > 0 &&
+    column.name.length <= DICTIONARY_SUGGESTIONS_MAX_NAME_LENGTH
+  );
+}
+
+/**
+ * The columns alternated one side then the other. A request cut to fit its
+ * model drops columns from the end, so alternating keeps both sides in it
+ * until the last pair.
+ */
+function _interleave<Item>(
+  first: readonly Item[],
+  second: readonly Item[],
+): Item[] {
+  return Array.from(
+    { length: Math.max(first.length, second.length) },
+    (_item, index) => {
+      return [first[index], second[index]].filter((column) => {
+        return column !== undefined;
+      });
+    },
+  ).flat();
+}
+
 /**
  * The meaning-match request for one layout: the combined dataset's columns
- * it has not filled, then its own columns that no fill reads. Undefined for
- * the reference layout, and when either side is empty, before or after the
- * request is cut to fit the model.
+ * it has not filled, alternating with its own columns that no fill reads.
+ * Nothing to match for the reference layout and when either side is empty.
+ * Too large when the request cannot be cut to fit the model that will
+ * answer and still hold a column of each side.
  */
 export function makeCrosswalkMatchesRequest(
   options: Readonly<{
@@ -130,24 +169,37 @@ export function makeCrosswalkMatchesRequest(
     locale: string;
     model: DictionarySuggestionModel;
   }>,
-): CrosswalkMatchesRequest | undefined {
+): CrosswalkMatchesResult {
   const layout = options.draft.layouts.find((candidate) => {
     return candidate.id === options.layoutId;
   });
   if (!layout || layout.isReference) {
-    return undefined;
+    return { status: "nothing_to_match" };
   }
   const mappings = options.draft.mappings[layout.id] ?? {};
-  const targetColumns = _getTargetColumns({ ...options, mappings });
-  const sourceColumns = _getSourceColumns({ ...options, layout, mappings });
+  const targetColumns = _getTargetColumns({ ...options, mappings }).filter(
+    _hasSendableName,
+  );
+  const sourceColumns = _getSourceColumns({
+    ...options,
+    layout,
+    mappings,
+  }).filter(_hasSendableName);
+  if (targetColumns.length === 0 || sourceColumns.length === 0) {
+    return { status: "nothing_to_match" };
+  }
   const request = DictionarySuggestions.makeMatchesRequestFromColumns({
-    columns: [...targetColumns, ...sourceColumns],
+    columns: _interleave(targetColumns, sourceColumns),
     locale: options.locale,
     model: options.model,
   });
-  return request?.task === "matches"
-    ? _toCrosswalkRequest(request, targetColumns)
-    : undefined;
+  const crosswalkRequest =
+    request?.task === "matches"
+      ? _toCrosswalkRequest(request, targetColumns)
+      : undefined;
+  return crosswalkRequest
+    ? { status: "ready", request: crosswalkRequest }
+    : { status: "too_large_for_model" };
 }
 
 /** Splits a fitted request's names back into the crosswalk's two sides. */

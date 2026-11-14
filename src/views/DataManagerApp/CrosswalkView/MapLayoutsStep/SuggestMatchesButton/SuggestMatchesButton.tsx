@@ -13,7 +13,8 @@ type Props = {
 
 /** Why Suggest matches is off, or what the last search found, or nothing. */
 function _getNote(meaningMatches: CrosswalkMeaningMatches): ReactNode {
-  const { availability, canSuggest, status, foundCount } = meaningMatches;
+  const { availability, canSuggest, status, foundCount, blockReason } =
+    meaningMatches;
   if (availability === "unavailable") {
     return (
       <Trans>
@@ -39,6 +40,17 @@ function _getNote(meaningMatches: CrosswalkMeaningMatches): ReactNode {
       })
     );
   }
+  if (status === "not_sent") {
+    return <Trans>Nothing was sent. No matches were suggested.</Trans>;
+  }
+  if (blockReason === "too_large_for_model") {
+    return (
+      <Trans>
+        There are too many columns to look for matches at once. Mapping still
+        works.
+      </Trans>
+    );
+  }
   if (!canSuggest && status !== "finding") {
     return <Trans>Nothing is left to match in this dataset.</Trans>;
   }
@@ -49,8 +61,9 @@ function _getNote(meaningMatches: CrosswalkMeaningMatches): ReactNode {
  * Step 2's Suggest matches: asks the suggestion model for the layout's
  * columns that mean the combined dataset's unfilled ones, under names the
  * scorer cannot match. Off, with the reason beside it, when no model can
- * answer, the user declined, or nothing is left to ask about. The search's
- * progress and failure are read out politely.
+ * answer, the user declined, nothing is left to ask about, or the layout has
+ * too many columns for the model. The search's progress and failure are
+ * read out politely.
  */
 export function SuggestMatchesButton({
   meaningMatches,
@@ -60,7 +73,11 @@ export function SuggestMatchesButton({
   const isFinding = meaningMatches.status === "finding";
   return (
     <Group gap="xs" wrap="nowrap" miw={0}>
-      <MeaningMatchStatusLine status={meaningMatches.status} />
+      <MeaningMatchStatusLine
+        status={
+          meaningMatches.status === "not_sent" ? "idle" : meaningMatches.status
+        }
+      />
       <div aria-live="polite">
         {note ? (
           <Text id={noteId} size="xs" c="dimmed">

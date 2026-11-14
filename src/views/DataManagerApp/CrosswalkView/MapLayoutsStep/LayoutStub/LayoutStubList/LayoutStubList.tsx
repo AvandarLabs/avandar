@@ -97,6 +97,35 @@ function _renderRow(
   );
 }
 
+/**
+ * The id the listbox points at: the active row's, unless a long list has
+ * scrolled it out of the rendered window. An id with no element behind it
+ * would point at nothing, so the listbox points at no row until the active
+ * row is rendered again.
+ */
+function _getActiveDescendantId(
+  options: Readonly<{
+    activeLayoutId: CrosswalkLayout.Id | undefined;
+    layouts: readonly CrosswalkDraft.Layout[];
+    virtualizer: LayoutVirtualizer | undefined;
+    getOptionId: (layoutId: CrosswalkLayout.Id) => string;
+  }>,
+): string | undefined {
+  const { activeLayoutId, virtualizer } = options;
+  if (!activeLayoutId) {
+    return undefined;
+  }
+  const activeIndex = options.layouts.findIndex((layout) => {
+    return layout.id === activeLayoutId;
+  });
+  const isRendered =
+    !virtualizer ||
+    virtualizer.getVirtualItems().some((item) => {
+      return item.index === activeIndex;
+    });
+  return isRendered ? options.getOptionId(activeLayoutId) : undefined;
+}
+
 /** The rows in view, each in a wrapper the virtualizer measures and places. */
 function _renderVirtualRows(
   options: RowOptions & { virtualizer: LayoutVirtualizer },
@@ -172,9 +201,12 @@ export function LayoutStubList(
       role="listbox"
       tabIndex={0}
       aria-label={t`Map each dataset`}
-      aria-activedescendant={
-        activeLayoutId ? getOptionId(activeLayoutId) : undefined
-      }
+      aria-activedescendant={_getActiveDescendantId({
+        activeLayoutId,
+        layouts,
+        virtualizer,
+        getOptionId,
+      })}
       className={css.layoutStubList}
       onKeyDown={keyboard.onKeyDown}
     >

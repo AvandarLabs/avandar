@@ -16,6 +16,7 @@ import {
   useCrosswalkSuggestionConsent,
 } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches";
 import type { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
+import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import type { ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
@@ -61,14 +62,17 @@ function _makeWrapper(): (props: { children: ReactNode }) => ReactNode {
   };
 }
 
-function _render(layoutId: CrosswalkLayout.Id = QUEENS_LAYOUT) {
+function _render(
+  layoutId: CrosswalkLayout.Id = QUEENS_LAYOUT,
+  draft: CrosswalkDraft.T = makeMeaningDraft(),
+) {
   const dispatch = vi.fn();
   const rendered = renderHook(
     (props: { layoutId: CrosswalkLayout.Id }) => {
       // Step 2 keeps the consent above the shown layout. Kept here too.
       const suggestionConsent = useCrosswalkSuggestionConsent();
       return useCrosswalkMeaningMatches({
-        draft: makeMeaningDraft(),
+        draft,
         layoutId: props.layoutId,
         context: MEANING_CONTEXT,
         targets: MEANING_TARGETS,
@@ -115,7 +119,7 @@ describe("useCrosswalkMeaningMatches", () => {
     expect(result.current.foundCount).toBe(1);
   });
 
-  it("dispatches nothing and says done when the user declined to send", async () => {
+  it("dispatches nothing when the request was not let go", async () => {
     mocks.requestReply.mockResolvedValue(undefined);
     const { result, dispatch } = _render();
 
@@ -124,10 +128,65 @@ describe("useCrosswalkMeaningMatches", () => {
     });
 
     await waitFor(() => {
-      expect(result.current.status).toBe("done");
+      expect(result.current.status).toBe("not_sent");
     });
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("counts no matches for a request that was not let go", async () => {
+    mocks.requestReply.mockResolvedValue(undefined);
+    const { result } = _render();
+
+    act(() => {
+      result.current.suggestMatches();
+    });
+
+    await waitFor(() => {
+      expect(result.current.status).toBe("not_sent");
+    });
+    expect(result.current.foundCount).toBeUndefined();
+  });
+
+  it("finishes as done, with none found, when the reply holds no pairs", async () => {
+    mocks.requestReply.mockResolvedValue('{"matches":[]}');
+    const { result } = _render();
+
+    act(() => {
+      result.current.suggestMatches();
+    });
+
+    await waitFor(() => {
+      expect(result.current.status).toBe("done");
+    });
     expect(result.current.foundCount).toBe(0);
+  });
+
+  it("dispatches a late reply with the layout that was asked about", async () => {
+    let resolveReply: (reply: string) => void = () => {};
+    mocks.requestReply.mockReturnValue(
+      new Promise<string>((resolve) => {
+        resolveReply = resolve;
+      }),
+    );
+    const { result, rerender, dispatch } = _render();
+    act(() => {
+      result.current.suggestMatches();
+    });
+
+    rerender({ layoutId: REFERENCE_LAYOUT });
+    await act(async () => {
+      resolveReply('{"matches":[{"name":"birth_date","sameAs":"dob"}]}');
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(dispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "meaning_matches_found",
+          layoutId: QUEENS_LAYOUT,
+        }),
+      );
+    });
   });
 
   it("reports a failed search without dispatching", async () => {
@@ -162,17 +221,62 @@ describe("useCrosswalkMeaningMatches", () => {
     expect(result.current.foundCount).toBeUndefined();
   });
 
-  it("cannot suggest with nothing to ask, or with no model", () => {
+  it("cannot suggest for the reference layout", () => {
     expect(_render(REFERENCE_LAYOUT).result.current.canSuggest).toBe(false);
+  });
+
+  it("cannot suggest for a mapped layout", () => {
+    const draft = makeMeaningDraft();
+    const mapped: CrosswalkDraft.T = {
+      ...draft,
+      layouts: draft.layouts.map((layout) => {
+        return layout.id === QUEENS_LAYOUT
+          ? { ...layout, status: "mapped" }
+          : layout;
+      }),
+    };
+
+    const { result } = _render(QUEENS_LAYOUT, mapped);
+
+    expect(result.current.canSuggest).toBe(false);
+    expect(result.current.blockReason).toBe("nothing_to_match");
+  });
+
+  it("cannot suggest for a skipped layout", () => {
+    const draft = makeMeaningDraft();
+    const skipped: CrosswalkDraft.T = {
+      ...draft,
+      layouts: draft.layouts.map((layout) => {
+        return layout.id === QUEENS_LAYOUT
+          ? { ...layout, status: "skipped" }
+          : layout;
+      }),
+    };
+
+    expect(_render(QUEENS_LAYOUT, skipped).result.current.canSuggest).toBe(
+      false,
+    );
+  });
+
+  it("cannot suggest with no model", () => {
     mocks.availability = "unavailable";
     mocks.model = "unavailable";
-    expect(_render().result.current.canSuggest).toBe(false);
-    mocks.availability = "declined";
-    mocks.model = "online";
+
     expect(_render().result.current.canSuggest).toBe(false);
   });
 
-  it("keeps the user's consent answer for the rest of the session", () => {
+  it("cannot suggest after the user declined to send", () => {
+    mocks.availability = "declined";
+
+    expect(_render().result.current.canSuggest).toBe(false);
+  });
+
+  it("can suggest for a layout being mapped, with a model ready", () => {
+    expect(_render().result.current.canSuggest).toBe(true);
+    expect(_render().result.current.blockReason).toBeUndefined();
+  });
+
+  it("passes the user's answer on to the suggestions hook", () => {
     const { rerender } = _render();
 
     act(() => {

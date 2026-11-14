@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor, within } from "@/test-utils";
+import { act, fireEvent, render, screen, waitFor, within } from "@/test-utils";
 import {
   BRONX_LAYOUT_ID,
   GENDER_FILL,
@@ -21,21 +21,32 @@ import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCros
 const mocks = vi.hoisted(() => {
   return {
     suggestMatchesMock: vi.fn(),
+    /** The consent the footer's suggestions hook was last given. */
+    lastConsent: undefined as
+      | undefined
+      | { consent: string; onConsentDecided: (isApproved: boolean) => void },
     valuesStatus: "ready" as "reading" | "ready" | "failed",
   };
 });
 
 vi.mock(
   "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches",
-  () => {
+  async (importOriginal) => {
+    // The consent hook stays real, so a test can see what it keeps.
+    const actual =
+      await importOriginal<
+        typeof import("@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/useCrosswalkMeaningMatches/useCrosswalkMeaningMatches")
+      >();
     return {
-      useCrosswalkSuggestionConsent: () => {
-        return { consent: "not_asked", onConsentDecided: vi.fn() };
-      },
-      useCrosswalkMeaningMatches: () => {
+      useCrosswalkSuggestionConsent: actual.useCrosswalkSuggestionConsent,
+      useCrosswalkMeaningMatches: (options: {
+        suggestionConsent: NonNullable<typeof mocks.lastConsent>;
+      }) => {
+        mocks.lastConsent = options.suggestionConsent;
         return {
           availability: "online",
           canSuggest: true,
+          blockReason: undefined,
           status: "idle",
           foundCount: undefined,
           suggestMatches: mocks.suggestMatchesMock,
@@ -145,6 +156,7 @@ describe("MapLayoutsStep", () => {
   beforeEach(() => {
     mocks.valuesStatus = "ready";
     mocks.suggestMatchesMock.mockReset();
+    mocks.lastConsent = undefined;
   });
 
   it("shows the first layout to map, named by its first dataset, with the column needing attention", () => {
@@ -347,5 +359,30 @@ describe("MapLayoutsStep", () => {
     expect(
       screen.queryByRole("button", { name: "Suggest matches" }),
     ).toBeNull();
+  });
+
+  it("keeps the answer to sending column names when another layout is shown", () => {
+    const flow = makeFlow();
+    const { rerender } = render(
+      <MapLayoutsStep
+        flow={flow}
+        catalog={makeCatalog()}
+        crosswalk={undefined}
+      />,
+    );
+    act(() => {
+      mocks.lastConsent?.onConsentDecided(true);
+    });
+    expect(mocks.lastConsent?.consent).toBe("approved");
+
+    rerender(
+      <MapLayoutsStep
+        flow={makeFlow(makeDraft(), { layoutId: BRONX_LAYOUT_ID })}
+        catalog={makeCatalog()}
+        crosswalk={undefined}
+      />,
+    );
+
+    expect(mocks.lastConsent?.consent).toBe("approved");
   });
 });

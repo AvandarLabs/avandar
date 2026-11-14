@@ -6,6 +6,7 @@ import type { CrosswalkMeaningMatches } from "@/views/DataManagerApp/CrosswalkVi
 const READY: CrosswalkMeaningMatches = {
   availability: "online",
   canSuggest: true,
+  blockReason: undefined,
   status: "idle",
   foundCount: undefined,
   suggestMatches: vi.fn(),
@@ -50,7 +51,7 @@ describe("SuggestMatchesButton", () => {
   });
 
   it("says when nothing is left to match", () => {
-    _render({ canSuggest: false });
+    _render({ canSuggest: false, blockReason: "nothing_to_match" });
 
     expect(_button()).toBeDisabled();
     expect(
@@ -58,11 +59,37 @@ describe("SuggestMatchesButton", () => {
     ).toBeInTheDocument();
   });
 
-  it("says how many matches it found, or that it found none", () => {
+  it("says how many matches it found", () => {
     _render({ status: "done", foundCount: 2 });
     expect(
       screen.getByText("Found 2 more matches. They're marked Suggested."),
     ).toBeInTheDocument();
+  });
+
+  it("says when nothing was sent, not that it found none", () => {
+    _render({ status: "not_sent", foundCount: undefined });
+
+    expect(
+      screen.getByText("Nothing was sent. No matches were suggested."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("No other matches found.")).toBeNull();
+  });
+
+  it("says when the layout has too many columns for the model", () => {
+    _render({
+      canSuggest: false,
+      blockReason: "too_large_for_model",
+    });
+
+    expect(_button()).toBeDisabled();
+    expect(
+      screen.getByText(
+        "There are too many columns to look for matches at once. Mapping still works.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Nothing is left to match in this dataset."),
+    ).toBeNull();
   });
 
   it("says it found none", () => {
@@ -70,7 +97,7 @@ describe("SuggestMatchesButton", () => {
     expect(screen.getByText("No other matches found.")).toBeInTheDocument();
   });
 
-  it("says while it is looking, and when it could not finish", () => {
+  it("says while it is looking", () => {
     _render({ status: "finding" });
     expect(
       screen.getByText("Looking for columns that mean the same thing"),

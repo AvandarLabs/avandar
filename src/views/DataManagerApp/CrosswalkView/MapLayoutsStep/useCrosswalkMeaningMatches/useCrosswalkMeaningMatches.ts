@@ -13,6 +13,7 @@ import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/Colu
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import type {
   CrosswalkMatchesRequest,
+  CrosswalkMatchesResult,
   CrosswalkMeaningMatch,
 } from "@/lib/crosswalks/makeCrosswalkMatchesRequest/makeCrosswalkMatchesRequest";
 import type { DictionarySuggestionModel } from "@/lib/dataDictionaries/DictionarySuggestions/DictionarySuggestions";
@@ -27,13 +28,26 @@ import type {
 } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useDictionarySuggestions/useDictionarySuggestions";
 import type { MeaningMatchStatus } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/useMeaningMatches";
 
+/**
+ * Where the search for the selected layout stands. `not_sent` is a search
+ * that finished without asking: the user did not let the request go.
+ */
+export type CrosswalkMeaningStatus = MeaningMatchStatus | "not_sent";
+
+/** Why a layout has nothing to ask the suggestion model. */
+export type CrosswalkMeaningBlockReason =
+  | "nothing_to_match"
+  | "too_large_for_model";
+
 /** What step 2's Suggest matches shows and does for the selected layout. */
 export type CrosswalkMeaningMatches = {
   availability: DictionarySuggestionAvailability;
   /** True when a model can answer and the layout has something to ask about. */
   canSuggest: boolean;
+  /** Why there is nothing to ask, when a model could answer. */
+  blockReason: CrosswalkMeaningBlockReason | undefined;
   /** The search for this layout; another layout's search reads as idle. */
-  status: MeaningMatchStatus;
+  status: CrosswalkMeaningStatus;
   /** How many pairs the last search for this layout found, once it is done. */
   foundCount: number | undefined;
   suggestMatches: () => void;
@@ -55,6 +69,12 @@ type MeaningMatchesOptions = Readonly<{
   suggestionConsent: CrosswalkSuggestionConsent;
   dispatch: (action: CrosswalkAction) => void;
 }>;
+
+/** What a search came to: whether it asked, and the pairs it found. */
+type MatchesFound = {
+  wasSent: boolean;
+  matches: CrosswalkMeaningMatch[];
+};
 
 type MatchesVariables = {
   request: CrosswalkMatchesRequest;
@@ -81,38 +101,60 @@ export function useCrosswalkSuggestionConsent(): CrosswalkSuggestionConsent {
 async function _requestMatches(
   request: CrosswalkMatchesRequest,
   requestReply: RequestSuggestionReply,
-): Promise<CrosswalkMeaningMatch[]> {
+): Promise<MatchesFound> {
   const reply = await requestReply(request.request);
   if (reply === undefined) {
-    return [];
+    return { wasSent: false, matches: [] };
   }
   const names = request.request.columns.map((column) => {
     return column.name;
   });
   const matches = parseDictionaryMeaningMatches(reply, names) ?? [];
-  return toCrosswalkMeaningMatches({ request, matches });
+  return {
+    wasSent: true,
+    matches: toCrosswalkMeaningMatches({ request, matches }),
+  };
 }
 
 function _toStatus(result: {
   isPending: boolean;
   isError: boolean;
   isSuccess: boolean;
-}): MeaningMatchStatus {
+  data: MatchesFound | undefined;
+}): CrosswalkMeaningStatus {
   if (result.isPending) {
     return "finding";
   }
   if (result.isError) {
     return "failed";
   }
-  return result.isSuccess ? "done" : "idle";
+  if (!result.isSuccess) {
+    return "idle";
+  }
+  return result.data?.wasSent === false ? "not_sent" : "done";
 }
 
-/** The layout's request, cut to fit the model that will answer, if any. */
+/**
+ * The layout's request, cut to fit the model that will answer. Only a
+ * layout still being mapped is asked about: a mapped or skipped layout has
+ * been settled, and the reference has nothing to map.
+ */
 function _makeRequest(
   options: MeaningMatchesOptions,
   locale: string,
   model: DictionarySuggestionModel,
-): CrosswalkMatchesRequest | undefined {
+): CrosswalkMatchesResult {
+  const layout = options.draft.layouts.find((candidate) => {
+    return candidate.id === options.layoutId;
+  });
+  if (
+    !layout ||
+    layout.isReference ||
+    layout.status === "mapped" ||
+    layout.status === "skipped"
+  ) {
+    return { status: "nothing_to_match" };
+  }
   return makeCrosswalkMatchesRequest({
     draft: options.draft,
     layoutId: options.layoutId,
@@ -136,12 +178,12 @@ function useFindMatches(
     mutationFn: (variables: MatchesVariables) => {
       return _requestMatches(variables.request, options.requestReply);
     },
-    onSuccess: (matches, variables) => {
-      if (matches.length > 0) {
+    onSuccess: (found, variables) => {
+      if (found.matches.length > 0) {
         options.dispatch({
           type: "meaning_matches_found",
           layoutId: variables.layoutId,
-          matches,
+          matches: found.matches,
           sources: variables.sources,
           context: options.context,
         });
@@ -158,16 +200,18 @@ function useFindMatches(
  * combined dataset's unfilled columns, and dispatches the pairs as
  * `meaning_matches_found` for the layout that was asked about. Online
  * sends go through the chat's consent gate, with the answer the step keeps;
- * on device nothing is asked; with no model nothing is sent. A failure is
- * shown by the footer's note, not a toast: the matches by name and values
- * are still there.
+ * on device nothing is asked; with no model nothing is sent. A request the
+ * user did not let go finishes as `not_sent`. A failure is shown by the
+ * footer's note, not a toast: the matches by name and values are still
+ * there.
  */
 export function useCrosswalkMeaningMatches(
   options: MeaningMatchesOptions,
 ): CrosswalkMeaningMatches {
   const { i18n } = useLingui();
   const suggestions = useDictionarySuggestions(options.suggestionConsent);
-  const request = _makeRequest(options, i18n.locale, suggestions.model);
+  const check = _makeRequest(options, i18n.locale, suggestions.model);
+  const request = check.status === "ready" ? check.request : undefined;
   const [findMatches, , result] = useFindMatches({
     requestReply: suggestions.requestReply,
     context: options.context,
@@ -180,9 +224,12 @@ export function useCrosswalkMeaningMatches(
   return {
     availability: suggestions.availability,
     canSuggest: isModelReady && request !== undefined,
+    blockReason: check.status === "ready" ? undefined : check.status,
     status: isThisLayout ? _toStatus(result) : "idle",
     foundCount:
-      isThisLayout && result.isSuccess ? result.data.length : undefined,
+      isThisLayout && result.isSuccess && result.data.wasSent
+        ? result.data.matches.length
+        : undefined,
     suggestMatches: () => {
       if (request && isModelReady && !result.isPending) {
         findMatches({
