@@ -33,8 +33,9 @@ function _getNormalizedNames(columnNames: readonly string[]): string[] {
 
 /**
  * The key two datasets share when they have the same columns: the names
- * trimmed, lowercased, each once, sorted, and joined. Column order and case
- * never change it, so `CaseNo` and `caseno ` share one.
+ * lowercased, each once, sorted, and joined. Column order and case never
+ * change it, so `CaseNo` and `caseno` share one. Edge spaces are part of a
+ * name, since DuckDB keeps them, so `CaseNo ` does not.
  */
 function buildLayoutKey(columnNames: readonly string[]): string {
   return _getNormalizedNames(columnNames)

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@/test-utils";
+import { cleanup, fireEvent, render, screen } from "@/test-utils";
 import { ExportMappingButton } from "@/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/ExportMappingButton";
 import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
@@ -215,6 +215,41 @@ describe("ExportMappingButton", () => {
     fireEvent.click(screen.getByRole("button", { name: "Export mapping" }));
 
     expect(_exportedText()).toContain(`,"'=SUM(A1:A9)",case_id,`);
+  });
+
+  it("keeps a value a spreadsheet would run after leading spaces, or that starts with a line break, as text", () => {
+    render(
+      <ExportMappingButton
+        draft={_makeDraft()}
+        context={_makeContext("  =SUM(A1:A9)")}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Export mapping" }));
+    expect(_exportedText()).toContain(`,"'  =SUM(A1:A9)",case_id,`);
+
+    mocks.downloadTextFile.mockClear();
+    cleanup();
+    render(
+      <ExportMappingButton
+        draft={_makeDraft()}
+        context={_makeContext("\n=1+1")}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Export mapping" }));
+    expect(_exportedText()).toContain(`,"'\n=1+1",case_id,`);
+  });
+
+  it("does not touch a value that only contains a formula character", () => {
+    render(
+      <ExportMappingButton
+        draft={_makeDraft()}
+        context={_makeContext("Kings - March")}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Export mapping" }));
+
+    expect(_exportedText()).toContain(",Kings - March,case_id,");
   });
 
   it("keeps a multi-line value that starts like a formula as text", () => {

@@ -105,6 +105,35 @@ describe("CrosswalkMapping.fillFromDBJson", () => {
     }).toThrow("either converts or translates");
   });
 
+  it.each([0, 65, 1.5])("refuses a pad length of %s", (length) => {
+    expect(() => {
+      return CrosswalkMapping.fillFromDBJson({
+        version: 1,
+        kind: "column",
+        source_column: "zip",
+        convert: { kind: "pad_text", length },
+        code_list_id: null,
+        holds_labels: false,
+      });
+    }).toThrow();
+  });
+
+  it.each([1, CrosswalkMapping.MAX_PAD_TEXT_LENGTH])(
+    "accepts a pad length of %s",
+    (length) => {
+      expect(
+        CrosswalkMapping.fillFromDBJson({
+          version: 1,
+          kind: "column",
+          source_column: "zip",
+          convert: { kind: "pad_text", length },
+          code_list_id: null,
+          holds_labels: false,
+        }),
+      ).toMatchObject({ convert: { kind: "pad_text", length } });
+    },
+  );
+
   it("refuses a version it does not know", () => {
     expect(() => {
       return CrosswalkMapping.fillFromDBJson({ version: 2, kind: "empty" });

@@ -8,6 +8,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useId, useState } from "react";
+import { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import { toDateFormatLabel } from "@/lib/crosswalks/toDateFormatLabel/toDateFormatLabel";
 import { ColumnProfileSql } from "@/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql";
 import {
@@ -16,7 +17,6 @@ import {
   makeConvertForKind,
   MULTIPLY_PRESETS,
 } from "@/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/convertDefaults/convertDefaults";
-import type { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type {
   ConvertKind,
@@ -229,7 +229,8 @@ function PadLengthInput(
       label={t`Length`}
       description={t`Values made only of digits get leading zeros up to this length. Longer values stay as they are.`}
       min={1}
-      max={64}
+      max={CrosswalkMapping.MAX_PAD_TEXT_LENGTH}
+      clampBehavior="strict"
       allowDecimal={false}
       allowNegative={false}
       value={props.length}
@@ -237,7 +238,8 @@ function PadLengthInput(
         if (
           typeof value === "number" &&
           Number.isInteger(value) &&
-          value >= 1
+          value >= 1 &&
+          value <= CrosswalkMapping.MAX_PAD_TEXT_LENGTH
         ) {
           props.onChange({ kind: "pad_text", length: value });
         }

@@ -297,8 +297,7 @@ async function _expectCombinedDatasetPage(page: Page): Promise<void> {
 async function _waitForCombinedCrosswalk(
   options: Readonly<{
     admin: AvaSupabaseDBClient;
-    workspaceId: string;
-    startedAt: string;
+    crosswalkIds: ReadonlySet<string>;
   }>,
 ): Promise<CombinedCrosswalk> {
   let combined: CombinedCrosswalk | undefined;
@@ -308,8 +307,7 @@ async function _waitForCombinedCrosswalk(
         const { data } = await options.admin
           .from("crosswalks")
           .select("output_dataset_id, compiled_code_lists")
-          .eq("workspace_id", options.workspaceId)
-          .gte("created_at", options.startedAt)
+          .in("id", [...options.crosswalkIds])
           .not("output_dataset_id", "is", null)
           .throwOnError();
         const row = data[0];
@@ -373,26 +371,43 @@ async function _readDatasetName(
 type CrosswalkSourcesFixture = {
   admin: AvaSupabaseDBClient;
   workspaceId: string;
-  /** When the test began, to find the crosswalk it creates. */
-  startedAt: string;
+  /**
+   * The id of every crosswalk the page opened, read from its URL. Cleanup
+   * deletes only these, never another crosswalk in the workspace.
+   */
+  crosswalkIds: ReadonlySet<string>;
   /** Signs in and imports the three line lists. */
   signInAndImport: () => Promise<SourceDatasets>;
 };
+
+/** Records the id of every crosswalk the page opens, from its URL. */
+function _trackCrosswalkIds(page: Page): Set<string> {
+  const crosswalkIds = new Set<string>();
+  page.on("framenavigated", (frame) => {
+    const match = /\/crosswalks\/([0-9a-f-]{36})(?:[/?#]|$)/.exec(frame.url());
+    if (match?.[1]) {
+      crosswalkIds.add(match[1]);
+    }
+  });
+  return crosswalkIds;
+}
 
 /** Deletes the crosswalks this test made, then their combined datasets. */
 async function _deleteCrosswalks(
   options: Readonly<{
     admin: AvaSupabaseDBClient;
     workspaceId: string;
-    startedAt: string;
+    crosswalkIds: ReadonlySet<string>;
   }>,
 ): Promise<void> {
   const { admin, workspaceId } = options;
+  if (options.crosswalkIds.size === 0) {
+    return;
+  }
   const { data: crosswalks } = await admin
     .from("crosswalks")
     .select("id, output_dataset_id")
-    .eq("workspace_id", workspaceId)
-    .gte("created_at", options.startedAt)
+    .in("id", [...options.crosswalkIds])
     .throwOnError();
   if (crosswalks.length === 0) {
     return;
@@ -420,9 +435,9 @@ async function _deleteCrosswalks(
 
 /**
  * Seeds the dictionary before the first page load. Afterwards it deletes
- * the crosswalks the test made (their layouts, columns, memberships, and
- * mappings cascade) and their combined datasets, the imports, then the
- * dictionary, whose children cascade.
+ * the crosswalks whose URLs the page opened (their layouts, columns,
+ * memberships, and mappings cascade) and their combined datasets, the
+ * imports, then the dictionary, whose children cascade.
  */
 const test = base.extend<{ crosswalkSources: CrosswalkSourcesFixture }>({
   crosswalkSources: async ({ page, e2eWorkerDb }, use) => {
@@ -431,7 +446,7 @@ const test = base.extend<{ crosswalkSources: CrosswalkSourcesFixture }>({
       supabaseAdminClient: admin,
       slug: e2eWorkerDb.workspaceSlug,
     });
-    const startedAt = new Date().toISOString();
+    const crosswalkIds = _trackCrosswalkIds(page);
     const dictionaryId = await seedDataDictionary({
       admin,
       workspaceId,
@@ -473,9 +488,9 @@ const test = base.extend<{ crosswalkSources: CrosswalkSourcesFixture }>({
       };
     };
     try {
-      await use({ admin, workspaceId, startedAt, signInAndImport });
+      await use({ admin, workspaceId, crosswalkIds, signInAndImport });
     } finally {
-      await _deleteCrosswalks({ admin, workspaceId, startedAt });
+      await _deleteCrosswalks({ admin, workspaceId, crosswalkIds });
       for (const datasetId of importedIds) {
         await deleteDatasetFixture({ admin, datasetId, workspaceId });
       }

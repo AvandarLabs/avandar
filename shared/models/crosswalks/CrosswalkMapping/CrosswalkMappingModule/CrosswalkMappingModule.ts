@@ -9,6 +9,9 @@ import type { Json } from "$/types/database.types.ts";
 /** The fill format this code reads and writes. */
 const FILL_VERSION = 1;
 
+/** The longest length a pad conversion can ask for. */
+const MAX_PAD_TEXT_LENGTH = 64;
+
 /** A `{column name}` placeholder in a Combine expression. */
 const COMBINE_PLACEHOLDER_PATTERN = /\{([^{}]+)\}/g;
 
@@ -18,7 +21,10 @@ function _isNotBlank(text: string): boolean {
 
 const StoredConvertSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("parse_date"), format: z.string().min(1) }),
-  z.object({ kind: z.literal("pad_text"), length: z.number().int().min(1) }),
+  z.object({
+    kind: z.literal("pad_text"),
+    length: z.number().int().min(1).max(MAX_PAD_TEXT_LENGTH),
+  }),
   z.object({ kind: z.literal("multiply"), factor: z.number() }),
   z.object({
     kind: z.literal("trim_and_fix_case"),
@@ -154,6 +160,7 @@ function getCombineColumnNames(sql: string): string[] {
  */
 export const CrosswalkMappingModule = {
   COMBINE_PLACEHOLDER_PATTERN,
+  MAX_PAD_TEXT_LENGTH,
   fillFromDBJson,
   fillToDBJson,
   getCombineColumnNames,

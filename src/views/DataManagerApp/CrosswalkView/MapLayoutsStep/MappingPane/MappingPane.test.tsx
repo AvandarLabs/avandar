@@ -388,6 +388,20 @@ describe("MappingPane", () => {
     });
   });
 
+  it("does not pad to a length the combined dataset cannot hold", () => {
+    const fill = {
+      ...columnFill("CaseNo"),
+      convert: { kind: "pad_text" as const, length: 5 },
+    };
+    const dispatch = _render({ fill });
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Length" }), {
+      target: { value: "65" },
+    });
+
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
   it("multiplies by a number of its own", () => {
     const fill = {
       ...columnFill("age_mo"),

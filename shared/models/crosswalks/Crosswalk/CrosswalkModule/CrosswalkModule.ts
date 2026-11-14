@@ -3,44 +3,48 @@ import type {
   CrosswalkSaveErrorHint,
 } from "$/models/crosswalks/Crosswalk/Crosswalk.types.ts";
 
-const SAVE_ERROR_HINTS: readonly CrosswalkSaveErrorHint[] = [
-  "crosswalk_editor_required",
-  "crosswalk_payload_invalid",
-  "crosswalk_name_required",
-  "column_name_required",
-  "column_names_not_unique",
-  "reference_layout_required",
-  "layout_signatures_not_unique",
-  "item_not_in_crosswalk",
-  "dataset_not_readable",
-  "entry_not_in_workspace",
-  "mappings_not_unique",
-  "fill_invalid",
-  "output_dataset_in_crosswalk",
-];
+const SAVE_ERROR_HINTS = {
+  crosswalk_editor_required: true,
+  crosswalk_payload_invalid: true,
+  crosswalk_name_required: true,
+  column_name_required: true,
+  column_names_not_unique: true,
+  reference_layout_required: true,
+  layout_signatures_not_unique: true,
+  item_not_in_crosswalk: true,
+  dataset_not_readable: true,
+  entry_not_in_workspace: true,
+  mappings_not_unique: true,
+  fill_invalid: true,
+  output_dataset_in_crosswalk: true,
+} satisfies Record<CrosswalkSaveErrorHint, true>;
 
-const COMBINE_ERROR_HINTS: readonly CrosswalkCombineErrorHint[] = [
-  "crosswalk_editor_required",
-  "combined_dataset_name_required",
-  "combined_columns_invalid",
-  "binding_column_missing",
-  "binding_not_in_workspace",
-  "dataset_creator_required",
-  "combined_dataset_mismatch",
-  "dataset_editor_required",
-  "crosswalk_has_unreadable_datasets",
-];
+const COMBINE_ERROR_HINTS = {
+  crosswalk_editor_required: true,
+  combined_dataset_name_required: true,
+  combined_columns_invalid: true,
+  binding_column_missing: true,
+  binding_not_in_workspace: true,
+  dataset_creator_required: true,
+  combined_dataset_mismatch: true,
+  dataset_editor_required: true,
+  crosswalk_has_unreadable_datasets: true,
+} satisfies Record<CrosswalkCombineErrorHint, true>;
 
-/** The `hint` on a thrown database error, when it is one of `knownHints`. */
+/**
+ * The `hint` on a thrown database error, when it is one of `knownHints`'
+ * keys. Each hint list is checked against its union, so a hint added to the
+ * union without a key here does not compile.
+ */
 function _findKnownHint<Hint extends string>(
   error: unknown,
-  knownHints: readonly Hint[],
+  knownHints: Readonly<Record<Hint, true>>,
 ): Hint | undefined {
   if (typeof error !== "object" || error === null || !("hint" in error)) {
     return undefined;
   }
   const { hint } = error;
-  return knownHints.find((knownHint) => {
+  return (Object.keys(knownHints) as Hint[]).find((knownHint) => {
     return knownHint === hint;
   });
 }

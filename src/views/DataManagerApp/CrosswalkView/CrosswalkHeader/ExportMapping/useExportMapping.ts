@@ -13,12 +13,13 @@ import type { CrosswalkContext } from "@/views/DataManagerApp/CrosswalkView/cros
 const UTF8_BOM = "\uFEFF";
 
 /**
- * Values a spreadsheet would run as a formula: those starting with `=`, `+`,
- * `-`, `@`, a tab, or a carriage return. Papaparse's own `true` setting
- * also requires the rest of the line to match, so it skips a value with a
- * line break after the leading character.
+ * Values a spreadsheet would run as a formula: those whose first
+ * non-space character is `=`, `+`, `-`, or `@`, and those starting with a
+ * tab, carriage return, or line feed. Papaparse's own `true` setting
+ * skips a value with leading spaces, and one with a line break after the
+ * leading character.
  */
-const FORMULA_START = /^[=+\-@\t\r]/;
+const FORMULA_START = /^\s*[=+\-@]|^[\t\r\n]/;
 
 /** Runs of characters a file name cannot hold on common systems. */
 const UNSAFE_FILE_NAME_CHARACTERS = /[\\/:*?"<>|\p{Cc}]+/gu;
