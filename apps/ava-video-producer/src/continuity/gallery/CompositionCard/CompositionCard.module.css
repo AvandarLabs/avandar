@@ -17,3 +17,15 @@
   letter-spacing: 1px;
   position: absolute;
 }
+
+.fallback {
+  background: var(--ava-neutral-9);
+  border-radius: 4px;
+  bottom: 8px;
+  color: var(--ava-neutral-4);
+  font: 9px var(--mono);
+  left: 8px;
+  letter-spacing: 1px;
+  padding: 3px 6px;
+  position: absolute;
+}

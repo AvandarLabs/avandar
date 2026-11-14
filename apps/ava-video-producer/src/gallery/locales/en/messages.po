@@ -2707,6 +2707,10 @@ msgstr "North"
 msgid "Motions"
 msgstr "Motions"
 
+#: src/continuity/gallery/CompositionCard/CompositionCard.tsx
+msgid "Preview in classic theme"
+msgstr "Preview in classic theme"
+
 #: src/gallery/HelperGallery/demos/TextDemos.tsx
 msgid "Shared helpers"
 msgstr "Shared helpers"
