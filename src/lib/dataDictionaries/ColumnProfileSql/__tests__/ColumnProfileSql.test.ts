@@ -126,15 +126,7 @@ describe("ColumnProfileSql", () => {
     });
   });
 
-  it("shares its date formats and its sample", () => {
-    expect(ColumnProfileSql.DATE_FORMATS).toEqual([
-      "%Y-%m-%d",
-      "%m/%d/%Y",
-      "%d/%m/%Y",
-      "%Y/%m/%d",
-      "%m-%d-%Y",
-      "%d-%m-%Y",
-    ]);
+  it("builds the date sample and tries every shared format in the summary", () => {
     expect(ColumnProfileSql.buildDateSampleSql('"t"')).toBe(
       'SELECT * FROM "t" USING SAMPLE reservoir(10000 ROWS) REPEATABLE (42)',
     );

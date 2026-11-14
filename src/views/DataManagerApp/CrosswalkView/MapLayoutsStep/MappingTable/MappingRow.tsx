@@ -35,7 +35,7 @@ function CombinedColumnCell(
           fz="sm"
           aria-current={props.isSelected || undefined}
           onClick={(event) => {
-            // The row selects on click too; one click is one selection.
+            // The row selects on click too. One click is one selection.
             event.stopPropagation();
             props.onSelect();
           }}
@@ -58,7 +58,7 @@ function CombinedColumnCell(
 /**
  * One row of the mapping table: the combined dataset's column, the line to
  * its fill, what fills it for this layout, and why. Clicking anywhere on
- * the row selects it; the column's name is the keyboard control.
+ * the row selects it. The column's name is the keyboard control.
  */
 export function MappingRow(props: Readonly<Props>): ReactNode {
   const { mapping } = props;

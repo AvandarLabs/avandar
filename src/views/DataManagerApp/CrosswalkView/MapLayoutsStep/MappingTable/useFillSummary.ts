@@ -1,4 +1,3 @@
-import { matchLiteral } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { toDateFormatLabel } from "@/lib/crosswalks/toDateFormatLabel/toDateFormatLabel";
 import type { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
@@ -13,48 +12,46 @@ export type FillSummary = {
   isEmpty: boolean;
 };
 
+/** The phrase for a trim conversion, by the letter case it asks for. */
+function useTrimDescriber(): (
+  letterCase: "keep" | "lower" | "upper",
+) => string {
+  const { t } = useLingui();
+  return (letterCase) => {
+    switch (letterCase) {
+      case "keep":
+        return t`Spaces trimmed`;
+      case "lower":
+        return t`Spaces trimmed, lowercase`;
+      case "upper":
+        return t`Spaces trimmed, UPPERCASE`;
+    }
+  };
+}
+
 /** Translates a conversion into a short phrase. */
 function useConvertDescriber(): (convert: CrosswalkMapping.Convert) => string {
   const { t, i18n } = useLingui();
+  const describeTrim = useTrimDescriber();
   return (convert) => {
-    return matchLiteral(convert.kind, {
-      parse_date: () => {
-        const format = toDateFormatLabel(
-          convert.kind === "parse_date" ? convert.format : "",
-        );
+    switch (convert.kind) {
+      case "parse_date": {
+        const format = toDateFormatLabel(convert.format);
         return t`Read as a date (${format})`;
-      },
-      pad_text: () => {
-        const length = i18n.number(
-          convert.kind === "pad_text" ? convert.length : 0,
-        );
+      }
+      case "pad_text": {
+        const length = i18n.number(convert.length);
         return t`Padded with zeros to ${length}`;
-      },
-      multiply: () => {
-        const factor = i18n.number(
-          convert.kind === "multiply" ? convert.factor : 1,
-          {
-            maximumFractionDigits: 6,
-          },
-        );
-        return t`Multiplied by ${factor}`;
-      },
-      trim_and_fix_case: () => {
-        const letterCase =
-          convert.kind === "trim_and_fix_case" ? convert.letterCase : "keep";
-        return matchLiteral(letterCase, {
-          keep: () => {
-            return t`Spaces trimmed`;
-          },
-          lower: () => {
-            return t`Spaces trimmed, lowercase`;
-          },
-          upper: () => {
-            return t`Spaces trimmed, UPPERCASE`;
-          },
+      }
+      case "multiply": {
+        const factor = i18n.number(convert.factor, {
+          maximumFractionDigits: 6,
         });
-      },
-    });
+        return t`Multiplied by ${factor}`;
+      }
+      case "trim_and_fix_case":
+        return describeTrim(convert.letterCase);
+    }
   };
 }
 
@@ -62,7 +59,7 @@ function useConvertDescriber(): (convert: CrosswalkMapping.Convert) => string {
  * A function describing a fill for the Filled from cell: the source
  * column and its conversion or code list, a fixed value, a Combine
  * expression, or Leave empty. Code lists are named from
- * `codeListNamesById`; a list no longer there is said to be deleted.
+ * `codeListNamesById`. A list no longer there is said to be deleted.
  */
 export function useFillSummary(
   codeListNamesById: ReadonlyMap<string, string>,

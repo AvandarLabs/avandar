@@ -82,6 +82,38 @@ function LayoutsSection(
 }
 
 /**
+ * The Add datasets modal wired to the flow: adding dispatches
+ * `datasets_added` for the newly picked datasets and closes the modal.
+ */
+function AddDatasetsDialog(
+  props: Readonly<
+    Pick<CrosswalkStepProps, "flow" | "catalog"> & {
+      isOpen: boolean;
+      onClose: () => void;
+    }
+  >,
+): ReactNode {
+  const { flow, catalog } = props;
+  return (
+    <AddDatasetsModal
+      isOpen={props.isOpen}
+      draft={flow.state.draft}
+      context={catalog.context}
+      isCatalogLoading={catalog.isLoading}
+      onAdd={(datasetIds) => {
+        flow.dispatch({
+          type: "datasets_added",
+          datasetIds,
+          context: catalog.context,
+        });
+        props.onClose();
+      }}
+      onClose={props.onClose}
+    />
+  );
+}
+
+/**
  * Step 1, Choose datasets: add datasets, see them grouped into layouts,
  * remove one, pick the reference layout, and Next. Next seeds the combined
  * dataset's columns from the reference the first time, saves through the
@@ -93,7 +125,6 @@ export function ChooseDatasetsStep({
   catalog,
 }: Readonly<CrosswalkStepProps>): ReactNode {
   const { draft } = flow.state;
-  const { context } = catalog;
   const [isAdding, setIsAdding] = useState(false);
   const seed = useSeedColumns({ flow, catalog });
   const hasDatasets = draft.layouts.some((layout) => {
@@ -108,7 +139,7 @@ export function ChooseDatasetsStep({
         {hasDatasets ? (
           <LayoutsSection
             draft={draft}
-            context={context}
+            context={catalog.context}
             dispatch={flow.dispatch}
             onAdd={openAdd}
           />
@@ -116,15 +147,10 @@ export function ChooseDatasetsStep({
           <NoDatasetsYet onAdd={openAdd} />
         )}
       </AppViewBody>
-      <AddDatasetsModal
+      <AddDatasetsDialog
+        flow={flow}
+        catalog={catalog}
         isOpen={isAdding}
-        draft={draft}
-        context={context}
-        isCatalogLoading={catalog.isLoading}
-        onAdd={(datasetIds) => {
-          flow.dispatch({ type: "datasets_added", datasetIds, context });
-          setIsAdding(false);
-        }}
         onClose={() => {
           setIsAdding(false);
         }}

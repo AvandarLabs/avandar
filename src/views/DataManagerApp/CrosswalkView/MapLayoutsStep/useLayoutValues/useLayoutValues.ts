@@ -73,7 +73,7 @@ export function buildLayoutTargets(
   options: Readonly<{
     columns: readonly CrosswalkDraft.Column[];
     referenceProfiles: readonly ColumnProfile.T[];
-    /** Names a name-and-type profile's dataset; the scorer ignores it. */
+    /** Names a name-and-type profile's dataset. The scorer ignores it. */
     dataset: Readonly<{ id: Dataset.Id; name: string }>;
   }>,
 ): CrosswalkMatch.Target[] {
@@ -83,8 +83,9 @@ export function buildLayoutTargets(
     }),
   );
   return options.columns.flatMap((column) => {
-    const [profile] = profileByName.has(_toNameKey(column.name))
-      ? [profileByName.get(_toNameKey(column.name))]
+    const referenceProfile = profileByName.get(_toNameKey(column.name));
+    const [profile] = referenceProfile
+      ? [referenceProfile]
       : CrosswalkMatch.toNameAndTypeProfiles({
           datasetId: options.dataset.id,
           datasetName: options.dataset.name,
@@ -117,10 +118,17 @@ function _planRead(
   };
 }
 
-/** The tag of a read: the layout, its spelling, and both datasets' columns. */
-function _buildReadKey(plan: ReadPlan | undefined): string | undefined {
+/**
+ * The tag of a read: the workspace, the layout, its spelling, and both
+ * datasets' columns.
+ */
+function _buildReadKey(
+  workspaceId: Workspace.Id,
+  plan: ReadPlan | undefined,
+): string | undefined {
   return plan
     ? JSON.stringify([
+        workspaceId,
         plan.layoutId,
         plan.columnNames,
         plan.source.id,
@@ -162,7 +170,7 @@ function _makeRespeller(
 /**
  * Profiles the layout's first dataset and, unless it is the same one, the
  * reference dataset, then finds the date format of each source column
- * that reads as dates. Both run with the dataset's own column names; the
+ * that reads as dates. Both run with the dataset's own column names. The
  * source profiles and the formats are then keyed by the layout's spelling.
  */
 async function _readLayoutValues(
@@ -239,16 +247,23 @@ type DispatchOptions = Readonly<{
 
 /**
  * Dispatches `values_read` for the layout when its read is ready and the
- * reducer has not recorded it in `readLayoutIds`. The ref holds layouts
- * dispatched but not yet recorded, so a render before the state catches up
- * never dispatches twice; once recorded they leave the ref, so a layout the
- * reducer later forgets is dispatched again from the same read.
+ * reducer has not recorded it in `readLayoutIds`.
  */
 function useDispatchValuesRead(options: DispatchOptions): void {
   const pendingLayoutIdsRef = useRef<Set<string>>(new Set());
   const { read, plan, targets, hasColumns, readLayoutIds, context, dispatch } =
     options;
+  // A new read has not been dispatched yet, whatever the last one was. This
+  // also covers a dispatch the reducer recorded and forgot in one batch,
+  // which `readLayoutIds` never shows.
   useEffect(() => {
+    pendingLayoutIdsRef.current.clear();
+  }, [read]);
+  useEffect(() => {
+    // The ref holds layouts dispatched but not yet recorded, so a render
+    // before the state catches up never dispatches twice. Once recorded
+    // they leave the ref, so a layout the reducer later forgets is
+    // dispatched again from the same read.
     readLayoutIds.forEach((layoutId) => {
       pendingLayoutIdsRef.current.delete(layoutId);
     });
@@ -274,14 +289,63 @@ function useDispatchValuesRead(options: DispatchOptions): void {
 }
 
 /**
+ * Whether the selected layout's datasets are named by the draft but not in
+ * the catalog yet, so there is nothing to read until the catalog loads.
+ */
+function _isWaitingForCatalog(
+  draft: CrosswalkDraft.T,
+  layoutId: CrosswalkLayout.Id | undefined,
+  datasetsById: ReadonlyMap<string, CrosswalkLayout.Dataset>,
+): boolean {
+  const layout = draft.layouts.find((candidate) => {
+    return candidate.id === layoutId;
+  });
+  const referenceId = CrosswalkDraft.getReferenceLayout(draft)?.datasetIds[0];
+  return [layout?.datasetIds[0], layout ? referenceId : undefined].some(
+    (datasetId) => {
+      return datasetId !== undefined && !datasetsById.has(datasetId);
+    },
+  );
+}
+
+/**
+ * The tagged read of the selected layout's datasets, and the plan it
+ * reads. A reply for a layout no longer selected is dropped.
+ */
+function useLayoutRead(
+  options: Readonly<{
+    draft: CrosswalkDraft.T;
+    layoutId: CrosswalkLayout.Id | undefined;
+    context: CrosswalkContext;
+  }>,
+): { plan: ReadPlan | undefined; read: TaggedRead<LayoutValuesRead> } {
+  const workspace = useCurrentWorkspace();
+  const { draft, layoutId, context } = options;
+  const plan = useMemo(() => {
+    return _planRead(draft, layoutId, context.datasetsById);
+  }, [draft, layoutId, context.datasetsById]);
+  const read = useTaggedRead({
+    key: _buildReadKey(workspace.id, plan),
+    devMsg: "Reading a crosswalk layout's values failed",
+    read: () => {
+      // `read` runs only with a key, and a key needs a plan.
+      return plan
+        ? _readLayoutValues(workspace.id, plan)
+        : Promise.reject(new Error("No layout to read"));
+    },
+  });
+  return { plan, read };
+}
+
+/**
  * Reads the selected layout's values on this device: its first dataset's
  * profiles, the reference dataset's profiles for the targets, and the
  * date format of each text column. The reference layout is read like any
  * other. A read the reducer has not recorded dispatches `values_read`,
- * which fills the layout's suggestions by values; later renders only
- * return what was read, for the pane's example values. A reply for a
- * layout no longer selected is dropped. It reads the datasets' own views,
- * the same values the combined dataset reads.
+ * which fills the layout's suggestions by values. Later renders only
+ * return what was read, for the pane's example values. It reads the
+ * datasets' own views, the same values the combined dataset reads, and
+ * reports "reading" while the catalog has not loaded the layout's datasets.
  */
 export function useLayoutValues(
   options: Readonly<{
@@ -293,21 +357,8 @@ export function useLayoutValues(
     dispatch: Dispatch<CrosswalkAction>;
   }>,
 ): LayoutValues {
-  const workspace = useCurrentWorkspace();
   const { draft, layoutId, readLayoutIds, context, dispatch } = options;
-  const plan = useMemo(() => {
-    return _planRead(draft, layoutId, context.datasetsById);
-  }, [draft, layoutId, context.datasetsById]);
-  const read = useTaggedRead({
-    key: _buildReadKey(plan),
-    devMsg: "Reading a crosswalk layout's values failed",
-    read: () => {
-      // `read` runs only with a key, and a key needs a plan.
-      return plan
-        ? _readLayoutValues(workspace.id, plan)
-        : Promise.reject(new Error("No layout to read"));
-    },
-  });
+  const { plan, read } = useLayoutRead({ draft, layoutId, context });
   const targets = useLayoutTargets(read, plan, draft.columns);
   const hasColumns = draft.columns.length > 0;
   useDispatchValuesRead({
@@ -320,7 +371,12 @@ export function useLayoutValues(
     dispatch,
   });
   if (!plan) {
-    return { status: "ready", ...NOTHING_READ };
+    const isWaiting = _isWaitingForCatalog(
+      draft,
+      layoutId,
+      context.datasetsById,
+    );
+    return { status: isWaiting ? "reading" : "ready", ...NOTHING_READ };
   }
   if (read.status !== "ready") {
     return { status: read.status, ...NOTHING_READ };

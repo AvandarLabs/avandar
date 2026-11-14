@@ -10,7 +10,7 @@
 }
 
 /*
- * Decorative: the cell's text says the same. Neutral by default; only the
+ * Decorative: the cell's text says the same. Neutral by default. Only the
  * selected row's line takes Brand Blue.
  */
 .connectorLine {

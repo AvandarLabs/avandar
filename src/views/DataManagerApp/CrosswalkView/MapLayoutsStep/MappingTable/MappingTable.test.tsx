@@ -141,7 +141,7 @@ describe("MappingTable", () => {
     expect(_lineOf(COUNTY_COLUMN.name)).toHaveAttribute("data-variant", "none");
   });
 
-  it("describes every other kind of fill", () => {
+  it("describes a fixed value, a Combine expression, a deleted code list, and Leave empty", () => {
     _renderTable(
       _withKingsFills({
         [CASE_COLUMN.id]: makeMapping({ kind: "constant", value: "Kings" }),
@@ -177,7 +177,7 @@ describe("MappingTable", () => {
     expect(_lineOf(COUNTY_COLUMN.name)).toHaveAttribute("data-variant", "none");
   });
 
-  it("describes each conversion", () => {
+  it("describes a trim, a multiplication, and a padding in plain words", () => {
     _renderTable(
       _withKingsFills({
         [CASE_COLUMN.id]: makeMapping(

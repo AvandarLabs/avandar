@@ -4,21 +4,22 @@ import { DateFormatSql } from "@/lib/crosswalks/detectDateFormats/DateFormatSql/
 import { withDuckDb } from "../../../../../tests/integration/queries/executedDuckDb";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
-/**
- * This suite lives under `src/` beside the module it tests, and reuses
- * `withDuckDb` as the other executed tests do.
- */
 const DATASET_ID = uuid<Dataset.Id>();
 const HOSTILE_NAME = `Case "no" O'Brien`;
 const COLUMN_NAMES = [
   "onset_dt",
   "iso",
   "eu",
+  "ambiguous",
   "half_iso",
   "blanks",
   HOSTILE_NAME,
 ];
 
+/**
+ * This suite lives under `src/` beside the module it tests, and reuses
+ * `withDuckDb` as the other executed tests do.
+ */
 describe("DateFormatSql", () => {
   it("picks the first format that parses 90% of each text column's sample", async () => {
     const formats = await withDuckDb(async (connection) => {
@@ -29,6 +30,7 @@ describe("DateFormatSql", () => {
             ELSE strftime(DATE '2026-02-01' + CAST(i AS INTEGER), '%m/%d/%Y') END AS onset_dt,
           strftime(DATE '2026-02-01' + CAST(i AS INTEGER), '%Y-%m-%d') AS iso,
           strftime(DATE '2026-03-13' + CAST(i AS INTEGER), '%d/%m/%Y') AS eu,
+          strftime(DATE '2026-01-01' + CAST(i % 12 AS INTEGER), '%m/%d/%Y') AS ambiguous,
           CASE WHEN i < 20 THEN '2026-03-01' ELSE 'March 1' END AS half_iso,
           CASE WHEN i % 4 = 0 THEN ''
             ELSE strftime(DATE '2026-02-01' + CAST(i AS INTEGER), '%Y-%m-%d') END AS blanks,
@@ -54,6 +56,8 @@ describe("DateFormatSql", () => {
         ["iso", "%Y-%m-%d"],
         // Days 13 and up cannot be months, so US parses too few.
         ["eu", "%d/%m/%Y"],
+        // Every day is 12 or less, so both orders parse: US comes first.
+        ["ambiguous", "%m/%d/%Y"],
         // Blank values are not counted against a format.
         ["blanks", "%Y-%m-%d"],
       ]),

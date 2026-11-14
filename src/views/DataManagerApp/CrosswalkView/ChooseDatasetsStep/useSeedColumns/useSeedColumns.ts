@@ -113,7 +113,7 @@ function _saveForMapping(
  * columns are seeded from the reference dataset: one per column, named and
  * typed as there, governed where the reference column has a binding. Then
  * it opens step 2 on the first layout to map, but only when the save
- * resolved true; `goToStep` moves a crosswalk saved for the first time to
+ * resolved true. `goToStep` moves a crosswalk saved for the first time to
  * its own URL. A second press while the first is working does nothing.
  */
 export function useSeedColumns(options: SeedOptions): SeedColumns {

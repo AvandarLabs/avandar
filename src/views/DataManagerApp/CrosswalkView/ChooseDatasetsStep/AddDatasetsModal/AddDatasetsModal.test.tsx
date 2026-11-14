@@ -89,6 +89,7 @@ describe("AddDatasetsModal", () => {
     });
     expect(kings).toBeChecked();
     expect(kings).toBeDisabled();
+    expect(kings).toHaveAccessibleDescription("Already in this crosswalk");
     expect(
       screen.getByRole("checkbox", { name: "Pick Queens cases" }),
     ).not.toBeChecked();

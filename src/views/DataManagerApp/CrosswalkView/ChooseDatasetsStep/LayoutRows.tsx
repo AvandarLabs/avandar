@@ -5,12 +5,13 @@ import {
   IconChevronRight,
   IconTrash,
 } from "@tabler/icons-react";
+import { useRef } from "react";
 import css from "@/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.module.css";
 import { LayoutName } from "@/views/DataManagerApp/CrosswalkView/layoutLabel/LayoutName";
 import type { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = {
   layout: CrosswalkDraft.Layout;
@@ -47,12 +48,14 @@ function DatasetsToggle(
     isExpanded: boolean;
     nameId: string;
     detailsId: string;
+    buttonRef: RefObject<HTMLButtonElement | null>;
     onToggle: () => void;
   }>,
 ): ReactNode {
   const Chevron = props.isExpanded ? IconChevronDown : IconChevronRight;
   return (
     <Button
+      ref={props.buttonRef}
       variant="subtle"
       color="neutral"
       size="compact-sm"
@@ -67,32 +70,93 @@ function DatasetsToggle(
   );
 }
 
-/** An opened layout's datasets, each with its own Remove button. */
-function LayoutDatasetList(
-  props: Readonly<Pick<Props, "layout" | "datasetsById" | "onRemoveDataset">>,
+/**
+ * Where focus goes when a dataset is removed: the next dataset's Remove
+ * button, else the previous one's, else the layout's Datasets toggle.
+ */
+function _getFocusTarget(
+  options: Readonly<{
+    datasetIds: readonly Dataset.Id[];
+    removedId: Dataset.Id;
+    removeButtons: ReadonlyMap<string, HTMLButtonElement>;
+    toggleButton: HTMLButtonElement | null;
+  }>,
+): HTMLElement | null {
+  const index = options.datasetIds.indexOf(options.removedId);
+  const neighborId =
+    options.datasetIds[index + 1] ?? options.datasetIds[index - 1];
+  return (
+    (neighborId ? options.removeButtons.get(neighborId) : undefined) ??
+    options.toggleButton
+  );
+}
+
+/** One dataset of an opened layout, with its Remove button. */
+function LayoutDatasetItem(
+  props: Readonly<{
+    datasetName: string;
+    registerButton: (button: HTMLButtonElement | null) => void;
+    onRemove: () => void;
+  }>,
 ): ReactNode {
   const { t } = useLingui();
+  const { datasetName } = props;
+  return (
+    <li className={css.layoutDataset}>
+      <Text size="sm" truncate>
+        {datasetName}
+      </Text>
+      <ActionIcon
+        ref={props.registerButton}
+        variant="subtle"
+        color="neutral"
+        size="sm"
+        aria-label={t`Remove ${datasetName}`}
+        onClick={props.onRemove}
+      >
+        <IconTrash size={14} aria-hidden />
+      </ActionIcon>
+    </li>
+  );
+}
+
+/** An opened layout's datasets, each with its own Remove button. */
+function LayoutDatasetList(
+  props: Readonly<
+    Pick<Props, "layout" | "datasetsById" | "onRemoveDataset"> & {
+      toggleRef: RefObject<HTMLButtonElement | null>;
+    }
+  >,
+): ReactNode {
+  const removeButtonsRef = useRef(new Map<string, HTMLButtonElement>());
+  const remove = (datasetId: Dataset.Id): void => {
+    // Focus moves before the dataset leaves, so it never falls to the page.
+    _getFocusTarget({
+      datasetIds: props.layout.datasetIds,
+      removedId: datasetId,
+      removeButtons: removeButtonsRef.current,
+      toggleButton: props.toggleRef.current,
+    })?.focus();
+    props.onRemoveDataset(datasetId);
+  };
   return (
     <ul className={css.layoutDatasetList}>
       {props.layout.datasetIds.map((datasetId) => {
-        const datasetName = props.datasetsById.get(datasetId)?.name ?? "";
         return (
-          <li key={datasetId} className={css.layoutDataset}>
-            <Text size="sm" truncate>
-              {datasetName}
-            </Text>
-            <ActionIcon
-              variant="subtle"
-              color="neutral"
-              size="sm"
-              aria-label={t`Remove ${datasetName}`}
-              onClick={() => {
-                props.onRemoveDataset(datasetId);
-              }}
-            >
-              <IconTrash size={14} aria-hidden />
-            </ActionIcon>
-          </li>
+          <LayoutDatasetItem
+            key={datasetId}
+            datasetName={props.datasetsById.get(datasetId)?.name ?? ""}
+            registerButton={(button) => {
+              if (button) {
+                removeButtonsRef.current.set(datasetId, button);
+              } else {
+                removeButtonsRef.current.delete(datasetId);
+              }
+            }}
+            onRemove={() => {
+              remove(datasetId);
+            }}
+          />
         );
       })}
     </ul>
@@ -107,6 +171,7 @@ function LayoutDatasetList(
 export function LayoutRows(props: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
   const { layout, isExpanded } = props;
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const nameId = `crosswalk-layout-name-${layout.id}`;
   const detailsId = `crosswalk-layout-datasets-${layout.id}`;
   return (
@@ -125,6 +190,7 @@ export function LayoutRows(props: Readonly<Props>): ReactNode {
             isExpanded={isExpanded}
             nameId={nameId}
             detailsId={detailsId}
+            buttonRef={toggleRef}
             onToggle={props.onToggle}
           />
         </Table.Td>
@@ -135,7 +201,12 @@ export function LayoutRows(props: Readonly<Props>): ReactNode {
       {isExpanded ? (
         <Table.Tr id={detailsId}>
           <Table.Td colSpan={3} className={css.layoutDatasets}>
-            <LayoutDatasetList {...props} />
+            <LayoutDatasetList
+              layout={layout}
+              datasetsById={props.datasetsById}
+              onRemoveDataset={props.onRemoveDataset}
+              toggleRef={toggleRef}
+            />
           </Table.Td>
         </Table.Tr>
       ) : null}

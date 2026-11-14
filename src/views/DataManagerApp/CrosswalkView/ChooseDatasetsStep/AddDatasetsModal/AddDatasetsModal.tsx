@@ -100,6 +100,15 @@ function usePickedIds(): {
   };
 }
 
+/** The ids of every dataset the crosswalk already holds. */
+function useInCrosswalkIds(draft: CrosswalkDraft.T): readonly Dataset.Id[] {
+  return useMemo(() => {
+    return draft.layouts.flatMap((layout) => {
+      return layout.datasetIds;
+    });
+  }, [draft.layouts]);
+}
+
 /**
  * The modal's list: a loader while reading, then the datasets to pick. A
  * dataset with no columns cannot form a layout, so it is shown disabled
@@ -136,6 +145,7 @@ function AddableDatasetsList(
         columnCounts={props.columnCounts}
         pickedDatasetIds={props.pickedIds}
         lockedDatasetIds={props.inCrosswalkIds}
+        lockedReason={<Trans>Already in this crosswalk</Trans>}
         unavailableDatasetIds={noColumnIds}
         unavailableReason={<Trans>This dataset has no columns yet.</Trans>}
         emptyMessage={<Trans>There are no datasets you can add.</Trans>}
@@ -145,19 +155,39 @@ function AddableDatasetsList(
   );
 }
 
+/** The modal's Cancel and Add buttons, the Add one counting what it adds. */
+function AddDatasetsActions(
+  props: Readonly<{
+    pickedCount: number;
+    onCancel: () => void;
+    onAdd: () => void;
+  }>,
+): ReactNode {
+  return (
+    <Group justify="flex-end" gap="sm">
+      <Button variant="default" onClick={props.onCancel}>
+        <Trans>Cancel</Trans>
+      </Button>
+      <Button disabled={props.pickedCount === 0} onClick={props.onAdd}>
+        <Plural
+          value={props.pickedCount}
+          one="Add # dataset"
+          other="Add # datasets"
+        />
+      </Button>
+    </Group>
+  );
+}
+
 /**
  * **Add datasets**: the workspace's datasets with a checkbox each. Those
- * already in the crosswalk show picked and cannot be unpicked; removing
+ * already in the crosswalk show picked and cannot be unpicked. Removing
  * one happens in the layouts table. Those with no columns show disabled.
  */
 export function AddDatasetsModal(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const { pickedIds, toggle, reset } = usePickedIds();
-  const inCrosswalkIds = useMemo(() => {
-    return props.draft.layouts.flatMap((layout) => {
-      return layout.datasetIds;
-    });
-  }, [props.draft.layouts]);
+  const inCrosswalkIds = useInCrosswalkIds(props.draft);
   const addable = useAddableDatasets({
     isOpen: props.isOpen,
     context: props.context,
@@ -184,24 +214,14 @@ export function AddDatasetsModal(props: Readonly<Props>): ReactNode {
           inCrosswalkIds={inCrosswalkIds}
           onToggle={toggle}
         />
-        <Group justify="flex-end" gap="sm">
-          <Button variant="default" onClick={close}>
-            <Trans>Cancel</Trans>
-          </Button>
-          <Button
-            disabled={pickedIds.length === 0}
-            onClick={() => {
-              props.onAdd(pickedIds);
-              reset();
-            }}
-          >
-            <Plural
-              value={pickedIds.length}
-              one="Add # dataset"
-              other="Add # datasets"
-            />
-          </Button>
-        </Group>
+        <AddDatasetsActions
+          pickedCount={pickedIds.length}
+          onCancel={close}
+          onAdd={() => {
+            props.onAdd(pickedIds);
+            reset();
+          }}
+        />
       </Stack>
     </Modal>
   );

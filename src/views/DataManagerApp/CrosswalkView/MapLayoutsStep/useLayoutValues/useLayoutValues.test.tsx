@@ -62,28 +62,37 @@ function _profile(
   };
 }
 
-function _renderValues(
-  options: {
-    layoutId?: CrosswalkLayout.Id;
-    readLayoutIds?: readonly CrosswalkLayout.Id[];
-    draft?: CrosswalkDraft.T;
-  } = {},
-) {
+type RenderProps = {
+  layoutId: CrosswalkLayout.Id;
+  readLayoutIds: readonly CrosswalkLayout.Id[];
+  draft: CrosswalkDraft.T;
+};
+
+/**
+ * Renders the hook for Kings by default. `rerender` takes only what changes
+ * and keeps the other props as they were.
+ */
+function _renderValues(options: Partial<RenderProps> = {}) {
   const dispatch = vi.fn();
-  const draft = options.draft ?? makeMappedDraft();
+  let props: RenderProps = {
+    layoutId: options.layoutId ?? KINGS_LAYOUT_ID,
+    readLayoutIds: options.readLayoutIds ?? [],
+    draft: options.draft ?? makeMappedDraft(),
+  };
   const rendered = renderHook(
-    (props: { readLayoutIds: readonly CrosswalkLayout.Id[] }) => {
-      return useLayoutValues({
-        draft,
-        layoutId: options.layoutId ?? KINGS_LAYOUT_ID,
-        readLayoutIds: props.readLayoutIds,
-        context: CONTEXT,
-        dispatch,
-      });
+    (current: RenderProps) => {
+      return useLayoutValues({ ...current, context: CONTEXT, dispatch });
     },
-    { initialProps: { readLayoutIds: options.readLayoutIds ?? [] } },
+    { initialProps: props },
   );
-  return { ...rendered, dispatch };
+  return {
+    ...rendered,
+    dispatch,
+    rerender: (changes: Partial<RenderProps>) => {
+      props = { ...props, ...changes };
+      rendered.rerender(props);
+    },
+  };
 }
 
 /** Each target's column name, and whether it was matched without values. */
@@ -266,6 +275,80 @@ describe("useLayoutValues", () => {
       ["county", false],
       ["rash_onset_date", true],
     ]);
+  });
+
+  it("drops a reply for a layout that is no longer selected", async () => {
+    const kingsProfiles = Promise.withResolvers<ColumnProfile.T[]>();
+    mocks.profileMock.mockImplementation(async (options) => {
+      if (options.dataset.id === KINGS_MARCH.id) {
+        return kingsProfiles.promise;
+      }
+      return options.columns.map(
+        (column: { name: string; dataType: AvaDataType.T }) => {
+          return _profile(options.dataset, column);
+        },
+      );
+    });
+    const { result, dispatch, rerender } = _renderValues();
+
+    rerender({ layoutId: BRONX_LAYOUT_ID });
+    await waitFor(() => {
+      expect(result.current.status).toBe("ready");
+    });
+    kingsProfiles.resolve(
+      KINGS_MARCH.columns.map((column) => {
+        return _profile(KINGS_MARCH, column);
+      }),
+    );
+    await waitFor(() => {
+      expect(mocks.detectMock).toHaveBeenCalled();
+    });
+
+    expect(dispatch).toHaveBeenCalledTimes(1);
+    expect(dispatch.mock.calls[0]?.[0]).toMatchObject({
+      type: "values_read",
+      layoutId: BRONX_LAYOUT_ID,
+    });
+    expect(result.current.profilesBySourceColumn.has("GENDER")).toBe(false);
+  });
+
+  it("dispatches again for a new read of a layout the reducer never recorded", async () => {
+    const { result, dispatch, rerender } = _renderValues();
+    await waitFor(() => {
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+
+    // A new column spelling is a new read. readLayoutIds still lacks the
+    // layout, as when the reducer recorded and forgot it in one batch.
+    const draft = makeMappedDraft();
+    rerender({
+      draft: {
+        ...draft,
+        layouts: [
+          BRONX_LAYOUT,
+          { ...KINGS_LAYOUT, columnNames: ["Case_ID", "GENDER", "county"] },
+        ],
+      },
+    });
+    await waitFor(() => {
+      expect(dispatch).toHaveBeenCalledTimes(2);
+    });
+    expect(result.current.status).toBe("ready");
+  });
+
+  it("keeps reading while the layout's dataset is not in the catalog yet", () => {
+    const { result } = renderHook(() => {
+      return useLayoutValues({
+        draft: makeMappedDraft(),
+        layoutId: KINGS_LAYOUT_ID,
+        readLayoutIds: [],
+        context: { ...CONTEXT, datasetsById: new Map() },
+        dispatch: vi.fn(),
+      });
+    });
+
+    expect(result.current.status).toBe("reading");
+    expect(mocks.profileMock).not.toHaveBeenCalled();
   });
 
   it("reports a failed read and dispatches nothing", async () => {

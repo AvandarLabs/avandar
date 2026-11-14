@@ -19,7 +19,7 @@ export type LayoutStubRowProps = {
 
 /**
  * One option of the stub's listbox: the layout's name, "+{count} with the
- * same layout", and its stamp. It takes no focus of its own; the listbox
+ * same layout", and its stamp. It takes no focus of its own. The listbox
  * keeps focus and handles keys.
  */
 export function LayoutStubRow({

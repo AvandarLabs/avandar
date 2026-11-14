@@ -118,6 +118,44 @@ describe("ChooseDatasetsStep", () => {
     });
   });
 
+  it("moves focus to the next Remove button after removing a dataset", () => {
+    _renderStep(makeLayoutsDraft());
+    fireEvent.click(screen.getByRole("button", { name: "2 datasets" }));
+
+    fireEvent.click(
+      screen.getByRole("button", { name: `Remove ${KINGS_MARCH.name}` }),
+    );
+
+    expect(
+      screen.getByRole("button", { name: `Remove ${KINGS_APRIL.name}` }),
+    ).toHaveFocus();
+  });
+
+  it("moves focus to the previous Remove button after removing the last dataset", () => {
+    _renderStep(makeLayoutsDraft());
+    fireEvent.click(screen.getByRole("button", { name: "2 datasets" }));
+
+    fireEvent.click(
+      screen.getByRole("button", { name: `Remove ${KINGS_APRIL.name}` }),
+    );
+
+    expect(
+      screen.getByRole("button", { name: `Remove ${KINGS_MARCH.name}` }),
+    ).toHaveFocus();
+  });
+
+  it("moves focus to the Datasets toggle when no other dataset is left in the layout", () => {
+    _renderStep(makeLayoutsDraft());
+    const toggle = screen.getByRole("button", { name: "1 dataset" });
+    fireEvent.click(toggle);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: `Remove ${BRONX.name}` }),
+    );
+
+    expect(toggle).toHaveFocus();
+  });
+
   it("says how well the reference covers the other datasets, and changes it", () => {
     const flow = _renderStep(makeLayoutsDraft());
 
@@ -173,7 +211,7 @@ describe("ChooseDatasetsStep", () => {
     expect(flow.dispatchAndSave).not.toHaveBeenCalled();
   });
 
-  it("opens Add datasets", async () => {
+  it("opens the Add datasets dialog from the layouts section", async () => {
     _renderStep(makeLayoutsDraft());
 
     fireEvent.click(screen.getByRole("button", { name: "Add datasets" }));
