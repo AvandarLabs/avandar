@@ -484,7 +484,7 @@ export function addColumn(
   }
   const column: CrosswalkDraft.Column = {
     id: action.columnId,
-    name: action.name,
+    name: action.name.trim(),
     position: draft.columns.length,
     dataType: action.dataType,
     entryId: undefined,
@@ -572,7 +572,7 @@ export function changeColumn(
       : (changes.entryId ?? undefined);
   const nextColumn = {
     ...column,
-    name: changes.name ?? column.name,
+    name: changes.name?.trim() ?? column.name,
     entryId,
     dataType: deriveColumnDataType({
       dataType: changes.dataType ?? column.dataType,

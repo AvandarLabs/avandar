@@ -857,6 +857,25 @@ describe("crosswalkReducer: columns", () => {
     });
     expect(getColumn(next, "borough").position).toBe(2);
   });
+
+  it("trims the edge spaces of an added or renamed column's name", () => {
+    const state = makeSeededState();
+    const added = crosswalkReducer(state, {
+      type: "column_added",
+      columnId: "bbbbbbbb-0000-4000-8000-0000000000a2" as CrosswalkColumn.Id,
+      name: " outbreak ",
+      dataType: "boolean",
+    });
+    const renamed = crosswalkReducer(added, {
+      type: "column_changed",
+      columnId: getColumn(added, "county").id,
+      changes: { name: " borough " },
+      context: CONTEXT,
+    });
+
+    expect(getColumn(renamed, "outbreak").position).toBe(3);
+    expect(getColumn(renamed, "borough").position).toBe(2);
+  });
 });
 
 describe("crosswalkReducer: settings and saving", () => {
