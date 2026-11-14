@@ -261,7 +261,7 @@ both from the theme, so a theme-scope edit recolours every composition.
 - **Motion.** `src/motion.ts` keeps no runtime imports. Callers pass token
   values to its helpers. A test keeps `DUR` and `EASE` equal to `classic`.
   `motion.tempo` (clamped 0.8–1.5) divides animation durations inside a
-  beat, so 1.5 is faster and 0.75 is slower. It never changes timeline
+  beat, so 1.5 is faster and 0.8 is slower. It never changes timeline
   lengths. Camera preset, shutter, and samples come from tokens.
 - **Appearance options split.**
   - Captions, camera motion on / off, motion blur on / off, and
