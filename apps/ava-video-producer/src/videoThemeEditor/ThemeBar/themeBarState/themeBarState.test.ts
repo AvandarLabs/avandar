@@ -4,6 +4,7 @@ import {
   getThemeBarActions,
   getThemeBarMessage,
   getThemeLabelFromInput,
+  reloadThenFocus,
   submitNewThemeName,
 } from "./themeBarState";
 
@@ -294,4 +295,22 @@ test("a copy after a refused save keeps Reload from file in the bar", () => {
     }).showsReload,
     true,
   );
+});
+
+test("focus moves to the theme bar once a reload succeeded, because the button that asked is gone", async () => {
+  const calls: string[] = [];
+  await reloadThenFocus({
+    reload: async () => true,
+    focus: () => calls.push("focus"),
+  });
+  assert.deepEqual(calls, ["focus"]);
+});
+
+test("focus stays where it is when the reload failed, so the button stays usable", async () => {
+  const calls: string[] = [];
+  await reloadThenFocus({
+    reload: async () => false,
+    focus: () => calls.push("focus"),
+  });
+  assert.deepEqual(calls, []);
 });

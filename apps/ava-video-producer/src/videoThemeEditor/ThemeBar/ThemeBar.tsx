@@ -31,6 +31,8 @@ type Props = Readonly<{
   onSaveAsNew: (label: string) => Promise<boolean>;
   onDiscard: () => void;
   onReloadTheme: () => void;
+  /** The bar itself, so the host can move focus here when a button leaves. */
+  barRef?: RefObject<HTMLDivElement | null>;
   onCopyJson: () => void;
 }>;
 
@@ -185,7 +187,8 @@ function ThemeActions(
 }
 
 /**
- * The theme picker and theme actions above the editor: Save (custom themes
+ * The theme picker and theme actions above the editor (a focusable group, so
+ * focus can land here when Reload from file is gone): Save (custom themes
  * only), Save as new theme, Discard, and Copy JSON (plus Reload from file after a save conflict), with an unsaved
  * indicator, a polite status line that also says why saving is unavailable,
  * and, for a built-in theme, a notice that its changes are saved as a new
@@ -202,7 +205,13 @@ export function ThemeBar(props: Props) {
     saveAsNewRef.current?.focus();
   };
   return (
-    <div className={css.bar}>
+    <div
+      ref={props.barRef}
+      className={css.bar}
+      role="group"
+      aria-label={t`Theme controls`}
+      tabIndex={-1}
+    >
       <ThemePicker {...props} />
       {props.isBuiltIn ? (
         <p className={css.notice}>

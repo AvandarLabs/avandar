@@ -140,3 +140,19 @@ export async function submitNewThemeName(
     options.close();
   }
 }
+
+/**
+ * Runs a reload and, only once it succeeded, moves focus to the theme bar.
+ * A successful reload removes the Reload from file button that asked for it,
+ * so focus would otherwise drop to the page. A failed reload keeps the button.
+ */
+export async function reloadThenFocus(
+  options: Readonly<{
+    reload: () => Promise<boolean>;
+    focus: () => void;
+  }>,
+): Promise<void> {
+  if (await options.reload()) {
+    options.focus();
+  }
+}

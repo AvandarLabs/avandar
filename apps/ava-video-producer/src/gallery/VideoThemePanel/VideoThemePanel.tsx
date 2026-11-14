@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChangedOnDiskBanner } from "../../videoThemeEditor/ThemeBar/ChangedOnDiskBanner";
 import { ThemeBar } from "../../videoThemeEditor/ThemeBar/ThemeBar";
+import { reloadThenFocus } from "../../videoThemeEditor/ThemeBar/themeBarState/themeBarState";
 import { VideoThemeEditor } from "../../videoThemeEditor/VideoThemeEditor/VideoThemeEditor";
 import { useGalleryVideoTheme } from "../GalleryVideoTheme/GalleryVideoTheme";
 import css from "./VideoThemePanel.module.css";
@@ -20,6 +21,12 @@ type Props = Readonly<{
 export function VideoThemePanel({ item, usedTokens }: Props) {
   const gallery = useGalleryVideoTheme();
   const [scope, setScope] = useState<ThemeEditScope>({ kind: "theme" });
+  const barRef = useRef<HTMLDivElement>(null);
+  const reloadTheme = () =>
+    void reloadThenFocus({
+      reload: gallery.reloadTheme,
+      focus: () => barRef.current?.focus(),
+    });
   return (
     <div className={css.panel}>
       <VideoThemeEditor
@@ -44,14 +51,15 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
               onSave={() => void gallery.save()}
               onSaveAsNew={gallery.saveAsNew}
               onDiscard={gallery.discard}
-              onReloadTheme={() => void gallery.reloadTheme()}
+              onReloadTheme={reloadTheme}
+              barRef={barRef}
               onCopyJson={() => void gallery.copyThemeJson()}
             />
             {gallery.isChangedOnDisk ? (
               <ChangedOnDiskBanner
                 onKeep={gallery.keepDraft}
                 onDiscard={gallery.discard}
-                onReload={() => void gallery.reloadTheme()}
+                onReload={reloadTheme}
               />
             ) : null}
           </>

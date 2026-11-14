@@ -7,6 +7,11 @@
   position: relative;
 }
 
+/* Focus lands here only from code, after a button leaves, so it needs no ring. */
+.bar:focus {
+  outline: none;
+}
+
 .notice {
   color: var(--muted);
   font-size: 11px;
