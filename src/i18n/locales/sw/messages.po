@@ -43,6 +43,10 @@ msgstr "{0} safu"
 msgid "We couldn't load a preview of this dataset."
 msgstr "Hatukuweza kupakia onyesho la kuchungulia la seti hii ya data."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Confirm and next"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
 msgid "What to do"
 msgstr ""
@@ -170,6 +174,11 @@ msgstr "Maneno muhimu"
 msgid "This query isn't written correctly, so it couldn't be read."
 msgstr "Hoja hii haijaandikwa kwa usahihi, kwa hivyo haikuweza kusomwa."
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Codes"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveAsStep.tsx
 msgid "Its conversions follow the dictionaries, so later edits to them show up "
 "here right away."
@@ -211,6 +220,10 @@ msgid "This query uses a function, {functionName}, that the query engine "
 msgstr "Hoja hii inatumia function, {functionName}, ambayo injini ya hoja "
 "haiungi mkono."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Change to the values"
+msgstr ""
+
 #: src/views/OntologyDesignerApp/ConceptCreatorView/index.tsx
 msgid "Name this case type and say where its fields come from. Map columns from "
 "existing datasets, or add fields to fill in by hand."
@@ -221,6 +234,11 @@ msgstr "Ipe aina hii ya kesi jina na eleza sehemu zinakotoka. Panga safu kutoka 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 msgid "Value column"
 msgstr "Safu ya thamani"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Values made only of digits get leading zeros up to this length. Longer "
+"values stay as they are."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Could not refresh this dataset"
@@ -249,6 +267,12 @@ msgstr "Ondoa ufikiaji kwa {name}."
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/MatchCaseToggle.tsx
 msgid "Match case"
 msgstr "Linganisha herufi kubwa na ndogo"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{datasetCount, plural, one {Reading # dataset on this device. The first "
+"time can take a few minutes.} other {Reading # datasets on this device. "
+"The first time can take a few minutes.}}"
+msgstr ""
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCard.test.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
@@ -315,9 +339,22 @@ msgid "Rewrites the uploaded data in place. It is synced to the workspace, so "
 "this changes it for everyone who uses it."
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "Becomes empty"
+msgstr ""
+
 #: src/views/DataExplorerApp/copy/queryFilterValidationLabel.ts
 msgid "\"{value}\" is not a number."
 msgstr "\"{value}\" si nambari."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+msgid "{datasetName} was saved, but this device may still show its old rows. "
+"Reload the page to refresh them."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "UPPERCASE"
+msgstr ""
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to map tools"
@@ -391,12 +428,18 @@ msgstr "Kosa lilitokea wakati wa kupakia faili"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnTypeSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
 msgstr "Aina"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "Nothing was saved. Please try again."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "lowercase"
 msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
@@ -406,6 +449,11 @@ msgstr ""
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 msgid " access"
 msgstr " ufikiaji"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "A dictionary entry this crosswalk uses was deleted. Choose another entry "
+"for that column."
+msgstr ""
 
 #: src/components/VisualizationContainer/VisualizationRenderError.tsx
 msgid "The {chartName} cannot be displayed."
@@ -482,6 +530,10 @@ msgstr "Chati hii inahitaji plugin ya {pluginId}, ambayo haipatikani."
 msgid "New case type"
 msgstr "Aina mpya ya kesi"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "A code list that is not available"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryEditor/DataDictionaryEditorTabs.tsx
 msgid "Code lists · {codeListCount}"
 msgstr ""
@@ -495,6 +547,10 @@ msgstr "Hakuna filtria bado. Ongeza moja ili kuwapa watazamaji uwezo wa "
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/DashboardMapAudienceAlert.tsx
 msgid "Not everyone can see every map"
 msgstr "Si kila mtu anaweza kuona kila ramani"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable.tsx
+msgid "Match"
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Excel files"
@@ -577,6 +633,8 @@ msgid "Go to a coordinate or P-code"
 msgstr "Nenda kwenye kiwianishi au P-code"
 
 #. placeholder {0}: drop.count
+#. placeholder {0}: props.preview.result.rowCount
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "{0, plural, one {# row} other {# rows}}"
 msgstr "{0, plural, one {# rekodi} other {# rekodi}}"
@@ -678,12 +736,17 @@ msgid "Could not open the place."
 msgstr "Haikuweza kufungua eneo."
 
 #: src/components/RichText/MentionMenu/MentionMenuList/MentionMenuGroupTitle.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 msgid "Datasets"
 msgstr "Seti za data"
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Custom role"
 msgstr "Jukumu la kawaida"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Dictionary entry"
+msgstr ""
 
 #: src/routes/signin.tsx
 msgid "Create account"
@@ -717,6 +780,10 @@ msgstr "Haiwezekani kuongeza dataset"
 msgid "No activity on this case yet"
 msgstr "Bado hakuna shughuli kwenye kesi hii"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/OpenCrosswalkLink.tsx
+msgid "Open crosswalk"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Members still assigned to this group must be moved first."
 msgstr "Wajumbe bado waliotengwa kwa kundi hili lazima wahamishwe kwanza."
@@ -734,6 +801,10 @@ msgstr "Mpangilio wa upau wa pembeni"
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditor.tsx
 msgid "Add status"
 msgstr "Ongeza hali"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Pad with zeros to {length} characters"
+msgstr ""
 
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPicker.tsx
 msgid "Search dashboards, datasets, maps..."
@@ -776,6 +847,10 @@ msgstr "Hali hizi zimebadilishwa mahali pengine. Funga dirisha hili na ujaribu "
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorActions.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
 msgid "Paste a list"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Reject"
 msgstr ""
 
 #: src/components/RichText/Gadget/GadgetCard/GadgetCardHeader.tsx
@@ -1114,6 +1189,19 @@ msgstr "Chuja kwa anayekabidhiwa"
 msgid "← Back"
 msgstr "← Nyuma"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Changes:"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "A column is already named {sourceColumnName}. Rename it in Map each "
+"dataset first."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Accept all suggestions"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "A local record of every clarifying question the AI has asked in this "
 "workspace. Only metadata is stored — never the question text or your "
@@ -1135,6 +1223,10 @@ msgstr "Haiwezi kuonyesha {chartName}"
 #: src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts
 msgid "Dataset failed to process"
 msgstr "Seti ya data ilishindwa kushughulika"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Enter a name for the combined dataset."
+msgstr ""
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetPaperOrientationFields.tsx
 msgid "Portrait"
@@ -1317,6 +1409,10 @@ msgstr "Chapisha sasisho la kwanza hapa chini. Andika @ ili kumtaja mwenzako wa 
 msgid "Collapse at"
 msgstr "Kunja katika"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "In this dataset"
+msgstr ""
+
 #: shared/copy/vizTypeLabel.ts
 msgid "Bubble Chart"
 msgstr "Chati ya Viputo"
@@ -1407,6 +1503,10 @@ msgstr "Ramani"
 msgid "Table"
 msgstr "Jedwali"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Same values · {percent}"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfAxisCalibration/PdfAxisCalibration.tsx
 msgid "First tick value"
 msgstr "Thamani ya tiki ya kwanza"
@@ -1431,11 +1531,19 @@ msgstr ""
 msgid "Orange"
 msgstr "Machungwa"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "The code list this used was deleted. Choose another."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginsTabHeader.tsx
 msgid "Plugins add features to this workspace. Installing or removing a plugin "
 "affects every member."
 msgstr "Plugin huongeza vipengele kwenye workspace hii. Kusakinisha au kuondoa "
 "plugin huathiri kila mwanachama."
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "Crosswalk failed to load"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "JOIN ON clause uses \"{operator}\": only equality joins are mapped."
@@ -1510,6 +1618,10 @@ msgstr "Hakuna maneno muhimu"
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 msgid "Updated {0}"
 msgstr "Imesasishwa {0}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "{columnName} isn't a column of this dataset."
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairList.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/CodeListValuesTable.tsx
@@ -1649,6 +1761,10 @@ msgid "Please check your email for a confirmation link. It may take a few "
 msgstr "Tafadhali angalia barua pepe yako kwa kiungo cha uthibitisho. Inaweza "
 "kuchukua dakika chache kufika."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+msgid "Review"
+msgstr ""
+
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeMenu.tsx
 msgid "Assign to"
 msgstr "Kabidhi kwa"
@@ -1685,6 +1801,10 @@ msgstr "Laha"
 msgid "Getting {0} from {1}"
 msgstr "Inapata {0} kutoka {1}"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "The example could not be read. The column is still filled this way."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardListView/DashboardCard/BadgeRow.tsx
 msgid "Published to workspace"
 msgstr "Imechapishwa kwenye workspace"
@@ -1696,7 +1816,15 @@ msgstr "Chaguo moja"
 #: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+#: src/views/DataManagerApp/CrosswalkView/useSaveCrosswalk/useSaveCrosswalk.ts
 msgid "You're offline. Reconnect to save this."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Only workspace admins can add datasets."
 msgstr ""
 
 #: src/views/RegisterView/DisabledRegistrationNotice.tsx
@@ -1799,6 +1927,10 @@ msgstr "Tengeneza dashboard yako ya kwanza"
 msgid "Close sidebar"
 msgstr "Funga upande"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Filled from"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
 #: src/components/permissions/ShareResourceModal/useShareResourceModalState/makeDisplaySharesFromSharingState.ts
 msgid "Unknown user"
@@ -1823,6 +1955,10 @@ msgstr "Kikomo cha viti kimefikiwa"
 #: src/views/DashboardApp/DashboardShareModal/useDashboardPublishingControl/useUnpublishDashboardMutation.ts
 msgid "Could not unpublish dashboard"
 msgstr "Imeshindikana kuacha kuchapisha dashibodi"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+msgid "Created {datasetName}."
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogTechnicalDetails.tsx
 msgid "Technical details"
@@ -1882,6 +2018,10 @@ msgid "JOIN subquery at position {index} could not be re-serialised."
 msgstr "Hoja ndogo ya JOIN katika nafasi ya {index} haikuweza kusawazishwa "
 "upya."
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Give the crosswalk a name."
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionarySaveBar/DataDictionarySaveBar.tsx
 msgid "{issueCount, plural, one {# thing to fix before saving} other {# things "
 "to fix before saving}}"
@@ -1931,9 +2071,17 @@ msgid "Reading a sample of this dataset to confirm its columns and their types. 
 msgstr "Inasoma sampuli ya mkusanyiko huu wa data ili kuthibitisha safu wima "
 "zake na aina zake. Orodha iliyo hapa chini inaweza kubadilika."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Pad with zeros"
+msgstr ""
+
 #: src/components/ChatPanel/ChatEmptyState/useChatSuggestions.ts
 msgid "Add a bar chart of {datasetName} grouped by {groupByColumn}"
 msgstr "Ongeza chati ya nguzo ya {datasetName} iliyogawanywa na {groupByColumn}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
+msgid "Add a column to the combined dataset"
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/EditStatusesForm.tsx
 msgid "Save statuses"
@@ -1966,9 +2114,17 @@ msgstr "Usemi wa kawaida"
 msgid "Skip"
 msgstr "Ruka"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Meaning"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader.tsx
 msgid "Copied"
 msgstr "Imeandikwa"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Translated with a code list that was deleted"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentCard/CommentActionsMenu.tsx
 msgid "Copy link to comment"
@@ -2008,6 +2164,8 @@ msgstr "Katalogi iko katika <0/> na hukua kutokana na mahitaji ya watu. "
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftIdentityFields.tsx
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogResultsHeader/DataCatalogResultsHeader.tsx
@@ -2152,6 +2310,10 @@ msgstr "Kwa kila kipindi"
 msgid "Select a layer to edit how it is queried and drawn."
 msgstr "Chagua tabaka ili kuhariri jinsi linavyoulizwa na kuchorwa."
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Fix the problems above to combine."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Approved"
 msgstr "Imeidhinishwa"
@@ -2174,6 +2336,10 @@ msgstr "Vitendo"
 #: src/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange.ts
 msgid "Assignment not changed"
 msgstr "Mgawo haujabadilishwa"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Translate codes"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryCustomFallback.tsx
 msgid "Type your answer…"
@@ -2287,6 +2453,10 @@ msgstr ""
 msgid "Couldn't export PDF"
 msgstr "Haiwezi kusafirisha PDF"
 
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell.tsx
+msgid "A code list changed since it was combined"
+msgstr ""
+
 #. placeholder {0}: attribute.name
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 msgid "Value to keep for {0}"
@@ -2325,6 +2495,10 @@ msgstr "ORDER BY inarejelea safu wima nyingi; fomu huhifadhi ya kwanza pekee."
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveWarnings.tsx
 msgid "Fix these before saving"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "Already in this crosswalk"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
@@ -2526,6 +2700,11 @@ msgstr "Onyesha safu 20 za kwanza za {datasetName}"
 msgid "Map of {0}"
 msgstr "Ramani ya {0}"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk would include its own combined dataset. Remove it from "
+"the datasets and try again."
+msgstr ""
+
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
 msgstr "Kitambulisho cha nafasi ya kazi lazima kiwe na urefu wa chini ya herufi "
@@ -2565,6 +2744,10 @@ msgstr "Kila aina ya kesi tayari ina hali. Chagua jina lingine."
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldValueList.tsx
 msgid "{0, plural, one {Show all # value} other {Show all # values}}"
 msgstr "{0, plural, one {Onyesha thamani #} other {Onyesha thamani zote #}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SourceColumnSelect.tsx
+msgid "For example: {example}"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Remove member"
@@ -2677,9 +2860,18 @@ msgstr "Vichujio vya chati hii"
 msgid "Align"
 msgstr "Pangilia"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+msgid "Skipped"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Give the place a name."
 msgstr "Lipe eneo jina."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "Reading the values of {datasetName} on this device"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffer around a layer"
@@ -2742,9 +2934,17 @@ msgstr ""
 msgid "One dataset is one tab."
 msgstr "Kila seti ya data ni kichupo kimoja."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useExportMapping.ts
+msgid "{crosswalkName} mapping"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapToolForm.tsx
 msgid "Label each ring with"
 msgstr "Weka lebo kwenye kila pete kwa"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Multiply by"
+msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveTargetCards.tsx
 msgid "I understand this changes {datasetName} for the whole workspace"
@@ -2756,6 +2956,11 @@ msgstr "Data inayoweza kusoma"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "Changed the data"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "You need edit access to the combined dataset to update it."
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceMemberPermissionsEditor.tsx
@@ -2778,6 +2983,12 @@ msgstr ""
 #: src/hooks/datasets/useDatasetSourceLabels.ts
 msgid "Excel file"
 msgstr "Faili la Excel"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Combine"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Couldn't capture the dashboard for annotation."
@@ -2843,6 +3054,11 @@ msgstr "Imeshindwa kupakia vipengele vya kundi hili."
 msgid "Table view has no chart settings."
 msgstr "Mwonekano wa jedwali hauna mipangilio ya chati."
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk includes a dataset you can't open, so it can't be updated "
+"by you."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow.tsx
 msgid "You save {discount}% compared to monthly billing"
 msgstr "Unahifadhi {discount}% ikilinganishwa na malipo ya kila mwezi"
@@ -2894,6 +3110,10 @@ msgstr "Wastani"
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading case"
 msgstr "Inapakia kesi"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
+msgid "Add column"
+msgstr ""
 
 #: src/components/caseStatuses/StatusColorPicker/StatusColorPicker.tsx
 msgid "Colors for {statusName}"
@@ -3036,6 +3256,10 @@ msgstr ""
 msgid "The custom URL can only contain lowercase letters, numbers, and hyphens"
 msgstr "URL maalum inaweza kuwa na herufi ndogo, nambari na vistari pekee"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "You need edit access to {existingName} to update it."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/CrsOverrideField/CrsOverrideField.tsx
 msgid "3857 - Web Mercator"
 msgstr "3857 - Web Mercator"
@@ -3051,6 +3275,11 @@ msgstr "Laini"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock.tsx
 msgid "Enter a name for the field"
 msgstr "Ingiza jina la uwanja"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Choose datasets"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.tsx
 msgid "Select Plan"
@@ -3076,6 +3305,14 @@ msgstr ""
 msgid "Avandar couldn't download that link. Check it and try again."
 msgstr "Avandar haikuweza kupakua kiungo hicho. Kikague kisha ujaribu tena."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "Write a formula, or choose another way to fill this column."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Read as a date"
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default value (optional)"
 msgstr "Thamani ya kawaida (hiari)"
@@ -3095,6 +3332,14 @@ msgstr "Jumla"
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendSection.tsx
 msgid "Top right"
 msgstr "Juu kulia"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "You need edit access to Data Sources to change this crosswalk."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Spaces trimmed, UPPERCASE"
+msgstr ""
 
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeSetupButton.tsx
 msgid "Set up offline mode to chat without an internet connection."
@@ -3161,6 +3406,11 @@ msgstr "Inaundwa…"
 msgid "Are you sure you want to proceed with this action? This cannot be "
 "undone."
 msgstr "Je, uko tayari kuendelea na hatua hii? Hii haiwezi kubadilishwa."
+
+#: src/views/DataManagerApp/CrosswalkView/layoutLabel/LayoutName.tsx
+#: src/views/DataManagerApp/CrosswalkView/layoutLabel/useLayoutNamer.ts
+msgid "No datasets left"
+msgstr ""
 
 #: src/components/forms/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
@@ -3255,6 +3505,12 @@ msgstr "Hitilafu isiyotarajiwa imetokea. Unaweza kujaribu tena au urudi kwenye "
 msgid "Remove code list"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{datasetName} was left out: a column it fills from holds a different "
+"kind of values than the same column of the first dataset with its "
+"layout. Remove it, or fix that column's type at its source."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishedTargetUrl.tsx
 msgid "Save URL"
 msgstr "Hifadhi URL"
@@ -3339,6 +3595,10 @@ msgstr "Umeshiriki dashibodi yako ya kwanza na nafasi yako ya kazi. Mtu yeyote "
 
 #: src/hooks/dataDictionaries/useReapplyDictionary/useReapplyDictionary.ts
 msgid "You can no longer read {dictionaryName}, so it was not re-applied."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Coded columns come out as"
 msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
@@ -3429,6 +3689,10 @@ msgstr "Miundo yote"
 msgid "No columns are available"
 msgstr "Hakuna safu zinazopatikana"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConstantInput.tsx
+msgid "Every row from these datasets gets this value."
+msgstr ""
+
 #: src/views/GisApp/MapListView/MapCard.tsx
 msgid "{layerText} · {updatedDate}"
 msgstr "{layerText} · {updatedDate}"
@@ -3469,6 +3733,10 @@ msgstr "Rekodi ya ndani ya kila wakati ulipokubali (au kufuta) kutuma data kwa "
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeStatusList/CaseTypeStatusList.tsx
 msgid "{0, plural, one {# record} other {# records}}"
 msgstr "{0, plural, one {rekodi #} other {rekodi #}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "From a similar layout"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unsupported aggregate function \"{funcName}\" in SELECT; skipped."
@@ -3685,6 +3953,11 @@ msgstr "Haikuweza kuhifadhi eneo."
 msgid "is before"
 msgstr "ni kabla ya"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+"for access to it, then try again."
+msgstr ""
+
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
 "and discover insights from your data."
@@ -3769,6 +4042,12 @@ msgstr "Vya hivi karibuni"
 msgid "Report a bug"
 msgstr "Ripoti hitilafu"
 
+#: src/views/DataManagerApp/CrosswalkView/layoutLabel/LayoutName.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "{otherDatasetCount, plural, one {+# with the same layout} other {+# with "
+"the same layout}}"
+msgstr ""
+
 #: src/views/GisApp/shell/MapShell/MapShell.tsx
 msgid "Pan, zoom and tap a feature to read it. To edit layers, open this map on "
 "a tablet or a laptop."
@@ -3821,6 +4100,7 @@ msgid "Audience"
 msgstr "Hadhira"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useSaveApply.ts
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
 msgid "Updated {datasetName}."
 msgstr ""
 
@@ -3841,6 +4121,10 @@ msgstr "Sasisho linapatikana"
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "I ran the query, but it failed."
 msgstr "Nimeendesha hoja, lakini imeshindwa."
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Crosswalk deleted"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Step"
@@ -3920,6 +4204,7 @@ msgstr "{keyboardShortcut} kuhifadhi"
 #: src/views/DashboardApp/DashboardEditorView/DeleteDashboardButton.tsx
 #: src/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem.tsx
 #: src/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
@@ -3951,9 +4236,18 @@ msgstr "Workspace yako iko kwenye mpango wa Free, unaokuruhusu kushiriki au "
 msgid "Disable"
 msgstr "Zima"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "How it is filled"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/fileUrlErrorMessage.ts
 msgid "That file is no longer in the download. Choose another one."
 msgstr "Faili hilo halipo tena kwenye upakuaji. Chagua jingine."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStub.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Map each dataset"
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "WHERE clause uses an expression on the left-hand side that is not a "
@@ -4103,6 +4397,10 @@ msgstr "Kiwango cha chini"
 msgid "Dashboard unpublished."
 msgstr "Uchapishaji wa dashibodi umeondolewa."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
+msgid "Reference: {layoutName}"
+msgstr ""
+
 #: src/views/DataExplorerApp/GeneratedPromptBanner/GeneratedPromptBanner.tsx
 #: src/views/DataExplorerApp/QueryResultsError/QueryResultsError.tsx
 msgid "Show SQL"
@@ -4116,6 +4414,11 @@ msgstr "Orodha ya vipengele"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Grid"
 msgstr "Gridi"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "There is nothing to combine yet. Map at least one dataset that isn't "
+"skipped."
+msgstr ""
 
 #: src/components/Nux/tutorials/firstDashboard/firstDashboard.ts
 msgid "Your dashboard exists, but nobody else can open it yet. Let's choose who "
@@ -4172,6 +4475,10 @@ msgstr "Imeshindikana kuchapisha dashibodi"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyFacts.ts
 msgid "{convertedCount, plural, one {# converted} other {# converted}}"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "No change"
 msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/GraduatedMeasureSelect.tsx
@@ -4249,6 +4556,10 @@ msgstr "{pluginName} imeondolewa"
 msgid "Apply"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "{layoutName} (reference)"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.tsx
 msgid "Enter a name for this dataset"
 msgstr "Ingiza jina la dataset hii"
@@ -4322,6 +4633,8 @@ msgstr "Usaidizi wa jiometri bado unapakuliwa. Hii inaweza kuchukua muda kwa "
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardListMode.tsx
 #: src/views/DataExplorerApp/SqlQueryView/SqlQueryView.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/ApplyDictionariesHeader.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
 #: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/PastePairsModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/DataDictionaryActionsMenu.tsx
@@ -4379,9 +4692,17 @@ msgstr "Chora kisanduku kuzunguka jedwali, chati, ramani au kipande cha "
 msgid "Listing tables..."
 msgstr "Inaorodhesha majedwali..."
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Datasets with the same columns are mapped once, together."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceSection/PublishSliceSection.tsx
 msgid "Data scope"
 msgstr "Muktadha wa data"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Delete crosswalk"
+msgstr ""
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/DatasetPreviewSection/DatasetPreviewSection.tsx
@@ -4396,6 +4717,7 @@ msgstr "Anwani hii hairuhusiwi"
 msgid "Your Google connection expired"
 msgstr "Muunganisho wako wa Google umeisha muda"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryFromDatasetsView.tsx
 msgid "Checking your access"
 msgstr ""
@@ -4411,6 +4733,10 @@ msgstr "Hoja hii ilisimamishwa kabla haijakamilika."
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/LayerLoadStatus.tsx
 msgid "Needs geometry"
 msgstr "Inahitaji jiometri"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Another format"
+msgstr ""
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Gridline color"
@@ -4450,6 +4776,11 @@ msgstr "Chagua aina ya chati hapo juu ili kuisanidi."
 msgid "Attach to {datasetName}"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk changed while you were working on it. Reload the page and "
+"try again."
+msgstr ""
+
 #: src/components/AppErrorBoundary/ManualRecoveryScreen.tsx
 msgid "Please sign in again to continue. If signing in does not work, reset the "
 "app to clear cached data and try once more."
@@ -4471,9 +4802,20 @@ msgid "We couldn't find \"{displayName}\" in the catalog. Try adding it again."
 msgstr "Hatukuweza kupata \"{displayName}\" kwenye katalogi. Jaribu kuiongeza "
 "tena."
 
+#. placeholder {0}: props.count
+#. placeholder {0}: props.datasetCount
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutRows.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{0, plural, one {# dataset} other {# datasets}}"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "Review matches"
 msgstr "Kagua zinazolingana"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Combined dataset"
+msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 msgid "Saved to Dictionaries like any other dictionary. {originDatasetName} is "
@@ -4513,6 +4855,10 @@ msgstr "Tabaka"
 #: src/views/GisApp/panels/LayerInspector/LayerLeadStatus/LayerLeadStatus.tsx
 msgid "{0} areas suppressed"
 msgstr "Maeneo {0} yamefichwa"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ReferenceLayoutSelect.tsx
+msgid "Matches {percent} of the columns in the other datasets."
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator.tsx
 msgid "Annotation text:"
@@ -4652,6 +4998,10 @@ msgstr "Imezimwa"
 msgid "is at most"
 msgstr "ni isiyozidi"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Translate labels"
+msgstr ""
+
 #: src/components/caseFields/useBucketGrainLabels/useBucketGrainLabels.ts
 msgid "Per year"
 msgstr "Kwa mwaka"
@@ -4709,6 +5059,11 @@ msgstr "Mashirika yote"
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone.tsx
 msgid "Drop a file here, or click to browse"
 msgstr "Dondosha faili hapa, au bofya ili kuvinjari"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Two columns of the combined dataset have the same name, or one is named "
+"{sourceColumnName}. Rename one of them."
+msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Go to Data Explorer"
@@ -4836,6 +5191,10 @@ msgstr "Chapisha"
 msgid "Entries"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Multiplied by {factor}"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/CoordinateValidationReport/CoordinateValidationReason.tsx
 msgid "Rows {rowIndexes}."
 msgstr "Safu mlalo {rowIndexes}."
@@ -4955,6 +5314,10 @@ msgstr "Kipengele"
 msgid "Draft"
 msgstr "Rasimu"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Accept the suggestion for {columnName}"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/PrivateResourcesPanel/ReassignOwnerModal.tsx
 msgid "Choose who should own this member’s private dashboards and datasets. You "
 "will not gain access to them."
@@ -4967,6 +5330,12 @@ msgid "Kept on for a map that will be printed: a reader cannot otherwise tell "
 msgstr "Imeachwa ikiwa imewashwa kwa ramani itakayochapishwa: msomaji hawezi "
 "vinginevyo kutofautisha eneo ambalo halikuripoti chochote na eneo "
 "lililoripoti sifuri."
+
+#. placeholder {0}: problem.datasetCount
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{0, plural, one {# dataset has mappings you haven't confirmed.} other {# "
+"datasets have mappings you haven't confirmed.}}"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Bind geometry on the selected layer to buffer it."
@@ -5008,8 +5377,18 @@ msgid "SQL was not applied. Approve the assumed filter values to run this "
 msgstr "SQL haikutekelezwa. Kubali thamani za vichujio zilizokadiriwa ili "
 "kuendesha swali hili."
 
+#. placeholder {0}: props.pickedCount
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "{0, plural, one {Add # dataset} other {Add # datasets}}"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 msgid "Removed"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkNameField/CrosswalkNameField.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "Untitled crosswalk"
 msgstr ""
 
 #: src/components/ChatPanel/useAvandarChatRuntime/applyChatModelTurnResponse.ts
@@ -5081,6 +5460,8 @@ msgstr "Andika sasisho. Andika @ ili kumtaja mwenzako wa timu au kuunganisha "
 "dashibodi, seti ya data, au kesi."
 
 #. placeholder {0}: _sumColumns(pickedDatasetIds, columnCounts)
+#. placeholder {0}: draft.columns.length
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsStep.tsx
 msgid "{0, plural, one {# column} other {# columns}}"
 msgstr ""
@@ -5175,6 +5556,11 @@ msgstr "Gawanya (+/-)"
 msgid "Active"
 msgstr "Inatumika"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
+msgid "Combining datasets needs edit access to Data Sources. Ask a workspace "
+"admin for it."
+msgstr ""
+
 #: src/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor.tsx
 msgid "Default values, comma-separated or JSON array"
 msgstr "Thamani za chaguo-msingi, zilizotengwa kwa koma au orodha ya JSON"
@@ -5210,6 +5596,10 @@ msgstr "Hakuna mada"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Padding"
 msgstr "Pengo la ndani"
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "Through {crosswalkName}"
+msgstr ""
 
 #: src/views/GisApp/layers/BufferDistanceUnit.constants.ts
 msgid "ft"
@@ -5393,6 +5783,10 @@ msgstr "Safu wima ya 9"
 msgid "You do not have permission to open this part of the workspace."
 msgstr "Huna ruhusa ya kufungua sehemu hii ya eneo la kazi."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/MappedProgress.tsx
+msgid "{mapped} of {total} mapped"
+msgstr ""
+
 #: src/views/RegisterView/useRegisterUser.ts
 msgid "Please check your email"
 msgstr "Tafadhali angalia barua yako pepe"
@@ -5536,6 +5930,10 @@ msgstr "Ramani za faragha"
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Same values"
+msgstr ""
+
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some coordinates are 0, 0."
 msgstr "Baadhi ya viwianishi ni 0, 0."
@@ -5575,6 +5973,10 @@ msgid "{resultCount, plural, =0 {No addresses found} one {# address found} "
 "other {# addresses found}}"
 msgstr "{resultCount, plural, =0 {Hakuna anwani zilizopatikana} one {Anwani # "
 "imepatikana} other {Anwani # zimepatikana}}"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Accept"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/BufferMapTool/BufferMapTool.tsx
 msgid "Buffers are off for layers set to Displace, since rings would reveal "
@@ -5778,6 +6180,10 @@ msgstr "Andika jina la workspace ili kuthibitisha"
 msgid "Save failed"
 msgstr "Kuokoa kumeshindwa"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Months to years"
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/Composer/Composer.tsx
 msgid "Chat is enabled in Data Explorer and Dashboards"
 msgstr "Chat imewezeshwa katika Data Explorer na Dashboards"
@@ -5845,6 +6251,11 @@ msgstr "Badilisha nenosiri"
 #: src/routes/_auth/$workspaceSlug/checkout.tsx
 msgid "Checkout Successful!"
 msgstr "Malipo Yamefanikiwa!"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "The crosswalk failed to load. Please try again later or reach out to "
+"support."
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ClarificationLogPanel.tsx
 msgid "Answered"
@@ -5947,6 +6358,10 @@ msgstr "Sogeza kielekezi juu ya ramani ili kusoma kiwianishi"
 #~ msgid "The name could not be saved: {0}"
 #~ msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Trim spaces, lowercase"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 msgid "Choose the language used across this workspace. Right-to-left languages "
 "flip the layout automatically."
@@ -5960,6 +6375,11 @@ msgstr "Hakuna mipango inapatikana."
 #: src/views/DataExplorerApp/copy/queryFilterOperatorLabel/queryFilterOperatorLabel.ts
 msgid "is on or after"
 msgstr "ni baada ya au tarehe hiyo"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Trim spaces"
+msgstr ""
 
 #: src/components/ChatPanel/ClarificationCard/DiscoveryUnavailableBody/DiscoveryRecoveryActions.tsx
 msgid "Try a different lookup"
@@ -6047,6 +6467,11 @@ msgstr "Tumia kila kichujio cha kimataifa kwenye dashibodi."
 msgid "Collapse"
 msgstr "Punguza"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Labels"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnValuesTable.tsx
 msgid "code {code}"
 msgstr ""
@@ -6104,6 +6529,12 @@ msgstr "Umbali hadi iliyo karibu zaidi na {sourceName}"
 msgid "is any of"
 msgstr "ni mojawapo ya"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkStaleBanner/CrosswalkStaleBanner.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Update combined dataset"
+msgstr ""
+
 #: src/views/GisApp/MapListView/CreateMapButton.tsx
 msgid "New map"
 msgstr "Ramani mpya"
@@ -6154,6 +6585,10 @@ msgstr "Eneo hilo halipo kwenye ukurasa tulioujumuisha katika usomaji. "
 #: src/views/GisApp/panels/LayerInspector/DataSection/SimplificationControls.tsx
 msgid "Advanced geometry settings"
 msgstr "Mipangilio mahiri ya jiometri"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "There are no datasets you can add."
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Upload CSV"
@@ -6218,6 +6653,10 @@ msgstr "Mazungumzo mapya"
 msgid "Unavailable result"
 msgstr "Matokeo hayapatikani"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "Reject the suggestion for {columnName}"
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceDatasetStep.tsx
 msgid "Create places dataset"
 msgstr "Unda mkusanyiko wa data wa maeneo"
@@ -6274,6 +6713,10 @@ msgstr "Ilisasishwa katika mwaka uliopita"
 msgid "1 filter"
 msgstr "Kichujio 1"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "Example"
+msgstr ""
+
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Shown under the map and in every export. Required."
 msgstr "Inaonyeshwa chini ya ramani na katika kila uhamishaji. Inahitajika."
@@ -6288,6 +6731,11 @@ msgstr "Yenye ukubwa"
 msgid "Save to dashboard"
 msgstr "Hifadhi kwenye dashibodi"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "The formula that fills {columnName} for {layoutName} isn't a valid "
+"expression. Fix it in Map each dataset."
+msgstr ""
+
 #: src/components/ChatPanel/ChatThread/ChatContextTray/ChatContextPickerOptions.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Added"
@@ -6300,6 +6748,11 @@ msgstr "Aina ya lebo"
 #: src/views/GisApp/panels/LayerInspector/SensitivitySection/JitterSensitivityControl.tsx
 msgid "Displace within"
 msgstr "Sambaza ndani ya"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "The crosswalk could not be deleted. Please try again or reach out to "
+"support."
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Number"
@@ -6412,6 +6865,10 @@ msgstr "Seti ya data sasa ni ya mtandaoni pekee"
 msgid "{0} copy"
 msgstr "Nakala ya {0}"
 
+#: src/views/DataManagerApp/DatasetNavbar/DatasetNavbar.tsx
+msgid "Crosswalks"
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Original"
 msgstr "Asili"
@@ -6426,6 +6883,7 @@ msgstr ""
 
 #: src/components/Nux/NuxTour/NuxTooltip/NuxTooltipFooter.tsx
 #: src/components/Nux/NuxTour/NuxTourJoyride.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsFooter.tsx
 msgid "Next"
 msgstr "Ifuatayo"
 
@@ -6552,6 +7010,10 @@ msgstr "ni kweli"
 msgid "URL"
 msgstr "URL"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "Add the datasets to combine first."
+msgstr ""
+
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "GROUP BY uses a non-column expression."
 msgstr "GROUP BY inatumia usemi ambao si safu."
@@ -6626,6 +7088,7 @@ msgstr "Ya mstari"
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachFooter.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveFooter.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesFooter.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValuesFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveFooter.tsx
@@ -6754,6 +7217,11 @@ msgstr "Kusasisha nenosiri kumeshindikana"
 msgid "Row {0}: {1}"
 msgstr "Mstari {0}: {1}"
 
+#. placeholder {0}: problem.datasetCount
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{0, plural, one {# dataset is skipped.} other {# datasets are skipped.}}"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareGeneralAccess.tsx
 msgid "Anyone in {app}"
 msgstr "Mtu yeyote katika {app}"
@@ -6817,6 +7285,20 @@ msgstr ""
 msgid "Add dataset to workspace"
 msgstr "Ongeza seti ya data kwenye eneo la kazi"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "One SQL expression. Put column names in braces, such as "
+"{exampleFormula}."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkStepLabels/useCrosswalkStepLabels.ts
+msgid "Create combined dataset"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Don't translate"
+msgstr ""
+
 #. placeholder {0}: summary.distinctValuesCount.toLocaleString(i18n.locale)
 #. placeholder {1}: totalRows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.tsx
@@ -6852,6 +7334,10 @@ msgstr "Hesabu ni mistari mingapi katika {datasetName}"
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 #~ msgid "Attached as reference"
 #~ msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/AddColumnButton.tsx
+msgid "Column name"
+msgstr ""
 
 #. placeholder {0}: _getRowLabel(leaf, columns)
 #: src/views/GisApp/panels/FeatureInspector/ClusterFeatureTable/ClusterFeatureTableBody.tsx
@@ -6901,6 +7387,10 @@ msgstr "[Utafutaji wa ugunduzi wa ndani umeshindikana. Jaribu safu wima tofauti 
 "au hoja ya utafutaji bila kuniomba nichague kwenye katalogi "
 "iliyoshindwa.]"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/ExportMappingButton.tsx
+msgid "Export mapping"
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useSuggestLabels.ts
 msgid "Suggested labels filled in. Check them before saving."
 msgstr ""
@@ -6932,6 +7422,11 @@ msgstr "Lebele, mfano. Mkoa"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/UsageStatusCell.tsx
 msgid "Up to date"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+msgid "A column"
 msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesForm/SaveErrorCallout.tsx
@@ -7007,6 +7502,11 @@ msgstr "Vitendo zaidi"
 msgid "Horizontal gridlines"
 msgstr "Mistari mlalo ya gridi"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/useSaveCombinedDataset/useSaveCombinedDataset.ts
+msgid "{datasetName} was saved, but it could not be opened. Open it from the "
+"dataset list."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Number range"
 msgstr "Muda wa nambari"
@@ -7027,6 +7527,7 @@ msgstr "seti data zaidi ya {formattedNumResults}"
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTableHead.tsx
@@ -7074,6 +7575,15 @@ msgstr "Mtu aliyeongeza laha hii anahitaji kuunganisha tena akaunti yake ya "
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfPagePreview.tsx
 msgid "Could not render this page."
 msgstr "Ukurasa huu haukuweza kuonyeshwa."
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{columnName} for {layoutName} translates with a code list that was "
+"deleted, so its values come through unchanged."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/useSaveCrosswalk/useSaveCrosswalk.ts
+msgid "Your profile is still loading. Try again."
+msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/LinkedDatasetCard.tsx
 msgid "Create a new linked dataset"
@@ -7401,6 +7911,10 @@ msgstr "Chagua moja au zaidi"
 msgid "Large"
 msgstr "Kubwa"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Spaces trimmed, lowercase"
+msgstr ""
+
 #: src/views/GisApp/export/loadExportFeatureTable/loadExportFeatureTable.ts
 msgid "The map's data is still loading. Try again in a moment."
 msgstr "Data ya ramani bado inapakia. Jaribu tena baada ya muda mfupi."
@@ -7420,6 +7934,10 @@ msgstr "Imetumwa barua ya kuweka upya nenosiri"
 #: src/views/GisApp/panels/LayerInspector/DataSection/AreaAggregationControls/AggregationOperationSelect.tsx
 msgid "Aggregation"
 msgstr "Ujumlishaji"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Letter case"
+msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/GraduatedControls/HighlightValuesBelowInput.tsx
 msgid "Below {threshold}"
@@ -7442,6 +7960,10 @@ msgstr "Unaweza kuona dataset hii kwa sababu ilishirikiwa nawe."
 #: src/views/GisApp/panels/LayerInspector/ClassificationEditor/ClassificationBreakHandles/ClassificationBreakHandles.tsx
 msgid "Break {0} of {1}, {value}"
 msgstr "Sehemu {0} kati ya {1}, {value}"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Blocks:"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginDetails/PluginDataAccessSection.tsx
 msgid "Add calculated columns to a Data Explorer query when you run one of its "
@@ -7527,6 +8049,7 @@ msgstr "Msimbo wa EPSG"
 msgid "Allow manual edit"
 msgstr "Ruhusu kuhariri kwa mkono"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogFilterRail.tsx
 msgid "Format"
 msgstr "Umbizo"
@@ -7577,6 +8100,8 @@ msgid "Download PDF"
 msgstr "Pakua PDF"
 
 #: src/components/caseStatuses/StatusSetEditor/useStatusSetIssueMessages.ts
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/useColumnNameError.ts
 msgid "Enter a name."
 msgstr "Weka jina."
 
@@ -7588,6 +8113,10 @@ msgstr ""
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
 msgid "Bold"
 msgstr "Nene"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Confirmed"
+msgstr ""
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/useValuePickerOptions.ts
 msgid "Alphabetically first"
@@ -7774,6 +8303,7 @@ msgstr "Nimetumia hoja katika Mchambuzi wa Data."
 msgid " Not published yet."
 msgstr " Bado haijachapishwa."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/useReviewHeadline.ts
 msgid "{datasetCount, plural, one {# dataset} other {# datasets}}"
@@ -7805,6 +8335,11 @@ msgstr "Andika jibu lako..."
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Built by hand"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "This isn't a single SQL expression. Check its brackets, quotes, and "
+"commas."
 msgstr ""
 
 #: src/components/AppDropzone/openFileImportFlow.tsx
@@ -7863,8 +8398,17 @@ msgstr "Sera ya Faragha"
 msgid "Sign out failed"
 msgstr "Kutoka nje kumeshindikana"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "One of the mappings is incomplete, so nothing was saved. Check how each "
+"column is filled and try again."
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveApplyNextField.tsx
 msgid "Apply it to {firstName} next"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Delete {crosswalkName}? Its mappings are deleted."
 msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewColumnsFooter.tsx
@@ -7893,6 +8437,7 @@ msgstr "Chagua thamani inayojirudia zaidi"
 msgid "Please try again. The PDF was not created."
 msgstr "Tafadhali jaribu tena. PDF haikuundwa."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Date format"
@@ -7936,6 +8481,10 @@ msgstr "si yoyote kati ya"
 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodePairRow.tsx
 msgid "Other spellings of value {rowNumber}"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Names the dataset each row came from."
 msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/GoToMapTool/GoToMapTool.tsx
@@ -7985,6 +8534,10 @@ msgstr "Programu"
 msgid "/month (paid yearly)"
 msgstr "/mwezi (inalipwa kila mwaka)"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkStaleBanner/CrosswalkStaleBanner.tsx
+msgid "A dictionary this crosswalk uses has changed."
+msgstr ""
+
 #: src/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardCreateMode.tsx
 msgid "Back to dashboards"
 msgstr "Rudi kwa dashibodi"
@@ -8023,6 +8576,10 @@ msgstr "Kila series ni safu ya nambari iliyoonyeshwa kwenye thamani ya radial. "
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading case type"
 msgstr "Inapakia aina ya kesi"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "Formula"
+msgstr ""
 
 #: src/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard.tsx
 msgid "Dataset loaded successfully"
@@ -8087,6 +8644,10 @@ msgstr "Idadi ya safu za kupuuzia"
 #: src/components/badges/SourceBadge.tsx
 msgid "From CSV"
 msgstr "Kutoka CSV"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Years to months"
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary.tsx
 msgid "min"
@@ -8284,6 +8845,10 @@ msgstr "Mwelekeo"
 msgid "Dashboard deleted successfully!"
 msgstr "Dashibodi imefutwa kwa mafanikio!"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ReferenceLayoutSelect.tsx
+msgid "Reference layout"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PickedEntryDetails.tsx
 msgid "Chosen from the data: these values are codes."
 msgstr ""
@@ -8307,6 +8872,10 @@ msgstr "Chora mshale"
 #: src/components/caseStatuses/useStatusColorLabels.ts
 msgid "Purple"
 msgstr "Zambarau"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "More crosswalk actions"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/IsochroneMapTool.tsx
 msgid "This tool arrives in a later release."
@@ -8429,6 +8998,9 @@ msgid "{pluginName}: the command failed"
 msgstr "{pluginName}: amri imeshindikana"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/ResolutionControl.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
 msgid "Leave empty"
 msgstr ""
 
@@ -8447,6 +9019,11 @@ msgstr "Unganisha tena akaunti yako ya Google kisha ujaribu tena."
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Direction"
 msgstr "Mwelekeo"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+msgid "A fixed value"
+msgstr ""
 
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Edited"
@@ -8540,6 +9117,12 @@ msgstr "Ongeza mfululizo"
 msgid "{0} km"
 msgstr "{0} km"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/FilledFromCell.tsx
+msgid "Not filled yet"
+msgstr ""
+
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
@@ -8619,6 +9202,9 @@ msgstr "Lebo ya mhimili wa X"
 msgid "This custom URL is reserved. Try adding a word to it."
 msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutRows.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "Reference"
 msgstr ""
@@ -8649,6 +9235,10 @@ msgstr "Modeli za nje ya mtandao zimepakuliwa"
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListMaxRowsField.tsx
 msgid "Maximum rows"
 msgstr "Safu mlalo za juu zaidi"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Keep case"
+msgstr ""
 
 #: src/components/providers/AvandarAppProvider.tsx
 msgid "{fieldName} must be at least {minLength} characters long"
@@ -8712,9 +9302,17 @@ msgstr "Puuza vichujio vyote vya kimataifa: uonyeshaji huu haujafichwa."
 msgid "Google Sheet"
 msgstr "Google Sheet"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Length"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/BiasNudgePanel.tsx
 msgid "You wrote:"
 msgstr "Umeandika:"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkNoAccess.tsx
+msgid "You can't edit crosswalks"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/usePeriodTableCaption.ts
 msgid "{fieldName} per day"
@@ -8749,6 +9347,11 @@ msgstr "Kushiriki kumeshindwa"
 #: src/views/GisApp/shell/MapToolCluster/MeasureReadout.tsx
 msgid "Measure readout"
 msgstr "Usomaji wa kipimo"
+
+#: src/config/AppLinks/AppLinks.tsx
+#: src/views/DataManagerApp/DataManagerToolbarActions/NewCrosswalkButton.tsx
+msgid "New crosswalk"
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryRail/DataDictionaryRail.tsx
 msgid "Both ways"
@@ -9028,6 +9631,8 @@ msgstr ""
 msgid "Ascending"
 msgstr "Kuongeza"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListStatusBadge.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/SuggestedTag.tsx
 msgid "Suggested"
@@ -9115,6 +9720,10 @@ msgstr "Hariri aina ya kesi"
 msgid "Dictionaries failed to load"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "It may have been deleted. Open another one from Data Sources."
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/ReviewColumnsStep/ReviewSections.tsx
 msgid "Coded columns"
 msgstr ""
@@ -9144,6 +9753,10 @@ msgstr ""
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/PdfParseControls/getOutputModeCopy/getOutputModeCopy.ts
 msgid "Rows from this table"
 msgstr "Mistari kutoka kwenye jedwali hili"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Days to years"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardShareModal/DashboardMapAudienceAlert/useLimitedAudienceMapNames.ts
 msgid "{numUnavailableMaps, plural, one {a map hidden from you} other {# maps "
@@ -9279,6 +9892,10 @@ msgid "Natural breaks used an evenly ranked sample of 5,000 values."
 msgstr "Mivunjo ya asili ilitumia sampuli iliyopangwa kwa viwango kwa usawa ya "
 "thamani 5,000."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Translated with {codeListName}"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/MedicalStrictPanel.tsx
 msgid "This data appears to contain health or patient information. Sending it "
 "to an AI provider may have legal and ethical implications (HIPAA, GDPR, "
@@ -9343,6 +9960,7 @@ msgid "Assigned to: {label}"
 msgstr "Imekabidhiwa kwa: {label}"
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftSourceSection.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutRows.tsx
 msgid "Remove {datasetName}"
 msgstr "Ondoa {datasetName}"
 
@@ -9473,6 +10091,11 @@ msgstr "Ukali ({0})"
 msgid "Search an address"
 msgstr "Tafuta anwani"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Add datasets"
+msgstr ""
+
 #. placeholder {0}: columns.length
 #. placeholder {1}: numRows.toLocaleString(i18n.locale)
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline.tsx
@@ -9564,6 +10187,10 @@ msgstr ""
 msgid "No basemap"
 msgstr "Hakuna ramani msingi"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "Translate codes with"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Categorical: named groups, such as sex or outcome"
 msgstr ""
@@ -9616,6 +10243,15 @@ msgstr "Kiteuzi cha faili cha Google hakikuweza kufunguliwa. Tafadhali jaribu "
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents.tsx
 msgid "{formattedPrice}/seat"
 msgstr "{formattedPrice}/kiti"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "Reading an example"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "Delete {crosswalkName}? Its mappings are deleted. {combinedDatasetName} "
+"stays, but stops updating."
+msgstr ""
 
 #: src/views/GisApp/export/ExportSheet/ExportSheetFeatureListSortFields.tsx
 msgid "Sort direction"
@@ -9682,6 +10318,10 @@ msgstr "hailingani na regex"
 
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Categorical"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane.tsx
+msgid "Rows from these datasets leave {columnName} empty."
 msgstr ""
 
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
@@ -9769,6 +10409,10 @@ msgstr "iko wazi"
 msgid "Create a new workspace. You can always edit it later."
 msgstr "Unda eneo jipya la kazi. Unaweza kila wakati kulihariri baadaye."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkActionsMenu/CrosswalkActionsMenu.tsx
+msgid "{crosswalkName} was deleted."
+msgstr ""
+
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/$individualId.tsx
 #: src/routes/_auth/$workspaceSlug/individual-manager/$conceptId/route.tsx
 #: src/routes/_auth/$workspaceSlug/ontology-designer/$conceptId.tsx
@@ -9788,6 +10432,10 @@ msgid "A linked dataset reads {datasetName}, so it can't be changed in place. "
 "Convert in the linked dataset instead."
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Multiply"
+msgstr ""
+
 #: src/views/DataManagerApp/ApplyDictionariesView/useApplyErrorMessage.ts
 msgid "{datasetName} is already up to date."
 msgstr ""
@@ -9801,6 +10449,10 @@ msgstr "Mtumiaji wa hifadhidata anapaswa kuwa na ufikiaji wa kusoma pekee "
 #: src/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip.tsx
 msgid "Close chat"
 msgstr "Funga gumzo"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "Loading the crosswalk"
+msgstr ""
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "The latitude must be between -90 and 90."
@@ -9992,6 +10644,11 @@ msgstr "Jina lako"
 msgid "Disputed status column"
 msgstr "Safu ya hali ya Zinazobishaniwa"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "The combined dataset needs at least one column, and no two columns can "
+"share a name."
+msgstr ""
+
 #: src/views/DashboardApp/DashboardShareModal/PublishSliceRowFilter/PublishSliceRowFilter.tsx
 msgid "Remove row filter"
 msgstr "Ondoa kichujio cha safu"
@@ -10029,6 +10686,10 @@ msgstr ""
 #: src/components/Nux/NuxWelcomeModal/NuxWelcomeModal.tsx
 msgid "Start tour"
 msgstr "Anza ziara"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineSettings.tsx
+msgid "Add a {sourceColumnName} column"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/useDatasetImportValidation.ts
 msgid "Can't save dataset"
@@ -10091,6 +10752,10 @@ msgstr "Kiungo hicho si cha faili la CSV, Excel, au PDF."
 msgid "Import dataset"
 msgstr "Ingiza seti ya data"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Trim spaces, UPPERCASE"
+msgstr ""
+
 #: src/views/GisApp/panels/LegendPanel/MapLegend/SizeLegend/SizeLegend.tsx
 msgid "Symbol sizes from {firstLabel} to {lastLabel}"
 msgstr "Ukubwa wa alama kutoka {firstLabel} hadi {lastLabel}"
@@ -10144,6 +10809,7 @@ msgid "does not end with"
 msgstr "haiishii na"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/PreviewTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "empty"
 msgstr ""
 
@@ -10168,6 +10834,10 @@ msgstr "Zana hii inahitaji usaidizi wa jiometri, ambao haukuweza kupakiwa."
 msgid "Save your changes first: the PDF reflects the saved dashboard."
 msgstr "Hifadhi mabadiliko yako kwanza: PDF inaonyesha dashibodi "
 "iliyohifadhiwa."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Remove column"
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntriesTab/DictionaryEntriesTab.tsx
 msgid "Edit {entryName}"
@@ -10395,6 +11065,10 @@ msgstr "Kikomo cha chini"
 msgid "This sheet can't be read right now"
 msgstr "Laha hii haiwezi kusomwa kwa sasa"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillKindControl.tsx
+msgid "How this column is filled"
+msgstr ""
+
 #: src/components/caseStatuses/StatusSetEditor/RemovedStatusRow.tsx
 #: src/components/caseStatuses/StatusSetEditor/StatusSetEditorRow.tsx
 msgid "Untitled status"
@@ -10440,8 +11114,19 @@ msgstr "Vichujio vya kimataifa"
 
 #: shared/copy/vizSettingGroupLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 msgid "Layout"
 msgstr "Mpangilio"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "Preview"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
+msgid "Matches use column names and types only. You can still map "
+"{datasetName}."
+msgstr ""
 
 #: src/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextSelectFrame.tsx
 msgid "Move annotation text"
@@ -10509,11 +11194,19 @@ msgstr "Jina la Seti ya Data"
 msgid "Copy share link"
 msgstr "Nakili kiungo cha kushiriki"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SuggestionActions.tsx
+msgid "This fill is a suggestion. Accept it, change it, or reject it."
+msgstr ""
+
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
 msgid "The file is hosted on a different site from the one that lists it, so "
 "Avandar doesn't download it."
 msgstr "Faili imepangishwa kwenye tovuti tofauti na ile inayoiorodhesha, kwa "
 "hivyo Avandar haipakui."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable.tsx
+msgid "Filled from this dataset"
+msgstr ""
 
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 msgid "Loading map"
@@ -10538,6 +11231,10 @@ msgstr "Maeneo {0} yamefichwa"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ModeSwitch.tsx
 msgid "Apply conversions"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Fixed value"
 msgstr ""
 
 #: src/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect.tsx
@@ -10665,10 +11362,23 @@ msgstr ""
 msgid "Loading dashboard"
 msgstr "Inapakia dashibodi"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "Avandar could not combine these datasets on this device. Check the "
+"mappings and try again."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/DataSection/BoundarySourceControls/BoundaryDatasetSelect.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/PointAggregationControls/PointBoundaryControls.tsx
 msgid "Boundary dataset"
 msgstr "Seti ya data ya mipaka"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Padded with zeros to {length}"
+msgstr ""
+
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/OpenCrosswalkLink.tsx
+msgid "Open crosswalk {crosswalkName}"
+msgstr ""
 
 #: src/hooks/ui/useGooglePicker.ts
 msgid "Shared with me"
@@ -10714,6 +11424,10 @@ msgid "{count, plural, one {Hide # column with no match} other {Hide # columns "
 "with no match}}"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Name and type · {percent}"
+msgstr ""
+
 #: src/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime.ts
 msgid "This question is too long for the offline models. Try a shorter "
 "question, or turn offline mode off to use online chat."
@@ -10757,6 +11471,7 @@ msgstr ""
 msgid "There was an error while trying to authenticate with Google Sheets."
 msgstr "Kulikuwa na hitilafu wakati wa kujaribu kuthibitisha na Google Sheets."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/CodeListStatusBadge.tsx
 msgid "To do"
 msgstr ""
@@ -10783,6 +11498,11 @@ msgstr "Inapakia rasilimali za faragha"
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "Choose the first value we see"
 msgstr "Chagua thamani ya kwanza tunayoona"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Use %Y for the year, %m for the month, and %d for the day, such as "
+"{exampleFormat}."
+msgstr ""
 
 #: src/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.tsx
 msgid "ID"
@@ -10817,6 +11537,10 @@ msgstr "Imetengenezwa \"{dashboardName}\""
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogFilterRail/DataCatalogUpdatedWithinSelect.tsx
 msgid "Past month"
 msgstr "Mwezi uliopita"
+
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+msgid "Multiply by {factor}"
+msgstr ""
 
 #. placeholder {0}: diagnostics.unmatchedBoundaryCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
@@ -10912,6 +11636,11 @@ msgid "This name only applies in {workspaceName}. Your other workspaces keep "
 msgstr "Jina hili linatumika tu katika {workspaceName}. Workspace zako nyingine "
 "zina majina yao wenyewe."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingTable.tsx
+msgid "Column of the combined dataset"
+msgstr ""
+
 #. placeholder {0}: diagnostics.ambiguousSourceKeyCount ?? 0
 #: src/views/GisApp/panels/LayerInspector/MatchReport/MatchReport.tsx
 msgid "{0} ambiguous source keys"
@@ -10940,6 +11669,7 @@ msgstr "Workspace hii haina usajili halali."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 #: src/views/DataManagerApp/DataDictionaryView/ApplyToDatasetButton/ApplyToDatasetModal.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/PickDatasetsStep/PickDatasetsTableHead.tsx
@@ -11050,6 +11780,10 @@ msgstr "Kosa"
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryNameField.tsx
 msgid "dictionary name"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Spaces trimmed"
 msgstr ""
 
 #: src/views/GisApp/panels/FeatureListDrawer/FeatureListTableRow.tsx
@@ -11170,6 +11904,10 @@ msgstr ""
 msgid "Choose what to read"
 msgstr "Chagua cha kusoma"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Change the values"
+msgstr ""
+
 #: src/components/privacy/ConsentModal/CompositePanel.tsx
 msgid "Suggested rewrite:"
 msgstr "Mapendekezo ya kuandika upya:"
@@ -11206,6 +11944,10 @@ msgstr "Ondoa"
 msgid "+{numHidden} more"
 msgstr "+{numHidden} zaidi"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/CrosswalkNameField/CrosswalkNameField.tsx
+msgid "crosswalk name"
+msgstr ""
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftCard.tsx
 msgid "1 dataset"
 msgstr "Seti 1 ya data"
@@ -11214,6 +11956,10 @@ msgstr "Seti 1 ya data"
 #: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 msgid "No numeric columns"
 msgstr "Hakuna safu za nambari"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/CombineInput.tsx
+msgid "Insert column"
+msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingDetail/DataCatalogSourceGroup.tsx
 msgid "Service"
@@ -11326,6 +12072,10 @@ msgstr ""
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Edit permissions"
 msgstr "Hariri ruhusa"
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/LayoutStub/LayoutStamp.tsx
+msgid "Mapped"
+msgstr ""
 
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusMenu.tsx
 msgid "Change status"
@@ -11443,6 +12193,10 @@ msgid "Give each value the label people should see. Suggestions are only a "
 "starting point."
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Your plan's dataset limit is reached, so a new dataset can't be added."
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/usePluginActionCopy.ts
 msgid "Install"
 msgstr "Sakinisha"
@@ -11501,6 +12255,10 @@ msgstr "Zilizowekwa katika makundi"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnPane.tsx
 msgid "Also matches {names}."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Every column of the combined dataset needs a name."
 msgstr ""
 
 #: src/components/permissions/useShareButtonState.ts
@@ -11762,6 +12520,7 @@ msgstr "Eneo lako la kazi liko kwenye mpango wa Bure, ambao unasaidia hadi seti 
 msgid "Avandar turns your question into a query to show you the answers."
 msgstr "Avandar hubadilisha swali lako kuwa query ili kukuonyesha majibu."
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/DictionaryUsedByTable.tsx
 msgid "Status"
 msgstr ""
@@ -11785,6 +12544,10 @@ msgstr "Safu mlalo {0}, {1}"
 msgid "{0} features"
 msgstr "Vipengele {0}"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Another number"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 #: src/components/permissions/ShareResourceModal/ShareGeneralAccess/ShareWorkspaceRoleSelect.tsx
 #: src/components/permissions/ShareResourceModal/SharePrincipalRow/SharePrincipalRow.tsx
@@ -11803,6 +12566,10 @@ msgstr "Shirika"
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryIdentityFields.tsx
 msgid "Type a column name and press Enter"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/useColumnNameError.ts
+msgid "{trimmedName} is already a column of the combined dataset."
 msgstr ""
 
 #: src/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView.tsx
@@ -11881,6 +12648,11 @@ msgstr "Rekodi za Kesi"
 msgid "Purchase {seatsToAdd} seats"
 msgstr "Nunua viti {seatsToAdd}"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/useFillSummary.ts
+msgid "Read as a date ({format})"
+msgstr ""
+
 #: src/components/RichText/Gadget/gadgetRegistry/gadgetRegistry.ts
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
 msgid "Loading dataset"
@@ -11917,6 +12689,11 @@ msgstr "Leta mkusanyiko wako wa kwanza wa data"
 msgid "Left"
 msgstr "Kushoto"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Avandar couldn't check your access to {existingName}. Reload the page "
+"and try again."
+msgstr ""
+
 #. placeholder {0}: vizTypeLabel(vizType)
 #. placeholder {1}: limit.max
 #. placeholder {2}: limit.noun
@@ -11951,6 +12728,10 @@ msgstr "Avandar inaweza kuleta faili za CSV, Excel na PDF."
 #: src/views/GisApp/panels/MapStatusCard/MapPartialMappingStatus.tsx
 msgid "Some rows have an empty latitude or longitude."
 msgstr "Baadhi ya safu zina latitudo au longitudo tupu."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Map this dataset"
+msgstr ""
 
 #. placeholder {0}: capitalize(role)
 #: src/components/permissions/ShareResourceModal/buildShareSummary/buildShareSummary.ts
@@ -12160,10 +12941,15 @@ msgstr "Jaribu tena."
 msgid "contains"
 msgstr "ina"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "{datasetName} has no values to show here."
+msgstr ""
+
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the notes under 2,000 characters."
 msgstr "Weka madokezo yasizidi herufi 2,000."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
 msgid "No code list"
 msgstr ""
@@ -12172,6 +12958,10 @@ msgstr ""
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 msgid "If there are multiple {attributeName} values for one {0}, then..."
 msgstr "Ikiwa kuna thamani nyingi za {attributeName} kwa {0} moja, basi..."
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/AddDatasetsModal/AddDatasetsModal.tsx
+msgid "This dataset has no columns yet."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "Unnamed column expression in SELECT; skipped."
@@ -12326,8 +13116,17 @@ msgstr ""
 msgid "Horizontal padding"
 msgstr "Pambizo ya mlalo"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/useCrosswalkFacts.ts
+#: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
+msgid "Crosswalk"
+msgstr ""
+
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/NewDictionaryHeader.tsx
 msgid "New dictionary from {originDatasetName}"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Before you combine"
 msgstr ""
 
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogInvalidNotice/DataCatalogInvalidNotice.tsx
@@ -12345,6 +13144,14 @@ msgstr "H2"
 #: src/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy.ts
 msgid "Your data will change. The labels stay attached too, so the column is "
 "still explained."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/FillExample.tsx
+msgid "In the combined dataset"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Entry no longer available"
 msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
@@ -12465,6 +13272,10 @@ msgstr "mstari"
 msgid "Source ID"
 msgstr "Kitambulisho cha chanzo"
 
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkView.tsx
+msgid "This crosswalk no longer exists"
+msgstr ""
+
 #: src/views/GisApp/panels/LayerPanel/LayerRow/LayerStatusBadge/ReadyLayerStatus.tsx
 msgid "{droppedRowCount} rows unmapped"
 msgstr "Safu {droppedRowCount} hazijawekewa ramani"
@@ -12483,6 +13294,11 @@ msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DataDictionaryHeader/DataDictionaryHeader.tsx
 msgid "Dictionary"
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/useColumnNameError.ts
+msgid "{sourceColumnName} is the column that names each row's dataset. Choose "
+"another name."
 msgstr ""
 
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
@@ -12555,6 +13371,9 @@ msgid "Failed to update display name"
 msgstr "Imeshindwa kuboresha jina la kuonyesha"
 
 #: src/components/dataDictionaries/CodeListPopover/CodeListPopoverContent.tsx
+#: src/views/DataManagerApp/CrosswalkView/CrosswalkHeader/ExportMapping/useMappingCsvCopy.ts
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/MappingPane.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MappingRow.tsx
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryEntryPane/EntryCodesFields.tsx
 msgid "Code list"
 msgstr ""
@@ -12590,6 +13409,7 @@ msgid "{valueCount, plural, one {# value in {listNames} has no label yet. It is 
 msgstr ""
 
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesStep.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsStep.tsx
 msgid "The values could not be read"
 msgstr ""
 
@@ -12678,6 +13498,10 @@ msgstr "Hitilafu isiyotarajiwa imetokea."
 msgid "Pay what you want"
 msgstr "Lipa unachotaka"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Give the combined dataset a name."
+msgstr ""
+
 #. placeholder {0}: region.label
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 msgid "Remove {0}"
@@ -12756,6 +13580,10 @@ msgstr ""
 msgid "I ran the query, but no data matched it."
 msgstr "Nimeendesha query, lakini hakuna data iliyolingana nayo."
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingTable/MatchCell.tsx
+msgid "Name and type"
+msgstr ""
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Dictionary suggestions"
 msgstr ""
@@ -12829,6 +13657,10 @@ msgstr "Kigae cha dashibodi"
 msgid "Source"
 msgstr "Chanzo"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConvertControl.tsx
+msgid "Factor"
+msgstr ""
+
 #: src/views/IndividualManagerApp/AssignedToMeView/AssignedToMeStates.tsx
 #: src/views/IndividualManagerApp/IndividualNavbar/IndividualNavbar.tsx
 msgid "Loading records"
@@ -12863,6 +13695,10 @@ msgid "The publisher has not added any rows to it. You can still open the "
 "original, where it is published."
 msgstr "Mchapishaji hajaongeza safu zozote kwenye seti hii. Bado unaweza "
 "kufungua ya asili, ambako imechapishwa."
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "Choose a reference layout before saving."
+msgstr ""
 
 #: src/views/DataManagerApp/DataDictionaryView/DictionaryUsedByTab/HowAppliedCell.tsx
 msgid "data unchanged, always current"
@@ -12946,6 +13782,10 @@ msgstr "Maoni haya yalifutwa."
 msgid "Filter entries or column names"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/TranslateCodesControl.tsx
+msgid "The column holds"
+msgstr ""
+
 #: src/components/ChatPanel/OfflineModeControl/OfflineModeDialog.tsx
 msgid "Answers are slower and less accurate than online chat."
 msgstr "Majibu ni ya polepole na si sahihi kama mazungumzo ya mtandaoni."
@@ -12975,9 +13815,15 @@ msgstr "Jiometri ya nukta"
 msgid "Let's move these results to a dashboard"
 msgstr "Hebu tuhamishe matokeo haya kwenye dashibodi"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
+"that it still exists and that you can open it."
+msgstr ""
+
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ConstantInput.tsx
 #: src/views/IndividualManagerApp/SingleIndividualView/RecordFieldValue/RecordFieldPeriodTable/PeriodTable.tsx
 msgid "Value"
 msgstr "Thamani"
@@ -13012,6 +13858,10 @@ msgstr "Imeondolewa: {0}"
 msgid "New code list for this entry"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Add the datasets to combine."
+msgstr ""
+
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupSection.tsx
 msgid "Popup"
 msgstr "Dirisha ibukizi"
@@ -13022,6 +13872,11 @@ msgstr "Sharti"
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/SaveStep/SaveNameFields.tsx
 msgid "Give this dictionary a name."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "Avandar couldn't check your access to the combined dataset. Reload the "
+"page and try again."
 msgstr ""
 
 #. placeholder {0}: load.savedConnections?.length ?? 0
@@ -13085,6 +13940,7 @@ msgstr "Neno muhimu: {keyword}"
 #: src/views/DataManagerApp/ApplyDictionariesView/AttachStep/AttachSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/SaveAsStep/SaveSummaryTable.tsx
 #: src/views/DataManagerApp/ApplyDictionariesView/UnmatchedValuesStep/UnmatchedValuesTable.tsx
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/SourceColumnSelect.tsx
 msgid "Column"
 msgstr "Safu"
 
@@ -13106,6 +13962,11 @@ msgstr "Hii inatoa kundi la mtumiaji kutoka kwa wanachama na rasilimali "
 msgid "Largest radius"
 msgstr "Radi kubwa zaidi"
 
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This crosswalk's combined dataset changed while you were working. Reload "
+"the page and try again."
+msgstr ""
+
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "Top"
 msgstr "Juu"
@@ -13121,6 +13982,10 @@ msgstr "Kutoka kwa kichocheo chako:"
 #: src/stores/OfflineChatEngineStore/OfflineChatEngineStore.ts
 msgid "Keep this tab open until it finishes."
 msgstr "Acha kichupo hiki wazi hadi ikamilike."
+
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnSettings.tsx
+msgid "Remove column {columnName}"
+msgstr ""
 
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
@@ -13593,6 +14458,10 @@ msgstr "Bado hakuna ramani"
 msgid "Add a prompt and generate SQL to configure this visualization."
 msgstr "Ongeza kichocheo na tengeneza SQL ili kuunda picha hii."
 
+#: src/views/DataManagerApp/DatasetMetaView/CombinedByFact/CombinedByFact.tsx
+msgid "Combined by"
+msgstr ""
+
 #: src/components/RichText/Gadget/GadgetActionsMenu/useGadgetActions.ts
 #: src/views/DashboardApp/DashboardShareModal/ShareUrlActions.tsx
 msgid "Copy link"
@@ -13699,6 +14568,10 @@ msgid "{codedCount, plural, one {# with a code list: open the tag to read it} "
 "other {# with a code list: open the tag to read it}}"
 msgstr ""
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "Note:"
+msgstr ""
+
 #: src/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow.tsx
 msgid "Search by name or user group"
 msgstr "Tafuta kwa jina au kikundi cha mtumiaji"
@@ -13707,8 +14580,16 @@ msgstr "Tafuta kwa jina au kikundi cha mtumiaji"
 msgid "Failed to update email"
 msgstr "Imeshindwa kuboresha barua pepe"
 
+#: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MapLayoutsFooter.tsx
+msgid "Skip this dataset"
+msgstr ""
+
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Every value needs a code."
+msgstr ""
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "A dictionary this crosswalk uses changed. Reload the page and try again."
 msgstr ""
 
 #: src/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewVisibilitySummary.tsx
@@ -13826,6 +14707,11 @@ msgstr "Mchoro ({strokeWidth}px)"
 msgid "Publish to workspace"
 msgstr "Chapisha kwenye nafasi ya kazi"
 
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ReferenceLayoutSelect.tsx
+msgid "You confirmed mappings against this layout, so the reference can't "
+"change."
+msgstr ""
+
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 msgid "Whole number"
@@ -13877,6 +14763,11 @@ msgstr "Ondoa mkusanyiko huu wa data"
 #: src/components/AppDropzone/AppDropzone.tsx
 msgid "CSV or Excel file"
 msgstr "Faili ya CSV au Excel"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "{datasetName} was left out: its columns changed since it was mapped. "
+"Remove it and add it again to map its new columns."
+msgstr ""
 
 #: shared/copy/sqlFailedMappingReasonLabel.ts
 msgid "SELECT references column \"{columnName}\" not present in the dataset."
@@ -13960,6 +14851,10 @@ msgstr "Futa {label}"
 #: shared/copy/vizTypeLabel.ts
 msgid "Scatter Plot"
 msgstr "Chati ya Vitawanyiko"
+
+#: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/ChooseDatasetsStep.tsx
+msgid "Layouts"
+msgstr ""
 
 #: src/views/DataManagerApp/NewDictionaryFromDatasetsView/useNewDictionaryFlow.ts
 msgid "This dataset is no longer available. Pick the datasets to learn from."
@@ -14132,6 +15027,7 @@ msgid "Anyone"
 msgstr "Mtu yeyote"
 
 #: src/views/DataManagerApp/ApplyDictionariesView/PreviewDrawer/ApplyPreviewDrawer.tsx
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
 msgid "The preview could not be read"
 msgstr ""
 
@@ -14168,6 +15064,10 @@ msgstr "Rudi kwenye matokeo"
 #: src/views/GisApp/panels/LayerInspector/StyleSection/SymbologyTypeControl/SymbologyTypeControl.tsx
 msgid "Heat"
 msgstr "Joto"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.tsx
+msgid "{rowsText} from {datasetsText}"
+msgstr ""
 
 #: src/views/GisApp/shell/SkipLinks/SkipLinks.tsx
 msgid "Skip to layer settings"
