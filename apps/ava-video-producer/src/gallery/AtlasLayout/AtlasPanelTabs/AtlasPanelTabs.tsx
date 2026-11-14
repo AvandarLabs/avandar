@@ -38,15 +38,20 @@ export function AtlasPanelTabs({ tab, onTabChange, details, tokens }: Props) {
           }
           onTabChange(chosen);
         }}
-        classNames={{ root: css.root, list: css.list, panel: css.panel }}
+        classNames={{
+          root: css.root,
+          list: css.list,
+          tab: css.tab,
+          panel: css.panel,
+        }}
       >
-        <Tabs.List grow>
+        <Tabs.List grow aria-label={t`Preview panels`}>
           <Tabs.Tab value="details">{t`Details`}</Tabs.Tab>
           <Tabs.Tab value="tokens">{t`Design tokens`}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="details">{details}</Tabs.Panel>
         <Tabs.Panel value="tokens">
-          {hasVisitedTokens ? tokens : null}
+          {hasVisitedTokens || tab === "tokens" ? tokens : null}
         </Tabs.Panel>
       </Tabs>
     </AtlasChromeProvider>

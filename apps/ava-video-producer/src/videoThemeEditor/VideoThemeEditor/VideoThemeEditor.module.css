@@ -4,11 +4,12 @@
   min-width: 0;
 }
 
+/* Sticks under an Atlas panel's tab list, or at the top without one. */
 .toolbar {
   background: var(--paper);
   display: grid;
   gap: 8px;
-  inset-block-start: 0;
+  inset-block-start: var(--atlas-panel-tabs-height, 0);
   padding-block-end: 8px;
   position: sticky;
   z-index: 2;
