@@ -11375,6 +11375,61 @@ pnpm test:e2e dashboard-workspace-publishing.spec.ts
 pnpm test:e2e web-offline-mode.spec.ts
 ```
 
+---
+
+## F135: Offline-only uploads keep their rows after a reload
+
+Status: not started. Built on `fix/offline-upload-reload`, branched from
+`demo/measles` at `6518c3aa5`. No PR is open.
+
+**Purpose:** A CSV, Excel, or PDF dataset kept offline ("This computer only")
+showed its rows only in the tab that uploaded it. After a reload its column
+summaries and every new query failed, because the dataset Parquet wrapper
+downloaded every uploaded file from cloud storage, where an offline-only file
+has nothing. The wrapper now reads the Parquet this device kept
+(`LocalDataset.parquetData`) when the file's source record says it was never
+stored. It waits for a transcode a reload resumed first. When a download
+fails for any other file, it falls back to the same local copy, which also
+covers a cached source record that has not yet seen the file made
+offline-only.
+
+**Value:** Offline-only datasets, the option for data that must not leave the
+device, keep working across reloads.
+
+**PR title:** `fix(datasets): read an offline-only upload's rows from this device after a reload`
+
+**Depends on:** nothing beyond `demo/measles`.
+
+**Files, by area** (`cf84a5af0`):
+
+- `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.ts`:
+  `_readStoredFileParquet`, `_isKeptOffline`, and `_findLocalParquet`.
+- `src/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper.test.ts`:
+  the local read, the resumed-transcode wait, the missing-copy error, and the
+  fallback when storage has no copy or the download fails.
+- `tests/e2e/offline-only-upload-reload.spec.ts`: uploads with cloud storage
+  off, reloads, and reads a column summary. The preview's rows come back from
+  the persisted query cache, so the spec asserts on a summary first read
+  after the reload. It waits for the persister to write the workspace's
+  dataset list first: a reload within its 1-second throttle restores a list
+  without the new dataset, and the workspace check then denies the query.
+
+**Schema:** none.
+
+**Deploy:** the frontend.
+
+**Known gaps:** a reload within a second of saving a dataset restores a
+workspace dataset list without it, so its queries are denied until that list
+refetches. That is the persister throttle `ALWAYS_REFETCH_ON_MOUNT` describes,
+not this fix.
+
+**Verification:** `pnpm exec tsc -b --force --noEmit`, `pnpm vitest run
+src/clients/qetl src/clients/datasets`, and `pnpm test:e2e
+offline-only-upload-reload.spec.ts`, which fails on the old wrapper (no column
+summary after the reload) and passes on this one. The e2e ran against
+`feat/dictionary-conversions`' switched stack, because the shared `avandar`
+stack predates `demo/measles`' migrations.
+
 ## Open decisions
 
 Questions the 2026-11-10 mapping could not settle from the code alone. Each
