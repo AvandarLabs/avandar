@@ -132,10 +132,11 @@ ids (`motion-product`, `product-motion`, `composite`) and the continuity
 
 ## Design tokens
 
-A **theme** holds every value a motion or composition draws. Its values are **design tokens**, in three tiers:
+A **theme** holds every value a motion or composition draws. Its values are **design tokens**, in four tiers:
 
 | Term | What it is | Example |
 | --- | --- | --- |
+| Mantine token | A literal value at the top-level key where Mantine expects it | `fontSizes.md` is 16 px |
 | Atomic token | A literal value with no meaning of its own, in a scale | `atomic.strokeWidth.sm` is 2 px |
 | Semantic token | A reference named by meaning; holds no literal | `color.accent`, `text.graphic.caption` |
 | Component token | One themed shape's default, a reference or a deliberate one-off | `components.ProgressBar.height` |

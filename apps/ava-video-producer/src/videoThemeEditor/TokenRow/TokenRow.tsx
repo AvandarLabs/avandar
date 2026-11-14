@@ -44,7 +44,9 @@ function OverrideDot({
       className={clsx(css.dot, state === "saved" && css.dotSaved)}
       role="img"
       aria-label={
-        state === "draft" ? t`Edited, not saved` : t`Saved for this item only`
+        state === "draft"
+          ? t`Edited, not saved`
+          : t`Saved for this motion or composition only`
       }
     />
   );

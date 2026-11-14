@@ -25,8 +25,11 @@ Top to bottom: theme bar (picker and save actions), the built-in notice or the
 changed-on-disk banner, a toolbar (scope switch, search, filters), Look and
 feel (the first group of rows), the layer tabs (Parts, Styles, Base values),
 then category accordions holding one row per token. The layer tabs are the
-component, semantic, and atomic tiers: copy never uses those three words, nor
-"token", "override", or "item", where a producer's own noun fits. The editor
+component, semantic, and atomic-plus-Mantine tiers: copy never uses those
+words, nor "override" or "item", where a producer's own noun fits. The scope
+switch says "Whole theme" and the open motion or composition's own name, never
+"item". The tab and panel are still called Design tokens, the name producers
+search for. The editor
 spells colour the British way throughout, matching the token catalog.
 
 ## Density and rhythm

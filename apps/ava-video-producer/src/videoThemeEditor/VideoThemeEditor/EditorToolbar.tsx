@@ -54,7 +54,7 @@ function ScopeSwitch({
         aria-label={t`Edit scope`}
         value={scope.kind}
         data={[
-          { value: "theme", label: t`All items (theme)` },
+          { value: "theme", label: t`Whole theme` },
           { value: "item", label: item.scopeLabel },
         ]}
         onChange={(kind) =>
