@@ -15,7 +15,7 @@ ALTER TABLE "dataset_columns__dictionary_bindings" ADD COLUMN "pinned_pairs" JSO
 
 ALTER TABLE "dataset_columns__dictionary_bindings" ADD COLUMN "replaced_data_type" datasets__ava_data_type;
 
-ALTER TABLE "dataset_columns__dictionary_bindings" ADD COLUMN "value_overrides" JSONB NOT NULL;
+ALTER TABLE "dataset_columns__dictionary_bindings" ADD COLUMN "value_overrides" JSONB NOT NULL DEFAULT '[]';
 
 ALTER TABLE "datasets__virtual" ADD COLUMN "linked_source_dataset_id" UUID;
 

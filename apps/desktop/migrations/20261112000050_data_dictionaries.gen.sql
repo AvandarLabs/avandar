@@ -5,11 +5,11 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 83
 -- FK constraints dropped (target not synced to SQLite): 1
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 10
-CREATE TABLE "data_dictionaries" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "owner_id" UUID NOT NULL, "owner_profile_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "description" TEXT, "version" INTEGER NOT NULL DEFAULT 1, "created_from_dataset_ids" TEXT NOT NULL);
+CREATE TABLE "data_dictionaries" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "owner_id" UUID NOT NULL, "owner_profile_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "description" TEXT, "version" INTEGER NOT NULL DEFAULT 1, "created_from_dataset_ids" TEXT NOT NULL DEFAULT '[]');
 
-CREATE TABLE "data_dictionaries__code_lists" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dictionary_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "is_ordered" INTEGER NOT NULL DEFAULT FALSE, "pairs" JSONB NOT NULL);
+CREATE TABLE "data_dictionaries__code_lists" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dictionary_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "is_ordered" INTEGER NOT NULL DEFAULT FALSE, "pairs" JSONB NOT NULL DEFAULT '[]');
 
-CREATE TABLE "data_dictionaries__entries" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dictionary_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "column_names" TEXT NOT NULL, "kind" data_dictionaries__entry_kind NOT NULL, "unit" TEXT, "valid_min" REAL, "valid_max" REAL, "description" TEXT, "position" INTEGER NOT NULL);
+CREATE TABLE "data_dictionaries__entries" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dictionary_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "column_names" TEXT NOT NULL DEFAULT '[]', "kind" data_dictionaries__entry_kind NOT NULL, "unit" TEXT, "valid_min" REAL, "valid_max" REAL, "description" TEXT, "position" INTEGER NOT NULL);
 
 CREATE TABLE "data_dictionaries__entry_codings" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dictionary_id" UUID NOT NULL, "entry_id" UUID NOT NULL, "code_list_id" UUID NOT NULL, "is_primary" INTEGER NOT NULL DEFAULT FALSE, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
 

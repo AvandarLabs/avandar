@@ -5,7 +5,7 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 36
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 5
-CREATE TABLE "dataset_columns__dictionary_bindings" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "dataset_column_id" UUID NOT NULL, "dictionary_id" UUID, "entry_id" UUID, "code_list_id" UUID, "mode" dataset_columns__binding_mode NOT NULL, "direction" dataset_columns__binding_direction NOT NULL, "applied_dictionary_version" INTEGER NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "dataset_columns__dictionary_bindings" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "dataset_column_id" UUID NOT NULL, "dictionary_id" UUID, "entry_id" UUID, "code_list_id" UUID, "mode" dataset_columns__binding_mode NOT NULL DEFAULT 'reference', "direction" dataset_columns__binding_direction NOT NULL DEFAULT 'decode', "applied_dictionary_version" INTEGER NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
 
 CREATE UNIQUE INDEX dataset_columns__dictionary_bindings_dataset_column_id_key ON dataset_columns__dictionary_bindings(dataset_column_id);
 
