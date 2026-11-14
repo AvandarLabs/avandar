@@ -2488,3 +2488,52 @@ p {
     grid-template-columns: minmax(0, 1fr) min(420px, 45vw);
   }
 }
+
+/*
+ * While the Design tokens tab is open on a phone, the player stays pinned
+ * under the dialog header as a small strip, so an edit stays in view. The
+ * strip, the header, and the tab list together cover about a third of the
+ * viewport. The panel tab list and the token editor's pinned block stick
+ * below the strip through --atlas-pin-offset. The scrubber and its labels
+ * are hidden while pinned. Play, pause, and restart stay.
+ */
+@media (width <= 760px) {
+  :root {
+    --atlas-header-height: 64px;
+    --atlas-strip-height: calc(14dvh + 48px);
+  }
+
+  .dialog-layout.is-token-panel {
+    --atlas-pin-offset: calc(
+      var(--atlas-header-height) + var(--atlas-strip-height)
+    );
+  }
+
+  .is-token-panel .dialog-player {
+    height: var(--atlas-strip-height);
+    inset-block-start: var(--atlas-header-height);
+    position: sticky;
+    z-index: 4;
+  }
+
+  .is-token-panel .dialog-stage {
+    padding: 0;
+  }
+
+  .is-token-panel .dialog-canvas {
+    aspect-ratio: 8 / 5;
+    height: 100%;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .is-token-panel .player-controls {
+    padding: 6px 16px;
+  }
+
+  .is-token-panel .frame-scrubber,
+  .is-token-panel .scrubber-labels,
+  .is-token-panel .frame-rate {
+    display: none;
+  }
+}

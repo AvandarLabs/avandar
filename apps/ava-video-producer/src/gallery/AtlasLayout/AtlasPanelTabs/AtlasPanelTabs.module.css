@@ -3,7 +3,9 @@
  * (such as the token editor toolbar) so it sticks just under the tabs. The
  * root is the modal grid's right column, so it scrolls on its own and keeps
  * the grid row as tall as the modal. The sticky tab list and token toolbar
- * stick inside this scroll container.
+ * stick inside this scroll container. On a phone, a host that pins a player
+ * strip above the tabs sets --atlas-pin-offset to the pinned height, and the
+ * tab list sticks just below it.
  */
 .root {
   --atlas-panel-tabs-height: 40px;
@@ -25,7 +27,7 @@
 .list {
   background: var(--paper);
   block-size: var(--atlas-panel-tabs-height);
-  inset-block-start: 0;
+  inset-block-start: var(--atlas-pin-offset, 0);
   position: sticky;
   z-index: 3;
 }

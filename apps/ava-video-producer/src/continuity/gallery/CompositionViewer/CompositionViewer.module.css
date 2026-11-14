@@ -147,3 +147,52 @@
     grid-template-rows: repeat(4, max-content);
   }
 }
+
+/*
+ * While the Design tokens tab is open on a phone, the player stays pinned
+ * under the dialog header as a small strip, as in the motion preview. A
+ * sticky grid item cannot leave its grid area, so the viewer becomes a flex
+ * column here, with the same order the single-column grid had. The strip
+ * sizes come from the gallery stylesheet, with the same values as fallbacks.
+ */
+@media (width <= 760px) {
+  .compositionViewer.isTokenPanel {
+    --atlas-pin-offset: calc(
+      var(--atlas-header-height, 64px) +
+        var(--atlas-strip-height, calc(14dvh + 48px))
+    );
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  .isTokenPanel .stage {
+    border-radius: 0;
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    height: var(--atlas-strip-height, calc(14dvh + 48px));
+    inset-block-start: var(--atlas-header-height, 64px);
+    margin: -10px -10px 0;
+    place-items: center;
+    position: sticky;
+    z-index: 4;
+  }
+
+  .isTokenPanel .compositionViewerPlayer {
+    height: 100%;
+    max-width: 100%;
+    width: auto;
+  }
+
+  .isTokenPanel .settings {
+    order: 1;
+  }
+
+  .isTokenPanel .details {
+    order: 2;
+  }
+
+  .isTokenPanel .guidance {
+    order: 3;
+  }
+}
