@@ -25,6 +25,9 @@ import type {
 /** Theme ids: 1 to 48 lowercase letters, digits, or hyphens. */
 export const VIDEO_THEME_SLUG_PATTERN = /^[a-z0-9-]{1,48}$/;
 
+/** Largest serialized theme, or theme snapshot, any surface accepts. */
+export const VIDEO_THEME_MAX_BYTES = 256 * 1024;
+
 type SchemaTier = "mantine" | "atomic" | "semantic" | "component";
 
 const tokenReferenceSchema = z
@@ -192,6 +195,27 @@ function _documentSchema(isComplete: boolean) {
 
 const SPARSE_DOCUMENT_SCHEMA = _documentSchema(false);
 const COMPLETE_DOCUMENT_SCHEMA = _documentSchema(true);
+
+/**
+ * A theme file as a schema, for composing into larger messages. It applies
+ * the same rule as `parseVideoThemeDocument`: a theme without `extends` must
+ * define every token.
+ */
+export const videoThemeDocumentSchema = SPARSE_DOCUMENT_SCHEMA.superRefine(
+  (document, context) => {
+    if (document.extends !== undefined) {
+      return;
+    }
+    const result = COMPLETE_DOCUMENT_SCHEMA.safeParse(document);
+    result.error?.issues.forEach((issue) => {
+      context.addIssue({
+        code: "custom",
+        path: issue.path,
+        message: issue.message,
+      });
+    });
+  },
+);
 
 /**
  * Validates a theme file. A theme that names `extends` may be sparse; a

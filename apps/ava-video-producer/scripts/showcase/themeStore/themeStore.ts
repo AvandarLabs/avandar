@@ -10,6 +10,7 @@ import { resolveVideoTheme } from "../../../src/videoTheme/resolveVideoTheme/res
 import { VideoThemeError } from "../../../src/videoTheme/VideoThemeError/VideoThemeError";
 import {
   parseVideoThemeDocument,
+  VIDEO_THEME_MAX_BYTES,
   VIDEO_THEME_SLUG_PATTERN,
 } from "../../../src/videoTheme/videoThemeSchema/videoThemeSchema";
 import type {
@@ -18,7 +19,7 @@ import type {
 } from "../../../src/videoTheme/videoTheme.types";
 
 /** Largest theme file the store writes, and the largest body the routes read. */
-export const THEME_FILE_MAX_BYTES = 256 * 1024;
+export const THEME_FILE_MAX_BYTES = VIDEO_THEME_MAX_BYTES;
 const THEME_FILE_SUFFIX = ".theme.json";
 
 /** One theme in the theme picker. */
