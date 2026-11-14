@@ -73,6 +73,10 @@ orange under 4.5:1. It offers three choices, each with a one-line description:
 Keep my edits, Discard my edits, and Reload from file. Save stays disabled
 until one is chosen.
 
+A colour field's picker opens on focus, click, or typing, and closes on Enter
+and on blur, so on a phone it never stays over the rows below after a colour
+is entered.
+
 ## Accessibility
 
 Every control has a label naming its token, shows its value as text, and is
