@@ -18,7 +18,7 @@ function useHintMessages(): Record<ErrorHint, string> {
     reference_layout_required: t`Choose a reference layout before saving.`,
     layout_signatures_not_unique: changedElsewhere,
     item_not_in_crosswalk: changedElsewhere,
-    dataset_not_readable: t`This change involves a dataset you can't open, so nothing was saved. Ask for access to it, then try again.`,
+    dataset_not_readable: t`This change involves a dataset you can't open, so nothing was saved. Ask for access to it, or reload the crosswalk to go back to what was last saved.`,
     entry_not_in_workspace: t`A dictionary entry this crosswalk uses was deleted. Choose another entry for that column.`,
     mappings_not_unique: changedElsewhere,
     fill_invalid: t`One of the mappings is incomplete, so nothing was saved. Check how each column is filled and try again.`,

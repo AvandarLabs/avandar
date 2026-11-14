@@ -287,6 +287,64 @@ describe("useCrosswalkFlow", () => {
     expect(mocks.savedDrafts).toHaveLength(1);
   });
 
+  it("saveLatest waits for a save in flight, then saves the changes made since", async () => {
+    mocks.isHoldingSaves = true;
+    const { result } = _renderFlow({
+      draft: makeSeededState().draft,
+      isSaved: true,
+    });
+
+    let saves: Array<Promise<boolean>> = [];
+    await act(async () => {
+      saves = [
+        result.current.dispatchAndSave({ type: "renamed", name: "First" }),
+      ];
+      await Promise.resolve();
+      result.current.dispatch({ type: "renamed", name: "Second" });
+      saves.push(result.current.saveLatest());
+      await Promise.resolve();
+      mocks.releaseSaves.shift()?.();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      for (let turn = 0; turn < 20 && mocks.releaseSaves.length === 0; turn++) {
+        await Promise.resolve();
+      }
+      mocks.releaseSaves.shift()?.();
+      await Promise.all(saves);
+    });
+
+    expect(
+      mocks.savedDrafts.map((draft) => {
+        return draft.name;
+      }),
+    ).toEqual(["First", "Second"]);
+    expect(await saves[1]).toBe(true);
+    expect(isCrosswalkDirty(result.current.state)).toBe(false);
+  });
+
+  it("saveLatest does not save again when the save in flight carried every change", async () => {
+    mocks.isHoldingSaves = true;
+    const { result } = _renderFlow({
+      draft: makeSeededState().draft,
+      isSaved: true,
+    });
+
+    let saves: Array<Promise<boolean>> = [];
+    await act(async () => {
+      saves = [
+        result.current.dispatchAndSave({ type: "renamed", name: "Renamed" }),
+        result.current.saveLatest(),
+      ];
+      await Promise.resolve();
+      mocks.releaseSaves.shift()?.();
+      await Promise.all(saves);
+    });
+
+    expect(mocks.savedDrafts).toHaveLength(1);
+    expect(await saves[1]).toBe(true);
+  });
+
   it("saves unsaved changes before opening a step from the step bar", async () => {
     const { result } = _renderFlow({
       draft: makeSeededState().draft,

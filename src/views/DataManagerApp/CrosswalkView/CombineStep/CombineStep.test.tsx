@@ -312,7 +312,7 @@ describe("CombineStep", () => {
   });
 
   it("saves the changed crosswalk first, then creates the combined dataset under its name", async () => {
-    const flow = makeFlow(makeDraft(), { save: mocks.saveCrosswalkMock });
+    const flow = makeFlow(makeDraft(), { saveLatest: mocks.saveCrosswalkMock });
     const dirtyFlow = {
       ...flow,
       state: {
@@ -357,7 +357,7 @@ describe("CombineStep", () => {
 
   it("does not save the combined dataset when saving the crosswalk first did not go through", async () => {
     mocks.saveCrosswalkMock.mockResolvedValue(false);
-    const flow = makeFlow(makeDraft(), { save: mocks.saveCrosswalkMock });
+    const flow = makeFlow(makeDraft(), { saveLatest: mocks.saveCrosswalkMock });
     _render({
       ...flow,
       state: {
@@ -514,6 +514,6 @@ describe("CombineStep", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Back" }));
 
-    expect(flow.goToStep).toHaveBeenCalledWith("map");
+    expect(flow.goToStepSaving).toHaveBeenCalledWith("map");
   });
 });

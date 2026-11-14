@@ -118,7 +118,7 @@ function useDisabledReason(
 }
 
 /**
- * Saving from step 3: the crosswalk first through `flow.save` when its
+ * Saving from step 3: the crosswalk first through `flow.saveLatest` when its
  * draft changed, so the crosswalk row always matches the SQL it produced,
  * then the combined dataset. A crosswalk save that did not go through
  * (offline, refused, or a second press) stops here. The flow has said why.
@@ -138,7 +138,7 @@ function useCombineSave(
       return;
     }
     const { draft } = flow.state;
-    if (isCrosswalkDirty(flow.state) && !(await flow.save(draft))) {
+    if (isCrosswalkDirty(flow.state) && !(await flow.saveLatest())) {
       return;
     }
     await saveCombined({
@@ -286,7 +286,7 @@ export function CombineStep(props: Readonly<CrosswalkStepProps>): ReactNode {
         }
         isSaving={isSaving}
         onBack={() => {
-          flow.goToStep("map");
+          void flow.goToStepSaving("map");
         }}
         onSave={() => {
           void save();

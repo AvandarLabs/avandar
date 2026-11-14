@@ -273,7 +273,7 @@ export function makeCrosswalkFlow(
     goToStepSaving: vi.fn(() => {
       return Promise.resolve();
     }),
-    save: vi.fn(() => {
+    saveLatest: vi.fn(() => {
       return Promise.resolve(true);
     }),
     dispatchAndSave: vi.fn(() => {

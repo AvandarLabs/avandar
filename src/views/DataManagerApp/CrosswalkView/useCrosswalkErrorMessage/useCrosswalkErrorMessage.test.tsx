@@ -41,7 +41,7 @@ describe("useCrosswalkErrorMessage", () => {
 
   it("explains a dataset the user can't open, whether it was sent or left behind", () => {
     expect(_toMessage({ hint: "dataset_not_readable" })).toBe(
-      "This change involves a dataset you can't open, so nothing was saved. Ask for access to it, then try again.",
+      "This change involves a dataset you can't open, so nothing was saved. Ask for access to it, or reload the crosswalk to go back to what was last saved.",
     );
   });
 

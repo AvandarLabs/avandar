@@ -141,7 +141,7 @@ describe("useSeedColumns", () => {
       ]),
       context: CONTEXT,
     });
-    expect(flow.save).not.toHaveBeenCalled();
+    expect(flow.saveLatest).not.toHaveBeenCalled();
     expect(flow.goToStep).toHaveBeenCalledWith("map", KINGS_LAYOUT_ID);
     expect(
       vi.mocked(flow.dispatchAndSave).mock.invocationCallOrder[0],
@@ -178,7 +178,7 @@ describe("useSeedColumns", () => {
     });
 
     expect(flow.dispatchAndSave).not.toHaveBeenCalled();
-    expect(flow.save).toHaveBeenCalledWith(state.draft);
+    expect(flow.saveLatest).toHaveBeenCalledOnce();
     expect(flow.goToStep).toHaveBeenCalledWith("map", KINGS_LAYOUT_ID);
   });
 
@@ -193,7 +193,7 @@ describe("useSeedColumns", () => {
     });
 
     expect(flow.dispatchAndSave).not.toHaveBeenCalled();
-    expect(flow.save).not.toHaveBeenCalled();
+    expect(flow.saveLatest).not.toHaveBeenCalled();
     expect(flow.goToStep).toHaveBeenCalledWith("map", KINGS_LAYOUT_ID);
   });
 

@@ -50,7 +50,13 @@ export type CrosswalkFlow = {
     step: CrosswalkStep,
     layoutId?: CrosswalkLayout.Id,
   ) => Promise<void>;
-  save: (draft: CrosswalkDraft.T) => Promise<boolean>;
+  /**
+   * Waits for a save in flight, then saves the latest draft, and resolves
+   * whether the crosswalk is saved. When it had to wait and that save
+   * carried every change, nothing more is saved. Use it for any save that
+   * does not come with an action, so it never races another save.
+   */
+  saveLatest: () => Promise<boolean>;
   /**
    * Applies an action, then saves the draft it produced. A save already in
    * flight is waited for first, and the draft is saved again only if the
@@ -126,8 +132,8 @@ function useCrosswalkState(
 }
 
 /**
- * Serialises saves. `save` is the hook's save, remembered while it is in
- * flight. `saveLatest` waits for any save in flight, then saves the current
+ * Serialises saves. The hook's `save` is remembered while it is in flight.
+ * `saveLatest` waits for any save in flight, then saves the current
  * draft: always when nothing was in flight, and only when that save left
  * changes behind when something was. So two quick actions never drop the
  * second one's changes, and a repeated press does not save twice.
@@ -137,16 +143,10 @@ function useSerializedSave(
     save: (draft: CrosswalkDraft.T) => Promise<boolean>;
     stateRef: RefObject<CrosswalkState>;
   }>,
-): {
-  save: (draft: CrosswalkDraft.T) => Promise<boolean>;
-  saveLatest: () => Promise<boolean>;
-} {
+): () => Promise<boolean> {
   const { save, stateRef } = options;
   const inFlightRef = useRef<Promise<boolean> | undefined>(undefined);
   const trackedSave = (draft: CrosswalkDraft.T): Promise<boolean> => {
-    if (inFlightRef.current) {
-      return save(draft);
-    }
     const saving = save(draft);
     inFlightRef.current = saving;
     const clear = (): void => {
@@ -157,7 +157,7 @@ function useSerializedSave(
     saving.then(clear, clear);
     return saving;
   };
-  const saveLatest = async (): Promise<boolean> => {
+  return async (): Promise<boolean> => {
     let hasWaited = false;
     while (inFlightRef.current) {
       hasWaited = true;
@@ -170,7 +170,6 @@ function useSerializedSave(
     }
     return trackedSave(stateRef.current.draft);
   };
-  return { save: trackedSave, saveLatest };
 }
 
 /**
@@ -241,7 +240,8 @@ function createSavingActions(
  * The crosswalk view's state and navigation: the reducer, the step and
  * layout in the URL (falling back to Choose datasets for a step the
  * crosswalk cannot open yet), and saving. Every action that saves goes
- * through `dispatchAndSave`, so the save always sends the draft after it.
+ * through `dispatchAndSave` and every other save through `saveLatest`, so
+ * saves never overlap and a save always sends the latest draft.
  */
 export function useCrosswalkFlow(
   options: Readonly<{
@@ -255,7 +255,7 @@ export function useCrosswalkFlow(
     options.isSaved,
   );
   const [rawSave, isSaving] = useSaveCrosswalk(dispatch);
-  const { save, saveLatest } = useSerializedSave({ save: rawSave, stateRef });
+  const saveLatest = useSerializedSave({ save: rawSave, stateRef });
   const { searchStep, layoutId } = useFlowSearch();
   const goToStep = useGoToStep({ crosswalkId: options.crosswalkId, stateRef });
   const { dispatchAndSave, goToStepSaving, selectLayout } = createSavingActions(
@@ -273,7 +273,7 @@ export function useCrosswalkFlow(
     goToStep,
     selectLayout,
     goToStepSaving,
-    save,
+    saveLatest,
     dispatchAndSave,
     isSaving,
   };

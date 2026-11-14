@@ -82,8 +82,8 @@ export function getFirstLayoutToMap(
  * Saves what Next needs saved. With no columns it seeds them from the
  * reference dataset through `dispatchAndSave`, so the draft saved is the
  * one the reducer produced (for a new crosswalk this is its first save).
- * With columns it saves the draft when it changed. Resolves whether the
- * crosswalk is saved.
+ * With columns it saves the latest draft when it changed, after any save in
+ * flight. Resolves whether the crosswalk is saved.
  */
 function _saveForMapping(
   options: SeedOptions,
@@ -104,7 +104,7 @@ function _saveForMapping(
     });
   }
   return isCrosswalkDirty(flow.state)
-    ? flow.save(flow.state.draft)
+    ? flow.saveLatest()
     : Promise.resolve(true);
 }
 

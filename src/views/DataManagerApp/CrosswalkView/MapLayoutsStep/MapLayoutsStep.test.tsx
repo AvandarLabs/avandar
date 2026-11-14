@@ -246,7 +246,7 @@ describe("MapLayoutsStep", () => {
     fireEvent.click(screen.getByRole("button", { name: "stub" }));
 
     expect(flow.selectLayout).toHaveBeenCalledWith(BRONX_LAYOUT_ID);
-    expect(flow.save).not.toHaveBeenCalled();
+    expect(flow.saveLatest).not.toHaveBeenCalled();
   });
 
   it("confirms the layout and moves to the next one to map", async () => {
