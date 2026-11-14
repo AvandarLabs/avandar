@@ -1018,7 +1018,12 @@ Each slice is one PR into `demo/measles`, recorded in
    as two PRs: the engine, schema, linked datasets, and every surface first;
    then converting in place, its warning, and **Re-apply**, frontend only.
 5. **Crosswalks.** Schema, layouts, the three steps, mapping fills and
-   conversions, compilation, export, the stale banner.
+   conversions, compilation, export, the stale banner. Planned in
+   [data-dictionaries-5-crosswalks-plan.md](data-dictionaries-5-crosswalks-plan.md)
+   as two PRs: the schema, the engine, every crosswalk surface, export, the
+   stale banner, and Used by first; then meaning suggestions, long layout
+   lists, combining progress, and the 100-dataset measurement, frontend only.
+   Its owner decisions await approval.
 
 ## 17. Roadmap
 
