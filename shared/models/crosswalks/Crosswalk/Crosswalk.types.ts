@@ -1,3 +1,14 @@
+import type { CrosswalkColumnId } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn.types.ts";
+import type {
+  CrosswalkLayoutId,
+  CrosswalkLayoutStatus,
+} from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout.types.ts";
+import type {
+  CrosswalkFill,
+  CrosswalkMappingId,
+  CrosswalkMappingReason,
+  CrosswalkMappingStatus,
+} from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping.types.ts";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary.ts";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList.ts";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry.ts";
@@ -78,6 +89,44 @@ type CrosswalkRead = Model.Base<
     workspaceId: Workspace.Id;
   }
 >;
+
+/** Everything `rpc_crosswalks__save` replaces, in model shape. */
+export type CrosswalkSavePayload = {
+  crosswalkId: CrosswalkId;
+  settings: {
+    name: string;
+    description: string | undefined;
+    codesOutputAs: CrosswalkCodesOutput;
+    addsSourceColumn: boolean;
+  };
+  columns: ReadonlyArray<{
+    id: CrosswalkColumnId;
+    name: string;
+    position: number;
+    dataType: AvaDataType.T;
+    entryId: DataDictionaryEntry.Id | undefined;
+  }>;
+  layouts: ReadonlyArray<{
+    id: CrosswalkLayoutId;
+    signature: string;
+    columnNames: readonly string[];
+    isReference: boolean;
+    status: CrosswalkLayoutStatus;
+  }>;
+  datasets: ReadonlyArray<{
+    datasetId: Dataset.Id;
+    layoutId: CrosswalkLayoutId;
+  }>;
+  mappings: ReadonlyArray<{
+    id: CrosswalkMappingId;
+    layoutId: CrosswalkLayoutId;
+    columnId: CrosswalkColumnId;
+    fill: CrosswalkFill;
+    status: CrosswalkMappingStatus;
+    confidence: number | undefined;
+    reason: CrosswalkMappingReason | undefined;
+  }>;
+};
 
 /** Everything `rpc_crosswalks__save_combined_dataset` writes. */
 export type CrosswalkCombinePayload = {

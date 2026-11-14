@@ -7,6 +7,7 @@ import type {
   CrosswalkId,
   CrosswalkModel,
   CrosswalkSaveErrorHint,
+  CrosswalkSavePayload,
 } from "$/models/crosswalks/Crosswalk/Crosswalk.types.ts";
 
 export { CrosswalkParsers } from "$/models/crosswalks/Crosswalk/CrosswalkParsers.ts";
@@ -25,6 +26,9 @@ export namespace Crosswalk {
 
   /** A code list the combined dataset embedded, with its fingerprint. */
   export type CompiledCodeList = CrosswalkCompiledCodeList;
+
+  /** Everything the save RPC replaces. */
+  export type SavePayload = CrosswalkSavePayload;
 
   /** Everything the combined-dataset RPC writes. */
   export type CombinePayload = CrosswalkCombinePayload;
