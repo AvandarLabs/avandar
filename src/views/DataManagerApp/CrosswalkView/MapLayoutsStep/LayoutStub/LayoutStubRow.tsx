@@ -14,6 +14,11 @@ export type LayoutStubRowProps = {
   isSelected: boolean;
   /** The option the keyboard is on. */
   isActive: boolean;
+  /**
+   * Where the row sits in the whole list, given when the list renders only
+   * the rows in view, so a screen reader still hears "12 of 200".
+   */
+  positionInList?: { position: number; count: number };
   onSelect: () => void;
 };
 
@@ -28,6 +33,7 @@ export function LayoutStubRow({
   optionId,
   isSelected,
   isActive,
+  positionInList,
   onSelect,
 }: Readonly<LayoutStubRowProps>): ReactNode {
   return (
@@ -35,6 +41,8 @@ export function LayoutStubRow({
       id={optionId}
       role="option"
       aria-selected={isSelected}
+      aria-posinset={positionInList?.position}
+      aria-setsize={positionInList?.count}
       data-active={isActive || undefined}
       className={css.layoutStubRow}
       onClick={onSelect}

@@ -62,6 +62,25 @@
   outline-offset: -2px;
 }
 
+/*
+ * A long list's rows: the sizer is as tall as every row together, so the
+ * scrollbar is true, and each rendered row sits at its measured offset
+ * inside it. The row's bottom padding stands in for the list's gap, which
+ * an absolutely placed row does not get.
+ */
+.layoutStubListSizer {
+  flex: none;
+  position: relative;
+  width: 100%;
+}
+
+.layoutStubVirtualRow {
+  inset-inline: 0;
+  padding-block-end: 2px;
+  position: absolute;
+  top: 0;
+}
+
 @media (width < 62em) {
   .layoutStub {
     border-block-end: 1px solid var(--ava-border-default);

@@ -55,6 +55,32 @@ function _getKeyAction(
   return movedLayoutId ? { kind: "move", layoutId: movedLayoutId } : undefined;
 }
 
+/** Scrolls the active option into view whenever it changes. */
+function useScrollActiveIntoView(
+  activeLayoutId: CrosswalkLayout.Id | undefined,
+  options: Readonly<{
+    getOptionId: (layoutId: CrosswalkLayout.Id) => string;
+    scrollToLayout?: (layoutId: CrosswalkLayout.Id) => void;
+  }>,
+): void {
+  useEffect(() => {
+    if (!activeLayoutId) {
+      return;
+    }
+    if (options.scrollToLayout) {
+      options.scrollToLayout(activeLayoutId);
+      return;
+    }
+    // jsdom has no scrollIntoView, so it is called only where it exists.
+    document
+      .getElementById(options.getOptionId(activeLayoutId))
+      ?.scrollIntoView?.({ block: "nearest" });
+    // Only a change of the active option scrolls. `getOptionId` and
+    // `scrollToLayout` stand for the same rows in the meantime.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeLayoutId]);
+}
+
 /**
  * The active option and a setter. A selection that changes from outside
  * takes the active option with it, and an active option that leaves the
@@ -91,6 +117,12 @@ export function useLayoutListKeyboard(
     selectedLayoutId: CrosswalkLayout.Id | undefined;
     getOptionId: (layoutId: CrosswalkLayout.Id) => string;
     onSelectLayout: (layoutId: CrosswalkLayout.Id) => void;
+    /**
+     * Scrolls a layout's row into view when the list renders only the rows
+     * in view, where the row may not be in the DOM. Without it the row is
+     * scrolled with `scrollIntoView`.
+     */
+    scrollToLayout?: (layoutId: CrosswalkLayout.Id) => void;
   }>,
 ): LayoutListKeyboard {
   const { layoutIds, selectedLayoutId } = options;
@@ -98,15 +130,7 @@ export function useLayoutListKeyboard(
     layoutIds,
     selectedLayoutId,
   );
-  useEffect(() => {
-    if (activeLayoutId) {
-      document
-        .getElementById(options.getOptionId(activeLayoutId))
-        ?.scrollIntoView?.({ block: "nearest" });
-    }
-    // `getOptionId` is stable for the life of the list.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeLayoutId]);
+  useScrollActiveIntoView(activeLayoutId, options);
   const onKeyDown = (event: KeyboardEvent<HTMLElement>): void => {
     const action = _getKeyAction({
       key: event.key,
