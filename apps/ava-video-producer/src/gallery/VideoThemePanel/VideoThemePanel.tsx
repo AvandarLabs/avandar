@@ -39,6 +39,7 @@ export function VideoThemePanel({ item, usedTokens }: Props) {
         <ChangedOnDiskBanner
           onKeep={gallery.keepDraft}
           onDiscard={gallery.discard}
+          onReload={() => void gallery.reloadTheme()}
         />
       ) : null}
       <VideoThemeEditor

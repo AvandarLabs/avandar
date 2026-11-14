@@ -4,12 +4,18 @@ import css from "./ThemeBar.module.css";
 
 /**
  * Shown when the theme file changed after the viewer's unsaved edits were
- * made: keep the edits on top of the new file, or discard them.
+ * made: keep the edits on top of the new file, discard them, or read the
+ * file again in case it changed once more.
  */
 export function ChangedOnDiskBanner({
   onKeep,
   onDiscard,
-}: Readonly<{ onKeep: () => void; onDiscard: () => void }>) {
+  onReload,
+}: Readonly<{
+  onKeep: () => void;
+  onDiscard: () => void;
+  onReload: () => void;
+}>) {
   const { t } = useLingui();
   return (
     <Alert variant="light" color="yellow" title={t`This theme changed on disk`}>
@@ -20,6 +26,9 @@ export function ChangedOnDiskBanner({
         <Button size="compact-xs" onClick={onKeep}>{t`Keep my edits`}</Button>
         <Button size="compact-xs" variant="subtle" onClick={onDiscard}>
           {t`Discard my edits`}
+        </Button>
+        <Button size="compact-xs" variant="subtle" onClick={onReload}>
+          {t`Reload theme`}
         </Button>
       </Group>
     </Alert>

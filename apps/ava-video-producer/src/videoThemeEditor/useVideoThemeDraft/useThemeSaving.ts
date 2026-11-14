@@ -34,6 +34,8 @@ export type ThemeSavingState = Readonly<{
   save: () => Promise<void>;
   /** Resolves true when the new theme was created, false when it was not. */
   saveAsNew: (label: string) => Promise<boolean>;
+  /** Re-reads the active theme's file, so its current hash guards the next save. */
+  reloadTheme: () => Promise<boolean>;
 }>;
 
 type SaveOptions = Readonly<{
@@ -80,6 +82,30 @@ export async function runThemeRequest(
     return false;
   } finally {
     inFlight.current = false;
+  }
+}
+
+/**
+ * Re-reads one theme's file and stores it, resolving true when it worked. A
+ * successful reload clears the status line, since a stale-hash failure no
+ * longer applies. A failed one reports why.
+ */
+export async function reloadStoredTheme(
+  options: Readonly<{
+    themeId: string;
+    read: (themeId: string) => Promise<StoredTheme>;
+    storeTheme: (stored: StoredTheme) => void;
+    setStatus: (status: ThemeSaveStatus) => void;
+  }>,
+): Promise<boolean> {
+  const { themeId, read, storeTheme, setStatus } = options;
+  try {
+    storeTheme(await read(themeId));
+    setStatus({ kind: "idle" });
+    return true;
+  } catch (error) {
+    setStatus(_buildFailureStatusFromError(error));
+    return false;
   }
 }
 
@@ -138,8 +164,19 @@ export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   );
   const save = useSaveInPlace(options, run);
   const saveAsNew = useSaveAsNew(options, run);
+  const { themeId, storeTheme } = options;
+  const reloadTheme = useCallback(
+    () =>
+      reloadStoredTheme({
+        themeId,
+        read: ThemeApi.read,
+        storeTheme,
+        setStatus,
+      }),
+    [themeId, storeTheme],
+  );
   return useMemo(
-    () => ({ status, setStatus, save, saveAsNew }),
-    [status, save, saveAsNew],
+    () => ({ status, setStatus, save, saveAsNew, reloadTheme }),
+    [status, save, saveAsNew, reloadTheme],
   );
 }

@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ThemeApiError } from "../ThemeApi/ThemeApi";
-import { runThemeRequest, type ThemeSaveStatus } from "./useThemeSaving";
+import { ThemeApiError, type StoredTheme } from "../ThemeApi/ThemeApi";
+import {
+  reloadStoredTheme,
+  runThemeRequest,
+  type ThemeSaveStatus,
+} from "./useThemeSaving";
 
 function createHarness() {
   const statuses: ThemeSaveStatus[] = [];
@@ -56,4 +60,44 @@ test("a request started while another is in flight resolves false", async () => 
   assert.equal(didSucceed, false);
   assert.equal(didRun, false);
   assert.deepEqual(harness.statuses, []);
+});
+
+const STORED_THEME = {
+  document: { id: "harbor", label: "Harbor" },
+  hash: "fresh",
+} as unknown as StoredTheme;
+
+test("reloading a theme stores the file's current contents and clears the status", async () => {
+  const harness = createHarness();
+  const stored: StoredTheme[] = [];
+  const didReload = await reloadStoredTheme({
+    themeId: "harbor",
+    read: async (id) => {
+      assert.equal(id, "harbor");
+      return STORED_THEME;
+    },
+    storeTheme: (theme) => stored.push(theme),
+    setStatus: harness.setStatus,
+  });
+  assert.equal(didReload, true);
+  assert.deepEqual(stored, [STORED_THEME]);
+  assert.deepEqual(harness.statuses, [{ kind: "idle" }]);
+});
+
+test("a theme that cannot be reloaded reports its status and stores nothing", async () => {
+  const harness = createHarness();
+  const stored: StoredTheme[] = [];
+  const didReload = await reloadStoredTheme({
+    themeId: "harbor",
+    read: async () => {
+      throw new ThemeApiError(404, "gone", []);
+    },
+    storeTheme: (theme) => stored.push(theme),
+    setStatus: harness.setStatus,
+  });
+  assert.equal(didReload, false);
+  assert.deepEqual(stored, []);
+  assert.deepEqual(harness.statuses, [
+    { kind: "failed", status: 404, issues: [] },
+  ]);
 });
