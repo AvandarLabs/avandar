@@ -9,6 +9,13 @@ import {
   writeStoredThemeDraft,
   type StoredThemeDraft,
 } from "../themeDraftStorage/themeDraftStorage";
+import {
+  createDiscardedRecord,
+  createEditedRecord,
+  createKeptRecord,
+  createRebasedRecord,
+  isRecordChangedOnDisk,
+} from "./storedDraftRecord";
 import type { BrowserStorage } from "./browserStorage";
 
 /** One theme's persisted draft and what can be done with it. */
@@ -70,29 +77,33 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
   const { record, store } = useStoredDraftRecord(options);
   const draft = record?.draft ?? EMPTY_THEME_DRAFT;
   const recordHash = record?.baseHash;
+  const isDirty = !isThemeDraftEmpty(draft);
   const setDraft = useCallback(
     (nextDraft: ThemeDraft) =>
-      store({ baseHash: recordHash || baseHash, draft: nextDraft }),
-    [store, recordHash, baseHash],
+      store(
+        createEditedRecord({
+          previousHash: recordHash,
+          hadEdits: isDirty,
+          fileHash: baseHash,
+          draft: nextDraft,
+        }),
+      ),
+    [store, recordHash, isDirty, baseHash],
   );
   const keepDraft = useCallback(
-    () => store({ baseHash, draft }),
+    () => store(createKeptRecord({ fileHash: baseHash, draft })),
     [store, baseHash, draft],
   );
   const rebaseDraft = useCallback(
-    (nextBaseHash: string) => store({ baseHash: nextBaseHash, draft }),
+    (nextBaseHash: string) =>
+      store(createRebasedRecord({ baseHash: nextBaseHash, draft })),
     [store, draft],
   );
   const discard = useCallback(
-    () => store({ baseHash, draft: EMPTY_THEME_DRAFT }),
+    () => store(createDiscardedRecord(baseHash)),
     [store, baseHash],
   );
-  const isDirty = !isThemeDraftEmpty(draft);
-  const isChangedOnDisk =
-    isDirty &&
-    Boolean(recordHash) &&
-    Boolean(baseHash) &&
-    recordHash !== baseHash;
+  const isChangedOnDisk = isRecordChangedOnDisk({ record, fileHash: baseHash });
   return useMemo(
     () => ({
       draft,
