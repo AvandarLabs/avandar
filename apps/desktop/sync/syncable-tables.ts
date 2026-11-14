@@ -20,9 +20,9 @@
  *     catalog listings and their drives, dashboards, concepts + their
  *     statuses, attributes, and attribute mappings, data dictionaries and
  *     their contents, the dictionary bindings of dataset columns,
- *     individuals, user
- *     profile, plus `workspaces` and `workspace_memberships` so the
- *     workspace picker renders offline.
+ *     crosswalks and their contents, individuals, user profile, plus
+ *     `workspaces` and `workspace_memberships` so the workspace picker
+ *     renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
  *     tables, the web-only `dexie_dbs` tracker, web GIS `maps`, and case
@@ -55,6 +55,11 @@ const ACTIVE_TABLES = [
   "data_dictionaries__entries",
   "data_dictionaries__entry_codings",
   "dataset_columns__dictionary_bindings",
+  "crosswalks",
+  "crosswalks__layouts",
+  "crosswalks__columns",
+  "crosswalks__datasets",
+  "crosswalks__mappings",
   "concept_attributes",
   "attribute_mappings__dataset_column",
   "attribute_mappings__manual_entry",
