@@ -235,7 +235,7 @@ export function Card({
   );
 }
 
-/** A themed pill-shaped tag; `color` and `width` are content overrides. */
+/** A themed pill-shaped tag in the caller's colour and width. */
 export function Pill({
   x,
   y,
@@ -246,28 +246,28 @@ export function Pill({
   x: number;
   y: number;
   text: string;
-  color?: string;
-  width?: number;
+  color: string;
+  width: number;
 }) {
-  const pill = useGraphicProps("Pill", { color, width });
+  const pill = useGraphicProps("Pill", {});
   return (
     <g>
       <StockRect
         x={x}
         y={y}
-        width={pill.width}
+        width={width}
         height={pill.height}
         rx={Math.min(pill.radius, pill.height / 2)}
-        fill={pill.color}
+        fill={color}
         fillOpacity={pill.fillAlpha}
-        stroke={pill.color}
+        stroke={color}
         strokeOpacity={pill.strokeAlpha}
       />
       <Text
         role="pill"
-        x={x + pill.width / 2}
+        x={x + width / 2}
         y={y + pill.textBaseline}
-        fill={pill.color}
+        fill={color}
         anchor="middle"
       >
         {text}
@@ -433,7 +433,7 @@ export function Packet({
   frame: number;
   from: Point;
   to: Point;
-  color?: string;
+  color: string;
   delay?: number;
   period?: number;
   size?: "sm" | "md";
@@ -441,7 +441,7 @@ export function Packet({
   radius?: number;
   bend?: number;
 }) {
-  const packet = useGraphicProps("Packet", { color, period });
+  const packet = useGraphicProps("Packet", { period });
   const motion = useGraphicMotion();
   const r = radius ?? (size === "sm" ? packet.radiusSm : packet.radius);
   const t = loopPhase(frame, packet.period, delay);
@@ -457,8 +457,8 @@ export function Packet({
     Math.min(1, t * PACKET_EDGE_FADE, (1 - t) * PACKET_EDGE_FADE);
   return (
     <g opacity={opacity}>
-      <Halo cx={point.x} cy={point.y} r={r} color={packet.color} />
-      <circle cx={point.x} cy={point.y} r={r} fill={packet.color} />
+      <Halo cx={point.x} cy={point.y} r={r} color={color} />
+      <circle cx={point.x} cy={point.y} r={r} fill={color} />
     </g>
   );
 }
@@ -660,7 +660,7 @@ export function CircleNode({
   );
 }
 
-/** A themed check mark; `color` and `size` are content overrides. */
+/** A themed check mark in the caller's colour and size. */
 export function Check({
   x,
   y,
@@ -669,16 +669,16 @@ export function Check({
 }: {
   x: number;
   y: number;
-  color?: string;
-  size?: number;
+  color: string;
+  size: number;
 }) {
-  const check = useGraphicProps("Check", { color, size });
-  const s = check.size;
+  const check = useGraphicProps("Check", {});
+  const s = size;
   return (
     <path
       d={`M${x - s * 0.5} ${y} l${s * 0.35} ${s * 0.36} l${s * 0.7} ${-s * 0.8}`}
       fill="none"
-      stroke={check.color}
+      stroke={color}
       strokeWidth={check.strokeWidth}
       strokeLinecap={check.cap}
       strokeLinejoin={check.join}

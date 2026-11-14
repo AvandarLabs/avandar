@@ -24,7 +24,9 @@ function _svg(element: ReactElement, patch?: VideoThemePatch): string {
 }
 
 test("a pill draws today's classic shape", () => {
-  const markup = _svg(<Pill x={0} y={0} text="05 nodes" />);
+  const markup = _svg(
+    <Pill x={0} y={0} text="05 nodes" color="#728794" width={114} />,
+  );
   assert.match(
     markup,
     /rx="15"[^>]*fill-opacity="0.08"[^>]*stroke-opacity="0.32"/,

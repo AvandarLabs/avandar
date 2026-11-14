@@ -232,10 +232,6 @@ const SHARED_GRAPHIC_TOKENS = {
     fadeIn: _duration("Route fade-in", "How long a route takes to appear."),
   },
   Packet: {
-    color: _color(
-      "Packet colour",
-      "Colour of a packet that names no colour of its own.",
-    ),
     radius: _length("Packet radius", "Radius of a packet."),
     radiusSm: _length(
       "Small packet radius",
@@ -316,14 +312,6 @@ const SHARED_GRAPHIC_TOKENS = {
     ),
   },
   Pill: {
-    color: _color(
-      "Pill colour",
-      "Colour of a pill that names no colour of its own.",
-    ),
-    width: _length(
-      "Pill width",
-      "Width of a pill that names no width of its own.",
-    ),
     height: _length("Pill height", "Height of a pill."),
     radius: _length(
       "Pill radius",
@@ -337,14 +325,6 @@ const SHARED_GRAPHIC_TOKENS = {
     ),
   },
   Check: {
-    color: _color(
-      "Check colour",
-      "Colour of a check mark that names no colour of its own.",
-    ),
-    size: _length(
-      "Check size",
-      "Size of a check mark that names no size of its own.",
-    ),
     strokeWidth: _stroke("Check width", "Stroke width of a check mark."),
     cap: _enum("Check cap", "How a check mark's ends are drawn.", CAPS),
     join: _enum("Check join", "How a check mark's corner is drawn.", JOINS),
