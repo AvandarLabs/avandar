@@ -127,11 +127,12 @@ export function buildVideoCssVariables(
   const variables: Record<string, string> = {};
   for (const { path, definition, isScale } of listTokenDefinitions()) {
     const segments = path.split(".");
+    const [root = ""] = segments;
     const isSkipped =
       isScale ||
-      segments[0] === "atomic" ||
-      isMantineTokenRoot(segments[0]) ||
-      UNSTYLED_GROUPS.has(segments[0]);
+      root === "atomic" ||
+      isMantineTokenRoot(root) ||
+      UNSTYLED_GROUPS.has(root);
     const value = isSkipped ? undefined : getResolvedTokenValue(theme, path);
     if (value !== undefined) {
       Object.assign(

@@ -27,7 +27,7 @@ export function isTokenReference(value: unknown): value is TokenReference {
 export function getTargetFromTokenReference(
   reference: TokenReference,
 ): TokenReferenceTarget {
-  const [root, ...rest] = reference.slice(1).split(".");
+  const [root = "", ...rest] = reference.slice(1).split(".");
   if (root === "primary" && rest.length === 0) {
     return { tier: "primary" };
   }

@@ -47,8 +47,9 @@ const scaleKeySchema = z
   .regex(/^[A-Za-z0-9]{1,32}$/, "Scale keys are letters and digits");
 
 function _union(options: readonly z.ZodType[]): z.ZodType {
-  return options.length === 1
-    ? options[0]
+  const [onlyOption] = options;
+  return options.length === 1 && onlyOption !== undefined
+    ? onlyOption
     : z.union(options as [z.ZodType, z.ZodType, ...z.ZodType[]]);
 }
 

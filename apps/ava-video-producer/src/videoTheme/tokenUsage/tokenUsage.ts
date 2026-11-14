@@ -64,6 +64,9 @@ export function createTokenUsageProxy<Value extends object>(
         return child;
       }
       const node = catalog[key];
+      if (node === undefined) {
+        return child;
+      }
       const path = [...basePath, key];
       if (isTokenDefinition(node) || isTokenScale(node)) {
         report(path.join("."));

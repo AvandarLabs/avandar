@@ -59,7 +59,7 @@ export function listTokenDefinitions(): readonly CatalogEntry[] {
 function _getSectionFromPath(
   segments: readonly string[],
 ): readonly [CatalogNode, readonly string[]] {
-  const [root, ...rest] = segments;
+  const [root = "", ...rest] = segments;
   if (root === "atomic") {
     return [ATOMIC_TOKENS, rest];
   }
@@ -89,7 +89,11 @@ export function getTokenDefinitionFromPath(
     if (isTokenDefinition(node) || !Object.hasOwn(node, segment)) {
       return undefined;
     }
-    node = node[segment];
+    const childNode: CatalogNode | undefined = node[segment];
+    if (childNode === undefined) {
+      return undefined;
+    }
+    node = childNode;
   }
   return isTokenDefinition(node) ? node : undefined;
 }

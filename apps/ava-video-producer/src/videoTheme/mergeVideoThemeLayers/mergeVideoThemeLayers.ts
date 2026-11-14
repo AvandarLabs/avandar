@@ -114,7 +114,7 @@ export function mergeVideoThemeLayers(
   const chain = getExtendsChainFromThemeId(library, themeId);
   const theme = chain[chain.length - 1];
   const overrides = (scope.overrideIds ?? []).flatMap((id) => {
-    const override = theme.overrides?.[id];
+    const override = theme?.overrides?.[id];
     return override ? [override] : [];
   });
   const layers: readonly VideoThemePatch[] = [

@@ -31,7 +31,7 @@ export function getResolvedTokenValue(
     Partial<Pick<ResolvedVideoTheme, "mantine">>,
   path: string,
 ): unknown {
-  const [root, ...rest] = path.split(".");
+  const [root = "", ...rest] = path.split(".");
   if (root === "atomic") {
     return getValueAtPath(theme.atomic, rest);
   }
