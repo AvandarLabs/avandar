@@ -50,7 +50,8 @@ export function useLayoutListKeyboard(
     layoutId: CrosswalkLayout.Id;
   }>();
   const activeLayoutId =
-    active?.underSelectedId === selectedLayoutId &&
+    active !== undefined &&
+    active.underSelectedId === selectedLayoutId &&
     layoutIds.includes(active.layoutId)
       ? active.layoutId
       : (selectedLayoutId ?? layoutIds[0]);
