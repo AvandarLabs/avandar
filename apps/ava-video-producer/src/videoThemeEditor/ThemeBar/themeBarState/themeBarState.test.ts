@@ -7,7 +7,12 @@ import {
 } from "./themeBarState";
 
 const IDLE = { kind: "idle" } as const;
-const QUIET = { isBuiltIn: false, isDirty: true, hasIssues: false };
+const QUIET = {
+  isBuiltIn: false,
+  isDirty: true,
+  hasIssues: false,
+  isChangedOnDisk: false,
+};
 
 function _failed(status: number) {
   return { kind: "failed", status, issues: [] } as const;
@@ -44,6 +49,17 @@ test("a refused save is explained by its HTTP status", () => {
   assert.equal(
     getThemeBarMessage({ ...QUIET, status: _failed(413) }),
     "themeTooLarge",
+  );
+});
+
+test("a conflict shown by the changed-on-disk banner points at its actions, not a reload", () => {
+  assert.equal(
+    getThemeBarMessage({
+      ...QUIET,
+      isChangedOnDisk: true,
+      status: _failed(409),
+    }),
+    "changedOnDiskUseBanner",
   );
 });
 

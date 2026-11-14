@@ -23,7 +23,8 @@ export type VideoThemeDraftState = StoredDraftState &
  * The theme list, the active theme (from `?theme=` or the viewer's last
  * choice), its unsaved draft (surviving reloads), and save actions. Call it
  * once per page and share the result with every modal, for example through
- * the gallery's theme context.
+ * the gallery's theme context. The result keeps its identity until one of
+ * its parts changes.
  */
 export function useVideoThemeDraft(): VideoThemeDraftState {
   const storage = useMemo(getBrowserStorage, []);
@@ -46,13 +47,16 @@ export function useVideoThemeDraft(): VideoThemeDraftState {
     selectTheme,
     discard: draftState.discard,
   });
-  return {
-    themes,
-    themeId,
-    selectTheme,
-    library,
-    isBuiltIn,
-    ...draftState,
-    ...saving,
-  };
+  return useMemo(
+    () => ({
+      themes,
+      themeId,
+      selectTheme,
+      library,
+      isBuiltIn,
+      ...draftState,
+      ...saving,
+    }),
+    [themes, themeId, selectTheme, library, isBuiltIn, draftState, saving],
+  );
 }

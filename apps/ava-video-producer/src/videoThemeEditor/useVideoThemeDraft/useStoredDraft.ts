@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   EMPTY_THEME_DRAFT,
   isThemeDraftEmpty,
@@ -23,19 +23,18 @@ export type StoredDraftState = Readonly<{
   discard: () => void;
 }>;
 
+type StoredDraftOptions = Readonly<{
+  themeId: string;
+  baseHash: string;
+  storage: BrowserStorage;
+}>;
+
 /**
- * The draft of the active theme, stored per viewer with the hash of the
- * file it was made against. The gallery reloads whenever a theme file
- * changes, so the stored hash is what tells a stale draft apart.
+ * The stored record of the active theme, re-read when the theme changes,
+ * and a stable function that writes a new record.
  */
-export function useStoredDraft(
-  options: Readonly<{
-    themeId: string;
-    baseHash: string;
-    storage: BrowserStorage;
-  }>,
-): StoredDraftState {
-  const { themeId, baseHash, storage } = options;
+function useStoredDraftRecord(options: StoredDraftOptions) {
+  const { themeId, storage } = options;
   const [state, setState] = useState(() => ({
     themeId,
     record: readStoredThemeDraft(storage, themeId),
@@ -47,23 +46,49 @@ export function useStoredDraft(
   if (state.themeId !== themeId) {
     setState({ themeId, record });
   }
+  const store = useCallback(
+    (nextRecord: StoredThemeDraft) => {
+      writeStoredThemeDraft(storage, themeId, nextRecord);
+      setState({ themeId, record: nextRecord });
+    },
+    [storage, themeId],
+  );
+  return { record, store };
+}
+
+/**
+ * The draft of the active theme, stored per viewer with the hash of the
+ * file it was made against. The gallery reloads whenever a theme file
+ * changes, so the stored hash is what tells a stale draft apart. The state
+ * and its functions keep their identity until the draft, theme, or hash
+ * changes, so a shared context does not re-render every consumer.
+ */
+export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
+  const { baseHash } = options;
+  const { record, store } = useStoredDraftRecord(options);
   const draft = record?.draft ?? EMPTY_THEME_DRAFT;
-  const store = (next: StoredThemeDraft) => {
-    writeStoredThemeDraft(storage, themeId, next);
-    setState({ themeId, record: next });
-  };
+  const recordHash = record?.baseHash;
+  const setDraft = useCallback(
+    (nextDraft: ThemeDraft) =>
+      store({ baseHash: recordHash || baseHash, draft: nextDraft }),
+    [store, recordHash, baseHash],
+  );
+  const keepDraft = useCallback(
+    () => store({ baseHash, draft }),
+    [store, baseHash, draft],
+  );
+  const discard = useCallback(
+    () => store({ baseHash, draft: EMPTY_THEME_DRAFT }),
+    [store, baseHash],
+  );
   const isDirty = !isThemeDraftEmpty(draft);
-  return {
-    draft,
-    isDirty,
-    isChangedOnDisk:
-      isDirty &&
-      Boolean(record?.baseHash) &&
-      Boolean(baseHash) &&
-      record?.baseHash !== baseHash,
-    setDraft: (next) =>
-      store({ baseHash: record?.baseHash || baseHash, draft: next }),
-    keepDraft: () => store({ baseHash, draft }),
-    discard: () => store({ baseHash, draft: EMPTY_THEME_DRAFT }),
-  };
+  const isChangedOnDisk =
+    isDirty &&
+    Boolean(recordHash) &&
+    Boolean(baseHash) &&
+    recordHash !== baseHash;
+  return useMemo(
+    () => ({ draft, isDirty, isChangedOnDisk, setDraft, keepDraft, discard }),
+    [draft, isDirty, isChangedOnDisk, setDraft, keepDraft, discard],
+  );
 }

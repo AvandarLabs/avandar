@@ -5,6 +5,8 @@ export type ThemeBarInput = Readonly<{
   isBuiltIn: boolean;
   isDirty: boolean;
   hasIssues: boolean;
+  /** The changed-on-disk banner is showing, with its keep and discard actions. */
+  isChangedOnDisk: boolean;
   status: ThemeSaveStatus;
 }>;
 
@@ -22,6 +24,7 @@ export type ThemeBarMessage =
   | "invalidTheme"
   | "readOnlyTheme"
   | "changedOnDisk"
+  | "changedOnDiskUseBanner"
   | "themeTooLarge"
   | "saveFailed";
 
@@ -51,7 +54,9 @@ function _getFailureMessage(
 
 /**
  * The status line's message: the last action's outcome, or, while idle, why
- * saving is unavailable, so a disabled save explains itself.
+ * saving is unavailable, so a disabled save explains itself. A conflict
+ * while the changed-on-disk banner shows points at the banner's actions
+ * rather than a page reload, so the two never disagree.
  */
 export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
   const { status } = input;
@@ -61,6 +66,9 @@ export function getThemeBarMessage(input: ThemeBarInput): ThemeBarMessage {
     case "copied":
       return status.kind;
     case "failed":
+      if (status.status === 409 && input.isChangedOnDisk) {
+        return "changedOnDiskUseBanner";
+      }
       return _getFailureMessage(status.status, status.issues.length > 0);
     case "idle":
       return input.hasIssues ? "fixIssuesFirst" : "none";

@@ -18,6 +18,7 @@ type Props = Readonly<{
   isBuiltIn: boolean;
   isDirty: boolean;
   hasIssues: boolean;
+  isChangedOnDisk: boolean;
   status: ThemeSaveStatus;
   onSelectTheme: (themeId: string) => void;
   onSave: () => void;
@@ -37,6 +38,7 @@ function useStatusText(): (message: ThemeBarMessage) => string {
     invalidTheme: t`The theme has problems. Fix the marked tokens and save again.`,
     readOnlyTheme: t`Built-in themes are read-only. Save a copy as a new theme.`,
     changedOnDisk: t`This theme changed on disk. Reload the page, then save again.`,
+    changedOnDiskUseBanner: t`This theme changed on disk. Keep or discard your edits in the notice below, then save again.`,
     themeTooLarge: t`This theme is too large to save.`,
     saveFailed: t`The theme could not be saved. Check the showcase terminal.`,
   };

@@ -1,0 +1,13 @@
+.panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding-block: 16px 20px;
+  padding-inline: 20px;
+}
+
+@media (width <= 760px) {
+  .panel {
+    padding: 12px;
+  }
+}

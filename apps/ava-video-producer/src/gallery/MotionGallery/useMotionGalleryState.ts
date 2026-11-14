@@ -3,6 +3,7 @@ import { useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { afterDownloads } from "../../../showcase/download.js";
 import { STOCK_CATALOG, type StockPresetId } from "../../stock/catalog";
+import { copyTextToClipboard } from "../copyText/copyText";
 import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../palette";
 import {
   type ContentDraft,
@@ -36,38 +37,6 @@ function _readPaletteOverride({
   }
 }
 
-async function _copyText({
-  value,
-  label,
-}: {
-  value: string;
-  label: string;
-}): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(value);
-    return;
-  } catch {
-    /* Local HTTP fallback. */
-  }
-  const previousFocus =
-    document.activeElement instanceof HTMLElement ||
-    document.activeElement instanceof SVGElement
-      ? document.activeElement
-      : undefined;
-  const field = document.createElement("textarea");
-  field.value = value;
-  field.setAttribute("aria-label", label);
-  field.style.cssText =
-    "position:fixed;left:0;top:0;opacity:0;width:1px;height:1px";
-  (document.querySelector("dialog[open]") ?? document.body).append(field);
-  field.select();
-  const copied = document.execCommand("copy");
-  field.remove();
-  previousFocus?.focus();
-  if (!copied) {
-    throw new Error("Clipboard unavailable");
-  }
-}
 /** Catalog selection, saved references, editable content, and playback controls. */
 export type MotionGalleryState = {
   accent: string;
@@ -273,7 +242,7 @@ export function useMotionGalleryState(): MotionGalleryState {
   const onCopy = useCallback(
     async (value: string, label: string) => {
       try {
-        await _copyText({ value, label: t`Text to copy` });
+        await copyTextToClipboard(value, t`Text to copy`);
         announce(label);
       } catch {
         announce(

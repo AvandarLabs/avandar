@@ -5,8 +5,8 @@ import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
 
 /**
  * The draft previews and exports may use: the current draft when every part
- * resolves, otherwise the last one of this theme that did. A preview must
- * never receive a draft that throws.
+ * resolves, otherwise the last one of this theme that did, and whether the
+ * current draft resolves. A preview must never receive a draft that throws.
  */
 export function useValidThemeDraft(
   options: Readonly<{
@@ -14,7 +14,7 @@ export function useValidThemeDraft(
     themeId: string;
     draft: ThemeDraft;
   }>,
-): ThemeDraft {
+): Readonly<{ draft: ThemeDraft; isValid: boolean }> {
   const { library, themeId, draft } = options;
   const isValid = useMemo(
     () => isThemeDraftValid({ library, themeId, draft }),
@@ -28,7 +28,10 @@ export function useValidThemeDraft(
     }
   }, [isValid, themeId, draft]);
   if (isValid) {
-    return draft;
+    return { draft, isValid };
   }
-  return lastValid?.themeId === themeId ? lastValid.draft : EMPTY_THEME_DRAFT;
+  return {
+    draft: lastValid?.themeId === themeId ? lastValid.draft : EMPTY_THEME_DRAFT,
+    isValid,
+  };
 }

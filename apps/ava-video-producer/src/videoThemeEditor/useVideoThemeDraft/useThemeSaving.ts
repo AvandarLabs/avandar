@@ -1,4 +1,4 @@
-import { useRef, useState, type RefObject } from "react";
+import { useCallback, useMemo, useRef, useState, type RefObject } from "react";
 import {
   ThemeApi,
   ThemeApiError,
@@ -80,49 +80,63 @@ async function _runThemeRequest(
   }
 }
 
+type RunThemeRequest = (request: () => Promise<void>) => Promise<void>;
+
+/** Saves the draft into its custom theme file, guarded by the file's hash. */
+function useSaveInPlace(options: SaveOptions, run: RunThemeRequest) {
+  const { isBuiltIn, storedTheme, draft, storeTheme, discard } = options;
+  return useCallback(async () => {
+    if (isBuiltIn || !storedTheme) {
+      return;
+    }
+    const document = createSavedDocumentFromDraft(storedTheme.document, draft);
+    await run(async () => {
+      const { hash } = await ThemeApi.save(document, storedTheme.hash);
+      storeTheme({ document, hash });
+      discard();
+    });
+  }, [isBuiltIn, storedTheme, draft, storeTheme, discard, run]);
+}
+
+/** Saves the draft as a new theme and makes it the active one. */
+function useSaveAsNew(options: SaveOptions, run: RunThemeRequest) {
+  const { library, themeId, draft, storeTheme, discard, selectTheme } = options;
+  return useCallback(
+    async (label: string) => {
+      const base = library.get(themeId);
+      if (!base) {
+        return;
+      }
+      const id = buildThemeIdFromLabel(label, [...library.keys()]);
+      const document = createNewThemeDocument({ base, draft, id, label });
+      await run(async () => {
+        const { hash } = await ThemeApi.create(document);
+        storeTheme({ document, hash });
+        discard();
+        selectTheme(id);
+      });
+    },
+    [library, themeId, draft, storeTheme, discard, selectTheme, run],
+  );
+}
+
 /**
  * Saves the draft into its theme (custom themes only, guarded by the file's
  * hash) or into a new theme, then clears the draft. A new theme becomes the
- * active one.
+ * active one. The state and its functions keep their identity until an
+ * option they use changes.
  */
 export function useThemeSaving(options: SaveOptions): ThemeSavingState {
   const [status, setStatus] = useState<ThemeSaveStatus>({ kind: "idle" });
   const inFlight = useRef(false);
-  const run = (request: () => Promise<void>) =>
-    _runThemeRequest({ inFlight, setStatus, request });
-  const save = async () => {
-    const { storedTheme } = options;
-    if (options.isBuiltIn || !storedTheme) {
-      return;
-    }
-    const document = createSavedDocumentFromDraft(
-      storedTheme.document,
-      options.draft,
-    );
-    await run(async () => {
-      const { hash } = await ThemeApi.save(document, storedTheme.hash);
-      options.storeTheme({ document, hash });
-      options.discard();
-    });
-  };
-  const saveAsNew = async (label: string) => {
-    const base = options.library.get(options.themeId);
-    if (!base) {
-      return;
-    }
-    const id = buildThemeIdFromLabel(label, [...options.library.keys()]);
-    const document = createNewThemeDocument({
-      base,
-      draft: options.draft,
-      id,
-      label,
-    });
-    await run(async () => {
-      const { hash } = await ThemeApi.create(document);
-      options.storeTheme({ document, hash });
-      options.discard();
-      options.selectTheme(id);
-    });
-  };
-  return { status, setStatus, save, saveAsNew };
+  const run = useCallback<RunThemeRequest>(
+    (request) => _runThemeRequest({ inFlight, setStatus, request }),
+    [],
+  );
+  const save = useSaveInPlace(options, run);
+  const saveAsNew = useSaveAsNew(options, run);
+  return useMemo(
+    () => ({ status, setStatus, save, saveAsNew }),
+    [status, save, saveAsNew],
+  );
 }

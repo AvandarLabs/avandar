@@ -1,0 +1,120 @@
+import { useLingui } from "@lingui/react/macro";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from "react";
+import { resolveVideoTheme } from "../../videoTheme/resolveVideoTheme/resolveVideoTheme";
+import { VideoThemeContext } from "../../videoTheme/useVideoTheme/useVideoTheme";
+import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
+import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
+import {
+  createSavedDocumentFromDraft,
+  type ThemeDraft,
+} from "../../videoThemeEditor/themeDraft/themeDraft";
+import {
+  useVideoThemeDraft,
+  type VideoThemeDraftState,
+} from "../../videoThemeEditor/useVideoThemeDraft/useVideoThemeDraft";
+import { copyTextToClipboard } from "../copyText/copyText";
+import type { ResolvedVideoTheme } from "../../videoTheme/videoTheme.types";
+
+/** The gallery's theme state plus what previews and exports need from it. */
+export type GalleryVideoThemeValue = VideoThemeDraftState &
+  Readonly<{
+    /** The last draft whose every part resolves; previews and exports use it. */
+    validDraft: ThemeDraft;
+    /** The theme with its theme-scope draft, for gallery-wide reads such as briefs. */
+    galleryTheme: ResolvedVideoTheme;
+    hasIssues: boolean;
+    copyThemeJson: () => Promise<void>;
+  }>;
+
+const GalleryVideoThemeContext = createContext<
+  GalleryVideoThemeValue | undefined
+>(undefined);
+const THEME_SCOPE = { kind: "theme" } as const;
+
+/** The gallery theme state. Throws outside `GalleryVideoTheme`. */
+export function useGalleryVideoTheme(): GalleryVideoThemeValue {
+  const value = useContext(GalleryVideoThemeContext);
+  if (!value) {
+    throw new Error(
+      "Gallery theme state needs a GalleryVideoTheme above this component",
+    );
+  }
+  return value;
+}
+
+/** Copies the active theme, as saving the draft would write it, as JSON. */
+function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
+  const { t } = useLingui();
+  const { library, themeId, draft, setStatus } = state;
+  return useCallback(async () => {
+    const document = library.get(themeId);
+    if (!document) {
+      return;
+    }
+    try {
+      const json = JSON.stringify(
+        createSavedDocumentFromDraft(document, draft),
+        null,
+        2,
+      );
+      await copyTextToClipboard(json, t`Theme JSON`);
+      setStatus({ kind: "copied" });
+    } catch {
+      setStatus({ kind: "failed", status: 0, issues: [] });
+    }
+  }, [library, themeId, draft, setStatus, t]);
+}
+
+/**
+ * Owns the one theme draft every Atlas modal edits, and makes the saved
+ * active theme the ambient video theme source. It sets no Mantine theme:
+ * each preview gets its own `GalleryItemTheme`, so the gallery chrome never
+ * picks up video tokens. Wrap the Motions, Compositions, and Sample films
+ * sections in it. Its value keeps its identity until the draft state or
+ * the resolved draft changes, so consumers skip unrelated renders.
+ */
+export function GalleryVideoTheme({
+  children,
+}: Readonly<{ children: ReactNode }>) {
+  const state = useVideoThemeDraft();
+  const { library, themeId, draft } = state;
+  const draftTheme = useDraftTheme({
+    library,
+    themeId,
+    draft,
+    scope: THEME_SCOPE,
+  });
+  const valid = useValidThemeDraft({ library, themeId, draft });
+  const copyThemeJson = useCopyThemeJson(state);
+  const savedTheme = useMemo(
+    () => resolveVideoTheme(library, themeId),
+    [library, themeId],
+  );
+  const videoContext = useMemo(
+    () => ({ theme: savedTheme, source: { library, themeId } }),
+    [savedTheme, library, themeId],
+  );
+  const value = useMemo<GalleryVideoThemeValue>(
+    () => ({
+      ...state,
+      validDraft: valid.draft,
+      galleryTheme: draftTheme.theme,
+      hasIssues: !valid.isValid,
+      copyThemeJson,
+    }),
+    [state, valid.draft, valid.isValid, draftTheme.theme, copyThemeJson],
+  );
+  return (
+    <GalleryVideoThemeContext.Provider value={value}>
+      <VideoThemeContext.Provider value={videoContext}>
+        {children}
+      </VideoThemeContext.Provider>
+    </GalleryVideoThemeContext.Provider>
+  );
+}
