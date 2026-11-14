@@ -1,0 +1,72 @@
+/*
+ * Step 2's flank: the layouts to map, on the body tint, with a hairline
+ * against the lit table. Its header never scrolls. The parent lays the
+ * stub and the table out as a row, like the Label values step does.
+ */
+.layoutStub {
+  background-color: var(--ava-surface-body);
+  border-inline-end: 1px solid var(--ava-border-default);
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  min-height: 0;
+  width: calc(16.25rem * var(--mantine-scale));
+}
+
+.layoutStubHeader {
+  flex: none;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-md)
+    var(--mantine-spacing-sm);
+}
+
+/*
+ * The listbox keeps focus itself and rings its active row instead, so its
+ * own outline would draw a second ring around every row.
+ */
+.layoutStubList {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  outline: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  scrollbar-width: thin;
+}
+
+.layoutStubRow {
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  cursor: pointer;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  justify-content: space-between;
+  min-width: 0;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  transition: var(--ava-transition-interactive);
+}
+
+/* The pane is neutral.0, so the hover takes neutral.1 to show at all. */
+.layoutStubRow:hover {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+.layoutStubRow[aria-selected="true"] {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.layoutStubList:focus-visible .layoutStubRow[data-active="true"] {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: -2px;
+}
+
+@media (width < 62em) {
+  .layoutStub {
+    border-block-end: 1px solid var(--ava-border-default);
+    border-inline-end: 0;
+    max-height: 40%;
+    width: auto;
+  }
+}
