@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => {
     invalidateQueries: vi.fn(),
     notifyError: vi.fn(),
     isOnline: true,
+    hasProfile: true,
   };
 });
 
@@ -78,7 +79,13 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
 vi.mock("@/hooks/users/useCurrentUserProfile", () => {
   return {
     useCurrentUserProfile: () => {
-      return [{ userId: "user-1", profileId: "profile-1" }, false, {}];
+      return [
+        mocks.hasProfile
+          ? { userId: "user-1", profileId: "profile-1" }
+          : undefined,
+        false,
+        {},
+      ];
     },
   };
 });
@@ -101,6 +108,7 @@ describe("useSaveCrosswalk", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.isOnline = true;
+    mocks.hasProfile = true;
     mocks.saveContents.mockResolvedValue(undefined);
     mocks.insert.mockResolvedValue({ id: CROSSWALK_ID });
     mocks.remove.mockResolvedValue(undefined);
@@ -206,6 +214,25 @@ describe("useSaveCrosswalk", () => {
 
     expect(secondResult).toBe(false);
     expect(mocks.saveContents).toHaveBeenCalledTimes(1);
+  });
+
+  it("says so, and sends nothing, while the user's profile has not loaded", async () => {
+    mocks.hasProfile = false;
+    const { result } = _renderSave();
+
+    let isSaved = true;
+    await act(async () => {
+      isSaved = await result.current[0]({
+        ...makeSeededState().draft,
+        isSaved: true,
+      });
+    });
+
+    expect(isSaved).toBe(false);
+    expect(mocks.saveContents).not.toHaveBeenCalled();
+    expect(mocks.notifyError).toHaveBeenCalledWith(
+      "Your profile is still loading. Try again.",
+    );
   });
 
   it("says the user is offline and sends nothing", async () => {

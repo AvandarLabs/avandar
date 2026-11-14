@@ -14,6 +14,7 @@ import { useCrosswalkErrorMessage } from "@/views/DataManagerApp/CrosswalkView/u
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CrosswalkAction } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
+import type { QueryClient } from "@tanstack/react-query";
 
 /** Saves a draft whole; resolves true once it is saved. */
 export type SaveCrosswalk = (draft: CrosswalkDraft.T) => Promise<boolean>;
@@ -75,6 +76,29 @@ async function _writeDraft(options: WriteOptions): Promise<void> {
   }
 }
 
+/** Marks the crosswalk queries stale without making the save wait. */
+function _refreshAfterSave(queryClient: QueryClient): void {
+  invalidateCrosswalkQueries(queryClient).catch((error: unknown) => {
+    Logger.error(error, { devMsg: "Refreshing after a crosswalk save failed" });
+  });
+}
+
+/** Writes the draft, then tells the view it is saved and refreshes queries. */
+async function _writeAndMarkSaved(
+  options: WriteOptions &
+    Readonly<{
+      dispatch: (action: CrosswalkAction) => void;
+      queryClient: QueryClient;
+    }>,
+): Promise<void> {
+  await _writeDraft(options);
+  options.dispatch({
+    type: "saved",
+    draft: { ...options.draft, isSaved: true },
+  });
+  _refreshAfterSave(options.queryClient);
+}
+
 /**
  * Saves the crosswalk's draft whole, then dispatches `saved` and marks the
  * crosswalk queries stale. A second save while one is in flight is
@@ -92,7 +116,11 @@ export function useSaveCrosswalk(
   const isSavingRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const save: SaveCrosswalk = async (draft) => {
-    if (isSavingRef.current || !userProfile) {
+    if (isSavingRef.current) {
+      return false;
+    }
+    if (!userProfile) {
+      notifyError(t`Your profile is still loading. Try again.`);
       return false;
     }
     if (!getIsOnline()) {
@@ -102,16 +130,12 @@ export function useSaveCrosswalk(
     isSavingRef.current = true;
     setIsSaving(true);
     try {
-      await _writeDraft({
+      await _writeAndMarkSaved({
         draft,
         workspaceId: workspace.id,
         owner: userProfile,
-      });
-      dispatch({ type: "saved", draft: { ...draft, isSaved: true } });
-      invalidateCrosswalkQueries(queryClient).catch((error: unknown) => {
-        Logger.error(error, {
-          devMsg: "Refreshing after a crosswalk save failed",
-        });
+        dispatch,
+        queryClient,
       });
       return true;
     } catch (error) {

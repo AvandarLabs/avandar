@@ -10,8 +10,9 @@ type Props = {
 
 /**
  * The crosswalk's name as inline-editable text. A crosswalk that exists is
- * saved on rename; a new one keeps the name for its first save, since a
- * crosswalk cannot be saved before it has a reference layout.
+ * saved on rename. A new one keeps the name until its first save, which
+ * happens when Choose datasets moves on to Map each dataset, so a new
+ * crosswalk abandoned on step 1 leaves no row behind.
  */
 export function CrosswalkNameField({ flow }: Readonly<Props>): ReactNode {
   const { t } = useLingui();

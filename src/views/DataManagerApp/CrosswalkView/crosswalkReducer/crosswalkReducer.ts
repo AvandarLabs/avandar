@@ -170,16 +170,16 @@ const HANDLERS: Handlers = {
     return _withDraft(state, addColumn(state.draft, action));
   },
   column_changed: (state, action) => {
-    const before = state.draft.columns.find((column) => {
+    const columnBefore = state.draft.columns.find((column) => {
       return column.id === action.columnId;
     });
     const draft = changeColumn(state.draft, action);
-    const after = draft.columns.find((column) => {
+    const columnAfter = draft.columns.find((column) => {
       return column.id === action.columnId;
     });
     // A new entry means new code lists to choose, so every layout is read
     // again.
-    return before?.entryId === after?.entryId
+    return columnBefore?.entryId === columnAfter?.entryId
       ? _withDraft(state, draft)
       : { ...state, draft, readLayoutIds: [] };
   },

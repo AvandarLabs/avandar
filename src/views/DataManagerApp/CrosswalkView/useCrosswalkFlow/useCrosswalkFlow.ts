@@ -42,8 +42,20 @@ export type CrosswalkFlow = {
    * layout opens even when the save fails; the changes stay unsaved.
    */
   selectLayout: (layoutId: CrosswalkLayout.Id) => Promise<void>;
+  /**
+   * Saves unsaved changes, then opens a step like `goToStep`. The step opens
+   * even when the save fails; the changes stay unsaved.
+   */
+  goToStepSaving: (
+    step: CrosswalkStep,
+    layoutId?: CrosswalkLayout.Id,
+  ) => Promise<void>;
   save: (draft: CrosswalkDraft.T) => Promise<boolean>;
-  /** Applies an action, then saves the draft it produced. */
+  /**
+   * Applies an action, then saves the draft it produced. A save already in
+   * flight is waited for first, and the draft is saved again only if the
+   * action left it with changes that save did not carry.
+   */
   dispatchAndSave: (action: CrosswalkAction) => Promise<boolean>;
   isSaving: boolean;
 };
@@ -114,6 +126,54 @@ function useCrosswalkState(
 }
 
 /**
+ * Serialises saves. `save` is the hook's save, remembered while it is in
+ * flight. `saveLatest` waits for any save in flight, then saves the current
+ * draft: always when nothing was in flight, and only when that save left
+ * changes behind when something was. So two quick actions never drop the
+ * second one's changes, and a repeated press does not save twice.
+ */
+function useSerializedSave(
+  options: Readonly<{
+    save: (draft: CrosswalkDraft.T) => Promise<boolean>;
+    stateRef: RefObject<CrosswalkState>;
+  }>,
+): {
+  save: (draft: CrosswalkDraft.T) => Promise<boolean>;
+  saveLatest: () => Promise<boolean>;
+} {
+  const { save, stateRef } = options;
+  const inFlightRef = useRef<Promise<boolean> | undefined>(undefined);
+  const trackedSave = (draft: CrosswalkDraft.T): Promise<boolean> => {
+    if (inFlightRef.current) {
+      return save(draft);
+    }
+    const saving = save(draft);
+    inFlightRef.current = saving;
+    const clear = (): void => {
+      if (inFlightRef.current === saving) {
+        inFlightRef.current = undefined;
+      }
+    };
+    saving.then(clear, clear);
+    return saving;
+  };
+  const saveLatest = async (): Promise<boolean> => {
+    let hasWaited = false;
+    while (inFlightRef.current) {
+      hasWaited = true;
+      await inFlightRef.current.catch(() => {
+        return false;
+      });
+    }
+    if (hasWaited && !isCrosswalkDirty(stateRef.current)) {
+      return true;
+    }
+    return trackedSave(stateRef.current.draft);
+  };
+  return { save: trackedSave, saveLatest };
+}
+
+/**
  * Opens a step on the crosswalk's own URL. Does nothing before the first
  * save.
  */
@@ -142,6 +202,42 @@ function useGoToStep(
 }
 
 /**
+ * The actions that save: an action plus a save, and opening a step or layout
+ * after saving what changed.
+ */
+function createSavingActions(
+  options: Readonly<{
+    stateRef: RefObject<CrosswalkState>;
+    dispatch: (action: CrosswalkAction) => void;
+    saveLatest: () => Promise<boolean>;
+    goToStep: CrosswalkFlow["goToStep"];
+  }>,
+): Pick<CrosswalkFlow, "dispatchAndSave" | "goToStepSaving" | "selectLayout"> {
+  const { stateRef, dispatch, saveLatest, goToStep } = options;
+  const goToStepSaving: CrosswalkFlow["goToStepSaving"] = async (
+    step,
+    layoutId,
+  ) => {
+    // A failed save (offline, refused) has already said why; the changes stay
+    // in the draft and the next action saves them, so the step still opens.
+    if (isCrosswalkDirty(stateRef.current)) {
+      await saveLatest();
+    }
+    goToStep(step, layoutId);
+  };
+  return {
+    dispatchAndSave: (action) => {
+      dispatch(action);
+      return saveLatest();
+    },
+    goToStepSaving,
+    selectLayout: (layoutId) => {
+      return goToStepSaving("map", layoutId);
+    },
+  };
+}
+
+/**
  * The crosswalk view's state and navigation: the reducer, the step and
  * layout in the URL (falling back to Choose datasets for a step the
  * crosswalk cannot open yet), and saving. Every action that saves goes
@@ -158,24 +254,14 @@ export function useCrosswalkFlow(
     options.initialDraft,
     options.isSaved,
   );
-  const [save, isSaving] = useSaveCrosswalk(dispatch);
+  const [rawSave, isSaving] = useSaveCrosswalk(dispatch);
+  const { save, saveLatest } = useSerializedSave({ save: rawSave, stateRef });
   const { searchStep, layoutId } = useFlowSearch();
   const goToStep = useGoToStep({ crosswalkId: options.crosswalkId, stateRef });
+  const { dispatchAndSave, goToStepSaving, selectLayout } = createSavingActions(
+    { stateRef, dispatch, saveLatest, goToStep },
+  );
   const reachableSteps = getReachableSteps(state);
-  const dispatchAndSave = (action: CrosswalkAction): Promise<boolean> => {
-    dispatch(action);
-    return save(stateRef.current.draft);
-  };
-  const selectLayout = async (
-    nextLayoutId: CrosswalkLayout.Id,
-  ): Promise<void> => {
-    // A failed save (offline, refused) has already said why; the changes stay
-    // in the draft and the next action saves them, so the layout still opens.
-    if (isCrosswalkDirty(stateRef.current)) {
-      await save(stateRef.current.draft);
-    }
-    goToStep("map", nextLayoutId);
-  };
   const step =
     searchStep && reachableSteps.has(searchStep) ? searchStep : "datasets";
   return {
@@ -186,6 +272,7 @@ export function useCrosswalkFlow(
     reachableSteps,
     goToStep,
     selectLayout,
+    goToStepSaving,
     save,
     dispatchAndSave,
     isSaving,

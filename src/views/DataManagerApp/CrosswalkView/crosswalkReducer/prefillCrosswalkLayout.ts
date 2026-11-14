@@ -226,9 +226,11 @@ export function prefillLayoutByNameAndType(
 }
 
 /**
- * Confirmed governed fills, given the code list their values fit. A list the
- * user chose (a fill set by hand, so with no `reason`) is kept; a list the
- * matcher guessed before the values were read is chosen again from them.
+ * Confirmed governed fills, given the code list their values fit. A fill the
+ * user set by hand has no `reason`, so it is kept as it is, including a
+ * choice of no translation. A fill whose list the matcher guessed, or left
+ * pending, before the values were read has a `reason` and is chosen again
+ * from them.
  */
 function _chooseCodeListsFromValues(
   draft: CrosswalkDraft.T,
@@ -245,9 +247,7 @@ function _chooseCodeListsFromValues(
         ? action.context.entriesById.get(column.entryId)
         : undefined;
       const isChosenByUser =
-        fill.kind === "column" &&
-        fill.codeListId !== undefined &&
-        mapping.reason === undefined;
+        fill.kind === "column" && mapping.reason === undefined;
       if (!entry || fill.kind !== "column" || fill.convert || isChosenByUser) {
         return [columnId, mapping];
       }

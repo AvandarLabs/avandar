@@ -29,7 +29,9 @@ function CrosswalkLoading({ label }: Readonly<{ label: string }>): ReactNode {
   );
 }
 
-function CrosswalkUnavailable(props: Readonly<{ title: string; message: string }>): ReactNode {
+function CrosswalkUnavailable(
+  props: Readonly<{ title: string; message: string }>,
+): ReactNode {
   return (
     <AppView>
       <Center flex={1} p="lg">
@@ -39,7 +41,10 @@ function CrosswalkUnavailable(props: Readonly<{ title: string; message: string }
   );
 }
 
-/** A crosswalk that does not exist yet, saved for the first time from Choose datasets. */
+/**
+ * A crosswalk that does not exist yet, saved for the first time from Choose
+ * datasets.
+ */
 function NewCrosswalk(): ReactNode {
   const { t } = useLingui();
   const [initialDraft] = useState(() => {
@@ -48,11 +53,22 @@ function NewCrosswalk(): ReactNode {
       name: t`Untitled crosswalk`,
     });
   });
-  return <CrosswalkFlowView crosswalk={undefined} initialDraft={initialDraft} isSaved={false} />;
+  return (
+    <CrosswalkFlowView
+      crosswalk={undefined}
+      initialDraft={initialDraft}
+      isSaved={false}
+    />
+  );
 }
 
-/** A saved crosswalk, opened once its tables and the datasets it maps have loaded. */
-function SavedCrosswalk({ crosswalkId }: Readonly<{ crosswalkId: Crosswalk.Id }>): ReactNode {
+/**
+ * A saved crosswalk, opened once its tables and the datasets it maps have
+ * loaded.
+ */
+function SavedCrosswalk({
+  crosswalkId,
+}: Readonly<{ crosswalkId: Crosswalk.Id }>): ReactNode {
   const { t } = useLingui();
   const { status, contents } = useCrosswalkContents(crosswalkId);
   const datasetIds = useMemo(() => {
@@ -86,7 +102,13 @@ function SavedCrosswalk({ crosswalkId }: Readonly<{ crosswalkId: Crosswalk.Id }>
   if (!contents || !initialDraft) {
     return <CrosswalkLoading label={t`Loading the crosswalk`} />;
   }
-  return <CrosswalkFlowView crosswalk={contents.crosswalk} initialDraft={initialDraft} isSaved />;
+  return (
+    <CrosswalkFlowView
+      crosswalk={contents.crosswalk}
+      initialDraft={initialDraft}
+      isSaved
+    />
+  );
 }
 
 /**
@@ -99,12 +121,18 @@ function SavedCrosswalk({ crosswalkId }: Readonly<{ crosswalkId: Crosswalk.Id }>
 export function CrosswalkView({ crosswalkId }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const [, areRolesLoading] = useUserAppRoles();
-  const canEditCrosswalks = useHasPermission("data_sources__can_edit_crosswalks");
+  const canEditCrosswalks = useHasPermission(
+    "data_sources__can_edit_crosswalks",
+  );
   if (areRolesLoading) {
     return <CrosswalkLoading label={t`Checking your access`} />;
   }
   if (!canEditCrosswalks) {
     return <CrosswalkNoAccess />;
   }
-  return crosswalkId ? <SavedCrosswalk crosswalkId={crosswalkId} /> : <NewCrosswalk />;
+  return crosswalkId ? (
+    <SavedCrosswalk crosswalkId={crosswalkId} />
+  ) : (
+    <NewCrosswalk />
+  );
 }

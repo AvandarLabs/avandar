@@ -270,6 +270,9 @@ export function makeCrosswalkFlow(
     selectLayout: vi.fn(() => {
       return Promise.resolve();
     }),
+    goToStepSaving: vi.fn(() => {
+      return Promise.resolve();
+    }),
     save: vi.fn(() => {
       return Promise.resolve(true);
     }),

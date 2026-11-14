@@ -9,6 +9,7 @@ import {
 } from "@/views/DataManagerApp/CrosswalkView/__tests__/crosswalk.fixtures";
 import { isCrosswalkDirty } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer";
 import { useCrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCrosswalkFlow/useCrosswalkFlow";
+import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
 import type { CrosswalkDraft } from "@/lib/crosswalks/CrosswalkDraft/CrosswalkDraft";
 import type { CrosswalkAction } from "@/views/DataManagerApp/CrosswalkView/crosswalkReducer/crosswalkReducer.types";
 
@@ -19,6 +20,9 @@ const mocks = vi.hoisted(() => {
     dispatch: undefined as undefined | ((action: CrosswalkAction) => void),
     isSaveRefused: false,
     savedDrafts: [] as CrosswalkDraft.T[],
+    isHoldingSaves: false,
+    isSaveInFlight: false,
+    releaseSaves: [] as Array<() => void>,
   };
 });
 
@@ -48,7 +52,18 @@ vi.mock(
       useSaveCrosswalk: (dispatch: (action: CrosswalkAction) => void) => {
         mocks.dispatch = dispatch;
         const save = async (draft: CrosswalkDraft.T) => {
+          // Like the real hook, a save while another is in flight is ignored.
+          if (mocks.isSaveInFlight) {
+            return false;
+          }
           mocks.savedDrafts.push(draft);
+          if (mocks.isHoldingSaves) {
+            mocks.isSaveInFlight = true;
+            await new Promise<void>((resolve) => {
+              mocks.releaseSaves.push(resolve);
+            });
+            mocks.isSaveInFlight = false;
+          }
           if (mocks.isSaveRefused) {
             return false;
           }
@@ -80,6 +95,9 @@ describe("useCrosswalkFlow", () => {
     mocks.search = {};
     mocks.isSaveRefused = false;
     mocks.savedDrafts = [];
+    mocks.isHoldingSaves = false;
+    mocks.isSaveInFlight = false;
+    mocks.releaseSaves = [];
   });
 
   it("opens on Choose datasets when the URL names a step not reachable yet", () => {
@@ -203,5 +221,113 @@ describe("useCrosswalkFlow", () => {
 
     expect(mocks.savedDrafts).toHaveLength(0);
     expect(mocks.navigate).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the changes of an action made while a save is in flight", async () => {
+    mocks.isHoldingSaves = true;
+    const { result } = _renderFlow({
+      draft: makeSeededState().draft,
+      isSaved: true,
+    });
+    const columnId =
+      "55555555-0000-4000-8000-000000000009" as CrosswalkColumn.Id;
+
+    let saves: Array<Promise<boolean>> = [];
+    await act(async () => {
+      saves = [
+        result.current.dispatchAndSave({ type: "renamed", name: "Renamed" }),
+        result.current.dispatchAndSave({
+          type: "column_added",
+          columnId,
+          name: "outbreak",
+          dataType: "boolean",
+        }),
+      ];
+      await Promise.resolve();
+      mocks.releaseSaves.shift()?.();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      for (let turn = 0; turn < 20 && mocks.releaseSaves.length === 0; turn++) {
+        await Promise.resolve();
+      }
+      mocks.releaseSaves.shift()?.();
+      await Promise.all(saves);
+    });
+
+    expect(mocks.savedDrafts).toHaveLength(2);
+    const finalDraft = mocks.savedDrafts.at(-1);
+    expect(finalDraft?.name).toBe("Renamed");
+    expect(
+      finalDraft?.columns.some((column) => {
+        return column.id === columnId;
+      }),
+    ).toBe(true);
+    expect(isCrosswalkDirty(result.current.state)).toBe(false);
+  });
+
+  it("does not save twice for a repeated press of the same change", async () => {
+    mocks.isHoldingSaves = true;
+    const { result } = _renderFlow({
+      draft: makeSeededState().draft,
+      isSaved: true,
+    });
+
+    let saves: Array<Promise<boolean>> = [];
+    await act(async () => {
+      saves = [
+        result.current.dispatchAndSave({ type: "renamed", name: "Renamed" }),
+        result.current.dispatchAndSave({ type: "renamed", name: "Renamed" }),
+      ];
+      await Promise.resolve();
+      mocks.releaseSaves.shift()?.();
+      await Promise.all(saves);
+    });
+
+    expect(mocks.savedDrafts).toHaveLength(1);
+  });
+
+  it("saves unsaved changes before opening a step from the step bar", async () => {
+    const { result } = _renderFlow({
+      draft: makeSeededState().draft,
+      isSaved: true,
+    });
+
+    await act(async () => {
+      result.current.dispatch({ type: "renamed", name: "Renamed" });
+    });
+    await act(async () => {
+      await result.current.goToStepSaving("combine");
+    });
+
+    expect(mocks.savedDrafts).toHaveLength(1);
+    expect(mocks.navigate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        search: { step: "combine", layoutId: undefined },
+      }),
+    );
+  });
+
+  it("still opens the step when its save fails, and skips the save when nothing changed", async () => {
+    const { result } = _renderFlow({
+      draft: makeSeededState().draft,
+      isSaved: true,
+    });
+
+    await act(async () => {
+      await result.current.goToStepSaving("combine");
+    });
+    expect(mocks.savedDrafts).toHaveLength(0);
+    expect(mocks.navigate).toHaveBeenCalledTimes(1);
+
+    mocks.isSaveRefused = true;
+    await act(async () => {
+      result.current.dispatch({ type: "renamed", name: "Renamed" });
+    });
+    await act(async () => {
+      await result.current.goToStepSaving("map");
+    });
+    expect(mocks.navigate).toHaveBeenCalledTimes(2);
+    expect(isCrosswalkDirty(result.current.state)).toBe(true);
   });
 });

@@ -11,6 +11,8 @@ const mocks = vi.hoisted(() => {
     canEdit: true,
     status: "ready" as CrosswalkContentsStatus,
     contents: undefined as CrosswalkDraft.Contents | undefined,
+    contentsSpy: vi.fn(),
+    catalogSpy: vi.fn(),
   };
 });
 
@@ -32,7 +34,8 @@ vi.mock(
   "@/views/DataManagerApp/CrosswalkView/useCrosswalkContents/useCrosswalkContents",
   () => {
     return {
-      useCrosswalkContents: () => {
+      useCrosswalkContents: (...args: unknown[]) => {
+        mocks.contentsSpy(...args);
         return { status: mocks.status, contents: mocks.contents };
       },
     };
@@ -45,7 +48,12 @@ vi.mock(
   async () => {
     const fixtures =
       await import("@/views/DataManagerApp/CrosswalkView/__tests__/crosswalk.fixtures");
-    return { useCrosswalkCatalog: fixtures.makeCrosswalkCatalog };
+    return {
+      useCrosswalkCatalog: (...args: unknown[]) => {
+        mocks.catalogSpy(...args);
+        return fixtures.makeCrosswalkCatalog();
+      },
+    };
   },
 );
 vi.mock(
@@ -84,6 +92,7 @@ const CONTENTS = {
 
 describe("CrosswalkView", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mocks.areRolesLoading = false;
     mocks.canEdit = true;
     mocks.status = "ready";
@@ -96,12 +105,16 @@ describe("CrosswalkView", () => {
     expect(
       screen.getByRole("status", { name: "Checking your access" }),
     ).toBeInTheDocument();
+    expect(mocks.contentsSpy).not.toHaveBeenCalled();
+    expect(mocks.catalogSpy).not.toHaveBeenCalled();
   });
 
   it("tells someone who cannot edit crosswalks", () => {
     mocks.canEdit = false;
-    render(<CrosswalkView crosswalkId={undefined} />);
+    render(<CrosswalkView crosswalkId={CROSSWALK_ID} />);
     expect(screen.getByText("You can't edit crosswalks")).toBeInTheDocument();
+    expect(mocks.contentsSpy).not.toHaveBeenCalled();
+    expect(mocks.catalogSpy).not.toHaveBeenCalled();
   });
 
   it("starts a new crosswalk named Untitled crosswalk", () => {

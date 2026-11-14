@@ -66,7 +66,7 @@ function _mergeGroups(
       return layout.key;
     }),
   );
-  const grown = layouts.map((layout) => {
+  const grownLayouts = layouts.map((layout) => {
     const group = groups.find((candidate) => {
       return candidate.key === layout.key;
     });
@@ -80,14 +80,14 @@ function _mergeGroups(
         }
       : layout;
   });
-  const created = groups
+  const createdLayouts = groups
     .filter((group) => {
       return !existingKeys.has(group.key);
     })
     .map(_createLayout);
   return {
-    layouts: [...grown, ...created],
-    createdLayoutIds: created.map((layout) => {
+    layouts: [...grownLayouts, ...createdLayouts],
+    createdLayoutIds: createdLayouts.map((layout) => {
       return layout.id;
     }),
   };
@@ -129,33 +129,42 @@ export function addDatasets(
   datasetIds: readonly Dataset.Id[],
   context: CrosswalkContext,
 ): CrosswalkDraft.T {
-  const known = new Set<string>(CrosswalkDraft.getDatasetIds(draft));
-  const added = [...new Set(datasetIds)].flatMap((datasetId) => {
-    const dataset = known.has(datasetId)
+  const knownDatasetIds = new Set<string>(CrosswalkDraft.getDatasetIds(draft));
+  const addedDatasets = [...new Set(datasetIds)].flatMap((datasetId) => {
+    const dataset = knownDatasetIds.has(datasetId)
       ? undefined
       : context.datasetsById.get(datasetId);
     return dataset && dataset.columns.length > 0 ? [dataset] : [];
   });
-  if (added.length === 0) {
+  if (addedDatasets.length === 0) {
     return draft;
   }
-  const merged = _mergeGroups(
+  const mergedGroups = _mergeGroups(
     draft.layouts,
-    CrosswalkLayout.groupDatasetsByLayout(added),
+    CrosswalkLayout.groupDatasetsByLayout(addedDatasets),
     context,
   );
-  const withReference = _ensureReference({ ...draft, layouts: merged.layouts });
-  const prefilled = merged.createdLayoutIds.reduce((current, layoutId) => {
-    const layout = current.layouts.find((candidate) => {
-      return candidate.id === layoutId;
-    });
-    return layout && !layout.isReference
-      ? prefillLayoutByNameAndType(current, layout, context)
-      : current;
-  }, withReference);
+  const withReference = _ensureReference({
+    ...draft,
+    layouts: mergedGroups.layouts,
+  });
+  const prefilledDraft = mergedGroups.createdLayoutIds.reduce(
+    (draftSoFar, layoutId) => {
+      const layout = draftSoFar.layouts.find((candidate) => {
+        return candidate.id === layoutId;
+      });
+      return layout && !layout.isReference
+        ? prefillLayoutByNameAndType(draftSoFar, layout, context)
+        : draftSoFar;
+    },
+    withReference,
+  );
   return {
-    ...prefilled,
-    layouts: CrosswalkDraft.sortLayouts(prefilled.layouts, _nameOf(context)),
+    ...prefilledDraft,
+    layouts: CrosswalkDraft.sortLayouts(
+      prefilledDraft.layouts,
+      _nameOf(context),
+    ),
   };
 }
 
@@ -173,10 +182,10 @@ export function removeDataset(
   if (!layout) {
     return draft;
   }
-  const remaining = layout.datasetIds.filter((id) => {
+  const remainingDatasetIds = layout.datasetIds.filter((id) => {
     return id !== datasetId;
   });
-  if (remaining.length === 0 && !layout.isReference) {
+  if (remainingDatasetIds.length === 0 && !layout.isReference) {
     return {
       ...draft,
       layouts: draft.layouts.filter((candidate) => {
@@ -189,7 +198,7 @@ export function removeDataset(
     ...draft,
     layouts: draft.layouts.map((candidate) => {
       return candidate.id === layout.id
-        ? { ...candidate, datasetIds: remaining }
+        ? { ...candidate, datasetIds: remainingDatasetIds }
         : candidate;
     }),
   };
@@ -205,13 +214,13 @@ export function chooseReference(
   draft: CrosswalkDraft.T,
   layoutId: CrosswalkLayout.Id,
 ): CrosswalkDraft.T {
-  const target = draft.layouts.find((layout) => {
+  const newReferenceLayout = draft.layouts.find((layout) => {
     return layout.id === layoutId;
   });
-  if (!target || target.isReference) {
+  if (!newReferenceLayout || newReferenceLayout.isReference) {
     return draft;
   }
-  const others = draft.layouts
+  const otherLayouts = draft.layouts
     .filter((layout) => {
       return layout.id !== layoutId;
     })
@@ -227,7 +236,10 @@ export function chooseReference(
     });
   return {
     ...draft,
-    layouts: [{ ...target, isReference: true, status: "mapped" }, ...others],
+    layouts: [
+      { ...newReferenceLayout, isReference: true, status: "mapped" },
+      ...otherLayouts,
+    ],
     columns: [],
     mappings: {},
   };
@@ -238,6 +250,7 @@ function _identityMapping(
   binding: ReferenceColumnBinding | undefined,
 ): CrosswalkDraft.Mapping {
   const isGoverned = column.entryId !== undefined;
+  const isListPending = isGoverned && binding?.codeListId === undefined;
   return {
     id: uuid<CrosswalkMapping.Id>(),
     fill: {
@@ -249,7 +262,10 @@ function _identityMapping(
     },
     status: "confirmed",
     confidence: undefined,
-    reason: undefined,
+    // A governed column whose list the reference does not name yet is marked
+    // as matched, not chosen, so reading its values picks the list that fits
+    // them. Any other fill with no reason is one the user chose.
+    reason: isListPending ? "name_and_type" : undefined,
   };
 }
 
@@ -293,16 +309,16 @@ export function seedColumns(
       ];
     }),
   );
-  const seeded: CrosswalkDraft.T = {
+  const seededDraft: CrosswalkDraft.T = {
     ...draft,
     columns,
     mappings: { [reference.id]: referenceMappings },
   };
-  return seeded.layouts.reduce((current, layout) => {
+  return seededDraft.layouts.reduce((draftSoFar, layout) => {
     return layout.isReference
-      ? current
-      : prefillLayoutByNameAndType(current, layout, context);
-  }, seeded);
+      ? draftSoFar
+      : prefillLayoutByNameAndType(draftSoFar, layout, context);
+  }, seededDraft);
 }
 
 function _hasLayoutAndColumn(
@@ -328,16 +344,16 @@ export function setFill(
   if (!_hasLayoutAndColumn(draft, action.layoutId, action.columnId)) {
     return draft;
   }
-  const current = draft.mappings[action.layoutId] ?? {};
+  const currentMappings = draft.mappings[action.layoutId] ?? {};
   const mapping: CrosswalkDraft.Mapping = {
-    id: current[action.columnId]?.id ?? uuid<CrosswalkMapping.Id>(),
+    id: currentMappings[action.columnId]?.id ?? uuid<CrosswalkMapping.Id>(),
     fill: action.fill,
     status: "confirmed",
     confidence: undefined,
     reason: undefined,
   };
   return withLayoutMappings(draft, action.layoutId, {
-    ...current,
+    ...currentMappings,
     [action.columnId]: mapping,
   });
 }
@@ -354,15 +370,21 @@ export function updateMappings(
     columnId: string,
   ) => CrosswalkDraft.Mapping | undefined,
 ): CrosswalkDraft.T {
-  const current = draft.mappings[layoutId];
-  if (!current) {
+  const currentMappings = draft.mappings[layoutId];
+  if (!currentMappings) {
     return draft;
   }
-  const next = Object.entries(current).flatMap(([columnId, mapping]) => {
-    const updated = update(mapping, columnId);
-    return updated ? [[columnId, updated] as const] : [];
-  });
-  return withLayoutMappings(draft, layoutId, Object.fromEntries(next));
+  const nextMappingEntries = Object.entries(currentMappings).flatMap(
+    ([columnId, mapping]) => {
+      const updated = update(mapping, columnId);
+      return updated ? [[columnId, updated] as const] : [];
+    },
+  );
+  return withLayoutMappings(
+    draft,
+    layoutId,
+    Object.fromEntries(nextMappingEntries),
+  );
 }
 
 function _setLayoutStatus(
@@ -394,10 +416,10 @@ export function confirmLayout(
   if (!layout || layout.isReference) {
     return draft;
   }
-  const current = draft.mappings[layoutId] ?? {};
+  const currentMappings = draft.mappings[layoutId] ?? {};
   const mappings: LayoutMappings = Object.fromEntries(
     draft.columns.map((column) => {
-      const existing = current[column.id];
+      const existing = currentMappings[column.id];
       const mapping: CrosswalkDraft.Mapping = existing
         ? { ...existing, status: "confirmed" }
         : {

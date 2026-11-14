@@ -51,7 +51,7 @@ export function CrosswalkFlowView({
         labels={labels}
         reachableSteps={flow.reachableSteps}
         onStepClick={(step) => {
-          flow.goToStep(step, step === "map" ? flow.layoutId : undefined);
+          flow.goToStepSaving(step, step === "map" ? flow.layoutId : undefined);
         }}
       />
       <CrosswalkStepHeading step={flow.step} labels={labels} />

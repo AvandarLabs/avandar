@@ -410,6 +410,64 @@ describe("crosswalkReducer: values_read", () => {
     });
   });
 
+  it("keeps a choice of no translation the user made", () => {
+    const state = makeSeededState(
+      new Map([
+        [
+          "sex",
+          { entryId: SEX_ENTRY_ID, codeListId: undefined, holdsLabels: false },
+        ],
+      ]),
+    );
+    const referenceId = getLayoutOf(state, BRONX.id).id;
+    const chosen = crosswalkReducer(state, {
+      type: "fill_set",
+      layoutId: referenceId,
+      columnId: getColumn(state, "sex").id,
+      fill: {
+        kind: "column",
+        sourceColumn: "sex",
+        convert: undefined,
+        codeListId: undefined,
+        holdsLabels: false,
+      },
+    });
+    const next = crosswalkReducer(chosen, {
+      type: "values_read",
+      layoutId: referenceId,
+      sources: [
+        makeProfile({
+          dataset: BRONX,
+          columnName: "sex",
+          dataType: "varchar",
+          values: ["M", "F"],
+        }),
+      ],
+      targets: [],
+      dateFormatsBySourceColumn: new Map(),
+      context: CONTEXT,
+    });
+
+    expect(_fillOf(next, referenceId, "sex")?.fill).toMatchObject({
+      codeListId: undefined,
+    });
+  });
+
+  it("ignores values read for a layout that is not in the crosswalk", () => {
+    const state = makeSeededState();
+    const next = crosswalkReducer(state, {
+      type: "values_read",
+      layoutId:
+        "99999999-0000-4000-8000-000000000001" as (typeof state.draft.layouts)[number]["id"],
+      sources: [],
+      targets: [],
+      dateFormatsBySourceColumn: new Map(),
+      context: CONTEXT,
+    });
+
+    expect(next).toBe(state);
+  });
+
   it("never replaces a confirmed fill", () => {
     const seeded = makeSeededState();
     const kings = getLayoutOf(seeded, KINGS_MARCH.id);
@@ -626,10 +684,20 @@ describe("crosswalkReducer: columns", () => {
   it("governs a column with a new entry and forgets its old code lists", () => {
     const state = makeSeededState();
     const countyId = getColumn(state, "county").id;
-    const withRead = {
-      ...state,
-      readLayoutIds: [getLayoutOf(state, BRONX.id).id],
-    };
+    const bronxId = getLayoutOf(state, BRONX.id).id;
+    const withOldList = crosswalkReducer(state, {
+      type: "fill_set",
+      layoutId: bronxId,
+      columnId: countyId,
+      fill: {
+        kind: "column",
+        sourceColumn: "county",
+        convert: undefined,
+        codeListId: SEX_LETTERS_ID,
+        holdsLabels: true,
+      },
+    });
+    const withRead = { ...withOldList, readLayoutIds: [bronxId] };
     const next = crosswalkReducer(withRead, {
       type: "column_changed",
       columnId: countyId,
@@ -638,6 +706,10 @@ describe("crosswalkReducer: columns", () => {
     });
 
     expect(getColumn(next, "county")).toMatchObject({ entryId: SEX_ENTRY_ID });
+    expect(_fillOf(next, bronxId, "county")?.fill).toMatchObject({
+      codeListId: undefined,
+      holdsLabels: false,
+    });
     expect(next.readLayoutIds).toEqual([]);
   });
 
@@ -657,6 +729,22 @@ describe("crosswalkReducer: columns", () => {
       codeListId: undefined,
       holdsLabels: false,
     });
+  });
+
+  it("keeps what was read when a column is only renamed", () => {
+    const state = makeSeededState();
+    const withRead = {
+      ...state,
+      readLayoutIds: [getLayoutOf(state, BRONX.id).id],
+    };
+    const next = crosswalkReducer(withRead, {
+      type: "column_changed",
+      columnId: getColumn(state, "county").id,
+      changes: { name: "borough" },
+      context: CONTEXT,
+    });
+
+    expect(next.readLayoutIds).toEqual(withRead.readLayoutIds);
   });
 
   it("renames a column", () => {

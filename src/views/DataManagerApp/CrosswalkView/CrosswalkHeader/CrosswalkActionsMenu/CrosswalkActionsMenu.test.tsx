@@ -129,7 +129,9 @@ describe("CrosswalkActionsMenu", () => {
 
   it("goes back to Data Sources once deleted", async () => {
     await _openDelete(undefined);
-    mocks.options?.onSuccess();
+    act(() => {
+      mocks.options?.onSuccess();
+    });
 
     expect(mocks.navigate).toHaveBeenCalledWith(
       expect.objectContaining({ to: "/$workspaceSlug/data-manager" }),
