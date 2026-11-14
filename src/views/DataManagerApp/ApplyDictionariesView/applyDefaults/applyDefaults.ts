@@ -1,8 +1,14 @@
+import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
+import { toValueKey } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { ColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type {
+  ColumnPick,
+  ValueResolution,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 
 type ApplyColumnRef = Readonly<{ id: DatasetColumn.Id; name: string }>;
 
@@ -12,13 +18,19 @@ export type MatchesByColumnName = ReadonlyMap<
   readonly DictionaryMatch.T[]
 >;
 
-/** The pick a match stands for. */
+/**
+ * The pick a match stands for, as reference, with the direction read from
+ * the data. The reducer gives a new coded pick its default mode.
+ */
 export function toColumnPick(match: Readonly<DictionaryMatch.T>): ColumnPick {
   return {
     dictionaryId: match.dictionaryId,
     entryId: match.entryId,
     codeListId: match.codeListId,
     direction: match.direction,
+    mode: "reference",
+    isDirectionFromData: true,
+    keepsOriginal: false,
   };
 }
 
@@ -102,18 +114,95 @@ function _picksFromBindings(
         entryId: binding.entryId,
         codeListId: binding.codeListId,
         direction: binding.direction,
+        // A converted column whose list is gone can only be attached again.
+        mode: binding.codeListId ? binding.mode : "reference",
+        isDirectionFromData: false,
+        keepsOriginal: binding.keepsOriginal,
       };
     }
   });
   return picks;
 }
 
+/** New picks with a code list start in `mode`. */
+function _inDefaultMode(
+  picks: Readonly<Record<string, ColumnPick>>,
+  mode: DictionaryBinding.Mode,
+): Record<string, ColumnPick> {
+  return Object.fromEntries(
+    Object.entries(picks).map(([columnId, pick]) => {
+      return [
+        columnId,
+        { ...pick, mode: pick.codeListId ? mode : "reference" },
+      ] as const;
+    }),
+  );
+}
+
+function _toResolution(
+  override: DictionaryBinding.ValueOverride,
+): ValueResolution {
+  return override.action === "map"
+    ? { action: "map", code: override.code }
+    : { action: override.action };
+}
+
+/** Whether a saved override can still be sent: a map needs its code listed. */
+function _isStillValid(
+  override: DictionaryBinding.ValueOverride,
+  codeList: DataDictionaryCodeList.T | undefined,
+): boolean {
+  if (override.action !== "map") {
+    return true;
+  }
+  return (codeList?.pairs ?? []).some((pair) => {
+    return ColumnConversion.isSameCode(pair.code, override.code);
+  });
+}
+
+/**
+ * How each converted column's unmatched values were resolved the last
+ * time, by column id and value key, so reopening Apply keeps them. A map to
+ * a code its list no longer has, or whose list is not in `codeLists`, is
+ * dropped so the value is kept as is: the apply RPC would refuse it.
+ */
+export function resolutionsFromBindings(
+  bindings: readonly DictionaryBinding.T[],
+  codeLists: ReadonlyMap<string, DataDictionaryCodeList.T>,
+): Record<string, Record<string, ValueResolution>> {
+  return Object.fromEntries(
+    bindings
+      .filter((binding) => {
+        return binding.mode === "convert" && binding.valueOverrides.length > 0;
+      })
+      .map((binding) => {
+        const codeList = binding.codeListId
+          ? codeLists.get(binding.codeListId)
+          : undefined;
+        const byKey = Object.fromEntries(
+          binding.valueOverrides
+            .filter((override) => {
+              return _isStillValid(override, codeList);
+            })
+            .map((override) => {
+              return [
+                toValueKey(override.value),
+                _toResolution(override),
+              ] as const;
+            }),
+        );
+        return [binding.datasetColumnId, byKey] as const;
+      }),
+  );
+}
+
 /**
  * The dictionaries and picks the apply flow opens with. A dataset that
- * already has bindings opens with them. A dictionary named when the flow
- * opened is the only one used for new picks. Otherwise every dictionary
- * that matches a column is used, ranked by how many columns it covers,
- * and a column two of them tie on goes to the higher ranked one.
+ * already has bindings opens with them, each in the mode it was applied
+ * in; new picks with a code list start in `defaultMode`. A dictionary named
+ * when the flow opened is the only one used for new picks. Otherwise every
+ * dictionary that matches a column is used, ranked by how many columns it
+ * covers, and a column two of them tie on goes to the higher ranked one.
  */
 export function makeInitialSelection(
   options: Readonly<{
@@ -122,6 +211,7 @@ export function makeInitialSelection(
     existingBindings: readonly DictionaryBinding.T[];
     preselectedDictionaryId: DataDictionary.Id | undefined;
     dictionaries: ReadonlyArray<{ id: DataDictionary.Id }>;
+    defaultMode: DictionaryBinding.Mode;
   }>,
 ): { dictionaryIds: DataDictionary.Id[]; picks: Record<string, ColumnPick> } {
   const existing = _picksFromBindings(options.existingBindings);
@@ -150,7 +240,10 @@ export function makeInitialSelection(
       return _rankOf(rankedIds, idA) - _rankOf(rankedIds, idB);
     }),
   });
-  const picks = { ...defaults, ...existing };
+  const picks = {
+    ..._inDefaultMode(defaults, options.defaultMode),
+    ...existing,
+  };
   // A dictionary the user named stays in use even when nothing matched.
   const named = options.preselectedDictionaryId;
   const dictionaryIds =

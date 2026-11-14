@@ -1,11 +1,18 @@
 import { Trans } from "@lingui/react/macro";
 import { Stack, Table, Text } from "@mantine/core";
 import css from "@/components/dataDictionaries/CodeListPopover/CodeListPopover.module.css";
+import { CodeListPopoverFooter } from "@/components/dataDictionaries/CodeListPopover/CodeListPopoverFooter";
+import { UnlabeledValuesNote } from "@/components/dataDictionaries/CodeListPopover/UnlabeledValuesNote";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
 type Props = {
   codes: ColumnCodes.T;
+  /** The column's name in the dataset, for the count of unlabeled values. */
+  columnName: string;
+  /** Set where the count of unlabeled values can be read. */
+  datasetId: Dataset.Id | undefined;
 };
 
 function PairLabel({ pair }: Readonly<{ pair: ColumnCodes.Pair }>): ReactNode {
@@ -30,15 +37,20 @@ function PairLabel({ pair }: Readonly<{ pair: ColumnCodes.Pair }>): ReactNode {
 }
 
 /**
- * What a column's code list says: its name, every pair, and where it came
- * from. The body of `CodeListPopover`.
+ * What a column's code list says: its name, every pair, where it came from,
+ * what it did to the values, and, for a converted column, how many values
+ * have no label. The body of `CodeListPopover`.
  */
-export function CodeListPopoverContent({ codes }: Readonly<Props>): ReactNode {
-  const { dictionaryName, entryName } = codes;
+export function CodeListPopoverContent({
+  codes,
+  columnName,
+  datasetId,
+}: Readonly<Props>): ReactNode {
+  const { entryName } = codes;
   return (
     <Stack gap="xs">
       <Text fw={600} size="sm">
-        {codes.codeListName ?? entryName}
+        {codes.codeListName || entryName || <Trans>Code list</Trans>}
       </Text>
       <Table className={css.codeListPopoverTable} verticalSpacing={2}>
         <Table.Tbody>
@@ -56,12 +68,14 @@ export function CodeListPopoverContent({ codes }: Readonly<Props>): ReactNode {
           })}
         </Table.Tbody>
       </Table>
-      <Text size="xs" c="dimmed">
-        <Trans>
-          From {dictionaryName} › {entryName}. Attached as reference. The values
-          in the data are unchanged.
-        </Trans>
-      </Text>
+      <CodeListPopoverFooter codes={codes} />
+      {codes.mode === "convert" && datasetId ? (
+        <UnlabeledValuesNote
+          datasetId={datasetId}
+          columnName={columnName}
+          codes={codes}
+        />
+      ) : null}
     </Stack>
   );
 }

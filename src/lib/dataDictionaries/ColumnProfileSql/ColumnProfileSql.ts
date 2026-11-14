@@ -75,10 +75,12 @@ function _buildSampleParts(column: ProfiledColumn, index: number): string[] {
 function buildSummarySql(
   options: Readonly<{
     datasetId: Dataset.Id;
+    /** The relation to read. Defaults to the dataset's own view. */
+    relationName?: string;
     columns: readonly ProfiledColumn[];
   }>,
 ): string {
-  const table = quoteSqlIdentifier(options.datasetId);
+  const table = quoteSqlIdentifier(options.relationName ?? options.datasetId);
   const exactParts = [
     'count(*) AS "row_count"',
     ...options.columns.flatMap(_buildSummaryParts),
@@ -99,10 +101,12 @@ function buildSummarySql(
 function buildValuesSql(
   options: Readonly<{
     datasetId: Dataset.Id;
+    /** The relation to read. Defaults to the dataset's own view. */
+    relationName?: string;
     columns: ReadonlyArray<{ index: number; name: string }>;
   }>,
 ): string {
-  const table = quoteSqlIdentifier(options.datasetId);
+  const table = quoteSqlIdentifier(options.relationName ?? options.datasetId);
   const selects = options.columns.map(({ index, name }) => {
     const column = quoteSqlIdentifier(name);
     const text = `trim(CAST(${column} AS VARCHAR))`;

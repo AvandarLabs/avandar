@@ -8,6 +8,19 @@ describe("DictionaryBinding.toApplyErrorHint", () => {
     ).toBe("dataset_editor_required");
   });
 
+  it.each([
+    "convert_needs_code_list",
+    "dataset_has_linked_datasets",
+    "dictionary_editor_required",
+    "code_pair_incomplete",
+    "codes_not_unique",
+    "labels_not_unique",
+    "dataset_creator_required",
+    "nothing_to_reapply",
+  ] as const)("reads the conversion hint %s", (hint) => {
+    expect(DictionaryBinding.toApplyErrorHint({ hint })).toBe(hint);
+  });
+
   it("ignores a hint it does not know", () => {
     expect(
       DictionaryBinding.toApplyErrorHint({ hint: "something_else" }),

@@ -175,7 +175,7 @@ functions, `/** */` docstrings. New enums get their own `00.enum.*.sql` file.
 | `id`, `workspace_id`, `dictionary_id` | `uuid` | `dictionary_id` cascades. |
 | `name` | `text not null` | "Sex (1/2/9)". |
 | `is_ordered` | `boolean not null default false` | Ordered lists keep their order in charts (section 6.4). |
-| `pairs` | `jsonb not null` | Array, in display order, of `{ code, label, acceptedSpellings, isMissing }`. Validated by a versioned Zod schema (the `AvaMapConfigSchema` pattern). A label may be blank: the value is saved and marked as needing a label. Slice 4 decides what a blank label does in each conversion direction. |
+| `pairs` | `jsonb not null` | Array, in display order, of `{ code, label, acceptedSpellings, isMissing }`. Validated by a versioned Zod schema (the `AvaMapConfigSchema` pattern). A label may be blank: the value is saved and marked as needing a label. Decoding skips a pair with a blank label, so its code passes through and is listed in Unmatched values; encoding ignores the blank label but still matches the pair's accepted spellings; an ordered list's `ENUM` skips blank labels. |
 
 A one-off list is a code list used by one entry. Nothing marks it; the UI
 says "Only this entry uses it".
@@ -220,8 +220,13 @@ and crosswalks pick the coding whose codes fit the data (section 8.2), so the
 | `direction` | `dataset_columns__binding_direction` | `decode` or `encode`. |
 | `keeps_original` | `boolean not null default false` | Convert only. Adds `<column>_original`. |
 | `value_overrides` | `jsonb not null default '[]'` | Unmatched-value resolutions: `{ value, action: "keep" \| "empty" \| "map", code? }`. |
-| `pinned_pairs` | `jsonb` | Null means "follow the live code list". Set for a dataset converted in place. |
+| `pinned_pairs` | `jsonb` | Null means "follow the live code list". Set for a dataset converted in place, and when a live binding's dictionary, entry, or code list is deleted. |
+| `pinned_is_ordered` | `boolean` | The pinned list's `is_ordered`. Null exactly when `pinned_pairs` is null. |
+| `replaced_data_type` | `datasets__ava_data_type` | The column's `data_type` before a convert binding set it, restored when the binding stops converting. Null for a reference binding. |
 | `applied_dictionary_version` | `integer not null` | |
+
+A check constraint keeps a reference binding plain: no `keeps_original`,
+`value_overrides`, `pinned_pairs`, or `replaced_data_type`.
 
 A binding with no `entry_id` and no `pinned_pairs` is inert: the UI shows it
 as "This dictionary entry was deleted" and nothing converts.
@@ -235,7 +240,11 @@ written whole, per dataset, by `rpc_dataset_columns__apply_dictionaries`
 
 `dataset_columns` gains `dictionary_binding_id uuid null` (`on delete
 cascade`): set on the `<column>_original` copy that a convert binding adds, so
-removing the binding removes the copy.
+removing the binding removes the copy. The copy shares the converted column's
+`original_name` (its Parquet header), is named `<name>_original` (then
+`_original_2`, `_3` when taken), and keeps the column's type from before the
+conversion. Only the apply RPCs set `dictionary_binding_id`; a trigger refuses
+a signed-in user setting or changing it.
 
 ### 5.3 Linked datasets
 
@@ -246,6 +255,15 @@ convert bindings on its own columns that have `pinned_pairs = null`.
 datasets on delete set null`, so the source's rail and the dictionary's Used
 by tab can name it. The source dataset gets reference bindings for the same
 columns, because conversions keep the list attached (section 3).
+
+`rpc_dataset_columns__apply_dictionaries_as_linked_dataset` creates the linked
+dataset, its columns (copied from the source's on the server), its convert
+bindings, and the source's reference bindings in one transaction. Creating a
+dataset needs workspace admin, as every import does
+(`rpc_datasets__add_dataset`), so only admins can create a linked dataset.
+Applying dictionaries to a linked dataset itself updates its live conversions
+in place, with no Save as choice. A dataset converted in place cannot also be
+the source of a linked dataset (section 7.5).
 
 ### 5.4 Crosswalks
 
@@ -307,8 +325,10 @@ type CrosswalkConvert =
   child writes are atomic. Creating a dictionary from datasets uses the same
   RPC.
 - Applying goes through `rpc_dataset_columns__apply_dictionaries`, which
-  writes every binding for one dataset in one transaction and, for a linked
-  dataset, calls `rpc_datasets__add_virtual_dataset` first.
+  writes every binding for one dataset in one transaction, after appending
+  any values the user added to code lists. A linked dataset goes through
+  `rpc_dataset_columns__apply_dictionaries_as_linked_dataset` (section 5.3),
+  and **Re-apply** through `rpc_dataset_columns__reapply_dictionary`.
 
 ## 6. How a dictionary reaches the data
 
@@ -371,31 +391,58 @@ END AS "GENDER"
 
 - Encoding matches the label and every accepted spelling, case- and
   space-insensitively, and returns the code.
-- Overrides render before the `ELSE`: `empty` as `THEN NULL`, `map` as the
-  mapped pair's output.
-- `outputType` is `INTEGER` when encoding and every code in the list is an
-  integer (regression-ready), `VARCHAR` otherwise, and an `ENUM` of the
-  labels for an ordered list (section 6.4).
-- Literals go through the existing SQL literal quoting helpers. A label is
-  data, never SQL.
-- The bindings are fetched alongside `dataset_columns` with the same
-  `ensureQueryData` pattern, and invalidated when a binding or a code list it
-  uses changes.
+- Both sides of a match are normalized by DuckDB: each `WHEN` literal is
+  written `lower(trim('<literal>'))`, so the key and the data always follow
+  the same case rules.
+- Overrides render after the pairs and before the `ELSE` (a value a pair
+  matches is never overridden): `empty` as `THEN NULL`, `map` as the mapped
+  pair's output.
+- The output type is `BIGINT` when encoding and every code in the list is an
+  integer of at most 18 digits (regression-ready, and the same as Ava's
+  `bigint`), `VARCHAR` otherwise, and an `ENUM` for an ordered list's labels
+  (section 6.4). The view reads the type from the column's stored
+  `data_type`, which the apply RPC sets by this rule (section 6.3), so the
+  view and the schema never disagree.
+- Literals go through `quoteSqlLiteral`. A label is data, never SQL. The
+  view's SQL template substitutes its parameters once, literally, so `$&`
+  or `` $` `` in a label stays text.
+- In code, `valueMapping` is a `ColumnConversion` (in
+  `shared/models/dataDictionaries/ColumnConversion/`): the rules above, and
+  the SQL they render, shared by the view, the apply flow's preview and
+  unmatched-value queries, and the tests.
+- The bindings and code lists are read with `fetchQuery` (fresh after an
+  invalidation or past the online stale time, cached offline). Each loaded
+  relation records a projection key, and a query that finds a different key
+  rebuilds the view from the cached bytes, so a binding or code-list change
+  reaches a view loaded earlier in the tab. Published dashboard snapshots
+  read a dataset with a convert binding through the workspace query, so they
+  publish converted values.
+- Every loaded relation also gets an `ava_raw_<datasetId>` view with renames
+  and casts but no conversions. Profiling, matching, unmatched values, and
+  the preview read it, since a converted dataset's own view holds labels.
 
 ### 6.3 Data types
 
 A converted column's `dataset_columns.data_type` is set by the apply RPC to
-the type the projection outputs (`text` for decoded labels, `number` for
+the type the projection outputs (`varchar` for decoded labels, `bigint` for
 integer codes), so schema views and the agent see the converted type. The
-column's `detected_data_type` is unchanged, so removing the binding restores
-the original type.
+binding records the type it replaced in `replaced_data_type`, and the RPC
+restores it when the binding is removed or switched to reference. A
+dictionary save re-derives the type for every live convert binding of a list
+it changed. The dataset page shows a converted column's type as read-only,
+"Set by <dictionary>".
 
 ### 6.4 Ordered lists
 
 An ordered list's decoded output is cast to a DuckDB `ENUM` of its labels in
 list order, so `ORDER BY` and chart axes follow Low, Lower-middle,
-Upper-middle, High instead of the alphabet. Section 18 has the fallback if
-an anonymous `ENUM` cast proves awkward inside a view.
+Upper-middle, High instead of the alphabet. The `ENUM` is built when the
+relation loads: the list's non-blank labels in list order (the first
+occurrence of a label wins), then every other value the conversion keeps,
+read with one `SELECT DISTINCT` and sorted. A cast to the labels alone fails
+every query once one value is not a label, and `TRY_CAST` would silently
+empty that value (section 18, decision 1). A result's `ENUM` column arrives
+as an Arrow dictionary and reads as text.
 
 ### 6.5 Reference mode
 
@@ -407,7 +454,11 @@ popover, the rail, the Used by tab, and Ask Avandar's context.
 "Change this dataset" writes convert bindings with `pinned_pairs` set to the
 pairs as they are now and `applied_dictionary_version` recorded. Later edits
 to the dictionary do not reach it. The Used by tab and the dataset's rail
-show "Applied version 2, now version 3" with **Re-apply**, which re-pins.
+show "Applied version 2, now version 3" with **Re-apply**, which re-pins
+through `rpc_dataset_columns__reapply_dictionary` and asks for a confirmation
+on a synced dataset. Re-apply is the one action in the rail. Switching a
+converted column back to Reference only in Apply restores its original
+values, since the stored data was never rewritten.
 
 Allowed for uploads (`csv_file`, `xlsx_file`, `pdf_file`), synced or offline
 only. For a synced dataset, the user must tick "I understand this changes
@@ -524,10 +575,9 @@ started."
   datasets can use it too"). Shown only while the dataset has no binding of
   any mode.
 
-Until conversions ship (slice 4), **Apply a dictionary**'s sub-line reads
-"Show what codes mean and add column descriptions", since attaching as
-reference cannot turn codes into labels. The copy above returns with
-conversions.
+Slice 3 shipped **Apply a dictionary** with the sub-line "Show what codes
+mean and add column descriptions", since attaching as reference cannot turn
+codes into labels. Slice 4 restores the copy above with conversions.
 
 Columns (Metadata tab's column list and each Data Summary column section):
 a column with a code list shows a tag icon after its values. Hover or focus
@@ -541,8 +591,13 @@ column's own description always wins.
 
 Rail (`DatasetSourceRail`): a **Dictionaries** group listing each dictionary
 with how it was applied ("Attached as reference · data unchanged", "Linked
-dataset: <name>", "Converted this dataset · version 2"). No actions in the
-rail.
+dataset: <name>", "Converted this dataset · version 2"). The one action in
+the rail is **Re-apply**, beside "Applied version 2, now version 3" on a
+dataset converted in place, for its editors (section 6.6). A linked dataset's
+own rail says "Reads <source>", or "The dataset it reads was deleted." A
+converted column's Type cell is read-only, "Set by <dictionary>", and its
+popover adds the pinned version, the keep-original copy's name, and, read
+when the popover opens, how many values in the data have no label.
 
 The Data Explorer result grid shows the same tag and popover in a column
 header when the column comes straight from a bound dataset column. That
@@ -612,8 +667,15 @@ If nothing is unmatched, an empty state says so with a Next button.
 - No conversions: **Attach to <dataset>** with "Nothing in your data changes.
   ... Edits to the dictionaries show up here right away." and the summary.
 - With conversions: radio cards **Create a new linked dataset** (with a Name
-  field, default `<dataset> (coded)`) and **Change <dataset>**, whose copy
-  depends on storage:
+  field, default `<dataset> (labeled)` when every converted column decodes,
+  `(coded)` when every one encodes, `(converted)` otherwise; disabled with
+  "Only workspace admins can add datasets." for anyone else) and **Change
+  <dataset>**, whose copy depends on storage. The linked card is selected
+  first, unless the dataset is already converted in place. **Change
+  <dataset>** is disabled while a linked dataset reads the dataset, since
+  converting it would convert twice. Applying to a linked dataset itself has
+  no cards: its conversions stay live and the button reads **Update
+  <dataset>**. The card copy by storage:
   - synced upload: "Rewrites the uploaded data in place. It is synced to the
     workspace, so this changes it for everyone who uses it." plus the
     confirmation checkbox;
@@ -622,7 +684,9 @@ If nothing is unmatched, an empty state says so with a Next button.
     yet, so a linked dataset is the only option for now."
   Under both cards: "Either way, the code lists and descriptions are attached
   to <dataset> for reference." Then a summary table: Column, From, What
-  happens.
+  happens. A column that was converted and is now reference-only (or whose
+  dataset becomes the source of a linked dataset) reads "Back to the
+  original values".
 - The primary button reads **Attach to <dataset>**, **Create linked
   dataset**, or **Change n columns**. Success returns to the dataset page (or
   the new linked dataset) with a toast.
@@ -764,10 +828,12 @@ SELECT ...
   drives the stale banner (section 7.6). Re-compiling is always the crosswalk
   editor's own action, so no recompile fans out to datasets they cannot edit.
 - The output is saved as `datasets__virtual.raw_sql` of `output_dataset_id`.
-- `VirtualDatasetWrapper` gets a real freshness signal: the virtual row's
-  `updated_at`. Without it, an updated combined dataset would keep serving
-  its old materialization from `DexieRelationCache`. This also fixes the same
-  limitation for every virtual dataset.
+- `VirtualDatasetWrapper` gets a real freshness signal, built in slice 4: the
+  storage key's definition token is the virtual dataset's defining SQL, so
+  an updated combined dataset never serves its old materialization from
+  `DexieRelationCache`, and a virtual dataset's rows go stale when a
+  dependency's do. This also fixes the same limitation for every virtual
+  dataset.
 
 Scale: QETL acquires a virtual dataset's dependencies one at a time
 (`createRegistryForFetch.ts`). With 100 datasets, the first materialization
@@ -779,7 +845,11 @@ acquisition as a follow-up if it is too slow in practice.
 
 Every path that describes datasets to a model gains code lists for bound
 columns. Reference and convert bindings both count; for a converted column
-the list explains the labels the model sees.
+the list explains the labels the model sees. A converted column is described
+by the side it holds once converted (`  - GENDER: values Male, Female`), which
+prompt `data-agent-v5` already reads as stored labels, so converting needs no
+new prompt version. The `chat` edge function is redeployed with it, because
+the shared formatter and the binding columns it reads changed.
 
 | Path | File | Change |
 |---|---|---|
@@ -860,7 +930,7 @@ tooltip, not `title`, and also open on keyboard focus.
 | Explanation, converting | Your data will change. The labels stay attached too, so the column is still explained. |
 | Explanation, reference | Your data stays the same, which is what you want for models and exports that need the original values. Hover the column to see the labels. |
 | Row chip | **Convert** · **Reference only** (tooltip: the matching side-pane tooltip plus "Click to attach as reference only instead." or "Click to convert instead.") |
-| Dataset menu | **Apply a dictionary** / Turn codes into labels and add column descriptions (until conversions ship: Show what codes mean and add column descriptions, section 7.4). **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
+| Dataset menu | **Apply a dictionary** / Turn codes into labels and add column descriptions (slice 3 shipped "Show what codes mean and add column descriptions" until conversions, section 7.4). **Create a dictionary from this dataset** / Saved to Dictionaries, so other datasets can use it too. |
 | Popover footer | From <dictionary> › <entry>. Attached as reference. The values in the data are unchanged. / The values were converted to these labels. |
 | Rail | Attached as reference · data unchanged / Linked dataset: <name> / Converted this dataset · version <n> |
 | Save step, reference only | Nothing in your data changes. <n> columns keep their values, with labels attached as reference. Edits to the dictionaries show up here right away. |
@@ -877,8 +947,10 @@ reference" to mean "look it up, don't change it".
 | A pair is removed from a live code list | Linked datasets show the raw value for it from the next load. Pinned datasets are unaffected. |
 | A dictionary is deleted | A trigger copies the current pairs into `pinned_pairs` for every live convert binding first, so no linked dataset changes silently. Reference bindings are removed. The delete confirm names the number of datasets affected. |
 | An entry is deleted | Same as above, scoped to the entry. |
-| A code list a binding uses is deleted | The binding keeps its entry, so the column keeps the entry's description, and shows no code list until a dictionary is applied again. A save can delete a list the binding used before the save adds the entry's new one, so the binding cannot follow it. |
-| The source of a linked dataset is deleted | Existing behavior for virtual datasets with a missing dependency. `linked_source_dataset_id` becomes null. |
+| A code list a binding uses is deleted | A live convert binding is pinned to the list's pairs first, so no linked dataset stops converting silently, and Used by offers **Re-apply**. A reference binding keeps its entry and description; the same save re-points it to the entry's code list when the entry is left exactly one, and otherwise it shows no code list until a dictionary is applied again. A pinned binding is never re-pointed. |
+| The source of a linked dataset is deleted | Existing behavior for virtual datasets with a missing dependency: its queries fail. `linked_source_dataset_id` becomes null, the linked dataset keeps its bindings, and its rail says "The dataset it reads was deleted." The source's delete confirmation names its linked datasets first. |
+| A pipeline reads a converted dataset | Pipelines read the stored files with Node DuckDB, so they see raw values, as they already see names and types from before a rename or cast. |
+| A user converts a dataset in another tab | The next query in this tab rebuilds the view once its cached bindings or code lists are refetched: at once after an edit in this tab, within the 6-minute online stale time otherwise. |
 | Two bindings for one column | Prevented by the unique `dataset_column_id`. Applying again replaces the binding. |
 | A column renamed after binding | Bindings use `dataset_column_id`, so they follow the rename. |
 | Applying with no edit rights on the dataset | The menu items are hidden; the route redirects to the dataset with a toast. |
@@ -941,7 +1013,10 @@ Each slice is one PR into `demo/measles`, recorded in
    linked datasets, converting in place with pinning and Re-apply, unmatched
    values, the preview drawer, keep-original columns, the virtual dataset
    freshness signal. It also restores the dataset menu's "Turn codes into
-   labels" sub-line (section 7.4) and settles open decision 5.
+   labels" sub-line (section 7.4) and settles open decision 5. Planned in
+   [data-dictionaries-4-conversions-plan.md](data-dictionaries-4-conversions-plan.md)
+   as two PRs: the engine, schema, linked datasets, and every surface first;
+   then converting in place, its warning, and **Re-apply**, frontend only.
 5. **Crosswalks.** Schema, layouts, the three steps, mapping fills and
    conversions, compilation, export, the stale banner.
 
@@ -966,21 +1041,25 @@ Each slice is one PR into `demo/measles`, recorded in
 
 ## 18. Open decisions
 
-1. **Anonymous `ENUM` casts in a view.** If `CAST(... AS ENUM('Low', ...))`
-   is awkward inside the replacement view, the fallback is `VARCHAR` output
-   plus a sort key column that charts and `ORDER BY` defaults read. Settle in
-   the slice 4 plan with an executed test.
-2. **Bindings in the relation cache key.** The projection is built at load,
-   but the plan must confirm every QETL entry point (Data Explorer, dashboard
-   blocks, maps, published snapshots, agent `run_query`) passes bindings to
-   `getColumnReplacementsFromColumns`, and that a binding change invalidates
-   the loaded view.
+1. **Anonymous `ENUM` casts in a view.** Settled by running the browser's
+   DuckDB-WASM build (DuckDB v1.4.4). A cast to the labels alone fails every
+   query once one value is not a label, `TRY_CAST` empties it, and duplicate
+   labels refuse the type. The `ENUM` is built at load from the labels and
+   the kept values (section 6.4), and the `VARCHAR` fallback is not needed.
+2. **Bindings in the relation cache key.** Settled: every browser entry point
+   (Data Explorer, dashboard blocks, maps, the agent's `run_query` online and
+   offline, concepts, virtual datasets) loads through `RelationLoading`,
+   which passes the conversions to `getColumnReplacementsFromColumns`. A
+   loaded view records a projection key and is rebuilt when it changes
+   (section 6.2). Published snapshots read a converted dataset through the
+   workspace query. Pipelines read stored files raw (section 14).
 3. **AI suggestion endpoint.** Whether label suggestions reuse the Pi data
    agent's proxy (`PostAgentStream`) with a dedicated prompt, or get their own
    small route. Depends on where the agent work stands when slice 2 starts.
 4. **Crosswalk materialization time at 100 datasets.** Measure in slice 5
    before deciding on parallel acquisition.
-5. **A reference binding whose code list is deleted.** It keeps its entry and
-   shows no list until a dictionary is applied again (section 14). Whether a
-   save re-points it to the entry's new list is settled in the slice 4 plan,
-   alongside pinning convert bindings, which must not be re-pointed.
+5. **A reference binding whose code list is deleted.** Settled with the
+   slice 4 plan (owner decision 4): the save that deletes the list re-points
+   the binding when its entry is left exactly one code list; otherwise it
+   keeps its entry and shows no list until the next apply. A convert binding
+   is pinned instead and never re-pointed (section 14).

@@ -7,7 +7,7 @@
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 4
 ALTER TABLE "data_catalog_listings" ADD COLUMN "api_freshness_probe" JSONB;
 
-ALTER TABLE "data_catalog_listings" ADD COLUMN "companion_listings" JSONB NOT NULL;
+ALTER TABLE "data_catalog_listings" ADD COLUMN "companion_listings" JSONB NOT NULL DEFAULT '[]';
 
 ALTER TABLE "data_catalog_listings" ADD COLUMN "parquet_cache_checked_at" TIMESTAMPTZ;
 

@@ -49,3 +49,38 @@
   flex: 1;
   min-width: 0;
 }
+
+/*
+ * A row's Values chip. Pill-shaped like the dictionary chips above it;
+ * Brand Blue only while the row converts.
+ */
+.modeChip {
+  background-color: var(--mantine-color-neutral-1);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-xl);
+  color: var(--mantine-color-neutral-7);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  padding: 2px var(--mantine-spacing-xs);
+  transition: var(--ava-transition-interactive);
+  white-space: nowrap;
+}
+
+.modeChip[data-mode="convert"] {
+  background-color: var(--mantine-color-primary-0);
+  border-color: var(--mantine-color-primary-3);
+  color: var(--mantine-color-primary-7);
+}
+
+.modeChip:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 2px;
+}
+
+.modeChip:hover:not([aria-disabled="true"]) {
+  border-color: var(--ava-border-strong);
+}
+
+.modeChip[aria-disabled="true"] {
+  cursor: not-allowed;
+}

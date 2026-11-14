@@ -26,9 +26,11 @@ function Loading(): ReactNode {
 }
 
 /**
- * Applies dictionaries to one dataset as reference: matches its columns to
- * dictionary entries, then attaches the picks without changing the data.
- * Only someone who can edit the dataset and read dictionaries gets in.
+ * Applies dictionaries to one dataset: matches its columns to dictionary
+ * entries, resolves the values no code list matches, and saves, either
+ * converting the values (in a new linked dataset, or in the dataset itself)
+ * or attaching the dictionaries as reference. Only someone who can edit the
+ * dataset and read dictionaries gets in.
  */
 export function ApplyDictionariesView({
   datasetId,

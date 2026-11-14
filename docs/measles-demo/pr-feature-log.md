@@ -186,6 +186,8 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F130 | Learn a data dictionary from datasets: profiling, matching, and suggested labels online and offline | not started | F129 | |
 | F131 | Apply a dictionary to a dataset as reference: code lists on the dataset page, in the Data Explorer, and in Ask Avandar online and offline | not started | F129, F130 | |
 | F132 | Data dictionary follow-ups: entry descriptions in the Description column, only editable datasets in Apply to a dataset, and tags on grouped SQL results | not started | F131 | |
+| F133 | Convert coded columns with a dictionary into a linked dataset that follows it: the load-time conversion, ordered lists, unmatched values, the preview, and the dataset and dictionary surfaces | not started | F131, F132 | |
+| F134 | Convert a dataset in place with a dictionary, pinned to the version applied, with the synced-data warning and Re-apply | not started | F133 | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -325,6 +327,8 @@ API. It's new work, not something this branch built.
 | after F129 | F130 | Builds on F129's tables, save RPC, models, and Dictionary view. Changes the save RPC's pair check (migration). Deploy the migration, then the `chat` edge function, then the frontend. |
 | after F130 | F131 | Builds on F129's tables and Dictionary view and F130's profiling, create flow, and dataset menu item. Adds the bindings table and the apply RPC (migration) and prompt `data-agent-v5`, which is the plugin AI tools' `data-agent-v4` plus the coded-column rules. Deploy the migration, then the `chat` edge function (it serves v5 and reads bindings, and the new frontend asks for v5), then the frontend. |
 | after F131 | F132 | Builds on F131's bound-column name, Apply to a dataset dialog, and Data Explorer tags. Adds `rpc_datasets__get_editable_ids` (migration). Deploy the migration, then the frontend: the new dialog calls the RPC. |
+| after F132 | F133 | Builds on F131's bindings, apply RPC, apply flow, popover, rail, and Used by, and F132's editable-ids RPC. Adds the conversion columns, the keep-original link, `linked_source_dataset_id`, pin-on-delete triggers, and three RPCs (migration). Deploy the migration, then the `chat` edge function (it reads the new binding columns and describes a converted column by its labels), then the frontend. |
+| after F133 | F134 | Frontend only: F133's migration already carries the pinned columns and `rpc_dataset_columns__reapply_dictionary`. Deploy the frontend. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -427,14 +431,14 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/layouts/AppView/AppViewHeader/{AppViewHeader.tsx,AppViewHeader.module.css,AppViewHeader.test.tsx}` | F131 | F131: an optional `breadcrumb` shown small above the title (`dd1bc5bec`). Shared layout, so any later feature that changes the header band takes this hunk too. |
 | `docs/ontology-architecture.md` | F58, F59, F60, F61, F62, F18, F71 to F75, F66, F68 | F58: `e229237bf`. F59 and F60: their screen rows of `9396bce96`. F61 and F62: their halves of `a55c41a73`. F66: the assignee filter (`4ac9b2821`). F68: the details band (`cb76ac57a`). |
 | `docs/production-plan-world-humanitarian-day.md` | F18, F21, F61, F66, others | F61: the roadmap hunks of `a55c41a73` (P5b.1 done, and the P5c.3 to P5c.9 status notes). F66: P5c.3, P5c.6, and P5c.8 (`f177ec60b`). |
-| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. |
+| `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/i18n/locales/*/messages.{po,ts}`, `src/routeTree.gen.ts` | F57, F58, F59, F60, F62, F66, F67, F131, F132, F133, F134 | Generated: regenerate in each. F131: regenerate for its migration, route, and messages. F132: regenerate for its migration and messages. F133: regenerate for its migration and messages. F134: messages only. |
 
 ### Joined cases (F69 to F76)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
 | `src/clients/DuckDbClient/duckDbRawQuery.ts` | F69, F70 | F69: `RawQueryReadScope`, `_getReadScope`, `_assertPublicReadAnalysis` (no non-dataset relation, no internal table, one plain query). F70: the `duckDbArrowResults/duckDbArrowResults` import path. |
-| `src/clients/DuckDbClient/duckDbSqlText.ts` | F69, F71, F75 | F69: `isStagingIndividualsTableName` needs a UUID suffix (`025b6de3d`). F71: `getEntityKeyComparisonSql` quotes with `quoteSqlIdentifier` (`4a2334cf8`). F75: `DATASET_ALIAS`, `buildTextExtremeSql` moved here from `buildAttributeValueSql.ts`, zoned timestamp handling (`2faaf6679`). |
+| `src/clients/DuckDbClient/duckDbSqlText.ts` | F69, F71, F75, F133 | F69: `isStagingIndividualsTableName` needs a UUID suffix (`025b6de3d`). F71: `getEntityKeyComparisonSql` quotes with `quoteSqlIdentifier` (`4a2334cf8`). F75: `DATASET_ALIAS`, `buildTextExtremeSql` moved here from `buildAttributeValueSql.ts`, zoned timestamp handling (`2faaf6679`). F133: `getQueryStringFromParams` substitutes each parameter once and literally (`0d11e2dba`), and the conversion projection, kept-`ENUM`-values queries, and `ava_raw_` view names (`b603b61b8`, `b195ad2e8`). |
 | `src/clients/maps/MapLayerSpatialQuery/compileBufferOfLayerQuery/compileBufferOfLayerQuery.test.ts` | F69, F33 | F69: the expected analysis gains `internalTableNames: []`. F33: its buffer tests. |
 | `src/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults.{ts,test.ts}` | F70, F75 | F70: the move into the folder, lists as plain arrays, struct and map rows, decimals through the exact decimal string, list dates, timestamps, and times as text (state at `8da6e68d4`). F75: dates inside list elements and struct fields as text (`e2570144f`), decimals inside a MAP or UNION keep their scale (`ae30326dd`). |
 | `shared/models/queries/QueryResult/QueryResult.types.ts` | F70, F75 | F70: `isArray` on a result field. F75: `bucketGrain`. |
@@ -442,7 +446,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql.{ts,executed.test.ts}` | F57 to F62, F71, F73, F74, F75 | F57 to F62: the status column. F71: `attributeId` on columns, case-insensitive reserved names, values from `buildAttributeValueSql`, exported `EXTERNAL_ID_COLUMN`. F73: rule types and tests (incl. `f1bd3ada5`'s test tidy). F74: value shape, view column names from `ConceptAttribute.getViewColumnNames`. F75: per-period columns. |
 | `src/clients/qetl/QueryMediator/conceptRelation/{makeConceptAttributeColumnsFromMetadata.ts,__tests__/conceptAttributeColumns.integration.executed.test.ts}` | F57 to F62, F71, F72, F73, F74, F75 | F71: `attributeId`, case-insensitive suffixing. F72: comment and test-comment wording after `AttributeAssertionClient` is deleted. F73: refuse a disallowed rule (`3e6d417c8`, `5213b4e02`), column Ava type. F74: value shape, shared view column names. F75: per-period columns and the date column. |
 | `src/clients/qetl/QueryMediator/conceptRelation/{getConceptRelationPlansFromSql/*,loadConceptSpine/loadConceptSpine.ts,conceptRelation.types.ts,getConceptAttributeColumnsFromConceptId.ts}` | F57 to F62, F71, F72, F74, F75 | F57 to F62: status name in the spine. F71: `ConceptSpineRestriction`, restricted spines, the collision message. F72: `a9730f086`'s hunk, comment updates (`c6b410ad3`). F74: `61bf863d9` in `loadConceptSpine.ts`. F75: fetch the date column (`b27358007`, `394d9090c`). |
-| `src/clients/qetl/QueryMediator/{QueryMediator.ts,QueryMediator.types.ts,queryRunner.ts}`, `src/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch.ts`, `src/clients/qetl/wrappers/createDefaultRegistry.ts` | F1, Postgres branch, F71 | F1: named create calls (`9377eb6c8`). Postgres branch: the registry and relation-loading refactor (`createRegistryForFetch.ts` exists only there; later `86f234dc1` and `ba9724f2a` also touch these files). F71: `conceptSpineRestrictions` plumbing, refusing a restriction without a planner, the nested-query comment, removing `ConceptWrapper` from the registry. |
+| `src/clients/qetl/QueryMediator/{QueryMediator.ts,QueryMediator.types.ts,queryRunner.ts}`, `src/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch.ts`, `src/clients/qetl/wrappers/createDefaultRegistry.ts` | F1, Postgres branch, F71, F133 | F1: named create calls (`9377eb6c8`). Postgres branch: the registry and relation-loading refactor (`createRegistryForFetch.ts` exists only there; later `86f234dc1` and `ba9724f2a` also touch these files). F71: `conceptSpineRestrictions` plumbing, refusing a restriction without a planner, the nested-query comment, removing `ConceptWrapper` from the registry. F133: `valueMapping` and `originalCopyDataType` on a column replacement, the catalog read with projection keys in `queryRunner.ts`, and a nested query's dependency stale-at in `createRegistryForFetch.ts` and `createDefaultRegistry.ts` (`b603b61b8`, `3bdccd425`, `59c506f64`, `62bedf4ee`). |
 | `src/clients/queries/runStructuredQuery/{runStructuredQueryWithMetadata.ts,runStructuredQuery.types.ts,runStructuredQuery.test.ts}` | F57 to F62, F71, F74, F75 | F71: out-of-sync case types run as SQL over the view, `executedSql` returned (`2c00baf97`), the dropped sort. F74: suffixed and duplicate field tests. F75: one fixture field. |
 | `src/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/generateIndividuals.{ts,test.ts}` | F57 to F62, F71, F73, F74, F75 | F71: Sync names from `buildAttributeValueSql`. F73: column Ava type for text `max`/`min`. F74: value shape. F75: fixture fields. |
 | `src/views/IndividualManagerApp/SingleIndividualView/{index.tsx,CaseDetailsRail.tsx,CaseDetailsRail.test.tsx,CaseDetailsRail.module.css}` | F57 to F62, F18, F72, F74, F75, F68, F66 | F72: `useRecordFields`, "No value", every source, the load-failure callout and retry. F74: `DetailsStatus`, source list named "Sources of <field>", heading order, `RecordFieldValue`. F75: per-period rows. Later: `cb76ac57a` (pin case details above the activity feed) and `3284a4b46` (assign a record from its header), F68 and F66. |
@@ -602,11 +606,11 @@ Take only your feature's hunks from these files. The last feature in the
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
-| `src/clients/qetl/QueryMediator/QueryMediator.ts`, `QueryMediator.types.ts`, `queryRunner.ts` | F1, F113, F71 to F75, Postgres branch | F1: the named `create("QueryMediator", { state })` call (`QueryMediator.ts`). F113: the `datasetColumnSource` option, its `DatasetColumnSource` type, and the `stored` skip in `_getParquetNeededByDatasetId`. F71 to F75: spine restrictions (`1ee2e4b2a`). Postgres branch: the `RelationLoading` module call sites (`b72a4d9fb`). |
-| `src/clients/qetl/QueryMediator/relationLoading.ts` on `develop` (`relationLoading/RelationLoading.ts` on `demo/measles`) | F113, Postgres branch | F113: return early from `loadRelationBytes` when there are no relations, and skip the catalog read when `datasetColumnSource` is `stored`. Postgres branch: the move into the `RelationLoading` module and `getColumnReplacementsFromColumns`. |
+| `src/clients/qetl/QueryMediator/QueryMediator.ts`, `QueryMediator.types.ts`, `queryRunner.ts` | F1, F113, F71 to F75, Postgres branch, F133 | F1: the named `create("QueryMediator", { state })` call (`QueryMediator.ts`). F113: the `datasetColumnSource` option, its `DatasetColumnSource` type, and the `stored` skip in `_getParquetNeededByDatasetId`. F71 to F75: spine restrictions (`1ee2e4b2a`). Postgres branch: the `RelationLoading` module call sites (`b72a4d9fb`). F133: `QueryMediator.types.ts` and `queryRunner.ts` only, the same hunks as in the row above (`b603b61b8`, `3bdccd425`, `59c506f64`, `62bedf4ee`). |
+| `src/clients/qetl/QueryMediator/relationLoading.ts` on `develop` (`relationLoading/RelationLoading.ts` on `demo/measles`) | F113, Postgres branch, F133 | F113: return early from `loadRelationBytes` when there are no relations, and skip the catalog read when `datasetColumnSource` is `stored`. Postgres branch: the move into the `RelationLoading` module and `getColumnReplacementsFromColumns`. F133: the projection key recorded per loaded view and the rebuild when it changes, conversions in a load, and virtual definitions as storage keys (`59c506f64`, `b66609496`, `62bedf4ee`). |
 | `src/clients/qetl/PublicQuerySession/PublicQuerySession.ts`, `__tests__/PublicQuerySession.test.ts` | F1, F113 | F1: the named create call. F113: `datasetColumnSource: "stored"` and the test that runs a public query through the real mediator without reading `dataset_columns`. |
 | `src/clients/qetl/QueryMediator/__tests__/relationCacheProjection.test.ts` | F1, F113 | F1: the named create call. F113: the no-dataset query test and the "dataset column source" `describe` block. |
-| `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts`, `DashboardClient.types.ts` | Postgres branch, F113 | Postgres branch: the `match` on `sourceType` and the Google Sheets and Postgres whole-dataset slices (`90952bf3c`). F113: `hasColumnReplacements`, `datasetIdsWithColumnReplacements`, and `_getDatasetIdsWithColumnReplacements`. |
+| `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts`, `DashboardClient.types.ts` | Postgres branch, F113, F133 | Postgres branch: the `match` on `sourceType` and the Google Sheets and Postgres whole-dataset slices (`90952bf3c`). F113: `hasColumnReplacements`, `datasetIdsWithColumnReplacements`, and `_getDatasetIdsWithColumnReplacements`. F133: `dashboardPublishSnapshots.ts` only, a dataset with a convert binding is sliced through the workspace query (`cac36bd9c`). |
 | `src/views/GisApp/layers/displaceSpatialFeatures/displaceSpatialFeatures.{ts,test.ts}` | F114, F33, F35 | F114: the new file. F33: buffer unit and label fixture fields (`8654bc93f`) and buffered lat/lng layers (`a48efb85f`). F35: the per-map salt (`35ccfc7da`), the coordinate seed (`47055e3ea`), and the radius key (`bd9b706c7`). |
 | `src/views/GisApp/layers/useMapLayersData/useMapLayersData.{ts,test.ts}` | F114, F33, F35 | F114: `displaceSpatialFeatures` in `_runSpatialLayer` and its tests. F33: the spatial filter and the popup-all widened query (including `5f934b1ac`'s test). F35: the `runMapLayerQuery` extraction and `jitterSalt`. |
 | `src/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.geometry.test.tsx` | F116, F33 | F116: "puts every source column on a geometry layer's popup". F33: the default popup fields test (`8efa8a80d`). `2658b9b29` only reformats F116's test. |
@@ -649,25 +653,32 @@ Take only your feature's hunks from these files. The last feature in the
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
 
-### Data dictionaries (F129 to F132)
+### Data dictionaries (F129 to F134)
 
 | File (final path) | Owners, in merge order | Each owner's hunks |
 |---|---|---|
-| `src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx` | Postgres branch, F21, F24, F131 | Postgres branch: the `postgres_table` source labels (`a0b8f1646`, `20a52c7cc`). F21: the shared source labels (`af925c7e6`). F24: the catalog preview (`d8a72da58`). F131: `useDatasetColumnCodes` and the codes passed to the column list and rail (`6248dc0f6`). |
-| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131, F132 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). F132: `DatasetMetadataList.tsx` only, the Description column's `renderValue` that shows the entry's description, and `BoundColumnName` without it (`22804b213`). |
-| `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` | Postgres branch, F130, F131 | Postgres branch: the refresh menu items (`20a52c7cc`). F130: `CreateDictionaryMenuItem` (`4ff06c4ca`). F131: `DictionaryMenuItems`, which offers Apply a dictionary and hides Create once one is applied (`32098fc2b`, `e26030a83`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetMetaView.tsx` | Postgres branch, F21, F24, F131, F133, F134 | Postgres branch: the `postgres_table` source labels (`a0b8f1646`, `20a52c7cc`). F21: the shared source labels (`af925c7e6`). F24: the catalog preview (`d8a72da58`). F131: `useDatasetColumnCodes` and the codes passed to the column list and rail (`6248dc0f6`). F133: `useLinkedDatasets` and the linked datasets passed to the rail (`76d145c3e`). F134: the columns ordered by `column_idx` with `toColumnsInTableOrder` (`25da4ee87`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx`, `src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx` | Postgres branch, F131, F132, F133, F134 | Postgres branch: the `postgres_table` arm (`a0b8f1646`). F131: `BoundColumnName` in the Columns list with its meta line, and the rail's Dictionaries group (`6248dc0f6`, `e26030a83`). F132: `DatasetMetadataList.tsx` only, the Description column's `renderValue` that shows the entry's description, and `BoundColumnName` without it (`22804b213`). F133: `DatasetMetadataList.tsx` passes `datasetId` to `BoundColumnName` and shows a converted column's read-only type with `ConvertedTypeNote` (`7663ab9e0`); `DatasetSourceRail.tsx` adds the `VirtualDataset` arm with `LinkedSourceFact` and the linked datasets (`76d145c3e`). F134: `DatasetSourceRail.tsx` only, the dataset passed to the Dictionaries group, which offers Re-apply (`6f5fd62a8`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu.tsx` | Postgres branch, F130, F131, F133 | Postgres branch: the refresh menu items (`20a52c7cc`). F130: `CreateDictionaryMenuItem` (`4ff06c4ca`). F131: `DictionaryMenuItems`, which offers Apply a dictionary and hides Create once one is applied (`32098fc2b`, `e26030a83`). F133: `DeleteDatasetConfirmBody` names the linked datasets, and Delete waits for them (`402335d0b`, `6705c3e3c`). |
 | `src/lib/ui/viz/DataGridColumnTitle/DataGridColumnTitle.tsx` | F23, F121, F131 | F23: the layer list (`52c823754`). F121: the truncated title tooltip. F131: the code list tag read from `ColumnCodesContext` (`e82540818`). |
 | `src/config/AppLinks/AppLinks.tsx` | F66, F129, F130, F131 | F66: Assigned to me. F129: the dictionary view. F130: the create route. F131: `dataManagerApplyDictionaries` (`23d401540`). |
 | `src/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers.ts` | F82, F87, F89, F128, F131 | F131: loading the workspace's column codes into the agent's datasets (`fb01c764b`). |
 | `supabase/functions/chat/PostAgentStream/loadDataAgentDatasets.ts` | F82, F131 | F131: `loadColumnCodes` with the caller's own client (`90aac2562`). |
 | `src/lib/agent/dataAgent/offline/{profileOfflineDatasets,buildOfflineDataAgentSystemPrompt,findQuestionValues}/*.ts` | F82, F83, F131 | F131: code lists in the offline profile, question values matched by label, and the capped code lines (`513e88d44`, `5ba9698b6`). |
-| `scripts/ai-eval/harnesses/pi/PiLocalHarness.ts`, `scripts/ai-eval/runtime/EvalDatabase.ts` | F81, F83, F131 | F131: column codes in the local harness, and the measles workspace's bindings in the eval database (`5ce5ba8a2`, `c567ca769`). |
+| `scripts/ai-eval/harnesses/pi/PiLocalHarness.ts`, `scripts/ai-eval/runtime/EvalDatabase.ts` | F81, F83, F131, F133 | F131: column codes in the local harness, and the measles workspace's bindings in the eval database (`5ce5ba8a2`, `c567ca769`). F133: `EvalDatabase.ts` only, a column's `sourceSql` for the converted copy of the line list (`da036466e`). |
 | `tests/e2e/agent-chat-sessions.spec.ts`, `tests/e2e/agent-chat-mentions.spec.ts` | F91, F128, F131 | F91 owns mentions and F128 owns sessions. F131: the `data-agent-v5` route (`03ca7f39c`, `b60b9206d`). |
 | `tests/e2e/dictionary-create-from-dataset.spec.ts`, `src/views/DataManagerApp/NewDictionaryFromDatasetsView/{SaveStep/SaveStep.tsx,ProposalStepBody.tsx,useCreateDictionary.ts,useNewDictionaryFlow.ts,newDictionaryReducer/newDictionaryReducer.ts}` | F130, F131 | F131: "Apply it to <dataset> next" on Save, `useOpenAfterCreate`, and the spec expecting Apply after a save (`242d427ef`, `ec386f1f6`, `d6f624f77`, `0a70cfcc6`). |
-| `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). |
-| `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). |
+| `src/views/DataManagerApp/DataDictionaryView/{DataDictionaryEditor,DataDictionaryHeader,DictionaryUsedByTab}/*` | F129, F131, F133, F134 | F129: the editor, header, and placeholder Used by tab. F131: the Used by count and table, and Apply to a dataset (`b278896db`, `ec386f1f6`, `c6ed4e267`). F133: `DataDictionaryEditor.tsx` passes the dictionary's version to `useDictionaryUsage`, and Used by says Reference or Linked and whether a dataset is behind, in `HowAppliedCell.tsx` and `UsageStatusCell.tsx` (`238ee4188`). F134: `DataDictionaryEditor.tsx` passes the dictionary's name to `useDictionaryUsage`, and Used by offers Re-apply under a behind status, set in ink (`6f5fd62a8`, `1f2459c4a`, `83af03334`). |
+| `src/clients/dataDictionaries/DictionaryBindingClient.ts` | F131, F133, F134 | F131: reading and applying bindings (`ab41fb10f`). F133: conversions and added values in the apply call, and the linked-dataset apply (`5a2d003f1`). F134: `reapplyDictionary`, which calls `rpc_dataset_columns__reapply_dictionary` (`c055c0854`). |
+| `src/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns.ts`, `src/clients/qetl/QueryMediator/getRelationSources.ts`, `src/lib/dataDictionaries/loadColumnReplacements/loadColumnReplacements.ts`, `docs/qetl-architecture.md` | F133, F134 | F133: see its rendering and loading area. F134: a table loaded outside the recorder counts as current only when the dataset needs no replacements, and the columns are read with `fetchQuery` once invalidated (`35db27b15`, `1ca97e30f`). |
+| `src/views/DataManagerApp/DataDictionaryView/useSaveDataDictionary.ts` | F129, F131, F133 | F129: the save hook and its refresh of the dictionary, entries, code lists, and codings. F131: the refresh also covers the bindings, so Used by is current after a save removes an entry (`ca665cb44`). F133: a save also refreshes the dataset columns and the cached rows, so converted datasets show the new labels (`238ee4188`). |
 | `src/clients/datasets/DatasetClient/{DatasetClient.ts,createDatasetQueries.ts}` | Postgres branch, F132 | Postgres branch: the Postgres table source (`581fa414b`). F132: the `getEditableIds` query (`051931742`). |
 | `shared/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types.ts` | F75, F132 | F75: `bucketGrain` (`00a93b53d`). F132: the `ProjectionDescriptor` docstring names `count(*)` (`b78b7b893`). |
+| `src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection/ColumnSection.tsx` | F131, F133 | F131: the code list tag beside a bound column's name (`6248dc0f6`). F133: the tag gets `datasetId`, so its popover can count unlabeled values (`7663ab9e0`). |
+| `supabase/schemas/50.rpc_data_dictionaries__save.sql` | F129, F130, F133 | F129: the save RPC. F130: its pair check. F133: re-pointing reference bindings and re-deriving converted columns' types after a save (`90c9e86b5`). Regenerate each migration, never copy it. |
+| `src/clients/DuckDbClient/duckDbParquetLoad.ts` | F63, F133 | F63: see its section. F133: the kept `ENUM` values read before the view is built, and the `ava_raw_` view of the values as stored (`b195ad2e8`). |
+| `src/clients/DuckDbClient/arrowFieldToQueryResultField.ts` | F70, F133 | F70: list, struct, decimal, date, and time fields. F133: a dictionary-encoded text field (an `ENUM`) is `varchar` (`cac36bd9c`). |
+| `src/lib/sql/DuckDbSqlAnalyzer/duckDbSqlSources.ts` | F22's BUG-001, F69, F133 | F22's BUG-001 and F69: see F69's section. F133: an `ava_raw_<datasetId>` view is reported as a read of its dataset, like `ava_rows_` (`b195ad2e8`). |
 
 ---
 
@@ -10947,6 +10958,422 @@ known maplibre `-$dashboardId.test.tsx` failure), `pnpm vitest run` in
 `packages/web/ui`, `pnpm test:db` on the branch's switched stack, and one at a
 time `dictionary-apply-reference`, `data-dictionary-edit`,
 `dictionary-create-from-dataset`, and `data-explorer-grid-layout` e2e specs.
+
+---
+
+## F133: Convert coded columns with a dictionary
+
+Status: built on `feat/dictionary-conversions`, branched from `demo/measles`
+at `6518c3aa5`. No PR is open.
+
+**Purpose:** Someone who can edit a dataset converts its coded columns from
+**Apply a dictionary**, now three steps (Match columns, Unmatched values,
+Save as). A workspace admin saves the conversions as a new linked dataset
+that reads the source and follows the dictionary; the source keeps the code
+lists as reference. Conversions run when a dataset loads, as a `CASE` in the
+view QETL builds, so stored data never changes. Ordered lists become an
+`ENUM` of their labels and kept values, built at load, so they sort in list
+order. Unmatched values are listed with row counts and kept, mapped to a
+label, added to the list, or emptied. A preview drawer shows the result
+before saving. A linked dataset's rail names the dataset it reads, the
+source's rail names its linked datasets, the popover says the values were
+converted and counts the values with no label, a converted column's type is
+read-only, Used by says Reference or Linked, and the delete confirmation
+names linked datasets. A loaded view records its projection and rebuilds on
+the next query after a binding or code-list change; published snapshots read
+converted datasets through the query; a virtual dataset's cache follows its
+SQL and its dependencies' age. Ask Avandar describes a converted column by
+its labels with no new prompt version. View templates substitute parameters
+once and literally.
+
+**Value:** "1 means Male" is applied once and every chart, filter, export,
+and answer reads Male, while the original upload stays untouched and the
+linked dataset keeps up with the dictionary.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md` and
+`docs/measles-demo/data-dictionaries-4-conversions-plan.md` (Part A).
+
+**PR title:** `feat(data-dictionaries): convert coded columns into linked datasets`
+
+**Depends on:** F131 and F132.
+
+**Files, by area** (`ApplyDictionariesView/` is
+`src/views/DataManagerApp/ApplyDictionariesView/`, `DatasetMetaView/` is
+`src/views/DataManagerApp/DatasetMetaView/`, `QM/` is
+`src/clients/qetl/QueryMediator/`, and `SM/` is
+`shared/models/dataDictionaries/`):
+
+- Docs (`fdf05e0b1`, `80eab168c`, `b37474687`): the handoff and the plan
+  in `docs/measles-demo/data-dictionaries-4-conversions-{handoff,plan}.md`,
+  the spec edits in `data-dictionaries-design.md`, and this log. The QETL
+  pipeline notes in `docs/qetl-architecture.md` (`b195ad2e8`, `59c506f64`,
+  `3315d7b01`, `b66609496`, `62bedf4ee`).
+- Templating (`0d11e2dba`): `src/clients/DuckDbClient/duckDbSqlText.ts`
+  (`getQueryStringFromParams` substitutes each parameter once and
+  literally) and its test.
+- Schema, migration, desktop twin, and pgTAP (`90c9e86b5`):
+  `supabase/schemas/20.dataset_columns.sql`, `20.datasets__virtual.sql`,
+  `30.dataset_columns__dictionary_bindings.sql`,
+  `50.rpc_data_dictionaries__save.sql`,
+  `50.rpc_dataset_columns__apply_dictionaries.sql`,
+  `50.rpc_dataset_columns__reapply_dictionary.sql`,
+  `51.rpc_dataset_columns__apply_dictionaries.sql`, and
+  `52.rpc_dataset_columns__apply_dictionaries_as_linked_dataset.sql`; the
+  generated `supabase/migrations/20261113181028_dictionary_conversions.sql`
+  and its twin
+  `apps/desktop/migrations/20261113181028_dictionary_conversions.gen.sql`;
+  `shared/types/database.types.ts`; and the tests under
+  `supabase/tests/database/dictionary_bindings/` (`dictionary_changes`,
+  `managed_columns`, `rpc_dataset_columns__apply_dictionaries`,
+  `..._apply_dictionaries__convert`,
+  `..._apply_dictionaries_as_linked_dataset`, and
+  `..._reapply_dictionary`) and `supabase/tests/database/permissions/`
+  (`rls_data_dictionaries__code_lists__linked`,
+  `rls_dataset_columns__dictionary_bindings`). Regenerate the migration
+  with `supabase-declarative-schema`, never copy it.
+- Desktop SQLite generator (`660875fdd`):
+  `apps/desktop/scripts/gen-sqlite-migrations/transpile.ts` turns sqlglot's
+  `DEFAULT CAST('<literal>' AS <type>)` into `DEFAULT '<literal>'` (an empty
+  array into `'[]'`) instead of dropping it, with the new `transpile.test.ts`
+  and a `runGenerator.test.ts` case that adds the column to a table holding a
+  row. Without it the `value_overrides` ADD COLUMN was `NOT NULL` with no
+  default, which SQLite refuses on a desktop database that already holds
+  bindings. Regenerating also restores the defaults in six older `.gen.sql`
+  files (`20250929162612`, `20260819055319`, `20261109082310`,
+  `20261112000050`, `20261113022522`, and `20261113181028`). The desktop
+  tracks applied migrations by name, so the older files change only fresh
+  installs. `pnpm desktop:sqlite:check-migrations` still reports
+  `20261109134745` and `20261109155144`, whose header counts drifted before
+  this branch.
+- Schema fixes from the final review (`cfbd887a4`): the generated
+  `supabase/migrations/20261113232435_dictionary_conversion_fixes.sql` and
+  its twin
+  `apps/desktop/migrations/20261113232435_dictionary_conversion_fixes.gen.sql`,
+  `shared/types/database.types.ts`, the matching edits to
+  `supabase/schemas/{30.dataset_columns__dictionary_bindings,50.rpc_data_dictionaries__save,51.rpc_dataset_columns__apply_dictionaries,52.rpc_dataset_columns__apply_dictionaries_as_linked_dataset}.sql`,
+  and the tests `dictionary_changes` and
+  `..._apply_dictionaries__convert`. `sync_live_types` types a column from
+  `coalesce(pinned_pairs, live pairs)`, so a save that edits a list and
+  deletes its entry leaves the right `data_type` (the save pinned the
+  entry's convert bindings to the list's new pairs, and re-typing then
+  skipped them). Both apply RPCs check the Data Sources editor right after
+  they authorize the dataset, before any binding is read, when the call adds
+  values.
+- Shared models (`12f5ee41a`, `029a31457`, `54af33e5f`, `cb3521097`,
+  `55ab3f63e`):
+  `SM/DictionaryBinding/`, `SM/DataDictionaryCodeList/`,
+  `shared/models/datasets/DatasetColumn/`,
+  `shared/models/datasets/VirtualDataset/`, and the new
+  `SM/ColumnConversion/` (the `WHEN` clauses, output type, and `ENUM`
+  labels, with codes trimmed the way SQL trims them). `12f5ee41a` also
+  touches `ApplyDictionariesView/AttachStep/` for the new binding fields.
+  `cb3521097` applies a map override whose code differs from a pair only in
+  case or surrounding spaces, as the apply RPC already accepts it, where the
+  lookup was exact and the override did nothing. `55ab3f63e` reads an
+  ordered column as text when a kept value holds a NUL character or the
+  column keeps more than 1,000 values, since either broke the `ENUM`
+  literal and the dataset's view failed to build. The kept values read, in
+  `src/clients/DuckDbClient/duckDbSqlText.ts` with its tests, now stops one
+  past the cap.
+- Rendering and loading (`b603b61b8`, `b195ad2e8`, `3bdccd425`,
+  `59c506f64`, `f25b4dcf3`, `9d5fe22f3`, `b66609496`):
+  `src/clients/DuckDbClient/{duckDbSqlText,duckDbParquetLoad,duckDbClientOperations}.ts`
+  with `duckDbSqlText.executed.test.ts`, `QM/QueryMediator.types.ts`,
+  `QM/relationLoading/getColumnReplacementsFromColumns/` (with
+  `getColumnReplacementsFromColumns.conversions.executed.test.ts`),
+  `QM/relationLoading/RelationLoading.ts`, `QM/queryRunner.ts`,
+  `QM/getRelationSources.ts`, `QM/QueryableRelationColumns/`, the
+  projection tests under `QM/__tests__/`,
+  `src/lib/sql/DuckDbSqlAnalyzer/duckDbSqlSources.ts` (the `ava_raw_` view
+  reads its dataset), `src/lib/dataDictionaries/loadColumnReplacements/`,
+  and `src/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding.ts`
+  (keep-original copies are left out of reconciliation).
+- Virtual dataset freshness (`62bedf4ee`, `caa91553b`, `69227a33e`):
+  `src/clients/qetl/wrappers/VirtualDatasetWrapper/`,
+  `src/clients/qetl/wrappers/createDefaultRegistry.ts`,
+  `QM/relationLoading/createRegistryForFetch.ts`,
+  `QM/relationLoading/getVirtualRelationDefinitions/`, and
+  `DatasetMetaView/clearCachedDatasetRows.ts` (a refresh also clears the
+  linked datasets that read the dataset).
+- Results and snapshots (`cac36bd9c`):
+  `src/clients/DuckDbClient/arrowFieldToQueryResultField.ts` (an `ENUM` is
+  text) and
+  `src/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardPublishSnapshots.ts`
+  with its tests.
+- Column codes (`537edd1d2`): `SM/ColumnCodes/`, both `loadColumnCodes/`
+  (`src/lib/dataDictionaries/` and `supabase/functions/chat/utils/`), and
+  the tests that read them.
+- The binding client (`5a2d003f1`):
+  `src/clients/dataDictionaries/DictionaryBindingClient.ts`,
+  `ApplyDictionariesView/invalidateAfterApply/`, and
+  `useAttachDictionaries.ts`.
+- The apply flow (`83781324c`, `4863ee56b`, `b67aea4cd`, `e1e0e0442`,
+  `8c7fa2781`, `d36ba57fd`, `7bc391c64`, `63a08980e`, `ae54962d0`,
+  `4ce941af3`, `3f668c259`, `161f24881`, `7f073e8d6`, `1c320c62d`,
+  `dbc4f876c`, `39bbce3dd`, `2b5a84053`, `73c7c4ade`, `2a9bc0850`,
+  `8c5e74acf`, `a95df8b8e`, `a7daa8a7d`): `ApplyDictionariesView/` (the reducer, defaults, inputs,
+  targets, the profile, unmatched-value, and preview reads,
+  `MatchColumnsStep/`, `UnmatchedValuesStep/`, `PreviewDrawer/`,
+  `SaveAsStep/`, the header, stepper, step heading, facts, and step
+  labels), `src/lib/dataDictionaries/{ColumnProfileSql,profileDatasetColumns}/`,
+  and `src/hooks/workspaces/useCanCreateDatasets/` with
+  `src/hooks/datasets/useIsUnderDatasetLimit/useIsUnderDatasetLimit.ts`.
+  `1c320c62d` profiles a converted column as its stored type, so Apply on a
+  linked dataset can read its columns. `dbc4f876c` keeps the preview's
+  hidden text inside the drawer. The final review fixed these:
+  `39bbce3dd` drops a saved map override to a code its list no longer
+  holds when the flow opens, and never sends it, since the RPC refused every
+  save with `binding_payload_invalid`. `2b5a84053` forgets a removed
+  dictionary's value resolutions along with its picks, so a later pick of
+  the same column does not inherit them. `73c7c4ade` keeps Save and Attach
+  disabled until the unmatched values read lands, because until then
+  overrides and added pairs held lowercased keys, not the stored text.
+  `2a9bc0850` counts a pending Add to list code that is not a whole number
+  when offering Keep as is, since it makes a whole-number column text.
+  `8c5e74acf` blocks saving when two values add one code to a list with
+  different labels (new `AddedCodeConflictCallout.tsx`, the conflicted
+  inputs name the code, and two columns adding the very same pair still
+  save). `a95df8b8e` formats these fixes, and `a7daa8a7d` extracts their
+  messages into the translation catalogs.
+- The dataset page (`402335d0b`, `76d145c3e`, `7663ab9e0`, `6705c3e3c`,
+  `dbc4f876c`): `DatasetMetaView/DatasetActionsMenu/`
+  (`ApplyDictionaryMenuItem.tsx`, `DatasetActionsMenu.tsx`,
+  `DeleteDatasetConfirmBody.tsx`), `DatasetMetaView/DatasetColumnCodes/`
+  (`BoundColumnName.tsx`, `ConvertedTypeNote.tsx`,
+  `DatasetDictionariesRailGroup.tsx`, `DictionaryUseNote.tsx`,
+  `describeDictionaryUses/`), `LinkedSourceFact.tsx`,
+  `DatasetSourceRail.tsx`, `DatasetMetaView.tsx`,
+  `DatasetMetadataList.tsx`,
+  `DatasetSummaryView/ColumnSection/ColumnSection.tsx`, and
+  `src/hooks/datasets/useLinkedDatasets/`.
+- The popover (`7663ab9e0`, `127334468`, `53e713f24`, `313b13d14`):
+  `src/components/dataDictionaries/CodeListPopover/` (the converted note,
+  `UnlabeledValuesNote.tsx`, `useUnlabeledValueCount.ts`,
+  `buildUnlabeledValueCountSql/`, and the keyboard path into and out of the
+  link).
+- The Dictionary view (`238ee4188`):
+  `src/views/DataManagerApp/DataDictionaryView/` (`useDictionaryUsage/`,
+  `DictionaryUsedByTab/` with `HowAppliedCell.tsx` and
+  `UsageStatusCell.tsx`, `DataDictionaryEditor/DataDictionaryEditor.tsx`,
+  and `useSaveDataDictionary.ts`, which now also refreshes the dataset
+  columns and the cached rows). `a62e71b49` adds
+  `DataDictionaryActionsMenu/invalidateAfterDictionaryDelete.ts`:
+  deleting a dictionary removes its reference bindings and pins its convert
+  bindings on the server, so the dataset bindings, columns, and rows are
+  refreshed too, where only the dictionary list was.
+- Test docstrings (`e6aebba2b`): the tests for `CodeListPopover`,
+  `DatasetDictionariesRailGroup`, `describeDictionaryUses`,
+  `DatasetMetadataList`, and `LinkedSourceFact` no longer name plan tasks.
+- Evals (`da036466e`, `8f6abcc07`, `f05473c46`, `682fbf212`):
+  `scripts/ai-eval/measles/`, `scripts/ai-eval/runtime/EvalDatabase.ts`
+  (a column's `sourceSql`), `docs/ai-agent/eval.md`, and
+  `docs/ai-agent/eval-runs/` (the converted-column runs).
+- E2E (`161f24881`, `766c39961`, `029c51b19`):
+  `tests/e2e/dictionary-apply-linked.spec.ts` (new) and
+  `dictionary-apply-reference.spec.ts` (the three-step flow).
+- Translations (`c9e47cd9f`, `a7daa8a7d`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
+
+**Schema:** yes, two migrations. `dictionary_conversions` holds the binding's
+`keeps_original`, `value_overrides`, `pinned_pairs`, `pinned_is_ordered`, and
+`replaced_data_type` with the reference-only check;
+`dataset_columns.dictionary_binding_id` and
+`datasets__virtual.linked_source_dataset_id`, both managed; the
+pin-on-delete triggers that replace the remove-reference ones; the
+re-pointing of reference bindings and the re-derived types in
+`rpc_data_dictionaries__save`; and `rpc_dataset_columns__apply_dictionaries`
+(now with conversions and added pairs),
+`rpc_dataset_columns__apply_dictionaries_as_linked_dataset`, and
+`rpc_dataset_columns__reapply_dictionary` (used from F134).
+`dictionary_conversion_fixes` retypes columns from `coalesce(pinned_pairs,
+live pairs)` and adds the Data Sources editor check to both apply RPCs. Each
+has its desktop SQLite twin. Regenerate each migration with
+`supabase-declarative-schema`, never copy it.
+
+**Deploy:** both migrations together first, then the `chat` edge function,
+then the frontend. Tabs opened before the deploy send the old two-argument apply
+call, which the new RPC's defaulted third argument still accepts.
+
+**Known gaps:** converting in place, its synced-data warning, and Re-apply
+are F134 (the RPCs are here). Pipelines (`packages/node/etl`,
+`apps/pipeline-server`) read stored files and see raw values, as they do for
+renames. Another user's open tab follows a code-list edit when its cached
+list goes stale (6 minutes online) or on reload. "Restore original values"
+as its own action, write-back to live sources, crosswalks (slice 5), and
+"Add from datasets" into an existing dictionary stay out. A linked dataset's
+cached rows do not follow a rename or cast on its source's columns, as for
+any virtual dataset. A published snapshot stores an ordered column as text,
+so a public chart sorts its labels alphabetically unless the chart sorts
+explicitly. Every workspace query reads its datasets' bindings and code
+lists, mostly from the query cache; a refetch past the 6-minute stale time
+happens while the query holds its DuckDB lease. The offline
+agent missed D04 in the converted-columns eval (recorded, not gated).
+Several deleted dictionaries in one dataset's rail collapse into one "A
+deleted dictionary" row. A linked dataset's page and preview list a
+converted column whose type changes (`GENDER` and `ses_cat`, whole numbers
+to text) after its other columns, in the order the load-time view selects
+them; `column_idx` keeps the source's order. The Data Summary
+shows only a column's most common values, so an ordered list's order shows
+in a grouped query, not there. A workspace member who is not an admin never
+reaches the disabled Save as card on an upload: Convert all and the row
+chips are already disabled at Match columns, with the same reason. After a
+reload, queries on an offline-only upload fail. This predates this feature,
+and F135 (`fix/offline-upload-reload`) fixes it.
+Shift+Tab is the only way back from the code-list popover's link to its tag.
+Tab from the link continues to the next control.
+
+**Verification:**
+```sh
+ava supabase status
+pnpm lint
+pnpm exec tsc -b --force --noEmit && pnpm type-check:deno
+deno info --config supabase/functions/chat/deno.json supabase/functions/chat/index.ts 2>&1 | grep -iE "error|not found|unable to"
+pnpm test:frontend
+pnpm vitest run --config vitest.executed.config.ts src/clients/qetl src/clients/DuckDbClient src/lib/dataDictionaries src/components/dataDictionaries src/lib/agent/dataAgent/pagePrivacy
+pnpm vitest run scripts/ai-eval
+pnpm test:db
+ava supabase migrations validate
+pnpm desktop:sqlite:gen-migrations
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e dictionary-apply-linked.spec.ts
+pnpm test:e2e dictionary-apply-reference.spec.ts
+pnpm test:e2e dictionary-create-from-dataset.spec.ts
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e data-explorer-grid-layout.spec.ts
+pnpm test:e2e data-explorer-query-drawer.spec.ts
+pnpm test:e2e dashboard-workspace-publishing.spec.ts
+pnpm test:e2e web-offline-mode.spec.ts
+pnpm test:e2e agent-chat-result.spec.ts
+```
+
+## F134: Convert a dataset in place
+
+Status: built on `feat/dictionary-conversions` after F133's commits. Split
+into its own PR from the commits after F133's log entry (`a77b2eed9`). No
+PR is open.
+
+**Purpose:** An upload, synced or offline only, is converted in place from
+Save as's **Change <dataset>** card, whose copy depends on where the dataset
+lives: a synced upload "Rewrites the uploaded data in place. It is synced to
+the workspace, so this changes it for everyone who uses it.", and an offline
+upload "It is offline only, so nobody else is affected." A synced upload
+needs "I understand this changes <dataset> for the whole workspace" ticked
+before **Change n columns** enables. A live connection and a dataset a
+linked dataset reads cannot be changed in place, and the disabled card says
+why ("<source> data can't be changed from Avandar yet, so a linked dataset
+is the only option for now.", or "<linked dataset> reads this dataset, so
+converting it here would convert twice. Change the linked dataset instead.",
+with "A linked dataset" until the name loads). The
+conversion is pinned to the dictionary version applied, so later edits do
+not reach it. The dataset rail and Used by say "Applied version n, now
+version m" and offer **Re-apply** to someone who can edit the dataset, with
+a confirmation on a synced upload, read when Re-apply is clicked. A dataset
+converted in the session that uploaded it shows the conversion: a table an
+upload's transcode loaded outside the queryable tier's recorder counts as
+current only while the dataset needs no renames, casts, or conversions, and
+a conversion reads the dataset's columns with `fetchQuery`, so it no longer
+takes a column's pre-conversion type from invalidated cached rows. The
+dataset page shows a converted column's new type as soon as the refetch
+lands, and keeps its columns in table order.
+
+**Value:** A team that wants one dataset of labels, not two, gets it without
+re-uploading, and a dictionary edit never changes a shared dataset without
+someone choosing to.
+
+**Design:** `docs/measles-demo/data-dictionaries-design.md` (sections 6.6
+and 7.5) and `docs/measles-demo/data-dictionaries-4-conversions-plan.md`
+(Part B).
+
+**PR title:** `feat(data-dictionaries): convert datasets in place and re-apply dictionaries`
+
+**Depends on:** F133.
+
+**Files, by area** (`ApplyDictionariesView/` is
+`src/views/DataManagerApp/ApplyDictionariesView/`, `DatasetMetaView/` is
+`src/views/DataManagerApp/DatasetMetaView/`, and `DataDictionaryView/` is
+`src/views/DataManagerApp/DataDictionaryView/`):
+
+- Profiling a converted dataset (`0e7c23ed4`):
+  `ApplyDictionariesView/useDatasetProfiles.ts` and its test (a converted
+  column without a replaced type is profiled as detected).
+- The client and hook (`c055c0854`):
+  `src/clients/dataDictionaries/DictionaryBindingClient.ts`
+  (`reapplyDictionary`) and
+  `src/hooks/dataDictionaries/useReapplyDictionary/`.
+- The Save as card (`08af7bcc8`, `79d071a55`, `27deb6c7e`):
+  `ApplyDictionariesView/SaveAsStep/{ChangeDatasetCard,SaveTargetCards}.tsx`
+  with `ChangeDatasetCard.test.tsx`, and
+  `ApplyDictionariesView/applyTargets/` with `useApplyTargets.ts`.
+  `27deb6c7e` makes the Change card name the linked dataset that reads this
+  one and say that converting here would convert twice, falling back to "A
+  linked dataset" while the name has not loaded.
+- Re-apply (`6f5fd62a8`, `1f2459c4a`, `83af03334`):
+  `src/components/dataDictionaries/ReapplyButton/`,
+  `DataDictionaryView/DictionaryUsedByTab/` (`DictionaryUsedByTab.tsx`,
+  `DictionaryUsedByTable.tsx`, `UsageStatusCell.tsx`),
+  `DataDictionaryView/useDictionaryUsage/`,
+  `DataDictionaryView/DataDictionaryEditor/DataDictionaryEditor.tsx`,
+  `DatasetMetaView/DatasetColumnCodes/` (`DatasetDictionariesRailGroup.tsx`,
+  `DictionaryUseNote.tsx`), and `DatasetMetaView/DatasetSourceRail.tsx`.
+  `83af03334` sets "Applied version n, now version m" in ink, not warning
+  yellow, which was about 1.6:1 on white.
+- Showing a conversion in the uploading session (`35db27b15`, `1ca97e30f`):
+  `src/clients/qetl/QueryMediator/QueryableRelationColumns/`,
+  `src/clients/qetl/QueryMediator/getRelationSources.ts` (docstring),
+  `src/lib/dataDictionaries/loadColumnReplacements/`, the QETL tests that
+  stub the recorder (`QueryMediator.coordination.test.ts`, and
+  `__tests__/{QueryMediator.concepts,relationCacheOrdering,relationCacheProjection,probeRelationCache}.test.ts`),
+  and `docs/qetl-architecture.md`.
+- The dataset page after converting (`b2c351b6c`, `25da4ee87`):
+  `packages/web/ui/src/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow.tsx`
+  with `ObjectDescriptionList.test.tsx` (an editable row shows its current
+  data outside edit mode, so a converted column's type is not stale until a
+  reload), and `DatasetMetaView/DatasetMetaView.tsx` with
+  `DatasetMetaView/toColumnsInTableOrder/` (columns by `column_idx`, since
+  Postgres returns an updated row last).
+- E2E (`e24570b96`): `tests/e2e/dictionary-apply-in-place.spec.ts` (new).
+- Translations (`3db99f7b8`): `src/i18n/locales/*/messages.{po,ts}`,
+  regenerated with `pnpm i18n:extract && pnpm i18n:compile`, never copied.
+
+**Schema:** none. F133's migration carries the pinned columns and
+`rpc_dataset_columns__reapply_dictionary`.
+
+**Deploy:** the frontend.
+
+**Known gaps:** "Restore original values" as its own action stays on the
+roadmap; switching a converted column back to Reference only in Apply
+already restores its values. Write-back to live sources stays out. A
+dataset whose import set a rename or cast, uploaded and then taken offline
+before its first catalog query, is no longer served from its
+transcode-loaded table: the rebuild needs the file. Before, it was served
+without its projection, which was wrong. `b2c351b6c` changes the published
+`@avandar/ui` package, so its auto-changeset bumps a patch.
+
+**Verification:**
+```sh
+ava supabase status
+pnpm lint
+pnpm exec tsc -b --force --noEmit && pnpm type-check:deno
+deno info --config supabase/functions/chat/deno.json supabase/functions/chat/index.ts 2>&1 | grep -iE "error|not found|unable to"
+pnpm test:frontend
+pnpm --filter @avandar/ui test
+pnpm vitest run --config vitest.executed.config.ts src/clients/qetl src/clients/DuckDbClient src/lib/dataDictionaries src/components/dataDictionaries src/lib/agent/dataAgent/pagePrivacy
+pnpm vitest run scripts/ai-eval
+pnpm test:db
+ava supabase migrations validate
+pnpm desktop:sqlite:gen-migrations
+pnpm test:desktop
+pnpm i18n:check
+pnpm test:e2e dictionary-apply-in-place.spec.ts
+pnpm test:e2e dictionary-apply-linked.spec.ts
+pnpm test:e2e dictionary-apply-reference.spec.ts
+pnpm test:e2e dictionary-create-from-dataset.spec.ts
+pnpm test:e2e data-dictionary-edit.spec.ts
+pnpm test:e2e data-explorer-grid-layout.spec.ts
+pnpm test:e2e dashboard-workspace-publishing.spec.ts
+pnpm test:e2e web-offline-mode.spec.ts
+```
 
 ## Open decisions
 

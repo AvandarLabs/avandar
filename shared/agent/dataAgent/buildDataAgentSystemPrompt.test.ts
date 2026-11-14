@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt.ts";
 import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools.ts";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 
 /**
  * SHA-256 of prompt v1's instructions (everything before DATASETS), as
@@ -32,6 +33,13 @@ const V3_INSTRUCTIONS_SHA256 =
  */
 const V4_INSTRUCTIONS_SHA256 =
   "0c7547581f90d48f9073bf4cc9e2d56799a19c2e579408a99e917244864d3fe2";
+
+/**
+ * SHA-256 of prompt v5's instructions (everything before DATASETS), as
+ * shipped. Converted columns change only the DATASETS block, never this.
+ */
+const V5_INSTRUCTIONS_SHA256 =
+  "177fb5d6a2048ea0e8a0a3bbb25ebcec8ca2daefd35fc30ec33b9de8fcb3bb7f";
 
 /** A line list whose GENDER and hosp_yn columns have code lists attached. */
 const CODED_DATASETS = [
@@ -261,6 +269,79 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(instructions.length).toBe(6828);
     expect(createHash("sha256").update(instructions).digest("hex")).toBe(
       V3_INSTRUCTIONS_SHA256,
+    );
+  });
+
+  it("keeps every character of v5's instructions", () => {
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: DATASETS,
+      today: "2026-11-13",
+      promptId: "data-agent-v5",
+    });
+    const instructions = prompt.slice(0, prompt.indexOf("\n\nDATASETS\n"));
+
+    expect(instructions.length).toBe(7665);
+    expect(createHash("sha256").update(instructions).digest("hex")).toBe(
+      V5_INSTRUCTIONS_SHA256,
+    );
+  });
+
+  it("lists a decoded column as the labels it now holds, in v5's own form", () => {
+    const codes = ColumnCodes.fromRows({
+      bindings: [
+        {
+          id: "binding-gender",
+          datasetColumnId: "col-gender",
+          dictionaryId: "dict-1",
+          entryId: "entry-sex",
+          codeListId: "list-sex",
+          mode: "convert",
+          direction: "decode",
+          keepsOriginal: false,
+          pinnedPairs: undefined,
+          pinnedIsOrdered: undefined,
+          appliedDictionaryVersion: 1,
+        },
+      ],
+      dictionaries: [{ id: "dict-1", name: "NYS codes", version: 1 }],
+      entries: [
+        {
+          id: "entry-sex",
+          name: "sex",
+          description: "Sex recorded on the case report.",
+        },
+      ],
+      codeLists: [
+        {
+          id: "list-sex",
+          name: "Sex (1/2/9)",
+          isOrdered: false,
+          pairs: CODED_DATASETS[0]!.columns[1]!.codes!.pairs,
+        },
+      ],
+    }).get("col-gender")!;
+
+    const prompt = buildDataAgentSystemPrompt({
+      datasets: [
+        {
+          ...CODED_DATASETS[0]!,
+          columns: [
+            {
+              name: "GENDER",
+              dataType: "varchar",
+              codes: ColumnCodes.toContext(codes),
+            },
+          ],
+        },
+      ],
+      today: "2026-11-13",
+      promptId: "data-agent-v5",
+    });
+
+    // The unlabeled 9 is not a value a decoded column can hold as a label,
+    // so it is left out, as for any column of labels.
+    expect(prompt).toContain(
+      't0 = "Bronx line list": GENDER text\n  - GENDER: values Male, Female. Sex recorded on the case report.',
     );
   });
 

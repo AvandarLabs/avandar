@@ -21,6 +21,28 @@ describe("profileDatasetColumns", () => {
     runQueryMock.mockReset();
   });
 
+  it("reads the stored values, not the converted ones, when asked", async () => {
+    runQueryMock
+      .mockResolvedValueOnce({
+        data: [{ row_count: 3n, non_null_0: 3n, distinct_0: 2n }],
+      })
+      .mockResolvedValueOnce({ data: [] });
+
+    await profileDatasetColumns({
+      workspaceId: WORKSPACE_ID,
+      dataset: DATASET,
+      columns: [{ name: "sex", dataType: "varchar" }],
+      readsRawValues: true,
+    });
+
+    const [summaryCall, valuesCall] = runQueryMock.mock.calls;
+    expect(summaryCall?.[0].rawSql).toContain(`"ava_raw_${DATASET.id}"`);
+    expect(valuesCall?.[0].rawSql).toContain(`"ava_raw_${DATASET.id}"`);
+    expect(summaryCall?.[0].neededColumnsByDatasetId).toEqual({
+      [DATASET.id]: ["sex"],
+    });
+  });
+
   it("reads a short column's values with a second query", async () => {
     runQueryMock
       .mockResolvedValueOnce({

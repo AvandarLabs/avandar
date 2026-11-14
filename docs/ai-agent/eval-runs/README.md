@@ -140,3 +140,7 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-13T05-24-43](2026-11-13T05-24-43-attach-dictionaries_coded-offline/results.jsonl) | `attach-dictionaries:coded-offline` | 4/4 | 0 | 0 | $0.00000 | 6.0 s / 72.7 s | none |
 | [2026-11-13T05-27-22](2026-11-13T05-27-22-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 7/7 | 0 | 0 | $0.00020 | 2.2 s / 3.7 s | none |
 | [2026-11-13T05-27-29](2026-11-13T05-27-29-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 7/7 | 0 | 0 | $0.00019 | 2.1 s / 2.7 s | none |
+| [2026-11-13T20-44-13](2026-11-13T20-44-13-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00041 | 2.0 s / 2.1 s | none |
+| [2026-11-13T20-44-22](2026-11-13T20-44-22-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00016 | 1.7 s / 2.0 s | none |
+| [2026-11-13T20-44-29](2026-11-13T20-44-29-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00014 | 1.8 s / 2.1 s | none |
+| [2026-11-13T20-46-47](2026-11-13T20-46-47-dictionary-conversions_converted-offline/results.jsonl) | `dictionary-conversions:converted-offline` | 6/7 | 1 | 0 | $0.00000 | 8.6 s / 76.8 s | D04 |

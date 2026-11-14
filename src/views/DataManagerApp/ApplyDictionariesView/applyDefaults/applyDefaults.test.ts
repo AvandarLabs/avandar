@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { makeInitialSelection } from "@/views/DataManagerApp/ApplyDictionariesView/applyDefaults/applyDefaults";
+import {
+  makeInitialSelection,
+  resolutionsFromBindings,
+} from "@/views/DataManagerApp/ApplyDictionariesView/applyDefaults/applyDefaults";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
 import type { DataDictionaryEntry } from "$/models/dataDictionaries/DataDictionaryEntry/DataDictionaryEntry";
@@ -54,6 +57,39 @@ const MATCHES = new Map([
   ],
 ]);
 const DICTIONARIES = [{ id: NYS }, { id: CDC }];
+const REFERENCE_BINDING = {
+  datasetColumnId: GENDER.id,
+  dictionaryId: NYS,
+  entryId: "entry-nys-sex" as DataDictionaryEntry.Id,
+  codeListId: undefined,
+  direction: "decode",
+  mode: "reference",
+  keepsOriginal: false,
+  valueOverrides: [],
+  pinnedPairs: undefined,
+  pinnedIsOrdered: undefined,
+  replacedDataType: undefined,
+} as unknown as DictionaryBinding.T;
+
+const SEX_LIST_ID = "list-129" as DataDictionaryCodeList.Id;
+const CODE_LISTS = new Map([
+  [
+    SEX_LIST_ID,
+    {
+      id: SEX_LIST_ID,
+      pairs: [
+        { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+        { code: "2", label: "Female", acceptedSpellings: [], isMissing: false },
+      ],
+    } as unknown as DataDictionaryCodeList.T,
+  ],
+]);
+const CONVERTED_BINDING = {
+  ...REFERENCE_BINDING,
+  codeListId: SEX_LIST_ID,
+  mode: "convert",
+  valueOverrides: [{ value: "M", action: "map", code: "1" }],
+} as DictionaryBinding.T;
 
 describe("makeInitialSelection", () => {
   it("uses every dictionary that matches a column, and only those", () => {
@@ -66,6 +102,7 @@ describe("makeInitialSelection", () => {
         ...DICTIONARIES,
         { id: "dict-unused" as DataDictionary.Id },
       ],
+      defaultMode: "reference",
     });
 
     expect(selection.dictionaryIds).toEqual([NYS, CDC]);
@@ -79,6 +116,7 @@ describe("makeInitialSelection", () => {
       existingBindings: [],
       preselectedDictionaryId: NYS,
       dictionaries: DICTIONARIES,
+      defaultMode: "reference",
     });
 
     expect(selection.dictionaryIds).toEqual([NYS]);
@@ -86,13 +124,7 @@ describe("makeInitialSelection", () => {
   });
 
   it("opens with the dataset's current bindings", () => {
-    const binding = {
-      datasetColumnId: GENDER.id,
-      dictionaryId: NYS,
-      entryId: "entry-nys-sex" as DataDictionaryEntry.Id,
-      codeListId: undefined,
-      direction: "decode",
-    } as DictionaryBinding.T;
+    const binding = REFERENCE_BINDING;
 
     const selection = makeInitialSelection({
       columns: [GENDER, CASE_NO],
@@ -100,6 +132,7 @@ describe("makeInitialSelection", () => {
       existingBindings: [binding],
       preselectedDictionaryId: undefined,
       dictionaries: DICTIONARIES,
+      defaultMode: "reference",
     });
 
     expect(selection.dictionaryIds).toEqual([NYS]);
@@ -114,6 +147,7 @@ describe("makeInitialSelection", () => {
       existingBindings: [],
       preselectedDictionaryId: undefined,
       dictionaries: DICTIONARIES,
+      defaultMode: "reference",
     });
     const backward = makeInitialSelection({
       columns: [CASE_NO, GENDER],
@@ -121,6 +155,7 @@ describe("makeInitialSelection", () => {
       existingBindings: [],
       preselectedDictionaryId: undefined,
       dictionaries: DICTIONARIES,
+      defaultMode: "reference",
     });
 
     expect(backward.dictionaryIds).toEqual(forward.dictionaryIds);
@@ -149,9 +184,86 @@ describe("makeInitialSelection", () => {
       existingBindings: [],
       preselectedDictionaryId: undefined,
       dictionaries: DICTIONARIES,
+      defaultMode: "reference",
     });
 
     expect(selection.dictionaryIds).toEqual([CDC, NYS]);
     expect(selection.picks[OUTCOME.id]?.dictionaryId).toBe(CDC);
+  });
+
+  it("starts new coded picks in the default mode and keeps a binding's own", () => {
+    const SES = { id: "col-ses" as DatasetColumn.Id, name: "SES" };
+    const converted = {
+      ...REFERENCE_BINDING,
+      codeListId: "list-nys-sex" as DataDictionaryCodeList.Id,
+      mode: "convert",
+      keepsOriginal: true,
+    } as DictionaryBinding.T;
+    const selection = makeInitialSelection({
+      columns: [GENDER, SES],
+      matchesByColumnName: new Map([
+        ...MATCHES,
+        [
+          "SES",
+          [
+            _match({
+              dictionaryId: NYS,
+              entryId: "entry-ses" as DataDictionaryEntry.Id,
+              codeListId: "list-ses" as DataDictionaryCodeList.Id,
+              coverage: 1,
+              fit: "fits",
+            }),
+          ],
+        ],
+      ]),
+      existingBindings: [converted],
+      preselectedDictionaryId: NYS,
+      dictionaries: DICTIONARIES,
+      defaultMode: "convert",
+    });
+
+    expect(selection.picks[GENDER.id]).toMatchObject({
+      mode: "convert",
+      keepsOriginal: true,
+      isDirectionFromData: false,
+    });
+    expect(selection.picks[SES.id]?.mode).toBe("convert");
+  });
+
+  it("reopens a converted column's overrides as resolutions", () => {
+    const converted = {
+      ...CONVERTED_BINDING,
+      valueOverrides: [
+        { value: " M ", action: "map", code: "1" },
+        { value: "7", action: "empty" },
+      ],
+    } as DictionaryBinding.T;
+
+    expect(resolutionsFromBindings([converted], CODE_LISTS)).toEqual({
+      [converted.datasetColumnId]: {
+        m: { action: "map", code: "1" },
+        "7": { action: "empty" },
+      },
+    });
+  });
+
+  it("drops a saved map to a code its list no longer has, so the value is kept as is", () => {
+    const converted = {
+      ...CONVERTED_BINDING,
+      valueOverrides: [
+        { value: "M", action: "map", code: "4" },
+        { value: "F", action: "map", code: " 2 " },
+      ],
+    } as DictionaryBinding.T;
+
+    expect(resolutionsFromBindings([converted], CODE_LISTS)).toEqual({
+      [converted.datasetColumnId]: { f: { action: "map", code: " 2 " } },
+    });
+  });
+
+  it("drops every saved map when the column's list is not loaded", () => {
+    expect(resolutionsFromBindings([CONVERTED_BINDING], new Map())).toEqual({
+      [CONVERTED_BINDING.datasetColumnId]: {},
+    });
   });
 });

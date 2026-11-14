@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { render, screen } from "@/test-utils";
+import { fireEvent, render, screen } from "@/test-utils";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -34,20 +34,28 @@ function makeColumn(
   });
 }
 
-function makeCodes(datasetColumnId: string): ColumnCodes.T {
+/** A column's codes, as `ColumnCodes.fromRows` returns them. */
+function makeCodes(overrides: Partial<ColumnCodes.T> = {}): ColumnCodes.T {
   return {
-    datasetColumnId,
-    dictionaryId: "dict-1",
+    datasetColumnId: "col-gender",
+    dictionaryId: "dict-nys",
     dictionaryName: "NYS codes",
     entryName: "sex",
     codeListName: "Sex (1/2/9)",
     isOrdered: false,
     mode: "reference",
     direction: "decode",
-    description: "Sex recorded on the case report.",
     pairs: [
       { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      { code: "2", label: "Female", acceptedSpellings: [], isMissing: false },
     ],
+    isPinned: false,
+    appliedDictionaryVersion: 1,
+    currentDictionaryVersion: 1,
+    isSourceDeleted: false,
+    keepsOriginal: false,
+    description: "Sex recorded on the case report.",
+    ...overrides,
   };
 }
 
@@ -77,10 +85,19 @@ function getDescriptionCell(columnName: string): HTMLElement {
   return within(row).getAllByRole("cell")[descriptionIdx]!;
 }
 
+function getTypeCell(columnName: string): HTMLElement {
+  const row = screen.getByRole("row", { name: new RegExp(columnName) });
+  const headers = screen.getAllByRole("columnheader");
+  const typeIdx = headers.findIndex((header) => {
+    return header.textContent === "Type";
+  });
+  return within(row).getAllByRole("cell")[typeIdx]!;
+}
+
 describe("DatasetMetadataList", () => {
   const columnCodesByName = new Map([
-    ["GENDER", makeCodes(GENDER.id)],
-    ["SEX_AT_BIRTH", makeCodes(SEX_AT_BIRTH.id)],
+    ["GENDER", makeCodes({ datasetColumnId: GENDER.id })],
+    ["SEX_AT_BIRTH", makeCodes({ datasetColumnId: SEX_AT_BIRTH.id })],
   ]);
 
   it("shows a bound entry's description in the Description column of a column with none", () => {
@@ -115,5 +132,56 @@ describe("DatasetMetadataList", () => {
     expect(
       within(descriptionCell).queryByText("Sex recorded on the case report."),
     ).toBeNull();
+  });
+
+  it("says which dictionary set a converted column's type", () => {
+    render(
+      <DatasetMetadataList
+        dataset={DATASET}
+        columnCodesByName={
+          new Map([
+            [
+              "GENDER",
+              makeCodes({
+                datasetColumnId: GENDER.id,
+                mode: "convert",
+                direction: "encode",
+              }),
+            ],
+          ])
+        }
+      />,
+      { wrapper: QueryWrapper },
+    );
+
+    expect(getTypeCell("GENDER")).toHaveTextContent("Set by NYS codes");
+    expect(getTypeCell("SEX_AT_BIRTH")).not.toHaveTextContent("Set by");
+  });
+
+  it("keeps a converted column's type out of the row's edit form", () => {
+    render(
+      <DatasetMetadataList
+        dataset={DATASET}
+        columnCodesByName={
+          new Map([
+            [
+              "GENDER",
+              makeCodes({
+                datasetColumnId: GENDER.id,
+                mode: "convert",
+                direction: "encode",
+              }),
+            ],
+          ])
+        }
+      />,
+      { wrapper: QueryWrapper },
+    );
+    const row = screen.getByRole("row", { name: /GENDER/ });
+
+    fireEvent.click(within(row).getByRole("button", { name: /Edit/ }));
+
+    expect(getTypeCell("GENDER")).toHaveTextContent("Set by NYS codes");
+    expect(within(getTypeCell("GENDER")).queryByRole("textbox")).toBeNull();
   });
 });

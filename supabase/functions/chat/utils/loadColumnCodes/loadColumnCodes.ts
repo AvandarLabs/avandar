@@ -3,32 +3,48 @@ import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 
 /**
  * Each binding with the dictionary, entry, and code list it names, embedded
- * through the binding's foreign keys. Row level security applies to every
- * embedded table, so a reader who cannot see a dictionary gets null.
+ * through the binding's foreign keys, plus what a conversion pins. Row level
+ * security applies to every embedded table, so a reader who cannot see a
+ * dictionary gets null.
  */
 const BINDING_SELECT =
-  "dataset_column_id, mode, direction, dictionary:data_dictionaries(id, name), entry:data_dictionaries__entries(id, name, description), code_list:data_dictionaries__code_lists(id, name, is_ordered, pairs)";
+  "id, dataset_column_id, mode, direction, keeps_original, pinned_pairs, pinned_is_ordered, applied_dictionary_version, dictionary:data_dictionaries(id, name, version), entry:data_dictionaries__entries(id, name, description), code_list:data_dictionaries__code_lists(id, name, is_ordered, pairs)";
 
-async function _readColumnCodes(
+async function _readBindingRows(
   options: Readonly<{ supabaseClient: AvaSupabaseClient; workspaceId: string }>,
-): Promise<Map<string, ColumnCodes.T>> {
+) {
   const { data } = await options.supabaseClient
     .from("dataset_columns__dictionary_bindings")
     .select(BINDING_SELECT)
     .eq("workspace_id", options.workspaceId)
     .throwOnError();
-  const rows = data ?? [];
-  return ColumnCodes.fromRows({
-    bindings: rows.map((row) => {
-      return {
-        datasetColumnId: row.dataset_column_id,
-        dictionaryId: row.dictionary?.id,
-        entryId: row.entry?.id,
-        codeListId: row.code_list?.id,
-        mode: row.mode,
-        direction: row.direction,
-      };
-    }),
+  return data ?? [];
+}
+
+type BindingRow = Awaited<ReturnType<typeof _readBindingRows>>[number];
+
+function _toBinding(row: BindingRow): ColumnCodes.Rows["bindings"][number] {
+  return {
+    id: row.id,
+    datasetColumnId: row.dataset_column_id,
+    dictionaryId: row.dictionary?.id,
+    entryId: row.entry?.id,
+    codeListId: row.code_list?.id,
+    mode: row.mode,
+    direction: row.direction,
+    keepsOriginal: row.keeps_original,
+    pinnedPairs:
+      row.pinned_pairs === null
+        ? undefined
+        : ColumnCodes.fromStoredPairs(row.pinned_pairs),
+    pinnedIsOrdered: row.pinned_is_ordered ?? undefined,
+    appliedDictionaryVersion: row.applied_dictionary_version,
+  };
+}
+
+function _toRows(rows: readonly BindingRow[]): ColumnCodes.Rows {
+  return {
+    bindings: rows.map(_toBinding),
     dictionaries: rows.flatMap((row) => {
       return row.dictionary ? [row.dictionary] : [];
     }),
@@ -49,7 +65,13 @@ async function _readColumnCodes(
           ]
         : [];
     }),
-  });
+  };
+}
+
+async function _readColumnCodes(
+  options: Readonly<{ supabaseClient: AvaSupabaseClient; workspaceId: string }>,
+): Promise<Map<string, ColumnCodes.T>> {
+  return ColumnCodes.fromRows(_toRows(await _readBindingRows(options)));
 }
 
 /**

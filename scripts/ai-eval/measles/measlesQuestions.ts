@@ -52,8 +52,9 @@ const NOT_A_QUERY: EvalQuestion["grade"] = () => {
 };
 
 /**
- * Questions about coded columns, asked in labels, over the measles line
- * list. Run with `--workspace measles`.
+ * Questions about coded columns, asked in labels: D over the coded line
+ * list, E over its linked dataset converted to labels. Run with
+ * `--workspace measles`.
  */
 export const MEASLES_QUESTIONS: readonly EvalQuestion[] = [
   {
@@ -90,5 +91,38 @@ export const MEASLES_QUESTIONS: readonly EvalQuestion[] = [
     truth: {},
     gradeText: gradeNoLabelAnswer,
     grade: NOT_A_QUERY,
+  },
+  {
+    id: "E01",
+    category: "coded",
+    prompt:
+      "In the labeled line list, how many female cases were hospitalized?",
+    clarification: "not_needed",
+    truth: {
+      count: `SELECT count(*) FROM labeled_line_list WHERE "GENDER" = 'Female' AND "hosp_yn" = 'Yes'`,
+    },
+    grade: _hasCount,
+  },
+  {
+    id: "E02",
+    category: "coded",
+    prompt:
+      "In the labeled line list, how many cases had a lower-middle socioeconomic status?",
+    clarification: "not_needed",
+    truth: {
+      count: `SELECT count(*) FROM labeled_line_list WHERE "ses_cat" = 'Lower-middle'`,
+    },
+    grade: _hasCount,
+  },
+  {
+    id: "E03",
+    category: "coded",
+    prompt:
+      "In the labeled line list, how many cases had an upper-middle or high socioeconomic status?",
+    clarification: "not_needed",
+    truth: {
+      count: `SELECT count(*) FROM labeled_line_list WHERE "ses_cat" IN ('Upper-middle', 'High')`,
+    },
+    grade: _hasCount,
   },
 ];

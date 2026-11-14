@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
 import type {
+  DictionaryBindingAddedPair,
   DictionaryBindingApplyErrorHint,
   DictionaryBindingDirection,
   DictionaryBindingId,
   DictionaryBindingInput,
   DictionaryBindingMode,
   DictionaryBindingModel,
+  DictionaryBindingValueOverride,
 } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding.types.ts";
 
 export { DictionaryBindingParsers } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBindingParsers.ts";
@@ -29,6 +31,12 @@ export namespace DictionaryBinding {
   /** One column's binding as the apply RPC takes it. */
   export type Input = DictionaryBindingInput;
 
-  /** Why the apply RPC refused an apply. */
+  /** How one unmatched value is resolved in a converted column. */
+  export type ValueOverride = DictionaryBindingValueOverride;
+
+  /** A value added to a code list while applying. */
+  export type AddedPair = DictionaryBindingAddedPair;
+
+  /** Why an apply RPC refused. */
   export type ApplyErrorHint = DictionaryBindingApplyErrorHint;
 }

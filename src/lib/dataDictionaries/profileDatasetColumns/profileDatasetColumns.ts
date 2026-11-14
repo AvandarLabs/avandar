@@ -1,4 +1,5 @@
 import { prop } from "@avandar/utils";
+import { getRawValuesViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { ColumnProfileSql } from "@/lib/dataDictionaries/ColumnProfileSql/ColumnProfileSql";
 import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
@@ -14,6 +15,7 @@ async function _readValueRows(
     workspaceId: Workspace.Id;
     dataset: Readonly<{ id: Dataset.Id }>;
     listedColumns: ReadonlyArray<{ index: number; name: string }>;
+    relationName: string;
   }>,
 ): Promise<ColumnValueRow[]> {
   const { dataset, listedColumns } = options;
@@ -27,6 +29,7 @@ async function _readValueRows(
     },
     rawSql: ColumnProfileSql.buildValuesSql({
       datasetId: dataset.id,
+      relationName: options.relationName,
       columns: listedColumns,
     }),
   });
@@ -38,19 +41,28 @@ async function _readValueRows(
  * layer, so it works for any dataset the workspace can query, offline-only
  * ones included. Rows stay in DuckDB; only counts, ranges, and the values
  * of short columns come back. Used when a dictionary is learned from
- * datasets.
+ * datasets. With `readsRawValues`, a converted dataset is read as stored,
+ * which is what matching it against dictionaries needs.
  */
 export async function profileDatasetColumns(
   options: Readonly<{
     workspaceId: Workspace.Id;
     dataset: Readonly<{ id: Dataset.Id; name: string }>;
     columns: readonly ProfiledColumn[];
+    /**
+     * Read the values as stored, through the dataset's raw-values view,
+     * rather than as its conversions show them.
+     */
+    readsRawValues?: boolean;
   }>,
 ): Promise<ColumnProfile.T[]> {
   const { workspaceId, dataset, columns } = options;
   if (columns.length === 0) {
     return [];
   }
+  const relationName = options.readsRawValues
+    ? getRawValuesViewName(dataset.id)
+    : dataset.id;
   const summary = await WorkspaceQuerySession.runQuery({
     workspaceId,
     neededColumnsByDatasetId: {
@@ -58,6 +70,7 @@ export async function profileDatasetColumns(
     },
     rawSql: ColumnProfileSql.buildSummarySql({
       datasetId: dataset.id,
+      relationName,
       columns,
     }),
   });
@@ -74,6 +87,7 @@ export async function profileDatasetColumns(
     workspaceId,
     dataset,
     listedColumns,
+    relationName,
   });
   return ColumnProfileSql.makeColumnProfilesFromRows({
     dataset,

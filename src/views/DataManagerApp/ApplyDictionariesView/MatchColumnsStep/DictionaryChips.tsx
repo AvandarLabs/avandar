@@ -11,6 +11,8 @@ type Props = {
   dictionaries: readonly DataDictionary.T[];
   onAdd: (dictionaryId: DataDictionary.Id) => void;
   onRemove: (dictionaryId: DataDictionary.Id) => void;
+  /** Controls on the band's trailing edge, such as Convert all. */
+  end?: ReactNode;
 };
 
 /** One dictionary in use, with a button to stop using it. */
@@ -47,33 +49,42 @@ export function DictionaryChips({
   dictionaries,
   onAdd,
   onRemove,
+  end,
 }: Readonly<Props>): ReactNode {
   const available = dictionaries.filter((dictionary) => {
     return !dictionaryIds.includes(dictionary.id);
   });
   return (
-    <Group gap="xs" className={css.matchColumnsChips}>
-      <Text size="sm" c="dimmed">
-        <Trans>Using</Trans>
-      </Text>
-      {dictionaryIds.map((dictionaryId) => {
-        const name =
-          dictionaries.find((dictionary) => {
-            return dictionary.id === dictionaryId;
-          })?.name ?? "";
-        return (
-          <DictionaryChip
-            key={dictionaryId}
-            name={name}
-            onRemove={() => {
-              onRemove(dictionaryId);
-            }}
-          />
-        );
-      })}
-      {available.length > 0 ? (
-        <AddDictionaryMenu available={available} onAdd={onAdd} />
-      ) : null}
+    <Group
+      gap="sm"
+      justify="space-between"
+      wrap="nowrap"
+      className={css.matchColumnsChips}
+    >
+      <Group gap="xs">
+        <Text size="sm" c="dimmed">
+          <Trans>Using</Trans>
+        </Text>
+        {dictionaryIds.map((dictionaryId) => {
+          const name =
+            dictionaries.find((dictionary) => {
+              return dictionary.id === dictionaryId;
+            })?.name ?? "";
+          return (
+            <DictionaryChip
+              key={dictionaryId}
+              name={name}
+              onRemove={() => {
+                onRemove(dictionaryId);
+              }}
+            />
+          );
+        })}
+        {available.length > 0 ? (
+          <AddDictionaryMenu available={available} onAdd={onAdd} />
+        ) : null}
+      </Group>
+      {end}
     </Group>
   );
 }

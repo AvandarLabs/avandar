@@ -9,13 +9,19 @@ type Props = {
   pickedCount: number;
   removedCount: number;
   isAttaching: boolean;
+  /**
+   * Nothing can be sent yet: the unmatched values are still being read, or
+   * two values add one code to a list.
+   */
+  isBlocked: boolean;
   onBack: () => void;
   onAttach: () => void;
 };
 
 /**
- * Back, and the button that attaches the picks. With nothing picked but
- * bindings to drop, the button says it removes them instead.
+ * Back to Unmatched values, and the button that attaches the picks. With
+ * nothing picked but bindings to drop, the button says it removes them
+ * instead.
  */
 export function AttachFooter(props: Readonly<Props>): ReactNode {
   const { t } = useLingui();
@@ -32,7 +38,10 @@ export function AttachFooter(props: Readonly<Props>): ReactNode {
       <OfflineGated>
         <Button
           loading={props.isAttaching}
-          disabled={props.pickedCount === 0 && props.removedCount === 0}
+          disabled={
+            props.isBlocked ||
+            (props.pickedCount === 0 && props.removedCount === 0)
+          }
           onClick={props.onAttach}
         >
           {isRemovingOnly

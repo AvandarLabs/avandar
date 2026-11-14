@@ -32,6 +32,11 @@ const GENDER_CODES: ColumnCodes.T = {
   codeListName: "Sex (1/2/9)",
   isOrdered: false,
   mode: "reference",
+  keepsOriginal: false,
+  isPinned: false,
+  appliedDictionaryVersion: 1,
+  currentDictionaryVersion: 1,
+  isSourceDeleted: false,
 };
 const CODES = new Map([["GENDER", GENDER_CODES]]);
 

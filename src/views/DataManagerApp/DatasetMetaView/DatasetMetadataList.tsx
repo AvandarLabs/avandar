@@ -10,6 +10,7 @@ import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { notifySuccess } from "@/utils/notifications/notify";
 import { BoundColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/BoundColumnName";
+import { ConvertedTypeNote } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/ConvertedTypeNote";
 import { EntryDescription } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/EntryDescription";
 import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
@@ -121,7 +122,11 @@ export function DatasetMetadataList({
                 const columnName = String(name);
                 const codes = columnCodesByName.get(columnName);
                 return codes ? (
-                  <BoundColumnName name={columnName} codes={codes} />
+                  <BoundColumnName
+                    name={columnName}
+                    codes={codes}
+                    datasetId={dataset.id}
+                  />
                 ) : undefined;
               },
             },
@@ -148,8 +153,22 @@ export function DatasetMetadataList({
               },
               // The translated counterpart, not `toDisplayValue`: this cell is
               // read by the user, and the untranslated identifier would show
-              // English in every locale.
-              renderValue: avaDataTypeLabel,
+              // English in every locale. A converted column's type follows
+              // its conversion, so it is shown, never edited.
+              renderValue: (dataType, _rootData, column) => {
+                const codes = columnCodesByName.get(column.name);
+                return codes?.mode === "convert" ? (
+                  <ConvertedTypeNote dataType={dataType} codes={codes} />
+                ) : (
+                  avaDataTypeLabel(dataType)
+                );
+              },
+              renderEditableValue: (dataType, _rootData, column) => {
+                const codes = columnCodesByName.get(column.name);
+                return codes?.mode === "convert" ? (
+                  <ConvertedTypeNote dataType={dataType} codes={codes} />
+                ) : undefined;
+              },
             },
           },
         }}

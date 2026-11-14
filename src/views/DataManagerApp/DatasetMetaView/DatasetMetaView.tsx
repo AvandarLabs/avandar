@@ -18,6 +18,7 @@ import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { useDatasetColumnCodes } from "@/hooks/dataDictionaries/useDatasetColumnCodes/useDatasetColumnCodes";
 import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
+import { useLinkedDatasets } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -29,6 +30,7 @@ import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/Datase
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
+import { toColumnsInTableOrder } from "@/views/DataManagerApp/DatasetMetaView/toColumnsInTableOrder/toColumnsInTableOrder";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -77,12 +79,16 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
       numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
       workspaceId: workspace.id,
     });
-  const [datasetColumns, isLoadingDatasetColumns] =
+  const [unorderedDatasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
+  const datasetColumns = useMemo(() => {
+    return toColumnsInTableOrder(unorderedDatasetColumns);
+  }, [unorderedDatasetColumns]);
   const columnCodes = useDatasetColumnCodes({
     datasetId: dataset.id,
     columns: datasetColumns,
   });
+  const { linkedDatasets } = useLinkedDatasets(dataset.id);
   const [datasetMeta, isLoadingDatasetMeta] =
     DatasetQueryClient.useGetDatasetMeta({
       datasetId: dataset.id,
@@ -189,6 +195,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
         dataset={dataset}
         source={datasetWithColumnsAndSource.source}
         columnCodes={columnCodes.byColumnId}
+        linkedDatasets={linkedDatasets}
       />
     );
 

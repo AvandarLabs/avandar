@@ -3,12 +3,15 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Menu, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { DataDictionaryClient } from "@/clients/dataDictionaries/DataDictionaryClient/DataDictionaryClient";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { POPOVER_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
+import { invalidateAfterDictionaryDelete } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryActionsMenu/invalidateAfterDictionaryDelete/invalidateAfterDictionaryDelete";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { ReactNode } from "react";
 
@@ -20,11 +23,16 @@ type Props = {
 function useDeleteDictionary(dictionary: DataDictionary.T): () => void {
   const { t } = useLingui();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const workspace = useCurrentWorkspace();
   const dictionaryName = dictionary.name;
   const [deleteDictionary] = DataDictionaryClient.useDelete({
-    queryToInvalidate: DataDictionaryClient.QueryKeys.getAll(),
     onSuccess: () => {
+      invalidateAfterDictionaryDelete(queryClient).catch((error: unknown) => {
+        Logger.error(error, {
+          devMsg: "Refreshing after a dictionary delete failed",
+        });
+      });
       navigate(AppLinks.dataManagerHome(workspace.slug));
       notifySuccess({
         title: t`Dictionary deleted`,

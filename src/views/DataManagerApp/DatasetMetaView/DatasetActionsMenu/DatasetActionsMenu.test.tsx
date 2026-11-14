@@ -13,6 +13,7 @@ const { navigateMock, permissionState } = vi.hoisted(() => {
       canEditDataset: true,
       hasBindings: false,
       hasBindingsError: false,
+      isLoadingLinkedDatasets: false,
     },
   };
 });
@@ -81,6 +82,17 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
   };
 });
 
+vi.mock("@/hooks/datasets/useLinkedDatasets/useLinkedDatasets", () => {
+  return {
+    useLinkedDatasets: () => {
+      return {
+        linkedDatasets: [],
+        isLoading: permissionState.isLoadingLinkedDatasets,
+      };
+    },
+  };
+});
+
 vi.mock(
   "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetRefreshMenuItem",
   () => {
@@ -116,6 +128,7 @@ describe("DatasetActionsMenu", () => {
     permissionState.canEditDataset = true;
     permissionState.hasBindings = false;
     permissionState.hasBindingsError = false;
+    permissionState.isLoadingLinkedDatasets = false;
   });
 
   it("opens learning a dictionary from this dataset", async () => {
@@ -167,6 +180,16 @@ describe("DatasetActionsMenu", () => {
     );
   });
 
+  it("says Apply turns codes into labels", async () => {
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+    expect(
+      await screen.findByRole("menuitem", { name: /Apply a dictionary/ }),
+    ).toHaveTextContent("Turn codes into labels and add column descriptions");
+  });
+
   it("does not offer Apply to someone who cannot edit the dataset", async () => {
     permissionState.canEditDataset = false;
     render(<DatasetActionsMenu dataset={DATASET} />);
@@ -211,5 +234,17 @@ describe("DatasetActionsMenu", () => {
         name: /Create a dictionary from this dataset/,
       }),
     ).toBeNull();
+  });
+
+  it("keeps Delete disabled until the linked datasets are known", async () => {
+    permissionState.isLoadingLinkedDatasets = true;
+    render(<DatasetActionsMenu dataset={DATASET} />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "More dataset actions" }),
+    );
+
+    expect(
+      await screen.findByRole("menuitem", { name: /Delete Dataset/ }),
+    ).toBeDisabled();
   });
 });

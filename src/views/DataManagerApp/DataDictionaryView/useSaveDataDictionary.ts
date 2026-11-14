@@ -6,8 +6,10 @@ import { DataDictionaryCodeListClient } from "@/clients/dataDictionaries/DataDic
 import { DataDictionaryEntryClient } from "@/clients/dataDictionaries/DataDictionaryEntryClient";
 import { DataDictionaryEntryCodingClient } from "@/clients/dataDictionaries/DataDictionaryEntryCodingClient";
 import { DictionaryBindingClient } from "@/clients/dataDictionaries/DictionaryBindingClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { Logger } from "@/utils/Logger";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { invalidateDatasetRowQueries } from "@/views/DataManagerApp/DatasetMetaView/invalidateDatasetRowQueries/invalidateDatasetRowQueries";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 
 type SaveDataDictionary = {
@@ -29,8 +31,9 @@ type SaveDataDictionary = {
 
 /**
  * Saves a dictionary's contents in one call, then refreshes the dictionary,
- * its entries, code lists, and codings, and the dataset bindings, which
- * removing an entry or code list changes.
+ * its entries, code lists, and codings, the dataset bindings, which removing
+ * an entry or code list changes, and the datasets' columns and shown rows,
+ * which a converted column's live list changes.
  *
  * A failure is logged, not toasted: the save bar shows it as translated
  * copy next to the Save button.
@@ -58,12 +61,14 @@ export function useSaveDataDictionary(
             DataDictionaryCodeListClient,
             DataDictionaryEntryCodingClient,
             DictionaryBindingClient,
+            DatasetColumnClient,
           ].map((client) => {
             return queryClient.invalidateQueries({
               queryKey: [client.getClientName()],
             });
           }),
         );
+        await invalidateDatasetRowQueries(queryClient);
         notifySuccess(t`Dictionary saved`);
       },
       onError: (error) => {

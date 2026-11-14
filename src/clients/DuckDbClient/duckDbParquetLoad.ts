@@ -1,9 +1,13 @@
+import { promiseMapSequential } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { uuid } from "$/lib/uuid";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import { registerParquetFile } from "@/clients/DuckDbClient/duckDbFileRegistry";
 import {
+  getKeptEnumValuesQueries,
   getParquetProjectionClauses,
+  getRawValuesViewName,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
 import { getLoadedDuckDbTableShape } from "@/clients/DuckDbClient/duckDbTableIntrospection";
@@ -15,15 +19,22 @@ import type {
 } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type * as duckdb from "@duckdb/duckdb-wasm";
 
+/** What every statement of one load runs with. */
+type ViewLoadContext = Readonly<{
+  client: DuckDbClientOperations;
+  conn: duckdb.AsyncDuckDBConnection;
+  datasetDuckDbLease: DatasetDuckDbLease;
+  tableName: string;
+}>;
+
+/** A view's `EXCLUDE` and replacement clauses. */
+type ProjectionClauses = Readonly<{
+  excludeClause: string;
+  replaceClause: string;
+}>;
+
 async function _createParquetView(
-  options: Readonly<{
-    client: DuckDbClientOperations;
-    conn: duckdb.AsyncDuckDBConnection;
-    datasetDuckDbLease: DatasetDuckDbLease;
-    excludeClause: string;
-    replaceClause: string;
-    tableName: string;
-  }>,
+  options: ViewLoadContext & ProjectionClauses,
 ): Promise<void> {
   await options.conn.query("SET enable_external_file_cache = false");
   try {
@@ -48,35 +59,29 @@ async function _createParquetView(
 }
 
 /**
- * Creates the auxiliary view that exposes the parquet file's physical row
- * order, beside the dataset's public view and over the same registered file.
- *
- * It carries the same projection as the public view so column names agree, plus
- * `file_row_number`, which `SELECT *` picks up automatically once
- * `file_row_number = true` is set. Dropped in `loadParquetIntoDuckDb` alongside
- * the public view, so the two never outlive each other.
+ * Creates an auxiliary view beside the dataset's public view and over the
+ * same registered file: `ava_rows_<id>`, with the public view's projection
+ * plus `file_row_number`, which `SELECT *` picks up once
+ * `file_row_number = true` is set, or `ava_raw_<id>`, with the renames and
+ * casts but none of the conversions.
  */
-async function _createRowNumberedView(
-  options: Readonly<{
-    client: DuckDbClientOperations;
-    conn: duckdb.AsyncDuckDBConnection;
-    datasetDuckDbLease: DatasetDuckDbLease;
-    excludeClause: string;
-    replaceClause: string;
-    tableName: string;
-  }>,
+async function _createAuxiliaryView(
+  options: ViewLoadContext &
+    ProjectionClauses &
+    Readonly<{ viewName: string; readParquetOptions: string }>,
 ): Promise<void> {
   await options.client.runRawQuery(
     `CREATE VIEW IF NOT EXISTS "$viewName$" AS
     SELECT * $excludeClause$ $replaceClause$
-    FROM read_parquet("$tableName$", file_row_number = true)`,
+    FROM read_parquet("$tableName$"$readParquetOptions$)`,
     {
       conn: options.conn,
       datasetDuckDbLease: options.datasetDuckDbLease,
       [TRUSTED_INTERNAL_SQL]: true,
       params: {
-        viewName: getRowNumberedViewName(options.tableName),
+        viewName: options.viewName,
         tableName: options.tableName,
+        readParquetOptions: options.readParquetOptions,
         replaceClause: options.replaceClause,
         excludeClause: options.excludeClause,
       },
@@ -85,35 +90,100 @@ async function _createRowNumberedView(
 }
 
 /**
- * Drops the auxiliary row-numbered view.
+ * Drops an auxiliary view.
  *
  * Deliberately a plain `DROP VIEW`, not `client.dropTableViewAndFile`: that
  * helper treats its argument as a dataset id when it takes the coordinator
- * lease, and an `ava_rows_` name is not one. There is also no registered file
- * of its own to drop, because it reads the dataset's file.
+ * lease, and an `ava_rows_` or `ava_raw_` name is not one. There is also no
+ * registered file of its own to drop, because it reads the dataset's file.
  *
- * KNOWN GAP, deliberate: this load path is the view's only lifecycle owner, so
- * a dataset dropped through `dropTableViewAndFile` and never reloaded leaves an
- * orphan view over a dropped file. Adding the drop to that shared helper was
- * tried and reverted: it changed the drop sequence every dataset drop goes
- * through and broke four leasing tests, which is too much risk for an orphan
- * that only fails if something queries it, and only the concept view ever
- * names one. Fix it with the spine caching work, which needs this lifecycle
- * anyway.
+ * KNOWN GAP, deliberate: this load path is the auxiliary views' only
+ * lifecycle owner, so a dataset dropped through `dropTableViewAndFile` and
+ * never reloaded leaves orphan views over a dropped file. Adding the drop to
+ * that shared helper was tried and reverted: it changed the drop sequence
+ * every dataset drop goes through and broke four leasing tests, which is too
+ * much risk for an orphan that only fails if something queries it. Fix it
+ * with the spine caching work, which needs this lifecycle anyway.
  */
-async function _dropRowNumberedView(
-  options: Readonly<{
-    client: DuckDbClientOperations;
-    conn: duckdb.AsyncDuckDBConnection;
-    datasetDuckDbLease: DatasetDuckDbLease;
-    tableName: string;
-  }>,
+async function _dropAuxiliaryView(
+  options: ViewLoadContext & Readonly<{ viewName: string }>,
 ): Promise<void> {
   await options.client.runRawQuery(`DROP VIEW IF EXISTS "$viewName$"`, {
     conn: options.conn,
     datasetDuckDbLease: options.datasetDuckDbLease,
     [TRUSTED_INTERNAL_SQL]: true,
-    params: { viewName: getRowNumberedViewName(options.tableName) },
+    params: { viewName: options.viewName },
+  });
+}
+
+/**
+ * Reads, from the registered file, the values each ordered column's
+ * conversion keeps beside its labels, by original column name. They
+ * complete the column's `ENUM`, so the view's cast never meets a value it
+ * lacks. Run one at a time on the load's own connection.
+ */
+async function _readKeptEnumValues(
+  options: ViewLoadContext &
+    Readonly<{
+      columnReplacements: DuckDbLoadParquetOptions["columnReplacements"];
+    }>,
+): Promise<Record<string, string[]>> {
+  const queries = getKeptEnumValuesQueries({
+    columnReplacements: options.columnReplacements,
+    relationSql: `read_parquet(${quoteSqlIdentifier(options.tableName)})`,
+  });
+  const entries = await promiseMapSequential(queries, async (query) => {
+    const { data } = await options.client.runRawQuery<{ kept_value: string }>(
+      query.sql,
+      {
+        conn: options.conn,
+        datasetDuckDbLease: options.datasetDuckDbLease,
+        [TRUSTED_INTERNAL_SQL]: true,
+      },
+    );
+    const keptValues = data.map((row) => {
+      return String(row.kept_value);
+    });
+    return [query.columnName, keptValues] as const;
+  });
+  return Object.fromEntries(entries);
+}
+
+/**
+ * Creates the dataset's public view and recreates its two auxiliary views
+ * over the registered file. The auxiliary views are recreated with the
+ * public view rather than left behind, so a reloaded dataset can never be
+ * ordered by a stale row order or profiled through stale casts.
+ */
+async function _createRelationViews(
+  options: ViewLoadContext &
+    Readonly<{
+      columnReplacements: DuckDbLoadParquetOptions["columnReplacements"];
+    }>,
+): Promise<void> {
+  const { columnReplacements, ...context } = options;
+  const keptValuesByColumn = await _readKeptEnumValues(options);
+  const projectionClauses = getParquetProjectionClauses(columnReplacements, {
+    keptValuesByColumn,
+  });
+  await _createParquetView({ ...context, ...projectionClauses });
+  const rowsViewName = getRowNumberedViewName(context.tableName);
+  await _dropAuxiliaryView({ ...context, viewName: rowsViewName });
+  await _createAuxiliaryView({
+    ...context,
+    ...projectionClauses,
+    viewName: rowsViewName,
+    readParquetOptions: ", file_row_number = true",
+  });
+  const rawViewName = getRawValuesViewName(context.tableName);
+  await _dropAuxiliaryView({ ...context, viewName: rawViewName });
+  await _createAuxiliaryView({
+    ...context,
+    ...getParquetProjectionClauses(columnReplacements, {
+      omitsValueMappings: true,
+    }),
+    viewName: rawViewName,
+    readParquetOptions: "",
   });
 }
 
@@ -137,7 +207,8 @@ async function _getParquetLoadResult(
 }
 
 /**
- * Registers a parquet blob and exposes it as the dataset's bare DuckDB view.
+ * Registers a parquet blob and exposes it as the dataset's bare DuckDB view,
+ * plus its `ava_rows_` and `ava_raw_` views.
  *
  * The caller must already hold the dataset's DuckDB lease.
  */
@@ -159,28 +230,12 @@ export async function loadParquetIntoDuckDb(
 
   const conn = await client.connect();
   try {
-    const projectionClauses = getParquetProjectionClauses(columnReplacements);
-    await _createParquetView({
+    await _createRelationViews({
       client,
       conn,
       datasetDuckDbLease: options.datasetDuckDbLease,
       tableName,
-      ...projectionClauses,
-    });
-    // The row-numbered view is recreated with the public view rather than left
-    // behind, so a reloaded dataset can never be ordered by a stale row order.
-    await _dropRowNumberedView({
-      client,
-      conn,
-      datasetDuckDbLease: options.datasetDuckDbLease,
-      tableName,
-    });
-    await _createRowNumberedView({
-      client,
-      conn,
-      datasetDuckDbLease: options.datasetDuckDbLease,
-      tableName,
-      ...projectionClauses,
+      columnReplacements,
     });
     return await _getParquetLoadResult({
       client,

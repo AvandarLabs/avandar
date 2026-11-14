@@ -15,7 +15,10 @@ import type { WorkspaceDictionaryContents } from "@/views/DataManagerApp/ApplyDi
 /** Everything the apply flow reads before matching. */
 export type ApplyDictionariesData = WorkspaceDictionaryContents & {
   dataset: Dataset.T | undefined;
-  /** Sorted by the dataset's column order. Undefined while loading. */
+  /**
+   * In the dataset's column order, without keep-original copies. Undefined
+   * while loading.
+   */
   columns: readonly DatasetColumn.T[] | undefined;
   existingBindings: readonly DictionaryBinding.T[];
   /** Every entry of every dictionary, ready to match. */
@@ -41,11 +44,15 @@ function useDatasetWithBindings(datasetId: Dataset.Id): {
   const [bindings, , bindingsQuery] =
     DictionaryBindingClient.useGetAll(ofDataset);
   const sortedColumns = useMemo(() => {
+    // A `<column>_original` copy is part of its column's conversion, not a
+    // column to apply a dictionary to.
     return columns
-      ? [...columns].sort((columnA, columnB) => {
-          return columnA.columnIdx - columnB.columnIdx;
-        })
-      : undefined;
+      ?.filter((column) => {
+        return column.dictionaryBindingId === undefined;
+      })
+      .sort((columnA, columnB) => {
+        return columnA.columnIdx - columnB.columnIdx;
+      });
   }, [columns]);
   return {
     dataset,

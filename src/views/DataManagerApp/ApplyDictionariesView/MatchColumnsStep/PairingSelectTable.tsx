@@ -4,6 +4,7 @@ import { Select, Table, Text } from "@mantine/core";
 import { toColumnPick } from "@/views/DataManagerApp/ApplyDictionariesView/applyDefaults/applyDefaults";
 import { ColumnNameCell } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/ColumnNameCell";
 import css from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/MatchColumnsStep.module.css";
+import { ValuesCell } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/PairingTable";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { DictionaryMatch } from "$/models/dataDictionaries/DictionaryMatch/DictionaryMatch";
 import type {
@@ -11,6 +12,7 @@ import type {
   ApplyDictionariesState,
   ColumnPick,
 } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
+import type { ConversionCopy } from "@/views/DataManagerApp/ApplyDictionariesView/MatchColumnsStep/useConversionCopy";
 import type { ApplyColumnRow } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyFlow";
 import type { Dispatch, ReactNode } from "react";
 
@@ -18,6 +20,7 @@ type Props = {
   rows: readonly ApplyColumnRow[];
   dictionaries: ReadonlyArray<Pick<DataDictionary.T, "id" | "name">>;
   state: ApplyDictionariesState;
+  copy: ConversionCopy;
   dispatch: Dispatch<ApplyDictionariesAction>;
 };
 
@@ -134,6 +137,15 @@ function SelectRow(
           <OtherMatchesText row={row} />
         </Text>
       </Table.Td>
+      <Table.Td>
+        <ValuesCell
+          columnId={columnId}
+          nameId={`apply-column-${columnId}`}
+          pick={pick}
+          copy={props.copy}
+          dispatch={dispatch}
+        />
+      </Table.Td>
     </Table.Tr>
   );
 }
@@ -156,6 +168,9 @@ export function PairingSelectTable(props: Readonly<Props>): ReactNode {
           </Table.Th>
           <Table.Th w="18%">
             <Trans>Other matches</Trans>
+          </Table.Th>
+          <Table.Th w="8.5rem">
+            <Trans>Values</Trans>
           </Table.Th>
         </Table.Tr>
       </Table.Thead>

@@ -12,9 +12,8 @@ type Props = {
 };
 
 /**
- * The datasets a dictionary is applied to and how. Applying it as reference
- * never changes the data and always shows the dictionary's latest version,
- * so every row is up to date.
+ * The datasets a dictionary is applied to, how each uses it, and whether a
+ * dataset changed in place is behind the dictionary's current version.
  */
 export function DictionaryUsedByTab({ usage }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
@@ -51,5 +50,5 @@ export function DictionaryUsedByTab({ usage }: Readonly<Props>): ReactNode {
       />
     );
   }
-  return <DictionaryUsedByTable rows={usage.rows} />;
+  return <DictionaryUsedByTable usage={usage} />;
 }

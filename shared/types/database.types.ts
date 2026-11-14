@@ -1320,6 +1320,7 @@ export type Database = {
           dataset_id: string
           description: string | null
           detected_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          dictionary_binding_id: string | null
           id: string
           name: string
           original_data_type: string
@@ -1334,6 +1335,7 @@ export type Database = {
           dataset_id: string
           description?: string | null
           detected_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          dictionary_binding_id?: string | null
           id?: string
           name: string
           original_data_type: string
@@ -1348,6 +1350,7 @@ export type Database = {
           dataset_id?: string
           description?: string | null
           detected_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          dictionary_binding_id?: string | null
           id?: string
           name?: string
           original_data_type?: string
@@ -1361,6 +1364,13 @@ export type Database = {
             columns: ["dataset_id"]
             isOneToOne: false
             referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dataset_columns_dictionary_binding_id_fkey"
+            columns: ["dictionary_binding_id"]
+            isOneToOne: false
+            referencedRelation: "dataset_columns__dictionary_bindings"
             referencedColumns: ["id"]
           },
           {
@@ -1383,8 +1393,15 @@ export type Database = {
           direction: Database["public"]["Enums"]["dataset_columns__binding_direction"]
           entry_id: string | null
           id: string
+          keeps_original: boolean
           mode: Database["public"]["Enums"]["dataset_columns__binding_mode"]
+          pinned_is_ordered: boolean | null
+          pinned_pairs: Json | null
+          replaced_data_type:
+            | Database["public"]["Enums"]["datasets__ava_data_type"]
+            | null
           updated_at: string
+          value_overrides: Json
           workspace_id: string
         }
         Insert: {
@@ -1397,8 +1414,15 @@ export type Database = {
           direction?: Database["public"]["Enums"]["dataset_columns__binding_direction"]
           entry_id?: string | null
           id?: string
+          keeps_original?: boolean
           mode?: Database["public"]["Enums"]["dataset_columns__binding_mode"]
+          pinned_is_ordered?: boolean | null
+          pinned_pairs?: Json | null
+          replaced_data_type?:
+            | Database["public"]["Enums"]["datasets__ava_data_type"]
+            | null
           updated_at?: string
+          value_overrides?: Json
           workspace_id: string
         }
         Update: {
@@ -1411,8 +1435,15 @@ export type Database = {
           direction?: Database["public"]["Enums"]["dataset_columns__binding_direction"]
           entry_id?: string | null
           id?: string
+          keeps_original?: boolean
           mode?: Database["public"]["Enums"]["dataset_columns__binding_mode"]
+          pinned_is_ordered?: boolean | null
+          pinned_pairs?: Json | null
+          replaced_data_type?:
+            | Database["public"]["Enums"]["datasets__ava_data_type"]
+            | null
           updated_at?: string
+          value_overrides?: Json
           workspace_id?: string
         }
         Relationships: [
@@ -1819,6 +1850,7 @@ export type Database = {
           dataset_id: string
           id: string
           is_places: boolean
+          linked_source_dataset_id: string | null
           raw_sql: string
           updated_at: string
           workspace_id: string
@@ -1828,6 +1860,7 @@ export type Database = {
           dataset_id: string
           id?: string
           is_places?: boolean
+          linked_source_dataset_id?: string | null
           raw_sql: string
           updated_at?: string
           workspace_id: string
@@ -1837,6 +1870,7 @@ export type Database = {
           dataset_id?: string
           id?: string
           is_places?: boolean
+          linked_source_dataset_id?: string | null
           raw_sql?: string
           updated_at?: string
           workspace_id?: string
@@ -1846,6 +1880,13 @@ export type Database = {
             foreignKeyName: "datasets__virtual_dataset_id_fkey"
             columns: ["dataset_id"]
             isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__virtual_linked_source_dataset_id_fkey"
+            columns: ["linked_source_dataset_id"]
+            isOneToOne: false
             referencedRelation: "datasets"
             referencedColumns: ["id"]
           },
@@ -3208,25 +3249,140 @@ export type Database = {
         }
         Returns: undefined
       }
+      dataset_columns__dictionary_bindings__add_pairs: {
+        Args: { p_added_pairs: Json; p_bindings: Json; p_workspace_id: string }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__as_reference: {
+        Args: { p_bindings: Json }
+        Returns: Json
+      }
+      dataset_columns__dictionary_bindings__authorize: {
+        Args: { p_dataset_id: string }
+        Returns: string
+      }
+      dataset_columns__dictionary_bindings__authorize_adding_pairs: {
+        Args: { p_added_pairs: Json; p_workspace_id: string }
+        Returns: undefined
+      }
       dataset_columns__dictionary_bindings__check: {
-        Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
+        Args: {
+          p_bindings: Json
+          p_dataset_id: string
+          p_is_for_linked_dataset: boolean
+          p_workspace_id: string
+        }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__check_conversion: {
+        Args: { p_bindings: Json }
         Returns: undefined
       }
       dataset_columns__dictionary_bindings__check_entries: {
         Args: { p_bindings: Json; p_workspace_id: string }
         Returns: undefined
       }
+      dataset_columns__dictionary_bindings__check_modes: {
+        Args: {
+          p_bindings: Json
+          p_dataset_id: string
+          p_is_for_linked_dataset: boolean
+        }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__check_overrides: {
+        Args: { p_bindings: Json }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__check_payload: {
+        Args: { p_bindings: Json }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__find_repointable: {
+        Args: { p_code_lists: Json; p_dictionary_id: string }
+        Returns: string[]
+      }
+      dataset_columns__dictionary_bindings__for_linked_dataset: {
+        Args: {
+          p_bindings: Json
+          p_linked_dataset_id: string
+          p_source_dataset_id: string
+        }
+        Returns: Json
+      }
+      dataset_columns__dictionary_bindings__get_output_data_type: {
+        Args: {
+          p_direction: Database["public"]["Enums"]["dataset_columns__binding_direction"]
+          p_pairs: Json
+        }
+        Returns: Database["public"]["Enums"]["datasets__ava_data_type"]
+      }
+      dataset_columns__dictionary_bindings__merge_pairs: {
+        Args: { p_added_pairs: Json }
+        Returns: Json
+      }
+      dataset_columns__dictionary_bindings__pin_live: {
+        Args: { p_binding_ids: string[] }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__repoint_reference: {
+        Args: { p_binding_ids: string[] }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__restore_types: {
+        Args: { p_bindings: Json; p_dataset_id: string }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__set_types: {
+        Args: { p_dataset_id: string }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__sync_copies: {
+        Args: { p_dataset_id: string }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__sync_live_types: {
+        Args: { p_code_list_ids: string[] }
+        Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__upsert: {
+        Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
+        Returns: undefined
+      }
       dataset_columns__dictionary_bindings__write: {
         Args: { p_bindings: Json; p_dataset_id: string; p_workspace_id: string }
         Returns: undefined
+      }
+      dataset_columns__dictionary_bindings__write_pairs: {
+        Args: { p_added_pairs: Json }
+        Returns: undefined
+      }
+      dataset_columns__get_free_name: {
+        Args: { p_base: string; p_dataset_id: string }
+        Returns: string
       }
       datasets__auth_user_may_add_column: {
         Args: { p_dataset_id: string }
         Returns: boolean
       }
+      datasets__ava_data_type_to_duckdb: {
+        Args: {
+          p_data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
+        }
+        Returns: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+      }
       datasets__is_postgres_table: {
         Args: { p_dataset_id: string }
         Returns: boolean
+      }
+      datasets__virtual__create_linked: {
+        Args: {
+          p_linked_dataset_id: string
+          p_name: string
+          p_source_dataset_id: string
+          p_workspace_id: string
+        }
+        Returns: undefined
       }
       maps__auth_user_may_select: {
         Args: { p_map_id: string }
@@ -3594,7 +3750,21 @@ export type Database = {
         Returns: number
       }
       rpc_dataset_columns__apply_dictionaries: {
-        Args: { p_bindings: Json; p_dataset_id: string }
+        Args: { p_added_pairs?: Json; p_bindings: Json; p_dataset_id: string }
+        Returns: number
+      }
+      rpc_dataset_columns__apply_dictionaries_as_linked_dataset: {
+        Args: {
+          p_added_pairs?: Json
+          p_bindings: Json
+          p_linked_dataset_id: string
+          p_linked_dataset_name: string
+          p_source_dataset_id: string
+        }
+        Returns: string
+      }
+      rpc_dataset_columns__reapply_dictionary: {
+        Args: { p_dataset_id: string; p_dictionary_id: string }
         Returns: number
       }
       rpc_datasets__add_csv_file_dataset: {
@@ -4007,6 +4177,10 @@ export type Database = {
           p_resource_type: Database["public"]["Enums"]["resource_type"]
           p_workspace_id: string
         }
+        Returns: boolean
+      }
+      util__auth_user_can_read_code_list_through_binding: {
+        Args: { p_code_list_id: string }
         Returns: boolean
       }
       util__auth_user_can_update_resource: {

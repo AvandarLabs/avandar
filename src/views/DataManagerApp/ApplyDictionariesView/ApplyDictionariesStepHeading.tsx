@@ -1,11 +1,11 @@
 import { Title, VisuallyHidden } from "@mantine/core";
 import { useEffect, useRef } from "react";
-import { useApplyStepLabels } from "@/views/DataManagerApp/ApplyDictionariesView/useApplyStepLabels";
 import type { ApplyStep } from "@/views/DataManagerApp/ApplyDictionariesView/applyDictionariesReducer/applyDictionariesReducer";
 import type { ReactNode } from "react";
 
 type Props = {
   step: ApplyStep;
+  labels: Record<ApplyStep, string>;
 };
 
 /**
@@ -16,8 +16,8 @@ type Props = {
  */
 export function ApplyDictionariesStepHeading({
   step,
+  labels,
 }: Readonly<Props>): ReactNode {
-  const labels = useApplyStepLabels();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const previousStepRef = useRef(step);
   useEffect(() => {

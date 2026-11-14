@@ -6,6 +6,25 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 const DATASET = { id: uuid<Dataset.Id>(), name: "Bronx line list" };
 
 describe("ColumnProfileSql", () => {
+  it("reads the relation it is given instead of the dataset's view", () => {
+    const datasetId = uuid<Dataset.Id>();
+    const options = {
+      datasetId,
+      relationName: `ava_raw_${datasetId}`,
+      columns: [{ name: "GENDER", dataType: "bigint" as const }],
+    };
+
+    const summarySql = ColumnProfileSql.buildSummarySql(options);
+    const valuesSql = ColumnProfileSql.buildValuesSql({
+      ...options,
+      columns: [{ index: 0, name: "GENDER" }],
+    });
+
+    expect(summarySql).toContain(`FROM "ava_raw_${datasetId}"`);
+    expect(valuesSql).toContain(`FROM "ava_raw_${datasetId}"`);
+    expect(summarySql).not.toContain(`FROM "${datasetId}"`);
+  });
+
   it("quotes hostile dataset and column names", () => {
     const sql = ColumnProfileSql.buildSummarySql({
       datasetId: DATASET.id,

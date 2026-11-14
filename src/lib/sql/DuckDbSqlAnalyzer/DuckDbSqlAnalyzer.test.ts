@@ -431,6 +431,33 @@ describe("DuckDbSqlAnalyzer/DuckDbSqlAnalyzer", () => {
     });
   });
 
+  // An `ava_raw_<datasetId>` view reads the same registered file as the
+  // dataset's public view, without its conversions, so it is a read of that
+  // dataset exactly as an `ava_rows_` view is.
+  it("reads a raw-values view as a read of the dataset it exposes", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT "GENDER", count(*) FROM "ava_raw_${DATASET_ID}" GROUP BY 1`,
+      ),
+    ).toEqual({
+      kind: "read",
+      relations: [{ kind: "dataset", id: DATASET_ID }],
+      internalTableNames: [],
+    });
+  });
+
+  it("still refuses a raw-values name that is not a dataset id", () => {
+    expect(
+      DuckDbSqlAnalyzer.getDuckDbSqlAnalysisFromSql(
+        `SELECT * FROM "ava_raw_whatever"`,
+      ),
+    ).toEqual({
+      kind: "unsafe",
+      reason: "uninspectable-source",
+      datasetIds: [],
+    });
+  });
+
   // The concept spine is deliberately not a relation name, so a statement that
   // names one cannot be analyzed. That is what forces the concept view's
   // definition to be run as trusted internal SQL, and it is also what stops raw

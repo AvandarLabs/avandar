@@ -9,49 +9,90 @@ type Props = {
   values: readonly ColumnProfile.Value[];
   pairs: readonly DataDictionaryCodeList.Pair[];
   direction: DictionaryBinding.Direction;
+  mode: DictionaryBinding.Mode;
 };
 
-/** The pair a value in the data stands for, in the column's direction. */
+/** The pair a value stands for, and whether an accepted spelling found it. */
+type FoundPair = {
+  pair: DataDictionaryCodeList.Pair;
+  isAcceptedSpelling: boolean;
+};
+
+function _isSameValue(spelling: string, key: string): boolean {
+  return (
+    spelling.trim() !== "" && ColumnProfile.getComparisonKey(spelling) === key
+  );
+}
+
 function _findPair(
   value: string,
   props: Readonly<Props>,
-): DataDictionaryCodeList.Pair | undefined {
+): FoundPair | undefined {
   const key = ColumnProfile.getComparisonKey(value);
-  return props.pairs.find((pair) => {
-    const spellings =
+  for (const pair of props.pairs) {
+    if (
       props.direction === "decode"
-        ? [pair.code]
-        : [pair.label, ...pair.acceptedSpellings];
-    return spellings.some((spelling) => {
-      return (
-        spelling.trim() !== "" &&
-        ColumnProfile.getComparisonKey(spelling) === key
-      );
-    });
-  });
+        ? _isSameValue(pair.code, key)
+        : _isSameValue(pair.label, key)
+    ) {
+      return { pair, isAcceptedSpelling: false };
+    }
+    if (
+      props.direction === "encode" &&
+      pair.acceptedSpellings.some((spelling) => {
+        return _isSameValue(spelling, key);
+      })
+    ) {
+      return { pair, isAcceptedSpelling: true };
+    }
+  }
+  return undefined;
+}
+
+function NotInList({ mode }: Readonly<Pick<Props, "mode">>): ReactNode {
+  return (
+    <Text size="sm" c="warning.8">
+      {mode === "convert" ? (
+        <Trans>Not in the list, kept as is</Trans>
+      ) : (
+        <Trans>Not in the list</Trans>
+      )}
+    </Text>
+  );
 }
 
 function MeaningCell(
   props: Readonly<{
-    pair: DataDictionaryCodeList.Pair | undefined;
+    found: FoundPair | undefined;
     direction: Props["direction"];
+    mode: Props["mode"];
   }>,
 ): ReactNode {
-  const { pair } = props;
-  if (!pair) {
-    return (
-      <Text size="sm" c="warning.8">
-        <Trans>Not in the list</Trans>
-      </Text>
-    );
+  if (!props.found) {
+    return <NotInList mode={props.mode} />;
   }
+  const { pair, isAcceptedSpelling } = props.found;
   const code = pair.code;
   if (props.direction === "encode") {
-    return <Trans>code {code}</Trans>;
+    return (
+      <>
+        {props.mode === "convert" ? code : <Trans>code {code}</Trans>}
+        {isAcceptedSpelling ? (
+          <Text span size="xs" c="dimmed">
+            {" "}
+            <Trans>(accepted spelling)</Trans>
+          </Text>
+        ) : null}
+      </>
+    );
   }
   return pair.label.trim() === "" ? (
     <Text size="sm" c="dimmed" fs="italic">
-      <Trans>No label yet</Trans>
+      {props.mode === "convert" ? (
+        <Trans>No label yet, kept as is</Trans>
+      ) : (
+        <Trans>No label yet</Trans>
+      )}
     </Text>
   ) : (
     pair.label
@@ -60,7 +101,8 @@ function MeaningCell(
 
 /**
  * Each value in a column, its rows, and what the code list says it means,
- * so the user can check a match before attaching it.
+ * or, when the column converts, what it becomes. Accepted spellings are
+ * marked, and a value the list does not hold says it is kept as is.
  */
 export function ColumnValuesTable(props: Readonly<Props>): ReactNode {
   const { i18n } = useLingui();
@@ -75,7 +117,11 @@ export function ColumnValuesTable(props: Readonly<Props>): ReactNode {
             <Trans>Rows</Trans>
           </Table.Th>
           <Table.Th>
-            <Trans>Means</Trans>
+            {props.mode === "convert" ? (
+              <Trans>Becomes</Trans>
+            ) : (
+              <Trans>Means</Trans>
+            )}
           </Table.Th>
         </Table.Tr>
       </Table.Thead>
@@ -87,8 +133,9 @@ export function ColumnValuesTable(props: Readonly<Props>): ReactNode {
               <Table.Td ta="end">{i18n.number(item.rowCount)}</Table.Td>
               <Table.Td>
                 <MeaningCell
-                  pair={_findPair(item.value, props)}
+                  found={_findPair(item.value, props)}
                   direction={props.direction}
+                  mode={props.mode}
                 />
               </Table.Td>
             </Table.Tr>

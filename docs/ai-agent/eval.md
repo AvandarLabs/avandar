@@ -227,7 +227,8 @@ Runs on 2026-11-13 for dictionaries attached as reference, archived under the
 `attach-dictionaries` label. These runs used the coded-column prompt before
 it was merged with the plugin AI tools: v3 plus CODED COLUMNS, then named v4.
 It ships as `data-agent-v5`, which also carries the plugin tools' v4 TOOLS
-bullet, and has not been rerun since. The prompt lists each bound column's codes and
+bullet. The measles questions were rerun with v5 on 2026-11-13, under
+the `dictionary-conversions` label (see "Converted columns"). The prompt lists each bound column's codes and
 description on its own line under its dataset, the offline agent reads the
 code lists in its profile and question values, and `lookup_values` answers
 from a code list without running a query. The coded-column questions D01 to
@@ -282,6 +283,41 @@ under "Questions and ground truth".
   runs (3,904 against 3,478 on the 45 questions, +12%), all from the coded
   columns instructions, since the COVID datasets have no code lists. All
   online runs cost about $0.035.
+
+### Converted columns
+
+Runs on 2026-11-13 for columns converted by a dictionary, archived under the
+`dictionary-conversions` label. A converted column's code line is written
+for the labels it holds (`values Male, Female`), so `data-agent-v5` reads it
+as stored labels with no new prompt version. The measles workspace now also
+holds the line list's linked dataset, `measles-line-list-small (labeled)`,
+whose GENDER, hosp_yn, and ses_cat are converted by the app's own
+`ColumnConversion` SQL (ses_cat as the ordered `ENUM`, GENDER's unlabeled 9
+passed through as `'9'`). E01 to E03 ask about it; D01 to D04 run beside it.
+
+| Run | Correct | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|
+| dictionary-conversions:converted #1-#3 (D01-D04, E01-E03) | 7/7, 7/7, 7/7 | 0 / 0 | $0.00014 to $0.00041 | 3,957 | 1.7 to 2.0 s / 2.0 to 2.1 s |
+| dictionary-conversions:converted-offline (Qwen3 4B, D01-D04, E01-E03) | 6/7 | 1 / 0 | $0 | 836 | 8.6 s / 76.8 s |
+
+- The bar, "D01 to D04 and E01 to E03 pass on all three online runs", is
+  met: every online run scored 7/7. The offline run is recorded, not gated.
+- Every E answer, online and offline, filtered the labeled dataset on labels
+  (`"GENDER" = 'Female' AND "hosp_yn" = 'Yes'`, `"ses_cat" = 'Lower-middle'`,
+  `"ses_cat" IN ('Upper-middle', 'High')`, or offline the same with `OR`),
+  never on codes.
+- With both datasets in the prompt, the online runs answered D01 over the
+  labeled dataset on all three runs (filtering on labels, with the right
+  count), and D02 and D03 over the coded one on codes. Offline, D03 went to
+  the labeled dataset and filtered `'High'`. Every one of those counts was
+  right.
+- The offline D04 missed: instead of saying 9 has no label, it asked the
+  simulated user whether 9 means "Unknown" or "Not applicable", took
+  "Unknown", and replied that 9 means "Unknown". The `attach-dictionaries`
+  offline run passed D04 with one dataset in the prompt. No prompt changed.
+- The second dataset adds about 180 to 240 input tokens per call online
+  (3,957 against 3,721 to 3,781 on the `attach-dictionaries:coded` runs) and
+  22 offline (836 against 814). All online runs cost about $0.005.
 
 ## Offline mode
 
@@ -572,13 +608,17 @@ be stacked as stored, and it names a real difference (a near-match such as
 S02 is "Try again" in the same conversation. Any query shown to the user
 fails the question. They run only with `--questions S`.
 
-`measles/measlesQuestions.ts` holds the coded-column questions D01 to D04,
-over the 24-row measles line list in `tests/data/measles-line-list-small/`,
-with the code lists in `measles/measlesWorkspace.ts` attached as reference.
+`measles/measlesQuestions.ts` holds the coded-column questions. D01 to D04
+run over the 24-row measles line list in `tests/data/measles-line-list-small/`,
+with the code lists in `measles/measlesWorkspace.ts` attached as reference:
 D01 to D03 ask in labels and are graded by their count; D04 asks what an
 unlabeled code means and passes only when the reply says it has no label.
-They run only with `--workspace measles`, on the `pi` and `pi-local`
-harnesses.
+E01 to E03 ask in labels over the line list's linked dataset, whose GENDER,
+hosp_yn, and ses_cat hold labels, built with the app's own conversion SQL;
+they are graded by their count. They run only with `--workspace measles`, on
+the `pi` and `pi-local` harnesses. Since the converted-columns plan, D01 to
+D04 run with the linked dataset in the prompt beside the coded one, so their
+runs are not comparable with earlier runs.
 
 ### Metrics
 
@@ -653,6 +693,7 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | The mention questions (add `--label phase-1b:agent-mentions`) | `--harness pi --config haiku-sonnet --questions M` |
 | The coded-column questions (add `--label attach-dictionaries:coded`) | `--harness pi --config haiku-sonnet --workspace measles` |
 | The coded-column questions offline | `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --concurrency 1 --workspace measles` |
+| The converted-column questions (add `--label dictionary-conversions:converted`) | `--harness pi --config haiku-sonnet --workspace measles` |
 | Today's chat on the page questions it has context for | `--harness baseline --model anthropic/claude-haiku-5.5 --questions P01,P02,P05` |
 
 The PDF table assistant has its own runner,
@@ -689,7 +730,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 112 runs (every
+chat index lists all 131 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first

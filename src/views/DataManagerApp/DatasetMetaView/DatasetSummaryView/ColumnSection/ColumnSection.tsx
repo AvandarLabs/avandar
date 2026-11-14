@@ -103,7 +103,11 @@ export function ColumnSection({
             {buildFullDataTypeLabel(dataType, i18n)}
           </Text>
           {codes && codes.pairs.length > 0 ? (
-            <CodeListPopover columnName={columnName} codes={codes} />
+            <CodeListPopover
+              columnName={columnName}
+              codes={codes}
+              datasetId={datasetId}
+            />
           ) : null}
         </Group>
         {isReadyToLoad ? (

@@ -8,7 +8,9 @@
  *   everyone signed in: no INSERT, UPDATE, or DELETE (the apply RPC writes)
  *
  * A dictionary or entry that is deleted takes its reference bindings with
- * it. A code list that is deleted leaves the binding with its description.
+ * it and pins its live convert bindings. A code list that is deleted pins
+ * the live convert bindings that use it, and a save points a reference
+ * binding at its entry's only remaining list.
  */
 begin;
 
@@ -114,7 +116,7 @@ begin
 end;
 $$;
 
-select plan (16);
+select plan (17);
 
 -- 1.
 select is (
@@ -201,13 +203,14 @@ select throws_ok (
   'a binding cannot move to another workspace'
 );
 
--- A convert binding, which no apply can write yet, on a fourth column. A
--- deleted entry or dictionary must leave it in place.
+-- A live convert binding, as a linked dataset's would be, on a fourth
+-- column. A deleted code list, entry, or dictionary must pin it, not
+-- remove it.
 insert into public.dataset_columns (id, dataset_id, workspace_id, original_name, name, original_data_type, detected_data_type, data_type, column_idx)
 values ('db460004-0000-4000-8000-000000000004'::uuid, 'db450001-0000-4000-8000-000000000001'::uuid, 'db100001-0000-4000-8000-000000000001'::uuid, 'hosp_code', 'hosp_code', 'VARCHAR', 'VARCHAR', 'varchar', 2);
 
-insert into public.dataset_columns__dictionary_bindings (id, workspace_id, dataset_id, dataset_column_id, dictionary_id, entry_id, code_list_id, mode, applied_dictionary_version)
-values ('db470004-0000-4000-8000-000000000004'::uuid, 'db100001-0000-4000-8000-000000000001'::uuid, 'db450001-0000-4000-8000-000000000001'::uuid, 'db460004-0000-4000-8000-000000000004'::uuid, 'db400001-0000-4000-8000-000000000001'::uuid, 'db600002-0000-4000-8000-000000000002'::uuid, null, 'convert', 1);
+insert into public.dataset_columns__dictionary_bindings (id, workspace_id, dataset_id, dataset_column_id, dictionary_id, entry_id, code_list_id, mode, applied_dictionary_version, replaced_data_type)
+values ('db470004-0000-4000-8000-000000000004'::uuid, 'db100001-0000-4000-8000-000000000001'::uuid, 'db450001-0000-4000-8000-000000000001'::uuid, 'db460004-0000-4000-8000-000000000004'::uuid, 'db400001-0000-4000-8000-000000000001'::uuid, 'db600002-0000-4000-8000-000000000002'::uuid, 'db500002-0000-4000-8000-000000000002'::uuid, 'convert', 1, 'varchar');
 
 -- 9. A save that gives hospitalized a new code list deletes Yes/No.
 select lives_ok (
@@ -231,13 +234,24 @@ select results_eq (
     from public.dataset_columns__dictionary_bindings
     where id = 'db470003-0000-4000-8000-000000000003'::uuid
   $q$,
-  $q$ values ('db600002-0000-4000-8000-000000000002'::uuid, null::uuid) $q$,
-  'the binding keeps its entry, and its description, when its code list is deleted'
+  $q$ values ('db600002-0000-4000-8000-000000000002'::uuid, 'db500003-0000-4000-8000-000000000003'::uuid) $q$,
+  'a reference binding whose code list a save deleted follows its entry''s only remaining list'
 );
 
--- 11. A save that leaves hospitalized out deletes the entry.
+-- 11.
+select results_eq (
+  $q$
+    select code_list_id, pinned_pairs
+    from public.dataset_columns__dictionary_bindings
+    where id = 'db470004-0000-4000-8000-000000000004'::uuid
+  $q$,
+  $q$ values (null::uuid, '[{"code":"Y","label":"Yes","accepted_spellings":[],"is_missing":false}]'::jsonb) $q$,
+  'a live convert binding is pinned to its deleted code list''s pairs'
+);
+
+-- 12. A save that leaves hospitalized out deletes the entry.
 select lives_ok (
-  $t11$
+  $t12$
   set local role authenticated;
   select set_config('request.jwt.claims', '{"sub":"db000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
   select public.rpc_data_dictionaries__save (
@@ -245,41 +259,41 @@ select lives_ok (
     '[{"id":"db500001-0000-4000-8000-000000000001","name":"Sex (1/2/9)","is_ordered":false,"pairs":[{"code":"1","label":"Male","accepted_spellings":[],"is_missing":false}]}]'::jsonb,
     '[{"id":"db600001-0000-4000-8000-000000000001","name":"sex","column_names":[],"kind":"categorical","unit":null,"valid_min":null,"valid_max":null,"description":null,"position":0,"codings":[{"code_list_id":"db500001-0000-4000-8000-000000000001","is_primary":true}]}]'::jsonb
   );
-  $t11$,
+  $t12$,
   'the owner saves the dictionary without the hospitalized entry'
 );
 reset role;
 
--- 12.
+-- 13.
 select results_eq (
   'select id from public.dataset_columns__dictionary_bindings where mode = ''reference'' and workspace_id = ''db100001-0000-4000-8000-000000000001''::uuid order by id',
   $$ values ('db470001-0000-4000-8000-000000000001'::uuid), ('db470002-0000-4000-8000-000000000002'::uuid) $$,
   'a deleted entry takes its reference bindings with it'
 );
 
--- 13.
+-- 14.
 select results_eq (
   $q$
-    select dictionary_id, entry_id
+    select dictionary_id, entry_id, pinned_pairs is not null
     from public.dataset_columns__dictionary_bindings
     where id = 'db470004-0000-4000-8000-000000000004'::uuid
   $q$,
-  $q$ values ('db400001-0000-4000-8000-000000000001'::uuid, null::uuid) $q$,
-  'a deleted entry leaves a convert binding in place'
+  $q$ values ('db400001-0000-4000-8000-000000000001'::uuid, null::uuid, true) $q$,
+  'a deleted entry leaves a pinned convert binding in place'
 );
 
--- 14. The owner may delete the dictionary without editing either dataset.
+-- 15. The owner may delete the dictionary without editing either dataset.
 select lives_ok (
-  $t14$
+  $t15$
   set local role authenticated;
   select set_config('request.jwt.claims', '{"sub":"db000001-0000-4000-8000-000000000001","role":"authenticated"}', true);
   delete from public.data_dictionaries where id = 'db400001-0000-4000-8000-000000000001'::uuid;
-  $t14$,
+  $t15$,
   'the owner deletes the dictionary'
 );
 reset role;
 
--- 15.
+-- 16.
 select is (
   (
     select count(*)::int
@@ -290,15 +304,15 @@ select is (
   'a deleted dictionary takes its reference bindings with it'
 );
 
--- 16.
+-- 17.
 select results_eq (
   $q$
-    select dictionary_id, entry_id
+    select dictionary_id, entry_id, pinned_pairs is not null
     from public.dataset_columns__dictionary_bindings
     where id = 'db470004-0000-4000-8000-000000000004'::uuid
   $q$,
-  $q$ values (null::uuid, null::uuid) $q$,
-  'a deleted dictionary leaves a convert binding in place'
+  $q$ values (null::uuid, null::uuid, true) $q$,
+  'a deleted dictionary leaves a pinned convert binding in place'
 );
 
 select * from finish ();

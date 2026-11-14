@@ -11,6 +11,7 @@ import {
 import z from "zod";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   DatasetColumnId,
@@ -27,6 +28,7 @@ const DBReadSchema = z.object({
   data_type: z.enum(AvaDataType.Types),
   dataset_id: z.uuid(),
   description: z.string().nullable(),
+  dictionary_binding_id: z.uuid().nullable(),
   id: z.uuid(),
   original_name: z.string(),
   name: z.string(),
@@ -47,6 +49,9 @@ export const DatasetColumnParsers =
           ...obj,
           id: obj.id as DatasetColumnId,
           datasetId: obj.datasetId as DatasetId,
+          dictionaryBindingId: obj.dictionaryBindingId as
+            | DictionaryBinding.Id
+            | undefined,
           workspaceId: obj.workspaceId as Workspace.Id,
         });
       },

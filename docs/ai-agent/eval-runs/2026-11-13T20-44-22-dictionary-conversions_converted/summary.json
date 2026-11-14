@@ -1,0 +1,17 @@
+{
+  "label": "dictionary-conversions:converted",
+  "questionCount": 7,
+  "passCount": 7,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 7,
+  "promptTokens": 27696,
+  "cachedPromptTokens": 27668,
+  "completionTokens": 1613,
+  "totalCost": 0.00108598,
+  "costPerQuestion": 0.00015514,
+  "latencyMedianMs": 1654.4215409999997,
+  "latencyP90Ms": 2015.8060840000003,
+  "failedIds": []
+}
