@@ -22,16 +22,25 @@ export function isColorPair(value: unknown): value is ColorPair {
   );
 }
 
+/** Whether a colour role has a value to pair. An unset role has none. */
+export function canPairColorRole(value: unknown): boolean {
+  return value !== undefined && value !== null;
+}
+
 /**
  * A colour role's value with its light-ground side switched on or off.
  * Pairing starts both sides at the current value. Unpairing keeps the
- * dark-ground side. A role already in the asked shape comes back unchanged.
+ * dark-ground side, or the light-ground side when the dark one is unset. A
+ * role already in the asked shape comes back unchanged, and so does an unset
+ * role, so a pair never has an undefined side.
  */
 export function setColorPairing(value: unknown, isPaired: boolean): unknown {
   if (isColorPair(value)) {
-    return isPaired ? value : value.onDark;
+    return isPaired ? value : (value.onDark ?? value.onLight);
   }
-  return isPaired ? { onDark: value, onLight: value } : value;
+  return isPaired && canPairColorRole(value)
+    ? { onDark: value, onLight: value }
+    : value;
 }
 
 /**

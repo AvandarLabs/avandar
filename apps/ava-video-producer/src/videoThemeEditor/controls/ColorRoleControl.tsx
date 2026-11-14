@@ -10,6 +10,7 @@ import { ContrastBadge } from "./ContrastBadge";
 import css from "./controls.module.css";
 import { ReferenceControl } from "./ReferenceControl";
 import {
+  canPairColorRole,
   isColorPair,
   setColorPairing,
   type ColorPair,
@@ -68,6 +69,7 @@ export function ColorRoleControl({ row, label }: RoleProps) {
         error={hasIssue}
         {...issueAriaProps}
         checked={pair !== undefined}
+        disabled={!canPairColorRole(row.value)}
         onChange={(event) =>
           editor.setToken(
             row.path,

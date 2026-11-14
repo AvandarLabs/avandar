@@ -11,6 +11,7 @@ import {
 } from "../RowIssueContext/RowIssueContext";
 import { useOptionCopy, type OptionCopy } from "../tokenCopy/useEditorCopy";
 import css from "./controls.module.css";
+import { getEnumSelection } from "./controlValues/controlValues";
 import type { ValueControlProps } from "./valueControl.types";
 
 /** A font token: one of the registered families, marked when its glyph widths are measured. */
@@ -44,7 +45,7 @@ export function FontValueControl({
 type EnumOption = OptionCopy & Readonly<{ option: string }>;
 
 /** An enum menu whose options show their explanations under their names. */
-function _EnumMenu({
+function EnumMenu({
   label,
   value,
   options,
@@ -52,11 +53,12 @@ function _EnumMenu({
   onChange,
 }: Readonly<{
   label: string;
-  value: string;
+  value: string | undefined;
   options: readonly EnumOption[];
   hasIssue: boolean;
   onChange: (option: string) => void;
 }>) {
+  const { t } = useLingui();
   const descriptions = new Map(
     options.map((entry) => [entry.option, entry.description]),
   );
@@ -64,7 +66,8 @@ function _EnumMenu({
     <AtlasSelect
       aria-label={label}
       error={hasIssue}
-      value={value}
+      value={value ?? null}
+      placeholder={t`Not set`}
       data={options.map((entry) => ({
         value: entry.option,
         label: entry.label,
@@ -99,11 +102,15 @@ export function EnumValueControl({
     option,
     ...copy(optionKey, option),
   }));
+  const selection = getEnumSelection(
+    value,
+    options.map((entry) => entry.option),
+  );
   if (options.length > 3) {
     return (
-      <_EnumMenu
+      <EnumMenu
         label={label}
-        value={String(value)}
+        value={selection}
         options={options}
         hasIssue={hasIssue}
         onChange={onChange}
@@ -116,7 +123,7 @@ export function EnumValueControl({
       fullWidth
       aria-label={label}
       aria-invalid={hasIssue || undefined}
-      value={String(value)}
+      value={selection ?? ""}
       data={options.map((entry) => ({
         value: entry.option,
         label: entry.label,

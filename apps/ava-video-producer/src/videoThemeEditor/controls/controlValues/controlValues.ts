@@ -50,3 +50,17 @@ export function parseDashDraft(text: string): readonly number[] | undefined {
 export function formatDashPattern(pattern: readonly number[]): string {
   return pattern.join(" ");
 }
+
+/**
+ * The option an enum control shows as selected, or `undefined` when the
+ * value is unset or is not one of the options. The control then shows
+ * nothing selected rather than passing the first option off as the value.
+ */
+export function getEnumSelection(
+  value: unknown,
+  options: readonly string[],
+): string | undefined {
+  return typeof value === "string" && options.includes(value)
+    ? value
+    : undefined;
+}

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   formatDashPattern,
+  getEnumSelection,
   parseDashDraft,
   parseHexDraft,
   toNumberInRange,
@@ -48,4 +49,18 @@ test("dash text rejects negatives, words, and more than eight lengths", () => {
 test("a dash pattern formats as space-separated lengths", () => {
   assert.equal(formatDashPattern([6, 6]), "6 6");
   assert.equal(formatDashPattern([]), "");
+});
+
+test("an enum value that is one of the options is the selection", () => {
+  assert.equal(getEnumSelection("fast", ["slow", "fast"]), "fast");
+});
+
+test("an unset enum value has no selection, not the first option", () => {
+  assert.equal(getEnumSelection(undefined, ["slow", "fast"]), undefined);
+  assert.equal(getEnumSelection(null, ["slow", "fast"]), undefined);
+});
+
+test("an enum value outside the options has no selection", () => {
+  assert.equal(getEnumSelection("medium", ["slow", "fast"]), undefined);
+  assert.equal(getEnumSelection(3, ["slow", "fast"]), undefined);
 });

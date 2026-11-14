@@ -4,6 +4,7 @@ import {
   getCompositeFieldsFromValue,
   getContrastSummaryFromColors,
   getContrastSummaryFromRatio,
+  canPairColorRole,
   isColorPair,
   setColorPairing,
 } from "./roleValues";
@@ -34,6 +35,20 @@ test("pairing or unpairing a role that is already that way leaves it alone", () 
   const pair = { onDark: "$colors.gray.0", onLight: "$colors.dark.9" };
   assert.equal(setColorPairing(pair, true), pair);
   assert.equal(setColorPairing("$color.accent", false), "$color.accent");
+});
+
+test("an unset colour role is never paired into undefined sides", () => {
+  assert.equal(setColorPairing(undefined, true), undefined);
+  assert.equal(setColorPairing(null, true), null);
+  assert.equal(canPairColorRole(undefined), false);
+  assert.equal(canPairColorRole("$color.accent"), true);
+});
+
+test("unpairing falls back to the light side when the dark side is unset", () => {
+  assert.equal(
+    setColorPairing({ onDark: undefined, onLight: "$colors.dark.9" }, false),
+    "$colors.dark.9",
+  );
 });
 
 test("white on black passes AAA with its ratio rounded to one decimal", () => {

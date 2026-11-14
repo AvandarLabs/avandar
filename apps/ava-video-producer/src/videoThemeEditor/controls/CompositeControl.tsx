@@ -44,7 +44,7 @@ function CompositeField({ row, label, name, field, value }: FieldProps) {
         <EnumValueControl
           label={fieldLabel}
           definition={field}
-          value={value[name] ?? field.options?.[0]}
+          value={value[name]}
           optionKey={name}
           onChange={write}
         />
