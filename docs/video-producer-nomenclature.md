@@ -35,6 +35,9 @@ film
 | Film | A complete video made of one or more compositions in sequence | Whole | Storyboards; the Atlas **Sample films** section |
 | Helper | A shared function that computes animation values: curves, durations, masks, camera paths | Code | The Atlas **Helpers** section, `helperCatalog.yaml` |
 | Reenactment | Real Avandar UI performed programmatically, frame by frame, from fixture state | Source footage | `avandar-adapter/`, `avandar` shots, continuity `product` beats |
+| Theme | A JSON file of design tokens that sets how every motion and composition looks and moves | Whole look | `apps/ava-video-producer/themes/`; the Atlas **Design tokens** tab |
+| Design token | One named visual or animation value in a theme | Value | The token catalog in `src/videoTheme/tokenCatalog/` |
+| Override | Per-item art direction a theme applies to one Atlas id | Part of a theme | A theme's `overrides` |
 
 ## Terms
 
@@ -126,6 +129,18 @@ product UI), "Reenactment to motion" (a product result opens into a diagram),
 and "Motion over reenactment" (motion composited over product UI). The catalog
 ids (`motion-product`, `product-motion`, `composite`) and the continuity
 `product` beat kind keep their names; only the words a reader sees changed.
+
+## Design tokens
+
+A **theme** holds every value a motion or composition draws. Its values are **design tokens**, in three tiers:
+
+| Term | What it is | Example |
+| --- | --- | --- |
+| Atomic token | A literal value with no meaning of its own, in a scale | `atomic.strokeWidth.sm` is 2 px |
+| Semantic token | A reference named by meaning; holds no literal | `color.accent`, `text.graphic.caption` |
+| Component token | One themed shape's default, a reference or a deliberate one-off | `components.ProgressBar.height` |
+
+An **override** is per-item art direction inside a theme, keyed by Atlas id. It is never inherited by a theme that extends the one declaring it. Say "token" for these values; a continuity object that travels between motions is a **shared object**, never a token. See `apps/ava-video-producer/docs/video-theme.md`.
 
 ## Reserved and avoided words
 
