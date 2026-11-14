@@ -4,6 +4,7 @@ import {
   getThemeBarActions,
   getThemeBarMessage,
   getThemeLabelFromInput,
+  submitNewThemeName,
 } from "./themeBarState";
 
 const IDLE = { kind: "idle" } as const;
@@ -157,4 +158,27 @@ test("other outcomes do not offer Reload theme in the bar", () => {
     getThemeBarActions({ ...QUIET, status: IDLE }).showsReload,
     false,
   );
+});
+
+test("the name form closes only once the theme was created", async () => {
+  let closeCount = 0;
+  await submitNewThemeName({
+    label: "Night shift",
+    saveAsNew: async (label) => {
+      assert.equal(label, "Night shift");
+      return true;
+    },
+    close: () => closeCount++,
+  });
+  assert.equal(closeCount, 1);
+});
+
+test("the name form stays open, keeping the typed name, when the save fails", async () => {
+  let closeCount = 0;
+  await submitNewThemeName({
+    label: "Night shift",
+    saveAsNew: async () => false,
+    close: () => closeCount++,
+  });
+  assert.equal(closeCount, 0);
 });

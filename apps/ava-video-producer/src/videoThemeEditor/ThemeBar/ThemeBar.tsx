@@ -7,6 +7,7 @@ import {
   getThemeBarActions,
   getThemeBarMessage,
   getThemeLabelFromInput,
+  submitNewThemeName,
   type ThemeBarMessage,
 } from "./themeBarState/themeBarState";
 import type { ThemeSummary } from "../ThemeApi/ThemeApi";
@@ -203,11 +204,13 @@ export function ThemeBar(props: Props) {
       {isNaming ? (
         <SaveAsNewForm
           onCancel={closeNaming}
-          onSubmit={async (label) => {
-            if (await props.onSaveAsNew(label)) {
-              closeNaming();
-            }
-          }}
+          onSubmit={(label) =>
+            submitNewThemeName({
+              label,
+              saveAsNew: props.onSaveAsNew,
+              close: closeNaming,
+            })
+          }
         />
       ) : null}
       <p className={css.status} role="status" aria-live="polite">

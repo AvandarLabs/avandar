@@ -99,3 +99,19 @@ export function getThemeLabelFromInput(input: string): string | undefined {
   const label = input.trim();
   return label === "" ? undefined : label;
 }
+
+/**
+ * Submits a new theme's name and closes the name form only when the theme was
+ * created. A refused save leaves the form open, so the typed name is kept.
+ */
+export async function submitNewThemeName(
+  options: Readonly<{
+    label: string;
+    saveAsNew: (label: string) => Promise<boolean>;
+    close: () => void;
+  }>,
+): Promise<void> {
+  if (await options.saveAsNew(options.label)) {
+    options.close();
+  }
+}
