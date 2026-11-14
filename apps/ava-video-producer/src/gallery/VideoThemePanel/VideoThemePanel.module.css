@@ -4,6 +4,33 @@
   min-width: 0;
   padding-block: 16px 20px;
   padding-inline: 20px;
+
+  /*
+   * One focus ring for every control in the panel, matching the gallery's own
+   * focus style: 2px of --ava-primary-7. It overrides Mantine's stock blue.
+   */
+  :focus-visible {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 2px;
+  }
+
+  /* A switch and a segmented control hide their input, so the ring goes on what is drawn. */
+  :global(.mantine-Switch-input):focus-visible
+    + :global(.mantine-Switch-track) {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 2px;
+  }
+
+  :global(.mantine-SegmentedControl-input):focus-visible
+    + :global(.mantine-SegmentedControl-label) {
+    outline: 2px solid var(--ava-primary-7);
+    outline-offset: 0;
+  }
+
+  /* Text fields and selects also recolour their border, but never over an error. */
+  :global(.mantine-Input-input):focus:not([data-error]) {
+    border-color: var(--ava-primary-7);
+  }
 }
 
 @media (width <= 760px) {

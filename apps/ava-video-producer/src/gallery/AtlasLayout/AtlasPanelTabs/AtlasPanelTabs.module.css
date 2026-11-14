@@ -35,6 +35,12 @@
   padding-block: 0;
 }
 
+/* The gallery's focus ring, drawn inside the tab so the list does not clip it. */
+.tab:focus-visible {
+  outline: 2px solid var(--ava-primary-7);
+  outline-offset: -2px;
+}
+
 .panel {
   min-width: 0;
 }
