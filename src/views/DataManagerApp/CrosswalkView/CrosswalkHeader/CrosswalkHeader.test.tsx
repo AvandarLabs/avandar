@@ -110,4 +110,27 @@ describe("CrosswalkHeader", () => {
       screen.queryByRole("button", { name: "Crosswalk actions" }),
     ).toBeNull();
   });
+
+  it("offers Export mapping beside the crosswalk's other actions", () => {
+    _renderHeader(CROSSWALK);
+
+    expect(
+      screen.getByRole("button", { name: "Export mapping" }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "Crosswalk actions" }),
+    ).toBeInTheDocument();
+  });
+
+  it("offers Export mapping to an editor who cannot delete the crosswalk", () => {
+    mocks.currentUserId = OTHER_ID;
+    _renderHeader(CROSSWALK);
+
+    expect(
+      screen.getByRole("button", { name: "Export mapping" }),
+    ).toBeEnabled();
+    expect(
+      screen.queryByRole("button", { name: "Crosswalk actions" }),
+    ).toBeNull();
+  });
 });
