@@ -1,0 +1,32 @@
+.bar {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+.notice {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.form {
+  display: grid;
+  gap: 8px;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 0;
+  min-height: 1.4em;
+}
+
+.bannerText {
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0 0 8px;
+}
