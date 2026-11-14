@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildIssueAriaProps, markSliderThumbInvalid } from "./RowIssueContext";
+import {
+  createIssueAriaProps,
+  markSliderThumbInvalid,
+} from "./RowIssueContext";
 
 type StubThumb = {
   attributes: Map<string, string>;
@@ -24,12 +27,12 @@ function createStubRoot(thumb: StubThumb | null) {
   };
 }
 
-test("buildIssueAriaProps marks a row with an issue invalid", () => {
-  assert.deepEqual(buildIssueAriaProps(true), { "aria-invalid": true });
+test("createIssueAriaProps marks a row with an issue invalid", () => {
+  assert.deepEqual(createIssueAriaProps(true), { "aria-invalid": true });
 });
 
-test("buildIssueAriaProps adds nothing for a row without an issue", () => {
-  assert.deepEqual(buildIssueAriaProps(false), {});
+test("createIssueAriaProps adds nothing for a row without an issue", () => {
+  assert.deepEqual(createIssueAriaProps(false), {});
 });
 
 test("markSliderThumbInvalid sets and clears aria-invalid on the thumb", () => {
