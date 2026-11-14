@@ -3245,6 +3245,11 @@ msgstr "总和"
 msgid "Top right"
 msgstr "右上"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can update the combined dataset."
+msgstr ""
+
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "You need edit access to Data Sources to change this crosswalk."
 msgstr ""
@@ -3845,9 +3850,9 @@ msgid "is before"
 msgstr "早于"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
-msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
-"for access to it, then try again."
-msgstr ""
+#~ msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+#~ "for access to it, then try again."
+#~ msgstr ""
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -7023,6 +7028,11 @@ msgstr "密码更新失败"
 msgid "Row {0}: {1}"
 msgstr "第 {0} 行：{1}"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can create the combined dataset."
+msgstr ""
+
 #. placeholder {0}: problem.datasetCount
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
 msgid "{0, plural, one {# dataset is skipped.} other {# datasets are skipped.}}"
@@ -7178,6 +7188,11 @@ msgstr "{0}"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "X 轴标签旋转角度"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "A dataset in this crosswalk couldn't be read, so it can't be part of the "
+"combined dataset. Check that it still exists and that you can open it."
+msgstr ""
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Refreshed from the database"
@@ -13478,9 +13493,9 @@ msgid "Let's move these results to a dashboard"
 msgstr "将这些结果移至仪表板"
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
-msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
-"that it still exists and that you can open it."
-msgstr ""
+#~ msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
+#~ "that it still exists and that you can open it."
+#~ msgstr ""
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
@@ -13803,6 +13818,12 @@ msgstr "显示标记为 {keyword} 的数据集"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group deleted"
 msgstr "角色组已删除"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+"for access to it, or reload the crosswalk to go back to what was last "
+"saved."
+msgstr ""
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select sort order"

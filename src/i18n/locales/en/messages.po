@@ -3343,6 +3343,12 @@ msgstr "Sum"
 msgid "Top right"
 msgstr "Top right"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can update the combined dataset."
+msgstr "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can update the combined dataset."
+
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
 msgid "You need edit access to Data Sources to change this crosswalk."
 msgstr "You need edit access to Data Sources to change this crosswalk."
@@ -3961,10 +3967,10 @@ msgid "is before"
 msgstr "is before"
 
 #: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
-msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
-"for access to it, then try again."
-msgstr "This change involves a dataset you can't open, so nothing was saved. "
-"Ask for access to it, then try again."
+#~ msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+#~ "for access to it, then try again."
+#~ msgstr "This change involves a dataset you can't open, so nothing was saved. "
+#~ "Ask for access to it, then try again."
 
 #: src/views/WorkspaceHomeView/WorkspaceHomeView.tsx
 msgid "Use the Data Explorer to analyze your datasets, create visualizations, "
@@ -7244,6 +7250,12 @@ msgstr "Password update failed"
 msgid "Row {0}: {1}"
 msgstr "Row {0}: {1}"
 
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineStep.tsx
+msgid "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can create the combined dataset."
+msgstr "This crosswalk includes a dataset you can't open, so only someone who "
+"can open every dataset can create the combined dataset."
+
 #. placeholder {0}: problem.datasetCount
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
 msgid "{0, plural, one {# dataset is skipped.} other {# datasets are skipped.}}"
@@ -7405,6 +7417,13 @@ msgstr "{0}"
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 msgid "X axis label rotation"
 msgstr "X axis label rotation"
+
+#: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
+msgid "A dataset in this crosswalk couldn't be read, so it can't be part of the "
+"combined dataset. Check that it still exists and that you can open it."
+msgstr "A dataset in this crosswalk couldn't be read, so it can't be part of "
+"the combined dataset. Check that it still exists and that you can open "
+"it."
 
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshPostgresTableDataset/useRefreshPostgresTableDataset.ts
 msgid "Refreshed from the database"
@@ -13897,10 +13916,10 @@ msgid "Let's move these results to a dashboard"
 msgstr "Let's move these results to a dashboard"
 
 #: src/views/DataManagerApp/CrosswalkView/CombineStep/CombineProblems.tsx
-msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
-"that it still exists and that you can open it."
-msgstr "A dataset in this crosswalk couldn't be read, so it was left out. Check "
-"that it still exists and that you can open it."
+#~ msgid "A dataset in this crosswalk couldn't be read, so it was left out. Check "
+#~ "that it still exists and that you can open it."
+#~ msgstr "A dataset in this crosswalk couldn't be read, so it was left out. Check "
+#~ "that it still exists and that you can open it."
 
 #: src/components/VisualizationContainer/VizSettingsForm/PieChartForm/PieChartForm.tsx
 #: src/views/DataExplorerApp/QueryForm/QueryFiltersField/FilterValueEditor/FilterValueEditor.tsx
@@ -14234,6 +14253,14 @@ msgstr "Show datasets tagged {keyword}"
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Role group deleted"
 msgstr "Role group deleted"
+
+#: src/views/DataManagerApp/CrosswalkView/useCrosswalkErrorMessage/useCrosswalkErrorMessage.ts
+msgid "This change involves a dataset you can't open, so nothing was saved. Ask "
+"for access to it, or reload the crosswalk to go back to what was last "
+"saved."
+msgstr "This change involves a dataset you can't open, so nothing was saved. "
+"Ask for access to it, or reload the crosswalk to go back to what was "
+"last saved."
 
 #: src/views/DataExplorerApp/QueryForm/ManualQueryForm/SortFields.tsx
 msgid "Select sort order"
