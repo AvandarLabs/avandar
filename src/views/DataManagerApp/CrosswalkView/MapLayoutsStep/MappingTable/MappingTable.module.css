@@ -1,0 +1,43 @@
+/*
+ * The Filled from cell leaves a gutter at its leading edge for the
+ * connector line that joins it to the reference column.
+ */
+.filledFrom {
+  padding-inline-start: calc(
+    var(--mantine-spacing-lg) + var(--mantine-spacing-md)
+  );
+  position: relative;
+}
+
+/*
+ * Decorative: the cell's text says the same. Neutral by default; only the
+ * selected row's line takes Brand Blue.
+ */
+.connectorLine {
+  border-top: 2px solid var(--mantine-color-neutral-5);
+  inset-inline-start: var(--mantine-spacing-xs);
+  position: absolute;
+  top: 50%;
+  width: var(--mantine-spacing-lg);
+}
+
+.connectorLine[data-variant="dashed"] {
+  border-top-color: var(--mantine-color-neutral-4);
+  border-top-style: dashed;
+}
+
+.connectorLine[data-variant="none"] {
+  display: none;
+}
+
+.mappingRow {
+  cursor: pointer;
+}
+
+.mappingRow[data-selected="true"] td {
+  background-color: var(--mantine-color-primary-0);
+}
+
+.mappingRow[data-selected="true"] .connectorLine[data-variant="solid"] {
+  border-top-color: var(--mantine-color-primary-5);
+}
