@@ -3,7 +3,10 @@ import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/Queryable
 import { createRegistryForFetch } from "@/clients/qetl/QueryMediator/relationLoading/createRegistryForFetch";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
-import type { QetlRunQuery } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type {
+  QetlRunQuery,
+  RelationFetchedListener,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { DefaultRegistryOptions } from "@/clients/qetl/wrappers/createDefaultRegistry";
 
 const { createDefaultRegistryMock } = vi.hoisted(() => {
@@ -19,11 +22,13 @@ const SHEET_ID = "22222222-2222-4222-8222-222222222222" as Dataset.Id;
 /** The `runParquetQuery` the registry is built with, bound to `runQuery`. */
 function _getRunParquetQuery(
   runQuery: QetlRunQuery,
+  onRelationFetched?: RelationFetchedListener,
 ): DefaultRegistryOptions["runParquetQuery"] {
   createRegistryForFetch({
     relationSources: [],
     datasetDuckDbLease: {} as DatasetDuckDbLease,
     runQuery,
+    onRelationFetched,
   });
   const options = createDefaultRegistryMock.mock
     .calls[0]?.[0] as DefaultRegistryOptions;
@@ -65,5 +70,23 @@ describe("createRegistryForFetch runParquetQuery", () => {
     });
 
     expect(result.staleAt).toBeUndefined();
+  });
+
+  it("passes the progress callback to the nested query", async () => {
+    const onRelationFetched = vi.fn();
+    const runQuery = vi
+      .fn()
+      .mockResolvedValue(new Blob(["rows"])) as unknown as QetlRunQuery;
+
+    await _getRunParquetQuery(
+      runQuery,
+      onRelationFetched,
+    )({
+      rawSql: `SELECT * FROM "${SHEET_ID}"`,
+    });
+
+    expect(runQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ returnType: "parquet", onRelationFetched }),
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { makeBucketRecord, where } from "@avandar/utils";
+import { makeBucketRecord, prop, where } from "@avandar/utils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -18,6 +18,7 @@ import { loadColumnReplacements } from "@/lib/dataDictionaries/loadColumnReplace
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { LogicalDefinition } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type {
@@ -27,6 +28,7 @@ import type {
   NeededColumnsByDatasetId,
   QetlRunnerOptions,
   QetlRunQuery,
+  RelationFetchedListener,
   RunLeasedQueryOptions,
   RunQetlQueryOptions,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
@@ -140,6 +142,29 @@ async function _readQueryCatalog(
 }
 
 /**
+ * Tells the caller each of these datasets is in hand, leaving out
+ * `exceptIds`. A query without a callback reports nothing.
+ */
+function _reportRelationsInHand(
+  options: Readonly<{
+    datasetIds: readonly Dataset.Id[];
+    exceptIds?: readonly Dataset.Id[];
+    onRelationFetched: RelationFetchedListener | undefined;
+  }>,
+): void {
+  const { onRelationFetched } = options;
+  if (!onRelationFetched) {
+    return;
+  }
+  const exceptIds = new Set<string>(options.exceptIds ?? []);
+  options.datasetIds.forEach((datasetId) => {
+    if (!exceptIds.has(datasetId)) {
+      onRelationFetched(datasetId);
+    }
+  });
+}
+
+/**
  * Serves the relations the storage tier holds and acquires the rest from
  * their sources. An empty uncached list skips `getRelationSources`, which
  * does not short-circuit on its own.
@@ -165,6 +190,10 @@ async function _acquireRelations(
       principalKey: options.runnerOptions.principalKey,
       relationCache: options.runnerOptions.relationCache,
     });
+  _reportRelationsInHand({
+    datasetIds: cachedRelations.map(prop("datasetId")),
+    onRelationFetched: options.queryOptions.onRelationFetched,
+  });
   const relationSources =
     uncachedDatasetIds.length > 0
       ? await getRelationSources(uncachedDatasetIds)
@@ -175,6 +204,7 @@ async function _acquireRelations(
     neededByDatasetId: options.neededByDatasetId,
     relationSources,
     runQuery: options.runQuery,
+    onRelationFetched: options.queryOptions.onRelationFetched,
   });
   return { cachedRelations, fetchedRelationBytes };
 }
@@ -208,6 +238,11 @@ async function _loadQueryRelations(
     neededByDatasetId,
     catalog.columnReplacements?.projectionKeyByDatasetId,
   );
+  _reportRelationsInHand({
+    datasetIds: queryOptions.queryDependencies,
+    exceptIds: notInQueryableTier,
+    onRelationFetched: queryOptions.onRelationFetched,
+  });
   const { cachedRelations, fetchedRelationBytes } = await _acquireRelations({
     ...options,
     datasetIds: notInQueryableTier,
@@ -346,6 +381,28 @@ async function _getConceptRelationPlans(
   });
 }
 
+/** The options the leased part of one query runs with. */
+function _toLeasedQueryOptions(
+  options: Readonly<{
+    queryOptions: RunQetlQueryOptions;
+    datasetDuckDbLease: DatasetDuckDbLease;
+    queryDependencies: readonly Dataset.Id[];
+    conceptRelations: readonly ConceptRelationPlan[];
+  }>,
+): RunLeasedQueryOptions {
+  const { queryOptions } = options;
+  return {
+    datasetDuckDbLease: options.datasetDuckDbLease,
+    queryDependencies: options.queryDependencies,
+    conceptRelations: options.conceptRelations,
+    rawSql: queryOptions.rawSql,
+    returnType: queryOptions.returnType ?? "js",
+    signal: queryOptions.signal,
+    neededColumnsByDatasetId: queryOptions.neededColumnsByDatasetId,
+    onRelationFetched: queryOptions.onRelationFetched,
+  };
+}
+
 async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
   options: Readonly<{
     runnerOptions: QetlRunnerOptions;
@@ -377,16 +434,12 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
       return _runLeasedQuery<RowObject>({
         runnerOptions: options.runnerOptions,
         runQuery: options.runQuery,
-        queryOptions: {
+        queryOptions: _toLeasedQueryOptions({
+          queryOptions: options.queryOptions,
           datasetDuckDbLease,
           queryDependencies,
           conceptRelations,
-          rawSql: options.queryOptions.rawSql,
-          returnType: options.queryOptions.returnType ?? "js",
-          signal: options.queryOptions.signal,
-          neededColumnsByDatasetId:
-            options.queryOptions.neededColumnsByDatasetId,
-        },
+        }),
       });
     },
   });

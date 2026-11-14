@@ -192,6 +192,15 @@ export type DatasetsBySourceType = Record<Dataset.T["sourceType"], Dataset.T[]>;
 /** Datasets keyed by their ID. */
 export type DatasetsById = Record<Dataset.Id, Dataset.T | undefined>;
 
+/**
+ * Called once for each dataset a query loads, as soon as its relation is
+ * in hand: at once for one DuckDB already serves, after the storage tier's
+ * bytes are read, or after its source returns them. A virtual dataset's
+ * nested query reports its own datasets through the same callback. Lets a
+ * caller show progress across a query that reads many datasets.
+ */
+export type RelationFetchedListener = (datasetId: Dataset.Id) => void;
+
 /** Options for one Qetl query. */
 export type RunQetlQueryOptions = {
   rawSql: string;
@@ -220,6 +229,8 @@ export type RunQetlQueryOptions = {
    * data to the concept planner, never into the SQL.
    */
   conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+  /** Reports each dataset as its relation is in hand. */
+  onRelationFetched?: RelationFetchedListener;
 };
 
 /** The overloaded `runQuery` a Qetl client exposes. */
@@ -243,4 +254,6 @@ export type RunLeasedQueryOptions = {
   signal?: AbortSignal;
   /** The caller's stated column sets, overriding inference per dataset. */
   neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+  /** The caller's progress callback, passed down to relation loading. */
+  onRelationFetched?: RelationFetchedListener;
 };

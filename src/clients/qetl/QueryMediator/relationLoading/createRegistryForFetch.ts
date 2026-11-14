@@ -8,6 +8,7 @@ import type { RelationCsvReader } from "$/models/relations/SourceWrapper/SourceW
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type {
   QetlRunQuery,
+  RelationFetchedListener,
   RelationSource,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
@@ -86,6 +87,7 @@ export function createRegistryForFetch(
     relationSources: readonly RelationSource[];
     datasetDuckDbLease: DatasetDuckDbLease;
     runQuery: QetlRunQuery;
+    onRelationFetched?: RelationFetchedListener;
   }>,
 ): RelationRegistry {
   const lookups = _lookupsForFetch(options.relationSources);
@@ -111,6 +113,9 @@ export function createRegistryForFetch(
         rawSql,
         returnType: "parquet",
         datasetDuckDbLease: options.datasetDuckDbLease,
+        // The nested query's datasets are part of the outer query's work,
+        // so they report through the same callback.
+        onRelationFetched: options.onRelationFetched,
       });
       return { parquetBlob, staleAt: _getDependencyStaleAt(rawSql) };
     },

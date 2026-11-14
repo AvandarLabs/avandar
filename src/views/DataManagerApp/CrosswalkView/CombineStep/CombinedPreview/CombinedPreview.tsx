@@ -5,15 +5,16 @@ import { Center, Loader, Stack, Table, Text } from "@mantine/core";
 import { useId } from "react";
 import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppViewSection";
 import css from "@/views/DataManagerApp/CrosswalkView/CombineStep/CombinedPreview/CombinedPreview.module.css";
-import type { TaggedRead } from "@/views/DataManagerApp/ApplyDictionariesView/useTaggedRead";
+import { CombiningProgress } from "@/views/DataManagerApp/CrosswalkView/CombineStep/CombiningProgress/CombiningProgress";
 import type {
-  CombinedPreviewResult,
+  CombinedPreviewRead,
   CombinedPreviewRow,
 } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombinedPreview/useCombinedPreview";
+import type { CombiningProgressCount } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombiningProgress/useCombiningProgress";
 import type { ReactNode } from "react";
 
 type Props = {
-  preview: TaggedRead<CombinedPreviewResult>;
+  preview: CombinedPreviewRead;
   columnNames: readonly string[];
   /** How many datasets the combined dataset stacks. */
   datasetCount: number;
@@ -91,7 +92,11 @@ function PreviewTable(
 
 function ReadingPreview({
   datasetCount,
-}: Readonly<{ datasetCount: number }>): ReactNode {
+  progress,
+}: Readonly<{
+  datasetCount: number;
+  progress: CombiningProgressCount;
+}>): ReactNode {
   const message = plural(datasetCount, {
     one: "Reading # dataset on this device. The first time can take a few minutes.",
     other:
@@ -99,8 +104,12 @@ function ReadingPreview({
   });
   return (
     <Center py="lg" role="status">
-      <Stack align="center" gap="sm">
+      <Stack align="center" gap="sm" w="100%">
         <Loader size="sm" />
+        <CombiningProgress
+          readCount={progress.readCount}
+          totalCount={progress.totalCount}
+        />
         <Text size="sm" c="dimmed">
           {message}
         </Text>
@@ -145,7 +154,10 @@ export function CombinedPreview(props: Readonly<Props>): ReactNode {
       meta={usePreviewMeta(props)}
     >
       {preview.status === "reading" ? (
-        <ReadingPreview datasetCount={props.datasetCount} />
+        <ReadingPreview
+          datasetCount={props.datasetCount}
+          progress={preview.progress}
+        />
       ) : null}
       {preview.status === "failed" ? (
         <Callout

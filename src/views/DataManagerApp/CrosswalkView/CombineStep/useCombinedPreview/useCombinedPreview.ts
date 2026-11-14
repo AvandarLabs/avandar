@@ -2,7 +2,11 @@ import { quoteSqlIdentifier } from "@avandar/utils/sql";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useTaggedRead } from "@/views/DataManagerApp/ApplyDictionariesView/useTaggedRead";
+import { useCombiningProgress } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombiningProgress/useCombiningProgress";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { TaggedRead } from "@/views/DataManagerApp/ApplyDictionariesView/useTaggedRead";
+import type { CombiningProgressCount } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombiningProgress/useCombiningProgress";
 
 /** How many stacked rows the preview shows. */
 export const COMBINED_PREVIEW_ROW_COUNT = 20;
@@ -14,6 +18,11 @@ export type CombinedPreviewRow = Readonly<Record<string, string | undefined>>;
 export type CombinedPreviewResult = {
   rows: CombinedPreviewRow[];
   rowCount: number;
+};
+
+/** The preview's read, and how many of the stacked datasets are read so far. */
+export type CombinedPreviewRead = TaggedRead<CombinedPreviewResult> & {
+  progress: CombiningProgressCount;
 };
 
 /**
@@ -50,43 +59,74 @@ function _toPreviewRow(
 }
 
 /**
+ * Runs the preview's two queries, the first rows and then the row count,
+ * reporting each dataset as relation loading has it in hand.
+ */
+async function _readCombinedPreview(
+  options: Readonly<{
+    workspaceId: Workspace.Id;
+    sql: string;
+    columnNames: readonly string[];
+    onRelationFetched: (datasetId: Dataset.Id) => void;
+  }>,
+): Promise<CombinedPreviewResult> {
+  const { workspaceId, columnNames, onRelationFetched } = options;
+  const { rowsSql, countSql } = buildCombinedPreviewSql(options);
+  const rows = await WorkspaceQuerySession.runQuery<Record<string, unknown>>({
+    workspaceId,
+    rawSql: rowsSql,
+    onRelationFetched,
+  });
+  const count = await WorkspaceQuerySession.runQuery<{ rows: unknown }>({
+    workspaceId,
+    rawSql: countSql,
+    onRelationFetched,
+  });
+  return {
+    rows: rows.data.map((row) => {
+      return _toPreviewRow(row, columnNames);
+    }),
+    rowCount: Number(count.data[0]?.rows ?? 0),
+  };
+}
+
+/**
  * Reads the combined dataset's preview on this device: the first rows,
  * then the row count. The first read loads every source dataset, so it can
- * take minutes. Keyed by the SQL and its columns, so a settings change
- * reads again and a late reply is dropped. Nothing is read without SQL.
+ * take minutes. `progress` counts the stacked datasets in hand meanwhile,
+ * from none for each new read. Keyed by the SQL and its columns, so a
+ * settings change reads again and a late reply is dropped. Nothing is read
+ * without SQL.
  */
 export function useCombinedPreview(
   options: Readonly<{
     sql: string | undefined;
     columnNames: readonly string[];
+    /** The datasets the SQL stacks, which the progress counts. */
+    datasetIds: readonly Dataset.Id[];
   }>,
-): TaggedRead<CombinedPreviewResult> {
+): CombinedPreviewRead {
   const workspace = useCurrentWorkspace();
   const { sql, columnNames } = options;
-  return useTaggedRead({
+  const progress = useCombiningProgress(options.datasetIds);
+  const read = useTaggedRead({
     key: sql === undefined ? undefined : JSON.stringify([sql, columnNames]),
     devMsg: "Reading the combined dataset preview failed",
-    read: async () => {
-      const { rowsSql, countSql } = buildCombinedPreviewSql({
+    read: () => {
+      progress.reset();
+      return _readCombinedPreview({
+        workspaceId: workspace.id,
         sql: sql ?? "",
         columnNames,
+        onRelationFetched: progress.onRelationFetched,
       });
-      const rows = await WorkspaceQuerySession.runQuery<
-        Record<string, unknown>
-      >({
-        workspaceId: workspace.id,
-        rawSql: rowsSql,
-      });
-      const count = await WorkspaceQuerySession.runQuery<{ rows: unknown }>({
-        workspaceId: workspace.id,
-        rawSql: countSql,
-      });
-      return {
-        rows: rows.data.map((row) => {
-          return _toPreviewRow(row, columnNames);
-        }),
-        rowCount: Number(count.data[0]?.rows ?? 0),
-      };
     },
   });
+  return {
+    ...read,
+    progress: {
+      readCount: progress.readCount,
+      totalCount: progress.totalCount,
+    },
+  };
 }

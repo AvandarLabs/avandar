@@ -210,3 +210,48 @@ describe("virtual dataset definitions", () => {
     });
   });
 });
+
+describe("RelationLoading.fetchRelationBytes progress", () => {
+  const SECOND_ID = "aaaaaaaa-3333-4333-8333-aaaaaaaaaaaa" as Dataset.Id;
+
+  function _csvSource(id: Dataset.Id): RelationSource {
+    return {
+      sourceType: "csv_file",
+      dataset: { id, workspaceId: "workspace-1", name: id },
+      sourceDataset: { datasetId: id },
+    } as unknown as RelationSource;
+  }
+
+  it("reports each dataset once its bytes arrive, in fetch order", async () => {
+    const order: string[] = [];
+    getWrapperForRefMock.mockReturnValue({
+      acquire: async (request: { ref: { id: string } }) => {
+        order.push(`acquire ${request.ref.id}`);
+        return {
+          ref: request.ref,
+          parquetBlob: new Blob(["rows"]),
+          sourceVersion: undefined,
+          maxAgeMs: undefined,
+        };
+      },
+    });
+
+    await RelationLoading.fetchRelationBytes({
+      datasetDuckDbLease: {} as DatasetDuckDbLease,
+      growFromColumnsByDatasetId: {},
+      neededByDatasetId: {},
+      relationSources: [_csvSource(DATASET_ID), _csvSource(SECOND_ID)],
+      runQuery: vi.fn() as unknown as QetlRunQuery,
+      onRelationFetched: (datasetId) => {
+        order.push(`fetched ${datasetId}`);
+      },
+    });
+
+    expect(order).toEqual([
+      `acquire ${DATASET_ID}`,
+      `fetched ${DATASET_ID}`,
+      `acquire ${SECOND_ID}`,
+      `fetched ${SECOND_ID}`,
+    ]);
+  });
+});

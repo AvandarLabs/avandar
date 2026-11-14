@@ -21,6 +21,7 @@ import type { CrosswalkFlow } from "@/views/DataManagerApp/CrosswalkView/useCros
 import type { ReactNode } from "react";
 
 const NO_COLUMN_NAMES: readonly string[] = [];
+const NO_DATASET_IDS: readonly Dataset.Id[] = [];
 
 /** The crosswalk's existing combined dataset, as far as it has been read. */
 type ExistingDataset = {
@@ -155,7 +156,11 @@ function CombineBody(props: Readonly<BodyProps>): ReactNode {
       }) ?? NO_COLUMN_NAMES
     );
   }, [ready]);
-  const preview = useCombinedPreview({ sql: ready?.sql, columnNames });
+  const preview = useCombinedPreview({
+    sql: ready?.sql,
+    columnNames,
+    datasetIds: ready?.includedDatasetIds ?? NO_DATASET_IDS,
+  });
   return (
     <AppViewBody>
       <Stack gap="xl">

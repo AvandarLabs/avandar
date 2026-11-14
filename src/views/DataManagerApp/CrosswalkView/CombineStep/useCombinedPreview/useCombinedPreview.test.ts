@@ -4,6 +4,7 @@ import {
   buildCombinedPreviewSql,
   useCombinedPreview,
 } from "@/views/DataManagerApp/CrosswalkView/CombineStep/useCombinedPreview/useCombinedPreview";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const { runQueryMock } = vi.hoisted(() => {
   return { runQueryMock: vi.fn() };
@@ -20,6 +21,8 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
+const KINGS = "d0000000-0000-4000-8000-000000000001" as Dataset.Id;
+const QUEENS = "d0000000-0000-4000-8000-000000000002" as Dataset.Id;
 const SQL = `SELECT 'a' AS "source_dataset", 1 AS "case_id"`;
 
 describe("buildCombinedPreviewSql", () => {
@@ -51,6 +54,7 @@ describe("useCombinedPreview", () => {
       return useCombinedPreview({
         sql: SQL,
         columnNames: ["source_dataset", "case_id"],
+        datasetIds: [],
       });
     });
 
@@ -61,6 +65,7 @@ describe("useCombinedPreview", () => {
           rows: [{ source_dataset: "Kings", case_id: undefined }],
           rowCount: 40,
         },
+        progress: { readCount: 0, totalCount: 0 },
       });
     });
     expect(runQueryMock).toHaveBeenCalledTimes(2);
@@ -68,10 +73,43 @@ describe("useCombinedPreview", () => {
 
   it("reads nothing while there is no SQL", () => {
     const { result } = renderHook(() => {
-      return useCombinedPreview({ sql: undefined, columnNames: [] });
+      return useCombinedPreview({
+        sql: undefined,
+        columnNames: [],
+        datasetIds: [],
+      });
     });
 
-    expect(result.current).toEqual({ status: "reading" });
+    expect(result.current).toEqual({
+      status: "reading",
+      progress: { readCount: 0, totalCount: 0 },
+    });
     expect(runQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("counts the stacked datasets each query reports while it reads", async () => {
+    runQueryMock.mockImplementation(
+      (params: { onRelationFetched?: (datasetId: Dataset.Id) => void }) => {
+        params.onRelationFetched?.(KINGS);
+        // Still reading Queens: the query never settles in this test.
+        return new Promise(() => {});
+      },
+    );
+
+    const { result } = renderHook(() => {
+      return useCombinedPreview({
+        sql: "SELECT 1",
+        columnNames: ["case_id"],
+        datasetIds: [KINGS, QUEENS],
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.progress).toEqual({ readCount: 1, totalCount: 2 });
+    });
+    expect(result.current.status).toBe("reading");
+    expect(runQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ onRelationFetched: expect.any(Function) }),
+    );
   });
 });
