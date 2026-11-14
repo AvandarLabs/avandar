@@ -12,7 +12,7 @@
 
 **Scope:** Slice 5: the crosswalk schema and RLS, layouts and their signatures, the three steps (Choose datasets, Map each dataset, Create combined dataset), mapping fills and conversions, compilation, the combined dataset, **Export mapping**, the stale banner, the Crosswalks list group and **New crosswalk**, Used by's **Crosswalk** rows, AI meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the measurement open decision 4 asks for. Out: side-by-side joins, write-back to live sources, "Add from datasets into an existing dictionary", and everything else in spec section 17.
 
-**Delivery:** two parts, each a mergeable PR (recommended owner decision 1). **Part A** (Tasks 0 to 28, feature F136) ships the schema, the engine, every surface in spec section 7.6, export, the stale banner, and Used by. **Part B** (Tasks 29 to 33, feature F137) is frontend only: meaning suggestions, the long layout list, combining progress, and the 100-dataset measurement. Part A's migration carries everything Part B needs.
+**Delivery:** two parts, each a mergeable PR (owner decision 1). **Part A** (Tasks 0 to 28, feature F136) ships the schema, the engine, every surface in spec section 7.6, export, the stale banner, and Used by. **Part B** (Tasks 29 to 33, feature F137) is frontend only: meaning suggestions, the long layout list, combining progress, and the 100-dataset measurement. Part A's migration carries everything Part B needs.
 
 **Builds on:** slice 1 ([plan](data-dictionaries-1-dictionaries-plan.md), F129) for the dictionary tables and their RLS conventions; slice 2 ([plan](data-dictionaries-2-inference-plan.md), F130) for `profileDatasetColumns`, `ColumnProfile` (the scorer and name helpers), `DictionarySuggestions`, `PickDatasetsTable`, `NewDictionaryFooter`, and `useListPaneToggle`; slice 3 ([plan](data-dictionaries-3-attach-plan.md), F131) and F132 for bindings, `DictionaryMatch`, `ColumnCodes`, the code-list popover, the rail group, and Used by; slice 4 ([plan](data-dictionaries-4-conversions-plan.md), F133, F134) for `ColumnConversion`, the `ava_raw_<datasetId>` view, linked datasets, the virtual dataset definition token, and `clearCachedDatasetRows`.
 
@@ -37533,7 +37533,7 @@ These override the spec where they differ.
 
 ## Owner decisions on the open questions
 
-Recommended by this plan, awaiting Juan Pablo's approval as a set. The tasks build the recommendations; a different answer changes the tasks named in the last column.
+Juan Pablo approved every recommendation on 2026-11-14. The tasks build these decisions.
 
 | # | Question | Recommendation | Where it lands |
 | --- | --- | --- | --- |

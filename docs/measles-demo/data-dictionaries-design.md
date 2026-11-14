@@ -1023,7 +1023,7 @@ Each slice is one PR into `demo/measles`, recorded in
    as two PRs: the schema, the engine, every crosswalk surface, export, the
    stale banner, and Used by first; then meaning suggestions, long layout
    lists, combining progress, and the 100-dataset measurement, frontend only.
-   Its owner decisions await approval.
+   Its owner decisions were approved on 2026-11-14.
 
 ## 17. Roadmap
 
