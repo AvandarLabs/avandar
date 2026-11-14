@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getCompositeFieldsFromValue,
   getContrastSummaryFromColors,
+  getContrastSummaryFromRatio,
   isColorPair,
   setColorPairing,
 } from "./roleValues";
@@ -60,4 +61,26 @@ test("a composite's fields are its authored object, or none for anything else", 
   assert.deepEqual(getCompositeFieldsFromValue(undefined), {});
   assert.deepEqual(getCompositeFieldsFromValue("$text.stage.title"), {});
   assert.deepEqual(getCompositeFieldsFromValue(["a"]), {});
+});
+
+test("body text at exactly 4.5 and 7 reaches AA and AAA", () => {
+  assert.deepEqual(getContrastSummaryFromRatio(4.5, false), {
+    level: "AA",
+    ratio: "4.5",
+  });
+  assert.deepEqual(getContrastSummaryFromRatio(7, false), {
+    level: "AAA",
+    ratio: "7.0",
+  });
+});
+
+test("a ratio just under a threshold never shows the threshold itself", () => {
+  assert.deepEqual(getContrastSummaryFromRatio(4.497, false), {
+    level: "fail",
+    ratio: "4.4",
+  });
+  assert.deepEqual(getContrastSummaryFromRatio(6.999, false), {
+    level: "AA",
+    ratio: "6.9",
+  });
 });

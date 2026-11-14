@@ -35,6 +35,21 @@ export function setColorPairing(value: unknown, isPaired: boolean): unknown {
 }
 
 /**
+ * A contrast ratio's WCAG level and its ratio floored to one decimal, so the
+ * number shown never reaches a threshold the level did not. For example,
+ * 4.497 shows `4.4` and fails, rather than `4.5`.
+ */
+export function getContrastSummaryFromRatio(
+  ratio: number,
+  isLargeText: boolean,
+): ContrastSummary {
+  return {
+    level: getWcagLevelFromContrast(ratio, isLargeText),
+    ratio: (Math.floor(ratio * 10) / 10).toFixed(1),
+  };
+}
+
+/**
  * The contrast of a text colour against a ground, for a contrast badge.
  * Pass the type style when one is known, so large text gets the lower bar.
  */
@@ -43,12 +58,10 @@ export function getContrastSummaryFromColors(
   ground: string,
   style?: Pick<ResolvedTypeStyle, "fontSize" | "fontWeight">,
 ): ContrastSummary {
-  const ratio = getContrastRatioFromColors(color, ground);
-  const level = getWcagLevelFromContrast(
-    ratio,
+  return getContrastSummaryFromRatio(
+    getContrastRatioFromColors(color, ground),
     style ? isLargeTypeStyle(style) : false,
   );
-  return { level, ratio: ratio.toFixed(1) };
 }
 
 /** A composite token's authored fields, or none when it holds a reference or nothing. */

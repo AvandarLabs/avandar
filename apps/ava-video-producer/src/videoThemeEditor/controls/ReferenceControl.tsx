@@ -121,6 +121,7 @@ function CustomValue(props: CustomValueProps) {
         className={css.customToggle}
         size="compact-xs"
         variant="subtle"
+        aria-label={t`Custom value for ${name}`}
         aria-expanded={isOpen}
         onClick={() => setOpen(!isOpen)}
       >
