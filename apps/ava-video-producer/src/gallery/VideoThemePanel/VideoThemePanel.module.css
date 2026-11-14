@@ -27,6 +27,21 @@
     outline-offset: 0;
   }
 
+  /*
+   * Labels use the ink colour. Mantine paints these in pure black or its stock
+   * gray.7, and DESIGN.md allows neither, so the panel states its own.
+   */
+  :global(.mantine-Button-root[data-variant="default"]),
+  :global(.mantine-SegmentedControl-label),
+  :global(.mantine-Accordion-label) {
+    color: var(--ink);
+  }
+
+  /* A disabled button's label is the neutral ramp, not stock gray.5. */
+  :global(.mantine-Button-root:disabled) {
+    color: var(--ava-neutral-4);
+  }
+
   /* Text fields and selects also recolour their border, but never over an error. */
   :global(.mantine-Input-input):focus:not([data-error]) {
     border-color: var(--ava-primary-7);
