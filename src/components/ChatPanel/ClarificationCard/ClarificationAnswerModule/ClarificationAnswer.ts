@@ -1,11 +1,9 @@
 import { match } from "ts-pattern";
+import { clarificationAnswerToLine } from "$/utils/chat/clarificationAnswerFormat";
 import type { ChatClarifyResponseShape } from "$/types/chat.types";
+import type { ClarificationSubmitAnswer } from "$/utils/chat/clarificationAnswerFormat";
 
-/** Answer submitted through the clarification card. */
-export type ClarificationSubmitAnswer =
-  | { kind: "none_of_above" }
-  | { kind: "preset"; value: string | string[] }
-  | { kind: "custom"; text: string };
+export type { ClarificationSubmitAnswer };
 
 /** Handles a clarification answer and reports whether it was accepted. */
 export type ClarificationAnswerHandler = (
@@ -14,21 +12,6 @@ export type ClarificationAnswerHandler = (
     isInternalDiscovery?: boolean;
   }>,
 ) => boolean | void | Promise<boolean | void>;
-
-function _formatForThread(answer: Readonly<ClarificationSubmitAnswer>): string {
-  return match(answer)
-    .with({ kind: "none_of_above" }, () => {
-      return "[Clarification answer: (none of the listed options)]";
-    })
-    .with({ kind: "custom" }, ({ text }) => {
-      return `[Clarification answer: (custom answer: ${text.trim()})]`;
-    })
-    .with({ kind: "preset" }, ({ value }) => {
-      const rendered = Array.isArray(value) ? value.join(", ") : value;
-      return `[Clarification answer: ${rendered}]`;
-    })
-    .exhaustive();
-}
 
 function _needsCrossBoundary(
   parameters: Readonly<{
@@ -56,6 +39,6 @@ export const ClarificationAnswer = {
   noneOfAbove: "__none_of_above__" as const,
   /** Sentinel for submitting an answer outside the offered options. */
   somethingElse: "__something_else__" as const,
-  formatForThread: _formatForThread,
+  formatForThread: clarificationAnswerToLine,
   needsCrossBoundary: _needsCrossBoundary,
 };
