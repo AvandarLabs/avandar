@@ -14,6 +14,29 @@
   margin: 0;
 }
 
+/*
+ * The theme's own actions stay together, and Copy JSON sits at the end
+ * of the row. When the row is too narrow it drops to a row of its own at the
+ * end, instead of splitting the actions.
+ */
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actionGroup {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.copyJson {
+  margin-inline-start: auto;
+}
+
 .form {
   display: grid;
   gap: 8px;

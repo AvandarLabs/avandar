@@ -33,3 +33,34 @@
   height: 44px;
   width: 44px;
 }
+
+/*
+ * On a phone the title may take up to three lines, with the subtitle under it,
+ * instead of cutting a long title to a few letters. The full title is also
+ * the heading's tooltip.
+ */
+@media (width <= 760px) {
+  .header:global(.dialog-header) {
+    height: auto;
+    min-height: 64px;
+    padding-block: 8px;
+  }
+
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+    overflow: visible;
+  }
+
+  .heading h2 {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    line-height: 1.2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}

@@ -128,52 +128,59 @@ function ThemeActions(
   const { t } = useLingui();
   const actions = getThemeBarActions(props);
   return (
-    <Group gap="xs">
-      {actions.showsSave ? (
+    <div className={css.actions}>
+      <div className={css.actionGroup}>
+        {actions.showsSave ? (
+          <Button
+            size="compact-xs"
+            disabled={!actions.canSave}
+            onClick={props.onSave}
+          >
+            {t`Save`}
+          </Button>
+        ) : null}
         <Button
-          size="compact-xs"
-          disabled={!actions.canSave}
-          onClick={props.onSave}
-        >
-          {t`Save`}
-        </Button>
-      ) : null}
-      <Button
-        ref={props.saveAsNewRef}
-        size="compact-xs"
-        variant="default"
-        disabled={!actions.canSaveAsNew}
-        onClick={props.onStartNaming}
-      >
-        {t`Save as new theme`}
-      </Button>
-      <Button
-        size="compact-xs"
-        variant="subtle"
-        disabled={!actions.canDiscard}
-        onClick={props.onDiscard}
-      >
-        {t`Discard`}
-      </Button>
-      {actions.showsReload ? (
-        <Button
+          ref={props.saveAsNewRef}
           size="compact-xs"
           variant="default"
-          onClick={props.onReloadTheme}
+          disabled={!actions.canSaveAsNew}
+          onClick={props.onStartNaming}
         >
-          {t`Reload from file`}
+          {t`Save as new theme`}
         </Button>
-      ) : null}
-      <Button size="compact-xs" variant="subtle" onClick={props.onCopyJson}>
-        {t`Copy theme JSON`}
+        <Button
+          size="compact-xs"
+          variant="subtle"
+          disabled={!actions.canDiscard}
+          onClick={props.onDiscard}
+        >
+          {t`Discard`}
+        </Button>
+        {actions.showsReload ? (
+          <Button
+            size="compact-xs"
+            variant="default"
+            onClick={props.onReloadTheme}
+          >
+            {t`Reload from file`}
+          </Button>
+        ) : null}
+      </div>
+      <Button
+        className={css.copyJson}
+        size="compact-xs"
+        variant="subtle"
+        onClick={props.onCopyJson}
+      >
+        {t`Copy JSON`}
       </Button>
-    </Group>
+    </div>
   );
 }
 
 /**
  * The theme picker and theme actions above the editor: Save (custom themes
- * only), Save as new theme, Discard, and Copy theme JSON (plus Reload from file after a save conflict), with an unsaved
+ * only), Save as new theme, Discard, and Copy JSON (plus Reload from file after a save conflict), with an unsaved
  * indicator, a polite status line that also says why saving is unavailable,
  * and, for a built-in theme, a notice that its changes are saved as a new
  * theme. The new theme's name form stays open, with the typed name, until
