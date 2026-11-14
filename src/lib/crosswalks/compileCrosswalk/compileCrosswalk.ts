@@ -2,6 +2,7 @@ import { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import { CrosswalkMapping } from "$/models/crosswalks/CrosswalkMapping/CrosswalkMapping";
 import { CrosswalkSql } from "$/models/crosswalks/CrosswalkSql/CrosswalkSql";
+import { buildCodeListLookups } from "@/lib/crosswalks/buildCodeListLookups/buildCodeListLookups";
 import { validateCombineExpression } from "@/lib/crosswalks/validateCombineExpression/validateCombineExpression";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";
 import type { DataDictionaryCodeList } from "$/models/dataDictionaries/DataDictionaryCodeList/DataDictionaryCodeList";
@@ -62,10 +63,7 @@ type CompileOptions = Readonly<{
   entriesById: ReadonlyMap<string, DictionaryMatch.Entry>;
 }>;
 
-type CodeListsById = ReadonlyMap<
-  string,
-  { pairs: readonly DataDictionaryCodeList.Pair[] }
->;
+type CodeListsById = CrosswalkSql.CodeLists["codeListsById"];
 
 /** One layout's part of the compile: what it adds, and what it reports. */
 type LayoutPart = {
@@ -73,18 +71,6 @@ type LayoutPart = {
   problems: CrosswalkProblem[];
   unconfirmedCount: number;
 };
-
-function _getCodeListsById(
-  entriesById: CompileOptions["entriesById"],
-): CodeListsById {
-  return new Map(
-    [...entriesById.values()].flatMap((entry) => {
-      return entry.codeLists.map((codeList) => {
-        return [codeList.id as string, { pairs: codeList.pairs }] as const;
-      });
-    }),
-  );
-}
 
 type DraftFills = ReadonlyArray<readonly [string, CrosswalkMapping.Fill]>;
 
@@ -327,19 +313,6 @@ function _getBindings(
   });
 }
 
-function _getPrimaryCodeListIdByEntryId(
-  entriesById: CompileOptions["entriesById"],
-): Map<string, string> {
-  return new Map(
-    [...entriesById.values()].flatMap((entry) => {
-      const primaryList = entry.codeLists[0];
-      return primaryList
-        ? [[entry.entryId as string, primaryList.id as string] as const]
-        : [];
-    }),
-  );
-}
-
 function _countProblems(
   draft: CrosswalkDraftT,
   parts: readonly LayoutPart[],
@@ -367,7 +340,7 @@ function _countProblems(
 function _compileSql(
   options: CompileOptions,
   sqlLayouts: readonly CrosswalkSql.Layout[],
-  codeListsById: CodeListsById,
+  codeLists: CrosswalkSql.CodeLists,
 ): CrosswalkSql.Output | undefined {
   try {
     return CrosswalkSql.compile({
@@ -377,10 +350,7 @@ function _compileSql(
         : undefined,
       columns: options.draft.columns,
       layouts: sqlLayouts,
-      codeListsById,
-      primaryCodeListIdByEntryId: _getPrimaryCodeListIdByEntryId(
-        options.entriesById,
-      ),
+      ...codeLists,
     });
   } catch (error) {
     if (
@@ -447,9 +417,12 @@ function _getCompiledCodeLists(
 export function compileCrosswalk(
   options: CompileOptions,
 ): CompileCrosswalkResult {
-  const codeListsById = _getCodeListsById(options.entriesById);
-  const { sqlLayouts, problems } = _compileLayouts(options, codeListsById);
-  const output = _compileSql(options, sqlLayouts, codeListsById);
+  const codeLists = buildCodeListLookups(options.entriesById);
+  const { sqlLayouts, problems } = _compileLayouts(
+    options,
+    codeLists.codeListsById,
+  );
+  const output = _compileSql(options, sqlLayouts, codeLists);
   if (output === undefined) {
     return {
       status: "blocked",
@@ -470,7 +443,7 @@ export function compileCrosswalk(
     bindings: _getBindings(options.draft, options.entriesById),
     compiledCodeLists: _getCompiledCodeLists(
       output.usedCodeListIds,
-      codeListsById,
+      codeLists.codeListsById,
     ),
     includedDatasetIds: sqlLayouts.flatMap((layout) => {
       return layout.datasets.map((dataset) => {
